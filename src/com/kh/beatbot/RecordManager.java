@@ -2,7 +2,6 @@ package com.kh.beatbot;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -20,7 +19,10 @@ public class RecordManager {
 	private static final int RECORDER_SAMPLERATE = 44100;
 	private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
 	private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
-
+	private final int CHANNELS = 2;
+	private final long BYTE_RATE = RECORDER_BPP * RECORDER_SAMPLERATE * CHANNELS / 8;
+	private final long LONG_SAMPLE_RATE = RECORDER_SAMPLERATE;
+	
 	private static RecordManager singletonInstance = null;
 
 	// Midi Manager to manage MIDI events
@@ -35,8 +37,8 @@ public class RecordManager {
 
 	// The amp at which recording starts/stops (like thermostat temp)
 	private int onThreshold = 6000;
-	private int offThreshold = 4000;	
-	
+	private int offThreshold = 4000;
+
 	private short currAmp = 0;
 
 	public enum State {
@@ -60,7 +62,6 @@ public class RecordManager {
 		recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
 				RECORDER_SAMPLERATE, RECORDER_CHANNELS,
 				RECORDER_AUDIO_ENCODING, bufferSize);
-
 		state = State.INITIALIZING;
 	}
 
@@ -98,54 +99,50 @@ public class RecordManager {
 	public void setThresholdBar(ThresholdBar thresholdBar) {
 		this.thresholdBar = thresholdBar;
 	}
-	
-	private void writeAudioDataToFile() {
-		byte buffer[] = new byte[bufferSize];		
-		int read = 0;
-		
-		recorder.read(buffer, 0, bufferSize);
-		
-		while (state == State.RECORDING || state == State.LISTENING) {
-			read = recorder.read(buffer, 0, bufferSize);
 
-			if (read != AudioRecord.ERROR_INVALID_OPERATION) {
-				try {
-					//Log.d("maxAmp", String.valueOf(maxAmp));
-					if (state == State.LISTENING && overThreshold(buffer)) {
-						startRecording();
-					}
-					if (state == State.RECORDING) {
-						os.write(buffer); // Write buffer to file
-						if (underThreshold(buffer)) {
-							stopRecording();
-						}
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
+	private void writeAudioDataToFile() {
+		byte buffer[] = new byte[bufferSize];
+		recorder.read(buffer, 0, bufferSize);
+
+		try {
+			while (state == State.RECORDING || state == State.LISTENING) {
+				recorder.read(buffer, 0, bufferSize);
+				
+				if (state == State.LISTENING && overThreshold(buffer)) {
+					startRecording();
 				}
-				// update status bar here.  not working now.
-				//thresholdBar.setProgress(currAmp/100);
+				if (state == State.RECORDING) {
+					os.write(buffer); // Write buffer to file
+					if (underThreshold(buffer)) {
+						stopRecording();
+					}
+				}
+				// update status bar here. not working now.
+				// thresholdBar.setProgress(currAmp/100);
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
 	private void startRecording() throws IOException {
-		String filename = getTempFilename();
-		os = new FileOutputStream(filename);
 		state = State.RECORDING;
-
 		// MIDI-on event (velocity)
 		midiManager.setRecordNoteOn(100);
+		
+		String filename = getTempFilename();
+		os = new FileOutputStream(filename);
 	}
 
 	private void stopRecording() throws IOException {
-		// close and write .wav ending
+		state = State.LISTENING;
+		// MIDI-off event (velocity)
+		midiManager.setRecordNoteOff(100);
+		
+		// close and write to WAV
 		os.close();
 		copyWaveFile(getTempFilename(), getFilename());
 		deleteTempFile();
-		// MIDI-off event (velocity)
-		midiManager.setRecordNoteOff(100);
-		state = State.LISTENING;
 	}
 
 	public void startListening() {
@@ -157,7 +154,7 @@ public class RecordManager {
 				writeAudioDataToFile();
 			}
 		}, "AudioRecorder Thread");
-		state = State.LISTENING;		
+		state = State.LISTENING;
 		midiManager.start();
 		recordingThread.start();
 	}
@@ -167,8 +164,7 @@ public class RecordManager {
 			recorder.stop();
 			state = State.INITIALIZING;
 		} else {
-			Log.e(RecordManager.class.getName(),
-					"stopListening in wrong state");
+			Log.e(RecordManager.class.getName(), "stopListening in wrong state");
 		}
 	}
 
@@ -184,42 +180,30 @@ public class RecordManager {
 	}
 
 	private void copyWaveFile(String inFilename, String outFilename) {
-		FileInputStream in = null;
-		FileOutputStream out = null;
-		long totalAudioLen = 0;
-		long totalDataLen = totalAudioLen + 36;
-		long longSampleRate = RECORDER_SAMPLERATE;
-		int channels = 2;
-		long byteRate = RECORDER_BPP * RECORDER_SAMPLERATE * channels / 8;
-
 		byte[] buffer = new byte[bufferSize];
-
+		
 		try {
-			in = new FileInputStream(inFilename);
-			out = new FileOutputStream(outFilename);
-			totalAudioLen = in.getChannel().size();
-			totalDataLen = totalAudioLen + 36;
+			FileInputStream in = new FileInputStream(inFilename);
+			FileOutputStream out = new FileOutputStream(outFilename);
+			long totalAudioLen = in.getChannel().size();
+			long totalDataLen = totalAudioLen + 36;
 
-			WriteWaveFileHeader(out, totalAudioLen, totalDataLen,
-					longSampleRate, channels, byteRate);
+			WriteWaveFileHeader(out, totalAudioLen, totalDataLen);
 
 			while (in.read(buffer) != -1) {
 				out.write(buffer);
 			}
-
 			in.close();
 			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	private boolean overThreshold(byte[] buffer) {
-		for (int i = 0; i < bufferSize/32; i++) {
+		for (int i = 0; i < bufferSize / 32; i++) {
 			// 16bit sample size
-			currAmp= getShort(buffer[i * 32], buffer[i * 32 + 1]);
+			currAmp = getShort(buffer[i * 32], buffer[i * 32 + 1]);
 			if (currAmp > onThreshold) { // Check amplitude
 				return true;
 			}
@@ -228,18 +212,18 @@ public class RecordManager {
 	}
 
 	private boolean underThreshold(byte[] buffer) {
-		for (int i = 0; i < bufferSize/32; i++) {
+		for (int i = 0; i < bufferSize / 32; i++) {
 			// 16bit sample size
-			currAmp= getShort(buffer[i * 32], buffer[i * 32 + 1]);
+			currAmp = getShort(buffer[i * 32], buffer[i * 32 + 1]);
 			if (currAmp > offThreshold) { // Check amplitude
 				return false;
 			}
 		}
 		return true;
 	}
-	
+
 	private void WriteWaveFileHeader(FileOutputStream out, long totalAudioLen,
-			long totalDataLen, long longSampleRate, int channels, long byteRate)
+			long totalDataLen)
 			throws IOException {
 
 		byte[] header = new byte[44];
@@ -266,16 +250,16 @@ public class RecordManager {
 		header[19] = 0;
 		header[20] = 1; // format = 1
 		header[21] = 0;
-		header[22] = (byte) channels;
+		header[22] = (byte) CHANNELS;
 		header[23] = 0;
-		header[24] = (byte) (longSampleRate & 0xff);
-		header[25] = (byte) ((longSampleRate >> 8) & 0xff);
-		header[26] = (byte) ((longSampleRate >> 16) & 0xff);
-		header[27] = (byte) ((longSampleRate >> 24) & 0xff);
-		header[28] = (byte) (byteRate & 0xff);
-		header[29] = (byte) ((byteRate >> 8) & 0xff);
-		header[30] = (byte) ((byteRate >> 16) & 0xff);
-		header[31] = (byte) ((byteRate >> 24) & 0xff);
+		header[24] = (byte) (LONG_SAMPLE_RATE & 0xff);
+		header[25] = (byte) ((LONG_SAMPLE_RATE >> 8) & 0xff);
+		header[26] = (byte) ((LONG_SAMPLE_RATE >> 16) & 0xff);
+		header[27] = (byte) ((LONG_SAMPLE_RATE >> 24) & 0xff);
+		header[28] = (byte) (BYTE_RATE & 0xff);
+		header[29] = (byte) ((BYTE_RATE >> 8) & 0xff);
+		header[30] = (byte) ((BYTE_RATE >> 16) & 0xff);
+		header[31] = (byte) ((BYTE_RATE >> 24) & 0xff);
 		header[32] = (byte) (2 * 16 / 8); // block align
 		header[33] = 0;
 		header[34] = RECORDER_BPP; // bits per sample

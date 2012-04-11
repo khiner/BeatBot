@@ -112,7 +112,6 @@ public abstract class SurfaceViewBase extends SurfaceView implements SurfaceHold
                 EGL10.EGL_RED_SIZE,      5,
                 EGL10.EGL_GREEN_SIZE,    6,
                 EGL10.EGL_BLUE_SIZE,     5,
-                EGL10.EGL_DEPTH_SIZE,   16,
                 EGL10.EGL_NONE
         };
         

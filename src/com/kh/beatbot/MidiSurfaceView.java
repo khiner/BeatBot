@@ -210,7 +210,6 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	public MidiSurfaceView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		for (int i = 0; i < 5; i++) {
-			touchedNotes.put(i, null);
 			dragOffsetTick[i] = 0;
 		}
 	}
@@ -251,13 +250,15 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		int bottomNote = Math.max(note, selectRegionStartNote);
 
 		for (MidiNote midiNote : midiManager.getMidiNotes()) {
-			if (topNote <= midiNote.getNote()
-					&& bottomNote >= midiNote.getNote()
-					&& (leftTick < midiNote.getOffTick()
-							&& rightTick > midiNote.getOffTick()
-							|| leftTick < midiNote.getOnTick()
-							&& rightTick > midiNote.getOnTick() || leftTick > midiNote
-							.getOnTick() && rightTick < midiNote.getOffTick())) {
+			// conditions for region selection
+			boolean a = leftTick < midiNote.getOffTick();
+			boolean b = rightTick > midiNote.getOffTick();
+			boolean c = leftTick < midiNote.getOnTick();
+			boolean d = rightTick > midiNote.getOnTick();
+			boolean noteCondition = topNote <= midiNote.getNote()
+					&& bottomNote >= midiNote.getNote();
+
+			if (noteCondition && (a && b || c && d || !b && !c)) {
 				if (!selectedNotes.contains(midiNote)) {
 					selectedNotes.add(midiNote);
 				}
@@ -298,7 +299,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 					// been highlighted, make it the only highlighted note.
 					// If we are multi-selecting, add it to the highlighted list
 					if (!selectedNotes.contains(midiNote)) {
-						if (!midiSelected())
+						if (touchedNotes.isEmpty())
 							selectedNotes.clear();
 						selectedNotes.add(midiNote);
 					}
@@ -444,14 +445,6 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 	private int yToNote(float y) {
 		return (int) (midiManager.getNumSamples() * y / height);
-	}
-
-	private boolean midiSelected() {
-		for (MidiNote midiNote : touchedNotes.values()) {
-			if (midiNote != null)
-				return true;
-		}
-		return false;
 	}
 
 	private boolean legalHighlightedNoteMove(int noteDiff) {
@@ -632,17 +625,21 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			lastDownTime = System.currentTimeMillis();
 			selectMidiNote(e.getX(0), e.getY(0), id);
 			if (touchedNotes.get(id) == null) {
+				long tick = xToTick(e.getX(0));
+				int note = yToNote(e.getY(0));
 				// no note selected. if this is a double-tap-hold (if there was
 				// a recent single tap),
 				// start a selection region. otherwise, enable scrolling
-				if (System.currentTimeMillis() - lastTapTime < 300) {
-					selectRegionStartTick = xToTick(e.getX(0));
-					selectRegionStartNote = yToNote(e.getY(0));
+				if (System.currentTimeMillis() - lastTapTime < 300
+						&& Math.abs(lastTapX - e.getX(0)) < 20
+						&& note == yToNote(lastTapY)) {
+					selectRegionStartTick = tick;
+					selectRegionStartNote = note;
 					selectRegionVB = null;
 					selectRegion = true;
 				} else {
 					tickWindow.scrolling = true;
-					scrollAnchorTick = xToTick(e.getX(0));
+					scrollAnchorTick = tick;
 				}
 			}
 			break;
@@ -651,7 +648,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			tickWindow.scrolling = false; // two fingers == no scrolling
 			int index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 			selectMidiNote(e.getX(index), e.getY(index), e.getPointerId(index));
-			if (!midiSelected() && e.getPointerCount() == 2) {
+			if (touchedNotes.isEmpty() && e.getPointerCount() == 2) {
 				// init zoom anchors (the same ticks should be under the fingers
 				// at all times)
 				float leftAnchorX = Math.min(e.getX(0), e.getX(1));
@@ -665,15 +662,15 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			touchedNotes.remove(e.getPointerId(index));
 			index = index == 0 ? 1 : 0;
 			if (e.getPointerCount() == 2) {
+				long tick = xToTick(e.getX(index));
 				if (pinch) {
 					id = e.getPointerId(index);
 					MidiNote touched = touchedNotes.get(id);
-					dragOffsetTick[id] = xToTick(e.getX(index))
-							- touched.getOnTick();
+					dragOffsetTick[id] = tick - touched.getOnTick();
 					pinch = false;
 				} else {
+					scrollAnchorTick = tick;
 					tickWindow.scrolling = true;
-					scrollAnchorTick = xToTick(e.getX(index));
 				}
 			}
 			break;
@@ -683,14 +680,12 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				MidiNote selectedNote = touchedNotes.get(id);
 				float leftX = Math.min(e.getX(0), e.getX(1));
 				float rightX = Math.max(e.getX(0), e.getX(1));
-				long newOnTick = xToTick(leftX) - pinchLeftOffsetTick;
-				long newOffTick = xToTick(rightX) + pinchRightOffsetTick;
-				long onTickDiff = newOnTick - selectedNote.getOnTick();
-				long offTickDiff = newOffTick - selectedNote.getOffTick();
+				long onTickDiff = xToTick(leftX) - pinchLeftOffsetTick - selectedNote.getOnTick();
+				long offTickDiff = xToTick(rightX) + pinchRightOffsetTick - selectedNote.getOffTick();
 				for (MidiNote midiNote : selectedNotes) {
 					pinchNote(midiNote, onTickDiff, offTickDiff);
 				}
-			} else if (midiSelected()) { // at least one midi selected
+			} else if (!touchedNotes.isEmpty()) { // at least one midi selected
 				MidiNote leftMost = leftMostSelectedNote();
 				MidiNote rightMost = rightMostSelectedNote();
 				for (int i = 0; i < e.getPointerCount(); i++) {
@@ -730,17 +725,19 @@ public class MidiSurfaceView extends SurfaceViewBase {
 						dragNote(id, touchedNote, tickDiff);
 						touchedNote.setNote(newNote);
 					}
-					
-					// make room in the view window if we are dragging out of the view
-					tickWindow.updateView(leftMost.getOnTick(), rightMost.getOffTick());
+
+					// make room in the view window if we are dragging out of
+					// the view
+					tickWindow.updateView(leftMost.getOnTick(),
+							rightMost.getOffTick());
 				}
 				// handle any overlapping notes (clip or delete notes as
 				// appropriate)
 				handleMidiCollisions();
 			} else { // no midi selected. scroll, zoom, or update select region
 				if (e.getPointerCount() == 1) {
-					if (selectRegion) { // update select region											
-						selectWithRegion(e.getX(0), e.getY(0));						
+					if (selectRegion) { // update select region
+						selectWithRegion(e.getX(0), e.getY(0));
 					} else { // one finger scroll
 						scrollVelocity = tickWindow.scroll(e.getX());
 					}
@@ -757,16 +754,14 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			tickWindow.scrolling = false;
 			selectRegion = false;
 			handleActionUp(e);
-			for (int k : touchedNotes.keySet()) {
-				touchedNotes.put(k, null);
-			}
-			startOnTicks.clear();
 			for (int k : tempNotes.keySet()) {
 				if (tempNotes.get(k) != null)
 					midiManager.getMidiNotes().set(k, tempNotes.get(k));
 				else
 					midiManager.getMidiNotes().remove(k);
 			}
+			touchedNotes.clear();
+			startOnTicks.clear();
 			tempNotes.clear();
 			break;
 		}
