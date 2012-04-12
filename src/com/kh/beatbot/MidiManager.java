@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import android.os.Environment;
+
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiTrack;
@@ -17,25 +19,25 @@ import com.kh.beatbot.midi.event.meta.TimeSignature;
 
 public class MidiManager {
 
-	TimeSignature ts = new TimeSignature();
-	Tempo tempo = new Tempo();
-	MidiTrack tempoTrack = new MidiTrack();
-	List<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
-	List<MidiNote> midiNotes = new ArrayList<MidiNote>();
+	private static final String SAVE_FOLDER = "BeatBot/MIDI";	
+	private TimeSignature ts = new TimeSignature();
+	private Tempo tempo = new Tempo();
+	private MidiTrack tempoTrack = new MidiTrack();
+	private ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
+	private List<MidiNote> midiNotes = new ArrayList<MidiNote>();
 
-	Thread tickThread = null;
-	PlaybackManager playbackManager = null;
-	RecordManager recordManager = null;
+	private Thread tickThread = null;
+	private PlaybackManager playbackManager = null;
+	private RecordManager recordManager = null;
 
-	boolean recording = false;
-	int numSamples = 0;
+	private boolean recording = false;
+	private int numSamples = 0;
 
 	// ticks per quarter note (I think)
 	public final int RESOLUTION = MidiFile.DEFAULT_RESOLUTION;
 
-	long startNanoTime = -1;
-	long currTick = 0;
-	long MSPT;
+	private long currTick = 0;
+	private long MSPT;
 
 	public MidiManager(int numSamples) {
 		this.numSamples = numSamples;
@@ -72,12 +74,17 @@ public class MidiManager {
 	public void addNote(long onTick, long offTick, int note) {
 		NoteOn on = new NoteOn(onTick, 0, note, 100);
 		NoteOff off = new NoteOff(offTick, 0, note, 100);
+		midiTracks.get(0).insertEvent(on);
+		midiTracks.get(0).insertEvent(off);
 		midiNotes.add(new MidiNote(on, off));
 	}
 
 	public void removeNote(MidiNote midiNote) {
-		if (midiNotes.contains(midiNote))
+		if (midiNotes.contains(midiNote)) {
+			midiTracks.get(0).removeEvent(midiNote.getOnEvent());
+			midiTracks.get(0).removeEvent(midiNote.getOffEvent());
 			midiNotes.remove(midiNote);
+		}
 	}
 
 	public Tempo getTempo() {
@@ -94,6 +101,9 @@ public class MidiManager {
 				.get(midiTracks.get(0).getEventCount() - 1).getTick();
 	}
 
+	/* Translate the provided midi note to its on-tick's nearest major tick
+	 * given the provided beat division
+	 */
 	public void quantize(MidiNote midiNote, float beatDivision) {
 		long ticksPerBeat = (long) (RESOLUTION / beatDivision);
 		long diff = midiNote.getOnTick() % ticksPerBeat;
@@ -103,6 +113,9 @@ public class MidiManager {
 		midiNote.setOffTick(midiNote.getOffTick() + diff);
 	}
 
+	/* Translate all midi notes to their on-ticks' nearest major ticks
+	 * given the provided beat division
+	 */	
 	public void quantize(float beatDivision) {
 		long ticksPerBeat = (long) (RESOLUTION / beatDivision);
 		for (MidiNote midiNote : midiNotes) {
@@ -176,28 +189,28 @@ public class MidiManager {
 		return currTick;
 	}
 
-	// public long nanoToTick(long nanoTime) {
-	// if (startNanoTime == -1) {
-	// return 0;
-	// }
-	// float microSec = (nanoTime - startNanoTime)/1000;
-	// float quarterNotes = microSec/tempo.getMpqn();
-	// return (long)(quarterNotes*RESOLUTION);
-	// }
+	private String getFilename() {
+		String filepath = Environment.getExternalStorageDirectory().getPath();
+		File file = new File(filepath, SAVE_FOLDER);
 
-	public void writeToFile() {
-		// 3. Create a MidiFile with the tracks we created
-		ArrayList<MidiTrack> tracks = new ArrayList<MidiTrack>();
-		tracks.add(tempoTrack);
-		for (MidiTrack midiTrack : midiTracks) {
-			Collections.sort(midiTrack.getEvents());
-			tracks.add(midiTrack);
+		if (!file.exists()) {
+			file.mkdirs();
 		}
 
-		MidiFile midi = new MidiFile(RESOLUTION, tracks);
+		return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + ".MIDI");
+	}
+	
+	public void writeToFile() {
+		// 3. Create a MidiFile with the tracks we created
+		for (MidiTrack midiTrack : midiTracks) {
+			Collections.sort(midiTrack.getEvents());
+		}
+		midiTracks.add(0, tempoTrack);
+
+		MidiFile midi = new MidiFile(RESOLUTION, midiTracks);
 
 		// 4. Write the MIDI data to a file
-		File output = new File("data/midi/test.mid");
+		File output = new File(getFilename());
 		try {
 			midi.writeToFile(output);
 		} catch (IOException e) {

@@ -23,6 +23,10 @@ public class MidiNote {
 		return noteOn;
 	}
 	
+	public MidiEvent getOffEvent() {
+		return noteOff;
+	}
+	
 	public long getOnTick() {
 		return noteOn.getTick();
 	}

@@ -295,9 +295,9 @@ public class MidiSurfaceView extends SurfaceViewBase {
 					// don't need right offset for simple drag (one finger
 					// select)
 
-					// If this is the only selected midi note, and it hasn't yet
-					// been highlighted, make it the only highlighted note.
-					// If we are multi-selecting, add it to the highlighted list
+					// If this is the only touched midi note, and it hasn't yet
+					// been selected, make it the only selected note.
+					// If we are multi-selecting, add it to the selected list
 					if (!selectedNotes.contains(midiNote)) {
 						if (touchedNotes.isEmpty())
 							selectedNotes.clear();
@@ -447,9 +447,9 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		return (int) (midiManager.getNumSamples() * y / height);
 	}
 
-	private boolean legalHighlightedNoteMove(int noteDiff) {
+	private boolean legalSelectedNoteMove(int noteDiff) {
 		for (MidiNote midiNote : selectedNotes) {
-			if (midiNote.getNote() + noteDiff < 0
+			if (midiNote.getNote() + noteDiff < 1
 					|| midiNote.getNote() + noteDiff >= midiManager
 							.getNumSamples()) {
 				return false;
@@ -700,7 +700,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 					if (e.getPointerCount() == 1) {
 						// dragging one note - drag all
 						// selected notes together
-						boolean moveNote = legalHighlightedNoteMove(noteDiff);
+						boolean moveNote = legalSelectedNoteMove(noteDiff);
 
 						if (leftMost.getOnTick() + tickDiff < 0)
 							tickDiff = -leftMost.getOnTick();
@@ -723,7 +723,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 						// dragging more than one note - drag each note
 						// individually
 						dragNote(id, touchedNote, tickDiff);
-						touchedNote.setNote(newNote);
+						if (newNote > 0) // can't drag to record row (note 0)
+							touchedNote.setNote(newNote);
 					}
 
 					// make room in the view window if we are dragging out of

@@ -13,9 +13,8 @@ import android.util.Log;
 
 public class RecordManager {
 	private static final int RECORDER_BPP = 16;
-	private static final String AUDIO_RECORDER_FILE_EXT_WAV = ".wav";
-	private static final String AUDIO_RECORDER_FOLDER = "AudioRecorder";
-	private static final String AUDIO_RECORDER_TEMP_FILE = "record_temp.raw";
+	private static final String SAVE_FOLDER = "BeatBot/Recorded_Audio";
+	private static final String TEMP_FILE = "record_temp.raw";
 	private static final int RECORDER_SAMPLERATE = 44100;
 	private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
 	private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
@@ -67,29 +66,29 @@ public class RecordManager {
 
 	private String getFilename() {
 		String filepath = Environment.getExternalStorageDirectory().getPath();
-		File file = new File(filepath, AUDIO_RECORDER_FOLDER);
+		File file = new File(filepath, SAVE_FOLDER);
 
 		if (!file.exists()) {
 			file.mkdirs();
 		}
 
-		return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + AUDIO_RECORDER_FILE_EXT_WAV);
+		return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + ".wav");
 	}
 
 	private String getTempFilename() {
 		String filepath = Environment.getExternalStorageDirectory().getPath();
-		File file = new File(filepath, AUDIO_RECORDER_FOLDER);
+		File file = new File(filepath, SAVE_FOLDER);
 
 		if (!file.exists()) {
 			file.mkdirs();
 		}
 
-		File tempFile = new File(filepath, AUDIO_RECORDER_TEMP_FILE);
+		File tempFile = new File(filepath, TEMP_FILE);
 
 		if (tempFile.exists())
 			tempFile.delete();
 
-		return (file.getAbsolutePath() + "/" + AUDIO_RECORDER_TEMP_FILE);
+		return (file.getAbsolutePath() + "/" + TEMP_FILE);
 	}
 
 	public void setMidiManager(MidiManager midiManager) {

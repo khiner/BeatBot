@@ -101,6 +101,7 @@ public class BeatBotActivity extends Activity {
     		midiManager.quantize(8);
     		return true;
     	case R.id.save_midi:
+    		midiManager.writeToFile();
     		return true;
     	case R.id.save_wav:
     		return true;
@@ -114,11 +115,11 @@ public class BeatBotActivity extends Activity {
     	if (recordManager.getState() == RecordManager.State.LISTENING ||
     			recordManager.getState() == RecordManager.State.RECORDING) {
     		recordManager.stopListening();
-    		recButton.setImageResource(R.drawable.rec_button_off_src);
+    		recButton.setImageResource(R.drawable.rec_btn_off_src);
     	} else {
     		midiSurfaceView.reset();    		
     		recordManager.startListening();
-    		recButton.setImageResource(R.drawable.rec_button_on_src);
+    		recButton.setImageResource(R.drawable.rec_btn_on_src);
     	}
     }
     
@@ -126,12 +127,20 @@ public class BeatBotActivity extends Activity {
     	Button playButton = (Button)view;
     	if (playbackManager.getState() == PlaybackManager.State.PLAYING) {
     		playbackManager.stop();
-    		playButton.setText(R.string.play);
+    		//playButton.setImageResource(R.drawable.rec_btn_off_src);
     	} else if (playbackManager.getState() == PlaybackManager.State.STOPPED) {
     		midiSurfaceView.reset();
     		playbackManager.play();
     		midiManager.start();
-    		playButton.setText(R.string.stop);
+    		//playButton.setImageResource(R.drawable.rec_btn_on_src);
     	}
+    }
+    
+    public void stop(View view) {
+    	
+    }
+    
+    public void undo(View view) {
+    	
     }
 }

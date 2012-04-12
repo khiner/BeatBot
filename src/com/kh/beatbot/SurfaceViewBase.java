@@ -109,9 +109,9 @@ public abstract class SurfaceViewBase extends SurfaceView implements SurfaceHold
         egl.eglInitialize(dpy, version);
         
         int[] configSpec = {
-                EGL10.EGL_RED_SIZE,      5,
-                EGL10.EGL_GREEN_SIZE,    6,
-                EGL10.EGL_BLUE_SIZE,     5,
+                EGL10.EGL_RED_SIZE,      4,
+                EGL10.EGL_GREEN_SIZE,    4,
+                EGL10.EGL_BLUE_SIZE,     4,
                 EGL10.EGL_NONE
         };
         

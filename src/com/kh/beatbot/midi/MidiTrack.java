@@ -220,6 +220,7 @@ public class MidiTrack {
 			MidiEvent last = mEvents.get(mEvents.size() - 1);
 			lastTick = last.getTick() + 1;
 		}
+		
 		EndOfTrack eot = new EndOfTrack(lastTick, 0);
 		insertEvent(eot);
 	}
