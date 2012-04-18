@@ -12,57 +12,58 @@
         android:layout_alignLeft="@+id/sampleListView"
         android:orientation="horizontal" >
 
-        <Button
+        <ImageButton
             android:id="@+id/playButton"
-            android:layout_width="80dp"
+            android:layout_width="40dp"
             android:layout_height="40dp"
+            android:background="#FF000000"
             android:onClick="play"
-            android:text="@string/play" />
-        <!-- android:src="@drawable/play_btn_off_src" /> -->
+            android:src="@drawable/play_btn_src" />
 
-        <Button
+        <ImageButton
             android:id="@+id/stopButton"
-            android:layout_width="80dp"
+            android:layout_width="40dp"
             android:layout_height="40dp"
+            android:background="#FF000000"
             android:onClick="stop"
-            android:text="@string/stop" />
-        <!-- android:src="@drawable/stop_btn_off_src" /> -->
+            android:src="@drawable/stop_btn_src" />
+
+        <ImageButton
+            android:id="@+id/recordButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="#FF000000"
+            android:onClick="toggleListening"
+            android:src="@drawable/rec_btn_off_src" />
 
         <com.kh.beatbot.ThresholdBar
             android:id="@+id/thresholdBar"
             android:layout_width="400dp"
-            android:layout_height="25dp" />
+            android:layout_height="30dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp" />
 
-        <Button
+        <ImageButton
             android:id="@+id/undo"
-            android:layout_width="80dp"
+            android:layout_width="40dp"
             android:layout_height="40dp"
-            android:text="@string/undo"
-            android:onClick="undo" />
-                
+            android:background="#FF000000"
+            android:onClick="undo"
+            android:src="@drawable/undo_btn_src" />
     </LinearLayout>
-
-    <ImageButton
-        android:id="@+id/recordButton"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:layout_below="@+id/controlLayout"
-        android:background="#FF000000"
-        android:onClick="toggleListening"
-        android:src="@drawable/rec_btn_off_src" />
 
     <ListView
         android:id="@+id/sampleListView"
-        android:layout_width="80dp"
+        android:layout_width="38dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/recordButton" />
+        android:layout_below="@+id/controlLayout"/>
 
     <com.kh.beatbot.MidiSurfaceView
         android:id="@+id/midiSurfaceView"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:layout_alignBottom="@+id/sampleListView"
-        android:layout_alignTop="@+id/recordButton"
+        android:layout_alignTop="@+id/sampleListView"
         android:layout_toRightOf="@+id/sampleListView" />
 
 </RelativeLayout>

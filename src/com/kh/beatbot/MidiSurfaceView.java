@@ -11,7 +11,6 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.opengl.GLU;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.midi.MidiNote;
@@ -26,17 +25,17 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 		boolean scrolling = false;
 
-		int minLinesDisplayed = 4;
-		int maxLinesDisplayed = 16;
+		int minLinesDisplayed = 8;
+		int maxLinesDisplayed = 32;
 
-		long minTicks = allTicks / 8;
-		long maxTicks = allTicks * 16;
+		long minTicks = allTicks / minLinesDisplayed;
+		long maxTicks = allTicks * maxLinesDisplayed;
 
 		float granularity = 1;
 
 		TickWindow(long tickOffset, long numTicks) {
 			this.tickOffset = tickOffset;
-			this.numTicks = numTicks;
+			this.numTicks = numTicks - 1;
 			updateGranularity();
 		}
 
@@ -112,17 +111,6 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			return false;
 		}
 
-		public float[] getMajorXCoords() {
-			float[] xCoords = new float[maxLinesDisplayed];
-			int index = 0;
-			for (long i = tickOffset; i < tickOffset + numTicks; i++) {
-				if (i % (minTicks / granularity) == 0) {
-					xCoords[index++] = tickToX(i);
-				}
-			}
-			return xCoords;
-		}
-
 		public long getTickSpacing() {
 			return (long) (minTicks / granularity);
 		}
@@ -155,7 +143,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	// options
 	boolean snapToGrid = false;
 
-	// NIO Buffer for the square
+	// NIO Buffers
 	FloatBuffer hLineVB = null;
 	FloatBuffer vLineVB = null;
 	FloatBuffer recordRowVB = null;
@@ -377,22 +365,28 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	}
 
 	private void drawMidiNote(int note, long onTick, long offTick,
-			boolean recording) {
-		float xLocOn = tickToX(onTick);
-		float xLocOff = tickToX(offTick);
-		float yLoc1 = (height * note) / midiManager.getNumSamples();
-		float yLoc2 = (height * (note + 1)) / midiManager.getNumSamples();
-		FloatBuffer midiBuf = makeFloatBuffer(new float[] { xLocOn, yLoc1,
-				xLocOff, yLoc1, xLocOn, yLoc2, xLocOff, yLoc2 });
-		if (recording)
+			boolean selected) {
+		// midi note rectangle coordinates
+		float x1 = tickToX(onTick);
+		float x2 = tickToX(offTick);
+		float y1 = (height * note) / midiManager.getNumSamples();
+		float y2 = (height * (note + 1)) / midiManager.getNumSamples();
+		// the float buffer for the midi note coordinates
+		FloatBuffer midiBuf = makeFloatBuffer(new float[] { x1, y1, x2, y1, x1,
+				y2, x2, y2 });
+		if (selected) // draw blue note if it is currently selected (also will
+						// be true if recording)
 			gl.glColor4f(0, 0, 1, 1);
 		else
+			// non-selected, non-recording notes are filled red
 			gl.glColor4f(1, 0, 0, 1);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, midiBuf);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
 
-		FloatBuffer outlineBuf = makeFloatBuffer(new float[] { xLocOn, yLoc1,
-				xLocOff, yLoc1, xLocOff, yLoc2, xLocOn, yLoc2, xLocOn, yLoc2 });
+		// draw outline - same coordinates, but different ordering for a
+		// line_loop instead of a triangle_strip
+		FloatBuffer outlineBuf = makeFloatBuffer(new float[] { x1, y1, x2, y1,
+				x2, y2, x1, y2, x1, y2 });
 		gl.glColor4f(0, 0, 0, 1);
 		gl.glLineWidth(4);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, outlineBuf);
@@ -422,13 +416,23 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 	private void initVLineVB() {
 		// 4 vertices per line
-		float[] vLines = new float[tickWindow.maxLinesDisplayed * 4];
-		float[] xCoords = tickWindow.getMajorXCoords();
+		float[] vLines = new float[(tickWindow.maxLinesDisplayed + 1) * 4];
+		long tickStart = tickWindow.getMajorTickToLeftOf(tickWindow.tickOffset);
+		long tickSpacing = tickWindow.getTickSpacing();
 		float y1 = height / midiManager.getNumSamples();
-		for (int i = 0; i < xCoords.length; i++) {
-			vLines[i * 4] = xCoords[i];
-			vLines[i * 4 + 1] = y1;
-			vLines[i * 4 + 2] = xCoords[i];
+		for (int t = (int) tickStart, i = 0; t < tickWindow.tickOffset
+				+ tickWindow.numTicks; t += tickSpacing, i++) {
+			float x = tickToX(t);
+			vLines[i * 4] = x;
+			// the top of the tick line is higher for major ticks
+			if (t % (int) (midiManager.RESOLUTION * 2 / tickWindow.granularity) == 0)
+				vLines[i * 4 + 1] = y1 - y1 / 2;
+			else if (t
+					% (int) (midiManager.RESOLUTION / tickWindow.granularity) == 0)
+				vLines[i * 4 + 1] = y1 - y1 / 3;
+			else
+				vLines[i * 4 + 1] = y1 - y1 / 4;
+			vLines[i * 4 + 2] = x;
 			vLines[i * 4 + 3] = height;
 		}
 		vLineVB = makeFloatBuffer(vLines);
@@ -680,8 +684,10 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				MidiNote selectedNote = touchedNotes.get(id);
 				float leftX = Math.min(e.getX(0), e.getX(1));
 				float rightX = Math.max(e.getX(0), e.getX(1));
-				long onTickDiff = xToTick(leftX) - pinchLeftOffsetTick - selectedNote.getOnTick();
-				long offTickDiff = xToTick(rightX) + pinchRightOffsetTick - selectedNote.getOffTick();
+				long onTickDiff = xToTick(leftX) - pinchLeftOffsetTick
+						- selectedNote.getOnTick();
+				long offTickDiff = xToTick(rightX) + pinchRightOffsetTick
+						- selectedNote.getOffTick();
 				for (MidiNote midiNote : selectedNotes) {
 					pinchNote(midiNote, onTickDiff, offTickDiff);
 				}

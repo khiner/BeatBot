@@ -34,10 +34,6 @@ public class RecordManager {
 	private State state;
 	FileOutputStream os = null;
 
-	// The amp at which recording starts/stops (like thermostat temp)
-	private int onThreshold = 6000;
-	private int offThreshold = 4000;
-
 	private short currAmp = 0;
 
 	public enum State {
@@ -116,8 +112,8 @@ public class RecordManager {
 						stopRecording();
 					}
 				}
-				// update status bar here. not working now.
-				// thresholdBar.setProgress(currAmp/100);
+				// update threshold bar
+				thresholdBar.setChannelLevels(currAmp/10000f, currAmp/10000f);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -200,6 +196,7 @@ public class RecordManager {
 	}
 
 	private boolean overThreshold(byte[] buffer) {
+		int onThreshold = (int)(thresholdBar.getThreshold()*10000);
 		for (int i = 0; i < bufferSize / 32; i++) {
 			// 16bit sample size
 			currAmp = getShort(buffer[i * 32], buffer[i * 32 + 1]);
@@ -211,6 +208,7 @@ public class RecordManager {
 	}
 
 	private boolean underThreshold(byte[] buffer) {
+		int offThreshold = (int)(thresholdBar.getThreshold()*10000) - 2000;
 		for (int i = 0; i < bufferSize / 32; i++) {
 			// 16bit sample size
 			currAmp = getShort(buffer[i * 32], buffer[i * 32 + 1]);
