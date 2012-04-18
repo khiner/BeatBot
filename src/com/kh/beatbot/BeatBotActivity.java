@@ -36,25 +36,25 @@ public class BeatBotActivity extends Activity {
 
 			switch (position) {
 			case 0: // recorded/voice
-				icon.setImageResource(R.drawable.microphone_icon_small);
+				icon.setImageResource(R.drawable.microphone_icon_src);
 				break;
 			case 1: // kick
-				icon.setImageResource(R.drawable.kick_icon_small);
+				icon.setImageResource(R.drawable.kick_icon_src);
 				break;
 			case 2: // snare
-				icon.setImageResource(R.drawable.snare_icon_small);
+				icon.setImageResource(R.drawable.snare_icon_src);
 				break;
 			case 3: // hh closed
-				icon.setImageResource(R.drawable.hh_closed_icon_small);
+				icon.setImageResource(R.drawable.hh_closed_icon_src);
 				break;
 			case 4: // hh open
-				icon.setImageResource(R.drawable.hh_open_icon_small);
+				icon.setImageResource(R.drawable.hh_open_icon_src);
 				break;
 			case 5: // rimshot
-				icon.setImageResource(R.drawable.rimshot_icon_small);
+				icon.setImageResource(R.drawable.rimshot_icon_src);
 				break;
 			case 6: // bass
-				icon.setImageResource(R.drawable.bass_icon_small);
+				icon.setImageResource(R.drawable.bass_icon_src);
 				break;
 			}
 			return view;
@@ -79,7 +79,7 @@ public class BeatBotActivity extends Activity {
 		String[] sampleTypes = getResources().getStringArray(
 				R.array.sample_types);
 		ArrayAdapter<String> adapter = new SampleIconAdapter(this,
-				R.layout.instrument_icon_view, sampleTypes);
+				R.layout.sample_icon_view, sampleTypes);
 		ListView sampleListView = (ListView) findViewById(R.id.sampleListView);
 		sampleListView.setAdapter(adapter);
 		playbackManager = new PlaybackManager(this, sampleResources);
@@ -88,7 +88,7 @@ public class BeatBotActivity extends Activity {
 					@Override
 					public void onItemClick(AdapterView parentView,
 							View childView, int position, long id) {
-						playbackManager.playSample(position);
+						playbackManager.playSample(position - 1);
 					}
 				});
 		midiManager = new MidiManager(sampleTypes.length);
