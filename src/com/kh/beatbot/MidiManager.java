@@ -59,6 +59,10 @@ public class MidiManager {
 		this.recordManager = recordManager;
 	}
 
+	public int getBPM() {
+		return (int)tempo.getBpm();
+	}
+	
 	public int getNumSamples() {
 		return numSamples;
 	}

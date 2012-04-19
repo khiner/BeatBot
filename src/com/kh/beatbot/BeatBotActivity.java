@@ -10,10 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.KarlHiner.BeatBox.R;
 
@@ -61,6 +61,7 @@ public class BeatBotActivity extends Activity {
 		}
 	}
 
+	private ListView sampleListView; 
 	private MidiManager midiManager;
 	private PlaybackManager playbackManager;
 	private RecordManager recordManager;
@@ -80,7 +81,7 @@ public class BeatBotActivity extends Activity {
 				R.array.sample_types);
 		ArrayAdapter<String> adapter = new SampleIconAdapter(this,
 				R.layout.sample_icon_view, sampleTypes);
-		ListView sampleListView = (ListView) findViewById(R.id.sampleListView);
+		sampleListView = (ListView) findViewById(R.id.sampleListView);
 		sampleListView.setAdapter(adapter);
 		playbackManager = new PlaybackManager(this, sampleResources);
 		sampleListView
@@ -103,6 +104,8 @@ public class BeatBotActivity extends Activity {
 		midiSurfaceView.setMidiManager(midiManager);
 		midiSurfaceView.setRecorderService(recordManager);
 		midiSurfaceView.setPlaybackManager(playbackManager);
+		
+		((TextView)findViewById(R.id.bpm)).setText(String.valueOf(midiManager.getBPM()));
 	}
 
 	@Override
@@ -152,6 +155,16 @@ public class BeatBotActivity extends Activity {
 		}
 	}
 
+	// DON'T USE YET! this needs to run on the UI thread somehow.
+	public void activateIcon(int sampleNum) {
+		((ImageView)sampleListView.getChildAt(sampleNum)).setImageState(new int[] { android.R.attr.state_pressed }, true);
+	}
+	
+	// DON'T USE YET! this needs to run on the UI thread somehow.	
+	public void deactivateIcon(int sampleNum) {
+		((ImageView)sampleListView.getChildAt(sampleNum)).setImageState(new int[] { android.R.attr.state_empty }, true);
+	}
+	
 	public void toggleListening(View view) {
 		ImageButton recButton = (ImageButton) view;
 		if (recordManager.getState() == RecordManager.State.LISTENING
@@ -188,5 +201,9 @@ public class BeatBotActivity extends Activity {
 
 	public void undo(View view) {
 
+	}
+	
+	public void bpmTap(View view) {
+		
 	}
 }

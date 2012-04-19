@@ -8,12 +8,14 @@ public class PlaybackManager {
 	private int[] sampleIDs;
 	private int[] streamIDs;
 	private SoundPool soundPool;
+	private BeatBotActivity context;
 
 	public enum State {
 		PLAYING, STOPPED
 	}
 	
 	public PlaybackManager(BeatBotActivity context, int[] sampleRawResources) {
+		this.context = context;
 		state = State.STOPPED;
 		sampleIDs = new int[sampleRawResources.length];
 		streamIDs = new int[sampleRawResources.length];
@@ -35,13 +37,19 @@ public class PlaybackManager {
 	}
 	
 	public void playSample(int sampleNum) {
-		if (sampleNum >= 0 && sampleNum < sampleIDs.length)
+		if (sampleNum >= 0 && sampleNum < sampleIDs.length) {
 			streamIDs[sampleNum] = soundPool.play(sampleIDs[sampleNum], 1f, 1f, 1, 0, 1f);
+			// highlight the icon to indicate playing
+			//context.activateIcon(sampleNum);
+		}
 	}
 	
 	public void stopSample(int sampleNum) {
-		if (sampleNum >= 0 && sampleNum < sampleIDs.length)		
+		if (sampleNum >= 0 && sampleNum < sampleIDs.length) {
 			soundPool.stop(streamIDs[sampleNum]);
+			// set the icon back to normal after playing is done			
+			//context.deactivateIcon(sampleNum);
+		}
 	}
 	
 }

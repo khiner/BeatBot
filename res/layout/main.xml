@@ -38,7 +38,7 @@
 
         <com.kh.beatbot.ThresholdBar
             android:id="@+id/thresholdBar"
-            android:layout_width="400dp"
+            android:layout_width="300dp"
             android:layout_height="30dp"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp" />
@@ -47,9 +47,18 @@
             android:id="@+id/undo"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_marginLeft="50dp"
             android:background="#FF000000"
             android:onClick="undo"
             android:src="@drawable/undo_btn_src" />
+        <TextView
+            android:id="@+id/bpm"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp"
+            android:background="#FFFFFF00"
+            android:onClick="bpmTap" />
+            
     </LinearLayout>
 
     <ListView

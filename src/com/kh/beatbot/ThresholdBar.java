@@ -1,6 +1,7 @@
 package com.kh.beatbot;
 
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -12,12 +13,14 @@ import android.view.SurfaceHolder;
 
 public class ThresholdBar extends SurfaceViewBase {
 
+	private final int numBars = 75; 
+	private final float thumbWidth = 15;
+	
 	FloatBuffer channelBuffer;
 	FloatBuffer thresholdBarBuffer;
 	FloatBuffer thresholdLineBuffer;
 
-	private float barWidth;
-	private float thumbWidth = 15;
+	private int barWidth;
 
 	private float threshold = 0.35f;
 	private float[] channelLevels = new float[] { 0.25f, 0.85f };
@@ -41,15 +44,15 @@ public class ThresholdBar extends SurfaceViewBase {
 	}
 
 	private void initChannelBuffers() {
-		// only 1/3 of the lines (100/3 = 33) are initialized, so they can be
+		// only 1/3 of the lines are initialized, so they can be
 		// drawn all together as one
 		// color. to draw more lines with a different color, simply translate to
 		// the right and change the color
-		// (33 lines per channel) X (4 coordinates per line) = 132
-		float[] channelCoords = new float[132];
-		float y1 = 0;
-		float y2 = height / 4;
-		for (int x = 0, i = 0; i < 33; x += barWidth, i++) {
+		// (numBars/3 lines per channel) X (4 coordinates per line)
+		float[] channelCoords = new float[(numBars*4)];
+		int y1 = 0;
+		int y2 = height / 4;
+		for (int x = 0, i = 0; i < numBars; x += barWidth, i++) {
 			channelCoords[i * 4] = x;
 			channelCoords[i * 4 + 1] = y1;
 			channelCoords[i * 4 + 2] = x;
@@ -60,45 +63,42 @@ public class ThresholdBar extends SurfaceViewBase {
 	}
 
 	private void drawChannel(float channelLevel) {
+		int buffNum = (int) (channelLevel * numBars) * 2;		
 		if (channelLevel < .33) {
 			gl.glColor4f(0, 1, 0, 1); // green lines
-			gl.glDrawArrays(GL10.GL_LINES, 0, (int) (channelLevel * 100) * 2);
-			return;
+			gl.glDrawArrays(GL10.GL_LINES, 0, buffNum);
 		} else if (channelLevel < .66) {
 			gl.glColor4f(0, 1, 0, 1); // green lines
-			gl.glDrawArrays(GL10.GL_LINES, 0, channelBuffer.capacity() / 2);
-			gl.glTranslatef(.33f * width, 0, 0);
+			gl.glDrawArrays(GL10.GL_LINES, 0, channelBuffer.capacity() / 6);
 			gl.glColor4f(1, 1, 0, 1); // yellow lines
-			gl.glDrawArrays(GL10.GL_LINES, 0,
-					((int) (channelLevel * 100) - 33) * 2);
-			return;
+			gl.glDrawArrays(GL10.GL_LINES, channelBuffer.capacity() / 6,
+					buffNum - channelBuffer.capacity() / 6);
 		} else {
 			gl.glColor4f(0, 1, 0, 1); // green lines
-			gl.glDrawArrays(GL10.GL_LINES, 0, channelBuffer.capacity() / 2);
-			gl.glTranslatef(.33f * width, 0, 0);
+			gl.glDrawArrays(GL10.GL_LINES, 0, channelBuffer.capacity() / 6);
 			gl.glColor4f(1, 1, 0, 1); // yellow lines
-			gl.glDrawArrays(GL10.GL_LINES, 0, channelBuffer.capacity() / 2);
-			gl.glTranslatef(.33f * width, 0, 0);
+			gl.glDrawArrays(GL10.GL_LINES, channelBuffer.capacity() / 6, channelBuffer.capacity() / 6);
 			gl.glColor4f(1, 0, 0, 1); // red lines
-			gl.glDrawArrays(GL10.GL_LINES, 0,
-					((int) (channelLevel * 100) - 66) * 2);
+			gl.glDrawArrays(GL10.GL_LINES, channelBuffer.capacity() / 3,
+					buffNum - channelBuffer.capacity()/3);
 		}
+		gl.glColor4f(.5f, .5f, .5f, .7f);
+		gl.glDrawArrays(GL10.GL_LINES, buffNum, channelBuffer.capacity()/2 - buffNum);		
 	}
 
 	private void drawChannels() {
 		gl.glLineWidth(barWidth * .75f);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, channelBuffer);
 
-		// draw channel 0
 		gl.glPushMatrix();
+		
+		// draw channel 0		
 		gl.glTranslatef(0, 5, 0);
 		drawChannel(channelLevels[0]);
-		gl.glPopMatrix();
-
 		// draw channel 1
-		gl.glPushMatrix();
-		gl.glTranslatef(0, height / 4 + 10, 0);
+		gl.glTranslatef(0, height / 4 + 5, 0);
 		drawChannel(channelLevels[1]);
+		
 		gl.glPopMatrix();
 	}
 
@@ -125,7 +125,7 @@ public class ThresholdBar extends SurfaceViewBase {
 	@Override
 	protected void init() {
 		gl.glClearColor(0, 0, 0, 1);
-		barWidth = 0.01f * width;
+		barWidth = width / numBars;
 		initChannelBuffers();
 		initThresholdBar();
 	}
@@ -153,7 +153,7 @@ public class ThresholdBar extends SurfaceViewBase {
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		super.surfaceChanged(holder, format, width, height);
-		barWidth = 0.01f * width;
+		barWidth = width / numBars;
 		initChannelBuffers();
 		initThresholdBar();		
 	}

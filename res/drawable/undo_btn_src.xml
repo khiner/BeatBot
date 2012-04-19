@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true"
-          android:drawable="@drawable/undo" /> <!-- pressed -->
+          android:drawable="@drawable/undo_selected_small" /> <!-- pressed -->
     <item android:state_focused="true"
-          android:drawable="@drawable/undo" /> <!-- focused -->
-    <item android:drawable="@drawable/undo" />  <!-- default -->
+          android:drawable="@drawable/undo_selected_small" /> <!-- focused -->
+    <item android:drawable="@drawable/undo_small" />  <!-- default -->
 </selector>
