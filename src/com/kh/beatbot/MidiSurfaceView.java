@@ -67,7 +67,6 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				scrollVelocity *= 0.95;
 				setTickOffset((long) (tickOffset + scrollVelocity));
 				if (scrollVelocity == 0) {
-					Log.d("ScrollEnd", "se");
 					scrollViewEndTime = System.currentTimeMillis();
 				}
 			}
@@ -670,7 +669,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 	private void startScrollView() {
 		long now = System.currentTimeMillis();
-		if (now - scrollViewStartTime >= 300)
+		if (now - scrollViewEndTime > 600)
 			scrollViewStartTime = now;
 		else
 			scrollViewEndTime = Long.MAX_VALUE;
@@ -683,7 +682,6 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		case MotionEvent.ACTION_DOWN:
 			Log.d("ActionDown", "AD");
 			startScrollView();
-			scrolling = true;
 			int id = e.getPointerId(0);
 			lastDownTime = System.currentTimeMillis();
 			selectMidiNote(e.getX(0), e.getY(0), id);
