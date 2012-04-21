@@ -11,6 +11,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.opengl.GLU;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.midi.MidiNote;
@@ -22,8 +23,6 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		private long tickOffset;
 		// number of ticks within the window
 		private long numTicks;
-
-		boolean scrolling = false;
 
 		int minLinesDisplayed = 8;
 		int maxLinesDisplayed = 32;
@@ -40,7 +39,6 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		}
 
 		public void zoom(float leftX, float rightX) {
-			startScrollView();
 			long newTOS = (long) ((zoomRightAnchorTick * leftX - zoomLeftAnchorTick
 					* rightX) / (leftX - rightX));
 			long newNumTicks = (long) ((zoomLeftAnchorTick - newTOS) * width / leftX);
@@ -68,13 +66,14 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			if (!scrolling && scrollVelocity != 0) {
 				scrollVelocity *= 0.95;
 				setTickOffset((long) (tickOffset + scrollVelocity));
-				if (scrollVelocity == 0)
+				if (scrollVelocity == 0) {
+					Log.d("ScrollEnd", "se");
 					scrollViewEndTime = System.currentTimeMillis();
+				}
 			}
 		}
 
 		public long scroll(float x) {
-			startScrollView();
 			long newTickOffset = scrollAnchorTick
 					- (long) ((numTicks * x) / width);
 			long diff = newTickOffset - tickOffset;
@@ -199,7 +198,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	// true when a note is being "pinched" (two-fingers touching the note)
 	boolean pinch = false;
 
-	boolean scrollView = false;
+	boolean scrolling = false;	
 	long scrollViewStartTime = 0;
 	long scrollViewEndTime = Long.MAX_VALUE;
 
@@ -524,7 +523,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		drawVerticalLines();
 		drawAllMidiNotes();
 		drawSelectRegion();
-		if (scrollView) {
+		if (scrolling || scrollVelocity != 0 || Math.abs(System.currentTimeMillis() - scrollViewEndTime) <= 600) {
 			drawScrollView();
 		}
 	}
@@ -538,16 +537,11 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				- scrollViewEndTime : System.currentTimeMillis()
 				- scrollViewStartTime;
 
-		if (scrollingEnded && elapsedTime > 300) {
-			scrollView = false;
-			return;
-		}
-
 		float alpha = .8f;
 		if (!scrollingEnded && elapsedTime <= 300)
 			alpha *= elapsedTime / 300f;
-		else if (scrollingEnded)
-			alpha *= (300 - elapsedTime) / 300f;
+		else if (scrollingEnded && elapsedTime > 300)
+			alpha *= (600 - elapsedTime) / 300f;
 
 		gl.glColor4f(1, 1, 1, alpha);
 
@@ -675,16 +669,21 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	}
 
 	private void startScrollView() {
-		if (scrollView == true)
-			return;
-		scrollView = true;
-		scrollViewStartTime = System.currentTimeMillis();
+		long now = System.currentTimeMillis();
+		if (now - scrollViewStartTime >= 300)
+			scrollViewStartTime = now;
+		else
+			scrollViewEndTime = Long.MAX_VALUE;
+		scrolling = true;
 	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent e) {
 		switch (e.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
+			Log.d("ActionDown", "AD");
+			startScrollView();
+			scrolling = true;
 			int id = e.getPointerId(0);
 			lastDownTime = System.currentTimeMillis();
 			selectMidiNote(e.getX(0), e.getY(0), id);
@@ -702,14 +701,12 @@ public class MidiSurfaceView extends SurfaceViewBase {
 					selectRegionVB = null;
 					selectRegion = true;
 				} else {
-					tickWindow.scrolling = true;
 					scrollAnchorTick = tick;
 				}
 			}
 			break;
 		case MotionEvent.ACTION_POINTER_DOWN:
 			// lastDownTime = System.currentTimeMillis();
-			tickWindow.scrolling = false; // two fingers == no scrolling
 			int index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 			selectMidiNote(e.getX(index), e.getY(index), e.getPointerId(index));
 			if (touchedNotes.isEmpty() && e.getPointerCount() == 2) {
@@ -734,7 +731,6 @@ public class MidiSurfaceView extends SurfaceViewBase {
 					pinch = false;
 				} else {
 					scrollAnchorTick = tick;
-					tickWindow.scrolling = true;
 				}
 			}
 			break;
@@ -818,7 +814,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			break;
 
 		case MotionEvent.ACTION_UP:
-			tickWindow.scrolling = false;
+			scrolling = false;
 			if (scrollVelocity == 0)
 				scrollViewEndTime = System.currentTimeMillis();
 			selectRegion = false;
