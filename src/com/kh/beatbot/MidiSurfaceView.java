@@ -603,7 +603,9 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	private void handleActionUp(MotionEvent e) {
 		long time = System.currentTimeMillis();
 		if (time - lastDownTime < 200) {
-			if (time - lastTapTime < 300) {
+			// if the second tap is not in the same location as the first tap,
+			// no double tap :(
+			if (time - lastTapTime < 300 && Math.abs(e.getX() - lastTapX) <= 25 && yToNote(e.getY()) == yToNote(lastTapY)) {
 				doubleTap(e, touchedNotes.get(e.getPointerId(0)));
 			} else {
 				singleTap(e, touchedNotes.get(e.getPointerId(0)));
@@ -624,10 +626,6 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	private void doubleTap(MotionEvent e, MidiNote touchedNote) {
 		long tick = xToTick(e.getX());
 		int note = yToNote(e.getY());
-		// if the second tap is not in the same location as the first tap, no
-		// double tap :(
-		if (Math.abs(e.getX() - lastTapX) > 25 || note != yToNote(lastTapY))
-			return;
 		if (touchedNote != null) {
 			if (selectedNotes.contains(touchedNote)) {
 				selectedNotes.remove(touchedNote);
