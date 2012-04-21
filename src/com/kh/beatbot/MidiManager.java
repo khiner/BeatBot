@@ -77,12 +77,14 @@ public class MidiManager implements Parcelable {
 		return midiNotes;
 	}
 
-	public void addNote(long onTick, long offTick, int note) {
+	public MidiNote addNote(long onTick, long offTick, int note) {
 		NoteOn on = new NoteOn(onTick, 0, note, 100);
 		NoteOff off = new NoteOff(offTick, 0, note, 100);
 		midiTracks.get(0).insertEvent(on);
 		midiTracks.get(0).insertEvent(off);
-		midiNotes.add(new MidiNote(on, off));
+		MidiNote midiNote = new MidiNote(on, off);
+		midiNotes.add(midiNote);
+		return midiNote;
 	}
 
 	public void removeNote(MidiNote midiNote) {

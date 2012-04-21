@@ -127,11 +127,11 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		// grid line) to the left and ending one tick before the nearest major
 		// tick to the right of the given tick
 		// @param tick the tick somewhere in the middle of the desired range
-		public void addMidiNote(long tick, int note) {
+		public MidiNote addMidiNote(long tick, int note) {
 			long spacing = (long) (minTicks / granularity);
 			long onTick = tick - tick % spacing;
 			long offTick = onTick + spacing - 1;
-			midiManager.addNote(onTick, offTick, note);
+			return midiManager.addNote(onTick, offTick, note);
 		}
 
 		public void updateView(long leftTick, long rightTick) {
@@ -625,8 +625,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		long tick = xToTick(e.getX());
 		int note = yToNote(e.getY());
 		// if the second tap is not in the same location as the first tap, no
-		// double tap
-		if (Math.abs(e.getX() - lastTapX) > 20 || note != yToNote(lastTapY))
+		// double tap :(
+		if (Math.abs(e.getX() - lastTapX) > 25 || note != yToNote(lastTapY))
 			return;
 		if (touchedNote != null) {
 			if (selectedNotes.contains(touchedNote)) {
@@ -635,7 +635,12 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			midiManager.removeNote(touchedNote);
 		} else {
 			// add a note based on the current tick granularity
-			tickWindow.addMidiNote(tick, note);
+			if (note > 0) {// can't add note on record track
+				MidiNote noteToAdd = tickWindow.addMidiNote(tick, note);
+				selectedNotes.add(noteToAdd);
+				handleMidiCollisions();
+				selectedNotes.remove(noteToAdd);
+			}
 		}
 		// reset tap time so that a third tap doesn't register as
 		// another double tap
@@ -647,22 +652,23 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		for (MidiNote selected : selectedNotes) {
 			for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
 				MidiNote note = midiManager.getMidiNotes().get(i);
+				if (selected.equals(note))
+					continue;
 				if (selected.getNote() == note.getNote()) {
 					// if a selected note begins in the middle of another note,
 					// clip the covered note
 					if (selected.getOnTick() > note.getOnTick()
-							&& selected.getOnTick() < note.getOffTick()) {
+							&& selected.getOnTick() <= note.getOffTick()) {
 						MidiNote copy = note.getCopy();
-						copy.setOffTick(selected.getOnTick());
+						copy.setOffTick(selected.getOnTick() - 1);
 						tempNotes.put(i, copy);
-						// also, if the selected note ends after the beginning
-						// of a note,
-						// or if the selected note completely covers another
-						// note, delete the covered note
+						// if the selected note ends after the beginning
+						// of the other note, or if the selected note completely covers
+						// the other note, delete the covered note
 					} else if (selected.getOffTick() >= note.getOnTick()
-							&& selected.getOffTick() < note.getOffTick()
+							&& selected.getOffTick() <= note.getOffTick()
 							|| selected.getOnTick() <= note.getOnTick()
-							&& selected.getOffTick() > note.getOffTick()) {
+							&& selected.getOffTick() >= note.getOffTick()) {
 						tempNotes.put(i, null);
 					}
 				}

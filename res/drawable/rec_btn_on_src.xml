@@ -3,6 +3,6 @@
     <item android:state_pressed="true"
           android:drawable="@drawable/rec_on_selected_small" /> <!-- pressed -->
     <item android:state_focused="true"
-          android:drawable="@drawable/rec_off_selected_small" /> <!-- focused -->
-    <item android:drawable="@drawable/rec_on_small" />  <!-- default -->
+          android:drawable="@drawable/rec_on_selected_small" /> <!-- focused -->
+    <item android:drawable="@drawable/rec_on_selected_small" />  <!-- default -->
 </selector>
