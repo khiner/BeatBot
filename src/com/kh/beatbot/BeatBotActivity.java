@@ -61,7 +61,7 @@ public class BeatBotActivity extends Activity {
 		}
 	}
 
-	private ListView sampleListView; 
+	private ListView sampleListView;
 	private MidiManager midiManager;
 	private PlaybackManager playbackManager;
 	private RecordManager recordManager;
@@ -92,20 +92,26 @@ public class BeatBotActivity extends Activity {
 						playbackManager.playSample(position - 1);
 					}
 				});
-		midiManager = new MidiManager(sampleTypes.length);
+		if (savedInstanceState == null)
+			midiManager = new MidiManager(sampleTypes.length);
+		else
+			midiManager = savedInstanceState.getParcelable("midiManager");
+
 		midiManager.setPlaybackManager(playbackManager);
 
 		recordManager = RecordManager.getInstance();
 		recordManager.setMidiManager(midiManager);
-		recordManager.setThresholdBar((ThresholdBar) findViewById(R.id.thresholdBar));
+		recordManager
+				.setThresholdBar((ThresholdBar) findViewById(R.id.thresholdBar));
 		midiManager.setRecordManager(recordManager);
 
 		midiSurfaceView = ((MidiSurfaceView) findViewById(R.id.midiSurfaceView));
 		midiSurfaceView.setMidiManager(midiManager);
 		midiSurfaceView.setRecorderService(recordManager);
 		midiSurfaceView.setPlaybackManager(playbackManager);
-		
-		((TextView)findViewById(R.id.bpm)).setText(String.valueOf(midiManager.getBPM()));
+
+		((TextView) findViewById(R.id.bpm)).setText(String.valueOf(midiManager
+				.getBPM()));
 	}
 
 	@Override
@@ -113,6 +119,12 @@ public class BeatBotActivity extends Activity {
 		if (isFinishing())
 			recordManager.release();
 		super.onDestroy();
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putParcelable("midiManager", midiManager);
 	}
 
 	@Override
@@ -157,14 +169,16 @@ public class BeatBotActivity extends Activity {
 
 	// DON'T USE YET! this needs to run on the UI thread somehow.
 	public void activateIcon(int sampleNum) {
-		((ImageView)sampleListView.getChildAt(sampleNum)).setImageState(new int[] { android.R.attr.state_pressed }, true);
+		((ImageView) sampleListView.getChildAt(sampleNum)).setImageState(
+				new int[] { android.R.attr.state_pressed }, true);
 	}
-	
-	// DON'T USE YET! this needs to run on the UI thread somehow.	
+
+	// DON'T USE YET! this needs to run on the UI thread somehow.
 	public void deactivateIcon(int sampleNum) {
-		((ImageView)sampleListView.getChildAt(sampleNum)).setImageState(new int[] { android.R.attr.state_empty }, true);
+		((ImageView) sampleListView.getChildAt(sampleNum)).setImageState(
+				new int[] { android.R.attr.state_empty }, true);
 	}
-	
+
 	public void toggleListening(View view) {
 		ImageButton recButton = (ImageButton) view;
 		if (recordManager.getState() == RecordManager.State.LISTENING
@@ -192,18 +206,17 @@ public class BeatBotActivity extends Activity {
 	}
 
 	public void stop(View view) {
-		ImageButton stopButton = (ImageButton)view;
+		ImageButton stopButton = (ImageButton) view;
 		if (playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			playbackManager.stop();
-			stopButton.setImageResource(R.drawable.stop_btn_src);
-		}		
+		}
 	}
 
 	public void undo(View view) {
 
 	}
-	
+
 	public void bpmTap(View view) {
-		
+
 	}
 }

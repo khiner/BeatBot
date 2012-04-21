@@ -124,13 +124,13 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		}
 
 		// adds a note starting at the nearest major tick (nearest displayed
-		// grid line) to the left
-		// and ending at the nearest major tick to the right ot the given tick
+		// grid line) to the left and ending one tick before the nearest major
+		// tick to the right of the given tick
 		// @param tick the tick somewhere in the middle of the desired range
 		public void addMidiNote(long tick, int note) {
 			long spacing = (long) (minTicks / granularity);
 			long onTick = tick - tick % spacing;
-			long offTick = onTick + spacing;
+			long offTick = onTick + spacing - 1;
 			midiManager.addNote(onTick, offTick, note);
 		}
 
@@ -534,15 +534,15 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		// time of scroll start,
 		// otherwise, elapsed time is relative to scroll end time
 		boolean scrollingEnded = scrollViewStartTime < scrollViewEndTime;
-		long elapsedTime = scrollingEnded ? System
-				.currentTimeMillis() - scrollViewEndTime : System
-				.currentTimeMillis() - scrollViewStartTime;
-				
+		long elapsedTime = scrollingEnded ? System.currentTimeMillis()
+				- scrollViewEndTime : System.currentTimeMillis()
+				- scrollViewStartTime;
+
 		if (scrollingEnded && elapsedTime > 300) {
 			scrollView = false;
 			return;
 		}
-		
+
 		float alpha = .8f;
 		if (!scrollingEnded && elapsedTime <= 300)
 			alpha *= elapsedTime / 300f;
@@ -550,7 +550,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			alpha *= (300 - elapsedTime) / 300f;
 
 		gl.glColor4f(1, 1, 1, alpha);
-		
+
 		float x1 = tickWindow.tickOffset * width / tickWindow.maxTicks;
 		float x2 = (tickWindow.tickOffset + tickWindow.numTicks) * width
 				/ tickWindow.maxTicks;
@@ -647,16 +647,22 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		for (MidiNote selected : selectedNotes) {
 			for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
 				MidiNote note = midiManager.getMidiNotes().get(i);
-				// if a selected note begins in the middle of another note, clip
-				// the covered note
 				if (selected.getNote() == note.getNote()) {
+					// if a selected note begins in the middle of another note,
+					// clip the covered note
 					if (selected.getOnTick() > note.getOnTick()
 							&& selected.getOnTick() < note.getOffTick()) {
 						MidiNote copy = note.getCopy();
 						copy.setOffTick(selected.getOnTick());
 						tempNotes.put(i, copy);
-					} else if (selected.getOffTick() > note.getOnTick()
-							&& selected.getOffTick() < note.getOffTick()) {
+						// also, if the selected note ends after the beginning
+						// of a note,
+						// or if the selected note completely covers another
+						// note, delete the covered note
+					} else if (selected.getOffTick() >= note.getOnTick()
+							&& selected.getOffTick() < note.getOffTick()
+							|| selected.getOnTick() <= note.getOnTick()
+							&& selected.getOffTick() > note.getOffTick()) {
 						tempNotes.put(i, null);
 					}
 				}

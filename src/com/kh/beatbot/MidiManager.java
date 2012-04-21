@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.List;
 
 import android.os.Environment;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
@@ -17,9 +19,9 @@ import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
 
-public class MidiManager {
+public class MidiManager implements Parcelable {
 
-	private static final String SAVE_FOLDER = "BeatBot/MIDI";	
+	private static final String SAVE_FOLDER = "BeatBot/MIDI";
 	private TimeSignature ts = new TimeSignature();
 	private Tempo tempo = new Tempo();
 	private MidiTrack tempoTrack = new MidiTrack();
@@ -42,13 +44,13 @@ public class MidiManager {
 	public MidiManager(int numSamples) {
 		this.numSamples = numSamples;
 
-		midiTracks.add(new MidiTrack());
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,
 				TimeSignature.DEFAULT_DIVISION);
 		tempo.setBpm(140);
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
 		MSPT = Tempo.DEFAULT_MPQN / MidiFile.DEFAULT_RESOLUTION;
+		midiTracks.add(new MidiTrack());
 	}
 
 	public void setPlaybackManager(PlaybackManager playbackManager) {
@@ -60,9 +62,9 @@ public class MidiManager {
 	}
 
 	public int getBPM() {
-		return (int)tempo.getBpm();
+		return (int) tempo.getBpm();
 	}
-	
+
 	public int getNumSamples() {
 		return numSamples;
 	}
@@ -105,7 +107,8 @@ public class MidiManager {
 				.get(midiTracks.get(0).getEventCount() - 1).getTick();
 	}
 
-	/* Translate the provided midi note to its on-tick's nearest major tick
+	/*
+	 * Translate the provided midi note to its on-tick's nearest major tick
 	 * given the provided beat division
 	 */
 	public void quantize(MidiNote midiNote, float beatDivision) {
@@ -117,9 +120,10 @@ public class MidiManager {
 		midiNote.setOffTick(midiNote.getOffTick() + diff);
 	}
 
-	/* Translate all midi notes to their on-ticks' nearest major ticks
-	 * given the provided beat division
-	 */	
+	/*
+	 * Translate all midi notes to their on-ticks' nearest major ticks given the
+	 * provided beat division
+	 */
 	public void quantize(float beatDivision) {
 		long ticksPerBeat = (long) (RESOLUTION / beatDivision);
 		for (MidiNote midiNote : midiNotes) {
@@ -203,7 +207,7 @@ public class MidiManager {
 
 		return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + ".MIDI");
 	}
-	
+
 	public void writeToFile() {
 		// 3. Create a MidiFile with the tracks we created
 		for (MidiTrack midiTrack : midiTracks) {
@@ -219,6 +223,58 @@ public class MidiManager {
 			midi.writeToFile(output);
 		} catch (IOException e) {
 			System.err.println(e);
+		}
+	}
+
+	@Override
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel out, int flags) {
+		out.writeInt(numSamples);
+		out.writeIntArray(new int[] { 4, 4, TimeSignature.DEFAULT_METER,
+				TimeSignature.DEFAULT_DIVISION });
+		out.writeFloat(tempo.getBpm());
+		out.writeLong(Tempo.DEFAULT_MPQN / MidiFile.DEFAULT_RESOLUTION);
+		// on-tick, off-tick, and note for each midiNote
+		long[] noteInfo = new long[midiNotes.size() * 3];
+		for (int i = 0; i < midiNotes.size(); i++) {
+			noteInfo[i * 3] = midiNotes.get(i).getOnTick();
+			noteInfo[i * 3 + 1] = midiNotes.get(i).getOffTick();
+			noteInfo[i * 3 + 2] = (long) midiNotes.get(i).getNote();
+		}
+		out.writeInt(noteInfo.length);
+		out.writeLongArray(noteInfo);
+	}
+
+	public static final Parcelable.Creator<MidiManager> CREATOR = new Parcelable.Creator<MidiManager>() {
+		public MidiManager createFromParcel(Parcel in) {
+			return new MidiManager(in);
+		}
+
+		public MidiManager[] newArray(int size) {
+			return new MidiManager[size];
+		}
+	};
+
+	private MidiManager(Parcel in) {
+		numSamples = in.readInt();
+		int[] timeSigInfo = new int[4];
+		in.readIntArray(timeSigInfo);
+		ts.setTimeSignature(timeSigInfo[0], timeSigInfo[1], timeSigInfo[2],
+				timeSigInfo[3]);
+		tempo.setBpm(in.readInt());
+		tempoTrack.insertEvent(ts);
+		tempoTrack.insertEvent(tempo);
+		MSPT = in.readLong();
+		midiTracks.add(new MidiTrack());
+		long[] noteInfo = new long[in.readInt()];
+		in.readLongArray(noteInfo);
+		for (int i = 0; i < noteInfo.length; i += 3) {
+			addNote(noteInfo[i], noteInfo[i + 1], (int) noteInfo[i + 2]);
 		}
 	}
 }

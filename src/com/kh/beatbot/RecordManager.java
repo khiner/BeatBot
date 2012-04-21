@@ -19,9 +19,10 @@ public class RecordManager {
 	private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
 	private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 	private final int CHANNELS = 2;
-	private final long BYTE_RATE = RECORDER_BPP * RECORDER_SAMPLERATE * CHANNELS / 8;
+	private final long BYTE_RATE = RECORDER_BPP * RECORDER_SAMPLERATE
+			* CHANNELS / 8;
 	private final long LONG_SAMPLE_RATE = RECORDER_SAMPLERATE;
-	
+
 	private static RecordManager singletonInstance = null;
 
 	// Midi Manager to manage MIDI events
@@ -54,10 +55,14 @@ public class RecordManager {
 	private RecordManager() {
 		bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
 				RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
+		initRecorder();
+		state = State.INITIALIZING;
+	}
+
+	private void initRecorder() {
 		recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
 				RECORDER_SAMPLERATE, RECORDER_CHANNELS,
 				RECORDER_AUDIO_ENCODING, bufferSize);
-		state = State.INITIALIZING;
 	}
 
 	private String getFilename() {
@@ -102,18 +107,20 @@ public class RecordManager {
 		try {
 			while (state == State.RECORDING || state == State.LISTENING) {
 				recorder.read(buffer, 0, bufferSize);
-				
+
 				if (state == State.LISTENING && overThreshold(buffer)) {
 					startRecording();
 				}
 				if (state == State.RECORDING) {
 					os.write(buffer); // Write buffer to file
 					if (underThreshold(buffer)) {
+						state = State.LISTENING;
 						stopRecording();
 					}
 				}
 				// update threshold bar
-				thresholdBar.setChannelLevels(currAmp/10000f, currAmp/10000f);
+				thresholdBar.setChannelLevels(currAmp / 10000f,
+						currAmp / 10000f);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -124,16 +131,15 @@ public class RecordManager {
 		state = State.RECORDING;
 		// MIDI-on event (velocity)
 		midiManager.setRecordNoteOn(100);
-		
+
 		String filename = getTempFilename();
 		os = new FileOutputStream(filename);
 	}
 
 	private void stopRecording() throws IOException {
-		state = State.LISTENING;
 		// MIDI-off event (velocity)
 		midiManager.setRecordNoteOff(100);
-		
+
 		// close and write to WAV
 		os.close();
 		copyWaveFile(getTempFilename(), getFilename());
@@ -141,6 +147,8 @@ public class RecordManager {
 	}
 
 	public void startListening() {
+		if (recorder.getState() != AudioRecord.STATE_INITIALIZED)
+			initRecorder();
 		recorder.startRecording();
 		recordingThread = new Thread(new Runnable() {
 
@@ -155,17 +163,28 @@ public class RecordManager {
 	}
 
 	public void stopListening() {
+		boolean recording = state == State.RECORDING;
+		state = State.INITIALIZING;				
 		if (recorder != null) {
 			recorder.stop();
-			state = State.INITIALIZING;
+			try {
+				if (recording) {
+					stopRecording();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		} else {
 			Log.e(RecordManager.class.getName(), "stopListening in wrong state");
 		}
 	}
 
 	public void release() {
-		if (recorder != null)
+		if (recorder != null) {
+			if (state == State.LISTENING || state == State.RECORDING)
+				stopListening();
 			recorder.release();
+		}
 	}
 
 	private void deleteTempFile() {
@@ -176,7 +195,7 @@ public class RecordManager {
 
 	private void copyWaveFile(String inFilename, String outFilename) {
 		byte[] buffer = new byte[bufferSize];
-		
+
 		try {
 			FileInputStream in = new FileInputStream(inFilename);
 			FileOutputStream out = new FileOutputStream(outFilename);
@@ -196,7 +215,7 @@ public class RecordManager {
 	}
 
 	private boolean overThreshold(byte[] buffer) {
-		int onThreshold = (int)(thresholdBar.getThreshold()*10000);
+		int onThreshold = (int) (thresholdBar.getThreshold() * 10000);
 		for (int i = 0; i < bufferSize / 32; i++) {
 			// 16bit sample size
 			currAmp = getShort(buffer[i * 32], buffer[i * 32 + 1]);
@@ -208,7 +227,7 @@ public class RecordManager {
 	}
 
 	private boolean underThreshold(byte[] buffer) {
-		int offThreshold = (int)(thresholdBar.getThreshold()*10000) - 2000;
+		int offThreshold = (int) (thresholdBar.getThreshold() * 10000) - 2000;
 		for (int i = 0; i < bufferSize / 32; i++) {
 			// 16bit sample size
 			currAmp = getShort(buffer[i * 32], buffer[i * 32 + 1]);
@@ -220,8 +239,7 @@ public class RecordManager {
 	}
 
 	private void WriteWaveFileHeader(FileOutputStream out, long totalAudioLen,
-			long totalDataLen)
-			throws IOException {
+			long totalDataLen) throws IOException {
 
 		byte[] header = new byte[44];
 
