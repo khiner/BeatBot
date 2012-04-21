@@ -179,7 +179,7 @@ public class BeatBotActivity extends Activity {
 				new int[] { android.R.attr.state_empty }, true);
 	}
 
-	public void toggleListening(View view) {
+	public void record(View view) {
 		ImageButton recButton = (ImageButton) view;
 		if (recordManager.getState() == RecordManager.State.LISTENING
 				|| recordManager.getState() == RecordManager.State.RECORDING) {
@@ -187,28 +187,33 @@ public class BeatBotActivity extends Activity {
 			recButton.setImageResource(R.drawable.rec_btn_off_src);
 		} else {
 			midiSurfaceView.reset();
+			// if we are already playing, the midiManager is already ticking away.
+			if (playbackManager.getState() != PlaybackManager.State.PLAYING)
+				play((ImageButton)findViewById(R.id.playButton));
 			recordManager.startListening();
 			recButton.setImageResource(R.drawable.rec_btn_on_src);
 		}
 	}
-
+	
 	public void play(View view) {
-		ImageButton playButton = (ImageButton) view;
 		if (playbackManager.getState() == PlaybackManager.State.PLAYING) {
-			playbackManager.stop();
-			playButton.setImageResource(R.drawable.play_btn_src);
+			midiManager.reset();
 		} else if (playbackManager.getState() == PlaybackManager.State.STOPPED) {
+			((ImageButton)findViewById(R.id.playButton)).setImageResource(R.drawable.play_btn_on_src);
 			midiSurfaceView.reset();
 			playbackManager.play();
 			midiManager.start();
-			playButton.setImageResource(R.drawable.pause_btn_src);
 		}
 	}
 
 	public void stop(View view) {
-		ImageButton stopButton = (ImageButton) view;
+		if (recordManager.getState() == RecordManager.State.RECORDING ||
+			recordManager.getState() == RecordManager.State.LISTENING)
+			record((ImageButton)findViewById(R.id.recordButton));
 		if (playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			playbackManager.stop();
+			midiManager.reset();
+			((ImageButton)findViewById(R.id.playButton)).setImageResource(R.drawable.play_btn_off_src);
 		}
 	}
 

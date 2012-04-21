@@ -18,7 +18,7 @@
             android:layout_height="40dp"
             android:background="#FF000000"
             android:onClick="play"
-            android:src="@drawable/play_btn_src" />
+            android:src="@drawable/play_btn_off_src" />
 
         <ImageButton
             android:id="@+id/stopButton"
@@ -33,7 +33,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="#FF000000"
-            android:onClick="toggleListening"
+            android:onClick="record"
             android:src="@drawable/rec_btn_off_src" />
 
         <com.kh.beatbot.ThresholdBar

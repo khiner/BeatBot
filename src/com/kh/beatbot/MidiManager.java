@@ -178,6 +178,10 @@ public class MidiManager implements Parcelable {
 		tickThread.start();
 	}
 
+	public void reset() {
+		currTick = 0;
+	}
+	
 	public void setRecordNoteOn(int velocity) {
 		long onTick = currTick;
 		// tick, channel, note, velocity

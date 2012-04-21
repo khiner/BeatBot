@@ -27,6 +27,7 @@ public class RecordManager {
 
 	// Midi Manager to manage MIDI events
 	private MidiManager midiManager;
+	
 	private ThresholdBar thresholdBar;
 
 	private AudioRecord recorder = null;
@@ -91,11 +92,11 @@ public class RecordManager {
 
 		return (file.getAbsolutePath() + "/" + TEMP_FILE);
 	}
-
+	
 	public void setMidiManager(MidiManager midiManager) {
 		this.midiManager = midiManager;
 	}
-
+	
 	public void setThresholdBar(ThresholdBar thresholdBar) {
 		this.thresholdBar = thresholdBar;
 	}
@@ -158,12 +159,11 @@ public class RecordManager {
 			}
 		}, "AudioRecorder Thread");
 		state = State.LISTENING;
-		midiManager.start();
-		recordingThread.start();
+		recordingThread.start();		
 	}
 
 	public void stopListening() {
-		boolean recording = state == State.RECORDING;
+		boolean recording = (state == State.RECORDING);
 		state = State.INITIALIZING;				
 		if (recorder != null) {
 			recorder.stop();
@@ -174,8 +174,6 @@ public class RecordManager {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		} else {
-			Log.e(RecordManager.class.getName(), "stopListening in wrong state");
 		}
 	}
 
