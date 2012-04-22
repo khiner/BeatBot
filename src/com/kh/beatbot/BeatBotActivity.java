@@ -117,8 +117,10 @@ public class BeatBotActivity extends Activity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();		
-		if (isFinishing())
+		if (isFinishing()) {
 			recordManager.release();
+			playbackManager.release();			
+		}
 	}
 
 	@Override

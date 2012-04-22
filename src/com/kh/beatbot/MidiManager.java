@@ -39,6 +39,7 @@ public class MidiManager implements Parcelable {
 	public final int RESOLUTION = MidiFile.DEFAULT_RESOLUTION;
 
 	private long currTick = 0;
+	private long loopTick = RESOLUTION * 4;
 	private long MSPT;
 
 	public MidiManager(int numSamples) {
@@ -75,6 +76,10 @@ public class MidiManager implements Parcelable {
 
 	public List<MidiNote> getMidiNotes() {
 		return midiNotes;
+	}
+
+	public long getLoopTick() {
+		return loopTick;
 	}
 
 	public MidiNote addNote(long onTick, long offTick, int note) {
@@ -151,6 +156,18 @@ public class MidiManager implements Parcelable {
 				|| recordManager.getState() == RecordManager.State.LISTENING) {
 			if (System.nanoTime() >= nextTickNano) {
 				currTick++;
+				if (currTick >= loopTick) {
+					if (recording) {
+						try {
+							recordManager.stopRecording();
+							currTick = 0;
+							recordManager.startRecording();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					} else
+						currTick = 0;
+				}
 				nextTickNano += MSPT * 1000;
 				for (int i = 0; i < midiNotes.size(); i++) {
 					MidiNote midiNote = midiNotes.get(i);
@@ -181,7 +198,7 @@ public class MidiManager implements Parcelable {
 	public void reset() {
 		currTick = 0;
 	}
-	
+
 	public void setRecordNoteOn(int velocity) {
 		long onTick = currTick;
 		// tick, channel, note, velocity

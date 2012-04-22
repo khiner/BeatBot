@@ -36,6 +36,11 @@ public class PlaybackManager {
 		state = State.STOPPED;
 	}
 	
+	public void release() {
+		state = State.STOPPED;
+		soundPool.release();
+	}
+	
 	public void playSample(int sampleNum) {
 		if (sampleNum >= 0 && sampleNum < sampleIDs.length) {
 			streamIDs[sampleNum] = soundPool.play(sampleIDs[sampleNum], 1f, 1f, 1, 0, 1f);

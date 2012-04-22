@@ -128,7 +128,7 @@ public class RecordManager {
 		}
 	}
 
-	private void startRecording() throws IOException {
+	public void startRecording() throws IOException {
 		state = State.RECORDING;
 		// MIDI-on event (velocity)
 		midiManager.setRecordNoteOn(100);
@@ -137,7 +137,7 @@ public class RecordManager {
 		os = new FileOutputStream(filename);
 	}
 
-	private void stopRecording() throws IOException {
+	public void stopRecording() throws IOException {
 		// MIDI-off event (velocity)
 		midiManager.setRecordNoteOff(100);
 

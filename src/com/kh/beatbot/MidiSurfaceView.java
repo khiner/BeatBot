@@ -11,7 +11,6 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.opengl.GLU;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.midi.MidiNote;
@@ -150,6 +149,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	FloatBuffer vLineVB = null;
 	FloatBuffer recordRowVB = null;
 	FloatBuffer selectRegionVB = null;
+	FloatBuffer loopMarkerVB = null;
+	FloatBuffer loopMarkerLineVB = null;
 
 	MidiManager midiManager;
 	RecordManager recorder;
@@ -229,8 +230,6 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 	public void reset() {
 		tickWindow.setTickOffset(0);
-		tickWindow.setNumTicks(allTicks);
-		tickWindow.granularity = 1;
 		currTick = 0;
 	}
 
@@ -326,6 +325,18 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		gl.glDrawArrays(GL10.GL_LINES, 0, 2);
 	}
 
+	private void drawLoopMarker() {
+		gl.glPushMatrix();
+		gl.glTranslatef(tickToX(midiManager.getLoopTick()), 0, 0);
+		gl.glColor4f(0, 0, 0, 1);
+		gl.glLineWidth(6);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerVB);
+		gl.glDrawArrays(GL10.GL_TRIANGLES, 0, 3);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerLineVB);
+		gl.glDrawArrays(GL10.GL_LINES, 0, 2);
+		gl.glPopMatrix();
+	}
+	
 	private void drawRecordRowFill(boolean recording) {
 		gl.glColor4f(.7f, .7f, .7f, 1f);
 		if (recording)
@@ -444,6 +455,15 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		vLineVB = makeFloatBuffer(vLines);
 	}
 
+	private void initLoopMarkerVBs() {
+		float h = height/midiManager.getNumSamples();
+		float[] loopMarkerLine = new float[] {0, h/2 + 1, 0, height};
+		float[] loopMarkerTriangle = new float[] {0, h/2, 0, h, -h/2, 3*h/4};
+		
+		loopMarkerLineVB = makeFloatBuffer(loopMarkerLine);
+		loopMarkerVB = makeFloatBuffer(loopMarkerTriangle);
+	}
+	
 	private float tickToX(long tick) {
 		return (float) (tick - tickWindow.tickOffset) / tickWindow.numTicks
 				* width;
@@ -491,6 +511,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		tickWindow = new TickWindow(0, allTicks);
 		initHLineVB();
 		initVLineVB();
+		initLoopMarkerVBs();
 		initRecordRowVB();
 	}
 
@@ -512,14 +533,15 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		if (recording
 				|| playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			currTick = midiManager.getCurrTick();
-			if (currTick > allTicks)
-				tickWindow.setNumTicks(currTick);
+			if (currTick > tickWindow.tickOffset + tickWindow.numTicks)
+				tickWindow.setNumTicks(currTick - tickWindow.tickOffset);
 			drawCurrentTick();
 		}
 		tickWindow.scroll();
 		initVLineVB();
 		drawHorizontalLines();
 		drawVerticalLines();
+		drawLoopMarker();
 		drawAllMidiNotes();
 		drawSelectRegion();
 		if (scrolling || scrollVelocity != 0 || Math.abs(System.currentTimeMillis() - scrollViewEndTime) <= 600) {
@@ -680,7 +702,6 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	public boolean onTouchEvent(MotionEvent e) {
 		switch (e.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
-			Log.d("ActionDown", "AD");
 			startScrollView();
 			int id = e.getPointerId(0);
 			lastDownTime = System.currentTimeMillis();
