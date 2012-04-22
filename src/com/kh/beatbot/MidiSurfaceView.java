@@ -146,8 +146,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				
 			// if both left and right are out of view, us 
 			} else if (leftTick <= tickOffset && rightTick >= tickOffset + numTicks) {
-				setTickOffset(leftTick);
-				setNumTicks(rightTick - leftTick);
+//				setTickOffset(leftTick);
+//				setNumTicks(rightTick - leftTick);
 			}
 		}
 	}
@@ -174,39 +174,41 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	List<MidiNote> selectedNotes = new ArrayList<MidiNote>();
 
 	TickWindow tickWindow;
+	
+	private final long doubleTapTime = 300;
 
-	long dragOffsetTick[] = new long[5];
+	private long dragOffsetTick[] = new long[5];
 
-	long pinchLeftOffsetTick = 0;
-	long pinchRightOffsetTick = 0;
+	private long pinchLeftOffsetTick = 0;
+	private long pinchRightOffsetTick = 0;
 
-	long zoomLeftAnchorTick = 0;
-	long zoomRightAnchorTick = 0;
+	private long zoomLeftAnchorTick = 0;
+	private long zoomRightAnchorTick = 0;
 
-	long scrollAnchorTick = 0;
-	long scrollVelocity = 0;
+	private long scrollAnchorTick = 0;
+	private long scrollVelocity = 0;
 
-	boolean selectRegion = false;
-	long selectRegionStartTick = -1;
-	int selectRegionStartNote = -1;
+	private boolean selectRegion = false;
+	private long selectRegionStartTick = -1;
+	private int selectRegionStartNote = -1;
 
-	long currTick = 0;
-	long allTicks;
+	private long currTick = 0;
+	private long allTicks;
 
-	long lastDownTime = 0;
-	long lastTapTime = 0;
+	private long lastDownTime = 0;
+	private long lastTapTime = 0;
 
-	float lastTapX = -10;
-	float lastTapY = -10;
+	private float lastTapX = -10;
+	private float lastTapY = -10;
 
 	// true when a note is being "pinched" (two-fingers touching the note)
-	boolean pinch = false;
+	private boolean pinch = false;
 
-	boolean scrolling = false;	
-	long scrollViewStartTime = 0;
-	long scrollViewEndTime = Long.MAX_VALUE;
+	private boolean scrolling = false;	
+	private long scrollViewStartTime = 0;
+	private long scrollViewEndTime = Long.MAX_VALUE;
 	
-	boolean loopMarkerSelected = false;
+	private boolean loopMarkerSelected = false;
 
 	public MidiSurfaceView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -549,7 +551,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		drawLoopMarker();
 		drawAllMidiNotes();
 		drawSelectRegion();
-		if (scrolling || scrollVelocity != 0 || Math.abs(System.currentTimeMillis() - scrollViewEndTime) <= 600) {
+		if (scrolling || scrollVelocity != 0 || Math.abs(System.currentTimeMillis() - scrollViewEndTime) <= doubleTapTime*2) {
 			drawScrollView();
 		}
 	}
@@ -564,10 +566,10 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				- scrollViewStartTime;
 
 		float alpha = .8f;
-		if (!scrollingEnded && elapsedTime <= 300)
-			alpha *= elapsedTime / 300f;
-		else if (scrollingEnded && elapsedTime > 300)
-			alpha *= (600 - elapsedTime) / 300f;
+		if (!scrollingEnded && elapsedTime <= doubleTapTime)
+			alpha *= elapsedTime / (float)doubleTapTime;
+		else if (scrollingEnded && elapsedTime > doubleTapTime)
+			alpha *= (doubleTapTime*2 - elapsedTime) / (float)doubleTapTime;
 
 		gl.glColor4f(1, 1, 1, alpha);
 
@@ -625,7 +627,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		if (time - lastDownTime < 200) {
 			// if the second tap is not in the same location as the first tap,
 			// no double tap :(
-			if (time - lastTapTime < 300 && Math.abs(e.getX() - lastTapX) <= 25 && yToNote(e.getY()) == yToNote(lastTapY)) {
+			if (time - lastTapTime < doubleTapTime && Math.abs(e.getX() - lastTapX) <= 25 && yToNote(e.getY()) == yToNote(lastTapY)) {
 				doubleTap(e, touchedNotes.get(e.getPointerId(0)));
 			} else {
 				singleTap(e, touchedNotes.get(e.getPointerId(0)));
@@ -696,7 +698,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 	private void startScrollView() {
 		long now = System.currentTimeMillis();
-		if (now - scrollViewEndTime > 600)
+		if (now - scrollViewEndTime > doubleTapTime*2)
 			scrollViewStartTime = now;
 		else
 			scrollViewEndTime = Long.MAX_VALUE;
@@ -717,7 +719,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				// no note selected. if this is a double-tap-hold (if there was
 				// a recent single tap),
 				// start a selection region.
-				if (System.currentTimeMillis() - lastTapTime < 300
+				if (System.currentTimeMillis() - lastTapTime < doubleTapTime
 						&& Math.abs(lastTapX - e.getX(0)) < 20
 						&& note == yToNote(lastTapY)) {
 					selectRegionStartTick = tick;

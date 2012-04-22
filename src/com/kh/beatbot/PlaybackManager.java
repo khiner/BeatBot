@@ -57,4 +57,9 @@ public class PlaybackManager {
 		}
 	}
 	
+	public void stopAllSamples() {
+		for (int sampleID = 0; sampleID < sampleIDs.length; sampleID++) {
+			soundPool.stop(streamIDs[sampleID]);
+		}
+	}
 }

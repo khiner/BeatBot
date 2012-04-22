@@ -79,7 +79,7 @@ public class MidiManager implements Parcelable {
 		tempo.setBpm(bpm);
 		MSPT = tempo.getMpqn() / MidiFile.DEFAULT_RESOLUTION;
 	}
-	
+
 	public int getNumSamples() {
 		return numSamples;
 	}
@@ -105,10 +105,12 @@ public class MidiManager implements Parcelable {
 
 	public void mergeTempNotes() {
 		for (int k : tempNotes.keySet()) {
-			if (tempNotes.get(k) != null)
-				midiNotes.set(k, tempNotes.get(k));
-			else if (k < midiNotes.size()) // sanity check
-				midiNotes.remove(k);
+			if (k < midiNotes.size()) {// sanity check
+				if (tempNotes.get(k) != null)
+					midiNotes.set(k, tempNotes.get(k));
+				else
+					midiNotes.remove(k);
+			}
 		}
 		tempNotes.clear();
 	}
@@ -116,7 +118,7 @@ public class MidiManager implements Parcelable {
 	public long getLoopTick() {
 		return loopTick;
 	}
-	
+
 	public void setLoopTick(long loopTick) {
 		this.loopTick = loopTick;
 	}
@@ -194,6 +196,7 @@ public class MidiManager implements Parcelable {
 			if (System.nanoTime() >= nextTickNano) {
 				currTick++;
 				if (currTick >= loopTick) {
+					playbackManager.stopAllSamples();
 					if (recording) {
 						try {
 							recordManager.stopRecording();
