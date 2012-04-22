@@ -59,7 +59,7 @@ public class MidiManager implements Parcelable {
 		tempo.setBpm(140);
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
-		MSPT = Tempo.DEFAULT_MPQN / MidiFile.DEFAULT_RESOLUTION;
+		MSPT = tempo.getMpqn() / MidiFile.DEFAULT_RESOLUTION;
 		midiTracks.add(new MidiTrack());
 	}
 
@@ -71,10 +71,15 @@ public class MidiManager implements Parcelable {
 		this.recordManager = recordManager;
 	}
 
-	public int getBPM() {
-		return (int) tempo.getBpm();
+	public float getBPM() {
+		return tempo.getBpm();
 	}
 
+	public void setBPM(float bpm) {
+		tempo.setBpm(bpm);
+		MSPT = tempo.getMpqn() / MidiFile.DEFAULT_RESOLUTION;
+	}
+	
 	public int getNumSamples() {
 		return numSamples;
 	}
