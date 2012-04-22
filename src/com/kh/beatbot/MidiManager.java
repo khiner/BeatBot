@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.os.Environment;
 import android.os.Parcel;
@@ -27,6 +29,13 @@ public class MidiManager implements Parcelable {
 	private MidiTrack tempoTrack = new MidiTrack();
 	private ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
 	private List<MidiNote> midiNotes = new ArrayList<MidiNote>();
+	// if a note is dragged over another, the "eclipsed" note should be
+	// shortened or removed as appropriate. However, these changes only become
+	// saved to the midiManager.midiNotes list after the eclipsing note is
+	// "dropped". If the note is dragged off of the eclipsed note, the original
+	// note is used again instead of its temp version
+	// the integer keys correspond to indices in midiManager.midiNotes list
+	private Map<Integer, MidiNote> tempNotes = new HashMap<Integer, MidiNote>();
 
 	private Thread tickThread = null;
 	private PlaybackManager playbackManager = null;
@@ -76,6 +85,27 @@ public class MidiManager implements Parcelable {
 
 	public List<MidiNote> getMidiNotes() {
 		return midiNotes;
+	}
+
+	public MidiNote getMidiNote(int i) {
+		// if there is a temporary (clipped or deleted) version of the note,
+		// return that version instead
+		return tempNotes.keySet().contains(i) ? tempNotes.get(i) : midiNotes
+				.get(i);
+	}
+
+	public Map<Integer, MidiNote> getTempNotes() {
+		return tempNotes;
+	}
+
+	public void mergeTempNotes() {
+		for (int k : tempNotes.keySet()) {
+			if (tempNotes.get(k) != null)
+				midiNotes.set(k, tempNotes.get(k));
+			else
+				midiNotes.remove(k);
+		}
+		tempNotes.clear();
 	}
 
 	public long getLoopTick() {
@@ -170,7 +200,7 @@ public class MidiManager implements Parcelable {
 				}
 				nextTickNano += MSPT * 1000;
 				for (int i = 0; i < midiNotes.size(); i++) {
-					MidiNote midiNote = midiNotes.get(i);
+					MidiNote midiNote = getMidiNote(i);
 					// note(s) could have been deleted since the start of the
 					// loop
 					if (midiNote == null)

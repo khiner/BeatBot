@@ -159,13 +159,6 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	// map of pointerIds to the notes they are selecting
 	Map<Integer, MidiNote> touchedNotes = new HashMap<Integer, MidiNote>();
 	Map<Integer, Long> startOnTicks = new HashMap<Integer, Long>();
-	// if a note is dragged over another, the "eclipsed" note should be
-	// shortened or removed as appropriate. However, these changes only become
-	// saved to the midiManager.midiNotes list after the eclipsing note is
-	// "dropped". If the note is dragged off of the eclipsed note, the original
-	// note is used again instead of its temp version
-	// the integer keys correspond to indices in midiManager.midiNotes list
-	Map<Integer, MidiNote> tempNotes = new HashMap<Integer, MidiNote>();
 	// all selected notes (to draw in blue, and to drag together)
 	List<MidiNote> selectedNotes = new ArrayList<MidiNote>();
 
@@ -368,10 +361,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
 			if (midiManager.getMidiNotes().size() <= i)
 				break;
-			// if there is a temporary (clipped or deleted) version of the note,
-			// draw that version instead
-			MidiNote midiNote = tempNotes.keySet().contains(i) ? tempNotes
-					.get(i) : midiManager.getMidiNotes().get(i);
+			MidiNote midiNote = midiManager.getMidiNote(i);
 			if (midiNote != null)
 				drawMidiNote(midiNote.getNote(), midiNote.getOnTick(),
 						midiNote.getOffTick(), selectedNotes.contains(midiNote));
@@ -533,7 +523,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		if (recording
 				|| playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			currTick = midiManager.getCurrTick();
-			if (currTick > tickWindow.tickOffset + tickWindow.numTicks)
+			// if we're recording, keep the current recording tick in view.
+			if (recording && currTick > tickWindow.tickOffset + tickWindow.numTicks)
 				tickWindow.setNumTicks(currTick - tickWindow.tickOffset);
 			drawCurrentTick();
 		}
@@ -661,7 +652,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	}
 
 	private void handleMidiCollisions() {
-		tempNotes.clear();
+		midiManager.getTempNotes().clear();
 		for (MidiNote selected : selectedNotes) {
 			for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
 				MidiNote note = midiManager.getMidiNotes().get(i);
@@ -674,7 +665,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 							&& selected.getOnTick() <= note.getOffTick()) {
 						MidiNote copy = note.getCopy();
 						copy.setOffTick(selected.getOnTick() - 1);
-						tempNotes.put(i, copy);
+						midiManager.getTempNotes().put(i, copy);
 						// if the selected note ends after the beginning
 						// of the other note, or if the selected note completely covers
 						// the other note, delete the covered note
@@ -682,7 +673,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 							&& selected.getOffTick() <= note.getOffTick()
 							|| selected.getOnTick() <= note.getOnTick()
 							&& selected.getOffTick() >= note.getOffTick()) {
-						tempNotes.put(i, null);
+						midiManager.getTempNotes().put(i, null);
 					}
 				}
 			}
@@ -838,15 +829,9 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				scrollViewEndTime = System.currentTimeMillis();
 			selectRegion = false;
 			handleActionUp(e);
-			for (int k : tempNotes.keySet()) {
-				if (tempNotes.get(k) != null)
-					midiManager.getMidiNotes().set(k, tempNotes.get(k));
-				else
-					midiManager.getMidiNotes().remove(k);
-			}
+			midiManager.mergeTempNotes();
 			touchedNotes.clear();
 			startOnTicks.clear();
-			tempNotes.clear();
 			break;
 		}
 		return true;
