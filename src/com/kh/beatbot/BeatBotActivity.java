@@ -2,6 +2,7 @@ package com.kh.beatbot;
 
 import android.app.Activity;
 import android.content.Context;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -76,6 +77,8 @@ public class BeatBotActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		// assign hardware (ringer) volume +/- to media while this application has focus 
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		setContentView(R.layout.main);
 		String[] sampleTypes = getResources().getStringArray(
 				R.array.sample_types);
@@ -112,6 +115,13 @@ public class BeatBotActivity extends Activity {
 
 		((TextView) findViewById(R.id.bpm)).setText(String.valueOf(midiManager
 				.getBPM()));
+		if (savedInstanceState != null) {
+			if (savedInstanceState.getBoolean("recording")) {
+				record(findViewById(R.id.recordButton));
+			} else if (savedInstanceState.getBoolean("playing")) {
+				play(findViewById(R.id.playButton));
+			}
+		}
 	}
 
 	@Override
@@ -127,6 +137,8 @@ public class BeatBotActivity extends Activity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putParcelable("midiManager", midiManager);
+		outState.putBoolean("playing", playbackManager.getState() == PlaybackManager.State.PLAYING);
+		outState.putBoolean("recording", recordManager.getState() != RecordManager.State.INITIALIZING);
 	}
 
 	@Override
@@ -183,8 +195,7 @@ public class BeatBotActivity extends Activity {
 
 	public void record(View view) {
 		ImageButton recButton = (ImageButton) view;
-		if (recordManager.getState() == RecordManager.State.LISTENING
-				|| recordManager.getState() == RecordManager.State.RECORDING) {
+		if (recordManager.getState() != RecordManager.State.INITIALIZING) {
 			recordManager.stopListening();
 			recButton.setImageResource(R.drawable.rec_btn_off_src);
 		} else {
@@ -202,18 +213,17 @@ public class BeatBotActivity extends Activity {
 			midiManager.reset();
 		} else if (playbackManager.getState() == PlaybackManager.State.STOPPED) {
 			((ImageButton)findViewById(R.id.playButton)).setImageResource(R.drawable.play_btn_on_src);
-			midiSurfaceView.reset();
 			playbackManager.play();
-			midiManager.start();
+			midiManager.start();			
 		}
 	}
 
 	public void stop(View view) {
-		if (recordManager.getState() == RecordManager.State.RECORDING ||
-			recordManager.getState() == RecordManager.State.LISTENING)
+		if (recordManager.getState() != RecordManager.State.INITIALIZING)
 			record((ImageButton)findViewById(R.id.recordButton));
 		if (playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			playbackManager.stop();
+			spin(10); // wait for midi tick thread to notice that playback has stopped
 			midiManager.reset();
 			((ImageButton)findViewById(R.id.playButton)).setImageResource(R.drawable.play_btn_off_src);
 		}
@@ -225,5 +235,10 @@ public class BeatBotActivity extends Activity {
 
 	public void bpmTap(View view) {
 
+	}
+	
+	private void spin(long millis) {
+		long start = System.currentTimeMillis();
+		while (System.currentTimeMillis() - start < millis);
 	}
 }

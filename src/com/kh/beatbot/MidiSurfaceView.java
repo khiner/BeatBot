@@ -33,7 +33,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 		TickWindow(long tickOffset, long numTicks) {
 			this.tickOffset = tickOffset;
-			this.numTicks = numTicks - 1;
+			this.numTicks = numTicks;
 			updateGranularity();
 		}
 
@@ -131,12 +131,23 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			return midiManager.addNote(onTick, offTick, note);
 		}
 
+		// translates the tickOffset to ensure that leftTick and rightTick are in view
+		// returns the amount translated
+		//TODO: to fix select region prob, also update numTicks if need be, i.e. fit everything!
 		public void updateView(long leftTick, long rightTick) {
 			// if we are dragging out of view, scroll appropriately
-			if (rightTick > tickWindow.tickOffset + tickWindow.numTicks) {
-				tickWindow.setTickOffset(rightTick - tickWindow.numTicks);
-			} else if (leftTick < tickWindow.tickOffset) {
-				tickWindow.setTickOffset(leftTick);
+			// if the right is out but the left is in, just scroll
+			if (leftTick < tickOffset && rightTick < tickOffset + numTicks) {
+				setTickOffset(leftTick);
+				
+			// if the left is out but the right is in, just scroll				
+			} else if (rightTick > tickOffset + numTicks && leftTick > tickOffset) {				
+				setTickOffset(rightTick - numTicks);
+				
+			// if both left and right are out of view, us 
+			} else if (leftTick <= tickOffset && rightTick >= tickOffset + numTicks) {
+				setTickOffset(leftTick);
+				setNumTicks(rightTick - leftTick);
 			}
 		}
 	}
@@ -194,6 +205,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	boolean scrolling = false;	
 	long scrollViewStartTime = 0;
 	long scrollViewEndTime = Long.MAX_VALUE;
+	
+	boolean loopMarkerSelected = false;
 
 	public MidiSurfaceView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -205,6 +218,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	public void setMidiManager(MidiManager midiManager) {
 		this.midiManager = midiManager;
 		allTicks = midiManager.RESOLUTION * 4;
+		tickWindow = new TickWindow(0, allTicks - 1);
 	}
 
 	public void setRecorderService(RecordManager recorder) {
@@ -497,8 +511,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	}
 
 	protected void init() {
+		tickWindow.updateGranularity();
 		gl.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-		tickWindow = new TickWindow(0, allTicks);
 		initHLineVB();
 		initVLineVB();
 		initLoopMarkerVBs();
@@ -702,7 +716,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				int note = yToNote(e.getY(0));
 				// no note selected. if this is a double-tap-hold (if there was
 				// a recent single tap),
-				// start a selection region. otherwise, enable scrolling
+				// start a selection region.
 				if (System.currentTimeMillis() - lastTapTime < 300
 						&& Math.abs(lastTapX - e.getX(0)) < 20
 						&& note == yToNote(lastTapY)) {
@@ -711,7 +725,12 @@ public class MidiSurfaceView extends SurfaceViewBase {
 					selectRegionVB = null;
 					selectRegion = true;
 				} else {
-					scrollAnchorTick = tick;
+					// check if loop marker selected
+					float loopX = tickToX(midiManager.getLoopTick());
+					if (note == 0 && e.getX(0) >= loopX - 20 && e.getX(0) <= loopX + 20){
+						loopMarkerSelected = true;
+					} else // otherwise, enable scrolling
+						scrollAnchorTick = tick;
 				}
 			}
 			break;
@@ -798,11 +817,11 @@ public class MidiSurfaceView extends SurfaceViewBase {
 						if (newNote > 0) // can't drag to record row (note 0)
 							touchedNote.setNote(newNote);
 					}
-
 					// make room in the view window if we are dragging out of
 					// the view
 					tickWindow.updateView(leftMost.getOnTick(),
 							rightMost.getOffTick());
+					//dragOffsetTick[id] += translate;
 				}
 				// handle any overlapping notes (clip or delete notes as
 				// appropriate)
@@ -811,8 +830,10 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				if (e.getPointerCount() == 1) {
 					if (selectRegion) { // update select region
 						selectWithRegion(e.getX(0), e.getY(0));
+					} else if (loopMarkerSelected) {
+						midiManager.setLoopTick(tickWindow.getMajorTickToLeftOf(xToTick(e.getX(0))));
 					} else { // one finger scroll
-						scrollVelocity = tickWindow.scroll(e.getX());
+						scrollVelocity = tickWindow.scroll(e.getX(0));
 					}
 				} else if (e.getPointerCount() == 2) {
 					// two finger zoom
@@ -825,6 +846,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 		case MotionEvent.ACTION_UP:
 			scrolling = false;
+			loopMarkerSelected = false;
 			if (scrollVelocity == 0)
 				scrollViewEndTime = System.currentTimeMillis();
 			selectRegion = false;

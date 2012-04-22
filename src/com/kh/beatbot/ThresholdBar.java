@@ -1,7 +1,6 @@
 package com.kh.beatbot;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -23,7 +22,7 @@ public class ThresholdBar extends SurfaceViewBase {
 	private int barWidth;
 
 	private float threshold = 0.35f;
-	private float[] channelLevels = new float[] { 0.25f, 0.85f };
+	private float[] channelLevels = new float[] { 0 , 0 };
 
 	public ThresholdBar(Context context, AttributeSet attrs) {
 		super(context, attrs);

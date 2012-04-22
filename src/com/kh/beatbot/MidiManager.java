@@ -47,7 +47,7 @@ public class MidiManager implements Parcelable {
 	// ticks per quarter note (I think)
 	public final int RESOLUTION = MidiFile.DEFAULT_RESOLUTION;
 
-	private long currTick = 0;
+	private long currTick = -1;
 	private long loopTick = RESOLUTION * 4;
 	private long MSPT;
 
@@ -102,7 +102,7 @@ public class MidiManager implements Parcelable {
 		for (int k : tempNotes.keySet()) {
 			if (tempNotes.get(k) != null)
 				midiNotes.set(k, tempNotes.get(k));
-			else
+			else if (k < midiNotes.size()) // sanity check
 				midiNotes.remove(k);
 		}
 		tempNotes.clear();
@@ -110,6 +110,10 @@ public class MidiManager implements Parcelable {
 
 	public long getLoopTick() {
 		return loopTick;
+	}
+	
+	public void setLoopTick(long loopTick) {
+		this.loopTick = loopTick;
 	}
 
 	public MidiNote addNote(long onTick, long offTick, int note) {
@@ -177,13 +181,11 @@ public class MidiManager implements Parcelable {
 	}
 
 	public void runTicker() {
-		currTick = -1;
 		long startNano = System.nanoTime();
 		long nextTickNano = startNano + MSPT * 1000;
 
 		while (playbackManager.getState() == PlaybackManager.State.PLAYING
-				|| recordManager.getState() == RecordManager.State.RECORDING
-				|| recordManager.getState() == RecordManager.State.LISTENING) {
+				|| recordManager.getState() != RecordManager.State.INITIALIZING) {
 			if (System.nanoTime() >= nextTickNano) {
 				currTick++;
 				if (currTick >= loopTick) {
@@ -226,7 +228,7 @@ public class MidiManager implements Parcelable {
 	}
 
 	public void reset() {
-		currTick = 0;
+		currTick = -1;
 	}
 
 	public void setRecordNoteOn(int velocity) {
@@ -301,6 +303,8 @@ public class MidiManager implements Parcelable {
 		}
 		out.writeInt(noteInfo.length);
 		out.writeLongArray(noteInfo);
+		out.writeLong(currTick);
+		out.writeLong(loopTick);
 	}
 
 	public static final Parcelable.Creator<MidiManager> CREATOR = new Parcelable.Creator<MidiManager>() {
@@ -329,5 +333,7 @@ public class MidiManager implements Parcelable {
 		for (int i = 0; i < noteInfo.length; i += 3) {
 			addNote(noteInfo[i], noteInfo[i + 1], (int) noteInfo[i + 2]);
 		}
+		currTick = in.readLong();
+		loopTick = in.readLong();
 	}
 }
