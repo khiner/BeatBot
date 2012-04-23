@@ -139,10 +139,6 @@ public class ThresholdBar extends SurfaceViewBase {
 
 	@Override
 	protected void drawFrame() {
-		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		gl.glViewport(0, 0, width, height);
-		gl.glLoadIdentity();
-		GLU.gluOrtho2D(gl, 0, width, height, 0);
 		drawChannels();
 		drawThresholdBar();
 		initThresholdBar();

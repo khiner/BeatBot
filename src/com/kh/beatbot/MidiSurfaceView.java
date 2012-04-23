@@ -9,7 +9,6 @@ import java.util.Map;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
-import android.opengl.GLU;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
@@ -528,11 +527,6 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 	@Override
 	protected void drawFrame() {
-		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		gl.glViewport(0, 0, width, height);
-		gl.glLoadIdentity();
-		GLU.gluOrtho2D(gl, 0, width, height, 0);
-
 		boolean recording = recorder.getState() == RecordManager.State.LISTENING
 				|| recorder.getState() == RecordManager.State.RECORDING;
 		drawRecordRowFill(recording);

@@ -61,12 +61,11 @@
             android:onClick="bpmTap"
             android:src="@drawable/bpm_tap_btn_src" />
         
-        <TextView
+        <com.kh.beatbot.BpmView
             android:id="@+id/bpm"
-            android:layout_width="60dp"
+            android:layout_width="66dp"
             android:layout_height="40dp"
-            android:layout_marginLeft="10dp"
-            android:background="#FFFFFF00" />
+            android:layout_marginLeft="10dp" />
             
             
     </LinearLayout>

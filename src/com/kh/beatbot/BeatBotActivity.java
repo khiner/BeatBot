@@ -14,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.KarlHiner.BeatBox.R;
 
@@ -115,7 +114,7 @@ public class BeatBotActivity extends Activity {
 		midiSurfaceView.setRecorderService(recordManager);
 		midiSurfaceView.setPlaybackManager(playbackManager);
 
-		((TextView) findViewById(R.id.bpm)).setText(String.valueOf((int)midiManager
+		((BpmView) findViewById(R.id.bpm)).setText(String.valueOf((int)midiManager
 				.getBPM()));
 		if (savedInstanceState != null) {
 			if (savedInstanceState.getBoolean("recording")) {
@@ -240,11 +239,11 @@ public class BeatBotActivity extends Activity {
 		float secondsElapsed = (tapTime - lastTapTime)/1000f;
 		lastTapTime = tapTime;
 		// if too much time has passed, assume this is inteded as the first tap
-		if (secondsElapsed > 2)
+		if (secondsElapsed > 1.8)
 			return;
 		
 		float bpm = (1/secondsElapsed)*60;
-		((TextView)findViewById(R.id.bpm)).setText(String.valueOf((int)bpm));
+		((BpmView)findViewById(R.id.bpm)).setText(String.valueOf((int)bpm));
 		midiManager.setBPM(bpm);
 	}
 	

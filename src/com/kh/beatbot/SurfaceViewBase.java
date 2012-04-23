@@ -15,6 +15,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.app.Activity;
 import android.content.Context;
+import android.opengl.GLU;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -166,6 +167,10 @@ public abstract class SurfaceViewBase extends SurfaceView implements SurfaceHold
 	}	
 
 	private void drawFrame(GL10 gl, int w, int h) {
+		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+		gl.glViewport(0, 0, width, height);
+		gl.glLoadIdentity();
+		GLU.gluOrtho2D(gl, 0, width, height, 0);
 		drawFrame();
 	}
 		

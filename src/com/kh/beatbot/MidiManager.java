@@ -214,7 +214,7 @@ public class MidiManager implements Parcelable {
 					// note(s) could have been deleted since the start of the
 					// loop
 					if (midiNote == null)
-						break;
+						continue;
 					if (currTick == midiNote.getOnTick())
 						// note - 1, since track 0 is recording track
 						playbackManager.playSample(midiNote.getNote() - 1);
