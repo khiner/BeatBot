@@ -37,6 +37,10 @@ public class RecordManager {
 	FileOutputStream os = null;
 
 	private short currAmp = 0;
+	private short lastAmp = 0;
+	private int runningTotal = 0, runningAvg = 0, runningCount = 0;
+	
+	private boolean spike = false;
 
 	public enum State {
 		LISTENING, RECORDING, INITIALIZING
@@ -106,17 +110,21 @@ public class RecordManager {
 		recorder.read(buffer, 0, bufferSize);
 
 		try {
-			while (state == State.RECORDING || state == State.LISTENING) {
+			while (state != State.INITIALIZING) {
 				recorder.read(buffer, 0, bufferSize);
 
 				if (state == State.LISTENING && overThreshold(buffer)) {
+					Log.d("record", "rec");
 					startRecording();
 				}
 				if (state == State.RECORDING) {
 					os.write(buffer); // Write buffer to file
 					if (underThreshold(buffer)) {
-						state = State.LISTENING;
 						stopRecording();
+					} else if (spike) {
+						Log.d("spike!", "spike");
+						stopRecording();
+						startRecording();
 					}
 				}
 				// update threshold bar
@@ -124,11 +132,18 @@ public class RecordManager {
 						currAmp / 10000f);
 			}
 		} catch (IOException e) {
+			try {
+				stopRecording();
+			} catch (IOException e2) {
+				e.printStackTrace();
+			}
 			e.printStackTrace();
 		}
 	}
 
 	public void startRecording() throws IOException {
+		runningTotal = 0;
+		runningCount = 0;
 		state = State.RECORDING;
 		// MIDI-on event (velocity)
 		midiManager.setRecordNoteOn(100);
@@ -138,6 +153,7 @@ public class RecordManager {
 	}
 
 	public void stopRecording() throws IOException {
+		state = State.LISTENING;
 		// MIDI-off event (velocity)
 		midiManager.setRecordNoteOff(100);
 
@@ -230,6 +246,7 @@ public class RecordManager {
 			// 16bit sample size
 			currAmp = getShort(buffer[i * 32], buffer[i * 32 + 1]);
 			if (currAmp > offThreshold) { // Check amplitude
+				//spike = currAmp > offThreshold + 3500;				
 				return false;
 			}
 		}

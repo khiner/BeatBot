@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import android.os.Environment;
 import android.os.Parcel;
@@ -36,7 +37,12 @@ public class MidiManager implements Parcelable {
 	// note is used again instead of its temp version
 	// the integer keys correspond to indices in midiManager.midiNotes list
 	private Map<Integer, MidiNote> tempNotes = new HashMap<Integer, MidiNote>();
+	
+	// stack of MidiNote lists, for undo
+	private Stack<List<MidiNote>> undoStack = new Stack<List<MidiNote>>();
 
+	private List<MidiNote> currState = new ArrayList<MidiNote>();
+	
 	private Thread tickThread = null;
 	private PlaybackManager playbackManager = null;
 	private RecordManager recordManager = null;
@@ -61,6 +67,7 @@ public class MidiManager implements Parcelable {
 		tempoTrack.insertEvent(tempo);
 		MSPT = tempo.getMpqn() / MidiFile.DEFAULT_RESOLUTION;
 		midiTracks.add(new MidiTrack());
+		saveState();
 	}
 
 	public void setPlaybackManager(PlaybackManager playbackManager) {
@@ -260,6 +267,30 @@ public class MidiManager implements Parcelable {
 		return currTick;
 	}
 
+	public void saveState() {
+		undoStack.push(currState);
+		currState = copyMidiList(midiNotes);
+		// max undo stack of 40
+		if (undoStack.size() > 40)
+			undoStack.remove(0);
+	}
+	
+	public void undo() {
+		if (undoStack.isEmpty())
+			return;
+		List<MidiNote> lastState = undoStack.pop();
+		midiNotes = lastState;
+		currState = copyMidiList(midiNotes);
+	}
+	
+	private List<MidiNote> copyMidiList(List<MidiNote> midiList) {
+		List<MidiNote> copy = new ArrayList<MidiNote>();
+		for (MidiNote midiNote : midiNotes) {
+			copy.add(midiNote.getCopy());
+		}
+		return copy;
+	}
+	
 	private String getFilename() {
 		String filepath = Environment.getExternalStorageDirectory().getPath();
 		File file = new File(filepath, SAVE_FOLDER);

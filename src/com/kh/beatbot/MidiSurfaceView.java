@@ -130,23 +130,27 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			return midiManager.addNote(onTick, offTick, note);
 		}
 
-		// translates the tickOffset to ensure that leftTick and rightTick are in view
+		// translates the tickOffset to ensure that leftTick and rightTick are
+		// in view
 		// returns the amount translated
-		//TODO: to fix select region prob, also update numTicks if need be, i.e. fit everything!
+		// TODO: to fix select region prob, also update numTicks if need be,
+		// i.e. fit everything!
 		public void updateView(long leftTick, long rightTick) {
 			// if we are dragging out of view, scroll appropriately
 			// if the right is out but the left is in, just scroll
 			if (leftTick < tickOffset && rightTick < tickOffset + numTicks) {
 				setTickOffset(leftTick);
-				
-			// if the left is out but the right is in, just scroll				
-			} else if (rightTick > tickOffset + numTicks && leftTick > tickOffset) {				
+
+				// if the left is out but the right is in, just scroll
+			} else if (rightTick > tickOffset + numTicks
+					&& leftTick > tickOffset) {
 				setTickOffset(rightTick - numTicks);
-				
-			// if both left and right are out of view, us 
-			} else if (leftTick <= tickOffset && rightTick >= tickOffset + numTicks) {
-//				setTickOffset(leftTick);
-//				setNumTicks(rightTick - leftTick);
+
+				// if both left and right are out of view, us
+			} else if (leftTick <= tickOffset
+					&& rightTick >= tickOffset + numTicks) {
+				// setTickOffset(leftTick);
+				// setNumTicks(rightTick - leftTick);
 			}
 		}
 	}
@@ -173,7 +177,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	List<MidiNote> selectedNotes = new ArrayList<MidiNote>();
 
 	TickWindow tickWindow;
-	
+
 	private final long doubleTapTime = 300;
 
 	private long dragOffsetTick[] = new long[5];
@@ -203,11 +207,13 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	// true when a note is being "pinched" (two-fingers touching the note)
 	private boolean pinch = false;
 
-	private boolean scrolling = false;	
+	private boolean scrolling = false;
 	private long scrollViewStartTime = 0;
 	private long scrollViewEndTime = Long.MAX_VALUE;
-	
+
 	private boolean loopMarkerSelected = false;
+
+	private boolean stateChanged = false;
 
 	public MidiSurfaceView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -344,7 +350,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		gl.glDrawArrays(GL10.GL_LINES, 0, 2);
 		gl.glPopMatrix();
 	}
-	
+
 	private void drawRecordRowFill(boolean recording) {
 		gl.glColor4f(.7f, .7f, .7f, 1f);
 		if (recording)
@@ -461,14 +467,15 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	}
 
 	private void initLoopMarkerVBs() {
-		float h = height/midiManager.getNumSamples();
-		float[] loopMarkerLine = new float[] {0, h/2 + 1, 0, height};
-		float[] loopMarkerTriangle = new float[] {0, h/2, 0, h, -h/2, 3*h/4};
-		
+		float h = height / midiManager.getNumSamples();
+		float[] loopMarkerLine = new float[] { 0, h / 2 + 1, 0, height };
+		float[] loopMarkerTriangle = new float[] { 0, h / 2, 0, h, -h / 2,
+				3 * h / 4 };
+
 		loopMarkerLineVB = makeFloatBuffer(loopMarkerLine);
 		loopMarkerVB = makeFloatBuffer(loopMarkerTriangle);
 	}
-	
+
 	private float tickToX(long tick) {
 		return (float) (tick - tickWindow.tickOffset) / tickWindow.numTicks
 				* width;
@@ -534,7 +541,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				|| playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			currTick = midiManager.getCurrTick();
 			// if we're recording, keep the current recording tick in view.
-			if (recording && currTick > tickWindow.tickOffset + tickWindow.numTicks)
+			if (recording
+					&& currTick > tickWindow.tickOffset + tickWindow.numTicks)
 				tickWindow.setNumTicks(currTick - tickWindow.tickOffset);
 			drawCurrentTick();
 		}
@@ -545,7 +553,9 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		drawLoopMarker();
 		drawAllMidiNotes();
 		drawSelectRegion();
-		if (scrolling || scrollVelocity != 0 || Math.abs(System.currentTimeMillis() - scrollViewEndTime) <= doubleTapTime*2) {
+		if (scrolling
+				|| scrollVelocity != 0
+				|| Math.abs(System.currentTimeMillis() - scrollViewEndTime) <= doubleTapTime * 2) {
 			drawScrollView();
 		}
 	}
@@ -561,9 +571,9 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 		float alpha = .8f;
 		if (!scrollingEnded && elapsedTime <= doubleTapTime)
-			alpha *= elapsedTime / (float)doubleTapTime;
+			alpha *= elapsedTime / (float) doubleTapTime;
 		else if (scrollingEnded && elapsedTime > doubleTapTime)
-			alpha *= (doubleTapTime*2 - elapsedTime) / (float)doubleTapTime;
+			alpha *= (doubleTapTime * 2 - elapsedTime) / (float) doubleTapTime;
 
 		gl.glColor4f(1, 1, 1, alpha);
 
@@ -584,17 +594,24 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	 */
 	private long dragNote(int pointerId, MidiNote midiNote, long tickDiff) {
 		long beforeTick = midiNote.getOnTick();
-		// drag only if the note is moved a certain distance from its start tick
-		// this prevents minute finger movements from moving/quantizing notes
-		// and also indicates a "sticking point" of the initial note position
-		if (startOnTicks.containsKey(pointerId)
-				&& Math.abs(startOnTicks.get(pointerId) - midiNote.getOnTick())
-						+ Math.abs(tickDiff) > 15) {
-			midiNote.setOnTick(midiNote.getOnTick() + tickDiff);
-			midiNote.setOffTick(midiNote.getOffTick() + tickDiff);
-			if (snapToGrid) // quantize if snapToGrid mode is on
-				midiManager.quantize(midiNote, currentBeatDivision());
+		if (startOnTicks.containsKey(pointerId)) {
+			// drag only if the note is moved a certain distance
+			// from its start tick this prevents minute finger
+			// movements from moving/quantizing notes and also
+			// indicates a "sticking point" of the initial note position
+			if (Math.abs(startOnTicks.get(pointerId) - midiNote.getOnTick())
+					+ Math.abs(tickDiff) > 10) {
+				midiNote.setOnTick(midiNote.getOnTick() + tickDiff);
+				midiNote.setOffTick(midiNote.getOffTick() + tickDiff);
+				if (snapToGrid) // quantize if snapToGrid mode is on
+					midiManager.quantize(midiNote, currentBeatDivision());
+			} else { // inside threshold distance - set to original position
+				midiNote.setOffTick(startOnTicks.get(pointerId)
+						+ midiNote.getOffTick() - midiNote.getOnTick());
+				midiNote.setOnTick(startOnTicks.get(pointerId));
+			}
 		}
+		stateChanged = true;
 		return midiNote.getOnTick() - beforeTick;
 	}
 
@@ -614,6 +631,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			if (midiNote.getOffTick() + offTickDiff <= tickWindow.maxTicks)
 				midiNote.setOffTick(midiNote.getOffTick() + offTickDiff);
 		}
+		stateChanged = true;
 	}
 
 	private void handleActionUp(MotionEvent e) {
@@ -621,7 +639,9 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		if (time - lastDownTime < 200) {
 			// if the second tap is not in the same location as the first tap,
 			// no double tap :(
-			if (time - lastTapTime < doubleTapTime && Math.abs(e.getX() - lastTapX) <= 25 && yToNote(e.getY()) == yToNote(lastTapY)) {
+			if (time - lastTapTime < doubleTapTime
+					&& Math.abs(e.getX() - lastTapX) <= 25
+					&& yToNote(e.getY()) == yToNote(lastTapY)) {
 				doubleTap(e, touchedNotes.get(e.getPointerId(0)));
 			} else {
 				singleTap(e, touchedNotes.get(e.getPointerId(0)));
@@ -647,6 +667,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				selectedNotes.remove(touchedNote);
 			}
 			midiManager.removeNote(touchedNote);
+			stateChanged = true;
 		} else {
 			// add a note based on the current tick granularity
 			if (note > 0) {// can't add note on record track
@@ -654,6 +675,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				selectedNotes.add(noteToAdd);
 				handleMidiCollisions();
 				selectedNotes.remove(noteToAdd);
+				stateChanged = true;
 			}
 		}
 		// reset tap time so that a third tap doesn't register as
@@ -677,7 +699,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 						copy.setOffTick(selected.getOnTick() - 1);
 						midiManager.getTempNotes().put(i, copy);
 						// if the selected note ends after the beginning
-						// of the other note, or if the selected note completely covers
+						// of the other note, or if the selected note completely
+						// covers
 						// the other note, delete the covered note
 					} else if (selected.getOffTick() >= note.getOnTick()
 							&& selected.getOffTick() <= note.getOffTick()
@@ -692,7 +715,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 	private void startScrollView() {
 		long now = System.currentTimeMillis();
-		if (now - scrollViewEndTime > doubleTapTime*2)
+		if (now - scrollViewEndTime > doubleTapTime * 2)
 			scrollViewStartTime = now;
 		else
 			scrollViewEndTime = Long.MAX_VALUE;
@@ -723,9 +746,11 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				} else {
 					// check if loop marker selected
 					float loopX = tickToX(midiManager.getLoopTick());
-					if (note == 0 && e.getX(0) >= loopX - 20 && e.getX(0) <= loopX + 20){
+					if (note == 0 && e.getX(0) >= loopX - 20
+							&& e.getX(0) <= loopX + 20) {
 						loopMarkerSelected = true;
-					} else // otherwise, enable scrolling
+					} else
+						// otherwise, enable scrolling
 						scrollAnchorTick = tick;
 				}
 			}
@@ -817,7 +842,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 					// the view
 					tickWindow.updateView(leftMost.getOnTick(),
 							rightMost.getOffTick());
-					//dragOffsetTick[id] += translate;
+					// dragOffsetTick[id] += translate;
 				}
 				// handle any overlapping notes (clip or delete notes as
 				// appropriate)
@@ -827,7 +852,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 					if (selectRegion) { // update select region
 						selectWithRegion(e.getX(0), e.getY(0));
 					} else if (loopMarkerSelected) {
-						midiManager.setLoopTick(tickWindow.getMajorTickToLeftOf(xToTick(e.getX(0))));
+						midiManager.setLoopTick(tickWindow
+								.getMajorTickToLeftOf(xToTick(e.getX(0))));
 					} else { // one finger scroll
 						scrollVelocity = tickWindow.scroll(e.getX(0));
 					}
@@ -850,6 +876,9 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			midiManager.mergeTempNotes();
 			touchedNotes.clear();
 			startOnTicks.clear();
+			if (stateChanged)
+				midiManager.saveState();
+			stateChanged = false;
 			break;
 		}
 		return true;
