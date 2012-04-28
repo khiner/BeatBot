@@ -28,7 +28,6 @@ public class MidiManager implements Parcelable {
 	private TimeSignature ts = new TimeSignature();
 	private Tempo tempo = new Tempo();
 	private MidiTrack tempoTrack = new MidiTrack();
-	private ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
 	private List<MidiNote> midiNotes = new ArrayList<MidiNote>();
 	// if a note is dragged over another, the "eclipsed" note should be
 	// shortened or removed as appropriate. However, these changes only become
@@ -47,7 +46,8 @@ public class MidiManager implements Parcelable {
 	private PlaybackManager playbackManager = null;
 	private RecordManager recordManager = null;
 
-	private boolean recording = false;
+	private MidiEvent lastEvent = null;
+	private boolean recording;
 	private int numSamples = 0;
 
 	// ticks per quarter note (I think)
@@ -66,7 +66,6 @@ public class MidiManager implements Parcelable {
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
 		MSPT = tempo.getMpqn() / MidiFile.DEFAULT_RESOLUTION;
-		midiTracks.add(new MidiTrack());
 		saveState();
 	}
 
@@ -91,9 +90,6 @@ public class MidiManager implements Parcelable {
 		return numSamples;
 	}
 
-	public List<MidiTrack> getMidiTracks() {
-		return midiTracks;
-	}
 
 	public List<MidiNote> getMidiNotes() {
 		return midiNotes;
@@ -133,8 +129,6 @@ public class MidiManager implements Parcelable {
 	public MidiNote addNote(long onTick, long offTick, int note) {
 		NoteOn on = new NoteOn(onTick, 0, note, 100);
 		NoteOff off = new NoteOff(offTick, 0, note, 100);
-		midiTracks.get(0).insertEvent(on);
-		midiTracks.get(0).insertEvent(off);
 		MidiNote midiNote = new MidiNote(on, off);
 		midiNotes.add(midiNote);
 		return midiNote;
@@ -142,8 +136,6 @@ public class MidiManager implements Parcelable {
 
 	public void removeNote(MidiNote midiNote) {
 		if (midiNotes.contains(midiNote)) {
-			midiTracks.get(0).removeEvent(midiNote.getOnEvent());
-			midiTracks.get(0).removeEvent(midiNote.getOffEvent());
 			midiNotes.remove(midiNote);
 		}
 	}
@@ -152,14 +144,8 @@ public class MidiManager implements Parcelable {
 		return tempo;
 	}
 
-	public MidiEvent getLastEvent() {
-		return midiTracks.get(0).getEvents()
-				.get(midiTracks.get(0).getEventCount() - 1);
-	}
-
 	public long getLastTick() {
-		return midiTracks.get(0).getEvents()
-				.get(midiTracks.get(0).getEventCount() - 1).getTick();
+		return lastEvent.getTick();
 	}
 
 	/*
@@ -250,16 +236,17 @@ public class MidiManager implements Parcelable {
 		long onTick = currTick;
 		// tick, channel, note, velocity
 		NoteOn on = new NoteOn(onTick, 0, 0, velocity);
-		midiTracks.get(0).insertEvent(on);
+		lastEvent = on;
 		recording = true;
+
 	}
 
 	public void setRecordNoteOff(int velocity) {
 		long offTick = currTick;
 		// tick, channel, note, velocity
 		NoteOff off = new NoteOff(offTick, 0, 0, velocity);
-		midiNotes.add(new MidiNote((NoteOn) getLastEvent(), off));
-		midiTracks.get(0).insertEvent(off);
+		midiNotes.add(new MidiNote((NoteOn)lastEvent, off));
+		lastEvent = off;
 		recording = false;
 	}
 
@@ -304,9 +291,13 @@ public class MidiManager implements Parcelable {
 
 	public void writeToFile() {
 		// 3. Create a MidiFile with the tracks we created
-		for (MidiTrack midiTrack : midiTracks) {
-			Collections.sort(midiTrack.getEvents());
+		ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
+		midiTracks.add(new MidiTrack());
+		for (MidiNote midiNote : midiNotes) {
+			midiTracks.get(0).insertEvent(midiNote.getOnEvent());
+			midiTracks.get(0).insertEvent(midiNote.getOffEvent());
 		}
+		Collections.sort(midiTracks.get(0).getEvents());
 		midiTracks.add(0, tempoTrack);
 
 		MidiFile midi = new MidiFile(RESOLUTION, midiTracks);
@@ -366,7 +357,6 @@ public class MidiManager implements Parcelable {
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
 		MSPT = in.readLong();
-		midiTracks.add(new MidiTrack());
 		long[] noteInfo = new long[in.readInt()];
 		in.readLongArray(noteInfo);
 		for (int i = 0; i < noteInfo.length; i += 3) {
