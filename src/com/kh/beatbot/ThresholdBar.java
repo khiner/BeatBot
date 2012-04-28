@@ -5,7 +5,6 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
-import android.opengl.GLU;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -21,25 +20,33 @@ public class ThresholdBar extends SurfaceViewBase {
 
 	private int barWidth;
 
-	private float threshold = 0.35f;
+	private float threshold;
+	private short shortThreshold;
 	private float[] channelLevels = new float[] { 0 , 0 };
 
 	public ThresholdBar(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		setThreshold(0.5f);
 	}
 
 	public float getThreshold() {
 		return threshold;
 	}
 
+	public short getShortThreshold() {
+		return shortThreshold;
+	}
+	
 	public void setThreshold(float threshold) {
 		this.threshold = clipToUnit(threshold);
+		shortThreshold = dbToShort((this.threshold - 1)*60);
 	}
 
-	public void setChannelLevels(float channel1Lvl, float channel2Lvl) {
-		// clip the channels to range (0, 1)
-		channelLevels[0] = clipToUnit(channel1Lvl);
-		channelLevels[1] = clipToUnit(channel2Lvl);
+	public void setChannelLevels(float channel1Db, float channel2Db) {
+		// map channel DBs to range (0, 1)
+		channelLevels[0] = dbToUnit(channel1Db);
+		channelLevels[1] = dbToUnit(channel2Db);
+		// Log.d("channel level", String.valueOf(channelLevels[0]));
 	}
 
 	private void initChannelBuffers() {
@@ -129,6 +136,11 @@ public class ThresholdBar extends SurfaceViewBase {
 		initThresholdBar();
 	}
 
+	private float dbToUnit(float db) {
+		// db range = -60 - 0, need range 0-1
+		return db <= -60 ? 0 : db/60 + 1;
+	}
+	
 	private float clipToUnit(float x) {
 		if (x < 0)
 			return 0;
@@ -165,4 +177,8 @@ public class ThresholdBar extends SurfaceViewBase {
 		}
 		return true;
 	}
+	
+	private short dbToShort(float db) {
+		return (short)(32768*Math.pow(10, db/20));
+	}	
 }

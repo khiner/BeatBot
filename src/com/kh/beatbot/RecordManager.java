@@ -4,17 +4,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Environment;
-import android.util.Log;
 
 public class RecordManager {
 	private static final int RECORDER_BPP = 16;
 	private static final String SAVE_FOLDER = "BeatBot/Recorded_Audio";
 	private static final String TEMP_FILE = "record_temp.raw";
+	private String baseRecordPath = null;
 	private static final int RECORDER_SAMPLERATE = 44100;
 	private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
 	private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
@@ -23,24 +26,25 @@ public class RecordManager {
 			* CHANNELS / 8;
 	private final long LONG_SAMPLE_RATE = RECORDER_SAMPLERATE;
 
+	private String currFilename = null;
+
 	private static RecordManager singletonInstance = null;
 
 	// Midi Manager to manage MIDI events
 	private MidiManager midiManager;
-	
+
 	private ThresholdBar thresholdBar;
 
 	private AudioRecord recorder = null;
 	private int bufferSize = 0;
+	// queue of paths to raw audio data to process
+	private Queue<String> processingQueue = new LinkedList<String>();
 	private Thread recordingThread = null;
+	private Thread smrtThread = null;
 	private State state;
-	FileOutputStream os = null;
+	private FileOutputStream os = null;
 
 	private short currAmp = 0;
-	private short lastAmp = 0;
-	private int runningTotal = 0, runningAvg = 0, runningCount = 0;
-	
-	private boolean spike = false;
 
 	public enum State {
 		LISTENING, RECORDING, INITIALIZING
@@ -61,6 +65,7 @@ public class RecordManager {
 		bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
 				RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 		initRecorder();
+		baseRecordPath = getBaseRecordPath();
 		state = State.INITIALIZING;
 	}
 
@@ -81,26 +86,32 @@ public class RecordManager {
 		return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + ".wav");
 	}
 
-	private String getTempFilename() {
+	private String getBaseRecordPath() {
 		String filepath = Environment.getExternalStorageDirectory().getPath();
 		File file = new File(filepath, SAVE_FOLDER);
 
 		if (!file.exists()) {
 			file.mkdirs();
 		}
-
-		File tempFile = new File(filepath, TEMP_FILE);
-
-		if (tempFile.exists())
-			tempFile.delete();
-
-		return (file.getAbsolutePath() + "/" + TEMP_FILE);
+		return file.getAbsolutePath();
 	}
-	
+
+	private String getTempFilename() {
+		File tempFile = new File(baseRecordPath, TEMP_FILE);
+
+		int i = 0;
+		while (tempFile.exists()) {
+			i++;
+			tempFile = new File(baseRecordPath, TEMP_FILE + i);
+		}
+
+		return tempFile.getAbsolutePath();
+	}
+
 	public void setMidiManager(MidiManager midiManager) {
 		this.midiManager = midiManager;
 	}
-	
+
 	public void setThresholdBar(ThresholdBar thresholdBar) {
 		this.thresholdBar = thresholdBar;
 	}
@@ -108,28 +119,24 @@ public class RecordManager {
 	private void writeAudioDataToFile() {
 		byte buffer[] = new byte[bufferSize];
 		recorder.read(buffer, 0, bufferSize);
+		recorder.read(buffer, 0, bufferSize);
 
 		try {
 			while (state != State.INITIALIZING) {
 				recorder.read(buffer, 0, bufferSize);
 
 				if (state == State.LISTENING && overThreshold(buffer)) {
-					Log.d("record", "rec");
 					startRecording();
 				}
 				if (state == State.RECORDING) {
 					os.write(buffer); // Write buffer to file
 					if (underThreshold(buffer)) {
 						stopRecording();
-					} else if (spike) {
-						Log.d("spike!", "spike");
-						stopRecording();
-						startRecording();
 					}
 				}
 				// update threshold bar
-				thresholdBar.setChannelLevels(currAmp / 10000f,
-						currAmp / 10000f);
+				float Db = shortToDb(currAmp);
+				thresholdBar.setChannelLevels(Db, Db);
 			}
 		} catch (IOException e) {
 			try {
@@ -141,15 +148,41 @@ public class RecordManager {
 		}
 	}
 
+	private void processByteBuffersOnQueue() {
+		String filePath = null;
+		try {
+			while (true) {
+				synchronized (processingQueue) {
+					while (processingQueue.isEmpty())
+						processingQueue.wait();
+					filePath = processingQueue.remove();
+				}
+				try {
+					// copy file to byte array
+					// byte[] bytes = getBytesFromFile(new
+					// File(filePath));
+					// copy to wave
+					copyWaveFile(filePath, getFilename());
+					// close file
+					new File(filePath).delete();
+					// xml = extractFeatures(wav);
+					// class = classify(xml);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void startRecording() throws IOException {
-		runningTotal = 0;
-		runningCount = 0;
-		state = State.RECORDING;
 		// MIDI-on event (velocity)
 		midiManager.setRecordNoteOn(100);
 
-		String filename = getTempFilename();
-		os = new FileOutputStream(filename);
+		currFilename = getTempFilename();
+		os = new FileOutputStream(currFilename);
+		state = State.RECORDING;
 	}
 
 	public void stopRecording() throws IOException {
@@ -157,10 +190,12 @@ public class RecordManager {
 		// MIDI-off event (velocity)
 		midiManager.setRecordNoteOff(100);
 
-		// close and write to WAV
+		// close and add to processing queue
 		os.close();
-		copyWaveFile(getTempFilename(), getFilename());
-		deleteTempFile();
+		synchronized (processingQueue) {
+			processingQueue.add(currFilename);
+			processingQueue.notify();
+		}
 	}
 
 	public void startListening() {
@@ -175,12 +210,19 @@ public class RecordManager {
 			}
 		}, "AudioRecorder Thread");
 		state = State.LISTENING;
-		recordingThread.start();		
+		recordingThread.start();
+		smrtThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				processByteBuffersOnQueue();
+			}
+		}, "Smart Thread");
+		smrtThread.start();
 	}
 
 	public void stopListening() {
 		boolean recording = (state == State.RECORDING);
-		state = State.INITIALIZING;				
+		state = State.INITIALIZING;
 		if (recorder != null) {
 			recorder.stop();
 			try {
@@ -201,12 +243,6 @@ public class RecordManager {
 		}
 	}
 
-	private void deleteTempFile() {
-		File file = new File(getTempFilename());
-
-		file.delete();
-	}
-
 	private void copyWaveFile(String inFilename, String outFilename) {
 		byte[] buffer = new byte[bufferSize];
 
@@ -216,7 +252,7 @@ public class RecordManager {
 			long totalAudioLen = in.getChannel().size();
 			long totalDataLen = totalAudioLen + 36;
 
-			WriteWaveFileHeader(out, totalAudioLen, totalDataLen);
+			writeWaveFileHeader(out, totalAudioLen, totalDataLen);
 
 			while (in.read(buffer) != -1) {
 				out.write(buffer);
@@ -229,7 +265,7 @@ public class RecordManager {
 	}
 
 	private boolean overThreshold(byte[] buffer) {
-		int onThreshold = (int) (thresholdBar.getThreshold() * 10000);
+		short onThreshold = thresholdBar.getShortThreshold();
 		for (int i = 0; i < bufferSize / 32; i++) {
 			// 16bit sample size
 			currAmp = getShort(buffer[i * 32], buffer[i * 32 + 1]);
@@ -241,19 +277,41 @@ public class RecordManager {
 	}
 
 	private boolean underThreshold(byte[] buffer) {
-		int offThreshold = (int) (thresholdBar.getThreshold() * 10000) - 2000;
+		short offThreshold = (short) (thresholdBar.getShortThreshold() * .8);
 		for (int i = 0; i < bufferSize / 32; i++) {
 			// 16bit sample size
 			currAmp = getShort(buffer[i * 32], buffer[i * 32 + 1]);
 			if (currAmp > offThreshold) { // Check amplitude
-				//spike = currAmp > offThreshold + 3500;				
 				return false;
 			}
 		}
 		return true;
 	}
 
-	private void WriteWaveFileHeader(FileOutputStream out, long totalAudioLen,
+	// Returns the contents of the file in a byte array.
+	public static byte[] getBytesFromFile(File file) throws IOException {
+		InputStream is = new FileInputStream(file);
+
+		// Get the size of the file
+		long length = file.length();
+
+		// Create the byte array to hold the data
+		byte[] bytes = new byte[(int) length];
+
+		// Read in the bytes
+		int offset = 0;
+		int numRead = 0;
+		while (offset < bytes.length
+				&& (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+			offset += numRead;
+		}
+
+		// Close the input stream and return bytes
+		is.close();
+		return bytes;
+	}
+
+	private void writeWaveFileHeader(FileOutputStream out, long totalAudioLen,
 			long totalDataLen) throws IOException {
 
 		byte[] header = new byte[44];
@@ -311,5 +369,9 @@ public class RecordManager {
 	 */
 	private short getShort(byte argB1, byte argB2) {
 		return (short) (argB1 | (argB2 << 8));
+	}
+
+	private float shortToDb(short amp) {
+		return 20 * (float) Math.log10(Math.abs(amp) / 32768f);
 	}
 }

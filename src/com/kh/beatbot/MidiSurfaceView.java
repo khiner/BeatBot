@@ -882,5 +882,5 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			break;
 		}
 		return true;
-	}
+	}	
 }
