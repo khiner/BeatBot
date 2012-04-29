@@ -118,21 +118,19 @@ public class ChannelEvent extends MidiEvent {
 	}
 	public static ChannelEvent parseChannelEvent(long tick, long delta, int type, int channel, InputStream in) throws IOException {
 		
-		int val1 = in.read();
-		int val2 = 0;
-		if(type != PROGRAM_CHANGE && type != CHANNEL_AFTERTOUCH) {
-			val2 = in.read();
-		}
+		int note = in.read();
+		int velocity = in.read();
+
 		
 		switch(type) {
 			case NOTE_OFF:
-				return new NoteOff(tick, delta, channel, val1, val2);
+				return new NoteOff(tick, delta, channel, note, velocity);
 			case NOTE_ON:
-				return new NoteOn(tick, delta, channel, val1, val2);
+				return new NoteOn(tick, delta, channel, note, velocity);
 			case PITCH_BEND:
-				return new PitchBend(tick, delta, channel, val1, val2);
+				return new PitchBend(tick, delta, channel, note, velocity);
 			default:
-				return new ChannelEvent(tick, delta, type, channel, val1, val2);
+				return new ChannelEvent(tick, delta, type, channel, note, velocity);
 		}
 	}
 	

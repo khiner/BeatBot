@@ -232,6 +232,15 @@ public class MidiTrack {
 		}
 	}
 	
+	public void recalculateDeltas() {
+		if (mEvents.isEmpty())
+			return;
+		mEvents.get(0).setDelta(mEvents.get(0).getTick());
+		for (int i = 1; i < mEvents.size(); i++) {
+			mEvents.get(i).setDelta(mEvents.get(i).getTick() - mEvents.get(i-1).getTick());
+		}
+	}
+	
 	private void recalculateSize() {
 		
 		mSize = 0;

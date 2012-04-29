@@ -287,6 +287,7 @@ public class MidiManager implements Parcelable {
 			midiTracks.get(1).insertEvent(midiNote.getOffEvent());
 		}
 		Collections.sort(midiTracks.get(1).getEvents());
+		midiTracks.get(1).recalculateDeltas();
 
 		MidiFile midi = new MidiFile(RESOLUTION, midiTracks);
 
@@ -314,9 +315,11 @@ public class MidiManager implements Parcelable {
 					unfinishedNotes.add((NoteOn)events.get(i));
 				else if (events.get(i) instanceof NoteOff) {
 					NoteOff off = (NoteOff)events.get(i);
-					for (NoteOn on : unfinishedNotes) {
+					for (int j = 0; j < unfinishedNotes.size(); j++) {
+						NoteOn on = unfinishedNotes.get(j);
 						if (on.getNoteValue() == off.getNoteValue()) {
 							midiNotes.add(new MidiNote(on, off));
+							unfinishedNotes.remove(j);
 							break;
 						}
 					}
