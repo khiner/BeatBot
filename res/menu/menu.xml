@@ -28,9 +28,9 @@
         </menu>
     </item>
     <item
-        android:id="@+id/save_midi"
+        android:id="@+id/midi_menu_item"
         android:icon="@drawable/midi"
-        android:title="@string/save_midi"/>
+        android:title="@string/import_export_midi" />
     <item
         android:id="@+id/save_wav"
         android:icon="@drawable/wav"

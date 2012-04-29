@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">BeatBot</string>
+    <string name="midi_menu">Midi Menu</string>
     <string name="start_listening">Start Listening</string>
     <string name="stop_listening">Stop Listening</string>
 	<string name="record">Record</string>
@@ -16,8 +17,9 @@
 	<string name="sixteenth_note">1/16</string>
 	<string name="thirty_second_note">1/32</string>
 	<string name="save">Save</string>
-	<string name="save_midi">Export as MIDI</string>
-	<string name="save_wav">Export as WAV</string>
+	<string name="save_midi">Save MIDI</string>
+	<string name="save_wav">Export as WAV</string>	
+	<string name="import_export_midi">Import/Export as MIDI</string>
     <string-array name="sample_types">
         <item name="recorded">Recorded</item>
         <item name="kick">Kick</item>
@@ -27,5 +29,6 @@
         <item name="rim">Rim</item>
         <item name="bass">Bass</item>
     </string-array>
+    <string name="default_midi_file_name">MyMidi</string>
 
 </resources>

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import android.os.Environment;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -24,7 +23,6 @@ import com.kh.beatbot.midi.event.meta.TimeSignature;
 
 public class MidiManager implements Parcelable {
 
-	private static final String SAVE_FOLDER = "BeatBot/MIDI";
 	private TimeSignature ts = new TimeSignature();
 	private Tempo tempo = new Tempo();
 	private MidiTrack tempoTrack = new MidiTrack();
@@ -278,34 +276,22 @@ public class MidiManager implements Parcelable {
 		return copy;
 	}
 	
-	private String getFilename() {
-		String filepath = Environment.getExternalStorageDirectory().getPath();
-		File file = new File(filepath, SAVE_FOLDER);
-
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-
-		return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + ".MIDI");
-	}
-
-	public void writeToFile() {
+	public void writeToFile(File outFile) {
 		// 3. Create a MidiFile with the tracks we created
 		ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
+		midiTracks.add(tempoTrack);
 		midiTracks.add(new MidiTrack());
 		for (MidiNote midiNote : midiNotes) {
-			midiTracks.get(0).insertEvent(midiNote.getOnEvent());
-			midiTracks.get(0).insertEvent(midiNote.getOffEvent());
+			midiTracks.get(1).insertEvent(midiNote.getOnEvent());
+			midiTracks.get(1).insertEvent(midiNote.getOffEvent());
 		}
-		Collections.sort(midiTracks.get(0).getEvents());
-		midiTracks.add(0, tempoTrack);
+		Collections.sort(midiTracks.get(1).getEvents());
 
 		MidiFile midi = new MidiFile(RESOLUTION, midiTracks);
 
 		// 4. Write the MIDI data to a file
-		File output = new File(getFilename());
 		try {
-			midi.writeToFile(output);
+			midi.writeToFile(outFile);
 		} catch (IOException e) {
 			System.err.println(e);
 		}

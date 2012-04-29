@@ -2,6 +2,7 @@ package com.kh.beatbot;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.KarlHiner.BeatBox.R;
+import com.kh.beatbot.menu.MidiFileMenu;
 
 public class BeatBotActivity extends Activity {
 	public class SampleIconAdapter extends ArrayAdapter<String> {
@@ -114,6 +116,7 @@ public class BeatBotActivity extends Activity {
 		midiSurfaceView.setRecorderService(recordManager);
 		midiSurfaceView.setPlaybackManager(playbackManager);
 
+	
 		((BpmView) findViewById(R.id.bpm)).setText(String.valueOf((int)midiManager
 				.getBPM()));
 		if (savedInstanceState != null) {
@@ -146,6 +149,9 @@ public class BeatBotActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
+		Intent midiFileMenuIntent = new Intent(this, MidiFileMenu.class);
+		midiFileMenuIntent.putExtra("midiManager", midiManager);
+		menu.findItem(R.id.midi_menu_item).setIntent(midiFileMenuIntent);
 		return true;
 	}
 
@@ -172,11 +178,9 @@ public class BeatBotActivity extends Activity {
 		case R.id.quantize_thirty_second:
 			midiManager.quantize(8);
 			return true;
-		case R.id.save_midi:
-			midiManager.writeToFile();
-			return true;
 		case R.id.save_wav:
 			return true;
+		// midi import/export menu item is handled as an intent - MidiFileMenu.class	
 		default:
 			return super.onOptionsItemSelected(item);
 		}

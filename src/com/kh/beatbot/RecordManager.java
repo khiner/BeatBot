@@ -17,7 +17,7 @@ public class RecordManager {
 	private static final int RECORDER_BPP = 16;
 	private static final String SAVE_FOLDER = "BeatBot/Recorded_Audio";
 	private static final String TEMP_FILE = "record_temp.raw";
-	private String baseRecordPath = null;
+	private String baseFilePath = null;
 	private static final int RECORDER_SAMPLERATE = 44100;
 	private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
 	private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
@@ -65,7 +65,7 @@ public class RecordManager {
 		bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
 				RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 		initRecorder();
-		baseRecordPath = getBaseRecordPath();
+		baseFilePath = createBaseRecordPath();
 		state = State.INITIALIZING;
 	}
 
@@ -86,7 +86,7 @@ public class RecordManager {
 		return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + ".wav");
 	}
 
-	private String getBaseRecordPath() {
+	private String createBaseRecordPath() {
 		String filepath = Environment.getExternalStorageDirectory().getPath();
 		File file = new File(filepath, SAVE_FOLDER);
 
@@ -97,12 +97,12 @@ public class RecordManager {
 	}
 
 	private String getTempFilename() {
-		File tempFile = new File(baseRecordPath, TEMP_FILE);
+		File tempFile = new File(baseFilePath, TEMP_FILE);
 
 		int i = 0;
 		while (tempFile.exists()) {
 			i++;
-			tempFile = new File(baseRecordPath, TEMP_FILE + i);
+			tempFile = new File(baseFilePath, TEMP_FILE + i);
 		}
 
 		return tempFile.getAbsolutePath();
