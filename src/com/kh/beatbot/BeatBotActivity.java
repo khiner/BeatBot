@@ -115,7 +115,8 @@ public class BeatBotActivity extends Activity {
 		midiSurfaceView.setMidiManager(midiManager);
 		midiSurfaceView.setRecorderService(recordManager);
 		midiSurfaceView.setPlaybackManager(playbackManager);
-
+		GlobalVars gv = (GlobalVars)getApplicationContext();
+		gv.setMidiManager(midiManager);
 	
 		((BpmView) findViewById(R.id.bpm)).setText(String.valueOf((int)midiManager
 				.getBPM()));
@@ -150,7 +151,6 @@ public class BeatBotActivity extends Activity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
 		Intent midiFileMenuIntent = new Intent(this, MidiFileMenu.class);
-		midiFileMenuIntent.putExtra("midiManager", midiManager);
 		menu.findItem(R.id.midi_menu_item).setIntent(midiFileMenuIntent);
 		return true;
 	}

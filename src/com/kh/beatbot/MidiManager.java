@@ -1,6 +1,7 @@
 package com.kh.beatbot;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,7 +64,7 @@ public class MidiManager implements Parcelable {
 		tempo.setBpm(140);
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
-		MSPT = tempo.getMpqn() / MidiFile.DEFAULT_RESOLUTION;
+		MSPT = tempo.getMpqn() / RESOLUTION;
 		saveState();
 	}
 
@@ -81,7 +82,7 @@ public class MidiManager implements Parcelable {
 
 	public void setBPM(float bpm) {
 		tempo.setBpm(bpm);
-		MSPT = tempo.getMpqn() / MidiFile.DEFAULT_RESOLUTION;
+		MSPT = tempo.getMpqn() / RESOLUTION;
 	}
 
 	public int getNumSamples() {
@@ -297,6 +298,35 @@ public class MidiManager implements Parcelable {
 		}
 	}
 
+	public void importFromFile(FileInputStream in) {
+		try {
+			MidiFile midiFile = new MidiFile(in);
+			ArrayList<MidiTrack> midiTracks = midiFile.getTracks();
+			tempoTrack = midiTracks.get(0);
+			ArrayList<MidiEvent> events = midiTracks.get(1).getEvents();
+			midiNotes = new ArrayList<MidiNote>();
+			// midiEvents are ordered by tick, so on/off events don't necessarily
+			// alternate if there are interleaving notes (with different "notes" - pitches)
+			// thus, we need to keep track of notes that have an on event, but are waiting for the off event
+			ArrayList<NoteOn> unfinishedNotes = new ArrayList<NoteOn>();
+			for (int i = 0; i < events.size(); i++) {
+				if (events.get(i) instanceof NoteOn)
+					unfinishedNotes.add((NoteOn)events.get(i));
+				else if (events.get(i) instanceof NoteOff) {
+					NoteOff off = (NoteOff)events.get(i);
+					for (NoteOn on : unfinishedNotes) {
+						if (on.getNoteValue() == off.getNoteValue()) {
+							midiNotes.add(new MidiNote(on, off));
+							break;
+						}
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@Override
 	public int describeContents() {
 		// TODO Auto-generated method stub

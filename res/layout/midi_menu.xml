@@ -16,4 +16,11 @@
         android:text="@string/save_midi"
         android:onClick="saveMidi" />
     
+    <Button 
+        android:id="@+id/midi_open"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/open_midi"
+        android:onClick="openMidi" />
+    
 </LinearLayout>
