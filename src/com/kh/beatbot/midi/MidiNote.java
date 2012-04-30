@@ -14,8 +14,8 @@ public class MidiNote {
 	}
 	
 	public MidiNote getCopy() {
-		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0, noteOn.getNoteValue(), 100);
-		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0, noteOff.getNoteValue(), 100);
+		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0, noteOn.getNoteValue(), noteOn.getVelocity());
+		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0, noteOff.getNoteValue(), noteOn.getVelocity());
 		return new MidiNote(noteOnCopy, noteOffCopy);
 	}
 	
@@ -35,8 +35,19 @@ public class MidiNote {
 		return noteOff.getTick();
 	}
 
-	public int getNote() {
+	public int getNoteValue() {
 		return noteOn.getNoteValue();
+	}
+	
+	public int getVelocity() {
+		return noteOn.getVelocity();
+	}
+	
+	public void setVelocity(int velocity) {
+		if (velocity >= 0 && velocity <= 100) {
+			noteOn.setVelocity(velocity);
+			noteOff.setVelocity(velocity);
+		}
 	}
 	
 	public void setOnTick(long onTick) {

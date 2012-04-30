@@ -98,7 +98,8 @@ public class BeatBotActivity extends Activity {
 					@Override
 					public void onItemClick(AdapterView parentView,
 							View childView, int position, long id) {
-						playbackManager.playSample(position - 1);
+						// preview the sample with a default volume of 80
+						playbackManager.playSample(position - 1, 80);
 					}
 				});
 		if (savedInstanceState == null)
@@ -238,7 +239,7 @@ public class BeatBotActivity extends Activity {
 	}
 
 	public void levels(View view) {
-		
+		midiSurfaceView.toggleLevelsView();
 	}
 	
 	public void undo(View view) {

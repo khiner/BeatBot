@@ -168,7 +168,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	FloatBuffer selectRegionVB = null;
 	FloatBuffer loopMarkerVB = null;
 	FloatBuffer loopMarkerLineVB = null;
-	
+	FloatBuffer volumeBarsVB = null;
+
 	int[] vLineWidths = null;
 
 	MidiManager midiManager;
@@ -182,6 +183,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	List<MidiNote> selectedNotes = new ArrayList<MidiNote>();
 
 	TickWindow tickWindow;
+
+	private float bgColor = .5f;
 
 	private final long doubleTapTime = 300;
 
@@ -217,6 +220,12 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	private long scrollViewEndTime = Long.MAX_VALUE;
 
 	private boolean loopMarkerSelected = false;
+
+	private enum State {
+		LEVELS_VIEW, NORMAL_VIEW, TO_LEVELS_VIEW, TO_NORMAL_VIEW
+	};
+
+	private State viewState = State.NORMAL_VIEW;
 
 	private boolean stateChanged = false;
 
@@ -267,8 +276,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			boolean b = rightTick > midiNote.getOffTick();
 			boolean c = leftTick < midiNote.getOnTick();
 			boolean d = rightTick > midiNote.getOnTick();
-			boolean noteCondition = topNote <= midiNote.getNote()
-					&& bottomNote >= midiNote.getNote();
+			boolean noteCondition = topNote <= midiNote.getNoteValue()
+					&& bottomNote >= midiNote.getNoteValue();
 
 			if (noteCondition && (a && b || c && d || !b && !c)) {
 				if (!selectedNotes.contains(midiNote)) {
@@ -289,7 +298,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 		for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
 			MidiNote midiNote = midiManager.getMidiNotes().get(i);
-			if (midiNote.getNote() == note && midiNote.getOnTick() <= tick
+			if (midiNote.getNoteValue() == note && midiNote.getOnTick() <= tick
 					&& midiNote.getOffTick() >= tick) {
 				if (touchedNotes.containsValue(midiNote)) {
 					long leftOffsetTick = tick - midiNote.getOnTick();
@@ -321,6 +330,17 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		}
 	}
 
+	private void selectNoteVolume(float x, float y, int pointerId) {
+		long tick = xToTick(x);
+		for (MidiNote midiNote : selectedNotes) {
+			float velocityY = velocityToY(midiNote);
+			if (Math.abs(midiNote.getOnTick() - tick) < 35
+					&& Math.abs(velocityY - y) < 35) {
+				touchedNotes.put(pointerId, midiNote);
+			}
+		}
+	}
+
 	private void drawHorizontalLines() {
 		gl.glColor4f(0, 0, 0, 1);
 		gl.glLineWidth(2);
@@ -333,7 +353,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vLineVB);
 		for (int i = 0; i < vLineWidths.length; i++) {
 			gl.glLineWidth(vLineWidths[i]);
-			gl.glDrawArrays(GL10.GL_LINES, i*2, 2);
+			gl.glDrawArrays(GL10.GL_LINES, i * 2, 2);
 		}
 	}
 
@@ -359,11 +379,26 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	}
 
 	private void drawRecordRowFill(boolean recording) {
-		gl.glColor4f(.7f, .7f, .7f, 1f);
+		float recordRowColor = bgColor * 1.2f;
+		gl.glColor4f(recordRowColor, recordRowColor, recordRowColor, 1f);
 		if (recording)
 			gl.glColor4f(1f, .6f, .6f, .7f);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, recordRowVB);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+	}
+
+	private void drawVolumeBars() {
+		gl.glColor4f(.505f, .776f, 1, 1);
+		gl.glLineWidth(7);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, volumeBarsVB);
+		gl.glDrawArrays(GL10.GL_LINES, 0, volumeBarsVB.capacity() / 2);
+		// draw circles (big points) at top of bars
+		gl.glPointSize(25);
+		gl.glEnable(GL10.GL_POINT_SMOOTH);
+		for (int i = 0; i < volumeBarsVB.capacity() / 2; i += 2) {
+			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, volumeBarsVB);
+			gl.glDrawArrays(GL10.GL_POINTS, i, 1);
+		}
 	}
 
 	private void updateSelectRegionVB(long leftTick, long rightTick,
@@ -391,7 +426,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				break;
 			MidiNote midiNote = midiManager.getMidiNote(i);
 			if (midiNote != null)
-				drawMidiNote(midiNote.getNote(), midiNote.getOnTick(),
+				drawMidiNote(midiNote.getNoteValue(), midiNote.getOnTick(),
 						midiNote.getOffTick(), selectedNotes.contains(midiNote));
 		}
 		if (midiManager.isRecording()) {
@@ -406,15 +441,21 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		float x2 = tickToX(offTick);
 		float y1 = (height * note) / midiManager.getNumSamples();
 		float y2 = (height * (note + 1)) / midiManager.getNumSamples();
+		float baseColor = (1 - bgColor * 2);
 		// the float buffer for the midi note coordinates
 		FloatBuffer midiBuf = makeFloatBuffer(new float[] { x1, y1, x2, y1, x1,
 				y2, x2, y2 });
 		if (selected) // draw blue note if it is currently selected (also will
 						// be true if recording)
-			gl.glColor4f(0, 0, 1, 1);
-		else
-			// non-selected, non-recording notes are filled red
+			gl.glColor4f(baseColor, baseColor, 1, 1);
+		else if (viewState == State.NORMAL_VIEW)
+			// non-selected, non-recording notes are filled red for normal
+			// viewing state
 			gl.glColor4f(1, 0, 0, 1);
+		else
+			// non-selected notes are filled with bg color (black when in
+			// LEVELS_VIEW)
+			gl.glColor4f(bgColor * 2, bgColor, bgColor, 1);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, midiBuf);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
 
@@ -422,7 +463,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		// line_loop instead of a triangle_strip
 		FloatBuffer outlineBuf = makeFloatBuffer(new float[] { x1, y1, x2, y1,
 				x2, y2, x1, y2, x1, y2 });
-		gl.glColor4f(0, 0, 0, 1);
+		gl.glColor4f(baseColor, baseColor, baseColor, 1);
 		gl.glLineWidth(4);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, outlineBuf);
 		gl.glDrawArrays(GL10.GL_LINE_LOOP, 0, outlineBuf.capacity() / 2);
@@ -452,7 +493,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	private void initVLineVB() {
 		// 4 vertices per line
 		float[] vLines = new float[(tickWindow.maxLinesDisplayed + 1) * 4];
-		vLineWidths = new int[vLines.length/4];
+		vLineWidths = new int[vLines.length / 4];
 		long tickStart = tickWindow.getMajorTickToLeftOf(tickWindow.tickOffset);
 		long tickSpacing = tickWindow.getTickSpacing();
 		float y1 = height / midiManager.getNumSamples();
@@ -464,13 +505,11 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			if (t % (int) (midiManager.RESOLUTION * 2 / tickWindow.granularity) == 0) {
 				vLines[i * 4 + 1] = y1 - y1 / 2;
 				vLineWidths[i] = 5;
-			}
-			else if (t
+			} else if (t
 					% (int) (midiManager.RESOLUTION / tickWindow.granularity) == 0) {
 				vLines[i * 4 + 1] = y1 - y1 / 3;
 				vLineWidths[i] = 3;
-			}
-			else {
+			} else {
 				vLines[i * 4 + 1] = y1 - y1 / 4;
 				vLineWidths[i] = 2;
 			}
@@ -490,6 +529,19 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		loopMarkerVB = makeFloatBuffer(loopMarkerTriangle);
 	}
 
+	private void initVolumeBarsVB() {
+		float[] volumeBars = new float[selectedNotes.size() * 4];
+		for (int i = 0; i < selectedNotes.size(); i++) {
+			float x = tickToX(selectedNotes.get(i).getOnTick());
+			volumeBars[i * 4] = x;
+			volumeBars[i * 4 + 1] = velocityToY(selectedNotes.get(i));
+			volumeBars[i * 4 + 2] = x;
+			volumeBars[i * 4 + 3] = height;
+		}
+
+		volumeBarsVB = makeFloatBuffer(volumeBars);
+	}
+
 	private float tickToX(long tick) {
 		return (float) (tick - tickWindow.tickOffset) / tickWindow.numTicks
 				* width;
@@ -503,10 +555,18 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		return (int) (midiManager.getNumSamples() * y / height);
 	}
 
+	private float velocityToY(MidiNote midiNote) {
+		return height - midiNote.getVelocity() * height / 100;
+	}
+
+	private int yToVelocity(float y) {
+		return (int) (100 * (height - y) / height);
+	}
+
 	private boolean legalSelectedNoteMove(int noteDiff) {
 		for (MidiNote midiNote : selectedNotes) {
-			if (midiNote.getNote() + noteDiff < 1
-					|| midiNote.getNote() + noteDiff >= midiManager
+			if (midiNote.getNoteValue() + noteDiff < 1
+					|| midiNote.getNoteValue() + noteDiff >= midiManager
 							.getNumSamples()) {
 				return false;
 			}
@@ -534,7 +594,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 	protected void init() {
 		tickWindow.updateGranularity();
-		gl.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+		gl.glClearColor(bgColor, bgColor, bgColor, 1.0f);
 		initHLineVB();
 		initVLineVB();
 		initLoopMarkerVBs();
@@ -548,6 +608,18 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 	@Override
 	protected void drawFrame() {
+		if (viewState == State.TO_LEVELS_VIEW
+				|| viewState == State.TO_NORMAL_VIEW) {
+			float amt = .5f / 30;
+			bgColor = viewState == State.TO_LEVELS_VIEW ? bgColor - amt
+					: bgColor + amt;
+			gl.glClearColor(bgColor, bgColor, bgColor, 1.0f);
+			if (bgColor >= .5f || bgColor <= 0f) {
+				viewState = bgColor >= .5f ? State.NORMAL_VIEW
+						: State.LEVELS_VIEW;
+			}
+		}
+
 		boolean recording = recorder.getState() == RecordManager.State.LISTENING
 				|| recorder.getState() == RecordManager.State.RECORDING;
 		drawRecordRowFill(recording);
@@ -561,11 +633,17 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			drawCurrentTick();
 		}
 		tickWindow.scroll();
-		initVLineVB();
-		drawHorizontalLines();
-		drawVerticalLines();
-		drawLoopMarker();
-		drawAllMidiNotes();
+		if (viewState == State.LEVELS_VIEW) {
+			drawAllMidiNotes();
+			initVolumeBarsVB();
+			drawVolumeBars();
+		} else {
+			initVLineVB();
+			drawHorizontalLines();
+			drawVerticalLines();
+			drawLoopMarker();
+			drawAllMidiNotes();
+		}
 		drawSelectRegion();
 		if (scrolling
 				|| scrollVelocity != 0
@@ -704,7 +782,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				MidiNote note = midiManager.getMidiNotes().get(i);
 				if (selected.equals(note))
 					continue;
-				if (selected.getNote() == note.getNote()) {
+				if (selected.getNoteValue() == note.getNoteValue()) {
 					// if a selected note begins in the middle of another note,
 					// clip the covered note
 					if (selected.getOnTick() > note.getOnTick()
@@ -736,14 +814,26 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		scrolling = true;
 	}
 
+	public void toggleLevelsView() {
+		if (viewState == State.NORMAL_VIEW || viewState == State.TO_NORMAL_VIEW) {
+			viewState = State.TO_LEVELS_VIEW;
+		} else {
+			viewState = State.TO_NORMAL_VIEW;
+		}
+	}
+
 	@Override
 	public boolean onTouchEvent(MotionEvent e) {
 		switch (e.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
+			lastDownTime = System.currentTimeMillis();
 			startScrollView();
 			int id = e.getPointerId(0);
-			lastDownTime = System.currentTimeMillis();
-			selectMidiNote(e.getX(0), e.getY(0), id);
+			if (viewState == State.LEVELS_VIEW) {
+				selectNoteVolume(e.getX(), e.getY(), id);
+			} else {
+				selectMidiNote(e.getX(0), e.getY(0), id);
+			}
 			if (touchedNotes.get(id) == null) {
 				long tick = xToTick(e.getX(0));
 				int note = yToNote(e.getY(0));
@@ -772,7 +862,13 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		case MotionEvent.ACTION_POINTER_DOWN:
 			// lastDownTime = System.currentTimeMillis();
 			int index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-			selectMidiNote(e.getX(index), e.getY(index), e.getPointerId(index));
+			if (viewState == State.LEVELS_VIEW) {
+				selectNoteVolume(e.getX(index), e.getY(index),
+						e.getPointerId(index));
+			} else {
+				selectMidiNote(e.getX(index), e.getY(index),
+						e.getPointerId(index));
+			}
 			if (touchedNotes.isEmpty() && e.getPointerCount() == 2) {
 				// init zoom anchors (the same ticks should be under the fingers
 				// at all times)
@@ -788,7 +884,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			index = index == 0 ? 1 : 0;
 			if (e.getPointerCount() == 2) {
 				long tick = xToTick(e.getX(index));
-				if (pinch) {
+				if (viewState != State.LEVELS_VIEW && pinch) {
 					id = e.getPointerId(index);
 					MidiNote touched = touchedNotes.get(id);
 					dragOffsetTick[id] = tick - touched.getOnTick();
@@ -799,6 +895,29 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			}
 			break;
 		case MotionEvent.ACTION_MOVE:
+			if (viewState == State.LEVELS_VIEW) {
+				if (!touchedNotes.isEmpty())
+					for (int i = 0; i < e.getPointerCount(); i++) {
+						id = e.getPointerId(i);
+						MidiNote touchedNote = touchedNotes.get(id);
+						if (touchedNote == null)
+							continue;
+						touchedNote.setVelocity(yToVelocity(e.getY(i)));
+					}
+				else { // no midi selected. scroll, zoom, or update select
+						// region
+					if (e.getPointerCount() == 1) {
+						scrollVelocity = tickWindow.scroll(e.getX(0));
+					} else if (e.getPointerCount() == 2) {
+						// two finger zoom
+						float leftX = Math.min(e.getX(0), e.getX(1));
+						float rightX = Math.max(e.getX(0), e.getX(1));
+						tickWindow.zoom(leftX, rightX);
+					}
+				}
+				return true;
+			}
+
 			if (pinch) { // two touching one note
 				id = e.getPointerId(0);
 				MidiNote selectedNote = touchedNotes.get(id);
@@ -821,7 +940,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 						continue;
 					int newNote = yToNote(e.getY(i));
 					long newOnTick = xToTick(e.getX(i)) - dragOffsetTick[id];
-					int noteDiff = newNote - touchedNote.getNote();
+					int noteDiff = newNote - touchedNote.getNoteValue();
 					long tickDiff = newOnTick - touchedNote.getOnTick();
 					if (e.getPointerCount() == 1) {
 						// dragging one note - drag all
@@ -843,7 +962,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 										+ tickDiff);
 							}
 							if (moveNote)
-								midiNote.setNote(midiNote.getNote() + noteDiff);
+								midiNote.setNote(midiNote.getNoteValue()
+										+ noteDiff);
 						}
 					} else {
 						// dragging more than one note - drag each note
@@ -886,15 +1006,17 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			if (scrollVelocity == 0)
 				scrollViewEndTime = System.currentTimeMillis();
 			selectRegion = false;
-			handleActionUp(e);
-			midiManager.mergeTempNotes();
+			if (viewState != State.LEVELS_VIEW) {
+				handleActionUp(e);
+				midiManager.mergeTempNotes();
+				startOnTicks.clear();
+			}
 			touchedNotes.clear();
-			startOnTicks.clear();
 			if (stateChanged)
 				midiManager.saveState();
 			stateChanged = false;
 			break;
 		}
 		return true;
-	}	
+	}
 }

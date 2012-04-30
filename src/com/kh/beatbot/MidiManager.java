@@ -126,8 +126,8 @@ public class MidiManager implements Parcelable {
 	}
 
 	public MidiNote addNote(long onTick, long offTick, int note) {
-		NoteOn on = new NoteOn(onTick, 0, note, 100);
-		NoteOff off = new NoteOff(offTick, 0, note, 100);
+		NoteOn on = new NoteOn(onTick, 0, note, 80);
+		NoteOff off = new NoteOff(offTick, 0, note, 80);
 		MidiNote midiNote = new MidiNote(on, off);
 		midiNotes.add(midiNote);
 		return midiNote;
@@ -209,9 +209,9 @@ public class MidiManager implements Parcelable {
 						continue;
 					if (currTick == midiNote.getOnTick())
 						// note - 1, since track 0 is recording track
-						playbackManager.playSample(midiNote.getNote() - 1);
+						playbackManager.playSample(midiNote.getNoteValue() - 1, midiNote.getVelocity());
 					else if (currTick == midiNote.getOffTick())
-						playbackManager.stopSample(midiNote.getNote() - 1);
+						playbackManager.stopSample(midiNote.getNoteValue() - 1);
 				}
 			}
 		}
@@ -348,7 +348,7 @@ public class MidiManager implements Parcelable {
 		for (int i = 0; i < midiNotes.size(); i++) {
 			noteInfo[i * 3] = midiNotes.get(i).getOnTick();
 			noteInfo[i * 3 + 1] = midiNotes.get(i).getOffTick();
-			noteInfo[i * 3 + 2] = (long) midiNotes.get(i).getNote();
+			noteInfo[i * 3 + 2] = (long) midiNotes.get(i).getNoteValue();
 		}
 		out.writeInt(noteInfo.length);
 		out.writeLongArray(noteInfo);
