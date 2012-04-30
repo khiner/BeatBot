@@ -18,6 +18,9 @@ import android.widget.ListView;
 
 import com.KarlHiner.BeatBox.R;
 import com.kh.beatbot.menu.MidiFileMenu;
+import com.kh.beatbot.views.BpmView;
+import com.kh.beatbot.views.MidiSurfaceView;
+import com.kh.beatbot.views.ThresholdBarView;
 
 public class BeatBotActivity extends Activity {
 	public class SampleIconAdapter extends ArrayAdapter<String> {
@@ -108,7 +111,7 @@ public class BeatBotActivity extends Activity {
 		recordManager = RecordManager.getInstance();
 		recordManager.setMidiManager(midiManager);
 		recordManager
-				.setThresholdBar((ThresholdBar) findViewById(R.id.thresholdBar));
+				.setThresholdBar((ThresholdBarView) findViewById(R.id.thresholdBar));
 		midiManager.setRecordManager(recordManager);
 
 		midiSurfaceView = ((MidiSurfaceView) findViewById(R.id.midiSurfaceView));

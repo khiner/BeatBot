@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import com.kh.beatbot.views.ThresholdBarView;
+
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -33,7 +35,7 @@ public class RecordManager {
 	// Midi Manager to manage MIDI events
 	private MidiManager midiManager;
 
-	private ThresholdBar thresholdBar;
+	private ThresholdBarView thresholdBar;
 
 	private AudioRecord recorder = null;
 	private int bufferSize = 0;
@@ -112,7 +114,7 @@ public class RecordManager {
 		this.midiManager = midiManager;
 	}
 
-	public void setThresholdBar(ThresholdBar thresholdBar) {
+	public void setThresholdBar(ThresholdBarView thresholdBar) {
 		this.thresholdBar = thresholdBar;
 	}
 
