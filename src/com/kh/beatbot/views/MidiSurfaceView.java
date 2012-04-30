@@ -130,7 +130,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			long spacing = (long) (minTicks / granularity);
 			long onTick = tick - tick % spacing;
 			long offTick = onTick + spacing - 1;
-			return midiManager.addNote(onTick, offTick, note);
+			return midiManager.addNote(onTick, offTick, note, 80);
 		}
 
 		// translates the tickOffset to ensure that leftTick and rightTick are
@@ -446,7 +446,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				break;
 			MidiNote midiNote = midiManager.getMidiNote(i);
 			if (midiNote != null) {
-				selectColor(midiNote);
+				calculateColor(midiNote);
 				drawMidiNote(midiNote.getNoteValue(), midiNote.getOnTick(),
 						midiNote.getOffTick());
 			}
@@ -457,7 +457,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		}
 	}
 
-	private void selectColor(MidiNote midiNote) {
+	private void calculateColor(MidiNote midiNote) {
 		boolean selected = selectedNotes.contains(midiNote);
 		boolean levelSelected = viewState != State.NORMAL_VIEW
 				&& selectedLevelNotes.contains(midiNote);
@@ -807,6 +807,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 				selectedNotes.remove(tappedLevelNote);
 			midiManager.removeNote(tappedLevelNote);
 			updateSelectedLevelNotes();
+			stateChanged = true;
 			return;
 		}
 		long tick = xToTick(e.getX());
@@ -878,7 +879,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	}
 
 	// add all non-overlapping notes to selectedLevelNotes
-	private void updateSelectedLevelNotes() {
+	public void updateSelectedLevelNotes() {
 		selectedLevelNotes.clear();
 		for (MidiNote midiNote : midiManager.getMidiNotes()) {
 			addToSelectedLevelNotes(midiNote);
@@ -984,6 +985,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 						if (touchedNote == null)
 							continue;
 						touchedNote.setVelocity(yToVelocity(e.getY(i)));
+						// velocity changes are valid undo events
+						stateChanged = true;
 					}
 				else { // no midi selected. scroll, zoom, or update select
 						// region

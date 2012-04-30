@@ -244,6 +244,7 @@ public class BeatBotActivity extends Activity {
 	
 	public void undo(View view) {
 		midiManager.undo();
+		midiSurfaceView.updateSelectedLevelNotes();
 	}
 
 	public void bpmTap(View view) {

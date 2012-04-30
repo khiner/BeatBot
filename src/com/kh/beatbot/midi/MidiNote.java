@@ -15,7 +15,7 @@ public class MidiNote {
 	
 	public MidiNote getCopy() {
 		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0, noteOn.getNoteValue(), noteOn.getVelocity());
-		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0, noteOff.getNoteValue(), noteOn.getVelocity());
+		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0, noteOff.getNoteValue(), noteOff.getVelocity());
 		return new MidiNote(noteOnCopy, noteOffCopy);
 	}
 	

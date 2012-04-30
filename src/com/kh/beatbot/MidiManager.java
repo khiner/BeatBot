@@ -125,9 +125,9 @@ public class MidiManager implements Parcelable {
 		this.loopTick = loopTick;
 	}
 
-	public MidiNote addNote(long onTick, long offTick, int note) {
-		NoteOn on = new NoteOn(onTick, 0, note, 80);
-		NoteOff off = new NoteOff(offTick, 0, note, 80);
+	public MidiNote addNote(long onTick, long offTick, int note, int velocity) {
+		NoteOn on = new NoteOn(onTick, 0, note, velocity);
+		NoteOff off = new NoteOff(offTick, 0, note, velocity);
 		MidiNote midiNote = new MidiNote(on, off);
 		midiNotes.add(midiNote);
 		return midiNote;
@@ -343,12 +343,13 @@ public class MidiManager implements Parcelable {
 				TimeSignature.DEFAULT_DIVISION });
 		out.writeFloat(tempo.getBpm());
 		out.writeLong(Tempo.DEFAULT_MPQN / MidiFile.DEFAULT_RESOLUTION);
-		// on-tick, off-tick, and note for each midiNote
-		long[] noteInfo = new long[midiNotes.size() * 3];
+		// on-tick, off-tick, note, and velocity for each midiNote
+		long[] noteInfo = new long[midiNotes.size() * 4];
 		for (int i = 0; i < midiNotes.size(); i++) {
-			noteInfo[i * 3] = midiNotes.get(i).getOnTick();
-			noteInfo[i * 3 + 1] = midiNotes.get(i).getOffTick();
-			noteInfo[i * 3 + 2] = (long) midiNotes.get(i).getNoteValue();
+			noteInfo[i * 4] = midiNotes.get(i).getOnTick();
+			noteInfo[i * 4 + 1] = midiNotes.get(i).getOffTick();
+			noteInfo[i * 4 + 2] = (long) midiNotes.get(i).getNoteValue();
+			noteInfo[i * 4 + 3] = (long) midiNotes.get(i).getVelocity();
 		}
 		out.writeInt(noteInfo.length);
 		out.writeLongArray(noteInfo);
@@ -378,8 +379,8 @@ public class MidiManager implements Parcelable {
 		MSPT = in.readLong();
 		long[] noteInfo = new long[in.readInt()];
 		in.readLongArray(noteInfo);
-		for (int i = 0; i < noteInfo.length; i += 3) {
-			addNote(noteInfo[i], noteInfo[i + 1], (int) noteInfo[i + 2]);
+		for (int i = 0; i < noteInfo.length; i += 4) {
+			addNote(noteInfo[i], noteInfo[i + 1], (int) noteInfo[i + 2], (int)noteInfo[i + 3]);
 		}
 		currTick = in.readLong();
 		loopTick = in.readLong();
