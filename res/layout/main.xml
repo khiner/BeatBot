@@ -50,7 +50,7 @@
             android:layout_height="40dp"
             android:background="#FF000000"
             android:onClick="levels"
-            android:src="@drawable/levels_btn_src" />        
+            android:src="@drawable/levels_btn_off_src" />        
         
         <ImageButton
             android:id="@+id/undo"

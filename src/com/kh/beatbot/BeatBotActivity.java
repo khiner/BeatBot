@@ -239,7 +239,13 @@ public class BeatBotActivity extends Activity {
 	}
 
 	public void levels(View view) {
+		ImageButton levelsButton = (ImageButton)view;
 		midiSurfaceView.toggleLevelsView();
+		if (midiSurfaceView.getState() == MidiSurfaceView.State.TO_LEVELS_VIEW) {
+			levelsButton.setImageResource(R.drawable.levels_btn_on_src);
+		} else {
+			levelsButton.setImageResource(R.drawable.levels_btn_off_src);
+		}
 	}
 	
 	public void undo(View view) {
@@ -251,11 +257,10 @@ public class BeatBotActivity extends Activity {
 		long tapTime = System.currentTimeMillis();		
 		float secondsElapsed = (tapTime - lastTapTime)/1000f;
 		lastTapTime = tapTime;
-		// if too much time has passed, assume this is inteded as the first tap
-		if (secondsElapsed > 1.8)
-			return;
-		
-		float bpm = (1/secondsElapsed)*60;
+		float bpm = 60/secondsElapsed;
+		// bpm limits
+		if (bpm < 30 || bpm > 500)
+			return;		
 		((BpmView)findViewById(R.id.bpm)).setText(String.valueOf((int)bpm));
 		midiManager.setBPM(bpm);
 	}

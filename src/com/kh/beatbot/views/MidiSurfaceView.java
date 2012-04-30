@@ -227,7 +227,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 	private boolean loopMarkerSelected = false;
 
-	private enum State {
+	public enum State {
 		LEVELS_VIEW, NORMAL_VIEW, TO_LEVELS_VIEW, TO_NORMAL_VIEW
 	};
 
@@ -242,6 +242,10 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		}
 	}
 
+	public State getState() {
+		return viewState;
+	}
+	
 	public void setMidiManager(MidiManager midiManager) {
 		this.midiManager = midiManager;
 		allTicks = midiManager.RESOLUTION * 4;

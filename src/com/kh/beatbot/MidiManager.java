@@ -200,7 +200,6 @@ public class MidiManager implements Parcelable {
 					} else
 						currTick = 0;
 				}
-				nextTickNano += MSPT * 1000;
 				for (int i = 0; i < midiNotes.size(); i++) {
 					MidiNote midiNote = getMidiNote(i);
 					// note(s) could have been deleted since the start of the
@@ -213,6 +212,8 @@ public class MidiManager implements Parcelable {
 					else if (currTick == midiNote.getOffTick())
 						playbackManager.stopSample(midiNote.getNoteValue() - 1);
 				}
+				// update time of next tick
+				nextTickNano += MSPT * 1000;
 			}
 		}
 	}
