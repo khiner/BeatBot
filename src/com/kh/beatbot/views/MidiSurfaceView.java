@@ -182,6 +182,12 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	// all selected notes (to draw in blue, and to drag together)
 	List<MidiNote> selectedNotes = new ArrayList<MidiNote>();
 
+	// notes to display level info for in LEVEL_VIEW (volume, etc.)
+	// (for multiple notes with same start tick, only one displays level info)
+	List<MidiNote> selectedLevelNotes = new ArrayList<MidiNote>();
+
+	private MidiNote tappedLevelNote = null;
+	
 	TickWindow tickWindow;
 
 	private float bgColor = .5f;
@@ -330,9 +336,23 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		}
 	}
 
-	private void selectNoteVolume(float x, float y, int pointerId) {
+	private MidiNote selectLevelNote(float x, float y) {
 		long tick = xToTick(x);
-		for (MidiNote midiNote : selectedNotes) {
+		long note = yToNote(y);
+		
+		for (MidiNote midiNote : midiManager.getMidiNotes()) {
+			if (midiNote.getNoteValue() == note && midiNote.getOnTick() <= tick
+					&& midiNote.getOffTick() >= tick) {
+				addToSelectedLevelNotes(midiNote);
+				return midiNote;
+			}
+		}
+		return null;
+	}
+	
+	private void selectVelocity(float x, float y, int pointerId) {
+		long tick = xToTick(x);
+		for (MidiNote midiNote : selectedLevelNotes) {
 			float velocityY = velocityToY(midiNote);
 			if (Math.abs(midiNote.getOnTick() - tick) < 35
 					&& Math.abs(velocityY - y) < 35) {
@@ -425,37 +445,58 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			if (midiManager.getMidiNotes().size() <= i)
 				break;
 			MidiNote midiNote = midiManager.getMidiNote(i);
-			if (midiNote != null)
+			if (midiNote != null) {
+				selectColor(midiNote);
 				drawMidiNote(midiNote.getNoteValue(), midiNote.getOnTick(),
-						midiNote.getOffTick(), selectedNotes.contains(midiNote));
+						midiNote.getOffTick());
+			}
 		}
 		if (midiManager.isRecording()) {
-			drawMidiNote(0, midiManager.getLastTick(), currTick, true);
+			gl.glColor4f(0, 0, 1, 1);
+			drawMidiNote(0, midiManager.getLastTick(), currTick);
 		}
 	}
 
-	private void drawMidiNote(int note, long onTick, long offTick,
-			boolean selected) {
+	private void selectColor(MidiNote midiNote) {
+		boolean selected = selectedNotes.contains(midiNote);
+		boolean levelSelected = viewState != State.NORMAL_VIEW
+				&& selectedLevelNotes.contains(midiNote);
+		if (viewState == State.NORMAL_VIEW) {
+			if (selected)
+				// selected notes are fileed blue
+				gl.glColor4f(0, 0, 1, 1);
+			else
+				// non-selected, non-recording notes are filled red
+				gl.glColor4f(1, 0, 0, 1);
+		} else {
+			float blackToWhite = (1 - bgColor * 2);
+			float whiteToBlack = bgColor * 2;
+			if (!selected && levelSelected) {
+				// fade from red to white
+				gl.glColor4f(1, blackToWhite, blackToWhite, 1);
+			} else if (selected && levelSelected) {
+				// fade from blue to white
+				gl.glColor4f(blackToWhite, blackToWhite, 1, 1);
+			} else if (!selected && !levelSelected) {
+				// fade from red to black
+				gl.glColor4f(whiteToBlack, 0, 0, 1);
+			} else if (selected && !levelSelected) {
+				// fade from blue to black
+				gl.glColor4f(0, 0, whiteToBlack, 1);
+			}
+		}
+
+	}
+
+	private void drawMidiNote(int note, long onTick, long offTick) {
 		// midi note rectangle coordinates
 		float x1 = tickToX(onTick);
 		float x2 = tickToX(offTick);
 		float y1 = (height * note) / midiManager.getNumSamples();
 		float y2 = (height * (note + 1)) / midiManager.getNumSamples();
-		float baseColor = (1 - bgColor * 2);
 		// the float buffer for the midi note coordinates
 		FloatBuffer midiBuf = makeFloatBuffer(new float[] { x1, y1, x2, y1, x1,
 				y2, x2, y2 });
-		if (selected) // draw blue note if it is currently selected (also will
-						// be true if recording)
-			gl.glColor4f(baseColor, baseColor, 1, 1);
-		else if (viewState == State.NORMAL_VIEW)
-			// non-selected, non-recording notes are filled red for normal
-			// viewing state
-			gl.glColor4f(1, 0, 0, 1);
-		else
-			// non-selected notes are filled with bg color (black when in
-			// LEVELS_VIEW)
-			gl.glColor4f(bgColor * 2, bgColor, bgColor, 1);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, midiBuf);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
 
@@ -463,6 +504,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		// line_loop instead of a triangle_strip
 		FloatBuffer outlineBuf = makeFloatBuffer(new float[] { x1, y1, x2, y1,
 				x2, y2, x1, y2, x1, y2 });
+		float baseColor = (1 - bgColor * 2); // fade outline from black to white
 		gl.glColor4f(baseColor, baseColor, baseColor, 1);
 		gl.glLineWidth(4);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, outlineBuf);
@@ -530,11 +572,11 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	}
 
 	private void initVolumeBarsVB() {
-		float[] volumeBars = new float[selectedNotes.size() * 4];
-		for (int i = 0; i < selectedNotes.size(); i++) {
-			float x = tickToX(selectedNotes.get(i).getOnTick());
+		float[] volumeBars = new float[selectedLevelNotes.size() * 4];
+		for (int i = 0; i < selectedLevelNotes.size(); i++) {
+			float x = tickToX(selectedLevelNotes.get(i).getOnTick());
 			volumeBars[i * 4] = x;
-			volumeBars[i * 4 + 1] = velocityToY(selectedNotes.get(i));
+			volumeBars[i * 4 + 1] = velocityToY(selectedLevelNotes.get(i));
 			volumeBars[i * 4 + 2] = x;
 			volumeBars[i * 4 + 3] = height;
 		}
@@ -745,15 +787,30 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		lastTapX = e.getX();
 		lastTapY = e.getY();
 		lastTapTime = System.currentTimeMillis();
-		selectedNotes.clear();
-		if (touchedNote != null) {
-			selectedNotes.add(touchedNote);
+		if (viewState == State.LEVELS_VIEW) {
+			tappedLevelNote = selectLevelNote(lastTapX, lastTapY);
+		} else {
+			selectedNotes.clear();
+			if (touchedNote != null) {
+				selectedNotes.add(touchedNote);
+			}
 		}
 	}
 
 	private void doubleTap(MotionEvent e, MidiNote touchedNote) {
+		if (viewState == State.LEVELS_VIEW) {
+			if (tappedLevelNote == null)
+				return;
+			if (selectedLevelNotes.contains(tappedLevelNote))
+				selectedLevelNotes.remove(tappedLevelNote);
+			if (selectedNotes.contains(tappedLevelNote))
+				selectedNotes.remove(tappedLevelNote);
+			midiManager.removeNote(tappedLevelNote);
+			updateSelectedLevelNotes();
+			return;
+		}
 		long tick = xToTick(e.getX());
-		int note = yToNote(e.getY());
+		int note = yToNote(e.getY());		
 		if (touchedNote != null) {
 			if (selectedNotes.contains(touchedNote)) {
 				selectedNotes.remove(touchedNote);
@@ -805,6 +862,29 @@ public class MidiSurfaceView extends SurfaceViewBase {
 		}
 	}
 
+	// add midiNote to selectedLevelNotes.
+	// if another note in the list has the same onTick,
+	// it is replaced by midiNote
+	private void addToSelectedLevelNotes(MidiNote midiNote) {
+		long tick = midiNote.getOnTick();
+		for (int i = 0; i < selectedLevelNotes.size(); i++) {
+			MidiNote selected = selectedLevelNotes.get(i);
+			if (tick == selected.getOnTick()) {
+				selectedLevelNotes.remove(i);
+				break;
+			}
+		}
+		selectedLevelNotes.add(midiNote);
+	}
+
+	// add all non-overlapping notes to selectedLevelNotes
+	private void updateSelectedLevelNotes() {
+		selectedLevelNotes.clear();
+		for (MidiNote midiNote : midiManager.getMidiNotes()) {
+			addToSelectedLevelNotes(midiNote);
+		}
+	}
+
 	private void startScrollView() {
 		long now = System.currentTimeMillis();
 		if (now - scrollViewEndTime > doubleTapTime * 2)
@@ -815,6 +895,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	}
 
 	public void toggleLevelsView() {
+		updateSelectedLevelNotes();
 		if (viewState == State.NORMAL_VIEW || viewState == State.TO_NORMAL_VIEW) {
 			viewState = State.TO_LEVELS_VIEW;
 		} else {
@@ -830,7 +911,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			startScrollView();
 			int id = e.getPointerId(0);
 			if (viewState == State.LEVELS_VIEW) {
-				selectNoteVolume(e.getX(), e.getY(), id);
+				selectVelocity(e.getX(), e.getY(), id);
 			} else {
 				selectMidiNote(e.getX(0), e.getY(0), id);
 			}
@@ -863,7 +944,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			// lastDownTime = System.currentTimeMillis();
 			int index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 			if (viewState == State.LEVELS_VIEW) {
-				selectNoteVolume(e.getX(index), e.getY(index),
+				selectVelocity(e.getX(index), e.getY(index),
 						e.getPointerId(index));
 			} else {
 				selectMidiNote(e.getX(index), e.getY(index),
@@ -1006,8 +1087,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			if (scrollVelocity == 0)
 				scrollViewEndTime = System.currentTimeMillis();
 			selectRegion = false;
+			handleActionUp(e);
 			if (viewState != State.LEVELS_VIEW) {
-				handleActionUp(e);
 				midiManager.mergeTempNotes();
 				startOnTicks.clear();
 			}
