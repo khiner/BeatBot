@@ -15,7 +15,6 @@ import android.view.MotionEvent;
 import com.kh.beatbot.MidiManager;
 import com.kh.beatbot.PlaybackManager;
 import com.kh.beatbot.RecordManager;
-import com.kh.beatbot.PlaybackManager.State;
 import com.kh.beatbot.midi.MidiNote;
 
 public class MidiSurfaceView extends SurfaceViewBase {
@@ -169,6 +168,8 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	FloatBuffer selectRegionVB = null;
 	FloatBuffer loopMarkerVB = null;
 	FloatBuffer loopMarkerLineVB = null;
+	
+	int[] vLineWidths = null;
 
 	MidiManager midiManager;
 	RecordManager recorder;
@@ -329,9 +330,11 @@ public class MidiSurfaceView extends SurfaceViewBase {
 
 	private void drawVerticalLines() {
 		gl.glColor4f(0, 0, 0, 1);
-		gl.glLineWidth(2);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vLineVB);
-		gl.glDrawArrays(GL10.GL_LINES, 0, vLineVB.capacity() / 2);
+		for (int i = 0; i < vLineWidths.length; i++) {
+			gl.glLineWidth(vLineWidths[i]);
+			gl.glDrawArrays(GL10.GL_LINES, i*2, 2);
+		}
 	}
 
 	private void drawCurrentTick() {
@@ -449,6 +452,7 @@ public class MidiSurfaceView extends SurfaceViewBase {
 	private void initVLineVB() {
 		// 4 vertices per line
 		float[] vLines = new float[(tickWindow.maxLinesDisplayed + 1) * 4];
+		vLineWidths = new int[vLines.length/4];
 		long tickStart = tickWindow.getMajorTickToLeftOf(tickWindow.tickOffset);
 		long tickSpacing = tickWindow.getTickSpacing();
 		float y1 = height / midiManager.getNumSamples();
@@ -457,13 +461,19 @@ public class MidiSurfaceView extends SurfaceViewBase {
 			float x = tickToX(t);
 			vLines[i * 4] = x;
 			// the top of the tick line is higher for major ticks
-			if (t % (int) (midiManager.RESOLUTION * 2 / tickWindow.granularity) == 0)
+			if (t % (int) (midiManager.RESOLUTION * 2 / tickWindow.granularity) == 0) {
 				vLines[i * 4 + 1] = y1 - y1 / 2;
+				vLineWidths[i] = 5;
+			}
 			else if (t
-					% (int) (midiManager.RESOLUTION / tickWindow.granularity) == 0)
+					% (int) (midiManager.RESOLUTION / tickWindow.granularity) == 0) {
 				vLines[i * 4 + 1] = y1 - y1 / 3;
-			else
+				vLineWidths[i] = 3;
+			}
+			else {
 				vLines[i * 4 + 1] = y1 - y1 / 4;
+				vLineWidths[i] = 2;
+			}
 			vLines[i * 4 + 2] = x;
 			vLines[i * 4 + 3] = height;
 		}
