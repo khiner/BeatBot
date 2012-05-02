@@ -24,6 +24,8 @@ import com.kh.beatbot.midi.event.meta.TimeSignature;
 
 public class MidiManager implements Parcelable {
 
+	private static MidiManager singletonInstance = null;
+	
 	private TimeSignature ts = new TimeSignature();
 	private Tempo tempo = new Tempo();
 	private MidiTrack tempoTrack = new MidiTrack();
@@ -56,7 +58,7 @@ public class MidiManager implements Parcelable {
 	private long loopTick = RESOLUTION * 4;
 	private long MSPT;
 
-	public MidiManager(int numSamples) {
+	private MidiManager(int numSamples) {
 		this.numSamples = numSamples;
 
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,
@@ -66,6 +68,13 @@ public class MidiManager implements Parcelable {
 		tempoTrack.insertEvent(tempo);
 		MSPT = tempo.getMpqn() / RESOLUTION;
 		saveState();
+	}
+	
+	public static MidiManager getInstance(int numSamples) {
+		if (singletonInstance == null) {
+			singletonInstance = new MidiManager(numSamples);
+		}
+		return singletonInstance;
 	}
 
 	public void setPlaybackManager(PlaybackManager playbackManager) {

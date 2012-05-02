@@ -19,7 +19,7 @@ import android.widget.ListView;
 import com.KarlHiner.BeatBox.R;
 import com.kh.beatbot.menu.MidiFileMenu;
 import com.kh.beatbot.views.BpmView;
-import com.kh.beatbot.views.MidiSurfaceView;
+import com.kh.beatbot.views.MidiView;
 import com.kh.beatbot.views.ThresholdBarView;
 
 public class BeatBotActivity extends Activity {
@@ -71,7 +71,7 @@ public class BeatBotActivity extends Activity {
 	private PlaybackManager playbackManager;
 	private RecordManager recordManager;
 
-	private MidiSurfaceView midiSurfaceView;
+	private MidiView midiView;
 
 	private final int[] sampleResources = new int[] { R.raw.kick_808,
 			R.raw.snare_808, R.raw.hat_closed_808, R.raw.hat_open_808,
@@ -92,38 +92,48 @@ public class BeatBotActivity extends Activity {
 				R.layout.sample_icon_view, sampleTypes);
 		sampleListView = (ListView) findViewById(R.id.sampleListView);
 		sampleListView.setAdapter(adapter);
-		playbackManager = new PlaybackManager(this, sampleResources);
 		sampleListView
 				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 					@Override
 					public void onItemClick(AdapterView parentView,
 							View childView, int position, long id) {
-						// preview the sample with a default volume of 80
+						// preview the sample with a default velocity of 80
 						playbackManager.playSample(position - 1, 80);
 					}
 				});
+		
+		// get all Manager singletons
+		playbackManager = PlaybackManager.getInstance(this, sampleResources);
+		recordManager = RecordManager.getInstance();
+		// if this context is being restored from a destroyed context,
+		// recover the midiManager.  otherwise, create a new one
 		if (savedInstanceState == null)
-			midiManager = new MidiManager(sampleTypes.length);
+			midiManager = MidiManager.getInstance(sampleTypes.length);
 		else
 			midiManager = savedInstanceState.getParcelable("midiManager");
-
+		
+		
 		midiManager.setPlaybackManager(playbackManager);
-
-		recordManager = RecordManager.getInstance();
 		recordManager.setMidiManager(midiManager);
+		// recordManager needs the threshold bar (with levels display) to send decibel levels
 		recordManager
 				.setThresholdBar((ThresholdBarView) findViewById(R.id.thresholdBar));
 		midiManager.setRecordManager(recordManager);
 
-		midiSurfaceView = ((MidiSurfaceView) findViewById(R.id.midiSurfaceView));
-		midiSurfaceView.setMidiManager(midiManager);
-		midiSurfaceView.setRecorderService(recordManager);
-		midiSurfaceView.setPlaybackManager(playbackManager);
+		midiView = ((MidiView) findViewById(R.id.midiView));
+		midiView.setMidiManager(midiManager);
+		midiView.setRecordManager(recordManager);
+		midiView.setPlaybackManager(playbackManager);
+		
+		// set midiManager as a global variable, since it needs to be accessed by
+		// separate MidiFileMenu activity
 		GlobalVars gv = (GlobalVars)getApplicationContext();
 		gv.setMidiManager(midiManager);
 	
 		((BpmView) findViewById(R.id.bpm)).setText(String.valueOf((int)midiManager
 				.getBPM()));
+		
+		// recall from last instance state whether we were recording and/or playing
 		if (savedInstanceState != null) {
 			if (savedInstanceState.getBoolean("recording")) {
 				record(findViewById(R.id.recordButton));
@@ -138,7 +148,8 @@ public class BeatBotActivity extends Activity {
 		super.onDestroy();		
 		if (isFinishing()) {
 			recordManager.release();
-			playbackManager.release();			
+			playbackManager.release();
+			android.os.Process.killProcess(android.os.Process.myPid());
 		}
 	}
 
@@ -163,13 +174,13 @@ public class BeatBotActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.snap:
-			if (midiSurfaceView.toggleSnapToGrid())
+			if (midiView.toggleSnapToGrid())
 				item.setIcon(R.drawable.btn_check_buttonless_on);
 			else
 				item.setIcon(R.drawable.btn_check_buttonless_off);
 			return true;
 		case R.id.quantize_current:
-			midiManager.quantize(midiSurfaceView.currentBeatDivision());
+			midiManager.quantize(midiView.currentBeatDivision());
 			return true;
 		case R.id.quantize_quarter:
 			midiManager.quantize(1);
@@ -208,7 +219,7 @@ public class BeatBotActivity extends Activity {
 			recordManager.stopListening();
 			recButton.setImageResource(R.drawable.rec_btn_off_src);
 		} else {
-			midiSurfaceView.reset();
+			midiView.reset();
 			// if we are already playing, the midiManager is already ticking away.
 			if (playbackManager.getState() != PlaybackManager.State.PLAYING)
 				play((ImageButton)findViewById(R.id.playButton));
@@ -240,8 +251,8 @@ public class BeatBotActivity extends Activity {
 
 	public void levels(View view) {
 		ImageButton levelsButton = (ImageButton)view;
-		midiSurfaceView.toggleLevelsView();
-		if (midiSurfaceView.getState() == MidiSurfaceView.State.TO_LEVELS_VIEW) {
+		midiView.toggleLevelsView();
+		if (midiView.getState() == MidiView.State.TO_LEVELS_VIEW) {
 			levelsButton.setImageResource(R.drawable.levels_btn_on_src);
 		} else {
 			levelsButton.setImageResource(R.drawable.levels_btn_off_src);
@@ -250,7 +261,7 @@ public class BeatBotActivity extends Activity {
 	
 	public void undo(View view) {
 		midiManager.undo();
-		midiSurfaceView.updateSelectedLevelNotes();
+		midiView.updateSelectedLevelNotes();
 	}
 
 	public void bpmTap(View view) {

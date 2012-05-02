@@ -1,21 +1,29 @@
 package com.kh.beatbot;
 
+import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
 
 public class PlaybackManager {
+	private static PlaybackManager singletonInstance = null;
+	
 	private State state;
 	private int[] sampleIDs;
 	private int[] streamIDs;
 	private SoundPool soundPool;
-	private BeatBotActivity context;
 
 	public enum State {
 		PLAYING, STOPPED
 	}
 	
-	public PlaybackManager(BeatBotActivity context, int[] sampleRawResources) {
-		this.context = context;
+	public static PlaybackManager getInstance(Context context, int[] sampleRawResources) {
+		if (singletonInstance == null) {
+			singletonInstance = new PlaybackManager(context, sampleRawResources);
+		}
+		return singletonInstance;			
+	}
+	
+	private PlaybackManager(Context context, int[] sampleRawResources) {
 		state = State.STOPPED;
 		sampleIDs = new int[sampleRawResources.length];
 		streamIDs = new int[sampleRawResources.length];

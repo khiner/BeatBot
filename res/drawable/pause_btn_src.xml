@@ -2,7 +2,5 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true"
           android:drawable="@drawable/pause_selected_small" /> <!-- pressed -->
-    <item android:state_focused="true"
-          android:drawable="@drawable/pause_selected_small" /> <!-- focused -->
     <item android:drawable="@drawable/pause_selected_small" />  <!-- default -->
 </selector>

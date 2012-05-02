@@ -8,12 +8,13 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import com.kh.beatbot.views.ThresholdBarView;
-
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Environment;
+import android.util.Log;
+
+import com.kh.beatbot.views.ThresholdBarView;
 
 public class RecordManager {
 	private static final int RECORDER_BPP = 16;
@@ -125,6 +126,7 @@ public class RecordManager {
 
 		try {
 			while (state != State.INITIALIZING) {
+				Log.d("rr", "running");
 				recorder.read(buffer, 0, bufferSize);
 
 				if (state == State.LISTENING && overThreshold(buffer)) {
@@ -154,6 +156,7 @@ public class RecordManager {
 		String filePath = null;
 		try {
 			while (true) {
+				Log.d("bb", "running");
 				synchronized (processingQueue) {
 					while (processingQueue.isEmpty())
 						processingQueue.wait();

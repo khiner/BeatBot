@@ -77,7 +77,7 @@ public final class R {
         public static final int iconView=0x7f08000f;
         public static final int levels=0x7f080007;
         public static final int main=0x7f080000;
-        public static final int midiSurfaceView=0x7f08000b;
+        public static final int midiView=0x7f08000b;
         public static final int midi_menu_item=0x7f080017;
         public static final int midi_open=0x7f08000e;
         public static final int midi_save=0x7f08000d;

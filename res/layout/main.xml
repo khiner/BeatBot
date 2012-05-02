@@ -81,10 +81,10 @@
         android:id="@+id/sampleListView"
         android:layout_width="38dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/controlLayout"/>
+        android:layout_below="@+id/controlLayout" />
 
-    <com.kh.beatbot.views.MidiSurfaceView
-        android:id="@+id/midiSurfaceView"
+    <com.kh.beatbot.views.MidiView
+        android:id="@+id/midiView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignBottom="@+id/sampleListView"
