@@ -162,12 +162,12 @@ public class MidiView extends SurfaceViewBase {
 		}
 	}
 
-	private static final int[] V_LINE_WIDTHS = new int[] { 2, 3, 5 };
-	private static final float[] V_LINE_COLORS = new float[] { .3f, .2f, 0 };
+	private static final int[] V_LINE_WIDTHS = new int[] { 5, 3, 2 };
+	private static final float[] V_LINE_COLORS = new float[] { 0, .2f, .3f };
 
 	// NIO Buffers
+	private FloatBuffer[] vLineVB = new FloatBuffer[3];	
 	private FloatBuffer hLineVB = null;
-	private FloatBuffer[] vLineVB = new FloatBuffer[3];
 	private FloatBuffer recordRowVB = null;
 	private FloatBuffer selectRegionVB = null;
 	private FloatBuffer loopMarkerVB = null;
@@ -401,7 +401,7 @@ public class MidiView extends SurfaceViewBase {
 
 		gl.glPushMatrix();
 		gl.glTranslatef(startX, 0, 0);
-		for (int i = 2; i >= 0; i--) {
+		for (int i = 0; i < 3; i++) {
 			float color = V_LINE_COLORS[i];
 			gl.glColor4f(color, color, color, 1); // appropriate line color
 			gl.glLineWidth(V_LINE_WIDTHS[i]); // appropriate line width
@@ -412,11 +412,11 @@ public class MidiView extends SurfaceViewBase {
 				gl.glTranslatef(translateDist, 0, 0);
 			}
 			gl.glPopMatrix();
-			if (i == 2) {
+			if (i == 0) {
 				gl.glTranslatef(translateDist / 2, 0, 0);
 			} else if (i == 1) {
-				translateDist = translateDist/2f;
-				gl.glTranslatef(-translateDist / 2, 0, 0);
+				translateDist /= 2;
+				gl.glTranslatef(-translateDist / 2, 0, 0);								
 			}
 		}
 		gl.glPopMatrix();
@@ -579,27 +579,18 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void initVLineVBs() {
-		// 4 vertices per line
-		float[] shortLine = new float[4];
-		float[] medLine = new float[4];
-		float[] tallLine = new float[4];
+		// height of the bottom of the record row
 		float y1 = height / midiManager.getNumSamples();
-		// the top of the tick line is higher for major ticks
-		shortLine[0] = 0;
-		shortLine[1] = y1 - y1 / 4;
-		shortLine[2] = 0;
-		shortLine[3] = height;
-		medLine[0] = 0;
-		medLine[1] = y1 - y1 / 3;
-		medLine[2] = 0;
-		medLine[3] = height;
-		tallLine[0] = 0;
-		tallLine[1] = y1 - y1 / 2;
-		tallLine[2] = 0;
-		tallLine[3] = height;
-		vLineVB[0] = makeFloatBuffer(shortLine);
-		vLineVB[1] = makeFloatBuffer(medLine);
-		vLineVB[2] = makeFloatBuffer(tallLine);
+		
+		for (int i = 0; i < 3; i++) {
+			// 4 vertices per line					
+			float[] line = new float[4];
+			line[0] = 0;
+			line[1] = y1 - y1/(i + 2);
+			line[2] = 0;
+			line[3] = height;
+			vLineVB[i] = makeFloatBuffer(line);
+		}
 	}
 
 	private void initLoopMarkerVBs() {
