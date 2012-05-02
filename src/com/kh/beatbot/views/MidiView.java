@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
@@ -272,10 +273,20 @@ public class MidiView extends SurfaceViewBase {
 		this.playbackManager = playbackManager;
 	}
 
-	public State getState() {
+	public State getViewState() {
 		return viewState;
 	}
 
+	public void setViewState(State viewState) {
+		if (viewState == State.TO_LEVELS_VIEW || viewState == State.TO_NORMAL_VIEW)
+			return;
+		this.viewState = viewState;
+		if (viewState == State.LEVELS_VIEW)
+			bgColor = 0;
+		else
+			bgColor = .5f;
+	}
+	
 	public float currentBeatDivision() {
 		// currently, granularity is relative to an eight note; x2 for quarter
 		// note
@@ -1135,5 +1146,36 @@ public class MidiView extends SurfaceViewBase {
 			break;
 		}
 		return true;
+	}
+
+	public void writeToBundle(Bundle out) {
+		ArrayList<Integer> selectedIndices = new ArrayList<Integer>();
+		for (int i = 0; i < selectedNotes.size(); i++) {
+			int index = midiManager.getMidiNotes().indexOf(selectedNotes.get(i)); 
+			if (index != -1)
+				selectedIndices.add(index);
+		}
+		out.putIntegerArrayList("selectedIndices", selectedIndices);
+		ArrayList<Integer> selectedLevelIndices = new ArrayList<Integer>();
+		for (int i = 0; i < selectedLevelNotes.size(); i++) {
+			int index = midiManager.getMidiNotes().indexOf(selectedLevelNotes.get(i)); 
+			if (index != -1)
+				selectedLevelIndices.add(index);
+		}		
+		out.putIntegerArrayList("selectedLevelIndices", selectedLevelIndices);
+		out.putInt("viewState", viewState.ordinal());
+	}
+
+	// use constructor first, and set the deets with this method
+	public void readFromBundle(Bundle in) {
+		ArrayList<Integer> selectedIndices = in.getIntegerArrayList("selectedIndices");
+		for (int index : selectedIndices) {
+			selectedNotes.add(midiManager.getMidiNotes().get(index));
+		}		
+		ArrayList<Integer> selectedLevelIndices = in.getIntegerArrayList("selectedLevelIndices");
+		for (int index : selectedLevelIndices) {
+			selectedLevelNotes.add(midiManager.getMidiNotes().get(index));
+		}
+		setViewState(State.values()[in.getInt("viewState")]);			
 	}
 }

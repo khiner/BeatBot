@@ -112,7 +112,6 @@ public class BeatBotActivity extends Activity {
 		else
 			midiManager = savedInstanceState.getParcelable("midiManager");
 		
-		
 		midiManager.setPlaybackManager(playbackManager);
 		recordManager.setMidiManager(midiManager);
 		// recordManager needs the threshold bar (with levels display) to send decibel levels
@@ -124,7 +123,9 @@ public class BeatBotActivity extends Activity {
 		midiView.setMidiManager(midiManager);
 		midiView.setRecordManager(recordManager);
 		midiView.setPlaybackManager(playbackManager);
-		
+		if (savedInstanceState != null)
+			midiView.readFromBundle(savedInstanceState);
+
 		// set midiManager as a global variable, since it needs to be accessed by
 		// separate MidiFileMenu activity
 		GlobalVars gv = (GlobalVars)getApplicationContext();
@@ -157,6 +158,7 @@ public class BeatBotActivity extends Activity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putParcelable("midiManager", midiManager);
+		midiView.writeToBundle(outState);
 		outState.putBoolean("playing", playbackManager.getState() == PlaybackManager.State.PLAYING);
 		outState.putBoolean("recording", recordManager.getState() != RecordManager.State.INITIALIZING);
 	}
@@ -252,7 +254,7 @@ public class BeatBotActivity extends Activity {
 	public void levels(View view) {
 		ImageButton levelsButton = (ImageButton)view;
 		midiView.toggleLevelsView();
-		if (midiView.getState() == MidiView.State.TO_LEVELS_VIEW) {
+		if (midiView.getViewState() == MidiView.State.TO_LEVELS_VIEW) {
 			levelsButton.setImageResource(R.drawable.levels_btn_on_src);
 		} else {
 			levelsButton.setImageResource(R.drawable.levels_btn_off_src);

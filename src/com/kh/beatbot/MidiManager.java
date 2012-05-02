@@ -367,16 +367,6 @@ public class MidiManager implements Parcelable {
 		out.writeLong(loopTick);
 	}
 
-	public static final Parcelable.Creator<MidiManager> CREATOR = new Parcelable.Creator<MidiManager>() {
-		public MidiManager createFromParcel(Parcel in) {
-			return new MidiManager(in);
-		}
-
-		public MidiManager[] newArray(int size) {
-			return new MidiManager[size];
-		}
-	};
-
 	private MidiManager(Parcel in) {
 		numSamples = in.readInt();
 		int[] timeSigInfo = new int[4];
