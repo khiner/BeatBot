@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/controlLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/playButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="#FF000000"
+            android:onClick="play"
+            android:src="@drawable/play_btn_off_src" />
+
+        <ImageButton
+            android:id="@+id/stopButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="#FF000000"
+            android:onClick="stop"
+            android:src="@drawable/stop_btn_src" />
+
+        <ImageButton
+            android:id="@+id/recordButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="#FF000000"
+            android:onClick="record"
+            android:src="@drawable/rec_btn_off_src" />
+
+        <ImageButton
+            android:id="@+id/levels"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="#FF000000"
+            android:onClick="levels"
+            android:src="@drawable/levels_btn_off_src" />
+
+        <ImageButton
+            android:id="@+id/undo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="#FF000000"
+            android:onClick="undo"
+            android:src="@drawable/undo_btn_src" />
+
+        <ImageButton
+            android:id="@+id/bpm_tap"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="5dp"
+            android:background="#FF000000"
+            android:onClick="bpmTap"
+            android:src="@drawable/bpm_tap_btn_src" />
+
+        <com.kh.beatbot.views.BpmView
+            android:id="@+id/bpm"
+            android:layout_width="66dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp" />
+    </LinearLayout>
+
+    <com.kh.beatbot.views.ThresholdBarView
+        android:id="@+id/thresholdBar"
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:layout_below="@+id/controlLayout"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp" />
+
+    <ListView
+        android:id="@+id/sampleListView"
+        android:layout_width="38dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/thresholdBar" />
+
+    <com.kh.beatbot.views.MidiView
+        android:id="@+id/midiView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/sampleListView"
+        android:layout_alignTop="@+id/sampleListView"
+        android:layout_toRightOf="@+id/sampleListView" />
+
+</RelativeLayout>
