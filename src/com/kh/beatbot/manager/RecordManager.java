@@ -1,4 +1,4 @@
-package com.kh.beatbot;
+package com.kh.beatbot.manager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,7 +14,7 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.util.Log;
 
-import com.kh.beatbot.views.ThresholdBarView;
+import com.kh.beatbot.view.ThresholdBarView;
 
 public class RecordManager {
 	private static final int RECORDER_BPP = 16;

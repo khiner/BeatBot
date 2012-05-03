@@ -1,4 +1,4 @@
-package com.kh.beatbot.menu;
+package com.kh.beatbot;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,10 +15,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.KarlHiner.BeatBox.R;
-import com.kh.beatbot.GlobalVars;
-import com.kh.beatbot.MidiManager;
+import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.manager.MidiManager;
 
-public class MidiFileMenu extends Activity {
+public class MidiFileMenuActivity extends Activity {
 	private static final String SAVE_FOLDER = "BeatBot/MIDI";
 	private String baseFilePath = null;
 	MidiManager midiManager;

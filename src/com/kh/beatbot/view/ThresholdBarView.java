@@ -1,4 +1,4 @@
-package com.kh.beatbot.views;
+package com.kh.beatbot.view;
 
 import java.nio.FloatBuffer;
 

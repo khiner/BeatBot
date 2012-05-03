@@ -1,4 +1,4 @@
-package com.kh.beatbot.views;
+package com.kh.beatbot.view;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -81,7 +81,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements SurfaceHold
 	}
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {		
+			int height) {
 		this.width = width;
 		this.height = height;
 	}

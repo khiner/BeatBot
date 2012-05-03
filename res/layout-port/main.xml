@@ -60,14 +60,14 @@
             android:onClick="bpmTap"
             android:src="@drawable/bpm_tap_btn_src" />
 
-        <com.kh.beatbot.views.BpmView
+        <com.kh.beatbot.view.BpmView
             android:id="@+id/bpm"
             android:layout_width="66dp"
             android:layout_height="40dp"
             android:layout_marginLeft="10dp" />
     </LinearLayout>
 
-    <com.kh.beatbot.views.ThresholdBarView
+    <com.kh.beatbot.view.ThresholdBarView
         android:id="@+id/thresholdBar"
         android:layout_width="fill_parent"
         android:layout_height="30dp"
@@ -81,7 +81,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/thresholdBar" />
 
-    <com.kh.beatbot.views.MidiView
+    <com.kh.beatbot.view.MidiView
         android:id="@+id/midiView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

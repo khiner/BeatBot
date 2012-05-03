@@ -1,4 +1,4 @@
-package com.kh.beatbot;
+package com.kh.beatbot.manager;
 
 import android.content.Context;
 import android.media.AudioManager;

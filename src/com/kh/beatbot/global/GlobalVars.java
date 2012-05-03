@@ -1,4 +1,6 @@
-package com.kh.beatbot;
+package com.kh.beatbot.global;
+
+import com.kh.beatbot.manager.MidiManager;
 
 import android.app.Application;
 

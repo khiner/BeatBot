@@ -1,4 +1,4 @@
-package com.kh.beatbot;
+package com.kh.beatbot.manager;
 
 import java.io.File;
 import java.io.FileInputStream;

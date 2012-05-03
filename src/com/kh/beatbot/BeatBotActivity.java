@@ -17,10 +17,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.KarlHiner.BeatBox.R;
-import com.kh.beatbot.menu.MidiFileMenu;
-import com.kh.beatbot.views.BpmView;
-import com.kh.beatbot.views.MidiView;
-import com.kh.beatbot.views.ThresholdBarView;
+import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.manager.PlaybackManager;
+import com.kh.beatbot.manager.RecordManager;
+import com.kh.beatbot.view.BpmView;
+import com.kh.beatbot.view.MidiView;
+import com.kh.beatbot.view.ThresholdBarView;
 
 public class BeatBotActivity extends Activity {
 	public class SampleIconAdapter extends ArrayAdapter<String> {
@@ -167,7 +170,7 @@ public class BeatBotActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
-		Intent midiFileMenuIntent = new Intent(this, MidiFileMenu.class);
+		Intent midiFileMenuIntent = new Intent(this, MidiFileMenuActivity.class);
 		menu.findItem(R.id.midi_menu_item).setIntent(midiFileMenuIntent);
 		return true;
 	}
@@ -182,7 +185,7 @@ public class BeatBotActivity extends Activity {
 				item.setIcon(R.drawable.btn_check_buttonless_off);
 			return true;
 		case R.id.quantize_current:
-			midiManager.quantize(midiView.currentBeatDivision());
+			midiManager.quantize(midiView.getCurrentBeatDivision());
 			return true;
 		case R.id.quantize_quarter:
 			midiManager.quantize(1);
