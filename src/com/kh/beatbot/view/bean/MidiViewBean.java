@@ -11,6 +11,8 @@ public class MidiViewBean {
 
 	private float width, height;
 	private float yOffset;
+	private float noteHeight;
+	private float midiHeight;
 	// the main background color for the view.
 	// this color can change when transitioning to/from LEVEL_VIEW
 	private float bgColor = .5f;
@@ -71,12 +73,28 @@ public class MidiViewBean {
 		this.height = height;
 	}
 
+	public float getMidiHeight() {
+		return midiHeight;
+	}
+
+	public void setMidiHeight(float midiHeight) {
+		this.midiHeight = midiHeight;
+	}
+
 	public float getYOffset() {
 		return yOffset;
 	}
 
 	public void setYOffset(float yOffset) {
 		this.yOffset = yOffset;
+	}
+
+	public float getNoteHeight() {
+		return noteHeight;
+	}
+
+	public void setNoteHeight(float noteHeight) {
+		this.noteHeight = noteHeight;
 	}
 
 	public float getBgColor() {

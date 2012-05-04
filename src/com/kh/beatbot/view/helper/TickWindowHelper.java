@@ -58,7 +58,7 @@ public class TickWindowHelper {
 	public void scroll() {
 		long sv = viewBean.getScrollVelocity();
 		if (!viewBean.isScrolling() && sv != 0) {
-			sv *= 0.95;
+			viewBean.setScrollVelocity(sv *= 0.95);
 			setTickOffset((long) (tickOffset + sv));
 			if (sv == 0) {
 				viewBean.setScrollViewEndTime(System.currentTimeMillis());

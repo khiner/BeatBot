@@ -66,6 +66,8 @@ public class MidiView extends SurfaceViewBase {
 
 	public MidiView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		bean.setHeight(height);
+		bean.setWidth(width);
 		for (int i = 0; i < 5; i++) {
 			bean.setDragOffsetTick(i, 0);
 		}
@@ -349,7 +351,6 @@ public class MidiView extends SurfaceViewBase {
 				gl.glColor4f(0, 0, whiteToBlack, 1);
 			}
 		}
-
 	}
 
 	private void drawMidiNote(int note, long onTick, long offTick) {
@@ -357,7 +358,7 @@ public class MidiView extends SurfaceViewBase {
 		float x1 = tickToX(onTick);
 		float x2 = tickToX(offTick);
 		float y1 = noteToY(note);
-		float y2 = noteToY(note + 1);
+		float y2 = y1 + bean.getNoteHeight();
 		// the float buffer for the midi note coordinates
 		FloatBuffer midiBuf = makeFloatBuffer(new float[] { x1, y1, x2, y1, x1,
 				y2, x2, y2 });
@@ -392,13 +393,12 @@ public class MidiView extends SurfaceViewBase {
 		hLines[2] = width;
 		hLines[3] = 0;
 		float y = bean.getYOffset();
-		float ySpacing = (bean.getHeight() - y) / midiManager.getNumSamples();
 		for (int i = 1; i < midiManager.getNumSamples() + 2; i++) {
 			hLines[i * 4] = 0;
 			hLines[i * 4 + 1] = y;
 			hLines[i * 4 + 2] = width;
 			hLines[i * 4 + 3] = y;
-			y += ySpacing;
+			y += bean.getNoteHeight();
 		}
 		hLineVB = makeFloatBuffer(hLines);
 	}
@@ -458,17 +458,15 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private float noteToY(int note) {
-		return note * (bean.getHeight() - bean.getYOffset())
-				/ midiManager.getNumSamples() + bean.getYOffset();
+		return note * bean.getNoteHeight() + bean.getYOffset();
 	}
 
 	private float velocityToY(MidiNote midiNote) {
-		return bean.getHeight() - midiNote.getVelocity() * bean.getHeight()
-				/ 100;
+		return bean.getHeight() - midiNote.getVelocity() * bean.getMidiHeight() / 100;
 	}
 
 	private int yToVelocity(float y) {
-		return (int) (100 * (bean.getHeight() - y) / bean.getHeight());
+		return (int) (100 * (bean.getHeight() - y) / bean.getMidiHeight());
 	}
 
 	private boolean legalSelectedNoteMove(int noteDiff) {
@@ -518,8 +516,8 @@ public class MidiView extends SurfaceViewBase {
 			bean.setBgColor(viewState == State.TO_LEVELS_VIEW ? bean
 					.getBgColor() - amt : bean.getBgColor() + amt);
 			gl.glClearColor(bean.getBgColor(), bean.getBgColor(),
-					bean.getBgColor(), 1.0f);
-			if (bean.getBgColor() >= .5f || bean.getBgColor() <= 0f) {
+					bean.getBgColor(), 1);
+			if (bean.getBgColor() >= .5f || bean.getBgColor() <= 0) {
 				viewState = bean.getBgColor() >= .5f ? State.NORMAL_VIEW
 						: State.LEVELS_VIEW;
 			}
@@ -798,6 +796,8 @@ public class MidiView extends SurfaceViewBase {
 		super.surfaceChanged(holder, format, width, height);
 		bean.setWidth(width);
 		bean.setHeight(height);
+		bean.setMidiHeight(bean.getHeight() - bean.getYOffset());		
+		bean.setNoteHeight(bean.getMidiHeight()/midiManager.getNumSamples());		
 	}
 
 	@Override
