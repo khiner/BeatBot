@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Stack;
 
 import android.os.Parcel;
@@ -57,10 +58,11 @@ public class MidiManager implements Parcelable {
 	private long currTick = -1;
 	private long loopTick = RESOLUTION * 4;
 	private long MSPT;
+	private Random random;
 
 	private MidiManager(int numSamples) {
 		this.numSamples = numSamples;
-
+		random = new Random();
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,
 				TimeSignature.DEFAULT_DIVISION);
 		tempo.setBpm(140);
@@ -217,9 +219,9 @@ public class MidiManager implements Parcelable {
 						continue;
 					if (currTick == midiNote.getOnTick())
 						// note - 1, since track 0 is recording track
-						playbackManager.playSample(midiNote.getNoteValue() - 1, midiNote.getVelocity());
+						playbackManager.playSample(midiNote.getNoteValue(), midiNote.getVelocity());
 					else if (currTick == midiNote.getOffTick())
-						playbackManager.stopSample(midiNote.getNoteValue() - 1);
+						playbackManager.stopSample(midiNote.getNoteValue());
 				}
 				// update time of next tick
 				nextTickNano += MSPT * 1000;
@@ -243,18 +245,19 @@ public class MidiManager implements Parcelable {
 
 	public void setRecordNoteOn(int velocity) {
 		long onTick = currTick;
+		// random note for now.
+		int note = random.nextInt(numSamples);
 		// tick, channel, note, velocity
-		NoteOn on = new NoteOn(onTick, 0, 0, velocity);
+		NoteOn on = new NoteOn(onTick, 0, note, velocity);
 		lastEvent = on;
 		recording = true;
-
 	}
 
 	public void setRecordNoteOff(int velocity) {
-		long offTick = currTick;
+		NoteOn lastOn = (NoteOn)lastEvent;
 		// tick, channel, note, velocity
-		NoteOff off = new NoteOff(offTick, 0, 0, velocity);
-		midiNotes.add(new MidiNote((NoteOn)lastEvent, off));
+		NoteOff off = new NoteOff(currTick, 0, lastOn.getNoteValue(), velocity);
+		midiNotes.add(new MidiNote(lastOn, off));
 		lastEvent = off;
 		recording = false;
 	}

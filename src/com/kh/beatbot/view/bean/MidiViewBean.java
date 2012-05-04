@@ -2,7 +2,7 @@ package com.kh.beatbot.view.bean;
 
 public class MidiViewBean {
 
-		// the size of the "dots" at the top of level display
+	// the size of the "dots" at the top of level display
 	public static final int LEVEL_POINT_SIZE = 25;
 	// the width of the lines for note levels
 	public static final int LEVEL_LINE_WIDTH = 7;
@@ -10,6 +10,7 @@ public class MidiViewBean {
 	public final static long DOUBLE_TAP_TIME = 300;
 
 	private float width, height;
+	private float yOffset;
 	// the main background color for the view.
 	// this color can change when transitioning to/from LEVEL_VIEW
 	private float bgColor = .5f;
@@ -68,6 +69,14 @@ public class MidiViewBean {
 
 	public void setHeight(float height) {
 		this.height = height;
+	}
+
+	public float getYOffset() {
+		return yOffset;
+	}
+
+	public void setYOffset(float yOffset) {
+		this.yOffset = yOffset;
 	}
 
 	public float getBgColor() {

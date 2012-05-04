@@ -140,7 +140,7 @@ public class RecordManager {
 				}
 				// update threshold bar
 				float Db = shortToDb(currAmp);
-				thresholdBar.setChannelLevels(Db, Db);
+				thresholdBar.setChannelLevel(Db);
 			}
 		} catch (IOException e) {
 			try {

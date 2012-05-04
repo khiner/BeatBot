@@ -70,12 +70,12 @@ public final class R {
         public static final int wav=0x7f020035;
     }
     public static final class id {
-        public static final int bpm=0x7f08000a;
-        public static final int bpm_tap=0x7f080009;
+        public static final int bpm=0x7f080009;
+        public static final int bpm_tap=0x7f080008;
         public static final int controlLayout=0x7f080001;
         public static final int filePathEdit=0x7f08000c;
         public static final int iconView=0x7f08000f;
-        public static final int levels=0x7f080007;
+        public static final int levels=0x7f080006;
         public static final int main=0x7f080000;
         public static final int midiView=0x7f08000b;
         public static final int midi_menu_item=0x7f080017;
@@ -93,8 +93,8 @@ public final class R {
         public static final int save_wav=0x7f080018;
         public static final int snap=0x7f080010;
         public static final int stopButton=0x7f080004;
-        public static final int thresholdBar=0x7f080006;
-        public static final int undo=0x7f080008;
+        public static final int thresholdBar=0x7f08000a;
+        public static final int undo=0x7f080007;
     }
     public static final class layout {
         public static final int main=0x7f030000;

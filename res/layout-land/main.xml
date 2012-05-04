@@ -36,22 +36,14 @@
             android:onClick="record"
             android:src="@drawable/rec_btn_off_src" />
 
-        <com.kh.beatbot.view.ThresholdBarView
-            android:id="@+id/thresholdBar"
-            android:layout_width="0dip"
-            android:layout_height="30dp"
-            android:layout_weight="1"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="5dp" />
-
         <ImageButton
             android:id="@+id/levels"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="#FF000000"
             android:onClick="levels"
-            android:src="@drawable/levels_btn_off_src" />        
-        
+            android:src="@drawable/levels_btn_off_src" />
+
         <ImageButton
             android:id="@+id/undo"
             android:layout_width="40dp"
@@ -59,23 +51,30 @@
             android:background="#FF000000"
             android:onClick="undo"
             android:src="@drawable/undo_btn_src" />
-        
+
         <ImageButton
             android:id="@+id/bpm_tap"
             android:layout_width="40dp"
             android:layout_height="40dp"
-			android:layout_marginLeft="5dp"            
+            android:layout_marginLeft="5dp"
             android:background="#FF000000"
             android:onClick="bpmTap"
             android:src="@drawable/bpm_tap_btn_src" />
-                                
+
         <com.kh.beatbot.view.BpmView
             android:id="@+id/bpm"
             android:layout_width="66dp"
             android:layout_height="40dp"
             android:layout_marginLeft="10dp" />
-                    
     </LinearLayout>
+
+    <com.kh.beatbot.view.ThresholdBarView
+        android:id="@+id/thresholdBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@+id/sampleListView"
+        android:layout_below="@+id/controlLayout"
+        android:layout_above="@+id/midiView" />
 
     <ListView
         android:id="@+id/sampleListView"
@@ -86,9 +85,8 @@
     <com.kh.beatbot.view.MidiView
         android:id="@+id/midiView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="246dp"
         android:layout_alignBottom="@+id/sampleListView"
-        android:layout_alignTop="@+id/sampleListView"
         android:layout_toRightOf="@+id/sampleListView" />
 
 </RelativeLayout>

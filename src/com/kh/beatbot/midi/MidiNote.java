@@ -63,6 +63,8 @@ public class MidiNote {
 	}
 	
 	public void setNote(int note) {
+		if (note < 0)
+			return;
 		this.noteOn.setNoteValue(note);
 		this.noteOff.setNoteValue(note);
 	}	

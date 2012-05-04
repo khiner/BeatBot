@@ -23,7 +23,7 @@ public class ThresholdBarView extends SurfaceViewBase {
 
 	private float threshold;
 	private short shortThreshold;
-	private float[] channelLevels = new float[] { 0 , 0 };
+	private float channelLevel = 0;
 
 	public ThresholdBarView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -43,10 +43,9 @@ public class ThresholdBarView extends SurfaceViewBase {
 		shortThreshold = dbToShort((this.threshold - 1)*60);
 	}
 
-	public void setChannelLevels(float channel1Db, float channel2Db) {
-		// map channel DBs to range (0, 1)
-		channelLevels[0] = dbToUnit(channel1Db);
-		channelLevels[1] = dbToUnit(channel2Db);
+	public void setChannelLevel(float channelDb) {
+		// map channel DB to range (0, 1)
+		channelLevel = dbToUnit(channelDb);
 		// Log.d("channel level", String.valueOf(channelLevels[0]));
 	}
 
@@ -58,7 +57,7 @@ public class ThresholdBarView extends SurfaceViewBase {
 		// (numBars/3 lines per channel) X (4 coordinates per line)
 		float[] channelCoords = new float[(numBars*4)];
 		int y1 = 0;
-		int y2 = height / 4;
+		int y2 = 3*height / 4;
 		for (int x = 0, i = 0; i < numBars; x += barWidth, i++) {
 			channelCoords[i * 4] = x;
 			channelCoords[i * 4 + 1] = y1;
@@ -89,7 +88,7 @@ public class ThresholdBarView extends SurfaceViewBase {
 			gl.glDrawArrays(GL10.GL_LINES, channelBuffer.capacity() / 3,
 					buffNum - channelBuffer.capacity()/3);
 		}
-		gl.glColor4f(.5f, .5f, .5f, .7f);
+		gl.glColor4f(.6f, .6f, .6f, 1);
 		gl.glDrawArrays(GL10.GL_LINES, buffNum, channelBuffer.capacity()/2 - buffNum);		
 	}
 
@@ -99,12 +98,9 @@ public class ThresholdBarView extends SurfaceViewBase {
 
 		gl.glPushMatrix();
 		
-		// draw channel 0		
+		// draw channel lines		
 		gl.glTranslatef(0, 5, 0);
-		drawChannel(channelLevels[0]);
-		// draw channel 1
-		gl.glTranslatef(0, height / 4 + 5, 0);
-		drawChannel(channelLevels[1]);
+		drawChannel(channelLevel);
 		
 		gl.glPopMatrix();
 	}

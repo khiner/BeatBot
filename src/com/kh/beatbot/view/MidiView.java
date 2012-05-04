@@ -31,7 +31,7 @@ public class MidiView extends SurfaceViewBase {
 	// NIO Buffers
 	private FloatBuffer[] vLineVB = new FloatBuffer[3];
 	private FloatBuffer hLineVB = null;
-	private FloatBuffer recordRowVB = null;
+	private FloatBuffer tipTickFillVB = null;
 	private FloatBuffer selectRegionVB = null;
 	private FloatBuffer loopMarkerVB = null;
 	private FloatBuffer loopMarkerLineVB = null;
@@ -75,6 +75,7 @@ public class MidiView extends SurfaceViewBase {
 		this.midiManager = midiManager;
 		bean.setAllTicks(midiManager.RESOLUTION * 4);
 		tickWindow = new TickWindowHelper(bean, 0, bean.getAllTicks() - 1);
+		bean.setYOffset(21);
 	}
 
 	public void setRecordManager(RecordManager recorder) {
@@ -262,12 +263,10 @@ public class MidiView extends SurfaceViewBase {
 		gl.glPopMatrix();
 	}
 
-	private void drawRecordRowFill(boolean recording) {
-		float recordRowColor = bean.getBgColor() * 1.2f;
-		gl.glColor4f(recordRowColor, recordRowColor, recordRowColor, 1f);
-		if (recording)
-			gl.glColor4f(1f, .6f, .6f, .7f);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, recordRowVB);
+	private void drawTopTickFill(boolean recording) {
+		float color = .3f;
+		gl.glColor4f(color, color, color, 1);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, tipTickFillVB);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
 	}
 
@@ -289,9 +288,8 @@ public class MidiView extends SurfaceViewBase {
 			int topNote, int bottomNote) {
 		float x1 = tickToX(leftTick);
 		float x2 = tickToX(rightTick);
-		float y1 = (bean.getHeight() * topNote) / midiManager.getNumSamples();
-		float y2 = (bean.getHeight() * (bottomNote + 1))
-				/ midiManager.getNumSamples();
+		float y1 = noteToY(topNote);
+		float y2 = noteToY(bottomNote + 1);
 		selectRegionVB = makeFloatBuffer(new float[] { x1, y1, x2, y1, x1, y2,
 				x2, y2 });
 	}
@@ -358,9 +356,8 @@ public class MidiView extends SurfaceViewBase {
 		// midi note rectangle coordinates
 		float x1 = tickToX(onTick);
 		float x2 = tickToX(offTick);
-		float y1 = (bean.getHeight() * note) / midiManager.getNumSamples();
-		float y2 = (bean.getHeight() * (note + 1))
-				/ midiManager.getNumSamples();
+		float y1 = noteToY(note);
+		float y2 = noteToY(note + 1);
 		// the float buffer for the midi note coordinates
 		FloatBuffer midiBuf = makeFloatBuffer(new float[] { x1, y1, x2, y1, x1,
 				y2, x2, y2 });
@@ -383,32 +380,38 @@ public class MidiView extends SurfaceViewBase {
 		float x1 = 0;
 		float x2 = width;
 		float y1 = 0;
-		float y2 = bean.getHeight() / midiManager.getNumSamples();
-		recordRowVB = makeFloatBuffer(new float[] { x1, y1, x2, y1, x1, y2, x2,
-				y2 });
+		float y2 = bean.getYOffset();
+		tipTickFillVB = makeFloatBuffer(new float[] { x1, y1, x2, y1, x1, y2,
+				x2, y2 });
 	}
 
 	private void initHLineVB() {
-		float[] hLines = new float[(midiManager.getNumSamples() + 1) * 4];
-		for (int i = 0; i <= midiManager.getNumSamples(); i++) {
-			float yLoc = (bean.getHeight() * i) / midiManager.getNumSamples();
+		float[] hLines = new float[(midiManager.getNumSamples() + 2) * 4];
+		hLines[0] = 0;
+		hLines[1] = 0;
+		hLines[2] = width;
+		hLines[3] = 0;
+		float y = bean.getYOffset();
+		float ySpacing = (bean.getHeight() - y) / midiManager.getNumSamples();
+		for (int i = 1; i < midiManager.getNumSamples() + 2; i++) {
 			hLines[i * 4] = 0;
-			hLines[i * 4 + 1] = yLoc;
+			hLines[i * 4 + 1] = y;
 			hLines[i * 4 + 2] = width;
-			hLines[i * 4 + 3] = yLoc;
+			hLines[i * 4 + 3] = y;
+			y += ySpacing;
 		}
 		hLineVB = makeFloatBuffer(hLines);
 	}
 
 	private void initVLineVBs() {
 		// height of the bottom of the record row
-		float y1 = bean.getHeight() / midiManager.getNumSamples();
+		float y1 = bean.getYOffset();
 
 		for (int i = 0; i < 3; i++) {
 			// 4 vertices per line
 			float[] line = new float[4];
 			line[0] = 0;
-			line[1] = y1 - y1 / (i + 2);
+			line[1] = y1 - y1 / (i + 1.5f);
 			line[2] = 0;
 			line[3] = bean.getHeight();
 			vLineVB[i] = makeFloatBuffer(line);
@@ -416,11 +419,9 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void initLoopMarkerVBs() {
-		float h = bean.getHeight() / midiManager.getNumSamples();
-		float[] loopMarkerLine = new float[] { 0, h / 2 + 1, 0,
-				bean.getHeight() };
-		float[] loopMarkerTriangle = new float[] { 0, h / 2, 0, h, -h / 2,
-				3 * h / 4 };
+		float h = bean.getYOffset();
+		float[] loopMarkerLine = new float[] { 0, 0, 0, bean.getHeight() };
+		float[] loopMarkerTriangle = new float[] { 0, 0, 0, h, -h, h / 2 };
 
 		loopMarkerLineVB = makeFloatBuffer(loopMarkerLine);
 		loopMarkerVB = makeFloatBuffer(loopMarkerTriangle);
@@ -450,7 +451,15 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private int yToNote(float y) {
-		return (int) (midiManager.getNumSamples() * y / bean.getHeight());
+		if (y >= 0 && y < bean.getYOffset())
+			return -1;
+		return (int) (midiManager.getNumSamples() * (y - bean.getYOffset()) / (bean
+				.getHeight() - bean.getYOffset()));
+	}
+
+	private float noteToY(int note) {
+		return note * (bean.getHeight() - bean.getYOffset())
+				/ midiManager.getNumSamples() + bean.getYOffset();
 	}
 
 	private float velocityToY(MidiNote midiNote) {
@@ -464,7 +473,7 @@ public class MidiView extends SurfaceViewBase {
 
 	private boolean legalSelectedNoteMove(int noteDiff) {
 		for (MidiNote midiNote : selectedNotes) {
-			if (midiNote.getNoteValue() + noteDiff < 1
+			if (midiNote.getNoteValue() + noteDiff < 0
 					|| midiNote.getNoteValue() + noteDiff >= midiManager
 							.getNumSamples()) {
 				return false;
@@ -518,7 +527,7 @@ public class MidiView extends SurfaceViewBase {
 
 		boolean recording = recorder.getState() == RecordManager.State.LISTENING
 				|| recorder.getState() == RecordManager.State.RECORDING;
-		drawRecordRowFill(recording);
+		drawTopTickFill(recording);
 		if (recording
 				|| playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			// if we're recording, keep the current recording tick in view.
@@ -681,7 +690,7 @@ public class MidiView extends SurfaceViewBase {
 			bean.setStateChanged(true);
 		} else {
 			// add a note based on the current tick granularity
-			if (note > 0) {// can't add note on record track
+			if (note >= 0) {
 				addMidiNote(tick, note);
 				bean.setStateChanged(true);
 			}
@@ -807,8 +816,7 @@ public class MidiView extends SurfaceViewBase {
 				long tick = xToTick(e.getX(0));
 				int note = yToNote(e.getY(0));
 				// no note selected. if this is a double-tap-hold (if there was
-				// a recent single tap),
-				// start a selection region.
+				// a recent single tap) start a selection region.
 				if (System.currentTimeMillis() - bean.getLastTapTime() < MidiViewBean.DOUBLE_TAP_TIME
 						&& Math.abs(bean.getLastTapX() - e.getX(0)) < 20
 						&& note == yToNote(bean.getLastTapY())) {
@@ -819,8 +827,7 @@ public class MidiView extends SurfaceViewBase {
 				} else {
 					// check if loop marker selected
 					float loopX = tickToX(midiManager.getLoopTick());
-					if (note == 0 && e.getX(0) >= loopX - 20
-							&& e.getX(0) <= loopX + 20) {
+					if (note == -1 && Math.abs(e.getX(0) - loopX) <= 20) {
 						bean.setLoopMarkerSelected(true);
 					} else
 						// otherwise, enable scrolling
@@ -944,8 +951,7 @@ public class MidiView extends SurfaceViewBase {
 						// dragging more than one note - drag each note
 						// individually
 						dragNote(id, touchedNote, tickDiff);
-						if (newNote > 0) // can't drag to record row (note 0)
-							touchedNote.setNote(newNote);
+						touchedNote.setNote(newNote);
 					}
 					// make room in the view window if we are dragging out of
 					// the view

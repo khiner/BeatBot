@@ -111,7 +111,7 @@ public class BeatBotActivity extends Activity {
 		// if this context is being restored from a destroyed context,
 		// recover the midiManager.  otherwise, create a new one
 		if (savedInstanceState == null)
-			midiManager = MidiManager.getInstance(sampleTypes.length);
+			midiManager = MidiManager.getInstance(sampleTypes.length - 1);
 		else
 			midiManager = savedInstanceState.getParcelable("midiManager");
 		
