@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ToggleButton;
 
 import com.KarlHiner.BeatBox.R;
 import com.kh.beatbot.global.GlobalVars;
@@ -219,25 +220,23 @@ public class BeatBotActivity extends Activity {
 	}
 
 	public void record(View view) {
-		ImageButton recButton = (ImageButton) view;
 		if (recordManager.getState() != RecordManager.State.INITIALIZING) {
 			recordManager.stopListening();
-			recButton.setImageResource(R.drawable.rec_btn_off_src);
+			((ToggleButton)view).setChecked(false);
 		} else {
 			midiView.reset();
 			// if we are already playing, the midiManager is already ticking away.
 			if (playbackManager.getState() != PlaybackManager.State.PLAYING)
-				play((ImageButton)findViewById(R.id.playButton));
+				play(findViewById(R.id.playButton));
 			recordManager.startListening();
-			recButton.setImageResource(R.drawable.rec_btn_on_src);
 		}
 	}
 	
 	public void play(View view) {
+		((ToggleButton)view).setChecked(true);
 		if (playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			midiManager.reset();
 		} else if (playbackManager.getState() == PlaybackManager.State.STOPPED) {
-			((ImageButton)findViewById(R.id.playButton)).setImageResource(R.drawable.play_btn_on_src);
 			playbackManager.play();
 			midiManager.start();			
 		}
@@ -245,30 +244,41 @@ public class BeatBotActivity extends Activity {
 
 	public void stop(View view) {
 		if (recordManager.getState() != RecordManager.State.INITIALIZING)
-			record((ImageButton)findViewById(R.id.recordButton));
+			record(findViewById(R.id.recordButton));
 		if (playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			playbackManager.stop();
+			((ToggleButton)findViewById(R.id.playButton)).setChecked(false);
 			spin(10); // wait for midi tick thread to notice that playback has stopped
 			midiManager.reset();
-			((ImageButton)findViewById(R.id.playButton)).setImageResource(R.drawable.play_btn_off_src);
 		}
 	}
 
-	public void levels(View view) {
-		ImageButton levelsButton = (ImageButton)view;
-		midiView.toggleLevelsView();
-		if (midiView.getViewState() == MidiView.State.TO_LEVELS_VIEW) {
-			levelsButton.setImageResource(R.drawable.levels_btn_on_src);
-		} else {
-			levelsButton.setImageResource(R.drawable.levels_btn_off_src);
-		}
-	}
-	
 	public void undo(View view) {
 		midiManager.undo();
 		midiView.updateSelectedLevelNotes();
 	}
+	
+	public void levels(View view) {
+		midiView.toggleLevelsView();
+	}
 
+	public void volume(View view) {
+		((ToggleButton)findViewById(R.id.panButton)).setChecked(false);
+		((ToggleButton)findViewById(R.id.pitchButton)).setChecked(false);
+	}
+	
+	public void pan(View view) {
+		((ToggleButton)findViewById(R.id.volumeButton)).setChecked(false);
+		((ToggleButton)findViewById(R.id.pitchButton)).setChecked(false);
+		
+	}
+	
+	public void pitch(View view) {
+		((ToggleButton)findViewById(R.id.volumeButton)).setChecked(false);
+		((ToggleButton)findViewById(R.id.panButton)).setChecked(false);
+		
+	}
+	
 	public void bpmTap(View view) {
 		long tapTime = System.currentTimeMillis();		
 		float secondsElapsed = (tapTime - lastTapTime)/1000f;

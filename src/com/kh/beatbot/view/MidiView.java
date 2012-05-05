@@ -273,7 +273,7 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void drawVolumeBars() {
-		gl.glColor4f(.505f, .776f, 1, 1);
+		gl.glColor4f(.412f, .788f, 1, 1);
 		gl.glLineWidth(MidiViewBean.LEVEL_LINE_WIDTH);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, volumeBarsVB);
 		gl.glDrawArrays(GL10.GL_LINES, 0, volumeBarsVB.capacity() / 2);
