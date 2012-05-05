@@ -30,15 +30,7 @@ import com.kh.beatbot.view.ThresholdBarView;
 
 public class BeatBotActivity extends Activity {
 	private class FadeListener implements AnimationListener {
-		ToggleButton volume, pan, pitch;
 		boolean fadeOut;
-
-		public FadeListener(ToggleButton volume, ToggleButton pan,
-				ToggleButton pitch) {
-			this.volume = volume;
-			this.pan = pan;
-			this.pitch = pitch;
-		}
 
 		public void setFadeOut(boolean flag) {
 			fadeOut = flag;
@@ -109,9 +101,10 @@ public class BeatBotActivity extends Activity {
 	}
 
 	private Animation fadeIn, fadeOut;
-	// these are used as variables for convenience, since they are reference frequently
+	// these are used as variables for convenience, since they are reference
+	// frequently
 	private ToggleButton volume, pan, pitch;
-	private FadeListener fadeListener;
+	private FadeListener fadeListener = new FadeListener();
 	private ListView sampleListView;
 	private MidiManager midiManager;
 	private PlaybackManager playbackManager;
@@ -136,7 +129,6 @@ public class BeatBotActivity extends Activity {
 		volume = (ToggleButton) findViewById(R.id.volumeButton);
 		pan = (ToggleButton) findViewById(R.id.panButton);
 		pitch = (ToggleButton) findViewById(R.id.pitchButton);
-		fadeListener = new FadeListener(volume, pan, pitch);
 		fadeIn = AnimationUtils.loadAnimation(this, R.anim.fadein);
 		fadeOut = AnimationUtils.loadAnimation(this, R.anim.fadeout);
 		fadeIn.setAnimationListener(fadeListener);
@@ -153,7 +145,8 @@ public class BeatBotActivity extends Activity {
 					public void onItemClick(AdapterView parentView,
 							View childView, int position, long id) {
 						// preview the sample with a default velocity of 80
-						playbackManager.playSample(position - 1, 80);
+						// and a default pan of 50
+						playbackManager.playSample(position - 1, 80, 50);
 					}
 				});
 
@@ -336,18 +329,21 @@ public class BeatBotActivity extends Activity {
 		volume.setChecked(true);
 		pan.setChecked(false);
 		pitch.setChecked(false);
+		midiView.setLevelMode(MidiView.LevelMode.VOLUME);
 	}
 
 	public void pan(View view) {
 		volume.setChecked(false);
 		pan.setChecked(true);
 		pitch.setChecked(false);
+		midiView.setLevelMode(MidiView.LevelMode.PAN);
 	}
 
 	public void pitch(View view) {
 		volume.setChecked(false);
 		pan.setChecked(false);
 		pitch.setChecked(true);
+		midiView.setLevelMode(MidiView.LevelMode.PITCH);
 	}
 
 	public void bpmTap(View view) {

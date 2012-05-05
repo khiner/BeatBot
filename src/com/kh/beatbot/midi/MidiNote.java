@@ -3,6 +3,7 @@ package com.kh.beatbot.midi;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
+import com.kh.beatbot.view.MidiView;
 
 public class MidiNote {
 	NoteOn noteOn;
@@ -14,8 +15,8 @@ public class MidiNote {
 	}
 	
 	public MidiNote getCopy() {
-		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0, noteOn.getNoteValue(), noteOn.getVelocity());
-		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0, noteOff.getNoteValue(), noteOff.getVelocity());
+		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0, noteOn.getNoteValue(), noteOn.getVelocity(), noteOn.getPan());
+		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0, noteOff.getNoteValue(), noteOff.getVelocity(), noteOff.getPan());
 		return new MidiNote(noteOnCopy, noteOffCopy);
 	}
 	
@@ -43,10 +44,21 @@ public class MidiNote {
 		return noteOn.getVelocity();
 	}
 	
+	public int getPan() {
+		return noteOn.getPan();
+	}
+	
 	public void setVelocity(int velocity) {
 		if (velocity >= 0 && velocity <= 100) {
 			noteOn.setVelocity(velocity);
 			noteOff.setVelocity(velocity);
+		}
+	}
+	
+	public void setPan(int pan) {
+		if (pan >= 0 && pan <= 100) {
+			noteOn.setPan(pan);
+			noteOff.setPan(pan);
 		}
 	}
 	
@@ -71,5 +83,17 @@ public class MidiNote {
 	
 	public long getNoteLength() {
 		return noteOff.getTick() - noteOn.getTick();
+	}
+	
+	public int getLevel(MidiView.LevelMode levelMode) {
+		if (levelMode == MidiView.LevelMode.VOLUME)
+			return noteOn.getVelocity();
+		else if (levelMode == MidiView.LevelMode.PAN)
+			return noteOn.getPan();
+		else if (levelMode == MidiView.LevelMode.PITCH)
+			//TODO
+			return noteOn.getPan();
+		
+		return 0;
 	}
 }

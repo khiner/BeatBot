@@ -49,10 +49,11 @@ public class PlaybackManager {
 		soundPool.release();
 	}
 	
-	public void playSample(int sampleNum, int velocity) {
+	public void playSample(int sampleNum, int velocity, int pan) {
 		if (sampleNum >= 0 && sampleNum < sampleIDs.length) {
 			float normVelocity = velocity/100f;
-			streamIDs[sampleNum] = soundPool.play(sampleIDs[sampleNum], normVelocity, normVelocity, 1, 0, 1f);
+			float normPan = pan/100f;
+			streamIDs[sampleNum] = soundPool.play(sampleIDs[sampleNum], normVelocity*(1 - normPan), normVelocity*normPan, 1, 0, 1f);
 			// highlight the icon to indicate playing
 			//context.activateIcon(sampleNum);
 		}

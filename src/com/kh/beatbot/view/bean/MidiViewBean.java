@@ -9,6 +9,21 @@ public class MidiViewBean {
 	// time (in millis) between taps before handling as a double-tap
 	public final static long DOUBLE_TAP_TIME = 300;
 
+	// RGB color for volume bars
+	public final static float VOLUME_R = .412f;
+	public final static float VOLUME_G = .788f;
+	public final static float VOLUME_B = 1;
+
+	// RGB color for pan bars	
+	public final static float PAN_R = 1;
+	public final static float PAN_G = .788f;
+	public final static float PAN_B = .392f;
+
+	// RGB color for pitch bars		
+	public final static float PITCH_R = .443f;
+	public final static float PITCH_G = 1;
+	public final static float PITCH_B = .533f;
+	
 	private float width, height;
 	private float yOffset;
 	private float noteHeight;

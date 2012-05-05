@@ -21,10 +21,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.TreeSet;
 
 import com.kh.beatbot.midi.event.MidiEvent;
-import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.midi.event.meta.EndOfTrack;
 import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
@@ -34,8 +32,6 @@ import com.kh.beatbot.midi.util.VariableLengthInt;
 
 public class MidiTrack {
 	
-	private static final boolean VERBOSE = false;
-
 	public static final byte[] IDENTIFIER = { 'M', 'T', 'r', 'k' };
 	
 	private int mSize;
@@ -87,10 +83,6 @@ public class MidiTrack {
 				System.out.println("Event skipped!");
 				continue;
 			}
-			
-			if(VERBOSE) {
-				System.out.println(E);
-			}
 
 			// Not adding the EndOfTrack event here allows the track to be edited
 			// after being read in from file.
@@ -125,13 +117,7 @@ public class MidiTrack {
 		MidiEvent E = mEvents.get(mEvents.size() - 1);
 		return E.getTick();
 	}
-	
-	public void insertNote(int channel, int pitch, int velocity, long tick, long duration) {
-		
-		insertEvent(new NoteOn(tick, channel, pitch, velocity));
-		insertEvent(new NoteOn(tick + duration, channel, pitch, 0));
-	}
-	
+
 	public void insertEvent(MidiEvent newEvent) {
 		
 		if(newEvent == null) {
@@ -280,10 +266,7 @@ public class MidiTrack {
 		
 		while(it.hasNext()) {
 			MidiEvent event = it.next();
-			if(VERBOSE) {
-				System.out.println("Writing: " + event);
-			}
-			
+
 			if(event.getClass().equals(lastEventClass)) {
 				event.writeToFile(out, false);
 			} else {

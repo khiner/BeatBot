@@ -19,12 +19,12 @@ package com.kh.beatbot.midi.event;
 
 public class PitchBend extends ChannelEvent {
 
-	public PitchBend(long tick, int channel, int lsb, int msb) {
-		super(tick, ChannelEvent.PITCH_BEND, channel, lsb, msb);
+	public PitchBend(long tick, int channel, int lsb, int msb, int pan) {
+		super(tick, ChannelEvent.PITCH_BEND, channel, lsb, msb, pan);
 	}
 	
-	public PitchBend(long tick, long delta, int channel, int lsb, int msb) {
-		super(tick, delta, ChannelEvent.PITCH_BEND, channel, lsb, msb);
+	public PitchBend(long tick, long delta, int channel, int lsb, int msb, int pan) {
+		super(tick, delta, ChannelEvent.PITCH_BEND, channel, lsb, msb, pan);
 	}
 	
 	public int getLeastSignificantBits() {

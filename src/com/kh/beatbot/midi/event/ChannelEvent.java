@@ -26,21 +26,47 @@ public class ChannelEvent extends MidiEvent {
 	protected int mChannel;
 	protected int mValue1;
 	protected int mValue2;
+	protected int mValue3;
 	
-	protected ChannelEvent(long tick, int type, int channel, int param1, int param2) {
-		this(tick, 0, type, channel, param1, param2);
+	protected ChannelEvent(long tick, int type, int channel, int param1, int param2, int param3) {
+		this(tick, 0, type, channel, param1, param2, param3);
 	}
-	protected ChannelEvent(long tick, long delta, int type, int channel, int param1, int param2) {
+	protected ChannelEvent(long tick, long delta, int type, int channel, int param1, int param2, int param3) {
 		super(tick, delta);
 		
 		mType = type & 0x0F;
 		mChannel = channel & 0x0F;
 		mValue1 = param1 & 0xFF;
 		mValue2 = param2 & 0xFF;
+		mValue3 = param3 & 0xFF;
 	}
 	
 	public int getType() {
 		return mType;
+	}
+	
+		public int getNoteValue() {
+		return mValue1;
+	}
+	
+	public int getVelocity() {
+		return mValue2;
+	}
+	
+	public int getPan() {
+		return mValue3;
+	}
+	
+	public void setNoteValue(int p) {
+		mValue1 = p;
+	}
+	
+	public void setVelocity(int v) {
+		mValue2 = v;
+	}
+	
+	public void setPan(int pan) {
+		mValue3 = pan;
 	}
 	
 	public void setChannel(int c) {
@@ -114,23 +140,25 @@ public class ChannelEvent extends MidiEvent {
 		out.write(mValue1);
 		if(mType != PROGRAM_CHANGE && mType != CHANNEL_AFTERTOUCH) {
 			out.write(mValue2);
+			out.write(mValue3);
 		}
 	}
 	public static ChannelEvent parseChannelEvent(long tick, long delta, int type, int channel, InputStream in) throws IOException {
 		
 		int note = in.read();
 		int velocity = in.read();
+		int pan = in.read();
 
 		
 		switch(type) {
 			case NOTE_OFF:
-				return new NoteOff(tick, delta, channel, note, velocity);
+				return new NoteOff(tick, delta, channel, note, velocity, pan);
 			case NOTE_ON:
-				return new NoteOn(tick, delta, channel, note, velocity);
+				return new NoteOn(tick, delta, channel, note, velocity, pan);
 			case PITCH_BEND:
-				return new PitchBend(tick, delta, channel, note, velocity);
+				return new PitchBend(tick, delta, channel, note, velocity, pan);
 			default:
-				return new ChannelEvent(tick, delta, type, channel, note, velocity);
+				return new ChannelEvent(tick, delta, type, channel, note, velocity, pan);
 		}
 	}
 	
