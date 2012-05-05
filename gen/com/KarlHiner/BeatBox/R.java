@@ -8,8 +8,12 @@
 package com.KarlHiner.BeatBox;
 
 public final class R {
+    public static final class anim {
+        public static final int fadein=0x7f040000;
+        public static final int fadeout=0x7f040001;
+    }
     public static final class array {
-        public static final int sample_types=0x7f060000;
+        public static final int sample_types=0x7f070000;
     }
     public static final class attr {
     }
@@ -76,34 +80,34 @@ public final class R {
         public static final int wav=0x7f02003b;
     }
     public static final class id {
-        public static final int bpm=0x7f08000c;
-        public static final int bpm_tap=0x7f08000b;
-        public static final int controlLayout=0x7f080001;
-        public static final int filePathEdit=0x7f08000f;
-        public static final int iconView=0x7f080012;
-        public static final int levels=0x7f080009;
-        public static final int main=0x7f080000;
-        public static final int midiView=0x7f08000e;
-        public static final int midi_menu_item=0x7f08001a;
-        public static final int midi_open=0x7f080011;
-        public static final int midi_save=0x7f080010;
-        public static final int panButton=0x7f080007;
-        public static final int pitchButton=0x7f080008;
-        public static final int playButton=0x7f080003;
-        public static final int quantize=0x7f080014;
-        public static final int quantize_current=0x7f080015;
-        public static final int quantize_eighth=0x7f080017;
-        public static final int quantize_quarter=0x7f080016;
-        public static final int quantize_sixteenth=0x7f080018;
-        public static final int quantize_thirty_second=0x7f080019;
-        public static final int recordButton=0x7f080005;
-        public static final int sampleListView=0x7f080002;
-        public static final int save_wav=0x7f08001b;
-        public static final int snap=0x7f080013;
-        public static final int stopButton=0x7f080004;
-        public static final int thresholdBar=0x7f08000d;
-        public static final int undo=0x7f08000a;
-        public static final int volumeButton=0x7f080006;
+        public static final int bpm=0x7f09000c;
+        public static final int bpm_tap=0x7f09000b;
+        public static final int controlLayout=0x7f090001;
+        public static final int filePathEdit=0x7f09000f;
+        public static final int iconView=0x7f090012;
+        public static final int levels=0x7f090009;
+        public static final int main=0x7f090000;
+        public static final int midiView=0x7f09000e;
+        public static final int midi_menu_item=0x7f09001a;
+        public static final int midi_open=0x7f090011;
+        public static final int midi_save=0x7f090010;
+        public static final int panButton=0x7f090007;
+        public static final int pitchButton=0x7f090008;
+        public static final int playButton=0x7f090003;
+        public static final int quantize=0x7f090014;
+        public static final int quantize_current=0x7f090015;
+        public static final int quantize_eighth=0x7f090017;
+        public static final int quantize_quarter=0x7f090016;
+        public static final int quantize_sixteenth=0x7f090018;
+        public static final int quantize_thirty_second=0x7f090019;
+        public static final int recordButton=0x7f090005;
+        public static final int sampleListView=0x7f090002;
+        public static final int save_wav=0x7f09001b;
+        public static final int snap=0x7f090013;
+        public static final int stopButton=0x7f090004;
+        public static final int thresholdBar=0x7f09000d;
+        public static final int undo=0x7f09000a;
+        public static final int volumeButton=0x7f090006;
     }
     public static final class layout {
         public static final int main=0x7f030000;
@@ -111,48 +115,48 @@ public final class R {
         public static final int sample_icon_view=0x7f030002;
     }
     public static final class menu {
-        public static final int menu=0x7f070000;
+        public static final int menu=0x7f080000;
     }
     public static final class raw {
-        public static final int clap_808=0x7f040000;
-        public static final int clap_casio=0x7f040001;
-        public static final int cowbell_casio=0x7f040002;
-        public static final int crash_808=0x7f040003;
-        public static final int crash_casio=0x7f040004;
-        public static final int hat_closed_808=0x7f040005;
-        public static final int hat_closed_casio=0x7f040006;
-        public static final int hat_open_808=0x7f040007;
-        public static final int hat_open_casio=0x7f040008;
-        public static final int kick_808=0x7f040009;
-        public static final int kick_casio=0x7f04000a;
-        public static final int rimshot_808=0x7f04000b;
-        public static final int rimshot_casio=0x7f04000c;
-        public static final int snare_808=0x7f04000d;
-        public static final int snare_casio=0x7f04000e;
-        public static final int tom_low_808=0x7f04000f;
-        public static final int tom_low_casio=0x7f040010;
+        public static final int clap_808=0x7f050000;
+        public static final int clap_casio=0x7f050001;
+        public static final int cowbell_casio=0x7f050002;
+        public static final int crash_808=0x7f050003;
+        public static final int crash_casio=0x7f050004;
+        public static final int hat_closed_808=0x7f050005;
+        public static final int hat_closed_casio=0x7f050006;
+        public static final int hat_open_808=0x7f050007;
+        public static final int hat_open_casio=0x7f050008;
+        public static final int kick_808=0x7f050009;
+        public static final int kick_casio=0x7f05000a;
+        public static final int rimshot_808=0x7f05000b;
+        public static final int rimshot_casio=0x7f05000c;
+        public static final int snare_808=0x7f05000d;
+        public static final int snare_casio=0x7f05000e;
+        public static final int tom_low_808=0x7f05000f;
+        public static final int tom_low_casio=0x7f050010;
     }
     public static final class string {
-        public static final int app_name=0x7f050000;
-        public static final int current_grid=0x7f05000a;
-        public static final int default_midi_file_name=0x7f050014;
-        public static final int eighth_note=0x7f05000c;
-        public static final int import_export_midi=0x7f050013;
-        public static final int midi_menu=0x7f050001;
-        public static final int open_midi=0x7f050011;
-        public static final int play=0x7f050005;
-        public static final int quantize=0x7f050009;
-        public static final int quarter_note=0x7f05000b;
-        public static final int record=0x7f050004;
-        public static final int save=0x7f05000f;
-        public static final int save_midi=0x7f050010;
-        public static final int save_wav=0x7f050012;
-        public static final int sixteenth_note=0x7f05000d;
-        public static final int snap=0x7f050008;
-        public static final int start_listening=0x7f050002;
-        public static final int stop=0x7f050006;
-        public static final int stop_listening=0x7f050003;
-        public static final int thirty_second_note=0x7f05000e;
-        public static final int undo=0x7f050007;
+        public static final int app_name=0x7f060000;
+        public static final int current_grid=0x7f06000a;
+        public static final int default_midi_file_name=0x7f060014;
+        public static final int eighth_note=0x7f06000c;
+        public static final int import_export_midi=0x7f060013;
+        public static final int midi_menu=0x7f060001;
+        public static final int open_midi=0x7f060011;
+        public static final int play=0x7f060005;
+        public static final int quantize=0x7f060009;
+        public static final int quarter_note=0x7f06000b;
+        public static final int record=0x7f060004;
+        public static final int save=0x7f06000f;
+        public static final int save_midi=0x7f060010;
+        public static final int save_wav=0x7f060012;
+        public static final int sixteenth_note=0x7f06000d;
+        public static final int snap=0x7f060008;
+        public static final int start_listening=0x7f060002;
+        public static final int stop=0x7f060006;
+        public static final int stop_listening=0x7f060003;
+        public static final int thirty_second_note=0x7f06000e;
+        public static final int undo=0x7f060007;
     }
 }

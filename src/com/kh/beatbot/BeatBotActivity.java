@@ -10,9 +10,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ToggleButton;
@@ -27,6 +29,42 @@ import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.ThresholdBarView;
 
 public class BeatBotActivity extends Activity {
+	private class FadeListener implements AnimationListener {
+		ToggleButton volume, pan, pitch;
+		boolean fadeOut;
+
+		public FadeListener(ToggleButton volume, ToggleButton pan,
+				ToggleButton pitch) {
+			this.volume = volume;
+			this.pan = pan;
+			this.pitch = pitch;
+		}
+
+		public void setFadeOut(boolean flag) {
+			fadeOut = flag;
+		}
+
+		@Override
+		public void onAnimationEnd(Animation animation) {
+			if (fadeOut) {
+				volume.setVisibility(View.GONE);
+				pan.setVisibility(View.GONE);
+				pitch.setVisibility(View.GONE);
+			}
+		}
+
+		@Override
+		public void onAnimationRepeat(Animation animation) {
+		}
+
+		@Override
+		public void onAnimationStart(Animation animation) {
+			volume.setVisibility(View.VISIBLE);
+			pan.setVisibility(View.VISIBLE);
+			pitch.setVisibility(View.VISIBLE);
+		}
+	}
+
 	public class SampleIconAdapter extends ArrayAdapter<String> {
 		String[] sampleTypes;
 		int resourceId;
@@ -70,6 +108,10 @@ public class BeatBotActivity extends Activity {
 		}
 	}
 
+	private Animation fadeIn, fadeOut;
+	// these are used as variables for convenience, since they are reference frequently
+	private ToggleButton volume, pan, pitch;
+	private FadeListener fadeListener;
 	private ListView sampleListView;
 	private MidiManager midiManager;
 	private PlaybackManager playbackManager;
@@ -80,16 +122,25 @@ public class BeatBotActivity extends Activity {
 	private final int[] sampleResources = new int[] { R.raw.kick_808,
 			R.raw.snare_808, R.raw.hat_closed_808, R.raw.hat_open_808,
 			R.raw.rimshot_808, R.raw.tom_low_808 };
-	
+
 	private long lastTapTime = 0;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// assign hardware (ringer) volume +/- to media while this application has focus 
+		// assign hardware (ringer) volume +/- to media while this application
+		// has focus
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		setContentView(R.layout.main);
+		volume = (ToggleButton) findViewById(R.id.volumeButton);
+		pan = (ToggleButton) findViewById(R.id.panButton);
+		pitch = (ToggleButton) findViewById(R.id.pitchButton);
+		fadeListener = new FadeListener(volume, pan, pitch);
+		fadeIn = AnimationUtils.loadAnimation(this, R.anim.fadein);
+		fadeOut = AnimationUtils.loadAnimation(this, R.anim.fadeout);
+		fadeIn.setAnimationListener(fadeListener);
+		fadeOut.setAnimationListener(fadeListener);
 		String[] sampleTypes = getResources().getStringArray(
 				R.array.sample_types);
 		ArrayAdapter<String> adapter = new SampleIconAdapter(this,
@@ -105,20 +156,21 @@ public class BeatBotActivity extends Activity {
 						playbackManager.playSample(position - 1, 80);
 					}
 				});
-		
+
 		// get all Manager singletons
 		playbackManager = PlaybackManager.getInstance(this, sampleResources);
 		recordManager = RecordManager.getInstance();
 		// if this context is being restored from a destroyed context,
-		// recover the midiManager.  otherwise, create a new one
+		// recover the midiManager. otherwise, create a new one
 		if (savedInstanceState == null)
 			midiManager = MidiManager.getInstance(sampleTypes.length - 1);
 		else
 			midiManager = savedInstanceState.getParcelable("midiManager");
-		
+
 		midiManager.setPlaybackManager(playbackManager);
 		recordManager.setMidiManager(midiManager);
-		// recordManager needs the threshold bar (with levels display) to send decibel levels
+		// recordManager needs the threshold bar (with levels display) to send
+		// decibel levels
 		recordManager
 				.setThresholdBar((ThresholdBarView) findViewById(R.id.thresholdBar));
 		midiManager.setRecordManager(recordManager);
@@ -130,15 +182,17 @@ public class BeatBotActivity extends Activity {
 		if (savedInstanceState != null)
 			midiView.readFromBundle(savedInstanceState);
 
-		// set midiManager as a global variable, since it needs to be accessed by
+		// set midiManager as a global variable, since it needs to be accessed
+		// by
 		// separate MidiFileMenu activity
-		GlobalVars gv = (GlobalVars)getApplicationContext();
+		GlobalVars gv = (GlobalVars) getApplicationContext();
 		gv.setMidiManager(midiManager);
-	
-		((BpmView) findViewById(R.id.bpm)).setText(String.valueOf((int)midiManager
-				.getBPM()));
-		
-		// recall from last instance state whether we were recording and/or playing
+
+		((BpmView) findViewById(R.id.bpm)).setText(String
+				.valueOf((int) midiManager.getBPM()));
+
+		// recall from last instance state whether we were recording and/or
+		// playing
 		if (savedInstanceState != null) {
 			if (savedInstanceState.getBoolean("recording")) {
 				record(findViewById(R.id.recordButton));
@@ -150,7 +204,7 @@ public class BeatBotActivity extends Activity {
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();		
+		super.onDestroy();
 		if (isFinishing()) {
 			recordManager.release();
 			playbackManager.release();
@@ -163,8 +217,10 @@ public class BeatBotActivity extends Activity {
 		super.onSaveInstanceState(outState);
 		outState.putParcelable("midiManager", midiManager);
 		midiView.writeToBundle(outState);
-		outState.putBoolean("playing", playbackManager.getState() == PlaybackManager.State.PLAYING);
-		outState.putBoolean("recording", recordManager.getState() != RecordManager.State.INITIALIZING);
+		outState.putBoolean("playing",
+				playbackManager.getState() == PlaybackManager.State.PLAYING);
+		outState.putBoolean("recording",
+				recordManager.getState() != RecordManager.State.INITIALIZING);
 	}
 
 	@Override
@@ -201,7 +257,8 @@ public class BeatBotActivity extends Activity {
 			return true;
 		case R.id.save_wav:
 			return true;
-		// midi import/export menu item is handled as an intent - MidiFileMenu.class	
+			// midi import/export menu item is handled as an intent -
+			// MidiFileMenu.class
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -222,23 +279,24 @@ public class BeatBotActivity extends Activity {
 	public void record(View view) {
 		if (recordManager.getState() != RecordManager.State.INITIALIZING) {
 			recordManager.stopListening();
-			((ToggleButton)view).setChecked(false);
+			((ToggleButton) view).setChecked(false);
 		} else {
 			midiView.reset();
-			// if we are already playing, the midiManager is already ticking away.
+			// if we are already playing, the midiManager is already ticking
+			// away.
 			if (playbackManager.getState() != PlaybackManager.State.PLAYING)
 				play(findViewById(R.id.playButton));
 			recordManager.startListening();
 		}
 	}
-	
+
 	public void play(View view) {
-		((ToggleButton)view).setChecked(true);
+		((ToggleButton) view).setChecked(true);
 		if (playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			midiManager.reset();
 		} else if (playbackManager.getState() == PlaybackManager.State.STOPPED) {
 			playbackManager.play();
-			midiManager.start();			
+			midiManager.start();
 		}
 	}
 
@@ -247,8 +305,9 @@ public class BeatBotActivity extends Activity {
 			record(findViewById(R.id.recordButton));
 		if (playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			playbackManager.stop();
-			((ToggleButton)findViewById(R.id.playButton)).setChecked(false);
-			spin(10); // wait for midi tick thread to notice that playback has stopped
+			((ToggleButton) findViewById(R.id.playButton)).setChecked(false);
+			spin(10); // wait for midi tick thread to notice that playback has
+						// stopped
 			midiManager.reset();
 		}
 	}
@@ -257,42 +316,55 @@ public class BeatBotActivity extends Activity {
 		midiManager.undo();
 		midiView.updateSelectedLevelNotes();
 	}
-	
+
 	public void levels(View view) {
 		midiView.toggleLevelsView();
+		if (midiView.getViewState() == MidiView.State.TO_LEVELS_VIEW) {
+			fadeListener.setFadeOut(false);
+			volume.startAnimation(fadeIn);
+			pan.startAnimation(fadeIn);
+			pitch.startAnimation(fadeIn);
+		} else {
+			fadeListener.setFadeOut(true);
+			volume.startAnimation(fadeOut);
+			pan.startAnimation(fadeOut);
+			pitch.startAnimation(fadeOut);
+		}
 	}
 
 	public void volume(View view) {
-		((ToggleButton)findViewById(R.id.panButton)).setChecked(false);
-		((ToggleButton)findViewById(R.id.pitchButton)).setChecked(false);
+		volume.setChecked(true);
+		pan.setChecked(false);
+		pitch.setChecked(false);
 	}
-	
+
 	public void pan(View view) {
-		((ToggleButton)findViewById(R.id.volumeButton)).setChecked(false);
-		((ToggleButton)findViewById(R.id.pitchButton)).setChecked(false);
-		
+		volume.setChecked(false);
+		pan.setChecked(true);
+		pitch.setChecked(false);
 	}
-	
+
 	public void pitch(View view) {
-		((ToggleButton)findViewById(R.id.volumeButton)).setChecked(false);
-		((ToggleButton)findViewById(R.id.panButton)).setChecked(false);
-		
+		volume.setChecked(false);
+		pan.setChecked(false);
+		pitch.setChecked(true);
 	}
-	
+
 	public void bpmTap(View view) {
-		long tapTime = System.currentTimeMillis();		
-		float secondsElapsed = (tapTime - lastTapTime)/1000f;
+		long tapTime = System.currentTimeMillis();
+		float secondsElapsed = (tapTime - lastTapTime) / 1000f;
 		lastTapTime = tapTime;
-		float bpm = 60/secondsElapsed;
+		float bpm = 60 / secondsElapsed;
 		// bpm limits
 		if (bpm < 30 || bpm > 500)
-			return;		
-		((BpmView)findViewById(R.id.bpm)).setText(String.valueOf((int)bpm));
+			return;
+		((BpmView) findViewById(R.id.bpm)).setText(String.valueOf((int) bpm));
 		midiManager.setBPM(bpm);
 	}
-	
+
 	private void spin(long millis) {
 		long start = System.currentTimeMillis();
-		while (System.currentTimeMillis() - start < millis);
+		while (System.currentTimeMillis() - start < millis)
+			;
 	}
 }
