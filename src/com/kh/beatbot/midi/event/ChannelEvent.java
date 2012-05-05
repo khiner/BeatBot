@@ -27,11 +27,12 @@ public class ChannelEvent extends MidiEvent {
 	protected int mValue1;
 	protected int mValue2;
 	protected int mValue3;
+	protected int pitch;
 	
-	protected ChannelEvent(long tick, int type, int channel, int param1, int param2, int param3) {
-		this(tick, 0, type, channel, param1, param2, param3);
+	protected ChannelEvent(long tick, int type, int channel, int param1, int param2, int param3, int pitch) {
+		this(tick, 0, type, channel, param1, param2, param3, pitch);
 	}
-	protected ChannelEvent(long tick, long delta, int type, int channel, int param1, int param2, int param3) {
+	protected ChannelEvent(long tick, long delta, int type, int channel, int param1, int param2, int param3, int pitch) {
 		super(tick, delta);
 		
 		mType = type & 0x0F;
@@ -39,6 +40,7 @@ public class ChannelEvent extends MidiEvent {
 		mValue1 = param1 & 0xFF;
 		mValue2 = param2 & 0xFF;
 		mValue3 = param3 & 0xFF;
+		this.pitch = pitch;
 	}
 	
 	public int getType() {
@@ -57,6 +59,10 @@ public class ChannelEvent extends MidiEvent {
 		return mValue3;
 	}
 	
+	public int getPitch() {
+		return pitch;
+	}
+	
 	public void setNoteValue(int p) {
 		mValue1 = p;
 	}
@@ -67,6 +73,10 @@ public class ChannelEvent extends MidiEvent {
 	
 	public void setPan(int pan) {
 		mValue3 = pan;
+	}
+	
+	public void setPitch(int pitch) {
+		this.pitch = pitch;
 	}
 	
 	public void setChannel(int c) {
@@ -148,17 +158,17 @@ public class ChannelEvent extends MidiEvent {
 		int note = in.read();
 		int velocity = in.read();
 		int pan = in.read();
-
+		
 		
 		switch(type) {
 			case NOTE_OFF:
-				return new NoteOff(tick, delta, channel, note, velocity, pan);
+				return new NoteOff(tick, delta, channel, note, velocity, pan, 64);
 			case NOTE_ON:
-				return new NoteOn(tick, delta, channel, note, velocity, pan);
+				return new NoteOn(tick, delta, channel, note, velocity, pan, 64);
 			case PITCH_BEND:
-				return new PitchBend(tick, delta, channel, note, velocity, pan);
+				return new PitchBend(tick, delta, channel, note, velocity, pan, 64);
 			default:
-				return new ChannelEvent(tick, delta, type, channel, note, velocity, pan);
+				return new ChannelEvent(tick, delta, type, channel, note, velocity, pan, 64);
 		}
 	}
 	

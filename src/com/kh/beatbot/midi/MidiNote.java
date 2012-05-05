@@ -15,8 +15,8 @@ public class MidiNote {
 	}
 	
 	public MidiNote getCopy() {
-		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0, noteOn.getNoteValue(), noteOn.getVelocity(), noteOn.getPan());
-		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0, noteOff.getNoteValue(), noteOff.getVelocity(), noteOff.getPan());
+		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0, noteOn.getNoteValue(), noteOn.getVelocity(), noteOn.getPan(), noteOn.getPitch());
+		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0, noteOff.getNoteValue(), noteOff.getVelocity(), noteOff.getPan(), noteOn.getPitch());
 		return new MidiNote(noteOnCopy, noteOffCopy);
 	}
 	
@@ -48,20 +48,30 @@ public class MidiNote {
 		return noteOn.getPan();
 	}
 	
+	public int getPitch() {
+		return noteOn.getPitch();
+	}
+	
 	public void setVelocity(int velocity) {
-		if (velocity >= 0 && velocity <= 100) {
+		if (velocity >= 0 && velocity <= 127) {
 			noteOn.setVelocity(velocity);
 			noteOff.setVelocity(velocity);
 		}
 	}
 	
 	public void setPan(int pan) {
-		if (pan >= 0 && pan <= 100) {
+		if (pan >= 0 && pan <= 127) {
 			noteOn.setPan(pan);
 			noteOff.setPan(pan);
 		}
 	}
 	
+	public void setPitch(int pitch) {
+		if (pitch >= 10 && pitch <= 127) {
+			noteOn.setPitch(pitch);
+			noteOff.setPitch(pitch);
+		}
+	}
 	public void setOnTick(long onTick) {
 		if (onTick >= 0)
 			noteOn.setTick(onTick);
@@ -79,7 +89,7 @@ public class MidiNote {
 			return;
 		this.noteOn.setNoteValue(note);
 		this.noteOff.setNoteValue(note);
-	}	
+	}
 	
 	public long getNoteLength() {
 		return noteOff.getTick() - noteOn.getTick();
@@ -91,9 +101,17 @@ public class MidiNote {
 		else if (levelMode == MidiView.LevelMode.PAN)
 			return noteOn.getPan();
 		else if (levelMode == MidiView.LevelMode.PITCH)
-			//TODO
-			return noteOn.getPan();
+			return noteOn.getPitch();
 		
 		return 0;
+	}
+	
+	public void setLevel(MidiView.LevelMode levelMode, int level) {
+		if (levelMode == MidiView.LevelMode.VOLUME)
+			noteOn.setVelocity(level);
+		else if (levelMode == MidiView.LevelMode.PAN)
+			noteOn.setPan(level);
+		else if (levelMode == MidiView.LevelMode.PITCH)
+			noteOn.setPitch(level);
 	}
 }

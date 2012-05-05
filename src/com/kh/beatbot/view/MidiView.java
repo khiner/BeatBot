@@ -292,7 +292,6 @@ public class MidiView extends SurfaceViewBase {
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, velocityBarsVB);
 		gl.glDrawArrays(GL10.GL_LINES, 0, velocityBarsVB.capacity() / 2);		
 		for (int i = 0; i < velocityBarsVB.capacity() / 2; i += 2) {
-			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, velocityBarsVB);
 			gl.glDrawArrays(GL10.GL_POINTS, i, 1);
 		}
 	}
@@ -303,7 +302,6 @@ public class MidiView extends SurfaceViewBase {
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, panBarsVB);
 		gl.glDrawArrays(GL10.GL_LINES, 0, panBarsVB.capacity() / 2);		
 		for (int i = 0; i < panBarsVB.capacity() / 2; i += 2) {
-			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, panBarsVB);
 			gl.glDrawArrays(GL10.GL_POINTS, i, 1);
 		}
 	}
@@ -312,9 +310,8 @@ public class MidiView extends SurfaceViewBase {
 		gl.glColor4f(MidiViewBean.PITCH_R, MidiViewBean.PITCH_G, MidiViewBean.PITCH_B, 1);
 		gl.glLineWidth(MidiViewBean.LEVEL_LINE_WIDTH);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, pitchBarsVB);
-		gl.glDrawArrays(GL10.GL_LINES, 0, pitchBarsVB.capacity() / 2);		
+		gl.glDrawArrays(GL10.GL_LINES, 0, pitchBarsVB.capacity() / 2);
 		for (int i = 0; i < pitchBarsVB.capacity() / 2; i += 2) {
-			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, pitchBarsVB);
 			gl.glDrawArrays(GL10.GL_POINTS, i, 1);
 		}
 	}
@@ -472,8 +469,7 @@ public class MidiView extends SurfaceViewBase {
 			pitchBars[i * 4] = x;			
 			volumeBars[i * 4 + 1] = levelToY(levelNote.getVelocity());
 			panBars[i * 4 + 1] = levelToY(levelNote.getPan());
-			//TODO change this to .getPitch after implementing pitch
-			pitchBars[i * 4 + 1] = levelToY(levelNote.getPan());  
+			pitchBars[i * 4 + 1] = levelToY(levelNote.getPitch());  
 			volumeBars[i * 4 + 2] = x;
 			panBars[i * 4 + 2] = x;
 			pitchBars[i * 4 + 2] = x;						
@@ -484,6 +480,7 @@ public class MidiView extends SurfaceViewBase {
 
 		velocityBarsVB = makeFloatBuffer(volumeBars);
 		panBarsVB = makeFloatBuffer(panBars);
+		pitchBarsVB = makeFloatBuffer(pitchBars);
 	}
 
 	private float tickToX(long tick) {
@@ -508,11 +505,11 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private float levelToY(int level) {
-		return bean.getHeight() - level * bean.getMidiHeight() / 100;
+		return bean.getHeight() - level * bean.getMidiHeight() / 127;
 	}
 
 	private int yToLevel(float y) {
-		return (int) (100 * (bean.getHeight() - y) / bean.getMidiHeight());
+		return (int) (127 * (bean.getHeight() - y) / bean.getMidiHeight());
 	}
 
 	private boolean legalSelectedNoteMove(int noteDiff) {
@@ -759,7 +756,7 @@ public class MidiView extends SurfaceViewBase {
 		long spacing = tickWindow.getMajorTickSpacing();
 		long onTick = tick - tick % spacing;
 		long offTick = onTick + spacing - 1;
-		MidiNote noteToAdd = midiManager.addNote(onTick, offTick, note, 80, 50);
+		MidiNote noteToAdd = midiManager.addNote(onTick, offTick, note, 80, 64, 64);
 		selectedNotes.add(noteToAdd);
 		handleMidiCollisions();
 		selectedNotes.remove(noteToAdd);
@@ -932,14 +929,7 @@ public class MidiView extends SurfaceViewBase {
 						MidiNote touchedNote = touchedNotes.get(id);
 						if (touchedNote == null)
 							continue;
-						if (levelMode == LevelMode.VOLUME)
-							touchedNote.setVelocity(yToLevel(e.getY(i)));
-						else if (levelMode == LevelMode.PAN)
-							touchedNote.setPan(yToLevel(e.getY(i)));
-						else if (levelMode == LevelMode.PITCH) {
-							// TODO
-						}
-						
+						touchedNote.setLevel(levelMode, yToLevel(e.getY(i)));						
 						// velocity changes are valid undo events
 						bean.setStateChanged(true);
 					}

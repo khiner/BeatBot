@@ -144,9 +144,9 @@ public class BeatBotActivity extends Activity {
 					@Override
 					public void onItemClick(AdapterView parentView,
 							View childView, int position, long id) {
-						// preview the sample with a default velocity of 80
-						// and a default pan of 50
-						playbackManager.playSample(position - 1, 80, 50);
+						// preview the sample with a default velocity of 80,
+						// a default pan of 64 (halfway) and a default pitch of 64
+						playbackManager.playSample(position - 1, 80, 64, 64);
 					}
 				});
 
