@@ -213,11 +213,11 @@ public class LevelsViewHelper {
 	}
 
 	private float levelToY(int level) {
-		return bean.getHeight() - level * bean.getMidiHeight() / 127;
+		return bean.getHeight() - MidiViewBean.LEVEL_POINT_SIZE/2 - level * bean.getLevelsHeight() / 127;
 	}
 
 	private int yToLevel(float y) {
-		return (int) (127 * (bean.getHeight() - y) / bean.getMidiHeight());
+		return (int) (127 * (bean.getHeight() - MidiViewBean.LEVEL_POINT_SIZE/2 - y) / bean.getLevelsHeight());
 	}
 
 	public void doubleTap() {

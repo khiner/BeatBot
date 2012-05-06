@@ -267,8 +267,8 @@ public class MidiView extends SurfaceViewBase {
 		gl.glPopMatrix();
 	}
 
-	private void drawTopTickFill(boolean recording) {
-		float color = .3f;
+	private void drawTopTickFill() {
+		float color = .4f*bean.getBgColor()*2;
 		gl.glColor4f(color, color, color, 1);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, tipTickFillVB);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
@@ -475,7 +475,7 @@ public class MidiView extends SurfaceViewBase {
 						: State.LEVELS_VIEW);
 			}
 		}				
-		drawTopTickFill(recording);
+		drawTopTickFill();
 		if (recording
 				|| playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			// if we're recording, keep the current recording tick in view.
@@ -717,7 +717,8 @@ public class MidiView extends SurfaceViewBase {
 		bean.setWidth(width);
 		bean.setHeight(height);
 		bean.setMidiHeight(bean.getHeight() - bean.getYOffset());		
-		bean.setNoteHeight(bean.getMidiHeight()/midiManager.getNumSamples());		
+		bean.setNoteHeight(bean.getMidiHeight()/midiManager.getNumSamples());
+		bean.setLevelsHeight(bean.getMidiHeight() - MidiViewBean.LEVEL_POINT_SIZE);
 	}
 
 	@Override

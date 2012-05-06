@@ -54,25 +54,33 @@ public class MidiNote {
 	}
 	
 	public void setVelocity(int velocity) {
-		if (velocity >= 0 && velocity <= 127) {
-			noteOn.setVelocity(velocity);
-			noteOff.setVelocity(velocity);
-		}
+		velocity = clipLevel(velocity);
+		noteOn.setVelocity(velocity);
+		noteOff.setVelocity(velocity);
 	}
 	
 	public void setPan(int pan) {
-		if (pan >= 0 && pan <= 127) {
-			noteOn.setPan(pan);
-			noteOff.setPan(pan);
-		}
+		pan = clipLevel(pan);
+		noteOn.setPan(pan);
+		noteOff.setPan(pan);
 	}
 	
 	public void setPitch(int pitch) {
-		if (pitch >= 10 && pitch <= 127) {
-			noteOn.setPitch(pitch);
-			noteOff.setPitch(pitch);
-		}
+		pitch = clipLevel(pitch);
+		noteOn.setPitch(pitch);
+		noteOff.setPitch(pitch);
 	}
+	
+	// clip the level to be within the min/max allowed
+	// level range (0-127)
+	private int clipLevel(int level) {
+		if (level < 0)
+			return 0;
+		if (level > 127)
+			return 127;
+		return level;
+	}
+	
 	public void setOnTick(long onTick) {
 		if (onTick >= 0)
 			noteOn.setTick(onTick);
@@ -109,10 +117,10 @@ public class MidiNote {
 	
 	public void setLevel(LevelsViewHelper.LevelMode levelMode, int level) {
 		if (levelMode == LevelsViewHelper.LevelMode.VOLUME)
-			noteOn.setVelocity(level);
+			setVelocity(level);
 		else if (levelMode == LevelsViewHelper.LevelMode.PAN)
-			noteOn.setPan(level);
+			setPan(level);
 		else if (levelMode == LevelsViewHelper.LevelMode.PITCH)
-			noteOn.setPitch(level);
+			setPitch(level);
 	}
 }

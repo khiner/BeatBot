@@ -17,9 +17,9 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentLeft="true"
-            android:textOn="" android:textOff=""
             android:background="@drawable/play_btn_src"
-            android:onClick="play" />
+            android:onClick="play"
+            android:textOff="" android:textOn="" />
 
         <ImageButton
             android:id="@+id/stopButton"
@@ -34,58 +34,28 @@
             android:id="@+id/recordButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:textOn="" android:textOff=""
             android:layout_toRightOf="@+id/stopButton"
             android:background="@drawable/rec_btn_src"
-            android:onClick="record" />
-
-        <ToggleButton
-            android:id="@+id/volumeButton"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
-            android:textOn="" android:textOff=""    
-            android:visibility="gone"        
-            android:checked="true"
-            android:layout_toLeftOf="@+id/panButton"
-            android:background="@drawable/volume_btn_src"
-            android:onClick="volume" />
-        
-        <ToggleButton
-            android:id="@+id/panButton"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
-            android:textOn="" android:textOff=""
-            android:visibility="gone"           
-            android:layout_toLeftOf="@+id/pitchButton"
-            android:background="@drawable/pan_btn_src"
-            android:onClick="pan" />
-        
-        <ToggleButton
-            android:id="@+id/pitchButton"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
-            android:textOn="" android:textOff=""
-            android:visibility="gone"            
-            android:layout_toLeftOf="@+id/levels"
-            android:background="@drawable/pitch_btn_src"
-            android:onClick="pitch" />
+            android:onClick="record"
+            android:textOff="" android:textOn="" />
 
         <ToggleButton
             android:id="@+id/levels"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:textOn="" android:textOff=""
             android:layout_toLeftOf="@+id/undo"
             android:background="@drawable/levels_btn_src"
-            android:onClick="levels" />
+            android:onClick="levels"
+            android:textOff=""
+            android:textOn="" />
 
         <ImageButton
             android:id="@+id/undo"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_toLeftOf="@+id/bpm_tap"
             android:background="#FF000000"
             android:onClick="undo"
-            android:layout_toLeftOf="@+id/bpm_tap"
             android:src="@drawable/undo_btn_src" />
 
         <ImageButton
@@ -101,23 +71,61 @@
             android:id="@+id/bpm"
             android:layout_width="66dp"
             android:layout_height="40dp"
-            android:layout_marginLeft="10dp"
-            android:layout_alignParentRight="true" />
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="10dp" />
+        
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/levelsLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/controlLayout"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <ToggleButton
+            android:id="@+id/volumeButton"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/volume_btn_src"
+            android:checked="true"
+            android:onClick="volume"
+            android:textOff="" android:textOn="" />
+        <ToggleButton
+            android:id="@+id/panButton"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:layout_toRightOf="@+id/volumeButton"
+            android:background="@drawable/pan_btn_src"
+            android:onClick="pan"
+            android:textOff="" android:textOn="" />
+
+        <ToggleButton
+            android:id="@+id/pitchButton"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:layout_toRightOf="@+id/panButton"
+            android:background="@drawable/pitch_btn_src"
+            android:onClick="pitch"
+            android:textOff="" android:textOn="" />
+        
     </RelativeLayout>
 
     <com.kh.beatbot.view.ThresholdBarView
         android:id="@+id/thresholdBar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toRightOf="@+id/sampleListView"
-        android:layout_below="@+id/controlLayout"
-        android:layout_above="@+id/midiView" />
+        android:layout_above="@+id/midiView"
+        android:layout_below="@+id/levelsLayout"
+        android:layout_toRightOf="@+id/sampleListView" />
 
     <ListView
         android:id="@+id/sampleListView"
         android:layout_width="38dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/controlLayout" />
+        android:layout_below="@+id/levelsLayout" />
 
     <com.kh.beatbot.view.MidiView
         android:id="@+id/midiView"

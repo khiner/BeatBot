@@ -40,9 +40,7 @@ public class BeatBotActivity extends Activity {
 		@Override
 		public void onAnimationEnd(Animation animation) {
 			if (fadeOut) {
-				volume.setVisibility(View.GONE);
-				pan.setVisibility(View.GONE);
-				pitch.setVisibility(View.GONE);
+				levelsGroup.setVisibility(View.GONE);
 			}
 		}
 
@@ -52,9 +50,7 @@ public class BeatBotActivity extends Activity {
 
 		@Override
 		public void onAnimationStart(Animation animation) {
-			volume.setVisibility(View.VISIBLE);
-			pan.setVisibility(View.VISIBLE);
-			pitch.setVisibility(View.VISIBLE);
+			levelsGroup.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -105,7 +101,8 @@ public class BeatBotActivity extends Activity {
 	// these are used as variables for convenience, since they are reference
 	// frequently
 	private ToggleButton volume, pan, pitch;
-	private FadeListener fadeListener = new FadeListener();
+	private ViewGroup levelsGroup;
+	private FadeListener fadeListener;
 	private ListView sampleListView;
 	private MidiManager midiManager;
 	private PlaybackManager playbackManager;
@@ -122,14 +119,16 @@ public class BeatBotActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);		
 		// assign hardware (ringer) volume +/- to media while this application
 		// has focus
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		setContentView(R.layout.main);
+		levelsGroup = (ViewGroup)findViewById(R.id.levelsLayout);
 		volume = (ToggleButton) findViewById(R.id.volumeButton);
 		pan = (ToggleButton) findViewById(R.id.panButton);
-		pitch = (ToggleButton) findViewById(R.id.pitchButton);
+		pitch = (ToggleButton) findViewById(R.id.pitchButton);		
+		fadeListener = new FadeListener();
 		fadeIn = AnimationUtils.loadAnimation(this, R.anim.fadein);
 		fadeOut = AnimationUtils.loadAnimation(this, R.anim.fadeout);
 		fadeIn.setAnimationListener(fadeListener);
@@ -205,7 +204,7 @@ public class BeatBotActivity extends Activity {
 			android.os.Process.killProcess(android.os.Process.myPid());
 		}
 	}
-
+	
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
@@ -315,14 +314,10 @@ public class BeatBotActivity extends Activity {
 		midiView.toggleLevelsView();
 		if (midiView.getViewState() == MidiView.State.TO_LEVELS_VIEW) {
 			fadeListener.setFadeOut(false);
-			volume.startAnimation(fadeIn);
-			pan.startAnimation(fadeIn);
-			pitch.startAnimation(fadeIn);
+			levelsGroup.startAnimation(fadeIn);
 		} else {
 			fadeListener.setFadeOut(true);
-			volume.startAnimation(fadeOut);
-			pan.startAnimation(fadeOut);
-			pitch.startAnimation(fadeOut);
+			levelsGroup.startAnimation(fadeOut);
 		}
 	}
 
