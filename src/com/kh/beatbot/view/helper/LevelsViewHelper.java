@@ -91,7 +91,7 @@ public class LevelsViewHelper {
 		return selectedLevelNotes;
 	}
 
-	private void clearTouchedNotes() {
+	public void clearTouchedNotes() {
 		touchedLevels.clear();
 	}
 
@@ -408,11 +408,6 @@ public class LevelsViewHelper {
 				midiView.getTickWindow().zoom(leftX, rightX);
 			}
 		}
-		return true;
-	}
-
-	public boolean handleActionUp(MotionEvent e) {
-		clearTouchedNotes();
 		return true;
 	}
 }

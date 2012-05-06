@@ -892,15 +892,17 @@ public class MidiView extends SurfaceViewBase {
 			if (bean.getScrollVelocity() == 0)
 				bean.setScrollViewEndTime(System.currentTimeMillis());
 			bean.setSelectRegion(false);
-			midiManager.mergeTempNotes();			
+			midiManager.mergeTempNotes();
+			handleActionUp(e);			
 			if (bean.isStateChanged())
 				midiManager.saveState();
-			bean.setStateChanged(false);			
-			handleActionUp(e);			
+			bean.setStateChanged(false);
 			if (bean.getViewState() == State.LEVELS_VIEW)
-				return levelsHelper.handleActionUp(e);			
-			startOnTicks.clear();
-			touchedNotes.clear();
+				levelsHelper.clearTouchedNotes();
+			else {
+				startOnTicks.clear();
+				touchedNotes.clear();
+			}
 			break;
 		}
 		return true;
