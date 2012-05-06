@@ -5,6 +5,8 @@ import com.kh.beatbot.manager.MidiManager;
 import android.app.Application;
 
 public class GlobalVars extends Application {
+	public static final int LEVEL_MAX = 127;
+	
 	private MidiManager midiManager = null;
 		
 	public MidiManager getMidiManager() {

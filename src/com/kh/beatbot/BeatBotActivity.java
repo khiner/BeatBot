@@ -119,15 +119,15 @@ public class BeatBotActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);		
+		super.onCreate(savedInstanceState);
 		// assign hardware (ringer) volume +/- to media while this application
 		// has focus
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		setContentView(R.layout.main);
-		levelsGroup = (ViewGroup)findViewById(R.id.levelsLayout);
+		levelsGroup = (ViewGroup) findViewById(R.id.levelsLayout);
 		volume = (ToggleButton) findViewById(R.id.volumeButton);
 		pan = (ToggleButton) findViewById(R.id.panButton);
-		pitch = (ToggleButton) findViewById(R.id.pitchButton);		
+		pitch = (ToggleButton) findViewById(R.id.pitchButton);
 		fadeListener = new FadeListener();
 		fadeIn = AnimationUtils.loadAnimation(this, R.anim.fadein);
 		fadeOut = AnimationUtils.loadAnimation(this, R.anim.fadeout);
@@ -144,9 +144,12 @@ public class BeatBotActivity extends Activity {
 					@Override
 					public void onItemClick(AdapterView parentView,
 							View childView, int position, long id) {
-						// preview the sample with a default velocity of 80,
-						// a default pan of 64 (halfway) and a default pitch of 64
-						playbackManager.playSample(position - 1, 80, 64, 64);
+						// preview the sample with a default velocity of 3/4,
+						// a default pan of halfway and a default normal pitch
+						playbackManager.playSample(position - 1,
+								3 * GlobalVars.LEVEL_MAX / 4,
+								GlobalVars.LEVEL_MAX / 2,
+								GlobalVars.LEVEL_MAX / 2);
 					}
 				});
 
@@ -204,7 +207,7 @@ public class BeatBotActivity extends Activity {
 			android.os.Process.killProcess(android.os.Process.myPid());
 		}
 	}
-	
+
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);

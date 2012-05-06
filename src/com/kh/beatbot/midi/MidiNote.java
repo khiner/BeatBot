@@ -1,9 +1,9 @@
 package com.kh.beatbot.midi;
 
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
-import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.helper.LevelsViewHelper;
 
 public class MidiNote {
@@ -76,7 +76,7 @@ public class MidiNote {
 	private int clipLevel(int level) {
 		if (level < 0)
 			return 0;
-		if (level > 127)
+		if (level > GlobalVars.LEVEL_MAX)
 			return 127;
 		return level;
 	}

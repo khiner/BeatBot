@@ -16,15 +16,30 @@ public class MidiViewBean {
 	public final static float VOLUME_G = .788f;
 	public final static float VOLUME_B = 1;
 
+	// RGB color for volume bars when they are selected	
+	public final static float VOLUME_SELECTED_R = 1;
+	public final static float VOLUME_SELECTED_G = 0;
+	public final static float VOLUME_SELECTED_B = 0;
+	
 	// RGB color for pan bars	
 	public final static float PAN_R = 1;
 	public final static float PAN_G = .788f;
 	public final static float PAN_B = .392f;
 
+	// RGB color for pan bars when they are selected	
+	public final static float PAN_SELECTED_R = 1;
+	public final static float PAN_SELECTED_G = 0;
+	public final static float PAN_SELECTED_B = 0;
+	
 	// RGB color for pitch bars		
 	public final static float PITCH_R = .443f;
 	public final static float PITCH_G = 1;
 	public final static float PITCH_B = .533f;
+	
+	// RGB color for pitch bars	when they are selected
+	public final static float PITCH_SELECTED_R = 1;
+	public final static float PITCH_SELECTED_G = 0;
+	public final static float PITCH_SELECTED_B = 0;
 	
 	private MidiView.State viewState = MidiView.State.NORMAL_VIEW;
 	
@@ -50,7 +65,7 @@ public class MidiViewBean {
 
 	private boolean selectRegion = false;
 	private long selectRegionStartTick = -1;
-	private int selectRegionStartNote = -1;
+	private float selectRegionStartY = -1;
 
 	private long allTicks;
 
@@ -213,12 +228,12 @@ public class MidiViewBean {
 		this.selectRegionStartTick = selectRegionStartTick;
 	}
 
-	public int getSelectRegionStartNote() {
-		return selectRegionStartNote;
+	public float getSelectRegionStartY() {
+		return selectRegionStartY;
 	}
 
-	public void setSelectRegionStartNote(int selectRegionStartNote) {
-		this.selectRegionStartNote = selectRegionStartNote;
+	public void setSelectRegionStartY(float selectRegionStartY) {
+		this.selectRegionStartY = selectRegionStartY;
 	}
 
 	public long getAllTicks() {

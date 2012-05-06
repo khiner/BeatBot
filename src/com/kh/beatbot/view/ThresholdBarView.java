@@ -58,7 +58,7 @@ public class ThresholdBarView extends SurfaceViewBase {
 		float[] channelCoords = new float[(numBars*4)];
 		int y1 = 0;
 		int y2 = 3*height / 4;
-		for (int x = 0, i = 0; i < numBars; x += barWidth, i++) {
+		for (int x = barWidth/2, i = 0; i < numBars; x += barWidth, i++) {
 			channelCoords[i * 4] = x;
 			channelCoords[i * 4 + 1] = y1;
 			channelCoords[i * 4 + 2] = x;
