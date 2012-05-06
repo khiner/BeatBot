@@ -344,6 +344,11 @@ public class LevelsViewHelper {
 		bean.setStateChanged(true);
 	}
 	
+	public void handleUndo() {
+		selectedLevels.clear();
+		updateSelectedLevelNotes();		
+	}
+	
 	public boolean handleActionPointerDown(MotionEvent e, int index) {
 		selectLevel(e.getX(index), e.getY(index), e.getPointerId(index));
 		if (touchedLevels.isEmpty() && e.getPointerCount() == 2) {

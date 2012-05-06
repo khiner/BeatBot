@@ -310,7 +310,7 @@ public class BeatBotActivity extends Activity {
 
 	public void undo(View view) {
 		midiManager.undo();
-		midiView.updateSelectedLevelNotes();
+		midiView.handleUndo();
 	}
 
 	public void levels(View view) {

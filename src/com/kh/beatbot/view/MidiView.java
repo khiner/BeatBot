@@ -102,8 +102,8 @@ public class MidiView extends SurfaceViewBase {
 		return bean.getViewState();
 	}
 
-	public void updateSelectedLevelNotes() {
-		levelsHelper.updateSelectedLevelNotes();
+	public void handleUndo() {
+		levelsHelper.handleUndo();
 	}
 
 	public void setViewState(State viewState) {
@@ -703,9 +703,9 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	public void toggleLevelsView() {
-		levelsHelper.updateSelectedLevelNotes();
 		if (bean.getViewState() == State.NORMAL_VIEW
 				|| bean.getViewState() == State.TO_NORMAL_VIEW) {
+			levelsHelper.updateSelectedLevelNotes();
 			bean.setViewState(State.TO_LEVELS_VIEW);
 		} else {
 			bean.setViewState(State.TO_NORMAL_VIEW);
