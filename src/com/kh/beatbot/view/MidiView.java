@@ -103,7 +103,7 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	public void handleUndo() {
-		levelsHelper.handleUndo();
+		levelsHelper.resetSelected();
 	}
 
 	public void setViewState(State viewState) {
@@ -125,7 +125,7 @@ public class MidiView extends SurfaceViewBase {
 		return selectedNotes.contains(midiNote);
 	}
 
-	public void removeNote(MidiNote midiNote) {
+	public void removeSelected(MidiNote midiNote) {
 		selectedNotes.remove(midiNote);
 	}
 
@@ -623,9 +623,7 @@ public class MidiView extends SurfaceViewBase {
 		long tick = xToTick(e.getX());
 		int note = yToNote(e.getY());
 		if (touchedNote != null) {
-			if (selectedNotes.contains(touchedNote)) {
-				selectedNotes.remove(touchedNote);
-			}
+			selectedNotes.remove(touchedNote);
 			midiManager.removeNote(touchedNote);
 			bean.setStateChanged(true);
 		} else {
@@ -705,7 +703,7 @@ public class MidiView extends SurfaceViewBase {
 	public void toggleLevelsView() {
 		if (bean.getViewState() == State.NORMAL_VIEW
 				|| bean.getViewState() == State.TO_NORMAL_VIEW) {
-			levelsHelper.updateSelectedLevelNotes();
+			levelsHelper.resetSelected();
 			bean.setViewState(State.TO_LEVELS_VIEW);
 		} else {
 			bean.setViewState(State.TO_NORMAL_VIEW);

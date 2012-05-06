@@ -237,6 +237,7 @@ public class LevelsViewHelper {
 		for (int i = 0; i < selectedLevelNotes.size(); i++) {
 			MidiNote selected = selectedLevelNotes.get(i);
 			if (tick == selected.getOnTick()) {
+				selectedLevels.remove(selected);
 				selectedLevelNotes.remove(i);
 				break;
 			}
@@ -336,15 +337,15 @@ public class LevelsViewHelper {
 	public void doubleTap() {
 		if (tappedLevelNote == null)
 			return;
-		if (selectedLevelNotes.contains(tappedLevelNote))
-			selectedLevelNotes.remove(tappedLevelNote);
-		midiView.removeNote((tappedLevelNote));
+		selectedLevels.remove(tappedLevelNote);
+		selectedLevelNotes.remove(tappedLevelNote);
+		midiView.removeSelected((tappedLevelNote));
 		midiManager.removeNote(tappedLevelNote);
 		updateSelectedLevelNotes();
 		bean.setStateChanged(true);
 	}
 	
-	public void handleUndo() {
+	public void resetSelected() {
 		selectedLevels.clear();
 		updateSelectedLevelNotes();		
 	}
