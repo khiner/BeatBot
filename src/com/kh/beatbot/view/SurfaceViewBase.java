@@ -36,27 +36,13 @@ public abstract class SurfaceViewBase extends SurfaceView implements SurfaceHold
 	 * @param arr The array
 	 * @return The newly created FloatBuffer
 	 */
-	protected static FloatBuffer makeFloatBuffer(float[] arr) {
+	public static FloatBuffer makeFloatBuffer(float[] arr) {
 		ByteBuffer bb = ByteBuffer.allocateDirect(arr.length*4);
 		bb.order(ByteOrder.nativeOrder());
 		FloatBuffer fb = bb.asFloatBuffer();
 		fb.put(arr);
 		fb.position(0);
 		return fb;
-	}
-
-	/**
-	 * Make a direct NIO IntBuffer from an array of ints
-	 * @param arr The array
-	 * @return The newly created IntBuffer
-	 */
-	protected static IntBuffer makeIntBuffer(int[] arr) {
-		ByteBuffer bb = ByteBuffer.allocateDirect(arr.length*4);
-		bb.order(ByteOrder.nativeOrder());
-		IntBuffer ib = bb.asIntBuffer();
-		ib.put(arr);
-		ib.position(0);
-		return ib;
 	}
 
 	/**

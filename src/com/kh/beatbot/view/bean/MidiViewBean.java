@@ -1,5 +1,7 @@
 package com.kh.beatbot.view.bean;
 
+import com.kh.beatbot.view.MidiView;
+
 public class MidiViewBean {
 
 	// the size of the "dots" at the top of level display
@@ -23,6 +25,8 @@ public class MidiViewBean {
 	public final static float PITCH_R = .443f;
 	public final static float PITCH_G = 1;
 	public final static float PITCH_B = .533f;
+	
+	private MidiView.State viewState = MidiView.State.NORMAL_VIEW;
 	
 	private float width, height;
 	private float yOffset;
@@ -72,6 +76,14 @@ public class MidiViewBean {
 	private boolean snapToGrid = false;
 
 	
+	public MidiView.State getViewState() {
+		return viewState;
+	}
+
+	public void setViewState(MidiView.State viewState) {
+		this.viewState = viewState;
+	}
+
 	public float getWidth() {
 		return width;
 	}

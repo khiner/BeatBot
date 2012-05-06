@@ -27,6 +27,7 @@ import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.view.BpmView;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.ThresholdBarView;
+import com.kh.beatbot.view.helper.LevelsViewHelper;
 
 public class BeatBotActivity extends Activity {
 	private class FadeListener implements AnimationListener {
@@ -329,21 +330,21 @@ public class BeatBotActivity extends Activity {
 		volume.setChecked(true);
 		pan.setChecked(false);
 		pitch.setChecked(false);
-		midiView.setLevelMode(MidiView.LevelMode.VOLUME);
+		midiView.setLevelMode(LevelsViewHelper.LevelMode.VOLUME);
 	}
 
 	public void pan(View view) {
 		volume.setChecked(false);
 		pan.setChecked(true);
 		pitch.setChecked(false);
-		midiView.setLevelMode(MidiView.LevelMode.PAN);
+		midiView.setLevelMode(LevelsViewHelper.LevelMode.PAN);
 	}
 
 	public void pitch(View view) {
 		volume.setChecked(false);
 		pan.setChecked(false);
 		pitch.setChecked(true);
-		midiView.setLevelMode(MidiView.LevelMode.PITCH);
+		midiView.setLevelMode(LevelsViewHelper.LevelMode.PITCH);
 	}
 
 	public void bpmTap(View view) {

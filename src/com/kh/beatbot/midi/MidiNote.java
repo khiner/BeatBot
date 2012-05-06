@@ -4,6 +4,7 @@ import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.view.MidiView;
+import com.kh.beatbot.view.helper.LevelsViewHelper;
 
 public class MidiNote {
 	NoteOn noteOn;
@@ -95,23 +96,23 @@ public class MidiNote {
 		return noteOff.getTick() - noteOn.getTick();
 	}
 	
-	public int getLevel(MidiView.LevelMode levelMode) {
-		if (levelMode == MidiView.LevelMode.VOLUME)
+	public int getLevel(LevelsViewHelper.LevelMode levelMode) {
+		if (levelMode == LevelsViewHelper.LevelMode.VOLUME)
 			return noteOn.getVelocity();
-		else if (levelMode == MidiView.LevelMode.PAN)
+		else if (levelMode == LevelsViewHelper.LevelMode.PAN)
 			return noteOn.getPan();
-		else if (levelMode == MidiView.LevelMode.PITCH)
+		else if (levelMode == LevelsViewHelper.LevelMode.PITCH)
 			return noteOn.getPitch();
 		
 		return 0;
 	}
 	
-	public void setLevel(MidiView.LevelMode levelMode, int level) {
-		if (levelMode == MidiView.LevelMode.VOLUME)
+	public void setLevel(LevelsViewHelper.LevelMode levelMode, int level) {
+		if (levelMode == LevelsViewHelper.LevelMode.VOLUME)
 			noteOn.setVelocity(level);
-		else if (levelMode == MidiView.LevelMode.PAN)
+		else if (levelMode == LevelsViewHelper.LevelMode.PAN)
 			noteOn.setPan(level);
-		else if (levelMode == MidiView.LevelMode.PITCH)
+		else if (levelMode == LevelsViewHelper.LevelMode.PITCH)
 			noteOn.setPitch(level);
 	}
 }

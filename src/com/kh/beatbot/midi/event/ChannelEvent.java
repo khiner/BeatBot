@@ -47,7 +47,7 @@ public class ChannelEvent extends MidiEvent {
 		return mType;
 	}
 	
-		public int getNoteValue() {
+	public int getNoteValue() {
 		return mValue1;
 	}
 	
