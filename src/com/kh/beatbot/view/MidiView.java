@@ -22,6 +22,7 @@ import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.bean.MidiViewBean;
 import com.kh.beatbot.view.helper.LevelsViewHelper;
 import com.kh.beatbot.view.helper.TickWindowHelper;
+import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class MidiView extends SurfaceViewBase {
 
@@ -57,6 +58,7 @@ public class MidiView extends SurfaceViewBase {
 
 	private TickWindowHelper tickWindow;
 	private LevelsViewHelper levelsHelper;
+	private WaveformHelper waveformHelper;
 
 	public MidiView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -68,10 +70,10 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	public void setMidiManager(MidiManager midiManager) {
-		this.midiManager = midiManager;
+		this.midiManager = midiManager;		
 		bean.setAllTicks(midiManager.RESOLUTION * 4);
+		bean.setYOffset(21);		
 		tickWindow = new TickWindowHelper(bean, 0, bean.getAllTicks() - 1);
-		bean.setYOffset(21);
 	}
 
 	public MidiManager getMidiManager() {
@@ -133,6 +135,10 @@ public class MidiView extends SurfaceViewBase {
 		tickWindow.setTickOffset(0);
 	}
 
+	public void drawWaveform(byte[] bytes) {
+		waveformHelper.addBytesToQueue(bytes);
+	}
+	
 	private void selectWithRegion(float x, float y) {
 		long tick = xToTick(x);
 
@@ -275,6 +281,15 @@ public class MidiView extends SurfaceViewBase {
 		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
 	}
 
+	private void drawRecordingWaveforms() {
+		gl.glLineWidth(1);
+		ArrayList<FloatBuffer> waveformVBs = waveformHelper.getWaveformFloatBuffers();
+		for (int i = 0; i < waveformVBs.size(); i++) {
+			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVBs.get(i));
+			gl.glDrawArrays(GL10.GL_LINES, 0, waveformVBs.get(i).capacity() / 2);
+		}
+	}
+	
 	public void updateSelectRegionVB(long leftTick, long rightTick, float topY,
 			float bottomY) {
 		float x1 = tickToX(leftTick);
@@ -446,6 +461,8 @@ public class MidiView extends SurfaceViewBase {
 
 	protected void init() {
 		levelsHelper = new LevelsViewHelper(this);
+		// waveformHelper constructor: yPos, height
+		waveformHelper = new WaveformHelper(bean.getHeight()/3);
 		tickWindow.updateGranularity();
 		float color = bean.getBgColor();
 		gl.glClearColor(color, color, color, 1.0f);
@@ -504,6 +521,7 @@ public class MidiView extends SurfaceViewBase {
 						- bean.getScrollViewEndTime()) <= MidiViewBean.DOUBLE_TAP_TIME * 2) {
 			drawScrollView();
 		}
+		drawRecordingWaveforms();
 	}
 
 	private void drawScrollView() {

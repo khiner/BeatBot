@@ -175,6 +175,7 @@ public class BeatBotActivity extends Activity {
 		midiView.setMidiManager(midiManager);
 		midiView.setRecordManager(recordManager);
 		midiView.setPlaybackManager(playbackManager);
+		recordManager.setMidiView(midiView);
 		if (savedInstanceState != null)
 			midiView.readFromBundle(savedInstanceState);
 

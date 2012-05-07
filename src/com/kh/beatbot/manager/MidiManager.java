@@ -200,16 +200,7 @@ public class MidiManager implements Parcelable {
 				currTick++;
 				if (currTick >= loopTick) {
 					playbackManager.stopAllSamples();
-					if (recording) {
-						try {
-							recordManager.stopRecording();
-							currTick = 0;
-							recordManager.startRecording();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					} else
-						currTick = 0;
+					currTick = 0;
 				}
 				for (int i = 0; i < midiNotes.size(); i++) {
 					MidiNote midiNote = getMidiNote(i);

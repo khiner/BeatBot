@@ -14,6 +14,7 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.util.Log;
 
+import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.ThresholdBarView;
 
 public class RecordManager {
@@ -35,6 +36,7 @@ public class RecordManager {
 
 	// Midi Manager to manage MIDI events
 	private MidiManager midiManager;
+	private MidiView midiView;
 
 	private ThresholdBarView thresholdBar;
 
@@ -72,6 +74,18 @@ public class RecordManager {
 		state = State.INITIALIZING;
 	}
 
+	public void setMidiManager(MidiManager midiManager) {
+		this.midiManager = midiManager;
+	}
+
+	public void setThresholdBar(ThresholdBarView thresholdBar) {
+		this.thresholdBar = thresholdBar;
+	}
+	
+	public void setMidiView(MidiView midiView) {
+		this.midiView = midiView;
+	}
+	
 	private void initRecorder() {
 		recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
 				RECORDER_SAMPLERATE, RECORDER_CHANNELS,
@@ -111,14 +125,6 @@ public class RecordManager {
 		return tempFile.getAbsolutePath();
 	}
 
-	public void setMidiManager(MidiManager midiManager) {
-		this.midiManager = midiManager;
-	}
-
-	public void setThresholdBar(ThresholdBarView thresholdBar) {
-		this.thresholdBar = thresholdBar;
-	}
-
 	private void writeAudioDataToFile() {
 		byte buffer[] = new byte[bufferSize];
 		recorder.read(buffer, 0, bufferSize);
@@ -133,7 +139,8 @@ public class RecordManager {
 					startRecording();
 				}
 				if (state == State.RECORDING) {
-					os.write(buffer); // Write buffer to file
+					os.write(buffer); // write buffer to file
+					midiView.drawWaveform(buffer); // draw waveform
 					if (underThreshold(buffer)) {
 						stopRecording();
 					}
@@ -154,9 +161,8 @@ public class RecordManager {
 
 	private void processByteBuffersOnQueue() {
 		String filePath = null;
-		try {
-			while (true) {
-				Log.d("bb", "running");
+		while (state == State.RECORDING || !processingQueue.isEmpty()) {
+			try {
 				synchronized (processingQueue) {
 					while (processingQueue.isEmpty())
 						processingQueue.wait();
@@ -175,10 +181,11 @@ public class RecordManager {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
+
 	}
 
 	public void startRecording() throws IOException {
