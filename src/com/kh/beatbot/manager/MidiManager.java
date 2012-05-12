@@ -48,8 +48,6 @@ public class MidiManager implements Parcelable {
 	private PlaybackManager playbackManager = null;
 	private RecordManager recordManager = null;
 
-	private MidiEvent lastEvent = null;
-	private boolean recording;
 	private int numSamples = 0;
 
 	// ticks per quarter note (I think)
@@ -58,11 +56,9 @@ public class MidiManager implements Parcelable {
 	private long currTick = -1;
 	private long loopTick = RESOLUTION * 4;
 	private long MSPT;
-	private Random random;
 
 	private MidiManager(int numSamples) {
 		this.numSamples = numSamples;
-		random = new Random();
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,
 				TimeSignature.DEFAULT_DIVISION);
 		tempo.setBpm(140);
@@ -154,10 +150,6 @@ public class MidiManager implements Parcelable {
 		return tempo;
 	}
 
-	public long getLastTick() {
-		return lastEvent.getTick();
-	}
-
 	/*
 	 * Translate the provided midi note to its on-tick's nearest major tick
 	 * given the provided beat division
@@ -186,10 +178,6 @@ public class MidiManager implements Parcelable {
 		}
 	}
 
-	public boolean isRecording() {
-		return recording;
-	}
-
 	public void runTicker() {
 		long startNano = System.nanoTime();
 		long nextTickNano = startNano + MSPT * 1000;
@@ -200,6 +188,7 @@ public class MidiManager implements Parcelable {
 				currTick++;
 				if (currTick >= loopTick) {
 					playbackManager.stopAllSamples();
+					recordManager.notifyLoop();
 					currTick = 0;
 				}
 				for (int i = 0; i < midiNotes.size(); i++) {
@@ -232,25 +221,6 @@ public class MidiManager implements Parcelable {
 
 	public void reset() {
 		currTick = -1;
-	}
-
-	public void setRecordNoteOn(int velocity) {
-		long onTick = currTick;
-		// random note for now.
-		int note = random.nextInt(numSamples);
-		// tick, channel, note, velocity
-		NoteOn on = new NoteOn(onTick, 0, note, velocity, 64, 64);
-		lastEvent = on;
-		recording = true;
-	}
-
-	public void setRecordNoteOff(int velocity) {
-		NoteOn lastOn = (NoteOn)lastEvent;
-		// tick, channel, note, velocity
-		NoteOff off = new NoteOff(currTick, 0, lastOn.getNoteValue(), velocity, 64, 64);
-		midiNotes.add(new MidiNote(lastOn, off));
-		lastEvent = off;
-		recording = false;
 	}
 
 	public long getCurrTick() {

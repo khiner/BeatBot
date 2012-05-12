@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -14,6 +15,7 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.util.Log;
 
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.ThresholdBarView;
 
@@ -30,6 +32,7 @@ public class RecordManager {
 			* CHANNELS / 8;
 	private final long LONG_SAMPLE_RATE = RECORDER_SAMPLERATE;
 
+	private Random random = new Random();
 	private String currFilename = null;
 
 	private static RecordManager singletonInstance = null;
@@ -44,12 +47,14 @@ public class RecordManager {
 	private int bufferSize = 0;
 	// queue of paths to raw audio data to process
 	private Queue<String> processingQueue = new LinkedList<String>();
+	private Queue<Long> recordTickQueue = new LinkedList<Long>();
 	private Thread recordingThread = null;
 	private Thread smrtThread = null;
 	private State state;
 	private FileOutputStream os = null;
 
 	private short currAmp = 0;
+	private long recordStartTick = 0;
 
 	public enum State {
 		LISTENING, RECORDING, INITIALIZING
@@ -59,6 +64,14 @@ public class RecordManager {
 		return state;
 	}
 
+	public boolean isRecording() {
+		return state == State.RECORDING;
+	}
+	
+	public long getRecordStartTick() {
+		return recordStartTick;
+	}
+	
 	public static RecordManager getInstance() {
 		if (singletonInstance == null) {
 			singletonInstance = new RecordManager();
@@ -143,6 +156,7 @@ public class RecordManager {
 					midiView.drawWaveform(buffer); // draw waveform
 					if (underThreshold(buffer)) {
 						stopRecording();
+						midiView.endWaveform();
 					}
 				}
 				// update threshold bar
@@ -158,10 +172,26 @@ public class RecordManager {
 			e.printStackTrace();
 		}
 	}
-
+	
+	public void notifyLoop() {
+		if (state == State.RECORDING) {
+			recordTickQueue.add(midiManager.getLoopTick());
+			addRecordNote(random.nextInt(midiManager.getNumSamples()));
+			recordTickQueue.add((long)0);
+			recordStartTick = 0;
+		}
+	}
+	
+	private void addRecordNote(int note) {
+		long recordNoteOnTick = recordTickQueue.remove();
+		long recordNoteOffTick = recordTickQueue.remove();
+		midiView.addMidiNote(recordNoteOnTick, recordNoteOffTick, note);
+		midiView.handleMidiCollisions();		
+	}
+	
 	private void processByteBuffersOnQueue() {
 		String filePath = null;
-		while (state == State.RECORDING || !processingQueue.isEmpty()) {
+		while ((state == State.RECORDING || state == State.LISTENING) || !processingQueue.isEmpty()) {
 			try {
 				synchronized (processingQueue) {
 					while (processingQueue.isEmpty())
@@ -177,7 +207,9 @@ public class RecordManager {
 					// close file
 					new File(filePath).delete();
 					// xml = extractFeatures(wav);
-					// class = classify(xml);
+					// cl = classify(xml);
+					int cl = random.nextInt(midiManager.getNumSamples());
+					addRecordNote(cl);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -189,9 +221,8 @@ public class RecordManager {
 	}
 
 	public void startRecording() throws IOException {
-		// MIDI-on event (velocity)
-		midiManager.setRecordNoteOn(100);
-
+		recordStartTick = midiManager.getCurrTick();
+		recordTickQueue.add(recordStartTick);		
 		currFilename = getTempFilename();
 		os = new FileOutputStream(currFilename);
 		state = State.RECORDING;
@@ -199,9 +230,7 @@ public class RecordManager {
 
 	public void stopRecording() throws IOException {
 		state = State.LISTENING;
-		// MIDI-off event (velocity)
-		midiManager.setRecordNoteOff(100);
-
+		recordTickQueue.add(midiManager.getCurrTick());		
 		// close and add to processing queue
 		os.close();
 		synchronized (processingQueue) {
