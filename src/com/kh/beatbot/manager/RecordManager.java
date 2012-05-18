@@ -40,6 +40,7 @@ public class RecordManager {
 	// Midi Manager to manage MIDI events
 	private MidiManager midiManager;
 	private MidiView midiView;
+	private AudioClassificationManager audioClassificationManager;
 
 	private ThresholdBarView thresholdBar;
 
@@ -97,6 +98,10 @@ public class RecordManager {
 	
 	public void setMidiView(MidiView midiView) {
 		this.midiView = midiView;
+	}
+	
+	public void setAudioClassificationManager(AudioClassificationManager audioClassificationManager) {
+		this.audioClassificationManager = audioClassificationManager;
 	}
 	
 	private void initRecorder() {
@@ -205,8 +210,8 @@ public class RecordManager {
 					// copy to wave
 					copyWaveFile(filePath, getFilename());
 					// close file
+					//audioClassificationManager.extractFeatures(new File(filePath));
 					new File(filePath).delete();
-					// xml = extractFeatures(wav);
 					// cl = classify(xml);
 					int cl = random.nextInt(midiManager.getNumSamples());
 					addRecordNote(cl);

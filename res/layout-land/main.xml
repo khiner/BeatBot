@@ -121,22 +121,24 @@
 
     <com.kh.beatbot.view.ThresholdBarView
         android:id="@+id/thresholdBar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/midiView"
+        android:layout_width="0dp"
+        android:layout_height="25dp"
         android:layout_below="@+id/controlLayout"
-        android:layout_toRightOf="@+id/sampleListView" />
+        android:layout_alignLeft="@+id/midiView"
+        android:layout_alignRight="@+id/midiView" />
 
     <ListView
         android:id="@+id/sampleListView"
-        android:layout_width="38dp"
+        android:layout_width="98dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/controlLayout" />
+        android:layout_below="@+id/thresholdBar"
+        android:layout_marginTop="13dp"/>
 
     <com.kh.beatbot.view.MidiView
         android:id="@+id/midiView"
         android:layout_width="match_parent"
         android:layout_height="246dp"
+        android:layout_below="@+id/thresholdBar"
         android:layout_alignBottom="@+id/sampleListView"
         android:layout_toRightOf="@+id/sampleListView" />
 

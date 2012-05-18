@@ -969,6 +969,7 @@ public class MidiView extends SurfaceViewBase {
 		for (int index : selectedIndices) {
 			selectedNotes.add(midiManager.getMidiNotes().get(index));
 		}
+		levelsHelper = new LevelsViewHelper(this);		
 		ArrayList<Integer> selectedLevelIndices = in
 				.getIntegerArrayList("selectedLevelIndices");
 		for (int index : selectedLevelIndices) {

@@ -21,6 +21,7 @@ import android.widget.ToggleButton;
 
 import com.KarlHiner.BeatBox.R;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.manager.AudioClassificationManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
@@ -68,28 +69,25 @@ public class BeatBotActivity extends Activity {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View view = getLayoutInflater().inflate(resourceId, parent, false);
-			ImageView icon = (ImageView) view.findViewById(R.id.iconView);
+			ImageView icon = (ImageView) view.findViewById(R.id.icon);
 
 			switch (position) {
-			case 0: // recorded/voice
-				icon.setImageResource(R.drawable.microphone_icon_src);
-				break;
-			case 1: // kick
+			case 0: // kick
 				icon.setImageResource(R.drawable.kick_icon_src);
 				break;
-			case 2: // snare
+			case 1: // snare
 				icon.setImageResource(R.drawable.snare_icon_src);
 				break;
-			case 3: // hh closed
+			case 2: // hh closed
 				icon.setImageResource(R.drawable.hh_closed_icon_src);
 				break;
-			case 4: // hh open
+			case 3: // hh open
 				icon.setImageResource(R.drawable.hh_open_icon_src);
 				break;
-			case 5: // rimshot
+			case 4: // rimshot
 				icon.setImageResource(R.drawable.rimshot_icon_src);
 				break;
-			case 6: // bass
+			case 5: // bass
 				icon.setImageResource(R.drawable.bass_icon_src);
 				break;
 			}
@@ -136,7 +134,7 @@ public class BeatBotActivity extends Activity {
 		String[] sampleTypes = getResources().getStringArray(
 				R.array.sample_types);
 		ArrayAdapter<String> adapter = new SampleIconAdapter(this,
-				R.layout.sample_icon_view, sampleTypes);
+				R.layout.sample_row, sampleTypes);
 		sampleListView = (ListView) findViewById(R.id.sampleListView);
 		sampleListView.setAdapter(adapter);
 		sampleListView
@@ -159,12 +157,13 @@ public class BeatBotActivity extends Activity {
 		// if this context is being restored from a destroyed context,
 		// recover the midiManager. otherwise, create a new one
 		if (savedInstanceState == null)
-			midiManager = MidiManager.getInstance(sampleTypes.length - 1);
+			midiManager = MidiManager.getInstance(sampleTypes.length);
 		else
 			midiManager = savedInstanceState.getParcelable("midiManager");
 
 		midiManager.setPlaybackManager(playbackManager);
 		recordManager.setMidiManager(midiManager);
+		recordManager.setAudioClassificationManager(new AudioClassificationManager());
 		// recordManager needs the threshold bar (with levels display) to send
 		// decibel levels
 		recordManager

@@ -22,7 +22,6 @@
 	<string name="save_wav">Export as WAV</string>	
 	<string name="import_export_midi">Import/Export as MIDI</string>
     <string-array name="sample_types">
-        <item name="recorded">Recorded</item>
         <item name="kick">Kick</item>
         <item name="snare">Snare</item>
         <item name="hi_hat_closed">HH Closed</item>

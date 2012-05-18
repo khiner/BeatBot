@@ -8,6 +8,7 @@
 package jAudioFeatureExtractor.jAudioTools;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
@@ -41,7 +42,7 @@ public class AudioMethods
 	public static double[][] extractSampleValues(File file)
 		throws Exception
 	{
-		byte[] audio_bytes = getBytesFromFile(file);
+		byte[] audio_bytes = getBytesFromRawFile(file);
 		int number_bytes = audio_bytes.length;
 
 		// Extract information from this_audio_format
@@ -199,7 +200,25 @@ public class AudioMethods
 		return max_sample_value;
 	}
 	
-	public static byte[] getBytesFromFile(File infile) {
-		return new byte[10];
+	public static byte[] getBytesFromRawFile(File infile) {
+		byte[] bytes = null;		
+		try {
+			FileInputStream in = new FileInputStream(infile.getAbsolutePath());
+			int audioLength = (int)in.getChannel().size();
+			bytes = new byte[audioLength];					
+			byte[] smallBuffer = new byte[1024];
+			
+			int totalBytesWritten = 0;
+			
+			while (in.read(smallBuffer) != -1) {
+				for (int i = 0; i < smallBuffer.length; i++) {
+					bytes[i + totalBytesWritten] = smallBuffer[i];
+				}
+				totalBytesWritten += smallBuffer.length;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return bytes;
 	}
 }

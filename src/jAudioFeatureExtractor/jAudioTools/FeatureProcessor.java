@@ -415,72 +415,13 @@ public class FeatureProcessor {
 					}
 		}
 
-		// Find the correct order to extract features in by filling the
-		// feature_extractors field
-		int number_features_to_extract = 0;
-		for (int i = 0; i < features_to_extract.length; i++)
-			if (features_to_extract[i])
-				number_features_to_extract++;
-		feature_extractors = new FeatureExtractor[number_features_to_extract];
-		features_to_save = new boolean[number_features_to_extract];
-		for (int i = 0; i < features_to_save.length; i++)
-			features_to_save[i] = false;
-		boolean[] feature_added = new boolean[dependencies.length];
-		for (int i = 0; i < feature_added.length; i++)
-			feature_added[i] = false;
-		int current_position = 0;
-		done = false;
-		while (!done) {
-			done = true;
-
-			// Add all features that have no remaining dependencies and remove
-			// their dependencies from all unadded features
-			for (int feat = 0; feat < dependencies.length; feat++) {
-				if (features_to_extract[feat] && !feature_added[feat])
-					if (dependencies[feat] == null) // add feature if it has no
-					// dependencies
-					{
-						feature_added[feat] = true;
-						feature_extractors[current_position] = all_feature_extractors[feat];
-						features_to_save[current_position] = features_to_save_among_all[feat];
-						current_position++;
-						done = false;
-
-						// Remove this dependency from all features that have
-						// it as a dependency and are marked to be extracted
-						for (int i = 0; i < dependencies.length; i++)
-							if (features_to_extract[i]
-									&& dependencies[i] != null) {
-								int num_defs = dependencies[i].length;
-								for (int j = 0; j < num_defs; j++) {
-									if (dependencies[i][j]
-											.equals(all_feature_names[feat])) {
-										if (dependencies[i].length == 1) {
-											dependencies[i] = null;
-											j = num_defs;
-										} else {
-											String[] temp = new String[dependencies[i].length - 1];
-											int m = 0;
-											for (int k = 0; k < dependencies[i].length; k++) {
-												if (k != j) {
-													temp[m] = dependencies[i][k];
-													m++;
-												}
-											}
-											dependencies[i] = temp;
-											j--;
-											num_defs--;
-										}
-									}
-								}
-							}
-					}
-			}
-		}
-
 		// Find the indices of the feature extractor dependencies for each
 		// feature
 		// extractor
+		feature_extractors = new FeatureExtractor[all_feature_extractors.length];
+		for (int i = 0; i < all_feature_extractors.length; i++) {
+			feature_extractors[i] = all_feature_extractors[i];
+		}
 		feature_extractor_dependencies = new int[feature_extractors.length][];
 		String[] feature_names = new String[feature_extractors.length];
 		for (int feat = 0; feat < feature_names.length; feat++) {

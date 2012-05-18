@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="98dp"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+    
+    <ToggleButton
+        android:id="@+id/mute"
+        android:layout_width="30dp"
+        android:layout_height="38dp"
+        android:textOn="" android:textOff=""
+        android:background="@drawable/mute_btn_src"/>
+    
+    <ToggleButton
+        android:id="@+id/solo"
+        android:layout_width="30dp"
+        android:layout_height="38dp"
+        android:textOn="" android:textOff=""        
+        android:background="@drawable/solo_btn_src"/>
+
+    <ImageButton
+	    android:id="@+id/icon"
+	    android:layout_width="38dp"
+	    android:layout_height="38dp"
+	    android:background="#FF000000" />
+        
+</LinearLayout>
