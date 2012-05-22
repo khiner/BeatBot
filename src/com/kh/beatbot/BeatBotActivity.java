@@ -1,5 +1,7 @@
 package com.kh.beatbot;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +17,7 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ToggleButton;
@@ -55,22 +58,55 @@ public class BeatBotActivity extends Activity {
 		}
 	}
 
-	public class SampleIconAdapter extends ArrayAdapter<String> {
-		String[] sampleTypes;
+	public class SampleRowAdapterAndOnClickListener extends
+			ArrayAdapter<String> implements AdapterView.OnClickListener {
 		int resourceId;
+		ArrayList<ToggleButton> soloButtons = new ArrayList<ToggleButton>();
 
-		public SampleIconAdapter(Context context, int resourceId,
-				String[] sampleTypes) {
+		public SampleRowAdapterAndOnClickListener(Context context,
+				int resourceId, String[] sampleTypes) {
 			super(context, resourceId, sampleTypes);
-			this.sampleTypes = sampleTypes;
 			this.resourceId = resourceId;
+		}
+
+		@Override
+		public void onClick(View view) {
+			int position = (Integer)view.getTag();
+			if (view.getId() == R.id.icon) {
+				// preview the sample with a default velocity of 3/4,
+				// middle pan and normal pitch
+				playbackManager.playSample(position, 3 * GlobalVars.LEVEL_MAX / 4, GlobalVars.LEVEL_MAX / 2,
+						GlobalVars.LEVEL_MAX / 2);
+			} else if (view.getId() == R.id.mute) {
+				ToggleButton muteButton = (ToggleButton)view;
+				playbackManager.setMute(position, muteButton.isChecked()); 
+			} else if (view.getId() == R.id.solo) {
+				ToggleButton soloButton = (ToggleButton)view;
+				if (soloButton.isChecked()) {
+					playbackManager.setSolo(position);
+					for (ToggleButton otherSoloButton : soloButtons) {
+						if (otherSoloButton.isChecked() && !otherSoloButton.equals(soloButton)) {
+							otherSoloButton.setChecked(false);
+						}
+					}
+				} else
+					playbackManager.setSolo(-1); 
+			}			
 		}
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View view = getLayoutInflater().inflate(resourceId, parent, false);
-			ImageView icon = (ImageView) view.findViewById(R.id.icon);
-
+			ImageButton icon = (ImageButton) view.findViewById(R.id.icon);
+			ToggleButton mute = (ToggleButton)view.findViewById(R.id.mute);
+			ToggleButton solo = (ToggleButton)view.findViewById(R.id.solo);
+			soloButtons.add(solo);
+			icon.setTag(position + 1);
+			mute.setTag(position + 1);
+			solo.setTag(position + 1);
+			icon.setOnClickListener(this);
+			mute.setOnClickListener(this);
+			solo.setOnClickListener(this);
 			switch (position) {
 			case 0: // kick
 				icon.setImageResource(R.drawable.kick_icon_src);
@@ -133,23 +169,10 @@ public class BeatBotActivity extends Activity {
 		fadeOut.setAnimationListener(fadeListener);
 		String[] sampleTypes = getResources().getStringArray(
 				R.array.sample_types);
-		ArrayAdapter<String> adapter = new SampleIconAdapter(this,
-				R.layout.sample_row, sampleTypes);
+		SampleRowAdapterAndOnClickListener adapter = new SampleRowAdapterAndOnClickListener(
+				this, R.layout.sample_row, sampleTypes);
 		sampleListView = (ListView) findViewById(R.id.sampleListView);
 		sampleListView.setAdapter(adapter);
-		sampleListView
-				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-					@Override
-					public void onItemClick(AdapterView parentView,
-							View childView, int position, long id) {
-						// preview the sample with a default velocity of 3/4,
-						// a default pan of halfway and a default normal pitch
-						playbackManager.playSample(position - 1,
-								3 * GlobalVars.LEVEL_MAX / 4,
-								GlobalVars.LEVEL_MAX / 2,
-								GlobalVars.LEVEL_MAX / 2);
-					}
-				});
 
 		// get all Manager singletons
 		playbackManager = PlaybackManager.getInstance(this, sampleResources);
@@ -163,9 +186,8 @@ public class BeatBotActivity extends Activity {
 
 		midiManager.setPlaybackManager(playbackManager);
 		recordManager.setMidiManager(midiManager);
-		recordManager.setAudioClassificationManager(new AudioClassificationManager());
-		// recordManager needs the threshold bar (with levels display) to send
-		// decibel levels
+		recordManager
+				.setAudioClassificationManager(new AudioClassificationManager());
 		recordManager
 				.setThresholdBar((ThresholdBarView) findViewById(R.id.thresholdBar));
 		midiManager.setRecordManager(recordManager);
@@ -179,16 +201,15 @@ public class BeatBotActivity extends Activity {
 			midiView.readFromBundle(savedInstanceState);
 
 		// set midiManager as a global variable, since it needs to be accessed
-		// by
-		// separate MidiFileMenu activity
+		// by separate MidiFileMenu activity
 		GlobalVars gv = (GlobalVars) getApplicationContext();
+		// make midiManager a global var
 		gv.setMidiManager(midiManager);
 
 		((BpmView) findViewById(R.id.bpm)).setText(String
 				.valueOf((int) midiManager.getBPM()));
 
-		// recall from last instance state whether we were recording and/or
-		// playing
+		// were we recording and/or playing before losing the instance?
 		if (savedInstanceState != null) {
 			if (savedInstanceState.getBoolean("recording")) {
 				record(findViewById(R.id.recordButton));
@@ -263,7 +284,7 @@ public class BeatBotActivity extends Activity {
 	// DON'T USE YET! this needs to run on the UI thread somehow.
 	public void activateIcon(int sampleNum) {
 		((ImageView) sampleListView.getChildAt(sampleNum)).setImageState(
-				new int[] { android.R.attr.state_pressed }, true);
+				new int[] { android.R.attr.state_checked }, true);
 	}
 
 	// DON'T USE YET! this needs to run on the UI thread somehow.
@@ -278,8 +299,7 @@ public class BeatBotActivity extends Activity {
 			((ToggleButton) view).setChecked(false);
 		} else {
 			midiView.reset();
-			// if we are already playing, the midiManager is already ticking
-			// away.
+			// if we're already playing, midiManager is already ticking away.
 			if (playbackManager.getState() != PlaybackManager.State.PLAYING)
 				play(findViewById(R.id.playButton));
 			recordManager.startListening();

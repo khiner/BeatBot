@@ -15,7 +15,7 @@
         android:id="@+id/solo"
         android:layout_width="30dp"
         android:layout_height="38dp"
-        android:textOn="" android:textOff=""        
+        android:textOn="" android:textOff=""
         android:background="@drawable/solo_btn_src"/>
 
     <ImageButton
