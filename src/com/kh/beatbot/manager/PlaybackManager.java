@@ -54,12 +54,12 @@ public class PlaybackManager {
 	
 	public void playSample(int sampleNum, int velocity, int pan, int pitch) {
 		if (sampleNum >= 0 && sampleNum < sampleNames.length) {
-//			float normVelocity = velocity/127f;
-//			float normPan = pan/127f;
+			float normVelocity = velocity/127f;
+			float normPan = pan/127f;
 //			float normPitch = 2*pitch/127f;
 			// highlight the icon to indicate playing
 			//context.activateIcon(sampleNum);
-			playSample(sampleNum);
+			playSample(sampleNum, normVelocity, normPan);
 		}
 	}
 	
@@ -69,7 +69,7 @@ public class PlaybackManager {
 		}
 	}
 
-	public native void playSample(int sampleNum);
+	public native void playSample(int sampleNum, float volume, float pan);
 	public native void stopSample(int sampleNum);
 	public native void muteSample(int sampleNum);
 	public native void unmuteSample(int sampleNum);

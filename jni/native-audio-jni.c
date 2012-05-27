@@ -39,14 +39,17 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 
+#define CONV16BIT 32768
+#define CONVMYFLT (1./32768.)
 typedef struct Sample_ {
 	// buffer to hold sample
-	short *buffer;		
+	short *buffer;	
 	int totalSamples;
 
 	SLObjectItf outputPlayerObject;	
-	SLPlayItf outputPlayerPlay;	
-	SLMuteSoloItf outputPlayerMuteSolo;		
+	SLPlayItf outputPlayerPlay;
+	SLVolumeItf outputPlayerVolume;
+	SLMuteSoloItf outputPlayerMuteSolo;
 	// output buffer interfaces
 	SLAndroidSimpleBufferQueueItf outputBufferQueue;		
 } Sample;
@@ -73,7 +76,7 @@ void Java_com_kh_beatbot_BeatBotActivity_createEngine(JNIEnv* env, jclass clazz,
 {
     SLresult result;
 
-	numSamples = (int)_numSamples;
+	numSamples = _numSamples;
 	samples = (Sample*)malloc(sizeof(Sample)*numSamples);
 	
     // create engine
@@ -158,10 +161,10 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
 	SLDataSource outputAudioSrc = {&loc_bufq, &format_pcm};
 
 	// create audio player for output buffer queue
-    const SLInterfaceID ids1[] = {SL_IID_ANDROIDSIMPLEBUFFERQUEUE, SL_IID_MUTESOLO};
+    const SLInterfaceID ids1[] = {SL_IID_ANDROIDSIMPLEBUFFERQUEUE, SL_IID_VOLUME, SL_IID_MUTESOLO};
     const SLboolean req1[] = {SL_BOOLEAN_TRUE};
     result = (*engineEngine)->CreateAudioPlayer(engineEngine, &(sample->outputPlayerObject), &outputAudioSrc, &audioSnk,
-												   2, ids1, req1);
+												   3, ids1, req1);
 	
 	// realize the output player
     result = (*(sample->outputPlayerObject))->Realize(sample->outputPlayerObject, SL_BOOLEAN_FALSE);
@@ -171,6 +174,10 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
 	result = (*(sample->outputPlayerObject))->GetInterface(sample->outputPlayerObject, SL_IID_PLAY, &(sample->outputPlayerPlay));
 	assert(result == SL_RESULT_SUCCESS);
 
+	// get the volume interface
+	result = (*(sample->outputPlayerObject))->GetInterface(sample->outputPlayerObject, SL_IID_VOLUME, &(sample->outputPlayerVolume));
+	assert(result == SL_RESULT_SUCCESS);
+	
     // get the mute/solo interface
 	result = (*(sample->outputPlayerObject))->GetInterface(sample->outputPlayerObject, SL_IID_MUTESOLO, &(sample->outputPlayerMuteSolo));
 	assert(result == SL_RESULT_SUCCESS);
@@ -190,15 +197,27 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
     return JNI_TRUE;
 }
 
+short* volumePanFilter(short inBuffer[], int size, float volume, float pan) {
+	short *outBuffer = malloc(size*sizeof(short));	
+	float leftVolume = (1 - pan)*volume;
+	float rightVolume = pan*volume;
+	int i;
+	for (i = 0; i < size; i+=2) {
+		outBuffer[i] = inBuffer[i]*leftVolume;
+		outBuffer[i+1] = inBuffer[i]*rightVolume;
+	}
+	return outBuffer;
+}
+
 void Java_com_kh_beatbot_manager_PlaybackManager_playSample(JNIEnv* env,
-        jclass clazz, jint sampleNum)
+        jclass clazz, jint sampleNum, jfloat volume, jfloat pan)
 {
 	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
-	Sample *sample = &samples[(int)sampleNum];
-
-	(*(sample->outputBufferQueue))->Enqueue(sample->outputBufferQueue,
-											sample->buffer, sample->totalSamples*sizeof(short));
+	Sample *sample = &samples[sampleNum];
+	short *outBuffer = volumePanFilter(sample->buffer, sample->totalSamples, volume, pan);
+	(*(sample->outputBufferQueue))->Enqueue(sample->outputBufferQueue,											
+											outBuffer, sample->totalSamples*sizeof(short));
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_stopSample(JNIEnv* env,
@@ -206,7 +225,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_stopSample(JNIEnv* env,
 {
 	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
-	Sample *sample = &samples[(int)sampleNum];
+	Sample *sample = &samples[sampleNum];
 	(*(sample->outputBufferQueue))->Clear(sample->outputBufferQueue);
 }
 
@@ -231,6 +250,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_unmuteSample(JNIEnv* env,
 	(*(sample->outputPlayerMuteSolo))->SetChannelMute(sample->outputPlayerMuteSolo, 0, SL_BOOLEAN_FALSE);
 	(*(sample->outputPlayerMuteSolo))->SetChannelMute(sample->outputPlayerMuteSolo, 1, SL_BOOLEAN_FALSE);		
 }
+
 void Java_com_kh_beatbot_manager_PlaybackManager_soloSample(JNIEnv* env,
 															  jclass clazz, jint sampleNum)
 {
