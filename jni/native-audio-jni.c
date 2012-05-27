@@ -26,6 +26,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "smbPitchShift.h"
+
 // for __android_log_print(ANDROID_LOG_INFO, "YourApp", "formatted message");
 // #include <android/log.h>
 
@@ -43,7 +45,10 @@
 #define CONVMYFLT (1./32768.)
 typedef struct Sample_ {
 	// buffer to hold sample
-	short *buffer;	
+	float *buffer;	
+	float *scratchBuffer;
+	short *outBuffer;
+	
 	int totalSamples;
 
 	SLObjectItf outputPlayerObject;	
@@ -142,15 +147,19 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
 
 	// asset->getLength() returns size in bytes.  we need size in shorts
 	sample->totalSamples = AAsset_getLength(asset)/2;
+	sample->buffer = malloc(sizeof(float)*sample->totalSamples);
+	sample->scratchBuffer = malloc(sizeof(float)*sample->totalSamples);
+	sample->outBuffer = malloc(sizeof(short)*sample->totalSamples);
+	
 	char *charBuf = malloc(sizeof(char)*sample->totalSamples*2);
-	charBuf = (char *)AAsset_getBuffer(asset);
-	sample->buffer = (short *)malloc(sizeof(short)*sample->totalSamples);
+	charBuf = AAsset_getBuffer(asset);
 	int i;
 	for (i = 0; i < sample->totalSamples; i++) {
-		sample->buffer[i] = charsToShort(charBuf[i*2 + 1], charBuf[i*2]);
+		sample->buffer[i] = charsToShort(charBuf[i*2 + 1], charBuf[i*2])*CONVMYFLT;
 	}
 	free(charBuf);
     AAsset_close(asset);
+	memcpy(sample->scratchBuffer, sample->buffer, sample->totalSamples);
 	
     // configure audio sink
     SLDataLocator_OutputMix loc_outmix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
@@ -197,16 +206,21 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
     return JNI_TRUE;
 }
 
-short* volumePanFilter(short inBuffer[], int size, float volume, float pan) {
-	short *outBuffer = malloc(size*sizeof(short));	
+void volumePanFilter(float inBuffer[], float outBuffer[], int size, float volume, float pan) {
 	float leftVolume = (1 - pan)*volume;
 	float rightVolume = pan*volume;
 	int i;
 	for (i = 0; i < size; i+=2) {
 		outBuffer[i] = inBuffer[i]*leftVolume;
-		outBuffer[i+1] = inBuffer[i]*rightVolume;
+		outBuffer[i+1] = inBuffer[i + 1]*rightVolume;
 	}
-	return outBuffer;
+}
+
+void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {
+	int i;
+	for (i = 0; i < size; i++) {
+		outBuffer[i] = (short)(inBuffer[i]*CONV16BIT);
+	}
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_playSample(JNIEnv* env,
@@ -215,9 +229,11 @@ void Java_com_kh_beatbot_manager_PlaybackManager_playSample(JNIEnv* env,
 	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
 	Sample *sample = &samples[sampleNum];
-	short *outBuffer = volumePanFilter(sample->buffer, sample->totalSamples, volume, pan);
+	volumePanFilter(sample->scratchBuffer, sample->scratchBuffer, sample->totalSamples, volume, pan);
+	floatArytoShortAry(sample->scratchBuffer, sample->outBuffer, sample->totalSamples);
 	(*(sample->outputBufferQueue))->Enqueue(sample->outputBufferQueue,											
-											outBuffer, sample->totalSamples*sizeof(short));
+											sample->outBuffer, sample->totalSamples*sizeof(short));
+	memcpy(sample->scratchBuffer, sample->buffer, sample->totalSamples);	
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_stopSample(JNIEnv* env,
@@ -272,6 +288,8 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv* env, jclass clazz)
 		sample->outputBufferQueue = NULL;			
 		sample->outputPlayerPlay = NULL;
 		free(sample->buffer);
+		free(sample->scratchBuffer);
+		free(sample->outBuffer);
 	}
 
 	free(samples);
