@@ -63,6 +63,11 @@ static AAssetManager* assetManager = NULL;
 // output mix interfaces
 static SLObjectItf outputMixObject = NULL;
 
+static SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, 2, SL_SAMPLINGRATE_44_1,
+									  SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
+									  SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT,
+								      SL_BYTEORDER_LITTLEENDIAN};
+
 // create the engine and output mix objects
 void Java_com_kh_beatbot_BeatBotActivity_createEngine(JNIEnv* env, jclass clazz, jobject _assetManager, jint _numSamples)
 {
@@ -98,18 +103,6 @@ void Java_com_kh_beatbot_BeatBotActivity_createEngine(JNIEnv* env, jclass clazz,
     assert(NULL != assetManager);
 }
 
-short swapShort( short Value ) {
-	char c, *in;
-	
-	in = (char *) &Value;
-		
-	c=*in;                /* Value in left byte stored in c */
-	*in=*(in+1);          /* New Left byte value set to Old right byte value */
-	*(in+1)=c;            /* New Right byte value set to Old left byte value sorted in c */ 
-	
-	return( Value );	
-}  
-
 short charsToShort(char first, char second) {
 	return (first << 8) | second;
 }
@@ -121,8 +114,6 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
 	if (sampleCount >= numSamples) {
 		return JNI_FALSE;
 	}
-	
-    SLresult result;
 
     // convert Java string to UTF-8
     const jbyte *utf8 = (*env)->GetStringUTFChars(env, filename, NULL);
@@ -139,12 +130,15 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
     }
 
 	Sample *sample = &samples[sampleCount];
+    SLresult result;
 	
     // open asset as file descriptor
     off_t start, length;
     int fd = AAsset_openFileDescriptor(asset, &start, &length);
     assert(0 <= fd);
-	sample->totalSamples = AAsset_getLength(asset)/2; // asset->getLength() returns size in bytes.  we need size in shorts
+
+	// asset->getLength() returns size in bytes.  we need size in shorts
+	sample->totalSamples = AAsset_getLength(asset)/2;
 	char *charBuf = malloc(sizeof(char)*sample->totalSamples*2);
 	charBuf = (char *)AAsset_getBuffer(asset);
 	sample->buffer = (short *)malloc(sizeof(short)*sample->totalSamples);
@@ -155,13 +149,6 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
 	free(charBuf);
     AAsset_close(asset);
 	
-    // configure audio source for FileDescriptor player (source is asset file)
-
-	int speakers = SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;
-    SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, 2, SL_SAMPLINGRATE_44_1,
-		SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
-	speakers, SL_BYTEORDER_LITTLEENDIAN};
-
     // configure audio sink
     SLDataLocator_OutputMix loc_outmix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
     SLDataSink audioSnk = {&loc_outmix, NULL};
