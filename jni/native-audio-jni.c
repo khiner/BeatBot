@@ -193,7 +193,7 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
 void Java_com_kh_beatbot_manager_PlaybackManager_playSample(JNIEnv* env,
         jclass clazz, jint sampleNum)
 {
-	if (sampleNum <= 0 || sampleNum >= numSamples)
+	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
 	Sample *sample = &samples[(int)sampleNum];
 
@@ -204,7 +204,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_playSample(JNIEnv* env,
 void Java_com_kh_beatbot_manager_PlaybackManager_stopSample(JNIEnv* env,
 													jclass clazz, jint sampleNum)
 {
-	if (sampleNum <= 0 || sampleNum >= numSamples)
+	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
 	Sample *sample = &samples[(int)sampleNum];
 	(*(sample->outputBufferQueue))->Clear(sample->outputBufferQueue);
