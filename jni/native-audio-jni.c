@@ -26,7 +26,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "smbPitchShift.h"
+#include "effects.h"
 
 // for __android_log_print(ANDROID_LOG_INFO, "YourApp", "formatted message");
 // #include <android/log.h>
@@ -48,9 +48,10 @@ typedef struct Sample_ {
 	float *buffer;	
 	float *scratchBuffer;
 	short *outBuffer;
-	
 	int totalSamples;
-
+	
+	DELAYLINE *delayLine;
+	
 	SLObjectItf outputPlayerObject;	
 	SLPlayItf outputPlayerPlay;
 	SLVolumeItf outputPlayerVolume;
@@ -152,14 +153,16 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
 	sample->outBuffer = malloc(sizeof(short)*sample->totalSamples);
 	
 	char *charBuf = malloc(sizeof(char)*sample->totalSamples*2);
-	charBuf = AAsset_getBuffer(asset);
+	charBuf = (char *)AAsset_getBuffer(asset);
 	int i;
 	for (i = 0; i < sample->totalSamples; i++) {
 		sample->buffer[i] = charsToShort(charBuf[i*2 + 1], charBuf[i*2])*CONVMYFLT;
 	}
 	free(charBuf);
     AAsset_close(asset);
-	memcpy(sample->scratchBuffer, sample->buffer, sample->totalSamples);
+	memcpy(sample->scratchBuffer, sample->buffer, sample->totalSamples*sizeof(float));
+
+	sample->delayLine = delayline_create(0.1f*(sampleCount + 1), 0.7f);
 	
     // configure audio sink
     SLDataLocator_OutputMix loc_outmix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
@@ -224,16 +227,17 @@ void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_playSample(JNIEnv* env,
-        jclass clazz, jint sampleNum, jfloat volume, jfloat pan)
+        jclass clazz, jint sampleNum, jfloat volume, jfloat pan, jfloat pitch)
 {
 	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
 	Sample *sample = &samples[sampleNum];
 	volumePanFilter(sample->scratchBuffer, sample->scratchBuffer, sample->totalSamples, volume, pan);
+	//delayline_process(sample->delayLine, sample->scratchBuffer, sample->totalSamples);
 	floatArytoShortAry(sample->scratchBuffer, sample->outBuffer, sample->totalSamples);
 	(*(sample->outputBufferQueue))->Enqueue(sample->outputBufferQueue,											
 											sample->outBuffer, sample->totalSamples*sizeof(short));
-	memcpy(sample->scratchBuffer, sample->buffer, sample->totalSamples);	
+	memcpy(sample->scratchBuffer, sample->buffer, sample->totalSamples*sizeof(float));	
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_stopSample(JNIEnv* env,

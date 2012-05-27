@@ -22,15 +22,7 @@
  /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/machine/kernel.h \
  /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/sys/sysmacros.h \
  /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/memory.h \
- /Users/khiner/Documents/workspace/BeatBot/jni/smbPitchShift.h \
- /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/math.h \
- /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/limits.h \
- /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/sys/limits.h \
- /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/linux/limits.h \
- /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/machine/internal_types.h \
- /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/machine/limits.h \
- /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/sys/syslimits.h \
- /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/stdio.h \
+ /Users/khiner/Documents/workspace/BeatBot/jni/effects.h \
  /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/SLES/OpenSLES.h \
  /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/SLES/OpenSLES_Platform.h \
  /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/SLES/OpenSLES_Android.h \
@@ -82,23 +74,7 @@
 
 /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/memory.h:
 
-/Users/khiner/Documents/workspace/BeatBot/jni/smbPitchShift.h:
-
-/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/math.h:
-
-/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/limits.h:
-
-/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/sys/limits.h:
-
-/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/linux/limits.h:
-
-/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/machine/internal_types.h:
-
-/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/machine/limits.h:
-
-/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/sys/syslimits.h:
-
-/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/stdio.h:
+/Users/khiner/Documents/workspace/BeatBot/jni/effects.h:
 
 /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/SLES/OpenSLES.h:
 
