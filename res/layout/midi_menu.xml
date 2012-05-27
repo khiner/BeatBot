@@ -23,4 +23,11 @@
         android:text="@string/open_midi"
         android:onClick="openMidi" />
     
+    <Button
+        android:id="@+id/testOpenSL"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+        android:text="Test OpenSL"
+        android:onClick="testOpenSl" />
+    
 </LinearLayout>

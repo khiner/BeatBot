@@ -1,50 +1,45 @@
 package com.kh.beatbot.manager;
 
 import android.content.Context;
-import android.media.AudioManager;
-import android.media.SoundPool;
+import android.media.AudioFormat;
+import android.media.AudioTrack;
 
 public class PlaybackManager {
-	private class Sample {
-		private int streamId;
-		private boolean muted = false;
-		private float leftVolume = 0;
-		private float rightVolume = 0;
-		
-		public Sample(int streamId) {
-			this.streamId = streamId;
-		}
-	}
 	
 	private static PlaybackManager singletonInstance = null;
-	
 	private State state;
-	private SoundPool soundPool;
+		
+	private String[] sampleNames;
 	
-	private Sample[] samples;	
-
-	private Sample soloSample = null;
+	private static final int SAMPLE_RATE = 41000;
+	private static final int MIN_BUF_SIZE = AudioTrack.getMinBufferSize(SAMPLE_RATE,
+			AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT);				;
+	private static byte[] zeroBytes = new byte[MIN_BUF_SIZE];
+	
+	static {
+		for (int i = 0; i < zeroBytes.length; i++) {
+			zeroBytes[i] = 0;
+		}
+	}
 	
 	public enum State {
 		PLAYING, STOPPED
 	}
 	
-	public static PlaybackManager getInstance(Context context, int[] sampleRawResources) {
+	public static PlaybackManager getInstance(Context context, String[] sampleNames) {
 		if (singletonInstance == null) {
-			singletonInstance = new PlaybackManager(context, sampleRawResources);
+			singletonInstance = new PlaybackManager(context, sampleNames);
 		}
 		return singletonInstance;			
 	}
 	
-	private PlaybackManager(Context context, int[] sampleRawResources) {
-		state = State.STOPPED;		
-		samples = new Sample[sampleRawResources.length];
-		soundPool = new SoundPool(sampleRawResources.length, AudioManager.STREAM_MUSIC, 0);
-		for (int i = 0; i < sampleRawResources.length; i++) {
-			samples[i] = new Sample(soundPool.load(context, sampleRawResources[i], 1));
-		}
+	private PlaybackManager(Context context, String[] sampleNames) {
+		this.sampleNames = sampleNames;
+		//audioTracks = new AudioTrack[sampleNames.length];
+		//streams = new Stream[sampleNames.length];
+		state = State.STOPPED;
 	}
-		
+	
 	public State getState() {
 		return state;
 	}
@@ -57,71 +52,26 @@ public class PlaybackManager {
 		state = State.STOPPED;
 	}
 	
-	public void release() {
-		state = State.STOPPED;
-		soundPool.release();
-	}
-	
-	public void setSolo(int sampleId) {
-		if (sampleId >= 0) {
-			soloSample = samples[sampleId];
-			soundPool.setVolume(soloSample.streamId, soloSample.leftVolume, soloSample.rightVolume);
-			for (Sample sample : samples) {
-				if (!sample.equals(soloSample)) {
-					soundPool.setVolume(sample.streamId, 0, 0);					
-				}
-			}					
-		} else {			
-			soloSample = null;
-			for (Sample sample : samples) {
-				if (!sample.muted)
-					soundPool.setVolume(sample.streamId, sample.leftVolume, sample.rightVolume);					
-			}			
-		}		
-	}
-		
-	public void setMute(int sampleId, boolean muted) {
-		samples[sampleId].muted = muted;
-		if (muted)
-			soundPool.setVolume(samples[sampleId].streamId, 0, 0);
-		else
-			soundPool.setVolume(samples[sampleId].streamId, samples[sampleId].leftVolume, samples[sampleId].rightVolume);
-	}
-	
 	public void playSample(int sampleNum, int velocity, int pan, int pitch) {
-		if (sampleNum >= 0 && sampleNum < samples.length) {
-			float normVelocity = velocity/127f;
-			float normPan = pan/127f;
-			float normPitch = 2*pitch/127f;
-			// set the volume of the sample regardless of mute status, so it is remembered if unmuted mid-note
-			samples[sampleNum].leftVolume = normVelocity*(1 - normPan);
-			samples[sampleNum].rightVolume = normVelocity*normPan;
-			float playVolumeLeft = samples[sampleNum].leftVolume;
-			float playVolumeRight = samples[sampleNum].rightVolume;
-			// if muted or another note is soloing, still play the sample, but just at 0 volume
-			// so we can unmute the sample mid-note
-			if (samples[sampleNum].muted || soloSample != null && !soloSample.equals(samples[sampleNum])) {
-				playVolumeLeft = 0;
-				playVolumeRight = 0;				
-			}
-			samples[sampleNum].streamId = soundPool.play(sampleNum, playVolumeLeft, playVolumeRight, 1, 0, 1);
-			soundPool.setRate(samples[sampleNum].streamId, normPitch);
+		if (sampleNum >= 0 && sampleNum < sampleNames.length) {
+//			float normVelocity = velocity/127f;
+//			float normPan = pan/127f;
+//			float normPitch = 2*pitch/127f;
 			// highlight the icon to indicate playing
 			//context.activateIcon(sampleNum);
-		}
-	}
-	
-	public void stopSample(int sampleNum) {
-		if (sampleNum >= 0 && sampleNum < samples.length) {
-			soundPool.stop(samples[sampleNum].streamId);
-			// set the icon back to normal after playing is done			
-			//context.deactivateIcon(sampleNum);
+			playSample(sampleNum);
 		}
 	}
 	
 	public void stopAllSamples() {
-		for (int sampleID = 0; sampleID < samples.length; sampleID++) {
-			soundPool.stop(samples[sampleID].streamId);
+		for (int sampleNum = 0; sampleNum < sampleNames.length; sampleNum++) {
+			stopSample(sampleNum);
 		}
 	}
+
+	public native void playSample(int sampleNum);
+	public native void stopSample(int sampleNum);
+	public native void muteSample(int sampleNum);
+	public native void unmuteSample(int sampleNum);
+	public native void soloSample(int sampleNum);
 }

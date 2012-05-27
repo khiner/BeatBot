@@ -19,7 +19,8 @@
             android:layout_alignParentLeft="true"
             android:background="@drawable/play_btn_src"
             android:onClick="play"
-            android:textOff="" android:textOn="" />
+            android:textOff="" android:textOn=""
+            android:contentDescription="@string/play" />
 
         <ImageButton
             android:id="@+id/stopButton"
@@ -28,7 +29,8 @@
             android:layout_toRightOf="@+id/playButton"
             android:background="#FF000000"
             android:onClick="stop"
-            android:src="@drawable/stop_btn_src" />
+            android:src="@drawable/stop_btn_src"
+            android:contentDescription="@string/stop" />
 
         <ToggleButton
             android:id="@+id/recordButton"
@@ -37,7 +39,8 @@
             android:layout_toRightOf="@+id/stopButton"
             android:background="@drawable/rec_btn_src"
             android:onClick="record"
-            android:textOff="" android:textOn="" />
+            android:textOff="" android:textOn=""
+            android:contentDescription="@string/record" />
 
         <ToggleButton
             android:id="@+id/levels"
@@ -47,7 +50,8 @@
             android:background="@drawable/levels_btn_src"
             android:onClick="levels"
             android:textOff=""
-            android:textOn="" />
+            android:textOn=""
+            android:contentDescription="@string/levels" />
 
         <ImageButton
             android:id="@+id/undo"
@@ -56,7 +60,8 @@
             android:layout_toLeftOf="@+id/bpm_tap"
             android:background="#FF000000"
             android:onClick="undo"
-            android:src="@drawable/undo_btn_src" />
+            android:src="@drawable/undo_btn_src"
+            android:contentDescription="@string/undo" />
 
         <ImageButton
             android:id="@+id/bpm_tap"
@@ -65,7 +70,8 @@
             android:layout_toLeftOf="@+id/bpm"
             android:background="#FF000000"
             android:onClick="bpmTap"
-            android:src="@drawable/bpm_tap_btn_src" />
+            android:src="@drawable/bpm_tap_btn_src"
+            android:contentDescription="@string/bpm_tap" />
 
         <com.kh.beatbot.view.BpmView
             android:id="@+id/bpm"

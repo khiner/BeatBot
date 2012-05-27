@@ -198,9 +198,9 @@ public class MidiManager implements Parcelable {
 					if (midiNote == null)
 						continue;
 					if (currTick == midiNote.getOnTick())
-						playbackManager.playSample(midiNote.getNoteValue() + 1, midiNote.getVelocity(), midiNote.getPan(), midiNote.getPitch());
+						playbackManager.playSample(midiNote.getNoteValue(), midiNote.getVelocity(), midiNote.getPan(), midiNote.getPitch());
 					else if (currTick == midiNote.getOffTick())
-						playbackManager.stopSample(midiNote.getNoteValue() + 1);
+						playbackManager.stopSample(midiNote.getNoteValue());
 				}
 				// update time of next tick
 				nextTickNano += MSPT * 1000;

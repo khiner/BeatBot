@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -79,18 +80,21 @@ public class BeatBotActivity extends Activity {
 						GlobalVars.LEVEL_MAX / 2);
 			} else if (view.getId() == R.id.mute) {
 				ToggleButton muteButton = (ToggleButton)view;
-				playbackManager.setMute(position, muteButton.isChecked()); 
+				if (muteButton.isChecked())
+					playbackManager.muteSample(position);
+				else
+					playbackManager.unmuteSample(position);
 			} else if (view.getId() == R.id.solo) {
 				ToggleButton soloButton = (ToggleButton)view;
 				if (soloButton.isChecked()) {
-					playbackManager.setSolo(position);
+					playbackManager.soloSample(position);
 					for (ToggleButton otherSoloButton : soloButtons) {
 						if (otherSoloButton.isChecked() && !otherSoloButton.equals(soloButton)) {
 							otherSoloButton.setChecked(false);
 						}
 					}
 				} else
-					playbackManager.setSolo(-1); 
+					playbackManager.soloSample(-1);
 			}			
 		}
 
@@ -101,9 +105,9 @@ public class BeatBotActivity extends Activity {
 			ToggleButton mute = (ToggleButton)view.findViewById(R.id.mute);
 			ToggleButton solo = (ToggleButton)view.findViewById(R.id.solo);
 			soloButtons.add(solo);
-			icon.setTag(position + 1);
-			mute.setTag(position + 1);
-			solo.setTag(position + 1);
+			icon.setTag(position);
+			mute.setTag(position);
+			solo.setTag(position);
 			icon.setOnClickListener(this);
 			mute.setOnClickListener(this);
 			solo.setOnClickListener(this);
@@ -141,12 +145,13 @@ public class BeatBotActivity extends Activity {
 	private MidiManager midiManager;
 	private PlaybackManager playbackManager;
 	private RecordManager recordManager;
+	private static AssetManager assetManager;
 
 	private MidiView midiView;
 
-	private final int[] sampleResources = new int[] { R.raw.kick_808,
-			R.raw.snare_808, R.raw.hat_closed_808, R.raw.hat_open_808,
-			R.raw.rimshot_808, R.raw.tom_low_808 };
+	private final String[] sampleNames = new String[] { "kick_808.wav",
+			"snare_808.wav", "hat_closed_808.wav", "hat_open_808.wav",
+			"rimshot_808.wav", "tom_low_808.wav" };
 
 	private long lastTapTime = 0;
 
@@ -174,8 +179,11 @@ public class BeatBotActivity extends Activity {
 		sampleListView = (ListView) findViewById(R.id.sampleListView);
 		sampleListView.setAdapter(adapter);
 
+		assetManager = getAssets();			
+		createEngine(assetManager, sampleNames.length);
+		createAllAssetAudioPlayers();
 		// get all Manager singletons
-		playbackManager = PlaybackManager.getInstance(this, sampleResources);
+		playbackManager = PlaybackManager.getInstance(this, sampleNames);
 		recordManager = RecordManager.getInstance();
 		// if this context is being restored from a destroyed context,
 		// recover the midiManager. otherwise, create a new one
@@ -224,7 +232,7 @@ public class BeatBotActivity extends Activity {
 		super.onDestroy();
 		if (isFinishing()) {
 			recordManager.release();
-			playbackManager.release();
+			shutdown();			
 			android.os.Process.killProcess(android.os.Process.myPid());
 		}
 	}
@@ -281,6 +289,12 @@ public class BeatBotActivity extends Activity {
 		}
 	}
 
+    private boolean createAllAssetAudioPlayers() {
+    	for (String sampleName : sampleNames)
+    		createAssetAudioPlayer(sampleName);
+    	return true;
+    }
+	
 	// DON'T USE YET! this needs to run on the UI thread somehow.
 	public void activateIcon(int sampleNum) {
 		((ImageView) sampleListView.getChildAt(sampleNum)).setImageState(
@@ -382,4 +396,13 @@ public class BeatBotActivity extends Activity {
 		while (System.currentTimeMillis() - start < millis)
 			;
 	}
+	
+    public static native void createEngine(AssetManager assetManager, int numSamples);
+	public static native boolean createAssetAudioPlayer(String filename);
+    public static native void shutdown();	
+	
+    /** Load jni .so on initialization */
+    static {
+         System.loadLibrary("native-audio-jni");
+    }	
 }
