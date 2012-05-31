@@ -403,6 +403,6 @@ public class BeatBotActivity extends Activity {
 	
     /** Load jni .so on initialization */
     static {
-         System.loadLibrary("native-audio-jni");
+         System.loadLibrary("nativeaudio");
     }	
 }

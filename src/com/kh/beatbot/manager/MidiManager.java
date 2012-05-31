@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Stack;
 
 import android.os.Parcel;
@@ -53,10 +52,6 @@ public class MidiManager implements Parcelable {
 	// ticks per quarter note (I think)
 	public final int RESOLUTION = MidiFile.DEFAULT_RESOLUTION;
 
-	private long currTick = -1;
-	private long loopTick = RESOLUTION * 4;
-	private long MSPT;
-
 	private MidiManager(int numSamples) {
 		this.numSamples = numSamples;
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,
@@ -64,7 +59,8 @@ public class MidiManager implements Parcelable {
 		tempo.setBpm(140);
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
-		MSPT = tempo.getMpqn() / RESOLUTION;
+		setMSPT(tempo.getMpqn() / RESOLUTION);
+		setLoopTick(RESOLUTION * 4);		
 		saveState();
 	}
 	
@@ -89,7 +85,7 @@ public class MidiManager implements Parcelable {
 
 	public void setBPM(float bpm) {
 		tempo.setBpm(bpm);
-		MSPT = tempo.getMpqn() / RESOLUTION;
+		setMSPT(tempo.getMpqn() / RESOLUTION);
 	}
 
 	public int getNumSamples() {
@@ -122,14 +118,6 @@ public class MidiManager implements Parcelable {
 			}
 		}
 		tempNotes.clear();
-	}
-
-	public long getLoopTick() {
-		return loopTick;
-	}
-
-	public void setLoopTick(long loopTick) {
-		this.loopTick = loopTick;
 	}
 
 	public MidiNote addNote(long onTick, long offTick, int note, int velocity, int pan, int pitch) {
@@ -178,52 +166,13 @@ public class MidiManager implements Parcelable {
 		}
 	}
 
-	public void runTicker() {
-		long startNano = System.nanoTime();
-		long nextTickNano = startNano + MSPT * 1000;
-
-		while (playbackManager.getState() == PlaybackManager.State.PLAYING
-				|| recordManager.getState() != RecordManager.State.INITIALIZING) {
-			if (System.nanoTime() >= nextTickNano) {
-				currTick++;
-				if (currTick >= loopTick) {
-					playbackManager.stopAllSamples();
-					recordManager.notifyLoop();
-					currTick = 0;
-				}
-				for (int i = 0; i < midiNotes.size(); i++) {
-					MidiNote midiNote = getMidiNote(i);
-					// note(s) could have been deleted since the start of the
-					// loop
-					if (midiNote == null)
-						continue;
-					if (currTick == midiNote.getOnTick())
-						playbackManager.playSample(midiNote.getNoteValue(), midiNote.getVelocity(), midiNote.getPan(), midiNote.getPitch());
-					else if (currTick == midiNote.getOffTick())
-						playbackManager.stopSample(midiNote.getNoteValue());
-				}
-				// update time of next tick
-				nextTickNano += MSPT * 1000;
+	public void start() {
+		new Thread() {
+			public void run() {
+				startTicking();
 			}
 		}
-	}
-
-	public void start() {
-		tickThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				runTicker();
-			}
-		}, "Tick Thread");
-		tickThread.start();
-	}
-
-	public void reset() {
-		currTick = -1;
-	}
-
-	public long getCurrTick() {
-		return currTick;
+		.start();		
 	}
 
 	public void saveState() {
@@ -328,8 +277,8 @@ public class MidiManager implements Parcelable {
 		}
 		out.writeInt(noteInfo.length);
 		out.writeLongArray(noteInfo);
-		out.writeLong(currTick);
-		out.writeLong(loopTick);
+		out.writeLong(getCurrTick());
+		out.writeLong(getLoopTick());
 	}
 
 	private MidiManager(Parcel in) {
@@ -341,13 +290,22 @@ public class MidiManager implements Parcelable {
 		tempo.setBpm(in.readInt());
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
-		MSPT = in.readLong();
+		setMSPT(in.readLong());
 		long[] noteInfo = new long[in.readInt()];
 		in.readLongArray(noteInfo);
 		for (int i = 0; i < noteInfo.length; i += 4) {
 			addNote(noteInfo[i], noteInfo[i + 1], (int) noteInfo[i + 2], (int)noteInfo[i + 3], (int)noteInfo[i + 4], (int)noteInfo[i + 5]);
 		}
-		currTick = in.readLong();
-		loopTick = in.readLong();
+		setCurrTick(in.readLong());
+		setLoopTick(in.readLong());
 	}
+	
+	public native void setMSPT(long MSPT);
+	public native void reset();
+	public native void setCurrTick(long currTick);
+	public native long getCurrTick();
+	public native long getLoopTick();
+	public native void setLoopTick(long loopTick);
+	
+	public native void startTicking();
 }

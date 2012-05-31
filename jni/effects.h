@@ -1,3 +1,6 @@
+#ifndef EFFECTS_H
+#define EFFECTS_H
+
 #include <stdlib.h>
 
 typedef struct delayline_t {
@@ -12,3 +15,5 @@ DELAYLINE *delayline_create(float delay, float fdb);
 void delayline_process(DELAYLINE *p,float *buffer, int size);
 
 void *delayline_destroy(DELAYLINE *p);
+
+#endif // EFFECTS_H

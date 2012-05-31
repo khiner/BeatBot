@@ -16,8 +16,8 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := native-audio-jni
-LOCAL_SRC_FILES := native-audio-jni.c effects.c
+LOCAL_MODULE    := nativeaudio
+LOCAL_SRC_FILES := nativeaudio.c effects.c hashmap.c ticker.c
 # for native audio
 LOCAL_LDLIBS    += -lOpenSLES
 # for logging

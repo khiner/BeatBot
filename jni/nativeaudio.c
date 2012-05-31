@@ -1,0 +1,340 @@
+#include "nativeaudio.h"
+
+// __android_log_print(ANDROID_LOG_INFO, "YourApp", "formatted message");
+// #include <android/log.h>
+
+static int sampleCount = 0;
+
+// engine interfaces
+static SLObjectItf engineObject = NULL;
+static SLEngineItf engineEngine = NULL;
+static AAssetManager* assetManager = NULL;
+
+// output mix interfaces
+static SLObjectItf outputMixObject = NULL;
+
+// create the engine and output mix objects
+void Java_com_kh_beatbot_BeatBotActivity_createEngine(JNIEnv* env, jclass clazz, jobject _assetManager, jint _numSamples) {
+    SLresult result;
+
+	numSamples = _numSamples;
+	playState = 0;
+	samples = (Sample*)malloc(sizeof(Sample)*numSamples);
+	
+    // create engine
+    result = slCreateEngine(&engineObject, 0, NULL, 0, NULL, NULL);
+    assert(SL_RESULT_SUCCESS == result);
+
+    // realize the engine
+    result = (*engineObject)->Realize(engineObject, SL_BOOLEAN_FALSE);
+    assert(SL_RESULT_SUCCESS == result);
+
+    // get the engine interface, which is needed in order to create other objects
+    result = (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE, &engineEngine);
+    assert(SL_RESULT_SUCCESS == result);
+
+	// create output mix, with volume specified as a non-required interface
+    const SLInterfaceID ids[1] = {SL_IID_VOLUME};
+    const SLboolean req[1] = {SL_BOOLEAN_FALSE};
+    result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 1, ids, req);
+    assert(SL_RESULT_SUCCESS == result);
+
+    // realize the output mix
+    result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
+    assert(SL_RESULT_SUCCESS == result);
+	
+    // use asset manager to open asset by filename
+    assetManager = AAssetManager_fromJava(env, _assetManager);
+    assert(NULL != assetManager);
+}
+
+short charsToShort(unsigned char first, unsigned char second) {
+	return (first << 8) | second;
+}
+
+void initSample(Sample *sample, AAsset *asset) {
+	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
+	sample->totalSamples = AAsset_getLength(asset)/2 - 22;
+	sample->buffer = calloc(sample->totalSamples, sizeof(float));
+	sample->playing = 0;
+	sample->currSample = 0;
+	sample->midiEvents = hashmapCreate(20);
+	sample->delayLine = delayline_create(0.8, 0.7);
+}
+
+void volumePanFilter(float inBuffer[], float outBuffer[], int size, float volume, float pan) {
+	float leftVolume = (1 - pan)*volume;
+	float rightVolume = pan*volume;
+	int i;
+	for (i = 0; i < size; i+=2) {
+		outBuffer[i] = inBuffer[i]*leftVolume;
+		outBuffer[i+1] = inBuffer[i + 1]*rightVolume;
+	}
+}
+
+void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {
+	int i;
+	for (i = 0; i < size; i++) {
+		outBuffer[i] = (short)(inBuffer[i]*CONV16BIT);
+	}
+}
+
+void calcNextBuffer(Sample *sample) {
+	// start with all zeros
+	memset(sample->currBufferFlt, 0, BUFF_SIZE*sizeof(float));
+    if (sample->playing) {
+		int nextSize; // how many samples to copy from the source
+		if (sample->currSample + BUFF_SIZE >= sample->totalSamples) {
+			// at the end of the sample - copy all samples that are left
+			nextSize = sample->totalSamples - sample->currSample;
+			// end of sample - stop!
+			sample->playing = 0;
+		} else {
+			nextSize = BUFF_SIZE; // plenty of samples left to copy :)		
+		}					   
+		// copy the next block of data from the scratch buffer into the current float buffer for streaming
+		memcpy(sample->currBufferFlt, &(sample->buffer[sample->currSample]), nextSize*sizeof(float));
+		// if we are at the end of the sample, reset the sample pointer, otherwise increment it
+		sample->currSample = (nextSize < BUFF_SIZE) ? 0 : sample->currSample + BUFF_SIZE;
+    }
+	// calc volume/pan
+	//volumePanFilter(sample->currBufferFlt, sample->currBufferFlt, BUFF_SIZE, sample->volume, sample->pan);
+	// calc delay
+	//delayline_process(sample->delayLine, sample->currBufferFlt, BUFF_SIZE);
+	// convert floats to shorts
+	floatArytoShortAry(sample->currBufferFlt, sample->currBufferShort, BUFF_SIZE);	
+}
+
+// this callback handler is called every time a buffer finishes playing
+void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
+	if (!playState) {
+		// global play is off.  no sound
+		return;
+	}
+	
+	Sample *sample = (Sample *)(context);
+	SLresult result;
+	
+	// calculate the next buffer
+	calcNextBuffer(sample);
+	
+	// enqueue the buffer
+    result = (*bq)->Enqueue(bq, sample->currBufferShort, BUFF_SIZE*sizeof(short));
+    assert(SL_RESULT_SUCCESS == result);
+}
+
+// create asset audio player
+jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env, jclass clazz,
+        jstring filename)
+{
+	if (sampleCount >= numSamples) {
+		return JNI_FALSE;
+	}
+
+    // convert Java string to UTF-8
+    const jbyte *utf8 = (*env)->GetStringUTFChars(env, filename, NULL);
+    assert(NULL != utf8);
+
+	AAsset* asset = AAssetManager_open(assetManager, (const char *) utf8, AASSET_MODE_UNKNOWN);	
+
+    // release the Java string and UTF-8
+    (*env)->ReleaseStringUTFChars(env, filename, utf8);
+	
+    // the asset might not be found
+    if (NULL == asset) {
+        return JNI_FALSE;
+    }
+
+	Sample *sample = &samples[sampleCount];
+    SLresult result;
+	
+    // open asset as file descriptor
+    off_t start, length;
+	
+	initSample(sample, asset);
+	
+	unsigned char *charBuf = (unsigned char *)AAsset_getBuffer(asset);
+	int i;
+	for (i = 0; i < sample->totalSamples; i++) {
+		// first 44 bytes of a wav file are header
+		sample->buffer[i] = charsToShort(charBuf[i*2 + 1 + 44], charBuf[i*2 + 44])*CONVMYFLT;
+	}
+	free(charBuf);
+    AAsset_close(asset);
+	
+    // configure audio sink
+    SLDataLocator_OutputMix loc_outmix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
+    SLDataSink audioSnk = {&loc_outmix, NULL};
+	
+	// config audio source for output buffer (source is a SimpleBufferQueue)
+    SLDataLocator_AndroidSimpleBufferQueue loc_bufq = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 2};
+	SLDataSource outputAudioSrc = {&loc_bufq, &format_pcm};
+
+	// create audio player for output buffer queue
+    const SLInterfaceID ids1[] = {SL_IID_ANDROIDSIMPLEBUFFERQUEUE, SL_IID_VOLUME, SL_IID_MUTESOLO};
+    const SLboolean req1[] = {SL_BOOLEAN_TRUE};
+    result = (*engineEngine)->CreateAudioPlayer(engineEngine, &(sample->outputPlayerObject), &outputAudioSrc, &audioSnk,
+												   3, ids1, req1);
+	
+	// realize the output player
+    result = (*(sample->outputPlayerObject))->Realize(sample->outputPlayerObject, SL_BOOLEAN_FALSE);
+    assert(result == SL_RESULT_SUCCESS);
+
+    // get the play interface
+	result = (*(sample->outputPlayerObject))->GetInterface(sample->outputPlayerObject, SL_IID_PLAY, &(sample->outputPlayerPlay));
+	assert(result == SL_RESULT_SUCCESS);
+
+	// get the volume interface
+	result = (*(sample->outputPlayerObject))->GetInterface(sample->outputPlayerObject, SL_IID_VOLUME, &(sample->outputPlayerVolume));
+	assert(result == SL_RESULT_SUCCESS);
+	
+    // get the mute/solo interface
+	result = (*(sample->outputPlayerObject))->GetInterface(sample->outputPlayerObject, SL_IID_MUTESOLO, &(sample->outputPlayerMuteSolo));
+	assert(result == SL_RESULT_SUCCESS);
+	
+	// get the buffer queue interface for output
+    result = (*(sample->outputPlayerObject))->GetInterface(sample->outputPlayerObject, SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
+													   &(sample->outputBufferQueue));
+    assert(result == SL_RESULT_SUCCESS);	
+
+    // register callback on the buffer queue
+    result = (*sample->outputBufferQueue)->RegisterCallback(sample->outputBufferQueue, bufferQueueCallback, sample);
+	
+      // set the player's state to playing
+	result = (*(sample->outputPlayerPlay))->SetPlayState(sample->outputPlayerPlay, SL_PLAYSTATE_PLAYING);
+	assert(result == SL_RESULT_SUCCESS);
+	
+	// all done! increment sample count
+	sampleCount++;
+
+    return JNI_TRUE;
+}
+
+/****************************************************************************************
+ Local versions of playSample and stopSample, to be called by the native MIDI ticker
+ ****************************************************************************************/
+void playSample(int sampleNum, float volume, float pan, float pitch) {
+	if (sampleNum < 0 || sampleNum >= numSamples)
+		return;
+	Sample *sample = &samples[sampleNum];
+	sample->playing = 1;	
+	sample->currSample = 0;	
+	sample->volume = volume;
+	sample->pan = pan;
+}
+
+void stopSample(int sampleNum) {
+	if (sampleNum < 0 || sampleNum >= numSamples)
+		return;
+	Sample *sample = &samples[sampleNum];
+	sample->playing = 0;
+	sample->currSample = 0;
+}
+
+
+void stopAll() {
+	int i;
+	for (i = 0; i < sampleCount; i++) {
+		samples[i].playing = 0;
+	}
+}
+
+/****************************************************************************************
+ Java PlaybackManager JNI methods
+ ****************************************************************************************/
+void Java_com_kh_beatbot_manager_PlaybackManager_openSlPlay(JNIEnv* env, jclass clazz) {
+	playState = 1;
+	int i;
+	// trigger buffer queue callback to begin writing data to tracks
+	for (i = 0; i < sampleCount; i++) {
+		bufferQueueCallback(samples[i].outputBufferQueue, &(samples[i]));
+	}
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_openSlStop(JNIEnv* env, jclass clazz) {
+	playState = 0;
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_playSample(JNIEnv* env,
+															jclass clazz, jint sampleNum, jfloat volume, jfloat pan, jfloat pitch) {
+	if (sampleNum < 0 || sampleNum >= numSamples)
+		return;
+	Sample *sample = &samples[sampleNum];
+	sample->playing = 1;	
+	sample->currSample = 0;	
+	sample->volume = volume;
+	sample->pan = pan;
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_stopSample(JNIEnv* env,
+															jclass clazz, jint sampleNum) {
+	if (sampleNum < 0 || sampleNum >= numSamples)
+		return;
+	Sample *sample = &samples[sampleNum];
+	sample->playing = 0;
+	sample->currSample = 0;
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_muteSample(JNIEnv* env,
+															jclass clazz, jint sampleNum)
+{
+	if (sampleNum < 0 || sampleNum >= numSamples)
+		return;
+	Sample *sample = &samples[sampleNum];
+	if (sample->outputPlayerMuteSolo != NULL) {
+		(*(sample->outputPlayerMuteSolo))->SetChannelMute(sample->outputPlayerMuteSolo, 0, SL_BOOLEAN_TRUE);
+		(*(sample->outputPlayerMuteSolo))->SetChannelMute(sample->outputPlayerMuteSolo, 1, SL_BOOLEAN_TRUE);	
+	}
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_unmuteSample(JNIEnv* env,
+															jclass clazz, jint sampleNum)
+{
+	if (sampleNum < 0 || sampleNum >= numSamples)
+		return;
+	Sample *sample = &samples[sampleNum];
+	(*(sample->outputPlayerMuteSolo))->SetChannelMute(sample->outputPlayerMuteSolo, 0, SL_BOOLEAN_FALSE);
+	(*(sample->outputPlayerMuteSolo))->SetChannelMute(sample->outputPlayerMuteSolo, 1, SL_BOOLEAN_FALSE);		
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_soloSample(JNIEnv* env,
+															  jclass clazz, jint sampleNum)
+{
+	if (sampleNum < 0 || sampleNum >= numSamples)
+		return;	
+	Sample *sample = &samples[sampleNum];
+	(*(sample->outputPlayerMuteSolo))->SetChannelSolo(sample->outputPlayerMuteSolo, 0, SL_BOOLEAN_TRUE);
+	(*(sample->outputPlayerMuteSolo))->SetChannelSolo(sample->outputPlayerMuteSolo, 1, SL_BOOLEAN_TRUE);		
+}
+
+// shut down the native audio system
+void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv* env, jclass clazz)
+{
+	// destroy all samples
+	int i;
+	for (i = 0; i < numSamples; i++) {
+		Sample *sample = &samples[i];
+		(*(sample->outputBufferQueue))->Clear(sample->outputBufferQueue);
+		sample->outputBufferQueue = NULL;			
+		sample->outputPlayerPlay = NULL;
+		free(sample->buffer);
+		free(sample->currBufferFlt);
+		free(sample->currBufferShort);
+		free(sample->delayLine);
+		hashmapFree(sample->midiEvents);
+	}
+	free(samples);
+	
+    // destroy output mix object, and invalidate all associated interfaces
+    if (outputMixObject != NULL) {
+        (*outputMixObject)->Destroy(outputMixObject);
+        outputMixObject = NULL;
+    }
+
+    // destroy engine object, and invalidate all associated interfaces
+    if (engineObject != NULL) {
+        (*engineObject)->Destroy(engineObject);
+        engineObject = NULL;
+        engineEngine = NULL;
+    }
+}
