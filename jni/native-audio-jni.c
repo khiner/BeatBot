@@ -28,7 +28,7 @@
 
 #include "effects.h"
 
-// for __android_log_print(ANDROID_LOG_INFO, "YourApp", "formatted message");
+// __android_log_print(ANDROID_LOG_INFO, "YourApp", "formatted message");
 // #include <android/log.h>
 
 // for native audio
@@ -43,26 +43,39 @@
 
 #define CONV16BIT 32768
 #define CONVMYFLT (1./32768.)
+#define BUFF_SIZE 2048
+
+
 typedef struct Sample_ {
+	float currBufferFlt[BUFF_SIZE];
+	short currBufferShort[BUFF_SIZE];
+	
 	// buffer to hold sample
 	float *buffer;	
 	float *scratchBuffer;
-	short *outBuffer;
+
 	int totalSamples;
+	int currSample;
+
+	float volume;
+	float pan;
 	
+	unsigned int playing;
+
 	DELAYLINE *delayLine;
 	
-	SLObjectItf outputPlayerObject;	
+	SLObjectItf outputPlayerObject;
 	SLPlayItf outputPlayerPlay;
 	SLVolumeItf outputPlayerVolume;
 	SLMuteSoloItf outputPlayerMuteSolo;
 	// output buffer interfaces
-	SLAndroidSimpleBufferQueueItf outputBufferQueue;		
+	SLAndroidSimpleBufferQueueItf outputBufferQueue;
 } Sample;
 
 static Sample *samples;
 static int numSamples;
 static int sampleCount = 0;
+static unsigned int playing = 0;
 
 // engine interfaces
 static SLObjectItf engineObject = NULL;
@@ -78,8 +91,7 @@ static SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, 2, SL_SAMPLINGRATE_44_1
 								      SL_BYTEORDER_LITTLEENDIAN};
 
 // create the engine and output mix objects
-void Java_com_kh_beatbot_BeatBotActivity_createEngine(JNIEnv* env, jclass clazz, jobject _assetManager, jint _numSamples)
-{
+void Java_com_kh_beatbot_BeatBotActivity_createEngine(JNIEnv* env, jclass clazz, jobject _assetManager, jint _numSamples) {
     SLresult result;
 
 	numSamples = _numSamples;
@@ -112,8 +124,81 @@ void Java_com_kh_beatbot_BeatBotActivity_createEngine(JNIEnv* env, jclass clazz,
     assert(NULL != assetManager);
 }
 
-short charsToShort(char first, char second) {
+short charsToShort(unsigned char first, unsigned char second) {
 	return (first << 8) | second;
+}
+
+void initSample(Sample *sample, AAsset *asset) {
+	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
+	sample->totalSamples = AAsset_getLength(asset)/2 - 22;
+	sample->buffer = calloc(sample->totalSamples, sizeof(float));
+	sample->scratchBuffer = calloc(sample->totalSamples, sizeof(float));
+	sample->playing = 0;
+	sample->currSample = 0;
+	sample->delayLine = delayline_create(0.8, 0.7);
+}
+
+void volumePanFilter(float inBuffer[], float outBuffer[], int size, float volume, float pan) {
+	float leftVolume = (1 - pan)*volume;
+	float rightVolume = pan*volume;
+	int i;
+	for (i = 0; i < size; i+=2) {
+		outBuffer[i] = inBuffer[i]*leftVolume;
+		outBuffer[i+1] = inBuffer[i + 1]*rightVolume;
+	}
+}
+
+void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {
+	int i;
+	for (i = 0; i < size; i++) {
+		outBuffer[i] = (short)(inBuffer[i]*CONV16BIT);
+	}
+}
+
+void calcNextBuffer(Sample *sample) {
+	// start with all zeros
+	memset(sample->currBufferFlt, 0, BUFF_SIZE*sizeof(float));
+    if (sample->playing) {
+		int nextSize; // how many samples to copy from the source
+		if (sample->currSample + BUFF_SIZE >= sample->totalSamples) {
+			// at the end of the sample - copy all samples that are left
+			nextSize = sample->totalSamples - sample->currSample;
+			// end of sample - stop!
+			sample->playing = 0;
+		} else {
+			nextSize = BUFF_SIZE; // plenty of samples left to copy :)		
+		}					   
+		// copy the next block of data from the scratch buffer into the current float buffer for streaming
+		memcpy(sample->currBufferFlt, &(sample->buffer[sample->currSample]), nextSize*sizeof(float));
+		// if we are at the end of the sample, reset the sample pointer, otherwise increment it
+		sample->currSample = (nextSize < BUFF_SIZE) ? 0 : sample->currSample + BUFF_SIZE;
+    }
+	// calc volume/pan
+	volumePanFilter(sample->currBufferFlt, sample->currBufferFlt, BUFF_SIZE, sample->volume, sample->pan);
+	// calc delay
+	//delayline_process(sample->delayLine, sample->currBufferFlt, BUFF_SIZE);
+	// convert floats to shorts
+	floatArytoShortAry(sample->currBufferFlt, sample->currBufferShort, BUFF_SIZE);	
+}
+
+// this callback handler is called every time a buffer finishes playing
+void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
+	if (!playing) {
+		// global play is off.  no sound
+		return;
+	}
+	
+	Sample *sample = (Sample *)(context);
+	SLresult result;
+	
+	// enqueue another buffer
+    result = (*bq)->Enqueue(bq, sample->currBufferShort, BUFF_SIZE*sizeof(short));
+//	short shortBuffer[sample->totalSamples];	
+//	floatArytoShortAry(sample->buffer, shortBuffer, sample->totalSamples);	
+//	result = (*bq)->Enqueue(bq, shortBuffer, sample->totalSamples*sizeof(short));
+    assert(SL_RESULT_SUCCESS == result);
+	// calculate the next buffer
+	calcNextBuffer(sample);
 }
 
 // create asset audio player
@@ -143,26 +228,18 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
 	
     // open asset as file descriptor
     off_t start, length;
-    int fd = AAsset_openFileDescriptor(asset, &start, &length);
-    assert(0 <= fd);
-
-	// asset->getLength() returns size in bytes.  we need size in shorts
-	sample->totalSamples = AAsset_getLength(asset)/2;
-	sample->buffer = malloc(sizeof(float)*sample->totalSamples);
-	sample->scratchBuffer = malloc(sizeof(float)*sample->totalSamples);
-	sample->outBuffer = malloc(sizeof(short)*sample->totalSamples);
 	
-	char *charBuf = malloc(sizeof(char)*sample->totalSamples*2);
-	charBuf = (char *)AAsset_getBuffer(asset);
+	initSample(sample, asset);
+	
+	unsigned char *charBuf = (unsigned char *)AAsset_getBuffer(asset);
 	int i;
 	for (i = 0; i < sample->totalSamples; i++) {
-		sample->buffer[i] = charsToShort(charBuf[i*2 + 1], charBuf[i*2])*CONVMYFLT;
+		// first 44 bytes of a wav file are header
+		sample->buffer[i] = charsToShort(charBuf[i*2 + 1 + 44], charBuf[i*2 + 44])*CONVMYFLT;
 	}
 	free(charBuf);
     AAsset_close(asset);
 	memcpy(sample->scratchBuffer, sample->buffer, sample->totalSamples*sizeof(float));
-
-	sample->delayLine = delayline_create(0.1f*(sampleCount + 1), 0.7f);
 	
     // configure audio sink
     SLDataLocator_OutputMix loc_outmix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
@@ -198,7 +275,10 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
     result = (*(sample->outputPlayerObject))->GetInterface(sample->outputPlayerObject, SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
 													   &(sample->outputBufferQueue));
     assert(result == SL_RESULT_SUCCESS);	
-			
+
+    // register callback on the buffer queue
+    result = (*sample->outputBufferQueue)->RegisterCallback(sample->outputBufferQueue, bufferQueueCallback, sample);
+	
       // set the player's state to playing
 	result = (*(sample->outputPlayerPlay))->SetPlayState(sample->outputPlayerPlay, SL_PLAYSTATE_PLAYING);
 	assert(result == SL_RESULT_SUCCESS);
@@ -209,50 +289,45 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
     return JNI_TRUE;
 }
 
-void volumePanFilter(float inBuffer[], float outBuffer[], int size, float volume, float pan) {
-	float leftVolume = (1 - pan)*volume;
-	float rightVolume = pan*volume;
+void Java_com_kh_beatbot_manager_PlaybackManager_openSlPlay(JNIEnv* env, jclass clazz) {
+	playing = 1;
 	int i;
-	for (i = 0; i < size; i+=2) {
-		outBuffer[i] = inBuffer[i]*leftVolume;
-		outBuffer[i+1] = inBuffer[i + 1]*rightVolume;
+	// trigger buffer queue callback to begin writing data to tracks
+	for (i = 0; i < sampleCount; i++) {
+		bufferQueueCallback(samples[i].outputBufferQueue, &(samples[i]));
 	}
 }
 
-void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {
-	int i;
-	for (i = 0; i < size; i++) {
-		outBuffer[i] = (short)(inBuffer[i]*CONV16BIT);
-	}
+void Java_com_kh_beatbot_manager_PlaybackManager_openSlStop(JNIEnv* env, jclass clazz) {
+	playing = 0;
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_playSample(JNIEnv* env,
-        jclass clazz, jint sampleNum, jfloat volume, jfloat pan, jfloat pitch)
-{
+        jclass clazz, jint sampleNum, jfloat volume, jfloat pan, jfloat pitch) {
 	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
 	Sample *sample = &samples[sampleNum];
-	volumePanFilter(sample->scratchBuffer, sample->scratchBuffer, sample->totalSamples, volume, pan);
-	//delayline_process(sample->delayLine, sample->scratchBuffer, sample->totalSamples);
-	floatArytoShortAry(sample->scratchBuffer, sample->outBuffer, sample->totalSamples);
-	(*(sample->outputBufferQueue))->Enqueue(sample->outputBufferQueue,											
-											sample->outBuffer, sample->totalSamples*sizeof(short));
-	memcpy(sample->scratchBuffer, sample->buffer, sample->totalSamples*sizeof(float));	
+	sample->playing = 1;	
+	sample->currSample = 0;	
+	sample->volume = volume;
+	sample->pan = pan;
+	memset(sample->currBufferFlt, 0, BUFF_SIZE*sizeof(float));
+	memset(sample->currBufferShort, 0, BUFF_SIZE*sizeof(short));
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_stopSample(JNIEnv* env,
-													jclass clazz, jint sampleNum)
-{
+													jclass clazz, jint sampleNum) {
 	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
 	Sample *sample = &samples[sampleNum];
-	(*(sample->outputBufferQueue))->Clear(sample->outputBufferQueue);
+	sample->playing = 0;
+	sample->currSample = 0;
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_muteSample(JNIEnv* env,
 															jclass clazz, jint sampleNum)
 {
-	if (sampleNum <= 0 || sampleNum >= numSamples)
+	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
 	Sample *sample = &samples[sampleNum];
 	if (sample->outputPlayerMuteSolo != NULL) {
@@ -264,7 +339,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_muteSample(JNIEnv* env,
 void Java_com_kh_beatbot_manager_PlaybackManager_unmuteSample(JNIEnv* env,
 															jclass clazz, jint sampleNum)
 {
-	if (sampleNum <= 0 || sampleNum >= numSamples)
+	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
 	Sample *sample = &samples[sampleNum];
 	(*(sample->outputPlayerMuteSolo))->SetChannelMute(sample->outputPlayerMuteSolo, 0, SL_BOOLEAN_FALSE);
@@ -274,7 +349,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_unmuteSample(JNIEnv* env,
 void Java_com_kh_beatbot_manager_PlaybackManager_soloSample(JNIEnv* env,
 															  jclass clazz, jint sampleNum)
 {
-	if (sampleNum <= 0 || sampleNum >= numSamples)
+	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;	
 	Sample *sample = &samples[sampleNum];
 	(*(sample->outputPlayerMuteSolo))->SetChannelSolo(sample->outputPlayerMuteSolo, 0, SL_BOOLEAN_TRUE);
@@ -284,7 +359,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_soloSample(JNIEnv* env,
 // shut down the native audio system
 void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv* env, jclass clazz)
 {
-    // destroy file descriptor audio player object, and invalidate all associated interfaces
+	// destroy all samples
 	int i;
 	for (i = 0; i < numSamples; i++) {
 		Sample *sample = &samples[i];
@@ -293,10 +368,12 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv* env, jclass clazz)
 		sample->outputPlayerPlay = NULL;
 		free(sample->buffer);
 		free(sample->scratchBuffer);
-		free(sample->outBuffer);
+		free(sample->currBufferFlt);
+		free(sample->currBufferShort);
+		free(sample->delayLine);
 	}
-
 	free(samples);
+	
     // destroy output mix object, and invalidate all associated interfaces
     if (outputMixObject != NULL) {
         (*outputMixObject)->Destroy(outputMixObject);

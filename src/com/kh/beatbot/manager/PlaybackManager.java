@@ -46,10 +46,12 @@ public class PlaybackManager {
 	
 	public void play() {
 		state = State.PLAYING;
+		openSlPlay();
 	}
 
 	public void stop() {
 		state = State.STOPPED;
+		openSlStop();
 	}
 	
 	public void playSample(int sampleNum, int velocity, int pan, int pitch) {
@@ -69,6 +71,8 @@ public class PlaybackManager {
 		}
 	}
 
+	public native void openSlPlay();
+	public native void openSlStop();
 	public native void playSample(int sampleNum, float volume, float pan, float pitch);
 	public native void stopSample(int sampleNum);
 	public native void muteSample(int sampleNum);
