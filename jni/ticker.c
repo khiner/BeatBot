@@ -1,10 +1,6 @@
 #include <stdint.h>
 #include "nativeaudio.h"
 
-#define ON_EVENT 1
-#define OFF_EVENT -1
-#define NO_EVENT 0
-
 // nanoseconds per tick
 long NSPT = 100;
 
@@ -62,18 +58,14 @@ void Java_com_kh_beatbot_manager_MidiManager_startTicking(JNIEnv *env, jclass cl
 		int i;
 		for (i = 0; i < numSamples; i++) {
 			Sample *sample = &samples[i];
-			Hashmap *midiEvents = sample->midiEvents;
-			MidiEvent *currEvent = (MidiEvent *)hashmapGet(sample->midiEvents, &currTick);
-			if (currEvent == NULL) {
+			MidiEventNode *midiEventHead = sample->eventHead;
+			MidiEvent *currEvent = findEvent(midiEventHead, currTick);
+			if (currEvent == NULL)
 				continue;
-			}
-			switch (currEvent->eventType) {
-				case ON_EVENT:
-					playSample(i, currEvent->volume, currEvent->pan, currEvent->pitch);
-					break;
-				case OFF_EVENT:
-					stopSample(i);
-					break;
+		    if (sample->playing) {
+				stopSample(i);
+			} else {
+				playSample(i, currEvent->volume, currEvent->pan, currEvent->pitch);
 			}
 		}
 		// update time of next tick

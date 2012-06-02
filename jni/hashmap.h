@@ -8,6 +8,10 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
+#define ON_EVENT 1
+#define OFF_EVENT -1
+#define NO_EVENT 0
+
 typedef struct Entry Entry;
 struct Entry {
     void* key;

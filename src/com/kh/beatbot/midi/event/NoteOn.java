@@ -18,11 +18,11 @@ package com.kh.beatbot.midi.event;
 
 public class NoteOn extends ChannelEvent {
 
-	public NoteOn(long tick, int channel, int note, int velocity, int pan, int pitch) {
+	public NoteOn(long tick, int channel, int note, float velocity, float pan, float pitch) {
 		super(tick, ChannelEvent.NOTE_ON, channel, note, velocity, pan, pitch);
 	}
 	
-	public NoteOn(long tick, long delta, int channel, int note, int velocity, int pan, int pitch) {
+	public NoteOn(long tick, long delta, int channel, int note, float velocity, float pan, float pitch) {
 		super(tick, delta, ChannelEvent.NOTE_ON, channel, note, velocity, pan, pitch);
 	}
 }

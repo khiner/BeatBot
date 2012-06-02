@@ -20,26 +20,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.kh.beatbot.global.GlobalVars;
+
 public class ChannelEvent extends MidiEvent {
 
 	protected int mType;
 	protected int mChannel;
-	protected int mValue1;
-	protected int mValue2;
-	protected int mValue3;
-	protected int pitch;
+	protected int note;
+	protected float velocity;
+	protected float pan;
+	protected float pitch;
 	
-	protected ChannelEvent(long tick, int type, int channel, int param1, int param2, int param3, int pitch) {
-		this(tick, 0, type, channel, param1, param2, param3, pitch);
+	protected ChannelEvent(long tick, int type, int channel, int note, float velocity, float pan, float pitch) {
+		this(tick, 0, type, channel, note, velocity, pan, pitch);
 	}
-	protected ChannelEvent(long tick, long delta, int type, int channel, int param1, int param2, int param3, int pitch) {
+	protected ChannelEvent(long tick, long delta, int type, int channel, int note, float velocity, float pan, float pitch) {
 		super(tick, delta);
 		
 		mType = type & 0x0F;
 		mChannel = channel & 0x0F;
-		mValue1 = param1 & 0xFF;
-		mValue2 = param2 & 0xFF;
-		mValue3 = param3 & 0xFF;
+		this.note = note & 0xFF;
+		this.velocity = velocity;
+		this.pan = pan;
 		this.pitch = pitch;
 	}
 	
@@ -48,34 +50,34 @@ public class ChannelEvent extends MidiEvent {
 	}
 	
 	public int getNoteValue() {
-		return mValue1;
+		return note;
 	}
 	
-	public int getVelocity() {
-		return mValue2;
+	public float getVelocity() {
+		return velocity;
 	}
 	
-	public int getPan() {
-		return mValue3;
+	public float getPan() {
+		return pan;
 	}
 	
-	public int getPitch() {
+	public float getPitch() {
 		return pitch;
 	}
 	
 	public void setNoteValue(int p) {
-		mValue1 = p;
+		note = p;
 	}
 	
-	public void setVelocity(int v) {
-		mValue2 = v;
+	public void setVelocity(float velocity) {
+		this.velocity = velocity;
 	}
 	
-	public void setPan(int pan) {
-		mValue3 = pan;
+	public void setPan(float pan) {
+		this.pan = pan;
 	}
 	
-	public void setPitch(int pitch) {
+	public void setPitch(float pitch) {
 		this.pitch = pitch;
 	}
 	
@@ -113,11 +115,11 @@ public class ChannelEvent extends MidiEvent {
 		if(mType != o.getType()) {
 			return 1;
 		}
-		if(mValue1 != o.mValue1) {
-			return mValue1 < o.mValue1 ? -1 : 1;
+		if(note != o.note) {
+			return note < o.note ? -1 : 1;
 		}
-		if(mValue2 != o.mValue2) {
-			return mValue2 < o.mValue2 ? -1 : 1;
+		if(velocity != o.velocity) {
+			return velocity < o.velocity ? -1 : 1;
 		}
 		if(mChannel != o.getChannel()) {
 			return mChannel < o.getChannel() ? -1 : 1;
@@ -147,28 +149,27 @@ public class ChannelEvent extends MidiEvent {
 			out.write(typeChannel);
 		}
 		
-		out.write(mValue1);
+		out.write(note);
 		if(mType != PROGRAM_CHANGE && mType != CHANNEL_AFTERTOUCH) {
-			out.write(mValue2);
-			out.write(mValue3);
+			int int_vel = (int)(velocity*GlobalVars.LEVEL_MAX) & 0xFF;
+			int int_pan = (int)(pan*GlobalVars.LEVEL_MAX) & 0xFF;
+			out.write(int_vel);
+			out.write(int_pan);
 		}
 	}
 	public static ChannelEvent parseChannelEvent(long tick, long delta, int type, int channel, InputStream in) throws IOException {
 		
 		int note = in.read();
-		int velocity = in.read();
-		int pan = in.read();
-		
-		
+		float velocity = (float)in.read()/(float)GlobalVars.LEVEL_MAX;
+		float pan = (float)in.read()/(float)GlobalVars.LEVEL_MAX;
+				
 		switch(type) {
 			case NOTE_OFF:
-				return new NoteOff(tick, delta, channel, note, velocity, pan, 64);
+				return new NoteOff(tick, delta, channel, note, velocity, pan, .5f);
 			case NOTE_ON:
-				return new NoteOn(tick, delta, channel, note, velocity, pan, 64);
-			case PITCH_BEND:
-				return new PitchBend(tick, delta, channel, note, velocity, pan, 64);
+				return new NoteOn(tick, delta, channel, note, velocity, pan, .5f);
 			default:
-				return new ChannelEvent(tick, delta, type, channel, note, velocity, pan, 64);
+				return new ChannelEvent(tick, delta, type, channel, note, velocity, pan, .5f);
 		}
 	}
 	

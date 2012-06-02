@@ -41,43 +41,43 @@ public class MidiNote {
 		return noteOn.getNoteValue();
 	}
 	
-	public int getVelocity() {
+	public float getVelocity() {
 		return noteOn.getVelocity();
 	}
 	
-	public int getPan() {
+	public float getPan() {
 		return noteOn.getPan();
 	}
 	
-	public int getPitch() {
+	public float getPitch() {
 		return noteOn.getPitch();
 	}
 	
-	public void setVelocity(int velocity) {
+	public void setVelocity(float velocity) {
 		velocity = clipLevel(velocity);
 		noteOn.setVelocity(velocity);
 		noteOff.setVelocity(velocity);
 	}
 	
-	public void setPan(int pan) {
+	public void setPan(float pan) {
 		pan = clipLevel(pan);
 		noteOn.setPan(pan);
 		noteOff.setPan(pan);
 	}
 	
-	public void setPitch(int pitch) {
+	public void setPitch(float pitch) {
 		pitch = clipLevel(pitch);
 		noteOn.setPitch(pitch);
 		noteOff.setPitch(pitch);
 	}
 	
 	// clip the level to be within the min/max allowed
-	// level range (0-127)
-	private int clipLevel(int level) {
+	// (0-1)
+	private float clipLevel(float level) {
 		if (level < 0)
 			return 0;
-		if (level > GlobalVars.LEVEL_MAX)
-			return 127;
+		if (level > 1)
+			return 1;
 		return level;
 	}
 	
@@ -104,7 +104,7 @@ public class MidiNote {
 		return noteOff.getTick() - noteOn.getTick();
 	}
 	
-	public int getLevel(LevelsViewHelper.LevelMode levelMode) {
+	public float getLevel(LevelsViewHelper.LevelMode levelMode) {
 		if (levelMode == LevelsViewHelper.LevelMode.VOLUME)
 			return noteOn.getVelocity();
 		else if (levelMode == LevelsViewHelper.LevelMode.PAN)
@@ -115,12 +115,22 @@ public class MidiNote {
 		return 0;
 	}
 	
-	public void setLevel(LevelsViewHelper.LevelMode levelMode, int level) {
-		if (levelMode == LevelsViewHelper.LevelMode.VOLUME)
+	public void setLevel(LevelsViewHelper.LevelMode levelMode, float level) {
+		if (levelMode == LevelsViewHelper.LevelMode.VOLUME) {
 			setVelocity(level);
-		else if (levelMode == LevelsViewHelper.LevelMode.PAN)
+			setVolume(getNoteValue(), getOnTick(), level);
+		}
+		else if (levelMode == LevelsViewHelper.LevelMode.PAN) {
 			setPan(level);
-		else if (levelMode == LevelsViewHelper.LevelMode.PITCH)
+			setPan(getNoteValue(), getOnTick(), level);
+		}
+		else if (levelMode == LevelsViewHelper.LevelMode.PITCH) {
 			setPitch(level);
+			setPitch(getNoteValue(), getOnTick(), level);
+		}
 	}
+	
+	public native void setVolume(int track, long onTick, float volume);
+	public native void setPan(int track, long onTick, float pan);
+	public native void setPitch(int track, long onTick, float pitch);	
 }

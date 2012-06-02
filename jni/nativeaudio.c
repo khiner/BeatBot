@@ -52,13 +52,22 @@ short charsToShort(unsigned char first, unsigned char second) {
 	return (first << 8) | second;
 }
 
+MidiEvent* initEvent(long onTick, long offTick, float volume, float pan, float pitch) {
+	MidiEvent *event = malloc(sizeof(MidiEvent));
+	event->onTick = onTick;
+	event->offTick = offTick;
+	event->volume = volume;
+	event->pan = pan;
+	event->pitch = pitch;
+    return event;
+}
+
 void initSample(Sample *sample, AAsset *asset) {
 	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
 	sample->totalSamples = AAsset_getLength(asset)/2 - 22;
 	sample->buffer = calloc(sample->totalSamples, sizeof(float));
-	sample->playing = 0;
+	sample->playing = false;
 	sample->currSample = 0;
-	sample->midiEvents = hashmapCreate(20);
 	sample->delayLine = delayline_create(0.8, 0.7);
 }
 
@@ -82,20 +91,18 @@ void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {
 void calcNextBuffer(Sample *sample) {
 	// start with all zeros
 	memset(sample->currBufferFlt, 0, BUFF_SIZE*sizeof(float));
-    if (sample->playing) {
+    if (sample->playing && sample->currSample < sample->totalSamples) {
 		int nextSize; // how many samples to copy from the source
 		if (sample->currSample + BUFF_SIZE >= sample->totalSamples) {
 			// at the end of the sample - copy all samples that are left
 			nextSize = sample->totalSamples - sample->currSample;
-			// end of sample - stop!
-			sample->playing = 0;
 		} else {
 			nextSize = BUFF_SIZE; // plenty of samples left to copy :)		
 		}					   
 		// copy the next block of data from the scratch buffer into the current float buffer for streaming
 		memcpy(sample->currBufferFlt, &(sample->buffer[sample->currSample]), nextSize*sizeof(float));
 		// if we are at the end of the sample, reset the sample pointer, otherwise increment it
-		sample->currSample = (nextSize < BUFF_SIZE) ? 0 : sample->currSample + BUFF_SIZE;
+		sample->currSample += nextSize;
     }
 	// calc volume/pan
 	//volumePanFilter(sample->currBufferFlt, sample->currBufferFlt, BUFF_SIZE, sample->volume, sample->pan);
@@ -217,8 +224,8 @@ void playSample(int sampleNum, float volume, float pan, float pitch) {
 	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
 	Sample *sample = &samples[sampleNum];
-	sample->playing = 1;	
-	sample->currSample = 0;	
+	sample->playing = true;
+	sample->currSample = 0;
 	sample->volume = volume;
 	sample->pan = pan;
 }
@@ -227,7 +234,7 @@ void stopSample(int sampleNum) {
 	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
 	Sample *sample = &samples[sampleNum];
-	sample->playing = 0;
+	sample->playing = false;
 	sample->currSample = 0;
 }
 
@@ -235,7 +242,7 @@ void stopSample(int sampleNum) {
 void stopAll() {
 	int i;
 	for (i = 0; i < sampleCount; i++) {
-		samples[i].playing = 0;
+		samples[i].playing = false;
 	}
 }
 
@@ -260,7 +267,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_playSample(JNIEnv* env,
 	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
 	Sample *sample = &samples[sampleNum];
-	sample->playing = 1;	
+	sample->playing = true;	
 	sample->currSample = 0;	
 	sample->volume = volume;
 	sample->pan = pan;
@@ -271,13 +278,12 @@ void Java_com_kh_beatbot_manager_PlaybackManager_stopSample(JNIEnv* env,
 	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
 	Sample *sample = &samples[sampleNum];
-	sample->playing = 0;
+	sample->playing = false;
 	sample->currSample = 0;
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_muteSample(JNIEnv* env,
-															jclass clazz, jint sampleNum)
-{
+															jclass clazz, jint sampleNum) {
 	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
 	Sample *sample = &samples[sampleNum];
@@ -288,8 +294,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_muteSample(JNIEnv* env,
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_unmuteSample(JNIEnv* env,
-															jclass clazz, jint sampleNum)
-{
+															jclass clazz, jint sampleNum) {
 	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;
 	Sample *sample = &samples[sampleNum];
@@ -298,13 +303,129 @@ void Java_com_kh_beatbot_manager_PlaybackManager_unmuteSample(JNIEnv* env,
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_soloSample(JNIEnv* env,
-															  jclass clazz, jint sampleNum)
-{
+															  jclass clazz, jint sampleNum) {
 	if (sampleNum < 0 || sampleNum >= numSamples)
 		return;	
 	Sample *sample = &samples[sampleNum];
 	(*(sample->outputPlayerMuteSolo))->SetChannelSolo(sample->outputPlayerMuteSolo, 0, SL_BOOLEAN_TRUE);
 	(*(sample->outputPlayerMuteSolo))->SetChannelSolo(sample->outputPlayerMuteSolo, 1, SL_BOOLEAN_TRUE);		
+}
+
+/****************************************************************************************
+ Java MidiManager JNI methods
+ ****************************************************************************************/
+MidiEvent *findEvent(MidiEventNode *head, long tick) {
+	MidiEventNode *cur_ptr = head;
+	while (cur_ptr != NULL) {
+		if (cur_ptr->event->onTick == tick || cur_ptr->event->offTick == tick)
+			return cur_ptr->event;
+		cur_ptr = cur_ptr->next;
+	}
+	return NULL;
+}
+
+//Adding a Node at the end of the list  
+MidiEventNode *addEvent(MidiEventNode *head, MidiEvent *event) {
+	MidiEventNode *temp = malloc(sizeof(MidiEventNode));
+	temp->event = event;
+	temp->next = head;
+	head = temp;
+	return head;
+}
+
+// Deleting a node from List depending upon the data in the node.
+MidiEventNode *removeEvent(MidiEventNode *head, long onTick, long offTick) {  
+	MidiEventNode *prev_ptr, *cur_ptr = head;  	
+	
+	while(cur_ptr != NULL) {
+		if(cur_ptr->event->onTick == onTick && cur_ptr->event->offTick == offTick) {
+			if(cur_ptr == head) {
+				head = cur_ptr->next;
+				free(cur_ptr->event);
+				free(cur_ptr);				
+				cur_ptr = NULL;				
+				return head;
+			} else {
+				prev_ptr->next = cur_ptr->next;
+				free(cur_ptr->event);
+				free(cur_ptr);				
+				cur_ptr = NULL;
+				return head;
+			}
+		} else {
+			prev_ptr = cur_ptr;
+			cur_ptr = cur_ptr->next;
+		}
+	}
+	return head;
+}
+
+void freeLinkedList(MidiEventNode *head) {
+	MidiEventNode *cur_ptr = head;
+	while (cur_ptr != NULL) {
+		free(cur_ptr->event); // free the event
+		MidiEventNode *prev_ptr = cur_ptr;
+		cur_ptr = cur_ptr->next;
+		free(prev_ptr); // free the entire Node
+	}	
+}
+
+void printLinkedList(MidiEventNode *head) {
+	__android_log_print(ANDROID_LOG_DEBUG, "LL", "Elements:");	
+	MidiEventNode *cur_ptr = head;
+	while (cur_ptr != NULL) {
+		__android_log_print(ANDROID_LOG_DEBUG, "LL Element", "onTick = %d", cur_ptr->event->onTick);
+		__android_log_print(ANDROID_LOG_DEBUG, "LL Element", "offTick = %d", cur_ptr->event->offTick);		
+		cur_ptr = cur_ptr->next;
+	}	
+}
+
+void Java_com_kh_beatbot_manager_MidiManager_addMidiEvents(JNIEnv* env, jclass clazz, jint sampleNum,
+															   jlong onTick, jlong offTick, jfloat volume,
+															   jfloat pan, jfloat pitch) {
+	if (sampleNum < 0 || sampleNum >= numSamples)
+		return;
+	Sample *sample = &samples[sampleNum];
+	MidiEvent *event = initEvent(onTick, offTick, volume, pan, pitch);
+	sample->eventHead = addEvent(sample->eventHead, event);
+}
+
+void Java_com_kh_beatbot_manager_MidiManager_removeMidiEvents(JNIEnv* env, jclass clazz, jint sampleNum,
+															   jlong onTick, jlong offTick) {
+	if (sampleNum < 0 || sampleNum >= numSamples)
+		return;	
+	Sample *sample = &samples[sampleNum];
+	sample->eventHead = removeEvent(sample->eventHead, onTick, offTick);
+}
+
+void Java_com_kh_beatbot_manager_MidiManager_moveMidiEventTicks(JNIEnv* env, jclass clazz, jint sampleNum,
+															    jlong prevOnTick, jlong newOnTick,
+															    jlong prevOffTick, jlong newOffTick) {
+	if (sampleNum < 0 || sampleNum >= numSamples)
+		return;		
+	Sample *sample = &samples[sampleNum];
+	MidiEvent *event = findEvent(sample->eventHead, prevOnTick);
+	if (event != NULL) {
+		event->onTick = newOnTick;
+		event->offTick = newOffTick;
+	}
+}
+
+void Java_com_kh_beatbot_manager_MidiManager_moveMidiEventNote(JNIEnv* env, jclass clazz, jint sampleNum,
+															   jlong onTick, jlong offTick, jint newSampleNum) {
+	if (sampleNum < 0 || sampleNum >= numSamples || newSampleNum < 0 || newSampleNum >= numSamples)
+		return;
+	Sample *prevSample = &samples[sampleNum];
+	Sample *newSample = &samples[newSampleNum];	
+	MidiEvent *event = findEvent(prevSample->eventHead, onTick);
+	if (event != NULL) {	
+		float volume = event->volume;
+		float pan = event->pan;
+		float pitch = event->pitch;
+		prevSample->eventHead = removeEvent(prevSample->eventHead, onTick, offTick);
+		MidiEvent *newEvent = initEvent(onTick, offTick, volume, pan, pitch);
+		newSample->eventHead = addEvent(newSample->eventHead, newEvent);
+	}
 }
 
 // shut down the native audio system
@@ -321,7 +442,7 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv* env, jclass clazz)
 		free(sample->currBufferFlt);
 		free(sample->currBufferShort);
 		free(sample->delayLine);
-		hashmapFree(sample->midiEvents);
+		freeLinkedList(sample->eventHead);
 	}
 	free(samples);
 	

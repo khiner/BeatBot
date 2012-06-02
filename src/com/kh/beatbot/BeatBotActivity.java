@@ -76,8 +76,7 @@ public class BeatBotActivity extends Activity {
 			if (view.getId() == R.id.icon) {
 				// preview the sample with a default velocity of 3/4,
 				// middle pan and normal pitch
-				playbackManager.playSample(position, 3 * GlobalVars.LEVEL_MAX / 4, GlobalVars.LEVEL_MAX / 2,
-						GlobalVars.LEVEL_MAX / 2);
+				playbackManager.playSample(position, .75f, .5f, .5f);
 			} else if (view.getId() == R.id.mute) {
 				ToggleButton muteButton = (ToggleButton)view;
 				if (muteButton.isChecked())

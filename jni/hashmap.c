@@ -159,9 +159,10 @@ static inline bool equalKeys(void* keyA, int hashA, void* keyB, int hashB,
 }
 
 void* hashmapPut(Hashmap* map, void* key, void* value) {
-    int hash = hashKey(map, key);
+    int hash = map->hash(key);//hashKey(map, key);
+	__android_log_print(ANDROID_LOG_VERBOSE, "put hash = ", " %d ", hash);	
     size_t index = calculateIndex(map->bucketCount, hash);
-	
+	__android_log_print(ANDROID_LOG_VERBOSE, "put index = ", " %d ", index);
     Entry** p = &(map->buckets[index]);
     while (true) {
         Entry* current = *p;
@@ -191,21 +192,24 @@ void* hashmapPut(Hashmap* map, void* key, void* value) {
 }
 
 void* hashmapGet(Hashmap* map, void* key) {
-    int hash = hashKey(map, key);
+    int hash = map->hash(key);//hashKey(map, key);	
+	__android_log_print(ANDROID_LOG_VERBOSE, "get hash = ", " %d ", hash);	
     size_t index = calculateIndex(map->bucketCount, hash);
+	__android_log_print(ANDROID_LOG_VERBOSE, "after off remove", "moving");	__android_log_print(ANDROID_LOG_VERBOSE, "get index = ", " %d ", index);	
     Entry* entry = map->buckets[index];
     while (entry != NULL) {
         if (equalKeys(entry->key, entry->hash, key, hash, map->equals)) {
+			__android_log_print(ANDROID_LOG_VERBOSE, "returning", "value");
             return entry->value;
         }
         entry = entry->next;
     }
-	
+	__android_log_print(ANDROID_LOG_VERBOSE, "returning", "null");
     return NULL;
 }
 
 bool hashmapContainsKey(Hashmap* map, void* key) {
-    int hash = hashKey(map, key);
+    int hash = map->hash(key);//hashKey(map, key);
     size_t index = calculateIndex(map->bucketCount, hash);
 	
     Entry* entry = map->buckets[index];
@@ -221,7 +225,7 @@ bool hashmapContainsKey(Hashmap* map, void* key) {
 
 void* hashmapMemoize(Hashmap* map, void* key, 
 					 void* (*initialValue)(void* key, void* context), void* context) {
-    int hash = hashKey(map, key);
+    int hash = map->hash(key);//hashKey(map, key);
     size_t index = calculateIndex(map->bucketCount, hash);
 	
     Entry** p = &(map->buckets[index]);
@@ -253,7 +257,7 @@ void* hashmapMemoize(Hashmap* map, void* key,
 }
 
 void* hashmapRemove(Hashmap* map, void* key) {
-    int hash = hashKey(map, key);
+    int hash = map->hash(key);//hashKey(map, key);
     size_t index = calculateIndex(map->bucketCount, hash);
 	
     // Pointer to the current entry.

@@ -32,7 +32,21 @@ static SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, 2, SL_SAMPLINGRATE_44_1
 									  SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT,
 									  SL_BYTEORDER_LITTLEENDIAN};
 
+typedef struct MidiEvent_ {
+	long onTick;
+	long offTick;	
+	float volume;
+	float pan;
+	float pitch;
+} MidiEvent;
+
+typedef struct MidiEventNode_ {
+	MidiEvent *event;
+	struct MidiEventNode_ *next;
+} MidiEventNode;
+
 typedef struct Sample_ {
+	MidiEventNode *eventHead;
 	float currBufferFlt[BUFF_SIZE];
 	short currBufferShort[BUFF_SIZE];
 	
@@ -45,9 +59,7 @@ typedef struct Sample_ {
 	float volume;
 	float pan;
 	
-	unsigned int playing;
-	
-	Hashmap *midiEvents;
+	bool playing;
 	
 	DELAYLINE *delayLine;
 	
@@ -59,17 +71,12 @@ typedef struct Sample_ {
 	SLAndroidSimpleBufferQueueItf outputBufferQueue;
 } Sample;
 
-typedef struct MidiEvent_ {
-	int eventType;
-	float volume;
-	float pan;
-	float pitch;
-} MidiEvent;
-
 unsigned int playState;
 Sample *samples;
 int numSamples;
 
+MidiEvent *findEvent(MidiEventNode *midiEventHead, long tick);
+void printLinkedList(MidiEventNode *head);
 void playSample(int sampleNum, float volume, float pan, float pitch);
 void stopSample(int sampleNum);
 void stopAll();

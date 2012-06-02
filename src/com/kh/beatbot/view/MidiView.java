@@ -11,7 +11,6 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
@@ -575,44 +574,49 @@ public class MidiView extends SurfaceViewBase {
 	private long dragNote(int pointerId, MidiNote midiNote, long tickDiff) {
 		long beforeTick = midiNote.getOnTick();
 		if (startOnTicks.containsKey(pointerId)) {
+			long newOnTick = midiNote.getOnTick(), newOffTick = midiNote.getOffTick();			
 			// drag only if the note is moved a certain distance
 			// from its start tick this prevents minute finger
 			// movements from moving/quantizing notes and also
 			// indicates a "sticking point" of the initial note position
 			if (Math.abs(startOnTicks.get(pointerId) - midiNote.getOnTick())
 					+ Math.abs(tickDiff) > 10) {
-				midiNote.setOnTick(midiNote.getOnTick() + tickDiff);
-				midiNote.setOffTick(midiNote.getOffTick() + tickDiff);
+				newOnTick = midiNote.getOnTick() + tickDiff;
+				newOffTick = midiNote.getOffTick() + tickDiff;
+				midiManager.setNoteTicks(midiNote, newOnTick, newOffTick);
 				if (bean.isSnapToGrid()) // quantize if snapToGrid mode is
 											// on
 					midiManager.quantize(midiNote,
 							tickWindow.getCurrentBeatDivision());
 			} else { // inside threshold distance - set to original position
-				midiNote.setOffTick(startOnTicks.get(pointerId)
-						+ midiNote.getOffTick() - midiNote.getOnTick());
-				midiNote.setOnTick(startOnTicks.get(pointerId));
+				newOnTick = startOnTicks.get(pointerId);
+				newOffTick = startOnTicks.get(pointerId) +
+						midiNote.getOffTick() - midiNote.getOnTick(); 
+				midiManager.setNoteTicks(midiNote, newOnTick, newOffTick);
 			}
+			bean.setStateChanged(true);
 		}
-		bean.setStateChanged(true);
 		return midiNote.getOnTick() - beforeTick;
 	}
 
 	private void pinchNote(MidiNote midiNote, long onTickDiff, long offTickDiff) {
+		long newOnTick = midiNote.getOnTick(), newOffTick = midiNote.getOffTick();
 		if (bean.isSnapToGrid()) {
 			long minDiff = tickWindow.getMajorTickSpacing() / 2;
 			if (Math.abs(onTickDiff) >= minDiff) {
-				midiNote.setOnTick(tickWindow.getMajorTickToLeftOf(midiNote
-						.getOnTick() + onTickDiff));
+				newOnTick = tickWindow.getMajorTickToLeftOf(midiNote
+						.getOnTick() + onTickDiff);
 			}
 			if (Math.abs(offTickDiff) >= minDiff) {
-				midiNote.setOffTick(tickWindow.getMajorTickToLeftOf(midiNote
-						.getOffTick() + offTickDiff));
+				newOffTick = tickWindow.getMajorTickToLeftOf(midiNote
+						.getOffTick() + offTickDiff);
 			}
 		} else {
-			midiNote.setOnTick(midiNote.getOnTick() + onTickDiff);
+			newOnTick = midiNote.getOnTick() + onTickDiff;
 			if (midiNote.getOffTick() + offTickDiff <= tickWindow.getMaxTicks())
-				midiNote.setOffTick(midiNote.getOffTick() + offTickDiff);
+				newOffTick = midiNote.getOffTick() + offTickDiff;
 		}
+		midiManager.setNoteTicks(midiNote, newOnTick, newOffTick);
 		bean.setStateChanged(true);
 	}
 
@@ -679,14 +683,11 @@ public class MidiView extends SurfaceViewBase {
 	}
 	
 	public void addMidiNote(long onTick, long offTick, int note) {
-		MidiNote noteToAdd = midiManager.addNote(onTick, offTick, note,
-				3 * GlobalVars.LEVEL_MAX / 4, GlobalVars.LEVEL_MAX / 2,
-				GlobalVars.LEVEL_MAX / 2);
+		MidiNote noteToAdd = midiManager.addNote(onTick, offTick, note, .75f, .5f, .5f);
 		selectedNotes.add(noteToAdd);
 		handleMidiCollisions();
 		midiManager.mergeTempNotes();
-		selectedNotes.remove(noteToAdd);
-		
+		selectedNotes.remove(noteToAdd);		
 	}
 
 	public void handleMidiCollisions() {
@@ -877,20 +878,20 @@ public class MidiView extends SurfaceViewBase {
 						tickDiff = dragNote(id, leftMost, tickDiff);
 						for (MidiNote midiNote : selectedNotes) {
 							if (!midiNote.equals(leftMost)) {
-								midiNote.setOnTick(midiNote.getOnTick()
-										+ tickDiff);
-								midiNote.setOffTick(midiNote.getOffTick()
-										+ tickDiff);
+								midiManager.setNoteTicks(midiNote, midiNote.getOnTick() + tickDiff,
+										midiNote.getOffTick() + tickDiff);
+								bean.setStateChanged(true);
 							}
-							if (moveNote)
-								midiNote.setNote(midiNote.getNoteValue()
-										+ noteDiff);
+							if (moveNote) {
+								midiManager.setNoteValue(midiNote, midiNote.getNoteValue() + noteDiff);
+								bean.setStateChanged(true);
+							}
 						}
 					} else {
 						// dragging more than one note - drag each note
 						// individually
 						dragNote(id, touchedNote, tickDiff);
-						touchedNote.setNote(newNote);
+						midiManager.setNoteValue(touchedNote, newNote);						
 					}
 					// make room in the view window if we are dragging out of
 					// the view

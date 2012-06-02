@@ -10,7 +10,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.view.MotionEvent;
 
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.MidiView;
@@ -19,9 +18,9 @@ import com.kh.beatbot.view.bean.MidiViewBean;
 public class LevelsViewHelper {
 	private class DragLine {
 		private float m;
-		private int b;
+		private float b;
 		private long leftTick, rightTick;
-		private int leftLevel, rightLevel;
+		private float leftLevel, rightLevel;
 		
 		public DragLine() {
 			this.m = 0;
@@ -32,13 +31,13 @@ public class LevelsViewHelper {
 			this.leftTick = 0;
 		}
 
-		public int getLevel(long tick) {
+		public float getLevel(long tick) {
 			if (tick < leftTick)
 				return leftLevel;
 			if (tick > rightTick)
 				return rightLevel;
 			
-			return (int)(m*tick + b);
+			return m*tick + b;
 		}
 	}
 	
@@ -66,9 +65,8 @@ public class LevelsViewHelper {
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedLevels = new HashMap<Integer, MidiNote>();
 
-	// map Midi Note to the offset of their level relative to the touched
-	// level(s)
-	private Map<MidiNote, Integer> levelOffsets = new HashMap<MidiNote, Integer>();
+	// map Midi Note to the offset of their level relative to the touched level(s)
+	private Map<MidiNote, Float> levelOffsets = new HashMap<MidiNote, Float>();
 
 	// last single-tapped level-note
 	private MidiNote tappedLevelNote = null;
@@ -323,15 +321,14 @@ public class LevelsViewHelper {
 		drawLevels();
 	}
 
-	private float levelToY(int level) {
+	private float levelToY(float level) {
 		return bean.getHeight() - MidiViewBean.LEVEL_POINT_SIZE / 2 - level
-				* bean.getLevelsHeight() / GlobalVars.LEVEL_MAX;
+				* bean.getLevelsHeight();
 	}
 
-	private int yToLevel(float y) {
-		return (int) (GlobalVars.LEVEL_MAX
-				* (bean.getHeight() - MidiViewBean.LEVEL_POINT_SIZE / 2 - y) / bean
-					.getLevelsHeight());
+	private float yToLevel(float y) {
+		return (bean.getHeight() - MidiViewBean.LEVEL_POINT_SIZE / 2 - y) / bean
+					.getLevelsHeight();
 	}
 
 	public void doubleTap() {
@@ -379,8 +376,9 @@ public class LevelsViewHelper {
 		if (!touchedLevels.isEmpty()) {
 			for (int i = 0; i < e.getPointerCount(); i++) {
 				MidiNote touched = touchedLevels.get(e.getPointerId(i));
-				if (touched != null)
-					touched.setLevel(levelMode, yToLevel(e.getY(i)));
+				if (touched != null) {
+					touched.setLevel(levelMode, yToLevel(e.getY(i)));				
+				}
 			}
 			updateDragLine();
 			for (MidiNote selected : selectedLevels) {
