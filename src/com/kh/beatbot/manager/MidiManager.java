@@ -228,7 +228,10 @@ public class MidiManager implements Parcelable {
 		if (undoStack.isEmpty())
 			return;
 		List<MidiNote> lastState = undoStack.pop();
-		midiNotes = lastState;
+		clearNotes();
+		for (MidiNote midiNote : lastState) {
+			addNote(midiNote);
+		}
 		currState = copyMidiList(midiNotes);
 	}
 	
