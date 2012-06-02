@@ -58,6 +58,7 @@ typedef struct Sample_ {
 	
 	float volume;
 	float pan;
+	float pitch;
 	
 	bool playing;
 	

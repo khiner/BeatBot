@@ -105,7 +105,7 @@ void calcNextBuffer(Sample *sample) {
 		sample->currSample += nextSize;
     }
 	// calc volume/pan
-	//volumePanFilter(sample->currBufferFlt, sample->currBufferFlt, BUFF_SIZE, sample->volume, sample->pan);
+	volumePanFilter(sample->currBufferFlt, sample->currBufferFlt, BUFF_SIZE, sample->volume, sample->pan);
 	// calc delay
 	//delayline_process(sample->delayLine, sample->currBufferFlt, BUFF_SIZE);
 	// convert floats to shorts
@@ -427,6 +427,40 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiEventNote(JNIEnv* env, jcla
 		newSample->eventHead = addEvent(newSample->eventHead, newEvent);
 	}
 }
+
+/****************************************************************************************
+ Java MidiNote JNI methods
+ ****************************************************************************************/
+void Java_com_kh_beatbot_midi_MidiNote_setVolume(JNIEnv* env, jclass clazz, jint sampleNum, jlong onTick, jfloat volume) {
+	if (sampleNum < 0 || sampleNum >= numSamples)
+		return;		
+	Sample *sample = &samples[sampleNum];
+	MidiEvent *event = findEvent(sample->eventHead, onTick);	
+	if (event != NULL) {
+		event->volume = volume;
+	}
+}
+
+void Java_com_kh_beatbot_midi_MidiNote_setPan(JNIEnv* env, jclass clazz, jint sampleNum, jlong onTick, jfloat pan) {
+	if (sampleNum < 0 || sampleNum >= numSamples)
+		return;		
+	Sample *sample = &samples[sampleNum];
+	MidiEvent *event = findEvent(sample->eventHead, onTick);	
+	if (event != NULL) {
+		event->pan = pan;
+	}
+}
+
+void Java_com_kh_beatbot_midi_MidiNote_setPitch(JNIEnv* env, jclass clazz, jint sampleNum, jlong onTick, jfloat pitch) {
+	if (sampleNum < 0 || sampleNum >= numSamples)
+		return;		
+	Sample *sample = &samples[sampleNum];
+	MidiEvent *event = findEvent(sample->eventHead, onTick);
+	if (event != NULL) {
+		event->pitch = pitch;
+	}
+}
+
 
 // shut down the native audio system
 void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv* env, jclass clazz)
