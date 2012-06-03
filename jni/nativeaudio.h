@@ -33,6 +33,10 @@ static SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, 2, SL_SAMPLINGRATE_44_1
 									  SL_BYTEORDER_LITTLEENDIAN};
 
 typedef struct MidiEvent_ {
+	bool selected;
+	bool levelSelected;
+	
+	bool muted;
 	long onTick;
 	long offTick;	
 	float volume;

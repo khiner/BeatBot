@@ -54,6 +54,9 @@ short charsToShort(unsigned char first, unsigned char second) {
 
 MidiEvent* initEvent(long onTick, long offTick, float volume, float pan, float pitch) {
 	MidiEvent *event = malloc(sizeof(MidiEvent));
+	event->selected = false;
+	event->levelSelected = false;	
+	event->muted = false;
 	event->onTick = onTick;
 	event->offTick = offTick;
 	event->volume = volume;
@@ -232,8 +235,6 @@ void playTrack(int trackNum, float volume, float pan, float pitch) {
 	track->volume = volume;
 	track->pan = pan;
 	track->playing = true;
-	__android_log_print(ANDROID_LOG_VERBOSE, "play volume", "%f", volume);
-	__android_log_print(ANDROID_LOG_VERBOSE, "play pan", "%f", pan);	
 }
 
 void stopTrack(int trackNum) {
@@ -276,9 +277,6 @@ void Java_com_kh_beatbot_manager_PlaybackManager_playTrack(JNIEnv* env,
 	track->volume = volume;
 	track->pan = pan;
 	track->playing = true;
-	__android_log_print(ANDROID_LOG_VERBOSE, "play volume", "%f", volume);	
-	__android_log_print(ANDROID_LOG_VERBOSE, "play pan", "%f", pan);
-	printLinkedList(track->eventHead);
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_stopTrack(JNIEnv* env,
@@ -342,11 +340,12 @@ MidiEventNode *addEvent(MidiEventNode *head, MidiEvent *event) {
 }
 
 // Deleting a node from List depending upon the data in the node.
-MidiEventNode *removeEvent(MidiEventNode *head, long onTick, long offTick) {  
+MidiEventNode *removeEvent(MidiEventNode *head, long onTick, bool muted) {  
 	MidiEventNode *prev_ptr, *cur_ptr = head;  	
 	
 	while(cur_ptr != NULL) {
-		if(cur_ptr->event->onTick == onTick && cur_ptr->event->offTick == offTick) {
+		if((muted && cur_ptr->event->muted) ||
+		   cur_ptr->event->onTick == onTick) {
 			if(cur_ptr == head) {
 				head = cur_ptr->next;
 				free(cur_ptr->event);
@@ -368,6 +367,7 @@ MidiEventNode *removeEvent(MidiEventNode *head, long onTick, long offTick) {
 	return head;
 }
 
+
 void freeLinkedList(MidiEventNode *head) {
 	MidiEventNode *cur_ptr = head;
 	while (cur_ptr != NULL) {
@@ -384,8 +384,6 @@ void printLinkedList(MidiEventNode *head) {
 	while (cur_ptr != NULL) {
 		__android_log_print(ANDROID_LOG_DEBUG, "LL Element", "onTick = %d", cur_ptr->event->onTick);
 		__android_log_print(ANDROID_LOG_DEBUG, "LL Element", "offTick = %d", cur_ptr->event->offTick);		
-		__android_log_print(ANDROID_LOG_DEBUG, "LL Element", "volume = %f", cur_ptr->event->volume);				
-		__android_log_print(ANDROID_LOG_DEBUG, "LL Element", "pan = %f", cur_ptr->event->pan);						
 		cur_ptr = cur_ptr->next;
 	}	
 }
@@ -405,7 +403,7 @@ void Java_com_kh_beatbot_manager_MidiManager_removeMidiEvents(JNIEnv* env, jclas
 	if (trackNum < 0 || trackNum >= numTracks)
 		return;	
 	Track *track = &tracks[trackNum];
-	track->eventHead = removeEvent(track->eventHead, onTick, offTick);
+	track->eventHead = removeEvent(track->eventHead, onTick, false);
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_moveMidiEventTicks(JNIEnv* env, jclass clazz, jint trackNum,
@@ -432,9 +430,30 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiEventNote(JNIEnv* env, jcla
 		float volume = event->volume;
 		float pan = event->pan;
 		float pitch = event->pitch;
-		prevTrack->eventHead = removeEvent(prevTrack->eventHead, onTick, offTick);
+		prevTrack->eventHead = removeEvent(prevTrack->eventHead, onTick, false);
 		MidiEvent *newEvent = initEvent(onTick, offTick, volume, pan, pitch);
 		newTrack->eventHead = addEvent(newTrack->eventHead, newEvent);
+	}
+}
+void Java_com_kh_beatbot_manager_MidiManager_setEventMute(JNIEnv* env, jclass clazz, jint trackNum,
+															   jlong onTick, jlong offTick, jboolean muted) {
+	if (trackNum < 0 || trackNum >= numTracks)
+		return;		
+	Track *track = &tracks[trackNum];
+	MidiEvent *event = findEvent(track->eventHead, onTick);
+	event->muted = muted;
+	if (event->muted)
+		__android_log_print(ANDROID_LOG_VERBOSE, "muted", "true");
+	else
+		__android_log_print(ANDROID_LOG_VERBOSE, "muted", "false");
+}
+
+void Java_com_kh_beatbot_manager_MidiManager_clearMutedEvents(JNIEnv* env, jclass clazz) {
+	int i;
+	for (i = 0; i < numTracks; i++) {
+		Track *track = &tracks[i];
+		MidiEventNode *head = track->eventHead;
+		removeEvent(head, -1, true);	
 	}
 }
 
@@ -448,7 +467,6 @@ void Java_com_kh_beatbot_midi_MidiNote_setVolume(JNIEnv* env, jclass clazz, jint
 	Track *track = &tracks[trackNum];
 	MidiEvent *event = findEvent(track->eventHead, onTick);	
 	if (event != NULL) {
-		__android_log_print(ANDROID_LOG_VERBOSE, "setting volume", "%f", volume);		
 		event->volume = volume;
 	}
 }
@@ -460,9 +478,7 @@ void Java_com_kh_beatbot_midi_MidiNote_setPan(JNIEnv* env, jclass clazz, jint tr
 	MidiEvent *event = findEvent(track->eventHead, onTick);	
 	if (event != NULL) {
 		event->pan = pan;
-		__android_log_print(ANDROID_LOG_VERBOSE, "setting pan", "%f", event->pan);		
 	}
-	printLinkedList(track->eventHead);
 }
 
 void Java_com_kh_beatbot_midi_MidiNote_setPitch(JNIEnv* env, jclass clazz, jint trackNum, jlong onTick, jfloat pitch) {

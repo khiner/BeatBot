@@ -106,17 +106,13 @@ public class MidiManager implements Parcelable {
 				.get(i);
 	}
 
-	public Map<Integer, MidiNote> getTempNotes() {
-		return tempNotes;
-	}
-
 	public void mergeTempNotes() {
 		for (int k : tempNotes.keySet()) {
 			if (k < midiNotes.size()) {// sanity check
-				if (tempNotes.get(k) != null) {
-					replaceNote(k, tempNotes.get(k));					
-				}
-				else {
+				MidiNote temp = tempNotes.get(k);				
+				if (temp != null) {
+					midiNotes.set(k, tempNotes.get(k));
+				} else {
 					removeNote(midiNotes.get(k));
 				}
 			}
@@ -142,6 +138,10 @@ public class MidiManager implements Parcelable {
 				midiNote.getOffTick(), midiNote.getVelocity(), midiNote.getPan(), midiNote.getPitch());
 	}
 	
+	public void putTempNote(int index, MidiNote midiNote) {
+		tempNotes.put(index, midiNote);		
+	}
+	
 	public void removeNote(MidiNote midiNote) {
 		if (midiNotes.contains(midiNote)) {
 			midiNotes.remove(midiNote);
@@ -155,15 +155,12 @@ public class MidiManager implements Parcelable {
 		}
 		midiNotes.clear();
 	}
-	public void replaceNote(int pos, MidiNote newNote) {
-		MidiNote oldNote = midiNotes.get(pos);
-		if (oldNote == null)
-			return;
-		Log.d("replace", "replace");
-		removeMidiEvents(oldNote.getNoteValue(), oldNote.getOnTick(), oldNote.getOffTick());
-		addMidiEvents(newNote.getNoteValue(), newNote.getOnTick(), newNote.getOffTick(),
-				newNote.getVelocity(), newNote.getPan(), newNote.getPitch());
-		midiNotes.set(pos, newNote);
+	
+	public void clearTempNotes() {
+		for (MidiNote midiNote : midiNotes) {
+			setEventMute(midiNote.getNoteValue(), midiNote.getOnTick(), midiNote.getOffTick(), false);
+		}
+		tempNotes.clear();
 	}
 	
 	public void setNoteValue(MidiNote midiNote, int newNote) {
@@ -363,4 +360,6 @@ public class MidiManager implements Parcelable {
 	public native void moveMidiEventTicks(int track, long prevOnTick, long newOnTick, long prevOffTick, long newOffTick);
 	// change track num
 	public native void moveMidiEventNote(int track, long onTick, long offTick, int newTrack);
+	public native void setEventMute(int track, long onTick, long offTick, boolean muted);
+	public native void clearMutedEvents();
 }

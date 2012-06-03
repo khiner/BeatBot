@@ -54,28 +54,28 @@ public class PlaybackManager {
 		openSlStop();
 	}
 	
-	public void playSample(int sampleNum, int velocity, int pan, int pitch) {
-		if (sampleNum >= 0 && sampleNum < sampleNames.length) {
+	public void playTrack(int trackNum, int velocity, int pan, int pitch) {
+		if (trackNum >= 0 && trackNum < sampleNames.length) {
 			float normVelocity = velocity/127f;
 			float normPan = pan/127f;
 			float normPitch = 1.5f*pitch/127f + .5f;
 			// highlight the icon to indicate playing
 			//context.activateIcon(sampleNum);
-			playSample(sampleNum, normVelocity, normPan, normPitch);
+			playTrack(trackNum, normVelocity, normPan, normPitch);
 		}
 	}
 	
-	public void stopAllSamples() {
+	public void stopAllTracks() {
 		for (int sampleNum = 0; sampleNum < sampleNames.length; sampleNum++) {
-			stopSample(sampleNum);
+			stopTrack(sampleNum);
 		}
 	}
 
 	public native void openSlPlay();
 	public native void openSlStop();
-	public native void playSample(int sampleNum, float volume, float pan, float pitch);
-	public native void stopSample(int sampleNum);
-	public native void muteSample(int sampleNum);
-	public native void unmuteSample(int sampleNum);
-	public native void soloSample(int sampleNum);
+	public native void playTrack(int sampleNum, float volume, float pan, float pitch);
+	public native void stopTrack(int sampleNum);
+	public native void muteTrack(int sampleNum);
+	public native void unmuteTrack(int sampleNum);
+	public native void soloTrack(int sampleNum);
 }

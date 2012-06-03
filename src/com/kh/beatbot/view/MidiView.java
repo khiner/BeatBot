@@ -14,7 +14,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
@@ -691,10 +690,10 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	public void handleMidiCollisions() {
-		midiManager.getTempNotes().clear();
+		midiManager.clearTempNotes();
 		for (MidiNote selected : selectedNotes) {
 			for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
-				MidiNote note = midiManager.getMidiNotes().get(i);
+				MidiNote note = midiManager.getMidiNote(i);
 				if (selected.equals(note))
 					continue;
 				if (selected.getNoteValue() == note.getNoteValue()) {
@@ -704,16 +703,19 @@ public class MidiView extends SurfaceViewBase {
 							&& selected.getOnTick() <= note.getOffTick()) {
 						MidiNote copy = note.getCopy();
 						copy.setOffTick(selected.getOnTick() - 1);
-						midiManager.getTempNotes().put(i, copy);
+						// update the native midi events
+						midiManager.moveMidiEventTicks(note.getNoteValue(), note.getOnTick(),
+								copy.getOnTick(), note.getOffTick(), copy.getOffTick());
+						midiManager.putTempNote(i, copy);
 						// if the selected note ends after the beginning
 						// of the other note, or if the selected note completely
-						// covers
-						// the other note, delete the covered note
+						// covers the other note, delete the covered note
 					} else if (selected.getOffTick() >= note.getOnTick()
 							&& selected.getOffTick() <= note.getOffTick()
 							|| selected.getOnTick() <= note.getOnTick()
 							&& selected.getOffTick() >= note.getOffTick()) {
-						midiManager.getTempNotes().put(i, null);
+						midiManager.setEventMute(note.getNoteValue(), note.getOnTick(), note.getOffTick(), true);
+						midiManager.putTempNote(i, null);
 					}
 				}
 			}

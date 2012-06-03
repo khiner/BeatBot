@@ -76,24 +76,24 @@ public class BeatBotActivity extends Activity {
 			if (view.getId() == R.id.icon) {
 				// preview the sample with a default velocity of 3/4,
 				// middle pan and normal pitch
-				playbackManager.playSample(position, .75f, .5f, .5f);
+				playbackManager.playTrack(position, .75f, .5f, .5f);
 			} else if (view.getId() == R.id.mute) {
 				ToggleButton muteButton = (ToggleButton)view;
 				if (muteButton.isChecked())
-					playbackManager.muteSample(position);
+					playbackManager.muteTrack(position);
 				else
-					playbackManager.unmuteSample(position);
+					playbackManager.unmuteTrack(position);
 			} else if (view.getId() == R.id.solo) {
 				ToggleButton soloButton = (ToggleButton)view;
 				if (soloButton.isChecked()) {
-					playbackManager.soloSample(position);
+					playbackManager.soloTrack(position);
 					for (ToggleButton otherSoloButton : soloButtons) {
 						if (otherSoloButton.isChecked() && !otherSoloButton.equals(soloButton)) {
 							otherSoloButton.setChecked(false);
 						}
 					}
 				} else
-					playbackManager.soloSample(-1);
+					playbackManager.soloTrack(-1);
 			}			
 		}
 
@@ -178,9 +178,11 @@ public class BeatBotActivity extends Activity {
 		sampleListView = (ListView) findViewById(R.id.sampleListView);
 		sampleListView.setAdapter(adapter);
 
-		assetManager = getAssets();			
-		createEngine(assetManager, sampleNames.length);
-		createAllAssetAudioPlayers();
+		assetManager = getAssets();	
+		if (savedInstanceState == null) {
+			createEngine(assetManager, sampleNames.length);
+			createAllAssetAudioPlayers();
+		}
 		// get all Manager singletons
 		playbackManager = PlaybackManager.getInstance(this, sampleNames);
 		recordManager = RecordManager.getInstance();

@@ -62,12 +62,12 @@ void Java_com_kh_beatbot_manager_MidiManager_startTicking(JNIEnv *env, jclass cl
 			MidiEvent *currEvent = findEvent(midiEventHead, currTick);
 			if (currEvent == NULL)
 				continue;
-		    if (track->playing) {
+		    if (track->playing && !currEvent->muted) {
 				stopTrack(i);
-			} else {
-				__android_log_print(ANDROID_LOG_VERBOSE, "tick volume", "%f", currEvent->volume);
-				__android_log_print(ANDROID_LOG_VERBOSE, "tick pan", "%f", currEvent->pan);					
+			} else if (!currEvent->muted) {
 				playTrack(i, currEvent->volume, currEvent->pan, currEvent->pitch);
+			} else {
+				__android_log_print(ANDROID_LOG_VERBOSE, "not playin!", "muted");
 			}
 		}
 		// update time of next tick
