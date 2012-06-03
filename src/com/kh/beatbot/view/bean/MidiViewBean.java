@@ -15,31 +15,20 @@ public class MidiViewBean {
 	public final static float VOLUME_R = .412f;
 	public final static float VOLUME_G = .788f;
 	public final static float VOLUME_B = 1;
-
-	// RGB color for volume bars when they are selected	
-	public final static float VOLUME_SELECTED_R = 1;
-	public final static float VOLUME_SELECTED_G = 0;
-	public final static float VOLUME_SELECTED_B = 0;
 	
 	// RGB color for pan bars	
 	public final static float PAN_R = 1;
 	public final static float PAN_G = .788f;
 	public final static float PAN_B = .392f;
-
-	// RGB color for pan bars when they are selected	
-	public final static float PAN_SELECTED_R = 1;
-	public final static float PAN_SELECTED_G = 0;
-	public final static float PAN_SELECTED_B = 0;
 	
 	// RGB color for pitch bars		
 	public final static float PITCH_R = .443f;
 	public final static float PITCH_G = 1;
 	public final static float PITCH_B = .533f;
 	
-	// RGB color for pitch bars	when they are selected
-	public final static float PITCH_SELECTED_R = 1;
-	public final static float PITCH_SELECTED_G = 0;
-	public final static float PITCH_SELECTED_B = 0;
+	public final static float SELECTED_LEVEL_R = .9f;
+	public final static float SELECTED_LEVEL_G = 0;
+	public final static float SELECTED_LEVEL_B = .1f;
 	
 	private MidiView.State viewState = MidiView.State.NORMAL_VIEW;
 	
@@ -91,7 +80,8 @@ public class MidiViewBean {
 	// if true, all midi note movements are rounded to the nearest major tick
 	private boolean snapToGrid = false;
 
-	
+	private int animateCount = 0;
+
 	public MidiView.State getViewState() {
 		return viewState;
 	}
@@ -331,5 +321,13 @@ public class MidiViewBean {
 	public boolean toggleSnapToGrid() {
 		snapToGrid = !snapToGrid;
 		return snapToGrid;
+	}
+	
+	public int getAnimateCount() {
+		return animateCount;
+	}
+
+	public void incrementAnimateCount() {
+		animateCount++;
 	}
 }

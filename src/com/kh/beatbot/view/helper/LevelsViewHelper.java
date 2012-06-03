@@ -83,14 +83,13 @@ public class LevelsViewHelper {
 	}
 
 	private void initLevelBarsVB() {
-		ArrayList<Float> selectedLevelBars = new ArrayList<Float>();		
+		ArrayList<Float> selectedLevelBars = new ArrayList<Float>();
 		for (MidiNote midiNote : midiManager.getMidiNotes()) {
 			if (!midiNote.isLevelSelected())
-				continue;			
+				continue;
 			float x = midiView.tickToX(midiNote.getOnTick());
 			selectedLevelBars.add(x);
-			selectedLevelBars.add(levelToY(midiNote
-					.getLevel(levelMode)));
+			selectedLevelBars.add(levelToY(midiNote.getLevel(levelMode)));
 			selectedLevelBars.add(x);
 			selectedLevelBars.add(bean.getHeight());
 		}
@@ -111,68 +110,59 @@ public class LevelsViewHelper {
 			levelBarsAry[i] = levelBars.get(i);
 		float[] selectedLevelBarsAry = new float[selectedLevelBars.size()];
 		for (int i = 0; i < selectedLevelBarsAry.length; i++)
-			selectedLevelBarsAry[i] = selectedLevelBars.get(i);		
+			selectedLevelBarsAry[i] = selectedLevelBars.get(i);
 		levelBarsVB = MidiView.makeFloatBuffer(levelBarsAry);
 		selectedLevelBarsVB = MidiView.makeFloatBuffer(selectedLevelBarsAry);
 	}
 
 	private void drawLevels() {
-		drawNonSelectedLevels();
-		drawSelectedLevels();
+		drawLevels(true);
+		drawLevels(false);
 	}
 
-	private void drawNonSelectedLevels() {
-		gl.glLineWidth(2f);
-		for (int i = -10; i < 10; i++) {		
-			float alpha = 1 - Math.abs(i)/10f;
-		if (levelMode == LevelMode.VOLUME)
-			gl.glColor4f(MidiViewBean.VOLUME_R, MidiViewBean.VOLUME_G,
-					MidiViewBean.VOLUME_B, alpha);
-		else if (levelMode == LevelMode.PAN)
-			gl.glColor4f(MidiViewBean.PAN_R, MidiViewBean.PAN_G,
-					MidiViewBean.PAN_B, alpha);
-		else if (levelMode == LevelMode.PITCH)
-			gl.glColor4f(MidiViewBean.PITCH_R, MidiViewBean.PITCH_G,
-					MidiViewBean.PITCH_B, alpha);
+	private void drawLevels(boolean selected) {
+		FloatBuffer vertexBuffer = selected ? selectedLevelBarsVB : levelBarsVB;
+		gl.glLineWidth(2f); // 2 pixels wide
+		// draw each line (2*blurWidth) times, translating and changing the
+		// alpha channel
+		// for each line, to achieve a DIY "blur" effect
+		// this blur is animated to get wider and narrower for a "pulse" effect
+		float blurWidth = ((bean.getAnimateCount() / 150)) % 2 == 0 ? (bean
+				.getAnimateCount() / 30f) % 5
+				: 5 - (bean.getAnimateCount() / 30f) % 5;
+		blurWidth += 15;
+		for (float i = -blurWidth; i < blurWidth; i++) {
+			float alpha = 1 - Math.abs(i) / (float) blurWidth;
+			// calculate color. selected bars are always red,
+			// non-selected bars depend on the LevelMode type
+			if (selected) {
+				gl.glColor4f(MidiViewBean.SELECTED_LEVEL_R,
+						MidiViewBean.SELECTED_LEVEL_G,
+						MidiViewBean.SELECTED_LEVEL_B, alpha);
+			} else {
+				if (levelMode == LevelMode.VOLUME)
+					gl.glColor4f(MidiViewBean.VOLUME_R, MidiViewBean.VOLUME_G,
+							MidiViewBean.VOLUME_B, alpha);
+				else if (levelMode == LevelMode.PAN)
+					gl.glColor4f(MidiViewBean.PAN_R, MidiViewBean.PAN_G,
+							MidiViewBean.PAN_B, alpha);
+				else if (levelMode == LevelMode.PITCH)
+					gl.glColor4f(MidiViewBean.PITCH_R, MidiViewBean.PITCH_G,
+							MidiViewBean.PITCH_B, alpha);
+			}
 			gl.glTranslatef(i, 0, 0);
-			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, levelBarsVB);
-			gl.glDrawArrays(GL10.GL_LINES, 0, levelBarsVB.capacity() / 2);
+			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vertexBuffer);
+			gl.glDrawArrays(GL10.GL_LINES, 0, vertexBuffer.capacity() / 2);
 			gl.glTranslatef(-i, 0, 0);
 			// draw circles (big points) at top of level bars
 			if (i < 1)
 				continue;
-			gl.glPointSize((i*4));			
-			for (int j = 0; j < levelBarsVB.capacity() / 2; j += 2) {
+			gl.glPointSize(i * 3.5f);
+			for (int j = 0; j < vertexBuffer.capacity() / 2; j += 2) {
 				gl.glDrawArrays(GL10.GL_POINTS, j, 1);
-			}			
+			}
 		}
-	}
-
-	private void drawSelectedLevels() {
-		gl.glLineWidth(2f);
-		for (int i = -10; i < 10; i++) {		
-			float alpha = 1 - Math.abs(i)/10f;
-		if (levelMode == LevelMode.VOLUME)
-			gl.glColor4f(MidiViewBean.VOLUME_SELECTED_R, MidiViewBean.VOLUME_SELECTED_G,
-					MidiViewBean.VOLUME_SELECTED_B, alpha);
-		else if (levelMode == LevelMode.PAN)
-			gl.glColor4f(MidiViewBean.PAN_SELECTED_R, MidiViewBean.PAN_SELECTED_G,
-					MidiViewBean.PAN_SELECTED_B, alpha);
-		else if (levelMode == LevelMode.PITCH)
-			gl.glColor4f(MidiViewBean.PITCH_SELECTED_R, MidiViewBean.PITCH_SELECTED_G,
-					MidiViewBean.PITCH_SELECTED_B, alpha);
-			gl.glTranslatef(i, 0, 0);
-			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, selectedLevelBarsVB);
-			gl.glDrawArrays(GL10.GL_LINES, 0, selectedLevelBarsVB.capacity() / 2);
-			gl.glTranslatef(-i, 0, 0);
-			// draw circles (big points) at top of level bars
-			if (i < 1)
-				continue;
-			gl.glPointSize((i*4));			
-			for (int j = 0; j < selectedLevelBarsVB.capacity() / 2; j += 2) {
-				gl.glDrawArrays(GL10.GL_POINTS, j, 1);
-			}			
-		}
+		bean.incrementAnimateCount();
 	}
 
 	public void selectLevel(float x, float y, int pointerId) {
@@ -304,7 +294,7 @@ public class LevelsViewHelper {
 			midiNote.setLevelSelected(false);
 		}
 	}
-	
+
 	// add all non-overlapping notes to selectedLevelNotes
 	public void updateSelectedLevelNotes() {
 		deselectAllLevelViews();
@@ -416,10 +406,11 @@ public class LevelsViewHelper {
 			}
 			updateDragLine();
 			for (MidiNote selected : midiManager.getMidiNotes()) {
-				if (selected.isLevelSelected() && levelOffsets.get(selected) != null) {
+				if (selected.isLevelSelected()
+						&& levelOffsets.get(selected) != null) {
 					selected.setLevel(levelMode,
-						dragLine.getLevel(selected.getOnTick())
-								+ levelOffsets.get(selected));
+							dragLine.getLevel(selected.getOnTick())
+									+ levelOffsets.get(selected));
 				}
 			}
 
