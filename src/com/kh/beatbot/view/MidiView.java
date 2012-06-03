@@ -3,7 +3,6 @@ package com.kh.beatbot.view;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.microedition.khronos.opengles.GL10;
