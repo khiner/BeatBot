@@ -130,6 +130,7 @@ public class MidiView extends SurfaceViewBase {
 	public void endWaveform() {
 		waveformHelper.endWaveform();
 	}
+
 	private void selectWithRegion(float x, float y) {
 		long tick = xToTick(x);
 
@@ -164,6 +165,7 @@ public class MidiView extends SurfaceViewBase {
 			midiNote.setSelected(false);
 		}
 	}
+
 	private void selectMidiNote(float x, float y, int pointerId) {
 		long tick = xToTick(x);
 		long note = yToNote(y);
@@ -282,11 +284,12 @@ public class MidiView extends SurfaceViewBase {
 				.getCurrentWaveformVBs();
 		if (recordManager.isRecording() && !waveformVBs.isEmpty()) {
 			FloatBuffer last = waveformVBs.get(waveformVBs.size() - 1);
-			float waveWidth = last.get(last.capacity()/2 - 2);
-			float noteWidth = tickToX(midiManager.getCurrTick() - recordManager.getRecordStartTick());
+			float waveWidth = last.get(last.capacity() / 2 - 2);
+			float noteWidth = tickToX(midiManager.getCurrTick()
+					- recordManager.getRecordStartTick());
 			gl.glPushMatrix();
 			gl.glTranslatef(tickToX(recordManager.getRecordStartTick()), 0, 0);
-			gl.glScalef(noteWidth/waveWidth, 1, 1);
+			gl.glScalef(noteWidth / waveWidth, 1, 1);
 			// midiManager.
 			for (int i = 0; i < waveformVBs.size(); i++) {
 				gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVBs.get(i));
@@ -433,7 +436,8 @@ public class MidiView extends SurfaceViewBase {
 
 	private boolean legalSelectedNoteMove(int noteDiff) {
 		for (MidiNote midiNote : midiManager.getMidiNotes()) {
-			if (midiNote.isSelected() && midiNote.getNoteValue() + noteDiff < 0
+			if (midiNote.isSelected()
+					&& midiNote.getNoteValue() + noteDiff < 0
 					|| midiNote.getNoteValue() + noteDiff >= midiManager
 							.getNumSamples()) {
 				return false;
@@ -442,12 +446,13 @@ public class MidiView extends SurfaceViewBase {
 		return true;
 	}
 
-	private MidiNote leftMostSelectedNote() {		
+	private MidiNote leftMostSelectedNote() {
 		MidiNote leftMostNote = null;
 		for (MidiNote midiNote : midiManager.getMidiNotes()) {
 			if (midiNote.isSelected() && leftMostNote == null)
 				leftMostNote = midiNote;
-			else if (midiNote.isSelected() && midiNote.getOnTick() < leftMostNote.getOnTick())
+			else if (midiNote.isSelected()
+					&& midiNote.getOnTick() < leftMostNote.getOnTick())
 				leftMostNote = midiNote;
 		}
 		return leftMostNote;
@@ -457,8 +462,9 @@ public class MidiView extends SurfaceViewBase {
 		MidiNote rightMostNote = null;
 		for (MidiNote midiNote : midiManager.getMidiNotes()) {
 			if (midiNote.isSelected() && rightMostNote == null)
-				rightMostNote = midiNote;			
-			else if (midiNote.isSelected() && midiNote.getOffTick() > rightMostNote.getOffTick())
+				rightMostNote = midiNote;
+			else if (midiNote.isSelected()
+					&& midiNote.getOffTick() > rightMostNote.getOffTick())
 				rightMostNote = midiNote;
 		}
 		return rightMostNote;
@@ -471,8 +477,6 @@ public class MidiView extends SurfaceViewBase {
 		tickWindow.updateGranularity();
 		float color = bean.getBgColor();
 		gl.glClearColor(color, color, color, 1.0f);
-		// draw circles (big points) at top of level bars
-		gl.glPointSize(MidiViewBean.LEVEL_POINT_SIZE);
 		gl.glEnable(GL10.GL_POINT_SMOOTH);
 		initHLineVB();
 		initVLineVBs();
@@ -568,7 +572,8 @@ public class MidiView extends SurfaceViewBase {
 	private long dragNote(int pointerId, MidiNote midiNote, long tickDiff) {
 		long beforeTick = midiNote.getOnTick();
 		if (startOnTicks.containsKey(pointerId)) {
-			long newOnTick = midiNote.getOnTick(), newOffTick = midiNote.getOffTick();			
+			long newOnTick = midiNote.getOnTick(), newOffTick = midiNote
+					.getOffTick();
 			// drag only if the note is moved a certain distance
 			// from its start tick this prevents minute finger
 			// movements from moving/quantizing notes and also
@@ -584,8 +589,8 @@ public class MidiView extends SurfaceViewBase {
 							tickWindow.getCurrentBeatDivision());
 			} else { // inside threshold distance - set to original position
 				newOnTick = startOnTicks.get(pointerId);
-				newOffTick = startOnTicks.get(pointerId) +
-						midiNote.getOffTick() - midiNote.getOnTick(); 
+				newOffTick = startOnTicks.get(pointerId)
+						+ midiNote.getOffTick() - midiNote.getOnTick();
 				midiManager.setNoteTicks(midiNote, newOnTick, newOffTick);
 			}
 			bean.setStateChanged(true);
@@ -594,7 +599,8 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void pinchNote(MidiNote midiNote, long onTickDiff, long offTickDiff) {
-		long newOnTick = midiNote.getOnTick(), newOffTick = midiNote.getOffTick();
+		long newOnTick = midiNote.getOnTick(), newOffTick = midiNote
+				.getOffTick();
 		if (bean.isSnapToGrid()) {
 			long minDiff = tickWindow.getMajorTickSpacing() / 2;
 			if (Math.abs(onTickDiff) >= minDiff) {
@@ -630,15 +636,29 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void singleTap(MotionEvent e, MidiNote touchedNote) {
+		float lastDownX = bean.getLastTapX();
+		float lastDownY = bean.getLastTapY();
 		bean.setLastTapX(e.getX());
 		bean.setLastTapY(e.getY());
 		bean.setLastTapTime(System.currentTimeMillis());
+		// if the up is not at the same place as the down, no tap
+		if (Math.abs(e.getX() - lastDownX) > 25
+				|| yToNote(e.getY()) != yToNote(lastDownY))
+			return;
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			levelsHelper.selectLevelNote(e.getX(), e.getY());
 		} else {
 			deselectAll();
 			if (touchedNote != null) {
 				touchedNote.setSelected(true);
+			} else {
+				int note = yToNote(e.getY());
+				long tick = xToTick(e.getX());
+				// add a note based on the current tick granularity
+				if (note >= 0) {
+					addMidiNote(tick, note);
+					bean.setStateChanged(true);
+				}
 			}
 		}
 	}
@@ -648,18 +668,10 @@ public class MidiView extends SurfaceViewBase {
 			levelsHelper.doubleTap();
 			return;
 		}
-		long tick = xToTick(e.getX());
-		int note = yToNote(e.getY());
 		if (touchedNote != null) {
 			touchedNote.setSelected(false);
 			midiManager.removeNote(touchedNote);
 			bean.setStateChanged(true);
-		} else {
-			// add a note based on the current tick granularity
-			if (note >= 0) {
-				addMidiNote(tick, note);
-				bean.setStateChanged(true);
-			}
 		}
 		// reset tap time so that a third tap doesn't register as
 		// another double tap
@@ -675,13 +687,14 @@ public class MidiView extends SurfaceViewBase {
 		long offTick = onTick + spacing - 1;
 		addMidiNote(onTick, offTick, note);
 	}
-	
+
 	public void addMidiNote(long onTick, long offTick, int note) {
-		MidiNote noteToAdd = midiManager.addNote(onTick, offTick, note, .75f, .5f, .5f);
+		MidiNote noteToAdd = midiManager.addNote(onTick, offTick, note, .75f,
+				.5f, .5f);
 		noteToAdd.setSelected(true);
 		handleMidiCollisions();
 		midiManager.mergeTempNotes();
-		noteToAdd.setSelected(false);		
+		noteToAdd.setSelected(false);
 	}
 
 	public void handleMidiCollisions() {
@@ -691,29 +704,31 @@ public class MidiView extends SurfaceViewBase {
 				continue;
 			for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
 				MidiNote note = midiManager.getMidiNote(i);
-				if (selected.equals(note))
+				if (note == null || selected.equals(note)
+						|| selected.getNoteValue() != note.getNoteValue()) {
 					continue;
-				if (selected.getNoteValue() == note.getNoteValue()) {
-					// if a selected note begins in the middle of another note,
-					// clip the covered note
-					if (selected.getOnTick() > note.getOnTick()
-							&& selected.getOnTick() <= note.getOffTick()) {
-						MidiNote copy = note.getCopy();
-						copy.setOffTick(selected.getOnTick() - 1);
-						// update the native midi events
-						midiManager.moveMidiEventTicks(note.getNoteValue(), note.getOnTick(),
-								copy.getOnTick(), note.getOffTick(), copy.getOffTick());
-						midiManager.putTempNote(i, copy);
-						// if the selected note ends after the beginning
-						// of the other note, or if the selected note completely
-						// covers the other note, delete the covered note
-					} else if (selected.getOffTick() >= note.getOnTick()
-							&& selected.getOffTick() <= note.getOffTick()
-							|| selected.getOnTick() <= note.getOnTick()
-							&& selected.getOffTick() >= note.getOffTick()) {
-						midiManager.setEventMute(note.getNoteValue(), note.getOnTick(), note.getOffTick(), true);
-						midiManager.putTempNote(i, null);
-					}
+				}
+				// if a selected note begins in the middle of another note,
+				// clip the covered note
+				if (selected.getOnTick() > note.getOnTick()
+						&& selected.getOnTick() <= note.getOffTick()) {
+					MidiNote copy = note.getCopy();
+					copy.setOffTick(selected.getOnTick() - 1);
+					// update the native midi events
+					midiManager.moveMidiNoteTicks(note.getNoteValue(),
+							note.getOnTick(), copy.getOnTick(),
+							note.getOffTick(), copy.getOffTick());
+					midiManager.putTempNote(i, copy);
+					// if the selected note ends after the beginning
+					// of the other note, or if the selected note completely
+					// covers the other note, delete the covered note
+				} else if (selected.getOffTick() >= note.getOnTick()
+						&& selected.getOffTick() <= note.getOffTick()
+						|| selected.getOnTick() <= note.getOnTick()
+						&& selected.getOffTick() >= note.getOffTick()) {
+					midiManager.setNoteMute(note.getNoteValue(),
+							note.getOnTick(), true);
+					midiManager.putTempNote(i, null);
 				}
 			}
 		}
@@ -763,6 +778,8 @@ public class MidiView extends SurfaceViewBase {
 		switch (e.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
 			bean.setLastDownTime(System.currentTimeMillis());
+			bean.setLastTapX(e.getX());
+			bean.setLastTapY(e.getY());
 			startScrollView();
 			int id = e.getPointerId(0);
 			if (bean.getViewState() == State.LEVELS_VIEW) {
@@ -881,12 +898,14 @@ public class MidiView extends SurfaceViewBase {
 							if (!midiNote.isSelected())
 								continue;
 							if (!midiNote.equals(leftMost)) {
-								midiManager.setNoteTicks(midiNote, midiNote.getOnTick() + tickDiff,
+								midiManager.setNoteTicks(midiNote,
+										midiNote.getOnTick() + tickDiff,
 										midiNote.getOffTick() + tickDiff);
 								bean.setStateChanged(true);
 							}
 							if (moveNote) {
-								midiManager.setNoteValue(midiNote, midiNote.getNoteValue() + noteDiff);
+								midiManager.setNoteValue(midiNote,
+										midiNote.getNoteValue() + noteDiff);
 								bean.setStateChanged(true);
 							}
 						}
@@ -894,7 +913,7 @@ public class MidiView extends SurfaceViewBase {
 						// dragging more than one note - drag each note
 						// individually
 						dragNote(id, touchedNote, tickDiff);
-						midiManager.setNoteValue(touchedNote, newNote);						
+						midiManager.setNoteValue(touchedNote, newNote);
 					}
 					// make room in the view window if we are dragging out of
 					// the view

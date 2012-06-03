@@ -132,7 +132,7 @@ public class MidiManager implements Parcelable {
 	
 	private void addNote(MidiNote midiNote) {
 		midiNotes.add(midiNote);
-		addMidiEvents(midiNote.getNoteValue(), midiNote.getOnTick(),
+		addMidiNote(midiNote.getNoteValue(), midiNote.getOnTick(),
 				midiNote.getOffTick(), midiNote.getVelocity(), midiNote.getPan(), midiNote.getPitch());
 	}
 	
@@ -143,20 +143,20 @@ public class MidiManager implements Parcelable {
 	public void removeNote(MidiNote midiNote) {
 		if (midiNotes.contains(midiNote)) {
 			midiNotes.remove(midiNote);
-			removeMidiEvents(midiNote.getNoteValue(), midiNote.getOnTick(), midiNote.getOffTick());
+			removeMidiNote(midiNote.getNoteValue(), midiNote.getOnTick());
 		}
 	}
 
 	public void clearNotes() {
 		for (MidiNote midiNote : midiNotes) {
-			removeMidiEvents(midiNote.getNoteValue(), midiNote.getOnTick(), midiNote.getOffTick());
+			removeMidiNote(midiNote.getNoteValue(), midiNote.getOnTick());
 		}
 		midiNotes.clear();
 	}
 	
 	public void clearTempNotes() {
 		for (MidiNote midiNote : midiNotes) {
-			setEventMute(midiNote.getNoteValue(), midiNote.getOnTick(), midiNote.getOffTick(), false);
+			setNoteMute(midiNote.getNoteValue(), midiNote.getOnTick(), false);
 		}
 		tempNotes.clear();
 	}
@@ -164,14 +164,14 @@ public class MidiManager implements Parcelable {
 	public void setNoteValue(MidiNote midiNote, int newNote) {
 		if (midiNote.getNoteValue() == newNote)
 			return;
-		moveMidiEventNote(midiNote.getNoteValue(), midiNote.getOnTick(), midiNote.getOffTick(), newNote);
+		moveMidiNote(midiNote.getNoteValue(), midiNote.getOnTick(), newNote);
 		midiNote.setNote(newNote);		
 	}
 	
 	public void setNoteTicks(MidiNote midiNote, long onTick, long offTick) {
 		if (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)
 			return;
-		moveMidiEventTicks(midiNote.getNoteValue(), midiNote.getOnTick(), onTick, midiNote.getOffTick(), offTick);
+		moveMidiNoteTicks(midiNote.getNoteValue(), midiNote.getOnTick(), onTick, midiNote.getOffTick(), offTick);
 		midiNote.setOnTick(onTick);
 		midiNote.setOffTick(offTick);		
 	}
@@ -351,13 +351,13 @@ public class MidiManager implements Parcelable {
 	
 	public native void startTicking();
 	
-	public native void addMidiEvents(int track, long onTick, long offTick,
+	public native void addMidiNote(int track, long onTick, long offTick,
 										float volume, float pan, float pitch);
-	public native void removeMidiEvents(int track, long onTick, long offTick);
+	public native void removeMidiNote(int track, long tick);
 	// change ticks
-	public native void moveMidiEventTicks(int track, long prevOnTick, long newOnTick, long prevOffTick, long newOffTick);
+	public native void moveMidiNoteTicks(int track, long prevOnTick, long newOnTick, long prevOffTick, long newOffTick);
 	// change track num
-	public native void moveMidiEventNote(int track, long onTick, long offTick, int newTrack);
-	public native void setEventMute(int track, long onTick, long offTick, boolean muted);
-	public native void clearMutedEvents();
+	public native void moveMidiNote(int track, long tick, int newTrack);
+	public native void setNoteMute(int track, long tick, boolean muted);
+	public native void clearMutedNotes();
 }

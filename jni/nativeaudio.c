@@ -386,7 +386,7 @@ void printLinkedList(MidiEventNode *head) {
 	}	
 }
 
-void Java_com_kh_beatbot_manager_MidiManager_addMidiEvents(JNIEnv* env, jclass clazz, jint trackNum,
+void Java_com_kh_beatbot_manager_MidiManager_addMidiNote(JNIEnv* env, jclass clazz, jint trackNum,
 															   jlong onTick, jlong offTick, jfloat volume,
 															   jfloat pan, jfloat pitch) {
 	if (trackNum < 0 || trackNum >= numTracks)
@@ -396,15 +396,15 @@ void Java_com_kh_beatbot_manager_MidiManager_addMidiEvents(JNIEnv* env, jclass c
 	track->eventHead = addEvent(track->eventHead, event);
 }
 
-void Java_com_kh_beatbot_manager_MidiManager_removeMidiEvents(JNIEnv* env, jclass clazz, jint trackNum,
-															   jlong onTick, jlong offTick) {
+void Java_com_kh_beatbot_manager_MidiManager_removeMidiNote(JNIEnv* env, jclass clazz, jint trackNum,
+															   jlong tick) {
 	if (trackNum < 0 || trackNum >= numTracks)
 		return;	
 	Track *track = &tracks[trackNum];
-	track->eventHead = removeEvent(track->eventHead, onTick, false);
+	track->eventHead = removeEvent(track->eventHead, tick, false);
 }
 
-void Java_com_kh_beatbot_manager_MidiManager_moveMidiEventTicks(JNIEnv* env, jclass clazz, jint trackNum,
+void Java_com_kh_beatbot_manager_MidiManager_moveMidiNoteTicks(JNIEnv* env, jclass clazz, jint trackNum,
 															    jlong prevOnTick, jlong newOnTick,
 															    jlong prevOffTick, jlong newOffTick) {
 	if (trackNum < 0 || trackNum >= numTracks)
@@ -417,32 +417,34 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiEventTicks(JNIEnv* env, jcl
 	}
 }
 
-void Java_com_kh_beatbot_manager_MidiManager_moveMidiEventNote(JNIEnv* env, jclass clazz, jint trackNum,
-															   jlong onTick, jlong offTick, jint newTrackNum) {
+void Java_com_kh_beatbot_manager_MidiManager_moveMidiNote(JNIEnv* env, jclass clazz, jint trackNum,
+															   jlong tick, jint newTrackNum) {
 	if (trackNum < 0 || trackNum >= numTracks || newTrackNum < 0 || newTrackNum >= numTracks)
 		return;
 	Track *prevTrack = &tracks[trackNum];
 	Track *newTrack = &tracks[newTrackNum];	
-	MidiEvent *event = findEvent(prevTrack->eventHead, onTick);
+	MidiEvent *event = findEvent(prevTrack->eventHead, tick);
 	if (event != NULL) {	
 		float volume = event->volume;
 		float pan = event->pan;
 		float pitch = event->pitch;
-		prevTrack->eventHead = removeEvent(prevTrack->eventHead, onTick, false);
+		int onTick = event->onTick;
+		int offTick = event->offTick;
+		prevTrack->eventHead = removeEvent(prevTrack->eventHead, tick, false);
 		MidiEvent *newEvent = initEvent(onTick, offTick, volume, pan, pitch);
 		newTrack->eventHead = addEvent(newTrack->eventHead, newEvent);
 	}
 }
-void Java_com_kh_beatbot_manager_MidiManager_setEventMute(JNIEnv* env, jclass clazz, jint trackNum,
-															   jlong onTick, jlong offTick, jboolean muted) {
+void Java_com_kh_beatbot_manager_MidiManager_setNoteMute(JNIEnv* env, jclass clazz, jint trackNum,
+															   jlong tick, jboolean muted) {
 	if (trackNum < 0 || trackNum >= numTracks)
 		return;		
 	Track *track = &tracks[trackNum];
-	MidiEvent *event = findEvent(track->eventHead, onTick);
+	MidiEvent *event = findEvent(track->eventHead, tick);
 	event->muted = muted;
 }
 
-void Java_com_kh_beatbot_manager_MidiManager_clearMutedEvents(JNIEnv* env, jclass clazz) {
+void Java_com_kh_beatbot_manager_MidiManager_clearMutedNotes(JNIEnv* env, jclass clazz) {
 	int i;
 	for (i = 0; i < numTracks; i++) {
 		Track *track = &tracks[i];
@@ -484,6 +486,7 @@ void Java_com_kh_beatbot_midi_MidiNote_setPitch(JNIEnv* env, jclass clazz, jint 
 		event->pitch = pitch;
 	}
 }
+
 
 
 // shut down the native audio system
