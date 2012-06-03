@@ -32,10 +32,7 @@ static SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, 2, SL_SAMPLINGRATE_44_1
 									  SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT,
 									  SL_BYTEORDER_LITTLEENDIAN};
 
-typedef struct MidiEvent_ {
-	bool selected;
-	bool levelSelected;
-	
+typedef struct MidiEvent_ {	
 	bool muted;
 	long onTick;
 	long offTick;	

@@ -1,6 +1,5 @@
 package com.kh.beatbot.midi;
 
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
@@ -9,6 +8,9 @@ import com.kh.beatbot.view.helper.LevelsViewHelper;
 public class MidiNote {
 	NoteOn noteOn;
 	NoteOff noteOff;
+	boolean selected = false;
+	boolean levelSelected = false;
+	boolean touched = false;
 
 	public MidiNote(NoteOn noteOn, NoteOff noteOff) {
 		this.noteOn = noteOn;
@@ -18,7 +20,11 @@ public class MidiNote {
 	public MidiNote getCopy() {
 		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0, noteOn.getNoteValue(), noteOn.getVelocity(), noteOn.getPan(), noteOn.getPitch());
 		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0, noteOff.getNoteValue(), noteOff.getVelocity(), noteOff.getPan(), noteOn.getPitch());
-		return new MidiNote(noteOnCopy, noteOffCopy);
+		MidiNote copy = new MidiNote(noteOnCopy, noteOffCopy);
+		copy.setSelected(selected);
+		copy.setLevelSelected(levelSelected);
+		copy.setTouched(touched);
+		return copy;
 	}
 	
 	public MidiEvent getOnEvent() {
@@ -51,6 +57,30 @@ public class MidiNote {
 	
 	public float getPitch() {
 		return noteOn.getPitch();
+	}
+	
+	public boolean isSelected() {
+		return selected;
+	}
+	
+	public boolean isLevelSelected() {
+		return levelSelected;
+	}
+	
+	public boolean isTouched() {
+		return touched;
+	}
+	
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+	}
+	
+	public void setLevelSelected(boolean levelSelected) {
+		this.levelSelected = levelSelected;
+	}
+	
+	public void setTouched(boolean touched) {
+		this.touched = touched;
 	}
 	
 	public void setVelocity(float velocity) {

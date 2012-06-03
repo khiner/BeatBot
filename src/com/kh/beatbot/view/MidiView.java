@@ -48,8 +48,6 @@ public class MidiView extends SurfaceViewBase {
 	// map of pointerIds to the original on-ticks of the notes they are touching
 	// (before dragging)
 	private Map<Integer, Long> startOnTicks = new HashMap<Integer, Long>();
-	// all selected notes (to draw in blue, and to drag together)
-	private List<MidiNote> selectedNotes = new ArrayList<MidiNote>();
 
 	public enum State {
 		LEVELS_VIEW, NORMAL_VIEW, TO_LEVELS_VIEW, TO_NORMAL_VIEW
@@ -122,14 +120,6 @@ public class MidiView extends SurfaceViewBase {
 		levelsHelper.setLevelMode(levelMode);
 	}
 
-	public boolean isNoteSelected(MidiNote midiNote) {
-		return selectedNotes.contains(midiNote);
-	}
-
-	public void removeSelected(MidiNote midiNote) {
-		selectedNotes.remove(midiNote);
-	}
-
 	public void reset() {
 		tickWindow.setTickOffset(0);
 	}
@@ -160,11 +150,9 @@ public class MidiView extends SurfaceViewBase {
 					&& bottomNote >= midiNote.getNoteValue();
 
 			if (noteCondition && (a && b || c && d || !b && !c)) {
-				if (!isNoteSelected(midiNote)) {
-					selectedNotes.add(midiNote);
-				}
+				midiNote.setSelected(true);
 			} else
-				selectedNotes.remove(midiNote);
+				midiNote.setSelected(false);
 		}
 		// make room in the view window if we are dragging out of the view
 		tickWindow.updateView(leftTick, rightTick);
@@ -172,6 +160,11 @@ public class MidiView extends SurfaceViewBase {
 				noteToY(bottomNote + 1));
 	}
 
+	private void deselectAll() {
+		for (MidiNote midiNote : midiManager.getMidiNotes()) {
+			midiNote.setSelected(false);
+		}
+	}
 	private void selectMidiNote(float x, float y, int pointerId) {
 		long tick = xToTick(x);
 		long note = yToNote(y);
@@ -201,10 +194,10 @@ public class MidiView extends SurfaceViewBase {
 					// If this is the only touched midi note, and it hasn't yet
 					// been selected, make it the only selected note.
 					// If we are multi-selecting, add it to the selected list
-					if (!isNoteSelected(midiNote)) {
+					if (!midiNote.isSelected()) {
 						if (touchedNotes.isEmpty())
-							selectedNotes.clear();
-						selectedNotes.add(midiNote);
+							deselectAll();
+						midiNote.setSelected(true);
 					}
 				}
 				touchedNotes.put(pointerId, midiNote);
@@ -336,8 +329,7 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void calculateColor(MidiNote midiNote) {
-		boolean selected = selectedNotes.contains(midiNote);
-		if (selected)
+		if (midiNote.isSelected())
 			// selected notes are fileed blue
 			gl.glColor4f(0, 0, 1, 1);
 		else
@@ -441,8 +433,8 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private boolean legalSelectedNoteMove(int noteDiff) {
-		for (MidiNote midiNote : selectedNotes) {
-			if (midiNote.getNoteValue() + noteDiff < 0
+		for (MidiNote midiNote : midiManager.getMidiNotes()) {
+			if (midiNote.isSelected() && midiNote.getNoteValue() + noteDiff < 0
 					|| midiNote.getNoteValue() + noteDiff >= midiManager
 							.getNumSamples()) {
 				return false;
@@ -451,19 +443,23 @@ public class MidiView extends SurfaceViewBase {
 		return true;
 	}
 
-	private MidiNote leftMostSelectedNote() {
-		MidiNote leftMostNote = selectedNotes.get(0);
-		for (MidiNote midiNote : selectedNotes) {
-			if (midiNote.getOnTick() < leftMostNote.getOnTick())
+	private MidiNote leftMostSelectedNote() {		
+		MidiNote leftMostNote = null;
+		for (MidiNote midiNote : midiManager.getMidiNotes()) {
+			if (midiNote.isSelected() && leftMostNote == null)
+				leftMostNote = midiNote;
+			else if (midiNote.isSelected() && midiNote.getOnTick() < leftMostNote.getOnTick())
 				leftMostNote = midiNote;
 		}
 		return leftMostNote;
 	}
 
 	private MidiNote rightMostSelectedNote() {
-		MidiNote rightMostNote = selectedNotes.get(0);
-		for (MidiNote midiNote : selectedNotes) {
-			if (midiNote.getOffTick() > rightMostNote.getOffTick())
+		MidiNote rightMostNote = null;
+		for (MidiNote midiNote : midiManager.getMidiNotes()) {
+			if (midiNote.isSelected() && rightMostNote == null)
+				rightMostNote = midiNote;			
+			else if (midiNote.isSelected() && midiNote.getOffTick() > rightMostNote.getOffTick())
 				rightMostNote = midiNote;
 		}
 		return rightMostNote;
@@ -641,9 +637,9 @@ public class MidiView extends SurfaceViewBase {
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			levelsHelper.selectLevelNote(e.getX(), e.getY());
 		} else {
-			selectedNotes.clear();
+			deselectAll();
 			if (touchedNote != null) {
-				selectedNotes.add(touchedNote);
+				touchedNote.setSelected(true);
 			}
 		}
 	}
@@ -656,7 +652,7 @@ public class MidiView extends SurfaceViewBase {
 		long tick = xToTick(e.getX());
 		int note = yToNote(e.getY());
 		if (touchedNote != null) {
-			selectedNotes.remove(touchedNote);
+			touchedNote.setSelected(false);
 			midiManager.removeNote(touchedNote);
 			bean.setStateChanged(true);
 		} else {
@@ -683,15 +679,17 @@ public class MidiView extends SurfaceViewBase {
 	
 	public void addMidiNote(long onTick, long offTick, int note) {
 		MidiNote noteToAdd = midiManager.addNote(onTick, offTick, note, .75f, .5f, .5f);
-		selectedNotes.add(noteToAdd);
+		noteToAdd.setSelected(true);
 		handleMidiCollisions();
 		midiManager.mergeTempNotes();
-		selectedNotes.remove(noteToAdd);		
+		noteToAdd.setSelected(false);		
 	}
 
 	public void handleMidiCollisions() {
 		midiManager.clearTempNotes();
-		for (MidiNote selected : selectedNotes) {
+		for (MidiNote selected : midiManager.getMidiNotes()) {
+			if (!selected.isSelected())
+				continue;
 			for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
 				MidiNote note = midiManager.getMidiNote(i);
 				if (selected.equals(note))
@@ -849,8 +847,10 @@ public class MidiView extends SurfaceViewBase {
 				long offTickDiff = xToTick(rightX)
 						+ bean.getPinchRightOffsetTick()
 						- selectedNote.getOffTick();
-				for (MidiNote midiNote : selectedNotes) {
-					pinchNote(midiNote, onTickDiff, offTickDiff);
+				for (MidiNote midiNote : midiManager.getMidiNotes()) {
+					if (midiNote.isSelected()) {
+						pinchNote(midiNote, onTickDiff, offTickDiff);
+					}
 				}
 			} else if (!touchedNotes.isEmpty()) { // at least one midi selected
 				MidiNote leftMost = leftMostSelectedNote();
@@ -878,7 +878,9 @@ public class MidiView extends SurfaceViewBase {
 									- rightMost.getOffTick();
 
 						tickDiff = dragNote(id, leftMost, tickDiff);
-						for (MidiNote midiNote : selectedNotes) {
+						for (MidiNote midiNote : midiManager.getMidiNotes()) {
+							if (!midiNote.isSelected())
+								continue;
 							if (!midiNote.equals(leftMost)) {
 								midiManager.setNoteTicks(midiNote, midiNote.getOnTick() + tickDiff,
 										midiNote.getOffTick() + tickDiff);
@@ -946,39 +948,11 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	public void writeToBundle(Bundle out) {
-		ArrayList<Integer> selectedIndices = new ArrayList<Integer>();
-		for (int i = 0; i < selectedNotes.size(); i++) {
-			int index = midiManager.getMidiNotes()
-					.indexOf(selectedNotes.get(i));
-			if (index != -1)
-				selectedIndices.add(index);
-		}
-		out.putIntegerArrayList("selectedIndices", selectedIndices);
-		ArrayList<Integer> selectedLevelIndices = new ArrayList<Integer>();
-		for (int i = 0; i < levelsHelper.getSelectedLevelNotes().size(); i++) {
-			int index = midiManager.getMidiNotes().indexOf(
-					levelsHelper.getSelectedLevelNotes().get(i));
-			if (index != -1)
-				selectedLevelIndices.add(index);
-		}
-		out.putIntegerArrayList("selectedLevelIndices", selectedLevelIndices);
 		out.putInt("viewState", bean.getViewState().ordinal());
 	}
 
 	// use constructor first, and set the deets with this method
 	public void readFromBundle(Bundle in) {
-		ArrayList<Integer> selectedIndices = in
-				.getIntegerArrayList("selectedIndices");
-		for (int index : selectedIndices) {
-			selectedNotes.add(midiManager.getMidiNotes().get(index));
-		}
-		levelsHelper = new LevelsViewHelper(this);		
-		ArrayList<Integer> selectedLevelIndices = in
-				.getIntegerArrayList("selectedLevelIndices");
-		for (int index : selectedLevelIndices) {
-			levelsHelper.getSelectedLevelNotes().add(
-					midiManager.getMidiNotes().get(index));
-		}
 		setViewState(State.values()[in.getInt("viewState")]);
 	}
 }

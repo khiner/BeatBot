@@ -12,7 +12,6 @@ import java.util.Stack;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
@@ -22,7 +21,6 @@ import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
-import com.kh.beatbot.view.helper.LevelsViewHelper;
 
 public class MidiManager implements Parcelable {
 

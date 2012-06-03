@@ -54,8 +54,6 @@ short charsToShort(unsigned char first, unsigned char second) {
 
 MidiEvent* initEvent(long onTick, long offTick, float volume, float pan, float pitch) {
 	MidiEvent *event = malloc(sizeof(MidiEvent));
-	event->selected = false;
-	event->levelSelected = false;	
 	event->muted = false;
 	event->onTick = onTick;
 	event->offTick = offTick;
@@ -442,10 +440,6 @@ void Java_com_kh_beatbot_manager_MidiManager_setEventMute(JNIEnv* env, jclass cl
 	Track *track = &tracks[trackNum];
 	MidiEvent *event = findEvent(track->eventHead, onTick);
 	event->muted = muted;
-	if (event->muted)
-		__android_log_print(ANDROID_LOG_VERBOSE, "muted", "true");
-	else
-		__android_log_print(ANDROID_LOG_VERBOSE, "muted", "false");
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_clearMutedEvents(JNIEnv* env, jclass clazz) {
