@@ -56,16 +56,18 @@ void Java_com_kh_beatbot_manager_MidiManager_startTicking(JNIEnv *env, jclass cl
 			currTick = 0;
 		}
 		int i;
-		for (i = 0; i < numSamples; i++) {
-			Sample *sample = &samples[i];
-			MidiEventNode *midiEventHead = sample->eventHead;
+		for (i = 0; i < numTracks; i++) {
+			Track *track = &tracks[i];
+			MidiEventNode *midiEventHead = track->eventHead;
 			MidiEvent *currEvent = findEvent(midiEventHead, currTick);
 			if (currEvent == NULL)
 				continue;
-		    if (sample->playing) {
-				stopSample(i);
+		    if (track->playing) {
+				stopTrack(i);
 			} else {
-				playSample(i, currEvent->volume, currEvent->pan, currEvent->pitch);
+				__android_log_print(ANDROID_LOG_VERBOSE, "tick volume", "%f", currEvent->volume);
+				__android_log_print(ANDROID_LOG_VERBOSE, "tick pan", "%f", currEvent->pan);					
+				playTrack(i, currEvent->volume, currEvent->pan, currEvent->pitch);
 			}
 		}
 		// update time of next tick

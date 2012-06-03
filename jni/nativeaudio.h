@@ -45,7 +45,7 @@ typedef struct MidiEventNode_ {
 	struct MidiEventNode_ *next;
 } MidiEventNode;
 
-typedef struct Sample_ {
+typedef struct Track_ {
 	MidiEventNode *eventHead;
 	float currBufferFlt[BUFF_SIZE];
 	short currBufferShort[BUFF_SIZE];
@@ -70,16 +70,16 @@ typedef struct Sample_ {
 	SLMuteSoloItf outputPlayerMuteSolo;
 	// output buffer interfaces
 	SLAndroidSimpleBufferQueueItf outputBufferQueue;
-} Sample;
+} Track;
 
 unsigned int playState;
-Sample *samples;
-int numSamples;
+Track *tracks;
+int numTracks;
 
 MidiEvent *findEvent(MidiEventNode *midiEventHead, long tick);
 void printLinkedList(MidiEventNode *head);
-void playSample(int sampleNum, float volume, float pan, float pitch);
-void stopSample(int sampleNum);
+void playTrack(int trackNum, float volume, float pan, float pitch);
+void stopTrack(int trackNum);
 void stopAll();
 
 #endif // NATIVEAUDIO_H

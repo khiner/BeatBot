@@ -116,17 +116,18 @@ public class MidiNote {
 	}
 	
 	public void setLevel(LevelsViewHelper.LevelMode levelMode, float level) {
+		float clippedLevel = clipLevel(level);
 		if (levelMode == LevelsViewHelper.LevelMode.VOLUME) {
-			setVelocity(level);
-			setVolume(getNoteValue(), getOnTick(), level);
+			setVelocity(clippedLevel);
+			setVolume(getNoteValue(), getOnTick(), clippedLevel);
 		}
 		else if (levelMode == LevelsViewHelper.LevelMode.PAN) {
-			setPan(level);
-			setPan(getNoteValue(), getOnTick(), level);
+			setPan(clippedLevel);
+			setPan(getNoteValue(), getOnTick(), clippedLevel);
 		}
 		else if (levelMode == LevelsViewHelper.LevelMode.PITCH) {
-			setPitch(level);
-			setPitch(getNoteValue(), getOnTick(), level);
+			setPitch(clippedLevel);
+			setPitch(getNoteValue(), getOnTick(), clippedLevel);
 		}
 	}
 	
