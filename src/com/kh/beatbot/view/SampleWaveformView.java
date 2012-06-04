@@ -17,6 +17,9 @@ public class SampleWaveformView extends SurfaceViewBase {
 	FloatBuffer waveformVB = null;
 	FloatBuffer loopMarkerVB = null;
 	PlaybackManager playbackManager = null;
+	
+	// the left of this view is a preview button
+	int previewButtonWidth, waveformWidth;
 
 	byte[] sampleBytes = null;
 
@@ -49,10 +52,12 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private void drawWaveform() {
 		if (waveformVB == null)
 			return;
+		gl.glTranslatef(previewButtonWidth, 0, 0);
 		gl.glColor4f(0, 0, 1, 1);
 		gl.glLineWidth(1);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVB);
 		gl.glDrawArrays(GL10.GL_LINES, 0, waveformVB.capacity() / 2);
+		gl.glTranslatef(-previewButtonWidth, 0, 0);		
 	}
 
 	private void drawLoopMarkers() {
@@ -66,7 +71,9 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	@Override
 	protected void init() {
-		waveformHelper = new WaveformHelper(width, height);
+		previewButtonWidth = width/7;
+		waveformWidth = 6*width/7;
+		waveformHelper = new WaveformHelper(waveformWidth, height);
 		while (sampleBytes == null)
 			; // wait until we're sure sampleBytes has been passed in
 		waveformVB = waveformHelper.bytesToFloatBuffer(sampleBytes);
@@ -83,11 +90,11 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	float sampleToX(int sample) {
-		return width * (float) sample / sampleBytes.length;
+		return previewButtonWidth + waveformWidth * (float) sample / sampleBytes.length;
 	}
 
 	int xToSample(float x) {
-		return (int) (x * sampleBytes.length / width);
+		return (int) (((x - previewButtonWidth)*sampleBytes.length) / waveformWidth);
 	}
 
 	@Override
@@ -142,10 +149,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 		selectLoopMarker(id, x);
 	}
 
-	public void handleActionUp(int id, float x) {
-		beginLoopMarkerTouched = endLoopMarkerTouched = -1;
-	}
-
 	public void handleActionPointerDown(int id, float x) {
 		selectLoopMarker(id, x);
 	}
@@ -159,5 +162,43 @@ public class SampleWaveformView extends SurfaceViewBase {
 			int id = e.getPointerId(i);
 			moveLoopMarker(id, e.getX(i));
 		}
+	}
+	
+	public boolean onTouchEvent(MotionEvent e) {		
+		// delegating the wave edit touch events through the parent activity to allow
+		// touching of multiple views at the same time
+		// TODO: still doesn't work!
+		switch (e.getAction() & MotionEvent.ACTION_MASK) {
+		case MotionEvent.ACTION_CANCEL:
+			return false;
+		case MotionEvent.ACTION_DOWN:
+			if (e.getX(0) > previewButtonWidth)
+				handleActionDown(e.getPointerId(0), e.getX(0));
+			else
+				playbackManager.playTrack(sampleNum, .8f, .5f, .5f);
+			break;
+		case MotionEvent.ACTION_POINTER_DOWN:
+			int index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+			if (e.getX(index) > previewButtonWidth)
+				handleActionPointerDown(e.getPointerId(index), e.getX(index));
+			else 
+				playbackManager.playTrack(sampleNum, .8f, .5f, .5f);
+			break;
+		case MotionEvent.ACTION_MOVE:
+			handleActionMove(e);			
+			break;
+		case MotionEvent.ACTION_POINTER_UP:			
+			index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+			if (e.getX(index) > previewButtonWidth)
+				handleActionPointerUp(e.getPointerId(index), e.getX(index));
+			else 
+				playbackManager.stopTrack(sampleNum);				
+			break;
+		case MotionEvent.ACTION_UP:
+			beginLoopMarkerTouched = endLoopMarkerTouched = -1;			
+			playbackManager.stopTrack(sampleNum);
+			break;
+		}
+		return true;
 	}
 }
