@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.KarlHiner.BeatBox"
+    package="com.KarlHiner.BeatBot"
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="9" />
+    <uses-sdk android:minSdkVersion="10" />
     
 	<uses-permission android:name="android.permission.SET_DEBUG_APP" />    
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -28,6 +28,10 @@
         <activity
             android:name="com.kh.beatbot.MidiFileMenuActivity"
             android:label="@string/midi_menu" >
+        </activity>
+        <activity
+            android:name="com.kh.beatbot.SampleEditActivity"
+            android:label="@string/sample_edit_activity" >
         </activity>
         
     </application>

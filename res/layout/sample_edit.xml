@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <Button 
+        android:id="@+id/preview_sample"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:text="@string/preview_sample"
+        />
+    <!-- preview onClick is handled in the activity, since we need down and up events -->
+            
+    <com.kh.beatbot.view.SampleWaveformView
+        android:id="@+id/sample_waveform_view"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:layout_toRightOf="@+id/preview_sample"
+        />
+    
+    <ToggleButton
+        android:id="@+id/loop_toggle"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/preview_sample"
+        android:text="@string/loop_sample"
+        android:onClick="toggleLoop"
+        />
+    
+</RelativeLayout>

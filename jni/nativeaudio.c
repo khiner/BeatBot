@@ -17,9 +17,8 @@ static SLObjectItf outputMixObject = NULL;
 void Java_com_kh_beatbot_BeatBotActivity_createEngine(JNIEnv* env, jclass clazz, jobject _assetManager, jint _numTracks) {
     SLresult result;
 
-	numTracks = _numTracks;
-	playState = 0;
-	tracks = (Track*)malloc(sizeof(Track)*numTracks);
+    numTracks = _numTracks;
+    tracks = (Track*)malloc(sizeof(Track)*numTracks);
 	
     // create engine
     result = slCreateEngine(&engineObject, 0, NULL, 0, NULL, NULL);
@@ -67,23 +66,19 @@ void initTrack(Track *track, AAsset *asset) {
 	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
 	track->totalSamples = AAsset_getLength(asset)/2 - 22;
 	track->buffer = calloc(track->totalSamples, sizeof(float));
+	track->armed = false;
 	track->playing = false;
+	track->loopMode = false;
+	track->loopBegin = 0;
+	track->loopEnd = track->totalSamples;
 	track->currSample = 0;
 	track->volume = .5f;
 	track->pan = .5f;
-	track->pitch = .5f;		
-	track->delayLine = delayline_create(0.8, 0.7);
-}
-
-void volumePanFilter(float inBuffer[], float outBuffer[], int size, float volume, float pan) {
-	float leftVolume = (1 - pan)*volume;
-	float rightVolume = pan*volume;
-
-	int i;
-	for (i = 0; i < size; i+=2) {
-		outBuffer[i] = inBuffer[i]*leftVolume;
-		outBuffer[i+1] = inBuffer[i + 1]*rightVolume;
-	}
+	track->pitch = .5f;
+	track->volumePanConfig = volumepanconfig_create(.5, .5);
+	track->delayConfig = delayconfig_create(0.8, 0.7);
+	track->filterConfig = filterconfig_create(11050, 0.5);
+	track->decimateConfig = decimateconfig_create(4, 0.5);
 }
 
 void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {
@@ -96,35 +91,45 @@ void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {
 void calcNextBuffer(Track *track) {
 	// start with all zeros
 	memset(track->currBufferFlt, 0, BUFF_SIZE*sizeof(float));
-    if (track->playing && track->currSample < track->totalSamples) {
+    if (track->playing && track->currSample < track->loopEnd) {
 		int nextSize; // how many tracks to copy from the source
-		if (track->currSample + BUFF_SIZE >= track->totalSamples) {
+		if (track->currSample + BUFF_SIZE >= track->loopEnd) {
 			// at the end of the track - copy all tracks that are left
-			nextSize = track->totalSamples - track->currSample;
+			nextSize = track->loopEnd - track->currSample;
 		} else {
 			nextSize = BUFF_SIZE; // plenty of tracks left to copy :)		
 		}					   
 		// copy the next block of data from the scratch buffer into the current float buffer for streaming
 		memcpy(track->currBufferFlt, &(track->buffer[track->currSample]), nextSize*sizeof(float));
-		// if we are at the end of the track, reset the track pointer, otherwise increment it
+		// increment sample counter to reflect bytes written so far
 		track->currSample += nextSize;
+		if (track->loopMode && track->currSample >= track->loopEnd) {
+		  // if this track is looping and we've hit the end of the buffer,
+		  // reset to the beginning of the buffer
+		        track->currSample = track->loopBegin;
+		}
     }
 	// calc volume/pan
-	volumePanFilter(track->currBufferFlt, track->currBufferFlt, BUFF_SIZE, track->volume, track->pan);
+        volumepan_process(track->volumePanConfig, track->currBufferFlt, BUFF_SIZE);
 	// calc delay
-	//delayline_process(track->delayLine, track->currBufferFlt, BUFF_SIZE);
+	// delay_process(track->delayConfig, track->currBufferFlt, BUFF_SIZE);
+	// calc filter
+	// filter_process(track->filterConfig, track->currBufferFlt, BUFF_SIZE);
+	// calc decimate
+	//decimate_process(track->decimateConfig, track->currBufferFlt, BUFF_SIZE);
+
 	// convert floats to shorts
 	floatArytoShortAry(track->currBufferFlt, track->currBufferShort, BUFF_SIZE);	
 }
 
 // this callback handler is called every time a buffer finishes playing
 void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
-	if (!playState) {
-		// global play is off.  no sound
+	Track *track = (Track *)(context);
+	if (!track->armed) {
+		// track is not armed. don't play any sound.
 		return;
 	}
 	
-	Track *track = (Track *)(context);
 	SLresult result;
 	
 	// calculate the next buffer
@@ -229,9 +234,9 @@ void playTrack(int trackNum, float volume, float pan, float pitch) {
 	if (trackNum < 0 || trackNum >= numTracks)
 		return;
 	Track *track = &tracks[trackNum];
-	track->currSample = 0;
-	track->volume = volume;
-	track->pan = pan;
+	track->currSample = track->loopBegin;
+	track->volumePanConfig->volume = volume;
+	track->volumePanConfig->pan = pan;
 	track->playing = true;
 }
 
@@ -240,7 +245,7 @@ void stopTrack(int trackNum) {
 		return;
 	Track *track = &tracks[trackNum];
 	track->playing = false;
-	track->currSample = 0;
+	track->currSample = track->loopBegin;
 }
 
 void stopAll() {
@@ -253,41 +258,61 @@ void stopAll() {
 /****************************************************************************************
  Java PlaybackManager JNI methods
  ****************************************************************************************/
-void Java_com_kh_beatbot_manager_PlaybackManager_openSlPlay(JNIEnv* env, jclass clazz) {
-	playState = 1;
+void Java_com_kh_beatbot_manager_PlaybackManager_armAllTracks(JNIEnv* env, jclass clazz) {
 	int i;
+        // arm each track, and
 	// trigger buffer queue callback to begin writing data to tracks
 	for (i = 0; i < trackCount; i++) {
+    	        if (tracks[i].armed)
+		      continue;
+         	tracks[i].armed = true;
+               // start writing zeros to the track's audio out
 		bufferQueueCallback(tracks[i].outputBufferQueue, &(tracks[i]));
 	}
 }
 
-void Java_com_kh_beatbot_manager_PlaybackManager_openSlStop(JNIEnv* env, jclass clazz) {
-	playState = 0;
+void Java_com_kh_beatbot_manager_PlaybackManager_armTrack(JNIEnv* env, jclass clazz, jint trackNum) {
+        if (tracks[trackNum].armed)
+	      return;
+        // arm the track
+        tracks[trackNum].armed = true;
+        // start writing zeros to the track's audio out
+	bufferQueueCallback(tracks[trackNum].outputBufferQueue, &(tracks[trackNum]));
 }
 
-void Java_com_kh_beatbot_manager_PlaybackManager_playTrack(JNIEnv* env,
-															jclass clazz, jint trackNum, jfloat volume, jfloat pan, jfloat pitch) {
+void Java_com_kh_beatbot_manager_PlaybackManager_disarmAllTracks(JNIEnv* env, jclass clazz) {
+        // disarm all tracks
+        int i;
+	for (i = 0; i < trackCount; i++) {
+         	tracks[i].armed = false;
+	}
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_disarmTrack(JNIEnv* env, jclass clazz, jint trackNum) {
+        // disarm the track
+        tracks[trackNum].armed = false;
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_playTrack(JNIEnv* env, jclass clazz, jint trackNum,
+							   jfloat volume, jfloat pan, jfloat pitch) {
 	if (trackNum < 0 || trackNum >= numTracks)
 		return;
 	Track *track = &tracks[trackNum];
-	track->currSample = 0;
+	track->currSample = track->loopBegin;
 	track->volume = volume;
 	track->pan = pan;
 	track->playing = true;
 }
 
-void Java_com_kh_beatbot_manager_PlaybackManager_stopTrack(JNIEnv* env,
-															jclass clazz, jint trackNum) {
+void Java_com_kh_beatbot_manager_PlaybackManager_stopTrack(JNIEnv* env, jclass clazz, jint trackNum) {
 	if (trackNum < 0 || trackNum >= numTracks)
 		return;
 	Track *track = &tracks[trackNum];
 	track->playing = false;
-	track->currSample = 0;
+	track->currSample = track->loopBegin;
 }
 
-void Java_com_kh_beatbot_manager_PlaybackManager_muteTrack(JNIEnv* env,
-															jclass clazz, jint trackNum) {
+void Java_com_kh_beatbot_manager_PlaybackManager_muteTrack(JNIEnv* env, jclass clazz, jint trackNum) {
 	if (trackNum < 0 || trackNum >= numTracks)
 		return;
 	Track *track = &tracks[trackNum];
@@ -297,8 +322,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_muteTrack(JNIEnv* env,
 	}
 }
 
-void Java_com_kh_beatbot_manager_PlaybackManager_unmuteTrack(JNIEnv* env,
-															jclass clazz, jint trackNum) {
+void Java_com_kh_beatbot_manager_PlaybackManager_unmuteTrack(JNIEnv* env, jclass clazz, jint trackNum) {
 	if (trackNum < 0 || trackNum >= numTracks)
 		return;
 	Track *track = &tracks[trackNum];
@@ -306,13 +330,33 @@ void Java_com_kh_beatbot_manager_PlaybackManager_unmuteTrack(JNIEnv* env,
 	(*(track->outputPlayerMuteSolo))->SetChannelMute(track->outputPlayerMuteSolo, 1, SL_BOOLEAN_FALSE);		
 }
 
-void Java_com_kh_beatbot_manager_PlaybackManager_soloTrack(JNIEnv* env,
-															  jclass clazz, jint trackNum) {
+void Java_com_kh_beatbot_manager_PlaybackManager_soloTrack(JNIEnv* env, jclass clazz, jint trackNum) {
 	if (trackNum < 0 || trackNum >= numTracks)
 		return;	
 	Track *track = &tracks[trackNum];
 	(*(track->outputPlayerMuteSolo))->SetChannelSolo(track->outputPlayerMuteSolo, 0, SL_BOOLEAN_TRUE);
 	(*(track->outputPlayerMuteSolo))->SetChannelSolo(track->outputPlayerMuteSolo, 1, SL_BOOLEAN_TRUE);		
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_toggleLooping(JNIEnv* env, jclass clazz, jint trackNum) {
+	if (trackNum < 0 || trackNum >= numTracks)
+		return;	
+	Track *track = &tracks[trackNum];
+	track->loopMode = !track->loopMode;
+}
+
+jboolean Java_com_kh_beatbot_manager_PlaybackManager_isLooping(JNIEnv* env, jclass clazz, jint trackNum) {
+        return tracks[trackNum].loopMode;
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_setLoopWindow(JNIEnv* env, jclass clazz,
+							       jint trackNum, jint loopBeginSample, jint loopEndSample) {
+	if (trackNum < 0 || trackNum >= numTracks)
+		return;	
+	Track *track = &tracks[trackNum];
+	track->loopBegin = loopBeginSample;
+	track->loopEnd = loopEndSample;
+	__android_log_print(ANDROID_LOG_DEBUG, "Loop window", "%d, %d", track->loopBegin, track->loopEnd);
 }
 
 /****************************************************************************************
@@ -377,7 +421,7 @@ void freeLinkedList(MidiEventNode *head) {
 }
 
 void printLinkedList(MidiEventNode *head) {
-	__android_log_print(ANDROID_LOG_DEBUG, "LL", "Elements:");	
+	__android_log_print(ANDROID_LOG_DEBUG, "LL", "Elements:");
 	MidiEventNode *cur_ptr = head;
 	while (cur_ptr != NULL) {
 		__android_log_print(ANDROID_LOG_DEBUG, "LL Element", "onTick = %d", cur_ptr->event->onTick);
@@ -387,8 +431,8 @@ void printLinkedList(MidiEventNode *head) {
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_addMidiNote(JNIEnv* env, jclass clazz, jint trackNum,
-															   jlong onTick, jlong offTick, jfloat volume,
-															   jfloat pan, jfloat pitch) {
+     		                  			 jlong onTick, jlong offTick, jfloat volume,
+ 						         jfloat pan, jfloat pitch) {
 	if (trackNum < 0 || trackNum >= numTracks)
 		return;
 	Track *track = &tracks[trackNum];
@@ -397,7 +441,7 @@ void Java_com_kh_beatbot_manager_MidiManager_addMidiNote(JNIEnv* env, jclass cla
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_removeMidiNote(JNIEnv* env, jclass clazz, jint trackNum,
-															   jlong tick) {
+							    jlong tick) {
 	if (trackNum < 0 || trackNum >= numTracks)
 		return;	
 	Track *track = &tracks[trackNum];
@@ -405,8 +449,8 @@ void Java_com_kh_beatbot_manager_MidiManager_removeMidiNote(JNIEnv* env, jclass 
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_moveMidiNoteTicks(JNIEnv* env, jclass clazz, jint trackNum,
-															    jlong prevOnTick, jlong newOnTick,
-															    jlong prevOffTick, jlong newOffTick) {
+							       jlong prevOnTick, jlong newOnTick,
+							       jlong prevOffTick, jlong newOffTick) {
 	if (trackNum < 0 || trackNum >= numTracks)
 		return;		
 	Track *track = &tracks[trackNum];
@@ -418,7 +462,7 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiNoteTicks(JNIEnv* env, jcla
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_moveMidiNote(JNIEnv* env, jclass clazz, jint trackNum,
-															   jlong tick, jint newTrackNum) {
+							  jlong tick, jint newTrackNum) {
 	if (trackNum < 0 || trackNum >= numTracks || newTrackNum < 0 || newTrackNum >= numTracks)
 		return;
 	Track *prevTrack = &tracks[trackNum];
@@ -436,7 +480,7 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiNote(JNIEnv* env, jclass cl
 	}
 }
 void Java_com_kh_beatbot_manager_MidiManager_setNoteMute(JNIEnv* env, jclass clazz, jint trackNum,
-															   jlong tick, jboolean muted) {
+							 jlong tick, jboolean muted) {
 	if (trackNum < 0 || trackNum >= numTracks)
 		return;		
 	Track *track = &tracks[trackNum];
@@ -502,7 +546,8 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv* env, jclass clazz)
 		free(track->buffer);
 		free(track->currBufferFlt);
 		free(track->currBufferShort);
-		free(track->delayLine);
+		delayconfig_destroy(track->delayConfig);
+		volumepanconfig_destroy(track->volumePanConfig);
 		freeLinkedList(track->eventHead);
 	}
 	free(tracks);

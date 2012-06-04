@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.KarlHiner.BeatBox.R;
+import com.KarlHiner.BeatBot.R;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.MidiManager;
 

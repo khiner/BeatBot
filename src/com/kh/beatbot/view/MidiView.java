@@ -473,7 +473,7 @@ public class MidiView extends SurfaceViewBase {
 	protected void init() {
 		levelsHelper = new LevelsViewHelper(this);
 		// waveformHelper constructor: yPos, height
-		waveformHelper = new WaveformHelper(bean.getHeight() / 3);
+		waveformHelper = new WaveformHelper(0, bean.getHeight() / 3);
 		tickWindow.updateGranularity();
 		float color = bean.getBgColor();
 		gl.glClearColor(color, color, color, 1.0f);
@@ -776,6 +776,8 @@ public class MidiView extends SurfaceViewBase {
 	@Override
 	public boolean onTouchEvent(MotionEvent e) {
 		switch (e.getAction() & MotionEvent.ACTION_MASK) {
+		case MotionEvent.ACTION_CANCEL:
+			return false;		
 		case MotionEvent.ACTION_DOWN:
 			bean.setLastDownTime(System.currentTimeMillis());
 			bean.setLastTapX(e.getX());
@@ -783,7 +785,7 @@ public class MidiView extends SurfaceViewBase {
 			startScrollView();
 			int id = e.getPointerId(0);
 			if (bean.getViewState() == State.LEVELS_VIEW) {
-				levelsHelper.selectLevel(e.getX(), e.getY(), id);
+				levelsHelper.selectLevel(e.getX(0), e.getY(0), id);
 			} else {
 				selectMidiNote(e.getX(0), e.getY(0), id);
 			}

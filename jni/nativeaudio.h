@@ -32,7 +32,7 @@ static SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, 2, SL_SAMPLINGRATE_44_1
 									  SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT,
 									  SL_BYTEORDER_LITTLEENDIAN};
 
-typedef struct MidiEvent_ {	
+typedef struct MidiEvent_ {
 	bool muted;
 	long onTick;
 	long offTick;	
@@ -61,10 +61,19 @@ typedef struct Track_ {
 	float pan;
 	float pitch;
 	
+        bool armed;
 	bool playing;
-	
-	DELAYLINE *delayLine;
-	
+        bool loopMode;
+
+        int loopBegin;
+        int loopEnd;
+
+        // effect configs
+        VolumePanConfig *volumePanConfig;	
+	DelayConfig *delayConfig;
+        FilterConfig *filterConfig;
+        DecimateConfig *decimateConfig;
+
 	SLObjectItf outputPlayerObject;
 	SLPlayItf outputPlayerPlay;
 	SLVolumeItf outputPlayerVolume;
@@ -73,7 +82,6 @@ typedef struct Track_ {
 	SLAndroidSimpleBufferQueueItf outputBufferQueue;
 } Track;
 
-unsigned int playState;
 Track *tracks;
 int numTracks;
 

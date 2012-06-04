@@ -45,7 +45,7 @@ void Java_com_kh_beatbot_manager_MidiManager_startTicking(JNIEnv *env, jclass cl
 	
 	uint64_t nextTickNano = startNano + NSPT;
 	
-	while (playState) {
+	while (tracks[0].armed) {
 		if (currTimeNano(&now) < nextTickNano) {
 			continue;
 		}
@@ -66,8 +66,6 @@ void Java_com_kh_beatbot_manager_MidiManager_startTicking(JNIEnv *env, jclass cl
 				stopTrack(i);
 			} else if (!currEvent->muted) {
 				playTrack(i, currEvent->volume, currEvent->pan, currEvent->pitch);
-			} else {
-				__android_log_print(ANDROID_LOG_VERBOSE, "not playin!", "muted");
 			}
 		}
 		// update time of next tick

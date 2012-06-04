@@ -32,6 +32,13 @@
  /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/android/asset_manager.h \
  /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/android/asset_manager_jni.h \
  /Users/khiner/Documents/workspace/BeatBot/jni/effects.h \
+ /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/math.h \
+ /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/limits.h \
+ /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/sys/limits.h \
+ /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/linux/limits.h \
+ /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/machine/internal_types.h \
+ /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/machine/limits.h \
+ /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/sys/syslimits.h \
  /Users/khiner/Documents/workspace/BeatBot/jni/hashmap.h \
  /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/errno.h \
  /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/linux/errno.h \
@@ -102,6 +109,20 @@
 /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/android/asset_manager_jni.h:
 
 /Users/khiner/Documents/workspace/BeatBot/jni/effects.h:
+
+/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/math.h:
+
+/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/limits.h:
+
+/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/sys/limits.h:
+
+/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/linux/limits.h:
+
+/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/machine/internal_types.h:
+
+/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/machine/limits.h:
+
+/Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/sys/syslimits.h:
 
 /Users/khiner/Documents/workspace/BeatBot/jni/hashmap.h:
 

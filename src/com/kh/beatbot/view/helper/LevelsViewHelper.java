@@ -381,7 +381,6 @@ public class LevelsViewHelper {
 			bean.setZoomLeftAnchorTick(midiView.xToTick(leftAnchorX));
 			bean.setZoomRightAnchorTick(midiView.xToTick(rightAnchorX));
 		}
-
 		return true;
 	}
 

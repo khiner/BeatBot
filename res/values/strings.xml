@@ -31,5 +31,9 @@
         <item name="rim">Rim</item>
         <item name="bass">Bass</item>
     </string-array>
-    <string name="default_midi_file_name">MyMidi</string>  
+    <string name="default_midi_file_name">MyMidi</string>
+    
+    <string name="sample_edit_activity">Sample Edit</string>
+    <string name="preview_sample">Preview</string>
+    <string name="loop_sample">Loop Sample</string>
 </resources>

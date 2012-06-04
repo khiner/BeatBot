@@ -5,7 +5,7 @@
  * should not be modified by hand.
  */
 
-package com.KarlHiner.BeatBox;
+package com.KarlHiner.BeatBot;
 
 public final class R {
     public static final class anim {
@@ -90,32 +90,34 @@ public final class R {
         public static final int bpm_tap=0x7f08000c;
         public static final int controlLayout=0x7f080001;
         public static final int filePathEdit=0x7f080011;
-        public static final int icon=0x7f080017;
+        public static final int icon=0x7f080019;
         public static final int levels=0x7f080010;
         public static final int levelsButton=0x7f080007;
         public static final int levelsLayout=0x7f080006;
+        public static final int loop_toggle=0x7f080016;
         public static final int main=0x7f080000;
         public static final int midiView=0x7f08000f;
-        public static final int midi_menu_item=0x7f08001f;
+        public static final int midi_menu_item=0x7f080021;
         public static final int midi_open=0x7f080013;
         public static final int midi_save=0x7f080012;
-        public static final int mute=0x7f080015;
+        public static final int mute=0x7f080017;
         public static final int panButton=0x7f080009;
         public static final int pitchButton=0x7f08000a;
         public static final int playButton=0x7f080003;
-        public static final int quantize=0x7f080019;
-        public static final int quantize_current=0x7f08001a;
-        public static final int quantize_eighth=0x7f08001c;
-        public static final int quantize_quarter=0x7f08001b;
-        public static final int quantize_sixteenth=0x7f08001d;
-        public static final int quantize_thirty_second=0x7f08001e;
+        public static final int preview_sample=0x7f080014;
+        public static final int quantize=0x7f08001b;
+        public static final int quantize_current=0x7f08001c;
+        public static final int quantize_eighth=0x7f08001e;
+        public static final int quantize_quarter=0x7f08001d;
+        public static final int quantize_sixteenth=0x7f08001f;
+        public static final int quantize_thirty_second=0x7f080020;
         public static final int recordButton=0x7f080005;
         public static final int sampleListView=0x7f080002;
-        public static final int save_wav=0x7f080020;
-        public static final int snap=0x7f080018;
-        public static final int solo=0x7f080016;
+        public static final int sample_waveform_view=0x7f080015;
+        public static final int save_wav=0x7f080022;
+        public static final int snap=0x7f08001a;
+        public static final int solo=0x7f080018;
         public static final int stopButton=0x7f080004;
-        public static final int testOpenSL=0x7f080014;
         public static final int thresholdBar=0x7f08000e;
         public static final int undo=0x7f08000b;
         public static final int volumeButton=0x7f080008;
@@ -123,7 +125,8 @@ public final class R {
     public static final class layout {
         public static final int main=0x7f030000;
         public static final int midi_menu=0x7f030001;
-        public static final int sample_row=0x7f030002;
+        public static final int sample_edit=0x7f030002;
+        public static final int sample_row=0x7f030003;
     }
     public static final class menu {
         public static final int menu=0x7f070000;
@@ -136,12 +139,15 @@ public final class R {
         public static final int eighth_note=0x7f05000e;
         public static final int import_export_midi=0x7f050015;
         public static final int levels=0x7f050008;
+        public static final int loop_sample=0x7f050019;
         public static final int midi_menu=0x7f050001;
         public static final int open_midi=0x7f050013;
         public static final int play=0x7f050005;
+        public static final int preview_sample=0x7f050018;
         public static final int quantize=0x7f05000b;
         public static final int quarter_note=0x7f05000d;
         public static final int record=0x7f050004;
+        public static final int sample_edit_activity=0x7f050017;
         public static final int save=0x7f050011;
         public static final int save_midi=0x7f050012;
         public static final int save_wav=0x7f050014;

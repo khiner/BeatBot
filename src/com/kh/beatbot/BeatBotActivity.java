@@ -23,7 +23,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ToggleButton;
 
-import com.KarlHiner.BeatBox.R;
+import com.KarlHiner.BeatBot.R;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.AudioClassificationManager;
 import com.kh.beatbot.manager.MidiManager;
@@ -72,37 +72,46 @@ public class BeatBotActivity extends Activity {
 
 		@Override
 		public void onClick(View view) {
-			int position = (Integer)view.getTag();
+			int position = (Integer) view.getTag();
 			if (view.getId() == R.id.icon) {
 				// preview the sample with a default velocity of 3/4,
 				// middle pan and normal pitch
-				playbackManager.playTrack(position, .75f, .5f, .5f);
+				// playbackManager.playTrack(position, .75f, .5f, .5f);
+
+				// open new intent for sample edit view
+				// and pass the name and number of the sample to the intent as extras
+				Intent intent = new Intent();
+				intent.setClass(this.getContext(), SampleEditActivity.class);
+				intent.putExtra("sampleNum", position);
+				intent.putExtra("sampleName",getItem(position));
+				startActivity(intent);	
 			} else if (view.getId() == R.id.mute) {
-				ToggleButton muteButton = (ToggleButton)view;
+				ToggleButton muteButton = (ToggleButton) view;
 				if (muteButton.isChecked())
 					playbackManager.muteTrack(position);
 				else
 					playbackManager.unmuteTrack(position);
 			} else if (view.getId() == R.id.solo) {
-				ToggleButton soloButton = (ToggleButton)view;
+				ToggleButton soloButton = (ToggleButton) view;
 				if (soloButton.isChecked()) {
 					playbackManager.soloTrack(position);
 					for (ToggleButton otherSoloButton : soloButtons) {
-						if (otherSoloButton.isChecked() && !otherSoloButton.equals(soloButton)) {
+						if (otherSoloButton.isChecked()
+								&& !otherSoloButton.equals(soloButton)) {
 							otherSoloButton.setChecked(false);
 						}
 					}
 				} else
 					playbackManager.soloTrack(-1);
-			}			
+			}
 		}
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View view = getLayoutInflater().inflate(resourceId, parent, false);
 			ImageButton icon = (ImageButton) view.findViewById(R.id.icon);
-			ToggleButton mute = (ToggleButton)view.findViewById(R.id.mute);
-			ToggleButton solo = (ToggleButton)view.findViewById(R.id.solo);
+			ToggleButton mute = (ToggleButton) view.findViewById(R.id.mute);
+			ToggleButton solo = (ToggleButton) view.findViewById(R.id.solo);
 			soloButtons.add(solo);
 			icon.setTag(position);
 			mute.setTag(position);
@@ -171,14 +180,12 @@ public class BeatBotActivity extends Activity {
 		fadeOut = AnimationUtils.loadAnimation(this, R.anim.fadeout);
 		fadeIn.setAnimationListener(fadeListener);
 		fadeOut.setAnimationListener(fadeListener);
-		String[] sampleTypes = getResources().getStringArray(
-				R.array.sample_types);
 		SampleRowAdapterAndOnClickListener adapter = new SampleRowAdapterAndOnClickListener(
-				this, R.layout.sample_row, sampleTypes);
+				this, R.layout.sample_row, sampleNames);
 		sampleListView = (ListView) findViewById(R.id.sampleListView);
 		sampleListView.setAdapter(adapter);
 
-		assetManager = getAssets();	
+		assetManager = getAssets();
 		if (savedInstanceState == null) {
 			createEngine(assetManager, sampleNames.length);
 			createAllAssetAudioPlayers();
@@ -189,7 +196,7 @@ public class BeatBotActivity extends Activity {
 		// if this context is being restored from a destroyed context,
 		// recover the midiManager. otherwise, create a new one
 		if (savedInstanceState == null)
-			midiManager = MidiManager.getInstance(sampleTypes.length);
+			midiManager = MidiManager.getInstance(sampleNames.length);
 		else
 			midiManager = savedInstanceState.getParcelable("midiManager");
 
@@ -214,6 +221,7 @@ public class BeatBotActivity extends Activity {
 		GlobalVars gv = (GlobalVars) getApplicationContext();
 		// make midiManager a global var
 		gv.setMidiManager(midiManager);
+		gv.setPlaybackManager(playbackManager);
 
 		((BpmView) findViewById(R.id.bpm)).setText(String
 				.valueOf((int) midiManager.getBPM()));
@@ -233,7 +241,7 @@ public class BeatBotActivity extends Activity {
 		super.onDestroy();
 		if (isFinishing()) {
 			recordManager.release();
-			shutdown();			
+			shutdown();
 			android.os.Process.killProcess(android.os.Process.myPid());
 		}
 	}
@@ -284,18 +292,18 @@ public class BeatBotActivity extends Activity {
 		case R.id.save_wav:
 			return true;
 			// midi import/export menu item is handled as an intent -
-			// MidiFileMenu.class
+			// MidiFileMenuActivity.class
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
 
-    private boolean createAllAssetAudioPlayers() {
-    	for (String sampleName : sampleNames)
-    		createAssetAudioPlayer(sampleName);
-    	return true;
-    }
-	
+	private boolean createAllAssetAudioPlayers() {
+		for (String sampleName : sampleNames)
+			createAssetAudioPlayer(sampleName);
+		return true;
+	}
+
 	// DON'T USE YET! this needs to run on the UI thread somehow.
 	public void activateIcon(int sampleNum) {
 		((ImageView) sampleListView.getChildAt(sampleNum)).setImageState(
@@ -397,13 +405,16 @@ public class BeatBotActivity extends Activity {
 		while (System.currentTimeMillis() - start < millis)
 			;
 	}
-	
-    public static native void createEngine(AssetManager assetManager, int numSamples);
+
+	public static native void createEngine(AssetManager assetManager,
+			int numSamples);
+
 	public static native boolean createAssetAudioPlayer(String filename);
-    public static native void shutdown();	
-	
-    /** Load jni .so on initialization */
-    static {
-         System.loadLibrary("nativeaudio");
-    }	
+
+	public static native void shutdown();
+
+	/** Load jni .so on initialization */
+	static {
+		System.loadLibrary("nativeaudio");
+	}
 }

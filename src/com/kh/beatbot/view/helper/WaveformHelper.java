@@ -24,13 +24,14 @@ public class WaveformHelper extends Thread {
 
 	Queue<byte[]> bytesQueue = new LinkedList<byte[]>();
 
-	private float height;
+	private float width, height;
 
 	private int xOffset = 0;
 	
 	private boolean completed;
 
-	public WaveformHelper(float height) {
+	public WaveformHelper(float width, float height) {
+		this.width = width;
 		this.height = height;
 		start();
 	}
@@ -77,11 +78,10 @@ public class WaveformHelper extends Thread {
 		completed = true;
 	}
 	
-	private FloatBuffer bytesToFloatBuffer(byte[] bytes) {
+	public FloatBuffer bytesToFloatBuffer(byte[] bytes) {
 		float[] data = floatsFromBytes(bytes);
 		int size = data.length;
-		Log.d("size", String.valueOf(size));
-		int samplesPerPixel = 200;
+		int samplesPerPixel = width <= 0 ? 200 : size/(int)width; // default to 200 if no width specified
 		float[] outputAry = new float[8 * size / samplesPerPixel];
 		for (int x = 0; x < size / samplesPerPixel; x++) {
 			// determine start and end points within WAV

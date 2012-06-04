@@ -1,8 +1,6 @@
 package com.kh.beatbot.manager;
 
 import android.content.Context;
-import android.media.AudioFormat;
-import android.media.AudioTrack;
 
 public class PlaybackManager {
 	
@@ -12,15 +10,6 @@ public class PlaybackManager {
 	private String[] sampleNames;
 	
 	private static final int SAMPLE_RATE = 41000;
-	private static final int MIN_BUF_SIZE = AudioTrack.getMinBufferSize(SAMPLE_RATE,
-			AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT);				;
-	private static byte[] zeroBytes = new byte[MIN_BUF_SIZE];
-	
-	static {
-		for (int i = 0; i < zeroBytes.length; i++) {
-			zeroBytes[i] = 0;
-		}
-	}
 	
 	public enum State {
 		PLAYING, STOPPED
@@ -46,12 +35,12 @@ public class PlaybackManager {
 	
 	public void play() {
 		state = State.PLAYING;
-		openSlPlay();
+		armAllTracks();
 	}
 
 	public void stop() {
 		state = State.STOPPED;
-		openSlStop();
+		disarmAllTracks();
 	}
 	
 	public void playTrack(int trackNum, int velocity, int pan, int pitch) {
@@ -71,11 +60,16 @@ public class PlaybackManager {
 		}
 	}
 
-	public native void openSlPlay();
-	public native void openSlStop();
-	public native void playTrack(int sampleNum, float volume, float pan, float pitch);
-	public native void stopTrack(int sampleNum);
-	public native void muteTrack(int sampleNum);
-	public native void unmuteTrack(int sampleNum);
-	public native void soloTrack(int sampleNum);
+	public native void armAllTracks();
+	public native void armTrack(int trackNum);
+	public native void disarmAllTracks();
+	public native void disarmTrack(int trackNum);
+	public native void playTrack(int trackNum, float volume, float pan, float pitch);
+	public native void stopTrack(int trackNum);
+	public native void muteTrack(int trackNum);
+	public native void unmuteTrack(int trackNum);
+	public native void soloTrack(int trackNum);
+	public native void toggleLooping(int trackNum);
+	public native boolean isLooping(int trackNum); 
+	public native void setLoopWindow(int sampleNum, int loopBegin, int loopEnd);
 }
