@@ -16,7 +16,8 @@ static SLObjectItf outputMixObject = NULL;
 // create the engine and output mix objects
 void Java_com_kh_beatbot_BeatBotActivity_createEngine(JNIEnv* env, jclass clazz, jobject _assetManager, jint _numTracks) {
   SLresult result;
-
+  
+  initTicker();
   numTracks = _numTracks;
   tracks = (Track*)malloc(sizeof(Track)*numTracks);
 	
@@ -108,12 +109,15 @@ void calcNextBuffer(Track *track) {
       totalSize += nextSize;
       // increment sample counter to reflect bytes written so far
       track->currSample += nextSize;
-      if (track->loopMode && track->currSample >= track->loopEnd) {
-        // if we are looping, and we're past the end, loop back to the beginning
-        track->currSample = track->loopBegin;
-      } else {
-        break; // not looping, so we can play less than BUFF_SIZE samples
-      }
+      if (track->currSample >= track->loopEnd) {
+        if (track->loopMode) {
+          // if we are looping, and we're past the end, loop back to the beginning
+          track->currSample = track->loopBegin;
+        } else {
+          track->playing = false;
+          break; // not looping, so we can play less than BUFF_SIZE samples
+        }
+      } 
     }
   }
   // calc volume/pan
@@ -258,7 +262,7 @@ void stopTrack(int trackNum) {
 void stopAll() {
   int i;
   for (i = 0; i < trackCount; i++) {
-    tracks[i].playing = false;
+    stopTrack(i);
   }
 }
 
@@ -476,17 +480,21 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiNote(JNIEnv* env, jclass cl
   Track *prevTrack = &tracks[trackNum];
   Track *newTrack = &tracks[newTrackNum];	
   MidiEvent *event = findEvent(prevTrack->eventHead, tick);
-  if (event != NULL) {	
+  if (event != NULL) {
     float volume = event->volume;
     float pan = event->pan;
     float pitch = event->pitch;
     int onTick = event->onTick;
     int offTick = event->offTick;
+    if (prevTrack->playing && currTick >= onTick && currTick <= offTick) {
+      stopTrack(trackNum);
+    }
     prevTrack->eventHead = removeEvent(prevTrack->eventHead, tick, false);
     MidiEvent *newEvent = initEvent(onTick, offTick, volume, pan, pitch);
     newTrack->eventHead = addEvent(newTrack->eventHead, newEvent);
   }
 }
+
 void Java_com_kh_beatbot_manager_MidiManager_setNoteMute(JNIEnv* env, jclass clazz, jint trackNum,
                                                          jlong tick, jboolean muted) {
   if (trackNum < 0 || trackNum >= numTracks)

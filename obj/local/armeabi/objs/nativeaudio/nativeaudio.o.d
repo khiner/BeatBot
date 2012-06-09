@@ -44,7 +44,8 @@
  /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/linux/errno.h \
  /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/asm/errno.h \
  /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/asm-generic/errno.h \
- /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/asm-generic/errno-base.h
+ /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/asm-generic/errno-base.h \
+ /Users/khiner/Documents/workspace/BeatBot/jni/ticker.h
 
 /Users/khiner/Documents/workspace/BeatBot/jni/nativeaudio.h:
 
@@ -135,3 +136,5 @@
 /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/asm-generic/errno.h:
 
 /Users/khiner/android-ndk-r6/platforms/ANDROID-9/arch-arm/usr/include/asm-generic/errno-base.h:
+
+/Users/khiner/Documents/workspace/BeatBot/jni/ticker.h:

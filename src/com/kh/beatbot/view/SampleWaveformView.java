@@ -20,8 +20,9 @@ public class SampleWaveformView extends SurfaceViewBase {
 	// min distance for pointer to select loop markers
 	private final int SNAP_DIST = 35;
 	
+	private final int MIN_LOOP_WINDOW = 32;
 	// the left of this view is a preview button
-	private int previewButtonWidth, waveformWidth;
+	private float previewButtonWidth, waveformWidth;
 
 	private int trackNum;
 	
@@ -35,20 +36,20 @@ public class SampleWaveformView extends SurfaceViewBase {
 	// so we can handle pointer-up/ move events outside the button
 	private int previewPointerId = -1;
 
-	private int sampleLoopBegin = 0;
-	private int sampleLoopEnd = 0; // to be set with the sample byte-length
+	private float sampleLoopBegin = 0;
+	private float sampleLoopEnd = 0; // to be set with the sample byte-length
 	
-	private int zoomLeftAnchorSample = -1;
-	private int zoomRightAnchorSample = -1;
+	private float zoomLeftAnchorSample = -1;
+	private float zoomRightAnchorSample = -1;
 
-	private int scrollAnchorSample = 0;
+	private float scrollAnchorSample = -1;
 	private int scrollVelocity = 0;
 
 	private byte[] sampleBytes = null;
 	// zooming/scrolling will change the view window of the samples
 	// keep track of that with offset and width
-	private int sampleOffset = 0;
-	private int sampleWidth;
+	private float sampleOffset = 0;
+	private float sampleWidth;
 	
 	public SampleWaveformView(Context c, AttributeSet as) {
 		super(c, as);
@@ -82,9 +83,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glTranslatef(previewButtonWidth, 0, 0);
 		gl.glScalef(scale, 1, 1);
 		gl.glTranslatef(translate, 0, 0);		
-		gl.glDrawArrays(GL10.GL_LINE_STRIP, (sampleOffset/WaveformHelper.DEFAULT_SPP),
-				(int)(sampleWidth/(float)WaveformHelper.DEFAULT_SPP));
-		//gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, waveformVB.capacity()/2);
+		gl.glDrawArrays(GL10.GL_LINE_STRIP, (int)(sampleOffset/WaveformHelper.DEFAULT_SPP),
+				(int)(sampleWidth/WaveformHelper.DEFAULT_SPP));
 		gl.glPopMatrix();
 	}
 
@@ -95,6 +95,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glLineWidth(10); // width of 10 for now
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerVB);
 		gl.glDrawArrays(GL10.GL_LINES, 0, loopMarkerVB.capacity() / 2);
+		gl.glColor4f(1, 1, 1, .3f); // white for now		
+		gl.glDrawArrays(GL10.GL_TRIANGLE_FAN, 0, loopMarkerVB.capacity()/2);
 	}
 
 	@Override
@@ -111,22 +113,22 @@ public class SampleWaveformView extends SurfaceViewBase {
 		float xLoopBegin = sampleToX(sampleLoopBegin);
 		float xLoopEnd = sampleToX(sampleLoopEnd);
 		float[] loopMarkerVertices = { xLoopBegin, 0, xLoopBegin, height,
-				xLoopEnd, 0, xLoopEnd, height };
+				xLoopEnd, height, xLoopEnd, 0 };
 
 		loopMarkerVB = makeFloatBuffer(loopMarkerVertices);
 	}
 
-	float sampleToX(int sample) {
-		return (sample - sampleOffset)*waveformWidth/(float)sampleWidth + previewButtonWidth;
+	float sampleToX(float sample) {
+		return (sample - sampleOffset)*waveformWidth/sampleWidth + previewButtonWidth;
 	}
 
-	int xToSample(float x) {
-		return (int) (((x - previewButtonWidth)*sampleWidth) / waveformWidth) + sampleOffset;
+	float xToSample(float x) {
+		return (x - previewButtonWidth)*sampleWidth / waveformWidth + sampleOffset;
 	}
 
 	void updateSampleOffset(float scrollX) {
 		// set sampleOffset such that the scroll anchor sample stays under scrollX
-		int newSampleOffset = scrollAnchorSample - (int)((scrollX - previewButtonWidth)*sampleWidth)/waveformWidth;
+		float newSampleOffset = scrollAnchorSample - (scrollX - previewButtonWidth)*sampleWidth/waveformWidth;
 		sampleOffset = newSampleOffset < 0 ?
 				0 : (newSampleOffset + sampleWidth > numSamples ?
 						numSamples - sampleWidth : newSampleOffset);
@@ -135,12 +137,40 @@ public class SampleWaveformView extends SurfaceViewBase {
 	void updateZoom(float x1, float x2) {
 		// set sampleOffset and sampleWidth such that the zoom
 		// anchor samples stay under x1 and x2
-		int newSampleWidth = (int)(waveformWidth*(zoomRightAnchorSample - zoomLeftAnchorSample)/(x2 - x1));
-		int newSampleOffset = zoomRightAnchorSample - (int)(sampleWidth*(x2 - previewButtonWidth)/waveformWidth);
+		float newSampleWidth = waveformWidth*(zoomRightAnchorSample - zoomLeftAnchorSample)/(x2 - x1);
+		float newSampleOffset = zoomRightAnchorSample - newSampleWidth*(x2 - previewButtonWidth)/waveformWidth;
+		if (newSampleOffset < 0 && newSampleOffset + newSampleWidth > numSamples ||
+				newSampleWidth < MIN_LOOP_WINDOW) {
+			return;
+		}
 		if (newSampleOffset >= 0 && newSampleOffset + newSampleWidth <= numSamples) {
 			sampleOffset = newSampleOffset;
 			sampleWidth = newSampleWidth;
+		} else if (newSampleOffset < 0) {
+			sampleOffset = 0;
+			sampleWidth = zoomRightAnchorSample*waveformWidth/(x2 - previewButtonWidth);
+		} else if (newSampleOffset + newSampleWidth > numSamples) {
+			sampleWidth = waveformWidth*(zoomLeftAnchorSample - numSamples)/(x1 - previewButtonWidth - waveformWidth);
+			sampleOffset = numSamples - sampleWidth;
 		}
+	}
+	
+	void updateLoopMarkers() {
+		float diff = 0;
+		if (sampleLoopBegin < sampleOffset && sampleLoopEnd > sampleOffset + sampleWidth) {
+			clipLoopToWindow();
+		} else if (sampleLoopBegin < sampleOffset)
+			diff = sampleOffset - sampleLoopBegin;
+		else if (sampleLoopEnd >= sampleOffset + sampleWidth)
+			diff = sampleOffset + sampleWidth - sampleLoopEnd;
+		if (diff != 0) {			
+			sampleLoopBegin += diff;
+			sampleLoopEnd += diff;
+			clipLoopToWindow();
+		}
+		playbackManager.setLoopWindow(trackNum, (int)sampleLoopBegin, (int)sampleLoopEnd);
+		// update the display location of the loop markers
+		initLoopMarkerVB();
 	}
 	
 	@Override
@@ -173,22 +203,31 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	private boolean moveLoopMarker(int id, float x) {
 		if (beginLoopMarkerTouched == id) {
-			int newLoopBegin = xToSample(x);
+			float newLoopBegin = xToSample(x);
 			sampleLoopBegin = newLoopBegin < 0 ? 0
-					: (newLoopBegin >= sampleLoopEnd - 64 ? sampleLoopEnd - 64
+					: (newLoopBegin >= sampleLoopEnd - MIN_LOOP_WINDOW ? sampleLoopEnd - MIN_LOOP_WINDOW
 							: newLoopBegin);
 		} else if (endLoopMarkerTouched == id) {
-			int newLoopEnd = xToSample(x);
+			float newLoopEnd = xToSample(x);
 			sampleLoopEnd = newLoopEnd >= numSamples ? numSamples - 1
-					: (newLoopEnd <= sampleLoopBegin + 64 ? sampleLoopBegin + 64
+					: (newLoopEnd <= sampleLoopBegin + MIN_LOOP_WINDOW ? sampleLoopBegin + MIN_LOOP_WINDOW
 							: newLoopEnd);
 		} else {
 			return false;
 		}
+		if (sampleLoopBegin < sampleOffset) {
+			sampleOffset = sampleLoopBegin;
+			if (sampleLoopEnd > sampleOffset + sampleWidth)
+				sampleWidth = sampleLoopEnd - sampleLoopBegin;
+		} else if (sampleLoopEnd > sampleOffset + sampleWidth) {
+			sampleWidth = sampleLoopEnd - sampleOffset;
+			if (sampleWidth + sampleOffset > numSamples)
+				sampleWidth = numSamples - sampleOffset;
+		}
 		// update UI
 		initLoopMarkerVB();
 		// update sample playback.
-		playbackManager.setLoopWindow(trackNum, sampleLoopBegin, sampleLoopEnd);
+		playbackManager.setLoopWindow(trackNum, (int)sampleLoopBegin, (int)sampleLoopEnd);
 		return true;
 	}
 
@@ -223,6 +262,13 @@ public class SampleWaveformView extends SurfaceViewBase {
 		return true;
 	}
 	
+	private void clipLoopToWindow() {
+		if (sampleLoopBegin < sampleOffset)
+			sampleLoopBegin = sampleOffset;
+		if (sampleLoopEnd > sampleOffset + sampleWidth)
+			sampleLoopEnd = sampleOffset + sampleWidth;
+	}
+	
 	private void handleWaveActionDown(int id, float x) {
 		if (!selectLoopMarker(id, x)) {
 			// loop marker not close enough to select.  start scroll
@@ -241,29 +287,33 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	private void handleWaveActionPointerUp(MotionEvent e, int id) {
 		deselectLoopMarker(id);
+		scrollAnchorSample = -1;
 		// stop zooming
 		if (zoomLeftAnchorSample != -1 && zoomRightAnchorSample != -1) {
-			setScrollAnchor(e.getX((id + 1)%2));
+			int otherId = (id + 1)%2;
+			if (otherId != previewPointerId)
+				setScrollAnchor(e.getX(otherId));
 		}
 		zoomLeftAnchorSample = zoomRightAnchorSample = -1;
 	}
 
-	private void handleWaveActionMove(MotionEvent e) {
+	private void handleActionMove(MotionEvent e) {
 		if (zoomLeftAnchorSample != -1 && zoomRightAnchorSample != -1
 				&& previewPointerId == -1)
 			zoom(e.getX(0), e.getX(1));
 		for (int i = 0; i < e.getPointerCount(); i++) {
 			int id = e.getPointerId(i);
-			if (!moveLoopMarker(id, e.getX(i)))
+			if (id == previewPointerId) {
+				if (e.getX(i) > previewButtonWidth) {					
+					// if a click goes down on the preview button, 
+					// then moves out of it into wave, stop previewing
+					previewPointerId = -1;
+					playbackManager.stopTrack(trackNum);
+				}
+			} else if (!moveLoopMarker(id, e.getX(i)))
 				scroll(e.getX(i));
-			if (id == previewPointerId && e.getX(i) > previewButtonWidth) {
-				// if a click goes down on the preview button, 
-				// then moves out of it into wave, stop previewing
-				playbackManager.stopTrack(trackNum);
-			}
 		}
-		// update the display location of the loop markers
-		initLoopMarkerVB();
+		updateLoopMarkers();
 	}
 	
 	public void handlePreviewActionDown(int id) {
@@ -297,7 +347,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 				handlePreviewActionPointerDown(e.getPointerId(index));
 			break;
 		case MotionEvent.ACTION_MOVE:
-			handleWaveActionMove(e);			
+			handleActionMove(e);			
 			break;
 		case MotionEvent.ACTION_POINTER_UP:			
 			index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;

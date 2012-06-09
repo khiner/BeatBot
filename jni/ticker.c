@@ -1,13 +1,9 @@
-#include <stdint.h>
 #include "nativeaudio.h"
 
-// nanoseconds per tick
-long NSPT = 100;
-
-long loopTick = 0; // again, this should be set by Java
-
-// startTicking() keeps track of this currTick
-long currTick = 0;
+void initTicker() {
+  currTick = 0;
+  loopTick = 0;
+}
 
 jlong Java_com_kh_beatbot_manager_MidiManager_getCurrTick(JNIEnv *env, jclass clazz) {
 	return currTick;
@@ -62,9 +58,9 @@ void Java_com_kh_beatbot_manager_MidiManager_startTicking(JNIEnv *env, jclass cl
 			MidiEvent *currEvent = findEvent(midiEventHead, currTick);
 			if (currEvent == NULL)
 				continue;
-		    if (track->playing && !currEvent->muted) {
+		    if (currTick == currEvent->offTick && !currEvent->muted) {
 				stopTrack(i);
-			} else if (!currEvent->muted) {
+			} else if (currTick == currEvent->onTick && !currEvent->muted) {
 				playTrack(i, currEvent->volume, currEvent->pan, currEvent->pitch);
 			}
 		}
