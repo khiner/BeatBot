@@ -8,11 +8,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import android.util.Log;
-
 import com.kh.beatbot.view.MidiView;
 
 public class WaveformHelper extends Thread {
+	public static final int DEFAULT_HEIGHT = 100;
+	public static final int DEFAULT_SPP = 2; // default samples per pixel
+	
 	// byte buffers will be read from file in segments and
 	// temporarily stored in this array until they are consolidated
 	// into one large FloatBuffer and stored in completedWaveforms
@@ -22,20 +23,10 @@ public class WaveformHelper extends Thread {
 	// and before they are classified and displayed as MIDI notes
 	private ArrayList<FloatBuffer> completedWaveforms = new ArrayList<FloatBuffer>();
 
-	Queue<byte[]> bytesQueue = new LinkedList<byte[]>();
-
-	private float width, height;
-
-	private int xOffset = 0;
-	
+	private Queue<byte[]> bytesQueue = new LinkedList<byte[]>();
+		
 	private boolean completed;
-
-	public WaveformHelper(float width, float height) {
-		this.width = width;
-		this.height = height;
-		start();
-	}
-
+		
 	public ArrayList<FloatBuffer> getCurrentWaveformVBs() {
 		return waveformSegmentsVB;
 	}
@@ -47,6 +38,8 @@ public class WaveformHelper extends Thread {
 	@Override
 	public void run() {
 		byte[] bytes;
+		int xOffset = 0;
+		
 		while (true) {
 			try {
 				synchronized (bytesQueue) {
@@ -55,9 +48,10 @@ public class WaveformHelper extends Thread {
 					}
 					bytes = bytesQueue.remove();
 				}
-				waveformSegmentsVB.add(bytesToFloatBuffer(bytes));
-				if (completed) {				
-					xOffset = 0;					
+				waveformSegmentsVB.add(bytesToFloatBuffer(bytes, DEFAULT_HEIGHT, xOffset));
+				xOffset += bytes.length / DEFAULT_SPP;				
+				if (completed) {
+					xOffset = 0;
 					waveformSegmentsVB.clear();
 					completed = false;
 				}
@@ -78,15 +72,25 @@ public class WaveformHelper extends Thread {
 		completed = true;
 	}
 	
-	public FloatBuffer bytesToFloatBuffer(byte[] bytes) {
-		float[] data = floatsFromBytes(bytes);
+	// default to 0 offset, used when only a single FloatBuffer is needed
+	// (for a static sample)
+	public static FloatBuffer bytesToFloatBuffer(byte[] bytes, float height) {
+		return bytesToFloatBuffer(bytes, height, 0);
+	}
+	
+	public static FloatBuffer bytesToFloatBuffer(byte[] bytes, float height, int xOffset) {
+		float[] floats = bytesToFloats(bytes);
+		return floatsToFloatBuffer(floats, height, xOffset);
+	}
+	
+	public static FloatBuffer floatsToFloatBuffer(float[] data, float height, int xOffset) {
 		int size = data.length;
-		int samplesPerPixel = width <= 0 ? 200 : size/(int)width; // default to 200 if no width specified
-		float[] outputAry = new float[8 * size / samplesPerPixel];
-		for (int x = 0; x < size / samplesPerPixel; x++) {
+		// int samplesPerPixel = width <= 0 || (int)(size/width) > 4 ? 4 : (int)(size/width);
+		float[] outputAry = new float[2 * size / DEFAULT_SPP];
+		for (int x = 0; x < size / DEFAULT_SPP; x++) {
 			// determine start and end points within WAV
-			int start = x * samplesPerPixel;
-			int end = (x + 1) * samplesPerPixel;
+			int start = x * DEFAULT_SPP;
+			int end = (x + 1) * DEFAULT_SPP;
 			float min = Float.MAX_VALUE;
 			float max = Float.MIN_VALUE;
 			for (int i = start; i < end; i++) {
@@ -94,26 +98,24 @@ public class WaveformHelper extends Thread {
 				min = val < min ? val : min;
 				max = val > max ? val : max;
 			}
-			float yMin = (height - ((min + 1) * .5f * height));
-			float yMax = (height - ((max + 1) * .5f * height));
-			outputAry[x * 4] = x + xOffset;
-			outputAry[x * 4 + 1] = yMin;
-			outputAry[x * 4 + 2] = x + xOffset;
-			outputAry[x * 4 + 3] = yMax;
+			
+			float y1 = height*(min + 1)/2 + 1;
+			float y2 = height*(max + 1)/2 - 1;
+			outputAry[x * 2] = x + xOffset;
+			outputAry[x * 2 + 1] = (y1 + y2)/2;
 		}
-		xOffset += size / samplesPerPixel;
 
 		return MidiView.makeFloatBuffer(outputAry);
 	}
 
-	private float[] floatsFromBytes(byte[] input) {
-		ShortBuffer sbuf = ByteBuffer.wrap(input).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
-		short[] audioShorts = new short[sbuf.capacity()];
-		sbuf.get(audioShorts);
-		float[] audioFloats = new float[audioShorts.length];
-		for (int i = 0; i < audioShorts.length; i++) {
-			audioFloats[i] = ((float)audioShorts[i])/0x8000;
+	public static float[] bytesToFloats(byte[] input) {
+		ShortBuffer shortBuffer = ByteBuffer.wrap(input).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
+		short[] shortData = new short[shortBuffer.capacity()];
+		shortBuffer.get(shortData);
+		float[] floatData = new float[shortData.length];
+		for (int i = 0; i < shortData.length; i++) {
+			floatData[i] = ((float)shortData[i])/0x8000;
 		}		
-		return audioFloats;
+		return floatData;
 	}
 }

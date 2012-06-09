@@ -74,17 +74,13 @@ public class BeatBotActivity extends Activity {
 		public void onClick(View view) {
 			int position = (Integer) view.getTag();
 			if (view.getId() == R.id.icon) {
-				// preview the sample with a default velocity of 3/4,
-				// middle pan and normal pitch
-				// playbackManager.playTrack(position, .75f, .5f, .5f);
-
 				// open new intent for sample edit view
 				// and pass the name and number of the sample to the intent as extras
 				Intent intent = new Intent();
 				intent.setClass(this.getContext(), SampleEditActivity.class);
 				intent.putExtra("sampleNum", position);
 				intent.putExtra("sampleName",getItem(position));
-				startActivity(intent);	
+				startActivity(intent);
 			} else if (view.getId() == R.id.mute) {
 				ToggleButton muteButton = (ToggleButton) view;
 				if (muteButton.isChecked())

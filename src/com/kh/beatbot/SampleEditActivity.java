@@ -28,23 +28,24 @@ public class SampleEditActivity extends Activity {
 		sampleNum = getIntent().getExtras().getInt("sampleNum");
 		sampleWaveformView = ((SampleWaveformView)findViewById(R.id.sample_waveform_view));
 		sampleWaveformView.setPlaybackManager(playbackManager);
-		sampleWaveformView.setSampleNum(sampleNum);
+		sampleWaveformView.setTrackNum(sampleNum);
 		String sampleName = getIntent().getExtras().getString("sampleName");
-		loadSampleBytes(sampleName);
+		// numSamples should be in shorts, so divide by two
+		sampleWaveformView.setSampleBytes(loadSampleBytes(sampleName));
 		playbackManager.armTrack(sampleNum);
 		((ToggleButton)findViewById(R.id.loop_toggle)).setChecked(playbackManager.isLooping(sampleNum));
 	}
 
-	private void loadSampleBytes(String sampleName) {
+	private byte[] loadSampleBytes(String sampleName) {
 		try {
 			AssetFileDescriptor fd = getAssets().openFd(sampleName);
-			byte[] sampleBytes = new byte[(int) fd.getLength()];
-			// read in the sample bytes
-			fd.createInputStream().read(sampleBytes);
-			// set the view sample bytes
-			((SampleWaveformView) findViewById(R.id.sample_waveform_view)).setSampleBytes(sampleBytes);			
+			// the first 44 bytes of a .wav file are header - skip them
+			byte[] sampleBytes = new byte[(int) fd.getLength() - 44];
+			fd.createInputStream().read(sampleBytes, 44, sampleBytes.length - 44);
+			return sampleBytes;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return null;
 		}
 	}
 

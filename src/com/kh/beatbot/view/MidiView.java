@@ -284,18 +284,19 @@ public class MidiView extends SurfaceViewBase {
 				.getCurrentWaveformVBs();
 		if (recordManager.isRecording() && !waveformVBs.isEmpty()) {
 			FloatBuffer last = waveformVBs.get(waveformVBs.size() - 1);
-			float waveWidth = last.get(last.capacity() / 2 - 2);
+			float waveWidth = last.get(last.capacity() - 2);
 			float noteWidth = tickToX(midiManager.getCurrTick()
 					- recordManager.getRecordStartTick());
 			gl.glPushMatrix();
 			gl.glTranslatef(tickToX(recordManager.getRecordStartTick()), 0, 0);
-			gl.glScalef(noteWidth / waveWidth, 1, 1);
-			// midiManager.
+			// scale drawing so the entire waveform exactly fits in the note width			
+			gl.glScalef(noteWidth / waveWidth, 1, 1);			
 			for (int i = 0; i < waveformVBs.size(); i++) {
 				gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVBs.get(i));
-				gl.glDrawArrays(GL10.GL_LINES, 0,
+				gl.glDrawArrays(GL10.GL_LINE_STRIP, 0,
 						waveformVBs.get(i).capacity() / 2);
 			}
+			
 			gl.glPopMatrix();
 		}
 	}
@@ -470,10 +471,14 @@ public class MidiView extends SurfaceViewBase {
 		return rightMostNote;
 	}
 
+	public void signalRecording() {
+		waveformHelper.start();
+	}
+	
 	protected void init() {
 		levelsHelper = new LevelsViewHelper(this);
 		// waveformHelper constructor: yPos, height
-		waveformHelper = new WaveformHelper(0, bean.getHeight() / 3);
+		waveformHelper = new WaveformHelper();
 		tickWindow.updateGranularity();
 		float color = bean.getBgColor();
 		gl.glClearColor(color, color, color, 1.0f);

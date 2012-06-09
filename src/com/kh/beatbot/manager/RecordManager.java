@@ -13,9 +13,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Environment;
-import android.util.Log;
 
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.ThresholdBarView;
 
@@ -148,9 +146,12 @@ public class RecordManager {
 		recorder.read(buffer, 0, bufferSize);
 		recorder.read(buffer, 0, bufferSize);
 
+		// let the midi view know recording has started
+		// so it can listen for byte buffers to draw them
+		midiView.signalRecording();
+		
 		try {
 			while (state != State.INITIALIZING) {
-				Log.d("rr", "running");
 				recorder.read(buffer, 0, bufferSize);
 
 				if (state == State.LISTENING && overThreshold(buffer)) {
@@ -227,7 +228,7 @@ public class RecordManager {
 
 	public void startRecording() throws IOException {
 		recordStartTick = midiManager.getCurrTick();
-		recordTickQueue.add(recordStartTick);		
+		recordTickQueue.add(recordStartTick);
 		currFilename = getTempFilename();
 		os = new FileOutputStream(currFilename);
 		state = State.RECORDING;
