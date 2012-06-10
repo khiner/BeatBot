@@ -45,7 +45,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private float scrollAnchorSample = -1;
 	private int scrollVelocity = 0;
 
-	private byte[] sampleBytes = null;
+	private float[] samples = null;
 	// zooming/scrolling will change the view window of the samples
 	// keep track of that with offset and width
 	private float sampleOffset = 0;
@@ -63,11 +63,14 @@ public class SampleWaveformView extends SurfaceViewBase {
 		this.trackNum = trackNum;
 	}
 
-	public void setSampleBytes(byte[] sampleBytes) {
-		this.sampleBytes = sampleBytes;
-		numSamples = sampleBytes.length/2;
+	public void setSamples(float[] samples) {
+		this.samples = samples;
+		numSamples = samples.length;
 		sampleLoopEnd = numSamples;
-		sampleWidth = numSamples;		
+		sampleWidth = numSamples;	
+		if (height != 0) {
+			waveformVB = WaveformHelper.floatsToFloatBuffer(samples, height, 0);
+		}
 	}
 	
 	private void drawWaveform() {
@@ -103,9 +106,9 @@ public class SampleWaveformView extends SurfaceViewBase {
 	protected void init() {
 		previewButtonWidth = width/7;
 		waveformWidth = 6*width/7;
-		while (sampleBytes == null)
+		while (samples == null)
 			; // wait until we're sure the sample bytes have been set
-		waveformVB = WaveformHelper.bytesToFloatBuffer(sampleBytes, height);		
+		waveformVB = WaveformHelper.floatsToFloatBuffer(samples, height, 0);		
 		initLoopMarkerVB();
 	}
 

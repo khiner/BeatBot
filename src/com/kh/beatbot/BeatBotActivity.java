@@ -75,11 +75,10 @@ public class BeatBotActivity extends Activity {
 			int position = (Integer) view.getTag();
 			if (view.getId() == R.id.icon) {
 				// open new intent for sample edit view
-				// and pass the name and number of the sample to the intent as extras
+				// and pass the number of the sample to the intent as extras
 				Intent intent = new Intent();
 				intent.setClass(this.getContext(), SampleEditActivity.class);
 				intent.putExtra("sampleNum", position);
-				intent.putExtra("sampleName",getItem(position));
 				startActivity(intent);
 			} else if (view.getId() == R.id.mute) {
 				ToggleButton muteButton = (ToggleButton) view;

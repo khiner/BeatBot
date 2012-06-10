@@ -99,8 +99,8 @@ public class WaveformHelper extends Thread {
 				max = val > max ? val : max;
 			}
 			
-			float y1 = height*(min + 1)/2 + 1;
-			float y2 = height*(max + 1)/2 - 1;
+			float y1 = height*(min + 1)/2;
+			float y2 = height*(max + 1)/2;
 			outputAry[x * 2] = x + xOffset;
 			outputAry[x * 2 + 1] = (y1 + y2)/2;
 		}

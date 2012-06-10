@@ -36,4 +36,7 @@
     <string name="sample_edit_activity">Sample Edit</string>
     <string name="preview_sample">Preview</string>
     <string name="loop_sample">Loop Sample</string>
+    <string name="reverse">Reverse</string>
+    <string name="normalize">Normalize</string>
+    
 </resources>

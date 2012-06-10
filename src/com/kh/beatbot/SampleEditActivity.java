@@ -1,9 +1,6 @@
 package com.kh.beatbot;
 
-import java.io.IOException;
-
 import android.app.Activity;
-import android.content.res.AssetFileDescriptor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ToggleButton;
@@ -29,28 +26,22 @@ public class SampleEditActivity extends Activity {
 		sampleWaveformView = ((SampleWaveformView)findViewById(R.id.sample_waveform_view));
 		sampleWaveformView.setPlaybackManager(playbackManager);
 		sampleWaveformView.setTrackNum(sampleNum);
-		String sampleName = getIntent().getExtras().getString("sampleName");
 		// numSamples should be in shorts, so divide by two
-		sampleWaveformView.setSampleBytes(loadSampleBytes(sampleName));
+		sampleWaveformView.setSamples(getSamples(sampleNum));
 		playbackManager.armTrack(sampleNum);
 		((ToggleButton)findViewById(R.id.loop_toggle)).setChecked(playbackManager.isLooping(sampleNum));
 	}
 
-	private byte[] loadSampleBytes(String sampleName) {
-		try {
-			AssetFileDescriptor fd = getAssets().openFd(sampleName);
-			// the first 44 bytes of a .wav file are header - skip them
-			byte[] sampleBytes = new byte[(int) fd.getLength() - 44];
-			fd.createInputStream().read(sampleBytes, 44, sampleBytes.length - 44);
-			return sampleBytes;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
 	public void toggleLoop(View view) {
 		playbackManager.toggleLooping(sampleNum);
+	}
+	
+	public void reverse(View view) {
+		sampleWaveformView.setSamples(reverse(sampleNum));
+	}
+	
+	public void normalize(View view) {
+		sampleWaveformView.setSamples(normalize(sampleNum));
 	}
 	
 	@Override
@@ -59,5 +50,12 @@ public class SampleEditActivity extends Activity {
 		if (playbackManager.getState() != PlaybackManager.State.PLAYING)
 			// if not currently playing, disarm the track
 			playbackManager.disarmTrack(sampleNum);
-	}		
+	}	
+	
+	// get the audio data in floats
+	public native float[] getSamples(int trackNum);
+	// reverse the sample from loop begin to loop end
+	public native float[] reverse(int trackNum);
+	// scale all samples so that the sample with the highest amplitude is at 1
+	public native float[] normalize(int trackNum);
 }

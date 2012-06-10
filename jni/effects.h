@@ -59,4 +59,8 @@ void decimate_process(DecimateConfig *p, float buffer[], int size);
 
 void decimateconfig_destroy(DecimateConfig *p);
 
+void reverse(float buffer[], int begin, int end);
+
+void normalize(float buffer[], int size);
+
 #endif // EFFECTS_H

@@ -52,7 +52,7 @@ typedef struct Track_ {
 	float currBufferFlt[BUFF_SIZE];
 	short currBufferShort[BUFF_SIZE];
 	
-	// buffer to hold sample
+	// buffer to hold original sample data
 	float *buffer;
 	
 	int totalSamples;

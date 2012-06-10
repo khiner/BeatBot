@@ -516,7 +516,8 @@ void Java_com_kh_beatbot_manager_MidiManager_clearMutedNotes(JNIEnv* env, jclass
 /****************************************************************************************
  Java MidiNote JNI methods
 ****************************************************************************************/
-void Java_com_kh_beatbot_midi_MidiNote_setVolume(JNIEnv* env, jclass clazz, jint trackNum, jlong onTick, jfloat volume) {
+void Java_com_kh_beatbot_midi_MidiNote_setVolume(JNIEnv* env, jclass clazz,
+                                                 jint trackNum, jlong onTick, jfloat volume) {
   if (trackNum < 0 || trackNum >= numTracks)
     return;		
 	
@@ -527,7 +528,8 @@ void Java_com_kh_beatbot_midi_MidiNote_setVolume(JNIEnv* env, jclass clazz, jint
   }
 }
 
-void Java_com_kh_beatbot_midi_MidiNote_setPan(JNIEnv* env, jclass clazz, jint trackNum, jlong onTick, jfloat pan) {
+void Java_com_kh_beatbot_midi_MidiNote_setPan(JNIEnv* env, jclass clazz,
+                                              jint trackNum, jlong onTick, jfloat pan) {
   if (trackNum < 0 || trackNum >= numTracks)
     return;		
   Track *track = &tracks[trackNum];
@@ -537,7 +539,8 @@ void Java_com_kh_beatbot_midi_MidiNote_setPan(JNIEnv* env, jclass clazz, jint tr
   }
 }
 
-void Java_com_kh_beatbot_midi_MidiNote_setPitch(JNIEnv* env, jclass clazz, jint trackNum, jlong onTick, jfloat pitch) {
+void Java_com_kh_beatbot_midi_MidiNote_setPitch(JNIEnv* env, jclass clazz,
+                                                jint trackNum, jlong onTick, jfloat pitch) {
   if (trackNum < 0 || trackNum >= numTracks)
     return;		
   Track *track = &tracks[trackNum];
@@ -547,7 +550,37 @@ void Java_com_kh_beatbot_midi_MidiNote_setPitch(JNIEnv* env, jclass clazz, jint 
   }
 }
 
+/****************************************************************************************
+ Java SampleEditActivity JNI methods
+****************************************************************************************/
+jfloatArray makejFloatArray(JNIEnv* env, float floatAry[], int size) {
+	jfloatArray result = (*env)->NewFloatArray(env, size);
+	(*env)->SetFloatArrayRegion(env, result, 0, size, floatAry);
+	return result;
+}
 
+jfloatArray Java_com_kh_beatbot_SampleEditActivity_getSamples(JNIEnv* env, jclass clazz, jint trackNum) {
+  	if (trackNum < 0 || trackNum >= numTracks)
+	    return;		
+  	Track *track = &tracks[trackNum];
+	return makejFloatArray(env, track->buffer, track->totalSamples);
+}
+
+jfloatArray Java_com_kh_beatbot_SampleEditActivity_reverse(JNIEnv* env, jclass clazz, jint trackNum) {
+  	if (trackNum < 0 || trackNum >= numTracks)
+	    return;		
+  	Track *track = &tracks[trackNum];
+	reverse(track->buffer, track->loopBegin, track->loopEnd);	
+	return makejFloatArray(env, track->buffer, track->totalSamples);
+}
+
+jfloatArray Java_com_kh_beatbot_SampleEditActivity_normalize(JNIEnv* env, jclass clazz, jint trackNum) {
+	if (trackNum < 0 || trackNum >= numTracks)
+		return;
+	Track *track = &tracks[trackNum];
+	normalize(track->buffer, track->totalSamples);
+	return makejFloatArray(env, track->buffer, track->totalSamples);
+}
 
 // shut down the native audio system
 void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv* env, jclass clazz)
