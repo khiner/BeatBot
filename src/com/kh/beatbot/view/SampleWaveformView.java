@@ -332,7 +332,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 	public boolean onTouchEvent(MotionEvent e) {		
 		// delegating the wave edit touch events through the parent activity to allow
 		// touching of multiple views at the same time
-		// TODO: still doesn't work!
 		switch (e.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_CANCEL:
 			return false;

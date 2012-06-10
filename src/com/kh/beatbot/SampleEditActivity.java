@@ -8,12 +8,14 @@ import android.widget.ToggleButton;
 import com.KarlHiner.BeatBot.R;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.PlaybackManager;
+import com.kh.beatbot.view.EditLevelsView;
 import com.kh.beatbot.view.SampleWaveformView;
 
 
 public class SampleEditActivity extends Activity {
 	private PlaybackManager playbackManager = null;
-	private SampleWaveformView sampleWaveformView = null;	
+	private SampleWaveformView sampleWaveformView = null;
+	private EditLevelsView editLevelsView = null;
 	private int sampleNum;
 	
 	@Override
@@ -24,8 +26,11 @@ public class SampleEditActivity extends Activity {
 		playbackManager = gv.getPlaybackManager();
 		sampleNum = getIntent().getExtras().getInt("sampleNum");
 		sampleWaveformView = ((SampleWaveformView)findViewById(R.id.sample_waveform_view));
+		editLevelsView = ((EditLevelsView)findViewById(R.id.edit_levels_view));
 		sampleWaveformView.setPlaybackManager(playbackManager);
 		sampleWaveformView.setTrackNum(sampleNum);
+		editLevelsView.setActivity(this);
+		editLevelsView.setTrackNum(sampleNum);
 		// numSamples should be in shorts, so divide by two
 		sampleWaveformView.setSamples(getSamples(sampleNum));
 		playbackManager.armTrack(sampleNum);

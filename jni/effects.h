@@ -35,6 +35,8 @@ typedef struct DecimateConfig_t {
 
 VolumePanConfig *volumepanconfig_create(float volume, float pan);
 
+void volumepanconfig_set(VolumePanConfig *volumePanConfig, float volume, float pan);
+
 void volumepan_process(VolumePanConfig *p, float buffer[], int size);
 
 void *volumepanconfig_destroy(VolumePanConfig *p);

@@ -9,6 +9,11 @@ VolumePanConfig *volumepanconfig_create(float volume, float pan) {
 	return p;
 }
 
+void volumepanconfig_set(VolumePanConfig *p, float volume, float pan) {
+	p->volume = volume;
+	p->pan = pan;
+}
+
 void volumepan_process(VolumePanConfig *p, float buffer[], int size) {
 	float leftVolume = (1 - p->pan)*p->volume;
 	float rightVolume = p->pan*p->volume;

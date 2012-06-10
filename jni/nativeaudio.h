@@ -54,26 +54,32 @@ typedef struct Track_ {
 	
 	// buffer to hold original sample data
 	float *buffer;
+	// buffer to hold sample data with precalculated effects
+	float *scratchBuffer;
 	
 	int totalSamples;
 	int currSample;
+	
+	float primaryVolume;
+	float primaryPan;
+	float primaryPitch;
 	
 	float volume;
 	float pan;
 	float pitch;
 	
-        bool armed;
+	bool armed;
 	bool playing;
-        bool loopMode;
+    bool loopMode;
 
-        int loopBegin;
-        int loopEnd;
+    int loopBegin;
+    int loopEnd;
 
-        // effect configs
-        VolumePanConfig *volumePanConfig;	
+    // effect configs
+    VolumePanConfig *volumePanConfig;	
 	DelayConfig *delayConfig;
-        FilterConfig *filterConfig;
-        DecimateConfig *decimateConfig;
+    FilterConfig *filterConfig;
+    DecimateConfig *decimateConfig;
 
 	SLObjectItf outputPlayerObject;
 	SLPlayItf outputPlayerPlay;
