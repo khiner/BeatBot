@@ -65,10 +65,12 @@ MidiEvent* initEvent(long onTick, long offTick, float volume, float pan, float p
 
 void precalculateEffects(Track *track) {
 	// start with the raw audio samples
-	memcpy(track->scratchBuffer, track->buffer, track->totalSamples);
+	memcpy(track->scratchBuffer, track->buffer, sizeof(float)*track->totalSamples);	
+//	pitchconfig_set(track->pitchConfig, track->primaryPitch);
+//	__android_log_print(ANDROID_LOG_INFO, "about to process", "pitch");	
+//	pitch_process(track->pitchConfig, track->scratchBuffer, track->totalSamples);	
 	volumepanconfig_set(track->volumePanConfig, track->primaryVolume, track->primaryPan);
 	volumepan_process(track->volumePanConfig, track->scratchBuffer, track->totalSamples);
-	
     // filter_process(track->filterConfig, track->currBufferFlt, BUFF_SIZE);
     // decimate_process(track->decimateConfig, track->currBufferFlt, BUFF_SIZE);
 }
@@ -91,6 +93,7 @@ void initTrack(Track *track, AAsset *asset) {
   track->pan = .5f;
   track->pitch = .5f;
   track->volumePanConfig = volumepanconfig_create(.5, .5);
+  track->pitchConfig = pitchconfig_create(1);
   track->delayConfig = delayconfig_create(0.8, 0.7);
   track->filterConfig = filterconfig_create(11050, 0.5);
   track->decimateConfig = decimateconfig_create(4, 0.5);
@@ -134,10 +137,10 @@ void calcNextBuffer(Track *track) {
       } 
     }
   }
-  // calc volume/pan
   volumepan_process(track->volumePanConfig, track->currBufferFlt, BUFF_SIZE);
-  // calc delay
-  // delay_process(track->delayConfig, track->currBufferFlt, BUFF_SIZE);
+  
+  //pitch_process(track->pitch, track->currBufferFlt, BUFF_SIZE);
+  //delay_process(track->delayConfig, track->currBufferFlt, BUFF_SIZE);
   
   // convert floats to shorts
   floatArytoShortAry(track->currBufferFlt, track->currBufferShort, BUFF_SIZE);	
@@ -280,7 +283,7 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
   SLDataSource outputAudioSrc = {&loc_bufq, &format_pcm};
 
   // create audio player for output buffer queue
-  const SLInterfaceID ids1[] = {SL_IID_ANDROIDSIMPLEBUFFERQUEUE, SL_IID_VOLUME, SL_IID_MUTESOLO};
+  const SLInterfaceID ids1[] = {SL_IID_ANDROIDSIMPLEBUFFERQUEUE, SL_IID_PLAYBACKRATE, SL_IID_MUTESOLO};
   const SLboolean req1[] = {SL_BOOLEAN_TRUE};
   result = (*engineEngine)->CreateAudioPlayer(engineEngine, &(track->outputPlayerObject), &outputAudioSrc, &audioSnk,
                                               3, ids1, req1);
@@ -293,10 +296,14 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
   result = (*(track->outputPlayerObject))->GetInterface(track->outputPlayerObject, SL_IID_PLAY, &(track->outputPlayerPlay));
   assert(result == SL_RESULT_SUCCESS);
 
-  // get the volume interface
-  result = (*(track->outputPlayerObject))->GetInterface(track->outputPlayerObject, SL_IID_VOLUME, &(track->outputPlayerVolume));
+  // get the pitch interface
+  result = (*(track->outputPlayerObject))->GetInterface(track->outputPlayerObject, SL_IID_PLAYBACKRATE, &(track->outputPlayerPitch));
   assert(result == SL_RESULT_SUCCESS);
-	
+
+	if (!track->outputPlayerPitch)
+	 	__android_log_print(ANDROID_LOG_INFO, "null!", "pitch");
+	else
+		(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, 1000);
   // get the mute/solo interface
   result = (*(track->outputPlayerObject))->GetInterface(track->outputPlayerObject, SL_IID_MUTESOLO, &(track->outputPlayerMuteSolo));
   assert(result == SL_RESULT_SUCCESS);
@@ -332,8 +339,9 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv* env, jclass clazz) {
     free(track->scratchBuffer);    
     free(track->currBufferFlt);
     free(track->currBufferShort);
-    delayconfig_destroy(track->delayConfig);
     volumepanconfig_destroy(track->volumePanConfig);
+    pitchconfig_destroy(track->pitchConfig);
+    delayconfig_destroy(track->delayConfig);
     freeLinkedList(track->eventHead);
   }
   free(tracks);
@@ -368,7 +376,11 @@ void playTrack(int trackNum, float volume, float pan, float pitch) {
   track->currSample = track->loopBegin;
   track->volumePanConfig->volume = volume;
   track->volumePanConfig->pan = pan;
+  track->pitch = pitch;
   track->playing = true;
+  if (track->outputPlayerPitch != NULL) {
+	  (*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((pitch + track->primaryPitch)*750 + 500));
+  }	  
 }
 
 void stopTrack(int trackNum) {
@@ -685,5 +697,8 @@ void Java_com_kh_beatbot_view_EditLevelsView_setPrimaryPitch(JNIEnv* env, jclass
 	if (track == NULL)
 		return;
 	track->primaryPitch = pitch;
-	precalculateEffects(track);	
+	//precalculateEffects(track);	
+	if (track->outputPlayerPitch != NULL) {
+	  (*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((track->pitch + track->primaryPitch)*750 + 500));	
+  	}	
 }

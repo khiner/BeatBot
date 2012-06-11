@@ -3,6 +3,10 @@
 
 #include <stdlib.h>
 #include <math.h>
+// sound touch pitch-shifting/time-stretching library
+// cpp-wrapper port
+#include <soundtouch4c.h>
+#include <stdbool.h>
 
 #define BUDDA_Q_SCALE 6.f
 
@@ -34,35 +38,29 @@ typedef struct DecimateConfig_t {
 } DecimateConfig;
 
 VolumePanConfig *volumepanconfig_create(float volume, float pan);
-
 void volumepanconfig_set(VolumePanConfig *volumePanConfig, float volume, float pan);
-
 void volumepan_process(VolumePanConfig *p, float buffer[], int size);
-
 void *volumepanconfig_destroy(VolumePanConfig *p);
 
+struct soundtouch4c *pitchconfig_create(float pitch);
+void pitchconfig_set(struct soundtouch4c *snd, float pitch);
+void pitch_process(float pitch, float buffer[], int size);
+void pitchconfig_destroy(struct soundtouch4c *snd);
+
 DelayConfig *delayconfig_create(float delay, float fdb);
-
 void delay_process(DelayConfig *p, float buffer[], int size);
-
 void *delayconfig_destroy(DelayConfig *p);
 
 FilterConfig *filterconfig_create(float cutoff, float q);
-
 void filterconfig_set(FilterConfig *filterConfig, float cutoff, float q);
-
 void filter_process(FilterConfig *p, float buffer[], int size);
-
 void *filterconfig_destroy(FilterConfig *p);
 
 DecimateConfig *decimateconfig_create(int bits, float rate);
-
 void decimate_process(DecimateConfig *p, float buffer[], int size);
-
 void decimateconfig_destroy(DecimateConfig *p);
 
 void reverse(float buffer[], int begin, int end);
-
 void normalize(float buffer[], int size);
 
 #endif // EFFECTS_H

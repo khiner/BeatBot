@@ -71,5 +71,28 @@
         android:layout_toRightOf="@+id/volumeView"
         android:layout_alignTop="@+id/volumeView"
         android:layout_alignBottom="@+id/pitchView" />
+    
+    <ImageButton
+        android:id="@+id/filterButton"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:background="@drawable/filter_icon"
+        android:layout_below="@+id/edit_levels_view" />
 
+    <ImageButton
+        android:id="@+id/bitcrushButton"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:background="@drawable/bitcrush_icon"
+        android:layout_toRightOf="@+id/filterButton"
+        android:layout_below="@+id/edit_levels_view" />
+
+    <ImageButton
+        android:id="@+id/delayButton"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:background="@drawable/delay_icon"
+        android:layout_toRightOf="@+id/bitcrushButton"
+        android:layout_below="@+id/edit_levels_view" />
+    
 </RelativeLayout>

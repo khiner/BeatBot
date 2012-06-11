@@ -19,7 +19,7 @@ public class EditLevelsView extends SurfaceViewBase {
 	private long animateCount = 0;
 	private FloatBuffer levelsVB = null;
 	private int[] selected = { -1, -1, -1 };
-	private final float SNAP_DIST_X = 35;
+	private final float SNAP_DIST_X = 45;
 	private final float SNAP_DIST_Y = 25;	
 
 	private SampleEditActivity activity;
@@ -102,7 +102,7 @@ public class EditLevelsView extends SurfaceViewBase {
 
 	@Override
 	protected void drawFrame() {
-		gl.glClearColor(.2f, .2f, .2f, 1);
+		gl.glClearColor(0, 0, 0, 1);
 		drawLevels();
 	}
 

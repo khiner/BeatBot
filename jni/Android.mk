@@ -17,12 +17,9 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := nativeaudio
-LOCAL_SRC_FILES := nativeaudio.c effects.c hashmap.c ticker.c
-# for native audio
-LOCAL_LDLIBS    += -lOpenSLES
-# for logging
-LOCAL_LDLIBS    += -llog
-# for native asset manager
-LOCAL_LDLIBS    += -landroid
+LOCAL_SRC_FILES := nativeaudio.c effects.c ticker.c soundtouch4c.cpp
+FILE_LIST := $(wildcard $(LOCAL_PATH)/SoundTouch/*.cpp)
+LOCAL_SRC_FILES += $(FILE_LIST:$(LOCAL_PATH)/%=%)
+LOCAL_LDLIBS    += -lOpenSLES -llog -landroid
 
 include $(BUILD_SHARED_LIBRARY)

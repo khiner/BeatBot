@@ -5,6 +5,7 @@
 #include <jni.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <sys/time.h>
 
 // for Android logging
@@ -16,17 +17,15 @@
 
 // for native asset manager
 #include <sys/types.h>
-#include <android/log.h>
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 
 #include "effects.h"
-#include "hashmap.h"
 #include "ticker.h"
 
 #define CONV16BIT 32768
 #define CONVMYFLT (1./32768.)
-#define BUFF_SIZE 512
+#define BUFF_SIZE 1024
 
 static SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, 2, SL_SAMPLINGRATE_44_1,
 									  SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
@@ -76,15 +75,16 @@ typedef struct Track_ {
     int loopEnd;
 
     // effect configs
-    VolumePanConfig *volumePanConfig;	
+    VolumePanConfig *volumePanConfig;
+    struct soundtouch4c *pitchConfig;
 	DelayConfig *delayConfig;
     FilterConfig *filterConfig;
     DecimateConfig *decimateConfig;
-
+	
 	SLObjectItf outputPlayerObject;
 	SLPlayItf outputPlayerPlay;
-	SLVolumeItf outputPlayerVolume;
 	SLMuteSoloItf outputPlayerMuteSolo;
+	SLPlaybackRateItf outputPlayerPitch;
 	// output buffer interfaces
 	SLAndroidSimpleBufferQueueItf outputBufferQueue;
 } Track;
