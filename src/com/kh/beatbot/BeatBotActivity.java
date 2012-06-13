@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -56,6 +57,17 @@ public class BeatBotActivity extends Activity {
 		@Override
 		public void onAnimationStart(Animation animation) {
 			levelsGroup.setVisibility(View.VISIBLE);
+		}
+	}
+
+	public class IconLongClickListener implements OnLongClickListener {
+		@Override
+		public boolean onLongClick(View view) {
+			int position = (Integer) view.getTag();
+			if (view.getId() == R.id.icon) {
+				midiManager.selectRow(position);
+			}			
+			return true;
 		}
 	}
 
@@ -114,6 +126,8 @@ public class BeatBotActivity extends Activity {
 			icon.setOnClickListener(this);
 			mute.setOnClickListener(this);
 			solo.setOnClickListener(this);
+			icon.setOnLongClickListener(iconLongClickListener);
+			
 			switch (position) {
 			case 0: // kick
 				icon.setImageResource(R.drawable.kick_icon_src);
@@ -152,6 +166,8 @@ public class BeatBotActivity extends Activity {
 
 	private MidiView midiView;
 
+	private IconLongClickListener iconLongClickListener = new IconLongClickListener();
+	
 	private final String[] sampleNames = new String[] { "kick_808.wav",
 			"snare_808.wav", "hat_closed_808.wav", "hat_open_808.wav",
 			"rimshot_808.wav", "tom_low_808.wav" };

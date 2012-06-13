@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.manager.PlaybackManager;
+import com.kh.beatbot.view.bean.MidiViewBean;
 import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class SampleWaveformView extends SurfaceViewBase {
@@ -78,8 +79,11 @@ public class SampleWaveformView extends SurfaceViewBase {
 			return;
 		float scale = (waveformWidth*WaveformHelper.DEFAULT_SPP)/((float)sampleWidth);
 		float translate = -sampleOffset/WaveformHelper.DEFAULT_SPP;
-		gl.glLineWidth(1);
-		gl.glColor4f(0, 1, 1, 1);
+		gl.glLineWidth(8);
+		gl.glEnable(GL10.GL_LINE_SMOOTH);
+		//gl.glColor4f(.7922f, .5255f, .9804f, 1);
+		//gl.glColor4f(1, .64706f, 0, .9f);
+		gl.glColor4f(MidiViewBean.VOLUME_R, MidiViewBean.VOLUME_G, MidiViewBean.VOLUME_B, .9f);		
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVB);		
 		gl.glPushMatrix();
 		// scale drawing so the entire waveform exactly fits in the view
@@ -98,14 +102,15 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glLineWidth(10); // width of 10 for now
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerVB);
 		gl.glDrawArrays(GL10.GL_LINES, 0, loopMarkerVB.capacity() / 2);
-		gl.glColor4f(1, 1, 1, .3f); // white for now		
+		gl.glColor4f(1, .64706f, 0, .4f);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_FAN, 0, loopMarkerVB.capacity()/2);
 	}
 
 	@Override
 	protected void init() {
-		previewButtonWidth = width/7;
-		waveformWidth = 6*width/7;
+		// preview button is 80dpX80dp, but that is not the same as a height of '80'.  80dp will be the height		
+		previewButtonWidth = height;
+		waveformWidth = width - height;
 		while (samples == null)
 			; // wait until we're sure the sample bytes have been set
 		waveformVB = WaveformHelper.floatsToFloatBuffer(samples, height, 0);		

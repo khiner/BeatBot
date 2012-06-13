@@ -104,6 +104,73 @@ public class MidiManager implements Parcelable {
 				.get(i);
 	}
 
+	public void deselectAllNotes() {
+		for (MidiNote midiNote : midiNotes) {
+			midiNote.setSelected(false);
+		}
+	}
+
+	// return true if any Midi note is selected
+	public boolean anyNoteSelected() {
+		for (MidiNote midiNote : midiNotes) {
+			if (midiNote.isSelected())
+				return true;
+		}
+		return false;
+	}
+
+	public MidiNote getLeftMostSelectedNote() {
+		MidiNote leftMostNote = null;
+		for (MidiNote midiNote : midiNotes) {
+			if (midiNote.isSelected() && leftMostNote == null)
+				leftMostNote = midiNote;
+			else if (midiNote.isSelected()
+					&& midiNote.getOnTick() < leftMostNote.getOnTick())
+				leftMostNote = midiNote;
+		}
+		return leftMostNote;
+	}
+
+	public MidiNote getRightMostSelectedNote() {
+		MidiNote rightMostNote = null;
+		for (MidiNote midiNote : midiNotes) {
+			if (midiNote.isSelected() && rightMostNote == null)
+				rightMostNote = midiNote;
+			else if (midiNote.isSelected()
+					&& midiNote.getOffTick() > rightMostNote.getOffTick())
+				rightMostNote = midiNote;
+		}
+		return rightMostNote;
+	}
+	
+	public void selectRegion(long leftTick, long rightTick, int topNote, int bottomNote) {
+		for (MidiNote midiNote : midiNotes) {
+			// conditions for region selection
+			boolean a = leftTick < midiNote.getOffTick();
+			boolean b = rightTick > midiNote.getOffTick();
+			boolean c = leftTick < midiNote.getOnTick();
+			boolean d = rightTick > midiNote.getOnTick();
+			boolean noteCondition = topNote <= midiNote.getNoteValue()
+					&& bottomNote >= midiNote.getNoteValue();
+			if (noteCondition && (a && b || c && d || !b && !c)) {
+				midiNote.setSelected(true);
+			} else
+				midiNote.setSelected(false);
+		}
+	}
+	
+	public void selectRow(int rowNum) {
+		for (MidiNote midiNote : midiNotes) {
+			if (midiNote.getNoteValue() == rowNum) {
+				midiNote.setSelected(true);
+				midiNote.setLevelViewSelected(true);
+			} else {
+				midiNote.setSelected(false);
+				midiNote.setLevelViewSelected(false);				
+			}
+		}
+	}
+	
 	public void mergeTempNotes() {
 		for (int k : tempNotes.keySet()) {
 			if (k < midiNotes.size()) {// sanity check

@@ -6,31 +6,32 @@
     <com.kh.beatbot.view.SampleWaveformView
         android:id="@+id/sample_waveform_view"
         android:layout_width="fill_parent"
-        android:layout_height="60dp" />
+        android:layout_height="80dp" />
 
     <ToggleButton
         android:id="@+id/loop_toggle"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="80dp"
+        android:layout_height="50dp"
         android:layout_below="@+id/sample_waveform_view"
         android:onClick="toggleLoop"
+        android:background="@drawable/loop_btn_src"
+        android:textOn=""
+        android:textOff=""        
         android:text="@string/loop_sample" />
 
     <Button
         android:id="@+id/reverse"
-        android:layout_width="90dp"
-        android:layout_height="30dp"
-        android:layout_below="@+id/sample_waveform_view"
-        android:layout_toRightOf="@+id/loop_toggle"
+        android:layout_width="80dp"
+        android:layout_height="35dp"
+        android:layout_below="@+id/loop_toggle"
         android:onClick="reverse"
         android:text="@string/reverse" />
 
     <Button
         android:id="@+id/normalize"
-        android:layout_width="90dp"
-        android:layout_height="30dp"
+        android:layout_width="80dp"
+        android:layout_height="35dp"
         android:layout_below="@+id/reverse"
-        android:layout_toRightOf="@+id/loop_toggle"
         android:onClick="normalize"
         android:text="@string/normalize" />
 
@@ -38,7 +39,8 @@
         android:id="@+id/volumeView"
         android:layout_width="80dp"
         android:layout_height="40dp"
-        android:layout_below="@+id/loop_toggle"
+        android:layout_toRightOf="@+id/reverse"
+        android:layout_below="@+id/sample_waveform_view"
         android:clickable="false"
 	    android:textOff=""
         android:textOn="" 
@@ -49,6 +51,7 @@
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:layout_below="@+id/volumeView"
+        android:layout_alignLeft="@+id/volumeView"
         android:clickable="false"
    	    android:textOff=""
         android:textOn=""
@@ -59,6 +62,7 @@
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:layout_below="@+id/panView"
+		android:layout_alignLeft="@+id/panView"        
         android:clickable="false"
 	    android:textOff=""
         android:textOn=""        
