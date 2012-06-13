@@ -71,7 +71,8 @@ public class MidiViewBean {
 	private long scrollViewStartTime = 0;
 	private long scrollViewEndTime = Long.MAX_VALUE;
 
-	private boolean loopMarkerSelected = false;
+	private int loopBeginId = -1;
+	private int loopEndId = -1;	
 
 	// set this to true after an event that can be undone (with undo btn)
 	private boolean stateChanged = false;
@@ -298,12 +299,20 @@ public class MidiViewBean {
 		this.scrollViewEndTime = scrollViewEndTime;
 	}
 
-	public boolean isLoopMarkerSelected() {
-		return loopMarkerSelected;
+	public int getLoopBeginId() {
+		return loopBeginId;
 	}
 
-	public void setLoopMarkerSelected(boolean loopMarkerSelected) {
-		this.loopMarkerSelected = loopMarkerSelected;
+	public void setLoopBeginId(int loopBeginId) {
+		this.loopBeginId = loopBeginId;
+	}
+	
+	public int getLoopEndId() {
+		return loopEndId;
+	}
+	
+	public void setLoopEndId(int loopEndId) {
+		this.loopEndId = loopEndId;
 	}
 
 	public boolean isStateChanged() {

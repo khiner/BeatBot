@@ -4,8 +4,6 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -42,7 +40,7 @@ public class MidiView extends SurfaceViewBase {
 	private MidiManager midiManager;
 	private RecordManager recordManager;
 	private PlaybackManager playbackManager;
-	
+
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedNotes = new HashMap<Integer, MidiNote>();
 
@@ -240,15 +238,20 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void drawLoopMarker() {
-		gl.glPushMatrix();
-		gl.glTranslatef(tickToX(midiManager.getLoopTick()), 0, 0);
 		gl.glColor4f(.8f, .8f, .8f, 1);
 		gl.glLineWidth(6);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerVB);
-		gl.glDrawArrays(GL10.GL_TRIANGLES, 0, 3);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerLineVB);
-		gl.glDrawArrays(GL10.GL_LINES, 0, 2);
-		gl.glPopMatrix();
+		float[] loopMarkerLocs = { tickToX(midiManager.getLoopBeginTick()),
+				tickToX(midiManager.getLoopEndTick()) };
+		for (int i = 0; i < 2; i++) {
+			float loopMarkerLoc = loopMarkerLocs[i];
+			gl.glPushMatrix();
+			gl.glTranslatef(loopMarkerLoc, 0, 0);
+			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerVB);
+			gl.glDrawArrays(GL10.GL_TRIANGLES, i*3, 3);
+			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerLineVB);
+			gl.glDrawArrays(GL10.GL_LINES, 0, 2);
+			gl.glPopMatrix();
+		}
 	}
 
 	private void drawTopTickFill() {
@@ -390,10 +393,11 @@ public class MidiView extends SurfaceViewBase {
 	private void initLoopMarkerVBs() {
 		float h = bean.getYOffset();
 		float[] loopMarkerLine = new float[] { 0, 0, 0, bean.getHeight() };
-		float[] loopMarkerTriangle = new float[] { 0, 0, 0, h, -h, h / 2 };
+		float[] loopMarkerTriangles = new float[] { 0, 0, 0, h, h, h / 2,    // loop begin triangle, pointing right
+													0, 0, 0, h, -h, h / 2 }; // loop end triangle, pointing left
 
 		loopMarkerLineVB = makeFloatBuffer(loopMarkerLine);
-		loopMarkerVB = makeFloatBuffer(loopMarkerTriangle);
+		loopMarkerVB = makeFloatBuffer(loopMarkerTriangles);
 	}
 
 	public float tickToX(long tick) {
@@ -585,7 +589,7 @@ public class MidiView extends SurfaceViewBase {
 
 	private void handleActionUp(MotionEvent e) {
 		long time = System.currentTimeMillis();
-		if (time - bean.getLastDownTime() < 200) {
+		if (Math.abs(time - bean.getLastDownTime()) < 200) {
 			// if the second tap is not in the same location as the first tap,
 			// no double tap :(
 			if (time - bean.getLastTapTime() < MidiViewBean.DOUBLE_TAP_TIME
@@ -599,15 +603,9 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void singleTap(MotionEvent e, MidiNote touchedNote) {
-		float lastDownX = bean.getLastTapX();
-		float lastDownY = bean.getLastTapY();
 		bean.setLastTapX(e.getX());
 		bean.setLastTapY(e.getY());
 		bean.setLastTapTime(System.currentTimeMillis());
-		// if the up is not at the same place as the down, no tap
-		if (Math.abs(e.getX() - lastDownX) > 25
-				|| yToNote(e.getY()) != yToNote(lastDownY))
-			return;
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			levelsHelper.selectLevelNote(e.getX(), e.getY());
 		} else {
@@ -629,7 +627,7 @@ public class MidiView extends SurfaceViewBase {
 			}
 		}
 	}
-	
+
 	private void startSelectRegion(float x, float y) {
 		bean.setSelectRegionStartTick(xToTick(x));
 		if (bean.getViewState() == State.LEVELS_VIEW)
@@ -738,6 +736,27 @@ public class MidiView extends SurfaceViewBase {
 		}
 	}
 
+	public void noMidiMove(MotionEvent e) {
+		if (e.getPointerCount() == 1) {
+			long majorTick = tickWindow
+					.getMajorTickToLeftOf(xToTick(e.getX(0)));
+			if (bean.isSelectRegion()) { // update select region
+				selectRegion(e.getX(0), e.getY(0));
+			} else if (bean.getLoopBeginId() != -1) {
+				midiManager.setLoopBeginTick(majorTick);
+			} else if (bean.getLoopEndId() != -1) {
+				midiManager.setLoopEndTick(majorTick);
+			} else { // one finger scroll
+				bean.setScrollVelocity(tickWindow.scroll(e.getX(0)));
+			}
+		} else if (e.getPointerCount() == 2) {
+			// two finger zoom
+			float leftX = Math.min(e.getX(0), e.getX(1));
+			float rightX = Math.max(e.getX(0), e.getX(1));
+			tickWindow.zoom(leftX, rightX);
+		}
+	}
+
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
@@ -767,16 +786,19 @@ public class MidiView extends SurfaceViewBase {
 				selectMidiNote(e.getX(0), e.getY(0), id);
 			}
 			if (touchedNotes.get(id) == null) {
-				long tick = xToTick(e.getX(0));
-				int note = yToNote(e.getY(0));
 				// no note selected.
 				// check if loop marker selected
-				float loopX = tickToX(midiManager.getLoopTick());
-				if (note == -1 && Math.abs(e.getX(0) - loopX) <= 20) {
-					bean.setLoopMarkerSelected(true);
+				if (yToNote(e.getY(0)) == -1) {
+					float loopBeginX = tickToX(midiManager.getLoopBeginTick());
+					float loopEndX = tickToX(midiManager.getLoopEndTick());
+					if (Math.abs(e.getX(0) - loopBeginX) <= 20) {
+						bean.setLoopBeginId(id);
+					} else if (Math.abs(e.getX(0) - loopEndX) <= 20) {
+						bean.setLoopEndId(id);
+					}
 				} else
 					// otherwise, enable scrolling
-					bean.setScrollAnchorTick(tick);
+					bean.setScrollAnchorTick(xToTick(e.getX(0)));
 			}
 			break;
 		case MotionEvent.ACTION_POINTER_DOWN:
@@ -814,7 +836,8 @@ public class MidiView extends SurfaceViewBase {
 			}
 			break;
 		case MotionEvent.ACTION_MOVE:
-			if (Math.abs(e.getX() - bean.getLastTapX()) < 30 && Math.abs(e.getY() - bean.getLastTapY()) < 30) {			
+			if (Math.abs(e.getX() - bean.getLastTapX()) < 25
+					&& yToNote(e.getY()) == yToNote(bean.getLastTapY())) {
 				if (System.currentTimeMillis() - bean.getLastDownTime() > 500) {
 					startSelectRegion(e.getX(), e.getY());
 				}
@@ -825,7 +848,7 @@ public class MidiView extends SurfaceViewBase {
 			if (bean.getViewState() == State.LEVELS_VIEW) {
 				return levelsHelper.handleActionMove(e);
 			}
-			
+
 			if (bean.isPinch()) { // two touching one note
 				id = e.getPointerId(0);
 				MidiNote selectedNote = touchedNotes.get(id);
@@ -899,27 +922,14 @@ public class MidiView extends SurfaceViewBase {
 				// appropriate)
 				handleMidiCollisions();
 			} else { // no midi selected. scroll, zoom, or update select region
-				if (e.getPointerCount() == 1) {
-					if (bean.isSelectRegion()) { // update select region
-						selectRegion(e.getX(0), e.getY(0));
-					} else if (bean.isLoopMarkerSelected()) {
-						midiManager.setLoopTick(tickWindow
-								.getMajorTickToLeftOf(xToTick(e.getX(0))));
-					} else { // one finger scroll
-						bean.setScrollVelocity(tickWindow.scroll(e.getX(0)));
-					}
-				} else if (e.getPointerCount() == 2) {
-					// two finger zoom
-					float leftX = Math.min(e.getX(0), e.getX(1));
-					float rightX = Math.max(e.getX(0), e.getX(1));
-					tickWindow.zoom(leftX, rightX);
-				}
+				noMidiMove(e);
 			}
 			break;
 
 		case MotionEvent.ACTION_UP:
 			bean.setScrolling(false);
-			bean.setLoopMarkerSelected(false);
+			bean.setLoopBeginId(-1);
+			bean.setLoopEndId(-1);
 			if (bean.getScrollVelocity() == 0)
 				bean.setScrollViewEndTime(System.currentTimeMillis());
 			bean.setSelectRegion(false);
@@ -934,7 +944,7 @@ public class MidiView extends SurfaceViewBase {
 				startOnTicks.clear();
 				touchedNotes.clear();
 			}
-			bean.setLastDownTime(Long.MAX_VALUE);			
+			bean.setLastDownTime(Long.MAX_VALUE);
 			break;
 		}
 		return true;

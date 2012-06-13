@@ -9,7 +9,8 @@ void initTicker();
 static long NSPT = 100;
 
 // Java sets the loop tick
-long loopTick;
+long loopBeginTick;
+long loopEndTick;
 
 // startTicking() keeps track of this currTick
 long currTick;

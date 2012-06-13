@@ -2,7 +2,8 @@
 
 void initTicker() {
   currTick = 0;
-  loopTick = 0;
+  loopBeginTick = 0;
+  loopEndTick = 0;  
 }
 
 jlong Java_com_kh_beatbot_manager_MidiManager_getCurrTick(JNIEnv *env, jclass clazz) {
@@ -17,16 +18,32 @@ void Java_com_kh_beatbot_manager_MidiManager_setMSPT(JNIEnv *env, jclass clazz, 
 	NSPT = MSPT*1000;
 }
 
-jlong Java_com_kh_beatbot_manager_MidiManager_getLoopTick(JNIEnv *env, jclass clazz) {
-	return loopTick;
+jlong Java_com_kh_beatbot_manager_MidiManager_getLoopBeginTick(JNIEnv *env, jclass clazz) {
+	return loopBeginTick;
 }
 
-void Java_com_kh_beatbot_manager_MidiManager_setLoopTick(JNIEnv *env, jclass clazz, jlong _loopTick) {
-	loopTick = _loopTick;
+void Java_com_kh_beatbot_manager_MidiManager_setLoopBeginTick(JNIEnv *env, jclass clazz, jlong _loopBeginTick) {
+	if (_loopBeginTick >= loopEndTick)
+		return;
+		
+	loopBeginTick = _loopBeginTick;
+	if (!tracks[0].armed) // hack to see if we're playing
+		currTick = loopBeginTick;
+}
+
+jlong Java_com_kh_beatbot_manager_MidiManager_getLoopEndTick(JNIEnv *env, jclass clazz) {
+	return loopEndTick;
+}
+
+void Java_com_kh_beatbot_manager_MidiManager_setLoopEndTick(JNIEnv *env, jclass clazz, jlong _loopEndTick) {
+	if (_loopEndTick <= loopBeginTick)
+		return;
+		 
+	loopEndTick = _loopEndTick;
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_reset(JNIEnv *env, jclass clazz) {
-	currTick = -1;
+	currTick = loopBeginTick - 1;
 }
 
 uint64_t currTimeNano(struct timespec *now) {
@@ -46,10 +63,10 @@ void Java_com_kh_beatbot_manager_MidiManager_startTicking(JNIEnv *env, jclass cl
 			continue;
 		}
 		currTick++;
-		if (currTick >= loopTick) {
+		if (currTick >= loopEndTick) {
 			stopAll();
 			//recordManager.notifyLoop();
-			currTick = 0;
+			currTick = loopBeginTick;
 		}
 		int i;
 		for (i = 0; i < numTracks; i++) {

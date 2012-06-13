@@ -60,7 +60,8 @@ public class MidiManager implements Parcelable {
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
 		setMSPT(tempo.getMpqn() / RESOLUTION);
-		setLoopTick(RESOLUTION * 4);		
+		setLoopBeginTick(0);
+		setLoopEndTick(RESOLUTION * 4);		
 		saveState();
 	}
 	
@@ -387,7 +388,8 @@ public class MidiManager implements Parcelable {
 		out.writeInt(noteInfo.length);
 		out.writeFloatArray(noteInfo);
 		out.writeLong(getCurrTick());
-		out.writeLong(getLoopTick());
+		out.writeLong(getLoopBeginTick());
+		out.writeLong(getLoopEndTick());		
 	}
 
 	private MidiManager(Parcel in) {
@@ -406,15 +408,18 @@ public class MidiManager implements Parcelable {
 			addNote((long)noteInfo[i], (long)noteInfo[i + 1], (int)noteInfo[i + 2], noteInfo[i + 3], noteInfo[i + 4], noteInfo[i + 5]);
 		}
 		setCurrTick(in.readLong());
-		setLoopTick(in.readLong());
+		setLoopBeginTick(in.readLong());
+		setLoopEndTick(in.readLong());		
 	}
 	
 	public native void setMSPT(long MSPT);
 	public native void reset();
 	public native void setCurrTick(long currTick);
 	public native long getCurrTick();
-	public native long getLoopTick();
-	public native void setLoopTick(long loopTick);
+	public native long getLoopBeginTick();
+	public native void setLoopBeginTick(long loopBeginTick);
+	public native long getLoopEndTick();
+	public native void setLoopEndTick(long loopEndTick);
 	
 	public native void startTicking();
 	

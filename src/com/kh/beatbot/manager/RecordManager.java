@@ -181,10 +181,10 @@ public class RecordManager {
 	
 	public void notifyLoop() {
 		if (state == State.RECORDING) {
-			recordTickQueue.add(midiManager.getLoopTick());
+			recordTickQueue.add(midiManager.getLoopEndTick());
 			addRecordNote(random.nextInt(midiManager.getNumSamples()));
-			recordTickQueue.add((long)0);
-			recordStartTick = 0;
+			recordTickQueue.add(midiManager.getLoopBeginTick());
+			recordStartTick = midiManager.getLoopBeginTick();
 		}
 	}
 	

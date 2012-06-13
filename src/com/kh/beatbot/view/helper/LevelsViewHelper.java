@@ -412,28 +412,10 @@ public class LevelsViewHelper {
 									+ levelOffsets.get(selected));
 				}
 			}
-
 			// velocity changes are valid undo events
 			bean.setStateChanged(true);
-
-		} else { // no midi selected. scroll, zoom, or update select
-					// region
-			if (e.getPointerCount() == 1) {
-				if (bean.isSelectRegion()) { // update select region
-					selectWithRegion(e.getX(0), e.getY(0));
-				} else if (bean.isLoopMarkerSelected()) {
-					midiManager.setLoopTick(midiView.getTickWindow()
-							.getMajorTickToLeftOf(midiView.xToTick(e.getX(0))));
-				} else { // one finger scroll
-					bean.setScrollVelocity(midiView.getTickWindow().scroll(
-							e.getX(0)));
-				}
-			} else if (e.getPointerCount() == 2) {
-				// two finger zoom
-				float leftX = Math.min(e.getX(0), e.getX(1));
-				float rightX = Math.max(e.getX(0), e.getX(1));
-				midiView.getTickWindow().zoom(leftX, rightX);
-			}
+		} else { // no midi selected. midiView can handle it.
+			midiView.noMidiMove(e);
 		}
 		return true;
 	}
