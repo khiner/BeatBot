@@ -7,6 +7,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 
 public class BpmView extends SurfaceViewBase {
 	private boolean[][] segments = new boolean[3][7];
@@ -194,4 +195,28 @@ public class BpmView extends SurfaceViewBase {
 		drawSegments();
 	}
 
+	@Override
+	protected void handleActionDown(int id, float x, float y) {
+		return; // no touch events
+	}
+
+	@Override
+	protected void handleActionPointerDown(MotionEvent e, int id, float x, float y) {
+		return; // no touch events
+	}
+
+	@Override
+	protected void handleActionMove(MotionEvent e) {
+		return; // no touch events
+	}
+
+	@Override
+	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
+		return; // no touch events
+	}
+
+	@Override
+	protected void handleActionUp(int id, float x, float y) {
+		return; // no touch events
+	}
 }

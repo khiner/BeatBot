@@ -153,9 +153,9 @@ public class MidiManager implements Parcelable {
 			boolean d = rightTick > midiNote.getOnTick();
 			boolean noteCondition = topNote <= midiNote.getNoteValue()
 					&& bottomNote >= midiNote.getNoteValue();
-			if (noteCondition && (a && b || c && d || !b && !c)) {
+			if (noteCondition && (a && b || c && d || !b && !c))
 				midiNote.setSelected(true);
-			} else
+			else
 				midiNote.setSelected(false);
 		}
 	}

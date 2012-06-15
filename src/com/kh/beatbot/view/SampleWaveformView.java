@@ -304,8 +304,35 @@ public class SampleWaveformView extends SurfaceViewBase {
 		}
 		zoomLeftAnchorSample = zoomRightAnchorSample = -1;
 	}
+	
+	public void handlePreviewActionDown(int id) {
+		playbackManager.playTrack(trackNum, .8f, .5f, .5f);
+		previewPointerId = id;		
+	}
+	
+	public void handlePreviewActionPointerDown(int id) {
+		playbackManager.playTrack(trackNum, .8f, .5f, .5f);
+		previewPointerId = id;
+	}
 
-	private void handleActionMove(MotionEvent e) {
+	@Override
+	protected void handleActionDown(int id, float x, float y) {
+		if (x > previewButtonWidth)
+			handleWaveActionDown(id, x);
+		else
+			handlePreviewActionDown(id);
+	}
+	
+	@Override
+	protected void handleActionPointerDown(MotionEvent e, int id, float x, float y) {
+		if (x >previewButtonWidth)
+			handleWaveActionPointerDown(id, x);
+		else
+			handlePreviewActionPointerDown(id);
+	}
+
+	@Override
+	protected void handleActionMove(MotionEvent e) {
 		if (zoomLeftAnchorSample != -1 && zoomRightAnchorSample != -1
 				&& previewPointerId == -1)
 			zoom(e.getX(0), e.getX(1));
@@ -323,52 +350,19 @@ public class SampleWaveformView extends SurfaceViewBase {
 		}
 		updateLoopMarkers();
 	}
-	
-	public void handlePreviewActionDown(int id) {
-		playbackManager.playTrack(trackNum, .8f, .5f, .5f);
-		previewPointerId = id;		
+
+	@Override
+	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
+		if (x > previewButtonWidth)
+			handleWaveActionPointerUp(e, id);
+		else
+			playbackManager.stopTrack(trackNum);		
 	}
-	
-	public void handlePreviewActionPointerDown(int id) {
-		playbackManager.playTrack(trackNum, .8f, .5f, .5f);
-		previewPointerId = id;
-	}
-	
-	public boolean onTouchEvent(MotionEvent e) {		
-		// delegating the wave edit touch events through the parent activity to allow
-		// touching of multiple views at the same time
-		switch (e.getAction() & MotionEvent.ACTION_MASK) {
-		case MotionEvent.ACTION_CANCEL:
-			return false;
-		case MotionEvent.ACTION_DOWN:
-			if (e.getX(0) > previewButtonWidth)
-				handleWaveActionDown(e.getPointerId(0), e.getX(0));
-			else
-				handlePreviewActionDown(e.getPointerId(0));
-			break;
-		case MotionEvent.ACTION_POINTER_DOWN:
-			int index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-			if (e.getX(index) > previewButtonWidth)
-				handleWaveActionPointerDown(e.getPointerId(index), e.getX(index));
-			else
-				handlePreviewActionPointerDown(e.getPointerId(index));
-			break;
-		case MotionEvent.ACTION_MOVE:
-			handleActionMove(e);			
-			break;
-		case MotionEvent.ACTION_POINTER_UP:			
-			index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-			if (e.getX(index) > previewButtonWidth)
-				handleWaveActionPointerUp(e, e.getPointerId(index));
-			else
-				playbackManager.stopTrack(trackNum);				
-			break;
-		case MotionEvent.ACTION_UP:
-			beginLoopMarkerTouched = endLoopMarkerTouched = -1;			
-			playbackManager.stopTrack(trackNum);			
-			scrollAnchorSample = zoomLeftAnchorSample = zoomRightAnchorSample = -1;			
-			break;
-		}
-		return true;
-	}
+
+	@Override
+	protected void handleActionUp(int id, float x, float y) {
+		beginLoopMarkerTouched = endLoopMarkerTouched = -1;			
+		playbackManager.stopTrack(trackNum);			
+		scrollAnchorSample = zoomLeftAnchorSample = zoomRightAnchorSample = -1;
+	}	
 }

@@ -157,7 +157,8 @@ public class EditLevelsView extends SurfaceViewBase {
 		}
 	}
 	
-	private void handleActionDown(int id, float x, float y) {
+	@Override
+	protected void handleActionDown(int id, float x, float y) {
 		for (int levelNum = 0; levelNum < 3; levelNum++) {
 			if (Math.abs(y - (levelNum + 1) * 2 * height / 6f) < SNAP_DIST_Y
 					&& Math.abs(x - levelToX(getLevel(levelNum))) < SNAP_DIST_X) {
@@ -168,16 +169,32 @@ public class EditLevelsView extends SurfaceViewBase {
 		}
 	}
 
-	private void handleActionMove(int id, float x) {
-		for (int levelNum = 0; levelNum < 3; levelNum++) {
-			if (selected[levelNum] == id) {
-				setLevel(levelNum, xToLevel(x));
+	@Override
+	protected void handleActionPointerDown(MotionEvent e, int id, float x, float y) {
+		handleActionDown(id, x, y);
+	}
+	
+	@Override
+	protected void handleActionMove(MotionEvent e) {
+		for (int i = 0; i < e.getPointerCount(); i++) {
+			int id = e.getPointerId(i);
+			float x = e.getX(i);		
+			for (int levelNum = 0; levelNum < 3; levelNum++) {
+				if (selected[levelNum] == id) {
+					setLevel(levelNum, xToLevel(x));
+				}
+				initLevelsVB(); // update display, since one changed
 			}
-			initLevelsVB(); // update display, since one changed
 		}
 	}
 
-	private void handleActionUp(int id) {
+	@Override
+	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
+		handleActionUp(id, x, y);
+	}
+	
+	@Override
+	protected void handleActionUp(int id, float x, float y) {
 		for (int levelNum = 0; levelNum < 3; levelNum++) {
 			if (selected[levelNum] == id) {
 				selected[levelNum] = -1;
@@ -185,35 +202,7 @@ public class EditLevelsView extends SurfaceViewBase {
 			}
 		}
 	}
-
-	@Override
-	public boolean onTouchEvent(MotionEvent e) {
-		switch (e.getAction() & MotionEvent.ACTION_MASK) {
-		case MotionEvent.ACTION_CANCEL:
-			return false;
-		case MotionEvent.ACTION_DOWN:
-			handleActionDown(e.getPointerId(0), e.getX(0), e.getY(0));
-			break;
-		case MotionEvent.ACTION_POINTER_DOWN:
-			int index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-			handleActionDown(e.getPointerId(index), e.getX(index),
-					e.getY(index));
-			break;
-		case MotionEvent.ACTION_MOVE:
-			for (int i = 0; i < e.getPointerCount(); i++)
-				handleActionMove(e.getPointerId(i), e.getX(i));
-			break;
-		case MotionEvent.ACTION_POINTER_UP:
-			index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-			handleActionUp(e.getPointerId(index));
-			break;
-		case MotionEvent.ACTION_UP:
-			handleActionUp(e.getPointerId(0));
-			break;
-		}
-		return true;
-	}
-
+	
 	public native float getPrimaryVolume(int trackNum);
 
 	public native float getPrimaryPan(int trackNum);

@@ -202,9 +202,10 @@ public class LevelsViewHelper {
 	}
 
 	private void addToLevelViewSelected(MidiNote midiNote) {
-		for (MidiNote overlapping : getOverlapping(midiNote))
+		for (MidiNote overlapping : getOverlapping(midiNote)) {
 			overlapping.setLevelViewSelected(false);
-		if (!midiNote.isLevelViewSelected())
+			overlapping.setLevelSelected(false);
+		} if (!midiNote.isLevelViewSelected())
 			midiNote.setLevelViewSelected(true);
 	}
 
@@ -218,13 +219,7 @@ public class LevelsViewHelper {
 		return overlapping;
 	}
 
-	private void selectWithRegion(float x, float y) {
-		long tick = midiView.xToTick(x);
-
-		long leftTick = Math.min(tick, bean.getSelectRegionStartTick());
-		long rightTick = Math.max(tick, bean.getSelectRegionStartTick());
-		float topY = Math.min(y, bean.getSelectRegionStartY());
-		float bottomY = Math.max(y, bean.getSelectRegionStartY());
+	public void selectRegion(long leftTick, long rightTick, float topY, float bottomY) {
 		for (MidiNote midiNote : midiManager.getMidiNotes()) {
 			if (!midiNote.isLevelViewSelected())
 				return;
@@ -232,15 +227,10 @@ public class LevelsViewHelper {
 			if (leftTick < midiNote.getOnTick()
 					&& rightTick > midiNote.getOnTick() && topY < levelY
 					&& bottomY > levelY) {
-				if (!midiNote.isLevelSelected()) {
-					midiNote.setLevelSelected(true);
-				}
+				midiNote.setLevelSelected(true);
 			} else
 				midiNote.setLevelSelected(false);
 		}
-		// make room in the view window if we are dragging out of the view
-		midiView.getTickWindow().updateView(leftTick, rightTick);
-		midiView.updateSelectRegionVB(leftTick, rightTick, topY, bottomY);
 	}
 
 	private void updateDragLine() {
@@ -371,8 +361,8 @@ public class LevelsViewHelper {
 		updateSelectedLevelNotes();
 	}
 
-	public boolean handleActionPointerDown(MotionEvent e, int index) {
-		selectLevel(e.getX(index), e.getY(index), e.getPointerId(index));
+	public boolean handleActionPointerDown(MotionEvent e, int id, float x, float y) {
+		selectLevel(x, y, id);
 		if (touchedLevels.isEmpty() && e.getPointerCount() == 2) {
 			// init zoom anchors (the same ticks should be under the fingers
 			// at all times)
@@ -384,10 +374,11 @@ public class LevelsViewHelper {
 		return true;
 	}
 
-	public boolean handleActionPointerUp(MotionEvent e, int index) {
-		touchedLevels.remove(e.getPointerId(index));
+	public boolean handleActionPointerUp(MotionEvent e, int id) {
+		touchedLevels.remove(id);
 		updateLevelOffsets();
-		index = index == 0 ? 1 : 0;
+		// TODO : using getActionIndex could introduce bugs. 
+		int index = e.getActionIndex() == 0 ? 1 : 0;
 		if (e.getPointerCount() == 2) {
 			long tick = midiView.xToTick(e.getX(index));
 			bean.setScrollAnchorTick(tick);

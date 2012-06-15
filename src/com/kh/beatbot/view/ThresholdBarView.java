@@ -161,21 +161,33 @@ public class ThresholdBarView extends SurfaceViewBase {
 		initChannelBuffers();
 		initThresholdBar();		
 	}
-
-	@Override
-	public boolean onTouchEvent(MotionEvent e) {
-		switch (e.getAction() & MotionEvent.ACTION_MASK) {
-		case MotionEvent.ACTION_DOWN:
-			setThreshold(e.getX() / width);
-			break;
-		case MotionEvent.ACTION_MOVE:
-			setThreshold(e.getX() / width);
-			break;
-		}
-		return true;
-	}
 	
 	private short dbToShort(float db) {
 		return (short)(32768*Math.pow(10, db/20));
+	}
+
+	@Override
+	protected void handleActionDown(int id, float x, float y) {
+		setThreshold(x / width);		
+	}
+
+	@Override
+	protected void handleActionPointerDown(MotionEvent e, int id, float x, float y) {
+		return; // not handled
+	}
+
+	@Override
+	protected void handleActionMove(MotionEvent e) {
+		setThreshold(e.getX(0) / width);		
+	}
+
+	@Override
+	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {		
+		return; // not handled
+	}
+
+	@Override
+	protected void handleActionUp(int id, float x, float y) {
+		return; // not handled
 	}	
 }
