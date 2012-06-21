@@ -27,6 +27,7 @@ typedef struct FilterConfig_t {
         float coef0, coef1, coef2, coef3;
         float history1, history2, history3, history4;
         float gain;
+        float cutoff, q;
         float min_cutoff, max_cutoff;	
 } FilterConfig;
 

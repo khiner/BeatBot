@@ -122,6 +122,23 @@ public class LevelsViewHelper {
 
 	private void drawLevels(boolean selected) {
 		FloatBuffer vertexBuffer = selected ? selectedLevelBarsVB : levelBarsVB;
+		float[] color = new float[3];
+		if (selected) {
+			color = MidiViewBean.SELECTED_COLOR;
+		} else {
+			switch (levelMode) {
+			case VOLUME:
+				color = MidiViewBean.VOLUME_COLOR;
+				break;
+			case PAN:
+				color = MidiViewBean.PAN_COLOR;
+				break;
+			case PITCH:
+				color = MidiViewBean.PITCH_COLOR;
+				break;
+			}
+		}
+
 		gl.glLineWidth(2f); // 2 pixels wide
 		// draw each line (2*blurWidth) times, translating and changing the
 		// alpha channel
@@ -135,21 +152,7 @@ public class LevelsViewHelper {
 			float alpha = 1 - Math.abs(i) / (float) blurWidth;
 			// calculate color. selected bars are always red,
 			// non-selected bars depend on the LevelMode type
-			if (selected) {
-				gl.glColor4f(MidiViewBean.SELECTED_LEVEL_R,
-						MidiViewBean.SELECTED_LEVEL_G,
-						MidiViewBean.SELECTED_LEVEL_B, alpha);
-			} else {
-				if (levelMode == LevelMode.VOLUME)
-					gl.glColor4f(MidiViewBean.VOLUME_R, MidiViewBean.VOLUME_G,
-							MidiViewBean.VOLUME_B, alpha);
-				else if (levelMode == LevelMode.PAN)
-					gl.glColor4f(MidiViewBean.PAN_R, MidiViewBean.PAN_G,
-							MidiViewBean.PAN_B, alpha);
-				else if (levelMode == LevelMode.PITCH)
-					gl.glColor4f(MidiViewBean.PITCH_R, MidiViewBean.PITCH_G,
-							MidiViewBean.PITCH_B, alpha);
-			}
+			gl.glColor4f(color[0], color[1], color[2], alpha);
 			gl.glTranslatef(i, 0, 0);
 			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vertexBuffer);
 			gl.glDrawArrays(GL10.GL_LINES, 0, vertexBuffer.capacity() / 2);
@@ -205,7 +208,8 @@ public class LevelsViewHelper {
 		for (MidiNote overlapping : getOverlapping(midiNote)) {
 			overlapping.setLevelViewSelected(false);
 			overlapping.setLevelSelected(false);
-		} if (!midiNote.isLevelViewSelected())
+		}
+		if (!midiNote.isLevelViewSelected())
 			midiNote.setLevelViewSelected(true);
 	}
 
@@ -219,7 +223,8 @@ public class LevelsViewHelper {
 		return overlapping;
 	}
 
-	public void selectRegion(long leftTick, long rightTick, float topY, float bottomY) {
+	public void selectRegion(long leftTick, long rightTick, float topY,
+			float bottomY) {
 		for (MidiNote midiNote : midiManager.getMidiNotes()) {
 			if (!midiNote.isLevelViewSelected())
 				return;
@@ -361,7 +366,8 @@ public class LevelsViewHelper {
 		updateSelectedLevelNotes();
 	}
 
-	public boolean handleActionPointerDown(MotionEvent e, int id, float x, float y) {
+	public boolean handleActionPointerDown(MotionEvent e, int id, float x,
+			float y) {
 		selectLevel(x, y, id);
 		if (touchedLevels.isEmpty() && e.getPointerCount() == 2) {
 			// init zoom anchors (the same ticks should be under the fingers
@@ -377,7 +383,7 @@ public class LevelsViewHelper {
 	public boolean handleActionPointerUp(MotionEvent e, int id) {
 		touchedLevels.remove(id);
 		updateLevelOffsets();
-		// TODO : using getActionIndex could introduce bugs. 
+		// TODO : using getActionIndex could introduce bugs.
 		int index = e.getActionIndex() == 0 ? 1 : 0;
 		if (e.getPointerCount() == 2) {
 			long tick = midiView.xToTick(e.getX(index));

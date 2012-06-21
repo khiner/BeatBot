@@ -83,7 +83,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glEnable(GL10.GL_LINE_SMOOTH);
 		//gl.glColor4f(.7922f, .5255f, .9804f, 1);
 		//gl.glColor4f(1, .64706f, 0, .9f);
-		gl.glColor4f(MidiViewBean.VOLUME_R, MidiViewBean.VOLUME_G, MidiViewBean.VOLUME_B, .9f);		
+		float[] color = MidiViewBean.VOLUME_COLOR;
+		gl.glColor4f(color[0], color[1], color[2], .9f);		
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVB);		
 		gl.glPushMatrix();
 		// scale drawing so the entire waveform exactly fits in the view

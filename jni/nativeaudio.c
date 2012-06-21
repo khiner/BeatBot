@@ -53,7 +53,7 @@ short charsToShort(unsigned char first, unsigned char second) {
 }
 
 MidiEvent* initEvent(long onTick, long offTick, float volume, float pan, float pitch) {
-  MidiEvent *event = malloc(sizeof(MidiEvent));
+  MidiEvent *event = (MidiEvent *)malloc(sizeof(MidiEvent));
   event->muted = false;
   event->onTick = onTick;
   event->offTick = offTick;
@@ -71,15 +71,15 @@ void precalculateEffects(Track *track) {
 //	pitch_process(track->pitchConfig, track->scratchBuffer, track->totalSamples);	
 	volumepanconfig_set(track->volumePanConfig, track->primaryVolume, track->primaryPan);
 	volumepan_process(track->volumePanConfig, track->scratchBuffer, track->totalSamples);
-    // filter_process(track->filterConfig, track->currBufferFlt, BUFF_SIZE);
+    filter_process(track->filterConfig, track->scratchBuffer, track->totalSamples);
     // decimate_process(track->decimateConfig, track->currBufferFlt, BUFF_SIZE);
 }
 
 void initTrack(Track *track, AAsset *asset) {
   // asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
   track->totalSamples = AAsset_getLength(asset)/2 - 22;
-  track->buffer = calloc(track->totalSamples, sizeof(float));
-  track->scratchBuffer = calloc(track->totalSamples, sizeof(float));  
+  track->buffer = (float *)calloc(track->totalSamples, sizeof(float));
+  track->scratchBuffer = (float *)calloc(track->totalSamples, sizeof(float));  
   track->armed = false;
   track->playing = false;
   track->loopMode = false;
@@ -176,7 +176,7 @@ MidiEvent *findEvent(MidiEventNode *head, long tick) {
 
 //Adding a Node at the end of the list  
 MidiEventNode *addEvent(MidiEventNode *head, MidiEvent *event) {
-  MidiEventNode *temp = malloc(sizeof(MidiEventNode));
+  MidiEventNode *temp = (MidiEventNode *)malloc(sizeof(MidiEventNode));
   temp->event = event;
   temp->next = head;
   head = temp;
@@ -241,10 +241,10 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
   }
 
   // convert Java string to UTF-8
-  const jbyte *utf8 = (*env)->GetStringUTFChars(env, filename, NULL);
+  const char *utf8 = (*env)->GetStringUTFChars(env, filename, NULL);
   assert(NULL != utf8);
 
-  AAsset* asset = AAssetManager_open(assetManager, (const char *) utf8, AASSET_MODE_UNKNOWN);	
+  AAsset* asset = AAssetManager_open(assetManager, utf8, AASSET_MODE_UNKNOWN);	
 
   // release the Java string and UTF-8
   (*env)->ReleaseStringUTFChars(env, filename, utf8);
@@ -360,7 +360,7 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv* env, jclass clazz) {
   }
 }
 
-Track *getTrack(trackNum) {
+Track *getTrack(int trackNum) {
 	if (trackNum < 0 || trackNum >= numTracks)
 		return NULL;
 	return &tracks[trackNum];
@@ -626,14 +626,14 @@ jfloatArray makejFloatArray(JNIEnv* env, float floatAry[], int size) {
 jfloatArray Java_com_kh_beatbot_SampleEditActivity_getSamples(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
 	if (track == NULL)
-		return;
+		return NULL;
 	return makejFloatArray(env, track->buffer, track->totalSamples);
 }
 
 jfloatArray Java_com_kh_beatbot_SampleEditActivity_reverse(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
 	if (track == NULL)
-		return;
+		return NULL;
 	reverse(track->buffer, track->loopBegin, track->loopEnd);
 	precalculateEffects(track);	
 	return makejFloatArray(env, track->buffer, track->totalSamples);
@@ -642,7 +642,7 @@ jfloatArray Java_com_kh_beatbot_SampleEditActivity_reverse(JNIEnv* env, jclass c
 jfloatArray Java_com_kh_beatbot_SampleEditActivity_normalize(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
 	if (track == NULL)
-		return;
+		return NULL;
 	normalize(track->buffer, track->totalSamples);
 	precalculateEffects(track);		
 	return makejFloatArray(env, track->buffer, track->totalSamples);
@@ -701,4 +701,32 @@ void Java_com_kh_beatbot_view_EditLevelsView_setPrimaryPitch(JNIEnv* env, jclass
 	if (track->outputPlayerPitch != NULL) {
 	  (*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((track->pitch + track->primaryPitch)*750 + 500));	
   	}	
+}
+
+/****************************************************************************************
+ Java Effects JNI methods
+****************************************************************************************/
+void Java_com_kh_beatbot_FilterActivity_setCutoff(JNIEnv* env, jclass clazz,
+													  jint trackNum, jfloat cutoff) {
+	Track *track = getTrack(trackNum);
+	if (track == NULL)
+		return;
+	
+	// provided cutoff is between 0 and 1.  map this to a value between
+	// min_cutoff and max_cutoff	
+	cutoff *= (track->filterConfig->max_cutoff - track->filterConfig->min_cutoff);
+	cutoff += track->filterConfig->min_cutoff;
+	
+	filterconfig_set(track->filterConfig, cutoff, track->filterConfig->q);
+	precalculateEffects(track);
+}
+
+void Java_com_kh_beatbot_FilterActivity_setQ(JNIEnv* env, jclass clazz,
+													  jint trackNum, jfloat q) {
+	Track *track = getTrack(trackNum);
+	if (track == NULL)
+		return;
+	
+	filterconfig_set(track->filterConfig, track->filterConfig->cutoff, q);
+	precalculateEffects(track);
 }

@@ -12,23 +12,16 @@ public class MidiViewBean {
 	public final static long DOUBLE_TAP_TIME = 300;
 
 	// RGB color for volume bars
-	public final static float VOLUME_R = .412f;
-	public final static float VOLUME_G = .788f;
-	public final static float VOLUME_B = 1;
+	public final static float[] VOLUME_COLOR = {.412f, .788f, 1};
 	
 	// RGB color for pan bars	
-	public final static float PAN_R = 1;
-	public final static float PAN_G = .788f;
-	public final static float PAN_B = .392f;
+	public final static float[] PAN_COLOR = {1, .788f, .392f};
 	
-	// RGB color for pitch bars		
-	public final static float PITCH_R = .443f;
-	public final static float PITCH_G = 1;
-	public final static float PITCH_B = .533f;
-	
-	public final static float SELECTED_LEVEL_R = .9f;
-	public final static float SELECTED_LEVEL_G = 0;
-	public final static float SELECTED_LEVEL_B = .1f;
+	// RGB color for pitch bars
+	public final static float[] PITCH_COLOR = {.443f, 1, .533f};
+
+	// RGB color for selected bars
+	public final static float[] SELECTED_COLOR = {.9f, 0, .1f};
 	
 	private MidiView.State viewState = MidiView.State.NORMAL_VIEW;
 	

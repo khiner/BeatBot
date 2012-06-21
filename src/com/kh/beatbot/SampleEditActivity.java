@@ -16,7 +16,7 @@ public class SampleEditActivity extends Activity {
 	private PlaybackManager playbackManager = null;
 	private SampleWaveformView sampleWaveformView = null;
 	private EditLevelsView editLevelsView = null;
-	private int sampleNum;
+	private int trackNum;
 	private enum Effect {BITCRUSH, DELAY, FILTER};
 	
 	@Override
@@ -25,30 +25,30 @@ public class SampleEditActivity extends Activity {
 		setContentView(R.layout.sample_edit);
 		GlobalVars gv = (GlobalVars) getApplicationContext();
 		playbackManager = gv.getPlaybackManager();
-		sampleNum = getIntent().getExtras().getInt("sampleNum");
+		trackNum = getIntent().getExtras().getInt("trackNum");
 		sampleWaveformView = ((SampleWaveformView) findViewById(R.id.sample_waveform_view));
 		editLevelsView = ((EditLevelsView) findViewById(R.id.edit_levels_view));
 		sampleWaveformView.setPlaybackManager(playbackManager);
-		sampleWaveformView.setTrackNum(sampleNum);
+		sampleWaveformView.setTrackNum(trackNum);
 		editLevelsView.setActivity(this);
-		editLevelsView.setTrackNum(sampleNum);
+		editLevelsView.setTrackNum(trackNum);
 		// numSamples should be in shorts, so divide by two
-		sampleWaveformView.setSamples(getSamples(sampleNum));
-		playbackManager.armTrack(sampleNum);
+		sampleWaveformView.setSamples(getSamples(trackNum));
+		playbackManager.armTrack(trackNum);
 		((ToggleButton) findViewById(R.id.loop_toggle))
-				.setChecked(playbackManager.isLooping(sampleNum));
+				.setChecked(playbackManager.isLooping(trackNum));
 	}
 
 	public void toggleLoop(View view) {
-		playbackManager.toggleLooping(sampleNum);
+		playbackManager.toggleLooping(trackNum);
 	}
 
 	public void reverse(View view) {
-		sampleWaveformView.setSamples(reverse(sampleNum));
+		sampleWaveformView.setSamples(reverse(trackNum));
 	}
 
 	public void normalize(View view) {
-		sampleWaveformView.setSamples(normalize(sampleNum));
+		sampleWaveformView.setSamples(normalize(trackNum));
 	}
 
 	public void bitcrush(View view) {
@@ -72,11 +72,11 @@ public class SampleEditActivity extends Activity {
 		case DELAY:
 			intent.setClass(this, DelayActivity.class);
 			break;
-			case FILTER:
+		case FILTER:
 			intent.setClass(this, FilterActivity.class);
 			break;
 		}
-		intent.putExtra("sampleNum", sampleNum);
+		intent.putExtra("trackNum", trackNum);
 		startActivity(intent);		
 	}
 	
@@ -85,7 +85,7 @@ public class SampleEditActivity extends Activity {
 		super.onDestroy();
 		if (playbackManager.getState() != PlaybackManager.State.PLAYING)
 			// if not currently playing, disarm the track
-			playbackManager.disarmTrack(sampleNum);
+			playbackManager.disarmTrack(trackNum);
 	}
 
 	// get the audio data in floats

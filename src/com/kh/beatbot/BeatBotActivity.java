@@ -90,7 +90,7 @@ public class BeatBotActivity extends Activity {
 				// and pass the number of the sample to the intent as extras
 				Intent intent = new Intent();
 				intent.setClass(this.getContext(), SampleEditActivity.class);
-				intent.putExtra("sampleNum", position);
+				intent.putExtra("trackNum", position);
 				startActivity(intent);
 			} else if (view.getId() == R.id.mute) {
 				ToggleButton muteButton = (ToggleButton) view;
@@ -316,14 +316,14 @@ public class BeatBotActivity extends Activity {
 	}
 
 	// DON'T USE YET! this needs to run on the UI thread somehow.
-	public void activateIcon(int sampleNum) {
-		((ImageView) sampleListView.getChildAt(sampleNum)).setImageState(
+	public void activateIcon(int trackNum) {
+		((ImageView) sampleListView.getChildAt(trackNum)).setImageState(
 				new int[] { android.R.attr.state_checked }, true);
 	}
 
 	// DON'T USE YET! this needs to run on the UI thread somehow.
-	public void deactivateIcon(int sampleNum) {
-		((ImageView) sampleListView.getChildAt(sampleNum)).setImageState(
+	public void deactivateIcon(int trackNum) {
+		((ImageView) sampleListView.getChildAt(trackNum)).setImageState(
 				new int[] { android.R.attr.state_empty }, true);
 	}
 

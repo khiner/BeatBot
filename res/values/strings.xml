@@ -38,5 +38,8 @@
     <string name="loop_sample">Loop Sample</string>
     <string name="reverse">Reverse</string>
     <string name="normalize">Normalize</string>
+    <string name="bitcrush">Bitcrush</string>
+    <string name="delay">Delay</string>
+    <string name="filter">Filter</string>
     
 </resources>

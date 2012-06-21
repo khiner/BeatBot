@@ -33,6 +33,19 @@
             android:name="com.kh.beatbot.SampleEditActivity"
             android:label="@string/sample_edit_activity" >
         </activity>
+        <activity
+            android:name="com.kh.beatbot.BitcrushActivity"
+            android:label="@string/bitcrush" >
+        </activity>
+        <activity
+            android:name="com.kh.beatbot.DelayActivity"
+            android:label="@string/delay" >
+        </activity>
+        <activity
+            android:name="com.kh.beatbot.FilterActivity"
+            android:label="@string/filter" >
+        </activity>
+
         
     </application>
 

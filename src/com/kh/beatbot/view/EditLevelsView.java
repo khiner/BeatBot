@@ -20,10 +20,10 @@ public class EditLevelsView extends SurfaceViewBase {
 	private FloatBuffer levelsVB = null;
 	private int[] selected = { -1, -1, -1 };
 	private final float SNAP_DIST_X = 45;
-	private final float SNAP_DIST_Y = 25;	
+	private final float SNAP_DIST_Y = 25;
 
 	private SampleEditActivity activity;
-	
+
 	public EditLevelsView(Context c, AttributeSet as) {
 		super(c, as);
 	}
@@ -35,7 +35,7 @@ public class EditLevelsView extends SurfaceViewBase {
 	public void setActivity(SampleEditActivity activity) {
 		this.activity = activity;
 	}
-	
+
 	@Override
 	protected void init() {
 		gl.glEnable(GL10.GL_POINT_SMOOTH);
@@ -55,6 +55,7 @@ public class EditLevelsView extends SurfaceViewBase {
 	}
 
 	private void drawLevels() {
+		float[] color = new float[3];
 		gl.glLineWidth(2f); // 2 pixels wide
 		// draw each line (2*blurWidth) times, translating and changing the
 		// alpha channel
@@ -68,22 +69,21 @@ public class EditLevelsView extends SurfaceViewBase {
 			for (float i = -blurWidth; i < blurWidth; i++) {
 				float alpha = 1 - Math.abs(i) / (float) blurWidth;
 				if (selected[levelNum] != -1) {
-					gl.glColor4f(MidiViewBean.SELECTED_LEVEL_R,
-							MidiViewBean.SELECTED_LEVEL_G,
-							MidiViewBean.SELECTED_LEVEL_B, alpha);
+					color = MidiViewBean.SELECTED_COLOR;
 				} else {
-					if (levelNum == 0)
-						gl.glColor4f(MidiViewBean.VOLUME_R,
-								MidiViewBean.VOLUME_G, MidiViewBean.VOLUME_B,
-								alpha);
-					else if (levelNum == 1)
-						gl.glColor4f(MidiViewBean.PAN_R, MidiViewBean.PAN_G,
-								MidiViewBean.PAN_B, alpha);
-					else if (levelNum == 2)
-						gl.glColor4f(MidiViewBean.PITCH_R,
-								MidiViewBean.PITCH_G, MidiViewBean.PITCH_B,
-								alpha);
+					switch (levelNum) {
+					case 0:
+						color = MidiViewBean.VOLUME_COLOR;
+						break;
+					case 1:
+						color = MidiViewBean.PAN_COLOR;
+						break;
+					case 2:
+						color = MidiViewBean.PITCH_COLOR;
+						break;
+					}
 				}
+				gl.glColor4f(color[0], color[1], color[2], alpha);
 				// calculate color. selected bars are always red,
 				// non-selected bars depend on the LevelMode type
 				gl.glTranslatef(0, i, 0);
@@ -128,8 +128,10 @@ public class EditLevelsView extends SurfaceViewBase {
 	}
 
 	private void setLevel(int levelNum, float level) {
-		if (level < 0) level = 0;
-		else if (level > 1) level = 1;
+		if (level < 0)
+			level = 0;
+		else if (level > 1)
+			level = 1;
 		switch (levelNum) {
 		case 0:
 			setPrimaryVolume(trackNum, level);
@@ -146,17 +148,20 @@ public class EditLevelsView extends SurfaceViewBase {
 	private void setViewChecked(int levelNum, boolean checked) {
 		switch (levelNum) {
 		case 0:
-			((ToggleButton)activity.findViewById(R.id.volumeView)).setChecked(checked);
+			((ToggleButton) activity.findViewById(R.id.volumeView))
+					.setChecked(checked);
 			break;
 		case 1:
-			((ToggleButton)activity.findViewById(R.id.panView)).setChecked(checked);
+			((ToggleButton) activity.findViewById(R.id.panView))
+					.setChecked(checked);
 			break;
 		case 2:
-			((ToggleButton)activity.findViewById(R.id.pitchView)).setChecked(checked);
+			((ToggleButton) activity.findViewById(R.id.pitchView))
+					.setChecked(checked);
 			break;
 		}
 	}
-	
+
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		for (int levelNum = 0; levelNum < 3; levelNum++) {
@@ -170,15 +175,16 @@ public class EditLevelsView extends SurfaceViewBase {
 	}
 
 	@Override
-	protected void handleActionPointerDown(MotionEvent e, int id, float x, float y) {
+	protected void handleActionPointerDown(MotionEvent e, int id, float x,
+			float y) {
 		handleActionDown(id, x, y);
 	}
-	
+
 	@Override
 	protected void handleActionMove(MotionEvent e) {
 		for (int i = 0; i < e.getPointerCount(); i++) {
 			int id = e.getPointerId(i);
-			float x = e.getX(i);		
+			float x = e.getX(i);
 			for (int levelNum = 0; levelNum < 3; levelNum++) {
 				if (selected[levelNum] == id) {
 					setLevel(levelNum, xToLevel(x));
@@ -192,17 +198,17 @@ public class EditLevelsView extends SurfaceViewBase {
 	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
 		handleActionUp(id, x, y);
 	}
-	
+
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
 		for (int levelNum = 0; levelNum < 3; levelNum++) {
 			if (selected[levelNum] == id) {
 				selected[levelNum] = -1;
-				setViewChecked(levelNum, false);				
+				setViewChecked(levelNum, false);
 			}
 		}
 	}
-	
+
 	public native float getPrimaryVolume(int trackNum);
 
 	public native float getPrimaryPan(int trackNum);
