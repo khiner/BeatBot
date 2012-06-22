@@ -65,14 +65,12 @@ MidiEvent* initEvent(long onTick, long offTick, float volume, float pan, float p
 
 void precalculateEffects(Track *track) {
 	// start with the raw audio samples
-	memcpy(track->scratchBuffer, track->buffer, sizeof(float)*track->totalSamples);	
-//	pitchconfig_set(track->pitchConfig, track->primaryPitch);
-//	__android_log_print(ANDROID_LOG_INFO, "about to process", "pitch");	
-//	pitch_process(track->pitchConfig, track->scratchBuffer, track->totalSamples);	
-	volumepanconfig_set(track->volumePanConfig, track->primaryVolume, track->primaryPan);
-	volumepan_process(track->volumePanConfig, track->scratchBuffer, track->totalSamples);
-    filter_process(track->filterConfig, track->scratchBuffer, track->totalSamples);
-    // decimate_process(track->decimateConfig, track->currBufferFlt, BUFF_SIZE);
+	memcpy(track->scratchBuffer, track->buffer, sizeof(float)*track->totalSamples);
+	int i;
+	for (i = 2; i < 4; i++) {
+		Effect effect = track->effects[i];
+		effect.process(effect.config, track->scratchBuffer, track->totalSamples);
+	}
 }
 
 void initTrack(Track *track, AAsset *asset) {
@@ -92,11 +90,26 @@ void initTrack(Track *track, AAsset *asset) {
   track->volume = .8f;
   track->pan = .5f;
   track->pitch = .5f;
-  track->volumePanConfig = volumepanconfig_create(.5, .5);
-  track->pitchConfig = pitchconfig_create(1);
-  track->delayConfig = delayconfig_create(0.8, 0.7);
-  track->filterConfig = filterconfig_create(11050, 0.5);
-  track->decimateConfig = decimateconfig_create(4, 0.5);
+  
+  track->effects[0].config = decimateconfig_create(4, 0.5);
+  track->effects[1].config = delayconfig_create(0.8, 0.7);
+  track->effects[2].config = filterconfig_create(11050, 0.5);
+  track->effects[3].config = volumepanconfig_create(.5, .5);
+  
+  track->effects[0].set = decimateconfig_set;
+  track->effects[1].set = delayconfig_set;
+  track->effects[2].set = filterconfig_set;
+  track->effects[3].set = volumepanconfig_set;
+
+  track->effects[0].process = decimate_process;
+  track->effects[1].process = delay_process;
+  track->effects[2].process = filter_process;
+  track->effects[3].process = volumepan_process;
+
+  track->effects[0].destroy = decimateconfig_destroy;
+  track->effects[1].destroy = delayconfig_destroy;
+  track->effects[2].destroy = filterconfig_destroy;
+  track->effects[3].destroy = volumepanconfig_destroy;
 }
 
 void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {
@@ -137,13 +150,17 @@ void calcNextBuffer(Track *track) {
       } 
     }
   }
-  volumepan_process(track->volumePanConfig, track->currBufferFlt, BUFF_SIZE);
-  
-  //pitch_process(track->pitch, track->currBufferFlt, BUFF_SIZE);
-  //delay_process(track->delayConfig, track->currBufferFlt, BUFF_SIZE);
-  
+}
+
+void processEffects(Track *track) {
+  int i;
+  for (i = 1; i < 2; i++) {
+  	Effect effect = track->effects[i];
+  	effect.process(effect.config, track->currBufferFlt, BUFF_SIZE);
+  }
+    
   // convert floats to shorts
-  floatArytoShortAry(track->currBufferFlt, track->currBufferShort, BUFF_SIZE);	
+  floatArytoShortAry(track->currBufferFlt, track->currBufferShort, BUFF_SIZE);
 }
 
 // this callback handler is called every time a buffer finishes playing
@@ -158,6 +175,7 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	
   // calculate the next buffer
   calcNextBuffer(track);
+  processEffects(track);	
 	
   // enqueue the buffer
   result = (*bq)->Enqueue(bq, track->currBufferShort, BUFF_SIZE*sizeof(short));
@@ -257,9 +275,6 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
   Track *track = &tracks[trackCount];
   SLresult result;
 	
-  // open asset as file descriptor
-  off_t start, length;
-	
   initTrack(track, asset);
 	
   unsigned char *charBuf = (unsigned char *)AAsset_getBuffer(asset);
@@ -300,10 +315,9 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
   result = (*(track->outputPlayerObject))->GetInterface(track->outputPlayerObject, SL_IID_PLAYBACKRATE, &(track->outputPlayerPitch));
   assert(result == SL_RESULT_SUCCESS);
 
-	if (!track->outputPlayerPitch)
-	 	__android_log_print(ANDROID_LOG_INFO, "null!", "pitch");
-	else
-		(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, 1000);
+  if (track->outputPlayerPitch)
+	(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, 1000);
+		
   // get the mute/solo interface
   result = (*(track->outputPlayerObject))->GetInterface(track->outputPlayerObject, SL_IID_MUTESOLO, &(track->outputPlayerMuteSolo));
   assert(result == SL_RESULT_SUCCESS);
@@ -329,19 +343,19 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
 // shut down the native audio system
 void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv* env, jclass clazz) {
   // destroy all tracks
-  int i;
+  int i, j;
   for (i = 0; i < numTracks; i++) {
     Track *track = &tracks[i];
     (*(track->outputBufferQueue))->Clear(track->outputBufferQueue);
     track->outputBufferQueue = NULL;			
     track->outputPlayerPlay = NULL;
     free(track->buffer);
-    free(track->scratchBuffer);    
+    free(track->scratchBuffer);
     free(track->currBufferFlt);
     free(track->currBufferShort);
-    volumepanconfig_destroy(track->volumePanConfig);
-    pitchconfig_destroy(track->pitchConfig);
-    delayconfig_destroy(track->delayConfig);
+    for (j = 0; j < 4; j++) {
+  	  track->effects[i].destroy(track->effects[i].config);
+  	}    
     freeLinkedList(track->eventHead);
   }
   free(tracks);
@@ -374,8 +388,7 @@ void playTrack(int trackNum, float volume, float pan, float pitch) {
   if (track == NULL)
 	return;
   track->currSample = track->loopBegin;
-  track->volumePanConfig->volume = volume;
-  track->volumePanConfig->pan = pan;
+  track->effects[3].set(track->effects[3].config, volume, pan);
   track->pitch = pitch;
   track->playing = true;
   if (track->outputPlayerPitch != NULL) {
@@ -713,11 +726,13 @@ void Java_com_kh_beatbot_FilterActivity_setCutoff(JNIEnv* env, jclass clazz,
 		return;
 	
 	// provided cutoff is between 0 and 1.  map this to a value between
-	// min_cutoff and max_cutoff	
-	cutoff *= (track->filterConfig->max_cutoff - track->filterConfig->min_cutoff);
-	cutoff += track->filterConfig->min_cutoff;
+	// min_cutoff and max_cutoff
+	FilterConfig *config = (FilterConfig *)track->effects[2].config; 
+	cutoff *= config->max_cutoff - config->min_cutoff;
+	cutoff /= 5;
+	cutoff += config->min_cutoff;
 	
-	filterconfig_set(track->filterConfig, cutoff, track->filterConfig->q);
+	filterconfig_set(config, cutoff, config->q);
 	precalculateEffects(track);
 }
 
@@ -726,7 +741,7 @@ void Java_com_kh_beatbot_FilterActivity_setQ(JNIEnv* env, jclass clazz,
 	Track *track = getTrack(trackNum);
 	if (track == NULL)
 		return;
-	
-	filterconfig_set(track->filterConfig, track->filterConfig->cutoff, q);
+	FilterConfig *config = (FilterConfig *)track->effects[2].config; 	
+	filterconfig_set(config, config->cutoff, q/2);
 	precalculateEffects(track);
 }

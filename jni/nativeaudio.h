@@ -57,6 +57,8 @@ typedef struct Track_ {
 	// buffer to hold sample data with precalculated effects
 	float *scratchBuffer;
 	
+	Effect effects[4];
+	
 	int totalSamples;
 	int currSample;
 	
@@ -74,13 +76,6 @@ typedef struct Track_ {
 
     int loopBegin;
     int loopEnd;
-
-    // effect configs
-    VolumePanConfig *volumePanConfig;
-    struct soundtouch4c *pitchConfig;
-	DelayConfig *delayConfig;
-    FilterConfig *filterConfig;
-    DecimateConfig *decimateConfig;
 	
 	SLObjectItf outputPlayerObject;
 	SLPlayItf outputPlayerPlay;

@@ -35,23 +35,32 @@ typedef struct DecimateConfig_t {
         float y;
 } DecimateConfig;
 
-VolumePanConfig *volumepanconfig_create(float volume, float pan);
-void volumepanconfig_set(VolumePanConfig *volumePanConfig, float volume, float pan);
-void volumepan_process(VolumePanConfig *p, float buffer[], int size);
-void *volumepanconfig_destroy(VolumePanConfig *p);
+typedef struct Effect_t {
+	void *config;
+	void (*set)(void *, float, float);
+	void (*process)(void *, float *, int);
+	void *(*destroy)(void *);
+} Effect;
+
+DecimateConfig *decimateconfig_create(float bits, float rate);
+void decimateconfig_set(void *p, float bits, float rate);
+void decimate_process(void *p, float buffer[], int size);
+void decimateconfig_destroy(void *p);
 
 DelayConfig *delayconfig_create(float delay, float fdb);
-void delay_process(DelayConfig *p, float buffer[], int size);
-void *delayconfig_destroy(DelayConfig *p);
+void delayconfig_set(void *delayConfig, float delay, float fdb);
+void delay_process(void *p, float buffer[], int size);
+void delayconfig_destroy(void *p);
 
 FilterConfig *filterconfig_create(float cutoff, float q);
-void filterconfig_set(FilterConfig *filterConfig, float cutoff, float q);
-void filter_process(FilterConfig *p, float buffer[], int size);
-void *filterconfig_destroy(FilterConfig *p);
+void filterconfig_set(void *filterConfig, float cutoff, float q);
+void filter_process(void *p, float buffer[], int size);
+void filterconfig_destroy(void *p);
 
-DecimateConfig *decimateconfig_create(int bits, float rate);
-void decimate_process(DecimateConfig *p, float buffer[], int size);
-void decimateconfig_destroy(DecimateConfig *p);
+VolumePanConfig *volumepanconfig_create(float volume, float pan);
+void volumepanconfig_set(void *volumePanConfig, float volume, float pan);
+void volumepan_process(void *p, float buffer[], int size);
+void volumepanconfig_destroy(void *p);
 
 void reverse(float buffer[], int begin, int end);
 void normalize(float buffer[], int size);

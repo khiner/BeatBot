@@ -2,78 +2,75 @@
 #include <stdlib.h>
 #include <android/log.h>
 
-
-VolumePanConfig *volumepanconfig_create(float volume, float pan) {
-        VolumePanConfig *p = (VolumePanConfig *)malloc(sizeof(VolumePanConfig));
-	p->volume = volume;
-	p->pan = pan;
-	return p;
+DecimateConfig *decimateconfig_create(float bits, float rate) {
+    DecimateConfig *decimateConfig = malloc(sizeof(DecimateConfig));
+	decimateConfig->cnt = 0;
+	decimateConfig->y = 0;
+	decimateConfig->bits = (int)bits;
+	decimateConfig->rate = rate;
 }
 
-void volumepanconfig_set(VolumePanConfig *p, float volume, float pan) {
-	p->volume = volume;
-	p->pan = pan;
+void decimateconfig_set(void *p, float bits, float rate) {
+	DecimateConfig *config = (DecimateConfig *)p;
+	config->bits = (int)bits;
+	config->rate = rate;	
 }
 
-void volumepan_process(VolumePanConfig *p, float buffer[], int size) {
-	float leftVolume = (1 - p->pan)*p->volume;
-	float rightVolume = p->pan*p->volume;
-
+void decimate_process(void *p, float buffer[], int size) {
+	DecimateConfig *config = (DecimateConfig *)p;
+    long int m = 1 << (config->bits - 1);
 	int i;
-	for (i = 0; i < size; i+=2) {
-      	        // left channel
-		buffer[i] = buffer[i]*leftVolume;
-                // right channel
-		buffer[i+1] = buffer[i + 1]*rightVolume;
-	}  
+	for (i = 0; i < size; i++) {
+	    config->cnt += config->rate;
+	    if (config->cnt >= 1) {
+	        config->cnt -= 1;
+		config->y = (long int)(buffer[i]*m)/(float)m;
+	    }
+	    buffer[i] = config->y;
+	}
 }
 
-void *volumepanconfig_destroy(VolumePanConfig *p) {
-        if(p != NULL) free(p);
-}
-
-struct soundtouch4c *pitchconfig_create(float pitch) {
-	return NULL;
-}
-
-void pitchconfig_set(struct soundtouch4c *snd, float pitch) {
-}
-
-void pitch_process(float pitch, float buffer[], int size) {
-}
-
-void pitchconfig_destroy(struct soundtouch4c *snd) {
+void decimateconfig_destroy(void *p) {	
+	if(p != NULL) free((DecimateConfig *)p);
 }
 
 DelayConfig *delayconfig_create(float delay, float fdb) {
 	// allocate memory and set feedback parameter
 	DelayConfig *p = (DelayConfig *)malloc(sizeof(DelayConfig));
-	p->size = delay*41000;	
+	p->size = delay*41000;
 	p->delay = calloc(sizeof(float), p->size);
 	p->rp = 0;
 	p->fdb = fdb > 0.f ? (fdb < 1.f ? fdb : 0.99999999f) : 0.f;
 	return p;
 }
 
-void delay_process(DelayConfig *p,float buffer[], int size) {
+void delayconfig_set(void *p, float delay, float fdb) {
+	DelayConfig *config = (DelayConfig *)p;
+	config->size = delay*41000;
+	config->delay = calloc(sizeof(float), config->size);
+	config->fdb = fdb > 0.f ? (fdb < 1.f ? fdb : 0.99999999f) : 0.f;
+}
+
+void delay_process(void *p, float buffer[], int size) {
+	DelayConfig *config = (DelayConfig *)p;
 	// process the delay, replacing the buffer
-	float out, *delay = p->delay, fdb = p->fdb;
-	int i, dsize = p->size, *rp = &(p->rp);
+	float out, *delay = config->delay, fdb = config->fdb;
+	int i, dsize = config->size, *rp = &(config->rp);
 	for(i = 0; i < size; i++){
 		out = delay[*rp];
-		p->delay[(*rp)++] = buffer[i] + out*fdb;
+		config->delay[(*rp)++] = buffer[i] + out*fdb;
 		if(*rp == dsize) *rp = 0;
 		buffer[i] = out;
 	}
 }
 
-void *delayconfig_destroy(DelayConfig *p){
+void delayconfig_destroy(void *p){
 	// free memory
-	if(p != NULL) free(p);
+	if(p != NULL) free((DelayConfig *)p);
 }
 
 FilterConfig *filterconfig_create(float cutoff, float q) {
-        FilterConfig *filterConfig = malloc(sizeof(FilterConfig));
+    FilterConfig *filterConfig = malloc(sizeof(FilterConfig));
     filterConfig->cutoff = cutoff;
 	filterConfig->history1 = 0;
 	filterConfig->history2 = 0;
@@ -94,11 +91,12 @@ FilterConfig *filterconfig_create(float cutoff, float q) {
 	return filterConfig;
 }
 
-void filterconfig_set(FilterConfig *filterConfig, float cutoff, float q) {
-        if (cutoff < filterConfig->min_cutoff)
-            cutoff = filterConfig->min_cutoff;
-        else if(cutoff > filterConfig->max_cutoff)
-            cutoff = filterConfig->max_cutoff;
+void filterconfig_set(void *p, float cutoff, float q) {
+	FilterConfig *filterConfig = (FilterConfig *)p;
+    if (cutoff < filterConfig->min_cutoff)
+        cutoff = filterConfig->min_cutoff;
+    else if(cutoff > filterConfig->max_cutoff)
+        cutoff = filterConfig->max_cutoff;
 
     filterConfig->cutoff = cutoff;
     
@@ -138,61 +136,68 @@ void filterconfig_set(FilterConfig *filterConfig, float cutoff, float q) {
 	filterConfig->coef3 = (bd_tmp - filterConfig->t2 * b1) * bd;
 }
 
-void filter_process(FilterConfig *p, float buffer[], int size) {
+void filter_process(void *p, float buffer[], int size) {
+	FilterConfig *config = (FilterConfig *)p;
 	int i;
 	for (i = 0; i < size; i++) {
-	    float output = buffer[i] * p->gain;
+	    float output = buffer[i] * config->gain;
 	    float new_hist;
 
-	    output -= p->history1 * p->coef0;
-	    new_hist = output - p->history2 * p->coef1;
+	    output -= config->history1 * config->coef0;
+	    new_hist = output - config->history2 * config->coef1;
 
-	    output = new_hist + p->history1 * 2.f;
-	    output += p->history2;
+	    output = new_hist + config->history1 * 2.f;
+	    output += config->history2;
 
-	    p->history2 = p->history1;
-	    p->history1 = new_hist;
+	    config->history2 = config->history1;
+	    config->history1 = new_hist;
 
-	    output -= p->history3 * p->coef2;
-	    new_hist = output - p->history4 * p->coef3;
+	    output -= config->history3 * config->coef2;
+	    new_hist = output - config->history4 * config->coef3;
 
-	    output = new_hist + p->history3 * 2.f;
-	    output += p->history4;
+	    output = new_hist + config->history3 * 2.f;
+	    output += config->history4;
 
-	    p->history4 = p->history3;
-	    p->history3 = new_hist;
+	    config->history4 = config->history3;
+	    config->history3 = new_hist;
 
 	    buffer[i] = output;
 	}
 }
 
-void *filterconfig_destroy(FilterConfig *p) {
-	if(p != NULL) free(p);
+void filterconfig_destroy(void *p) {
+	if(p != NULL) free((FilterConfig *)p);
 }
 
-DecimateConfig *decimateconfig_create(int bits, float rate) {
-        DecimateConfig *decimateConfig = malloc(sizeof(DecimateConfig));
-	decimateConfig->cnt = 0;
-	decimateConfig->y = 0;
-	decimateConfig->bits = bits;
-	decimateConfig->rate = rate;
+VolumePanConfig *volumepanconfig_create(float volume, float pan) {
+    VolumePanConfig *p = (VolumePanConfig *)malloc(sizeof(VolumePanConfig));
+	p->volume = volume;
+	p->pan = pan;
+	return p;
 }
 
-void decimate_process(DecimateConfig *p, float buffer[], int size) {
-        long int m = 1 << (p->bits - 1);
+void volumepanconfig_set(void *p, float volume, float pan) {
+	VolumePanConfig *config = (VolumePanConfig *)p;
+	config->volume = volume;
+	config->pan = pan;
+}
+
+void volumepan_process(void *p, float buffer[], int size) {
+	VolumePanConfig *config = (VolumePanConfig *)p;
+	float leftVolume = (1 - config->pan)*config->volume;
+	float rightVolume = config->pan*config->volume;
+
 	int i;
-	for (i = 0; i < size; i++) {
-	    p->cnt += p->rate;
-	    if (p->cnt >= 1) {
-	        p->cnt -= 1;
-		p->y = (long int)(buffer[i]*m)/(float)m;
-	    }
-	    buffer[i] = p->y;
-	}
+	for (i = 0; i < size; i+=2) {
+      	        // left channel
+		buffer[i] = buffer[i]*leftVolume;
+                // right channel
+		buffer[i+1] = buffer[i + 1]*rightVolume;
+	}  
 }
 
-void decimateconfig_destroy(DecimateConfig *p) {
-	if(p != NULL) free(p);
+void volumepanconfig_destroy(void *p) {
+        if(p != NULL) free((VolumePanConfig *)p);
 }
 
 void swap(float *a , float *b) {
