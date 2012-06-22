@@ -3,9 +3,6 @@
 
 #include <stdlib.h>
 #include <math.h>
-// sound touch pitch-shifting/time-stretching library
-// cpp-wrapper port
-#include <soundtouch4c.h>
 #include <stdbool.h>
 
 #define BUDDA_Q_SCALE 6.f
@@ -42,11 +39,6 @@ VolumePanConfig *volumepanconfig_create(float volume, float pan);
 void volumepanconfig_set(VolumePanConfig *volumePanConfig, float volume, float pan);
 void volumepan_process(VolumePanConfig *p, float buffer[], int size);
 void *volumepanconfig_destroy(VolumePanConfig *p);
-
-struct soundtouch4c *pitchconfig_create(float pitch);
-void pitchconfig_set(struct soundtouch4c *snd, float pitch);
-void pitch_process(float pitch, float buffer[], int size);
-void pitchconfig_destroy(struct soundtouch4c *snd);
 
 DelayConfig *delayconfig_create(float delay, float fdb);
 void delay_process(DelayConfig *p, float buffer[], int size);

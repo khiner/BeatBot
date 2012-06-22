@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <sys/time.h>
+#include <fftw3.h>
 
 // for Android logging
 #include <android/log.h>
