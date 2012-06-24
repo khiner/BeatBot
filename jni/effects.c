@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <android/log.h>
 
-void initEffect(Effect *effect, bool on, void *config,
+void initEffect(Effect *effect, bool on, bool dynamic, void *config,
 				void (*set), void (*process), void (*destroy)) {
 	effect->on = on;
+	effect->dynamic = dynamic;
 	effect->config = config;
 	effect->set = set;
 	effect->process = process;
@@ -48,6 +49,7 @@ void decimateconfig_destroy(void *p) {
 DelayConfig *delayconfig_create(float time, float fdb) {
 	// allocate memory and set feedback parameter
 	DelayConfig *p = (DelayConfig *)malloc(sizeof(DelayConfig));
+	p->beatmatch = false;
 	p->rp = 0;
 	delayconfig_set(p, time, fdb);
 	return p;
@@ -55,18 +57,15 @@ DelayConfig *delayconfig_create(float time, float fdb) {
 
 void delayconfig_set(void *p, float time, float fdb) {
 	DelayConfig *config = (DelayConfig *)p;
-	if (time < 0.001)
-		time = 0.001;	
-	config->time = time;
-	config->size = time*41000;
+	config->time = time > 0.05f ? (time < 1.99f ? time : 1.99f) : 0.05f;
+	config->size = config->time*44100;
 	config->delay = calloc(sizeof(float), config->size);
 	config->fdb = fdb > 0.f ? (fdb < 1.f ? fdb : 0.9999999f) : 0.f;
 }
 
 void delayconfig_setTime(DelayConfig *config, float time) {
-	if (time < 0.001)
-		time = 0.001;
-	int newSize = time*41000;
+	config->time = time > 0.05f ? (time < 1.99f ? time : 1.99f) : 0.05f;
+	int newSize = config->time*44100;
 	float *newBuffer = calloc(newSize, sizeof(float));
 	if (config->size > 0 && config->size <= newSize) {
 		long prefix = newSize - config->size;

@@ -5,33 +5,45 @@
     
     <ToggleButton
         android:id="@+id/effect_toggleOn"
-        android:layout_width="fill_parent"
+        android:layout_width="250dp"
         android:layout_height="50dp"
         android:onClick="toggleEffect"
     />
     
+    <ToggleButton
+        android:id="@+id/beatmatch"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignRight="@+id/effect_toggleOn"        
+        android:layout_below="@+id/effect_toggleOn"
+        android:onClick="beatMatch"
+    />
+    
     <SeekBar
         android:id="@+id/effect_control_1"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="25dp"
+        android:layout_alignRight="@+id/effect_toggleOn"
+        android:layout_below="@+id/beatmatch"
         android:onClick="setParam1"
-        android:layout_below="@+id/effect_toggleOn"
     />
     
     <SeekBar
         android:id="@+id/effect_control_2"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="25dp"
+        android:layout_alignRight="@+id/effect_toggleOn"        
         android:layout_below="@+id/effect_control_1"     
         android:onClick="setParam2"
     />
-    
+
     <com.kh.beatbot.view.XYView
         android:id="@+id/xy_view"
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/effect_control_2"        
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
         android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/effect_toggleOn"
     />
 
+    
 </RelativeLayout>

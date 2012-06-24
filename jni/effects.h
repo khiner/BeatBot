@@ -13,8 +13,8 @@
 #define FILTER_ID 2
 
 // dynamic effect ids
-#define DYNAMIC_VOL_PAN_ID 0
-#define DELAY_ID 1
+#define DYNAMIC_VOL_PAN_ID 3
+#define DELAY_ID 4
 
 typedef struct DecimateConfig_t {
     int bits; // 2-32
@@ -24,6 +24,7 @@ typedef struct DecimateConfig_t {
 } DecimateConfig;
 
 typedef struct DelayConfig_t {
+	bool beatmatch; // sync to the beat
 	float *delay; // delayline
 	int size;     // length  in samples
 	int rp;       // read pointer
@@ -47,13 +48,14 @@ typedef struct VolumePanConfig_t {
 
 typedef struct Effect_t {
 	bool on;
+	bool dynamic;
 	void *config;
 	void (*set)(void *, float, float);
 	void (*process)(void *, float *, int);
 	void (*destroy)(void *);
 } Effect;
 
-void initEffect(Effect *effect, bool on, void *config,
+void initEffect(Effect *effect, bool on, bool dynamic, void *config,
 				void (*set), void (*process), void (*destroy));
 DecimateConfig *decimateconfig_create(float bits, float rate);
 void decimateconfig_set(void *p, float bits, float rate);
@@ -80,6 +82,5 @@ void volumepanconfig_destroy(void *p);
 void reverse(float buffer[], int begin, int end);
 void normalize(float buffer[], int size);
 
-static const int numStaticEffects = 3;
-static const int numDynamicEffects = 2;
+static const int numEffects = 5;
 #endif // EFFECTS_H

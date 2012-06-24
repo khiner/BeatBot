@@ -11,6 +11,7 @@ public class DecimateActivity extends EffectActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.effect_layout);		
 		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.decimateOn[trackNum]);
 	}
 	
@@ -42,7 +43,12 @@ public class DecimateActivity extends EffectActivity {
 		setDecimateOn(trackNum, on);
 	}
 	
+	public void setEffectDynamic(boolean dynamic) {
+		setDecimateDynamic(trackNum, dynamic);
+	}
+	
 	public native void setDecimateOn(int trackNum, boolean on);	
+	public native void setDecimateDynamic(int trackNum, boolean dynamic);	
 	public native void setDecimateBits(int trackNum, float bits);
 	public native void setDecimateRate(int trackNum, float rate);
 }

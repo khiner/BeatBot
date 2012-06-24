@@ -10,12 +10,20 @@
         android:onClick="toggleEffect"
     />
     
+    <ToggleButton
+        android:id="@+id/beatmatch"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/effect_toggleOn"
+        android:onClick="beatMatch"
+    />
+    
     <SeekBar
         android:id="@+id/effect_control_1"
         android:layout_width="fill_parent"
         android:layout_height="25dp"
         android:onClick="setParam1"
-        android:layout_below="@+id/effect_toggleOn"
+        android:layout_below="@+id/beatmatch"
     />
     
     <SeekBar

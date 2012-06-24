@@ -11,6 +11,7 @@ public class FilterActivity extends EffectActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.effect_layout);		
 		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.filterOn[trackNum]);
 	}
 	
@@ -37,7 +38,12 @@ public class FilterActivity extends EffectActivity {
 		setFilterOn(trackNum, on);
 	}
 	
-	public native void setFilterOn(int trackNum, boolean on);	
+	public void setEffectDynamic(boolean dynamic) {
+		setFilterDynamic(trackNum, dynamic);
+	}
+	
+	public native void setFilterOn(int trackNum, boolean on);
+	public native void setFilterDynamic(int trackNum, boolean dynamic);
 	public native void setFilterCutoff(int trackNum, float cutoff);
 	public native void setFilterQ(int trackNum, float q);
 }

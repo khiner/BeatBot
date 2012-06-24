@@ -58,6 +58,7 @@ public class XYView extends SurfaceViewBase {
 	
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
+		effectActivity.setEffectDynamic(true);
 		selectLocation(x, y);
 	}
 
@@ -79,7 +80,8 @@ public class XYView extends SurfaceViewBase {
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		return; // nothing to do
+		effectActivity.setEffectDynamic(false);
 	}
 
+	
 }

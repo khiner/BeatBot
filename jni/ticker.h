@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define RESOLUTION 480
+
 void initTicker();
 
 // Java sets the loop tick
