@@ -26,7 +26,7 @@ LOCAL_MODULE := nativeaudio
 
 LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -lOpenSLES -llog -landroid
 LOCAL_STATIC_LIBRARIES := fftw3
-LOCAL_SRC_FILES := nativeaudio.c effects.c ticker.c feedback.c input.c linkage.c libpostfish.c window.c freeverb.c
+LOCAL_SRC_FILES := nativeaudio.c effects.c ticker.c
 LOCAL_SRC_FILES += $(FILE_LIST:$(LOCAL_PATH)/%=%)
 
 include $(BUILD_SHARED_LIBRARY)

@@ -17,7 +17,7 @@ public class SampleEditActivity extends Activity {
 	private SampleWaveformView sampleWaveformView = null;
 	private EditLevelsView editLevelsView = null;
 	private int trackNum;
-	private enum Effect {BITCRUSH, DELAY, FILTER};
+	private enum Effect {BITCRUSH, DELAY, FILTER, REVERB};
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -61,6 +61,10 @@ public class SampleEditActivity extends Activity {
 	public void filter(View view) {
 		launchIntent(Effect.FILTER);
 	}
+	
+	public void reverb(View view) {
+		launchIntent(Effect.REVERB);
+	}
 
 	private void launchIntent(Effect effect) {
 		Intent intent = new Intent();		
@@ -74,9 +78,12 @@ public class SampleEditActivity extends Activity {
 		case FILTER:
 			intent.setClass(this, FilterActivity.class);
 			break;
+		case REVERB:
+			intent.setClass(this, ReverbActivity.class);
+			break;
 		}
 		intent.putExtra("trackNum", trackNum);
-		startActivity(intent);		
+		startActivity(intent);
 	}
 	
 	@Override

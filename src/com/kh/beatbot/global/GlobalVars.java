@@ -11,9 +11,9 @@ public class GlobalVars {
 	
 	// effect settings are stored here instead of in the effect activities because
 	// the activities are destroyed after clicking 'back', and we need to persist state
-	public static float[] decimateX, decimateY, delayX, delayY, filterX, filterY;
+	public static float[] decimateX, decimateY, delayX, delayY, filterX, filterY, reverbX, reverbY;
 	
-	public static boolean[] decimateOn, delayOn, filterOn;
+	public static boolean[] decimateOn, delayOn, filterOn, reverbOn;
 	
 	public static MidiManager getMidiManager() {
 		return midiManager;
@@ -27,13 +27,17 @@ public class GlobalVars {
 		delayX = new float[num];
 		delayY = new float[num];
 		filterX = new float[num];
-		filterY = new float[num];		
+		filterY = new float[num];
+		reverbX = new float[num];
+		reverbY = new float[num];
 		decimateOn = new boolean[num];
-		delayOn = new boolean[num];		
-		filterOn = new boolean[num];		
+		delayOn = new boolean[num];
+		filterOn = new boolean[num];
+		reverbOn = new boolean[num];
 		for (int i = 0; i < midiManager.getNumSamples(); i++) { 
-			decimateX[i] = decimateY[i] = delayX[i] = delayY[i] = filterX[i] = filterY[i] = .5f;
-			decimateOn[i] = delayOn[i] = filterOn[i] = false;
+			decimateX[i] = decimateY[i] = delayX[i] = delayY[i] =
+						   filterX[i] = filterY[i] = reverbY[i] = reverbX[i] = .5f;
+			decimateOn[i] = delayOn[i] = filterOn[i] = reverbOn[i] = false;
 		}
 	}	
 	

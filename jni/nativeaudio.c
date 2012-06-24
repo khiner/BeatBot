@@ -1,7 +1,6 @@
 #include "nativeaudio.h"
 
 // __android_log_print(ANDROID_LOG_INFO, "YourApp", "formatted message");
-// #include <android/log.h>
 
 static int trackCount = 0;
 
@@ -75,36 +74,38 @@ void precalculateEffects(Track *track) {
 }
 
 void initTrack(Track *track, AAsset *asset) {
-  // asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
-  track->totalSamples = AAsset_getLength(asset)/2 - 22;
-  track->buffer = (float *)calloc(track->totalSamples, sizeof(float));
-  track->scratchBuffer = (float *)calloc(track->totalSamples, sizeof(float));  
-  track->armed = false;
-  track->playing = false;
-  track->loopMode = false;
-  track->loopBegin = 0;
-  track->loopEnd = track->totalSamples;
-  track->currSample = 0;
-  track->primaryPitch = .5f;
-  track->pitch = .5f;
+  	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
+  	track->totalSamples = AAsset_getLength(asset)/2 - 22;
+  	track->buffer = (float *)calloc(track->totalSamples, sizeof(float));
+  	track->scratchBuffer = (float *)calloc(track->totalSamples, sizeof(float));  
+	track->armed = false;
+  	track->playing = false;
+  	track->loopMode = false;
+  	track->loopBegin = 0;
+  	track->loopEnd = track->totalSamples;
+  	track->currSample = 0;
+  	track->primaryPitch = .5f;
+  	track->pitch = .5f;
   
-  initEffect(&(track->effects[STATIC_VOL_PAN_ID]), true, false, volumepanconfig_create(.5, .5),
-  			 volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
-  initEffect(&(track->effects[DECIMATE_ID]), false, false, decimateconfig_create(4, 0.5), 
-  			 decimateconfig_set, decimate_process, decimateconfig_destroy);  			 
-  initEffect(&(track->effects[FILTER_ID]), false, false, filterconfig_create(11050, 0.5),
-  			 filterconfig_set, filter_process, filterconfig_destroy);
-  initEffect(&(track->effects[DYNAMIC_VOL_PAN_ID]), true, true, volumepanconfig_create(.5, .5), 
-  			 volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
-  initEffect(&(track->effects[DELAY_ID]), false, true, delayconfig_create(.5, .5),
-  			 delayconfig_set, delay_process, delayconfig_destroy);
+  	initEffect(&(track->effects[STATIC_VOL_PAN_ID]), true, false, volumepanconfig_create(.5, .5),
+  			   volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
+  	initEffect(&(track->effects[DECIMATE_ID]), false, false, decimateconfig_create(4, 0.5),
+  			   decimateconfig_set, decimate_process, decimateconfig_destroy);
+  	initEffect(&(track->effects[FILTER_ID]), false, false, filterconfig_create(11050, 0.5),
+  			   filterconfig_set, filter_process, filterconfig_destroy);
+  	initEffect(&(track->effects[DYNAMIC_VOL_PAN_ID]), true, true, volumepanconfig_create(.5, .5),
+  			   volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
+  	initEffect(&(track->effects[DELAY_ID]), false, true, delayconfig_create(.5, .5),
+  			   delayconfig_set, delay_process, delayconfig_destroy);
+  	initEffect(&(track->effects[REVERB_ID]), false, true, reverbconfig_create(.5, .5),
+  			   reverbconfig_set, reverb_process, reverbconfig_destroy);
 }
 
 void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {
-  int i;
-  for (i = 0; i < size; i++) {
-    outBuffer[i] = (short)(inBuffer[i]*CONV16BIT);
-  }
+  	int i;
+  	for (i = 0; i < size; i++) {
+	    outBuffer[i] = (short)(inBuffer[i]*CONV16BIT);
+  	}
 }
 
 void calcNextBuffer(Track *track) {
@@ -779,3 +780,25 @@ void Java_com_kh_beatbot_DelayActivity_setDelayFeedback(JNIEnv* env, jclass claz
 	DelayConfig *config = (DelayConfig *)track->effects[DELAY_ID].config;
 	delayconfig_setFeedback(config, fdb);
 }
+
+void Java_com_kh_beatbot_ReverbActivity_setReverbOn(JNIEnv* env, jclass clazz,
+													jint trackNum, jboolean on) {
+	Track *track = getTrack(trackNum);
+	Effect *reverb = &(track->effects[REVERB_ID]);
+	reverb->on = on;
+}
+
+void Java_com_kh_beatbot_ReverbActivity_setReverbFeedback(JNIEnv* env, jclass clazz,
+													      jint trackNum, jfloat feedback) {
+	Track *track = getTrack(trackNum);
+	ReverbConfig *config = (ReverbConfig *)track->effects[REVERB_ID].config;
+	config->feedback = feedback;
+}
+
+void Java_com_kh_beatbot_ReverbActivity_setReverbHfDamp(JNIEnv* env, jclass clazz,
+													  jint trackNum, jfloat hfDamp) {
+	Track *track = getTrack(trackNum);
+	ReverbConfig *config = (ReverbConfig *)track->effects[REVERB_ID].config;
+	config->hfDamp = hfDamp;
+}
+

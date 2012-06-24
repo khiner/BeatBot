@@ -44,6 +44,10 @@
             android:name="com.kh.beatbot.FilterActivity"
             android:label="@string/filter" >
         </activity>
+        <activity
+            android:name="com.kh.beatbot.ReverbActivity"
+            android:label="@string/reverb" >
+        </activity>
 
         
     </application>

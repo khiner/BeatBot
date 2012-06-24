@@ -102,4 +102,13 @@
         android:layout_below="@+id/edit_levels_view"
         android:onClick="delay" />
     
+    <Button
+        android:id="@+id/reverbButton"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@+id/delayButton"
+        android:layout_below="@+id/edit_levels_view"
+        android:text="@string/reverb"
+    	android:onClick="reverb" />
+    
 </RelativeLayout>

@@ -41,5 +41,6 @@
     <string name="decimate">Decimate</string>
     <string name="delay">Delay</string>
     <string name="filter">Filter</string>
+    <string name="reverb">Reverb</string>
     
 </resources>
