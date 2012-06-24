@@ -34,8 +34,8 @@
             android:label="@string/sample_edit_activity" >
         </activity>
         <activity
-            android:name="com.kh.beatbot.BitcrushActivity"
-            android:label="@string/bitcrush" >
+            android:name="com.kh.beatbot.DecimateActivity"
+            android:label="@string/decimate" >
         </activity>
         <activity
             android:name="com.kh.beatbot.DelayActivity"

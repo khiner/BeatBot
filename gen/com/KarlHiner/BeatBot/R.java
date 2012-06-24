@@ -156,9 +156,9 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f060000;
-        public static final int bitcrush=0x7f06001c;
         public static final int bpm_tap=0x7f060009;
         public static final int current_grid=0x7f06000c;
+        public static final int decimate=0x7f06001c;
         public static final int default_midi_file_name=0x7f060016;
         public static final int delay=0x7f06001d;
         public static final int eighth_note=0x7f06000e;

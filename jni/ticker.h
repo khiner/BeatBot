@@ -5,13 +5,12 @@
 
 void initTicker();
 
-// nanoseconds per tick
-static long NSPT = 100;
-
 // Java sets the loop tick
 long loopBeginTick;
 long loopEndTick;
 
+// nanoseconds per tick
+long NSPT;
 // startTicking() keeps track of this currTick
 long currTick;
 

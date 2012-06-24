@@ -2,23 +2,34 @@
 #include <stdlib.h>
 #include <android/log.h>
 
+void initEffect(Effect *effect, bool on, void *config,
+				void (*set), void (*process), void (*destroy)) {
+	effect->on = on;
+	effect->config = config;
+	effect->set = set;
+	effect->process = process;
+	effect->destroy = destroy;				
+}
+
 DecimateConfig *decimateconfig_create(float bits, float rate) {
     DecimateConfig *decimateConfig = malloc(sizeof(DecimateConfig));
 	decimateConfig->cnt = 0;
 	decimateConfig->y = 0;
 	decimateConfig->bits = (int)bits;
 	decimateConfig->rate = rate;
+	return decimateConfig;
 }
 
 void decimateconfig_set(void *p, float bits, float rate) {
 	DecimateConfig *config = (DecimateConfig *)p;
-	config->bits = (int)bits;
+	if ((int)bits != 0)
+		config->bits = (int)bits;
 	config->rate = rate;	
 }
 
 void decimate_process(void *p, float buffer[], int size) {
 	DecimateConfig *config = (DecimateConfig *)p;
-    long int m = 1 << (config->bits - 1);
+    int m = 1 << (config->bits - 1);
 	int i;
 	for (i = 0; i < size; i++) {
 	    config->cnt += config->rate;
@@ -34,32 +45,58 @@ void decimateconfig_destroy(void *p) {
 	if(p != NULL) free((DecimateConfig *)p);
 }
 
-DelayConfig *delayconfig_create(float delay, float fdb) {
+DelayConfig *delayconfig_create(float time, float fdb) {
 	// allocate memory and set feedback parameter
 	DelayConfig *p = (DelayConfig *)malloc(sizeof(DelayConfig));
-	p->size = delay*41000;
-	p->delay = calloc(sizeof(float), p->size);
 	p->rp = 0;
-	p->fdb = fdb > 0.f ? (fdb < 1.f ? fdb : 0.99999999f) : 0.f;
+	delayconfig_set(p, time, fdb);
 	return p;
 }
 
-void delayconfig_set(void *p, float delay, float fdb) {
+void delayconfig_set(void *p, float time, float fdb) {
 	DelayConfig *config = (DelayConfig *)p;
-	config->size = delay*41000;
+	if (time < 0.001)
+		time = 0.001;	
+	config->time = time;
+	config->size = time*41000;
 	config->delay = calloc(sizeof(float), config->size);
-	config->fdb = fdb > 0.f ? (fdb < 1.f ? fdb : 0.99999999f) : 0.f;
+	config->fdb = fdb > 0.f ? (fdb < 1.f ? fdb : 0.9999999f) : 0.f;
+}
+
+void delayconfig_setTime(DelayConfig *config, float time) {
+	if (time < 0.001)
+		time = 0.001;
+	int newSize = time*41000;
+	float *newBuffer = calloc(newSize, sizeof(float));
+	if (config->size > 0 && config->size <= newSize) {
+		long prefix = newSize - config->size;
+		delay_process(config, &(newBuffer[prefix]), config->size);
+	} else if (config->size > 0 && config->size > newSize) {
+		long cut = config->size - newSize;
+		float *tempZeros = calloc(cut, sizeof(float));
+		delay_process(config, tempZeros, cut);
+		free(tempZeros);
+		delay_process(config, newBuffer, newSize);
+	}
+	free(config->delay);
+	config->rp = 0; 			
+	config->size = newSize;
+	config->delay = newBuffer;	
+}
+
+void delayconfig_setFeedback(DelayConfig *config, float fdb) {
+	config->fdb = fdb > 0.f ? (fdb < 1.f ? fdb : 0.9999999f) : 0.f;
 }
 
 void delay_process(void *p, float buffer[], int size) {
 	DelayConfig *config = (DelayConfig *)p;
 	// process the delay, replacing the buffer
 	float out, *delay = config->delay, fdb = config->fdb;
-	int i, dsize = config->size, *rp = &(config->rp);
+	int i, *rp = &(config->rp);
 	for(i = 0; i < size; i++){
 		out = delay[*rp];
 		config->delay[(*rp)++] = buffer[i] + out*fdb;
-		if(*rp == dsize) *rp = 0;
+		if(*rp == config->size) *rp = 0;
 		buffer[i] = out;
 	}
 }
@@ -92,22 +129,22 @@ FilterConfig *filterconfig_create(float cutoff, float q) {
 }
 
 void filterconfig_set(void *p, float cutoff, float q) {
-	FilterConfig *filterConfig = (FilterConfig *)p;
-    if (cutoff < filterConfig->min_cutoff)
-        cutoff = filterConfig->min_cutoff;
-    else if(cutoff > filterConfig->max_cutoff)
-        cutoff = filterConfig->max_cutoff;
+	FilterConfig *config = (FilterConfig *)p;
+    if (cutoff < config->min_cutoff)
+        cutoff = config->min_cutoff;
+    else if(cutoff > config->max_cutoff)
+        cutoff = config->max_cutoff;
 
-    filterConfig->cutoff = cutoff;
+    config->cutoff = cutoff;
     
 	if(q < 0.f)
    	    q = 0.f;
 	else if(q > 1.f)
 	    q = 1.f;
 
-	filterConfig->q = q;
+	config->q = q;
 	
-	float wp = filterConfig->t2 * tanf(filterConfig->t3 * cutoff);
+	float wp = config->t2 * tanf(config->t3 * cutoff);
 	float bd, bd_tmp, b1, b2;
 
 	q *= BUDDA_Q_SCALE;
@@ -116,38 +153,38 @@ void filterconfig_set(void *p, float cutoff, float q) {
 	b1 = (0.765367f / (q*wp));
 	b2 = 1.f / (wp * wp);
 
-	bd_tmp = filterConfig->t0 * b2 + 1.f;
+	bd_tmp = config->t0 * b2 + 1.f;
 
-	bd = 1.f / (bd_tmp + filterConfig->t2 * b1);
+	bd = 1.f / (bd_tmp + config->t2 * b1);
 
-	filterConfig->gain = bd;
+	config->gain = bd;
 
-	filterConfig->coef2 = (2.f - filterConfig->t1 * b2);
+	config->coef2 = (2.f - config->t1 * b2);
 
-	filterConfig->coef0 = filterConfig->coef2 * bd;
-	filterConfig->coef1 = (bd_tmp - filterConfig->t2 * b1) * bd;
+	config->coef0 = config->coef2 * bd;
+	config->coef1 = (bd_tmp - config->t2 * b1) * bd;
 
 	b1 = (1.847759f / (q*wp));
 
-	bd = 1.f / (bd_tmp + filterConfig->t2 * b1);
+	bd = 1.f / (bd_tmp + config->t2 * b1);
 
-	filterConfig->gain *= bd;
-	filterConfig->coef2 *= bd;
-	filterConfig->coef3 = (bd_tmp - filterConfig->t2 * b1) * bd;
+	config->gain *= bd;
+	config->coef2 *= bd;
+	config->coef3 = (bd_tmp - config->t2 * b1) * bd;
 }
 
 void filter_process(void *p, float buffer[], int size) {
 	FilterConfig *config = (FilterConfig *)p;
 	int i;
 	for (i = 0; i < size; i++) {
+		if (buffer[i] == 0) continue;
 	    float output = buffer[i] * config->gain;
 	    float new_hist;
 
 	    output -= config->history1 * config->coef0;
 	    new_hist = output - config->history2 * config->coef1;
 
-	    output = new_hist + config->history1 * 2.f;
-	    output += config->history2;
+	    output = new_hist + config->history1 * 2.f + config->history2;
 
 	    config->history2 = config->history1;
 	    config->history1 = new_hist;
@@ -155,8 +192,7 @@ void filter_process(void *p, float buffer[], int size) {
 	    output -= config->history3 * config->coef2;
 	    new_hist = output - config->history4 * config->coef3;
 
-	    output = new_hist + config->history3 * 2.f;
-	    output += config->history4;
+	    output = new_hist + config->history3 * 2.f + config->history4;
 
 	    config->history4 = config->history3;
 	    config->history3 = new_hist;
@@ -189,10 +225,9 @@ void volumepan_process(void *p, float buffer[], int size) {
 
 	int i;
 	for (i = 0; i < size; i+=2) {
-      	        // left channel
-		buffer[i] = buffer[i]*leftVolume;
-                // right channel
-		buffer[i+1] = buffer[i + 1]*rightVolume;
+		if (buffer[i] == 0) continue;
+		buffer[i] = buffer[i]*leftVolume; // left channel
+		buffer[i+1] = buffer[i + 1]*rightVolume; // right channel
 	}  
 }
 

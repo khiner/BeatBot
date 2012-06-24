@@ -67,7 +67,7 @@ public class SampleEditActivity extends Activity {
 		Intent intent = new Intent();		
 		switch (effect) {
 		case BITCRUSH:
-			intent.setClass(this, BitcrushActivity.class);
+			intent.setClass(this, DecimateActivity.class);
 			break;
 		case DELAY:
 			intent.setClass(this, DelayActivity.class);

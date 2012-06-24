@@ -307,13 +307,12 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 	
 	public void handlePreviewActionDown(int id) {
-		playbackManager.playTrack(trackNum, .8f, .5f, .5f);
+		playbackManager.playTrack(trackNum);
 		previewPointerId = id;		
 	}
 	
 	public void handlePreviewActionPointerDown(int id) {
-		playbackManager.playTrack(trackNum, .8f, .5f, .5f);
-		previewPointerId = id;
+		handlePreviewActionDown(id);
 	}
 
 	@Override

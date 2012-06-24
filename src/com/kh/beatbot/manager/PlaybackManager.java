@@ -42,18 +42,7 @@ public class PlaybackManager {
 		state = State.STOPPED;
 		disarmAllTracks();
 	}
-	
-	public void playTrack(int trackNum, int velocity, int pan, int pitch) {
-		if (trackNum >= 0 && trackNum < sampleNames.length) {
-			float normVelocity = velocity/127f;
-			float normPan = pan/127f;
-			float normPitch = 1.5f*pitch/127f + .5f;
-			// highlight the icon to indicate playing
-			//context.activateIcon(sampleNum);
-			playTrack(trackNum, normVelocity, normPan, normPitch);
-		}
-	}
-	
+		
 	public void stopAllTracks() {
 		for (int sampleNum = 0; sampleNum < sampleNames.length; sampleNum++) {
 			stopTrack(sampleNum);
@@ -64,7 +53,7 @@ public class PlaybackManager {
 	public native void armTrack(int trackNum);
 	public native void disarmAllTracks();
 	public native void disarmTrack(int trackNum);
-	public native void playTrack(int trackNum, float volume, float pan, float pitch);
+	public native void playTrack(int trackNum);
 	public native void stopTrack(int trackNum);
 	public native void muteTrack(int trackNum);
 	public native void unmuteTrack(int trackNum);
