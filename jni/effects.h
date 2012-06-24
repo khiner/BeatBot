@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdbool.h>
+#include "ticker.h"
 
 #define BUDDA_Q_SCALE 6.f
 
@@ -25,11 +26,12 @@ typedef struct DecimateConfig_t {
 
 typedef struct DelayConfig_t {
 	bool beatmatch; // sync to the beat
-	float *delay; // delayline
-	int size;     // length  in samples
-	int rp;       // read pointer
-	float fdb;    // feedback amount: 0-1
-	float time;   // time from 0-1
+	int numBeats;   // number of beats to delay for beatmatch
+	float *delay;   // delayline
+	int size;       // length  in samples
+	int rp;         // read pointer
+	float fdb;      // feedback amount: 0-1
+	float time;     // time from 0-1
 } DelayConfig;
 
 typedef struct FilterConfig_t {
@@ -65,6 +67,8 @@ void decimateconfig_destroy(void *p);
 DelayConfig *delayconfig_create(float delay, float fdb);
 void delayconfig_set(void *delayConfig, float time, float fdb);
 void delayconfig_setTime(DelayConfig *delayConfig, float time);
+void delayconfig_setNumBeats(DelayConfig *config, int numBeats);
+void delayconfig_syncToBPM(DelayConfig *config);
 void delayconfig_setFeedback(DelayConfig *delayCoinfig, float fdb);
 void delay_process(void *p, float buffer[], int size);
 void delayconfig_destroy(void *p);

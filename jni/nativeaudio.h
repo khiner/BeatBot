@@ -89,5 +89,6 @@ void printLinkedList(MidiEventNode *head);
 void playTrack(int trackNum, float volume, float pan, float pitch);
 void stopTrack(int trackNum);
 void stopAll();
+void syncAll(); // sync all BPM-syncable events to (new) BPM
 
 #endif // NATIVEAUDIO_H

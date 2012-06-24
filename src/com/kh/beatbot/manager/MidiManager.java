@@ -56,10 +56,9 @@ public class MidiManager implements Parcelable {
 		this.numSamples = numSamples;
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,
 				TimeSignature.DEFAULT_DIVISION);
-		tempo.setBpm(140);
+		setBPM(120);
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
-		setMSPT(tempo.getMpqn() / RESOLUTION);
 		setLoopBeginTick(0);
 		setLoopEndTick(RESOLUTION * 4);		
 		saveState();
@@ -85,8 +84,9 @@ public class MidiManager implements Parcelable {
 	}
 
 	public void setBPM(float bpm) {
-		tempo.setBpm(bpm);
-		setMSPT(tempo.getMpqn() / RESOLUTION);
+		tempo.setBpm(bpm);		
+		setNativeBPM(bpm);		
+		setNativeMSPT(tempo.getMpqn() / RESOLUTION);
 	}
 
 	public int getNumSamples() {
@@ -335,7 +335,7 @@ public class MidiManager implements Parcelable {
 			tempoTrack = midiTracks.get(0);
 			ts = (TimeSignature)tempoTrack.getEvents().get(0);
 			tempo = (Tempo)tempoTrack.getEvents().get(1);
-			setMSPT(tempo.getMpqn() / RESOLUTION);
+			setNativeMSPT(tempo.getMpqn() / RESOLUTION);
 			ArrayList<MidiEvent> events = midiTracks.get(1).getEvents();
 			clearNotes();
 			// midiEvents are ordered by tick, so on/off events don't necessarily
@@ -398,10 +398,10 @@ public class MidiManager implements Parcelable {
 		in.readIntArray(timeSigInfo);
 		ts.setTimeSignature(timeSigInfo[0], timeSigInfo[1], timeSigInfo[2],
 				timeSigInfo[3]);
-		tempo.setBpm(in.readInt());
+		setBPM(in.readInt());
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
-		setMSPT(in.readLong());
+		setNativeMSPT(in.readLong());
 		float[] noteInfo = new float[in.readInt()];
 		in.readFloatArray(noteInfo);
 		for (int i = 0; i < noteInfo.length; i += 4) {
@@ -412,17 +412,16 @@ public class MidiManager implements Parcelable {
 		setLoopEndTick(in.readLong());		
 	}
 	
-	public native void setMSPT(long MSPT);
+	public native void setNativeMSPT(long MSPT);
+	public native void setNativeBPM(float BPM);
 	public native void reset();
 	public native void setCurrTick(long currTick);
 	public native long getCurrTick();
 	public native long getLoopBeginTick();
 	public native void setLoopBeginTick(long loopBeginTick);
 	public native long getLoopEndTick();
-	public native void setLoopEndTick(long loopEndTick);
-	
-	public native void startTicking();
-	
+	public native void setLoopEndTick(long loopEndTick);	
+	public native void startTicking();	
 	public native void addMidiNote(int track, long onTick, long offTick,
 										float volume, float pan, float pitch);
 	public native void removeMidiNote(int track, long tick);

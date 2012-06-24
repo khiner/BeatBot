@@ -11,6 +11,7 @@ void initTicker();
 long loopBeginTick;
 long loopEndTick;
 
+float BPM;
 // nanoseconds per tick
 long NSPT;
 // startTicking() keeps track of this currTick

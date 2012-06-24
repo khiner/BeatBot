@@ -50,6 +50,7 @@ DelayConfig *delayconfig_create(float time, float fdb) {
 	// allocate memory and set feedback parameter
 	DelayConfig *p = (DelayConfig *)malloc(sizeof(DelayConfig));
 	p->beatmatch = false;
+	p->numBeats = 4;
 	p->rp = 0;
 	delayconfig_set(p, time, fdb);
 	return p;
@@ -57,17 +58,29 @@ DelayConfig *delayconfig_create(float time, float fdb) {
 
 void delayconfig_set(void *p, float time, float fdb) {
 	DelayConfig *config = (DelayConfig *)p;
-	config->time = time > 0.05f ? (time < 1.99f ? time : 1.99f) : 0.05f;
+	config->time = time > 0.02f ? (time < 3.0f ? time : 3.0f) : 0.02f;
 	config->size = config->time*44100;
 	config->delay = calloc(sizeof(float), config->size);
 	config->fdb = fdb > 0.f ? (fdb < 1.f ? fdb : 0.9999999f) : 0.f;
 }
 
+void delayconfig_setNumBeats(DelayConfig *config, int numBeats) {
+	if (numBeats == config->numBeats) return;
+	config->numBeats = numBeats;
+	delayconfig_syncToBPM(config);
+}
+
+void delayconfig_syncToBPM(DelayConfig *config) {
+	if (!config->beatmatch) return;
+	float newTime = (BPM/480.0f)*(float)config->numBeats; // divide by 60 for seconds, divide by 8 for 8th notes
+	delayconfig_setTime(config, newTime);	
+}
+
 void delayconfig_setTime(DelayConfig *config, float time) {
-	config->time = time > 0.05f ? (time < 1.99f ? time : 1.99f) : 0.05f;
+	config->time = time > 0.02f ? (time <= 3.0f ? time : 3.0f) : 0.02f;
 	int newSize = config->time*44100;
 	float *newBuffer = calloc(newSize, sizeof(float));
-	if (config->size > 0 && config->size <= newSize) {
+	if (config->size > 0 && config->size < newSize) {
 		long prefix = newSize - config->size;
 		delay_process(config, &(newBuffer[prefix]), config->size);
 	} else if (config->size > 0 && config->size > newSize) {

@@ -304,8 +304,8 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
   result = (*(track->outputPlayerObject))->GetInterface(track->outputPlayerObject, SL_IID_PLAYBACKRATE, &(track->outputPlayerPitch));
   assert(result == SL_RESULT_SUCCESS);
 
-  if (track->outputPlayerPitch)
-	(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, 1000);
+  //if (track->outputPlayerPitch)
+	//(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, 1000);
 		
   // get the mute/solo interface
   result = (*(track->outputPlayerObject))->GetInterface(track->outputPlayerObject, SL_IID_MUTESOLO, &(track->outputPlayerMuteSolo));
@@ -380,7 +380,8 @@ void playTrack(int trackNum, float volume, float pan, float pitch) {
   track->pitch = pitch;
   track->playing = true;
   if (track->outputPlayerPitch != NULL) {
-	  (*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((pitch + track->primaryPitch)*750 + 500));
+	  //(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((pitch + track->primaryPitch)*750 + 500));
+	  //__android_log_print(ANDROID_LOG_INFO, "numbeats", "%d", numBeats);	  
   }	  
 }
 
@@ -395,6 +396,13 @@ void stopAll() {
   for (i = 0; i < trackCount; i++) {
     stopTrack(i);
   }
+}
+
+void syncAll() {
+	int i;
+	for (i = 0; i < numTracks; i++) {
+		delayconfig_syncToBPM((DelayConfig *)(getTrack(i)->effects[DELAY_ID].config));
+	}	
 }
 
 /****************************************************************************************
@@ -651,7 +659,7 @@ void Java_com_kh_beatbot_view_EditLevelsView_setPrimaryPitch(JNIEnv* env, jclass
 	Track *track = getTrack(trackNum);
 	track->primaryPitch = pitch;
 	if (track->outputPlayerPitch != NULL) {
-	  (*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((track->pitch + track->primaryPitch)*750 + 500));	
+	  //(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((track->pitch + track->primaryPitch)*750 + 500));	
   	}	
 }
 
@@ -743,26 +751,26 @@ void Java_com_kh_beatbot_DelayActivity_setDelayOn(JNIEnv* env, jclass clazz,
 	delay->on = on;
 }
 
-void Java_com_kh_beatbot_DelayActivity_setDelayBeatmatch(JNIEnv* env, jclass clazz,
-												  jint trackNum, jboolean beatmatch) {
-	Track *track = getTrack(trackNum);
-	DelayConfig *config = (DelayConfig *)track->effects[DELAY_ID].config;
-	config->beatmatch = beatmatch;		
-}
-
 void Java_com_kh_beatbot_DelayActivity_setDelayTime(JNIEnv* env, jclass clazz,
 													  jint trackNum, jfloat time) {
 	Track *track = getTrack(trackNum);
 	DelayConfig *config = (DelayConfig *)track->effects[DELAY_ID].config;
-	float newTime = time*2;
+	float newTime;
 	if (config->beatmatch) {
-		int numBeats = (int)(time*7) + 1; // map float 0-1 to int 1-8 for number of beats
-		__android_log_print(ANDROID_LOG_INFO, "numbeats", "%d", numBeats);
-		/* units: beats * nanoseconds/tick * ticks/beat * millis/nanosecond */
-		newTime = numBeats*NSPT*RESOLUTION*0.000000001;
-		__android_log_print(ANDROID_LOG_INFO, "newTime", "%f", newTime);		
+ 		// map float 0-1 to int 1-16 for number of beats
+		delayconfig_setNumBeats(config, (int)(time*15) + 1);
+	} else {
+		newTime = time*2;
+		delayconfig_setTime(config, newTime);
 	}
-	delayconfig_setTime(config, newTime);
+}
+
+void Java_com_kh_beatbot_DelayActivity_setDelayBeatmatch(JNIEnv* env, jclass clazz,
+												  jint trackNum, jboolean beatmatch) {
+	Track *track = getTrack(trackNum);
+	DelayConfig *config = (DelayConfig *)track->effects[DELAY_ID].config;
+	config->beatmatch = beatmatch;
+	Java_com_kh_beatbot_DelayActivity_setDelayTime(NULL, NULL, trackNum, config->time);
 }
 
 void Java_com_kh_beatbot_DelayActivity_setDelayFeedback(JNIEnv* env, jclass clazz,

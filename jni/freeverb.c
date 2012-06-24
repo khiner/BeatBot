@@ -31,6 +31,7 @@
 #include "internal.h"
 #include "freeverb.h"
 #include "window.h"
+#include "libpostfish.h"
 
 static void inject_set(reverb_state *r,int inject){
   int i;
@@ -148,12 +149,10 @@ void reverb_instance_reset(reverb_instance *ri){
 }
 
 static void process_one_inner(reverb_state *r, 
-			      float feedback, float hfdamp, float att,
+			      float feedback, float hfdamp,
 			      float *input, float *output, long n){
   float out,val=0;
   int i;
-
-  att=fromdB(att) * fixedgain;
 
   while(n-- > 0){
     out = 0;
@@ -165,7 +164,7 @@ static void process_one_inner(reverb_state *r,
     for(i=0;i<numallpasses;i++)
       out  = allpass_process(r->allpass+i,out);
     
-    if(output) *output++ = out*att;
+    if(output) *output++ = out;
   }
 }
 
@@ -233,8 +232,8 @@ static void process_one_wrapper(reverb_state *r,
 		       feedback,feedback2,hfdamp,hfdamp2,att,att2,
 		       inject,inject2,input1,n1,input2,n2,output);
   }else{
-    process_one_inner(r,feedback,hfdamp,att,input1,output,n1);      
-    process_one_inner(r,feedback,hfdamp,att,input2,output+n1,n2);
+    process_one_inner(r,feedback,hfdamp,input1,output,n1);      
+    process_one_inner(r,feedback,hfdamp,input2,output+n1,n2);
   }
 }
 
@@ -503,11 +502,11 @@ int reverb_process(reverb_instance *ri, reverb_settings **rs,
 	reverb_instance_one *rio=ri->reverbs+i;
 	float *tmp=rio->cache;
 
-	u_int32_t ret=process_one(rio, rs[i], in->data[i], mute_channel_muted(in->active,i),
+	u_int32_t ret=process_one(rio, rs[i], in->data[i], 0,
 				  outL->data[i],(outR?outR->data[i]:0),ri->transwindow,
 				  in->samples,ri->blocksize);
 	
-	if(rs[i]->dry_mix && !mute_channel_muted(in->active,i)){
+	if(rs[i]->dry_mix){
 	  int j;
 	  float *dataO=outL->data[i];
 	  float *dataI=in->data[i];
