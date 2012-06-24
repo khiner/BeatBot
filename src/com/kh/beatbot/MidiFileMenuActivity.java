@@ -33,8 +33,7 @@ public class MidiFileMenuActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.midi_menu);
-		GlobalVars gv = (GlobalVars)getApplicationContext();
-		midiManager = gv.getMidiManager();
+		midiManager = GlobalVars.getMidiManager();
 		
 		baseFilePath = createBasePath();
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);

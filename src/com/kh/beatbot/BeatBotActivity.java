@@ -229,10 +229,10 @@ public class BeatBotActivity extends Activity {
 
 		// set midiManager as a global variable, since it needs to be accessed
 		// by separate MidiFileMenu activity
-		GlobalVars gv = (GlobalVars) getApplicationContext();
+		//GlobalVars gv = (GlobalVars) getApplicationContext();
 		// make midiManager a global var
-		gv.setMidiManager(midiManager);
-		gv.setPlaybackManager(playbackManager);
+		GlobalVars.setMidiManager(midiManager);
+		GlobalVars.setPlaybackManager(playbackManager);
 
 		((BpmView) findViewById(R.id.bpm)).setText(String
 				.valueOf((int) midiManager.getBPM()));

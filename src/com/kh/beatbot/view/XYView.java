@@ -6,6 +6,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.EffectActivity;
@@ -21,10 +22,15 @@ public class XYView extends SurfaceViewBase {
 		effectActivity = (EffectActivity)getContext();
 	}
 	
+	public void setSelectXY(float x, float y) {
+		Log.d("x, y = ", String.valueOf(x) + ", " + String.valueOf(y));
+		selectX = x*(width - 30) + 15;
+		selectY = y*(height - 30) + 15;
+	}
+		
 	@Override
 	protected void init() {
-		selectX = width/2;
-		selectY = height/2;
+		setSelectXY(effectActivity.getXValue(), effectActivity.getYValue());
 		gl.glEnable(GL10.GL_POINT_SMOOTH);		
 	}
 

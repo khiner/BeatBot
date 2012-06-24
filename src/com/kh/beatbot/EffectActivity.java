@@ -2,12 +2,14 @@ package com.kh.beatbot;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ToggleButton;
 
 import com.KarlHiner.BeatBot.R;
 
 public abstract class EffectActivity extends Activity {
 	
-	protected float xValue = 0, yValue = 0;
 	protected int trackNum;
 	
 	@Override
@@ -21,21 +23,15 @@ public abstract class EffectActivity extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 	}
+
+	public abstract float getXValue();
+	public abstract float getYValue();
+	public abstract void setXValue(float x);
+	public abstract void setYValue(float y);
 	
-	public void setXValue(float xValue) {
-		this.xValue = xValue;
+	public abstract void setEffectOn(boolean on);
+	
+	public void toggleEffect(View view) {
+		setEffectOn(((ToggleButton)view).isChecked());
 	}
-	
-	public void setYValue(float yValue) {
-		this.yValue = yValue;
-	}
-	
-	public float getXValue() {
-		return xValue;
-	}
-	
-	public float getYValue() {
-		return yValue;
-	}
-	
 }

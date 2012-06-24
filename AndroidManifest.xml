@@ -13,7 +13,6 @@
 	<uses-feature android:name="android.hardware.audio.low_latency" />
 	        
     <application
-        android:name="com.kh.beatbot.global.GlobalVars"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
         <activity

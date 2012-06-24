@@ -23,8 +23,7 @@ public class SampleEditActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.sample_edit);
-		GlobalVars gv = (GlobalVars) getApplicationContext();
-		playbackManager = gv.getPlaybackManager();
+		playbackManager = GlobalVars.getPlaybackManager();
 		trackNum = getIntent().getExtras().getInt("trackNum");
 		sampleWaveformView = ((SampleWaveformView) findViewById(R.id.sample_waveform_view));
 		editLevelsView = ((EditLevelsView) findViewById(R.id.edit_levels_view));

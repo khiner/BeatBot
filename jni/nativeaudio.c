@@ -90,14 +90,14 @@ void initTrack(Track *track, AAsset *asset) {
   
   initEffect(&(track->staticEffects[STATIC_VOL_PAN_ID]), true, volumepanconfig_create(.5, .5),
   			 volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
-  initEffect(&(track->staticEffects[DECIMATE_ID]), true, decimateconfig_create(4, 0.5), 
+  initEffect(&(track->staticEffects[DECIMATE_ID]), false, decimateconfig_create(4, 0.5), 
   			 decimateconfig_set, decimate_process, decimateconfig_destroy);  			 
-  initEffect(&(track->staticEffects[FILTER_ID]), true, filterconfig_create(11050, 0.5),
+  initEffect(&(track->staticEffects[FILTER_ID]), false, filterconfig_create(11050, 0.5),
   			 filterconfig_set, filter_process, filterconfig_destroy);
   initEffect(&(track->dynamicEffects[DYNAMIC_VOL_PAN_ID]), true, volumepanconfig_create(.5, .5), 
   			 volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
-  initEffect(&(track->dynamicEffects[DELAY_ID]), true, delayconfig_create(.5, .5),
-  			 delayconfig_set, delay_process, delayconfig_destroy);  			 
+  initEffect(&(track->dynamicEffects[DELAY_ID]), false, delayconfig_create(.5, .5),
+  			 delayconfig_set, delay_process, delayconfig_destroy);
 }
 
 void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {
@@ -377,8 +377,6 @@ Track *getTrack(int trackNum) {
 ****************************************************************************************/
 void playTrack(int trackNum, float volume, float pan, float pitch) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   track->currSample = track->loopBegin;
   track->dynamicEffects[0].set(track->dynamicEffects[0].config, volume, pan);
   track->pitch = pitch;
@@ -390,8 +388,6 @@ void playTrack(int trackNum, float volume, float pan, float pitch) {
 
 void stopTrack(int trackNum) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   track->playing = false;
   track->currSample = track->loopBegin;
 }
@@ -443,24 +439,18 @@ void Java_com_kh_beatbot_manager_PlaybackManager_disarmTrack(JNIEnv* env, jclass
 
 void Java_com_kh_beatbot_manager_PlaybackManager_playTrack(JNIEnv* env, jclass clazz, jint trackNum) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   track->currSample = track->loopBegin;
   track->playing = true;
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_stopTrack(JNIEnv* env, jclass clazz, jint trackNum) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   track->playing = false;
   track->currSample = track->loopBegin;
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_muteTrack(JNIEnv* env, jclass clazz, jint trackNum) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   if (track->outputPlayerMuteSolo != NULL) {
     (*(track->outputPlayerMuteSolo))->SetChannelMute(track->outputPlayerMuteSolo, 0, SL_BOOLEAN_TRUE);
     (*(track->outputPlayerMuteSolo))->SetChannelMute(track->outputPlayerMuteSolo, 1, SL_BOOLEAN_TRUE);	
@@ -469,24 +459,18 @@ void Java_com_kh_beatbot_manager_PlaybackManager_muteTrack(JNIEnv* env, jclass c
 
 void Java_com_kh_beatbot_manager_PlaybackManager_unmuteTrack(JNIEnv* env, jclass clazz, jint trackNum) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   (*(track->outputPlayerMuteSolo))->SetChannelMute(track->outputPlayerMuteSolo, 0, SL_BOOLEAN_FALSE);
   (*(track->outputPlayerMuteSolo))->SetChannelMute(track->outputPlayerMuteSolo, 1, SL_BOOLEAN_FALSE);		
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_soloTrack(JNIEnv* env, jclass clazz, jint trackNum) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   (*(track->outputPlayerMuteSolo))->SetChannelSolo(track->outputPlayerMuteSolo, 0, SL_BOOLEAN_TRUE);
   (*(track->outputPlayerMuteSolo))->SetChannelSolo(track->outputPlayerMuteSolo, 1, SL_BOOLEAN_TRUE);		
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_toggleLooping(JNIEnv* env, jclass clazz, jint trackNum) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   track->loopMode = !track->loopMode;
 }
 
@@ -497,8 +481,6 @@ jboolean Java_com_kh_beatbot_manager_PlaybackManager_isLooping(JNIEnv* env, jcla
 void Java_com_kh_beatbot_manager_PlaybackManager_setLoopWindow(JNIEnv* env, jclass clazz,
                                                                jint trackNum, jint loopBeginSample, jint loopEndSample) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   track->loopBegin = loopBeginSample;
   track->loopEnd = loopEndSample;
   if (track->currSample >= track->loopEnd)
@@ -513,8 +495,6 @@ void Java_com_kh_beatbot_manager_MidiManager_addMidiNote(JNIEnv* env, jclass cla
                                                          jlong onTick, jlong offTick, jfloat volume,
                                                          jfloat pan, jfloat pitch) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   MidiEvent *event = initEvent(onTick, offTick, volume, pan, pitch);
   track->eventHead = addEvent(track->eventHead, event);
 }
@@ -522,8 +502,6 @@ void Java_com_kh_beatbot_manager_MidiManager_addMidiNote(JNIEnv* env, jclass cla
 void Java_com_kh_beatbot_manager_MidiManager_removeMidiNote(JNIEnv* env, jclass clazz, jint trackNum,
                                                             jlong tick) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   track->eventHead = removeEvent(track->eventHead, tick, false);
 }
 
@@ -531,8 +509,6 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiNoteTicks(JNIEnv* env, jcla
                                                                jlong prevOnTick, jlong newOnTick,
                                                                jlong prevOffTick, jlong newOffTick) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   MidiEvent *event = findEvent(track->eventHead, prevOnTick);
   if (event != NULL) {
     event->onTick = newOnTick;
@@ -565,8 +541,6 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiNote(JNIEnv* env, jclass cl
 void Java_com_kh_beatbot_manager_MidiManager_setNoteMute(JNIEnv* env, jclass clazz, jint trackNum,
                                                          jlong tick, jboolean muted) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   MidiEvent *event = findEvent(track->eventHead, tick);
   event->muted = muted;
 }
@@ -586,8 +560,6 @@ void Java_com_kh_beatbot_manager_MidiManager_clearMutedNotes(JNIEnv* env, jclass
 void Java_com_kh_beatbot_midi_MidiNote_setVolume(JNIEnv* env, jclass clazz,
                                                  jint trackNum, jlong onTick, jfloat volume) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   MidiEvent *event = findEvent(track->eventHead, onTick);	
   if (event != NULL) {
     event->volume = volume;
@@ -597,8 +569,6 @@ void Java_com_kh_beatbot_midi_MidiNote_setVolume(JNIEnv* env, jclass clazz,
 void Java_com_kh_beatbot_midi_MidiNote_setPan(JNIEnv* env, jclass clazz,
                                               jint trackNum, jlong onTick, jfloat pan) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;                                              
   MidiEvent *event = findEvent(track->eventHead, onTick);	
   if (event != NULL) {
     event->pan = pan;
@@ -608,8 +578,6 @@ void Java_com_kh_beatbot_midi_MidiNote_setPan(JNIEnv* env, jclass clazz,
 void Java_com_kh_beatbot_midi_MidiNote_setPitch(JNIEnv* env, jclass clazz,
                                                 jint trackNum, jlong onTick, jfloat pitch) {
   Track *track = getTrack(trackNum);
-  if (track == NULL)
-	return;
   MidiEvent *event = findEvent(track->eventHead, onTick);
   if (event != NULL) {
     event->pitch = pitch;
@@ -627,15 +595,11 @@ jfloatArray makejFloatArray(JNIEnv* env, float floatAry[], int size) {
 
 jfloatArray Java_com_kh_beatbot_SampleEditActivity_getSamples(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return NULL;
 	return makejFloatArray(env, track->buffer, track->totalSamples);
 }
 
 jfloatArray Java_com_kh_beatbot_SampleEditActivity_reverse(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return NULL;
 	reverse(track->buffer, track->loopBegin, track->loopEnd);
 	precalculateEffects(track);	
 	return makejFloatArray(env, track->buffer, track->totalSamples);
@@ -643,8 +607,6 @@ jfloatArray Java_com_kh_beatbot_SampleEditActivity_reverse(JNIEnv* env, jclass c
 
 jfloatArray Java_com_kh_beatbot_SampleEditActivity_normalize(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return NULL;
 	normalize(track->buffer, track->totalSamples);
 	precalculateEffects(track);		
 	return makejFloatArray(env, track->buffer, track->totalSamples);
@@ -656,30 +618,22 @@ jfloatArray Java_com_kh_beatbot_SampleEditActivity_normalize(JNIEnv* env, jclass
 
 jfloat Java_com_kh_beatbot_view_EditLevelsView_getPrimaryVolume(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return -1;
 	return ((VolumePanConfig *)track->staticEffects[STATIC_VOL_PAN_ID].config)->volume;
 }
 
 jfloat Java_com_kh_beatbot_view_EditLevelsView_getPrimaryPan(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return -1;
 	return ((VolumePanConfig *)track->staticEffects[STATIC_VOL_PAN_ID].config)->pan;
 }
 
 jfloat Java_com_kh_beatbot_view_EditLevelsView_getPrimaryPitch(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return -1;
 	return track->primaryPitch;
 }
 
 void Java_com_kh_beatbot_view_EditLevelsView_setPrimaryVolume(JNIEnv* env, jclass clazz,
 														 jint trackNum, jfloat volume) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return;
 	VolumePanConfig *config = (VolumePanConfig *)track->staticEffects[STATIC_VOL_PAN_ID].config;
 	track->staticEffects[STATIC_VOL_PAN_ID].set(config, volume, config->pan);
 	precalculateEffects(track);
@@ -688,8 +642,6 @@ void Java_com_kh_beatbot_view_EditLevelsView_setPrimaryVolume(JNIEnv* env, jclas
 void Java_com_kh_beatbot_view_EditLevelsView_setPrimaryPan(JNIEnv* env, jclass clazz,
 													  jint trackNum, jfloat pan) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return;
 	VolumePanConfig *config = (VolumePanConfig *)track->staticEffects[STATIC_VOL_PAN_ID].config;
 	track->staticEffects[STATIC_VOL_PAN_ID].set(config, config->volume, pan);
 	
@@ -699,8 +651,6 @@ void Java_com_kh_beatbot_view_EditLevelsView_setPrimaryPan(JNIEnv* env, jclass c
 void Java_com_kh_beatbot_view_EditLevelsView_setPrimaryPitch(JNIEnv* env, jclass clazz,
 														jint trackNum, jfloat pitch) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return;
 	track->primaryPitch = pitch;
 	if (track->outputPlayerPitch != NULL) {
 	  (*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((track->pitch + track->primaryPitch)*750 + 500));	
@@ -711,11 +661,17 @@ void Java_com_kh_beatbot_view_EditLevelsView_setPrimaryPitch(JNIEnv* env, jclass
  Java Effects JNI methods
 ****************************************************************************************/
 
-void Java_com_kh_beatbot_DecimateActivity_setBits(JNIEnv* env, jclass clazz,
+void Java_com_kh_beatbot_DecimateActivity_setDecimateOn(JNIEnv* env, jclass clazz,
+														jint trackNum, jboolean on) {
+	Track *track = getTrack(trackNum);
+	Effect *decimate = &(track->staticEffects[DECIMATE_ID]);
+	decimate->on = on;
+	precalculateEffects(track);	
+}
+
+void Java_com_kh_beatbot_DecimateActivity_setDecimateBits(JNIEnv* env, jclass clazz,
 													jint trackNum, jfloat bits) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return;
 	Effect decimate = track->staticEffects[DECIMATE_ID];
 	DecimateConfig *decimateConfig = (DecimateConfig *)decimate.config;
 	// bits range from 2 to 32
@@ -725,23 +681,26 @@ void Java_com_kh_beatbot_DecimateActivity_setBits(JNIEnv* env, jclass clazz,
 	precalculateEffects(track);
 }
 
-void Java_com_kh_beatbot_DecimateActivity_setRate(JNIEnv* env, jclass clazz,
+void Java_com_kh_beatbot_DecimateActivity_setDecimateRate(JNIEnv* env, jclass clazz,
 													jint trackNum, jfloat rate) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return;
 	Effect decimate = track->staticEffects[DECIMATE_ID];
 	DecimateConfig *decimateConfig = (DecimateConfig *)decimate.config;
 	decimate.set(decimateConfig, decimateConfig->bits, rate);
 	precalculateEffects(track);	
 }
 
-void Java_com_kh_beatbot_FilterActivity_setCutoff(JNIEnv* env, jclass clazz,
+void Java_com_kh_beatbot_FilterActivity_setFilterOn(JNIEnv* env, jclass clazz,
+													jint trackNum, jboolean on) {
+	Track *track = getTrack(trackNum);
+	Effect *filter = &(track->staticEffects[FILTER_ID]);
+	filter->on = on;
+	precalculateEffects(track);	
+}
+
+void Java_com_kh_beatbot_FilterActivity_setFilterCutoff(JNIEnv* env, jclass clazz,
 													  jint trackNum, jfloat cutoff) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return;
-	
 	// provided cutoff is between 0 and 1.  map this to a value between
 	// min_cutoff and max_cutoff
 	Effect filter = track->staticEffects[FILTER_ID];
@@ -754,21 +713,24 @@ void Java_com_kh_beatbot_FilterActivity_setCutoff(JNIEnv* env, jclass clazz,
 	precalculateEffects(track);
 }
 
-void Java_com_kh_beatbot_FilterActivity_setQ(JNIEnv* env, jclass clazz,
+void Java_com_kh_beatbot_FilterActivity_setFilterQ(JNIEnv* env, jclass clazz,
 													  jint trackNum, jfloat q) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return;
 	FilterConfig *config = (FilterConfig *)track->staticEffects[FILTER_ID].config; 	
 	filterconfig_set(config, config->cutoff, q/2);
 	precalculateEffects(track);
 }
 
+void Java_com_kh_beatbot_DelayActivity_setDelayOn(JNIEnv* env, jclass clazz,
+												  jint trackNum, jboolean on) {
+	Track *track = getTrack(trackNum);
+	Effect *delay = &(track->dynamicEffects[DELAY_ID]);
+	delay->on = on;
+}
+
 void Java_com_kh_beatbot_DelayActivity_setDelayTime(JNIEnv* env, jclass clazz,
 													  jint trackNum, jfloat time) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return;
 	DelayConfig *config = (DelayConfig *)track->dynamicEffects[DELAY_ID].config;
 	delayconfig_setTime(config, time);
 }
@@ -776,8 +738,6 @@ void Java_com_kh_beatbot_DelayActivity_setDelayTime(JNIEnv* env, jclass clazz,
 void Java_com_kh_beatbot_DelayActivity_setDelayFeedback(JNIEnv* env, jclass clazz,
 													  jint trackNum, jfloat fdb) {
 	Track *track = getTrack(trackNum);
-	if (track == NULL)
-		return;
-	DelayConfig *config = (DelayConfig *)track->dynamicEffects[DELAY_ID].config; 	
+	DelayConfig *config = (DelayConfig *)track->dynamicEffects[DELAY_ID].config;
 	delayconfig_setFeedback(config, fdb);
 }
