@@ -6,7 +6,8 @@
 #include <stdbool.h>
 #include "ticker.h"
 
-#define BUDDA_Q_SCALE 6.f
+#define SAMPLE_RATE 44100
+#define INV_SAMPLE_RATE 1.0f/44100.0f
 
 // static effect ids
 #define STATIC_VOL_PAN_ID 0
@@ -131,12 +132,11 @@ typedef struct DelayConfig_t {
 } DelayConfig;
 
 typedef struct FilterConfig_t {
-    float t0, t1, t2, t3;
-    float coef0, coef1, coef2, coef3;
-    float history1, history2, history3, history4;
-    float gain;
-    float cutoff, q;
-    float min_cutoff, max_cutoff;	
+	bool hp; // lowpass/highpass flag
+	float a1, a2, a3, b1, b2;
+	float f, c, r;
+	float in1, in2;
+	float out1, out2;
 } FilterConfig;
 
 typedef struct VolumePanConfig_t {
@@ -169,8 +169,8 @@ void delayconfig_setFeedback(DelayConfig *config, float feedback);
 void delay_process(void *p, float buffer[], int size);
 void delayconfig_destroy(void *p);
 
-FilterConfig *filterconfig_create(float cutoff, float q);
-void filterconfig_set(void *config, float cutoff, float q);
+FilterConfig *filterconfig_create(float cutoff, float r);
+void filterconfig_set(void *config, float cutoff, float r);
 void filter_process(void *config, float buffer[], int size);
 void filterconfig_destroy(void *config);
 

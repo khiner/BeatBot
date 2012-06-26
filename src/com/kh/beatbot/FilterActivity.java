@@ -1,6 +1,7 @@
 package com.kh.beatbot;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ToggleButton;
 
 import com.KarlHiner.BeatBot.R;
@@ -11,7 +12,7 @@ public class FilterActivity extends EffectActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.effect_layout);		
+		setContentView(R.layout.filter_layout);		
 		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.filterOn[trackNum]);
 	}
 	
@@ -30,7 +31,7 @@ public class FilterActivity extends EffectActivity {
 	
 	public void setYValue(float yValue) {
 		GlobalVars.filterY[trackNum] = yValue;
-		setFilterQ(trackNum, yValue);
+		setFilterResonance(trackNum, yValue);
 	}
 	
 	public void setEffectOn(boolean on) {
@@ -42,8 +43,13 @@ public class FilterActivity extends EffectActivity {
 		setFilterDynamic(trackNum, dynamic);
 	}
 	
+	public void toggleLpHpFilter(View view) {
+		setFilterMode(trackNum, ((ToggleButton)findViewById(R.id.lp_hp_toggle)).isChecked());
+	}
+	
 	public native void setFilterOn(int trackNum, boolean on);
 	public native void setFilterDynamic(int trackNum, boolean dynamic);
+	public native void setFilterMode(int trackNum, boolean lp);	
 	public native void setFilterCutoff(int trackNum, float cutoff);
-	public native void setFilterQ(int trackNum, float q);
+	public native void setFilterResonance(int trackNum, float q);
 }

@@ -80,7 +80,7 @@ void initTrack(Track *track, AAsset *asset) {
   	track->scratchBuffer = (float *)calloc(track->totalSamples, sizeof(float));  
 	track->armed = false;
   	track->playing = false;
-  	track->loopMode = false;
+  	track->loop = false;
   	track->loopBegin = 0;
   	track->loopEnd = track->totalSamples;
   	track->currSample = 0;
@@ -129,7 +129,7 @@ void calcNextBuffer(Track *track) {
       // increment sample counter to reflect bytes written so far
       track->currSample += nextSize;
       if (track->currSample >= track->loopEnd) {
-        if (track->loopMode) {
+        if (track->loop) {
           // if we are looping, and we're past the end, loop back to the beginning
           track->currSample = track->loopBegin;
         } else {
@@ -478,11 +478,11 @@ void Java_com_kh_beatbot_manager_PlaybackManager_soloTrack(JNIEnv* env, jclass c
 
 void Java_com_kh_beatbot_manager_PlaybackManager_toggleLooping(JNIEnv* env, jclass clazz, jint trackNum) {
   Track *track = getTrack(trackNum);
-  track->loopMode = !track->loopMode;
+  track->loop = !track->loop;
 }
 
 jboolean Java_com_kh_beatbot_manager_PlaybackManager_isLooping(JNIEnv* env, jclass clazz, jint trackNum) {
-  return tracks[trackNum].loopMode;
+  return tracks[trackNum].loop;
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_setLoopWindow(JNIEnv* env, jclass clazz,
@@ -719,29 +719,38 @@ void Java_com_kh_beatbot_FilterActivity_setFilterDynamic(JNIEnv* env, jclass cla
 	Track *track = getTrack(trackNum);
 	Effect *filter = &(track->effects[FILTER_ID]);
 	filter->dynamic = dynamic;
-	precalculateEffects(track);	
+	precalculateEffects(track);
+}
+
+void Java_com_kh_beatbot_FilterActivity_setFilterMode(JNIEnv* env, jclass clazz,
+													jint trackNum, jboolean hp) {
+	Track *track = getTrack(trackNum);
+	Effect *filter = &(track->effects[FILTER_ID]);
+	FilterConfig *filterConfig = (FilterConfig *)filter->config;
+	filterConfig->hp = hp;
+	filterconfig_set(filterConfig, filterConfig->f, filterConfig->r);
+	precalculateEffects(track);
 }
 
 void Java_com_kh_beatbot_FilterActivity_setFilterCutoff(JNIEnv* env, jclass clazz,
 													  jint trackNum, jfloat cutoff) {
 	Track *track = getTrack(trackNum);
-	// provided cutoff is between 0 and 1.  map this to a value between
-	// min_cutoff and max_cutoff
 	Effect filter = track->effects[FILTER_ID];
 	FilterConfig *filterConfig = (FilterConfig *)filter.config;
-	cutoff *= filterConfig->max_cutoff - filterConfig->min_cutoff;
-	cutoff /= 5;
-	cutoff += filterConfig->min_cutoff;
-	
-	filter.set(filterConfig, cutoff, filterConfig->q);
+	// provided cutoff is between 0 and 1.  map this to a value between
+	// 0 and samplerate/2 = 22050... - 50 because high frequencies are bad news
+	cutoff *= 22000.0f;
+	cutoff = cutoff < 0.01f ? 0.01f : cutoff;
+	filter.set(filterConfig, cutoff, filterConfig->r);
 	precalculateEffects(track);
 }
 
-void Java_com_kh_beatbot_FilterActivity_setFilterQ(JNIEnv* env, jclass clazz,
-													  jint trackNum, jfloat q) {
+void Java_com_kh_beatbot_FilterActivity_setFilterResonance(JNIEnv* env, jclass clazz,
+													  jint trackNum, jfloat r) {
 	Track *track = getTrack(trackNum);
-	FilterConfig *config = (FilterConfig *)track->effects[FILTER_ID].config; 	
-	filterconfig_set(config, config->cutoff, q/2);
+	FilterConfig *config = (FilterConfig *)track->effects[FILTER_ID].config;
+	r = r < 0.011f ? 0.011f : r;
+	filterconfig_set(config, config->f, r);
 	precalculateEffects(track);
 }
 

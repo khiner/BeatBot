@@ -1,7 +1,4 @@
 #include "effects.h"
-#include <stdlib.h>
-#include <android/log.h>
-#include <pthread.h>
 
 void initEffect(Effect *effect, bool on, bool dynamic, void *config,
 				void (*set), void (*process), void (*destroy)) {
@@ -60,7 +57,7 @@ DelayConfig *delayconfig_create(float time, float feedback) {
 void delayconfig_set(void *p, float time, float feedback) {
 	DelayConfig *config = (DelayConfig *)p;
 	config->time = time > 0.02f ? (time < 3.0f ? time : 3.0f) : 0.02f;
-	config->size = config->time*44100;
+	config->size = config->time*SAMPLE_RATE;
 	config->delay = calloc(sizeof(float), config->size);
 	config->feedback = feedback > 0.f ? (feedback < 1.f ? feedback : 0.9999999f) : 0.f;
 }
@@ -79,7 +76,7 @@ void delayconfig_syncToBPM(DelayConfig *config) {
 
 void delayconfig_setTime(DelayConfig *config, float time) {
 	config->time = time > 0.02f ? (time <= 3.0f ? time : 3.0f) : 0.02f;
-	int newSize = config->time*44100;
+	int newSize = config->time*SAMPLE_RATE;
 	float *newBuffer = calloc(newSize, sizeof(float));
 	if (config->size > 0 && config->size < newSize) {
 		long prefix = newSize - config->size;
@@ -122,103 +119,58 @@ void delayconfig_destroy(void *p){
 	if(p != NULL) free((DelayConfig *)p);
 }
 
-FilterConfig *filterconfig_create(float cutoff, float q) {
-    FilterConfig *filterConfig = malloc(sizeof(FilterConfig));
-    filterConfig->cutoff = cutoff;
-	filterConfig->history1 = 0;
-	filterConfig->history2 = 0;
-	filterConfig->history3 = 0;
-	filterConfig->history4 = 0;
-
-	float pi = 3.1415926535897;
-	float fs = 44100; // sample rate
-
-	filterConfig->t0 = 4.f * fs * fs;
-	filterConfig->t1 = 8.f * fs * fs;
-	filterConfig->t2 = 2.f * fs;
-	filterConfig->t3 = pi / fs;
-
-	filterConfig->min_cutoff = fs * 0.01f;
-	filterConfig->max_cutoff = fs * 0.45f;
-	filterconfig_set(filterConfig, cutoff, q);
-	return filterConfig;
+FilterConfig *filterconfig_create(float f, float r) {
+	FilterConfig *config = (FilterConfig *)malloc(sizeof(FilterConfig));
+	config->hp = false;
+	config->in1 = 0;
+	config->in2 = 0;
+	config->out1 = 0;
+	config->out2 = 0;
+	filterconfig_set(config, f, r);
+	return config;
 }
 
-void filterconfig_set(void *p, float cutoff, float q) {
+void filterconfig_set(void *p, float f, float r) {
 	FilterConfig *config = (FilterConfig *)p;
-    if (cutoff < config->min_cutoff)
-        cutoff = config->min_cutoff;
-    else if(cutoff > config->max_cutoff)
-        cutoff = config->max_cutoff;
-
-    config->cutoff = cutoff;
-    
-	if(q < 0.f)
-   	    q = 0.f;
-	else if(q > 1.f)
-	    q = 1.f;
-
-	config->q = q;
-	
-	float wp = config->t2 * tanf(config->t3 * cutoff);
-	float bd, bd_tmp, b1, b2;
-
-	q *= BUDDA_Q_SCALE;
-	q += 1.f;
-
-	b1 = (0.765367f / (q*wp));
-	b2 = 1.f / (wp * wp);
-
-	bd_tmp = config->t0 * b2 + 1.f;
-
-	bd = 1.f / (bd_tmp + config->t2 * b1);
-
-	config->gain = bd;
-
-	config->coef2 = (2.f - config->t1 * b2);
-
-	config->coef0 = config->coef2 * bd;
-	config->coef1 = (bd_tmp - config->t2 * b1) * bd;
-
-	b1 = (1.847759f / (q*wp));
-
-	bd = 1.f / (bd_tmp + config->t2 * b1);
-
-	config->gain *= bd;
-	config->coef2 *= bd;
-	config->coef3 = (bd_tmp - config->t2 * b1) * bd;
+	config->f = f;
+	config->r = r;	
+	float f0 = f * INV_SAMPLE_RATE;
+	if (config->hp) { // lowpass filter settings
+		config->c = f0 < 0.1f ? f0 * M_PI : tan(M_PI * f0);
+		config->a1 = 1.0f/(1.0f + config->r * config->c + config->c * config->c);
+		config->a2 = -2.0f * config->a1;
+		config->a3 = config->a1;
+		config->b1 = 2.0f * (config->c * config->c - 1.0f) * config->a1;
+	} else { // highpass filter settings
+		// for frequencies < ~ 4000 Hz, approximate the tan function as an optimization.
+		config->c = f0 < 0.1f ? 1.0f / (f0 * M_PI) : tan((0.5f - f0) * M_PI);
+		config->a1 = 1.0f/(1.0f + config->r * config->c + config->c * config->c);
+		config->a2 = 2.0f * config->a1;
+		config->a3 = config->a1;
+		config->b1 = 2.0f * (1.0f - config->c * config->c) * config->a1;
+	}
+	config->b2 = (1.0f - config->r * config->c + config->c * config->c) * config->a1;
 }
 
 void filter_process(void *p, float buffer[], int size) {
 	FilterConfig *config = (FilterConfig *)p;
 	int i;
-	for (i = 0; i < size; i++) {
-		if (buffer[i] == 0) continue;
-	    float output = buffer[i] * config->gain;
-	    float new_hist;
-
-	    output -= config->history1 * config->coef0;
-	    new_hist = output - config->history2 * config->coef1;
-
-	    output = new_hist + config->history1 * 2.f + config->history2;
-
-	    config->history2 = config->history1;
-	    config->history1 = new_hist;
-
-	    output -= config->history3 * config->coef2;
-	    new_hist = output - config->history4 * config->coef3;
-
-	    output = new_hist + config->history3 * 2.f + config->history4;
-
-	    config->history4 = config->history3;
-	    config->history3 = new_hist;
-
-	    buffer[i] = output;
-	}
+	for(i = 0; i < size; i++) {
+		float out = config->a1 * buffer[i] +
+					config->a2 * config->in1 +
+					config->a3 * config->in2 -
+					config->b1 * config->out1 -
+					config->b2 * config->out2;
+		config->in2 = config->in1;
+		config->in1 = buffer[i];
+		config->out2 = config->out1;
+		config->out1 = out;
+		buffer[i] = out;
+	}	
 }
 
 void filterconfig_destroy(void *p) {
-	if(p != NULL) free((FilterConfig *)p);
+	free((FilterConfig *)p);
 }
 
 VolumePanConfig *volumepanconfig_create(float volume, float pan) {

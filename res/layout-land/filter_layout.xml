@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <ToggleButton
+        android:id="@+id/effect_toggleOn"
+        android:layout_width="250dp"
+        android:layout_height="50dp"
+        android:onClick="toggleEffect"
+    />
+    
+    <ToggleButton 
+        android:id="@+id/lp_hp_toggle"
+    	android:layout_width="match_parent"
+    	android:layout_height="25dp"
+    	android:layout_alignRight="@+id/effect_toggleOn"
+    	android:layout_below="@+id/effect_toggleOn"
+    	android:onClick="toggleLpHpFilter"
+    />
+    
+    <SeekBar
+        android:id="@+id/effect_control_1"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_alignRight="@+id/effect_toggleOn"        
+        android:layout_below="@+id/lp_hp_toggle"
+        android:onClick="setParam1"
+    />
+    
+    <SeekBar
+        android:id="@+id/effect_control_2"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_alignRight="@+id/effect_toggleOn"        
+        android:layout_below="@+id/effect_control_1"     
+        android:onClick="setParam2"
+    />
+
+    <com.kh.beatbot.view.XYView
+        android:id="@+id/xy_view"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/effect_toggleOn"
+    />
+
+    
+</RelativeLayout>

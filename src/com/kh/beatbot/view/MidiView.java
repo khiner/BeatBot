@@ -8,11 +8,14 @@ import java.util.Map;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import com.KarlHiner.BeatBot.R;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
@@ -36,6 +39,8 @@ public class MidiView extends SurfaceViewBase {
 	private FloatBuffer selectRegionVB = null;
 	private FloatBuffer loopMarkerVB = null;
 	private FloatBuffer loopMarkerLineVB = null;
+
+	private int[] textures = new int[1];
 
 	private MidiManager midiManager;
 	private RecordManager recordManager;
@@ -448,6 +453,33 @@ public class MidiView extends SurfaceViewBase {
 		waveformHelper.start();
 	}
 
+	private void renderBackgroundTexture() {
+		float vertices[] = { -width, -height, -width, height, width, -height,
+				width, height };
+
+		float texture[] = { 0.0f, height, 0.0f, 0.0f, width, height, width,
+				0.0f };
+
+		FloatBuffer vertexBuffer = makeFloatBuffer(vertices);
+		FloatBuffer textureBuffer = makeFloatBuffer(texture);
+		// bind the previously generated texture
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
+
+		// Point to our buffers
+		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+
+		// Set the face rotation
+		gl.glFrontFace(GL10.GL_CW);
+
+		// Point to our vertex buffer
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vertexBuffer);
+		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer);
+
+		// Draw the vertices as triangle strip
+		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, vertexBuffer.capacity() / 2);
+	}
+
 	protected void init() {
 		levelsHelper = new LevelsViewHelper(this);
 		// waveformHelper constructor: yPos, height
@@ -456,6 +488,10 @@ public class MidiView extends SurfaceViewBase {
 		float color = bean.getBgColor();
 		gl.glClearColor(color, color, color, 1.0f);
 		gl.glEnable(GL10.GL_POINT_SMOOTH);
+		//gl.glEnable(GL10.GL_TEXTURE_2D);
+		Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
+				R.drawable.background);
+		loadTexture(gl, bitmap, textures);
 		initHLineVB();
 		initVLineVBs();
 		initLoopMarkerVBs();
@@ -464,6 +500,7 @@ public class MidiView extends SurfaceViewBase {
 
 	@Override
 	protected void drawFrame() {
+		//renderBackgroundTexture();		
 		boolean recording = recordManager.getState() == RecordManager.State.LISTENING
 				|| recordManager.getState() == RecordManager.State.RECORDING;
 		if (bean.getViewState() == State.TO_LEVELS_VIEW
@@ -773,7 +810,7 @@ public class MidiView extends SurfaceViewBase {
 		bean.setLevelsHeight(bean.getMidiHeight()
 				- MidiViewBean.LEVEL_POINT_SIZE);
 	}
-	
+
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		bean.setLastDownTime(System.currentTimeMillis());

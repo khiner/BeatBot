@@ -4,25 +4,23 @@
 #include <assert.h>
 #include <jni.h>
 #include <string.h>
+#include <math.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <sys/time.h>
-#include <fftw3.h>
+#include <sys/types.h>
 
+// fast-fourier transform library
+#include <fftw3.h>
 // for Android logging
 #include <android/log.h>
-
 // for native audio
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
-
 // for native asset manager
-#include <sys/types.h>
-#include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
-
+// local .h includes
 #include "effects.h"
-#include "ticker.h"
 
 #define CONV16BIT 32768
 #define CONVMYFLT (1./32768.)
@@ -68,7 +66,7 @@ typedef struct Track_ {
 	
 	bool armed;
 	bool playing;
-    bool loopMode;
+    bool loop;
 
     int loopBegin;
     int loopEnd;

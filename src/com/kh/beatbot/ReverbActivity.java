@@ -19,7 +19,6 @@ public class ReverbActivity extends EffectActivity {
 		return GlobalVars.reverbX[trackNum];
 	}
 
-
 	public float getYValue() {
 		return GlobalVars.reverbY[trackNum];
 	}
