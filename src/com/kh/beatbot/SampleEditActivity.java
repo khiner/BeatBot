@@ -8,14 +8,17 @@ import android.widget.ToggleButton;
 
 import com.KarlHiner.BeatBot.R;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.PlaybackManager;
-import com.kh.beatbot.view.EditLevelsView;
 import com.kh.beatbot.view.SampleWaveformView;
+import com.kh.beatbot.view.TronSeekbar;
+import com.kh.beatbot.view.bean.MidiViewBean;
 
-public class SampleEditActivity extends Activity {
+public class SampleEditActivity extends Activity implements LevelListener {
 	private PlaybackManager playbackManager = null;
 	private SampleWaveformView sampleWaveformView = null;
-	private EditLevelsView editLevelsView = null;
+	//private EditLevelsView editLevelsView = null;
+	private TronSeekbar volumeLevel, panLevel, pitchLevel;
 	private int trackNum;
 	private enum Effect {BITCRUSH, DELAY, FILTER, REVERB};
 	
@@ -26,11 +29,12 @@ public class SampleEditActivity extends Activity {
 		playbackManager = GlobalVars.getPlaybackManager();
 		trackNum = getIntent().getExtras().getInt("trackNum");
 		sampleWaveformView = ((SampleWaveformView) findViewById(R.id.sample_waveform_view));
-		editLevelsView = ((EditLevelsView) findViewById(R.id.edit_levels_view));
+		//editLevelsView = ((EditLevelsView) findViewById(R.id.edit_levels_view));
 		sampleWaveformView.setPlaybackManager(playbackManager);
 		sampleWaveformView.setTrackNum(trackNum);
-		editLevelsView.setActivity(this);
-		editLevelsView.setTrackNum(trackNum);
+		//editLevelsView.setActivity(this);
+		//editLevelsView.setTrackNum(trackNum);
+		initLevels();
 		// numSamples should be in shorts, so divide by two
 		sampleWaveformView.setSamples(getSamples(trackNum));
 		playbackManager.armTrack(trackNum);
@@ -94,6 +98,44 @@ public class SampleEditActivity extends Activity {
 			playbackManager.disarmTrack(trackNum);
 	}
 
+	private void initLevels() {
+		volumeLevel = ((TronSeekbar)findViewById(R.id.volumeLevel));
+		panLevel = ((TronSeekbar)findViewById(R.id.panLevel));
+		pitchLevel = ((TronSeekbar)findViewById(R.id.pitchLevel));
+		volumeLevel.setLevelListener(this);
+		panLevel.setLevelListener(this);
+		pitchLevel.setLevelListener(this);
+		volumeLevel.setLevelColor(MidiViewBean.VOLUME_COLOR);
+		panLevel.setLevelColor(MidiViewBean.PAN_COLOR);
+		pitchLevel.setLevelColor(MidiViewBean.PITCH_COLOR);
+		volumeLevel.setLevel(getPrimaryVolume(trackNum));
+		panLevel.setLevel(getPrimaryPan(trackNum));
+		pitchLevel.setLevel(getPrimaryPitch(trackNum));
+	}
+	
+	public void setLevel(TronSeekbar levelBar, float level) {
+		if (levelBar.equals(volumeLevel)) {
+			setPrimaryVolume(trackNum, level);
+		} else if (levelBar.equals(panLevel)) {
+			setPrimaryPan(trackNum, level);			
+		} else if (levelBar.equals(pitchLevel)) {
+			setPrimaryPitch(trackNum, level);			
+		}
+	}
+	
+	public void setLevelChecked(TronSeekbar levelBar, boolean checked) {
+		if (levelBar.equals(volumeLevel)) {
+			((ToggleButton) findViewById(R.id.volumeView))
+					.setChecked(checked);
+		} else if (levelBar.equals(panLevel)) {
+			((ToggleButton) findViewById(R.id.panView))
+					.setChecked(checked);
+		} else if (levelBar.equals(pitchLevel)) {
+			((ToggleButton) findViewById(R.id.pitchView))
+					.setChecked(checked);
+		}	
+	}
+		
 	// get the audio data in floats
 	public native float[] getSamples(int trackNum);
 
@@ -102,4 +144,16 @@ public class SampleEditActivity extends Activity {
 
 	// scale all samples so that the sample with the highest amplitude is at 1
 	public native float[] normalize(int trackNum);
+	
+	public native float getPrimaryVolume(int trackNum);
+
+	public native float getPrimaryPan(int trackNum);
+
+	public native float getPrimaryPitch(int trackNum);
+
+	public native void setPrimaryVolume(int trackNum, float volume);
+
+	public native void setPrimaryPan(int trackNum, float pan);
+
+	public native void setPrimaryPitch(int trackNum, float pitch);	
 }

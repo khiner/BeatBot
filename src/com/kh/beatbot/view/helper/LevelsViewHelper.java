@@ -122,7 +122,7 @@ public class LevelsViewHelper {
 
 	private void drawLevels(boolean selected) {
 		FloatBuffer vertexBuffer = selected ? selectedLevelBarsVB : levelBarsVB;
-		float[] color = new float[3];
+		float[] color = null;
 		if (selected) {
 			color = MidiViewBean.SELECTED_COLOR;
 		} else {

@@ -18,7 +18,7 @@
         android:onClick="beatMatch"
     />
     
-    <SeekBar
+    <com.kh.beatbot.view.TronSeekbar
         android:id="@+id/effect_control_1"
         android:layout_width="fill_parent"
         android:layout_height="25dp"
@@ -26,7 +26,7 @@
         android:layout_below="@+id/beatmatch"
     />
     
-    <SeekBar
+    <com.kh.beatbot.view.TronSeekbar
         android:id="@+id/effect_control_2"
         android:layout_width="fill_parent"
         android:layout_height="25dp"

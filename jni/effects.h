@@ -115,7 +115,7 @@ typedef struct ReverbConfig_t {
 /******* END FREEVERB STUFF *******/
 
 typedef struct DecimateConfig_t {
-    int   bits; // 2-32
+    int   bits; // 4-32
     float rate; // 0-1
     float cnt;
     float y;
@@ -123,7 +123,8 @@ typedef struct DecimateConfig_t {
 
 typedef struct DelayConfig_t {
 	float *delay;     // delayline
-	float  feedback;       // feedback amount: 0-1
+	float  wet;       // wet/dry
+	float  feedback;  // feedback amount: 0-1
 	float  time;      // time from 0-1	
 	bool   beatmatch; // sync to the beat
 	int    numBeats;  // number of beats to delay for beatmatch

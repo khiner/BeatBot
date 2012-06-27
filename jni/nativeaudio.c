@@ -619,26 +619,22 @@ jfloatArray Java_com_kh_beatbot_SampleEditActivity_normalize(JNIEnv* env, jclass
 	return makejFloatArray(env, track->buffer, track->totalSamples);
 }
 
-/****************************************************************************************
- Java EditLevelsView JNI methods
-****************************************************************************************/
-
-jfloat Java_com_kh_beatbot_view_EditLevelsView_getPrimaryVolume(JNIEnv* env, jclass clazz, jint trackNum) {
+jfloat Java_com_kh_beatbot_SampleEditActivity_getPrimaryVolume(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
 	return ((VolumePanConfig *)track->effects[STATIC_VOL_PAN_ID].config)->volume;
 }
 
-jfloat Java_com_kh_beatbot_view_EditLevelsView_getPrimaryPan(JNIEnv* env, jclass clazz, jint trackNum) {
+jfloat Java_com_kh_beatbot_SampleEditActivity_getPrimaryPan(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
 	return ((VolumePanConfig *)track->effects[STATIC_VOL_PAN_ID].config)->pan;
 }
 
-jfloat Java_com_kh_beatbot_view_EditLevelsView_getPrimaryPitch(JNIEnv* env, jclass clazz, jint trackNum) {
+jfloat Java_com_kh_beatbot_SampleEditActivity_getPrimaryPitch(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
 	return track->primaryPitch;
 }
 
-void Java_com_kh_beatbot_view_EditLevelsView_setPrimaryVolume(JNIEnv* env, jclass clazz,
+void Java_com_kh_beatbot_SampleEditActivity_setPrimaryVolume(JNIEnv* env, jclass clazz,
 														 jint trackNum, jfloat volume) {
 	Track *track = getTrack(trackNum);
 	VolumePanConfig *config = (VolumePanConfig *)track->effects[STATIC_VOL_PAN_ID].config;
@@ -646,7 +642,7 @@ void Java_com_kh_beatbot_view_EditLevelsView_setPrimaryVolume(JNIEnv* env, jclas
 	precalculateEffects(track);
 }
 
-void Java_com_kh_beatbot_view_EditLevelsView_setPrimaryPan(JNIEnv* env, jclass clazz,
+void Java_com_kh_beatbot_SampleEditActivity_setPrimaryPan(JNIEnv* env, jclass clazz,
 													  jint trackNum, jfloat pan) {
 	Track *track = getTrack(trackNum);
 	VolumePanConfig *config = (VolumePanConfig *)track->effects[STATIC_VOL_PAN_ID].config;
@@ -655,7 +651,7 @@ void Java_com_kh_beatbot_view_EditLevelsView_setPrimaryPan(JNIEnv* env, jclass c
 	precalculateEffects(track);	
 }
 
-void Java_com_kh_beatbot_view_EditLevelsView_setPrimaryPitch(JNIEnv* env, jclass clazz,
+void Java_com_kh_beatbot_SampleEditActivity_setPrimaryPitch(JNIEnv* env, jclass clazz,
 														jint trackNum, jfloat pitch) {
 	Track *track = getTrack(trackNum);
 	track->primaryPitch = pitch;
@@ -681,9 +677,9 @@ void Java_com_kh_beatbot_DecimateActivity_setDecimateBits(JNIEnv* env, jclass cl
 	Track *track = getTrack(trackNum);
 	Effect decimate = track->effects[DECIMATE_ID];
 	DecimateConfig *decimateConfig = (DecimateConfig *)decimate.config;
-	// bits range from 2 to 32
-	bits *= 30;
-	bits += 2;
+	// bits range from 4 to 32
+	bits *= 28;
+	bits += 4;
 	decimate.set(decimateConfig, bits, decimateConfig->rate);
 	precalculateEffects(track);
 }

@@ -19,7 +19,7 @@
     	android:onClick="toggleLpHpFilter"
     />
     
-    <SeekBar
+    <com.kh.beatbot.view.TronSeekbar
         android:id="@+id/effect_control_1"
         android:layout_width="match_parent"
         android:layout_height="25dp"
@@ -28,7 +28,7 @@
         android:onClick="setParam1"
     />
     
-    <SeekBar
+    <com.kh.beatbot.view.TronSeekbar
         android:id="@+id/effect_control_2"
         android:layout_width="match_parent"
         android:layout_height="25dp"

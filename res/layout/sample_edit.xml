@@ -45,7 +45,7 @@
 	    android:textOff=""
         android:textOn="" 
         android:background="@drawable/volume_btn_src" />
-
+	    
     <ToggleButton
         android:id="@+id/panView"
         android:layout_width="80dp"
@@ -67,21 +67,43 @@
 	    android:textOff=""
         android:textOn=""        
         android:background="@drawable/pitch_btn_src"/>
-    
-    <com.kh.beatbot.view.EditLevelsView
-        android:id="@+id/edit_levels_view"
+        
+    <com.kh.beatbot.view.TronSeekbar
+        android:id="@+id/volumeLevel"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="25dp"
+        android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/volumeView"
         android:layout_alignTop="@+id/volumeView"
-        android:layout_alignBottom="@+id/pitchView" />
+        android:layout_marginTop="8dp"
+    />
+
+    <com.kh.beatbot.view.TronSeekbar
+        android:id="@+id/panLevel"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/panView"
+        android:layout_alignTop="@+id/panView"
+        android:layout_marginTop="8dp"        
+    />
+
+    <com.kh.beatbot.view.TronSeekbar
+        android:id="@+id/pitchLevel"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/pitchView"
+        android:layout_alignTop="@+id/pitchView"
+        android:layout_marginTop="8dp"        
+    />
     
     <ImageButton
         android:id="@+id/filterButton"
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:background="@drawable/filter_icon"
-        android:layout_below="@+id/edit_levels_view"
+        android:layout_below="@+id/pitchView"
         android:onClick="filter"/>
 
     <ImageButton
@@ -90,7 +112,7 @@
         android:layout_height="40dp"
         android:background="@drawable/bitcrush_icon"
         android:layout_toRightOf="@+id/filterButton"
-        android:layout_below="@+id/edit_levels_view"
+        android:layout_below="@+id/pitchView"
         android:onClick="bitcrush"/>
 
     <ImageButton
@@ -99,7 +121,7 @@
         android:layout_height="40dp"
         android:background="@drawable/delay_icon"
         android:layout_toRightOf="@+id/bitcrushButton"
-        android:layout_below="@+id/edit_levels_view"
+        android:layout_below="@+id/pitchView"
         android:onClick="delay" />
     
     <Button
@@ -107,7 +129,7 @@
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:layout_toRightOf="@+id/delayButton"
-        android:layout_below="@+id/edit_levels_view"
+        android:layout_below="@+id/pitchView"
         android:text="@string/reverb"
     	android:onClick="reverb" />
     
