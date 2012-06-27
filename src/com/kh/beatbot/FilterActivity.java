@@ -1,6 +1,7 @@
 package com.kh.beatbot;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ToggleButton;
 
@@ -12,8 +13,9 @@ public class FilterActivity extends EffectActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.filter_layout);		
-		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.filterOn[trackNum]);
+		setContentView(R.layout.filter_layout);
+		initLevelBars();
+		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.filterOn[trackNum]);		
 	}
 	
 	public float getXValue() {
@@ -25,6 +27,7 @@ public class FilterActivity extends EffectActivity {
 	}
 	
 	public void setXValue(float xValue) {
+		Log.d("yo", "yo");
 		GlobalVars.filterX[trackNum] = xValue;
 		setFilterCutoff(trackNum, xValue);
 	}

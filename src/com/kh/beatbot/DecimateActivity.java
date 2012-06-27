@@ -11,7 +11,8 @@ public class DecimateActivity extends EffectActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.effect_layout);		
+		setContentView(R.layout.effect_layout);
+		initLevelBars();
 		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.decimateOn[trackNum]);
 	}
 	

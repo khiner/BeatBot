@@ -11,7 +11,7 @@
     />
     
     <com.kh.beatbot.view.TronSeekbar
-        android:id="@+id/effect_control_1"
+        android:id="@+id/xParamBar"
         android:layout_width="fill_parent"
         android:layout_height="25dp"
         android:onClick="setParam1"
@@ -19,10 +19,10 @@
     />
     
     <com.kh.beatbot.view.TronSeekbar
-        android:id="@+id/effect_control_2"
+        android:id="@+id/yParamBar"
         android:layout_width="fill_parent"
         android:layout_height="25dp"
-        android:layout_below="@+id/effect_control_1"     
+        android:layout_below="@+id/xParamBar"     
         android:onClick="setParam2"
     />
     
@@ -30,7 +30,7 @@
         android:id="@+id/xy_view"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/effect_control_2"        
+        android:layout_below="@+id/yParamBar"        
         android:layout_alignParentRight="true"
     />
 

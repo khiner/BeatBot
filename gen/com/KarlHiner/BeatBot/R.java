@@ -104,8 +104,6 @@ public final class R {
         public static final int bpm_tap=0x7f090012;
         public static final int controlLayout=0x7f090007;
         public static final int delayButton=0x7f090026;
-        public static final int effect_control_1=0x7f090002;
-        public static final int effect_control_2=0x7f090003;
         public static final int effect_toggleOn=0x7f090000;
         public static final int filePathEdit=0x7f090017;
         public static final int filterButton=0x7f090024;
@@ -149,7 +147,9 @@ public final class R {
         public static final int volumeButton=0x7f09000e;
         public static final int volumeLevel=0x7f090021;
         public static final int volumeView=0x7f09001e;
+        public static final int xParamBar=0x7f090002;
         public static final int xy_view=0x7f090004;
+        public static final int yParamBar=0x7f090003;
     }
     public static final class layout {
         public static final int delay_layout=0x7f030000;
