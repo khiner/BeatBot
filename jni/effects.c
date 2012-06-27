@@ -192,7 +192,8 @@ void delay_process(void *p, float buffer[], int size) {
 	float out, *delay = config->delay, feedback = config->feedback;
 	int i, *rp = &(config->rp);
 	for(i = 0; i < size; i++){
-		out = delay[*rp];
+		out = delay[*rp]*config->wet + buffer[i]*(1 - config->wet);
+		if (out > 1) out = 1;
 		config->delay[(*rp)++] = buffer[i] + out*feedback;
 		if(*rp == config->size) *rp = 0;
 		buffer[i] = out;

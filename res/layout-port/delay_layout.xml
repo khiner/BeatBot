@@ -32,6 +32,14 @@
         android:layout_below="@+id/xParamBar"
     />
     
+    <com.kh.beatbot.view.TronSeekbar
+        android:id="@+id/delayWet"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_alignRight="@+id/effect_toggleOn"        
+        android:layout_below="@+id/yParamBar"
+    />    
+    
     <com.kh.beatbot.view.XYView
         android:id="@+id/xy_view"
         android:layout_width="fill_parent"

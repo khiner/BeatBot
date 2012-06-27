@@ -786,6 +786,13 @@ void Java_com_kh_beatbot_DelayActivity_setDelayFeedback(JNIEnv* env, jclass claz
 	delayconfig_setFeedback(config, fdb);
 }
 
+void Java_com_kh_beatbot_DelayActivity_setDelayWet(JNIEnv* env, jclass clazz,
+												   jint trackNum, jfloat wet) {
+	Track *track = getTrack(trackNum);
+	DelayConfig *config = (DelayConfig *)track->effects[DELAY_ID].config;
+	config->wet = wet;
+}
+
 void Java_com_kh_beatbot_ReverbActivity_setReverbOn(JNIEnv* env, jclass clazz,
 													jint trackNum, jboolean on) {
 	Track *track = getTrack(trackNum);

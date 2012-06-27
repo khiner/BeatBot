@@ -11,7 +11,8 @@ public class GlobalVars {
 	
 	// effect settings are stored here instead of in the effect activities because
 	// the activities are destroyed after clicking 'back', and we need to persist state
-	public static float[] decimateX, decimateY, delayX, delayY, filterX, filterY, reverbX, reverbY;
+	public static float[] decimateX, decimateY, delayX, delayY, delayWet,
+						  filterX, filterY, reverbX, reverbY;
 	
 	public static boolean[] decimateOn, delayOn, filterOn, reverbOn;
 	
@@ -26,6 +27,7 @@ public class GlobalVars {
 		decimateY = new float[num];
 		delayX = new float[num];
 		delayY = new float[num];
+		delayWet = new float[num];
 		filterX = new float[num];
 		filterY = new float[num];
 		reverbX = new float[num];

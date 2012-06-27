@@ -1,20 +1,25 @@
 package com.kh.beatbot;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ToggleButton;
 
 import com.KarlHiner.BeatBot.R;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.view.TronSeekbar;
 
 public class DelayActivity extends EffectActivity {
-
+	TronSeekbar wetBar = null;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.delay_layout);
 		initLevelBars();
-		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.delayOn[trackNum]);		
+		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.delayOn[trackNum]);
+		wetBar = (TronSeekbar)findViewById(R.id.delayWet);
+		wetBar.setLevelListener(this);
 	}
 	
 	public float getXValue() {
@@ -34,7 +39,7 @@ public class DelayActivity extends EffectActivity {
 		GlobalVars.delayY[trackNum] = yValue;		
 		setDelayFeedback(trackNum, yValue);
 	}
-	
+		
 	public void setEffectOn(boolean on) {
 		GlobalVars.delayOn[trackNum] = on;
 		setDelayOn(trackNum, on);
@@ -42,6 +47,21 @@ public class DelayActivity extends EffectActivity {
 	
 	public void setEffectDynamic(boolean dynamic) {
 		return; // delay is always dynamic
+	}
+	
+	@Override
+	public void setLevel(TronSeekbar levelBar, float level) {		
+		super.setLevel(levelBar, level);
+		Log.d("Yo", "Yo");
+		if (levelBar.equals(wetBar)) {
+			setWetValue(level);
+		}
+	}
+		
+	public void setWetValue(float wet) {
+		Log.d("Yo yo", "Yo yo");		
+		GlobalVars.delayWet[trackNum] = wet;
+		setDelayWet(trackNum, wet);
 	}
 	
 	public void beatMatch(View view) {
@@ -52,4 +72,5 @@ public class DelayActivity extends EffectActivity {
 	public native void setDelayBeatmatch(int trackNum, boolean beatmatch);	
 	public native void setDelayTime(int trackNum, float delay);
 	public native void setDelayFeedback(int trackNum, float feedback);
+	public native void setDelayWet(int trackNum, float wet);
 }
