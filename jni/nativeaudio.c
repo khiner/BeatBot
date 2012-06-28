@@ -64,23 +64,29 @@ MidiEvent* initEvent(long onTick, long offTick, float volume, float pan, float p
 
 void precalculateEffects(Track *track) {
 	// start with the raw audio samples
-	memcpy(track->scratchBufferL, track->bufferL, sizeof(float)*track->totalSamples/2);
-	memcpy(track->scratchBufferR, track->bufferR, sizeof(float)*track->totalSamples/2);
+	memcpy(track->scratchBuffers[0], track->buffers[0], sizeof(float)*track->totalSamples/2);
+	memcpy(track->scratchBuffers[1], track->buffers[1], sizeof(float)*track->totalSamples/2);
 	int i;
 	for (i = 0; i < numEffects; i++) {
 		Effect effect = track->effects[i];
 		if (!effect.dynamic && effect.on)
-			effect.process(effect.config, track->scratchBufferL, track->scratchBufferR, track->totalSamples/2);
+			effect.process(effect.config, track->scratchBuffers, track->totalSamples/2);
 	}
 }
 
 void initTrack(Track *track, AAsset *asset) {
   	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
   	track->totalSamples = AAsset_getLength(asset)/2 - 22;
-  	track->bufferL = (float *)calloc(track->totalSamples/2, sizeof(float));
-  	track->bufferR = (float *)calloc(track->totalSamples/2, sizeof(float));
-  	track->scratchBufferL = (float *)calloc(track->totalSamples/2, sizeof(float));
-  	track->scratchBufferR = (float *)calloc(track->totalSamples/2, sizeof(float));
+
+  	track->currBuffers = (float **)malloc(2*sizeof(float *));
+  	track->currBuffers[0] = (float *)calloc(track->totalSamples/2, sizeof(float));
+  	track->currBuffers[1] = (float *)calloc(track->totalSamples/2, sizeof(float));
+  	track->buffers = (float **)malloc(2*sizeof(float *));
+  	track->buffers[0] = (float *)calloc(track->totalSamples/2, sizeof(float));
+  	track->buffers[1] = (float *)calloc(track->totalSamples/2, sizeof(float));
+	track->scratchBuffers = (float **)malloc(2*sizeof(float *));
+  	track->scratchBuffers[0] = (float *)calloc(track->totalSamples/2, sizeof(float));
+  	track->scratchBuffers[1] = (float *)calloc(track->totalSamples/2, sizeof(float));
 	track->armed = false;
   	track->playing = false;
   	track->loop = false;
@@ -121,8 +127,9 @@ void combineStereo(float left[], float right[], float combined[], int size) {
 
 void calcNextBuffer(Track *track) {
   // start with all zeros
-  memset(track->currBufferL, 0, (BUFF_SIZE/2)*sizeof(float));
-  memset(track->currBufferR, 0, (BUFF_SIZE/2)*sizeof(float));
+  memset(track->currBuffers[0], 0, (BUFF_SIZE/2)*sizeof(float));
+  memset(track->currBuffers[1], 0, (BUFF_SIZE/2)*sizeof(float));
+  
   if (track->playing && track->currSample < track->loopEnd) {
     int totalSize = 0;
     int nextSize; // how many samples to copy from the source
@@ -134,9 +141,9 @@ void calcNextBuffer(Track *track) {
         nextSize = BUFF_SIZE/2 - totalSize; // plenty of samples left to copy :)		
       }					   
       // copy the next block of data from the scratch buffer into the current float buffer for streaming
-      memcpy(&(track->currBufferL[totalSize]), &(track->scratchBufferL[track->currSample]),
+      memcpy(&(track->currBuffers[0][totalSize]), &(track->scratchBuffers[0][track->currSample]),
              nextSize*sizeof(float));
-      memcpy(&(track->currBufferR[totalSize]), &(track->scratchBufferR[track->currSample]),
+      memcpy(&(track->currBuffers[1][totalSize]), &(track->scratchBuffers[1][track->currSample]),
              nextSize*sizeof(float));
 
       totalSize += nextSize;
@@ -157,13 +164,13 @@ void calcNextBuffer(Track *track) {
 
 void processEffects(Track *track) {
   int i;
-  //for (i = 0; i < numEffects; i++) {
-  //	Effect effect = track->effects[i];
-  //	if (effect.dynamic && effect.on)
-  //		effect.process(effect.config, track->currBufferL, track->currBufferR, BUFF_SIZE/2);
-  //}
+  for (i = 0; i < numEffects; i++) {
+	  Effect effect = track->effects[i];
+  	  if (effect.dynamic && effect.on)
+  		  effect.process(effect.config, track->currBuffers, BUFF_SIZE/2);
+  }
   // combine the two channels into one buffer, alternating L and R samples
-  combineStereo(track->currBufferL, track->currBufferR, track->currBufferFlt, BUFF_SIZE/2);
+  combineStereo(track->currBuffers[0], track->currBuffers[1], track->currBufferFlt, BUFF_SIZE/2);
   // convert floats to shorts
   floatArytoShortAry(track->currBufferFlt, track->currBufferShort, BUFF_SIZE);
 }
@@ -286,8 +293,8 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
   int i;
   for (i = 0; i < track->totalSamples/2; i++) {
     // first 44 bytes of a wav file are header
-    track->bufferL[i] = charsToShort(charBuf[i*4 + 1 + 44], charBuf[i*4 + 44])*CONVMYFLT;
-    track->bufferR[i] = charsToShort(charBuf[i*4 + 3 + 44], charBuf[i*4 + 2 + 44])*CONVMYFLT;
+    track->buffers[0][i] = charsToShort(charBuf[i*4 + 1 + 44], charBuf[i*4 + 44])*CONVMYFLT;
+    track->buffers[1][i] = charsToShort(charBuf[i*4 + 3 + 44], charBuf[i*4 + 2 + 44])*CONVMYFLT;
   }
   free(charBuf);
   AAsset_close(asset);
@@ -355,12 +362,12 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv* env, jclass clazz) {
     (*(track->outputBufferQueue))->Clear(track->outputBufferQueue);
     track->outputBufferQueue = NULL;			
     track->outputPlayerPlay = NULL;
-    free(track->bufferL);
-    free(track->bufferR);
-    free(track->scratchBufferL);
-    free(track->scratchBufferR);
-    free(track->currBufferL);
-    free(track->currBufferR);
+    free(track->buffers[0]);
+    free(track->buffers[1]);
+    free(track->scratchBuffers[0]);
+    free(track->scratchBuffers[1]);
+    free(track->currBuffers[0]);
+    free(track->currBuffers[1]);
     free(track->currBufferFlt);
     free(track->currBufferShort);
     for (j = 0; j < numEffects; j++) {
@@ -622,23 +629,23 @@ jfloatArray makejFloatArray(JNIEnv* env, float floatAry[], int size) {
 
 jfloatArray Java_com_kh_beatbot_SampleEditActivity_getSamples(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
-	return makejFloatArray(env, track->bufferL, track->totalSamples/2);
+	return makejFloatArray(env, track->buffers[0], track->totalSamples/2);
 }
 
 jfloatArray Java_com_kh_beatbot_SampleEditActivity_reverse(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
-	reverse(track->bufferL, track->loopBegin, track->loopEnd);
-	reverse(track->bufferR, track->loopBegin, track->loopEnd);
+	reverse(track->buffers[0], track->loopBegin, track->loopEnd);
+	reverse(track->buffers[1], track->loopBegin, track->loopEnd);
 	precalculateEffects(track);	
-	return makejFloatArray(env, track->bufferL, track->totalSamples/2);
+	return makejFloatArray(env, track->buffers[0], track->totalSamples/2);
 }
 
 jfloatArray Java_com_kh_beatbot_SampleEditActivity_normalize(JNIEnv* env, jclass clazz, jint trackNum) {
 	Track *track = getTrack(trackNum);
-	normalize(track->bufferL, track->totalSamples/2);
-	normalize(track->bufferR, track->totalSamples/2);
+	normalize(track->buffers[0], track->totalSamples/2);
+	normalize(track->buffers[1], track->totalSamples/2);
 	precalculateEffects(track);		
-	return makejFloatArray(env, track->bufferL, track->totalSamples);
+	return makejFloatArray(env, track->buffers[0], track->totalSamples);
 }
 
 jfloat Java_com_kh_beatbot_SampleEditActivity_getPrimaryVolume(JNIEnv* env, jclass clazz, jint trackNum) {

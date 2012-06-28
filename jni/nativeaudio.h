@@ -47,17 +47,14 @@ typedef struct MidiEventNode_ {
 
 typedef struct Track_ {
 	MidiEventNode *eventHead;
-	float currBufferL[BUFF_SIZE/2];
-	float currBufferR[BUFF_SIZE/2];
+	float **currBuffers;
 	float currBufferFlt[BUFF_SIZE];
 	short currBufferShort[BUFF_SIZE];
 	
 	// buffer to hold original sample data
-	float *bufferL;
-	float *bufferR;
+	float **buffers;
 	// buffer to hold sample data with precalculated effects
-	float *scratchBufferL;
-	float *scratchBufferR;
+	float **scratchBuffers;
 	
 	Effect effects[6];
 	

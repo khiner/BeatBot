@@ -150,7 +150,7 @@ typedef struct Effect_t {
 	bool dynamic;
 	void *config;
 	void (*set)(void *, float, float);
-	void (*process)(void *, float *, float *, int);
+	void (*process)(void *, float **, int);
 	void (*destroy)(void *);
 } Effect;
 
@@ -158,7 +158,7 @@ void initEffect(Effect *effect, bool on, bool dynamic, void *config,
 				void (*set), void (*process), void (*destroy));
 DecimateConfig *decimateconfig_create(float bits, float rate);
 void decimateconfig_set(void *p, float bits, float rate);
-void decimate_process(void *p, float bufferL[], float bufferR[], int size);
+void decimate_process(void *p, float **buffers, int size);
 void decimateconfig_destroy(void *p);
 
 DelayConfig *delayconfig_create(float delay, float feedback);
@@ -167,22 +167,22 @@ void delayconfig_setTime(DelayConfig *config, float time);
 void delayconfig_setNumBeats(DelayConfig *config, int numBeats);
 void delayconfig_syncToBPM(DelayConfig *config);
 void delayconfig_setFeedback(DelayConfig *config, float feedback);
-void delay_process(void *p, float bufferL[], float bufferR[], int size);
+void delay_process(void *p, float **buffers, int size);
 void delayconfig_destroy(void *p);
 
 FilterConfig *filterconfig_create(float cutoff, float r);
 void filterconfig_set(void *config, float cutoff, float r);
-void filter_process(void *config, float bufferL[], float bufferR[], int size);
+void filter_process(void *config, float **buffers, int size);
 void filterconfig_destroy(void *config);
 
 ReverbConfig *reverbconfig_create(float feedback, float hfDamp);
 void reverbconfig_set(void *config, float feedback, float hfDamp);
-void reverb_process(void *config, float bufferL[], float bufferR[], int size);
+void reverb_process(void *config, float **buffers, int size);
 void reverbconfig_destroy(void *config);
 
 VolumePanConfig *volumepanconfig_create(float volume, float pan);
 void volumepanconfig_set(void *config, float volume, float pan);
-void volumepan_process(void *config, float bufferL[], float bufferR[], int size);
+void volumepan_process(void *config, float **buffers, int size);
 void volumepanconfig_destroy(void *config);
 
 void reverse(float buffer[], int begin, int end);
