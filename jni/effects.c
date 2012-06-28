@@ -110,7 +110,7 @@ void decimateconfig_set(void *p, float bits, float rate) {
 	config->rate = rate;	
 }
 
-void decimate_process(void *p, float buffer[], int size) {
+void decimate_process(void *p, float bufferL[], float bufferR[], int size) {
 	DecimateConfig *config = (DecimateConfig *)p;
     int m = 1 << (config->bits - 1);
 	int i;
@@ -118,9 +118,9 @@ void decimate_process(void *p, float buffer[], int size) {
 	    config->cnt += config->rate;
 	    if (config->cnt >= 1) {
 	        config->cnt -= 1;
-		config->y = (long int)(buffer[i]*m)/(float)m;
+		config->y = (long int)(bufferL[i]*m)/(float)m;
 	    }
-	    buffer[i] = config->y;
+	    bufferL[i] = bufferR[i] = config->y;
 	}
 }
 
@@ -170,9 +170,9 @@ void delayconfig_setTime(DelayConfig *config, float time) {
 	} else if (config->size > 0 && config->size > newSize) {
 		long cut = config->size - newSize;
 		float *tempZeros = calloc(cut, sizeof(float));
-		delay_process(config, tempZeros, cut);
-		free(tempZeros);
-		delay_process(config, newBuffer, newSize);
+		//delay_process(config, tempZeros, cut);
+		//free(tempZeros);
+		//delay_process(config, newBuffer, newSize);
 		config->rp = 0;
 	}
 	config->size = newSize;
@@ -186,17 +186,17 @@ void delayconfig_setFeedback(DelayConfig *config, float feedback) {
 	config->feedback = feedback > 0.f ? (feedback < 1.f ? feedback : 0.9999999f) : 0.f;
 }
 
-void delay_process(void *p, float buffer[], int size) {
+void delay_process(void *p, float bufferL[], float bufferR[], int size) {
 	DelayConfig *config = (DelayConfig *)p;
 	// process the delay, replacing the buffer
 	float out, *delay = config->delay, feedback = config->feedback;
 	int i, *rp = &(config->rp);
 	for(i = 0; i < size; i++){
-		out = delay[*rp]*config->wet + buffer[i]*(1 - config->wet);
+		out = delay[*rp]*config->wet + bufferL[i]*(1 - config->wet);
 		if (out > 1) out = 1;
-		config->delay[(*rp)++] = buffer[i] + out*feedback;
+		config->delay[(*rp)++] = bufferL[i] + out*feedback;
 		if(*rp == config->size) *rp = 0;
-		buffer[i] = out;
+		bufferL[i] = bufferR[i] = out;
 	}
 }
 
@@ -238,20 +238,20 @@ void filterconfig_set(void *p, float f, float r) {
 	config->b2 = (1.0f - config->r * config->c + config->c * config->c) * config->a1;
 }
 
-void filter_process(void *p, float buffer[], int size) {
+void filter_process(void *p, float bufferL[], float bufferR[], int size) {
 	FilterConfig *config = (FilterConfig *)p;
 	int i;
 	for(i = 0; i < size; i++) {
-		float out = config->a1 * buffer[i] +
+		float out = config->a1 * bufferL[i] +
 					config->a2 * config->in1 +
 					config->a3 * config->in2 -
 					config->b1 * config->out1 -
 					config->b2 * config->out2;
 		config->in2 = config->in1;
-		config->in1 = buffer[i];
+		config->in1 = bufferL[i];
 		config->out2 = config->out1;
 		config->out1 = out;
-		buffer[i] = out;
+		bufferL[i] = bufferR[i] = out;
 	}	
 }
 
@@ -272,17 +272,20 @@ void volumepanconfig_set(void *p, float volume, float pan) {
 	config->pan = pan;
 }
 
-void volumepan_process(void *p, float buffer[], int size) {
+void volumepan_process(void *p, float bufferL[], float bufferR[], int size) {
 	VolumePanConfig *config = (VolumePanConfig *)p;
 	float leftVolume = (1 - config->pan)*config->volume;
 	float rightVolume = config->pan*config->volume;
 
 	int i;
-	for (i = 0; i < size; i+=2) {
-		if (buffer[i] == 0) continue;
-		buffer[i] = buffer[i]*leftVolume; // left channel
-		buffer[i+1] = buffer[i + 1]*rightVolume; // right channel
-	}  
+	for (i = 0; i < size; i++) {
+		if (bufferL[i] == 0) continue;
+		bufferL[i] = bufferL[i]*leftVolume; // left channel
+	}
+	for (i = 0; i < size; i++) {
+		if (bufferR[i] == 0) continue;
+		bufferR[i] = bufferR[i]*rightVolume; // right channel	
+	}
 }
 
 void volumepanconfig_destroy(void *p) {
@@ -304,19 +307,19 @@ void reverbconfig_set(void *p, float feedback, float hfDamp) {
 	config->hfDamp = hfDamp;
 }
 
-void reverb_process(void *p, float buffer[], int size) {	
+void reverb_process(void *p, float bufferL[], float bufferR[], int size) {	
 	ReverbConfig *config = (ReverbConfig *)p;
   	float out, val=0;
   	int i, j;
 
   	for (i = 0; i < size; i++) {
     	out = 0;
-    	val = buffer[i];
+    	val = bufferL[i];
 	    for(j = 0; j < numcombs; j++)
       		out += comb_process(config->state->comb + j, config->feedback, config->hfDamp, val);
 	    for(j = 0; j < numallpasses; j++)
     	    out = allpass_process(config->state->allpass + j, out);
-	    buffer[i] = out;
+	    bufferL[i] = bufferR[i] = out;
 	}
 }
 

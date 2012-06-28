@@ -52,14 +52,12 @@ public class DelayActivity extends EffectActivity {
 	@Override
 	public void setLevel(TronSeekbar levelBar, float level) {		
 		super.setLevel(levelBar, level);
-		Log.d("Yo", "Yo");
 		if (levelBar.equals(wetBar)) {
 			setWetValue(level);
 		}
 	}
 		
 	public void setWetValue(float wet) {
-		Log.d("Yo yo", "Yo yo");		
 		GlobalVars.delayWet[trackNum] = wet;
 		setDelayWet(trackNum, wet);
 	}
