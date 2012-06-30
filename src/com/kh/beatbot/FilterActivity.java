@@ -43,7 +43,7 @@ public class FilterActivity extends EffectActivity {
 	}
 	
 	public void setEffectDynamic(boolean dynamic) {
-		setFilterDynamic(trackNum, dynamic);
+		//setFilterDynamic(trackNum, dynamic);
 	}
 	
 	public void toggleLpHpFilter(View view) {

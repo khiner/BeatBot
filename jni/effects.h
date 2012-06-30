@@ -122,22 +122,23 @@ typedef struct DecimateConfig_t {
 } DecimateConfig;
 
 typedef struct DelayConfig_t {
-	float *delay;     // delayline
-	float  wet;       // wet/dry
-	float  feedback;  // feedback amount: 0-1
-	float  time;      // time from 0-1	
-	bool   beatmatch; // sync to the beat
-	int    numBeats;  // number of beats to delay for beatmatch
-	int    size;      // length  in samples
-	int    rp;        // read pointer
+	float  **delayBuffer; // delay buffer for each channel
+	float  feedback[2];        // feedback amount: 0-1, one for each channel
+	float  delayTime;       // delay time in seconds: 0-1
+	float  wet;                // wet/dry
+	int    delaySamples;       // delay time in samples: 0 - SAMPLE_RATE	
+	int    numBeats;  		   // number of beats to delay for beatmatch
+	int    delayBufferSize;
+	int    rp[2], wp[2];       // read & write pointers
+	bool   beatmatch; 		   // sync to the beat?
 } DelayConfig;
 
 typedef struct FilterConfig_t {
 	bool hp; // lowpass/highpass flag
 	float a1, a2, a3, b1, b2;
 	float f, c, r;
-	float in1, in2;
-	float out1, out2;
+	float in1[2], in2[2]; // one for each channel
+	float out1[2], out2[2]; // one for each channel
 } FilterConfig;
 
 typedef struct VolumePanConfig_t {
@@ -162,8 +163,8 @@ void decimate_process(void *p, float **buffers, int size);
 void decimateconfig_destroy(void *p);
 
 DelayConfig *delayconfig_create(float delay, float feedback);
-void delayconfig_set(void *config, float time, float feedback);
-void delayconfig_setTime(DelayConfig *config, float time);
+void delayconfig_set(void *config, float delay, float feedback);
+void delayconfig_setDelayTime(DelayConfig *config, float delay);
 void delayconfig_setNumBeats(DelayConfig *config, int numBeats);
 void delayconfig_syncToBPM(DelayConfig *config);
 void delayconfig_setFeedback(DelayConfig *config, float feedback);

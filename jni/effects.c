@@ -129,23 +129,48 @@ void decimateconfig_destroy(void *p) {
 	if(p != NULL) free((DecimateConfig *)p);
 }
 
-DelayConfig *delayconfig_create(float time, float feedback) {
+DelayConfig *delayconfig_create(float delay, float feedback) {
 	// allocate memory and set feedback parameter
 	DelayConfig *p = (DelayConfig *)malloc(sizeof(DelayConfig));
+	p->delayBuffer = (float **)malloc(2*sizeof(float *));
+	p->delayBuffer[0] = (float *)malloc(SAMPLE_RATE*sizeof(float));
+	p->delayBuffer[1] = (float *)malloc(SAMPLE_RATE*sizeof(float));
+	p->delayBufferSize = SAMPLE_RATE;	
+	delayconfig_set(p, delay, feedback);
 	p->wet = 0.5f;
-	p->beatmatch = false;
 	p->numBeats = 4;
-	p->rp = 0;
-	delayconfig_set(p, time, feedback);
+	p->beatmatch = false;
+	int i;
+	for (i = 0; i < 2; i++) {
+		p->rp[i] = p->wp[i] = 0;
+	}	
 	return p;
 }
 
-void delayconfig_set(void *p, float time, float feedback) {
+void delayconfig_set(void *p, float delay, float feedback) {
 	DelayConfig *config = (DelayConfig *)p;
-	config->time = time > 0.02f ? (time < 3.0f ? time : 3.0f) : 0.02f;
-	config->size = config->time*SAMPLE_RATE;
-	config->delay = calloc(sizeof(float), config->size);
-	config->feedback = feedback > 0.f ? (feedback < 1.f ? feedback : 0.9999999f) : 0.f;
+	delayconfig_setDelayTime(config, delay);
+	delayconfig_setFeedback(config, feedback);
+}
+
+void delayconfig_setDelayTime(DelayConfig *config, float delay) {
+	config->delayTime = delay > 0.02f ? (delay <= 1.0f ? delay : 1.0f) : 0.02f;
+	config->delaySamples = (int)(config->delayTime*SAMPLE_RATE);
+	int i, *rp, *wp;
+	for (i = 0; i < 2; i++) {
+		rp = &(config->rp[i]);
+		wp = &(config->wp[i]);
+		*rp = *wp - config->delaySamples;
+		while (*rp < config->delaySamples) {
+			*rp += config->delaySamples;
+		}
+	}
+}
+
+void delayconfig_setFeedback(DelayConfig *config, float feedback) {
+	int i;
+	for (i = 0; i < 2; i++)
+		config->feedback[i] = feedback > 0.f ? (feedback < 1.f ? feedback : 0.9999999f) : 0.f;
 }
 
 void delayconfig_setNumBeats(DelayConfig *config, int numBeats) {
@@ -157,47 +182,24 @@ void delayconfig_setNumBeats(DelayConfig *config, int numBeats) {
 void delayconfig_syncToBPM(DelayConfig *config) {
 	if (!config->beatmatch) return;
 	float newTime = (BPM/480.0f)*(float)config->numBeats; // divide by 60 for seconds, divide by 8 for 8th notes
-	delayconfig_setTime(config, newTime);	
-}
-
-void delayconfig_setTime(DelayConfig *config, float time) {
-	config->time = time > 0.02f ? (time <= 3.0f ? time : 3.0f) : 0.02f;
-	int newSize = config->time*SAMPLE_RATE;
-	float *newBuffer = calloc(newSize, sizeof(float));
-	if (config->size > 0 && config->size < newSize) {
-		long prefix = newSize - config->size;
-		//delay_process(config, &(newBuffer[prefix]), config->size);
-		memcpy(newBuffer, config->delay, config->size*sizeof(float));		
-	} else if (config->size > 0 && config->size > newSize) {
-		long cut = config->size - newSize;
-		float *tempZeros = calloc(cut, sizeof(float));
-		//delay_process(config, tempZeros, cut);
-		//free(tempZeros);
-		//delay_process(config, newBuffer, newSize);
-		config->rp = 0;
-	}
-	config->size = newSize;
-	
-	float *oldPtr = config->delay;
-	config->delay = newBuffer;
-	free(oldPtr);
-}
-
-void delayconfig_setFeedback(DelayConfig *config, float feedback) {
-	config->feedback = feedback > 0.f ? (feedback < 1.f ? feedback : 0.9999999f) : 0.f;
+	delayconfig_setDelayTime(config, newTime);	
 }
 
 void delay_process(void *p, float **buffers, int size) {
 	DelayConfig *config = (DelayConfig *)p;
-	// process the delay, replacing the buffer
-	float out, *delay = config->delay, feedback = config->feedback;
-	int i, *rp = &(config->rp);
-	for(i = 0; i < size; i++){
-		out = delay[*rp]*config->wet + buffers[0][i]*(1 - config->wet);
-		if (out > 1) out = 1;
-		config->delay[(*rp)++] = buffers[0][i] + out*feedback;
-		if(*rp == config->size) *rp = 0;
-		buffers[0][i] = buffers[1][i] = out;
+	float out;	
+	int i, j, *wp, *rp;
+	for (i = 0; i < 2; i++) {
+		rp = &(config->rp[i]);
+		wp = &(config->wp[i]);
+		for (j = 0; j < size; j++) {
+			out = config->delayBuffer[i][(*rp)++]*config->wet + buffers[i][j]*(1 - config->wet);
+			if (out > 1) out = 1;
+			config->delayBuffer[i][(*wp)++] = buffers[i][j] + out*config->feedback[i];
+			if (*wp >= config->delaySamples) *wp -= config->delaySamples;
+			if (*rp >= config->delaySamples) *rp -= config->delaySamples;
+			buffers[i][j] = out;
+		}
 	}
 }
 
@@ -209,10 +211,10 @@ void delayconfig_destroy(void *p){
 FilterConfig *filterconfig_create(float f, float r) {
 	FilterConfig *config = (FilterConfig *)malloc(sizeof(FilterConfig));
 	config->hp = false;
-	config->in1 = 0;
-	config->in2 = 0;
-	config->out1 = 0;
-	config->out2 = 0;
+	config->in1[0] = config->in1[1] = 0;
+	config->in2[0] = config->in2[1] = 0;
+	config->out1[0] = config->out1[1] = 0;
+	config->out2[0] = config->out2[1] = 0;
 	filterconfig_set(config, f, r);
 	return config;
 }
@@ -241,19 +243,21 @@ void filterconfig_set(void *p, float f, float r) {
 
 void filter_process(void *p, float **buffers, int size) {
 	FilterConfig *config = (FilterConfig *)p;
-	int i;
-	for(i = 0; i < size; i++) {
-		float out = config->a1 * buffers[0][i] +
-					config->a2 * config->in1 +
-					config->a3 * config->in2 -
-					config->b1 * config->out1 -
-					config->b2 * config->out2;
-		config->in2 = config->in1;
-		config->in1 = buffers[0][i];
-		config->out2 = config->out1;
-		config->out1 = out;
-		buffers[0][i] = buffers[1][i] = out;
-	}	
+	int i, j;
+	for (i = 0; i < 2; i++) {
+		for(j = 0; j < size; j++) {
+			float out = config->a1 * buffers[i][j] +
+				        config->a2 * config->in1[i] +
+					    config->a3 * config->in2[i] -
+					    config->b1 * config->out1[i] -
+					    config->b2 * config->out2[i];
+			config->in2[i] = config->in1[i];
+			config->in1[i] = buffers[i][j];
+			config->out2[i] = config->out1[i];
+			config->out1[i] = out;
+			buffers[i][j] = out;
+		}	
+	}
 }
 
 void filterconfig_destroy(void *p) {
