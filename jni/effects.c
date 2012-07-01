@@ -143,7 +143,8 @@ DelayConfig *delayconfig_create(float delay, float feedback) {
 	int i;
 	for (i = 0; i < 2; i++) {
 		p->rp[i] = p->wp[i] = 0;
-	}	
+	}
+	int count;
 	return p;
 }
 
@@ -154,8 +155,9 @@ void delayconfig_set(void *p, float delay, float feedback) {
 }
 
 void delayconfig_setDelayTime(DelayConfig *config, float delay) {
-	config->delayTime = delay > 0.02f ? (delay <= 1.0f ? delay : 1.0f) : 0.02f;
+	config->delayTime = delay > 0 ? (delay <= 1 ? delay : 1) : 0;
 	config->delaySamples = (int)(config->delayTime*SAMPLE_RATE);
+	if (config->delaySamples < 8) config->delaySamples = 8;
 	int i, *rp, *wp;
 	for (i = 0; i < 2; i++) {
 		rp = &(config->rp[i]);
@@ -181,7 +183,8 @@ void delayconfig_setNumBeats(DelayConfig *config, int numBeats) {
 
 void delayconfig_syncToBPM(DelayConfig *config) {
 	if (!config->beatmatch) return;
-	float newTime = (BPM/480.0f)*(float)config->numBeats; // divide by 60 for seconds, divide by 8 for 8th notes
+	// divide by 60 for seconds, divide by 16 for 16th notes
+	float newTime = (BPM/960.0f)*(float)config->numBeats;
 	delayconfig_setDelayTime(config, newTime);	
 }
 
@@ -190,14 +193,13 @@ void delay_process(void *p, float **buffers, int size) {
 	float out;	
 	int i, j, *wp, *rp;
 	for (i = 0; i < 2; i++) {
+		//delayconfig_setDelayTime(config, 0.005f + 0.01f*sin(100*M_PI*config->count++*INV_SAMPLE_RATE));	
 		rp = &(config->rp[i]);
 		wp = &(config->wp[i]);
 		for (j = 0; j < size; j++) {
-			out = config->delayBuffer[i][(*rp)++]*config->wet + buffers[i][j]*(1 - config->wet);
+			out = config->delayBuffer[i][(*rp)++ % config->delaySamples]*config->wet + buffers[i][j]*(1 - config->wet);
 			if (out > 1) out = 1;
-			config->delayBuffer[i][(*wp)++] = buffers[i][j] + out*config->feedback[i];
-			if (*wp >= config->delaySamples) *wp -= config->delaySamples;
-			if (*rp >= config->delaySamples) *rp -= config->delaySamples;
+			config->delayBuffer[i][(*wp)++ % config->delaySamples] = buffers[i][j] + out*config->feedback[i];
 			buffers[i][j] = out;
 		}
 	}

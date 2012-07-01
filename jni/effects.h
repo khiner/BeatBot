@@ -131,6 +131,7 @@ typedef struct DelayConfig_t {
 	int    delayBufferSize;
 	int    rp[2], wp[2];       // read & write pointers
 	bool   beatmatch; 		   // sync to the beat?
+	int count;
 } DelayConfig;
 
 typedef struct FilterConfig_t {
