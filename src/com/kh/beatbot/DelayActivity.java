@@ -1,7 +1,6 @@
 package com.kh.beatbot;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ToggleButton;
 
@@ -19,7 +18,7 @@ public class DelayActivity extends EffectActivity {
 		initLevelBars();
 		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.delayOn[trackNum]);
 		wetBar = (TronSeekbar)findViewById(R.id.delayWet);
-		wetBar.setLevelListener(this);
+		wetBar.addLevelListener(this);
 	}
 	
 	public float getXValue() {

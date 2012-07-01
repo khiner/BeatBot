@@ -795,7 +795,7 @@ void Java_com_kh_beatbot_DelayActivity_setDelayTime(JNIEnv* env, jclass clazz,
  		// map float 0-1 to int 1-16 for number of beats
 		delayconfig_setNumBeats(config, (int)(time*15) + 1);
 	} else {
-		newTime = time*2;
+		newTime = time;
 		delayconfig_setDelayTime(config, newTime);
 	}
 }

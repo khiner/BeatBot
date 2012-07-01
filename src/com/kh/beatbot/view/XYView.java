@@ -1,6 +1,7 @@
 package com.kh.beatbot.view;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -8,28 +9,36 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import com.kh.beatbot.EffectActivity;
+import com.kh.beatbot.listener.Level2dListener;
 import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class XYView extends SurfaceViewBase {
+	private ArrayList<Level2dListener> levelListeners = new ArrayList<Level2dListener>();
 	private float[] color = MidiViewBean.VOLUME_COLOR;
-	private EffectActivity effectActivity;	
 	private float selectX = 0, selectY = 0;
 	
 	public XYView(Context c, AttributeSet as) {
 		super(c, as);
-		effectActivity = (EffectActivity)getContext();
 	}
 	
-	public void setSelectXY(float x, float y) {
+	public void setViewLevelX(float x) {
 		selectX = x*(width - 50) + 25;
+	}
+	
+	public void setViewLevelY(float y) {
 		selectY = y*(height - 50) + 25;
 	}
 		
+	public void addLevelListener(Level2dListener levelListener) {
+		levelListeners.add(levelListener);
+	}
+	
 	@Override
 	protected void init() {
-		setSelectXY(effectActivity.getXValue(), effectActivity.getYValue());
-		gl.glEnable(GL10.GL_POINT_SMOOTH);		
+		gl.glEnable(GL10.GL_POINT_SMOOTH);
+		for (Level2dListener listener : levelListeners) {
+			listener.notifyInit(this);
+		}
 	}
 
 	@Override
@@ -52,14 +61,17 @@ public class XYView extends SurfaceViewBase {
 	private void selectLocation(float x, float y) {
 		selectX = x < 25 ? 25 : (x > width - 25 ? width - 25 : x);
 		selectY = y < 25 ? 25 : (y > height - 25 ? height - 25 : y);
-		effectActivity.setXValue((selectX - 25)/(width - 50));
-		effectActivity.setYValue((selectY - 25)/(height - 50));		
+		for (Level2dListener listener : levelListeners) {
+			listener.setLevel(this, (selectX - 25)/(width - 50), (selectY - 25)/(height - 50));
+		}
 	}
 	
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		color = MidiViewBean.SELECTED_COLOR;
-		effectActivity.setEffectDynamic(true);
+		for (Level2dListener listener : levelListeners) {
+			listener.notifyChecked(this, true);
+		}
 		selectLocation(x, y);
 	}
 
@@ -81,7 +93,9 @@ public class XYView extends SurfaceViewBase {
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		color = MidiViewBean.VOLUME_COLOR;		
-		effectActivity.setEffectDynamic(false);
+		color = MidiViewBean.VOLUME_COLOR;
+		for (Level2dListener listener : levelListeners) {
+			listener.notifyChecked(this, false);
+		}
 	}	
 }

@@ -102,17 +102,12 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		volumeLevel = ((TronSeekbar)findViewById(R.id.volumeLevel));
 		panLevel = ((TronSeekbar)findViewById(R.id.panLevel));
 		pitchLevel = ((TronSeekbar)findViewById(R.id.pitchLevel));
-		volumeLevel.setLevelListener(this);
-		panLevel.setLevelListener(this);
-		pitchLevel.setLevelListener(this);
-		volumeLevel.setLevelColor(MidiViewBean.VOLUME_COLOR);
-		panLevel.setLevelColor(MidiViewBean.PAN_COLOR);
-		pitchLevel.setLevelColor(MidiViewBean.PITCH_COLOR);
-		volumeLevel.setLevel(getPrimaryVolume(trackNum));
-		panLevel.setLevel(getPrimaryPan(trackNum));
-		pitchLevel.setLevel(getPrimaryPitch(trackNum));
+		volumeLevel.addLevelListener(this);
+		panLevel.addLevelListener(this);
+		pitchLevel.addLevelListener(this);
 	}
 	
+	@Override
 	public void setLevel(TronSeekbar levelBar, float level) {
 		if (levelBar.equals(volumeLevel)) {
 			setPrimaryVolume(trackNum, level);
@@ -123,7 +118,22 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 	}
 	
-	public void setLevelChecked(TronSeekbar levelBar, boolean checked) {
+	@Override
+	public void notifyInit(TronSeekbar levelBar) {
+		if (levelBar.equals(volumeLevel)) {
+			volumeLevel.setLevelColor(MidiViewBean.VOLUME_COLOR);
+			volumeLevel.setViewLevel(getPrimaryVolume(trackNum));
+		} else if (levelBar.equals(panLevel)) {
+			panLevel.setLevelColor(MidiViewBean.PAN_COLOR);
+			panLevel.setViewLevel(getPrimaryPan(trackNum));
+		} else if (levelBar.equals(pitchLevel)) {
+			pitchLevel.setLevelColor(MidiViewBean.PITCH_COLOR);
+			pitchLevel.setViewLevel(getPrimaryPitch(trackNum));
+		}
+	}	
+	
+	@Override
+	public void notifyChecked(TronSeekbar levelBar, boolean checked) {
 		if (levelBar.equals(volumeLevel)) {
 			((ToggleButton) findViewById(R.id.volumeView))
 					.setChecked(checked);
@@ -155,5 +165,5 @@ public class SampleEditActivity extends Activity implements LevelListener {
 
 	public native void setPrimaryPan(int trackNum, float pan);
 
-	public native void setPrimaryPitch(int trackNum, float pitch);	
+	public native void setPrimaryPitch(int trackNum, float pitch);
 }

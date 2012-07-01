@@ -1,6 +1,7 @@
 package com.kh.beatbot.view;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -12,7 +13,7 @@ import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class TronSeekbar extends SurfaceViewBase {
-	LevelListener levelListener = null;
+	ArrayList<LevelListener> levelListeners = new ArrayList<LevelListener>();
 	
 	private float level = .5f;
 	private float[] levelColor = MidiViewBean.VOLUME_COLOR;
@@ -24,8 +25,8 @@ public class TronSeekbar extends SurfaceViewBase {
 		super(c, as);
 	}
 
-	public void setLevelListener(LevelListener levelListener) {
-		this.levelListener = levelListener;
+	public void addLevelListener(LevelListener levelListener) {		
+		levelListeners.add(levelListener);
 	}
 	
 	private void initBgBar() {
@@ -33,7 +34,7 @@ public class TronSeekbar extends SurfaceViewBase {
 		bgBarVb = makeFloatBuffer(vertices);		
 	}
 	
-	private void initLevelBar() {
+	private void initLevelBarVB() {
 		float[] vertices = new float[] { height/2, height/2, levelToX(level), height/2 };
 		levelBarVb = makeFloatBuffer(vertices);
 	}
@@ -42,7 +43,10 @@ public class TronSeekbar extends SurfaceViewBase {
 	protected void init() {
 		gl.glEnable(GL10.GL_POINT_SMOOTH);
 		initBgBar();
-		initLevelBar();
+		initLevelBarVB();
+		for (LevelListener levelListener : levelListeners) {
+			levelListener.notifyInit(this);
+		}
 	}
 		
 	private void drawBar(FloatBuffer vb, float[] color) {
@@ -62,12 +66,16 @@ public class TronSeekbar extends SurfaceViewBase {
 	public float getLevel() {
 		return level;
 	}
+
+	public void setViewLevel(float x) {
+		this.level = x;
+		initLevelBarVB();
+	}
 	
 	/* level should be from 0 to 1 */
 	public void setLevel(float level) {
-		this.level = level;
-		initLevelBar();	
-		if (levelListener != null)
+		setViewLevel(level);
+		for (LevelListener levelListener : levelListeners)
 			levelListener.setLevel(this, level);
 	}
 	
@@ -95,8 +103,8 @@ public class TronSeekbar extends SurfaceViewBase {
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		setLevel(xToLevel(x));
-		if (levelListener != null)
-			levelListener.setLevelChecked(this, true);
+		for (LevelListener levelListener : levelListeners)
+			levelListener.notifyChecked(this, true);
 	}
 
 	@Override
@@ -117,8 +125,8 @@ public class TronSeekbar extends SurfaceViewBase {
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		if (levelListener != null)
-			levelListener.setLevelChecked(this, false);
+		for (LevelListener levelListener : levelListeners)
+			levelListener.notifyChecked(this, false);
 	}
 	
 }
