@@ -1,9 +1,9 @@
 package com.kh.beatbot.listener;
 
-import com.kh.beatbot.view.XYView;
+import com.kh.beatbot.view.TronSeekbar2d;
 
 public interface Level2dListener {
-	void notifyInit(XYView level2d);
-	void notifyChecked(XYView level2d, boolean checked);	
-	void setLevel(XYView level2d, float levelX, float levelY);
+	void notifyInit(TronSeekbar2d level2d);
+	void notifyChecked(TronSeekbar2d level2d, boolean checked);	
+	void setLevel(TronSeekbar2d level2d, float levelX, float levelY);
 }

@@ -40,8 +40,8 @@
         android:layout_below="@+id/yParamBar"
     />    
     
-    <com.kh.beatbot.view.XYView
-        android:id="@+id/xy_view"
+    <com.kh.beatbot.view.TronSeekbar2d
+        android:id="@+id/xyParamBar"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/delayWet"        

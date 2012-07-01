@@ -149,7 +149,7 @@ public final class R {
         public static final int volumeLevel=0x7f090022;
         public static final int volumeView=0x7f09001f;
         public static final int xParamBar=0x7f090002;
-        public static final int xy_view=0x7f090005;
+        public static final int xyParamBar=0x7f090005;
         public static final int yParamBar=0x7f090003;
     }
     public static final class layout {

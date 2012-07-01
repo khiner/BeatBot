@@ -9,14 +9,14 @@ import com.KarlHiner.BeatBot.R;
 import com.kh.beatbot.listener.Level2dListener;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.TronSeekbar;
-import com.kh.beatbot.view.XYView;
+import com.kh.beatbot.view.TronSeekbar2d;
 
 public abstract class EffectActivity extends Activity implements LevelListener, Level2dListener {
 	
 	protected int trackNum;
 	protected TronSeekbar xLevelBar = null;
 	protected TronSeekbar yLevelBar = null;
-	protected XYView level2d = null;
+	protected TronSeekbar2d level2d = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +45,7 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 	protected void initLevelBars() {
 		xLevelBar = (TronSeekbar)findViewById(R.id.xParamBar);
 		yLevelBar = (TronSeekbar)findViewById(R.id.yParamBar);
-		level2d = (XYView)findViewById(R.id.xy_view);
+		level2d = (TronSeekbar2d)findViewById(R.id.xyParamBar);
 		xLevelBar.addLevelListener(this);
 		yLevelBar.addLevelListener(this);
 		level2d.addLevelListener(this);
@@ -64,7 +64,7 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 	}
 
 	@Override
-	public void setLevel(XYView level2d, float levelX, float levelY) {
+	public void setLevel(TronSeekbar2d level2d, float levelX, float levelY) {
 		xLevelBar.setViewLevel(levelX);
 		yLevelBar.setViewLevel(levelY);
 		setXValue(levelX);
@@ -77,7 +77,7 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 	}
 	
 	@Override
-	public void notifyChecked(XYView level2d, boolean checked) {
+	public void notifyChecked(TronSeekbar2d level2d, boolean checked) {
 		setEffectDynamic(checked);
 	}
 	
@@ -90,7 +90,7 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 	}
 	
 	@Override
-	public void notifyInit(XYView level2d) {
+	public void notifyInit(TronSeekbar2d level2d) {
 		level2d.setViewLevelX(getXValue());
 		level2d.setViewLevelY(getYValue());
 	}	
