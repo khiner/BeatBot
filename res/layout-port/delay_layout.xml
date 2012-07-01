@@ -44,7 +44,7 @@
         android:id="@+id/xy_view"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/yParamBar"        
+        android:layout_below="@+id/delayWet"        
         android:layout_alignParentRight="true"
     />
 

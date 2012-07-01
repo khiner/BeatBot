@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="25dp"
         android:layout_alignRight="@+id/effect_toggleOn"
-        android:layout_below="@+id/effect_toggleOn"
+        android:layout_below="@+id/beatmatch"
     />
     
     <com.kh.beatbot.view.TronSeekbar
