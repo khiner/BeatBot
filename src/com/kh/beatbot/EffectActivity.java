@@ -38,7 +38,7 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 			View view = getLayoutInflater().inflate(resourceId, parent, false);
 			TextView label = (TextView) view.findViewById(R.id.param_label);
 			TronSeekbar levelBar = (TronSeekbar) view.findViewById(R.id.param_bar);
-			levelBar.setTag(position); 
+			levelBar.setTag(position);
 			levelBar.addLevelListener((EffectActivity)getContext());
 			if (!paramBars.containsKey(position))
 				paramBars.put(position, levelBar);

@@ -30,7 +30,6 @@ public class FilterActivity extends EffectActivity {
 	}
 	
 	public void setXValue(float xValue) {
-		Log.d("yo", "yo");
 		GlobalVars.filterX[trackNum] = xValue;
 		setFilterCutoff(trackNum, xValue);
 	}
