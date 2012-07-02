@@ -18,33 +18,19 @@
         android:onClick="beatMatch"
     />
     
-    <com.kh.beatbot.view.TronSeekbar
-        android:id="@+id/xParamBar"
-        android:layout_width="fill_parent"
-        android:layout_height="25dp"
+	<ListView
+        android:id="@+id/paramListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+ 		android:layout_alignRight="@+id/effect_toggleOn"
         android:layout_below="@+id/beatmatch"
     />
-    
-    <com.kh.beatbot.view.TronSeekbar
-        android:id="@+id/yParamBar"
-        android:layout_width="fill_parent"
-        android:layout_height="25dp"
-        android:layout_below="@+id/xParamBar"
-    />
-    
-    <com.kh.beatbot.view.TronSeekbar
-        android:id="@+id/delayWet"
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:layout_alignRight="@+id/effect_toggleOn"        
-        android:layout_below="@+id/yParamBar"
-    />    
-    
+	
     <com.kh.beatbot.view.TronSeekbar2d
         android:id="@+id/xyParamBar"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/delayWet"        
+        android:layout_below="@+id/paramListView"        
         android:layout_alignParentRight="true"
     />
 

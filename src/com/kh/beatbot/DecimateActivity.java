@@ -1,10 +1,12 @@
 package com.kh.beatbot;
 
 import android.os.Bundle;
+import android.widget.ListView;
 import android.widget.ToggleButton;
 
 import com.KarlHiner.BeatBot.R;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.view.TronSeekbar2d;
 
 public class DecimateActivity extends EffectActivity {
 
@@ -12,8 +14,9 @@ public class DecimateActivity extends EffectActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.effect_layout);
-		initLevelBars();
+		((ListView) findViewById(R.id.paramListView)).setAdapter(adapter);
 		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.decimateOn[trackNum]);
+		((TronSeekbar2d)findViewById(R.id.xyParamBar)).addLevelListener(this);
 	}
 	
 	public float getXValue() {
@@ -52,4 +55,24 @@ public class DecimateActivity extends EffectActivity {
 	public native void setDecimateDynamic(int trackNum, boolean dynamic);	
 	public native void setDecimateBits(int trackNum, float bits);
 	public native void setDecimateRate(int trackNum, float rate);
+
+	@Override
+	public int getNumParams() {
+		return 2;
+	}
+	
+	@Override
+	public String getLabelX() {
+		return getResources().getString(R.string.bits);
+	}
+
+	@Override
+	public String getLabelY() {
+		return getResources().getString(R.string.samplerate);
+	}
+
+	@Override
+	public String getLabelParam3() {
+		return "";
+	}
 }

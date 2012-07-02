@@ -10,24 +10,14 @@
         android:onClick="toggleEffect"
     />
     
-    <com.kh.beatbot.view.TronSeekbar
-        android:id="@+id/xParamBar"
+	<ListView
+        android:id="@+id/paramListView"
         android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:layout_alignRight="@+id/effect_toggleOn"        
+        android:layout_height="wrap_content"
+ 		android:layout_alignRight="@+id/effect_toggleOn"
         android:layout_below="@+id/effect_toggleOn"
-        android:onClick="setParam1"
     />
-    
-    <com.kh.beatbot.view.TronSeekbar
-        android:id="@+id/yParamBar"
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:layout_alignRight="@+id/effect_toggleOn"        
-        android:layout_below="@+id/xParamBar"     
-        android:onClick="setParam2"
-    />
-
+	    
     <com.kh.beatbot.view.TronSeekbar2d
         android:id="@+id/xyParamBar"
         android:layout_width="match_parent"

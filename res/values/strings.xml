@@ -43,4 +43,12 @@
     <string name="filter">Filter</string>
     <string name="reverb">Reverb</string>
     
+    <string name="wet">Wet</string>
+    <string name="feedback">Feedback</string>
+    <string name="cutoff">Cutoff</string>
+    <string name="resonance">Q</string>
+    <string name="bits">Bits</string>
+    <string name="samplerate">Rate</string>
+    <string name="hfDamp">HF Damp</string>
+    
 </resources>

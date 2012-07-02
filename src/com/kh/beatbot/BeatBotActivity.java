@@ -80,7 +80,7 @@ public class BeatBotActivity extends Activity {
 				int resourceId, String[] sampleTypes) {
 			super(context, resourceId, sampleTypes);
 			this.resourceId = resourceId;
-		}
+		}		
 
 		@Override
 		public void onClick(View view) {

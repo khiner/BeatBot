@@ -1,8 +1,14 @@
 package com.kh.beatbot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.KarlHiner.BeatBot.R;
@@ -13,15 +19,55 @@ import com.kh.beatbot.view.TronSeekbar2d;
 
 public abstract class EffectActivity extends Activity implements LevelListener, Level2dListener {
 	
+	public class SampleRowAdapter extends
+			ArrayAdapter<String> {
+		int resourceId;
+		int count = 0;
+		
+		public SampleRowAdapter(EffectActivity context,
+				int resourceId, String[] params) {
+			super(context, resourceId, params);
+			this.resourceId = resourceId;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			// big hack here.  all the views are retrieved multiple times, and the
+			// level bars are getting overwritten.
+			if (count++ < ((EffectActivity)getContext()).getNumParams()) return getLayoutInflater().inflate(resourceId, parent, false);
+			View view = getLayoutInflater().inflate(resourceId, parent, false);
+			TextView label = (TextView) view.findViewById(R.id.param_label);
+			TronSeekbar levelBar = (TronSeekbar) view.findViewById(R.id.param_bar);
+			levelBar.setTag(position); 
+			levelBar.addLevelListener((EffectActivity)getContext());
+			if (!paramBars.containsKey(position))
+				paramBars.put(position, levelBar);
+			
+			switch (position) {
+			case 0:
+				label.setText(getLabelX());
+				break;
+			case 1:
+				label.setText(getLabelY());
+				break;
+			case 2:
+				label.setText(getLabelParam3());
+				break;
+			}
+			return view;
+		}
+	}
+	
 	protected int trackNum;
-	protected TronSeekbar xLevelBar = null;
-	protected TronSeekbar yLevelBar = null;
 	protected TronSeekbar2d level2d = null;
+	protected SampleRowAdapter adapter;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
 		trackNum = getIntent().getExtras().getInt("trackNum");
+		adapter = new SampleRowAdapter(
+				this, R.layout.param_row, new String[getNumParams()]);
 	}
 	
 	@Override
@@ -33,31 +79,25 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 	public abstract float getYValue();
 	public abstract void setXValue(float x);
 	public abstract void setYValue(float y);
+	public abstract int getNumParams();
+	public abstract String getLabelX();
+	public abstract String getLabelY();
+	public abstract String getLabelParam3();
 	
 	public abstract void setEffectOn(boolean on);
 	
 	public abstract void setEffectDynamic(boolean dynamic);
-	
+	public Map<Integer, TronSeekbar> paramBars = new HashMap<Integer, TronSeekbar>();
 	public void toggleEffect(View view) {
 		setEffectOn(((ToggleButton)view).isChecked());
-	}
-
-	protected void initLevelBars() {
-		xLevelBar = (TronSeekbar)findViewById(R.id.xParamBar);
-		yLevelBar = (TronSeekbar)findViewById(R.id.yParamBar);
-		level2d = (TronSeekbar2d)findViewById(R.id.xyParamBar);
-		xLevelBar.addLevelListener(this);
-		yLevelBar.addLevelListener(this);
-		level2d.addLevelListener(this);
 	}
 	
 	@Override
 	public void setLevel(TronSeekbar levelBar, float level) {
-		if (levelBar.equals(xLevelBar)) {
+		if (levelBar.getTag().equals(0)) {
 			level2d.setViewLevelX(level);
 			setXValue(level);
-		}
-		else if (levelBar.equals(yLevelBar)) {
+		} else if (levelBar.getTag().equals(1)) {
 			level2d.setViewLevelY(level);
 			setYValue(level);
 		}
@@ -65,8 +105,8 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 
 	@Override
 	public void setLevel(TronSeekbar2d level2d, float levelX, float levelY) {
-		xLevelBar.setViewLevel(levelX);
-		yLevelBar.setViewLevel(levelY);
+		paramBars.get(0).setViewLevel(levelX);
+		paramBars.get(1).setViewLevel(levelY);
 		setXValue(levelX);
 		setYValue(levelY);
 	}
@@ -83,15 +123,15 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 	
 	@Override
 	public void notifyInit(TronSeekbar levelBar) {
-		if (levelBar.equals(xLevelBar))
-			xLevelBar.setViewLevel(getXValue());
-		else if (levelBar.equals(yLevelBar))
-			yLevelBar.setViewLevel(getYValue());
+		if (levelBar.getTag().equals(0))
+			levelBar.setViewLevel(getXValue());
+		else if (levelBar.getTag().equals(1))
+			levelBar.setViewLevel(getYValue());
 	}
 	
 	@Override
 	public void notifyInit(TronSeekbar2d level2d) {
 		level2d.setViewLevelX(getXValue());
 		level2d.setViewLevelY(getYValue());
-	}	
+	}
 }
