@@ -102,7 +102,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	
 	private void initAdsrVB() {
 		float[] pointVertices = new float[10];
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 5; i++) {			
 			for (int j = 0; j < 2; j++) {
 				pointVertices[i*2 + j] = j == 1 ? height - adsrPoints[i][j]*height : adsrToX(adsrPoints[i][j]);
 			}
@@ -170,7 +170,9 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glColor4f(0, 1, 0, 1); // green points for now
 		gl.glPointSize(10);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, adsrPointVB);
-		gl.glDrawArrays(GL10.GL_POINTS, 1, 3);
+		// draw selection circles at 0, 1, 2, and 4
+		gl.glDrawArrays(GL10.GL_POINTS, 0, 3);
+		gl.glDrawArrays(GL10.GL_POINTS, 4, 1);
 		gl.glLineWidth(3);
 		for (int i = 0; i < adsrCurveVB.length; i++) {
 			gl.glColor4f(ADSR_COLORS[i][0], ADSR_COLORS[i][1], ADSR_COLORS[i][2],
@@ -280,7 +282,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	private boolean selectAdsrPoint(int id, float x, float y) {
-		for (int i = 1; i < 4; i++) {
+		for (int i = 0; i < 5; i++) {
+			if (i == 3) continue;
 			if (Math.abs(adsrToX(adsrPoints[i][0]) - x) < SNAP_DIST &&
 					Math.abs((1 - adsrPoints[i][1])*height - y) < SNAP_DIST) {
 				adsrSelected[i] = id;
@@ -326,11 +329,13 @@ public class SampleWaveformView extends SurfaceViewBase {
 	
 	private boolean moveAdsrPoint(int id, float x, float y) {
 		for (int i = 0; i < adsrSelected.length; i++) {
+			if (i == 3) continue;
 			if (adsrSelected[i] == id) {
 				float adsrX = xToAdsr(x);
 				float adsrY = yToAdsr(y);
 				float prevX = i >= 2 ? adsrPoints[i - 1][0] : 0;
 				float nextX = i <= 2 ? adsrPoints[i + 1][0] : 1;
+				if (i == 0) adsrX = 0;
 				// ADSR samples cannot go past the next ADSR sample or before the previous sample 
 				adsrPoints[i][0] = adsrX > prevX ? (adsrX < nextX ? adsrX : nextX) : prevX;
 				adsrPoints[i][1] = adsrY > 0 ? (adsrY < 1 ? adsrY : 1) : 0;
@@ -339,8 +344,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 				// ie.  adjusting either 2 or 3 will adjust both points' y values
 				if (i == 2)
 					adsrPoints[3][1] = adsrPoints[2][1];
-				else if (i == 3)
-					adsrPoints[2][1] = adsrPoints[3][1];
 				initAdsrVB();
 				setAdsrPoint(trackNum, i, adsrPoints[i][0], adsrPoints[i][1]);
 				return true;

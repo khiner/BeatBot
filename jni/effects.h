@@ -121,9 +121,11 @@ typedef struct AdsrConfig_t {
 	AdsrPoint adsrPoints[5];
 	float coeffs[4];
 	float currLevel;
+	float sustain;
+	int gateSample; // sample to begin release
 	int currSampleNum;
-	int currAdsrNum;
 	int totalSamples;
+	bool rising;
 } AdsrConfig;
 
 typedef struct DecimateConfig_t {

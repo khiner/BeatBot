@@ -115,17 +115,26 @@ void adsr_process(void *p, float **buffers, int size) {
 	AdsrConfig *config = (AdsrConfig *)p;
 	int i;
 	for (i = 0; i < size; i++) {
-		if (config->currAdsrNum == 3) // release
-			config->currLevel += config->coeffs[3]*(1.0f - (1.0f/0.63f) - config->currLevel);
-		else
-			config->currLevel += config->coeffs[config->currAdsrNum]*((1.0f/0.63f) - config->currLevel);
-		config->currSampleNum++;
-		if (config->currSampleNum >= config->totalSamples) {
-			config->currSampleNum = config->currAdsrNum = 0;
-			config->currLevel = 0.0001f;
-		} else if (config->currSampleNum >=
-			       config->adsrPoints[config->currAdsrNum + 1].sampleNum) {
-			config->currAdsrNum++;
+		if (config->currSampleNum < config->gateSample) {
+			if (config->rising) {
+				// attack phase
+				config->currLevel += config->coeffs[0]*((1.0f/0.63f) - config->currLevel);
+				if (config->currLevel > 1.0f) {
+					config->currLevel = 1.0f;
+					config->rising = false;
+				}
+			} else { // decal/sustain
+				config->currLevel += config->coeffs[2] * (config->sustain - config->currLevel);
+			}
+		} else { // past gate sample, go to release phase
+			config->currLevel += config->coeffs[4] * (1.0f - (1.0f/0.63f) - config->currLevel);
+			if (config->currLevel < 0.00001f) {
+				config->currLevel = 0.00001f;
+			}
+		}
+		if (++config->currSampleNum > config->totalSamples) {
+			config->currSampleNum = 0;
+			config->rising = true;
 		}
 		buffers[0][i] *= config->currLevel;
 		buffers[1][i] *= config->currLevel;
@@ -141,7 +150,6 @@ void adsrconfig_destroy(void *p) {
 void updateAdsr(AdsrConfig *config, int totalSamples) {
 	config->totalSamples = totalSamples;
 	int i, startSample, endSample;
-	float startLevel, endLevel;
 	for (i = 0; i < 5; i++) {
 		config->adsrPoints[i].sampleNum = (int)(config->adsrPoints[i].sampleCents*totalSamples);
 	}
@@ -151,11 +159,13 @@ void updateAdsr(AdsrConfig *config, int totalSamples) {
 		config->coeffs[i] = 1.0f/(endSample - startSample + 1);
 		config->coeffs[i] = config->coeffs[i] > 0 ? (config->coeffs[i] < 1 ? config->coeffs[i] : 1) : 0;
 	}
+	config->gateSample = config->adsrPoints[4].sampleNum;
 }
 
 void resetAdsr(AdsrConfig *config) {
-	config->currSampleNum = config->currAdsrNum = 0;
-	config->currLevel = 0.0001f;
+	config->currSampleNum  = 0;
+	config->currLevel = 0.00001f;
+	config->rising = true;
 }
 
 DecimateConfig *decimateconfig_create(float bits, float rate) {
