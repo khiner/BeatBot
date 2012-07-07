@@ -65,7 +65,9 @@ public class MidiViewBean {
 	private long scrollViewEndTime = Long.MAX_VALUE;
 
 	private int loopBeginId = -1;
+	private int loopMiddleId = -1;
 	private int loopEndId = -1;	
+	private float loopSelectionOffset = 0;
 
 	// set this to true after an event that can be undone (with undo btn)
 	private boolean stateChanged = false;
@@ -295,9 +297,17 @@ public class MidiViewBean {
 	public int getLoopBeginId() {
 		return loopBeginId;
 	}
-
+	
 	public void setLoopBeginId(int loopBeginId) {
 		this.loopBeginId = loopBeginId;
+	}
+
+	public int getLoopMiddleId() {
+		return loopMiddleId;
+	}
+	
+	public void setLoopMiddleId(int loopMiddleId) {
+		this.loopMiddleId = loopMiddleId;
 	}
 	
 	public int getLoopEndId() {
@@ -308,6 +318,14 @@ public class MidiViewBean {
 		this.loopEndId = loopEndId;
 	}
 
+	public float getLoopSelectionOffset() {
+		return loopSelectionOffset;
+	}
+	
+	public void setLoopSelectionOffset(float loopSelectionOffset) {
+		this.loopSelectionOffset = loopSelectionOffset;
+	}
+	
 	public boolean isStateChanged() {
 		return stateChanged;
 	}

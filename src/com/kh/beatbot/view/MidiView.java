@@ -35,11 +35,12 @@ public class MidiView extends SurfaceViewBase {
 	// NIO Buffers
 	private FloatBuffer[] vLineVB = new FloatBuffer[3];
 	private FloatBuffer hLineVB = null;
-	private FloatBuffer tipTickFillVB = null;
+	private FloatBuffer tickFillVB = null;
 	private FloatBuffer selectRegionVB = null;
 	private FloatBuffer loopMarkerVB = null;
 	private FloatBuffer loopMarkerLineVB = null;
-
+	private FloatBuffer loopSquareVB = null;
+	
 	private int[] textures = new int[1];
 
 	private MidiManager midiManager;
@@ -117,7 +118,7 @@ public class MidiView extends SurfaceViewBase {
 		if (viewState == State.LEVELS_VIEW)
 			bean.setBgColor(0);
 		else
-			bean.setBgColor(.5f);
+			bean.setBgColor(.3f);
 	}
 
 	public void setLevelMode(LevelsViewHelper.LevelMode levelMode) {
@@ -267,12 +268,19 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void drawTopTickFill() {
-		float color = .4f * bean.getBgColor() * 2;
+		float color = .8f * bean.getBgColor();
 		gl.glColor4f(color, color, color, 1);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, tipTickFillVB);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, tickFillVB);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
 	}
 
+	private void drawLoopSquare() {
+		float color = 1.3f * bean.getBgColor();
+		gl.glColor4f(color, color, color, .6f);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopSquareVB);
+		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+	}
+	
 	private void drawRecordingWaveforms() {
 		gl.glLineWidth(1);
 		gl.glColor4f(0, 0, 0, 1);
@@ -361,15 +369,23 @@ public class MidiView extends SurfaceViewBase {
 		gl.glDrawArrays(GL10.GL_LINE_LOOP, 0, outlineBuf.capacity() / 2);
 	}
 
-	private void initRecordRowVB() {
+	private void initTickFillVB() {
 		float x1 = 0;
 		float x2 = width;
 		float y1 = 0;
 		float y2 = bean.getYOffset();
-		tipTickFillVB = makeFloatBuffer(new float[] { x1, y1, x2, y1, x1, y2,
+		tickFillVB = makeFloatBuffer(new float[] { x1, y1, x2, y1, x1, y2,
 				x2, y2 });
 	}
-
+	
+	private void initLoopSquareVB() {
+		float x1 = tickToX(midiManager.getLoopBeginTick());
+		float x2 = tickToX(midiManager.getLoopEndTick());
+		float y1 = 0;
+		float y2 = height;
+		loopSquareVB = makeFloatBuffer(new float[] {x1, y1, x2, y1, x1, y2, x2, y2});
+	}
+	
 	private void initHLineVB() {
 		float[] hLines = new float[(midiManager.getNumSamples() + 2) * 4];
 		hLines[0] = 0;
@@ -495,7 +511,8 @@ public class MidiView extends SurfaceViewBase {
 		initHLineVB();
 		initVLineVBs();
 		initLoopMarkerVBs();
-		initRecordRowVB();
+		initLoopSquareVB();
+		initTickFillVB();
 	}
 
 	@Override
@@ -515,7 +532,10 @@ public class MidiView extends SurfaceViewBase {
 						: State.LEVELS_VIEW);
 			}
 		}
+		tickWindow.scroll();
+		initLoopSquareVB();		
 		drawTopTickFill();
+		drawLoopSquare();
 		if (recording
 				|| playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			// if we're recording, keep the current recording tick in view.
@@ -526,7 +546,6 @@ public class MidiView extends SurfaceViewBase {
 						- tickWindow.getTickOffset());
 			drawCurrentTick();
 		}
-		tickWindow.scroll();
 		if (bean.getViewState() != State.LEVELS_VIEW) {
 			// normal or transitioning view. draw lines
 			drawHorizontalLines();
@@ -779,6 +798,15 @@ public class MidiView extends SurfaceViewBase {
 				midiManager.setLoopBeginTick(majorTick);
 			} else if (bean.getLoopEndId() != -1) {
 				midiManager.setLoopEndTick(majorTick);
+			} else if (bean.getLoopMiddleId() != -1) {
+				//TODO: move begin and end relative to down-x
+				long newOnTick = tickWindow.getMajorTickToLeftOf(xToTick(e.getX(0) - bean.getLoopSelectionOffset()));
+				long newOffTick = midiManager.getLoopEndTick() + newOnTick - midiManager.getLoopBeginTick();
+				if (newOnTick >= 0 && newOffTick <= tickWindow.getMaxTicks()) {
+					midiManager.setLoopBeginTick(newOnTick);
+					midiManager.setLoopEndTick(newOffTick);
+					tickWindow.updateView(newOnTick, newOffTick);
+				}
 			} else { // one finger scroll
 				bean.setScrollVelocity(tickWindow.scroll(e.getX(0)));
 			}
@@ -832,6 +860,9 @@ public class MidiView extends SurfaceViewBase {
 					bean.setLoopBeginId(id);
 				} else if (Math.abs(x - loopEndX) <= 20) {
 					bean.setLoopEndId(id);
+				} else if (x > loopBeginX && x < loopEndX) {
+					bean.setLoopMiddleId(id);
+					bean.setLoopSelectionOffset(x - loopBeginX);
 				}
 			} else
 				// otherwise, enable scrolling
