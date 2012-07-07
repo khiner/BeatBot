@@ -126,7 +126,7 @@ typedef struct AdsrConfig_t {
 	int gateSample; // sample to begin release
 	int currSampleNum;
 	int totalSamples;
-	bool rising;
+	bool active, rising;
 } AdsrConfig;
 
 typedef struct DecimateConfig_t {

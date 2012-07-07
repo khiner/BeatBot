@@ -46,6 +46,12 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		playbackManager.toggleLooping(trackNum);
 	}
 
+	public void toggleAdsr(View view) {
+		boolean on = ((ToggleButton)view).isChecked();
+		sampleWaveformView.setShowAdsr(on);
+		setAdsrOn(trackNum, on);
+	}
+	
 	public void reverse(View view) {
 		sampleWaveformView.setSamples(reverse(trackNum));
 	}
@@ -145,7 +151,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 					.setChecked(checked);
 		}	
 	}
-		
+	
 	// get the audio data in floats
 	public native float[] getSamples(int trackNum);
 
@@ -166,4 +172,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public native void setPrimaryPan(int trackNum, float pan);
 
 	public native void setPrimaryPitch(int trackNum, float pitch);
+	
+	public native void setAdsrOn(int trackNum, boolean on);
 }

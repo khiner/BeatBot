@@ -106,7 +106,9 @@ void initAdsrPoints(AdsrConfig *config) {
 AdsrConfig *adsrconfig_create(int totalSamples) {
 	AdsrConfig *config = (AdsrConfig *)malloc(sizeof(AdsrConfig));
 	initAdsrPoints(config);
+	config->active = false;
 	config->initial = config->end = 0.0001f;
+	config->sustain = 0.6f;
 	config->peak = 1.0f;
 	resetAdsr(config);
 	updateAdsr(config, totalSamples);
@@ -115,6 +117,7 @@ AdsrConfig *adsrconfig_create(int totalSamples) {
 
 void adsr_process(void *p, float **buffers, int size) {
 	AdsrConfig *config = (AdsrConfig *)p;
+	if (!config->active) return;
 	int i;
 	for (i = 0; i < size; i++) {
 		if (++config->currSampleNum < config->gateSample) {

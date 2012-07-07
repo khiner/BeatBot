@@ -30,7 +30,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	// init to -1 to indicate no pointer is selecting
 	private int[] adsrSelected = new int[] {-1, -1, -1, -1, -1};
 	
-	private boolean showAdsr = true; // show ADSR points?
+	private boolean showAdsr = false; // show ADSR points?
 	
 	// min distance for pointer to select loop markers
 	private final int SNAP_DIST = 35;
@@ -87,6 +87,10 @@ public class SampleWaveformView extends SurfaceViewBase {
 		}
 	}
 	
+	public void setShowAdsr(boolean on) {
+		showAdsr = on;
+	}
+	
 	private void initDefaultAdsrPoints() {
 		for (int i = 0; i < 5; i++) {
 			// x coords
@@ -94,7 +98,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		}
 		// y coords
 		adsrPoints[0][1] = 0;
-		adsrPoints[1][1] = .75f;
+		adsrPoints[1][1] = 1;
 		adsrPoints[2][1] = .60f;
 		adsrPoints[3][1] = .60f;
 		adsrPoints[4][1] = 0;
@@ -203,27 +207,27 @@ public class SampleWaveformView extends SurfaceViewBase {
 		loopMarkerVB = makeFloatBuffer(loopMarkerVertices);
 	}
 
-	float sampleToX(float sample) {
+	private float sampleToX(float sample) {
 		return (sample - sampleOffset)*waveformWidth/sampleWidth + previewButtonWidth;
 	}
 
-	float xToSample(float x) {
+	private float xToSample(float x) {
 		return (x - previewButtonWidth)*sampleWidth / waveformWidth + sampleOffset;
 	}
 
-	float adsrToX(float adsr) {
+	private float adsrToX(float adsr) {
 		return sampleToX(sampleLoopBegin)*(1 - adsr) + adsr*sampleToX(sampleLoopEnd); 
 	}
 	
-	float xToAdsr(float x) {
+	private float xToAdsr(float x) {
 		return  (x - sampleToX(sampleLoopBegin))/(sampleToX(sampleLoopEnd) - sampleToX(sampleLoopBegin));
 	}
 	
-	float yToAdsr(float y) {
+	private float yToAdsr(float y) {
 		return 1 - y/height;	
 	}
 	
-	void updateSampleOffset(float scrollX) {
+	private void updateSampleOffset(float scrollX) {
 		// set sampleOffset such that the scroll anchor sample stays under scrollX
 		float newSampleOffset = scrollAnchorSample - (scrollX - previewButtonWidth)*sampleWidth/waveformWidth;
 		sampleOffset = newSampleOffset < 0 ?
@@ -231,7 +235,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 						numSamples - sampleWidth : newSampleOffset);
 	}
 	
-	void updateZoom(float x1, float x2) {
+	private void updateZoom(float x1, float x2) {
 		// set sampleOffset and sampleWidth such that the zoom
 		// anchor samples stay under x1 and x2
 		float newSampleWidth = waveformWidth*(zoomRightAnchorSample - zoomLeftAnchorSample)/(x2 - x1);
@@ -252,7 +256,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		}
 	}
 	
-	void updateLoopMarkers() {
+	private void updateLoopMarkers() {
 		float diff = 0;
 		if (sampleLoopBegin < sampleOffset && sampleLoopEnd > sampleOffset + sampleWidth) {
 			clipLoopToWindow();
@@ -276,7 +280,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glClearColor(.2f, .2f, .2f, 1);
 		drawWaveform();
 		drawLoopMarkers();
-		drawAdsr();
+		if (showAdsr)
+			drawAdsr();
 	}
 
 	private boolean selectAdsrPoint(int id, float x, float y) {

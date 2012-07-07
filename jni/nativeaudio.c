@@ -410,8 +410,9 @@ void playTrack(int trackNum, float volume, float pan, float pitch) {
   track->effects[DYNAMIC_VOL_PAN_ID].set(track->effects[DYNAMIC_VOL_PAN_ID].config, volume, pan);
   track->pitch = pitch;
   track->playing = true;
-  track->effects[ADSR_ID].on = true;
-  resetAdsr((AdsrConfig *)track->effects[ADSR_ID].config);
+  AdsrConfig *adsrConfig = (AdsrConfig *)track->effects[ADSR_ID].config;
+  adsrConfig->active = true;
+  resetAdsr(adsrConfig);
   if (track->outputPlayerPitch != NULL) {
 	  //(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((pitch + track->primaryPitch)*750 + 500));
   }	  
@@ -421,7 +422,7 @@ void stopTrack(int trackNum) {
   Track *track = getTrack(trackNum);
   track->playing = false;
   track->currSample = track->loopBegin;
-  track->effects[ADSR_ID].on = false;
+  ((AdsrConfig *)track->effects[ADSR_ID].config)->active = false;
 }
 
 void stopAll() {
@@ -478,8 +479,9 @@ void Java_com_kh_beatbot_manager_PlaybackManager_disarmTrack(JNIEnv* env, jclass
 
 void Java_com_kh_beatbot_manager_PlaybackManager_playTrack(JNIEnv* env, jclass clazz, jint trackNum) {
   Track *track = getTrack(trackNum);
-  track->effects[ADSR_ID].on = true;
-  resetAdsr((AdsrConfig *)track->effects[ADSR_ID].config);  
+  AdsrConfig *adsrConfig = (AdsrConfig *)track->effects[ADSR_ID].config;
+  adsrConfig->active = true;
+  resetAdsr(adsrConfig);
   track->currSample = track->loopBegin;
   track->playing = true;
 }
@@ -697,6 +699,11 @@ void Java_com_kh_beatbot_SampleEditActivity_setPrimaryPitch(JNIEnv* env, jclass 
   	}	
 }
 
+void Java_com_kh_beatbot_SampleEditActivity_setAdsrOn(JNIEnv* env, jclass clazz,
+													  jint trackNum, jboolean on) {
+	Track *track = getTrack(trackNum);
+	track->effects[ADSR_ID].on = on;
+}
 /****************************************************************************************
  Java Effects JNI methods
 ****************************************************************************************/

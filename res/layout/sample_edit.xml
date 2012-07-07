@@ -5,14 +5,29 @@
 
     <com.kh.beatbot.view.SampleWaveformView
         android:id="@+id/sample_waveform_view"
-        android:layout_width="fill_parent"
-        android:layout_height="80dp" />
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_toLeftOf="@+id/adsr_toggle"
+        android:layout_marginRight="5dp" />
 
+    <ToggleButton
+        android:id="@+id/adsr_toggle"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_alignTop="@+id/sample_waveform_view"
+        android:onClick="toggleAdsr"
+        android:background="@drawable/adsr_btn_src"
+        android:layout_alignParentRight="true"
+        android:textOn=""
+        android:textOff=""
+        android:text="@string/adsr"/>   
+    
     <ToggleButton
         android:id="@+id/loop_toggle"
         android:layout_width="80dp"
-        android:layout_height="50dp"
-        android:layout_below="@+id/sample_waveform_view"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/adsr_toggle"
         android:onClick="toggleLoop"
         android:background="@drawable/loop_btn_src"
         android:textOn=""
@@ -23,7 +38,7 @@
         android:id="@+id/reverse"
         android:layout_width="80dp"
         android:layout_height="35dp"
-        android:layout_below="@+id/loop_toggle"
+        android:layout_below="@+id/sample_waveform_view"
         android:onClick="reverse"
         android:text="@string/reverse" />
 
