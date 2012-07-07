@@ -170,9 +170,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glColor4f(0, 1, 0, 1); // green points for now
 		gl.glPointSize(10);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, adsrPointVB);
-		// draw selection circles at 0, 1, 2, and 4
-		gl.glDrawArrays(GL10.GL_POINTS, 0, 3);
-		gl.glDrawArrays(GL10.GL_POINTS, 4, 1);
+		gl.glDrawArrays(GL10.GL_POINTS, 0, 5);
 		gl.glLineWidth(3);
 		for (int i = 0; i < adsrCurveVB.length; i++) {
 			gl.glColor4f(ADSR_COLORS[i][0], ADSR_COLORS[i][1], ADSR_COLORS[i][2],
@@ -283,7 +281,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	private boolean selectAdsrPoint(int id, float x, float y) {
 		for (int i = 0; i < 5; i++) {
-			if (i == 3) continue;
 			if (Math.abs(adsrToX(adsrPoints[i][0]) - x) < SNAP_DIST &&
 					Math.abs((1 - adsrPoints[i][1])*height - y) < SNAP_DIST) {
 				adsrSelected[i] = id;
@@ -329,16 +326,16 @@ public class SampleWaveformView extends SurfaceViewBase {
 	
 	private boolean moveAdsrPoint(int id, float x, float y) {
 		for (int i = 0; i < adsrSelected.length; i++) {
-			if (i == 3) continue;
 			if (adsrSelected[i] == id) {
 				float adsrX = xToAdsr(x);
 				float adsrY = yToAdsr(y);
 				float prevX = i >= 2 ? adsrPoints[i - 1][0] : 0;
-				float nextX = i <= 2 ? adsrPoints[i + 1][0] : 1;
+				float nextX = i <= 3 ? adsrPoints[i + 1][0] : 1;
 				if (i == 0) adsrX = 0;
 				// ADSR samples cannot go past the next ADSR sample or before the previous sample 
 				adsrPoints[i][0] = adsrX > prevX ? (adsrX < nextX ? adsrX : nextX) : prevX;
-				adsrPoints[i][1] = adsrY > 0 ? (adsrY < 1 ? adsrY : 1) : 0;
+				if (i != 3) // can only change the x coord of the cutoff point
+					adsrPoints[i][1] = adsrY > 0 ? (adsrY < 1 ? adsrY : 1) : 0;
 				// points 2 and 3 must have the same y value, since these are the two ends
 				// of the sustain level, which must be linear.
 				// ie.  adjusting either 2 or 3 will adjust both points' y values

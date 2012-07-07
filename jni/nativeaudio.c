@@ -863,6 +863,8 @@ void Java_com_kh_beatbot_view_SampleWaveformView_setAdsrPoint(JNIEnv* env, jclas
 	config->adsrPoints[adsrPointNum].sampleCents = x;
 	if (adsrPointNum == 0)
 		config->initial = y;
+	else if (adsrPointNum == 1)
+		config->peak = y;
 	else if (adsrPointNum == 2)
 		config->sustain = y;
 	else if (adsrPointNum == 4)

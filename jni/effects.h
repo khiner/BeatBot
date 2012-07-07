@@ -122,7 +122,7 @@ typedef struct AdsrConfig_t {
 	float attackCoeff, decayCoeff, releaseCoeff;
 	float currLevel;
 	float sustain;
-	float initial, end;
+	float initial, peak, end;
 	int gateSample; // sample to begin release
 	int currSampleNum;
 	int totalSamples;
