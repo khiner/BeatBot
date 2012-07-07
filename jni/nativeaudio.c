@@ -861,11 +861,5 @@ void Java_com_kh_beatbot_view_SampleWaveformView_setAdsrPoint(JNIEnv* env, jclas
 	Track *track = getTrack(trackNum);
 	AdsrConfig *config = (AdsrConfig *)track->effects[ADSR_ID].config;
 	config->adsrPoints[adsrPointNum].sampleCents = x;
-	config->adsrPoints[adsrPointNum].level = y;
-	// points 2 and 3 are two ends of sustain, which has constant slope
-	if (adsrPointNum == 2)
-		config->adsrPoints[3].level = y;
-	else if (adsrPointNum == 3)
-		config->adsrPoints[2].level = y;
 	updateAdsr(config, config->totalSamples);
 }

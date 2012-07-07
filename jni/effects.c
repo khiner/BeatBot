@@ -97,15 +97,10 @@ void initEffect(Effect *effect, bool on, bool dynamic, void *config,
 
 void initAdsrPoints(AdsrConfig *config) {
 	config->adsrPoints[0].sampleCents = 0;
-	config->adsrPoints[0].level = 0.0001f;
 	config->adsrPoints[1].sampleCents = 0.25f;
-	config->adsrPoints[1].level = 0.85f;
 	config->adsrPoints[2].sampleCents = 0.5f;
-	config->adsrPoints[2].level = 0.60f;
 	config->adsrPoints[3].sampleCents = 0.75f;
-	config->adsrPoints[3].level = 0.60f;
 	config->adsrPoints[4].sampleCents = 1;
-	config->adsrPoints[4].level = 0.0001f;
 }
 
 AdsrConfig *adsrconfig_create(int totalSamples) {
@@ -120,15 +115,17 @@ void adsr_process(void *p, float **buffers, int size) {
 	AdsrConfig *config = (AdsrConfig *)p;
 	int i;
 	for (i = 0; i < size; i++) {
-		config->currLevel *= config->coeffs[config->currAdsrNum];
+		if (config->currAdsrNum == 3) // release
+			config->currLevel += config->coeffs[3]*(1.0f - (1.0f/0.63f) - config->currLevel);
+		else
+			config->currLevel += config->coeffs[config->currAdsrNum]*((1.0f/0.63f) - config->currLevel);
 		config->currSampleNum++;
 		if (config->currSampleNum >= config->totalSamples) {
 			config->currSampleNum = config->currAdsrNum = 0;
-			config->currLevel = config->adsrPoints[0].level;
+			config->currLevel = 0.0001f;
 		} else if (config->currSampleNum >=
 			       config->adsrPoints[config->currAdsrNum + 1].sampleNum) {
-			config->currAdsrNum++;			
-			config->currLevel = config->adsrPoints[config->currAdsrNum].level;
+			config->currAdsrNum++;
 		}
 		buffers[0][i] *= config->currLevel;
 		buffers[1][i] *= config->currLevel;
@@ -151,17 +148,14 @@ void updateAdsr(AdsrConfig *config, int totalSamples) {
 	for (i = 0; i < 4; i++) {
 		startSample = config->adsrPoints[i].sampleNum;
 		endSample = config->adsrPoints[i + 1].sampleNum;
-		startLevel = config->adsrPoints[i].level;
-		endLevel = config->adsrPoints[i + 1].level;
-		// constant coefficient for sustain.  all other segments are exponential
-		config->coeffs[i] = i == 3 ? 1 : 1.0f + (log(endLevel) - log(startLevel)) /
-				   						(float)(endSample - startSample);
+		config->coeffs[i] = 1.0f/(endSample - startSample + 1);
+		config->coeffs[i] = config->coeffs[i] > 0 ? (config->coeffs[i] < 1 ? config->coeffs[i] : 1) : 0;
 	}
 }
 
 void resetAdsr(AdsrConfig *config) {
 	config->currSampleNum = config->currAdsrNum = 0;
-	config->currLevel = config->adsrPoints[0].level;
+	config->currLevel = 0.0001f;
 }
 
 DecimateConfig *decimateconfig_create(float bits, float rate) {

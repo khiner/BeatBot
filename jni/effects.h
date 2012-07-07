@@ -115,7 +115,6 @@ typedef struct ReverbConfig_t {
 typedef struct AdsrPoint_t {
 	int sampleNum;
 	float sampleCents;
-	float level;
 } AdsrPoint;
 
 typedef struct AdsrConfig_t {
