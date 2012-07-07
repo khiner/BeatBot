@@ -1,12 +1,12 @@
 package com.kh.beatbot.view;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.manager.PlaybackManager;
@@ -15,9 +15,14 @@ import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class SampleWaveformView extends SurfaceViewBase {
 
+	private final float[][] ADSR_COLORS = new float[][] {{0, 1, 0, .7f},
+													    {1, .5f, .5f, .7f}, 
+													    {0, 0, 1, .7f},
+													    {1, 0, 1, .7f}}; 
 	private FloatBuffer waveformVB = null;
 	private FloatBuffer loopMarkerVB = null;
-	private FloatBuffer adsrVB = null;
+	private FloatBuffer adsrPointVB = null;
+	private FloatBuffer[] adsrCurveVB = new FloatBuffer[4];
 	private PlaybackManager playbackManager = null;
 	
 	private final float[][] adsrPoints = new float[5][2];
@@ -96,13 +101,37 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 	
 	private void initAdsrVB() {
-		float[] vertices = new float[10];
+		float[] pointVertices = new float[10];
 		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 2; j++) {
-				vertices[i*2 + j] = j == 1 ? height - adsrPoints[i][j]*height : adsrToX(adsrPoints[i][j]);
+				pointVertices[i*2 + j] = j == 1 ? height - adsrPoints[i][j]*height : adsrToX(adsrPoints[i][j]);
 			}
 		}
-		adsrVB = makeFloatBuffer(vertices);
+		adsrPointVB = makeFloatBuffer(pointVertices);
+		for (int i = 0; i < 4; i++) {
+			ArrayList<Float> curveVertices = new ArrayList<Float>();
+			curveVertices.addAll(makeExponentialCurveVertices(pointVertices[i*2],
+							     pointVertices[i*2 + 1], pointVertices[(i + 1)*2], pointVertices[(i + 1)*2 + 1]));
+			float[] converted = new float[curveVertices.size()];
+			for (int j = 0; j < curveVertices.size(); j++) {
+				converted[j] = curveVertices.get(j);
+			}
+			adsrCurveVB[i] = makeFloatBuffer(converted);			
+		}
+	}
+	
+	private ArrayList<Float> makeExponentialCurveVertices(float x1, float y1, float x2, float y2) {
+		ArrayList<Float> vertices = new ArrayList<Float>();
+		// fake it w/ Bezier curve
+		for (float t=0; t <= 1; t += 0.05) {
+			float bezierX = x1;
+			float bezierY = y2;
+			vertices.add((1-t)*(1-t)*x1 + 2*(1-t)*t*bezierX + t*t*x2);
+			vertices.add((1-t)*(1-t)*y1 + 2*(1-t)*t*bezierY + t*t*y2);
+		}
+		vertices.add(x2);
+		vertices.add(y2);
+		return vertices;
 	}
 	
 	private void drawWaveform() {
@@ -111,7 +140,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		float scale = (waveformWidth*WaveformHelper.DEFAULT_SPP)/((float)sampleWidth);
 		float translate = -sampleOffset/WaveformHelper.DEFAULT_SPP;
 		float[] color = MidiViewBean.VOLUME_COLOR;		
-		gl.glLineWidth(8);
+		gl.glLineWidth(10);
 		gl.glEnable(GL10.GL_LINE_SMOOTH);
 		gl.glColor4f(color[0], color[1], color[2], .9f);		
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVB);		
@@ -140,10 +169,15 @@ public class SampleWaveformView extends SurfaceViewBase {
 		if (!showAdsr) return;
 		gl.glColor4f(0, 1, 0, 1); // green points for now
 		gl.glPointSize(10);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, adsrVB);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, adsrPointVB);
 		gl.glDrawArrays(GL10.GL_POINTS, 1, 3);
 		gl.glLineWidth(3);
-		gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, adsrVB.capacity() / 2);		
+		for (int i = 0; i < adsrCurveVB.length; i++) {
+			gl.glColor4f(ADSR_COLORS[i][0], ADSR_COLORS[i][1], ADSR_COLORS[i][2],
+						 ADSR_COLORS[i][3]);
+			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, adsrCurveVB[i]);
+			gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, adsrCurveVB[i].capacity() / 2);
+		}
 	}
 
 	@Override
@@ -300,7 +334,15 @@ public class SampleWaveformView extends SurfaceViewBase {
 				// ADSR samples cannot go past the next ADSR sample or before the previous sample 
 				adsrPoints[i][0] = adsrX > prevX ? (adsrX < nextX ? adsrX : nextX) : prevX;
 				adsrPoints[i][1] = adsrY > 0 ? (adsrY < 1 ? adsrY : 1) : 0;
+				// points 2 and 3 must have the same y value, since these are the two ends
+				// of the sustain level, which must be linear.
+				// ie.  adjusting either 2 or 3 will adjust both points' y values
+				if (i == 2)
+					adsrPoints[3][1] = adsrPoints[2][1];
+				else if (i == 3)
+					adsrPoints[2][1] = adsrPoints[3][1];
 				initAdsrVB();
+				setAdsrPoint(trackNum, i, adsrPoints[i][0], adsrPoints[i][1]);
 				return true;
 			}
 		}
@@ -465,5 +507,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 		playbackManager.stopTrack(trackNum);			
 		scrollAnchorSample = zoomLeftAnchorSample = zoomRightAnchorSample = -1;
 		clearAdsrSelected();
-	}	
+	}
+	
+	// set the native adsr point.  x and y range from 0 to 1
+	public native void setAdsrPoint(int trackNum, int adsrPointNum, float x, float y);
 }

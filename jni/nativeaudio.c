@@ -68,8 +68,9 @@ void precalculateEffects(Track *track) {
 	memcpy(track->scratchBuffers[1], track->buffers[1], sizeof(float)*track->totalSamples/2);
 	int i;
 	for (i = 0; i < numEffects; i++) {
+		if (i == ADSR_ID) continue;
 		Effect effect = track->effects[i];
-		if (!effect.dynamic && effect.on)
+		if (effect.on && !effect.dynamic)
 			effect.process(effect.config, track->scratchBuffers, track->totalSamples/2);
 	}
 }
@@ -98,7 +99,7 @@ void initTrack(Track *track, AAsset *asset) {
   
   	initEffect(&(track->effects[STATIC_VOL_PAN_ID]), true, false, volumepanconfig_create(.5f, .5f),
   			   volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
-  	initEffect(&(track->effects[DECIMATE_ID]), false, false, decimateconfig_create(4.0f, 0.5f),
+  	initEffect(&(track->effects[DECIMATE_ID]), false, true, decimateconfig_create(4.0f, 0.5f),
   			   decimateconfig_set, decimate_process, decimateconfig_destroy);
   	initEffect(&(track->effects[FILTER_ID]), false, true, filterconfig_create(11050.0f, 0.5f),
   			   filterconfig_set, filter_process, filterconfig_destroy);
@@ -108,6 +109,8 @@ void initTrack(Track *track, AAsset *asset) {
   			   delayconfig_set, delay_process, delayconfig_destroy);
   	initEffect(&(track->effects[REVERB_ID]), false, true, reverbconfig_create(.5f, .5f),
   			   reverbconfig_set, reverb_process, reverbconfig_destroy);
+  	initEffect(&(track->effects[ADSR_ID]), false, true, adsrconfig_create(track->loopEnd - track->loopBegin),
+  			   NULL, adsr_process, adsrconfig_destroy);
 }
 
 void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {
@@ -145,7 +148,7 @@ void calcNextBuffer(Track *track) {
              nextSize*sizeof(float));
       memcpy(&(track->currBuffers[1][totalSize]), &(track->scratchBuffers[1][track->currSample]),
              nextSize*sizeof(float));
-
+	  
       totalSize += nextSize;
       // increment sample counter to reflect bytes written so far
       track->currSample += nextSize;
@@ -407,9 +410,10 @@ void playTrack(int trackNum, float volume, float pan, float pitch) {
   track->effects[DYNAMIC_VOL_PAN_ID].set(track->effects[DYNAMIC_VOL_PAN_ID].config, volume, pan);
   track->pitch = pitch;
   track->playing = true;
+  track->effects[ADSR_ID].on = true;
+  resetAdsr((AdsrConfig *)track->effects[ADSR_ID].config);
   if (track->outputPlayerPitch != NULL) {
 	  //(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((pitch + track->primaryPitch)*750 + 500));
-	  //__android_log_print(ANDROID_LOG_INFO, "numbeats", "%d", numBeats);	  
   }	  
 }
 
@@ -417,6 +421,7 @@ void stopTrack(int trackNum) {
   Track *track = getTrack(trackNum);
   track->playing = false;
   track->currSample = track->loopBegin;
+  track->effects[ADSR_ID].on = false;
 }
 
 void stopAll() {
@@ -473,6 +478,8 @@ void Java_com_kh_beatbot_manager_PlaybackManager_disarmTrack(JNIEnv* env, jclass
 
 void Java_com_kh_beatbot_manager_PlaybackManager_playTrack(JNIEnv* env, jclass clazz, jint trackNum) {
   Track *track = getTrack(trackNum);
+  track->effects[ADSR_ID].on = true;
+  resetAdsr((AdsrConfig *)track->effects[ADSR_ID].config);  
   track->currSample = track->loopBegin;
   track->playing = true;
 }
@@ -519,6 +526,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_setLoopWindow(JNIEnv* env, jcla
   track->loopEnd = loopEndSample;
   if (track->currSample >= track->loopEnd)
     track->currSample = track->loopBegin;
+  updateAdsr((AdsrConfig *)track->effects[ADSR_ID].config, track->loopEnd - track->loopBegin);
 }
 
 /****************************************************************************************
@@ -837,9 +845,27 @@ void Java_com_kh_beatbot_ReverbActivity_setReverbFeedback(JNIEnv* env, jclass cl
 }
 
 void Java_com_kh_beatbot_ReverbActivity_setReverbHfDamp(JNIEnv* env, jclass clazz,
-													  jint trackNum, jfloat hfDamp) {
+													    jint trackNum, jfloat hfDamp) {
 	Track *track = getTrack(trackNum);
 	ReverbConfig *config = (ReverbConfig *)track->effects[REVERB_ID].config;
 	config->hfDamp = hfDamp;
 }
 
+/****************************************************************************************
+ Java Effects JNI methods
+****************************************************************************************/
+
+void Java_com_kh_beatbot_view_SampleWaveformView_setAdsrPoint(JNIEnv* env, jclass clazz,
+															  jint trackNum, jint adsrPointNum,
+															  jfloat x, jfloat y) {
+	Track *track = getTrack(trackNum);
+	AdsrConfig *config = (AdsrConfig *)track->effects[ADSR_ID].config;
+	config->adsrPoints[adsrPointNum].sampleCents = x;
+	config->adsrPoints[adsrPointNum].level = y;
+	// points 2 and 3 are two ends of sustain, which has constant slope
+	if (adsrPointNum == 2)
+		config->adsrPoints[3].level = y;
+	else if (adsrPointNum == 3)
+		config->adsrPoints[2].level = y;
+	updateAdsr(config, config->totalSamples);
+}

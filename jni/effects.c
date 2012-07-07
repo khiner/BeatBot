@@ -95,6 +95,75 @@ void initEffect(Effect *effect, bool on, bool dynamic, void *config,
 	effect->destroy = destroy;				
 }
 
+void initAdsrPoints(AdsrConfig *config) {
+	config->adsrPoints[0].sampleCents = 0;
+	config->adsrPoints[0].level = 0.0001f;
+	config->adsrPoints[1].sampleCents = 0.25f;
+	config->adsrPoints[1].level = 0.85f;
+	config->adsrPoints[2].sampleCents = 0.5f;
+	config->adsrPoints[2].level = 0.60f;
+	config->adsrPoints[3].sampleCents = 0.75f;
+	config->adsrPoints[3].level = 0.60f;
+	config->adsrPoints[4].sampleCents = 1;
+	config->adsrPoints[4].level = 0.0001f;
+}
+
+AdsrConfig *adsrconfig_create(int totalSamples) {
+	AdsrConfig *config = (AdsrConfig *)malloc(sizeof(AdsrConfig));
+	initAdsrPoints(config);
+	resetAdsr(config);
+	updateAdsr(config, totalSamples);
+	return config;
+}
+
+void adsr_process(void *p, float **buffers, int size) {
+	AdsrConfig *config = (AdsrConfig *)p;
+	int i;
+	for (i = 0; i < size; i++) {
+		config->currLevel *= config->coeffs[config->currAdsrNum];
+		config->currSampleNum++;
+		if (config->currSampleNum >= config->totalSamples) {
+			config->currSampleNum = config->currAdsrNum = 0;
+			config->currLevel = config->adsrPoints[0].level;
+		} else if (config->currSampleNum >=
+			       config->adsrPoints[config->currAdsrNum + 1].sampleNum) {
+			config->currAdsrNum++;			
+			config->currLevel = config->adsrPoints[config->currAdsrNum].level;
+		}
+		buffers[0][i] *= config->currLevel;
+		buffers[1][i] *= config->currLevel;
+    }
+}
+
+void adsrconfig_destroy(void *p) {
+	AdsrConfig *config = (AdsrConfig *)p;
+	free(config->adsrPoints);
+	free(config);
+}
+
+void updateAdsr(AdsrConfig *config, int totalSamples) {
+	config->totalSamples = totalSamples;
+	int i, startSample, endSample;
+	float startLevel, endLevel;
+	for (i = 0; i < 5; i++) {
+		config->adsrPoints[i].sampleNum = (int)(config->adsrPoints[i].sampleCents*totalSamples);
+	}
+	for (i = 0; i < 4; i++) {
+		startSample = config->adsrPoints[i].sampleNum;
+		endSample = config->adsrPoints[i + 1].sampleNum;
+		startLevel = config->adsrPoints[i].level;
+		endLevel = config->adsrPoints[i + 1].level;
+		// constant coefficient for sustain.  all other segments are exponential
+		config->coeffs[i] = i == 3 ? 1 : 1.0f + (log(endLevel) - log(startLevel)) /
+				   						(float)(endSample - startSample);
+	}
+}
+
+void resetAdsr(AdsrConfig *config) {
+	config->currSampleNum = config->currAdsrNum = 0;
+	config->currLevel = config->adsrPoints[0].level;
+}
+
 DecimateConfig *decimateconfig_create(float bits, float rate) {
     DecimateConfig *decimateConfig = (DecimateConfig *)malloc(sizeof(DecimateConfig));
 	decimateConfig->cnt = 0;
@@ -144,7 +213,6 @@ DelayConfig *delayconfig_create(float delay, float feedback) {
 	for (i = 0; i < 2; i++) {
 		p->rp[i] = p->wp[i] = 0;
 	}
-	int count;
 	return p;
 }
 

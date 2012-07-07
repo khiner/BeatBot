@@ -33,7 +33,7 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			// big hack here.  all the views are retrieved multiple times, and the
-			// level bars are getting overwritten.
+			// level bars are getting overwritten, resulting in invisible bars behind visible ones
 			if (count++ < ((EffectActivity)getContext()).getNumParams()) return getLayoutInflater().inflate(resourceId, parent, false);
 			View view = getLayoutInflater().inflate(resourceId, parent, false);
 			TextView label = (TextView) view.findViewById(R.id.param_label);

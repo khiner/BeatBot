@@ -9,15 +9,13 @@
 #define SAMPLE_RATE 44100
 #define INV_SAMPLE_RATE 1.0f/44100.0f
 
-// static effect ids
 #define STATIC_VOL_PAN_ID 0
 #define DECIMATE_ID 1
 #define FILTER_ID 2
-
-// dynamic effect ids
 #define DYNAMIC_VOL_PAN_ID 3
 #define DELAY_ID 4
 #define REVERB_ID 5
+#define ADSR_ID 6
 
 /******* BEGIN FREEVERB STUFF *********/
 typedef struct allpass{
@@ -114,6 +112,21 @@ typedef struct ReverbConfig_t {
 
 /******* END FREEVERB STUFF *******/
 
+typedef struct AdsrPoint_t {
+	int sampleNum;
+	float sampleCents;
+	float level;
+} AdsrPoint;
+
+typedef struct AdsrConfig_t {
+	AdsrPoint adsrPoints[5];
+	float coeffs[4];
+	float currLevel;
+	int currSampleNum;
+	int currAdsrNum;
+	int totalSamples;
+} AdsrConfig;
+
 typedef struct DecimateConfig_t {
     int   bits; // 4-32
     float rate; // 0-1
@@ -158,6 +171,14 @@ typedef struct Effect_t {
 
 void initEffect(Effect *effect, bool on, bool dynamic, void *config,
 				void (*set), void (*process), void (*destroy));
+				
+AdsrConfig *adsrconfig_create(int totalSamples);
+void adsr_process(void *p, float **buffers, int size);
+void adsrconfig_destroy(void *p);
+
+void updateAdsr(AdsrConfig *config, int totalSamples);
+void resetAdsr(AdsrConfig *config);
+
 DecimateConfig *decimateconfig_create(float bits, float rate);
 void decimateconfig_set(void *p, float bits, float rate);
 void decimate_process(void *p, float **buffers, int size);
@@ -190,6 +211,6 @@ void volumepanconfig_destroy(void *config);
 void reverse(float buffer[], int begin, int end);
 void normalize(float buffer[], int size);
 			      
-static const int numEffects = 6;
+static const int numEffects = 7;
 
 #endif // EFFECTS_H
