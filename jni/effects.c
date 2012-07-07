@@ -106,6 +106,7 @@ void initAdsrPoints(AdsrConfig *config) {
 AdsrConfig *adsrconfig_create(int totalSamples) {
 	AdsrConfig *config = (AdsrConfig *)malloc(sizeof(AdsrConfig));
 	initAdsrPoints(config);
+	config->initial = config->end = 0.0001f;
 	resetAdsr(config);
 	updateAdsr(config, totalSamples);
 	return config;
@@ -118,23 +119,22 @@ void adsr_process(void *p, float **buffers, int size) {
 		if (config->currSampleNum < config->gateSample) {
 			if (config->rising) {
 				// attack phase
-				config->currLevel += config->coeffs[0]*((1.0f/0.63f) - config->currLevel);
+				config->currLevel += config->attackCoeff*((1.0f/0.63f) - config->currLevel);
 				if (config->currLevel > 1.0f) {
 					config->currLevel = 1.0f;
 					config->rising = false;
 				}
 			} else { // decal/sustain
-				config->currLevel += config->coeffs[2] * (config->sustain - config->currLevel);
+				config->currLevel += config->decayCoeff * (config->sustain - config->currLevel);
 			}
 		} else { // past gate sample, go to release phase
-			config->currLevel += config->coeffs[4] * (1.0f - (1.0f/0.63f) - config->currLevel);
-			if (config->currLevel < 0.00001f) {
-				config->currLevel = 0.00001f;
+			config->currLevel += config->releaseCoeff * (1.0f - (1.0f/0.63f) - config->currLevel);
+			if (config->currLevel < config->end) {
+				config->currLevel = config->end;
 			}
 		}
 		if (++config->currSampleNum > config->totalSamples) {
-			config->currSampleNum = 0;
-			config->rising = true;
+			resetAdsr(config);
 		}
 		buffers[0][i] *= config->currLevel;
 		buffers[1][i] *= config->currLevel;
@@ -156,15 +156,19 @@ void updateAdsr(AdsrConfig *config, int totalSamples) {
 	for (i = 0; i < 4; i++) {
 		startSample = config->adsrPoints[i].sampleNum;
 		endSample = config->adsrPoints[i + 1].sampleNum;
-		config->coeffs[i] = 1.0f/(endSample - startSample + 1);
-		config->coeffs[i] = config->coeffs[i] > 0 ? (config->coeffs[i] < 1 ? config->coeffs[i] : 1) : 0;
+		if (i == 0)
+			config->attackCoeff = (1.0f - config->initial)/(endSample - startSample + 1);
+		else if (i == 1)
+			config->decayCoeff = 1.0f/(endSample - startSample + 1);
+		else if (i == 3)
+			config->releaseCoeff = (1.0f /* - config->end */)/(endSample - startSample + 1);
 	}
 	config->gateSample = config->adsrPoints[4].sampleNum;
 }
 
 void resetAdsr(AdsrConfig *config) {
 	config->currSampleNum  = 0;
-	config->currLevel = 0.00001f;
+	config->currLevel = config->initial;
 	config->rising = true;
 }
 

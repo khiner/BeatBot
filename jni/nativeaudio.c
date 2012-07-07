@@ -861,7 +861,11 @@ void Java_com_kh_beatbot_view_SampleWaveformView_setAdsrPoint(JNIEnv* env, jclas
 	Track *track = getTrack(trackNum);
 	AdsrConfig *config = (AdsrConfig *)track->effects[ADSR_ID].config;
 	config->adsrPoints[adsrPointNum].sampleCents = x;
-	if (adsrPointNum == 2)
+	if (adsrPointNum == 0)
+		config->initial = y;
+	else if (adsrPointNum == 2)
 		config->sustain = y;
+	else if (adsrPointNum == 4)
+		config->end = y + 0.00001f;
 	updateAdsr(config, config->totalSamples);
 }

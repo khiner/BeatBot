@@ -119,9 +119,10 @@ typedef struct AdsrPoint_t {
 
 typedef struct AdsrConfig_t {
 	AdsrPoint adsrPoints[5];
-	float coeffs[4];
+	float attackCoeff, decayCoeff, releaseCoeff;
 	float currLevel;
 	float sustain;
+	float initial, end;
 	int gateSample; // sample to begin release
 	int currSampleNum;
 	int totalSamples;
