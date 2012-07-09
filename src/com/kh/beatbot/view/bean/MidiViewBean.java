@@ -11,8 +11,13 @@ public class MidiViewBean {
 	// time (in millis) between taps before handling as a double-tap
 	public final static long DOUBLE_TAP_TIME = 300;
 
+	// RGB color for non-selected notes
+	public final static float[] NOTE_COLOR = {1, 0, 0, 1};	
+	// RGB color for selected notes
+	public final static float[] NOTE_SELECTED_COLOR = {0, 0, 1, 1};
+	
 	// RGB color for volume bars
-	public final static float[] VOLUME_COLOR = {.412f, .788f, 1};
+	public final static float[] VOLUME_COLOR = {.412f, .788f, 1, .8f};
 	
 	// RGB color for pan bars	
 	public final static float[] PAN_COLOR = {1, .788f, .392f};
@@ -21,8 +26,11 @@ public class MidiViewBean {
 	public final static float[] PITCH_COLOR = {.443f, 1, .533f};
 
 	// RGB color for selected bars
-	public final static float[] SELECTED_COLOR = {.9f, 0, .1f};
-	
+	public final static float[] LEVEL_SELECTED_COLOR = {.9f, 0, .1f};	
+	public final static float[] TICK_FILL_COLOR = {.3f, .3f, .3f, 1};
+	public final static float[] TICK_MARKER_COLOR = {.8f, .8f, .8f};
+	public final static float[] TICK_SELECTED_COLOR = VOLUME_COLOR;
+		
 	private MidiView.State viewState = MidiView.State.NORMAL_VIEW;
 	
 	private float width, height;
@@ -85,7 +93,7 @@ public class MidiViewBean {
 	public void setViewState(MidiView.State viewState) {
 		this.viewState = viewState;
 	}
-
+	
 	public float getWidth() {
 		return width;
 	}

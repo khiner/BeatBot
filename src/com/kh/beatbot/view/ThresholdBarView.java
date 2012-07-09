@@ -12,6 +12,7 @@ import android.view.SurfaceHolder;
 
 public class ThresholdBarView extends SurfaceViewBase {
 
+	private final float[] LINE_COLOR = new float[] {.9f, .9f, .9f, .65f};
 	private final int numBars = 75; 
 	private final float thumbWidth = 15;
 	
@@ -110,15 +111,12 @@ public class ThresholdBarView extends SurfaceViewBase {
 		float x2 = x1 + thumbWidth;
 		float y1 = 0;
 		float y2 = height;
-		thresholdBarBuffer = makeFloatBuffer(new float[] { x1, y1, x2, y1, x1, y2, x2,
-				y2 });
-		thresholdLineBuffer = makeFloatBuffer(new float[] { x1, y1, x2, y1, x2, y2, x1, y2, x1, y2 });		
+		thresholdBarBuffer = makeRectFloatBuffer(x1, y1, x2, y2);
+		thresholdLineBuffer = makeFloatBuffer(new float[] { x1, y1, x1, y2, x2, y2, x2, y1});
 	}
 
 	private void drawThresholdBar() {
-		gl.glColor4f(.9f, .9f, .9f, .65f);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, thresholdBarBuffer);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		drawTriangleStrip(thresholdBarBuffer, LINE_COLOR);
 		gl.glColor4f(1, 1, 1, .9f);
 		gl.glLineWidth(4);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, thresholdLineBuffer);

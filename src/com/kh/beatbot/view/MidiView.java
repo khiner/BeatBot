@@ -8,14 +8,11 @@ import java.util.Map;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
-import com.KarlHiner.BeatBot.R;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
@@ -40,7 +37,7 @@ public class MidiView extends SurfaceViewBase {
 	private FloatBuffer loopMarkerVB = null;
 	private FloatBuffer loopMarkerLineVB = null;
 	private FloatBuffer loopSquareVB = null;
-	
+
 	private int[] textures = new int[1];
 
 	private MidiManager midiManager;
@@ -155,7 +152,7 @@ public class MidiView extends SurfaceViewBase {
 		}
 		// make room in the view window if we are dragging out of the view
 		tickWindow.updateView(leftTick, rightTick);
-		updateSelectRegionVB(leftTick, rightTick, topY, bottomY);
+		initSelectRegionVB(leftTick, rightTick, topY, bottomY);
 	}
 
 	private void selectMidiNote(float x, float y, int pointerId) {
@@ -251,12 +248,17 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void drawLoopMarker() {
-		gl.glColor4f(.8f, .8f, .8f, 1);
+		float[][] color = new float[2][3];
+		color[0] = bean.getLoopBeginId() != -1 ? MidiViewBean.TICK_SELECTED_COLOR
+				: MidiViewBean.TICK_MARKER_COLOR;
+		color[1] = bean.getLoopEndId() != -1 ? MidiViewBean.TICK_SELECTED_COLOR
+				: MidiViewBean.TICK_MARKER_COLOR;
 		gl.glLineWidth(6);
 		float[] loopMarkerLocs = { tickToX(midiManager.getLoopBeginTick()),
 				tickToX(midiManager.getLoopEndTick()) };
 		for (int i = 0; i < 2; i++) {
 			float loopMarkerLoc = loopMarkerLocs[i];
+			gl.glColor4f(color[i][0], color[i][1], color[i][2], 1);
 			gl.glPushMatrix();
 			gl.glTranslatef(loopMarkerLoc, 0, 0);
 			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerVB);
@@ -267,20 +269,28 @@ public class MidiView extends SurfaceViewBase {
 		}
 	}
 
-	private void drawTopTickFill() {
-		float color = .8f * bean.getBgColor();
-		gl.glColor4f(color, color, color, 1);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, tickFillVB);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+	private void drawTickFill() {
+		drawTriangleStrip(tickFillVB, MidiViewBean.TICK_FILL_COLOR);
+		if (bean.getLoopMiddleId() != -1) {
+			drawSelectedLoopBar();
+		}
+	}
+
+	private void drawSelectedLoopBar() {
+		// entire loop bar is selected. draw darker square
+		float x1 = tickToX(midiManager.getLoopBeginTick());
+		float x2 = tickToX(midiManager.getLoopEndTick());
+		float y1 = 0;
+		float y2 = bean.getYOffset();
+		drawRectangle(x1, y1, x2, y2, MidiViewBean.TICK_SELECTED_COLOR);
 	}
 
 	private void drawLoopSquare() {
-		float color = 1.3f * bean.getBgColor();
-		gl.glColor4f(color, color, color, .6f);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopSquareVB);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		float gray = 1.3f * bean.getBgColor();
+		float[] color = new float[] {gray, gray, gray, .6f};
+		drawTriangleStrip(loopSquareVB, color);
 	}
-	
+
 	private void drawRecordingWaveforms() {
 		gl.glLineWidth(1);
 		gl.glColor4f(0, 0, 0, 1);
@@ -306,20 +316,15 @@ public class MidiView extends SurfaceViewBase {
 		}
 	}
 
-	public void updateSelectRegionVB(long leftTick, long rightTick, float topY,
+	public void initSelectRegionVB(long leftTick, long rightTick, float topY,
 			float bottomY) {
-		float x1 = tickToX(leftTick);
-		float x2 = tickToX(rightTick);
-		selectRegionVB = makeFloatBuffer(new float[] { x1, topY, x2, topY, x1,
-				bottomY, x2, bottomY });
+		selectRegionVB = makeRectFloatBuffer(tickToX(leftTick), topY, tickToX(rightTick), bottomY);
 	}
 
 	private void drawSelectRegion() {
 		if (!bean.isSelectRegion() || selectRegionVB == null)
 			return;
-		gl.glColor4f(.6f, .6f, 1, .7f);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, selectRegionVB);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		drawTriangleStrip(selectRegionVB, new float[] {.6f, .6f, 1, .7f});
 	}
 
 	private void drawAllMidiNotes() {
@@ -329,34 +334,20 @@ public class MidiView extends SurfaceViewBase {
 				break;
 			MidiNote midiNote = midiManager.getMidiNote(i);
 			if (midiNote != null) {
-				calculateColor(midiNote);
-				drawMidiNote(midiNote.getNoteValue(), midiNote.getOnTick(),
-						midiNote.getOffTick());
+				drawMidiNote(midiNote, midiNote.isSelected() ?
+						MidiViewBean.NOTE_SELECTED_COLOR : MidiViewBean.NOTE_COLOR);
 			}
 		}
 	}
 
-	private void calculateColor(MidiNote midiNote) {
-		if (midiNote.isSelected())
-			// selected notes are fileed blue
-			gl.glColor4f(0, 0, 1, 1);
-		else
-			// non-selected, non-recording notes are filled red
-			gl.glColor4f(1, 0, 0, 1);
-	}
-
-	public void drawMidiNote(int note, long onTick, long offTick) {
+	public void drawMidiNote(MidiNote midiNote, float[] color) {
 		// midi note rectangle coordinates
-		float x1 = tickToX(onTick);
-		float x2 = tickToX(offTick);
-		float y1 = noteToY(note);
+		float x1 = tickToX(midiNote.getOnTick());
+		float y1 = noteToY(midiNote.getNoteValue());		
+		float x2 = tickToX(midiNote.getOffTick());
 		float y2 = y1 + bean.getNoteHeight();
-		// the float buffer for the midi note coordinates
-		FloatBuffer midiBuf = makeFloatBuffer(new float[] { x1, y1, x2, y1, x1,
-				y2, x2, y2 });
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, midiBuf);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
-
+		// the float buffer for the midi note coordinates		
+		drawRectangle(x1, y1, x2, y2, color);
 		// draw outline - same coordinates, but different ordering for a
 		// line_loop instead of a triangle_strip
 		FloatBuffer outlineBuf = makeFloatBuffer(new float[] { x1, y1, x2, y1,
@@ -370,22 +361,14 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void initTickFillVB() {
-		float x1 = 0;
-		float x2 = width;
-		float y1 = 0;
-		float y2 = bean.getYOffset();
-		tickFillVB = makeFloatBuffer(new float[] { x1, y1, x2, y1, x1, y2,
-				x2, y2 });
+		tickFillVB = makeRectFloatBuffer(0, 0, width, bean.getYOffset());
 	}
-	
+
 	private void initLoopSquareVB() {
-		float x1 = tickToX(midiManager.getLoopBeginTick());
-		float x2 = tickToX(midiManager.getLoopEndTick());
-		float y1 = 0;
-		float y2 = height;
-		loopSquareVB = makeFloatBuffer(new float[] {x1, y1, x2, y1, x1, y2, x2, y2});
+		loopSquareVB = makeRectFloatBuffer(tickToX(midiManager.getLoopBeginTick()), 0,
+										   tickToX(midiManager.getLoopEndTick()), height);
 	}
-	
+
 	private void initHLineVB() {
 		float[] hLines = new float[(midiManager.getNumSamples() + 2) * 4];
 		hLines[0] = 0;
@@ -421,13 +404,9 @@ public class MidiView extends SurfaceViewBase {
 	private void initLoopMarkerVBs() {
 		float h = bean.getYOffset();
 		float[] loopMarkerLine = new float[] { 0, 0, 0, bean.getHeight() };
-		float[] loopMarkerTriangles = new float[] { 0, 0, 0, h, h, h / 2, // loop
-																			// begin
-																			// triangle,
-																			// pointing
-																			// right
-				0, 0, 0, h, -h, h / 2 }; // loop end triangle, pointing left
-
+		float[] loopMarkerTriangles = new float[]
+				{ 0, 0, 0, h, h, h / 2,    // loop begin triangle, pointing right
+				  0, 0, 0, h, -h, h / 2 }; // loop end triangle, pointing left
 		loopMarkerLineVB = makeFloatBuffer(loopMarkerLine);
 		loopMarkerVB = makeFloatBuffer(loopMarkerTriangles);
 	}
@@ -449,7 +428,7 @@ public class MidiView extends SurfaceViewBase {
 				.getHeight() - bean.getYOffset()));
 	}
 
-	private float noteToY(int note) {
+	public float noteToY(int note) {
 		return note * bean.getNoteHeight() + bean.getYOffset();
 	}
 
@@ -473,8 +452,7 @@ public class MidiView extends SurfaceViewBase {
 		float vertices[] = { -width, -height, -width, height, width, -height,
 				width, height };
 
-		float texture[] = { 0.0f, height, 0.0f, 0.0f, width, height, width,
-				0.0f };
+		float texture[] = { 0, 1, 0, 0, 1, 1, 1, 0 };
 
 		FloatBuffer vertexBuffer = makeFloatBuffer(vertices);
 		FloatBuffer textureBuffer = makeFloatBuffer(texture);
@@ -504,10 +482,10 @@ public class MidiView extends SurfaceViewBase {
 		float color = bean.getBgColor();
 		gl.glClearColor(color, color, color, 1.0f);
 		gl.glEnable(GL10.GL_POINT_SMOOTH);
-		//gl.glEnable(GL10.GL_TEXTURE_2D);
-		Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
-				R.drawable.background);
-		loadTexture(gl, bitmap, textures);
+		// gl.glEnable(GL10.GL_TEXTURE_2D);
+		//Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
+		//		R.drawable.background);
+		//loadTexture(gl, bitmap, textures);
 		initHLineVB();
 		initVLineVBs();
 		initLoopMarkerVBs();
@@ -517,7 +495,7 @@ public class MidiView extends SurfaceViewBase {
 
 	@Override
 	protected void drawFrame() {
-		//renderBackgroundTexture();		
+		// renderBackgroundTexture();
 		boolean recording = recordManager.getState() == RecordManager.State.LISTENING
 				|| recordManager.getState() == RecordManager.State.RECORDING;
 		if (bean.getViewState() == State.TO_LEVELS_VIEW
@@ -533,8 +511,8 @@ public class MidiView extends SurfaceViewBase {
 			}
 		}
 		tickWindow.scroll();
-		initLoopSquareVB();		
-		drawTopTickFill();
+		initLoopSquareVB();
+		drawTickFill();
 		drawLoopSquare();
 		if (recording
 				|| playbackManager.getState() == PlaybackManager.State.PLAYING) {
@@ -583,19 +561,13 @@ public class MidiView extends SurfaceViewBase {
 		else if (scrollingEnded && elapsedTime > MidiViewBean.DOUBLE_TAP_TIME)
 			alpha *= (MidiViewBean.DOUBLE_TAP_TIME * 2 - elapsedTime)
 					/ (float) MidiViewBean.DOUBLE_TAP_TIME;
-
-		gl.glColor4f(1, 1, 1, alpha);
-
+		
 		float x1 = tickWindow.getTickOffset() * width
 				/ tickWindow.getMaxTicks();
 		float x2 = (tickWindow.getTickOffset() + tickWindow.getNumTicks())
 				* width / tickWindow.getMaxTicks();
-		// the float buffer for the midi note coordinates
-		FloatBuffer scrollBuf = makeFloatBuffer(new float[] { x1,
-				bean.getHeight() - 20, x2, bean.getHeight() - 20, x1,
-				bean.getHeight(), x2, bean.getHeight() });
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, scrollBuf);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		drawRectangle(x1, bean.getHeight() - 20, x2, bean.getHeight(),
+				      new float[] {1, 1, 1, alpha});
 	}
 
 	/**
@@ -799,9 +771,10 @@ public class MidiView extends SurfaceViewBase {
 			} else if (bean.getLoopEndId() != -1) {
 				midiManager.setLoopEndTick(majorTick);
 			} else if (bean.getLoopMiddleId() != -1) {
-				//TODO: move begin and end relative to down-x
-				long newOnTick = tickWindow.getMajorTickToLeftOf(xToTick(e.getX(0) - bean.getLoopSelectionOffset()));
-				long newOffTick = midiManager.getLoopEndTick() + newOnTick - midiManager.getLoopBeginTick();
+				long newOnTick = tickWindow.getMajorTickToLeftOf(xToTick(e
+						.getX(0) - bean.getLoopSelectionOffset()));
+				long newOffTick = midiManager.getLoopEndTick() + newOnTick
+						- midiManager.getLoopBeginTick();
 				if (newOnTick >= 0 && newOffTick <= tickWindow.getMaxTicks()) {
 					midiManager.setLoopBeginTick(newOnTick);
 					midiManager.setLoopEndTick(newOffTick);
@@ -1005,6 +978,7 @@ public class MidiView extends SurfaceViewBase {
 	protected void handleActionUp(int id, float x, float y) {
 		bean.setScrolling(false);
 		bean.setLoopBeginId(-1);
+		bean.setLoopMiddleId(-1);
 		bean.setLoopEndId(-1);
 		if (bean.getScrollVelocity() == 0)
 			bean.setScrollViewEndTime(System.currentTimeMillis());

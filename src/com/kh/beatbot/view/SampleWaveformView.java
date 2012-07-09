@@ -18,7 +18,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private final float[][] ADSR_COLORS = new float[][] {{0, 1, 0, .7f},
 													    {1, .5f, .5f, .7f}, 
 													    {0, 0, 1, .7f},
-													    {1, 0, 1, .7f}}; 
+													    {1, 0, 1, .7f}};
+	private final float[] LOOP_HIGHLIGHT_COLOR = new float[] {1, .64706f, 0, .4f};
 	private FloatBuffer waveformVB = null;
 	private FloatBuffer loopMarkerVB = null;
 	private FloatBuffer adsrPointVB = null;
@@ -165,8 +166,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glLineWidth(10); // width of 10 for now
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerVB);
 		gl.glDrawArrays(GL10.GL_LINES, 0, loopMarkerVB.capacity() / 2);
-		gl.glColor4f(1, .64706f, 0, .4f);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_FAN, 0, loopMarkerVB.capacity()/2);
+		drawTriangleFan(loopMarkerVB, LOOP_HIGHLIGHT_COLOR);
 	}
 	
 	private void drawAdsr() {

@@ -124,7 +124,7 @@ public class LevelsViewHelper {
 		FloatBuffer vertexBuffer = selected ? selectedLevelBarsVB : levelBarsVB;
 		float[] color = null;
 		if (selected) {
-			color = MidiViewBean.SELECTED_COLOR;
+			color = MidiViewBean.LEVEL_SELECTED_COLOR;
 		} else {
 			switch (levelMode) {
 			case VOLUME:
@@ -299,7 +299,8 @@ public class LevelsViewHelper {
 		}
 	}
 
-	private void calculateColor(MidiNote midiNote) {
+	private float[] calculateColor(MidiNote midiNote) {
+		float[] color = new float[4];
 		boolean selected = midiNote.isSelected();
 		boolean levelViewSelected = midiNote.isLevelViewSelected();
 
@@ -307,17 +308,23 @@ public class LevelsViewHelper {
 		float whiteToBlack = bean.getBgColor() * 2;
 		if (!selected && levelViewSelected) {
 			// fade from red to white
-			gl.glColor4f(1, blackToWhite, blackToWhite, 1);
+			color[0] = 1;
+			color[1] = color[2] = blackToWhite;
 		} else if (selected && levelViewSelected) {
 			// fade from blue to white
-			gl.glColor4f(blackToWhite, blackToWhite, 1, 1);
+			color[0] = color[1] = blackToWhite;
+			color[2] = 1;
 		} else if (!selected && !levelViewSelected) {
 			// fade from red to black
-			gl.glColor4f(whiteToBlack, 0, 0, 1);
+			color[0] = whiteToBlack;
+			color[1] = color[2] = 0;
 		} else if (selected && !levelViewSelected) {
 			// fade from blue to black
-			gl.glColor4f(0, 0, whiteToBlack, 1);
+			color[0] = color[1] = 0;
+			color[2] = whiteToBlack;
 		}
+		color[3] = 1; // alpha always 1
+		return color;
 	}
 
 	private void drawAllMidiNotes() {
@@ -327,9 +334,7 @@ public class LevelsViewHelper {
 				break;
 			MidiNote midiNote = midiManager.getMidiNote(i);
 			if (midiNote != null) {
-				calculateColor(midiNote);
-				midiView.drawMidiNote(midiNote.getNoteValue(),
-						midiNote.getOnTick(), midiNote.getOffTick());
+				midiView.drawMidiNote(midiNote, calculateColor(midiNote));
 			}
 		}
 	}

@@ -49,6 +49,27 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		return fb;
 	}
 
+	public static FloatBuffer makeRectFloatBuffer(float x1, float y1, float x2, float y2) {
+		return makeFloatBuffer(new float[] { x1, y1, x2, y1, x1,
+											 y2, x2, y2 });		
+	}
+	
+	public static void drawRectangle(float x1, float y1, float x2, float y2, float[] color) {
+		drawTriangleStrip(makeRectFloatBuffer(x1, y1, x2, y2), color);
+	}
+	
+	public static void drawTriangleStrip(FloatBuffer vb, float[] color) {
+		gl.glColor4f(color[0], color[1], color[2], color[3]);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
+		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, vb.capacity() / 2);		
+	}
+
+	public static void drawTriangleFan(FloatBuffer vb, float[] color) {
+		gl.glColor4f(color[0], color[1], color[2], color[3]);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
+		gl.glDrawArrays(GL10.GL_TRIANGLE_FAN, 0, vb.capacity() / 2);		
+	}
+	
 	/**
 	 * Constructor
 	 * 

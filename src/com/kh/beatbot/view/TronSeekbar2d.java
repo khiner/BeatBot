@@ -68,7 +68,7 @@ public class TronSeekbar2d extends SurfaceViewBase {
 	
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
-		color = MidiViewBean.SELECTED_COLOR;
+		color = MidiViewBean.LEVEL_SELECTED_COLOR;
 		for (Level2dListener listener : levelListeners) {
 			listener.notifyChecked(this, true);
 		}

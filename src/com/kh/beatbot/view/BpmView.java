@@ -133,11 +133,11 @@ public class BpmView extends SurfaceViewBase {
 		}
 	}
 	
-	private void setColor(boolean on) {
+	private float[] calculateColor(boolean on) {
 		if (on)
-			gl.glColor4f(1, 0, 0, 1);
+			return new float[] {1, 0, 0, 1};
 		else
-			gl.glColor4f(1, 0, 0, .3f);
+			return new float[] {1, 0, 0, .3f};
 	}
 	
 	@Override
@@ -150,44 +150,29 @@ public class BpmView extends SurfaceViewBase {
 		gl.glPushMatrix();
 		for (int i = 0; i < 3; i++) {
 			gl.glPushMatrix();
+			// long segments
 			gl.glTranslatef(4, 4, 0);
-			setColor(segments[i][0]);
-			drawLongSegment();
+			drawTriangleStrip(longSegmentVB, calculateColor(segments[i][0]));
 			gl.glPushMatrix();
 			gl.glTranslatef(0, (height - 9)/2, 0);
-			setColor(segments[i][1]);
-			drawLongSegment();
+			drawTriangleStrip(longSegmentVB, calculateColor(segments[i][1]));
 			gl.glTranslatef((width - 10)/3 - 10, -(height - 9)/2, 0);
-			setColor(segments[i][2]);
-			drawLongSegment();
+			drawTriangleStrip(longSegmentVB, calculateColor(segments[i][2]));
 			gl.glTranslatef(0, (height - 9)/2, 0);
-			setColor(segments[i][3]);
-			drawLongSegment();
+			drawTriangleStrip(longSegmentVB, calculateColor(segments[i][3]));
+			// short segments
 			gl.glPopMatrix();
 			gl.glTranslatef(1, 0, 0);
-			setColor(segments[i][4]);
-			drawShortSegment();
+			drawTriangleStrip(shortSegmentVB, calculateColor(segments[i][4]));
 			gl.glTranslatef(0, (height - 9)/2 - 1, 0);
-			setColor(segments[i][5]);
-			drawShortSegment();
+			drawTriangleStrip(shortSegmentVB, calculateColor(segments[i][5]));
 			gl.glTranslatef(0, (height - 9)/2, 0);
-			setColor(segments[i][6]);
-			drawShortSegment();	
+			drawTriangleStrip(shortSegmentVB, calculateColor(segments[i][6]));
 			gl.glPopMatrix();
 			// translate for next digit
 			gl.glTranslatef((width - 8)/3, 0, 0);			
 		}
 		gl.glPopMatrix();		
-	}
-
-	private void drawLongSegment() {
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, longSegmentVB);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 6);		
-	}
-
-	private void drawShortSegment() {
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, shortSegmentVB);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 6);
 	}
 	
 	@Override
