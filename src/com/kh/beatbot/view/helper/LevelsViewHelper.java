@@ -209,8 +209,7 @@ public class LevelsViewHelper {
 			overlapping.setLevelViewSelected(false);
 			overlapping.setLevelSelected(false);
 		}
-		if (!midiNote.isLevelViewSelected())
-			midiNote.setLevelViewSelected(true);
+		midiNote.setLevelViewSelected(true);
 	}
 
 	private ArrayList<MidiNote> getOverlapping(MidiNote midiNote) {
@@ -227,13 +226,13 @@ public class LevelsViewHelper {
 			float bottomY) {
 		for (MidiNote midiNote : midiManager.getMidiNotes()) {
 			if (!midiNote.isLevelViewSelected())
-				return;
+				continue;
 			float levelY = levelToY(midiNote.getLevel(levelMode));
 			if (leftTick < midiNote.getOnTick()
 					&& rightTick > midiNote.getOnTick() && topY < levelY
-					&& bottomY > levelY) {
+					&& bottomY > levelY)
 				midiNote.setLevelSelected(true);
-			} else
+			else
 				midiNote.setLevelSelected(false);
 		}
 	}
@@ -278,6 +277,17 @@ public class LevelsViewHelper {
 		}
 	}
 
+	private void setLevelsToDragLine() {
+		for (MidiNote selected : midiManager.getMidiNotes()) {
+			if (selected.isLevelSelected()
+					&& levelOffsets.get(selected) != null) {
+				selected.setLevel(levelMode,
+						dragLine.getLevel(selected.getOnTick())
+								+ levelOffsets.get(selected));
+			}
+		}
+	}
+
 	private void deselectAllLevelViews() {
 		for (MidiNote midiNote : midiManager.getMidiNotes()) {
 			midiNote.setLevelViewSelected(false);
@@ -295,7 +305,6 @@ public class LevelsViewHelper {
 		deselectAllLevelViews();
 		for (MidiNote midiNote : midiManager.getMidiNotes()) {
 			addToLevelViewSelected(midiNote);
-			midiNote.setLevelViewSelected(true);
 		}
 	}
 
@@ -303,7 +312,6 @@ public class LevelsViewHelper {
 		float[] color = new float[4];
 		boolean selected = midiNote.isSelected();
 		boolean levelViewSelected = midiNote.isLevelViewSelected();
-
 		float blackToWhite = (1 - bean.getBgColor() * 2);
 		float whiteToBlack = bean.getBgColor() * 2;
 		if (!selected && levelViewSelected) {
@@ -371,7 +379,7 @@ public class LevelsViewHelper {
 		updateSelectedLevelNotes();
 	}
 
-	public boolean handleActionPointerDown(MotionEvent e, int id, float x,
+	public void handleActionPointerDown(MotionEvent e, int id, float x,
 			float y) {
 		selectLevel(x, y, id);
 		if (touchedLevels.isEmpty() && e.getPointerCount() == 2) {
@@ -382,10 +390,9 @@ public class LevelsViewHelper {
 			bean.setZoomLeftAnchorTick(midiView.xToTick(leftAnchorX));
 			bean.setZoomRightAnchorTick(midiView.xToTick(rightAnchorX));
 		}
-		return true;
 	}
 
-	public boolean handleActionPointerUp(MotionEvent e, int id) {
+	public void handleActionPointerUp(MotionEvent e, int id) {
 		touchedLevels.remove(id);
 		updateLevelOffsets();
 		// TODO : using getActionIndex could introduce bugs.
@@ -394,10 +401,9 @@ public class LevelsViewHelper {
 			long tick = midiView.xToTick(e.getX(index));
 			bean.setScrollAnchorTick(tick);
 		}
-		return true;
 	}
 
-	public boolean handleActionMove(MotionEvent e) {
+	public void handleActionMove(MotionEvent e) {
 		if (!touchedLevels.isEmpty()) {
 			for (int i = 0; i < e.getPointerCount(); i++) {
 				MidiNote touched = touchedLevels.get(e.getPointerId(i));
@@ -406,19 +412,11 @@ public class LevelsViewHelper {
 				}
 			}
 			updateDragLine();
-			for (MidiNote selected : midiManager.getMidiNotes()) {
-				if (selected.isLevelSelected()
-						&& levelOffsets.get(selected) != null) {
-					selected.setLevel(levelMode,
-							dragLine.getLevel(selected.getOnTick())
-									+ levelOffsets.get(selected));
-				}
-			}
+			setLevelsToDragLine();
 			// velocity changes are valid undo events
 			bean.setStateChanged(true);
 		} else { // no midi selected. midiView can handle it.
 			midiView.noMidiMove(e);
 		}
-		return true;
 	}
 }
