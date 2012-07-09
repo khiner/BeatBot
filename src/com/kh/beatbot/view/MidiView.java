@@ -28,7 +28,6 @@ public class MidiView extends SurfaceViewBase {
 
 	private static final int[] V_LINE_WIDTHS = new int[] { 5, 3, 2 };
 	private static final float[] V_LINE_COLORS = new float[] { 0, .2f, .3f };
-
 	// NIO Buffers
 	private FloatBuffer[] vLineVB = new FloatBuffer[3];
 	private FloatBuffer hLineVB = null;
@@ -292,8 +291,6 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void drawRecordingWaveforms() {
-		gl.glLineWidth(1);
-		gl.glColor4f(0, 0, 0, 1);
 		ArrayList<FloatBuffer> waveformVBs = waveformHelper
 				.getCurrentWaveformVBs();
 		if (recordManager.isRecording() && !waveformVBs.isEmpty()) {
@@ -307,11 +304,8 @@ public class MidiView extends SurfaceViewBase {
 			// width
 			gl.glScalef(noteWidth / waveWidth, 1, 1);
 			for (int i = 0; i < waveformVBs.size(); i++) {
-				gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVBs.get(i));
-				gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, waveformVBs.get(i)
-						.capacity() / 2);
+				drawLines(waveformVBs.get(i), MidiViewBean.WAVEFORM_COLOR, 1, GL10.GL_LINE_STRIP);
 			}
-
 			gl.glPopMatrix();
 		}
 	}
@@ -346,18 +340,10 @@ public class MidiView extends SurfaceViewBase {
 		float y1 = noteToY(midiNote.getNoteValue());		
 		float x2 = tickToX(midiNote.getOffTick());
 		float y2 = y1 + bean.getNoteHeight();
-		// the float buffer for the midi note coordinates		
+		 // fade outline from black to white
+		float baseColor = (1 - bean.getBgColor() * 2);
 		drawRectangle(x1, y1, x2, y2, color);
-		// draw outline - same coordinates, but different ordering for a
-		// line_loop instead of a triangle_strip
-		FloatBuffer outlineBuf = makeFloatBuffer(new float[] { x1, y1, x2, y1,
-				x2, y2, x1, y2, x1, y2 });
-		float baseColor = (1 - bean.getBgColor() * 2); // fade outline from
-														// black to white
-		gl.glColor4f(baseColor, baseColor, baseColor, 1);
-		gl.glLineWidth(4);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, outlineBuf);
-		gl.glDrawArrays(GL10.GL_LINE_LOOP, 0, outlineBuf.capacity() / 2);
+		drawRectangleOutline(x1, y1, x2, y2, new float[] {baseColor, baseColor, baseColor, 1}, 4);
 	}
 
 	private void initTickFillVB() {

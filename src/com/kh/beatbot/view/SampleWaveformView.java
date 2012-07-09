@@ -15,11 +15,13 @@ import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class SampleWaveformView extends SurfaceViewBase {
 
-	private final float[][] ADSR_COLORS = new float[][] {{0, 1, 0, .7f},
-													    {1, .5f, .5f, .7f}, 
-													    {0, 0, 1, .7f},
-													    {1, 0, 1, .7f}};
-	private final float[] LOOP_HIGHLIGHT_COLOR = new float[] {1, .64706f, 0, .4f};
+	private final float[][] ADSR_COLORS = {{0, 1, 0, .7f},
+										   {1, .5f, .5f, .7f}, 
+										   {0, 0, 1, .7f},
+										   {1, 0, 1, .7f}};
+	private final float[] LOOP_HIGHLIGHT_COLOR = {1, .64706f, 0, .4f};
+	private final float[] LOOP_MARKER_COLOR = {1, 1, 1, 1};
+	
 	private FloatBuffer waveformVB = null;
 	private FloatBuffer loopMarkerVB = null;
 	private FloatBuffer adsrPointVB = null;
@@ -162,10 +164,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private void drawLoopMarkers() {
 		if (loopMarkerVB == null)
 			return;
-		gl.glColor4f(1, 1, 1, 1); // white for now
-		gl.glLineWidth(10); // width of 10 for now
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerVB);
-		gl.glDrawArrays(GL10.GL_LINES, 0, loopMarkerVB.capacity() / 2);
+		drawLines(loopMarkerVB, LOOP_MARKER_COLOR, 10, GL10.GL_LINES);
 		drawTriangleFan(loopMarkerVB, LOOP_HIGHLIGHT_COLOR);
 	}
 	
@@ -175,12 +174,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glPointSize(10);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, adsrPointVB);
 		gl.glDrawArrays(GL10.GL_POINTS, 0, 5);
-		gl.glLineWidth(3);
 		for (int i = 0; i < adsrCurveVB.length; i++) {
-			gl.glColor4f(ADSR_COLORS[i][0], ADSR_COLORS[i][1], ADSR_COLORS[i][2],
-						 ADSR_COLORS[i][3]);
-			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, adsrCurveVB[i]);
-			gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, adsrCurveVB[i].capacity() / 2);
+			drawLines(adsrCurveVB[i], ADSR_COLORS[i], 3, GL10.GL_LINE_STRIP);
 		}
 	}
 

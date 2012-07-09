@@ -17,7 +17,7 @@ public class TronSeekbar extends SurfaceViewBase {
 	
 	private float level = .5f;
 	private float[] levelColor = MidiViewBean.VOLUME_COLOR;
-	private float[] bgColor = new float[] {.3f, .3f, .3f };
+	private float[] bgColor = new float[] {.3f, .3f, .3f , 1};
 	private FloatBuffer bgBarVb = null;
 	private FloatBuffer levelBarVb = null;
 
@@ -50,10 +50,7 @@ public class TronSeekbar extends SurfaceViewBase {
 	}
 		
 	private void drawBar(FloatBuffer vb, float[] color) {
-		gl.glColor4f(color[0], color[1], color[2], 1);		
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
-		gl.glLineWidth(height/2);
-		gl.glDrawArrays(GL10.GL_LINES, 0, 2);
+		drawLines(vb, color, height/2, GL10.GL_LINES);
 		gl.glPointSize(height/4.5f);
 		gl.glDrawArrays(GL10.GL_POINTS, 0, 2);
 		if (vb.equals(levelBarVb)) {

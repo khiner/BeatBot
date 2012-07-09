@@ -11,6 +11,12 @@ public class MidiViewBean {
 	// time (in millis) between taps before handling as a double-tap
 	public final static long DOUBLE_TAP_TIME = 300;
 
+	// RGB color to draw main midi grid lines
+	public final static float[] GRID_LINE_COLOR = {0, 0, 0, 1};
+		
+	// RGB color to draw waveform lines in midi view
+	public final static float[] WAVEFORM_COLOR = {0, 0, 0, 1};
+	
 	// RGB color for non-selected notes
 	public final static float[] NOTE_COLOR = {1, 0, 0, 1};	
 	// RGB color for selected notes
@@ -20,10 +26,10 @@ public class MidiViewBean {
 	public final static float[] VOLUME_COLOR = {.412f, .788f, 1, .8f};
 	
 	// RGB color for pan bars	
-	public final static float[] PAN_COLOR = {1, .788f, .392f};
+	public final static float[] PAN_COLOR = {1, .788f, .392f, 1};
 	
 	// RGB color for pitch bars
-	public final static float[] PITCH_COLOR = {.443f, 1, .533f};
+	public final static float[] PITCH_COLOR = {.443f, 1, .533f, 1};
 
 	// RGB color for selected bars
 	public final static float[] LEVEL_SELECTED_COLOR = {.9f, 0, .1f};	

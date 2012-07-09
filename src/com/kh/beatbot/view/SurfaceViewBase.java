@@ -54,8 +54,17 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 											 y2, x2, y2 });		
 	}
 	
+	public static FloatBuffer makeRectOutlineFloatBuffer(float x1, float y1, float x2, float y2) {
+		return makeFloatBuffer(new float[] { x1, y1, x1, y2, x2,
+											 y2, x2, y1 });
+	}
+		
 	public static void drawRectangle(float x1, float y1, float x2, float y2, float[] color) {
 		drawTriangleStrip(makeRectFloatBuffer(x1, y1, x2, y2), color);
+	}
+
+	public static void drawRectangleOutline(float x1, float y1, float x2, float y2, float[] color, float width) {
+		drawLines(makeRectOutlineFloatBuffer(x1, y1, x2, y2), color, width, GL10.GL_LINE_LOOP);
 	}
 	
 	public static void drawTriangleStrip(FloatBuffer vb, float[] color) {
@@ -64,6 +73,13 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, vb.capacity() / 2);		
 	}
 
+	public static void drawLines(FloatBuffer vb, float[] color, float width, int type) {
+		gl.glColor4f(color[0], color[1], color[2], color[3]);
+		gl.glLineWidth(width);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
+		gl.glDrawArrays(type, 0, vb.capacity() / 2);
+	}
+	
 	public static void drawTriangleFan(FloatBuffer vb, float[] color) {
 		gl.glColor4f(color[0], color[1], color[2], color[3]);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);

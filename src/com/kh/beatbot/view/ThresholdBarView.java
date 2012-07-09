@@ -12,7 +12,9 @@ import android.view.SurfaceHolder;
 
 public class ThresholdBarView extends SurfaceViewBase {
 
-	private final float[] LINE_COLOR = new float[] {.9f, .9f, .9f, .65f};
+	private final float[] LINE_COLOR = {.9f, .9f, .9f, .65f};
+	private final float[] LINE_OUTLINE_COLOR = {1, 1, 1, 1};
+	
 	private final int numBars = 75; 
 	private final float thumbWidth = 15;
 	
@@ -96,13 +98,10 @@ public class ThresholdBarView extends SurfaceViewBase {
 	private void drawChannels() {
 		gl.glLineWidth(barWidth * .75f);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, channelBuffer);
-
 		gl.glPushMatrix();
-		
-		// draw channel lines		
+		// draw channel lines
 		gl.glTranslatef(0, 5, 0);
-		drawChannel(channelLevel);
-		
+		drawChannel(channelLevel);		
 		gl.glPopMatrix();
 	}
 
@@ -112,15 +111,12 @@ public class ThresholdBarView extends SurfaceViewBase {
 		float y1 = 0;
 		float y2 = height;
 		thresholdBarBuffer = makeRectFloatBuffer(x1, y1, x2, y2);
-		thresholdLineBuffer = makeFloatBuffer(new float[] { x1, y1, x1, y2, x2, y2, x2, y1});
+		thresholdLineBuffer = makeRectOutlineFloatBuffer(x1, y1, x2, y2);
 	}
 
 	private void drawThresholdBar() {
 		drawTriangleStrip(thresholdBarBuffer, LINE_COLOR);
-		gl.glColor4f(1, 1, 1, .9f);
-		gl.glLineWidth(4);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, thresholdLineBuffer);
-		gl.glDrawArrays(GL10.GL_LINE_LOOP, 0, thresholdLineBuffer.capacity()/2);
+		drawLines(thresholdLineBuffer, LINE_OUTLINE_COLOR, 4, GL10.GL_LINE_LOOP);
 	}
 
 	@Override
