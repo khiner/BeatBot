@@ -287,7 +287,7 @@ public class BeatBotActivity extends Activity {
 				item.setIcon(R.drawable.btn_check_buttonless_off);
 			return true;
 		case R.id.quantize_current:
-			midiManager.quantize(midiView.getCurrentBeatDivision());
+			midiManager.quantize(GlobalVars.currBeatDivision);
 			return true;
 		case R.id.quantize_quarter:
 			midiManager.quantize(1);

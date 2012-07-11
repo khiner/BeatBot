@@ -16,6 +16,8 @@ public class GlobalVars {
 	
 	public static boolean[] decimateOn, delayOn, filterOn, reverbOn;
 	
+	public static float currBeatDivision;
+	
 	public static MidiManager getMidiManager() {
 		return midiManager;
 	}

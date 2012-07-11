@@ -1,5 +1,6 @@
 package com.kh.beatbot.view.helper;
 
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class TickWindowHelper {
@@ -86,6 +87,7 @@ public class TickWindowHelper {
 		else if ((minLinesDisplayed * spacing) / granularity > viewBean.getWidth()
 				&& granularity < 4)
 			granularity *= 2;
+		GlobalVars.currBeatDivision = granularity * 2;
 	}
 
 	public long getTickOffset() {
