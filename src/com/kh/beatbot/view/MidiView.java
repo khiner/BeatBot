@@ -883,8 +883,8 @@ public class MidiView extends SurfaceViewBase {
 					// did not select a note. start pinching all selected notes.
 					MidiNote touchedNote = touchedNotes.values().iterator()
 							.next();
-					int leftId = e.getX(0) <= e.getX(1) ? 0 : 1;
-					int rightId = leftId + 1 % 2;
+					int leftId = e.getX(e.findPointerIndex(0)) <= e.getX(e.findPointerIndex(1)) ? 0 : 1;
+					int rightId = (leftId + 1) % 2;
 					bean.setPinchLeftPointerId(leftId);
 					bean.setPinchRightPointerId(rightId);
 					bean.setPinchLeftOffset(leftTick - touchedNote.getOnTick());
@@ -920,8 +920,8 @@ public class MidiView extends SurfaceViewBase {
 			return;
 		}
 		if (bean.isPinch()) {
-			long leftTick = xToTick(e.getX(bean.getPinchLeftPointerId()));
-			long rightTick = xToTick(e.getX(bean.getPinchRightPointerId()));
+			long leftTick = xToTick(e.getX(e.findPointerIndex(bean.getPinchLeftPointerId())));
+			long rightTick = xToTick(e.getX(e.findPointerIndex(bean.getPinchRightPointerId())));
 			pinchSelectedNotes(leftTick, rightTick);
 		} else if (!touchedNotes.isEmpty()) { // at least one midi selected
 			if (e.getPointerCount() == 1) {
