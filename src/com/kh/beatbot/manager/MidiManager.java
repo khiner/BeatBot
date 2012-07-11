@@ -98,6 +98,15 @@ public class MidiManager implements Parcelable {
 		return midiNotes;
 	}
 
+	public List<MidiNote> getSelectedNotes() {
+		ArrayList<MidiNote> selectedNotes = new ArrayList<MidiNote>();
+		for (MidiNote midiNote : midiNotes) {
+			if (midiNote.isSelected())
+				selectedNotes.add(midiNote);
+		}
+		return selectedNotes;
+	}
+	
 	public MidiNote getMidiNote(int i) {
 		// if there is a temporary (clipped or deleted) version of the note,
 		// return that version instead
@@ -218,12 +227,16 @@ public class MidiManager implements Parcelable {
 	public void setNoteTicks(MidiNote midiNote, long onTick, long offTick, boolean snapToGrid) {
 		if (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)
 			return;
+		if (offTick <= onTick)
+			offTick = onTick + 4;
 		if (snapToGrid) {
 			onTick = getNearestMajorTick(onTick, GlobalVars.currBeatDivision);
 			offTick = getNearestMajorTick(offTick, GlobalVars.currBeatDivision);
 		}
+		// move native note ticks
 		moveMidiNoteTicks(midiNote.getNoteValue(), midiNote.getOnTick(),
 				onTick, midiNote.getOffTick(), offTick);
+		// move Java note ticks
 		midiNote.setOnTick(onTick);
 		midiNote.setOffTick(offTick);
 	}

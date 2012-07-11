@@ -2,7 +2,9 @@ package com.kh.beatbot.view;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -10,7 +12,6 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
@@ -548,9 +549,8 @@ public class MidiView extends SurfaceViewBase {
 		if (tickDiff == 0)
 			return 0;
 		long adjustedTickDiff = tickDiff;
-		for (MidiNote selectedNote : midiManager.getMidiNotes()) {
-			if (!selectedNote.isSelected() || singleNote != null
-					&& !selectedNote.equals(singleNote))
+		for (MidiNote selectedNote : midiManager.getSelectedNotes()) {
+			if (singleNote != null && !selectedNote.equals(singleNote))
 				continue;
 			if (Math.abs(startOnTicks.get(pointerId) - selectedNote.getOnTick())
 					+ Math.abs(tickDiff) <= 10) {
@@ -574,19 +574,16 @@ public class MidiView extends SurfaceViewBase {
 		if (noteDiff == 0)
 			return 0;
 		int adjustedNoteDiff = noteDiff;
-		for (MidiNote selectedNote : midiManager.getMidiNotes()) {
-			if (!selectedNote.isSelected())
-				continue;
-			if (selectedNote.getNoteValue() + noteDiff < 0) {
-				if (selectedNote.getNoteValue() > adjustedNoteDiff)
-					adjustedNoteDiff = -selectedNote.getNoteValue();
-			} else if (selectedNote.getNoteValue() + noteDiff > midiManager
-					.getNumSamples() - 1) {
-				if (midiManager.getNumSamples() - 1
-						- selectedNote.getNoteValue() < adjustedNoteDiff)
-					adjustedNoteDiff = midiManager.getNumSamples() - 1
-							- selectedNote.getNoteValue();
-			}
+		for (MidiNote selectedNote : midiManager.getSelectedNotes()) {
+			if (selectedNote.getNoteValue() + noteDiff < 0
+					&& selectedNote.getNoteValue() > adjustedNoteDiff)
+				adjustedNoteDiff = -selectedNote.getNoteValue();
+			else if (selectedNote.getNoteValue() + noteDiff > midiManager
+					.getNumSamples() - 1
+					&& midiManager.getNumSamples() - 1
+							- selectedNote.getNoteValue() < adjustedNoteDiff)
+				adjustedNoteDiff = midiManager.getNumSamples() - 1
+						- selectedNote.getNoteValue();
 		}
 		return adjustedNoteDiff;
 	}
@@ -675,9 +672,7 @@ public class MidiView extends SurfaceViewBase {
 
 	public void handleMidiCollisions() {
 		midiManager.clearTempNotes();
-		for (MidiNote selected : midiManager.getMidiNotes()) {
-			if (!selected.isSelected())
-				continue;
+		for (MidiNote selected : midiManager.getSelectedNotes()) {
 			for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
 				MidiNote note = midiManager.getMidiNote(i);
 				if (note == null || selected.equals(note)
@@ -733,22 +728,7 @@ public class MidiView extends SurfaceViewBase {
 		}
 	}
 
-	private void dragSingleNote(int pointerId, long currTick, int currNote) {
-		MidiNote touchedNote = touchedNotes.get(pointerId);
-		if (touchedNote == null)
-			return;
-		long tickDiff = currTick - bean.getDragOffsetTick(pointerId)
-				- touchedNote.getOnTick();
-		tickDiff = getAdjustedTickDiff(tickDiff, pointerId, touchedNote);
-		midiManager.setNoteTicks(touchedNote, touchedNote.getOnTick()
-				+ tickDiff, touchedNote.getOffTick() + tickDiff,
-				bean.isSnapToGrid());
-		midiManager.setNoteValue(touchedNote, currNote);
-		if (tickDiff > 0)
-			bean.setStateChanged(true);
-	}
-
-	private void dragSelectedNotes(int pointerId, long currTick, int currNote) {
+	private void dragNotes(boolean dragAllSelected, int pointerId, long currTick, int currNote) {
 		MidiNote touchedNote = touchedNotes.get(pointerId);
 		if (touchedNote == null)
 			return;
@@ -757,10 +737,10 @@ public class MidiView extends SurfaceViewBase {
 				- touchedNote.getOnTick();
 		tickDiff = getAdjustedTickDiff(tickDiff, pointerId, null);
 		noteDiff = getAdjustedNoteDiff(noteDiff);
+		List<MidiNote> notesToDrag = dragAllSelected ?
+				midiManager.getSelectedNotes() : Arrays.asList(touchedNote);
 		// dragging one note - drag all selected notes together
-		for (MidiNote midiNote : midiManager.getMidiNotes()) {
-			if (!midiNote.isSelected())
-				continue;
+		for (MidiNote midiNote : notesToDrag) {
 			midiManager.setNoteTicks(midiNote, midiNote.getOnTick() + tickDiff,
 					midiNote.getOffTick() + tickDiff, bean.isSnapToGrid());
 			midiManager.setNoteValue(midiNote, midiNote.getNoteValue()
@@ -776,10 +756,8 @@ public class MidiView extends SurfaceViewBase {
 				- bean.getPinchLeftOffset();
 		long offTickDiff = currRightTick - touchedNote.getOffTick()
 				+ bean.getPinchRightOffset();
-		for (MidiNote midiNote : midiManager.getMidiNotes()) {
-			if (midiNote.isSelected()) {
-				pinchNote(midiNote, onTickDiff, offTickDiff);
-			}
+		for (MidiNote midiNote : midiManager.getSelectedNotes()) {
+			pinchNote(midiNote, onTickDiff, offTickDiff);
 		}
 	}
 
@@ -881,7 +859,11 @@ public class MidiView extends SurfaceViewBase {
 			if (noteAlreadySelected && touchedNotes.get(id) == null) {
 				// note is selected with one pointer, but this pointer did not
 				// select a note. start pinching all selected notes.
-				MidiNote touchedNote = touchedNotes.get(++id % 2);
+				MidiNote touchedNote = touchedNotes.values().iterator().next();
+				int leftId = e.getX(0) <= e.getX(1) ? 0 : 1;
+				int rightId = leftId + 1 % 2;
+				bean.setPinchLeftPointerId(leftId);
+				bean.setPinchRightPointerId(rightId);
 				bean.setPinchLeftOffset(leftTick - touchedNote.getOnTick());
 				bean.setPinchRightOffset(touchedNote.getOffTick() - rightTick);
 				bean.setPinch(true);
@@ -909,16 +891,16 @@ public class MidiView extends SurfaceViewBase {
 			return;
 		}
 		if (bean.isPinch()) {
-			long leftTick = xToTick(Math.min(e.getX(0), e.getX(1)));
-			long rightTick = xToTick(Math.max(e.getX(0), e.getX(1)));
+			long leftTick = xToTick(e.getX(bean.getPinchLeftPointerId()));
+			long rightTick = xToTick(e.getX(bean.getPinchRightPointerId()));
 			pinchSelectedNotes(leftTick, rightTick);
 		} else if (!touchedNotes.isEmpty()) { // at least one midi selected
 			if (e.getPointerCount() == 1) {
-				dragSelectedNotes(e.getPointerId(0), xToTick(e.getX(0)),
+				dragNotes(true, e.getPointerId(0), xToTick(e.getX(0)),
 						yToNote(e.getY(0)));
 			} else {
 				for (int i = 0; i < e.getPointerCount(); i++) {
-					dragSingleNote(e.getPointerId(i), xToTick(e.getX(i)),
+					dragNotes(false, e.getPointerId(i), xToTick(e.getX(i)),
 							yToNote(e.getY(i)));
 				}
 			}

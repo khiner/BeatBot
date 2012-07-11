@@ -50,9 +50,10 @@ public class MidiViewBean {
 
 	private long dragOffsetTick[] = new long[5];
 
+	private int pinchLeftPointerId = -1;
+	private int pinchRightPointerId = -1;
 	private long pinchLeftOffset = 0;
 	private long pinchRightOffset = 0;
-
 	private long zoomLeftAnchorTick = 0;
 	private long zoomRightAnchorTick = 0;
 
@@ -164,6 +165,22 @@ public class MidiViewBean {
 		dragOffsetTick[i] = dragOffset;
 	}
 
+	public int getPinchLeftPointerId() {
+		return pinchLeftPointerId;
+	}
+
+	public void setPinchLeftPointerId(int pinchLeftPointerId) {
+		this.pinchLeftPointerId = pinchLeftPointerId;
+	}
+
+	public int getPinchRightPointerId() {
+		return pinchRightPointerId;
+	}
+
+	public void setPinchRightPointerId(int pinchRightPointerId) {
+		this.pinchRightPointerId = pinchRightPointerId;
+	}
+	
 	public long getPinchLeftOffset() {
 		return pinchLeftOffset;
 	}
