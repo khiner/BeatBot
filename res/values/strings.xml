@@ -9,6 +9,7 @@
 	<string name="play">Play</string>
 	<string name="stop">Stop</string>	
 	<string name="undo">Undo</string>
+	<string name="delete">Delete</string>
 	<string name="levels">Levels</string>
 	<string name="bpm_tap">BPM Tap</string>
 	<string name="snap">Snap to Grid</string>

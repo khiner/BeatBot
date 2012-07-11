@@ -13,6 +13,7 @@ import java.util.Stack;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.kh.beatbot.BeatBotActivity;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
@@ -27,6 +28,8 @@ public class MidiManager implements Parcelable {
 
 	private static MidiManager singletonInstance = null;
 
+	private BeatBotActivity activity = null;
+	
 	private TimeSignature ts = new TimeSignature();
 	private Tempo tempo = new Tempo();
 	private MidiTrack tempoTrack = new MidiTrack();
@@ -80,6 +83,11 @@ public class MidiManager implements Parcelable {
 		this.recordManager = recordManager;
 	}
 
+	public void setActivity(BeatBotActivity activity) {
+		this.activity = activity;
+		activity.setDeleteIconEnabled(false);
+	}
+	
 	public float getBPM() {
 		return tempo.getBpm();
 	}
@@ -118,6 +126,7 @@ public class MidiManager implements Parcelable {
 		for (MidiNote midiNote : midiNotes) {
 			midiNote.setSelected(false);
 		}
+		activity.setDeleteIconEnabled(false);
 	}
 
 	// return true if any Midi note is selected
@@ -129,6 +138,17 @@ public class MidiManager implements Parcelable {
 		return false;
 	}
 
+	public void selectNote(MidiNote midiNote) {
+		midiNote.setSelected(true);
+		activity.setDeleteIconEnabled(true);
+	}
+	
+	public void deselectNote(MidiNote midiNote) {
+		midiNote.setSelected(false);
+		if (!anyNoteSelected())
+			activity.setDeleteIconEnabled(false);
+	}
+	
 	public void selectRegion(long leftTick, long rightTick, int topNote,
 			int bottomNote) {
 		for (MidiNote midiNote : midiNotes) {
@@ -144,6 +164,7 @@ public class MidiManager implements Parcelable {
 			else
 				midiNote.setSelected(false);
 		}
+		activity.setDeleteIconEnabled(anyNoteSelected());
 	}
 
 	public void selectRow(int rowNum) {
@@ -156,6 +177,7 @@ public class MidiManager implements Parcelable {
 				midiNote.setLevelViewSelected(false);
 			}
 		}
+		activity.setDeleteIconEnabled(anyNoteSelected());
 	}
 
 	public void mergeTempNotes() {
@@ -165,7 +187,7 @@ public class MidiManager implements Parcelable {
 				if (temp != null) {
 					midiNotes.set(k, tempNotes.get(k));
 				} else {
-					removeNote(midiNotes.get(k));
+					deleteNote(midiNotes.get(k));
 				}
 			}
 		}
@@ -196,13 +218,22 @@ public class MidiManager implements Parcelable {
 		tempNotes.put(index, midiNote);
 	}
 
-	public void removeNote(MidiNote midiNote) {
+	public void deleteNote(MidiNote midiNote) {
 		if (midiNotes.contains(midiNote)) {
 			midiNotes.remove(midiNote);
 			removeMidiNote(midiNote.getNoteValue(), midiNote.getOnTick());
 		}
 	}
 
+	public void deleteSelectedNotes() {
+		if (anyNoteSelected())
+			saveState();
+		for (MidiNote selected : getSelectedNotes()) {
+			deleteNote(selected);
+		}
+		activity.setDeleteIconEnabled(false);
+	}
+	
 	public void clearNotes() {
 		for (MidiNote midiNote : midiNotes) {
 			removeMidiNote(midiNote.getNoteValue(), midiNote.getOnTick());
@@ -321,6 +352,7 @@ public class MidiManager implements Parcelable {
 			addNote(midiNote);
 		}
 		currState = copyMidiList(midiNotes);
+		activity.setDeleteIconEnabled(anyNoteSelected());
 	}
 
 	private List<MidiNote> copyMidiList(List<MidiNote> midiList) {
@@ -443,38 +475,23 @@ public class MidiManager implements Parcelable {
 	}
 
 	public native void setNativeMSPT(long MSPT);
-
 	public native void setNativeBPM(float BPM);
-
 	public native void reset();
-
 	public native void setCurrTick(long currTick);
-
 	public native long getCurrTick();
-
 	public native long getLoopBeginTick();
-
 	public native void setLoopBeginTick(long loopBeginTick);
-
 	public native long getLoopEndTick();
-
 	public native void setLoopEndTick(long loopEndTick);
-
 	public native void startTicking();
-
 	public native void addMidiNote(int track, long onTick, long offTick,
 			float volume, float pan, float pitch);
-
 	public native void removeMidiNote(int track, long tick);
-
 	// change ticks
 	public native void moveMidiNoteTicks(int track, long prevOnTick,
 			long newOnTick, long prevOffTick, long newOffTick);
-
 	// change track num
 	public native void moveMidiNote(int track, long tick, int newTrack);
-
 	public native void setNoteMute(int track, long tick, boolean muted);
-
 	public native void clearMutedNotes();
 }

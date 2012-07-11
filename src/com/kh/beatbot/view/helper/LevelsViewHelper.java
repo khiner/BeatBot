@@ -369,7 +369,7 @@ public class LevelsViewHelper {
 		tappedLevelNote.setLevelSelected(false);
 		tappedLevelNote.setLevelViewSelected(false);
 		tappedLevelNote.setSelected(false);
-		midiManager.removeNote(tappedLevelNote);
+		midiManager.deleteNote(tappedLevelNote);
 		updateSelectedLevelNotes();
 		bean.setStateChanged(true);
 	}

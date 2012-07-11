@@ -49,7 +49,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/controlLayout"
-            android:layout_toLeftOf="@+id/levelsButton"
+            android:layout_toLeftOf="@+id/levels"
             android:layout_toRightOf="@+id/recordButton"
             android:orientation="horizontal"
             android:visibility="gone" >
@@ -86,8 +86,18 @@
                 android:textOn="" />
         </RelativeLayout>
 
+        <ImageButton
+            android:id="@+id/delete"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_toLeftOf="@+id/levels"
+            android:background="@drawable/delete_btn_src"
+            android:onClick="delete"
+            android:state_enabled="false"
+            android:contentDescription="@string/delete" />
+        
         <ToggleButton
-            android:id="@+id/levelsButton"
+            android:id="@+id/levels"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_toLeftOf="@+id/undo"

@@ -212,6 +212,7 @@ public class BeatBotActivity extends Activity {
 			midiManager = savedInstanceState.getParcelable("midiManager");
 
 		midiManager.setPlaybackManager(playbackManager);
+		midiManager.setActivity(this);
 		recordManager.setMidiManager(midiManager);
 		recordManager
 				.setAudioClassificationManager(new AudioClassificationManager());
@@ -315,6 +316,10 @@ public class BeatBotActivity extends Activity {
 		return true;
 	}
 
+	public void setDeleteIconEnabled(boolean enabled) {
+		((ImageButton)findViewById(R.id.delete)).setEnabled(enabled);
+	}
+	
 	// DON'T USE YET! this needs to run on the UI thread somehow.
 	public void activateIcon(int trackNum) {
 		((ImageView) sampleListView.getChildAt(trackNum)).setImageState(
@@ -378,6 +383,10 @@ public class BeatBotActivity extends Activity {
 		}
 	}
 
+	public void delete(View view) {
+		midiManager.deleteSelectedNotes();
+	}
+	
 	public void volume(View view) {
 		volume.setChecked(true);
 		pan.setChecked(false);

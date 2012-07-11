@@ -177,7 +177,7 @@ public class MidiView extends SurfaceViewBase {
 					if (!midiNote.isSelected()) {
 						if (touchedNotes.isEmpty())
 							midiManager.deselectAllNotes();
-						midiNote.setSelected(true);
+						midiManager.selectNote(midiNote);
 					}
 					touchedNotes.put(pointerId, midiNote);
 				}
@@ -619,7 +619,7 @@ public class MidiView extends SurfaceViewBase {
 				// single tapping a note always makes it the only selected note
 				if (touchedNote.isSelected())
 					midiManager.deselectAllNotes();
-				touchedNote.setSelected(true);
+				midiManager.selectNote(touchedNote);
 			} else {
 				int note = yToNote(y);
 				long tick = xToTick(x);
@@ -652,8 +652,7 @@ public class MidiView extends SurfaceViewBase {
 			return;
 		}
 		if (touchedNote != null) {
-			touchedNote.setSelected(false);
-			midiManager.removeNote(touchedNote);
+			midiManager.deleteNote(touchedNote);
 			bean.setStateChanged(true);
 		}
 		// reset tap time so that a third tap doesn't register as
@@ -674,10 +673,10 @@ public class MidiView extends SurfaceViewBase {
 	public void addMidiNote(long onTick, long offTick, int note) {
 		MidiNote noteToAdd = midiManager.addNote(onTick, offTick, note, .75f,
 				.5f, .5f);
-		noteToAdd.setSelected(true);
+		midiManager.selectNote(noteToAdd);
 		handleMidiCollisions();
 		midiManager.mergeTempNotes();
-		noteToAdd.setSelected(false);
+		midiManager.deselectNote(noteToAdd);
 	}
 
 	public void handleMidiCollisions() {
