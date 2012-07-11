@@ -249,18 +249,18 @@ public class MidiManager implements Parcelable {
 		return (long) (RESOLUTION / beatDivision);
 	}
 
-	public long getLeftMostTick() {
+	public long getLeftMostSelectedTick() {
 		long leftMostTick = Long.MAX_VALUE;
-		for (MidiNote midiNote : midiNotes) {
+		for (MidiNote midiNote : getSelectedNotes()) {
 			if (midiNote.getOnTick() < leftMostTick)
 				leftMostTick = midiNote.getOnTick();
 		}
 		return leftMostTick;
 	}
 	
-	public long getRightMostTick() {
+	public long getRightMostSelectedTick() {
 		long rightMostTick = Long.MIN_VALUE;
-		for (MidiNote midiNote : midiNotes) {
+		for (MidiNote midiNote : getSelectedNotes()) {
 			if (midiNote.getOffTick() > rightMostTick)
 				rightMostTick = midiNote.getOffTick();
 		}

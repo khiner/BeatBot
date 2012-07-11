@@ -23,7 +23,7 @@ public class MidiViewBean {
 	public final static float[] NOTE_SELECTED_COLOR = {0, 0, 1, 1};
 	
 	// RGB color for volume bars
-	public final static float[] VOLUME_COLOR = {.412f, .788f, 1, .8f};
+	public final static float[] VOLUME_COLOR = {.412f, .788f, 1, 1};
 	
 	// RGB color for pan bars	
 	public final static float[] PAN_COLOR = {1, .788f, .392f, 1};
@@ -35,6 +35,7 @@ public class MidiViewBean {
 	public final static float[] LEVEL_SELECTED_COLOR = {.9f, 0, .1f};	
 	public final static float[] TICK_FILL_COLOR = {.3f, .3f, .3f, 1};
 	public final static float[] TICK_MARKER_COLOR = {.8f, .8f, .8f};
+	public final static float[] TICKBAR_COLOR = {.6f, .6f, .6f, 1};
 	public final static float[] TICK_SELECTED_COLOR = VOLUME_COLOR;
 		
 	private MidiView.State viewState = MidiView.State.NORMAL_VIEW;
@@ -57,6 +58,7 @@ public class MidiViewBean {
 	private long zoomLeftAnchorTick = 0;
 	private long zoomRightAnchorTick = 0;
 
+	private int scrollPointerId = -1;
 	private long scrollAnchorTick = 0;
 	private long scrollVelocity = 0;
 
@@ -79,9 +81,7 @@ public class MidiViewBean {
 	private long scrollViewStartTime = 0;
 	private long scrollViewEndTime = Long.MAX_VALUE;
 
-	private int loopBeginId = -1;
-	private int loopMiddleId = -1;
-	private int loopEndId = -1;	
+	private int[] loopPointerIds = {-1, -1, -1};
 	private float loopSelectionOffset = 0;
 
 	// set this to true after an event that can be undone (with undo btn)
@@ -217,6 +217,14 @@ public class MidiViewBean {
 		return scrollAnchorTick;
 	}
 
+	public void setScrollPointerId(int scrollPointerId) {
+		this.scrollPointerId = scrollPointerId;
+	}
+	
+	public int getScrollPointerId() {
+		return scrollPointerId;
+	}
+	
 	public void setScrollAnchorTick(long scrollAnchorTick) {
 		this.scrollAnchorTick = scrollAnchorTick;
 	}
@@ -325,30 +333,24 @@ public class MidiViewBean {
 		this.scrollViewEndTime = scrollViewEndTime;
 	}
 
-	public int getLoopBeginId() {
-		return loopBeginId;
+	public int[] getLoopPointerIds() {
+		return loopPointerIds;
 	}
 	
-	public void setLoopBeginId(int loopBeginId) {
-		this.loopBeginId = loopBeginId;
-	}
-
-	public int getLoopMiddleId() {
-		return loopMiddleId;
+	public void setLoopPointerId(int num, int id) {
+		if ((id != -1 && loopPointerIds[1] != -1 || num == 1 && (loopPointerIds[0] != -1 || loopPointerIds[2] != -1)))
+			return; // can't select middle and left or right at the same time
+		loopPointerIds[num] = id;
 	}
 	
-	public void setLoopMiddleId(int loopMiddleId) {
-		this.loopMiddleId = loopMiddleId;
+	public int getNumLoopMarkersSelected() {
+		int numSelected = 0;
+		for (int i = 0; i < 3; i++)
+			if (loopPointerIds[i] != -1)
+				numSelected++;
+		return numSelected;
 	}
 	
-	public int getLoopEndId() {
-		return loopEndId;
-	}
-	
-	public void setLoopEndId(int loopEndId) {
-		this.loopEndId = loopEndId;
-	}
-
 	public float getLoopSelectionOffset() {
 		return loopSelectionOffset;
 	}

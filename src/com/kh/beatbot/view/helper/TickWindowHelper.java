@@ -149,10 +149,10 @@ public class TickWindowHelper {
 		} else if (rightTick > tickOffset + numTicks && leftTick > tickOffset) {
 			setTickOffset(rightTick - numTicks);
 
-			// if both left and right are out of view, us
+			// if both left and right are out of view,
 		} else if (leftTick <= tickOffset && rightTick >= tickOffset + numTicks) {
-			// setTickOffset(leftTick);
-			// setNumTicks(rightTick - leftTick);
+			setTickOffset(leftTick);
+			setNumTicks(rightTick - leftTick);
 		}
 	}
 }
