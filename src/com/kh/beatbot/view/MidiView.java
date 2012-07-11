@@ -924,7 +924,7 @@ public class MidiView extends SurfaceViewBase {
 			long rightTick = xToTick(e.getX(e.findPointerIndex(bean.getPinchRightPointerId())));
 			pinchSelectedNotes(leftTick, rightTick);
 		} else if (!touchedNotes.isEmpty()) { // at least one midi selected
-			if (e.getPointerCount() == 1) {
+			if (e.getPointerCount() - bean.getNumLoopMarkersSelected() == 1) {
 				// drag all selected notes together
 				dragNotes(true, e.getPointerId(0), xToTick(e.getX(0)),
 						yToNote(e.getY(0)));
