@@ -89,7 +89,7 @@ public class MidiViewBean {
 
 	// this option can be set via a menu item.
 	// if true, all midi note movements are rounded to the nearest major tick
-	private boolean snapToGrid = false;
+	private boolean snapToGrid = true;
 
 	private int animateCount = 0;
 

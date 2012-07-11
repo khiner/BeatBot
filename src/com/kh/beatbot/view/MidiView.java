@@ -12,7 +12,6 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 

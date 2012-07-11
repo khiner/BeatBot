@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/snap"
-        android:icon="@drawable/btn_check_buttonless_off"
+        android:icon="@drawable/btn_check_buttonless_on"
         android:title="@string/snap"/>
     <item
         android:id="@+id/quantize"
