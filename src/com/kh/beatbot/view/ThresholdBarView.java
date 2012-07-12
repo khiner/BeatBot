@@ -44,20 +44,24 @@ public class ThresholdBarView extends SurfaceViewBase {
 	public void setThreshold(float threshold) {
 		this.threshold = clipToUnit(threshold);
 		shortThreshold = dbToShort((this.threshold - 1)*60);
+		initThresholdBar();
 	}
 
 	public void setChannelLevel(float channelDb) {
 		// map channel DB to range (0, 1)
-		channelLevel = dbToUnit(channelDb);
-		// Log.d("channel level", String.valueOf(channelLevels[0]));
+		float newChannelLevel = dbToUnit(channelDb);
+		// only see channel level changing if the 'spike' is
+		// greater than the current perceived level
+		channelLevel = Math.max(channelLevel, newChannelLevel);
 	}
 
+	private void dampChannelLevel() {
+		// dampen level to emulate physical level meter
+		channelLevel *= .95f;
+		channelLevel = channelLevel < 0 ? 0 : channelLevel;
+	}
+	
 	private void initChannelBuffers() {
-		// only 1/3 of the lines are initialized, so they can be
-		// drawn all together as one
-		// color. to draw more lines with a different color, simply translate to
-		// the right and change the color
-		// (numBars/3 lines per channel) X (4 coordinates per line)
 		float[] channelCoords = new float[(numBars*4)];
 		int y1 = 0;
 		int y2 = 3*height / 4;
@@ -67,7 +71,6 @@ public class ThresholdBarView extends SurfaceViewBase {
 			channelCoords[i * 4 + 2] = x;
 			channelCoords[i * 4 + 3] = y2;
 		}
-		// the float buffer for OpenGL to draw the bar coordinates
 		channelBuffer = makeFloatBuffer(channelCoords);
 	}
 
@@ -133,18 +136,14 @@ public class ThresholdBarView extends SurfaceViewBase {
 	}
 	
 	private float clipToUnit(float x) {
-		if (x < 0)
-			return 0;
-		else if (x > 1)
-			return 1;
-		return x;
+		return x >= 0 ? (x <= 1 ? x : 1) : 0;
 	}
 
 	@Override
 	protected void drawFrame() {
 		drawChannels();
 		drawThresholdBar();
-		initThresholdBar();
+		dampChannelLevel();
 	}
 
 	@Override
