@@ -589,7 +589,7 @@ void Java_com_kh_beatbot_manager_MidiManager_addMidiNote(JNIEnv* env, jclass cla
   track->eventHead = addEvent(track->eventHead, event);
 }
 
-void Java_com_kh_beatbot_manager_MidiManager_removeMidiNote(JNIEnv* env, jclass clazz, jint trackNum,
+void Java_com_kh_beatbot_manager_MidiManager_deleteMidiNote(JNIEnv* env, jclass clazz, jint trackNum,
                                                             jlong tick) {
   Track *track = getTrack(trackNum);
   track->eventHead = removeEvent(track->eventHead, tick, false);

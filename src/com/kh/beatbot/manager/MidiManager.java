@@ -221,7 +221,8 @@ public class MidiManager implements Parcelable {
 	public void deleteNote(MidiNote midiNote) {
 		if (midiNotes.contains(midiNote)) {
 			midiNotes.remove(midiNote);
-			removeMidiNote(midiNote.getNoteValue(), midiNote.getOnTick());
+			deleteMidiNote(midiNote.getNoteValue(), midiNote.getOnTick());
+			activity.setDeleteIconEnabled(anyNoteSelected());
 		}
 	}
 
@@ -231,12 +232,11 @@ public class MidiManager implements Parcelable {
 		for (MidiNote selected : getSelectedNotes()) {
 			deleteNote(selected);
 		}
-		activity.setDeleteIconEnabled(false);
 	}
 	
 	public void clearNotes() {
 		for (MidiNote midiNote : midiNotes) {
-			removeMidiNote(midiNote.getNoteValue(), midiNote.getOnTick());
+			deleteMidiNote(midiNote.getNoteValue(), midiNote.getOnTick());
 		}
 		midiNotes.clear();
 	}
@@ -486,7 +486,7 @@ public class MidiManager implements Parcelable {
 	public native void startTicking();
 	public native void addMidiNote(int track, long onTick, long offTick,
 			float volume, float pan, float pitch);
-	public native void removeMidiNote(int track, long tick);
+	public native void deleteMidiNote(int track, long tick);
 	// change ticks
 	public native void moveMidiNoteTicks(int track, long prevOnTick,
 			long newOnTick, long prevOffTick, long newOffTick);

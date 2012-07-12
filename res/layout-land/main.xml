@@ -85,28 +85,28 @@
                 android:textOff=""
                 android:textOn="" />
         </RelativeLayout>
-
-        <ImageButton
-            android:id="@+id/delete"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_toLeftOf="@+id/levels"
-            android:background="@drawable/delete_btn_src"
-            android:onClick="delete"
-            android:state_enabled="false"
-            android:contentDescription="@string/delete" />
         
         <ToggleButton
             android:id="@+id/levels"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_toLeftOf="@+id/undo"
+            android:layout_toLeftOf="@+id/delete"
             android:background="@drawable/levels_btn_src"
             android:onClick="levels"
             android:textOff=""
             android:textOn=""
             android:contentDescription="@string/levels" />
 
+        <ImageButton
+            android:id="@+id/delete"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_toLeftOf="@+id/undo"
+            android:background="@drawable/delete_btn_src"
+            android:onClick="delete"
+            android:state_enabled="false"
+            android:contentDescription="@string/delete" />
+        
         <ImageButton
             android:id="@+id/undo"
             android:layout_width="40dp"

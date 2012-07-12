@@ -49,7 +49,7 @@ public class WaveformHelper extends Thread {
 					bytes = bytesQueue.remove();
 				}
 				waveformSegmentsVB.add(bytesToFloatBuffer(bytes, DEFAULT_HEIGHT, xOffset));
-				xOffset += bytes.length / DEFAULT_SPP;				
+				xOffset += bytes.length / (DEFAULT_SPP * 2);				
 				if (completed) {
 					xOffset = 0;
 					waveformSegmentsVB.clear();
