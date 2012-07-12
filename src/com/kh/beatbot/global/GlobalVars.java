@@ -4,8 +4,8 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 
 public class GlobalVars {
-	public static final int LEVEL_MAX = 127;
-	
+	public static final int UNDO_STACK_SIZE = 40;
+	public static final short LEVEL_MAX = 127;
 	private static MidiManager midiManager = null;
 	private static PlaybackManager playbackManager = null;
 	

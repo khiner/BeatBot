@@ -90,6 +90,7 @@ void initTrack(Track *track, AAsset *asset) {
   	track->scratchBuffers[1] = (float *)calloc(track->totalSamples/2, sizeof(float));
 	track->armed = false;
   	track->playing = false;
+  	track->mute = track->solo = false;
   	track->loop = false;
   	track->loopBegin = 0;
   	track->loopEnd = track->totalSamples/2;
@@ -492,29 +493,74 @@ void Java_com_kh_beatbot_manager_PlaybackManager_stopTrack(JNIEnv* env, jclass c
   track->currSample = track->loopBegin;
 }
 
+void setTrackMute(Track *track, bool mute) {
+  	if (track->outputPlayerMuteSolo == NULL) return;
+  	
+	if (mute) {
+	    (*(track->outputPlayerMuteSolo))->SetChannelMute(track->outputPlayerMuteSolo, 0, SL_BOOLEAN_TRUE);
+	    (*(track->outputPlayerMuteSolo))->SetChannelMute(track->outputPlayerMuteSolo, 1, SL_BOOLEAN_TRUE);
+    } else {
+		(*(track->outputPlayerMuteSolo))->SetChannelMute(track->outputPlayerMuteSolo, 0, SL_BOOLEAN_FALSE);
+  		(*(track->outputPlayerMuteSolo))->SetChannelMute(track->outputPlayerMuteSolo, 1, SL_BOOLEAN_FALSE);
+    }
+}
+
+int getSoloingTrackNum() {
+	int i;
+	for (i = 0; i < numTracks; i++) {
+		if (getTrack(i)->solo) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 void Java_com_kh_beatbot_manager_PlaybackManager_muteTrack(JNIEnv* env, jclass clazz, jint trackNum) {
-  Track *track = getTrack(trackNum);
-  if (track->outputPlayerMuteSolo != NULL) {
-    (*(track->outputPlayerMuteSolo))->SetChannelMute(track->outputPlayerMuteSolo, 0, SL_BOOLEAN_TRUE);
-    (*(track->outputPlayerMuteSolo))->SetChannelMute(track->outputPlayerMuteSolo, 1, SL_BOOLEAN_TRUE);	
-  }
+    Track *track = getTrack(trackNum);
+  	setTrackMute(track, true);
+    track->mute = true;
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_unmuteTrack(JNIEnv* env, jclass clazz, jint trackNum) {
-  Track *track = getTrack(trackNum);
-  (*(track->outputPlayerMuteSolo))->SetChannelMute(track->outputPlayerMuteSolo, 0, SL_BOOLEAN_FALSE);
-  (*(track->outputPlayerMuteSolo))->SetChannelMute(track->outputPlayerMuteSolo, 1, SL_BOOLEAN_FALSE);		
+ 	Track *track = getTrack(trackNum);
+ 	int soloingTrackNum = getSoloingTrackNum();
+ 	if (soloingTrackNum == -1 || soloingTrackNum == trackNum)
+  		setTrackMute(track, false);
+  	track->mute = false;
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_soloTrack(JNIEnv* env, jclass clazz, jint trackNum) {
-  Track *track = getTrack(trackNum);
-  (*(track->outputPlayerMuteSolo))->SetChannelSolo(track->outputPlayerMuteSolo, 0, SL_BOOLEAN_TRUE);
-  (*(track->outputPlayerMuteSolo))->SetChannelSolo(track->outputPlayerMuteSolo, 1, SL_BOOLEAN_TRUE);		
+	Track *track = getTrack(trackNum);
+	track->solo = true;
+	int i;
+	if (!track->mute) {
+		setTrackMute(track, false);
+	}
+  	for (i = 0; i < numTracks; i++) {
+  		if (i != trackNum) {
+  			track = getTrack(i);
+	  		setTrackMute(track, true);
+	  		track->solo = false;
+	  	}
+  	}
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_unsoloTrack(JNIEnv* env, jclass clazz, jint trackNum) {
+	int i;
+	Track *track = getTrack(trackNum);
+	track->solo = false;
+  	for (i = 0; i < numTracks; i++) {
+  		track = getTrack(i);
+		if (!track->mute) {
+			setTrackMute(track, false);
+		}
+  	}
+  	
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_toggleLooping(JNIEnv* env, jclass clazz, jint trackNum) {
-  Track *track = getTrack(trackNum);
-  track->loop = !track->loop;
+  	Track *track = getTrack(trackNum);
+  	track->loop = !track->loop;
 }
 
 jboolean Java_com_kh_beatbot_manager_PlaybackManager_isLooping(JNIEnv* env, jclass clazz, jint trackNum) {

@@ -338,8 +338,8 @@ public class MidiManager implements Parcelable {
 	public void saveState() {
 		undoStack.push(currState);
 		currState = copyMidiList(midiNotes);
-		// max undo stack of 40
-		if (undoStack.size() > 40)
+		// enforce max undo stack size
+		if (undoStack.size() > GlobalVars.UNDO_STACK_SIZE)
 			undoStack.remove(0);
 	}
 

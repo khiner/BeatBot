@@ -109,7 +109,7 @@ public class BeatBotActivity extends Activity {
 						}
 					}
 				} else
-					playbackManager.soloTrack(-1);
+					playbackManager.unsoloTrack(position);
 			}
 		}
 

@@ -45,6 +45,7 @@ public class Tempo extends MetaEvent {
 	public int getMpqn() {
 		return mMPQN;
 	}
+	
 	public float getBpm() {
 		return mBPM;
 	}

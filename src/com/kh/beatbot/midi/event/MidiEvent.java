@@ -94,16 +94,6 @@ public abstract class MidiEvent implements Comparable<MidiEvent> {
 			
 			return MetaEvent.parseMetaEvent(tick, delta, in);
 		}
-		else if(sId == 0xF0 || sId == 0xF7) {
-
-			VariableLengthInt size = new VariableLengthInt(in);
-			byte[] data = new byte[size.getValue()];
-			in.read(data);
-			return new SystemExclusiveEvent(sId, tick, delta, data);
-		}
-		else {
-			System.out.println("No Fucking Clue: " + sId);
-		}
 		
 		return null;
 	}

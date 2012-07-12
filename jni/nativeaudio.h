@@ -68,7 +68,9 @@ typedef struct Track_ {
 	bool armed;
 	bool playing;
     bool loop;
-
+	bool mute;
+	bool solo;
+	
     int loopBegin;
     int loopEnd;
 	
