@@ -187,7 +187,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 		while (samples == null)
 			; // wait until we're sure the sample bytes have been set
 		waveformVB = WaveformHelper.floatsToFloatBuffer(samples, height, 0);
-		gl.glEnable(GL10.GL_POINT_SMOOTH);
 		initLoopMarkerVB();
 		initDefaultAdsrPoints();
 		initAdsrVB();

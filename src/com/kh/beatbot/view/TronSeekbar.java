@@ -41,7 +41,6 @@ public class TronSeekbar extends SurfaceViewBase {
 	
 	@Override
 	protected void init() {
-		gl.glEnable(GL10.GL_POINT_SMOOTH);
 		initBgBar();
 		initLevelBarVB();
 		for (LevelListener levelListener : levelListeners) {

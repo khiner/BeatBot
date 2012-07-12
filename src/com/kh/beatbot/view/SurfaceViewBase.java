@@ -135,7 +135,6 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 
 	public void run() {
 		// Much of this code is from GLSurfaceView in the Google API Demos.
-		// I encourage those interested to look there for documentation.
 		EGL10 egl = (EGL10) EGLContext.getEGL();
 		EGLDisplay dpy = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
 
@@ -158,10 +157,10 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		egl.eglMakeCurrent(dpy, surface, surface, context);
 
 		gl = (GL10) context.getGL();
-		gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA);
-		gl.glEnable(gl.GL_BLEND);
+		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+		gl.glEnable(GL10.GL_BLEND);
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-
+		gl.glEnable(GL10.GL_POINT_SMOOTH);
 		init();
 
 		int delta = -1;

@@ -35,7 +35,6 @@ public class TronSeekbar2d extends SurfaceViewBase {
 	
 	@Override
 	protected void init() {
-		gl.glEnable(GL10.GL_POINT_SMOOTH);
 		for (Level2dListener listener : levelListeners) {
 			listener.notifyInit(this);
 		}

@@ -29,7 +29,7 @@ public class MidiManager implements Parcelable {
 	private static MidiManager singletonInstance = null;
 
 	private BeatBotActivity activity = null;
-	
+
 	private TimeSignature ts = new TimeSignature();
 	private Tempo tempo = new Tempo();
 	private MidiTrack tempoTrack = new MidiTrack();
@@ -87,7 +87,7 @@ public class MidiManager implements Parcelable {
 		this.activity = activity;
 		activity.setDeleteIconEnabled(false);
 	}
-	
+
 	public float getBPM() {
 		return tempo.getBpm();
 	}
@@ -114,7 +114,25 @@ public class MidiManager implements Parcelable {
 		}
 		return selectedNotes;
 	}
-	
+
+	public List<MidiNote> getLevelSelectedNotes() {
+		ArrayList<MidiNote> levelSelectedNotes = new ArrayList<MidiNote>();
+		for (MidiNote midiNote : midiNotes) {
+			if (midiNote.isLevelSelected())
+				levelSelectedNotes.add(midiNote);
+		}
+		return levelSelectedNotes;
+	}
+
+	public List<MidiNote> getLevelViewSelectedNotes() {
+		ArrayList<MidiNote> levelViewSelectedNotes = new ArrayList<MidiNote>();
+		for (MidiNote midiNote : midiNotes) {
+			if (midiNote.isLevelViewSelected())
+				levelViewSelectedNotes.add(midiNote);
+		}
+		return levelViewSelectedNotes;
+	}
+
 	public MidiNote getMidiNote(int i) {
 		// if there is a temporary (clipped or deleted) version of the note,
 		// return that version instead
@@ -142,13 +160,13 @@ public class MidiManager implements Parcelable {
 		midiNote.setSelected(true);
 		activity.setDeleteIconEnabled(true);
 	}
-	
+
 	public void deselectNote(MidiNote midiNote) {
 		midiNote.setSelected(false);
 		if (!anyNoteSelected())
 			activity.setDeleteIconEnabled(false);
 	}
-	
+
 	public void selectRegion(long leftTick, long rightTick, int topNote,
 			int bottomNote) {
 		for (MidiNote midiNote : midiNotes) {
@@ -171,9 +189,11 @@ public class MidiManager implements Parcelable {
 		for (MidiNote midiNote : midiNotes) {
 			if (midiNote.getNoteValue() == rowNum) {
 				midiNote.setSelected(true);
+				// midiNote.setLevelSelected(true);
 				midiNote.setLevelViewSelected(true);
 			} else {
 				midiNote.setSelected(false);
+				midiNote.setLevelSelected(false);
 				midiNote.setLevelViewSelected(false);
 			}
 		}
@@ -233,7 +253,7 @@ public class MidiManager implements Parcelable {
 			deleteNote(selected);
 		}
 	}
-	
+
 	public void clearNotes() {
 		for (MidiNote midiNote : midiNotes) {
 			deleteMidiNote(midiNote.getNoteValue(), midiNote.getOnTick());
@@ -255,7 +275,8 @@ public class MidiManager implements Parcelable {
 		midiNote.setNote(newNote);
 	}
 
-	public void setNoteTicks(MidiNote midiNote, long onTick, long offTick, boolean snapToGrid) {
+	public void setNoteTicks(MidiNote midiNote, long onTick, long offTick,
+			boolean snapToGrid) {
 		if (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)
 			return;
 		if (offTick <= onTick)
@@ -288,7 +309,7 @@ public class MidiManager implements Parcelable {
 		}
 		return leftMostTick;
 	}
-	
+
 	public long getRightMostSelectedTick() {
 		long rightMostTick = Long.MIN_VALUE;
 		for (MidiNote midiNote : getSelectedNotes()) {
@@ -303,7 +324,8 @@ public class MidiManager implements Parcelable {
 	 * given the provided beat division
 	 */
 	public void quantize(MidiNote midiNote, float beatDivision) {
-		long diff = getNearestMajorTick(midiNote.getOnTick(), beatDivision) - midiNote.getOnTick();
+		long diff = getNearestMajorTick(midiNote.getOnTick(), beatDivision)
+				- midiNote.getOnTick();
 		setNoteTicks(midiNote, midiNote.getOnTick() + diff,
 				midiNote.getOffTick() + diff, false);
 	}
@@ -316,7 +338,7 @@ public class MidiManager implements Parcelable {
 			nearestMajorTick += ticksPerBeat;
 		return nearestMajorTick;
 	}
-	
+
 	/*
 	 * Translate all midi notes to their on-ticks' nearest major ticks given the
 	 * provided beat division
@@ -424,7 +446,6 @@ public class MidiManager implements Parcelable {
 
 	@Override
 	public int describeContents() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -475,23 +496,38 @@ public class MidiManager implements Parcelable {
 	}
 
 	public native void setNativeMSPT(long MSPT);
+
 	public native void setNativeBPM(float BPM);
+
 	public native void reset();
+
 	public native void setCurrTick(long currTick);
+
 	public native long getCurrTick();
+
 	public native long getLoopBeginTick();
+
 	public native void setLoopBeginTick(long loopBeginTick);
+
 	public native long getLoopEndTick();
+
 	public native void setLoopEndTick(long loopEndTick);
+
 	public native void startTicking();
+
 	public native void addMidiNote(int track, long onTick, long offTick,
 			float volume, float pan, float pitch);
+
 	public native void deleteMidiNote(int track, long tick);
+
 	// change ticks
 	public native void moveMidiNoteTicks(int track, long prevOnTick,
 			long newOnTick, long prevOffTick, long newOffTick);
+
 	// change track num
 	public native void moveMidiNote(int track, long tick, int newTrack);
+
 	public native void setNoteMute(int track, long tick, boolean muted);
+
 	public native void clearMutedNotes();
 }
