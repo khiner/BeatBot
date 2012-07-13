@@ -27,9 +27,8 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_toRightOf="@+id/playButton"
-            android:background="#FF000000"
             android:onClick="stop"
-            android:src="@drawable/stop_btn_src"
+            android:background="@drawable/stop_btn_src"
             android:contentDescription="@string/stop" />
 
         <ToggleButton
@@ -68,9 +67,8 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_toLeftOf="@+id/bpm_tap"
-            android:background="#FF000000"
             android:onClick="undo"
-            android:src="@drawable/undo_btn_src"
+            android:background="@drawable/undo_btn_src"
             android:contentDescription="@string/undo" />
 
         <ImageButton
@@ -78,9 +76,8 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_toLeftOf="@+id/bpm"
-            android:background="#FF000000"
             android:onClick="bpmTap"
-            android:src="@drawable/bpm_tap_btn_src"
+            android:background="@drawable/bpm_tap_btn_src"
             android:contentDescription="@string/bpm_tap" />
 
         <com.kh.beatbot.view.BpmView
@@ -110,6 +107,7 @@
             android:checked="true"
             android:onClick="volume"
             android:textOff="" android:textOn="" />
+        
         <ToggleButton
             android:id="@+id/panButton"
             android:layout_width="80dp"

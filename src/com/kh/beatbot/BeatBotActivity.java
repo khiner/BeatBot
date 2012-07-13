@@ -6,7 +6,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.PixelFormat;
 import android.media.AudioManager;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -66,7 +68,7 @@ public class BeatBotActivity extends Activity {
 			int position = (Integer) view.getTag();
 			if (view.getId() == R.id.icon) {
 				midiManager.selectRow(position);
-			}			
+			}
 			return true;
 		}
 	}
@@ -80,7 +82,7 @@ public class BeatBotActivity extends Activity {
 				int resourceId, String[] sampleTypes) {
 			super(context, resourceId, sampleTypes);
 			this.resourceId = resourceId;
-		}		
+		}
 
 		@Override
 		public void onClick(View view) {
@@ -127,27 +129,7 @@ public class BeatBotActivity extends Activity {
 			mute.setOnClickListener(this);
 			solo.setOnClickListener(this);
 			icon.setOnLongClickListener(iconLongClickListener);
-			
-			switch (position) {
-			case 0: // kick
-				icon.setImageResource(R.drawable.kick_icon_src);
-				break;
-			case 1: // snare
-				icon.setImageResource(R.drawable.snare_icon_src);
-				break;
-			case 2: // hh closed
-				icon.setImageResource(R.drawable.hh_closed_icon_src);
-				break;
-			case 3: // hh open
-				icon.setImageResource(R.drawable.hh_open_icon_src);
-				break;
-			case 4: // rimshot
-				icon.setImageResource(R.drawable.rimshot_icon_src);
-				break;
-			case 5: // bass
-				icon.setImageResource(R.drawable.bass_icon_src);
-				break;
-			}
+			icon.setBackgroundResource(drumIcons[position]);
 			return view;
 		}
 	}
@@ -167,11 +149,15 @@ public class BeatBotActivity extends Activity {
 	private MidiView midiView;
 
 	private IconLongClickListener iconLongClickListener = new IconLongClickListener();
-	
-	private final String[] sampleNames = new String[] { "kick_808.wav",
-			"snare_808.wav", "hat_closed_808.wav", "hat_open_808.wav",
-			"rimshot_808.wav", "tom_low_808.wav" };
 
+	private final String[] sampleNames = { "kick_808.wav", "snare_808.wav",
+			"hat_closed_808.wav", "hat_open_808.wav", "rimshot_808.wav",
+			"tom_low_808.wav" };
+
+	private final int[] drumIcons = { R.drawable.kick_icon_src,
+			R.drawable.snare_icon_src, R.drawable.hh_closed_icon_src,
+			R.drawable.hh_open_icon_src, R.drawable.rimshot_icon_src,
+			R.drawable.bass_icon_src, };
 	private long lastTapTime = 0;
 
 	/** Called when the activity is first created. */
@@ -220,7 +206,7 @@ public class BeatBotActivity extends Activity {
 				.setThresholdBar((ThresholdBarView) findViewById(R.id.thresholdBar));
 		midiManager.setRecordManager(recordManager);
 
-		midiView = ((MidiView) findViewById(R.id.midiView));
+		midiView = ((MidiView) findViewById(R.id.midiView));		
 		midiView.setMidiManager(midiManager);
 		midiView.setRecordManager(recordManager);
 		midiView.setPlaybackManager(playbackManager);
@@ -230,14 +216,13 @@ public class BeatBotActivity extends Activity {
 
 		// set midiManager as a global variable, since it needs to be accessed
 		// by separate MidiFileMenu activity
-		//GlobalVars gv = (GlobalVars) getApplicationContext();
+		// GlobalVars gv = (GlobalVars) getApplicationContext();
 		// make midiManager a global var
 		GlobalVars.setMidiManager(midiManager);
 		GlobalVars.setPlaybackManager(playbackManager);
 
 		((BpmView) findViewById(R.id.bpm)).setText(String
-				.valueOf((int) midiManager.getBPM()));
-
+				.valueOf((int) midiManager.getBPM()));		
 		// were we recording and/or playing before losing the instance?
 		if (savedInstanceState != null) {
 			if (savedInstanceState.getBoolean("recording")) {
@@ -317,9 +302,9 @@ public class BeatBotActivity extends Activity {
 	}
 
 	public void setDeleteIconEnabled(boolean enabled) {
-		((ImageButton)findViewById(R.id.delete)).setEnabled(enabled);
+		((ImageButton) findViewById(R.id.delete)).setEnabled(enabled);
 	}
-	
+
 	// DON'T USE YET! this needs to run on the UI thread somehow.
 	public void activateIcon(int trackNum) {
 		((ImageView) sampleListView.getChildAt(trackNum)).setImageState(
@@ -386,7 +371,7 @@ public class BeatBotActivity extends Activity {
 	public void delete(View view) {
 		midiManager.deleteSelectedNotes();
 	}
-	
+
 	public void volume(View view) {
 		volume.setChecked(true);
 		pan.setChecked(false);

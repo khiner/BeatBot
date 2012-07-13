@@ -436,10 +436,9 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void renderBackgroundTexture() {
-		float vertices[] = { -width, -height, -width, height, width, -height,
-				width, height };
+		float vertices[] = { 0, 0, 0, height, width, 0, width, height };
 
-		float texture[] = { 0, 1, 0, 0, 1, 1, 1, 0 };
+		float texture[] = { 0, 0, 0, 1, 1, 0, 1, 1 };
 
 		FloatBuffer vertexBuffer = makeFloatBuffer(vertices);
 		FloatBuffer textureBuffer = makeFloatBuffer(texture);
@@ -468,7 +467,7 @@ public class MidiView extends SurfaceViewBase {
 		tickWindow.updateGranularity();
 		float color = bean.getBgColor();
 		gl.glClearColor(color, color, color, 1.0f);
-		//gl.glEnable(GL10.GL_TEXTURE_2D);
+		gl.glEnable(GL10.GL_TEXTURE_2D);
 		//Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.background);
 		//loadTexture(gl, bitmap, textures);
 		initHLineVB();
@@ -480,7 +479,6 @@ public class MidiView extends SurfaceViewBase {
 
 	@Override
 	protected void drawFrame() {
-		//renderBackgroundTexture();
 		boolean recording = recordManager.getState() == RecordManager.State.LISTENING
 				|| recordManager.getState() == RecordManager.State.RECORDING;
 		if (bean.getViewState() == State.TO_LEVELS_VIEW
