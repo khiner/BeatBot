@@ -212,94 +212,18 @@ void decimateconfig_destroy(void *p) {
 	if(p != NULL) free((DecimateConfig *)p);
 }
 
-DelayConfig *delayconfig_create(float delay, float feedback) {
-	// allocate memory and set feedback parameter
-	DelayConfig *p = (DelayConfig *)malloc(sizeof(DelayConfig));
-	p->delayBuffer = (float **)malloc(2*sizeof(float *));
-	p->delayBuffer[0] = (float *)malloc(SAMPLE_RATE*sizeof(float));
-	p->delayBuffer[1] = (float *)malloc(SAMPLE_RATE*sizeof(float));
-	p->delayBufferSize = SAMPLE_RATE;	
-	delayconfigi_set(p, delay, feedback);
-	p->wet = 0.5f;
-	p->numBeats = 4;
-	p->beatmatch = false;
-	int i;
-	for (i = 0; i < 2; i++) {
-		p->rp[i] = p->wp[i] = 0;
-	}
-	return p;
-}
-
-void delayconfig_set(void *p, float delay, float feedback) {
-	DelayConfig *config = (DelayConfig *)p;
-	delayconfig_setDelayTime(config, delay);
-	delayconfig_setFeedback(config, feedback);
-}
-
-void delayconfig_setDelayTime(DelayConfig *config, float delay) {
-	config->delayTime = delay > 0 ? (delay <= 1 ? delay : 1) : 0;
-	if (config->delayTime < 0.0001) config->delayTime = 0.0001;
-	config->delaySamples = (int)(config->delayTime*SAMPLE_RATE);
-	if (config->delaySamples < 2) config->delaySamples = 2;
-	int i, *rp, *wp;
-	pthread_mutex_lock(&delayMutex);
-	for (i = 0; i < 2; i++) {
-		rp = &(config->rp[i]);
-		wp = &(config->wp[i]);
-		*rp = *wp - config->delaySamples;
-		while (*rp < config->delaySamples) {
-			*rp += config->delaySamples;
-		}
-	}
-	pthread_mutex_unlock(&delayMutex);
-}
-
-void delayconfig_setFeedback(DelayConfig *config, float feedback) {
-	int i;
-	for (i = 0; i < 2; i++)
-		config->feedback[i] = feedback > 0.f ? (feedback < 1.f ? feedback : 0.9999999f) : 0.f;
-}
-
-void delay_process(void *p, float **buffers, int size) {
-	DelayConfig *config = (DelayConfig *)p;
-	float out;	
-	int channel, samp, *wp, *rp;
-	for (channel = 0; channel < 2; channel++) {
-		rp = &(config->rp[channel]);
-		wp = &(config->wp[channel]);
-		for (samp = 0; samp < size; samp++) {
-			pthread_mutex_lock(&delayMutex);
-			if (*rp >= config->delaySamples) (*rp) -= config->delaySamples;
-			if (*wp >= config->delaySamples) (*wp) -= config->delaySamples;
-			pthread_mutex_unlock(&delayMutex);
-			out = config->delayBuffer[channel][(*rp)++]*config->wet + buffers[channel][samp]*(1 - config->wet);
-			if (out > 1) out = 1;
-			config->delayBuffer[channel][(*wp)++] = buffers[channel][samp] + out*config->feedback[channel];
-			buffers[channel][samp] = out;
-		}
-	}
-}
-
-void delayconfig_destroy(void *p){
-	// free memory
-	if(p != NULL) free((DelayConfig *)p);
-}
-
 DelayConfigI *delayconfigi_create(float delay, float feedback) {
 	// allocate memory and set feedback parameter
 	DelayConfigI *p = (DelayConfigI *)malloc(sizeof(DelayConfigI));
 	p->delayBuffer = (float **)malloc(2*sizeof(float *));
 	p->delayBuffer[0] = (float *)malloc(SAMPLE_RATE*sizeof(float));
 	p->delayBuffer[1] = (float *)malloc(SAMPLE_RATE*sizeof(float));
-	p->delayBufferSize = SAMPLE_RATE;	
+	p->delayBufferSize = SAMPLE_RATE;
+	p->rp[0] = p->wp[1] = 0;
 	delayconfigi_set(p, delay, feedback);
 	p->wet = 0.5f;
 	p->numBeats = 4;
 	p->beatmatch = false;
-	int i;
-	for (i = 0; i < 2; i++) {
-		p->rp[i] = p->wp[i] = 0;
-	}
 	return p;
 }
 
@@ -312,17 +236,19 @@ void delayconfigi_set(void *p, float delay, float feedback) {
 void delayconfigi_setDelayTime(DelayConfigI *config, float delay) {
 	config->delayTime = delay > 0 ? (delay <= 1 ? delay : 1) : 0;
 	if (config->delayTime < 0.0001) config->delayTime = 0.0001;
-	config->delaySamples = config->delayTime*SAMPLE_RATE;
-	int i;
-	float *rp, *wp;
+	int i, *rp, *wp;
 	pthread_mutex_lock( &delayMutex);
+	config->delaySamples = config->delayTime*SAMPLE_RATE;
 	for (i = 0; i < 2; i++) {
 		rp = &(config->rp[i]);
 		wp = &(config->wp[i]);
-		*rp = *wp - config->delaySamples;
-		while (*rp < config->delaySamples) {
-			*rp += config->delaySamples;
-		}
+		float rpf = *wp - config->delaySamples; // read chases write
+		while (rpf < 0)
+			rpf += config->delayBufferSize;
+		*rp = floorf(rpf);
+		if (*rp >= config->delayBufferSize) (*rp) = 0;
+		config->alpha[i] = rpf - (*rp);
+		config->omAlpha[i] = 1.0f - config->alpha[i];
 	}
 	pthread_mutex_unlock( &delayMutex);
 }
@@ -346,29 +272,29 @@ void delayconfigi_syncToBPM(DelayConfigI *config) {
 	delayconfigi_setDelayTime(config, newTime);	
 }
 
-float interp(float *delayBuffer, float delaySamples, float position) {
-	position = fmod(position, delaySamples);
-	int prev = floorf(position);
-	int next = fmod(ceilf(position), delaySamples);
-	float frac = position - prev;
-	return delayBuffer[prev] + frac*(delayBuffer[next] - delayBuffer[prev]);
+float interp(DelayConfigI *config, int channel, int position) {
+	float out = config->delayBuffer[channel][position] * config->omAlpha[channel];
+	if (position + 1 < config->delayBufferSize)
+		out += config->delayBuffer[channel][position + 1] * config->alpha[channel];
+	else
+		out += config->delayBuffer[channel][0] * config->alpha[channel];
+	return out;
 }
 
 void delayi_process(void *p, float **buffers, int size) {
 	DelayConfigI *config = (DelayConfigI *)p;
 	float out;	
-	int channel, samp;
-	float *wp, *rp;
+	int channel, samp, *wp, *rp;
 	for (channel = 0; channel < 2; channel++) {
 		rp = &(config->rp[channel]);
 		wp = &(config->wp[channel]);
 		for (samp = 0; samp < size; samp++) {
-			if (channel == 0)
-				delayconfigi_setDelayTime(config, 0.0061f + 0.006f*sin(M_PI*config->count++*INV_SAMPLE_RATE));
+			//if (channel == 0)
+//				delayconfigi_setDelayTime(config, 0.0061f + 0.006f*sin(M_PI*config->count++*INV_SAMPLE_RATE));
 			pthread_mutex_lock(&delayMutex);
-			if (*rp >= config->delaySamples) (*rp) -= config->delaySamples;
-			if (*wp >= config->delaySamples) (*wp) -= config->delaySamples;
-			float interpolated = interp(config->delayBuffer[channel], config->delaySamples, (*rp)++);
+			if (*rp >= config->delayBufferSize) (*rp) = 0;
+			if (*wp >= config->delayBufferSize) (*wp) = 0;
+			float interpolated = interp(config, channel, (*rp)++);
 			int wpi = floorf((*wp)++);
 			pthread_mutex_unlock(&delayMutex);
 			out = interpolated*config->wet + buffers[channel][samp]*(1 - config->wet);

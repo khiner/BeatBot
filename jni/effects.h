@@ -138,27 +138,17 @@ typedef struct DecimateConfig_t {
     float y;
 } DecimateConfig;
 
-typedef struct DelayConfig_t {
-	float  **delayBuffer;      // delay buffer for each channel
-	float  feedback[2];        // feedback amount: 0-1, one for each channel
-	float  delayTime;          // delay time in seconds: 0-1
-	float  wet;                // wet/dry
-	int    delaySamples;       // delay time in samples: 0 - SAMPLE_RATE	
-	int    numBeats;  		   // number of beats to delay for beatmatch
-	int    delayBufferSize;
-	int    rp[2], wp[2];       // read & write pointers
-	bool   beatmatch; 		   // sync to the beat?
-} DelayConfig;
-
 typedef struct DelayConfigI_t {
 	float  **delayBuffer;      // delay buffer for each channel
 	float  feedback[2];        // feedback amount: 0-1, one for each channel
 	float  delayTime;          // delay time in seconds: 0-1
 	float  wet;                // wet/dry
+	float  alpha[2];
+	float  omAlpha[2];
 	float  delaySamples;       // (fractional) delay time in samples: 0 - SAMPLE_RATE	
 	int    numBeats;  		   // number of beats to delay for beatmatch
 	int    delayBufferSize;    // maximum size of delay buffer (set to SAMPLE_RATE)
-	float  rp[2], wp[2];       // (fractional) read & write pointers
+	int    rp[2], wp[2];       // (fractional) read & write pointers
 	bool   beatmatch; 		   // sync to the beat?
 	int    count;              // count for sin modulation of delay length
 } DelayConfigI;
@@ -203,13 +193,6 @@ void decimateconfig_set(void *p, float bits, float rate);
 void decimate_process(void *p, float **buffers, int size);
 void decimateconfig_destroy(void *p);
 
-DelayConfig *delayconfig_create(float delay, float feedback);
-void delayconfig_set(void *config, float delay, float feedback);
-void delayconfig_setDelayTime(DelayConfig *config, float delay);
-void delayconfig_setFeedback(DelayConfig *config, float feedback);
-void delay_process(void *p, float **buffers, int size);
-void delayconfig_destroy(void *p);
-
 DelayConfigI *delayconfigi_create(float delay, float feedback);
 void delayconfigi_set(void *config, float delay, float feedback);
 void delayconfigi_setDelayTime(DelayConfigI *config, float delay);
@@ -222,7 +205,7 @@ void delayconfigi_destroy(void *p);
 FilterConfig *filterconfig_create(float cutoff, float r);
 void filterconfig_set(void *config, float cutoff, float r);
 void filter_process(void *config, float **buffers, int size);
-void filter_tick(FilterConfig *config, int channel, int samp);
+float filter_tick(FilterConfig *config, float in, int channel);
 void filterconfig_destroy(void *config);
 
 PitchConfig *pitchconfig_create(float shift);
