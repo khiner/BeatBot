@@ -80,8 +80,8 @@ void initTrack(Track *track, AAsset *asset) {
   	track->totalSamples = AAsset_getLength(asset)/2 - 22;
 
   	track->currBuffers = (float **)malloc(2*sizeof(float *));
-  	track->currBuffers[0] = (float *)calloc(track->totalSamples/2, sizeof(float));
-  	track->currBuffers[1] = (float *)calloc(track->totalSamples/2, sizeof(float));
+  	track->currBuffers[0] = (float *)calloc(BUFF_SIZE/2, sizeof(float));
+  	track->currBuffers[1] = (float *)calloc(BUFF_SIZE/2, sizeof(float));
   	track->buffers = (float **)malloc(2*sizeof(float *));
   	track->buffers[0] = (float *)calloc(track->totalSamples/2, sizeof(float));
   	track->buffers[1] = (float *)calloc(track->totalSamples/2, sizeof(float));
