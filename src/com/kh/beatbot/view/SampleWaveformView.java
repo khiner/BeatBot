@@ -279,6 +279,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	private boolean selectAdsrPoint(int id, float x, float y) {
+		if (!showAdsr)
+			return false;
 		for (int i = 0; i < 5; i++) {
 			if (Math.abs(adsrToX(adsrPoints[i][0]) - x) < SNAP_DIST &&
 					Math.abs((1 - adsrPoints[i][1])*height - y) < SNAP_DIST) {

@@ -56,6 +56,8 @@ typedef struct comb{
 #define all2 341
 #define all3 225
 
+#define MAX_PITCH_DELAY 5024;
+
 /* These values assume 44.1KHz sample rate
    they will probably be OK for 48KHz sample rate
    but would need scaling for 96KHz (or other) sample rates.
@@ -137,17 +139,29 @@ typedef struct DecimateConfig_t {
 } DecimateConfig;
 
 typedef struct DelayConfig_t {
-	float  **delayBuffer; // delay buffer for each channel
+	float  **delayBuffer;      // delay buffer for each channel
 	float  feedback[2];        // feedback amount: 0-1, one for each channel
-	float  delayTime;       // delay time in seconds: 0-1
+	float  delayTime;          // delay time in seconds: 0-1
 	float  wet;                // wet/dry
 	int    delaySamples;       // delay time in samples: 0 - SAMPLE_RATE	
 	int    numBeats;  		   // number of beats to delay for beatmatch
 	int    delayBufferSize;
 	int    rp[2], wp[2];       // read & write pointers
 	bool   beatmatch; 		   // sync to the beat?
-	int count;
 } DelayConfig;
+
+typedef struct DelayConfigI_t {
+	float  **delayBuffer;      // delay buffer for each channel
+	float  feedback[2];        // feedback amount: 0-1, one for each channel
+	float  delayTime;          // delay time in seconds: 0-1
+	float  wet;                // wet/dry
+	float  delaySamples;       // (fractional) delay time in samples: 0 - SAMPLE_RATE	
+	int    numBeats;  		   // number of beats to delay for beatmatch
+	int    delayBufferSize;    // maximum size of delay buffer (set to SAMPLE_RATE)
+	float  rp[2], wp[2];       // (fractional) read & write pointers
+	bool   beatmatch; 		   // sync to the beat?
+	int    count;              // count for sin modulation of delay length
+} DelayConfigI;
 
 typedef struct FilterConfig_t {
 	bool hp; // lowpass/highpass flag
@@ -156,6 +170,9 @@ typedef struct FilterConfig_t {
 	float in1[2], in2[2]; // one for each channel
 	float out1[2], out2[2]; // one for each channel
 } FilterConfig;
+
+typedef struct PitchConfig_t {
+} PitchConfig;
 
 typedef struct VolumePanConfig_t {
     float volume;
@@ -189,16 +206,30 @@ void decimateconfig_destroy(void *p);
 DelayConfig *delayconfig_create(float delay, float feedback);
 void delayconfig_set(void *config, float delay, float feedback);
 void delayconfig_setDelayTime(DelayConfig *config, float delay);
-void delayconfig_setNumBeats(DelayConfig *config, int numBeats);
-void delayconfig_syncToBPM(DelayConfig *config);
 void delayconfig_setFeedback(DelayConfig *config, float feedback);
 void delay_process(void *p, float **buffers, int size);
 void delayconfig_destroy(void *p);
 
+DelayConfigI *delayconfigi_create(float delay, float feedback);
+void delayconfigi_set(void *config, float delay, float feedback);
+void delayconfigi_setDelayTime(DelayConfigI *config, float delay);
+void delayconfigi_setNumBeats(DelayConfigI *config, int numBeats);
+void delayconfigi_syncToBPM(DelayConfigI *config);
+void delayconfigi_setFeedback(DelayConfigI *config, float feedback);
+void delayi_process(void *p, float **buffers, int size);
+void delayconfigi_destroy(void *p);
+
 FilterConfig *filterconfig_create(float cutoff, float r);
 void filterconfig_set(void *config, float cutoff, float r);
 void filter_process(void *config, float **buffers, int size);
+void filter_tick(FilterConfig *config, int channel, int samp);
 void filterconfig_destroy(void *config);
+
+PitchConfig *pitchconfig_create(float shift);
+void pitchconfig_set(float shift);
+void pitch_process(void *config, float **buffers, int size);
+void pitch_tick(PitchConfig *config, int channel, int samp);
+void pitchconfig_destroy(void *config);
 
 ReverbConfig *reverbconfig_create(float feedback, float hfDamp);
 void reverbconfig_set(void *config, float feedback, float hfDamp);

@@ -1,5 +1,8 @@
 #include "effects.h"
 #include <android/log.h>
+#include <pthread.h>
+
+pthread_mutex_t delayMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static inline void underguard(float *x) {
   	union {
@@ -216,7 +219,7 @@ DelayConfig *delayconfig_create(float delay, float feedback) {
 	p->delayBuffer[0] = (float *)malloc(SAMPLE_RATE*sizeof(float));
 	p->delayBuffer[1] = (float *)malloc(SAMPLE_RATE*sizeof(float));
 	p->delayBufferSize = SAMPLE_RATE;	
-	delayconfig_set(p, delay, feedback);
+	delayconfigi_set(p, delay, feedback);
 	p->wet = 0.5f;
 	p->numBeats = 4;
 	p->beatmatch = false;
@@ -235,9 +238,11 @@ void delayconfig_set(void *p, float delay, float feedback) {
 
 void delayconfig_setDelayTime(DelayConfig *config, float delay) {
 	config->delayTime = delay > 0 ? (delay <= 1 ? delay : 1) : 0;
+	if (config->delayTime < 0.0001) config->delayTime = 0.0001;
 	config->delaySamples = (int)(config->delayTime*SAMPLE_RATE);
-	if (config->delaySamples < 8) config->delaySamples = 8;
+	if (config->delaySamples < 2) config->delaySamples = 2;
 	int i, *rp, *wp;
+	pthread_mutex_lock(&delayMutex);
 	for (i = 0; i < 2; i++) {
 		rp = &(config->rp[i]);
 		wp = &(config->wp[i]);
@@ -246,6 +251,7 @@ void delayconfig_setDelayTime(DelayConfig *config, float delay) {
 			*rp += config->delaySamples;
 		}
 	}
+	pthread_mutex_unlock(&delayMutex);
 }
 
 void delayconfig_setFeedback(DelayConfig *config, float feedback) {
@@ -254,32 +260,22 @@ void delayconfig_setFeedback(DelayConfig *config, float feedback) {
 		config->feedback[i] = feedback > 0.f ? (feedback < 1.f ? feedback : 0.9999999f) : 0.f;
 }
 
-void delayconfig_setNumBeats(DelayConfig *config, int numBeats) {
-	if (numBeats == config->numBeats) return;
-	config->numBeats = numBeats;
-	delayconfig_syncToBPM(config);
-}
-
-void delayconfig_syncToBPM(DelayConfig *config) {
-	if (!config->beatmatch) return;
-	// divide by 60 for seconds, divide by 16 for 16th notes
-	float newTime = (BPM/960.0f)*(float)config->numBeats;
-	delayconfig_setDelayTime(config, newTime);	
-}
-
 void delay_process(void *p, float **buffers, int size) {
 	DelayConfig *config = (DelayConfig *)p;
 	float out;	
-	int i, j, *wp, *rp;
-	for (i = 0; i < 2; i++) {
-		//delayconfig_setDelayTime(config, 0.005f + 0.01f*sin(100*M_PI*config->count++*INV_SAMPLE_RATE));	
-		rp = &(config->rp[i]);
-		wp = &(config->wp[i]);
-		for (j = 0; j < size; j++) {
-			out = config->delayBuffer[i][(*rp)++ % config->delaySamples]*config->wet + buffers[i][j]*(1 - config->wet);
+	int channel, samp, *wp, *rp;
+	for (channel = 0; channel < 2; channel++) {
+		rp = &(config->rp[channel]);
+		wp = &(config->wp[channel]);
+		for (samp = 0; samp < size; samp++) {
+			pthread_mutex_lock(&delayMutex);
+			if (*rp >= config->delaySamples) (*rp) -= config->delaySamples;
+			if (*wp >= config->delaySamples) (*wp) -= config->delaySamples;
+			pthread_mutex_unlock(&delayMutex);
+			out = config->delayBuffer[channel][(*rp)++]*config->wet + buffers[channel][samp]*(1 - config->wet);
 			if (out > 1) out = 1;
-			config->delayBuffer[i][(*wp)++ % config->delaySamples] = buffers[i][j] + out*config->feedback[i];
-			buffers[i][j] = out;
+			config->delayBuffer[channel][(*wp)++] = buffers[channel][samp] + out*config->feedback[channel];
+			buffers[channel][samp] = out;
 		}
 	}
 }
@@ -287,6 +283,105 @@ void delay_process(void *p, float **buffers, int size) {
 void delayconfig_destroy(void *p){
 	// free memory
 	if(p != NULL) free((DelayConfig *)p);
+}
+
+DelayConfigI *delayconfigi_create(float delay, float feedback) {
+	// allocate memory and set feedback parameter
+	DelayConfigI *p = (DelayConfigI *)malloc(sizeof(DelayConfigI));
+	p->delayBuffer = (float **)malloc(2*sizeof(float *));
+	p->delayBuffer[0] = (float *)malloc(SAMPLE_RATE*sizeof(float));
+	p->delayBuffer[1] = (float *)malloc(SAMPLE_RATE*sizeof(float));
+	p->delayBufferSize = SAMPLE_RATE;	
+	delayconfigi_set(p, delay, feedback);
+	p->wet = 0.5f;
+	p->numBeats = 4;
+	p->beatmatch = false;
+	int i;
+	for (i = 0; i < 2; i++) {
+		p->rp[i] = p->wp[i] = 0;
+	}
+	return p;
+}
+
+void delayconfigi_set(void *p, float delay, float feedback) {
+	DelayConfigI *config = (DelayConfigI *)p;
+	delayconfigi_setDelayTime(config, delay);
+	delayconfigi_setFeedback(config, feedback);
+}
+
+void delayconfigi_setDelayTime(DelayConfigI *config, float delay) {
+	config->delayTime = delay > 0 ? (delay <= 1 ? delay : 1) : 0;
+	if (config->delayTime < 0.0001) config->delayTime = 0.0001;
+	config->delaySamples = config->delayTime*SAMPLE_RATE;
+	int i;
+	float *rp, *wp;
+	pthread_mutex_lock( &delayMutex);
+	for (i = 0; i < 2; i++) {
+		rp = &(config->rp[i]);
+		wp = &(config->wp[i]);
+		*rp = *wp - config->delaySamples;
+		while (*rp < config->delaySamples) {
+			*rp += config->delaySamples;
+		}
+	}
+	pthread_mutex_unlock( &delayMutex);
+}
+
+void delayconfigi_setFeedback(DelayConfigI *config, float feedback) {
+	int i;
+	for (i = 0; i < 2; i++)
+		config->feedback[i] = feedback > 0.f ? (feedback < 1.f ? feedback : 0.9999999f) : 0.f;
+}
+
+void delayconfigi_setNumBeats(DelayConfigI *config, int numBeats) {
+	if (numBeats == config->numBeats) return;
+	config->numBeats = numBeats;
+	delayconfigi_syncToBPM(config);
+}
+
+void delayconfigi_syncToBPM(DelayConfigI *config) {
+	if (!config->beatmatch) return;
+	// divide by 60 for seconds, divide by 16 for 16th notes
+	float newTime = (BPM/960.0f)*(float)config->numBeats;
+	delayconfigi_setDelayTime(config, newTime);	
+}
+
+float interp(float *delayBuffer, float delaySamples, float position) {
+	position = fmod(position, delaySamples);
+	int prev = floorf(position);
+	int next = fmod(ceilf(position), delaySamples);
+	float frac = position - prev;
+	return delayBuffer[prev] + frac*(delayBuffer[next] - delayBuffer[prev]);
+}
+
+void delayi_process(void *p, float **buffers, int size) {
+	DelayConfigI *config = (DelayConfigI *)p;
+	float out;	
+	int channel, samp;
+	float *wp, *rp;
+	for (channel = 0; channel < 2; channel++) {
+		rp = &(config->rp[channel]);
+		wp = &(config->wp[channel]);
+		for (samp = 0; samp < size; samp++) {
+			if (channel == 0)
+				delayconfigi_setDelayTime(config, 0.0061f + 0.006f*sin(M_PI*config->count++*INV_SAMPLE_RATE));
+			pthread_mutex_lock(&delayMutex);
+			if (*rp >= config->delaySamples) (*rp) -= config->delaySamples;
+			if (*wp >= config->delaySamples) (*wp) -= config->delaySamples;
+			float interpolated = interp(config->delayBuffer[channel], config->delaySamples, (*rp)++);
+			int wpi = floorf((*wp)++);
+			pthread_mutex_unlock(&delayMutex);
+			out = interpolated*config->wet + buffers[channel][samp]*(1 - config->wet);
+			if (out > 1) out = 1;
+			config->delayBuffer[channel][wpi] = buffers[channel][samp] + out*config->feedback[channel];
+			buffers[channel][samp] = out;
+		}
+	}
+}
+
+void delayconfigi_destroy(void *p){
+	// free memory
+	if(p != NULL) free((DelayConfigI *)p);
 }
 
 FilterConfig *filterconfig_create(float f, float r) {
@@ -324,25 +419,41 @@ void filterconfig_set(void *p, float f, float r) {
 
 void filter_process(void *p, float **buffers, int size) {
 	FilterConfig *config = (FilterConfig *)p;
-	int i, j;
-	for (i = 0; i < 2; i++) {
-		for(j = 0; j < size; j++) {
-			float out = config->a1 * buffers[i][j] +
-				        config->a2 * config->in1[i] +
-					    config->a3 * config->in2[i] -
-					    config->b1 * config->out1[i] -
-					    config->b2 * config->out2[i];
-			config->in2[i] = config->in1[i];
-			config->in1[i] = buffers[i][j];
-			config->out2[i] = config->out1[i];
-			config->out1[i] = out;
-			buffers[i][j] = out;
+	int channel, samp;
+	for (channel = 0; channel < 2; channel++) {
+		for(samp = 0; samp < size; samp++) {
+			float out = config->a1 * buffers[channel][samp] +
+				        config->a2 * config->in1[channel] +
+					    config->a3 * config->in2[channel] -
+					    config->b1 * config->out1[channel] -
+					    config->b2 * config->out2[channel];
+			config->in2[channel] = config->in1[channel];
+			config->in1[channel] = buffers[channel][samp];
+			config->out2[channel] = config->out1[channel];
+			config->out1[channel] = out;
+			buffers[channel][samp] = out;
 		}	
 	}
 }
 
 void filterconfig_destroy(void *p) {
 	free((FilterConfig *)p);
+}
+
+PitchConfig *pitchconfig_create(float shift) {
+	return NULL;
+}
+
+void pitchconfig_set(float shift) {
+
+}
+
+void pitch_process(void *config, float **buffers, int size) {
+
+}
+
+void pitchconfig_destroy(void *config) {
+
 }
 
 VolumePanConfig *volumepanconfig_create(float volume, float pan) {

@@ -106,8 +106,8 @@ void initTrack(Track *track, AAsset *asset) {
   			   filterconfig_set, filter_process, filterconfig_destroy);
   	initEffect(&(track->effects[DYNAMIC_VOL_PAN_ID]), true, true, volumepanconfig_create(.5f, .5f),
   			   volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
-  	initEffect(&(track->effects[DELAY_ID]), false, true, delayconfig_create(.5f, .5f),
-  			   delayconfig_set, delay_process, delayconfig_destroy);
+  	initEffect(&(track->effects[DELAY_ID]), false, true, delayconfigi_create(.5f, .5f),
+  			   delayconfigi_set, delayi_process, delayconfigi_destroy);
   	initEffect(&(track->effects[REVERB_ID]), false, true, reverbconfig_create(.5f, .5f),
   			   reverbconfig_set, reverb_process, reverbconfig_destroy);
   	initEffect(&(track->effects[ADSR_ID]), false, true, adsrconfig_create(track->loopEnd - track->loopBegin),
@@ -436,7 +436,7 @@ void stopAll() {
 void syncAll() {
 	int i;
 	for (i = 0; i < numTracks; i++) {
-		delayconfig_syncToBPM((DelayConfig *)(getTrack(i)->effects[DELAY_ID].config));
+		delayconfigi_syncToBPM((DelayConfigI *)(getTrack(i)->effects[DELAY_ID].config));
 	}	
 }
 
@@ -850,21 +850,21 @@ void Java_com_kh_beatbot_DelayActivity_setDelayOn(JNIEnv* env, jclass clazz,
 void Java_com_kh_beatbot_DelayActivity_setDelayTime(JNIEnv* env, jclass clazz,
 													  jint trackNum, jfloat time) {
 	Track *track = getTrack(trackNum);
-	DelayConfig *config = (DelayConfig *)track->effects[DELAY_ID].config;
+	DelayConfigI *config = (DelayConfigI *)track->effects[DELAY_ID].config;
 	float newTime;
 	if (config->beatmatch) {
  		// map float 0-1 to int 1-16 for number of beats
-		delayconfig_setNumBeats(config, (int)(time*15) + 1);
+		delayconfigi_setNumBeats(config, (int)(time*15) + 1);
 	} else {
 		newTime = time;
-		delayconfig_setDelayTime(config, newTime);
+		delayconfigi_setDelayTime(config, newTime);
 	}
 }
 
 void Java_com_kh_beatbot_DelayActivity_setDelayBeatmatch(JNIEnv* env, jclass clazz,
 												  jint trackNum, jboolean beatmatch) {
 	Track *track = getTrack(trackNum);
-	DelayConfig *config = (DelayConfig *)track->effects[DELAY_ID].config;
+	DelayConfigI *config = (DelayConfigI *)track->effects[DELAY_ID].config;
 	config->beatmatch = beatmatch;
 	Java_com_kh_beatbot_DelayActivity_setDelayTime(NULL, NULL, trackNum, config->delayTime);
 }
@@ -872,14 +872,14 @@ void Java_com_kh_beatbot_DelayActivity_setDelayBeatmatch(JNIEnv* env, jclass cla
 void Java_com_kh_beatbot_DelayActivity_setDelayFeedback(JNIEnv* env, jclass clazz,
 													  jint trackNum, jfloat fdb) {
 	Track *track = getTrack(trackNum);
-	DelayConfig *config = (DelayConfig *)track->effects[DELAY_ID].config;
-	delayconfig_setFeedback(config, fdb);
+	DelayConfigI *config = (DelayConfigI *)track->effects[DELAY_ID].config;
+	delayconfigi_setFeedback(config, fdb);
 }
 
 void Java_com_kh_beatbot_DelayActivity_setDelayWet(JNIEnv* env, jclass clazz,
 												   jint trackNum, jfloat wet) {
 	Track *track = getTrack(trackNum);
-	DelayConfig *config = (DelayConfig *)track->effects[DELAY_ID].config;
+	DelayConfigI *config = (DelayConfigI *)track->effects[DELAY_ID].config;
 	config->wet = wet;
 }
 

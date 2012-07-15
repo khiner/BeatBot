@@ -17,6 +17,7 @@ public class DelayActivity extends EffectActivity {
 		setContentView(R.layout.delay_layout);
 		((ListView) findViewById(R.id.paramListView)).setAdapter(adapter);
 		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.delayOn[trackNum]);
+		
 		level2d = (TronSeekbar2d)findViewById(R.id.xyParamBar);
 		level2d.addLevelListener(this);
 	}
@@ -61,8 +62,19 @@ public class DelayActivity extends EffectActivity {
 		setDelayWet(trackNum, wet);
 	}
 	
+	public float getWetValue() {
+		return GlobalVars.delayWet[trackNum];
+	}
+	
 	public void beatMatch(View view) {
 		setDelayBeatmatch(trackNum, ((ToggleButton)view).isChecked());
+	}
+	
+	@Override
+	public void notifyInit(TronSeekbar levelBar) {
+		super.notifyInit(levelBar);
+		if (levelBar.getTag().equals(2))
+			levelBar.setLevel(getWetValue());
 	}
 	
 	@Override
