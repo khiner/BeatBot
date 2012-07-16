@@ -12,9 +12,10 @@ public class GlobalVars {
 	// effect settings are stored here instead of in the effect activities because
 	// the activities are destroyed after clicking 'back', and we need to persist state
 	public static float[] decimateX, decimateY, delayX, delayY, delayWet,
-						  filterX, filterY, reverbX, reverbY;
+						  flangerX, flangerY, flangerWet, flangerModRate,
+						  flangerModAmt, filterX, filterY, reverbX, reverbY;
 	
-	public static boolean[] decimateOn, delayOn, filterOn, reverbOn;
+	public static boolean[] decimateOn, delayOn, flangerOn, filterOn, reverbOn;
 		
 	public static float currBeatDivision;
 	
@@ -30,12 +31,18 @@ public class GlobalVars {
 		delayX = new float[num];
 		delayY = new float[num];
 		delayWet = new float[num];
+		flangerX = new float[num];
+		flangerY = new float[num];
+		flangerWet = new float[num];
+		flangerModRate = new float[num];
+		flangerModAmt = new float[num];
 		filterX = new float[num];
 		filterY = new float[num];
 		reverbX = new float[num];
 		reverbY = new float[num];
 		decimateOn = new boolean[num];
 		delayOn = new boolean[num];
+		flangerOn = new boolean[num];
 		filterOn = new boolean[num];
 		reverbOn = new boolean[num];
 		for (int i = 0; i < midiManager.getNumSamples(); i++) { 

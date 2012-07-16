@@ -4,18 +4,25 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdbool.h>
+#include <pthread.h>
+#include <android/log.h>
+
+#include "generators.h"
 #include "ticker.h"
 
 #define SAMPLE_RATE 44100
 #define INV_SAMPLE_RATE 1.0f/44100.0f
+#define MIN_FLANGER_DELAY 0.002f
+#define MAX_FLANGER_DELAY 0.015f
 
 #define STATIC_VOL_PAN_ID 0
 #define DECIMATE_ID 1
 #define FILTER_ID 2
 #define DYNAMIC_VOL_PAN_ID 3
 #define DELAY_ID 4
-#define REVERB_ID 5
-#define ADSR_ID 6
+#define FLANGER_ID 5
+#define REVERB_ID 6
+#define ADSR_ID 7
 
 /******* BEGIN FREEVERB STUFF *********/
 typedef struct allpass{
@@ -140,18 +147,27 @@ typedef struct DecimateConfig_t {
 
 typedef struct DelayConfigI_t {
 	float  **delayBuffer;      // delay buffer for each channel
-	float  feedback[2];        // feedback amount: 0-1, one for each channel
 	float  delayTime;          // delay time in seconds: 0-1
+	float  feedback[2];        // feedback amount: 0-1, one for each channel
 	float  wet;                // wet/dry
 	float  alpha[2];
 	float  omAlpha[2];
-	float  delaySamples;       // (fractional) delay time in samples: 0 - SAMPLE_RATE	
+	float  delaySamples;       // (fractional) delay time in samples: 0 - SAMPLE_RATE
+	float  out;	
 	int    numBeats;  		   // number of beats to delay for beatmatch
 	int    delayBufferSize;    // maximum size of delay buffer (set to SAMPLE_RATE)
-	int    rp[2], wp[2];       // (fractional) read & write pointers
+	int    rp[2], wp[2];       // read & write pointers
 	bool   beatmatch; 		   // sync to the beat?
-	int    count;              // count for sin modulation of delay length
+	pthread_mutex_t mutex;
 } DelayConfigI;
+
+typedef struct FlangerConfig_t {
+	DelayConfigI *delayConfig;     // delay line
+	SineWave     *mod;             // table-based sine wave generator for modulation
+	float        baseTime;         // center time for delay modulation
+	float 		 modAmt;           // modulation depth
+	int          count;            // count for sin modulation of delay length
+} FlangerConfig;
 
 typedef struct FilterConfig_t {
 	bool hp; // lowpass/highpass flag
@@ -200,6 +216,7 @@ void delayconfigi_setNumBeats(DelayConfigI *config, int numBeats);
 void delayconfigi_syncToBPM(DelayConfigI *config);
 void delayconfigi_setFeedback(DelayConfigI *config, float feedback);
 void delayi_process(void *p, float **buffers, int size);
+float delayi_tick(DelayConfigI *config, float in, int channel);
 void delayconfigi_destroy(void *p);
 
 FilterConfig *filterconfig_create(float cutoff, float r);
@@ -207,6 +224,16 @@ void filterconfig_set(void *config, float cutoff, float r);
 void filter_process(void *config, float **buffers, int size);
 float filter_tick(FilterConfig *config, float in, int channel);
 void filterconfig_destroy(void *config);
+
+FlangerConfig *flangerconfig_create(float delayTime, float feedback);
+void flangerconfig_set(void *p, float delayTime, float feedback);
+void flangerconfig_setBaseTime(FlangerConfig *config, float baseTime);
+void flangerconfig_setTime(FlangerConfig *config, float time);
+void flangerconfig_setFeedback(FlangerConfig *config, float feedback);
+void flangerconfig_setModRate(FlangerConfig *config, float modRate);
+void flangerconfig_setModAmt(FlangerConfig *config, float modAmt);
+void flanger_process(void *config, float **buffers, int size);
+void flangerconfig_destroy(void *config);
 
 PitchConfig *pitchconfig_create(float shift);
 void pitchconfig_set(float shift);
@@ -227,6 +254,6 @@ void volumepanconfig_destroy(void *config);
 void reverse(float buffer[], int begin, int end);
 void normalize(float buffer[], int size);
 			      
-static const int numEffects = 7;
+static const int numEffects = 8;
 
 #endif // EFFECTS_H

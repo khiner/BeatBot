@@ -9,7 +9,7 @@ import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.TronSeekbar2d;
 
 public class DecimateActivity extends EffectActivity {
-
+	final int NUM_PARAMS = 2;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -58,21 +58,13 @@ public class DecimateActivity extends EffectActivity {
 
 	@Override
 	public int getNumParams() {
-		return 2;
+		return NUM_PARAMS;
 	}
 	
 	@Override
-	public String getLabelX() {
-		return getResources().getString(R.string.bits);
-	}
-
-	@Override
-	public String getLabelY() {
-		return getResources().getString(R.string.samplerate);
-	}
-
-	@Override
-	public String getLabelParam3() {
+	public String getParamLabel(int paramNum) {
+		if (paramNum < NUM_PARAMS)
+			return getResources().getStringArray(R.array.decimate_params)[paramNum];
 		return "";
 	}
 }

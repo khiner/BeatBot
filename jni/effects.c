@@ -1,8 +1,4 @@
 #include "effects.h"
-#include <android/log.h>
-#include <pthread.h>
-
-pthread_mutex_t delayMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static inline void underguard(float *x) {
   	union {
@@ -215,6 +211,7 @@ void decimateconfig_destroy(void *p) {
 DelayConfigI *delayconfigi_create(float delay, float feedback) {
 	// allocate memory and set feedback parameter
 	DelayConfigI *p = (DelayConfigI *)malloc(sizeof(DelayConfigI));
+	pthread_mutex_init(&p->mutex, NULL);
 	p->delayBuffer = (float **)malloc(2*sizeof(float *));
 	p->delayBuffer[0] = (float *)malloc(SAMPLE_RATE*sizeof(float));
 	p->delayBuffer[1] = (float *)malloc(SAMPLE_RATE*sizeof(float));
@@ -237,7 +234,7 @@ void delayconfigi_setDelayTime(DelayConfigI *config, float delay) {
 	config->delayTime = delay > 0 ? (delay <= 1 ? delay : 1) : 0;
 	if (config->delayTime < 0.0001) config->delayTime = 0.0001;
 	int i, *rp, *wp;
-	pthread_mutex_lock( &delayMutex);
+	pthread_mutex_lock(&config->mutex);
 	config->delaySamples = config->delayTime*SAMPLE_RATE;
 	for (i = 0; i < 2; i++) {
 		rp = &(config->rp[i]);
@@ -250,7 +247,7 @@ void delayconfigi_setDelayTime(DelayConfigI *config, float delay) {
 		config->alpha[i] = rpf - (*rp);
 		config->omAlpha[i] = 1.0f - config->alpha[i];
 	}
-	pthread_mutex_unlock( &delayMutex);
+	pthread_mutex_unlock(&config->mutex);
 }
 
 void delayconfigi_setFeedback(DelayConfigI *config, float feedback) {
@@ -283,31 +280,31 @@ float interp(DelayConfigI *config, int channel, int position) {
 
 void delayi_process(void *p, float **buffers, int size) {
 	DelayConfigI *config = (DelayConfigI *)p;
-	float out;	
-	int channel, samp, *wp, *rp;
+	int channel, samp;
 	for (channel = 0; channel < 2; channel++) {
-		rp = &(config->rp[channel]);
-		wp = &(config->wp[channel]);
 		for (samp = 0; samp < size; samp++) {
-			//if (channel == 0)
-//				delayconfigi_setDelayTime(config, 0.0061f + 0.006f*sin(M_PI*config->count++*INV_SAMPLE_RATE));
-			pthread_mutex_lock(&delayMutex);
-			if (*rp >= config->delayBufferSize) (*rp) = 0;
-			if (*wp >= config->delayBufferSize) (*wp) = 0;
-			float interpolated = interp(config, channel, (*rp)++);
-			int wpi = floorf((*wp)++);
-			pthread_mutex_unlock(&delayMutex);
-			out = interpolated*config->wet + buffers[channel][samp]*(1 - config->wet);
-			if (out > 1) out = 1;
-			config->delayBuffer[channel][wpi] = buffers[channel][samp] + out*config->feedback[channel];
-			buffers[channel][samp] = out;
+			buffers[channel][samp] = delayi_tick(config, buffers[channel][samp], channel);
 		}
 	}
 }
 
+float delayi_tick(DelayConfigI *config, float in, int channel) {
+	pthread_mutex_lock(&config->mutex);
+	if ((config->rp[channel]) >= config->delayBufferSize) ((config->rp[channel])) = 0;
+	if ((config->wp[channel]) >= config->delayBufferSize) ((config->wp[channel])) = 0;
+	float interpolated = interp(config, channel, (config->rp[channel])++);
+	pthread_mutex_unlock(&config->mutex);
+	int wpi = floorf((config->wp[channel])++);
+	config->out = interpolated*config->wet + in*(1 - config->wet);
+	if (config->out > 1) config->out = 1;
+	config->delayBuffer[channel][wpi] = in + config->out*config->feedback[channel];
+	return config->out;	
+}
+
 void delayconfigi_destroy(void *p){
-	// free memory
-	if(p != NULL) free((DelayConfigI *)p);
+	DelayConfigI *config = (DelayConfigI *)p;
+	free(config->delayBuffer);
+	free((DelayConfigI *)p);
 }
 
 FilterConfig *filterconfig_create(float f, float r) {
@@ -364,6 +361,62 @@ void filter_process(void *p, float **buffers, int size) {
 
 void filterconfig_destroy(void *p) {
 	free((FilterConfig *)p);
+}
+
+FlangerConfig *flangerconfig_create(float delayTime, float feedback) {
+	FlangerConfig *flangerConfig = (FlangerConfig *)malloc(sizeof(FlangerConfig));
+	flangerConfig->delayConfig = delayconfigi_create(delayTime, feedback);
+	flangerconfig_set(flangerConfig, delayTime, feedback);
+	flangerConfig->mod = sinewave_create();
+	flangerConfig->modAmt = .5f;
+	return flangerConfig;
+}
+
+void flangerconfig_set(void *p, float delayTime, float feedback) {
+	FlangerConfig *config = (FlangerConfig *)p;
+	flangerconfig_setBaseTime(config, delayTime);
+	flangerconfig_setTime(config, delayTime);
+	flangerconfig_setFeedback(config, feedback);
+}
+
+void flangerconfig_setBaseTime(FlangerConfig *config, float baseTime) {
+	config->baseTime = baseTime;
+}
+
+void flangerconfig_setTime(FlangerConfig *config, float time) {
+	float scaledTime = time * (MAX_FLANGER_DELAY - MIN_FLANGER_DELAY) + MIN_FLANGER_DELAY;
+	delayconfigi_setDelayTime(config->delayConfig, scaledTime);
+}
+
+void flangerconfig_setFeedback(FlangerConfig *config, float feedback) {
+	delayconfigi_setFeedback(config->delayConfig, feedback);
+}
+
+void flangerconfig_setModRate(FlangerConfig *config, float modRate) {
+	sinewave_setRateInSamples(config->mod, modRate*SAMPLE_RATE/100);
+}
+
+void flangerconfig_setModAmt(FlangerConfig *config, float modAmt) {
+	config->modAmt = modAmt;
+}
+
+void flanger_process(void *p, float **buffers, int size) {
+	FlangerConfig *config = (FlangerConfig *)p;
+	int channel, samp;
+	for (channel = 0; channel < 2; channel++) {
+		for (samp = 0; samp < size; samp++) {
+			if (channel == 0)
+				//flangerconfig_setTime(config, config->baseTime * (1.0f + config->modAmt * sinewave_tick(config->mod)));
+				flangerconfig_setTime(config, config->baseTime * (1.0f + config->modAmt * sin(config->count++ * INV_SAMPLE_RATE * config->mod->rate/20)));
+			buffers[channel][samp] = delayi_tick(config->delayConfig, buffers[channel][samp], channel);
+		}	
+	}	
+}
+
+void flangerconfig_destroy(void *p) {
+	FlangerConfig *config = (FlangerConfig *)p;
+	delayconfigi_destroy(config->delayConfig);
+	free(config);
 }
 
 PitchConfig *pitchconfig_create(float shift) {

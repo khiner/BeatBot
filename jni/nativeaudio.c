@@ -108,6 +108,8 @@ void initTrack(Track *track, AAsset *asset) {
   			   volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
   	initEffect(&(track->effects[DELAY_ID]), false, true, delayconfigi_create(.5f, .5f),
   			   delayconfigi_set, delayi_process, delayconfigi_destroy);
+    initEffect(&(track->effects[FLANGER_ID]), false, true, flangerconfig_create(.5f, .5f),
+    		   flangerconfig_set, flanger_process, flangerconfig_destroy);
   	initEffect(&(track->effects[REVERB_ID]), false, true, reverbconfig_create(.5f, .5f),
   			   reverbconfig_set, reverb_process, reverbconfig_destroy);
   	initEffect(&(track->effects[ADSR_ID]), false, true, adsrconfig_create(track->loopEnd - track->loopBegin),
@@ -881,6 +883,48 @@ void Java_com_kh_beatbot_DelayActivity_setDelayWet(JNIEnv* env, jclass clazz,
 	Track *track = getTrack(trackNum);
 	DelayConfigI *config = (DelayConfigI *)track->effects[DELAY_ID].config;
 	config->wet = wet;
+}
+
+void Java_com_kh_beatbot_FlangerActivity_setFlangerOn(JNIEnv* env, jclass clazz,
+												      jint trackNum, jboolean on) {
+	Track *track = getTrack(trackNum);
+	Effect *flanger = &(track->effects[FLANGER_ID]);
+	flanger->on = on;
+}
+
+void Java_com_kh_beatbot_FlangerActivity_setFlangerTime(JNIEnv* env, jclass clazz,
+												        jint trackNum, jfloat time) {
+	Track *track = getTrack(trackNum);
+	FlangerConfig *config = (FlangerConfig *)track->effects[FLANGER_ID].config;
+	flangerconfig_setBaseTime(config, time);
+}
+
+void Java_com_kh_beatbot_FlangerActivity_setFlangerFeedback(JNIEnv* env, jclass clazz,
+												            jint trackNum, jfloat feedback) {
+	Track *track = getTrack(trackNum);
+	FlangerConfig *config = (FlangerConfig *)track->effects[FLANGER_ID].config;
+	delayconfigi_setFeedback(config->delayConfig, feedback);
+}
+
+void Java_com_kh_beatbot_FlangerActivity_setFlangerWet(JNIEnv* env, jclass clazz,
+												       jint trackNum, jfloat wet) {
+	Track *track = getTrack(trackNum);
+	FlangerConfig *config = (FlangerConfig *)track->effects[FLANGER_ID].config;
+	config->delayConfig->wet = wet;
+}
+
+void Java_com_kh_beatbot_FlangerActivity_setFlangerModRate(JNIEnv* env, jclass clazz,
+												           jint trackNum, jfloat modRate) {
+	Track *track = getTrack(trackNum);
+	FlangerConfig *config = (FlangerConfig *)track->effects[FLANGER_ID].config;
+	flangerconfig_setModRate(config, modRate);
+}
+
+void Java_com_kh_beatbot_FlangerActivity_setFlangerModAmt(JNIEnv* env, jclass clazz,
+												          jint trackNum, jfloat modAmt) {
+	Track *track = getTrack(trackNum);
+	FlangerConfig *config = (FlangerConfig *)track->effects[FLANGER_ID].config;
+	flangerconfig_setModAmt(config, modAmt);
 }
 
 void Java_com_kh_beatbot_ReverbActivity_setReverbOn(JNIEnv* env, jclass clazz,

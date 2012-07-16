@@ -1,7 +1,6 @@
 package com.kh.beatbot;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ToggleButton;
@@ -11,6 +10,7 @@ import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.TronSeekbar2d;
 
 public class FilterActivity extends EffectActivity {
+	private static final int NUM_PARAMS = 2;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -60,21 +60,13 @@ public class FilterActivity extends EffectActivity {
 
 	@Override
 	public int getNumParams() {
-		return 2;
+		return NUM_PARAMS;
 	}
 	
 	@Override
-	public String getLabelX() {
-		return getResources().getString(R.string.cutoff);
-	}
-
-	@Override
-	public String getLabelY() {
-		return getResources().getString(R.string.resonance);
-	}
-
-	@Override
-	public String getLabelParam3() {
-		return "";
+	public String getParamLabel(int paramNum) {
+		if (paramNum < NUM_PARAMS)
+			return getResources().getStringArray(R.array.filter_params)[paramNum];
+		return ""; 
 	}
 }

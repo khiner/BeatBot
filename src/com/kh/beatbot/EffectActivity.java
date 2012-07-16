@@ -43,17 +43,7 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 			if (!paramBars.containsKey(position))
 				paramBars.put(position, levelBar);
 			
-			switch (position) {
-			case 0:
-				label.setText(getLabelX());
-				break;
-			case 1:
-				label.setText(getLabelY());
-				break;
-			case 2:
-				label.setText(getLabelParam3());
-				break;
-			}
+			label.setText(getParamLabel(position));
 			return view;
 		}
 	}
@@ -80,9 +70,7 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 	public abstract void setXValue(float x);
 	public abstract void setYValue(float y);
 	public abstract int getNumParams();
-	public abstract String getLabelX();
-	public abstract String getLabelY();
-	public abstract String getLabelParam3();
+	public abstract String getParamLabel(int paramNum);
 	
 	public abstract void setEffectOn(boolean on);
 	

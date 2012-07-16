@@ -41,6 +41,10 @@
             android:label="@string/delay" >
         </activity>
         <activity
+            android:name="com.kh.beatbot.FlangerActivity"
+            android:label="@string/flanger" >
+        </activity>
+        <activity
             android:name="com.kh.beatbot.FilterActivity"
             android:label="@string/filter" >
         </activity>

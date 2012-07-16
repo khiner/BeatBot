@@ -10,7 +10,9 @@ import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.TronSeekbar;
 import com.kh.beatbot.view.TronSeekbar2d;
 
-public class DelayActivity extends EffectActivity {	
+public class DelayActivity extends EffectActivity {
+	private final int NUM_PARAMS = 3;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -79,23 +81,16 @@ public class DelayActivity extends EffectActivity {
 	
 	@Override
 	public int getNumParams() {
-		return 3;
+		return NUM_PARAMS;
 	}
 	
 	@Override
-	public String getLabelX() {
-		return getResources().getString(R.string.delay);
+	public String getParamLabel(int paramNum) {
+		if (paramNum < NUM_PARAMS)
+			return getResources().getStringArray(R.array.delay_params)[paramNum];
+		return ""; 
 	}
-
-	@Override
-	public String getLabelY() {
-		return getResources().getString(R.string.feedback);
-	}
-
-	@Override
-	public String getLabelParam3() {
-		return getResources().getString(R.string.wet);
-	}	
+	
 	public native void setDelayOn(int trackNum, boolean on);
 	public native void setDelayBeatmatch(int trackNum, boolean beatmatch);	
 	public native void setDelayTime(int trackNum, float delay);

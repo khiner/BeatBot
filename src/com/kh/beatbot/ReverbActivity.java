@@ -9,7 +9,7 @@ import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.TronSeekbar2d;
 
 public class ReverbActivity extends EffectActivity {
-	
+	private static final int NUM_PARAMS = 2;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -52,21 +52,13 @@ public class ReverbActivity extends EffectActivity {
 
 	@Override
 	public int getNumParams() {
-		return 2;
+		return NUM_PARAMS;
 	}
 	
 	@Override
-	public String getLabelX() {
-		return getResources().getString(R.string.hfDamp);
-	}
-
-	@Override
-	public String getLabelY() {
-		return getResources().getString(R.string.feedback);
-	}
-
-	@Override
-	public String getLabelParam3() {
-		return "";
+	public String getParamLabel(int paramNum) {
+		if (paramNum < NUM_PARAMS)
+			return getResources().getStringArray(R.array.reverb_params)[paramNum];
+		return ""; 
 	}
 }

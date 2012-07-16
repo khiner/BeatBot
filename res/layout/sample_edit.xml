@@ -138,12 +138,21 @@
         android:layout_toRightOf="@+id/bitcrushButton"
         android:layout_below="@+id/pitchView"
         android:onClick="delay" />
+
+    <Button
+        android:id="@+id/flangerButton"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@+id/delayButton"
+        android:layout_below="@+id/pitchView"
+        android:text="@string/flanger"
+    	android:onClick="flanger" />
     
     <Button
         android:id="@+id/reverbButton"
         android:layout_width="80dp"
         android:layout_height="40dp"
-        android:layout_toRightOf="@+id/delayButton"
+        android:layout_toRightOf="@+id/flangerButton"
         android:layout_below="@+id/pitchView"
         android:text="@string/reverb"
     	android:onClick="reverb" />
