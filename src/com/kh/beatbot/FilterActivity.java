@@ -31,12 +31,12 @@ public class FilterActivity extends EffectActivity {
 	
 	public void setXValue(float xValue) {
 		GlobalVars.filterX[trackNum] = xValue;
-		setFilterCutoff(trackNum, xValue);
+		setFilterParam(trackNum, 0, xValue);
 	}
 	
 	public void setYValue(float yValue) {
 		GlobalVars.filterY[trackNum] = yValue;
-		setFilterResonance(trackNum, yValue);
+		setFilterParam(trackNum, 1, yValue);
 	}
 	
 	public void setEffectOn(boolean on) {
@@ -55,8 +55,7 @@ public class FilterActivity extends EffectActivity {
 	public native void setFilterOn(int trackNum, boolean on);
 	public native void setFilterDynamic(int trackNum, boolean dynamic);
 	public native void setFilterMode(int trackNum, boolean lp);	
-	public native void setFilterCutoff(int trackNum, float cutoff);
-	public native void setFilterResonance(int trackNum, float q);
+	public native void setFilterParam(int trackNum, int paramNum, float param);
 
 	@Override
 	public int getNumParams() {

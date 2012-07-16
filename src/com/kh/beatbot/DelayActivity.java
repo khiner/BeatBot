@@ -34,12 +34,12 @@ public class DelayActivity extends EffectActivity {
 	
 	public void setXValue(float xValue) {
 		GlobalVars.delayX[trackNum] = xValue;
-		setDelayTime(trackNum, xValue);
+		setDelayParam(trackNum, 0, xValue);
 	}
 	
 	public void setYValue(float yValue) {
 		GlobalVars.delayY[trackNum] = yValue;		
-		setDelayFeedback(trackNum, yValue);
+		setDelayParam(trackNum, 1, yValue);
 	}
 		
 	public void setEffectOn(boolean on) {
@@ -61,7 +61,7 @@ public class DelayActivity extends EffectActivity {
 		
 	public void setWetValue(float wet) {
 		GlobalVars.delayWet[trackNum] = wet;
-		setDelayWet(trackNum, wet);
+		setDelayParam(trackNum, 2, wet);
 	}
 	
 	public float getWetValue() {
@@ -93,7 +93,5 @@ public class DelayActivity extends EffectActivity {
 	
 	public native void setDelayOn(int trackNum, boolean on);
 	public native void setDelayBeatmatch(int trackNum, boolean beatmatch);	
-	public native void setDelayTime(int trackNum, float delay);
-	public native void setDelayFeedback(int trackNum, float feedback);
-	public native void setDelayWet(int trackNum, float wet);
+	public native void setDelayParam(int trackNum, int paramNum, float param);
 }

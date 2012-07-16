@@ -29,12 +29,12 @@ public class ReverbActivity extends EffectActivity {
 
 	public void setXValue(float xValue) {
 		GlobalVars.reverbX[trackNum] = xValue;
-		setReverbHfDamp(trackNum, xValue);
+		setReverbParam(trackNum, 0, xValue);
 	}
 	
 	public void setYValue(float yValue) {
 		GlobalVars.reverbY[trackNum] = yValue;
-		setReverbFeedback(trackNum, yValue);
+		setReverbParam(trackNum, 1, yValue);
 	}
 
 	public void setEffectOn(boolean on) {
@@ -47,8 +47,7 @@ public class ReverbActivity extends EffectActivity {
 	}
 	
 	public native void setReverbOn(int trackNum, boolean on);
-	public native void setReverbFeedback(int trackNum, float feedback);
-	public native void setReverbHfDamp(int trackNum, float hfDamp);
+	public native void setReverbParam(int trackNum, int paramNum, float feedback);
 
 	@Override
 	public int getNumParams() {

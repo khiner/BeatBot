@@ -33,12 +33,12 @@ public class FlangerActivity extends EffectActivity {
 	
 	public void setXValue(float xValue) {
 		GlobalVars.flangerX[trackNum] = xValue;
-		setFlangerTime(trackNum, xValue);
+		setFlangerParam(trackNum, 0, xValue);
 	}
 	
 	public void setYValue(float yValue) {
 		GlobalVars.flangerY[trackNum] = yValue;		
-		setFlangerFeedback(trackNum, yValue);
+		setFlangerParam(trackNum, 1, yValue);
 	}
 		
 	public void setEffectOn(boolean on) {
@@ -54,27 +54,13 @@ public class FlangerActivity extends EffectActivity {
 	public void setLevel(TronSeekbar levelBar, float level) {		
 		super.setLevel(levelBar, level);
 		if (levelBar.getTag().equals(2)) {
-			setWetValue(level);
+			GlobalVars.flangerWet[trackNum] = level;
 		} else if (levelBar.getTag().equals(3)) {
-			setModRateValue(level);
+			GlobalVars.flangerModRate[trackNum] = level;
 		} else if (levelBar.getTag().equals(4)) {
-			setModAmtValue(level);
+			GlobalVars.flangerModAmt[trackNum] = level;
 		}
-	}
-		
-	public void setWetValue(float wet) {
-		GlobalVars.flangerWet[trackNum] = wet;
-		setFlangerWet(trackNum, wet);
-	}
-
-	public void setModRateValue(float modRate) {
-		GlobalVars.flangerModRate[trackNum] = modRate;
-		setFlangerModRate(trackNum, modRate);
-	}
-
-	public void setModAmtValue(float modAmt) {
-		GlobalVars.flangerModAmt[trackNum] = modAmt;
-		setFlangerModAmt(trackNum, modAmt);
+		setFlangerParam(trackNum, (Integer)levelBar.getTag(), level);
 	}
 	
 	public float getWetValue() {
@@ -114,9 +100,5 @@ public class FlangerActivity extends EffectActivity {
 	}
 	
 	public native void setFlangerOn(int trackNum, boolean on);
-	public native void setFlangerTime(int trackNum, float delay);
-	public native void setFlangerFeedback(int trackNum, float feedback);
-	public native void setFlangerWet(int trackNum, float wet);
-	public native void setFlangerModRate(int trackNum, float modRate);
-	public native void setFlangerModAmt(int trackNum, float modAmt);
+	public native void setFlangerParam(int trackNum, int paramNum, float param);
 }

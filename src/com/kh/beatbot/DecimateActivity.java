@@ -29,12 +29,12 @@ public class DecimateActivity extends EffectActivity {
 	
 	public void setXValue(float xValue) {
 		GlobalVars.decimateX[trackNum] = xValue;		
-		setDecimateBits(trackNum, xValue);
+		setDecimateParam(trackNum, 0, xValue);
 	}
 	
 	public void setYValue(float yValue) {
 		GlobalVars.decimateY[trackNum] = yValue;
-		setDecimateRate(trackNum, yValue);
+		setDecimateParam(trackNum, 1, yValue);
 	}
 	
 	public boolean isEffectOn() {
@@ -51,11 +51,6 @@ public class DecimateActivity extends EffectActivity {
 		setDecimateDynamic(trackNum, dynamic);
 	}
 	
-	public native void setDecimateOn(int trackNum, boolean on);	
-	public native void setDecimateDynamic(int trackNum, boolean dynamic);	
-	public native void setDecimateBits(int trackNum, float bits);
-	public native void setDecimateRate(int trackNum, float rate);
-
 	@Override
 	public int getNumParams() {
 		return NUM_PARAMS;
@@ -67,4 +62,8 @@ public class DecimateActivity extends EffectActivity {
 			return getResources().getStringArray(R.array.decimate_params)[paramNum];
 		return "";
 	}
+	
+	public native void setDecimateOn(int trackNum, boolean on);
+	public native void setDecimateDynamic(int trackNum, boolean dynamic);	
+	public native void setDecimateParam(int trackNum, int paramNum, float param);
 }

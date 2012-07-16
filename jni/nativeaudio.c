@@ -764,33 +764,28 @@ void Java_com_kh_beatbot_DecimateActivity_setDecimateOn(JNIEnv* env, jclass claz
 	precalculateEffects(track);	
 }
 
-void Java_com_kh_beatbot_DecimateActivity_setDecimateBits(JNIEnv* env, jclass clazz,
-													jint trackNum, jfloat bits) {
-	Track *track = getTrack(trackNum);
-	Effect decimate = track->effects[DECIMATE_ID];
-	DecimateConfig *decimateConfig = (DecimateConfig *)decimate.config;
-	// bits range from 4 to 32
-	bits *= 28;
-	bits += 4;
-	decimate.set(decimateConfig, bits, decimateConfig->rate);
-	precalculateEffects(track);
-}
-
-void Java_com_kh_beatbot_DecimateActivity_setDecimateRate(JNIEnv* env, jclass clazz,
-													jint trackNum, jfloat rate) {
-	Track *track = getTrack(trackNum);
-	Effect decimate = track->effects[DECIMATE_ID];
-	DecimateConfig *decimateConfig = (DecimateConfig *)decimate.config;
-	decimate.set(decimateConfig, decimateConfig->bits, rate);
-	precalculateEffects(track);	
-}
-
 void Java_com_kh_beatbot_DecimateActivity_setDecimateDynamic(JNIEnv* env, jclass clazz,
 													jint trackNum, jboolean dynamic) {
 	Track *track = getTrack(trackNum);
 	Effect *decimate = &(track->effects[DECIMATE_ID]);
 	decimate->dynamic = dynamic;
 	precalculateEffects(track);	
+}
+
+void Java_com_kh_beatbot_DecimateActivity_setDecimateParam(JNIEnv* env, jclass clazz,
+													jint trackNum, jint paramNum, jfloat param) {
+	Track *track = getTrack(trackNum);
+	Effect decimate = track->effects[DECIMATE_ID];
+	DecimateConfig *decimateConfig = (DecimateConfig *)decimate.config;
+	if (paramNum == 0) { // rate
+	 	decimate.set(decimateConfig, decimateConfig->bits, param);
+	} else if (paramNum == 1) { // bits
+		// bits range from 4 to 32
+		param *= 28;
+		param += 4;
+		decimate.set(decimateConfig, param, decimateConfig->rate);
+	}
+	precalculateEffects(track);
 }
 
 void Java_com_kh_beatbot_FilterActivity_setFilterOn(JNIEnv* env, jclass clazz,
@@ -800,7 +795,6 @@ void Java_com_kh_beatbot_FilterActivity_setFilterOn(JNIEnv* env, jclass clazz,
 	filter->on = on;
 	precalculateEffects(track);	
 }
-
 
 void Java_com_kh_beatbot_FilterActivity_setFilterDynamic(JNIEnv* env, jclass clazz,
 													jint trackNum, jboolean dynamic) {
@@ -820,25 +814,21 @@ void Java_com_kh_beatbot_FilterActivity_setFilterMode(JNIEnv* env, jclass clazz,
 	precalculateEffects(track);
 }
 
-void Java_com_kh_beatbot_FilterActivity_setFilterCutoff(JNIEnv* env, jclass clazz,
-													  jint trackNum, jfloat cutoff) {
+void Java_com_kh_beatbot_FilterActivity_setFilterParam(JNIEnv* env, jclass clazz,
+													  jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(trackNum);
 	Effect filter = track->effects[FILTER_ID];
-	FilterConfig *filterConfig = (FilterConfig *)filter.config;
-	// provided cutoff is between 0 and 1.  map this to a value between
-	// 0 and samplerate/2 = 22050... - 50 because high frequencies are bad news
-	cutoff *= 22000.0f;
-	cutoff = cutoff < 0.01f ? 0.01f : cutoff;
-	filter.set(filterConfig, cutoff, filterConfig->r);
-	precalculateEffects(track);
-}
-
-void Java_com_kh_beatbot_FilterActivity_setFilterResonance(JNIEnv* env, jclass clazz,
-													  jint trackNum, jfloat r) {
-	Track *track = getTrack(trackNum);
-	FilterConfig *config = (FilterConfig *)track->effects[FILTER_ID].config;
-	r = r < 0.011f ? 0.011f : r;
-	filterconfig_set(config, config->f, r);
+	FilterConfig *config = (FilterConfig *)filter.config;
+	if (paramNum == 0) { // cutoff
+		// provided cutoff is between 0 and 1.  map this to a value between
+		// 0 and samplerate/2 = 22050... - 50 because high frequencies are bad news
+		param *= 22000.0f;
+		param = param < 0.01f ? 0.01f : param;
+		filter.set(config, param, config->r);
+	} else if (paramNum == 1) {
+		param = param < 0.011f ? 0.011f : param;
+		filter.set(config, config->f, param);
+	}
 	precalculateEffects(track);
 }
 
@@ -849,17 +839,22 @@ void Java_com_kh_beatbot_DelayActivity_setDelayOn(JNIEnv* env, jclass clazz,
 	delay->on = on;
 }
 
-void Java_com_kh_beatbot_DelayActivity_setDelayTime(JNIEnv* env, jclass clazz,
-													  jint trackNum, jfloat time) {
+void Java_com_kh_beatbot_DelayActivity_setDelayParam(JNIEnv* env, jclass clazz,
+													  jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(trackNum);
 	DelayConfigI *config = (DelayConfigI *)track->effects[DELAY_ID].config;
-	float newTime;
-	if (config->beatmatch) {
- 		// map float 0-1 to int 1-16 for number of beats
-		delayconfigi_setNumBeats(config, (int)(time*15) + 1);
-	} else {
-		newTime = time;
-		delayconfigi_setDelayTime(config, newTime);
+	if (paramNum == 0) { // delay time
+		float newTime;
+		if (config->beatmatch) {
+	 		// map float 0-1 to int 1-16 for number of beats
+			delayconfigi_setNumBeats(config, (int)(param*15) + 1);
+		} else {
+			delayconfigi_setDelayTime(config, param);
+		}
+	} else if (paramNum == 1) { // feedback
+		delayconfigi_setFeedback(config, param);
+	} else if (paramNum == 2) { // wet/dry
+		config->wet = param;
 	}
 }
 
@@ -868,21 +863,7 @@ void Java_com_kh_beatbot_DelayActivity_setDelayBeatmatch(JNIEnv* env, jclass cla
 	Track *track = getTrack(trackNum);
 	DelayConfigI *config = (DelayConfigI *)track->effects[DELAY_ID].config;
 	config->beatmatch = beatmatch;
-	Java_com_kh_beatbot_DelayActivity_setDelayTime(NULL, NULL, trackNum, config->delayTime);
-}
-
-void Java_com_kh_beatbot_DelayActivity_setDelayFeedback(JNIEnv* env, jclass clazz,
-													  jint trackNum, jfloat fdb) {
-	Track *track = getTrack(trackNum);
-	DelayConfigI *config = (DelayConfigI *)track->effects[DELAY_ID].config;
-	delayconfigi_setFeedback(config, fdb);
-}
-
-void Java_com_kh_beatbot_DelayActivity_setDelayWet(JNIEnv* env, jclass clazz,
-												   jint trackNum, jfloat wet) {
-	Track *track = getTrack(trackNum);
-	DelayConfigI *config = (DelayConfigI *)track->effects[DELAY_ID].config;
-	config->wet = wet;
+	Java_com_kh_beatbot_DelayActivity_setDelayParam(NULL, NULL, trackNum, 0, config->delayTime);
 }
 
 void Java_com_kh_beatbot_FlangerActivity_setFlangerOn(JNIEnv* env, jclass clazz,
@@ -892,39 +873,21 @@ void Java_com_kh_beatbot_FlangerActivity_setFlangerOn(JNIEnv* env, jclass clazz,
 	flanger->on = on;
 }
 
-void Java_com_kh_beatbot_FlangerActivity_setFlangerTime(JNIEnv* env, jclass clazz,
-												        jint trackNum, jfloat time) {
+void Java_com_kh_beatbot_FlangerActivity_setFlangerParam(JNIEnv* env, jclass clazz,
+												        jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(trackNum);
 	FlangerConfig *config = (FlangerConfig *)track->effects[FLANGER_ID].config;
-	flangerconfig_setBaseTime(config, time);
-}
-
-void Java_com_kh_beatbot_FlangerActivity_setFlangerFeedback(JNIEnv* env, jclass clazz,
-												            jint trackNum, jfloat feedback) {
-	Track *track = getTrack(trackNum);
-	FlangerConfig *config = (FlangerConfig *)track->effects[FLANGER_ID].config;
-	delayconfigi_setFeedback(config->delayConfig, feedback);
-}
-
-void Java_com_kh_beatbot_FlangerActivity_setFlangerWet(JNIEnv* env, jclass clazz,
-												       jint trackNum, jfloat wet) {
-	Track *track = getTrack(trackNum);
-	FlangerConfig *config = (FlangerConfig *)track->effects[FLANGER_ID].config;
-	config->delayConfig->wet = wet;
-}
-
-void Java_com_kh_beatbot_FlangerActivity_setFlangerModRate(JNIEnv* env, jclass clazz,
-												           jint trackNum, jfloat modRate) {
-	Track *track = getTrack(trackNum);
-	FlangerConfig *config = (FlangerConfig *)track->effects[FLANGER_ID].config;
-	flangerconfig_setModRate(config, modRate);
-}
-
-void Java_com_kh_beatbot_FlangerActivity_setFlangerModAmt(JNIEnv* env, jclass clazz,
-												          jint trackNum, jfloat modAmt) {
-	Track *track = getTrack(trackNum);
-	FlangerConfig *config = (FlangerConfig *)track->effects[FLANGER_ID].config;
-	flangerconfig_setModAmt(config, modAmt);
+	if (paramNum == 0) { // delay time
+		flangerconfig_setBaseTime(config, param);
+	} else if (paramNum == 1) { // feedback
+		delayconfigi_setFeedback(config->delayConfig, param);
+	} else if (paramNum == 2) { // wet/dry
+		config->delayConfig->wet = param;
+	} else if (paramNum == 3) { // modulation rate
+		flangerconfig_setModRate(config, param);
+	} else if (paramNum == 4) { // modulation amount
+		flangerconfig_setModAmt(config, param);
+	}
 }
 
 void Java_com_kh_beatbot_ReverbActivity_setReverbOn(JNIEnv* env, jclass clazz,
@@ -934,22 +897,19 @@ void Java_com_kh_beatbot_ReverbActivity_setReverbOn(JNIEnv* env, jclass clazz,
 	reverb->on = on;
 }
 
-void Java_com_kh_beatbot_ReverbActivity_setReverbFeedback(JNIEnv* env, jclass clazz,
-													      jint trackNum, jfloat feedback) {
+void Java_com_kh_beatbot_ReverbActivity_setReverbParam(JNIEnv* env, jclass clazz,
+													      jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(trackNum);
 	ReverbConfig *config = (ReverbConfig *)track->effects[REVERB_ID].config;
-	config->feedback = feedback;
-}
-
-void Java_com_kh_beatbot_ReverbActivity_setReverbHfDamp(JNIEnv* env, jclass clazz,
-													    jint trackNum, jfloat hfDamp) {
-	Track *track = getTrack(trackNum);
-	ReverbConfig *config = (ReverbConfig *)track->effects[REVERB_ID].config;
-	config->hfDamp = hfDamp;
+	if (paramNum == 0) { // feedback
+		config->feedback = param;
+	} else if (paramNum == 1) { // hf damp
+		config->hfDamp = param;
+	}
 }
 
 /****************************************************************************************
- Java Effects JNI methods
+ Java Sample Waveform JNI methods
 ****************************************************************************************/
 
 void Java_com_kh_beatbot_view_SampleWaveformView_setAdsrPoint(JNIEnv* env, jclass clazz,
