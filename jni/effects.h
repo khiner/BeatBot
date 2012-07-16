@@ -196,17 +196,99 @@ typedef struct Effect_t {
 
 void initEffect(Effect *effect, bool on, bool dynamic, void *config,
 				void (*set), void (*process), void (*destroy));
-				
+
+static inline void underguard(float *x) {
+  	union {
+	    u_int32_t i;
+	    float f;
+  	} ix;
+  	ix.f = *x;
+  	if((ix.i & 0x7f800000)==0) *x=0.0f;
+}
+
+static inline float allpass_process(allpass_state *a, float  input){
+  	float val    = *a->bufptr;
+  	float output = val - input;
+  
+  	*a->bufptr   = val * .5f + input;
+  	underguard(a->bufptr);
+  
+  	if(a->bufptr<=a->buffer) a->bufptr += a->size;
+  	--a->bufptr;
+
+  	return output;
+}
+
+static inline float comb_process(comb_state *c, float  feedback, float  hfDamp, float  input){
+  	float val      = *c->extptr;
+  	c->filterstore = val + (c->filterstore - val)*hfDamp;
+  	underguard(&c->filterstore);
+
+  	*c->injptr     = input + c->filterstore * feedback;
+  	underguard(c->injptr);
+
+  	if(c->injptr<=c->buffer) c->injptr += c->size;
+  	--c->injptr;
+  	if(c->extptr<=c->buffer) c->extptr += c->size;
+  	--c->extptr;
+  	
+  return val;
+}
+
 AdsrConfig *adsrconfig_create(int totalSamples);
-void adsr_process(void *p, float **buffers, int size);
-void adsrconfig_destroy(void *p);
 
 void updateAdsr(AdsrConfig *config, int totalSamples);
 void resetAdsr(AdsrConfig *config);
 
+static inline void adsr_process(void *p, float **buffers, int size) {
+	AdsrConfig *config = (AdsrConfig *)p;
+	if (!config->active) return;
+	int i;
+	for (i = 0; i < size; i++) {
+		if (++config->currSampleNum < config->gateSample) {
+			if (config->rising) { // attack phase
+				config->currLevel += config->attackCoeff*(config->peak/0.63f - config->currLevel);
+				if (config->currLevel > 1.0f) {
+					config->currLevel = 1.0f;
+					config->rising = false;
+				}
+			} else { // decal/sustain
+				config->currLevel += config->decayCoeff * (config->sustain - config->currLevel)/0.63f;
+			}
+		} else if (config->currSampleNum < config->adsrPoints[4].sampleNum) { // past gate sample, go to release phase
+			config->currLevel += config->releaseCoeff * (config->end - config->currLevel)/0.63f;
+			if (config->currLevel < config->end) {
+				config->currLevel = config->end;
+			}
+		} else if (config->currSampleNum < config->totalSamples) {
+			config->currLevel = 0;
+		} else {
+			resetAdsr(config);
+		}
+		buffers[0][i] *= config->currLevel;
+		buffers[1][i] *= config->currLevel;
+    }
+}
+
+void adsrconfig_destroy(void *p);
+
 DecimateConfig *decimateconfig_create(float bits, float rate);
 void decimateconfig_set(void *p, float bits, float rate);
-void decimate_process(void *p, float **buffers, int size);
+
+static inline void decimate_process(void *p, float **buffers, int size) {
+	DecimateConfig *config = (DecimateConfig *)p;
+    int m = 1 << (config->bits - 1);
+	int i;
+	for (i = 0; i < size; i++) {
+	    config->cnt += config->rate;
+	    if (config->cnt >= 1) {
+	        config->cnt -= 1;
+		config->y = (long int)(buffers[0][i]*m)/(float)m;
+	    }
+	    buffers[0][i] = buffers[1][i] = config->y;
+	}
+}
+
 void decimateconfig_destroy(void *p);
 
 DelayConfigI *delayconfigi_create(float delay, float feedback);
@@ -215,14 +297,58 @@ void delayconfigi_setDelayTime(DelayConfigI *config, float delay);
 void delayconfigi_setNumBeats(DelayConfigI *config, int numBeats);
 void delayconfigi_syncToBPM(DelayConfigI *config);
 void delayconfigi_setFeedback(DelayConfigI *config, float feedback);
-void delayi_process(void *p, float **buffers, int size);
-float delayi_tick(DelayConfigI *config, float in, int channel);
+
+static inline float delayi_tick(DelayConfigI *config, float in, int channel) {
+	pthread_mutex_lock(&config->mutex);
+	if ((config->rp[channel]) >= config->delayBufferSize) config->rp[channel] = 0;
+	if ((config->wp[channel]) >= config->delayBufferSize) config->wp[channel] = 0;
+	int rpi = config->rp[channel]++;
+	int wpi = floorf(config->wp[channel]++);
+	
+	float interpolated = config->delayBuffer[channel][rpi] * config->omAlpha[channel];
+	interpolated += config->delayBuffer[channel][rpi + 1 % config->delayBufferSize] * config->alpha[channel];	
+	pthread_mutex_unlock(&config->mutex);
+	
+	config->out = interpolated*config->wet + in*(1 - config->wet);
+	if (config->out > 1) config->out = 1;
+	config->delayBuffer[channel][wpi] = in + config->out*config->feedback[channel];
+	return config->out;	
+}
+
+static inline void delayi_process(void *p, float **buffers, int size) {
+	DelayConfigI *config = (DelayConfigI *)p;
+	int channel, samp;
+	for (channel = 0; channel < 2; channel++) {
+		for (samp = 0; samp < size; samp++) {
+			buffers[channel][samp] = delayi_tick(config, buffers[channel][samp], channel);
+		}
+	}
+}
+
 void delayconfigi_destroy(void *p);
 
 FilterConfig *filterconfig_create(float cutoff, float r);
 void filterconfig_set(void *config, float cutoff, float r);
-void filter_process(void *config, float **buffers, int size);
-float filter_tick(FilterConfig *config, float in, int channel);
+
+static inline void filter_process(void *p, float **buffers, int size) {
+	FilterConfig *config = (FilterConfig *)p;
+	int channel, samp;
+	for (channel = 0; channel < 2; channel++) {
+		for(samp = 0; samp < size; samp++) {
+			float out = config->a1 * buffers[channel][samp] +
+				        config->a2 * config->in1[channel] +
+					    config->a3 * config->in2[channel] -
+					    config->b1 * config->out1[channel] -
+					    config->b2 * config->out2[channel];
+			config->in2[channel] = config->in1[channel];
+			config->in1[channel] = buffers[channel][samp];
+			config->out2[channel] = config->out1[channel];
+			config->out1[channel] = out;
+			buffers[channel][samp] = out;
+		}	
+	}
+}
+
 void filterconfig_destroy(void *config);
 
 FlangerConfig *flangerconfig_create(float delayTime, float feedback);
@@ -232,23 +358,71 @@ void flangerconfig_setTime(FlangerConfig *config, float time);
 void flangerconfig_setFeedback(FlangerConfig *config, float feedback);
 void flangerconfig_setModRate(FlangerConfig *config, float modRate);
 void flangerconfig_setModAmt(FlangerConfig *config, float modAmt);
-void flanger_process(void *config, float **buffers, int size);
+
+static inline void flanger_process(void *p, float **buffers, int size) {
+	FlangerConfig *config = (FlangerConfig *)p;
+	int channel, samp;
+	for (channel = 0; channel < 2; channel++) {
+		for (samp = 0; samp < size; samp++) {
+			if (channel == 0)
+				//flangerconfig_setTime(config, config->baseTime * (1.0f + config->modAmt * sinewave_tick(config->mod)));
+				flangerconfig_setTime(config, config->baseTime * (1.0f + config->modAmt * sin(config->count++ * INV_SAMPLE_RATE * config->mod->rate/20)));
+			buffers[channel][samp] = delayi_tick(config->delayConfig, buffers[channel][samp], channel);
+		}	
+	}	
+}
+
 void flangerconfig_destroy(void *config);
 
 PitchConfig *pitchconfig_create(float shift);
 void pitchconfig_set(float shift);
-void pitch_process(void *config, float **buffers, int size);
+
+static inline void pitch_process(void *config, float **buffers, int size) {
+
+}
+
 void pitch_tick(PitchConfig *config, int channel, int samp);
 void pitchconfig_destroy(void *config);
 
 ReverbConfig *reverbconfig_create(float feedback, float hfDamp);
 void reverbconfig_set(void *config, float feedback, float hfDamp);
-void reverb_process(void *config, float **buffers, int size);
+
+static inline void reverb_process(void *p, float **buffers, int size) {	
+	ReverbConfig *config = (ReverbConfig *)p;
+  	float out, val=0;
+  	int i, j;
+
+  	for (i = 0; i < size; i++) {
+    	out = 0;
+    	val = buffers[0][i];
+	    for(j = 0; j < numcombs; j++)
+      		out += comb_process(config->state->comb + j, config->feedback, config->hfDamp, val);
+	    for(j = 0; j < numallpasses; j++)
+    	    out = allpass_process(config->state->allpass + j, out);
+	    buffers[0][i] = buffers[1][i] = out;
+	}
+}
+
 void reverbconfig_destroy(void *config);
 
 VolumePanConfig *volumepanconfig_create(float volume, float pan);
 void volumepanconfig_set(void *config, float volume, float pan);
-void volumepan_process(void *config, float **buffers, int size);
+
+static inline void volumepan_process(void *p, float **buffers, int size) {
+	VolumePanConfig *config = (VolumePanConfig *)p;
+	float leftVolume = (1 - config->pan)*config->volume;
+	float rightVolume = config->pan*config->volume;
+	int i;
+	for (i = 0; i < size; i++) {
+		if (buffers[0][i] == 0) continue;
+		buffers[0][i] *= leftVolume; // left channel
+	}
+	for (i = 0; i < size; i++) {
+		if (buffers[1][i] == 0) continue;
+		buffers[1][i] *= rightVolume; // right channel	
+	}
+}
+
 void volumepanconfig_destroy(void *config);
 
 void reverse(float buffer[], int begin, int end);
