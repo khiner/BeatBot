@@ -752,6 +752,7 @@ void Java_com_kh_beatbot_SampleEditActivity_setAdsrOn(JNIEnv* env, jclass clazz,
 	Track *track = getTrack(trackNum);
 	track->effects[ADSR_ID].on = on;
 }
+
 /****************************************************************************************
  Java Effects JNI methods
 ****************************************************************************************/

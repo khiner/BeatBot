@@ -16,7 +16,8 @@ public class DecimateActivity extends EffectActivity {
 		setContentView(R.layout.effect_layout);
 		((ListView) findViewById(R.id.paramListView)).setAdapter(adapter);
 		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.decimateOn[trackNum]);
-		((TronSeekbar2d)findViewById(R.id.xyParamBar)).addLevelListener(this);
+		level2d = (TronSeekbar2d)findViewById(R.id.xyParamBar);
+		level2d.addLevelListener(this);
 	}
 	
 	public float getXValue() {
