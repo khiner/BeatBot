@@ -100,13 +100,17 @@ void initTrack(Track *track, AAsset *asset) {
   
   	initEffect(&(track->effects[STATIC_VOL_PAN_ID]), true, false, volumepanconfig_create(.5f, .5f),
   			   volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
+  	initEffect(&(track->effects[STATIC_PITCH_ID]), false, false, pitchconfig_create(),
+  			   pitchconfig_setShift, pitch_process, pitchconfig_destroy);
   	initEffect(&(track->effects[DECIMATE_ID]), false, true, decimateconfig_create(4.0f, 0.5f),
   			   decimateconfig_set, decimate_process, decimateconfig_destroy);
   	initEffect(&(track->effects[FILTER_ID]), false, true, filterconfig_create(11050.0f, 0.5f),
   			   filterconfig_set, filter_process, filterconfig_destroy);
   	initEffect(&(track->effects[DYNAMIC_VOL_PAN_ID]), true, true, volumepanconfig_create(.5f, .5f),
   			   volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
-  	initEffect(&(track->effects[DELAY_ID]), false, true, delayconfigi_create(.5f, .5f),
+  	initEffect(&(track->effects[DYNAMIC_PITCH_ID]), false, true, pitchconfig_create(),
+  			   pitchconfig_setShift, pitch_process, pitchconfig_destroy);
+  	initEffect(&(track->effects[DELAY_ID]), false, true, delayconfigi_create(.5f, .5f, SAMPLE_RATE),
   			   delayconfigi_set, delayi_process, delayconfigi_destroy);
     initEffect(&(track->effects[FLANGER_ID]), false, true, flangerconfig_create(.5f, .5f),
     		   flangerconfig_set, flanger_process, flangerconfig_destroy);
@@ -845,7 +849,6 @@ void Java_com_kh_beatbot_DelayActivity_setDelayParam(JNIEnv* env, jclass clazz,
 	Track *track = getTrack(trackNum);
 	DelayConfigI *config = (DelayConfigI *)track->effects[DELAY_ID].config;
 	if (paramNum == 0) { // delay time
-		float newTime;
 		if (config->beatmatch) {
 	 		// map float 0-1 to int 1-16 for number of beats
 			delayconfigi_setNumBeats(config, (int)(param*15) + 1);

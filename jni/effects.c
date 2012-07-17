@@ -126,14 +126,11 @@ void decimateconfig_destroy(void *p) {
 	if(p != NULL) free((DecimateConfig *)p);
 }
 
-DelayConfigI *delayconfigi_create(float delay, float feedback) {
+DelayConfigI *delayconfigi_create(float delay, float feedback, int maxSamples) {
 	// allocate memory and set feedback parameter
 	DelayConfigI *p = (DelayConfigI *)malloc(sizeof(DelayConfigI));
 	pthread_mutex_init(&p->mutex, NULL);
-	p->delayBuffer = (float **)malloc(2*sizeof(float *));
-	p->delayBuffer[0] = (float *)malloc(SAMPLE_RATE*sizeof(float));
-	p->delayBuffer[1] = (float *)malloc(SAMPLE_RATE*sizeof(float));
-	p->delayBufferSize = SAMPLE_RATE;
+	delayconfigi_setMaxSamples(p, maxSamples);
 	p->rp[0] = p->wp[1] = 0;
 	delayconfigi_set(p, delay, feedback);
 	p->wet = 0.5f;
@@ -151,21 +148,37 @@ void delayconfigi_set(void *p, float delay, float feedback) {
 void delayconfigi_setDelayTime(DelayConfigI *config, float delay) {
 	config->delayTime = delay > 0 ? (delay <= 1 ? delay : 1) : 0;
 	if (config->delayTime < 0.0001) config->delayTime = 0.0001;
+	delayconfigi_setDelaySamples(config, config->delayTime*SAMPLE_RATE);
+}
+
+void delayconfigi_setDelaySamples(DelayConfigI *config, float numSamples) {
 	int i, *rp, *wp;
 	pthread_mutex_lock(&config->mutex);
-	config->delaySamples = config->delayTime*SAMPLE_RATE;
+	config->delaySamples = numSamples > 2 ? (numSamples < SAMPLE_RATE ? numSamples : SAMPLE_RATE - 1) : 2;
 	for (i = 0; i < 2; i++) {
 		rp = &(config->rp[i]);
 		wp = &(config->wp[i]);
 		float rpf = *wp - config->delaySamples; // read chases write
 		while (rpf < 0)
-			rpf += config->delayBufferSize;
+			rpf += config->maxSamples;
 		*rp = floorf(rpf);
-		if (*rp >= config->delayBufferSize) (*rp) = 0;
+		if (*rp >= config->maxSamples) (*rp) = 0;
 		config->alpha[i] = rpf - (*rp);
 		config->omAlpha[i] = 1.0f - config->alpha[i];
 	}
 	pthread_mutex_unlock(&config->mutex);
+}
+
+void delayconfigi_setMaxSamples(DelayConfigI *config, int maxSamples) {
+	config->maxSamples = maxSamples;
+	//if (config->delayBuffer != NULL) {
+//		free(config->delayBuffer[0]);
+//		free(config->delayBuffer[1]);
+//		free(config->delayBuffer);	
+//	}
+	config->delayBuffer = (float **)malloc(2*sizeof(float *));
+	config->delayBuffer[0] = (float *)malloc(maxSamples*sizeof(float));
+	config->delayBuffer[1] = (float *)malloc(maxSamples*sizeof(float));
 }
 
 void delayconfigi_setFeedback(DelayConfigI *config, float feedback) {
@@ -232,7 +245,7 @@ void filterconfig_destroy(void *p) {
 
 FlangerConfig *flangerconfig_create(float delayTime, float feedback) {
 	FlangerConfig *flangerConfig = (FlangerConfig *)malloc(sizeof(FlangerConfig));
-	flangerConfig->delayConfig = delayconfigi_create(delayTime, feedback);
+	flangerConfig->delayConfig = delayconfigi_create(delayTime, feedback, MAX_FLANGER_DELAY*SAMPLE_RATE + 1024);
 	flangerconfig_set(flangerConfig, delayTime, feedback);
 	flangerConfig->mod = sinewave_create();
 	flangerConfig->modAmt = .5f;
@@ -273,16 +286,37 @@ void flangerconfig_destroy(void *p) {
 	free(config);
 }
 
-PitchConfig *pitchconfig_create(float shift) {
-	return NULL;
+PitchConfig *pitchconfig_create() {
+	PitchConfig *config = (PitchConfig *)malloc(sizeof(PitchConfig));
+	config->delayLength = MAX_PITCH_DELAY_SAMPS - 24;
+	config->halfLength = config->delayLength / 2;
+	config->delaySamples[0] = 12;
+	config->delaySamples[1] = MAX_PITCH_DELAY_SAMPS / 2;
+	
+	config->delayLine[0] = delayconfigi_create(.5f, 1, MAX_PITCH_DELAY_SAMPS);
+	delayconfigi_setDelaySamples(config->delayLine[0], config->delaySamples[0]);
+	config->delayLine[1] = delayconfigi_create(.5f, 1, MAX_PITCH_DELAY_SAMPS);
+	delayconfigi_setDelaySamples(config->delayLine[1], config->delaySamples[1]);
+	
+	config->rate = 1.0f;
+	config->wet = 0.5f;
+	return config;
 }
 
-void pitchconfig_set(float shift) {
-
+void pitchconfig_setShift(PitchConfig *config, float shift) {
+	if (shift == 1.0) {
+		config->rate = 0.0;
+		config->delaySamples[0] = config->halfLength + 12;
+	} else {
+		config->rate = 1.0 - shift;
+	}
 }
 
-void pitchconfig_destroy(void *config) {
-
+void pitchconfig_destroy(void *p) {
+	PitchConfig *config = (PitchConfig *)p;
+	delayconfigi_destroy(config->delayLine[0]);
+	delayconfigi_destroy(config->delayLine[1]);
+	free((PitchConfig *)config);
 }
 
 VolumePanConfig *volumepanconfig_create(float volume, float pan) {

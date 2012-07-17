@@ -14,15 +14,18 @@
 #define INV_SAMPLE_RATE 1.0f/44100.0f
 #define MIN_FLANGER_DELAY 0.002f
 #define MAX_FLANGER_DELAY 0.015f
+#define MAX_PITCH_DELAY_SAMPS 5024
 
 #define STATIC_VOL_PAN_ID 0
-#define DECIMATE_ID 1
-#define FILTER_ID 2
-#define DYNAMIC_VOL_PAN_ID 3
-#define DELAY_ID 4
-#define FLANGER_ID 5
-#define REVERB_ID 6
-#define ADSR_ID 7
+#define STATIC_PITCH_ID 1
+#define DECIMATE_ID 2
+#define FILTER_ID 3
+#define DYNAMIC_VOL_PAN_ID 4
+#define DYNAMIC_PITCH_ID 5
+#define DELAY_ID 6
+#define FLANGER_ID 7
+#define REVERB_ID 8
+#define ADSR_ID 9
 
 /******* BEGIN FREEVERB STUFF *********/
 typedef struct allpass{
@@ -153,9 +156,9 @@ typedef struct DelayConfigI_t {
 	float  alpha[2];
 	float  omAlpha[2];
 	float  delaySamples;       // (fractional) delay time in samples: 0 - SAMPLE_RATE
-	float  out;	
+	float  out;
+	int    maxSamples; 	       // maximum size of delay buffer (set to SAMPLE_RATE by default)
 	int    numBeats;  		   // number of beats to delay for beatmatch
-	int    delayBufferSize;    // maximum size of delay buffer (set to SAMPLE_RATE)
 	int    rp[2], wp[2];       // read & write pointers
 	bool   beatmatch; 		   // sync to the beat?
 	pthread_mutex_t mutex;
@@ -178,6 +181,13 @@ typedef struct FilterConfig_t {
 } FilterConfig;
 
 typedef struct PitchConfig_t {
+	DelayConfigI *delayLine[2];
+	float delaySamples[2];
+	float env[2];
+	float rate;
+	float wet;
+	unsigned long delayLength;
+	unsigned long halfLength;
 } PitchConfig;
 
 typedef struct VolumePanConfig_t {
@@ -291,22 +301,24 @@ static inline void decimate_process(void *p, float **buffers, int size) {
 
 void decimateconfig_destroy(void *p);
 
-DelayConfigI *delayconfigi_create(float delay, float feedback);
+DelayConfigI *delayconfigi_create(float delay, float feedback, int maxSamples);
 void delayconfigi_set(void *config, float delay, float feedback);
 void delayconfigi_setDelayTime(DelayConfigI *config, float delay);
+void delayconfigi_setDelaySamples(DelayConfigI *config, float numSamples);
+void delayconfigi_setMaxSamples(DelayConfigI *config, int maxSamples);
+void delayconfigi_setFeedback(DelayConfigI *config, float feedback);
 void delayconfigi_setNumBeats(DelayConfigI *config, int numBeats);
 void delayconfigi_syncToBPM(DelayConfigI *config);
-void delayconfigi_setFeedback(DelayConfigI *config, float feedback);
 
 static inline float delayi_tick(DelayConfigI *config, float in, int channel) {
 	pthread_mutex_lock(&config->mutex);
-	if ((config->rp[channel]) >= config->delayBufferSize) config->rp[channel] = 0;
-	if ((config->wp[channel]) >= config->delayBufferSize) config->wp[channel] = 0;
+	if ((config->rp[channel]) >= config->maxSamples) config->rp[channel] = 0;
+	if ((config->wp[channel]) >= config->maxSamples) config->wp[channel] = 0;
 	int rpi = config->rp[channel]++;
 	int wpi = floorf(config->wp[channel]++);
 	
 	float interpolated = config->delayBuffer[channel][rpi] * config->omAlpha[channel];
-	interpolated += config->delayBuffer[channel][rpi + 1 % config->delayBufferSize] * config->alpha[channel];	
+	interpolated += config->delayBuffer[channel][rpi + 1 % config->maxSamples] * config->alpha[channel];	
 	pthread_mutex_unlock(&config->mutex);
 	
 	config->out = interpolated*config->wet + in*(1 - config->wet);
@@ -374,14 +386,54 @@ static inline void flanger_process(void *p, float **buffers, int size) {
 
 void flangerconfig_destroy(void *config);
 
-PitchConfig *pitchconfig_create(float shift);
-void pitchconfig_set(float shift);
+PitchConfig *pitchconfig_create();
+void pitchconfig_setShift(PitchConfig *config, float shift);
 
-static inline void pitch_process(void *config, float **buffers, int size) {
+static inline float pitch_tick(PitchConfig *config, float in, int channel) {
+	// Calculate the two delay length values, keeping them within the
+	// range 12 to maxDelay-12.
+	config->delaySamples[0] += config->rate;
+	while (config->delaySamples[0] > MAX_PITCH_DELAY_SAMPS - 12)
+		config->delaySamples[0] -= config->delayLength;
+	while ( config->delaySamples[0] < 12 )
+		config->delaySamples[0] += config->delayLength;
 
+	config->delaySamples[1] = config->delaySamples[0] + config->halfLength;
+	while (config->delaySamples[1] > MAX_PITCH_DELAY_SAMPS - 12)
+		config->delaySamples[1] -= config->delayLength;
+	while (config->delaySamples[1] < 12)
+		config->delaySamples[1] += config->delayLength;
+
+	// Set the new delay line lengths.
+	delayconfigi_setDelaySamples(config->delayLine[0], config->delaySamples[0]);
+	delayconfigi_setDelaySamples(config->delayLine[1], config->delaySamples[1]);
+
+	// Calculate a triangular envelope.
+	config->env[1] = fabs((config->delaySamples[0] - config->halfLength + 12) *
+						 (1.0 / (config->halfLength + 12)));
+	config->env[0] = 1.0 - config->env[1];
+
+	// Delay input and apply envelope.
+	float out = config->env[0] * delayi_tick(config->delayLine[0], in, channel);
+	out += config->env[1] * delayi_tick(config->delayLine[1], in, channel);
+
+	// Compute effect mix and output.
+	out *= config->wet;
+	out += (1.0 - config->wet) * in;
+
+	return out;
 }
 
-void pitch_tick(PitchConfig *config, int channel, int samp);
+static inline void pitch_process(void *p, float **buffers, int size) {
+	PitchConfig *config = (PitchConfig *)p;
+	int channel, samp;
+	for (channel = 0; channel < 2; channel++) {
+		for (samp = 0; samp < size; samp++) {
+			buffers[channel][samp] = pitch_tick(config, buffers[channel][samp], channel);
+		}
+	}
+}
+
 void pitchconfig_destroy(void *config);
 
 ReverbConfig *reverbconfig_create(float feedback, float hfDamp);
@@ -428,6 +480,6 @@ void volumepanconfig_destroy(void *config);
 void reverse(float buffer[], int begin, int end);
 void normalize(float buffer[], int size);
 			      
-static const int numEffects = 8;
+static const int numEffects = 10;
 
 #endif // EFFECTS_H
