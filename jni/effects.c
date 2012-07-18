@@ -145,37 +145,10 @@ void delayconfigi_set(void *p, float delay, float feedback) {
 	delayconfigi_setFeedback(config, feedback);
 }
 
-void delayconfigi_setDelayTime(DelayConfigI *config, float delay) {
-	config->delayTime = delay > 0 ? (delay <= 1 ? delay : 1) : 0;
-	if (config->delayTime < 0.0001) config->delayTime = 0.0001;
-	delayconfigi_setDelaySamples(config, config->delayTime*SAMPLE_RATE);
-}
-
-void delayconfigi_setDelaySamples(DelayConfigI *config, float numSamples) {
-	int i, *rp, *wp;
-	pthread_mutex_lock(&config->mutex);
-	config->delaySamples = numSamples > 2 ? (numSamples < SAMPLE_RATE ? numSamples : SAMPLE_RATE - 1) : 2;
-	for (i = 0; i < 2; i++) {
-		rp = &(config->rp[i]);
-		wp = &(config->wp[i]);
-		float rpf = *wp - config->delaySamples; // read chases write
-		while (rpf < 0)
-			rpf += config->maxSamples;
-		*rp = floorf(rpf);
-		if (*rp >= config->maxSamples) (*rp) = 0;
-		config->alpha[i] = rpf - (*rp);
-		config->omAlpha[i] = 1.0f - config->alpha[i];
-	}
-	pthread_mutex_unlock(&config->mutex);
-}
-
 void delayconfigi_setMaxSamples(DelayConfigI *config, int maxSamples) {
 	config->maxSamples = maxSamples;
-	//if (config->delayBuffer != NULL) {
-//		free(config->delayBuffer[0]);
-//		free(config->delayBuffer[1]);
-//		free(config->delayBuffer);	
-//	}
+	//free(config->delayBuffer[0]);
+	//free(config->delayBuffer[1]);
 	config->delayBuffer = (float **)malloc(2*sizeof(float *));
 	config->delayBuffer[0] = (float *)malloc(maxSamples*sizeof(float));
 	config->delayBuffer[1] = (float *)malloc(maxSamples*sizeof(float));
@@ -263,11 +236,6 @@ void flangerconfig_setBaseTime(FlangerConfig *config, float baseTime) {
 	config->baseTime = baseTime;
 }
 
-void flangerconfig_setTime(FlangerConfig *config, float time) {
-	float scaledTime = time * (MAX_FLANGER_DELAY - MIN_FLANGER_DELAY) + MIN_FLANGER_DELAY;
-	delayconfigi_setDelayTime(config->delayConfig, scaledTime);
-}
-
 void flangerconfig_setFeedback(FlangerConfig *config, float feedback) {
 	delayconfigi_setFeedback(config->delayConfig, feedback);
 }
@@ -293,9 +261,9 @@ PitchConfig *pitchconfig_create() {
 	config->delaySamples[0] = 12;
 	config->delaySamples[1] = MAX_PITCH_DELAY_SAMPS / 2;
 	
-	config->delayLine[0] = delayconfigi_create(.5f, 1, MAX_PITCH_DELAY_SAMPS);
+	config->delayLine[0] = delayconfigi_create(0, 1, MAX_PITCH_DELAY_SAMPS);
 	delayconfigi_setDelaySamples(config->delayLine[0], config->delaySamples[0]);
-	config->delayLine[1] = delayconfigi_create(.5f, 1, MAX_PITCH_DELAY_SAMPS);
+	config->delayLine[1] = delayconfigi_create(0, 1, MAX_PITCH_DELAY_SAMPS);
 	delayconfigi_setDelaySamples(config->delayLine[1], config->delaySamples[1]);
 	
 	config->rate = 1.0f;

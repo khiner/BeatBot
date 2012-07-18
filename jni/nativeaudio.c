@@ -415,6 +415,7 @@ void playTrack(int trackNum, float volume, float pan, float pitch) {
   Track *track = getTrack(trackNum);
   track->currSample = track->loopBegin;
   track->effects[DYNAMIC_VOL_PAN_ID].set(track->effects[DYNAMIC_VOL_PAN_ID].config, volume, pan);
+  pitchconfig_setShift((PitchConfig *)track->effects[DYNAMIC_PITCH_ID].config, pitch*2 - 1);
   track->pitch = pitch;
   track->playing = true;
   AdsrConfig *adsrConfig = (AdsrConfig *)track->effects[ADSR_ID].config;
@@ -766,15 +767,6 @@ void Java_com_kh_beatbot_DecimateActivity_setDecimateOn(JNIEnv* env, jclass claz
 	Track *track = getTrack(trackNum);
 	Effect *decimate = &(track->effects[DECIMATE_ID]);
 	decimate->on = on;
-	precalculateEffects(track);	
-}
-
-void Java_com_kh_beatbot_DecimateActivity_setDecimateDynamic(JNIEnv* env, jclass clazz,
-													jint trackNum, jboolean dynamic) {
-	Track *track = getTrack(trackNum);
-	Effect *decimate = &(track->effects[DECIMATE_ID]);
-	decimate->dynamic = dynamic;
-	precalculateEffects(track);	
 }
 
 void Java_com_kh_beatbot_DecimateActivity_setDecimateParam(JNIEnv* env, jclass clazz,
@@ -790,7 +782,6 @@ void Java_com_kh_beatbot_DecimateActivity_setDecimateParam(JNIEnv* env, jclass c
 		param += 4;
 		decimate.set(decimateConfig, param, decimateConfig->rate);
 	}
-	precalculateEffects(track);
 }
 
 void Java_com_kh_beatbot_FilterActivity_setFilterOn(JNIEnv* env, jclass clazz,
@@ -798,15 +789,6 @@ void Java_com_kh_beatbot_FilterActivity_setFilterOn(JNIEnv* env, jclass clazz,
 	Track *track = getTrack(trackNum);
 	Effect *filter = &(track->effects[FILTER_ID]);
 	filter->on = on;
-	precalculateEffects(track);	
-}
-
-void Java_com_kh_beatbot_FilterActivity_setFilterDynamic(JNIEnv* env, jclass clazz,
-													jint trackNum, jboolean dynamic) {
-	Track *track = getTrack(trackNum);
-	Effect *filter = &(track->effects[FILTER_ID]);
-	filter->dynamic = dynamic;
-	precalculateEffects(track);
 }
 
 void Java_com_kh_beatbot_FilterActivity_setFilterMode(JNIEnv* env, jclass clazz,
@@ -816,7 +798,6 @@ void Java_com_kh_beatbot_FilterActivity_setFilterMode(JNIEnv* env, jclass clazz,
 	FilterConfig *filterConfig = (FilterConfig *)filter->config;
 	filterConfig->hp = hp;
 	filterconfig_set(filterConfig, filterConfig->f, filterConfig->r);
-	precalculateEffects(track);
 }
 
 void Java_com_kh_beatbot_FilterActivity_setFilterParam(JNIEnv* env, jclass clazz,
@@ -834,7 +815,6 @@ void Java_com_kh_beatbot_FilterActivity_setFilterParam(JNIEnv* env, jclass clazz
 		param = param < 0.011f ? 0.011f : param;
 		filter.set(config, config->f, param);
 	}
-	precalculateEffects(track);
 }
 
 void Java_com_kh_beatbot_DelayActivity_setDelayOn(JNIEnv* env, jclass clazz,

@@ -54,7 +54,7 @@
     </string-array>
     
     <string-array name="delay_params">
-    	<item name="time">Delay Time</item>
+    	<item name="time">Time</item>
     	<item name="feedback">Feedback</item>
     	<item name="wet">Wet</item>
     </string-array>

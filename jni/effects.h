@@ -303,12 +303,34 @@ void decimateconfig_destroy(void *p);
 
 DelayConfigI *delayconfigi_create(float delay, float feedback, int maxSamples);
 void delayconfigi_set(void *config, float delay, float feedback);
-void delayconfigi_setDelayTime(DelayConfigI *config, float delay);
-void delayconfigi_setDelaySamples(DelayConfigI *config, float numSamples);
 void delayconfigi_setMaxSamples(DelayConfigI *config, int maxSamples);
 void delayconfigi_setFeedback(DelayConfigI *config, float feedback);
 void delayconfigi_setNumBeats(DelayConfigI *config, int numBeats);
 void delayconfigi_syncToBPM(DelayConfigI *config);
+
+static inline void delayconfigi_setDelaySamples(DelayConfigI *config, float numSamples) {
+	int i, *rp, *wp;
+	pthread_mutex_lock(&config->mutex);
+	config->delaySamples = fmax(2, numSamples);
+	for (i = 0; i < 2; i++) {
+		rp = &(config->rp[i]);
+		wp = &(config->wp[i]);
+		float rpf = *wp - config->delaySamples; // read chases write
+		while (rpf < 0)
+			rpf += config->maxSamples;
+		*rp = (unsigned int)rpf;
+		if (*rp >= config->maxSamples) (*rp) = 0;
+		config->alpha[i] = rpf - (*rp);
+		config->omAlpha[i] = 1.0f - config->alpha[i];
+	}
+	pthread_mutex_unlock(&config->mutex);
+}
+
+static inline void delayconfigi_setDelayTime(DelayConfigI *config, float delay) {
+	config->delayTime = delay > 0 ? (delay <= 1 ? delay : 1) : 0;
+	if (config->delayTime < 0.0001) config->delayTime = 0.0001;
+	delayconfigi_setDelaySamples(config, config->delayTime*SAMPLE_RATE);
+}
 
 static inline float delayi_tick(DelayConfigI *config, float in, int channel) {
 	pthread_mutex_lock(&config->mutex);
@@ -366,10 +388,14 @@ void filterconfig_destroy(void *config);
 FlangerConfig *flangerconfig_create(float delayTime, float feedback);
 void flangerconfig_set(void *p, float delayTime, float feedback);
 void flangerconfig_setBaseTime(FlangerConfig *config, float baseTime);
-void flangerconfig_setTime(FlangerConfig *config, float time);
 void flangerconfig_setFeedback(FlangerConfig *config, float feedback);
 void flangerconfig_setModRate(FlangerConfig *config, float modRate);
 void flangerconfig_setModAmt(FlangerConfig *config, float modAmt);
+
+static inline void flangerconfig_setTime(FlangerConfig *config, float time) {
+	float scaledTime = time * (MAX_FLANGER_DELAY - MIN_FLANGER_DELAY) + MIN_FLANGER_DELAY;
+	delayconfigi_setDelayTime(config->delayConfig, scaledTime);
+}
 
 static inline void flanger_process(void *p, float **buffers, int size) {
 	FlangerConfig *config = (FlangerConfig *)p;

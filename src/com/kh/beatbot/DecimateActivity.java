@@ -49,7 +49,7 @@ public class DecimateActivity extends EffectActivity {
 	}
 	
 	public void setEffectDynamic(boolean dynamic) {
-		setDecimateDynamic(trackNum, dynamic);
+		// decimate is always dynamic
 	}
 	
 	@Override
@@ -65,6 +65,5 @@ public class DecimateActivity extends EffectActivity {
 	}
 	
 	public native void setDecimateOn(int trackNum, boolean on);
-	public native void setDecimateDynamic(int trackNum, boolean dynamic);	
 	public native void setDecimateParam(int trackNum, int paramNum, float param);
 }

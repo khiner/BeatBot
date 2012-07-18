@@ -46,7 +46,7 @@ public class FilterActivity extends EffectActivity {
 	}
 	
 	public void setEffectDynamic(boolean dynamic) {
-		//setFilterDynamic(trackNum, dynamic);
+		// filter is always dynamic
 	}
 	
 	public void toggleLpHpFilter(View view) {
@@ -54,7 +54,6 @@ public class FilterActivity extends EffectActivity {
 	}
 	
 	public native void setFilterOn(int trackNum, boolean on);
-	public native void setFilterDynamic(int trackNum, boolean dynamic);
 	public native void setFilterMode(int trackNum, boolean lp);	
 	public native void setFilterParam(int trackNum, int paramNum, float param);
 
