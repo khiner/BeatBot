@@ -112,7 +112,7 @@ void initTrack(Track *track, AAsset *asset) {
   			   pitchconfig_setShift, pitch_process, pitchconfig_destroy);
   	initEffect(&(track->effects[DELAY_ID]), false, true, delayconfigi_create(.5f, .5f, SAMPLE_RATE),
   			   delayconfigi_set, delayi_process, delayconfigi_destroy);
-    initEffect(&(track->effects[FLANGER_ID]), false, true, flangerconfig_create(.5f, .5f),
+    initEffect(&(track->effects[FLANGER_ID]), false, true, flangerconfig_create(.010f, .5f),
     		   flangerconfig_set, flanger_process, flangerconfig_destroy);
   	initEffect(&(track->effects[REVERB_ID]), false, true, reverbconfig_create(.5f, .5f),
   			   reverbconfig_set, reverb_process, reverbconfig_destroy);
@@ -862,7 +862,7 @@ void Java_com_kh_beatbot_FlangerActivity_setFlangerParam(JNIEnv* env, jclass cla
 	Track *track = getTrack(trackNum);
 	FlangerConfig *config = (FlangerConfig *)track->effects[FLANGER_ID].config;
 	if (paramNum == 0) { // delay time
-		flangerconfig_setBaseTime(config, param);
+		flangerconfig_setBaseTime(config, MIN_FLANGER_DELAY + param*(MAX_FLANGER_DELAY - MIN_FLANGER_DELAY));
 	} else if (paramNum == 1) { // feedback
 		delayconfigi_setFeedback(config->delayConfig, param);
 	} else if (paramNum == 2) { // wet/dry

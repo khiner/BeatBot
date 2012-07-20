@@ -218,17 +218,18 @@ void filterconfig_destroy(void *p) {
 
 FlangerConfig *flangerconfig_create(float delayTime, float feedback) {
 	FlangerConfig *flangerConfig = (FlangerConfig *)malloc(sizeof(FlangerConfig));
-	flangerConfig->delayConfig = delayconfigi_create(delayTime, feedback, MAX_FLANGER_DELAY*SAMPLE_RATE + 1024);
-	flangerconfig_set(flangerConfig, delayTime, feedback);
+	float delayTimeSamples = delayTime*SAMPLE_RATE;
+	flangerConfig->delayConfig = delayconfigi_create(delayTime, feedback, MAX_FLANGER_DELAY + 1024);
+	flangerconfig_set(flangerConfig, delayTimeSamples, feedback);
 	flangerConfig->mod = sinewave_create();
 	flangerConfig->modAmt = .5f;
 	return flangerConfig;
 }
 
-void flangerconfig_set(void *p, float delayTime, float feedback) {
+void flangerconfig_set(void *p, float delayTimeInSamples, float feedback) {
 	FlangerConfig *config = (FlangerConfig *)p;
-	flangerconfig_setBaseTime(config, delayTime);
-	flangerconfig_setTime(config, delayTime);
+	flangerconfig_setBaseTime(config, delayTimeInSamples);
+	delayconfigi_setDelaySamples(config->delayConfig, delayTimeInSamples);
 	flangerconfig_setFeedback(config, feedback);
 }
 
@@ -241,7 +242,7 @@ void flangerconfig_setFeedback(FlangerConfig *config, float feedback) {
 }
 
 void flangerconfig_setModRate(FlangerConfig *config, float modRate) {
-	sinewave_setRateInSamples(config->mod, modRate*SAMPLE_RATE/100);
+	sinewave_setRate(config->mod, modRate/2);
 }
 
 void flangerconfig_setModAmt(FlangerConfig *config, float modAmt) {

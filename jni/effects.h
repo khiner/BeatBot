@@ -12,8 +12,8 @@
 
 #define SAMPLE_RATE 44100
 #define INV_SAMPLE_RATE 1.0f/44100.0f
-#define MIN_FLANGER_DELAY 0.002f
-#define MAX_FLANGER_DELAY 0.015f
+#define MIN_FLANGER_DELAY 0.002f*SAMPLE_RATE
+#define MAX_FLANGER_DELAY 0.015f*SAMPLE_RATE
 #define MAX_PITCH_DELAY_SAMPS 5024
 
 #define STATIC_VOL_PAN_ID 0
@@ -311,7 +311,7 @@ void delayconfigi_syncToBPM(DelayConfigI *config);
 static inline void delayconfigi_setDelaySamples(DelayConfigI *config, float numSamples) {
 	int i, *rp, *wp;
 	pthread_mutex_lock(&config->mutex);
-	config->delaySamples = fmax(2, numSamples);
+	config->delaySamples = fmax(8, numSamples);
 	for (i = 0; i < 2; i++) {
 		rp = &(config->rp[i]);
 		wp = &(config->wp[i]);
@@ -333,7 +333,7 @@ static inline void delayconfigi_setDelayTime(DelayConfigI *config, float delay) 
 }
 
 static inline float delayi_tick(DelayConfigI *config, float in, int channel) {
-	pthread_mutex_lock(&config->mutex);
+	
 	if ((config->rp[channel]) >= config->maxSamples) config->rp[channel] = 0;
 	if ((config->wp[channel]) >= config->maxSamples) config->wp[channel] = 0;
 	int rpi = config->rp[channel]++;
@@ -341,8 +341,6 @@ static inline float delayi_tick(DelayConfigI *config, float in, int channel) {
 	
 	float interpolated = config->delayBuffer[channel][rpi] * config->omAlpha[channel];
 	interpolated += config->delayBuffer[channel][rpi + 1 % config->maxSamples] * config->alpha[channel];	
-	pthread_mutex_unlock(&config->mutex);
-	
 	config->out = interpolated*config->wet + in*(1 - config->wet);
 	if (config->out > 1) config->out = 1;
 	config->delayBuffer[channel][wpi] = in + config->out*config->feedback[channel];
@@ -352,10 +350,12 @@ static inline float delayi_tick(DelayConfigI *config, float in, int channel) {
 static inline void delayi_process(void *p, float **buffers, int size) {
 	DelayConfigI *config = (DelayConfigI *)p;
 	int channel, samp;
-	for (channel = 0; channel < 2; channel++) {
-		for (samp = 0; samp < size; samp++) {
+	for (samp = 0; samp < size; samp++) {
+		pthread_mutex_lock(&config->mutex);
+		for (channel = 0; channel < 2; channel++) {
 			buffers[channel][samp] = delayi_tick(config, buffers[channel][samp], channel);
 		}
+		pthread_mutex_unlock(&config->mutex);
 	}
 }
 
@@ -392,21 +392,16 @@ void flangerconfig_setFeedback(FlangerConfig *config, float feedback);
 void flangerconfig_setModRate(FlangerConfig *config, float modRate);
 void flangerconfig_setModAmt(FlangerConfig *config, float modAmt);
 
-static inline void flangerconfig_setTime(FlangerConfig *config, float time) {
-	float scaledTime = time * (MAX_FLANGER_DELAY - MIN_FLANGER_DELAY) + MIN_FLANGER_DELAY;
-	delayconfigi_setDelayTime(config->delayConfig, scaledTime);
-}
-
 static inline void flanger_process(void *p, float **buffers, int size) {
 	FlangerConfig *config = (FlangerConfig *)p;
 	int channel, samp;
-	for (channel = 0; channel < 2; channel++) {
-		for (samp = 0; samp < size; samp++) {
-			if (channel == 0)
-				//flangerconfig_setTime(config, config->baseTime * (1.0f + config->modAmt * sinewave_tick(config->mod)));
-				flangerconfig_setTime(config, config->baseTime * (1.0f + config->modAmt * sin(config->count++ * INV_SAMPLE_RATE * config->mod->rate/20)));
+	for (samp = 0; samp < size; samp++) {
+		delayconfigi_setDelaySamples(config->delayConfig, config->baseTime * (1.0f + config->modAmt * sinewave_tick(config->mod)));
+		pthread_mutex_lock(&config->delayConfig->mutex);
+		for (channel = 0; channel < 2; channel++) {
 			buffers[channel][samp] = delayi_tick(config->delayConfig, buffers[channel][samp], channel);
-		}	
+		}
+		pthread_mutex_unlock(&config->delayConfig->mutex);
 	}	
 }
 

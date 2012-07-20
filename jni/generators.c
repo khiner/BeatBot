@@ -14,7 +14,7 @@ SineWave *sinewave_create() {
 	return sineWave;
 }
 
-void sinewave_setRateInSamples(SineWave *config, float rate) {
+void sinewave_setRate(SineWave *config, float rate) {
 	config->rate = rate;
 }
 
@@ -33,20 +33,4 @@ void sinewave_addTimeInPhase(SineWave *config, float phase) {
 void sinewave_addPhaseOffset(SineWave *config, float phaseOffset) {
 	config->time += (phaseOffset - config->phaseOffset) * TABLE_SIZE;
 	config->phaseOffset = phaseOffset;
-}
-
-float sinewave_tick(SineWave *config) {
-	while (config->time < 0)
-		config->time += TABLE_SIZE;
-	while (config->time >= TABLE_SIZE)
-		config->time -= TABLE_SIZE;
-	
-	config->iIndex = floorf(config->time);
-	config->alpha = config->time - config->iIndex;
-	float tmp = config->table[config->iIndex];
-	tmp += (config->alpha * (config->table[config->iIndex + 1] - tmp) );
-	
-	config->time += config->rate;
-	
-	return tmp;
 }
