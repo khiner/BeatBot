@@ -130,51 +130,51 @@ DelayConfigI *delayconfigi_create(float delay, float feedback, int maxSamples) {
 	// allocate memory and set feedback parameter
 	DelayConfigI *p = (DelayConfigI *)malloc(sizeof(DelayConfigI));
 	pthread_mutex_init(&p->mutex, NULL);
-	delayconfigi_setMaxSamples(p, maxSamples);
+	p->maxSamples = maxSamples;
+	p->delayBuffer = (float **)malloc(2*sizeof(float *));
+	p->delayBuffer[0] = (float *)malloc(maxSamples*sizeof(float));
+	p->delayBuffer[1] = (float *)malloc(maxSamples*sizeof(float));
 	p->rp[0] = p->wp[1] = 0;
 	delayconfigi_set(p, delay, feedback);
 	p->wet = 0.5f;
-	p->numBeats = 4;
+	p->numBeats[0] = p->numBeats[1] = 4;
 	p->beatmatch = false;
 	return p;
 }
 
 void delayconfigi_set(void *p, float delay, float feedback) {
 	DelayConfigI *config = (DelayConfigI *)p;
-	delayconfigi_setDelayTime(config, delay);
+	int channel;
+	for (channel = 0; channel < 2; channel++)
+		delayconfigi_setDelayTime(config, delay, channel);
 	delayconfigi_setFeedback(config, feedback);
 }
 
-void delayconfigi_setMaxSamples(DelayConfigI *config, int maxSamples) {
-	config->maxSamples = maxSamples;
-	//free(config->delayBuffer[0]);
-	//free(config->delayBuffer[1]);
-	config->delayBuffer = (float **)malloc(2*sizeof(float *));
-	config->delayBuffer[0] = (float *)malloc(maxSamples*sizeof(float));
-	config->delayBuffer[1] = (float *)malloc(maxSamples*sizeof(float));
-}
-
 void delayconfigi_setFeedback(DelayConfigI *config, float feedback) {
-	int i;
-	for (i = 0; i < 2; i++)
-		config->feedback[i] = feedback > 0.f ? (feedback < 1.f ? feedback : 0.9999999f) : 0.f;
+	config->feedback = feedback > 0.f ? (feedback < 1.f ? feedback : 0.9999999f) : 0.f;
 }
 
-void delayconfigi_setNumBeats(DelayConfigI *config, int numBeats) {
-	if (numBeats == config->numBeats) return;
-	config->numBeats = numBeats;
+void delayconfigi_setNumBeats(DelayConfigI *config, int numBeats, int channel) {
+	if (numBeats == config->numBeats[channel]) return;
+	config->numBeats[channel] = numBeats;
 	delayconfigi_syncToBPM(config);
 }
 
 void delayconfigi_syncToBPM(DelayConfigI *config) {
 	if (!config->beatmatch) return;
-	// divide by 60 for seconds, divide by 16 for 16th notes
-	float newTime = (BPM/960.0f)*(float)config->numBeats;
-	delayconfigi_setDelayTime(config, newTime);	
+	int channel;
+	for (channel = 0; channel < 2; channel++) {
+		// divide by 60 for seconds, divide by 16 for 16th notes
+		float newTime = (BPM/960.0f)*(float)config->numBeats[channel];
+		delayconfigi_setDelayTime(config, newTime, channel);
+	}
 }
 
 void delayconfigi_destroy(void *p){
 	DelayConfigI *config = (DelayConfigI *)p;
+	int channel;
+	for (channel = 0; channel < 2; channel++)
+		free(config->delayBuffer[channel]);
 	free(config->delayBuffer);
 	free((DelayConfigI *)p);
 }
@@ -229,7 +229,9 @@ FlangerConfig *flangerconfig_create(float delayTime, float feedback) {
 void flangerconfig_set(void *p, float delayTimeInSamples, float feedback) {
 	FlangerConfig *config = (FlangerConfig *)p;
 	flangerconfig_setBaseTime(config, delayTimeInSamples);
-	delayconfigi_setDelaySamples(config->delayConfig, delayTimeInSamples);
+	int channel;
+	for (channel = 0; channel < 2; channel++)
+		delayconfigi_setDelaySamples(config->delayConfig, delayTimeInSamples, channel);
 	flangerconfig_setFeedback(config, feedback);
 }
 
@@ -263,9 +265,12 @@ PitchConfig *pitchconfig_create() {
 	config->delaySamples[1] = MAX_PITCH_DELAY_SAMPS / 2;
 	
 	config->delayLine[0] = delayconfigi_create(0, 1, MAX_PITCH_DELAY_SAMPS);
-	delayconfigi_setDelaySamples(config->delayLine[0], config->delaySamples[0]);
 	config->delayLine[1] = delayconfigi_create(0, 1, MAX_PITCH_DELAY_SAMPS);
-	delayconfigi_setDelaySamples(config->delayLine[1], config->delaySamples[1]);
+	int channel;
+	for (channel = 0; channel < 2; channel++) {
+		delayconfigi_setDelaySamples(config->delayLine[0], config->delaySamples[0], channel);
+		delayconfigi_setDelaySamples(config->delayLine[1], config->delaySamples[1], channel);
+	}
 	
 	config->rate = 1.0f;
 	config->wet = 0.5f;

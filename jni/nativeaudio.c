@@ -828,13 +828,19 @@ void Java_com_kh_beatbot_DelayActivity_setDelayParam(JNIEnv* env, jclass clazz,
 													  jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(trackNum);
 	DelayConfigI *config = (DelayConfigI *)track->effects[DELAY_ID].config;
+	int channel;
 	if (paramNum == 0) { // delay time
+		pthread_mutex_lock(&config->mutex);
 		if (config->beatmatch) {
-	 		// map float 0-1 to int 1-16 for number of beats
-			delayconfigi_setNumBeats(config, (int)(param*15) + 1);
+			for (channel = 0; channel < 2; channel++) {
+	 			// map float 0-1 to int 1-16 for number of beats
+				delayconfigi_setNumBeats(config, (int)(param*15) + 1, channel);
+			}
 		} else {
-			delayconfigi_setDelayTime(config, param);
+			for (channel = 0; channel < 2; channel++)
+				delayconfigi_setDelayTime(config, param, channel);
 		}
+		pthread_mutex_unlock(&config->mutex);
 	} else if (paramNum == 1) { // feedback
 		delayconfigi_setFeedback(config, param);
 	} else if (paramNum == 2) { // wet/dry
@@ -847,7 +853,7 @@ void Java_com_kh_beatbot_DelayActivity_setDelayBeatmatch(JNIEnv* env, jclass cla
 	Track *track = getTrack(trackNum);
 	DelayConfigI *config = (DelayConfigI *)track->effects[DELAY_ID].config;
 	config->beatmatch = beatmatch;
-	Java_com_kh_beatbot_DelayActivity_setDelayParam(NULL, NULL, trackNum, 0, config->delayTime);
+	Java_com_kh_beatbot_DelayActivity_setDelayParam(NULL, NULL, trackNum, 0, config->delayTime[0]);
 }
 
 void Java_com_kh_beatbot_FlangerActivity_setFlangerOn(JNIEnv* env, jclass clazz,
