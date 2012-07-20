@@ -10,7 +10,7 @@ import com.kh.beatbot.view.TronSeekbar;
 import com.kh.beatbot.view.TronSeekbar2d;
 
 public class FlangerActivity extends EffectActivity {
-	private static final int NUM_PARAMS = 5;
+	private static final int NUM_PARAMS = 6;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

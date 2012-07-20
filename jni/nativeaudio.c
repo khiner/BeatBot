@@ -867,6 +867,7 @@ void Java_com_kh_beatbot_FlangerActivity_setFlangerParam(JNIEnv* env, jclass cla
 												        jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(trackNum);
 	FlangerConfig *config = (FlangerConfig *)track->effects[FLANGER_ID].config;
+	pthread_mutex_lock(&config->delayConfig->mutex);
 	if (paramNum == 0) { // delay time
 		flangerconfig_setBaseTime(config, MIN_FLANGER_DELAY + param*(MAX_FLANGER_DELAY - MIN_FLANGER_DELAY));
 	} else if (paramNum == 1) { // feedback
@@ -877,7 +878,10 @@ void Java_com_kh_beatbot_FlangerActivity_setFlangerParam(JNIEnv* env, jclass cla
 		flangerconfig_setModRate(config, param);
 	} else if (paramNum == 4) { // modulation amount
 		flangerconfig_setModAmt(config, param);
+	} else if (paramNum == 5) { // phase offset
+		flangerconfig_setPhaseShift(config, param);
 	}
+	pthread_mutex_unlock(&config->delayConfig->mutex);
 }
 
 void Java_com_kh_beatbot_ReverbActivity_setReverbOn(JNIEnv* env, jclass clazz,

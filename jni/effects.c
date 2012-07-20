@@ -221,7 +221,8 @@ FlangerConfig *flangerconfig_create(float delayTime, float feedback) {
 	float delayTimeSamples = delayTime*SAMPLE_RATE;
 	flangerConfig->delayConfig = delayconfigi_create(delayTime, feedback, MAX_FLANGER_DELAY + 1024);
 	flangerconfig_set(flangerConfig, delayTimeSamples, feedback);
-	flangerConfig->mod = sinewave_create();
+	flangerConfig->mod[0] = sinewave_create();
+	flangerConfig->mod[1] = sinewave_create();
 	flangerConfig->modAmt = .5f;
 	return flangerConfig;
 }
@@ -244,11 +245,17 @@ void flangerconfig_setFeedback(FlangerConfig *config, float feedback) {
 }
 
 void flangerconfig_setModRate(FlangerConfig *config, float modRate) {
-	sinewave_setRate(config->mod, modRate/2);
+	int channel;
+	for (channel = 0; channel < 2; channel++)
+		sinewave_setRate(config->mod[channel], modRate/2);
 }
 
 void flangerconfig_setModAmt(FlangerConfig *config, float modAmt) {
 	config->modAmt = modAmt;
+}
+
+void flangerconfig_setPhaseShift(FlangerConfig *config, float phaseShift) {
+	sinewave_addPhaseOffset(config->mod[1], phaseShift);
 }
 
 void flangerconfig_destroy(void *p) {

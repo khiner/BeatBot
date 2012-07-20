@@ -75,6 +75,7 @@
     	<item name="wet">Wet</item>
     	<item name="modRate">Rate</item>
     	<item name="modAmt">Amount</item>
+    	<item name="phase">Phase</item>
     </string-array>
     
 </resources>

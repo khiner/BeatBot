@@ -166,7 +166,7 @@ typedef struct DelayConfigI_t {
 
 typedef struct FlangerConfig_t {
 	DelayConfigI *delayConfig;     // delay line
-	SineWave     *mod;             // table-based sine wave generator for modulation
+	SineWave     *mod[2];          // table-based sine wave generator for modulation
 	float        baseTime;         // center time for delay modulation
 	float 		 modAmt;           // modulation depth
 	int          count;            // count for sin modulation of delay length
@@ -384,16 +384,15 @@ void flangerconfig_setBaseTime(FlangerConfig *config, float baseTime);
 void flangerconfig_setFeedback(FlangerConfig *config, float feedback);
 void flangerconfig_setModRate(FlangerConfig *config, float modRate);
 void flangerconfig_setModAmt(FlangerConfig *config, float modAmt);
+void flangerconfig_setPhaseShift(FlangerConfig *config, float phaseShift);
 
 static inline void flanger_process(void *p, float **buffers, int size) {
 	FlangerConfig *config = (FlangerConfig *)p;
 	int channel, samp;
-	float nextSine;
 	for (samp = 0; samp < size; samp++) {
-		nextSine = sinewave_tick(config->mod);
 		pthread_mutex_lock(&config->delayConfig->mutex);
 		for (channel = 0; channel < 2; channel++) {
-			delayconfigi_setDelaySamples(config->delayConfig, config->baseTime * (1.0f + config->modAmt * nextSine), channel);
+			delayconfigi_setDelaySamples(config->delayConfig, config->baseTime * (1.0f + config->modAmt * sinewave_tick(config->mod[channel])), channel);
 		}
 		for (channel = 0; channel < 2; channel++) {
 			buffers[channel][samp] = delayi_tick(config->delayConfig, buffers[channel][samp], channel);
