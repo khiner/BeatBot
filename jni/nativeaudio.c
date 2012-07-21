@@ -114,14 +114,14 @@ void initTrack(Track *track, AAsset *asset) {
   			   pitchconfig_setShift, pitch_process, pitchconfig_destroy);
   	initEffect(&(track->effects[DELAY_ID]), false, true, delayconfigi_create(.5f, .5f, SAMPLE_RATE),
   			   delayconfigi_set, delayi_process, delayconfigi_destroy);
-  	initEffect(&(track->effects[CHORUS_ID]), false, true, chorusconfig_create(.5f, .5f),
-    		   chorusconfig_set, chorus_process, chorusconfig_destroy);
     initEffect(&(track->effects[FLANGER_ID]), false, true, flangerconfig_create(.010f, .5f),
     		   flangerconfig_set, flanger_process, flangerconfig_destroy);
   	initEffect(&(track->effects[REVERB_ID]), false, true, reverbconfig_create(.5f, .5f),
   			   reverbconfig_set, reverb_process, reverbconfig_destroy);
   	initEffect(&(track->effects[ADSR_ID]), false, true, adsrconfig_create(track->loopEnd - track->loopBegin),
   			   NULL, adsr_process, adsrconfig_destroy);
+//  	initEffect(&(track->effects[CHORUS_ID]), false, true, chorusconfig_create(.5f, .5f),
+//    		   chorusconfig_set, chorus_process, chorusconfig_destroy);
 }
 
 void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {

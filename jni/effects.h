@@ -26,10 +26,10 @@
 #define DYNAMIC_VOL_PAN_ID 5
 #define DYNAMIC_PITCH_ID 6
 #define DELAY_ID 7
-#define CHORUS_ID 8
-#define FLANGER_ID 9
-#define REVERB_ID 10
-#define ADSR_ID 11
+#define FLANGER_ID 8
+#define REVERB_ID 9
+#define ADSR_ID 10
+#define CHORUS_ID 11
 
 /******* BEGIN FREEVERB STUFF *********/
 typedef struct allpass{
@@ -539,6 +539,6 @@ void volumepanconfig_destroy(void *config);
 void reverse(float buffer[], int begin, int end);
 void normalize(float buffer[], int size);
 			      
-static const int numEffects = 12;
+static const int numEffects = 11;
 
 #endif // EFFECTS_H
