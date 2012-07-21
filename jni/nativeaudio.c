@@ -873,7 +873,7 @@ void Java_com_kh_beatbot_FlangerActivity_setFlangerParam(JNIEnv* env, jclass cla
 	} else if (paramNum == 2) { // wet/dry
 		config->delayConfig->wet = param;
 	} else if (paramNum == 3) { // modulation rate
-		flangerconfig_setModRate(config, param);
+		flangerconfig_setModFreq(config, param);
 	} else if (paramNum == 4) { // modulation amount
 		flangerconfig_setModAmt(config, param);
 	} else if (paramNum == 5) { // phase offset

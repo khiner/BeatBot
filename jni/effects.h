@@ -304,7 +304,7 @@ void decimateconfig_destroy(void *p);
 DelayConfigI *delayconfigi_create(float delay, float feedback, int maxSamples);
 void delayconfigi_set(void *config, float delay, float feedback);
 void delayconfigi_setFeedback(DelayConfigI *config, float feedback);
-void delayconfigi_setNumBeats(DelayConfigI *config, int numBeats, int channel);
+void delayconfigi_setNumBeats(DelayConfigI *config, unsigned int numBeatsL, unsigned int numBeatsR);
 void delayconfigi_syncToBPM(DelayConfigI *config);
 
 static inline void delayconfigi_setDelaySamples(DelayConfigI *config, float numSamplesL, float numSamplesR) {
@@ -389,7 +389,7 @@ FlangerConfig *flangerconfig_create(float delayTime, float feedback);
 void flangerconfig_set(void *p, float delayTime, float feedback);
 void flangerconfig_setBaseTime(FlangerConfig *config, float baseTime);
 void flangerconfig_setFeedback(FlangerConfig *config, float feedback);
-void flangerconfig_setModRate(FlangerConfig *config, float modRate);
+void flangerconfig_setModFreq(FlangerConfig *config, float modFreq);
 void flangerconfig_setModAmt(FlangerConfig *config, float modAmt);
 void flangerconfig_setPhaseShift(FlangerConfig *config, float phaseShift);
 

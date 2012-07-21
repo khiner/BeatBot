@@ -144,7 +144,6 @@ DelayConfigI *delayconfigi_create(float delay, float feedback, int maxSamples) {
 
 void delayconfigi_set(void *p, float delay, float feedback) {
 	DelayConfigI *config = (DelayConfigI *)p;
-	int channel;
 	delayconfigi_setDelayTime(config, delay, delay);
 	delayconfigi_setFeedback(config, feedback);
 }
@@ -153,18 +152,19 @@ void delayconfigi_setFeedback(DelayConfigI *config, float feedback) {
 	config->feedback = feedback > 0.f ? (feedback < 1.f ? feedback : 0.9999999f) : 0.f;
 }
 
-void delayconfigi_setNumBeats(DelayConfigI *config, int numBeats, int channel) {
-	if (numBeats == config->numBeats[channel]) return;
-	config->numBeats[channel] = numBeats;
+void delayconfigi_setNumBeats(DelayConfigI *config, unsigned int numBeatsL, unsigned int numBeatsR) {
+	if (numBeatsL == config->numBeats[0] && numBeatsR == config->numBeats[1]) return;
+	config->numBeats[0] = numBeatsL;
+	config->numBeats[1] = numBeatsR;
 	delayconfigi_syncToBPM(config);
 }
 
 void delayconfigi_syncToBPM(DelayConfigI *config) {
 	if (!config->beatmatch) return;
-	int channel;
 	// divide by 60 for seconds, divide by 16 for 16th notes
-	float newTime = (BPM/960.0f)*(float)config->numBeats[channel];
-	delayconfigi_setDelayTime(config, newTime, newTime);
+	float newTimeL = (BPM/960.0f)*(float)config->numBeats[0];
+	float newTimeR = (BPM/960.0f)*(float)config->numBeats[1];
+	delayconfigi_setDelayTime(config, newTimeL, newTimeR);
 }
 
 void delayconfigi_destroy(void *p){
@@ -241,10 +241,10 @@ void flangerconfig_setFeedback(FlangerConfig *config, float feedback) {
 	delayconfigi_setFeedback(config->delayConfig, feedback);
 }
 
-void flangerconfig_setModRate(FlangerConfig *config, float modRate) {
+void flangerconfig_setModFreq(FlangerConfig *config, float modFreq) {
 	int channel;
 	for (channel = 0; channel < 2; channel++)
-		sinewave_setRate(config->mod[channel], modRate/2);
+		sinewave_setFrequency(config->mod[channel], modFreq*16);
 }
 
 void flangerconfig_setModAmt(FlangerConfig *config, float modAmt) {
