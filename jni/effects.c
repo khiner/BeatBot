@@ -145,8 +145,7 @@ DelayConfigI *delayconfigi_create(float delay, float feedback, int maxSamples) {
 void delayconfigi_set(void *p, float delay, float feedback) {
 	DelayConfigI *config = (DelayConfigI *)p;
 	int channel;
-	for (channel = 0; channel < 2; channel++)
-		delayconfigi_setDelayTime(config, delay, channel);
+	delayconfigi_setDelayTime(config, delay, delay);
 	delayconfigi_setFeedback(config, feedback);
 }
 
@@ -163,11 +162,9 @@ void delayconfigi_setNumBeats(DelayConfigI *config, int numBeats, int channel) {
 void delayconfigi_syncToBPM(DelayConfigI *config) {
 	if (!config->beatmatch) return;
 	int channel;
-	for (channel = 0; channel < 2; channel++) {
-		// divide by 60 for seconds, divide by 16 for 16th notes
-		float newTime = (BPM/960.0f)*(float)config->numBeats[channel];
-		delayconfigi_setDelayTime(config, newTime, channel);
-	}
+	// divide by 60 for seconds, divide by 16 for 16th notes
+	float newTime = (BPM/960.0f)*(float)config->numBeats[channel];
+	delayconfigi_setDelayTime(config, newTime, newTime);
 }
 
 void delayconfigi_destroy(void *p){

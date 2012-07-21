@@ -830,17 +830,15 @@ void Java_com_kh_beatbot_DelayActivity_setDelayParam(JNIEnv* env, jclass clazz,
 	DelayConfigI *config = (DelayConfigI *)track->effects[DELAY_ID].config;
 	int channel;
 	if (paramNum == 0) { // delay time
-		pthread_mutex_lock(&config->mutex);
 		if (config->beatmatch) {
 			for (channel = 0; channel < 2; channel++) {
 	 			// map float 0-1 to int 1-16 for number of beats
-				delayconfigi_setNumBeats(config, (int)(param*15) + 1, channel);
+	 			int numBeats = (int)(param*15) + 1;
+				delayconfigi_setNumBeats(config, numBeats, numBeats);
 			}
 		} else {
-			for (channel = 0; channel < 2; channel++)
-				delayconfigi_setDelayTime(config, param, channel);
+			delayconfigi_setDelayTime(config, param, param);
 		}
-		pthread_mutex_unlock(&config->mutex);
 	} else if (paramNum == 1) { // feedback
 		delayconfigi_setFeedback(config, param);
 	} else if (paramNum == 2) { // wet/dry
