@@ -104,8 +104,10 @@ void initTrack(Track *track, AAsset *asset) {
   			   pitchconfig_setShift, pitch_process, pitchconfig_destroy);
   	initEffect(&(track->effects[DECIMATE_ID]), false, true, decimateconfig_create(4.0f, 0.5f),
   			   decimateconfig_set, decimate_process, decimateconfig_destroy);
-  	initEffect(&(track->effects[FILTER_ID]), false, true, filterconfig_create(11050.0f, 0.5f),
-  			   filterconfig_set, filter_process, filterconfig_destroy);
+  	initEffect(&(track->effects[LP_FILTER_ID]), false, true, filterconfig_create(11050.0f, 0.5f),
+  			   filterconfig_setLp, filter_process, filterconfig_destroy);
+  	initEffect(&(track->effects[HP_FILTER_ID]), false, true, filterconfig_create(11050.0f, 0.5f),
+  			   filterconfig_setHp, filter_process, filterconfig_destroy);
   	initEffect(&(track->effects[DYNAMIC_VOL_PAN_ID]), true, true, volumepanconfig_create(.5f, .5f),
   			   volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
   	initEffect(&(track->effects[DYNAMIC_PITCH_ID]), false, true, pitchconfig_create(),
@@ -785,35 +787,60 @@ void Java_com_kh_beatbot_DecimateActivity_setDecimateParam(JNIEnv* env, jclass c
 }
 
 void Java_com_kh_beatbot_FilterActivity_setFilterOn(JNIEnv* env, jclass clazz,
-													jint trackNum, jboolean on) {
+													jint trackNum, jboolean on, jint mode) {
 	Track *track = getTrack(trackNum);
-	Effect *filter = &(track->effects[FILTER_ID]);
-	filter->on = on;
+	Effect *lpFilter = &(track->effects[LP_FILTER_ID]);
+	Effect *hpFilter = &(track->effects[HP_FILTER_ID]);
+	if (!on) {
+		lpFilter->on = false;
+		hpFilter->on = false;
+	} else if (mode == 0) { // lowpass filter
+		hpFilter->on = false;
+		lpFilter->on = true;
+	} else if (mode == 1) { // bandpass filter - chain lp and hp filters
+		lpFilter->on = true;
+		hpFilter->on = true;
+	} else if (mode == 2) { // highpass filter
+		lpFilter->on = false;
+		hpFilter->on = true;
+	}
 }
 
 void Java_com_kh_beatbot_FilterActivity_setFilterMode(JNIEnv* env, jclass clazz,
-													jint trackNum, jboolean hp) {
+													jint trackNum, jint mode) {
 	Track *track = getTrack(trackNum);
-	Effect *filter = &(track->effects[FILTER_ID]);
-	FilterConfig *filterConfig = (FilterConfig *)filter->config;
-	filterConfig->hp = hp;
-	filterconfig_set(filterConfig, filterConfig->f, filterConfig->r);
+	Effect *lpFilter = &(track->effects[LP_FILTER_ID]);
+	Effect *hpFilter = &(track->effects[HP_FILTER_ID]);
+	if (mode == 0) { // lowpass filter
+		hpFilter->on = false;
+		lpFilter->on = true;
+	} else if (mode == 1) { // bandpass filter - chain lp and hp filters
+		lpFilter->on = true;
+		hpFilter->on = true;
+	} else if (mode == 2) { // highpass filter
+		lpFilter->on = false;
+		hpFilter->on = true;
+	}
 }
 
 void Java_com_kh_beatbot_FilterActivity_setFilterParam(JNIEnv* env, jclass clazz,
 													  jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(trackNum);
-	Effect filter = track->effects[FILTER_ID];
-	FilterConfig *config = (FilterConfig *)filter.config;
+	Effect lpFilter = track->effects[LP_FILTER_ID];
+	Effect hpFilter = track->effects[HP_FILTER_ID];
+	FilterConfig *lpConfig = (FilterConfig *)lpFilter.config;
+	FilterConfig *hpConfig = (FilterConfig *)hpFilter.config;
 	if (paramNum == 0) { // cutoff
 		// provided cutoff is between 0 and 1.  map this to a value between
 		// 0 and samplerate/2 = 22050... - 50 because high frequencies are bad news
 		param *= 22000.0f;
 		param = param < 0.01f ? 0.01f : param;
-		filter.set(config, param, config->r);
+		lpFilter.set(lpConfig, param, lpConfig->r);
+		hpFilter.set(hpConfig, param, hpConfig->r);
 	} else if (paramNum == 1) {
 		param = param < 0.011f ? 0.011f : param;
-		filter.set(config, config->f, param);
+		lpFilter.set(lpConfig, lpConfig->f, param);
+		hpFilter.set(hpConfig, hpConfig->f, param);
 	}
 }
 

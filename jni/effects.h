@@ -12,20 +12,21 @@
 
 #define SAMPLE_RATE 44100
 #define INV_SAMPLE_RATE 1.0f/44100.0f
-#define MIN_FLANGER_DELAY 0.001f*SAMPLE_RATE
+#define MIN_FLANGER_DELAY 0.0005f*SAMPLE_RATE
 #define MAX_FLANGER_DELAY 0.007f*SAMPLE_RATE
 #define MAX_PITCH_DELAY_SAMPS 5024
 
 #define STATIC_VOL_PAN_ID 0
 #define STATIC_PITCH_ID 1
 #define DECIMATE_ID 2
-#define FILTER_ID 3
-#define DYNAMIC_VOL_PAN_ID 4
-#define DYNAMIC_PITCH_ID 5
-#define DELAY_ID 6
-#define FLANGER_ID 7
-#define REVERB_ID 8
-#define ADSR_ID 9
+#define LP_FILTER_ID 3
+#define HP_FILTER_ID 4
+#define DYNAMIC_VOL_PAN_ID 5
+#define DYNAMIC_PITCH_ID 6
+#define DELAY_ID 7
+#define FLANGER_ID 8
+#define REVERB_ID 9
+#define ADSR_ID 10
 
 /******* BEGIN FREEVERB STUFF *********/
 typedef struct allpass{
@@ -173,7 +174,6 @@ typedef struct FlangerConfig_t {
 } FlangerConfig;
 
 typedef struct FilterConfig_t {
-	bool hp; // lowpass/highpass flag
 	float a1, a2, a3, b1, b2;
 	float f, c, r;
 	float in1[2], in2[2]; // one for each channel
@@ -362,7 +362,8 @@ static inline void delayi_process(void *p, float **buffers, int size) {
 void delayconfigi_destroy(void *p);
 
 FilterConfig *filterconfig_create(float cutoff, float r);
-void filterconfig_set(void *config, float cutoff, float r);
+void filterconfig_setLp(void *config, float cutoff, float r);
+void filterconfig_setHp(void *config, float cutoff, float r);
 
 static inline void filter_process(void *p, float **buffers, int size) {
 	FilterConfig *config = (FilterConfig *)p;
@@ -504,6 +505,6 @@ void volumepanconfig_destroy(void *config);
 void reverse(float buffer[], int begin, int end);
 void normalize(float buffer[], int size);
 			      
-static const int numEffects = 10;
+static const int numEffects = 11;
 
 #endif // EFFECTS_H
