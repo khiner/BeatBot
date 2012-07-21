@@ -190,6 +190,8 @@ void processEffects(Track *track) {
   floatArytoShortAry(track->currBufferFlt, track->currBufferShort, BUFF_SIZE);
 }
 
+int count = 0;
+
 // this callback handler is called every time a buffer finishes playing
 void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
   Track *track = (Track *)(context);
@@ -202,10 +204,11 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	
   // calculate the next buffer
   calcNextBuffer(track);
-  //processEffects(track);
+  processEffects(track);
   
   // enqueue the buffer
   result = (*bq)->Enqueue(bq, track->currBufferShort, BUFF_SIZE*sizeof(short));
+  __android_log_print(ANDROID_LOG_INFO, "count", "%d", count++);
   assert(SL_RESULT_SUCCESS == result);
 }
 
@@ -364,7 +367,7 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv* env,
 	
   // all done! increment track count
   trackCount++;
-
+  __android_log_print(ANDROID_LOG_DEBUG, "trackCount", "%d", trackCount);
   return JNI_TRUE;
 }
 
@@ -901,7 +904,7 @@ void Java_com_kh_beatbot_ChorusActivity_setChorusParam(JNIEnv* env, jclass clazz
 	} else if (paramNum == 1) { // modulation amount
 		chorusconfig_setModAmt(config, param);
 	} else if (paramNum == 2) { // delay time
-		chorusconfig_setBaseTime(config, MIN_FLANGER_DELAY + param*(MAX_FLANGER_DELAY - MIN_FLANGER_DELAY));
+		chorusconfig_setBaseTime(config, MIN_CHORUS_DELAY + param*(MAX_CHORUS_DELAY - MIN_CHORUS_DELAY));
 	} else if (paramNum == 3) { // feedback
 		chorusconfig_setFeedback(config, param);
 	} else if (paramNum == 4) { // wet/dry
