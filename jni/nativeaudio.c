@@ -114,6 +114,8 @@ void initTrack(Track *track, AAsset *asset) {
   			   pitchconfig_setShift, pitch_process, pitchconfig_destroy);
   	initEffect(&(track->effects[DELAY_ID]), false, true, delayconfigi_create(.5f, .5f, SAMPLE_RATE),
   			   delayconfigi_set, delayi_process, delayconfigi_destroy);
+  	initEffect(&(track->effects[CHORUS_ID]), false, true, chorusconfig_create(.5f, .5f),
+    		   chorusconfig_set, chorus_process, chorusconfig_destroy);
     initEffect(&(track->effects[FLANGER_ID]), false, true, flangerconfig_create(.010f, .5f),
     		   flangerconfig_set, flanger_process, flangerconfig_destroy);
   	initEffect(&(track->effects[REVERB_ID]), false, true, reverbconfig_create(.5f, .5f),
@@ -178,6 +180,7 @@ void processEffects(Track *track) {
   int i;
   for (i = 0; i < numEffects; i++) {
 	  Effect effect = track->effects[i];
+	  __android_log_print(ANDROID_LOG_INFO, "effect #", "%d", i);
   	  if (effect.dynamic && effect.on)
   		  effect.process(effect.config, track->currBuffers, BUFF_SIZE/2);
   }
@@ -199,7 +202,7 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	
   // calculate the next buffer
   calcNextBuffer(track);
-  processEffects(track);
+  //processEffects(track);
   
   // enqueue the buffer
   result = (*bq)->Enqueue(bq, track->currBufferShort, BUFF_SIZE*sizeof(short));
@@ -879,6 +882,32 @@ void Java_com_kh_beatbot_DelayActivity_setDelayBeatmatch(JNIEnv* env, jclass cla
 	DelayConfigI *config = (DelayConfigI *)track->effects[DELAY_ID].config;
 	config->beatmatch = beatmatch;
 	Java_com_kh_beatbot_DelayActivity_setDelayParam(NULL, NULL, trackNum, 0, config->delayTime[0]);
+}
+
+void Java_com_kh_beatbot_ChorusActivity_setChorusOn(JNIEnv* env, jclass clazz,
+												      jint trackNum, jboolean on) {
+	Track *track = getTrack(trackNum);
+	Effect *chorus = &(track->effects[CHORUS_ID]);
+	chorus->on = on;
+}
+
+void Java_com_kh_beatbot_ChorusActivity_setChorusParam(JNIEnv* env, jclass clazz,
+												        jint trackNum, jint paramNum, jfloat param) {
+	Track *track = getTrack(trackNum);
+	ChorusConfig *config = (ChorusConfig *)track->effects[CHORUS_ID].config;
+	pthread_mutex_lock(&config->delayConfig->mutex);
+	if (paramNum == 0) { // modulation rate
+		chorusconfig_setModFreq(config, param);
+	} else if (paramNum == 1) { // modulation amount
+		chorusconfig_setModAmt(config, param);
+	} else if (paramNum == 2) { // delay time
+		chorusconfig_setBaseTime(config, MIN_FLANGER_DELAY + param*(MAX_FLANGER_DELAY - MIN_FLANGER_DELAY));
+	} else if (paramNum == 3) { // feedback
+		chorusconfig_setFeedback(config, param);
+	} else if (paramNum == 4) { // wet/dry
+		config->delayConfig->wet = param;
+	}
+	pthread_mutex_unlock(&config->delayConfig->mutex);
 }
 
 void Java_com_kh_beatbot_FlangerActivity_setFlangerOn(JNIEnv* env, jclass clazz,

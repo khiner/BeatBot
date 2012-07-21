@@ -12,6 +12,8 @@
 
 #define SAMPLE_RATE 44100
 #define INV_SAMPLE_RATE 1.0f/44100.0f
+#define MIN_CHORUS_DELAY 0.006f*SAMPLE_RATE
+#define MAX_CHORUS_DELAY 0.025f*SAMPLE_RATE
 #define MIN_FLANGER_DELAY 0.0005f*SAMPLE_RATE
 #define MAX_FLANGER_DELAY 0.007f*SAMPLE_RATE
 #define MAX_PITCH_DELAY_SAMPS 5024
@@ -24,9 +26,10 @@
 #define DYNAMIC_VOL_PAN_ID 5
 #define DYNAMIC_PITCH_ID 6
 #define DELAY_ID 7
-#define FLANGER_ID 8
-#define REVERB_ID 9
-#define ADSR_ID 10
+#define CHORUS_ID 8
+#define FLANGER_ID 9
+#define REVERB_ID 10
+#define ADSR_ID 11
 
 /******* BEGIN FREEVERB STUFF *********/
 typedef struct allpass{
@@ -165,12 +168,18 @@ typedef struct DelayConfigI_t {
 	pthread_mutex_t mutex;     // mutex since sets happen on a different thread than processing
 } DelayConfigI;
 
+typedef struct ChorusConfig_t {
+	DelayConfigI *delayConfig;     // delay line
+	SineWave     *mod[2];          // table-based sine wave generator for modulation
+	float        baseTime;         // center time for delay modulation
+	float 		 modAmt;           // modulation depth
+} ChorusConfig;
+
 typedef struct FlangerConfig_t {
 	DelayConfigI *delayConfig;     // delay line
 	SineWave     *mod[2];          // table-based sine wave generator for modulation
 	float        baseTime;         // center time for delay modulation
 	float 		 modAmt;           // modulation depth
-	int          count;            // count for sin modulation of delay length
 } FlangerConfig;
 
 typedef struct FilterConfig_t {
@@ -386,6 +395,31 @@ static inline void filter_process(void *p, float **buffers, int size) {
 
 void filterconfig_destroy(void *config);
 
+ChorusConfig *chorusconfig_create(float modFreq, float modAmt);
+void chorusconfig_set(void *p, float modFreq, float modAmt);
+
+void chorusconfig_setBaseTime(ChorusConfig *config, float baseTime);
+void chorusconfig_setFeedback(ChorusConfig *config, float feedback);
+void chorusconfig_setModFreq(ChorusConfig *config, float modFreq);
+void chorusconfig_setModAmt(ChorusConfig *config, float modAmt);
+
+static inline void chorus_process(void *p, float **buffers, int size) {
+	ChorusConfig *config = (ChorusConfig *)p;
+	int channel, samp;
+	for (samp = 0; samp < size; samp++) {
+		float dTimeL = config->baseTime * 0.707 * (1.0f + config->modAmt * sinewave_tick(config->mod[0]));
+		float dTimeR = config->baseTime * 0.5 * (1.0f - config->modAmt * sinewave_tick(config->mod[1]));
+		delayconfigi_setDelaySamples(config->delayConfig, dTimeL, dTimeR);
+		pthread_mutex_lock(&config->delayConfig->mutex);
+		for (channel = 0; channel < 2; channel++) {
+			buffers[channel][samp] = delayi_tick(config->delayConfig, buffers[channel][samp], channel);
+		}
+		pthread_mutex_unlock(&config->delayConfig->mutex);
+	}
+}
+
+void chorusconfig_destroy(void *p);
+
 FlangerConfig *flangerconfig_create(float delayTime, float feedback);
 void flangerconfig_set(void *p, float delayTime, float feedback);
 void flangerconfig_setBaseTime(FlangerConfig *config, float baseTime);
@@ -505,6 +539,6 @@ void volumepanconfig_destroy(void *config);
 void reverse(float buffer[], int begin, int end);
 void normalize(float buffer[], int size);
 			      
-static const int numEffects = 11;
+static const int numEffects = 12;
 
 #endif // EFFECTS_H

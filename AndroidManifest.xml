@@ -33,6 +33,10 @@
             android:label="@string/sample_edit_activity" >
         </activity>
         <activity
+            android:name="com.kh.beatbot.ChorusActivity"
+            android:label="@string/chorus" >
+        </activity>        
+        <activity
             android:name="com.kh.beatbot.DecimateActivity"
             android:label="@string/decimate" >
         </activity>

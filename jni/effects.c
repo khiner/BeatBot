@@ -217,6 +217,45 @@ void filterconfig_destroy(void *p) {
 	free((FilterConfig *)p);
 }
 
+ChorusConfig *chorusconfig_create(float modFreq, float modAmt) {
+	ChorusConfig *config = (ChorusConfig *)malloc(sizeof(ChorusConfig));
+	chorusconfig_setBaseTime(config, (MAX_CHORUS_DELAY - MIN_CHORUS_DELAY) / 2);
+	config->delayConfig = delayconfigi_create(config->baseTime*INV_SAMPLE_RATE, .5f, MAX_CHORUS_DELAY + 1024);
+	config->mod[0] = sinewave_create();
+	config->mod[1] = sinewave_create();
+	chorusconfig_set(config, modFreq, modAmt);
+	return config;	
+}
+
+void chorusconfig_set(void *p, float modFreq, float modAmt) {
+	ChorusConfig *config = (ChorusConfig *)p;
+	chorusconfig_setModAmt(config, modAmt);
+	chorusconfig_setModFreq(config, modFreq);
+}
+
+void chorusconfig_setBaseTime(ChorusConfig *config, float baseTime) {
+	config->baseTime = baseTime;	
+}
+
+void chorusconfig_setFeedback(ChorusConfig *config, float feedback) {
+	config->delayConfig->feedback = feedback;
+}
+
+void chorusconfig_setModFreq(ChorusConfig *config, float modFreq) {
+	sinewave_setFrequency(config->mod[0], modFreq);
+	sinewave_setFrequency(config->mod[1], modFreq * 1.1111);
+}
+
+void chorusconfig_setModAmt(ChorusConfig *config, float modAmt) {
+	config->modAmt = modAmt;
+}
+
+void chorusconfig_destroy(void *p) {
+	ChorusConfig *config = (ChorusConfig *)p;
+	delayconfigi_destroy(config->delayConfig);
+	free(config);
+}
+
 FlangerConfig *flangerconfig_create(float delayTime, float feedback) {
 	FlangerConfig *flangerConfig = (FlangerConfig *)malloc(sizeof(FlangerConfig));
 	float delayTimeSamples = delayTime*SAMPLE_RATE;

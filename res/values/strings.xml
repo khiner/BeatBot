@@ -40,6 +40,7 @@
     <string name="adsr">ADSR</string>
     <string name="reverse">Reverse</string>
     <string name="normalize">Normalize</string>
+    <string name="chorus">Chorus</string>
     <string name="decimate">Decimate</string>
     <string name="delay">Delay</string>
     <string name="flanger">Flanger</string>
@@ -69,6 +70,14 @@
     	<item name="feedback">Feedback</item>
     </string-array>
     
+    <string-array name="chorus_params">
+    	<item name="modRate">Rate</item>
+    	<item name="modAmt">Amount</item>
+    	<item name="time">Time</item>
+    	<item name="feedback">Feedback</item>
+    	<item name="wet">Wet</item>
+    </string-array>
+        
     <string-array name="flanger_params">
     	<item name="time">Time</item>
     	<item name="feedback">Feedback</item>

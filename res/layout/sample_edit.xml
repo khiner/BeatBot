@@ -140,10 +140,19 @@
         android:onClick="delay" />
 
     <Button
-        android:id="@+id/flangerButton"
+        android:id="@+id/chorusButton"
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:layout_toRightOf="@+id/delayButton"
+        android:layout_below="@+id/pitchView"
+        android:text="@string/chorus"
+    	android:onClick="chorus" />
+    
+    <Button
+        android:id="@+id/flangerButton"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@+id/chorusButton"
         android:layout_below="@+id/pitchView"
         android:text="@string/flanger"
     	android:onClick="flanger" />

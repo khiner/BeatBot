@@ -20,7 +20,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	//private EditLevelsView editLevelsView = null;
 	private TronSeekbar volumeLevel, panLevel, pitchLevel;
 	private int trackNum;
-	private enum Effect {BITCRUSH, DELAY, FLANGER, FILTER, REVERB};
+	private enum Effect {BITCRUSH, CHORUS, DELAY, FLANGER, FILTER, REVERB};
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -64,7 +64,11 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		launchIntent(Effect.BITCRUSH);
 	}
 
-	public void delay(View veiw) {
+	public void chorus(View view) {
+		launchIntent(Effect.CHORUS);
+	}
+	
+	public void delay(View view) {
 		launchIntent(Effect.DELAY);
 	}
 
@@ -85,6 +89,9 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		switch (effect) {
 		case BITCRUSH:
 			intent.setClass(this, DecimateActivity.class);
+			break;
+		case CHORUS:
+			intent.setClass(this, ChorusActivity.class);
 			break;
 		case DELAY:
 			intent.setClass(this, DelayActivity.class);
