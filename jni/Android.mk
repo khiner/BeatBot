@@ -24,7 +24,7 @@ LOCAL_CFLAGS := -Wall -Wextra
 
 LOCAL_MODULE := nativeaudio
 
-LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -lOpenSLES -llog -landroid
+LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -landroid -lOpenSLES 
 LOCAL_STATIC_LIBRARIES := fftw3
 LOCAL_SRC_FILES := nativeaudio.c effects.c generators.c ticker.c
 LOCAL_SRC_FILES += $(FILE_LIST:$(LOCAL_PATH)/%=%)

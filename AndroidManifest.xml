@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.KarlHiner.BeatBot"
+    package="com.kh.beatbot"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -10,8 +10,8 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     
-	<uses-feature android:name="android.hardware.audio.low_latency" />
-	        
+	<uses-feature android:name="android.hardware.audio.low_latency" />	        
+    
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
@@ -55,9 +55,7 @@
         <activity
             android:name="com.kh.beatbot.ReverbActivity"
             android:label="@string/reverb" >
-        </activity>
-
-        
+        </activity>        
     </application>
 
 </manifest>

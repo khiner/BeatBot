@@ -24,7 +24,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ToggleButton;
 
-import com.KarlHiner.BeatBot.R;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.AudioClassificationManager;
 import com.kh.beatbot.manager.MidiManager;

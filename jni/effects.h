@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include <stdbool.h>
 #include <pthread.h>
 #include <android/log.h>
 
@@ -18,18 +17,24 @@
 #define MAX_FLANGER_DELAY 0.007f*SAMPLE_RATE
 #define MAX_PITCH_DELAY_SAMPS 5024
 
+#define bool _Bool
+#define false 0
+#define true 1
+
 #define STATIC_VOL_PAN_ID 0
 #define STATIC_PITCH_ID 1
 #define DECIMATE_ID 2
 #define LP_FILTER_ID 3
 #define HP_FILTER_ID 4
 #define DYNAMIC_VOL_PAN_ID 5
-#define DYNAMIC_PITCH_ID 6
+#define CHORUS_ID 6
+//#define DYNAMIC_PITCH_ID 6
 #define DELAY_ID 7
 #define FLANGER_ID 8
 #define REVERB_ID 9
 #define ADSR_ID 10
-#define CHORUS_ID 11
+
+#define NUM_EFFECTS 11
 
 /******* BEGIN FREEVERB STUFF *********/
 typedef struct allpass{
@@ -161,9 +166,9 @@ typedef struct DelayConfigI_t {
 	float  omAlpha[2];
 	float  delaySamples[2];    // (fractional) delay time in samples: 0 - SAMPLE_RATE; one for each channel
 	float  out;
-	unsigned int    maxSamples; 	       // maximum size of delay buffer (set to SAMPLE_RATE by default)
-	unsigned int    numBeats[2];		   // number of beats to delay for beatmatch; one for each channel
-	unsigned int    rp[2], wp[2];       // read & write pointers
+	int    maxSamples; 	       // maximum size of delay buffer (set to SAMPLE_RATE by default)
+	int    numBeats[2];		   // number of beats to delay for beatmatch; one for each channel
+	int    rp[2], wp[2];       // read & write pointers
 	bool   beatmatch; 		   // sync to the beat?
 	pthread_mutex_t mutex;     // mutex since sets happen on a different thread than processing
 } DelayConfigI;
@@ -313,11 +318,11 @@ void decimateconfig_destroy(void *p);
 DelayConfigI *delayconfigi_create(float delay, float feedback, int maxSamples);
 void delayconfigi_set(void *config, float delay, float feedback);
 void delayconfigi_setFeedback(DelayConfigI *config, float feedback);
-void delayconfigi_setNumBeats(DelayConfigI *config, unsigned int numBeatsL, unsigned int numBeatsR);
+void delayconfigi_setNumBeats(DelayConfigI *config, int numBeatsL, int numBeatsR);
 void delayconfigi_syncToBPM(DelayConfigI *config);
 
 static inline void delayconfigi_setDelaySamples(DelayConfigI *config, float numSamplesL, float numSamplesR) {
-	unsigned int *rp, *wp, channel;
+	int *rp, *wp, channel;
 	float rpf;
 	pthread_mutex_lock(&config->mutex);
 	config->delaySamples[0] = numSamplesL;
@@ -328,7 +333,7 @@ static inline void delayconfigi_setDelaySamples(DelayConfigI *config, float numS
 		rpf = *wp - config->delaySamples[channel]; // read chases write
 		while (rpf < 0)
 			rpf += config->maxSamples;
-		*rp = (unsigned int)rpf;
+		*rp = (int)rpf;
 		if (*rp >= config->maxSamples) (*rp) = 0;
 		config->alpha[channel] = rpf - (*rp);
 		config->omAlpha[channel] = 1.0f - config->alpha[channel];
@@ -420,7 +425,7 @@ static inline void chorus_process(void *p, float **buffers, int size) {
 
 void chorusconfig_destroy(void *p);
 
-FlangerConfig *flangerconfig_create(float delayTime, float feedback);
+FlangerConfig *flangerconfig_create();
 void flangerconfig_set(void *p, float delayTime, float feedback);
 void flangerconfig_setBaseTime(FlangerConfig *config, float baseTime);
 void flangerconfig_setFeedback(FlangerConfig *config, float feedback);
@@ -538,7 +543,5 @@ void volumepanconfig_destroy(void *config);
 
 void reverse(float buffer[], int begin, int end);
 void normalize(float buffer[], int size);
-			      
-static const int numEffects = 11;
 
 #endif // EFFECTS_H

@@ -11,7 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.KarlHiner.BeatBot.R;
 import com.kh.beatbot.listener.Level2dListener;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.TronSeekbar;

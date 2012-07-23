@@ -1,5 +1,4 @@
 #include "effects.h"
-
 static void inject_set(ReverbState *r,int inject) {
   	int i;
   	for(i=0;i<numcombs;i++){
@@ -134,7 +133,7 @@ DelayConfigI *delayconfigi_create(float delay, float feedback, int maxSamples) {
 	p->delayBuffer = (float **)malloc(2*sizeof(float *));
 	p->delayBuffer[0] = (float *)malloc(maxSamples*sizeof(float));
 	p->delayBuffer[1] = (float *)malloc(maxSamples*sizeof(float));
-	p->rp[0] = p->wp[1] = 0;
+	p->rp[0] = p->rp[1] = p->wp[0] = p->wp[1] = 0;
 	delayconfigi_set(p, delay, feedback);
 	p->wet = 0.5f;
 	p->numBeats[0] = p->numBeats[1] = 4;
@@ -152,7 +151,7 @@ void delayconfigi_setFeedback(DelayConfigI *config, float feedback) {
 	config->feedback = feedback > 0.f ? (feedback < 1.f ? feedback : 0.9999999f) : 0.f;
 }
 
-void delayconfigi_setNumBeats(DelayConfigI *config, unsigned int numBeatsL, unsigned int numBeatsR) {
+void delayconfigi_setNumBeats(DelayConfigI *config, int numBeatsL, int numBeatsR) {
 	if (numBeatsL == config->numBeats[0] && numBeatsR == config->numBeats[1]) return;
 	config->numBeats[0] = numBeatsL;
 	config->numBeats[1] = numBeatsR;
@@ -219,8 +218,8 @@ void filterconfig_destroy(void *p) {
 
 ChorusConfig *chorusconfig_create(float modFreq, float modAmt) {
 	ChorusConfig *config = (ChorusConfig *)malloc(sizeof(ChorusConfig));
-	chorusconfig_setBaseTime(config, (MAX_CHORUS_DELAY - MIN_CHORUS_DELAY) / 2);
-	config->delayConfig = delayconfigi_create(config->baseTime*INV_SAMPLE_RATE, .5f, MAX_CHORUS_DELAY + 1024);
+	chorusconfig_setBaseTime(config, MIN_CHORUS_DELAY + (MAX_CHORUS_DELAY - MIN_CHORUS_DELAY) / 2);
+	config->delayConfig = delayconfigi_create((config->baseTime)*INV_SAMPLE_RATE, .5f, MAX_CHORUS_DELAY + 2048);
 	config->mod[0] = sinewave_create();
 	config->mod[1] = sinewave_create();
 	chorusconfig_set(config, modFreq, modAmt);
@@ -234,11 +233,12 @@ void chorusconfig_set(void *p, float modFreq, float modAmt) {
 }
 
 void chorusconfig_setBaseTime(ChorusConfig *config, float baseTime) {
-	config->baseTime = baseTime;	
+	__android_log_print(ANDROID_LOG_INFO, "setting base time = ", "%f", baseTime);
+	config->baseTime = baseTime;
 }
 
 void chorusconfig_setFeedback(ChorusConfig *config, float feedback) {
-	config->delayConfig->feedback = feedback;
+	delayconfigi_setFeedback(config->delayConfig, feedback);
 }
 
 void chorusconfig_setModFreq(ChorusConfig *config, float modFreq) {
@@ -256,11 +256,10 @@ void chorusconfig_destroy(void *p) {
 	free(config);
 }
 
-FlangerConfig *flangerconfig_create(float delayTime, float feedback) {
+FlangerConfig *flangerconfig_create() {
 	FlangerConfig *flangerConfig = (FlangerConfig *)malloc(sizeof(FlangerConfig));
-	float delayTimeSamples = delayTime*SAMPLE_RATE;
-	flangerConfig->delayConfig = delayconfigi_create(delayTime, feedback, MAX_FLANGER_DELAY + 1024);
-	flangerconfig_set(flangerConfig, delayTimeSamples, feedback);
+	flangerConfig->delayConfig = delayconfigi_create(0.003f, 0.5f, MAX_FLANGER_DELAY + 512);
+	flangerconfig_set(flangerConfig, 0.003f*SAMPLE_RATE, 0.5f);
 	flangerConfig->mod[0] = sinewave_create();
 	flangerConfig->mod[1] = sinewave_create();
 	flangerConfig->modAmt = .5f;
@@ -270,9 +269,7 @@ FlangerConfig *flangerconfig_create(float delayTime, float feedback) {
 void flangerconfig_set(void *p, float delayTimeInSamples, float feedback) {
 	FlangerConfig *config = (FlangerConfig *)p;
 	flangerconfig_setBaseTime(config, delayTimeInSamples);
-	int channel;
-	for (channel = 0; channel < 2; channel++)
-		delayconfigi_setDelaySamples(config->delayConfig, delayTimeInSamples, channel);
+	delayconfigi_setDelaySamples(config->delayConfig, delayTimeInSamples, delayTimeInSamples);
 	flangerconfig_setFeedback(config, feedback);
 }
 

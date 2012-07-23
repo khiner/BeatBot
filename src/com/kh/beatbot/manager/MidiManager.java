@@ -287,7 +287,7 @@ public class MidiManager implements Parcelable {
 		}
 		// move native note ticks
 		moveMidiNoteTicks(midiNote.getNoteValue(), midiNote.getOnTick(),
-				onTick, midiNote.getOffTick(), offTick);
+				onTick, offTick);
 		// move Java note ticks
 		midiNote.setOnTick(onTick);
 		midiNote.setOffTick(offTick);
@@ -522,7 +522,7 @@ public class MidiManager implements Parcelable {
 
 	// change ticks
 	public native void moveMidiNoteTicks(int track, long prevOnTick,
-			long newOnTick, long prevOffTick, long newOffTick);
+			long newOnTick, long newOffTick);
 
 	// change track num
 	public native void moveMidiNote(int track, long tick, int newTrack);

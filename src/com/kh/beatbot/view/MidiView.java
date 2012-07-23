@@ -10,14 +10,11 @@ import java.util.Map;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
-import com.KarlHiner.BeatBot.R;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
@@ -695,8 +692,7 @@ public class MidiView extends SurfaceViewBase {
 					copy.setOffTick(selected.getOnTick() - 1);
 					// update the native midi events
 					midiManager.moveMidiNoteTicks(note.getNoteValue(),
-							note.getOnTick(), copy.getOnTick(),
-							note.getOffTick(), copy.getOffTick());
+							note.getOnTick(), copy.getOnTick(), copy.getOffTick());
 					midiManager.putTempNote(i, copy);
 					// if the selected note ends after the beginning
 					// of the other note, or if the selected note completely

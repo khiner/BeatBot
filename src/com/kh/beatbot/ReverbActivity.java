@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.ToggleButton;
 
-import com.KarlHiner.BeatBot.R;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.TronSeekbar2d;
 
