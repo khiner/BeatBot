@@ -26,15 +26,15 @@
 #define CONVMYFLT (1./32768.)
 #define BUFF_SIZE 1024
 
-static SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, 2, SL_SAMPLINGRATE_44_1,
-									  SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
-									  SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT,
-									  SL_BYTEORDER_LITTLEENDIAN};
+static SLDataFormat_PCM format_pcm = { SL_DATAFORMAT_PCM, 2,
+		SL_SAMPLINGRATE_44_1, SL_PCMSAMPLEFORMAT_FIXED_16,
+		SL_PCMSAMPLEFORMAT_FIXED_16, SL_SPEAKER_FRONT_LEFT
+				| SL_SPEAKER_FRONT_RIGHT, SL_BYTEORDER_LITTLEENDIAN };
 
 typedef struct MidiEvent_ {
 	bool muted;
 	long onTick;
-	long offTick;	
+	long offTick;
 	float volume;
 	float pan;
 	float pitch;
@@ -50,30 +50,26 @@ typedef struct Track_ {
 	float **currBuffers;
 	float currBufferFlt[BUFF_SIZE];
 	short currBufferShort[BUFF_SIZE];
-	
+
 	// buffer to hold original sample data
 	float **buffers;
 	// buffer to hold sample data with precalculated effects
 	float **scratchBuffers;
-	
+
 	Effect effects[NUM_EFFECTS];
-	
+
 	int totalSamples;
 	int currSample;
-	
+
 	float primaryPitch;
-	
+
 	float pitch;
-	
-	bool armed;
-	bool playing;
-    bool loop;
-	bool mute;
-	bool solo;
-	
-    int loopBegin;
-    int loopEnd;
-	
+
+	bool armed;bool playing;bool loop;bool mute;bool solo;
+
+	int loopBegin;
+	int loopEnd;
+
 	SLObjectItf outputPlayerObject;
 	SLPlayItf outputPlayerPlay;
 	SLMuteSoloItf outputPlayerMuteSolo;

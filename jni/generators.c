@@ -1,12 +1,12 @@
 #include "generators.h"
 
 SineWave *sinewave_create() {
-	SineWave *sineWave = (SineWave *)malloc(sizeof(SineWave));
+	SineWave *sineWave = (SineWave *) malloc(sizeof(SineWave));
 	sineWave->time = 0;
 	sineWave->rate = 1;
 	sineWave->phaseOffset = 0;
-	sineWave->table = (float *)malloc((TABLE_SIZE + 1)*sizeof(float));
-	float tmp = 1.0f/TABLE_SIZE;
+	sineWave->table = (float *) malloc((TABLE_SIZE + 1) * sizeof(float));
+	float tmp = 1.0f / TABLE_SIZE;
 	int i;
 	for (i = 0; i < TABLE_SIZE; i++) {
 		sineWave->table[i] = sin(M_PI * 2 * i * tmp);
