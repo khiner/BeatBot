@@ -52,7 +52,7 @@ void initEffect(Effect *effect, bool on, bool dynamic, void *config,
 	effect->config = config;
 	effect->set = set;
 	effect->process = process;
-	effect->destroy = destroy;				
+	effect->destroy = destroy;
 }
 
 void initAdsrPoints(AdsrConfig *config) {

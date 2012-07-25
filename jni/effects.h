@@ -52,14 +52,14 @@ typedef struct comb{
   int    size;
 } comb_state;
 
-#define numcombs 8
+#define numcombs 6
 #define numallpasses 4
 #define scalehfdamp 0.4f
 #define scaleliveness 0.4f
 #define offsetliveness 0.58f
 #define scaleroom 1111
 #define stereospread 23
-#define fixedgain 0.015f
+#define fixedgain 0.09f
 
 #define comb0 1116
 #define comb1 1188
@@ -84,12 +84,12 @@ typedef struct comb{
 
 static const int combL[numcombs]={
   comb0, comb1, comb2, comb3, 
-  comb4, comb5, comb6, comb7 
+  comb4, comb5
 };
 
 static const int combR[numcombs]={
   comb0+stereospread, comb1+stereospread, comb2+stereospread, comb3+stereospread, 
-  comb4+stereospread, comb5+stereospread, comb6+stereospread, comb7+stereospread 
+  comb4+stereospread, comb5+stereospread
 };
 
 static const int allL[numallpasses]={
@@ -126,8 +126,9 @@ typedef struct ReverbConfig_t {
 	ReverbState *state;
 	float feedback;
 	float hfDamp;
-	int   inject;
 	float wet;
+
+	int   inject;
 	int   width;
 } ReverbConfig;
 
@@ -245,7 +246,7 @@ static inline float allpass_process(allpass_state *a, float  input){
 
 static inline float comb_process(comb_state *c, float  feedback, float  hfDamp, float  input){
   	float val      = *c->extptr;
-  	c->filterstore = val + (c->filterstore - val)*hfDamp;
+  	c->filterstore = val + (c->filterstore - val) * hfDamp * scalehfdamp;
   	underguard(&c->filterstore);
 
   	*c->injptr     = input + c->filterstore * feedback;
@@ -515,7 +516,7 @@ static inline void reverb_process(void *p, float **buffers, int size) {
       		out += comb_process(config->state->comb + j, config->feedback, config->hfDamp, val);
 	    for(j = 0; j < numallpasses; j++)
     	    out = allpass_process(config->state->allpass + j, out);
-	    buffers[0][i] = buffers[1][i] = out;
+	    buffers[0][i] = buffers[1][i] = out * fixedgain;
 	}
 }
 
