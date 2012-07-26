@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <string name="app_name">BeatBot</string>
     <string name="midi_menu">Midi Menu</string>
@@ -46,6 +46,7 @@
     <string name="flanger">Flanger</string>
     <string name="filter">Filter</string>
     <string name="reverb">Reverb</string>
+    <string name="tremelo">Tremelo</string>
     <string name="cutoff">Cutoff</string>
     <string name="resonance">Q</string>
     
@@ -82,9 +83,14 @@
     	<item name="time">Time</item>
     	<item name="feedback">Feedback</item>
     	<item name="wet">Wet</item>
-    	<item name="modRate">Rate</item>
+    	<item name="modRate">Frequency</item>
     	<item name="modAmt">Amount</item>
     	<item name="phase">Phase</item>
+    </string-array>
+    
+    <string-array name="tremelo_params">
+        <item name="freq">Frequency</item>
+        <item name="depth">Depth</item>
     </string-array>
     
 </resources>

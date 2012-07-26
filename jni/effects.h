@@ -24,17 +24,18 @@
 #define STATIC_VOL_PAN_ID 0
 #define STATIC_PITCH_ID 1
 #define DECIMATE_ID 2
-#define LP_FILTER_ID 3
-#define HP_FILTER_ID 4
-#define DYNAMIC_VOL_PAN_ID 5
-#define CHORUS_ID 6
-//#define DYNAMIC_PITCH_ID 6
-#define DELAY_ID 7
-#define FLANGER_ID 8
-#define REVERB_ID 9
-#define ADSR_ID 10
+#define TREMELO_ID 3
+#define LP_FILTER_ID 4
+#define HP_FILTER_ID 5
+#define DYNAMIC_VOL_PAN_ID 6
+#define CHORUS_ID 7
+//#define DYNAMIC_PITCH_ID 8
+#define DELAY_ID 8
+#define FLANGER_ID 9
+#define REVERB_ID 10
+#define ADSR_ID 11
 
-#define NUM_EFFECTS 11
+#define NUM_EFFECTS 12
 
 /******* BEGIN FREEVERB STUFF *********/
 typedef struct allpass {
@@ -196,6 +197,11 @@ typedef struct PitchConfig_t {
 	unsigned long delayLength;
 	unsigned long halfLength;
 } PitchConfig;
+
+typedef struct TremeloConfig_t {
+	SineWave *mod[2];
+	float depth;
+} TremeloConfig;
 
 typedef struct VolumePanConfig_t {
 	float volume;
@@ -546,6 +552,26 @@ static inline void reverb_process(void *p, float **buffers, int size) {
 }
 
 void reverbconfig_destroy(void *config);
+
+TremeloConfig *tremeloconfig_create(float freq, float depth);
+
+void tremeloconfig_set(void *config, float freq, float depth);
+void tremeloconfig_setFrequency(TremeloConfig *config, float freqL,
+		float freqR);
+void tremeloconfig_setDepth(TremeloConfig *config, float depth);
+
+static inline void tremelo_process(void *p, float **buffers, int size) {
+	TremeloConfig *config = (TremeloConfig *) p;
+	int channel, samp;
+	for (channel = 0; channel < 2; channel++) {
+		for (samp = 0; samp < size; samp++) {
+			// TODO : how to scale amplitude from 0 to 1 without halving amp when depth is 0
+			buffers[channel][samp] *= .75f*(1 + sinewave_tick(config->mod[channel]) * config->depth);
+		}
+	}
+}
+
+void tremeloconfig_destroy(void *p);
 
 VolumePanConfig *volumepanconfig_create(float volume, float pan);
 void volumepanconfig_set(void *config, float volume, float pan);

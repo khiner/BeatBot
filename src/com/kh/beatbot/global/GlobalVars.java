@@ -16,10 +16,11 @@ public class GlobalVars {
 	public static float[] chorusX, chorusY, chorusWet, chorusModRate,
 			chorusModAmt, decimateX, decimateY, delayX, delayY, delayWet,
 			flangerX, flangerY, flangerWet, flangerModRate, flangerModAmt,
-			flangerPhase, filterX, filterY, reverbX, reverbY;
+			flangerPhase, filterX, filterY, reverbX, reverbY, tremeloX,
+			tremeloY;
 
 	public static boolean[] chorusOn, decimateOn, delayOn, flangerOn, filterOn,
-			reverbOn;
+			reverbOn, tremeloOn;
 
 	public static float currBeatDivision;
 
@@ -50,16 +51,22 @@ public class GlobalVars {
 		filterY = new float[num];
 		reverbX = new float[num];
 		reverbY = new float[num];
+		tremeloX = new float[num];
+		tremeloY = new float[num];
 		chorusOn = new boolean[num];
 		decimateOn = new boolean[num];
 		delayOn = new boolean[num];
 		flangerOn = new boolean[num];
 		filterOn = new boolean[num];
 		reverbOn = new boolean[num];
+		tremeloOn = new boolean[num];
 		for (int i = 0; i < midiManager.getNumSamples(); i++) {
-			chorusX[i] = chorusY[i] = chorusWet[i] = chorusModRate[i] = chorusModAmt[i] = flangerX[i] = flangerY[i] = flangerWet[i] = flangerModRate[i] = flangerModAmt[i] = decimateX[i] = decimateY[i] = delayX[i] = delayY[i] = filterX[i] = filterY[i] = reverbY[i] = reverbX[i] = .5f;
+			chorusX[i] = chorusY[i] = chorusWet[i] = chorusModRate[i] = chorusModAmt[i] =
+					flangerX[i] = flangerY[i] = flangerWet[i] = flangerModRate[i] =
+					flangerModAmt[i] = decimateX[i] = decimateY[i] = delayX[i] = delayY[i] =
+					filterX[i] = filterY[i] = reverbY[i] = reverbX[i] = tremeloX[i] = tremeloY[i] = .5f;
 			flangerPhase[i] = 1;
-			chorusOn[i] = decimateOn[i] = delayOn[i] = filterOn[i] = flangerOn[i] = reverbOn[i] = false;
+			chorusOn[i] = decimateOn[i] = delayOn[i] = filterOn[i] = flangerOn[i] = reverbOn[i] = tremeloOn[i] = false;
 		}
 	}
 

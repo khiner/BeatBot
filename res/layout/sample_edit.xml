@@ -165,5 +165,14 @@
         android:layout_below="@+id/pitchView"
         android:text="@string/reverb"
     	android:onClick="reverb" />
+
+    <Button
+        android:id="@+id/tremeloButton"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@+id/reverbButton"
+        android:layout_below="@+id/pitchView"
+        android:text="@string/tremelo"
+    	android:onClick="tremelo" />
     
 </RelativeLayout>

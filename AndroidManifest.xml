@@ -55,7 +55,11 @@
         <activity
             android:name="com.kh.beatbot.ReverbActivity"
             android:label="@string/reverb" >
-        </activity>        
+        </activity>
+        <activity
+            android:name="com.kh.beatbot.TremeloActivity"
+            android:label="@string/tremelo" >
+        </activity>
     </application>
 
 </manifest>

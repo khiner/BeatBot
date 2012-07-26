@@ -19,7 +19,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	//private EditLevelsView editLevelsView = null;
 	private TronSeekbar volumeLevel, panLevel, pitchLevel;
 	private int trackNum;
-	private enum Effect {BITCRUSH, CHORUS, DELAY, FLANGER, FILTER, REVERB};
+	private enum Effect {BITCRUSH, CHORUS, DELAY, FLANGER, FILTER, REVERB, TREMELO};
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -83,6 +83,10 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		launchIntent(Effect.REVERB);
 	}
 
+	public void tremelo(View view) {
+		launchIntent(Effect.TREMELO);
+	}
+	
 	private void launchIntent(Effect effect) {
 		Intent intent = new Intent();		
 		switch (effect) {
@@ -104,6 +108,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		case REVERB:
 			intent.setClass(this, ReverbActivity.class);
 			break;
+		case TREMELO:
+			intent.setClass(this, TremeloActivity.class);
 		}
 		intent.putExtra("trackNum", trackNum);
 		startActivity(intent);

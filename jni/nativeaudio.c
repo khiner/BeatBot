@@ -72,15 +72,6 @@ void precalculateEffects(Track *track) {
 			sizeof(float) * track->totalSamples / 2);
 	memcpy(track->scratchBuffers[1], track->buffers[1],
 			sizeof(float) * track->totalSamples / 2);
-	int i;
-	for (i = 0; i < NUM_EFFECTS; i++) {
-		if (i == ADSR_ID)
-			continue;
-		Effect effect = track->effects[i];
-		if (effect.on && !effect.dynamic)
-			effect.process(effect.config, track->scratchBuffers,
-					track->totalSamples / 2);
-	}
 }
 
 void initTrack(Track *track, AAsset *asset) {
@@ -119,6 +110,9 @@ void initTrack(Track *track, AAsset *asset) {
 	initEffect(&(track->effects[DECIMATE_ID]), false, true,
 			decimateconfig_create(4.0f, 0.5f), decimateconfig_set,
 			decimate_process, decimateconfig_destroy);
+	initEffect(&(track->effects[TREMELO_ID]), false, true,
+			tremeloconfig_create(0.5f, 0.5f), tremeloconfig_set,
+			tremelo_process, tremeloconfig_destroy);
 	initEffect(&(track->effects[LP_FILTER_ID]), false, true,
 			filterconfig_create(11050.0f, 0.5f), filterconfig_setLp,
 			filter_process, filterconfig_destroy);
@@ -215,8 +209,6 @@ void processEffects(Track *track) {
 	// convert floats to shorts
 	floatArytoShortAry(track->currBufferFlt, track->currBufferShort, BUFF_SIZE);
 }
-
-int count = 0;
 
 // this callback handler is called every time a buffer finishes playing
 void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
@@ -1036,6 +1028,24 @@ void Java_com_kh_beatbot_ReverbActivity_setReverbParam(JNIEnv *env,
 		config->feedback = param;
 	} else if (paramNum == 1) { // hf damp
 		config->hfDamp = param;
+	}
+}
+
+void Java_com_kh_beatbot_TremeloActivity_setTremeloOn(JNIEnv *env,
+		jclass clazz, jint trackNum, jint on) {
+	Track *track = getTrack(env, clazz, trackNum);
+	Effect *tremelo = &(track->effects[TREMELO_ID]);
+	tremelo->on = on;
+}
+
+void Java_com_kh_beatbot_TremeloActivity_setTremeloParam(JNIEnv *env,
+		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
+	Track *track = getTrack(env, clazz, trackNum);
+	TremeloConfig *config = (TremeloConfig*)track->effects[TREMELO_ID].config;
+	if (paramNum == 0) { // frequency
+		tremeloconfig_setFrequency(config, param, param);
+	} else if (paramNum == 1) { // depth
+		tremeloconfig_setDepth(config, param);
 	}
 }
 
