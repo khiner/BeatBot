@@ -49,10 +49,6 @@ public class FilterActivity extends EffectActivity {
 		setFilterOn(trackNum, on, mode);
 	}
 	
-	public void setEffectDynamic(boolean dynamic) {
-		// filter is always dynamic
-	}
-	
 	public void selectFilterMode(View view) {
 		for (int i = 0; i < filterButtons.length; i++) {
 			if (view.equals(filterButtons[i])) {

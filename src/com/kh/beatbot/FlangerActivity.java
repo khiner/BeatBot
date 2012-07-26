@@ -44,10 +44,6 @@ public class FlangerActivity extends EffectActivity {
 		setFlangerOn(trackNum, on);
 	}
 	
-	public void setEffectDynamic(boolean dynamic) {
-		return; // flanger is always dynamic
-	}
-	
 	@Override
 	public void setLevel(TronSeekbar levelBar, float level) {		
 		super.setLevel(levelBar, level);

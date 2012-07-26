@@ -47,10 +47,6 @@ public class DecimateActivity extends EffectActivity {
 		setDecimateOn(trackNum, on);
 	}
 	
-	public void setEffectDynamic(boolean dynamic) {
-		// decimate is always dynamic
-	}
-	
 	@Override
 	public int getNumParams() {
 		return NUM_PARAMS;

@@ -1,7 +1,6 @@
 package com.kh.beatbot;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.ToggleButton;
 
@@ -42,10 +41,6 @@ public class TremeloActivity extends EffectActivity {
 	public void setEffectOn(boolean on) {
 		GlobalVars.tremeloOn[trackNum] = on;
 		setTremeloOn(trackNum, on);
-	}
-	
-	public void setEffectDynamic(boolean dynamic) {
-		// tremelo is always dynamic
 	}
 	
 	public native void setTremeloOn(int trackNum, boolean on);

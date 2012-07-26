@@ -21,21 +21,19 @@
 #define false 0
 #define true 1
 
-#define STATIC_VOL_PAN_ID 0
-#define STATIC_PITCH_ID 1
+#define VOL_PAN_ID 0
+#define PITCH_ID 1
 #define DECIMATE_ID 2
 #define TREMELO_ID 3
 #define LP_FILTER_ID 4
 #define HP_FILTER_ID 5
-#define DYNAMIC_VOL_PAN_ID 6
-#define CHORUS_ID 7
-//#define DYNAMIC_PITCH_ID 8
-#define DELAY_ID 8
-#define FLANGER_ID 9
-#define REVERB_ID 10
-#define ADSR_ID 11
+#define CHORUS_ID 6
+#define DELAY_ID 7
+#define FLANGER_ID 8
+#define REVERB_ID 9
+#define ADSR_ID 10
 
-#define NUM_EFFECTS 12
+#define NUM_EFFECTS 11
 
 /******* BEGIN FREEVERB STUFF *********/
 typedef struct allpass {
@@ -209,14 +207,14 @@ typedef struct VolumePanConfig_t {
 } VolumePanConfig;
 
 typedef struct Effect_t {
-	bool on;bool dynamic;
+	bool on;
 	void *config;
 	void (*set)(void *, float, float);
 	void (*process)(void *, float **, int);
 	void (*destroy)(void *);
 } Effect;
 
-void initEffect(Effect *effect, bool on, bool dynamic, void *config,
+void initEffect(Effect *effect, bool on, void *config,
 		void (*set), void (*process), void (*destroy));
 
 static inline void underguard(float *x) {

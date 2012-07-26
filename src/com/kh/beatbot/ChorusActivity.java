@@ -44,10 +44,6 @@ public class ChorusActivity extends EffectActivity {
 		setChorusOn(trackNum, on);
 	}
 	
-	public void setEffectDynamic(boolean dynamic) {
-		return; // chorus is always dynamic
-	}
-	
 	@Override
 	public void setLevel(TronSeekbar levelBar, float level) {		
 		super.setLevel(levelBar, level);

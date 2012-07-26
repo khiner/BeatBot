@@ -66,14 +66,6 @@ MidiEvent* initEvent(long onTick, long offTick, float volume, float pan,
 	return event;
 }
 
-void precalculateEffects(Track *track) {
-	// start with the raw audio samples
-	memcpy(track->scratchBuffers[0], track->buffers[0],
-			sizeof(float) * track->totalSamples / 2);
-	memcpy(track->scratchBuffers[1], track->buffers[1],
-			sizeof(float) * track->totalSamples / 2);
-}
-
 void initTrack(Track *track, AAsset *asset) {
 	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
 	track->totalSamples = AAsset_getLength(asset) / 2 - 22;
@@ -86,11 +78,6 @@ void initTrack(Track *track, AAsset *asset) {
 			sizeof(float));
 	track->buffers[1] = (float *) calloc(track->totalSamples / 2,
 			sizeof(float));
-	track->scratchBuffers = (float **) malloc(2 * sizeof(float *));
-	track->scratchBuffers[0] = (float *) calloc(track->totalSamples / 2,
-			sizeof(float));
-	track->scratchBuffers[1] = (float *) calloc(track->totalSamples / 2,
-			sizeof(float));
 	track->armed = false;
 	track->playing = false;
 	track->mute = track->solo = false;
@@ -98,45 +85,42 @@ void initTrack(Track *track, AAsset *asset) {
 	track->loopBegin = 0;
 	track->loopEnd = track->totalSamples / 2;
 	track->currSample = 0;
-	track->primaryPitch = .5f;
-	track->pitch = .5f;
+	track->volume = .8f;
+	track->pan = track->pitch = .5f;
 
-	initEffect(&(track->effects[STATIC_VOL_PAN_ID]), true, false,
-			volumepanconfig_create(.5f, .5f), volumepanconfig_set,
+	initEffect(&(track->effects[VOL_PAN_ID]), true,
+			volumepanconfig_create(.8f, .5f), volumepanconfig_set,
 			volumepan_process, volumepanconfig_destroy);
-	initEffect(&(track->effects[STATIC_PITCH_ID]), false, false,
+	initEffect(&(track->effects[PITCH_ID]), false,
 			pitchconfig_create(), pitchconfig_setShift, pitch_process,
 			pitchconfig_destroy);
-	initEffect(&(track->effects[DECIMATE_ID]), false, true,
+	initEffect(&(track->effects[DECIMATE_ID]), false,
 			decimateconfig_create(4.0f, 0.5f), decimateconfig_set,
 			decimate_process, decimateconfig_destroy);
-	initEffect(&(track->effects[TREMELO_ID]), false, true,
+	initEffect(&(track->effects[TREMELO_ID]), false,
 			tremeloconfig_create(0.5f, 0.5f), tremeloconfig_set,
 			tremelo_process, tremeloconfig_destroy);
-	initEffect(&(track->effects[LP_FILTER_ID]), false, true,
+	initEffect(&(track->effects[LP_FILTER_ID]), false,
 			filterconfig_create(11050.0f, 0.5f), filterconfig_setLp,
 			filter_process, filterconfig_destroy);
-	initEffect(&(track->effects[HP_FILTER_ID]), false, true,
+	initEffect(&(track->effects[HP_FILTER_ID]), false,
 			filterconfig_create(11050.0f, 0.5f), filterconfig_setHp,
 			filter_process, filterconfig_destroy);
-	initEffect(&(track->effects[DYNAMIC_VOL_PAN_ID]), true, true,
-			volumepanconfig_create(.5f, .5f), volumepanconfig_set,
-			volumepan_process, volumepanconfig_destroy);
-	initEffect(&(track->effects[CHORUS_ID]), false, true,
+	initEffect(&(track->effects[CHORUS_ID]), false,
 			chorusconfig_create(.5f, .5f), chorusconfig_set, chorus_process,
 			chorusconfig_destroy);
 //  	initEffect(&(track->effects[DYNAMIC_PITCH_ID]), false, true, pitchconfig_create(),
 //  			   pitchconfig_setShift, pitch_process, pitchconfig_destroy);
-	initEffect(&(track->effects[DELAY_ID]), false, true,
+	initEffect(&(track->effects[DELAY_ID]), false,
 			delayconfigi_create(.5f, .5f, SAMPLE_RATE), delayconfigi_set,
 			delayi_process, delayconfigi_destroy);
-	initEffect(&(track->effects[FLANGER_ID]), false, true,
+	initEffect(&(track->effects[FLANGER_ID]), false,
 			flangerconfig_create(), flangerconfig_set, flanger_process,
 			flangerconfig_destroy);
-	initEffect(&(track->effects[REVERB_ID]), false, true,
+	initEffect(&(track->effects[REVERB_ID]), false,
 			reverbconfig_create(.5f, .5f), reverbconfig_set, reverb_process,
 			reverbconfig_destroy);
-	initEffect(&(track->effects[ADSR_ID]), false, true,
+	initEffect(&(track->effects[ADSR_ID]), false,
 			adsrconfig_create(track->loopEnd - track->loopBegin), NULL,
 			adsr_process, adsrconfig_destroy);
 }
@@ -174,10 +158,10 @@ void calcNextBuffer(Track *track) {
 			}
 			// copy the next block of data from the scratch buffer into the current float buffer for streaming
 			memcpy(&(track->currBuffers[0][totalSize]),
-					&(track->scratchBuffers[0][track->currSample]),
+					&(track->buffers[0][track->currSample]),
 					nextSize * sizeof(float));
 			memcpy(&(track->currBuffers[1][totalSize]),
-					&(track->scratchBuffers[1][track->currSample]),
+					&(track->buffers[1][track->currSample]),
 					nextSize * sizeof(float));
 
 			totalSize += nextSize;
@@ -200,7 +184,7 @@ void processEffects(Track *track) {
 	int i;
 	for (i = 0; i < NUM_EFFECTS; i++) {
 		Effect effect = track->effects[i];
-		if (effect.dynamic && effect.on)
+		if (effect.on)
 			effect.process(effect.config, track->currBuffers, BUFF_SIZE / 2);
 	}
 	// combine the two channels into one buffer, alternating L and R samples
@@ -346,9 +330,6 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(
 	free(charBuf);
 	AAsset_close(asset);
 
-	// prepare the scratch buffer with precalculated effects
-	precalculateEffects(track);
-
 	// configure audio sink
 	SLDataLocator_OutputMix loc_outmix = { SL_DATALOCATOR_OUTPUTMIX,
 			outputMixObject };
@@ -423,8 +404,6 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv *env, jclass clazz) {
 		track->outputPlayerPlay = NULL;
 		free(track->buffers[0]);
 		free(track->buffers[1]);
-		free(track->scratchBuffers[0]);
-		free(track->scratchBuffers[1]);
 		free(track->currBuffers[0]);
 		free(track->currBuffers[1]);
 		free(track->currBufferFlt);
@@ -457,17 +436,16 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv *env, jclass clazz) {
 void playTrack(int trackNum, float volume, float pan, float pitch) {
 	Track *track = getTrack(NULL, NULL, trackNum);
 	track->currSample = track->loopBegin;
-	track->effects[DYNAMIC_VOL_PAN_ID].set(
-			track->effects[DYNAMIC_VOL_PAN_ID].config, volume, pan);
+	track->effects[VOL_PAN_ID].set(
+			track->effects[VOL_PAN_ID].config, track->volume*volume, track->pan*pan);
 	//pitchconfig_setShift((PitchConfig *)track->effects[DYNAMIC_PITCH_ID].config, pitch*2 - 1);
-	track->pitch = pitch;
 	track->playing = true;
 	AdsrConfig *adsrConfig = (AdsrConfig *) track->effects[ADSR_ID].config;
 	adsrConfig->active = true;
 	resetAdsr(adsrConfig);
-	if (track->outputPlayerPitch != NULL) {
-		//(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((pitch + track->primaryPitch)*750 + 500));
-	}
+	//if (track->outputPlayerPitch != NULL) {
+	//	(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((pitch + track->primaryPitch)*750 + 500));
+	//}
 }
 
 void stopTrack(int trackNum) {
@@ -768,7 +746,6 @@ jfloatArray Java_com_kh_beatbot_SampleEditActivity_reverse(JNIEnv *env,
 	Track *track = getTrack(env, clazz, trackNum);
 	reverse(track->buffers[0], track->loopBegin, track->loopEnd);
 	reverse(track->buffers[1], track->loopBegin, track->loopEnd);
-	precalculateEffects(track);
 	return makejFloatArray(env, track->buffers[0], track->totalSamples / 2);
 }
 
@@ -777,51 +754,43 @@ jfloatArray Java_com_kh_beatbot_SampleEditActivity_normalize(JNIEnv *env,
 	Track *track = getTrack(env, clazz, trackNum);
 	normalize(track->buffers[0], track->totalSamples / 2);
 	normalize(track->buffers[1], track->totalSamples / 2);
-	precalculateEffects(track);
 	return makejFloatArray(env, track->buffers[0], track->totalSamples);
 }
 
 jfloat Java_com_kh_beatbot_SampleEditActivity_getPrimaryVolume(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
-	return ((VolumePanConfig *) track->effects[STATIC_VOL_PAN_ID].config)->volume;
+	return ((VolumePanConfig *) track->effects[VOL_PAN_ID].config)->volume;
 }
 
 jfloat Java_com_kh_beatbot_SampleEditActivity_getPrimaryPan(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
-	return ((VolumePanConfig *) track->effects[STATIC_VOL_PAN_ID].config)->pan;
+	return ((VolumePanConfig *) track->effects[VOL_PAN_ID].config)->pan;
 }
 
 jfloat Java_com_kh_beatbot_SampleEditActivity_getPrimaryPitch(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
-	return track->primaryPitch;
+	return track->pitch;
 }
 
 void Java_com_kh_beatbot_SampleEditActivity_setPrimaryVolume(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat volume) {
 	Track *track = getTrack(env, clazz, trackNum);
-	VolumePanConfig *config =
-			(VolumePanConfig *) track->effects[STATIC_VOL_PAN_ID].config;
-	track->effects[STATIC_VOL_PAN_ID].set(config, volume, config->pan);
-	precalculateEffects(track);
+	track->volume = volume;
 }
 
 void Java_com_kh_beatbot_SampleEditActivity_setPrimaryPan(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat pan) {
 	Track *track = getTrack(env, clazz, trackNum);
-	VolumePanConfig *config =
-			(VolumePanConfig *) track->effects[STATIC_VOL_PAN_ID].config;
-	track->effects[STATIC_VOL_PAN_ID].set(config, config->volume, pan);
-
-	precalculateEffects(track);
+	track->pan = pan;
 }
 
 void Java_com_kh_beatbot_SampleEditActivity_setPrimaryPitch(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat pitch) {
 	Track *track = getTrack(env, clazz, trackNum);
-	track->primaryPitch = pitch;
+	track->pitch = pitch;
 	if (track->outputPlayerPitch != NULL) {
 		//(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((track->pitch + track->primaryPitch)*750 + 500));
 	}

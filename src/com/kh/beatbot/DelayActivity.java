@@ -45,10 +45,6 @@ public class DelayActivity extends EffectActivity {
 		setDelayOn(trackNum, on);
 	}
 	
-	public void setEffectDynamic(boolean dynamic) {
-		return; // delay is always dynamic
-	}
-	
 	@Override
 	public void setLevel(TronSeekbar levelBar, float level) {		
 		super.setLevel(levelBar, level);

@@ -1,10 +1,8 @@
 package com.kh.beatbot;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -39,7 +37,7 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 			TronSeekbar levelBar = (TronSeekbar) view.findViewById(R.id.param_bar);
 			levelBar.setTag(position);
 			levelBar.addLevelListener((EffectActivity)getContext());
-			if (!paramBars.containsKey(position))
+			if (paramBars.get(position) != null)
 				paramBars.put(position, levelBar);
 			
 			label.setText(getParamLabel(position));
@@ -66,15 +64,15 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 
 	public abstract float getXValue();
 	public abstract float getYValue();
-	public abstract void setXValue(float x);
-	public abstract void setYValue(float y);
 	public abstract int getNumParams();
 	public abstract String getParamLabel(int paramNum);
 	
-	public abstract void setEffectOn(boolean on);
+	public abstract void setXValue(float x);
+	public abstract void setYValue(float y);
+	public abstract void setEffectOn(boolean on);	
 	
-	public abstract void setEffectDynamic(boolean dynamic);
-	public Map<Integer, TronSeekbar> paramBars = new HashMap<Integer, TronSeekbar>();
+	public SparseArray<TronSeekbar> paramBars = new SparseArray<TronSeekbar>();
+	
 	public void toggleEffect(View view) {
 		setEffectOn(((ToggleButton)view).isChecked());
 	}
@@ -105,7 +103,7 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 	
 	@Override
 	public void notifyChecked(TronSeekbar2d level2d, boolean checked) {
-		setEffectDynamic(checked);
+		// nothing yet.  might change font to bold or something while selected
 	}
 	
 	@Override

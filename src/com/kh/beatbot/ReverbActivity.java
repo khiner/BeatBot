@@ -41,10 +41,6 @@ public class ReverbActivity extends EffectActivity {
 		GlobalVars.reverbOn[trackNum] = on;
 		setReverbOn(trackNum, on);
 	}
-
-	public void setEffectDynamic(boolean dynamic) {
-		return;  // reverb can only be dynamic
-	}
 	
 	public native void setReverbOn(int trackNum, boolean on);
 	public native void setReverbParam(int trackNum, int paramNum, float feedback);

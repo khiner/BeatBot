@@ -46,10 +46,9 @@ static ReverbState *initReverbState() {
 	return r;
 }
 
-void initEffect(Effect *effect, bool on, bool dynamic, void *config,
+void initEffect(Effect *effect, bool on, void *config,
 		void (*set), void (*process), void (*destroy)) {
 	effect->on = on;
-	effect->dynamic = dynamic;
 	effect->config = config;
 	effect->set = set;
 	effect->process = process;

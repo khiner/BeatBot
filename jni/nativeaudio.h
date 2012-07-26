@@ -53,14 +53,10 @@ typedef struct Track_ {
 	float **currBuffers;
 	// buffer to hold original sample data
 	float **buffers;
-	// buffer to hold sample data with precalculated effects
-	float **scratchBuffers;
 	int totalSamples;
 	int currSample;
 
-	float primaryPitch;
-
-	float pitch;
+	float volume, pan, pitch;
 
 	bool armed;
 	bool playing;

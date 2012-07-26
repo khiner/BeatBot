@@ -18,8 +18,9 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	private SampleWaveformView sampleWaveformView = null;
 	//private EditLevelsView editLevelsView = null;
 	private TronSeekbar volumeLevel, panLevel, pitchLevel;
+	private enum Effect {BITCRUSH, CHORUS, DELAY, FLANGER, FILTER, REVERB, TREMELO};	
+	
 	private int trackNum;
-	private enum Effect {BITCRUSH, CHORUS, DELAY, FLANGER, FILTER, REVERB, TREMELO};
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
