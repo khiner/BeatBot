@@ -24,7 +24,7 @@
 
 #define CONV16BIT 32768
 #define CONVMYFLT (1./32768.)
-#define BUFF_SIZE 1024
+#define BUFF_SIZE 512 // 512 samples, each with one short for each channel
 
 static SLDataFormat_PCM format_pcm = { SL_DATAFORMAT_PCM, 2,
 		SL_SAMPLINGRATE_44_1, SL_PCMSAMPLEFORMAT_FIXED_16,
@@ -47,8 +47,8 @@ typedef struct MidiEventNode_ {
 
 typedef struct Track_ {
 	Effect effects[NUM_EFFECTS];
-	float currBufferFlt[BUFF_SIZE];
-	short currBufferShort[BUFF_SIZE];
+	float currBufferFlt[BUFF_SIZE * 2];
+	short currBufferShort[BUFF_SIZE * 2];
 	MidiEventNode *eventHead;
 	float **currBuffers;
 	// buffer to hold original sample data
