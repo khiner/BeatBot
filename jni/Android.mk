@@ -20,6 +20,7 @@ include $(call all-subdir-makefiles)
 include $(CLEAR_VARS)
 FILE_LIST := $(wildcard $(LOCAL_PATH)/*.c)
 FILE_LIST += $(wildcard $(LOCAL_PATH)/effects/*.c)
+FILE_LIST += $(wildcard $(LOCAL_PATH)/generators/*.c)
 
 LOCAL_PATH = $(ROOT_PATH)
 LOCAL_CFLAGS := -Wall -Wextra

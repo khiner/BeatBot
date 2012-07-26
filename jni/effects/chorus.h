@@ -20,6 +20,7 @@ void chorusconfig_setBaseTime(ChorusConfig *config, float baseTime);
 void chorusconfig_setFeedback(ChorusConfig *config, float feedback);
 void chorusconfig_setModFreq(ChorusConfig *config, float modFreq);
 void chorusconfig_setModAmt(ChorusConfig *config, float modAmt);
+void chorusconfig_setWet(ChorusConfig *config, float wet);
 
 static inline void chorus_process(void *p, float **buffers, int size) {
 	ChorusConfig *config = (ChorusConfig *) p;

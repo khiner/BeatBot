@@ -21,7 +21,7 @@ void flangerconfig_set(void *p, float delayTimeInSamples, float feedback) {
 }
 
 void flangerconfig_setBaseTime(FlangerConfig *config, float baseTime) {
-	config->baseTime = baseTime;
+	config->baseTime = MIN_FLANGER_DELAY + baseTime*(MAX_FLANGER_DELAY - MIN_FLANGER_DELAY);
 }
 
 void flangerconfig_setFeedback(FlangerConfig *config, float feedback) {

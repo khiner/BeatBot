@@ -19,9 +19,7 @@ void chorusconfig_set(void *p, float modFreq, float modAmt) {
 }
 
 void chorusconfig_setBaseTime(ChorusConfig *config, float baseTime) {
-	__android_log_print(ANDROID_LOG_INFO, "setting base time = ", "%f",
-			baseTime);
-	config->baseTime = baseTime;
+	config->baseTime = MIN_CHORUS_DELAY + baseTime*(MAX_CHORUS_DELAY - MIN_CHORUS_DELAY);
 }
 
 void chorusconfig_setFeedback(ChorusConfig *config, float feedback) {
@@ -35,6 +33,10 @@ void chorusconfig_setModFreq(ChorusConfig *config, float modFreq) {
 
 void chorusconfig_setModAmt(ChorusConfig *config, float modAmt) {
 	config->modAmt = modAmt;
+}
+
+void chorusconfig_setWet(ChorusConfig *config, float wet) {
+	config->delayConfig->wet = wet;
 }
 
 void chorusconfig_destroy(void *p) {

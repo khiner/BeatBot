@@ -1,4 +1,4 @@
-#include "generators.h"
+#include "sinewave.h"
 
 SineWave *sinewave_create() {
 	SineWave *sineWave = (SineWave *) malloc(sizeof(SineWave));

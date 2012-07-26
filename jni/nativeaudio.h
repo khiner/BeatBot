@@ -1,6 +1,8 @@
 #ifndef NATIVEAUDIO_H
 #define NATIVEAUDIO_H
 
+#include "effects.h"
+
 #include <assert.h>
 #include <jni.h>
 #include <string.h>
@@ -10,17 +12,11 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
-// fast-fourier transform library
 #include <fftw3.h>
-// for Android logging
 #include <android/log.h>
-// for native audio
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
-// for native asset manager
 #include <android/asset_manager_jni.h>
-// local .h includes
-#include "effects.h"
 
 #define CONV16BIT 32768
 #define CONVMYFLT (1./32768.)

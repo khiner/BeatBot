@@ -929,21 +929,17 @@ void Java_com_kh_beatbot_ChorusActivity_setChorusParam(JNIEnv *env,
 		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(env, clazz, trackNum);
 	ChorusConfig *config = (ChorusConfig *) track->effects[CHORUS_ID].config;
-	pthread_mutex_lock(&config->delayConfig->mutex);
 	if (paramNum == 0) { // modulation rate
 		chorusconfig_setModFreq(config, param);
 	} else if (paramNum == 1) { // modulation amount
 		chorusconfig_setModAmt(config, param);
 	} else if (paramNum == 2) { // delay time
-		chorusconfig_setBaseTime(config,
-				MIN_CHORUS_DELAY
-						+ param * (MAX_CHORUS_DELAY - MIN_CHORUS_DELAY));
+		chorusconfig_setBaseTime(config, param);
 	} else if (paramNum == 3) { // feedback
 		chorusconfig_setFeedback(config, param);
 	} else if (paramNum == 4) { // wet/dry
-		config->delayConfig->wet = param;
+		chorusconfig_setWet(config, param);
 	}
-	pthread_mutex_unlock(&config->delayConfig->mutex);
 }
 
 void Java_com_kh_beatbot_FlangerActivity_setFlangerOn(JNIEnv *env, jclass clazz,
@@ -957,11 +953,8 @@ void Java_com_kh_beatbot_FlangerActivity_setFlangerParam(JNIEnv *env,
 		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(env, clazz, trackNum);
 	FlangerConfig *config = (FlangerConfig *) track->effects[FLANGER_ID].config;
-	pthread_mutex_lock(&config->delayConfig->mutex);
 	if (paramNum == 0) { // delay time
-		flangerconfig_setBaseTime(config,
-				MIN_FLANGER_DELAY
-						+ param * (MAX_FLANGER_DELAY - MIN_FLANGER_DELAY));
+		flangerconfig_setBaseTime(config, param);
 	} else if (paramNum == 1) { // feedback
 		delayconfigi_setFeedback(config->delayConfig, param);
 	} else if (paramNum == 2) { // wet/dry
@@ -973,7 +966,6 @@ void Java_com_kh_beatbot_FlangerActivity_setFlangerParam(JNIEnv *env,
 	} else if (paramNum == 5) { // phase offset
 		flangerconfig_setPhaseShift(config, param);
 	}
-	pthread_mutex_unlock(&config->delayConfig->mutex);
 }
 
 void Java_com_kh_beatbot_ReverbActivity_setReverbOn(JNIEnv *env, jclass clazz,
