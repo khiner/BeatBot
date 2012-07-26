@@ -69,3 +69,23 @@ void reverbconfig_destroy(void *p) {
 	free(config);
 	config = NULL;
 }
+
+/********* JNI METHODS **********/
+void Java_com_kh_beatbot_ReverbActivity_setReverbOn(JNIEnv *env, jclass clazz,
+		jint trackNum, jboolean on) {
+	Track *track = getTrack(env, clazz, trackNum);
+	Effect *reverb = &(track->effects[REVERB_ID]);
+	reverb->on = on;
+}
+
+void Java_com_kh_beatbot_ReverbActivity_setReverbParam(JNIEnv *env,
+		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
+	Track *track = getTrack(env, clazz, trackNum);
+	ReverbConfig *config = (ReverbConfig *) track->effects[REVERB_ID].config;
+	if (paramNum == 0) { // feedback
+		config->feedback = param;
+	} else if (paramNum == 1) { // hf damp
+		config->hfDamp = param;
+	}
+}
+

@@ -38,3 +38,33 @@ void normalize(float buffer[], int size) {
 		}
 	}
 }
+
+jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size) {
+	jfloatArray result = (*env)->NewFloatArray(env, size);
+	(*env)->SetFloatArrayRegion(env, result, 0, size, floatAry);
+	return result;
+}
+
+/********* JNI METHODS **********/
+
+jfloatArray Java_com_kh_beatbot_SampleEditActivity_getSamples(JNIEnv *env,
+		jclass clazz, jint trackNum) {
+	Track *track = getTrack(env, clazz, trackNum);
+	return makejFloatArray(env, track->buffers[0], track->totalSamples);
+}
+
+jfloatArray Java_com_kh_beatbot_SampleEditActivity_reverse(JNIEnv *env,
+		jclass clazz, jint trackNum) {
+	Track *track = getTrack(env, clazz, trackNum);
+	reverse(track->buffers[0], track->loopBegin, track->loopEnd);
+	reverse(track->buffers[1], track->loopBegin, track->loopEnd);
+	return makejFloatArray(env, track->buffers[0], track->totalSamples);
+}
+
+jfloatArray Java_com_kh_beatbot_SampleEditActivity_normalize(JNIEnv *env,
+		jclass clazz, jint trackNum) {
+	Track *track = getTrack(env, clazz, trackNum);
+	normalize(track->buffers[0], track->totalSamples);
+	normalize(track->buffers[1], track->totalSamples);
+	return makejFloatArray(env, track->buffers[0], track->totalSamples);
+}

@@ -47,3 +47,31 @@ void flangerconfig_destroy(void *p) {
 	delayconfigi_destroy(config->delayConfig);
 	free(config);
 }
+
+/********* JNI METHODS **********/
+void Java_com_kh_beatbot_FlangerActivity_setFlangerOn(JNIEnv *env, jclass clazz,
+		jint trackNum, jboolean on) {
+	Track *track = getTrack(env, clazz, trackNum);
+	Effect *flanger = &(track->effects[FLANGER_ID]);
+	flanger->on = on;
+}
+
+void Java_com_kh_beatbot_FlangerActivity_setFlangerParam(JNIEnv *env,
+		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
+	Track *track = getTrack(env, clazz, trackNum);
+	FlangerConfig *config = (FlangerConfig *) track->effects[FLANGER_ID].config;
+	if (paramNum == 0) { // delay time
+		flangerconfig_setBaseTime(config, param);
+	} else if (paramNum == 1) { // feedback
+		delayconfigi_setFeedback(config->delayConfig, param);
+	} else if (paramNum == 2) { // wet/dry
+		config->delayConfig->wet = param;
+	} else if (paramNum == 3) { // modulation rate
+		flangerconfig_setModFreq(config, param);
+	} else if (paramNum == 4) { // modulation amount
+		flangerconfig_setModAmt(config, param);
+	} else if (paramNum == 5) { // phase offset
+		flangerconfig_setPhaseShift(config, param);
+	}
+}
+
