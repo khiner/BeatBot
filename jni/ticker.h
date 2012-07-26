@@ -1,8 +1,6 @@
 #ifndef TICKER_H
 #define TICKER_H
 
-#include <stdint.h>
-
 #define RESOLUTION 480
 
 void initTicker();

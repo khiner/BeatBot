@@ -18,15 +18,16 @@ ROOT_PATH := $(LOCAL_PATH)
 
 include $(call all-subdir-makefiles)
 include $(CLEAR_VARS)
+FILE_LIST := $(wildcard $(LOCAL_PATH)/*.c)
+FILE_LIST += $(wildcard $(LOCAL_PATH)/effects/*.c)
 
 LOCAL_PATH = $(ROOT_PATH)
 LOCAL_CFLAGS := -Wall -Wextra
+#LOCAL_C_INCLUDES := $(LOCAL_PATH)/include/effects
 
 LOCAL_MODULE := nativeaudio
-
 LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -landroid -lOpenSLES 
 LOCAL_STATIC_LIBRARIES := fftw3
-LOCAL_SRC_FILES := nativeaudio.c effects.c generators.c ticker.c
 LOCAL_SRC_FILES += $(FILE_LIST:$(LOCAL_PATH)/%=%)
 
 include $(BUILD_SHARED_LIBRARY)
