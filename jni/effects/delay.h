@@ -13,18 +13,13 @@ typedef struct DelayConfigI_t {
 	float delaySamples[2]; // (fractional) delay time in samples: 0 - SAMPLE_RATE; one for each channel
 	float out;
 	int maxSamples; // maximum size of delay buffer (set to SAMPLE_RATE by default)
-	int numBeats[2]; // number of beats to delay for beatmatch; one for each channel
 	int rp[2], wp[2]; // read & write pointers
-	bool beatmatch; // sync to the beat?
 	pthread_mutex_t mutex; // mutex since sets happen on a different thread than processing
 } DelayConfigI;
 
 DelayConfigI *delayconfigi_create(float delay, float feedback, int maxSamples);
 void delayconfigi_set(void *config, float delay, float feedback);
 void delayconfigi_setFeedback(DelayConfigI *config, float feedback);
-void delayconfigi_setNumBeats(DelayConfigI *config, int numBeatsL,
-		int numBeatsR);
-void delayconfigi_syncToBPM(DelayConfigI *config);
 
 static inline void delayconfigi_setDelaySamples(DelayConfigI *config,
 		float numSamplesL, float numSamplesR) {

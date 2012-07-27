@@ -351,14 +351,6 @@ void stopAll() {
 	}
 }
 
-void syncAll() {
-	int i;
-	for (i = 0; i < NUM_TRACKS; i++) {
-		delayconfigi_syncToBPM(
-				(DelayConfigI *) (getTrack(NULL, NULL, i)->effects[DELAY_ID].config));
-	}
-}
-
 /****************************************************************************************
  Java PlaybackManager JNI methods
  ****************************************************************************************/

@@ -11,8 +11,6 @@ DelayConfigI *delayconfigi_create(float delay, float feedback, int maxSamples) {
 	p->rp[0] = p->rp[1] = p->wp[0] = p->wp[1] = 0;
 	delayconfigi_set(p, delay, feedback);
 	p->wet = 0.5f;
-	p->numBeats[0] = p->numBeats[1] = 4;
-	p->beatmatch = false;
 	return p;
 }
 
@@ -25,24 +23,6 @@ void delayconfigi_set(void *p, float delay, float feedback) {
 void delayconfigi_setFeedback(DelayConfigI *config, float feedback) {
 	config->feedback =
 			feedback > 0.f ? (feedback < 1.f ? feedback : 0.9999999f) : 0.f;
-}
-
-void delayconfigi_setNumBeats(DelayConfigI *config, int numBeatsL,
-		int numBeatsR) {
-	if (numBeatsL == config->numBeats[0] && numBeatsR == config->numBeats[1])
-		return;
-	config->numBeats[0] = numBeatsL;
-	config->numBeats[1] = numBeatsR;
-	delayconfigi_syncToBPM(config);
-}
-
-void delayconfigi_syncToBPM(DelayConfigI *config) {
-	if (!config->beatmatch)
-		return;
-	// divide by 60 for seconds, divide by 16 for 16th notes
-	float newTimeL = (BPM / 960.0f) * (float) config->numBeats[0];
-	float newTimeR = (BPM / 960.0f) * (float) config->numBeats[1];
-	delayconfigi_setDelayTime(config, newTimeL, newTimeR);
 }
 
 void delayconfigi_destroy(void *p) {
@@ -68,28 +48,10 @@ void Java_com_kh_beatbot_DelayActivity_setDelayParam(JNIEnv *env, jclass clazz,
 	DelayConfigI *config = (DelayConfigI *) track->effects[DELAY_ID].config;
 	int channel;
 	if (paramNum == 0) { // delay time
-		if (config->beatmatch) {
-			for (channel = 0; channel < 2; channel++) {
-				// map float 0-1 to int 1-16 for number of beats
-				int numBeats = (int) (param * 15) + 1;
-				delayconfigi_setNumBeats(config, numBeats, numBeats);
-			}
-		} else {
-			delayconfigi_setDelayTime(config, param, param);
-		}
+		delayconfigi_setDelayTime(config, param, param);
 	} else if (paramNum == 1) { // feedback
 		delayconfigi_setFeedback(config, param);
 	} else if (paramNum == 2) { // wet/dry
 		config->wet = param;
 	}
 }
-
-void Java_com_kh_beatbot_DelayActivity_setDelayBeatmatch(JNIEnv *env,
-		jclass clazz, jint trackNum, jboolean beatmatch) {
-	Track *track = getTrack(env, clazz, trackNum);
-	DelayConfigI *config = (DelayConfigI *) track->effects[DELAY_ID].config;
-	config->beatmatch = beatmatch;
-	Java_com_kh_beatbot_DelayActivity_setDelayParam(NULL, NULL, trackNum, 0,
-			config->delayTime[0]);
-}
-

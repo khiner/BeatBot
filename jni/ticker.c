@@ -19,7 +19,6 @@ void Java_com_kh_beatbot_manager_MidiManager_setCurrTick(JNIEnv *env,
 void Java_com_kh_beatbot_manager_MidiManager_setNativeBPM(JNIEnv *env,
 		jclass clazz, jfloat _BPM) {
 	BPM = _BPM;
-	syncAll();
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_setNativeMSPT(JNIEnv *env,

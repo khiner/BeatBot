@@ -123,4 +123,15 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 	protected float scaleLevel(float level) {
 		return (float)(Math.pow(9, level) - 1)/8;
 	}
+	
+	protected float quantizeToBeat(float level) {
+		// minimum beat == 1/16 note = 1(1 << 4)
+		for (int pow = 4; pow >= 0; pow--) {
+			float quantized = 1f/(1 << pow);
+			if (level <= quantized) {
+				return quantized;
+			}
+		}
+		return 1;
+	}
 }

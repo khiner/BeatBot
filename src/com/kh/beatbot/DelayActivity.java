@@ -33,7 +33,10 @@ public class DelayActivity extends EffectActivity {
 	public void setXValue(float xValue) {
 		GlobalVars.delayX[trackNum] = xValue;
 		// exponential scale for time
-		setDelayParam(trackNum, 0, scaleLevel(xValue));
+		float scaledLevel = scaleLevel(xValue);
+		if (GlobalVars.delayBeatmatch[trackNum])
+			scaledLevel = quantizeToBeat(scaledLevel);
+		setDelayParam(trackNum, 0, scaledLevel);
 	}
 	
 	public void setYValue(float yValue) {
@@ -64,7 +67,8 @@ public class DelayActivity extends EffectActivity {
 	}
 	
 	public void beatMatch(View view) {
-		setDelayBeatmatch(trackNum, ((ToggleButton)view).isChecked());
+		boolean beatmatch = ((ToggleButton)view).isChecked();
+		GlobalVars.delayBeatmatch[trackNum] = beatmatch;
 	}
 	
 	@Override
@@ -87,6 +91,5 @@ public class DelayActivity extends EffectActivity {
 	}
 	
 	public native void setDelayOn(int trackNum, boolean on);
-	public native void setDelayBeatmatch(int trackNum, boolean beatmatch);	
 	public native void setDelayParam(int trackNum, int paramNum, float param);
 }
