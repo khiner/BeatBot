@@ -78,8 +78,7 @@ static inline float delayi_tick(DelayConfigI *config, float in, int channel) {
 	return config->out;
 }
 
-static inline void delayi_process(void *p, float **buffers, int size) {
-	DelayConfigI *config = (DelayConfigI *) p;
+static inline void delayi_process(DelayConfigI *config, float **buffers, int size) {
 	int channel, samp;
 	for (samp = 0; samp < size; samp++) {
 		pthread_mutex_lock(&config->mutex);

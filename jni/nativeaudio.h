@@ -2,6 +2,7 @@
 #define NATIVEAUDIO_H
 
 #include "effects.h"
+#include "wavfile.h"
 
 #include <assert.h>
 #include <jni.h>
@@ -19,8 +20,6 @@
 #include <android/asset_manager_jni.h>
 
 #define CONV16BIT 32768
-#define CONVMYFLT (1./32768.)
-#define BUFF_SIZE 512 // 512 samples, each with one short for each channel
 
 static SLDataFormat_PCM format_pcm = { SL_DATAFORMAT_PCM, 2,
 		SL_SAMPLINGRATE_44_1, SL_PCMSAMPLEFORMAT_FIXED_16,
@@ -43,25 +42,18 @@ typedef struct MidiEventNode_ {
 
 typedef struct Track_ {
 	Effect effects[NUM_EFFECTS];
+	Generator *generator;
+	MidiEventNode *eventHead;
 	float currBufferFlt[BUFF_SIZE * 2];
 	short currBufferShort[BUFF_SIZE * 2];
-	MidiEventNode *eventHead;
 	float **currBuffers;
-	// buffer to hold original sample data
-	float **buffers;
-	int totalSamples;
-	int currSample;
 
 	float volume, pan, pitch;
 
 	bool armed;
 	bool playing;
-	bool loop;
 	bool mute;
 	bool solo;
-
-	int loopBegin;
-	int loopEnd;
 
 	SLObjectItf outputPlayerObject;
 	SLPlayItf outputPlayerPlay;

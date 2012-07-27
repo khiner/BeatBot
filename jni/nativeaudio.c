@@ -68,25 +68,17 @@ MidiEvent* initEvent(long onTick, long offTick, float volume, float pan,
 
 void initTrack(Track *track, AAsset *asset) {
 	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
-	track->totalSamples = AAsset_getLength(asset) / 2 - 22;
-	track->totalSamples /= 2; // 1 sample has one short for each channel (2 channels)
-
 	track->currBuffers = (float **) malloc(2 * sizeof(float *));
 	track->currBuffers[0] = (float *) calloc(BUFF_SIZE, sizeof(float));
 	track->currBuffers[1] = (float *) calloc(BUFF_SIZE, sizeof(float));
-	track->buffers = (float **) malloc(2 * sizeof(float *));
-	track->buffers[0] = (float *) calloc(track->totalSamples, sizeof(float));
-	track->buffers[1] = (float *) calloc(track->totalSamples, sizeof(float));
 	track->armed = false;
 	track->playing = false;
 	track->mute = track->solo = false;
-	track->loop = false;
-	track->loopBegin = 0;
-	track->loopEnd = track->totalSamples;
-	track->currSample = 0;
 	track->volume = .8f;
 	track->pan = track->pitch = .5f;
 
+	initGenerator(track->generator, wavfile_create(asset), wavfile_reset,
+			wavfile_generate, wavfile_destroy);
 	initEffect(&(track->effects[VOL_PAN_ID]), true,
 			volumepanconfig_create(.8f, .5f), volumepanconfig_set,
 			volumepan_process, volumepanconfig_destroy);
@@ -120,7 +112,7 @@ void initTrack(Track *track, AAsset *asset) {
 			reverbconfig_create(.5f, .5f), reverbconfig_set, reverb_process,
 			reverbconfig_destroy);
 	initEffect(&(track->effects[ADSR_ID]), false,
-			adsrconfig_create(track->loopEnd - track->loopBegin), NULL,
+			adsrconfig_create(((WavFile *)(track->generator))->totalSamples), NULL,
 			adsr_process, adsrconfig_destroy);
 }
 
@@ -144,39 +136,8 @@ void calcNextBuffer(Track *track) {
 	memset(track->currBuffers[0], 0, (BUFF_SIZE) * sizeof(float));
 	memset(track->currBuffers[1], 0, (BUFF_SIZE) * sizeof(float));
 
-	if (track->playing && track->currSample < track->loopEnd) {
-		int totalSize = 0;
-		int nextSize; // how many samples to copy from the source
-		while (totalSize < BUFF_SIZE) {
-			if (track->currSample + BUFF_SIZE - totalSize
-					>= track->loopEnd) {
-				// at the end of the window - copy all samples that are left
-				nextSize = track->loopEnd - track->currSample;
-			} else {
-				nextSize = BUFF_SIZE - totalSize; // plenty of samples left to copy :)
-			}
-			// copy the next block of data from the scratch buffer into the current float buffer for streaming
-			memcpy(&(track->currBuffers[0][totalSize]),
-					&(track->buffers[0][track->currSample]),
-					nextSize * sizeof(float));
-			memcpy(&(track->currBuffers[1][totalSize]),
-					&(track->buffers[1][track->currSample]),
-					nextSize * sizeof(float));
-
-			totalSize += nextSize;
-			// increment sample counter to reflect bytes written so far
-			track->currSample += nextSize;
-			if (track->currSample >= track->loopEnd) {
-				if (track->loop) {
-					// if we are looping, and we're past the end, loop back to the beginning
-					track->currSample = track->loopBegin;
-				} else {
-					track->playing = false;
-					break; // not looping, so we can play less than BUFF_SIZE samples
-				}
-			}
-		}
-	}
+	if (track->playing)
+		track->generator->generate(track->generator, track->currBuffers, BUFF_SIZE);
 }
 
 void processEffects(Track *track) {
@@ -317,18 +278,6 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(
 
 	initTrack(track, asset);
 
-	unsigned char *charBuf = (unsigned char *) AAsset_getBuffer(asset);
-	int i;
-	for (i = 0; i < track->totalSamples; i++) {
-		// first 44 bytes of a wav file are header
-		track->buffers[0][i] = charsToShort(charBuf[i * 4 + 1 + 44],
-				charBuf[i * 4 + 44]) * CONVMYFLT;
-		track->buffers[1][i] = charsToShort(charBuf[i * 4 + 3 + 44],
-				charBuf[i * 4 + 2 + 44]) * CONVMYFLT;
-	}
-	free(charBuf);
-	AAsset_close(asset);
-
 	// configure audio sink
 	SLDataLocator_OutputMix loc_outmix = { SL_DATALOCATOR_OUTPUTMIX,
 			outputMixObject };
@@ -401,12 +350,11 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv *env, jclass clazz) {
 		(*(track->outputBufferQueue))->Clear(track->outputBufferQueue);
 		track->outputBufferQueue = NULL;
 		track->outputPlayerPlay = NULL;
-		free(track->buffers[0]);
-		free(track->buffers[1]);
 		free(track->currBuffers[0]);
 		free(track->currBuffers[1]);
 		free(track->currBufferFlt);
 		free(track->currBufferShort);
+		track->generator->destroy(track->generator->config);
 		for (j = 0; j < NUM_EFFECTS; j++) {
 			track->effects[i].destroy(track->effects[i].config);
 		}
@@ -434,11 +382,11 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv *env, jclass clazz) {
  ****************************************************************************************/
 void playTrack(int trackNum, float volume, float pan, float pitch) {
 	Track *track = getTrack(NULL, NULL, trackNum);
-	track->currSample = track->loopBegin;
-	track->effects[VOL_PAN_ID].set(
-			track->effects[VOL_PAN_ID].config, track->volume*volume, track->pan*pan);
-	//pitchconfig_setShift((PitchConfig *)track->effects[DYNAMIC_PITCH_ID].config, pitch*2 - 1);
+	wavfile_reset((WavFile *)track->generator); // maybe don't need this (done on stop)
 	track->playing = true;
+	track->effects[VOL_PAN_ID].set(
+				track->effects[VOL_PAN_ID].config, track->volume*volume, track->pan*pan);
+	//pitchconfig_setShift((PitchConfig *)track->effects[DYNAMIC_PITCH_ID].config, pitch*2 - 1);
 	AdsrConfig *adsrConfig = (AdsrConfig *) track->effects[ADSR_ID].config;
 	adsrConfig->active = true;
 	resetAdsr(adsrConfig);
@@ -450,7 +398,7 @@ void playTrack(int trackNum, float volume, float pan, float pitch) {
 void stopTrack(int trackNum) {
 	Track *track = getTrack(NULL, NULL, trackNum);
 	track->playing = false;
-	track->currSample = track->loopBegin;
+	wavfile_reset((WavFile *)track->generator);
 	((AdsrConfig *) track->effects[ADSR_ID].config)->active = false;
 }
 
@@ -522,7 +470,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_stopTrack(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->playing = false;
-	track->currSample = track->loopBegin;
+	wavfile_reset((WavFile *)track->generator);
 }
 
 void setTrackMute(Track *track, bool mute) {
@@ -597,28 +545,6 @@ void Java_com_kh_beatbot_manager_PlaybackManager_unsoloTrack(JNIEnv *env,
 		}
 	}
 
-}
-
-void Java_com_kh_beatbot_manager_PlaybackManager_toggleLooping(JNIEnv *env,
-		jclass clazz, jint trackNum) {
-	Track *track = getTrack(env, clazz, trackNum);
-	track->loop = !track->loop;
-}
-
-jboolean Java_com_kh_beatbot_manager_PlaybackManager_isLooping(JNIEnv *env,
-		jclass clazz, jint trackNum) {
-	return getTrack(env, clazz, trackNum)->loop;
-}
-
-void Java_com_kh_beatbot_manager_PlaybackManager_setLoopWindow(JNIEnv *env,
-		jclass clazz, jint trackNum, jint loopBeginSample, jint loopEndSample) {
-	Track *track = getTrack(env, clazz, trackNum);
-	track->loopBegin = loopBeginSample;
-	track->loopEnd = loopEndSample;
-	if (track->currSample >= track->loopEnd)
-		track->currSample = track->loopBegin;
-	updateAdsr((AdsrConfig *) track->effects[ADSR_ID].config,
-			track->loopEnd - track->loopBegin);
 }
 
 /****************************************************************************************

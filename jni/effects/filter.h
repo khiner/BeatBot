@@ -14,8 +14,7 @@ FilterConfig *filterconfig_create(float cutoff, float r);
 void filterconfig_setLp(void *config, float cutoff, float r);
 void filterconfig_setHp(void *config, float cutoff, float r);
 
-static inline void filter_process(void *p, float **buffers, int size) {
-	FilterConfig *config = (FilterConfig *) p;
+static inline void filter_process(FilterConfig *config, float **buffers, int size) {
 	int channel, samp;
 	for (channel = 0; channel < 2; channel++) {
 		for (samp = 0; samp < size; samp++) {

@@ -6,7 +6,6 @@
 #include <pthread.h>
 #include <android/log.h>
 
-#include "generators.h"
 #include "ticker.h"
 
 #define SAMPLE_RATE 44100

@@ -25,8 +25,7 @@ AdsrConfig *adsrconfig_create(int totalSamples);
 void updateAdsr(AdsrConfig *config, int totalSamples);
 void resetAdsr(AdsrConfig *config);
 
-static inline void adsr_process(void *p, float **buffers, int size) {
-	AdsrConfig *config = (AdsrConfig *) p;
+static inline void adsr_process(AdsrConfig *config, float **buffers, int size) {
 	if (!config->active)
 		return;
 	int i;

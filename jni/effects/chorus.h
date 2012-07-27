@@ -22,8 +22,7 @@ void chorusconfig_setModFreq(ChorusConfig *config, float modFreq);
 void chorusconfig_setModAmt(ChorusConfig *config, float modAmt);
 void chorusconfig_setWet(ChorusConfig *config, float wet);
 
-static inline void chorus_process(void *p, float **buffers, int size) {
-	ChorusConfig *config = (ChorusConfig *) p;
+static inline void chorus_process(ChorusConfig *config, float **buffers, int size) {
 	int channel, samp;
 	for (samp = 0; samp < size; samp++) {
 		float dTimeL = config->baseTime * 0.707

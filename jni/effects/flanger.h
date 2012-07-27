@@ -21,8 +21,7 @@ void flangerconfig_setModFreq(FlangerConfig *config, float modFreq);
 void flangerconfig_setModAmt(FlangerConfig *config, float modAmt);
 void flangerconfig_setPhaseShift(FlangerConfig *config, float phaseShift);
 
-static inline void flanger_process(void *p, float **buffers, int size) {
-	FlangerConfig *config = (FlangerConfig *) p;
+static inline void flanger_process(FlangerConfig *config, float **buffers, int size) {
 	int channel, samp;
 	for (samp = 0; samp < size; samp++) {
 		float dTimeL = config->baseTime

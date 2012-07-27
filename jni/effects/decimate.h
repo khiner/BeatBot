@@ -13,8 +13,7 @@ typedef struct DecimateConfig_t {
 DecimateConfig *decimateconfig_create(float bits, float rate);
 void decimateconfig_set(void *p, float bits, float rate);
 
-static inline void decimate_process(void *p, float **buffers, int size) {
-	DecimateConfig *config = (DecimateConfig *) p;
+static inline void decimate_process(DecimateConfig *config, float **buffers, int size) {
 	int m = 1 << (config->bits - 1);
 	int i;
 	for (i = 0; i < size; i++) {

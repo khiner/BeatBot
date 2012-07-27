@@ -56,8 +56,7 @@ static inline float pitch_tick(PitchConfig *config, float in, int channel) {
 	return out;
 }
 
-static inline void pitch_process(void *p, float **buffers, int size) {
-	PitchConfig *config = (PitchConfig *) p;
+static inline void pitch_process(PitchConfig *config, float **buffers, int size) {
 	int channel, samp;
 	for (channel = 0; channel < 2; channel++) {
 		for (samp = 0; samp < size; samp++) {

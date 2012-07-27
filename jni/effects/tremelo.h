@@ -15,8 +15,7 @@ void tremeloconfig_setFrequency(TremeloConfig *config, float freqL,
 		float freqR);
 void tremeloconfig_setDepth(TremeloConfig *config, float depth);
 
-static inline void tremelo_process(void *p, float **buffers, int size) {
-	TremeloConfig *config = (TremeloConfig *) p;
+static inline void tremelo_process(TremeloConfig *config, float **buffers, int size) {
 	int channel, samp;
 	for (channel = 0; channel < 2; channel++) {
 		for (samp = 0; samp < size; samp++) {

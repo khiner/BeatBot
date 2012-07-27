@@ -11,8 +11,7 @@ typedef struct VolumePanConfig_t {
 VolumePanConfig *volumepanconfig_create(float volume, float pan);
 void volumepanconfig_set(void *config, float volume, float pan);
 
-static inline void volumepan_process(void *p, float **buffers, int size) {
-	VolumePanConfig *config = (VolumePanConfig *) p;
+static inline void volumepan_process(VolumePanConfig *config, float **buffers, int size) {
 	float leftVolume = (1 - config->pan) * config->volume;
 	float rightVolume = config->pan * config->volume;
 	int i;
