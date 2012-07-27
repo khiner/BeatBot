@@ -30,11 +30,11 @@
 #define NUM_EFFECTS 11
 
 typedef struct Effect_t {
-	bool on;
 	void *config;
 	void (*set)(void *, float, float);
 	void (*process)(void *, float **, int);
 	void (*destroy)(void *);
+	bool on;
 } Effect;
 
 void initEffect(Effect *effect, bool on, void *config,

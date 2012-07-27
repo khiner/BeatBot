@@ -113,11 +113,12 @@ void initTrack(Track *track, AAsset *asset) {
 			NULL, adsr_process, adsrconfig_destroy);
 }
 
-void interleave(float left[], float right[], short combined[], int size) {
+void interleaveFloatsToShorts(float left[], float right[], short interleaved[],
+		int size) {
 	int i;
 	for (i = 0; i < size; i++) {
-		combined[i * 2] = left[i] * CONV16BIT;
-		combined[i * 2 + 1] = right[i] * CONV16BIT;
+		interleaved[i * 2] = left[i] * CONV16BIT;
+		interleaved[i * 2 + 1] = right[i] * CONV16BIT;
 	}
 }
 
@@ -138,8 +139,8 @@ void processEffects(Track *track) {
 	}
 	// combine the two channels of floats into one buffer of shorts,
 	// interleaving L and R samples
-	interleave(track->currBufferFloat[0], track->currBufferFloat[1],
-			track->currBufferShort, BUFF_SIZE);
+	interleaveFloatsToShorts(track->currBufferFloat[0],
+			track->currBufferFloat[1], track->currBufferShort, BUFF_SIZE);
 }
 
 // this callback handler is called every time a buffer finishes playing

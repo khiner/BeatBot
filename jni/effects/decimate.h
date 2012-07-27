@@ -4,10 +4,10 @@
 #include "effects.h"
 
 typedef struct DecimateConfig_t {
-	int bits; // 4-32
 	float rate; // 0-1
 	float cnt;
 	float y;
+	int bits; // 4-32
 } DecimateConfig;
 
 DecimateConfig *decimateconfig_create(float bits, float rate);

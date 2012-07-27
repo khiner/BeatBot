@@ -27,17 +27,17 @@ static SLDataFormat_PCM format_pcm = { SL_DATAFORMAT_PCM, 2,
 				| SL_SPEAKER_FRONT_RIGHT, SL_BYTEORDER_LITTLEENDIAN };
 
 typedef struct MidiEvent_ {
-	bool muted;
-	long onTick;
-	long offTick;
 	float volume;
 	float pan;
 	float pitch;
+	long onTick;
+	long offTick;
+	bool muted;
 } MidiEvent;
 
 typedef struct MidiEventNode_ {
 	MidiEvent *event;
-	struct MidiEventNode_ *next;
+	MidiEventNode *next;
 } MidiEventNode;
 
 typedef struct Track_ {
@@ -49,17 +49,16 @@ typedef struct Track_ {
 
 	float volume, pan, pitch;
 
-	bool armed;
-	bool playing;
-	bool mute;
-	bool solo;
-
 	SLObjectItf outputPlayerObject;
 	SLPlayItf outputPlayerPlay;
 	SLMuteSoloItf outputPlayerMuteSolo;
 	SLPlaybackRateItf outputPlayerPitch;
-	// output buffer interfaces
 	SLAndroidSimpleBufferQueueItf outputBufferQueue;
+
+	bool armed;
+	bool playing;
+	bool mute;
+	bool solo;
 } Track;
 
 Track *tracks;

@@ -4,10 +4,10 @@
 #include "effects.h"
 
 typedef struct FilterConfig_t {
-	float a1, a2, a3, b1, b2;
-	float f, c, r;
 	float in1[2], in2[2]; // one for each channel
 	float out1[2], out2[2]; // one for each channel
+	float a1, a2, a3, b1, b2;
+	float f, c, r;
 } FilterConfig;
 
 FilterConfig *filterconfig_create(float cutoff, float r);
