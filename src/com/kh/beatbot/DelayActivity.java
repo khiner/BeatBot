@@ -32,7 +32,8 @@ public class DelayActivity extends EffectActivity {
 	
 	public void setXValue(float xValue) {
 		GlobalVars.delayX[trackNum] = xValue;
-		setDelayParam(trackNum, 0, xValue);
+		// exponential scale for time
+		setDelayParam(trackNum, 0, scaleLevel(xValue));
 	}
 	
 	public void setYValue(float yValue) {

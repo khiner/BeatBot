@@ -31,7 +31,8 @@ public class ChorusActivity extends EffectActivity {
 	
 	public void setXValue(float xValue) {
 		GlobalVars.chorusX[trackNum] = xValue;
-		setChorusParam(trackNum, 0, xValue);
+		// exponential scale for rate
+		setChorusParam(trackNum, 0, scaleLevel(xValue));
 	}
 	
 	public void setYValue(float yValue) {
@@ -54,7 +55,7 @@ public class ChorusActivity extends EffectActivity {
 		} else if (levelBar.getTag().equals(4)) {
 			GlobalVars.chorusModAmt[trackNum] = level;
 		}
-		setChorusParam(trackNum, (Integer)levelBar.getTag(), level);
+		setChorusParam(trackNum, (Integer)levelBar.getTag(), scaleLevel(level));
 	}
 	
 	public float getWetValue() {

@@ -36,7 +36,8 @@ public class FilterActivity extends EffectActivity {
 	
 	public void setXValue(float xValue) {
 		GlobalVars.filterX[trackNum] = xValue;
-		setFilterParam(trackNum, 0, xValue);
+		// exponential scale for freq
+		setFilterParam(trackNum, 0, scaleLevel(xValue));
 	}
 	
 	public void setYValue(float yValue) {

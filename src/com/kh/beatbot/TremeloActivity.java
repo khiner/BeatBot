@@ -30,7 +30,8 @@ public class TremeloActivity extends EffectActivity {
 	
 	public void setXValue(float xValue) {
 		GlobalVars.tremeloX[trackNum] = xValue;
-		setTremeloParam(trackNum, 0, xValue);
+		// exponential scale for mod rate
+		setTremeloParam(trackNum, 0, scaleLevel(xValue));
 	}
 	
 	public void setYValue(float yValue) {

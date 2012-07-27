@@ -119,4 +119,8 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 		level2d.setViewLevelX(getXValue());
 		level2d.setViewLevelY(getYValue());
 	}
+	
+	protected float scaleLevel(float level) {
+		return (float)(Math.pow(9, level) - 1)/8;
+	}
 }

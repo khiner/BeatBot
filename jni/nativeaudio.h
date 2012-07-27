@@ -13,7 +13,6 @@
 #include "effects/tremelo.h"
 #include "effects/volpan.h"
 
-
 #define CONV16BIT 32768
 
 static SLDataFormat_PCM format_pcm = { SL_DATAFORMAT_PCM, 2,

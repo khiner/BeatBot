@@ -31,7 +31,8 @@ public class FlangerActivity extends EffectActivity {
 	
 	public void setXValue(float xValue) {
 		GlobalVars.flangerX[trackNum] = xValue;
-		setFlangerParam(trackNum, 0, xValue);
+		// exponential scale for base time
+		setFlangerParam(trackNum, 0, scaleLevel(xValue));
 	}
 	
 	public void setYValue(float yValue) {
@@ -51,6 +52,8 @@ public class FlangerActivity extends EffectActivity {
 			GlobalVars.flangerWet[trackNum] = level;
 		} else if (levelBar.getTag().equals(3)) {
 			GlobalVars.flangerModRate[trackNum] = level;
+			// exponential scale for mod rate
+			level = scaleLevel(level);
 		} else if (levelBar.getTag().equals(4)) {
 			GlobalVars.flangerModAmt[trackNum] = level;
 		}

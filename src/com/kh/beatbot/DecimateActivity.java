@@ -28,13 +28,15 @@ public class DecimateActivity extends EffectActivity {
 	}
 	
 	public void setXValue(float xValue) {
-		GlobalVars.decimateX[trackNum] = xValue;		
-		setDecimateParam(trackNum, 0, xValue);
+		GlobalVars.decimateX[trackNum] = xValue;
+		// exponential scale for rate
+		setDecimateParam(trackNum, 0, scaleLevel(xValue));
 	}
 	
 	public void setYValue(float yValue) {
 		GlobalVars.decimateY[trackNum] = yValue;
-		setDecimateParam(trackNum, 1, yValue);
+		// exponential scale for bits
+		setDecimateParam(trackNum, 1, scaleLevel(yValue));
 	}
 	
 	public boolean isEffectOn() {
@@ -42,8 +44,7 @@ public class DecimateActivity extends EffectActivity {
 	}
 	
 	public void setEffectOn(boolean on) {
-		GlobalVars.decimateOn[trackNum] = on;
-		
+		GlobalVars.decimateOn[trackNum] = on;		
 		setDecimateOn(trackNum, on);
 	}
 	
