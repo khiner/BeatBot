@@ -42,11 +42,10 @@ typedef struct MidiEventNode_ {
 
 typedef struct Track_ {
 	Effect effects[NUM_EFFECTS];
+	float currBufferFloat[2][BUFF_SIZE];
+	short currBufferShort[BUFF_SIZE * 2];
 	Generator *generator;
 	MidiEventNode *eventHead;
-	float currBufferFlt[BUFF_SIZE * 2];
-	short currBufferShort[BUFF_SIZE * 2];
-	float **currBuffers;
 
 	float volume, pan, pitch;
 

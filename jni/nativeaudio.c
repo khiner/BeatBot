@@ -70,9 +70,6 @@ MidiEvent* initEvent(long onTick, long offTick, float volume, float pan,
 
 void initTrack(Track *track, AAsset *asset) {
 	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
-	track->currBuffers = (float **) malloc(2 * sizeof(float *));
-	track->currBuffers[0] = (float *) calloc(BUFF_SIZE, sizeof(float));
-	track->currBuffers[1] = (float *) calloc(BUFF_SIZE, sizeof(float));
 	track->armed = false;
 	track->playing = false;
 	track->mute = track->solo = false;
@@ -116,27 +113,20 @@ void initTrack(Track *track, AAsset *asset) {
 			NULL, adsr_process, adsrconfig_destroy);
 }
 
-void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {
+void interleave(float left[], float right[], short combined[], int size) {
 	int i;
 	for (i = 0; i < size; i++) {
-		outBuffer[i] = (short) (inBuffer[i] * CONV16BIT);
-	}
-}
-
-void combineStereo(float left[], float right[], float combined[], int size) {
-	int i;
-	for (i = 0; i < size; i++) {
-		combined[i * 2] = left[i];
-		combined[i * 2 + 1] = right[i];
+		combined[i * 2] = left[i] * CONV16BIT;
+		combined[i * 2 + 1] = right[i] * CONV16BIT;
 	}
 }
 
 void calcNextBuffer(Track *track) {
 	if (track->playing)
-		track->generator->generate(track->generator, track->currBuffers,
+		track->generator->generate(track->generator, track->currBufferFloat,
 				BUFF_SIZE);
 	else
-		track->currBuffers = zeroBuffer;
+		track->currBufferFloat = zeroBuffer;
 }
 
 void processEffects(Track *track) {
@@ -144,14 +134,12 @@ void processEffects(Track *track) {
 	for (i = 0; i < NUM_EFFECTS; i++) {
 		Effect effect = track->effects[i];
 		if (effect.on)
-			effect.process(effect.config, track->currBuffers, BUFF_SIZE);
+			effect.process(effect.config, track->currBufferFloat, BUFF_SIZE);
 	}
-	// combine the two channels into one buffer, alternating L and R samples
-	combineStereo(track->currBuffers[0], track->currBuffers[1],
-			track->currBufferFlt, BUFF_SIZE);
-	// convert floats to shorts ( * 2 to account for channel interleaving)
-	floatArytoShortAry(track->currBufferFlt, track->currBufferShort,
-			BUFF_SIZE * 2);
+	// combine the two channels of floats into one buffer of shorts,
+	// interleaving L and R samples
+	interleave(track->currBufferFloat[0], track->currBufferFloat[1],
+			track->currBufferShort, BUFF_SIZE);
 }
 
 // this callback handler is called every time a buffer finishes playing
@@ -347,9 +335,7 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv *env, jclass clazz) {
 		(*(track->outputBufferQueue))->Clear(track->outputBufferQueue);
 		track->outputBufferQueue = NULL;
 		track->outputPlayerPlay = NULL;
-		free(track->currBuffers[0]);
-		free(track->currBuffers[1]);
-		free(track->currBufferFlt);
+		free(track->currBufferFloat);
 		free(track->currBufferShort);
 		track->generator->destroy(track->generator->config);
 		for (j = 0; j < NUM_EFFECTS; j++) {
