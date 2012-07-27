@@ -1,5 +1,9 @@
 #include "wavfile.h"
 
+static inline short charsToShort(unsigned char first, unsigned char second) {
+	return (first << 8) | second;
+}
+
 WavFile *wavfile_create(AAsset *asset) {
 	WavFile *wavFile = (WavFile *)malloc(sizeof(WavFile));
 	wavFile->totalSamples = AAsset_getLength(asset) / 2 - 22;
@@ -23,7 +27,6 @@ WavFile *wavfile_create(AAsset *asset) {
 	}
 	free(charBuf);
 	AAsset_close(asset);
-
 	return wavFile;
 }
 
@@ -42,21 +45,23 @@ void wavfile_destroy(void *p) {
 void Java_com_kh_beatbot_manager_PlaybackManager_toggleLooping(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
-	WavFile *wavFile = (WavFile *)track->generator;
+	WavFile *wavFile = (WavFile *)track->generator->config;
 	wavFile->looping = !wavFile->looping;
 }
 
 jboolean Java_com_kh_beatbot_manager_PlaybackManager_isLooping(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
-	WavFile *wavFile = (WavFile *)track->generator;
+	WavFile *wavFile = (WavFile *)track->generator->config;
 	return wavFile->looping;
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_setLoopWindow(JNIEnv *env,
 		jclass clazz, jint trackNum, jint loopBeginSample, jint loopEndSample) {
 	Track *track = getTrack(env, clazz, trackNum);
-	WavFile *wavFile = (WavFile *)track->generator;
+	WavFile *wavFile = (WavFile *)track->generator->config;
+	if (wavFile->loopBegin == loopBeginSample && wavFile->loopEnd == loopEndSample)
+		return;
 	wavFile->loopBegin = loopBeginSample;
 	wavFile->loopEnd = loopEndSample;
 	if (wavFile->currSample >= wavFile->loopEnd)

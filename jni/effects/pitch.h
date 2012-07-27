@@ -2,6 +2,7 @@
 #define PITCH_H
 
 #include "effects.h"
+#include "delay.h"
 
 #define MAX_PITCH_DELAY_SAMPS 5024
 

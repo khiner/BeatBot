@@ -2,6 +2,8 @@
 #define CHORUS_H
 
 #include "effects.h"
+#include "delay.h"
+#include "../generators/sinewave.h"
 
 #define MIN_CHORUS_DELAY 0.008f*SAMPLE_RATE
 #define MAX_CHORUS_DELAY 0.025f*SAMPLE_RATE

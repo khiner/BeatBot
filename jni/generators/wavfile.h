@@ -1,7 +1,8 @@
 #ifndef WAVFILE_H
 #define WAVFILE_H
 
-#include "generators.h"
+#include "../effects/effects.h"
+#include "../effects/adsr.h"
 
 #define CONVMYFLT (1./32768.)
 
@@ -18,18 +19,16 @@ WavFile *wavfile_create();
 void wavfile_reset(WavFile *config);
 
 static inline void wavfile_generate(WavFile *config, float **inBuffer, int size) {
-	// start with all zeros
-	memset(inBuffer, 0, (BUFF_SIZE) * 2 * sizeof(float));
 	if (config->currSample < config->loopEnd) {
 		int totalSize = 0;
 		int nextSize; // how many samples to copy from the source
-		while (totalSize < BUFF_SIZE) {
-			if (config->currSample + BUFF_SIZE - totalSize
+		while (totalSize < size) {
+			if (config->currSample + size - totalSize
 					>= config->loopEnd) {
 				// at the end of the window - copy all samples that are left
 				nextSize = config->loopEnd - config->currSample;
 			} else {
-				nextSize = BUFF_SIZE - totalSize; // plenty of samples left to copy :)
+				nextSize = size - totalSize; // plenty of samples left to copy :)
 			}
 			// copy the next block of data from the scratch buffer into the current float buffer for streaming
 			memcpy(&(inBuffer[0][totalSize]),
@@ -47,7 +46,7 @@ static inline void wavfile_generate(WavFile *config, float **inBuffer, int size)
 					// if we are looping, and we're past the end, loop back to the beginning
 					config->currSample = config->loopBegin;
 				} else {
-					break; // not looping, so we can play less than BUFF_SIZE samples
+					break; // not looping, so we can play less than size samples
 				}
 			}
 		}

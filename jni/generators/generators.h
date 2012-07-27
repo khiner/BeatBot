@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include "effects.h"
+#include <android/log.h>
 
 #define TABLE_SIZE 2048
 #define BUFF_SIZE 512 // 512 samples, each with one short for each channel
@@ -14,7 +14,7 @@
 
 typedef struct Generator_t {
 	void *config;
-	void (*set)(void *, float, float);
+	void (*set)(void *);
 	void (*generate)(void *, float **, int);
 	void (*destroy)(void *);
 } Generator;

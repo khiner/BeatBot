@@ -2,6 +2,7 @@
 #define TREMELO_H
 
 #include "effects.h"
+#include "../generators/sinewave.h"
 
 typedef struct TremeloConfig_t {
 	SineWave *mod[2];

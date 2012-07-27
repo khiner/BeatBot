@@ -83,7 +83,7 @@ void Java_com_kh_beatbot_manager_MidiManager_startTicking(JNIEnv *env,
 			currTick = loopBeginTick;
 		}
 		int i;
-		for (i = 0; i < numTracks; i++) {
+		for (i = 0; i < NUM_TRACKS; i++) {
 			Track *track = &tracks[i];
 			MidiEventNode *midiEventHead = track->eventHead;
 			MidiEvent *currEvent = findEvent(midiEventHead, currTick);

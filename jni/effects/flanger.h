@@ -2,6 +2,8 @@
 #define FLANGER_H
 
 #include "effects.h"
+#include "delay.h"
+#include "../generators/sinewave.h"
 
 #define MIN_FLANGER_DELAY 0.0005f*SAMPLE_RATE
 #define MAX_FLANGER_DELAY 0.007f*SAMPLE_RATE

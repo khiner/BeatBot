@@ -5,15 +5,19 @@
 #include <math.h>
 #include <pthread.h>
 #include <android/log.h>
-
-#include "ticker.h"
-
-#define SAMPLE_RATE 44100
-#define INV_SAMPLE_RATE 1.0f/44100.0f
+#include <jni.h>
+#include <fftw3.h>
+#include <android/log.h>
+#include <SLES/OpenSLES.h>
+#include <SLES/OpenSLES_Android.h>
+#include <android/asset_manager_jni.h>
 
 #define bool _Bool
 #define false 0
 #define true 1
+
+#define SAMPLE_RATE 44100
+#define INV_SAMPLE_RATE 1.0f/44100.0f
 
 #define VOL_PAN_ID 0
 #define PITCH_ID 1
@@ -36,6 +40,12 @@ typedef struct Effect_t {
 	void (*destroy)(void *);
 	bool on;
 } Effect;
+
+#include "../generators/generators.h"
+#include "../generators/wavfile.h"
+#include "midievent.h"
+#include "track.h"
+#include "ticker.h"
 
 void initEffect(Effect *effect, bool on, void *config,
 		void (*set), void (*process), void (*destroy));

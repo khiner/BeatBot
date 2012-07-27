@@ -181,7 +181,7 @@ public class BeatBotActivity extends Activity {
 
 		assetManager = getAssets();
 		if (savedInstanceState == null) {
-			createEngine(assetManager, sampleNames.length);
+			createEngine(assetManager);
 			createAllAssetAudioPlayers();
 		}
 		// get all Manager singletons
@@ -408,8 +408,7 @@ public class BeatBotActivity extends Activity {
 			;
 	}
 
-	public static native void createEngine(AssetManager assetManager,
-			int numSamples);
+	public static native void createEngine(AssetManager assetManager);
 
 	public static native boolean createAssetAudioPlayer(String filename);
 

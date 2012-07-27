@@ -50,14 +50,14 @@ jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size) {
 jfloatArray Java_com_kh_beatbot_SampleEditActivity_getSamples(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
-	WavFile *wavFile = (WavFile *)track->generator;
+	WavFile *wavFile = (WavFile *)track->generator->config;
 	return makejFloatArray(env, wavFile->buffers[0], wavFile->totalSamples);
 }
 
 jfloatArray Java_com_kh_beatbot_SampleEditActivity_reverse(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
-	WavFile *wavFile = (WavFile *)track->generator;
+	WavFile *wavFile = (WavFile *)track->generator->config;
 	reverse(wavFile->buffers[0], wavFile->loopBegin, wavFile->loopEnd);
 	reverse(wavFile->buffers[1], wavFile->loopBegin, wavFile->loopEnd);
 	return makejFloatArray(env, wavFile->buffers[0], wavFile->totalSamples);
@@ -66,7 +66,7 @@ jfloatArray Java_com_kh_beatbot_SampleEditActivity_reverse(JNIEnv *env,
 jfloatArray Java_com_kh_beatbot_SampleEditActivity_normalize(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
-	WavFile *wavFile = (WavFile *)track->generator;
+	WavFile *wavFile = (WavFile *)track->generator->config;
 	normalize(wavFile->buffers[0], wavFile->totalSamples);
 	normalize(wavFile->buffers[1], wavFile->totalSamples);
 	return makejFloatArray(env, wavFile->buffers[0], wavFile->totalSamples);
