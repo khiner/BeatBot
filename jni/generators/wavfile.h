@@ -18,6 +18,8 @@ WavFile *wavfile_create();
 void wavfile_reset(WavFile *config);
 
 static inline void wavfile_generate(WavFile *config, float **inBuffer, int size) {
+	// start with all zeros
+	memset(inBuffer, 0, (BUFF_SIZE) * 2 * sizeof(float));
 	if (config->currSample < config->loopEnd) {
 		int totalSize = 0;
 		int nextSize; // how many samples to copy from the source
@@ -45,7 +47,6 @@ static inline void wavfile_generate(WavFile *config, float **inBuffer, int size)
 					// if we are looping, and we're past the end, loop back to the beginning
 					config->currSample = config->loopBegin;
 				} else {
-					//track->playing = false;
 					break; // not looping, so we can play less than BUFF_SIZE samples
 				}
 			}

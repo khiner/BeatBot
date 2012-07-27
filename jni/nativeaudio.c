@@ -12,6 +12,8 @@ static AAssetManager* assetManager = NULL;
 // output mix interfaces
 static SLObjectItf outputMixObject = NULL;
 
+static float zeroBuffer[2][BUFF_SIZE];
+
 // create the engine and output mix objects
 void Java_com_kh_beatbot_BeatBotActivity_createEngine(JNIEnv *env, jclass clazz,
 		jobject _assetManager, jint _numTracks) {
@@ -82,9 +84,8 @@ void initTrack(Track *track, AAsset *asset) {
 	initEffect(&(track->effects[VOL_PAN_ID]), true,
 			volumepanconfig_create(.8f, .5f), volumepanconfig_set,
 			volumepan_process, volumepanconfig_destroy);
-	initEffect(&(track->effects[PITCH_ID]), false,
-			pitchconfig_create(), pitchconfig_setShift, pitch_process,
-			pitchconfig_destroy);
+	initEffect(&(track->effects[PITCH_ID]), false, pitchconfig_create(),
+			pitchconfig_setShift, pitch_process, pitchconfig_destroy);
 	initEffect(&(track->effects[DECIMATE_ID]), false,
 			decimateconfig_create(4.0f, 0.5f), decimateconfig_set,
 			decimate_process, decimateconfig_destroy);
@@ -105,15 +106,14 @@ void initTrack(Track *track, AAsset *asset) {
 	initEffect(&(track->effects[DELAY_ID]), false,
 			delayconfigi_create(.5f, .5f, SAMPLE_RATE), delayconfigi_set,
 			delayi_process, delayconfigi_destroy);
-	initEffect(&(track->effects[FLANGER_ID]), false,
-			flangerconfig_create(), flangerconfig_set, flanger_process,
-			flangerconfig_destroy);
+	initEffect(&(track->effects[FLANGER_ID]), false, flangerconfig_create(),
+			flangerconfig_set, flanger_process, flangerconfig_destroy);
 	initEffect(&(track->effects[REVERB_ID]), false,
 			reverbconfig_create(.5f, .5f), reverbconfig_set, reverb_process,
 			reverbconfig_destroy);
 	initEffect(&(track->effects[ADSR_ID]), false,
-			adsrconfig_create(((WavFile *)(track->generator))->totalSamples), NULL,
-			adsr_process, adsrconfig_destroy);
+			adsrconfig_create(((WavFile *) (track->generator))->totalSamples),
+			NULL, adsr_process, adsrconfig_destroy);
 }
 
 void floatArytoShortAry(float inBuffer[], short outBuffer[], int size) {
@@ -132,12 +132,11 @@ void combineStereo(float left[], float right[], float combined[], int size) {
 }
 
 void calcNextBuffer(Track *track) {
-	// start with all zeros
-	memset(track->currBuffers[0], 0, (BUFF_SIZE) * sizeof(float));
-	memset(track->currBuffers[1], 0, (BUFF_SIZE) * sizeof(float));
-
 	if (track->playing)
-		track->generator->generate(track->generator, track->currBuffers, BUFF_SIZE);
+		track->generator->generate(track->generator, track->currBuffers,
+				BUFF_SIZE);
+	else
+		track->currBuffers = zeroBuffer;
 }
 
 void processEffects(Track *track) {
@@ -151,19 +150,17 @@ void processEffects(Track *track) {
 	combineStereo(track->currBuffers[0], track->currBuffers[1],
 			track->currBufferFlt, BUFF_SIZE);
 	// convert floats to shorts ( * 2 to account for channel interleaving)
-	floatArytoShortAry(track->currBufferFlt, track->currBufferShort, BUFF_SIZE * 2);
+	floatArytoShortAry(track->currBufferFlt, track->currBufferShort,
+			BUFF_SIZE * 2);
 }
 
 // this callback handler is called every time a buffer finishes playing
 void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	Track *track = (Track *) (context);
-	if (!track->armed) {
-		// track is not armed. don't play any sound.
+	if (!track->armed) { // track is not armed. don't play any sound.
 		return;
 	}
-
 	SLresult result;
-
 	// calculate the next buffer
 	calcNextBuffer(track);
 	processEffects(track);
@@ -171,7 +168,7 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	// enqueue the buffer
 	result = (*bq)->Enqueue(bq, track->currBufferShort,
 			BUFF_SIZE * 2 * sizeof(short));
-	assert(SL_RESULT_SUCCESS == result);
+	//assert(SL_RESULT_SUCCESS == result);
 }
 
 MidiEvent *findEvent(MidiEventNode *head, long tick) {
@@ -382,10 +379,9 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv *env, jclass clazz) {
  ****************************************************************************************/
 void playTrack(int trackNum, float volume, float pan, float pitch) {
 	Track *track = getTrack(NULL, NULL, trackNum);
-	wavfile_reset((WavFile *)track->generator); // maybe don't need this (done on stop)
 	track->playing = true;
-	track->effects[VOL_PAN_ID].set(
-				track->effects[VOL_PAN_ID].config, track->volume*volume, track->pan*pan);
+	track->effects[VOL_PAN_ID].set(track->effects[VOL_PAN_ID].config,
+			track->volume * volume, track->pan * pan);
 	//pitchconfig_setShift((PitchConfig *)track->effects[DYNAMIC_PITCH_ID].config, pitch*2 - 1);
 	AdsrConfig *adsrConfig = (AdsrConfig *) track->effects[ADSR_ID].config;
 	adsrConfig->active = true;
@@ -398,7 +394,7 @@ void playTrack(int trackNum, float volume, float pan, float pitch) {
 void stopTrack(int trackNum) {
 	Track *track = getTrack(NULL, NULL, trackNum);
 	track->playing = false;
-	wavfile_reset((WavFile *)track->generator);
+	wavfile_reset((WavFile *) track->generator);
 	((AdsrConfig *) track->effects[ADSR_ID].config)->active = false;
 }
 
@@ -470,7 +466,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_stopTrack(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->playing = false;
-	wavfile_reset((WavFile *)track->generator);
+	wavfile_reset((WavFile *) track->generator);
 }
 
 void setTrackMute(Track *track, bool mute) {
