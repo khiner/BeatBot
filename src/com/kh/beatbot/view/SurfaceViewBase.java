@@ -29,9 +29,9 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	protected Thread t;
 	protected static GL10 gl;
 	protected boolean running;
-	int width;
-	int height;
-	int fps;
+	protected int width;
+	protected int height;
+	protected int fps;
 
 	/**
 	 * Make a direct NIO FloatBuffer from an array of floats

@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.view.SampleWaveformView;
@@ -134,7 +135,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 	
 	@Override
-	public void setLevel(TronSeekbar levelBar, float level) {
+	public void setLevel(LevelListenable levelBar, float level) {
 		if (levelBar.equals(volumeLevel)) {
 			setPrimaryVolume(trackNum, level);
 		} else if (levelBar.equals(panLevel)) {
@@ -145,7 +146,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 	
 	@Override
-	public void notifyInit(TronSeekbar levelBar) {
+	public void notifyInit(LevelListenable levelBar) {
 		if (levelBar.equals(volumeLevel)) {
 			volumeLevel.setLevelColor(MidiViewBean.VOLUME_COLOR);
 			volumeLevel.setViewLevel(getPrimaryVolume(trackNum));
@@ -159,7 +160,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}	
 	
 	@Override
-	public void notifyChecked(TronSeekbar levelBar, boolean checked) {
+	public void notifyChecked(LevelListenable levelBar, boolean checked) {
 		if (levelBar.equals(volumeLevel)) {
 			((ToggleButton) findViewById(R.id.volumeView))
 					.setChecked(checked);
@@ -194,4 +195,11 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public native void setPrimaryPitch(int trackNum, float pitch);
 	
 	public native void setAdsrOn(int trackNum, boolean on);
+
+	@Override
+	public void setLevel(LevelListenable levelListenable, float levelX,
+			float levelY) {
+		// for 2d seekbar.  nothing to do
+		
+	}
 }

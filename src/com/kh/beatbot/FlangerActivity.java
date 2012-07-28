@@ -5,7 +5,7 @@ import android.widget.ListView;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.view.TronSeekbar;
+import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.view.TronSeekbar2d;
 
 public class FlangerActivity extends EffectActivity {
@@ -46,8 +46,10 @@ public class FlangerActivity extends EffectActivity {
 	}
 	
 	@Override
-	public void setLevel(TronSeekbar levelBar, float level) {		
+	public void setLevel(LevelListenable levelBar, float level) {		
 		super.setLevel(levelBar, level);
+		if (levelBar instanceof TronSeekbar2d)
+			return;
 		if (levelBar.getTag().equals(2)) {
 			GlobalVars.flangerWet[trackNum] = level;
 		} else if (levelBar.getTag().equals(3)) {
@@ -73,7 +75,9 @@ public class FlangerActivity extends EffectActivity {
 	}
 	
 	@Override
-	public void notifyInit(TronSeekbar levelBar) {
+	public void notifyInit(LevelListenable levelBar) {
+		if (levelBar instanceof TronSeekbar2d)
+			return;
 		super.notifyInit(levelBar);
 		if (levelBar.getTag().equals(2))
 			levelBar.setLevel(getWetValue());

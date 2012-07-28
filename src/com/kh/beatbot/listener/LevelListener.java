@@ -1,9 +1,10 @@
 package com.kh.beatbot.listener;
 
-import com.kh.beatbot.view.TronSeekbar;
+import com.kh.beatbot.listenable.LevelListenable;
 
 public interface LevelListener {
-	void notifyInit(TronSeekbar levelBar);
-	void notifyChecked(TronSeekbar levelBar, boolean checked);
-	void setLevel(TronSeekbar levelBar, float level);
+	void notifyInit(LevelListenable levelListenable);
+	void notifyChecked(LevelListenable levelListenable, boolean checked);
+	void setLevel(LevelListenable levelListenable, float level);
+	void setLevel(LevelListenable levelListenable, float levelX, float levelY);
 }

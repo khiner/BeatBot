@@ -1,7 +1,6 @@
 package com.kh.beatbot.view;
 
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -9,12 +8,11 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import com.kh.beatbot.listener.Level2dListener;
+import com.kh.beatbot.listenable.LevelListenable;
+import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.bean.MidiViewBean;
 
-public class TronSeekbar2d extends SurfaceViewBase {
-	private ArrayList<Level2dListener> levelListeners = new ArrayList<Level2dListener>();
-	private float[] color = MidiViewBean.VOLUME_COLOR;
+public class TronSeekbar2d extends LevelListenable {
 	private float selectX = 0, selectY = 0;
 	
 	public TronSeekbar2d(Context c, AttributeSet as) {
@@ -26,20 +24,9 @@ public class TronSeekbar2d extends SurfaceViewBase {
 	}
 	
 	public void setViewLevelY(float y) {
-		selectY = y*(height - 50) + 25;
-	}
-		
-	public void addLevelListener(Level2dListener levelListener) {
-		levelListeners.add(levelListener);
+		selectY = y*(height - 50) + 25;	
 	}
 	
-	@Override
-	protected void init() {
-		for (Level2dListener listener : levelListeners) {
-			listener.notifyInit(this);
-		}
-	}
-
 	@Override
 	protected void drawFrame() {
 		gl.glClearColor(.3f, .3f, .3f, 1);
@@ -52,7 +39,7 @@ public class TronSeekbar2d extends SurfaceViewBase {
 		for (int i = 15; i > 10; i--) {
 			float alpha = (16 - i)/6f;
 			gl.glPointSize(i*3);
-			gl.glColor4f(color[0], color[1], color[2], alpha);
+			gl.glColor4f(levelColor[0], levelColor[1], levelColor[2], alpha);
 			gl.glDrawArrays(GL10.GL_POINTS, 0, 1);
 		}
 	}
@@ -60,24 +47,16 @@ public class TronSeekbar2d extends SurfaceViewBase {
 	private void selectLocation(float x, float y) {
 		selectX = x < 25 ? 25 : (x > width - 25 ? width - 25 : x);
 		selectY = y < 25 ? 25 : (y > height - 25 ? height - 25 : y);
-		for (Level2dListener listener : levelListeners) {
+		for (LevelListener listener : levelListeners) {
 			listener.setLevel(this, (selectX - 25)/(width - 50), (selectY - 25)/(height - 50));
 		}
 	}
 	
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
-		color = MidiViewBean.LEVEL_SELECTED_COLOR;
-		for (Level2dListener listener : levelListeners) {
-			listener.notifyChecked(this, true);
-		}
+		levelColor = MidiViewBean.LEVEL_SELECTED_COLOR;
 		selectLocation(x, y);
-	}
-
-	@Override
-	protected void handleActionPointerDown(MotionEvent e, int id, float x,
-			float y) {
-		return; // only one selection
+		super.handleActionDown(id, x,  y);
 	}
 
 	@Override
@@ -86,15 +65,8 @@ public class TronSeekbar2d extends SurfaceViewBase {
 	}
 
 	@Override
-	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
-		return; // only one selection		
-	}
-
-	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		color = MidiViewBean.VOLUME_COLOR;
-		for (Level2dListener listener : levelListeners) {
-			listener.notifyChecked(this, false);
-		}
+		levelColor = MidiViewBean.VOLUME_COLOR;
+		super.handleActionUp(id,  x, y);
 	}	
 }

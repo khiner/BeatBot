@@ -2,8 +2,6 @@ package com.kh.beatbot.view;
 
 import java.nio.FloatBuffer;
 
-import javax.microedition.khronos.opengles.GL10;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;

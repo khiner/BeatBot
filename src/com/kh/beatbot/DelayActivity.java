@@ -6,7 +6,7 @@ import android.widget.ListView;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.view.TronSeekbar;
+import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.view.TronSeekbar2d;
 
 public class DelayActivity extends EffectActivity {
@@ -50,9 +50,10 @@ public class DelayActivity extends EffectActivity {
 	}
 	
 	@Override
-	public void setLevel(TronSeekbar levelBar, float level) {		
+	public void setLevel(LevelListenable levelBar, float level) {		
 		super.setLevel(levelBar, level);
-		if (levelBar.getTag().equals(2)) {
+		if (!(levelBar instanceof TronSeekbar2d) && 
+				levelBar.getTag().equals(2)) {
 			setWetValue(level);
 		}
 	}
@@ -72,9 +73,10 @@ public class DelayActivity extends EffectActivity {
 	}
 	
 	@Override
-	public void notifyInit(TronSeekbar levelBar) {
-		super.notifyInit(levelBar);
-		if (levelBar.getTag().equals(2))
+	public void notifyInit(LevelListenable levelBar) {
+		super.notifyInit(levelBar); 
+		if (!(levelBar instanceof TronSeekbar2d) && 
+				levelBar.getTag().equals(2))
 			levelBar.setLevel(getWetValue());
 	}
 	
