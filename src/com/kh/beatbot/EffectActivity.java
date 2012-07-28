@@ -11,6 +11,7 @@ import android.widget.ToggleButton;
 
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
+import com.kh.beatbot.view.TronKnob;
 import com.kh.beatbot.view.TronSeekbar;
 import com.kh.beatbot.view.TronSeekbar2d;
 
@@ -36,7 +37,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 				return getLayoutInflater().inflate(resourceId, parent, false);
 			View view = getLayoutInflater().inflate(resourceId, parent, false);
 			TextView label = (TextView) view.findViewById(R.id.param_label);
-			TronSeekbar levelBar = (TronSeekbar) view
+			TronKnob levelBar = (TronKnob) view
 					.findViewById(R.id.param_bar);
 			levelBar.setTag(position);
 			levelBar.addLevelListener((EffectActivity) getContext());
@@ -79,7 +80,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 
 	public abstract void setEffectOn(boolean on);
 
-	public SparseArray<TronSeekbar> paramBars = new SparseArray<TronSeekbar>();
+	public SparseArray<TronKnob> paramBars = new SparseArray<TronKnob>();
 
 	public void toggleEffect(View view) {
 		setEffectOn(((ToggleButton) view).isChecked());

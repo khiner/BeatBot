@@ -11,10 +11,10 @@ import com.kh.beatbot.view.SurfaceViewBase;
 import com.kh.beatbot.view.bean.MidiViewBean;
 
 public abstract class LevelListenable extends SurfaceViewBase {
-	protected ArrayList<LevelListener> levelListeners = new ArrayList<LevelListener>();
-	
+	protected ArrayList<LevelListener> levelListeners = new ArrayList<LevelListener>();	
 	protected float level = .5f;
 	protected float[] levelColor = MidiViewBean.VOLUME_COLOR;
+	protected boolean selected = false;
 	
 	public LevelListenable(Context c, AttributeSet as) {
 		super(c, as);
@@ -54,6 +54,7 @@ public abstract class LevelListenable extends SurfaceViewBase {
 	protected void handleActionDown(int id, float x, float y) {
 		for (LevelListener levelListener : levelListeners)
 			levelListener.notifyChecked(this, true);
+		selected = true;
 	}
 
 	@Override
@@ -71,5 +72,6 @@ public abstract class LevelListenable extends SurfaceViewBase {
 	protected void handleActionUp(int id, float x, float y) {
 		for (LevelListener levelListener : levelListeners)
 			levelListener.notifyChecked(this, false);
+		selected = false;
 	}
 }

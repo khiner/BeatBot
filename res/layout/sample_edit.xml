@@ -175,4 +175,12 @@
         android:text="@string/tremelo"
     	android:onClick="tremelo" />
     
+    <com.kh.beatbot.view.TronKnob
+        android:id="@+id/knob"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_toRightOf="@+id/tremeloButton"
+        android:layout_below="@+id/pitchView"
+        />
+    
 </RelativeLayout>

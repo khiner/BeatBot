@@ -67,17 +67,25 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		drawLines(makeRectOutlineFloatBuffer(x1, y1, x2, y2), color, width, GL10.GL_LINE_LOOP);
 	}
 	
-	public static void drawTriangleStrip(FloatBuffer vb, float[] color) {
+	public static void drawTriangleStrip(FloatBuffer vb, float[] color, int numVertices) {
 		gl.glColor4f(color[0], color[1], color[2], color[3]);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, vb.capacity() / 2);		
+		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, numVertices);
+	}
+	
+	public static void drawTriangleStrip(FloatBuffer vb, float[] color) {
+		drawTriangleStrip(vb, color, vb.capacity() / 2);
 	}
 
-	public static void drawLines(FloatBuffer vb, float[] color, float width, int type) {
+	public static void drawLines(FloatBuffer vb, float[] color, float width, int type, int stride) {
 		gl.glColor4f(color[0], color[1], color[2], color[3]);
 		gl.glLineWidth(width);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
-		gl.glDrawArrays(type, 0, vb.capacity() / 2);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, stride, vb);
+		gl.glDrawArrays(type, 0, vb.capacity() / (2 + stride/8));
+	}
+	
+	public static void drawLines(FloatBuffer vb, float[] color, float width, int type) {
+		drawLines(vb, color, width, type, 0);
 	}
 	
 	public static void drawTriangleFan(FloatBuffer vb, float[] color) {

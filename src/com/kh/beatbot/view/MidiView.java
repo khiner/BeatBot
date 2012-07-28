@@ -39,8 +39,6 @@ public class MidiView extends SurfaceViewBase {
 	private FloatBuffer loopMarkerLineVB = null;
 	private FloatBuffer loopSquareVB = null;
 
-	private int[] textures = new int[1];
-
 	private MidiManager midiManager;
 	private RecordManager recordManager;
 	private PlaybackManager playbackManager;
@@ -432,31 +430,6 @@ public class MidiView extends SurfaceViewBase {
 		waveformHelper.start();
 	}
 
-	private void renderBackgroundTexture() {
-		float vertices[] = { 0, 0, 0, height, width, 0, width, height };
-
-		float texture[] = { 0, 0, 0, 1, 1, 0, 1, 1 };
-
-		FloatBuffer vertexBuffer = makeFloatBuffer(vertices);
-		FloatBuffer textureBuffer = makeFloatBuffer(texture);
-		// bind the previously generated texture
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
-
-		// Point to our buffers
-		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-
-		// Set the face rotation
-		gl.glFrontFace(GL10.GL_CW);
-
-		// Point to our vertex buffer
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vertexBuffer);
-		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer);
-
-		// Draw the vertices as triangle strip
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, vertexBuffer.capacity() / 2);
-		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-	}
-
 	protected void init() {
 		levelsHelper = new LevelsViewHelper(this);
 		// waveformHelper constructor: yPos, height
@@ -464,9 +437,6 @@ public class MidiView extends SurfaceViewBase {
 		tickWindow.updateGranularity();
 		float color = bean.getBgColor();
 		gl.glClearColor(color, color, color, 1.0f);
-		gl.glEnable(GL10.GL_TEXTURE_2D);
-		//Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.background);
-		//loadTexture(gl, bitmap, textures);
 		initHLineVB();
 		initVLineVBs();
 		initLoopMarkerVBs();
