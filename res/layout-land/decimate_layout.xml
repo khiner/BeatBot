@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
     
     <include
         layout="@layout/decimate_param_layout"
-        android:id="@+id/decimate_param_layout"
         android:layout_width="wrap_content"
     	android:layout_height="wrap_content" />
 
     <com.kh.beatbot.view.TronSeekbar2d
         android:id="@+id/xyParamBar"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:layout_toRightOf="@+id/decimate_param_layout"
-        android:layout_alignParentRight="true" />
+        android:layout_height="fill_parent" />
     
-</RelativeLayout>
+</LinearLayout>
