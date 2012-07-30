@@ -5,9 +5,7 @@
     android:orientation="vertical" >
     
     <include
-        layout="@layout/flanger_param_layout"
-        android:layout_width="wrap_content"
-    	android:layout_height="wrap_content" />
+        layout="@layout/flanger_param_layout" />
 
     <com.kh.beatbot.view.TronSeekbar2d
         android:id="@+id/xyParamBar"

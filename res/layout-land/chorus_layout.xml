@@ -5,9 +5,7 @@
     android:orientation="horizontal" >
     
     <include
-        layout="@layout/chorus_param_layout"
-        android:layout_width="wrap_content"
-    	android:layout_height="wrap_content" />
+        layout="@layout/chorus_param_layout" />
 
     <com.kh.beatbot.view.TronSeekbar2d
         android:id="@+id/xyParamBar"
