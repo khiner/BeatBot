@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:paramControl="http://schemas.android.com/apk/res/com.kh.beatbot"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+    
+    <include
+        layout="@layout/effect_on_toggle"
+        android:id="@+id/effectToggleOn" />
+    
+    <com.kh.beatbot.layout.EffectControlLayout
+        android:id="@+id/param1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/effectToggleOn"
+        paramControl:beatsync_enabled="false"
+        paramControl:param_name="@string/hfDamp" />
+    
+    <com.kh.beatbot.layout.EffectControlLayout
+        android:id="@+id/param2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/param1"
+        android:layout_below="@+id/effectToggleOn"
+        paramControl:beatsync_enabled="false"
+        paramControl:param_name="@string/feedback" />
+
+</RelativeLayout>

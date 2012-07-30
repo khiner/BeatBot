@@ -4,8 +4,8 @@
     android:layout_height="match_parent" >
     
     <include
-        layout="@layout/delay_param_layout"
-        android:id="@+id/delay_param_layout"
+        layout="@layout/tremelo_param_layout"
+        android:id="@+id/tremelo_param_layout"
         android:layout_width="wrap_content"
     	android:layout_height="wrap_content" />
 
@@ -13,7 +13,7 @@
         android:id="@+id/xyParamBar"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/delay_param_layout"
+        android:layout_below="@+id/tremelo_param_layout"
         android:layout_alignParentBottom="true" />
     
 </RelativeLayout>

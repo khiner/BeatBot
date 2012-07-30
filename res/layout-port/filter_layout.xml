@@ -3,62 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
     
-    <ToggleButton
-        android:id="@+id/effect_toggleOn"
-        android:layout_width="fill_parent"
-        android:layout_height="50dp"
-        android:onClick="toggleEffect"
-    />
-    
-    <ToggleButton 
-        android:id="@+id/lp_toggle"
-    	android:layout_width="50dp"
-    	android:layout_height="50dp"
-    	android:layout_below="@+id/effect_toggleOn"
-    	android:textOn = ""
-    	android:textOff = ""
-    	android:background="@drawable/lowpass_filter_btn_src"
-    	android:onClick="selectFilterMode"
-    />
-    
-    <ToggleButton 
-        android:id="@+id/bp_toggle"
-    	android:layout_width="50dp"
-    	android:layout_height="50dp"
-    	android:layout_below="@+id/effect_toggleOn"
-    	android:layout_toRightOf="@+id/lp_toggle"
-    	android:background="@drawable/bandpass_filter_btn_src"
-    	android:textOn = ""
-    	android:textOff = ""
-    	android:onClick="selectFilterMode"
-    />
-    
-    <ToggleButton 
-        android:id="@+id/hp_toggle"
-    	android:layout_width="50dp"
-    	android:layout_height="50dp"
-    	android:layout_below="@+id/effect_toggleOn"
-    	android:layout_toRightOf="@+id/bp_toggle"
-    	android:textOn = ""
-    	android:textOff = ""
-    	android:background="@drawable/highpass_filter_btn_src"
-    	android:onClick="selectFilterMode"
-    />    
-        
-	<ListView
-        android:id="@+id/paramListView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
- 		android:layout_alignRight="@+id/effect_toggleOn"
-        android:layout_below="@+id/lp_toggle"
-    />
-    
+    <include
+        layout="@layout/filter_param_layout"
+        android:id="@+id/filter_param_layout"
+        android:layout_width="wrap_content"
+    	android:layout_height="wrap_content" />
+
     <com.kh.beatbot.view.TronSeekbar2d
         android:id="@+id/xyParamBar"
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/paramListView"        
-        android:layout_alignParentRight="true"
-    />
-
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/filter_param_layout"
+        android:layout_alignParentBottom="true" />
+    
 </RelativeLayout>

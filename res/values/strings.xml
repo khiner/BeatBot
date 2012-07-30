@@ -47,50 +47,25 @@
     <string name="filter">Filter</string>
     <string name="reverb">Reverb</string>
     <string name="tremelo">Tremelo</string>
+    
+    <!-- param names -->
+    <string name="bits">Bits</string>
     <string name="cutoff">Cutoff</string>
+    <string name="depth">Depth</string>
+	<string name="modRate">Rate</string>
+    <string name="modAmt">Depth</string>
+    <string name="phase">Phase</string>
     <string name="resonance">Q</string>
-    
-    <string-array name="decimate_params">
-        <item name="bits">Bits</item>
-        <item name="samplerate">Rate</item>
-    </string-array>
-    
-    <string-array name="delay_params">
-    	<item name="time">Time</item>
-    	<item name="feedback">Feedback</item>
-    	<item name="wet">Wet</item>
-    </string-array>
-
-    <string-array name="filter_params">
-    	<item name="cutoff">Cutoff</item>
-    	<item name="resonance">Q</item>
-    </string-array>
+    <string name="feedback">Feedback</string>
+    <string name="frequency">Freq</string>
+    <string name="hfDamp">HF Damp</string>
+    <string name="sampleRate">Rate</string>
+    <string name="time">Time</string>
+    <string name="wet">Wet</string>
 
     <string-array name="reverb_params">
     	<item name="hfDamp">HF Damp</item>
     	<item name="feedback">Feedback</item>
-    </string-array>
-    
-    <string-array name="chorus_params">
-    	<item name="modRate">Rate</item>
-    	<item name="modAmt">Amount</item>
-    	<item name="time">Time</item>
-    	<item name="feedback">Feedback</item>
-    	<item name="wet">Wet</item>
-    </string-array>
-        
-    <string-array name="flanger_params">
-    	<item name="time">Time</item>
-    	<item name="feedback">Feedback</item>
-    	<item name="wet">Wet</item>
-    	<item name="modRate">Frequency</item>
-    	<item name="modAmt">Amount</item>
-    	<item name="phase">Phase</item>
-    </string-array>
-    
-    <string-array name="tremelo_params">
-        <item name="freq">Frequency</item>
-        <item name="depth">Depth</item>
     </string-array>
     
 </resources>

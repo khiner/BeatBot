@@ -1,14 +1,13 @@
 package com.kh.beatbot;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.SparseArray;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.kh.beatbot.layout.EffectControlLayout;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.TronKnob;
@@ -17,50 +16,46 @@ import com.kh.beatbot.view.TronSeekbar2d;
 
 public abstract class EffectActivity extends Activity implements LevelListener {
 
-	public class SampleRowAdapter extends ArrayAdapter<String> {
-		int resourceId;
-		int count = 0;
-
-		public SampleRowAdapter(EffectActivity context, int resourceId,
-				String[] params) {
-			super(context, resourceId, params);
-			this.resourceId = resourceId;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			// big hack here. all the views are retrieved multiple times, and
-			// the
-			// level bars are getting overwritten, resulting in invisible bars
-			// behind visible ones
-			if (count++ < ((EffectActivity) getContext()).getNumParams())
-				return getLayoutInflater().inflate(resourceId, parent, false);
-			View view = getLayoutInflater().inflate(resourceId, parent, false);
-			TextView label = (TextView) view.findViewById(R.id.param_label);
-			TronKnob levelBar = (TronKnob) view
-					.findViewById(R.id.param_bar);
-			levelBar.setTag(position);
-			levelBar.addLevelListener((EffectActivity) getContext());
-			if (paramBars.get(position) == null)
-				paramBars.put(position, levelBar);
-
-			label.setText(getParamLabel(position));
-			return view;
-		}
-	}
-
 	protected int trackNum;
+	protected ArrayList<TronKnob> paramKnobs = new ArrayList<TronKnob>();
 	protected TronSeekbar2d level2d = null;
-	protected SampleRowAdapter adapter;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		trackNum = getIntent().getExtras().getInt("trackNum");
-		adapter = new SampleRowAdapter(this, R.layout.param_row,
-				new String[getNumParams()]);
 	}
-
+	
+	protected void initParams(int numParams) {
+		EffectControlLayout param = (EffectControlLayout)findViewById(R.id.param1);
+		paramKnobs.add((TronKnob)(param.findViewById(R.id.param_knob)));
+		param = (EffectControlLayout)findViewById(R.id.param2);
+		paramKnobs.add((TronKnob)(param.findViewById(R.id.param_knob)));
+		if (numParams > 2) {
+			param = (EffectControlLayout)findViewById(R.id.param3);
+			paramKnobs.add((TronKnob)(param.findViewById(R.id.param_knob)));
+		}
+		if (numParams > 3) {
+			param = (EffectControlLayout)findViewById(R.id.param4);
+			paramKnobs.add((TronKnob)(param.findViewById(R.id.param_knob)));
+		}		
+		if (numParams > 4) {
+			param = (EffectControlLayout)findViewById(R.id.param5);
+			paramKnobs.add((TronKnob)(param.findViewById(R.id.param_knob)));
+		}
+		if (numParams > 5) {
+			param = (EffectControlLayout)findViewById(R.id.param6);
+			paramKnobs.add((TronKnob)(param.findViewById(R.id.param_knob)));
+		}
+		for (int i = 0; i < paramKnobs.size(); i++) {
+			TronKnob knob = paramKnobs.get(i);
+			knob.setId(i);
+			knob.addLevelListener(this);
+		}
+		level2d = (TronSeekbar2d)findViewById(R.id.xyParamBar);
+		level2d.addLevelListener(this);
+	}
+	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -72,35 +67,34 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 
 	public abstract int getNumParams();
 
-	public abstract String getParamLabel(int paramNum);
-
 	public abstract void setXValue(float x);
 
 	public abstract void setYValue(float y);
 
 	public abstract void setEffectOn(boolean on);
 
-	public SparseArray<TronKnob> paramBars = new SparseArray<TronKnob>();
-
-	public void toggleEffect(View view) {
+	public void toggleOn(View view) {
 		setEffectOn(((ToggleButton) view).isChecked());
 	}
 
 	@Override
-	public void setLevel(LevelListenable levelBar, float level) {
-		if (levelBar.getTag().equals(0)) {
+	public void setLevel(LevelListenable levelListenable, float level) {
+		switch (levelListenable.getId()) {
+		case 0:
 			level2d.setViewLevelX(level);
 			setXValue(level);
-		} else if (levelBar.getTag().equals(1)) {
+			break;
+		case 1:
 			level2d.setViewLevelY(level);
 			setYValue(level);
+			break;
 		}
 	}
 
 	@Override
 	public void setLevel(LevelListenable level2d, float levelX, float levelY) {
-		paramBars.get(0).setViewLevel(levelX);
-		paramBars.get(1).setViewLevel(levelY);
+		paramKnobs.get(0).setViewLevel(levelX);
+		paramKnobs.get(1).setViewLevel(levelY);
 		setXValue(levelX);
 		setYValue(levelY);
 	}

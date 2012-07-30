@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:paramControl="http://schemas.android.com/apk/res/com.kh.beatbot"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+    
+    <include
+        layout="@layout/effect_on_toggle"
+        android:id="@+id/effectToggleOn" />
+    
+	<ToggleButton
+	    android:id="@+id/lp_toggle"
+    	android:layout_width="50dp"
+    	android:layout_height="50dp"
+    	android:layout_below="@+id/effectToggleOn"
+    	android:textOn = ""
+    	android:textOff = ""
+    	android:background="@drawable/lowpass_btn_src"
+    	android:onClick="selectFilterMode" />
+
+	<ToggleButton
+	    android:id="@+id/bp_toggle"
+    	android:layout_width="50dp"
+    	android:layout_height="50dp"
+    	android:layout_below="@+id/effectToggleOn"
+    	android:layout_toRightOf="@+id/lp_toggle"
+    	android:textOn = ""
+    	android:textOff = ""
+    	android:background="@drawable/bandpass_btn_src"
+    	android:onClick="selectFilterMode" />
+			
+	<ToggleButton
+	    android:id="@+id/hp_toggle"
+    	android:layout_width="50dp"
+    	android:layout_height="50dp"
+    	android:layout_below="@+id/effectToggleOn"
+    	android:layout_toRightOf="@+id/bp_toggle"
+    	android:textOn = ""
+    	android:textOff = ""
+    	android:background="@drawable/highpass_btn_src"
+    	android:onClick="selectFilterMode" />
+	
+    <com.kh.beatbot.layout.EffectControlLayout
+        android:id="@+id/param1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lp_toggle"
+        paramControl:beatsync_enabled="false"
+        paramControl:param_name="@string/frequency" />
+    
+    <com.kh.beatbot.layout.EffectControlLayout
+        android:id="@+id/param2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/param1"
+        android:layout_below="@+id/lp_toggle"
+        paramControl:beatsync_enabled="false"
+        paramControl:param_name="@string/resonance" />
+
+</RelativeLayout>

@@ -3,37 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
     
-    <ToggleButton
-        android:id="@+id/effect_toggleOn"
-        android:layout_width="250dp"
-        android:layout_height="50dp"
-        android:onClick="toggleEffect"
-    />
-    
-    <ToggleButton
-        android:id="@+id/beatmatch"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignRight="@+id/effect_toggleOn"        
-        android:layout_below="@+id/effect_toggleOn"
-        android:onClick="beatMatch"
-    />
-    
-    <ListView
-        android:id="@+id/paramListView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
- 		android:layout_alignRight="@+id/effect_toggleOn"
-        android:layout_below="@+id/beatmatch"
-    />
-    
+    <include
+        layout="@layout/delay_param_layout"
+        android:id="@+id/delay_param_layout"
+        android:layout_width="wrap_content"
+    	android:layout_height="wrap_content" />
+
     <com.kh.beatbot.view.TronSeekbar2d
         android:id="@+id/xyParamBar"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/effect_toggleOn"
-    />
-
+        android:layout_toRightOf="@+id/delay_param_layout"
+        android:layout_alignParentRight="true" />
     
 </RelativeLayout>

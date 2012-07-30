@@ -14,27 +14,33 @@ import android.opengl.GLUtils;
 import android.util.AttributeSet;
 import android.util.FloatMath;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.listenable.LevelListenable;
 
 public class TronKnob extends LevelListenable {
 
-	private FloatBuffer circleVb = null;
-	private FloatBuffer selectCircleVb = null;
-	private FloatBuffer selectCircleVb2 = null;
+	private static FloatBuffer circleVb = null;
+	private static FloatBuffer selectCircleVb = null;
+	private static FloatBuffer selectCircleVb2 = null;
+	private static int circleWidth = 0, circleHeight = 0;
 	private float[] bgColor = new float[] {.3f, .3f, .3f , 1};
 	private float[] selectColor = {levelColor[0], levelColor[1], levelColor[2], .4f};
 	private int[] textureHandlers = new int[2];
-	private int[] crop = new int[4];
-	private int imageWidth, imageHeight;
+	private int[] crop = null;
 	private int currentTexture = 0;
 	private long timeDown = 0;
+	private boolean beatSync = false;
 	
 	public TronKnob(Context c, AttributeSet as) {
 		super(c, as);
 	}
 
+	public void setBeatSync(boolean beatSync) {
+		this.beatSync = beatSync;
+	}
+	
 	public void loadTexture(final int resourceId, int textureId) {
 		// Generate Texture ID
 		gl.glGenTextures(1, textureHandlers, textureId);
@@ -45,14 +51,13 @@ public class TronKnob extends LevelListenable {
 		Bitmap bitmap = BitmapFactory.decodeStream(is);
 		 
 		// Build our crop texture to be the size of the bitmap (ie full texture)
-		crop[0] = 0;
-		crop[1] = imageHeight = bitmap.getHeight();
-		crop[2] = imageWidth = bitmap.getWidth();
-		crop[3] = -bitmap.getHeight();
-		 
+		// we only need to do this once, since both images will have the same width/height
+		if (crop == null) {
+			crop = new int[] {0, bitmap.getHeight(), bitmap.getWidth(), -bitmap.getHeight()};
+		}
+
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
-
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_REPEAT);
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_REPEAT);
 		
@@ -69,7 +74,7 @@ public class TronKnob extends LevelListenable {
 		gl.glDisable(GL10.GL_TEXTURE_2D);
 	}
 	
-	private void initCircleVbs() {
+	private static void initCircleVbs(float width, float height) {
 		float[] circleVertices = new float[400];
 		float[] selectCircleVertices = new float[400];
 		float[] selectCircle2Vertices = new float[400];
@@ -97,11 +102,23 @@ public class TronKnob extends LevelListenable {
 	@Override
 	protected void init() {
 		super.init();
-		loadTexture(R.drawable.clock, 0);
-		loadTexture(R.drawable.note_icon, 1);
+		if (beatSync) {
+			loadTexture(R.drawable.clock, 0);
+			loadTexture(R.drawable.note_icon, 1);
+		}
 		gl.glClearColor(0, 0, 0, 1);
 		gl.glEnable(GL10.GL_LINE_SMOOTH);
-		initCircleVbs();
+	}
+	
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,
+			int height) {
+		super.surfaceChanged(holder, format, width, height);
+		// all knobs share the same circle VBs, and they should only change when width or height changes
+		if (width != circleWidth || height != circleHeight) {
+			initCircleVbs(width, height);
+			circleWidth = width;
+			circleHeight = height;
+		}
 	}
 	
 	@Override
@@ -112,8 +129,8 @@ public class TronKnob extends LevelListenable {
 			drawTriangleStrip(selectCircleVb2, selectColor ,(int)(circleVb.capacity() * level / 2));
 			drawTriangleStrip(selectCircleVb, selectColor ,(int)(circleVb.capacity() * level / 2));
 		}
-		//drawLines(outerCircleVb, levelColor , 2, GL10.GL_LINE_STRIP, Float.SIZE/2);
-		drawTexture();
+		if (beatSync)
+			drawTexture();
 	}
 
 	@Override

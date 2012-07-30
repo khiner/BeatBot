@@ -1,7 +1,6 @@
 package com.kh.beatbot;
 
 import android.os.Bundle;
-import android.widget.ListView;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
@@ -14,11 +13,9 @@ public class ChorusActivity extends EffectActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.effect_layout);
-		((ListView) findViewById(R.id.paramListView)).setAdapter(adapter);
-		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.chorusOn[trackNum]);
-		level2d = (TronSeekbar2d)findViewById(R.id.xyParamBar);
-		level2d.addLevelListener(this);
+		setContentView(R.layout.chorus_layout);
+		initParams(NUM_PARAMS);
+		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.chorusOn[trackNum]);
 	}
 	
 	public float getXValue() {
@@ -50,52 +47,44 @@ public class ChorusActivity extends EffectActivity {
 		super.setLevel(levelBar, level);
 		if (levelBar instanceof TronSeekbar2d)
 			return;
-		if (levelBar.getTag().equals(2)) {
+		switch (levelBar.getId()) {
+		case 2:
 			GlobalVars.chorusWet[trackNum] = level;
-		} else if (levelBar.getTag().equals(3)) {
+			break;
+		case 3:
 			GlobalVars.chorusModRate[trackNum] = level;
-		} else if (levelBar.getTag().equals(4)) {
+			break;
+		case 4:
 			GlobalVars.chorusModAmt[trackNum] = level;
+			break;
 		}
-		setChorusParam(trackNum, (Integer)levelBar.getTag(), scaleLevel(level));
+		setChorusParam(trackNum, levelBar.getId(), scaleLevel(level));
 	}
 	
-	public float getWetValue() {
-		return GlobalVars.chorusWet[trackNum];
+	public float getLevel(int paramNum) {
+		switch (paramNum) {
+		case 2:
+			return GlobalVars.chorusWet[trackNum]; 
+		case 3:
+			return GlobalVars.chorusModRate[trackNum];
+		case 4:
+			return GlobalVars.chorusModAmt[trackNum];
+		default:
+			return 0;
+		}
 	}
-	
-	public float getModRate() {
-		return GlobalVars.chorusModRate[trackNum];
-	}
-		
-	public float getModAmt() {
-		return GlobalVars.chorusModAmt[trackNum];
-	}
-	
+			
 	@Override
 	public void notifyInit(LevelListenable levelBar) {
 		super.notifyInit(levelBar);
 		if (levelBar instanceof TronSeekbar2d)
 			return;
-		if (levelBar.getTag().equals(2))
-			levelBar.setLevel(getWetValue());
-		else if (levelBar.getTag().equals(3)) {
-			levelBar.setLevel(getModRate());
-		} else if (levelBar.getTag().equals(4)) {
-			levelBar.setLevel(getModAmt());
-		}
+		levelBar.setLevel(getLevel(levelBar.getId()));
 	}
 	
 	@Override
 	public int getNumParams() {
 		return NUM_PARAMS;
-	}
-	
-	@Override
-	public String getParamLabel(int paramNum) {
-		if (paramNum < NUM_PARAMS)
-			return getResources().getStringArray(R.array.chorus_params)[paramNum];
-		return ""; 
 	}
 	
 	public native void setChorusOn(int trackNum, boolean on);

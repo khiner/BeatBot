@@ -1,22 +1,18 @@
 package com.kh.beatbot;
 
 import android.os.Bundle;
-import android.widget.ListView;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.view.TronSeekbar2d;
 
 public class ReverbActivity extends EffectActivity {
 	private static final int NUM_PARAMS = 2;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.effect_layout);
-		((ListView) findViewById(R.id.paramListView)).setAdapter(adapter);
-		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.reverbOn[trackNum]);
-		level2d = (TronSeekbar2d)findViewById(R.id.xyParamBar);
-		level2d.addLevelListener(this);
+		setContentView(R.layout.reverb_layout);
+		initParams(NUM_PARAMS);
+		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.reverbOn[trackNum]);
 	}
 	
 	public float getXValue() {
@@ -48,12 +44,5 @@ public class ReverbActivity extends EffectActivity {
 	@Override
 	public int getNumParams() {
 		return NUM_PARAMS;
-	}
-	
-	@Override
-	public String getParamLabel(int paramNum) {
-		if (paramNum < NUM_PARAMS)
-			return getResources().getStringArray(R.array.reverb_params)[paramNum];
-		return ""; 
 	}
 }

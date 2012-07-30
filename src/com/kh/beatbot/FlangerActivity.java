@@ -1,7 +1,6 @@
 package com.kh.beatbot;
 
 import android.os.Bundle;
-import android.widget.ListView;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
@@ -14,11 +13,9 @@ public class FlangerActivity extends EffectActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.effect_layout);
-		((ListView) findViewById(R.id.paramListView)).setAdapter(adapter);
-		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.flangerOn[trackNum]);
-		level2d = (TronSeekbar2d)findViewById(R.id.xyParamBar);
-		level2d.addLevelListener(this);
+		setContentView(R.layout.flanger_layout);
+		initParams(NUM_PARAMS);
+		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.flangerOn[trackNum]);
 	}
 	
 	public float getXValue() {
@@ -50,18 +47,34 @@ public class FlangerActivity extends EffectActivity {
 		super.setLevel(levelBar, level);
 		if (levelBar instanceof TronSeekbar2d)
 			return;
-		if (levelBar.getTag().equals(2)) {
+		switch (levelBar.getId()) {
+		case 2:
 			GlobalVars.flangerWet[trackNum] = level;
-		} else if (levelBar.getTag().equals(3)) {
+			break;
+		case 3:
 			GlobalVars.flangerModRate[trackNum] = level;
 			// exponential scale for mod rate
 			level = scaleLevel(level);
-		} else if (levelBar.getTag().equals(4)) {
+			break;
+		case 4:
 			GlobalVars.flangerModAmt[trackNum] = level;
 		}
-		setFlangerParam(trackNum, (Integer)levelBar.getTag(), level);
+		setFlangerParam(trackNum, levelBar.getId(), level);
 	}
 	
+	public float getLevel(int paramNum) {
+		switch (paramNum) {
+		case 2:
+			return GlobalVars.flangerWet[trackNum]; 
+		case 3:
+			return GlobalVars.flangerModRate[trackNum];
+		case 4:
+			return GlobalVars.flangerModAmt[trackNum];
+		default:
+			return 0;
+		}
+	}
+
 	public float getWetValue() {
 		return GlobalVars.flangerWet[trackNum];
 	}
@@ -79,25 +92,12 @@ public class FlangerActivity extends EffectActivity {
 		if (levelBar instanceof TronSeekbar2d)
 			return;
 		super.notifyInit(levelBar);
-		if (levelBar.getTag().equals(2))
-			levelBar.setLevel(getWetValue());
-		else if (levelBar.getTag().equals(3)) {
-			levelBar.setLevel(getModRate());
-		} else if (levelBar.getTag().equals(4)) {
-			levelBar.setLevel(getModAmt());
-		}
+		levelBar.setLevel(getLevel(levelBar.getId()));
 	}
 	
 	@Override
 	public int getNumParams() {
 		return NUM_PARAMS;
-	}
-	
-	@Override
-	public String getParamLabel(int paramNum) {
-		if (paramNum < NUM_PARAMS)
-			return getResources().getStringArray(R.array.flanger_params)[paramNum];
-		return ""; 
 	}
 	
 	public native void setFlangerOn(int trackNum, boolean on);

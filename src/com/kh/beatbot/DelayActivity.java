@@ -2,7 +2,6 @@ package com.kh.beatbot;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
@@ -16,10 +15,8 @@ public class DelayActivity extends EffectActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.delay_layout);
-		((ListView) findViewById(R.id.paramListView)).setAdapter(adapter);
-		((ToggleButton)findViewById(R.id.effect_toggleOn)).setChecked(GlobalVars.delayOn[trackNum]);
-		level2d = (TronSeekbar2d)findViewById(R.id.xyParamBar);
-		level2d.addLevelListener(this);
+		initParams(NUM_PARAMS);
+		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.delayOn[trackNum]);
 	}
 	
 	public float getXValue() {
@@ -53,7 +50,7 @@ public class DelayActivity extends EffectActivity {
 	public void setLevel(LevelListenable levelBar, float level) {		
 		super.setLevel(levelBar, level);
 		if (!(levelBar instanceof TronSeekbar2d) && 
-				levelBar.getTag().equals(2)) {
+				levelBar.getId() == 2) {
 			setWetValue(level);
 		}
 	}
@@ -76,20 +73,13 @@ public class DelayActivity extends EffectActivity {
 	public void notifyInit(LevelListenable levelBar) {
 		super.notifyInit(levelBar); 
 		if (!(levelBar instanceof TronSeekbar2d) && 
-				levelBar.getTag().equals(2))
+				levelBar.getId() == 2)
 			levelBar.setLevel(getWetValue());
 	}
 	
 	@Override
 	public int getNumParams() {
 		return NUM_PARAMS;
-	}
-	
-	@Override
-	public String getParamLabel(int paramNum) {
-		if (paramNum < NUM_PARAMS)
-			return getResources().getStringArray(R.array.delay_params)[paramNum];
-		return ""; 
 	}
 	
 	public native void setDelayOn(int trackNum, boolean on);
