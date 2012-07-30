@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+        <ToggleButton
+            android:id="@+id/playButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/play_btn_src"
+            android:onClick="play"
+            android:textOff=""
+            android:textOn=""
+            android:contentDescription="@string/play" />
+
+        <ImageButton
+            android:id="@+id/stopButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/stop_btn_src"
+            android:onClick="stop"
+            android:contentDescription="@string/stop" />
+
+        <ToggleButton
+            android:id="@+id/recordButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/rec_btn_src"
+            android:onClick="record"
+            android:textOff=""
+            android:textOn=""
+            android:contentDescription="@string/record" />
+        
+</merge>

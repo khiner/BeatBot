@@ -2,6 +2,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <string name="app_name">BeatBot</string>
+    <string name="control">Control</string>
     <string name="midi_menu">Midi Menu</string>
     <string name="start_listening">Start Listening</string>
     <string name="stop_listening">Stop Listening</string>
@@ -61,11 +62,5 @@
     <string name="hfDamp">HF Damp</string>
     <string name="sampleRate">Rate</string>
     <string name="time">Time</string>
-    <string name="wet">Wet</string>
-
-    <string-array name="reverb_params">
-    	<item name="hfDamp">HF Damp</item>
-    	<item name="feedback">Feedback</item>
-    </string-array>
-    
+    <string name="wet">Wet</string>    
 </resources>

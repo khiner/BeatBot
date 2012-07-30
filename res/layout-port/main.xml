@@ -10,72 +10,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-        <ToggleButton
-            android:id="@+id/playButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/play_btn_src"
-            android:onClick="play"
-            android:textOff="" android:textOn=""
-            android:contentDescription="@string/play" />
-
-        <ImageButton
-            android:id="@+id/stopButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:onClick="stop"
-            android:background="@drawable/stop_btn_src"
-            android:contentDescription="@string/stop" />
-
-        <ToggleButton
-            android:id="@+id/recordButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/rec_btn_src"
-            android:onClick="record"
-            android:textOff="" android:textOn=""
-            android:contentDescription="@string/record" />
-
-        <ToggleButton
-            android:id="@+id/levels"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/levels_btn_src"
-            android:onClick="levels"
-            android:textOff=""
-            android:textOn=""
-            android:contentDescription="@string/levels" />
-
-        <ImageButton
-            android:id="@+id/delete"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:state_enabled="false"
-            android:background="@drawable/delete_btn_src"
-            android:onClick="delete"
-            android:contentDescription="@string/delete" />
-
-        <ImageButton
-            android:id="@+id/undo"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:onClick="undo"
-            android:background="@drawable/undo_btn_src"
-            android:contentDescription="@string/undo" />
-
-        <ImageButton
-            android:id="@+id/bpm_tap"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:onClick="bpmTap"
-            android:background="@drawable/bpm_tap_btn_src"
-            android:contentDescription="@string/bpm_tap" />
-
-        <com.kh.beatbot.view.BpmView
-            android:id="@+id/bpm"
-            android:layout_width="66dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="10dp" />
+        <include layout="@layout/left_control_buttons" />
+		<include layout="@layout/right_control_buttons" />
         
     </LinearLayout>
 

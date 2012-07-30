@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <ToggleButton
+        android:id="@+id/levels"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/levels_btn_src"
+        android:contentDescription="@string/levels"
+        android:onClick="levels"
+        android:textOff=""
+        android:textOn="" />
+
+    <ImageButton
+        android:id="@+id/delete"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/delete_btn_src"
+        android:contentDescription="@string/delete"
+        android:onClick="delete"
+        android:state_enabled="false" />
+
+    <ImageButton
+        android:id="@+id/undo"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/undo_btn_src"
+        android:contentDescription="@string/undo"
+        android:onClick="undo" />
+
+    <ImageButton
+        android:id="@+id/bpm_tap"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/bpm_tap_btn_src"
+        android:contentDescription="@string/bpm_tap"
+        android:onClick="bpmTap" />
+
+    <com.kh.beatbot.view.BpmView
+        android:id="@+id/bpm"
+        android:layout_width="66dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp" />
+
+</merge>
