@@ -20,11 +20,12 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.listenable.LevelListenable;
 
 public class TronKnob extends LevelListenable {
-
+	public static final float ¹ = (float)Math.PI;
 	private static FloatBuffer circleVb = null;
 	private static FloatBuffer selectCircleVb = null;
 	private static FloatBuffer selectCircleVb2 = null;
 	private static int circleWidth = 0, circleHeight = 0;
+	
 	private float[] bgColor = new float[] {.3f, .3f, .3f , 1};
 	private float[] selectColor = {levelColor[0], levelColor[1], levelColor[2], .4f};
 	private int[] textureHandlers = new int[2];
@@ -78,17 +79,23 @@ public class TronKnob extends LevelListenable {
 		float[] circleVertices = new float[400];
 		float[] selectCircleVertices = new float[400];
 		float[] selectCircle2Vertices = new float[400];
-		float theta;
+		float theta = 3 * ¹ / 4; // start at 1/8 around the circle
 		for (int i = 0; i < circleVertices.length / 4; i++) {
-			theta = (float)(Math.PI / 2) * (i * 13f / (circleVertices.length) + 33f/24);
+			// theta will range from ¹/4 to 7¹/8,
+			// with the ¹/8 gap at the "bottom" of the view
+			theta += 6 * ¹ /circleVertices.length; 
+			// main circles will show when user is not touching
 			circleVertices[i * 4] = FloatMath.cos(theta)*width/2.3f + width/2;
 			circleVertices[i * 4 + 1] = FloatMath.sin(theta)*height/2.3f + height/2;
 			circleVertices[i * 4 + 2] = FloatMath.cos(theta)*width/3.1f + width/2;
 			circleVertices[i * 4 + 3] = FloatMath.sin(theta)*height/3.1f + height/2;
+			// two dimmer circles are shown for a "glow" effect when the user touches the view
+			// this first one is slightly wider...
 			selectCircleVertices[i * 4] = FloatMath.cos(theta)*width/2.2f + width/2;
 			selectCircleVertices[i * 4 + 1] = FloatMath.sin(theta)*height/2.2f + height/2;
 			selectCircleVertices[i * 4 + 2] = FloatMath.cos(theta)*width/3.2f + width/2;
 			selectCircleVertices[i * 4 + 3] = FloatMath.sin(theta)*height/3.2f + height/2;
+			// and this one is even wider... use alpha channel to produce glow effect
 			selectCircle2Vertices[i * 4] = FloatMath.cos(theta)*width/2.1f + width/2;
 			selectCircle2Vertices[i * 4 + 1] = FloatMath.sin(theta)*height/2.1f + height/2;
 			selectCircle2Vertices[i * 4 + 2] = FloatMath.cos(theta)*width/3.3f + width/2;
@@ -147,10 +154,6 @@ public class TronKnob extends LevelListenable {
 		if (distanceFromCenter(e.getX(0), e.getY(0)) < width/4)
 			return;
 		float newLevel = coordToLevel(e.getX(0), e.getY(0));
-//		if (newLevel - level < -.2f)
-//			newLevel = 1;
-//		else if (level - newLevel < -.2f)
-//			newLevel = 0;
 		setLevel(newLevel);
 	}
 	
@@ -169,9 +172,12 @@ public class TronKnob extends LevelListenable {
 	private float coordToLevel(float x, float y) {
 		float unitX = (x - width/2)/width;
 		float unitY = (y - height/2)/height;
-		float theta = (float)Math.atan(unitY/unitX);
-		float level = theta/(2*(float)Math.PI) + 0.25f;
-		if (unitX > 0) level += .5;
-		return level;
+		float theta = (float)Math.atan(unitY/unitX) + ¹ / 2;
+		// atan ranges from 0 to ¹, and produces symmetric results around the y axis.
+		// we need 0 to 2*¹, so ad ¹ if right of x axis.
+		if (unitX > 0) theta += ¹;
+		// convert to level - remember, min theta is ¹/4, max is 7¹/8
+		float level = (4 * theta / ¹ - 1) / 6;
+		return level > 0 ? (level < 1 ? level : 1) : 0;
 	}
 }
