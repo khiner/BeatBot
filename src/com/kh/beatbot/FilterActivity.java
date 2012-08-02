@@ -11,6 +11,13 @@ public class FilterActivity extends EffectActivity {
 	private ToggleButton[] filterButtons = new ToggleButton[3];
 	
 	@Override
+	public void initParams() {
+		super.initParams();
+		GlobalVars.params[trackNum].add(new EffectParam(false, 'x', "Hz"));
+		GlobalVars.params[trackNum].add(new EffectParam(false, 'y', ""));
+	}
+	
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		NUM_PARAMS = 2;
@@ -38,42 +45,12 @@ public class FilterActivity extends EffectActivity {
 		}
 	}
 
-	public native void setFilterOn(int trackNum, boolean on, int mode);
-	public native void setFilterMode(int trackNum, int mode);	
-	public native void setFilterParam(int trackNum, int paramNum, float param);
-
 	@Override
-	public float getParamLevel(int paramNum) {
-		switch(paramNum) {
-		case 0:  return GlobalVars.filterX[trackNum];
-		case 1:  return GlobalVars.filterY[trackNum];
-		default: return 0;
-		}
-	}
-
-	@Override
-	public void setParamLevel(int paramNum, float level) {
-		super.setParamLevel(paramNum, level);
-		switch(paramNum) {
-		case 0: GlobalVars.filterX[trackNum] = level;
-			break;
-		case 1: GlobalVars.filterY[trackNum] = level;
-			break;
-		default:
-			return;
-		}
+	public void setParamNative(int paramNum, float level) {
 		setFilterParam(trackNum, paramNum, level);
 	}
 	
-	@Override
-	public String getParamSuffix(int paramNum) {
-		switch(paramNum) {
-		case 0:
-			return "Hz"; // frequency in Hertz
-		case 1:
-			return ""; // naked units for resonance
-		default:
-			return "";
-		}
-	}
+	public native void setFilterOn(int trackNum, boolean on, int mode);
+	public native void setFilterMode(int trackNum, int mode);	
+	public native void setFilterParam(int trackNum, int paramNum, float param);
 }

@@ -8,12 +8,33 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ToggleButton;
 
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.layout.EffectControlLayout;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.TronSeekbar2d;
 
 public abstract class EffectActivity extends Activity implements LevelListener {
+	public class EffectParam {
+		public float level;
+		public boolean beatSyncable;
+		public char    axis;
+		public String  unitString;
+		
+		public EffectParam() {
+			level = 0.5f;
+			beatSyncable = false;
+			axis = ' ';
+			unitString = "";
+		}
+		
+		public EffectParam(boolean beatSyncable, char axis, String unitString) {
+			this.beatSyncable = beatSyncable;
+			this.axis = axis;
+			this.unitString = unitString;
+		}
+	}
+	
 	protected int NUM_PARAMS;
 	protected int trackNum;
 	protected List<EffectControlLayout> paramControls = new ArrayList<EffectControlLayout>();
@@ -54,22 +75,20 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		super.onDestroy();
 	}
 	
-	public abstract float getParamLevel(int paramNum);
-
 	public void updateParamValueLabel(int paramNum) {
 		paramControls.get(paramNum).setValueLabel(getParamValueString(paramNum));
 	}
 	
-	public abstract String getParamSuffix(int paramNum);
-
 	public abstract void setEffectOn(boolean on);
+	public abstract void setParamNative(int paramNum, float level);
 
 	public void toggleOn(View view) {
 		setEffectOn(((ToggleButton) view).isChecked());
 	}
 
 	public String getParamValueString(int paramNum) {
-		return ((Float)getParamLevel(paramNum)).toString() + " " + getParamSuffix(paramNum);
+		return ((Float)GlobalVars.params[trackNum].get(paramNum).level).toString() + " " +
+				GlobalVars.params[trackNum].get(paramNum).unitString;
 	}
 	
 	@Override
@@ -79,15 +98,13 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		updateParamValueLabel(paramNum);
 	}
 	
-	protected void setParamLevel(int paramNum, float level) {
-		switch (paramNum) {
-		case 0:
+	private final void setParamLevel(int paramNum, float level) {
+		GlobalVars.params[trackNum].get(paramNum).level = level;
+		setParamNative(paramNum, level);
+		if (paramNum == 0)
 			level2d.setViewLevelX(level);
-			break;
-		case 1:
+		else if (paramNum == 1)
 			level2d.setViewLevelY(level);
-			break;
-		}
 	}
 
 	@Override
@@ -107,6 +124,8 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 
 	@Override
 	public final void notifyInit(LevelListenable listenable) {
+		if (listenable instanceof TronSeekbar2d)
+			return;
 		setParamLevel(listenable.getId(), .5f);
 	}
 

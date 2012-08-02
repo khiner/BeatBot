@@ -8,6 +8,16 @@ import com.kh.beatbot.global.GlobalVars;
 public class ChorusActivity extends EffectActivity {
 	
 	@Override
+	public void initParams() {
+		super.initParams();
+		GlobalVars.params[trackNum].add(new EffectParam(false, 'x', "Hz"));
+		GlobalVars.params[trackNum].add(new EffectParam(false, 'y', ""));
+		GlobalVars.params[trackNum].add(new EffectParam(false, ' ', ""));
+		GlobalVars.params[trackNum].add(new EffectParam(true, ' ', "ms"));
+		GlobalVars.params[trackNum].add(new EffectParam(false, ' ', ""));
+	}
+	
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		NUM_PARAMS = 5;
@@ -21,46 +31,8 @@ public class ChorusActivity extends EffectActivity {
 		setChorusOn(trackNum, on);
 	}
 	
-	@Override
-	public void setParamLevel(int paramNum, float level) {		
-		switch (paramNum) {
-		case 2: GlobalVars.chorusWet[trackNum] = level;
-			break;
-		case 3: GlobalVars.chorusModRate[trackNum] = level;
-			break;
-		case 4: GlobalVars.chorusModAmt[trackNum] = level;
-			break;
-		default:
-			return;
-		}
+	public void setParamNative(int paramNum, float level) {
 		setChorusParam(trackNum, paramNum, scaleLevel(level));
-	}
-
-	@Override
-	public float getParamLevel(int paramNum) {
-		switch (paramNum) {
-		case 2:
-			return GlobalVars.chorusWet[trackNum]; 
-		case 3:
-			return GlobalVars.chorusModRate[trackNum];
-		case 4:
-			return GlobalVars.chorusModAmt[trackNum];
-		default:
-			return 0;
-		}
-	}
-	
-	public String getParamSuffix(int paramNum) {
-		switch (paramNum) {
-		case 2:
-			return ""; // wet value is naked 0-1
-		case 3:
-			return "Hz";  // mod rate is in Hz
-		case 4:
-			return ""; // mod amt is naked 0-1
-		default:
-			return "";
-		}
 	}
 	
 	public native void setChorusOn(int trackNum, boolean on);

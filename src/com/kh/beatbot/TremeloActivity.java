@@ -7,6 +7,13 @@ import com.kh.beatbot.global.GlobalVars;
 
 public class TremeloActivity extends EffectActivity {
 	@Override
+	public void initParams() {
+		super.initParams();
+		GlobalVars.params[trackNum].add(new EffectParam(true, 'x', "Hz"));
+		GlobalVars.params[trackNum].add(new EffectParam(false, 'y', ""));
+	}
+	
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		NUM_PARAMS = 2;
@@ -19,40 +26,12 @@ public class TremeloActivity extends EffectActivity {
 		GlobalVars.tremeloOn[trackNum] = on;
 		setTremeloOn(trackNum, on);
 	}
-	
-	public native void setTremeloOn(int trackNum, boolean on);
-	public native void setTremeloParam(int trackNum, int paramNum, float param);
 
 	@Override
-	public float getParamLevel(int paramNum) {
-		switch(paramNum) {
-		case 0 : return GlobalVars.tremeloX[trackNum];
-		case 1 : return GlobalVars.tremeloY[trackNum];
-		default : return 0;
-		}
-	}
-
-	@Override
-	public void setParamLevel(int paramNum, float level) {
-		super.setParamLevel(paramNum, level);
-		switch(paramNum) {
-		case 0 : GlobalVars.tremeloX[trackNum] = level;
-			break;
-		case 1: GlobalVars.tremeloY[trackNum] = level;
-			break;
-		default :
-			return;
-		}
+	public void setParamNative(int paramNum, float level) {
 		setTremeloParam(trackNum, paramNum, level);
 	}
 	
-	@Override
-	public String getParamSuffix(int paramNum) {
-		switch(paramNum) {
-		case 0 : return "Hz"; // herrz for rate
-		case 1: return ""; // naked units for depth
-		default : return "";
-		}
-	}
-	
+	public native void setTremeloOn(int trackNum, boolean on);
+	public native void setTremeloParam(int trackNum, int paramNum, float param);
 }
