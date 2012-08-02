@@ -6,11 +6,10 @@ import android.widget.ToggleButton;
 import com.kh.beatbot.global.GlobalVars;
 
 public class FlangerActivity extends EffectActivity {
-	private static final int NUM_PARAMS = 6;
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		NUM_PARAMS = 6;
 		setContentView(R.layout.flanger_layout);
 		initParams();
 		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.flangerOn[trackNum]);
@@ -43,11 +42,6 @@ public class FlangerActivity extends EffectActivity {
 			return;
 		}
 		setFlangerParam(trackNum, paramNum, level);
-	}
-	
-	@Override
-	public int getNumParams() {
-		return NUM_PARAMS;
 	}
 	
 	public native void setFlangerOn(int trackNum, boolean on);

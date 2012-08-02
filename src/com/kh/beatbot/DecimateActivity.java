@@ -6,10 +6,10 @@ import android.widget.ToggleButton;
 import com.kh.beatbot.global.GlobalVars;
 
 public class DecimateActivity extends EffectActivity {
-	final int NUM_PARAMS = 2;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		NUM_PARAMS = 2;
 		setContentView(R.layout.decimate_layout);
 		initParams();
 		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.decimateOn[trackNum]);
@@ -22,11 +22,6 @@ public class DecimateActivity extends EffectActivity {
 	public void setEffectOn(boolean on) {
 		GlobalVars.decimateOn[trackNum] = on;		
 		setDecimateOn(trackNum, on);
-	}
-	
-	@Override
-	public int getNumParams() {
-		return NUM_PARAMS;
 	}
 	
 	public native void setDecimateOn(int trackNum, boolean on);

@@ -6,11 +6,10 @@ import android.widget.ToggleButton;
 import com.kh.beatbot.global.GlobalVars;
 
 public class TremeloActivity extends EffectActivity {
-	private static final int NUM_PARAMS = 2;
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		NUM_PARAMS = 2;
 		setContentView(R.layout.tremelo_layout);
 		initParams();
 		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.tremeloOn[trackNum]);
@@ -23,11 +22,6 @@ public class TremeloActivity extends EffectActivity {
 	
 	public native void setTremeloOn(int trackNum, boolean on);
 	public native void setTremeloParam(int trackNum, int paramNum, float param);
-
-	@Override
-	public int getNumParams() {
-		return NUM_PARAMS;
-	}
 
 	@Override
 	public float getParamLevel(int paramNum) {

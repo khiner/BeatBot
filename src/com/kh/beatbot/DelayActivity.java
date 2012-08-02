@@ -7,11 +7,11 @@ import android.widget.ToggleButton;
 import com.kh.beatbot.global.GlobalVars;
 
 public class DelayActivity extends EffectActivity {
-	private final int NUM_PARAMS = 3;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		NUM_PARAMS = 3;
 		setContentView(R.layout.delay_layout);
 		initParams();
 		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.delayOn[trackNum]);
@@ -25,11 +25,6 @@ public class DelayActivity extends EffectActivity {
 	public void beatMatch(View view) {
 		boolean beatmatch = ((ToggleButton)view).isChecked();
 		GlobalVars.delayBeatmatch[trackNum] = beatmatch;
-	}	
-	
-	@Override
-	public int getNumParams() {
-		return NUM_PARAMS;
 	}
 	
 	public native void setDelayOn(int trackNum, boolean on);

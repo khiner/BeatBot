@@ -6,11 +6,11 @@ import android.widget.ToggleButton;
 import com.kh.beatbot.global.GlobalVars;
 
 public class ChorusActivity extends EffectActivity {
-	private static final int NUM_PARAMS = 5;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		NUM_PARAMS = 5;
 		setContentView(R.layout.chorus_layout);
 		initParams();
 		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.chorusOn[trackNum]);
@@ -35,12 +35,7 @@ public class ChorusActivity extends EffectActivity {
 		}
 		setChorusParam(trackNum, paramNum, scaleLevel(level));
 	}
-	
-	@Override
-	public int getNumParams() {
-		return NUM_PARAMS;
-	}
-		
+
 	@Override
 	public float getParamLevel(int paramNum) {
 		switch (paramNum) {

@@ -7,13 +7,13 @@ import android.widget.ToggleButton;
 import com.kh.beatbot.global.GlobalVars;
 
 public class FilterActivity extends EffectActivity {
-	private static final int NUM_PARAMS = 2;
 	private int mode = 0;
 	private ToggleButton[] filterButtons = new ToggleButton[3];
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		NUM_PARAMS = 2;
 		setContentView(R.layout.filter_layout);
 		initParams();
 		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.filterOn[trackNum]);
@@ -41,11 +41,6 @@ public class FilterActivity extends EffectActivity {
 	public native void setFilterOn(int trackNum, boolean on, int mode);
 	public native void setFilterMode(int trackNum, int mode);	
 	public native void setFilterParam(int trackNum, int paramNum, float param);
-
-	@Override
-	public int getNumParams() {
-		return NUM_PARAMS;
-	}
 
 	@Override
 	public float getParamLevel(int paramNum) {

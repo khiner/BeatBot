@@ -14,7 +14,7 @@ import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.TronSeekbar2d;
 
 public abstract class EffectActivity extends Activity implements LevelListener {
-
+	protected int NUM_PARAMS;
 	protected int trackNum;
 	protected List<EffectControlLayout> paramControls = new ArrayList<EffectControlLayout>();
 	protected TronSeekbar2d level2d = null;
@@ -26,20 +26,18 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	}
 	
 	protected void initParams() {
-		int numParams = getNumParams();
-		
 		paramControls.add((EffectControlLayout)findViewById(R.id.param1));
 		paramControls.add((EffectControlLayout)findViewById(R.id.param2));
-		if (numParams > 2) {
+		if (NUM_PARAMS > 2) {
 			paramControls.add((EffectControlLayout)findViewById(R.id.param3));
 		}
-		if (numParams > 3) {
+		if (NUM_PARAMS > 3) {
 			paramControls.add((EffectControlLayout)findViewById(R.id.param4));
 		}		
-		if (numParams > 4) {
+		if (NUM_PARAMS > 4) {
 			paramControls.add((EffectControlLayout)findViewById(R.id.param5));
 		}
-		if (numParams > 5) {
+		if (NUM_PARAMS > 5) {
 			paramControls.add((EffectControlLayout)findViewById(R.id.param6));
 		}
 		for (int i = 0; i < paramControls.size(); i++) {
@@ -55,8 +53,6 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	public void onDestroy() {
 		super.onDestroy();
 	}
-
-	public abstract int getNumParams();
 	
 	public abstract float getParamLevel(int paramNum);
 

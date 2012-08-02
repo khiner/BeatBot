@@ -6,10 +6,10 @@ import android.widget.ToggleButton;
 import com.kh.beatbot.global.GlobalVars;
 
 public class ReverbActivity extends EffectActivity {
-	private static final int NUM_PARAMS = 2;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		NUM_PARAMS = 2;
 		setContentView(R.layout.reverb_layout);
 		initParams();
 		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.reverbOn[trackNum]);
@@ -22,11 +22,6 @@ public class ReverbActivity extends EffectActivity {
 	
 	public native void setReverbOn(int trackNum, boolean on);
 	public native void setReverbParam(int trackNum, int paramNum, float feedback);
-
-	@Override
-	public int getNumParams() {
-		return NUM_PARAMS;
-	}
 
 	@Override
 	public float getParamLevel(int paramNum) {
