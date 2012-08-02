@@ -11,7 +11,11 @@ import android.widget.TextView;
 import com.kh.beatbot.R;
 import com.kh.beatbot.view.TronKnob;
 
-public class EffectControlLayout extends LinearLayout {	
+public class EffectControlLayout extends LinearLayout {
+	private TextView label = null;
+	private TextView valueLabel = null;
+	private TronKnob knob = null;
+	
     public EffectControlLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOrientation(VERTICAL);
@@ -30,8 +34,32 @@ public class EffectControlLayout extends LinearLayout {
         if (paramLabel == null) paramLabel = "Param";
         if (paramValue == null) paramValue = "0";
         
-        ((TextView)findViewById(R.id.param_label)).setText(paramLabel);
-        ((TextView)findViewById(R.id.param_value_label)).setText(paramValue);
-        ((TronKnob)findViewById(R.id.param_knob)).setBeatSync(beatSyncEnabled);
+        label = (TextView)findViewById(R.id.param_label);
+        valueLabel = (TextView)findViewById(R.id.param_value_label);
+        knob = (TronKnob)findViewById(R.id.param_knob);
+        
+        label.setText(paramLabel);
+        valueLabel.setText(paramValue);
+        knob.setBeatSync(beatSyncEnabled);
+    }
+
+    public TronKnob getKnob() {
+    	return knob;
+    }
+    
+    public float getLevel() {
+    	return knob.getLevel();
+    }
+    
+    public String getValueLabel() {
+    	return valueLabel.getText().toString();
+    }
+    
+    public void setLevel(float level) {
+    	knob.setViewLevel(level);
+    }
+    
+    public void setValueLabel(String valueLabelText) {
+    	valueLabel.setText(valueLabelText);
     }
 }

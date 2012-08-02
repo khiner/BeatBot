@@ -24,7 +24,7 @@ public class TronSeekbar2d extends LevelListenable {
 	}
 	
 	public void setViewLevelY(float y) {
-		selectY = y*(height - 50) + 25;	
+		selectY = (1 - y)*(height - 50) + 25; // top of screen has lowest value in my OpenGl window
 	}
 	
 	@Override
@@ -48,7 +48,7 @@ public class TronSeekbar2d extends LevelListenable {
 		selectX = x < 25 ? 25 : (x > width - 25 ? width - 25 : x);
 		selectY = y < 25 ? 25 : (y > height - 25 ? height - 25 : y);
 		for (LevelListener listener : levelListeners) {
-			listener.setLevel(this, (selectX - 25)/(width - 50), (selectY - 25)/(height - 50));
+			listener.setLevel(this, (selectX - 25)/(width - 50), ((height - selectY) - 25)/(height - 50));
 		}
 	}
 	

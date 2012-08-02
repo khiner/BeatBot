@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.listenable.LevelListenable;
-import com.kh.beatbot.view.TronSeekbar2d;
 
 public class FlangerActivity extends EffectActivity {
 	private static final int NUM_PARAMS = 6;
@@ -14,85 +12,37 @@ public class FlangerActivity extends EffectActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.flanger_layout);
-		initParams(NUM_PARAMS);
+		initParams();
 		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.flangerOn[trackNum]);
 	}
-	
-	public float getXValue() {
-		return GlobalVars.flangerX[trackNum];
-	}
-	
-	public float getYValue() {
-		return GlobalVars.flangerY[trackNum];
-	}
-	
-	public void setXValue(float xValue) {
-		GlobalVars.flangerX[trackNum] = xValue;
-		// exponential scale for base time
-		setFlangerParam(trackNum, 0, scaleLevel(xValue));
-	}
-	
-	public void setYValue(float yValue) {
-		GlobalVars.flangerY[trackNum] = yValue;		
-		setFlangerParam(trackNum, 1, yValue);
-	}
-		
+			
 	public void setEffectOn(boolean on) {
 		GlobalVars.flangerOn[trackNum] = on;
 		setFlangerOn(trackNum, on);
 	}
 	
 	@Override
-	public void setLevel(LevelListenable levelBar, float level) {		
-		super.setLevel(levelBar, level);
-		if (levelBar instanceof TronSeekbar2d)
-			return;
-		switch (levelBar.getId()) {
-		case 2:
-			GlobalVars.flangerWet[trackNum] = level;
+	public void setParamLevel(int paramNum, float level) {		
+		super.setParamLevel(paramNum, level);
+		switch (paramNum) {
+		case 0: GlobalVars.flangerX[trackNum] = level;
 			break;
-		case 3:
-			GlobalVars.flangerModRate[trackNum] = level;
+		case 1: GlobalVars.flangerY[trackNum] = level;
+			break;
+		case 2: GlobalVars.flangerWet[trackNum] = level;
+			break;
+		case 3: GlobalVars.flangerModRate[trackNum] = level;
 			// exponential scale for mod rate
 			level = scaleLevel(level);
 			break;
-		case 4:
-			GlobalVars.flangerModAmt[trackNum] = level;
-		}
-		setFlangerParam(trackNum, levelBar.getId(), level);
-	}
-	
-	public float getLevel(int paramNum) {
-		switch (paramNum) {
-		case 2:
-			return GlobalVars.flangerWet[trackNum]; 
-		case 3:
-			return GlobalVars.flangerModRate[trackNum];
-		case 4:
-			return GlobalVars.flangerModAmt[trackNum];
+		case 4: GlobalVars.flangerModAmt[trackNum] = level;
+			break;
+		case 5: GlobalVars.flangerPhase[trackNum] = level;
+			break;
 		default:
-			return 0;
-		}
-	}
-
-	public float getWetValue() {
-		return GlobalVars.flangerWet[trackNum];
-	}
-	
-	public float getModRate() {
-		return GlobalVars.flangerModRate[trackNum];
-	}
-		
-	public float getModAmt() {
-		return GlobalVars.flangerModAmt[trackNum];
-	}
-	
-	@Override
-	public void notifyInit(LevelListenable levelBar) {
-		if (levelBar instanceof TronSeekbar2d)
 			return;
-		super.notifyInit(levelBar);
-		levelBar.setLevel(getLevel(levelBar.getId()));
+		}
+		setFlangerParam(trackNum, paramNum, level);
 	}
 	
 	@Override
@@ -102,4 +52,34 @@ public class FlangerActivity extends EffectActivity {
 	
 	public native void setFlangerOn(int trackNum, boolean on);
 	public native void setFlangerParam(int trackNum, int paramNum, float param);
+
+	@Override
+	public float getParamLevel(int paramNum) {
+		switch (paramNum) {
+		case 0:  return GlobalVars.flangerX[trackNum];
+		case 1:  return GlobalVars.flangerY[trackNum];
+		case 2:  return GlobalVars.flangerWet[trackNum]; 
+		case 3:  return GlobalVars.flangerModRate[trackNum];
+		case 4:  return GlobalVars.flangerModAmt[trackNum];
+		default: return 0;
+		}		
+	}
+
+	@Override
+	public String getParamSuffix(int paramNum) {
+		switch (paramNum) {
+		case 0:
+			return "ms"; // time in mn;
+		case 1:
+			return "fb";
+		case 2:
+			return ""; // wet/dry has naked units 0-1
+		case 3:
+			return "Hz"; // rate in Hz
+		case 4:
+			return ""; // naked units for mod amt
+		default:
+			return "";
+		}
+	}
 }

@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.listenable.LevelListenable;
-import com.kh.beatbot.view.TronSeekbar2d;
 
 public class ChorusActivity extends EffectActivity {
 	private static final int NUM_PARAMS = 5;
@@ -14,54 +12,37 @@ public class ChorusActivity extends EffectActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.chorus_layout);
-		initParams(NUM_PARAMS);
+		initParams();
 		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.chorusOn[trackNum]);
 	}
-	
-	public float getXValue() {
-		return GlobalVars.chorusX[trackNum];
-	}
-	
-	public float getYValue() {
-		return GlobalVars.chorusY[trackNum];
-	}
-	
-	public void setXValue(float xValue) {
-		GlobalVars.chorusX[trackNum] = xValue;
-		// exponential scale for rate
-		setChorusParam(trackNum, 0, scaleLevel(xValue));
-	}
-	
-	public void setYValue(float yValue) {
-		GlobalVars.chorusY[trackNum] = yValue;		
-		setChorusParam(trackNum, 1, yValue);
-	}
-		
+			
 	public void setEffectOn(boolean on) {
 		GlobalVars.chorusOn[trackNum] = on;
 		setChorusOn(trackNum, on);
 	}
 	
 	@Override
-	public void setLevel(LevelListenable levelBar, float level) {		
-		super.setLevel(levelBar, level);
-		if (levelBar instanceof TronSeekbar2d)
+	public void setParamLevel(int paramNum, float level) {		
+		switch (paramNum) {
+		case 2: GlobalVars.chorusWet[trackNum] = level;
+			break;
+		case 3: GlobalVars.chorusModRate[trackNum] = level;
+			break;
+		case 4: GlobalVars.chorusModAmt[trackNum] = level;
+			break;
+		default:
 			return;
-		switch (levelBar.getId()) {
-		case 2:
-			GlobalVars.chorusWet[trackNum] = level;
-			break;
-		case 3:
-			GlobalVars.chorusModRate[trackNum] = level;
-			break;
-		case 4:
-			GlobalVars.chorusModAmt[trackNum] = level;
-			break;
 		}
-		setChorusParam(trackNum, levelBar.getId(), scaleLevel(level));
+		setChorusParam(trackNum, paramNum, scaleLevel(level));
 	}
 	
-	public float getLevel(int paramNum) {
+	@Override
+	public int getNumParams() {
+		return NUM_PARAMS;
+	}
+		
+	@Override
+	public float getParamLevel(int paramNum) {
 		switch (paramNum) {
 		case 2:
 			return GlobalVars.chorusWet[trackNum]; 
@@ -73,18 +54,18 @@ public class ChorusActivity extends EffectActivity {
 			return 0;
 		}
 	}
-			
-	@Override
-	public void notifyInit(LevelListenable levelBar) {
-		super.notifyInit(levelBar);
-		if (levelBar instanceof TronSeekbar2d)
-			return;
-		levelBar.setLevel(getLevel(levelBar.getId()));
-	}
 	
-	@Override
-	public int getNumParams() {
-		return NUM_PARAMS;
+	public String getParamSuffix(int paramNum) {
+		switch (paramNum) {
+		case 2:
+			return ""; // wet value is naked 0-1
+		case 3:
+			return "Hz";  // mod rate is in Hz
+		case 4:
+			return ""; // mod amt is naked 0-1
+		default:
+			return "";
+		}
 	}
 	
 	public native void setChorusOn(int trackNum, boolean on);

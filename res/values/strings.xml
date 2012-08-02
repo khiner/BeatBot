@@ -60,7 +60,7 @@
     <string name="feedback">Feedback</string>
     <string name="frequency">Freq</string>
     <string name="hfDamp">HF Damp</string>
-    <string name="sampleRate">Rate</string>
+    <string name="sampleRate">BitRate</string>
     <string name="time">Time</string>
     <string name="wet">Wet</string>    
 </resources>

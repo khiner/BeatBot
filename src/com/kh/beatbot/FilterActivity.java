@@ -15,32 +15,13 @@ public class FilterActivity extends EffectActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.filter_layout);
-		initParams(NUM_PARAMS);
+		initParams();
 		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.filterOn[trackNum]);
 		filterButtons[0] = (ToggleButton)findViewById(R.id.lp_toggle);
 		filterButtons[1] = (ToggleButton)findViewById(R.id.bp_toggle);
 		filterButtons[2] = (ToggleButton)findViewById(R.id.hp_toggle);
 	}
-	
-	public float getXValue() {
-		return GlobalVars.filterX[trackNum];
-	}
-	
-	public float getYValue() {
-		return GlobalVars.filterY[trackNum];
-	}
-	
-	public void setXValue(float xValue) {
-		GlobalVars.filterX[trackNum] = xValue;
-		// exponential scale for freq
-		setFilterParam(trackNum, 0, scaleLevel(xValue));
-	}
-	
-	public void setYValue(float yValue) {
-		GlobalVars.filterY[trackNum] = yValue;
-		setFilterParam(trackNum, 1, yValue);
-	}
-	
+
 	public void setEffectOn(boolean on) {
 		GlobalVars.filterOn[trackNum] = on;
 		setFilterOn(trackNum, on, mode);
@@ -64,5 +45,40 @@ public class FilterActivity extends EffectActivity {
 	@Override
 	public int getNumParams() {
 		return NUM_PARAMS;
+	}
+
+	@Override
+	public float getParamLevel(int paramNum) {
+		switch(paramNum) {
+		case 0:  return GlobalVars.filterX[trackNum];
+		case 1:  return GlobalVars.filterY[trackNum];
+		default: return 0;
+		}
+	}
+
+	@Override
+	public void setParamLevel(int paramNum, float level) {
+		super.setParamLevel(paramNum, level);
+		switch(paramNum) {
+		case 0: GlobalVars.filterX[trackNum] = level;
+			break;
+		case 1: GlobalVars.filterY[trackNum] = level;
+			break;
+		default:
+			return;
+		}
+		setFilterParam(trackNum, paramNum, level);
+	}
+	
+	@Override
+	public String getParamSuffix(int paramNum) {
+		switch(paramNum) {
+		case 0:
+			return "Hz"; // frequency in Hertz
+		case 1:
+			return ""; // naked units for resonance
+		default:
+			return "";
+		}
 	}
 }

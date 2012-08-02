@@ -1,6 +1,8 @@
 package com.kh.beatbot.view;
 
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -130,6 +132,16 @@ public class TronKnob extends LevelListenable {
 	
 	@Override
 	protected void drawFrame() {
+//		byte[] colors = {Byte.MAX_VALUE, Byte.MAX_VALUE, Byte.MAX_VALUE, 0,
+//				Byte.MAX_VALUE, Byte.MAX_VALUE, Byte.MAX_VALUE, 1,
+//				Byte.MAX_VALUE, Byte.MAX_VALUE, Byte.MAX_VALUE, 0,
+//				Byte.MAX_VALUE, Byte.MAX_VALUE, Byte.MAX_VALUE, 1
+//		};
+//		ByteBuffer bb = ByteBuffer.allocateDirect(colors.length);
+//		bb.order(ByteOrder.nativeOrder());
+///	    bb.put(colors);
+//		gl.glColorPointer(4, GL10.GL_UNSIGNED_BYTE, 0, bb);
+//		gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 		drawTriangleStrip(circleVb, bgColor);
 		drawTriangleStrip(circleVb, levelColor ,(int)(circleVb.capacity() * level / 2));
 		if (selected) {
@@ -138,6 +150,8 @@ public class TronKnob extends LevelListenable {
 		}
 		if (beatSync)
 			drawTexture();
+		//gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+//		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 	}
 
 	@Override
