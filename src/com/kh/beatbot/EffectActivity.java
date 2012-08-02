@@ -17,19 +17,23 @@ import com.kh.beatbot.view.TronSeekbar2d;
 public abstract class EffectActivity extends Activity implements LevelListener {
 	public class EffectParam {
 		public float level;
-		public boolean beatSyncable;
+		public boolean beatSync;
+		public boolean logScale;
 		public char    axis;
 		public String  unitString;
 		
 		public EffectParam() {
 			level = 0.5f;
-			beatSyncable = false;
+			beatSync = false;
+			logScale = false;
 			axis = ' ';
 			unitString = "";
 		}
 		
-		public EffectParam(boolean beatSyncable, char axis, String unitString) {
-			this.beatSyncable = beatSyncable;
+		public EffectParam(boolean logScale, char axis, String unitString) {
+			level = 0.5f;
+			this.beatSync = false;
+			this.logScale = logScale;
 			this.axis = axis;
 			this.unitString = unitString;
 		}
@@ -99,12 +103,19 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	}
 	
 	private final void setParamLevel(int paramNum, float level) {
-		GlobalVars.params[trackNum].get(paramNum).level = level;
-		setParamNative(paramNum, level);
+		EffectParam param = GlobalVars.params[trackNum].get(paramNum);
 		if (paramNum == 0)
 			level2d.setViewLevelX(level);
 		else if (paramNum == 1)
 			level2d.setViewLevelY(level);
+		
+		if (param.logScale)
+			level = scaleLevel(level);
+		if (param.beatSync)
+			level = quantizeToBeat(level);
+		
+		setParamNative(paramNum, level);
+		param.level = level;
 	}
 
 	@Override
@@ -118,15 +129,22 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	}
 
 	@Override
-	public void notifyChecked(LevelListenable levelBar, boolean checked) {
-		// do nothing
+	public void notifyPressed(LevelListenable listenable, boolean pressed) {
+		// do nothing for
 	}
 
 	@Override
+	public void notifyClicked(LevelListenable listenable) {
+		if (!(listenable instanceof TronSeekbar2d)) {
+			EffectParam param = GlobalVars.params[trackNum].get(listenable.getId()); 
+			param.beatSync = !param.beatSync;
+		}
+	}
+	
+	@Override
 	public final void notifyInit(LevelListenable listenable) {
-		if (listenable instanceof TronSeekbar2d)
-			return;
-		setParamLevel(listenable.getId(), .5f);
+		if (!(listenable instanceof TronSeekbar2d))
+			setParamLevel(listenable.getId(), .5f);
 	}
 
 	protected float scaleLevel(float level) {

@@ -1,8 +1,6 @@
 package com.kh.beatbot.view;
 
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -20,6 +18,7 @@ import android.view.SurfaceHolder;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.listenable.LevelListenable;
+import com.kh.beatbot.listener.LevelListener;
 
 public class TronKnob extends LevelListenable {
 	public static final float ¹ = (float)Math.PI;
@@ -34,14 +33,14 @@ public class TronKnob extends LevelListenable {
 	private int[] crop = null;
 	private int currentTexture = 0;
 	private long timeDown = 0;
-	private boolean beatSync = false;
+	private boolean clickable = false;
 	
 	public TronKnob(Context c, AttributeSet as) {
 		super(c, as);
 	}
 
-	public void setBeatSync(boolean beatSync) {
-		this.beatSync = beatSync;
+	public void setClickable(boolean clickable) {
+		this.clickable = clickable;
 	}
 	
 	public void loadTexture(final int resourceId, int textureId) {
@@ -111,7 +110,7 @@ public class TronKnob extends LevelListenable {
 	@Override
 	protected void init() {
 		super.init();
-		if (beatSync) {
+		if (clickable) {
 			loadTexture(R.drawable.clock, 0);
 			loadTexture(R.drawable.note_icon, 1);
 		}
@@ -148,7 +147,7 @@ public class TronKnob extends LevelListenable {
 			drawTriangleStrip(selectCircleVb2, selectColor ,(int)(circleVb.capacity() * level / 2));
 			drawTriangleStrip(selectCircleVb, selectColor ,(int)(circleVb.capacity() * level / 2));
 		}
-		if (beatSync)
+		if (clickable)
 			drawTexture();
 		//gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 //		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
@@ -173,8 +172,11 @@ public class TronKnob extends LevelListenable {
 	
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		if (System.currentTimeMillis() - timeDown < 300) {
+		if (clickable && System.currentTimeMillis() - timeDown < 300) {
 			currentTexture = (currentTexture + 1 ) % 2;
+			for (LevelListener listener : levelListeners) {
+				listener.notifyClicked(this);
+			}
 		}
 		super.handleActionUp(id, x, y);
 	}

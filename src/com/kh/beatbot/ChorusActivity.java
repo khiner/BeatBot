@@ -10,7 +10,7 @@ public class ChorusActivity extends EffectActivity {
 	@Override
 	public void initParams() {
 		super.initParams();
-		GlobalVars.params[trackNum].add(new EffectParam(false, 'x', "Hz"));
+		GlobalVars.params[trackNum].add(new EffectParam(true, 'x', "Hz"));
 		GlobalVars.params[trackNum].add(new EffectParam(false, 'y', ""));
 		GlobalVars.params[trackNum].add(new EffectParam(false, ' ', ""));
 		GlobalVars.params[trackNum].add(new EffectParam(true, ' ', "ms"));

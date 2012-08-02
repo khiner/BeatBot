@@ -53,7 +53,7 @@ public abstract class LevelListenable extends SurfaceViewBase {
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		for (LevelListener levelListener : levelListeners)
-			levelListener.notifyChecked(this, true);
+			levelListener.notifyPressed(this, true);
 		selected = true;
 	}
 
@@ -71,7 +71,7 @@ public abstract class LevelListenable extends SurfaceViewBase {
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
 		for (LevelListener levelListener : levelListeners)
-			levelListener.notifyChecked(this, false);
+			levelListener.notifyPressed(this, false);
 		selected = false;
 	}
 }

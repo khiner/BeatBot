@@ -160,17 +160,22 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}	
 	
 	@Override
-	public void notifyChecked(LevelListenable levelBar, boolean checked) {
+	public void notifyPressed(LevelListenable levelBar, boolean pressed) {
 		if (levelBar.equals(volumeLevel)) {
 			((ToggleButton) findViewById(R.id.volumeView))
-					.setChecked(checked);
+					.setChecked(pressed);
 		} else if (levelBar.equals(panLevel)) {
 			((ToggleButton) findViewById(R.id.panView))
-					.setChecked(checked);
+					.setChecked(pressed);
 		} else if (levelBar.equals(pitchLevel)) {
 			((ToggleButton) findViewById(R.id.pitchView))
-					.setChecked(checked);
+					.setChecked(pressed);
 		}	
+	}
+	
+	@Override
+	public void notifyClicked(LevelListenable levelListenable) {
+		// do nothing when levels are clicked
 	}
 	
 	// get the audio data in floats

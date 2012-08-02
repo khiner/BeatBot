@@ -9,8 +9,8 @@ public class DecimateActivity extends EffectActivity {
 	@Override
 	public void initParams() {
 		super.initParams();
-		GlobalVars.params[trackNum].add(new EffectParam(false, 'x', "Hz"));
-		GlobalVars.params[trackNum].add(new EffectParam(false, 'y', "Bits"));
+		GlobalVars.params[trackNum].add(new EffectParam(true, 'x', "Hz"));
+		GlobalVars.params[trackNum].add(new EffectParam(true, 'y', "Bits"));
 	}
 	
 	@Override

@@ -40,7 +40,7 @@ public class EffectControlLayout extends LinearLayout {
         
         label.setText(paramLabel);
         valueLabel.setText(paramValue);
-        knob.setBeatSync(beatSyncEnabled);
+        knob.setClickable(beatSyncEnabled);
     }
 
     public TronKnob getKnob() {
