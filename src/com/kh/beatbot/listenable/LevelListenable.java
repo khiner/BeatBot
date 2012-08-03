@@ -24,6 +24,10 @@ public abstract class LevelListenable extends SurfaceViewBase {
 		levelListeners.add(levelListener);
 	}
 	
+	public void removeAllListeners() {
+		levelListeners.clear();
+	}
+	
 	@Override
 	protected void init() {
 		for (LevelListener levelListener : levelListeners) {

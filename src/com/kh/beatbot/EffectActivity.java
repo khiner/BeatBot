@@ -39,9 +39,10 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		}
 	}
 	
+	protected int EFFECT_NUM;
 	protected int NUM_PARAMS;
 	protected int trackNum;
-	protected List<EffectControlLayout> paramControls = new ArrayList<EffectControlLayout>();
+	protected List<EffectControlLayout> paramControls  = new ArrayList<EffectControlLayout>();
 	protected TronSeekbar2d level2d = null;
 
 	@Override
@@ -51,6 +52,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	}
 	
 	protected void initParams() {
+		paramControls = new ArrayList<EffectControlLayout>();
 		paramControls.add((EffectControlLayout)findViewById(R.id.param1));
 		paramControls.add((EffectControlLayout)findViewById(R.id.param2));
 		if (NUM_PARAMS > 2) {
@@ -68,9 +70,11 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		for (int i = 0; i < paramControls.size(); i++) {
 			EffectControlLayout ecl = paramControls.get(i);
 			ecl.getKnob().setId(i);
+			ecl.getKnob().removeAllListeners();
 			ecl.getKnob().addLevelListener(this);
 		}
 		level2d = (TronSeekbar2d)findViewById(R.id.xyParamBar);
+		level2d.removeAllListeners();
 		level2d.addLevelListener(this);
 	}
 	
@@ -78,7 +82,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	public void onDestroy() {
 		super.onDestroy();
 	}
-	
+
 	public void updateParamValueLabel(int paramNum) {
 		paramControls.get(paramNum).setValueLabel(getParamValueString(paramNum));
 	}
@@ -91,8 +95,8 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	}
 
 	public String getParamValueString(int paramNum) {
-		return ((Float)GlobalVars.params[trackNum].get(paramNum).level).toString() + " " +
-				GlobalVars.params[trackNum].get(paramNum).unitString;
+		EffectParam param = GlobalVars.params[trackNum][EFFECT_NUM].get(paramNum); 
+		return ((Float)param.level).toString() + " " + param.unitString;
 	}
 	
 	@Override
@@ -103,7 +107,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	}
 	
 	private final void setParamLevel(int paramNum, float level) {
-		EffectParam param = GlobalVars.params[trackNum].get(paramNum);
+		EffectParam param = GlobalVars.params[trackNum][EFFECT_NUM].get(paramNum);
 		if (paramNum == 0)
 			level2d.setViewLevelX(level);
 		else if (paramNum == 1)
@@ -111,8 +115,9 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		
 		if (param.logScale)
 			level = scaleLevel(level);
-		if (param.beatSync)
+		if (param.beatSync) {
 			level = quantizeToBeat(level);
+		}
 		
 		setParamNative(paramNum, level);
 		param.level = level;
@@ -136,7 +141,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	@Override
 	public void notifyClicked(LevelListenable listenable) {
 		if (!(listenable instanceof TronSeekbar2d)) {
-			EffectParam param = GlobalVars.params[trackNum].get(listenable.getId()); 
+			EffectParam param = GlobalVars.params[trackNum][EFFECT_NUM].get(listenable.getId()); 
 			param.beatSync = !param.beatSync;
 		}
 	}

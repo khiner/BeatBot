@@ -181,6 +181,10 @@ public class TronKnob extends LevelListenable {
 		super.handleActionUp(id, x, y);
 	}
 	
+	public boolean isClickable() {
+		return clickable;
+	}
+	
 	private float distanceFromCenter(float x, float y) {
 		return FloatMath.sqrt((x - width/2)*(x - width/2) + (y - height/2)*(y - height/2));
 	}

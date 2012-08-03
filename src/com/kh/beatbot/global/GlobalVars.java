@@ -9,6 +9,7 @@ import com.kh.beatbot.manager.PlaybackManager;
 
 public class GlobalVars {
 	public static final int UNDO_STACK_SIZE = 40;
+	public static final int NUM_EFFECTS = 7;
 	public static final short LEVEL_MAX = 127;
 	private static MidiManager midiManager = null;
 	private static PlaybackManager playbackManager = null;
@@ -16,10 +17,9 @@ public class GlobalVars {
 	// effect settings are stored here instead of in the effect activities
 	// because the activities are destroyed after clicking 'back', and we
 	// need to persist state
-	public static List<EffectParam>[] params;
+	public static List<EffectParam>[][] params;
 	
-	public static boolean[] chorusOn, decimateOn, delayOn, delayBeatmatch,
-			flangerOn, filterOn, reverbOn, tremeloOn;
+	public static boolean[][] effectOn;
 
 	public static float currBeatDivision;
 
@@ -29,20 +29,14 @@ public class GlobalVars {
 
 	public static void setMidiManager(MidiManager midiManager) {
 		GlobalVars.midiManager = midiManager;
-		int num = midiManager.getNumSamples();
-		params = (ArrayList<EffectParam>[])new ArrayList[num];
-		for (int i = 0; i < num; i++)
-			params[i] = new ArrayList<EffectParam>();
-		chorusOn = new boolean[num];
-		decimateOn = new boolean[num];
-		delayOn = new boolean[num];
-		delayBeatmatch = new boolean[num];
-		flangerOn = new boolean[num];
-		filterOn = new boolean[num];
-		reverbOn = new boolean[num];
-		tremeloOn = new boolean[num];
-		for (int i = 0; i < midiManager.getNumSamples(); i++) {
-			chorusOn[i] = decimateOn[i] = delayOn[i] = delayBeatmatch[i] = filterOn[i] = flangerOn[i] = reverbOn[i] = tremeloOn[i] = false;
+		int numTracks = midiManager.getNumSamples();
+		params = (ArrayList<EffectParam>[][])new ArrayList[numTracks][NUM_EFFECTS];
+		effectOn = new boolean[numTracks][NUM_EFFECTS];
+		for (int track = 0; track < numTracks; track++) {
+			for (int effect = 0; effect < NUM_EFFECTS; effect++) {
+				effectOn[track][effect] = false;
+				params[track][effect] = null;
+			}
 		}
 	}
 
