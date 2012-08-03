@@ -1,8 +1,5 @@
 package com.kh.beatbot;
 
-import android.os.Bundle;
-import android.widget.ToggleButton;
-
 import com.kh.beatbot.global.GlobalVars;
 
 public class FlangerActivity extends EffectActivity {
@@ -15,18 +12,8 @@ public class FlangerActivity extends EffectActivity {
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ' ', ""));
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, ' ', "Hz"));
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ' ', ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ' ', ""));
 		}
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EFFECT_NUM = 4;
-		NUM_PARAMS = 6;
-		setContentView(R.layout.flanger_layout);
-		initParams();
-		((ToggleButton) findViewById(R.id.effectToggleOn))
-				.setChecked(GlobalVars.effectOn[trackNum][EFFECT_NUM]);
 	}
 
 	public void setEffectOnNative(boolean on) {
@@ -38,7 +25,11 @@ public class FlangerActivity extends EffectActivity {
 		setFlangerParam(trackNum, paramNum, level);
 	}
 
+	@Override
+	public int getEffectLayoutId() {
+		return R.layout.flanger_layout;
+	}
+	
 	public native void setFlangerOn(int trackNum, boolean on);
-
 	public native void setFlangerParam(int trackNum, int paramNum, float param);
 }

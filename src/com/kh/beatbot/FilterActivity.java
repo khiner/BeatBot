@@ -22,11 +22,6 @@ public class FilterActivity extends EffectActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		EFFECT_NUM = 3;
-		NUM_PARAMS = 2;
-		setContentView(R.layout.filter_layout);
-		initParams();
-		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.effectOn[trackNum][EFFECT_NUM]);
 		filterButtons[0] = (ToggleButton)findViewById(R.id.lp_toggle);
 		filterButtons[1] = (ToggleButton)findViewById(R.id.bp_toggle);
 		filterButtons[2] = (ToggleButton)findViewById(R.id.hp_toggle);
@@ -50,6 +45,11 @@ public class FilterActivity extends EffectActivity {
 	@Override
 	public void setParamNative(int paramNum, float level) {
 		setFilterParam(trackNum, paramNum, level);
+	}
+
+	@Override
+	public int getEffectLayoutId() {
+		return R.layout.filter_layout;
 	}
 	
 	public native void setFilterOn(int trackNum, boolean on, int mode);

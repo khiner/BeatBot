@@ -1,8 +1,5 @@
 package com.kh.beatbot;
 
-import android.os.Bundle;
-import android.widget.ToggleButton;
-
 import com.kh.beatbot.global.GlobalVars;
 
 public class DelayActivity extends EffectActivity {
@@ -17,17 +14,6 @@ public class DelayActivity extends EffectActivity {
 		}
 	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EFFECT_NUM = 2;
-		NUM_PARAMS = 3;
-		setContentView(R.layout.delay_layout);
-		initParams();
-		((ToggleButton) findViewById(R.id.effectToggleOn))
-				.setChecked(GlobalVars.effectOn[trackNum][EFFECT_NUM]);
-	}
-
 	public void setEffectOnNative(boolean on) {
 		setDelayOn(trackNum, on);
 	}
@@ -37,7 +23,11 @@ public class DelayActivity extends EffectActivity {
 		setDelayParam(trackNum, paramNum, level);
 	}
 
+	@Override
+	public int getEffectLayoutId() {
+		return R.layout.delay_layout;
+	}
+	
 	public native void setDelayOn(int trackNum, boolean on);
-
 	public native void setDelayParam(int trackNum, int paramNum, float param);
 }

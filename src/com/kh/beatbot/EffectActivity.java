@@ -49,6 +49,10 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		trackNum = getIntent().getExtras().getInt("trackNum");
+		setContentView(getEffectLayoutId());
+		initParams();
+		((ToggleButton) findViewById(R.id.effectToggleOn))
+				.setChecked(GlobalVars.effectOn[trackNum][EFFECT_NUM]);
 	}
 	
 	protected void initParams() {
@@ -82,6 +86,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		paramControls.get(paramNum).setValueLabel(getParamValueString(paramNum));
 	}
 	
+	public abstract int getEffectLayoutId();
 	public abstract void setEffectOnNative(boolean on);
 	public abstract void setParamNative(int paramNum, float level);
 

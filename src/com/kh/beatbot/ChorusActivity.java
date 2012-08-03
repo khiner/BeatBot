@@ -1,8 +1,5 @@
 package com.kh.beatbot;
 
-import android.os.Bundle;
-import android.widget.ToggleButton;
-
 import com.kh.beatbot.global.GlobalVars;
 
 public class ChorusActivity extends EffectActivity {
@@ -19,17 +16,6 @@ public class ChorusActivity extends EffectActivity {
 		}
 	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EFFECT_NUM = 0;
-		NUM_PARAMS = 5;
-		setContentView(R.layout.chorus_layout);
-		initParams();
-		((ToggleButton) findViewById(R.id.effectToggleOn))
-				.setChecked(GlobalVars.effectOn[trackNum][EFFECT_NUM]);
-	}
-
 	public void setEffectOnNative(boolean on) {
 		setChorusOn(trackNum, on);
 	}
@@ -41,4 +27,9 @@ public class ChorusActivity extends EffectActivity {
 	public native void setChorusOn(int trackNum, boolean on);
 
 	public native void setChorusParam(int trackNum, int paramNum, float param);
+
+	@Override
+	public int getEffectLayoutId() {
+		return R.layout.chorus_layout;
+	}
 }
