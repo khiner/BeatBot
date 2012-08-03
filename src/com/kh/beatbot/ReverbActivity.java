@@ -1,8 +1,5 @@
 package com.kh.beatbot;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.os.Bundle;
 import android.widget.ToggleButton;
 
@@ -12,11 +9,9 @@ public class ReverbActivity extends EffectActivity {
 	@Override
 	public void initParams() {
 		super.initParams();
-		if (GlobalVars.params[trackNum][EFFECT_NUM] == null) {
-			List<EffectParam> params = new ArrayList<EffectParam>();
-			params.add(new EffectParam(false, 'x', ""));
-			params.add(new EffectParam(false, 'y', ""));
-			GlobalVars.params[trackNum][EFFECT_NUM] = params;
+		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, 'x', ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, 'y', ""));
 		}
 	}
 	

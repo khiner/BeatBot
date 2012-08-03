@@ -35,7 +35,7 @@ public class GlobalVars {
 		for (int track = 0; track < numTracks; track++) {
 			for (int effect = 0; effect < NUM_EFFECTS; effect++) {
 				effectOn[track][effect] = false;
-				params[track][effect] = null;
+				params[track][effect] = new ArrayList<EffectParam>();
 			}
 		}
 	}
