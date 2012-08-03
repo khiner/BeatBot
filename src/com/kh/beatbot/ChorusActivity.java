@@ -30,8 +30,7 @@ public class ChorusActivity extends EffectActivity {
 				.setChecked(GlobalVars.effectOn[trackNum][EFFECT_NUM]);
 	}
 
-	public void setEffectOn(boolean on) {
-		GlobalVars.effectOn[trackNum][EFFECT_NUM] = on;
+	public void setEffectOnNative(boolean on) {
 		setChorusOn(trackNum, on);
 	}
 

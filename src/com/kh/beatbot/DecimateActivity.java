@@ -29,8 +29,7 @@ public class DecimateActivity extends EffectActivity {
 		return GlobalVars.effectOn[trackNum][EFFECT_NUM];
 	}
 	
-	public void setEffectOn(boolean on) {
-		GlobalVars.effectOn[trackNum][EFFECT_NUM] = on;		
+	public void setEffectOnNative(boolean on) {
 		setDecimateOn(trackNum, on);
 	}
 

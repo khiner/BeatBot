@@ -78,20 +78,17 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		level2d.addLevelListener(this);
 	}
 	
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-	}
-
 	public void updateParamValueLabel(int paramNum) {
 		paramControls.get(paramNum).setValueLabel(getParamValueString(paramNum));
 	}
 	
-	public abstract void setEffectOn(boolean on);
+	public abstract void setEffectOnNative(boolean on);
 	public abstract void setParamNative(int paramNum, float level);
 
 	public void toggleOn(View view) {
-		setEffectOn(((ToggleButton) view).isChecked());
+		boolean on = ((ToggleButton) view).isChecked();
+		GlobalVars.effectOn[trackNum][EFFECT_NUM] = on;
+		setEffectOnNative(on);
 	}
 
 	public String getParamValueString(int paramNum) {

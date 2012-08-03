@@ -32,8 +32,7 @@ public class FilterActivity extends EffectActivity {
 		filterButtons[2] = (ToggleButton)findViewById(R.id.hp_toggle);
 	}
 
-	public void setEffectOn(boolean on) {
-		GlobalVars.effectOn[trackNum][EFFECT_NUM] = on;
+	public void setEffectOnNative(boolean on) {
 		setFilterOn(trackNum, on, mode);
 	}
 	

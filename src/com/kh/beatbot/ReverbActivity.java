@@ -25,8 +25,7 @@ public class ReverbActivity extends EffectActivity {
 		((ToggleButton)findViewById(R.id.effectToggleOn)).setChecked(GlobalVars.effectOn[trackNum][EFFECT_NUM]);
 	}
 
-	public void setEffectOn(boolean on) {
-		GlobalVars.effectOn[trackNum][EFFECT_NUM] = on;
+	public void setEffectOnNative(boolean on) {
 		setReverbOn(trackNum, on);
 	}
 	
