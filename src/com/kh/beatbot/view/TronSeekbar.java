@@ -12,7 +12,6 @@ import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 
 public class TronSeekbar extends LevelListenable {
-	private float[] bgColor = new float[] {.3f, .3f, .3f , 1};
 	private FloatBuffer bgBarVb = null;
 	private FloatBuffer levelBarVb = null;
 

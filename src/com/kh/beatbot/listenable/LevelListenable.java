@@ -13,6 +13,7 @@ import com.kh.beatbot.view.bean.MidiViewBean;
 public abstract class LevelListenable extends SurfaceViewBase {
 	protected ArrayList<LevelListener> levelListeners = new ArrayList<LevelListener>();	
 	protected float level = .5f;
+	protected static final float[] bgColor = new float[] {.3f, .3f, .3f , 1};
 	protected float[] levelColor = MidiViewBean.VOLUME_COLOR;
 	protected boolean selected = false;
 	

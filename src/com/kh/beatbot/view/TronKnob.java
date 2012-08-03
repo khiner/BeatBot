@@ -27,7 +27,6 @@ public class TronKnob extends LevelListenable {
 	private static FloatBuffer selectCircleVb2 = null;
 	private static int circleWidth = 0, circleHeight = 0;
 	
-	private float[] bgColor = new float[] {.3f, .3f, .3f , 1};
 	private float[] selectColor = {levelColor[0], levelColor[1], levelColor[2], .4f};
 	private int[] textureHandlers = new int[2];
 	private int[] crop = null;
@@ -77,9 +76,9 @@ public class TronKnob extends LevelListenable {
 	}
 	
 	private static void initCircleVbs(float width, float height) {
-		float[] circleVertices = new float[400];
-		float[] selectCircleVertices = new float[400];
-		float[] selectCircle2Vertices = new float[400];
+		float[] circleVertices = new float[300];
+		float[] selectCircleVertices = new float[300];
+		float[] selectCircle2Vertices = new float[300];
 		float theta = 3 * ¹ / 4; // start at 1/8 around the circle
 		for (int i = 0; i < circleVertices.length / 4; i++) {
 			// theta will range from ¹/4 to 7¹/8,
@@ -141,9 +140,12 @@ public class TronKnob extends LevelListenable {
 ///	    bb.put(colors);
 //		gl.glColorPointer(4, GL10.GL_UNSIGNED_BYTE, 0, bb);
 //		gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
+		
+		// background
 		drawTriangleStrip(circleVb, bgColor);
+		// main selection
 		drawTriangleStrip(circleVb, levelColor ,(int)(circleVb.capacity() * level / 2));
-		if (selected) {
+		if (selected) { // selected glow
 			drawTriangleStrip(selectCircleVb2, selectColor ,(int)(circleVb.capacity() * level / 2));
 			drawTriangleStrip(selectCircleVb, selectColor ,(int)(circleVb.capacity() * level / 2));
 		}
