@@ -34,7 +34,7 @@ public class MidiViewBean {
 	// RGB color for selected bars
 	public final static float[] LEVEL_SELECTED_COLOR = {.9f, 0, .1f, 1};	
 	public final static float[] TICK_FILL_COLOR = {.3f, .3f, .3f, 1};
-	public final static float[] TICK_MARKER_COLOR = {.8f, .8f, .8f};
+	public final static float[] TICK_MARKER_COLOR = {.8f, .8f, .8f, 1};
 	public final static float[] TICKBAR_COLOR = {.6f, .6f, .6f, 1};
 	public final static float[] TICK_SELECTED_COLOR = VOLUME_COLOR;
 		

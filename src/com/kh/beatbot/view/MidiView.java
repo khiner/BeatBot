@@ -28,8 +28,8 @@ public class MidiView extends SurfaceViewBase {
 
 	private MidiViewBean bean = new MidiViewBean();
 
-	private static final int[] V_LINE_WIDTHS = new int[] { 5, 3, 2 };
-	private static final float[] V_LINE_COLORS = new float[] { 0, .2f, .3f };
+	private static final int[] V_LINE_WIDTHS = new int[] { 5, 3, 2};
+	private static final float[] V_LINE_COLORS = new float[] { 0, .2f, .3f};
 	// NIO Buffers
 	private FloatBuffer[] vLineVB = new FloatBuffer[3];
 	private FloatBuffer hLineVB = null;
@@ -259,7 +259,7 @@ public class MidiView extends SurfaceViewBase {
 				tickToX(midiManager.getLoopEndTick()) };
 		for (int i = 0; i < 2; i++) {
 			float loopMarkerLoc = loopMarkerLocs[i];
-			gl.glColor4f(color[i][0], color[i][1], color[i][2], 1);
+			setColor(color[i]);
 			gl.glPushMatrix();
 			gl.glTranslatef(loopMarkerLoc, 0, 0);
 			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerVB);
