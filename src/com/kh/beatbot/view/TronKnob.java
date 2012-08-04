@@ -27,7 +27,6 @@ public class TronKnob extends LevelListenable {
 	private static FloatBuffer selectCircleVb2 = null;
 	private static int circleWidth = 0, circleHeight = 0;
 	
-	private float[] selectColor = {levelColor[0], levelColor[1], levelColor[2], .4f};
 	private int[] textureHandlers = new int[2];
 	private int[] crop = null;
 	private int currentTexture = 0;
