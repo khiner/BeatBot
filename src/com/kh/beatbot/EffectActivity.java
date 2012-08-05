@@ -105,22 +105,21 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	public final void setLevel(LevelListenable levelListenable, float level) {
 		int paramNum = levelListenable.getId();
 		setParamLevel(paramNum, level);
+		if (paramNum == 0)
+			level2d.setViewLevelX(level);
+		else if (paramNum == 1)
+			level2d.setViewLevelY(level);
 		updateParamValueLabel(paramNum);
 	}
 	
 	private final void setParamLevel(int paramNum, float level) {
 		EffectParam param = GlobalVars.params[trackNum][EFFECT_NUM].get(paramNum);
-		if (paramNum == 0)
-			level2d.setViewLevelX(level);
-		else if (paramNum == 1)
-			level2d.setViewLevelY(level);
-		
-		if (param.logScale)
+		if (param.logScale) {
 			level = scaleLevel(level);
+		}
 		if (param.beatSync) {
 			level = quantizeToBeat(level);
 		}
-		
 		setParamNative(paramNum, level);
 		param.level = level;
 	}
@@ -129,8 +128,8 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	public void setLevel(LevelListenable level2d, float levelX, float levelY) {
 		setParamLevel(0, levelX);
 		setParamLevel(1, levelY);
-		paramControls.get(0).setLevel(levelX);
-		paramControls.get(1).setLevel(levelY);
+		paramControls.get(0).getKnob().setViewLevel(levelX);
+		paramControls.get(1).getKnob().setViewLevel(levelY);
 		updateParamValueLabel(0);
 		updateParamValueLabel(1);
 	}

@@ -17,21 +17,25 @@ import com.kh.beatbot.view.bean.MidiViewBean;
 public class TronSeekbar2d extends LevelListenable {
 	private static final int DRAW_OFFSET = 8;
 	private float selectX = 0, selectY = 0;
+	private float selectionSide, selectionCornerRadius, borderRadius,
+			borderSide;
 	private static FloatBuffer borderVb = null;
 	private static FloatBuffer selectionVb = null;
 	private static FloatBuffer horizontalVb = null;
 	private static FloatBuffer verticalVb = null;
-	
-	private float ¹ = (float)Math.PI;
+
+	private float ¹ = (float) Math.PI;
+
 	public TronSeekbar2d(Context c, AttributeSet as) {
 		super(c, as);
 	}
-	
-	public float[] calcRoundedCornerVertices(float width, float height, float cornerRadius, int resolution) {
+
+	public float[] calcRoundedCornerVertices(float width, float height,
+			float cornerRadius, int resolution) {
 		float[] roundedRect = new float[resolution * 8];
 		float theta, addX, addY;
 		for (int i = 0; i < roundedRect.length / 2; i++) {
-			theta =  i * 4 * ¹ / roundedRect.length;
+			theta = i * 4 * ¹ / roundedRect.length;
 			if (theta < ¹ / 2) { // lower right
 				addX = width / 2 - cornerRadius;
 				addY = height / 2 - cornerRadius;
@@ -50,38 +54,73 @@ public class TronSeekbar2d extends LevelListenable {
 		}
 		return roundedRect;
 	}
-	
+
 	private void initBorderVb() {
-		float rectWidth = width - DRAW_OFFSET;
-		float rectHeight = height - DRAW_OFFSET;
-		float cornerRadius = rectWidth/8;
 		int resolution = 25;
-		borderVb = makeFloatBuffer(calcRoundedCornerVertices(rectWidth, rectHeight, cornerRadius, resolution));
+		borderSide = width - DRAW_OFFSET;
+		borderRadius = borderSide / 8;
+		borderVb = makeFloatBuffer(calcRoundedCornerVertices(borderSide,
+				borderSide, borderRadius, resolution));
 	}
 
 	private void initSelectionVb() {
-		float rectWidth = width / 10;
-		float rectHeight = height / 10;
-		float cornerRadius = rectWidth / 4;
 		int resolution = 10;
-		selectionVb = makeFloatBuffer(calcRoundedCornerVertices(rectWidth, rectHeight, cornerRadius, resolution));
+		selectionSide = width / 12;
+		selectionCornerRadius = selectionSide / 4;
+		selectionVb = makeFloatBuffer(calcRoundedCornerVertices(selectionSide,
+				selectionSide, selectionCornerRadius, resolution));
 	}
-	
+
 	private void initLineVbs() {
-		horizontalVb = makeRectFloatBuffer(DRAW_OFFSET / 2, -3, width - DRAW_OFFSET / 2, 3);
-		verticalVb = makeRectFloatBuffer(-3, DRAW_OFFSET / 2, 3, height - DRAW_OFFSET / 2);
+		horizontalVb = makeRectFloatBuffer(DRAW_OFFSET / 2, -3, width
+				- DRAW_OFFSET / 2, 3);
+		verticalVb = makeRectFloatBuffer(-3, DRAW_OFFSET / 2, 3, height
+				- DRAW_OFFSET / 2);
 	}
-	
+
 	public void setViewLevelX(float x) {
-		selectX = x*(width - 50) + 25;
+		float minX = min(selectY);
+		selectX = x * (width - 2 * minX) + minX;
 	}
-	
+
 	public void setViewLevelY(float y) {
-		selectY = (1 - y)*(height - 50) + 25; // top of screen has lowest value in my OpenGl window
+		float minY = min(selectX);
+		selectY = (1 - y) * (height - minY * 2) + minY; // top of screen has
+														// lowest value in my
+														// OpenGl window
 	}
-	
+
+	// input = x view location or y view location
+	// output = the minimum allowable view location for the opposite dimension
+	// such that the entire selection marker is within the rounded square border
+	private float min(float loc) {
+		float min = DRAW_OFFSET + selectionSide / 2;
+		float selectionLow = loc - selectionSide / 2;
+		float selectionHigh = loc + selectionSide / 2;
+		if (selectionLow > DRAW_OFFSET + borderRadius
+				&& selectionHigh < borderSide - borderRadius)
+			return min;
+		if (selectionLow < 0 || selectionHigh > height) {
+			min += borderRadius;
+			return min;
+		}
+		if (selectionLow < DRAW_OFFSET + borderRadius) {
+			min += borderRadius
+					- FloatMath.sqrt(borderRadius * borderRadius
+							- (selectionLow - borderRadius)
+							* (selectionLow - borderRadius));
+		} else if (selectionHigh > borderSide - borderRadius) {
+			min += borderRadius
+					- FloatMath.sqrt(borderRadius * borderRadius
+							- ((height - selectionHigh) - borderRadius)
+							* ((height - selectionHigh) - borderRadius));
+		}
+		return min;
+	}
+
 	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,
+			int height) {
 		super.surfaceChanged(holder, format, width, height);
 		initBorderVb();
 		initLineVbs();
@@ -103,63 +142,77 @@ public class TronSeekbar2d extends LevelListenable {
 		drawTriangleFan(borderVb, bgColor);
 		gl.glPopMatrix();
 	}
+
 	private void drawBorder() {
 		gl.glPushMatrix();
 		gl.glTranslatef(width / 2, height / 2, 0);
 		drawLines(borderVb, MidiViewBean.VOLUME_COLOR, 5, GL10.GL_LINE_LOOP);
 		gl.glPopMatrix();
 	}
-	
+
 	private void drawLines() {
 		gl.glPushMatrix();
 		gl.glTranslatef(selectX, 0, 0);
+		levelColor[3] = 1; // set max alpha
 		drawTriangleStrip(verticalVb, levelColor);
-		if (selected) {
-			gl.glPushMatrix();
-			for (int i = 0; i < 5; i++) {
-				gl.glScalef(1.1f, 1, 1);
-				drawTriangleStrip(verticalVb, selectColor);
-			}
-			gl.glPopMatrix();
-		}			
-		gl.glTranslatef(-selectX, selectY, 0);
-		drawTriangleStrip(horizontalVb, levelColor);
-		if (selected) {
-			gl.glPushMatrix();
-			for (int i = 0; i < 5; i++) {
-				gl.glScalef(1, 1.1f, 1);
-				drawTriangleStrip(horizontalVb, selectColor);
-			}
-			gl.glPopMatrix();			
+		levelColor[3] = .3f; // fade alpha
+		gl.glPushMatrix();
+		for (int i = 0; i < 5; i++) {
+			gl.glScalef(1.15f, 1, 1);
+			drawTriangleStrip(verticalVb, levelColor);
 		}
 		gl.glPopMatrix();
+		gl.glTranslatef(-selectX, selectY, 0);
+		levelColor[3] = 1; // set max alpha
+		drawTriangleStrip(horizontalVb, levelColor);
+		gl.glPushMatrix();
+		levelColor[3] = .3f; // fade alpha
+		for (int i = 0; i < 5; i++) {
+			gl.glScalef(1, 1.15f, 1);
+			drawTriangleStrip(horizontalVb, levelColor);
+		}
+		gl.glPopMatrix();
+		gl.glPopMatrix();
 	}
-	
+
 	private void drawSelection() {
 		gl.glPushMatrix();
 		gl.glTranslatef(selectX, selectY, 0);
+		levelColor[3] = 1; // set max alpha
 		drawTriangleFan(selectionVb, levelColor);
-		if (selected) {
-			for (int i = 0; i < 5; i++) {
-				gl.glScalef(1.05f, 1.05f, 1);
-				drawTriangleFan(selectionVb, selectColor);
-			}
+		for (int i = 0; i < 5; i++) {
+			levelColor[3] = .5f; // fade alpha
+			gl.glScalef(1.04f, 1.04f, 1);
+			drawTriangleFan(selectionVb, levelColor);
 		}
 		gl.glPopMatrix();
 	}
-	
+
 	private void selectLocation(float x, float y) {
-		selectX = x < 25 ? 25 : (x > width - 25 ? width - 25 : x);
-		selectY = y < 25 ? 25 : (y > height - 25 ? height - 25 : y);
+		float minX = min(y);
+		float maxX = width - minX;
+		selectX = x < minX ? minX : (x > maxX ? maxX : x);
+		float minY = min(selectX);
+		float maxY = height - minY;
+		selectY = y < minY ? minY : (y > maxY ? maxY : y);
 		for (LevelListener listener : levelListeners) {
-			listener.setLevel(this, (selectX - 25)/(width - 50), ((height - selectY) - 25)/(height - 50));
+			listener.setLevel(this, (selectX - minX) / (width - minX * 2),
+					((height - selectY) - minY) / (height - minY * 2));
 		}
 	}
-	
+
+	// constrain 2d Seekbar to square proportions
+	@Override
+	public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		int side = Math.min(widthMeasureSpec, heightMeasureSpec);
+		super.onMeasure(side, side);
+	}
+
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		selectLocation(x, y);
-		super.handleActionDown(id, x,  y);
+		levelColor = MidiViewBean.LEVEL_SELECTED_COLOR.clone();
+		super.handleActionDown(id, x, y);
 	}
 
 	@Override
@@ -169,6 +222,7 @@ public class TronSeekbar2d extends LevelListenable {
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		super.handleActionUp(id,  x, y);
-	}	
+		levelColor = MidiViewBean.VOLUME_COLOR.clone();
+		super.handleActionUp(id, x, y);
+	}
 }
