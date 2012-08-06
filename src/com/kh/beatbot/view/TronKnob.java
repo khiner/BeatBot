@@ -114,7 +114,7 @@ public class TronKnob extends LevelListenable {
 			loadTexture(R.drawable.note_icon, 1);
 		}
 		gl.glClearColor(0, 0, 0, 1);
-		gl.glEnable(GL10.GL_LINE_SMOOTH);
+		setViewLevel(0.5f);
 	}
 	
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,

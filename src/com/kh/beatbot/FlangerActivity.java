@@ -4,8 +4,9 @@ import com.kh.beatbot.global.GlobalVars;
 
 public class FlangerActivity extends EffectActivity {
 	@Override
-	public void initParamControls() {
-		super.initParamControls();
+	public void initParams() {
+		EFFECT_NUM = 4;
+		NUM_PARAMS = 6;
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, 'x', "ms"));
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, 'y', ""));

@@ -4,8 +4,7 @@ import com.kh.beatbot.global.GlobalVars;
 
 public class TremeloActivity extends EffectActivity {
 	@Override
-	public void initParamControls() {
-		super.initParamControls();
+	public void initParams() {
 		EFFECT_NUM = 6;
 		NUM_PARAMS = 2;
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {

@@ -64,7 +64,7 @@ public class TronSeekbar2d extends LevelListenable {
 	}
 
 	private void initSelectionVb() {
-		int resolution = 10;
+		int resolution = 8;
 		selectionSide = width / 12;
 		selectionCornerRadius = selectionSide / 4;
 		selectionVb = makeFloatBuffer(calcRoundedCornerVertices(selectionSide,
@@ -72,13 +72,13 @@ public class TronSeekbar2d extends LevelListenable {
 	}
 	
 	public void setViewLevelX(float x) {
-		float minX = min(selectY);
+		float minX = min(selectY) + selectionSide / 2;
 		selectX = x * (width - 2 * minX) + minX;
 		initLines();
 	}
 
 	public void setViewLevelY(float y) {
-		float minY = min(selectX);
+		float minY = min(selectX) + selectionSide / 2;
 		// top of screen lowest value in my	OpenGl window
 		selectY = (1 - y) * (height - minY * 2) + minY;
 		initLines();
@@ -114,23 +114,18 @@ public class TronSeekbar2d extends LevelListenable {
 	protected void drawFrame() {
 		gl.glClearColor(0, 0, 0, 1); // black bg
 		drawBackground();
-		drawLines();
 		drawSelection();
-		drawBorder();
 	}
 
 	private void drawBackground() {
-		gl.glPushMatrix();
 		gl.glTranslatef(width / 2, height / 2, 0);
 		drawTriangleFan(borderVb, bgColor);
-		gl.glPopMatrix();
-	}
-
-	private void drawBorder() {
-		gl.glPushMatrix();
+		gl.glTranslatef(-width / 2, -height / 2, 0);
+		levelColor[3] = 1; // completely opaque alpha
+		drawLines(lineVb, levelColor, 5, GL10.GL_LINES);
 		gl.glTranslatef(width / 2, height / 2, 0);
 		drawLines(borderVb, MidiViewBean.VOLUME_COLOR, 5, GL10.GL_LINE_LOOP);
-		gl.glPopMatrix();
+		gl.glTranslatef(-width / 2, -height / 2, 0);
 	}
 
 	private void initLines() {
@@ -141,19 +136,13 @@ public class TronSeekbar2d extends LevelListenable {
 		lineVb = makeFloatBuffer(new float[] {xMin, selectY, xMax, selectY, selectX, yMin, selectX, yMax});
 	}
 
-	private void drawLines() {
-		levelColor[3] = 1; // completely opaque alpha
-		drawLines(lineVb, levelColor, 5, GL10.GL_LINES);
-	}
-	
 	private void drawSelection() {
 		gl.glPushMatrix();
 		gl.glTranslatef(selectX, selectY, 0);
-		levelColor[3] = 1; // set max alpha
 		drawTriangleFan(selectionVb, levelColor);
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 3; i++) {
 			levelColor[3] = .5f; // fade alpha
-			gl.glScalef(1.04f, 1.04f, 1);
+			gl.glScalef(1.05f, 1.05f, 1);
 			drawTriangleFan(selectionVb, levelColor);
 		}
 		gl.glPopMatrix();

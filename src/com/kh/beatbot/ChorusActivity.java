@@ -5,8 +5,9 @@ import com.kh.beatbot.global.GlobalVars;
 public class ChorusActivity extends EffectActivity {
 
 	@Override
-	public void initParamControls() {
-		super.initParamControls();
+	protected void initParams() {
+		EFFECT_NUM = 0;
+		NUM_PARAMS = 5;	
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, 'x', "Hz"));
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, 'y', ""));
