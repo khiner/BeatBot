@@ -98,7 +98,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 
 	public String getParamValueString(int paramNum) {
 		EffectParam param = GlobalVars.params[trackNum][EFFECT_NUM].get(paramNum); 
-		return ((Float)param.level).toString() + " " + param.unitString;
+		return String.format("%.3f", param.level) + " " + param.unitString;
 	}
 	
 	@Override
