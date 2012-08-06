@@ -51,6 +51,19 @@ public class TronSeekbar extends LevelListenable {
 		// draw level
 		drawTriangleStrip(levelBarVb, levelColor, numLevelVertices);
 		
+		if (selected) {
+			gl.glPushMatrix();
+			selectColor[3] = .2f;
+			gl.glTranslatef(-6f, 0, 0);
+			gl.glScalef(1.01f, 1, 1);
+			for (int i = 0; i < 5; i++) {
+				gl.glScalef(1, 1.2f, 1);
+				drawTriangleStrip(levelBarVb, selectColor, numLevelVertices);
+			}
+			gl.glPopMatrix();
+			selectColor[3] = .5f;
+		}
+		
 		// draw circle at the end of background rect
 		gl.glPointSize(8);
 		gl.glTranslatef(0, 4, 0);
@@ -62,8 +75,20 @@ public class TronSeekbar extends LevelListenable {
 		gl.glDrawArrays(GL10.GL_POINTS, numLevelVertices - 2, 1);
 		setColor(selectColor);
 		// draw bigger, translucent 'selection' circle at end
-		gl.glPointSize(20);
-		gl.glDrawArrays(GL10.GL_POINTS, numLevelVertices - 2, 1);
+		if (selected) {
+			gl.glPointSize(18);
+			setColor(levelColor);
+			gl.glDrawArrays(GL10.GL_POINTS, numLevelVertices - 2, 1);
+			setColor(selectColor);
+			for (int i = 20; i < 32; i+=4) {
+				gl.glPointSize(i);
+				gl.glDrawArrays(GL10.GL_POINTS, numLevelVertices - 2, 1);
+			}
+		} else {
+			gl.glPointSize(20);
+			gl.glDrawArrays(GL10.GL_POINTS, numLevelVertices - 2, 1);
+		}
+			
 		gl.glPopMatrix();
 	}
 
