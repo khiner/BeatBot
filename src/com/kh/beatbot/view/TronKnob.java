@@ -30,6 +30,7 @@ public class TronKnob extends LevelListenable {
 	private int[] textureHandlers = new int[2];
 	private int[] crop = null;
 	private int currentTexture = 0;
+	private int drawIndex = 0;
 	private long timeDown = 0;
 	private boolean clickable = false;
 	
@@ -75,9 +76,9 @@ public class TronKnob extends LevelListenable {
 	}
 	
 	private static void initCircleVbs(float width, float height) {
-		float[] circleVertices = new float[300];
-		float[] selectCircleVertices = new float[300];
-		float[] selectCircle2Vertices = new float[300];
+		float[] circleVertices = new float[128];
+		float[] selectCircleVertices = new float[128];
+		float[] selectCircle2Vertices = new float[128];
 		float theta = 3 * ¹ / 4; // start at 1/8 around the circle
 		for (int i = 0; i < circleVertices.length / 4; i++) {
 			// theta will range from ¹/4 to 7¹/8,
@@ -129,31 +130,37 @@ public class TronKnob extends LevelListenable {
 	
 	@Override
 	protected void drawFrame() {
-//		byte[] colors = {Byte.MAX_VALUE, Byte.MAX_VALUE, Byte.MAX_VALUE, 0,
-//				Byte.MAX_VALUE, Byte.MAX_VALUE, Byte.MAX_VALUE, 1,
-//				Byte.MAX_VALUE, Byte.MAX_VALUE, Byte.MAX_VALUE, 0,
-//				Byte.MAX_VALUE, Byte.MAX_VALUE, Byte.MAX_VALUE, 1
-//		};
-//		ByteBuffer bb = ByteBuffer.allocateDirect(colors.length);
-//		bb.order(ByteOrder.nativeOrder());
-///	    bb.put(colors);
-//		gl.glColorPointer(4, GL10.GL_UNSIGNED_BYTE, 0, bb);
-//		gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
-		
 		// background
 		drawTriangleStrip(circleVb, bgColor);
 		// main selection
-		drawTriangleStrip(circleVb, levelColor ,(int)(circleVb.capacity() * level / 2));
+		drawTriangleStrip(circleVb, levelColor, drawIndex);
 		if (selected) { // selected glow
-			drawTriangleStrip(selectCircleVb2, selectColor ,(int)(circleVb.capacity() * level / 2));
-			drawTriangleStrip(selectCircleVb, selectColor ,(int)(circleVb.capacity() * level / 2));
+			drawTriangleStrip(selectCircleVb2, selectColor, drawIndex);
+			drawTriangleStrip(selectCircleVb, selectColor, drawIndex);
 		}
 		if (clickable)
 			drawTexture();
-		//gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-//		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 	}
 
+	private void updateDrawIndex() {
+		if (circleVb == null)
+			return;
+		drawIndex = (int)(circleVb.capacity() * level / 2);
+		drawIndex += drawIndex % 2;
+	}
+	
+	@Override
+	public void setViewLevel(float level) {
+		super.setViewLevel(level);
+		updateDrawIndex();
+	}
+	
+	@Override
+	public void setLevel(float level) {
+		super.setLevel(level);
+		updateDrawIndex();
+	}
+	
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		if (distanceFromCenter(x, y) > width/4)

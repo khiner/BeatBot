@@ -8,7 +8,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.FloatMath;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
@@ -102,12 +101,13 @@ public class TronSeekbar2d extends LevelListenable {
 	}
 	
 	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
-		super.surfaceChanged(holder, format, width, height);
+	public void init() {
+		super.init();
 		initBorderVb();
 		initLines();
 		initSelectionVb();
+		setViewLevelX(0.5f);
+		setViewLevelY(0.5f);
 	}
 
 	@Override

@@ -11,8 +11,8 @@ public class FilterActivity extends EffectActivity {
 	private ToggleButton[] filterButtons = new ToggleButton[3];
 	
 	@Override
-	public void initParams() {
-		super.initParams();
+	public void initParamControls() {
+		super.initParamControls();
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, 'x', "Hz"));
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, 'y', ""));

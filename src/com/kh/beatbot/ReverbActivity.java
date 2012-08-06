@@ -4,8 +4,8 @@ import com.kh.beatbot.global.GlobalVars;
 
 public class ReverbActivity extends EffectActivity {
 	@Override
-	public void initParams() {
-		super.initParams();
+	public void initParamControls() {
+		super.initParamControls();
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, 'x', ""));
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, 'y', ""));
