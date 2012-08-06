@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:paramControl="http://schemas.android.com/apk/res/com.kh.beatbot"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" >
@@ -29,4 +29,4 @@
         paramControl:param_value="0.5"
     />
 
-</RelativeLayout>
+</merge>

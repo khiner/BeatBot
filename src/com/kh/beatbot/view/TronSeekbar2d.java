@@ -15,14 +15,11 @@ import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class TronSeekbar2d extends LevelListenable {
 	private static final int DRAW_OFFSET = 8;
-	int borderResolution = 25;
+	private static float minX, maxX, minY, maxY;
 	private float selectX = 0, selectY = 0;
-	private float selectionSide, selectionCornerRadius, borderRadius,
-			borderSide;
-	private static float minCoord;
+	private float borderRadius;
 	private static FloatBuffer borderVb = null;
 	private static FloatBuffer lineVb = null;
-	private static FloatBuffer selectionVb = null;
 
 	private float ¹ = (float) Math.PI;
 
@@ -56,56 +53,31 @@ public class TronSeekbar2d extends LevelListenable {
 	}
 
 	private void initBorderVb() {
-		borderSide = width - DRAW_OFFSET;
-		borderRadius = borderSide / 8;
-		borderVb = makeFloatBuffer(calcRoundedCornerVertices(borderSide,
-				borderSide, borderRadius, borderResolution));
-		minCoord = borderVb.get((int)(borderResolution * 2.5)) + width / 2;
+		borderRadius = width / 14;
+		minX = DRAW_OFFSET + borderRadius;
+		minY = DRAW_OFFSET + borderRadius;
+		maxX = width - DRAW_OFFSET - borderRadius;
+		maxY = height - DRAW_OFFSET - borderRadius;
+		borderVb = makeFloatBuffer(calcRoundedCornerVertices(width
+				- DRAW_OFFSET * 2, height - DRAW_OFFSET * 2, borderRadius, 25));
 	}
 
-	private void initSelectionVb() {
-		int resolution = 8;
-		selectionSide = width / 12;
-		selectionCornerRadius = selectionSide / 4;
-		selectionVb = makeFloatBuffer(calcRoundedCornerVertices(selectionSide,
-				selectionSide, selectionCornerRadius, resolution));
-	}
-	
 	public void setViewLevelX(float x) {
-		float minX = min(selectY) + selectionSide / 2;
 		selectX = x * (width - 2 * minX) + minX;
 		initLines();
 	}
 
 	public void setViewLevelY(float y) {
-		float minY = min(selectX) + selectionSide / 2;
-		// top of screen lowest value in my	OpenGl window
+		// top of screen lowest value in my OpenGl window
 		selectY = (1 - y) * (height - minY * 2) + minY;
 		initLines();
 	}
 
-	// input = x view location or y view location
-	// output = the minimum allowable view location for the opposite dimension
-	// such that the entire selection marker is within the rounded square border
-	private float min(float coord) {
-		if (coord > DRAW_OFFSET + borderRadius && coord < borderSide - borderRadius)
-			return DRAW_OFFSET;
-		if (coord < DRAW_OFFSET || coord > borderSide)
-			return minCoord;
-		if (coord > borderSide - borderRadius)
-			coord = width - coord;
-		float percent = coord / borderRadius;
-		int index = (int)(borderResolution * 2 * (1f + percent));
-		index += index % 2; // make sure we're grabbing x coord
-		return borderVb.get(index) + width / 2;
-	}
-	
 	@Override
 	public void init() {
 		super.init();
 		initBorderVb();
 		initLines();
-		initSelectionVb();
 		setViewLevelX(0.5f);
 		setViewLevelY(0.5f);
 	}
@@ -129,31 +101,27 @@ public class TronSeekbar2d extends LevelListenable {
 	}
 
 	private void initLines() {
-		float xMin = min(selectY) - 2;
-		float yMin = min(selectX) - 2;
-		float xMax = width - xMin;
-		float yMax = height - yMin;
-		lineVb = makeFloatBuffer(new float[] {xMin, selectY, xMax, selectY, selectX, yMin, selectX, yMax});
+		lineVb = makeFloatBuffer(new float[] { DRAW_OFFSET, selectY,
+				width - DRAW_OFFSET, selectY, selectX, DRAW_OFFSET, selectX,
+				height - DRAW_OFFSET });
 	}
 
 	private void drawSelection() {
-		gl.glPushMatrix();
-		gl.glTranslatef(selectX, selectY, 0);
-		drawTriangleFan(selectionVb, levelColor);
-		for (int i = 0; i < 3; i++) {
-			levelColor[3] = .5f; // fade alpha
-			gl.glScalef(1.05f, 1.05f, 1);
-			drawTriangleFan(selectionVb, levelColor);
+		setColor(levelColor);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, makeFloatBuffer(new float[] {
+				selectX, selectY }));
+		gl.glPointSize(borderRadius);
+		gl.glDrawArrays(GL10.GL_POINTS, 0, 1);
+		levelColor[3] = .4f;
+		setColor(levelColor);
+		for (float size = borderRadius; size < borderRadius * 1.5; size++) {
+			gl.glPointSize(size);
+			gl.glDrawArrays(GL10.GL_POINTS, 0, 1);
 		}
-		gl.glPopMatrix();
 	}
 
 	private void selectLocation(float x, float y) {
-		float minX = min(y) + selectionSide / 2;
-		float maxX = width - minX;
 		selectX = x < minX ? minX : (x > maxX ? maxX : x);
-		float minY = min(selectX) + selectionSide / 2;
-		float maxY = height - minY;
 		selectY = y < minY ? minY : (y > maxY ? maxY : y);
 		initLines();
 		for (LevelListener listener : levelListeners) {
@@ -162,11 +130,10 @@ public class TronSeekbar2d extends LevelListenable {
 		}
 	}
 
-	// constrain 2d Seekbar to square proportions
 	@Override
-	public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		int side = Math.min(widthMeasureSpec, heightMeasureSpec);
-		super.onMeasure(side, side);
+	protected void onMeasure(int width, int height) {
+		int dim = Math.min(width, height);
+		super.onMeasure(dim, dim);
 	}
 
 	@Override
