@@ -5,10 +5,11 @@
 
 typedef struct SineWave_t {
 	float *table;
-	float time;
-	float rate;
-	float phaseOffset;
 	float alpha;
+	float frequency;
+	float phaseOffset;
+	float rate;
+	float time;
 	unsigned int iIndex;
 } SineWave;
 

@@ -21,6 +21,14 @@ void tremeloconfig_setFrequency(TremeloConfig *config, float freqL, float freqR)
 	sinewave_setFrequency(config->mod[1], freqR);
 }
 
+void tremeloconfig_setFrequencyLeft(TremeloConfig *config, float freqL) {
+	tremeloconfig_setFrequency(config, freqL, config->mod[1]->frequency);
+}
+
+void tremeloconfig_setFrequencyRight(TremeloConfig *config, float freqR) {
+	tremeloconfig_setFrequency(config, config->mod[0]->frequency, freqR);
+}
+
 void tremeloconfig_setDepth(TremeloConfig *config, float depth) {
 	config->depth = depth;
 }
@@ -45,9 +53,11 @@ void Java_com_kh_beatbot_TremeloActivity_setTremeloParam(JNIEnv *env,
 		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(env, clazz, trackNum);
 	TremeloConfig *config = (TremeloConfig*)track->effects[TREMELO_ID].config;
-	if (paramNum == 0) { // frequency
-		tremeloconfig_setFrequency(config, param, param);
-	} else if (paramNum == 1) { // depth
+	if (paramNum == 0) { // left frequency
+		tremeloconfig_setFrequencyLeft(config, param);
+	} else if (paramNum == 1) { // right frequency
+		tremeloconfig_setFrequencyRight(config, param);
+	} else if (paramNum == 2) { // depth
 		tremeloconfig_setDepth(config, param);
 	}
 }
