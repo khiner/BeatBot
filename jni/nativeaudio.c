@@ -582,24 +582,6 @@ void Java_com_kh_beatbot_midi_MidiNote_setPitch(JNIEnv *env, jclass clazz,
  Java SampleEditActivity JNI methods
  ****************************************************************************************/
 
-jfloat Java_com_kh_beatbot_SampleEditActivity_getPrimaryVolume(JNIEnv *env,
-		jclass clazz, jint trackNum) {
-	Track *track = getTrack(env, clazz, trackNum);
-	return ((VolumePanConfig *) track->effects[VOL_PAN_ID].config)->volume;
-}
-
-jfloat Java_com_kh_beatbot_SampleEditActivity_getPrimaryPan(JNIEnv *env,
-		jclass clazz, jint trackNum) {
-	Track *track = getTrack(env, clazz, trackNum);
-	return ((VolumePanConfig *) track->effects[VOL_PAN_ID].config)->pan;
-}
-
-jfloat Java_com_kh_beatbot_SampleEditActivity_getPrimaryPitch(JNIEnv *env,
-		jclass clazz, jint trackNum) {
-	Track *track = getTrack(env, clazz, trackNum);
-	return track->pitch;
-}
-
 void Java_com_kh_beatbot_SampleEditActivity_setPrimaryVolume(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat volume) {
 	Track *track = getTrack(env, clazz, trackNum);

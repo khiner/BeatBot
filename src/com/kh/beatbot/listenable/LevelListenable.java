@@ -42,8 +42,8 @@ public abstract class LevelListenable extends SurfaceViewBase {
 		return level;
 	}
 
-	public void setViewLevel(float x) {
-		this.level = x;
+	public void setViewLevel(float level) {
+		this.level = level;
 	}
 
 	/* level should be from 0 to 1 */

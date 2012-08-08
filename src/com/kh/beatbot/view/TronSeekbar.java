@@ -92,11 +92,6 @@ public class TronSeekbar extends LevelListenable {
 		gl.glPopMatrix();
 	}
 
-	public void setViewLevel(float x) {
-		super.setViewLevel(x);
-		initLevelBarVB();
-	}
-
 	@Override
 	protected void drawFrame() {
 		gl.glClearColor(0, 0, 0, 1);
@@ -105,6 +100,10 @@ public class TronSeekbar extends LevelListenable {
 
 	public void setLevel(float level) {
 		super.setLevel(level);
+	}
+	
+	public void setViewLevel(float level) {
+		super.setViewLevel(level);
 		updateNumLevelVertices();
 	}
 	
@@ -120,10 +119,6 @@ public class TronSeekbar extends LevelListenable {
 		float level = (x - height/2)/(width - height);
 		level = level < 0 ? 0 : (level > 1 ? 1 : level);
 		return level;
-	}
-	
-	private float levelToX(float level) {
-		return height/2 + level*(width - height);
 	}
 	
 	@Override

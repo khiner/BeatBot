@@ -54,10 +54,10 @@ public class TronSeekbar2d extends LevelListenable {
 
 	private void initBorderVb() {
 		borderRadius = width / 14;
-		minX = DRAW_OFFSET + borderRadius;
-		minY = DRAW_OFFSET + borderRadius;
-		maxX = width - DRAW_OFFSET - borderRadius;
-		maxY = height - DRAW_OFFSET - borderRadius;
+		minX = borderRadius + 2;
+		minY = borderRadius + 2;
+		maxX = width - borderRadius - 2;
+		maxY = height - borderRadius - 2;
 		borderVb = makeFloatBuffer(calcRoundedCornerVertices(width
 				- DRAW_OFFSET * 2, height - DRAW_OFFSET * 2, borderRadius, 25));
 	}

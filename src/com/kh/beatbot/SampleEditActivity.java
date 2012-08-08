@@ -149,13 +149,13 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public void notifyInit(LevelListenable levelBar) {
 		if (levelBar.equals(volumeLevel)) {
 			volumeLevel.setLevelColor(MidiViewBean.VOLUME_COLOR);
-			volumeLevel.setViewLevel(getPrimaryVolume(trackNum));
+			volumeLevel.setLevel(.8f);
 		} else if (levelBar.equals(panLevel)) {
 			panLevel.setLevelColor(MidiViewBean.PAN_COLOR);
-			panLevel.setViewLevel(getPrimaryPan(trackNum));
+			panLevel.setLevel(0);
 		} else if (levelBar.equals(pitchLevel)) {
 			pitchLevel.setLevelColor(MidiViewBean.PITCH_COLOR);
-			pitchLevel.setViewLevel(getPrimaryPitch(trackNum));
+			pitchLevel.setLevel(.5f);
 		}
 	}	
 	
@@ -187,12 +187,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	// scale all samples so that the sample with the highest amplitude is at 1
 	public native float[] normalize(int trackNum);
 	
-	public native float getPrimaryVolume(int trackNum);
-
-	public native float getPrimaryPan(int trackNum);
-
-	public native float getPrimaryPitch(int trackNum);
-
 	public native void setPrimaryVolume(int trackNum, float volume);
 
 	public native void setPrimaryPan(int trackNum, float pan);
