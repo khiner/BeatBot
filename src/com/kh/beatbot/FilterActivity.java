@@ -44,8 +44,9 @@ public class FilterActivity extends EffectActivity {
 	}
 
 	@Override
-	public void setParamNative(int paramNum, float level) {
+	public float setParamNative(int paramNum, float level) {
 		setFilterParam(trackNum, paramNum, level);
+		return level;
 	}
 
 	@Override

@@ -21,8 +21,9 @@ public class ChorusActivity extends EffectActivity {
 		setChorusOn(trackNum, on);
 	}
 
-	public void setParamNative(int paramNum, float level) {
+	public float setParamNative(int paramNum, float level) {
 		setChorusParam(trackNum, paramNum, scaleLevel(level));
+		return level;
 	}
 
 	public native void setChorusOn(int trackNum, boolean on);

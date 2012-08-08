@@ -22,8 +22,9 @@ public class DecimateActivity extends EffectActivity {
 	}
 
 	@Override
-	public void setParamNative(int paramNum, float level) {
+	public float setParamNative(int paramNum, float level) {
 		setDecimateParam(trackNum, paramNum, level);
+		return level;
 	}
 	
 	@Override

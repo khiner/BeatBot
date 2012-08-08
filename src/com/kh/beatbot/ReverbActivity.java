@@ -18,8 +18,9 @@ public class ReverbActivity extends EffectActivity {
 	}
 	
 	@Override
-	public void setParamNative(int paramNum, float level) {
+	public float setParamNative(int paramNum, float level) {
 		setReverbParam(trackNum, paramNum, level);
+		return level;
 	}
 	
 	@Override

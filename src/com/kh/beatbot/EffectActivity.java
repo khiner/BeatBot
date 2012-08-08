@@ -94,7 +94,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	
 	public abstract int getEffectLayoutId();
 	public abstract void setEffectOnNative(boolean on);
-	public abstract void setParamNative(int paramNum, float level);
+	public abstract float setParamNative(int paramNum, float level);
 
 	public void toggleOn(View view) {
 		boolean on = ((ToggleButton) view).isChecked();
@@ -126,7 +126,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		if (param.beatSync) {
 			level = quantizeToBeat(level);
 		}
-		setParamNative(paramNum, level);
+		level = setParamNative(paramNum, level);
 		param.level = level;
 	}
 

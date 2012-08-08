@@ -18,8 +18,11 @@ public class TremeloActivity extends EffectActivity {
 	}
 
 	@Override
-	public void setParamNative(int paramNum, float level) {
+	public float setParamNative(int paramNum, float level) {
+		if (paramNum == 0)
+			level *= 16; // mod rate has max of 16 Hz
 		setTremeloParam(trackNum, paramNum, level);
+		return level;
 	}
 	
 	@Override

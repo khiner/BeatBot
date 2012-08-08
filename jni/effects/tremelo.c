@@ -17,8 +17,8 @@ void tremeloconfig_set(void *p, float freq, float depth) {
 }
 
 void tremeloconfig_setFrequency(TremeloConfig *config, float freqL, float freqR) {
-	sinewave_setFrequency(config->mod[0], freqL*20);
-	sinewave_setFrequency(config->mod[1], freqR*20);
+	sinewave_setFrequency(config->mod[0], freqL);
+	sinewave_setFrequency(config->mod[1], freqR);
 }
 
 void tremeloconfig_setDepth(TremeloConfig *config, float depth) {

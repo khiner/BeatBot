@@ -22,8 +22,9 @@ public class FlangerActivity extends EffectActivity {
 	}
 
 	@Override
-	public void setParamNative(int paramNum, float level) {
+	public float setParamNative(int paramNum, float level) {
 		setFlangerParam(trackNum, paramNum, level);
+		return level;
 	}
 
 	@Override

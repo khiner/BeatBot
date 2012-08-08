@@ -21,8 +21,9 @@ public class DelayActivity extends EffectActivity {
 	}
 
 	@Override
-	public void setParamNative(int paramNum, float level) {
+	public float setParamNative(int paramNum, float level) {
 		setDelayParam(trackNum, paramNum, level);
+		return level;
 	}
 
 	@Override
