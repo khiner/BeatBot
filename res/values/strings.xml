@@ -62,5 +62,7 @@
     <string name="hfDamp">HF Damp</string>
     <string name="sampleRate">BitRate</string>
     <string name="time">Time</string>
+    <string name="timeLeft">Time Left</string>
+    <string name="timeRight">Time Right</string>
     <string name="wet">Wet</string>    
 </resources>

@@ -7,10 +7,11 @@ public class DelayActivity extends EffectActivity {
 	@Override
 	public void initParams() {
 		EFFECT_NUM = 2;
-		NUM_PARAMS = 3;
+		NUM_PARAMS = 4;
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, 'x', "ms"));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, 'y', ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, 'y', "ms"));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ' ', ""));
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ' ', ""));
 		}
 	}

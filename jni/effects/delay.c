@@ -47,11 +47,13 @@ void Java_com_kh_beatbot_DelayActivity_setDelayParam(JNIEnv *env, jclass clazz,
 	Track *track = getTrack(env, clazz, trackNum);
 	DelayConfigI *config = (DelayConfigI *) track->effects[DELAY_ID].config;
 	int channel;
-	if (paramNum == 0) { // delay time
-		delayconfigi_setDelayTime(config, param, param);
-	} else if (paramNum == 1) { // feedback
+	if (paramNum == 0) { // delay time left
+		delayconfigi_setDelayTimeLeft(config, param);
+	} if (paramNum == 1) { // delay time right
+		delayconfigi_setDelayTimeRight(config, param);
+	} else if (paramNum == 2) { // feedback
 		delayconfigi_setFeedback(config, param);
-	} else if (paramNum == 2) { // wet/dry
+	} else if (paramNum == 3) { // wet/dry
 		config->wet = param;
 	}
 }

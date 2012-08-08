@@ -55,6 +55,14 @@ static inline void delayconfigi_setDelayTime(DelayConfigI *config, float lDelay,
 			config->delayTime[1] * SAMPLE_RATE);
 }
 
+static inline void delayconfigi_setDelayTimeLeft(DelayConfigI *config, float lDelay) {
+	delayconfigi_setDelayTime(config, lDelay, config->delayTime[1]);
+}
+
+static inline void delayconfigi_setDelayTimeRight(DelayConfigI *config, float rDelay) {
+	delayconfigi_setDelayTime(config, config->delayTime[0], rDelay);
+}
+
 static inline float delayi_tick(DelayConfigI *config, float in, int channel) {
 	if (config->rp[channel] >= config->maxSamples)
 		config->rp[channel] = 0;
