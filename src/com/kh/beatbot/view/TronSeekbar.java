@@ -38,8 +38,8 @@ public class TronSeekbar extends LevelListenable {
 	
 	@Override
 	protected void init() {
-		super.init();
 		initLevelBarVB();
+		super.init();
 	}
 		
 	private void drawBar() {

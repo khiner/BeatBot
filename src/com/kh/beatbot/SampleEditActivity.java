@@ -152,7 +152,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			volumeLevel.setLevel(.8f);
 		} else if (levelBar.equals(panLevel)) {
 			panLevel.setLevelColor(MidiViewBean.PAN_COLOR);
-			panLevel.setLevel(0);
+			panLevel.setLevel(.5f);
 		} else if (levelBar.equals(pitchLevel)) {
 			pitchLevel.setLevelColor(MidiViewBean.PITCH_COLOR);
 			pitchLevel.setLevel(.5f);
