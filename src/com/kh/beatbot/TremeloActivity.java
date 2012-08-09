@@ -8,9 +8,9 @@ public class TremeloActivity extends EffectActivity {
 		EFFECT_NUM = 6;
 		NUM_PARAMS = 3;
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, 'x', "Hz"));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, 'y', "Hz"));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ' ', ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, "Hz"));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, "Hz"));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ""));
 		}
 	}
 	

@@ -49,8 +49,9 @@ public abstract class LevelListenable extends SurfaceViewBase {
 	/* level should be from 0 to 1 */
 	public void setLevel(float level) {
 		setViewLevel(level);
-		for (LevelListener levelListener : levelListeners)
-			levelListener.setLevel(this, level);
+		if (isEnabled()) // only notify listeners if enabled
+			for (LevelListener levelListener : levelListeners)
+				levelListener.setLevel(this, level);
 	}
 	
 	public void setLevelColor(float[] newLevelColor) {

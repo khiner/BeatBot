@@ -8,8 +8,8 @@ public class DecimateActivity extends EffectActivity {
 		EFFECT_NUM = 1;
 		NUM_PARAMS = 2;
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, 'x', "Hz"));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, 'y', "Bits"));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, "Hz"));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, "Bits"));
 		}
 	}
 			

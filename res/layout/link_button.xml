@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ToggleButton xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linkButton"
+    android:layout_width="32dp"
+    android:layout_height="32dp"
+    android:layout_centerInParent="true"
+    android:background="@drawable/link_src"
+    android:textOff=""
+    android:textOn=""
+    android:onClick="link" />

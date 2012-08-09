@@ -15,8 +15,8 @@ public class FilterActivity extends EffectActivity {
 		EFFECT_NUM = 3;
 		NUM_PARAMS = 2;
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, 'x', "Hz"));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, 'y', ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, "Hz"));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ""));
 		}
 	}
 	

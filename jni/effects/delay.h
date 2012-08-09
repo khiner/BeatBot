@@ -14,6 +14,7 @@ typedef struct DelayConfigI_t {
 	float out;
 	int maxSamples; // maximum size of delay buffer (set to SAMPLE_RATE by default)
 	int rp[2], wp[2]; // read & write pointers
+	bool linkChannels;
 	pthread_mutex_t mutex; // mutex since sets happen on a different thread than processing
 } DelayConfigI;
 
@@ -45,6 +46,8 @@ static inline void delayconfigi_setDelaySamples(DelayConfigI *config,
 
 static inline void delayconfigi_setDelayTime(DelayConfigI *config, float lDelay,
 		float rDelay) {
+	if (config->linkChannels)
+		rDelay = lDelay;  // if channels are linked, follow left channel
 	pthread_mutex_lock(&config->mutex);
 	config->delayTime[0] =
 			lDelay > 0.0001 ? (lDelay <= 1 ? lDelay : 1) : 0.0001;
@@ -56,11 +59,17 @@ static inline void delayconfigi_setDelayTime(DelayConfigI *config, float lDelay,
 }
 
 static inline void delayconfigi_setDelayTimeLeft(DelayConfigI *config, float lDelay) {
-	delayconfigi_setDelayTime(config, lDelay, config->delayTime[1]);
+	float rDelay = config->delayTime[1];
+	delayconfigi_setDelayTime(config, lDelay, rDelay);
 }
 
 static inline void delayconfigi_setDelayTimeRight(DelayConfigI *config, float rDelay) {
-	delayconfigi_setDelayTime(config, config->delayTime[0], rDelay);
+	float lDelay = config->delayTime[0];
+	delayconfigi_setDelayTime(config, lDelay, rDelay);
+}
+
+static inline void delayconfigi_updateDelayTime(DelayConfigI *config) {
+	delayconfigi_setDelayTime(config, config->delayTime[0], config->delayTime[1]);
 }
 
 static inline float delayi_tick(DelayConfigI *config, float in, int channel) {

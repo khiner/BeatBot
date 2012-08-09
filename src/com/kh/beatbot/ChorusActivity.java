@@ -9,11 +9,11 @@ public class ChorusActivity extends EffectActivity {
 		EFFECT_NUM = 0;
 		NUM_PARAMS = 5;	
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, 'x', "Hz"));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, 'y', ""));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ' ', ""));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, ' ', "ms"));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ' ', ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, "Hz"));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, "ms"));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ""));
 		}
 	}
 

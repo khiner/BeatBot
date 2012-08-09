@@ -11,6 +11,7 @@ DelayConfigI *delayconfigi_create(float delay, float feedback, int maxSamples) {
 	p->rp[0] = p->rp[1] = p->wp[0] = p->wp[1] = 0;
 	delayconfigi_set(p, delay, feedback);
 	p->wet = 0.5f;
+	p->linkChannels = true;
 	return p;
 }
 
@@ -42,11 +43,18 @@ void Java_com_kh_beatbot_DelayActivity_setDelayOn(JNIEnv *env, jclass clazz,
 	delay->on = on;
 }
 
+void Java_com_kh_beatbot_DelayActivity_setDelayLinkChannels(JNIEnv *env, jclass clazz,
+		jint trackNum, jboolean linkChannels) {
+	Track *track = getTrack(env, clazz, trackNum);
+	DelayConfigI *config = (DelayConfigI *) track->effects[DELAY_ID].config;
+	config->linkChannels = linkChannels;
+	delayconfigi_updateDelayTime(config);
+}
+
 void Java_com_kh_beatbot_DelayActivity_setDelayParam(JNIEnv *env, jclass clazz,
 		jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(env, clazz, trackNum);
 	DelayConfigI *config = (DelayConfigI *) track->effects[DELAY_ID].config;
-	int channel;
 	if (paramNum == 0) { // delay time left
 		delayconfigi_setDelayTimeLeft(config, param);
 	} if (paramNum == 1) { // delay time right

@@ -12,6 +12,7 @@ import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.layout.EffectControlLayout;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
+import com.kh.beatbot.view.TronKnob;
 import com.kh.beatbot.view.TronSeekbar2d;
 
 public abstract class EffectActivity extends Activity implements LevelListener {
@@ -19,22 +20,19 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		public float level;
 		public boolean beatSync;
 		public boolean logScale;
-		public char    axis;
 		public String  unitString;
 		
 		public EffectParam() {
 			level = 0.5f;
 			beatSync = false;
 			logScale = false;
-			axis = ' ';
 			unitString = "";
 		}
 		
-		public EffectParam(boolean logScale, char axis, String unitString) {
+		public EffectParam(boolean logScale, String unitString) {
 			level = 0.5f;
 			this.beatSync = false;
 			this.logScale = logScale;
-			this.axis = axis;
 			this.unitString = unitString;
 		}
 	}
@@ -43,6 +41,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	protected int NUM_PARAMS;
 	protected int trackNum;
 	protected List<EffectControlLayout> paramControls  = new ArrayList<EffectControlLayout>();
+	protected TronKnob xParamKnob = null, yParamKnob = null; 
 	protected TronSeekbar2d level2d = null;
 
 	@Override
@@ -55,6 +54,8 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 			
 		((ToggleButton) findViewById(R.id.effectToggleOn))
 				.setChecked(GlobalVars.effectOn[trackNum][EFFECT_NUM]);
+		xParamKnob = paramControls.get(0).getKnob();
+		yParamKnob = paramControls.get(1).getKnob();
 		for (EffectControlLayout paramControl : paramControls)
 			setLevel(paramControl.getKnob(), 0.5f);
 	}
@@ -92,6 +93,15 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		paramControls.get(paramNum).setValueLabel(getParamValueString(paramNum));
 	}
 	
+	public void updateXYViewLevel() {
+		level2d.setViewLevelX(xParamKnob.getLevel());
+		level2d.setViewLevelY(yParamKnob.getLevel());
+	}
+	public String getParamValueString(int paramNum) {
+		EffectParam param = GlobalVars.params[trackNum][EFFECT_NUM].get(paramNum); 
+		return String.format("%.3f", param.level) + " " + param.unitString;
+	}
+	
 	public abstract int getEffectLayoutId();
 	public abstract void setEffectOnNative(boolean on);
 	public abstract float setParamNative(int paramNum, float level);
@@ -100,22 +110,6 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		boolean on = ((ToggleButton) view).isChecked();
 		GlobalVars.effectOn[trackNum][EFFECT_NUM] = on;
 		setEffectOnNative(on);
-	}
-
-	public String getParamValueString(int paramNum) {
-		EffectParam param = GlobalVars.params[trackNum][EFFECT_NUM].get(paramNum); 
-		return String.format("%.3f", param.level) + " " + param.unitString;
-	}
-	
-	@Override
-	public final void setLevel(LevelListenable levelListenable, float level) {
-		int paramNum = levelListenable.getId();
-		setParamLevel(paramNum, level);
-		if (paramNum == 0)
-			level2d.setViewLevelX(level);
-		else if (paramNum == 1)
-			level2d.setViewLevelY(level);
-		updateParamValueLabel(paramNum);
 	}
 	
 	private final void setParamLevel(int paramNum, float level) {
@@ -131,13 +125,19 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	}
 
 	@Override
+	public void setLevel(LevelListenable levelListenable, float level) {
+		int paramNum = levelListenable.getId();
+		setParamLevel(paramNum, level);
+		updateXYViewLevel();
+		updateParamValueLabel(paramNum);
+	}
+	
+	@Override
 	public void setLevel(LevelListenable level2d, float levelX, float levelY) {
-		setParamLevel(0, levelX);
-		setParamLevel(1, levelY);
-		paramControls.get(0).getKnob().setViewLevel(levelX);
-		paramControls.get(1).getKnob().setViewLevel(levelY);
-		updateParamValueLabel(0);
-		updateParamValueLabel(1);
+		xParamKnob.setLevel(levelX);
+		yParamKnob.setLevel(levelY);
+		updateParamValueLabel(xParamKnob.getId());
+		updateParamValueLabel(yParamKnob.getId());
 	}
 
 	@Override
