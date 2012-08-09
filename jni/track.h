@@ -12,6 +12,8 @@ typedef struct Track_ {
 	Generator *generator;
 	MidiEventNode *eventHead;
 
+	MidiEventNode *nextEventNode;
+
 	float volume, pan, pitch;
 
 	SLObjectItf outputPlayerObject;
@@ -35,6 +37,16 @@ static inline Track *getTrack(JNIEnv *env, jclass clazz, int trackNum) {
 	if (trackNum < 0 || trackNum >= NUM_TRACKS)
 		return NULL;
 	return &tracks[trackNum];
+}
+
+static inline void freeLinkedList(MidiEventNode *head) {
+	MidiEventNode *cur_ptr = head;
+	while (cur_ptr != NULL) {
+		free(cur_ptr->event); // free the event
+		MidiEventNode *prev_ptr = cur_ptr;
+		cur_ptr = cur_ptr->next;
+		free(prev_ptr); // free the entire Node
+	}
 }
 
 static inline void freeTracks() {

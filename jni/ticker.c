@@ -58,7 +58,7 @@ void Java_com_kh_beatbot_manager_MidiManager_reset(JNIEnv *env, jclass clazz) {
 	currTick = loopBeginTick - 1;
 }
 
-uint64_t currTimeNano(struct timespec *now) {
+static inline uint64_t currTimeNano(struct timespec *now) {
 	clock_gettime(CLOCK_MONOTONIC, now);
 	return now->tv_sec * 1000000000LL + now->tv_nsec;
 }
@@ -68,34 +68,32 @@ void Java_com_kh_beatbot_manager_MidiManager_startTicking(JNIEnv *env,
 	struct timespec now;
 
 	uint64_t startNano = currTimeNano(&now);
-
 	uint64_t nextTickNano = startNano + NSPT;
 
 	while (tracks[0].armed) {
 		if (currTimeNano(&now) < nextTickNano) {
 			continue;
 		}
-		currTick++;
-		if (currTick >= loopEndTick) {
-			stopAll();
-			//recordManager.notifyLoop();
-			currTick = loopBeginTick;
-		}
 		int i;
 		for (i = 0; i < NUM_TRACKS; i++) {
-			Track *track = &tracks[i];
-			MidiEventNode *midiEventHead = track->eventHead;
-			MidiEvent *currEvent = findEvent(midiEventHead, currTick);
-			if (currEvent == NULL)
+			MidiEventNode *nextEventNode = tracks[i].nextEventNode;
+			if (nextEventNode == NULL)
 				continue;
-			if (currTick == currEvent->offTick && !currEvent->muted) {
+			if (currTick == nextEventNode->event->offTick) {
 				stopTrack(i);
-			} else if (currTick == currEvent->onTick && !currEvent->muted) {
-				playTrack(i, currEvent->volume, currEvent->pan,
-						currEvent->pitch);
+				tracks[i].nextEventNode = nextEventNode->next == NULL ? tracks[i].eventHead : nextEventNode->next;
+			} else if (currTick == nextEventNode->event->onTick) {
+				playTrack(i, nextEventNode->event->volume, nextEventNode->event->pan,
+						nextEventNode->event->pitch);
 			}
 		}
 		// update time of next tick
 		nextTickNano += NSPT;
+		// update currTick
+		currTick++;
+		if (currTick >= loopEndTick) {
+			stopAll();
+			currTick = loopBeginTick;
+		}
 	}
 }

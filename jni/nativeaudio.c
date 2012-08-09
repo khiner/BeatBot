@@ -58,6 +58,7 @@ MidiEvent* initEvent(long onTick, long offTick, float volume, float pan,
 
 void initTrack(Track *track, AAsset *asset) {
 	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
+	track->nextEventNode = NULL;
   	track->currBufferFloat = (float **)malloc(2*sizeof(float *));
   	track->currBufferFloat[0] = (float *)calloc(BUFF_SIZE, sizeof(float));
   	track->currBufferFloat[1] = (float *)calloc(BUFF_SIZE, sizeof(float));
@@ -152,8 +153,8 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	//assert(SL_RESULT_SUCCESS == result);
 }
 
-MidiEvent *findEvent(MidiEventNode *head, long tick) {
-	MidiEventNode *cur_ptr = head;
+MidiEvent *findEvent(Track *track, long tick) {
+	MidiEventNode *cur_ptr = track->eventHead;
 	while (cur_ptr != NULL) {
 		if (cur_ptr->event->onTick == tick || cur_ptr->event->offTick == tick)
 			return cur_ptr->event;
@@ -162,51 +163,52 @@ MidiEvent *findEvent(MidiEventNode *head, long tick) {
 	return NULL;
 }
 
-//Adding a Node at the end of the list  
-MidiEventNode *addEvent(MidiEventNode *head, MidiEvent *event) {
+// add a midi event to the track's event linked list, inserting in order of onTick
+MidiEventNode *addEvent(Track *track, MidiEvent *event) {
 	MidiEventNode *temp = (MidiEventNode *) malloc(sizeof(MidiEventNode));
 	temp->event = event;
-	temp->next = head;
-	head = temp;
-	return head;
+	MidiEventNode *cur_ptr = track->eventHead;
+	while (cur_ptr != NULL) {
+		if (temp->event->onTick > cur_ptr->event->onTick &&
+				(cur_ptr->next == NULL || temp->event->onTick < cur_ptr->next->event->onTick)) {
+			temp->next = cur_ptr->next;
+			cur_ptr->next = temp;
+			return temp;
+		}
+		cur_ptr = cur_ptr->next;
+	}
+	// if we get here, the new event is before any other event, or is the first event
+	temp->next = track->eventHead;
+	track->eventHead = temp;
+	return temp;
 }
 
 // Deleting a node from List depending upon the data in the node.
-MidiEventNode *removeEvent(MidiEventNode *head, long onTick, bool muted) {
-	MidiEventNode *prev_ptr = NULL, *cur_ptr = head;
+MidiEventNode *removeEvent(Track *track, long onTick, bool muted) {
+	MidiEventNode *prev_ptr = NULL, *cur_ptr = track->eventHead;
 
 	while (cur_ptr != NULL) {
 		if ((muted && cur_ptr->event->muted)
 				|| cur_ptr->event->onTick == onTick) {
-			if (cur_ptr == head) {
-				head = cur_ptr->next;
+			if (cur_ptr == track->eventHead) {
+				track->eventHead = cur_ptr->next;
 				free(cur_ptr->event);
 				free(cur_ptr);
 				cur_ptr = NULL;
-				return head;
+				return track->eventHead;
 			} else {
 				prev_ptr->next = cur_ptr->next;
 				free(cur_ptr->event);
 				free(cur_ptr);
 				cur_ptr = NULL;
-				return head;
+				return track->eventHead;
 			}
 		} else {
 			prev_ptr = cur_ptr;
 			cur_ptr = cur_ptr->next;
 		}
 	}
-	return head;
-}
-
-void freeLinkedList(MidiEventNode *head) {
-	MidiEventNode *cur_ptr = head;
-	while (cur_ptr != NULL) {
-		free(cur_ptr->event); // free the event
-		MidiEventNode *prev_ptr = cur_ptr;
-		cur_ptr = cur_ptr->next;
-		free(prev_ptr); // free the entire Node
-	}
+	return track->eventHead;
 }
 
 void printLinkedList(MidiEventNode *head) {
@@ -488,20 +490,25 @@ void Java_com_kh_beatbot_manager_MidiManager_addMidiNote(JNIEnv *env,
 		jfloat pan, jfloat pitch) {
 	Track *track = getTrack(env, clazz, trackNum);
 	MidiEvent *event = initEvent(onTick, offTick, volume, pan, pitch);
-	track->eventHead = addEvent(track->eventHead, event);
+	bool empty = track->eventHead == NULL;
+
+	MidiEventNode *created = addEvent(track, event);
+	printLinkedList(track->eventHead);
+	if (empty)
+		track->nextEventNode = created;
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_deleteMidiNote(JNIEnv *env,
 		jclass clazz, jint trackNum, jlong tick) {
 	Track *track = getTrack(env, clazz, trackNum);
-	track->eventHead = removeEvent(track->eventHead, tick, false);
+	removeEvent(track, tick, false);
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_moveMidiNoteTicks(JNIEnv *env,
 		jclass clazz, jint trackNum, jlong prevOnTick, jlong newOnTick,
 		jlong newOffTick) {
 	Track *track = getTrack(env, clazz, trackNum);
-	MidiEvent *event = findEvent(track->eventHead, prevOnTick);
+	MidiEvent *event = findEvent(track, prevOnTick);
 	if (event != NULL) {
 		event->onTick = newOnTick;
 		event->offTick = newOffTick;
@@ -515,7 +522,7 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiNote(JNIEnv *env,
 		return;
 	Track *prevTrack = getTrack(env, clazz, trackNum);
 	Track *newTrack = getTrack(env, clazz, newTrackNum);
-	MidiEvent *event = findEvent(prevTrack->eventHead, tick);
+	MidiEvent *event = findEvent(prevTrack, tick);
 	if (event != NULL) {
 		float volume = event->volume;
 		float pan = event->pan;
@@ -525,16 +532,16 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiNote(JNIEnv *env,
 		if (prevTrack->playing && currTick >= onTick && currTick <= offTick) {
 			stopTrack(trackNum);
 		}
-		prevTrack->eventHead = removeEvent(prevTrack->eventHead, tick, false);
+		removeEvent(prevTrack, tick, false);
 		MidiEvent *newEvent = initEvent(onTick, offTick, volume, pan, pitch);
-		newTrack->eventHead = addEvent(newTrack->eventHead, newEvent);
+		addEvent(newTrack, newEvent);
 	}
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_setNoteMute(JNIEnv *env,
 		jclass clazz, jint trackNum, jlong tick, jboolean muted) {
 	Track *track = getTrack(env, clazz, trackNum);
-	MidiEvent *event = findEvent(track->eventHead, tick);
+	MidiEvent *event = findEvent(track, tick);
 	event->muted = muted;
 }
 
@@ -554,7 +561,7 @@ void Java_com_kh_beatbot_manager_MidiManager_clearMutedNotes(JNIEnv *env,
 void Java_com_kh_beatbot_midi_MidiNote_setVolume(JNIEnv *env, jclass clazz,
 		jint trackNum, jlong onTick, jfloat volume) {
 	Track *track = getTrack(env, clazz, trackNum);
-	MidiEvent *event = findEvent(track->eventHead, onTick);
+	MidiEvent *event = findEvent(track, onTick);
 	if (event != NULL) {
 		event->volume = volume;
 	}
@@ -563,7 +570,7 @@ void Java_com_kh_beatbot_midi_MidiNote_setVolume(JNIEnv *env, jclass clazz,
 void Java_com_kh_beatbot_midi_MidiNote_setPan(JNIEnv *env, jclass clazz,
 		jint trackNum, jlong onTick, jfloat pan) {
 	Track *track = getTrack(env, clazz, trackNum);
-	MidiEvent *event = findEvent(track->eventHead, onTick);
+	MidiEvent *event = findEvent(track, onTick);
 	if (event != NULL) {
 		event->pan = pan;
 	}
@@ -572,7 +579,7 @@ void Java_com_kh_beatbot_midi_MidiNote_setPan(JNIEnv *env, jclass clazz,
 void Java_com_kh_beatbot_midi_MidiNote_setPitch(JNIEnv *env, jclass clazz,
 		jint trackNum, jlong onTick, jfloat pitch) {
 	Track *track = getTrack(env, clazz, trackNum);
-	MidiEvent *event = findEvent(track->eventHead, onTick);
+	MidiEvent *event = findEvent(track, onTick);
 	if (event != NULL) {
 		event->pitch = pitch;
 	}
