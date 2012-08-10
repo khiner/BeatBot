@@ -33,12 +33,15 @@ jlong Java_com_kh_beatbot_manager_MidiManager_getLoopBeginTick(JNIEnv *env,
 
 void Java_com_kh_beatbot_manager_MidiManager_setLoopBeginTick(JNIEnv *env,
 		jclass clazz, jlong _loopBeginTick) {
-	if (_loopBeginTick >= loopEndTick)
+	if (_loopBeginTick >= loopEndTick || _loopBeginTick == loopBeginTick)
 		return;
 
 	loopBeginTick = _loopBeginTick;
 	if (!tracks[0].armed) // hack to see if we're playing
 		currTick = loopBeginTick;
+	int i;
+	for (i = 0; i < NUM_TRACKS; i++)
+		tracks[i].nextEventNode = findNextEvent(&tracks[i]);
 }
 
 jlong Java_com_kh_beatbot_manager_MidiManager_getLoopEndTick(JNIEnv *env,
@@ -48,10 +51,12 @@ jlong Java_com_kh_beatbot_manager_MidiManager_getLoopEndTick(JNIEnv *env,
 
 void Java_com_kh_beatbot_manager_MidiManager_setLoopEndTick(JNIEnv *env,
 		jclass clazz, jlong _loopEndTick) {
-	if (_loopEndTick <= loopBeginTick)
+	if (_loopEndTick <= loopBeginTick || _loopEndTick == loopEndTick)
 		return;
-
 	loopEndTick = _loopEndTick;
+	int i;
+	for (i = 0; i < NUM_TRACKS; i++)
+		tracks[i].nextEventNode = findNextEvent(&tracks[i]);
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_reset(JNIEnv *env, jclass clazz) {
@@ -81,7 +86,6 @@ void Java_com_kh_beatbot_manager_MidiManager_startTicking(JNIEnv *env,
 				continue;
 			if (currTick == nextEventNode->event->offTick) {
 				stopTrack(i);
-				tracks[i].nextEventNode = nextEventNode->next == NULL ? tracks[i].eventHead : nextEventNode->next;
 			} else if (currTick == nextEventNode->event->onTick) {
 				playTrack(i, nextEventNode->event->volume, nextEventNode->event->pan,
 						nextEventNode->event->pitch);

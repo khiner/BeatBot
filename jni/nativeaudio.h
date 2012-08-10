@@ -21,6 +21,7 @@ static SLDataFormat_PCM format_pcm = { SL_DATAFORMAT_PCM, 2,
 				| SL_SPEAKER_FRONT_RIGHT, SL_BYTEORDER_LITTLEENDIAN };
 
 void printLinkedList(MidiEventNode *head);
+MidiEventNode *findNextEvent(Track *track);
 void playTrack(int trackNum, float volume, float pan, float pitch);
 void stopTrack(int trackNum);
 void stopAll();

@@ -163,6 +163,23 @@ MidiEvent *findEvent(Track *track, long tick) {
 	return NULL;
 }
 
+MidiEventNode *findNextEvent(Track *track) {
+	if (track->eventHead == NULL)
+		return NULL; // no midi notes in this track
+   	// find event right after current tick
+   	MidiEventNode *ptr = track->eventHead;
+   	while (ptr->next != NULL && ptr->event->offTick <= currTick)
+   		ptr = ptr->next;
+   	if (ptr->event->offTick <= currTick || ptr->event->onTick >= loopEndTick) {
+   		// no events after curr tick, or next event after loop end.
+   		// return fist event after loop begin
+    	ptr = track->eventHead;
+    	while (ptr->next != NULL && ptr->event->onTick < loopBeginTick)
+    		ptr = ptr->next;
+    }
+    return ptr;
+}
+
 // add a midi event to the track's event linked list, inserting in order of onTick
 MidiEventNode *addEvent(Track *track, MidiEvent *event) {
 	MidiEventNode *temp = (MidiEventNode *) malloc(sizeof(MidiEventNode));
@@ -344,6 +361,8 @@ void stopTrack(int trackNum) {
 	track->playing = false;
 	wavfile_reset((WavFile *) track->generator->config);
 	((AdsrConfig *) track->effects[ADSR_ID].config)->active = false;
+	// update next track
+	track->nextEventNode = findNextEvent(track);
 }
 
 void stopAll() {
@@ -493,15 +512,14 @@ void Java_com_kh_beatbot_manager_MidiManager_addMidiNote(JNIEnv *env,
 	bool empty = track->eventHead == NULL;
 
 	MidiEventNode *created = addEvent(track, event);
-	printLinkedList(track->eventHead);
-	if (empty)
-		track->nextEventNode = created;
+	track->nextEventNode = findNextEvent(track);
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_deleteMidiNote(JNIEnv *env,
 		jclass clazz, jint trackNum, jlong tick) {
 	Track *track = getTrack(env, clazz, trackNum);
 	removeEvent(track, tick, false);
+	track->nextEventNode = findNextEvent(track);
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_moveMidiNoteTicks(JNIEnv *env,
@@ -513,6 +531,7 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiNoteTicks(JNIEnv *env,
 		event->onTick = newOnTick;
 		event->offTick = newOffTick;
 	}
+	track->nextEventNode = findNextEvent(track);
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_moveMidiNote(JNIEnv *env,
@@ -536,6 +555,8 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiNote(JNIEnv *env,
 		MidiEvent *newEvent = initEvent(onTick, offTick, volume, pan, pitch);
 		addEvent(newTrack, newEvent);
 	}
+	prevTrack->nextEventNode = findNextEvent(prevTrack);
+	newTrack->nextEventNode = findNextEvent(newTrack);
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_setNoteMute(JNIEnv *env,
@@ -552,6 +573,7 @@ void Java_com_kh_beatbot_manager_MidiManager_clearMutedNotes(JNIEnv *env,
 		Track *track = getTrack(env, clazz, i);
 		MidiEventNode *head = track->eventHead;
 		removeEvent(head, -1, true);
+		track->nextEventNode = findNextEvent(track);
 	}
 }
 
