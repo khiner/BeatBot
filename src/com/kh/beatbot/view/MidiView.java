@@ -669,7 +669,7 @@ public class MidiView extends SurfaceViewBase {
 					// if the selected note ends after the beginning
 					// of the other note, or if the selected note completely
 					// covers the other note, delete the covered note
-				} else if (selected.getOffTick() >= note.getOnTick()
+				} else if (!note.isSelected() && selected.getOffTick() >= note.getOnTick()
 						&& selected.getOffTick() <= note.getOffTick()
 						|| selected.getOnTick() <= note.getOnTick()
 						&& selected.getOffTick() >= note.getOffTick()) {
@@ -735,6 +735,8 @@ public class MidiView extends SurfaceViewBase {
 				- bean.getPinchLeftOffset();
 		long offTickDiff = currRightTick - touchedNote.getOffTick()
 				+ bean.getPinchRightOffset();
+		if (onTickDiff == 0 && offTickDiff == 0)
+			return;
 		for (MidiNote midiNote : midiManager.getSelectedNotes()) {
 			pinchNote(midiNote, onTickDiff, offTickDiff);
 		}
