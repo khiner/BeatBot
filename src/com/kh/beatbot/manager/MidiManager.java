@@ -274,17 +274,19 @@ public class MidiManager implements Parcelable {
 		moveMidiNote(midiNote.getNoteValue(), midiNote.getOnTick(), newNote);
 		midiNote.setNote(newNote);
 	}
-
+	
 	public void setNoteTicks(MidiNote midiNote, long onTick, long offTick,
-			boolean snapToGrid) {
+			boolean snapToGrid, boolean maintainNoteLength) {
 		if (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)
 			return;
 		if (offTick <= onTick)
 			offTick = onTick + 4;
 		if (snapToGrid) {
 			onTick = getNearestMajorTick(onTick, GlobalVars.currBeatDivision);
-			offTick = getNearestMajorTick(offTick, GlobalVars.currBeatDivision);
+			offTick = getNearestMajorTick(offTick, GlobalVars.currBeatDivision) - 1;				
 		}
+		if (maintainNoteLength)
+			offTick = midiNote.getOffTick() + onTick - midiNote.getOnTick();
 		// move native note ticks
 		moveMidiNoteTicks(midiNote.getNoteValue(), midiNote.getOnTick(),
 				onTick, offTick);
@@ -327,7 +329,7 @@ public class MidiManager implements Parcelable {
 		long diff = getNearestMajorTick(midiNote.getOnTick(), beatDivision)
 				- midiNote.getOnTick();
 		setNoteTicks(midiNote, midiNote.getOnTick() + diff,
-				midiNote.getOffTick() + diff, false);
+				midiNote.getOffTick() + diff, false, true);
 	}
 
 	public long getNearestMajorTick(long tick, float beatDivision) {

@@ -362,7 +362,7 @@ void stopTrack(int trackNum) {
 	wavfile_reset((WavFile *) track->generator->config);
 	((AdsrConfig *) track->effects[ADSR_ID].config)->active = false;
 	// update next track
-	track->nextEventNode = findNextEvent(track);
+	track->nextEventNode = findNextEvent(&track);
 }
 
 void stopAll() {

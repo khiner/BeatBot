@@ -565,12 +565,14 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void pinchNote(MidiNote midiNote, long onTickDiff, long offTickDiff) {
-		long newOnTick = midiNote.getOnTick() + onTickDiff;
+		long newOnTick = midiNote.getOnTick();
 		long newOffTick = midiNote.getOffTick();
+		if (midiNote.getOnTick() + onTickDiff >= 0)
+			newOnTick += onTickDiff;
 		if (midiNote.getOffTick() + offTickDiff <= tickWindow.getMaxTicks())
-			newOffTick = midiNote.getOffTick() + offTickDiff;
+			newOffTick += offTickDiff;
 		midiManager.setNoteTicks(midiNote, newOnTick, newOffTick,
-				bean.isSnapToGrid());
+				bean.isSnapToGrid(), false);
 		bean.setStateChanged(true);
 	}
 
@@ -710,6 +712,8 @@ public class MidiView extends SurfaceViewBase {
 		int noteDiff = currNote - touchedNote.getNoteValue();
 		long tickDiff = currTick - bean.getDragOffsetTick(pointerId)
 				- touchedNote.getOnTick();
+		if (noteDiff == 0 && tickDiff == 0)
+			return;
 		tickDiff = getAdjustedTickDiff(tickDiff, pointerId, null);
 		noteDiff = getAdjustedNoteDiff(noteDiff);
 		List<MidiNote> notesToDrag = dragAllSelected ? midiManager
@@ -717,12 +721,12 @@ public class MidiView extends SurfaceViewBase {
 		// dragging one note - drag all selected notes together
 		for (MidiNote midiNote : notesToDrag) {
 			midiManager.setNoteTicks(midiNote, midiNote.getOnTick() + tickDiff,
-					midiNote.getOffTick() + tickDiff, bean.isSnapToGrid());
+					midiNote.getOffTick() + tickDiff, bean.isSnapToGrid(), true);
 			midiManager.setNoteValue(midiNote, midiNote.getNoteValue()
 					+ noteDiff);
 		}
-		if (noteDiff > 0 || tickDiff > 0)
-			bean.setStateChanged(true);
+		bean.setStateChanged(true);
+		handleMidiCollisions();
 	}
 
 	private void pinchSelectedNotes(long currLeftTick, long currRightTick) {
@@ -734,6 +738,7 @@ public class MidiView extends SurfaceViewBase {
 		for (MidiNote midiNote : midiManager.getSelectedNotes()) {
 			pinchNote(midiNote, onTickDiff, offTickDiff);
 		}
+		handleMidiCollisions();
 	}
 
 	public void updateLoopMarkers(MotionEvent e) {
@@ -906,9 +911,6 @@ public class MidiView extends SurfaceViewBase {
 			// make room in the view window if we are dragging out of the view
 			tickWindow.updateView(midiManager.getLeftMostSelectedTick(),
 					midiManager.getRightMostSelectedTick());
-			// handle any overlapping notes (clip or delete notes as
-			// appropriate)
-			handleMidiCollisions();
 		} else { // no midi selected. scroll, zoom, or update select region
 			noMidiMove(e);
 		}

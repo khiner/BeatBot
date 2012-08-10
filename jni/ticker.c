@@ -75,11 +75,11 @@ void Java_com_kh_beatbot_manager_MidiManager_startTicking(JNIEnv *env,
 	uint64_t startNano = currTimeNano(&now);
 	uint64_t nextTickNano = startNano + NSPT;
 
+	int i;
 	while (tracks[0].armed) {
 		if (currTimeNano(&now) < nextTickNano) {
 			continue;
 		}
-		int i;
 		for (i = 0; i < NUM_TRACKS; i++) {
 			MidiEventNode *nextEventNode = tracks[i].nextEventNode;
 			if (nextEventNode == NULL)
