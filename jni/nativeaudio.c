@@ -167,7 +167,7 @@ MidiEventNode *findNextEvent(Track *track) {
 	if (track->eventHead == NULL)
 		return NULL; // no midi notes in this track
    	// find event right after current tick
-   	MidiEventNode *ptr = track->eventHead;
+	MidiEventNode *ptr = track->eventHead;
    	while (ptr->next != NULL && ptr->event->offTick <= currTick)
    		ptr = ptr->next;
    	if (ptr->event->offTick <= currTick || ptr->event->onTick >= loopEndTick) {
@@ -362,7 +362,7 @@ void stopTrack(int trackNum) {
 	wavfile_reset((WavFile *) track->generator->config);
 	((AdsrConfig *) track->effects[ADSR_ID].config)->active = false;
 	// update next track
-	track->nextEventNode = findNextEvent(&track);
+	track->nextEventNode = findNextEvent(track);
 }
 
 void stopAll() {
@@ -509,7 +509,6 @@ void Java_com_kh_beatbot_manager_MidiManager_addMidiNote(JNIEnv *env,
 		jfloat pan, jfloat pitch) {
 	Track *track = getTrack(env, clazz, trackNum);
 	MidiEvent *event = initEvent(onTick, offTick, volume, pan, pitch);
-	bool empty = track->eventHead == NULL;
 
 	MidiEventNode *created = addEvent(track, event);
 	track->nextEventNode = findNextEvent(track);
