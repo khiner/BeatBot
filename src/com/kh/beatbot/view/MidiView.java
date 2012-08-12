@@ -114,7 +114,7 @@ public class MidiView extends SurfaceViewBase {
 		if (viewState == State.LEVELS_VIEW)
 			bean.setBgColor(0);
 		else
-			bean.setBgColor(.3f);
+			bean.setBgColor(MidiViewBean.MIDI_VIEW_DEFAULT_BG_COLOR);
 	}
 
 	public void setLevelMode(LevelsViewHelper.LevelMode levelMode) {
@@ -284,7 +284,7 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void drawLoopSquare() {
-		float gray = 1.3f * bean.getBgColor();
+		float gray = bean.getBgColor();
 		float[] color = new float[] { gray, gray, gray, .6f };
 		drawTriangleStrip(loopSquareVB, color);
 	}

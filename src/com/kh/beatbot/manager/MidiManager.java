@@ -25,7 +25,6 @@ import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
 
 public class MidiManager implements Parcelable {
-
 	private static MidiManager singletonInstance = null;
 
 	private BeatBotActivity activity = null;

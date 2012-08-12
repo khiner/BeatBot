@@ -150,7 +150,6 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	// enqueue the buffer
 	result = (*bq)->Enqueue(bq, track->currBufferShort,
 			BUFF_SIZE * 2 * sizeof(short));
-	//assert(SL_RESULT_SUCCESS == result);
 }
 
 MidiEvent *findEvent(Track *track, long tick) {

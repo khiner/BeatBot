@@ -20,12 +20,17 @@ public class SampleWaveformView extends SurfaceViewBase {
 										   {0, 0, 1, .7f},
 										   {1, 0, 1, .7f}};
 	private final float[] LOOP_HIGHLIGHT_COLOR = {1, .64706f, 0, .4f};
-	private final float[] LOOP_MARKER_COLOR = {1, 1, 1, 1};
+	private final float[] LOOP_SELECTION_LINE_COLOR = {1, 1, 1, 1};
+	private final float[] LOOP_SELECTION_RECT_COLOR = {.9f, .9f, 1, .5f};
+			                  							
 	
-	private FloatBuffer waveformVB = null;
-	private FloatBuffer loopMarkerVB = null;
-	private FloatBuffer adsrPointVB = null;
-	private FloatBuffer[] adsrCurveVB = new FloatBuffer[4];
+	private final int DRAW_OFFSET = 15;
+	
+	private FloatBuffer waveformVb = null;
+	private FloatBuffer loopSelectionLineVb = null;
+	private FloatBuffer loopSelectionRectVbs[] = new FloatBuffer[2];
+	private FloatBuffer adsrPointVb = null;
+	private FloatBuffer[] adsrCurveVb = new FloatBuffer[4];
 	private PlaybackManager playbackManager = null;
 	
 	private final float[][] adsrPoints = new float[5][2];
@@ -86,7 +91,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		sampleLoopEnd = numSamples;
 		sampleWidth = numSamples;	
 		if (height != 0) {
-			waveformVB = WaveformHelper.floatsToFloatBuffer(samples, height, 0);
+			waveformVb = WaveformHelper.floatsToFloatBuffer(samples, height, 0);
 		}
 	}
 	
@@ -107,14 +112,14 @@ public class SampleWaveformView extends SurfaceViewBase {
 		adsrPoints[4][1] = 0;
 	}
 	
-	private void initAdsrVB() {
+	private void initAdsrVb() {
 		float[] pointVertices = new float[10];
 		for (int i = 0; i < 5; i++) {			
 			for (int j = 0; j < 2; j++) {
 				pointVertices[i*2 + j] = j == 1 ? height - adsrPoints[i][j]*height : adsrToX(adsrPoints[i][j]);
 			}
 		}
-		adsrPointVB = makeFloatBuffer(pointVertices);
+		adsrPointVb = makeFloatBuffer(pointVertices);
 		for (int i = 0; i < 4; i++) {
 			ArrayList<Float> curveVertices = new ArrayList<Float>();
 			curveVertices.addAll(makeExponentialCurveVertices(pointVertices[i*2],
@@ -123,8 +128,19 @@ public class SampleWaveformView extends SurfaceViewBase {
 			for (int j = 0; j < curveVertices.size(); j++) {
 				converted[j] = curveVertices.get(j);
 			}
-			adsrCurveVB[i] = makeFloatBuffer(converted);			
+			adsrCurveVb[i] = makeFloatBuffer(converted);			
 		}
+	}
+	
+	private void initLoopMarkerVb() {
+		float xLoopBegin = sampleToX(sampleLoopBegin);
+		float xLoopEnd = sampleToX(sampleLoopEnd);
+		float[] loopSelectionVertices = { xLoopBegin, 0, xLoopBegin, height,
+				xLoopEnd, height, xLoopEnd, 0 };
+
+		loopSelectionLineVb = makeFloatBuffer(loopSelectionVertices);
+		loopSelectionRectVbs[0] = makeRectFloatBuffer(xLoopBegin - DRAW_OFFSET, height, xLoopBegin + DRAW_OFFSET, 0);
+		loopSelectionRectVbs[1] = makeRectFloatBuffer(xLoopEnd - DRAW_OFFSET, height, xLoopEnd + DRAW_OFFSET, 0);
 	}
 	
 	private ArrayList<Float> makeExponentialCurveVertices(float x1, float y1, float x2, float y2) {
@@ -142,7 +158,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 	
 	private void drawWaveform() {
-		if (waveformVB == null)
+		if (waveformVb == null)
 			return;
 		float scale = (waveformWidth*WaveformHelper.DEFAULT_SPP)/((float)sampleWidth);
 		float translate = -sampleOffset/WaveformHelper.DEFAULT_SPP;
@@ -150,10 +166,10 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glLineWidth(10);
 		gl.glEnable(GL10.GL_LINE_SMOOTH);
 		gl.glColor4f(color[0], color[1], color[2], .9f);		
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVB);		
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVb);		
 		gl.glPushMatrix();
 		// scale drawing so the entire waveform exactly fits in the view
-		gl.glTranslatef(previewButtonWidth, 0, 0);
+		gl.glTranslatef(previewButtonWidth + DRAW_OFFSET, 0, 0);
 		gl.glScalef(scale, 1, 1);
 		gl.glTranslatef(translate, 0, 0);		
 		gl.glDrawArrays(GL10.GL_LINE_STRIP, (int)(sampleOffset/WaveformHelper.DEFAULT_SPP),
@@ -161,21 +177,23 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glPopMatrix();
 	}
 
-	private void drawLoopMarkers() {
-		if (loopMarkerVB == null)
+	private void drawLoopSelectionMarkers() {
+		if (loopSelectionLineVb == null)
 			return;
-		drawLines(loopMarkerVB, LOOP_MARKER_COLOR, 10, GL10.GL_LINES);
-		drawTriangleFan(loopMarkerVB, LOOP_HIGHLIGHT_COLOR);
+		drawLines(loopSelectionLineVb, LOOP_SELECTION_LINE_COLOR, 10, GL10.GL_LINES);
+		drawTriangleFan(loopSelectionLineVb, LOOP_HIGHLIGHT_COLOR);
+		drawTriangleStrip(loopSelectionRectVbs[0], LOOP_SELECTION_RECT_COLOR);
+		drawTriangleStrip(loopSelectionRectVbs[1], LOOP_SELECTION_RECT_COLOR);
 	}
 	
 	private void drawAdsr() {
 		if (!showAdsr) return;
 		gl.glColor4f(0, 1, 0, 1); // green points for now
 		gl.glPointSize(10);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, adsrPointVB);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, adsrPointVb);
 		gl.glDrawArrays(GL10.GL_POINTS, 0, 5);
-		for (int i = 0; i < adsrCurveVB.length; i++) {
-			drawLines(adsrCurveVB[i], ADSR_COLORS[i], 3, GL10.GL_LINE_STRIP);
+		for (int i = 0; i < adsrCurveVb.length; i++) {
+			drawLines(adsrCurveVb[i], ADSR_COLORS[i], 3, GL10.GL_LINE_STRIP);
 		}
 	}
 
@@ -183,30 +201,21 @@ public class SampleWaveformView extends SurfaceViewBase {
 	protected void init() {
 		// preview button is 80dpX80dp, but that is not the same as a height of '80'.  80dp will be the height		
 		previewButtonWidth = height;
-		waveformWidth = width - height;
+		waveformWidth = width - previewButtonWidth - DRAW_OFFSET * 2;
 		while (samples == null)
 			; // wait until we're sure the sample bytes have been set
-		waveformVB = WaveformHelper.floatsToFloatBuffer(samples, height, 0);
-		initLoopMarkerVB();
+		waveformVb = WaveformHelper.floatsToFloatBuffer(samples, height, 0);
+		initLoopMarkerVb();
 		initDefaultAdsrPoints();
-		initAdsrVB();
-	}
-
-	private void initLoopMarkerVB() {
-		float xLoopBegin = sampleToX(sampleLoopBegin);
-		float xLoopEnd = sampleToX(sampleLoopEnd);
-		float[] loopMarkerVertices = { xLoopBegin, 0, xLoopBegin, height,
-				xLoopEnd, height, xLoopEnd, 0 };
-
-		loopMarkerVB = makeFloatBuffer(loopMarkerVertices);
+		initAdsrVb();
 	}
 
 	private float sampleToX(float sample) {
-		return (sample - sampleOffset)*waveformWidth/sampleWidth + previewButtonWidth;
+		return (sample - sampleOffset)*waveformWidth/sampleWidth + previewButtonWidth + DRAW_OFFSET;
 	}
 
 	private float xToSample(float x) {
-		return (x - previewButtonWidth)*sampleWidth / waveformWidth + sampleOffset;
+		return (x - (previewButtonWidth + DRAW_OFFSET))*sampleWidth / waveformWidth + sampleOffset;
 	}
 
 	private float adsrToX(float adsr) {
@@ -265,15 +274,15 @@ public class SampleWaveformView extends SurfaceViewBase {
 		}
 		playbackManager.setLoopWindow(trackNum, (int)sampleLoopBegin, (int)sampleLoopEnd);
 		// update the display location of the loop markers
-		initLoopMarkerVB();
-		initAdsrVB();
+		initLoopMarkerVb();
+		initAdsrVb();
 	}
 	
 	@Override
 	protected void drawFrame() {
 		gl.glClearColor(.2f, .2f, .2f, 1);
 		drawWaveform();
-		drawLoopMarkers();
+		drawLoopSelectionMarkers();
 		if (showAdsr)
 			drawAdsr();
 	}
@@ -342,7 +351,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 				// ie.  adjusting either 2 or 3 will adjust both points' y values
 				if (i == 2)
 					adsrPoints[3][1] = adsrPoints[2][1];
-				initAdsrVB();
+				initAdsrVb();
 				setAdsrPoint(trackNum, i, adsrPoints[i][0], adsrPoints[i][1]);
 				return true;
 			}
@@ -374,8 +383,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 				sampleWidth = numSamples - sampleOffset;
 		}
 		// update UI
-		initLoopMarkerVB();
-		initAdsrVB();
+		initLoopMarkerVb();
+		initAdsrVb();
 		// update sample playback.
 		playbackManager.setLoopWindow(trackNum, (int)sampleLoopBegin, (int)sampleLoopEnd);
 		return true;

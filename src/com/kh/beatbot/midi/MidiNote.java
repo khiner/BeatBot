@@ -5,7 +5,7 @@ import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.view.helper.LevelsViewHelper;
 
-public class MidiNote {
+public class MidiNote implements Comparable<MidiNote> {
 	NoteOn noteOn;
 	NoteOff noteOff;
 	boolean selected = false;
@@ -173,5 +173,10 @@ public class MidiNote {
 	
 	public native void setVolume(int track, long onTick, float volume);
 	public native void setPan(int track, long onTick, float pan);
-	public native void setPitch(int track, long onTick, float pitch);	
+	public native void setPitch(int track, long onTick, float pitch);
+
+	@Override
+	public int compareTo(MidiNote otherNote) {
+		return (int)(otherNote.getOnTick() - this.getOnTick());
+	}	
 }

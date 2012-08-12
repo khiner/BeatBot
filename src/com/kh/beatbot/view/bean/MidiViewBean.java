@@ -11,6 +11,8 @@ public class MidiViewBean {
 	// time (in millis) between taps before handling as a double-tap
 	public final static long DOUBLE_TAP_TIME = 300;
 
+	public final static float MIDI_VIEW_DEFAULT_BG_COLOR = .5f;
+	
 	// RGB color to draw main midi grid lines
 	public final static float[] GRID_LINE_COLOR = {0, 0, 0, 1};
 		
@@ -24,10 +26,8 @@ public class MidiViewBean {
 	
 	// RGB color for volume bars
 	public final static float[] VOLUME_COLOR = {.412f, .788f, 1, 1};
-	
 	// RGB color for pan bars	
 	public final static float[] PAN_COLOR = {1, .788f, .392f, 1};
-	
 	// RGB color for pitch bars
 	public final static float[] PITCH_COLOR = {.443f, 1, .533f, 1};
 
@@ -47,7 +47,7 @@ public class MidiViewBean {
 	private float levelsHeight;
 	// the main background color for the view.
 	// this color can change when transitioning to/from LEVEL_VIEW
-	private float bgColor = .5f;
+	private float bgColor = MIDI_VIEW_DEFAULT_BG_COLOR;
 
 	private long dragOffsetTick[] = new long[5];
 
