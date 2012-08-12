@@ -15,22 +15,15 @@ import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class LevelsViewHelper {
-	private class DragLine {
-		private float m;
-		private float b;
-		private long leftTick, rightTick;
-		private float leftLevel, rightLevel;
+	private static class DragLine {
+		private static float m = 0;
+		private static float b = 0;
+		private static long leftTick = Long.MIN_VALUE;
+		private static long rightTick = Long.MAX_VALUE;
+		private static float leftLevel = 0;
+		private static float rightLevel = 0;
 
-		public DragLine() {
-			this.m = 0;
-			this.b = 0;
-			this.leftTick = Long.MIN_VALUE;
-			this.rightTick = Long.MAX_VALUE;
-			this.leftLevel = 0;
-			this.leftTick = 0;
-		}
-
-		public float getLevel(long tick) {
+		public static float getLevel(long tick) {
 			if (tick < leftTick)
 				return leftLevel;
 			if (tick > rightTick)
@@ -45,53 +38,51 @@ public class LevelsViewHelper {
 	};
 
 	// Level Bar Vertex Buffers
-	private FloatBuffer levelBarsVB = null;
-	private FloatBuffer selectedLevelBarsVB = null;
+	private static FloatBuffer levelBarsVB = null;
+	private static FloatBuffer selectedLevelBarsVB = null;
 
-	private MidiView midiView;
-	private MidiViewBean bean;
-	private MidiManager midiManager;
-	private GL10 gl;
-
-	DragLine dragLine = new DragLine();
+	private static MidiView midiView;
+	private static MidiViewBean bean;
+	private static MidiManager midiManager;
+	private static GL10 gl;
 
 	// map of pointerIds to the notes they are selecting
-	private Map<Integer, MidiNote> touchedLevels = new HashMap<Integer, MidiNote>();
+	private static Map<Integer, MidiNote> touchedLevels = new HashMap<Integer, MidiNote>();
 
 	// map Midi Note to the offset of their level relative to the touched
 	// level(s)
-	private Map<MidiNote, Float> levelOffsets = new HashMap<MidiNote, Float>();
+	private static Map<MidiNote, Float> levelOffsets = new HashMap<MidiNote, Float>();
 
 	// last single-tapped level-note
-	private MidiNote tappedLevelNote = null;
+	private static MidiNote tappedLevelNote = null;
 
-	private LevelMode levelMode = LevelMode.VOLUME;
+	private static LevelMode currLevelMode = LevelMode.VOLUME;
 
-	public LevelsViewHelper(MidiView midiView) {
-		this.midiView = midiView;
-		this.bean = midiView.getBean();
-		this.midiManager = midiView.getMidiManager();
-		this.gl = midiView.getGL10();
+	public static void initHelper(MidiView _midiView) {
+		midiView = _midiView;
+		bean = midiView.getBean();
+		midiManager = midiView.getMidiManager();
+		gl = midiView.getGL10();
 	}
 
-	public void setLevelMode(LevelMode levelMode) {
-		this.levelMode = levelMode;
+	public static void setLevelMode(LevelMode levelMode) {
+		currLevelMode = levelMode;
 	}
 
-	public void clearTouchedLevels() {
+	public static void clearTouchedLevels() {
 		touchedLevels.clear();
 	}
 
-	public MidiNote getTouchedLevel(int id) {
+	public static MidiNote getTouchedLevel(int id) {
 		return touchedLevels.get(id);
 	}
 	
-	private void initLevelBarsVB() {
+	private static void initLevelBarsVB() {
 		ArrayList<Float> selectedLevelBars = new ArrayList<Float>();
 		for (MidiNote levelSelected : midiManager.getLevelSelectedNotes()) {
 			float x = midiView.tickToX(levelSelected.getOnTick());
 			selectedLevelBars.add(x);
-			selectedLevelBars.add(levelToY(levelSelected.getLevel(levelMode)));
+			selectedLevelBars.add(levelToY(levelSelected.getLevel(currLevelMode)));
 			selectedLevelBars.add(x);
 			selectedLevelBars.add(bean.getHeight());
 		}
@@ -100,7 +91,7 @@ public class LevelsViewHelper {
 			float x = midiView.tickToX(levelViewSelected.getOnTick());
 			if (!levelViewSelected.isLevelSelected()) {
 				levelBars.add(x);
-				levelBars.add(levelToY(levelViewSelected.getLevel(levelMode)));
+				levelBars.add(levelToY(levelViewSelected.getLevel(currLevelMode)));
 				levelBars.add(x);
 				levelBars.add(bean.getHeight());
 			}
@@ -115,18 +106,18 @@ public class LevelsViewHelper {
 		selectedLevelBarsVB = MidiView.makeFloatBuffer(selectedLevelBarsAry);
 	}
 
-	private void drawLevels() {
+	private static void drawLevels() {
 		drawLevels(true);
 		drawLevels(false);
 	}
 
-	private void drawLevels(boolean selected) {
+	private static void drawLevels(boolean selected) {
 		FloatBuffer vertexBuffer = selected ? selectedLevelBarsVB : levelBarsVB;
 		float[] color = null;
 		if (selected) {
 			color = MidiViewBean.LEVEL_SELECTED_COLOR;
 		} else {
-			switch (levelMode) {
+			switch (currLevelMode) {
 			case VOLUME:
 				color = MidiViewBean.VOLUME_COLOR;
 				break;
@@ -168,9 +159,9 @@ public class LevelsViewHelper {
 		bean.incrementAnimateCount();
 	}
 
-	public void selectLevel(float x, float y, int pointerId) {
+	public static void selectLevel(float x, float y, int pointerId) {
 		for (MidiNote levelViewSelected : midiManager.getLevelViewSelectedNotes()) {
-			float velocityY = levelToY(levelViewSelected.getLevel(levelMode));
+			float velocityY = levelToY(levelViewSelected.getLevel(currLevelMode));
 			if (Math.abs(midiView.tickToX(levelViewSelected.getOnTick()) - x) < 35
 					&& Math.abs(velocityY - y) < 35) {
 				// If this is the only touched level, and it hasn't yet
@@ -188,7 +179,7 @@ public class LevelsViewHelper {
 		}
 	}
 
-	public void selectLevelNote(float x, float y) {
+	public static void selectLevelNote(float x, float y) {
 		long tick = midiView.xToTick(x);
 		long note = midiView.yToNote(y);
 
@@ -202,7 +193,7 @@ public class LevelsViewHelper {
 		}
 	}
 
-	private void addToLevelViewSelected(MidiNote midiNote) {
+	private static void addToLevelViewSelected(MidiNote midiNote) {
 		for (MidiNote overlapping : getOverlapping(midiNote)) {
 			overlapping.setLevelViewSelected(false);
 			overlapping.setLevelSelected(false);
@@ -210,7 +201,7 @@ public class LevelsViewHelper {
 		midiNote.setLevelViewSelected(true);
 	}
 
-	private ArrayList<MidiNote> getOverlapping(MidiNote midiNote) {
+	private static ArrayList<MidiNote> getOverlapping(MidiNote midiNote) {
 		ArrayList<MidiNote> overlapping = new ArrayList<MidiNote>();
 		for (MidiNote otherNote : midiManager.getMidiNotes()) {
 			if (!otherNote.equals(midiNote)
@@ -220,10 +211,10 @@ public class LevelsViewHelper {
 		return overlapping;
 	}
 
-	public void selectRegion(long leftTick, long rightTick, float topY,
+	public static void selectRegion(long leftTick, long rightTick, float topY,
 			float bottomY) {
 		for (MidiNote levelViewSelected : midiManager.getLevelViewSelectedNotes()) {
-			float levelY = levelToY(levelViewSelected.getLevel(levelMode));
+			float levelY = levelToY(levelViewSelected.getLevel(currLevelMode));
 			if (leftTick < levelViewSelected.getOnTick()
 					&& rightTick > levelViewSelected.getOnTick() && topY < levelY
 					&& bottomY > levelY)
@@ -233,14 +224,14 @@ public class LevelsViewHelper {
 		}
 	}
 
-	private void updateDragLine() {
+	private static void updateDragLine() {
 		int touchedSize = touchedLevels.values().size();
 		if (touchedSize == 1) {
-			dragLine.m = 0;
+			DragLine.m = 0;
 			MidiNote touched = (MidiNote) touchedLevels.values().toArray()[0];
-			dragLine.b = touched.getLevel(levelMode);
-			dragLine.leftTick = Long.MIN_VALUE;
-			dragLine.rightTick = Long.MAX_VALUE;
+			DragLine.b = touched.getLevel(currLevelMode);
+			DragLine.leftTick = Long.MIN_VALUE;
+			DragLine.rightTick = Long.MAX_VALUE;
 		} else if (touchedSize == 2) {
 			MidiNote leftLevel = touchedLevels.get(0).getOnTick() < touchedLevels
 					.get(1).getOnTick() ? touchedLevels.get(0) : touchedLevels
@@ -248,60 +239,60 @@ public class LevelsViewHelper {
 			MidiNote rightLevel = touchedLevels.get(0).getOnTick() < touchedLevels
 					.get(1).getOnTick() ? touchedLevels.get(1) : touchedLevels
 					.get(0);
-			dragLine.m = (rightLevel.getLevel(levelMode) - leftLevel
-					.getLevel(levelMode))
+			DragLine.m = (rightLevel.getLevel(currLevelMode) - leftLevel
+					.getLevel(currLevelMode))
 					/ (rightLevel.getOnTick() - leftLevel.getOnTick());
-			dragLine.b = (leftLevel.getLevel(levelMode) - dragLine.m
+			DragLine.b = (leftLevel.getLevel(currLevelMode) - DragLine.m
 					* leftLevel.getOnTick());
-			dragLine.leftTick = leftLevel.getOnTick();
-			dragLine.rightTick = rightLevel.getOnTick();
-			dragLine.leftLevel = leftLevel.getLevel(levelMode);
-			dragLine.rightLevel = rightLevel.getLevel(levelMode);
+			DragLine.leftTick = leftLevel.getOnTick();
+			DragLine.rightTick = rightLevel.getOnTick();
+			DragLine.leftLevel = leftLevel.getLevel(currLevelMode);
+			DragLine.rightLevel = rightLevel.getLevel(currLevelMode);
 		}
 	}
 
-	private void updateLevelOffsets() {
+	private static void updateLevelOffsets() {
 		levelOffsets.clear();
 		updateDragLine();
 		for (MidiNote levelSelected : midiManager.getLevelSelectedNotes()) {
 			levelOffsets.put(
 					levelSelected,
-					levelSelected.getLevel(levelMode)
-							- dragLine.getLevel(levelSelected.getOnTick()));
+					levelSelected.getLevel(currLevelMode)
+							- DragLine.getLevel(levelSelected.getOnTick()));
 		}
 	}
 
-	private void setLevelsToDragLine() {
+	private static void setLevelsToDragLine() {
 		for (MidiNote levelSelected : midiManager.getLevelSelectedNotes()) {
 			if (levelOffsets.get(levelSelected) != null) {
-				levelSelected.setLevel(levelMode,
-						dragLine.getLevel(levelSelected.getOnTick())
+				levelSelected.setLevel(currLevelMode,
+						DragLine.getLevel(levelSelected.getOnTick())
 								+ levelOffsets.get(levelSelected));
 			}
 		}
 	}
 
-	private void deselectAllLevelViews() {
+	private static void deselectAllLevelViews() {
 		for (MidiNote midiNote : midiManager.getMidiNotes()) {
 			midiNote.setLevelViewSelected(false);
 		}
 	}
 
-	private void deselectAllLevels() {
+	private static void deselectAllLevels() {
 		for (MidiNote midiNote : midiManager.getMidiNotes()) {
 			midiNote.setLevelSelected(false);
 		}
 	}
 
 	// add all non-overlapping notes to selectedLevelNotes
-	public void updateSelectedLevelNotes() {
+	public static void updateSelectedLevelNotes() {
 		deselectAllLevelViews();
 		for (MidiNote midiNote : midiManager.getMidiNotes()) {
 			addToLevelViewSelected(midiNote);
 		}
 	}
 
-	private float[] calculateColor(MidiNote midiNote) {
+	private static float[] calculateColor(MidiNote midiNote) {
 		float[] color = new float[4];
 		boolean selected = midiNote.isSelected();
 		boolean levelViewSelected = midiNote.isLevelViewSelected();
@@ -328,7 +319,7 @@ public class LevelsViewHelper {
 		return color;
 	}
 
-	private void drawAllMidiNotes() {
+	private static void drawAllMidiNotes() {
 		// not using for-each to avoid concurrent modification
 		for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
 			if (midiManager.getMidiNotes().size() <= i)
@@ -340,23 +331,23 @@ public class LevelsViewHelper {
 		}
 	}
 
-	public void drawFrame() {
+	public static void drawFrame() {
 		initLevelBarsVB();
 		drawAllMidiNotes();
 		drawLevels();
 	}
 
-	private float levelToY(float level) {
+	private static float levelToY(float level) {
 		return bean.getHeight() - MidiViewBean.LEVEL_POINT_SIZE / 2 - level
 				* bean.getLevelsHeight();
 	}
 
-	private float yToLevel(float y) {
+	private static float yToLevel(float y) {
 		return (bean.getHeight() - MidiViewBean.LEVEL_POINT_SIZE / 2 - y)
 				/ bean.getLevelsHeight();
 	}
 
-	public void doubleTap() {
+	public static void doubleTap() {
 		if (tappedLevelNote == null)
 			return;
 		tappedLevelNote.setLevelSelected(false);
@@ -367,22 +358,22 @@ public class LevelsViewHelper {
 		bean.setStateChanged(true);
 	}
 
-	public void resetSelected() {
+	public static void resetSelected() {
 		deselectAllLevels();
 		updateSelectedLevelNotes();
 	}
 
-	public void handleActionPointerUp(MotionEvent e, int id) {
+	public static void handleActionPointerUp(MotionEvent e, int id) {
 		touchedLevels.remove(id);
 		updateLevelOffsets();
 	}
 
-	public void handleActionMove(MotionEvent e) {
+	public static void handleActionMove(MotionEvent e) {
 		if (!touchedLevels.isEmpty()) {
 			for (int i = 0; i < e.getPointerCount(); i++) {
 				MidiNote touched = touchedLevels.get(e.getPointerId(i));
 				if (touched != null) {
-					touched.setLevel(levelMode, yToLevel(e.getY(i)));
+					touched.setLevel(currLevelMode, yToLevel(e.getY(i)));
 				}
 			}
 			updateDragLine();

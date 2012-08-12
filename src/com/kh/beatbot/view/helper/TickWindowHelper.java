@@ -22,16 +22,15 @@ public class TickWindowHelper {
 	public static long getNumTicks() {
 		return currNumTicks;
 	}
-	
+
 	public static long getTickOffset() {
 		return currTickOffset;
 	}
-	
+
 	public static void zoom(float leftX, float rightX) {
 		long ZLAT = viewBean.getZoomLeftAnchorTick();
 		long ZRAT = viewBean.getZoomRightAnchorTick();
-		long newTOS = (long) ((ZRAT * leftX - ZLAT
-				* rightX) / (leftX - rightX));
+		long newTOS = (long) ((ZRAT * leftX - ZLAT * rightX) / (leftX - rightX));
 		long newNumTicks = (long) ((ZLAT - newTOS) * viewBean.getWidth() / leftX);
 
 		if (newTOS < 0 && newTOS + newNumTicks > MAX_TICKS
@@ -46,7 +45,8 @@ public class TickWindowHelper {
 			currNumTicks = (long) (ZRAT * viewBean.getWidth() / rightX);
 			currNumTicks = currNumTicks > MAX_TICKS ? MAX_TICKS : currNumTicks;
 		} else if (newTOS + newNumTicks > MAX_TICKS) {
-			currNumTicks = (long) ((ZLAT - MAX_TICKS) / (leftX / viewBean.getWidth() - 1));
+			currNumTicks = (long) ((ZLAT - MAX_TICKS) / (leftX
+					/ viewBean.getWidth() - 1));
 			currTickOffset = MAX_TICKS - currNumTicks;
 		}
 		updateGranularity();
@@ -61,7 +61,8 @@ public class TickWindowHelper {
 	}
 
 	public static long scroll(float x) {
-		long newTickOffset = viewBean.getScrollAnchorTick() - (long) ((currNumTicks * x) / viewBean.getWidth());
+		long newTickOffset = viewBean.getScrollAnchorTick()
+				- (long) ((currNumTicks * x) / viewBean.getWidth());
 		long diff = newTickOffset - currTickOffset;
 		setTickOffset(newTickOffset);
 		return diff;
@@ -69,7 +70,8 @@ public class TickWindowHelper {
 
 	public static void updateGranularity() {
 		// x-coord width of one eight note
-		float spacing = ((float) MidiManager.TICKS_IN_ONE_MEASURE * viewBean.getWidth()) / (currNumTicks * 8);
+		float spacing = ((float) MidiManager.TICKS_IN_ONE_MEASURE * viewBean
+				.getWidth()) / (currNumTicks * 8);
 		// after algebra, this condition says: if more than maxLines will
 		// display, reduce the granularity by one half, else if less than
 		// maxLines will display, increase the granularity by one half
@@ -77,8 +79,8 @@ public class TickWindowHelper {
 		// maxLinesDisplayed) at all times
 		if ((MAX_LINES_DISPLAYED * spacing) / granularity < viewBean.getWidth())
 			granularity /= 2;
-		else if ((MIN_LINES_DISPLAYED * spacing) / granularity > viewBean.getWidth()
-				&& granularity < 4)
+		else if ((MIN_LINES_DISPLAYED * spacing) / granularity > viewBean
+				.getWidth() && granularity < 4)
 			granularity *= 2;
 		GlobalVars.currBeatDivision = granularity * 2;
 	}
@@ -106,7 +108,7 @@ public class TickWindowHelper {
 		// note
 		return granularity * 2;
 	}
-	
+
 	public static long getMajorTickSpacing() {
 		return (long) (MIN_TICKS / granularity);
 	}
@@ -125,15 +127,18 @@ public class TickWindowHelper {
 	public static void updateView(long leftTick, long rightTick) {
 		// if we are dragging out of view, scroll appropriately
 		// if the right is out but the left is in, just scroll
-		if (leftTick < currTickOffset && rightTick < currTickOffset + currNumTicks) {
+		if (leftTick < currTickOffset
+				&& rightTick < currTickOffset + currNumTicks) {
 			setTickOffset(leftTick);
 
 			// if the left is out but the right is in, just scroll
-		} else if (rightTick > currTickOffset + currNumTicks && leftTick > currTickOffset) {
+		} else if (rightTick > currTickOffset + currNumTicks
+				&& leftTick > currTickOffset) {
 			setTickOffset(rightTick - currNumTicks);
 
 			// if both left and right are out of view,
-		} else if (leftTick <= currTickOffset && rightTick >= currTickOffset + currNumTicks) {
+		} else if (leftTick <= currTickOffset
+				&& rightTick >= currTickOffset + currNumTicks) {
 			setTickOffset(leftTick);
 			setNumTicks(rightTick - leftTick);
 		}
