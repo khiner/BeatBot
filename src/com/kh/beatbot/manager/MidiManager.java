@@ -456,7 +456,7 @@ public class MidiManager implements Parcelable {
 		out.writeIntArray(new int[] { 4, 4, TimeSignature.DEFAULT_METER,
 				TimeSignature.DEFAULT_DIVISION });
 		out.writeFloat(tempo.getBpm());
-		out.writeLong(Tempo.DEFAULT_MPQN / MidiFile.DEFAULT_RESOLUTION);
+		out.writeLong(Tempo.DEFAULT_MPQN / RESOLUTION);
 		// on-tick, off-tick, note, and velocity for each midiNote
 		float[] noteInfo = new float[midiNotes.size() * 6];
 		for (int i = 0; i < midiNotes.size(); i++) {

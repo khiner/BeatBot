@@ -32,7 +32,7 @@ public class MidiFile {
 	public static final int HEADER_SIZE = 14;
 	public static final byte[] IDENTIFIER = { 'M', 'T', 'h', 'd' };
 	
-	public static final int DEFAULT_RESOLUTION = 480;
+	public static final int DEFAULT_RESOLUTION = 320;
 	
 	private int mType;
 	private int mTrackCount;

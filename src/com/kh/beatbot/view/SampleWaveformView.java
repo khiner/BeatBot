@@ -22,9 +22,9 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private final float[] LOOP_HIGHLIGHT_COLOR = {1, .64706f, 0, .4f};
 	private final float[] LOOP_SELECTION_LINE_COLOR = {1, 1, 1, 1};
 	private final float[] LOOP_SELECTION_RECT_COLOR = {.9f, .9f, 1, .5f};
-			                  							
 	
-	private final int DRAW_OFFSET = 15;
+	// min distance for pointer to select loop markers
+	private final int SNAP_DIST = 32;
 	
 	private FloatBuffer waveformVb = null;
 	private FloatBuffer loopSelectionLineVb = null;
@@ -39,9 +39,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private int[] adsrSelected = new int[] {-1, -1, -1, -1, -1};
 	
 	private boolean showAdsr = false; // show ADSR points?
-	
-	// min distance for pointer to select loop markers
-	private final int SNAP_DIST = 35;
 	
 	private final int MIN_LOOP_WINDOW = 32;
 	// the left of this view is a preview button
@@ -139,8 +136,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 				xLoopEnd, height, xLoopEnd, 0 };
 
 		loopSelectionLineVb = makeFloatBuffer(loopSelectionVertices);
-		loopSelectionRectVbs[0] = makeRectFloatBuffer(xLoopBegin - DRAW_OFFSET, height, xLoopBegin + DRAW_OFFSET, 0);
-		loopSelectionRectVbs[1] = makeRectFloatBuffer(xLoopEnd - DRAW_OFFSET, height, xLoopEnd + DRAW_OFFSET, 0);
+		loopSelectionRectVbs[0] = makeRectFloatBuffer(xLoopBegin - SNAP_DIST / 2, height, xLoopBegin + SNAP_DIST / 2, 0);
+		loopSelectionRectVbs[1] = makeRectFloatBuffer(xLoopEnd - SNAP_DIST / 2, height, xLoopEnd + SNAP_DIST / 2, 0);
 	}
 	
 	private ArrayList<Float> makeExponentialCurveVertices(float x1, float y1, float x2, float y2) {
@@ -169,7 +166,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVb);		
 		gl.glPushMatrix();
 		// scale drawing so the entire waveform exactly fits in the view
-		gl.glTranslatef(previewButtonWidth + DRAW_OFFSET, 0, 0);
+		gl.glTranslatef(previewButtonWidth + SNAP_DIST / 2, 0, 0);
 		gl.glScalef(scale, 1, 1);
 		gl.glTranslatef(translate, 0, 0);		
 		gl.glDrawArrays(GL10.GL_LINE_STRIP, (int)(sampleOffset/WaveformHelper.DEFAULT_SPP),
@@ -201,7 +198,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	protected void init() {
 		// preview button is 80dpX80dp, but that is not the same as a height of '80'.  80dp will be the height		
 		previewButtonWidth = height;
-		waveformWidth = width - previewButtonWidth - DRAW_OFFSET * 2;
+		waveformWidth = width - previewButtonWidth - SNAP_DIST;
 		while (samples == null)
 			; // wait until we're sure the sample bytes have been set
 		waveformVb = WaveformHelper.floatsToFloatBuffer(samples, height, 0);
@@ -211,11 +208,11 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	private float sampleToX(float sample) {
-		return (sample - sampleOffset)*waveformWidth/sampleWidth + previewButtonWidth + DRAW_OFFSET;
+		return (sample - sampleOffset)*waveformWidth/sampleWidth + previewButtonWidth + SNAP_DIST / 2;
 	}
 
 	private float xToSample(float x) {
-		return (x - (previewButtonWidth + DRAW_OFFSET))*sampleWidth / waveformWidth + sampleOffset;
+		return (x - previewButtonWidth - SNAP_DIST / 2)*sampleWidth / waveformWidth + sampleOffset;
 	}
 
 	private float adsrToX(float adsr) {
@@ -232,7 +229,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	
 	private void updateSampleOffset(float scrollX) {
 		// set sampleOffset such that the scroll anchor sample stays under scrollX
-		float newSampleOffset = scrollAnchorSample - (scrollX - previewButtonWidth)*sampleWidth/waveformWidth;
+		float newSampleOffset = scrollAnchorSample - xToSample(scrollX) + sampleOffset;
 		sampleOffset = newSampleOffset < 0 ?
 				0 : (newSampleOffset + sampleWidth > numSamples ?
 						numSamples - sampleWidth : newSampleOffset);
@@ -242,7 +239,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		// set sampleOffset and sampleWidth such that the zoom
 		// anchor samples stay under x1 and x2
 		float newSampleWidth = waveformWidth*(zoomRightAnchorSample - zoomLeftAnchorSample)/(x2 - x1);
-		float newSampleOffset = zoomRightAnchorSample - newSampleWidth*(x2 - previewButtonWidth)/waveformWidth;
+		float newSampleOffset = zoomRightAnchorSample - newSampleWidth*(x2 - previewButtonWidth - SNAP_DIST / 2)/waveformWidth;
 		if (newSampleOffset < 0 && newSampleOffset + newSampleWidth > numSamples ||
 				newSampleWidth < MIN_LOOP_WINDOW) {
 			return;
@@ -477,7 +474,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	
 	@Override
 	protected void handleActionPointerDown(MotionEvent e, int id, float x, float y) {
-		if (x >previewButtonWidth)
+		if (x > previewButtonWidth)
 			handleWaveActionPointerDown(id, x, y);
 		else
 			handlePreviewActionPointerDown(id);
