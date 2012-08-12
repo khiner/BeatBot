@@ -60,7 +60,6 @@ public class MidiViewBean {
 
 	private int scrollPointerId = -1;
 	private long scrollAnchorTick = 0;
-	private long scrollVelocity = 0;
 
 	private boolean selectRegion = false;
 	private long selectRegionStartTick = -1;
@@ -76,10 +75,6 @@ public class MidiViewBean {
 
 	// true when a note is being "pinched" (two-fingers touching the note)
 	private boolean pinch = false;
-
-	private boolean scrolling = false;
-	private long scrollViewStartTime = 0;
-	private long scrollViewEndTime = Long.MAX_VALUE;
 
 	private int[] loopPointerIds = {-1, -1, -1};
 	private float loopSelectionOffset = 0;
@@ -229,14 +224,6 @@ public class MidiViewBean {
 		this.scrollAnchorTick = scrollAnchorTick;
 	}
 
-	public long getScrollVelocity() {
-		return scrollVelocity;
-	}
-
-	public void setScrollVelocity(long scrollVelocity) {
-		this.scrollVelocity = scrollVelocity;
-	}
-
 	public boolean isSelectRegion() {
 		return selectRegion;
 	}
@@ -307,30 +294,6 @@ public class MidiViewBean {
 
 	public void setPinch(boolean pinch) {
 		this.pinch = pinch;
-	}
-
-	public boolean isScrolling() {
-		return scrolling;
-	}
-
-	public void setScrolling(boolean scrolling) {
-		this.scrolling = scrolling;
-	}
-
-	public long getScrollViewStartTime() {
-		return scrollViewStartTime;
-	}
-
-	public void setScrollViewStartTime(long scrollViewStartTime) {
-		this.scrollViewStartTime = scrollViewStartTime;
-	}
-
-	public long getScrollViewEndTime() {
-		return scrollViewEndTime;
-	}
-
-	public void setScrollViewEndTime(long scrollViewEndTime) {
-		this.scrollViewEndTime = scrollViewEndTime;
 	}
 
 	public int[] getLoopPointerIds() {

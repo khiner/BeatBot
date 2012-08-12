@@ -57,13 +57,10 @@ public class TickWindowHelper {
 	}
 
 	public void scroll() {
-		long sv = viewBean.getScrollVelocity();
-		if (!viewBean.isScrolling() && sv != 0) {
-			viewBean.setScrollVelocity(sv *= 0.95);
+		long sv = ScrollBarHelper.scrollVelocity;
+		if (!ScrollBarHelper.scrolling && sv != 0) {
+			ScrollBarHelper.tickScrollVelocity();
 			setTickOffset((long) (tickOffset + sv));
-			if (sv == 0) {
-				viewBean.setScrollViewEndTime(System.currentTimeMillis());
-			}
 		}
 	}
 
@@ -136,9 +133,7 @@ public class TickWindowHelper {
 
 	// translates the tickOffset to ensure that leftTick and rightTick are
 	// in view
-	// returns the amount translated
-	// TODO: to fix select region prob, also update numTicks if need be,
-	// i.e. fit everything!
+	// @returns the amount translated
 	public void updateView(long leftTick, long rightTick) {
 		// if we are dragging out of view, scroll appropriately
 		// if the right is out but the left is in, just scroll

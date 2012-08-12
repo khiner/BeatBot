@@ -21,6 +21,7 @@ import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.bean.MidiViewBean;
 import com.kh.beatbot.view.helper.LevelsViewHelper;
+import com.kh.beatbot.view.helper.ScrollBarHelper;
 import com.kh.beatbot.view.helper.TickWindowHelper;
 import com.kh.beatbot.view.helper.WaveformHelper;
 
@@ -395,12 +396,10 @@ public class MidiView extends SurfaceViewBase {
 	private void initLoopMarkerVBs() {
 		float h = bean.getYOffset();
 		float[] loopMarkerLine = new float[] { 0, 0, 0, bean.getHeight() };
-		float[] loopMarkerTriangles = new float[] { 0, 0, 0, h, h, h / 2, // loop
-																			// begin
-																			// triangle,
-																			// pointing
-																			// right
-				0, 0, 0, h, -h, h / 2 }; // loop end triangle, pointing left
+		// loop begin triangle, pointing right, and
+		// loop end triangle, pointing left
+		float[] loopMarkerTriangles = new float[] { 0, 0, 0, h, h, h / 2, 
+				0, 0, 0, h, -h, h / 2 };
 		loopMarkerLineVB = makeFloatBuffer(loopMarkerLine);
 		loopMarkerVB = makeFloatBuffer(loopMarkerTriangles);
 	}
@@ -486,38 +485,9 @@ public class MidiView extends SurfaceViewBase {
 		}
 		drawLoopMarker();
 		drawSelectRegion();
-		if (bean.isScrolling()
-				|| bean.getScrollVelocity() != 0
-				|| Math.abs(System.currentTimeMillis()
-						- bean.getScrollViewEndTime()) <= MidiViewBean.DOUBLE_TAP_TIME * 2) {
-			drawScrollView();
-		}
+		ScrollBarHelper.updateScrollbar(tickWindow, width, height);
+		ScrollBarHelper.drawScrollView();
 		drawRecordingWaveforms();
-	}
-
-	private void drawScrollView() {
-		// if scrolling is still in progress, elapsed time is relative to the
-		// time of scroll start,
-		// otherwise, elapsed time is relative to scroll end time
-		boolean scrollingEnded = bean.getScrollViewStartTime() < bean
-				.getScrollViewEndTime();
-		long elapsedTime = scrollingEnded ? System.currentTimeMillis()
-				- bean.getScrollViewEndTime() : System.currentTimeMillis()
-				- bean.getScrollViewStartTime();
-
-		float alpha = .8f;
-		if (!scrollingEnded && elapsedTime <= MidiViewBean.DOUBLE_TAP_TIME)
-			alpha *= elapsedTime / (float) MidiViewBean.DOUBLE_TAP_TIME;
-		else if (scrollingEnded && elapsedTime > MidiViewBean.DOUBLE_TAP_TIME)
-			alpha *= (MidiViewBean.DOUBLE_TAP_TIME * 2 - elapsedTime)
-					/ (float) MidiViewBean.DOUBLE_TAP_TIME;
-
-		float x1 = tickWindow.getTickOffset() * width
-				/ tickWindow.getMaxTicks();
-		float x2 = (tickWindow.getTickOffset() + tickWindow.getNumTicks())
-				* width / tickWindow.getMaxTicks();
-		drawRectangle(x1, bean.getHeight() - 20, x2, bean.getHeight(),
-				new float[] { 1, 1, 1, alpha });
 	}
 
 	private long getAdjustedTickDiff(long tickDiff, int pointerId,
@@ -685,15 +655,6 @@ public class MidiView extends SurfaceViewBase {
 		return bean.toggleSnapToGrid();
 	}
 
-	private void startScrollView() {
-		long now = System.currentTimeMillis();
-		if (now - bean.getScrollViewEndTime() > MidiViewBean.DOUBLE_TAP_TIME * 2)
-			bean.setScrollViewStartTime(now);
-		else
-			bean.setScrollViewEndTime(Long.MAX_VALUE);
-		bean.setScrolling(true);
-	}
-
 	public void toggleLevelsView() {
 		if (bean.getViewState() == State.NORMAL_VIEW
 				|| bean.getViewState() == State.TO_NORMAL_VIEW) {
@@ -777,7 +738,7 @@ public class MidiView extends SurfaceViewBase {
 			} else { // one finger scroll
 				if (bean.getScrollPointerId() < e.getPointerCount()) {
 					int index = e.findPointerIndex(bean.getScrollPointerId());
-					bean.setScrollVelocity(tickWindow.scroll(e.getX(index)));
+					ScrollBarHelper.scrollVelocity = tickWindow.scroll(e.getX(index));
 				}
 			}
 		} else if (e.getPointerCount()  - bean.getNumLoopMarkersSelected() == 2) {
@@ -814,7 +775,7 @@ public class MidiView extends SurfaceViewBase {
 		bean.setLastDownTime(System.currentTimeMillis());
 		bean.setLastTapX(x);
 		bean.setLastTapY(y);
-		startScrollView();
+		ScrollBarHelper.startScrollView();
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			levelsHelper.selectLevel(x, y, id);
 		} else {
@@ -941,11 +902,9 @@ public class MidiView extends SurfaceViewBase {
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		bean.setScrolling(false);
+		ScrollBarHelper.handleActionUp();
 		for (int i = 0; i < 3; i++)
 			bean.setLoopPointerId(i, -1);
-		if (bean.getScrollVelocity() == 0)
-			bean.setScrollViewEndTime(System.currentTimeMillis());
 		bean.setSelectRegion(false);
 		midiManager.mergeTempNotes();
 		long time = System.currentTimeMillis();
