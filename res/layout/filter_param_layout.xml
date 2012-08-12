@@ -4,6 +4,13 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" >
     
+    <LinearLayout
+        android:id="@+id/filterTypes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true" >
+
     <include
         layout="@layout/effect_on_toggle"
         android:id="@+id/effectToggleOn" />
@@ -12,7 +19,6 @@
 	    android:id="@+id/lp_toggle"
     	android:layout_width="50dp"
     	android:layout_height="50dp"
-    	android:layout_below="@+id/effectToggleOn"
     	android:textOn = ""
     	android:textOff = ""
     	android:background="@drawable/lowpass_btn_src"
@@ -22,8 +28,6 @@
 	    android:id="@+id/bp_toggle"
     	android:layout_width="50dp"
     	android:layout_height="50dp"
-    	android:layout_below="@+id/effectToggleOn"
-    	android:layout_toRightOf="@+id/lp_toggle"
     	android:textOn = ""
     	android:textOff = ""
     	android:background="@drawable/bandpass_btn_src"
@@ -33,18 +37,17 @@
 	    android:id="@+id/hp_toggle"
     	android:layout_width="50dp"
     	android:layout_height="50dp"
-    	android:layout_below="@+id/effectToggleOn"
-    	android:layout_toRightOf="@+id/bp_toggle"
     	android:textOn = ""
     	android:textOff = ""
     	android:background="@drawable/highpass_btn_src"
     	android:onClick="selectFilterMode" />
+	</LinearLayout>
 	
     <com.kh.beatbot.layout.EffectControlLayout
         android:id="@+id/param1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/lp_toggle"
+        android:layout_below="@+id/filterTypes"
         paramControl:beatsync_enabled="false"
         paramControl:param_name="@string/frequency" />
     
@@ -53,7 +56,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/param1"
-        android:layout_below="@+id/lp_toggle"
+        android:layout_below="@+id/filterTypes"
         paramControl:beatsync_enabled="false"
         paramControl:param_name="@string/resonance" />
 

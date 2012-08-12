@@ -60,12 +60,12 @@ public class TickWindowHelper {
 		}
 	}
 
-	public static long scroll(float x) {
+	public static void scroll(float x) {
 		long newTickOffset = viewBean.getScrollAnchorTick()
 				- (long) ((currNumTicks * x) / viewBean.getWidth());
 		long diff = newTickOffset - currTickOffset;
 		setTickOffset(newTickOffset);
-		return diff;
+		ScrollBarHelper.scrollVelocity = diff;
 	}
 
 	public static void updateGranularity() {

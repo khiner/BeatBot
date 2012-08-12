@@ -480,8 +480,7 @@ public class MidiView extends SurfaceViewBase {
 		}
 		drawLoopMarker();
 		drawSelectRegion();
-		ScrollBarHelper.updateScrollbar(width, height);
-		ScrollBarHelper.drawScrollView();
+		ScrollBarHelper.drawScrollView(width, height);
 		drawRecordingWaveforms();
 	}
 
@@ -738,8 +737,7 @@ public class MidiView extends SurfaceViewBase {
 			} else { // one finger scroll
 				if (bean.getScrollPointerId() < e.getPointerCount()) {
 					int index = e.findPointerIndex(bean.getScrollPointerId());
-					ScrollBarHelper.scrollVelocity = TickWindowHelper.scroll(e
-							.getX(index));
+					TickWindowHelper.scroll(e.getX(index));
 				}
 			}
 		} else if (e.getPointerCount() - bean.getNumLoopMarkersSelected() == 2) {

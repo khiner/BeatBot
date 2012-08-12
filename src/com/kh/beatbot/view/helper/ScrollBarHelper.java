@@ -9,21 +9,25 @@ import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class ScrollBarHelper {
 	private static final float DAMP_CONSTANT = 0.95f;
-	
-	private static float[] innerScrollBarColor = {1, 1, 1, .8f};
-	private static float[] outerScrollBarColor = MidiViewBean.VOLUME_COLOR.clone();
-	
+	private static final int CORNER_RESOLUTION = 15;
+
+	private static float[] innerScrollBarColor = { 1, 1, 1, .8f };
+	private static float[] outerScrollBarColor = MidiViewBean.VOLUME_COLOR
+			.clone();
+
 	private static float translateX = 0;
 	private static float translateY = 0;
-	
+
 	private static long scrollViewStartTime = 0;
 	private static long scrollViewEndTime = Long.MAX_VALUE;
-	private static int outerScrollBarHeight = 30;
 	private static int innerScrollBarHeight = 20;
-	
+	private static int outerScrollBarHeight = 30;
+	private static int innerScrollBarCornerRadius = 7;
+	private static int outerScrollBarCornerRadius = 10;
+
 	public static boolean scrolling = false;
 	public static long scrollVelocity = 0;
-	
+
 	private static FloatBuffer innerScrollBarVb = null;
 	private static FloatBuffer outerScrollBarVb = null;
 	private static FloatBuffer scrollBarLinesVb = null;
@@ -43,9 +47,10 @@ public class ScrollBarHelper {
 		scrolling = true;
 	}
 
-	public static void drawScrollView() {
+	public static void drawScrollView(float parentWidth, float parentHeight) {
 		if (!shouldDrawScrollView())
 			return;
+		updateScrollBar(parentWidth, parentHeight);
 		// if scrolling is still in progress, elapsed time is relative to the
 		// time of scroll start,
 		// otherwise, elapsed time is relative to scroll end time
@@ -63,7 +68,8 @@ public class ScrollBarHelper {
 		innerScrollBarColor[3] = alpha;
 		outerScrollBarColor[3] = alpha * .6f;
 		SurfaceViewBase.translate(0, translateY);
-		SurfaceViewBase.drawLines(scrollBarLinesVb, outerScrollBarColor, 3, GL10.GL_LINES);
+		SurfaceViewBase.drawLines(scrollBarLinesVb, outerScrollBarColor, 3,
+				GL10.GL_LINES);
 		SurfaceViewBase.translate(translateX, 0);
 		SurfaceViewBase.drawTriangleFan(outerScrollBarVb, outerScrollBarColor);
 		SurfaceViewBase.drawTriangleFan(innerScrollBarVb, innerScrollBarColor);
@@ -77,7 +83,7 @@ public class ScrollBarHelper {
 		}
 	}
 
-	public static void updateScrollbar(float parentWidth, float parentHeight) {
+	public static void updateScrollBar(float parentWidth, float parentHeight) {
 		float x1 = TickWindowHelper.getTickOffset() * parentWidth
 				/ TickWindowHelper.MAX_TICKS;
 		float x2 = (TickWindowHelper.getTickOffset() + TickWindowHelper
@@ -86,14 +92,18 @@ public class ScrollBarHelper {
 		float innerWidth = outerWidth - 10;
 		translateX = (x2 + x1) / 2;
 		translateY = parentHeight - outerScrollBarHeight / 2;
-		innerScrollBarVb = SurfaceViewBase.makeRoundedCornerRectBuffer(innerWidth, innerScrollBarHeight, innerScrollBarHeight / 3, 15);
-		outerScrollBarVb = SurfaceViewBase.makeRoundedCornerRectBuffer(outerWidth, outerScrollBarHeight, outerScrollBarHeight / 3, 15);
-		scrollBarLinesVb = SurfaceViewBase.makeFloatBuffer(new float[] {0, 0, x1, 0, x2, 0, parentWidth, 0});
+		innerScrollBarVb = SurfaceViewBase.makeRoundedCornerRectBuffer(
+				innerWidth, innerScrollBarHeight, innerScrollBarCornerRadius,
+				CORNER_RESOLUTION);
+		outerScrollBarVb = SurfaceViewBase.makeRoundedCornerRectBuffer(
+				outerWidth, outerScrollBarHeight, outerScrollBarCornerRadius,
+				CORNER_RESOLUTION);
+		scrollBarLinesVb = SurfaceViewBase.makeFloatBuffer(new float[] { 0, 0,
+				x1, 0, x2, 0, parentWidth, 0 });
 	}
 
 	public static void handleActionUp() {
 		scrolling = false;
-		if (scrollVelocity == 0)
-			scrollViewEndTime = System.currentTimeMillis();
+		tickScrollVelocity();
 	}
 }
