@@ -6,7 +6,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.FloatMath;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.listenable.LevelListenable;
@@ -18,38 +17,12 @@ public class TronSeekbar2d extends LevelListenable {
 	private static float minX, maxX, minY, maxY;
 	private float selectX = 0, selectY = 0;
 	private float borderRadius;
+	
 	private static FloatBuffer borderVb = null;
 	private static FloatBuffer lineVb = null;
 
-	private float ¹ = (float) Math.PI;
-
 	public TronSeekbar2d(Context c, AttributeSet as) {
 		super(c, as);
-	}
-
-	public float[] calcRoundedCornerVertices(float width, float height,
-			float cornerRadius, int resolution) {
-		float[] roundedRect = new float[resolution * 8];
-		float theta = 0, addX, addY;
-		for (int i = 0; i < roundedRect.length / 2; i++) {
-			theta += 4 * ¹ / roundedRect.length;
-			if (theta < ¹ / 2) { // lower right
-				addX = width / 2 - cornerRadius;
-				addY = height / 2 - cornerRadius;
-			} else if (theta < ¹) { // lower left
-				addX = -width / 2 + cornerRadius;
-				addY = height / 2 - cornerRadius;
-			} else if (theta < 3 * ¹ / 2) { // upper left
-				addX = -width / 2 + cornerRadius;
-				addY = -height / 2 + cornerRadius;
-			} else { // upper right
-				addX = width / 2 - cornerRadius;
-				addY = -height / 2 + cornerRadius;
-			}
-			roundedRect[i * 2] = FloatMath.cos(theta) * cornerRadius + addX;
-			roundedRect[i * 2 + 1] = FloatMath.sin(theta) * cornerRadius + addY;
-		}
-		return roundedRect;
 	}
 
 	private void initBorderVb() {
@@ -58,8 +31,8 @@ public class TronSeekbar2d extends LevelListenable {
 		minY = borderRadius + 2;
 		maxX = width - borderRadius - 2;
 		maxY = height - borderRadius - 2;
-		borderVb = makeFloatBuffer(calcRoundedCornerVertices(width
-				- DRAW_OFFSET * 2, height - DRAW_OFFSET * 2, borderRadius, 25));
+		borderVb = makeRoundedCornerRectBuffer(width
+				- DRAW_OFFSET * 2, height - DRAW_OFFSET * 2, borderRadius, 25);
 	}
 
 	public void setViewLevelX(float x) {

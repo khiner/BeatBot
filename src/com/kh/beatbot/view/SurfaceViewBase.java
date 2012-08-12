@@ -18,12 +18,15 @@ import android.graphics.Bitmap;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
 import android.util.AttributeSet;
+import android.util.FloatMath;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public abstract class SurfaceViewBase extends SurfaceView implements
 		SurfaceHolder.Callback, Runnable {
+	public static final float ¹ = (float) Math.PI;
+	
 	protected EGLContext glContext;
 	protected SurfaceHolder sHolder;
 	protected Thread t;
@@ -49,6 +52,10 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		return fb;
 	}
 
+	public static void translate(float x, float y) {
+		gl.glTranslatef(x, y, 0);
+	}
+	
 	public static FloatBuffer makeRectFloatBuffer(float x1, float y1, float x2, float y2) {
 		return makeFloatBuffer(new float[] { x1, y1, x2, y1, x1,
 											 y2, x2, y2 });		
@@ -58,7 +65,32 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		return makeFloatBuffer(new float[] { x1, y1, x1, y2, x2,
 											 y2, x2, y1 });
 	}
-		
+	
+	public static FloatBuffer makeRoundedCornerRectBuffer(float width, float height,
+			float cornerRadius, int resolution) {
+		float[] roundedRect = new float[resolution * 8];
+		float theta = 0, addX, addY;
+		for (int i = 0; i < roundedRect.length / 2; i++) {
+			theta += 4 * ¹ / roundedRect.length;
+			if (theta < ¹ / 2) { // lower right
+				addX = width / 2 - cornerRadius;
+				addY = height / 2 - cornerRadius;
+			} else if (theta < ¹) { // lower left
+				addX = -width / 2 + cornerRadius;
+				addY = height / 2 - cornerRadius;
+			} else if (theta < 3 * ¹ / 2) { // upper left
+				addX = -width / 2 + cornerRadius;
+				addY = -height / 2 + cornerRadius;
+			} else { // upper right
+				addX = width / 2 - cornerRadius;
+				addY = -height / 2 + cornerRadius;
+			}
+			roundedRect[i * 2] = FloatMath.cos(theta) * cornerRadius + addX;
+			roundedRect[i * 2 + 1] = FloatMath.sin(theta) * cornerRadius + addY;
+		}
+		return makeFloatBuffer(roundedRect);
+	}
+	
 	public static void drawRectangle(float x1, float y1, float x2, float y2, float[] color) {
 		drawTriangleStrip(makeRectFloatBuffer(x1, y1, x2, y2), color);
 	}

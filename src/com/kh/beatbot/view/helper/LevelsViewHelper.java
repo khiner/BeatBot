@@ -76,22 +76,25 @@ public class LevelsViewHelper {
 	public static MidiNote getTouchedLevel(int id) {
 		return touchedLevels.get(id);
 	}
-	
+
 	private static void initLevelBarsVB() {
 		ArrayList<Float> selectedLevelBars = new ArrayList<Float>();
 		for (MidiNote levelSelected : midiManager.getLevelSelectedNotes()) {
 			float x = midiView.tickToX(levelSelected.getOnTick());
 			selectedLevelBars.add(x);
-			selectedLevelBars.add(levelToY(levelSelected.getLevel(currLevelMode)));
+			selectedLevelBars.add(levelToY(levelSelected
+					.getLevel(currLevelMode)));
 			selectedLevelBars.add(x);
 			selectedLevelBars.add(bean.getHeight());
 		}
 		ArrayList<Float> levelBars = new ArrayList<Float>();
-		for (MidiNote levelViewSelected : midiManager.getLevelViewSelectedNotes()) {
+		for (MidiNote levelViewSelected : midiManager
+				.getLevelViewSelectedNotes()) {
 			float x = midiView.tickToX(levelViewSelected.getOnTick());
 			if (!levelViewSelected.isLevelSelected()) {
 				levelBars.add(x);
-				levelBars.add(levelToY(levelViewSelected.getLevel(currLevelMode)));
+				levelBars.add(levelToY(levelViewSelected
+						.getLevel(currLevelMode)));
 				levelBars.add(x);
 				levelBars.add(bean.getHeight());
 			}
@@ -160,8 +163,10 @@ public class LevelsViewHelper {
 	}
 
 	public static void selectLevel(float x, float y, int pointerId) {
-		for (MidiNote levelViewSelected : midiManager.getLevelViewSelectedNotes()) {
-			float velocityY = levelToY(levelViewSelected.getLevel(currLevelMode));
+		for (MidiNote levelViewSelected : midiManager
+				.getLevelViewSelectedNotes()) {
+			float velocityY = levelToY(levelViewSelected
+					.getLevel(currLevelMode));
 			if (Math.abs(midiView.tickToX(levelViewSelected.getOnTick()) - x) < 35
 					&& Math.abs(velocityY - y) < 35) {
 				// If this is the only touched level, and it hasn't yet
@@ -213,11 +218,12 @@ public class LevelsViewHelper {
 
 	public static void selectRegion(long leftTick, long rightTick, float topY,
 			float bottomY) {
-		for (MidiNote levelViewSelected : midiManager.getLevelViewSelectedNotes()) {
+		for (MidiNote levelViewSelected : midiManager
+				.getLevelViewSelectedNotes()) {
 			float levelY = levelToY(levelViewSelected.getLevel(currLevelMode));
 			if (leftTick < levelViewSelected.getOnTick()
-					&& rightTick > levelViewSelected.getOnTick() && topY < levelY
-					&& bottomY > levelY)
+					&& rightTick > levelViewSelected.getOnTick()
+					&& topY < levelY && bottomY > levelY)
 				levelViewSelected.setLevelSelected(true);
 			else
 				levelViewSelected.setLevelSelected(false);

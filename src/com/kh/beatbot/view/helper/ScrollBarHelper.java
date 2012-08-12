@@ -2,19 +2,31 @@ package com.kh.beatbot.view.helper;
 
 import java.nio.FloatBuffer;
 
+import javax.microedition.khronos.opengles.GL10;
+
 import com.kh.beatbot.view.SurfaceViewBase;
 import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class ScrollBarHelper {
 	private static final float DAMP_CONSTANT = 0.95f;
-	private static FloatBuffer scrollBarVb = null;
+	
+	private static float[] innerScrollBarColor = {1, 1, 1, .8f};
+	private static float[] outerScrollBarColor = MidiViewBean.VOLUME_COLOR.clone();
+	
+	private static float translateX = 0;
+	private static float translateY = 0;
+	
 	private static long scrollViewStartTime = 0;
 	private static long scrollViewEndTime = Long.MAX_VALUE;
-	private static int scrollBarHeight = 20;
-	private static float[] scrollBarColor = { 1, 1, 1, .8f };
-
+	private static int outerScrollBarHeight = 30;
+	private static int innerScrollBarHeight = 20;
+	
 	public static boolean scrolling = false;
 	public static long scrollVelocity = 0;
+	
+	private static FloatBuffer innerScrollBarVb = null;
+	private static FloatBuffer outerScrollBarVb = null;
+	private static FloatBuffer scrollBarLine = null;
 
 	private static boolean shouldDrawScrollView() {
 		return scrolling
@@ -48,8 +60,14 @@ public class ScrollBarHelper {
 		else if (scrollingEnded && elapsedTime > MidiViewBean.DOUBLE_TAP_TIME)
 			alpha *= (MidiViewBean.DOUBLE_TAP_TIME * 2 - elapsedTime)
 					/ (float) MidiViewBean.DOUBLE_TAP_TIME;
-		scrollBarColor[3] = alpha;
-		SurfaceViewBase.drawTriangleStrip(scrollBarVb, scrollBarColor);
+		innerScrollBarColor[3] = alpha;
+		outerScrollBarColor[3] = alpha * .6f;
+		SurfaceViewBase.translate(0, translateY);
+		SurfaceViewBase.drawLines(scrollBarLine, outerScrollBarColor, 3, GL10.GL_LINES);
+		SurfaceViewBase.translate(translateX, 0);
+		SurfaceViewBase.drawTriangleFan(outerScrollBarVb, outerScrollBarColor);
+		SurfaceViewBase.drawTriangleFan(innerScrollBarVb, innerScrollBarColor);
+		SurfaceViewBase.translate(-translateX, -translateY);
 	}
 
 	public static void tickScrollVelocity() {
@@ -64,8 +82,13 @@ public class ScrollBarHelper {
 				/ TickWindowHelper.MAX_TICKS;
 		float x2 = (TickWindowHelper.getTickOffset() + TickWindowHelper
 				.getNumTicks()) * parentWidth / TickWindowHelper.MAX_TICKS;
-		scrollBarVb = SurfaceViewBase.makeRectFloatBuffer(x1, parentHeight
-				- scrollBarHeight, x2, parentHeight);
+		float outerWidth = x2 - x1;
+		float innerWidth = outerWidth - 10;
+		translateX = (x2 + x1) / 2;
+		translateY = parentHeight - outerScrollBarHeight / 2;
+		innerScrollBarVb = SurfaceViewBase.makeRoundedCornerRectBuffer(innerWidth, innerScrollBarHeight, innerScrollBarHeight / 3, 15);
+		outerScrollBarVb = SurfaceViewBase.makeRoundedCornerRectBuffer(outerWidth, outerScrollBarHeight, outerScrollBarHeight / 3, 15);
+		scrollBarLine = SurfaceViewBase.makeFloatBuffer(new float[] {0, 0, parentWidth, 0});
 	}
 
 	public static void handleActionUp() {

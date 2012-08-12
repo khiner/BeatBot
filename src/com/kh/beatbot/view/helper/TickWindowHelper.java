@@ -8,7 +8,7 @@ public class TickWindowHelper {
 	public static MidiViewBean viewBean;
 
 	public static final long MIN_TICKS = MidiManager.TICKS_IN_ONE_MEASURE / 8;
-	public static final long MAX_TICKS = MidiManager.TICKS_IN_ONE_MEASURE * 10;
+	public static final long MAX_TICKS = MidiManager.TICKS_IN_ONE_MEASURE * 4;
 	public static final int MIN_LINES_DISPLAYED = 8;
 	public static final int MAX_LINES_DISPLAYED = 32;
 
