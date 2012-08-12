@@ -53,8 +53,9 @@ public class MidiManager implements Parcelable {
 	private int numSamples = 0;
 
 	// ticks per quarter note (I think)
-	public final int RESOLUTION = MidiFile.DEFAULT_RESOLUTION;
-
+	public static final int RESOLUTION = MidiFile.DEFAULT_RESOLUTION;
+	public static final long TICKS_IN_ONE_MEASURE = RESOLUTION * 4;
+	
 	private MidiManager(int numSamples) {
 		this.numSamples = numSamples;
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,

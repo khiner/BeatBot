@@ -3,7 +3,8 @@ package com.kh.beatbot.view.bean;
 import com.kh.beatbot.view.MidiView;
 
 public class MidiViewBean {
-
+	public static final float Y_OFFSET = 21;
+	
 	// the size of the "dots" at the top of level display
 	public static final int LEVEL_POINT_SIZE = 25;
 	// the width of the lines for note levels
@@ -41,7 +42,6 @@ public class MidiViewBean {
 	private MidiView.State viewState = MidiView.State.NORMAL_VIEW;
 	
 	private float width, height;
-	private float yOffset;
 	private float noteHeight;
 	private float midiHeight;
 	private float levelsHeight;
@@ -64,8 +64,6 @@ public class MidiViewBean {
 	private boolean selectRegion = false;
 	private long selectRegionStartTick = -1;
 	private float selectRegionStartY = -1;
-
-	private long allTicks;
 
 	private long lastDownTime = 0;
 	private long lastTapTime = 0;
@@ -118,14 +116,6 @@ public class MidiViewBean {
 
 	public void setMidiHeight(float midiHeight) {
 		this.midiHeight = midiHeight;
-	}
-
-	public float getYOffset() {
-		return yOffset;
-	}
-
-	public void setYOffset(float yOffset) {
-		this.yOffset = yOffset;
 	}
 
 	public float getNoteHeight() {
@@ -246,14 +236,6 @@ public class MidiViewBean {
 
 	public void setSelectRegionStartY(float selectRegionStartY) {
 		this.selectRegionStartY = selectRegionStartY;
-	}
-
-	public long getAllTicks() {
-		return allTicks;
-	}
-
-	public void setAllTicks(long allTicks) {
-		this.allTicks = allTicks;
 	}
 
 	public long getLastDownTime() {
