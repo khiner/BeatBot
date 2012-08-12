@@ -26,7 +26,7 @@ public class ScrollBarHelper {
 	
 	private static FloatBuffer innerScrollBarVb = null;
 	private static FloatBuffer outerScrollBarVb = null;
-	private static FloatBuffer scrollBarLine = null;
+	private static FloatBuffer scrollBarLinesVb = null;
 
 	private static boolean shouldDrawScrollView() {
 		return scrolling
@@ -63,7 +63,7 @@ public class ScrollBarHelper {
 		innerScrollBarColor[3] = alpha;
 		outerScrollBarColor[3] = alpha * .6f;
 		SurfaceViewBase.translate(0, translateY);
-		SurfaceViewBase.drawLines(scrollBarLine, outerScrollBarColor, 3, GL10.GL_LINES);
+		SurfaceViewBase.drawLines(scrollBarLinesVb, outerScrollBarColor, 3, GL10.GL_LINES);
 		SurfaceViewBase.translate(translateX, 0);
 		SurfaceViewBase.drawTriangleFan(outerScrollBarVb, outerScrollBarColor);
 		SurfaceViewBase.drawTriangleFan(innerScrollBarVb, innerScrollBarColor);
@@ -88,7 +88,7 @@ public class ScrollBarHelper {
 		translateY = parentHeight - outerScrollBarHeight / 2;
 		innerScrollBarVb = SurfaceViewBase.makeRoundedCornerRectBuffer(innerWidth, innerScrollBarHeight, innerScrollBarHeight / 3, 15);
 		outerScrollBarVb = SurfaceViewBase.makeRoundedCornerRectBuffer(outerWidth, outerScrollBarHeight, outerScrollBarHeight / 3, 15);
-		scrollBarLine = SurfaceViewBase.makeFloatBuffer(new float[] {0, 0, parentWidth, 0});
+		scrollBarLinesVb = SurfaceViewBase.makeFloatBuffer(new float[] {0, 0, x1, 0, x2, 0, parentWidth, 0});
 	}
 
 	public static void handleActionUp() {
