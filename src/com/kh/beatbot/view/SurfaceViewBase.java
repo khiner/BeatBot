@@ -1,5 +1,6 @@
 package com.kh.beatbot.view;
 
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -11,10 +12,13 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.opengles.GL11;
+import javax.microedition.khronos.opengles.GL11Ext;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
 import android.util.AttributeSet;
@@ -35,6 +39,10 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	protected int width;
 	protected int height;
 	protected int fps;
+	
+	protected int[] textureHandlers = new int[2];
+	protected int[] crop = null;
+	protected int currentTexture = 0;	
 
 	/**
 	 * Make a direct NIO FloatBuffer from an array of floats
@@ -126,8 +134,41 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glDrawArrays(GL10.GL_TRIANGLE_FAN, 0, vb.capacity() / 2);		
 	}
 	
-	public static void setColor(float[] color) {
+	protected static void setColor(float[] color) {
 		gl.glColor4f(color[0], color[1], color[2], color[3]);
+	}
+	
+	protected void loadTexture(final int resourceId, int textureId) {
+		// Generate Texture ID
+		gl.glGenTextures(1, textureHandlers, textureId);
+		// Bind texture id texturing target
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[textureId]); 
+		 
+		InputStream is = getContext().getResources().openRawResource(resourceId);
+		Bitmap bitmap = BitmapFactory.decodeStream(is);
+		 
+		// Build our crop texture to be the size of the bitmap (ie full texture)
+		// we only need to do this once, since both images will have the same width/height
+		if (crop == null) {
+			crop = new int[] {0, bitmap.getHeight(), bitmap.getWidth(), -bitmap.getHeight()};
+		}
+
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_REPEAT);
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_REPEAT);
+		
+		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+		bitmap.recycle();
+	}
+	
+	protected void drawTexture(float width, float height) {
+		gl.glEnable(GL10.GL_TEXTURE_2D);
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[currentTexture]);
+		((GL11)gl).glTexParameteriv(GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, crop, 0);
+		gl.glColor4f(1, 1, 1, 1);
+		((GL11Ext)gl).glDrawTexfOES(0, 0, 0, width, height);
+		gl.glDisable(GL10.GL_TEXTURE_2D);
 	}
 	
 	/**

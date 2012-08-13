@@ -15,7 +15,7 @@ public abstract class LevelListenable extends SurfaceViewBase {
 	protected float level = .5f;
 	protected float[] levelColor = MidiViewBean.VOLUME_COLOR.clone();
 	protected float[] selectColor = {levelColor[0], levelColor[1], levelColor[2], .5f};
-	protected static final float[] bgColor = new float[] {.3f, .3f, .3f , 1};
+	protected static final float[] bgColor = new float[] {0.3275f, 0.3994f, 0.4465f, 1};
 	
 	protected boolean selected = false;
 	
