@@ -19,9 +19,12 @@ public class TronKnob extends LevelListenable {
 	private static FloatBuffer selectCircleVb2 = null;
 	private static int circleWidth = 0, circleHeight = 0;
 	
+	private static float snapDistSquared;
+	
 	private int drawIndex = 0;
 	private long timeDown = 0;
 	private boolean clickable = false;
+	private boolean levelSelected = false;
 	
 	public TronKnob(Context c, AttributeSet as) {
 		super(c, as);
@@ -76,6 +79,7 @@ public class TronKnob extends LevelListenable {
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		super.surfaceChanged(holder, format, width, height);
+		snapDistSquared = (width / 4)*(width / 4);
 		// all knobs share the same circle VBs, and they should only change when width or height changes
 		if (width != circleWidth || height != circleHeight) {
 			initCircleVbs(width, height);
@@ -90,7 +94,7 @@ public class TronKnob extends LevelListenable {
 		drawTriangleStrip(circleVb, bgColor);
 		// main selection
 		drawTriangleStrip(circleVb, levelColor, drawIndex);
-		if (selected) { // selected glow
+		if (levelSelected) { // selected glow
 			drawTriangleStrip(selectCircleVb2, selectColor, drawIndex);
 			drawTriangleStrip(selectCircleVb, selectColor, drawIndex);
 		}
@@ -119,8 +123,10 @@ public class TronKnob extends LevelListenable {
 	
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
-		if (distanceFromCenter(x, y) > width/4)
+		if (distanceFromCenterSquared(x, y) > snapDistSquared) {
+			levelSelected = true;
 			setLevel(coordToLevel(x, y));
+		}
 		else
 			timeDown = System.currentTimeMillis();
 		super.handleActionDown(id, x, y);
@@ -128,7 +134,7 @@ public class TronKnob extends LevelListenable {
 
 	@Override
 	protected void handleActionMove(MotionEvent e) {
-		if (distanceFromCenter(e.getX(0), e.getY(0)) < width/4)
+		if (!levelSelected)
 			return;
 		float newLevel = coordToLevel(e.getX(0), e.getY(0));
 		setLevel(newLevel);
@@ -136,6 +142,7 @@ public class TronKnob extends LevelListenable {
 	
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
+		levelSelected = false;
 		if (clickable && System.currentTimeMillis() - timeDown < 300) {
 			currentTexture = (currentTexture + 1 ) % 2;
 			for (LevelListener listener : levelListeners) {
@@ -149,8 +156,8 @@ public class TronKnob extends LevelListenable {
 		return clickable;
 	}
 	
-	private float distanceFromCenter(float x, float y) {
-		return FloatMath.sqrt((x - width/2)*(x - width/2) + (y - height/2)*(y - height/2));
+	private float distanceFromCenterSquared(float x, float y) {
+		return (x - width/2)*(x - width/2) + (y - height/2)*(y - height/2);
 	}
 	
 	private float coordToLevel(float x, float y) {

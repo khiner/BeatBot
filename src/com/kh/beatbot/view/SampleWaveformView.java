@@ -16,8 +16,8 @@ import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class SampleWaveformView extends SurfaceViewBase {
 
-	private final float[][] ADSR_COLORS = { { 0, 1, 0, .7f },
-			{ 1, .5f, .5f, .7f }, { 0, 0, 1, .7f }, { 1, 0, 1, .7f } };
+	private final float[] ADSR_COLOR = MidiViewBean.PITCH_COLOR.clone();
+	private final float[] ADSR_SELECTED_COLOR = {ADSR_COLOR[0], ADSR_COLOR[1], ADSR_COLOR[2], .6f};
 	private final float[] LOOP_HIGHLIGHT_COLOR = { 1, .64706f, 0, .4f };
 	private final float[] LOOP_SELECTION_LINE_COLOR = { 1, 1, 1, 1 };
 	private final float[] LOOP_SELECTION_RECT_COLOR = { .9f, .9f, 1, .5f };
@@ -26,7 +26,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private final float ADSR_POINT_RADIUS = 5;
 	// min distance for pointer to select loop markers
 	private final int SNAP_DIST = 32;
-
+	private final int SNAP_DIST_SQUARED = 1024;
 	private FloatBuffer waveformVb = null;
 	private FloatBuffer backgroundSquareVb = null;
 	private FloatBuffer loopSelectionLineVb = null;
@@ -204,12 +204,19 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private void drawAdsr() {
 		if (!showAdsr)
 			return;
-		gl.glColor4f(0, 1, 0, 1); // green points for now
+		setColor(ADSR_COLOR);
 		gl.glPointSize(ADSR_POINT_RADIUS * 2);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, adsrPointVb);
 		gl.glDrawArrays(GL10.GL_POINTS, 0, 5);
+		for (int i = 0; i < adsrPoints.length; i++) {
+			if (adsrSelected[i] != -1) {
+				gl.glPointSize(ADSR_POINT_RADIUS * 4);
+				setColor(ADSR_SELECTED_COLOR);
+				gl.glDrawArrays(GL10.GL_POINTS, i, 1);
+			}
+		}
 		for (int i = 0; i < adsrCurveVb.length; i++) {
-			drawLines(adsrCurveVb[i], ADSR_COLORS[i], 3, GL10.GL_LINE_STRIP);
+			drawLines(adsrCurveVb[i], ADSR_COLOR, 3, GL10.GL_LINE_STRIP);
 		}
 	}
 
@@ -334,8 +341,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		if (!showAdsr)
 			return false;
 		for (int i = 0; i < 5; i++) {
-			if (Math.abs(adsrToX(adsrPoints[i][0]) - x) < SNAP_DIST
-					&& Math.abs((1 - adsrPoints[i][1]) * height - y) < SNAP_DIST) {
+			if (distanceFromPointSquared(adsrToX(adsrPoints[i][0]), adsrToY(adsrPoints[i][1]), x, y) < SNAP_DIST_SQUARED) {
 				adsrSelected[i] = id;
 				return true;
 			}
@@ -343,6 +349,10 @@ public class SampleWaveformView extends SurfaceViewBase {
 		return false;
 	}
 
+	private float distanceFromPointSquared(float pointX, float pointY, float x, float y) {
+		return (x - pointX)*(x - pointX) + (y - pointY)*(y - pointY);
+	}
+	
 	private boolean selectLoopMarker(int id, float x) {
 		if (Math.abs(x - sampleToX(sampleLoopBegin)) < SNAP_DIST) {
 			// begin loop marker touched
