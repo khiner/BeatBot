@@ -7,45 +7,43 @@
         android:id="@+id/sample_waveform_view"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:layout_toLeftOf="@+id/adsr_toggle"
-        android:layout_marginRight="5dp" />
+        android:layout_toLeftOf="@+id/adsr_toggle"/>
 
     <ToggleButton
         android:id="@+id/adsr_toggle"
         android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:layout_alignTop="@+id/sample_waveform_view"
+        android:layout_height="80dp"
+        android:layout_alignParentRight="true"
         android:onClick="toggleAdsr"
         android:background="@drawable/adsr_btn_src"
-        android:layout_alignParentRight="true"
         android:textOn=""
         android:textOff=""
         android:text="@string/adsr"/>   
-    
+
     <ToggleButton
         android:id="@+id/loop_toggle"
         android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/adsr_toggle"
+        android:layout_height="80dp"
+        android:layout_below="@+id/sample_waveform_view"
         android:onClick="toggleLoop"
         android:background="@drawable/loop_btn_src"
         android:textOn=""
-        android:textOff=""        
-        android:text="@string/loop_sample" />
-
-    <Button
+        android:textOff="" />
+    
+    <ToggleButton
         android:id="@+id/reverse"
         android:layout_width="80dp"
-        android:layout_height="35dp"
-        android:layout_below="@+id/sample_waveform_view"
+        android:layout_height="80dp"
+        android:layout_below="@+id/loop_toggle"
         android:onClick="reverse"
-        android:text="@string/reverse" />
+        android:background="@drawable/reverse_btn_src"
+        android:textOn=""
+        android:textOff="" />
 
     <Button
         android:id="@+id/normalize"
         android:layout_width="80dp"
-        android:layout_height="35dp"
+        android:layout_height="40dp"
         android:layout_below="@+id/reverse"
         android:onClick="normalize"
         android:text="@string/normalize" />
@@ -119,6 +117,7 @@
         android:layout_height="40dp"
         android:background="@drawable/filter_icon"
         android:layout_below="@+id/pitchView"
+        android:layout_toRightOf="@+id/loop_toggle"
         android:onClick="filter"/>
 
     <ImageButton
