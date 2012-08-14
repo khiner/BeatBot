@@ -24,6 +24,7 @@ typedef struct Track_ {
 
 	bool armed;
 	bool playing;
+	bool previewing;
 	bool mute;
 	bool solo;
 } Track;

@@ -63,7 +63,7 @@ void initTrack(Track *track, AAsset *asset) {
   	track->currBufferFloat[0] = (float *)calloc(BUFF_SIZE, sizeof(float));
   	track->currBufferFloat[1] = (float *)calloc(BUFF_SIZE, sizeof(float));
 	track->armed = false;
-	track->playing = false;
+	track->playing = track->previewing = false;
 	track->mute = track->solo = false;
 	track->volume = .8f;
 	track->pan = track->pitch = .5f;
@@ -118,7 +118,7 @@ void calcNextBuffer(Track *track) {
 	// start with all zeros
 	memset(track->currBufferFloat[0], 0, BUFF_SIZE * sizeof(float));
 	memset(track->currBufferFloat[1], 0, BUFF_SIZE * sizeof(float));
-	if (track->playing) {
+	if (track->playing || track->previewing) {
 		track->generator->generate(track->generator->config, track->currBufferFloat, BUFF_SIZE);
 	}
 }
@@ -341,9 +341,7 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv *env, jclass clazz) {
 /****************************************************************************************
  Local versions of playTrack and stopTrack, to be called by the native MIDI ticker
  ****************************************************************************************/
-void playTrack(int trackNum, float volume, float pan, float pitch) {
-	Track *track = getTrack(NULL, NULL, trackNum);
-	track->playing = true;
+void soundTrack(Track *track, float volume, float pan, float pitch) {
 	track->effects[VOL_PAN_ID].set(track->effects[VOL_PAN_ID].config,
 			track->volume * volume, track->pan * pan);
 	//pitchconfig_setShift((PitchConfig *)track->effects[DYNAMIC_PITCH_ID].config, pitch*2 - 1);
@@ -355,13 +353,39 @@ void playTrack(int trackNum, float volume, float pan, float pitch) {
 	//}
 }
 
-void stopTrack(int trackNum) {
-	Track *track = getTrack(NULL, NULL, trackNum);
-	track->playing = false;
+void stopSoundingTrack(Track *track) {
 	wavfile_reset((WavFile *) track->generator->config);
 	((AdsrConfig *) track->effects[ADSR_ID].config)->active = false;
 	// update next track
 	track->nextEventNode = findNextEvent(track);
+}
+
+void previewTrack(int trackNum, float volume, float pan, float pitch) {
+	Track *track = getTrack(NULL, NULL, trackNum);
+	track->previewing = true;
+	if (!track->playing)
+		soundTrack(track, volume, pan, pitch);
+}
+
+void playTrack(int trackNum, float volume, float pan, float pitch) {
+	Track *track = getTrack(NULL, NULL, trackNum);
+	track->playing = true;
+	if (!track->previewing)
+		soundTrack(track, volume, pan, pitch);
+}
+
+void stopPreviewingTrack(int trackNum) {
+	Track *track = getTrack(NULL, NULL, trackNum);
+	track->previewing = false;
+	if (!track->playing)
+		stopSoundingTrack(track);
+}
+
+void stopTrack(int trackNum) {
+	Track *track = getTrack(NULL, NULL, trackNum);
+	track->playing = false;
+	if (!track->previewing)
+		stopSoundingTrack(track);
 }
 
 void stopAll() {
@@ -417,12 +441,12 @@ void Java_com_kh_beatbot_manager_PlaybackManager_disarmTrack(JNIEnv *env,
 
 void Java_com_kh_beatbot_manager_PlaybackManager_playTrack(JNIEnv *env,
 		jclass clazz, jint trackNum) {
-	playTrack(trackNum, 1, 1, 1);
+	previewTrack(trackNum, 1, 1, 1);
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_stopTrack(JNIEnv *env,
 		jclass clazz, jint trackNum) {
-	stopTrack(trackNum);
+	stopPreviewingTrack(trackNum);
 }
 
 void setTrackMute(Track *track, bool mute) {

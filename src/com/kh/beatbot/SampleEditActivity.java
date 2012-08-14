@@ -54,7 +54,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 	
 	public void reverse(View view) {
-		sampleWaveformView.setSamples(reverse(trackNum));
+		setReverse(trackNum, ((ToggleButton)view).isChecked());
 	}
 
 	public void normalize(View view) {
@@ -181,8 +181,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	// get the audio data in floats
 	public native float[] getSamples(int trackNum);
 
-	// reverse the sample from loop begin to loop end
-	public native float[] reverse(int trackNum);
+	// set play mode to reverse
+	public native void setReverse(int trackNum, boolean reverse);
 
 	// scale all samples so that the sample with the highest amplitude is at 1
 	public native float[] normalize(int trackNum);

@@ -54,13 +54,17 @@ jfloatArray Java_com_kh_beatbot_SampleEditActivity_getSamples(JNIEnv *env,
 	return makejFloatArray(env, wavFile->buffers[0], wavFile->totalSamples);
 }
 
-jfloatArray Java_com_kh_beatbot_SampleEditActivity_reverse(JNIEnv *env,
-		jclass clazz, jint trackNum) {
+void Java_com_kh_beatbot_SampleEditActivity_setReverse(JNIEnv *env,
+		jclass clazz, jint trackNum, jboolean reverse) {
 	Track *track = getTrack(env, clazz, trackNum);
 	WavFile *wavFile = (WavFile *)track->generator->config;
-	reverse(wavFile->buffers[0], wavFile->loopBegin, wavFile->loopEnd);
-	reverse(wavFile->buffers[1], wavFile->loopBegin, wavFile->loopEnd);
-	return makejFloatArray(env, wavFile->buffers[0], wavFile->totalSamples);
+	wavFile->reverse = reverse;
+	// if the track is not looping, the wavFile generator will not loop to the beginning/end
+	// after enaabling/disabling reverse
+	if (reverse && wavFile->currSample == wavFile->loopBegin)
+		wavFile->currSample = wavFile->loopEnd;
+	else if (!reverse && wavFile->currSample == wavFile->loopEnd)
+		wavFile->currSample = wavFile->loopBegin;
 }
 
 jfloatArray Java_com_kh_beatbot_SampleEditActivity_normalize(JNIEnv *env,

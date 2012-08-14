@@ -11,7 +11,7 @@ WavFile *wavfile_create(AAsset *asset) {
 	wavFile->buffers = (float **) malloc(2 * sizeof(float *));
 	wavFile->buffers[0] = (float *) calloc(wavFile->totalSamples, sizeof(float));
 	wavFile->buffers[1] = (float *) calloc(wavFile->totalSamples, sizeof(float));
-	wavFile->looping = false;
+	wavFile->looping = wavFile->reverse = false;
 	wavFile->loopBegin = 0;
 	wavFile->loopEnd = wavFile->totalSamples;
 	wavFile->currSample = 0;
@@ -31,7 +31,10 @@ WavFile *wavfile_create(AAsset *asset) {
 }
 
 void wavfile_reset(WavFile *config) {
-	config->currSample = config->loopBegin;
+	if (config->reverse)
+		config->currSample = config->loopEnd;
+	else
+		config->currSample = config->loopBegin;
 }
 
 void wavfile_destroy(void *p) {
