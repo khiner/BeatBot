@@ -57,14 +57,13 @@ public class TronSeekbar2d extends LevelListenable {
 
 	@Override
 	protected void drawFrame() {
-		gl.glClearColor(0, 0, 0, 1); // black bg
 		drawBackground();
 		drawSelection();
 	}
 
 	private void drawBackground() {
 		gl.glTranslatef(width / 2, height / 2, 0);
-		drawTriangleFan(borderVb, bgColor);
+		drawTriangleFan(borderVb, BG_COLOR);
 		gl.glTranslatef(-width / 2, -height / 2, 0);
 		levelColor[3] = 1; // completely opaque alpha
 		drawLines(lineVb, levelColor, 5, GL10.GL_LINES);

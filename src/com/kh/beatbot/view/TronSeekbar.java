@@ -46,7 +46,7 @@ public class TronSeekbar extends LevelListenable {
 		gl.glPushMatrix();
 		// draw background rect
 		gl.glTranslatef(0,  height/2, 0);
-		drawTriangleStrip(levelBarVb, bgColor);
+		drawTriangleStrip(levelBarVb, BG_COLOR);
 		
 		// draw level
 		drawTriangleStrip(levelBarVb, levelColor, numLevelVertices);
@@ -67,7 +67,7 @@ public class TronSeekbar extends LevelListenable {
 		// draw circle at the end of background rect
 		gl.glPointSize(8);
 		gl.glTranslatef(0, 4, 0);
-		setColor(bgColor);
+		setColor(BG_COLOR);
 		gl.glDrawArrays(GL10.GL_POINTS, levelBarVb.capacity() / 2 - 2, 1);
 		// draw level-colored circle at beginning and end of level
 		setColor(levelColor);
@@ -94,7 +94,6 @@ public class TronSeekbar extends LevelListenable {
 
 	@Override
 	protected void drawFrame() {
-		gl.glClearColor(0, 0, 0, 1);
 		drawBar();
 	}
 

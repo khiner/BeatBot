@@ -27,6 +27,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.kh.beatbot.global.GlobalVars;
+
 public abstract class SurfaceViewBase extends SurfaceView implements
 		SurfaceHolder.Callback, Runnable {
 	public static final float ¹ = (float) Math.PI;
@@ -132,6 +134,10 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		setColor(color);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_FAN, 0, vb.capacity() / 2);		
+	}
+	
+	protected static void setBackgroundColor(float[] color) {
+		gl.glClearColor(color[0], color[1], color[2], color[3]);
 	}
 	
 	protected static void setColor(float[] color) {
@@ -313,11 +319,16 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		bitmap.recycle();
 	}
 
+	protected void fillBackground() {
+		setBackgroundColor(GlobalVars.BG_COLOR);
+	}
+	
 	private void drawFrame(GL10 gl, int w, int h) {
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		gl.glViewport(0, 0, width, height);
 		gl.glLoadIdentity();
 		GLU.gluOrtho2D(gl, 0, width, height, 0);
+		fillBackground();
 		drawFrame();
 	}
 

@@ -11,6 +11,7 @@ public class GlobalVars {
 	public static final int UNDO_STACK_SIZE = 40;
 	public static final int NUM_EFFECTS = 7;
 	public static final short LEVEL_MAX = 127;
+	public static final float[] BG_COLOR = {0.12549f, 0.188235f, 0.227451f, 1};
 	private static MidiManager midiManager = null;
 	private static PlaybackManager playbackManager = null;
 

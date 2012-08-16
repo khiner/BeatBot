@@ -143,7 +143,6 @@ public class BpmView extends SurfaceViewBase {
 
 	@Override
 	protected void init() {
-		gl.glClearColor(0, 0, 0, 0);
 		initSegmentVBs();
 	}
 
@@ -178,7 +177,6 @@ public class BpmView extends SurfaceViewBase {
 
 	@Override
 	protected void drawFrame() {
-		gl.glClearColor(0, 0, 0, 0); // transparent
 		drawSegments();
 	}
 

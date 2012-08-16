@@ -124,7 +124,6 @@ public class ThresholdBarView extends SurfaceViewBase {
 
 	@Override
 	protected void init() {
-		gl.glClearColor(0, 0, 0, 1);
 		barWidth = width / numBars;
 		initChannelBuffers();
 		initThresholdBar();

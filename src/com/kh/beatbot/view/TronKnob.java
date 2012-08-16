@@ -72,7 +72,6 @@ public class TronKnob extends LevelListenable {
 			loadTexture(R.drawable.clock, 0);
 			loadTexture(R.drawable.note_icon, 1);
 		}
-		gl.glClearColor(0, 0, 0, 1);
 		setViewLevel(0.5f);
 	}
 	
@@ -91,7 +90,7 @@ public class TronKnob extends LevelListenable {
 	@Override
 	protected void drawFrame() {
 		// background
-		drawTriangleStrip(circleVb, bgColor);
+		drawTriangleStrip(circleVb, BG_COLOR);
 		// main selection
 		drawTriangleStrip(circleVb, levelColor, drawIndex);
 		if (levelSelected) { // selected glow

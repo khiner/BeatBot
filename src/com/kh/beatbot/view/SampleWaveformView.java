@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.view.bean.MidiViewBean;
 import com.kh.beatbot.view.helper.WaveformHelper;
@@ -21,7 +22,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private final float[] LOOP_HIGHLIGHT_COLOR = { 1, .64706f, 0, .4f };
 	private final float[] LOOP_SELECTION_LINE_COLOR = { 1, 1, 1, 1 };
 	private final float[] LOOP_SELECTION_RECT_COLOR = { .9f, .9f, 1, .5f };
-	private final float[] PREVIEW_BUTTON_BACKGROUND_COLOR = { 0, 0, 0, 1 };
+	private final float[] BG_COLOR = {LOOP_HIGHLIGHT_COLOR[0] * .5f, LOOP_HIGHLIGHT_COLOR[1] * .5f,
+			LOOP_HIGHLIGHT_COLOR[2] * .5f, 1};
 
 	private final float ADSR_POINT_RADIUS = 5;
 	// min distance for pointer to select loop markers
@@ -327,9 +329,13 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	@Override
+	protected void fillBackground() {
+		setBackgroundColor(BG_COLOR);
+	}
+	
+	@Override
 	protected void drawFrame() {
-		gl.glClearColor(.2f, .2f, .2f, 1);
-		drawTriangleStrip(backgroundSquareVb, PREVIEW_BUTTON_BACKGROUND_COLOR);
+		drawTriangleStrip(backgroundSquareVb, GlobalVars.BG_COLOR);
 		drawTexture(height, height);
 		drawWaveform();
 		drawLoopSelectionMarkers();

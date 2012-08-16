@@ -280,8 +280,8 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void drawLoopSquare() {
-		float gray = bean.getBgColor();
-		float[] color = new float[] { gray, gray, gray, .6f };
+		float gray = bean.getBgColor()  + .2f;
+		float[] color = new float[] { gray, gray, gray, 1};
 		drawTriangleStrip(loopSquareVB, color);
 	}
 
@@ -429,8 +429,6 @@ public class MidiView extends SurfaceViewBase {
 		// waveformHelper constructor: yPos, height
 		waveformHelper = new WaveformHelper();
 		TickWindowHelper.updateGranularity();
-		float color = bean.getBgColor();
-		gl.glClearColor(color, color, color, 1.0f);
 		initHLineVB();
 		initVLineVBs();
 		initLoopMarkerVBs();
@@ -439,21 +437,24 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	@Override
-	protected void drawFrame() {
-		boolean recording = recordManager.getState() == RecordManager.State.LISTENING
-				|| recordManager.getState() == RecordManager.State.RECORDING;
+	protected void fillBackground() {
 		if (bean.getViewState() == State.TO_LEVELS_VIEW
 				|| bean.getViewState() == State.TO_NORMAL_VIEW) { // transitioning
 			float amt = .5f / 30;
 			bean.setBgColor(bean.getViewState() == State.TO_LEVELS_VIEW ? bean
 					.getBgColor() - amt : bean.getBgColor() + amt);
-			gl.glClearColor(bean.getBgColor(), bean.getBgColor(),
-					bean.getBgColor(), 1);
 			if (bean.getBgColor() >= .5f || bean.getBgColor() <= 0) {
 				bean.setViewState(bean.getBgColor() >= .5f ? State.NORMAL_VIEW
 						: State.LEVELS_VIEW);
 			}
 		}
+		gl.glClearColor(bean.getBgColor(), bean.getBgColor(),
+				bean.getBgColor(), 1);
+	}
+	
+	@Override
+	protected void drawFrame() {
+		boolean recording = recordManager.getState() != RecordManager.State.INITIALIZING;
 		TickWindowHelper.scroll();
 		initLoopSquareVB();
 		drawTickFill();
