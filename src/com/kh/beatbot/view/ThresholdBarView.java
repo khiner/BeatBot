@@ -4,16 +4,17 @@ import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import com.kh.beatbot.global.GlobalVars;
+
 public class ThresholdBarView extends SurfaceViewBase {
 
 	private final float[] LINE_COLOR = {.9f, .9f, .9f, .65f};
-	private final float[] LINE_OUTLINE_COLOR = {1, 1, 1, 1};
+	private final float[] LINE_OUTLINE_COLOR = GlobalVars.WHITE;
 	
 	private final int numBars = 75; 
 	private final float thumbWidth = 15;

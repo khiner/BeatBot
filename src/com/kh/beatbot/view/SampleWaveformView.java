@@ -30,7 +30,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private final int SNAP_DIST = 32;
 	private final int SNAP_DIST_SQUARED = 1024;
 	private FloatBuffer waveformVb = null;
-	private FloatBuffer backgroundSquareVb = null;
+	private FloatBuffer backgroundOutlineVb = null;
+	private FloatBuffer previewButtonSquareVb = null;
 	private FloatBuffer loopSelectionLineVb = null;
 	private FloatBuffer loopSelectionRectVbs[] = new FloatBuffer[2];
 	private FloatBuffer adsrPointVb = null;
@@ -136,11 +137,15 @@ public class SampleWaveformView extends SurfaceViewBase {
 		}
 	}
 
-	private void initBackgroundSquareVb() {
-		backgroundSquareVb = makeRectFloatBuffer(0, 0, previewButtonWidth,
-				previewButtonWidth);
+	private void initBackgroundOutlineVb() {
+		backgroundOutlineVb = makeRectOutlineFloatBuffer(previewButtonWidth, 0, width - 2, height);
 	}
 
+	private void initPreviewButtonSquareVb() {
+		previewButtonSquareVb = makeRectFloatBuffer(0, 0, previewButtonWidth,
+				previewButtonWidth);
+	}
+	
 	private void initLoopMarkerVb() {
 		float xLoopBegin = sampleToX(sampleLoopBegin);
 		float xLoopEnd = sampleToX(sampleLoopEnd);
@@ -190,13 +195,14 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glDrawArrays(GL10.GL_LINE_STRIP,
 				(int) (sampleOffset / WaveformHelper.DEFAULT_SPP),
 				(int) (sampleWidth / WaveformHelper.DEFAULT_SPP));
+		gl.glDisable(GL10.GL_LINE_SMOOTH);
 		gl.glPopMatrix();
 	}
 
 	private void drawLoopSelectionMarkers() {
 		if (loopSelectionLineVb == null)
 			return;
-		drawLines(loopSelectionLineVb, LOOP_SELECTION_LINE_COLOR, 10,
+		drawLines(loopSelectionLineVb, LOOP_SELECTION_LINE_COLOR, 2,
 				GL10.GL_LINES);
 		drawTriangleFan(loopSelectionLineVb, LOOP_HIGHLIGHT_COLOR);
 		drawTriangleStrip(loopSelectionRectVbs[0], LOOP_SELECTION_RECT_COLOR);
@@ -233,7 +239,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 		waveformVb = WaveformHelper.floatsToFloatBuffer(samples, height, 0);
 		loadTexture(R.drawable.preview_icon4, 0);
 		loadTexture(R.drawable.preview_icon_selected4, 1);
-		initBackgroundSquareVb();
+		initBackgroundOutlineVb();
+		initPreviewButtonSquareVb();
 		initLoopMarkerVb();
 		initDefaultAdsrPoints();
 		initAdsrVb();
@@ -335,7 +342,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	
 	@Override
 	protected void drawFrame() {
-		drawTriangleStrip(backgroundSquareVb, GlobalVars.BG_COLOR);
+		drawTriangleStrip(previewButtonSquareVb, GlobalVars.BG_COLOR);
+		drawLines(backgroundOutlineVb, GlobalVars.WHITE, 4, GL10.GL_LINE_LOOP);
 		drawTexture(height, height);
 		drawWaveform();
 		drawLoopSelectionMarkers();

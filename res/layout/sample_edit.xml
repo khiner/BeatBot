@@ -8,6 +8,7 @@
         android:id="@+id/sample_waveform_view"
         android:layout_width="match_parent"
         android:layout_height="80dp"
+        android:layout_marginTop="5dp"
         android:layout_toLeftOf="@+id/adsr_toggle"/>
 
     <ToggleButton
@@ -15,6 +16,7 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/sample_waveform_view"
         android:onClick="toggleAdsr"
         android:background="@drawable/adsr_btn_src"
         android:textOn=""
