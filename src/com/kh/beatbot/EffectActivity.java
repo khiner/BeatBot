@@ -5,7 +5,9 @@ import java.util.List;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
@@ -48,7 +50,11 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		trackNum = getIntent().getExtras().getInt("trackNum");
-		setContentView(getEffectLayoutId());
+		setContentView(R.layout.effect_layout);
+		ViewGroup parent = (ViewGroup) findViewById(R.id.effect_layout);
+	    View view = LayoutInflater.from(getBaseContext()).inflate(this.getParamLayoutId(),
+	                null);
+		parent.addView(view);
 		initParams();
 		initParamControls();
 			
@@ -102,7 +108,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		return String.format("%.3f", param.level) + " " + param.unitString;
 	}
 	
-	public abstract int getEffectLayoutId();
+	public abstract int getParamLayoutId();
 	public abstract void setEffectOnNative(boolean on);
 	public abstract float setParamNative(int paramNum, float level);
 

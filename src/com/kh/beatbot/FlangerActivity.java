@@ -28,8 +28,8 @@ public class FlangerActivity extends EffectActivity {
 	}
 
 	@Override
-	public int getEffectLayoutId() {
-		return R.layout.flanger_layout;
+	public int getParamLayoutId() {
+		return R.layout.flanger_param_layout;
 	}
 	
 	public native void setFlangerOn(int trackNum, boolean on);

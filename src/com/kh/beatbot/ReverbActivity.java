@@ -24,8 +24,8 @@ public class ReverbActivity extends EffectActivity {
 	}
 	
 	@Override
-	public int getEffectLayoutId() {
-		return R.layout.reverb_layout;
+	public int getParamLayoutId() {
+		return R.layout.reverb_param_layout;
 	}
 	
 	public native void setReverbOn(int trackNum, boolean on);

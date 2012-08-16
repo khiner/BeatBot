@@ -31,7 +31,7 @@ public class ChorusActivity extends EffectActivity {
 	public native void setChorusParam(int trackNum, int paramNum, float param);
 
 	@Override
-	public int getEffectLayoutId() {
-		return R.layout.chorus_layout;
+	public int getParamLayoutId() {
+		return R.layout.chorus_param_layout;
 	}
 }

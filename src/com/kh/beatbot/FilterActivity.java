@@ -50,8 +50,8 @@ public class FilterActivity extends EffectActivity {
 	}
 
 	@Override
-	public int getEffectLayoutId() {
-		return R.layout.filter_layout;
+	public int getParamLayoutId() {
+		return R.layout.filter_param_layout;
 	}
 	
 	public native void setFilterOn(int trackNum, boolean on, int mode);

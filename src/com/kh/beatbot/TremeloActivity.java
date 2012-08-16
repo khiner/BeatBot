@@ -27,8 +27,8 @@ public class TremeloActivity extends EffectActivity {
 	}
 	
 	@Override
-	public int getEffectLayoutId() {
-		return R.layout.tremelo_layout;
+	public int getParamLayoutId() {
+		return R.layout.tremelo_param_layout;
 	}
 	
 	public native void setTremeloOn(int trackNum, boolean on);

@@ -28,8 +28,8 @@ public class DecimateActivity extends EffectActivity {
 	}
 	
 	@Override
-	public int getEffectLayoutId() {
-		return R.layout.decimate_layout;
+	public int getParamLayoutId() {
+		return R.layout.decimate_param_layout;
 	}
 	
 	public native void setDecimateOn(int trackNum, boolean on);

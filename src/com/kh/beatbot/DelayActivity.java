@@ -47,8 +47,8 @@ public class DelayActivity extends EffectActivity {
 	}
 
 	@Override
-	public int getEffectLayoutId() {
-		return R.layout.delay_layout;
+	public int getParamLayoutId() {
+		return R.layout.delay_param_layout;
 	}
 	
 	@Override
