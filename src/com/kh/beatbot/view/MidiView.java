@@ -32,13 +32,14 @@ public class MidiView extends SurfaceViewBase {
 	private static final int[] V_LINE_WIDTHS = new int[] { 5, 3, 2 };
 	private static final float[] V_LINE_COLORS = new float[] { 0, .2f, .3f };
 	// NIO Buffers
-	private FloatBuffer[] vLineVB = new FloatBuffer[3];
-	private FloatBuffer hLineVB = null;
-	private FloatBuffer tickFillVB = null;
-	private FloatBuffer selectRegionVB = null;
-	private FloatBuffer loopMarkerVB = null;
-	private FloatBuffer loopMarkerLineVB = null;
-	private FloatBuffer loopSquareVB = null;
+	private FloatBuffer[] vLineVb = new FloatBuffer[3];
+	private FloatBuffer currTickVb = null;
+	private FloatBuffer hLineVb = null;
+	private FloatBuffer tickFillVb = null;
+	private FloatBuffer selectRegionVb = null;
+	private FloatBuffer loopMarkerVb = null;
+	private FloatBuffer loopMarkerLineVb = null;
+	private FloatBuffer loopSquareVb = null;
 
 	private MidiManager midiManager;
 	private RecordManager recordManager;
@@ -145,7 +146,7 @@ public class MidiView extends SurfaceViewBase {
 		}
 		// make room in the view window if we are dragging out of the view
 		TickWindowHelper.updateView(leftTick, rightTick);
-		initSelectRegionVB(leftTick, rightTick, topY, bottomY);
+		initSelectRegionVb(leftTick, rightTick, topY, bottomY);
 	}
 
 	private void selectMidiNote(float x, float y, int pointerId) {
@@ -194,8 +195,8 @@ public class MidiView extends SurfaceViewBase {
 	private void drawHorizontalLines() {
 		gl.glColor4f(0, 0, 0, 1);
 		gl.glLineWidth(2);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, hLineVB);
-		gl.glDrawArrays(GL10.GL_LINES, 0, hLineVB.capacity() / 2);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, hLineVb);
+		gl.glDrawArrays(GL10.GL_LINES, 0, hLineVb.capacity() / 2);
 	}
 
 	private void drawVerticalLines() {
@@ -219,7 +220,7 @@ public class MidiView extends SurfaceViewBase {
 			gl.glLineWidth(V_LINE_WIDTHS[i]); // appropriate line width
 			gl.glPushMatrix();
 			for (float x = startX; x < endX; x += translateDist) {
-				gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vLineVB[i]);
+				gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vLineVb[i]);
 				gl.glDrawArrays(GL10.GL_LINES, 0, 2);
 				gl.glTranslatef(translateDist, 0, 0);
 			}
@@ -236,11 +237,9 @@ public class MidiView extends SurfaceViewBase {
 
 	private void drawCurrentTick() {
 		float xLoc = tickToX(midiManager.getCurrTick());
-		float[] vertLine = new float[] { xLoc, width, xLoc, 0 };
-		FloatBuffer lineBuff = makeFloatBuffer(vertLine);
-		gl.glColor4f(1, 1, 1, 0.5f);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, lineBuff);
-		gl.glDrawArrays(GL10.GL_LINES, 0, 2);
+		gl.glTranslatef(xLoc, 0, 0);
+		drawLines(currTickVb, MidiViewBean.VOLUME_COLOR, 5, GL10.GL_LINES);
+		gl.glTranslatef(-xLoc, 0, 0);
 	}
 
 	private void drawLoopMarker() {
@@ -257,16 +256,16 @@ public class MidiView extends SurfaceViewBase {
 			setColor(color[i]);
 			gl.glPushMatrix();
 			gl.glTranslatef(loopMarkerLoc, 0, 0);
-			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerVB);
+			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerVb);
 			gl.glDrawArrays(GL10.GL_TRIANGLES, i * 3, 3);
-			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerLineVB);
+			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerLineVb);
 			gl.glDrawArrays(GL10.GL_LINES, 0, 2);
 			gl.glPopMatrix();
 		}
 	}
 
 	private void drawTickFill() {
-		drawTriangleStrip(tickFillVB, MidiViewBean.TICK_FILL_COLOR);
+		drawTriangleStrip(tickFillVb, MidiViewBean.TICK_FILL_COLOR);
 		drawLoopBar();
 	}
 
@@ -280,16 +279,16 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void drawLoopSquare() {
-		float gray = bean.getBgColor()  + .2f;
-		float[] color = new float[] { gray, gray, gray, 1};
-		drawTriangleStrip(loopSquareVB, color);
+		float gray = bean.getBgColor() + .2f;
+		float[] color = new float[] { gray, gray, gray, 1 };
+		drawTriangleStrip(loopSquareVb, color);
 	}
 
 	private void drawRecordingWaveforms() {
-		ArrayList<FloatBuffer> waveformVBs = waveformHelper
-				.getCurrentWaveformVBs();
-		if (recordManager.isRecording() && !waveformVBs.isEmpty()) {
-			FloatBuffer last = waveformVBs.get(waveformVBs.size() - 1);
+		ArrayList<FloatBuffer> waveformVbs = waveformHelper
+				.getCurrentWaveformVbs();
+		if (recordManager.isRecording() && !waveformVbs.isEmpty()) {
+			FloatBuffer last = waveformVbs.get(waveformVbs.size() - 1);
 			float waveWidth = last.get(last.capacity() - 2);
 			float noteWidth = tickToX(midiManager.getCurrTick()
 					- recordManager.getRecordStartTick());
@@ -298,24 +297,24 @@ public class MidiView extends SurfaceViewBase {
 			// scale drawing so the entire waveform exactly fits in the note
 			// width
 			gl.glScalef(noteWidth / waveWidth, 1, 1);
-			for (int i = 0; i < waveformVBs.size(); i++) {
-				drawLines(waveformVBs.get(i), MidiViewBean.WAVEFORM_COLOR, 1,
+			for (int i = 0; i < waveformVbs.size(); i++) {
+				drawLines(waveformVbs.get(i), MidiViewBean.WAVEFORM_COLOR, 1,
 						GL10.GL_LINE_STRIP);
 			}
 			gl.glPopMatrix();
 		}
 	}
 
-	public void initSelectRegionVB(long leftTick, long rightTick, float topY,
+	public void initSelectRegionVb(long leftTick, long rightTick, float topY,
 			float bottomY) {
-		selectRegionVB = makeRectFloatBuffer(tickToX(leftTick), topY,
+		selectRegionVb = makeRectFloatBuffer(tickToX(leftTick), topY,
 				tickToX(rightTick), bottomY);
 	}
 
 	private void drawSelectRegion() {
-		if (!bean.isSelectRegion() || selectRegionVB == null)
+		if (!bean.isSelectRegion() || selectRegionVb == null)
 			return;
-		drawTriangleStrip(selectRegionVB, new float[] { .6f, .6f, 1, .7f });
+		drawTriangleStrip(selectRegionVb, new float[] { .6f, .6f, 1, .7f });
 	}
 
 	private void drawAllMidiNotes() {
@@ -346,17 +345,22 @@ public class MidiView extends SurfaceViewBase {
 				baseColor, baseColor, 1 }, 4);
 	}
 
-	private void initTickFillVB() {
-		tickFillVB = makeRectFloatBuffer(0, 0, width, MidiViewBean.Y_OFFSET);
+	private void initTickFillVb() {
+		tickFillVb = makeRectFloatBuffer(0, 0, width, MidiViewBean.Y_OFFSET);
 	}
 
-	private void initLoopSquareVB() {
-		loopSquareVB = makeRectFloatBuffer(
+	private void initLoopSquareVb() {
+		loopSquareVb = makeRectFloatBuffer(
 				tickToX(midiManager.getLoopBeginTick()), MidiViewBean.Y_OFFSET,
 				tickToX(midiManager.getLoopEndTick()), height);
 	}
 
-	private void initHLineVB() {
+	private void initCurrTickVb() {
+		float[] vertLine = new float[] { 0, MidiViewBean.Y_OFFSET, 0, height };
+		currTickVb = makeFloatBuffer(vertLine);
+	}
+
+	private void initHLineVb() {
 		float[] hLines = new float[(midiManager.getNumSamples() + 2) * 4];
 		hLines[0] = 0;
 		hLines[1] = 0;
@@ -370,10 +374,10 @@ public class MidiView extends SurfaceViewBase {
 			hLines[i * 4 + 3] = y;
 			y += bean.getNoteHeight();
 		}
-		hLineVB = makeFloatBuffer(hLines);
+		hLineVb = makeFloatBuffer(hLines);
 	}
 
-	private void initVLineVBs() {
+	private void initVLineVbs() {
 		// height of the bottom of the record row
 		float y1 = MidiViewBean.Y_OFFSET;
 
@@ -384,19 +388,19 @@ public class MidiView extends SurfaceViewBase {
 			line[1] = y1 - y1 / (i + 1.5f);
 			line[2] = 0;
 			line[3] = bean.getHeight();
-			vLineVB[i] = makeFloatBuffer(line);
+			vLineVb[i] = makeFloatBuffer(line);
 		}
 	}
 
-	private void initLoopMarkerVBs() {
+	private void initLoopMarkerVbs() {
 		float h = MidiViewBean.Y_OFFSET;
 		float[] loopMarkerLine = new float[] { 0, 0, 0, bean.getHeight() };
 		// loop begin triangle, pointing right, and
 		// loop end triangle, pointing left
 		float[] loopMarkerTriangles = new float[] { 0, 0, 0, h, h, h / 2, 0, 0,
 				0, h, -h, h / 2 };
-		loopMarkerLineVB = makeFloatBuffer(loopMarkerLine);
-		loopMarkerVB = makeFloatBuffer(loopMarkerTriangles);
+		loopMarkerLineVb = makeFloatBuffer(loopMarkerLine);
+		loopMarkerVb = makeFloatBuffer(loopMarkerTriangles);
 	}
 
 	public float tickToX(long tick) {
@@ -429,11 +433,12 @@ public class MidiView extends SurfaceViewBase {
 		// waveformHelper constructor: yPos, height
 		waveformHelper = new WaveformHelper();
 		TickWindowHelper.updateGranularity();
-		initHLineVB();
-		initVLineVBs();
-		initLoopMarkerVBs();
-		initLoopSquareVB();
-		initTickFillVB();
+		initCurrTickVb();
+		initHLineVb();
+		initVLineVbs();
+		initLoopMarkerVbs();
+		initLoopSquareVb();
+		initTickFillVb();
 	}
 
 	@Override
@@ -451,24 +456,21 @@ public class MidiView extends SurfaceViewBase {
 		gl.glClearColor(bean.getBgColor(), bean.getBgColor(),
 				bean.getBgColor(), 1);
 	}
-	
+
 	@Override
 	protected void drawFrame() {
 		boolean recording = recordManager.getState() != RecordManager.State.INITIALIZING;
+		boolean playing = playbackManager.getState() == PlaybackManager.State.PLAYING;
 		TickWindowHelper.scroll();
-		initLoopSquareVB();
+		initLoopSquareVb();
 		drawTickFill();
 		drawLoopSquare();
+		// if we're recording, keep the current recording tick in view.
 		if (recording
-				|| playbackManager.getState() == PlaybackManager.State.PLAYING) {
-			// if we're recording, keep the current recording tick in view.
-			if (recording
-					&& midiManager.getCurrTick() > TickWindowHelper
-							.getTickOffset() + TickWindowHelper.getNumTicks())
-				TickWindowHelper.setNumTicks(midiManager.getCurrTick()
-						- TickWindowHelper.getTickOffset());
-			drawCurrentTick();
-		}
+				&& midiManager.getCurrTick() > TickWindowHelper.getTickOffset()
+						+ TickWindowHelper.getNumTicks())
+			TickWindowHelper.setNumTicks(midiManager.getCurrTick()
+					- TickWindowHelper.getTickOffset());
 		if (bean.getViewState() != State.LEVELS_VIEW) {
 			// normal or transitioning view. draw lines
 			drawHorizontalLines();
@@ -483,6 +485,9 @@ public class MidiView extends SurfaceViewBase {
 		drawSelectRegion();
 		ScrollBarHelper.drawScrollView(width, height);
 		drawRecordingWaveforms();
+		if (playing || recording) {
+			drawCurrentTick();
+		}
 	}
 
 	private long getAdjustedTickDiff(long tickDiff, int pointerId,
@@ -574,7 +579,7 @@ public class MidiView extends SurfaceViewBase {
 			bean.setSelectRegionStartY(y);
 		else
 			bean.setSelectRegionStartY(noteToY(yToNote(y)));
-		selectRegionVB = null;
+		selectRegionVb = null;
 		bean.setSelectRegion(true);
 	}
 

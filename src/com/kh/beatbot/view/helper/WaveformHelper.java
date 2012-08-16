@@ -27,7 +27,7 @@ public class WaveformHelper extends Thread {
 		
 	private boolean completed;
 		
-	public ArrayList<FloatBuffer> getCurrentWaveformVBs() {
+	public ArrayList<FloatBuffer> getCurrentWaveformVbs() {
 		return waveformSegmentsVB;
 	}
 
