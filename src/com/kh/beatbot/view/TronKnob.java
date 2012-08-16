@@ -72,7 +72,6 @@ public class TronKnob extends LevelListenable {
 			loadTexture(R.drawable.clock, 0);
 			loadTexture(R.drawable.note_icon, 1);
 		}
-		setViewLevel(0.5f);
 	}
 	
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,

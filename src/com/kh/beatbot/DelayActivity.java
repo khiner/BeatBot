@@ -56,6 +56,7 @@ public class DelayActivity extends EffectActivity {
 		super.setLevel(listenable, level);
 		if (linkChannels) {
 			if (listenable.getId() == 0) {
+				setParamLevel(1, level);
 				paramControls.get(1).getKnob().setViewLevel(level);
 				paramControls.get(1).setValueLabel(paramControls.get(0).getValueLabel());
 			} else if (listenable.getId() == 1) {
