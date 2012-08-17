@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
@@ -26,6 +27,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		// remove title bar
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.sample_edit);
 		playbackManager = GlobalVars.getPlaybackManager();
 		trackNum = getIntent().getExtras().getInt("trackNum");

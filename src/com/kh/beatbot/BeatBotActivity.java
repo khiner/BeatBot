@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
@@ -167,6 +168,8 @@ public class BeatBotActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		// remove title bar
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		// assign hardware (ringer) volume +/- to media while this application
 		// has focus
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
