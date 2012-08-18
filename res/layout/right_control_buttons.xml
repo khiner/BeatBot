@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <ToggleButton
-        android:id="@+id/levels"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@drawable/levels_btn_src"
-        android:contentDescription="@string/levels"
-        android:onClick="levels"
-        android:textOff=""
-        android:textOn="" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
 
     <ImageButton
         android:id="@+id/delete"
@@ -27,6 +20,17 @@
         android:background="@drawable/undo_btn_src"
         android:contentDescription="@string/undo"
         android:onClick="undo" />
+    
+    <ToggleButton
+        android:id="@+id/levels"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/levels_btn_src"
+        android:contentDescription="@string/levels"
+        android:onClick="levels"
+        android:textOff=""
+        android:textOn="" />
 
     <ImageButton
         android:id="@+id/bpm_tap"
@@ -42,4 +46,4 @@
         android:layout_height="40dp"
         android:layout_marginLeft="10dp" />
 
-</merge>
+</LinearLayout>

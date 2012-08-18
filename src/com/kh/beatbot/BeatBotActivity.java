@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -47,12 +46,7 @@ public class BeatBotActivity extends Activity {
 		@Override
 		public void onAnimationEnd(Animation animation) {
 			if (fadeOut) {
-				// in landscape mode, we only want to make levels invisible so they still take up space
-				// in portrait, they get their own row only when visible, so make it completely gone
-				if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
-					levelsGroup.setVisibility(View.INVISIBLE);
-				else
-					levelsGroup.setVisibility(View.GONE);
+				levelsGroup.setVisibility(View.GONE);
 			}
 		}
 

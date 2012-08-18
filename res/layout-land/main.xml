@@ -5,75 +5,81 @@
     android:layout_height="fill_parent"
     android:background="@color/background" >
 
-    <LinearLayout
-        android:id="@+id/controlLayout"
-        android:layout_width="fill_parent"
+    <include layout="@layout/left_control_buttons"
+        android:id="@+id/leftControlButtons"
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/midiView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    <include layout="@layout/right_control_buttons"
+        android:id="@+id/rightControlButtons"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <include layout="@layout/left_control_buttons" />
-            
-        <LinearLayout
-            android:id="@+id/levelsLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="invisible" >
-
-            <ToggleButton
-                android:id="@+id/volumeButton"
-                android:layout_width="80dp"
-                android:layout_height="40dp"
-                android:background="@drawable/volume_btn_src"
-                android:checked="true"
-                android:onClick="volume"
-                android:textOff=""
-                android:textOn="" />
-
-            <ToggleButton
-                android:id="@+id/panButton"
-                android:layout_width="80dp"
-                android:layout_height="40dp"
-                android:background="@drawable/pan_btn_src"
-                android:onClick="pan"
-                android:textOff=""
-                android:textOn="" />
-
-            <ToggleButton
-                android:id="@+id/pitchButton"
-                android:layout_width="80dp"
-                android:layout_height="40dp"
-                android:background="@drawable/pitch_btn_src"
-                android:onClick="pitch"
-                android:textOff=""
-                android:textOn="" />
-        </LinearLayout>
-        
-		<include layout="@layout/right_control_buttons" />
-		
-    </LinearLayout>
-
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true" />
+    
     <com.kh.beatbot.view.ThresholdBarView
         android:id="@+id/thresholdBar"
-        android:layout_width="0dp"
-        android:layout_height="25dp"
-        android:layout_below="@+id/controlLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_below="@+id/leftControlButtons"
         android:layout_alignLeft="@+id/midiView"
-        android:layout_alignRight="@+id/midiView" />
+        android:layout_toLeftOf="@+id/levelsLayout" />
+       
+    <LinearLayout
+        android:id="@+id/levelsLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/midiView"
+        android:layout_below="@+id/rightControlButtons"
+        android:layout_alignParentRight="true"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <ToggleButton
+            android:id="@+id/volumeButton"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:background="@drawable/volume_btn_src"
+            android:checked="true"
+            android:onClick="volume"
+            android:textOff=""
+            android:textOn="" />
+
+        <ToggleButton
+            android:id="@+id/panButton"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:background="@drawable/pan_btn_src"
+            android:onClick="pan"
+            android:textOff=""
+            android:textOn="" />
+
+        <ToggleButton
+            android:id="@+id/pitchButton"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:background="@drawable/pitch_btn_src"
+            android:onClick="pitch"
+            android:textOff=""
+            android:textOn="" />
+    </LinearLayout>
+
 
     <ListView
         android:id="@+id/sampleListView"
         android:layout_width="98dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/thresholdBar"
-        android:layout_marginTop="13dp"/>
+        android:layout_marginTop="13dp" />
 
     <com.kh.beatbot.view.MidiView
         android:id="@+id/midiView"
         android:layout_width="match_parent"
         android:layout_height="246dp"
-        android:layout_below="@+id/thresholdBar"
         android:layout_alignBottom="@+id/sampleListView"
+        android:layout_below="@+id/thresholdBar"
         android:layout_toRightOf="@+id/sampleListView" />
 
 </RelativeLayout>
