@@ -110,13 +110,17 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	}
 	
 	public static void drawTriangleStrip(FloatBuffer vb, float[] color, int numVertices) {
-		setColor(color);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, numVertices);
+		drawTriangleStrip(vb, color, 0, numVertices);
 	}
 	
 	public static void drawTriangleStrip(FloatBuffer vb, float[] color) {
 		drawTriangleStrip(vb, color, vb.capacity() / 2);
+	}
+	
+	public static void drawTriangleStrip(FloatBuffer vb, float[] color, int beginVertex, int endVertex) {
+		setColor(color);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
+		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, beginVertex, endVertex - beginVertex);
 	}
 
 	public static void drawLines(FloatBuffer vb, float[] color, float width, int type, int stride) {
@@ -134,6 +138,12 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		setColor(color);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_FAN, 0, vb.capacity() / 2);		
+	}
+	
+	public static void drawPoint(float pointSize, float[] color, int vertex) {
+		setColor(color);
+		gl.glPointSize(pointSize);
+		gl.glDrawArrays(GL10.GL_POINTS, vertex, 1);
 	}
 	
 	protected static void setBackgroundColor(float[] color) {
