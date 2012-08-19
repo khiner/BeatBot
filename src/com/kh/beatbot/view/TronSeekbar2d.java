@@ -52,8 +52,6 @@ public class TronSeekbar2d extends LevelListenable {
 		super.init();
 		initBorderVb();
 		initLines();
-		setViewLevelX(0.5f);
-		setViewLevelY(0.5f);
 	}
 
 	@Override

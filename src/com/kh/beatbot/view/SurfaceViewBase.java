@@ -114,10 +114,14 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	}
 	
 	public static void drawTriangleStrip(FloatBuffer vb, float[] color) {
+		if (vb == null)
+			return;
 		drawTriangleStrip(vb, color, vb.capacity() / 2);
 	}
 	
 	public static void drawTriangleStrip(FloatBuffer vb, float[] color, int beginVertex, int endVertex) {
+		if (vb == null)
+			return;
 		setColor(color);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, beginVertex, endVertex - beginVertex);

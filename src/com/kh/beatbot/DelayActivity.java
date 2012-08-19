@@ -30,7 +30,7 @@ public class DelayActivity extends EffectActivity {
 		NUM_PARAMS = 4;
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, "ms"));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, "ms"));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, "ms"));
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ""));
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ""));
 		}
