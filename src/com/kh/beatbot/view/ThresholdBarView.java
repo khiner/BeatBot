@@ -7,7 +7,7 @@ import android.view.MotionEvent;
 import com.kh.beatbot.global.GlobalVars;
 
 public class ThresholdBarView extends TronSeekbar {
-
+	private final float[] THRESHOLD_COLOR = { BG_COLOR[0] + .2f, BG_COLOR[1] + .2f, BG_COLOR[2] + .2f, 1};
 	private float dbThreshold;
 	private short shortThreshold;
 	private int thresholdVertex;
@@ -31,7 +31,7 @@ public class ThresholdBarView extends TronSeekbar {
 			return;
 		thresholdVertex = (int)(dbThreshold * levelBarVb.capacity() / 2);
 		thresholdVertex += thresholdVertex % 2;
-		thresholdVertex = thresholdVertex > levelBarVb.capacity() / 2 - 2? levelBarVb.capacity() / 2 - 2: thresholdVertex;
+		thresholdVertex = thresholdVertex > 2 ? thresholdVertex : 2;
 	}
 	
 	public void setThreshold(float threshold) {
@@ -68,11 +68,18 @@ public class ThresholdBarView extends TronSeekbar {
 		updateThresholdVertex();
 	}
 	
-	@Override
-	protected void drawLevel() {
-		setColor(GlobalVars.GREEN);
-		gl.glPushMatrix();
-		translate(levelBarHeight * 2, height / 2);
+	private void drawThresholdLevel() {
+		drawTriangleStrip(levelBarVb, THRESHOLD_COLOR, thresholdVertex);
+		translate(0, levelBarHeight / 2);
+		// circles for rounded rect ends
+		drawPoint(levelBarHeight, THRESHOLD_COLOR, 0);
+		drawPoint(levelBarHeight, THRESHOLD_COLOR, thresholdVertex - 2);
+		// bigger selection point
+		drawPoint(levelBarHeight * 4, selectColor, thresholdVertex - 2);
+		translate(0, -levelBarHeight / 2);
+	}
+	
+	private void drawDbLevel() {
 		drawTriangleStrip(levelBarVb, GlobalVars.GREEN, 0,
 				numLevelVertices <= maxGreenVertices ? numLevelVertices : maxGreenVertices);
 		if (numLevelVertices >= maxGreenVertices) {
@@ -90,9 +97,17 @@ public class ThresholdBarView extends TronSeekbar {
 		if (numLevelVertices >= maxRedVertices) { // draw circle at end
 			drawPoint(levelBarHeight, GlobalVars.RED, levelBarVb.capacity() - 2);
 		}
-		drawPoint(levelBarHeight * 4, selectColor, thresholdVertex);
-		gl.glPopMatrix();
+		translate(0, -levelBarHeight / 2);
+	}
+	
+	@Override
+	protected void drawLevel() {
+		gl.glPushMatrix();
+		translate(levelBarHeight * 2, height / 2);
+		drawThresholdLevel();
+		drawDbLevel();
 		dampLevel();
+		gl.glPopMatrix();
 	}
 
 	@Override
@@ -111,7 +126,7 @@ public class ThresholdBarView extends TronSeekbar {
 	}
 	
 	private float clipToUnit(float x) {
-		return x >= 0 ? (x <= 0.99f ? x : 0.99f) : 0;
+		return x >= 0 ? (x <= 1 ? x : 1) : 0;
 	}
 	
 	private short dbToShort(float db) {

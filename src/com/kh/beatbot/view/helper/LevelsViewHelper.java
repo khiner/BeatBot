@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.MidiView;
+import com.kh.beatbot.view.SurfaceViewBase;
 import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class LevelsViewHelper {
@@ -37,10 +38,8 @@ public class LevelsViewHelper {
 		VOLUME, PAN, PITCH
 	};
 
-	// Level Bar Vertex Buffers
-	private static FloatBuffer levelBarsVB = null;
-	private static FloatBuffer selectedLevelBarsVB = null;
-
+	private static FloatBuffer levelBarVb = null;
+	private static final int LEVEL_BAR_WIDTH = MidiViewBean.LEVEL_POINT_SIZE / 2;
 	private static MidiView midiView;
 	private static MidiViewBean bean;
 	private static MidiManager midiManager;
@@ -63,6 +62,7 @@ public class LevelsViewHelper {
 		bean = midiView.getBean();
 		midiManager = midiView.getMidiManager();
 		gl = midiView.getGL10();
+		initLevelBarVb();
 	}
 
 	public static void setLevelMode(LevelMode levelMode) {
@@ -77,89 +77,73 @@ public class LevelsViewHelper {
 		return touchedLevels.get(id);
 	}
 
-	private static void initLevelBarsVB() {
-		ArrayList<Float> selectedLevelBars = new ArrayList<Float>();
-		for (MidiNote levelSelected : midiManager.getLevelSelectedNotes()) {
-			float x = midiView.tickToX(levelSelected.getOnTick());
-			selectedLevelBars.add(x);
-			selectedLevelBars.add(levelToY(levelSelected
-					.getLevel(currLevelMode)));
-			selectedLevelBars.add(x);
-			selectedLevelBars.add(bean.getHeight());
+	private static void initLevelBarVb() {
+		float[] vertices = new float[800];
+		for (int i = 0; i < vertices.length / 4; i++) {
+			vertices[i * 4] = -LEVEL_BAR_WIDTH / 2;
+			vertices[i * 4 + 1] = bean.getHeight()
+					- ((float) i / (vertices.length / 4))
+					* bean.getLevelsHeight();
+			vertices[i * 4 + 2] = LEVEL_BAR_WIDTH / 2;
+			vertices[i * 4 + 3] = vertices[i * 4 + 1];
 		}
-		ArrayList<Float> levelBars = new ArrayList<Float>();
-		for (MidiNote levelViewSelected : midiManager
-				.getLevelViewSelectedNotes()) {
-			float x = midiView.tickToX(levelViewSelected.getOnTick());
-			if (!levelViewSelected.isLevelSelected()) {
-				levelBars.add(x);
-				levelBars.add(levelToY(levelViewSelected
-						.getLevel(currLevelMode)));
-				levelBars.add(x);
-				levelBars.add(bean.getHeight());
-			}
-		}
-		float[] levelBarsAry = new float[levelBars.size()];
-		for (int i = 0; i < levelBarsAry.length; i++)
-			levelBarsAry[i] = levelBars.get(i);
-		float[] selectedLevelBarsAry = new float[selectedLevelBars.size()];
-		for (int i = 0; i < selectedLevelBarsAry.length; i++)
-			selectedLevelBarsAry[i] = selectedLevelBars.get(i);
-		levelBarsVB = MidiView.makeFloatBuffer(levelBarsAry);
-		selectedLevelBarsVB = MidiView.makeFloatBuffer(selectedLevelBarsAry);
+		levelBarVb = SurfaceViewBase.makeFloatBuffer(vertices);
 	}
 
-	private static void drawLevels() {
-		drawLevels(true);
-		drawLevels(false);
+	private static int calcVertex(float level) {
+		int vertex = (int) (level * (levelBarVb.capacity() / 2 - 16));
+		vertex += 16;
+		vertex += vertex % 2;
+		vertex = vertex > 2 ? vertex : 2;
+		return vertex;
 	}
 
-	private static void drawLevels(boolean selected) {
-		FloatBuffer vertexBuffer = selected ? selectedLevelBarsVB : levelBarsVB;
-		float[] color = null;
+	protected static void drawLevel(float x, float level, float[] levelColor) {
+		int vertex = calcVertex(level);
+		gl.glPushMatrix();
+		SurfaceViewBase.translate(x, 0);
+		SurfaceViewBase.drawTriangleStrip(levelBarVb, levelColor, vertex);
+
+		SurfaceViewBase.translate(LEVEL_BAR_WIDTH / 2 - .15f, 0);
+		// draw level-colored circle at beginning and end of level
+		SurfaceViewBase.drawPoint(LEVEL_BAR_WIDTH, levelColor, vertex - 2);
+
+		drawLevelSelectionCircle(vertex - 2, levelColor);
+		gl.glPopMatrix();
+	}
+
+	protected static void drawLevelSelectionCircle(int vertex, float[] levelColor) {
+		// draw bigger, translucent 'selection' circle at end of level
+		levelColor[3] = .5f;
+		SurfaceViewBase.drawPoint(LEVEL_BAR_WIDTH * 2.5f, levelColor, vertex);
+		levelColor[3] = 1;
+	}
+
+	private static float[] calcLevelColor(boolean selected) {
 		if (selected) {
-			color = MidiViewBean.LEVEL_SELECTED_COLOR;
+			return MidiViewBean.LEVEL_SELECTED_COLOR;
 		} else {
 			switch (currLevelMode) {
 			case VOLUME:
-				color = MidiViewBean.VOLUME_COLOR;
-				break;
+				return MidiViewBean.VOLUME_COLOR;
 			case PAN:
-				color = MidiViewBean.PAN_COLOR;
-				break;
+				return MidiViewBean.PAN_COLOR;
 			case PITCH:
-				color = MidiViewBean.PITCH_COLOR;
-				break;
+				return MidiViewBean.PITCH_COLOR;
+			default:
+				return MidiViewBean.LEVEL_SELECTED_COLOR;
 			}
 		}
+	}
 
-		gl.glLineWidth(2f); // 2 pixels wide
-		// draw each line (2*blurWidth) times, translating and changing the
-		// alpha channel
-		// for each line, to achieve a DIY "blur" effect
-		// this blur is animated to get wider and narrower for a "pulse" effect
-		float blurWidth = ((bean.getAnimateCount() / 150)) % 2 == 0 ? (bean
-				.getAnimateCount() / 30f) % 5
-				: 5 - (bean.getAnimateCount() / 30f) % 5;
-		blurWidth += 15;
-		for (float i = -blurWidth; i < blurWidth; i++) {
-			float alpha = 1 - Math.abs(i) / (float) blurWidth;
-			// calculate color. selected bars are always red,
-			// non-selected bars depend on the LevelMode type
-			gl.glColor4f(color[0], color[1], color[2], alpha);
-			gl.glTranslatef(i, 0, 0);
-			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vertexBuffer);
-			gl.glDrawArrays(GL10.GL_LINES, 0, vertexBuffer.capacity() / 2);
-			gl.glTranslatef(-i, 0, 0);
-			// draw circles (big points) at top of level bars
-			if (i < 1)
-				continue;
-			gl.glPointSize(i * 3.5f);
-			for (int j = 0; j < vertexBuffer.capacity() / 2; j += 2) {
-				gl.glDrawArrays(GL10.GL_POINTS, j, 1);
+	private static void drawLevels() {
+		for (MidiNote midiNote : midiManager.getMidiNotes()) {
+			if (midiNote.isLevelViewSelected()) {
+				drawLevel(midiView.tickToX(midiNote.getOnTick()),
+						midiNote.getLevel(currLevelMode),
+						calcLevelColor(midiNote.isLevelSelected()));
 			}
 		}
-		bean.incrementAnimateCount();
 	}
 
 	public static void selectLevel(float x, float y, int pointerId) {
@@ -338,7 +322,6 @@ public class LevelsViewHelper {
 	}
 
 	public static void drawFrame() {
-		initLevelBarsVB();
 		drawAllMidiNotes();
 		drawLevels();
 	}

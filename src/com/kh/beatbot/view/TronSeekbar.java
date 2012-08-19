@@ -75,7 +75,9 @@ public class TronSeekbar extends LevelListenable {
 	}
 
 	protected void drawTouchedLevelSelectionCircle() {
-		drawPoint(levelBarHeight * 3, levelColor, numLevelVertices - 2);
+		selectColor[3] = .7f;
+		drawPoint(levelBarHeight * 3, selectColor, numLevelVertices - 2);
+		selectColor[3] = .5f;
 		for (int i = (int)(levelBarHeight * 3); i < levelBarHeight * 4; i += 4) {
 			drawPoint(i, selectColor, numLevelVertices - 2);
 		}

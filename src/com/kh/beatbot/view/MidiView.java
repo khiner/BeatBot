@@ -772,7 +772,7 @@ public class MidiView extends SurfaceViewBase {
 		bean.setMidiHeight(bean.getHeight() - MidiViewBean.Y_OFFSET);
 		bean.setNoteHeight(bean.getMidiHeight() / midiManager.getNumSamples());
 		bean.setLevelsHeight(bean.getMidiHeight()
-				- MidiViewBean.LEVEL_POINT_SIZE);
+				- MidiViewBean.LEVEL_POINT_SIZE / 2);
 	}
 
 	@Override

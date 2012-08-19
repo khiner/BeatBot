@@ -6,7 +6,7 @@ public class MidiViewBean {
 	public static final float Y_OFFSET = 21;
 
 	// the size of the "dots" at the top of level display
-	public static final int LEVEL_POINT_SIZE = 25;
+	public static final int LEVEL_POINT_SIZE = 16;
 	// the width of the lines for note levels
 	public static final int LEVEL_LINE_WIDTH = 7;
 	// time (in millis) between taps before handling as a double-tap
@@ -83,8 +83,6 @@ public class MidiViewBean {
 	// this option can be set via a menu item.
 	// if true, all midi note movements are rounded to the nearest major tick
 	private boolean snapToGrid = true;
-
-	private int animateCount = 0;
 
 	public MidiView.State getViewState() {
 		return viewState;
@@ -320,13 +318,5 @@ public class MidiViewBean {
 	public boolean toggleSnapToGrid() {
 		snapToGrid = !snapToGrid;
 		return snapToGrid;
-	}
-
-	public int getAnimateCount() {
-		return animateCount;
-	}
-
-	public void incrementAnimateCount() {
-		animateCount++;
 	}
 }
