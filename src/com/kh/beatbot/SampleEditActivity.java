@@ -141,10 +141,13 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public void setLevel(LevelListenable levelBar, float level) {
 		if (levelBar.equals(volumeLevel)) {
 			setPrimaryVolume(trackNum, level);
+			GlobalVars.trackVolume[trackNum] = level;
 		} else if (levelBar.equals(panLevel)) {
-			setPrimaryPan(trackNum, level);			
+			setPrimaryPan(trackNum, level);
+			GlobalVars.trackPan[trackNum] = level;
 		} else if (levelBar.equals(pitchLevel)) {
-			setPrimaryPitch(trackNum, level);			
+			setPrimaryPitch(trackNum, level);
+			GlobalVars.trackPitch[trackNum] = level;
 		}
 	}
 	
@@ -152,13 +155,13 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public void notifyInit(LevelListenable levelBar) {
 		if (levelBar.equals(volumeLevel)) {
 			volumeLevel.setLevelColor(MidiViewBean.VOLUME_COLOR);
-			volumeLevel.setLevel(.8f);
+			volumeLevel.setLevel(GlobalVars.trackVolume[trackNum]);
 		} else if (levelBar.equals(panLevel)) {
 			panLevel.setLevelColor(MidiViewBean.PAN_COLOR);
-			panLevel.setLevel(.5f);
+			panLevel.setLevel(GlobalVars.trackPan[trackNum]);
 		} else if (levelBar.equals(pitchLevel)) {
 			pitchLevel.setLevelColor(MidiViewBean.PITCH_COLOR);
-			pitchLevel.setLevel(.5f);
+			pitchLevel.setLevel(GlobalVars.trackPitch[trackNum]);
 		}
 	}	
 	
@@ -202,6 +205,5 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public void setLevel(LevelListenable levelListenable, float levelX,
 			float levelY) {
 		// for 2d seekbar.  nothing to do
-		
 	}
 }

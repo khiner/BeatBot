@@ -28,6 +28,10 @@ public class GlobalVars {
 	public static boolean[][] effectOn;
 	public static List<EffectParam>[][] params;
 
+	public static float[] trackVolume;
+	public static float[] trackPan;
+	public static float[] trackPitch;
+	
 	public static float currBeatDivision;
 
 	public static MidiManager getMidiManager() {
@@ -41,8 +45,13 @@ public class GlobalVars {
 		effectOn = new boolean[numTracks][NUM_EFFECTS];
 		delayParamsLinked = new boolean[numTracks];
 		tremeloParamsLinked = new boolean[numTracks];
+		trackVolume = new float[numTracks];
+		trackPan = new float[numTracks];
+		trackPitch = new float[numTracks];
 		for (int track = 0; track < numTracks; track++) {
 			delayParamsLinked[track] = tremeloParamsLinked[track] = true;
+			trackVolume[track] = .8f;
+			trackPan[track] = trackPitch[track] = .5f;
 			for (int effect = 0; effect < NUM_EFFECTS; effect++) {
 				effectOn[track][effect] = false;
 				params[track][effect] = new ArrayList<EffectParam>();
