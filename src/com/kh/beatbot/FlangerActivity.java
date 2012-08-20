@@ -23,6 +23,8 @@ public class FlangerActivity extends EffectActivity {
 
 	@Override
 	public float setParamNative(int paramNum, float level) {
+		if (paramNum == 3)
+			level *= 16;
 		setFlangerParam(trackNum, paramNum, level);
 		return level;
 	}

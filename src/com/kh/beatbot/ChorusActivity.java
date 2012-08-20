@@ -22,7 +22,9 @@ public class ChorusActivity extends EffectActivity {
 	}
 
 	public float setParamNative(int paramNum, float level) {
-		setChorusParam(trackNum, paramNum, scaleLevel(level));
+		if (paramNum == 0)
+			level *= 16;
+		setChorusParam(trackNum, paramNum, level);
 		return level;
 	}
 

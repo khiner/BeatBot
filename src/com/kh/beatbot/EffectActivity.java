@@ -163,6 +163,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		if (!(listenable instanceof TronSeekbar2d)) {
 			EffectParam param = getParam(listenable.getId());
 			param.beatSync = ((TronKnob)listenable).isBeatSync();
+			listenable.setLevel(param.viewLevel);
 		}
 	}
 

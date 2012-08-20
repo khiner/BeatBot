@@ -86,9 +86,11 @@ public class DelayActivity extends EffectActivity {
 				if (paramNum == 0) {
 					getParam(1).beatSync = param.beatSync;
 					paramControls.get(1).getKnob().setBeatSync(param.beatSync);
+					paramControls.get(1).getKnob().setLevel(param.viewLevel);
 				} else if (paramNum == 1) {
 					getParam(0).beatSync = param.beatSync;
 					paramControls.get(0).getKnob().setBeatSync(param.beatSync);
+					paramControls.get(0).getKnob().setLevel(param.viewLevel);
 				}
 			}
 		}
