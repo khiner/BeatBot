@@ -222,7 +222,7 @@ public class BeatBotActivity extends Activity {
 		GlobalVars.setPlaybackManager(playbackManager);
 
 		((BpmView) findViewById(R.id.bpm)).setText(String
-				.valueOf((int) midiManager.getBPM()));		
+				.valueOf((int) MidiManager.getBPM()));		
 		// were we recording and/or playing before losing the instance?
 		if (savedInstanceState != null) {
 			if (savedInstanceState.getBoolean("recording")) {
@@ -399,10 +399,11 @@ public class BeatBotActivity extends Activity {
 		lastTapTime = tapTime;
 		float bpm = 60 / secondsElapsed;
 		// bpm limits
-		if (bpm < 30 || bpm > 500)
+		if (bpm < MidiManager.MIN_BPM || bpm > MidiManager.MAX_BPM)
 			return;
 		((BpmView) findViewById(R.id.bpm)).setText(String.valueOf((int) bpm));
-		midiManager.setBPM(bpm);
+		MidiManager.setBPM(bpm);
+		SampleEditActivity.quantizeEffectParams();
 	}
 
 	private void spin(long millis) {

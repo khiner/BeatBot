@@ -3,7 +3,6 @@ package com.kh.beatbot.layout;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
@@ -41,7 +40,6 @@ public class EffectControlLayout extends LinearLayout {
         
         label.setText(paramLabel);
         valueLabel.setText(paramValue);
-        Log.i("setting knob beatsync = ", String.valueOf(beatSyncEnabled));
         knob.setClickable(beatSyncEnabled);
     }
 

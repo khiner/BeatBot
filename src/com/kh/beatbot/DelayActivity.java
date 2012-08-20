@@ -28,24 +28,14 @@ public class DelayActivity extends EffectActivity {
 	
 	@Override
 	public void initParams() {
-		EFFECT_NUM = 2;
+		EFFECT_NUM = GlobalVars.DELAY_EFFECT_NUM;
 		NUM_PARAMS = 4;
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, "ms"));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, "ms"));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ""));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, true, "ms"));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, true, "ms"));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, false, ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, false, ""));
 		}
-	}
-
-	public void setEffectOnNative(boolean on) {
-		setDelayOn(trackNum, on);
-	}
-
-	@Override
-	public float setParamNative(int paramNum, float level) {
-		setDelayParam(trackNum, paramNum, level);
-		return level;
 	}
 
 	@Override
@@ -126,7 +116,5 @@ public class DelayActivity extends EffectActivity {
 		getParam(1).beatSync = newRightChannelSynced;
 	}
 	
-	public native void setDelayOn(int trackNum, boolean on);
-	public native void setDelayLinkChannels(int trackNum, boolean link);
-	public native void setDelayParam(int trackNum, int paramNum, float param);
+	public static native void setDelayLinkChannels(int trackNum, boolean link);
 }

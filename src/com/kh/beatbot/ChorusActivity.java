@@ -6,31 +6,17 @@ public class ChorusActivity extends EffectActivity {
 
 	@Override
 	protected void initParams() {
-		EFFECT_NUM = 0;
+		EFFECT_NUM = GlobalVars.CHORUS_EFFECT_NUM;
 		NUM_PARAMS = 5;	
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, "Hz"));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ""));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ""));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, "ms"));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, true, "Hz"));
+			getParam(0).scaleFactor = 16;
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, false, ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, false, ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, true, "ms"));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, false, ""));
 		}
 	}
-
-	public void setEffectOnNative(boolean on) {
-		setChorusOn(trackNum, on);
-	}
-
-	public float setParamNative(int paramNum, float level) {
-		if (paramNum == 0)
-			level *= 16;
-		setChorusParam(trackNum, paramNum, level);
-		return level;
-	}
-
-	public native void setChorusOn(int trackNum, boolean on);
-
-	public native void setChorusParam(int trackNum, int paramNum, float param);
 
 	@Override
 	public int getParamLayoutId() {

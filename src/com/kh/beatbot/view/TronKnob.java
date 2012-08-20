@@ -127,7 +127,7 @@ public class TronKnob extends LevelListenable {
 	}
 	
 	public boolean isBeatSync() {
-		return currentTexture == BEAT_TEXTURE_NUM;
+		return clickable && currentTexture == BEAT_TEXTURE_NUM;
 	}
 	
 	@Override

@@ -36,7 +36,7 @@ void delayconfigi_destroy(void *p) {
 }
 
 /********* JNI METHODS **********/
-void Java_com_kh_beatbot_DelayActivity_setDelayOn(JNIEnv *env, jclass clazz,
+void Java_com_kh_beatbot_EffectActivity_setDelayOn(JNIEnv *env, jclass clazz,
 		jint trackNum, jboolean on) {
 	Track *track = getTrack(env, clazz, trackNum);
 	Effect *delay = &(track->effects[DELAY_ID]);
@@ -51,7 +51,7 @@ void Java_com_kh_beatbot_DelayActivity_setDelayLinkChannels(JNIEnv *env, jclass 
 	delayconfigi_updateDelayTime(config);
 }
 
-void Java_com_kh_beatbot_DelayActivity_setDelayParam(JNIEnv *env, jclass clazz,
+void Java_com_kh_beatbot_EffectActivity_setDelayParam(JNIEnv *env, jclass clazz,
 		jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(env, clazz, trackNum);
 	DelayConfigI *config = (DelayConfigI *) track->effects[DELAY_ID].config;

@@ -23,14 +23,14 @@ void decimateconfig_destroy(void *p) {
 }
 
 /********* JNI METHODS **********/
-void Java_com_kh_beatbot_DecimateActivity_setDecimateOn(JNIEnv *env,
+void Java_com_kh_beatbot_EffectActivity_setDecimateOn(JNIEnv *env,
 		jclass clazz, jint trackNum, jboolean on) {
 	Track *track = getTrack(env, clazz, trackNum);
 	Effect *decimate = &(track->effects[DECIMATE_ID]);
 	decimate->on = on;
 }
 
-void Java_com_kh_beatbot_DecimateActivity_setDecimateParam(JNIEnv *env,
+void Java_com_kh_beatbot_EffectActivity_setDecimateParam(JNIEnv *env,
 		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(env, clazz, trackNum);
 	Effect decimate = track->effects[DECIMATE_ID];

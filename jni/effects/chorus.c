@@ -46,14 +46,14 @@ void chorusconfig_destroy(void *p) {
 }
 
 /********* JNI METHODS **********/
-void Java_com_kh_beatbot_ChorusActivity_setChorusOn(JNIEnv *env, jclass clazz,
+void Java_com_kh_beatbot_EffectActivity_setChorusOn(JNIEnv *env, jclass clazz,
 		jint trackNum, jboolean on) {
 	Track *track = getTrack(env, clazz, trackNum);
 	Effect *chorus = &(track->effects[CHORUS_ID]);
 	chorus->on = on;
 }
 
-void Java_com_kh_beatbot_ChorusActivity_setChorusParam(JNIEnv *env,
+void Java_com_kh_beatbot_EffectActivity_setChorusParam(JNIEnv *env,
 		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(env, clazz, trackNum);
 	ChorusConfig *config = (ChorusConfig *) track->effects[CHORUS_ID].config;

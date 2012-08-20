@@ -1,5 +1,7 @@
 package com.kh.beatbot;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +9,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.ToggleButton;
 
+import com.kh.beatbot.EffectActivity.EffectParam;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
@@ -18,12 +21,15 @@ import com.kh.beatbot.view.bean.MidiViewBean;
 public class SampleEditActivity extends Activity implements LevelListener {
 	private PlaybackManager playbackManager = null;
 	private SampleWaveformView sampleWaveformView = null;
-	//private EditLevelsView editLevelsView = null;
+	// private EditLevelsView editLevelsView = null;
 	private TronSeekbar volumeLevel, panLevel, pitchLevel;
-	private enum Effect {BITCRUSH, CHORUS, DELAY, FLANGER, FILTER, REVERB, TREMELO};	
-	
+
+	private enum Effect {
+		BITCRUSH, CHORUS, DELAY, FLANGER, FILTER, REVERB, TREMELO
+	};
+
 	private int trackNum;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -33,11 +39,12 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		playbackManager = GlobalVars.getPlaybackManager();
 		trackNum = getIntent().getExtras().getInt("trackNum");
 		sampleWaveformView = ((SampleWaveformView) findViewById(R.id.sample_waveform_view));
-		//editLevelsView = ((EditLevelsView) findViewById(R.id.edit_levels_view));
+		// editLevelsView = ((EditLevelsView)
+		// findViewById(R.id.edit_levels_view));
 		sampleWaveformView.setPlaybackManager(playbackManager);
 		sampleWaveformView.setTrackNum(trackNum);
-		//editLevelsView.setActivity(this);
-		//editLevelsView.setTrackNum(trackNum);
+		// editLevelsView.setActivity(this);
+		// editLevelsView.setTrackNum(trackNum);
 		initLevels();
 		// numSamples should be in shorts, so divide by two
 		sampleWaveformView.setSamples(getSamples(trackNum));
@@ -46,18 +53,34 @@ public class SampleEditActivity extends Activity implements LevelListener {
 				.setChecked(playbackManager.isLooping(trackNum));
 	}
 
+	public static void quantizeEffectParams() {
+		for (int trackNum = 0; trackNum < GlobalVars.params.length; trackNum++) {
+			for (int effectNum = 0; effectNum < GlobalVars.NUM_EFFECTS; effectNum++) {
+				List<EffectParam> params = GlobalVars.params[trackNum][effectNum];
+				for (int paramNum = 0; paramNum < params.size(); paramNum++) {
+					if (params.get(paramNum).beatSync) {
+						float level = EffectActivity.calcLevel(
+								params.get(paramNum),
+								params.get(paramNum).viewLevel);
+						EffectActivity.setParamNative(paramNum, level);
+					}
+				}
+			}
+		}
+	}
+
 	public void toggleLoop(View view) {
 		playbackManager.toggleLooping(trackNum);
 	}
 
 	public void toggleAdsr(View view) {
-		boolean on = ((ToggleButton)view).isChecked();
+		boolean on = ((ToggleButton) view).isChecked();
 		sampleWaveformView.setShowAdsr(on);
 		setAdsrOn(trackNum, on);
 	}
-	
+
 	public void reverse(View view) {
-		setReverse(trackNum, ((ToggleButton)view).isChecked());
+		setReverse(trackNum, ((ToggleButton) view).isChecked());
 	}
 
 	public void normalize(View view) {
@@ -71,7 +94,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public void chorus(View view) {
 		launchIntent(Effect.CHORUS);
 	}
-	
+
 	public void delay(View view) {
 		launchIntent(Effect.DELAY);
 	}
@@ -79,11 +102,11 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public void flanger(View view) {
 		launchIntent(Effect.FLANGER);
 	}
-	
+
 	public void filter(View view) {
 		launchIntent(Effect.FILTER);
 	}
-	
+
 	public void reverb(View view) {
 		launchIntent(Effect.REVERB);
 	}
@@ -91,9 +114,9 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public void tremelo(View view) {
 		launchIntent(Effect.TREMELO);
 	}
-	
+
 	private void launchIntent(Effect effect) {
-		Intent intent = new Intent();		
+		Intent intent = new Intent();
 		switch (effect) {
 		case BITCRUSH:
 			intent.setClass(this, DecimateActivity.class);
@@ -119,7 +142,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		intent.putExtra("trackNum", trackNum);
 		startActivity(intent);
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -129,14 +152,14 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	private void initLevels() {
-		volumeLevel = ((TronSeekbar)findViewById(R.id.volumeLevel));
-		panLevel = ((TronSeekbar)findViewById(R.id.panLevel));
-		pitchLevel = ((TronSeekbar)findViewById(R.id.pitchLevel));
+		volumeLevel = ((TronSeekbar) findViewById(R.id.volumeLevel));
+		panLevel = ((TronSeekbar) findViewById(R.id.panLevel));
+		pitchLevel = ((TronSeekbar) findViewById(R.id.pitchLevel));
 		volumeLevel.addLevelListener(this);
 		panLevel.addLevelListener(this);
 		pitchLevel.addLevelListener(this);
 	}
-	
+
 	@Override
 	public void setLevel(LevelListenable levelBar, float level) {
 		if (levelBar.equals(volumeLevel)) {
@@ -150,7 +173,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			GlobalVars.trackPitch[trackNum] = level;
 		}
 	}
-	
+
 	@Override
 	public void notifyInit(LevelListenable levelBar) {
 		if (levelBar.equals(volumeLevel)) {
@@ -163,27 +186,24 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			pitchLevel.setLevelColor(MidiViewBean.PITCH_COLOR);
 			pitchLevel.setLevel(GlobalVars.trackPitch[trackNum]);
 		}
-	}	
-	
+	}
+
 	@Override
 	public void notifyPressed(LevelListenable levelBar, boolean pressed) {
 		if (levelBar.equals(volumeLevel)) {
-			((ToggleButton) findViewById(R.id.volumeView))
-					.setChecked(pressed);
+			((ToggleButton) findViewById(R.id.volumeView)).setChecked(pressed);
 		} else if (levelBar.equals(panLevel)) {
-			((ToggleButton) findViewById(R.id.panView))
-					.setChecked(pressed);
+			((ToggleButton) findViewById(R.id.panView)).setChecked(pressed);
 		} else if (levelBar.equals(pitchLevel)) {
-			((ToggleButton) findViewById(R.id.pitchView))
-					.setChecked(pressed);
-		}	
+			((ToggleButton) findViewById(R.id.pitchView)).setChecked(pressed);
+		}
 	}
-	
+
 	@Override
 	public void notifyClicked(LevelListenable levelListenable) {
 		// do nothing when levels are clicked
 	}
-	
+
 	// get the audio data in floats
 	public native float[] getSamples(int trackNum);
 
@@ -192,18 +212,18 @@ public class SampleEditActivity extends Activity implements LevelListener {
 
 	// scale all samples so that the sample with the highest amplitude is at 1
 	public native float[] normalize(int trackNum);
-	
+
 	public native void setPrimaryVolume(int trackNum, float volume);
 
 	public native void setPrimaryPan(int trackNum, float pan);
 
 	public native void setPrimaryPitch(int trackNum, float pitch);
-	
+
 	public native void setAdsrOn(int trackNum, boolean on);
 
 	@Override
 	public void setLevel(LevelListenable levelListenable, float levelX,
 			float levelY) {
-		// for 2d seekbar.  nothing to do
+		// for 2d seekbar. nothing to do
 	}
 }

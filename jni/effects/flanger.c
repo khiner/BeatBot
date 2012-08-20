@@ -49,14 +49,14 @@ void flangerconfig_destroy(void *p) {
 }
 
 /********* JNI METHODS **********/
-void Java_com_kh_beatbot_FlangerActivity_setFlangerOn(JNIEnv *env, jclass clazz,
+void Java_com_kh_beatbot_EffectActivity_setFlangerOn(JNIEnv *env, jclass clazz,
 		jint trackNum, jboolean on) {
 	Track *track = getTrack(env, clazz, trackNum);
 	Effect *flanger = &(track->effects[FLANGER_ID]);
 	flanger->on = on;
 }
 
-void Java_com_kh_beatbot_FlangerActivity_setFlangerParam(JNIEnv *env,
+void Java_com_kh_beatbot_EffectActivity_setFlangerParam(JNIEnv *env,
 		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(env, clazz, trackNum);
 	FlangerConfig *config = (FlangerConfig *) track->effects[FLANGER_ID].config;

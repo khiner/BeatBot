@@ -15,27 +15,29 @@ import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.layout.EffectControlLayout;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
+import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.view.TronKnob;
 import com.kh.beatbot.view.TronSeekbar2d;
 
 public abstract class EffectActivity extends Activity implements LevelListener {
 	public class EffectParam {
 		public float level, viewLevel;
+		public float scaleFactor = 1;
 		public boolean beatSync;
 		public boolean logScale;
 		public String unitString;
 
-		public EffectParam(boolean logScale, String unitString) {
+		public EffectParam(boolean logScale, boolean beatSync, String unitString) {
 			level = viewLevel = 0.5f;
-			this.beatSync = true;
+			this.beatSync = beatSync;
 			this.logScale = logScale;
 			this.unitString = unitString;
 		}
 	}
 
-	protected int EFFECT_NUM;
-	protected int NUM_PARAMS;
-	protected int trackNum;
+	protected static int EFFECT_NUM;
+	protected static int NUM_PARAMS;
+	protected static int trackNum;
 	protected List<EffectControlLayout> paramControls = new ArrayList<EffectControlLayout>();
 	protected TronKnob xParamKnob = null, yParamKnob = null;
 	protected TronSeekbar2d level2d = null;
@@ -103,7 +105,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		level2d.setViewLevelY(yParamKnob.getLevel());
 	}
 
-	public EffectParam getParam(int paramNum) {
+	public static EffectParam getParam(int paramNum) {
 		return GlobalVars.params[trackNum][EFFECT_NUM].get(paramNum);
 	}
 
@@ -114,27 +116,17 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 
 	public abstract int getParamLayoutId();
 
-	public abstract void setEffectOnNative(boolean on);
-
-	public abstract float setParamNative(int paramNum, float level);
-
-	public void toggleOn(View view) {
+	public static void toggleOn(View view) {
 		boolean on = ((ToggleButton) view).isChecked();
 		GlobalVars.effectOn[trackNum][EFFECT_NUM] = on;
 		setEffectOnNative(on);
 	}
 
-	protected final void setParamLevel(int paramNum, float level) {
+	protected static final void setParamLevel(int paramNum, float level) {
 		EffectParam param = getParam(paramNum);
 		param.viewLevel = level;
-		if (param.logScale) {
-			level = scaleLevel(level);
-		}
-		if (param.beatSync) {
-			level = quantizeToBeat(level);
-		}
-		level = setParamNative(paramNum, level);
-		param.level = level;
+		param.level = level = calcLevel(param, level);
+		setParamNative(paramNum, param.level);
 	}
 
 	@Override
@@ -180,18 +172,82 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		}
 	}
 
-	protected float scaleLevel(float level) {
+	protected static float calcLevel(EffectParam param, float level) {
+		if (param.logScale) {
+			level = logScaleLevel(level);
+		}
+		if (param.beatSync) {
+			level = quantizeToBeat(level);
+		}
+		level *= param.scaleFactor;
+		return level;
+	}
+	
+	protected static float logScaleLevel(float level) {
 		return (float) (Math.pow(9, level) - 1) / 8;
 	}
 
-	protected float quantizeToBeat(float level) {
+	protected static float quantizeToBeat(float level) {
 		// minimum beat == 1/16 note = 1(1 << 4)
 		for (int pow = 4; pow >= 0; pow--) {
-			float quantized = 1f / (1 << pow);
+			float quantized = 60f / (MidiManager.getBPM() * (1 << pow));
 			if (level <= quantized) {
 				return quantized;
 			}
 		}
 		return 1;
 	}
+	
+	public static void setEffectOnNative(boolean on) {
+		switch(EFFECT_NUM) {
+		case GlobalVars.CHORUS_EFFECT_NUM:
+			setChorusOn(trackNum, on); return;
+		case GlobalVars.DECIMATE_EFFECT_NUM:
+			setDecimateOn(trackNum, on); return;
+		case GlobalVars.DELAY_EFFECT_NUM:
+			setDelayOn(trackNum, on); return;
+		case GlobalVars.FILTER_EFFECT_NUM:
+			setFilterOn(trackNum, on); return;
+		case GlobalVars.FLANGER_EFFECT_NUM:
+			setFlangerOn(trackNum, on); return;
+		case GlobalVars.REVERB_EFFECT_NUM:
+			setReverbOn(trackNum, on); return;
+		case GlobalVars.TREMELO_EFFECT_NUM:
+			setTremeloOn(trackNum, on); return;
+		}
+	}
+	
+	public static void setParamNative(int paramNum, float paramLevel) {
+		switch(EFFECT_NUM) {
+		case GlobalVars.CHORUS_EFFECT_NUM:
+			setChorusParam(trackNum, paramNum, paramLevel); return;
+		case GlobalVars.DECIMATE_EFFECT_NUM:
+			setDecimateParam(trackNum, paramNum, paramLevel); return;
+		case GlobalVars.DELAY_EFFECT_NUM:
+			setDelayParam(trackNum, paramNum, paramLevel); return;
+		case GlobalVars.FILTER_EFFECT_NUM:
+			setFilterParam(trackNum, paramNum, paramLevel); return;
+		case GlobalVars.FLANGER_EFFECT_NUM:
+			setFlangerParam(trackNum, paramNum, paramLevel); return;
+		case GlobalVars.REVERB_EFFECT_NUM:
+			setReverbParam(trackNum, paramNum, paramLevel); return;
+		case GlobalVars.TREMELO_EFFECT_NUM:
+			setTremeloParam(trackNum, paramNum, paramLevel); return;
+		}
+	}
+	
+	public static native void setChorusOn(int trackNum, boolean on);
+	public static native void setChorusParam(int trackNum, int paramNum, float param);
+	public static native void setDecimateOn(int trackNum, boolean on);
+	public static native void setDecimateParam(int trackNum, int paramNum, float param);
+	public static native void setDelayOn(int trackNum, boolean on);
+	public static native void setDelayParam(int trackNum, int paramNum, float param);
+	public static native void setFilterOn(int trackNum, boolean on);
+	public static native void setFilterParam(int trackNum, int paramNum, float param);
+	public static native void setFlangerOn(int trackNum, boolean on);
+	public static native void setFlangerParam(int trackNum, int paramNum, float param);
+	public static native void setReverbOn(int trackNum, boolean on);
+	public static native void setReverbParam(int trackNum, int paramNum, float param);
+	public static native void setTremeloOn(int trackNum, boolean on);
+	public static native void setTremeloParam(int trackNum, int paramNum, float param);
 }

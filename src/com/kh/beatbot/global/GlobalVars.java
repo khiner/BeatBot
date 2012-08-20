@@ -8,12 +8,19 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 
 public class GlobalVars {
+	public static final int CHORUS_EFFECT_NUM = 0;
+	public static final int DECIMATE_EFFECT_NUM = 1;
+	public static final int DELAY_EFFECT_NUM = 2;
+	public static final int FILTER_EFFECT_NUM = 3;
+	public static final int FLANGER_EFFECT_NUM = 4;
+	public static final int REVERB_EFFECT_NUM = 5;
+	public static final int TREMELO_EFFECT_NUM = 6;
+	
 	public static final float[] BG_COLOR = { 0.12549f, 0.188235f, 0.227451f, 1 };
 	public static final float[] WHITE = { 1, 1, 1, 1 };
 	public static final float[] GREEN = { 0, 1, 0, 1 };
 	public static final float[] YELLOW = { 1, 1, 0, 1 };
 	public static final float[] RED = { 1, 0, 0, 1 };
-
 	public static final int UNDO_STACK_SIZE = 40;
 	public static final int NUM_EFFECTS = 7;
 	public static final short LEVEL_MAX = 127;

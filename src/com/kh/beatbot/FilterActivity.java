@@ -12,11 +12,11 @@ public class FilterActivity extends EffectActivity {
 	
 	@Override
 	public void initParams() {
-		EFFECT_NUM = 3;
+		EFFECT_NUM = GlobalVars.FILTER_EFFECT_NUM;
 		NUM_PARAMS = 2;
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, "Hz"));
-			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, false, "Hz"));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, false, ""));
 		}
 	}
 	
@@ -28,10 +28,6 @@ public class FilterActivity extends EffectActivity {
 		filterButtons[2] = (ToggleButton)findViewById(R.id.hp_toggle);
 	}
 
-	public void setEffectOnNative(boolean on) {
-		setFilterOn(trackNum, on, mode);
-	}
-	
 	public void selectFilterMode(View view) {
 		for (int i = 0; i < filterButtons.length; i++) {
 			if (view.equals(filterButtons[i])) {
@@ -44,17 +40,9 @@ public class FilterActivity extends EffectActivity {
 	}
 
 	@Override
-	public float setParamNative(int paramNum, float level) {
-		setFilterParam(trackNum, paramNum, level);
-		return level;
-	}
-
-	@Override
 	public int getParamLayoutId() {
 		return R.layout.filter_param_layout;
 	}
 	
-	public native void setFilterOn(int trackNum, boolean on, int mode);
 	public native void setFilterMode(int trackNum, int mode);	
-	public native void setFilterParam(int trackNum, int paramNum, float param);
 }

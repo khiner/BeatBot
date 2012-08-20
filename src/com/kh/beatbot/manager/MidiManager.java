@@ -27,12 +27,15 @@ import com.kh.beatbot.midi.event.meta.TimeSignature;
 public class MidiManager implements Parcelable {
 	private static MidiManager singletonInstance = null;
 
+	public static final int MIN_BPM = 45;
+	public static final int MAX_BPM = 300;
+	
 	private BeatBotActivity activity = null;
 
-	private TimeSignature ts = new TimeSignature();
-	private Tempo tempo = new Tempo();
-	private MidiTrack tempoTrack = new MidiTrack();
-	private List<MidiNote> midiNotes = new ArrayList<MidiNote>();
+	private static TimeSignature ts = new TimeSignature();
+	private static Tempo tempo = new Tempo();
+	private static MidiTrack tempoTrack = new MidiTrack();
+	private static List<MidiNote> midiNotes = new ArrayList<MidiNote>();
 	// if a note is dragged over another, the "eclipsed" note should be
 	// shortened or removed as appropriate. However, these changes only become
 	// saved to the midiManager.midiNotes list after the eclipsing note is
@@ -88,11 +91,11 @@ public class MidiManager implements Parcelable {
 		activity.setDeleteIconEnabled(false);
 	}
 
-	public float getBPM() {
+	public static float getBPM() {
 		return tempo.getBpm();
 	}
 
-	public void setBPM(float bpm) {
+	public static void setBPM(float bpm) {
 		tempo.setBpm(bpm);
 		setNativeBPM(bpm);
 		setNativeMSPT(tempo.getMpqn() / RESOLUTION);
@@ -295,11 +298,11 @@ public class MidiManager implements Parcelable {
 		midiNote.setOffTick(offTick);
 	}
 
-	public Tempo getTempo() {
+	public static Tempo getTempo() {
 		return tempo;
 	}
 
-	public long getTicksPerBeat(float beatDivision) {
+	public static long getTicksPerBeat(float beatDivision) {
 		return (long) (RESOLUTION / beatDivision);
 	}
 
@@ -497,9 +500,9 @@ public class MidiManager implements Parcelable {
 		setLoopEndTick(in.readLong());
 	}
 
-	public native void setNativeMSPT(long MSPT);
+	public static native void setNativeMSPT(long MSPT);
 
-	public native void setNativeBPM(float BPM);
+	public static native void setNativeBPM(float BPM);
 
 	public native void reset();
 
