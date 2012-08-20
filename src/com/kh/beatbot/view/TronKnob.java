@@ -14,6 +14,8 @@ import com.kh.beatbot.listener.LevelListener;
 
 public class TronKnob extends LevelListenable {
 	public static final float ¹ = (float)Math.PI;
+	private static final int CLOCK_TEXTURE_NUM = 0;
+	private static final int BEAT_TEXTURE_NUM = 1;
 	private static FloatBuffer circleVb = null;
 	private static FloatBuffer selectCircleVb = null;
 	private static FloatBuffer selectCircleVb2 = null;
@@ -28,6 +30,7 @@ public class TronKnob extends LevelListenable {
 	
 	public TronKnob(Context c, AttributeSet as) {
 		super(c, as);
+		currentTexture = BEAT_TEXTURE_NUM;
 	}
 
 	public void setClickable(boolean clickable) {
@@ -69,8 +72,8 @@ public class TronKnob extends LevelListenable {
 	protected void init() {
 		super.init();
 		if (clickable) {
-			loadTexture(R.drawable.clock, 0);
-			loadTexture(R.drawable.note_icon, 1);
+			loadTexture(R.drawable.clock, CLOCK_TEXTURE_NUM);
+			loadTexture(R.drawable.note_icon, BEAT_TEXTURE_NUM);
 		}
 	}
 	
@@ -117,6 +120,14 @@ public class TronKnob extends LevelListenable {
 	public void setLevel(float level) {
 		super.setLevel(level);
 		updateDrawIndex();
+	}
+	
+	public void setBeatSync(boolean beatSync) {
+		currentTexture = beatSync ? BEAT_TEXTURE_NUM : CLOCK_TEXTURE_NUM;
+	}
+	
+	public boolean isBeatSync() {
+		return currentTexture == BEAT_TEXTURE_NUM;
 	}
 	
 	@Override

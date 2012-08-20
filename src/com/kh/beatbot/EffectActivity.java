@@ -23,21 +23,21 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		public float level, viewLevel;
 		public boolean beatSync;
 		public boolean logScale;
-		public String  unitString;
-				
+		public String unitString;
+
 		public EffectParam(boolean logScale, String unitString) {
 			level = viewLevel = 0.5f;
-			this.beatSync = false;
+			this.beatSync = true;
 			this.logScale = logScale;
 			this.unitString = unitString;
 		}
 	}
-	
+
 	protected int EFFECT_NUM;
 	protected int NUM_PARAMS;
 	protected int trackNum;
-	protected List<EffectControlLayout> paramControls  = new ArrayList<EffectControlLayout>();
-	protected TronKnob xParamKnob = null, yParamKnob = null; 
+	protected List<EffectControlLayout> paramControls = new ArrayList<EffectControlLayout>();
+	protected TronKnob xParamKnob = null, yParamKnob = null;
 	protected TronSeekbar2d level2d = null;
 
 	@Override
@@ -48,12 +48,12 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		trackNum = getIntent().getExtras().getInt("trackNum");
 		setContentView(R.layout.effect_layout);
 		ViewGroup parent = (ViewGroup) findViewById(R.id.effect_layout);
-	    View view = LayoutInflater.from(getBaseContext()).inflate(getParamLayoutId(),
-	                null);
+		View view = LayoutInflater.from(getBaseContext()).inflate(
+				getParamLayoutId(), null);
 		parent.addView(view, 0);
 		initParams();
 		initParamControls();
-			
+
 		((ToggleButton) findViewById(R.id.effectToggleOn))
 				.setChecked(GlobalVars.effectOn[trackNum][EFFECT_NUM]);
 		xParamKnob = paramControls.get(0).getKnob();
@@ -63,25 +63,24 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 			updateParamValueLabel(paramNum);
 		}
 	}
-	
-	protected abstract void initParams();
-	
-	protected void initParamControls() {
 
+	protected abstract void initParams();
+
+	protected void initParamControls() {
 		paramControls = new ArrayList<EffectControlLayout>();
-		paramControls.add((EffectControlLayout)findViewById(R.id.param1));
-		paramControls.add((EffectControlLayout)findViewById(R.id.param2));
+		paramControls.add((EffectControlLayout) findViewById(R.id.param1));
+		paramControls.add((EffectControlLayout) findViewById(R.id.param2));
 		if (NUM_PARAMS > 2) {
-			paramControls.add((EffectControlLayout)findViewById(R.id.param3));
+			paramControls.add((EffectControlLayout) findViewById(R.id.param3));
 		}
 		if (NUM_PARAMS > 3) {
-			paramControls.add((EffectControlLayout)findViewById(R.id.param4));
-		}		
+			paramControls.add((EffectControlLayout) findViewById(R.id.param4));
+		}
 		if (NUM_PARAMS > 4) {
-			paramControls.add((EffectControlLayout)findViewById(R.id.param5));
+			paramControls.add((EffectControlLayout) findViewById(R.id.param5));
 		}
 		if (NUM_PARAMS > 5) {
-			paramControls.add((EffectControlLayout)findViewById(R.id.param6));
+			paramControls.add((EffectControlLayout) findViewById(R.id.param6));
 		}
 		for (int i = 0; i < paramControls.size(); i++) {
 			EffectControlLayout ecl = paramControls.get(i);
@@ -89,31 +88,34 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 			ecl.getKnob().removeAllListeners();
 			ecl.getKnob().addLevelListener(this);
 		}
-		level2d = (TronSeekbar2d)findViewById(R.id.xyParamBar);
+		level2d = (TronSeekbar2d) findViewById(R.id.xyParamBar);
 		level2d.removeAllListeners();
 		level2d.addLevelListener(this);
 	}
-	
+
 	public void updateParamValueLabel(int paramNum) {
-		paramControls.get(paramNum).setValueLabel(getParamValueString(paramNum));
+		paramControls.get(paramNum)
+				.setValueLabel(getParamValueString(paramNum));
 	}
-	
+
 	public void updateXYViewLevel() {
 		level2d.setViewLevelX(xParamKnob.getLevel());
 		level2d.setViewLevelY(yParamKnob.getLevel());
 	}
-	
+
 	public EffectParam getParam(int paramNum) {
 		return GlobalVars.params[trackNum][EFFECT_NUM].get(paramNum);
 	}
-	
+
 	public String getParamValueString(int paramNum) {
-		EffectParam param = getParam(paramNum); 
+		EffectParam param = getParam(paramNum);
 		return String.format("%.3f", param.level) + " " + param.unitString;
 	}
-	
+
 	public abstract int getParamLayoutId();
+
 	public abstract void setEffectOnNative(boolean on);
+
 	public abstract float setParamNative(int paramNum, float level);
 
 	public void toggleOn(View view) {
@@ -121,7 +123,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		GlobalVars.effectOn[trackNum][EFFECT_NUM] = on;
 		setEffectOnNative(on);
 	}
-	
+
 	protected final void setParamLevel(int paramNum, float level) {
 		EffectParam param = getParam(paramNum);
 		param.viewLevel = level;
@@ -142,7 +144,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		updateXYViewLevel();
 		updateParamValueLabel(paramNum);
 	}
-	
+
 	@Override
 	public void setLevel(LevelListenable level2d, float levelX, float levelY) {
 		xParamKnob.setLevel(levelX);
@@ -159,18 +161,20 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	@Override
 	public void notifyClicked(LevelListenable listenable) {
 		if (!(listenable instanceof TronSeekbar2d)) {
-			EffectParam param = getParam(listenable.getId()); 
-			param.beatSync = !param.beatSync;
+			EffectParam param = getParam(listenable.getId());
+			param.beatSync = ((TronKnob)listenable).isBeatSync();
 		}
 	}
-	
+
 	@Override
 	public final void notifyInit(LevelListenable listenable) {
 		if (listenable instanceof TronSeekbar2d) {
-			((TronSeekbar2d)listenable).setViewLevelX(getParam(xParamKnob.getId()).viewLevel);
-			((TronSeekbar2d)listenable).setViewLevelY(getParam(yParamKnob.getId()).viewLevel);
+			((TronSeekbar2d) listenable).setViewLevelX(getParam(xParamKnob
+					.getId()).viewLevel);
+			((TronSeekbar2d) listenable).setViewLevelY(getParam(yParamKnob
+					.getId()).viewLevel);
 		} else {
-			EffectParam param = getParam(listenable.getId()); 
+			EffectParam param = getParam(listenable.getId());
 			listenable.setViewLevel(param.viewLevel);
 		}
 	}

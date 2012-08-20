@@ -5,6 +5,7 @@
     android:layout_height="32dp"
     android:layout_centerInParent="true"
     android:background="@drawable/link_src"
+    android:checked="true"
     android:textOff=""
     android:textOn=""
     android:onClick="link" />
