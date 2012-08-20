@@ -68,6 +68,15 @@ public class DelayActivity extends EffectActivity {
 	}
 	
 	@Override
+	public final void notifyInit(LevelListenable listenable) {
+		super.notifyInit(listenable);
+		if (!(listenable instanceof TronSeekbar2d)) {
+			EffectParam param = getParam(listenable.getId());
+			((TronKnob)listenable).setBeatSync(param.beatSync);
+		}
+	}
+	
+	@Override
 	public void notifyClicked(LevelListenable listenable) {
 		super.notifyClicked(listenable);
 		if (!(listenable instanceof TronSeekbar2d)) {

@@ -167,7 +167,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	}
 
 	@Override
-	public final void notifyInit(LevelListenable listenable) {
+	public void notifyInit(LevelListenable listenable) {
 		if (listenable instanceof TronSeekbar2d) {
 			((TronSeekbar2d) listenable).setViewLevelX(getParam(xParamKnob
 					.getId()).viewLevel);
