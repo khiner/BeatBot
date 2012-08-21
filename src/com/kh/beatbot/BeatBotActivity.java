@@ -206,7 +206,7 @@ public class BeatBotActivity extends Activity {
 				.setThresholdBar((ThresholdBarView) findViewById(R.id.thresholdBar));
 		midiManager.setRecordManager(recordManager);
 
-		midiView = ((MidiView) findViewById(R.id.midiView));		
+		midiView = ((MidiView) findViewById(R.id.midiView));
 		midiView.setMidiManager(midiManager);
 		midiView.setRecordManager(recordManager);
 		midiView.setPlaybackManager(playbackManager);
@@ -222,7 +222,7 @@ public class BeatBotActivity extends Activity {
 		GlobalVars.setPlaybackManager(playbackManager);
 
 		((BpmView) findViewById(R.id.bpm)).setText(String
-				.valueOf((int) MidiManager.getBPM()));		
+				.valueOf((int) MidiManager.getBPM()));
 		// were we recording and/or playing before losing the instance?
 		if (savedInstanceState != null) {
 			if (savedInstanceState.getBoolean("recording")) {
@@ -399,8 +399,8 @@ public class BeatBotActivity extends Activity {
 		lastTapTime = tapTime;
 		float bpm = 60 / secondsElapsed;
 		// bpm limits
-		if (bpm < MidiManager.MIN_BPM || bpm > MidiManager.MAX_BPM)
-			return;
+		bpm = bpm >= MidiManager.MIN_BPM ? (bpm <= MidiManager.MAX_BPM ? bpm
+				: MidiManager.MAX_BPM) : MidiManager.MIN_BPM;
 		((BpmView) findViewById(R.id.bpm)).setText(String.valueOf((int) bpm));
 		MidiManager.setBPM(bpm);
 		SampleEditActivity.quantizeEffectParams();

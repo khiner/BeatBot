@@ -157,24 +157,23 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	public void notifyClicked(LevelListenable listenable) {
 		if (!(listenable instanceof TronSeekbar2d)) {
 			EffectParam param = getParam(listenable.getId());
-			param.beatSync = ((TronKnob)listenable).isBeatSync();
+			param.beatSync = ((TronKnob) listenable).isBeatSync();
 			listenable.setLevel(param.viewLevel);
 		}
 	}
 
 	@Override
 	public void notifyInit(final LevelListenable listenable) {
-		// not in the thread that created the view, so we cannot call setLevel.
-		// need to do everything manually
+		// need to use the thread that created the text label view to update label
+		// (which is done when listenable notifies after 'setLevel')
 		Handler refresh = new Handler(Looper.getMainLooper());
 		refresh.post(new Runnable() {
-		    public void run()
-		    {
+			public void run() {
 				if (!(listenable instanceof TronSeekbar2d)) {
 					EffectParam param = getParam(listenable.getId());
 					listenable.setLevel(param.viewLevel);
 				}
-		    }
+			}
 		});
 	}
 
@@ -187,7 +186,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 			param.level = level;
 		}
 	}
-	
+
 	protected static void logScaleLevel(EffectParam param, float level) {
 		param.level = (float) (Math.pow(9, level) - 1) / 8;
 		if (param.hz)
@@ -195,63 +194,98 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	}
 
 	protected static void quantizeToBeat(EffectParam param, float level) {
-		int numSixteenthNotes = param.hz ? 16 - (int)FloatMath.ceil(level * 16) : (int)FloatMath.ceil(level * 16);
+		int numSixteenthNotes = param.hz ? 16 - (int) FloatMath
+				.ceil(level * 16) : (int) FloatMath.ceil(level * 16);
 		numSixteenthNotes = numSixteenthNotes > 0 ? numSixteenthNotes : 1;
 		param.level = (60f * numSixteenthNotes) / (MidiManager.getBPM() * 16f);
 		if (param.hz)
 			param.level = 1 / param.level;
 	}
-	
+
 	public static void setEffectOnNative(boolean on) {
-		switch(EFFECT_NUM) {
+		switch (EFFECT_NUM) {
 		case GlobalVars.CHORUS_EFFECT_NUM:
-			setChorusOn(trackNum, on); return;
+			setChorusOn(trackNum, on);
+			return;
 		case GlobalVars.DECIMATE_EFFECT_NUM:
-			setDecimateOn(trackNum, on); return;
+			setDecimateOn(trackNum, on);
+			return;
 		case GlobalVars.DELAY_EFFECT_NUM:
-			setDelayOn(trackNum, on); return;
+			setDelayOn(trackNum, on);
+			return;
 		case GlobalVars.FILTER_EFFECT_NUM:
-			setFilterOn(trackNum, on); return;
+			setFilterOn(trackNum, on);
+			return;
 		case GlobalVars.FLANGER_EFFECT_NUM:
-			setFlangerOn(trackNum, on); return;
+			setFlangerOn(trackNum, on);
+			return;
 		case GlobalVars.REVERB_EFFECT_NUM:
-			setReverbOn(trackNum, on); return;
+			setReverbOn(trackNum, on);
+			return;
 		case GlobalVars.TREMELO_EFFECT_NUM:
-			setTremeloOn(trackNum, on); return;
+			setTremeloOn(trackNum, on);
+			return;
 		}
 	}
-	
+
 	public static void setParamNative(int paramNum, float paramLevel) {
-		switch(EFFECT_NUM) {
+		switch (EFFECT_NUM) {
 		case GlobalVars.CHORUS_EFFECT_NUM:
-			setChorusParam(trackNum, paramNum, paramLevel); return;
+			setChorusParam(trackNum, paramNum, paramLevel);
+			return;
 		case GlobalVars.DECIMATE_EFFECT_NUM:
-			setDecimateParam(trackNum, paramNum, paramLevel); return;
+			setDecimateParam(trackNum, paramNum, paramLevel);
+			return;
 		case GlobalVars.DELAY_EFFECT_NUM:
-			setDelayParam(trackNum, paramNum, paramLevel); return;
+			setDelayParam(trackNum, paramNum, paramLevel);
+			return;
 		case GlobalVars.FILTER_EFFECT_NUM:
-			setFilterParam(trackNum, paramNum, paramLevel); return;
+			setFilterParam(trackNum, paramNum, paramLevel);
+			return;
 		case GlobalVars.FLANGER_EFFECT_NUM:
-			setFlangerParam(trackNum, paramNum, paramLevel); return;
+			setFlangerParam(trackNum, paramNum, paramLevel);
+			return;
 		case GlobalVars.REVERB_EFFECT_NUM:
-			setReverbParam(trackNum, paramNum, paramLevel); return;
+			setReverbParam(trackNum, paramNum, paramLevel);
+			return;
 		case GlobalVars.TREMELO_EFFECT_NUM:
-			setTremeloParam(trackNum, paramNum, paramLevel); return;
+			setTremeloParam(trackNum, paramNum, paramLevel);
+			return;
 		}
 	}
-	
+
 	public static native void setChorusOn(int trackNum, boolean on);
-	public static native void setChorusParam(int trackNum, int paramNum, float param);
+
+	public static native void setChorusParam(int trackNum, int paramNum,
+			float param);
+
 	public static native void setDecimateOn(int trackNum, boolean on);
-	public static native void setDecimateParam(int trackNum, int paramNum, float param);
+
+	public static native void setDecimateParam(int trackNum, int paramNum,
+			float param);
+
 	public static native void setDelayOn(int trackNum, boolean on);
-	public static native void setDelayParam(int trackNum, int paramNum, float param);
+
+	public static native void setDelayParam(int trackNum, int paramNum,
+			float param);
+
 	public static native void setFilterOn(int trackNum, boolean on);
-	public static native void setFilterParam(int trackNum, int paramNum, float param);
+
+	public static native void setFilterParam(int trackNum, int paramNum,
+			float param);
+
 	public static native void setFlangerOn(int trackNum, boolean on);
-	public static native void setFlangerParam(int trackNum, int paramNum, float param);
+
+	public static native void setFlangerParam(int trackNum, int paramNum,
+			float param);
+
 	public static native void setReverbOn(int trackNum, boolean on);
-	public static native void setReverbParam(int trackNum, int paramNum, float param);
+
+	public static native void setReverbParam(int trackNum, int paramNum,
+			float param);
+
 	public static native void setTremeloOn(int trackNum, boolean on);
-	public static native void setTremeloParam(int trackNum, int paramNum, float param);
+
+	public static native void setTremeloParam(int trackNum, int paramNum,
+			float param);
 }
