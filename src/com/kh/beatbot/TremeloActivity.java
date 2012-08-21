@@ -10,7 +10,7 @@ public class TremeloActivity extends EffectActivity {
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, true, "Hz"));
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, true, "Hz"));
-			getParam(0).scaleFactor = getParam(1).scaleFactor = 16;
+			getParam(0).hz = getParam(1).hz = true;
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, false, ""));
 		}
 	}

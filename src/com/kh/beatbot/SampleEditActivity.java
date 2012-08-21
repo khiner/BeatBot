@@ -58,11 +58,10 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			for (int effectNum = 0; effectNum < GlobalVars.NUM_EFFECTS; effectNum++) {
 				List<EffectParam> params = GlobalVars.params[trackNum][effectNum];
 				for (int paramNum = 0; paramNum < params.size(); paramNum++) {
-					if (params.get(paramNum).beatSync) {
-						float level = EffectActivity.calcLevel(
-								params.get(paramNum),
-								params.get(paramNum).viewLevel);
-						EffectActivity.setParamNative(paramNum, level);
+					EffectParam param = params.get(paramNum);
+					if (param.beatSync) {
+						EffectActivity.setParamLevel(param, param.viewLevel);
+						EffectActivity.setParamNative(paramNum, param.level);
 					}
 				}
 			}

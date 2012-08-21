@@ -31,7 +31,7 @@ void flangerconfig_setFeedback(FlangerConfig *config, float feedback) {
 void flangerconfig_setModFreq(FlangerConfig *config, float modFreq) {
 	int channel;
 	for (channel = 0; channel < 2; channel++)
-		sinewave_setFrequency(config->mod[channel], modFreq * 16);
+		sinewave_setFrequency(config->mod[channel], modFreq);
 }
 
 void flangerconfig_setModAmt(FlangerConfig *config, float modAmt) {

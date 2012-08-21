@@ -93,7 +93,7 @@ void initTrack(Track *track, AAsset *asset) {
 //  	initEffect(&(track->effects[DYNAMIC_PITCH_ID]), false, true, pitchconfig_create(),
 //  			   pitchconfig_setShift, pitch_process, pitchconfig_destroy);
 	initEffect(&(track->effects[DELAY_ID]), false,
-			delayconfigi_create(.5f, .5f, SAMPLE_RATE), delayconfigi_set,
+			delayconfigi_create(.5f, .5f, (int)(SAMPLE_RATE * 1.5)), delayconfigi_set,
 			delayi_process, delayconfigi_destroy);
 	initEffect(&(track->effects[FLANGER_ID]), false, flangerconfig_create(),
 			flangerconfig_set, flanger_process, flangerconfig_destroy);

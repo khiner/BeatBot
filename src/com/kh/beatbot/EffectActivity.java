@@ -5,6 +5,9 @@ import java.util.List;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.FloatMath;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +25,7 @@ import com.kh.beatbot.view.TronSeekbar2d;
 public abstract class EffectActivity extends Activity implements LevelListener {
 	public class EffectParam {
 		public float level, viewLevel;
-		public float scaleFactor = 1;
+		public boolean hz = false;
 		public boolean beatSync;
 		public boolean logScale;
 		public String unitString;
@@ -125,7 +128,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	protected static final void setParamLevel(int paramNum, float level) {
 		EffectParam param = getParam(paramNum);
 		param.viewLevel = level;
-		param.level = level = calcLevel(param, level);
+		setParamLevel(param, level);
 		setParamNative(paramNum, param.level);
 	}
 
@@ -160,42 +163,43 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	}
 
 	@Override
-	public void notifyInit(LevelListenable listenable) {
-		if (listenable instanceof TronSeekbar2d) {
-			((TronSeekbar2d) listenable).setViewLevelX(getParam(xParamKnob
-					.getId()).viewLevel);
-			((TronSeekbar2d) listenable).setViewLevelY(getParam(yParamKnob
-					.getId()).viewLevel);
-		} else {
-			EffectParam param = getParam(listenable.getId());
-			listenable.setViewLevel(param.viewLevel);
-		}
+	public void notifyInit(final LevelListenable listenable) {
+		// not in the thread that created the view, so we cannot call setLevel.
+		// need to do everything manually
+		Handler refresh = new Handler(Looper.getMainLooper());
+		refresh.post(new Runnable() {
+		    public void run()
+		    {
+				if (!(listenable instanceof TronSeekbar2d)) {
+					EffectParam param = getParam(listenable.getId());
+					listenable.setLevel(param.viewLevel);
+				}
+		    }
+		});
 	}
 
-	protected static float calcLevel(EffectParam param, float level) {
-		if (param.logScale) {
-			level = logScaleLevel(level);
-		}
+	protected static void setParamLevel(EffectParam param, float level) {
 		if (param.beatSync) {
-			level = quantizeToBeat(level);
+			quantizeToBeat(param, level);
+		} else if (param.logScale) {
+			logScaleLevel(param, level);
+		} else {
+			param.level = level;
 		}
-		level *= param.scaleFactor;
-		return level;
 	}
 	
-	protected static float logScaleLevel(float level) {
-		return (float) (Math.pow(9, level) - 1) / 8;
+	protected static void logScaleLevel(EffectParam param, float level) {
+		param.level = (float) (Math.pow(9, level) - 1) / 8;
+		if (param.hz)
+			param.level *= 16;
 	}
 
-	protected static float quantizeToBeat(float level) {
-		// minimum beat == 1/16 note = 1(1 << 4)
-		for (int pow = 4; pow >= 0; pow--) {
-			float quantized = 60f / (MidiManager.getBPM() * (1 << pow));
-			if (level <= quantized) {
-				return quantized;
-			}
-		}
-		return 1;
+	protected static void quantizeToBeat(EffectParam param, float level) {
+		int numSixteenthNotes = param.hz ? 16 - (int)FloatMath.ceil(level * 16) : (int)FloatMath.ceil(level * 16);
+		numSixteenthNotes = numSixteenthNotes > 0 ? numSixteenthNotes : 1;
+		param.level = (60f * numSixteenthNotes) / (MidiManager.getBPM() * 16f);
+		if (param.hz)
+			param.level = 1 / param.level;
 	}
 	
 	public static void setEffectOnNative(boolean on) {

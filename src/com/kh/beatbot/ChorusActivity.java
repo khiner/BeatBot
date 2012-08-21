@@ -10,7 +10,7 @@ public class ChorusActivity extends EffectActivity {
 		NUM_PARAMS = 5;	
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, true, "Hz"));
-			getParam(0).scaleFactor = 16;
+			getParam(0).hz = true;
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, false, ""));
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, false, ""));
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, true, "ms"));
