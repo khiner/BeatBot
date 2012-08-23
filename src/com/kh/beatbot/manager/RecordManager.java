@@ -35,10 +35,7 @@ public class RecordManager {
 
 	private static RecordManager singletonInstance = null;
 
-	// Midi Manager to manage MIDI events
-	private MidiManager midiManager;
 	private MidiView midiView;
-	private AudioClassificationManager audioClassificationManager;
 
 	private ThresholdBarView thresholdBar;
 
@@ -86,20 +83,12 @@ public class RecordManager {
 		state = State.INITIALIZING;
 	}
 
-	public void setMidiManager(MidiManager midiManager) {
-		this.midiManager = midiManager;
-	}
-
 	public void setThresholdBar(ThresholdBarView thresholdBar) {
 		this.thresholdBar = thresholdBar;
 	}
 	
 	public void setMidiView(MidiView midiView) {
 		this.midiView = midiView;
-	}
-	
-	public void setAudioClassificationManager(AudioClassificationManager audioClassificationManager) {
-		this.audioClassificationManager = audioClassificationManager;
 	}
 	
 	private void initRecorder() {
@@ -181,10 +170,10 @@ public class RecordManager {
 	
 	public void notifyLoop() {
 		if (state == State.RECORDING) {
-			recordTickQueue.add(midiManager.getLoopEndTick());
-			addRecordNote(random.nextInt(midiManager.getNumSamples()));
-			recordTickQueue.add(midiManager.getLoopBeginTick());
-			recordStartTick = midiManager.getLoopBeginTick();
+			recordTickQueue.add(Managers.midiManager.getLoopEndTick());
+			addRecordNote(random.nextInt(Managers.midiManager.getNumSamples()));
+			recordTickQueue.add(Managers.midiManager.getLoopBeginTick());
+			recordStartTick = Managers.midiManager.getLoopBeginTick();
 		}
 	}
 	
@@ -214,7 +203,7 @@ public class RecordManager {
 					//audioClassificationManager.extractFeatures(new File(filePath));
 					new File(filePath).delete();
 					// cl = classify(xml);
-					int cl = random.nextInt(midiManager.getNumSamples());
+					int cl = random.nextInt(Managers.midiManager.getNumSamples());
 					addRecordNote(cl);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -227,7 +216,7 @@ public class RecordManager {
 	}
 
 	public void startRecording() throws IOException {
-		recordStartTick = midiManager.getCurrTick();
+		recordStartTick = Managers.midiManager.getCurrTick();
 		recordTickQueue.add(recordStartTick);
 		currFilename = getTempFilename();
 		os = new FileOutputStream(currFilename);
@@ -236,7 +225,7 @@ public class RecordManager {
 
 	public void stopRecording() throws IOException {
 		state = State.LISTENING;
-		recordTickQueue.add(midiManager.getCurrTick());		
+		recordTickQueue.add(Managers.midiManager.getCurrTick());		
 		// close and add to processing queue
 		os.close();
 		synchronized (processingQueue) {

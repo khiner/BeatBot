@@ -15,6 +15,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
@@ -27,6 +28,7 @@ import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class MidiView extends SurfaceViewBase {
 
+	private static MidiManager midiManager;
 	private MidiViewBean bean = new MidiViewBean();
 
 	private static final int[] V_LINE_WIDTHS = new int[] { 5, 3, 2 };
@@ -40,10 +42,6 @@ public class MidiView extends SurfaceViewBase {
 	private FloatBuffer loopMarkerVb = null;
 	private FloatBuffer loopMarkerLineVb = null;
 	private FloatBuffer loopSquareVb = null;
-
-	private MidiManager midiManager;
-	private RecordManager recordManager;
-	private PlaybackManager playbackManager;
 
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedNotes = new HashMap<Integer, MidiNote>();
@@ -67,14 +65,10 @@ public class MidiView extends SurfaceViewBase {
 		}
 	}
 
-	public void setMidiManager(MidiManager midiManager) {
-		this.midiManager = midiManager;
+	public void initMeFirstTest() {
+		midiManager = Managers.midiManager;
 		TickWindowHelper.viewBean = bean;
 		TickWindowHelper.updateGranularity();
-	}
-
-	public MidiManager getMidiManager() {
-		return midiManager;
 	}
 
 	public MidiViewBean getBean() {
@@ -83,14 +77,6 @@ public class MidiView extends SurfaceViewBase {
 
 	public GL10 getGL10() {
 		return gl;
-	}
-
-	public void setRecordManager(RecordManager recorder) {
-		this.recordManager = recorder;
-	}
-
-	public void setPlaybackManager(PlaybackManager playbackManager) {
-		this.playbackManager = playbackManager;
 	}
 
 	public State getViewState() {
@@ -287,13 +273,13 @@ public class MidiView extends SurfaceViewBase {
 	private void drawRecordingWaveforms() {
 		ArrayList<FloatBuffer> waveformVbs = waveformHelper
 				.getCurrentWaveformVbs();
-		if (recordManager.isRecording() && !waveformVbs.isEmpty()) {
+		if (Managers.recordManager.isRecording() && !waveformVbs.isEmpty()) {
 			FloatBuffer last = waveformVbs.get(waveformVbs.size() - 1);
 			float waveWidth = last.get(last.capacity() - 2);
 			float noteWidth = tickToX(midiManager.getCurrTick()
-					- recordManager.getRecordStartTick());
+					- Managers.recordManager.getRecordStartTick());
 			gl.glPushMatrix();
-			gl.glTranslatef(tickToX(recordManager.getRecordStartTick()), 0, 0);
+			gl.glTranslatef(tickToX(Managers.recordManager.getRecordStartTick()), 0, 0);
 			// scale drawing so the entire waveform exactly fits in the note
 			// width
 			gl.glScalef(noteWidth / waveWidth, 1, 1);
@@ -459,8 +445,8 @@ public class MidiView extends SurfaceViewBase {
 
 	@Override
 	protected void drawFrame() {
-		boolean recording = recordManager.getState() != RecordManager.State.INITIALIZING;
-		boolean playing = playbackManager.getState() == PlaybackManager.State.PLAYING;
+		boolean recording = Managers.recordManager.getState() != RecordManager.State.INITIALIZING;
+		boolean playing = Managers.playbackManager.getState() == PlaybackManager.State.PLAYING;
 		TickWindowHelper.scroll();
 		initLoopSquareVb();
 		drawTickFill();

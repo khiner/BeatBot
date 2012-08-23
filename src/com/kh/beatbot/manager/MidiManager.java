@@ -50,8 +50,6 @@ public class MidiManager implements Parcelable {
 	private List<MidiNote> currState = new ArrayList<MidiNote>();
 
 	private Thread tickThread = null;
-	private PlaybackManager playbackManager = null;
-	private RecordManager recordManager = null;
 
 	private int numSamples = 0;
 
@@ -78,17 +76,8 @@ public class MidiManager implements Parcelable {
 		return singletonInstance;
 	}
 
-	public void setPlaybackManager(PlaybackManager playbackManager) {
-		this.playbackManager = playbackManager;
-	}
-
-	public void setRecordManager(RecordManager recordManager) {
-		this.recordManager = recordManager;
-	}
-
 	public void setActivity(BeatBotActivity activity) {
 		this.activity = activity;
-		activity.setDeleteIconEnabled(false);
 	}
 
 	public static float getBPM() {

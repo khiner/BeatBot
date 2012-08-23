@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.EffectActivity.EffectParam;
-import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.manager.PlaybackManager;
 
 public class GlobalVars {
 	public static final int CHORUS_EFFECT_NUM = 0;
@@ -24,8 +22,6 @@ public class GlobalVars {
 	public static final int UNDO_STACK_SIZE = 40;
 	public static final int NUM_EFFECTS = 7;
 	public static final short LEVEL_MAX = 127;
-	private static MidiManager midiManager = null;
-	private static PlaybackManager playbackManager = null;
 
 	// effect settings are stored here instead of in the effect activities
 	// because the activities are destroyed after clicking 'back', and we
@@ -41,13 +37,7 @@ public class GlobalVars {
 	
 	public static float currBeatDivision;
 
-	public static MidiManager getMidiManager() {
-		return midiManager;
-	}
-
-	public static void setMidiManager(MidiManager midiManager) {
-		GlobalVars.midiManager = midiManager;
-		int numTracks = midiManager.getNumSamples();
+	public static void init(int numTracks) {
 		params = (ArrayList<EffectParam>[][]) new ArrayList[numTracks][NUM_EFFECTS];
 		effectOn = new boolean[numTracks][NUM_EFFECTS];
 		delayParamsLinked = new boolean[numTracks];
@@ -64,13 +54,5 @@ public class GlobalVars {
 				params[track][effect] = new ArrayList<EffectParam>();
 			}
 		}
-	}
-
-	public static PlaybackManager getPlaybackManager() {
-		return playbackManager;
-	}
-
-	public static void setPlaybackManager(PlaybackManager playbackManager) {
-		GlobalVars.playbackManager = playbackManager;
 	}
 }

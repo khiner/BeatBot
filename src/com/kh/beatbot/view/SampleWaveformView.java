@@ -11,7 +11,7 @@ import android.view.MotionEvent;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.manager.PlaybackManager;
+import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.bean.MidiViewBean;
 import com.kh.beatbot.view.helper.WaveformHelper;
 
@@ -36,7 +36,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private FloatBuffer loopSelectionRectVbs[] = new FloatBuffer[2];
 	private FloatBuffer adsrPointVb = null;
 	private FloatBuffer[] adsrCurveVb = new FloatBuffer[4];
-	private PlaybackManager playbackManager = null;
 
 	private final float[][] adsrPoints = new float[5][2];
 	// keep track of which pointer ids are selecting which ADSR points
@@ -77,10 +76,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	public SampleWaveformView(Context c, AttributeSet as) {
 		super(c, as);
-	}
-
-	public void setPlaybackManager(PlaybackManager playbackManager) {
-		this.playbackManager = playbackManager;
 	}
 
 	public void setTrackNum(int trackNum) {
@@ -328,7 +323,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 			sampleLoopEnd += diff;
 			clipLoopToWindow();
 		}
-		playbackManager.setLoopWindow(trackNum, (int) sampleLoopBegin,
+		Managers.playbackManager.setLoopWindow(trackNum, (int) sampleLoopBegin,
 				(int) sampleLoopEnd);
 		// update the display location of the loop markers
 		initLoopMarkerVb();
@@ -459,7 +454,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		initLoopMarkerVb();
 		initAdsrVb();
 		// update sample playback.
-		playbackManager.setLoopWindow(trackNum, (int) sampleLoopBegin,
+		Managers.playbackManager.setLoopWindow(trackNum, (int) sampleLoopBegin,
 				(int) sampleLoopEnd);
 		return true;
 	}
@@ -535,7 +530,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	public void handlePreviewActionDown(int id) {
 		currentTexture = 1;
-		playbackManager.playTrack(trackNum);
+		Managers.playbackManager.playTrack(trackNum);
 		previewPointerId = id;
 	}
 
@@ -572,7 +567,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 					// if a click goes down on the preview button,
 					// then moves out of it into wave, stop previewing
 					previewPointerId = -1;
-					playbackManager.stopTrack(trackNum);
+					Managers.playbackManager.stopTrack(trackNum);
 				}
 			} else if (!moveAdsrPoint(id, e.getX(i), e.getY(i))
 					&& !moveLoopMarker(id, e.getX(i)))
@@ -587,7 +582,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 			handleWaveActionPointerUp(e, id);
 		else {
 			currentTexture = 0;
-			playbackManager.stopTrack(trackNum);
+			Managers.playbackManager.stopTrack(trackNum);
 		}
 	}
 
@@ -595,7 +590,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	protected void handleActionUp(int id, float x, float y) {
 		currentTexture = 0;
 		beginLoopMarkerTouched = endLoopMarkerTouched = -1;
-		playbackManager.stopTrack(trackNum);
+		Managers.playbackManager.stopTrack(trackNum);
 		scrollAnchorSample = zoomLeftAnchorSample = zoomRightAnchorSample = -1;
 		clearAdsrSelected();
 	}

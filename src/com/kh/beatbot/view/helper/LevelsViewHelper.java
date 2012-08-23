@@ -9,7 +9,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.view.MotionEvent;
 
-import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.SurfaceViewBase;
@@ -42,7 +42,6 @@ public class LevelsViewHelper {
 	private static final int LEVEL_BAR_WIDTH = MidiViewBean.LEVEL_POINT_SIZE / 2;
 	private static MidiView midiView;
 	private static MidiViewBean bean;
-	private static MidiManager midiManager;
 	private static GL10 gl;
 
 	// map of pointerIds to the notes they are selecting
@@ -60,7 +59,6 @@ public class LevelsViewHelper {
 	public static void initHelper(MidiView _midiView) {
 		midiView = _midiView;
 		bean = midiView.getBean();
-		midiManager = midiView.getMidiManager();
 		gl = midiView.getGL10();
 		initLevelBarVb();
 	}
@@ -137,7 +135,7 @@ public class LevelsViewHelper {
 	}
 
 	private static void drawLevels() {
-		for (MidiNote midiNote : midiManager.getMidiNotes()) {
+		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
 			if (midiNote.isLevelViewSelected()) {
 				drawLevel(midiView.tickToX(midiNote.getOnTick()),
 						midiNote.getLevel(currLevelMode),
@@ -147,7 +145,7 @@ public class LevelsViewHelper {
 	}
 
 	public static void selectLevel(float x, float y, int pointerId) {
-		for (MidiNote levelViewSelected : midiManager
+		for (MidiNote levelViewSelected : Managers.midiManager
 				.getLevelViewSelectedNotes()) {
 			float velocityY = levelToY(levelViewSelected
 					.getLevel(currLevelMode));
@@ -172,7 +170,7 @@ public class LevelsViewHelper {
 		long tick = midiView.xToTick(x);
 		long note = midiView.yToNote(y);
 
-		for (MidiNote midiNote : midiManager.getMidiNotes()) {
+		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
 			if (midiNote.getNoteValue() == note && midiNote.getOnTick() <= tick
 					&& midiNote.getOffTick() >= tick) {
 				addToLevelViewSelected(midiNote);
@@ -192,7 +190,7 @@ public class LevelsViewHelper {
 
 	private static ArrayList<MidiNote> getOverlapping(MidiNote midiNote) {
 		ArrayList<MidiNote> overlapping = new ArrayList<MidiNote>();
-		for (MidiNote otherNote : midiManager.getMidiNotes()) {
+		for (MidiNote otherNote : Managers.midiManager.getMidiNotes()) {
 			if (!otherNote.equals(midiNote)
 					&& midiNote.getOnTick() == otherNote.getOnTick())
 				overlapping.add(otherNote);
@@ -202,7 +200,7 @@ public class LevelsViewHelper {
 
 	public static void selectRegion(long leftTick, long rightTick, float topY,
 			float bottomY) {
-		for (MidiNote levelViewSelected : midiManager
+		for (MidiNote levelViewSelected : Managers.midiManager
 				.getLevelViewSelectedNotes()) {
 			float levelY = levelToY(levelViewSelected.getLevel(currLevelMode));
 			if (leftTick < levelViewSelected.getOnTick()
@@ -244,7 +242,7 @@ public class LevelsViewHelper {
 	private static void updateLevelOffsets() {
 		levelOffsets.clear();
 		updateDragLine();
-		for (MidiNote levelSelected : midiManager.getLevelSelectedNotes()) {
+		for (MidiNote levelSelected : Managers.midiManager.getLevelSelectedNotes()) {
 			levelOffsets.put(
 					levelSelected,
 					levelSelected.getLevel(currLevelMode)
@@ -253,7 +251,7 @@ public class LevelsViewHelper {
 	}
 
 	private static void setLevelsToDragLine() {
-		for (MidiNote levelSelected : midiManager.getLevelSelectedNotes()) {
+		for (MidiNote levelSelected : Managers.midiManager.getLevelSelectedNotes()) {
 			if (levelOffsets.get(levelSelected) != null) {
 				levelSelected.setLevel(currLevelMode,
 						DragLine.getLevel(levelSelected.getOnTick())
@@ -263,13 +261,13 @@ public class LevelsViewHelper {
 	}
 
 	private static void deselectAllLevelViews() {
-		for (MidiNote midiNote : midiManager.getMidiNotes()) {
+		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
 			midiNote.setLevelViewSelected(false);
 		}
 	}
 
 	private static void deselectAllLevels() {
-		for (MidiNote midiNote : midiManager.getMidiNotes()) {
+		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
 			midiNote.setLevelSelected(false);
 		}
 	}
@@ -277,7 +275,7 @@ public class LevelsViewHelper {
 	// add all non-overlapping notes to selectedLevelNotes
 	public static void updateSelectedLevelNotes() {
 		deselectAllLevelViews();
-		for (MidiNote midiNote : midiManager.getMidiNotes()) {
+		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
 			addToLevelViewSelected(midiNote);
 		}
 	}
@@ -311,10 +309,10 @@ public class LevelsViewHelper {
 
 	private static void drawAllMidiNotes() {
 		// not using for-each to avoid concurrent modification
-		for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
-			if (midiManager.getMidiNotes().size() <= i)
+		for (int i = 0; i < Managers.midiManager.getMidiNotes().size(); i++) {
+			if (Managers.midiManager.getMidiNotes().size() <= i)
 				break;
-			MidiNote midiNote = midiManager.getMidiNote(i);
+			MidiNote midiNote = Managers.midiManager.getMidiNote(i);
 			if (midiNote != null) {
 				midiView.drawMidiNote(midiNote, calculateColor(midiNote));
 			}
@@ -342,7 +340,7 @@ public class LevelsViewHelper {
 		tappedLevelNote.setLevelSelected(false);
 		tappedLevelNote.setLevelViewSelected(false);
 		tappedLevelNote.setSelected(false);
-		midiManager.deleteNote(tappedLevelNote);
+		Managers.midiManager.deleteNote(tappedLevelNote);
 		updateSelectedLevelNotes();
 		bean.setStateChanged(true);
 	}

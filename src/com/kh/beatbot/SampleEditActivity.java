@@ -13,13 +13,13 @@ import com.kh.beatbot.EffectActivity.EffectParam;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
+import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.view.SampleWaveformView;
 import com.kh.beatbot.view.TronSeekbar;
 import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class SampleEditActivity extends Activity implements LevelListener {
-	private PlaybackManager playbackManager = null;
 	private SampleWaveformView sampleWaveformView = null;
 	// private EditLevelsView editLevelsView = null;
 	private TronSeekbar volumeLevel, panLevel, pitchLevel;
@@ -36,21 +36,19 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		// remove title bar
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.sample_edit);
-		playbackManager = GlobalVars.getPlaybackManager();
 		trackNum = getIntent().getExtras().getInt("trackNum");
 		sampleWaveformView = ((SampleWaveformView) findViewById(R.id.sample_waveform_view));
 		// editLevelsView = ((EditLevelsView)
 		// findViewById(R.id.edit_levels_view));
-		sampleWaveformView.setPlaybackManager(playbackManager);
 		sampleWaveformView.setTrackNum(trackNum);
 		// editLevelsView.setActivity(this);
 		// editLevelsView.setTrackNum(trackNum);
 		initLevels();
 		// numSamples should be in shorts, so divide by two
 		sampleWaveformView.setSamples(getSamples(trackNum));
-		playbackManager.armTrack(trackNum);
+		Managers.playbackManager.armTrack(trackNum);
 		((ToggleButton) findViewById(R.id.loop_toggle))
-				.setChecked(playbackManager.isLooping(trackNum));
+				.setChecked(Managers.playbackManager.isLooping(trackNum));
 	}
 
 	public static void quantizeEffectParams() {
@@ -69,7 +67,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	public void toggleLoop(View view) {
-		playbackManager.toggleLooping(trackNum);
+		Managers.playbackManager.toggleLooping(trackNum);
 	}
 
 	public void toggleAdsr(View view) {
@@ -145,9 +143,9 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (playbackManager.getState() != PlaybackManager.State.PLAYING)
+		if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
 			// if not currently playing, disarm the track
-			playbackManager.disarmTrack(trackNum);
+			Managers.playbackManager.disarmTrack(trackNum);
 	}
 
 	private void initLevels() {

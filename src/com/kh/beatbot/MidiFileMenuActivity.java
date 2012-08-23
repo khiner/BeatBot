@@ -14,13 +14,11 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.manager.Managers;
 
 public class MidiFileMenuActivity extends Activity {
 	private static final String SAVE_FOLDER = "BeatBot/MIDI";
 	private String baseFilePath = null;
-	MidiManager midiManager;
 	File outFile;
 	FileInputStream inFile;
 	String[] fileNames;
@@ -35,7 +33,6 @@ public class MidiFileMenuActivity extends Activity {
 		// remove title bar
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.midi_menu);
-		midiManager = GlobalVars.getMidiManager();
 		
 		baseFilePath = createBasePath();
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -44,7 +41,7 @@ public class MidiFileMenuActivity extends Activity {
 				.setPositiveButton("Yes",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								midiManager.writeToFile(outFile);
+								Managers.midiManager.writeToFile(outFile);
 							}
 						})
 				.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -90,7 +87,7 @@ public class MidiFileMenuActivity extends Activity {
 				.setPositiveButton("Yes",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								midiManager.importFromFile(inFile);
+								Managers.midiManager.importFromFile(inFile);
 							}
 						})
 				.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -112,7 +109,7 @@ public class MidiFileMenuActivity extends Activity {
 		String fullPathName = getFullPathName(editText.getText().toString());
 		outFile = new File(fullPathName);
 		if (!outFile.exists())
-			midiManager.writeToFile(outFile);
+			Managers.midiManager.writeToFile(outFile);
 		else {
 			// file exists - popup dialog confirming overwrite of existing file
 			fileExistsAlert.show();
@@ -127,8 +124,8 @@ public class MidiFileMenuActivity extends Activity {
 		String fullPath = baseFilePath + "/" + fileName;
 		try {
 			inFile = new FileInputStream(fullPath);
-			if (midiManager.getMidiNotes().isEmpty())
-				midiManager.importFromFile(inFile);
+			if (Managers.midiManager.getMidiNotes().isEmpty())
+				Managers.midiManager.importFromFile(inFile);
 			else
 				confirmImportAlert.show();
 		} catch (FileNotFoundException e) {

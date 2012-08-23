@@ -1,6 +1,5 @@
 package com.kh.beatbot.manager;
 
-import android.content.Context;
 
 public class PlaybackManager {
 	
@@ -15,14 +14,14 @@ public class PlaybackManager {
 		PLAYING, STOPPED
 	}
 	
-	public static PlaybackManager getInstance(Context context, String[] sampleNames) {
+	public static PlaybackManager getInstance(String[] sampleNames) {
 		if (singletonInstance == null) {
-			singletonInstance = new PlaybackManager(context, sampleNames);
+			singletonInstance = new PlaybackManager(sampleNames);
 		}
 		return singletonInstance;			
 	}
 	
-	private PlaybackManager(Context context, String[] sampleNames) {
+	private PlaybackManager(String[] sampleNames) {
 		this.sampleNames = sampleNames;
 		//audioTracks = new AudioTrack[sampleNames.length];
 		//streams = new Stream[sampleNames.length];
