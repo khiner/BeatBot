@@ -192,10 +192,11 @@ public class BeatBotActivity extends Activity {
 		recordManager = RecordManager.getInstance();
 		// if this context is being restored from a destroyed context,
 		// recover the midiManager. otherwise, create a new one
-		if (savedInstanceState == null)
+		if (savedInstanceState == null) {
 			midiManager = MidiManager.getInstance(sampleNames.length);
-		else
+		} else {
 			midiManager = savedInstanceState.getParcelable("midiManager");
+		}
 
 		midiManager.setPlaybackManager(playbackManager);
 		midiManager.setActivity(this);
@@ -211,8 +212,14 @@ public class BeatBotActivity extends Activity {
 		midiView.setRecordManager(recordManager);
 		midiView.setPlaybackManager(playbackManager);
 		recordManager.setMidiView(midiView);
-		if (savedInstanceState != null)
+		if (savedInstanceState != null) {
 			midiView.readFromBundle(savedInstanceState);
+			// if going to levels view or in levels view, level icons should be visible
+			int levelsVisibilityState = midiView.getViewState() == MidiView.State.TO_LEVELS_VIEW ||
+					midiView.getViewState() == MidiView.State.LEVELS_VIEW ? View.VISIBLE : View.GONE;
+			levelsGroup.setVisibility(levelsVisibilityState);
+
+		}
 
 		// set midiManager as a global variable, since it needs to be accessed
 		// by separate MidiFileMenu activity
