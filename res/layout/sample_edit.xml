@@ -142,33 +142,34 @@
         android:background="@drawable/delay_icon"
         android:onClick="delay" />
 
-    <Button
+    <ImageButton
         android:id="@+id/chorusButton"
         android:layout_width="80dp"
         android:layout_height="40dp"
-        android:onClick="chorus"
-        android:text="@string/chorus" />
+        android:background="@drawable/chorus_icon"
+        android:onClick="chorus" />
 
-    <Button
+    <ImageButton
         android:id="@+id/flangerButton"
         android:layout_width="80dp"
         android:layout_height="40dp"
-        android:onClick="flanger"
-        android:text="@string/flanger" />
+        android:background="@drawable/flanger_icon"
+        android:onClick="flanger" />
 
-    <Button
+    <ImageButton
         android:id="@+id/reverbButton"
         android:layout_width="80dp"
         android:layout_height="40dp"
-        android:onClick="reverb"
-        android:text="@string/reverb" />
+        android:background="@drawable/reverb_icon"
+        android:onClick="reverb" />
 
-    <Button
+    <ImageButton
         android:id="@+id/tremeloButton"
         android:layout_width="80dp"
         android:layout_height="40dp"
-        android:onClick="tremelo"
-        android:text="@string/tremelo" />
+        android:background="@drawable/tremelo_icon"
+        android:onClick="tremelo" />
+    
 	</LinearLayout>
 	
 </RelativeLayout>

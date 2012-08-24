@@ -11,9 +11,14 @@
         android:orientation="horizontal"
         android:layout_centerHorizontal="true" >
 
-    <include
-        layout="@layout/effect_on_toggle"
-        android:id="@+id/effectToggleOn" />
+    <ToggleButton
+        android:id="@+id/effectToggleOn"
+        android:layout_width="130dp"
+        android:layout_height="40dp"
+        android:background="@drawable/filter_toggle_src"
+        android:onClick="toggleOn"
+        android:textOff=""
+        android:textOn="" />
     
 	<ToggleButton
 	    android:id="@+id/lp_toggle"

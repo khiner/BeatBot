@@ -3,11 +3,17 @@
     xmlns:paramControl="http://schemas.android.com/apk/res/com.kh.beatbot"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" >
-    
-    <include
-        layout="@layout/effect_on_toggle"
-        android:id="@+id/effectToggleOn" />
-    
+
+    <ToggleButton
+        android:id="@+id/effectToggleOn"
+        android:layout_centerHorizontal="true"
+        android:layout_width="130dp"
+        android:layout_height="40dp"
+        android:background="@drawable/chorus_toggle_src"
+        android:onClick="toggleOn"
+        android:textOff=""
+        android:textOn="" />
+
     <com.kh.beatbot.layout.EffectControlLayout
         android:id="@+id/param1"
         android:layout_width="wrap_content"
@@ -15,41 +21,41 @@
         android:layout_below="@+id/effectToggleOn"
         paramControl:beatsync_enabled="true"
         paramControl:param_name="@string/modRate" />
-    
+
     <com.kh.beatbot.layout.EffectControlLayout
         android:id="@+id/param2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/param1"
         android:layout_below="@+id/effectToggleOn"
+        android:layout_toRightOf="@+id/param1"
         paramControl:beatsync_enabled="false"
         paramControl:param_name="@string/modAmt" />
-    
-	<com.kh.beatbot.layout.EffectControlLayout
+
+    <com.kh.beatbot.layout.EffectControlLayout
         android:id="@+id/param3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/param2"
         android:layout_below="@+id/effectToggleOn"
+        android:layout_toRightOf="@+id/param2"
         paramControl:beatsync_enabled="false"
         paramControl:param_name="@string/time" />
-	
-	<com.kh.beatbot.layout.EffectControlLayout
+
+    <com.kh.beatbot.layout.EffectControlLayout
         android:id="@+id/param4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/param2"
-        android:layout_below="@+id/param1"
         android:layout_alignParentLeft="true"
+        android:layout_below="@+id/param1"
+        android:layout_toRightOf="@+id/param2"
         paramControl:beatsync_enabled="false"
         paramControl:param_name="@string/feedback" />
 
-	<com.kh.beatbot.layout.EffectControlLayout
+    <com.kh.beatbot.layout.EffectControlLayout
         android:id="@+id/param5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/param4"
         android:layout_below="@+id/param2"
+        android:layout_toRightOf="@+id/param4"
         paramControl:beatsync_enabled="false"
         paramControl:param_name="@string/wet" />
 

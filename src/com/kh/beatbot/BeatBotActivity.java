@@ -247,7 +247,7 @@ public class BeatBotActivity extends Activity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putParcelable("Managers.midiManager", Managers.midiManager);
+		outState.putParcelable("midiManager", Managers.midiManager);
 		midiView.writeToBundle(outState);
 		outState.putBoolean("playing",
 				Managers.playbackManager.getState() == PlaybackManager.State.PLAYING);
