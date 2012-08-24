@@ -174,9 +174,9 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private void drawWaveform() {
 		if (waveformVb == null)
 			return;
-		float scale = (waveformWidth * WaveformHelper.DEFAULT_SPP)
+		float scale = (waveformWidth)
 				/ ((float) sampleWidth);
-		float translate = -sampleOffset / WaveformHelper.DEFAULT_SPP;
+		float translate = -sampleOffset;
 		float[] color = MidiViewBean.VOLUME_COLOR;
 		gl.glLineWidth(10);
 		gl.glEnable(GL10.GL_LINE_SMOOTH);
@@ -187,9 +187,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glTranslatef(previewButtonWidth + SNAP_DIST / 2, 0, 0);
 		gl.glScalef(scale, 1, 1);
 		gl.glTranslatef(translate, 0, 0);
-		gl.glDrawArrays(GL10.GL_LINE_STRIP,
-				(int) (sampleOffset / WaveformHelper.DEFAULT_SPP),
-				(int) (sampleWidth / WaveformHelper.DEFAULT_SPP));
+		gl.glDrawArrays(GL10.GL_LINE_STRIP, (int) (sampleOffset),
+				(int) (sampleWidth));
 		gl.glDisable(GL10.GL_LINE_SMOOTH);
 		gl.glPopMatrix();
 	}
@@ -338,9 +337,9 @@ public class SampleWaveformView extends SurfaceViewBase {
 	@Override
 	protected void drawFrame() {
 		drawTriangleStrip(previewButtonSquareVb, GlobalVars.BG_COLOR);
-		drawLines(backgroundOutlineVb, GlobalVars.WHITE, 4, GL10.GL_LINE_LOOP);
 		drawTexture(height, height);
 		drawWaveform();
+		drawLines(backgroundOutlineVb, GlobalVars.WHITE, 4, GL10.GL_LINE_LOOP);
 		drawLoopSelectionMarkers();
 		if (showAdsr)
 			drawAdsr();

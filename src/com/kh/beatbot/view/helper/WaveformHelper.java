@@ -12,7 +12,6 @@ import com.kh.beatbot.view.MidiView;
 
 public class WaveformHelper extends Thread {
 	public static final int DEFAULT_HEIGHT = 100;
-	public static final int DEFAULT_SPP = 2; // default samples per pixel
 	
 	// byte buffers will be read from file in segments and
 	// temporarily stored in this array until they are consolidated
@@ -49,7 +48,7 @@ public class WaveformHelper extends Thread {
 					bytes = bytesQueue.remove();
 				}
 				waveformSegmentsVB.add(bytesToFloatBuffer(bytes, DEFAULT_HEIGHT, xOffset));
-				xOffset += bytes.length / (DEFAULT_SPP * 2);				
+				xOffset += bytes.length / 2;				
 				if (completed) {
 					xOffset = 0;
 					waveformSegmentsVB.clear();
@@ -86,23 +85,11 @@ public class WaveformHelper extends Thread {
 	public static FloatBuffer floatsToFloatBuffer(float[] data, float height, int xOffset) {
 		int size = data.length;
 		// int samplesPerPixel = width <= 0 || (int)(size/width) > 4 ? 4 : (int)(size/width);
-		float[] outputAry = new float[2 * size / DEFAULT_SPP];
-		for (int x = 0; x < size / DEFAULT_SPP; x++) {
-			// determine start and end points within WAV
-			int start = x * DEFAULT_SPP;
-			int end = (x + 1) * DEFAULT_SPP;
-			float min = Float.MAX_VALUE;
-			float max = Float.MIN_VALUE;
-			for (int i = start; i < end; i++) {
-				float val = data[i];
-				min = val < min ? val : min;
-				max = val > max ? val : max;
-			}
-			
-			float y1 = height*(min + 1)/2;
-			float y2 = height*(max + 1)/2;
+		float[] outputAry = new float[2 * size];
+		for (int x = 0; x < size; x++) {
+			float y = height*(data[x] + 1)/2;
 			outputAry[x * 2] = x + xOffset;
-			outputAry[x * 2 + 1] = (y1 + y2)/2;
+			outputAry[x * 2 + 1] = y;
 		}
 
 		return MidiView.makeFloatBuffer(outputAry);
