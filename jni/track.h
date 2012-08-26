@@ -14,7 +14,8 @@ typedef struct Track_ {
 
 	MidiEventNode *nextEventNode;
 
-	float volume, pan, pitch;
+	float noteVolume, notePan, notePitch,
+		  primaryVolume, primaryPan, primaryPitch;
 
 	SLObjectItf outputPlayerObject;
 	SLPlayItf outputPlayerPlay;

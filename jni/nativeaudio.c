@@ -65,8 +65,8 @@ void initTrack(Track *track, AAsset *asset) {
 	track->armed = false;
 	track->playing = track->previewing = false;
 	track->mute = track->solo = false;
-	track->volume = .8f;
-	track->pan = track->pitch = .5f;
+	track->primaryVolume = .8f;
+	track->primaryPan = track->primaryPitch = .5f;
 	track->generator = malloc(sizeof(Generator));
 	initGenerator(track->generator, wavfile_create(asset), wavfile_reset,
 			wavfile_generate, wavfile_destroy);
@@ -341,9 +341,9 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv *env, jclass clazz) {
 /****************************************************************************************
  Local versions of playTrack and stopTrack, to be called by the native MIDI ticker
  ****************************************************************************************/
-void soundTrack(Track *track, float volume, float pan, float pitch) {
+void soundTrack(Track *track) {
 	track->effects[VOL_PAN_ID].set(track->effects[VOL_PAN_ID].config,
-			track->volume * volume, track->pan * pan);
+			track->primaryVolume * track->noteVolume, track->primaryPan * track->notePan);
 	//pitchconfig_setShift((PitchConfig *)track->effects[DYNAMIC_PITCH_ID].config, pitch*2 - 1);
 	AdsrConfig *adsrConfig = (AdsrConfig *) track->effects[ADSR_ID].config;
 	adsrConfig->active = true;
@@ -360,18 +360,21 @@ void stopSoundingTrack(Track *track) {
 	track->nextEventNode = findNextEvent(track);
 }
 
-void previewTrack(int trackNum, float volume, float pan, float pitch) {
+void previewTrack(int trackNum) {
 	Track *track = getTrack(NULL, NULL, trackNum);
 	track->previewing = true;
 	if (!track->playing)
-		soundTrack(track, volume, pan, pitch);
+		soundTrack(track);
 }
 
 void playTrack(int trackNum, float volume, float pan, float pitch) {
 	Track *track = getTrack(NULL, NULL, trackNum);
+	track->noteVolume = volume;
+	track->notePan = pan;
+	track->notePitch = pitch;
 	track->playing = true;
 	if (!track->previewing)
-		soundTrack(track, volume, pan, pitch);
+		soundTrack(track);
 }
 
 void stopPreviewingTrack(int trackNum) {
@@ -418,7 +421,6 @@ void Java_com_kh_beatbot_manager_PlaybackManager_armTrack(JNIEnv *env,
 	Track *track = getTrack(env, clazz, trackNum);
 	if (track->armed)
 		return;
-	// arm the track
 	track->armed = true;
 	// start writing zeros to the track's audio out
 	bufferQueueCallback(track->outputBufferQueue, track);
@@ -426,7 +428,6 @@ void Java_com_kh_beatbot_manager_PlaybackManager_armTrack(JNIEnv *env,
 
 void Java_com_kh_beatbot_manager_PlaybackManager_disarmAllTracks(JNIEnv *env,
 		jclass clazz) {
-	// disarm all tracks
 	int i;
 	for (i = 0; i < trackCount; i++) {
 		getTrack(env, clazz, i)->armed = false;
@@ -435,13 +436,12 @@ void Java_com_kh_beatbot_manager_PlaybackManager_disarmAllTracks(JNIEnv *env,
 
 void Java_com_kh_beatbot_manager_PlaybackManager_disarmTrack(JNIEnv *env,
 		jclass clazz, jint trackNum) {
-	// disarm the track
 	getTrack(env, clazz, trackNum)->armed = false;
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_playTrack(JNIEnv *env,
 		jclass clazz, jint trackNum) {
-	previewTrack(trackNum, 1, 1, 1);
+	previewTrack(trackNum);
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_stopTrack(JNIEnv *env,
@@ -636,19 +636,23 @@ void Java_com_kh_beatbot_midi_MidiNote_setPitch(JNIEnv *env, jclass clazz,
 void Java_com_kh_beatbot_SampleEditActivity_setPrimaryVolume(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat volume) {
 	Track *track = getTrack(env, clazz, trackNum);
-	track->volume = volume;
+	track->primaryVolume = volume;
+	track->effects[VOL_PAN_ID].set(track->effects[VOL_PAN_ID].config,
+			track->primaryVolume * track->noteVolume, track->primaryPan * track->notePan);
 }
 
 void Java_com_kh_beatbot_SampleEditActivity_setPrimaryPan(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat pan) {
 	Track *track = getTrack(env, clazz, trackNum);
-	track->pan = pan;
+	track->primaryPan = pan;
+	track->effects[VOL_PAN_ID].set(track->effects[VOL_PAN_ID].config,
+			track->primaryVolume * track->noteVolume, track->primaryPan * track->notePan);
 }
 
 void Java_com_kh_beatbot_SampleEditActivity_setPrimaryPitch(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat pitch) {
 	Track *track = getTrack(env, clazz, trackNum);
-	track->pitch = pitch;
+	track->primaryPitch = pitch;
 	if (track->outputPlayerPitch != NULL) {
 		//(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((track->pitch + track->primaryPitch)*750 + 500));
 	}
