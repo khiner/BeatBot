@@ -2,6 +2,7 @@ package com.kh.beatbot.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.global.GlobalVars;
@@ -50,8 +51,10 @@ public class ThresholdBarView extends TronSeekbar {
 
 	private void dampLevel() {
 		// dampen level to emulate physical level meter
-		level -= .008f;
+		level -= .01f;
 		level = level < 0 ? 0 : level;
+		setViewLevel(level);
+		Log.d("damping", "level = " + level);
 	}
 	
 	private void initVerticesLimits() {
@@ -64,6 +67,7 @@ public class ThresholdBarView extends TronSeekbar {
 	
 	protected void init() {
 		super.init();
+		level = 0;
 		initVerticesLimits();
 		updateThresholdVertex();
 	}
