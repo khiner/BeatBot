@@ -11,6 +11,8 @@ import java.util.Queue;
 import com.kh.beatbot.view.MidiView;
 
 public class WaveformHelper extends Thread {
+	private boolean recording = false;
+	
 	public static final int DEFAULT_HEIGHT = 100;
 	
 	// byte buffers will be read from file in segments and
@@ -36,15 +38,19 @@ public class WaveformHelper extends Thread {
 	
 	@Override
 	public void run() {
-		byte[] bytes;
+		byte[] bytes = null;
 		int xOffset = 0;
-		
-		while (true) {
+		recording = true;
+		while (recording) {
 			try {
 				synchronized (bytesQueue) {
 					while (bytesQueue.isEmpty()) {
+						if (!recording)
+							break;
 						bytesQueue.wait();
 					}
+					if (!recording)
+						break;
 					bytes = bytesQueue.remove();
 				}
 				waveformSegmentsVB.add(bytesToFloatBuffer(bytes, DEFAULT_HEIGHT, xOffset));
@@ -67,6 +73,13 @@ public class WaveformHelper extends Thread {
 		}
 	}
 
+	public void endRecording() {
+		recording = false;
+		synchronized (bytesQueue) {
+			bytesQueue.notify();
+		}
+	}
+	
 	public void endWaveform() {
 		completed = true;
 	}

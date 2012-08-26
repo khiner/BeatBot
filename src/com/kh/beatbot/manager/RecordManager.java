@@ -166,6 +166,7 @@ public class RecordManager {
 			}
 			e.printStackTrace();
 		}
+		midiView.signalEndRecording();
 	}
 	
 	public void notifyLoop() {

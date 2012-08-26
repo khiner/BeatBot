@@ -411,13 +411,19 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	public void signalRecording() {
+		waveformHelper = new WaveformHelper();
 		waveformHelper.start();
 	}
 
+	public void signalEndRecording() {
+		waveformHelper.endRecording();
+	}
+	
 	protected void init() {
 		LevelsViewHelper.initHelper(this);
 		// waveformHelper constructor: yPos, height
 		waveformHelper = new WaveformHelper();
+		
 		TickWindowHelper.updateGranularity();
 		initCurrTickVb();
 		initHLineVb();
