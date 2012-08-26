@@ -65,8 +65,8 @@ void initTrack(Track *track, AAsset *asset) {
 	track->armed = false;
 	track->playing = track->previewing = false;
 	track->mute = track->solo = false;
-	track->primaryVolume = .8f;
-	track->primaryPan = track->primaryPitch = .5f;
+	track->primaryVolume = track->noteVolume = .8f;
+	track->primaryPan = track->primaryPitch = track->notePan = track->notePitch = .5f;
 	track->generator = malloc(sizeof(Generator));
 	initGenerator(track->generator, wavfile_create(asset), wavfile_reset,
 			wavfile_generate, wavfile_destroy);

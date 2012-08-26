@@ -17,18 +17,21 @@ import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class SampleWaveformView extends SurfaceViewBase {
 
-	private final float[] ADSR_COLOR = MidiViewBean.PITCH_COLOR.clone();
-	private final float[] ADSR_SELECTED_COLOR = {ADSR_COLOR[0], ADSR_COLOR[1], ADSR_COLOR[2], .6f};
-	private final float[] LOOP_HIGHLIGHT_COLOR = { 1, .64706f, 0, .4f };
-	private final float[] LOOP_SELECTION_LINE_COLOR = { 1, 1, 1, 1 };
-	private final float[] LOOP_SELECTION_RECT_COLOR = { .9f, .9f, 1, .5f };
-	private final float[] BG_COLOR = {LOOP_HIGHLIGHT_COLOR[0] * .5f, LOOP_HIGHLIGHT_COLOR[1] * .5f,
+	private static final float[] ADSR_COLOR = MidiViewBean.PITCH_COLOR.clone();
+	private static final float[] ADSR_SELECTED_COLOR = {ADSR_COLOR[0], ADSR_COLOR[1], ADSR_COLOR[2], .6f};
+	private static final float[] LOOP_HIGHLIGHT_COLOR = { 1, .64706f, 0, .4f };
+	private static final float[] LOOP_SELECTION_LINE_COLOR = { 1, 1, 1, 1 };
+	private static final float[] LOOP_SELECTION_RECT_COLOR = { .9f, .9f, 1, .5f };
+	private static final float[] LOOP_SELECTION_RECT_SELECT_COLOR = { MidiViewBean.VOLUME_COLOR[0],
+																	  MidiViewBean.VOLUME_COLOR[1], 
+																	  MidiViewBean.VOLUME_COLOR[2], .6f };
+	private static final float[] BG_COLOR = {LOOP_HIGHLIGHT_COLOR[0] * .5f, LOOP_HIGHLIGHT_COLOR[1] * .5f,
 			LOOP_HIGHLIGHT_COLOR[2] * .5f, 1};
 
-	private final float ADSR_POINT_RADIUS = 5;
+	private static final float ADSR_POINT_RADIUS = 5;
 	// min distance for pointer to select loop markers
-	private final int SNAP_DIST = 32;
-	private final int SNAP_DIST_SQUARED = 1024;
+	private static final int SNAP_DIST = 32;
+	private static final int SNAP_DIST_SQUARED = 1024;
 	private FloatBuffer waveformVb = null;
 	private FloatBuffer backgroundOutlineVb = null;
 	private FloatBuffer previewButtonSquareVb = null;
@@ -199,8 +202,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 		drawLines(loopSelectionLineVb, LOOP_SELECTION_LINE_COLOR, 2,
 				GL10.GL_LINES);
 		drawTriangleFan(loopSelectionLineVb, LOOP_HIGHLIGHT_COLOR);
-		drawTriangleStrip(loopSelectionRectVbs[0], LOOP_SELECTION_RECT_COLOR);
-		drawTriangleStrip(loopSelectionRectVbs[1], LOOP_SELECTION_RECT_COLOR);
+		drawTriangleStrip(loopSelectionRectVbs[0], beginLoopMarkerTouched == -1 ? LOOP_SELECTION_RECT_COLOR : LOOP_SELECTION_RECT_SELECT_COLOR);
+		drawTriangleStrip(loopSelectionRectVbs[1], endLoopMarkerTouched == -1 ? LOOP_SELECTION_RECT_COLOR : LOOP_SELECTION_RECT_SELECT_COLOR);
 	}
 
 	private void drawAdsr() {
