@@ -5,11 +5,11 @@
 
 void initTicker();
 
-long loopBeginTick; // Java sets the loop tick
-long loopEndTick;
+long loopBeginTick, loopEndTick;
+long loopBeginSample, loopEndSample;
 
 float BPM;
-long NSPT; // nanoseconds per tick
-long currTick; // startTicking() keeps track of this currTick
+long MSPT; // microseconds per tick
+long SPT;  // samples per tick
 
 #endif // TICKER_H

@@ -1,6 +1,5 @@
 package com.kh.beatbot.manager;
 
-
 public class PlaybackManager {
 	
 	private static PlaybackManager singletonInstance = null;

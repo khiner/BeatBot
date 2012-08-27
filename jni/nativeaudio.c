@@ -14,6 +14,19 @@ static SLObjectItf outputMixObject = NULL;
 
 //static float zeroBuffer[2][BUFF_SIZE];
 
+void updateNextNoteSamples() {
+	int trackNum;
+	for (trackNum = 0; trackNum < NUM_TRACKS; trackNum++) {
+		Track *track = getTrack(NULL, NULL, trackNum);
+		if (track->nextEventNode != NULL) {
+			track->nextStartSample = tickToSample(
+					track->nextEventNode->event->onTick);
+			track->nextStopSample = tickToSample(
+					track->nextEventNode->event->offTick);
+		}
+	}
+}
+
 // create the engine and output mix objects
 void Java_com_kh_beatbot_BeatBotActivity_createEngine(JNIEnv *env, jclass clazz,
 		jobject _assetManager) {
@@ -58,15 +71,19 @@ MidiEvent* initEvent(long onTick, long offTick, float volume, float pan,
 
 void initTrack(Track *track, AAsset *asset) {
 	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
+	track->num = trackCount;
 	track->nextEventNode = NULL;
-  	track->currBufferFloat = (float **)malloc(2*sizeof(float *));
-  	track->currBufferFloat[0] = (float *)calloc(BUFF_SIZE, sizeof(float));
-  	track->currBufferFloat[1] = (float *)calloc(BUFF_SIZE, sizeof(float));
+	track->currSample = 0;
+	track->nextStartSample = track->nextStopSample = -1;
+	track->currBufferFloat = (float **) malloc(2 * sizeof(float *));
+	track->currBufferFloat[0] = (float *) calloc(BUFF_SIZE, sizeof(float));
+	track->currBufferFloat[1] = (float *) calloc(BUFF_SIZE, sizeof(float));
 	track->armed = false;
 	track->playing = track->previewing = false;
 	track->mute = track->solo = false;
 	track->primaryVolume = track->noteVolume = .8f;
-	track->primaryPan = track->primaryPitch = track->notePan = track->notePitch = .5f;
+	track->primaryPan = track->primaryPitch = track->notePan =
+			track->notePitch = .5f;
 	track->generator = malloc(sizeof(Generator));
 	initGenerator(track->generator, wavfile_create(asset), wavfile_reset,
 			wavfile_generate, wavfile_destroy);
@@ -93,15 +110,16 @@ void initTrack(Track *track, AAsset *asset) {
 //  	initEffect(&(track->effects[DYNAMIC_PITCH_ID]), false, true, pitchconfig_create(),
 //  			   pitchconfig_setShift, pitch_process, pitchconfig_destroy);
 	initEffect(&(track->effects[DELAY_ID]), false,
-			delayconfigi_create(.5f, .5f, (int)(SAMPLE_RATE * 1.5)), delayconfigi_set,
-			delayi_process, delayconfigi_destroy);
+			delayconfigi_create(.5f, .5f, (int) (SAMPLE_RATE * 1.5)),
+			delayconfigi_set, delayi_process, delayconfigi_destroy);
 	initEffect(&(track->effects[FLANGER_ID]), false, flangerconfig_create(),
 			flangerconfig_set, flanger_process, flangerconfig_destroy);
 	initEffect(&(track->effects[REVERB_ID]), false,
 			reverbconfig_create(.5f, .5f), reverbconfig_set, reverb_process,
 			reverbconfig_destroy);
 	initEffect(&(track->effects[ADSR_ID]), false,
-			adsrconfig_create(((WavFile *) (track->generator->config))->totalSamples),
+			adsrconfig_create(
+					((WavFile *) (track->generator->config))->totalSamples),
 			NULL, adsr_process, adsrconfig_destroy);
 }
 
@@ -111,15 +129,6 @@ void interleaveFloatsToShorts(float left[], float right[], short interleaved[],
 	for (i = 0; i < size; i++) {
 		interleaved[i * 2] = left[i] * CONV16BIT;
 		interleaved[i * 2 + 1] = right[i] * CONV16BIT;
-	}
-}
-
-void calcNextBuffer(Track *track) {
-	// start with all zeros
-	memset(track->currBufferFloat[0], 0, BUFF_SIZE * sizeof(float));
-	memset(track->currBufferFloat[1], 0, BUFF_SIZE * sizeof(float));
-	if (track->playing || track->previewing) {
-		track->generator->generate(track->generator->config, track->currBufferFloat, BUFF_SIZE);
 	}
 }
 
@@ -136,6 +145,102 @@ void processEffects(Track *track) {
 			track->currBufferFloat[1], track->currBufferShort, BUFF_SIZE);
 }
 
+void updateNextEvent(Track *track) {
+	if (track->eventHead == NULL)
+		return; // no midi notes in this track
+	// find event right after current tick
+	MidiEventNode *ptr = track->eventHead;
+	long currTick = sampleToTick(track->currSample);
+	while (ptr->next != NULL && ptr->event->offTick <= currTick)
+		ptr = ptr->next;
+	if (ptr->event->offTick <= currTick || ptr->event->onTick >= loopEndTick) {
+		// no events after curr tick, or next event after loop end.
+		// return fist event after loop begin
+		ptr = track->eventHead;
+		while (ptr->next != NULL && ptr->event->onTick < loopBeginTick)
+			ptr = ptr->next;
+	}
+	track->nextEventNode = ptr;
+	track->nextStartSample = tickToSample(track->nextEventNode->event->onTick);
+	track->nextStopSample = tickToSample(track->nextEventNode->event->offTick);
+}
+
+void soundTrack(Track *track) {
+	track->effects[VOL_PAN_ID].set(track->effects[VOL_PAN_ID].config,
+			track->primaryVolume * track->noteVolume,
+			track->primaryPan * track->notePan);
+	//pitchconfig_setShift((PitchConfig *)track->effects[DYNAMIC_PITCH_ID].config, pitch*2 - 1);
+	AdsrConfig *adsrConfig = (AdsrConfig *) track->effects[ADSR_ID].config;
+	adsrConfig->active = true;
+	resetAdsr(adsrConfig);
+	//if (track->outputPlayerPitch != NULL) {
+	//	(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((pitch + track->primaryPitch)*750 + 500));
+	//}
+}
+
+void playTrack(Track *track) {
+	MidiEventNode *nextEventNode = track->nextEventNode;
+	track->noteVolume = nextEventNode->event->volume;
+	track->notePan = nextEventNode->event->pan;
+	track->notePitch = nextEventNode->event->pitch;
+	track->playing = true;
+	soundTrack(track);
+}
+
+void stopTrack(Track *track) {
+	if (!track->playing)
+		return;
+	track->playing = false;
+	wavfile_reset((WavFile *) track->generator->config);
+	((AdsrConfig *) track->effects[ADSR_ID].config)->active = false;
+	// update next track
+	updateNextEvent(track);
+}
+
+void stopAll() {
+	int trackNum;
+	for (trackNum = 0; trackNum < trackCount; trackNum++) {
+		stopTrack(&tracks[trackNum]);
+	}
+}
+
+void previewTrack(int trackNum) {
+	Track *track = getTrack(NULL, NULL, trackNum);
+	track->previewing = true;
+	if (!track->playing)
+		soundTrack(track);
+}
+
+void stopPreviewingTrack(int trackNum) {
+	Track *track = getTrack(NULL, NULL, trackNum);
+	track->previewing = false;
+}
+
+void generateNextBuffer(Track *track) {
+	float *sample = calloc(2, sizeof(float));
+	int samp, channel;
+	for (samp = 0; samp < BUFF_SIZE; samp++) {
+		if (track->currSample > loopEndSample) {
+			stopTrack(track);
+			track->currSample = loopBeginSample;
+		}
+		if (track->currSample == track->nextStartSample) {
+			playTrack(track);
+		} else if (track->currSample == track->nextStopSample) {
+			stopTrack(track);
+		}
+		if (track->playing || track->previewing) {
+			wavfile_tick((WavFile *) track->generator->config, sample);
+		} else {
+			sample[0] = sample[1] = 0;
+		}
+		for (channel = 0; channel < 2; channel++) {
+			track->currBufferFloat[channel][samp] = sample[channel];
+		}
+		track->currSample++;
+	}
+}
+
 // this callback handler is called every time a buffer finishes playing
 void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	Track *track = (Track *) (context);
@@ -144,7 +249,7 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	}
 	SLresult result;
 	// calculate the next buffer
-	calcNextBuffer(track);
+	generateNextBuffer(track);
 	processEffects(track);
 
 	// enqueue the buffer
@@ -162,31 +267,15 @@ MidiEvent *findEvent(Track *track, long tick) {
 	return NULL;
 }
 
-MidiEventNode *findNextEvent(Track *track) {
-	if (track->eventHead == NULL)
-		return NULL; // no midi notes in this track
-   	// find event right after current tick
-	MidiEventNode *ptr = track->eventHead;
-   	while (ptr->next != NULL && ptr->event->offTick <= currTick)
-   		ptr = ptr->next;
-   	if (ptr->event->offTick <= currTick || ptr->event->onTick >= loopEndTick) {
-   		// no events after curr tick, or next event after loop end.
-   		// return fist event after loop begin
-    	ptr = track->eventHead;
-    	while (ptr->next != NULL && ptr->event->onTick < loopBeginTick)
-    		ptr = ptr->next;
-    }
-    return ptr;
-}
-
 // add a midi event to the track's event linked list, inserting in order of onTick
 MidiEventNode *addEvent(Track *track, MidiEvent *event) {
 	MidiEventNode *temp = (MidiEventNode *) malloc(sizeof(MidiEventNode));
 	temp->event = event;
 	MidiEventNode *cur_ptr = track->eventHead;
 	while (cur_ptr != NULL) {
-		if (temp->event->onTick > cur_ptr->event->onTick &&
-				(cur_ptr->next == NULL || temp->event->onTick < cur_ptr->next->event->onTick)) {
+		if (temp->event->onTick > cur_ptr->event->onTick
+				&& (cur_ptr->next == NULL
+						|| temp->event->onTick < cur_ptr->next->event->onTick)) {
 			temp->next = cur_ptr->next;
 			cur_ptr->next = temp;
 			return temp;
@@ -341,62 +430,6 @@ void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv *env, jclass clazz) {
 /****************************************************************************************
  Local versions of playTrack and stopTrack, to be called by the native MIDI ticker
  ****************************************************************************************/
-void soundTrack(Track *track) {
-	track->effects[VOL_PAN_ID].set(track->effects[VOL_PAN_ID].config,
-			track->primaryVolume * track->noteVolume, track->primaryPan * track->notePan);
-	//pitchconfig_setShift((PitchConfig *)track->effects[DYNAMIC_PITCH_ID].config, pitch*2 - 1);
-	AdsrConfig *adsrConfig = (AdsrConfig *) track->effects[ADSR_ID].config;
-	adsrConfig->active = true;
-	resetAdsr(adsrConfig);
-	//if (track->outputPlayerPitch != NULL) {
-	//	(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((pitch + track->primaryPitch)*750 + 500));
-	//}
-}
-
-void stopSoundingTrack(Track *track) {
-	wavfile_reset((WavFile *) track->generator->config);
-	((AdsrConfig *) track->effects[ADSR_ID].config)->active = false;
-	// update next track
-	track->nextEventNode = findNextEvent(track);
-}
-
-void previewTrack(int trackNum) {
-	Track *track = getTrack(NULL, NULL, trackNum);
-	track->previewing = true;
-	if (!track->playing)
-		soundTrack(track);
-}
-
-void playTrack(int trackNum, float volume, float pan, float pitch) {
-	Track *track = getTrack(NULL, NULL, trackNum);
-	track->noteVolume = volume;
-	track->notePan = pan;
-	track->notePitch = pitch;
-	track->playing = true;
-	if (!track->previewing)
-		soundTrack(track);
-}
-
-void stopPreviewingTrack(int trackNum) {
-	Track *track = getTrack(NULL, NULL, trackNum);
-	track->previewing = false;
-	if (!track->playing)
-		stopSoundingTrack(track);
-}
-
-void stopTrack(int trackNum) {
-	Track *track = getTrack(NULL, NULL, trackNum);
-	track->playing = false;
-	if (!track->previewing)
-		stopSoundingTrack(track);
-}
-
-void stopAll() {
-	int i;
-	for (i = 0; i < trackCount; i++) {
-		stopTrack(i);
-	}
-}
 
 /****************************************************************************************
  Java PlaybackManager JNI methods
@@ -533,15 +566,15 @@ void Java_com_kh_beatbot_manager_MidiManager_addMidiNote(JNIEnv *env,
 	Track *track = getTrack(env, clazz, trackNum);
 	MidiEvent *event = initEvent(onTick, offTick, volume, pan, pitch);
 
-	MidiEventNode *created = addEvent(track, event);
-	track->nextEventNode = findNextEvent(track);
+	addEvent(track, event);
+	updateNextEvent(track);
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_deleteMidiNote(JNIEnv *env,
 		jclass clazz, jint trackNum, jlong tick) {
 	Track *track = getTrack(env, clazz, trackNum);
 	removeEvent(track, tick, false);
-	track->nextEventNode = findNextEvent(track);
+	updateNextEvent(track);
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_moveMidiNoteTicks(JNIEnv *env,
@@ -553,33 +586,33 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiNoteTicks(JNIEnv *env,
 		event->onTick = newOnTick;
 		event->offTick = newOffTick;
 	}
-	track->nextEventNode = findNextEvent(track);
+	updateNextEvent(track);
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_moveMidiNote(JNIEnv *env,
 		jclass clazz, jint trackNum, jlong tick, jint newTrackNum) {
-	if (trackNum < 0 || trackNum >= NUM_TRACKS || newTrackNum < 0
-			|| newTrackNum >= NUM_TRACKS)
-		return;
-	Track *prevTrack = getTrack(env, clazz, trackNum);
-	Track *newTrack = getTrack(env, clazz, newTrackNum);
-	MidiEvent *event = findEvent(prevTrack, tick);
-	if (event != NULL) {
-		float volume = event->volume;
-		float pan = event->pan;
-		float pitch = event->pitch;
-		int onTick = event->onTick;
-		int offTick = event->offTick;
-		if (prevTrack->playing && currTick >= onTick && currTick <= offTick) {
-			stopTrack(trackNum);
+	if (trackNum < 0|| trackNum >= NUM_TRACKS || newTrackNum < 0
+	|| newTrackNum >= NUM_TRACKS)return
+;		Track *prevTrack = getTrack(env, clazz, trackNum);
+		Track *newTrack = getTrack(env, clazz, newTrackNum);
+		MidiEvent *event = findEvent(prevTrack, tick);
+		if (event != NULL) {
+			float volume = event->volume;
+			float pan = event->pan;
+			float pitch = event->pitch;
+			int onTick = event->onTick;
+			int offTick = event->offTick;
+			long currTick = sampleToTick(prevTrack->currSample);
+			if (prevTrack->playing && currTick >= onTick && currTick <= offTick) {
+				stopTrack(&tracks[trackNum]);
+			}
+			removeEvent(prevTrack, tick, false);
+			MidiEvent *newEvent = initEvent(onTick, offTick, volume, pan, pitch);
+			addEvent(newTrack, newEvent);
 		}
-		removeEvent(prevTrack, tick, false);
-		MidiEvent *newEvent = initEvent(onTick, offTick, volume, pan, pitch);
-		addEvent(newTrack, newEvent);
+		updateNextEvent(prevTrack);
+		updateNextEvent(newTrack);
 	}
-	prevTrack->nextEventNode = findNextEvent(prevTrack);
-	newTrack->nextEventNode = findNextEvent(newTrack);
-}
 
 void Java_com_kh_beatbot_manager_MidiManager_setNoteMute(JNIEnv *env,
 		jclass clazz, jint trackNum, jlong tick, jboolean muted) {
@@ -593,9 +626,8 @@ void Java_com_kh_beatbot_manager_MidiManager_clearMutedNotes(JNIEnv *env,
 	int i;
 	for (i = 0; i < NUM_TRACKS; i++) {
 		Track *track = getTrack(env, clazz, i);
-		MidiEventNode *head = track->eventHead;
-		removeEvent(head, -1, true);
-		track->nextEventNode = findNextEvent(track);
+		removeEvent(track, -1, true);
+		updateNextEvent(track);
 	}
 }
 
@@ -638,7 +670,8 @@ void Java_com_kh_beatbot_SampleEditActivity_setPrimaryVolume(JNIEnv *env,
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryVolume = volume;
 	track->effects[VOL_PAN_ID].set(track->effects[VOL_PAN_ID].config,
-			track->primaryVolume * track->noteVolume, track->primaryPan * track->notePan);
+			track->primaryVolume * track->noteVolume,
+			track->primaryPan * track->notePan);
 }
 
 void Java_com_kh_beatbot_SampleEditActivity_setPrimaryPan(JNIEnv *env,
@@ -646,7 +679,8 @@ void Java_com_kh_beatbot_SampleEditActivity_setPrimaryPan(JNIEnv *env,
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryPan = pan;
 	track->effects[VOL_PAN_ID].set(track->effects[VOL_PAN_ID].config,
-			track->primaryVolume * track->noteVolume, track->primaryPan * track->notePan);
+			track->primaryVolume * track->noteVolume,
+			track->primaryPan * track->notePan);
 }
 
 void Java_com_kh_beatbot_SampleEditActivity_setPrimaryPitch(JNIEnv *env,

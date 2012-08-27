@@ -14,6 +14,7 @@ typedef struct Track_ {
 
 	MidiEventNode *nextEventNode;
 
+	long currSample, nextStartSample, nextStopSample;
 	float noteVolume, notePan, notePitch,
 		  primaryVolume, primaryPan, primaryPitch;
 
@@ -23,6 +24,7 @@ typedef struct Track_ {
 	SLPlaybackRateItf outputPlayerPitch;
 	SLAndroidSimpleBufferQueueItf outputBufferQueue;
 
+	int num;
 	bool armed;
 	bool playing;
 	bool previewing;
@@ -68,7 +70,6 @@ static inline void freeTracks() {
 		free(track->effects);
 		freeLinkedList(track->eventHead);
 	}
-	free(tracks);
 }
 
 #endif // TRACK_H

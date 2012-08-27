@@ -12,8 +12,8 @@ typedef struct TremeloConfig_t {
 TremeloConfig *tremeloconfig_create(float freq, float depth);
 
 void tremeloconfig_set(void *config, float freq, float depth);
-void tremeloconfig_setFrequency(TremeloConfig *config, float freqL,
-		float freqR);
+void tremeloconfig_setFrequency(TremeloConfig *config, float freq);
+void tremeloconfig_setPhase(TremeloConfig *config, float phase);
 void tremeloconfig_setDepth(TremeloConfig *config, float depth);
 
 static inline void tremelo_process(TremeloConfig *config, float **buffers, int size) {

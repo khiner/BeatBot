@@ -343,14 +343,6 @@ public class MidiManager implements Parcelable {
 		}
 	}
 
-	public void start() {
-		new Thread() {
-			public void run() {
-				startTicking();
-			}
-		}.start();
-	}
-
 	public void saveState() {
 		undoStack.push(currState);
 		currState = copyMidiList(midiNotes);
@@ -506,8 +498,6 @@ public class MidiManager implements Parcelable {
 	public native long getLoopEndTick();
 
 	public native void setLoopEndTick(long loopEndTick);
-
-	public native void startTicking();
 
 	public native void addMidiNote(int track, long onTick, long offTick,
 			float volume, float pan, float pitch);

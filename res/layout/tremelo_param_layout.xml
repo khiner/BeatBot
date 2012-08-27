@@ -29,8 +29,8 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/param1"
         android:layout_below="@+id/effectToggleOn"
-        paramControl:beatsync_enabled="true"
-        paramControl:param_name="Mod Rate"
+        paramControl:beatsync_enabled="false"
+        paramControl:param_name="Phase"
     />
         
     <com.kh.beatbot.layout.EffectControlLayout

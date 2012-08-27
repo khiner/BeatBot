@@ -337,7 +337,6 @@ public class BeatBotActivity extends Activity {
 			Managers.midiManager.reset();
 		} else if (Managers.playbackManager.getState() == PlaybackManager.State.STOPPED) {
 			Managers.playbackManager.play();
-			Managers.midiManager.start();
 		}
 	}
 
