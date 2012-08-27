@@ -123,7 +123,7 @@ void initTrack(Track *track, AAsset *asset) {
 			NULL, adsr_process, adsrconfig_destroy);
 }
 
-void interleaveFloatsToShorts(float left[], float right[], short interleaved[],
+static inline void interleaveFloatsToShorts(float left[], float right[], short interleaved[],
 		int size) {
 	int i;
 	for (i = 0; i < size; i++) {
@@ -132,7 +132,7 @@ void interleaveFloatsToShorts(float left[], float right[], short interleaved[],
 	}
 }
 
-void processEffects(Track *track) {
+static inline void processEffects(Track *track) {
 	int i;
 	for (i = 0; i < NUM_EFFECTS; i++) {
 		Effect effect = track->effects[i];
@@ -141,14 +141,14 @@ void processEffects(Track *track) {
 	}
 }
 
-void processEffectsForAllTracks() {
+static inline void processEffectsForAllTracks() {
 	int trackNum;
 	for (trackNum = 0; trackNum < NUM_TRACKS; trackNum++) {
 		processEffects(&tracks[trackNum]);
 	}
 }
 
-void mixTracks() {
+static inline void mixTracks() {
 	int channel, samp, trackNum;
 	float total;
 	for (channel = 0; channel < 2; channel++) {
@@ -222,12 +222,12 @@ void playTrack(Track *track) {
 }
 
 void stopTrack(Track *track) {
+	// update next track
+	updateNextEvent(track);
 	if (!track->playing)
 		return;
 	track->playing = false;
 	stopSoundingTrack(track);
-	// update next track
-	updateNextEvent(track);
 }
 
 void stopAllTracks() {

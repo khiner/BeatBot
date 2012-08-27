@@ -396,10 +396,13 @@ public class BeatBotActivity extends Activity {
 
 	public void bpmTap(View view) {
 		long tapTime = System.currentTimeMillis();
-		float secondsElapsed = (tapTime - lastTapTime) / 1000f;
+		float millisElapsed = tapTime - lastTapTime;
 		lastTapTime = tapTime;
-		float bpm = 60 / secondsElapsed;
-		// bpm limits
+		float bpm = 60000 / millisElapsed;
+		// if bpm is far below MIN limit, consider this the first tap, otherwise,
+		// if it's under but close, set to MIN_BPM
+		if (bpm < MidiManager.MIN_BPM - 10)
+			return;
 		bpm = bpm >= MidiManager.MIN_BPM ? (bpm <= MidiManager.MAX_BPM ? bpm
 				: MidiManager.MAX_BPM) : MidiManager.MIN_BPM;
 		((BpmView) findViewById(R.id.bpm)).setText(String.valueOf((int) bpm));
