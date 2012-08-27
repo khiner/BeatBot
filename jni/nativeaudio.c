@@ -156,9 +156,11 @@ void mixTracks() {
 			total = 0;
 			for (trackNum = 0; trackNum < NUM_TRACKS; trackNum++) {
 				if ((&tracks[trackNum])->shouldSound)
-					total += (&tracks[trackNum])->currBufferFloat[channel][samp] * .7f;
+					total += (&tracks[trackNum])->currBufferFloat[channel][samp]
+							* .7f;
 			}
-			openSlOut->currBufferFloat[channel][samp] = total > -1 ? (total < 1 ? total : 1) : -1;
+			openSlOut->currBufferFloat[channel][samp] =
+					total > -1 ? (total < 1 ? total : 1) : -1;
 		}
 	}
 	// combine the two channels of floats into one buffer of shorts,
@@ -169,8 +171,12 @@ void mixTracks() {
 }
 
 void updateNextEvent(Track *track) {
-	if (track->eventHead == NULL)
+	if (track->eventHead == NULL) {
+		track->nextEventNode = NULL;
+		track->nextStartSample = -1;
+		track->nextStopSample = -1;
 		return; // no midi notes in this track
+	}
 	// find event right after current tick
 	MidiEventNode *ptr = track->eventHead;
 	long currTick = sampleToTick(currSample);
@@ -256,7 +262,8 @@ void generateNextBuffer() {
 		}
 		for (trackNum = 0; trackNum < NUM_TRACKS; trackNum++) {
 			Track *track = &tracks[trackNum];
-			if (!track->armed) continue;
+			if (!track->armed)
+				continue;
 			if (currSample == track->nextStartSample) {
 				playTrack(track);
 			} else if (currSample == track->nextStopSample) {
@@ -295,8 +302,8 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	mixTracks();
 	// enqueue the buffer
 	if (anyTrackArmed())
-	result = (*bq)->Enqueue(bq, openSlOut->currBufferShort,
-			BUFF_SIZE * 2 * sizeof(short));
+		result = (*bq)->Enqueue(bq, openSlOut->currBufferShort,
+				BUFF_SIZE * 2 * sizeof(short));
 }
 
 MidiEvent *findEvent(Track *track, long tick) {
@@ -333,7 +340,6 @@ MidiEventNode *addEvent(Track *track, MidiEvent *event) {
 // Deleting a node from List depending upon the data in the node.
 MidiEventNode *removeEvent(Track *track, long onTick, bool muted) {
 	MidiEventNode *prev_ptr = NULL, *cur_ptr = track->eventHead;
-
 	while (cur_ptr != NULL) {
 		if ((muted && cur_ptr->event->muted)
 				|| cur_ptr->event->onTick == onTick) {
@@ -424,8 +430,8 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv *env,
 			ids1, req1);
 
 	// realize the output player
-	(*(openSlOut->outputPlayerObject))->Realize(
-			openSlOut->outputPlayerObject, SL_BOOLEAN_FALSE);
+	(*(openSlOut->outputPlayerObject))->Realize(openSlOut->outputPlayerObject,
+			SL_BOOLEAN_FALSE);
 
 	// get the play interface
 	(*(openSlOut->outputPlayerObject))->GetInterface(
@@ -455,8 +461,8 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv *env,
 			openSlOut->outputBufferQueue, bufferQueueCallback, openSlOut);
 
 	// set the player's state to playing
-	(*(openSlOut->outputPlayerPlay))->SetPlayState(
-			openSlOut->outputPlayerPlay, SL_PLAYSTATE_PLAYING);
+	(*(openSlOut->outputPlayerPlay))->SetPlayState(openSlOut->outputPlayerPlay,
+			SL_PLAYSTATE_PLAYING);
 
 	return JNI_TRUE;
 }
@@ -520,7 +526,6 @@ void Java_com_kh_beatbot_manager_PlaybackManager_disarmTrack(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	getTrack(env, clazz, trackNum)->armed = false;
 }
-
 
 void Java_com_kh_beatbot_manager_PlaybackManager_playTrack(JNIEnv *env,
 		jclass clazz, jint trackNum) {
@@ -624,28 +629,30 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiNoteTicks(JNIEnv *env,
 
 void Java_com_kh_beatbot_manager_MidiManager_moveMidiNote(JNIEnv *env,
 		jclass clazz, jint trackNum, jlong tick, jint newTrackNum) {
-	if (trackNum < 0|| trackNum >= NUM_TRACKS || newTrackNum < 0
-	|| newTrackNum >= NUM_TRACKS)return
-;		Track *prevTrack = getTrack(env, clazz, trackNum);
-		Track *newTrack = getTrack(env, clazz, newTrackNum);
-		MidiEvent *event = findEvent(prevTrack, tick);
-		if (event != NULL) {
-			float volume = event->volume;
-			float pan = event->pan;
-			float pitch = event->pitch;
-			int onTick = event->onTick;
-			int offTick = event->offTick;
-			long currTick = sampleToTick(currSample);
-			if (prevTrack->playing && currTick >= onTick && currTick <= offTick) {
-				stopTrack(&tracks[trackNum]);
-			}
-			removeEvent(prevTrack, tick, false);
-			MidiEvent *newEvent = initEvent(onTick, offTick, volume, pan, pitch);
-			addEvent(newTrack, newEvent);
-		}
-		updateNextEvent(prevTrack);
-		updateNextEvent(newTrack);
+	if (trackNum < 0 || trackNum >= NUM_TRACKS ||
+			newTrackNum < 0 || newTrackNum >= NUM_TRACKS) {
+		return;
 	}
+	Track *prevTrack = getTrack(env, clazz, trackNum);
+	Track *newTrack = getTrack(env, clazz, newTrackNum);
+	MidiEvent *event = findEvent(prevTrack, tick);
+	if (event != NULL) {
+		float volume = event->volume;
+		float pan = event->pan;
+		float pitch = event->pitch;
+		int onTick = event->onTick;
+		int offTick = event->offTick;
+		long currTick = sampleToTick(currSample);
+		if (prevTrack->playing && currTick >= onTick && currTick <= offTick) {
+			stopTrack(&tracks[trackNum]);
+		}
+		removeEvent(prevTrack, tick, false);
+		MidiEvent *newEvent = initEvent(onTick, offTick, volume, pan, pitch);
+		addEvent(newTrack, newEvent);
+	}
+	updateNextEvent(prevTrack);
+	updateNextEvent(newTrack);
+}
 
 void Java_com_kh_beatbot_manager_MidiManager_setNoteMute(JNIEnv *env,
 		jclass clazz, jint trackNum, jlong tick, jboolean muted) {
