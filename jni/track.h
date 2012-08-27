@@ -9,6 +9,7 @@ typedef struct OpenSlOut_ {
 	float **currBufferFloat;
 	short currBufferShort[BUFF_SIZE * 2];
 	bool armed;
+	bool anyTrackArmed;
 	SLObjectItf outputPlayerObject;
 	SLPlayItf outputPlayerPlay;
 	SLMuteSoloItf outputPlayerMuteSolo;
@@ -18,6 +19,7 @@ typedef struct OpenSlOut_ {
 
 typedef struct Track_ {
 	Effect effects[NUM_EFFECTS];
+	float tempSample[2];
 	float **currBufferFloat;
 	Generator *generator;
 	MidiEventNode *eventHead;

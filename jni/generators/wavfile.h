@@ -7,6 +7,7 @@
 #define CONVMYFLT (1./32768.)
 
 typedef struct WavFile_t {
+	float tempSample[2];
 	float **buffers; // buffer to hold wav data
 	int totalSamples;
 	int currSample;
@@ -48,12 +49,11 @@ static inline void wavfile_tick(WavFile *config, float *sample) {
 }
 
 static inline void wavfile_generate(WavFile *config, float **inBuffer, int size) {
-	float *sample = calloc(2, sizeof(float));
 	int i, channel;
 	for (i = 0; i < size; i++) {
-		wavfile_tick(config, sample);
+		wavfile_tick(config, config->tempSample);
 		for (channel = 0; channel < 2; channel++) {
-			inBuffer[channel][i] = sample[channel];
+			inBuffer[channel][i] = config->tempSample[channel];
 		}
 	}
 }

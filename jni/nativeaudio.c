@@ -252,8 +252,7 @@ void stopPreviewingTrack(int trackNum) {
 		stopSoundingTrack(track);
 }
 
-void generateNextBuffer() {
-	float *sample = calloc(2, sizeof(float));
+static inline void generateNextBuffer() {
 	int trackNum, samp, channel;
 	for (samp = 0; samp < BUFF_SIZE; samp++) {
 		if (currSample > loopEndSample) {
@@ -270,12 +269,12 @@ void generateNextBuffer() {
 				stopTrack(track);
 			}
 			if (track->playing || track->previewing) {
-				wavfile_tick((WavFile *) track->generator->config, sample);
+				wavfile_tick((WavFile *) track->generator->config, track->tempSample);
 			} else {
-				sample[0] = sample[1] = 0;
+				track->tempSample[0] = track->tempSample[1] = 0;
 			}
 			for (channel = 0; channel < 2; channel++) {
-				track->currBufferFloat[channel][samp] = sample[channel];
+				track->currBufferFloat[channel][samp] = track->tempSample[channel];
 			}
 		}
 		if (openSlOut->armed)
@@ -283,26 +282,15 @@ void generateNextBuffer() {
 	}
 }
 
-bool anyTrackArmed() {
-	int trackNum;
-	for (trackNum = 0; trackNum < NUM_TRACKS; trackNum++) {
-		if ((&tracks[trackNum])->armed) {
-			return true;
-		}
-	}
-	return openSlOut->armed;
-}
-
 // this callback handler is called every time a buffer finishes playing
 void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
-	SLresult result;
 	// calculate the next buffer
 	generateNextBuffer();
 	processEffectsForAllTracks();
 	mixTracks();
 	// enqueue the buffer
-	if (anyTrackArmed())
-		result = (*bq)->Enqueue(bq, openSlOut->currBufferShort,
+	if (openSlOut->anyTrackArmed)
+		(*bq)->Enqueue(bq, openSlOut->currBufferShort,
 				BUFF_SIZE * 2 * sizeof(short));
 }
 
@@ -409,7 +397,7 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAssetAudioPlayer(JNIEnv *env,
 	openSlOut->currBufferFloat = (float **) malloc(2 * sizeof(float *));
 	openSlOut->currBufferFloat[0] = (float *) calloc(BUFF_SIZE, sizeof(float));
 	openSlOut->currBufferFloat[1] = (float *) calloc(BUFF_SIZE, sizeof(float));
-	openSlOut->armed = false;
+	openSlOut->armed = openSlOut->anyTrackArmed = false;
 
 	// configure audio sink
 	SLDataLocator_OutputMix loc_outmix = { SL_DATALOCATOR_OUTPUTMIX,
@@ -500,7 +488,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_armAllTracks(JNIEnv *env,
 		Track *track = getTrack(env, clazz, i);
 		track->armed = true;
 	}
-	openSlOut->armed = true;
+	openSlOut->armed = openSlOut->anyTrackArmed = true;
 	// start writing zeros to the track's audio out
 	bufferQueueCallback(openSlOut->outputBufferQueue, NULL);
 }
@@ -508,7 +496,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_armAllTracks(JNIEnv *env,
 void Java_com_kh_beatbot_manager_PlaybackManager_armTrack(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
-	track->armed = true;
+	track->armed = openSlOut->anyTrackArmed = true;
 	// start writing zeros to the track's audio out
 	bufferQueueCallback(openSlOut->outputBufferQueue, NULL);
 }
@@ -519,12 +507,12 @@ void Java_com_kh_beatbot_manager_PlaybackManager_disarmAllTracks(JNIEnv *env,
 	for (i = 0; i < trackCount; i++) {
 		getTrack(env, clazz, i)->armed = false;
 	}
-	openSlOut->armed = false;
+	openSlOut->armed = openSlOut->anyTrackArmed = false;
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_disarmTrack(JNIEnv *env,
 		jclass clazz, jint trackNum) {
-	getTrack(env, clazz, trackNum)->armed = false;
+	getTrack(env, clazz, trackNum)->armed = openSlOut->anyTrackArmed = false;
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_playTrack(JNIEnv *env,
