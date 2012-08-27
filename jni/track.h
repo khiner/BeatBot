@@ -8,6 +8,7 @@
 typedef struct OpenSlOut_ {
 	float **currBufferFloat;
 	short currBufferShort[BUFF_SIZE * 2];
+	bool armed;
 	SLObjectItf outputPlayerObject;
 	SLPlayItf outputPlayerPlay;
 	SLMuteSoloItf outputPlayerMuteSolo;

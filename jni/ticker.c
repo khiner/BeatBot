@@ -5,19 +5,14 @@ void initTicker() {
 	loopEndTick = loopEndSample = 0;
 }
 
-void updateCurrSamples(long currTick) {
-	currSample = tickToSample(currTick);
-}
-
 jlong Java_com_kh_beatbot_manager_MidiManager_getCurrTick(JNIEnv *env,
 		jclass clazz) {
 	return sampleToTick(currSample);
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_setCurrTick(JNIEnv *env,
-		jclass clazz, jlong _currTick) {
-	updateCurrSamples(_currTick);
-
+		jclass clazz, jlong currTick) {
+	currSample = tickToSample(currTick);
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_setNativeBPM(JNIEnv *env,
@@ -47,7 +42,7 @@ void Java_com_kh_beatbot_manager_MidiManager_setLoopBeginTick(JNIEnv *env,
 	loopBeginTick = _loopBeginTick;
 	loopBeginSample = tickToSample(loopBeginTick);
 	if (!tracks[0].armed) {
-		updateCurrSamples(loopBeginTick);
+		currSample = tickToSample(loopBeginTick);
 	}
 	int i;
 	for (i = 0; i < NUM_TRACKS; i++)
@@ -71,7 +66,7 @@ void Java_com_kh_beatbot_manager_MidiManager_setLoopEndTick(JNIEnv *env,
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_reset(JNIEnv *env, jclass clazz) {
-	updateCurrSamples(loopBeginTick - 1);
+	currSample = tickToSample(loopBeginTick);
 	int trackNum;
 	for (trackNum = 0; trackNum < NUM_TRACKS; trackNum++) {
 		updateNextEvent(&tracks[trackNum]);
