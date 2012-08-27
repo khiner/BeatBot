@@ -6,7 +6,7 @@
 void initTicker();
 
 long loopBeginTick, loopEndTick;
-long loopBeginSample, loopEndSample;
+long currSample, loopBeginSample, loopEndSample;
 
 float BPM;
 long MSPT; // microseconds per tick

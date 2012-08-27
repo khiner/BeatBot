@@ -5,24 +5,27 @@
 
 #define NUM_TRACKS 6
 
+typedef struct OpenSlOut_ {
+	float **currBufferFloat;
+	short currBufferShort[BUFF_SIZE * 2];
+	SLObjectItf outputPlayerObject;
+	SLPlayItf outputPlayerPlay;
+	SLMuteSoloItf outputPlayerMuteSolo;
+	SLPlaybackRateItf outputPlayerPitch;
+	SLAndroidSimpleBufferQueueItf outputBufferQueue;
+} OpenSlOut;
+
 typedef struct Track_ {
 	Effect effects[NUM_EFFECTS];
-	short currBufferShort[BUFF_SIZE * 2];
 	float **currBufferFloat;
 	Generator *generator;
 	MidiEventNode *eventHead;
 
 	MidiEventNode *nextEventNode;
 
-	long currSample, nextStartSample, nextStopSample;
+	long nextStartSample, nextStopSample;
 	float noteVolume, notePan, notePitch,
 		  primaryVolume, primaryPan, primaryPitch;
-
-	SLObjectItf outputPlayerObject;
-	SLPlayItf outputPlayerPlay;
-	SLMuteSoloItf outputPlayerMuteSolo;
-	SLPlaybackRateItf outputPlayerPitch;
-	SLAndroidSimpleBufferQueueItf outputBufferQueue;
 
 	int num;
 	bool armed;
@@ -30,9 +33,11 @@ typedef struct Track_ {
 	bool previewing;
 	bool mute;
 	bool solo;
+	bool shouldSound;
 } Track;
 
 Track tracks[NUM_TRACKS];
+OpenSlOut *openSlOut;
 
 static inline Track *getTrack(JNIEnv *env, jclass clazz, int trackNum) {
 	(void *) env; // avoid warnings about unused paramaters
@@ -58,11 +63,9 @@ static inline void freeTracks() {
 	int i, j;
 	for (i = 0; i < NUM_TRACKS; i++) {
 		Track *track = getTrack(NULL, NULL, i);
-		(*(track->outputBufferQueue))->Clear(track->outputBufferQueue);
-		track->outputBufferQueue = NULL;
-		track->outputPlayerPlay = NULL;
+		free(track->currBufferFloat[0]);
+		free(track->currBufferFloat[1]);
 		free(track->currBufferFloat);
-		free(track->currBufferShort);
 		track->generator->destroy(track->generator->config);
 		for (j = 0; j < NUM_EFFECTS; j++) {
 			track->effects[i].destroy(track->effects[i].config);
@@ -70,6 +73,13 @@ static inline void freeTracks() {
 		free(track->effects);
 		freeLinkedList(track->eventHead);
 	}
+	free(openSlOut->currBufferFloat[0]);
+	free(openSlOut->currBufferFloat[1]);
+	free(openSlOut->currBufferFloat);
+	free(openSlOut->currBufferShort);
+	(*openSlOut->outputBufferQueue)->Clear(openSlOut->outputBufferQueue);
+	openSlOut->outputBufferQueue = NULL;
+	openSlOut->outputPlayerPlay = NULL;
 }
 
 #endif // TRACK_H

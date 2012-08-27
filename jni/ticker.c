@@ -1,19 +1,17 @@
 #include "nativeaudio.h"
 
 void initTicker() {
-	loopBeginTick = loopBeginSample = 0;
+	currSample = loopBeginTick = loopBeginSample = 0;
 	loopEndTick = loopEndSample = 0;
 }
 
 void updateCurrSamples(long currTick) {
-	int trackNum;
-	for (trackNum = 0; trackNum < NUM_TRACKS; trackNum++)
-		(&tracks[trackNum])->currSample = tickToSample(currTick);
+	currSample = tickToSample(currTick);
 }
 
 jlong Java_com_kh_beatbot_manager_MidiManager_getCurrTick(JNIEnv *env,
 		jclass clazz) {
-	return sampleToTick((&tracks[0])->currSample);
+	return sampleToTick(currSample);
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_setCurrTick(JNIEnv *env,

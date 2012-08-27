@@ -297,8 +297,9 @@ public class BeatBotActivity extends Activity {
 	}
 
 	private boolean createAllAssetAudioPlayers() {
+		createAssetAudioPlayer();
 		for (String sampleName : sampleNames)
-			createAssetAudioPlayer(sampleName);
+			initTrack(sampleName);
 		return true;
 	}
 
@@ -414,7 +415,8 @@ public class BeatBotActivity extends Activity {
 
 	public static native void createEngine(AssetManager assetManager);
 
-	public static native boolean createAssetAudioPlayer(String filename);
+	public static native boolean createAssetAudioPlayer();
+	public static native boolean initTrack(String filename);
 
 	public static native void shutdown();
 
