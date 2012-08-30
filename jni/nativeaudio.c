@@ -99,10 +99,10 @@ void initTrack(Track *track, AAsset *asset) {
 			tremeloconfig_create(0.5f, 0.5f), tremeloconfig_set,
 			tremelo_process, tremeloconfig_destroy);
 	initEffect(&(track->effects[LP_FILTER_ID]), false,
-			filterconfig_create(11050.0f, 0.5f), filterconfig_setLp,
+			filterconfig_create(0.5f, 0.5f, true), filterconfig_set,
 			filter_process, filterconfig_destroy);
 	initEffect(&(track->effects[HP_FILTER_ID]), false,
-			filterconfig_create(11050.0f, 0.5f), filterconfig_setHp,
+			filterconfig_create(0.5f, 0.5f, false), filterconfig_set,
 			filter_process, filterconfig_destroy);
 	initEffect(&(track->effects[CHORUS_ID]), false,
 			chorusconfig_create(.5f, .5f), chorusconfig_set, chorus_process,

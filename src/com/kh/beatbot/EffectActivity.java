@@ -194,10 +194,10 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	}
 
 	protected static void quantizeToBeat(EffectParam param, float level) {
-		int numSixteenthNotes = param.hz ? 16 - (int) FloatMath
-				.ceil(level * 16) : (int) FloatMath.ceil(level * 16);
-		numSixteenthNotes = numSixteenthNotes > 0 ? numSixteenthNotes : 1;
-		param.level = (60f * numSixteenthNotes) / (MidiManager.getBPM() * 16f);
+		int numEigthNotes = param.hz ? 10 - (int) FloatMath
+				.ceil(level * 8) : (int) FloatMath.ceil(level * 8);
+		numEigthNotes = numEigthNotes > 0 ? numEigthNotes : 1;
+		param.level = (60f * numEigthNotes) / (MidiManager.getBPM() * 8f);
 		if (param.hz)
 			param.level = 1 / param.level;
 	}
@@ -214,7 +214,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 			setDelayOn(trackNum, on);
 			return;
 		case GlobalVars.FILTER_EFFECT_NUM:
-			setFilterOn(trackNum, on);
+			setFilterOn(trackNum, on, GlobalVars.filterMode[trackNum]);
 			return;
 		case GlobalVars.FLANGER_EFFECT_NUM:
 			setFlangerOn(trackNum, on);
@@ -269,7 +269,7 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	public static native void setDelayParam(int trackNum, int paramNum,
 			float param);
 
-	public static native void setFilterOn(int trackNum, boolean on);
+	public static native void setFilterOn(int trackNum, boolean on, int mode);
 
 	public static native void setFilterParam(int trackNum, int paramNum,
 			float param);

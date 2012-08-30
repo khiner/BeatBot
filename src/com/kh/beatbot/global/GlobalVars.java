@@ -31,6 +31,7 @@ public class GlobalVars {
 	public static boolean[][] effectOn;
 	public static List<EffectParam>[][] params;
 
+	public static int[]   filterMode;
 	public static float[] trackVolume;
 	public static float[] trackPan;
 	public static float[] trackPitch;
@@ -40,12 +41,14 @@ public class GlobalVars {
 	public static void init(int numTracks) {
 		params = (ArrayList<EffectParam>[][]) new ArrayList[numTracks][NUM_EFFECTS];
 		effectOn = new boolean[numTracks][NUM_EFFECTS];
+		filterMode = new int[numTracks];
 		delayParamsLinked = new boolean[numTracks];
 		tremeloParamsLinked = new boolean[numTracks];
 		trackVolume = new float[numTracks];
 		trackPan = new float[numTracks];
 		trackPitch = new float[numTracks];
 		for (int track = 0; track < numTracks; track++) {
+			filterMode[track] = 0;
 			delayParamsLinked[track] = tremeloParamsLinked[track] = true;
 			trackVolume[track] = .8f;
 			trackPan[track] = trackPitch[track] = .5f;

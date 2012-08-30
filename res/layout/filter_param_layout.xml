@@ -64,5 +64,22 @@
         android:layout_below="@+id/filterTypes"
         paramControl:beatsync_enabled="false"
         paramControl:param_name="@string/resonance" />
+    
+    <com.kh.beatbot.layout.EffectControlLayout
+        android:id="@+id/param3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/param1"
+        paramControl:beatsync_enabled="true"
+        paramControl:param_name="@string/modRate" />
+
+    <com.kh.beatbot.layout.EffectControlLayout
+        android:id="@+id/param4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/param2"
+        android:layout_toRightOf="@+id/param3"
+        paramControl:beatsync_enabled="false"
+        paramControl:param_name="@string/modAmt" />
 
 </RelativeLayout>

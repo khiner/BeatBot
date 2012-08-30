@@ -7,15 +7,17 @@ import android.widget.ToggleButton;
 import com.kh.beatbot.global.GlobalVars;
 
 public class FilterActivity extends EffectActivity {
-	private int mode = 0;
 	private ToggleButton[] filterButtons = new ToggleButton[3];
 	
 	@Override
 	public void initParams() {
 		EFFECT_NUM = GlobalVars.FILTER_EFFECT_NUM;
-		NUM_PARAMS = 2;
+		NUM_PARAMS = 4;
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, false, "Hz"));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, false, ""));
+			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, true, "Hz"));
+			getParam(2).hz = true;
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, false, ""));
 		}
 	}
@@ -26,13 +28,15 @@ public class FilterActivity extends EffectActivity {
 		filterButtons[0] = (ToggleButton)findViewById(R.id.lp_toggle);
 		filterButtons[1] = (ToggleButton)findViewById(R.id.bp_toggle);
 		filterButtons[2] = (ToggleButton)findViewById(R.id.hp_toggle);
+		filterButtons[GlobalVars.filterMode[trackNum]].setChecked(true);
 	}
 
 	public void selectFilterMode(View view) {
 		for (int i = 0; i < filterButtons.length; i++) {
 			if (view.equals(filterButtons[i])) {
-				mode = i;
-				setFilterMode(trackNum, mode);
+				GlobalVars.filterMode[trackNum] = i;
+				setFilterOn(trackNum, GlobalVars.effectOn[EFFECT_NUM][trackNum], i);
+				filterButtons[i].setChecked(true);
 			}
 			else
 				filterButtons[i].setChecked(false);
@@ -43,6 +47,4 @@ public class FilterActivity extends EffectActivity {
 	public int getParamLayoutId() {
 		return R.layout.filter_param_layout;
 	}
-	
-	public native void setFilterMode(int trackNum, int mode);	
 }
