@@ -18,12 +18,13 @@ FilterConfig *filterconfig_create(float f, float r, bool lp) {
 void filterconfig_set(void *p, float f, float r) {
 	FilterConfig *config = (FilterConfig *) p;
 	// provided cutoff is between 0 and 1.  map this to a value between
-	// 0 and samplerate/2 = 22050... - 50 because high frequencies are bad news
+	// 0 and samplerate/2 = 21950... - 50 because high frequencies are bad news
+	config->f = f;
 	f *= 22000;
 	f = f > 50 ? (f < 21950 ? f : 21950) : 50;
-	config->f = f;
+	config->frequency = f;
 	config->r = r;
-	float f0 = f * INV_SAMPLE_RATE;
+	float f0 = config->frequency * INV_SAMPLE_RATE;
 	if (config->lp) {
 		// for frequencies < ~ 4000 Hz, approximate the tan function as an optimization.
 		config->c = f0 < 0.1f ? 1.0f / (f0 * M_PI) : tan((0.5f - f0) * M_PI);
@@ -87,9 +88,8 @@ void Java_com_kh_beatbot_EffectActivity_setFilterParam(JNIEnv *env,
 	if (paramNum == 0) { // frequency
 		((FilterConfig *) lpFilter.config)->baseF = param;
 		((FilterConfig *) hpFilter.config)->baseF = param;
-		lpFilter.set(lpConfig, param, lpConfig->r);
-		hpFilter.set(hpConfig, param, hpConfig->r);
 	} else if (paramNum == 1) { // resonance
+		param = 1 - param * .7f; // flip and scale to .3 to 1
 		lpFilter.set(lpConfig, lpConfig->f, param);
 		hpFilter.set(hpConfig, hpConfig->f, param);
 	} else if (paramNum == 2) { // mod rate

@@ -8,7 +8,7 @@ typedef struct FilterConfig_t {
 	float in1[2], in2[2]; // one for each channel
 	float out1[2], out2[2]; // one for each channel
 	float a1, a2, a3, b1, b2;
-	float baseF, f, c, r;
+	float baseF, frequency, f, c, r;
 	float modDepth;bool lp; // is this filter an lp or hp filter?
 	SineWave *mod; // table-based sine wave generator for modulation
 } FilterConfig;
