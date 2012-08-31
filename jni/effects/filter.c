@@ -100,4 +100,3 @@ void Java_com_kh_beatbot_EffectActivity_setFilterParam(JNIEnv *env,
 		filterconfig_setModDepth(hpFilter.config, param);
 	}
 }
-

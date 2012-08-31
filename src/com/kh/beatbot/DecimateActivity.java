@@ -21,4 +21,9 @@ public class DecimateActivity extends EffectActivity {
 	public int getParamLayoutId() {
 		return R.layout.decimate_param_layout;
 	}
+	
+	@Override
+	public int getOnButtonDrawableId() {
+		return R.drawable.bitcrush_toggle_src;
+	}
 }

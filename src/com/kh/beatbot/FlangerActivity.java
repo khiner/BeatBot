@@ -22,4 +22,9 @@ public class FlangerActivity extends EffectActivity {
 	public int getParamLayoutId() {
 		return R.layout.flanger_param_layout;
 	}
+	
+	@Override
+	public int getOnButtonDrawableId() {
+		return R.drawable.flanger_toggle_src;
+	}
 }

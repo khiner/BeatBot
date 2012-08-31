@@ -17,4 +17,9 @@ public class ReverbActivity extends EffectActivity {
 	public int getParamLayoutId() {
 		return R.layout.reverb_param_layout;
 	}
+
+	@Override
+	public int getOnButtonDrawableId() {
+		return R.drawable.reverb_toggle_src;
+	}
 }

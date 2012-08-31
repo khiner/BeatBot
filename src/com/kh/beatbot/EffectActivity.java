@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,7 +12,10 @@ import android.util.FloatMath;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
@@ -22,7 +26,7 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.view.TronKnob;
 import com.kh.beatbot.view.TronSeekbar2d;
 
-public abstract class EffectActivity extends Activity implements LevelListener {
+public abstract class EffectActivity extends Activity implements LevelListener, View.OnClickListener {
 	public class EffectParam {
 		public float level, viewLevel;
 		public boolean hz = false;
@@ -45,22 +49,91 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	protected TronKnob xParamKnob = null, yParamKnob = null;
 	protected TronSeekbar2d level2d = null;
 
+	private View initEffectToggleButton(ViewGroup parent) {
+		if (this instanceof FilterActivity) {
+			LinearLayout filterTypesLayout = (LinearLayout)LayoutInflater.from(getBaseContext()).inflate(
+					R.layout.filter_types_layout, parent, false);
+			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+					RelativeLayout.LayoutParams.WRAP_CONTENT);
+			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+			layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+			filterTypesLayout.setLayoutParams(layoutParams);
+			filterTypesLayout.setId(5);
+			return filterTypesLayout;
+		} else {
+			ToggleButton effectToggleButton = new ToggleButton(this);
+			effectToggleButton.setBackgroundDrawable(getResources().getDrawable(getOnButtonDrawableId()));
+			effectToggleButton.setTextOn("");
+			effectToggleButton.setTextOff("");
+			effectToggleButton.setOnClickListener(this);
+			effectToggleButton.setChecked(GlobalVars.effectOn[trackNum][EFFECT_NUM]);
+			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(effectToggleButton.getBackground().getIntrinsicWidth(),
+					effectToggleButton.getBackground().getIntrinsicHeight());
+			layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+			effectToggleButton.setLayoutParams(layoutParams);
+			effectToggleButton.setId(5);
+			return effectToggleButton;
+		}
+	}
+	
+	private View initEffectLayout(ViewGroup parent) {
+		View effectToggleButton = initEffectToggleButton(parent);
+		
+		View effectParamLayout = LayoutInflater.from(getBaseContext()).inflate(
+				getParamLayoutId(), parent, false);
+		RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		layoutParams.addRule(RelativeLayout.BELOW, effectToggleButton.getId());
+		layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+		
+		effectParamLayout.setLayoutParams(layoutParams);
+		RelativeLayout paramWrapperLayout = new RelativeLayout(this);
+		paramWrapperLayout.setId(2);
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			// in landscape view, take up all vertical, but need space to the
+			// right for xy control
+			paramWrapperLayout.setLayoutParams(new RelativeLayout.LayoutParams(
+					ViewGroup.LayoutParams.WRAP_CONTENT,
+					ViewGroup.LayoutParams.MATCH_PARENT));
+		} else {
+			// in landscape view, take up all horizontal, but need space below
+			// for xy control
+			paramWrapperLayout.setLayoutParams(new RelativeLayout.LayoutParams(
+					ViewGroup.LayoutParams.MATCH_PARENT,
+					ViewGroup.LayoutParams.WRAP_CONTENT));
+		}
+		paramWrapperLayout.addView(effectToggleButton);
+		paramWrapperLayout.addView(effectParamLayout);
+		return paramWrapperLayout;
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// remove title bar
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		trackNum = getIntent().getExtras().getInt("trackNum");
+		requestWindowFeature(Window.FEATURE_NO_TITLE); // remove title bar
+		trackNum = getIntent().getExtras().getInt("trackNum"); // set track
+																// number
 		setContentView(R.layout.effect_layout);
 		ViewGroup parent = (ViewGroup) findViewById(R.id.effect_layout);
-		View view = LayoutInflater.from(getBaseContext()).inflate(
-				getParamLayoutId(), null);
-		parent.addView(view, 0);
+		View paramWrapperLayout = initEffectLayout(parent);
+		// set layout params for XY view, needs to be to right of / below
+		// params, depending on orientation
+		RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			layoutParams.addRule(RelativeLayout.RIGHT_OF,
+					paramWrapperLayout.getId());
+		} else {
+			layoutParams.addRule(RelativeLayout.BELOW,
+					paramWrapperLayout.getId());
+		}
+		findViewById(R.id.xyParamBar).setLayoutParams(layoutParams);
+		parent.addView(paramWrapperLayout);
 		initParams();
 		initParamControls();
 
-		((ToggleButton) findViewById(R.id.effectToggleOn))
-				.setChecked(GlobalVars.effectOn[trackNum][EFFECT_NUM]);
 		xParamKnob = paramControls.get(0).getKnob();
 		yParamKnob = paramControls.get(1).getKnob();
 		for (EffectControlLayout paramControl : paramControls) {
@@ -69,8 +142,11 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		}
 	}
 
+	protected abstract int getParamLayoutId();
+	protected abstract int getOnButtonDrawableId();
+	
 	protected abstract void initParams();
-
+	
 	protected void initParamControls() {
 		paramControls = new ArrayList<EffectControlLayout>();
 		paramControls.add((EffectControlLayout) findViewById(R.id.param1));
@@ -112,19 +188,22 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 		return GlobalVars.params[trackNum][EFFECT_NUM].get(paramNum);
 	}
 
-	public String getParamValueString(int paramNum) {
+	public static String getParamValueString(int paramNum) {
 		EffectParam param = getParam(paramNum);
 		return String.format("%.3f", param.level) + " " + param.unitString;
 	}
 
-	public abstract int getParamLayoutId();
-
-	public static void toggleOn(View view) {
+	@Override
+	public void onClick(View view) {
+		toggleOn(view);
+	}
+	
+	public void toggleOn(View view) {
 		boolean on = ((ToggleButton) view).isChecked();
 		GlobalVars.effectOn[trackNum][EFFECT_NUM] = on;
 		setEffectOnNative(on);
 	}
-
+	
 	protected static final void setParamLevel(int paramNum, float level) {
 		EffectParam param = getParam(paramNum);
 		param.viewLevel = level;
@@ -164,7 +243,8 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 
 	@Override
 	public void notifyInit(final LevelListenable listenable) {
-		// need to use the thread that created the text label view to update label
+		// need to use the thread that created the text label view to update
+		// label
 		// (which is done when listenable notifies after 'setLevel')
 		Handler refresh = new Handler(Looper.getMainLooper());
 		refresh.post(new Runnable() {
@@ -194,8 +274,8 @@ public abstract class EffectActivity extends Activity implements LevelListener {
 	}
 
 	protected static void quantizeToBeat(EffectParam param, float level) {
-		int numEigthNotes = param.hz ? 10 - (int) FloatMath
-				.ceil(level * 8) : (int) FloatMath.ceil(level * 8);
+		int numEigthNotes = param.hz ? 10 - (int) FloatMath.ceil(level * 8)
+				: (int) FloatMath.ceil(level * 8);
 		numEigthNotes = numEigthNotes > 0 ? numEigthNotes : 1;
 		param.level = (60f * numEigthNotes) / (MidiManager.getBPM() * 8f);
 		if (param.hz)

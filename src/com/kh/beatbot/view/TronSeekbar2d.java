@@ -26,7 +26,7 @@ public class TronSeekbar2d extends LevelListenable {
 	}
 
 	private void initBorderVb() {
-		borderRadius = width / 14;
+		borderRadius = Math.min(width, height) / 14;
 		minX = borderRadius + 2;
 		minY = borderRadius + 2;
 		maxX = width - borderRadius - 2;
@@ -98,12 +98,6 @@ public class TronSeekbar2d extends LevelListenable {
 			listener.setLevel(this, (selectX - minX) / (width - minX * 2),
 					((height - selectY) - minY) / (height - minY * 2));
 		}
-	}
-
-	@Override
-	protected void onMeasure(int width, int height) {
-		int dim = Math.min(width, height);
-		super.onMeasure(dim, dim);
 	}
 
 	@Override

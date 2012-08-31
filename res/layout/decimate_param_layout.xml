@@ -4,21 +4,10 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" >
     
-    <ToggleButton
-        android:id="@+id/effectToggleOn"
-        android:layout_centerHorizontal="true"
-        android:layout_width="130dp"
-        android:layout_height="40dp"
-        android:background="@drawable/bitcrush_toggle_src"
-        android:onClick="toggleOn"
-        android:textOff=""
-        android:textOn="" />
-    
     <com.kh.beatbot.layout.EffectControlLayout
         android:id="@+id/param1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/effectToggleOn"
         paramControl:beatsync_enabled="false"
         paramControl:param_name="@string/sampleRate"        
         paramControl:param_value="0 Hz" />
@@ -28,7 +17,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/param1"
-        android:layout_below="@+id/effectToggleOn"
         paramControl:beatsync_enabled="false"
         paramControl:param_name="@string/bits"
         paramControl:param_value="0.5" />

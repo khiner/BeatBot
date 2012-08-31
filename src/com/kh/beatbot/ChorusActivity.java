@@ -22,4 +22,9 @@ public class ChorusActivity extends EffectActivity {
 	public int getParamLayoutId() {
 		return R.layout.chorus_param_layout;
 	}
+	
+	@Override
+	public int getOnButtonDrawableId() {
+		return R.drawable.chorus_toggle_src;
+	}
 }

@@ -47,4 +47,9 @@ public class FilterActivity extends EffectActivity {
 	public int getParamLayoutId() {
 		return R.layout.filter_param_layout;
 	}
+	
+	@Override
+	public int getOnButtonDrawableId() {
+		return R.drawable.filter_toggle_src;
+	}
 }

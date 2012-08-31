@@ -19,4 +19,9 @@ public class TremeloActivity extends EffectActivity {
 	public int getParamLayoutId() {
 		return R.layout.tremelo_param_layout;
 	}
+	
+	@Override
+	public int getOnButtonDrawableId() {
+		return R.drawable.tremelo_toggle_src;
+	}
 }

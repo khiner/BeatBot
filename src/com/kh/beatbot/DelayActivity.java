@@ -44,6 +44,11 @@ public class DelayActivity extends EffectActivity {
 	}
 	
 	@Override
+	public int getOnButtonDrawableId() {
+		return R.drawable.delay_toggle_src;
+	}
+	
+	@Override
 	public void setLevel(LevelListenable listenable, float level) {
 		super.setLevel(listenable, level);
 		if (GlobalVars.delayParamsLinked[trackNum]) {
