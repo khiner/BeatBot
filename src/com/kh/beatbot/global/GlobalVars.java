@@ -31,14 +31,31 @@ public class GlobalVars {
 	public static boolean[][] effectOn;
 	public static List<EffectParam>[][] params;
 
+	public static int     numTracks;
 	public static int[]   filterMode;
 	public static float[] trackVolume;
 	public static float[] trackPan;
 	public static float[] trackPitch;
-	
+	public static float[][][] adsrPoints;
+	public static float[] sampleLoopBegin;
+	public static float[] sampleLoopEnd;
 	public static float currBeatDivision;
 
+	private static void initDefaultAdsrPoints(int trackNum) {
+		for (int i = 0; i < 5; i++) {
+			// x coords
+			adsrPoints[trackNum][i][0] = i / 4f;
+		}
+		// y coords
+		adsrPoints[trackNum][0][1] = 0;
+		adsrPoints[trackNum][1][1] = 1;
+		adsrPoints[trackNum][2][1] = .60f;
+		adsrPoints[trackNum][3][1] = .60f;
+		adsrPoints[trackNum][4][1] = 0;
+	}
+	
 	public static void init(int numTracks) {
+		GlobalVars.numTracks = numTracks;
 		params = (ArrayList<EffectParam>[][]) new ArrayList[numTracks][NUM_EFFECTS];
 		effectOn = new boolean[numTracks][NUM_EFFECTS];
 		filterMode = new int[numTracks];
@@ -47,7 +64,12 @@ public class GlobalVars {
 		trackVolume = new float[numTracks];
 		trackPan = new float[numTracks];
 		trackPitch = new float[numTracks];
+		adsrPoints = new float[numTracks][5][2];
+		sampleLoopBegin = new float[numTracks];
+		sampleLoopEnd = new float[numTracks];
 		for (int track = 0; track < numTracks; track++) {
+			initDefaultAdsrPoints(track);
+			sampleLoopBegin[track] = sampleLoopEnd[track] = 0;
 			filterMode[track] = 0;
 			delayParamsLinked[track] = tremeloParamsLinked[track] = true;
 			trackVolume[track] = .8f;
