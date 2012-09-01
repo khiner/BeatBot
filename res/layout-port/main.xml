@@ -52,26 +52,38 @@
         
     </LinearLayout>
 
+    <ToggleButton
+        android:id="@+id/thresholdLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/midiView"
+        android:layout_below="@+id/levelsLayout"
+        android:background="@drawable/threshold_btn_src"
+        android:clickable="false"
+        android:textOff=""
+        android:textOn="" />
+        
    <com.kh.beatbot.view.ThresholdBarView
         android:id="@+id/thresholdBar"
         android:layout_width="0dp"
         android:layout_height="25dp"
-        android:layout_below="@+id/levelsLayout"
-        android:layout_alignLeft="@+id/midiView"
+        android:layout_alignTop="@+id/thresholdLabel"
+        android:layout_alignBottom="@+id/thresholdLabel"
+        android:layout_toRightOf="@+id/thresholdLabel"
         android:layout_alignRight="@+id/midiView" />
 
     <ListView
         android:id="@+id/sampleListView"
         android:layout_width="98dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/thresholdBar"
+        android:layout_below="@+id/thresholdLabel"
         android:layout_marginTop="13dp"/>
 
     <com.kh.beatbot.view.MidiView
         android:id="@+id/midiView"
         android:layout_width="match_parent"
         android:layout_height="246dp"
-        android:layout_below="@+id/thresholdBar"
+        android:layout_below="@+id/thresholdLabel"
         android:layout_alignBottom="@+id/sampleListView"
         android:layout_toRightOf="@+id/sampleListView" />
 

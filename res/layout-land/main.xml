@@ -5,35 +5,49 @@
     android:layout_height="fill_parent"
     android:background="@color/background" >
 
-    <include layout="@layout/left_control_buttons"
+    <include
         android:id="@+id/leftControlButtons"
-        android:layout_alignParentTop="true"
-        android:layout_alignLeft="@+id/midiView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    
-    <include layout="@layout/right_control_buttons"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/midiView"
+        android:layout_alignParentTop="true"
+        layout="@layout/left_control_buttons" />
+
+    <include
         android:id="@+id/rightControlButtons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true" />
-    
+        layout="@layout/right_control_buttons" />
+
+    <ToggleButton
+        android:id="@+id/thresholdLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/midiView"
+        android:layout_below="@+id/leftControlButtons"
+        android:background="@drawable/threshold_btn_src"
+        android:clickable="false"
+        android:textOff=""
+        android:textOn="" />
+
     <com.kh.beatbot.view.ThresholdBarView
         android:id="@+id/thresholdBar"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_below="@+id/leftControlButtons"
-        android:layout_alignLeft="@+id/midiView"
-        android:layout_toLeftOf="@+id/levelsLayout" />
-       
+        android:layout_height="0dp"
+        android:layout_toRightOf="@+id/thresholdLabel"
+        android:layout_toLeftOf="@+id/levelsLayout"
+        android:layout_alignTop="@+id/thresholdLabel"
+        android:layout_alignBottom="@+id/thresholdLabel" />
+        
     <LinearLayout
         android:id="@+id/levelsLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/midiView"
-        android:layout_below="@+id/rightControlButtons"
         android:layout_alignParentRight="true"
+        android:layout_below="@+id/rightControlButtons"
         android:orientation="horizontal"
         android:visibility="gone" >
 
@@ -66,12 +80,11 @@
             android:textOn="" />
     </LinearLayout>
 
-
     <ListView
         android:id="@+id/sampleListView"
         android:layout_width="98dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/thresholdBar"
+        android:layout_below="@+id/thresholdLabel"
         android:layout_marginTop="13dp" />
 
     <com.kh.beatbot.view.MidiView
@@ -79,7 +92,7 @@
         android:layout_width="match_parent"
         android:layout_height="246dp"
         android:layout_alignBottom="@+id/sampleListView"
-        android:layout_below="@+id/thresholdBar"
+        android:layout_below="@+id/thresholdLabel"
         android:layout_toRightOf="@+id/sampleListView" />
 
 </RelativeLayout>

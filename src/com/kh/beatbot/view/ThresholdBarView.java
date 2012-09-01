@@ -9,8 +9,8 @@ public class ThresholdBarView extends TronSeekbar {
 	private static final float[] THRESHOLD_COLOR = { BG_COLOR[0] + .2f, BG_COLOR[1] + .2f, BG_COLOR[2] + .2f, 1};
 	private static int maxGreenVertices, maxYellowVertices, maxRedVertices;
 	
-	private static int currAmpVertex;
-	private static float currAmpLevel;
+	private static int currAmpVertex = 0;
+	private static float currAmpLevel = 0;
 	
 	public ThresholdBarView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -50,13 +50,12 @@ public class ThresholdBarView extends TronSeekbar {
 	
 	protected void init() {
 		super.init();
-		level = 0;
+		setViewLevel(0.8f);
 		initVerticesLimits();
-		updateAmpVertex();
 	}
 	
 	private void drawThresholdLevel() {
-		drawTriangleStrip(levelBarVb, THRESHOLD_COLOR, currAmpVertex);
+		drawTriangleStrip(levelBarVb, THRESHOLD_COLOR, numLevelVertices);
 		translate(0, levelBarHeight / 2);
 		// circles for rounded rect ends
 		drawPoint(levelBarHeight, THRESHOLD_COLOR, 0);
