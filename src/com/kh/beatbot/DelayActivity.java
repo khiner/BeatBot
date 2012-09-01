@@ -121,9 +121,9 @@ public class DelayActivity extends EffectActivity {
 			if (rightChannelLevelMemory > 0)
 				newRightChannelLevel = rightChannelLevelMemory;
 		}
-		rightChannelKnob.setLevel(newRightChannelLevel);
-		rightChannelKnob.setBeatSync(newRightChannelSynced);
 		getParam(1).beatSync = newRightChannelSynced;
+		rightChannelKnob.setBeatSync(newRightChannelSynced);
+		rightChannelKnob.setLevel(newRightChannelLevel);
 	}
 	
 	public static native void setDelayLinkChannels(int trackNum, boolean link);

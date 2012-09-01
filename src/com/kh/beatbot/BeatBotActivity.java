@@ -204,6 +204,7 @@ public class BeatBotActivity extends Activity {
 			createEngine(assetManager);
 			createAllAssetAudioPlayers();
 		}
+		GlobalVars.init(sampleNames.length);
 		initManagers(savedInstanceState);
 		
 		midiView = ((MidiView) findViewById(R.id.midiView));
@@ -219,7 +220,6 @@ public class BeatBotActivity extends Activity {
 
 		}
 
-		GlobalVars.init(Managers.midiManager.getNumSamples());
 		// were we recording and/or playing before losing the instance?
 		if (savedInstanceState != null) {
 			if (savedInstanceState.getBoolean("recording")) {
@@ -400,7 +400,6 @@ public class BeatBotActivity extends Activity {
 		if (bpm < MidiManager.MIN_BPM - 10)
 			return;
 		MidiManager.setBPM(bpm);
-		SampleEditActivity.quantizeEffectParams();
 	}
 
 	private void spin(long millis) {
