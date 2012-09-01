@@ -7,31 +7,31 @@ import com.kh.beatbot.view.bean.MidiViewBean;
 public class TickWindowHelper {
 	public static MidiViewBean viewBean;
 
-	public static final long MIN_TICKS = MidiManager.TICKS_IN_ONE_MEASURE / 8;
-	public static final long MAX_TICKS = MidiManager.TICKS_IN_ONE_MEASURE * 4;
+	public static final float MIN_TICKS = MidiManager.TICKS_IN_ONE_MEASURE / 8;
+	public static final float MAX_TICKS = MidiManager.TICKS_IN_ONE_MEASURE * 4;
 	public static final int MIN_LINES_DISPLAYED = 8;
 	public static final int MAX_LINES_DISPLAYED = 32;
 
 	// leftmost tick to display
-	private static long currTickOffset = 0;
+	private static float currTickOffset = 0;
 	// current number of ticks within the window
-	private static long currNumTicks = MidiManager.TICKS_IN_ONE_MEASURE - 1;
+	private static float currNumTicks = MidiManager.TICKS_IN_ONE_MEASURE - 1;
 
 	private static float granularity = 1;
 
-	public static long getNumTicks() {
+	public static float getNumTicks() {
 		return currNumTicks;
 	}
 
-	public static long getTickOffset() {
+	public static float getTickOffset() {
 		return currTickOffset;
 	}
 
 	public static void zoom(float leftX, float rightX) {
-		long ZLAT = viewBean.getZoomLeftAnchorTick();
-		long ZRAT = viewBean.getZoomRightAnchorTick();
-		long newTOS = (long) ((ZRAT * leftX - ZLAT * rightX) / (leftX - rightX));
-		long newNumTicks = (long) ((ZLAT - newTOS) * viewBean.getWidth() / leftX);
+		float ZLAT = viewBean.getZoomLeftAnchorTick();
+		float ZRAT = viewBean.getZoomRightAnchorTick();
+		float newTOS = (ZRAT * leftX - ZLAT * rightX) / (leftX - rightX);
+		float newNumTicks = (ZLAT - newTOS) * viewBean.getWidth() / leftX;
 
 		if (newTOS < 0 && newTOS + newNumTicks > MAX_TICKS
 				|| newNumTicks < MIN_TICKS) {
@@ -42,28 +42,28 @@ public class TickWindowHelper {
 			currNumTicks = newNumTicks;
 		} else if (newTOS < 0) {
 			currTickOffset = 0;
-			currNumTicks = (long) (ZRAT * viewBean.getWidth() / rightX);
+			currNumTicks = ZRAT * viewBean.getWidth() / rightX;
 			currNumTicks = currNumTicks > MAX_TICKS ? MAX_TICKS : currNumTicks;
 		} else if (newTOS + newNumTicks > MAX_TICKS) {
-			currNumTicks = (long) ((ZLAT - MAX_TICKS) / (leftX
-					/ viewBean.getWidth() - 1));
+			currNumTicks = (ZLAT - MAX_TICKS) / (leftX
+					/ viewBean.getWidth() - 1);
 			currTickOffset = MAX_TICKS - currNumTicks;
 		}
 		updateGranularity();
 	}
 
 	public static void scroll() {
-		long sv = ScrollBarHelper.scrollVelocity;
+		float sv = ScrollBarHelper.scrollVelocity;
 		if (!ScrollBarHelper.scrolling && sv != 0) {
 			ScrollBarHelper.tickScrollVelocity();
-			setTickOffset((long) (currTickOffset + sv));
+			setTickOffset(currTickOffset + sv);
 		}
 	}
 
 	public static void scroll(float x) {
-		long newTickOffset = viewBean.getScrollAnchorTick()
-				- (long) ((currNumTicks * x) / viewBean.getWidth());
-		long diff = newTickOffset - currTickOffset;
+		float newTickOffset = viewBean.getScrollAnchorTick()
+				- (currNumTicks * x) / viewBean.getWidth();
+		float diff = newTickOffset - currTickOffset;
 		setTickOffset(newTickOffset);
 		ScrollBarHelper.scrollVelocity = diff;
 	}
@@ -85,7 +85,7 @@ public class TickWindowHelper {
 		GlobalVars.currBeatDivision = granularity * 2;
 	}
 
-	public static void setTickOffset(long tickOffset) {
+	public static void setTickOffset(float tickOffset) {
 		if (tickOffset + currNumTicks <= MAX_TICKS && tickOffset >= 0) {
 			currTickOffset = tickOffset;
 		} else if (tickOffset < 0)
@@ -94,7 +94,7 @@ public class TickWindowHelper {
 			currTickOffset = MAX_TICKS - currNumTicks;
 	}
 
-	public static boolean setNumTicks(long numTicks) {
+	public static boolean setNumTicks(float numTicks) {
 		if (numTicks <= MAX_TICKS && numTicks >= MIN_TICKS) {
 			currNumTicks = numTicks;
 			updateGranularity();
@@ -109,22 +109,22 @@ public class TickWindowHelper {
 		return granularity * 2;
 	}
 
-	public static long getMajorTickSpacing() {
-		return (long) (MIN_TICKS / granularity);
+	public static float getMajorTickSpacing() {
+		return MIN_TICKS / granularity;
 	}
 
-	public static long getMajorTickToLeftOf(long tick) {
+	public static float getMajorTickToLeftOf(float tick) {
 		return tick - tick % getMajorTickSpacing();
 	}
 
-	public static long getPrimaryTickToLeftOf(long tick) {
+	public static float getPrimaryTickToLeftOf(float tick) {
 		return tick - tick % (getMajorTickSpacing() * 4);
 	}
 
 	// translates the tickOffset to ensure that leftTick and rightTick are
 	// in view
 	// @returns the amount translated
-	public static void updateView(long leftTick, long rightTick) {
+	public static void updateView(float leftTick, float rightTick) {
 		// if we are dragging out of view, scroll appropriately
 		// if the right is out but the left is in, just scroll
 		if (leftTick < currTickOffset

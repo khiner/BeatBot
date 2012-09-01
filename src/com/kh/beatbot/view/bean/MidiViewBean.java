@@ -49,20 +49,20 @@ public class MidiViewBean {
 	// this color can change when transitioning to/from LEVEL_VIEW
 	private float bgColor = MIDI_VIEW_DEFAULT_BG_COLOR;
 
-	private long dragOffsetTick[] = new long[5];
+	private float dragOffsetTick[] = new float[5];
 
 	private int pinchLeftPointerId = -1;
 	private int pinchRightPointerId = -1;
-	private long pinchLeftOffset = 0;
-	private long pinchRightOffset = 0;
-	private long zoomLeftAnchorTick = 0;
-	private long zoomRightAnchorTick = 0;
+	private float pinchLeftOffset = 0;
+	private float pinchRightOffset = 0;
+	private float zoomLeftAnchorTick = 0;
+	private float zoomRightAnchorTick = 0;
 
 	private int scrollPointerId = -1;
-	private long scrollAnchorTick = 0;
+	private float scrollAnchorTick = 0;
 
 	private boolean selectRegion = false;
-	private long selectRegionStartTick = -1;
+	private float selectRegionStartTick = -1;
 	private float selectRegionStartY = -1;
 
 	private long lastDownTime = 0;
@@ -140,11 +140,11 @@ public class MidiViewBean {
 		this.bgColor = bgColor;
 	}
 
-	public long getDragOffsetTick(int i) {
+	public float getDragOffsetTick(int i) {
 		return dragOffsetTick[i];
 	}
 
-	public void setDragOffsetTick(int i, long dragOffset) {
+	public void setDragOffsetTick(int i, float dragOffset) {
 		dragOffsetTick[i] = dragOffset;
 	}
 
@@ -164,39 +164,39 @@ public class MidiViewBean {
 		this.pinchRightPointerId = pinchRightPointerId;
 	}
 
-	public long getPinchLeftOffset() {
+	public float getPinchLeftOffset() {
 		return pinchLeftOffset;
 	}
 
-	public void setPinchLeftOffset(long pinchLeftOffset) {
+	public void setPinchLeftOffset(float pinchLeftOffset) {
 		this.pinchLeftOffset = pinchLeftOffset;
 	}
 
-	public long getPinchRightOffset() {
+	public float getPinchRightOffset() {
 		return pinchRightOffset;
 	}
 
-	public void setPinchRightOffset(long pinchRightOffset) {
+	public void setPinchRightOffset(float pinchRightOffset) {
 		this.pinchRightOffset = pinchRightOffset;
 	}
 
-	public long getZoomLeftAnchorTick() {
+	public float getZoomLeftAnchorTick() {
 		return zoomLeftAnchorTick;
 	}
 
-	public void setZoomLeftAnchorTick(long zoomLeftAnchorTick) {
+	public void setZoomLeftAnchorTick(float zoomLeftAnchorTick) {
 		this.zoomLeftAnchorTick = zoomLeftAnchorTick;
 	}
 
-	public long getZoomRightAnchorTick() {
+	public float getZoomRightAnchorTick() {
 		return zoomRightAnchorTick;
 	}
 
-	public void setZoomRightAnchorTick(long zoomRightAnchorTick) {
+	public void setZoomRightAnchorTick(float zoomRightAnchorTick) {
 		this.zoomRightAnchorTick = zoomRightAnchorTick;
 	}
 
-	public long getScrollAnchorTick() {
+	public float getScrollAnchorTick() {
 		return scrollAnchorTick;
 	}
 
@@ -208,7 +208,7 @@ public class MidiViewBean {
 		return scrollPointerId;
 	}
 
-	public void setScrollAnchorTick(long scrollAnchorTick) {
+	public void setScrollAnchorTick(float scrollAnchorTick) {
 		this.scrollAnchorTick = scrollAnchorTick;
 	}
 
@@ -220,11 +220,11 @@ public class MidiViewBean {
 		this.selectRegion = selectRegion;
 	}
 
-	public long getSelectRegionStartTick() {
+	public float getSelectRegionStartTick() {
 		return selectRegionStartTick;
 	}
 
-	public void setSelectRegionStartTick(long selectRegionStartTick) {
+	public void setSelectRegionStartTick(float selectRegionStartTick) {
 		this.selectRegionStartTick = selectRegionStartTick;
 	}
 

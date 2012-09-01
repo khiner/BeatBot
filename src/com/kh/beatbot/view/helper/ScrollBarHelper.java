@@ -8,7 +8,7 @@ import com.kh.beatbot.view.SurfaceViewBase;
 import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class ScrollBarHelper {
-	private static final float DAMP_CONSTANT = 0.95f;
+	private static final float DAMP_CONSTANT = 0.9f;
 	private static final int CORNER_RESOLUTION = 15;
 
 	private static float[] innerScrollBarColor = { 1, 1, 1, .8f };
@@ -26,7 +26,7 @@ public class ScrollBarHelper {
 	private static int outerScrollBarCornerRadius = 10;
 
 	public static boolean scrolling = false;
-	public static long scrollVelocity = 0;
+	public static float scrollVelocity = 0;
 
 	private static FloatBuffer innerScrollBarVb = null;
 	private static FloatBuffer outerScrollBarVb = null;
@@ -78,7 +78,8 @@ public class ScrollBarHelper {
 
 	public static void tickScrollVelocity() {
 		scrollVelocity *= DAMP_CONSTANT; // dampen velocity
-		if (scrollVelocity == 0) {
+		if (Math.abs(scrollVelocity) < 1) {
+			scrollVelocity = 0;
 			scrollViewEndTime = System.currentTimeMillis();
 		}
 	}

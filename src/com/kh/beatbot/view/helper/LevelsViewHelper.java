@@ -19,12 +19,12 @@ public class LevelsViewHelper {
 	private static class DragLine {
 		private static float m = 0;
 		private static float b = 0;
-		private static long leftTick = Long.MIN_VALUE;
-		private static long rightTick = Long.MAX_VALUE;
+		private static float leftTick = Float.MIN_VALUE;
+		private static float rightTick = Float.MAX_VALUE;
 		private static float leftLevel = 0;
 		private static float rightLevel = 0;
 
-		public static float getLevel(long tick) {
+		public static float getLevel(float tick) {
 			if (tick < leftTick)
 				return leftLevel;
 			if (tick > rightTick)
@@ -167,8 +167,8 @@ public class LevelsViewHelper {
 	}
 
 	public static void selectLevelNote(float x, float y) {
-		long tick = midiView.xToTick(x);
-		long note = midiView.yToNote(y);
+		float tick = midiView.xToTick(x);
+		float note = midiView.yToNote(y);
 
 		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
 			if (midiNote.getNoteValue() == note && midiNote.getOnTick() <= tick
@@ -198,7 +198,7 @@ public class LevelsViewHelper {
 		return overlapping;
 	}
 
-	public static void selectRegion(long leftTick, long rightTick, float topY,
+	public static void selectRegion(float leftTick, float rightTick, float topY,
 			float bottomY) {
 		for (MidiNote levelViewSelected : Managers.midiManager
 				.getLevelViewSelectedNotes()) {
@@ -218,8 +218,8 @@ public class LevelsViewHelper {
 			DragLine.m = 0;
 			MidiNote touched = (MidiNote) touchedLevels.values().toArray()[0];
 			DragLine.b = touched.getLevel(currLevelMode);
-			DragLine.leftTick = Long.MIN_VALUE;
-			DragLine.rightTick = Long.MAX_VALUE;
+			DragLine.leftTick = Float.MIN_VALUE;
+			DragLine.rightTick = Float.MAX_VALUE;
 		} else if (touchedSize == 2) {
 			MidiNote leftLevel = touchedLevels.get(0).getOnTick() < touchedLevels
 					.get(1).getOnTick() ? touchedLevels.get(0) : touchedLevels
