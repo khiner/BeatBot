@@ -24,7 +24,12 @@ public class ChorusActivity extends EffectActivity {
 	}
 	
 	@Override
-	public int getOnButtonDrawableId() {
-		return R.drawable.chorus_toggle_src;
+	public int getOnDrawableId() {
+		return R.drawable.chorus_label_on;
+	}
+	
+	@Override
+	public int getOffDrawableId() {
+		return R.drawable.chorus_label_off;
 	}
 }

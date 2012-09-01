@@ -24,7 +24,12 @@ public class FlangerActivity extends EffectActivity {
 	}
 	
 	@Override
-	public int getOnButtonDrawableId() {
-		return R.drawable.flanger_toggle_src;
+	public int getOnDrawableId() {
+		return R.drawable.flanger_label_on;
+	}
+	
+	@Override
+	public int getOffDrawableId() {
+		return R.drawable.flanger_label_off;
 	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -62,7 +63,10 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 			return filterTypesLayout;
 		} else {
 			ToggleButton effectToggleButton = new ToggleButton(this);
-			effectToggleButton.setBackgroundDrawable(getResources().getDrawable(getOnButtonDrawableId()));
+			StateListDrawable drawable = new StateListDrawable();
+			drawable.addState(new int[] {android.R.attr.state_checked }, getResources().getDrawable(getOnDrawableId()));
+			drawable.addState(new int[] {}, getResources().getDrawable(getOffDrawableId()));
+			effectToggleButton.setBackgroundDrawable(drawable);
 			effectToggleButton.setTextOn("");
 			effectToggleButton.setTextOff("");
 			effectToggleButton.setOnClickListener(this);
@@ -143,7 +147,8 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 	}
 
 	protected abstract int getParamLayoutId();
-	protected abstract int getOnButtonDrawableId();
+	protected abstract int getOnDrawableId();
+	protected abstract int getOffDrawableId();
 	
 	protected abstract void initParams();
 	

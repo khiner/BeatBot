@@ -44,8 +44,13 @@ public class DelayActivity extends EffectActivity {
 	}
 	
 	@Override
-	public int getOnButtonDrawableId() {
-		return R.drawable.delay_toggle_src;
+	public int getOnDrawableId() {
+		return R.drawable.delay_label_on;
+	}
+	
+	@Override
+	public int getOffDrawableId() {
+		return R.drawable.delay_label_off;
 	}
 	
 	@Override

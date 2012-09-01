@@ -21,7 +21,12 @@ public class TremeloActivity extends EffectActivity {
 	}
 	
 	@Override
-	public int getOnButtonDrawableId() {
-		return R.drawable.tremelo_toggle_src;
+	public int getOnDrawableId() {
+		return R.drawable.tremelo_label_on;
+	}
+	
+	@Override
+	public int getOffDrawableId() {
+		return R.drawable.tremelo_label_off;
 	}
 }

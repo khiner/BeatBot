@@ -23,7 +23,12 @@ public class DecimateActivity extends EffectActivity {
 	}
 	
 	@Override
-	public int getOnButtonDrawableId() {
-		return R.drawable.bitcrush_toggle_src;
+	public int getOnDrawableId() {
+		return R.drawable.bitcrush_label_on;
+	}
+	
+	@Override
+	public int getOffDrawableId() {
+		return R.drawable.bitcrush_label_off;
 	}
 }

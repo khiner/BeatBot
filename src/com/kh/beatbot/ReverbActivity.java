@@ -19,7 +19,12 @@ public class ReverbActivity extends EffectActivity {
 	}
 
 	@Override
-	public int getOnButtonDrawableId() {
-		return R.drawable.reverb_toggle_src;
+	public int getOnDrawableId() {
+		return R.drawable.reverb_label_on;
+	}
+	
+	@Override
+	public int getOffDrawableId() {
+		return R.drawable.reverb_label_off;
 	}
 }

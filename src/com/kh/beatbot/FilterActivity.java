@@ -49,7 +49,12 @@ public class FilterActivity extends EffectActivity {
 	}
 	
 	@Override
-	public int getOnButtonDrawableId() {
-		return R.drawable.filter_toggle_src;
+	public int getOnDrawableId() {
+		return R.drawable.filter_label_on;
+	}
+	
+	@Override
+	public int getOffDrawableId() {
+		return R.drawable.filter_label_off;
 	}
 }
