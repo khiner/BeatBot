@@ -7,7 +7,7 @@ public class PlaybackManager {
 		
 	private String[] sampleNames;
 	
-	private static final int SAMPLE_RATE = 41000;
+	public static final int SAMPLE_RATE = 44100;
 	
 	public enum State {
 		PLAYING, STOPPED

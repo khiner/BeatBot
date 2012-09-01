@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -24,7 +23,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
@@ -32,7 +30,6 @@ import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
-import com.kh.beatbot.view.BpmView;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.ThresholdBarView;
 import com.kh.beatbot.view.helper.LevelsViewHelper;
@@ -223,8 +220,6 @@ public class BeatBotActivity extends Activity {
 		}
 
 		GlobalVars.init(Managers.midiManager.getNumSamples());
-		((BpmView) findViewById(R.id.bpm)).setText(String
-				.valueOf((int) MidiManager.getBPM()));
 		// were we recording and/or playing before losing the instance?
 		if (savedInstanceState != null) {
 			if (savedInstanceState.getBoolean("recording")) {
@@ -404,9 +399,6 @@ public class BeatBotActivity extends Activity {
 		// if it's under but close, set to MIN_BPM
 		if (bpm < MidiManager.MIN_BPM - 10)
 			return;
-		bpm = bpm >= MidiManager.MIN_BPM ? (bpm <= MidiManager.MAX_BPM ? bpm
-				: MidiManager.MAX_BPM) : MidiManager.MIN_BPM;
-		((BpmView) findViewById(R.id.bpm)).setText(String.valueOf((int) bpm));
 		MidiManager.setBPM(bpm);
 		SampleEditActivity.quantizeEffectParams();
 	}

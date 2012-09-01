@@ -23,6 +23,7 @@ import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
+import com.kh.beatbot.view.BpmView;
 
 public class MidiManager implements Parcelable {
 	private static MidiManager singletonInstance = null;
@@ -85,6 +86,8 @@ public class MidiManager implements Parcelable {
 	}
 
 	public static void setBPM(float bpm) {
+		bpm = bpm >= MIN_BPM ? (bpm <= MAX_BPM ? bpm : MAX_BPM) : MIN_BPM;
+		BpmView.setText(String.valueOf((int)bpm));
 		tempo.setBpm(bpm);
 		setNativeBPM(bpm);
 		setNativeMSPT(tempo.getMpqn() / RESOLUTION);

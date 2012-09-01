@@ -44,7 +44,8 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	
 	protected int[] textureHandlers = new int[2];
 	protected int[] crop = null;
-	protected int currentTexture = 0;	
+	protected int currentTexture = 0;
+	protected float[] backgroundColor = GlobalVars.BG_COLOR;
 
 	/**
 	 * Make a direct NIO FloatBuffer from an array of floats
@@ -150,8 +151,8 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glDrawArrays(GL10.GL_POINTS, vertex, 1);
 	}
 	
-	protected static void setBackgroundColor(float[] color) {
-		gl.glClearColor(color[0], color[1], color[2], color[3]);
+	protected void setBackgroundColor(float[] color) {
+		backgroundColor = color;
 	}
 	
 	protected static void setColor(float[] color) {
@@ -334,7 +335,8 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	}
 
 	protected void fillBackground() {
-		setBackgroundColor(GlobalVars.BG_COLOR);
+		gl.glClearColor(backgroundColor[0], backgroundColor[1],
+				backgroundColor[2], backgroundColor[3]);
 	}
 	
 	private void drawFrame(GL10 gl, int w, int h) {

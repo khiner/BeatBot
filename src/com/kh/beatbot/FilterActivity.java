@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.manager.PlaybackManager;
 
 public class FilterActivity extends EffectActivity {
 	private ToggleButton[] filterButtons = new ToggleButton[3];
@@ -15,6 +16,7 @@ public class FilterActivity extends EffectActivity {
 		NUM_PARAMS = 4;
 		if (GlobalVars.params[trackNum][EFFECT_NUM].isEmpty()) {
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, false, "Hz"));
+			getParam(0).scale = PlaybackManager.SAMPLE_RATE / 2;
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(false, false, ""));
 			GlobalVars.params[trackNum][EFFECT_NUM].add(new EffectParam(true, true, "Hz"));
 			getParam(2).hz = true;

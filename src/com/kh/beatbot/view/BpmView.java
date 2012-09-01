@@ -6,12 +6,24 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.kh.beatbot.manager.MidiManager;
+
 public class BpmView extends SurfaceViewBase {
-	private boolean[][] segments = new boolean[3][7];
+	private static final float[] SEGMENT_ON_COLOR = {1, 0, 0, 1};
+	private static final float[] SEGMENT_OFF_COLOR = {1, 0, 0, .3f};
+	private static final float[] SEGMENT_ON_TOUCHED_COLOR = {1, .3f, .25f, 1};
+	private static final float[] SEGMENT_OFF_TOUCHED_COLOR = {1, .3f, .25f, .3f};
+	private static final float INC_BPM_THRESH = 15;
+	private static boolean[][] segments = new boolean[3][7];
+	private static boolean touched = false;
+	private static FloatBuffer longSegmentVB = null;
+	private static FloatBuffer shortSegmentVB = null;
 
-	FloatBuffer longSegmentVB = null;
-	FloatBuffer shortSegmentVB = null;
-
+	private static float lastFrameXLoc = -1;
+	private static float lastFrameYLoc = -1;
+	private static float currXDragTotal = 0;
+	private static float currYDragTotal = 0;
+	
 	public BpmView(Context c, AttributeSet as) {
 		super(c, as);
 	}
@@ -28,7 +40,7 @@ public class BpmView extends SurfaceViewBase {
 		shortSegmentVB = makeFloatBuffer(shortSegmentBuf);
 	}
 
-	public void setText(String text) {
+	public static void setText(String text) {
 		if (text.length() > 3)
 			return;
 		for (int i = 0; i < 3 - text.length(); i++) {
@@ -39,7 +51,7 @@ public class BpmView extends SurfaceViewBase {
 		}
 	}
 
-	private void setSegments(int position, int digit) {
+	private static void setSegments(int position, int digit) {
 		switch (digit) {
 		case 0:
 			segments[position][0] = true;
@@ -135,10 +147,11 @@ public class BpmView extends SurfaceViewBase {
 	}
 
 	private float[] calculateColor(boolean on) {
-		if (on)
-			return new float[] { 1, 0, 0, 1 };
-		else
-			return new float[] { 1, 0, 0, .3f };
+		if (on) {
+			return touched ? SEGMENT_ON_TOUCHED_COLOR : SEGMENT_ON_COLOR;
+		} else {
+			return touched ? SEGMENT_OFF_TOUCHED_COLOR : SEGMENT_OFF_COLOR;
+		}
 	}
 
 	@Override
@@ -182,27 +195,47 @@ public class BpmView extends SurfaceViewBase {
 
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
-		return; // no touch events
+		touched = true;
+		lastFrameXLoc = x;
+		lastFrameYLoc = y;
 	}
 
 	@Override
 	protected void handleActionPointerDown(MotionEvent e, int id, float x,
 			float y) {
-		return; // no touch events
+		return; // no pointer down events
 	}
 
 	@Override
 	protected void handleActionMove(MotionEvent e) {
-		return; // no touch events
+		float x = e.getX(0);
+		float y = e.getY(0);
+		currXDragTotal += x - lastFrameXLoc;
+		currYDragTotal += lastFrameYLoc - y;
+		lastFrameXLoc = x;
+		lastFrameYLoc = y;
+		if (Math.abs(currYDragTotal) > INC_BPM_THRESH) {
+			float newBPM = currYDragTotal < 0 ? MidiManager.getBPM() - 1 :
+				MidiManager.getBPM() + 1;
+			MidiManager.setBPM(newBPM);
+			setText(String.valueOf((int)newBPM));
+			currYDragTotal %= INC_BPM_THRESH;
+		} else if (Math.abs(currXDragTotal) > INC_BPM_THRESH) {
+			float newBPM = currXDragTotal < 0 ? MidiManager.getBPM() - 1 :
+				MidiManager.getBPM() + 1;
+			MidiManager.setBPM(newBPM);
+			setText(String.valueOf((int)newBPM));
+			currXDragTotal %= INC_BPM_THRESH;
+		}
 	}
 
 	@Override
 	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
-		return; // no touch events
+		return; // no pointer up events
 	}
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		return; // no touch events
+		touched = false;
 	}
 }

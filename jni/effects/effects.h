@@ -16,7 +16,7 @@
 #define false 0
 #define true 1
 
-#define SAMPLE_RATE 44100
+#define SAMPLE_RATE 44100.0f
 #define INV_SAMPLE_RATE 1.0f/44100.0f
 
 #define VOL_PAN_ID 0

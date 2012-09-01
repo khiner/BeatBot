@@ -29,7 +29,7 @@ import com.kh.beatbot.view.TronSeekbar2d;
 
 public abstract class EffectActivity extends Activity implements LevelListener, View.OnClickListener {
 	public class EffectParam {
-		public float level, viewLevel;
+		public float level, viewLevel, scale = 1;
 		public boolean hz = false;
 		public boolean beatSync;
 		public boolean logScale;
@@ -195,7 +195,7 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 
 	public static String getParamValueString(int paramNum) {
 		EffectParam param = getParam(paramNum);
-		return String.format("%.3f", param.level) + " " + param.unitString;
+		return String.format("%.2f", param.level * param.scale) + " " + param.unitString;
 	}
 
 	@Override
