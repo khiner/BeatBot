@@ -188,8 +188,7 @@ public class BeatBotActivity extends Activity {
 		Managers.init(savedInstanceState, sampleNames);
 		Managers.midiManager.setActivity(this);
 		setDeleteIconEnabled(false);
-		Managers.recordManager
-				.setThresholdBar((ThresholdBarView) findViewById(R.id.thresholdBar));
+		((ThresholdBarView) findViewById(R.id.thresholdBar)).addLevelListener(Managers.recordManager);
 	}
 	
 	/** Called when the activity is first created. */

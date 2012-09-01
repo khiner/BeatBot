@@ -14,10 +14,12 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Environment;
 
+import com.kh.beatbot.listenable.LevelListenable;
+import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.ThresholdBarView;
 
-public class RecordManager {
+public class RecordManager implements LevelListener {
 	private static final int RECORDER_BPP = 16;
 	private static final String SAVE_FOLDER = "BeatBot/Recorded_Audio";
 	private static final String TEMP_FILE = "record_temp.raw";
@@ -50,6 +52,7 @@ public class RecordManager {
 	private FileOutputStream os = null;
 
 	private short currAmp = 0;
+	private short currThreshold;
 	private long recordStartTick = 0;
 
 	public enum State {
@@ -81,10 +84,6 @@ public class RecordManager {
 		initRecorder();
 		baseFilePath = createBaseRecordPath();
 		state = State.INITIALIZING;
-	}
-
-	public void setThresholdBar(ThresholdBarView thresholdBar) {
-		this.thresholdBar = thresholdBar;
 	}
 	
 	public void setMidiView(MidiView midiView) {
@@ -302,11 +301,10 @@ public class RecordManager {
 	}
 
 	private boolean overThreshold(byte[] buffer) {
-		short onThreshold = thresholdBar.getShortThreshold();
 		for (int i = 0; i < bufferSize / 32; i++) {
 			// 16bit sample size
 			currAmp = getShort(buffer[i * 32], buffer[i * 32 + 1]);
-			if (currAmp > onThreshold) { // Check amplitude
+			if (currAmp > currThreshold) { // Check amplitude
 				return true;
 			}
 		}
@@ -314,7 +312,7 @@ public class RecordManager {
 	}
 
 	private boolean underThreshold(byte[] buffer) {
-		short offThreshold = (short) (thresholdBar.getShortThreshold() * .8);
+		short offThreshold = (short) (currThreshold * .8f);
 		for (int i = 0; i < bufferSize / 32; i++) {
 			// 16bit sample size
 			currAmp = getShort(buffer[i * 32], buffer[i * 32 + 1]);
@@ -410,5 +408,35 @@ public class RecordManager {
 
 	private float shortToDb(short amp) {
 		return 20 * (float) Math.log10(Math.abs(amp) / 32768f);
+	}
+
+	@Override
+	public void notifyInit(LevelListenable levelListenable) {
+		thresholdBar = (ThresholdBarView)levelListenable;
+	}
+
+	@Override
+	public void notifyPressed(LevelListenable levelListenable, boolean pressed) {
+		// TODO make threshold label light up
+	}
+
+	@Override
+	public void notifyClicked(LevelListenable levelListenable) {
+		// do nothing for clicks
+	}
+
+	@Override
+	public void setLevel(LevelListenable levelListenable, float level) {
+		currThreshold = dbToShort((level - 1)*60);
+	}
+	
+	@Override
+	public void setLevel(LevelListenable levelListenable, float levelX,
+			float levelY) {
+		// nothing - for level 2d
+	}
+	
+	public static short dbToShort(float db) {
+		return (short)(32768*Math.pow(10, db/20));
 	}
 }
