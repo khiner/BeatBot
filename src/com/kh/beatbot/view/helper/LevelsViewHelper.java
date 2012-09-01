@@ -19,15 +19,15 @@ public class LevelsViewHelper {
 	private static class DragLine {
 		private static float m = 0;
 		private static float b = 0;
-		private static float leftTick = Float.MIN_VALUE;
+		private static float leftTick = 0;
 		private static float rightTick = Float.MAX_VALUE;
 		private static float leftLevel = 0;
 		private static float rightLevel = 0;
 
 		public static float getLevel(float tick) {
-			if (tick < leftTick)
+			if (tick <= leftTick)
 				return leftLevel;
-			if (tick > rightTick)
+			if (tick >= rightTick)
 				return rightLevel;
 
 			return m * tick + b;
@@ -102,7 +102,7 @@ public class LevelsViewHelper {
 		SurfaceViewBase.translate(x, 0);
 		SurfaceViewBase.drawTriangleStrip(levelBarVb, levelColor, vertex);
 
-		SurfaceViewBase.translate(LEVEL_BAR_WIDTH / 2 - .15f, 0);
+		SurfaceViewBase.translate(LEVEL_BAR_WIDTH / 2, 0);
 		// draw level-colored circle at beginning and end of level
 		SurfaceViewBase.drawPoint(LEVEL_BAR_WIDTH, levelColor, vertex - 2);
 
@@ -110,7 +110,8 @@ public class LevelsViewHelper {
 		gl.glPopMatrix();
 	}
 
-	protected static void drawLevelSelectionCircle(int vertex, float[] levelColor) {
+	protected static void drawLevelSelectionCircle(int vertex,
+			float[] levelColor) {
 		// draw bigger, translucent 'selection' circle at end of level
 		levelColor[3] = .5f;
 		SurfaceViewBase.drawPoint(LEVEL_BAR_WIDTH * 2.5f, levelColor, vertex);
@@ -198,8 +199,8 @@ public class LevelsViewHelper {
 		return overlapping;
 	}
 
-	public static void selectRegion(float leftTick, float rightTick, float topY,
-			float bottomY) {
+	public static void selectRegion(float leftTick, float rightTick,
+			float topY, float bottomY) {
 		for (MidiNote levelViewSelected : Managers.midiManager
 				.getLevelViewSelectedNotes()) {
 			float levelY = levelToY(levelViewSelected.getLevel(currLevelMode));
@@ -218,8 +219,9 @@ public class LevelsViewHelper {
 			DragLine.m = 0;
 			MidiNote touched = (MidiNote) touchedLevels.values().toArray()[0];
 			DragLine.b = touched.getLevel(currLevelMode);
-			DragLine.leftTick = Float.MIN_VALUE;
+			DragLine.leftTick = 0;
 			DragLine.rightTick = Float.MAX_VALUE;
+			DragLine.leftLevel = DragLine.rightLevel = touched.getLevel(currLevelMode);
 		} else if (touchedSize == 2) {
 			MidiNote leftLevel = touchedLevels.get(0).getOnTick() < touchedLevels
 					.get(1).getOnTick() ? touchedLevels.get(0) : touchedLevels
@@ -242,7 +244,8 @@ public class LevelsViewHelper {
 	private static void updateLevelOffsets() {
 		levelOffsets.clear();
 		updateDragLine();
-		for (MidiNote levelSelected : Managers.midiManager.getLevelSelectedNotes()) {
+		for (MidiNote levelSelected : Managers.midiManager
+				.getLevelSelectedNotes()) {
 			levelOffsets.put(
 					levelSelected,
 					levelSelected.getLevel(currLevelMode)
@@ -251,7 +254,8 @@ public class LevelsViewHelper {
 	}
 
 	private static void setLevelsToDragLine() {
-		for (MidiNote levelSelected : Managers.midiManager.getLevelSelectedNotes()) {
+		for (MidiNote levelSelected : Managers.midiManager
+				.getLevelSelectedNotes()) {
 			if (levelOffsets.get(levelSelected) != null) {
 				levelSelected.setLevel(currLevelMode,
 						DragLine.getLevel(levelSelected.getOnTick())
