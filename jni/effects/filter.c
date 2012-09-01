@@ -2,6 +2,7 @@
 
 FilterConfig *filterconfig_create(float f, float r, bool lp) {
 	FilterConfig *config = (FilterConfig *) malloc(sizeof(FilterConfig));
+	config->rScale = .7f;
 	config->lp = lp;
 	config->baseF = f;
 	config->in1[0] = config->in1[1] = 0;
@@ -33,16 +34,19 @@ void Java_com_kh_beatbot_EffectActivity_setFilterOn(JNIEnv *env, jclass clazz,
 	Track *track = getTrack(env, clazz, trackNum);
 	Effect *lpFilter = &(track->effects[LP_FILTER_ID]);
 	Effect *hpFilter = &(track->effects[HP_FILTER_ID]);
+	FilterConfig *lpConfig = (FilterConfig *) lpFilter->config;
+	FilterConfig *hpConfig = (FilterConfig *) hpFilter->config;
 	if (!on) {
-		lpFilter->on = false;
-		hpFilter->on = false;
+		lpFilter->on = hpFilter->on = false;
 	} else if (mode == 0) { // lowpass filter
+		lpConfig->rScale = hpConfig->rScale = .7f;
 		hpFilter->on = false;
 		lpFilter->on = true;
 	} else if (mode == 1) { // bandpass filter - chain lp and hp filters
-		lpFilter->on = true;
-		hpFilter->on = true;
+		lpConfig->rScale = hpConfig->rScale = .4f;
+		lpFilter->on = hpFilter->on = true;
 	} else if (mode == 2) { // highpass filter
+		lpConfig->rScale = hpConfig->rScale = .7f;
 		lpFilter->on = false;
 		hpFilter->on = true;
 	}
@@ -59,7 +63,7 @@ void Java_com_kh_beatbot_EffectActivity_setFilterParam(JNIEnv *env,
 		((FilterConfig *) lpFilter.config)->baseF = param;
 		((FilterConfig *) hpFilter.config)->baseF = param;
 	} else if (paramNum == 1) { // resonance
-		param = 1 - param * .7f; // flip and scale to .3 to 1
+		param = 1 - param * lpConfig->rScale; // flip and scale to .3 to 1
 		lpFilter.set(lpConfig, lpConfig->f, param);
 		hpFilter.set(hpConfig, hpConfig->f, param);
 	} else if (paramNum == 2) { // mod rate

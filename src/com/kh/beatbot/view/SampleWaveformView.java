@@ -214,6 +214,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	protected void init() {
 		// preview button is 80dpX80dp, but that is not the same as a height of
 		// '80'. 80dp will be the height
+		setBackgroundColor(BG_COLOR);
 		previewButtonWidth = height;
 		waveformWidth = width - previewButtonWidth - SNAP_DIST;
 		while (samples == null)
@@ -316,11 +317,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 		initAdsrVb();
 	}
 
-	@Override
-	protected void fillBackground() {
-		setBackgroundColor(BG_COLOR);
-	}
-	
 	@Override
 	protected void drawFrame() {
 		drawTriangleStrip(previewButtonSquareVb, GlobalVars.BG_COLOR);
