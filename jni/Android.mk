@@ -24,12 +24,9 @@ FILE_LIST := $(wildcard $(LOCAL_PATH)/*.c)
 FILE_LIST += $(wildcard $(LOCAL_PATH)/effects/*.c)
 FILE_LIST += $(wildcard $(LOCAL_PATH)/generators/*.c)
 LOCAL_CFLAGS := -Wall -Wextra
-#LOCAL_C_INCLUDES := $(LOCAL_PATH)/track.h
 
 LOCAL_MODULE := nativeaudio
 LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -landroid -lOpenSLES 
-LOCAL_STATIC_LIBRARIES := fftw3
 LOCAL_SRC_FILES := $(FILE_LIST:$(LOCAL_PATH)/%=%)
-#LOCAL_SRC_FILES += nativeaudio.c
 
 include $(BUILD_SHARED_LIBRARY)

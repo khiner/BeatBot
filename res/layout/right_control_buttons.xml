@@ -6,8 +6,8 @@
 
     <ImageButton
         android:id="@+id/delete"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:background="@drawable/delete_btn_src"
         android:contentDescription="@string/delete"
         android:onClick="delete"
@@ -15,16 +15,16 @@
 
     <ImageButton
         android:id="@+id/undo"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:background="@drawable/undo_btn_src"
         android:contentDescription="@string/undo"
         android:onClick="undo" />
     
     <ToggleButton
         android:id="@+id/levels"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginRight="5dp"
         android:background="@drawable/levels_btn_src"
         android:contentDescription="@string/levels"
@@ -34,8 +34,8 @@
 
     <ImageButton
         android:id="@+id/bpm_tap"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:background="@drawable/bpm_tap_btn_src"
         android:contentDescription="@string/bpm_tap"
         android:onClick="bpmTap" />

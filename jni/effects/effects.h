@@ -6,7 +6,6 @@
 #include <pthread.h>
 #include <android/log.h>
 #include <jni.h>
-#include <fftw3.h>
 #include <android/log.h>
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>

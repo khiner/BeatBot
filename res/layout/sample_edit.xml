@@ -47,14 +47,14 @@
         android:id="@+id/levels"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_below="@+id/sample_waveform_view"
+        android:layout_marginTop="8dp"
         android:layout_toRightOf="@+id/reverse" >
 
         <ToggleButton
             android:id="@+id/volumeView"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="@drawable/volume_btn_src"
             android:clickable="false"
             android:textOff=""
@@ -62,8 +62,8 @@
 
         <ToggleButton
             android:id="@+id/panView"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/volumeView"
             android:layout_below="@+id/volumeView"
             android:background="@drawable/pan_btn_src"
@@ -73,8 +73,8 @@
 
         <ToggleButton
             android:id="@+id/pitchView"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/panView"
             android:layout_below="@+id/panView"
             android:background="@drawable/pitch_btn_src"
@@ -88,8 +88,8 @@
             android:layout_height="25dp"
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/volumeView"
-            android:layout_marginTop="8dp"
             android:layout_marginRight="6dp"
+            android:layout_marginTop="8dp"
             android:layout_toRightOf="@+id/volumeView" />
 
         <com.kh.beatbot.view.TronSeekbar
@@ -98,8 +98,8 @@
             android:layout_height="25dp"
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/panView"
-            android:layout_marginTop="8dp"
             android:layout_marginRight="6dp"
+            android:layout_marginTop="8dp"
             android:layout_toRightOf="@+id/panView" />
 
         <com.kh.beatbot.view.TronSeekbar
@@ -108,68 +108,67 @@
             android:layout_height="25dp"
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/pitchView"
-            android:layout_marginTop="8dp"
             android:layout_marginRight="6dp"
+            android:layout_marginTop="8dp"
             android:layout_toRightOf="@+id/pitchView" />
     </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/effects"
-        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/levels"
         android:layout_toRightOf="@+id/reverse"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-        
-    <ImageButton
-        android:id="@+id/filterButton"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:background="@drawable/filter_icon"
-        android:onClick="filter" />
+        android:orientation="horizontal" >
 
-    <ImageButton
-        android:id="@+id/bitcrushButton"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:background="@drawable/bitcrush_icon"
-        android:onClick="bitcrush" />
+        <ImageButton
+            android:id="@+id/filterButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/filter_icon"
+            android:onClick="filter" />
 
-    <ImageButton
-        android:id="@+id/delayButton"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:background="@drawable/delay_icon"
-        android:onClick="delay" />
+        <ImageButton
+            android:id="@+id/bitcrushButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bitcrush_icon"
+            android:onClick="bitcrush" />
 
-    <ImageButton
-        android:id="@+id/chorusButton"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:background="@drawable/chorus_icon"
-        android:onClick="chorus" />
+        <ImageButton
+            android:id="@+id/delayButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/delay_icon"
+            android:onClick="delay" />
 
-    <ImageButton
-        android:id="@+id/flangerButton"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:background="@drawable/flanger_icon"
-        android:onClick="flanger" />
+        <ImageButton
+            android:id="@+id/chorusButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/chorus_icon"
+            android:onClick="chorus" />
 
-    <ImageButton
-        android:id="@+id/reverbButton"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:background="@drawable/reverb_icon"
-        android:onClick="reverb" />
+        <ImageButton
+            android:id="@+id/flangerButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/flanger_icon"
+            android:onClick="flanger" />
 
-    <ImageButton
-        android:id="@+id/tremeloButton"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:background="@drawable/tremelo_icon"
-        android:onClick="tremelo" />
-    
-	</LinearLayout>
-	
+        <ImageButton
+            android:id="@+id/reverbButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/reverb_icon"
+            android:onClick="reverb" />
+
+        <ImageButton
+            android:id="@+id/tremeloButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/tremelo_icon"
+            android:onClick="tremelo" />
+    </LinearLayout>
+
 </RelativeLayout>

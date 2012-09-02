@@ -13,6 +13,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Environment;
+import android.util.Log;
 
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
@@ -20,57 +21,59 @@ import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.ThresholdBarView;
 
 public class RecordManager implements LevelListener {
+	private static final long RECORD_LATENCY = 250;
 	private static final int RECORDER_BPP = 16;
 	private static final String SAVE_FOLDER = "BeatBot/Recorded_Audio";
 	private static final String TEMP_FILE = "record_temp.raw";
-	private String baseFilePath = null;
 	private static final int RECORDER_SAMPLERATE = 44100;
 	private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
 	private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
-	private final int CHANNELS = 2;
-	private final long BYTE_RATE = RECORDER_BPP * RECORDER_SAMPLERATE
+	private static final int CHANNELS = 2;
+	private static final long BYTE_RATE = RECORDER_BPP * RECORDER_SAMPLERATE
 			* CHANNELS / 8;
-	private final long LONG_SAMPLE_RATE = RECORDER_SAMPLERATE;
+	private static final long LONG_SAMPLE_RATE = RECORDER_SAMPLERATE;
 
-	private Random random = new Random();
-	private String currFilename = null;
+	private static Random random = new Random();
+	private static String currFilename = null;
+	private static String baseFilePath = null;
 
 	private static RecordManager singletonInstance = null;
 
-	private MidiView midiView;
+	private static MidiView midiView;
 
-	private ThresholdBarView thresholdBar;
+	private static ThresholdBarView thresholdBar;
 
-	private AudioRecord recorder = null;
-	private int bufferSize = 0;
+	private static AudioRecord recorder = null;
+	private static int bufferSize = 0;
 	// queue of paths to raw audio data to process
-	private Queue<String> processingQueue = new LinkedList<String>();
-	private Queue<Long> recordTickQueue = new LinkedList<Long>();
-	private Thread recordingThread = null;
-	private Thread smrtThread = null;
-	private State state;
-	private FileOutputStream os = null;
+	private static Queue<String> processingQueue = new LinkedList<String>();
+	private static Queue<Long> recordTickQueue = new LinkedList<Long>();
+	private static Thread recordingThread = null;
+	private static Thread smrtThread = null;
+	private static State state;
+	private static FileOutputStream os = null;
 
-	private short currAmp = 0;
-	private short currThreshold;
-	private long recordStartTick = 0;
+	private static short currAmp = 0;
+	private static short currThreshold;
+	private static long recordStartTick = 0;
+	private static boolean noteCrossingLoop = false;
 
-	public enum State {
+	public static enum State {
 		LISTENING, RECORDING, INITIALIZING
 	};
 
-	public State getState() {
+	public static State getState() {
 		return state;
 	}
 
-	public boolean isRecording() {
+	public static boolean isRecording() {
 		return state == State.RECORDING;
 	}
-	
-	public long getRecordStartTick() {
+
+	public static long getRecordStartTick() {
 		return recordStartTick;
 	}
-	
+
 	public static RecordManager getInstance() {
 		if (singletonInstance == null) {
 			singletonInstance = new RecordManager();
@@ -85,11 +88,11 @@ public class RecordManager implements LevelListener {
 		baseFilePath = createBaseRecordPath();
 		state = State.INITIALIZING;
 	}
-	
+
 	public void setMidiView(MidiView midiView) {
-		this.midiView = midiView;
+		RecordManager.midiView = midiView;
 	}
-	
+
 	private void initRecorder() {
 		recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
 				RECORDER_SAMPLERATE, RECORDER_CHANNELS,
@@ -137,7 +140,6 @@ public class RecordManager implements LevelListener {
 		// let the midi view know recording has started
 		// so it can listen for byte buffers to draw them
 		midiView.signalRecording();
-		
 		try {
 			while (state != State.INITIALIZING) {
 				recorder.read(buffer, 0, bufferSize);
@@ -167,26 +169,17 @@ public class RecordManager implements LevelListener {
 		}
 		midiView.signalEndRecording();
 	}
-	
-	public void notifyLoop() {
-		if (state == State.RECORDING) {
-			recordTickQueue.add(Managers.midiManager.getLoopEndTick());
-			addRecordNote(random.nextInt(Managers.midiManager.getNumSamples()));
-			recordTickQueue.add(Managers.midiManager.getLoopBeginTick());
-			recordStartTick = Managers.midiManager.getLoopBeginTick();
-		}
-	}
-	
+
 	private void addRecordNote(int note) {
 		long recordNoteOnTick = recordTickQueue.remove();
 		long recordNoteOffTick = recordTickQueue.remove();
 		midiView.addMidiNote(recordNoteOnTick, recordNoteOffTick, note);
-		midiView.handleMidiCollisions();		
 	}
-	
+
 	private void processByteBuffersOnQueue() {
 		String filePath = null;
-		while ((state == State.RECORDING || state == State.LISTENING) || !processingQueue.isEmpty()) {
+		while ((state == State.RECORDING || state == State.LISTENING)
+				|| !processingQueue.isEmpty()) {
 			try {
 				synchronized (processingQueue) {
 					while (processingQueue.isEmpty())
@@ -200,10 +193,12 @@ public class RecordManager implements LevelListener {
 					// copy to wave
 					copyWaveFile(filePath, getFilename());
 					// close file
-					//audioClassificationManager.extractFeatures(new File(filePath));
+					// audioClassificationManager.extractFeatures(new
+					// File(filePath));
 					new File(filePath).delete();
 					// cl = classify(xml);
-					int cl = random.nextInt(Managers.midiManager.getNumSamples());
+					int cl = random.nextInt(Managers.midiManager
+							.getNumSamples());
 					addRecordNote(cl);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -216,7 +211,7 @@ public class RecordManager implements LevelListener {
 	}
 
 	public void startRecording() throws IOException {
-		recordStartTick = Managers.midiManager.getCurrTick();
+		recordStartTick = getAdjustedRecordTick();
 		recordTickQueue.add(recordStartTick);
 		currFilename = getTempFilename();
 		os = new FileOutputStream(currFilename);
@@ -224,8 +219,9 @@ public class RecordManager implements LevelListener {
 	}
 
 	public void stopRecording() throws IOException {
+		long recordEndTick = getAdjustedRecordTick();
 		state = State.LISTENING;
-		recordTickQueue.add(Managers.midiManager.getCurrTick());		
+		recordTickQueue.add(recordEndTick);
 		// close and add to processing queue
 		os.close();
 		synchronized (processingQueue) {
@@ -239,7 +235,6 @@ public class RecordManager implements LevelListener {
 			initRecorder();
 		recorder.startRecording();
 		recordingThread = new Thread(new Runnable() {
-
 			@Override
 			public void run() {
 				writeAudioDataToFile();
@@ -410,9 +405,29 @@ public class RecordManager implements LevelListener {
 		return 20 * (float) Math.log10(Math.abs(amp) / 32768f);
 	}
 
+	private long getAdjustedRecordTick() {
+		long adjustedTick = Managers.midiManager.getCurrTick()
+				- MidiManager.millisToTick(RECORD_LATENCY);
+		if (adjustedTick < Managers.midiManager.getLoopBeginTick()
+				|| state == State.RECORDING && adjustedTick < recordStartTick) {
+			// if recording past loop end, wrap around to the beginning
+			adjustedTick = Managers.midiManager.getLoopEndTick()
+					- (Managers.midiManager.getLoopBeginTick() - adjustedTick);
+		}
+		if (state != State.RECORDING) {
+			// 16th note quantization for note beginning (but not end)
+			adjustedTick = Managers.midiManager.getNearestMajorTick(
+					adjustedTick, 4);
+			if (adjustedTick >= Managers.midiManager.getLoopEndTick()) {
+				adjustedTick %= Managers.midiManager.getLoopEndTick();
+			}
+		}
+		return adjustedTick;
+	}
+
 	@Override
 	public void notifyInit(LevelListenable levelListenable) {
-		thresholdBar = (ThresholdBarView)levelListenable;
+		thresholdBar = (ThresholdBarView) levelListenable;
 	}
 
 	@Override
@@ -427,16 +442,16 @@ public class RecordManager implements LevelListener {
 
 	@Override
 	public void setLevel(LevelListenable levelListenable, float level) {
-		currThreshold = dbToShort((level - 1)*60);
+		currThreshold = dbToShort((level - 1.001f) * 60);
 	}
-	
+
 	@Override
 	public void setLevel(LevelListenable levelListenable, float levelX,
 			float levelY) {
 		// nothing - for level 2d
 	}
-	
+
 	public static short dbToShort(float db) {
-		return (short)(32768*Math.pow(10, db/20));
+		return (short) (32768 * Math.pow(10, db / 20));
 	}
 }

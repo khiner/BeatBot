@@ -12,6 +12,7 @@ import java.util.Stack;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.kh.beatbot.BeatBotActivity;
 import com.kh.beatbot.SampleEditActivity;
@@ -300,6 +301,10 @@ public class MidiManager implements Parcelable {
 		return (long) (RESOLUTION / beatDivision);
 	}
 
+	public static long millisToTick(long millis) {
+		return (long)((RESOLUTION * 1000f / tempo.getMpqn()) * millis);
+	}
+	
 	public long getLeftMostSelectedTick() {
 		long leftMostTick = Long.MAX_VALUE;
 		for (MidiNote midiNote : getSelectedNotes()) {
@@ -375,7 +380,7 @@ public class MidiManager implements Parcelable {
 		}
 		return copy;
 	}
-
+	
 	public void writeToFile(File outFile) {
 		// 3. Create a MidiFile with the tracks we created
 		ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
