@@ -18,16 +18,16 @@
 #define SAMPLE_RATE 44100.0f
 #define INV_SAMPLE_RATE 1.0f/44100.0f
 
+#define CHORUS_ID 2
+#define DECIMATE_ID 3
+#define DELAY_ID 4
+#define FILTER_ID 5
+#define FLANGER_ID 6
+#define REVERB_ID 7
+#define TREMELO_ID 8
+
 #define VOL_PAN_ID 0
 #define PITCH_ID 1
-#define DECIMATE_ID 2
-#define TREMELO_ID 3
-#define LP_FILTER_ID 4
-#define HP_FILTER_ID 5
-#define CHORUS_ID 6
-#define DELAY_ID 7
-#define FLANGER_ID 8
-#define REVERB_ID 9
 #define ADSR_ID 10
 
 #define NUM_EFFECTS 11

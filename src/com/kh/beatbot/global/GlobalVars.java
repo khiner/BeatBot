@@ -10,6 +10,8 @@ public class GlobalVars {
 	public final static long SINGLE_TAP_TIME = 200;
 	// time (in millis) between taps before handling as a double-tap
 	public final static long DOUBLE_TAP_TIME = 300;
+	// time (in millis) for a long press in one location
+	public final static long LONG_CLICK_TIME = 500;
 	
 	public static final int CHORUS_EFFECT_NUM = 0;
 	public static final int DECIMATE_EFFECT_NUM = 1;

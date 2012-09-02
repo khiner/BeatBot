@@ -844,7 +844,7 @@ public class MidiView extends SurfaceViewBase {
 	protected void handleActionMove(MotionEvent e) {
 		if (Math.abs(e.getX() - bean.getLastTapX()) < 25
 				&& yToNote(e.getY()) == yToNote(bean.getLastTapY())) {
-			if (System.currentTimeMillis() - bean.getLastDownTime() > 500) {
+			if (System.currentTimeMillis() - bean.getLastDownTime() > GlobalVars.LONG_CLICK_TIME) {
 				startSelectRegion(e.getX(), e.getY());
 			}
 		} else {
