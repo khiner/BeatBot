@@ -183,6 +183,10 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		bitmap.recycle();
 	}
 	
+	protected float distanceFromCenterSquared(float x, float y) {
+		return (x - width/2)*(x - width/2) + (y - height/2)*(y - height/2);
+	}
+	
 	protected void drawTexture(float width, float height) {
 		gl.glEnable(GL10.GL_TEXTURE_2D);
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[currentTexture]);
@@ -392,5 +396,4 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		}
 		return true;
 	}
-
 }

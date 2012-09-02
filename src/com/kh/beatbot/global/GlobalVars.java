@@ -6,6 +6,11 @@ import java.util.List;
 import com.kh.beatbot.EffectActivity.EffectParam;
 
 public class GlobalVars {
+	// time (in millis) between pointer down and pointer up to be considered a tap
+	public final static long SINGLE_TAP_TIME = 200;
+	// time (in millis) between taps before handling as a double-tap
+	public final static long DOUBLE_TAP_TIME = 300;
+	
 	public static final int CHORUS_EFFECT_NUM = 0;
 	public static final int DECIMATE_EFFECT_NUM = 1;
 	public static final int DELAY_EFFECT_NUM = 2;

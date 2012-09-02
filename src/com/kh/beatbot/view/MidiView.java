@@ -15,6 +15,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -908,10 +909,10 @@ public class MidiView extends SurfaceViewBase {
 		bean.setSelectRegion(false);
 		midiManager.mergeTempNotes();
 		long time = System.currentTimeMillis();
-		if (Math.abs(time - bean.getLastDownTime()) < 200) {
+		if (Math.abs(time - bean.getLastDownTime()) < GlobalVars.SINGLE_TAP_TIME) {
 			// if the second tap is not in the same location as the first tap,
 			// no double tap :(
-			if (time - bean.getLastTapTime() < MidiViewBean.DOUBLE_TAP_TIME
+			if (time - bean.getLastTapTime() < GlobalVars.DOUBLE_TAP_TIME
 					&& Math.abs(x - bean.getLastTapX()) <= 25
 					&& yToNote(y) == yToNote(bean.getLastTapY())) {
 				doubleTap(touchedNotes.get(id));

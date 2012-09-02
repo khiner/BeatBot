@@ -9,6 +9,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 
@@ -152,7 +153,7 @@ public class TronKnob extends LevelListenable {
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
 		levelSelected = false;
-		if (clickable && System.currentTimeMillis() - timeDown < 300) {
+		if (clickable && System.currentTimeMillis() - timeDown < GlobalVars.SINGLE_TAP_TIME) {
 			currentTexture = (currentTexture + 1 ) % 2;
 			for (LevelListener listener : levelListeners) {
 				listener.notifyClicked(this);
@@ -163,10 +164,6 @@ public class TronKnob extends LevelListenable {
 	
 	public boolean isClickable() {
 		return clickable;
-	}
-	
-	private float distanceFromCenterSquared(float x, float y) {
-		return (x - width/2)*(x - width/2) + (y - height/2)*(y - height/2);
 	}
 	
 	private float coordToLevel(float x, float y) {

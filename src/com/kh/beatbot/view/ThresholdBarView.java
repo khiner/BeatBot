@@ -3,6 +3,7 @@ package com.kh.beatbot.view;
 import android.content.Context;
 import android.util.AttributeSet;
 
+import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
 
 public class ThresholdBarView extends TronSeekbar {
@@ -26,7 +27,7 @@ public class ThresholdBarView extends TronSeekbar {
 	
 	public void setChannelLevel(float channelDb) {
 		// map channel DB to range (0, 1)
-		float newChannelLevel = dbToUnit(channelDb);
+		float newChannelLevel = GeneralUtils.dbToUnit(channelDb);
 		// only see channel level changing if the 'spike' is
 		// greater than the current perceived level
 		currAmpLevel = Math.max(currAmpLevel, newChannelLevel);
@@ -94,10 +95,5 @@ public class ThresholdBarView extends TronSeekbar {
 		drawDbLevel();
 		dampLevel();
 		gl.glPopMatrix();
-	}
-	
-	private float dbToUnit(float db) {
-		// db range = -60 - 0, need range 0-1
-		return db <= -60 ? 0 : db/60 + 1;
 	}
 }

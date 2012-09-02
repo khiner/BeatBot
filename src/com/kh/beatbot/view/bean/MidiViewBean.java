@@ -9,8 +9,6 @@ public class MidiViewBean {
 	public static final int LEVEL_POINT_SIZE = 16;
 	// the width of the lines for note levels
 	public static final int LEVEL_LINE_WIDTH = 7;
-	// time (in millis) between taps before handling as a double-tap
-	public final static long DOUBLE_TAP_TIME = 300;
 
 	public final static float MIDI_VIEW_DEFAULT_BG_COLOR = .5f;
 

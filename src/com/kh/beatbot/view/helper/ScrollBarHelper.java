@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.SurfaceViewBase;
 import com.kh.beatbot.view.bean.MidiViewBean;
 
@@ -35,12 +36,12 @@ public class ScrollBarHelper {
 	private static boolean shouldDrawScrollView() {
 		return scrolling
 				|| scrollVelocity != 0
-				|| Math.abs(System.currentTimeMillis() - scrollViewEndTime) <= MidiViewBean.DOUBLE_TAP_TIME * 2;
+				|| Math.abs(System.currentTimeMillis() - scrollViewEndTime) <= GlobalVars.DOUBLE_TAP_TIME * 2;
 	}
 
 	public static void startScrollView() {
 		long now = System.currentTimeMillis();
-		if (now - scrollViewEndTime > MidiViewBean.DOUBLE_TAP_TIME * 2)
+		if (now - scrollViewEndTime > GlobalVars.DOUBLE_TAP_TIME * 2)
 			scrollViewStartTime = now;
 		else
 			scrollViewEndTime = Long.MAX_VALUE;
@@ -60,11 +61,11 @@ public class ScrollBarHelper {
 				- scrollViewStartTime;
 
 		float alpha = .8f;
-		if (!scrollingEnded && elapsedTime <= MidiViewBean.DOUBLE_TAP_TIME)
-			alpha *= elapsedTime / (float) MidiViewBean.DOUBLE_TAP_TIME;
-		else if (scrollingEnded && elapsedTime > MidiViewBean.DOUBLE_TAP_TIME)
-			alpha *= (MidiViewBean.DOUBLE_TAP_TIME * 2 - elapsedTime)
-					/ (float) MidiViewBean.DOUBLE_TAP_TIME;
+		if (!scrollingEnded && elapsedTime <= GlobalVars.DOUBLE_TAP_TIME)
+			alpha *= elapsedTime / (float) GlobalVars.DOUBLE_TAP_TIME;
+		else if (scrollingEnded && elapsedTime > GlobalVars.DOUBLE_TAP_TIME)
+			alpha *= (GlobalVars.DOUBLE_TAP_TIME * 2 - elapsedTime)
+					/ (float) GlobalVars.DOUBLE_TAP_TIME;
 		innerScrollBarColor[3] = alpha;
 		outerScrollBarColor[3] = alpha * .6f;
 		SurfaceViewBase.translate(0, translateY);

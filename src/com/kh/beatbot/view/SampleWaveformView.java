@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.bean.MidiViewBean;
@@ -332,17 +333,13 @@ public class SampleWaveformView extends SurfaceViewBase {
 		if (!showAdsr)
 			return false;
 		for (int i = 0; i < 5; i++) {
-			if (distanceFromPointSquared(adsrToX(GlobalVars.adsrPoints[trackNum][i][0]),
+			if (GeneralUtils.distanceFromPointSquared(adsrToX(GlobalVars.adsrPoints[trackNum][i][0]),
 					adsrToY(GlobalVars.adsrPoints[trackNum][i][1]), x, y) < SNAP_DIST_SQUARED) {
 				adsrSelected[i] = id;
 				return true;
 			}
 		}
 		return false;
-	}
-
-	private float distanceFromPointSquared(float pointX, float pointY, float x, float y) {
-		return (x - pointX)*(x - pointX) + (y - pointY)*(y - pointY);
 	}
 	
 	private boolean selectLoopMarker(int id, float x) {
