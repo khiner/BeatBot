@@ -21,10 +21,11 @@
 #define CHORUS_ID 2
 #define DECIMATE_ID 3
 #define DELAY_ID 4
-#define FILTER_ID 5
-#define FLANGER_ID 6
-#define REVERB_ID 7
-#define TREMELO_ID 8
+#define LP_FILTER_ID 5
+#define HP_FILTER_ID 6
+#define FLANGER_ID 7
+#define REVERB_ID 8
+#define TREMELO_ID 9
 
 #define VOL_PAN_ID 0
 #define PITCH_ID 1

@@ -40,8 +40,7 @@ public class LabelListListenable extends SurfaceViewBase {
 				// draw normal background
 			}
 			translate(x, 0);
-			currentTexture = id;
-			drawTexture(width, height);
+			drawTexture(id, width, height);
 			translate(-x, 0);
 		}
 
@@ -87,10 +86,6 @@ public class LabelListListenable extends SurfaceViewBase {
 	public void setListener(LabelListListener listener) {
 		this.listener = listener;
 	}
-	
-	private void initLabelTextures() {
-		currentTexture = ADD_LABEL_ID;
-	}
 
 	private boolean pointInsideAddButton(float x, float y) {
 		return x < height;
@@ -128,10 +123,20 @@ public class LabelListListenable extends SurfaceViewBase {
 		listener.labelSelected(label.id);
 	}
 
+	private void setAllLabelPrevPositions() {
+		for (int i = 0; i < labels.size(); i++) {
+			labels.get(i).prevPosition = i;
+		}
+	}
+	
 	// notify listener of the given label's old and new position in list
-	private void moveLabel(Label label) {
-		listener.labelMoved(label.id, label.prevPosition,
-				labels.indexOf(label));
+	private void updateLabelPositions() {
+		for (Label label : labels) {
+			int newPosition = labels.indexOf(label);
+			if (newPosition != label.prevPosition) {
+				listener.labelMoved(label.id, label.prevPosition, newPosition);
+			}
+		}
 	}
 
 	// notify listener the the given label has been removed form the list
@@ -141,15 +146,12 @@ public class LabelListListenable extends SurfaceViewBase {
 	
 	@Override
 	protected void init() {
-		initLabelTextures();
+
 	}
 
 	@Override
 	protected void drawFrame() {
-		// TODO draw each label (including dragged label) in its current
-		// position
-		currentTexture = ADD_LABEL_ID;
-		drawTexture(height, height); // for now, just draw plus label
+		drawTexture(ADD_LABEL_ID, height, height); // for now, just draw plus label
 		for (Label label : labels) {
 			label.draw();
 		}
@@ -176,6 +178,7 @@ public class LabelListListenable extends SurfaceViewBase {
 					System.currentTimeMillis() - LAST_DOWN_TIME >
 						GlobalVars.LONG_CLICK_TIME) {
 				draggedLabel = touchedLabel;
+				setAllLabelPrevPositions();
 			}
 		} else {
 			LAST_DOWN_TIME = Long.MAX_VALUE;
@@ -211,7 +214,7 @@ public class LabelListListenable extends SurfaceViewBase {
 		}
 		if (draggedLabel != null) {
 			if (labels.contains(draggedLabel)) {
-				moveLabel(draggedLabel);
+				updateLabelPositions();
 			} else {
 				// label dragged and dropped, but not in list - remove label
 				removeLabel(draggedLabel);

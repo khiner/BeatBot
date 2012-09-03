@@ -44,7 +44,6 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	
 	protected int[] textureHandlers = new int[2];
 	protected int[] crop = null;
-	protected int currentTexture = 0;
 	protected float[] backgroundColor = GlobalVars.BG_COLOR;
 
 	/**
@@ -187,9 +186,9 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		return (x - width/2)*(x - width/2) + (y - height/2)*(y - height/2);
 	}
 	
-	protected void drawTexture(float width, float height) {
+	protected void drawTexture(int textureId, float width, float height) {
 		gl.glEnable(GL10.GL_TEXTURE_2D);
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[currentTexture]);
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[textureId]);
 		((GL11)gl).glTexParameteriv(GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, crop, 0);
 		gl.glColor4f(1, 1, 1, 1);
 		((GL11Ext)gl).glDrawTexfOES(0, 0, 0, width, height);
@@ -245,20 +244,18 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 
 	public void run() {
 		// Much of this code is from GLSurfaceView in the Google API Demos.
-		EGL10 egl = (EGL10) EGLContext.getEGL();
-		EGLDisplay dpy = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
-
 		int[] version = new int[2];
-		egl.eglInitialize(dpy, version);
-
+		int[] num_config = new int[1];
 		int[] configSpec = { EGL10.EGL_RED_SIZE, 4, EGL10.EGL_GREEN_SIZE, 4,
 				EGL10.EGL_BLUE_SIZE, 4, EGL10.EGL_NONE };
-
+		
 		EGLConfig[] configs = new EGLConfig[1];
-		int[] num_config = new int[1];
+		EGL10 egl = (EGL10) EGLContext.getEGL();
+		
+		EGLDisplay dpy = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
+		egl.eglInitialize(dpy, version);
 		egl.eglChooseConfig(dpy, configSpec, configs, 1, num_config);
 		EGLConfig config = configs[0];
-
 		EGLContext context = egl.eglCreateContext(dpy, config,
 				EGL10.EGL_NO_CONTEXT, null);
 
@@ -267,8 +264,12 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		egl.eglMakeCurrent(dpy, surface, surface, context);
 
 		gl = (GL10) context.getGL();
-		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+		
+		gl.glViewport(0, 0, width, height);
+		GLU.gluOrtho2D(gl, 0, width, height, 0);
+		
 		gl.glEnable(GL10.GL_BLEND);
+		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnable(GL10.GL_POINT_SMOOTH);
 		init();
@@ -281,7 +282,6 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 
 		running = true;
 		while (running) {
-
 			if (System.currentTimeMillis() - time < delta) {
 				try {
 					Thread.sleep(System.currentTimeMillis() - time);
@@ -318,8 +318,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	 *            loading .pngs...)
 	 * @return The newly created identifier for the texture.
 	 */
-	protected static void loadTexture(GL10 gl, Bitmap bitmap, int[] textures) {
-
+	protected static void loadTexture(Bitmap bitmap, int[] textures) {
 		// generate one texture pointer
 		gl.glGenTextures(1, textures, 0);
 		// ...and bind it to our array
@@ -343,11 +342,8 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 				backgroundColor[2], backgroundColor[3]);
 	}
 	
-	private void drawFrame(GL10 gl, int w, int h) {
+	protected void drawFrame(GL10 gl, int w, int h) {
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		gl.glViewport(0, 0, width, height);
-		gl.glLoadIdentity();
-		GLU.gluOrtho2D(gl, 0, width, height, 0);
 		fillBackground();
 		drawFrame();
 	}

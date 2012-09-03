@@ -53,6 +53,10 @@
             android:label="@string/filter" >
         </activity>
         <activity
+            android:name="com.kh.beatbot.TextTestActivity"
+            android:label="textTest" >
+        </activity>
+        <activity
             android:name="com.kh.beatbot.ReverbActivity"
             android:label="@string/reverb" >
         </activity>

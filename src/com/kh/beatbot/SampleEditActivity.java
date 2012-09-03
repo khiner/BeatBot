@@ -128,7 +128,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			intent.setClass(this, FlangerActivity.class);
 			break;
 		case FILTER:
-			intent.setClass(this, FilterActivity.class);
+			//intent.setClass(this, FilterActivity.class);
+			intent.setClass(this, TextTestActivity.class);
 			break;
 		case REVERB:
 			intent.setClass(this, ReverbActivity.class);

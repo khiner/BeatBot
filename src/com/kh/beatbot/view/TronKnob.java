@@ -29,9 +29,10 @@ public class TronKnob extends LevelListenable {
 	private boolean clickable = false;
 	private boolean levelSelected = false;
 	
+	private int currentButtonTextureId = BEAT_TEXTURE_NUM;
+	
 	public TronKnob(Context c, AttributeSet as) {
 		super(c, as);
-		currentTexture = BEAT_TEXTURE_NUM;
 	}
 
 	public void setClickable(boolean clickable) {
@@ -101,7 +102,7 @@ public class TronKnob extends LevelListenable {
 			drawTriangleStrip(selectCircleVb, selectColor, drawIndex);
 		}
 		if (clickable)
-			drawTexture(width, height);
+			drawTexture(currentButtonTextureId, width, height);
 	}
 
 	private void updateDrawIndex() {
@@ -124,11 +125,11 @@ public class TronKnob extends LevelListenable {
 	}
 	
 	public void setBeatSync(boolean beatSync) {
-		currentTexture = beatSync ? BEAT_TEXTURE_NUM : CLOCK_TEXTURE_NUM;
+		currentButtonTextureId = beatSync ? BEAT_TEXTURE_NUM : CLOCK_TEXTURE_NUM;
 	}
 	
 	public boolean isBeatSync() {
-		return clickable && currentTexture == BEAT_TEXTURE_NUM;
+		return clickable && currentButtonTextureId == BEAT_TEXTURE_NUM;
 	}
 	
 	@Override
@@ -154,7 +155,7 @@ public class TronKnob extends LevelListenable {
 	protected void handleActionUp(int id, float x, float y) {
 		levelSelected = false;
 		if (clickable && System.currentTimeMillis() - timeDown < GlobalVars.SINGLE_TAP_TIME) {
-			currentTexture = (currentTexture + 1 ) % 2;
+			currentButtonTextureId = (currentButtonTextureId + 1 ) % 2;
 			for (LevelListener listener : levelListeners) {
 				listener.notifyClicked(this);
 			}

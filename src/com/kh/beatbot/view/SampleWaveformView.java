@@ -51,6 +51,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	// the left of this view is a preview button
 	private float previewButtonWidth, waveformWidth;
 
+	private int currentPreviewTextureId = 0;
+	
 	private int trackNum;
 
 	private int numSamples = 0;
@@ -321,7 +323,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	@Override
 	protected void drawFrame() {
 		drawTriangleStrip(previewButtonSquareVb, GlobalVars.BG_COLOR);
-		drawTexture(height, height);
+		drawTexture(currentPreviewTextureId, height, height);
 		drawWaveform();
 		drawLines(backgroundOutlineVb, GlobalVars.WHITE, 4, GL10.GL_LINE_LOOP);
 		drawLoopSelectionMarkers();
@@ -510,7 +512,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	public void handlePreviewActionDown(int id) {
-		currentTexture = 1;
+		currentPreviewTextureId = 1;
 		Managers.playbackManager.playTrack(trackNum);
 		previewPointerId = id;
 	}
@@ -562,14 +564,14 @@ public class SampleWaveformView extends SurfaceViewBase {
 		if (x > previewButtonWidth)
 			handleWaveActionPointerUp(e, id);
 		else {
-			currentTexture = 0;
+			currentPreviewTextureId = 0;
 			Managers.playbackManager.stopTrack(trackNum);
 		}
 	}
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		currentTexture = 0;
+		currentPreviewTextureId = 0;
 		beginLoopMarkerTouched = endLoopMarkerTouched = -1;
 		Managers.playbackManager.stopTrack(trackNum);
 		scrollAnchorSample = zoomLeftAnchorSample = zoomRightAnchorSample = -1;
