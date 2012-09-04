@@ -323,7 +323,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	@Override
 	protected void drawFrame() {
 		drawTriangleStrip(previewButtonSquareVb, GlobalVars.BG_COLOR);
-		drawTexture(currentPreviewTextureId, height, height);
+		drawTexture(currentPreviewTextureId, 0, 0, height, height);
 		drawWaveform();
 		drawLines(backgroundOutlineVb, GlobalVars.WHITE, 4, GL10.GL_LINE_LOOP);
 		drawLoopSelectionMarkers();

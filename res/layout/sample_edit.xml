@@ -4,17 +4,26 @@
     android:layout_height="match_parent"
     android:background="@color/background" >
 
+    <com.kh.beatbot.listenable.LabelListListenable
+        android:id="@+id/sampleList"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp" />
+    
     <com.kh.beatbot.view.SampleWaveformView
         android:id="@+id/sample_waveform_view"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="70dp"
         android:layout_marginTop="5dp"
-        android:layout_toLeftOf="@+id/adsr_toggle" />
-
+        android:layout_toLeftOf="@+id/adsr_toggle"
+        android:layout_below="@+id/sampleList" />
+    
     <ToggleButton
         android:id="@+id/adsr_toggle"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/sample_waveform_view"
         android:background="@drawable/adsr_btn_src"
@@ -25,8 +34,8 @@
 
     <ToggleButton
         android:id="@+id/loop_toggle"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_below="@+id/sample_waveform_view"
         android:background="@drawable/loop_btn_src"
         android:onClick="toggleLoop"
@@ -35,8 +44,8 @@
 
     <ToggleButton
         android:id="@+id/reverse"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_below="@+id/loop_toggle"
         android:background="@drawable/reverse_btn_src"
         android:onClick="reverse"
@@ -113,62 +122,13 @@
             android:layout_toRightOf="@+id/pitchView" />
     </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/effects"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/levels"
-        android:layout_toRightOf="@+id/reverse"
-        android:orientation="horizontal" >
-
-        <ImageButton
-            android:id="@+id/filterButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/filter_icon"
-            android:onClick="filter" />
-
-        <ImageButton
-            android:id="@+id/bitcrushButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bitcrush_icon"
-            android:onClick="bitcrush" />
-
-        <ImageButton
-            android:id="@+id/delayButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/delay_icon"
-            android:onClick="delay" />
-
-        <ImageButton
-            android:id="@+id/chorusButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/chorus_icon"
-            android:onClick="chorus" />
-
-        <ImageButton
-            android:id="@+id/flangerButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/flanger_icon"
-            android:onClick="flanger" />
-
-        <ImageButton
-            android:id="@+id/reverbButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/reverb_icon"
-            android:onClick="reverb" />
-
-        <ImageButton
-            android:id="@+id/tremeloButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/tremelo_icon"
-            android:onClick="tremelo" />
-    </LinearLayout>
+    <com.kh.beatbot.listenable.LabelListListenable
+        android:id="@+id/effectList"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_below="@+id/reverse"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp" />
 
 </RelativeLayout>

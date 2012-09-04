@@ -3,15 +3,21 @@ package com.kh.beatbot;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.EffectActivity.EffectParam;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.listenable.LabelListListenable;
 import com.kh.beatbot.listenable.LevelListenable;
+import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -20,22 +26,96 @@ import com.kh.beatbot.view.TronSeekbar;
 import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class SampleEditActivity extends Activity implements LevelListener {
+	class SampleLabelListListener implements LabelListListener {
+		SampleLabelListListener(Context c) {
+			
+		}
+
+		@Override
+		public void labelListInitialized(LabelListListenable labelList) {
+			
+		}
+		
+		@Override
+		public int labelAdded() {
+			
+			return 0;
+		}
+
+		@Override
+		public void labelRemoved(int id) {
+
+		}
+
+		@Override
+		public void labelMoved(int id, int oldPosition, int newPosition) {
+
+		}
+
+		@Override
+		public void labelSelected(int id) {
+			
+		}
+	}
+
+	class EffectLabelListListener implements LabelListListener {
+		private AlertDialog chooseEffectAlert = null;
+		private LabelListListenable labelList;
+		
+		EffectLabelListListener(Context c) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(c);
+			builder.setTitle("Choose Effect");
+			builder.setItems(effectNames, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
+					labelList.addLabel(effectNames[item], item);
+					launchIntent(effectNames[item]);
+				}
+			});
+			chooseEffectAlert = builder.create();
+		}
+
+		@Override
+		public void labelListInitialized(LabelListListenable labelList) {
+			this.labelList = labelList;
+		}
+		
+		@Override
+		public int labelAdded() {
+			chooseEffectAlert.show();
+			return 0;
+		}
+
+		@Override
+		public void labelRemoved(int id) {
+
+		}
+
+		@Override
+		public void labelMoved(int id, int oldPosition, int newPosition) {
+		}
+
+		@Override
+		public void labelSelected(int id) {
+
+		}
+	}
+	
 	private SampleWaveformView sampleWaveformView = null;
 	// private EditLevelsView editLevelsView = null;
 	private TronSeekbar volumeLevel, panLevel, pitchLevel;
 
-	private enum Effect {
-		BITCRUSH, CHORUS, DELAY, FLANGER, FILTER, REVERB, TREMELO
-	};
-
 	private int trackNum;
-
+	private static String[] effectNames;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// remove title bar
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.sample_edit);
+		effectNames = getResources().getStringArray(R.array.effect_names);
+		((LabelListListenable)findViewById(R.id.effectList)).setListener(new EffectLabelListListener(this));
+		((LabelListListenable)findViewById(R.id.sampleList)).setListener(new SampleLabelListListener(this));
 		trackNum = getIntent().getExtras().getInt("trackNum");
 		sampleWaveformView = ((SampleWaveformView) findViewById(R.id.sample_waveform_view));
 		// editLevelsView = ((EditLevelsView)
@@ -84,59 +164,23 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		sampleWaveformView.setSamples(normalize(trackNum));
 	}
 
-	public void bitcrush(View view) {
-		launchIntent(Effect.BITCRUSH);
-	}
-
-	public void chorus(View view) {
-		launchIntent(Effect.CHORUS);
-	}
-
-	public void delay(View view) {
-		launchIntent(Effect.DELAY);
-	}
-
-	public void flanger(View view) {
-		launchIntent(Effect.FLANGER);
-	}
-
-	public void filter(View view) {
-		launchIntent(Effect.FILTER);
-	}
-
-	public void reverb(View view) {
-		launchIntent(Effect.REVERB);
-	}
-
-	public void tremelo(View view) {
-		launchIntent(Effect.TREMELO);
-	}
-
-	private void launchIntent(Effect effect) {
+	private void launchIntent(String effectName) {
 		Intent intent = new Intent();
-		switch (effect) {
-		case BITCRUSH:
+		if (effectName.equals(getString(R.string.decimate)))
 			intent.setClass(this, DecimateActivity.class);
-			break;
-		case CHORUS:
+		else if (effectName.equals(getString(R.string.chorus)))
 			intent.setClass(this, ChorusActivity.class);
-			break;
-		case DELAY:
+		else if (effectName.equals(getString(R.string.delay)))
 			intent.setClass(this, DelayActivity.class);
-			break;
-		case FLANGER:
+		else if (effectName.equals(getString(R.string.flanger)))
 			intent.setClass(this, FlangerActivity.class);
-			break;
-		case FILTER:
-			//intent.setClass(this, FilterActivity.class);
-			intent.setClass(this, TextTestActivity.class);
-			break;
-		case REVERB:
+		else if (effectName.equals(getString(R.string.filter)))
+			intent.setClass(this, FilterActivity.class);
+		else if (effectName.equals(getString(R.string.reverb)))
 			intent.setClass(this, ReverbActivity.class);
-			break;
-		case TREMELO:
+		else if (effectName.equals(getString(R.string.tremelo)))
 			intent.setClass(this, TremeloActivity.class);
-		}
+
 		intent.putExtra("trackNum", trackNum);
 		startActivity(intent);
 	}

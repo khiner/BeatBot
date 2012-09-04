@@ -102,7 +102,7 @@ public class TronKnob extends LevelListenable {
 			drawTriangleStrip(selectCircleVb, selectColor, drawIndex);
 		}
 		if (clickable)
-			drawTexture(currentButtonTextureId, width, height);
+			drawTexture(currentButtonTextureId, 0, 0, width, height);
 	}
 
 	private void updateDrawIndex() {

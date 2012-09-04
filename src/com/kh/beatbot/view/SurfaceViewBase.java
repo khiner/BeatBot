@@ -127,6 +127,12 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, beginVertex, endVertex - beginVertex);
 	}
 
+	public static void drawTriangleFan(FloatBuffer vb, float[] color) {
+		setColor(color);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
+		gl.glDrawArrays(GL10.GL_TRIANGLE_FAN, 0, vb.capacity() / 2);		
+	}
+	
 	public static void drawLines(FloatBuffer vb, float[] color, float width, int type, int stride) {
 		setColor(color);
 		gl.glLineWidth(width);
@@ -136,12 +142,6 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	
 	public static void drawLines(FloatBuffer vb, float[] color, float width, int type) {
 		drawLines(vb, color, width, type, 0);
-	}
-	
-	public static void drawTriangleFan(FloatBuffer vb, float[] color) {
-		setColor(color);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_FAN, 0, vb.capacity() / 2);		
 	}
 	
 	public static void drawPoint(float pointSize, float[] color, int vertex) {
@@ -186,12 +186,12 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		return (x - width/2)*(x - width/2) + (y - height/2)*(y - height/2);
 	}
 	
-	protected void drawTexture(int textureId, float width, float height) {
+	protected void drawTexture(int textureId, float x, float y, float width, float height) {
 		gl.glEnable(GL10.GL_TEXTURE_2D);
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[textureId]);
 		((GL11)gl).glTexParameteriv(GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, crop, 0);
 		gl.glColor4f(1, 1, 1, 1);
-		((GL11Ext)gl).glDrawTexfOES(0, 0, 0, width, height);
+		((GL11Ext)gl).glDrawTexfOES(x, y, 0, width, height);
 		gl.glDisable(GL10.GL_TEXTURE_2D);
 	}
 	

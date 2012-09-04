@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <string name="app_name">BeatBot</string>
-    <string name="control">Control</string>
-    <string name="midi_menu">Midi Menu</string>
-    <string name="start_listening">Start Listening</string>
-    <string name="stop_listening">Stop Listening</string>
+	<string name="app_name">BeatBot</string>
+	<string name="control">Control</string>
+	<string name="midi_menu">Midi Menu</string>
+	<string name="start_listening">Start Listening</string>
+	<string name="stop_listening">Stop Listening</string>
 	<string name="record">Record</string>
 	<string name="play">Play</string>
-	<string name="stop">Stop</string>	
+	<string name="stop">Stop</string>
 	<string name="undo">Undo</string>
 	<string name="delete">Delete</string>
 	<string name="levels">Levels</string>
@@ -23,46 +23,56 @@
 	<string name="save">Save</string>
 	<string name="save_midi">Save MIDI</string>
 	<string name="open_midi">Open MIDI</string>
-	<string name="save_wav">Export as WAV</string>	
+	<string name="save_wav">Export as WAV</string>
 	<string name="import_export_midi">Import/Export as MIDI</string>
-    <string-array name="sample_types">
-        <item name="kick">Kick</item>
-        <item name="snare">Snare</item>
-        <item name="hi_hat_closed">HH Closed</item>
-        <item name="hi_hat_open">HH Open</item>
-        <item name="rim">Rim</item>
-        <item name="bass">Bass</item>
-    </string-array>
-    <string name="default_midi_file_name">MyMidi</string>
-    
-    <string name="sample_edit_activity">Sample Edit</string>
-    <string name="preview_sample">Preview</string>
-    <string name="loop_sample">Loop Sample</string>
-    <string name="adsr">ADSR</string>
-    <string name="reverse">Reverse</string>
-    <string name="normalize">Normalize</string>
-    <string name="chorus">Chorus</string>
-    <string name="decimate">Decimate</string>
-    <string name="delay">Delay</string>
-    <string name="flanger">Flanger</string>
-    <string name="filter">Filter</string>
-    <string name="reverb">Reverb</string>
-    <string name="tremelo">Tremelo</string>
-    
-    <!-- param names -->
-    <string name="bits">Bits</string>
-    <string name="cutoff">Cutoff</string>
-    <string name="depth">Depth</string>
+	<string-array name="sample_types">
+		<item name="kick">Kick</item>
+		<item name="snare">Snare</item>
+		<item name="hi_hat_closed">HH Closed</item>
+		<item name="hi_hat_open">HH Open</item>
+		<item name="rim">Rim</item>
+		<item name="bass">Bass</item>
+	</string-array>
+	<string name="default_midi_file_name">MyMidi</string>
+
+	<string name="sample_edit_activity">Sample Edit</string>
+	<string name="preview_sample">Preview</string>
+	<string name="loop_sample">Loop Sample</string>
+	<string name="adsr">ADSR</string>
+	<string name="reverse">Reverse</string>
+	<string name="normalize">Normalize</string>
+	<string name="chorus">Chorus</string>
+	<string name="decimate">Decimate</string>
+	<string name="delay">Delay</string>
+	<string name="flanger">Flanger</string>
+	<string name="filter">Filter</string>
+	<string name="reverb">Reverb</string>
+	<string name="tremelo">Tremelo</string>
+
+	<string-array name="effect_names">
+		<item name="chorus">Chorus</item>
+		<item name="decimate">Decimate</item>
+		<item name="delay">Delay</item>>
+		<item name="flanger">Flanger</item>
+		<item name="filter">Filter</item>
+		<item name="reverb">Reverb</item>
+		<item name="tremelo">Tremelo</item>
+	</string-array>
+
+	<!-- param names -->
+	<string name="bits">Bits</string>
+	<string name="cutoff">Cutoff</string>
+	<string name="depth">Depth</string>
 	<string name="modRate">Rate</string>
-    <string name="modAmt">Depth</string>
-    <string name="phase">Phase</string>
-    <string name="resonance">Q</string>
-    <string name="feedback">Feedback</string>
-    <string name="frequency">Freq</string>
-    <string name="hfDamp">HF Damp</string>
-    <string name="sampleRate">BitRate</string>
-    <string name="time">Time</string>
-    <string name="timeLeft">Time Left</string>
-    <string name="timeRight">Time Right</string>
-    <string name="wet">Wet</string>    
+	<string name="modAmt">Depth</string>
+	<string name="phase">Phase</string>
+	<string name="resonance">Q</string>
+	<string name="feedback">Feedback</string>
+	<string name="frequency">Freq</string>
+	<string name="hfDamp">HF Damp</string>
+	<string name="sampleRate">BitRate</string>
+	<string name="time">Time</string>
+	<string name="timeLeft">Time Left</string>
+	<string name="timeRight">Time Right</string>
+	<string name="wet">Wet</string>
 </resources>
