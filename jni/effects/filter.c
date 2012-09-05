@@ -29,7 +29,7 @@ void filterconfig_destroy(void *p) {
 }
 
 /********* JNI METHODS **********/
-void Java_com_kh_beatbot_EffectActivity_setFilterOn(JNIEnv *env, jclass clazz,
+void Java_com_kh_beatbot_effect_Filter_setFilterOn(JNIEnv *env, jclass clazz,
 		jint trackNum, jboolean on, jint mode) {
 	Track *track = getTrack(env, clazz, trackNum);
 	Effect *lpFilter = &(track->effects[LP_FILTER_ID]);
@@ -52,7 +52,7 @@ void Java_com_kh_beatbot_EffectActivity_setFilterOn(JNIEnv *env, jclass clazz,
 	}
 }
 
-void Java_com_kh_beatbot_EffectActivity_setFilterParam(JNIEnv *env,
+void Java_com_kh_beatbot_effect_Filter_setFilterParam(JNIEnv *env,
 		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(env, clazz, trackNum);
 	Effect lpFilter = track->effects[LP_FILTER_ID];

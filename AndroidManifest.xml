@@ -33,36 +33,8 @@
             android:label="@string/sample_edit_activity" >
         </activity>
         <activity
-            android:name="com.kh.beatbot.ChorusActivity"
-            android:label="@string/chorus" >
-        </activity>        
-        <activity
-            android:name="com.kh.beatbot.DecimateActivity"
-            android:label="@string/decimate" >
-        </activity>
-        <activity
-            android:name="com.kh.beatbot.DelayActivity"
-            android:label="@string/delay" >
-        </activity>
-        <activity
-            android:name="com.kh.beatbot.FlangerActivity"
-            android:label="@string/flanger" >
-        </activity>
-        <activity
-            android:name="com.kh.beatbot.FilterActivity"
-            android:label="@string/filter" >
-        </activity>
-        <activity
-            android:name="com.kh.beatbot.TextTestActivity"
-            android:label="textTest" >
-        </activity>
-        <activity
-            android:name="com.kh.beatbot.ReverbActivity"
-            android:label="@string/reverb" >
-        </activity>
-        <activity
-            android:name="com.kh.beatbot.TremeloActivity"
-            android:label="@string/tremelo" >
+            android:name="com.kh.beatbot.EffectActivity"
+            android:label="Effect" >
         </activity>
     </application>
 

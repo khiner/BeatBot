@@ -38,14 +38,14 @@ void tremeloconfig_destroy(void *p) {
 
 
 /********* JNI METHODS **********/
-void Java_com_kh_beatbot_EffectActivity_setTremeloOn(JNIEnv *env,
+void Java_com_kh_beatbot_effect_Tremelo_setTremeloOn(JNIEnv *env,
 		jclass clazz, jint trackNum, jint on) {
 	Track *track = getTrack(env, clazz, trackNum);
 	Effect *tremelo = &(track->effects[TREMELO_ID]);
 	tremelo->on = on;
 }
 
-void Java_com_kh_beatbot_EffectActivity_setTremeloParam(JNIEnv *env,
+void Java_com_kh_beatbot_effect_Tremelo_setTremeloParam(JNIEnv *env,
 		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
 	Track *track = getTrack(env, clazz, trackNum);
 	TremeloConfig *config = (TremeloConfig*)track->effects[TREMELO_ID].config;

@@ -29,6 +29,7 @@ public class LabelListListenable extends SurfaceViewBase {
 		private float x, textWidth, width;
 		private int id;
 		private int prevPosition;
+		private boolean on = false;
 
 		Label(String text, int id, float x) {
 			this.text = text;
@@ -47,9 +48,11 @@ public class LabelListListenable extends SurfaceViewBase {
 			gl.glDisable(GL10.GL_TEXTURE_2D);
 			gl.glPushMatrix();
 			translate(x + this.width / 2, height / 2);
-			// draw background - lighter background for dragged/selected label
+			// draw background - different background colors for
+			// normal/dragged/on labels
 			drawTriangleFan(backgroundRectVb,
-					this.equals(draggedLabel) ? LABEL_RECT_SELECTED_COLOR : LABEL_RECT_COLOR);
+					this.equals(draggedLabel) ? LABEL_RECT_SELECTED_COLOR :
+						(on ? LABEL_RECT_ON_COLOR : LABEL_RECT_COLOR));
 			gl.glPopMatrix();
 			gl.glEnable(GL10.GL_TEXTURE_2D);
 			setColor(GlobalVars.WHITE);
@@ -104,11 +107,30 @@ public class LabelListListenable extends SurfaceViewBase {
 	public void setListener(LabelListListener listener) {
 		this.listener = listener;
 	}
-
+	
+	public void setLabelOn(String labelText, boolean on) {
+		Label label = findLabel(labelText);
+		if (label != null) {
+			label.on = on;
+		}
+	}
+	
 	private boolean pointInsideAddButton(float x, float y) {
 		return x < height;
 	}
 
+	/*
+	 * Find the label with the given text
+	 */
+	private Label findLabel(String text) {
+		for (Label label : labels) {
+			if (label.text.equals(text)) {
+				return label;
+			}
+		}
+		return null;
+	}
+	
 	/*
 	 * Find the label such that the given coordinates are inside
 	 */
@@ -135,7 +157,7 @@ public class LabelListListenable extends SurfaceViewBase {
 	// notify listener that a new label has been created,
 	// and set the returned id
 	private void labelAdded() {
-		listener.labelAdded();
+		listener.labelAdded(labels.size());
 	}
 	
 	// callback function for listener to notify when the label text and id is known

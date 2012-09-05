@@ -1,7 +1,5 @@
 package com.kh.beatbot;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -10,10 +8,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.kh.beatbot.EffectActivity.EffectParam;
+import com.kh.beatbot.effect.Chorus;
+import com.kh.beatbot.effect.Decimate;
+import com.kh.beatbot.effect.Delay;
+import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.effect.Effect.EffectParam;
+import com.kh.beatbot.effect.Filter;
+import com.kh.beatbot.effect.Flanger;
+import com.kh.beatbot.effect.Reverb;
+import com.kh.beatbot.effect.Tremelo;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listenable.LabelListListenable;
 import com.kh.beatbot.listenable.LevelListenable;
@@ -37,7 +42,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 		
 		@Override
-		public int labelAdded() {
+		public int labelAdded(int labelNum) {
 			
 			return 0;
 		}
@@ -68,7 +73,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			builder.setItems(effectNames, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
 					labelList.addLabel(effectNames[item], item);
-					launchIntent(effectNames[item]);
+					launchEffectIntent(effectNames[item]);
 				}
 			});
 			chooseEffectAlert = builder.create();
@@ -80,7 +85,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 		
 		@Override
-		public int labelAdded() {
+		public int labelAdded(int labelNum) {
 			chooseEffectAlert.show();
 			return 0;
 		}
@@ -100,46 +105,57 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 	}
 	
-	private SampleWaveformView sampleWaveformView = null;
+	private static SampleWaveformView sampleWaveformView = null;
 	// private EditLevelsView editLevelsView = null;
-	private TronSeekbar volumeLevel, panLevel, pitchLevel;
-
+	private static TronSeekbar volumeLevel, panLevel, pitchLevel;
+	private static LabelListListenable effectLabelList = null, sampleLabelList = null;
+	
 	private int trackNum;
 	private static String[] effectNames;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		trackNum = getIntent().getExtras().getInt("trackNum");
 		// remove title bar
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.sample_edit);
-		effectNames = getResources().getStringArray(R.array.effect_names);
-		((LabelListListenable)findViewById(R.id.effectList)).setListener(new EffectLabelListListener(this));
-		((LabelListListenable)findViewById(R.id.sampleList)).setListener(new SampleLabelListListener(this));
-		trackNum = getIntent().getExtras().getInt("trackNum");
-		sampleWaveformView = ((SampleWaveformView) findViewById(R.id.sample_waveform_view));
-		// editLevelsView = ((EditLevelsView)
-		// findViewById(R.id.edit_levels_view));
-		sampleWaveformView.setTrackNum(trackNum);
-		// editLevelsView.setActivity(this);
-		// editLevelsView.setTrackNum(trackNum);
 		initLevels();
-		// numSamples should be in shorts, so divide by two
-		sampleWaveformView.setSamples(getSamples(trackNum));
+		initSampleLabelList();
+		initEffectLabelList();
+		initSampleWaveformView();
+		
 		Managers.playbackManager.armTrack(trackNum);
 		((ToggleButton) findViewById(R.id.loop_toggle))
 				.setChecked(Managers.playbackManager.isLooping(trackNum));
 	}
 
+	private void initEffectLabelList() {
+		effectNames = getResources().getStringArray(R.array.effect_names);
+		effectLabelList = (LabelListListenable)findViewById(R.id.effectList); 
+		effectLabelList.setListener(new EffectLabelListListener(this));
+	}
+	
+	private void initSampleLabelList() {
+		sampleLabelList = (LabelListListenable)findViewById(R.id.sampleList); 
+		sampleLabelList.setListener(new SampleLabelListListener(this));
+	}
+	
+	private void initSampleWaveformView() {
+		sampleWaveformView = ((SampleWaveformView) findViewById(R.id.sample_waveform_view));
+		sampleWaveformView.setTrackNum(trackNum);
+		// numSamples should be in shorts, so divide by two
+		sampleWaveformView.setSamples(getSamples(trackNum));
+	}
+	
 	public static void quantizeEffectParams() {
 		for (int trackNum = 0; trackNum < GlobalVars.params.length; trackNum++) {
-			for (int effectNum = 0; effectNum < GlobalVars.NUM_EFFECTS; effectNum++) {
-				List<EffectParam> params = GlobalVars.params[trackNum][effectNum];
-				for (int paramNum = 0; paramNum < params.size(); paramNum++) {
-					EffectParam param = params.get(paramNum);
+			for (Effect effect : GlobalVars.effects[trackNum]) {
+				for (int paramNum = 0; paramNum < effect.getNumParams(); paramNum++) { 
+					EffectParam param = effect.getParam(paramNum);
 					if (param.beatSync) {
-						EffectActivity.setParamLevel(param, param.viewLevel);
-						EffectActivity.setParamNative(paramNum, param.level);
+						effect.setParamLevel(param, param.viewLevel);
+						effect.setParamNative(paramNum, param.viewLevel);
 					}
 				}
 			}
@@ -164,24 +180,28 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		sampleWaveformView.setSamples(normalize(trackNum));
 	}
 
-	private void launchIntent(String effectName) {
+	private void launchEffectIntent(String effectName) {
 		Intent intent = new Intent();
+		intent.setClass(this, EffectActivity.class);
+		Effect effect = null;
 		if (effectName.equals(getString(R.string.decimate)))
-			intent.setClass(this, DecimateActivity.class);
+			effect = new Decimate(effectName, trackNum);
 		else if (effectName.equals(getString(R.string.chorus)))
-			intent.setClass(this, ChorusActivity.class);
+			effect = new Chorus(effectName, trackNum);
 		else if (effectName.equals(getString(R.string.delay)))
-			intent.setClass(this, DelayActivity.class);
+			effect = new Delay(effectName, trackNum);
 		else if (effectName.equals(getString(R.string.flanger)))
-			intent.setClass(this, FlangerActivity.class);
+			effect = new Flanger(effectName, trackNum);
 		else if (effectName.equals(getString(R.string.filter)))
-			intent.setClass(this, FilterActivity.class);
+			effect = new Filter(effectName, trackNum);
 		else if (effectName.equals(getString(R.string.reverb)))
-			intent.setClass(this, ReverbActivity.class);
+			effect = new Reverb(effectName, trackNum);
 		else if (effectName.equals(getString(R.string.tremelo)))
-			intent.setClass(this, TremeloActivity.class);
-
+			effect = new Tremelo(effectName, trackNum);
+		
+		intent.putExtra("effectNum", effect.effectNum);
 		intent.putExtra("trackNum", trackNum);
+
 		startActivity(intent);
 	}
 
@@ -247,21 +267,21 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	// get the audio data in floats
-	public native float[] getSamples(int trackNum);
+	public static native float[] getSamples(int trackNum);
 
 	// set play mode to reverse
-	public native void setReverse(int trackNum, boolean reverse);
+	public static native void setReverse(int trackNum, boolean reverse);
 
 	// scale all samples so that the sample with the highest amplitude is at 1
-	public native float[] normalize(int trackNum);
+	public static native float[] normalize(int trackNum);
 
-	public native void setPrimaryVolume(int trackNum, float volume);
+	public static native void setPrimaryVolume(int trackNum, float volume);
 
-	public native void setPrimaryPan(int trackNum, float pan);
+	public static native void setPrimaryPan(int trackNum, float pan);
 
-	public native void setPrimaryPitch(int trackNum, float pitch);
+	public static native void setPrimaryPitch(int trackNum, float pitch);
 
-	public native void setAdsrOn(int trackNum, boolean on);
+	public static native void setAdsrOn(int trackNum, boolean on);
 
 	@Override
 	public void setLevel(LevelListenable levelListenable, float levelX,

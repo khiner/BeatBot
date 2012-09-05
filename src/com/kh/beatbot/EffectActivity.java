@@ -9,7 +9,6 @@ import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.FloatMath;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,42 +18,32 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ToggleButton;
 
+import com.kh.beatbot.effect.Delay;
+import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.effect.Effect.EffectParam;
+import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.layout.EffectControlLayout;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
-import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.view.TronKnob;
 import com.kh.beatbot.view.TronSeekbar2d;
 
-public abstract class EffectActivity extends Activity implements LevelListener, View.OnClickListener {
-	public class EffectParam {
-		public float level, viewLevel, scale = 1;
-		public int topBeatNum = 1, bottomBeatNum = 1;
-		public boolean hz = false;
-		public boolean beatSync;
-		public boolean logScale;
-		public String unitString;
-
-		public EffectParam(boolean logScale, boolean beatSync, String unitString) {
-			level = viewLevel = 0.5f;
-			this.beatSync = beatSync;
-			this.logScale = logScale;
-			this.unitString = unitString;
-		}
-	}
-
-	protected static int EFFECT_NUM;
-	protected static int NUM_PARAMS;
-	protected static int trackNum;
+public class EffectActivity extends Activity implements LevelListener, View.OnClickListener {
+	protected Effect effect;
+	private ToggleButton[] filterButtons = new ToggleButton[3];
 	protected List<EffectControlLayout> paramControls = new ArrayList<EffectControlLayout>();
 	protected TronKnob xParamKnob = null, yParamKnob = null;
 	protected TronSeekbar2d level2d = null;
 
 	private View initEffectToggleButton(ViewGroup parent) {
-		if (this instanceof FilterActivity) {
+		if (effect instanceof Filter) {
 			LinearLayout filterTypesLayout = (LinearLayout)LayoutInflater.from(getBaseContext()).inflate(
 					R.layout.filter_types_layout, parent, false);
+			filterButtons[0] = (ToggleButton)filterTypesLayout.findViewById(R.id.lp_toggle);
+			filterButtons[1] = (ToggleButton)filterTypesLayout.findViewById(R.id.bp_toggle);
+			filterButtons[2] = (ToggleButton)filterTypesLayout.findViewById(R.id.hp_toggle);
+			filterButtons[((Filter)effect).getFilterMode()].setChecked(true);
 			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
 					RelativeLayout.LayoutParams.WRAP_CONTENT);
 			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
@@ -65,13 +54,13 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 		} else {
 			ToggleButton effectToggleButton = new ToggleButton(this);
 			StateListDrawable drawable = new StateListDrawable();
-			drawable.addState(new int[] {android.R.attr.state_checked }, getResources().getDrawable(getOnDrawableId()));
-			drawable.addState(new int[] {}, getResources().getDrawable(getOffDrawableId()));
+			drawable.addState(new int[] {android.R.attr.state_checked }, getResources().getDrawable(effect.getOnDrawableId()));
+			drawable.addState(new int[] {}, getResources().getDrawable(effect.getOffDrawableId()));
 			effectToggleButton.setBackgroundDrawable(drawable);
 			effectToggleButton.setTextOn("");
 			effectToggleButton.setTextOff("");
 			effectToggleButton.setOnClickListener(this);
-			effectToggleButton.setChecked(GlobalVars.effectOn[trackNum][EFFECT_NUM]);
+			effectToggleButton.setChecked(effect.on);
 			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(effectToggleButton.getBackground().getIntrinsicWidth(),
 					effectToggleButton.getBackground().getIntrinsicHeight());
 			layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
@@ -83,10 +72,10 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 	}
 	
 	private View initEffectLayout(ViewGroup parent) {
-		View effectToggleButton = initEffectToggleButton(parent);
 		
 		View effectParamLayout = LayoutInflater.from(getBaseContext()).inflate(
-				getParamLayoutId(), parent, false);
+				effect.getParamLayoutId(), parent, false);
+		View effectToggleButton = initEffectToggleButton(parent);
 		RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		layoutParams.addRule(RelativeLayout.BELOW, effectToggleButton.getId());
@@ -113,12 +102,21 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 		return paramWrapperLayout;
 	}
 
+	private void initDelayKnobs() {
+		// since left/right delay times are linked by default,
+		// xy view is set to x = left channel, y = feedback
+		xParamKnob = paramControls.get(0).getKnob();
+		yParamKnob = effect.paramsLinked() ? paramControls.get(2).getKnob() : paramControls.get(1).getKnob();
+		((ToggleButton)findViewById(R.id.linkButton)).setChecked(effect.paramsLinked());
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE); // remove title bar
-		trackNum = getIntent().getExtras().getInt("trackNum"); // set track
-																// number
+		int effectNum = getIntent().getExtras().getInt("effectNum");
+		int trackNum = getIntent().getExtras().getInt("trackNum");
+		effect = GlobalVars.effects[trackNum].get(effectNum);
 		setContentView(R.layout.effect_layout);
 		ViewGroup parent = (ViewGroup) findViewById(R.id.effect_layout);
 		View paramWrapperLayout = initEffectLayout(parent);
@@ -136,7 +134,6 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 		}
 		findViewById(R.id.xyParamBar).setLayoutParams(layoutParams);
 		parent.addView(paramWrapperLayout);
-		initParams();
 		initParamControls();
 
 		xParamKnob = paramControls.get(0).getKnob();
@@ -145,28 +142,26 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 			int paramNum = paramControl.getKnob().getId();
 			updateParamValueLabel(paramNum);
 		}
+		if (effect instanceof Delay) {
+			initDelayKnobs();
+		}
 	}
-
-	protected abstract int getParamLayoutId();
-	protected abstract int getOnDrawableId();
-	protected abstract int getOffDrawableId();
-	
-	protected abstract void initParams();
 	
 	protected void initParamControls() {
+		int numParams = effect.getNumParams();
 		paramControls = new ArrayList<EffectControlLayout>();
 		paramControls.add((EffectControlLayout) findViewById(R.id.param1));
 		paramControls.add((EffectControlLayout) findViewById(R.id.param2));
-		if (NUM_PARAMS > 2) {
+		if (numParams > 2) {
 			paramControls.add((EffectControlLayout) findViewById(R.id.param3));
 		}
-		if (NUM_PARAMS > 3) {
+		if (numParams > 3) {
 			paramControls.add((EffectControlLayout) findViewById(R.id.param4));
 		}
-		if (NUM_PARAMS > 4) {
+		if (numParams > 4) {
 			paramControls.add((EffectControlLayout) findViewById(R.id.param5));
 		}
-		if (NUM_PARAMS > 5) {
+		if (numParams > 5) {
 			paramControls.add((EffectControlLayout) findViewById(R.id.param6));
 		}
 		for (int i = 0; i < paramControls.size(); i++) {
@@ -182,7 +177,7 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 
 	public void updateParamValueLabel(int paramNum) {
 		paramControls.get(paramNum)
-				.setValueLabel(getParamValueString(paramNum));
+				.setValueLabel(effect.getParamValueString(paramNum));
 	}
 
 	public void updateXYViewLevel() {
@@ -190,42 +185,58 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 		level2d.setViewLevelY(yParamKnob.getLevel());
 	}
 
-	public static EffectParam getParam(int paramNum) {
-		return GlobalVars.params[trackNum][EFFECT_NUM].get(paramNum);
-	}
-
-	public static String getParamValueString(int paramNum) {
-		EffectParam param = getParam(paramNum);
-		if (param.beatSync)
-			return param.topBeatNum + (param.bottomBeatNum == 1 ? "" : "/" + param.bottomBeatNum);
-		else
-			return String.format("%.2f", param.level * param.scale) + " " + param.unitString;
-	}
-
 	@Override
 	public void onClick(View view) {
 		toggleOn(view);
 	}
 	
-	public void toggleOn(View view) {
-		boolean on = ((ToggleButton) view).isChecked();
-		GlobalVars.effectOn[trackNum][EFFECT_NUM] = on;
-		setEffectOnNative(on);
+	public void link(View view) {
+		TronKnob leftChannelKnob = paramControls.get(0).getKnob();
+		TronKnob rightChannelKnob = paramControls.get(1).getKnob();
+		float newRightChannelLevel = rightChannelKnob.getLevel();
+		boolean newRightChannelSynced = rightChannelKnob.isBeatSync();
+
+		effect.setParamsLinked(((ToggleButton)view).isChecked());
+		
+
+		if (effect.paramsLinked()) {
+			// y = feedback when linked
+			yParamKnob = paramControls.get(2).getKnob();
+			((Delay)effect).rightChannelLevelMemory = rightChannelKnob.getLevel();
+			((Delay)effect).rightChannelBeatSyncMemory = rightChannelKnob.isBeatSync();
+			newRightChannelLevel = leftChannelKnob.getLevel();
+			newRightChannelSynced = leftChannelKnob.isBeatSync();
+		} else {
+			// y = right delay time when not linked
+			yParamKnob = paramControls.get(1).getKnob();
+			newRightChannelSynced = ((Delay)effect).rightChannelBeatSyncMemory;
+			if (((Delay)effect).rightChannelLevelMemory > 0)
+				newRightChannelLevel = ((Delay)effect).rightChannelLevelMemory;
+		}
+		effect.getParam(1).beatSync = newRightChannelSynced;
+		rightChannelKnob.setBeatSync(newRightChannelSynced);
+		rightChannelKnob.setLevel(newRightChannelLevel);
 	}
 	
-	protected static final void setParamLevel(int paramNum, float level) {
-		EffectParam param = getParam(paramNum);
-		param.viewLevel = level;
-		setParamLevel(param, level);
-		setParamNative(paramNum, param.level);
+	public void toggleOn(View view) {
+		effect.setOn(((ToggleButton) view).isChecked());
 	}
 
 	@Override
 	public void setLevel(LevelListenable levelListenable, float level) {
 		int paramNum = levelListenable.getId();
-		setParamLevel(paramNum, level);
+		effect.setParamLevel(paramNum, level);
 		updateXYViewLevel();
 		updateParamValueLabel(paramNum);
+		if (effect.paramsLinked()) {
+			if (levelListenable.getId() == 0) {
+				effect.setParamLevel(1, level);
+				paramControls.get(1).getKnob().setViewLevel(level);
+				paramControls.get(1).setValueLabel(paramControls.get(0).getValueLabel());
+			} else if (levelListenable.getId() == 1) {
+				paramControls.get(0).getKnob().setLevel(level);
+			}
+		}
 	}
 
 	@Override
@@ -244,9 +255,21 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 	@Override
 	public void notifyClicked(LevelListenable listenable) {
 		if (!(listenable instanceof TronSeekbar2d)) {
-			EffectParam param = getParam(listenable.getId());
+			int paramNum = listenable.getId();
+			EffectParam param = effect.getParam(paramNum);
 			param.beatSync = ((TronKnob) listenable).isBeatSync();
 			listenable.setLevel(param.viewLevel);
+			if (effect.paramsLinked()) {
+				if (paramNum == 0) {
+					effect.getParam(1).beatSync = param.beatSync;
+					paramControls.get(1).getKnob().setBeatSync(param.beatSync);
+					paramControls.get(1).getKnob().setLevel(param.viewLevel);
+				} else if (paramNum == 1) {
+					effect.getParam(0).beatSync = param.beatSync;
+					paramControls.get(0).getKnob().setBeatSync(param.beatSync);
+					paramControls.get(0).getKnob().setLevel(param.viewLevel);
+				}
+			}
 		}
 	}
 
@@ -259,163 +282,25 @@ public abstract class EffectActivity extends Activity implements LevelListener, 
 		refresh.post(new Runnable() {
 			public void run() {
 				if (!(listenable instanceof TronSeekbar2d)) {
-					EffectParam param = getParam(listenable.getId());
+					EffectParam param = effect.getParam(listenable.getId());
 					listenable.setLevel(param.viewLevel);
 				}
 			}
 		});
-	}
-
-	protected static void setParamLevel(EffectParam param, float level) {
-		if (param.beatSync) {
-			quantizeToBeat(param, level);
-		} else if (param.logScale) {
-			logScaleLevel(param, level);
-		} else {
-			param.level = level;
-		}
-	}
-
-	protected static void logScaleLevel(EffectParam param, float level) {
-		param.level = (float) (Math.pow(9, level) - 1) / 8;
-		if (param.hz)
-			param.level *= 32;
-	}
-
-	private static int getTopBeatNum(int which) {
-		switch(which) {
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4: return 1;
-		case 5: return 3;
-		case 6: return 1;
-		case 7: return 5;
-		case 8: return 1;
-		case 9: return 3;
-		case 10: return 1;
-		case 11: return 3;
-		case 12: return 1;
-		case 13: return 3;
-		case 14: return 2;
-		default: return 1;
+		if (effect.paramsLinked() && !(listenable instanceof TronSeekbar2d)) {
+			EffectParam param = effect.getParam(listenable.getId());
+			((TronKnob)listenable).setBeatSync(param.beatSync);
 		}
 	}
 	
-	private static int getBottomBeatNum(int which) {
-		switch(which) {
-		case 0:
-		case 1: return 16;
-		case 2: return 12;
-		case 3: return 8;
-		case 4: return 6;
-		case 5: return 16;
-		case 6: return 4;
-		case 7: return 16;
-		case 8: return 3;
-		case 9: return 8;
-		case 10: return 2;
-		case 11: return 4;
-		case 12: return 1;
-		case 13: return 2;
-		case 14: return 1;
-		default: return 1;
+	public void selectFilterMode(View view) {
+		for (int i = 0; i < filterButtons.length; i++) {
+			if (view.equals(filterButtons[i])) {
+				((Filter)effect).setFilterOn(i);
+				filterButtons[i].setChecked(true);
+			}
+			else
+				filterButtons[i].setChecked(false);
 		}
 	}
-	
-	protected static void quantizeToBeat(EffectParam param, float level) {
-		param.topBeatNum = getTopBeatNum((int)FloatMath.ceil(level * 14));
-		param.bottomBeatNum = getBottomBeatNum((int)FloatMath.ceil(level * 14));
-		param.level = (60f / (MidiManager.getBPM()) * ((float)param.topBeatNum / (float)param.bottomBeatNum));
-		if (param.hz)
-			param.level = 1 / param.level;
-	}
-
-	public static void setEffectOnNative(boolean on) {
-		switch (EFFECT_NUM) {
-		case GlobalVars.CHORUS_EFFECT_NUM:
-			setChorusOn(trackNum, on);
-			return;
-		case GlobalVars.DECIMATE_EFFECT_NUM:
-			setDecimateOn(trackNum, on);
-			return;
-		case GlobalVars.DELAY_EFFECT_NUM:
-			setDelayOn(trackNum, on);
-			return;
-		case GlobalVars.FILTER_EFFECT_NUM:
-			setFilterOn(trackNum, on, GlobalVars.filterMode[trackNum]);
-			return;
-		case GlobalVars.FLANGER_EFFECT_NUM:
-			setFlangerOn(trackNum, on);
-			return;
-		case GlobalVars.REVERB_EFFECT_NUM:
-			setReverbOn(trackNum, on);
-			return;
-		case GlobalVars.TREMELO_EFFECT_NUM:
-			setTremeloOn(trackNum, on);
-			return;
-		}
-	}
-
-	public static void setParamNative(int paramNum, float paramLevel) {
-		switch (EFFECT_NUM) {
-		case GlobalVars.CHORUS_EFFECT_NUM:
-			setChorusParam(trackNum, paramNum, paramLevel);
-			return;
-		case GlobalVars.DECIMATE_EFFECT_NUM:
-			setDecimateParam(trackNum, paramNum, paramLevel);
-			return;
-		case GlobalVars.DELAY_EFFECT_NUM:
-			setDelayParam(trackNum, paramNum, paramLevel);
-			return;
-		case GlobalVars.FILTER_EFFECT_NUM:
-			setFilterParam(trackNum, paramNum, paramLevel);
-			return;
-		case GlobalVars.FLANGER_EFFECT_NUM:
-			setFlangerParam(trackNum, paramNum, paramLevel);
-			return;
-		case GlobalVars.REVERB_EFFECT_NUM:
-			setReverbParam(trackNum, paramNum, paramLevel);
-			return;
-		case GlobalVars.TREMELO_EFFECT_NUM:
-			setTremeloParam(trackNum, paramNum, paramLevel);
-			return;
-		}
-	}
-
-	public static native void setChorusOn(int trackNum, boolean on);
-
-	public static native void setChorusParam(int trackNum, int paramNum,
-			float param);
-
-	public static native void setDecimateOn(int trackNum, boolean on);
-
-	public static native void setDecimateParam(int trackNum, int paramNum,
-			float param);
-
-	public static native void setDelayOn(int trackNum, boolean on);
-
-	public static native void setDelayParam(int trackNum, int paramNum,
-			float param);
-
-	public static native void setFilterOn(int trackNum, boolean on, int mode);
-
-	public static native void setFilterParam(int trackNum, int paramNum,
-			float param);
-
-	public static native void setFlangerOn(int trackNum, boolean on);
-
-	public static native void setFlangerParam(int trackNum, int paramNum,
-			float param);
-
-	public static native void setReverbOn(int trackNum, boolean on);
-
-	public static native void setReverbParam(int trackNum, int paramNum,
-			float param);
-
-	public static native void setTremeloOn(int trackNum, boolean on);
-
-	public static native void setTremeloParam(int trackNum, int paramNum,
-			float param);
 }
