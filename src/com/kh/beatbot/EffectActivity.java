@@ -72,7 +72,6 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 	}
 	
 	private View initEffectLayout(ViewGroup parent) {
-		
 		View effectParamLayout = LayoutInflater.from(getBaseContext()).inflate(
 				effect.getParamLayoutId(), parent, false);
 		View effectToggleButton = initEffectToggleButton(parent);
@@ -114,9 +113,9 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE); // remove title bar
-		int effectNum = getIntent().getExtras().getInt("effectNum");
+		int effectId = getIntent().getExtras().getInt("effectId");
 		int trackNum = getIntent().getExtras().getInt("trackNum");
-		effect = GlobalVars.effects[trackNum].get(effectNum);
+		effect = GlobalVars.findEffect(effectId, trackNum);
 		setContentView(R.layout.effect_layout);
 		ViewGroup parent = (ViewGroup) findViewById(R.id.effect_layout);
 		View paramWrapperLayout = initEffectLayout(parent);

@@ -1,8 +1,10 @@
 package com.kh.beatbot.effect;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.util.FloatMath;
 
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.MidiManager;
 
 public abstract class Effect {
@@ -22,7 +24,9 @@ public abstract class Effect {
 		}
 	}
 	
-	public int effectNum;
+	protected List<EffectParam> params = new ArrayList<EffectParam>();
+	
+	public int id;
 	protected int trackNum;
 	protected int numParams;
 	
@@ -30,12 +34,12 @@ public abstract class Effect {
 	public boolean on = false;
 	protected boolean paramsLinked = false;
 	
-	public Effect(String name, int trackNum) {
+	public Effect(int id, String name, int trackNum) {
+		this.id = id;
 		this.name = name;
 		this.trackNum = trackNum;
-		this.effectNum = GlobalVars.effects[trackNum].size();
-		GlobalVars.effects[trackNum].add(this);
 		initParams();
+		setOn(true);
 	}
 	
 	public void setOn(boolean on) {
@@ -60,7 +64,7 @@ public abstract class Effect {
 	}
 	
 	public EffectParam getParam(int paramNum) {
-		return GlobalVars.params[trackNum][effectNum].get(paramNum);
+		return params.get(paramNum);
 	}
 	
 	public String getParamValueString(int paramNum) {

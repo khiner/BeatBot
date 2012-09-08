@@ -6,20 +6,20 @@ import com.kh.beatbot.manager.PlaybackManager;
 
 public class Filter extends Effect {
 	
-	public Filter(String name, int trackNum) {
-		super(name, trackNum);
+	public Filter(int id, String name, int trackNum) {
+		super(id, name, trackNum);
 	}
 
 	@Override
 	public void initParams() {
 		numParams = 4;
-		if (GlobalVars.params[trackNum][effectNum].isEmpty()) {
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(true, false, "Hz"));
+		if (params.isEmpty()) {
+			params.add(new EffectParam(true, false, "Hz"));
 			getParam(0).scale = PlaybackManager.SAMPLE_RATE / 2;
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(true, true, "Hz"));
+			params.add(new EffectParam(false, false, ""));
+			params.add(new EffectParam(true, true, "Hz"));
 			getParam(2).hz = true;
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
+			params.add(new EffectParam(false, false, ""));
 		}
 	}
 

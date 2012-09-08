@@ -1,25 +1,24 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.GlobalVars;
 
 public class Flanger extends Effect {
 
-	public Flanger(String name, int trackNum) {
-		super(name, trackNum);
+	public Flanger(int id, String name, int trackNum) {
+		super(id, name, trackNum);
 	}
 
 	@Override
 	public void initParams() {
 		numParams = 6;
-		if (GlobalVars.params[trackNum][effectNum].isEmpty()) {
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(true, false, "ms"));
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(true, true, "Hz"));
+		if (params.isEmpty()) {
+			params.add(new EffectParam(true, false, "ms"));
+			params.add(new EffectParam(false, false, ""));
+			params.add(new EffectParam(false, false, ""));
+			params.add(new EffectParam(true, true, "Hz"));
 			getParam(3).hz = true;
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
+			params.add(new EffectParam(false, false, ""));
+			params.add(new EffectParam(false, false, ""));
 		}
 	}
 

@@ -1,20 +1,19 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.GlobalVars;
 
 public class Decimate extends Effect {
 
-	public Decimate(String name, int trackNum) {
-		super(name, trackNum);
+	public Decimate(int id, String name, int trackNum) {
+		super(id, name, trackNum);
 	}
 
 	@Override
 	protected void initParams() {
 		numParams = 2;
-		if (GlobalVars.params[trackNum][effectNum].isEmpty()) {
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(true, false, "Hz"));
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(true, false, "Bits"));
+		if (params.isEmpty()) {
+			params.add(new EffectParam(true, false, "Hz"));
+			params.add(new EffectParam(true, false, "Bits"));
 		}
 	}
 	

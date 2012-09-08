@@ -40,17 +40,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		public void labelListInitialized(LabelListListenable labelList) {
 			
 		}
-		
-		@Override
-		public int labelAdded(int labelNum) {
-			
-			return 0;
-		}
-
-		@Override
-		public void labelRemoved(int id) {
-
-		}
 
 		@Override
 		public void labelMoved(int id, int oldPosition, int newPosition) {
@@ -58,7 +47,12 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 
 		@Override
-		public void labelSelected(int id) {
+		public void labelClicked(int id, String text) {
+			
+		}
+
+		@Override
+		public void labelLongClicked(int id) {
 			
 		}
 	}
@@ -66,14 +60,15 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	class EffectLabelListListener implements LabelListListener {
 		private AlertDialog chooseEffectAlert = null;
 		private LabelListListenable labelList;
+		private int lastClickedId = -1;
 		
 		EffectLabelListListener(Context c) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(c);
 			builder.setTitle("Choose Effect");
 			builder.setItems(effectNames, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-					labelList.addLabel(effectNames[item], item);
-					launchEffectIntent(effectNames[item]);
+					labelList.setLabelText(lastClickedId, effectNames[item]);
+					launchEffectIntent(effectNames[item], lastClickedId);
 				}
 			});
 			chooseEffectAlert = builder.create();
@@ -83,25 +78,25 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		public void labelListInitialized(LabelListListenable labelList) {
 			this.labelList = labelList;
 		}
-		
-		@Override
-		public int labelAdded(int labelNum) {
-			chooseEffectAlert.show();
-			return 0;
-		}
-
-		@Override
-		public void labelRemoved(int id) {
-
-		}
 
 		@Override
 		public void labelMoved(int id, int oldPosition, int newPosition) {
+			
 		}
 
 		@Override
-		public void labelSelected(int id) {
+		public void labelClicked(int id, String text) {
+			lastClickedId = id;
+			if (text.isEmpty()) {
+				chooseEffectAlert.show();
+			} else {
+				launchEffectIntent(text, id);
+			}
+		}
 
+		@Override
+		public void labelLongClicked(int id) {
+			
 		}
 	}
 	
@@ -149,7 +144,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 	
 	public static void quantizeEffectParams() {
-		for (int trackNum = 0; trackNum < GlobalVars.params.length; trackNum++) {
+		for (int trackNum = 0; trackNum < GlobalVars.numTracks; trackNum++) {
 			for (Effect effect : GlobalVars.effects[trackNum]) {
 				for (int paramNum = 0; paramNum < effect.getNumParams(); paramNum++) { 
 					EffectParam param = effect.getParam(paramNum);
@@ -180,26 +175,33 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		sampleWaveformView.setSamples(normalize(trackNum));
 	}
 
-	private void launchEffectIntent(String effectName) {
+	private Effect getEffect(String effectName, int effectId) {
+		Effect effect = GlobalVars.findEffect(effectId, trackNum);
+		if (effect != null)
+			return effect;
+		if (effectName.equals(getString(R.string.decimate)))
+			effect = new Decimate(effectId, effectName, trackNum);
+		else if (effectName.equals(getString(R.string.chorus)))
+			effect = new Chorus(effectId, effectName, trackNum);
+		else if (effectName.equals(getString(R.string.delay)))
+			effect = new Delay(effectId, effectName, trackNum);
+		else if (effectName.equals(getString(R.string.flanger)))
+			effect = new Flanger(effectId, effectName, trackNum);
+		else if (effectName.equals(getString(R.string.filter)))
+			effect = new Filter(effectId, effectName, trackNum);
+		else if (effectName.equals(getString(R.string.reverb)))
+			effect = new Reverb(effectId, effectName, trackNum);
+		else if (effectName.equals(getString(R.string.tremelo)))
+			effect = new Tremelo(effectId, effectName, trackNum);
+		GlobalVars.effects[trackNum].add(effect);
+		return effect;
+	}
+	
+	private void launchEffectIntent(String effectName, int effectId) {
+		Effect effect = getEffect(effectName, effectId);
 		Intent intent = new Intent();
 		intent.setClass(this, EffectActivity.class);
-		Effect effect = null;
-		if (effectName.equals(getString(R.string.decimate)))
-			effect = new Decimate(effectName, trackNum);
-		else if (effectName.equals(getString(R.string.chorus)))
-			effect = new Chorus(effectName, trackNum);
-		else if (effectName.equals(getString(R.string.delay)))
-			effect = new Delay(effectName, trackNum);
-		else if (effectName.equals(getString(R.string.flanger)))
-			effect = new Flanger(effectName, trackNum);
-		else if (effectName.equals(getString(R.string.filter)))
-			effect = new Filter(effectName, trackNum);
-		else if (effectName.equals(getString(R.string.reverb)))
-			effect = new Reverb(effectName, trackNum);
-		else if (effectName.equals(getString(R.string.tremelo)))
-			effect = new Tremelo(effectName, trackNum);
-		
-		intent.putExtra("effectNum", effect.effectNum);
+		intent.putExtra("effectId", effect.id);
 		intent.putExtra("trackNum", trackNum);
 
 		startActivity(intent);

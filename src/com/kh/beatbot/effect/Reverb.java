@@ -1,20 +1,19 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.GlobalVars;
 
 public class Reverb extends Effect {
 
-	public Reverb(String name, int trackNum) {
-		super(name, trackNum);
+	public Reverb(int id, String name, int trackNum) {
+		super(id, name, trackNum);
 	}
 
 	@Override
 	public void initParams() {
 		numParams = 2;
-		if (GlobalVars.params[trackNum][effectNum].isEmpty()) {
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
+		if (params.isEmpty()) {
+			params.add(new EffectParam(false, false, ""));
+			params.add(new EffectParam(false, false, ""));
 		}
 	}
 

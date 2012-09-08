@@ -1,24 +1,23 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.GlobalVars;
 
 public class Chorus extends Effect {
 
-	public Chorus(String name, int trackNum) {
-		super(name, trackNum);
+	public Chorus(int id, String name, int trackNum) {
+		super(id, name, trackNum);
 	}
 
 	@Override
 	protected void initParams() {
 		numParams = 5;	
-		if (GlobalVars.params[trackNum][effectNum].isEmpty()) {
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(true, true, "Hz"));
+		if (params.isEmpty()) {
+			params.add(new EffectParam(true, true, "Hz"));
 			getParam(0).hz = true;
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(true, true, "ms"));
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
+			params.add(new EffectParam(false, false, ""));
+			params.add(new EffectParam(false, false, ""));
+			params.add(new EffectParam(true, true, "ms"));
+			params.add(new EffectParam(false, false, ""));
 		}
 	}
 

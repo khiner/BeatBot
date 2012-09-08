@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.effect.Effect.EffectParam;
 
 
 public class GlobalVars {
@@ -28,7 +27,6 @@ public class GlobalVars {
 	// because the activities are destroyed after clicking 'back', and we
 	// need to persist state
 	public static List<Effect>[] effects;
-	public static List<EffectParam>[][] params;
 
 	public static int     numTracks;
 	public static int[]   filterMode;
@@ -55,7 +53,6 @@ public class GlobalVars {
 	
 	public static void init(int numTracks) {
 		GlobalVars.numTracks = numTracks;
-		params = (ArrayList<EffectParam>[][]) new ArrayList[numTracks][NUM_EFFECTS];
 		effects = (ArrayList<Effect>[]) new ArrayList[numTracks];
 		filterMode = new int[numTracks];
 		trackVolume = new float[numTracks];
@@ -71,9 +68,15 @@ public class GlobalVars {
 			trackVolume[track] = .8f;
 			trackPan[track] = trackPitch[track] = .5f;
 			effects[track] = new ArrayList<Effect>();
-			for (int effect = 0; effect < NUM_EFFECTS; effect++) {
-				params[track][effect] = new ArrayList<EffectParam>();
+		}
+	}
+	
+	public static Effect findEffect(int effectId, int trackNum) {
+		for (Effect effect : GlobalVars.effects[trackNum]) {
+			if (effect.id == effectId) {
+				return effect;
 			}
 		}
+		return null;
 	}
 }

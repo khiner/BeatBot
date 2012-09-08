@@ -1,11 +1,10 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.GlobalVars;
 
 public class Delay extends Effect {
-	public Delay(String name, int trackNum) {
-		super(name, trackNum);
+	public Delay(int id, String name, int trackNum) {
+		super(id, name, trackNum);
 		paramsLinked = true;
 	}
 	
@@ -18,11 +17,11 @@ public class Delay extends Effect {
 	@Override
 	public void initParams() {
 		numParams = 4;
-		if (GlobalVars.params[trackNum][effectNum].isEmpty()) {
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(true, true, "ms"));
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(true, true, "ms"));
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
+		if (params.isEmpty()) {
+			params.add(new EffectParam(true, true, "ms"));
+			params.add(new EffectParam(true, true, "ms"));
+			params.add(new EffectParam(false, false, ""));
+			params.add(new EffectParam(false, false, ""));
 		}
 	}
 

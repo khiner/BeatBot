@@ -1,22 +1,21 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.GlobalVars;
 
 public class Tremelo extends Effect {
 
-	public Tremelo(String name, int trackNum) {
-		super(name, trackNum);
+	public Tremelo(int id, String name, int trackNum) {
+		super(id, name, trackNum);
 	}
 
 	@Override
 	public void initParams() {
 		numParams = 3;
-		if (GlobalVars.params[trackNum][effectNum].isEmpty()) {
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(true, true, "Hz"));
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
+		if (params.isEmpty()) {
+			params.add(new EffectParam(true, true, "Hz"));
+			params.add(new EffectParam(false, false, ""));
 			getParam(0).hz = true;
-			GlobalVars.params[trackNum][effectNum].add(new EffectParam(false, false, ""));
+			params.add(new EffectParam(false, false, ""));
 		}
 	}
 
