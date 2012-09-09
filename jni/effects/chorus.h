@@ -15,8 +15,8 @@ typedef struct ChorusConfig_t {
 	float modAmt; // modulation depth
 } ChorusConfig;
 
-ChorusConfig *chorusconfig_create(float modFreq, float modAmt);
-void chorusconfig_set(void *p, float modFreq, float modAmt);
+ChorusConfig *chorusconfig_create();
+void chorusconfig_setParam(void *p, float paramNum, float param);
 
 void chorusconfig_setBaseTime(ChorusConfig *config, float baseTime);
 void chorusconfig_setFeedback(ChorusConfig *config, float feedback);

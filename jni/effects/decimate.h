@@ -10,8 +10,9 @@ typedef struct DecimateConfig_t {
 	int bits; // 4-32
 } DecimateConfig;
 
-DecimateConfig *decimateconfig_create(float bits, float rate);
+DecimateConfig *decimateconfig_create();
 void decimateconfig_set(void *p, float bits, float rate);
+void decimateconfig_setParam(void *p, float paramNum, float param);
 
 static inline void decimate_process(DecimateConfig *config, float **buffers, int size) {
 	int m = 1 << (config->bits - 1);

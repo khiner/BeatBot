@@ -29,7 +29,6 @@ public class GlobalVars {
 	public static List<Effect>[] effects;
 
 	public static int     numTracks;
-	public static int[]   filterMode;
 	public static float[] trackVolume;
 	public static float[] trackPan;
 	public static float[] trackPitch;
@@ -54,7 +53,6 @@ public class GlobalVars {
 	public static void init(int numTracks) {
 		GlobalVars.numTracks = numTracks;
 		effects = (ArrayList<Effect>[]) new ArrayList[numTracks];
-		filterMode = new int[numTracks];
 		trackVolume = new float[numTracks];
 		trackPan = new float[numTracks];
 		trackPitch = new float[numTracks];
@@ -64,7 +62,6 @@ public class GlobalVars {
 		for (int track = 0; track < numTracks; track++) {
 			initDefaultAdsrPoints(track);
 			sampleLoopBegin[track] = sampleLoopEnd[track] = 0;
-			filterMode[track] = 0;
 			trackVolume[track] = .8f;
 			trackPan[track] = trackPitch[track] = .5f;
 			effects[track] = new ArrayList<Effect>();
@@ -73,7 +70,7 @@ public class GlobalVars {
 	
 	public static Effect findEffect(int effectId, int trackNum) {
 		for (Effect effect : GlobalVars.effects[trackNum]) {
-			if (effect.id == effectId) {
+			if (effect.getId() == effectId) {
 				return effect;
 			}
 		}

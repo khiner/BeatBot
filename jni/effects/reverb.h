@@ -132,8 +132,8 @@ static inline float comb_process(comb_state *c, float feedback, float hfDamp,
 	return val;
 }
 
-ReverbConfig *reverbconfig_create(float feedback, float hfDamp);
-void reverbconfig_set(void *config, float feedback, float hfDamp);
+ReverbConfig *reverbconfig_create();
+void reverbconfig_setParam(void *p, float paramNum, float param);
 
 static inline void reverb_process(ReverbConfig *config, float **buffers, int size) {
 	float out, val = 0;

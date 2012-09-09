@@ -8,7 +8,7 @@ typedef struct VolumePanConfig_t {
 	float pan;
 } VolumePanConfig;
 
-VolumePanConfig *volumepanconfig_create(float volume, float pan);
+VolumePanConfig *volumepanconfig_create();
 void volumepanconfig_set(void *config, float volume, float pan);
 
 static inline void volumepan_process(VolumePanConfig *config, float **buffers, int size) {

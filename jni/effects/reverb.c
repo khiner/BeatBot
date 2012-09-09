@@ -47,19 +47,12 @@ static ReverbState *initReverbState() {
 	return r;
 }
 
-ReverbConfig *reverbconfig_create(float feedback, float hfDamp) {
+ReverbConfig *reverbconfig_create() {
 	ReverbConfig *config = (ReverbConfig *) malloc(sizeof(ReverbConfig));
 	config->state = initReverbState();
-	config->feedback = feedback;
-	config->hfDamp = hfDamp;
-
+	config->feedback = .5f;
+	config->hfDamp = .5f;
 	return config;
-}
-
-void reverbconfig_set(void *p, float feedback, float hfDamp) {
-	ReverbConfig *config = (ReverbConfig *) p;
-	config->feedback = feedback;
-	config->hfDamp = hfDamp;
 }
 
 void reverbconfig_destroy(void *p) {
@@ -70,18 +63,9 @@ void reverbconfig_destroy(void *p) {
 	config = NULL;
 }
 
-/********* JNI METHODS **********/
-void Java_com_kh_beatbot_effect_Reverb_setReverbOn(JNIEnv *env, jclass clazz,
-		jint trackNum, jboolean on) {
-	Track *track = getTrack(env, clazz, trackNum);
-	Effect *reverb = &(track->effects[REVERB_ID]);
-	reverb->on = on;
-}
-
-void Java_com_kh_beatbot_effect_Reverb_setReverbParam(JNIEnv *env,
-		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
-	Track *track = getTrack(env, clazz, trackNum);
-	ReverbConfig *config = (ReverbConfig *) track->effects[REVERB_ID].config;
+void reverbconfig_setParam(void *p, float paramNumFloat, float param) {
+	int paramNum = (int)paramNumFloat;
+	ReverbConfig *config = (ReverbConfig *) p;
 	if (paramNum == 0) { // feedback
 		config->feedback = param;
 	} else if (paramNum == 1) { // hf damp

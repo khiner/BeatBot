@@ -41,9 +41,9 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 			LinearLayout filterTypesLayout = (LinearLayout)LayoutInflater.from(getBaseContext()).inflate(
 					R.layout.filter_types_layout, parent, false);
 			filterButtons[0] = (ToggleButton)filterTypesLayout.findViewById(R.id.lp_toggle);
-			filterButtons[1] = (ToggleButton)filterTypesLayout.findViewById(R.id.bp_toggle);
-			filterButtons[2] = (ToggleButton)filterTypesLayout.findViewById(R.id.hp_toggle);
-			filterButtons[((Filter)effect).getFilterMode()].setChecked(true);
+			filterButtons[1] = (ToggleButton)filterTypesLayout.findViewById(R.id.hp_toggle);
+			filterButtons[2] = (ToggleButton)filterTypesLayout.findViewById(R.id.bp_toggle);
+			filterButtons[((Filter)effect).getMode()].setChecked(true);
 			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
 					RelativeLayout.LayoutParams.WRAP_CONTENT);
 			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
@@ -295,7 +295,7 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 	public void selectFilterMode(View view) {
 		for (int i = 0; i < filterButtons.length; i++) {
 			if (view.equals(filterButtons[i])) {
-				((Filter)effect).setFilterOn(i);
+				((Filter)effect).setMode(i);
 				filterButtons[i].setChecked(true);
 			}
 			else

@@ -56,7 +56,7 @@ void resetAdsr(AdsrConfig *config) {
 void Java_com_kh_beatbot_view_SampleWaveformView_setAdsrPoint(JNIEnv *env,
 		jclass clazz, jint trackNum, jint adsrPointNum, jfloat x, jfloat y) {
 	Track *track = getTrack(env, clazz, trackNum);
-	AdsrConfig *config = (AdsrConfig *) track->effects[ADSR_ID].config;
+	AdsrConfig *config = (AdsrConfig *) track->adsr->config;
 	config->adsrPoints[adsrPointNum].sampleCents = x;
 	if (adsrPointNum == 0)
 		config->initial = y;
@@ -72,5 +72,5 @@ void Java_com_kh_beatbot_view_SampleWaveformView_setAdsrPoint(JNIEnv *env,
 void Java_com_kh_beatbot_SampleEditActivity_setAdsrOn(JNIEnv *env, jclass clazz,
 		jint trackNum, jboolean on) {
 	Track *track = getTrack(env, clazz, trackNum);
-	track->effects[ADSR_ID].on = on;
+	track->adsr->on = on;
 }

@@ -5,7 +5,6 @@ import com.kh.beatbot.R;
 public class Delay extends Effect {
 	public Delay(int id, String name, int trackNum) {
 		super(id, name, trackNum);
-		paramsLinked = true;
 	}
 	
 	// keep track of what right channel was before linking
@@ -16,7 +15,9 @@ public class Delay extends Effect {
 	
 	@Override
 	public void initParams() {
+		paramsLinked = true;
 		numParams = 4;
+		effectNum = 2;
 		if (params.isEmpty()) {
 			params.add(new EffectParam(true, true, "ms"));
 			params.add(new EffectParam(true, true, "ms"));
@@ -41,23 +42,8 @@ public class Delay extends Effect {
 	}
 	
 	@Override
-	public void setEffectOnNative(boolean on) {
-		setDelayOn(trackNum, on);
-	}
-	
-	@Override
-	public void setParamNative(int paramNum, float paramLevel) {
-		setDelayParam(trackNum, paramNum, paramLevel);
-	}
-	
-	@Override
 	public void setParamsLinked(boolean linked) {
 		super.setParamsLinked(linked);
-		setDelayLinkChannels(trackNum, linked);
+		setEffectParam(trackNum, id, 4, linked ? 1 : 0);
 	}
-	
-	public static native void setDelayOn(int trackNum, boolean on);
-	public static native void setDelayParam(int trackNum, int paramNum,
-			float param);
-	public static native void setDelayLinkChannels(int trackNum, boolean link);
 }

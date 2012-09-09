@@ -72,6 +72,7 @@ MidiEvent* initEvent(long onTick, long offTick, float volume, float pan,
 void initTrack(Track *track, AAsset *asset) {
 	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
 	track->num = trackCount;
+	track->effectHead = NULL;
 	track->nextEventNode = NULL;
 	track->nextStartSample = track->nextStopSample = -1;
 	track->currBufferFloat = (float **) malloc(2 * sizeof(float *));
@@ -87,44 +88,18 @@ void initTrack(Track *track, AAsset *asset) {
 	track->generator = malloc(sizeof(Generator));
 	initGenerator(track->generator, wavfile_create(asset), wavfile_reset,
 			wavfile_generate, wavfile_destroy);
-	initEffect(&(track->effects[VOL_PAN_ID]), true,
-			volumepanconfig_create(.8f, .5f), volumepanconfig_set,
-			volumepan_process, volumepanconfig_destroy);
-	initEffect(&(track->effects[PITCH_ID]), false, pitchconfig_create(),
+	track->volPan = initEffect(-1, true, volumepanconfig_create(),
+			volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
+	track->pitch = initEffect(-1, false, pitchconfig_create(),
 			pitchconfig_setShift, pitch_process, pitchconfig_destroy);
-	initEffect(&(track->effects[DECIMATE_ID]), false,
-			decimateconfig_create(4.0f, 0.5f), decimateconfig_set,
-			decimate_process, decimateconfig_destroy);
-	initEffect(&(track->effects[TREMELO_ID]), false,
-			tremeloconfig_create(0.5f, 0.5f), tremeloconfig_set,
-			tremelo_process, tremeloconfig_destroy);
-	initEffect(&(track->effects[LP_FILTER_ID]), false,
-			filterconfig_create(0.5f, 0.5f, true), filterconfig_set,
-			filter_process, filterconfig_destroy);
-	initEffect(&(track->effects[HP_FILTER_ID]), false,
-			filterconfig_create(0.5f, 0.5f, false), filterconfig_set,
-			filter_process, filterconfig_destroy);
-	initEffect(&(track->effects[CHORUS_ID]), false,
-			chorusconfig_create(.5f, .5f), chorusconfig_set, chorus_process,
-			chorusconfig_destroy);
-//  	initEffect(&(track->effects[DYNAMIC_PITCH_ID]), false, true, pitchconfig_create(),
-//  			   pitchconfig_setShift, pitch_process, pitchconfig_destroy);
-	initEffect(&(track->effects[DELAY_ID]), false,
-			delayconfigi_create(.5f, .5f, (int) (SAMPLE_RATE * 1.5)),
-			delayconfigi_set, delayi_process, delayconfigi_destroy);
-	initEffect(&(track->effects[FLANGER_ID]), false, flangerconfig_create(),
-			flangerconfig_set, flanger_process, flangerconfig_destroy);
-	initEffect(&(track->effects[REVERB_ID]), false,
-			reverbconfig_create(.5f, .5f), reverbconfig_set, reverb_process,
-			reverbconfig_destroy);
-	initEffect(&(track->effects[ADSR_ID]), false,
+	track->adsr = initEffect(-1, true,
 			adsrconfig_create(
 					((WavFile *) (track->generator->config))->totalSamples),
 			NULL, adsr_process, adsrconfig_destroy);
 }
 
-static inline void interleaveFloatsToShorts(float left[], float right[], short interleaved[],
-		int size) {
+static inline void interleaveFloatsToShorts(float left[], float right[],
+		short interleaved[], int size) {
 	int i;
 	for (i = 0; i < size; i++) {
 		interleaved[i * 2] = left[i] * CONV16BIT;
@@ -133,11 +108,15 @@ static inline void interleaveFloatsToShorts(float left[], float right[], short i
 }
 
 static inline void processEffects(Track *track) {
-	int i;
-	for (i = 0; i < NUM_EFFECTS; i++) {
-		Effect effect = track->effects[i];
-		if (effect.on)
-			effect.process(effect.config, track->currBufferFloat, BUFF_SIZE);
+	track->volPan->process(track->volPan->config,
+						track->currBufferFloat, BUFF_SIZE);
+	EffectNode *effectNode = track->effectHead;
+	while (effectNode != NULL) {
+		if (effectNode->effect != NULL && effectNode->effect->on) {
+			effectNode->effect->process(effectNode->effect->config,
+					track->currBufferFloat, BUFF_SIZE);
+		}
+		effectNode = effectNode->next;
 	}
 }
 
@@ -195,11 +174,11 @@ void updateNextEvent(Track *track) {
 }
 
 void soundTrack(Track *track) {
-	track->effects[VOL_PAN_ID].set(track->effects[VOL_PAN_ID].config,
+	track->volPan->set(track->volPan->config,
 			track->primaryVolume * track->noteVolume,
 			track->primaryPan * track->notePan);
 	//pitchconfig_setShift((PitchConfig *)track->effects[DYNAMIC_PITCH_ID].config, pitch*2 - 1);
-	AdsrConfig *adsrConfig = (AdsrConfig *) track->effects[ADSR_ID].config;
+	AdsrConfig *adsrConfig = (AdsrConfig *) track->adsr->config;
 	adsrConfig->active = true;
 	resetAdsr(adsrConfig);
 	//if (track->outputPlayerPitch != NULL) {
@@ -209,7 +188,7 @@ void soundTrack(Track *track) {
 
 void stopSoundingTrack(Track *track) {
 	wavfile_reset((WavFile *) track->generator->config);
-	((AdsrConfig *) track->effects[ADSR_ID].config)->active = false;
+	((AdsrConfig *) track->adsr->config)->active = false;
 }
 
 void playTrack(Track *track) {
@@ -269,12 +248,14 @@ static inline void generateNextBuffer() {
 				stopTrack(track);
 			}
 			if (track->playing || track->previewing) {
-				wavfile_tick((WavFile *) track->generator->config, track->tempSample);
+				wavfile_tick((WavFile *) track->generator->config,
+						track->tempSample);
 			} else {
 				track->tempSample[0] = track->tempSample[1] = 0;
 			}
 			for (channel = 0; channel < 2; channel++) {
-				track->currBufferFloat[channel][samp] = track->tempSample[channel];
+				track->currBufferFloat[channel][samp] =
+						track->tempSample[channel];
 			}
 		}
 		if (openSlOut->armed)
@@ -617,10 +598,9 @@ void Java_com_kh_beatbot_manager_MidiManager_moveMidiNoteTicks(JNIEnv *env,
 
 void Java_com_kh_beatbot_manager_MidiManager_moveMidiNote(JNIEnv *env,
 		jclass clazz, jint trackNum, jlong tick, jint newTrackNum) {
-	if (trackNum < 0 || trackNum >= NUM_TRACKS ||
-			newTrackNum < 0 || newTrackNum >= NUM_TRACKS) {
-		return;
-	}
+	if (trackNum < 0|| trackNum >= NUM_TRACKS ||
+	newTrackNum < 0 || newTrackNum >= NUM_TRACKS) {return
+;	}
 	Track *prevTrack = getTrack(env, clazz, trackNum);
 	Track *newTrack = getTrack(env, clazz, newTrackNum);
 	MidiEvent *event = findEvent(prevTrack, tick);
@@ -697,7 +677,7 @@ void Java_com_kh_beatbot_SampleEditActivity_setPrimaryVolume(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat volume) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryVolume = volume;
-	track->effects[VOL_PAN_ID].set(track->effects[VOL_PAN_ID].config,
+	track->volPan->set(track->volPan->config,
 			track->primaryVolume * track->noteVolume,
 			track->primaryPan * track->notePan);
 }
@@ -706,7 +686,7 @@ void Java_com_kh_beatbot_SampleEditActivity_setPrimaryPan(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat pan) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryPan = pan;
-	track->effects[VOL_PAN_ID].set(track->effects[VOL_PAN_ID].config,
+	track->volPan->set(track->volPan->config,
 			track->primaryVolume * track->noteVolume,
 			track->primaryPan * track->notePan);
 }

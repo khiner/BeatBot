@@ -11,6 +11,7 @@ public class Flanger extends Effect {
 	@Override
 	public void initParams() {
 		numParams = 6;
+		effectNum = 4;
 		if (params.isEmpty()) {
 			params.add(new EffectParam(true, false, "ms"));
 			params.add(new EffectParam(false, false, ""));
@@ -20,11 +21,6 @@ public class Flanger extends Effect {
 			params.add(new EffectParam(false, false, ""));
 			params.add(new EffectParam(false, false, ""));
 		}
-	}
-
-	@Override
-	public void setParamNative(int paramNum, float paramLevel) {
-		setFlangerParam(trackNum, paramNum, paramLevel);
 	}
 	
 	@Override
@@ -41,13 +37,4 @@ public class Flanger extends Effect {
 	public int getOffDrawableId() {
 		return R.drawable.flanger_label_off;
 	}
-
-	@Override
-	public void setEffectOnNative(boolean on) {
-		setFlangerOn(trackNum, on);
-	}
-	
-	public static native void setFlangerOn(int trackNum, boolean on);
-	public static native void setFlangerParam(int trackNum, int paramNum,
-			float param);
 }

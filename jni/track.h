@@ -18,8 +18,9 @@ typedef struct OpenSlOut_ {
 } OpenSlOut;
 
 typedef struct Track_ {
-	Effect effects[NUM_EFFECTS];
 	float tempSample[2];
+	EffectNode *effectHead;
+	Effect *volPan, *pitch, *adsr;
 	float **currBufferFloat;
 	Generator *generator;
 	MidiEventNode *eventHead;
@@ -51,8 +52,8 @@ static inline Track *getTrack(JNIEnv *env, jclass clazz, int trackNum) {
 	return &tracks[trackNum];
 }
 
-static inline void freeLinkedList(MidiEventNode *head) {
-	MidiEventNode *cur_ptr = head;
+static inline void freeMidiEvents(Track *track) {
+	MidiEventNode *cur_ptr = track->eventHead;
 	while (cur_ptr != NULL) {
 		free(cur_ptr->event); // free the event
 		MidiEventNode *prev_ptr = cur_ptr;
@@ -61,20 +62,27 @@ static inline void freeLinkedList(MidiEventNode *head) {
 	}
 }
 
+static inline void freeEffects(Track *track) {
+	EffectNode *cur_ptr = track->effectHead;
+	while (cur_ptr != NULL) {
+		cur_ptr->effect->destroy(cur_ptr->effect->config);
+		EffectNode *prev_ptr = cur_ptr;
+		cur_ptr = cur_ptr->next;
+		free(prev_ptr); // free the entire Node
+	}
+}
+
 static inline void freeTracks() {
 	// destroy all tracks
-	int i, j;
+	int i;
 	for (i = 0; i < NUM_TRACKS; i++) {
 		Track *track = getTrack(NULL, NULL, i);
 		free(track->currBufferFloat[0]);
 		free(track->currBufferFloat[1]);
 		free(track->currBufferFloat);
 		track->generator->destroy(track->generator->config);
-		for (j = 0; j < NUM_EFFECTS; j++) {
-			track->effects[i].destroy(track->effects[i].config);
-		}
-		free(track->effects);
-		freeLinkedList(track->eventHead);
+		freeEffects(track);
+		freeMidiEvents(track);
 	}
 	free(openSlOut->currBufferFloat[0]);
 	free(openSlOut->currBufferFloat[1]);

@@ -1,19 +1,12 @@
 #include "tremelo.h"
 
-TremeloConfig *tremeloconfig_create(float freq, float depth) {
+TremeloConfig *tremeloconfig_create() {
 	TremeloConfig *config = malloc(sizeof(TremeloConfig));
 	config->mod[0] = sinewave_create();
 	config->mod[1] = sinewave_create();
-	tremeloconfig_setFrequency(config, freq);
-	tremeloconfig_setDepth(config, depth);
+	tremeloconfig_setFrequency(config, .5f);
+	tremeloconfig_setDepth(config, .5f);
 	return config;
-}
-
-void tremeloconfig_set(void *p, float freq, float depth) {
-	TremeloConfig *config = (TremeloConfig *)p;
-	sinewave_setFrequency(config->mod[0], freq);
-	sinewave_setFrequency(config->mod[1], freq);
-	config->depth = depth;
 }
 
 void tremeloconfig_setFrequency(TremeloConfig *config, float freq) {
@@ -36,19 +29,9 @@ void tremeloconfig_destroy(void *p) {
 	free(config);
 }
 
-
-/********* JNI METHODS **********/
-void Java_com_kh_beatbot_effect_Tremelo_setTremeloOn(JNIEnv *env,
-		jclass clazz, jint trackNum, jint on) {
-	Track *track = getTrack(env, clazz, trackNum);
-	Effect *tremelo = &(track->effects[TREMELO_ID]);
-	tremelo->on = on;
-}
-
-void Java_com_kh_beatbot_effect_Tremelo_setTremeloParam(JNIEnv *env,
-		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
-	Track *track = getTrack(env, clazz, trackNum);
-	TremeloConfig *config = (TremeloConfig*)track->effects[TREMELO_ID].config;
+void tremeloconfig_setParam(void *p, float paramNumFloat, float param) {
+	int paramNum = (int)paramNumFloat;
+	TremeloConfig *config = (TremeloConfig *)p;
 	if (paramNum == 0) { // mod frequency
 		tremeloconfig_setFrequency(config, param);
 	} else if (paramNum == 1) { // phase

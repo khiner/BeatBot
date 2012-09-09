@@ -150,7 +150,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 					EffectParam param = effect.getParam(paramNum);
 					if (param.beatSync) {
 						effect.setParamLevel(param, param.viewLevel);
-						effect.setParamNative(paramNum, param.viewLevel);
+						effect.setEffectParam(trackNum, effect.getId(), paramNum, param.viewLevel);
 					}
 				}
 			}
@@ -201,7 +201,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		Effect effect = getEffect(effectName, effectId);
 		Intent intent = new Intent();
 		intent.setClass(this, EffectActivity.class);
-		intent.putExtra("effectId", effect.id);
+		intent.putExtra("effectId", effect.getId());
 		intent.putExtra("trackNum", trackNum);
 
 		startActivity(intent);

@@ -16,7 +16,7 @@ typedef struct FlangerConfig_t {
 } FlangerConfig;
 
 FlangerConfig *flangerconfig_create();
-void flangerconfig_set(void *p, float delayTime, float feedback);
+void flangerconfig_setParam(void *p, float paramNum, float param);
 void flangerconfig_setBaseTime(FlangerConfig *config, float baseTime);
 void flangerconfig_setFeedback(FlangerConfig *config, float feedback);
 void flangerconfig_setModFreq(FlangerConfig *config, float modFreq);

@@ -18,28 +18,27 @@
 #define SAMPLE_RATE 44100.0f
 #define INV_SAMPLE_RATE 1.0f/44100.0f
 
-#define CHORUS_ID 2
-#define DECIMATE_ID 3
-#define DELAY_ID 4
-#define LP_FILTER_ID 5
-#define HP_FILTER_ID 6
-#define FLANGER_ID 7
-#define REVERB_ID 8
-#define TREMELO_ID 9
-
-#define VOL_PAN_ID 0
-#define PITCH_ID 1
-#define ADSR_ID 10
-
-#define NUM_EFFECTS 11
+#define CHORUS   0
+#define DECIMATE 1
+#define DELAY    2
+#define FILTER   3
+#define FLANGER  4
+#define REVERB   5
+#define TREMELO  6
 
 typedef struct Effect_t {
 	void *config;
 	void (*set)(void *, float, float);
 	void (*process)(void *, float **, int);
 	void (*destroy)(void *);
+	int id;
 	bool on;
 } Effect;
+
+typedef struct EffectNode_t {
+	Effect *effect;
+	struct EffectNode_t *next;
+} EffectNode;
 
 #include "../generators/generators.h"
 #include "../generators/wavfile.h"
@@ -47,7 +46,7 @@ typedef struct Effect_t {
 #include "track.h"
 #include "ticker.h"
 
-void initEffect(Effect *effect, bool on, void *config,
+Effect *initEffect(int id, bool on, void *config,
 		void (*set), void (*process), void (*destroy));
 
 void reverse(float buffer[], int begin, int end);

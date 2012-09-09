@@ -18,8 +18,8 @@ typedef struct DelayConfigI_t {
 	pthread_mutex_t mutex; // mutex since sets happen on a different thread than processing
 } DelayConfigI;
 
-DelayConfigI *delayconfigi_create(float delay, float feedback, int maxSamples);
-void delayconfigi_set(void *config, float delay, float feedback);
+DelayConfigI *delayconfigi_create();
+
 void delayconfigi_setFeedback(DelayConfigI *config, float feedback);
 
 static inline void delayconfigi_setDelaySamples(DelayConfigI *config,
@@ -101,6 +101,8 @@ static inline void delayi_process(DelayConfigI *config, float **buffers, int siz
 		pthread_mutex_unlock(&config->mutex);
 	}
 }
+
+void delayconfigi_setParam(void *p, float paramNumFloat, float param);
 
 void delayconfigi_destroy(void *p);
 

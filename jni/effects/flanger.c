@@ -5,19 +5,15 @@ FlangerConfig *flangerconfig_create() {
 			sizeof(FlangerConfig));
 	flangerConfig->delayConfig = delayconfigi_create(0.003f, 0.5f,
 			MAX_FLANGER_DELAY + 512);
-	flangerconfig_set(flangerConfig, 0.003f * SAMPLE_RATE, 0.5f);
+	float delayTimeInSamples = 0.003f * SAMPLE_RATE;
+	flangerconfig_setBaseTime(flangerConfig, delayTimeInSamples);
+	delayconfigi_setDelaySamples(flangerConfig->delayConfig, delayTimeInSamples,
+			delayTimeInSamples);
+	flangerconfig_setFeedback(flangerConfig, .5f);
 	flangerConfig->mod[0] = sinewave_create();
 	flangerConfig->mod[1] = sinewave_create();
 	flangerConfig->modAmt = .5f;
 	return flangerConfig;
-}
-
-void flangerconfig_set(void *p, float delayTimeInSamples, float feedback) {
-	FlangerConfig *config = (FlangerConfig *) p;
-	flangerconfig_setBaseTime(config, delayTimeInSamples);
-	delayconfigi_setDelaySamples(config->delayConfig, delayTimeInSamples,
-			delayTimeInSamples);
-	flangerconfig_setFeedback(config, feedback);
 }
 
 void flangerconfig_setBaseTime(FlangerConfig *config, float baseTime) {
@@ -48,18 +44,9 @@ void flangerconfig_destroy(void *p) {
 	free(config);
 }
 
-/********* JNI METHODS **********/
-void Java_com_kh_beatbot_effect_Flanger_setFlangerOn(JNIEnv *env, jclass clazz,
-		jint trackNum, jboolean on) {
-	Track *track = getTrack(env, clazz, trackNum);
-	Effect *flanger = &(track->effects[FLANGER_ID]);
-	flanger->on = on;
-}
-
-void Java_com_kh_beatbot_effect_Flanger_setFlangerParam(JNIEnv *env,
-		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
-	Track *track = getTrack(env, clazz, trackNum);
-	FlangerConfig *config = (FlangerConfig *) track->effects[FLANGER_ID].config;
+void flangerconfig_setParam(void *p, float paramNumFloat, float param) {
+	int paramNum = (int)paramNumFloat;
+	FlangerConfig *config = (FlangerConfig *) p;
 	if (paramNum == 0) { // delay time
 		flangerconfig_setBaseTime(config, param);
 	} else if (paramNum == 1) { // feedback

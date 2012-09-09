@@ -26,12 +26,13 @@ public abstract class Effect {
 	
 	protected List<EffectParam> params = new ArrayList<EffectParam>();
 	
-	public int id;
+	protected int id;
+	protected int effectNum;
 	protected int trackNum;
 	protected int numParams;
 	
 	public String name;
-	public boolean on = false;
+	public boolean on = true;
 	protected boolean paramsLinked = false;
 	
 	public Effect(int id, String name, int trackNum) {
@@ -39,12 +40,16 @@ public abstract class Effect {
 		this.name = name;
 		this.trackNum = trackNum;
 		initParams();
-		setOn(true);
+		addEffect(trackNum, effectNum, id);
 	}
 	
 	public void setOn(boolean on) {
 		this.on = on;
-		setEffectOnNative(on);
+		setEffectOn(trackNum, id, on);
+	}
+	
+	public int getId() {
+		return id;
 	}
 	
 	public String getName() {
@@ -79,7 +84,7 @@ public abstract class Effect {
 		EffectParam param = getParam(paramNum);
 		param.viewLevel = level;
 		setParamLevel(param, level);
-		setParamNative(paramNum, param.level);
+		setEffectParam(trackNum, id, paramNum, param.level);
 	}
 	
 	public void setParamLevel(EffectParam param, float level) {
@@ -148,8 +153,9 @@ public abstract class Effect {
 		}
 	}
 	
-	public abstract void setEffectOnNative(boolean on);
-	public abstract void setParamNative(int paramNum, float paramLevel);
+	public native void addEffect(int trackNum, int effectNum, int effectId);
+	public native void setEffectOn(int trackNum, int effectId, boolean on);
+	public native void setEffectParam(int trackNum, int effectId, int paramNum, float paramLevel);
 	
 	protected abstract void initParams();
 	public abstract int getParamLayoutId();

@@ -11,17 +11,13 @@ public class Tremelo extends Effect {
 	@Override
 	public void initParams() {
 		numParams = 3;
+		effectNum = 6;
 		if (params.isEmpty()) {
 			params.add(new EffectParam(true, true, "Hz"));
 			params.add(new EffectParam(false, false, ""));
 			getParam(0).hz = true;
 			params.add(new EffectParam(false, false, ""));
 		}
-	}
-
-	@Override
-	public void setParamNative(int paramNum, float paramLevel) {
-		setTremeloParam(trackNum, paramNum, paramLevel);
 	}
 	
 	@Override
@@ -38,13 +34,4 @@ public class Tremelo extends Effect {
 	public int getOffDrawableId() {
 		return R.drawable.tremelo_label_off;
 	}
-
-	@Override
-	public void setEffectOnNative(boolean on) {
-		setTremeloOn(trackNum, on);
-	}
-	
-	public static native void setTremeloOn(int trackNum, boolean on);
-	public static native void setTremeloParam(int trackNum, int paramNum,
-			float param);
 }

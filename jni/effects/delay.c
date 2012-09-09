@@ -1,24 +1,19 @@
 #include "delay.h"
 
-DelayConfigI *delayconfigi_create(float delay, float feedback, int maxSamples) {
+DelayConfigI *delayconfigi_create() {
 	// allocate memory and set feedback parameter
 	DelayConfigI *p = (DelayConfigI *) malloc(sizeof(DelayConfigI));
 	pthread_mutex_init(&p->mutex, NULL);
-	p->maxSamples = maxSamples;
+	p->maxSamples = (int)(4.5f * SAMPLE_RATE);
 	p->delayBuffer = (float **) malloc(2 * sizeof(float *));
-	p->delayBuffer[0] = (float *) malloc(maxSamples * sizeof(float));
-	p->delayBuffer[1] = (float *) malloc(maxSamples * sizeof(float));
+	p->delayBuffer[0] = (float *) malloc(p->maxSamples * sizeof(float));
+	p->delayBuffer[1] = (float *) malloc(p->maxSamples * sizeof(float));
 	p->rp[0] = p->rp[1] = p->wp[0] = p->wp[1] = 0;
-	delayconfigi_set(p, delay, feedback);
+	delayconfigi_setDelayTime(p, .5f, .5f);
+	delayconfigi_setFeedback(p, .5f);
 	p->wet = 0.5f;
 	p->linkChannels = true;
 	return p;
-}
-
-void delayconfigi_set(void *p, float delay, float feedback) {
-	DelayConfigI *config = (DelayConfigI *) p;
-	delayconfigi_setDelayTime(config, delay, delay);
-	delayconfigi_setFeedback(config, feedback);
 }
 
 void delayconfigi_setFeedback(DelayConfigI *config, float feedback) {
@@ -35,26 +30,9 @@ void delayconfigi_destroy(void *p) {
 	free((DelayConfigI *) p);
 }
 
-/********* JNI METHODS **********/
-void Java_com_kh_beatbot_effect_Delay_setDelayOn(JNIEnv *env, jclass clazz,
-		jint trackNum, jboolean on) {
-	Track *track = getTrack(env, clazz, trackNum);
-	Effect *delay = &(track->effects[DELAY_ID]);
-	delay->on = on;
-}
-
-void Java_com_kh_beatbot_effect_Delay_setDelayLinkChannels(JNIEnv *env, jclass clazz,
-		jint trackNum, jboolean linkChannels) {
-	Track *track = getTrack(env, clazz, trackNum);
-	DelayConfigI *config = (DelayConfigI *) track->effects[DELAY_ID].config;
-	config->linkChannels = linkChannels;
-	delayconfigi_updateDelayTime(config);
-}
-
-void Java_com_kh_beatbot_effect_Delay_setDelayParam(JNIEnv *env, jclass clazz,
-		jint trackNum, jint paramNum, jfloat param) {
-	Track *track = getTrack(env, clazz, trackNum);
-	DelayConfigI *config = (DelayConfigI *) track->effects[DELAY_ID].config;
+void delayconfigi_setParam(void *p, float paramNumFloat, float param) {
+	int paramNum = (int)paramNumFloat;
+	DelayConfigI *config = (DelayConfigI *) p;
 	if (paramNum == 0) { // delay time left
 		delayconfigi_setDelayTimeLeft(config, param);
 	} if (paramNum == 1) { // delay time right
@@ -63,5 +41,8 @@ void Java_com_kh_beatbot_effect_Delay_setDelayParam(JNIEnv *env, jclass clazz,
 		delayconfigi_setFeedback(config, param);
 	} else if (paramNum == 3) { // wet/dry
 		config->wet = param;
+	} else if (paramNum == 4) { // link channels
+		config->linkChannels = (int)param == 0 ? false : true;
+		delayconfigi_updateDelayTime(config);
 	}
 }

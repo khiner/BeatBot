@@ -69,7 +69,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_setLoopWindow(JNIEnv *env,
 	wavFile->loopEnd = loopEndSample;
 	if (wavFile->currSample >= wavFile->loopEnd)
 		wavFile->currSample = wavFile->loopBegin;
-	updateAdsr((AdsrConfig *) track->effects[ADSR_ID].config,
+	updateAdsr((AdsrConfig *) track->adsr->config,
 			loopEndSample - loopBeginSample);
 }
 

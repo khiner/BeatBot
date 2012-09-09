@@ -1,6 +1,6 @@
 #include "chorus.h"
 
-ChorusConfig *chorusconfig_create(float modFreq, float modAmt) {
+ChorusConfig *chorusconfig_create() {
 	ChorusConfig *config = (ChorusConfig *) malloc(sizeof(ChorusConfig));
 	chorusconfig_setBaseTime(config,
 			MIN_CHORUS_DELAY + (MAX_CHORUS_DELAY - MIN_CHORUS_DELAY) / 2);
@@ -8,7 +8,7 @@ ChorusConfig *chorusconfig_create(float modFreq, float modAmt) {
 			(config->baseTime) * INV_SAMPLE_RATE, .5f, MAX_CHORUS_DELAY + 512);
 	config->mod[0] = sinewave_create();
 	config->mod[1] = sinewave_create();
-	chorusconfig_set(config, modFreq, modAmt);
+	chorusconfig_set(config, .5f, .5f);
 	return config;
 }
 
@@ -45,18 +45,9 @@ void chorusconfig_destroy(void *p) {
 	free(config);
 }
 
-/********* JNI METHODS **********/
-void Java_com_kh_beatbot_effect_Chorus_setChorusOn(JNIEnv *env, jclass clazz,
-		jint trackNum, jboolean on) {
-	Track *track = getTrack(env, clazz, trackNum);
-	Effect *chorus = &(track->effects[CHORUS_ID]);
-	chorus->on = on;
-}
-
-void Java_com_kh_beatbot_effect_Chorus_setChorusParam(JNIEnv *env,
-		jclass clazz, jint trackNum, jint paramNum, jfloat param) {
-	Track *track = getTrack(env, clazz, trackNum);
-	ChorusConfig *config = (ChorusConfig *) track->effects[CHORUS_ID].config;
+void chorusconfig_setParam(void *p, float paramNumFloat, float param) {
+	int paramNum = (int)paramNumFloat;
+	ChorusConfig *config = (ChorusConfig *) p;
 	if (paramNum == 0) { // modulation rate
 		chorusconfig_setModFreq(config, param);
 	} else if (paramNum == 1) { // modulation amount

@@ -11,17 +11,13 @@ public class Reverb extends Effect {
 	@Override
 	public void initParams() {
 		numParams = 2;
+		effectNum = 5;
 		if (params.isEmpty()) {
 			params.add(new EffectParam(false, false, ""));
 			params.add(new EffectParam(false, false, ""));
 		}
 	}
 
-	@Override
-	public void setParamNative(int paramNum, float paramLevel) {
-		setReverbParam(trackNum, paramNum, paramLevel);
-	}
-	
 	@Override
 	public int getParamLayoutId() {
 		return R.layout.reverb_param_layout;
@@ -36,13 +32,4 @@ public class Reverb extends Effect {
 	public int getOffDrawableId() {
 		return R.drawable.reverb_label_off;
 	}
-
-	@Override
-	public void setEffectOnNative(boolean on) {
-		setReverbOn(trackNum, on);
-	}
-	
-	public static native void setReverbOn(int trackNum, boolean on);
-	public static native void setReverbParam(int trackNum, int paramNum,
-			float param);
 }

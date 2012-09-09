@@ -9,9 +9,9 @@ typedef struct TremeloConfig_t {
 	float depth;
 } TremeloConfig;
 
-TremeloConfig *tremeloconfig_create(float freq, float depth);
+TremeloConfig *tremeloconfig_create();
 
-void tremeloconfig_set(void *config, float freq, float depth);
+void tremeloconfig_setParam(void *p, float paramNum, float param);
 void tremeloconfig_setFrequency(TremeloConfig *config, float freq);
 void tremeloconfig_setPhase(TremeloConfig *config, float phase);
 void tremeloconfig_setDepth(TremeloConfig *config, float depth);

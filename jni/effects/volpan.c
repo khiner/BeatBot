@@ -1,9 +1,9 @@
 #include "volpan.h"
 
-VolumePanConfig *volumepanconfig_create(float volume, float pan) {
+VolumePanConfig *volumepanconfig_create() {
 	VolumePanConfig *p = (VolumePanConfig *) malloc(sizeof(VolumePanConfig));
-	p->volume = volume;
-	p->pan = pan;
+	p->volume = .8f;
+	p->pan = .5f;
 	return p;
 }
 

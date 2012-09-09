@@ -10,7 +10,8 @@ public class Chorus extends Effect {
 
 	@Override
 	protected void initParams() {
-		numParams = 5;	
+		effectNum = 0;
+		numParams = 5;
 		if (params.isEmpty()) {
 			params.add(new EffectParam(true, true, "Hz"));
 			getParam(0).hz = true;
@@ -35,18 +36,4 @@ public class Chorus extends Effect {
 	public int getOffDrawableId() {
 		return R.drawable.chorus_label_off;
 	}
-
-	@Override
-	public void setEffectOnNative(boolean on) {
-		setChorusOn(trackNum, on);
-	}
-	
-	@Override
-	public void setParamNative(int paramNum, float paramLevel) {
-		setChorusParam(trackNum, paramNum, paramLevel);
-	}
-	
-	public static native void setChorusOn(int trackNum, boolean on);
-	public static native void setChorusParam(int trackNum, int paramNum,
-			float param);
 }
