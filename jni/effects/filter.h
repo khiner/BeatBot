@@ -71,8 +71,8 @@ static inline void filter_process(FilterConfig *config, float **buffers,
 						* (1.0f + config->modDepth * sinewave_tick(config->mod)),
 				config->r);
 		for (filterNum = 0; filterNum < 2; filterNum++) {
-			if (filterNum != config->mode && config->mode != 2) {
-				continue;
+			if (filterNum != config->mode && config->mode != BP_MODE) {
+				continue; // one pass for the lp/hp filter, or one pass for each if bp mode
 			}
 			for (channel = 0; channel < 2; channel++) {
 				float out = config->inner[filterNum]->a1

@@ -49,11 +49,10 @@ void filterconfig_setParam(void *p, float paramNumFloat, float param) {
 		filterconfig_setModDepth(config, param);
 	} else if (paramNum == 4) { // mode
 		config->mode = (int) param;
-		if ((int) param == 0) { // lowpass filter
+		if ((int) param == LP_MODE || (int)param == HP_MODE) {
 			config->rScale = .7f;
-		} else if ((int) param == 1) { // highpass filter
-			config->rScale = .7f;
-		} else if ((int) param == 2) { // bandpass filter - chain lp and hp filters
+		} else if ((int) param == BP_MODE) { // bandpass filter
+			// lp and hp are chained, so reduce resonance to avoid clipping
 			config->rScale = .4f;
 		}
 	}

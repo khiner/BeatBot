@@ -92,7 +92,7 @@ void initTrack(Track *track, AAsset *asset) {
 			volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
 	track->pitch = initEffect(-1, false, pitchconfig_create(),
 			pitchconfig_setShift, pitch_process, pitchconfig_destroy);
-	track->adsr = initEffect(-1, true,
+	track->adsr = initEffect(-1, false,
 			adsrconfig_create(
 					((WavFile *) (track->generator->config))->totalSamples),
 			NULL, adsr_process, adsrconfig_destroy);
@@ -117,6 +117,10 @@ static inline void processEffects(Track *track) {
 					track->currBufferFloat, BUFF_SIZE);
 		}
 		effectNode = effectNode->next;
+	}
+	if (track->adsr->on) {
+		track->adsr->process(track->adsr->config,
+				track->currBufferFloat, BUFF_SIZE);
 	}
 }
 
