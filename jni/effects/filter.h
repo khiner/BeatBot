@@ -9,18 +9,18 @@
 #define BP_MODE 2
 
 typedef struct InnerFitlerConfig_t {
+	float in1[2], in2[2]; // one for each channel
+	float out1[2], out2[2]; // one for each channel
 	float a1, a2, a3, b1, b2, c;
 } InnerFilterConfig;
 
 typedef struct FilterConfig_t {
-	float in1[2], in2[2]; // one for each channel
-	float out1[2], out2[2]; // one for each channel
 	float baseF, frequency, f, r;
 	float modDepth;
 	int mode; // is this filter an lp, hp or bp filter?
 	float rScale;
 	SineWave *mod; // table-based sine wave generator for modulation
-	InnerFilterConfig *innerFilterConfig[2];
+	InnerFilterConfig *inner[2];
 } FilterConfig;
 
 FilterConfig *filterconfig_create();
@@ -58,10 +58,8 @@ static inline void filterconfig_set(void *p, float f, float r) {
 	f = f > 50 ? (f < SAMPLE_RATE / 2 - 50 ? f : SAMPLE_RATE / 2 - 50) : 50;
 	config->frequency = f;
 	config->r = r;
-	lpfilterconfig_set(config->innerFilterConfig[0], config->frequency,
-			config->r);
-	hpfilterconfig_set(config->innerFilterConfig[1], config->frequency,
-			config->r);
+	lpfilterconfig_set(config->inner[0], config->frequency, config->r);
+	hpfilterconfig_set(config->inner[1], config->frequency, config->r);
 }
 
 static inline void filter_process(FilterConfig *config, float **buffers,
@@ -73,24 +71,26 @@ static inline void filter_process(FilterConfig *config, float **buffers,
 						* (1.0f + config->modDepth * sinewave_tick(config->mod)),
 				config->r);
 		for (filterNum = 0; filterNum < 2; filterNum++) {
-			if (filterNum != config->mode && filterNum != 2) {
+			if (filterNum != config->mode && config->mode != 2) {
 				continue;
 			}
 			for (channel = 0; channel < 2; channel++) {
-				float out = config->innerFilterConfig[filterNum]->a1
+				float out = config->inner[filterNum]->a1
 						* buffers[channel][samp]
-						+ config->innerFilterConfig[filterNum]->a2
-								* config->in1[channel]
-						+ config->innerFilterConfig[filterNum]->a3
-								* config->in2[channel]
-						- config->innerFilterConfig[filterNum]->b1
-								* config->out1[channel]
-						- config->innerFilterConfig[filterNum]->b2
-								* config->out2[channel];
-				config->in2[channel] = config->in1[channel];
-				config->in1[channel] = buffers[channel][samp];
-				config->out2[channel] = config->out1[channel];
-				config->out1[channel] = out;
+						+ config->inner[filterNum]->a2
+								* config->inner[filterNum]->in1[channel]
+						+ config->inner[filterNum]->a3
+								* config->inner[filterNum]->in2[channel]
+						- config->inner[filterNum]->b1
+								* config->inner[filterNum]->out1[channel]
+						- config->inner[filterNum]->b2
+								* config->inner[filterNum]->out2[channel];
+				config->inner[filterNum]->in2[channel] =
+						config->inner[filterNum]->in1[channel];
+				config->inner[filterNum]->in1[channel] = buffers[channel][samp];
+				config->inner[filterNum]->out2[channel] =
+						config->inner[filterNum]->out1[channel];
+				config->inner[filterNum]->out1[channel] = out;
 				buffers[channel][samp] = out;
 			}
 		}

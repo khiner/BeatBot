@@ -2,18 +2,20 @@
 
 FilterConfig *filterconfig_create() {
 	FilterConfig *config = (FilterConfig *) malloc(sizeof(FilterConfig));
-	config->innerFilterConfig[0] = malloc(sizeof(InnerFilterConfig));
-	config->innerFilterConfig[1] = malloc(sizeof(InnerFilterConfig));
 	config->rScale = .7f;
 	config->mode = 0;
 	config->baseF = .5f;
-	config->in1[0] = config->in1[1] = 0;
-	config->in2[0] = config->in2[1] = 0;
-	config->out1[0] = config->out1[1] = 0;
-	config->out2[0] = config->out2[1] = 0;
 	config->modDepth = .5f;
 	config->mod = sinewave_create();
 	sinewave_setFrequency(config->mod, .5f);
+	int filterNum;
+	for (filterNum = 0; filterNum < 2; filterNum++) {
+		config->inner[filterNum] = malloc(sizeof(InnerFilterConfig));
+		config->inner[filterNum]->in1[filterNum] = 0;
+		config->inner[filterNum]->in2[filterNum] = 0;
+		config->inner[filterNum]->out1[filterNum] = 0;
+		config->inner[filterNum]->out2[filterNum] = 0;
+	}
 	filterconfig_set(config, .5f, .5f);
 	return config;
 }
@@ -27,11 +29,14 @@ void filterconfig_setModDepth(FilterConfig *config, float depth) {
 }
 
 void filterconfig_destroy(void *p) {
-	free((FilterConfig *) p);
+	FilterConfig *config = (FilterConfig *) p;
+	free(config->inner[0]);
+	free(config->inner[1]);
+	free(config);
 }
 
 void filterconfig_setParam(void *p, float paramNumFloat, float param) {
-	int paramNum = (int)paramNumFloat;
+	int paramNum = (int) paramNumFloat;
 	FilterConfig *config = (FilterConfig *) p;
 	if (paramNum == 0) { // frequency
 		config->baseF = param;
@@ -43,13 +48,13 @@ void filterconfig_setParam(void *p, float paramNumFloat, float param) {
 	} else if (paramNum == 3) { // mod depth
 		filterconfig_setModDepth(config, param);
 	} else if (paramNum == 4) { // mode
-		config->mode = (int)param;
-		if ((int)param == 0) { // lowpass filter
+		config->mode = (int) param;
+		if ((int) param == 0) { // lowpass filter
 			config->rScale = .7f;
-		} else if ((int)param == 1) { // bandpass filter - chain lp and hp filters
+		} else if ((int) param == 1) { // highpass filter
+			config->rScale = .7f;
+		} else if ((int) param == 2) { // bandpass filter - chain lp and hp filters
 			config->rScale = .4f;
-		} else if ((int)param == 2) { // highpass filter
-			config->rScale = .7f;
 		}
 	}
 }
