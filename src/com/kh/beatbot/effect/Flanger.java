@@ -4,8 +4,8 @@ import com.kh.beatbot.R;
 
 public class Flanger extends Effect {
 
-	public Flanger(int id, String name, int trackNum) {
-		super(id, name, trackNum);
+	public Flanger(int id, String name, int trackNum, int position) {
+		super(id, name, trackNum, position);
 	}
 
 	@Override

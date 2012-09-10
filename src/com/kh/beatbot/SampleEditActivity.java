@@ -42,12 +42,12 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 
 		@Override
-		public void labelMoved(int id, int oldPosition, int newPosition) {
+		public void labelMoved(int id, int newPosition) {
 
 		}
 
 		@Override
-		public void labelClicked(int id, String text) {
+		public void labelClicked(String text, int id, int position) {
 			
 		}
 
@@ -61,6 +61,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		private AlertDialog chooseEffectAlert = null;
 		private LabelListListenable labelList;
 		private int lastClickedId = -1;
+		private int lastClickedPos = -1;
 		
 		EffectLabelListListener(Context c) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(c);
@@ -68,7 +69,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			builder.setItems(effectNames, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
 					labelList.setLabelText(lastClickedId, effectNames[item]);
-					launchEffectIntent(effectNames[item], lastClickedId);
+					launchEffectIntent(effectNames[item], lastClickedId, lastClickedPos);
 				}
 			});
 			chooseEffectAlert = builder.create();
@@ -80,17 +81,21 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 
 		@Override
-		public void labelMoved(int id, int oldPosition, int newPosition) {
-			
+		public void labelMoved(int id, int newPosition) {
+			Effect effect = GlobalVars.findEffect(id, trackNum);
+			if (effect != null) {
+				effect.setPosition(newPosition);
+			}
 		}
 
 		@Override
-		public void labelClicked(int id, String text) {
+		public void labelClicked(String text, int id, int position) {
 			lastClickedId = id;
+			lastClickedPos = position;
 			if (text.isEmpty()) {
 				chooseEffectAlert.show();
 			} else {
-				launchEffectIntent(text, id);
+				launchEffectIntent(text, id, position);
 			}
 		}
 
@@ -175,30 +180,30 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		sampleWaveformView.setSamples(normalize(trackNum));
 	}
 
-	private Effect getEffect(String effectName, int effectId) {
-		Effect effect = GlobalVars.findEffect(effectId, trackNum);
+	private Effect getEffect(String effectName, int id, int position) {
+		Effect effect = GlobalVars.findEffect(id, trackNum);
 		if (effect != null)
 			return effect;
 		if (effectName.equals(getString(R.string.decimate)))
-			effect = new Decimate(effectId, effectName, trackNum);
+			effect = new Decimate(id, effectName, trackNum, position);
 		else if (effectName.equals(getString(R.string.chorus)))
-			effect = new Chorus(effectId, effectName, trackNum);
+			effect = new Chorus(id, effectName, trackNum, position);
 		else if (effectName.equals(getString(R.string.delay)))
-			effect = new Delay(effectId, effectName, trackNum);
+			effect = new Delay(id, effectName, trackNum, position);
 		else if (effectName.equals(getString(R.string.flanger)))
-			effect = new Flanger(effectId, effectName, trackNum);
+			effect = new Flanger(id, effectName, trackNum, position);
 		else if (effectName.equals(getString(R.string.filter)))
-			effect = new Filter(effectId, effectName, trackNum);
+			effect = new Filter(id, effectName, trackNum, position);
 		else if (effectName.equals(getString(R.string.reverb)))
-			effect = new Reverb(effectId, effectName, trackNum);
+			effect = new Reverb(id, effectName, trackNum, position);
 		else if (effectName.equals(getString(R.string.tremelo)))
-			effect = new Tremelo(effectId, effectName, trackNum);
+			effect = new Tremelo(id, effectName, trackNum, position);
 		GlobalVars.effects[trackNum].add(effect);
 		return effect;
 	}
 	
-	private void launchEffectIntent(String effectName, int effectId) {
-		Effect effect = getEffect(effectName, effectId);
+	private void launchEffectIntent(String effectName, int effectId, int effectPosition) {
+		Effect effect = getEffect(effectName, effectId, effectPosition);
 		Intent intent = new Intent();
 		intent.setClass(this, EffectActivity.class);
 		intent.putExtra("effectId", effect.getId());

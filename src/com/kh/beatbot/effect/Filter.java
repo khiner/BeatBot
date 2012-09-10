@@ -6,8 +6,8 @@ import com.kh.beatbot.manager.PlaybackManager;
 public class Filter extends Effect {
 	private int mode = 0;
 	
-	public Filter(int id, String name, int trackNum) {
-		super(id, name, trackNum);
+	public Filter(int id, String name, int trackNum, int position) {
+		super(id, name, trackNum, position);
 	}
 
 	@Override

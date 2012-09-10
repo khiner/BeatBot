@@ -4,8 +4,8 @@ import com.kh.beatbot.R;
 
 public class Decimate extends Effect {
 
-	public Decimate(int id, String name, int trackNum) {
-		super(id, name, trackNum);
+	public Decimate(int id, String name, int trackNum, int position) {
+		super(id, name, trackNum, position);
 	}
 
 	@Override

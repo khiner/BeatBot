@@ -49,6 +49,8 @@ typedef struct EffectNode_t {
 Effect *initEffect(int id, bool on, void *config,
 		void (*set), void (*process), void (*destroy));
 
+void addEffect(Track *track, Effect *effect);
+
 void reverse(float buffer[], int begin, int end);
 void normalize(float buffer[], int size);
 

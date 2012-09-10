@@ -35,12 +35,12 @@ public abstract class Effect {
 	public boolean on = true;
 	protected boolean paramsLinked = false;
 	
-	public Effect(int id, String name, int trackNum) {
+	public Effect(int id, String name, int trackNum, int position) {
 		this.id = id;
 		this.name = name;
 		this.trackNum = trackNum;
 		initParams();
-		addEffect(trackNum, effectNum, id);
+		addEffect(trackNum, effectNum, id, position);
 	}
 	
 	public void setOn(boolean on) {
@@ -62,6 +62,10 @@ public abstract class Effect {
 	
 	public boolean paramsLinked() {
 		return paramsLinked;
+	}
+	
+	public void setPosition(int position) {
+		setEffectPosition(trackNum, id, position);
 	}
 	
 	public void setParamsLinked(boolean linked) {
@@ -153,7 +157,8 @@ public abstract class Effect {
 		}
 	}
 	
-	public native void addEffect(int trackNum, int effectNum, int effectId);
+	public native void addEffect(int trackNum, int effectNum, int effectId, int position);
+	public native void setEffectPosition(int trackNum, int effectId, int position);
 	public native void setEffectOn(int trackNum, int effectId, boolean on);
 	public native void setEffectParam(int trackNum, int effectId, int paramNum, float paramLevel);
 	

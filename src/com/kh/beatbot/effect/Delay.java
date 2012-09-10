@@ -3,8 +3,8 @@ package com.kh.beatbot.effect;
 import com.kh.beatbot.R;
 
 public class Delay extends Effect {
-	public Delay(int id, String name, int trackNum) {
-		super(id, name, trackNum);
+	public Delay(int id, String name, int trackNum, int position) {
+		super(id, name, trackNum, position);
 	}
 	
 	// keep track of what right channel was before linking

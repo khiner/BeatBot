@@ -88,6 +88,10 @@ void initTrack(Track *track, AAsset *asset) {
 	track->generator = malloc(sizeof(Generator));
 	initGenerator(track->generator, wavfile_create(asset), wavfile_reset,
 			wavfile_generate, wavfile_destroy);
+	int effectNum;
+	for (effectNum = 0; effectNum < 4; effectNum++) {
+		addEffect(track, NULL);
+	}
 	track->volPan = initEffect(-1, true, volumepanconfig_create(),
 			volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
 	track->pitch = initEffect(-1, false, pitchconfig_create(),

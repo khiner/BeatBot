@@ -7,8 +7,8 @@
 #include "reverb.h"
 #include "tremelo.h"
 
-Effect *initEffect(int id, bool on, void *config, void (*set),
-		void (*process), void (*destroy)) {
+Effect *initEffect(int id, bool on, void *config, void (*set), void (*process),
+		void (*destroy)) {
 	Effect *effect = malloc(sizeof(Effect));
 	effect->id = id;
 	effect->on = on;
@@ -49,34 +49,68 @@ void normalize(float buffer[], int size) {
 	}
 }
 
-Effect *findEffect(int trackNum, int id) {
+EffectNode *findEffectNodeById(int trackNum, int id) {
 	Track *track = &(tracks[trackNum]);
 	EffectNode *effectNode = track->effectHead;
 	while (effectNode != NULL) {
 		if (effectNode->effect != NULL && effectNode->effect->id == id) {
-			return effectNode->effect;
+			return effectNode;
 		}
 		effectNode = effectNode->next;
 	}
 	return NULL;
 }
 
+EffectNode *findEffectNodeByPosition(int trackNum, int position) {
+	Track *track = &(tracks[trackNum]);
+	EffectNode *cur_ptr = track->effectHead;
+	int count = 0;
+	while (count < position && cur_ptr != NULL) {
+		cur_ptr = cur_ptr->next;
+		count++;
+	}
+	return cur_ptr;
+}
+
+EffectNode *findPrevNode(int trackNum, EffectNode *effectNode) {
+	Track *track = &(tracks[trackNum]);
+	EffectNode *cur_ptr = track->effectHead;
+	if (cur_ptr == effectNode) {
+		return NULL; // effectNode is head, no prev node
+	}
+	while (cur_ptr->next != NULL) {
+		if (cur_ptr->next == effectNode) {
+			return cur_ptr;
+		}
+		cur_ptr = cur_ptr->next;
+	}
+	return NULL; // only happes when effectNode is not in the track's effect list
+}
+
 Effect *createEffect(int effectNum, int effectId) {
 	switch (effectNum) {
-	case CHORUS:   return initEffect(effectId, true, chorusconfig_create(),
-							chorusconfig_setParam, chorus_process, chorusconfig_destroy);
-	case DECIMATE: return initEffect(effectId, true, decimateconfig_create(),
-			                decimateconfig_setParam, decimate_process, decimateconfig_destroy);
-	case DELAY:    return initEffect(effectId, true, delayconfigi_create(),
-			                delayconfigi_setParam, delayi_process, delayconfigi_destroy);
-	case FILTER:   return initEffect(effectId, true, filterconfig_create(),
-							filterconfig_setParam, filter_process, filterconfig_destroy);
-	case FLANGER:  return initEffect(effectId, true, flangerconfig_create(),
-							flangerconfig_setParam, flanger_process, flangerconfig_destroy);
-	case REVERB:   return initEffect(effectId, true, reverbconfig_create(),
-							reverbconfig_setParam, reverb_process, reverbconfig_destroy);
-	case TREMELO:  return initEffect(effectId, true, tremeloconfig_create(),
-							tremeloconfig_setParam, tremelo_process, tremeloconfig_destroy);
+	case CHORUS:
+		return initEffect(effectId, true, chorusconfig_create(),
+				chorusconfig_setParam, chorus_process, chorusconfig_destroy);
+	case DECIMATE:
+		return initEffect(effectId, true, decimateconfig_create(),
+				decimateconfig_setParam, decimate_process,
+				decimateconfig_destroy);
+	case DELAY:
+		return initEffect(effectId, true, delayconfigi_create(),
+				delayconfigi_setParam, delayi_process, delayconfigi_destroy);
+	case FILTER:
+		return initEffect(effectId, true, filterconfig_create(),
+				filterconfig_setParam, filter_process, filterconfig_destroy);
+	case FLANGER:
+		return initEffect(effectId, true, flangerconfig_create(),
+				flangerconfig_setParam, flanger_process, flangerconfig_destroy);
+	case REVERB:
+		return initEffect(effectId, true, reverbconfig_create(),
+				reverbconfig_setParam, reverb_process, reverbconfig_destroy);
+	case TREMELO:
+		return initEffect(effectId, true, tremeloconfig_create(),
+				tremeloconfig_setParam, tremelo_process, tremeloconfig_destroy);
 	}
 	return NULL;
 }
@@ -87,7 +121,9 @@ void printEffects(EffectNode *head) {
 	while (cur_ptr != NULL) {
 		if (cur_ptr->effect != NULL)
 			__android_log_print(ANDROID_LOG_ERROR, "effect id = ", "%d, ",
-				cur_ptr->effect->id);
+					cur_ptr->effect->id);
+		else
+			__android_log_print(ANDROID_LOG_ERROR, "effect", "blank");
 		cur_ptr = cur_ptr->next;
 	}
 }
@@ -109,6 +145,50 @@ void addEffect(Track *track, Effect *effect) {
 	}
 }
 
+void setEffect(Track *track, int position, Effect *effect) {
+	EffectNode *cur_ptr = track->effectHead;
+	int count = 0;
+	while (count < position && cur_ptr != NULL) {
+		cur_ptr = cur_ptr->next;
+		count++;
+	}
+	cur_ptr->effect = effect;
+}
+
+void insertEffect(Track *track, int position, EffectNode *node) {
+	EffectNode *cur_ptr = track->effectHead;
+	EffectNode *prev_ptr = NULL;
+	int count = 0;
+	while (count < position && cur_ptr != NULL) {
+		prev_ptr = cur_ptr;
+		cur_ptr = cur_ptr->next;
+		count++;
+	}
+	if (prev_ptr != NULL) {
+		prev_ptr->next = node;
+		node->next = cur_ptr;
+	} else {
+		node->next = track->effectHead;
+		track->effectHead = node;
+	}
+}
+
+EffectNode *removeEffect(int trackNum, int effectId) {
+	EffectNode *one_back;
+	Track *track = getTrack(NULL, NULL, trackNum);
+	EffectNode *node = findEffectNodeById(trackNum, effectId);
+	if (node == track->effectHead) {
+		track->effectHead = track->effectHead->next;
+	} else {
+		one_back = track->effectHead;
+		while (one_back->next != node) {
+			one_back = one_back->next;
+		}
+		one_back->next = node->next;
+	}
+	return node;
+}
+
 /********* JNI METHODS **********/
 jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size) {
 	jfloatArray result = (*env)->NewFloatArray(env, size);
@@ -116,27 +196,36 @@ jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size) {
 	return result;
 }
 
-void Java_com_kh_beatbot_effect_Effect_addEffect(JNIEnv *env,
-		jclass clazz, jint trackNum, jint effectNum, jint effectId) {
+void Java_com_kh_beatbot_effect_Effect_addEffect(JNIEnv *env, jclass clazz,
+		jint trackNum, jint effectNum, jint effectId, jint position) {
 	Track *track = getTrack(env, clazz, trackNum);
 	Effect *effect = createEffect(effectNum, effectId);
-	addEffect(track, effect);
+	setEffect(track, position, effect);
+	printEffects(track->effectHead);
+}
+
+void Java_com_kh_beatbot_effect_Effect_setEffectPosition(JNIEnv *env,
+		jclass clazz, jint trackNum, jint effectId, jint position) {
+	// find node currently at the desired position
+	Track *track = getTrack(env, clazz, trackNum);
+	EffectNode *node = removeEffect(trackNum, effectId);
+	insertEffect(track, position, node);
+	printEffects(getTrack(env, clazz, trackNum)->effectHead);
 }
 
 void Java_com_kh_beatbot_effect_Effect_setEffectOn(JNIEnv *env, jclass clazz,
 		jint trackNum, jint effectId, jboolean on) {
-	Effect *effect = findEffect(trackNum, effectId);
-	if (effect != NULL) {
-		effect->on = on;
+	EffectNode *effectNode = findEffectNodeById(trackNum, effectId);
+	if (effectNode != NULL) {
+		effectNode->effect->on = on;
 	}
 }
 
-void Java_com_kh_beatbot_effect_Effect_setEffectParam(JNIEnv *env,
-		jclass clazz, jint trackNum, jint effectId, jint paramNum,
-		jfloat paramLevel) {
-	Effect *effect = findEffect(trackNum, effectId);
-	if (effect != NULL) {
-		effect->set(effect->config, (float)paramNum, paramLevel);
+void Java_com_kh_beatbot_effect_Effect_setEffectParam(JNIEnv *env, jclass clazz,
+		jint trackNum, jint effectId, jint paramNum, jfloat paramLevel) {
+	EffectNode *effectNode = findEffectNodeById(trackNum, effectId);
+	if (effectNode != NULL) {
+		effectNode->effect->set(effectNode->effect->config, (float) paramNum, paramLevel);
 	}
 }
 

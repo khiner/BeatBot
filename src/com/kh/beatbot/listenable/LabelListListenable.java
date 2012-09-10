@@ -9,6 +9,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.opengl.GLU;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.global.GlobalVars;
@@ -238,7 +239,8 @@ public class LabelListListenable extends SurfaceViewBase {
 
 	// notify listener that the label has been single-clicked (tapped)
 	private void clickLabel(Label label) {
-		listener.labelClicked(label.id, label.text);
+		Log.e("label clicked", "pos = " + labels.indexOf(label));
+		listener.labelClicked(label.text, label.id, labels.indexOf(label));
 	}
 
 	// notify listener that the label has been long-clicked
@@ -257,7 +259,7 @@ public class LabelListListenable extends SurfaceViewBase {
 		for (Label label : labels) {
 			int newPosition = labels.indexOf(label);
 			if (newPosition != label.prevPosition) {
-				listener.labelMoved(label.id, label.prevPosition, newPosition);
+				listener.labelMoved(label.id, newPosition);
 			}
 		}
 	}
