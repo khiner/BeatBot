@@ -68,9 +68,18 @@ public class GlobalVars {
 		}
 	}
 	
-	public static Effect findEffect(int effectId, int trackNum) {
+	public static Effect findEffectById(int effectId, int trackNum) {
 		for (Effect effect : GlobalVars.effects[trackNum]) {
 			if (effect.getId() == effectId) {
+				return effect;
+			}
+		}
+		return null;
+	}
+	
+	public static Effect findEffectByPosition(int position, int trackNum) {
+		for (Effect effect : GlobalVars.effects[trackNum]) {
+			if (effect.getPosition() == position) {
 				return effect;
 			}
 		}

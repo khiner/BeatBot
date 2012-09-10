@@ -7,7 +7,7 @@ import android.util.FloatMath;
 
 import com.kh.beatbot.manager.MidiManager;
 
-public abstract class Effect {
+public abstract class Effect implements Comparable<Effect> {
 	public class EffectParam {
 		public float level, viewLevel, scale = 1;
 		public int topBeatNum = 1, bottomBeatNum = 1;
@@ -30,6 +30,7 @@ public abstract class Effect {
 	protected int effectNum;
 	protected int trackNum;
 	protected int numParams;
+	protected int position;
 	
 	public String name;
 	public boolean on = true;
@@ -39,6 +40,7 @@ public abstract class Effect {
 		this.id = id;
 		this.name = name;
 		this.trackNum = trackNum;
+		this.position = position;
 		initParams();
 		addEffect(trackNum, effectNum, id, position);
 	}
@@ -50,6 +52,10 @@ public abstract class Effect {
 	
 	public int getId() {
 		return id;
+	}
+	
+	public int getPosition() {
+		return position;
 	}
 	
 	public String getName() {
@@ -65,7 +71,12 @@ public abstract class Effect {
 	}
 	
 	public void setPosition(int position) {
+		this.position = position;
 		setEffectPosition(trackNum, id, position);
+	}
+	
+	public void incPosition() {
+		this.position++;
 	}
 	
 	public void setParamsLinked(boolean linked) {
@@ -166,4 +177,9 @@ public abstract class Effect {
 	public abstract int getParamLayoutId();
 	public abstract int getOnDrawableId();
 	public abstract int getOffDrawableId();
+	
+	@Override
+	public int compareTo(Effect effect) {
+		return this.position - effect.position;
+	}
 }

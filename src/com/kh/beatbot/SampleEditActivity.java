@@ -1,5 +1,7 @@
 package com.kh.beatbot;
 
+import java.util.Collections;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -33,27 +35,27 @@ import com.kh.beatbot.view.bean.MidiViewBean;
 public class SampleEditActivity extends Activity implements LevelListener {
 	class SampleLabelListListener implements LabelListListener {
 		SampleLabelListListener(Context c) {
-			
+
 		}
 
 		@Override
 		public void labelListInitialized(LabelListListenable labelList) {
-			
+
 		}
 
 		@Override
-		public void labelMoved(int id, int newPosition) {
+		public void labelMoved(int id, int oldPosition, int newPosition) {
 
 		}
 
 		@Override
 		public void labelClicked(String text, int id, int position) {
-			
+
 		}
 
 		@Override
 		public void labelLongClicked(int id) {
-			
+
 		}
 	}
 
@@ -62,29 +64,60 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		private LabelListListenable labelList;
 		private int lastClickedId = -1;
 		private int lastClickedPos = -1;
-		
+
 		EffectLabelListListener(Context c) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(c);
 			builder.setTitle("Choose Effect");
-			builder.setItems(effectNames, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int item) {
-					labelList.setLabelText(lastClickedId, effectNames[item]);
-					launchEffectIntent(effectNames[item], lastClickedId, lastClickedPos);
-				}
-			});
+			builder.setItems(effectNames,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int item) {
+							labelList.setLabelText(lastClickedId,
+									effectNames[item]);
+							launchEffectIntent(effectNames[item],
+									lastClickedId, lastClickedPos);
+						}
+					});
 			chooseEffectAlert = builder.create();
 		}
 
+		private int getUniqueId(int lowest) {
+			for (int id = 0; id < 4; id++) {
+				if (GlobalVars.findEffectById(id, trackNum) == null && id >= lowest) {
+					return id;
+				}
+			}
+			return -1;
+		}
+		
 		@Override
 		public void labelListInitialized(LabelListListenable labelList) {
 			this.labelList = labelList;
+			if (labelList.noLabels()) {
+				for (int i = 0; i < 4; i++) {
+					Effect effect = GlobalVars
+							.findEffectByPosition(i, trackNum);
+					if (effect != null) {
+						this.labelList.addLabel(effect.name, effect.getId());
+					} else {
+						this.labelList.addLabel("", getUniqueId(i));
+					}
+				}
+			}
 		}
 
 		@Override
-		public void labelMoved(int id, int newPosition) {
-			Effect effect = GlobalVars.findEffect(id, trackNum);
+		public void labelMoved(int id, int oldPosition, int newPosition) {
+			Effect effect = GlobalVars.findEffectById(id, trackNum);
 			if (effect != null) {
 				effect.setPosition(newPosition);
+				for (Effect other : GlobalVars.effects[trackNum]) {
+					if (other.equals(effect))
+						continue;
+					if (other.getPosition() >= newPosition && other.getPosition() < oldPosition) {
+						other.incPosition();
+					}
+				}
+				Collections.sort(GlobalVars.effects[trackNum]);
 			}
 		}
 
@@ -101,18 +134,19 @@ public class SampleEditActivity extends Activity implements LevelListener {
 
 		@Override
 		public void labelLongClicked(int id) {
-			
+
 		}
 	}
-	
+
 	private static SampleWaveformView sampleWaveformView = null;
 	// private EditLevelsView editLevelsView = null;
 	private static TronSeekbar volumeLevel, panLevel, pitchLevel;
-	private static LabelListListenable effectLabelList = null, sampleLabelList = null;
-	
+	private static LabelListListenable effectLabelList = null,
+			sampleLabelList = null;
+
 	private int trackNum;
 	private static String[] effectNames;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -124,7 +158,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		initSampleLabelList();
 		initEffectLabelList();
 		initSampleWaveformView();
-		
+
 		Managers.playbackManager.armTrack(trackNum);
 		((ToggleButton) findViewById(R.id.loop_toggle))
 				.setChecked(Managers.playbackManager.isLooping(trackNum));
@@ -132,30 +166,31 @@ public class SampleEditActivity extends Activity implements LevelListener {
 
 	private void initEffectLabelList() {
 		effectNames = getResources().getStringArray(R.array.effect_names);
-		effectLabelList = (LabelListListenable)findViewById(R.id.effectList); 
+		effectLabelList = (LabelListListenable) findViewById(R.id.effectList);
 		effectLabelList.setListener(new EffectLabelListListener(this));
 	}
-	
+
 	private void initSampleLabelList() {
-		sampleLabelList = (LabelListListenable)findViewById(R.id.sampleList); 
+		sampleLabelList = (LabelListListenable) findViewById(R.id.sampleList);
 		sampleLabelList.setListener(new SampleLabelListListener(this));
 	}
-	
+
 	private void initSampleWaveformView() {
 		sampleWaveformView = ((SampleWaveformView) findViewById(R.id.sample_waveform_view));
 		sampleWaveformView.setTrackNum(trackNum);
 		// numSamples should be in shorts, so divide by two
 		sampleWaveformView.setSamples(getSamples(trackNum));
 	}
-	
+
 	public static void quantizeEffectParams() {
 		for (int trackNum = 0; trackNum < GlobalVars.numTracks; trackNum++) {
 			for (Effect effect : GlobalVars.effects[trackNum]) {
-				for (int paramNum = 0; paramNum < effect.getNumParams(); paramNum++) { 
+				for (int paramNum = 0; paramNum < effect.getNumParams(); paramNum++) {
 					EffectParam param = effect.getParam(paramNum);
 					if (param.beatSync) {
 						effect.setParamLevel(param, param.viewLevel);
-						effect.setEffectParam(trackNum, effect.getId(), paramNum, param.viewLevel);
+						effect.setEffectParam(trackNum, effect.getId(),
+								paramNum, param.viewLevel);
 					}
 				}
 			}
@@ -181,7 +216,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	private Effect getEffect(String effectName, int id, int position) {
-		Effect effect = GlobalVars.findEffect(id, trackNum);
+		Effect effect = GlobalVars.findEffectById(id, trackNum);
 		if (effect != null)
 			return effect;
 		if (effectName.equals(getString(R.string.decimate)))
@@ -201,8 +236,9 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		GlobalVars.effects[trackNum].add(effect);
 		return effect;
 	}
-	
-	private void launchEffectIntent(String effectName, int effectId, int effectPosition) {
+
+	private void launchEffectIntent(String effectName, int effectId,
+			int effectPosition) {
 		Effect effect = getEffect(effectName, effectId, effectPosition);
 		Intent intent = new Intent();
 		intent.setClass(this, EffectActivity.class);

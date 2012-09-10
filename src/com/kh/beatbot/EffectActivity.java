@@ -44,6 +44,7 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 			filterButtons[1] = (ToggleButton)filterTypesLayout.findViewById(R.id.hp_toggle);
 			filterButtons[2] = (ToggleButton)filterTypesLayout.findViewById(R.id.bp_toggle);
 			filterButtons[((Filter)effect).getMode()].setChecked(true);
+			((ToggleButton)filterTypesLayout.findViewById(R.id.effectToggleOn)).setChecked(effect.on);
 			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
 					RelativeLayout.LayoutParams.WRAP_CONTENT);
 			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
@@ -115,7 +116,7 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 		requestWindowFeature(Window.FEATURE_NO_TITLE); // remove title bar
 		int effectId = getIntent().getExtras().getInt("effectId");
 		int trackNum = getIntent().getExtras().getInt("trackNum");
-		effect = GlobalVars.findEffect(effectId, trackNum);
+		effect = GlobalVars.findEffectById(effectId, trackNum);
 		setContentView(R.layout.effect_layout);
 		ViewGroup parent = (ViewGroup) findViewById(R.id.effect_layout);
 		View paramWrapperLayout = initEffectLayout(parent);

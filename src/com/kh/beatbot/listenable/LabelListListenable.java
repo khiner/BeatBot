@@ -155,6 +155,10 @@ public class LabelListListenable extends SurfaceViewBase {
 		}
 	}
 
+	public Label getLabel(int index) {
+		return index < labels.size() ? labels.get(index) : null;
+	}
+	
 	/*
 	 * Find the label with the given id
 	 */
@@ -202,15 +206,8 @@ public class LabelListListenable extends SurfaceViewBase {
 		}
 	}
 
-	private void initLabels() {
-		labels = new ArrayList<Label>();
-		for (int i = 0; i < 4; i++) {
-			addLabel("");
-		}
-	}
-
-	public void addLabel(String text) {
-		labels.add(new Label(labels.size(), text, Float.MAX_VALUE));
+	public void addLabel(String text, int id) {
+		labels.add(new Label(id, text, Float.MAX_VALUE));
 		updateLabelLocations();
 	}
 
@@ -221,9 +218,21 @@ public class LabelListListenable extends SurfaceViewBase {
 		}
 	}
 
+	public boolean noLabels() {
+		return labels == null || labels.isEmpty();
+	}
+	
 	// callback function for listener to notify when the label text and id is
 	// known
 	public void setLabelText(int id, String text) {
+		Label label = findLabel(id);
+		if (label != null) {
+			label.setText(text);
+		}
+		updateLabelLocations();
+	}
+	
+	public void setLabel(int id, String text) {
 		Label label = findLabel(id);
 		if (label != null) {
 			label.setText(text);
@@ -239,7 +248,6 @@ public class LabelListListenable extends SurfaceViewBase {
 
 	// notify listener that the label has been single-clicked (tapped)
 	private void clickLabel(Label label) {
-		Log.e("label clicked", "pos = " + labels.indexOf(label));
 		listener.labelClicked(label.text, label.id, labels.indexOf(label));
 	}
 
@@ -259,7 +267,7 @@ public class LabelListListenable extends SurfaceViewBase {
 		for (Label label : labels) {
 			int newPosition = labels.indexOf(label);
 			if (newPosition != label.prevPosition) {
-				listener.labelMoved(label.id, newPosition);
+				listener.labelMoved(label.id, label.prevPosition, newPosition);
 			}
 		}
 	}
@@ -277,9 +285,9 @@ public class LabelListListenable extends SurfaceViewBase {
 
 	@Override
 	protected void init() {
-		initGlText();
 		if (labels == null)
-			initLabels();
+			labels = new ArrayList<Label>();
+		initGlText();
 		if (bgRectVb == null)
 			initBgRectVb();
 		listener.labelListInitialized(this);
