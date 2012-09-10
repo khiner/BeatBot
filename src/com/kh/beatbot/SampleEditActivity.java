@@ -73,6 +73,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 						public void onClick(DialogInterface dialog, int item) {
 							labelList.setLabelText(lastClickedId,
 									effectNames[item]);
+							labelList.setLabelOn(lastClickedId, true);
 							launchEffectIntent(effectNames[item],
 									lastClickedId, lastClickedPos);
 						}
@@ -97,10 +98,16 @@ public class SampleEditActivity extends Activity implements LevelListener {
 					Effect effect = GlobalVars
 							.findEffectByPosition(i, trackNum);
 					if (effect != null) {
-						this.labelList.addLabel(effect.name, effect.getId());
+						this.labelList.addLabel(effect.name, effect.getId(), effect.on);
 					} else {
-						this.labelList.addLabel("", getUniqueId(i));
+						this.labelList.addLabel("", getUniqueId(i), false);
 					}
+				}
+			} else {
+				for (int i = 0; i < 4; i++) {
+					Effect effect = GlobalVars.findEffectByPosition(i, trackNum);
+					if (effect != null)
+						this.labelList.setLabelOn(effect.getId(), effect.on);
 				}
 			}
 		}

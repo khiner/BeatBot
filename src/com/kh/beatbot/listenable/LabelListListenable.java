@@ -9,7 +9,6 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.opengl.GLU;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.global.GlobalVars;
@@ -35,17 +34,17 @@ public class LabelListListenable extends SurfaceViewBase {
 		private int id;
 		private int prevPosition;
 
-		Label(int id, String text, float x) {
+		Label(int id, String text, boolean on, float x) {
 			this.text = text;
 			this.id = id;
 			this.x = x;
+			// empty text indicates empty label
+			state = text.isEmpty() ? LabelState.EMPTY : (on ? LabelState.ON : LabelState.OFF);
 			setText(text);
 		}
 
 		public void setText(String text) {
 			this.text = text;
-			// empty text indicates empty label, start with on state otherwise
-			state = text.isEmpty() ? LabelState.EMPTY : LabelState.ON;
 			this.textWidth = glText.getTextWidth(text);
 			this.width = text.isEmpty() ? 200 : textWidth + 20;
 			backgroundRectVb = makeRoundedCornerRectBuffer(this.width, height,
@@ -148,10 +147,10 @@ public class LabelListListenable extends SurfaceViewBase {
 		this.listener = listener;
 	}
 
-	public void setLabelOn(String labelText, boolean on) {
-		Label label = findLabel(labelText);
+	public void setLabelOn(int labelId, boolean on) {
+		Label label = findLabel(labelId);
 		if (label != null) {
-			label.state = LabelState.ON;
+			label.state = on ? LabelState.ON : LabelState.OFF;
 		}
 	}
 
@@ -165,18 +164,6 @@ public class LabelListListenable extends SurfaceViewBase {
 	private Label findLabel(int id) {
 		for (Label label : labels) {
 			if (label.id == id) {
-				return label;
-			}
-		}
-		return null;
-	}
-
-	/*
-	 * Find the label with the given text
-	 */
-	private Label findLabel(String text) {
-		for (Label label : labels) {
-			if (label.text.equals(text)) {
 				return label;
 			}
 		}
@@ -206,16 +193,9 @@ public class LabelListListenable extends SurfaceViewBase {
 		}
 	}
 
-	public void addLabel(String text, int id) {
-		labels.add(new Label(id, text, Float.MAX_VALUE));
+	public void addLabel(String text, int id, boolean on) {
+		labels.add(new Label(id, text, on, Float.MAX_VALUE));
 		updateLabelLocations();
-	}
-
-	public void removeLabel(String text) {
-		Label label = findLabel(text);
-		if (label != null) {
-			labels.remove(label);
-		}
 	}
 
 	public boolean noLabels() {
