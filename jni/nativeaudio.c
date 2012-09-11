@@ -114,6 +114,7 @@ static inline void interleaveFloatsToShorts(float left[], float right[],
 static inline void processEffects(Track *track) {
 	track->volPan->process(track->volPan->config,
 						track->currBufferFloat, BUFF_SIZE);
+	pthread_mutex_lock(&track->effectMutex);
 	EffectNode *effectNode = track->effectHead;
 	while (effectNode != NULL) {
 		if (effectNode->effect != NULL && effectNode->effect->on) {
@@ -126,6 +127,7 @@ static inline void processEffects(Track *track) {
 		track->adsr->process(track->adsr->config,
 				track->currBufferFloat, BUFF_SIZE);
 	}
+	pthread_mutex_unlock(&track->effectMutex);
 }
 
 static inline void processEffectsForAllTracks() {

@@ -9,13 +9,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.TronKnob;
 
 public class EffectControlLayout extends LinearLayout {
 	private TextView label = null;
 	private TextView valueLabel = null;
 	private TronKnob knob = null;
-	
+
     public EffectControlLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOrientation(VERTICAL);
@@ -37,6 +38,9 @@ public class EffectControlLayout extends LinearLayout {
         label = (TextView)findViewById(R.id.param_label);
         valueLabel = (TextView)findViewById(R.id.param_value_label);
         knob = (TronKnob)findViewById(R.id.param_knob);
+        
+        label.setTypeface(GlobalVars.font);
+        valueLabel.setTypeface(GlobalVars.font);
         
         label.setText(paramLabel);
         valueLabel.setText(paramValue);

@@ -132,6 +132,7 @@ void addEffect(Track *track, Effect *effect) {
 	EffectNode *new = (EffectNode *) malloc(sizeof(EffectNode));
 	new->effect = effect;
 	new->next = NULL;
+	pthread_mutex_lock(&track->effectMutex);
 	// check for first insertion
 	if (track->effectHead == NULL) {
 		track->effectHead = new;
@@ -143,22 +144,26 @@ void addEffect(Track *track, Effect *effect) {
 		}
 		cur_ptr->next = new;
 	}
+	pthread_mutex_unlock(&track->effectMutex);
 }
 
 void setEffect(Track *track, int position, Effect *effect) {
 	EffectNode *cur_ptr = track->effectHead;
 	int count = 0;
+	pthread_mutex_lock(&track->effectMutex);
 	while (count < position && cur_ptr != NULL) {
 		cur_ptr = cur_ptr->next;
 		count++;
 	}
 	cur_ptr->effect = effect;
+	pthread_mutex_unlock(&track->effectMutex);
 }
 
 void insertEffect(Track *track, int position, EffectNode *node) {
 	EffectNode *cur_ptr = track->effectHead;
 	EffectNode *prev_ptr = NULL;
 	int count = 0;
+	pthread_mutex_lock(&track->effectMutex);
 	while (count < position && cur_ptr != NULL) {
 		prev_ptr = cur_ptr;
 		cur_ptr = cur_ptr->next;
@@ -171,12 +176,14 @@ void insertEffect(Track *track, int position, EffectNode *node) {
 		node->next = track->effectHead;
 		track->effectHead = node;
 	}
+	pthread_mutex_unlock(&track->effectMutex);
 }
 
 EffectNode *removeEffect(int trackNum, int effectId) {
 	EffectNode *one_back;
 	Track *track = getTrack(NULL, NULL, trackNum);
 	EffectNode *node = findEffectNodeById(trackNum, effectId);
+	pthread_mutex_lock(&track->effectMutex);
 	if (node == track->effectHead) {
 		track->effectHead = track->effectHead->next;
 	} else {
@@ -186,6 +193,7 @@ EffectNode *removeEffect(int trackNum, int effectId) {
 		}
 		one_back->next = node->next;
 	}
+	pthread_mutex_unlock(&track->effectMutex);
 	return node;
 }
 
@@ -202,6 +210,15 @@ void Java_com_kh_beatbot_effect_Effect_addEffect(JNIEnv *env, jclass clazz,
 	Effect *effect = createEffect(effectNum, effectId);
 	setEffect(track, position, effect);
 	printEffects(track->effectHead);
+}
+
+void Java_com_kh_beatbot_effect_Effect_removeEffect(JNIEnv *env, jclass clazz,
+		jint trackNum, jint id) {
+	EffectNode *effectNode = findEffectNodeById(trackNum, id);
+	free(effectNode->effect->config);
+	free(effectNode->effect);
+	effectNode->effect = NULL;
+	printEffects(getTrack(env, clazz, trackNum)->effectHead);
 }
 
 void Java_com_kh_beatbot_effect_Effect_setEffectPosition(JNIEnv *env,

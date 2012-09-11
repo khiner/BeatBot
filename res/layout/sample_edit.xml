@@ -122,11 +122,23 @@
             android:layout_toRightOf="@+id/pitchView" />
     </RelativeLayout>
 
+    <TextView 
+        android:id="@+id/effectsLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:layout_marginLeft="5dp"
+        android:layout_below="@+id/reverse"
+        android:textSize="16dp"
+        android:gravity="center"
+        android:text="@string/effects" />
+    
     <com.kh.beatbot.listenable.LabelListListenable
         android:id="@+id/effectList"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:layout_below="@+id/reverse"
+        android:layout_toRightOf="@+id/effectsLabel"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp" />

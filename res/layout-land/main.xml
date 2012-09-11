@@ -21,16 +21,16 @@
         android:layout_alignParentTop="true"
         layout="@layout/right_control_buttons" />
 
-    <ToggleButton
+    <TextView
         android:id="@+id/thresholdLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/midiView"
         android:layout_below="@+id/leftControlButtons"
-        android:background="@drawable/threshold_btn_src"
-        android:clickable="false"
-        android:textOff=""
-        android:textOn="" />
+        android:textSize="16dp"
+        android:gravity="center"
+        android:text="@string/threshold"
+        />
 
     <com.kh.beatbot.view.ThresholdBarView
         android:id="@+id/thresholdBar"

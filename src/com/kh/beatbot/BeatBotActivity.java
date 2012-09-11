@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -23,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
@@ -205,6 +207,9 @@ public class BeatBotActivity extends Activity {
 			createAllAssetAudioPlayers();
 		}
 		GlobalVars.init(sampleNames.length);
+		GlobalVars.font = Typeface.createFromAsset(getAssets(), "REDRING-1969-v03.ttf");
+		((TextView)findViewById(R.id.thresholdLabel)).setTypeface(GlobalVars.font);
+		
 		initManagers(savedInstanceState);
 		
 		midiView = ((MidiView) findViewById(R.id.midiView));

@@ -7,9 +7,7 @@
 
 typedef struct OpenSlOut_ {
 	float **currBufferFloat;
-	short currBufferShort[BUFF_SIZE * 2];
-	bool armed;
-	bool anyTrackArmed;
+	short currBufferShort[BUFF_SIZE * 2];bool armed;bool anyTrackArmed;
 	SLObjectItf outputPlayerObject;
 	SLPlayItf outputPlayerPlay;
 	SLMuteSoloItf outputPlayerMuteSolo;
@@ -24,20 +22,15 @@ typedef struct Track_ {
 	float **currBufferFloat;
 	Generator *generator;
 	MidiEventNode *eventHead;
-
 	MidiEventNode *nextEventNode;
 
+	// mutex for effects since insertion/setting/removing effects happens on diff thread than processing
+	pthread_mutex_t effectMutex;
 	long nextStartSample, nextStopSample;
-	float noteVolume, notePan, notePitch,
-		  primaryVolume, primaryPan, primaryPitch;
+	float noteVolume, notePan, notePitch, primaryVolume, primaryPan,
+			primaryPitch;
 
-	int num;
-	bool armed;
-	bool playing;
-	bool previewing;
-	bool mute;
-	bool solo;
-	bool shouldSound;
+	int num;bool armed;bool playing;bool previewing;bool mute;bool solo;bool shouldSound;
 } Track;
 
 Track tracks[NUM_TRACKS];

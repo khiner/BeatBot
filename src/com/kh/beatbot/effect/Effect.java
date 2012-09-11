@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.util.FloatMath;
 
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.MidiManager;
 
 public abstract class Effect implements Comparable<Effect> {
@@ -168,7 +169,13 @@ public abstract class Effect implements Comparable<Effect> {
 		}
 	}
 	
+	public void removeEffect() {
+		removeEffect(trackNum, id);
+		GlobalVars.effects[trackNum].remove(this);
+	}
+	
 	public native void addEffect(int trackNum, int effectNum, int effectId, int position);
+	public native void removeEffect(int trackNum, int id);
 	public native void setEffectPosition(int trackNum, int effectId, int position);
 	public native void setEffectOn(int trackNum, int effectId, boolean on);
 	public native void setEffectParam(int trackNum, int effectId, int paramNum, float paramLevel);

@@ -11,6 +11,7 @@ import android.opengl.GLU;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.kh.beatbot.R;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.view.SurfaceViewBase;
@@ -18,6 +19,8 @@ import com.kh.beatbot.view.bean.MidiViewBean;
 import com.kh.beatbot.view.text.GLText;
 
 public class LabelListListenable extends SurfaceViewBase {
+	private static float addTextWidth;
+	
 	static enum LabelState {
 		EMPTY, OFF, ON
 	};
@@ -30,7 +33,7 @@ public class LabelListListenable extends SurfaceViewBase {
 		LabelState state;
 		private FloatBuffer backgroundRectVb = null;
 		private String text = null;
-		private float x, textWidth, width;
+		private float x, textWidth, labelWidth;
 		private int id;
 		private int prevPosition;
 
@@ -45,28 +48,39 @@ public class LabelListListenable extends SurfaceViewBase {
 
 		public void setText(String text) {
 			this.text = text;
+			if (text.isEmpty())
+				state = LabelState.EMPTY;
 			this.textWidth = glText.getTextWidth(text);
-			this.width = text.isEmpty() ? 200 : textWidth + 20;
-			backgroundRectVb = makeRoundedCornerRectBuffer(this.width, height,
-					10, 16);
+			labelWidth = text.isEmpty() ? (width - 3 * GAP_BETWEEN_LABELS) / 4 : textWidth + 20;
+			backgroundRectVb = makeRoundedCornerRectBuffer(labelWidth, height,
+					14, 16);
 		}
 
 		public boolean isPointInsideLabel(float x) {
-			return x > this.x && x < this.x + width;
+			return x > this.x && x < this.x + labelWidth;
 		}
 
 		public void draw() {
-			gl.glDisable(GL10.GL_TEXTURE_2D);
 			gl.glPushMatrix();
-			translate(x + this.width / 2, height / 2);
+			translate(x + labelWidth / 2, height / 2);
 			// draw background - different background colors for
 			// normal/dragged/on labels
 			drawTriangleFan(backgroundRectVb, whichColor());
 			gl.glPopMatrix();
-			gl.glEnable(GL10.GL_TEXTURE_2D);
-			setColor(GlobalVars.WHITE);
-			// draw string in center of rect
-			glText.draw(text, x + width / 2 - textWidth / 2, 0);
+			if (state == LabelState.EMPTY) {
+				drawTexture(0, x + labelWidth / 2 - addTextWidth / 2, 0, height, height);
+				glText.begin(); // Begin Text Rendering
+				setColor(GlobalVars.WHITE);
+				// draw string in center of rect
+				glText.draw("ADD", x + labelWidth / 2 - addTextWidth / 2 + height, TEXT_Y_OFFSET);
+				glText.end();
+			} else {
+				glText.begin(); // Begin Text Rendering
+				setColor(GlobalVars.WHITE);
+				// draw string in center of rect
+				glText.draw(text, x + labelWidth / 2 - textWidth / 2, TEXT_Y_OFFSET);
+				glText.end();
+			}
 		}
 
 		private float[] whichColor() {
@@ -125,7 +139,7 @@ public class LabelListListenable extends SurfaceViewBase {
 		LABEL_RECT_ON_COLOR[1] + .1f, LABEL_RECT_ON_COLOR[2] + .1f, 1 };
 
 	private static final float GAP_BETWEEN_LABELS = 5;
-
+	private static final float TEXT_Y_OFFSET = 3;
 	private FloatBuffer bgRectVb = null;
 	private GLText glText = null; // A GLText Instance
 	private LabelListListener listener = null;
@@ -184,12 +198,12 @@ public class LabelListListenable extends SurfaceViewBase {
 
 	private void updateLabelLocations() {
 		Collections.sort(labels); // sort labels by x value
-		float xTotal = GAP_BETWEEN_LABELS;
+		float xTotal = 0;
 		for (Label label : labels) {
 			if (touchedLabel == null || !label.equals(touchedLabel)) {
 				label.x = xTotal;
 			}
-			xTotal += label.width + GAP_BETWEEN_LABELS;
+			xTotal += label.labelWidth + GAP_BETWEEN_LABELS;
 		}
 	}
 
@@ -233,7 +247,7 @@ public class LabelListListenable extends SurfaceViewBase {
 
 	// notify listener that the label has been long-clicked
 	private void longClickLabel(Label label) {
-		listener.labelLongClicked(label.id);
+		listener.labelLongClicked(label.id, labels.indexOf(label));
 	}
 
 	private void setAllLabelPrevPositions() {
@@ -260,14 +274,16 @@ public class LabelListListenable extends SurfaceViewBase {
 		glText = new GLText(gl, this.getContext().getAssets());
 		// Load the font from file with no padding, and height of 4/5 total
 		// height
-		glText.load("Roboto-Regular.ttf", 4 * height / 5, 0, 0);
+		glText.load("REDRING-1969-v03.ttf", height / 2, 0, 0);
 	}
 
 	@Override
 	protected void init() {
+		loadTexture(R.drawable.plus_outline, 0);
 		if (labels == null)
 			labels = new ArrayList<Label>();
 		initGlText();
+		addTextWidth = glText.getTextWidth("add") + height;
 		if (bgRectVb == null)
 			initBgRectVb();
 		listener.labelListInitialized(this);
@@ -275,17 +291,18 @@ public class LabelListListenable extends SurfaceViewBase {
 
 	@Override
 	protected void drawFrame() {
-		gl.glDisable(GL10.GL_TEXTURE_2D);
 		translate(width / 2, height / 2);
 		// draw background rounded rect
 		drawTriangleFan(bgRectVb, BG_RECT_COLOR);
 		translate(-width / 2, -height / 2);
-		gl.glEnable(GL10.GL_TEXTURE_2D);
-		glText.begin(); // Begin Text Rendering
+		// draw all other labels other than touched label first
 		for (Label label : labels) {
-			label.draw();
+			if (touchedLabel == null || !touchedLabel.equals(label))
+				label.draw();
 		}
-		glText.end(); // Begin Text Rendering
+		if (touchedLabel != null) {
+			touchedLabel.draw(); // draw touched label last so it's on top
+		}
 	}
 
 	@Override

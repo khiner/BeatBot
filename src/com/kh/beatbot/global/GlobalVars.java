@@ -3,10 +3,14 @@ package com.kh.beatbot.global;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.graphics.Typeface;
+
 import com.kh.beatbot.effect.Effect;
 
 
 public class GlobalVars {
+	public static Typeface font;
+	
 	// time (in millis) between pointer down and pointer up to be considered a tap
 	public final static long SINGLE_TAP_TIME = 200;
 	// time (in millis) between taps before handling as a double-tap

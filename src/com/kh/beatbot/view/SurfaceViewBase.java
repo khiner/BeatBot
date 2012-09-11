@@ -186,7 +186,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		return (x - width/2)*(x - width/2) + (y - height/2)*(y - height/2);
 	}
 	
-	protected void drawTexture(int textureId, float x, float y, float width, float height) {
+	public void drawTexture(int textureId, float x, float y, float width, float height) {
 		gl.glEnable(GL10.GL_TEXTURE_2D);
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[textureId]);
 		((GL11)gl).glTexParameteriv(GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, crop, 0);

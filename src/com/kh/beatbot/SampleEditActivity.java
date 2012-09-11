@@ -1,6 +1,7 @@
 package com.kh.beatbot;
 
 import java.util.Collections;
+import java.util.Stack;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -10,6 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.effect.Chorus;
@@ -54,7 +56,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 
 		@Override
-		public void labelLongClicked(int id) {
+		public void labelLongClicked(int id, int position) {
 
 		}
 	}
@@ -71,41 +73,53 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			builder.setItems(effectNames,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int item) {
-							labelList.setLabelText(lastClickedId,
-									effectNames[item]);
-							labelList.setLabelOn(lastClickedId, true);
-							launchEffectIntent(effectNames[item],
-									lastClickedId, lastClickedPos);
+							if (!effectNames[item].equals("NONE")) {
+								labelList.setLabelText(lastClickedId,
+										effectNames[item]);
+								labelList.setLabelOn(lastClickedId, true);
+								launchEffectIntent(effectNames[item],
+										lastClickedId, lastClickedPos);
+							} else {
+								labelList.setLabelText(lastClickedId, "");
+								Effect effect = GlobalVars.findEffectById(
+										lastClickedId, trackNum);
+								if (effect != null) {
+									effect.removeEffect();
+								}
+							}
 						}
 					});
 			chooseEffectAlert = builder.create();
 		}
 
-		private int getUniqueId(int lowest) {
+		private Stack<Integer> getUniqueIds() {
+			Stack<Integer> uniqueIds = new Stack<Integer>();
 			for (int id = 0; id < 4; id++) {
-				if (GlobalVars.findEffectById(id, trackNum) == null && id >= lowest) {
-					return id;
-				}
+				if (GlobalVars.findEffectById(id, trackNum) == null)
+					uniqueIds.add(id);
 			}
-			return -1;
+			return uniqueIds;
 		}
 		
 		@Override
 		public void labelListInitialized(LabelListListenable labelList) {
 			this.labelList = labelList;
+			Stack<Integer> uniqueIds = getUniqueIds();
 			if (labelList.noLabels()) {
 				for (int i = 0; i < 4; i++) {
 					Effect effect = GlobalVars
 							.findEffectByPosition(i, trackNum);
 					if (effect != null) {
-						this.labelList.addLabel(effect.name, effect.getId(), effect.on);
+						this.labelList.addLabel(effect.name, effect.getId(),
+								effect.on);
 					} else {
-						this.labelList.addLabel("", getUniqueId(i), false);
+						this.labelList.addLabel("", uniqueIds.pop(), false);
 					}
 				}
 			} else {
 				for (int i = 0; i < 4; i++) {
-					Effect effect = GlobalVars.findEffectByPosition(i, trackNum);
+					Effect effect = GlobalVars
+							.findEffectByPosition(i, trackNum);
 					if (effect != null)
 						this.labelList.setLabelOn(effect.getId(), effect.on);
 				}
@@ -120,7 +134,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 				for (Effect other : GlobalVars.effects[trackNum]) {
 					if (other.equals(effect))
 						continue;
-					if (other.getPosition() >= newPosition && other.getPosition() < oldPosition) {
+					if (other.getPosition() >= newPosition
+							&& other.getPosition() < oldPosition) {
 						other.incPosition();
 					}
 				}
@@ -140,8 +155,10 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 
 		@Override
-		public void labelLongClicked(int id) {
-
+		public void labelLongClicked(int id, int position) {
+			lastClickedId = id;
+			lastClickedPos = position;
+			chooseEffectAlert.show();
 		}
 	}
 
@@ -161,6 +178,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		// remove title bar
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.sample_edit);
+		((TextView)findViewById(R.id.effectsLabel)).setTypeface(GlobalVars.font);
 		initLevels();
 		initSampleLabelList();
 		initEffectLabelList();
@@ -247,6 +265,12 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	private void launchEffectIntent(String effectName, int effectId,
 			int effectPosition) {
 		Effect effect = getEffect(effectName, effectId, effectPosition);
+		if (effectName != effect.name) {
+			// different effect being added to the effect slot. need to replace
+			// it
+			effect.removeEffect();
+			effect = getEffect(effectName, effectId, effectPosition);
+		}
 		Intent intent = new Intent();
 		intent.setClass(this, EffectActivity.class);
 		intent.putExtra("effectId", effect.getId());

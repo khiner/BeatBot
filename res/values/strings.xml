@@ -35,28 +35,32 @@
 	</string-array>
 	<string name="default_midi_file_name">MyMidi</string>
 
+	<string name="effects">EFFECTS</string>
+	<string name="threshold">THRESH</string>
+	
 	<string name="sample_edit_activity">Sample Edit</string>
 	<string name="preview_sample">Preview</string>
 	<string name="loop_sample">Loop Sample</string>
 	<string name="adsr">ADSR</string>
 	<string name="reverse">Reverse</string>
 	<string name="normalize">Normalize</string>
-	<string name="chorus">Chorus</string>
-	<string name="decimate">Decimate</string>
-	<string name="delay">Delay</string>
-	<string name="flanger">Flanger</string>
-	<string name="filter">Filter</string>
-	<string name="reverb">Reverb</string>
-	<string name="tremelo">Tremelo</string>
+	<string name="chorus">CHORUS</string>
+	<string name="decimate">DECIMATE</string>
+	<string name="delay">DELAY</string>
+	<string name="flanger">FLANGER</string>
+	<string name="filter">FILTER</string>
+	<string name="reverb">REVERB</string>
+	<string name="tremelo">TREMELO</string>
 
 	<string-array name="effect_names">
-		<item name="chorus">Chorus</item>
-		<item name="decimate">Decimate</item>
-		<item name="delay">Delay</item>>
-		<item name="flanger">Flanger</item>
-		<item name="filter">Filter</item>
-		<item name="reverb">Reverb</item>
-		<item name="tremelo">Tremelo</item>
+		<item name="chorus">CHORUS</item>
+		<item name="decimate">DECIMATE</item>
+		<item name="delay">DELAY</item>>
+		<item name="flanger">FLANGER</item>
+		<item name="filter">FILTER</item>
+		<item name="reverb">REVERB</item>
+		<item name="tremelo">TREMELO</item>
+		<item name="none">NONE</item>
 	</string-array>
 
 	<!-- param names -->
