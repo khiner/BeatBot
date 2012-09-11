@@ -24,13 +24,12 @@
     <TextView
         android:id="@+id/thresholdLabel"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:layout_alignLeft="@+id/midiView"
         android:layout_below="@+id/leftControlButtons"
         android:textSize="16dp"
         android:gravity="center"
-        android:text="@string/threshold"
-        />
+        android:text="@string/threshold" />
 
     <com.kh.beatbot.view.ThresholdBarView
         android:id="@+id/thresholdBar"
@@ -53,8 +52,8 @@
 
         <ToggleButton
             android:id="@+id/volumeButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
             android:background="@drawable/volume_btn_src"
             android:checked="true"
             android:onClick="volume"
@@ -63,8 +62,8 @@
 
         <ToggleButton
             android:id="@+id/panButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
             android:background="@drawable/pan_btn_src"
             android:onClick="pan"
             android:textOff=""
@@ -72,8 +71,8 @@
 
         <ToggleButton
             android:id="@+id/pitchButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
             android:background="@drawable/pitch_btn_src"
             android:onClick="pitch"
             android:textOff=""
