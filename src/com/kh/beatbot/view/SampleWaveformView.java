@@ -223,8 +223,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 		while (samples == null)
 			; // wait until we're sure the sample bytes have been set
 		waveformVb = WaveformHelper.floatsToFloatBuffer(samples, height, 0);
-		loadTexture(R.drawable.preview_icon4, 0);
-		loadTexture(R.drawable.preview_icon_selected4, 1);
+		loadTexture(R.drawable.preview_icon, 0);
+		loadTexture(R.drawable.preview_icon_selected, 1);
 		initBackgroundOutlineVb();
 		initPreviewButtonSquareVb();
 		initLoopMarkerVb();
