@@ -6,7 +6,7 @@
 #include <android/log.h>
 
 #define TABLE_SIZE 2048
-#define BUFF_SIZE 512 // 512 samples, each with one short for each channel
+#define BUFF_SIZE 1024 // each sample has one short for each channel
 #define SAMPLE_RATE 44100
 #define bool _Bool
 #define false 0
