@@ -66,7 +66,7 @@ public class MidiView extends SurfaceViewBase {
 		}
 	}
 
-	public void initMeFirstTest() {
+	public void initMeFirst() {
 		midiManager = Managers.midiManager;
 		TickWindowHelper.viewBean = bean;
 		TickWindowHelper.updateGranularity();
@@ -274,13 +274,13 @@ public class MidiView extends SurfaceViewBase {
 	private void drawRecordingWaveforms() {
 		ArrayList<FloatBuffer> waveformVbs = waveformHelper
 				.getCurrentWaveformVbs();
-		if (Managers.recordManager.isRecording() && !waveformVbs.isEmpty()) {
+		if (RecordManager.isRecording() && !waveformVbs.isEmpty()) {
 			FloatBuffer last = waveformVbs.get(waveformVbs.size() - 1);
 			float waveWidth = last.get(last.capacity() - 2);
 			float noteWidth = tickToX(midiManager.getCurrTick()
-					- Managers.recordManager.getRecordStartTick());
+					- RecordManager.getRecordStartTick());
 			gl.glPushMatrix();
-			gl.glTranslatef(tickToX(Managers.recordManager.getRecordStartTick()), 0, 0);
+			gl.glTranslatef(tickToX(RecordManager.getRecordStartTick()), 0, 0);
 			// scale drawing so the entire waveform exactly fits in the note
 			// width
 			gl.glScalef(noteWidth / waveWidth, 1, 1);

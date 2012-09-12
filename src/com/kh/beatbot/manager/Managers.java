@@ -3,14 +3,12 @@ package com.kh.beatbot.manager;
 import android.os.Bundle;
 
 public class Managers {
-	public static AudioClassificationManager audioClassificationManager = null;
 	public static MidiManager midiManager = null;
 	public static PlaybackManager playbackManager = null;
 	public static RecordManager recordManager = null;
-	
+
 	public static void init(Bundle savedInstanceState, String[] sampleNames) {
 		// get all Manager singletons
-		audioClassificationManager = AudioClassificationManager.getInstance();
 		playbackManager = PlaybackManager.getInstance(sampleNames);
 		recordManager = RecordManager.getInstance();
 		

@@ -6,6 +6,7 @@ import java.util.List;
 import android.graphics.Typeface;
 
 import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.view.MidiView;
 
 
 public class GlobalVars {
@@ -27,6 +28,7 @@ public class GlobalVars {
 	public static final int NUM_EFFECTS = 7;
 	public static final short LEVEL_MAX = 127;
 	
+	public static MidiView midiView;
 	// effect settings are stored here instead of in the effect activities
 	// because the activities are destroyed after clicking 'back', and we
 	// need to persist state

@@ -12,7 +12,6 @@ import java.util.Stack;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.kh.beatbot.BeatBotActivity;
 import com.kh.beatbot.SampleEditActivity;
@@ -375,8 +374,11 @@ public class MidiManager implements Parcelable {
 
 	private List<MidiNote> copyMidiList(List<MidiNote> midiList) {
 		List<MidiNote> copy = new ArrayList<MidiNote>();
-		for (MidiNote midiNote : midiNotes) {
-			copy.add(midiNote.getCopy());
+		for (int i = 0; i < midiNotes.size(); i++) {
+			// avoid concurrent modification exception
+			if (i < midiNotes.size()) {// note could have been added/deleted after starting loop
+				copy.add(midiNotes.get(i).getCopy());
+			}
 		}
 		return copy;
 	}

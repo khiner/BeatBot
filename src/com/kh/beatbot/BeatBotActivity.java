@@ -9,6 +9,8 @@ import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,7 +24,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -142,8 +143,6 @@ public class BeatBotActivity extends Activity {
 	private ListView sampleListView;
 	private static AssetManager assetManager;
 
-	private MidiView midiView;
-
 	private IconLongClickListener iconLongClickListener = new IconLongClickListener();
 
 	private final String[] sampleNames = { "kick_808.wav", "snare_808.wav",
@@ -163,7 +162,7 @@ public class BeatBotActivity extends Activity {
 		// has focus
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 	}
-	
+
 	private void initLevelsIconGroup() {
 		levelsGroup = (ViewGroup) findViewById(R.id.levelsLayout);
 		volume = (ToggleButton) findViewById(R.id.volumeButton);
@@ -184,21 +183,22 @@ public class BeatBotActivity extends Activity {
 		sampleListView = (ListView) findViewById(R.id.sampleListView);
 		sampleListView.setAdapter(adapter);
 	}
-	
+
 	private void initManagers(Bundle savedInstanceState) {
 		Managers.init(savedInstanceState, sampleNames);
 		Managers.midiManager.setActivity(this);
 		setDeleteIconEnabled(false);
-		((ThresholdBarView) findViewById(R.id.thresholdBar)).addLevelListener(Managers.recordManager);
+		((ThresholdBarView) findViewById(R.id.thresholdBar))
+				.addLevelListener(Managers.recordManager);
 	}
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		initAndroidSettings();
 		setContentView(R.layout.main);
-		
+
 		initLevelsIconGroup();
 		initSampleListView();
 		assetManager = getAssets();
@@ -207,20 +207,23 @@ public class BeatBotActivity extends Activity {
 			createAllAssetAudioPlayers();
 		}
 		GlobalVars.init(sampleNames.length);
-		GlobalVars.font = Typeface.createFromAsset(getAssets(), "REDRING-1969-v03.ttf");
-		((TextView)findViewById(R.id.thresholdLabel)).setTypeface(GlobalVars.font);
-		
+		GlobalVars.font = Typeface.createFromAsset(getAssets(),
+				"REDRING-1969-v03.ttf");
+		((TextView) findViewById(R.id.thresholdLabel))
+				.setTypeface(GlobalVars.font);
+
 		initManagers(savedInstanceState);
-		
-		midiView = ((MidiView) findViewById(R.id.midiView));
-		midiView.initMeFirstTest();
-		Managers.recordManager.setMidiView(midiView);
-		
+
+		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));
+		GlobalVars.midiView.initMeFirst();
+
 		if (savedInstanceState != null) {
-			midiView.readFromBundle(savedInstanceState);
-			// if going to levels view or in levels view, level icons should be visible
-			int levelsVisibilityState = midiView.getViewState() == MidiView.State.TO_LEVELS_VIEW ||
-					midiView.getViewState() == MidiView.State.LEVELS_VIEW ? View.VISIBLE : View.GONE;
+			GlobalVars.midiView.readFromBundle(savedInstanceState);
+			// if going to levels view or in levels view, level icons should be
+			// visible
+			int levelsVisibilityState = GlobalVars.midiView.getViewState() == MidiView.State.TO_LEVELS_VIEW
+					|| GlobalVars.midiView.getViewState() == MidiView.State.LEVELS_VIEW ? View.VISIBLE
+					: View.GONE;
 			levelsGroup.setVisibility(levelsVisibilityState);
 
 		}
@@ -249,11 +252,12 @@ public class BeatBotActivity extends Activity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putParcelable("midiManager", Managers.midiManager);
-		midiView.writeToBundle(outState);
-		outState.putBoolean("playing",
+		GlobalVars.midiView.writeToBundle(outState);
+		outState.putBoolean(
+				"playing",
 				Managers.playbackManager.getState() == PlaybackManager.State.PLAYING);
 		outState.putBoolean("recording",
-				Managers.recordManager.getState() != RecordManager.State.INITIALIZING);
+				RecordManager.getState() != RecordManager.State.INITIALIZING);
 	}
 
 	@Override
@@ -269,7 +273,7 @@ public class BeatBotActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.snap:
-			if (midiView.toggleSnapToGrid())
+			if (GlobalVars.midiView.toggleSnapToGrid())
 				item.setIcon(R.drawable.btn_check_buttonless_on);
 			else
 				item.setIcon(R.drawable.btn_check_buttonless_off);
@@ -304,29 +308,24 @@ public class BeatBotActivity extends Activity {
 		return true;
 	}
 
-	public void setDeleteIconEnabled(boolean enabled) {
-		((ImageButton) findViewById(R.id.delete)).setEnabled(enabled);
-	}
-
-	// DON'T USE YET! this needs to run on the UI thread somehow.
-	public void activateIcon(int trackNum) {
-		((ImageView) sampleListView.getChildAt(trackNum)).setImageState(
-				new int[] { android.R.attr.state_checked }, true);
-	}
-
-	// DON'T USE YET! this needs to run on the UI thread somehow.
-	public void deactivateIcon(int trackNum) {
-		((ImageView) sampleListView.getChildAt(trackNum)).setImageState(
-				new int[] { android.R.attr.state_empty }, true);
+	public void setDeleteIconEnabled(final boolean enabled) {
+		// need to change UI stuff on the UI thread.
+		Handler refresh = new Handler(Looper.getMainLooper());
+		refresh.post(new Runnable() {
+			public void run() {
+				((ImageButton) findViewById(R.id.delete)).setEnabled(enabled);
+			}
+		});
 	}
 
 	public void record(View view) {
-		if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
+		if (RecordManager.getState() != RecordManager.State.INITIALIZING) {
 			Managers.recordManager.stopListening();
 			((ToggleButton) view).setChecked(false);
 		} else {
-			midiView.reset();
-			// if we're already playing, Managers.midiManager is already ticking away.
+			GlobalVars.midiView.reset();
+			// if we're already playing, Managers.midiManager is already ticking
+			// away.
 			if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
 				play(findViewById(R.id.playButton));
 			Managers.recordManager.startListening();
@@ -343,25 +342,23 @@ public class BeatBotActivity extends Activity {
 	}
 
 	public void stop(View view) {
-		if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING)
+		if (RecordManager.getState() != RecordManager.State.INITIALIZING)
 			record(findViewById(R.id.recordButton));
 		if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			Managers.playbackManager.stop();
 			((ToggleButton) findViewById(R.id.playButton)).setChecked(false);
-			spin(10); // wait for midi tick thread to notice that playback has
-						// stopped
 			Managers.midiManager.reset();
 		}
 	}
 
 	public void undo(View view) {
 		Managers.midiManager.undo();
-		midiView.handleUndo();
+		GlobalVars.midiView.handleUndo();
 	}
 
 	public void levels(View view) {
-		midiView.toggleLevelsView();
-		if (midiView.getViewState() == MidiView.State.TO_LEVELS_VIEW) {
+		GlobalVars.midiView.toggleLevelsView();
+		if (GlobalVars.midiView.getViewState() == MidiView.State.TO_LEVELS_VIEW) {
 			fadeListener.setFadeOut(false);
 			levelsGroup.startAnimation(fadeIn);
 		} else {
@@ -378,21 +375,21 @@ public class BeatBotActivity extends Activity {
 		volume.setChecked(true);
 		pan.setChecked(false);
 		pitch.setChecked(false);
-		midiView.setLevelMode(LevelsViewHelper.LevelMode.VOLUME);
+		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.VOLUME);
 	}
 
 	public void pan(View view) {
 		volume.setChecked(false);
 		pan.setChecked(true);
 		pitch.setChecked(false);
-		midiView.setLevelMode(LevelsViewHelper.LevelMode.PAN);
+		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.PAN);
 	}
 
 	public void pitch(View view) {
 		volume.setChecked(false);
 		pan.setChecked(false);
 		pitch.setChecked(true);
-		midiView.setLevelMode(LevelsViewHelper.LevelMode.PITCH);
+		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.PITCH);
 	}
 
 	public void bpmTap(View view) {
@@ -400,7 +397,8 @@ public class BeatBotActivity extends Activity {
 		float millisElapsed = tapTime - lastTapTime;
 		lastTapTime = tapTime;
 		float bpm = 60000 / millisElapsed;
-		// if bpm is far below MIN limit, consider this the first tap, otherwise,
+		// if bpm is far below MIN limit, consider this the first tap,
+		// otherwise,
 		// if it's under but close, set to MIN_BPM
 		if (bpm < MidiManager.MIN_BPM - 10)
 			return;
@@ -416,6 +414,7 @@ public class BeatBotActivity extends Activity {
 	public static native void createEngine(AssetManager assetManager);
 
 	public static native boolean createAssetAudioPlayer();
+
 	public static native boolean initTrack(String filename);
 
 	public static native void shutdown();

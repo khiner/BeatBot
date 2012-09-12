@@ -20,20 +20,12 @@ public class WaveformHelper extends Thread {
 	// into one large FloatBuffer and stored in completedWaveforms
 	private ArrayList<FloatBuffer> waveformSegmentsVB = new ArrayList<FloatBuffer>();
 
-	// holds full files of sound bytes after they have finished recording,
-	// and before they are classified and displayed as MIDI notes
-	private ArrayList<FloatBuffer> completedWaveforms = new ArrayList<FloatBuffer>();
-
 	private Queue<byte[]> bytesQueue = new LinkedList<byte[]>();
 		
 	private boolean completed;
 		
 	public ArrayList<FloatBuffer> getCurrentWaveformVbs() {
 		return waveformSegmentsVB;
-	}
-
-	public ArrayList<FloatBuffer> getCompletedWaveformVBs() {
-		return completedWaveforms;
 	}
 	
 	@Override
