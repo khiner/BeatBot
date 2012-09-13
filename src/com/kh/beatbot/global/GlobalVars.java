@@ -23,7 +23,7 @@ public class GlobalVars {
 	// time (in millis) for a long press in one location
 	public final static long LONG_CLICK_TIME = 500;
 
-	public static final String[] sampleTypes = { "kick", "snare", "hh_closed",
+	public static final String[] instrumentNames = { "kick", "snare", "hh_closed",
 			"hh_open", "rim", "bass", "recorded" };
 	public static final String[] iconTypes = { "kick", "snare", "hh_closed",
 			"hh_open", "rim", "bass" };
@@ -59,6 +59,7 @@ public class GlobalVars {
 	public static float[] sampleLoopEnd;
 	public static float currBeatDivision;
 	public static File[][] samples;
+	public static String[][] sampleNames;
 
 	private static void initDefaultAdsrPoints(int trackNum) {
 		for (int i = 0; i < 5; i++) {
@@ -82,10 +83,14 @@ public class GlobalVars {
 		adsrPoints = new float[numTracks][5][2];
 		sampleLoopBegin = new float[numTracks];
 		sampleLoopEnd = new float[numTracks];
-		samples = new File[numTracks][];
-		for (int track = 0; track < numTracks; track++) {
-			samples[track] = new File(appDirectory + sampleTypes[track])
-					.listFiles();
+		samples = new File[numTracks + 1][];
+		sampleNames = new String[numTracks + 1][];
+		for (int track = 0; track < numTracks + 1; track++) {
+			File dir = new File(appDirectory + instrumentNames[track]);
+			samples[track] = dir.listFiles();
+			sampleNames[track] = dir.list();
+			if (track >= numTracks)
+				continue;
 			initDefaultAdsrPoints(track);
 			sampleLoopBegin[track] = sampleLoopEnd[track] = 0;
 			trackVolume[track] = .8f;

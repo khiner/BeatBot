@@ -233,7 +233,7 @@ public class BeatBotActivity extends Activity {
 		File appDirectoryFile = new File(GlobalVars.appDirectory);
 		// build the directory structure, if needed
 		appDirectoryFile.mkdirs();
-		for (String sampleType : GlobalVars.sampleTypes) {
+		for (String sampleType : GlobalVars.instrumentNames) {
 			// the sample folder for this sample type does not yet exist.
 			// create it and write all assets of this type to the folder
 			copyFromAssetsToExternal(sampleType);
@@ -250,7 +250,7 @@ public class BeatBotActivity extends Activity {
 
 		initLevelsIconGroup();
 		initSampleListView();
-		GlobalVars.init(GlobalVars.sampleTypes.length - 1); // minus 1 for
+		GlobalVars.init(GlobalVars.instrumentNames.length - 1); // minus 1 for
 		// recorded type
 		if (savedInstanceState == null) {
 			createEngine(assetManager);

@@ -1,6 +1,5 @@
 package com.kh.beatbot;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.Stack;
 
@@ -165,6 +164,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 	}
 
+	private AlertDialog selectInstrumentAlert = null;
 	private AlertDialog selectSampleAlert = null;
 
 	private static SampleWaveformView sampleWaveformView = null;
@@ -173,15 +173,14 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	private static LabelListListenable effectLabelList = null,
 			sampleLabelList = null;
 
-	private int trackNum;
-	private String[] sampleNames;
+	private int trackNum, currInstrumentNum;
 
 	private static String[] effectNames;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		trackNum = getIntent().getExtras().getInt("trackNum");
+		trackNum = currInstrumentNum = getIntent().getExtras().getInt("trackNum");
 		// remove title bar
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.sample_edit);
@@ -193,10 +192,9 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		((ImageButton) findViewById(R.id.instrumentButton))
 				.setBackgroundResource(GlobalVars.drumIcons[trackNum]);
 		// set the instrument text
-		sampleNames = new File(GlobalVars.appDirectory
-				+ GlobalVars.sampleTypes[trackNum]).list();
-		((Button) findViewById(R.id.sampleSelect)).setText(sampleNames[0]);
-		initChooseSampleAlert();
+		((Button) findViewById(R.id.sampleSelect)).setText(GlobalVars.sampleNames[trackNum][0]);
+		initSelectInstrumentAlert();
+		initSelectSampleAlert();
 		initLevels();
 		initSampleLabelList();
 		initEffectLabelList();
@@ -207,14 +205,32 @@ public class SampleEditActivity extends Activity implements LevelListener {
 				.setChecked(Managers.playbackManager.isLooping(trackNum));
 	}
 
-	private void initChooseSampleAlert() {
+	private void setSample(int instrumentNum, int sampleNum) {
+		setSampleBytes(trackNum, GlobalVars.getSampleBytes(instrumentNum, sampleNum));
+		((Button) findViewById(R.id.sampleSelect)).setText(GlobalVars.sampleNames[instrumentNum][sampleNum]);
+		sampleWaveformView.setSamples(getSamples(trackNum));
+	}
+	
+	private void initSelectInstrumentAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Choose Effect");
-		builder.setItems(sampleNames, new DialogInterface.OnClickListener() {
+		builder.setTitle("Choose Instrument");
+		builder.setItems(GlobalVars.instrumentNames, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
-				setSampleBytes(trackNum, GlobalVars.getSampleBytes(trackNum, item));
-				((Button) findViewById(R.id.sampleSelect)).setText(sampleNames[item]);
-				sampleWaveformView.setSamples(getSamples(trackNum));
+				setSample(item, 0);
+				currInstrumentNum = item;
+				// update the sample select alert names with the new instrument samples
+				initSelectSampleAlert();
+			}
+		});
+		selectInstrumentAlert = builder.create();
+	}
+	
+	private void initSelectSampleAlert() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Choose Sample");
+		builder.setItems(GlobalVars.sampleNames[currInstrumentNum], new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
+				setSample(currInstrumentNum, item);
 			}
 		});
 		selectSampleAlert = builder.create();
@@ -253,6 +269,10 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 	}
 
+	public void selectInstrument(View view) {
+		selectInstrumentAlert.show();
+	}
+	
 	public void selectSample(View view) {
 		selectSampleAlert.show();
 	}
