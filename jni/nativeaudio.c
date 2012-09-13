@@ -71,7 +71,6 @@ MidiEvent* initEvent(long onTick, long offTick, float volume, float pan,
 
 void initTrack(Track *track, char *bytes, int length) {
 	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
-	__android_log_print(ANDROID_LOG_ERROR, "in native initTrack", "beginning");
 	track->num = trackCount;
 	track->effectHead = NULL;
 	track->nextEventNode = NULL;
@@ -89,7 +88,6 @@ void initTrack(Track *track, char *bytes, int length) {
 	track->generator = malloc(sizeof(Generator));
 	initGenerator(track->generator, wavfile_create(bytes, length), wavfile_reset,
 			wavfile_generate, wavfile_destroy);
-	__android_log_print(ANDROID_LOG_ERROR, "in native initTrack", "after generator create");
 	int effectNum;
 	for (effectNum = 0; effectNum < 4; effectNum++) {
 		addEffect(track, NULL);
@@ -364,12 +362,8 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_initTrack(JNIEnv *env,
 	}
 	Track *track = getTrack(env, clazz, trackCount);
 	int length = (*env)->GetArrayLength(env, bytes);
-	__android_log_print(ANDROID_LOG_ERROR, "in initTrack", "length = %d", length);
 	char *data = (char *)(*env)->GetByteArrayElements(env, bytes, 0);
-	__android_log_print(ANDROID_LOG_ERROR, "in initTrack", "after data assignment");
 	(*env)->ReleaseByteArrayElements(env, bytes, data, JNI_ABORT);
-	__android_log_print(ANDROID_LOG_ERROR, "in initTrack", "after release");
-
 	initTrack(track, data, length);
 	trackCount++; // all done! increment track count
 	return JNI_TRUE;

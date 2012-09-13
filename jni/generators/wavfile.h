@@ -18,6 +18,7 @@ typedef struct WavFile_t {
 } WavFile;
 
 WavFile *wavfile_create();
+void wavfile_setBytes(WavFile *wavFile, char *bytes, int length);
 void wavfile_reset(WavFile *config);
 
 static inline void wavfile_tick(WavFile *config, float *sample) {

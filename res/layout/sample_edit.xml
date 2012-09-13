@@ -3,14 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background" >
-
-    <com.kh.beatbot.listenable.LabelListListenable
-        android:id="@+id/sampleList"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
+    
+    <ImageButton 
+        android:id="@+id/instrumentButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp" />
+    
+    <Button
+        android:id="@+id/sampleSelect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/instrumentButton"
         android:layout_marginTop="5dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp" />
+        android:onClick="selectSample" />
     
     <com.kh.beatbot.view.SampleWaveformView
         android:id="@+id/sample_waveform_view"
@@ -18,7 +24,7 @@
         android:layout_height="70dp"
         android:layout_marginTop="5dp"
         android:layout_toLeftOf="@+id/adsr_toggle"
-        android:layout_below="@+id/sampleList" />
+        android:layout_below="@+id/instrumentButton" />
     
     <ToggleButton
         android:id="@+id/adsr_toggle"

@@ -9,7 +9,6 @@ import java.io.InputStream;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.os.Environment;
 
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listenable.LevelListenable;
@@ -19,7 +18,6 @@ import com.kh.beatbot.view.ThresholdBarView;
 public class RecordManager implements LevelListener {
 	private static final long RECORD_LATENCY = 250;
 	private static final int RECORDER_BPP = 16;
-	private static final String SAVE_FOLDER = "BeatBot/Recorded_Audio";
 	private static final String TEMP_FILE = "record_temp.raw";
 	private static final int RECORDER_SAMPLERATE = 44100;
 	private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
@@ -30,7 +28,8 @@ public class RecordManager implements LevelListener {
 	private static final long LONG_SAMPLE_RATE = RECORDER_SAMPLERATE;
 
 	private static String currFilename = null;
-	private static String baseFilePath = null;
+	
+	private static String recordDirectory = null;
 
 	private static RecordManager singletonInstance = null;
 
@@ -75,7 +74,7 @@ public class RecordManager implements LevelListener {
 		bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
 				RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 		initRecorder();
-		baseFilePath = createBaseRecordPath();
+		recordDirectory = GlobalVars.appDirectory + "recorded/";
 		state = State.INITIALIZING;
 	}
 
@@ -86,33 +85,16 @@ public class RecordManager implements LevelListener {
 	}
 
 	private String getFilename() {
-		String filepath = Environment.getExternalStorageDirectory().getPath();
-		File file = new File(filepath, SAVE_FOLDER);
-
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-
-		return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + ".wav");
-	}
-
-	private String createBaseRecordPath() {
-		String filepath = Environment.getExternalStorageDirectory().getPath();
-		File file = new File(filepath, SAVE_FOLDER);
-
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-		return file.getAbsolutePath();
+		return recordDirectory + "/" + System.currentTimeMillis() + ".wav";
 	}
 
 	private String getTempFilename() {
-		File tempFile = new File(baseFilePath, TEMP_FILE);
+		File tempFile = new File(recordDirectory, TEMP_FILE);
 
 		int i = 0;
 		while (tempFile.exists()) {
 			i++;
-			tempFile = new File(baseFilePath, TEMP_FILE + i);
+			tempFile = new File(recordDirectory, TEMP_FILE + i);
 		}
 
 		return tempFile.getAbsolutePath();

@@ -1,5 +1,6 @@
 package com.kh.beatbot;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.Stack;
 
@@ -11,6 +12,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -62,7 +65,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	class EffectLabelListListener implements LabelListListener {
-		private AlertDialog chooseEffectAlert = null;
+		private AlertDialog selectEffectAlert = null;
 		private LabelListListenable labelList;
 		private int lastClickedId = -1;
 		private int lastClickedPos = -1;
@@ -89,7 +92,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 							}
 						}
 					});
-			chooseEffectAlert = builder.create();
+			selectEffectAlert = builder.create();
 		}
 
 		private Stack<Integer> getUniqueIds() {
@@ -100,7 +103,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			}
 			return uniqueIds;
 		}
-		
+
 		@Override
 		public void labelListInitialized(LabelListListenable labelList) {
 			this.labelList = labelList;
@@ -148,7 +151,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			lastClickedId = id;
 			lastClickedPos = position;
 			if (text.isEmpty()) {
-				chooseEffectAlert.show();
+				selectEffectAlert.show();
 			} else {
 				launchEffectIntent(text, id, position);
 			}
@@ -158,9 +161,11 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		public void labelLongClicked(int id, int position) {
 			lastClickedId = id;
 			lastClickedPos = position;
-			chooseEffectAlert.show();
+			selectEffectAlert.show();
 		}
 	}
+
+	private AlertDialog selectSampleAlert = null;
 
 	private static SampleWaveformView sampleWaveformView = null;
 	// private EditLevelsView editLevelsView = null;
@@ -169,6 +174,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			sampleLabelList = null;
 
 	private int trackNum;
+	private String[] sampleNames;
+
 	private static String[] effectNames;
 
 	@Override
@@ -178,7 +185,18 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		// remove title bar
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.sample_edit);
-		((TextView)findViewById(R.id.effectsLabel)).setTypeface(GlobalVars.font);
+		// set text font
+		((TextView) findViewById(R.id.effectsLabel))
+				.setTypeface(GlobalVars.font);
+		((Button) findViewById(R.id.sampleSelect)).setTypeface(GlobalVars.font);
+		// set the instrument icon
+		((ImageButton) findViewById(R.id.instrumentButton))
+				.setBackgroundResource(GlobalVars.drumIcons[trackNum]);
+		// set the instrument text
+		sampleNames = new File(GlobalVars.appDirectory
+				+ GlobalVars.sampleTypes[trackNum]).list();
+		((Button) findViewById(R.id.sampleSelect)).setText(sampleNames[0]);
+		initChooseSampleAlert();
 		initLevels();
 		initSampleLabelList();
 		initEffectLabelList();
@@ -189,6 +207,19 @@ public class SampleEditActivity extends Activity implements LevelListener {
 				.setChecked(Managers.playbackManager.isLooping(trackNum));
 	}
 
+	private void initChooseSampleAlert() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Choose Effect");
+		builder.setItems(sampleNames, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
+				setSampleBytes(trackNum, GlobalVars.getSampleBytes(trackNum, item));
+				((Button) findViewById(R.id.sampleSelect)).setText(sampleNames[item]);
+				sampleWaveformView.setSamples(getSamples(trackNum));
+			}
+		});
+		selectSampleAlert = builder.create();
+	}
+
 	private void initEffectLabelList() {
 		effectNames = getResources().getStringArray(R.array.effect_names);
 		effectLabelList = (LabelListListenable) findViewById(R.id.effectList);
@@ -196,8 +227,9 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	private void initSampleLabelList() {
-		sampleLabelList = (LabelListListenable) findViewById(R.id.sampleList);
-		sampleLabelList.setListener(new SampleLabelListListener(this));
+		// sampleLabelList = (LabelListListenable)
+		// findViewById(R.id.sampleList);
+		// sampleLabelList.setListener(new SampleLabelListListener(this));
 	}
 
 	private void initSampleWaveformView() {
@@ -219,6 +251,10 @@ public class SampleEditActivity extends Activity implements LevelListener {
 				}
 			}
 		}
+	}
+
+	public void selectSample(View view) {
+		selectSampleAlert.show();
 	}
 
 	public void toggleLoop(View view) {
@@ -356,6 +392,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 
 	public static native void setAdsrOn(int trackNum, boolean on);
 
+	public static native void setSampleBytes(int trackNum, byte[] bytes);
+	
 	@Override
 	public void setLevel(LevelListenable levelListenable, float levelX,
 			float levelY) {

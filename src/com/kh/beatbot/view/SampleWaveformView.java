@@ -87,12 +87,12 @@ public class SampleWaveformView extends SurfaceViewBase {
 	public void setSamples(float[] samples) {
 		this.samples = samples;
 		numSamples = samples.length;
-		if (GlobalVars.sampleLoopEnd[trackNum] == 0)
-			GlobalVars.sampleLoopEnd[trackNum] = numSamples;
+		GlobalVars.sampleLoopEnd[trackNum] = numSamples;
 		sampleWidth = numSamples;
 		if (height != 0) {
 			waveformVb = WaveformHelper.floatsToFloatBuffer(samples, height, 0);
 		}
+		updateLoopMarkers();
 	}
 
 	public void setShowAdsr(boolean on) {

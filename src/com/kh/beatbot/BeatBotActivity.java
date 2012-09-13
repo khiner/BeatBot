@@ -1,7 +1,6 @@
 package com.kh.beatbot;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -138,7 +137,7 @@ public class BeatBotActivity extends Activity {
 			mute.setOnClickListener(this);
 			solo.setOnClickListener(this);
 			icon.setOnLongClickListener(iconLongClickListener);
-			icon.setBackgroundResource(drumIcons[position]);
+			icon.setBackgroundResource(GlobalVars.drumIcons[position]);
 			return view;
 		}
 	}
@@ -154,15 +153,6 @@ public class BeatBotActivity extends Activity {
 
 	private IconLongClickListener iconLongClickListener = new IconLongClickListener();
 
-	private static final String[] sampleTypes = { "kick", "snare", "hh_closed",
-			"hh_open", "rim", "bass", "recorded" };
-	private static final String[] iconTypes = { "kick", "snare", "hh_closed",
-			"hh_open", "rim", "bass" };
-
-	private final int[] drumIcons = { R.drawable.kick_icon_src,
-			R.drawable.snare_icon_src, R.drawable.hh_closed_icon_src,
-			R.drawable.hh_open_icon_src, R.drawable.rimshot_icon_src,
-			R.drawable.bass_icon_src, };
 	private long lastTapTime = 0;
 
 	private void initAndroidSettings() {
@@ -189,7 +179,7 @@ public class BeatBotActivity extends Activity {
 
 	private void initSampleListView() {
 		SampleRowAdapterAndOnClickListener adapter = new SampleRowAdapterAndOnClickListener(
-				this, R.layout.sample_row, iconTypes);
+				this, R.layout.sample_row, GlobalVars.iconTypes);
 		sampleListView = (ListView) findViewById(R.id.sampleListView);
 		sampleListView.setAdapter(adapter);
 	}
@@ -243,7 +233,7 @@ public class BeatBotActivity extends Activity {
 		File appDirectoryFile = new File(GlobalVars.appDirectory);
 		// build the directory structure, if needed
 		appDirectoryFile.mkdirs();
-		for (String sampleType : sampleTypes) {
+		for (String sampleType : GlobalVars.sampleTypes) {
 			// the sample folder for this sample type does not yet exist.
 			// create it and write all assets of this type to the folder
 			copyFromAssetsToExternal(sampleType);
@@ -260,11 +250,12 @@ public class BeatBotActivity extends Activity {
 
 		initLevelsIconGroup();
 		initSampleListView();
+		GlobalVars.init(GlobalVars.sampleTypes.length - 1); // minus 1 for
+		// recorded type
 		if (savedInstanceState == null) {
 			createEngine(assetManager);
 			createAllAssetAudioPlayers();
 		}
-		GlobalVars.init(sampleTypes.length - 1); // minus 1 for recorded type
 		GlobalVars.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
 		((TextView) findViewById(R.id.thresholdLabel))
@@ -359,22 +350,11 @@ public class BeatBotActivity extends Activity {
 		}
 	}
 
-	private boolean createAllAssetAudioPlayers() {
+	private void createAllAssetAudioPlayers() {
 		createAssetAudioPlayer();
-		for (String sampleType : sampleTypes)
-			if (!sampleType.equals("recorded")) {
-				try {
-					File asset = new File(GlobalVars.appDirectory + sampleType)
-							.listFiles()[0];
-					FileInputStream in = new FileInputStream(asset);
-					byte[] bytes = new byte[(int) asset.length()];
-					in.read(bytes);
-					initTrack(bytes);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		return true;
+		for (int trackNum = 0; trackNum < GlobalVars.numTracks; trackNum++) {
+			initTrack(GlobalVars.getSampleBytes(trackNum, 0));
+		}
 	}
 
 	public void setDeleteIconEnabled(final boolean enabled) {
