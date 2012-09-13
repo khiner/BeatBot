@@ -53,14 +53,11 @@ public class MidiManager implements Parcelable {
 
 	private Thread tickThread = null;
 
-	private int numSamples = 0;
-
 	// ticks per quarter note (I think)
 	public static final int RESOLUTION = MidiFile.DEFAULT_RESOLUTION;
 	public static final long TICKS_IN_ONE_MEASURE = RESOLUTION * 4;
 	
-	private MidiManager(int numSamples) {
-		this.numSamples = numSamples;
+	private MidiManager() {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,
 				TimeSignature.DEFAULT_DIVISION);
 		setBPM(120);
@@ -71,9 +68,9 @@ public class MidiManager implements Parcelable {
 		saveState();
 	}
 
-	public static MidiManager getInstance(int numSamples) {
+	public static MidiManager getInstance() {
 		if (singletonInstance == null) {
-			singletonInstance = new MidiManager(numSamples);
+			singletonInstance = new MidiManager();
 		}
 		return singletonInstance;
 	}
@@ -93,10 +90,6 @@ public class MidiManager implements Parcelable {
 		setNativeBPM(bpm);
 		setNativeMSPT(tempo.getMpqn() / RESOLUTION);
 		SampleEditActivity.quantizeEffectParams();
-	}
-
-	public int getNumSamples() {
-		return numSamples;
 	}
 
 	public List<MidiNote> getMidiNotes() {
@@ -449,7 +442,6 @@ public class MidiManager implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel out, int flags) {
-		out.writeInt(numSamples);
 		out.writeIntArray(new int[] { 4, 4, TimeSignature.DEFAULT_METER,
 				TimeSignature.DEFAULT_DIVISION });
 		out.writeFloat(tempo.getBpm());
@@ -472,7 +464,6 @@ public class MidiManager implements Parcelable {
 	}
 
 	private MidiManager(Parcel in) {
-		numSamples = in.readInt();
 		int[] timeSigInfo = new int[4];
 		in.readIntArray(timeSigInfo);
 		ts.setTimeSignature(timeSigInfo[0], timeSigInfo[1], timeSigInfo[2],

@@ -69,8 +69,9 @@ MidiEvent* initEvent(long onTick, long offTick, float volume, float pan,
 	return event;
 }
 
-void initTrack(Track *track, AAsset *asset) {
+void initTrack(Track *track, char *bytes, int length) {
 	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
+	__android_log_print(ANDROID_LOG_ERROR, "in native initTrack", "beginning");
 	track->num = trackCount;
 	track->effectHead = NULL;
 	track->nextEventNode = NULL;
@@ -86,8 +87,9 @@ void initTrack(Track *track, AAsset *asset) {
 	track->primaryPan = track->primaryPitch = track->notePan =
 			track->notePitch = .5f;
 	track->generator = malloc(sizeof(Generator));
-	initGenerator(track->generator, wavfile_create(asset), wavfile_reset,
+	initGenerator(track->generator, wavfile_create(bytes, length), wavfile_reset,
 			wavfile_generate, wavfile_destroy);
+	__android_log_print(ANDROID_LOG_ERROR, "in native initTrack", "after generator create");
 	int effectNum;
 	for (effectNum = 0; effectNum < 4; effectNum++) {
 		addEffect(track, NULL);
@@ -356,27 +358,20 @@ void printLinkedList(MidiEventNode *head) {
 }
 
 jboolean Java_com_kh_beatbot_BeatBotActivity_initTrack(JNIEnv *env,
-		jclass clazz, jstring filename) {
+		jclass clazz, jbyteArray bytes) {
 	if (trackCount >= NUM_TRACKS) {
 		return JNI_FALSE;
 	}
-	// convert Java string to UTF-8
-	const char *utf8 = (*env)->GetStringUTFChars(env, filename, NULL);
-
-	AAsset* asset = AAssetManager_open(assetManager, utf8, AASSET_MODE_UNKNOWN);
-
-	// release the Java string and UTF-8
-	(*env)->ReleaseStringUTFChars(env, filename, utf8);
-
-	// the asset might not be found
-	if (asset == NULL) {
-		return JNI_FALSE;
-	}
-
 	Track *track = getTrack(env, clazz, trackCount);
-	initTrack(track, asset);
-	// all done! increment track count
-	trackCount++;
+	int length = (*env)->GetArrayLength(env, bytes);
+	__android_log_print(ANDROID_LOG_ERROR, "in initTrack", "length = %d", length);
+	char *data = (char *)(*env)->GetByteArrayElements(env, bytes, 0);
+	__android_log_print(ANDROID_LOG_ERROR, "in initTrack", "after data assignment");
+	(*env)->ReleaseByteArrayElements(env, bytes, data, JNI_ABORT);
+	__android_log_print(ANDROID_LOG_ERROR, "in initTrack", "after release");
+
+	initTrack(track, data, length);
+	trackCount++; // all done! increment track count
 	return JNI_TRUE;
 }
 

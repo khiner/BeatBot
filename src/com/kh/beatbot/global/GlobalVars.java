@@ -29,6 +29,8 @@ public class GlobalVars {
 	public static final short LEVEL_MAX = 127;
 	
 	public static MidiView midiView;
+	public static String appDirectory;
+	
 	// effect settings are stored here instead of in the effect activities
 	// because the activities are destroyed after clicking 'back', and we
 	// need to persist state

@@ -1,27 +1,26 @@
 package com.kh.beatbot.manager;
 
+import com.kh.beatbot.global.GlobalVars;
+
 public class PlaybackManager {
 	
 	private static PlaybackManager singletonInstance = null;
 	private State state;
 		
-	private String[] sampleNames;
-	
 	public static final int SAMPLE_RATE = 44100;
 	
 	public enum State {
 		PLAYING, STOPPED
 	}
 	
-	public static PlaybackManager getInstance(String[] sampleNames) {
+	public static PlaybackManager getInstance() {
 		if (singletonInstance == null) {
-			singletonInstance = new PlaybackManager(sampleNames);
+			singletonInstance = new PlaybackManager();
 		}
 		return singletonInstance;			
 	}
 	
-	private PlaybackManager(String[] sampleNames) {
-		this.sampleNames = sampleNames;
+	private PlaybackManager() {
 		//audioTracks = new AudioTrack[sampleNames.length];
 		//streams = new Stream[sampleNames.length];
 		state = State.STOPPED;
@@ -42,7 +41,7 @@ public class PlaybackManager {
 	}
 		
 	public void stopAllTracks() {
-		for (int sampleNum = 0; sampleNum < sampleNames.length; sampleNum++) {
+		for (int sampleNum = 0; sampleNum < GlobalVars.numTracks; sampleNum++) {
 			stopTrack(sampleNum);
 		}
 	}

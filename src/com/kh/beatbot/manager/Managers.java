@@ -7,15 +7,15 @@ public class Managers {
 	public static PlaybackManager playbackManager = null;
 	public static RecordManager recordManager = null;
 
-	public static void init(Bundle savedInstanceState, String[] sampleNames) {
+	public static void init(Bundle savedInstanceState) {
 		// get all Manager singletons
-		playbackManager = PlaybackManager.getInstance(sampleNames);
+		playbackManager = PlaybackManager.getInstance();
 		recordManager = RecordManager.getInstance();
 		
 		// if this context is being restored from a destroyed context,
 		// recover the midiManager. otherwise, create a new one
 		if (savedInstanceState == null) {
-			midiManager = MidiManager.getInstance(sampleNames.length);
+			midiManager = MidiManager.getInstance();
 		} else {
 			midiManager = savedInstanceState.getParcelable("midiManager");
 		}

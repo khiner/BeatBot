@@ -348,13 +348,13 @@ public class MidiView extends SurfaceViewBase {
 	}
 
 	private void initHLineVb() {
-		float[] hLines = new float[(midiManager.getNumSamples() + 2) * 4];
+		float[] hLines = new float[(GlobalVars.numTracks + 2) * 4];
 		hLines[0] = 0;
 		hLines[1] = 0;
 		hLines[2] = width;
 		hLines[3] = 0;
 		float y = MidiViewBean.Y_OFFSET;
-		for (int i = 1; i < midiManager.getNumSamples() + 2; i++) {
+		for (int i = 1; i < GlobalVars.numTracks + 2; i++) {
 			hLines[i * 4] = 0;
 			hLines[i * 4 + 1] = y;
 			hLines[i * 4 + 2] = width;
@@ -403,7 +403,7 @@ public class MidiView extends SurfaceViewBase {
 	public int yToNote(float y) {
 		if (y >= 0 && y < MidiViewBean.Y_OFFSET)
 			return -1;
-		return (int) (midiManager.getNumSamples() * (y - MidiViewBean.Y_OFFSET) / (bean
+		return (int) (GlobalVars.numTracks * (y - MidiViewBean.Y_OFFSET) / (bean
 				.getHeight() - MidiViewBean.Y_OFFSET));
 	}
 
@@ -452,7 +452,7 @@ public class MidiView extends SurfaceViewBase {
 
 	@Override
 	protected void drawFrame() {
-		boolean recording = Managers.recordManager.getState() != RecordManager.State.INITIALIZING;
+		boolean recording = RecordManager.getState() != RecordManager.State.INITIALIZING;
 		boolean playing = Managers.playbackManager.getState() == PlaybackManager.State.PLAYING;
 		TickWindowHelper.scroll();
 		initLoopSquareVb();
@@ -516,11 +516,10 @@ public class MidiView extends SurfaceViewBase {
 			if (selectedNote.getNoteValue() + noteDiff < 0
 					&& selectedNote.getNoteValue() > adjustedNoteDiff)
 				adjustedNoteDiff = -selectedNote.getNoteValue();
-			else if (selectedNote.getNoteValue() + noteDiff > midiManager
-					.getNumSamples() - 1
-					&& midiManager.getNumSamples() - 1
+			else if (selectedNote.getNoteValue() + noteDiff > GlobalVars.numTracks - 1
+					&& GlobalVars.numTracks - 1
 							- selectedNote.getNoteValue() < adjustedNoteDiff)
-				adjustedNoteDiff = midiManager.getNumSamples() - 1
+				adjustedNoteDiff = GlobalVars.numTracks - 1
 						- selectedNote.getNoteValue();
 		}
 		return adjustedNoteDiff;
@@ -763,7 +762,7 @@ public class MidiView extends SurfaceViewBase {
 		bean.setWidth(width);
 		bean.setHeight(height);
 		bean.setMidiHeight(bean.getHeight() - MidiViewBean.Y_OFFSET);
-		bean.setNoteHeight(bean.getMidiHeight() / midiManager.getNumSamples());
+		bean.setNoteHeight(bean.getMidiHeight() / GlobalVars.numTracks);
 		bean.setLevelsHeight(bean.getMidiHeight()
 				- MidiViewBean.LEVEL_POINT_SIZE / 2);
 	}

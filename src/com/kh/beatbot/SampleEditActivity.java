@@ -203,7 +203,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	private void initSampleWaveformView() {
 		sampleWaveformView = ((SampleWaveformView) findViewById(R.id.sample_waveform_view));
 		sampleWaveformView.setTrackNum(trackNum);
-		// numSamples should be in shorts, so divide by two
 		sampleWaveformView.setSamples(getSamples(trackNum));
 	}
 

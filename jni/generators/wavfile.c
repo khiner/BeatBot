@@ -4,10 +4,11 @@ static inline short charsToShort(unsigned char first, unsigned char second) {
 	return (first << 8) | second;
 }
 
-WavFile *wavfile_create(AAsset *asset) {
+WavFile *wavfile_create(char *bytes, int length) {
 	WavFile *wavFile = (WavFile *)malloc(sizeof(WavFile));
-	wavFile->totalSamples = AAsset_getLength(asset) / 2 - 22;
-	wavFile->totalSamples /= 2; // 1 sample has one short for each channel (2 channels)
+	// each sample has one short for each channel (2 channels), and 2 bytes per short
+	wavFile->totalSamples = (length - 44) / 4;
+	__android_log_print(ANDROID_LOG_ERROR, "in wavfile create", "total samps = %d", wavFile->totalSamples);
 	wavFile->buffers = (float **) malloc(2 * sizeof(float *));
 	wavFile->buffers[0] = (float *) calloc(wavFile->totalSamples, sizeof(float));
 	wavFile->buffers[1] = (float *) calloc(wavFile->totalSamples, sizeof(float));
@@ -16,17 +17,17 @@ WavFile *wavfile_create(AAsset *asset) {
 	wavFile->loopEnd = wavFile->totalSamples;
 	wavFile->currSample = 0;
 
-	unsigned char *charBuf = (unsigned char *) AAsset_getBuffer(asset);
 	int i;
 	for (i = 0; i < wavFile->totalSamples; i++) {
 		// first 44 bytes of a wav file are header
-		wavFile->buffers[0][i] = charsToShort(charBuf[i * 4 + 1 + 44],
-				charBuf[i * 4 + 44]) * CONVMYFLT;
-		wavFile->buffers[1][i] = charsToShort(charBuf[i * 4 + 3 + 44],
-				charBuf[i * 4 + 2 + 44]) * CONVMYFLT;
+		wavFile->buffers[0][i] = charsToShort(bytes[i * 4 + 1 + 44],
+				bytes[i * 4 + 44]) * CONVMYFLT;
+		wavFile->buffers[1][i] = charsToShort(bytes[i * 4 + 3 + 44],
+				bytes[i * 4 + 2 + 44]) * CONVMYFLT;
 	}
-	free(charBuf);
-	AAsset_close(asset);
+	__android_log_print(ANDROID_LOG_ERROR, "in wavfile create", "after buffer copy");
+	//free(bytes);
+	__android_log_print(ANDROID_LOG_ERROR, "in wavfile create", "after free bytes");
 	return wavFile;
 }
 
