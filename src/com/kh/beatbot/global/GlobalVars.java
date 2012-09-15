@@ -24,14 +24,14 @@ public class GlobalVars {
 	public final static long LONG_CLICK_TIME = 500;
 
 	public static final String[] instrumentNames = { "kick", "snare", "hh_closed",
-			"hh_open", "rim", "bass", "recorded" };
-	public static final String[] iconTypes = { "kick", "snare", "hh_closed",
-			"hh_open", "rim", "bass" };
+			"hh_open", "rim", "recorded" };
+	public static final String[] defaultInstruments = { "kick", "snare", "hh_closed",
+			"hh_open", "rim" };
 
-	public final static int[] drumIcons = { R.drawable.kick_icon_src,
+	public final static int[] instrumentIcons = { R.drawable.kick_icon_src,
 			R.drawable.snare_icon_src, R.drawable.hh_closed_icon_src,
 			R.drawable.hh_open_icon_src, R.drawable.rimshot_icon_src,
-			R.drawable.bass_icon_src };
+			R.drawable.microphone_icon_src };
 
 	public static final float[] BG_COLOR = { 0.12549f, 0.188235f, 0.227451f, 1 };
 	public static final float[] WHITE = { 1, 1, 1, 1 };

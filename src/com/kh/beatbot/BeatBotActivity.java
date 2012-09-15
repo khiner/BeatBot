@@ -18,7 +18,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -137,7 +136,7 @@ public class BeatBotActivity extends Activity {
 			mute.setOnClickListener(this);
 			solo.setOnClickListener(this);
 			icon.setOnLongClickListener(iconLongClickListener);
-			icon.setBackgroundResource(GlobalVars.drumIcons[position]);
+			icon.setBackgroundResource(GlobalVars.instrumentIcons[position]);
 			return view;
 		}
 	}
@@ -179,7 +178,7 @@ public class BeatBotActivity extends Activity {
 
 	private void initSampleListView() {
 		SampleRowAdapterAndOnClickListener adapter = new SampleRowAdapterAndOnClickListener(
-				this, R.layout.sample_row, GlobalVars.iconTypes);
+				this, R.layout.sample_row, GlobalVars.defaultInstruments);
 		sampleListView = (ListView) findViewById(R.id.sampleListView);
 		sampleListView.setAdapter(adapter);
 	}
@@ -221,7 +220,7 @@ public class BeatBotActivity extends Activity {
 				}
 			}
 		} catch (IOException e) {
-			Log.e("tag", e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -253,19 +252,15 @@ public class BeatBotActivity extends Activity {
 		GlobalVars.init(GlobalVars.instrumentNames.length - 1); // minus 1 for
 		// recorded type
 		if (savedInstanceState == null) {
-			createEngine(assetManager);
-			createAllAssetAudioPlayers();
+			initNativeAudio();
 		}
 		GlobalVars.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
 		((TextView) findViewById(R.id.thresholdLabel))
 				.setTypeface(GlobalVars.font);
-
 		initManagers(savedInstanceState);
-
 		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));
 		GlobalVars.midiView.initMeFirst();
-
 		if (savedInstanceState != null) {
 			GlobalVars.midiView.readFromBundle(savedInstanceState);
 			// if going to levels view or in levels view, level icons should be
@@ -350,10 +345,11 @@ public class BeatBotActivity extends Activity {
 		}
 	}
 
-	private void createAllAssetAudioPlayers() {
-		createAssetAudioPlayer();
+	private void initNativeAudio() {
+		createEngine();
+		createAudioPlayer();
 		for (int trackNum = 0; trackNum < GlobalVars.numTracks; trackNum++) {
-			initTrack(GlobalVars.getSampleBytes(trackNum, 0));
+			addTrack(GlobalVars.getSampleBytes(trackNum, 0));
 		}
 	}
 
@@ -454,18 +450,9 @@ public class BeatBotActivity extends Activity {
 		MidiManager.setBPM(bpm);
 	}
 
-	private void spin(long millis) {
-		long start = System.currentTimeMillis();
-		while (System.currentTimeMillis() - start < millis)
-			;
-	}
-
-	public static native void createEngine(AssetManager assetManager);
-
-	public static native boolean createAssetAudioPlayer();
-
-	public static native boolean initTrack(byte[] bytes);
-
+	public static native void addTrack(byte[] bytes);
+	public static native boolean createAudioPlayer();
+	public static native void createEngine();
 	public static native void shutdown();
 
 	/** Load jni .so on initialization */

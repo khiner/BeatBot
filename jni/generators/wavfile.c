@@ -1,4 +1,5 @@
 #include "wavfile.h"
+#include "../track.h"
 
 static inline short charsToShort(unsigned char first, unsigned char second) {
 	return (first << 8) | second;

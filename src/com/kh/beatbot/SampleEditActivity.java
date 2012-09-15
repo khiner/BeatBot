@@ -180,7 +180,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		trackNum = currInstrumentNum = getIntent().getExtras().getInt("trackNum");
+		trackNum = currInstrumentNum = getIntent().getExtras().getInt(
+				"trackNum");
 		// remove title bar
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.sample_edit);
@@ -190,9 +191,10 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		((Button) findViewById(R.id.sampleSelect)).setTypeface(GlobalVars.font);
 		// set the instrument icon
 		((ImageButton) findViewById(R.id.instrumentButton))
-				.setBackgroundResource(GlobalVars.drumIcons[trackNum]);
+				.setBackgroundResource(GlobalVars.instrumentIcons[trackNum]);
 		// set the instrument text
-		((Button) findViewById(R.id.sampleSelect)).setText(GlobalVars.sampleNames[trackNum][0]);
+		((Button) findViewById(R.id.sampleSelect))
+				.setText(GlobalVars.sampleNames[trackNum][0]);
 		initSelectInstrumentAlert();
 		initSelectSampleAlert();
 		initLevels();
@@ -206,33 +208,41 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	private void setSample(int instrumentNum, int sampleNum) {
-		setSampleBytes(trackNum, GlobalVars.getSampleBytes(instrumentNum, sampleNum));
-		((Button) findViewById(R.id.sampleSelect)).setText(GlobalVars.sampleNames[instrumentNum][sampleNum]);
+		setSampleBytes(trackNum,
+				GlobalVars.getSampleBytes(instrumentNum, sampleNum));
+		((Button) findViewById(R.id.sampleSelect))
+				.setText(GlobalVars.sampleNames[instrumentNum][sampleNum]);
 		sampleWaveformView.setSamples(getSamples(trackNum));
 	}
-	
+
 	private void initSelectInstrumentAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose Instrument");
-		builder.setItems(GlobalVars.instrumentNames, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				setSample(item, 0);
-				currInstrumentNum = item;
-				// update the sample select alert names with the new instrument samples
-				initSelectSampleAlert();
-			}
-		});
+		builder.setItems(GlobalVars.instrumentNames,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+						setSample(item, 0);
+						currInstrumentNum = item;
+						// update instrument icon to reflect the change
+						((ImageButton) findViewById(R.id.instrumentButton))
+								.setBackgroundResource(GlobalVars.instrumentIcons[currInstrumentNum]);
+						// update the sample select alert names with the new
+						// instrument samples
+						initSelectSampleAlert();
+					}
+				});
 		selectInstrumentAlert = builder.create();
 	}
-	
+
 	private void initSelectSampleAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose Sample");
-		builder.setItems(GlobalVars.sampleNames[currInstrumentNum], new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				setSample(currInstrumentNum, item);
-			}
-		});
+		builder.setItems(GlobalVars.sampleNames[currInstrumentNum],
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+						setSample(currInstrumentNum, item);
+					}
+				});
 		selectSampleAlert = builder.create();
 	}
 
@@ -262,7 +272,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 					if (param.beatSync) {
 						effect.setParamLevel(param, param.viewLevel);
 						effect.setEffectParam(trackNum, effect.getId(),
-								paramNum, param.viewLevel);
+								paramNum, param.level);
 					}
 				}
 			}
@@ -272,7 +282,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public void selectInstrument(View view) {
 		selectInstrumentAlert.show();
 	}
-	
+
 	public void selectSample(View view) {
 		selectSampleAlert.show();
 	}
@@ -413,7 +423,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public static native void setAdsrOn(int trackNum, boolean on);
 
 	public static native void setSampleBytes(int trackNum, byte[] bytes);
-	
+
 	@Override
 	public void setLevel(LevelListenable levelListenable, float levelX,
 			float levelY) {

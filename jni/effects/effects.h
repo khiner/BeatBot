@@ -10,6 +10,9 @@
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 #include <android/asset_manager_jni.h>
+#include "../generators/generators.h"
+#include "../generators/wavfile.h"
+#include "ticker.h"
 
 #define bool _Bool
 #define false 0
@@ -40,16 +43,8 @@ typedef struct EffectNode_t {
 	struct EffectNode_t *next;
 } EffectNode;
 
-#include "../generators/generators.h"
-#include "../generators/wavfile.h"
-#include "midievent.h"
-#include "track.h"
-#include "ticker.h"
-
 Effect *initEffect(int id, bool on, void *config,
 		void (*set), void (*process), void (*destroy));
-
-void addEffect(Track *track, Effect *effect);
 
 void reverse(float buffer[], int begin, int end);
 void normalize(float buffer[], int size);

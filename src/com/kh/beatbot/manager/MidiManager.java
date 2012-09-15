@@ -65,6 +65,7 @@ public class MidiManager implements Parcelable {
 		tempoTrack.insertEvent(tempo);
 		setLoopBeginTick(0);
 		setLoopEndTick(RESOLUTION * 4);
+
 		saveState();
 	}
 

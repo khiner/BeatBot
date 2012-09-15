@@ -1,7 +1,6 @@
 #ifndef NATIVEAUDIO_H
 #define NATIVEAUDIO_H
 
-#include "effects/effects.h"
 #include "effects/adsr.h"
 #include "effects/chorus.h"
 #include "effects/decimate.h"
@@ -12,6 +11,7 @@
 #include "effects/reverb.h"
 #include "effects/tremelo.h"
 #include "effects/volpan.h"
+#include "track.h"
 
 #define CONV16BIT 32768
 

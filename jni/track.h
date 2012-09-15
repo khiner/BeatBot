@@ -2,8 +2,10 @@
 #define TRACK_H
 
 #include "generators/generators.h"
+#include "midievent.h"
+#include "effects/effects.h"
 
-#define NUM_TRACKS 6
+static int trackCount = 0;
 
 typedef struct OpenSlOut_ {
 	float **currBufferFloat;
@@ -33,57 +35,32 @@ typedef struct Track_ {
 	int num;bool armed;bool playing;bool previewing;bool mute;bool solo;bool shouldSound;
 } Track;
 
-Track tracks[NUM_TRACKS];
+typedef struct TrackNode_t {
+	Track *track;
+	struct TrackNode_t *next;
+} TrackNode;
+
+TrackNode *trackHead;
 OpenSlOut *openSlOut;
 
-static inline Track *getTrack(JNIEnv *env, jclass clazz, int trackNum) {
-	(void *) env; // avoid warnings about unused paramaters
-	(void *) clazz; // avoid warnings about unused paramaters
+TrackNode *getTrackNode(int trackNum);
 
-	if (trackNum < 0 || trackNum >= NUM_TRACKS)
-		return NULL;
-	return &tracks[trackNum];
-}
+Track *getTrack(JNIEnv *env, jclass clazz, int trackNum);
 
-static inline void freeMidiEvents(Track *track) {
-	MidiEventNode *cur_ptr = track->eventHead;
-	while (cur_ptr != NULL) {
-		free(cur_ptr->event); // free the event
-		MidiEventNode *prev_ptr = cur_ptr;
-		cur_ptr = cur_ptr->next;
-		free(prev_ptr); // free the entire Node
-	}
-}
+void addEffect(Track *track, Effect *effect);
 
-static inline void freeEffects(Track *track) {
-	EffectNode *cur_ptr = track->effectHead;
-	while (cur_ptr != NULL) {
-		cur_ptr->effect->destroy(cur_ptr->effect->config);
-		EffectNode *prev_ptr = cur_ptr;
-		cur_ptr = cur_ptr->next;
-		free(prev_ptr); // free the entire Node
-	}
-}
+void freeMidiEvents(Track *track);
 
-static inline void freeTracks() {
-	// destroy all tracks
-	int i;
-	for (i = 0; i < NUM_TRACKS; i++) {
-		Track *track = getTrack(NULL, NULL, i);
-		free(track->currBufferFloat[0]);
-		free(track->currBufferFloat[1]);
-		free(track->currBufferFloat);
-		track->generator->destroy(track->generator->config);
-		freeEffects(track);
-		freeMidiEvents(track);
-	}
-	free(openSlOut->currBufferFloat[0]);
-	free(openSlOut->currBufferFloat[1]);
-	free(openSlOut->currBufferFloat);
-	free(openSlOut->currBufferShort);
-	(*openSlOut->outputBufferQueue)->Clear(openSlOut->outputBufferQueue);
-	openSlOut->outputBufferQueue = NULL;
-	openSlOut->outputPlayerPlay = NULL;
-}
+void printTracks(TrackNode *head);
+
+void addTrack(Track *track);
+
+TrackNode *removeTrack(int trackNum);
+
+void freeEffects(Track *track);
+
+void freeTracks();
+
+Track *initTrack(char *bytes, int length);
 
 #endif // TRACK_H

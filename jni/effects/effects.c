@@ -6,6 +6,7 @@
 #include "flanger.h"
 #include "reverb.h"
 #include "tremelo.h"
+#include "../track.h"
 
 Effect *initEffect(int id, bool on, void *config, void (*set), void (*process),
 		void (*destroy)) {
@@ -50,7 +51,7 @@ void normalize(float buffer[], int size) {
 }
 
 EffectNode *findEffectNodeById(int trackNum, int id) {
-	Track *track = &(tracks[trackNum]);
+	Track *track = getTrack(NULL, NULL, trackNum);
 	EffectNode *effectNode = track->effectHead;
 	while (effectNode != NULL) {
 		if (effectNode->effect != NULL && effectNode->effect->id == id) {
@@ -62,7 +63,7 @@ EffectNode *findEffectNodeById(int trackNum, int id) {
 }
 
 EffectNode *findEffectNodeByPosition(int trackNum, int position) {
-	Track *track = &(tracks[trackNum]);
+	Track *track = getTrack(NULL, NULL, trackNum);
 	EffectNode *cur_ptr = track->effectHead;
 	int count = 0;
 	while (count < position && cur_ptr != NULL) {
@@ -73,7 +74,7 @@ EffectNode *findEffectNodeByPosition(int trackNum, int position) {
 }
 
 EffectNode *findPrevNode(int trackNum, EffectNode *effectNode) {
-	Track *track = &(tracks[trackNum]);
+	Track *track = getTrack(NULL, NULL, trackNum);
 	EffectNode *cur_ptr = track->effectHead;
 	if (cur_ptr == effectNode) {
 		return NULL; // effectNode is head, no prev node
@@ -126,25 +127,6 @@ void printEffects(EffectNode *head) {
 			__android_log_print(ANDROID_LOG_ERROR, "effect", "blank");
 		cur_ptr = cur_ptr->next;
 	}
-}
-
-void addEffect(Track *track, Effect *effect) {
-	EffectNode *new = (EffectNode *) malloc(sizeof(EffectNode));
-	new->effect = effect;
-	new->next = NULL;
-	pthread_mutex_lock(&track->effectMutex);
-	// check for first insertion
-	if (track->effectHead == NULL) {
-		track->effectHead = new;
-	} else {
-		// insert as last effect
-		EffectNode *cur_ptr = track->effectHead;
-		while (cur_ptr->next != NULL) {
-			cur_ptr = cur_ptr->next;
-		}
-		cur_ptr->next = new;
-	}
-	pthread_mutex_unlock(&track->effectMutex);
 }
 
 void setEffect(Track *track, int position, Effect *effect) {
