@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
@@ -95,12 +97,7 @@ public class BeatBotActivity extends Activity {
 		public void onClick(View view) {
 			int position = (Integer) view.getTag();
 			if (view.getId() == R.id.icon) {
-				// open new intent for sample edit view
-				// and pass the number of the sample to the intent as extras
-				Intent intent = new Intent();
-				intent.setClass(this.getContext(), SampleEditActivity.class);
-				intent.putExtra("trackNum", position);
-				startActivity(intent);
+				launchSampleEditActivity(position);
 			} else if (view.getId() == R.id.mute) {
 				ToggleButton muteButton = (ToggleButton) view;
 				if (muteButton.isChecked())
@@ -149,6 +146,8 @@ public class BeatBotActivity extends Activity {
 	private FadeListener fadeListener;
 	private ListView sampleListView;
 	private static AssetManager assetManager;
+	
+	private static AlertDialog selectInstrumentAlert = null;
 
 	private IconLongClickListener iconLongClickListener = new IconLongClickListener();
 
@@ -183,6 +182,22 @@ public class BeatBotActivity extends Activity {
 		sampleListView.setAdapter(adapter);
 	}
 
+	/**
+	 * The Select Instrument Alert is shown when adding a new track 
+	 */
+	private void initSelectInstrumentAlert() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Choose Instrument");
+		builder.setItems(GlobalVars.instrumentNames,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+						addTrack(GlobalVars.getSampleBytes(item, 0));
+						launchSampleEditActivity(GlobalVars.numTracks);
+					}
+				});
+		selectInstrumentAlert = builder.create();
+	}
+	
 	private void initManagers(Bundle savedInstanceState) {
 		Managers.init(savedInstanceState);
 		Managers.midiManager.setActivity(this);
@@ -249,6 +264,7 @@ public class BeatBotActivity extends Activity {
 
 		initLevelsIconGroup();
 		initSampleListView();
+		initSelectInstrumentAlert();
 		GlobalVars.init(GlobalVars.instrumentNames.length - 1); // minus 1 for
 		// recorded type
 		if (savedInstanceState == null) {
@@ -363,6 +379,17 @@ public class BeatBotActivity extends Activity {
 		});
 	}
 
+	/**
+	 * Open new intent for sample edit view, passing the track number to the
+	 * intent as an extra.
+	 */
+	private void launchSampleEditActivity(int trackNum) {
+		Intent intent = new Intent();
+		intent.setClass(this, SampleEditActivity.class);
+		intent.putExtra("trackNum", trackNum);
+		startActivity(intent);
+	}
+
 	public void record(View view) {
 		if (RecordManager.getState() != RecordManager.State.INITIALIZING) {
 			Managers.recordManager.stopListening();
@@ -450,9 +477,16 @@ public class BeatBotActivity extends Activity {
 		MidiManager.setBPM(bpm);
 	}
 
+	public void addTrack(View view) {
+		selectInstrumentAlert.show();
+	}
+
 	public static native void addTrack(byte[] bytes);
+
 	public static native boolean createAudioPlayer();
+
 	public static native void createEngine();
+
 	public static native void shutdown();
 
 	/** Load jni .so on initialization */

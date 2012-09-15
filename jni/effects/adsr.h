@@ -21,6 +21,7 @@ typedef struct AdsrConfig_t {
 } AdsrConfig;
 
 AdsrConfig *adsrconfig_create(int totalSamples);
+void adsrconfig_setNumSamples(AdsrConfig *config, int numSamples);
 
 void updateAdsr(AdsrConfig *config, int totalSamples);
 void resetAdsr(AdsrConfig *config);

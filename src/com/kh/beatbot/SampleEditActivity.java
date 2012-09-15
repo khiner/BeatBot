@@ -164,7 +164,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 	}
 
-	private AlertDialog selectInstrumentAlert = null;
+	private static AlertDialog selectInstrumentAlert = null;
 	private AlertDialog selectSampleAlert = null;
 
 	private static SampleWaveformView sampleWaveformView = null;
@@ -189,14 +189,18 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		((TextView) findViewById(R.id.effectsLabel))
 				.setTypeface(GlobalVars.font);
 		((Button) findViewById(R.id.sampleSelect)).setTypeface(GlobalVars.font);
+		// init alerts
+		if (selectInstrumentAlert == null) {
+			// only one, static list of instruments
+			initSelectInstrumentAlert();
+		}
+		initSelectSampleAlert();
 		// set the instrument icon
 		((ImageButton) findViewById(R.id.instrumentButton))
-				.setBackgroundResource(GlobalVars.instrumentIcons[trackNum]);
+				.setBackgroundResource(GlobalVars.instrumentIcons[currInstrumentNum]);
 		// set the instrument text
 		((Button) findViewById(R.id.sampleSelect))
-				.setText(GlobalVars.sampleNames[trackNum][0]);
-		initSelectInstrumentAlert();
-		initSelectSampleAlert();
+				.setText(GlobalVars.sampleNames[currInstrumentNum][0]);
 		initLevels();
 		initSampleLabelList();
 		initEffectLabelList();
@@ -407,21 +411,14 @@ public class SampleEditActivity extends Activity implements LevelListener {
 
 	// get the audio data in floats
 	public static native float[] getSamples(int trackNum);
-
 	// set play mode to reverse
 	public static native void setReverse(int trackNum, boolean reverse);
-
 	// scale all samples so that the sample with the highest amplitude is at 1
 	public static native float[] normalize(int trackNum);
-
 	public static native void setPrimaryVolume(int trackNum, float volume);
-
 	public static native void setPrimaryPan(int trackNum, float pan);
-
 	public static native void setPrimaryPitch(int trackNum, float pitch);
-
 	public static native void setAdsrOn(int trackNum, boolean on);
-
 	public static native void setSampleBytes(int trackNum, byte[] bytes);
 
 	@Override

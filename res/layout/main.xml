@@ -79,11 +79,22 @@
             android:textOn="" />
     </LinearLayout>
 
+    <ImageButton
+        android:id="@+id/addTrack"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/sampleListView"
+        android:layout_alignRight="@+id/sampleListView"
+        android:layout_alignTop="@+id/thresholdLabel"
+        android:layout_marginTop="2dp"
+        android:background="@drawable/plus_icon_large"
+       	android:onClick="addTrack" />
+    
     <ListView
         android:id="@+id/sampleListView"
         android:layout_width="98dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/thresholdLabel"
+        android:layout_below="@+id/thresholdBar"
         android:layout_marginTop="13dp" />
 
     <com.kh.beatbot.view.MidiView

@@ -68,17 +68,6 @@ jboolean Java_com_kh_beatbot_manager_PlaybackManager_isLooping(JNIEnv *env,
 	return wavFile->looping;
 }
 
-void Java_com_kh_beatbot_SampleEditActivity_setSampleBytes(JNIEnv *env,
-		jclass clazz, jint trackNum, jbyteArray bytes) {
-	Track *track = getTrack(env, clazz, trackNum);
-	WavFile *wavConfig = (WavFile *)track->generator->config;
-	int length = (*env)->GetArrayLength(env, bytes);
-	char *data = (char *) (*env)->GetByteArrayElements(env, bytes, 0);
-	(*env)->ReleaseByteArrayElements(env, bytes, data, JNI_ABORT);
-	freeBuffers(wavConfig);
-	wavfile_setBytes(wavConfig, data, length);
-}
-
 void Java_com_kh_beatbot_manager_PlaybackManager_setLoopWindow(JNIEnv *env,
 		jclass clazz, jint trackNum, jint loopBeginSample, jint loopEndSample) {
 	Track *track = getTrack(env, clazz, trackNum);

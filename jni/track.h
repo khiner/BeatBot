@@ -61,6 +61,6 @@ void freeEffects(Track *track);
 
 void freeTracks();
 
-Track *initTrack(char *bytes, int length);
+Track *initTrack();
 
 #endif // TRACK_H

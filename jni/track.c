@@ -109,11 +109,11 @@ void freeTracks() {
 	TrackNode *cur_ptr = trackHead;
 	while (cur_ptr != NULL) {
 		free(cur_ptr->track->currBufferFloat[0]);
-				free(cur_ptr->track->currBufferFloat[1]);
-				free(cur_ptr->track->currBufferFloat);
-				cur_ptr->track->generator->destroy(cur_ptr->track->generator->config);
-				freeEffects(cur_ptr->track);
-				freeMidiEvents(cur_ptr->track);
+		free(cur_ptr->track->currBufferFloat[1]);
+		free(cur_ptr->track->currBufferFloat);
+		cur_ptr->track->generator->destroy(cur_ptr->track->generator->config);
+		freeEffects(cur_ptr->track);
+		freeMidiEvents(cur_ptr->track);
 		TrackNode *prev_ptr = cur_ptr;
 		cur_ptr = cur_ptr->next;
 		free(prev_ptr); // free the entire Node
@@ -127,13 +127,14 @@ void freeTracks() {
 	openSlOut->outputPlayerPlay = NULL;
 }
 
-Track *initTrack(char *bytes, int length) {
+Track *initTrack() {
 	Track *track = malloc(sizeof(Track));
 	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
 	pthread_mutex_init(&track->effectMutex, NULL);
 	track->num = trackCount;
 	track->eventHead = NULL;
 	track->effectHead = NULL;
+	track->generator = NULL;
 	track->nextEventNode = NULL;
 	track->nextStartSample = track->nextStopSample = -1;
 	track->currBufferFloat = (float **) malloc(2 * sizeof(float *));
@@ -146,9 +147,6 @@ Track *initTrack(char *bytes, int length) {
 	track->primaryVolume = track->noteVolume = .8f;
 	track->primaryPan = track->primaryPitch = track->notePan =
 			track->notePitch = .5f;
-	track->generator = malloc(sizeof(Generator));
-	initGenerator(track->generator, wavfile_create(bytes, length), wavfile_reset,
-			wavfile_generate, wavfile_destroy);
 	int effectNum;
 	for (effectNum = 0; effectNum < 4; effectNum++) {
 		addEffect(track, NULL);
@@ -157,18 +155,48 @@ Track *initTrack(char *bytes, int length) {
 			volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
 	track->pitch = initEffect(-1, false, pitchconfig_create(),
 			pitchconfig_setShift, pitch_process, pitchconfig_destroy);
+	return track;
+}
+
+void initSampleBytes(Track *track, char *bytes, int length) {
+	__android_log_print(ANDROID_LOG_ERROR, "init sample bytes", "trackNum = %d", track->num);
+	track->generator = malloc(sizeof(Generator));
+	initGenerator(track->generator, wavfile_create(bytes, length),
+			wavfile_reset, wavfile_generate, wavfile_destroy);
 	track->adsr = initEffect(-1, false,
 			adsrconfig_create(
 					((WavFile *) (track->generator->config))->totalSamples),
 			NULL, adsr_process, adsrconfig_destroy);
-	return track;
+}
+
+void setSampleBytes(Track *track, char *bytes, int length) {
+	__android_log_print(ANDROID_LOG_ERROR, "set sample bytes 2", "trackNum = %d", track->num);
+	WavFile *wavConfig = (WavFile *) track->generator->config;
+	freeBuffers(wavConfig);
+	wavfile_setBytes(wavConfig, bytes, length);
+	adsrconfig_setNumSamples(track->adsr->config,
+			((WavFile *)track->generator->config)->totalSamples);
+}
+
+void Java_com_kh_beatbot_SampleEditActivity_setSampleBytes(JNIEnv *env,
+		jclass clazz, jint trackNum, jbyteArray bytes) {
+	__android_log_print(ANDROID_LOG_ERROR, "set sample bytes", "trackNum = %d", trackNum);
+	Track *track = getTrack(env, clazz, trackNum);
+	__android_log_print(ANDROID_LOG_ERROR, "set sample bytes", "after getTrack");
+	int length = (*env)->GetArrayLength(env, bytes);
+	char *data = (char *) (*env)->GetByteArrayElements(env, bytes, 0);
+	(*env)->ReleaseByteArrayElements(env, bytes, data, JNI_ABORT);
+	__android_log_print(ANDROID_LOG_ERROR, "set sample bytes", "before check");
+	if (track->generator == NULL) {
+		initSampleBytes(track, data, length);
+	} else {
+		setSampleBytes(track, data, length);
+	}
 }
 
 void Java_com_kh_beatbot_BeatBotActivity_addTrack(JNIEnv *env, jclass clazz, jbyteArray bytes) {
-	int length = (*env)->GetArrayLength(env, bytes);
-	char *data = (char *)(*env)->GetByteArrayElements(env, bytes, 0);
-	(*env)->ReleaseByteArrayElements(env, bytes, data, JNI_ABORT);
-	Track *track = initTrack(data, length);
+	Track *track = initTrack();
 	addTrack(track);
+	Java_com_kh_beatbot_SampleEditActivity_setSampleBytes(env, clazz, trackCount, bytes);
 	trackCount++;
 }

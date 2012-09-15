@@ -286,6 +286,7 @@ public class LabelListListenable extends SurfaceViewBase {
 		addTextWidth = glText.getTextWidth("add") + height;
 		if (bgRectVb == null)
 			initBgRectVb();
+		while (listener == null); // wait for listener
 		listener.labelListInitialized(this);
 	}
 

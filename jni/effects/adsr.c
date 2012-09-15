@@ -9,16 +9,20 @@ void initAdsrPoints(AdsrConfig *config) {
 	config->adsrPoints[4].sampleCents = 1;
 }
 
-AdsrConfig *adsrconfig_create(int totalSamples) {
+AdsrConfig *adsrconfig_create(int numSamples) {
 	AdsrConfig *config = (AdsrConfig *) malloc(sizeof(AdsrConfig));
+	adsrconfig_setNumSamples(config, numSamples);
+	return config;
+}
+
+void adsrconfig_setNumSamples(AdsrConfig *config, int numSamples) {
 	initAdsrPoints(config);
 	config->active = false;
 	config->initial = config->end = 0.0001f;
 	config->sustain = 0.6f;
 	config->peak = 1.0f;
 	resetAdsr(config);
-	updateAdsr(config, totalSamples);
-	return config;
+	updateAdsr(config, numSamples);
 }
 
 void adsrconfig_destroy(void *p) {
