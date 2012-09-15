@@ -29,7 +29,8 @@ import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.TronKnob;
 import com.kh.beatbot.view.TronSeekbar2d;
 
-public class EffectActivity extends Activity implements LevelListener, View.OnClickListener {
+public class EffectActivity extends Activity implements LevelListener,
+		View.OnClickListener {
 	protected Effect effect;
 	private ToggleButton[] filterButtons = new ToggleButton[3];
 	protected List<EffectControlLayout> paramControls = new ArrayList<EffectControlLayout>();
@@ -38,14 +39,20 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 
 	private View initEffectToggleButton(ViewGroup parent) {
 		if (effect instanceof Filter) {
-			LinearLayout filterTypesLayout = (LinearLayout)LayoutInflater.from(getBaseContext()).inflate(
-					R.layout.filter_types_layout, parent, false);
-			filterButtons[0] = (ToggleButton)filterTypesLayout.findViewById(R.id.lp_toggle);
-			filterButtons[1] = (ToggleButton)filterTypesLayout.findViewById(R.id.hp_toggle);
-			filterButtons[2] = (ToggleButton)filterTypesLayout.findViewById(R.id.bp_toggle);
-			filterButtons[((Filter)effect).getMode()].setChecked(true);
-			((ToggleButton)filterTypesLayout.findViewById(R.id.effectToggleOn)).setChecked(effect.on);
-			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+			LinearLayout filterTypesLayout = (LinearLayout) LayoutInflater
+					.from(getBaseContext()).inflate(
+							R.layout.filter_types_layout, parent, false);
+			filterButtons[0] = (ToggleButton) filterTypesLayout
+					.findViewById(R.id.lp_toggle);
+			filterButtons[1] = (ToggleButton) filterTypesLayout
+					.findViewById(R.id.hp_toggle);
+			filterButtons[2] = (ToggleButton) filterTypesLayout
+					.findViewById(R.id.bp_toggle);
+			filterButtons[((Filter) effect).getMode()].setChecked(true);
+			((ToggleButton) filterTypesLayout.findViewById(R.id.effectToggleOn))
+					.setChecked(effect.on);
+			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+					RelativeLayout.LayoutParams.WRAP_CONTENT,
 					RelativeLayout.LayoutParams.WRAP_CONTENT);
 			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 			layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
@@ -55,14 +62,17 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 		} else {
 			ToggleButton effectToggleButton = new ToggleButton(this);
 			StateListDrawable drawable = new StateListDrawable();
-			drawable.addState(new int[] {android.R.attr.state_checked }, getResources().getDrawable(effect.getOnDrawableId()));
-			drawable.addState(new int[] {}, getResources().getDrawable(effect.getOffDrawableId()));
+			drawable.addState(new int[] { android.R.attr.state_checked },
+					getResources().getDrawable(effect.getOnDrawableId()));
+			drawable.addState(new int[] {},
+					getResources().getDrawable(effect.getOffDrawableId()));
 			effectToggleButton.setBackgroundDrawable(drawable);
 			effectToggleButton.setTextOn("");
 			effectToggleButton.setTextOff("");
 			effectToggleButton.setOnClickListener(this);
 			effectToggleButton.setChecked(effect.on);
-			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(effectToggleButton.getBackground().getIntrinsicWidth(),
+			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+					effectToggleButton.getBackground().getIntrinsicWidth(),
 					effectToggleButton.getBackground().getIntrinsicHeight());
 			layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
 			layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
@@ -71,7 +81,7 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 			return effectToggleButton;
 		}
 	}
-	
+
 	private View initEffectLayout(ViewGroup parent) {
 		View effectParamLayout = LayoutInflater.from(getBaseContext()).inflate(
 				effect.getParamLayoutId(), parent, false);
@@ -80,23 +90,15 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		layoutParams.addRule(RelativeLayout.BELOW, effectToggleButton.getId());
 		layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-		
+
 		effectParamLayout.setLayoutParams(layoutParams);
 		RelativeLayout paramWrapperLayout = new RelativeLayout(this);
 		paramWrapperLayout.setId(2);
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			// in landscape view, take up all vertical, but need space to the
-			// right for xy control
-			paramWrapperLayout.setLayoutParams(new RelativeLayout.LayoutParams(
-					ViewGroup.LayoutParams.WRAP_CONTENT,
-					ViewGroup.LayoutParams.MATCH_PARENT));
-		} else {
-			// in landscape view, take up all horizontal, but need space below
-			// for xy control
-			paramWrapperLayout.setLayoutParams(new RelativeLayout.LayoutParams(
-					ViewGroup.LayoutParams.MATCH_PARENT,
-					ViewGroup.LayoutParams.WRAP_CONTENT));
-		}
+		// in landscape view, take up all vertical, but need space to the
+		// right for xy control
+		paramWrapperLayout.setLayoutParams(new RelativeLayout.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.MATCH_PARENT));
 		paramWrapperLayout.addView(effectToggleButton);
 		paramWrapperLayout.addView(effectParamLayout);
 		return paramWrapperLayout;
@@ -106,10 +108,12 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 		// since left/right delay times are linked by default,
 		// xy view is set to x = left channel, y = feedback
 		xParamKnob = paramControls.get(0).getKnob();
-		yParamKnob = effect.paramsLinked() ? paramControls.get(2).getKnob() : paramControls.get(1).getKnob();
-		((ToggleButton)findViewById(R.id.linkButton)).setChecked(effect.paramsLinked());
+		yParamKnob = effect.paramsLinked() ? paramControls.get(2).getKnob()
+				: paramControls.get(1).getKnob();
+		((ToggleButton) findViewById(R.id.linkButton)).setChecked(effect
+				.paramsLinked());
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -120,18 +124,12 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 		setContentView(R.layout.effect_layout);
 		ViewGroup parent = (ViewGroup) findViewById(R.id.effect_layout);
 		View paramWrapperLayout = initEffectLayout(parent);
-		// set layout params for XY view, needs to be to right of / below
-		// params, depending on orientation
+		// set layout params for XY view
 		RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
 				ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			layoutParams.addRule(RelativeLayout.RIGHT_OF,
-					paramWrapperLayout.getId());
-		} else {
-			layoutParams.addRule(RelativeLayout.BELOW,
-					paramWrapperLayout.getId());
-		}
+		layoutParams.addRule(RelativeLayout.RIGHT_OF,
+				paramWrapperLayout.getId());
 		findViewById(R.id.xyParamBar).setLayoutParams(layoutParams);
 		parent.addView(paramWrapperLayout);
 		initParamControls();
@@ -146,7 +144,7 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 			initDelayKnobs();
 		}
 	}
-	
+
 	protected void initParamControls() {
 		int numParams = effect.getNumParams();
 		paramControls = new ArrayList<EffectControlLayout>();
@@ -176,8 +174,8 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 	}
 
 	public void updateParamValueLabel(int paramNum) {
-		paramControls.get(paramNum)
-				.setValueLabel(effect.getParamValueString(paramNum));
+		paramControls.get(paramNum).setValueLabel(
+				effect.getParamValueString(paramNum));
 	}
 
 	public void updateXYViewLevel() {
@@ -189,35 +187,36 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 	public void onClick(View view) {
 		toggleOn(view);
 	}
-	
+
 	public void link(View view) {
 		TronKnob leftChannelKnob = paramControls.get(0).getKnob();
 		TronKnob rightChannelKnob = paramControls.get(1).getKnob();
 		float newRightChannelLevel = rightChannelKnob.getLevel();
 		boolean newRightChannelSynced = rightChannelKnob.isBeatSync();
 
-		effect.setParamsLinked(((ToggleButton)view).isChecked());
-		
+		effect.setParamsLinked(((ToggleButton) view).isChecked());
 
 		if (effect.paramsLinked()) {
 			// y = feedback when linked
 			yParamKnob = paramControls.get(2).getKnob();
-			((Delay)effect).rightChannelLevelMemory = rightChannelKnob.getLevel();
-			((Delay)effect).rightChannelBeatSyncMemory = rightChannelKnob.isBeatSync();
+			((Delay) effect).rightChannelLevelMemory = rightChannelKnob
+					.getLevel();
+			((Delay) effect).rightChannelBeatSyncMemory = rightChannelKnob
+					.isBeatSync();
 			newRightChannelLevel = leftChannelKnob.getLevel();
 			newRightChannelSynced = leftChannelKnob.isBeatSync();
 		} else {
 			// y = right delay time when not linked
 			yParamKnob = paramControls.get(1).getKnob();
-			newRightChannelSynced = ((Delay)effect).rightChannelBeatSyncMemory;
-			if (((Delay)effect).rightChannelLevelMemory > 0)
-				newRightChannelLevel = ((Delay)effect).rightChannelLevelMemory;
+			newRightChannelSynced = ((Delay) effect).rightChannelBeatSyncMemory;
+			if (((Delay) effect).rightChannelLevelMemory > 0)
+				newRightChannelLevel = ((Delay) effect).rightChannelLevelMemory;
 		}
 		effect.getParam(1).beatSync = newRightChannelSynced;
 		rightChannelKnob.setBeatSync(newRightChannelSynced);
 		rightChannelKnob.setLevel(newRightChannelLevel);
 	}
-	
+
 	public void toggleOn(View view) {
 		effect.setOn(((ToggleButton) view).isChecked());
 	}
@@ -232,7 +231,8 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 			if (levelListenable.getId() == 0) {
 				effect.setParamLevel(1, level);
 				paramControls.get(1).getKnob().setViewLevel(level);
-				paramControls.get(1).setValueLabel(paramControls.get(0).getValueLabel());
+				paramControls.get(1).setValueLabel(
+						paramControls.get(0).getValueLabel());
 			} else if (levelListenable.getId() == 1) {
 				paramControls.get(0).getKnob().setLevel(level);
 			}
@@ -289,17 +289,16 @@ public class EffectActivity extends Activity implements LevelListener, View.OnCl
 		});
 		if (effect.paramsLinked() && !(listenable instanceof TronSeekbar2d)) {
 			EffectParam param = effect.getParam(listenable.getId());
-			((TronKnob)listenable).setBeatSync(param.beatSync);
+			((TronKnob) listenable).setBeatSync(param.beatSync);
 		}
 	}
-	
+
 	public void selectFilterMode(View view) {
 		for (int i = 0; i < filterButtons.length; i++) {
 			if (view.equals(filterButtons[i])) {
-				((Filter)effect).setMode(i);
+				((Filter) effect).setMode(i);
 				filterButtons[i].setChecked(true);
-			}
-			else
+			} else
 				filterButtons[i].setChecked(false);
 		}
 	}
