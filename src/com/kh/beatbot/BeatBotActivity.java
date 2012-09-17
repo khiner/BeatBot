@@ -39,6 +39,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.listener.MidiTrackControlListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -48,7 +49,7 @@ import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.ThresholdBarView;
 import com.kh.beatbot.view.helper.LevelsViewHelper;
 
-public class BeatBotActivity extends Activity {
+public class BeatBotActivity extends Activity implements MidiTrackControlListener {
 	private class FadeListener implements AnimationListener {
 		boolean fadeOut;
 
@@ -135,7 +136,7 @@ public class BeatBotActivity extends Activity {
 			mute.setOnClickListener(this);
 			solo.setOnClickListener(this);
 			icon.setOnLongClickListener(iconLongClickListener);
-			icon.setBackgroundResource(GlobalVars.tracks.get(position).instrumentIcon);
+			//icon.setBackgroundResource(GlobalVars.tracks.get(position).instrumentIcon);
 			return view;
 		}
 	}
@@ -482,6 +483,16 @@ public class BeatBotActivity extends Activity {
 		selectInstrumentAlert.show();
 	}
 
+	@Override
+	public void midiControlIconClicked(int track, int controlNum) {
+		
+	}
+	
+	@Override
+	public void midiControlIconLongPressed(int track, int controlNum) {
+		
+	}
+	
 	private void addTrack(int instrumentType) {
 		String instrumentName = GlobalVars.tracks.get(instrumentType).instrumentName;
 		addTrack(GlobalVars.tracks.get(instrumentType).getSampleBytes(0));

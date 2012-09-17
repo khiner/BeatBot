@@ -3,8 +3,8 @@ package com.kh.beatbot.view;
 import android.content.Context;
 import android.util.AttributeSet;
 
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
-import com.kh.beatbot.global.GlobalVars;
 
 public class ThresholdBarView extends TronSeekbar {
 	private static final float[] THRESHOLD_COLOR = { BG_COLOR[0] + .2f, BG_COLOR[1] + .2f, BG_COLOR[2] + .2f, 1};
@@ -67,22 +67,22 @@ public class ThresholdBarView extends TronSeekbar {
 	}
 	
 	private void drawDbLevel() {
-		drawTriangleStrip(levelBarVb, GlobalVars.GREEN, 0,
+		drawTriangleStrip(levelBarVb, Colors.GREEN, 0,
 				currAmpVertex <= maxGreenVertices ? currAmpVertex : maxGreenVertices);
 		if (currAmpVertex >= maxGreenVertices) {
-			drawTriangleStrip(levelBarVb, GlobalVars.YELLOW, maxGreenVertices - 2,
+			drawTriangleStrip(levelBarVb, Colors.YELLOW, maxGreenVertices - 2,
 					currAmpVertex <= maxYellowVertices ? currAmpVertex : maxYellowVertices);
 		}
 		if (currAmpVertex >= maxYellowVertices) {
-			drawTriangleStrip(levelBarVb, GlobalVars.RED, maxYellowVertices - 2,
+			drawTriangleStrip(levelBarVb, Colors.RED, maxYellowVertices - 2,
 					currAmpVertex <= maxRedVertices ? currAmpVertex : maxRedVertices);
 		}
 		translate(0, levelBarHeight / 2);
 		if (currAmpVertex > 0) { // draw circle at beginning
-			drawPoint(levelBarHeight, GlobalVars.GREEN, 0);
+			drawPoint(levelBarHeight, Colors.GREEN, 0);
 		}
 		if (currAmpVertex >= maxRedVertices) { // draw circle at end
-			drawPoint(levelBarHeight, GlobalVars.RED, levelBarVb.capacity() - 2);
+			drawPoint(levelBarHeight, Colors.RED, levelBarVb.capacity() - 2);
 		}
 		translate(0, -levelBarHeight / 2);
 	}

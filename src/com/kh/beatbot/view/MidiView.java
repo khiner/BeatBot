@@ -24,6 +24,7 @@ import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.bean.MidiViewBean;
 import com.kh.beatbot.view.helper.LevelsViewHelper;
+import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 import com.kh.beatbot.view.helper.ScrollBarHelper;
 import com.kh.beatbot.view.helper.TickWindowHelper;
 import com.kh.beatbot.view.helper.WaveformHelper;
@@ -35,7 +36,7 @@ public class MidiView extends ClickableSurfaceView {
 
 	private static final int[] V_LINE_WIDTHS = new int[] { 5, 3, 2 };
 	private static final float[] V_LINE_COLORS = new float[] { 0, .2f, .3f };
-	
+
 	// NIO Buffers
 	private FloatBuffer[] vLineVb = new FloatBuffer[3];
 	private FloatBuffer currTickVb = null;
@@ -44,7 +45,8 @@ public class MidiView extends ClickableSurfaceView {
 	private FloatBuffer selectRegionVb = null;
 	private FloatBuffer loopMarkerVb = null;
 	private FloatBuffer loopMarkerLineVb = null;
-	private FloatBuffer loopSquareVb = null;
+	private FloatBuffer loopRectVb = null;
+	private FloatBuffer bgRectVb = null;
 
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedNotes = new HashMap<Integer, MidiNote>();
@@ -182,6 +184,10 @@ public class MidiView extends ClickableSurfaceView {
 		}
 	}
 
+	private void drawBgRect() {
+		drawTriangleStrip(bgRectVb, bean.getBgColorRgb());
+	}
+
 	private void drawHorizontalLines() {
 		gl.glColor4f(0, 0, 0, 1);
 		gl.glLineWidth(2);
@@ -192,7 +198,7 @@ public class MidiView extends ClickableSurfaceView {
 	private void drawVerticalLines() {
 		// distance between one primary tick to the next
 		float translateDist = TickWindowHelper.getMajorTickSpacing() * 4f
-				* width / TickWindowHelper.getNumTicks();
+				* bean.getWidth() / TickWindowHelper.getNumTicks();
 		// start at the first primary tick before display start
 		float startX = tickToX(TickWindowHelper
 				.getPrimaryTickToLeftOf(TickWindowHelper.getTickOffset()));
@@ -271,7 +277,7 @@ public class MidiView extends ClickableSurfaceView {
 	private void drawLoopSquare() {
 		float gray = bean.getBgColor() + .2f;
 		float[] color = new float[] { gray, gray, gray, 1 };
-		drawTriangleStrip(loopSquareVb, color);
+		drawTriangleStrip(loopRectVb, color);
 	}
 
 	private void drawRecordingWaveforms() {
@@ -314,8 +320,7 @@ public class MidiView extends ClickableSurfaceView {
 				break;
 			MidiNote midiNote = midiManager.getMidiNote(i);
 			if (midiNote != null) {
-				drawMidiNote(
-						midiNote,
+				drawMidiNote(midiNote,
 						midiNote.isSelected() ? Colors.NOTE_SELECTED_COLOR
 								: Colors.NOTE_COLOR);
 			}
@@ -336,29 +341,37 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	private void initTickFillVb() {
-		tickFillVb = makeRectFloatBuffer(0, 0, width, MidiViewBean.Y_OFFSET);
+		tickFillVb = makeRectFloatBuffer(MidiViewBean.X_OFFSET, 0, width,
+				MidiViewBean.Y_OFFSET);
 	}
 
-	private void initLoopSquareVb() {
-		loopSquareVb = makeRectFloatBuffer(
+	private void initBgRectVb() {
+		bgRectVb = makeRectFloatBuffer(MidiViewBean.X_OFFSET,
+				MidiViewBean.Y_OFFSET, width, MidiViewBean.allTracksHeight);
+	}
+
+	private void initLoopRectVb() {
+		loopRectVb = makeRectFloatBuffer(
 				tickToX(midiManager.getLoopBeginTick()), MidiViewBean.Y_OFFSET,
-				tickToX(midiManager.getLoopEndTick()), height);
+				tickToX(midiManager.getLoopEndTick()), bean.getHeight());
 	}
 
 	private void initCurrTickVb() {
-		float[] vertLine = new float[] { 0, MidiViewBean.Y_OFFSET, 0, height };
+		float[] vertLine = new float[] { MidiViewBean.X_OFFSET,
+				MidiViewBean.Y_OFFSET, MidiViewBean.X_OFFSET, bean.getHeight() };
 		currTickVb = makeFloatBuffer(vertLine);
 	}
 
 	private void initHLineVb() {
 		float[] hLines = new float[(GlobalVars.tracks.size() + 2) * 4];
-		hLines[0] = 0;
+		hLines[0] = MidiViewBean.X_OFFSET;
 		hLines[1] = 0;
 		hLines[2] = width;
 		hLines[3] = 0;
 		float y = MidiViewBean.Y_OFFSET;
 		for (int i = 1; i < GlobalVars.tracks.size() + 2; i++) {
-			hLines[i * 4] = 0;
+			hLines[i * 4] = MidiViewBean.X_OFFSET;
+			;
 			hLines[i * 4 + 1] = y;
 			hLines[i * 4 + 2] = width;
 			hLines[i * 4 + 3] = y;
@@ -395,12 +408,13 @@ public class MidiView extends ClickableSurfaceView {
 
 	public float tickToX(float tick) {
 		return (tick - TickWindowHelper.getTickOffset())
-				/ TickWindowHelper.getNumTicks() * bean.getWidth();
+				/ TickWindowHelper.getNumTicks() * bean.getWidth()
+				+ MidiViewBean.X_OFFSET;
 	}
 
 	public float xToTick(float x) {
-		return TickWindowHelper.getNumTicks() * x / bean.getWidth()
-				+ TickWindowHelper.getTickOffset();
+		return TickWindowHelper.getNumTicks() * (x - MidiViewBean.X_OFFSET)
+				/ bean.getWidth() + TickWindowHelper.getTickOffset();
 	}
 
 	public int yToNote(float y) {
@@ -424,44 +438,46 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	public void initAllVbs() {
+		initBgRectVb();
 		initCurrTickVb();
 		initHLineVb();
 		initVLineVbs();
 		initLoopMarkerVbs();
-		initLoopSquareVb();
+		initLoopRectVb();
 		initTickFillVb();
 	}
-	
+
 	protected void init() {
-		LevelsViewHelper.initHelper(this);
+		LevelsViewHelper.init(this);
+		MidiTrackControlHelper.init();
 		// waveformHelper constructor: yPos, height
 		waveformHelper = new WaveformHelper();
 		TickWindowHelper.updateGranularity();
 		initAllVbs();
 	}
 
-	@Override
-	protected void fillBackground() {
+	protected void calcBgColor() {
 		if (bean.getViewState() == State.TO_LEVELS_VIEW
 				|| bean.getViewState() == State.TO_NORMAL_VIEW) { // transitioning
-			float amt = .5f / 30;
 			bean.setBgColor(bean.getViewState() == State.TO_LEVELS_VIEW ? bean
-					.getBgColor() - amt : bean.getBgColor() + amt);
-			if (bean.getBgColor() >= .5f || bean.getBgColor() <= 0) {
-				bean.setViewState(bean.getBgColor() >= .5f ? State.NORMAL_VIEW
-						: State.LEVELS_VIEW);
+					.getBgColor() - MidiViewBean.COLOR_TRANSITION_RATE : bean
+					.getBgColor() + MidiViewBean.COLOR_TRANSITION_RATE);
+			if (bean.getBgColor() >= .5f) {
+				bean.setViewState(State.NORMAL_VIEW);
+			} else if (bean.getBgColor() <= 0) {
+				bean.setViewState(State.LEVELS_VIEW);
 			}
 		}
-		gl.glClearColor(bean.getBgColor(), bean.getBgColor(),
-				bean.getBgColor(), 1);
 	}
 
 	@Override
 	protected void drawFrame() {
+		calcBgColor();
+		drawBgRect();
 		boolean recording = RecordManager.getState() != RecordManager.State.INITIALIZING;
 		boolean playing = Managers.playbackManager.getState() == PlaybackManager.State.PLAYING;
 		TickWindowHelper.scroll();
-		initLoopSquareVb();
+		initLoopRectVb();
 		drawTickFill();
 		drawLoopSquare();
 		// if we're recording, keep the current recording tick in view.
@@ -482,11 +498,13 @@ public class MidiView extends ClickableSurfaceView {
 		}
 		drawLoopMarker();
 		drawSelectRegion();
-		ScrollBarHelper.drawScrollView(width, height);
+		ScrollBarHelper.drawScrollView(bean.getWidth(), bean.getHeight(),
+				MidiViewBean.X_OFFSET);
 		drawRecordingWaveforms();
 		if (playing || recording) {
 			drawCurrentTick();
 		}
+		MidiTrackControlHelper.draw();
 	}
 
 	private float getAdjustedTickDiff(float tickDiff, int pointerId,
@@ -701,14 +719,16 @@ public class MidiView extends ClickableSurfaceView {
 			} else { // one finger scroll
 				if (bean.getScrollPointerId() < e.getPointerCount()) {
 					int index = e.findPointerIndex(bean.getScrollPointerId());
-					TickWindowHelper.scroll(e.getX(index));
+					TickWindowHelper.scroll(e.getX(index)
+							- MidiViewBean.X_OFFSET);
 				}
 			}
 		} else if (e.getPointerCount() - bean.getNumLoopMarkersSelected() == 2) {
 			// two finger zoom
 			float leftX = Math.min(e.getX(0), e.getX(1));
 			float rightX = Math.max(e.getX(0), e.getX(1));
-			TickWindowHelper.zoom(leftX, rightX);
+			TickWindowHelper.zoom(leftX - MidiViewBean.X_OFFSET, rightX
+					- MidiViewBean.X_OFFSET);
 		}
 	}
 
@@ -732,7 +752,7 @@ public class MidiView extends ClickableSurfaceView {
 		bean.setLevelsHeight(bean.getMidiHeight()
 				- MidiViewBean.LEVEL_POINT_SIZE / 2);
 	}
-	
+
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
@@ -879,11 +899,19 @@ public class MidiView extends ClickableSurfaceView {
 
 	@Override
 	protected void longPress(int id, float x, float y) {
+		if (x < MidiTrackControlHelper.width) {
+			MidiTrackControlHelper.handleLongPress(x, yToNote(y));
+			return;
+		}
 		startSelectRegion(x, y);
 	}
-	
+
 	@Override
 	protected void singleTap(int id, float x, float y) {
+		if (x < MidiTrackControlHelper.width) {
+			MidiTrackControlHelper.handleClick(x, yToNote(y));
+			return;
+		}
 		MidiNote touchedNote = touchedNotes.get(id);
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			LevelsViewHelper.selectLevelNote(x, y);

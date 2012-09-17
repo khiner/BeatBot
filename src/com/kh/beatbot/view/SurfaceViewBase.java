@@ -1,6 +1,5 @@
 package com.kh.beatbot.view;
 
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -27,7 +26,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.global.Colors;
 
 public abstract class SurfaceViewBase extends SurfaceView implements
 		SurfaceHolder.Callback, Runnable {
@@ -42,9 +41,9 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	protected int height;
 	protected int fps;
 	
-	protected int[] textureHandlers = new int[2];
-	protected int[] crop = null;
-	protected float[] backgroundColor = GlobalVars.BG_COLOR;
+	protected int[] textureHandlers = new int[10];
+	protected int[][] crop = new int[10][];
+	protected float[] backgroundColor = Colors.BG_COLOR;
 
 	/**
 	 * Make a direct NIO FloatBuffer from an array of floats
@@ -158,20 +157,16 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glColor4f(color[0], color[1], color[2], color[3]);
 	}
 	
-	protected void loadTexture(final int resourceId, int textureId) {
+	public void loadTexture(final int resourceId, int textureId) {
 		// Generate Texture ID
 		gl.glGenTextures(1, textureHandlers, textureId);
 		// Bind texture id texturing target
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[textureId]); 
 		 
-		InputStream is = getContext().getResources().openRawResource(resourceId);
-		Bitmap bitmap = BitmapFactory.decodeStream(is);
+		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resourceId);
 		 
 		// Build our crop texture to be the size of the bitmap (ie full texture)
-		// we only need to do this once, since both images will have the same width/height
-		if (crop == null) {
-			crop = new int[] {0, bitmap.getHeight(), bitmap.getWidth(), -bitmap.getHeight()};
-		}
+		crop[textureId] = new int[] {0, bitmap.getHeight(), bitmap.getWidth(), -bitmap.getHeight()};
 
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
@@ -186,10 +181,22 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		return (x - width/2)*(x - width/2) + (y - height/2)*(y - height/2);
 	}
 	
+	public float getTextureWidth(int textureId) {
+		return crop[textureId][2];
+	}
+	
+	public float getTextureHeight(int textureId) {
+		return crop[textureId][1];
+	}
+	
+	public void drawTexture(int textureId, float x, float y) {
+		drawTexture(textureId, x, y, getTextureWidth(textureId), getTextureHeight(textureId));
+	}
+	
 	public void drawTexture(int textureId, float x, float y, float width, float height) {
 		gl.glEnable(GL10.GL_TEXTURE_2D);
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[textureId]);
-		((GL11)gl).glTexParameteriv(GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, crop, 0);
+		((GL11)gl).glTexParameteriv(GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, crop[textureId], 0);
 		gl.glColor4f(1, 1, 1, 1);
 		((GL11Ext)gl).glDrawTexfOES(x, y, 0, width, height);
 		gl.glDisable(GL10.GL_TEXTURE_2D);

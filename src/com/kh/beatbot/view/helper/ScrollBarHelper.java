@@ -48,10 +48,10 @@ public class ScrollBarHelper {
 		scrolling = true;
 	}
 
-	public static void drawScrollView(float parentWidth, float parentHeight) {
+	public static void drawScrollView(float parentWidth, float parentHeight, float offset) {
 		if (!shouldDrawScrollView())
 			return;
-		updateScrollBar(parentWidth, parentHeight);
+		updateScrollBar(parentWidth, parentHeight, offset);
 		// if scrolling is still in progress, elapsed time is relative to the
 		// time of scroll start,
 		// otherwise, elapsed time is relative to scroll end time
@@ -85,11 +85,11 @@ public class ScrollBarHelper {
 		}
 	}
 
-	public static void updateScrollBar(float parentWidth, float parentHeight) {
+	public static void updateScrollBar(float parentWidth, float parentHeight, float offset) {
 		float x1 = TickWindowHelper.getTickOffset() * parentWidth
-				/ TickWindowHelper.MAX_TICKS;
+				/ TickWindowHelper.MAX_TICKS + offset;
 		float x2 = (TickWindowHelper.getTickOffset() + TickWindowHelper
-				.getNumTicks()) * parentWidth / TickWindowHelper.MAX_TICKS;
+				.getNumTicks()) * parentWidth / TickWindowHelper.MAX_TICKS  + offset;
 		float outerWidth = x2 - x1;
 		float innerWidth = outerWidth - 10;
 		translateX = (x2 + x1) / 2;
@@ -100,8 +100,8 @@ public class ScrollBarHelper {
 		outerScrollBarVb = SurfaceViewBase.makeRoundedCornerRectBuffer(
 				outerWidth, outerScrollBarHeight, outerScrollBarCornerRadius,
 				CORNER_RESOLUTION);
-		scrollBarLinesVb = SurfaceViewBase.makeFloatBuffer(new float[] { 0, 0,
-				x1, 0, x2, 0, parentWidth, 0 });
+		scrollBarLinesVb = SurfaceViewBase.makeFloatBuffer(new float[] { offset, 0,
+				x1, 0, x2, 0, parentWidth + offset, 0 });
 	}
 
 	public static void handleActionUp() {

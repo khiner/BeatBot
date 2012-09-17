@@ -57,7 +57,7 @@ public class LevelsViewHelper {
 
 	private static LevelMode currLevelMode = LevelMode.VOLUME;
 
-	public static void initHelper(MidiView _midiView) {
+	public static void init(MidiView _midiView) {
 		midiView = _midiView;
 		bean = midiView.getBean();
 		gl = midiView.getGL10();

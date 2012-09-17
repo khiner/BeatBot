@@ -36,11 +36,6 @@ public class GlobalVars {
 		instrumentIcons.put("recorded", R.drawable.microphone_icon_src);
 	}
 
-	public static final float[] BG_COLOR = { 0.12549f, 0.188235f, 0.227451f, 1 };
-	public static final float[] WHITE = { 1, 1, 1, 1 };
-	public static final float[] GREEN = { 0, 1, 0, 1 };
-	public static final float[] YELLOW = { 1, 1, 0, 1 };
-	public static final float[] RED = { 1, 0, 0, 1 };
 	public static final int UNDO_STACK_SIZE = 40;
 	public static final int NUM_EFFECTS = 7;
 	public static final short LEVEL_MAX = 127;

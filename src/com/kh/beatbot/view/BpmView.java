@@ -146,7 +146,7 @@ public class BpmView extends SurfaceViewBase {
 		}
 	}
 
-	private float[] calculateColor(boolean on) {
+	private static float[] calculateColor(boolean on) {
 		if (on) {
 			return touched ? SEGMENT_ON_TOUCHED_COLOR : SEGMENT_ON_COLOR;
 		} else {

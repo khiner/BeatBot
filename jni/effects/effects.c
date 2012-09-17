@@ -191,7 +191,6 @@ void Java_com_kh_beatbot_effect_Effect_addEffect(JNIEnv *env, jclass clazz,
 	Track *track = getTrack(env, clazz, trackNum);
 	Effect *effect = createEffect(effectNum, effectId);
 	setEffect(track, position, effect);
-	printEffects(track->effectHead);
 }
 
 void Java_com_kh_beatbot_effect_Effect_removeEffect(JNIEnv *env, jclass clazz,
@@ -200,7 +199,6 @@ void Java_com_kh_beatbot_effect_Effect_removeEffect(JNIEnv *env, jclass clazz,
 	free(effectNode->effect->config);
 	free(effectNode->effect);
 	effectNode->effect = NULL;
-	printEffects(getTrack(env, clazz, trackNum)->effectHead);
 }
 
 void Java_com_kh_beatbot_effect_Effect_setEffectPosition(JNIEnv *env,
@@ -209,7 +207,6 @@ void Java_com_kh_beatbot_effect_Effect_setEffectPosition(JNIEnv *env,
 	Track *track = getTrack(env, clazz, trackNum);
 	EffectNode *node = removeEffect(trackNum, effectId);
 	insertEffect(track, position, node);
-	printEffects(getTrack(env, clazz, trackNum)->effectHead);
 }
 
 void Java_com_kh_beatbot_effect_Effect_setEffectOn(JNIEnv *env, jclass clazz,

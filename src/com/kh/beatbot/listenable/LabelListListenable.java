@@ -13,7 +13,6 @@ import android.view.MotionEvent;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.view.ClickableSurfaceView;
 import com.kh.beatbot.view.text.GLText;
@@ -70,13 +69,13 @@ public class LabelListListenable extends ClickableSurfaceView {
 			if (state == LabelState.EMPTY) {
 				drawTexture(0, x + labelWidth / 2 - addTextWidth / 2, 0, height, height);
 				glText.begin(); // Begin Text Rendering
-				setColor(GlobalVars.WHITE);
+				setColor(Colors.WHITE);
 				// draw string in center of rect
 				glText.draw("ADD", x + labelWidth / 2 - addTextWidth / 2 + height, TEXT_Y_OFFSET);
 				glText.end();
 			} else {
 				glText.begin(); // Begin Text Rendering
-				setColor(GlobalVars.WHITE);
+				setColor(Colors.WHITE);
 				// draw string in center of rect
 				glText.draw(text, x + labelWidth / 2 - textWidth / 2, TEXT_Y_OFFSET);
 				glText.end();
