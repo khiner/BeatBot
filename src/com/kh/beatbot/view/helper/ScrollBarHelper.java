@@ -4,16 +4,16 @@ import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.SurfaceViewBase;
-import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class ScrollBarHelper {
 	private static final float DAMP_CONSTANT = 0.9f;
 	private static final int CORNER_RESOLUTION = 15;
 
 	private static float[] innerScrollBarColor = { 1, 1, 1, .8f };
-	private static float[] outerScrollBarColor = MidiViewBean.VOLUME_COLOR
+	private static float[] outerScrollBarColor = Colors.VOLUME_COLOR
 			.clone();
 
 	private static float translateX = 0;

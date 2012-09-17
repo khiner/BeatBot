@@ -9,6 +9,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.view.MotionEvent;
 
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.MidiView;
@@ -120,17 +121,17 @@ public class LevelsViewHelper {
 
 	private static float[] calcLevelColor(boolean selected) {
 		if (selected) {
-			return MidiViewBean.LEVEL_SELECTED_COLOR;
+			return Colors.LEVEL_SELECTED_COLOR;
 		} else {
 			switch (currLevelMode) {
 			case VOLUME:
-				return MidiViewBean.VOLUME_COLOR;
+				return Colors.VOLUME_COLOR;
 			case PAN:
-				return MidiViewBean.PAN_COLOR;
+				return Colors.PAN_COLOR;
 			case PITCH:
-				return MidiViewBean.PITCH_COLOR;
+				return Colors.PITCH_COLOR;
 			default:
-				return MidiViewBean.LEVEL_SELECTED_COLOR;
+				return Colors.LEVEL_SELECTED_COLOR;
 			}
 		}
 	}

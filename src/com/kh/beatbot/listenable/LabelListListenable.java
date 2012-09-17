@@ -12,10 +12,10 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.view.ClickableSurfaceView;
-import com.kh.beatbot.view.bean.MidiViewBean;
 import com.kh.beatbot.view.text.GLText;
 
 public class LabelListListenable extends ClickableSurfaceView {
@@ -128,7 +128,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 			BG_RECT_COLOR[1] + .1f, BG_RECT_COLOR[2] + .1f, 1 };
 	private static final float[] LABEL_RECT_COLOR = { BG_RECT_COLOR[0] + .3f,
 			BG_RECT_COLOR[1] + .3f, BG_RECT_COLOR[2] + .3f, 1 };
-	private static final float[] LABEL_RECT_ON_COLOR = MidiViewBean.VOLUME_COLOR
+	private static final float[] LABEL_RECT_ON_COLOR = Colors.VOLUME_COLOR
 			.clone();
 
 	private static final float[] SELECTED_EMPTY_RECT_COLOR = { EMPTY_RECT_COLOR[0] + .2f,

@@ -25,6 +25,7 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremelo;
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listenable.LabelListListenable;
 import com.kh.beatbot.listenable.LevelListenable;
@@ -34,7 +35,6 @@ import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.view.SampleWaveformView;
 import com.kh.beatbot.view.TronSeekbar;
-import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class SampleEditActivity extends Activity implements LevelListener {
 	class SampleLabelListListener implements LabelListListener {
@@ -383,13 +383,13 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	@Override
 	public void notifyInit(LevelListenable levelBar) {
 		if (levelBar.equals(volumeLevel)) {
-			volumeLevel.setLevelColor(MidiViewBean.VOLUME_COLOR);
+			volumeLevel.setLevelColor(Colors.VOLUME_COLOR);
 			volumeLevel.setLevel(GlobalVars.tracks.get(trackNum).volume);
 		} else if (levelBar.equals(panLevel)) {
-			panLevel.setLevelColor(MidiViewBean.PAN_COLOR);
+			panLevel.setLevelColor(Colors.PAN_COLOR);
 			panLevel.setLevel(GlobalVars.tracks.get(trackNum).pan);
 		} else if (levelBar.equals(pitchLevel)) {
-			pitchLevel.setLevelColor(MidiViewBean.PITCH_COLOR);
+			pitchLevel.setLevelColor(Colors.PITCH_COLOR);
 			pitchLevel.setLevel(GlobalVars.tracks.get(trackNum).pitch);
 		}
 	}

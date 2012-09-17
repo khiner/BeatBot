@@ -10,23 +10,23 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.Managers;
-import com.kh.beatbot.view.bean.MidiViewBean;
 import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class SampleWaveformView extends SurfaceViewBase {
 
-	private static final float[] ADSR_COLOR = MidiViewBean.PITCH_COLOR.clone();
+	private static final float[] ADSR_COLOR = Colors.PITCH_COLOR.clone();
 	private static final float[] ADSR_SELECTED_COLOR = { ADSR_COLOR[0],
 			ADSR_COLOR[1], ADSR_COLOR[2], .6f };
 	private static final float[] LOOP_HIGHLIGHT_COLOR = { 1, .64706f, 0, .4f };
 	private static final float[] LOOP_SELECTION_LINE_COLOR = { 1, 1, 1, 1 };
 	private static final float[] LOOP_SELECTION_RECT_COLOR = { .9f, .9f, 1, .5f };
 	private static final float[] LOOP_SELECTION_RECT_SELECT_COLOR = {
-			MidiViewBean.VOLUME_COLOR[0], MidiViewBean.VOLUME_COLOR[1],
-			MidiViewBean.VOLUME_COLOR[2], .6f };
+			Colors.VOLUME_COLOR[0], Colors.VOLUME_COLOR[1],
+			Colors.VOLUME_COLOR[2], .6f };
 	private static final float[] BG_COLOR = { LOOP_HIGHLIGHT_COLOR[0] * .5f,
 			LOOP_HIGHLIGHT_COLOR[1] * .5f, LOOP_HIGHLIGHT_COLOR[2] * .5f, 1 };
 
@@ -170,7 +170,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 			return;
 		float scale = (waveformWidth) / ((float) sampleWidth);
 		float translate = -sampleOffset;
-		float[] color = MidiViewBean.VOLUME_COLOR;
+		float[] color = Colors.VOLUME_COLOR;
 		gl.glLineWidth(10);
 		gl.glEnable(GL10.GL_LINE_SMOOTH);
 		gl.glColor4f(color[0], color[1], color[2], .9f);

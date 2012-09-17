@@ -15,6 +15,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
@@ -34,6 +35,7 @@ public class MidiView extends ClickableSurfaceView {
 
 	private static final int[] V_LINE_WIDTHS = new int[] { 5, 3, 2 };
 	private static final float[] V_LINE_COLORS = new float[] { 0, .2f, .3f };
+	
 	// NIO Buffers
 	private FloatBuffer[] vLineVb = new FloatBuffer[3];
 	private FloatBuffer currTickVb = null;
@@ -96,7 +98,7 @@ public class MidiView extends ClickableSurfaceView {
 		if (viewState == State.LEVELS_VIEW)
 			bean.setBgColor(0);
 		else
-			bean.setBgColor(MidiViewBean.MIDI_VIEW_DEFAULT_BG_COLOR);
+			bean.setBgColor(Colors.MIDI_VIEW_DEFAULT_BG_COLOR);
 	}
 
 	public void setLevelMode(LevelsViewHelper.LevelMode levelMode) {
@@ -226,16 +228,16 @@ public class MidiView extends ClickableSurfaceView {
 	private void drawCurrentTick() {
 		float xLoc = tickToX(midiManager.getCurrTick());
 		gl.glTranslatef(xLoc, 0, 0);
-		drawLines(currTickVb, MidiViewBean.VOLUME_COLOR, 5, GL10.GL_LINES);
+		drawLines(currTickVb, Colors.VOLUME_COLOR, 5, GL10.GL_LINES);
 		gl.glTranslatef(-xLoc, 0, 0);
 	}
 
 	private void drawLoopMarker() {
 		float[][] color = new float[2][3];
-		color[0] = bean.getLoopPointerIds()[0] != -1 ? MidiViewBean.TICK_SELECTED_COLOR
-				: MidiViewBean.TICK_MARKER_COLOR;
-		color[1] = bean.getLoopPointerIds()[2] != -1 ? MidiViewBean.TICK_SELECTED_COLOR
-				: MidiViewBean.TICK_MARKER_COLOR;
+		color[0] = bean.getLoopPointerIds()[0] != -1 ? Colors.TICK_SELECTED_COLOR
+				: Colors.TICK_MARKER_COLOR;
+		color[1] = bean.getLoopPointerIds()[2] != -1 ? Colors.TICK_SELECTED_COLOR
+				: Colors.TICK_MARKER_COLOR;
 		gl.glLineWidth(6);
 		float[] loopMarkerLocs = { tickToX(midiManager.getLoopBeginTick()),
 				tickToX(midiManager.getLoopEndTick()) };
@@ -253,13 +255,13 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	private void drawTickFill() {
-		drawTriangleStrip(tickFillVb, MidiViewBean.TICK_FILL_COLOR);
+		drawTriangleStrip(tickFillVb, Colors.TICK_FILL_COLOR);
 		drawLoopBar();
 	}
 
 	private void drawLoopBar() {
-		float[] color = bean.getLoopPointerIds()[1] == -1 ? MidiViewBean.TICKBAR_COLOR
-				: MidiViewBean.TICK_SELECTED_COLOR;
+		float[] color = bean.getLoopPointerIds()[1] == -1 ? Colors.TICKBAR_COLOR
+				: Colors.TICK_SELECTED_COLOR;
 		// entire loop bar is selected. draw darker square
 		drawRectangle(tickToX(midiManager.getLoopBeginTick()), 0,
 				tickToX(midiManager.getLoopEndTick()), MidiViewBean.Y_OFFSET,
@@ -286,7 +288,7 @@ public class MidiView extends ClickableSurfaceView {
 			// width
 			gl.glScalef(noteWidth / waveWidth, 1, 1);
 			for (int i = 0; i < waveformVbs.size(); i++) {
-				drawLines(waveformVbs.get(i), MidiViewBean.WAVEFORM_COLOR, 1,
+				drawLines(waveformVbs.get(i), Colors.WAVEFORM_COLOR, 1,
 						GL10.GL_LINE_STRIP);
 			}
 			gl.glPopMatrix();
@@ -314,8 +316,8 @@ public class MidiView extends ClickableSurfaceView {
 			if (midiNote != null) {
 				drawMidiNote(
 						midiNote,
-						midiNote.isSelected() ? MidiViewBean.NOTE_SELECTED_COLOR
-								: MidiViewBean.NOTE_COLOR);
+						midiNote.isSelected() ? Colors.NOTE_SELECTED_COLOR
+								: Colors.NOTE_COLOR);
 			}
 		}
 	}

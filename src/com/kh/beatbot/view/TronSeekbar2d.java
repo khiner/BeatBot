@@ -8,9 +8,9 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
-import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class TronSeekbar2d extends LevelListenable {
 	private static final int DRAW_OFFSET = 8;
@@ -66,7 +66,7 @@ public class TronSeekbar2d extends LevelListenable {
 		levelColor[3] = 1; // completely opaque alpha
 		drawLines(lineVb, levelColor, 5, GL10.GL_LINES);
 		gl.glTranslatef(width / 2, height / 2, 0);
-		drawLines(borderVb, MidiViewBean.VOLUME_COLOR, 5, GL10.GL_LINE_LOOP);
+		drawLines(borderVb, Colors.VOLUME_COLOR, 5, GL10.GL_LINE_LOOP);
 		gl.glTranslatef(-width / 2, -height / 2, 0);
 	}
 
@@ -103,7 +103,7 @@ public class TronSeekbar2d extends LevelListenable {
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		selectLocation(x, y);
-		levelColor = MidiViewBean.LEVEL_SELECTED_COLOR.clone();
+		levelColor = Colors.LEVEL_SELECTED_COLOR.clone();
 		super.handleActionDown(id, x, y);
 	}
 
@@ -114,7 +114,7 @@ public class TronSeekbar2d extends LevelListenable {
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		levelColor = MidiViewBean.VOLUME_COLOR.clone();
+		levelColor = Colors.VOLUME_COLOR.clone();
 		super.handleActionUp(id, x, y);
 	}
 }

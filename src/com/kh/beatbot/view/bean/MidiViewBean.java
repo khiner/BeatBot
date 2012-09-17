@@ -1,5 +1,6 @@
 package com.kh.beatbot.view.bean;
 
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.view.MidiView;
 
 public class MidiViewBean {
@@ -10,33 +11,6 @@ public class MidiViewBean {
 	// the width of the lines for note levels
 	public static final int LEVEL_LINE_WIDTH = 7;
 
-	public final static float MIDI_VIEW_DEFAULT_BG_COLOR = .5f;
-
-	// RGB color to draw main midi grid lines
-	public final static float[] GRID_LINE_COLOR = { 0, 0, 0, 1 };
-
-	// RGB color to draw waveform lines in midi view
-	public final static float[] WAVEFORM_COLOR = { 0, 0, 0, 1 };
-
-	// RGB color for non-selected notes
-	public final static float[] NOTE_COLOR = { 1, 0, 0, 1 };
-	// RGB color for selected notes
-	public final static float[] NOTE_SELECTED_COLOR = { 0, 0, 1, 1 };
-
-	// RGB color for volume bars
-	public final static float[] VOLUME_COLOR = { .412f, .788f, 1, 1 };
-	// RGB color for pan bars
-	public final static float[] PAN_COLOR = { 1, .788f, .392f, 1 };
-	// RGB color for pitch bars
-	public final static float[] PITCH_COLOR = { .443f, 1, .533f, 1 };
-
-	// RGB color for selected bars
-	public final static float[] LEVEL_SELECTED_COLOR = { .9f, 0, .1f, 1 };
-	public final static float[] TICK_FILL_COLOR = { .3f, .3f, .3f, 1 };
-	public final static float[] TICK_MARKER_COLOR = { .8f, .8f, .8f, 1 };
-	public final static float[] TICKBAR_COLOR = { .6f, .6f, .6f, 1 };
-	public final static float[] TICK_SELECTED_COLOR = VOLUME_COLOR;
-
 	private MidiView.State viewState = MidiView.State.NORMAL_VIEW;
 
 	private float width, height;
@@ -45,7 +19,7 @@ public class MidiViewBean {
 	private float levelsHeight;
 	// the main background color for the view.
 	// this color can change when transitioning to/from LEVEL_VIEW
-	private float bgColor = MIDI_VIEW_DEFAULT_BG_COLOR;
+	private float bgColor = Colors.MIDI_VIEW_DEFAULT_BG_COLOR;
 
 	private float dragOffsetTick[] = new float[5];
 

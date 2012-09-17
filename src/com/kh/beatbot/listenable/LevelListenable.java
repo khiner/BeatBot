@@ -6,15 +6,15 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.SurfaceViewBase;
-import com.kh.beatbot.view.bean.MidiViewBean;
 
 public abstract class LevelListenable extends SurfaceViewBase {
 	public static final float[] BG_COLOR = new float[] {0.3275f, 0.3994f, 0.4465f, 1};
 	protected ArrayList<LevelListener> levelListeners = new ArrayList<LevelListener>();	
 	protected float level = .5f;
-	protected float[] levelColor = MidiViewBean.VOLUME_COLOR.clone();
+	protected float[] levelColor = Colors.VOLUME_COLOR.clone();
 	protected float[] selectColor = {levelColor[0], levelColor[1], levelColor[2], .5f};
 	
 	protected boolean selected = false;
