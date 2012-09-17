@@ -14,11 +14,11 @@ import android.view.MotionEvent;
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listener.LabelListListener;
-import com.kh.beatbot.view.SurfaceViewBase;
+import com.kh.beatbot.view.ClickableSurfaceView;
 import com.kh.beatbot.view.bean.MidiViewBean;
 import com.kh.beatbot.view.text.GLText;
 
-public class LabelListListenable extends SurfaceViewBase {
+public class LabelListListenable extends ClickableSurfaceView {
 	private static float addTextWidth;
 	
 	static enum LabelState {
@@ -145,9 +145,6 @@ public class LabelListListenable extends SurfaceViewBase {
 	private LabelListListener listener = null;
 	private ArrayList<Label> labels = null;
 
-	private long LAST_DOWN_TIME = -1;
-	private float LAST_DOWN_X = -1;
-
 	// which label is currently being touched? (null for none)
 	private Label touchedLabel = null;
 
@@ -240,15 +237,6 @@ public class LabelListListenable extends SurfaceViewBase {
 		setAllLabelPrevPositions();
 	}
 
-	// notify listener that the label has been single-clicked (tapped)
-	private void clickLabel(Label label) {
-		listener.labelClicked(label.text, label.id, labels.indexOf(label));
-	}
-
-	// notify listener that the label has been long-clicked
-	private void longClickLabel(Label label) {
-		listener.labelLongClicked(label.id, labels.indexOf(label));
-	}
 
 	private void setAllLabelPrevPositions() {
 		for (int i = 0; i < labels.size(); i++) {
@@ -308,8 +296,7 @@ public class LabelListListenable extends SurfaceViewBase {
 
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
-		LAST_DOWN_TIME = System.currentTimeMillis();
-		LAST_DOWN_X = x;
+		super.handleActionDown(id, x, y);
 		// clicking on an existing label will select label.
 		Label touched = findLabel(x, y);
 		if (touched != null) {
@@ -325,14 +312,7 @@ public class LabelListListenable extends SurfaceViewBase {
 
 	@Override
 	protected void handleActionMove(MotionEvent e) {
-		if (Math.abs(e.getX(0) - LAST_DOWN_X) < 25) {
-			if (touchedLabel != null
-					&& System.currentTimeMillis() - LAST_DOWN_TIME > GlobalVars.LONG_CLICK_TIME) {
-				longClickLabel(touchedLabel);
-			}
-		} else {
-			LAST_DOWN_TIME = Long.MAX_VALUE;
-		}
+		super.handleActionMove(e);
 		if (touchedLabel == null) {
 			return;
 		}
@@ -347,14 +327,9 @@ public class LabelListListenable extends SurfaceViewBase {
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		if (touchedLabel != null) {
-			if (Math.abs(System.currentTimeMillis() - LAST_DOWN_TIME) < GlobalVars.SINGLE_TAP_TIME) {
-				clickLabel(touchedLabel);
-			} else {
-				updateLabelPositions();
-			}
-		}
+		super.handleActionUp(id, x, y);
 		touchedLabel = null;
+		updateLabelPositions();
 		updateLabelLocations();
 	}
 
@@ -366,5 +341,24 @@ public class LabelListListenable extends SurfaceViewBase {
 		fillBackground();
 		drawFrame();
 		GLU.gluOrtho2D(gl, 0, width, height, 0);
+	}
+
+	@Override
+	protected void longPress(int id, float x, float y) {
+		// notify listener that the label has been long-clicked
+		if (touchedLabel != null)
+			listener.labelLongClicked(touchedLabel.id, labels.indexOf(touchedLabel));
+	}
+
+	@Override
+	protected void singleTap(int id, float x, float y) {
+		// notify listener that the label has been single-clicked (tapped)
+		if (touchedLabel != null)
+			listener.labelClicked(touchedLabel.text, touchedLabel.id, labels.indexOf(touchedLabel));
+	}
+
+	@Override
+	protected void doubleTap(int id, float x, float y) {
+		// no double tap for this view
 	}
 }

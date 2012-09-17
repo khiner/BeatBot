@@ -63,12 +63,6 @@ public class MidiViewBean {
 	private float selectRegionStartTick = -1;
 	private float selectRegionStartY = -1;
 
-	private long lastDownTime = 0;
-	private long lastTapTime = 0;
-
-	private float lastTapX = -10;
-	private float lastTapY = -10;
-
 	// true when a note is being "pinched" (two-fingers touching the note)
 	private boolean pinch = false;
 
@@ -232,38 +226,6 @@ public class MidiViewBean {
 
 	public void setSelectRegionStartY(float selectRegionStartY) {
 		this.selectRegionStartY = selectRegionStartY;
-	}
-
-	public long getLastDownTime() {
-		return lastDownTime;
-	}
-
-	public void setLastDownTime(long lastDownTime) {
-		this.lastDownTime = lastDownTime;
-	}
-
-	public long getLastTapTime() {
-		return lastTapTime;
-	}
-
-	public void setLastTapTime(long lastTapTime) {
-		this.lastTapTime = lastTapTime;
-	}
-
-	public float getLastTapX() {
-		return lastTapX;
-	}
-
-	public void setLastTapX(float lastTapX) {
-		this.lastTapX = lastTapX;
-	}
-
-	public float getLastTapY() {
-		return lastTapY;
-	}
-
-	public void setLastTapY(float lastTapY) {
-		this.lastTapY = lastTapY;
 	}
 
 	public boolean isPinch() {

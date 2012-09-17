@@ -27,7 +27,7 @@ import com.kh.beatbot.view.helper.ScrollBarHelper;
 import com.kh.beatbot.view.helper.TickWindowHelper;
 import com.kh.beatbot.view.helper.WaveformHelper;
 
-public class MidiView extends SurfaceViewBase {
+public class MidiView extends ClickableSurfaceView {
 
 	private static MidiManager midiManager;
 	private MidiViewBean bean = new MidiViewBean();
@@ -543,34 +543,6 @@ public class MidiView extends SurfaceViewBase {
 		bean.setStateChanged(true);
 	}
 
-	private void singleTap(float x, float y, MidiNote touchedNote) {
-		bean.setLastTapX(x);
-		bean.setLastTapY(y);
-		bean.setLastTapTime(System.currentTimeMillis());
-		if (bean.getViewState() == State.LEVELS_VIEW) {
-			LevelsViewHelper.selectLevelNote(x, y);
-		} else {
-			if (touchedNote != null) {
-				// single tapping a note always makes it the only selected note
-				if (touchedNote.isSelected())
-					midiManager.deselectAllNotes();
-				midiManager.selectNote(touchedNote);
-			} else {
-				int note = yToNote(y);
-				float tick = xToTick(x);
-				// if no note is touched, than this tap deselects all notes
-				if (midiManager.anyNoteSelected()) {
-					midiManager.deselectAllNotes();
-				} else { // add a note based on the current tick granularity
-					if (note >= 0) {
-						addMidiNote(tick, note);
-						bean.setStateChanged(true);
-					}
-				}
-			}
-		}
-	}
-
 	private void startSelectRegion(float x, float y) {
 		bean.setSelectRegionStartTick(xToTick(x));
 		if (bean.getViewState() == State.LEVELS_VIEW)
@@ -579,20 +551,6 @@ public class MidiView extends SurfaceViewBase {
 			bean.setSelectRegionStartY(noteToY(yToNote(y)));
 		selectRegionVb = null;
 		bean.setSelectRegion(true);
-	}
-
-	private void doubleTap(MidiNote touchedNote) {
-		if (bean.getViewState() == State.LEVELS_VIEW) {
-			LevelsViewHelper.doubleTap();
-			return;
-		}
-		if (touchedNote != null) {
-			midiManager.deleteNote(touchedNote);
-			bean.setStateChanged(true);
-		}
-		// reset tap time so that a third tap doesn't register as
-		// another double tap
-		bean.setLastTapTime(0);
 	}
 
 	// adds a note starting at the nearest major tick (nearest displayed
@@ -772,12 +730,10 @@ public class MidiView extends SurfaceViewBase {
 		bean.setLevelsHeight(bean.getMidiHeight()
 				- MidiViewBean.LEVEL_POINT_SIZE / 2);
 	}
-
+	
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
-		bean.setLastDownTime(System.currentTimeMillis());
-		bean.setLastTapX(x);
-		bean.setLastTapY(y);
+		super.handleActionDown(id, x, y);
 		ScrollBarHelper.startScrollView();
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			LevelsViewHelper.selectLevel(x, y, id);
@@ -800,6 +756,7 @@ public class MidiView extends SurfaceViewBase {
 	@Override
 	protected void handleActionPointerDown(MotionEvent e, int id, float x,
 			float y) {
+		super.handleActionPointerDown(e, id, x, y);
 		boolean noteAlreadySelected = false;
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			LevelsViewHelper.selectLevel(x, y, id);
@@ -847,14 +804,7 @@ public class MidiView extends SurfaceViewBase {
 
 	@Override
 	protected void handleActionMove(MotionEvent e) {
-		if (Math.abs(e.getX() - bean.getLastTapX()) < 25
-				&& yToNote(e.getY()) == yToNote(bean.getLastTapY())) {
-			if (System.currentTimeMillis() - bean.getLastDownTime() > GlobalVars.LONG_CLICK_TIME) {
-				startSelectRegion(e.getX(), e.getY());
-			}
-		} else {
-			bean.setLastDownTime(Long.MAX_VALUE);
-		}
+		super.handleActionMove(e);
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			LevelsViewHelper.handleActionMove(e);
 			return;
@@ -908,23 +858,12 @@ public class MidiView extends SurfaceViewBase {
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
+		super.handleActionUp(id, x, y);
 		ScrollBarHelper.handleActionUp();
 		for (int i = 0; i < 3; i++)
 			bean.setLoopPointerId(i, -1);
 		bean.setSelectRegion(false);
 		midiManager.mergeTempNotes();
-		long time = System.currentTimeMillis();
-		if (Math.abs(time - bean.getLastDownTime()) < GlobalVars.SINGLE_TAP_TIME) {
-			// if the second tap is not in the same location as the first tap,
-			// no double tap :(
-			if (time - bean.getLastTapTime() < GlobalVars.DOUBLE_TAP_TIME
-					&& Math.abs(x - bean.getLastTapX()) <= 25
-					&& yToNote(y) == yToNote(bean.getLastTapY())) {
-				doubleTap(touchedNotes.get(id));
-			} else {
-				singleTap(x, y, touchedNotes.get(id));
-			}
-		}
 		if (bean.isStateChanged())
 			midiManager.saveState();
 		bean.setStateChanged(false);
@@ -934,6 +873,50 @@ public class MidiView extends SurfaceViewBase {
 			startOnTicks.clear();
 			touchedNotes.clear();
 		}
-		bean.setLastDownTime(Long.MAX_VALUE);
+	}
+
+	@Override
+	protected void longPress(int id, float x, float y) {
+		startSelectRegion(x, y);
+	}
+	
+	@Override
+	protected void singleTap(int id, float x, float y) {
+		MidiNote touchedNote = touchedNotes.get(id);
+		if (bean.getViewState() == State.LEVELS_VIEW) {
+			LevelsViewHelper.selectLevelNote(x, y);
+		} else {
+			if (touchedNote != null) {
+				// single tapping a note always makes it the only selected note
+				if (touchedNote.isSelected())
+					midiManager.deselectAllNotes();
+				midiManager.selectNote(touchedNote);
+			} else {
+				int note = yToNote(y);
+				float tick = xToTick(x);
+				// if no note is touched, than this tap deselects all notes
+				if (midiManager.anyNoteSelected()) {
+					midiManager.deselectAllNotes();
+				} else { // add a note based on the current tick granularity
+					if (note >= 0) {
+						addMidiNote(tick, note);
+						bean.setStateChanged(true);
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	protected void doubleTap(int id, float x, float y) {
+		MidiNote touchedNote = touchedNotes.get(id);
+		if (bean.getViewState() == State.LEVELS_VIEW) {
+			LevelsViewHelper.doubleTap();
+			return;
+		}
+		if (touchedNote != null) {
+			midiManager.deleteNote(touchedNote);
+			bean.setStateChanged(true);
+		}
 	}
 }

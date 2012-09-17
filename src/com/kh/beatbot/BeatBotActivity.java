@@ -488,9 +488,8 @@ public class BeatBotActivity extends Activity {
 		GlobalVars.tracks.add(new Track(instrumentName, GlobalVars.instrumentIcons.get(instrumentName)));
 		GlobalVars.currentInstruments.add(instrumentName);
 		((ArrayAdapter<String>)sampleListView.getAdapter()).notifyDataSetChanged();
-		GlobalVars.midiView.updateViewport();
 		// launch sample edit activity for the newly added track
-		//launchSampleEditActivity(GlobalVars.tracks.size() - 1);
+		// launchSampleEditActivity(GlobalVars.tracks.size() - 1);
 	}
 	
 	public static native void addTrack(byte[] bytes);

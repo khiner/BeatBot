@@ -226,7 +226,6 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 			int height) {
 		this.width = width;
 		this.height = height;
-		updateViewport();
 	}
 
 	public void surfaceCreated(SurfaceHolder holder) {
@@ -241,13 +240,6 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		} catch (InterruptedException ex) {
 		}
 		t = null;
-	}
-	
-	public void updateViewport() {
-		if (gl != null) {
-			gl.glViewport(0, 0, width, height);
-			GLU.gluOrtho2D(gl, 0, width, height, 0);
-		}
 	}
 
 	public void run() {
@@ -273,7 +265,8 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 
 		gl = (GL10) context.getGL();
 		
-		updateViewport();
+		gl.glViewport(0, 0, width, height);
+		GLU.gluOrtho2D(gl, 0, width, height, 0);
 		
 		gl.glEnable(GL10.GL_BLEND);
 		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
