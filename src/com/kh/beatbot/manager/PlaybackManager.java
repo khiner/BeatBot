@@ -41,7 +41,7 @@ public class PlaybackManager {
 	}
 		
 	public void stopAllTracks() {
-		for (int sampleNum = 0; sampleNum < GlobalVars.numTracks; sampleNum++) {
+		for (int sampleNum = 0; sampleNum < GlobalVars.tracks.size(); sampleNum++) {
 			stopTrack(sampleNum);
 		}
 	}

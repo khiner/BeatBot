@@ -83,8 +83,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 										lastClickedId, lastClickedPos);
 							} else {
 								labelList.setLabelText(lastClickedId, "");
-								Effect effect = GlobalVars.findEffectById(
-										lastClickedId, trackNum);
+								Effect effect = GlobalVars.tracks.get(trackNum)
+										.findEffectById(lastClickedId);
 								if (effect != null) {
 									effect.removeEffect();
 								}
@@ -97,7 +97,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		private Stack<Integer> getUniqueIds() {
 			Stack<Integer> uniqueIds = new Stack<Integer>();
 			for (int id = 0; id < 4; id++) {
-				if (GlobalVars.findEffectById(id, trackNum) == null)
+				if (GlobalVars.tracks.get(trackNum).findEffectById(id) == null)
 					uniqueIds.add(id);
 			}
 			return uniqueIds;
@@ -109,8 +109,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			Stack<Integer> uniqueIds = getUniqueIds();
 			if (labelList.noLabels()) {
 				for (int i = 0; i < 4; i++) {
-					Effect effect = GlobalVars
-							.findEffectByPosition(i, trackNum);
+					Effect effect = GlobalVars.tracks.get(trackNum)
+							.findEffectByPosition(i);
 					if (effect != null) {
 						this.labelList.addLabel(effect.name, effect.getId(),
 								effect.on);
@@ -120,8 +120,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 				}
 			} else {
 				for (int i = 0; i < 4; i++) {
-					Effect effect = GlobalVars
-							.findEffectByPosition(i, trackNum);
+					Effect effect = GlobalVars.tracks.get(trackNum)
+							.findEffectByPosition(i);
 					if (effect != null)
 						this.labelList.setLabelOn(effect.getId(), effect.on);
 				}
@@ -130,10 +130,10 @@ public class SampleEditActivity extends Activity implements LevelListener {
 
 		@Override
 		public void labelMoved(int id, int oldPosition, int newPosition) {
-			Effect effect = GlobalVars.findEffectById(id, trackNum);
+			Effect effect = GlobalVars.tracks.get(trackNum).findEffectById(id);
 			if (effect != null) {
 				effect.setPosition(newPosition);
-				for (Effect other : GlobalVars.effects[trackNum]) {
+				for (Effect other : GlobalVars.tracks.get(trackNum).effects) {
 					if (other.equals(effect))
 						continue;
 					if (other.getPosition() >= newPosition
@@ -141,7 +141,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 						other.incPosition();
 					}
 				}
-				Collections.sort(GlobalVars.effects[trackNum]);
+				Collections.sort(GlobalVars.tracks.get(trackNum).effects);
 			}
 		}
 
@@ -197,10 +197,10 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		initSelectSampleAlert();
 		// set the instrument icon
 		((ImageButton) findViewById(R.id.instrumentButton))
-				.setBackgroundResource(GlobalVars.instrumentIcons[currInstrumentNum]);
+				.setBackgroundResource(GlobalVars.tracks.get(currInstrumentNum).instrumentIcon);
 		// set the instrument text
-		((Button) findViewById(R.id.sampleSelect))
-				.setText(GlobalVars.sampleNames[currInstrumentNum][0]);
+		((Button) findViewById(R.id.sampleSelect)).setText(GlobalVars.tracks
+				.get(currInstrumentNum).sampleNames[0]);
 		initLevels();
 		initSampleLabelList();
 		initEffectLabelList();
@@ -212,24 +212,25 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	private void setSample(int instrumentNum, int sampleNum) {
-		setSampleBytes(trackNum,
-				GlobalVars.getSampleBytes(instrumentNum, sampleNum));
-		((Button) findViewById(R.id.sampleSelect))
-				.setText(GlobalVars.sampleNames[instrumentNum][sampleNum]);
+		setSampleBytes(trackNum, GlobalVars.tracks.get(instrumentNum)
+				.getSampleBytes(sampleNum));
+		((Button) findViewById(R.id.sampleSelect)).setText(GlobalVars.tracks
+				.get(instrumentNum).sampleNames[sampleNum]);
 		sampleWaveformView.setSamples(getSamples(trackNum));
 	}
 
 	private void initSelectInstrumentAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose Instrument");
-		builder.setItems(GlobalVars.instrumentNames,
+		builder.setItems(GlobalVars.currentInstruments.toArray(new String[GlobalVars.currentInstruments.size()]),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
 						setSample(item, 0);
 						currInstrumentNum = item;
 						// update instrument icon to reflect the change
 						((ImageButton) findViewById(R.id.instrumentButton))
-								.setBackgroundResource(GlobalVars.instrumentIcons[currInstrumentNum]);
+								.setBackgroundResource(GlobalVars.tracks
+										.get(currInstrumentNum).instrumentIcon);
 						// update the sample select alert names with the new
 						// instrument samples
 						initSelectSampleAlert();
@@ -241,7 +242,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	private void initSelectSampleAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose Sample");
-		builder.setItems(GlobalVars.sampleNames[currInstrumentNum],
+		builder.setItems(GlobalVars.tracks.get(currInstrumentNum).sampleNames,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
 						setSample(currInstrumentNum, item);
@@ -269,8 +270,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	public static void quantizeEffectParams() {
-		for (int trackNum = 0; trackNum < GlobalVars.numTracks; trackNum++) {
-			for (Effect effect : GlobalVars.effects[trackNum]) {
+		for (int trackNum = 0; trackNum < GlobalVars.tracks.size(); trackNum++) {
+			for (Effect effect : GlobalVars.tracks.get(trackNum).effects) {
 				for (int paramNum = 0; paramNum < effect.getNumParams(); paramNum++) {
 					EffectParam param = effect.getParam(paramNum);
 					if (param.beatSync) {
@@ -310,7 +311,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	private Effect getEffect(String effectName, int id, int position) {
-		Effect effect = GlobalVars.findEffectById(id, trackNum);
+		Effect effect = GlobalVars.tracks.get(trackNum).findEffectById(id);
 		if (effect != null)
 			return effect;
 		if (effectName.equals(getString(R.string.decimate)))
@@ -327,7 +328,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			effect = new Reverb(id, effectName, trackNum, position);
 		else if (effectName.equals(getString(R.string.tremelo)))
 			effect = new Tremelo(id, effectName, trackNum, position);
-		GlobalVars.effects[trackNum].add(effect);
+		GlobalVars.tracks.get(trackNum).effects.add(effect);
 		return effect;
 	}
 
@@ -369,13 +370,13 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public void setLevel(LevelListenable levelBar, float level) {
 		if (levelBar.equals(volumeLevel)) {
 			setPrimaryVolume(trackNum, level);
-			GlobalVars.trackVolume[trackNum] = level;
+			GlobalVars.tracks.get(trackNum).volume = level;
 		} else if (levelBar.equals(panLevel)) {
 			setPrimaryPan(trackNum, level);
-			GlobalVars.trackPan[trackNum] = level;
+			GlobalVars.tracks.get(trackNum).pan = level;
 		} else if (levelBar.equals(pitchLevel)) {
 			setPrimaryPitch(trackNum, level);
-			GlobalVars.trackPitch[trackNum] = level;
+			GlobalVars.tracks.get(trackNum).pitch = level;
 		}
 	}
 
@@ -383,13 +384,13 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public void notifyInit(LevelListenable levelBar) {
 		if (levelBar.equals(volumeLevel)) {
 			volumeLevel.setLevelColor(MidiViewBean.VOLUME_COLOR);
-			volumeLevel.setLevel(GlobalVars.trackVolume[trackNum]);
+			volumeLevel.setLevel(GlobalVars.tracks.get(trackNum).volume);
 		} else if (levelBar.equals(panLevel)) {
 			panLevel.setLevelColor(MidiViewBean.PAN_COLOR);
-			panLevel.setLevel(GlobalVars.trackPan[trackNum]);
+			panLevel.setLevel(GlobalVars.tracks.get(trackNum).pan);
 		} else if (levelBar.equals(pitchLevel)) {
 			pitchLevel.setLevelColor(MidiViewBean.PITCH_COLOR);
-			pitchLevel.setLevel(GlobalVars.trackPitch[trackNum]);
+			pitchLevel.setLevel(GlobalVars.tracks.get(trackNum).pitch);
 		}
 	}
 
@@ -411,14 +412,21 @@ public class SampleEditActivity extends Activity implements LevelListener {
 
 	// get the audio data in floats
 	public static native float[] getSamples(int trackNum);
+
 	// set play mode to reverse
 	public static native void setReverse(int trackNum, boolean reverse);
+
 	// scale all samples so that the sample with the highest amplitude is at 1
 	public static native float[] normalize(int trackNum);
+
 	public static native void setPrimaryVolume(int trackNum, float volume);
+
 	public static native void setPrimaryPan(int trackNum, float pan);
+
 	public static native void setPrimaryPitch(int trackNum, float pitch);
+
 	public static native void setAdsrOn(int trackNum, boolean on);
+
 	public static native void setSampleBytes(int trackNum, byte[] bytes);
 
 	@Override

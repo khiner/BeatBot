@@ -119,7 +119,7 @@ public class EffectActivity extends Activity implements LevelListener,
 		requestWindowFeature(Window.FEATURE_NO_TITLE); // remove title bar
 		int effectId = getIntent().getExtras().getInt("effectId");
 		int trackNum = getIntent().getExtras().getInt("trackNum");
-		effect = GlobalVars.findEffectById(effectId, trackNum);
+		effect = GlobalVars.tracks.get(trackNum).findEffectById(effectId);
 		setContentView(R.layout.effect_layout);
 		ViewGroup parent = (ViewGroup) findViewById(R.id.effect_layout);
 		View paramWrapperLayout = initEffectLayout(parent);

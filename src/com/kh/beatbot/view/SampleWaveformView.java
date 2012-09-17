@@ -19,15 +19,16 @@ import com.kh.beatbot.view.helper.WaveformHelper;
 public class SampleWaveformView extends SurfaceViewBase {
 
 	private static final float[] ADSR_COLOR = MidiViewBean.PITCH_COLOR.clone();
-	private static final float[] ADSR_SELECTED_COLOR = {ADSR_COLOR[0], ADSR_COLOR[1], ADSR_COLOR[2], .6f};
+	private static final float[] ADSR_SELECTED_COLOR = { ADSR_COLOR[0],
+			ADSR_COLOR[1], ADSR_COLOR[2], .6f };
 	private static final float[] LOOP_HIGHLIGHT_COLOR = { 1, .64706f, 0, .4f };
 	private static final float[] LOOP_SELECTION_LINE_COLOR = { 1, 1, 1, 1 };
 	private static final float[] LOOP_SELECTION_RECT_COLOR = { .9f, .9f, 1, .5f };
-	private static final float[] LOOP_SELECTION_RECT_SELECT_COLOR = { MidiViewBean.VOLUME_COLOR[0],
-																	  MidiViewBean.VOLUME_COLOR[1], 
-																	  MidiViewBean.VOLUME_COLOR[2], .6f };
-	private static final float[] BG_COLOR = {LOOP_HIGHLIGHT_COLOR[0] * .5f, LOOP_HIGHLIGHT_COLOR[1] * .5f,
-			LOOP_HIGHLIGHT_COLOR[2] * .5f, 1};
+	private static final float[] LOOP_SELECTION_RECT_SELECT_COLOR = {
+			MidiViewBean.VOLUME_COLOR[0], MidiViewBean.VOLUME_COLOR[1],
+			MidiViewBean.VOLUME_COLOR[2], .6f };
+	private static final float[] BG_COLOR = { LOOP_HIGHLIGHT_COLOR[0] * .5f,
+			LOOP_HIGHLIGHT_COLOR[1] * .5f, LOOP_HIGHLIGHT_COLOR[2] * .5f, 1 };
 
 	private static final float ADSR_POINT_RADIUS = 5;
 	// min distance for pointer to select loop markers
@@ -52,7 +53,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private float previewButtonWidth, waveformWidth;
 
 	private int currentPreviewTextureId = 0;
-	
+
 	private int trackNum;
 
 	private int numSamples = 0;
@@ -87,7 +88,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	public void setSamples(float[] samples) {
 		this.samples = samples;
 		numSamples = samples.length;
-		GlobalVars.sampleLoopEnd[trackNum] = numSamples;
+		GlobalVars.tracks.get(trackNum).sampleLoopEnd = numSamples;
 		sampleWidth = numSamples;
 		if (height != 0) {
 			waveformVb = WaveformHelper.floatsToFloatBuffer(samples, height, 0);
@@ -103,8 +104,9 @@ public class SampleWaveformView extends SurfaceViewBase {
 		float[] pointVertices = new float[10];
 		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 2; j++) {
-				pointVertices[i * 2 + j] = j == 1 ? adsrToY(GlobalVars.adsrPoints[trackNum][i][j]) :
-					adsrToX(GlobalVars.adsrPoints[trackNum][i][j]);
+				pointVertices[i * 2 + j] = j == 1 ? adsrToY(GlobalVars.tracks
+						.get(trackNum).adsrPoints[i][j])
+						: adsrToX(GlobalVars.tracks.get(trackNum).adsrPoints[i][j]);
 			}
 		}
 		adsrPointVb = makeFloatBuffer(pointVertices);
@@ -124,17 +126,18 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	private void initBackgroundOutlineVb() {
-		backgroundOutlineVb = makeRectOutlineFloatBuffer(previewButtonWidth, 0, width - 2, height);
+		backgroundOutlineVb = makeRectOutlineFloatBuffer(previewButtonWidth, 0,
+				width - 2, height);
 	}
 
 	private void initPreviewButtonSquareVb() {
 		previewButtonSquareVb = makeRectFloatBuffer(0, 0, previewButtonWidth,
 				previewButtonWidth);
 	}
-	
+
 	private void initLoopMarkerVb() {
-		float xLoopBegin = sampleToX(GlobalVars.sampleLoopBegin[trackNum]);
-		float xLoopEnd = sampleToX(GlobalVars.sampleLoopEnd[trackNum]);
+		float xLoopBegin = sampleToX(GlobalVars.tracks.get(trackNum).sampleLoopBegin);
+		float xLoopEnd = sampleToX(GlobalVars.tracks.get(trackNum).sampleLoopEnd);
 		float[] loopSelectionVertices = { xLoopBegin, 0, xLoopBegin, height,
 				xLoopEnd, height, xLoopEnd, 0 };
 
@@ -165,8 +168,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private void drawWaveform() {
 		if (waveformVb == null)
 			return;
-		float scale = (waveformWidth)
-				/ ((float) sampleWidth);
+		float scale = (waveformWidth) / ((float) sampleWidth);
 		float translate = -sampleOffset;
 		float[] color = MidiViewBean.VOLUME_COLOR;
 		gl.glLineWidth(10);
@@ -190,8 +192,12 @@ public class SampleWaveformView extends SurfaceViewBase {
 		drawLines(loopSelectionLineVb, LOOP_SELECTION_LINE_COLOR, 2,
 				GL10.GL_LINES);
 		drawTriangleFan(loopSelectionLineVb, LOOP_HIGHLIGHT_COLOR);
-		drawTriangleStrip(loopSelectionRectVbs[0], beginLoopMarkerTouched == -1 ? LOOP_SELECTION_RECT_COLOR : LOOP_SELECTION_RECT_SELECT_COLOR);
-		drawTriangleStrip(loopSelectionRectVbs[1], endLoopMarkerTouched == -1 ? LOOP_SELECTION_RECT_COLOR : LOOP_SELECTION_RECT_SELECT_COLOR);
+		drawTriangleStrip(loopSelectionRectVbs[0],
+				beginLoopMarkerTouched == -1 ? LOOP_SELECTION_RECT_COLOR
+						: LOOP_SELECTION_RECT_SELECT_COLOR);
+		drawTriangleStrip(loopSelectionRectVbs[1],
+				endLoopMarkerTouched == -1 ? LOOP_SELECTION_RECT_COLOR
+						: LOOP_SELECTION_RECT_SELECT_COLOR);
 	}
 
 	private void drawAdsr() {
@@ -242,17 +248,20 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	private float adsrToX(float adsr) {
-		return sampleToX(GlobalVars.sampleLoopBegin[trackNum]) * (1 - adsr) + adsr
-				* sampleToX(GlobalVars.sampleLoopEnd[trackNum]);
+		return sampleToX(GlobalVars.tracks.get(trackNum).sampleLoopBegin)
+				* (1 - adsr) + adsr
+				* sampleToX(GlobalVars.tracks.get(trackNum).sampleLoopEnd);
 	}
 
 	private float adsrToY(float adsr) {
-		return -(adsr - 1)*(height - 2 * ADSR_POINT_RADIUS) + ADSR_POINT_RADIUS;
+		return -(adsr - 1) * (height - 2 * ADSR_POINT_RADIUS)
+				+ ADSR_POINT_RADIUS;
 	}
-	
+
 	private float xToAdsr(float x) {
-		return (x - sampleToX(GlobalVars.sampleLoopBegin[trackNum]))
-				/ (sampleToX(GlobalVars.sampleLoopEnd[trackNum]) - sampleToX(GlobalVars.sampleLoopBegin[trackNum]));
+		return (x - sampleToX(GlobalVars.tracks.get(trackNum).sampleLoopBegin))
+				/ (sampleToX(GlobalVars.tracks.get(trackNum).sampleLoopEnd) - sampleToX(GlobalVars.tracks
+						.get(trackNum).sampleLoopBegin));
 	}
 
 	private float yToAdsr(float y) {
@@ -301,20 +310,25 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	private void updateLoopMarkers() {
 		float diff = 0;
-		if (GlobalVars.sampleLoopBegin[trackNum] < sampleOffset
-				&& GlobalVars.sampleLoopEnd[trackNum] > sampleOffset + sampleWidth) {
+		if (GlobalVars.tracks.get(trackNum).sampleLoopBegin < sampleOffset
+				&& GlobalVars.tracks.get(trackNum).sampleLoopEnd > sampleOffset
+						+ sampleWidth) {
 			clipLoopToWindow();
-		} else if (GlobalVars.sampleLoopBegin[trackNum] < sampleOffset)
-			diff = sampleOffset - GlobalVars.sampleLoopBegin[trackNum];
-		else if (GlobalVars.sampleLoopEnd[trackNum] >= sampleOffset + sampleWidth)
-			diff = sampleOffset + sampleWidth - GlobalVars.sampleLoopEnd[trackNum];
+		} else if (GlobalVars.tracks.get(trackNum).sampleLoopBegin < sampleOffset)
+			diff = sampleOffset
+					- GlobalVars.tracks.get(trackNum).sampleLoopBegin;
+		else if (GlobalVars.tracks.get(trackNum).sampleLoopEnd >= sampleOffset
+				+ sampleWidth)
+			diff = sampleOffset + sampleWidth
+					- GlobalVars.tracks.get(trackNum).sampleLoopEnd;
 		if (diff != 0) {
-			GlobalVars.sampleLoopBegin[trackNum] += diff;
-			GlobalVars.sampleLoopEnd[trackNum] += diff;
+			GlobalVars.tracks.get(trackNum).sampleLoopBegin += diff;
+			GlobalVars.tracks.get(trackNum).sampleLoopEnd += diff;
 			clipLoopToWindow();
 		}
-		Managers.playbackManager.setLoopWindow(trackNum, (int) GlobalVars.sampleLoopBegin[trackNum],
-				(int) GlobalVars.sampleLoopEnd[trackNum]);
+		Managers.playbackManager.setLoopWindow(trackNum,
+				(int) GlobalVars.tracks.get(trackNum).sampleLoopBegin,
+				(int) GlobalVars.tracks.get(trackNum).sampleLoopEnd);
 		// update the display location of the loop markers
 		initLoopMarkerVb();
 		initAdsrVb();
@@ -335,21 +349,25 @@ public class SampleWaveformView extends SurfaceViewBase {
 		if (!showAdsr)
 			return false;
 		for (int i = 0; i < 5; i++) {
-			if (GeneralUtils.distanceFromPointSquared(adsrToX(GlobalVars.adsrPoints[trackNum][i][0]),
-					adsrToY(GlobalVars.adsrPoints[trackNum][i][1]), x, y) < SNAP_DIST_SQUARED) {
+			if (GeneralUtils.distanceFromPointSquared(
+					adsrToX(GlobalVars.tracks.get(trackNum).adsrPoints[i][0]),
+					adsrToY(GlobalVars.tracks.get(trackNum).adsrPoints[i][1]),
+					x, y) < SNAP_DIST_SQUARED) {
 				adsrSelected[i] = id;
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	private boolean selectLoopMarker(int id, float x) {
-		if (Math.abs(x - sampleToX(GlobalVars.sampleLoopBegin[trackNum])) < SNAP_DIST) {
+		if (Math.abs(x
+				- sampleToX(GlobalVars.tracks.get(trackNum).sampleLoopBegin)) < SNAP_DIST) {
 			// begin loop marker touched
 			beginLoopMarkerTouched = id;
 			return true;
-		} else if (Math.abs(x - sampleToX(GlobalVars.sampleLoopEnd[trackNum])) < SNAP_DIST) {
+		} else if (Math.abs(x
+				- sampleToX(GlobalVars.tracks.get(trackNum).sampleLoopEnd)) < SNAP_DIST) {
 			// end loop marker touched
 			endLoopMarkerTouched = id;
 			return true;
@@ -383,25 +401,32 @@ public class SampleWaveformView extends SurfaceViewBase {
 			if (adsrSelected[i] == id) {
 				float adsrX = xToAdsr(x);
 				float adsrY = yToAdsr(y);
-				float prevX = i >= 2 ? GlobalVars.adsrPoints[trackNum][i - 1][0] : 0;
-				float nextX = i <= 3 ? GlobalVars.adsrPoints[trackNum][i + 1][0] : 1;
+				float prevX = i >= 2 ? GlobalVars.tracks.get(trackNum).adsrPoints[i - 1][0]
+						: 0;
+				float nextX = i <= 3 ? GlobalVars.tracks.get(trackNum).adsrPoints[i + 1][0]
+						: 1;
 				if (i == 0)
 					adsrX = 0;
 				// ADSR samples cannot go past the next ADSR sample or before
 				// the previous sample
-				GlobalVars.adsrPoints[trackNum][i][0] = adsrX > prevX ? (adsrX < nextX ? adsrX
-						: nextX) : prevX;
+				GlobalVars.tracks.get(trackNum).adsrPoints[i][0] = adsrX > prevX ? (adsrX < nextX ? adsrX
+						: nextX)
+						: prevX;
 				if (i != 3) // can only change the x coord of the cutoff point
-					GlobalVars.adsrPoints[trackNum][i][1] = adsrY > 0 ? (adsrY < 1 ? adsrY : 1) : 0;
+					GlobalVars.tracks.get(trackNum).adsrPoints[i][1] = adsrY > 0 ? (adsrY < 1 ? adsrY
+							: 1)
+							: 0;
 				// points 2 and 3 must have the same y value, since these are
 				// the two ends
 				// of the sustain level, which must be linear.
 				// ie. adjusting either 2 or 3 will adjust both points' y values
 				if (i == 2)
-					GlobalVars.adsrPoints[trackNum][3][1] = GlobalVars.adsrPoints[trackNum][2][1];
+					GlobalVars.tracks.get(trackNum).adsrPoints[3][1] = GlobalVars.tracks
+							.get(trackNum).adsrPoints[2][1];
 				initAdsrVb();
-				setAdsrPoint(trackNum, i, GlobalVars.adsrPoints[trackNum][i][0],
-						GlobalVars.adsrPoints[trackNum][i][1]);
+				setAdsrPoint(trackNum, i,
+						GlobalVars.tracks.get(trackNum).adsrPoints[i][0],
+						GlobalVars.tracks.get(trackNum).adsrPoints[i][1]);
 				return true;
 			}
 		}
@@ -411,25 +436,31 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private boolean moveLoopMarker(int id, float x) {
 		if (beginLoopMarkerTouched == id) {
 			float newLoopBegin = xToSample(x);
-			GlobalVars.sampleLoopBegin[trackNum] = newLoopBegin < 0 ? 0
-					: (newLoopBegin >= GlobalVars.sampleLoopEnd[trackNum] - MIN_LOOP_WINDOW ? GlobalVars.sampleLoopEnd[trackNum]
+			GlobalVars.tracks.get(trackNum).sampleLoopBegin = newLoopBegin < 0 ? 0
+					: (newLoopBegin >= GlobalVars.tracks.get(trackNum).sampleLoopEnd
+							- MIN_LOOP_WINDOW ? GlobalVars.tracks.get(trackNum).sampleLoopEnd
 							- MIN_LOOP_WINDOW
 							: newLoopBegin);
 		} else if (endLoopMarkerTouched == id) {
 			float newLoopEnd = xToSample(x);
-			GlobalVars.sampleLoopEnd[trackNum] = newLoopEnd >= numSamples ? numSamples - 1
-					: (newLoopEnd <= GlobalVars.sampleLoopBegin[trackNum] + MIN_LOOP_WINDOW ? GlobalVars.sampleLoopBegin[trackNum]
+			GlobalVars.tracks.get(trackNum).sampleLoopEnd = newLoopEnd >= numSamples ? numSamples - 1
+					: (newLoopEnd <= GlobalVars.tracks.get(trackNum).sampleLoopBegin
+							+ MIN_LOOP_WINDOW ? GlobalVars.tracks.get(trackNum).sampleLoopBegin
 							+ MIN_LOOP_WINDOW
 							: newLoopEnd);
 		} else {
 			return false;
 		}
-		if (GlobalVars.sampleLoopBegin[trackNum] < sampleOffset) {
-			sampleOffset = GlobalVars.sampleLoopBegin[trackNum];
-			if (GlobalVars.sampleLoopEnd[trackNum] > sampleOffset + sampleWidth)
-				sampleWidth = GlobalVars.sampleLoopEnd[trackNum] - GlobalVars.sampleLoopBegin[trackNum];
-		} else if (GlobalVars.sampleLoopEnd[trackNum] > sampleOffset + sampleWidth) {
-			sampleWidth = GlobalVars.sampleLoopEnd[trackNum] - sampleOffset;
+		if (GlobalVars.tracks.get(trackNum).sampleLoopBegin < sampleOffset) {
+			sampleOffset = GlobalVars.tracks.get(trackNum).sampleLoopBegin;
+			if (GlobalVars.tracks.get(trackNum).sampleLoopEnd > sampleOffset
+					+ sampleWidth)
+				sampleWidth = GlobalVars.tracks.get(trackNum).sampleLoopEnd
+						- GlobalVars.tracks.get(trackNum).sampleLoopBegin;
+		} else if (GlobalVars.tracks.get(trackNum).sampleLoopEnd > sampleOffset
+				+ sampleWidth) {
+			sampleWidth = GlobalVars.tracks.get(trackNum).sampleLoopEnd
+					- sampleOffset;
 			if (sampleWidth + sampleOffset > numSamples)
 				sampleWidth = numSamples - sampleOffset;
 		}
@@ -437,8 +468,9 @@ public class SampleWaveformView extends SurfaceViewBase {
 		initLoopMarkerVb();
 		initAdsrVb();
 		// update sample playback.
-		Managers.playbackManager.setLoopWindow(trackNum, (int) GlobalVars.sampleLoopBegin[trackNum],
-				(int) GlobalVars.sampleLoopEnd[trackNum]);
+		Managers.playbackManager.setLoopWindow(trackNum,
+				(int) GlobalVars.tracks.get(trackNum).sampleLoopBegin,
+				(int) GlobalVars.tracks.get(trackNum).sampleLoopEnd);
 		return true;
 	}
 
@@ -474,10 +506,12 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	private void clipLoopToWindow() {
-		if (GlobalVars.sampleLoopBegin[trackNum] < sampleOffset)
-			GlobalVars.sampleLoopBegin[trackNum] = sampleOffset;
-		if (GlobalVars.sampleLoopEnd[trackNum] > sampleOffset + sampleWidth)
-			GlobalVars.sampleLoopEnd[trackNum] = sampleOffset + sampleWidth;
+		if (GlobalVars.tracks.get(trackNum).sampleLoopBegin < sampleOffset)
+			GlobalVars.tracks.get(trackNum).sampleLoopBegin = sampleOffset;
+		if (GlobalVars.tracks.get(trackNum).sampleLoopEnd > sampleOffset
+				+ sampleWidth)
+			GlobalVars.tracks.get(trackNum).sampleLoopEnd = sampleOffset
+					+ sampleWidth;
 	}
 
 	private void handleWaveActionDown(int id, float x, float y) {

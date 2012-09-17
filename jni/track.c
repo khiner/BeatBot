@@ -159,7 +159,6 @@ Track *initTrack() {
 }
 
 void initSampleBytes(Track *track, char *bytes, int length) {
-	__android_log_print(ANDROID_LOG_ERROR, "init sample bytes", "trackNum = %d", track->num);
 	track->generator = malloc(sizeof(Generator));
 	initGenerator(track->generator, wavfile_create(bytes, length),
 			wavfile_reset, wavfile_generate, wavfile_destroy);
@@ -170,7 +169,6 @@ void initSampleBytes(Track *track, char *bytes, int length) {
 }
 
 void setSampleBytes(Track *track, char *bytes, int length) {
-	__android_log_print(ANDROID_LOG_ERROR, "set sample bytes 2", "trackNum = %d", track->num);
 	WavFile *wavConfig = (WavFile *) track->generator->config;
 	freeBuffers(wavConfig);
 	wavfile_setBytes(wavConfig, bytes, length);
@@ -180,13 +178,10 @@ void setSampleBytes(Track *track, char *bytes, int length) {
 
 void Java_com_kh_beatbot_SampleEditActivity_setSampleBytes(JNIEnv *env,
 		jclass clazz, jint trackNum, jbyteArray bytes) {
-	__android_log_print(ANDROID_LOG_ERROR, "set sample bytes", "trackNum = %d", trackNum);
 	Track *track = getTrack(env, clazz, trackNum);
-	__android_log_print(ANDROID_LOG_ERROR, "set sample bytes", "after getTrack");
 	int length = (*env)->GetArrayLength(env, bytes);
 	char *data = (char *) (*env)->GetByteArrayElements(env, bytes, 0);
 	(*env)->ReleaseByteArrayElements(env, bytes, data, JNI_ABORT);
-	__android_log_print(ANDROID_LOG_ERROR, "set sample bytes", "before check");
 	if (track->generator == NULL) {
 		initSampleBytes(track, data, length);
 	} else {
