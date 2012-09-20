@@ -26,7 +26,8 @@ void updateNextNoteSamples() {
 }
 
 // create the engine and output mix objects
-void Java_com_kh_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env, jclass clazz) {
+void Java_com_kh_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env,
+		jclass clazz) {
 	SLresult result;
 	(void *) clazz; // avoid warnings about unused paramaters
 	initTicker();
@@ -74,8 +75,8 @@ static inline void interleaveFloatsToShorts(float left[], float right[],
 }
 
 static inline void processEffects(Track *track) {
-	track->volPan->process(track->volPan->config,
-						track->currBufferFloat, BUFF_SIZE);
+	track->volPan->process(track->volPan->config, track->currBufferFloat,
+			BUFF_SIZE);
 	pthread_mutex_lock(&track->effectMutex);
 	EffectNode *effectNode = track->effectHead;
 	while (effectNode != NULL) {
@@ -86,8 +87,8 @@ static inline void processEffects(Track *track) {
 		effectNode = effectNode->next;
 	}
 	if (track->adsr->on) {
-		track->adsr->process(track->adsr->config,
-				track->currBufferFloat, BUFF_SIZE);
+		track->adsr->process(track->adsr->config, track->currBufferFloat,
+				BUFF_SIZE);
 	}
 	pthread_mutex_unlock(&track->effectMutex);
 }
@@ -325,8 +326,8 @@ void printLinkedList(MidiEventNode *head) {
 	}
 }
 
-jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(JNIEnv *env,
-		jclass clazz) {
+jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
+		JNIEnv *env, jclass clazz) {
 	openSlOut = malloc(sizeof(OpenSlOut));
 	openSlOut->currBufferFloat = (float **) malloc(2 * sizeof(float *));
 	openSlOut->currBufferFloat[0] = (float *) calloc(BUFF_SIZE, sizeof(float));
@@ -390,7 +391,8 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(JNIEnv *
 }
 
 // shut down the native audio system
-void Java_com_kh_beatbot_activity_BeatBotActivity_shutdown(JNIEnv *env, jclass clazz) {
+void Java_com_kh_beatbot_activity_BeatBotActivity_shutdown(JNIEnv *env,
+		jclass clazz) {
 	freeTracks();
 	// destroy output mix object, and invalidate all associated interfaces
 	if (outputMixObject != NULL) {
@@ -473,48 +475,42 @@ int getSoloingTrackNum() {
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_muteTrack(JNIEnv *env,
-		jclass clazz, jint trackNum) {
+		jclass clazz, jint trackNum, jboolean mute) {
 	Track *track = getTrack(env, clazz, trackNum);
-	track->shouldSound = false;
-	track->mute = true;
-}
-
-void Java_com_kh_beatbot_manager_PlaybackManager_unmuteTrack(JNIEnv *env,
-		jclass clazz, jint trackNum) {
-	Track *track = getTrack(env, clazz, trackNum);
-	int soloingTrackNum = getSoloingTrackNum();
-	if (soloingTrackNum == -1 || soloingTrackNum == trackNum)
-		track->shouldSound = true;
-	track->mute = false;
+	if (mute) {
+		track->shouldSound = false;
+	} else {
+		int soloingTrackNum = getSoloingTrackNum();
+		if (soloingTrackNum == -1 || soloingTrackNum == trackNum)
+			track->shouldSound = true;
+	}
+	track->mute = mute;
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_soloTrack(JNIEnv *env,
-		jclass clazz, jint trackNum) {
+		jclass clazz, jint trackNum, jboolean solo) {
 	Track *track = getTrack(env, clazz, trackNum);
-	track->solo = true;
-	if (!track->mute) {
-		track->shouldSound = true;
-	}
-	TrackNode *cur_ptr = trackHead;
-	while (cur_ptr != NULL) {
-		if (cur_ptr->track->num != trackNum) {
-			cur_ptr->track->shouldSound = false;
-			cur_ptr->track->solo = false;
+	track->solo = solo;
+	if (solo) {
+		if (!track->mute) {
+			track->shouldSound = true;
 		}
-		cur_ptr = cur_ptr->next;
-	}
-}
-
-void Java_com_kh_beatbot_manager_PlaybackManager_unsoloTrack(JNIEnv *env,
-		jclass clazz, jint trackNum) {
-	Track *track = getTrack(env, clazz, trackNum);
-	track->solo = false;
-	TrackNode *cur_ptr = trackHead;
-	while (cur_ptr != NULL) {
-		if (!cur_ptr->track->mute) {
-			cur_ptr->track->shouldSound = true;
+		TrackNode *cur_ptr = trackHead;
+		while (cur_ptr != NULL) {
+			if (cur_ptr->track->num != trackNum) {
+				cur_ptr->track->shouldSound = false;
+				cur_ptr->track->solo = false;
+			}
+			cur_ptr = cur_ptr->next;
 		}
-		cur_ptr = cur_ptr->next;
+	} else {
+		TrackNode *cur_ptr = trackHead;
+		while (cur_ptr != NULL) {
+			if (!cur_ptr->track->mute) {
+				cur_ptr->track->shouldSound = true;
+			}
+			cur_ptr = cur_ptr->next;
+		}
 	}
 }
 
@@ -625,8 +621,8 @@ void Java_com_kh_beatbot_midi_MidiNote_setPitch(JNIEnv *env, jclass clazz,
  Java SampleEditActivity JNI methods
  ****************************************************************************************/
 
-void Java_com_kh_beatbot_activity_SampleEditActivity_setPrimaryVolume(JNIEnv *env,
-		jclass clazz, jint trackNum, jfloat volume) {
+void Java_com_kh_beatbot_activity_SampleEditActivity_setPrimaryVolume(
+		JNIEnv *env, jclass clazz, jint trackNum, jfloat volume) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryVolume = volume;
 	track->volPan->set(track->volPan->config,
@@ -643,8 +639,8 @@ void Java_com_kh_beatbot_activity_SampleEditActivity_setPrimaryPan(JNIEnv *env,
 			track->primaryPan * track->notePan);
 }
 
-void Java_com_kh_beatbot_activity_SampleEditActivity_setPrimaryPitch(JNIEnv *env,
-		jclass clazz, jint trackNum, jfloat pitch) {
+void Java_com_kh_beatbot_activity_SampleEditActivity_setPrimaryPitch(
+		JNIEnv *env, jclass clazz, jint trackNum, jfloat pitch) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryPitch = pitch;
 	//if (track->outputPlayerPitch != NULL) {

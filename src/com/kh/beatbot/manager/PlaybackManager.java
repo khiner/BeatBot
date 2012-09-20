@@ -52,10 +52,8 @@ public class PlaybackManager {
 	public native void disarmTrack(int trackNum);
 	public native void playTrack(int trackNum);
 	public native void stopTrack(int trackNum);
-	public native void muteTrack(int trackNum);
-	public native void unmuteTrack(int trackNum);
-	public native void soloTrack(int trackNum);
-	public native void unsoloTrack(int trackNum);
+	public native void muteTrack(int trackNum, boolean mute);
+	public native void soloTrack(int trackNum, boolean solo);
 	public native void toggleLooping(int trackNum);
 	public native boolean isLooping(int trackNum); 
 	public native void setLoopWindow(int sampleNum, int loopBegin, int loopEnd);

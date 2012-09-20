@@ -909,7 +909,7 @@ public class MidiView extends ClickableSurfaceView {
 	@Override
 	protected void singleTap(int id, float x, float y) {
 		if (x < MidiTrackControlHelper.width) {
-			MidiTrackControlHelper.handleClick(x, yToNote(y));
+			//MidiTrackControlHelper.handleClick(x, yToNote(y));
 			return;
 		}
 		MidiNote touchedNote = touchedNotes.get(id);

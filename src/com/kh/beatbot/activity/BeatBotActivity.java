@@ -5,13 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -25,16 +22,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -76,85 +69,15 @@ public class BeatBotActivity extends Activity implements MidiTrackControlListene
 		}
 	}
 
-	public class IconLongClickListener implements OnLongClickListener {
-		@Override
-		public boolean onLongClick(View view) {
-			int position = (Integer) view.getTag();
-			if (view.getId() == R.id.icon) {
-				Managers.midiManager.selectRow(position);
-			}
-			return true;
-		}
-	}
-
-	public class SampleRowAdapterAndOnClickListener extends
-			ArrayAdapter<String> implements AdapterView.OnClickListener {
-		int resourceId;
-		ArrayList<ToggleButton> soloButtons = new ArrayList<ToggleButton>();
-
-		public SampleRowAdapterAndOnClickListener(Context context,
-				int resourceId, List<String> sampleTypes) {
-			super(context, resourceId, sampleTypes);
-			this.resourceId = resourceId;
-		}
-
-		@Override
-		public void onClick(View view) {
-			int position = (Integer) view.getTag();
-			if (view.getId() == R.id.icon) {
-				launchSampleEditActivity(position);
-			} else if (view.getId() == R.id.mute) {
-				ToggleButton muteButton = (ToggleButton) view;
-				if (muteButton.isChecked())
-					Managers.playbackManager.muteTrack(position);
-				else
-					Managers.playbackManager.unmuteTrack(position);
-			} else if (view.getId() == R.id.solo) {
-				ToggleButton soloButton = (ToggleButton) view;
-				if (soloButton.isChecked()) {
-					Managers.playbackManager.soloTrack(position);
-					for (ToggleButton otherSoloButton : soloButtons) {
-						if (otherSoloButton.isChecked()
-								&& !otherSoloButton.equals(soloButton)) {
-							otherSoloButton.setChecked(false);
-						}
-					}
-				} else
-					Managers.playbackManager.unsoloTrack(position);
-			}
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			View view = getLayoutInflater().inflate(resourceId, parent, false);
-			ImageButton icon = (ImageButton) view.findViewById(R.id.icon);
-			ToggleButton mute = (ToggleButton) view.findViewById(R.id.mute);
-			ToggleButton solo = (ToggleButton) view.findViewById(R.id.solo);
-			soloButtons.add(solo);
-			icon.setTag(position);
-			mute.setTag(position);
-			solo.setTag(position);
-			icon.setOnClickListener(this);
-			mute.setOnClickListener(this);
-			solo.setOnClickListener(this);
-			icon.setOnLongClickListener(iconLongClickListener);
-			//icon.setBackgroundResource(GlobalVars.tracks.get(position).instrumentIcon);
-			return view;
-		}
-	}
-
 	private Animation fadeIn, fadeOut;
 	// these are used as variables for convenience, since they are reference
 	// frequently
 	private ToggleButton volume, pan, pitch;
 	private ViewGroup levelsGroup;
 	private FadeListener fadeListener;
-	private ListView sampleListView;
 	private static AssetManager assetManager;
 
 	private static AlertDialog selectInstrumentAlert = null;
-
-	private IconLongClickListener iconLongClickListener = new IconLongClickListener();
 
 	private long lastTapTime = 0;
 
@@ -178,13 +101,6 @@ public class BeatBotActivity extends Activity implements MidiTrackControlListene
 		fadeOut = AnimationUtils.loadAnimation(this, R.anim.fadeout);
 		fadeIn.setAnimationListener(fadeListener);
 		fadeOut.setAnimationListener(fadeListener);
-	}
-
-	private void initSampleListView() {
-		SampleRowAdapterAndOnClickListener adapter = new SampleRowAdapterAndOnClickListener(
-				this, R.layout.sample_row, GlobalVars.currentInstruments);
-		sampleListView = (ListView) findViewById(R.id.sampleListView);
-		sampleListView.setAdapter(adapter);
 	}
 
 	/**
@@ -267,7 +183,6 @@ public class BeatBotActivity extends Activity implements MidiTrackControlListene
 		SurfaceViewBase.setResources(getResources());
 		setContentView(R.layout.main);
 		initLevelsIconGroup();
-		initSampleListView();
 		initSelectInstrumentAlert();
 		GlobalVars.init();
 		// recorded type
@@ -486,13 +401,23 @@ public class BeatBotActivity extends Activity implements MidiTrackControlListene
 	}
 
 	@Override
-	public void midiControlIconClicked(int track, int controlNum) {
-		
+	public void muteToggled(int track, boolean mute) {
+		Managers.playbackManager.muteTrack(track, mute);
 	}
 	
 	@Override
-	public void midiControlIconLongPressed(int track, int controlNum) {
-		
+	public void soloToggled(int track, boolean solo) {
+		Managers.playbackManager.soloTrack(track, solo);
+	}
+	
+	@Override
+	public void trackLongPressed(int track) {
+		Managers.midiManager.selectRow(track);
+	}
+	
+	@Override
+	public void trackClicked(int track) {
+		launchSampleEditActivity(track);
 	}
 	
 	private void addTrack(int instrumentType) {
@@ -500,7 +425,7 @@ public class BeatBotActivity extends Activity implements MidiTrackControlListene
 		addTrack(GlobalVars.tracks.get(instrumentType).getSampleBytes(0));
 		GlobalVars.tracks.add(new Track(instrumentName, GlobalVars.instrumentIcons.get(instrumentName)));
 		GlobalVars.currentInstruments.add(instrumentName);
-		((ArrayAdapter<String>)sampleListView.getAdapter()).notifyDataSetChanged();
+		//((ArrayAdapter<String>)sampleListView.getAdapter()).notifyDataSetChanged();
 		// launch sample edit activity for the newly added track
 		// launchSampleEditActivity(GlobalVars.tracks.size() - 1);
 	}

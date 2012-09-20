@@ -34,4 +34,8 @@ public class BeatBotButton {
 	public float getIconHeight() {
 		return currentIcon.getHeight();
 	}
+	
+	public boolean isTouched() {
+		return currentIcon.equals(selectedIcon);
+	}
 }
