@@ -1,4 +1,4 @@
-package com.kh.beatbot;
+package com.kh.beatbot.activity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ToggleButton;
 
+import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Effect.EffectParam;

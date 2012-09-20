@@ -26,7 +26,7 @@ void updateNextNoteSamples() {
 }
 
 // create the engine and output mix objects
-void Java_com_kh_beatbot_BeatBotActivity_createEngine(JNIEnv *env, jclass clazz) {
+void Java_com_kh_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env, jclass clazz) {
 	SLresult result;
 	(void *) clazz; // avoid warnings about unused paramaters
 	initTicker();
@@ -325,7 +325,7 @@ void printLinkedList(MidiEventNode *head) {
 	}
 }
 
-jboolean Java_com_kh_beatbot_BeatBotActivity_createAudioPlayer(JNIEnv *env,
+jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(JNIEnv *env,
 		jclass clazz) {
 	openSlOut = malloc(sizeof(OpenSlOut));
 	openSlOut->currBufferFloat = (float **) malloc(2 * sizeof(float *));
@@ -390,7 +390,7 @@ jboolean Java_com_kh_beatbot_BeatBotActivity_createAudioPlayer(JNIEnv *env,
 }
 
 // shut down the native audio system
-void Java_com_kh_beatbot_BeatBotActivity_shutdown(JNIEnv *env, jclass clazz) {
+void Java_com_kh_beatbot_activity_BeatBotActivity_shutdown(JNIEnv *env, jclass clazz) {
 	freeTracks();
 	// destroy output mix object, and invalidate all associated interfaces
 	if (outputMixObject != NULL) {
@@ -625,7 +625,7 @@ void Java_com_kh_beatbot_midi_MidiNote_setPitch(JNIEnv *env, jclass clazz,
  Java SampleEditActivity JNI methods
  ****************************************************************************************/
 
-void Java_com_kh_beatbot_SampleEditActivity_setPrimaryVolume(JNIEnv *env,
+void Java_com_kh_beatbot_activity_SampleEditActivity_setPrimaryVolume(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat volume) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryVolume = volume;
@@ -634,7 +634,7 @@ void Java_com_kh_beatbot_SampleEditActivity_setPrimaryVolume(JNIEnv *env,
 			track->primaryPan * track->notePan);
 }
 
-void Java_com_kh_beatbot_SampleEditActivity_setPrimaryPan(JNIEnv *env,
+void Java_com_kh_beatbot_activity_SampleEditActivity_setPrimaryPan(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat pan) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryPan = pan;
@@ -643,7 +643,7 @@ void Java_com_kh_beatbot_SampleEditActivity_setPrimaryPan(JNIEnv *env,
 			track->primaryPan * track->notePan);
 }
 
-void Java_com_kh_beatbot_SampleEditActivity_setPrimaryPitch(JNIEnv *env,
+void Java_com_kh_beatbot_activity_SampleEditActivity_setPrimaryPitch(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat pitch) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryPitch = pitch;

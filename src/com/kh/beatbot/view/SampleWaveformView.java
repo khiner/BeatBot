@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.BeatBotButton;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
@@ -42,6 +43,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private FloatBuffer adsrPointVb = null;
 	private FloatBuffer[] adsrCurveVb = new FloatBuffer[4];
 
+	private BeatBotButton previewButton;
+	
 	// keep track of which pointer ids are selecting which ADSR points
 	// init to -1 to indicate no pointer is selecting
 	private int[] adsrSelected = new int[] { -1, -1, -1, -1, -1 };
@@ -51,8 +54,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private final int MIN_LOOP_WINDOW = 32;
 	// the left of this view is a preview button
 	private float previewButtonWidth, waveformWidth;
-
-	private int currentPreviewTextureId = 0;
 
 	private int trackNum;
 
@@ -223,14 +224,13 @@ public class SampleWaveformView extends SurfaceViewBase {
 	protected void init() {
 		// preview button is 80dpX80dp, but that is not the same as a height of
 		// '80'. 80dp will be the height
+		previewButton = new BeatBotButton(R.drawable.preview_icon, R.drawable.preview_icon_selected);
 		setBackgroundColor(BG_COLOR);
 		previewButtonWidth = height;
 		waveformWidth = width - previewButtonWidth - SNAP_DIST;
 		while (samples == null)
 			; // wait until we're sure the sample bytes have been set
 		waveformVb = WaveformHelper.floatsToFloatBuffer(samples, height, 0);
-		loadTexture(R.drawable.preview_icon, 0);
-		loadTexture(R.drawable.preview_icon_selected, 1);
 		initBackgroundOutlineVb();
 		initPreviewButtonSquareVb();
 		initLoopMarkerVb();
@@ -337,7 +337,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	@Override
 	protected void drawFrame() {
 		drawTriangleStrip(previewButtonSquareVb, Colors.BG_COLOR);
-		drawTexture(currentPreviewTextureId, 0, 0, height, height);
+		previewButton.draw(0, 0, height, height);
 		drawWaveform();
 		drawLines(backgroundOutlineVb, Colors.WHITE, 4, GL10.GL_LINE_LOOP);
 		drawLoopSelectionMarkers();
@@ -546,7 +546,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	public void handlePreviewActionDown(int id) {
-		currentPreviewTextureId = 1;
+		previewButton.touch();
 		Managers.playbackManager.playTrack(trackNum);
 		previewPointerId = id;
 	}
@@ -598,14 +598,14 @@ public class SampleWaveformView extends SurfaceViewBase {
 		if (x > previewButtonWidth)
 			handleWaveActionPointerUp(e, id);
 		else {
-			currentPreviewTextureId = 0;
+			previewButton.release();
 			Managers.playbackManager.stopTrack(trackNum);
 		}
 	}
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		currentPreviewTextureId = 0;
+		previewButton.release();
 		beginLoopMarkerTouched = endLoopMarkerTouched = -1;
 		Managers.playbackManager.stopTrack(trackNum);
 		scrollAnchorSample = zoomLeftAnchorSample = zoomRightAnchorSample = -1;

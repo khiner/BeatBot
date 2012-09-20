@@ -1,4 +1,4 @@
-package com.kh.beatbot;
+package com.kh.beatbot.activity;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +14,7 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.kh.beatbot.R;
 import com.kh.beatbot.manager.Managers;
 
 public class MidiFileMenuActivity extends Activity {

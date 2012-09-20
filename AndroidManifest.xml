@@ -16,7 +16,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
         <activity
-            android:name="com.kh.beatbot.BeatBotActivity"
+            android:name=".activity.BeatBotActivity"
             android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,15 +25,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.kh.beatbot.MidiFileMenuActivity"
+            android:name="com.kh.activity.MidiFileMenuActivity"
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:name="com.kh.beatbot.SampleEditActivity"
+            android:name="com.kh.beatbot.activity.SampleEditActivity"
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:name="com.kh.beatbot.EffectActivity"
+            android:name="com.kh.beatbot.activity.EffectActivity"
             android:screenOrientation="landscape" >
         </activity>
     </application>

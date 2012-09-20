@@ -1,17 +1,38 @@
 package com.kh.beatbot.view.helper;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.BeatBotButton;
+import com.kh.beatbot.global.BeatBotToggleButton;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.global.IconIds;
 import com.kh.beatbot.listener.MidiTrackControlListener;
 import com.kh.beatbot.view.SurfaceViewBase;
 import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class MidiTrackControlHelper {
-	private static final int MUTE_ICON_ID = 0;
-	private static final int SOLO_ICON_ID = 1;
+	public static class ButtonRow {
+		float width;
+		BeatBotButton instrumentButton;
+		BeatBotToggleButton muteButton, soloButton;
+		
+		public ButtonRow(IconIds iconIds) {
+			instrumentButton = new BeatBotButton(iconIds.defaultId, iconIds.selectedId);
+			muteButton = new BeatBotToggleButton(R.drawable.mute_icon, R.drawable.mute_icon_selected);
+			soloButton = new BeatBotToggleButton(R.drawable.solo_icon, R.drawable.solo_icon_selected);
+			width = instrumentButton.getIconWidth() + muteButton.getIconWidth() + soloButton.getIconWidth();
+		}
+		
+		public void draw(float y) {
+			instrumentButton.draw(0, y);
+			muteButton.draw(instrumentButton.getIconWidth(), y);
+			soloButton.draw(instrumentButton.getIconWidth() + muteButton.getIconWidth(), y);
+		}
+	}
 	
 	public static final int NUM_CONTROLS = 3; // mute/solo/track settings
 	public static float width;
@@ -19,18 +40,16 @@ public class MidiTrackControlHelper {
 	
 	private static MidiTrackControlListener listener;
 	private static FloatBuffer bgRectVb = null;
+	private static List<ButtonRow> buttonRows = new ArrayList<ButtonRow>();
 	
 	public static void init() {
-		GlobalVars.midiView.loadTexture(R.drawable.mute_icon, MUTE_ICON_ID);
-		GlobalVars.midiView.loadTexture(R.drawable.solo_icon, SOLO_ICON_ID);
 		for (int i = 0; i < GlobalVars.tracks.size(); i++) {
-			//GlobalVars.midiView.loadTexture(GlobalVars.tracks.get(i).instrumentIcon, i + 2);
-			GlobalVars.midiView.loadTexture(R.drawable.kick_icon_small, i + 2);
+			buttonRows.add(new ButtonRow(GlobalVars.tracks.get(i).instrumentIcon));
 		}
-		width = 3 * GlobalVars.midiView.getTextureWidth(0);
+		width = buttonRows.get(0).width;
 		height = GlobalVars.midiView.getBean().getHeight();
 		MidiViewBean.X_OFFSET = width;
-		MidiViewBean.setMinTrackHeight(GlobalVars.midiView.getTextureHeight(0));
+		MidiViewBean.setMinTrackHeight(buttonRows.get(0).instrumentButton.getIconHeight());
 		initBgRectVb();
 	}
 	
@@ -41,12 +60,10 @@ public class MidiTrackControlHelper {
 	/** draw background color & track control icons */
 	public static void draw() {
 		SurfaceViewBase.drawTriangleStrip(bgRectVb, Colors.BG_COLOR);
-		float y = 0;
-		for (int i = 0; i < GlobalVars.tracks.size(); i++) {
-			GlobalVars.midiView.drawTexture(i + 2, 0, y);
-			GlobalVars.midiView.drawTexture(MUTE_ICON_ID, width / 3, y);
-			GlobalVars.midiView.drawTexture(SOLO_ICON_ID, 2 * width / 3, y);
-			y += MidiViewBean.minTrackHeight;
+		float y = height - MidiViewBean.minTrackHeight;
+		for (ButtonRow buttonRow : buttonRows) {
+			buttonRow.draw(y);
+			y -= MidiViewBean.minTrackHeight;
 		}
 	}
 	

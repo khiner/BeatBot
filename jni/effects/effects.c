@@ -225,14 +225,7 @@ void Java_com_kh_beatbot_effect_Effect_setEffectParam(JNIEnv *env, jclass clazz,
 	}
 }
 
-jfloatArray Java_com_kh_beatbot_SampleEditActivity_getSamples(JNIEnv *env,
-		jclass clazz, jint trackNum) {
-	Track *track = getTrack(env, clazz, trackNum);
-	WavFile *wavFile = (WavFile *) track->generator->config;
-	return makejFloatArray(env, wavFile->buffers[0], wavFile->totalSamples);
-}
-
-void Java_com_kh_beatbot_SampleEditActivity_setReverse(JNIEnv *env,
+void Java_com_kh_beatbot_activity_SampleEditActivity_setReverse(JNIEnv *env,
 		jclass clazz, jint trackNum, jboolean reverse) {
 	Track *track = getTrack(env, clazz, trackNum);
 	WavFile *wavFile = (WavFile *) track->generator->config;
@@ -245,7 +238,7 @@ void Java_com_kh_beatbot_SampleEditActivity_setReverse(JNIEnv *env,
 		wavFile->currSample = wavFile->loopBegin;
 }
 
-jfloatArray Java_com_kh_beatbot_SampleEditActivity_normalize(JNIEnv *env,
+jfloatArray Java_com_kh_beatbot_activity_SampleEditActivity_normalize(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
 	WavFile *wavFile = (WavFile *) track->generator->config;

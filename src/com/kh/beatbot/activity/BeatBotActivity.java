@@ -1,4 +1,4 @@
-package com.kh.beatbot;
+package com.kh.beatbot.activity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,14 +38,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.kh.beatbot.R;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.MidiTrackControlListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
-import com.kh.beatbot.track.Track;
 import com.kh.beatbot.view.MidiView;
+import com.kh.beatbot.view.SurfaceViewBase;
 import com.kh.beatbot.view.ThresholdBarView;
 import com.kh.beatbot.view.helper.LevelsViewHelper;
 
@@ -262,8 +264,8 @@ public class BeatBotActivity extends Activity implements MidiTrackControlListene
 		super.onCreate(savedInstanceState);
 		initAndroidSettings();
 		copyAllSamplesToStorage();
+		SurfaceViewBase.setResources(getResources());
 		setContentView(R.layout.main);
-
 		initLevelsIconGroup();
 		initSampleListView();
 		initSelectInstrumentAlert();

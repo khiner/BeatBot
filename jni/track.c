@@ -176,7 +176,14 @@ void setSampleBytes(Track *track, char *bytes, int length) {
 			((WavFile *)track->generator->config)->totalSamples);
 }
 
-void Java_com_kh_beatbot_SampleEditActivity_setSampleBytes(JNIEnv *env,
+jfloatArray Java_com_kh_beatbot_activity_SampleEditActivity_getSampleFloats(JNIEnv *env,
+		jclass clazz, jint trackNum) {
+	Track *track = getTrack(env, clazz, trackNum);
+	WavFile *wavFile = (WavFile *) track->generator->config;
+	return makejFloatArray(env, wavFile->buffers[0], wavFile->totalSamples);
+}
+
+void Java_com_kh_beatbot_activity_SampleEditActivity_setSampleBytes(JNIEnv *env,
 		jclass clazz, jint trackNum, jbyteArray bytes) {
 	Track *track = getTrack(env, clazz, trackNum);
 	int length = (*env)->GetArrayLength(env, bytes);
@@ -189,9 +196,9 @@ void Java_com_kh_beatbot_SampleEditActivity_setSampleBytes(JNIEnv *env,
 	}
 }
 
-void Java_com_kh_beatbot_BeatBotActivity_addTrack(JNIEnv *env, jclass clazz, jbyteArray bytes) {
+void Java_com_kh_beatbot_activity_BeatBotActivity_addTrack(JNIEnv *env, jclass clazz, jbyteArray bytes) {
 	Track *track = initTrack();
 	addTrack(track);
-	Java_com_kh_beatbot_SampleEditActivity_setSampleBytes(env, clazz, trackCount, bytes);
+	Java_com_kh_beatbot_activity_SampleEditActivity_setSampleBytes(env, clazz, trackCount, bytes);
 	trackCount++;
 }

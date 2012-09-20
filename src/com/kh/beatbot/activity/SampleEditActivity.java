@@ -1,4 +1,4 @@
-package com.kh.beatbot;
+package com.kh.beatbot.activity;
 
 import java.util.Collections;
 import java.util.Stack;
@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Chorus;
 import com.kh.beatbot.effect.Decimate;
 import com.kh.beatbot.effect.Delay;
@@ -197,7 +198,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		initSelectSampleAlert();
 		// set the instrument icon
 		((ImageButton) findViewById(R.id.instrumentButton))
-				.setBackgroundResource(GlobalVars.tracks.get(currInstrumentNum).instrumentIcon);
+				.setBackgroundResource(GlobalVars.tracks.get(currInstrumentNum).instrumentIcon.source);
 		// set the instrument text
 		((Button) findViewById(R.id.sampleSelect)).setText(GlobalVars.tracks
 				.get(currInstrumentNum).sampleNames[0]);
@@ -216,7 +217,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 				.getSampleBytes(sampleNum));
 		((Button) findViewById(R.id.sampleSelect)).setText(GlobalVars.tracks
 				.get(instrumentNum).sampleNames[sampleNum]);
-		sampleWaveformView.setSamples(getSamples(trackNum));
+		sampleWaveformView.setSamples(getSampleFloats(trackNum));
 	}
 
 	private void initSelectInstrumentAlert() {
@@ -230,7 +231,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 						// update instrument icon to reflect the change
 						((ImageButton) findViewById(R.id.instrumentButton))
 								.setBackgroundResource(GlobalVars.tracks
-										.get(currInstrumentNum).instrumentIcon);
+										.get(currInstrumentNum).instrumentIcon.source);
 						// update the sample select alert names with the new
 						// instrument samples
 						initSelectSampleAlert();
@@ -266,7 +267,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	private void initSampleWaveformView() {
 		sampleWaveformView = ((SampleWaveformView) findViewById(R.id.sample_waveform_view));
 		sampleWaveformView.setTrackNum(trackNum);
-		sampleWaveformView.setSamples(getSamples(trackNum));
+		sampleWaveformView.setSamples(getSampleFloats(trackNum));
 	}
 
 	public static void quantizeEffectParams() {
@@ -411,7 +412,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	// get the audio data in floats
-	public static native float[] getSamples(int trackNum);
+	public static native float[] getSampleFloats(int trackNum);
 
 	// set play mode to reverse
 	public static native void setReverse(int trackNum, boolean reverse);

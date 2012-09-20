@@ -1,4 +1,4 @@
-package com.kh.beatbot.track;
+package com.kh.beatbot.global;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,12 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.global.GlobalVars;
 
 public class Track {
 	public String instrumentName;
 	public List<Effect> effects;
-	public int instrumentIcon;
+	public IconIds instrumentIcon;
 	public float volume = .8f;
 	public float pan = .5f;
 	public float pitch = .5f;
@@ -22,7 +21,7 @@ public class Track {
 	public File[] samples;
 	public String[] sampleNames;
 	
-	public Track(String instrumentName, int instrumentIcon) {
+	public Track(String instrumentName, IconIds instrumentIcon) {
 		this.instrumentName = instrumentName;
 		this.instrumentIcon = instrumentIcon;
 		File dir = new File(GlobalVars.appDirectory + instrumentName);

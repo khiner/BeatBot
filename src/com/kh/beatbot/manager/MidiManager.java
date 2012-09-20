@@ -13,8 +13,8 @@ import java.util.Stack;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.kh.beatbot.BeatBotActivity;
-import com.kh.beatbot.SampleEditActivity;
+import com.kh.beatbot.activity.BeatBotActivity;
+import com.kh.beatbot.activity.SampleEditActivity;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;

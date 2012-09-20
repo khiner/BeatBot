@@ -12,6 +12,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.BeatBotIcon;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.view.ClickableSurfaceView;
@@ -19,7 +20,7 @@ import com.kh.beatbot.view.text.GLText;
 
 public class LabelListListenable extends ClickableSurfaceView {
 	private static float addTextWidth;
-	
+
 	static enum LabelState {
 		EMPTY, OFF, ON
 	};
@@ -41,7 +42,8 @@ public class LabelListListenable extends ClickableSurfaceView {
 			this.id = id;
 			this.x = x;
 			// empty text indicates empty label
-			state = text.isEmpty() ? LabelState.EMPTY : (on ? LabelState.ON : LabelState.OFF);
+			state = text.isEmpty() ? LabelState.EMPTY : (on ? LabelState.ON
+					: LabelState.OFF);
 			setText(text);
 		}
 
@@ -50,7 +52,8 @@ public class LabelListListenable extends ClickableSurfaceView {
 			if (text.isEmpty())
 				state = LabelState.EMPTY;
 			this.textWidth = glText.getTextWidth(text);
-			labelWidth = text.isEmpty() ? (width - 3 * GAP_BETWEEN_LABELS) / 4 : textWidth + 20;
+			labelWidth = text.isEmpty() ? (width - 3 * GAP_BETWEEN_LABELS) / 4
+					: textWidth + 20;
 			backgroundRectVb = makeRoundedCornerRectBuffer(labelWidth, height,
 					14, 16);
 		}
@@ -67,17 +70,19 @@ public class LabelListListenable extends ClickableSurfaceView {
 			drawTriangleFan(backgroundRectVb, whichColor());
 			gl.glPopMatrix();
 			if (state == LabelState.EMPTY) {
-				drawTexture(0, x + labelWidth / 2 - addTextWidth / 2, 0, height, height);
+				plusIcon.draw(x + labelWidth / 2 - addTextWidth / 2, 0, height, height);
 				glText.begin(); // Begin Text Rendering
 				setColor(Colors.WHITE);
 				// draw string in center of rect
-				glText.draw("ADD", x + labelWidth / 2 - addTextWidth / 2 + height, TEXT_Y_OFFSET);
+				glText.draw("ADD", x + labelWidth / 2 - addTextWidth / 2
+						+ height, TEXT_Y_OFFSET);
 				glText.end();
 			} else {
 				glText.begin(); // Begin Text Rendering
 				setColor(Colors.WHITE);
 				// draw string in center of rect
-				glText.draw(text, x + labelWidth / 2 - textWidth / 2, TEXT_Y_OFFSET);
+				glText.draw(text, x + labelWidth / 2 - textWidth / 2,
+						TEXT_Y_OFFSET);
 				glText.end();
 			}
 		}
@@ -122,7 +127,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 
 	private static final float[] BG_RECT_COLOR = LevelListenable.BG_COLOR
 			.clone();
-	
+
 	private static final float[] EMPTY_RECT_COLOR = { BG_RECT_COLOR[0] + .1f,
 			BG_RECT_COLOR[1] + .1f, BG_RECT_COLOR[2] + .1f, 1 };
 	private static final float[] LABEL_RECT_COLOR = { BG_RECT_COLOR[0] + .3f,
@@ -130,12 +135,15 @@ public class LabelListListenable extends ClickableSurfaceView {
 	private static final float[] LABEL_RECT_ON_COLOR = Colors.VOLUME_COLOR
 			.clone();
 
-	private static final float[] SELECTED_EMPTY_RECT_COLOR = { EMPTY_RECT_COLOR[0] + .2f,
-		EMPTY_RECT_COLOR[1] + .2f, EMPTY_RECT_COLOR[2] + .2f, 1 };
-	private static final float[] SELECTED_LABEL_RECT_COLOR = { LABEL_RECT_COLOR[0] + .2f,
-		LABEL_RECT_COLOR[1] + .2f, LABEL_RECT_COLOR[2] + .2f, 1 };
-	private static final float[] SELECTED_LABEL_RECT_ON_COLOR = { LABEL_RECT_ON_COLOR[0] + .1f,
-		LABEL_RECT_ON_COLOR[1] + .1f, LABEL_RECT_ON_COLOR[2] + .1f, 1 };
+	private static final float[] SELECTED_EMPTY_RECT_COLOR = {
+			EMPTY_RECT_COLOR[0] + .2f, EMPTY_RECT_COLOR[1] + .2f,
+			EMPTY_RECT_COLOR[2] + .2f, 1 };
+	private static final float[] SELECTED_LABEL_RECT_COLOR = {
+			LABEL_RECT_COLOR[0] + .2f, LABEL_RECT_COLOR[1] + .2f,
+			LABEL_RECT_COLOR[2] + .2f, 1 };
+	private static final float[] SELECTED_LABEL_RECT_ON_COLOR = {
+			LABEL_RECT_ON_COLOR[0] + .1f, LABEL_RECT_ON_COLOR[1] + .1f,
+			LABEL_RECT_ON_COLOR[2] + .1f, 1 };
 
 	private static final float GAP_BETWEEN_LABELS = 5;
 	private static final float TEXT_Y_OFFSET = 3;
@@ -143,6 +151,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 	private GLText glText = null; // A GLText Instance
 	private LabelListListener listener = null;
 	private ArrayList<Label> labels = null;
+	private BeatBotIcon plusIcon;
 
 	// which label is currently being touched? (null for none)
 	private Label touchedLabel = null;
@@ -167,7 +176,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 	public Label getLabel(int index) {
 		return index < labels.size() ? labels.get(index) : null;
 	}
-	
+
 	/*
 	 * Find the label with the given id
 	 */
@@ -211,7 +220,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 	public boolean noLabels() {
 		return labels == null || labels.isEmpty();
 	}
-	
+
 	// callback function for listener to notify when the label text and id is
 	// known
 	public void setLabelText(int id, String text) {
@@ -221,7 +230,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 		}
 		updateLabelLocations();
 	}
-	
+
 	public void setLabel(int id, String text) {
 		Label label = findLabel(id);
 		if (label != null) {
@@ -235,7 +244,6 @@ public class LabelListListenable extends ClickableSurfaceView {
 		dragOffset = touchedLabel.x - pointerX;
 		setAllLabelPrevPositions();
 	}
-
 
 	private void setAllLabelPrevPositions() {
 		for (int i = 0; i < labels.size(); i++) {
@@ -266,14 +274,15 @@ public class LabelListListenable extends ClickableSurfaceView {
 
 	@Override
 	protected void init() {
-		loadTexture(R.drawable.plus_outline, 0);
+		plusIcon = new BeatBotIcon(R.drawable.plus_outline);
 		if (labels == null)
 			labels = new ArrayList<Label>();
 		initGlText();
 		addTextWidth = glText.getTextWidth("add") + height;
 		if (bgRectVb == null)
 			initBgRectVb();
-		while (listener == null); // wait for listener
+		while (listener == null)
+			; // wait for listener
 		listener.labelListInitialized(this);
 	}
 
@@ -346,14 +355,16 @@ public class LabelListListenable extends ClickableSurfaceView {
 	protected void longPress(int id, float x, float y) {
 		// notify listener that the label has been long-clicked
 		if (touchedLabel != null)
-			listener.labelLongClicked(touchedLabel.id, labels.indexOf(touchedLabel));
+			listener.labelLongClicked(touchedLabel.id,
+					labels.indexOf(touchedLabel));
 	}
 
 	@Override
 	protected void singleTap(int id, float x, float y) {
 		// notify listener that the label has been single-clicked (tapped)
 		if (touchedLabel != null)
-			listener.labelClicked(touchedLabel.text, touchedLabel.id, labels.indexOf(touchedLabel));
+			listener.labelClicked(touchedLabel.text, touchedLabel.id,
+					labels.indexOf(touchedLabel));
 	}
 
 	@Override
