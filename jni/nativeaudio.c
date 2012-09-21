@@ -109,9 +109,10 @@ static inline void mixTracks() {
 			total = 0;
 			TrackNode *cur_ptr = trackHead;
 			while (cur_ptr != NULL) {
-				if (cur_ptr->track->shouldSound)
+				if (cur_ptr->track->shouldSound) {
 					total += cur_ptr->track->currBufferFloat[channel][samp]
 							* .7f;
+				}
 				cur_ptr = cur_ptr->next;
 			}
 			openSlOut->currBufferFloat[channel][samp] =

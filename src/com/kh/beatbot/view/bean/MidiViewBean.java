@@ -1,12 +1,10 @@
 package com.kh.beatbot.view.bean;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
 public class MidiViewBean {
-	public static float minTrackHeight;
 	public static final float COLOR_TRANSITION_RATE = .02f;
 	public static float X_OFFSET;
 	public static final float Y_OFFSET = 21;
@@ -16,13 +14,9 @@ public class MidiViewBean {
 	// the width of the lines for note levels
 	public static final int LEVEL_LINE_WIDTH = 7;
 
-	public static float allTracksHeight;
-	
 	private MidiView.State viewState = MidiView.State.NORMAL_VIEW;
 
 	private float width, height;
-	private float noteHeight;
-	private float midiHeight;
 	private float levelsHeight;
 	// the main background color for the view.
 	// this color can change when transitioning to/from LEVEL_VIEW
@@ -65,15 +59,6 @@ public class MidiViewBean {
 	public void setViewState(MidiView.State viewState) {
 		this.viewState = viewState;
 	}
-
-	public static void setMinTrackHeight(float minTrackHeight) {
-		MidiViewBean.minTrackHeight = minTrackHeight;
-		updateHeight();
-	}
-	
-	public static void updateHeight() {
-		allTracksHeight = GlobalVars.tracks.size() * (1 + minTrackHeight) + 2;
-	}
 	
 	public float getWidth() {
 		return width - MidiTrackControlHelper.width;
@@ -89,22 +74,6 @@ public class MidiViewBean {
 
 	public void setHeight(float height) {
 		this.height = height;
-	}
-
-	public float getMidiHeight() {
-		return midiHeight;
-	}
-
-	public void setMidiHeight(float midiHeight) {
-		this.midiHeight = midiHeight;
-	}
-
-	public float getNoteHeight() {
-		return noteHeight;
-	}
-
-	public void setNoteHeight(float noteHeight) {
-		this.noteHeight = noteHeight;
 	}
 
 	public float getLevelsHeight() {

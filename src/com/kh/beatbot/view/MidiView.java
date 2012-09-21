@@ -70,6 +70,15 @@ public class MidiView extends ClickableSurfaceView {
 		}
 	}
 
+	
+	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,
+			int height) {
+		super.surfaceChanged(holder, format, width, height);
+		bean.setWidth(width);
+		bean.setHeight(height);
+	}
+	
 	public void initMeFirst() {
 		midiManager = Managers.midiManager;
 		TickWindowHelper.viewBean = bean;
@@ -332,7 +341,7 @@ public class MidiView extends ClickableSurfaceView {
 		float x1 = tickToX(midiNote.getOnTick());
 		float y1 = noteToY(midiNote.getNoteValue());
 		float x2 = tickToX(midiNote.getOffTick());
-		float y2 = y1 + bean.getNoteHeight();
+		float y2 = y1 + MidiTrackControlHelper.trackHeight;
 		// fade outline from black to white
 		float baseColor = (1 - bean.getBgColor() * 2);
 		drawRectangle(x1, y1, x2, y2, color);
@@ -347,18 +356,17 @@ public class MidiView extends ClickableSurfaceView {
 
 	private void initBgRectVb() {
 		bgRectVb = makeRectFloatBuffer(MidiViewBean.X_OFFSET,
-				MidiViewBean.Y_OFFSET, width, MidiViewBean.allTracksHeight);
+				MidiViewBean.Y_OFFSET, width, MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET);
 	}
 
 	private void initLoopRectVb() {
 		loopRectVb = makeRectFloatBuffer(
 				tickToX(midiManager.getLoopBeginTick()), MidiViewBean.Y_OFFSET,
-				tickToX(midiManager.getLoopEndTick()), bean.getHeight());
+				tickToX(midiManager.getLoopEndTick()), MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET);
 	}
 
 	private void initCurrTickVb() {
-		float[] vertLine = new float[] { MidiViewBean.X_OFFSET,
-				MidiViewBean.Y_OFFSET, MidiViewBean.X_OFFSET, bean.getHeight() };
+		float[] vertLine = new float[] { 0, MidiViewBean.Y_OFFSET, 0, MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET };
 		currTickVb = makeFloatBuffer(vertLine);
 	}
 
@@ -375,7 +383,7 @@ public class MidiView extends ClickableSurfaceView {
 			hLines[i * 4 + 1] = y;
 			hLines[i * 4 + 2] = width;
 			hLines[i * 4 + 3] = y;
-			y += bean.getNoteHeight();
+			y += MidiTrackControlHelper.trackHeight;
 		}
 		hLineVb = makeFloatBuffer(hLines);
 	}
@@ -390,14 +398,14 @@ public class MidiView extends ClickableSurfaceView {
 			line[0] = 0;
 			line[1] = y1 - y1 / (i + 1.5f);
 			line[2] = 0;
-			line[3] = bean.getHeight();
+			line[3] = MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET;
 			vLineVb[i] = makeFloatBuffer(line);
 		}
 	}
 
 	private void initLoopMarkerVbs() {
 		float h = MidiViewBean.Y_OFFSET;
-		float[] loopMarkerLine = new float[] { 0, 0, 0, bean.getHeight() };
+		float[] loopMarkerLine = new float[] { 0, 0, 0, MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET };
 		// loop begin triangle, pointing right, and
 		// loop end triangle, pointing left
 		float[] loopMarkerTriangles = new float[] { 0, 0, 0, h, h, h / 2, 0, 0,
@@ -420,12 +428,11 @@ public class MidiView extends ClickableSurfaceView {
 	public int yToNote(float y) {
 		if (y >= 0 && y < MidiViewBean.Y_OFFSET)
 			return -1;
-		return (int) (GlobalVars.tracks.size() * (y - MidiViewBean.Y_OFFSET) / (bean
-				.getHeight() - MidiViewBean.Y_OFFSET));
+		return (int) ((y - MidiViewBean.Y_OFFSET) / MidiTrackControlHelper.trackHeight);
 	}
 
 	public float noteToY(int note) {
-		return note * bean.getNoteHeight() + MidiViewBean.Y_OFFSET;
+		return note * MidiTrackControlHelper.trackHeight + MidiViewBean.Y_OFFSET;
 	}
 
 	public void signalRecording() {
@@ -498,7 +505,7 @@ public class MidiView extends ClickableSurfaceView {
 		}
 		drawLoopMarker();
 		drawSelectRegion();
-		ScrollBarHelper.drawScrollView(bean.getWidth(), bean.getHeight(),
+		ScrollBarHelper.drawScrollView(bean.getWidth(), MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET,
 				MidiViewBean.X_OFFSET);
 		drawRecordingWaveforms();
 		if (playing || recording) {
@@ -742,19 +749,11 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
-		super.surfaceChanged(holder, format, width, height);
-		bean.setWidth(width);
-		bean.setHeight(height);
-		bean.setMidiHeight(bean.getHeight() - MidiViewBean.Y_OFFSET);
-		bean.setNoteHeight(bean.getMidiHeight() / GlobalVars.tracks.size());
-		bean.setLevelsHeight(bean.getMidiHeight()
-				- MidiViewBean.LEVEL_POINT_SIZE / 2);
-	}
-
-	@Override
 	protected void handleActionDown(int id, float x, float y) {
+		if (x < MidiTrackControlHelper.width) {
+			MidiTrackControlHelper.handlePress(id, x, yToNote(y));
+			return;
+		}
 		super.handleActionDown(id, x, y);
 		ScrollBarHelper.startScrollView();
 		if (bean.getViewState() == State.LEVELS_VIEW) {
@@ -778,6 +777,10 @@ public class MidiView extends ClickableSurfaceView {
 	@Override
 	protected void handleActionPointerDown(MotionEvent e, int id, float x,
 			float y) {
+		if (x < MidiTrackControlHelper.width) {
+			MidiTrackControlHelper.handlePress(id, x, yToNote(y));
+			return;
+		}
 		super.handleActionPointerDown(e, id, x, y);
 		boolean noteAlreadySelected = false;
 		if (bean.getViewState() == State.LEVELS_VIEW) {
@@ -827,6 +830,9 @@ public class MidiView extends ClickableSurfaceView {
 	@Override
 	protected void handleActionMove(MotionEvent e) {
 		super.handleActionMove(e);
+		if (MidiTrackControlHelper.ownsPointer(e.getPointerId(e.getActionIndex()))) {
+			return;
+		}
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			LevelsViewHelper.handleActionMove(e);
 			return;
@@ -860,6 +866,10 @@ public class MidiView extends ClickableSurfaceView {
 
 	@Override
 	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
+		if (MidiTrackControlHelper.ownsPointer(id)) {
+			MidiTrackControlHelper.handleRelease(id, x, yToNote(y));
+			return;
+		}
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			LevelsViewHelper.handleActionPointerUp(e, id);
 		} else {
@@ -881,6 +891,10 @@ public class MidiView extends ClickableSurfaceView {
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
 		super.handleActionUp(id, x, y);
+		if (MidiTrackControlHelper.ownsPointer(id)) {
+			MidiTrackControlHelper.handleRelease(id, x, yToNote(y));
+			return;
+		}
 		ScrollBarHelper.handleActionUp();
 		for (int i = 0; i < 3; i++)
 			bean.setLoopPointerId(i, -1);
@@ -900,7 +914,7 @@ public class MidiView extends ClickableSurfaceView {
 	@Override
 	protected void longPress(int id, float x, float y) {
 		if (x < MidiTrackControlHelper.width) {
-			MidiTrackControlHelper.handleLongPress(x, yToNote(y));
+			MidiTrackControlHelper.handleLongPress(id, x, yToNote(y));
 			return;
 		}
 		startSelectRegion(x, y);

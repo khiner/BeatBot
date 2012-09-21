@@ -25,7 +25,7 @@
         android:id="@+id/thresholdLabel"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_alignLeft="@+id/midiView"
+        android:layout_toRightOf="@+id/addTrack"
         android:layout_below="@+id/leftControlButtons"
         android:textSize="16dp"
         android:gravity="center"
@@ -83,8 +83,8 @@
         android:id="@+id/addTrack"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/midiView"
-        android:layout_alignTop="@+id/thresholdLabel"
+        android:layout_above="@+id/midiView"
+        android:layout_below="@+id/leftControlButtons"
         android:layout_marginTop="4dp"
         android:background="@drawable/plus_icon_large"
        	android:onClick="addTrack" />
@@ -92,8 +92,10 @@
     <com.kh.beatbot.view.MidiView
         android:id="@+id/midiView"
         android:layout_width="match_parent"
-        android:layout_height="246dp"
+        android:layout_height="0dp"
         android:layout_below="@+id/thresholdLabel"
-        android:layout_alignParentLeft="true" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

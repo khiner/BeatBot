@@ -43,6 +43,7 @@ import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.SurfaceViewBase;
 import com.kh.beatbot.view.ThresholdBarView;
 import com.kh.beatbot.view.helper.LevelsViewHelper;
+import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
 public class BeatBotActivity extends Activity implements MidiTrackControlListener {
 	private class FadeListener implements AnimationListener {
@@ -196,6 +197,7 @@ public class BeatBotActivity extends Activity implements MidiTrackControlListene
 		initManagers(savedInstanceState);
 		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));
 		GlobalVars.midiView.initMeFirst();
+		MidiTrackControlHelper.addListener(this);
 		if (savedInstanceState != null) {
 			GlobalVars.midiView.readFromBundle(savedInstanceState);
 			// if going to levels view or in levels view, level icons should be

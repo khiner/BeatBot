@@ -2,7 +2,9 @@ package com.kh.beatbot.view.helper;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.BeatBotButton;
@@ -21,7 +23,8 @@ public class MidiTrackControlHelper {
 		BeatBotButton instrumentButton;
 		BeatBotToggleButton muteButton, soloButton;
 
-		public ButtonRow(IconIds iconIds) {
+		public ButtonRow(int trackNum, IconIds iconIds) {
+			this.trackNum = trackNum;
 			instrumentButton = new BeatBotButton(iconIds.defaultId,
 					iconIds.selectedId);
 			muteButton = new BeatBotToggleButton(R.drawable.mute_icon,
@@ -49,22 +52,40 @@ public class MidiTrackControlHelper {
 
 		public void handleLongPress(float x) {
 			BeatBotButton pressedButton = getButton(x);
-			if (pressedButton.equals(instrumentButton) && pressedButton.isTouched()) {
+			if (pressedButton.equals(instrumentButton)
+					&& pressedButton.isTouched()) {
 				listener.trackLongPressed(trackNum);
 			}
 		}
-		
+
 		public void handleRelease(float x) {
 			BeatBotButton releasedButton = getButton(x);
 			if (releasedButton != null) {
-				if (releasedButton.equals(muteButton)) {
+				if (releasedButton.equals(instrumentButton)) {
+					listener.trackClicked(trackNum);
+				} else if (releasedButton.equals(muteButton)) {
 					((BeatBotToggleButton) releasedButton).toggle();
-					listener.muteToggled(trackNum, ((BeatBotToggleButton) releasedButton).isOn());
+					listener.muteToggled(trackNum,
+							((BeatBotToggleButton) releasedButton).isOn());
 				} else if (releasedButton.equals(soloButton)) {
-					((BeatBotToggleButton) releasedButton).toggle();
-					listener.soloToggled(trackNum, ((BeatBotToggleButton) releasedButton).isOn());
+					BeatBotToggleButton soloButton = ((BeatBotToggleButton) releasedButton); 
+					soloButton.toggle();
+					listener.soloToggled(trackNum,
+							soloButton.isOn());
+					if (soloButton.isOn()) {
+						// if this track is soloing, set all other solo icons to inactive.
+						for (ButtonRow buttonRow : buttonRows) {
+							if (!buttonRow.equals(this)) {
+								buttonRow.soloButton.setOn(false);
+							}
+						}
+					}
 				}
 			}
+			releaseAll();
+		}
+
+		public void releaseAll() {
 			instrumentButton.release();
 			muteButton.release();
 			soloButton.release();
@@ -73,7 +94,8 @@ public class MidiTrackControlHelper {
 		private BeatBotButton getButton(float x) {
 			if (x < buttonRows.get(0).instrumentButton.getIconWidth()) {
 				return instrumentButton;
-			} else if (x < buttonRows.get(0).muteButton.getIconWidth()) {
+			} else if (x < buttonRows.get(0).instrumentButton.getIconWidth()
+					+ buttonRows.get(0).muteButton.getIconWidth()) {
 				return muteButton;
 			} else if (x < width) {
 				return soloButton;
@@ -85,22 +107,22 @@ public class MidiTrackControlHelper {
 
 	public static final int NUM_CONTROLS = 3; // mute/solo/track settings
 	public static float width;
-	public static float height;
+	public static float height, trackHeight;
 
 	private static MidiTrackControlListener listener;
 	private static FloatBuffer bgRectVb = null;
 	private static List<ButtonRow> buttonRows = new ArrayList<ButtonRow>();
+	private static Map<Integer, ButtonRow> whichRowOwnsPointer = new HashMap<Integer, ButtonRow>();
 
 	public static void init() {
 		for (int i = 0; i < GlobalVars.tracks.size(); i++) {
-			buttonRows.add(new ButtonRow(
+			buttonRows.add(new ButtonRow(i,
 					GlobalVars.tracks.get(i).instrumentIcon));
 		}
 		width = buttonRows.get(0).width;
-		height = GlobalVars.midiView.getBean().getHeight();
 		MidiViewBean.X_OFFSET = width;
-		MidiViewBean.setMinTrackHeight(buttonRows.get(0).instrumentButton
-				.getIconHeight());
+		trackHeight = buttonRows.get(0).instrumentButton.getIconHeight();
+		height = trackHeight * buttonRows.size();
 		initBgRectVb();
 	}
 
@@ -111,38 +133,48 @@ public class MidiTrackControlHelper {
 	/** draw background color & track control icons */
 	public static void draw() {
 		SurfaceViewBase.drawTriangleStrip(bgRectVb, Colors.BG_COLOR);
-		float y = height - MidiViewBean.minTrackHeight;
+		float y = GlobalVars.midiView.getBean().getHeight() - trackHeight
+				- MidiViewBean.Y_OFFSET;
 		for (ButtonRow buttonRow : buttonRows) {
 			buttonRow.draw(y);
-			y -= MidiViewBean.minTrackHeight;
+			y -= trackHeight;
 		}
 	}
 
-	public static void handlePress(float x, int track) {
+	public static boolean ownsPointer(int pointerId) {
+		return whichRowOwnsPointer.containsKey(pointerId);
+	}
+
+	public static void handlePress(int id, float x, int track) {
 		if (x > width || listener == null || track < 0
-				|| track >= buttonRows.size())
+				|| track >= buttonRows.size()) {
 			return;
+		}
 		ButtonRow selectedRow = buttonRows.get(track);
+		whichRowOwnsPointer.put(id, selectedRow);
 		selectedRow.handlePress(x);
 	}
 
-	public static void handleLongPress(float x, int track) {
-		if (x > width || listener == null || track < 0
-				|| track >= buttonRows.size())
-			return;
-		ButtonRow selectedRow = buttonRows.get(track);
-		selectedRow.handleLongPress(x);
+	public static void handleLongPress(int id, float x, int track) {
+		ButtonRow selectedRow = whichRowOwnsPointer.get(id);
+		if (selectedRow != null) {
+			selectedRow.handleLongPress(x);
+		}
 	}
 
-	public static void handleRelease(float x, int track) {
-		if (x > width || listener == null || track < 0
-				|| track >= buttonRows.size())
-			return;
-		ButtonRow selectedRow = buttonRows.get(track);
-		selectedRow.handleRelease(x);
+	public static void handleRelease(int id, float x, int track) {
+		ButtonRow selectedRow = whichRowOwnsPointer.get(id);
+		if (selectedRow != null) {
+			if (selectedRow.equals(buttonRows.get(track))) {
+				selectedRow.handleRelease(x);
+			}
+			selectedRow.releaseAll();
+		}
+		whichRowOwnsPointer.remove(id);
 	}
 
 	private static void initBgRectVb() {
-		bgRectVb = SurfaceViewBase.makeRectFloatBuffer(0, 0, width, height);
+		bgRectVb = SurfaceViewBase.makeRectFloatBuffer(0, 0, width, height
+				+ MidiViewBean.Y_OFFSET);
 	}
 }
