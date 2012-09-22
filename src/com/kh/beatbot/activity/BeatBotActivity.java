@@ -13,7 +13,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -23,7 +22,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
@@ -32,6 +30,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.MidiTrackControlListener;
@@ -45,7 +44,8 @@ import com.kh.beatbot.view.ThresholdBarView;
 import com.kh.beatbot.view.helper.LevelsViewHelper;
 import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
-public class BeatBotActivity extends Activity implements MidiTrackControlListener {
+public class BeatBotActivity extends Activity implements
+		MidiTrackControlListener {
 	private class FadeListener implements AnimationListener {
 		boolean fadeOut;
 
@@ -82,14 +82,6 @@ public class BeatBotActivity extends Activity implements MidiTrackControlListene
 
 	private long lastTapTime = 0;
 
-	private void initAndroidSettings() {
-		// remove title bar
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		// assign hardware (ringer) volume +/- to media while this application
-		// has focus
-		setVolumeControlStream(AudioManager.STREAM_MUSIC);
-	}
-
 	private void initLevelsIconGroup() {
 		levelsGroup = (ViewGroup) findViewById(R.id.levelsLayout);
 		volume = (ToggleButton) findViewById(R.id.volumeButton);
@@ -110,7 +102,8 @@ public class BeatBotActivity extends Activity implements MidiTrackControlListene
 	private void initSelectInstrumentAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose Instrument");
-		builder.setItems(GlobalVars.currentInstruments.toArray(new String[GlobalVars.currentInstruments.size()]),
+		builder.setItems(GlobalVars.currentInstruments
+				.toArray(new String[GlobalVars.currentInstruments.size()]),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
 						addTrack(item);
@@ -179,7 +172,7 @@ public class BeatBotActivity extends Activity implements MidiTrackControlListene
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		initAndroidSettings();
+		GeneralUtils.initAndroidSettings(this);
 		copyAllSamplesToStorage();
 		SurfaceViewBase.setResources(getResources());
 		setContentView(R.layout.main);
@@ -406,32 +399,33 @@ public class BeatBotActivity extends Activity implements MidiTrackControlListene
 	public void muteToggled(int track, boolean mute) {
 		Managers.playbackManager.muteTrack(track, mute);
 	}
-	
+
 	@Override
 	public void soloToggled(int track, boolean solo) {
 		Managers.playbackManager.soloTrack(track, solo);
 	}
-	
+
 	@Override
 	public void trackLongPressed(int track) {
 		Managers.midiManager.selectRow(track);
 	}
-	
+
 	@Override
 	public void trackClicked(int track) {
 		launchSampleEditActivity(track);
 	}
-	
+
 	private void addTrack(int instrumentType) {
 		String instrumentName = GlobalVars.tracks.get(instrumentType).instrumentName;
 		addTrack(GlobalVars.tracks.get(instrumentType).getSampleBytes(0));
-		GlobalVars.tracks.add(new Track(instrumentName, GlobalVars.instrumentIcons.get(instrumentName)));
+		GlobalVars.tracks.add(new Track(instrumentName,
+				GlobalVars.instrumentIcons.get(instrumentName)));
 		GlobalVars.currentInstruments.add(instrumentName);
 		GlobalVars.midiView.updateTracks();
 		// launch sample edit activity for the newly added track
 		launchSampleEditActivity(GlobalVars.tracks.size() - 1);
 	}
-	
+
 	public static native void addTrack(byte[] bytes);
 
 	public static native boolean createAudioPlayer();

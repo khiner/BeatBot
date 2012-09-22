@@ -552,11 +552,11 @@ public class MidiView extends ClickableSurfaceView {
 		return adjustedTickDiff;
 	}
 
-	private int getAdjustedNoteDiff(int noteDiff) {
-		if (noteDiff == 0)
-			return 0;
+	private int getAdjustedNoteDiff(int noteDiff, MidiNote singleNote) {
 		int adjustedNoteDiff = noteDiff;
 		for (MidiNote selectedNote : midiManager.getSelectedNotes()) {
+			if (singleNote != null && !selectedNote.equals(singleNote))
+				continue;
 			if (selectedNote.getNoteValue() + noteDiff < 0
 					&& selectedNote.getNoteValue() > adjustedNoteDiff)
 				adjustedNoteDiff = -selectedNote.getNoteValue();
@@ -677,8 +677,8 @@ public class MidiView extends ClickableSurfaceView {
 				- touchedNote.getOnTick();
 		if (noteDiff == 0 && tickDiff == 0)
 			return;
-		tickDiff = getAdjustedTickDiff(tickDiff, pointerId, null);
-		noteDiff = getAdjustedNoteDiff(noteDiff);
+		tickDiff = getAdjustedTickDiff(tickDiff, pointerId, dragAllSelected ? null : touchedNote);
+		noteDiff = getAdjustedNoteDiff(noteDiff, dragAllSelected ? null : touchedNote);
 		List<MidiNote> notesToDrag = dragAllSelected ? midiManager
 				.getSelectedNotes() : Arrays.asList(touchedNote);
 		// dragging one note - drag all selected notes together
@@ -753,8 +753,6 @@ public class MidiView extends ClickableSurfaceView {
 			// two finger zoom
 			float leftX = Math.min(e.getX(0), e.getX(1));
 			float rightX = Math.max(e.getX(0), e.getX(1));
-			// just in case we are long pressing in the same loc with one pointer,
-			cancelSelectRegion();
 			TickWindowHelper.zoom(leftX - MidiViewBean.X_OFFSET, rightX
 					- MidiViewBean.X_OFFSET);
 		}
@@ -841,6 +839,8 @@ public class MidiView extends ClickableSurfaceView {
 					bean.setScrollAnchorTick(xToTick(x));
 					bean.setScrollPointerId(id);
 				} else {
+					// can never select region with two pointers in midi view
+					cancelSelectRegion();
 					// init zoom anchors (the same ticks should be under the
 					// fingers at all times)
 					bean.setZoomLeftAnchorTick(leftTick);

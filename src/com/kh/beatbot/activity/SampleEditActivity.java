@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -27,6 +26,7 @@ import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremelo;
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listenable.LabelListListenable;
 import com.kh.beatbot.listenable.LevelListenable;
@@ -183,8 +183,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		super.onCreate(savedInstanceState);
 		trackNum = currInstrumentNum = getIntent().getExtras().getInt(
 				"trackNum");
-		// remove title bar
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		GeneralUtils.initAndroidSettings(this);
 		setContentView(R.layout.sample_edit);
 		// set text font
 		((TextView) findViewById(R.id.effectsLabel))

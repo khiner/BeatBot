@@ -10,11 +10,11 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.manager.Managers;
 
 public class MidiFileMenuActivity extends Activity {
@@ -31,8 +31,7 @@ public class MidiFileMenuActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// remove title bar
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		GeneralUtils.initAndroidSettings(this);
 		setContentView(R.layout.midi_menu);
 		
 		baseFilePath = createBasePath();

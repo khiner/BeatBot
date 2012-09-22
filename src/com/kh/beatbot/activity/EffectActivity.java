@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ToggleButton;
@@ -22,6 +21,7 @@ import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Effect.EffectParam;
 import com.kh.beatbot.effect.Filter;
+import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.layout.EffectControlLayout;
 import com.kh.beatbot.listenable.LevelListenable;
@@ -117,7 +117,7 @@ public class EffectActivity extends Activity implements LevelListener,
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE); // remove title bar
+		GeneralUtils.initAndroidSettings(this);
 		int effectId = getIntent().getExtras().getInt("effectId");
 		int trackNum = getIntent().getExtras().getInt("trackNum");
 		effect = GlobalVars.tracks.get(trackNum).findEffectById(effectId);
