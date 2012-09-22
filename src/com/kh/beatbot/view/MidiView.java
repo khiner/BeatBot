@@ -593,6 +593,11 @@ public class MidiView extends ClickableSurfaceView {
 		bean.setSelectRegion(true);
 	}
 
+	private void cancelSelectRegion() {
+		bean.setSelectRegion(false);
+		selectRegionVb = null;
+	}
+	
 	// adds a note starting at the nearest major tick (nearest displayed
 	// grid line) to the left and ending one tick before the nearest major
 	// tick to the right of the given tick
@@ -748,6 +753,8 @@ public class MidiView extends ClickableSurfaceView {
 			// two finger zoom
 			float leftX = Math.min(e.getX(0), e.getX(1));
 			float rightX = Math.max(e.getX(0), e.getX(1));
+			// just in case we are long pressing in the same loc with one pointer,
+			cancelSelectRegion();
 			TickWindowHelper.zoom(leftX - MidiViewBean.X_OFFSET, rightX
 					- MidiViewBean.X_OFFSET);
 		}
@@ -935,7 +942,8 @@ public class MidiView extends ClickableSurfaceView {
 			MidiTrackControlHelper.handleLongPress(id, x, yToNote(y));
 			return;
 		}
-		startSelectRegion(x, y);
+		if (myPointers.size() == 1)
+			startSelectRegion(x, y);
 	}
 
 	@Override
