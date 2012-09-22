@@ -141,8 +141,14 @@ public class MidiTrackControlHelper {
 
 	public static void init() {
 		for (int i = 0; i < GlobalVars.tracks.size(); i++) {
-			buttonRows.add(new ButtonRow(i,
-					GlobalVars.tracks.get(i).instrumentIcon));
+			// this static class can be reinstantiated after switching between views.  make sure we're not re-adding rows
+			if (i < buttonRows.size()) {
+				buttonRows.set(i, new ButtonRow(i,
+						GlobalVars.tracks.get(i).instrumentIcon));
+			} else {
+				buttonRows.add(new ButtonRow(i,
+						GlobalVars.tracks.get(i).instrumentIcon));
+			}
 		}
 		width = buttonRows.get(0).width;
 		MidiViewBean.X_OFFSET = width;
