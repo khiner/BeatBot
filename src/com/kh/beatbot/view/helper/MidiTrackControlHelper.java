@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.view.MotionEvent;
+
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.BeatBotButton;
 import com.kh.beatbot.global.BeatBotToggleButton;
@@ -13,6 +15,7 @@ import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.IconIds;
 import com.kh.beatbot.listener.MidiTrackControlListener;
+import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.SurfaceViewBase;
 import com.kh.beatbot.view.bean.MidiViewBean;
 
@@ -167,6 +170,14 @@ public class MidiTrackControlHelper {
 		return whichRowOwnsPointer.containsKey(pointerId);
 	}
 
+	public static int getNumPointersDown() {
+		return whichRowOwnsPointer.size();
+	}
+
+	public static void clearPointers() {
+		whichRowOwnsPointer.clear();
+	}
+
 	public static void handlePress(int id, float x, int track) {
 		if (x > width || listener == null || track < 0
 				|| track >= buttonRows.size()) {
@@ -175,6 +186,15 @@ public class MidiTrackControlHelper {
 		ButtonRow selectedRow = buttonRows.get(track);
 		whichRowOwnsPointer.put(id, selectedRow);
 		selectedRow.handlePress(x);
+	}
+
+	public static void handleMove(MotionEvent e) {
+		for (int i = 0; i < e.getPointerCount(); i++) {
+			int id = e.getPointerId(i);
+			if (ownsPointer(id)) {
+				handleMove(id, e.getX(id), MidiView.yToNote(e.getY(id)));
+			}
+		}
 	}
 
 	public static void handleMove(int id, float x, int track) {

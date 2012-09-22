@@ -12,6 +12,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
@@ -55,6 +56,8 @@ public class MidiView extends ClickableSurfaceView {
 	// (before dragging)
 	private Map<Integer, Float> startOnTicks = new HashMap<Integer, Float>();
 
+	private List<Integer> myPointers = new ArrayList<Integer>();
+	
 	public enum State {
 		LEVELS_VIEW, NORMAL_VIEW, TO_LEVELS_VIEW, TO_NORMAL_VIEW
 	};
@@ -425,13 +428,13 @@ public class MidiView extends ClickableSurfaceView {
 				/ bean.getWidth() + TickWindowHelper.getTickOffset();
 	}
 
-	public int yToNote(float y) {
+	public static int yToNote(float y) {
 		if (y >= 0 && y < MidiViewBean.Y_OFFSET)
 			return -1;
 		return (int) ((y - MidiViewBean.Y_OFFSET) / MidiTrackControlHelper.trackHeight);
 	}
 
-	public float noteToY(int note) {
+	public static float noteToY(int note) {
 		return note * MidiTrackControlHelper.trackHeight + MidiViewBean.Y_OFFSET;
 	}
 
@@ -720,17 +723,18 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	public void noMidiMove(MotionEvent e) {
-		if (e.getPointerCount() - bean.getNumLoopMarkersSelected() == 1) {
+		if (myPointers.size() - bean.getNumLoopMarkersSelected() == 1) {
 			if (bean.isSelectRegion()) { // update select region
-				selectRegion(e.getX(0), e.getY(0));
+				int index = e.findPointerIndex(myPointers.get(0));
+				selectRegion(e.getX(index), e.getY(index));
 			} else { // one finger scroll
-				if (bean.getScrollPointerId() < e.getPointerCount()) {
-					int index = e.findPointerIndex(bean.getScrollPointerId());
+				int index = e.findPointerIndex(bean.getScrollPointerId());
+				if (index < e.getPointerCount()) {
 					TickWindowHelper.scroll(e.getX(index)
 							- MidiViewBean.X_OFFSET);
 				}
 			}
-		} else if (e.getPointerCount() - bean.getNumLoopMarkersSelected() == 2) {
+		} else if (myPointers.size() - bean.getNumLoopMarkersSelected() == 2) {
 			// two finger zoom
 			float leftX = Math.min(e.getX(0), e.getX(1));
 			float rightX = Math.max(e.getX(0), e.getX(1));
@@ -755,6 +759,7 @@ public class MidiView extends ClickableSurfaceView {
 			MidiTrackControlHelper.handlePress(id, x, yToNote(y));
 			return;
 		}
+		myPointers.add(id);
 		ScrollBarHelper.startScrollView();
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			LevelsViewHelper.selectLevel(x, y, id);
@@ -777,11 +782,12 @@ public class MidiView extends ClickableSurfaceView {
 	@Override
 	protected void handleActionPointerDown(MotionEvent e, int id, float x,
 			float y) {
+		super.handleActionPointerDown(e, id, x, y);
 		if (x < MidiTrackControlHelper.width) {
 			MidiTrackControlHelper.handlePress(id, x, yToNote(y));
 			return;
 		}
-		super.handleActionPointerDown(e, id, x, y);
+		myPointers.add(id);
 		boolean noteAlreadySelected = false;
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			LevelsViewHelper.selectLevel(x, y, id);
@@ -789,7 +795,7 @@ public class MidiView extends ClickableSurfaceView {
 			noteAlreadySelected = !touchedNotes.isEmpty();
 			selectMidiNote(x, y, id);
 		}
-		if (e.getPointerCount() > 2)
+		if (myPointers.size() > 2)
 			return;
 		if (touchedNotes.get(id) == null
 				|| bean.getViewState() == State.LEVELS_VIEW
@@ -813,7 +819,7 @@ public class MidiView extends ClickableSurfaceView {
 					bean.setPinchRightOffset(touchedNote.getOffTick()
 							- rightTick);
 					bean.setPinch(true);
-				} else if (bean.getNumLoopMarkersSelected() != 0) {
+				} else if (myPointers.size() - bean.getNumLoopMarkersSelected() == 1) {
 					// otherwise, enable scrolling
 					bean.setScrollAnchorTick(xToTick(x));
 					bean.setScrollPointerId(id);
@@ -830,10 +836,7 @@ public class MidiView extends ClickableSurfaceView {
 	@Override
 	protected void handleActionMove(MotionEvent e) {
 		super.handleActionMove(e);
-		if (MidiTrackControlHelper.ownsPointer(e.getPointerId(e.getActionIndex()))) {
-			MidiTrackControlHelper.handleMove(e.getPointerId(e.getActionIndex()), e.getX(), yToNote(e.getY()));
-			return;
-		}
+		MidiTrackControlHelper.handleMove(e);
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			LevelsViewHelper.handleActionMove(e);
 			return;
@@ -845,15 +848,15 @@ public class MidiView extends ClickableSurfaceView {
 					.getPinchRightPointerId())));
 			pinchSelectedNotes(leftTick, rightTick);
 		} else if (!touchedNotes.isEmpty()) { // at least one midi selected
-			if (e.getPointerCount() - bean.getNumLoopMarkersSelected() == 1) {
+			if (myPointers.size() - bean.getNumLoopMarkersSelected() == 1) {
 				// drag all selected notes together
-				dragNotes(true, e.getPointerId(0), xToTick(e.getX(0)),
-						yToNote(e.getY(0)));
+				dragNotes(true, myPointers.get(0), xToTick(e.getX(e.findPointerIndex(myPointers.get(0)))),
+						yToNote(e.getY(e.findPointerIndex(myPointers.get(0)))));
 			} else {
 				// drag each touched note separately
-				for (int i = 0; i < e.getPointerCount(); i++) {
-					dragNotes(false, e.getPointerId(i), xToTick(e.getX(i)),
-							yToNote(e.getY(i)));
+				for (int pointerId : myPointers) {
+					dragNotes(false, pointerId, xToTick(e.getX(pointerId)),
+							yToNote(e.getY(pointerId)));
 				}
 			}
 			// make room in the view window if we are dragging out of the view
@@ -882,11 +885,12 @@ public class MidiView extends ClickableSurfaceView {
 			if (bean.getLoopPointerIds()[i] == id)
 				bean.setLoopPointerId(i, -1);
 		int index = e.getActionIndex() == 0 ? 1 : 0;
-		if (e.getPointerCount() == 2) {
+		if (bean.getZoomLeftAnchorTick() != -1) {
 			bean.setPinch(false);
 			bean.setScrollAnchorTick(xToTick(e.getX(index)));
 			bean.setScrollPointerId(e.getPointerId(index));
 		}
+		myPointers.remove((Object)id);
 	}
 
 	@Override
@@ -894,6 +898,7 @@ public class MidiView extends ClickableSurfaceView {
 		super.handleActionUp(id, x, y);
 		if (MidiTrackControlHelper.ownsPointer(id)) {
 			MidiTrackControlHelper.handleRelease(id, x, yToNote(y));
+			MidiTrackControlHelper.clearPointers();
 			return;
 		}
 		ScrollBarHelper.handleActionUp();
@@ -910,6 +915,7 @@ public class MidiView extends ClickableSurfaceView {
 			startOnTicks.clear();
 			touchedNotes.clear();
 		}
+		myPointers.clear();
 	}
 
 	@Override

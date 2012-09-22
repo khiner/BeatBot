@@ -237,6 +237,12 @@ public class SampleWaveformView extends SurfaceViewBase {
 		initAdsrVb();
 	}
 
+	private void stopPreviewing() {
+		previewPointerId = -1;
+		previewButton.release();
+		Managers.playbackManager.stopTrack(trackNum);
+	}
+	
 	private float sampleToX(float sample) {
 		return (sample - sampleOffset) * waveformWidth / sampleWidth
 				+ previewButtonWidth + SNAP_DIST / 2;
@@ -583,8 +589,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 				if (e.getX(i) > previewButtonWidth) {
 					// if a click goes down on the preview button,
 					// then moves out of it into wave, stop previewing
-					previewPointerId = -1;
-					Managers.playbackManager.stopTrack(trackNum);
+					stopPreviewing();
 				}
 			} else if (!moveAdsrPoint(id, e.getX(i), e.getY(i))
 					&& !moveLoopMarker(id, e.getX(i)))

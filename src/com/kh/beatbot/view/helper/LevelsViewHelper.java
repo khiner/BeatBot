@@ -170,7 +170,7 @@ public class LevelsViewHelper {
 
 	public static void selectLevelNote(float x, float y) {
 		float tick = midiView.xToTick(x);
-		float note = midiView.yToNote(y);
+		float note = MidiView.yToNote(y);
 
 		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
 			if (midiNote.getNoteValue() == note && midiNote.getOnTick() <= tick
