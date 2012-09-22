@@ -475,7 +475,7 @@ public class MidiView extends ClickableSurfaceView {
 	public void updateTracks() {
 		int newTrackIndex = GlobalVars.tracks.size() - 1;
 		MidiTrackControlHelper.addTrack(newTrackIndex,
-				GlobalVars.tracks.get(newTrackIndex).instrumentIcon);
+				GlobalVars.tracks.get(newTrackIndex).getInstrument().getIcon());
 		initAllVbs();
 	}
 

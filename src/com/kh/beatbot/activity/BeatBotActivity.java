@@ -102,8 +102,7 @@ public class BeatBotActivity extends Activity implements
 	private void initSelectInstrumentAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose Instrument");
-		builder.setItems(GlobalVars.currentInstruments
-				.toArray(new String[GlobalVars.currentInstruments.size()]),
+		builder.setItems(GlobalVars.allInstrumentTypes,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
 						addTrack(item);
@@ -161,7 +160,7 @@ public class BeatBotActivity extends Activity implements
 		File appDirectoryFile = new File(GlobalVars.appDirectory);
 		// build the directory structure, if needed
 		appDirectoryFile.mkdirs();
-		for (String instrumentName : GlobalVars.currentInstruments) {
+		for (String instrumentName : GlobalVars.currentInstrumentNames) {
 			// the sample folder for this sample type does not yet exist.
 			// create it and write all assets of this type to the folder
 			copyFromAssetsToExternal(instrumentName);
@@ -279,7 +278,7 @@ public class BeatBotActivity extends Activity implements
 		createEngine();
 		createAudioPlayer();
 		for (int trackNum = 0; trackNum < GlobalVars.tracks.size(); trackNum++) {
-			addTrack(GlobalVars.tracks.get(trackNum).getSampleBytes(0));
+			addTrack(GlobalVars.tracks.get(trackNum).getInstrument().getSampleBytes(0));
 		}
 	}
 
@@ -416,11 +415,10 @@ public class BeatBotActivity extends Activity implements
 	}
 
 	private void addTrack(int instrumentType) {
-		String instrumentName = GlobalVars.tracks.get(instrumentType).instrumentName;
-		addTrack(GlobalVars.tracks.get(instrumentType).getSampleBytes(0));
-		GlobalVars.tracks.add(new Track(instrumentName,
-				GlobalVars.instrumentIcons.get(instrumentName)));
-		GlobalVars.currentInstruments.add(instrumentName);
+		String instrumentName = GlobalVars.allInstrumentTypes[instrumentType];
+		addTrack(GlobalVars.instruments.get(instrumentName).getSampleBytes(0));
+		GlobalVars.tracks.add(new Track(GlobalVars.instruments.get(instrumentName)));
+		GlobalVars.currentInstrumentNames.add(instrumentName);
 		GlobalVars.midiView.updateTracks();
 		// launch sample edit activity for the newly added track
 		launchSampleEditActivity(GlobalVars.tracks.size() - 1);

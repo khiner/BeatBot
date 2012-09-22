@@ -198,11 +198,11 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		// set the instrument icon
 		((ImageButton) findViewById(R.id.instrumentButton))
 				.setBackgroundResource(GlobalVars.instrumentSources
-						.get(GlobalVars.currentInstruments
+						.get(GlobalVars.currentInstrumentNames
 								.get(currInstrumentNum)));
 		// set the instrument text
 		((Button) findViewById(R.id.sampleSelect)).setText(GlobalVars.tracks
-				.get(currInstrumentNum).sampleNames[0]);
+				.get(currInstrumentNum).getInstrument().getSampleName(0));
 		initLevels();
 		initSampleLabelList();
 		initEffectLabelList();
@@ -215,17 +215,17 @@ public class SampleEditActivity extends Activity implements LevelListener {
 
 	private void setSample(int instrumentNum, int sampleNum) {
 		setSampleBytes(trackNum, GlobalVars.tracks.get(instrumentNum)
-				.getSampleBytes(sampleNum));
+				.getInstrument().getSampleBytes(sampleNum));
 		((Button) findViewById(R.id.sampleSelect)).setText(GlobalVars.tracks
-				.get(instrumentNum).sampleNames[sampleNum]);
+				.get(instrumentNum).getInstrument().getSampleName(sampleNum));
 		sampleWaveformView.setSamples(getSampleFloats(trackNum));
 	}
 
 	private void initSelectInstrumentAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose Instrument");
-		builder.setItems(GlobalVars.currentInstruments
-				.toArray(new String[GlobalVars.currentInstruments.size()]),
+		builder.setItems(GlobalVars.currentInstrumentNames
+				.toArray(new String[GlobalVars.currentInstrumentNames.size()]),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
 						setSample(item, 0);
@@ -233,7 +233,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 						// update instrument icon to reflect the change
 						((ImageButton) findViewById(R.id.instrumentButton))
 								.setBackgroundResource(GlobalVars.instrumentSources
-										.get(GlobalVars.currentInstruments
+										.get(GlobalVars.currentInstrumentNames
 												.get(item)));
 						// update the sample select alert names with the new
 						// instrument samples
@@ -246,7 +246,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	private void initSelectSampleAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose Sample");
-		builder.setItems(GlobalVars.tracks.get(currInstrumentNum).sampleNames,
+		builder.setItems(GlobalVars.tracks.get(currInstrumentNum).getInstrument().getSampleNames(),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
 						setSample(currInstrumentNum, item);

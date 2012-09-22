@@ -1,33 +1,23 @@
 package com.kh.beatbot.global;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.effect.Effect;
 
 public class Track {
-	public String instrumentName;
+	private Instrument instrument;
 	public List<Effect> effects;
-	public BeatBotIconSource instrumentIcon;
 	public float volume = .8f;
 	public float pan = .5f;
 	public float pitch = .5f;
 	public float[][] adsrPoints;
 	public float sampleLoopBegin = 0;
 	public float sampleLoopEnd = 0;
-	public File[] samples;
-	public String[] sampleNames;
 	
-	public Track(String instrumentName, BeatBotIconSource instrumentIcon) {
-		this.instrumentName = instrumentName;
-		this.instrumentIcon = instrumentIcon;
-		File dir = new File(GlobalVars.appDirectory + instrumentName);
+	public Track(Instrument instrument) {
+		this.instrument = instrument;
 		effects = new ArrayList<Effect>();
-		samples = dir.listFiles();
-		sampleNames = dir.list();
 		initDefaultAdsrPoints();
 	}
 	
@@ -43,21 +33,6 @@ public class Track {
 		adsrPoints[2][1] = .60f;
 		adsrPoints[3][1] = .60f;
 		adsrPoints[4][1] = 0;
-	}
-	
-	public byte[] getSampleBytes(int sampleNum) {
-		byte[] bytes = null;
-		try {
-			File sampleFile = samples[sampleNum];
-			FileInputStream in = new FileInputStream(sampleFile);
-			bytes = new byte[(int) sampleFile.length()];
-			in.read(bytes);
-			in.close();
-			in = null;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return bytes;
 	}
 	
 	public Effect findEffectById(int effectId) {
@@ -76,5 +51,9 @@ public class Track {
 			}
 		}
 		return null;
+	}
+	
+	public Instrument getInstrument() {
+		return instrument;
 	}
 }

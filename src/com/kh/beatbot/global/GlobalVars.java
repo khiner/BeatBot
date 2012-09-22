@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import android.graphics.Typeface;
-import android.util.Log;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.view.MidiView;
@@ -23,13 +22,15 @@ public class GlobalVars {
 	// time (in millis) for a long press in one location
 	public final static long LONG_CLICK_TIME = 500;
 
-	public static final ArrayList<String> currentInstruments = new ArrayList<String>(
+	public static final String[] allInstrumentTypes = { "kick", "snare", "hh_closed",
+		"hh_open", "rim", "recorded" };
+	public static final ArrayList<String> currentInstrumentNames = new ArrayList<String>(
 			Arrays.asList(new String[] { "kick", "snare", "hh_closed",
 					"hh_open", "rim" }));
 
 	public static final Map<String, Integer> instrumentSources = new HashMap<String, Integer>();
 	
-	public static Map<String, BeatBotIconSource> instrumentIcons = new HashMap<String, BeatBotIconSource>();
+	public static Map<String, Instrument> instruments = new HashMap<String, Instrument>();
 	static {
 		instrumentSources.put("kick", R.drawable.kick_icon_src);
 		instrumentSources.put("snare", R.drawable.snare_icon_src);
@@ -37,12 +38,6 @@ public class GlobalVars {
 		instrumentSources.put("hh_open", R.drawable.hh_open_icon_src);
 		instrumentSources.put("rim", R.drawable.rimshot_icon_src);
 		instrumentSources.put("recorded", R.drawable.microphone_icon_src);
-		instrumentIcons.put("kick", new BeatBotIconSource());
-		instrumentIcons.put("snare", new BeatBotIconSource());
-		instrumentIcons.put("hh_closed", new BeatBotIconSource());
-		instrumentIcons.put("hh_open", new BeatBotIconSource());
-		instrumentIcons.put("rim", new BeatBotIconSource());
-		instrumentIcons.put("recorded", new BeatBotIconSource());
 	}
 	
 	public static BeatBotIconSource muteIcon, soloIcon, previewIcon, beatSyncIcon;
@@ -61,9 +56,11 @@ public class GlobalVars {
 	public static float currBeatDivision;
 
 	public static void initTracks() {
-		for (String instrumentName : currentInstruments) {
-			tracks.add(new Track(instrumentName, instrumentIcons
-					.get(instrumentName)));
+		for (String instrumentName : allInstrumentTypes) {
+			Instrument instrument = new Instrument(instrumentName, new BeatBotIconSource()); 
+			instruments.put(instrumentName, instrument);
+			if (!instrumentName.equals("recorded"))
+				tracks.add(new Track(instrument));
 		}
 	}
 
@@ -74,17 +71,17 @@ public class GlobalVars {
 				R.drawable.solo_icon_selected);
 		previewIcon = new BeatBotIconSource(R.drawable.preview_icon, R.drawable.preview_icon_selected);
 		beatSyncIcon = new BeatBotIconSource(R.drawable.clock, R.drawable.note_icon);
-		instrumentIcons.get("kick").set(R.drawable.kick_icon_small,
+		instruments.get("kick").setIconResources(R.drawable.kick_icon_small,
 				R.drawable.kick_icon_selected_small);
-		instrumentIcons.get("snare").set(R.drawable.snare_icon_small,
+		instruments.get("snare").setIconResources(R.drawable.snare_icon_small,
 						R.drawable.snare_icon_selected_small);
-		instrumentIcons.get("hh_closed").set(R.drawable.hh_closed_icon_small,
+		instruments.get("hh_closed").setIconResources(R.drawable.hh_closed_icon_small,
 				R.drawable.hh_closed_icon_selected_small);
-		instrumentIcons.get("hh_open").set(R.drawable.hh_open_icon_small,
+		instruments.get("hh_open").setIconResources(R.drawable.hh_open_icon_small,
 				R.drawable.hh_open_icon_selected_small);
-		instrumentIcons.get("rim").set(R.drawable.rimshot_icon_small,
+		instruments.get("rim").setIconResources(R.drawable.rimshot_icon_small,
 				R.drawable.rimshot_icon_selected_small);
-		instrumentIcons.get("recorded").set(R.drawable.microphone_icon_small,
+		instruments.get("recorded").setIconResources(R.drawable.microphone_icon_small,
 				R.drawable.microphone_icon_selected_small);
 	}
 }
