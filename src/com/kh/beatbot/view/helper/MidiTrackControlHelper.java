@@ -50,6 +50,14 @@ public class MidiTrackControlHelper {
 			}
 		}
 
+		public void handleMove(float x) {
+			BeatBotButton currentSelected = getSelectedButton();
+			if (currentSelected != null
+					&& !currentSelected.equals(getButton(x))) {
+				currentSelected.release();
+			}
+		}
+
 		public void handleLongPress(float x) {
 			BeatBotButton pressedButton = getButton(x);
 			if (pressedButton.equals(instrumentButton)
@@ -62,19 +70,20 @@ public class MidiTrackControlHelper {
 		public void handleRelease(float x) {
 			BeatBotButton releasedButton = getButton(x);
 			if (releasedButton != null) {
-				if (releasedButton.equals(instrumentButton) && releasedButton.isTouched()) {
+				if (releasedButton.equals(instrumentButton)
+						&& releasedButton.isTouched()) {
 					listener.trackClicked(trackNum);
 				} else if (releasedButton.equals(muteButton)) {
 					((BeatBotToggleButton) releasedButton).toggle();
 					listener.muteToggled(trackNum,
 							((BeatBotToggleButton) releasedButton).isOn());
 				} else if (releasedButton.equals(soloButton)) {
-					BeatBotToggleButton soloButton = ((BeatBotToggleButton) releasedButton); 
+					BeatBotToggleButton soloButton = ((BeatBotToggleButton) releasedButton);
 					soloButton.toggle();
-					listener.soloToggled(trackNum,
-							soloButton.isOn());
+					listener.soloToggled(trackNum, soloButton.isOn());
 					if (soloButton.isOn()) {
-						// if this track is soloing, set all other solo icons to inactive.
+						// if this track is soloing, set all other solo icons to
+						// inactive.
 						for (ButtonRow buttonRow : buttonRows) {
 							if (!buttonRow.equals(this)) {
 								buttonRow.soloButton.setOn(false);
@@ -99,6 +108,18 @@ public class MidiTrackControlHelper {
 					+ buttonRows.get(0).muteButton.getIconWidth()) {
 				return muteButton;
 			} else if (x < width) {
+				return soloButton;
+			} else {
+				return null;
+			}
+		}
+
+		private BeatBotButton getSelectedButton() {
+			if (instrumentButton.isTouched()) {
+				return instrumentButton;
+			} else if (muteButton.isTouched()) {
+				return muteButton;
+			} else if (soloButton.isTouched()) {
 				return soloButton;
 			} else {
 				return null;
@@ -154,6 +175,15 @@ public class MidiTrackControlHelper {
 		ButtonRow selectedRow = buttonRows.get(track);
 		whichRowOwnsPointer.put(id, selectedRow);
 		selectedRow.handlePress(x);
+	}
+
+	public static void handleMove(int id, float x, int track) {
+		ButtonRow selectedRow = buttonRows.get(track);
+		if (selectedRow.equals(whichRowOwnsPointer.get(id))) {
+			selectedRow.handleMove(x);
+		} else {
+			whichRowOwnsPointer.get(id).releaseAll();
+		}
 	}
 
 	public static void handleLongPress(int id, float x, int track) {

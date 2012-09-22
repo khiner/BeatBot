@@ -831,6 +831,7 @@ public class MidiView extends ClickableSurfaceView {
 	protected void handleActionMove(MotionEvent e) {
 		super.handleActionMove(e);
 		if (MidiTrackControlHelper.ownsPointer(e.getPointerId(e.getActionIndex()))) {
+			MidiTrackControlHelper.handleMove(e.getPointerId(e.getActionIndex()), e.getX(), yToNote(e.getY()));
 			return;
 		}
 		if (bean.getViewState() == State.LEVELS_VIEW) {
