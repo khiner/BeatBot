@@ -135,11 +135,15 @@ public class MidiView extends ClickableSurfaceView {
 		float rightTick = Math.max(tick, bean.getSelectRegionStartTick());
 		float topY = Math.min(y, bean.getSelectRegionStartY());
 		float bottomY = Math.max(y, bean.getSelectRegionStartY());
+		// make sure select rect doesn't go into the tick view
+		topY = Math.max(topY, MidiViewBean.Y_OFFSET);
+		// make sure select rect doesn't go past the last track/note
+		bottomY = Math.min(bottomY, MidiViewBean.Y_OFFSET + MidiTrackControlHelper.height - .01f);
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			LevelsViewHelper.selectRegion(leftTick, rightTick, topY, bottomY);
 		} else {
-			int topNote = yToNote(Math.min(y, bean.getSelectRegionStartY()));
-			int bottomNote = yToNote(Math.max(y, bean.getSelectRegionStartY()));
+			int topNote = yToNote(topY);
+			int bottomNote = yToNote(bottomY);
 			midiManager.selectRegion((long) leftTick, (long) rightTick,
 					topNote, bottomNote);
 			// for normal view, round the drawn rectangle to nearest notes
@@ -968,7 +972,7 @@ public class MidiView extends ClickableSurfaceView {
 				if (midiManager.anyNoteSelected()) {
 					midiManager.deselectAllNotes();
 				} else { // add a note based on the current tick granularity
-					if (note >= 0) {
+					if (note >= 0 && note < GlobalVars.tracks.size()) {
 						addMidiNote(tick, note);
 						bean.setStateChanged(true);
 					}

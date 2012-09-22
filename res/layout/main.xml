@@ -81,9 +81,8 @@
 
     <ImageButton
         android:id="@+id/addTrack"
-        android:layout_width="80dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/midiView"
         android:layout_below="@+id/leftControlButtons"
         android:layout_marginTop="4dp"
         android:background="@drawable/plus_icon_large"
@@ -93,7 +92,7 @@
         android:id="@+id/midiView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_below="@+id/thresholdLabel"
+        android:layout_below="@+id/addTrack"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true" />
