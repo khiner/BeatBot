@@ -74,7 +74,7 @@ void Java_com_kh_beatbot_view_SampleWaveformView_setAdsrPoint(JNIEnv *env,
 	updateAdsr(config, config->totalSamples);
 }
 
-void Java_com_kh_beatbot_SampleEditActivity_setAdsrOn(JNIEnv *env, jclass clazz,
+void Java_com_kh_beatbot_activity_SampleEditActivity_setAdsrOn(JNIEnv *env, jclass clazz,
 		jint trackNum, jboolean on) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->adsr->on = on;

@@ -11,7 +11,7 @@ import com.kh.beatbot.effect.Effect;
 public class Track {
 	public String instrumentName;
 	public List<Effect> effects;
-	public IconIds instrumentIcon;
+	public BeatBotIconSource instrumentIcon;
 	public float volume = .8f;
 	public float pan = .5f;
 	public float pitch = .5f;
@@ -21,7 +21,7 @@ public class Track {
 	public File[] samples;
 	public String[] sampleNames;
 	
-	public Track(String instrumentName, IconIds instrumentIcon) {
+	public Track(String instrumentName, BeatBotIconSource instrumentIcon) {
 		this.instrumentName = instrumentName;
 		this.instrumentIcon = instrumentIcon;
 		File dir = new File(GlobalVars.appDirectory + instrumentName);

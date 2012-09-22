@@ -28,6 +28,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.GlobalVars;
 
 public abstract class SurfaceViewBase extends SurfaceView implements
 		SurfaceHolder.Callback, Runnable {
@@ -265,6 +266,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		egl.eglMakeCurrent(dpy, surface, surface, context);
 
 		gl = (GL10) context.getGL();
+		GlobalVars.initIcons();
 		
 		gl.glViewport(0, 0, width, height);
 		GLU.gluOrtho2D(gl, 0, width, height, 0);

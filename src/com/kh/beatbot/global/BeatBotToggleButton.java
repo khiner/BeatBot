@@ -4,8 +4,8 @@ public class BeatBotToggleButton extends BeatBotButton {
 	boolean on = false;
 	boolean touched = false;
 
-	public BeatBotToggleButton(int defaultResource, int selectedRecource) {
-		super(defaultResource, selectedRecource);
+	public BeatBotToggleButton(BeatBotIconSource iconSource) {
+		super(iconSource);
 	}
 
 	@Override

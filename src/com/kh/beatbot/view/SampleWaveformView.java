@@ -9,7 +9,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import com.kh.beatbot.R;
 import com.kh.beatbot.global.BeatBotButton;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
@@ -224,7 +223,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	protected void init() {
 		// preview button is 80dpX80dp, but that is not the same as a height of
 		// '80'. 80dp will be the height
-		previewButton = new BeatBotButton(R.drawable.preview_icon, R.drawable.preview_icon_selected);
+		previewButton = new BeatBotButton(GlobalVars.previewIcon);
 		setBackgroundColor(BG_COLOR);
 		previewButtonWidth = height;
 		waveformWidth = width - previewButtonWidth - SNAP_DIST;

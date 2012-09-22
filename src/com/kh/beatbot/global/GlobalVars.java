@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import android.graphics.Typeface;
+import android.util.Log;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.view.MidiView;
@@ -26,31 +27,26 @@ public class GlobalVars {
 			Arrays.asList(new String[] { "kick", "snare", "hh_closed",
 					"hh_open", "rim" }));
 
-	public static final Map<String, IconIds> instrumentIcons = new HashMap<String, IconIds>();
+	public static final Map<String, Integer> instrumentSources = new HashMap<String, Integer>();
+	
+	public static Map<String, BeatBotIconSource> instrumentIcons = new HashMap<String, BeatBotIconSource>();
 	static {
-		instrumentIcons.put("kick", new IconIds(R.drawable.kick_icon_small,
-				R.drawable.kick_icon_selected_small, R.drawable.kick_icon_src));
-		instrumentIcons.put("snare",
-				new IconIds(R.drawable.snare_icon_small,
-						R.drawable.snare_icon_selected_small,
-						R.drawable.snare_icon_src));
-		instrumentIcons.put("hh_closed", new IconIds(
-				R.drawable.hh_closed_icon_small,
-				R.drawable.hh_closed_icon_selected_small,
-				R.drawable.hh_closed_icon_src));
-		instrumentIcons.put("hh_open", new IconIds(
-				R.drawable.hh_open_icon_small,
-				R.drawable.hh_open_icon_selected_small,
-				R.drawable.hh_open_icon_src));
-		instrumentIcons.put("rim", new IconIds(R.drawable.rimshot_icon_small,
-				R.drawable.rimshot_icon_selected_small,
-				R.drawable.rimshot_icon_src));
-		instrumentIcons.put("recorded", new IconIds(
-				R.drawable.microphone_icon_small,
-				R.drawable.microphone_icon_selected_small,
-				R.drawable.microphone_icon_src));
+		instrumentSources.put("kick", R.drawable.kick_icon_src);
+		instrumentSources.put("snare", R.drawable.snare_icon_src);
+		instrumentSources.put("hh_closed", R.drawable.hh_closed_icon_src);
+		instrumentSources.put("hh_open", R.drawable.hh_open_icon_src);
+		instrumentSources.put("rim", R.drawable.rimshot_icon_src);
+		instrumentSources.put("recorded", R.drawable.microphone_icon_src);
+		instrumentIcons.put("kick", new BeatBotIconSource());
+		instrumentIcons.put("snare", new BeatBotIconSource());
+		instrumentIcons.put("hh_closed", new BeatBotIconSource());
+		instrumentIcons.put("hh_open", new BeatBotIconSource());
+		instrumentIcons.put("rim", new BeatBotIconSource());
+		instrumentIcons.put("recorded", new BeatBotIconSource());
 	}
-
+	
+	public static BeatBotIconSource muteIcon, soloIcon, previewIcon, beatSyncIcon;
+	
 	public static final int UNDO_STACK_SIZE = 40;
 	public static final int NUM_EFFECTS = 7;
 	public static final short LEVEL_MAX = 127;
@@ -64,10 +60,31 @@ public class GlobalVars {
 	public static List<Track> tracks = new ArrayList<Track>();
 	public static float currBeatDivision;
 
-	public static void init() {
+	public static void initTracks() {
 		for (String instrumentName : currentInstruments) {
 			tracks.add(new Track(instrumentName, instrumentIcons
 					.get(instrumentName)));
 		}
+	}
+
+	public static void initIcons() {
+		muteIcon = new BeatBotIconSource(R.drawable.mute_icon,
+				R.drawable.mute_icon_selected);
+		soloIcon = new BeatBotIconSource(R.drawable.solo_icon,
+				R.drawable.solo_icon_selected);
+		previewIcon = new BeatBotIconSource(R.drawable.preview_icon, R.drawable.preview_icon_selected);
+		beatSyncIcon = new BeatBotIconSource(R.drawable.clock, R.drawable.note_icon);
+		instrumentIcons.get("kick").set(R.drawable.kick_icon_small,
+				R.drawable.kick_icon_selected_small);
+		instrumentIcons.get("snare").set(R.drawable.snare_icon_small,
+						R.drawable.snare_icon_selected_small);
+		instrumentIcons.get("hh_closed").set(R.drawable.hh_closed_icon_small,
+				R.drawable.hh_closed_icon_selected_small);
+		instrumentIcons.get("hh_open").set(R.drawable.hh_open_icon_small,
+				R.drawable.hh_open_icon_selected_small);
+		instrumentIcons.get("rim").set(R.drawable.rimshot_icon_small,
+				R.drawable.rimshot_icon_selected_small);
+		instrumentIcons.get("recorded").set(R.drawable.microphone_icon_small,
+				R.drawable.microphone_icon_selected_small);
 	}
 }

@@ -168,10 +168,10 @@ public class BeatBotActivity extends Activity implements MidiTrackControlListene
 		File appDirectoryFile = new File(GlobalVars.appDirectory);
 		// build the directory structure, if needed
 		appDirectoryFile.mkdirs();
-		for (String sampleType : GlobalVars.instrumentIcons.keySet()) {
+		for (String instrumentName : GlobalVars.currentInstruments) {
 			// the sample folder for this sample type does not yet exist.
 			// create it and write all assets of this type to the folder
-			copyFromAssetsToExternal(sampleType);
+			copyFromAssetsToExternal(instrumentName);
 		}
 	}
 
@@ -185,7 +185,7 @@ public class BeatBotActivity extends Activity implements MidiTrackControlListene
 		setContentView(R.layout.main);
 		initLevelsIconGroup();
 		initSelectInstrumentAlert();
-		GlobalVars.init();
+		GlobalVars.initTracks();
 		// recorded type
 		if (savedInstanceState == null) {
 			initNativeAudio();
@@ -427,9 +427,9 @@ public class BeatBotActivity extends Activity implements MidiTrackControlListene
 		addTrack(GlobalVars.tracks.get(instrumentType).getSampleBytes(0));
 		GlobalVars.tracks.add(new Track(instrumentName, GlobalVars.instrumentIcons.get(instrumentName)));
 		GlobalVars.currentInstruments.add(instrumentName);
-		//((ArrayAdapter<String>)sampleListView.getAdapter()).notifyDataSetChanged();
+		GlobalVars.midiView.updateTracks();
 		// launch sample edit activity for the newly added track
-		// launchSampleEditActivity(GlobalVars.tracks.size() - 1);
+		launchSampleEditActivity(GlobalVars.tracks.size() - 1);
 	}
 	
 	public static native void addTrack(byte[] bytes);

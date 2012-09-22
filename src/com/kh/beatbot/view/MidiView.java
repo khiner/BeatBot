@@ -56,7 +56,7 @@ public class MidiView extends ClickableSurfaceView {
 	private Map<Integer, Float> startOnTicks = new HashMap<Integer, Float>();
 
 	private List<Integer> myPointers = new ArrayList<Integer>();
-	
+
 	public enum State {
 		LEVELS_VIEW, NORMAL_VIEW, TO_LEVELS_VIEW, TO_NORMAL_VIEW
 	};
@@ -72,7 +72,6 @@ public class MidiView extends ClickableSurfaceView {
 		}
 	}
 
-	
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
@@ -80,7 +79,7 @@ public class MidiView extends ClickableSurfaceView {
 		bean.setWidth(width);
 		bean.setHeight(height);
 	}
-	
+
 	public void initMeFirst() {
 		midiManager = Managers.midiManager;
 		TickWindowHelper.viewBean = bean;
@@ -358,17 +357,20 @@ public class MidiView extends ClickableSurfaceView {
 
 	private void initBgRectVb() {
 		bgRectVb = makeRectFloatBuffer(MidiViewBean.X_OFFSET,
-				MidiViewBean.Y_OFFSET, width, MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET);
+				MidiViewBean.Y_OFFSET, width, MidiTrackControlHelper.height
+						+ MidiViewBean.Y_OFFSET);
 	}
 
 	private void initLoopRectVb() {
 		loopRectVb = makeRectFloatBuffer(
 				tickToX(midiManager.getLoopBeginTick()), MidiViewBean.Y_OFFSET,
-				tickToX(midiManager.getLoopEndTick()), MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET);
+				tickToX(midiManager.getLoopEndTick()),
+				MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET);
 	}
 
 	private void initCurrTickVb() {
-		float[] vertLine = new float[] { 0, MidiViewBean.Y_OFFSET, 0, MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET };
+		float[] vertLine = new float[] { 0, MidiViewBean.Y_OFFSET, 0,
+				MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET };
 		currTickVb = makeFloatBuffer(vertLine);
 	}
 
@@ -407,7 +409,8 @@ public class MidiView extends ClickableSurfaceView {
 
 	private void initLoopMarkerVbs() {
 		float h = MidiViewBean.Y_OFFSET;
-		float[] loopMarkerLine = new float[] { 0, 0, 0, MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET };
+		float[] loopMarkerLine = new float[] { 0, 0, 0,
+				MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET };
 		// loop begin triangle, pointing right, and
 		// loop end triangle, pointing left
 		float[] loopMarkerTriangles = new float[] { 0, 0, 0, h, h, h / 2, 0, 0,
@@ -434,7 +437,8 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	public static float noteToY(int note) {
-		return note * MidiTrackControlHelper.trackHeight + MidiViewBean.Y_OFFSET;
+		return note * MidiTrackControlHelper.trackHeight
+				+ MidiViewBean.Y_OFFSET;
 	}
 
 	public void signalRecording() {
@@ -461,6 +465,13 @@ public class MidiView extends ClickableSurfaceView {
 		MidiTrackControlHelper.init();
 		waveformHelper = new WaveformHelper();
 		TickWindowHelper.updateGranularity();
+		initAllVbs();
+	}
+
+	public void updateTracks() {
+		int newTrackIndex = GlobalVars.tracks.size() - 1;
+		MidiTrackControlHelper.addTrack(newTrackIndex,
+				GlobalVars.tracks.get(newTrackIndex).instrumentIcon);
 		initAllVbs();
 	}
 
@@ -506,7 +517,8 @@ public class MidiView extends ClickableSurfaceView {
 		}
 		drawLoopMarker();
 		drawSelectRegion();
-		ScrollBarHelper.drawScrollView(bean.getWidth(), MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET,
+		ScrollBarHelper.drawScrollView(bean.getWidth(),
+				MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET,
 				MidiViewBean.X_OFFSET);
 		drawRecordingWaveforms();
 		if (playing || recording) {
@@ -848,7 +860,8 @@ public class MidiView extends ClickableSurfaceView {
 		} else if (!touchedNotes.isEmpty()) { // at least one midi selected
 			if (myPointers.size() - bean.getNumLoopMarkersSelected() == 1) {
 				// drag all selected notes together
-				dragNotes(true, myPointers.get(0), xToTick(e.getX(e.findPointerIndex(myPointers.get(0)))),
+				dragNotes(true, myPointers.get(0),
+						xToTick(e.getX(e.findPointerIndex(myPointers.get(0)))),
 						yToNote(e.getY(e.findPointerIndex(myPointers.get(0)))));
 			} else {
 				// drag each touched note separately
@@ -888,7 +901,7 @@ public class MidiView extends ClickableSurfaceView {
 			bean.setScrollAnchorTick(xToTick(e.getX(index)));
 			bean.setScrollPointerId(e.getPointerId(index));
 		}
-		myPointers.remove((Object)id);
+		myPointers.remove((Object) id);
 	}
 
 	@Override
@@ -928,7 +941,7 @@ public class MidiView extends ClickableSurfaceView {
 	@Override
 	protected void singleTap(int id, float x, float y) {
 		if (x < MidiTrackControlHelper.width) {
-			//MidiTrackControlHelper.handleClick(x, yToNote(y));
+			// MidiTrackControlHelper.handleClick(x, yToNote(y));
 			return;
 		}
 		MidiNote touchedNote = touchedNotes.get(id);

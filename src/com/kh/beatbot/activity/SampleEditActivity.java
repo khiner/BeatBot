@@ -198,7 +198,9 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		initSelectSampleAlert();
 		// set the instrument icon
 		((ImageButton) findViewById(R.id.instrumentButton))
-				.setBackgroundResource(GlobalVars.tracks.get(currInstrumentNum).instrumentIcon.source);
+				.setBackgroundResource(GlobalVars.instrumentSources
+						.get(GlobalVars.currentInstruments
+								.get(currInstrumentNum)));
 		// set the instrument text
 		((Button) findViewById(R.id.sampleSelect)).setText(GlobalVars.tracks
 				.get(currInstrumentNum).sampleNames[0]);
@@ -223,15 +225,17 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	private void initSelectInstrumentAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose Instrument");
-		builder.setItems(GlobalVars.currentInstruments.toArray(new String[GlobalVars.currentInstruments.size()]),
+		builder.setItems(GlobalVars.currentInstruments
+				.toArray(new String[GlobalVars.currentInstruments.size()]),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
 						setSample(item, 0);
 						currInstrumentNum = item;
 						// update instrument icon to reflect the change
 						((ImageButton) findViewById(R.id.instrumentButton))
-								.setBackgroundResource(GlobalVars.tracks
-										.get(currInstrumentNum).instrumentIcon.source);
+								.setBackgroundResource(GlobalVars.instrumentSources
+										.get(GlobalVars.currentInstruments
+												.get(item)));
 						// update the sample select alert names with the new
 						// instrument samples
 						initSelectSampleAlert();

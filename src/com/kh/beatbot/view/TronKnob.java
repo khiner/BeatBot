@@ -8,8 +8,8 @@ import android.util.FloatMath;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
-import com.kh.beatbot.R;
 import com.kh.beatbot.global.BeatBotToggleButton;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 
@@ -39,8 +39,7 @@ public class TronKnob extends LevelListenable {
 	public void init() {
 		super.init();
 		if (clickable) {
-			centerButton = new BeatBotToggleButton(R.drawable.clock,
-					R.drawable.note_icon);
+			centerButton = new BeatBotToggleButton(GlobalVars.beatSyncIcon);
 			centerButton.setOn(true);
 		}
 	}

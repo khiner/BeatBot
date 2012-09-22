@@ -8,12 +8,11 @@ import java.util.Map;
 
 import android.view.MotionEvent;
 
-import com.kh.beatbot.R;
 import com.kh.beatbot.global.BeatBotButton;
+import com.kh.beatbot.global.BeatBotIconSource;
 import com.kh.beatbot.global.BeatBotToggleButton;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.global.IconIds;
 import com.kh.beatbot.listener.MidiTrackControlListener;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.SurfaceViewBase;
@@ -26,14 +25,12 @@ public class MidiTrackControlHelper {
 		BeatBotButton instrumentButton;
 		BeatBotToggleButton muteButton, soloButton;
 
-		public ButtonRow(int trackNum, IconIds iconIds) {
+		public ButtonRow(int trackNum, BeatBotIconSource instrumentIcon) {
 			this.trackNum = trackNum;
-			instrumentButton = new BeatBotButton(iconIds.defaultId,
-					iconIds.selectedId);
-			muteButton = new BeatBotToggleButton(R.drawable.mute_icon,
-					R.drawable.mute_icon_selected);
-			soloButton = new BeatBotToggleButton(R.drawable.solo_icon,
-					R.drawable.solo_icon_selected);
+			this.instrumentButton = new BeatBotButton(instrumentIcon);
+
+			muteButton = new BeatBotToggleButton(GlobalVars.muteIcon);
+			soloButton = new BeatBotToggleButton(GlobalVars.soloIcon);
 			width = instrumentButton.getIconWidth() + muteButton.getIconWidth()
 					+ soloButton.getIconWidth();
 		}
@@ -160,7 +157,13 @@ public class MidiTrackControlHelper {
 	public static void addListener(MidiTrackControlListener listener) {
 		MidiTrackControlHelper.listener = listener;
 	}
-
+	
+	public static void addTrack(int trackNum, BeatBotIconSource instrumentIcon) {
+		buttonRows.add(new ButtonRow(trackNum, instrumentIcon));
+		height = trackHeight * buttonRows.size();
+		initBgRectVb();
+	}
+	
 	/** draw background color & track control icons */
 	public static void draw() {
 		SurfaceViewBase.drawTriangleStrip(bgRectVb, Colors.BG_COLOR);
@@ -185,8 +188,7 @@ public class MidiTrackControlHelper {
 	}
 
 	public static void handlePress(int id, float x, int track) {
-		if (x > width || listener == null || track < 0
-				|| track >= buttonRows.size()) {
+		if (track < 0 || track >= buttonRows.size()) {
 			return;
 		}
 		ButtonRow selectedRow = buttonRows.get(track);
@@ -204,6 +206,9 @@ public class MidiTrackControlHelper {
 	}
 
 	public static void handleMove(int id, float x, int track) {
+		if (track < 0 || track >= buttonRows.size()) {
+			return;
+		}
 		ButtonRow selectedRow = buttonRows.get(track);
 		if (selectedRow.equals(whichRowOwnsPointer.get(id))) {
 			selectedRow.handleMove(x);
