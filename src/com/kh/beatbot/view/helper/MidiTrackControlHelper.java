@@ -56,12 +56,13 @@ public class MidiTrackControlHelper {
 					&& pressedButton.isTouched()) {
 				listener.trackLongPressed(trackNum);
 			}
+			instrumentButton.release();
 		}
 
 		public void handleRelease(float x) {
 			BeatBotButton releasedButton = getButton(x);
 			if (releasedButton != null) {
-				if (releasedButton.equals(instrumentButton)) {
+				if (releasedButton.equals(instrumentButton) && releasedButton.isTouched()) {
 					listener.trackClicked(trackNum);
 				} else if (releasedButton.equals(muteButton)) {
 					((BeatBotToggleButton) releasedButton).toggle();

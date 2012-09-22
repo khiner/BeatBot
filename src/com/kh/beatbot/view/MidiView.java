@@ -750,11 +750,11 @@ public class MidiView extends ClickableSurfaceView {
 
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
+		super.handleActionDown(id, x, y);
 		if (x < MidiTrackControlHelper.width) {
 			MidiTrackControlHelper.handlePress(id, x, yToNote(y));
 			return;
 		}
-		super.handleActionDown(id, x, y);
 		ScrollBarHelper.startScrollView();
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			LevelsViewHelper.selectLevel(x, y, id);
