@@ -60,6 +60,7 @@ public class LevelsViewHelper {
 	public static void init(MidiView _midiView) {
 		midiView = _midiView;
 		bean = midiView.getBean();
+		bean.setLevelsHeight(MidiViewBean.Y_OFFSET + MidiTrackControlHelper.height - MidiViewBean.LEVEL_POINT_SIZE);
 		gl = midiView.getGL10();
 		initLevelBarVb();
 	}
@@ -80,7 +81,7 @@ public class LevelsViewHelper {
 		float[] vertices = new float[800];
 		for (int i = 0; i < vertices.length / 4; i++) {
 			vertices[i * 4] = -LEVEL_BAR_WIDTH / 2;
-			vertices[i * 4 + 1] = bean.getHeight()
+			vertices[i * 4 + 1] = MidiViewBean.Y_OFFSET + MidiTrackControlHelper.height
 					- ((float) i / (vertices.length / 4))
 					* bean.getLevelsHeight();
 			vertices[i * 4 + 2] = LEVEL_BAR_WIDTH / 2;
@@ -330,12 +331,12 @@ public class LevelsViewHelper {
 	}
 
 	private static float levelToY(float level) {
-		return bean.getHeight() - MidiViewBean.LEVEL_POINT_SIZE / 2 - level
+		return MidiViewBean.Y_OFFSET + MidiTrackControlHelper.height - MidiViewBean.LEVEL_POINT_SIZE / 2 - level
 				* bean.getLevelsHeight();
 	}
 
 	private static float yToLevel(float y) {
-		return (bean.getHeight() - MidiViewBean.LEVEL_POINT_SIZE / 2 - y)
+		return (MidiViewBean.Y_OFFSET + MidiTrackControlHelper.height - MidiViewBean.LEVEL_POINT_SIZE / 2 - y)
 				/ bean.getLevelsHeight();
 	}
 

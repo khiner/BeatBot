@@ -288,7 +288,7 @@ public class MidiView extends ClickableSurfaceView {
 				color);
 	}
 
-	private void drawLoopSquare() {
+	private void drawLoopRect() {
 		float gray = bean.getBgColor() + .2f;
 		float[] color = new float[] { gray, gray, gray, 1 };
 		drawTriangleStrip(loopRectVb, color);
@@ -465,8 +465,8 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	protected void init() {
-		LevelsViewHelper.init(this);
 		MidiTrackControlHelper.init();
+		LevelsViewHelper.init(this);
 		waveformHelper = new WaveformHelper();
 		TickWindowHelper.updateGranularity();
 		initAllVbs();
@@ -500,9 +500,11 @@ public class MidiView extends ClickableSurfaceView {
 		boolean recording = RecordManager.getState() != RecordManager.State.INITIALIZING;
 		boolean playing = Managers.playbackManager.getState() == PlaybackManager.State.PLAYING;
 		TickWindowHelper.scroll();
+		// we need to do this in every frame, because even if loop ticks aren't changing
+		// the tick window can change 
 		initLoopRectVb();
 		drawTickFill();
-		drawLoopSquare();
+		drawLoopRect();
 		// if we're recording, keep the current recording tick in view.
 		if (recording
 				&& midiManager.getCurrTick() > TickWindowHelper.getTickOffset()
