@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -28,7 +30,7 @@ public class RecordManager implements LevelListener {
 	private static final long LONG_SAMPLE_RATE = RECORDER_SAMPLERATE;
 
 	private static String currFilename = null;
-	
+
 	private static String recordDirectory = null;
 
 	private static RecordManager singletonInstance = null;
@@ -38,7 +40,7 @@ public class RecordManager implements LevelListener {
 	private static AudioRecord recorder = null;
 	private static int bufferSize = 0;
 	// queue of paths to raw audio data to process
-	//private static Queue<Long> recordTickQueue = new LinkedList<Long>();
+	// private static Queue<Long> recordTickQueue = new LinkedList<Long>();
 	private static Thread recordingThread = null;
 	private static State state;
 	private static FileOutputStream os = null;
@@ -46,6 +48,8 @@ public class RecordManager implements LevelListener {
 	private static short currAmp = 0;
 	private static short currThreshold;
 	private static long recordStartTick = 0;
+	private int currSampleNum = 0;
+	final static Pattern lastIntPattern = Pattern.compile("[^0-9]+([0-9]+)$");
 
 	public static enum State {
 		LISTENING, RECORDING, INITIALIZING
@@ -75,6 +79,7 @@ public class RecordManager implements LevelListener {
 				RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 		initRecorder();
 		recordDirectory = GlobalVars.appDirectory + "recorded/";
+		currSampleNum = findGreatestSampleNum(recordDirectory) + 1;
 		state = State.INITIALIZING;
 	}
 
@@ -84,8 +89,37 @@ public class RecordManager implements LevelListener {
 				RECORDER_AUDIO_ENCODING, bufferSize);
 	}
 
+	/**
+	 * Look through all the sample names in the given record directory and find
+	 * the sample with the greatest number appended to the end (Recorded file
+	 * naming convention is "R1, R2, R3, ...")
+	 * 
+	 * @param recordDirectoryName
+	 * @return the greatest appended sample num in all the recorded sample file
+	 *         names in the given dir
+	 */
+	private int findGreatestSampleNum(String recordDirectoryName) {
+		File recordDirectoryFile = new File(recordDirectoryName);
+		recordDirectoryFile.mkdir(); // just in case the record dir does not
+										// exist yet
+		String[] allRecordedFileNames = recordDirectoryFile.list();
+		int maxSampleNum = 0;
+		for (String recordedFileName : allRecordedFileNames) {
+			// strip ".wav" from end (and any other occurrences, which would be weird)
+			recordedFileName = recordedFileName.replace(".wav", "");
+			Matcher matcher = lastIntPattern.matcher(recordedFileName);
+			if (matcher.find()) {
+			    String numberString = matcher.group(1);
+			    // get ending integer
+			    int sampleNum = Integer.parseInt(numberString);
+			    maxSampleNum = Math.max(sampleNum, maxSampleNum);
+			}
+		}
+		return maxSampleNum;
+	}
+
 	private String getFilename() {
-		return recordDirectory + "/" + System.currentTimeMillis() + ".wav";
+		return recordDirectory + "/" + "R" + (currSampleNum++) + ".wav";
 	}
 
 	private String getTempFilename() {
@@ -148,7 +182,8 @@ public class RecordManager implements LevelListener {
 	public void stopRecording() throws IOException {
 		int trackNum = 0;
 		long recordEndTick = getAdjustedRecordTick();
-		GlobalVars.midiView.addMidiNote(recordStartTick, recordEndTick, trackNum);
+		GlobalVars.midiView.addMidiNote(recordStartTick, recordEndTick,
+				trackNum);
 		state = State.LISTENING;
 		// close and add to processing queue
 		os.close();
@@ -327,7 +362,7 @@ public class RecordManager implements LevelListener {
 	public static short dbToShort(float db) {
 		return (short) (32768 * Math.pow(10, db / 20));
 	}
-	
+
 	private long getAdjustedRecordTick() {
 		long adjustedTick = Managers.midiManager.getCurrTick()
 				- MidiManager.millisToTick(RECORD_LATENCY);
