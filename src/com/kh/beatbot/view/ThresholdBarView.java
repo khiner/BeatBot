@@ -51,7 +51,7 @@ public class ThresholdBarView extends TronSeekbar {
 	
 	protected void init() {
 		super.init();
-		setViewLevel(0.8f);
+		setLevel(0.8f);
 		initVerticesLimits();
 	}
 	
