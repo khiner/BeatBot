@@ -69,7 +69,7 @@ public class BeatBotActivity extends Activity implements
 			levelsGroup.setVisibility(View.VISIBLE);
 		}
 	}
-
+	
 	private Animation fadeIn, fadeOut;
 	// these are used as variables for convenience, since they are reference
 	// frequently
@@ -78,7 +78,7 @@ public class BeatBotActivity extends Activity implements
 	private FadeListener fadeListener;
 	private static AssetManager assetManager;
 
-	private static AlertDialog selectInstrumentAlert = null;
+	private static AlertDialog instrumentSelectAlert = null;
 
 	private long lastTapTime = 0;
 
@@ -99,16 +99,17 @@ public class BeatBotActivity extends Activity implements
 	/**
 	 * The Select Instrument Alert is shown when adding a new track
 	 */
-	private void initSelectInstrumentAlert() {
+	private void initInstrumentSelectAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose Instrument");
-		builder.setItems(GlobalVars.allInstrumentTypes,
+		builder.setAdapter(GlobalVars.instrumentSelectAdapter,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
 						addTrack(item);
 					}
 				});
-		selectInstrumentAlert = builder.create();
+		instrumentSelectAlert = builder.create();
+		instrumentSelectAlert.setOnShowListener(GlobalVars.instrumentSelectOnShowListener);
 	}
 
 	private void initManagers(Bundle savedInstanceState) {
@@ -175,9 +176,10 @@ public class BeatBotActivity extends Activity implements
 		copyAllSamplesToStorage();
 		SurfaceViewBase.setResources(getResources());
 		setContentView(R.layout.main);
-		initLevelsIconGroup();
-		initSelectInstrumentAlert();
 		GlobalVars.initTracks();
+		GlobalVars.initInstrumentSelect(this);
+		initLevelsIconGroup();
+		initInstrumentSelectAlert();
 		// recorded type
 		if (savedInstanceState == null) {
 			initNativeAudio();
@@ -278,7 +280,8 @@ public class BeatBotActivity extends Activity implements
 		createEngine();
 		createAudioPlayer();
 		for (int trackNum = 0; trackNum < GlobalVars.tracks.size(); trackNum++) {
-			addTrack(GlobalVars.tracks.get(trackNum).getInstrument().getSampleBytes(0));
+			addTrack(GlobalVars.tracks.get(trackNum).getInstrument()
+					.getSampleBytes(0));
 		}
 	}
 
@@ -391,7 +394,7 @@ public class BeatBotActivity extends Activity implements
 	}
 
 	public void addTrack(View view) {
-		selectInstrumentAlert.show();
+		instrumentSelectAlert.show();
 	}
 
 	@Override
@@ -417,7 +420,8 @@ public class BeatBotActivity extends Activity implements
 	private void addTrack(int instrumentType) {
 		String instrumentName = GlobalVars.allInstrumentTypes[instrumentType];
 		addTrack(GlobalVars.instruments.get(instrumentName).getSampleBytes(0));
-		GlobalVars.tracks.add(new Track(GlobalVars.instruments.get(instrumentName)));
+		GlobalVars.tracks.add(new Track(GlobalVars.instruments
+				.get(instrumentName)));
 		GlobalVars.currentInstrumentNames.add(instrumentName);
 		GlobalVars.midiView.updateTracks();
 		// launch sample edit activity for the newly added track

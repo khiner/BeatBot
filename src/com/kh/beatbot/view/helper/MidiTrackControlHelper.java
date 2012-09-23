@@ -141,10 +141,10 @@ public class MidiTrackControlHelper {
 			// this static class can be reinstantiated after switching between views.  make sure we're not re-adding rows
 			if (i < buttonRows.size()) {
 				buttonRows.set(i, new ButtonRow(i,
-						GlobalVars.tracks.get(i).getInstrument().getIcon()));
+						GlobalVars.tracks.get(i).getInstrument().getIconSource()));
 			} else {
 				buttonRows.add(new ButtonRow(i,
-						GlobalVars.tracks.get(i).getInstrument().getIcon()));
+						GlobalVars.tracks.get(i).getInstrument().getIconSource()));
 			}
 		}
 		width = buttonRows.get(0).width;

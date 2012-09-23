@@ -38,32 +38,6 @@ import com.kh.beatbot.view.SampleWaveformView;
 import com.kh.beatbot.view.TronSeekbar;
 
 public class SampleEditActivity extends Activity implements LevelListener {
-	class SampleLabelListListener implements LabelListListener {
-		SampleLabelListListener(Context c) {
-
-		}
-
-		@Override
-		public void labelListInitialized(LabelListListenable labelList) {
-
-		}
-
-		@Override
-		public void labelMoved(int id, int oldPosition, int newPosition) {
-
-		}
-
-		@Override
-		public void labelClicked(String text, int id, int position) {
-
-		}
-
-		@Override
-		public void labelLongClicked(int id, int position) {
-
-		}
-	}
-
 	class EffectLabelListListener implements LabelListListener {
 		private AlertDialog selectEffectAlert = null;
 		private LabelListListenable labelList;
@@ -165,8 +139,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 	}
 
-	private static AlertDialog selectInstrumentAlert = null;
-	private AlertDialog selectSampleAlert = null;
+	private static AlertDialog instrumentSelectAlert = null;
+	private AlertDialog sampleSelectAlert = null;
 
 	private static SampleWaveformView sampleWaveformView = null;
 	// private EditLevelsView editLevelsView = null;
@@ -190,11 +164,11 @@ public class SampleEditActivity extends Activity implements LevelListener {
 				.setTypeface(GlobalVars.font);
 		((Button) findViewById(R.id.sampleSelect)).setTypeface(GlobalVars.font);
 		// init alerts
-		if (selectInstrumentAlert == null) {
+		if (instrumentSelectAlert == null) {
 			// only one, static list of instruments
-			initSelectInstrumentAlert();
+			initInstrumentSelectAlert();
 		}
-		initSelectSampleAlert();
+		initSampleSelectAlert();
 		// set the instrument icon
 		((ImageButton) findViewById(R.id.instrumentButton))
 				.setBackgroundResource(GlobalVars.instrumentSources
@@ -221,11 +195,10 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		sampleWaveformView.setSamples(getSampleFloats(trackNum));
 	}
 
-	private void initSelectInstrumentAlert() {
+	private void initInstrumentSelectAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose Instrument");
-		builder.setItems(GlobalVars.currentInstrumentNames
-				.toArray(new String[GlobalVars.currentInstrumentNames.size()]),
+		builder.setAdapter(GlobalVars.instrumentSelectAdapter,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
 						setSample(item, 0);
@@ -237,13 +210,14 @@ public class SampleEditActivity extends Activity implements LevelListener {
 												.get(item)));
 						// update the sample select alert names with the new
 						// instrument samples
-						initSelectSampleAlert();
+						initSampleSelectAlert();
 					}
 				});
-		selectInstrumentAlert = builder.create();
+		instrumentSelectAlert = builder.create();
+		instrumentSelectAlert.setOnShowListener(GlobalVars.instrumentSelectOnShowListener);
 	}
 
-	private void initSelectSampleAlert() {
+	private void initSampleSelectAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose Sample");
 		builder.setItems(GlobalVars.tracks.get(currInstrumentNum).getInstrument().getSampleNames(),
@@ -252,7 +226,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 						setSample(currInstrumentNum, item);
 					}
 				});
-		selectSampleAlert = builder.create();
+		sampleSelectAlert = builder.create();
 	}
 
 	private void initEffectLabelList() {
@@ -289,11 +263,11 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	public void selectInstrument(View view) {
-		selectInstrumentAlert.show();
+		instrumentSelectAlert.show();
 	}
 
 	public void selectSample(View view) {
-		selectSampleAlert.show();
+		sampleSelectAlert.show();
 	}
 
 	public void toggleLoop(View view) {

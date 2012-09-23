@@ -6,13 +6,13 @@ import java.io.IOException;
 
 public class Instrument {
 	private String name;
-	private BeatBotIconSource icon;
+	private BeatBotIconSource iconSource;
 	private File[] sampleFiles;
 	private String[] sampleNames;
 	
 	public Instrument(String instrumentName, BeatBotIconSource instrumentIcon) {
 		this.name = instrumentName;
-		this.icon = instrumentIcon;
+		this.iconSource = instrumentIcon;
 		File dir = new File(GlobalVars.appDirectory + instrumentName);
 		sampleFiles = dir.listFiles();
 		sampleNames = dir.list();
@@ -37,12 +37,12 @@ public class Instrument {
 		return name;
 	}
 
-	public BeatBotIconSource getIcon() {
-		return icon;
+	public BeatBotIconSource getIconSource() {
+		return iconSource;
 	}
 
-	public void setIconResources(int defaultIconResourceId, int selectedIconResourceId) {
-		this.icon.set(defaultIconResourceId, selectedIconResourceId);
+	public void setIconResources(int defaultIconResourceId, int selectedIconResourceId, int listViewIconResourceId) {
+		this.iconSource.set(defaultIconResourceId, selectedIconResourceId, listViewIconResourceId);
 	}
 	
 	public File getSampleFile(int sampleNum) {
