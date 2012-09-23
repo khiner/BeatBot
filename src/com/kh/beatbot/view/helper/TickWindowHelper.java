@@ -15,7 +15,7 @@ public class TickWindowHelper {
 	// leftmost tick to display
 	private static float currTickOffset = 0;
 	// current number of ticks within the window
-	private static float currNumTicks = MidiManager.TICKS_IN_ONE_MEASURE - 1;
+	private static float currNumTicks = MidiManager.TICKS_IN_ONE_MEASURE + 4;
 
 	private static float granularity = 1;
 

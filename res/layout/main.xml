@@ -90,11 +90,9 @@
 
     <com.kh.beatbot.view.MidiView
         android:id="@+id/midiView"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_below="@+id/addTrack"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true" />
 
 </RelativeLayout>
