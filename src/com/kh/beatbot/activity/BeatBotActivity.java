@@ -32,6 +32,7 @@ import android.widget.ToggleButton;
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.global.Instrument;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.MidiTrackControlListener;
 import com.kh.beatbot.manager.Managers;
@@ -418,11 +419,10 @@ public class BeatBotActivity extends Activity implements
 	}
 
 	private void addTrack(int instrumentType) {
-		String instrumentName = GlobalVars.allInstrumentTypes[instrumentType];
-		addTrack(GlobalVars.instruments.get(instrumentName).getSampleBytes(0));
-		GlobalVars.tracks.add(new Track(GlobalVars.instruments
-				.get(instrumentName)));
-		GlobalVars.currentInstrumentNames.add(instrumentName);
+		Instrument newInstrument = GlobalVars.getInstrument(instrumentType); 
+		addTrack(newInstrument.getSampleBytes(0));
+		GlobalVars.tracks.add(new Track(newInstrument));
+		GlobalVars.currentInstrumentNames.add(newInstrument.getName());
 		GlobalVars.midiView.updateTracks();
 		// launch sample edit activity for the newly added track
 		launchSampleEditActivity(GlobalVars.tracks.size() - 1);

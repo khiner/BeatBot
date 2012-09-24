@@ -41,7 +41,7 @@ public class GlobalVars {
 
 	public static final Map<String, Integer> instrumentSources = new HashMap<String, Integer>();
 
-	public static Map<String, Instrument> instruments = new HashMap<String, Instrument>();
+	private static Map<String, Instrument> instruments = new HashMap<String, Instrument>();
 	static {
 		instrumentSources.put("kick", R.drawable.kick_icon_src);
 		instrumentSources.put("snare", R.drawable.snare_icon_src);
@@ -139,6 +139,11 @@ public class GlobalVars {
 		};
 	}
 
+	public static Instrument getInstrument(int instrumentNum) {
+		String instrumentName = allInstrumentTypes[instrumentNum];
+		return instruments.get(instrumentName);
+	}
+	
 	private static void initInstrumentSelectOnShowListener() {
 		instrumentSelectOnShowListener = new OnShowListener() {
 			@Override

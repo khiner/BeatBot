@@ -28,6 +28,7 @@ import com.kh.beatbot.effect.Tremelo;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.global.Instrument;
 import com.kh.beatbot.listenable.LabelListListenable;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LabelListListener;
@@ -188,10 +189,9 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	private void setSample(int instrumentNum, int sampleNum) {
-		setSampleBytes(trackNum, GlobalVars.tracks.get(instrumentNum)
-				.getInstrument().getSampleBytes(sampleNum));
-		((Button) findViewById(R.id.sampleSelect)).setText(GlobalVars.tracks
-				.get(instrumentNum).getInstrument().getSampleName(sampleNum));
+		Instrument instrument = GlobalVars.getInstrument(instrumentNum); 
+		setSampleBytes(trackNum, instrument.getSampleBytes(sampleNum));
+		((Button) findViewById(R.id.sampleSelect)).setText(instrument.getSampleName(sampleNum));
 		sampleWaveformView.setSamples(getSampleFloats(trackNum));
 	}
 
@@ -203,11 +203,11 @@ public class SampleEditActivity extends Activity implements LevelListener {
 					public void onClick(DialogInterface dialog, int item) {
 						setSample(item, 0);
 						currInstrumentNum = item;
+						int newInstrumentIcon = GlobalVars.instrumentSources
+								.get(GlobalVars.allInstrumentTypes[item]);
 						// update instrument icon to reflect the change
 						((ImageButton) findViewById(R.id.instrumentButton))
-								.setBackgroundResource(GlobalVars.instrumentSources
-										.get(GlobalVars.currentInstrumentNames
-												.get(item)));
+								.setBackgroundResource(newInstrumentIcon);
 						// update the sample select alert names with the new
 						// instrument samples
 						initSampleSelectAlert();
@@ -220,7 +220,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	private void initSampleSelectAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose Sample");
-		builder.setItems(GlobalVars.tracks.get(currInstrumentNum).getInstrument().getSampleNames(),
+		builder.setItems(GlobalVars.getInstrument(currInstrumentNum).getSampleNames(),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
 						setSample(currInstrumentNum, item);
