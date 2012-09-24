@@ -274,7 +274,10 @@ public class MidiManager implements Parcelable {
 			offTick = onTick + 4;
 		if (snapToGrid) {
 			onTick = getNearestMajorTick(onTick, GlobalVars.currBeatDivision);
-			offTick = getNearestMajorTick(offTick, GlobalVars.currBeatDivision) - 1;				
+			offTick = getNearestMajorTick(offTick, GlobalVars.currBeatDivision) - 1;
+			if (offTick == onTick - 1) {
+				offTick += getTicksPerBeat(GlobalVars.currBeatDivision);
+			}
 		}
 		if (maintainNoteLength)
 			offTick = midiNote.getOffTick() + onTick - midiNote.getOnTick();
