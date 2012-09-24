@@ -9,6 +9,8 @@ public class MidiViewBean {
 	public static float X_OFFSET;
 	public static final float Y_OFFSET = 21;
 
+	public static final float LOOP_SELECT_SNAP_DIST = 30;
+	
 	// the size of the "dots" at the top of level display
 	public static final int LEVEL_POINT_SIZE = 16;
 	// the width of the lines for note levels

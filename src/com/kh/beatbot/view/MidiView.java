@@ -138,7 +138,8 @@ public class MidiView extends ClickableSurfaceView {
 		// make sure select rect doesn't go into the tick view
 		topY = Math.max(topY, MidiViewBean.Y_OFFSET);
 		// make sure select rect doesn't go past the last track/note
-		bottomY = Math.min(bottomY, MidiViewBean.Y_OFFSET + MidiTrackControlHelper.height - .01f);
+		bottomY = Math.min(bottomY, MidiViewBean.Y_OFFSET
+				+ MidiTrackControlHelper.height - .01f);
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			LevelsViewHelper.selectRegion(leftTick, rightTick, topY, bottomY);
 		} else {
@@ -188,13 +189,13 @@ public class MidiView extends ClickableSurfaceView {
 	public void selectLoopMarker(int pointerId, float x) {
 		float loopBeginX = tickToX(midiManager.getLoopBeginTick());
 		float loopEndX = tickToX(midiManager.getLoopEndTick());
-		if (Math.abs(x - loopBeginX) <= 20) {
+		if (Math.abs(x - loopBeginX) <= MidiViewBean.LOOP_SELECT_SNAP_DIST) {
 			bean.setLoopPointerId(0, pointerId);
+		} else if (Math.abs(x - loopEndX) <= MidiViewBean.LOOP_SELECT_SNAP_DIST) {
+			bean.setLoopPointerId(2, pointerId);
 		} else if (x > loopBeginX && x < loopEndX) {
 			bean.setLoopPointerId(1, pointerId);
 			bean.setLoopSelectionOffset(x - loopBeginX);
-		} else if (Math.abs(x - loopEndX) <= 20) {
-			bean.setLoopPointerId(2, pointerId);
 		}
 	}
 
@@ -475,7 +476,8 @@ public class MidiView extends ClickableSurfaceView {
 	public void updateTracks() {
 		int newTrackIndex = GlobalVars.tracks.size() - 1;
 		MidiTrackControlHelper.addTrack(newTrackIndex,
-				GlobalVars.tracks.get(newTrackIndex).getInstrument().getIconSource());
+				GlobalVars.tracks.get(newTrackIndex).getInstrument()
+						.getIconSource());
 		initAllVbs();
 	}
 
@@ -500,8 +502,9 @@ public class MidiView extends ClickableSurfaceView {
 		boolean recording = RecordManager.getState() != RecordManager.State.INITIALIZING;
 		boolean playing = Managers.playbackManager.getState() == PlaybackManager.State.PLAYING;
 		TickWindowHelper.scroll();
-		// we need to do this in every frame, because even if loop ticks aren't changing
-		// the tick window can change 
+		// we need to do this in every frame, because even if loop ticks aren't
+		// changing
+		// the tick window can change
 		initLoopRectVb();
 		drawTickFill();
 		drawLoopRect();
@@ -603,7 +606,7 @@ public class MidiView extends ClickableSurfaceView {
 		bean.setSelectRegion(false);
 		selectRegionVb = null;
 	}
-	
+
 	// adds a note starting at the nearest major tick (nearest displayed
 	// grid line) to the left and ending one tick before the nearest major
 	// tick to the right of the given tick
@@ -683,8 +686,10 @@ public class MidiView extends ClickableSurfaceView {
 				- touchedNote.getOnTick();
 		if (noteDiff == 0 && tickDiff == 0)
 			return;
-		tickDiff = getAdjustedTickDiff(tickDiff, pointerId, dragAllSelected ? null : touchedNote);
-		noteDiff = getAdjustedNoteDiff(noteDiff, dragAllSelected ? null : touchedNote);
+		tickDiff = getAdjustedTickDiff(tickDiff, pointerId,
+				dragAllSelected ? null : touchedNote);
+		noteDiff = getAdjustedNoteDiff(noteDiff, dragAllSelected ? null
+				: touchedNote);
 		List<MidiNote> notesToDrag = dragAllSelected ? midiManager
 				.getSelectedNotes() : Arrays.asList(touchedNote);
 		// dragging one note - drag all selected notes together
