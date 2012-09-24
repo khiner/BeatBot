@@ -302,7 +302,7 @@ public class MidiView extends ClickableSurfaceView {
 			FloatBuffer last = waveformVbs.get(waveformVbs.size() - 1);
 			float waveWidth = last.get(last.capacity() - 2);
 			float noteWidth = tickToX(midiManager.getCurrTick()
-					- RecordManager.getRecordStartTick());
+					- RecordManager.getRecordStartTick()) - MidiTrackControlHelper.width;
 			gl.glPushMatrix();
 			gl.glTranslatef(tickToX(RecordManager.getRecordStartTick()), 0, 0);
 			// scale drawing so the entire waveform exactly fits in the note

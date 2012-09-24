@@ -185,7 +185,7 @@ public class RecordManager implements LevelListener {
 		GlobalVars.midiView.addMidiNote(recordStartTick, recordEndTick,
 				trackNum);
 		state = State.LISTENING;
-		// close and add to processing queue
+		// close output stream
 		os.close();
 		// copy to wave
 		copyWaveFile(currFilename, getFilename());
