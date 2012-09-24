@@ -505,6 +505,8 @@ public class MidiManager implements Parcelable {
 	public native long getLoopEndTick();
 
 	public native void setLoopEndTick(long loopEndTick);
+	
+	public native void setLoopTicks(long loopBeginTick, long loopEndTick);
 
 	public native void addMidiNote(int track, long onTick, long offTick,
 			float volume, float pan, float pitch);

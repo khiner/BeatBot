@@ -728,18 +728,18 @@ public class MidiView extends ClickableSurfaceView {
 						.getMajorTickToLeftOf(xToTick(x));
 				if (i == 0) { // begin loop marker selected
 					midiManager.setLoopBeginTick((long) majorTick);
-				} else if (i == 1) { // end loop marker selected
-					float newOnTick = TickWindowHelper
+				} else if (i == 1) { // middle selected. move begin and end
+					// preserve current loop length
+					float loopLength = midiManager.getLoopEndTick() - midiManager.getLoopBeginTick(); 
+					float newBeginTick = TickWindowHelper
 							.getMajorTickToLeftOf(xToTick(x
 									- bean.getLoopSelectionOffset()));
-					float newOffTick = midiManager.getLoopEndTick() + newOnTick
-							- midiManager.getLoopBeginTick();
-					if (newOnTick >= 0
-							&& newOffTick <= TickWindowHelper.MAX_TICKS) {
-						midiManager.setLoopBeginTick((long) newOnTick);
-						midiManager.setLoopEndTick((long) newOffTick);
+					float newEndTick = newBeginTick + loopLength;
+					if (newBeginTick >= 0
+							&& newEndTick <= TickWindowHelper.MAX_TICKS) {
+						midiManager.setLoopTicks((long) newBeginTick, (long) newEndTick);
 					}
-				} else { // middle selected. move begin and end
+				} else { // end loop marker selected
 					midiManager.setLoopEndTick((long) majorTick);
 				}
 				TickWindowHelper.updateView(midiManager.getLoopBeginTick(),

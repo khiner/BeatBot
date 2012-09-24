@@ -69,6 +69,20 @@ void Java_com_kh_beatbot_manager_MidiManager_setLoopEndTick(JNIEnv *env,
 	updateAllTrackNextEvents();
 }
 
+void Java_com_kh_beatbot_manager_MidiManager_setLoopTicks(JNIEnv *env,
+		jclass clazz, jlong _loopBeginTick, jlong _loopEndTick) {
+	if (_loopBeginTick >= _loopEndTick)
+		return;
+	loopBeginTick = _loopBeginTick;
+	loopEndTick = _loopEndTick;
+	loopBeginSample = tickToSample(loopBeginTick);
+	loopEndSample = tickToSample(loopEndTick);
+	if (!getTrack(NULL, NULL, 0)->armed) {
+		currSample = tickToSample(loopBeginTick);
+	}
+	updateAllTrackNextEvents();
+}
+
 void Java_com_kh_beatbot_manager_MidiManager_reset(JNIEnv *env, jclass clazz) {
 	currSample = tickToSample(loopBeginTick);
 	updateAllTrackNextEvents();
