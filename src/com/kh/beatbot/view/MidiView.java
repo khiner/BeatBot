@@ -301,8 +301,10 @@ public class MidiView extends ClickableSurfaceView {
 		if (RecordManager.isRecording() && !waveformVbs.isEmpty()) {
 			FloatBuffer last = waveformVbs.get(waveformVbs.size() - 1);
 			float waveWidth = last.get(last.capacity() - 2);
-			float noteWidth = tickToX(midiManager.getCurrTick()
-					- RecordManager.getRecordStartTick()) - MidiTrackControlHelper.width;
+			float noteWidth = tickToX(RecordManager.getRecordCurrTick()
+					- RecordManager.getRecordStartTick()
+					+ RecordManager.RECORD_LATENCY_TICKS)
+					- MidiTrackControlHelper.width;
 			gl.glPushMatrix();
 			gl.glTranslatef(tickToX(RecordManager.getRecordStartTick()), 0, 0);
 			// scale drawing so the entire waveform exactly fits in the note
@@ -730,14 +732,16 @@ public class MidiView extends ClickableSurfaceView {
 					midiManager.setLoopBeginTick((long) majorTick);
 				} else if (i == 1) { // middle selected. move begin and end
 					// preserve current loop length
-					float loopLength = midiManager.getLoopEndTick() - midiManager.getLoopBeginTick(); 
+					float loopLength = midiManager.getLoopEndTick()
+							- midiManager.getLoopBeginTick();
 					float newBeginTick = TickWindowHelper
 							.getMajorTickToLeftOf(xToTick(x
 									- bean.getLoopSelectionOffset()));
 					float newEndTick = newBeginTick + loopLength;
 					if (newBeginTick >= 0
 							&& newEndTick <= TickWindowHelper.MAX_TICKS) {
-						midiManager.setLoopTicks((long) newBeginTick, (long) newEndTick);
+						midiManager.setLoopTicks((long) newBeginTick,
+								(long) newEndTick);
 					}
 				} else { // end loop marker selected
 					midiManager.setLoopEndTick((long) majorTick);

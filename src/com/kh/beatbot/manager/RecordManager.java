@@ -18,7 +18,7 @@ import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.ThresholdBarView;
 
 public class RecordManager implements LevelListener {
-	private static final long RECORD_LATENCY = 250;
+	public static final long RECORD_LATENCY_TICKS = MidiManager.millisToTick(250);
 	private static final int RECORDER_BPP = 16;
 	private static final String TEMP_FILE = "record_temp.raw";
 	private static final int RECORDER_SAMPLERATE = 44100;
@@ -65,6 +65,18 @@ public class RecordManager implements LevelListener {
 
 	public static long getRecordStartTick() {
 		return recordStartTick;
+	}
+	
+	public static long getRecordCurrTick() {
+		long recordCurrTick = Managers.midiManager.getCurrTick()
+				- RECORD_LATENCY_TICKS;
+		if (recordCurrTick < Managers.midiManager.getLoopBeginTick()
+				|| state == State.RECORDING && recordCurrTick < recordStartTick) {
+			// if recording past loop end, keep record note going as if there was no loop
+			recordCurrTick = Managers.midiManager.getLoopEndTick()
+					- Managers.midiManager.getLoopBeginTick() + recordCurrTick;
+		}
+		return recordCurrTick;
 	}
 
 	public static RecordManager getInstance() {
@@ -363,15 +375,8 @@ public class RecordManager implements LevelListener {
 		return (short) (32768 * Math.pow(10, db / 20));
 	}
 
-	private long getAdjustedRecordTick() {
-		long adjustedTick = Managers.midiManager.getCurrTick()
-				- MidiManager.millisToTick(RECORD_LATENCY);
-		if (adjustedTick < Managers.midiManager.getLoopBeginTick()
-				|| state == State.RECORDING && adjustedTick < recordStartTick) {
-			// if recording past loop end, wrap around to the beginning
-			adjustedTick = Managers.midiManager.getLoopEndTick()
-					- (Managers.midiManager.getLoopBeginTick() - adjustedTick);
-		}
+	private static long getAdjustedRecordTick() {
+		long adjustedTick = getRecordCurrTick();
 		if (state != State.RECORDING) {
 			// 16th note quantization for note beginning (but not end)
 			adjustedTick = Managers.midiManager.getNearestMajorTick(
