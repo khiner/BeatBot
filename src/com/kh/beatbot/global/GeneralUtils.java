@@ -16,6 +16,8 @@ public class GeneralUtils {
 		// assign hardware (ringer) volume +/- to media while this application
 		// has focus
 		activity.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+		// prevent screen from turning off while this app is running
+		activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	}
 	
 	public static float distanceFromPointSquared(float pointX, float pointY, float x, float y) {
