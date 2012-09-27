@@ -12,6 +12,7 @@
 #include "effects/tremelo.h"
 #include "effects/volpan.h"
 #include "track.h"
+#include <stdio.h>
 
 #define CONV16BIT 32768
 

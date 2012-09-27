@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +19,8 @@ import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.ThresholdBarView;
 
 public class RecordManager implements LevelListener {
-	public static final long RECORD_LATENCY_TICKS = MidiManager.millisToTick(250);
+	public static final long RECORD_LATENCY_TICKS = MidiManager
+			.millisToTick(250);
 	private static final int RECORDER_BPP = 16;
 	private static final String TEMP_FILE = "record_temp.raw";
 	private static final int RECORDER_SAMPLERATE = 44100;
@@ -29,7 +31,7 @@ public class RecordManager implements LevelListener {
 			* CHANNELS / 8;
 	private static final long LONG_SAMPLE_RATE = RECORDER_SAMPLERATE;
 
-	private static String currFilename = null;
+	private static String currFileName = null;
 
 	private static String recordDirectory = null;
 
@@ -66,13 +68,14 @@ public class RecordManager implements LevelListener {
 	public static long getRecordStartTick() {
 		return recordStartTick;
 	}
-	
+
 	public static long getRecordCurrTick() {
 		long recordCurrTick = Managers.midiManager.getCurrTick()
 				- RECORD_LATENCY_TICKS;
 		if (recordCurrTick < Managers.midiManager.getLoopBeginTick()
 				|| state == State.RECORDING && recordCurrTick < recordStartTick) {
-			// if recording past loop end, keep record note going as if there was no loop
+			// if recording past loop end, keep record note going as if there
+			// was no loop
 			recordCurrTick = Managers.midiManager.getLoopEndTick()
 					- Managers.midiManager.getLoopBeginTick() + recordCurrTick;
 		}
@@ -117,33 +120,22 @@ public class RecordManager implements LevelListener {
 		String[] allRecordedFileNames = recordDirectoryFile.list();
 		int maxSampleNum = 0;
 		for (String recordedFileName : allRecordedFileNames) {
-			// strip ".wav" from end (and any other occurrences, which would be weird)
+			// strip ".wav" from end (and any other occurrences, which would be
+			// weird)
 			recordedFileName = recordedFileName.replace(".wav", "");
 			Matcher matcher = lastIntPattern.matcher(recordedFileName);
 			if (matcher.find()) {
-			    String numberString = matcher.group(1);
-			    // get ending integer
-			    int sampleNum = Integer.parseInt(numberString);
-			    maxSampleNum = Math.max(sampleNum, maxSampleNum);
+				String numberString = matcher.group(1);
+				// get ending integer
+				int sampleNum = Integer.parseInt(numberString);
+				maxSampleNum = Math.max(sampleNum, maxSampleNum);
 			}
 		}
 		return maxSampleNum;
 	}
 
-	private String getFilename() {
-		return recordDirectory + "/" + "R" + (currSampleNum++) + ".wav";
-	}
-
-	private String getTempFilename() {
-		File tempFile = new File(recordDirectory, TEMP_FILE);
-
-		int i = 0;
-		while (tempFile.exists()) {
-			i++;
-			tempFile = new File(recordDirectory, TEMP_FILE + i);
-		}
-
-		return tempFile.getAbsolutePath();
+	private String getFileName() {
+		return recordDirectory + "R" + (currSampleNum++) + ".wav";
 	}
 
 	private void writeAudioDataToFile() {
@@ -186,8 +178,8 @@ public class RecordManager implements LevelListener {
 
 	public void startRecording() throws IOException {
 		recordStartTick = getAdjustedRecordTick();
-		currFilename = getTempFilename();
-		os = new FileOutputStream(currFilename);
+		currFileName = getFileName();
+		os = writeWaveFileHeader(currFileName, 0, 0);
 		state = State.RECORDING;
 	}
 
@@ -199,9 +191,7 @@ public class RecordManager implements LevelListener {
 		state = State.LISTENING;
 		// close output stream
 		os.close();
-		// copy to wave
-		copyWaveFile(currFilename, getFilename());
-		new File(currFilename).delete();
+		insertLengthDataIntoWavFile(currFileName);
 	}
 
 	public void startListening() {
@@ -241,26 +231,6 @@ public class RecordManager implements LevelListener {
 		}
 	}
 
-	private void copyWaveFile(String inFilename, String outFilename) {
-		byte[] buffer = new byte[bufferSize];
-		try {
-			FileInputStream in = new FileInputStream(inFilename);
-			FileOutputStream out = new FileOutputStream(outFilename);
-			long totalAudioLen = in.getChannel().size();
-			long totalDataLen = totalAudioLen + 36;
-
-			writeWaveFileHeader(out, totalAudioLen, totalDataLen);
-
-			while (in.read(buffer) != -1) {
-				out.write(buffer);
-			}
-			in.close();
-			out.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	private boolean overThreshold(byte[] buffer) {
 		for (int i = 0; i < bufferSize / 32; i++) {
 			// 16bit sample size
@@ -284,32 +254,8 @@ public class RecordManager implements LevelListener {
 		return true;
 	}
 
-	// Returns the contents of the file in a byte array.
-	public static byte[] getBytesFromFile(File file) throws IOException {
-		InputStream is = new FileInputStream(file);
-
-		// Get the size of the file
-		long length = file.length();
-
-		// Create the byte array to hold the data
-		byte[] bytes = new byte[(int) length];
-
-		// Read in the bytes
-		int offset = 0;
-		int numRead = 0;
-		while (offset < bytes.length
-				&& (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
-			offset += numRead;
-		}
-
-		// Close the input stream and return bytes
-		is.close();
-		return bytes;
-	}
-
-	private void writeWaveFileHeader(FileOutputStream out, long totalAudioLen,
+	private FileOutputStream writeWaveFileHeader(String fileName, long totalAudioLen,
 			long totalDataLen) throws IOException {
-
 		byte[] header = new byte[44];
 
 		header[0] = 'R'; // RIFF/WAVE header
@@ -357,7 +303,38 @@ public class RecordManager implements LevelListener {
 		header[42] = (byte) ((totalAudioLen >> 16) & 0xff);
 		header[43] = (byte) ((totalAudioLen >> 24) & 0xff);
 
-		out.write(header, 0, 44);
+		FileOutputStream out = new FileOutputStream(fileName);
+		out.write(header);
+		return out;
+	}
+
+	private void insertLengthDataIntoWavFile(String fileName) {
+		try {
+			FileInputStream in = new FileInputStream(fileName);
+			long totalAudioLen = in.getChannel().size();
+			long totalDataLen = totalAudioLen + 36;
+			in.close();
+
+			byte[] headerLengthData = new byte[4];
+			RandomAccessFile wavFile = new RandomAccessFile(fileName, "rw");
+
+			wavFile.seek(4);
+			headerLengthData[0] = (byte) (totalDataLen & 0xff);
+			headerLengthData[1] = (byte) ((totalDataLen >> 8) & 0xff);
+			headerLengthData[2] = (byte) ((totalDataLen >> 16) & 0xff);
+			headerLengthData[3] = (byte) ((totalDataLen >> 24) & 0xff);
+			wavFile.write(headerLengthData);
+
+			wavFile.seek(40);
+			headerLengthData[0] = (byte) (totalAudioLen & 0xff);
+			headerLengthData[1] = (byte) ((totalAudioLen >> 8) & 0xff);
+			headerLengthData[2] = (byte) ((totalAudioLen >> 16) & 0xff);
+			headerLengthData[3] = (byte) ((totalAudioLen >> 24) & 0xff);
+			wavFile.write(headerLengthData);
+			wavFile.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/*
@@ -413,4 +390,27 @@ public class RecordManager implements LevelListener {
 			float levelY) {
 		// nothing - for level 2d
 	}
+
+	public void startRecordingNative() {
+		currFileName = getFileName();
+		try {
+			FileOutputStream out = writeWaveFileHeader(currFileName, 0, 0);
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		startRecordingNative(currFileName);
+		state = State.RECORDING;
+	}
+
+	public String stopRecordingAndWriteWav() {
+		stopRecordingNative();
+		insertLengthDataIntoWavFile(currFileName);
+		state = State.INITIALIZING;
+		return currFileName;
+	}
+
+	public native void startRecordingNative(String recordFileName);
+
+	public native void stopRecordingNative();
 }

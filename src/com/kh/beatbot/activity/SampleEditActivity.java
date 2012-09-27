@@ -189,9 +189,12 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	private void setSample(int instrumentNum, int sampleNum) {
-		Instrument instrument = GlobalVars.getInstrument(instrumentNum); 
+		Instrument instrument = GlobalVars.getInstrument(instrumentNum);
+		// set native sample bytes through JNI
 		setSampleBytes(trackNum, instrument.getSampleBytes(sampleNum));
+		// update sample label text
 		((Button) findViewById(R.id.sampleSelect)).setText(instrument.getSampleName(sampleNum));
+		// update sample waveform view with new sample bytes
 		sampleWaveformView.setSamples(getSampleFloats(trackNum));
 	}
 

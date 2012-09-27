@@ -27,6 +27,7 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.R;
@@ -309,15 +310,17 @@ public class BeatBotActivity extends Activity implements
 
 	public void record(View view) {
 		if (RecordManager.getState() != RecordManager.State.INITIALIZING) {
-			Managers.recordManager.stopListening();
-			((ToggleButton) view).setChecked(false);
+			//Managers.recordManager.stopListening();
+			String fileName = Managers.recordManager.stopRecordingAndWriteWav();
+			Toast.makeText(getApplicationContext(), "Recorded file to " + fileName,
+					Toast.LENGTH_SHORT).show();
 		} else {
 			GlobalVars.midiView.reset();
-			// if we're already playing, Managers.midiManager is already ticking
-			// away.
+			// if we're already playing, midiManager is already ticking away.
 			if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
 				play(findViewById(R.id.playButton));
-			Managers.recordManager.startListening();
+			Managers.recordManager.startRecordingNative();
+			//Managers.recordManager.startListening();
 		}
 	}
 

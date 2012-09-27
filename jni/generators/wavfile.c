@@ -77,22 +77,21 @@ WavFile *wavfile_create(char *bytes, int length) {
 }
 
 void wavfile_reset(WavFile *config) {
-	if (config->reverse)
-		config->currSample = config->loopEnd;
-	else
-		config->currSample = config->loopBegin;
+	config->currSample = config->reverse ? config->loopEnd : config->loopBegin;
 }
 
 void freeBuffers(WavFile *config) {
 	free(config->buffers[0]);
 	free(config->buffers[1]);
 	free(config->buffers);
+	config->buffers = NULL;
 }
 
 void wavfile_destroy(void *p) {
 	WavFile *config = (WavFile *) p;
 	freeBuffers(config);
 	free(config);
+	config = NULL;
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_toggleLooping(JNIEnv *env,

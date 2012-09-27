@@ -9,7 +9,9 @@ static SLEngineItf engineEngine = NULL;
 // output mix interfaces
 static SLObjectItf outputMixObject = NULL;
 
-//static float zeroBuffer[2][BUFF_SIZE];
+static bool recording = false;
+static FILE* recordOutFile = NULL;
+static pthread_mutex_t recordMutex;
 
 void updateNextNoteSamples() {
 	TrackNode *cur_ptr = trackHead;
@@ -71,6 +73,15 @@ static inline void interleaveFloatsToShorts(float left[], float right[],
 	for (i = 0; i < size; i++) {
 		interleaved[i * 2] = left[i] * CONV16BIT;
 		interleaved[i * 2 + 1] = right[i] * CONV16BIT;
+	}
+}
+
+static inline void writeBytesToFile(short buffer[], int size, FILE *out) {
+	int i = 0;
+	for (i = 0; i < size; i++) {
+		// write the chars of the short to file, little endian
+		fputc((char)buffer[i] & 0xff, out);
+		fputc((char)(buffer[i] >> 8) & 0xff, out);
 	}
 }
 
@@ -252,9 +263,16 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	processEffectsForAllTracks();
 	mixTracks();
 	// enqueue the buffer
-	if (openSlOut->anyTrackArmed)
+	if (openSlOut->anyTrackArmed) {
 		(*bq)->Enqueue(bq, openSlOut->currBufferShort,
 				BUFF_SIZE * 2 * sizeof(short));
+	}
+	// write to wav file if recording
+	pthread_mutex_lock(&recordMutex);
+	if (recording && recordOutFile != NULL) {
+		writeBytesToFile(openSlOut->currBufferShort, BUFF_SIZE * 2, recordOutFile);
+	}
+	pthread_mutex_unlock(&recordMutex);
 }
 
 MidiEvent *findEvent(Track *track, long tick) {
@@ -647,4 +665,27 @@ void Java_com_kh_beatbot_activity_SampleEditActivity_setPrimaryPitch(
 	//if (track->outputPlayerPitch != NULL) {
 	//(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((track->pitch + track->primaryPitch)*750 + 500));
 	//}
+}
+
+/****************************************************************************************
+ Java RecordManager JNI methods
+ ****************************************************************************************/
+void Java_com_kh_beatbot_manager_RecordManager_startRecordingNative(
+		JNIEnv *env, jclass clazz, jstring recordFilePath) {
+	const char *cRecordFilePath = (*env)->GetStringUTFChars(env, recordFilePath, 0);
+	// append to end of file, since header is written in Java
+	recordOutFile = fopen(cRecordFilePath, "a+");
+	recording = true;
+}
+
+void Java_com_kh_beatbot_manager_RecordManager_stopRecordingNative(
+		JNIEnv *env, jclass clazz) {
+	// stop recording
+	recording = false;
+	// file cleanup
+	pthread_mutex_lock(&recordMutex);
+    fflush(recordOutFile);
+    fclose(recordOutFile);
+    recordOutFile = NULL;
+    pthread_mutex_unlock(&recordMutex);
 }
