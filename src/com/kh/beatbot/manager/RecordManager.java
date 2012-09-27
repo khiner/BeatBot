@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -311,7 +310,7 @@ public class RecordManager implements LevelListener {
 	private void insertLengthDataIntoWavFile(String fileName) {
 		try {
 			FileInputStream in = new FileInputStream(fileName);
-			long totalAudioLen = in.getChannel().size();
+			long totalAudioLen = in.getChannel().size() - 36;
 			long totalDataLen = totalAudioLen + 36;
 			in.close();
 

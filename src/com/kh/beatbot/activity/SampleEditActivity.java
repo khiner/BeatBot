@@ -140,7 +140,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 	}
 
-	private static AlertDialog instrumentSelectAlert = null;
+	private AlertDialog instrumentSelectAlert = null;
 	private AlertDialog sampleSelectAlert = null;
 
 	private static SampleWaveformView sampleWaveformView = null;
@@ -165,10 +165,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 				.setTypeface(GlobalVars.font);
 		((Button) findViewById(R.id.sampleSelect)).setTypeface(GlobalVars.font);
 		// init alerts
-		if (instrumentSelectAlert == null) {
-			// only one, static list of instruments
-			initInstrumentSelectAlert();
-		}
+		initInstrumentSelectAlert();
 		initSampleSelectAlert();
 		// set the instrument icon
 		((ImageButton) findViewById(R.id.instrumentButton))
