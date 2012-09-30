@@ -233,7 +233,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private void stopPreviewing() {
 		previewPointerId = -1;
 		previewButton.release();
-		Managers.playbackManager.stopTrack(track.getId());
+		track.stop();
 	}
 	
 	private float sampleToX(float sample) {
@@ -324,9 +324,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 			track.sampleLoopEnd += diff;
 			clipLoopToWindow();
 		}
-		Managers.playbackManager.setLoopWindow(track.getId(),
-				(int) track.sampleLoopBegin,
-				(int) track.sampleLoopEnd);
+		track.setLoopWindow((int) track.sampleLoopBegin, (int) track.sampleLoopEnd);
 		// update the display location of the loop markers
 		initLoopMarkerVb();
 		initAdsrVb();
@@ -465,9 +463,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		initLoopMarkerVb();
 		initAdsrVb();
 		// update sample playback.
-		Managers.playbackManager.setLoopWindow(track.getId(),
-				(int) track.sampleLoopBegin,
-				(int) track.sampleLoopEnd);
+		track.setLoopWindow((int) track.sampleLoopBegin, (int) track.sampleLoopEnd);
 		return true;
 	}
 
@@ -544,7 +540,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	public void handlePreviewActionDown(int id) {
 		previewButton.touch();
-		Managers.playbackManager.playTrack(track.getId());
+		track.play();
 		previewPointerId = id;
 	}
 
@@ -595,7 +591,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 			handleWaveActionPointerUp(e, id);
 		else {
 			previewButton.release();
-			Managers.playbackManager.stopTrack(track.getId());
+			track.stop();
 		}
 	}
 
@@ -603,7 +599,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	protected void handleActionUp(int id, float x, float y) {
 		previewButton.release();
 		beginLoopMarkerTouched = endLoopMarkerTouched = -1;
-		Managers.playbackManager.stopTrack(track.getId());
+		track.stop();
 		scrollAnchorSample = zoomLeftAnchorSample = zoomRightAnchorSample = -1;
 		clearAdsrSelected();
 	}

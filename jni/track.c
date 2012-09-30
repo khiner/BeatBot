@@ -183,6 +183,105 @@ void setSampleBytes(Track *track, char *bytes, int length) {
 			((WavFile *)track->generator->config)->totalSamples);
 }
 
+void Java_com_kh_beatbot_manager_PlaybackManager_armAllTracks(JNIEnv *env,
+		jclass clazz) {
+	// arm each track, and
+	// trigger buffer queue callback to begin writing data to tracks
+	TrackNode *cur_ptr = trackHead;
+	while (cur_ptr != NULL) {
+		Track *track = cur_ptr->track;
+		track->armed = true;
+		cur_ptr = cur_ptr->next;
+	}
+	openSlOut->armed = openSlOut->anyTrackArmed = true;
+	// start writing zeros to the track's audio out
+	bufferQueueCallback(openSlOut->outputBufferQueue, NULL);
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_disarmAllTracks(JNIEnv *env,
+		jclass clazz) {
+	TrackNode *cur_ptr = trackHead;
+	while (cur_ptr != NULL) {
+		cur_ptr->track->armed = false;
+		cur_ptr = cur_ptr->next;
+	}
+	openSlOut->armed = openSlOut->anyTrackArmed = false;
+}
+
+void Java_com_kh_beatbot_global_Track_armTrack(JNIEnv *env,
+		jclass clazz, jint trackNum) {
+	Track *track = getTrack(env, clazz, trackNum);
+	track->armed = openSlOut->anyTrackArmed = true;
+	// start writing zeros to the track's audio out
+	bufferQueueCallback(openSlOut->outputBufferQueue, NULL);
+}
+
+void Java_com_kh_beatbot_global_Track_disarmTrack(JNIEnv *env,
+		jclass clazz, jint trackNum) {
+	getTrack(env, clazz, trackNum)->armed = openSlOut->anyTrackArmed = false;
+}
+
+void Java_com_kh_beatbot_global_Track_playTrack(JNIEnv *env,
+		jclass clazz, jint trackNum) {
+	previewTrack(trackNum);
+}
+
+void Java_com_kh_beatbot_global_Track_stopTrack(JNIEnv *env,
+		jclass clazz, jint trackNum) {
+	stopPreviewingTrack(trackNum);
+}
+
+int getSoloingTrackNum() {
+	TrackNode *cur_ptr = trackHead;
+	while (cur_ptr != NULL) {
+		if (cur_ptr->track->solo) {
+			return cur_ptr->track->num;
+		}
+		cur_ptr = cur_ptr->next;
+	}
+	return -1;
+}
+
+void Java_com_kh_beatbot_global_Track_muteTrack(JNIEnv *env,
+		jclass clazz, jint trackNum, jboolean mute) {
+	Track *track = getTrack(env, clazz, trackNum);
+	if (mute) {
+		track->shouldSound = false;
+	} else {
+		int soloingTrackNum = getSoloingTrackNum();
+		if (soloingTrackNum == -1 || soloingTrackNum == trackNum)
+			track->shouldSound = true;
+	}
+	track->mute = mute;
+}
+
+void Java_com_kh_beatbot_global_Track_soloTrack(JNIEnv *env,
+		jclass clazz, jint trackNum, jboolean solo) {
+	Track *track = getTrack(env, clazz, trackNum);
+	track->solo = solo;
+	if (solo) {
+		if (!track->mute) {
+			track->shouldSound = true;
+		}
+		TrackNode *cur_ptr = trackHead;
+		while (cur_ptr != NULL) {
+			if (cur_ptr->track->num != trackNum) {
+				cur_ptr->track->shouldSound = false;
+				cur_ptr->track->solo = false;
+			}
+			cur_ptr = cur_ptr->next;
+		}
+	} else {
+		TrackNode *cur_ptr = trackHead;
+		while (cur_ptr != NULL) {
+			if (!cur_ptr->track->mute) {
+				cur_ptr->track->shouldSound = true;
+			}
+			cur_ptr = cur_ptr->next;
+		}
+	}
+}
+
 void Java_com_kh_beatbot_global_Track_setPrimaryVolume(
 		JNIEnv *env, jclass clazz, jint trackNum, jfloat volume) {
 	Track *track = getTrack(env, clazz, trackNum);
@@ -256,4 +355,46 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_addTrack(JNIEnv *env, jclass c
 	addTrack(track);
 	Java_com_kh_beatbot_global_Track_setSampleBytes(env, clazz, trackCount, bytes);
 	trackCount++;
+}
+
+void Java_com_kh_beatbot_global_Track_toggleTrackLooping(JNIEnv *env,
+		jclass clazz, jint trackNum) {
+	Track *track = getTrack(env, clazz, trackNum);
+	WavFile *wavFile = (WavFile *) track->generator->config;
+	wavFile->looping = !wavFile->looping;
+}
+
+jboolean Java_com_kh_beatbot_global_Track_isTrackLooping(JNIEnv *env,
+		jclass clazz, jint trackNum) {
+	Track *track = getTrack(env, clazz, trackNum);
+	WavFile *wavFile = (WavFile *) track->generator->config;
+	return wavFile->looping;
+}
+
+void Java_com_kh_beatbot_global_Track_setTrackLoopWindow(JNIEnv *env,
+		jclass clazz, jint trackNum, jint loopBeginSample, jint loopEndSample) {
+	Track *track = getTrack(env, clazz, trackNum);
+	WavFile *wavFile = (WavFile *) track->generator->config;
+	if (wavFile->loopBegin == loopBeginSample
+			&& wavFile->loopEnd == loopEndSample)
+		return;
+	wavFile->loopBegin = loopBeginSample;
+	wavFile->loopEnd = loopEndSample;
+	if (wavFile->currSample >= wavFile->loopEnd)
+		wavFile->currSample = wavFile->loopBegin;
+	updateAdsr((AdsrConfig *) track->adsr->config,
+			loopEndSample - loopBeginSample);
+}
+
+void Java_com_kh_beatbot_global_Track_setTrackReverse(JNIEnv *env,
+		jclass clazz, jint trackNum, jboolean reverse) {
+	Track *track = getTrack(env, clazz, trackNum);
+	WavFile *wavFile = (WavFile *) track->generator->config;
+	wavFile->reverse = reverse;
+	// if the track is not looping, the wavFile generator will not loop to the beginning/end
+	// after enaabling/disabling reverse
+	if (reverse && wavFile->currSample == wavFile->loopBegin)
+		wavFile->currSample = wavFile->loopEnd;
+	else if (!reverse && wavFile->currSample == wavFile->loopEnd)
+		wavFile->currSample = wavFile->loopBegin;
 }

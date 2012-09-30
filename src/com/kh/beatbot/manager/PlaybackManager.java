@@ -1,6 +1,7 @@
 package com.kh.beatbot.manager;
 
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.global.Track;
 
 public class PlaybackManager {
 	
@@ -40,21 +41,12 @@ public class PlaybackManager {
 		disarmAllTracks();
 	}
 		
-	public void stopAllTracks() {
-		for (int sampleNum = 0; sampleNum < GlobalVars.tracks.size(); sampleNum++) {
-			stopTrack(sampleNum);
+	public static void stopAllTracks() {
+		for (Track track : GlobalVars.tracks) {
+			track.stop();
 		}
 	}
 
-	public native void armAllTracks();
-	public native void armTrack(int trackNum);
-	public native void disarmAllTracks();
-	public native void disarmTrack(int trackNum);
-	public native void playTrack(int trackNum);
-	public native void stopTrack(int trackNum);
-	public native void muteTrack(int trackNum, boolean mute);
-	public native void soloTrack(int trackNum, boolean solo);
-	public native void toggleLooping(int trackNum);
-	public native boolean isLooping(int trackNum); 
-	public native void setLoopWindow(int sampleNum, int loopBegin, int loopEnd);
+	public static native void armAllTracks();
+	public static native void disarmAllTracks();
 }

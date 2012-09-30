@@ -67,10 +67,46 @@ public class Track {
 		this.instrument = instrument;
 	}
 
-	/** Wrappers around native methods **/
+	/** Wrappers around native JNI methods **/
+	public void disarm() {
+		disarmTrack(id);
+	}
+
+	public void play() {
+		playTrack(id);
+	}
+
+	public void stop() {
+		stopTrack(id);
+	}
+
+	public void mute(boolean mute) {
+		muteTrack(id, mute);
+	}
+
+	public void solo(boolean solo) {
+		soloTrack(id, solo);
+	}
+
+	public void arm() {
+		armTrack(id);
+	}
+
+	public void toggleLooping() {
+		toggleTrackLooping(id);
+	}
+
+	public boolean isLooping() {
+		return isTrackLooping(id);
+	}
+
+	public void setLoopWindow(int loopBegin, int loopEnd) {
+		setTrackLoopWindow(id, loopBegin, loopEnd);
+	}
+
 	// set play mode to reverse
 	public void setReverse(boolean reverse) {
-		
+		setTrackReverse(id, reverse);
 	}
 
 	// scale all samples so that the sample with the highest amplitude is at 1
@@ -101,12 +137,31 @@ public class Track {
 	public void setAdsrPoint(int adsrPointNum, float x, float y) {
 		setAdsrPoint(id, adsrPointNum, x, y);
 	}
-	
+
 	public void setSampleBytes(byte[] bytes) {
 		setSampleBytes(id, bytes);
 	}
 
-	public static native void setReverse(int trackId, boolean reverse);
+	public static native void armTrack(int trackNum);
+
+	public static native void toggleTrackLooping(int trackNum);
+
+	public static native boolean isTrackLooping(int trackNum);
+
+	public static native void setTrackLoopWindow(int trackNum, int loopBegin,
+			int loopEnd);
+
+	public static native void disarmTrack(int trackNum);
+
+	public static native void playTrack(int trackNum);
+
+	public static native void stopTrack(int trackNum);
+
+	public static native void muteTrack(int trackNum, boolean mute);
+
+	public static native void soloTrack(int trackNum, boolean solo);
+
+	public static native void setTrackReverse(int trackId, boolean reverse);
 
 	public static native float[] normalize(int trackId);
 
@@ -117,7 +172,7 @@ public class Track {
 	public static native void setPrimaryPitch(int trackId, float pitch);
 
 	public static native void setAdsrOn(int trackId, boolean on);
-	
+
 	public native void setAdsrPoint(int trackId, int adsrPointNum, float x,
 			float y);
 

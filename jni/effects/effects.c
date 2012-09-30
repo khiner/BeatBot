@@ -219,19 +219,6 @@ void Java_com_kh_beatbot_effect_Effect_setEffectParam(JNIEnv *env, jclass clazz,
 	}
 }
 
-void Java_com_kh_beatbot_activity_SampleEditActivity_setReverse(JNIEnv *env,
-		jclass clazz, jint trackNum, jboolean reverse) {
-	Track *track = getTrack(env, clazz, trackNum);
-	WavFile *wavFile = (WavFile *) track->generator->config;
-	wavFile->reverse = reverse;
-	// if the track is not looping, the wavFile generator will not loop to the beginning/end
-	// after enaabling/disabling reverse
-	if (reverse && wavFile->currSample == wavFile->loopBegin)
-		wavFile->currSample = wavFile->loopEnd;
-	else if (!reverse && wavFile->currSample == wavFile->loopEnd)
-		wavFile->currSample = wavFile->loopBegin;
-}
-
 jfloatArray Java_com_kh_beatbot_activity_SampleEditActivity_normalize(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);

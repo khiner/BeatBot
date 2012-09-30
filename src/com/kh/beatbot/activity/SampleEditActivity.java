@@ -178,9 +178,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		initEffectLabelList();
 		initSampleWaveformView();
 
-		Managers.playbackManager.armTrack(trackId);
-		((ToggleButton) findViewById(R.id.loop_toggle))
-				.setChecked(Managers.playbackManager.isLooping(trackId));
+		currTrack.arm();
+		((ToggleButton) findViewById(R.id.loop_toggle)).setChecked(currTrack.isLooping());
 	}
 
 	private void setInstrument(Instrument instrument) {
@@ -272,7 +271,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	public void toggleLoop(View view) {
-		Managers.playbackManager.toggleLooping(currTrack.getId());
+		currTrack.toggleLooping();
 	}
 
 	public void toggleAdsr(View view) {
@@ -333,7 +332,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		super.onDestroy();
 		if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
 			// if not currently playing, disarm the track
-			Managers.playbackManager.disarmTrack(currTrack.getId());
+			currTrack.disarm();
 	}
 
 	private void initLevels() {

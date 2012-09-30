@@ -404,12 +404,12 @@ public class BeatBotActivity extends Activity implements
 
 	@Override
 	public void muteToggled(int track, boolean mute) {
-		Managers.playbackManager.muteTrack(track, mute);
+		GlobalVars.tracks.get(track).mute(mute);
 	}
 
 	@Override
 	public void soloToggled(int track, boolean solo) {
-		Managers.playbackManager.soloTrack(track, solo);
+		GlobalVars.tracks.get(track).solo(solo);
 	}
 
 	@Override
