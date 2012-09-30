@@ -1,10 +1,7 @@
 package com.kh.beatbot.global;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -35,21 +32,8 @@ public class GlobalVars {
 
 	public static final String[] allInstrumentTypes = { "kick", "snare",
 			"hh_closed", "hh_open", "rim", "recorded" };
-	public static final ArrayList<String> currentInstrumentNames = new ArrayList<String>(
-			Arrays.asList(new String[] { "kick", "snare", "hh_closed",
-					"hh_open", "rim" }));
 
-	public static final Map<String, Integer> instrumentSources = new HashMap<String, Integer>();
-
-	private static Map<String, Instrument> instruments = new HashMap<String, Instrument>();
-	static {
-		instrumentSources.put("kick", R.drawable.kick_icon_src);
-		instrumentSources.put("snare", R.drawable.snare_icon_src);
-		instrumentSources.put("hh_closed", R.drawable.hh_closed_icon_src);
-		instrumentSources.put("hh_open", R.drawable.hh_open_icon_src);
-		instrumentSources.put("rim", R.drawable.rimshot_icon_src);
-		instrumentSources.put("recorded", R.drawable.microphone_icon_src);
-	}
+	private static Instrument[] instruments = new Instrument[6];
 
 	public static BeatBotIconSource muteIcon, soloIcon, previewIcon,
 			beatSyncIcon;
@@ -71,10 +55,11 @@ public class GlobalVars {
 	public static float currBeatDivision;
 
 	public static void initTracks() {
-		for (String instrumentName : allInstrumentTypes) {
+		for (int i = 0; i < allInstrumentTypes.length; i++) {
+			String instrumentName = allInstrumentTypes[i];
 			Instrument instrument = new Instrument(instrumentName,
 					new BeatBotIconSource());
-			instruments.put(instrumentName, instrument);
+			instruments[i] = instrument;
 			if (!instrumentName.equals("recorded"))
 				tracks.add(new Track(tracks.size(), instrument));
 		}
@@ -89,24 +74,27 @@ public class GlobalVars {
 				R.drawable.preview_icon_selected);
 		beatSyncIcon = new BeatBotIconSource(R.drawable.clock,
 				R.drawable.note_icon);
-		instruments.get("kick").setIconResources(R.drawable.kick_icon_small,
+		instruments[0].setIconResources(R.drawable.kick_icon_src,
+				R.drawable.kick_icon_small,
 				R.drawable.kick_icon_selected_small,
 				R.drawable.kick_icon_listview);
-		instruments.get("snare").setIconResources(R.drawable.snare_icon_small,
+		instruments[1].setIconResources(R.drawable.snare_icon_src,
+				R.drawable.snare_icon_small,
 				R.drawable.snare_icon_selected_small,
 				R.drawable.snare_icon_listview);
-		instruments.get("hh_closed").setIconResources(
+		instruments[2].setIconResources(R.drawable.hh_closed_icon_src,
 				R.drawable.hh_closed_icon_small,
 				R.drawable.hh_closed_icon_selected_small,
 				R.drawable.hh_closed_icon_listview);
-		instruments.get("hh_open").setIconResources(
+		instruments[3].setIconResources(R.drawable.hh_open_icon_src,
 				R.drawable.hh_open_icon_small,
 				R.drawable.hh_open_icon_selected_small,
 				R.drawable.hh_open_icon_listview);
-		instruments.get("rim").setIconResources(R.drawable.rimshot_icon_small,
+		instruments[4].setIconResources(R.drawable.rimshot_icon_src,
+				R.drawable.rimshot_icon_small,
 				R.drawable.rimshot_icon_selected_small,
 				R.drawable.rimshot_icon_listview);
-		instruments.get("recorded").setIconResources(
+		instruments[5].setIconResources(R.drawable.microphone_icon_src,
 				R.drawable.microphone_icon_small,
 				R.drawable.microphone_icon_selected_small,
 				R.drawable.microphone_icon_listview);
@@ -116,7 +104,7 @@ public class GlobalVars {
 		initInstrumentSelectAdapter(activity);
 		initInstrumentSelectOnShowListener();
 	}
-	
+
 	private static void initInstrumentSelectAdapter(final Activity activity) {
 		instrumentSelectAdapter = new ArrayAdapter<String>(activity,
 				android.R.layout.select_dialog_item, android.R.id.text1,
@@ -126,7 +114,7 @@ public class GlobalVars {
 				TextView tv = (TextView) v.findViewById(android.R.id.text1);
 				// Put the image on the TextView
 				tv.setCompoundDrawablesWithIntrinsicBounds(
-						instruments.get(allInstrumentTypes[position]).getIconSource().listViewIcon.resourceId,
+						instruments[position].getBBIconSource().listViewIcon.resourceId,
 						0, 0, 0);
 				// Add margin between image and text (support various screen
 				// densities)
@@ -140,10 +128,9 @@ public class GlobalVars {
 	}
 
 	public static Instrument getInstrument(int instrumentNum) {
-		String instrumentName = allInstrumentTypes[instrumentNum];
-		return instruments.get(instrumentName);
+		return instruments[instrumentNum];
 	}
-	
+
 	private static void initInstrumentSelectOnShowListener() {
 		instrumentSelectOnShowListener = new OnShowListener() {
 			@Override

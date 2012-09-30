@@ -6,26 +6,27 @@ import java.io.IOException;
 
 public class Instrument {
 	private String name;
-	private BeatBotIconSource iconSource;
+	private BeatBotIconSource bbIconSource;
 	private File[] sampleFiles;
 	private String[] sampleNames;
 	private int currSampleNum;
-	
+	private int iconSource;
+
 	public Instrument(String instrumentName, BeatBotIconSource instrumentIcon) {
 		this.name = instrumentName;
-		this.iconSource = instrumentIcon;
+		this.bbIconSource = instrumentIcon;
 		File dir = new File(GlobalVars.appDirectory + instrumentName);
 		sampleFiles = dir.listFiles();
 		sampleNames = dir.list();
 		currSampleNum = 0;
 	}
-	
+
 	private byte[] getSampleBytes(int sampleNum) {
 		byte[] bytes = null;
 		try {
 			File sampleFile = sampleFiles[sampleNum];
 			FileInputStream in = new FileInputStream(sampleFile);
-			bytes = new byte[(int)sampleFile.length()];
+			bytes = new byte[(int) sampleFile.length()];
 			in.read(bytes);
 			in.close();
 			in = null;
@@ -34,19 +35,19 @@ public class Instrument {
 		}
 		return bytes;
 	}
-	
+
 	public void setCurrSampleNum(int currSampleNum) {
 		this.currSampleNum = currSampleNum;
 	}
-	
+
 	public int getCurrSampleNum() {
 		return currSampleNum;
 	}
-	
+
 	public byte[] getCurrSampleBytes() {
 		return getSampleBytes(currSampleNum);
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -54,15 +55,22 @@ public class Instrument {
 	public String getCurrSampleName() {
 		return getSampleName(currSampleNum);
 	}
-	
-	public BeatBotIconSource getIconSource() {
+
+	public BeatBotIconSource getBBIconSource() {
+		return bbIconSource;
+	}
+
+	public int getIconSource() {
 		return iconSource;
 	}
 
-	public void setIconResources(int defaultIconResourceId, int selectedIconResourceId, int listViewIconResourceId) {
-		this.iconSource.set(defaultIconResourceId, selectedIconResourceId, listViewIconResourceId);
+	public void setIconResources(int iconSource, int defaultIconResource,
+			int selectedIconResource, int listViewIconResource) {
+		this.iconSource = iconSource;
+		bbIconSource.set(defaultIconResource, selectedIconResource,
+				listViewIconResource);
 	}
-	
+
 	public File getSampleFile(int sampleNum) {
 		return sampleFiles[sampleNum];
 	}
@@ -70,7 +78,7 @@ public class Instrument {
 	public String[] getSampleNames() {
 		return sampleNames;
 	}
-	
+
 	public String getSampleName(int sampleNum) {
 		return sampleNames[sampleNum];
 	}

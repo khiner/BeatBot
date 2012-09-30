@@ -479,7 +479,7 @@ public class MidiView extends ClickableSurfaceView {
 		int newTrackIndex = GlobalVars.tracks.size() - 1;
 		MidiTrackControlHelper.addTrack(newTrackIndex,
 				GlobalVars.tracks.get(newTrackIndex).getInstrument()
-						.getIconSource());
+						.getBBIconSource());
 		initAllVbs();
 	}
 

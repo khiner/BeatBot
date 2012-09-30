@@ -85,7 +85,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	public void setSamples(byte[] samples) {
-		numSamples = samples.length / 4;
+		numSamples = samples.length / 2;
 		GlobalVars.tracks.get(trackNum).sampleLoopEnd = numSamples;
 		sampleWidth = numSamples;
 		waveformVb = WaveformHelper.bytesToFloatBuffer(samples, height, 0);

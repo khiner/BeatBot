@@ -15,18 +15,18 @@ public class Track {
 	public float[][] adsrPoints;
 	public float sampleLoopBegin = 0;
 	public float sampleLoopEnd = 0;
-	
+
 	public Track(int id, Instrument instrument) {
 		this.id = id;
 		this.instrument = instrument;
 		effects = new ArrayList<Effect>();
 		initDefaultAdsrPoints();
 	}
-	
+
 	public int getId() {
 		return id;
 	}
-	
+
 	public void initDefaultAdsrPoints() {
 		adsrPoints = new float[5][2];
 		for (int i = 0; i < 5; i++) {
@@ -40,7 +40,7 @@ public class Track {
 		adsrPoints[3][1] = .60f;
 		adsrPoints[4][1] = 0;
 	}
-	
+
 	public Effect findEffectById(int effectId) {
 		for (Effect effect : effects) {
 			if (effect.getId() == effectId) {
@@ -49,7 +49,7 @@ public class Track {
 		}
 		return null;
 	}
-	
+
 	public Effect findEffectByPosition(int position) {
 		for (Effect effect : effects) {
 			if (effect.getPosition() == position) {
@@ -58,8 +58,12 @@ public class Track {
 		}
 		return null;
 	}
-	
+
 	public Instrument getInstrument() {
 		return instrument;
+	}
+
+	public void setInstrument(Instrument instrument) {
+		this.instrument = instrument;
 	}
 }

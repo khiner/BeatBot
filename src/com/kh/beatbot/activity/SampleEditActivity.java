@@ -149,7 +149,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			sampleLabelList = null;
 
 	private Track currTrack;
-	private Instrument currInstrument;
 
 	private static String[] effectNames;
 
@@ -158,7 +157,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		super.onCreate(savedInstanceState);
 		int trackNum = getIntent().getExtras().getInt("trackNum");
 		currTrack = GlobalVars.tracks.get(trackNum);
-		currInstrument = currTrack.getInstrument();
 		GeneralUtils.initAndroidSettings(this);
 		setContentView(R.layout.sample_edit);
 		// set text font
@@ -170,11 +168,11 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		initSampleSelectAlert();
 		// set the instrument icon
 		((ImageButton) findViewById(R.id.instrumentButton))
-				.setBackgroundResource(GlobalVars.instrumentSources
-						.get(currInstrument.getName()));
+				.setBackgroundResource(currTrack.getInstrument()
+						.getIconSource());
 		// set the instrument text
-		((Button) findViewById(R.id.sampleSelect)).setText(currInstrument
-				.getSampleName(0));
+		((Button) findViewById(R.id.sampleSelect)).setText(currTrack
+				.getInstrument().getSampleName(0));
 		initLevels();
 		initSampleLabelList();
 		initEffectLabelList();
@@ -202,15 +200,14 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		builder.setAdapter(GlobalVars.instrumentSelectAdapter,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-						currInstrument = GlobalVars.getInstrument(item);
-						currInstrument.setCurrSampleNum(0);
-						currInstrument.getIconSource();
-						setInstrument(currInstrument);
-						int newInstrumentIcon = GlobalVars.instrumentSources
-								.get(GlobalVars.allInstrumentTypes[item]);
+						currTrack.setInstrument(GlobalVars.getInstrument(item));
+						currTrack.getInstrument().setCurrSampleNum(0);
+						currTrack.getInstrument().getBBIconSource();
+						setInstrument(currTrack.getInstrument());
 						// update instrument icon to reflect the change
 						((ImageButton) findViewById(R.id.instrumentButton))
-								.setBackgroundResource(newInstrumentIcon);
+								.setBackgroundResource(currTrack
+										.getInstrument().getIconSource());
 						// update the sample select alert names with the new
 						// instrument samples
 						initSampleSelectAlert();
@@ -224,11 +221,11 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	private void initSampleSelectAlert() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose Sample");
-		builder.setItems(currInstrument.getSampleNames(),
+		builder.setItems(currTrack.getInstrument().getSampleNames(),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-						currInstrument.setCurrSampleNum(item);
-						setInstrument(currInstrument);
+						currTrack.getInstrument().setCurrSampleNum(item);
+						setInstrument(currTrack.getInstrument());
 					}
 				});
 		sampleSelectAlert = builder.create();

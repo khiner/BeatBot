@@ -163,10 +163,11 @@ public class BeatBotActivity extends Activity implements
 		File appDirectoryFile = new File(GlobalVars.appDirectory);
 		// build the directory structure, if needed
 		appDirectoryFile.mkdirs();
-		for (String instrumentName : GlobalVars.currentInstrumentNames) {
+		for (String instrumentName : GlobalVars.allInstrumentTypes) {
 			// the sample folder for this sample type does not yet exist.
 			// create it and write all assets of this type to the folder
-			copyFromAssetsToExternal(instrumentName);
+			if (!instrumentName.equals("recorded"))
+				copyFromAssetsToExternal(instrumentName);
 		}
 	}
 
@@ -425,7 +426,6 @@ public class BeatBotActivity extends Activity implements
 		Instrument newInstrument = GlobalVars.getInstrument(instrumentType); 
 		addTrack(newInstrument.getCurrSampleBytes());
 		GlobalVars.tracks.add(new Track(GlobalVars.tracks.size(), newInstrument));
-		GlobalVars.currentInstrumentNames.add(newInstrument.getName());
 		GlobalVars.midiView.updateTracks();
 		// launch sample edit activity for the newly added track
 		launchSampleEditActivity(GlobalVars.tracks.size() - 1);
