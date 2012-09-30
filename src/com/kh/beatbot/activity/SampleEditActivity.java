@@ -148,15 +148,15 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	private static LabelListListenable effectLabelList = null,
 			sampleLabelList = null;
 
-	private Track currTrack;
+	private static Track currTrack;
 
 	private static String[] effectNames;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		int trackNum = getIntent().getExtras().getInt("trackNum");
-		currTrack = GlobalVars.tracks.get(trackNum);
+		int trackId = getIntent().getExtras().getInt("trackId");
+		currTrack = GlobalVars.tracks.get(trackId);
 		GeneralUtils.initAndroidSettings(this);
 		setContentView(R.layout.sample_edit);
 		// set text font
@@ -178,15 +178,15 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		initEffectLabelList();
 		initSampleWaveformView();
 
-		Managers.playbackManager.armTrack(trackNum);
+		Managers.playbackManager.armTrack(trackId);
 		((ToggleButton) findViewById(R.id.loop_toggle))
-				.setChecked(Managers.playbackManager.isLooping(trackNum));
+				.setChecked(Managers.playbackManager.isLooping(trackId));
 	}
 
 	private void setInstrument(Instrument instrument) {
 		// set native sample bytes through JNI
 		byte[] bytes = instrument.getCurrSampleBytes();
-		setSampleBytes(currTrack.getId(), bytes);
+		currTrack.setSampleBytes(bytes);
 		// update sample label text
 		((Button) findViewById(R.id.sampleSelect)).setText(instrument
 				.getCurrSampleName());
@@ -245,17 +245,17 @@ public class SampleEditActivity extends Activity implements LevelListener {
 
 	private void initSampleWaveformView() {
 		sampleWaveformView = ((SampleWaveformView) findViewById(R.id.sample_waveform_view));
-		sampleWaveformView.setTrackNum(currTrack.getId());
+		sampleWaveformView.setTrack(currTrack);
 	}
 
 	public static void quantizeEffectParams() {
-		for (int trackNum = 0; trackNum < GlobalVars.tracks.size(); trackNum++) {
-			for (Effect effect : GlobalVars.tracks.get(trackNum).effects) {
+		for (int trackId = 0; trackId < GlobalVars.tracks.size(); trackId++) {
+			for (Effect effect : GlobalVars.tracks.get(trackId).effects) {
 				for (int paramNum = 0; paramNum < effect.getNumParams(); paramNum++) {
 					EffectParam param = effect.getParam(paramNum);
 					if (param.beatSync) {
 						effect.setParamLevel(param, param.viewLevel);
-						effect.setEffectParam(trackNum, effect.getId(),
+						effect.setEffectParam(trackId, effect.getId(),
 								paramNum, param.level);
 					}
 				}
@@ -278,11 +278,11 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public void toggleAdsr(View view) {
 		boolean on = ((ToggleButton) view).isChecked();
 		sampleWaveformView.setShowAdsr(on);
-		setAdsrOn(currTrack.getId(), on);
+		currTrack.setAdsrOn(on);
 	}
 
 	public void reverse(View view) {
-		setReverse(currTrack.getId(), ((ToggleButton) view).isChecked());
+		currTrack.setReverse(((ToggleButton) view).isChecked());
 	}
 
 	// public void normalize(View view) {
@@ -323,7 +323,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		Intent intent = new Intent();
 		intent.setClass(this, EffectActivity.class);
 		intent.putExtra("effectId", effect.getId());
-		intent.putExtra("trackNum", currTrack.getId());
+		intent.putExtra("trackId", currTrack.getId());
 
 		startActivity(intent);
 	}
@@ -348,14 +348,11 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	@Override
 	public void setLevel(LevelListenable levelBar, float level) {
 		if (levelBar.equals(volumeLevel)) {
-			setPrimaryVolume(currTrack.getId(), level);
-			currTrack.volume = level;
+			currTrack.setPrimaryVolume(level);
 		} else if (levelBar.equals(panLevel)) {
-			setPrimaryPan(currTrack.getId(), level);
-			currTrack.pan = level;
+			currTrack.setPrimaryPan(level);
 		} else if (levelBar.equals(pitchLevel)) {
-			setPrimaryPitch(currTrack.getId(), level);
-			currTrack.pitch = level;
+			currTrack.setPrimaryPitch(level);
 		}
 	}
 
@@ -388,22 +385,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public void notifyClicked(LevelListenable levelListenable) {
 		// do nothing when levels are clicked
 	}
-
-	// set play mode to reverse
-	public static native void setReverse(int trackNum, boolean reverse);
-
-	// scale all samples so that the sample with the highest amplitude is at 1
-	public static native float[] normalize(int trackNum);
-
-	public static native void setPrimaryVolume(int trackNum, float volume);
-
-	public static native void setPrimaryPan(int trackNum, float pan);
-
-	public static native void setPrimaryPitch(int trackNum, float pitch);
-
-	public static native void setAdsrOn(int trackNum, boolean on);
-
-	public static native void setSampleBytes(int trackNum, byte[] bytes);
 
 	@Override
 	public void setLevel(LevelListenable levelListenable, float levelX,

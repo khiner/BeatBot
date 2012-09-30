@@ -66,4 +66,60 @@ public class Track {
 	public void setInstrument(Instrument instrument) {
 		this.instrument = instrument;
 	}
+
+	/** Wrappers around native methods **/
+	// set play mode to reverse
+	public void setReverse(boolean reverse) {
+		
+	}
+
+	// scale all samples so that the sample with the highest amplitude is at 1
+	public float[] normalize() {
+		return normalize(id);
+	}
+
+	public void setPrimaryVolume(float volume) {
+		this.volume = volume;
+		setPrimaryVolume(id, volume);
+	}
+
+	public void setPrimaryPan(float pan) {
+		this.pan = pan;
+		setPrimaryPan(id, volume);
+	}
+
+	public void setPrimaryPitch(float pitch) {
+		this.pitch = pitch;
+		setPrimaryPitch(id, volume);
+	}
+
+	public void setAdsrOn(boolean on) {
+		setAdsrOn(id, on);
+	}
+
+	// set the native adsr point. x and y range from 0 to 1
+	public void setAdsrPoint(int adsrPointNum, float x, float y) {
+		setAdsrPoint(id, adsrPointNum, x, y);
+	}
+	
+	public void setSampleBytes(byte[] bytes) {
+		setSampleBytes(id, bytes);
+	}
+
+	public static native void setReverse(int trackId, boolean reverse);
+
+	public static native float[] normalize(int trackId);
+
+	public static native void setPrimaryVolume(int trackId, float volume);
+
+	public static native void setPrimaryPan(int trackId, float pan);
+
+	public static native void setPrimaryPitch(int trackId, float pitch);
+
+	public static native void setAdsrOn(int trackId, boolean on);
+	
+	public native void setAdsrPoint(int trackId, int adsrPointNum, float x,
+			float y);
+
+	public static native void setSampleBytes(int trackId, byte[] bytes);
 }

@@ -21,7 +21,6 @@ import com.kh.beatbot.view.MidiView;
 
 public class GlobalVars {
 	public static Typeface font;
-
 	// time (in millis) between pointer down and pointer up to be considered a
 	// tap
 	public final static long SINGLE_TAP_TIME = 200;

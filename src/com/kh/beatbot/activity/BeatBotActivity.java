@@ -282,8 +282,8 @@ public class BeatBotActivity extends Activity implements
 	private void initNativeAudio() {
 		createEngine();
 		createAudioPlayer();
-		for (int trackNum = 0; trackNum < GlobalVars.tracks.size(); trackNum++) {
-			addTrack(GlobalVars.tracks.get(trackNum).getInstrument()
+		for (int trackId = 0; trackId < GlobalVars.tracks.size(); trackId++) {
+			addTrack(GlobalVars.tracks.get(trackId).getInstrument()
 					.getCurrSampleBytes());
 		}
 	}
@@ -302,10 +302,10 @@ public class BeatBotActivity extends Activity implements
 	 * Open new intent for sample edit view, passing the track number to the
 	 * intent as an extra.
 	 */
-	private void launchSampleEditActivity(int trackNum) {
+	private void launchSampleEditActivity(int trackId) {
 		Intent intent = new Intent();
 		intent.setClass(this, SampleEditActivity.class);
-		intent.putExtra("trackNum", trackNum);
+		intent.putExtra("trackId", trackId);
 		startActivity(intent);
 	}
 

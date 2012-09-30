@@ -1,4 +1,5 @@
 #include "track.h"
+#include "effects/adsr.h"
 #include "effects/volpan.h"
 #include "effects/pitch.h"
 
@@ -182,7 +183,56 @@ void setSampleBytes(Track *track, char *bytes, int length) {
 			((WavFile *)track->generator->config)->totalSamples);
 }
 
-void Java_com_kh_beatbot_activity_SampleEditActivity_setSampleBytes(JNIEnv *env,
+void Java_com_kh_beatbot_global_Track_setPrimaryVolume(
+		JNIEnv *env, jclass clazz, jint trackNum, jfloat volume) {
+	Track *track = getTrack(env, clazz, trackNum);
+	track->primaryVolume = volume;
+	track->volPan->set(track->volPan->config,
+			track->primaryVolume * track->noteVolume,
+			track->primaryPan * track->notePan);
+}
+
+void Java_com_kh_beatbot_global_Track_setPrimaryPan(JNIEnv *env,
+		jclass clazz, jint trackNum, jfloat pan) {
+	Track *track = getTrack(env, clazz, trackNum);
+	track->primaryPan = pan;
+	track->volPan->set(track->volPan->config,
+			track->primaryVolume * track->noteVolume,
+			track->primaryPan * track->notePan);
+}
+
+void Java_com_kh_beatbot_global_Track_setPrimaryPitch(
+		JNIEnv *env, jclass clazz, jint trackNum, jfloat pitch) {
+	Track *track = getTrack(env, clazz, trackNum);
+	track->primaryPitch = pitch;
+	//if (track->outputPlayerPitch != NULL) {
+	//(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((track->pitch + track->primaryPitch)*750 + 500));
+	//}
+}
+
+void Java_com_kh_beatbot_global_Track_setAdsrOn(JNIEnv *env, jclass clazz,
+		jint trackNum, jboolean on) {
+	Track *track = getTrack(env, clazz, trackNum);
+	track->adsr->on = on;
+}
+
+void Java_com_kh_beatbot_global_Track_setAdsrPoint(JNIEnv *env,
+		jclass clazz, jint trackNum, jint adsrPointNum, jfloat x, jfloat y) {
+	Track *track = getTrack(env, clazz, trackNum);
+	AdsrConfig *config = (AdsrConfig *) track->adsr->config;
+	config->adsrPoints[adsrPointNum].sampleCents = x;
+	if (adsrPointNum == 0)
+		config->initial = y;
+	else if (adsrPointNum == 1)
+		config->peak = y;
+	else if (adsrPointNum == 2)
+		config->sustain = y;
+	else if (adsrPointNum == 4)
+		config->end = y + 0.00001f;
+	updateAdsr(config, config->totalSamples);
+}
+
+void Java_com_kh_beatbot_global_Track_setSampleBytes(JNIEnv *env,
 		jclass clazz, jint trackNum, jbyteArray bytes) {
 	Track *track = getTrack(env, clazz, trackNum);
 	__android_log_print(ANDROID_LOG_ERROR, "in sample set bytes", "before getByteArrayElem");
@@ -204,6 +254,6 @@ void Java_com_kh_beatbot_activity_SampleEditActivity_setSampleBytes(JNIEnv *env,
 void Java_com_kh_beatbot_activity_BeatBotActivity_addTrack(JNIEnv *env, jclass clazz, jbyteArray bytes) {
 	Track *track = initTrack();
 	addTrack(track);
-	Java_com_kh_beatbot_activity_SampleEditActivity_setSampleBytes(env, clazz, trackCount, bytes);
+	Java_com_kh_beatbot_global_Track_setSampleBytes(env, clazz, trackCount, bytes);
 	trackCount++;
 }
