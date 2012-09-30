@@ -14,7 +14,6 @@ import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Track;
-import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class SampleWaveformView extends SurfaceViewBase {
@@ -76,6 +75,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	// keep track of that with offset and width
 	private float sampleOffset = 0;
 	private float sampleWidth;
+	private int channels;
 
 	public SampleWaveformView(Context c, AttributeSet as) {
 		super(c, as);
@@ -86,10 +86,11 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	public void setSamples(byte[] samples) {
-		numSamples = samples.length / 2;
+		channels = (int)samples[22];
+		numSamples = samples.length / 2 - 22;
 		track.sampleLoopEnd = numSamples;
 		sampleWidth = numSamples;
-		waveformVb = WaveformHelper.bytesToFloatBuffer(samples, height, 0);
+		waveformVb = WaveformHelper.bytesToFloatBuffer(samples, height, 0, 44);
 		updateLoopMarkers();
 	}
 
@@ -324,7 +325,9 @@ public class SampleWaveformView extends SurfaceViewBase {
 			track.sampleLoopEnd += diff;
 			clipLoopToWindow();
 		}
-		track.setLoopWindow((int) track.sampleLoopBegin, (int) track.sampleLoopEnd);
+		int nativeLoopBegin = channels == 2 ? (int) (track.sampleLoopBegin / 2) : (int)track.sampleLoopBegin; 
+		int nativeLoopEnd = channels == 2 ? (int) (track.sampleLoopEnd / 2) : (int)track.sampleLoopEnd; 
+		track.setLoopWindow(nativeLoopBegin, nativeLoopEnd);
 		// update the display location of the loop markers
 		initLoopMarkerVb();
 		initAdsrVb();
@@ -463,7 +466,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		initLoopMarkerVb();
 		initAdsrVb();
 		// update sample playback.
-		track.setLoopWindow((int) track.sampleLoopBegin, (int) track.sampleLoopEnd);
+		updateLoopMarkers();
 		return true;
 	}
 

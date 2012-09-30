@@ -45,7 +45,7 @@ public class WaveformHelper extends Thread {
 						break;
 					bytes = bytesQueue.remove();
 				}
-				waveformSegmentsVB.add(bytesToFloatBuffer(bytes, DEFAULT_HEIGHT, xOffset));
+				waveformSegmentsVB.add(bytesToFloatBuffer(bytes, DEFAULT_HEIGHT, xOffset, 0));
 				xOffset += bytes.length / 2;				
 				if (completed) {
 					xOffset = 0;
@@ -79,20 +79,20 @@ public class WaveformHelper extends Thread {
 	// default to 0 offset, used when only a single FloatBuffer is needed
 	// (for a static sample)
 	public static FloatBuffer bytesToFloatBuffer(byte[] bytes, float height) {
-		return bytesToFloatBuffer(bytes, height, 0);
+		return bytesToFloatBuffer(bytes, height, 0, 0);
 	}
 	
-	public static FloatBuffer bytesToFloatBuffer(byte[] bytes, float height, int xOffset) {
+	public static FloatBuffer bytesToFloatBuffer(byte[] bytes, float height, int xOffset, int skip) {
 		float[] floats = bytesToFloats(bytes);
-		return floatsToFloatBuffer(floats, height, xOffset);
+		return floatsToFloatBuffer(floats, height, xOffset, skip / 2);
 	}
 	
-	public static FloatBuffer floatsToFloatBuffer(float[] data, float height, int xOffset) {
-		int size = data.length;
+	public static FloatBuffer floatsToFloatBuffer(float[] data, float height, int xOffset, int skip) {
+		int size = data.length - skip;
 		// int samplesPerPixel = width <= 0 || (int)(size/width) > 4 ? 4 : (int)(size/width);
 		float[] outputAry = new float[2 * size];
 		for (int x = 0; x < size; x++) {
-			float y = height*(data[x] + 1)/2;
+			float y = height*(data[x + skip] + 1)/2;
 			outputAry[x * 2] = x + xOffset;
 			outputAry[x * 2 + 1] = y;
 		}
