@@ -56,7 +56,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	private int trackNum;
 
-	private int numSamples = 0;
+	private int numSamples = -1;
 
 	// which pointer id is touching which marker (-1 means no pointer)
 	private int beginLoopMarkerTouched = -1;
@@ -71,7 +71,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	private float scrollAnchorSample = -1;
 
-	private float[] samples = null;
 	// zooming/scrolling will change the view window of the samples
 	// keep track of that with offset and width
 	private float sampleOffset = 0;
@@ -85,14 +84,11 @@ public class SampleWaveformView extends SurfaceViewBase {
 		this.trackNum = trackNum;
 	}
 
-	public void setSamples(float[] samples) {
-		this.samples = samples;
-		numSamples = samples.length;
+	public void setSamples(byte[] samples) {
+		numSamples = samples.length / 4;
 		GlobalVars.tracks.get(trackNum).sampleLoopEnd = numSamples;
 		sampleWidth = numSamples;
-		if (height != 0) {
-			waveformVb = WaveformHelper.floatsToFloatBuffer(samples, height, 0);
-		}
+		waveformVb = WaveformHelper.bytesToFloatBuffer(samples, height, 0);
 		updateLoopMarkers();
 	}
 
@@ -168,7 +164,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private void drawWaveform() {
 		if (waveformVb == null)
 			return;
-		float scale = (waveformWidth) / ((float) sampleWidth);
+		float scale = waveformWidth / ((float) sampleWidth);
 		float translate = -sampleOffset;
 		float[] color = Colors.VOLUME_COLOR;
 		gl.glLineWidth(10);
@@ -227,9 +223,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		setBackgroundColor(BG_COLOR);
 		previewButtonWidth = height;
 		waveformWidth = width - previewButtonWidth - SNAP_DIST;
-		while (samples == null)
-			; // wait until we're sure the sample bytes have been set
-		waveformVb = WaveformHelper.floatsToFloatBuffer(samples, height, 0);
+		setSamples(GlobalVars.tracks.get(trackNum).getInstrument().getCurrSampleBytes());
 		initBackgroundOutlineVb();
 		initPreviewButtonSquareVb();
 		initLoopMarkerVb();

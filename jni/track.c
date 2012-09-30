@@ -2,6 +2,12 @@
 #include "effects/volpan.h"
 #include "effects/pitch.h"
 
+jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size) {
+	jfloatArray result = (*env)->NewFloatArray(env, size);
+	(*env)->SetFloatArrayRegion(env, result, 0, size, floatAry);
+	return result;
+}
+
 void printTracks(TrackNode *head) {
 	__android_log_print(ANDROID_LOG_ERROR, "tracks", "Elements:");
 	TrackNode *cur_ptr = head;
@@ -176,24 +182,23 @@ void setSampleBytes(Track *track, char *bytes, int length) {
 			((WavFile *)track->generator->config)->totalSamples);
 }
 
-jfloatArray Java_com_kh_beatbot_activity_SampleEditActivity_getSampleFloats(JNIEnv *env,
-		jclass clazz, jint trackNum) {
-	Track *track = getTrack(env, clazz, trackNum);
-	WavFile *wavFile = (WavFile *) track->generator->config;
-	return makejFloatArray(env, wavFile->buffers[0], wavFile->totalSamples);
-}
-
 void Java_com_kh_beatbot_activity_SampleEditActivity_setSampleBytes(JNIEnv *env,
 		jclass clazz, jint trackNum, jbyteArray bytes) {
 	Track *track = getTrack(env, clazz, trackNum);
-	int length = (*env)->GetArrayLength(env, bytes);
-	char *data = (char *) (*env)->GetByteArrayElements(env, bytes, 0);
-	(*env)->ReleaseByteArrayElements(env, bytes, data, JNI_ABORT);
+	__android_log_print(ANDROID_LOG_ERROR, "in sample set bytes", "before getByteArrayElem");
+	jbyte* tempPointer = (*env)->GetByteArrayElements(env, bytes, JNI_FALSE);
+	char* data = (char*) tempPointer;
+	int length = (int)(*env)->GetArrayLength(env, bytes);
+
+	(*env)->ReleaseByteArrayElements(env, bytes, tempPointer, 0);
+
+	__android_log_print(ANDROID_LOG_ERROR, "in sample set bytes", "before setSampleBytes");
 	if (track->generator == NULL) {
 		initSampleBytes(track, data, length);
 	} else {
 		setSampleBytes(track, data, length);
 	}
+	pthread_mutex_unlock(&((WavFile *)track->generator->config)->bufferMutex);
 }
 
 void Java_com_kh_beatbot_activity_BeatBotActivity_addTrack(JNIEnv *env, jclass clazz, jbyteArray bytes) {

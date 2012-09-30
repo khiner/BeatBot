@@ -43,6 +43,8 @@ typedef struct TrackNode_t {
 TrackNode *trackHead;
 OpenSlOut *openSlOut;
 
+jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size);
+
 TrackNode *getTrackNode(int trackNum);
 
 Track *getTrack(JNIEnv *env, jclass clazz, int trackNum);

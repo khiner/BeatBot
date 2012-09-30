@@ -7,6 +7,8 @@
 #define CONVMYFLT (1./32768.)
 
 typedef struct WavFile_t {
+	// mutex for buffer since setting the wav data happens on diff thread than processing
+	pthread_mutex_t bufferMutex;
 	float tempSample[2];
 	float **buffers; // buffer to hold wav data
 	int totalSamples;

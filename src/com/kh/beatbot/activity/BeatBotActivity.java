@@ -283,7 +283,7 @@ public class BeatBotActivity extends Activity implements
 		createAudioPlayer();
 		for (int trackNum = 0; trackNum < GlobalVars.tracks.size(); trackNum++) {
 			addTrack(GlobalVars.tracks.get(trackNum).getInstrument()
-					.getSampleBytes(0));
+					.getCurrSampleBytes());
 		}
 	}
 
@@ -423,7 +423,7 @@ public class BeatBotActivity extends Activity implements
 
 	private void addTrack(int instrumentType) {
 		Instrument newInstrument = GlobalVars.getInstrument(instrumentType); 
-		addTrack(newInstrument.getSampleBytes(0));
+		addTrack(newInstrument.getCurrSampleBytes());
 		GlobalVars.tracks.add(new Track(newInstrument));
 		GlobalVars.currentInstrumentNames.add(newInstrument.getName());
 		GlobalVars.midiView.updateTracks();

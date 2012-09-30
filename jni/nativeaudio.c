@@ -240,8 +240,10 @@ static inline void generateNextBuffer() {
 				stopTrack(track);
 			}
 			if (track->playing || track->previewing) {
+				pthread_mutex_lock(&((WavFile *) track->generator->config)->bufferMutex);
 				wavfile_tick((WavFile *) track->generator->config,
 						track->tempSample);
+				pthread_mutex_unlock(&((WavFile *) track->generator->config)->bufferMutex);
 			} else {
 				track->tempSample[0] = track->tempSample[1] = 0;
 			}

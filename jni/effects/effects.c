@@ -180,12 +180,6 @@ EffectNode *removeEffect(int trackNum, int effectId) {
 }
 
 /********* JNI METHODS **********/
-jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size) {
-	jfloatArray result = (*env)->NewFloatArray(env, size);
-	(*env)->SetFloatArrayRegion(env, result, 0, size, floatAry);
-	return result;
-}
-
 void Java_com_kh_beatbot_effect_Effect_addEffect(JNIEnv *env, jclass clazz,
 		jint trackNum, jint effectNum, jint effectId, jint position) {
 	Track *track = getTrack(env, clazz, trackNum);

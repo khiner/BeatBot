@@ -16,6 +16,7 @@ static inline float bytesToFloat(unsigned char firstByte,
  * http://stackoverflow.com/questions/8754111/how-to-read-the-data-in-a-wav-file-to-an-array
  */
 void wavfile_setBytes(WavFile *wavFile, char *wav, int length) {
+	pthread_mutex_lock(&wavFile->bufferMutex);
 	// Determine if mono or stereo
 	int channels = wav[22]; // Forget byte 23 as 99.999% of WAVs are 1 or 2 channels
 
@@ -41,6 +42,7 @@ void wavfile_setBytes(WavFile *wavFile, char *wav, int length) {
 	if (channels == 2)
 		wavFile->totalSamples /= 2; // 4 bytes per sample (16 bit stereo)
 
+	__android_log_print(ANDROID_LOG_ERROR, "in wavfile_setBytes", "before buffer alloc");
 	wavFile->buffers = (float **) malloc(2 * sizeof(float *));
 	// Allocate memory (right will be null if only mono sound)
 	wavFile->buffers[0] = (float *) calloc(wavFile->totalSamples,
@@ -48,6 +50,7 @@ void wavfile_setBytes(WavFile *wavFile, char *wav, int length) {
 	wavFile->buffers[1] = (float *) calloc(wavFile->totalSamples,
 			sizeof(float));
 
+	__android_log_print(ANDROID_LOG_ERROR, "in wavfile_setBytes", "after buffer alloc");
 	// write to wavFile float buffers
 	int i = 0;
 	while (pos < length) {
@@ -61,16 +64,20 @@ void wavfile_setBytes(WavFile *wavFile, char *wav, int length) {
 		}
 		i++;
 	}
+	__android_log_print(ANDROID_LOG_ERROR, "in wavfile_setBytes", "after buffer copy");
 	// init loop / currSample position data
 	wavFile->loopBegin = 0;
 	wavFile->loopEnd = wavFile->totalSamples - 2;
 	wavFile->currSample = 0;
 
-	//free(bytes); //taken care of by Release JNI method?
+	// free(wav); //taken care of by Release JNI method?
+	//wav = NULL;
+	pthread_mutex_unlock(&wavFile->bufferMutex);
 }
 
 WavFile *wavfile_create(char *bytes, int length) {
 	WavFile *wavFile = (WavFile *) malloc(sizeof(WavFile));
+	pthread_mutex_init(&wavFile->bufferMutex, NULL);
 	wavfile_setBytes(wavFile, bytes, length);
 	wavFile->looping = wavFile->reverse = false;
 	return wavFile;
@@ -81,10 +88,12 @@ void wavfile_reset(WavFile *config) {
 }
 
 void freeBuffers(WavFile *config) {
+	pthread_mutex_lock(&config->bufferMutex);
 	free(config->buffers[0]);
 	free(config->buffers[1]);
 	free(config->buffers);
 	config->buffers = NULL;
+	pthread_mutex_unlock(&config->bufferMutex);
 }
 
 void wavfile_destroy(void *p) {

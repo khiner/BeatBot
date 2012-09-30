@@ -185,14 +185,14 @@ public class SampleEditActivity extends Activity implements LevelListener {
 				.setChecked(Managers.playbackManager.isLooping(trackNum));
 	}
 
-	private void setSample(int instrumentNum, int sampleNum) {
-		Instrument instrument = GlobalVars.getInstrument(instrumentNum);
+	private void setInstrument(Instrument instrument) {
 		// set native sample bytes through JNI
-		setSampleBytes(trackNum, instrument.getSampleBytes(sampleNum));
+		byte[] bytes = instrument.getCurrSampleBytes();
+		setSampleBytes(trackNum, bytes);
 		// update sample label text
-		((Button) findViewById(R.id.sampleSelect)).setText(instrument.getSampleName(sampleNum));
+		((Button) findViewById(R.id.sampleSelect)).setText(instrument.getCurrSampleName());
 		// update sample waveform view with new sample bytes
-		sampleWaveformView.setSamples(getSampleFloats(trackNum));
+		sampleWaveformView.setSamples(bytes);
 	}
 
 	private void initInstrumentSelectAlert() {
@@ -201,8 +201,10 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		builder.setAdapter(GlobalVars.instrumentSelectAdapter,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-						setSample(item, 0);
 						currInstrumentNum = item;
+						Instrument instrument = GlobalVars.getInstrument(currInstrumentNum); 
+						instrument.setCurrSampleNum(0);
+						setInstrument(instrument);
 						int newInstrumentIcon = GlobalVars.instrumentSources
 								.get(GlobalVars.allInstrumentTypes[item]);
 						// update instrument icon to reflect the change
@@ -223,7 +225,9 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		builder.setItems(GlobalVars.getInstrument(currInstrumentNum).getSampleNames(),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-						setSample(currInstrumentNum, item);
+						Instrument instrument = GlobalVars.getInstrument(currInstrumentNum); 
+						instrument.setCurrSampleNum(item);
+						setInstrument(instrument);
 					}
 				});
 		sampleSelectAlert = builder.create();
@@ -244,7 +248,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	private void initSampleWaveformView() {
 		sampleWaveformView = ((SampleWaveformView) findViewById(R.id.sample_waveform_view));
 		sampleWaveformView.setTrackNum(trackNum);
-		sampleWaveformView.setSamples(getSampleFloats(trackNum));
 	}
 
 	public static void quantizeEffectParams() {
@@ -284,9 +287,9 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		setReverse(trackNum, ((ToggleButton) view).isChecked());
 	}
 
-	public void normalize(View view) {
-		sampleWaveformView.setSamples(normalize(trackNum));
-	}
+	//public void normalize(View view) {
+//		sampleWaveformView.setSamples(normalize(trackNum));
+//	}
 
 	private Effect getEffect(String effectName, int id, int position) {
 		Effect effect = GlobalVars.tracks.get(trackNum).findEffectById(id);
@@ -387,9 +390,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	public void notifyClicked(LevelListenable levelListenable) {
 		// do nothing when levels are clicked
 	}
-
-	// get the audio data in floats
-	public static native float[] getSampleFloats(int trackNum);
 
 	// set play mode to reverse
 	public static native void setReverse(int trackNum, boolean reverse);
