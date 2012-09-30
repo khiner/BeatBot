@@ -76,7 +76,7 @@ public class GlobalVars {
 					new BeatBotIconSource());
 			instruments.put(instrumentName, instrument);
 			if (!instrumentName.equals("recorded"))
-				tracks.add(new Track(instrument));
+				tracks.add(new Track(tracks.size(), instrument));
 		}
 	}
 

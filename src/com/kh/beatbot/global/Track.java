@@ -6,6 +6,7 @@ import java.util.List;
 import com.kh.beatbot.effect.Effect;
 
 public class Track {
+	private int id;
 	private Instrument instrument;
 	public List<Effect> effects;
 	public float volume = .8f;
@@ -15,10 +16,15 @@ public class Track {
 	public float sampleLoopBegin = 0;
 	public float sampleLoopEnd = 0;
 	
-	public Track(Instrument instrument) {
+	public Track(int id, Instrument instrument) {
+		this.id = id;
 		this.instrument = instrument;
 		effects = new ArrayList<Effect>();
 		initDefaultAdsrPoints();
+	}
+	
+	public int getId() {
+		return id;
 	}
 	
 	public void initDefaultAdsrPoints() {
