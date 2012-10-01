@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import com.kh.beatbot.view.MidiView;
+import com.kh.beatbot.view.SurfaceViewBase;
 
 public class WaveformHelper extends Thread {
 	private boolean recording = false;
@@ -45,7 +45,7 @@ public class WaveformHelper extends Thread {
 						break;
 					bytes = bytesQueue.remove();
 				}
-				waveformSegmentsVB.add(bytesToFloatBuffer(bytes, DEFAULT_HEIGHT, xOffset, 0));
+				waveformSegmentsVB.add(bytesToFloatBuffer(bytes, DEFAULT_HEIGHT, xOffset));
 				xOffset += bytes.length / 2;				
 				if (completed) {
 					xOffset = 0;
@@ -78,35 +78,34 @@ public class WaveformHelper extends Thread {
 	
 	// default to 0 offset, used when only a single FloatBuffer is needed
 	// (for a static sample)
-	public static FloatBuffer bytesToFloatBuffer(byte[] bytes, float height) {
-		return bytesToFloatBuffer(bytes, height, 0, 0);
+	public static FloatBuffer bytesToFloatBuffer(byte[] bytes, float width, float height) {
+		return bytesToFloatBuffer(bytes, width, height, 0);
 	}
 	
-	public static FloatBuffer bytesToFloatBuffer(byte[] bytes, float height, int xOffset, int skip) {
-		float[] floats = bytesToFloats(bytes);
-		return floatsToFloatBuffer(floats, height, xOffset, skip / 2);
+	public static FloatBuffer bytesToFloatBuffer(byte[] bytes, float width, float height, int xOffset) {
+		float[] floats = bytesToFloats(bytes, 0);
+		return floatsToFloatBuffer(floats, width, height, 0, (int)width, xOffset);
 	}
 	
-	public static FloatBuffer floatsToFloatBuffer(float[] data, float height, int xOffset, int skip) {
-		int size = data.length - skip;
-		// int samplesPerPixel = width <= 0 || (int)(size/width) > 4 ? 4 : (int)(size/width);
-		float[] outputAry = new float[2 * size];
-		for (int x = 0; x < size; x++) {
-			float y = height*(data[x + skip] + 1)/2;
-			outputAry[x * 2] = x + xOffset;
+	public static FloatBuffer floatsToFloatBuffer(float[] data, float width, float height, int offset, int numFloats, int xOffset) {
+		float spp = Math.min(2, numFloats / width);
+		float[] outputAry = new float[2 * (int)(width * spp)];
+		for (int x = 0; x < outputAry.length / 2; x++) {
+			float percent = (float)(x * 2) / outputAry.length;
+			float y = height*(data[offset + (int)(percent * numFloats)] + 1)/2;
+			outputAry[x * 2] = percent * width + xOffset;
 			outputAry[x * 2 + 1] = y;
 		}
-
-		return MidiView.makeFloatBuffer(outputAry);
+		return SurfaceViewBase.makeFloatBuffer(outputAry);
 	}
 
-	public static float[] bytesToFloats(byte[] input) {
+	public static float[] bytesToFloats(byte[] input, int skip) {
 		ShortBuffer shortBuffer = ByteBuffer.wrap(input).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
 		short[] shortData = new short[shortBuffer.capacity()];
 		shortBuffer.get(shortData);
-		float[] floatData = new float[shortData.length];
-		for (int i = 0; i < shortData.length; i++) {
-			floatData[i] = ((float)shortData[i])/0x8000;
+		float[] floatData = new float[shortData.length - skip];
+		for (int i = 0; i < shortData.length - skip; i++) {
+			floatData[i] = ((float)shortData[i + skip])/0x8000;
 		}		
 		return floatData;
 	}

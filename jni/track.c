@@ -177,35 +177,12 @@ void initSampleBytes(Track *track, char *bytes, int length) {
 
 void setSampleBytes(Track *track, char *bytes, int length) {
 	WavFile *wavConfig = (WavFile *) track->generator->config;
+	pthread_mutex_lock(&wavConfig->bufferMutex);
 	freeBuffers(wavConfig);
 	wavfile_setBytes(wavConfig, bytes, length);
 	adsrconfig_setNumSamples(track->adsr->config,
 			((WavFile *)track->generator->config)->totalSamples);
-}
-
-void Java_com_kh_beatbot_manager_PlaybackManager_armAllTracks(JNIEnv *env,
-		jclass clazz) {
-	// arm each track, and
-	// trigger buffer queue callback to begin writing data to tracks
-	TrackNode *cur_ptr = trackHead;
-	while (cur_ptr != NULL) {
-		Track *track = cur_ptr->track;
-		track->armed = true;
-		cur_ptr = cur_ptr->next;
-	}
-	openSlOut->armed = openSlOut->anyTrackArmed = true;
-	// start writing zeros to the track's audio out
-	bufferQueueCallback(openSlOut->outputBufferQueue, NULL);
-}
-
-void Java_com_kh_beatbot_manager_PlaybackManager_disarmAllTracks(JNIEnv *env,
-		jclass clazz) {
-	TrackNode *cur_ptr = trackHead;
-	while (cur_ptr != NULL) {
-		cur_ptr->track->armed = false;
-		cur_ptr = cur_ptr->next;
-	}
-	openSlOut->armed = openSlOut->anyTrackArmed = false;
+	pthread_mutex_unlock(&wavConfig->bufferMutex);
 }
 
 void Java_com_kh_beatbot_global_Track_armTrack(JNIEnv *env,
@@ -219,16 +196,6 @@ void Java_com_kh_beatbot_global_Track_armTrack(JNIEnv *env,
 void Java_com_kh_beatbot_global_Track_disarmTrack(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	getTrack(env, clazz, trackNum)->armed = openSlOut->anyTrackArmed = false;
-}
-
-void Java_com_kh_beatbot_global_Track_playTrack(JNIEnv *env,
-		jclass clazz, jint trackNum) {
-	previewTrack(trackNum);
-}
-
-void Java_com_kh_beatbot_global_Track_stopTrack(JNIEnv *env,
-		jclass clazz, jint trackNum) {
-	stopPreviewingTrack(trackNum);
 }
 
 int getSoloingTrackNum() {
@@ -334,20 +301,17 @@ void Java_com_kh_beatbot_global_Track_setAdsrPoint(JNIEnv *env,
 void Java_com_kh_beatbot_global_Track_setSampleBytes(JNIEnv *env,
 		jclass clazz, jint trackNum, jbyteArray bytes) {
 	Track *track = getTrack(env, clazz, trackNum);
-	__android_log_print(ANDROID_LOG_ERROR, "in sample set bytes", "before getByteArrayElem");
 	jbyte* tempPointer = (*env)->GetByteArrayElements(env, bytes, JNI_FALSE);
 	char* data = (char*) tempPointer;
 	int length = (int)(*env)->GetArrayLength(env, bytes);
 
 	(*env)->ReleaseByteArrayElements(env, bytes, tempPointer, 0);
 
-	__android_log_print(ANDROID_LOG_ERROR, "in sample set bytes", "before setSampleBytes");
 	if (track->generator == NULL) {
 		initSampleBytes(track, data, length);
 	} else {
 		setSampleBytes(track, data, length);
 	}
-	pthread_mutex_unlock(&((WavFile *)track->generator->config)->bufferMutex);
 }
 
 void Java_com_kh_beatbot_activity_BeatBotActivity_addTrack(JNIEnv *env, jclass clazz, jbyteArray bytes) {

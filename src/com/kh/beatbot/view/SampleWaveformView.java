@@ -34,14 +34,16 @@ public class SampleWaveformView extends SurfaceViewBase {
 	// min distance for pointer to select loop markers
 	private static final int SNAP_DIST = 32;
 	private static final int SNAP_DIST_SQUARED = 1024;
-	private FloatBuffer waveformVb = null;
-	private FloatBuffer backgroundOutlineVb = null;
-	private FloatBuffer previewButtonSquareVb = null;
-	private FloatBuffer loopSelectionLineVb = null;
-	private FloatBuffer loopSelectionRectVbs[] = new FloatBuffer[2];
-	private FloatBuffer adsrPointVb = null;
-	private FloatBuffer[] adsrCurveVb = new FloatBuffer[4];
+	private static FloatBuffer waveformVb = null;
+	private static FloatBuffer backgroundOutlineVb = null;
+	private static FloatBuffer previewButtonSquareVb = null;
+	private static FloatBuffer loopSelectionLineVb = null;
+	private static FloatBuffer loopSelectionRectVbs[] = new FloatBuffer[2];
+	private static FloatBuffer adsrPointVb = null;
+	private static FloatBuffer[] adsrCurveVb = new FloatBuffer[4];
 
+	private static float[] sampleBuffer = null;
+	
 	private BeatBotButton previewButton;
 	
 	// keep track of which pointer ids are selecting which ADSR points
@@ -74,7 +76,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	// zooming/scrolling will change the view window of the samples
 	// keep track of that with offset and width
 	private float sampleOffset = 0;
-	private float sampleWidth;
+	private float sampleWidth = 0;
 	private int channels;
 
 	public SampleWaveformView(Context c, AttributeSet as) {
@@ -87,10 +89,13 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	public void setSamples(byte[] samples) {
 		channels = (int)samples[22];
-		numSamples = samples.length / 2 - 22;
+		sampleBuffer = WaveformHelper.bytesToFloats(samples, 22);
+		numSamples = sampleBuffer.length;
+		track.sampleLoopBegin = 0;
 		track.sampleLoopEnd = numSamples;
 		sampleWidth = numSamples;
-		waveformVb = WaveformHelper.bytesToFloatBuffer(samples, height, 0, 44);
+		if (height != 0 && sampleWidth != 0)
+			updateWaveformVb();
 		updateLoopMarkers();
 	}
 
@@ -145,6 +150,10 @@ public class SampleWaveformView extends SurfaceViewBase {
 				height, xLoopEnd + SNAP_DIST / 2, 0);
 	}
 
+	private void updateWaveformVb() {
+		waveformVb = WaveformHelper.floatsToFloatBuffer(sampleBuffer, width - previewButtonWidth, height, (int)sampleOffset, (int)sampleWidth, 0);
+	}
+	
 	private ArrayList<Float> makeExponentialCurveVertices(float x1, float y1,
 			float x2, float y2) {
 		ArrayList<Float> vertices = new ArrayList<Float>();
@@ -165,22 +174,13 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private void drawWaveform() {
 		if (waveformVb == null)
 			return;
-		float scale = waveformWidth / ((float) sampleWidth);
-		float translate = -sampleOffset;
-		float[] color = Colors.VOLUME_COLOR;
-		gl.glLineWidth(10);
 		gl.glEnable(GL10.GL_LINE_SMOOTH);
-		gl.glColor4f(color[0], color[1], color[2], .9f);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVb);
 		gl.glPushMatrix();
-		// scale drawing so the entire waveform exactly fits in the view
 		gl.glTranslatef(previewButtonWidth + SNAP_DIST / 2, 0, 0);
-		gl.glScalef(scale, 1, 1);
-		gl.glTranslatef(translate, 0, 0);
-		gl.glDrawArrays(GL10.GL_LINE_STRIP, (int) (sampleOffset),
-				(int) (sampleWidth));
-		gl.glDisable(GL10.GL_LINE_SMOOTH);
+		drawLines(waveformVb, Colors.VOLUME_COLOR, 10, GL10.GL_LINE_STRIP);
 		gl.glPopMatrix();
+		gl.glDisable(GL10.GL_LINE_SMOOTH);
 	}
 
 	private void drawLoopSelectionMarkers() {
@@ -331,6 +331,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		// update the display location of the loop markers
 		initLoopMarkerVb();
 		initAdsrVb();
+		updateWaveformVb();
 	}
 
 	@Override

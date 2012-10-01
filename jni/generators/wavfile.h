@@ -13,7 +13,7 @@ typedef struct WavFile_t {
 	float **buffers; // buffer to hold wav data
 	int totalSamples;
 	int currSample;
-	int loopBegin;
+	long loopBegin;
 	int loopEnd;
 	bool looping;
 	bool reverse;

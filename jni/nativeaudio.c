@@ -197,14 +197,6 @@ void stopTrack(Track *track) {
 	stopSoundingTrack(track);
 }
 
-void stopAllTracks() {
-	TrackNode *cur_ptr = trackHead;
-	while (cur_ptr != NULL) {
-		stopTrack(cur_ptr->track);
-		cur_ptr = cur_ptr->next;
-	}
-}
-
 void previewTrack(int trackNum) {
 	Track *track = getTrack(NULL, NULL, trackNum);
 	track->previewing = true;
@@ -218,6 +210,34 @@ void stopPreviewingTrack(int trackNum) {
 	track->previewing = false;
 	if (!track->playing)
 		stopSoundingTrack(track);
+}
+
+void Java_com_kh_beatbot_global_Track_playTrack(JNIEnv *env,
+		jclass clazz, jint trackNum) {
+	previewTrack(trackNum);
+}
+
+void Java_com_kh_beatbot_global_Track_stopTrack(JNIEnv *env,
+		jclass clazz, jint trackNum) {
+	stopPreviewingTrack(trackNum);
+}
+
+void stopAllTracks() {
+	TrackNode *cur_ptr = trackHead;
+	while (cur_ptr != NULL) {
+		stopTrack(cur_ptr->track);
+		cur_ptr = cur_ptr->next;
+	}
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_disarmAllTracks(JNIEnv *env,
+		jclass clazz) {
+	TrackNode *cur_ptr = trackHead;
+	while (cur_ptr != NULL) {
+		cur_ptr->track->armed = false;
+		cur_ptr = cur_ptr->next;
+	}
+	openSlOut->armed = openSlOut->anyTrackArmed = false;
 }
 
 static inline void generateNextBuffer() {
@@ -275,6 +295,21 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 		writeBytesToFile(openSlOut->currBufferShort, BUFF_SIZE * 2, recordOutFile);
 	}
 	pthread_mutex_unlock(&recordMutex);
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_armAllTracks(JNIEnv *env,
+		jclass clazz) {
+	// arm each track, and
+	// trigger buffer queue callback to begin writing data to tracks
+	TrackNode *cur_ptr = trackHead;
+	while (cur_ptr != NULL) {
+		Track *track = cur_ptr->track;
+		track->armed = true;
+		cur_ptr = cur_ptr->next;
+	}
+	openSlOut->armed = openSlOut->anyTrackArmed = true;
+	// start writing zeros to the track's audio out
+	bufferQueueCallback(openSlOut->outputBufferQueue, NULL);
 }
 
 MidiEvent *findEvent(Track *track, long tick) {
