@@ -11,7 +11,8 @@ static SLObjectItf outputMixObject = NULL;
 
 static bool recording = false;
 static FILE* recordOutFile = NULL;
-static pthread_mutex_t recordMutex;
+static pthread_mutex_t recordMutex, bufferFillMutex;
+static pthread_cond_t bufferFillCond = PTHREAD_COND_INITIALIZER;
 
 void updateNextNoteSamples() {
 	TrackNode *cur_ptr = trackHead;
@@ -25,34 +26,6 @@ void updateNextNoteSamples() {
 		}
 		cur_ptr = cur_ptr->next;
 	}
-}
-
-// create the engine and output mix objects
-void Java_com_kh_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env,
-		jclass clazz) {
-	SLresult result;
-	(void *) clazz; // avoid warnings about unused paramaters
-	initTicker();
-
-	// create engine
-	result = slCreateEngine(&engineObject, 0, NULL, 0, NULL, NULL);
-
-	// realize the engine
-	result = (*engineObject)->Realize(engineObject, SL_BOOLEAN_FALSE);
-
-	// get the engine interface, which is needed in order to create other objects
-	result = (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE,
-			&engineEngine);
-
-	// create output mix, with volume specified as a non-required interface
-	const SLInterfaceID ids[1] = { SL_IID_VOLUME };
-	const SLboolean req[1] = { SL_BOOLEAN_FALSE };
-	result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 1,
-			ids, req);
-
-	// realize the output mix
-	result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
-	trackHead = NULL;
 }
 
 MidiEvent* initEvent(long onTick, long offTick, float volume, float pan,
@@ -165,13 +138,11 @@ void soundTrack(Track *track) {
 	track->volPan->set(track->volPan->config,
 			track->primaryVolume * track->noteVolume,
 			track->primaryPan * track->notePan);
-	//pitchconfig_setShift((PitchConfig *)track->effects[DYNAMIC_PITCH_ID].config, pitch*2 - 1);
+
+	((WavFile *)track->generator->config)->sampleRate = track->primaryPitch * track->notePitch * 4;
 	AdsrConfig *adsrConfig = (AdsrConfig *) track->adsr->config;
 	adsrConfig->active = true;
 	resetAdsr(adsrConfig);
-	//if (track->outputPlayerPitch != NULL) {
-	//	(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((pitch + track->primaryPitch)*750 + 500));
-	//}
 }
 
 void stopSoundingTrack(Track *track) {
@@ -260,10 +231,8 @@ static inline void generateNextBuffer() {
 				stopTrack(track);
 			}
 			if (track->playing || track->previewing) {
-				pthread_mutex_lock(&((WavFile *) track->generator->config)->bufferMutex);
 				wavfile_tick((WavFile *) track->generator->config,
 						track->tempSample);
-				pthread_mutex_unlock(&((WavFile *) track->generator->config)->bufferMutex);
 			} else {
 				track->tempSample[0] = track->tempSample[1] = 0;
 			}
@@ -278,23 +247,30 @@ static inline void generateNextBuffer() {
 	}
 }
 
-// this callback handler is called every time a buffer finishes playing
-void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
-	// calculate the next buffer
+// Generate each track's buffer (using the track's generator),
+// Process all effects for all tracks
+// Mix all tracks together into the OpenSL byte buffer
+void fillBuffer() {
 	generateNextBuffer();
 	processEffectsForAllTracks();
 	mixTracks();
+}
+
+// this callback handler is called every time a buffer finishes playing
+void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	// enqueue the buffer
 	if (openSlOut->anyTrackArmed) {
 		(*bq)->Enqueue(bq, openSlOut->currBufferShort,
 				BUFF_SIZE * 2 * sizeof(short));
 	}
+	// fill the buffer
+	fillBuffer();
 	// write to wav file if recording
-	pthread_mutex_lock(&recordMutex);
 	if (recording && recordOutFile != NULL) {
+		pthread_mutex_lock(&recordMutex);
 		writeBytesToFile(openSlOut->currBufferShort, BUFF_SIZE * 2, recordOutFile);
+		pthread_mutex_unlock(&recordMutex);
 	}
-	pthread_mutex_unlock(&recordMutex);
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_armAllTracks(JNIEnv *env,
@@ -308,7 +284,8 @@ void Java_com_kh_beatbot_manager_PlaybackManager_armAllTracks(JNIEnv *env,
 		cur_ptr = cur_ptr->next;
 	}
 	openSlOut->armed = openSlOut->anyTrackArmed = true;
-	// start writing zeros to the track's audio out
+	// we need to fill the buffer once before calling the OpenSL callback
+	fillBuffer();
 	bufferQueueCallback(openSlOut->outputBufferQueue, NULL);
 }
 
@@ -382,6 +359,35 @@ void printLinkedList(MidiEventNode *head) {
 	}
 }
 
+// create the engine and output mix objects
+void Java_com_kh_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env,
+		jclass clazz) {
+	SLresult result;
+	(void *) clazz; // avoid warnings about unused paramaters
+	initTicker();
+
+	// create engine
+	result = slCreateEngine(&engineObject, 0, NULL, 0, NULL, NULL);
+
+	// realize the engine
+	result = (*engineObject)->Realize(engineObject, SL_BOOLEAN_FALSE);
+
+	// get the engine interface, which is needed in order to create other objects
+	result = (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE,
+			&engineEngine);
+
+	// create output mix, with volume specified as a non-required interface
+	const SLInterfaceID ids[1] = { SL_IID_VOLUME };
+	const SLboolean req[1] = { SL_BOOLEAN_FALSE };
+	result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 1,
+			ids, req);
+
+	// realize the output mix
+	result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
+	trackHead = NULL;
+	//pthread_create(&bufferFillThread, NULL, fillBuffer, (void *)bufferFillThreadId);
+}
+
 jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 		JNIEnv *env, jclass clazz) {
 	openSlOut = malloc(sizeof(OpenSlOut));
@@ -416,14 +422,6 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 	(*(openSlOut->outputPlayerObject))->GetInterface(
 			openSlOut->outputPlayerObject, SL_IID_PLAY,
 			&(openSlOut->outputPlayerPlay));
-
-	// get the pitch interface
-	(*(openSlOut->outputPlayerObject))->GetInterface(
-			openSlOut->outputPlayerObject, SL_IID_PLAYBACKRATE,
-			&(openSlOut->outputPlayerPitch));
-
-	//if (openSlOut->outputPlayerPitch)
-	//(*(openSlOut->outputPlayerPitch))->SetRate(openSlOut->outputPlayerPitch, 1000);
 
 	// get the mute/solo interface
 	(*(openSlOut->outputPlayerObject))->GetInterface(
@@ -462,6 +460,8 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_shutdown(JNIEnv *env,
 		engineObject = NULL;
 		engineEngine = NULL;
 	}
+	pthread_mutex_destroy(&bufferFillMutex);
+	pthread_cond_destroy(&bufferFillCond);
 }
 
 /****************************************************************************************

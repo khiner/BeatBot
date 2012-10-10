@@ -1,6 +1,9 @@
 #include "wavfile.h"
 #include "../track.h"
 
+//TODO remove
+static int count = 0;
+
 static inline float bytesToFloat(unsigned char firstByte,
 		unsigned char secondByte) {
 	// convert two bytes to one short (little endian)
@@ -41,26 +44,29 @@ void wavfile_setBytes(WavFile *wavFile, char *wav, int length) {
 	if (channels == 2)
 		wavFile->totalSamples /= 2; // 4 bytes per sample (16 bit stereo)
 
-	wavFile->buffers = (float **) malloc(2 * sizeof(float *));
-	// Allocate memory (right will be null if only mono sound)
-	wavFile->buffers[0] = (float *) calloc(wavFile->totalSamples,
-			sizeof(float));
-	wavFile->buffers[1] = (float *) calloc(wavFile->totalSamples,
-			sizeof(float));
-
-	// write to wavFile float buffers
+	// TODO : change to passed-in file name - also want to write all files in the beginning,
+	// not dynamically
+	char sampleName[30];
+	char suffix[10];
+	sprintf(suffix, "%d", count++);
+	strcpy(sampleName, "/mnt/sdcard/BeatBot/");
+	strcat(sampleName, suffix);
+	wavFile->sampleFile = fopen(sampleName, "wb+");
 	int i = 0;
 	while (pos < length) {
-		wavFile->buffers[0][i] = bytesToFloat(wav[pos], wav[pos + 1]);
+		float val = bytesToFloat(wav[pos], wav[pos + 1]);
+		fwrite(&val, 1, sizeof(float), wavFile->sampleFile);
 		pos += 2;
 		if (channels == 2) {
-			wavFile->buffers[1][i] = bytesToFloat(wav[pos], wav[pos + 1]);
 			pos += 2;
-		} else {
-			wavFile->buffers[1][i] = wavFile->buffers[0][i];
 		}
+		val = bytesToFloat(wav[pos], wav[pos + 1]);
+		fwrite(&val, 1, sizeof(float), wavFile->sampleFile);
 		i++;
 	}
+	fflush(wavFile->sampleFile);
+	fclose(wavFile->sampleFile);
+	wavFile->sampleFile = fopen(sampleName, "rb");
 	// init loop / currSample position data
 	wavFile->loopBegin = wavFile->currSample = 0;
 	wavFile->loopEnd = wavFile->totalSamples - 2;
@@ -79,18 +85,13 @@ WavFile *wavfile_create(char *bytes, int length) {
 
 void wavfile_reset(WavFile *config) {
 	config->currSample = config->reverse ? config->loopEnd : config->loopBegin;
-}
-
-void freeBuffers(WavFile *config) {
-	free(config->buffers[0]);
-	free(config->buffers[1]);
-	free(config->buffers);
-	config->buffers = NULL;
+	fseek(config->sampleFile, config->currSample * TWO_FLOAT_SZ, SEEK_SET);
 }
 
 void wavfile_destroy(void *p) {
 	WavFile *config = (WavFile *) p;
-	freeBuffers(config);
+	fflush(config->sampleFile);
+	fclose(config->sampleFile);
 	free(config);
 	config = NULL;
 }

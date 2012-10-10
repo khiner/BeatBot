@@ -121,12 +121,12 @@ public class Track {
 
 	public void setPrimaryPan(float pan) {
 		this.pan = pan;
-		setPrimaryPan(id, volume);
+		setPrimaryPan(id, pan);
 	}
 
 	public void setPrimaryPitch(float pitch) {
 		this.pitch = pitch;
-		setPrimaryPitch(id, volume);
+		setPrimaryPitch(id, pitch);
 	}
 
 	public void setAdsrOn(boolean on) {

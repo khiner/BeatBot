@@ -92,7 +92,9 @@ public class WaveformHelper extends Thread {
 		float[] outputAry = new float[2 * (int)(width * spp)];
 		for (int x = 0; x < outputAry.length / 2; x++) {
 			float percent = (float)(x * 2) / outputAry.length;
-			float y = height*(data[offset + (int)(percent * numFloats)] + 1)/2;
+			int dataIndex = offset + (int)(percent * numFloats);
+			// sanity check - default to y = 0 if index out of bounds  
+			float y = dataIndex < data.length  && dataIndex >= 0 ? height*(data[dataIndex] + 1)/2 : 0;
 			outputAry[x * 2] = percent * width + xOffset;
 			outputAry[x * 2 + 1] = y;
 		}

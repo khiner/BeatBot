@@ -218,12 +218,3 @@ void Java_com_kh_beatbot_effect_Effect_setEffectParam(JNIEnv *env, jclass clazz,
 		effectNode->effect->set(effectNode->effect->config, (float) paramNum, paramLevel);
 	}
 }
-
-jfloatArray Java_com_kh_beatbot_activity_SampleEditActivity_normalize(JNIEnv *env,
-		jclass clazz, jint trackNum) {
-	Track *track = getTrack(env, clazz, trackNum);
-	WavFile *wavFile = (WavFile *) track->generator->config;
-	normalize(wavFile->buffers[0], wavFile->totalSamples);
-	normalize(wavFile->buffers[1], wavFile->totalSamples);
-	return makejFloatArray(env, wavFile->buffers[0], wavFile->totalSamples);
-}

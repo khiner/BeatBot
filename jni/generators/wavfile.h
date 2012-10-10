@@ -3,20 +3,24 @@
 
 #include "../effects/effects.h"
 #include "../effects/adsr.h"
+#include <stdio.h>
 
 #define CONVMYFLT (1./32768.)
+#define ONE_FLOAT_SZ sizeof(float)
+#define TWO_FLOAT_SZ 2 * sizeof(float)
 
 typedef struct WavFile_t {
 	// mutex for buffer since setting the wav data happens on diff thread than processing
 	pthread_mutex_t bufferMutex;
+	FILE *sampleFile;
 	float tempSample[2];
-	float **buffers; // buffer to hold wav data
 	int totalSamples;
-	int currSample;
+	float currSample;
 	long loopBegin;
-	int loopEnd;
+	long loopEnd;
 	bool looping;
 	bool reverse;
+	float sampleRate;
 } WavFile;
 
 WavFile *wavfile_create();
@@ -26,30 +30,28 @@ void freeBuffers(WavFile *config);
 
 static inline void wavfile_tick(WavFile *config, float *sample) {
 	// wrap sample around loop window
-	if (config->currSample > config->loopEnd) {
-		if (config->looping)
+	if (config->looping) {
+		if (config->currSample >= config->loopEnd) {
 			config->currSample = config->loopBegin;
-		else {
-			sample[0] = sample[1] = 0;
-			return;
-		}
-	} else if (config->currSample < config->loopBegin) {
-		if (config->looping)
+		} else if (config->currSample <= config->loopBegin) {
 			config->currSample = config->loopEnd;
-		else {
-			sample[0] = sample[1] = 0;
-			return;
 		}
 	}
-	int channel;
-	for (channel = 0; channel < 2; channel++) {
-		sample[channel] = config->buffers[channel][config->currSample];
+
+	if (config->currSample > config->loopEnd || config->currSample < config->loopBegin) {
+		sample[0] = sample[1] = 0;
+	} else {
+		fseek(config->sampleFile, (long)config->currSample * TWO_FLOAT_SZ, SEEK_SET);
+		fread(&sample[0], 1, ONE_FLOAT_SZ, config->sampleFile);
+		fread(&sample[1], 1, ONE_FLOAT_SZ, config->sampleFile);
 	}
+
 	// get next sample.  if reverse, go backwards, else go forwards
-	if (config->reverse)
-		config->currSample--;
-	else
-		config->currSample++;
+	if (config->reverse) {
+		config->currSample -= config->sampleRate;
+	} else {
+		config->currSample += config->sampleRate;
+	}
 }
 
 static inline void wavfile_generate(WavFile *config, float **inBuffer, int size) {

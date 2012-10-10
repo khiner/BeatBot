@@ -13,14 +13,13 @@ typedef struct OpenSlOut_ {
 	SLObjectItf outputPlayerObject;
 	SLPlayItf outputPlayerPlay;
 	SLMuteSoloItf outputPlayerMuteSolo;
-	SLPlaybackRateItf outputPlayerPitch;
 	SLAndroidSimpleBufferQueueItf outputBufferQueue;
 } OpenSlOut;
 
 typedef struct Track_ {
 	float tempSample[2];
 	EffectNode *effectHead;
-	Effect *volPan, *pitch, *adsr;
+	Effect *volPan, *adsr;
 	float **currBufferFloat;
 	Generator *generator;
 	MidiEventNode *eventHead;

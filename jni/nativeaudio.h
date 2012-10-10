@@ -7,7 +7,6 @@
 #include "effects/delay.h"
 #include "effects/filter.h"
 #include "effects/flanger.h"
-#include "effects/pitch.h"
 #include "effects/reverb.h"
 #include "effects/tremelo.h"
 #include "effects/volpan.h"

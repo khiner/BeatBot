@@ -1,7 +1,6 @@
 #include "track.h"
 #include "effects/adsr.h"
 #include "effects/volpan.h"
-#include "effects/pitch.h"
 
 jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size) {
 	jfloatArray result = (*env)->NewFloatArray(env, size);
@@ -160,8 +159,6 @@ Track *initTrack() {
 	}
 	track->volPan = initEffect(-1, true, volumepanconfig_create(),
 			volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
-	track->pitch = initEffect(-1, false, pitchconfig_create(),
-			pitchconfig_setShift, pitch_process, pitchconfig_destroy);
 	return track;
 }
 
@@ -178,7 +175,6 @@ void initSampleBytes(Track *track, char *bytes, int length) {
 void setSampleBytes(Track *track, char *bytes, int length) {
 	WavFile *wavConfig = (WavFile *) track->generator->config;
 	pthread_mutex_lock(&wavConfig->bufferMutex);
-	freeBuffers(wavConfig);
 	wavfile_setBytes(wavConfig, bytes, length);
 	adsrconfig_setNumSamples(track->adsr->config,
 			((WavFile *)track->generator->config)->totalSamples);
@@ -271,9 +267,7 @@ void Java_com_kh_beatbot_global_Track_setPrimaryPitch(
 		JNIEnv *env, jclass clazz, jint trackNum, jfloat pitch) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryPitch = pitch;
-	//if (track->outputPlayerPitch != NULL) {
-	//(*(track->outputPlayerPitch))->SetRate(track->outputPlayerPitch, (short)((track->pitch + track->primaryPitch)*750 + 500));
-	//}
+	((WavFile *)track->generator->config)->sampleRate = pitch * track->notePitch * 4;
 }
 
 void Java_com_kh_beatbot_global_Track_setAdsrOn(JNIEnv *env, jclass clazz,
