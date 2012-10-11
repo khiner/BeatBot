@@ -18,7 +18,7 @@ DelayConfigI *delayconfigi_create() {
 
 void delayconfigi_setFeedback(DelayConfigI *config, float feedback) {
 	config->feedback =
-			feedback > 0.f ? (feedback < 1.f ? feedback : 0.9999999f) : 0.f;
+			feedback > 0.f ? (feedback < .99f ? feedback : 0.99f) : 0.f;
 }
 
 void delayconfigi_destroy(void *p) {

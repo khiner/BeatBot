@@ -42,8 +42,7 @@ static inline void wavfile_tick(WavFile *config, float *sample) {
 		sample[0] = sample[1] = 0;
 	} else {
 		fseek(config->sampleFile, (long)config->currSample * TWO_FLOAT_SZ, SEEK_SET);
-		fread(&sample[0], 1, ONE_FLOAT_SZ, config->sampleFile);
-		fread(&sample[1], 1, ONE_FLOAT_SZ, config->sampleFile);
+		fread(sample, 1, TWO_FLOAT_SZ, config->sampleFile);
 	}
 
 	// get next sample.  if reverse, go backwards, else go forwards

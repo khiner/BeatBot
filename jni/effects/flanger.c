@@ -31,7 +31,7 @@ void flangerconfig_setModFreq(FlangerConfig *config, float modFreq) {
 }
 
 void flangerconfig_setModAmt(FlangerConfig *config, float modAmt) {
-	config->modAmt = modAmt;
+	config->modAmt = modAmt * .7f;
 }
 
 void flangerconfig_setPhaseShift(FlangerConfig *config, float phaseShift) {

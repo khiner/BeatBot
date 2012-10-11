@@ -1,6 +1,8 @@
 #ifndef DELAY_H
 #define DELAY_H
 
+#define MIN_DELAY_SAMPLES 32
+
 #include "effects.h"
 
 typedef struct DelayConfigI_t {
@@ -27,8 +29,8 @@ static inline void delayconfigi_setDelaySamples(DelayConfigI *config,
 	int *rp, *wp, channel;
 	float rpf;
 	pthread_mutex_lock(&config->mutex);
-	config->delaySamples[0] = numSamplesL;
-	config->delaySamples[1] = numSamplesR;
+	config->delaySamples[0] = numSamplesL < MIN_DELAY_SAMPLES ?  MIN_DELAY_SAMPLES : numSamplesL;
+	config->delaySamples[1] = numSamplesR  < MIN_DELAY_SAMPLES ?  MIN_DELAY_SAMPLES : numSamplesR;
 	for (channel = 0; channel < 2; channel++) {
 		rp = &(config->rp[channel]);
 		wp = &(config->wp[channel]);
@@ -49,10 +51,8 @@ static inline void delayconfigi_setDelayTime(DelayConfigI *config, float lDelay,
 	if (config->linkChannels)
 		rDelay = lDelay;  // if channels are linked, follow left channel
 	pthread_mutex_lock(&config->mutex);
-	config->delayTime[0] =
-			lDelay > 0.0001 ? (lDelay <= 1 ? lDelay : 1) : 0.0001;
-	config->delayTime[1] =
-			rDelay > 0.0001 ? (rDelay <= 1 ? rDelay : 1) : 0.0001;
+	config->delayTime[0] = lDelay;
+	config->delayTime[1] = rDelay;
 	pthread_mutex_unlock(&config->mutex);
 	delayconfigi_setDelaySamples(config, config->delayTime[0] * SAMPLE_RATE,
 			config->delayTime[1] * SAMPLE_RATE);
@@ -73,18 +73,19 @@ static inline void delayconfigi_updateDelayTime(DelayConfigI *config) {
 }
 
 static inline float delayi_tick(DelayConfigI *config, float in, int channel) {
-	if (config->rp[channel] >= config->maxSamples)
-		config->rp[channel] = 0;
-	if (config->wp[channel] >= config->maxSamples)
-		config->wp[channel] = 0;
-
 	float interpolated = config->delayBuffer[channel][config->rp[channel]++]
 			* config->omAlpha[channel];
-	interpolated += config->delayBuffer[channel][config->rp[channel]
-			% config->maxSamples] * config->alpha[channel];
-	config->out = interpolated * config->wet + in * (1 - config->wet);
-	if (config->out > 1)
-		config->out = 1;
+	// make sure we don't go past maxSamples (buffer end) after incrementing read/write pointer
+	if (config->rp[channel] >= config->maxSamples) {
+		config->rp[channel] = 0;
+	}
+	if (config->wp[channel] >= config->maxSamples) {
+		config->wp[channel] = 0;
+	}
+	interpolated += config->delayBuffer[channel][config->rp[channel]] * config->alpha[channel];
+
+	config->out = config->wet * (interpolated - in) + in;
+	// NOTE: not hard limiting to 1 max for efficiency
 	config->delayBuffer[channel][config->wp[channel]++] = in
 			+ config->out * config->feedback;
 	return config->out;
@@ -92,14 +93,14 @@ static inline float delayi_tick(DelayConfigI *config, float in, int channel) {
 
 static inline void delayi_process(DelayConfigI *config, float **buffers, int size) {
 	int channel, samp;
-	for (samp = 0; samp < size; samp++) {
-		pthread_mutex_lock(&config->mutex);
-		for (channel = 0; channel < 2; channel++) {
+	pthread_mutex_lock(&config->mutex);
+	for (channel = 0; channel < 2; channel++) {
+		for (samp = 0; samp < size; samp++) {
 			buffers[channel][samp] = delayi_tick(config, buffers[channel][samp],
 					channel);
 		}
-		pthread_mutex_unlock(&config->mutex);
 	}
+	pthread_mutex_unlock(&config->mutex);
 }
 
 void delayconfigi_setParam(void *p, float paramNumFloat, float param);

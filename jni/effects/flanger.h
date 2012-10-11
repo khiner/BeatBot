@@ -5,7 +5,7 @@
 #include "delay.h"
 #include "../generators/sinewave.h"
 
-#define MIN_FLANGER_DELAY 0.0005f*SAMPLE_RATE
+#define MIN_FLANGER_DELAY 0.0006f*SAMPLE_RATE
 #define MAX_FLANGER_DELAY 0.007f*SAMPLE_RATE
 
 typedef struct FlangerConfig_t {
@@ -27,9 +27,9 @@ static inline void flanger_process(FlangerConfig *config, float **buffers, int s
 	int channel, samp;
 	for (samp = 0; samp < size; samp++) {
 		float dTimeL = config->baseTime
-				* (1.0f + config->modAmt * sinewave_tick(config->mod[0]));
+				* (1.01f + config->modAmt * sinewave_tick(config->mod[0]));
 		float dTimeR = config->baseTime
-				* (1.0f + config->modAmt * sinewave_tick(config->mod[1]));
+				* (1.01f + config->modAmt * sinewave_tick(config->mod[1]));
 		delayconfigi_setDelaySamples(config->delayConfig, dTimeL, dTimeR);
 		pthread_mutex_lock(&config->delayConfig->mutex);
 		for (channel = 0; channel < 2; channel++) {
