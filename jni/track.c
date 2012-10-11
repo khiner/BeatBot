@@ -338,8 +338,7 @@ void Java_com_kh_beatbot_global_Track_setTrackLoopWindow(JNIEnv *env,
 		return;
 	wavFile->loopBegin = loopBeginSample;
 	wavFile->loopEnd = loopEndSample;
-	if (wavFile->currSample >= wavFile->loopEnd)
-		wavFile->currSample = wavFile->loopBegin;
+	wavFile->loopLength = wavFile->loopEnd - wavFile->loopBegin;
 	updateAdsr((AdsrConfig *) track->adsr->config,
 			loopEndSample - loopBeginSample);
 }

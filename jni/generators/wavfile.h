@@ -8,6 +8,7 @@
 #define CONVMYFLT (1./32768.)
 #define ONE_FLOAT_SZ sizeof(float)
 #define TWO_FLOAT_SZ 2 * sizeof(float)
+#define FOUR_FLOAT_SZ 4 * sizeof(float)
 
 typedef struct WavFile_t {
 	// mutex for buffer since setting the wav data happens on diff thread than processing
@@ -18,6 +19,7 @@ typedef struct WavFile_t {
 	float currSample;
 	long loopBegin;
 	long loopEnd;
+	long loopLength;
 	bool looping;
 	bool reverse;
 	float sampleRate;
@@ -32,17 +34,30 @@ static inline void wavfile_tick(WavFile *config, float *sample) {
 	// wrap sample around loop window
 	if (config->looping) {
 		if (config->currSample >= config->loopEnd) {
-			config->currSample = config->loopBegin;
+			config->currSample -= config->loopLength;
 		} else if (config->currSample <= config->loopBegin) {
-			config->currSample = config->loopEnd;
+			config->currSample += config->loopLength;
 		}
 	}
 
 	if (config->currSample > config->loopEnd || config->currSample < config->loopBegin) {
 		sample[0] = sample[1] = 0;
 	} else {
-		fseek(config->sampleFile, (long)config->currSample * TWO_FLOAT_SZ, SEEK_SET);
-		fread(sample, 1, TWO_FLOAT_SZ, config->sampleFile);
+		// perform linear interpolation on the next two samples
+		// (ignoring wrapping around loop - this is close enough and we avoid an extra
+		//  read from disk)
+		float nextTwoSamples[4];
+		long sampleIndex = (long)config->currSample;
+		float remainder = config->currSample - sampleIndex;
+		// read next two samples from current sample (rounded down)
+		fseek(config->sampleFile, sampleIndex * TWO_FLOAT_SZ, SEEK_SET);
+		fread(nextTwoSamples, 1, FOUR_FLOAT_SZ, config->sampleFile);
+		int channel;
+		for (channel = 0; channel < 2; channel++) {
+			// interpolate the next two samples linearly
+			sample[channel] = (1.0f - remainder) * nextTwoSamples[channel] +
+					remainder * nextTwoSamples[2 + channel];
+		}
 	}
 
 	// get next sample.  if reverse, go backwards, else go forwards

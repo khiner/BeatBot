@@ -70,7 +70,7 @@ void wavfile_setBytes(WavFile *wavFile, char *wav, int length) {
 	// init loop / currSample position data
 	wavFile->loopBegin = wavFile->currSample = 0;
 	wavFile->loopEnd = wavFile->totalSamples - 2;
-
+	wavFile->loopLength = wavFile->loopEnd - wavFile->loopBegin;
 	// free(wav); //taken care of by Release JNI method?
 	//wav = NULL;
 }
