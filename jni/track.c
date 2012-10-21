@@ -162,9 +162,9 @@ Track *initTrack() {
 	return track;
 }
 
-void initSampleBytes(Track *track, char *bytes, int length) {
+void initSample(Track *track, const char *sampleName) {
 	track->generator = malloc(sizeof(Generator));
-	initGenerator(track->generator, wavfile_create(bytes, length),
+	initGenerator(track->generator, wavfile_create(sampleName),
 			wavfile_reset, wavfile_generate, wavfile_destroy);
 	track->adsr = initEffect(-1, false,
 			adsrconfig_create(
@@ -172,10 +172,10 @@ void initSampleBytes(Track *track, char *bytes, int length) {
 			NULL, adsr_process, adsrconfig_destroy);
 }
 
-void setSampleBytes(Track *track, char *bytes, int length) {
+void setSample(Track *track, const char *sampleName) {
 	WavFile *wavConfig = (WavFile *) track->generator->config;
 	pthread_mutex_lock(&wavConfig->bufferMutex);
-	wavfile_setBytes(wavConfig, bytes, length);
+	wavfile_setSampleFile(wavConfig, sampleName);
 	adsrconfig_setNumSamples(track->adsr->config,
 			((WavFile *)track->generator->config)->totalSamples);
 	pthread_mutex_unlock(&wavConfig->bufferMutex);
@@ -292,26 +292,25 @@ void Java_com_kh_beatbot_global_Track_setAdsrPoint(JNIEnv *env,
 	updateAdsr(config, config->totalSamples);
 }
 
-void Java_com_kh_beatbot_global_Track_setSampleBytes(JNIEnv *env,
-		jclass clazz, jint trackNum, jbyteArray bytes) {
+void Java_com_kh_beatbot_global_Track_setSample(JNIEnv *env,
+		jclass clazz, jint trackNum, jstring sampleName) {
 	Track *track = getTrack(env, clazz, trackNum);
-	jbyte* tempPointer = (*env)->GetByteArrayElements(env, bytes, JNI_FALSE);
-	char* data = (char*) tempPointer;
-	int length = (int)(*env)->GetArrayLength(env, bytes);
 
-	(*env)->ReleaseByteArrayElements(env, bytes, tempPointer, 0);
+	const char *nativeSampleName = (*env)->GetStringUTFChars(env, sampleName, 0);
 
 	if (track->generator == NULL) {
-		initSampleBytes(track, data, length);
+		initSample(track, nativeSampleName);
 	} else {
-		setSampleBytes(track, data, length);
+		setSample(track, nativeSampleName);
 	}
+	// release string memory
+	(*env)->ReleaseStringUTFChars(env, sampleName, nativeSampleName);
 }
 
-void Java_com_kh_beatbot_activity_BeatBotActivity_addTrack(JNIEnv *env, jclass clazz, jbyteArray bytes) {
+void Java_com_kh_beatbot_activity_BeatBotActivity_addTrack(JNIEnv *env, jclass clazz, jstring sampleName) {
 	Track *track = initTrack();
 	addTrack(track);
-	Java_com_kh_beatbot_global_Track_setSampleBytes(env, clazz, trackCount, bytes);
+	Java_com_kh_beatbot_global_Track_setSample(env, clazz, trackCount, sampleName);
 	trackCount++;
 }
 
@@ -330,7 +329,7 @@ jboolean Java_com_kh_beatbot_global_Track_isTrackLooping(JNIEnv *env,
 }
 
 void Java_com_kh_beatbot_global_Track_setTrackLoopWindow(JNIEnv *env,
-		jclass clazz, jint trackNum, jint loopBeginSample, jint loopEndSample) {
+		jclass clazz, jint trackNum, jlong loopBeginSample, jlong loopEndSample) {
 	Track *track = getTrack(env, clazz, trackNum);
 	WavFile *wavFile = (WavFile *) track->generator->config;
 	if (wavFile->loopBegin == loopBeginSample

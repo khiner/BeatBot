@@ -1,8 +1,6 @@
 package com.kh.beatbot.global;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 public class Instrument {
 	private String name;
@@ -21,31 +19,12 @@ public class Instrument {
 		currSampleNum = 0;
 	}
 
-	private byte[] getSampleBytes(int sampleNum) {
-		byte[] bytes = null;
-		try {
-			File sampleFile = sampleFiles[sampleNum];
-			FileInputStream in = new FileInputStream(sampleFile);
-			bytes = new byte[(int) sampleFile.length()];
-			in.read(bytes);
-			in.close();
-			in = null;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return bytes;
-	}
-
 	public void setCurrSampleNum(int currSampleNum) {
 		this.currSampleNum = currSampleNum;
 	}
 
 	public int getCurrSampleNum() {
 		return currSampleNum;
-	}
-
-	public byte[] getCurrSampleBytes() {
-		return getSampleBytes(currSampleNum);
 	}
 
 	public String getName() {
@@ -56,6 +35,14 @@ public class Instrument {
 		return getSampleName(currSampleNum);
 	}
 
+	public File getCurrSampleFile() {
+		return sampleFiles[currSampleNum];
+	}
+	
+	public String getCurrSamplePath() {
+		return GlobalVars.appDirectory + name + "/" + getCurrSampleName();
+	}
+	
 	public BeatBotIconSource getBBIconSource() {
 		return bbIconSource;
 	}

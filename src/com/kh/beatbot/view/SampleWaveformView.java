@@ -1,5 +1,7 @@
 package com.kh.beatbot.view;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
@@ -42,8 +44,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private static FloatBuffer adsrPointVb = null;
 	private static FloatBuffer[] adsrCurveVb = new FloatBuffer[4];
 
-	private static float[] sampleBuffer = null;
-	
 	private BeatBotButton previewButton;
 	
 	// keep track of which pointer ids are selecting which ADSR points
@@ -58,7 +58,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	private Track track;
 
-	private int numSamples = -1;
+	private long numSamples = -1;
 
 	// which pointer id is touching which marker (-1 means no pointer)
 	private int beginLoopMarkerTouched = -1;
@@ -77,7 +77,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	// keep track of that with offset and width
 	private float sampleOffset = 0;
 	private float sampleWidth = 0;
-	private int channels;
+	File sampleFile = null;
 
 	public SampleWaveformView(Context c, AttributeSet as) {
 		super(c, as);
@@ -87,10 +87,9 @@ public class SampleWaveformView extends SurfaceViewBase {
 		this.track = track;
 	}
 
-	public void setSamples(byte[] samples) {
-		channels = (int)samples[22];
-		sampleBuffer = WaveformHelper.bytesToFloats(samples, 22);
-		numSamples = sampleBuffer.length;
+	public void setSampleFile(File sampleFile) {
+		this.sampleFile = sampleFile;
+		numSamples = sampleFile.length() / 8 - 44;
 		track.sampleLoopBegin = 0;
 		track.sampleLoopEnd = numSamples;
 		sampleWidth = numSamples;
@@ -151,7 +150,11 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	private void updateWaveformVb() {
-		waveformVb = WaveformHelper.floatsToFloatBuffer(sampleBuffer, width - previewButtonWidth, height, (int)sampleOffset, (int)sampleWidth, 0);
+		try {
+		waveformVb = WaveformHelper.floatFileToBuffer(sampleFile, width - previewButtonWidth, height, (long)sampleOffset, (long)sampleWidth, 0);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private ArrayList<Float> makeExponentialCurveVertices(float x1, float y1,
@@ -224,7 +227,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		setBackgroundColor(BG_COLOR);
 		previewButtonWidth = height;
 		waveformWidth = width - previewButtonWidth - SNAP_DIST;
-		setSamples(track.getInstrument().getCurrSampleBytes());
+		setSampleFile(track.getInstrument().getCurrSampleFile());
 		initBackgroundOutlineVb();
 		initPreviewButtonSquareVb();
 		initLoopMarkerVb();
@@ -325,9 +328,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 			track.sampleLoopEnd += diff;
 			clipLoopToWindow();
 		}
-		int nativeLoopBegin = channels == 2 ? (int) (track.sampleLoopBegin / 2) : (int)track.sampleLoopBegin; 
-		int nativeLoopEnd = channels == 2 ? (int) (track.sampleLoopEnd / 2) : (int)track.sampleLoopEnd; 
-		track.setLoopWindow(nativeLoopBegin, nativeLoopEnd);
+		track.setLoopWindow((long)track.sampleLoopBegin, (long)track.sampleLoopEnd);
 		// update the display location of the loop markers
 		initLoopMarkerVb();
 		initAdsrVb();

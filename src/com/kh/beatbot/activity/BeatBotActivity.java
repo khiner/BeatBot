@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 
 import android.app.Activity;
@@ -134,6 +136,39 @@ public class BeatBotActivity extends Activity implements
 		out.close();
 		out = null;
 	}
+	
+	/**
+	 * Copy the wavFile into a file with raw PCM Wav bytes.
+	 * Works with mono/stereo (for mono, duplicate each sample to the left/right channels)
+	 * Method for detecting/adapting to stereo/mono adapted from
+	 * http://stackoverflow.com/questions/8754111/how-to-read-the-data-in-a-wav-file-to-an-array
+	 */
+	private void convertWavToRaw(InputStream wavIn, FileOutputStream rawOut) throws IOException {		
+		byte[] headerBytes = new byte[44];
+		wavIn.read(headerBytes);
+		// Determine if mono or stereo
+		int channels = headerBytes[22]; // Forget byte 23 as 99.999% of WAVs are 1 or 2 channels
+
+		byte[] inBytes = new byte[2];
+		ByteBuffer floatBuffer = ByteBuffer.allocate(4);
+		floatBuffer.order(ByteOrder.LITTLE_ENDIAN);
+		while (wavIn.read(inBytes) != -1) {
+			// convert two bytes to a float (little endian)
+			short s = (short)(((inBytes[1] & 0xff) << 8) | (inBytes[0] & 0xff)); 
+			floatBuffer.putFloat(0, s / 32768.0f);
+			rawOut.write(floatBuffer.array());
+			if (channels == 1) {
+				// if mono, left and right copies should be identical 
+				rawOut.write(floatBuffer.array());
+			}
+		}
+		// clean up
+		wavIn.close();
+		wavIn = null;
+		rawOut.flush();
+		rawOut.close();
+		rawOut = null;
+	}
 
 	private void copyFromAssetsToExternal(String folderName) {
 		String newDirectory = GlobalVars.appDirectory + folderName + "/";
@@ -144,10 +179,13 @@ public class BeatBotActivity extends Activity implements
 		try {
 			filesToCopy = assetManager.list(folderName);
 			for (String file : filesToCopy) {
-				if (!Arrays.asList(existingFiles).contains(file)) {
+				// copy wav file exactly from assets to sdcard
+				if (!Arrays.asList(existingFiles).contains(file.replace(".wav", ".raw"))) {
 					InputStream in = assetManager.open(folderName + "/" + file);
-					OutputStream out = new FileOutputStream(newDirectory + file);
-					copyFile(in, out);
+					//OutputStream wavOut = new FileOutputStream(newDirectory + file);
+					FileOutputStream rawOut = new FileOutputStream(newDirectory + file.replace(".wav", ".raw"));
+					//copyFile(in, wavOut);
+					convertWavToRaw(in, rawOut);
 				}
 			}
 		} catch (IOException e) {
@@ -283,8 +321,8 @@ public class BeatBotActivity extends Activity implements
 		createEngine();
 		createAudioPlayer();
 		for (int trackId = 0; trackId < GlobalVars.tracks.size(); trackId++) {
-			addTrack(GlobalVars.tracks.get(trackId).getInstrument()
-					.getCurrSampleBytes());
+			Instrument instrument = GlobalVars.tracks.get(trackId).getInstrument();
+			addTrack(instrument.getCurrSamplePath());
 		}
 	}
 
@@ -424,14 +462,14 @@ public class BeatBotActivity extends Activity implements
 
 	private void addTrack(int instrumentType) {
 		Instrument newInstrument = GlobalVars.getInstrument(instrumentType); 
-		addTrack(newInstrument.getCurrSampleBytes());
+		addTrack(newInstrument.getCurrSampleName());
 		GlobalVars.tracks.add(new Track(GlobalVars.tracks.size(), newInstrument));
 		GlobalVars.midiView.updateTracks();
 		// launch sample edit activity for the newly added track
 		launchSampleEditActivity(GlobalVars.tracks.size() - 1);
 	}
 
-	public static native void addTrack(byte[] bytes);
+	public static native void addTrack(String sampleFileName);
 
 	public static native boolean createAudioPlayer();
 

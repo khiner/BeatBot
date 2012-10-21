@@ -14,7 +14,7 @@ typedef struct WavFile_t {
 	// mutex for buffer since setting the wav data happens on diff thread than processing
 	pthread_mutex_t bufferMutex;
 	FILE *sampleFile;
-	float tempSample[2];
+	float tempSample[4];
 	int totalSamples;
 	float currSample;
 	long loopBegin;
@@ -25,8 +25,8 @@ typedef struct WavFile_t {
 	float sampleRate;
 } WavFile;
 
-WavFile *wavfile_create();
-void wavfile_setBytes(WavFile *wavFile, char *bytes, int length);
+WavFile *wavfile_create(const char *sampleName);
+void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName);
 void wavfile_reset(WavFile *config);
 void freeBuffers(WavFile *config);
 
@@ -46,17 +46,16 @@ static inline void wavfile_tick(WavFile *config, float *sample) {
 		// perform linear interpolation on the next two samples
 		// (ignoring wrapping around loop - this is close enough and we avoid an extra
 		//  read from disk)
-		float nextTwoSamples[4];
 		long sampleIndex = (long)config->currSample;
 		float remainder = config->currSample - sampleIndex;
 		// read next two samples from current sample (rounded down)
 		fseek(config->sampleFile, sampleIndex * TWO_FLOAT_SZ, SEEK_SET);
-		fread(nextTwoSamples, 1, FOUR_FLOAT_SZ, config->sampleFile);
+		fread(config->tempSample, 1, FOUR_FLOAT_SZ, config->sampleFile);
 		int channel;
 		for (channel = 0; channel < 2; channel++) {
 			// interpolate the next two samples linearly
-			sample[channel] = (1.0f - remainder) * nextTwoSamples[channel] +
-					remainder * nextTwoSamples[2 + channel];
+			sample[channel] = (1.0f - remainder) * config->tempSample[channel] +
+					remainder * config->tempSample[2 + channel];
 		}
 	}
 

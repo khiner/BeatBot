@@ -100,7 +100,7 @@ public class Track {
 		return isTrackLooping(id);
 	}
 
-	public void setLoopWindow(int loopBegin, int loopEnd) {
+	public void setLoopWindow(long loopBegin, long loopEnd) {
 		setTrackLoopWindow(id, loopBegin, loopEnd);
 	}
 
@@ -138,8 +138,8 @@ public class Track {
 		setAdsrPoint(id, adsrPointNum, x, y);
 	}
 
-	public void setSampleBytes(byte[] bytes) {
-		setSampleBytes(id, bytes);
+	public void setSample(String sampleName) {
+		setSample(id, sampleName);
 	}
 
 	public static native void armTrack(int trackNum);
@@ -148,8 +148,8 @@ public class Track {
 
 	public static native boolean isTrackLooping(int trackNum);
 
-	public static native void setTrackLoopWindow(int trackNum, int loopBegin,
-			int loopEnd);
+	public static native void setTrackLoopWindow(int trackNum, long loopBegin,
+			long loopEnd);
 
 	public static native void disarmTrack(int trackNum);
 
@@ -176,5 +176,5 @@ public class Track {
 	public native void setAdsrPoint(int trackId, int adsrPointNum, float x,
 			float y);
 
-	public static native void setSampleBytes(int trackId, byte[] bytes);
+	public static native void setSample(int trackId, String sampleName);
 }

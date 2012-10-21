@@ -1,5 +1,8 @@
 package com.kh.beatbot.view.helper;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -11,6 +14,12 @@ import java.util.Queue;
 import com.kh.beatbot.view.SurfaceViewBase;
 
 public class WaveformHelper extends Thread {
+	// holds a single float in the form of 4 bytes, used to input floats from a byte file
+	private static ByteBuffer floatBuffer = ByteBuffer.allocate(4);
+	static {
+		floatBuffer.order(ByteOrder.LITTLE_ENDIAN);
+	}
+	
 	private boolean recording = false;
 	
 	public static final int DEFAULT_HEIGHT = 100;
@@ -87,16 +96,33 @@ public class WaveformHelper extends Thread {
 		return floatsToFloatBuffer(floats, width, height, 0, (int)width, xOffset);
 	}
 	
-	public static FloatBuffer floatsToFloatBuffer(float[] data, float width, float height, int offset, int numFloats, int xOffset) {
+	public static FloatBuffer floatFileToBuffer(File file, float width, float height, long offset, long numFloats, int xOffset) throws IOException {
+		RandomAccessFile sampleFile = new RandomAccessFile(file, "r");
 		float spp = Math.min(2, numFloats / width);
 		float[] outputAry = new float[2 * (int)(width * spp)];
-		for (int x = 0; x < outputAry.length / 2; x++) {
-			float percent = (float)(x * 2) / outputAry.length;
-			int dataIndex = offset + (int)(percent * numFloats);
+		for (int x = 0; x < outputAry.length; x += 2) {
+			float percent = (float) x / outputAry.length;
+			int dataIndex = (int)(offset + percent * numFloats);
+			// sanity check - default to y = 0 if index out of bounds
+			sampleFile.seek(dataIndex * 8);
+			sampleFile.read(floatBuffer.array());
+			float y = height*(floatBuffer.getFloat(0) + 1)/2;
+			outputAry[x] = percent * width + xOffset;
+			outputAry[x + 1] = y;
+		}
+		return SurfaceViewBase.makeFloatBuffer(outputAry);
+	}
+	
+	public static FloatBuffer floatsToFloatBuffer(float[] data, float width, float height, long offset, long numFloats, int xOffset) {
+		float spp = Math.min(2, numFloats / width);
+		float[] outputAry = new float[2 * (int)(width * spp)];
+		for (int x = 0; x < outputAry.length; x += 2) {
+			float percent = (float) x / outputAry.length;
+			int dataIndex = (int)(offset + percent * numFloats) * 2;
 			// sanity check - default to y = 0 if index out of bounds  
-			float y = dataIndex < data.length  && dataIndex >= 0 ? height*(data[dataIndex] + 1)/2 : 0;
-			outputAry[x * 2] = percent * width + xOffset;
-			outputAry[x * 2 + 1] = y;
+			float y = dataIndex < data.length  && dataIndex >= 0 ? height*(data[(int)dataIndex] + 1)/2 : 0;
+			outputAry[x] = percent * width + xOffset;
+			outputAry[x + 1] = y;
 		}
 		return SurfaceViewBase.makeFloatBuffer(outputAry);
 	}
