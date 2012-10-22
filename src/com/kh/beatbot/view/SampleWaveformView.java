@@ -77,7 +77,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 	// keep track of that with offset and width
 	private float sampleOffset = 0;
 	private float sampleWidth = 0;
-	File sampleFile = null;
 
 	public SampleWaveformView(Context c, AttributeSet as) {
 		super(c, as);
@@ -88,7 +87,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	public void setSampleFile(File sampleFile) {
-		this.sampleFile = sampleFile;
+		WaveformHelper.setSampleFile(sampleFile);
 		numSamples = sampleFile.length() / 8 - 44;
 		track.sampleLoopBegin = 0;
 		track.sampleLoopEnd = numSamples;
@@ -151,7 +150,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	private void updateWaveformVb() {
 		try {
-		waveformVb = WaveformHelper.floatFileToBuffer(sampleFile, width - previewButtonWidth, height, (long)sampleOffset, (long)sampleWidth, 0);
+		waveformVb = WaveformHelper.floatFileToBuffer(width - previewButtonWidth, height, (long)sampleOffset, (long)sampleWidth, 0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

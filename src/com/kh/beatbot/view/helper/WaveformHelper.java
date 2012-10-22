@@ -1,6 +1,7 @@
 package com.kh.beatbot.view.helper;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -19,6 +20,7 @@ public class WaveformHelper extends Thread {
 	static {
 		floatBuffer.order(ByteOrder.LITTLE_ENDIAN);
 	}
+	private static RandomAccessFile sampleFile = null;
 	
 	private boolean recording = false;
 	
@@ -85,6 +87,14 @@ public class WaveformHelper extends Thread {
 		completed = true;
 	}
 	
+	public static void setSampleFile(File file) {
+		try {
+			sampleFile = new RandomAccessFile(file, "r");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	// default to 0 offset, used when only a single FloatBuffer is needed
 	// (for a static sample)
 	public static FloatBuffer bytesToFloatBuffer(byte[] bytes, float width, float height) {
@@ -96,16 +106,14 @@ public class WaveformHelper extends Thread {
 		return floatsToFloatBuffer(floats, width, height, 0, (int)width, xOffset);
 	}
 	
-	public static FloatBuffer floatFileToBuffer(File file, float width, float height, long offset, long numFloats, int xOffset) throws IOException {
-		RandomAccessFile sampleFile = new RandomAccessFile(file, "r");
+	public static FloatBuffer floatFileToBuffer(float width, float height, long offset, long numFloats, int xOffset) throws IOException {
 		float spp = Math.min(2, numFloats / width);
 		float[] outputAry = new float[2 * (int)(width * spp)];
 		for (int x = 0; x < outputAry.length; x += 2) {
 			float percent = (float) x / outputAry.length;
 			int dataIndex = (int)(offset + percent * numFloats);
-			// sanity check - default to y = 0 if index out of bounds
-			sampleFile.seek(dataIndex * 8);
-			sampleFile.read(floatBuffer.array());
+			sampleFile.seek(dataIndex * 8); // 4 bytes per float * 2 floats per sample = 8 bytes
+			sampleFile.read(floatBuffer.array()); // read in the float at the current position
 			float y = height*(floatBuffer.getFloat(0) + 1)/2;
 			outputAry[x] = percent * width + xOffset;
 			outputAry[x + 1] = y;
