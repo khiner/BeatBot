@@ -15,6 +15,7 @@ typedef struct WavFile_t {
 	pthread_mutex_t bufferMutex;
 	FILE *sampleFile;
 	float tempSample[4];
+	float **samples;
 	int totalSamples;
 	float currSample;
 	long loopBegin;
@@ -49,13 +50,20 @@ static inline void wavfile_tick(WavFile *config, float *sample) {
 		long sampleIndex = (long)config->currSample;
 		float remainder = config->currSample - sampleIndex;
 		// read next two samples from current sample (rounded down)
-		fseek(config->sampleFile, sampleIndex * TWO_FLOAT_SZ, SEEK_SET);
-		fread(config->tempSample, 1, FOUR_FLOAT_SZ, config->sampleFile);
 		int channel;
-		for (channel = 0; channel < 2; channel++) {
-			// interpolate the next two samples linearly
-			sample[channel] = (1.0f - remainder) * config->tempSample[channel] +
-					remainder * config->tempSample[2 + channel];
+		if (config->samples == NULL) {
+			fseek(config->sampleFile, sampleIndex * TWO_FLOAT_SZ, SEEK_SET);
+			fread(config->tempSample, 1, FOUR_FLOAT_SZ, config->sampleFile);
+			for (channel = 0; channel < 2; channel++) {
+				// interpolate the next two samples linearly
+				sample[channel] = (1.0f - remainder) * config->tempSample[channel] +
+						remainder * config->tempSample[2 + channel];
+			}
+		} else {
+			for (channel = 0; channel < 2; channel++) {
+				sample[channel] = (1.0f - remainder) * config->samples[channel][sampleIndex] +
+						remainder * config->samples[channel][sampleIndex + 1];
+			}
 		}
 	}
 
