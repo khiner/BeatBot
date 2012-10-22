@@ -4,10 +4,13 @@
 void wavfile_freeBuffers(WavFile *wavFile) {
 	// if this sample was short enough, it was also loaded into memory, and will be non-null
 	if (wavFile->samples != NULL) {
-		free(wavFile->samples[0]);
-		free(wavFile->samples[1]);
-		free(wavFile->samples);
+		// use temp sample so there is no period when wavFile->samples is non-NULL but has freed memory
+		float **temp = wavFile->samples;
 		wavFile->samples = NULL;
+		free(temp[0]);
+		free(temp[1]);
+		free(temp);
+		temp = NULL;
 	}
 }
 
@@ -57,7 +60,7 @@ void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName) {
 
 WavFile *wavfile_create(const char *sampleName) {
 	WavFile *wavFile = (WavFile *) malloc(sizeof(WavFile));
-	pthread_mutex_init(&wavFile->bufferMutex, NULL);
+	wavFile->currSample = 0;
 	wavFile->samples = NULL;
 	wavfile_setSampleFile(wavFile, sampleName);
 	wavFile->looping = wavFile->reverse = false;

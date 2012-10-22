@@ -273,6 +273,14 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	}
 }
 
+void Java_com_kh_beatbot_global_Track_armTrack(JNIEnv *env,
+		jclass clazz, jint trackNum) {
+	Track *track = getTrack(env, clazz, trackNum);
+	track->armed = openSlOut->anyTrackArmed = true;
+	// start writing zeros to the track's audio out
+	bufferQueueCallback(openSlOut->outputBufferQueue, NULL);
+}
+
 void Java_com_kh_beatbot_manager_PlaybackManager_armAllTracks(JNIEnv *env,
 		jclass clazz) {
 	// arm each track, and

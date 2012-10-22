@@ -12,7 +12,6 @@
 
 typedef struct WavFile_t {
 	// mutex for buffer since setting the wav data happens on diff thread than processing
-	pthread_mutex_t bufferMutex;
 	FILE *sampleFile;
 	float tempSample[4];
 	float **samples;

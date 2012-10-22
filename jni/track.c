@@ -174,19 +174,9 @@ void initSample(Track *track, const char *sampleName) {
 
 void setSample(Track *track, const char *sampleName) {
 	WavFile *wavConfig = (WavFile *) track->generator->config;
-	pthread_mutex_lock(&wavConfig->bufferMutex);
 	wavfile_setSampleFile(wavConfig, sampleName);
 	adsrconfig_setNumSamples(track->adsr->config,
 			((WavFile *)track->generator->config)->totalSamples);
-	pthread_mutex_unlock(&wavConfig->bufferMutex);
-}
-
-void Java_com_kh_beatbot_global_Track_armTrack(JNIEnv *env,
-		jclass clazz, jint trackNum) {
-	Track *track = getTrack(env, clazz, trackNum);
-	track->armed = openSlOut->anyTrackArmed = true;
-	// start writing zeros to the track's audio out
-	bufferQueueCallback(openSlOut->outputBufferQueue, NULL);
 }
 
 void Java_com_kh_beatbot_global_Track_disarmTrack(JNIEnv *env,
