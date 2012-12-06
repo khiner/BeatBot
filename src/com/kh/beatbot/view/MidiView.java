@@ -729,7 +729,7 @@ public class MidiView extends ClickableSurfaceView {
 				float majorTick = TickWindowHelper
 						.getMajorTickToLeftOf(xToTick(x));
 				if (i == 0) { // begin loop marker selected
-					midiManager.setLoopBeginTick((long) majorTick);
+					midiManager.setLoopBeginTick(Math.max(0, (long) majorTick));
 				} else if (i == 1) { // middle selected. move begin and end
 					// preserve current loop length
 					float loopLength = midiManager.getLoopEndTick()
@@ -738,13 +738,18 @@ public class MidiView extends ClickableSurfaceView {
 							.getMajorTickToLeftOf(xToTick(x
 									- bean.getLoopSelectionOffset()));
 					float newEndTick = newBeginTick + loopLength;
-					if (newBeginTick >= 0
-							&& newEndTick <= TickWindowHelper.MAX_TICKS) {
-						midiManager.setLoopTicks((long) newBeginTick,
-								(long) newEndTick);
+					if (newBeginTick <= 0) {
+						newBeginTick = 0;
+						newEndTick = newBeginTick + loopLength;
+					} else if (newEndTick >= TickWindowHelper.MAX_TICKS) {
+						newEndTick = TickWindowHelper.MAX_TICKS;
+						newBeginTick = newEndTick - loopLength;
 					}
+					midiManager.setLoopTicks((long) newBeginTick,
+							(long) newEndTick);
 				} else { // end loop marker selected
-					midiManager.setLoopEndTick((long) majorTick);
+					midiManager.setLoopEndTick((long) Math.min(
+							TickWindowHelper.MAX_TICKS, majorTick));
 				}
 				TickWindowHelper.updateView(midiManager.getLoopBeginTick(),
 						midiManager.getLoopEndTick());
@@ -874,14 +879,18 @@ public class MidiView extends ClickableSurfaceView {
 			return;
 		}
 		if (bean.isPinch()) {
-			float leftTick = xToTick(e.getX(e.findPointerIndex(bean
-					.getPinchLeftPointerId())));
-			float rightTick = xToTick(e.getX(e.findPointerIndex(bean
-					.getPinchRightPointerId())));
+			int leftIndex = e.findPointerIndex(bean.getPinchLeftPointerId());
+			int rightIndex = e.findPointerIndex(bean.getPinchRightPointerId());
+			float leftTick = xToTick(e.getX(leftIndex));
+			float rightTick = xToTick(e.getX(rightIndex));
 			pinchSelectedNotes(leftTick, rightTick);
-		} else if (!touchedNotes.isEmpty()) { // at least one midi selected
+		} else if (touchedNotes.isEmpty()) { // no midi selected. scroll, zoom,
+												// or update select region
+			noMidiMove(e);
+		} else { // at least one midi selected
 			if (myPointers.size() - bean.getNumLoopMarkersSelected() == 1) {
-				// drag all selected notes together
+				// exactly one pointer not dragging loop markers - drag all
+				// selected notes together
 				dragNotes(true, myPointers.get(0),
 						xToTick(e.getX(e.findPointerIndex(myPointers.get(0)))),
 						yToNote(e.getY(e.findPointerIndex(myPointers.get(0)))));
@@ -895,8 +904,6 @@ public class MidiView extends ClickableSurfaceView {
 			// make room in the view window if we are dragging out of the view
 			TickWindowHelper.updateView(midiManager.getLeftMostSelectedTick(),
 					midiManager.getRightMostSelectedTick());
-		} else { // no midi selected. scroll, zoom, or update select region
-			noMidiMove(e);
 		}
 		updateLoopMarkers(e);
 	}

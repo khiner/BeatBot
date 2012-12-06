@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -171,20 +173,22 @@ public class BeatBotActivity extends Activity implements
 	}
 
 	private void copyFromAssetsToExternal(String folderName) {
-		String newDirectory = GlobalVars.appDirectory + folderName + "/";
+		String newDirectory = GlobalVars.appDirectory + "/" + folderName + "/";
 		File newSampleFolder = new File(newDirectory);
 		newSampleFolder.mkdir();
+		List<String> existingFiles = new ArrayList<String>();
 		String[] filesToCopy = null;
-		String[] existingFiles = newSampleFolder.list();
+		String[] existingFilesAry = newSampleFolder.list();
+		if (existingFilesAry != null) {
+			existingFiles = Arrays.asList(existingFilesAry);
+		}
 		try {
 			filesToCopy = assetManager.list(folderName);
 			for (String file : filesToCopy) {
 				// copy wav file exactly from assets to sdcard
-				if (!Arrays.asList(existingFiles).contains(file.replace(".wav", ".raw"))) {
-					InputStream in = assetManager.open(folderName + "/" + file);
-					//OutputStream wavOut = new FileOutputStream(newDirectory + file);
+				if (!existingFiles.contains(file.replace(".wav", ".raw"))) {
+					InputStream in = assetManager.open(folderName + file);
 					FileOutputStream rawOut = new FileOutputStream(newDirectory + file.replace(".wav", ".raw"));
-					//copyFile(in, wavOut);
 					convertWavToRaw(in, rawOut);
 				}
 			}
@@ -195,25 +199,34 @@ public class BeatBotActivity extends Activity implements
 
 	private void copyAllSamplesToStorage() {
 		assetManager = getAssets();
-		String extStorageDir = Environment.getExternalStorageDirectory()
-				.toString();
-		GlobalVars.appDirectory = extStorageDir + "/BeatBot/";
-		File appDirectoryFile = new File(GlobalVars.appDirectory);
-		// build the directory structure, if needed
-		appDirectoryFile.mkdirs();
 		for (String instrumentName : GlobalVars.allInstrumentTypes) {
 			// the sample folder for this sample type does not yet exist.
 			// create it and write all assets of this type to the folder
-			if (!instrumentName.equals("recorded"))
+			if (!instrumentName.equals("recorded")) {
 				copyFromAssetsToExternal(instrumentName);
+			}
 		}
 	}
 
+	private void initDataDir() {
+		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+			// we can read and write to external storage
+			String extStorageDir = Environment.getExternalStorageDirectory().toString();
+			GlobalVars.appDirectory = extStorageDir + "/BeatBot/";
+			File appDirectoryFile = new File(GlobalVars.appDirectory);
+			// build the directory structure, if needed
+			appDirectoryFile.mkdirs();
+		} else { // we need read AND write access for this app - default to internal storage
+			GlobalVars.appDirectory = getFilesDir().toString() + "/";	
+		}
+	}
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		GeneralUtils.initAndroidSettings(this);
+		initDataDir();
 		copyAllSamplesToStorage();
 		SurfaceViewBase.setResources(getResources());
 		setContentView(R.layout.main);
