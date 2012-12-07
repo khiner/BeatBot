@@ -226,7 +226,7 @@ public class MidiTrackControlHelper {
 
 	public static void handleRelease(int id, float x, int track) {
 		ButtonRow selectedRow = whichRowOwnsPointer.get(id);
-		if (selectedRow != null) {
+		if (selectedRow != null && track >= 0 && track < buttonRows.size()) {
 			if (selectedRow.equals(buttonRows.get(track))) {
 				selectedRow.handleRelease(x);
 			}
