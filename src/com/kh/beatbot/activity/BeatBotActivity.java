@@ -475,7 +475,7 @@ public class BeatBotActivity extends Activity implements
 
 	private void addTrack(int instrumentType) {
 		Instrument newInstrument = GlobalVars.getInstrument(instrumentType); 
-		addTrack(newInstrument.getCurrSampleName());
+		addTrack(newInstrument.getCurrSamplePath());
 		GlobalVars.tracks.add(new Track(GlobalVars.tracks.size(), newInstrument));
 		GlobalVars.midiView.updateTracks();
 		// launch sample edit activity for the newly added track

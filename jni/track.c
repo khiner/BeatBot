@@ -293,14 +293,17 @@ void Java_com_kh_beatbot_global_Track_setSample(JNIEnv *env,
 	} else {
 		setSample(track, nativeSampleName);
 	}
+
 	// release string memory
 	(*env)->ReleaseStringUTFChars(env, sampleName, nativeSampleName);
 }
 
 void Java_com_kh_beatbot_activity_BeatBotActivity_addTrack(JNIEnv *env, jclass clazz, jstring sampleName) {
 	Track *track = initTrack();
+	pthread_mutex_lock(&openSlOut->trackMutex);
 	addTrack(track);
 	Java_com_kh_beatbot_global_Track_setSample(env, clazz, trackCount, sampleName);
+	pthread_mutex_unlock(&openSlOut->trackMutex);
 	trackCount++;
 }
 

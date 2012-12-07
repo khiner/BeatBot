@@ -251,9 +251,11 @@ static inline void generateNextBuffer() {
 // Process all effects for all tracks
 // Mix all tracks together into the OpenSL byte buffer
 void fillBuffer() {
+	pthread_mutex_lock(&openSlOut->trackMutex);
 	generateNextBuffer();
 	processEffectsForAllTracks();
 	mixTracks();
+	pthread_mutex_unlock(&openSlOut->trackMutex);
 }
 
 // this callback handler is called every time a buffer finishes playing
@@ -400,6 +402,7 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 	openSlOut->currBufferFloat[1] = (float *) calloc(BUFF_SIZE, sizeof(float));
 	memset(openSlOut->currBufferShort, 0, sizeof(openSlOut->currBufferShort));
 	openSlOut->armed = openSlOut->anyTrackArmed = false;
+	pthread_mutex_init(&openSlOut->trackMutex, NULL);
 
 	// configure audio sink
 	SLDataLocator_OutputMix loc_outmix = { SL_DATALOCATOR_OUTPUTMIX,

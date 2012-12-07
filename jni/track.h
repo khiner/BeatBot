@@ -14,6 +14,7 @@ typedef struct OpenSlOut_ {
 	SLPlayItf outputPlayerPlay;
 	SLMuteSoloItf outputPlayerMuteSolo;
 	SLAndroidSimpleBufferQueueItf outputBufferQueue;
+	pthread_mutex_t trackMutex;
 } OpenSlOut;
 
 typedef struct Track_ {
