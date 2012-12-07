@@ -304,11 +304,10 @@ public class MidiView extends ClickableSurfaceView {
 			float noteWidth = tickToX(RecordManager.getRecordCurrTick()
 					- RecordManager.getRecordStartTick()
 					+ RecordManager.RECORD_LATENCY_TICKS)
-					- MidiTrackControlHelper.width;
+					- MidiViewBean.X_OFFSET;
 			gl.glPushMatrix();
 			gl.glTranslatef(tickToX(RecordManager.getRecordStartTick()), 0, 0);
-			// scale drawing so the entire waveform exactly fits in the note
-			// width
+			// scale drawing so entire waveform exactly fits in the note width
 			gl.glScalef(noteWidth / waveWidth, 1, 1);
 			for (int i = 0; i < waveformVbs.size(); i++) {
 				drawLines(waveformVbs.get(i), Colors.WAVEFORM_COLOR, 1,
@@ -790,7 +789,7 @@ public class MidiView extends ClickableSurfaceView {
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
-		if (x < MidiTrackControlHelper.width) {
+		if (x < MidiViewBean.X_OFFSET) {
 			MidiTrackControlHelper.handlePress(id, x, yToNote(y));
 			return;
 		}
@@ -818,7 +817,7 @@ public class MidiView extends ClickableSurfaceView {
 	protected void handleActionPointerDown(MotionEvent e, int id, float x,
 			float y) {
 		super.handleActionPointerDown(e, id, x, y);
-		if (x < MidiTrackControlHelper.width) {
+		if (x < MidiViewBean.X_OFFSET) {
 			MidiTrackControlHelper.handlePress(id, x, yToNote(y));
 			return;
 		}
@@ -960,7 +959,7 @@ public class MidiView extends ClickableSurfaceView {
 
 	@Override
 	protected void longPress(int id, float x, float y) {
-		if (x < MidiTrackControlHelper.width) {
+		if (x < MidiViewBean.X_OFFSET) {
 			MidiTrackControlHelper.handleLongPress(id, x, yToNote(y));
 			return;
 		}
@@ -970,7 +969,7 @@ public class MidiView extends ClickableSurfaceView {
 
 	@Override
 	protected void singleTap(int id, float x, float y) {
-		if (x < MidiTrackControlHelper.width) {
+		if (x < MidiViewBean.X_OFFSET) {
 			// MidiTrackControlHelper.handleClick(x, yToNote(y));
 			return;
 		}

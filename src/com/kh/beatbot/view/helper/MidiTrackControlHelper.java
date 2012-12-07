@@ -137,15 +137,14 @@ public class MidiTrackControlHelper {
 	private static Map<Integer, ButtonRow> whichRowOwnsPointer = new HashMap<Integer, ButtonRow>();
 
 	public static void init() {
+		if (!buttonRows.isEmpty()) {
+			// it is possible that this static class can be reinstantiated after switching between views.
+			// ensure we're not re-adding rows by exiting
+			return;
+		}
 		for (int i = 0; i < GlobalVars.tracks.size(); i++) {
-			// this static class can be reinstantiated after switching between views.  make sure we're not re-adding rows
-			if (i < buttonRows.size()) {
-				buttonRows.set(i, new ButtonRow(i,
-						GlobalVars.tracks.get(i).getInstrument().getBBIconSource()));
-			} else {
-				buttonRows.add(new ButtonRow(i,
-						GlobalVars.tracks.get(i).getInstrument().getBBIconSource()));
-			}
+			buttonRows.add(new ButtonRow(i,
+					GlobalVars.tracks.get(i).getInstrument().getBBIconSource()));
 		}
 		width = buttonRows.get(0).width;
 		MidiViewBean.X_OFFSET = width;
