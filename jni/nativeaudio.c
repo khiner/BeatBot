@@ -336,17 +336,13 @@ MidiEventNode *removeEvent(Track *track, long onTick, bool muted) {
 				|| cur_ptr->event->onTick == onTick) {
 			if (cur_ptr == track->eventHead) {
 				track->eventHead = cur_ptr->next;
-				free(cur_ptr->event);
-				free(cur_ptr);
-				cur_ptr = NULL;
-				return track->eventHead;
 			} else {
 				prev_ptr->next = cur_ptr->next;
-				free(cur_ptr->event);
-				free(cur_ptr);
-				cur_ptr = NULL;
-				return track->eventHead;
 			}
+			free(cur_ptr->event);
+			free(cur_ptr);
+			cur_ptr = NULL;
+			return track->eventHead;
 		} else {
 			prev_ptr = cur_ptr;
 			cur_ptr = cur_ptr->next;
@@ -402,6 +398,7 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 	openSlOut->currBufferFloat = (float **) malloc(2 * sizeof(float *));
 	openSlOut->currBufferFloat[0] = (float *) calloc(BUFF_SIZE, sizeof(float));
 	openSlOut->currBufferFloat[1] = (float *) calloc(BUFF_SIZE, sizeof(float));
+	memset(openSlOut->currBufferShort, 0, sizeof(openSlOut->currBufferShort));
 	openSlOut->armed = openSlOut->anyTrackArmed = false;
 
 	// configure audio sink
