@@ -40,13 +40,12 @@ public class PlaybackManager {
 		state = State.STOPPED;
 		disarmAllTracks();
 	}
-		
-	public void stopAllTracks() {
-		for (Track track : GlobalVars.tracks) {
-			track.stop();
-		}
-	}
 
+	public void reset() {
+		disarmAllTracks();
+		armAllTracks();
+	}
+	
 	public static native void armAllTracks();
 	public static native void disarmAllTracks();
 }

@@ -379,6 +379,7 @@ public class BeatBotActivity extends Activity implements
 	public void play(View view) {
 		((ToggleButton) view).setChecked(true);
 		if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
+			Managers.playbackManager.reset();
 			Managers.midiManager.reset();
 		} else if (Managers.playbackManager.getState() == PlaybackManager.State.STOPPED) {
 			Managers.playbackManager.play();

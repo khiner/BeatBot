@@ -204,6 +204,7 @@ void stopAllTracks() {
 void Java_com_kh_beatbot_manager_PlaybackManager_disarmAllTracks(JNIEnv *env,
 		jclass clazz) {
 	TrackNode *cur_ptr = trackHead;
+	stopAllTracks();
 	while (cur_ptr != NULL) {
 		cur_ptr->track->armed = false;
 		cur_ptr = cur_ptr->next;
