@@ -16,13 +16,9 @@ static inline void volumepan_process(VolumePanConfig *config, float **buffers, i
 	float rightVolume = config->pan * config->volume;
 	int i;
 	for (i = 0; i < size; i++) {
-		if (buffers[0][i] == 0)
-			continue;
 		buffers[0][i] *= leftVolume; // left channel
 	}
 	for (i = 0; i < size; i++) {
-		if (buffers[1][i] == 0)
-			continue;
 		buffers[1][i] *= rightVolume; // right channel
 	}
 }

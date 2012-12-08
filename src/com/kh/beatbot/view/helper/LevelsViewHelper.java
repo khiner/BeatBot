@@ -335,6 +335,9 @@ public class LevelsViewHelper {
 				* bean.getLevelsHeight();
 	}
 
+	/*
+	 * map y value of level bar to a value in [0,1]
+	 */
 	private static float yToLevel(float y) {
 		return (MidiViewBean.Y_OFFSET + MidiTrackControlHelper.height - MidiViewBean.LEVEL_POINT_SIZE / 2 - y)
 				/ bean.getLevelsHeight();

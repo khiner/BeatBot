@@ -135,9 +135,7 @@ void updateNextEvent(Track *track) {
 }
 
 void soundTrack(Track *track) {
-	track->volPan->set(track->volPan->config,
-			track->primaryVolume * track->noteVolume,
-			track->primaryPan * track->notePan);
+	updateVolPanValue(track);
 
 	((WavFile *)track->generator->config)->sampleRate = track->primaryPitch * track->notePitch * 4;
 	AdsrConfig *adsrConfig = (AdsrConfig *) track->adsr->config;

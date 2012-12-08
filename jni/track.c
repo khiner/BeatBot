@@ -235,22 +235,24 @@ void Java_com_kh_beatbot_global_Track_soloTrack(JNIEnv *env,
 	}
 }
 
+void updateVolPanValue(Track *track) {
+	track->volPan->set(track->volPan->config,
+			track->primaryVolume * track->noteVolume,
+			(track->primaryPan + track->notePan) / 2);
+}
+
 void Java_com_kh_beatbot_global_Track_setPrimaryVolume(
 		JNIEnv *env, jclass clazz, jint trackNum, jfloat volume) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryVolume = volume;
-	track->volPan->set(track->volPan->config,
-			track->primaryVolume * track->noteVolume,
-			track->primaryPan * track->notePan);
+	updateVolPanValue(track);
 }
 
 void Java_com_kh_beatbot_global_Track_setPrimaryPan(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat pan) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryPan = pan;
-	track->volPan->set(track->volPan->config,
-			track->primaryVolume * track->noteVolume,
-			track->primaryPan * track->notePan);
+	updateVolPanValue(track);
 }
 
 void Java_com_kh_beatbot_global_Track_setPrimaryPitch(

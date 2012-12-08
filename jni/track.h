@@ -61,6 +61,8 @@ void addTrack(Track *track);
 
 TrackNode *removeTrack(int trackNum);
 
+void updateVolPanValue(Track *track);
+
 void freeEffects(Track *track);
 
 void freeTracks();
