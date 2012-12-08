@@ -29,6 +29,8 @@ public class GlobalVars {
 	// time (in millis) for a long press in one location
 	public final static long LONG_CLICK_TIME = 500;
 
+	public final static int MAX_EFFECTS_PER_TRACK = 3; // also in jni/Track.h, ugly but necessary
+	
 	public static final String[] allInstrumentTypes = { "kick", "snare",
 			"hh_closed", "hh_open", "rim", "recorded" };
 

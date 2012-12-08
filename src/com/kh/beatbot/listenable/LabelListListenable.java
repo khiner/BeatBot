@@ -52,7 +52,10 @@ public class LabelListListenable extends ClickableSurfaceView {
 			if (text.isEmpty())
 				state = LabelState.EMPTY;
 			this.textWidth = glText.getTextWidth(text);
-			labelWidth = text.isEmpty() ? (width - 3 * GAP_BETWEEN_LABELS) / 4
+		}
+		
+		public void updateSize() {
+			labelWidth = state == LabelState.EMPTY ? (width - (labels.size() - 1) * GAP_BETWEEN_LABELS) / labels.size()
 					: textWidth + 20;
 			backgroundRectVb = makeRoundedCornerRectBuffer(labelWidth, height,
 					14, 16);
@@ -201,6 +204,12 @@ public class LabelListListenable extends ClickableSurfaceView {
 		return null;
 	}
 
+	private void updateLabelSizes() {
+		for (Label label : labels) {
+			label.updateSize();
+		}
+	}
+	
 	private void updateLabelLocations() {
 		Collections.sort(labels); // sort labels by x value
 		float xTotal = 0;
@@ -214,6 +223,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 
 	public void addLabel(String text, int id, boolean on) {
 		labels.add(new Label(id, text, on, Float.MAX_VALUE));
+		updateLabelSizes();
 		updateLabelLocations();
 	}
 

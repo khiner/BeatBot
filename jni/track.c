@@ -154,7 +154,7 @@ Track *initTrack() {
 	track->primaryPan = track->primaryPitch = track->notePan =
 			track->notePitch = .5f;
 	int effectNum;
-	for (effectNum = 0; effectNum < 4; effectNum++) {
+	for (effectNum = 0; effectNum < MAX_EFFECTS_PER_TRACK; effectNum++) {
 		addEffect(track, NULL);
 	}
 	track->volPan = initEffect(-1, true, volumepanconfig_create(),

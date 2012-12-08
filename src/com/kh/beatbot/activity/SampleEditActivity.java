@@ -86,7 +86,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 			this.labelList = labelList;
 			Stack<Integer> uniqueIds = getUniqueIds();
 			if (labelList.noLabels()) {
-				for (int i = 0; i < 4; i++) {
+				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
 					Effect effect = currTrack.findEffectByPosition(i);
 					if (effect != null) {
 						this.labelList.addLabel(effect.name, effect.getId(),
@@ -96,7 +96,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 					}
 				}
 			} else {
-				for (int i = 0; i < 4; i++) {
+				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
 					Effect effect = currTrack.findEffectByPosition(i);
 					if (effect != null)
 						this.labelList.setLabelOn(effect.getId(), effect.on);
