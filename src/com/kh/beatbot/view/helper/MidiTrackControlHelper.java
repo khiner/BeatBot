@@ -35,6 +35,10 @@ public class MidiTrackControlHelper {
 					+ soloButton.getIconWidth();
 		}
 
+		public void setIconSource(BeatBotIconSource instrumentIcon) {
+			this.instrumentButton.setIconSource(instrumentIcon);
+		}
+		
 		public void draw(float y) {
 			instrumentButton.draw(0, y);
 			muteButton.draw(instrumentButton.getIconWidth(), y);
@@ -153,6 +157,13 @@ public class MidiTrackControlHelper {
 		initBgRectVb();
 	}
 
+	public static void updateInstrumentIcon(int trackNum) {
+		if (trackNum < 0 || trackNum >= buttonRows.size()) {
+			return;
+		}
+		buttonRows.get(trackNum).setIconSource(GlobalVars.tracks.get(trackNum).getInstrument().getBBIconSource());
+	}
+	
 	public static void addListener(MidiTrackControlListener listener) {
 		MidiTrackControlHelper.listener = listener;
 	}

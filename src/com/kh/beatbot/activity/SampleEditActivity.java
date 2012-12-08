@@ -38,6 +38,7 @@ import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.view.SampleWaveformView;
 import com.kh.beatbot.view.TronSeekbar;
+import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
 public class SampleEditActivity extends Activity implements LevelListener {
 	class EffectLabelListListener implements LabelListListener {
@@ -188,6 +189,8 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		// update sample label text
 		((Button) findViewById(R.id.sampleSelect)).setText(instrument
 				.getCurrSampleName());
+		// update the midi view instrument icon for this track
+		MidiTrackControlHelper.updateInstrumentIcon(currTrack.getId());
 		// update sample waveform view with new sample bytes
 		sampleWaveformView.setSampleFile(instrument.getCurrSampleFile());
 	}

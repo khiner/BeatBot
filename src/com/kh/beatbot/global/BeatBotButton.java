@@ -5,7 +5,14 @@ public class BeatBotButton {
 	BeatBotIcon defaultIcon;
 	BeatBotIcon selectedIcon;
 	BeatBotIcon currentIcon;
+	
 	public BeatBotButton(BeatBotIconSource iconSource) {
+		defaultIcon = iconSource.defaultIcon;
+		selectedIcon = iconSource.selectedIcon;
+		currentIcon = defaultIcon;
+	}
+	
+	public void setIconSource(BeatBotIconSource iconSource) {
 		defaultIcon = iconSource.defaultIcon;
 		selectedIcon = iconSource.selectedIcon;
 		currentIcon = defaultIcon;
