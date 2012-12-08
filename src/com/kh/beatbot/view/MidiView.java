@@ -298,15 +298,15 @@ public class MidiView extends ClickableSurfaceView {
 	private void drawRecordingWaveforms() {
 		ArrayList<FloatBuffer> waveformVbs = waveformHelper
 				.getCurrentWaveformVbs();
-		if (RecordManager.isRecording() && !waveformVbs.isEmpty()) {
+		if (Managers.recordManager.isRecording() && !waveformVbs.isEmpty()) {
 			FloatBuffer last = waveformVbs.get(waveformVbs.size() - 1);
 			float waveWidth = last.get(last.capacity() - 2);
-			float noteWidth = tickToX(RecordManager.getRecordCurrTick()
-					- RecordManager.getRecordStartTick()
+			float noteWidth = tickToX(Managers.recordManager.getRecordCurrTick()
+					- Managers.recordManager.getRecordStartTick()
 					+ RecordManager.RECORD_LATENCY_TICKS)
 					- MidiViewBean.X_OFFSET;
 			gl.glPushMatrix();
-			gl.glTranslatef(tickToX(RecordManager.getRecordStartTick()), 0, 0);
+			gl.glTranslatef(tickToX(Managers.recordManager.getRecordStartTick()), 0, 0);
 			// scale drawing so entire waveform exactly fits in the note width
 			gl.glScalef(noteWidth / waveWidth, 1, 1);
 			for (int i = 0; i < waveformVbs.size(); i++) {
@@ -500,7 +500,7 @@ public class MidiView extends ClickableSurfaceView {
 	protected void drawFrame() {
 		calcBgColor();
 		drawBgRect();
-		boolean recording = RecordManager.getState() != RecordManager.State.INITIALIZING;
+		boolean recording = Managers.recordManager.getState() != RecordManager.State.INITIALIZING;
 		boolean playing = Managers.playbackManager.getState() == PlaybackManager.State.PLAYING;
 		TickWindowHelper.scroll();
 		// we need to do this in every frame, because even if loop ticks aren't

@@ -286,7 +286,7 @@ public class BeatBotActivity extends Activity implements
 				"playing",
 				Managers.playbackManager.getState() == PlaybackManager.State.PLAYING);
 		outState.putBoolean("recording",
-				RecordManager.getState() != RecordManager.State.INITIALIZING);
+				Managers.recordManager.getState() != RecordManager.State.INITIALIZING);
 	}
 
 	@Override
@@ -361,7 +361,7 @@ public class BeatBotActivity extends Activity implements
 	}
 
 	public void record(View view) {
-		if (RecordManager.getState() != RecordManager.State.INITIALIZING) {
+		if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
 			//Managers.recordManager.stopListening();
 			String fileName = Managers.recordManager.stopRecordingAndWriteWav();
 			Toast.makeText(getApplicationContext(), "Recorded file to " + fileName,
@@ -386,8 +386,11 @@ public class BeatBotActivity extends Activity implements
 	}
 
 	public void stop(View view) {
-		if (RecordManager.getState() != RecordManager.State.INITIALIZING)
-			record(findViewById(R.id.recordButton));
+		if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
+			ToggleButton recordButton = (ToggleButton) findViewById(R.id.recordButton); 
+			record(recordButton);
+			recordButton.setChecked(false);
+		}
 		if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			Managers.playbackManager.stop();
 			((ToggleButton) findViewById(R.id.playButton)).setChecked(false);

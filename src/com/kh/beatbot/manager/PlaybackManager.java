@@ -6,7 +6,7 @@ import com.kh.beatbot.global.Track;
 public class PlaybackManager {
 	
 	private static PlaybackManager singletonInstance = null;
-	private State state;
+	private static State state;
 		
 	public static final int SAMPLE_RATE = 44100;
 	
@@ -41,7 +41,7 @@ public class PlaybackManager {
 		disarmAllTracks();
 	}
 		
-	public static void stopAllTracks() {
+	public void stopAllTracks() {
 		for (Track track : GlobalVars.tracks) {
 			track.stop();
 		}
