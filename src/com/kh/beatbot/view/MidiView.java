@@ -156,34 +156,45 @@ public class MidiView extends ClickableSurfaceView {
 		initSelectRegionVb(leftTick, rightTick, topY, bottomY);
 	}
 
-	private void selectMidiNote(float x, float y, int pointerId) {
-		float tick = xToTick(x);
-		int note = yToNote(y);
-
+	public MidiNote getMidiNote(int track, float tick) {
+		if (track < 0 || track >= GlobalVars.tracks.size()) {
+			return null;
+		}
 		for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
 			MidiNote midiNote = midiManager.getMidiNotes().get(i);
-			if (midiNote.getNoteValue() == note && midiNote.getOnTick() <= tick
+			if (midiNote.getNoteValue() == track
+					&& midiNote.getOnTick() <= tick
 					&& midiNote.getOffTick() >= tick) {
-				if (!touchedNotes.containsValue(midiNote)) {
-					startOnTicks.put(pointerId, (float) midiNote.getOnTick());
-					float leftOffset = tick - midiNote.getOnTick();
-					bean.setDragOffsetTick(pointerId, leftOffset);
-					// don't need right offset for simple drag (one finger
-					// select)
-
-					// If this is the only touched midi note, and it hasn't yet
-					// been selected, make it the only selected note.
-					// If we are multi-selecting, add it to the selected list
-					if (!midiNote.isSelected()) {
-						if (touchedNotes.isEmpty())
-							midiManager.deselectAllNotes();
-						midiManager.selectNote(midiNote);
-					}
-					touchedNotes.put(pointerId, midiNote);
-				}
-				return;
+				return midiNote;
 			}
 		}
+		return null;
+	}
+
+	private void selectMidiNote(float x, float y, int pointerId) {
+		int track = yToNote(y);
+		float tick = xToTick(x);
+
+		MidiNote selectedNote = getMidiNote(track, tick);
+		if (selectedNote == null || touchedNotes.containsValue(selectedNote)) {
+			return;
+		}
+
+		startOnTicks.put(pointerId, (float) selectedNote.getOnTick());
+		float leftOffset = tick - selectedNote.getOnTick();
+		bean.setDragOffsetTick(pointerId, leftOffset);
+		// don't need right offset for simple drag (one finger
+		// select)
+
+		// If this is the only touched midi note, and it hasn't yet
+		// been selected, make it the only selected note.
+		// If we are multi-selecting, add it to the selected list
+		if (!selectedNote.isSelected()) {
+			if (touchedNotes.isEmpty())
+				midiManager.deselectAllNotes();
+			midiManager.selectNote(selectedNote);
+		}
+		touchedNotes.put(pointerId, selectedNote);
 	}
 
 	public void selectLoopMarker(int pointerId, float x) {
@@ -301,12 +312,14 @@ public class MidiView extends ClickableSurfaceView {
 		if (Managers.recordManager.isRecording() && !waveformVbs.isEmpty()) {
 			FloatBuffer last = waveformVbs.get(waveformVbs.size() - 1);
 			float waveWidth = last.get(last.capacity() - 2);
-			float noteWidth = tickToX(Managers.recordManager.getRecordCurrTick()
+			float noteWidth = tickToX(Managers.recordManager
+					.getRecordCurrTick()
 					- Managers.recordManager.getRecordStartTick()
 					+ RecordManager.RECORD_LATENCY_TICKS)
 					- MidiViewBean.X_OFFSET;
 			gl.glPushMatrix();
-			gl.glTranslatef(tickToX(Managers.recordManager.getRecordStartTick()), 0, 0);
+			gl.glTranslatef(
+					tickToX(Managers.recordManager.getRecordStartTick()), 0, 0);
 			// scale drawing so entire waveform exactly fits in the note width
 			gl.glScalef(noteWidth / waveWidth, 1, 1);
 			for (int i = 0; i < waveformVbs.size(); i++) {
@@ -504,8 +517,7 @@ public class MidiView extends ClickableSurfaceView {
 		boolean playing = Managers.playbackManager.getState() == PlaybackManager.State.PLAYING;
 		TickWindowHelper.scroll();
 		// we need to do this in every frame, because even if loop ticks aren't
-		// changing
-		// the tick window can change
+		// changing the tick window can change
 		initLoopRectVb();
 		drawTickFill();
 		drawLoopRect();
@@ -515,11 +527,8 @@ public class MidiView extends ClickableSurfaceView {
 						+ TickWindowHelper.getNumTicks())
 			TickWindowHelper.setNumTicks(midiManager.getCurrTick()
 					- TickWindowHelper.getTickOffset());
-		if (bean.getViewState() != State.LEVELS_VIEW) {
-			// normal or transitioning view. draw lines
-			drawHorizontalLines();
-			drawVerticalLines();
-		}
+		drawHorizontalLines();
+		drawVerticalLines();
 		if (bean.getViewState() != State.NORMAL_VIEW) {
 			LevelsViewHelper.drawFrame();
 		} else {
@@ -611,20 +620,22 @@ public class MidiView extends ClickableSurfaceView {
 	// adds a note starting at the nearest major tick (nearest displayed
 	// grid line) to the left and ending one tick before the nearest major
 	// tick to the right of the given tick
-	private void addMidiNote(float tick, int note) {
+	public MidiNote addMidiNote(float tick, int track) {
 		float spacing = TickWindowHelper.getMajorTickSpacing();
 		float onTick = tick - tick % spacing;
 		float offTick = onTick + spacing - 1;
-		addMidiNote(onTick, offTick, note);
+		return addMidiNote(onTick, offTick, track);
 	}
 
-	public void addMidiNote(float onTick, float offTick, int note) {
+	public MidiNote addMidiNote(float onTick, float offTick, int track) {
 		MidiNote noteToAdd = midiManager.addNote((long) onTick, (long) offTick,
-				note, .75f, .5f, .5f);
+				track, .75f, .5f, .5f);
 		midiManager.selectNote(noteToAdd);
 		handleMidiCollisions();
 		midiManager.mergeTempNotes();
 		midiManager.deselectNote(noteToAdd);
+		bean.setStateChanged(true);
+		return noteToAdd;
 	}
 
 	public void handleMidiCollisions() {
@@ -975,7 +986,7 @@ public class MidiView extends ClickableSurfaceView {
 		}
 		MidiNote touchedNote = touchedNotes.get(id);
 		if (bean.getViewState() == State.LEVELS_VIEW) {
-			LevelsViewHelper.selectLevelNote(x, y);
+			LevelsViewHelper.singleTap(x, y);
 		} else {
 			if (touchedNote != null) {
 				// single tapping a note always makes it the only selected note
@@ -991,7 +1002,6 @@ public class MidiView extends ClickableSurfaceView {
 				} else { // add a note based on the current tick granularity
 					if (note >= 0 && note < GlobalVars.tracks.size()) {
 						addMidiNote(tick, note);
-						bean.setStateChanged(true);
 					}
 				}
 			}

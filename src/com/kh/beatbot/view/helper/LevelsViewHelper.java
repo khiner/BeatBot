@@ -10,6 +10,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.MidiView;
@@ -164,20 +165,6 @@ public class LevelsViewHelper {
 				}
 				touchedLevels.put(pointerId, levelViewSelected);
 				updateLevelOffsets();
-				return;
-			}
-		}
-	}
-
-	public static void selectLevelNote(float x, float y) {
-		float tick = midiView.xToTick(x);
-		float note = MidiView.yToNote(y);
-
-		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
-			if (midiNote.getNoteValue() == note && midiNote.getOnTick() <= tick
-					&& midiNote.getOffTick() >= tick) {
-				addToLevelViewSelected(midiNote);
-				tappedLevelNote = midiNote;
 				return;
 			}
 		}
@@ -343,6 +330,19 @@ public class LevelsViewHelper {
 				/ bean.getLevelsHeight();
 	}
 
+	public static void singleTap(float x, float y) {
+		int track = MidiView.yToNote(y);
+		float tick = midiView.xToTick(x);
+
+		MidiNote selectedNote = midiView.getMidiNote(track, tick);
+		if (selectedNote != null) {
+			return;
+		}
+		MidiNote newNote = midiView.addMidiNote(tick, track);
+		addToLevelViewSelected(newNote);
+		tappedLevelNote = newNote;
+	}
+	
 	public static void doubleTap() {
 		if (tappedLevelNote == null)
 			return;
