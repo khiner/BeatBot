@@ -559,13 +559,10 @@ public class MidiView extends ClickableSurfaceView {
 				// inside threshold distance - set to original position
 				return startOnTicks.get(pointerId) - selectedNote.getOnTick();
 			}
-			if (selectedNote.getOnTick() + tickDiff < 0) {
-				if (selectedNote.getOnTick() > adjustedTickDiff)
-					adjustedTickDiff = -selectedNote.getOnTick();
-			} else if (selectedNote.getOffTick() + tickDiff > TickWindowHelper.MAX_TICKS) {
-				if (TickWindowHelper.MAX_TICKS - selectedNote.getOffTick() < adjustedTickDiff)
-					adjustedTickDiff = TickWindowHelper.MAX_TICKS
-							- selectedNote.getOffTick();
+			if (selectedNote.getOnTick() < -adjustedTickDiff) {
+				adjustedTickDiff = -selectedNote.getOnTick();
+			} else if (TickWindowHelper.MAX_TICKS - selectedNote.getOffTick() < adjustedTickDiff) {
+				adjustedTickDiff = TickWindowHelper.MAX_TICKS - selectedNote.getOffTick();
 			}
 		}
 		return adjustedTickDiff;
@@ -576,15 +573,13 @@ public class MidiView extends ClickableSurfaceView {
 		for (MidiNote selectedNote : midiManager.getSelectedNotes()) {
 			if (singleNote != null && !selectedNote.equals(singleNote))
 				continue;
-			if (selectedNote.getNoteValue() + noteDiff < 0
-					&& selectedNote.getNoteValue() > adjustedNoteDiff)
+			if (selectedNote.getNoteValue() < -adjustedNoteDiff) {
 				adjustedNoteDiff = -selectedNote.getNoteValue();
-			else if (selectedNote.getNoteValue() + noteDiff > GlobalVars.tracks
-					.size() - 1
-					&& GlobalVars.tracks.size() - 1
-							- selectedNote.getNoteValue() < adjustedNoteDiff)
+			} else if (GlobalVars.tracks.size() - 1
+							- selectedNote.getNoteValue() < adjustedNoteDiff) {
 				adjustedNoteDiff = GlobalVars.tracks.size() - 1
 						- selectedNote.getNoteValue();
+			}
 		}
 		return adjustedNoteDiff;
 	}
