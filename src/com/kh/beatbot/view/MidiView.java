@@ -754,6 +754,7 @@ public class MidiView extends ClickableSurfaceView {
 					midiManager.setLoopEndTick((long) Math.min(
 							TickWindowHelper.MAX_TICKS, majorTick));
 				}
+				midiManager.updateAllTrackNextNotes();
 				TickWindowHelper.updateView(midiManager.getLoopBeginTick(),
 						midiManager.getLoopEndTick());
 			}
