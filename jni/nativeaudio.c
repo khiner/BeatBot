@@ -17,6 +17,7 @@ static pthread_cond_t bufferFillCond = PTHREAD_COND_INITIALIZER;
 static jclass midiClass = NULL;
 static jmethodID getNextMidiNote = NULL;
 static JavaVM* javaVm = NULL;
+static JNIEnv* currEnv = NULL;
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 	JNIEnv* env;
@@ -36,8 +37,10 @@ JNIEnv *getJniEnv() {
 	JNIEnv* env;
 	if ((*javaVm)->GetEnv(javaVm, (void**) &env,
 			JNI_VERSION_1_6) == JNI_EDETACHED) {
+		(*javaVm)->DetachCurrentThread(NULL);
 		(*javaVm)->AttachCurrentThread(javaVm, &env, NULL);
 	}
+	currEnv = env;
 	return env;
 }
 
@@ -123,26 +126,27 @@ void setNextNoteInfo(Track *track, jlong onTick, jlong offTick, jfloat vol,
 void setNextNote(Track *track, jobject obj) {
 	JNIEnv* env = getJniEnv();
 	if (obj == NULL) {
-			track->nextStartSample = -1;
-			track->nextStopSample = -1;
-			return;
-		}
-		jclass cls = (*env)->GetObjectClass(env, obj);
+		track->nextStartSample = -1;
+		track->nextStopSample = -1;
+		return;
+	}
+	jclass cls = (*env)->GetObjectClass(env, obj);
 
-		long onTick = tickToSample(
-				(*env)->CallLongMethod(env, obj,
-						(*env)->GetMethodID(env, cls, "getOnTick", "()J")));
-		long offTick = tickToSample(
-				(*env)->CallLongMethod(env, obj,
-						(*env)->GetMethodID(env, cls, "getOffTick", "()J")));
-		float vol = (*env)->CallFloatMethod(env, obj,
-				(*env)->GetMethodID(env, cls, "getVelocity", "()F"));
-		float pan = (*env)->CallFloatMethod(env, obj,
-				(*env)->GetMethodID(env, cls, "getPan", "()F"));
-		float pitch = (*env)->CallFloatMethod(env, obj,
-				(*env)->GetMethodID(env, cls, "getPitch", "()F"));
+	long onTick = tickToSample(
+			(*env)->CallLongMethod(env, obj,
+					(*env)->GetMethodID(env, cls, "getOnTick", "()J")));
+	long offTick = tickToSample(
+			(*env)->CallLongMethod(env, obj,
+					(*env)->GetMethodID(env, cls, "getOffTick", "()J")));
+	float vol = (*env)->CallFloatMethod(env, obj,
+			(*env)->GetMethodID(env, cls, "getVelocity", "()F"));
+	float pan = (*env)->CallFloatMethod(env, obj,
+			(*env)->GetMethodID(env, cls, "getPan", "()F"));
+	float pitch = (*env)->CallFloatMethod(env, obj,
+			(*env)->GetMethodID(env, cls, "getPitch", "()F"));
 
-		setNextNoteInfo(track, onTick, offTick, vol, pan, pitch);
+	setNextNoteInfo(track, onTick, offTick, vol, pan, pitch);
+	(*env)->DeleteLocalRef(env, cls);
 }
 
 void updateNextNote(Track *track) {
@@ -150,6 +154,7 @@ void updateNextNote(Track *track) {
 	jobject obj = (*env)->CallStaticObjectMethod(env, midiClass,
 			getNextMidiNote, track->num, (jlong) sampleToTick(currSample));
 	setNextNote(track, obj);
+	(*env)->DeleteLocalRef(env, obj);
 }
 
 void soundTrack(Track *track) {

@@ -388,8 +388,7 @@ public class BeatBotActivity extends Activity implements
 		pan.setChecked(false);
 		pitch.setChecked(false);
 		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.VOLUME);
-		levelBar.setLevelColor(Colors.VOLUME_COLOR);
-		levelBar.setLevel(GlobalVars.MASTER_VOL_LEVEL);
+		updateLevelBar();
 	}
 
 	public void pan(View view) {
@@ -397,20 +396,34 @@ public class BeatBotActivity extends Activity implements
 		pan.setChecked(true);
 		pitch.setChecked(false);
 		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.PAN);
-		levelBar.setLevelColor(Colors.PAN_COLOR);
-		levelBar.setLevel(GlobalVars.MASTER_PAN_LEVEL);
+		updateLevelBar();
 	}
 
 	public void pitch(View view) {
 		volume.setChecked(false);
 		pan.setChecked(false);
 		pitch.setChecked(true);
-		
 		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.PITCH);
-		levelBar.setLevelColor(Colors.PITCH_COLOR);
-		levelBar.setLevel(GlobalVars.MASTER_PIT_LEVEL);
+		updateLevelBar();
 	}
 
+	private void updateLevelBar() {
+		switch (GlobalVars.midiView.getLevelMode()) {
+		case VOLUME:
+			levelBar.setLevelColor(Colors.VOLUME_COLOR);
+			levelBar.setLevel(GlobalVars.MASTER_VOL_LEVEL);
+			break;
+		case PAN:
+			levelBar.setLevelColor(Colors.PAN_COLOR);
+			levelBar.setLevel(GlobalVars.MASTER_PAN_LEVEL);
+			break;
+		case PITCH:
+			levelBar.setLevelColor(Colors.PITCH_COLOR);
+			levelBar.setLevel(GlobalVars.MASTER_PIT_LEVEL);
+			break;
+		}
+	}
+	
 	public void bpmTap(View view) {
 		long tapTime = System.currentTimeMillis();
 		float millisElapsed = tapTime - lastTapTime;
@@ -450,20 +463,7 @@ public class BeatBotActivity extends Activity implements
 
 	@Override
 	public void notifyInit(LevelListenable levelBar) {
-		switch (GlobalVars.midiView.getLevelMode()) {
-		case VOLUME:
-			levelBar.setLevelColor(Colors.VOLUME_COLOR);
-			levelBar.setLevel(GlobalVars.MASTER_VOL_LEVEL);
-			break;
-		case PAN:
-			levelBar.setLevelColor(Colors.PAN_COLOR);
-			levelBar.setLevel(GlobalVars.MASTER_PAN_LEVEL);
-			break;
-		case PITCH:
-			levelBar.setLevelColor(Colors.PAN_COLOR);
-			levelBar.setLevel(GlobalVars.MASTER_PAN_LEVEL);
-			break;
-		}
+		updateLevelBar();
 	}
 	
 	@Override
