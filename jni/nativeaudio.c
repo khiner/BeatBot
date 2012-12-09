@@ -67,10 +67,6 @@ static inline void processEffects(Track *track) {
 			BUFF_SIZE);
 	pthread_mutex_lock(&track->effectMutex);
 	EffectNode *effectNode = track->effectHead;
-	if (track->adsr->on) {
-			track->adsr->process(track->adsr->config, track->currBufferFloat,
-					BUFF_SIZE);
-	}
 	while (effectNode != NULL) {
 		if (effectNode->effect != NULL && effectNode->effect->on) {
 			effectNode->effect->process(effectNode->effect->config,
@@ -160,7 +156,7 @@ void updateNextNote(Track *track) {
 
 void soundTrack(Track *track) {
 	updateLevels(track);
-	AdsrConfig *adsrConfig = (AdsrConfig *) track->adsr->config;
+	AdsrConfig *adsrConfig = ((WavFile *)track->generator->config)->adsr;
 	adsrConfig->active = true;
 	resetAdsr(adsrConfig);
 }
@@ -172,7 +168,6 @@ void playTrack(Track *track) {
 
 void stopSoundingTrack(Track *track) {
 	wavfile_reset((WavFile *) track->generator->config);
-	((AdsrConfig *) track->adsr->config)->active = false;
 }
 
 void stopTrack(Track *track) {

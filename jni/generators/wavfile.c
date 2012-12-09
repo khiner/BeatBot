@@ -16,12 +16,12 @@ void wavfile_freeBuffers(WavFile *wavFile) {
 void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName) {
 	wavFile->sampleFile = fopen(sampleFileName, "rb");
 	fseek(wavFile->sampleFile, 0, SEEK_END);
-	wavFile->totalSamples = ftell(wavFile->sampleFile) / TWO_FLOAT_SZ; // 2 floats per sample
+	wavFile->totalSamples = ftell(wavFile->sampleFile) / 8; // 2 floats per sample
 	fseek(wavFile->sampleFile, 0, SEEK_SET);
 
 	// init loop / currSample position data
 	wavFile->loopBegin = 0;
-	wavFile->loopEnd = wavFile->totalSamples - 2;
+	wavFile->loopEnd = wavFile->totalSamples;
 	if (wavFile->currSample >= wavFile->loopEnd) {
 		wavFile->currSample = 0;
 	}
@@ -55,18 +55,45 @@ void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName) {
 		fflush(tempFile);
 		fclose(tempFile);
 	}
+	if (wavFile->adsr != NULL) {
+		updateAdsr(wavFile->adsr, wavFile->totalSamples);
+	}
 }
 
 WavFile *wavfile_create(const char *sampleName) {
 	WavFile *wavFile = (WavFile *) malloc(sizeof(WavFile));
 	wavFile->currSample = 0;
 	wavFile->samples = NULL;
+	wavFile->adsr = NULL;
 	wavfile_setSampleFile(wavFile, sampleName);
 	wavFile->looping = wavFile->reverse = false;
+	wavFile->adsr = adsrconfig_create(wavFile->totalSamples);
 	return wavFile;
 }
 
+void wavfile_setLoopWindow(WavFile *wavFile, long loopBeginSample,
+		long loopEndSample) {
+	if (wavFile->loopBegin == loopBeginSample
+			&& wavFile->loopEnd == loopEndSample)
+		return;
+	wavFile->loopBegin = loopBeginSample;
+	wavFile->loopEnd = loopEndSample;
+	wavFile->loopLength = wavFile->loopEnd - wavFile->loopBegin;
+	updateAdsr(wavFile->adsr, loopEndSample - loopBeginSample);
+}
+
+void wavfile_setReverse(WavFile *wavFile, bool reverse) {
+	wavFile->reverse = reverse;
+	// if the track is not looping, the wavFile generator will not loop to the beginning/end
+	// after enaabling/disabling reverse
+	if (reverse && wavFile->currSample == wavFile->loopBegin)
+		wavFile->currSample = wavFile->loopEnd;
+	else if (!reverse && wavFile->currSample == wavFile->loopEnd)
+		wavFile->currSample = wavFile->loopBegin;
+}
+
 void wavfile_reset(WavFile *config) {
+	config->adsr->active = false;
 	config->currSample = config->reverse ? config->loopEnd : config->loopBegin;
 	fseek(config->sampleFile, config->currSample * TWO_FLOAT_SZ, SEEK_SET);
 }
@@ -75,6 +102,7 @@ void wavfile_destroy(void *p) {
 	WavFile *config = (WavFile *) p;
 	fflush(config->sampleFile);
 	fclose(config->sampleFile);
+	adsrconfig_destroy(config->adsr);
 	wavfile_freeBuffers(config);
 	free(config);
 	config = NULL;

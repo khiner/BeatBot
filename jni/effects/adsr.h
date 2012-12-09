@@ -14,7 +14,8 @@ typedef struct AdsrConfig_t {
 	float initial, peak, end;
 	float currSample;
 	int gateSample; // sample to begin release
-	int totalSamples;bool active, rising;
+	int totalSamples;
+	bool active, rising;
 } AdsrConfig;
 
 AdsrConfig *adsrconfig_create(int totalSamples);
@@ -24,8 +25,10 @@ void updateAdsr(AdsrConfig *config, int totalSamples);
 void resetAdsr(AdsrConfig *config);
 
 static inline float adsr_tick(AdsrConfig *config, float sampleRate) {
-	if (!config->active)
+	if (!config->active) {
 		return 1;
+	}
+
 	config->currSample += sampleRate;
 	if (config->currSample < config->gateSample) {
 		if (config->rising) { // attack phase

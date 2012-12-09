@@ -152,17 +152,11 @@ void initSample(Track *track, const char *sampleName) {
 	track->generator = malloc(sizeof(Generator));
 	initGenerator(track->generator, wavfile_create(sampleName), wavfile_reset,
 			wavfile_generate, wavfile_destroy);
-	track->adsr = initEffect(-1, false,
-			adsrconfig_create(
-					((WavFile *) (track->generator->config))->totalSamples),
-			NULL, adsr_process, adsrconfig_destroy);
 }
 
 void setSample(Track *track, const char *sampleName) {
 	WavFile *wavConfig = (WavFile *) track->generator->config;
 	wavfile_setSampleFile(wavConfig, sampleName);
-	adsrconfig_setNumSamples(track->adsr->config,
-			((WavFile *) track->generator->config)->totalSamples);
 }
 
 void Java_com_kh_beatbot_global_Track_disarmTrack(JNIEnv *env, jclass clazz,
@@ -262,13 +256,13 @@ void Java_com_kh_beatbot_global_Track_setPrimaryPitch(JNIEnv *env, jclass clazz,
 void Java_com_kh_beatbot_global_Track_setAdsrOn(JNIEnv *env, jclass clazz,
 		jint trackNum, jboolean on) {
 	Track *track = getTrack(env, clazz, trackNum);
-	track->adsr->on = on;
+	((WavFile *)track->generator->config)->adsr->active = on;
 }
 
 void Java_com_kh_beatbot_global_Track_setAdsrPoint(JNIEnv *env, jclass clazz,
 		jint trackNum, jint adsrPointNum, jfloat x, jfloat y) {
 	Track *track = getTrack(env, clazz, trackNum);
-	AdsrConfig *config = (AdsrConfig *) track->adsr->config;
+	AdsrConfig *config = ((WavFile *)track->generator->config)->adsr;
 	config->adsrPoints[adsrPointNum].sampleCents = x;
 	if (adsrPointNum == 0)
 		config->initial = y;
@@ -327,25 +321,12 @@ void Java_com_kh_beatbot_global_Track_setTrackLoopWindow(JNIEnv *env,
 		jclass clazz, jint trackNum, jlong loopBeginSample, jlong loopEndSample) {
 	Track *track = getTrack(env, clazz, trackNum);
 	WavFile *wavFile = (WavFile *) track->generator->config;
-	if (wavFile->loopBegin == loopBeginSample
-			&& wavFile->loopEnd == loopEndSample)
-		return;
-	wavFile->loopBegin = loopBeginSample;
-	wavFile->loopEnd = loopEndSample;
-	wavFile->loopLength = wavFile->loopEnd - wavFile->loopBegin;
-	updateAdsr((AdsrConfig *) track->adsr->config,
-			loopEndSample - loopBeginSample);
+	wavfile_setLoopWindow(wavFile, loopBeginSample, loopEndSample);
 }
 
 void Java_com_kh_beatbot_global_Track_setTrackReverse(JNIEnv *env, jclass clazz,
 		jint trackNum, jboolean reverse) {
 	Track *track = getTrack(env, clazz, trackNum);
 	WavFile *wavFile = (WavFile *) track->generator->config;
-	wavFile->reverse = reverse;
-	// if the track is not looping, the wavFile generator will not loop to the beginning/end
-	// after enaabling/disabling reverse
-	if (reverse && wavFile->currSample == wavFile->loopBegin)
-		wavFile->currSample = wavFile->loopEnd;
-	else if (!reverse && wavFile->currSample == wavFile->loopEnd)
-		wavFile->currSample = wavFile->loopBegin;
+	wavfile_setReverse(wavFile, reverse);
 }

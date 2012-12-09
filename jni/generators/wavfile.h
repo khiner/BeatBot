@@ -4,10 +4,11 @@
 typedef struct WavFile_t {
 	// mutex for buffer since setting the wav data happens on diff thread than processing
 	FILE *sampleFile;
+	AdsrConfig *adsr;
 	float tempSample[4];
 	float **samples;
-	int totalSamples;
 	float currSample;
+	long totalSamples;
 	long loopBegin;
 	long loopEnd;
 	long loopLength;
@@ -18,6 +19,8 @@ typedef struct WavFile_t {
 
 WavFile *wavfile_create(const char *sampleName);
 void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName);
+void wavfile_setLoopWindow(WavFile *wavFile, long loopBeginSample, long loopEndSample);
+void wavfile_setReverse(WavFile *wavFile, bool reverse);
 void wavfile_reset(WavFile *config);
 void freeBuffers(WavFile *config);
 
@@ -63,6 +66,9 @@ static inline void wavfile_tick(WavFile *config, float *sample) {
 	} else {
 		config->currSample += config->sampleRate;
 	}
+	float gain = adsr_tick(config->adsr, config->sampleRate);
+	sample[0] *= gain;
+	sample[1] *= gain;
 }
 
 static inline void wavfile_generate(WavFile *config, float **inBuffer, int size) {

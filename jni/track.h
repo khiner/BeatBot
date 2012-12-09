@@ -14,7 +14,7 @@ typedef struct OpenSlOut_ {
 typedef struct Track_ {
 	float tempSample[2];
 	EffectNode *effectHead;
-	Effect *volPan, *adsr;
+	Effect *volPan;
 	float **currBufferFloat;
 	Generator *generator;
 	MidiEvent *nextEvent;
