@@ -12,6 +12,7 @@ import java.util.Stack;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.activity.SampleEditActivity;
@@ -523,4 +524,8 @@ public class MidiManager implements Parcelable {
 	public native void setNoteMute(int track, long tick, boolean muted);
 
 	public native void clearMutedNotes();
+	
+	public static void testJNIFunction() {
+
+	}
 }

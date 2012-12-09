@@ -14,6 +14,36 @@ static FILE* recordOutFile = NULL;
 static pthread_mutex_t recordMutex, bufferFillMutex;
 static pthread_cond_t bufferFillCond = PTHREAD_COND_INITIALIZER;
 
+static jclass midiClass = NULL;
+static jmethodID testJNIFunction = NULL;
+static JavaVM* javaVm = NULL;
+
+
+jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+  JNIEnv* env;
+  if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
+    return -1;
+
+  midiClass = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "com/kh/beatbot/manager/MidiManager"));
+  testJNIFunction = (*env)->GetStaticMethodID(env, midiClass, "testJNIFunction", "()V");
+
+  javaVm = vm;
+  return JNI_VERSION_1_6;
+}
+
+JNIEnv *getJniEnv() {
+	JNIEnv* env;
+	if ((*javaVm)->GetEnv(javaVm, (void**) &env, JNI_VERSION_1_6) == JNI_EDETACHED) {
+		(*javaVm)->AttachCurrentThread(javaVm, &env, NULL);
+	}
+	return env;
+}
+
+void doSomethingAwesomeInJava() {
+	JNIEnv* env = getJniEnv();
+	(*env)->CallStaticVoidMethod(env, midiClass, testJNIFunction);
+}
+
 void updateNextNoteSamples() {
 	TrackNode *cur_ptr = trackHead;
 	while (cur_ptr != NULL) {
