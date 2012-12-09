@@ -1,4 +1,4 @@
-#include "delay.h"
+#include "../all.h"
 
 DelayConfigI *delayconfigi_create() {
 	// allocate memory and set feedback parameter

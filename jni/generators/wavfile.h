@@ -1,14 +1,6 @@
 #ifndef WAVFILE_H
 #define WAVFILE_H
 
-#include "../effects/effects.h"
-#include <stdio.h>
-
-#define CONVMYFLT (1./32768.)
-#define ONE_FLOAT_SZ sizeof(float)
-#define TWO_FLOAT_SZ 2 * sizeof(float)
-#define FOUR_FLOAT_SZ 4 * sizeof(float)
-
 typedef struct WavFile_t {
 	// mutex for buffer since setting the wav data happens on diff thread than processing
 	FILE *sampleFile;

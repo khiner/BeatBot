@@ -1,8 +1,6 @@
 #ifndef REVERB_H
 #define REVERB_H
 
-#include "effects.h"
-
 typedef struct allpass {
 	float *buffer;
 	float *bufptr;

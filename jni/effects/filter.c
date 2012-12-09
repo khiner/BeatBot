@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "../all.h"
 
 FilterConfig *filterconfig_create() {
 	FilterConfig *config = (FilterConfig *) malloc(sizeof(FilterConfig));

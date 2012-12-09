@@ -1,6 +1,4 @@
-#include "track.h"
-#include "effects/adsr.h"
-#include "effects/volpan.h"
+#include "all.h"
 
 jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size) {
 	jfloatArray result = (*env)->NewFloatArray(env, size);

@@ -1,4 +1,4 @@
-#include "chorus.h"
+#include "../all.h"
 
 ChorusConfig *chorusconfig_create() {
 	ChorusConfig *config = (ChorusConfig *) malloc(sizeof(ChorusConfig));

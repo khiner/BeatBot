@@ -1,12 +1,6 @@
 #ifndef TRACK_H
 #define TRACK_H
 
-#include "generators/generators.h"
-#include "midievent.h"
-#include "effects/effects.h"
-
-#define MAX_EFFECTS_PER_TRACK 3 // also need to change GlobalVars.MAX_EFFECT_PER_TRACK
-
 typedef struct OpenSlOut_ {
 	float **currBufferFloat;
 	short currBufferShort[BUFF_SIZE * 2];bool armed;bool anyTrackArmed;

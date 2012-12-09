@@ -1,16 +1,6 @@
 #ifndef GENERATORS_H
 #define GENERATORS_H
 
-#include <stdlib.h>
-#include <math.h>
-
-#define TABLE_SIZE 2048
-#define BUFF_SIZE 1024 // each sample has one short for each channel
-#define SAMPLE_RATE 44100
-#define bool _Bool
-#define false 0
-#define true 1
-
 typedef struct Generator_t {
 	void *config;
 	void (*set)(void *);

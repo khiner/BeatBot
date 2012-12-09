@@ -1,7 +1,6 @@
 #ifndef CHORUS_H
 #define CHORUS_H
 
-#include "effects.h"
 #include "delay.h"
 #include "../generators/sinewave.h"
 

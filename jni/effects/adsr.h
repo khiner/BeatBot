@@ -1,8 +1,6 @@
 #ifndef ADSR_H
 #define ADSR_H
 
-#include "effects.h"
-
 typedef struct AdsrPoint_t {
 	int sampleNum;
 	float sampleCents;

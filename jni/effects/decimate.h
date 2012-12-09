@@ -1,8 +1,6 @@
 #ifndef DECIMATE_H
 #define DECIMATE_H
 
-#include "effects.h"
-
 typedef struct DecimateConfig_t {
 	float rate; // 0-1
 	float cnt;

@@ -1,4 +1,4 @@
-#include "flanger.h"
+#include "../all.h"
 
 FlangerConfig *flangerconfig_create() {
 	FlangerConfig *flangerConfig = (FlangerConfig *) malloc(

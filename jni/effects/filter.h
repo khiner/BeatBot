@@ -1,9 +1,6 @@
 #ifndef FILTER_H
 #define FILTER_H
 
-#include "effects.h"
-#include "../generators/sinewave.h"
-
 #define LP_MODE 0
 #define HP_MODE 1
 #define BP_MODE 2

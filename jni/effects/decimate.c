@@ -1,4 +1,4 @@
-#include "decimate.h"
+#include "../all.h"
 
 DecimateConfig *decimateconfig_create() {
 	DecimateConfig *decimateConfig = (DecimateConfig *) malloc(

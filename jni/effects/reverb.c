@@ -1,4 +1,4 @@
-#include "reverb.h"
+#include "../all.h"
 
 static void inject_set(ReverbState *r, int inject) {
 	int i;

@@ -1,12 +1,4 @@
-#include "effects.h"
-#include "chorus.h"
-#include "decimate.h"
-#include "delay.h"
-#include "filter.h"
-#include "flanger.h"
-#include "reverb.h"
-#include "tremelo.h"
-#include "../track.h"
+#include "../all.h"
 
 Effect *initEffect(int id, bool on, void *config, void (*set), void (*process),
 		void (*destroy)) {

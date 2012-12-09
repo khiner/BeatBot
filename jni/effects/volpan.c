@@ -1,4 +1,4 @@
-#include "volpan.h"
+#include "../all.h"
 
 VolumePanConfig *volumepanconfig_create() {
 	VolumePanConfig *p = (VolumePanConfig *) malloc(sizeof(VolumePanConfig));

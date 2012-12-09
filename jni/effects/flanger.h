@@ -1,13 +1,6 @@
 #ifndef FLANGER_H
 #define FLANGER_H
 
-#include "effects.h"
-#include "delay.h"
-#include "../generators/sinewave.h"
-
-#define MIN_FLANGER_DELAY 0.0006f*SAMPLE_RATE
-#define MAX_FLANGER_DELAY 0.007f*SAMPLE_RATE
-
 typedef struct FlangerConfig_t {
 	DelayConfigI *delayConfig; // delay line
 	SineWave *mod[2]; // table-based sine wave generator for modulation

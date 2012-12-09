@@ -1,4 +1,4 @@
-#include "nativeaudio.h"
+#include "all.h"
 
 // __android_log_print(ANDROID_LOG_INFO, "YourApp", "formatted message");
 

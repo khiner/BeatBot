@@ -1,8 +1,6 @@
 #ifndef VOLPAN_H
 #define VOLPAN_H
 
-#include "effects.h"
-
 typedef struct VolumePanConfig_t {
 	float volume;
 	float pan;

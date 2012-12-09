@@ -1,8 +1,6 @@
 #ifndef SINEWAVE_H
 #define SINEWAVE_H
 
-#include "generators.h"
-
 typedef struct SineWave_t {
 	float *table;
 	float alpha;

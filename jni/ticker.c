@@ -1,4 +1,4 @@
-#include "nativeaudio.h"
+#include "all.h"
 
 void initTicker() {
 	currSample = loopBeginTick = loopBeginSample = 0;

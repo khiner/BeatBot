@@ -3,8 +3,6 @@
 
 #define MIN_DELAY_SAMPLES 32
 
-#include "effects.h"
-
 typedef struct DelayConfigI_t {
 	float **delayBuffer; // delay buffer for each channel
 	float delayTime[2]; // delay time in seconds: 0-1; one for each channel

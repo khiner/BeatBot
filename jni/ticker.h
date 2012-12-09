@@ -1,8 +1,6 @@
 #ifndef TICKER_H
 #define TICKER_H
 
-#define RESOLUTION 480
-
 void initTicker();
 
 long loopBeginTick, loopEndTick;

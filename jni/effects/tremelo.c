@@ -1,4 +1,4 @@
-#include "tremelo.h"
+#include "../all.h"
 
 TremeloConfig *tremeloconfig_create() {
 	TremeloConfig *config = malloc(sizeof(TremeloConfig));

@@ -1,4 +1,4 @@
-#include "wavfile.h"
+#include "../all.h"
 
 void wavfile_freeBuffers(WavFile *wavFile) {
 	// if this sample was short enough, it was also loaded into memory, and will be non-null
