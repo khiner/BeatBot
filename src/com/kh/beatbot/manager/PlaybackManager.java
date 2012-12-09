@@ -1,7 +1,5 @@
 package com.kh.beatbot.manager;
 
-import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.global.Track;
 
 public class PlaybackManager {
 	

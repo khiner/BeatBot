@@ -31,6 +31,10 @@ public class GlobalVars {
 
 	public final static int MAX_EFFECTS_PER_TRACK = 3; // also in jni/Track.h, ugly but necessary
 	
+	public static float MASTER_VOL_LEVEL = .8f;
+	public static float MASTER_PAN_LEVEL = .5f;
+	public static float MASTER_PIT_LEVEL = .5f;
+	
 	public static final String[] allInstrumentTypes = { "kick", "snare",
 			"hh_closed", "hh_open", "rim", "recorded" };
 

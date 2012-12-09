@@ -113,6 +113,10 @@ public class MidiView extends ClickableSurfaceView {
 			bean.setBgColor(Colors.MIDI_VIEW_DEFAULT_BG_COLOR);
 	}
 
+	public LevelsViewHelper.LevelMode getLevelMode() {
+		return LevelsViewHelper.getLevelMode();
+	}
+	
 	public void setLevelMode(LevelsViewHelper.LevelMode levelMode) {
 		LevelsViewHelper.setLevelMode(levelMode);
 	}

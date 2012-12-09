@@ -8,7 +8,6 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 import com.kh.beatbot.listenable.LevelListenable;
-import com.kh.beatbot.listener.LevelListener;
 
 public class TronSeekbar extends LevelListenable {
 	protected static FloatBuffer levelBarVb = null;
@@ -19,11 +18,7 @@ public class TronSeekbar extends LevelListenable {
 	public TronSeekbar(Context c, AttributeSet as) {
 		super(c, as);
 	}
-
-	public void addLevelListener(LevelListener levelListener) {
-		levelListeners.add(levelListener);
-	}
-
+	
 	protected void initLevelBarVb() {
 		float[] vertices = new float[800];
 		for (int i = 0; i < vertices.length / 4; i++) {
@@ -39,7 +34,7 @@ public class TronSeekbar extends LevelListenable {
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		super.surfaceChanged(holder, format, width, height);
-		// all knobs share the same circle VBs, and they should only change when width or height changes
+		// all seekbars share the same circle VBs, and they should only change when width or height changes
 		if (width != currWidth) {
 			initLevelBarVb();
 			currWidth = width;

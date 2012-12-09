@@ -21,7 +21,7 @@
         android:layout_alignParentTop="true"
         layout="@layout/right_control_buttons" />
 
-    <TextView
+    <!-- <TextView
         android:id="@+id/thresholdLabel"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
@@ -38,17 +38,26 @@
         android:layout_toRightOf="@+id/thresholdLabel"
         android:layout_toLeftOf="@+id/levelsLayout"
         android:layout_alignTop="@+id/thresholdLabel"
-        android:layout_alignBottom="@+id/thresholdLabel" />
+        android:layout_alignBottom="@+id/thresholdLabel" /> --> 
+
+    <com.kh.beatbot.view.TronSeekbar
+            android:id="@+id/levelBar"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/levelsLayout"
+            android:layout_toRightOf="@+id/levelsLayout"
+            android:layout_marginRight="6dp"
+            android:layout_marginTop="8dp" />
         
     <LinearLayout
         android:id="@+id/levelsLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/midiView"
-        android:layout_alignParentRight="true"
         android:layout_below="@+id/rightControlButtons"
-        android:orientation="horizontal"
-        android:visibility="gone" >
+        android:layout_toRightOf="@+id/addTrack"
+        android:orientation="horizontal" >
 
         <ToggleButton
             android:id="@+id/volumeButton"

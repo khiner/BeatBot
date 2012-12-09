@@ -66,6 +66,10 @@ public class LevelsViewHelper {
 		initLevelBarVb();
 	}
 
+	public static LevelMode getLevelMode() {
+		return currLevelMode;
+	}
+	
 	public static void setLevelMode(LevelMode levelMode) {
 		currLevelMode = levelMode;
 	}

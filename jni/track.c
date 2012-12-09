@@ -235,31 +235,40 @@ void Java_com_kh_beatbot_global_Track_soloTrack(JNIEnv *env,
 	}
 }
 
-void updateVolPanValue(Track *track) {
+void updateLevels(Track *track) {
 	track->volPan->set(track->volPan->config,
 			track->primaryVolume * track->noteVolume,
-			(track->primaryPan + track->notePan) / 2);
+			(masterPan + track->primaryPan + track->notePan) / 3);
+	((WavFile *)track->generator->config)->sampleRate = masterPitch * track->primaryPitch * track->notePitch * 8;
+}
+
+void updateAllLevels() {
+	TrackNode *cur_ptr = trackHead;
+	while (cur_ptr != NULL) {
+		updateLevels(cur_ptr->track);
+		cur_ptr = cur_ptr->next;
+	}
 }
 
 void Java_com_kh_beatbot_global_Track_setPrimaryVolume(
 		JNIEnv *env, jclass clazz, jint trackNum, jfloat volume) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryVolume = volume;
-	updateVolPanValue(track);
+	updateLevels(track);
 }
 
 void Java_com_kh_beatbot_global_Track_setPrimaryPan(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat pan) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryPan = pan;
-	updateVolPanValue(track);
+	updateLevels(track);
 }
 
 void Java_com_kh_beatbot_global_Track_setPrimaryPitch(
 		JNIEnv *env, jclass clazz, jint trackNum, jfloat pitch) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryPitch = pitch;
-	((WavFile *)track->generator->config)->sampleRate = pitch * track->notePitch * 4;
+	updateLevels(track);
 }
 
 void Java_com_kh_beatbot_global_Track_setAdsrOn(JNIEnv *env, jclass clazz,

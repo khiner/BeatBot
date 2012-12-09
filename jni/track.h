@@ -5,8 +5,6 @@
 #include "midievent.h"
 #include "effects/effects.h"
 
-static int trackCount = 0;
-
 #define MAX_EFFECTS_PER_TRACK 3 // also need to change GlobalVars.MAX_EFFECT_PER_TRACK
 
 typedef struct OpenSlOut_ {
@@ -44,6 +42,8 @@ typedef struct TrackNode_t {
 
 TrackNode *trackHead;
 OpenSlOut *openSlOut;
+int trackCount;
+float masterVolume, masterPan, masterPitch;
 
 jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size);
 
@@ -61,7 +61,9 @@ void addTrack(Track *track);
 
 TrackNode *removeTrack(int trackNum);
 
-void updateVolPanValue(Track *track);
+void updateLevels(Track *track);
+
+void updateAllLevels();
 
 void freeEffects(Track *track);
 

@@ -95,7 +95,7 @@ static inline void mixTracks() {
 			while (cur_ptr != NULL) {
 				if (cur_ptr->track->shouldSound) {
 					total += cur_ptr->track->currBufferFloat[channel][samp]
-							* .7f;
+							* masterVolume;
 				}
 				cur_ptr = cur_ptr->next;
 			}
@@ -135,9 +135,7 @@ void updateNextEvent(Track *track) {
 }
 
 void soundTrack(Track *track) {
-	updateVolPanValue(track);
-
-	((WavFile *)track->generator->config)->sampleRate = track->primaryPitch * track->notePitch * 4;
+	updateLevels(track);
 	AdsrConfig *adsrConfig = (AdsrConfig *) track->adsr->config;
 	adsrConfig->active = true;
 	resetAdsr(adsrConfig);
@@ -449,6 +447,24 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 			SL_PLAYSTATE_PLAYING);
 
 	return JNI_TRUE;
+}
+
+void Java_com_kh_beatbot_activity_BeatBotActivity_setMasterVolume(JNIEnv *env, jclass clazz,
+		jfloat level) {
+	masterVolume = level;
+	updateAllLevels();
+}
+
+void Java_com_kh_beatbot_activity_BeatBotActivity_setMasterPan(JNIEnv *env, jclass clazz,
+		jfloat level) {
+	masterPan = level;
+	updateAllLevels();
+}
+
+void Java_com_kh_beatbot_activity_BeatBotActivity_setMasterPitch(JNIEnv *env, jclass clazz,
+		jfloat level) {
+	masterPitch = level;
+	updateAllLevels();
 }
 
 // shut down the native audio system
