@@ -221,6 +221,8 @@ public class MidiManager implements Parcelable {
 
 	private void addNote(MidiNote midiNote) {
 		midiNotes.add(midiNote);
+		GlobalVars.tracks.get(midiNote.getNoteValue()).notes.add(midiNote);
+		Collections.sort(GlobalVars.tracks.get(midiNote.getNoteValue()).notes);
 		addMidiNote(midiNote.getNoteValue(), midiNote.getOnTick(),
 				midiNote.getOffTick(), midiNote.getVelocity(),
 				midiNote.getPan(), midiNote.getPitch());
@@ -233,6 +235,7 @@ public class MidiManager implements Parcelable {
 	public void deleteNote(MidiNote midiNote) {
 		if (midiNotes.contains(midiNote)) {
 			midiNotes.remove(midiNote);
+			GlobalVars.tracks.get(midiNote.getNoteValue()).notes.remove(midiNote);
 			deleteMidiNote(midiNote.getNoteValue(), midiNote.getOnTick());
 			activity.setDeleteIconEnabled(anyNoteSelected());
 		}
@@ -263,8 +266,14 @@ public class MidiManager implements Parcelable {
 	public void setNoteValue(MidiNote midiNote, int newNote) {
 		if (midiNote.getNoteValue() == newNote)
 			return;
+		List<MidiNote> oldTrackNotes = GlobalVars.tracks.get(midiNote.getNoteValue()).notes; 
+		List<MidiNote> newTrackNotes = GlobalVars.tracks.get(newNote).notes; 
 		moveMidiNote(midiNote.getNoteValue(), midiNote.getOnTick(), newNote);
 		midiNote.setNote(newNote);
+		oldTrackNotes.remove(midiNote);
+		newTrackNotes.add(midiNote);
+		Collections.sort(oldTrackNotes);
+		Collections.sort(newTrackNotes);
 	}
 	
 	public void setNoteTicks(MidiNote midiNote, long onTick, long offTick,
@@ -283,11 +292,12 @@ public class MidiManager implements Parcelable {
 		if (maintainNoteLength)
 			offTick = midiNote.getOffTick() + onTick - midiNote.getOnTick();
 		// move native note ticks
-		moveMidiNoteTicks(midiNote.getNoteValue(), midiNote.getOnTick(),
-				onTick, offTick);
+				moveMidiNoteTicks(midiNote.getNoteValue(), midiNote.getOnTick(),
+						onTick, offTick);
 		// move Java note ticks
 		midiNote.setOnTick(onTick);
 		midiNote.setOffTick(offTick);
+		Collections.sort(GlobalVars.tracks.get(midiNote.getNoteValue()).notes);
 	}
 
 	public static Tempo getTempo() {
@@ -499,11 +509,11 @@ public class MidiManager implements Parcelable {
 
 	public native long getCurrTick();
 
-	public native long getLoopBeginTick();
+	public static native long getLoopBeginTick();
 
 	public native void setLoopBeginTick(long loopBeginTick);
 
-	public native long getLoopEndTick();
+	public static native long getLoopEndTick();
 
 	public native void setLoopEndTick(long loopEndTick);
 	
@@ -525,7 +535,29 @@ public class MidiManager implements Parcelable {
 
 	public native void clearMutedNotes();
 	
-	public static void testJNIFunction() {
-
+	public static MidiNote getNextMidiNote(int trackNum, long currTick) {
+		Log.d("tracknum, currtick", String.valueOf(trackNum) + ", " + currTick);
+		MidiNote nextNote = null;
+		List<MidiNote> trackNotes = GlobalVars.tracks.get(trackNum).notes; 
+		for (MidiNote midiNote : trackNotes) {
+			nextNote = midiNote;
+			if (midiNote.getOffTick() <= currTick) {
+				continue;
+			}
+		}
+		if (nextNote != null && (nextNote.getOffTick() <= currTick || nextNote.getOnTick() >= getLoopEndTick())) {
+			// no events after curr tick, or next event after loop end.
+			// return fist event after loop begin
+			for (MidiNote midiNote : trackNotes) {
+				nextNote = midiNote;
+				if (nextNote.getOnTick() >= getLoopBeginTick()) {
+					return nextNote;
+				}
+			}
+		}
+		if (nextNote == null) {
+			Log.e("in java", "about to ret null");
+		}
+		return nextNote;
 	}
 }

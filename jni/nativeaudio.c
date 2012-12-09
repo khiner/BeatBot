@@ -15,7 +15,7 @@ static pthread_mutex_t recordMutex, bufferFillMutex;
 static pthread_cond_t bufferFillCond = PTHREAD_COND_INITIALIZER;
 
 static jclass midiClass = NULL;
-static jmethodID testJNIFunction = NULL;
+static jmethodID getNextMidiNote = NULL;
 static JavaVM* javaVm = NULL;
 
 
@@ -25,7 +25,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     return -1;
 
   midiClass = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "com/kh/beatbot/manager/MidiManager"));
-  testJNIFunction = (*env)->GetStaticMethodID(env, midiClass, "testJNIFunction", "()V");
+  getNextMidiNote = (*env)->GetStaticMethodID(env, midiClass, "getNextMidiNote", "(IJ)Lcom/kh/beatbot/midi/MidiNote;");
 
   javaVm = vm;
   return JNI_VERSION_1_6;
@@ -39,9 +39,23 @@ JNIEnv *getJniEnv() {
 	return env;
 }
 
-void doSomethingAwesomeInJava() {
+void updateNextEventInfo(Track *track) {
 	JNIEnv* env = getJniEnv();
-	(*env)->CallStaticVoidMethod(env, midiClass, testJNIFunction);
+	jobject obj = (*env)->CallStaticObjectMethod(env, midiClass, getNextMidiNote, track->num, (jlong)sampleToTick(currSample));
+	if (obj == NULL) {
+		track->nextStartSample = tickToSample(-1);
+		track->nextStopSample = tickToSample(-1);
+		__android_log_print(ANDROID_LOG_ERROR, "update event", "null");
+		return;
+	}
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jlong onTick = (*env)->CallLongMethod(env, obj, (*env)->GetMethodID(env, cls, "getOnTick", "()J"));
+    jlong offTick = (*env)->CallLongMethod(env, obj, (*env)->GetMethodID(env, cls, "getOffTick", "()J"));
+    jfloat velocity = (*env)->CallFloatMethod(env, obj, (*env)->GetMethodID(env, cls, "getVelocity", "()F"));
+    jfloat pan = (*env)->CallFloatMethod(env, obj, (*env)->GetMethodID(env, cls, "getPan", "()F"));
+    jfloat pitch = (*env)->CallFloatMethod(env, obj, (*env)->GetMethodID(env, cls, "getPitch", "()F"));
+    track->nextStartSample = tickToSample(onTick);
+    track->nextStopSample = tickToSample(offTick);
 }
 
 void updateNextNoteSamples() {
@@ -160,8 +174,9 @@ void updateNextEvent(Track *track) {
 			ptr = ptr->next;
 	}
 	track->nextEventNode = ptr;
-	track->nextStartSample = tickToSample(track->nextEventNode->event->onTick);
-	track->nextStopSample = tickToSample(track->nextEventNode->event->offTick);
+	//track->nextStartSample = tickToSample(track->nextEventNode->event->onTick);
+	//track->nextStopSample = tickToSample(track->nextEventNode->event->offTick);
+	updateNextEventInfo(track);
 }
 
 void soundTrack(Track *track) {

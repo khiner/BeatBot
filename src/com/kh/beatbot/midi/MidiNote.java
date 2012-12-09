@@ -177,6 +177,9 @@ public class MidiNote implements Comparable<MidiNote> {
 
 	@Override
 	public int compareTo(MidiNote otherNote) {
+		if (otherNote.getNoteValue() != this.getNoteValue()) {
+			return otherNote.getNoteValue() - this.getNoteValue();
+		}
 		return (int)(otherNote.getOnTick() - this.getOnTick());
 	}	
 }

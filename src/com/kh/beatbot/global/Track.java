@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.midi.MidiNote;
 
 public class Track {
 	private int id;
 	private Instrument instrument;
-	public List<Effect> effects;
+	public List<MidiNote> notes = new ArrayList<MidiNote>();
+	public List<Effect> effects = new ArrayList<Effect>();
 	public float volume = .8f;
 	public float pan = .5f;
 	public float pitch = .5f;
@@ -19,7 +21,6 @@ public class Track {
 	public Track(int id, Instrument instrument) {
 		this.id = id;
 		this.instrument = instrument;
-		effects = new ArrayList<Effect>();
 		initDefaultAdsrPoints();
 	}
 
