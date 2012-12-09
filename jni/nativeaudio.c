@@ -157,7 +157,6 @@ void updateNextNote(Track *track) {
 void soundTrack(Track *track) {
 	updateLevels(track);
 	AdsrConfig *adsrConfig = ((WavFile *)track->generator->config)->adsr;
-	adsrConfig->active = true;
 	resetAdsr(adsrConfig);
 }
 

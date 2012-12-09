@@ -93,7 +93,7 @@ void wavfile_setReverse(WavFile *wavFile, bool reverse) {
 }
 
 void wavfile_reset(WavFile *config) {
-	config->adsr->active = false;
+	//config->adsr->active = false;
 	config->currSample = config->reverse ? config->loopEnd : config->loopBegin;
 	fseek(config->sampleFile, config->currSample * TWO_FLOAT_SZ, SEEK_SET);
 }
