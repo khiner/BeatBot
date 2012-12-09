@@ -5,10 +5,10 @@ void initTicker() {
 	loopEndTick = loopEndSample = 0;
 }
 
-void updateAllTrackNextEvents() {
+void updateAllTrackNextNotes() {
 	TrackNode *cur_ptr = trackHead;
 	while (cur_ptr != NULL) {
-		updateNextEvent(cur_ptr->track);
+		updateNextNote(cur_ptr->track);
 		cur_ptr = cur_ptr->next;
 	}
 }
@@ -34,7 +34,7 @@ void Java_com_kh_beatbot_manager_MidiManager_setNativeMSPT(JNIEnv *env,
 	SPT = (MSPT * SAMPLE_RATE) / 1000000;
 	loopBeginSample = tickToSample(loopBeginTick);
 	loopEndSample = tickToSample(loopEndTick);
-	updateNextNoteSamples();
+	//updateNextNoteSamples();
 }
 
 jlong Java_com_kh_beatbot_manager_MidiManager_getLoopBeginTick(JNIEnv *env,
@@ -52,7 +52,7 @@ void Java_com_kh_beatbot_manager_MidiManager_setLoopBeginTick(JNIEnv *env,
 	if (!getTrack(NULL, NULL, 0)->armed) {
 		currSample = tickToSample(loopBeginTick);
 	}
-	updateAllTrackNextEvents();
+	updateAllTrackNextNotes();
 }
 
 jlong Java_com_kh_beatbot_manager_MidiManager_getLoopEndTick(JNIEnv *env,
@@ -66,7 +66,7 @@ void Java_com_kh_beatbot_manager_MidiManager_setLoopEndTick(JNIEnv *env,
 		return;
 	loopEndTick = _loopEndTick;
 	loopEndSample = tickToSample(loopEndTick);
-	updateAllTrackNextEvents();
+	updateAllTrackNextNotes();
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_setLoopTicks(JNIEnv *env,
@@ -80,11 +80,11 @@ void Java_com_kh_beatbot_manager_MidiManager_setLoopTicks(JNIEnv *env,
 	if (!getTrack(NULL, NULL, 0)->armed) {
 		currSample = tickToSample(loopBeginTick);
 	}
-	updateAllTrackNextEvents();
+	updateAllTrackNextNotes();
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_reset(JNIEnv *env, jclass clazz) {
 	currSample = tickToSample(loopBeginTick);
-	updateAllTrackNextEvents();
+	updateAllTrackNextNotes();
 }
 

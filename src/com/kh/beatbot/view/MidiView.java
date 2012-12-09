@@ -652,10 +652,6 @@ public class MidiView extends ClickableSurfaceView {
 						&& selected.getOnTick() <= note.getOffTick()) {
 					MidiNote copy = note.getCopy();
 					copy.setOffTick(selected.getOnTick() - 1);
-					// update the native midi events
-					midiManager.moveMidiNoteTicks(note.getNoteValue(),
-							note.getOnTick(), copy.getOnTick(),
-							copy.getOffTick());
 					midiManager.putTempNote(i, copy);
 					// if the selected note ends after the beginning
 					// of the other note, or if the selected note completely
@@ -665,8 +661,6 @@ public class MidiView extends ClickableSurfaceView {
 						&& selected.getOffTick() <= note.getOffTick()
 						|| selected.getOnTick() <= note.getOnTick()
 						&& selected.getOffTick() >= note.getOffTick()) {
-					midiManager.setNoteMute(note.getNoteValue(),
-							note.getOnTick(), true);
 					midiManager.putTempNote(i, null);
 				}
 			}

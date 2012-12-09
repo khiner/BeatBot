@@ -58,16 +58,6 @@ Track *getTrack(JNIEnv *env, jclass clazz, int trackNum) {
 	return trackNode->track;
 }
 
-void freeMidiEvents(Track *track) {
-	MidiEventNode *cur_ptr = track->eventHead;
-	while (cur_ptr != NULL) {
-		free(cur_ptr->event); // free the event
-		MidiEventNode *prev_ptr = cur_ptr;
-		cur_ptr = cur_ptr->next;
-		free(prev_ptr); // free the entire Node
-	}
-}
-
 void addTrack(Track *track) {
 	TrackNode *new = (TrackNode *) malloc(sizeof(TrackNode));
 	new->track = track;
@@ -119,7 +109,6 @@ void freeTracks() {
 		free(cur_ptr->track->currBufferFloat);
 		cur_ptr->track->generator->destroy(cur_ptr->track->generator->config);
 		freeEffects(cur_ptr->track);
-		freeMidiEvents(cur_ptr->track);
 		TrackNode *prev_ptr = cur_ptr;
 		cur_ptr = cur_ptr->next;
 		free(prev_ptr); // free the entire Node
@@ -138,10 +127,9 @@ Track *initTrack() {
 	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
 	pthread_mutex_init(&track->effectMutex, NULL);
 	track->num = trackCount;
-	track->eventHead = NULL;
 	track->effectHead = NULL;
 	track->generator = NULL;
-	track->nextEventNode = NULL;
+	track->nextEvent = malloc(sizeof(MidiEvent));
 	track->nextStartSample = track->nextStopSample = -1;
 	track->currBufferFloat = (float **) malloc(2 * sizeof(float *));
 	track->currBufferFloat[0] = (float *) calloc(BUFF_SIZE, sizeof(float));
@@ -150,9 +138,9 @@ Track *initTrack() {
 	track->playing = track->previewing = false;
 	track->mute = track->solo = false;
 	track->shouldSound = true;
-	track->primaryVolume = track->noteVolume = .8f;
-	track->primaryPan = track->primaryPitch = track->notePan =
-			track->notePitch = .5f;
+	track->primaryVolume = track->nextEvent->volume = .8f;
+	track->primaryPan = track->primaryPitch = track->nextEvent->pitch =
+			track->nextEvent->pan = .5f;
 	int effectNum;
 	for (effectNum = 0; effectNum < MAX_EFFECTS_PER_TRACK; effectNum++) {
 		addEffect(track, NULL);
@@ -164,8 +152,8 @@ Track *initTrack() {
 
 void initSample(Track *track, const char *sampleName) {
 	track->generator = malloc(sizeof(Generator));
-	initGenerator(track->generator, wavfile_create(sampleName),
-			wavfile_reset, wavfile_generate, wavfile_destroy);
+	initGenerator(track->generator, wavfile_create(sampleName), wavfile_reset,
+			wavfile_generate, wavfile_destroy);
 	track->adsr = initEffect(-1, false,
 			adsrconfig_create(
 					((WavFile *) (track->generator->config))->totalSamples),
@@ -176,11 +164,11 @@ void setSample(Track *track, const char *sampleName) {
 	WavFile *wavConfig = (WavFile *) track->generator->config;
 	wavfile_setSampleFile(wavConfig, sampleName);
 	adsrconfig_setNumSamples(track->adsr->config,
-			((WavFile *)track->generator->config)->totalSamples);
+			((WavFile *) track->generator->config)->totalSamples);
 }
 
-void Java_com_kh_beatbot_global_Track_disarmTrack(JNIEnv *env,
-		jclass clazz, jint trackNum) {
+void Java_com_kh_beatbot_global_Track_disarmTrack(JNIEnv *env, jclass clazz,
+		jint trackNum) {
 	getTrack(env, clazz, trackNum)->armed = openSlOut->anyTrackArmed = false;
 }
 
@@ -195,8 +183,8 @@ int getSoloingTrackNum() {
 	return -1;
 }
 
-void Java_com_kh_beatbot_global_Track_muteTrack(JNIEnv *env,
-		jclass clazz, jint trackNum, jboolean mute) {
+void Java_com_kh_beatbot_global_Track_muteTrack(JNIEnv *env, jclass clazz,
+		jint trackNum, jboolean mute) {
 	Track *track = getTrack(env, clazz, trackNum);
 	if (mute) {
 		track->shouldSound = false;
@@ -208,8 +196,8 @@ void Java_com_kh_beatbot_global_Track_muteTrack(JNIEnv *env,
 	track->mute = mute;
 }
 
-void Java_com_kh_beatbot_global_Track_soloTrack(JNIEnv *env,
-		jclass clazz, jint trackNum, jboolean solo) {
+void Java_com_kh_beatbot_global_Track_soloTrack(JNIEnv *env, jclass clazz,
+		jint trackNum, jboolean solo) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->solo = solo;
 	if (solo) {
@@ -236,10 +224,12 @@ void Java_com_kh_beatbot_global_Track_soloTrack(JNIEnv *env,
 }
 
 void updateLevels(Track *track) {
+	MidiEvent *midiEvent = track->nextEvent;
 	track->volPan->set(track->volPan->config,
-			track->primaryVolume * track->noteVolume,
-			(masterPan + track->primaryPan + track->notePan) / 3);
-	((WavFile *)track->generator->config)->sampleRate = masterPitch * track->primaryPitch * track->notePitch * 8;
+			track->primaryVolume * midiEvent->volume,
+			(masterPan + track->primaryPan + midiEvent->pan) / 3);
+	((WavFile *) track->generator->config)->sampleRate = masterPitch
+			* track->primaryPitch * midiEvent->pitch * 8;
 }
 
 void updateAllLevels() {
@@ -250,22 +240,22 @@ void updateAllLevels() {
 	}
 }
 
-void Java_com_kh_beatbot_global_Track_setPrimaryVolume(
-		JNIEnv *env, jclass clazz, jint trackNum, jfloat volume) {
+void Java_com_kh_beatbot_global_Track_setPrimaryVolume(JNIEnv *env,
+		jclass clazz, jint trackNum, jfloat volume) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryVolume = volume;
 	updateLevels(track);
 }
 
-void Java_com_kh_beatbot_global_Track_setPrimaryPan(JNIEnv *env,
-		jclass clazz, jint trackNum, jfloat pan) {
+void Java_com_kh_beatbot_global_Track_setPrimaryPan(JNIEnv *env, jclass clazz,
+		jint trackNum, jfloat pan) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryPan = pan;
 	updateLevels(track);
 }
 
-void Java_com_kh_beatbot_global_Track_setPrimaryPitch(
-		JNIEnv *env, jclass clazz, jint trackNum, jfloat pitch) {
+void Java_com_kh_beatbot_global_Track_setPrimaryPitch(JNIEnv *env, jclass clazz,
+		jint trackNum, jfloat pitch) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->primaryPitch = pitch;
 	updateLevels(track);
@@ -277,8 +267,8 @@ void Java_com_kh_beatbot_global_Track_setAdsrOn(JNIEnv *env, jclass clazz,
 	track->adsr->on = on;
 }
 
-void Java_com_kh_beatbot_global_Track_setAdsrPoint(JNIEnv *env,
-		jclass clazz, jint trackNum, jint adsrPointNum, jfloat x, jfloat y) {
+void Java_com_kh_beatbot_global_Track_setAdsrPoint(JNIEnv *env, jclass clazz,
+		jint trackNum, jint adsrPointNum, jfloat x, jfloat y) {
 	Track *track = getTrack(env, clazz, trackNum);
 	AdsrConfig *config = (AdsrConfig *) track->adsr->config;
 	config->adsrPoints[adsrPointNum].sampleCents = x;
@@ -293,11 +283,12 @@ void Java_com_kh_beatbot_global_Track_setAdsrPoint(JNIEnv *env,
 	updateAdsr(config, config->totalSamples);
 }
 
-void Java_com_kh_beatbot_global_Track_setSample(JNIEnv *env,
-		jclass clazz, jint trackNum, jstring sampleName) {
+void Java_com_kh_beatbot_global_Track_setSample(JNIEnv *env, jclass clazz,
+		jint trackNum, jstring sampleName) {
 	Track *track = getTrack(env, clazz, trackNum);
 
-	const char *nativeSampleName = (*env)->GetStringUTFChars(env, sampleName, 0);
+	const char *nativeSampleName = (*env)->GetStringUTFChars(env, sampleName,
+			0);
 
 	if (track->generator == NULL) {
 		initSample(track, nativeSampleName);
@@ -309,11 +300,13 @@ void Java_com_kh_beatbot_global_Track_setSample(JNIEnv *env,
 	(*env)->ReleaseStringUTFChars(env, sampleName, nativeSampleName);
 }
 
-void Java_com_kh_beatbot_activity_BeatBotActivity_addTrack(JNIEnv *env, jclass clazz, jstring sampleName) {
+void Java_com_kh_beatbot_activity_BeatBotActivity_addTrack(JNIEnv *env,
+		jclass clazz, jstring sampleName) {
 	Track *track = initTrack();
 	pthread_mutex_lock(&openSlOut->trackMutex);
 	addTrack(track);
-	Java_com_kh_beatbot_global_Track_setSample(env, clazz, trackCount, sampleName);
+	Java_com_kh_beatbot_global_Track_setSample(env, clazz, trackCount,
+			sampleName);
 	pthread_mutex_unlock(&openSlOut->trackMutex);
 	trackCount++;
 }
@@ -346,8 +339,8 @@ void Java_com_kh_beatbot_global_Track_setTrackLoopWindow(JNIEnv *env,
 			loopEndSample - loopBeginSample);
 }
 
-void Java_com_kh_beatbot_global_Track_setTrackReverse(JNIEnv *env,
-		jclass clazz, jint trackNum, jboolean reverse) {
+void Java_com_kh_beatbot_global_Track_setTrackReverse(JNIEnv *env, jclass clazz,
+		jint trackNum, jboolean reverse) {
 	Track *track = getTrack(env, clazz, trackNum);
 	WavFile *wavFile = (WavFile *) track->generator->config;
 	wavFile->reverse = reverse;

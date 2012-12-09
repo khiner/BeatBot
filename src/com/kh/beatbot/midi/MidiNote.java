@@ -159,27 +159,20 @@ public class MidiNote implements Comparable<MidiNote> {
 		float clippedLevel = clipLevel(level);
 		if (levelMode == LevelsViewHelper.LevelMode.VOLUME) {
 			setVelocity(clippedLevel);
-			setVolume(getNoteValue(), getOnTick(), clippedLevel);
 		}
 		else if (levelMode == LevelsViewHelper.LevelMode.PAN) {
 			setPan(clippedLevel);
-			setPan(getNoteValue(), getOnTick(), clippedLevel);
 		}
 		else if (levelMode == LevelsViewHelper.LevelMode.PITCH) {
 			setPitch(clippedLevel);
-			setPitch(getNoteValue(), getOnTick(), clippedLevel);
 		}
 	}
-	
-	public native void setVolume(int track, long onTick, float volume);
-	public native void setPan(int track, long onTick, float pan);
-	public native void setPitch(int track, long onTick, float pitch);
 
 	@Override
 	public int compareTo(MidiNote otherNote) {
-		if (otherNote.getNoteValue() != this.getNoteValue()) {
-			return otherNote.getNoteValue() - this.getNoteValue();
+		if (this.getNoteValue() != otherNote.getNoteValue()) {
+			return this.getNoteValue() - otherNote.getNoteValue();
 		}
-		return (int)(otherNote.getOnTick() - this.getOnTick());
+		return (int)(this.getOnTick() - otherNote.getOnTick());
 	}	
 }

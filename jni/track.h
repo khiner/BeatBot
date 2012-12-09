@@ -23,14 +23,12 @@ typedef struct Track_ {
 	Effect *volPan, *adsr;
 	float **currBufferFloat;
 	Generator *generator;
-	MidiEventNode *eventHead;
-	MidiEventNode *nextEventNode;
+	MidiEvent *nextEvent;
 
 	// mutex for effects since insertion/setting/removing effects happens on diff thread than processing
 	pthread_mutex_t effectMutex;
 	long nextStartSample, nextStopSample;
-	float noteVolume, notePan, notePitch, primaryVolume, primaryPan,
-			primaryPitch;
+	float primaryVolume, primaryPan, primaryPitch;
 
 	int num;bool armed;bool playing;bool previewing;bool mute;bool solo;bool shouldSound;
 } Track;

@@ -20,7 +20,6 @@ static SLDataFormat_PCM format_pcm = { SL_DATAFORMAT_PCM, 2,
 		SL_PCMSAMPLEFORMAT_FIXED_16, SL_SPEAKER_FRONT_LEFT
 				| SL_SPEAKER_FRONT_RIGHT, SL_BYTEORDER_LITTLEENDIAN };
 
-void printLinkedList(MidiEventNode *head);
 static inline long tickToSample(long tick) {
 	return tick * SPT;
 }
@@ -30,7 +29,7 @@ static inline long sampleToTick(long sample) {
 }
 
 void updateNextNoteSamples();
-void updateNextEvent(Track *track);
+void updateNextNote(Track *track);
 void stopAll();
 
 #endif // NATIVEAUDIO_H

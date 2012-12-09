@@ -18,70 +18,27 @@ static jclass midiClass = NULL;
 static jmethodID getNextMidiNote = NULL;
 static JavaVM* javaVm = NULL;
 
-
 jint JNI_OnLoad(JavaVM* vm, void* reserved) {
-  JNIEnv* env;
-  if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
-    return -1;
+	JNIEnv* env;
+	if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
+		return -1;
 
-  midiClass = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "com/kh/beatbot/manager/MidiManager"));
-  getNextMidiNote = (*env)->GetStaticMethodID(env, midiClass, "getNextMidiNote", "(IJ)Lcom/kh/beatbot/midi/MidiNote;");
+	midiClass = (*env)->NewGlobalRef(env,
+			(*env)->FindClass(env, "com/kh/beatbot/manager/MidiManager"));
+	getNextMidiNote = (*env)->GetStaticMethodID(env, midiClass,
+			"getNextMidiNote", "(IJ)Lcom/kh/beatbot/midi/MidiNote;");
 
-  javaVm = vm;
-  return JNI_VERSION_1_6;
+	javaVm = vm;
+	return JNI_VERSION_1_6;
 }
 
 JNIEnv *getJniEnv() {
 	JNIEnv* env;
-	if ((*javaVm)->GetEnv(javaVm, (void**) &env, JNI_VERSION_1_6) == JNI_EDETACHED) {
+	if ((*javaVm)->GetEnv(javaVm, (void**) &env,
+			JNI_VERSION_1_6) == JNI_EDETACHED) {
 		(*javaVm)->AttachCurrentThread(javaVm, &env, NULL);
 	}
 	return env;
-}
-
-void updateNextEventInfo(Track *track) {
-	JNIEnv* env = getJniEnv();
-	jobject obj = (*env)->CallStaticObjectMethod(env, midiClass, getNextMidiNote, track->num, (jlong)sampleToTick(currSample));
-	if (obj == NULL) {
-		track->nextStartSample = tickToSample(-1);
-		track->nextStopSample = tickToSample(-1);
-		__android_log_print(ANDROID_LOG_ERROR, "update event", "null");
-		return;
-	}
-    jclass cls = (*env)->GetObjectClass(env, obj);
-    jlong onTick = (*env)->CallLongMethod(env, obj, (*env)->GetMethodID(env, cls, "getOnTick", "()J"));
-    jlong offTick = (*env)->CallLongMethod(env, obj, (*env)->GetMethodID(env, cls, "getOffTick", "()J"));
-    jfloat velocity = (*env)->CallFloatMethod(env, obj, (*env)->GetMethodID(env, cls, "getVelocity", "()F"));
-    jfloat pan = (*env)->CallFloatMethod(env, obj, (*env)->GetMethodID(env, cls, "getPan", "()F"));
-    jfloat pitch = (*env)->CallFloatMethod(env, obj, (*env)->GetMethodID(env, cls, "getPitch", "()F"));
-    track->nextStartSample = tickToSample(onTick);
-    track->nextStopSample = tickToSample(offTick);
-}
-
-void updateNextNoteSamples() {
-	TrackNode *cur_ptr = trackHead;
-	while (cur_ptr != NULL) {
-		Track *track = cur_ptr->track;
-		if (track->nextEventNode != NULL) {
-			track->nextStartSample = tickToSample(
-					track->nextEventNode->event->onTick);
-			track->nextStopSample = tickToSample(
-					track->nextEventNode->event->offTick);
-		}
-		cur_ptr = cur_ptr->next;
-	}
-}
-
-MidiEvent* initEvent(long onTick, long offTick, float volume, float pan,
-		float pitch) {
-	MidiEvent *event = (MidiEvent *) malloc(sizeof(MidiEvent));
-	event->muted = false;
-	event->onTick = onTick;
-	event->offTick = offTick;
-	event->volume = volume;
-	event->pan = pan;
-	event->pitch = pitch;
-	return event;
 }
 
 static inline void interleaveFloatsToShorts(float left[], float right[],
@@ -97,8 +54,8 @@ static inline void writeBytesToFile(short buffer[], int size, FILE *out) {
 	int i = 0;
 	for (i = 0; i < size; i++) {
 		// write the chars of the short to file, little endian
-		fputc((char)buffer[i] & 0xff, out);
-		fputc((char)(buffer[i] >> 8) & 0xff, out);
+		fputc((char) buffer[i] & 0xff, out);
+		fputc((char) (buffer[i] >> 8) & 0xff, out);
 	}
 }
 
@@ -154,29 +111,40 @@ static inline void mixTracks() {
 			BUFF_SIZE);
 }
 
-void updateNextEvent(Track *track) {
-	if (track->eventHead == NULL) {
-		track->nextEventNode = NULL;
+void updateNextNote(Track *track) {
+	JNIEnv* env = getJniEnv();
+	jobject obj = (*env)->CallStaticObjectMethod(env, midiClass,
+			getNextMidiNote, track->num, (jlong) sampleToTick(currSample));
+	if (obj == NULL) {
 		track->nextStartSample = -1;
 		track->nextStopSample = -1;
-		return; // no midi notes in this track
+		return;
 	}
-	// find event right after current tick
-	MidiEventNode *ptr = track->eventHead;
-	long currTick = sampleToTick(currSample);
-	while (ptr->next != NULL && ptr->event->offTick <= currTick)
-		ptr = ptr->next;
-	if (ptr->event->offTick <= currTick || ptr->event->onTick >= loopEndTick) {
-		// no events after curr tick, or next event after loop end.
-		// return fist event after loop begin
-		ptr = track->eventHead;
-		while (ptr->next != NULL && ptr->event->onTick < loopBeginTick)
-			ptr = ptr->next;
-	}
-	track->nextEventNode = ptr;
-	//track->nextStartSample = tickToSample(track->nextEventNode->event->onTick);
-	//track->nextStopSample = tickToSample(track->nextEventNode->event->offTick);
-	updateNextEventInfo(track);
+	jclass cls = (*env)->GetObjectClass(env, obj);
+
+	long onTick = tickToSample(
+			(*env)->CallLongMethod(env, obj,
+					(*env)->GetMethodID(env, cls, "getOnTick", "()J")));
+	long offTick = tickToSample(
+			(*env)->CallLongMethod(env, obj,
+					(*env)->GetMethodID(env, cls, "getOffTick", "()J")));
+	float vol = (*env)->CallFloatMethod(env, obj,
+			(*env)->GetMethodID(env, cls, "getVelocity", "()F"));
+	float pan = (*env)->CallFloatMethod(env, obj,
+			(*env)->GetMethodID(env, cls, "getPan", "()F"));
+	float pitch = (*env)->CallFloatMethod(env, obj,
+			(*env)->GetMethodID(env, cls, "getPitch", "()F"));
+
+	setNextNoteInfo(track, onTick, offTick, vol, pan, pitch);
+}
+
+void setNextNoteInfo(Track *track, jlong onTick, jlong offTick, jfloat vol,
+		jfloat pan, jfloat pitch) {
+	track->nextStartSample = onTick;
+	track->nextStopSample = offTick;
+	track->nextEvent->volume = vol;
+	track->nextEvent->pan = pan;
+	track->nextEvent->pitch = pitch;
 }
 
 void soundTrack(Track *track) {
@@ -186,23 +154,19 @@ void soundTrack(Track *track) {
 	resetAdsr(adsrConfig);
 }
 
+void playTrack(Track *track) {
+	track->playing = true;
+	soundTrack(track);
+}
+
 void stopSoundingTrack(Track *track) {
 	wavfile_reset((WavFile *) track->generator->config);
 	((AdsrConfig *) track->adsr->config)->active = false;
 }
 
-void playTrack(Track *track) {
-	MidiEventNode *nextEventNode = track->nextEventNode;
-	track->noteVolume = nextEventNode->event->volume;
-	track->notePan = nextEventNode->event->pan;
-	track->notePitch = nextEventNode->event->pitch;
-	track->playing = true;
-	soundTrack(track);
-}
-
 void stopTrack(Track *track) {
 	// update next track
-	updateNextEvent(track);
+	updateNextNote(track);
 	if (!track->playing)
 		return;
 	track->playing = false;
@@ -224,13 +188,13 @@ void stopPreviewingTrack(int trackNum) {
 		stopSoundingTrack(track);
 }
 
-void Java_com_kh_beatbot_global_Track_playTrack(JNIEnv *env,
-		jclass clazz, jint trackNum) {
+void Java_com_kh_beatbot_global_Track_playTrack(JNIEnv *env, jclass clazz,
+		jint trackNum) {
 	previewTrack(trackNum);
 }
 
-void Java_com_kh_beatbot_global_Track_stopTrack(JNIEnv *env,
-		jclass clazz, jint trackNum) {
+void Java_com_kh_beatbot_global_Track_stopTrack(JNIEnv *env, jclass clazz,
+		jint trackNum) {
 	stopPreviewingTrack(trackNum);
 }
 
@@ -312,13 +276,14 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	// write to wav file if recording
 	if (recording && recordOutFile != NULL) {
 		pthread_mutex_lock(&recordMutex);
-		writeBytesToFile(openSlOut->currBufferShort, BUFF_SIZE * 2, recordOutFile);
+		writeBytesToFile(openSlOut->currBufferShort, BUFF_SIZE * 2,
+				recordOutFile);
 		pthread_mutex_unlock(&recordMutex);
 	}
 }
 
-void Java_com_kh_beatbot_global_Track_armTrack(JNIEnv *env,
-		jclass clazz, jint trackNum) {
+void Java_com_kh_beatbot_global_Track_armTrack(JNIEnv *env, jclass clazz,
+		jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
 	track->armed = openSlOut->anyTrackArmed = true;
 	// start writing zeros to the track's audio out
@@ -339,72 +304,6 @@ void Java_com_kh_beatbot_manager_PlaybackManager_armAllTracks(JNIEnv *env,
 	// we need to fill the buffer once before calling the OpenSL callback
 	fillBuffer();
 	bufferQueueCallback(openSlOut->outputBufferQueue, NULL);
-}
-
-MidiEvent *findEvent(Track *track, long tick) {
-	MidiEventNode *cur_ptr = track->eventHead;
-	while (cur_ptr != NULL) {
-		if (cur_ptr->event->onTick == tick || cur_ptr->event->offTick == tick)
-			return cur_ptr->event;
-		cur_ptr = cur_ptr->next;
-	}
-	return NULL;
-}
-
-// add a midi event to the track's event linked list, inserting in order of onTick
-MidiEventNode *addEvent(Track *track, MidiEvent *event) {
-	MidiEventNode *temp = (MidiEventNode *) malloc(sizeof(MidiEventNode));
-	temp->event = event;
-	MidiEventNode *cur_ptr = track->eventHead;
-	while (cur_ptr != NULL) {
-		if (temp->event->onTick > cur_ptr->event->onTick
-				&& (cur_ptr->next == NULL
-						|| temp->event->onTick < cur_ptr->next->event->onTick)) {
-			temp->next = cur_ptr->next;
-			cur_ptr->next = temp;
-			return temp;
-		}
-		cur_ptr = cur_ptr->next;
-	}
-	// if we get here, the new event is before any other event, or is the first event
-	temp->next = track->eventHead;
-	track->eventHead = temp;
-	return temp;
-}
-
-// Deleting a node from List depending upon the data in the node.
-MidiEventNode *removeEvent(Track *track, long onTick, bool muted) {
-	MidiEventNode *prev_ptr = NULL, *cur_ptr = track->eventHead;
-	while (cur_ptr != NULL) {
-		if ((muted && cur_ptr->event->muted)
-				|| cur_ptr->event->onTick == onTick) {
-			if (cur_ptr == track->eventHead) {
-				track->eventHead = cur_ptr->next;
-			} else {
-				prev_ptr->next = cur_ptr->next;
-			}
-			free(cur_ptr->event);
-			free(cur_ptr);
-			cur_ptr = NULL;
-			return track->eventHead;
-		} else {
-			prev_ptr = cur_ptr;
-			cur_ptr = cur_ptr->next;
-		}
-	}
-	return track->eventHead;
-}
-
-void printLinkedList(MidiEventNode *head) {
-	__android_log_print(ANDROID_LOG_DEBUG, "LL", "Elements:");
-	MidiEventNode *cur_ptr = head;
-	while (cur_ptr != NULL) {
-		__android_log_print(ANDROID_LOG_DEBUG, "LL Element", "onTick = %ld",
-				cur_ptr->event->onTick);
-		__android_log_print(ANDROID_LOG_DEBUG, "LL Element", "offTick = %ld",
-				cur_ptr->event->offTick);
-		cur_ptr = cur_ptr->next;
-	}
 }
 
 // create the engine and output mix objects
@@ -494,20 +393,20 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 	return JNI_TRUE;
 }
 
-void Java_com_kh_beatbot_activity_BeatBotActivity_setMasterVolume(JNIEnv *env, jclass clazz,
-		jfloat level) {
+void Java_com_kh_beatbot_activity_BeatBotActivity_setMasterVolume(JNIEnv *env,
+		jclass clazz, jfloat level) {
 	masterVolume = level;
 	updateAllLevels();
 }
 
-void Java_com_kh_beatbot_activity_BeatBotActivity_setMasterPan(JNIEnv *env, jclass clazz,
-		jfloat level) {
+void Java_com_kh_beatbot_activity_BeatBotActivity_setMasterPan(JNIEnv *env,
+		jclass clazz, jfloat level) {
 	masterPan = level;
 	updateAllLevels();
 }
 
-void Java_com_kh_beatbot_activity_BeatBotActivity_setMasterPitch(JNIEnv *env, jclass clazz,
-		jfloat level) {
+void Java_com_kh_beatbot_activity_BeatBotActivity_setMasterPitch(JNIEnv *env,
+		jclass clazz, jfloat level) {
 	masterPitch = level;
 	updateAllLevels();
 }
@@ -536,124 +435,34 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_shutdown(JNIEnv *env,
  Java MidiManager JNI methods
  ****************************************************************************************/
 
-void Java_com_kh_beatbot_manager_MidiManager_addMidiNote(JNIEnv *env,
-		jclass clazz, jint trackNum, jlong onTick, jlong offTick, jfloat volume,
+void Java_com_kh_beatbot_manager_MidiManager_setNextNoteInfo(JNIEnv *env,
+		jclass clazz, jint trackNum, jlong onTick, jlong offTick, jfloat vol,
 		jfloat pan, jfloat pitch) {
 	Track *track = getTrack(env, clazz, trackNum);
-	MidiEvent *event = initEvent(onTick, offTick, volume, pan, pitch);
-
-	addEvent(track, event);
-	updateNextEvent(track);
-}
-
-void Java_com_kh_beatbot_manager_MidiManager_deleteMidiNote(JNIEnv *env,
-		jclass clazz, jint trackNum, jlong tick) {
-	Track *track = getTrack(env, clazz, trackNum);
-	removeEvent(track, tick, false);
-	updateNextEvent(track);
-}
-
-void Java_com_kh_beatbot_manager_MidiManager_moveMidiNoteTicks(JNIEnv *env,
-		jclass clazz, jint trackNum, jlong prevOnTick, jlong newOnTick,
-		jlong newOffTick) {
-	Track *track = getTrack(env, clazz, trackNum);
-	MidiEvent *event = findEvent(track, prevOnTick);
-	if (event != NULL) {
-		event->onTick = newOnTick;
-		event->offTick = newOffTick;
-	}
-	updateNextEvent(track);
-}
-
-void Java_com_kh_beatbot_manager_MidiManager_moveMidiNote(JNIEnv *env,
-		jclass clazz, jint trackNum, jlong tick, jint newTrackNum) {
-	Track *prevTrack = getTrack(env, clazz, trackNum);
-	Track *newTrack = getTrack(env, clazz, newTrackNum);
-	MidiEvent *event = findEvent(prevTrack, tick);
-	if (event != NULL) {
-		float volume = event->volume;
-		float pan = event->pan;
-		float pitch = event->pitch;
-		int onTick = event->onTick;
-		int offTick = event->offTick;
-		long currTick = sampleToTick(currSample);
-		if (prevTrack->playing && currTick >= onTick && currTick <= offTick) {
-			stopTrack(prevTrack);
-		}
-		removeEvent(prevTrack, tick, false);
-		MidiEvent *newEvent = initEvent(onTick, offTick, volume, pan, pitch);
-		addEvent(newTrack, newEvent);
-	}
-	updateNextEvent(prevTrack);
-	updateNextEvent(newTrack);
-}
-
-void Java_com_kh_beatbot_manager_MidiManager_setNoteMute(JNIEnv *env,
-		jclass clazz, jint trackNum, jlong tick, jboolean muted) {
-	Track *track = getTrack(env, clazz, trackNum);
-	MidiEvent *event = findEvent(track, tick);
-	event->muted = muted;
-}
-
-void Java_com_kh_beatbot_manager_MidiManager_clearMutedNotes(JNIEnv *env,
-		jclass clazz) {
-	TrackNode *cur_ptr = trackHead;
-	while (cur_ptr != NULL) {
-		removeEvent(cur_ptr->track, -1, true);
-		updateNextEvent(cur_ptr->track);
-		cur_ptr = cur_ptr->next;
-	}
-}
-
-/****************************************************************************************
- Java MidiNote JNI methods
- ****************************************************************************************/
-void Java_com_kh_beatbot_midi_MidiNote_setVolume(JNIEnv *env, jclass clazz,
-		jint trackNum, jlong onTick, jfloat volume) {
-	Track *track = getTrack(env, clazz, trackNum);
-	MidiEvent *event = findEvent(track, onTick);
-	if (event != NULL) {
-		event->volume = volume;
-	}
-}
-
-void Java_com_kh_beatbot_midi_MidiNote_setPan(JNIEnv *env, jclass clazz,
-		jint trackNum, jlong onTick, jfloat pan) {
-	Track *track = getTrack(env, clazz, trackNum);
-	MidiEvent *event = findEvent(track, onTick);
-	if (event != NULL) {
-		event->pan = pan;
-	}
-}
-
-void Java_com_kh_beatbot_midi_MidiNote_setPitch(JNIEnv *env, jclass clazz,
-		jint trackNum, jlong onTick, jfloat pitch) {
-	Track *track = getTrack(env, clazz, trackNum);
-	MidiEvent *event = findEvent(track, onTick);
-	if (event != NULL) {
-		event->pitch = pitch;
-	}
+	setNextNoteInfo(track, tickToSample(onTick), tickToSample(offTick), vol,
+			pan, pitch);
 }
 
 /****************************************************************************************
  Java RecordManager JNI methods
  ****************************************************************************************/
-void Java_com_kh_beatbot_manager_RecordManager_startRecordingNative(
-		JNIEnv *env, jclass clazz, jstring recordFilePath) {
-	const char *cRecordFilePath = (*env)->GetStringUTFChars(env, recordFilePath, 0);
+void Java_com_kh_beatbot_manager_RecordManager_startRecordingNative(JNIEnv *env,
+		jclass clazz, jstring recordFilePath) {
+	const char *cRecordFilePath = (*env)->GetStringUTFChars(env, recordFilePath,
+			0);
 	// append to end of file, since header is written in Java
 	recordOutFile = fopen(cRecordFilePath, "a+");
 	recording = true;
 }
 
-void Java_com_kh_beatbot_manager_RecordManager_stopRecordingNative(
-		JNIEnv *env, jclass clazz) {
+void Java_com_kh_beatbot_manager_RecordManager_stopRecordingNative(JNIEnv *env,
+		jclass clazz) {
 	// stop recording
 	recording = false;
 	// file cleanup
 	pthread_mutex_lock(&recordMutex);
-    fflush(recordOutFile);
-    fclose(recordOutFile);
-    recordOutFile = NULL;
-    pthread_mutex_unlock(&recordMutex);
+	fflush(recordOutFile);
+	fclose(recordOutFile);
+	recordOutFile = NULL;
+	pthread_mutex_unlock(&recordMutex);
 }
