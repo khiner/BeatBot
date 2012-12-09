@@ -226,7 +226,7 @@ void Java_com_kh_beatbot_global_Track_soloTrack(JNIEnv *env, jclass clazz,
 void updateLevels(Track *track) {
 	MidiEvent *midiEvent = track->nextEvent;
 	track->volPan->set(track->volPan->config,
-			track->primaryVolume * midiEvent->volume,
+			midiEvent->volume,
 			(masterPan + track->primaryPan + midiEvent->pan) / 3);
 	((WavFile *) track->generator->config)->sampleRate = masterPitch
 			* track->primaryPitch * midiEvent->pitch * 8;

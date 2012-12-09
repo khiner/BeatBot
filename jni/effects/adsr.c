@@ -1,5 +1,4 @@
 #include "adsr.h"
-#include "../track.h"
 
 void initAdsrPoints(AdsrConfig *config) {
 	config->adsrPoints[0].sampleCents = 0;
@@ -52,7 +51,7 @@ void updateAdsr(AdsrConfig *config, int totalSamples) {
 }
 
 void resetAdsr(AdsrConfig *config) {
-	config->currSampleNum = 0;
+	config->currSample = 0;
 	config->currLevel = config->initial;
 	config->rising = true;
 }

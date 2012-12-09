@@ -2,8 +2,6 @@
 #define WAVFILE_H
 
 #include "../effects/effects.h"
-#include "../effects/adsr.h"
-#include <stdio.h>
 
 #define CONVMYFLT (1./32768.)
 #define ONE_FLOAT_SZ sizeof(float)

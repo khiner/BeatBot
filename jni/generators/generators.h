@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include <android/log.h>
 
 #define TABLE_SIZE 2048
 #define BUFF_SIZE 1024 // each sample has one short for each channel

@@ -67,16 +67,16 @@ static inline void processEffects(Track *track) {
 			BUFF_SIZE);
 	pthread_mutex_lock(&track->effectMutex);
 	EffectNode *effectNode = track->effectHead;
+	if (track->adsr->on) {
+			track->adsr->process(track->adsr->config, track->currBufferFloat,
+					BUFF_SIZE);
+	}
 	while (effectNode != NULL) {
 		if (effectNode->effect != NULL && effectNode->effect->on) {
 			effectNode->effect->process(effectNode->effect->config,
 					track->currBufferFloat, BUFF_SIZE);
 		}
 		effectNode = effectNode->next;
-	}
-	if (track->adsr->on) {
-		track->adsr->process(track->adsr->config, track->currBufferFloat,
-				BUFF_SIZE);
 	}
 	pthread_mutex_unlock(&track->effectMutex);
 }
@@ -99,12 +99,13 @@ static inline void mixTracks() {
 			while (cur_ptr != NULL) {
 				if (cur_ptr->track->shouldSound) {
 					total += cur_ptr->track->currBufferFloat[channel][samp]
-							* masterVolume;
+							* cur_ptr->track->primaryVolume;
 				}
 				cur_ptr = cur_ptr->next;
 			}
+			total *= masterVolume;
 			openSlOut->currBufferFloat[channel][samp] =
-					total > -1 ? (total < 1 ? total : 1) : -1;
+					total  > -1 ? (total < 1 ? total : 1) : -1;
 		}
 	}
 	// combine the two channels of floats into one buffer of shorts,
