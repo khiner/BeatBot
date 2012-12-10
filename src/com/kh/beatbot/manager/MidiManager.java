@@ -34,7 +34,7 @@ public class MidiManager implements Parcelable {
 	// ticks per quarter note (I think)
 	public static final int RESOLUTION = MidiFile.DEFAULT_RESOLUTION;
 	public static final long TICKS_IN_ONE_MEASURE = RESOLUTION * 4;
-	
+
 	private BeatBotActivity activity = null;
 
 	private static TimeSignature ts = new TimeSignature();
@@ -133,7 +133,7 @@ public class MidiManager implements Parcelable {
 		for (MidiNote midiNote : midiNotes) {
 			midiNote.setSelected(false);
 		}
-		activity.setDeleteIconEnabled(false);
+		updateEditIcons();
 	}
 
 	// return true if any Midi note is selected
@@ -147,13 +147,12 @@ public class MidiManager implements Parcelable {
 
 	public void selectNote(MidiNote midiNote) {
 		midiNote.setSelected(true);
-		activity.setDeleteIconEnabled(true);
+		updateEditIcons();
 	}
 
 	public void deselectNote(MidiNote midiNote) {
 		midiNote.setSelected(false);
-		if (!anyNoteSelected())
-			activity.setDeleteIconEnabled(false);
+		updateEditIcons();
 	}
 
 	public void selectRegion(long leftTick, long rightTick, int topNote,
@@ -171,7 +170,7 @@ public class MidiManager implements Parcelable {
 			else
 				midiNote.setSelected(false);
 		}
-		activity.setDeleteIconEnabled(anyNoteSelected());
+		updateEditIcons();
 	}
 
 	public void selectRow(int rowNum) {
@@ -186,7 +185,7 @@ public class MidiManager implements Parcelable {
 				midiNote.setLevelViewSelected(false);
 			}
 		}
-		activity.setDeleteIconEnabled(anyNoteSelected());
+		updateEditIcons();
 	}
 
 	public void mergeTempNotes() {
@@ -228,32 +227,37 @@ public class MidiManager implements Parcelable {
 	}
 
 	public void deleteNote(MidiNote midiNote) {
-		if (midiNotes.contains(midiNote)) {
-			midiNotes.remove(midiNote);
-			GlobalVars.tracks.get(midiNote.getNoteValue()).notes
-					.remove(midiNote);
-			activity.setDeleteIconEnabled(anyNoteSelected());
-		}
+		if (!midiNotes.contains(midiNote))
+			return;
+		midiNotes.remove(midiNote);
+		GlobalVars.tracks.get(midiNote.getNoteValue()).notes.remove(midiNote);
+		updateEditIcons();
 	}
 
+	private void updateEditIcons() {
+		boolean anyNoteSelected = anyNoteSelected();
+		activity.setEditIconsEnabled(anyNoteSelected);
+	}
+	
 	public void copy() {
 		if (!anyNoteSelected())
 			return;
 		copiedNotes = this.copyMidiList(getSelectedNotes());
 	}
-	
+
 	public boolean isCopying() {
 		return !copiedNotes.isEmpty();
 	}
-	
+
 	public void cancelCopy() {
 		copiedNotes.clear();
 	}
-	
+
 	public void paste(long startTick) {
 		activity.uncheckCopyButton();
 		if (copiedNotes.isEmpty())
 			return;
+		saveState();
 		long tickOffset = startTick - getLeftMostTick(copiedNotes);
 		for (MidiNote copiedNote : copiedNotes) {
 			long newOnTick = copiedNote.getOnTick() + tickOffset;
@@ -262,9 +266,10 @@ public class MidiManager implements Parcelable {
 			addNote(copiedNote);
 		}
 		handleMidiCollisions(copiedNotes);
+		mergeTempNotes();
 		copiedNotes.clear();
 	}
-	
+
 	public void deleteSelectedNotes() {
 		if (anyNoteSelected())
 			saveState();
@@ -282,7 +287,7 @@ public class MidiManager implements Parcelable {
 	}
 
 	public void setNoteValue(MidiNote midiNote, int newNote) {
-		int oldNote = midiNote.getNoteValue() ;
+		int oldNote = midiNote.getNoteValue();
 		if (oldNote == newNote)
 			return;
 		midiNote.setNote(newNote);
@@ -335,16 +340,16 @@ public class MidiManager implements Parcelable {
 		}
 		return leftMostTick;
 	}
-	
+
 	public long getRightMostTick(List<MidiNote> notes) {
 		long rightMostTick = Long.MIN_VALUE;
 		for (MidiNote midiNote : notes) {
 			if (midiNote.getOffTick() > rightMostTick)
 				rightMostTick = midiNote.getOffTick();
 		}
-		return rightMostTick;		
+		return rightMostTick;
 	}
-	
+
 	public long getLeftMostSelectedTick() {
 		return getLeftMostTick(getSelectedNotes());
 	}
@@ -376,7 +381,7 @@ public class MidiManager implements Parcelable {
 	public void handleMidiCollisions() {
 		handleMidiCollisions(getSelectedNotes());
 	}
-	
+
 	public void handleMidiCollisions(List<MidiNote> preferredNotes) {
 		clearTempNotes();
 		for (MidiNote preferred : preferredNotes) {
@@ -386,14 +391,14 @@ public class MidiManager implements Parcelable {
 						|| preferred.getNoteValue() != note.getNoteValue()) {
 					continue;
 				}
-				// if a selected note begins in the middle of another note,
+				// if a preferred note begins in the middle of another note,
 				// clip the covered note
 				if (preferred.getOnTick() > note.getOnTick()
 						&& preferred.getOnTick() <= note.getOffTick()) {
 					MidiNote copy = note.getCopy();
 					copy.setOffTick(preferred.getOnTick() - 1);
 					putTempNote(i, copy);
-					// if the selected note ends after the beginning
+					// if the preferred note ends after the beginning
 					// of the other note, or if the selected note completely
 					// covers the other note, delete the covered note
 				} else if (!note.isSelected()
@@ -406,7 +411,7 @@ public class MidiManager implements Parcelable {
 			}
 		}
 	}
-	
+
 	/*
 	 * Translate all midi notes to their on-ticks' nearest major ticks given the
 	 * provided beat division
@@ -434,7 +439,6 @@ public class MidiManager implements Parcelable {
 			addNote(midiNote);
 		}
 		currState = copyMidiList(midiNotes);
-		activity.setDeleteIconEnabled(anyNoteSelected());
 	}
 
 	private List<MidiNote> copyMidiList(List<MidiNote> midiList) {
@@ -584,13 +588,13 @@ public class MidiManager implements Parcelable {
 			updateNextNote(trackNum);
 		}
 	}
-	
+
 	public void updateNextNote(int trackNum) {
 		Collections.sort(GlobalVars.tracks.get(trackNum).notes);
 		MidiNote nextNote = getNextMidiNote(trackNum, getCurrTick());
 		setNextNote(trackNum, nextNote);
 	}
-	
+
 	public static MidiNote getNextMidiNote(int trackNum, long currTick) {
 		List<MidiNote> trackNotes = GlobalVars.tracks.get(trackNum).notes;
 		for (MidiNote midiNote : trackNotes) {

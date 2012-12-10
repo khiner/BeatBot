@@ -320,12 +320,27 @@ public class BeatBotActivity extends Activity implements
 		}
 	}
 
-	public void setDeleteIconEnabled(final boolean enabled) {
+	public void setEditIconsEnabled(final boolean enabled) {
+		setDeleteIconEnabled(enabled);
+		setCopyIconEnabled(enabled);
+	}
+	
+	private void setDeleteIconEnabled(final boolean enabled) {
 		// need to change UI stuff on the UI thread.
 		Handler refresh = new Handler(Looper.getMainLooper());
 		refresh.post(new Runnable() {
 			public void run() {
 				((ImageButton) findViewById(R.id.delete)).setEnabled(enabled);
+			}
+		});
+	}
+	
+	private void setCopyIconEnabled(final boolean enabled) {
+		// need to change UI stuff on the UI thread.
+		Handler refresh = new Handler(Looper.getMainLooper());
+		refresh.post(new Runnable() {
+			public void run() {
+				((ToggleButton) findViewById(R.id.copy)).setEnabled(enabled);
 			}
 		});
 	}
