@@ -95,6 +95,10 @@ public class WaveformHelper extends Thread {
 		}
 	}
 	
+	public static RandomAccessFile getSampleFile() {
+		return sampleFile;
+	}
+	
 	// default to 0 offset, used when only a single FloatBuffer is needed
 	// (for a static sample)
 	public static FloatBuffer bytesToFloatBuffer(byte[] bytes, float width, float height) {

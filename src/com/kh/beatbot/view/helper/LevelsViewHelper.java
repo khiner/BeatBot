@@ -10,7 +10,6 @@ import javax.microedition.khronos.opengles.GL10;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.MidiView;

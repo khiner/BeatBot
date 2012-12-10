@@ -164,6 +164,7 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		((TextView) findViewById(R.id.effectsLabel))
 				.setTypeface(GlobalVars.font);
 		((Button) findViewById(R.id.sampleSelect)).setTypeface(GlobalVars.font);
+		((ToggleButton) findViewById(R.id.adsr_toggle)).setChecked(currTrack.adsrEnabled);
 		// init alerts
 		initInstrumentSelectAlert();
 		initSampleSelectAlert();
@@ -278,7 +279,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 
 	public void toggleAdsr(View view) {
 		boolean on = ((ToggleButton) view).isChecked();
-		sampleWaveformView.setShowAdsr(on);
 		currTrack.setAdsrOn(on);
 	}
 
