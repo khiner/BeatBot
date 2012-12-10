@@ -339,12 +339,11 @@ public class LevelsViewHelper {
 		float tick = midiView.xToTick(x);
 
 		MidiNote selectedNote = midiView.getMidiNote(track, tick);
-		if (selectedNote != null) {
-			return;
+		if (selectedNote == null) {
+			selectedNote = midiView.addMidiNote(tick, track);
 		}
-		MidiNote newNote = midiView.addMidiNote(tick, track);
-		addToLevelViewSelected(newNote);
-		tappedLevelNote = newNote;
+		addToLevelViewSelected(selectedNote);
+		tappedLevelNote = selectedNote;
 	}
 	
 	public static void doubleTap() {

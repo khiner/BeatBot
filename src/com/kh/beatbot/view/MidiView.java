@@ -978,10 +978,10 @@ public class MidiView extends ClickableSurfaceView {
 			// MidiTrackControlHelper.handleClick(x, yToNote(y));
 			return;
 		}
-		MidiNote touchedNote = touchedNotes.get(id);
 		if (bean.getViewState() == State.LEVELS_VIEW) {
 			LevelsViewHelper.singleTap(x, y);
 		} else {
+			MidiNote touchedNote = touchedNotes.get(id);
 			if (touchedNote != null) {
 				// single tapping a note always makes it the only selected note
 				if (touchedNote.isSelected())
