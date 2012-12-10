@@ -4,6 +4,17 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" >
 
+    <ToggleButton
+        android:id="@+id/copy"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/copy_btn_src"
+        android:contentDescription="@string/copy"
+        android:onClick="copy"
+        android:state_enabled="false"
+        android:textOff=""
+        android:textOn="" />
+    
     <ImageButton
         android:id="@+id/delete"
         android:layout_width="wrap_content"

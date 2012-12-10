@@ -630,41 +630,11 @@ public class MidiView extends ClickableSurfaceView {
 		MidiNote noteToAdd = midiManager.addNote((long) onTick, (long) offTick,
 				track, .75f, .5f, .5f);
 		midiManager.selectNote(noteToAdd);
-		handleMidiCollisions();
+		midiManager.handleMidiCollisions();
 		midiManager.mergeTempNotes();
 		midiManager.deselectNote(noteToAdd);
 		bean.setStateChanged(true);
 		return noteToAdd;
-	}
-
-	public void handleMidiCollisions() {
-		midiManager.clearTempNotes();
-		for (MidiNote selected : midiManager.getSelectedNotes()) {
-			for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
-				MidiNote note = midiManager.getMidiNote(i);
-				if (note == null || selected.equals(note)
-						|| selected.getNoteValue() != note.getNoteValue()) {
-					continue;
-				}
-				// if a selected note begins in the middle of another note,
-				// clip the covered note
-				if (selected.getOnTick() > note.getOnTick()
-						&& selected.getOnTick() <= note.getOffTick()) {
-					MidiNote copy = note.getCopy();
-					copy.setOffTick(selected.getOnTick() - 1);
-					midiManager.putTempNote(i, copy);
-					// if the selected note ends after the beginning
-					// of the other note, or if the selected note completely
-					// covers the other note, delete the covered note
-				} else if (!note.isSelected()
-						&& selected.getOffTick() >= note.getOnTick()
-						&& selected.getOffTick() <= note.getOffTick()
-						|| selected.getOnTick() <= note.getOnTick()
-						&& selected.getOffTick() >= note.getOffTick()) {
-					midiManager.putTempNote(i, null);
-				}
-			}
-		}
 	}
 
 	public boolean toggleSnapToGrid() {
@@ -707,7 +677,7 @@ public class MidiView extends ClickableSurfaceView {
 					+ noteDiff);
 		}
 		bean.setStateChanged(true);
-		handleMidiCollisions();
+		midiManager.handleMidiCollisions();
 	}
 
 	private void pinchSelectedNotes(float currLeftTick, float currRightTick) {
@@ -721,7 +691,7 @@ public class MidiView extends ClickableSurfaceView {
 		for (MidiNote midiNote : midiManager.getSelectedNotes()) {
 			pinchNote(midiNote, onTickDiff, offTickDiff);
 		}
-		handleMidiCollisions();
+		midiManager.handleMidiCollisions();
 	}
 
 	public void updateLoopMarkers(MotionEvent e) {
@@ -982,7 +952,9 @@ public class MidiView extends ClickableSurfaceView {
 			LevelsViewHelper.singleTap(x, y);
 		} else {
 			MidiNote touchedNote = touchedNotes.get(id);
-			if (touchedNote != null) {
+			if (midiManager.isCopying()) {
+				midiManager.paste((long)TickWindowHelper.getMajorTickToLeftOf(xToTick(x)));
+			} else if (touchedNote != null) {
 				// single tapping a note always makes it the only selected note
 				if (touchedNote.isSelected())
 					midiManager.deselectAllNotes();

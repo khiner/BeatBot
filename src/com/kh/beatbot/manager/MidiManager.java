@@ -52,6 +52,7 @@ public class MidiManager implements Parcelable {
 	// stack of MidiNote lists, for undo
 	private Stack<List<MidiNote>> undoStack = new Stack<List<MidiNote>>();
 
+	private List<MidiNote> copiedNotes = new ArrayList<MidiNote>();
 	private List<MidiNote> currState = new ArrayList<MidiNote>();
 
 	private MidiManager() {
@@ -235,6 +236,35 @@ public class MidiManager implements Parcelable {
 		}
 	}
 
+	public void copy() {
+		if (!anyNoteSelected())
+			return;
+		copiedNotes = this.copyMidiList(getSelectedNotes());
+	}
+	
+	public boolean isCopying() {
+		return !copiedNotes.isEmpty();
+	}
+	
+	public void cancelCopy() {
+		copiedNotes.clear();
+	}
+	
+	public void paste(long startTick) {
+		activity.uncheckCopyButton();
+		if (copiedNotes.isEmpty())
+			return;
+		long tickOffset = startTick - getLeftMostTick(copiedNotes);
+		for (MidiNote copiedNote : copiedNotes) {
+			long newOnTick = copiedNote.getOnTick() + tickOffset;
+			long newOffTick = copiedNote.getOffTick() + tickOffset;
+			setNoteTicks(copiedNote, newOnTick, newOffTick, false, true);
+			addNote(copiedNote);
+		}
+		handleMidiCollisions(copiedNotes);
+		copiedNotes.clear();
+	}
+	
 	public void deleteSelectedNotes() {
 		if (anyNoteSelected())
 			saveState();
@@ -297,22 +327,30 @@ public class MidiManager implements Parcelable {
 		return (long) ((RESOLUTION * 1000f / tempo.getMpqn()) * millis);
 	}
 
-	public long getLeftMostSelectedTick() {
+	public long getLeftMostTick(List<MidiNote> notes) {
 		long leftMostTick = Long.MAX_VALUE;
-		for (MidiNote midiNote : getSelectedNotes()) {
+		for (MidiNote midiNote : notes) {
 			if (midiNote.getOnTick() < leftMostTick)
 				leftMostTick = midiNote.getOnTick();
 		}
 		return leftMostTick;
 	}
-
-	public long getRightMostSelectedTick() {
+	
+	public long getRightMostTick(List<MidiNote> notes) {
 		long rightMostTick = Long.MIN_VALUE;
-		for (MidiNote midiNote : getSelectedNotes()) {
+		for (MidiNote midiNote : notes) {
 			if (midiNote.getOffTick() > rightMostTick)
 				rightMostTick = midiNote.getOffTick();
 		}
-		return rightMostTick;
+		return rightMostTick;		
+	}
+	
+	public long getLeftMostSelectedTick() {
+		return getLeftMostTick(getSelectedNotes());
+	}
+
+	public long getRightMostSelectedTick() {
+		return getRightMostTick(getSelectedNotes());
 	}
 
 	/*
@@ -335,6 +373,40 @@ public class MidiManager implements Parcelable {
 		return nearestMajorTick;
 	}
 
+	public void handleMidiCollisions() {
+		handleMidiCollisions(getSelectedNotes());
+	}
+	
+	public void handleMidiCollisions(List<MidiNote> preferredNotes) {
+		clearTempNotes();
+		for (MidiNote preferred : preferredNotes) {
+			for (int i = 0; i < getMidiNotes().size(); i++) {
+				MidiNote note = getMidiNote(i);
+				if (note == null || preferred == note
+						|| preferred.getNoteValue() != note.getNoteValue()) {
+					continue;
+				}
+				// if a selected note begins in the middle of another note,
+				// clip the covered note
+				if (preferred.getOnTick() > note.getOnTick()
+						&& preferred.getOnTick() <= note.getOffTick()) {
+					MidiNote copy = note.getCopy();
+					copy.setOffTick(preferred.getOnTick() - 1);
+					putTempNote(i, copy);
+					// if the selected note ends after the beginning
+					// of the other note, or if the selected note completely
+					// covers the other note, delete the covered note
+				} else if (!note.isSelected()
+						&& preferred.getOffTick() >= note.getOnTick()
+						&& preferred.getOffTick() <= note.getOffTick()
+						|| preferred.getOnTick() <= note.getOnTick()
+						&& preferred.getOffTick() >= note.getOffTick()) {
+					putTempNote(i, null);
+				}
+			}
+		}
+	}
+	
 	/*
 	 * Translate all midi notes to their on-ticks' nearest major ticks given the
 	 * provided beat division
@@ -367,11 +439,11 @@ public class MidiManager implements Parcelable {
 
 	private List<MidiNote> copyMidiList(List<MidiNote> midiList) {
 		List<MidiNote> copy = new ArrayList<MidiNote>();
-		for (int i = 0; i < midiNotes.size(); i++) {
+		for (int i = 0; i < midiList.size(); i++) {
 			// avoid concurrent modification exception
-			if (i < midiNotes.size()) {// note could have been added/deleted
+			if (i < midiList.size()) {// note could have been added/deleted
 										// after starting loop
-				copy.add(midiNotes.get(i).getCopy());
+				copy.add(midiList.get(i).getCopy());
 			}
 		}
 		return copy;

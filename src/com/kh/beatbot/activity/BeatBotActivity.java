@@ -52,7 +52,7 @@ import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
 public class BeatBotActivity extends Activity implements
 		MidiTrackControlListener, LevelListener {
-	
+
 	private Animation fadeIn, fadeOut;
 	// these are used as variables for convenience, since they are reference
 	// frequently
@@ -90,7 +90,8 @@ public class BeatBotActivity extends Activity implements
 					}
 				});
 		instrumentSelectAlert = builder.create();
-		instrumentSelectAlert.setOnShowListener(GlobalVars.instrumentSelectOnShowListener);
+		instrumentSelectAlert
+				.setOnShowListener(GlobalVars.instrumentSelectOnShowListener);
 	}
 
 	private void initManagers(Bundle savedInstanceState) {
@@ -111,29 +112,32 @@ public class BeatBotActivity extends Activity implements
 		out.close();
 		out = null;
 	}
-	
+
 	/**
-	 * Copy the wavFile into a file with raw PCM Wav bytes.
-	 * Works with mono/stereo (for mono, duplicate each sample to the left/right channels)
+	 * Copy the wavFile into a file with raw PCM Wav bytes. Works with
+	 * mono/stereo (for mono, duplicate each sample to the left/right channels)
 	 * Method for detecting/adapting to stereo/mono adapted from
-	 * http://stackoverflow.com/questions/8754111/how-to-read-the-data-in-a-wav-file-to-an-array
+	 * http://stackoverflow
+	 * .com/questions/8754111/how-to-read-the-data-in-a-wav-file-to-an-array
 	 */
-	private void convertWavToRaw(InputStream wavIn, FileOutputStream rawOut) throws IOException {		
+	private void convertWavToRaw(InputStream wavIn, FileOutputStream rawOut)
+			throws IOException {
 		byte[] headerBytes = new byte[44];
 		wavIn.read(headerBytes);
 		// Determine if mono or stereo
-		int channels = headerBytes[22]; // Forget byte 23 as 99.999% of WAVs are 1 or 2 channels
+		int channels = headerBytes[22]; // Forget byte 23 as 99.999% of WAVs are
+										// 1 or 2 channels
 
 		byte[] inBytes = new byte[2];
 		ByteBuffer floatBuffer = ByteBuffer.allocate(4);
 		floatBuffer.order(ByteOrder.LITTLE_ENDIAN);
 		while (wavIn.read(inBytes) != -1) {
 			// convert two bytes to a float (little endian)
-			short s = (short)(((inBytes[1] & 0xff) << 8) | (inBytes[0] & 0xff)); 
+			short s = (short) (((inBytes[1] & 0xff) << 8) | (inBytes[0] & 0xff));
 			floatBuffer.putFloat(0, s / 32768.0f);
 			rawOut.write(floatBuffer.array());
 			if (channels == 1) {
-				// if mono, left and right copies should be identical 
+				// if mono, left and right copies should be identical
 				rawOut.write(floatBuffer.array());
 			}
 		}
@@ -161,7 +165,8 @@ public class BeatBotActivity extends Activity implements
 				// copy wav file exactly from assets to sdcard
 				if (!existingFiles.contains(file.replace(".wav", ".raw"))) {
 					InputStream in = assetManager.open(folderName + file);
-					FileOutputStream rawOut = new FileOutputStream(newDirectory + file.replace(".wav", ".raw"));
+					FileOutputStream rawOut = new FileOutputStream(newDirectory
+							+ file.replace(".wav", ".raw"));
 					convertWavToRaw(in, rawOut);
 				}
 			}
@@ -182,18 +187,21 @@ public class BeatBotActivity extends Activity implements
 	}
 
 	private void initDataDir() {
-		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+		if (Environment.getExternalStorageState().equals(
+				Environment.MEDIA_MOUNTED)) {
 			// we can read and write to external storage
-			String extStorageDir = Environment.getExternalStorageDirectory().toString();
+			String extStorageDir = Environment.getExternalStorageDirectory()
+					.toString();
 			GlobalVars.appDirectory = extStorageDir + "/BeatBot/";
 			File appDirectoryFile = new File(GlobalVars.appDirectory);
 			// build the directory structure, if needed
 			appDirectoryFile.mkdirs();
-		} else { // we need read AND write access for this app - default to internal storage
-			GlobalVars.appDirectory = getFilesDir().toString() + "/";	
+		} else { // we need read AND write access for this app - default to
+					// internal storage
+			GlobalVars.appDirectory = getFilesDir().toString() + "/";
 		}
 	}
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -256,7 +264,8 @@ public class BeatBotActivity extends Activity implements
 		outState.putBoolean(
 				"playing",
 				Managers.playbackManager.getState() == PlaybackManager.State.PLAYING);
-		outState.putBoolean("recording",
+		outState.putBoolean(
+				"recording",
 				Managers.recordManager.getState() != RecordManager.State.INITIALIZING);
 	}
 
@@ -305,7 +314,8 @@ public class BeatBotActivity extends Activity implements
 		createEngine();
 		createAudioPlayer();
 		for (int trackId = 0; trackId < GlobalVars.tracks.size(); trackId++) {
-			Instrument instrument = GlobalVars.tracks.get(trackId).getInstrument();
+			Instrument instrument = GlobalVars.tracks.get(trackId)
+					.getInstrument();
 			addTrack(instrument.getCurrSamplePath());
 		}
 	}
@@ -333,17 +343,17 @@ public class BeatBotActivity extends Activity implements
 
 	public void record(View view) {
 		if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
-			//Managers.recordManager.stopListening();
+			// Managers.recordManager.stopListening();
 			String fileName = Managers.recordManager.stopRecordingAndWriteWav();
-			Toast.makeText(getApplicationContext(), "Recorded file to " + fileName,
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(),
+					"Recorded file to " + fileName, Toast.LENGTH_SHORT).show();
 		} else {
 			GlobalVars.midiView.reset();
 			// if we're already playing, midiManager is already ticking away.
 			if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
 				play(findViewById(R.id.playButton));
 			Managers.recordManager.startRecordingNative();
-			//Managers.recordManager.startListening();
+			// Managers.recordManager.startListening();
 		}
 	}
 
@@ -359,7 +369,7 @@ public class BeatBotActivity extends Activity implements
 
 	public void stop(View view) {
 		if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
-			ToggleButton recordButton = (ToggleButton) findViewById(R.id.recordButton); 
+			ToggleButton recordButton = (ToggleButton) findViewById(R.id.recordButton);
 			record(recordButton);
 			recordButton.setChecked(false);
 		}
@@ -379,6 +389,23 @@ public class BeatBotActivity extends Activity implements
 		GlobalVars.midiView.toggleLevelsView();
 	}
 
+	public void copy(View view) {
+		String msg = null;
+		if (((ToggleButton) view).isChecked()) {
+			Managers.midiManager.copy();
+			msg = "Tap To Paste";
+		} else {
+			Managers.midiManager.cancelCopy();
+			msg = "Copy Cancelled";
+		}
+		Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT)
+		.show();
+	}
+
+	public void uncheckCopyButton() {
+		((ToggleButton) findViewById(R.id.copy)).setChecked(false);
+	}
+	
 	public void delete(View view) {
 		Managers.midiManager.deleteSelectedNotes();
 	}
@@ -423,7 +450,7 @@ public class BeatBotActivity extends Activity implements
 			break;
 		}
 	}
-	
+
 	public void bpmTap(View view) {
 		long tapTime = System.currentTimeMillis();
 		float millisElapsed = tapTime - lastTapTime;
@@ -465,7 +492,7 @@ public class BeatBotActivity extends Activity implements
 	public void notifyInit(LevelListenable levelBar) {
 		updateLevelBar();
 	}
-	
+
 	@Override
 	public void notifyPressed(LevelListenable levelListenable, boolean pressed) {
 	}
@@ -496,11 +523,12 @@ public class BeatBotActivity extends Activity implements
 	public void setLevel(LevelListenable levelListenable, float levelX,
 			float levelY) {
 	}
-	
+
 	private void addTrack(int instrumentType) {
-		Instrument newInstrument = GlobalVars.getInstrument(instrumentType); 
+		Instrument newInstrument = GlobalVars.getInstrument(instrumentType);
 		addTrack(newInstrument.getCurrSamplePath());
-		GlobalVars.tracks.add(new Track(GlobalVars.tracks.size(), newInstrument));
+		GlobalVars.tracks
+				.add(new Track(GlobalVars.tracks.size(), newInstrument));
 		GlobalVars.midiView.updateTracks();
 		// launch sample edit activity for the newly added track
 		launchSampleEditActivity(GlobalVars.tracks.size() - 1);
@@ -509,9 +537,11 @@ public class BeatBotActivity extends Activity implements
 	public static native void addTrack(String sampleFileName);
 
 	public static native void setMasterVolume(float level);
+
 	public static native void setMasterPan(float level);
+
 	public static native void setMasterPitch(float level);
-	
+
 	public static native boolean createAudioPlayer();
 
 	public static native void createEngine();
