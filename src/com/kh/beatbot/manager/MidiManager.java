@@ -189,15 +189,19 @@ public class MidiManager implements Parcelable {
 	}
 
 	public void mergeTempNotes() {
+		List<MidiNote> notesToDelete = new ArrayList<MidiNote>();
 		for (int k : tempNotes.keySet()) {
 			if (k < midiNotes.size()) {// sanity check
 				MidiNote temp = tempNotes.get(k);
 				if (temp != null) {
 					midiNotes.set(k, tempNotes.get(k));
 				} else {
-					deleteNote(midiNotes.get(k));
+					notesToDelete.add(midiNotes.get(k));
 				}
 			}
+		}
+		for (MidiNote noteToDelete : notesToDelete) {
+			deleteNote(noteToDelete);
 		}
 		tempNotes.clear();
 	}
