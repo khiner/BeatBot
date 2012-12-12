@@ -82,9 +82,10 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	public void setTrack(Track track) {
 		this.track = track;
+		setSampleFile(track.getInstrument().getCurrSampleFile());
 	}
 
-	public void setSampleFile(File sampleFile) {
+	private void setSampleFile(File sampleFile) {
 		WaveformHelper.setSampleFile(sampleFile);
 		numSamples = sampleFile.length() / 8 - 44;
 		sampleWidth = numSamples;
@@ -201,7 +202,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	private void drawAdsr() {
-		if (!track.adsrEnabled)
+		if (!track.isAdsrEnabled())
 			return;
 		setColor(ADSR_COLOR);
 		gl.glPointSize(ADSR_POINT_RADIUS * 2);
@@ -221,10 +222,9 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	@Override
 	protected void init() {
-		// preview button is 80dpX80dp, but that is not the same as a height of
-		// '80'. 80dp will be the height
-		previewButton = new BeatBotButton(GlobalVars.previewIcon);
 		setBackgroundColor(BG_COLOR);
+		previewButton = new BeatBotButton(GlobalVars.previewIcon);
+		// make preview button square
 		previewButtonWidth = height;
 		waveformWidth = width - previewButtonWidth - SNAP_DIST;
 		setSampleFile(track.getInstrument().getCurrSampleFile());
@@ -338,12 +338,12 @@ public class SampleWaveformView extends SurfaceViewBase {
 		drawWaveform();
 		drawLines(backgroundOutlineVb, Colors.WHITE, 4, GL10.GL_LINE_LOOP);
 		drawLoopSelectionMarkers();
-		if (track.adsrEnabled)
+		if (track.isAdsrEnabled())
 			drawAdsr();
 	}
 
 	private boolean selectAdsrPoint(int id, float x, float y) {
-		if (!track.adsrEnabled)
+		if (!track.isAdsrEnabled())
 			return false;
 		for (int i = 0; i < 5; i++) {
 			if (GeneralUtils.distanceFromPointSquared(

@@ -9,9 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -28,7 +25,6 @@ import com.kh.beatbot.effect.Tremelo;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.global.Instrument;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listenable.LabelListListenable;
 import com.kh.beatbot.listenable.LevelListenable;
@@ -36,9 +32,7 @@ import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
-import com.kh.beatbot.view.SampleWaveformView;
 import com.kh.beatbot.view.TronSeekbar;
-import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
 public class SampleEditActivity extends Activity implements LevelListener {
 	class EffectLabelListListener implements LabelListListener {
@@ -140,10 +134,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		}
 	}
 
-	private AlertDialog instrumentSelectAlert = null;
-	private AlertDialog sampleSelectAlert = null;
-
-	private static SampleWaveformView sampleWaveformView = null;
 	// private EditLevelsView editLevelsView = null;
 	private static TronSeekbar volumeLevel, panLevel, pitchLevel;
 	private static LabelListListenable effectLabelList = null,
@@ -163,74 +153,12 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		// set text font
 		((TextView) findViewById(R.id.effectsLabel))
 				.setTypeface(GlobalVars.font);
-		((Button) findViewById(R.id.sampleSelect)).setTypeface(GlobalVars.font);
-		((ToggleButton) findViewById(R.id.adsr_toggle)).setChecked(currTrack.adsrEnabled);
-		// init alerts
-		initInstrumentSelectAlert();
-		initSampleSelectAlert();
-		// set the instrument icon
-		((ImageButton) findViewById(R.id.instrumentButton))
-				.setBackgroundResource(currTrack.getInstrument()
-						.getIconSource());
-		// set the instrument text
-		((Button) findViewById(R.id.sampleSelect)).setText(currTrack
-				.getInstrument().getSampleName(0));
 		initLevels();
 		initSampleLabelList();
 		initEffectLabelList();
-		initSampleWaveformView();
 
 		currTrack.arm();
 		((ToggleButton) findViewById(R.id.loop_toggle)).setChecked(currTrack.isLooping());
-	}
-
-	private void setInstrument(Instrument instrument) {
-		// set native sample bytes through JNI
-		currTrack.setSample(instrument.getCurrSamplePath());
-		// update sample label text
-		((Button) findViewById(R.id.sampleSelect)).setText(instrument
-				.getCurrSampleName());
-		// update the midi view instrument icon for this track
-		MidiTrackControlHelper.updateInstrumentIcon(currTrack.getId());
-		// update sample waveform view with new sample bytes
-		sampleWaveformView.setSampleFile(instrument.getCurrSampleFile());
-	}
-
-	private void initInstrumentSelectAlert() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Choose Instrument");
-		builder.setAdapter(GlobalVars.instrumentSelectAdapter,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						currTrack.setInstrument(GlobalVars.getInstrument(item));
-						currTrack.getInstrument().setCurrSampleNum(0);
-						currTrack.getInstrument().getBBIconSource();
-						setInstrument(currTrack.getInstrument());
-						// update instrument icon to reflect the change
-						((ImageButton) findViewById(R.id.instrumentButton))
-								.setBackgroundResource(currTrack
-										.getInstrument().getIconSource());
-						// update the sample select alert names with the new
-						// instrument samples
-						initSampleSelectAlert();
-					}
-				});
-		instrumentSelectAlert = builder.create();
-		instrumentSelectAlert
-				.setOnShowListener(GlobalVars.instrumentSelectOnShowListener);
-	}
-
-	private void initSampleSelectAlert() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Choose Sample");
-		builder.setItems(currTrack.getInstrument().getSampleNames(),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						currTrack.getInstrument().setCurrSampleNum(item);
-						setInstrument(currTrack.getInstrument());
-					}
-				});
-		sampleSelectAlert = builder.create();
 	}
 
 	private void initEffectLabelList() {
@@ -243,11 +171,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		// sampleLabelList = (LabelListListenable)
 		// findViewById(R.id.sampleList);
 		// sampleLabelList.setListener(new SampleLabelListListener(this));
-	}
-
-	private void initSampleWaveformView() {
-		sampleWaveformView = ((SampleWaveformView) findViewById(R.id.sample_waveform_view));
-		sampleWaveformView.setTrack(currTrack);
 	}
 
 	public static void quantizeEffectParams() {
@@ -263,27 +186,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 				}
 			}
 		}
-	}
-
-	public void selectInstrument(View view) {
-		instrumentSelectAlert.show();
-	}
-
-	public void selectSample(View view) {
-		sampleSelectAlert.show();
-	}
-
-	public void toggleLoop(View view) {
-		currTrack.toggleLooping();
-	}
-
-	public void toggleAdsr(View view) {
-		boolean on = ((ToggleButton) view).isChecked();
-		currTrack.setAdsrOn(on);
-	}
-
-	public void reverse(View view) {
-		currTrack.setReverse(((ToggleButton) view).isChecked());
 	}
 
 	// public void normalize(View view) {

@@ -9,6 +9,7 @@ import com.kh.beatbot.midi.MidiNote;
 public class Track {
 	private int id;
 	private Instrument instrument;
+	private boolean adsrEnabled = false, reverse = false;
 	public List<MidiNote> notes = new ArrayList<MidiNote>();
 	public List<Effect> effects = new ArrayList<Effect>();
 	public float volume = .8f;
@@ -17,7 +18,6 @@ public class Track {
 	public float[][] adsrPoints;
 	public float sampleLoopBegin = 0;
 	public float sampleLoopEnd = 0;
-	public boolean adsrEnabled = false;
 
 	public Track(int id, Instrument instrument) {
 		this.id = id;
@@ -102,12 +102,21 @@ public class Track {
 		return isTrackLooping(id);
 	}
 
+	public boolean isAdsrEnabled() {
+		return adsrEnabled;
+	}
+	
+	public boolean isReverse() {
+		return reverse;
+	}
+	
 	public void setLoopWindow(long loopBegin, long loopEnd) {
 		setTrackLoopWindow(id, loopBegin, loopEnd);
 	}
 
 	// set play mode to reverse
 	public void setReverse(boolean reverse) {
+		this.reverse = reverse;
 		setTrackReverse(id, reverse);
 	}
 

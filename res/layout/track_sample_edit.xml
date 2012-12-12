@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="@color/background" >
+    
+	<com.kh.beatbot.view.SampleWaveformView
+        android:id="@+id/sample_waveform_view"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_toLeftOf="@+id/adsr" />
+    
+    <ToggleButton
+        android:id="@+id/adsr"
+        android:layout_width="0dp"
+        android:layout_height="70dp"
+        android:background="@drawable/adsr_btn_src"
+        android:layout_toLeftOf="@+id/loop"
+        android:text="@string/adsr"
+        android:textOff=""
+        android:textOn="" />
+
+    <ToggleButton
+        android:id="@+id/loop"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_toLeftOf="@+id/reverse"
+        android:background="@drawable/loop_btn_src"
+        android:textOff=""
+        android:textOn="" />
+
+    <ToggleButton
+        android:id="@+id/reverse"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/reverse_btn_src"
+		android:layout_alignParentRight="true"
+        android:textOff=""
+        android:textOn="" />
+    
+</RelativeLayout>
