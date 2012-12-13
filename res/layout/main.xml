@@ -56,17 +56,17 @@
        	android:onClick="addTrack" />
         
     <com.kh.beatbot.view.TronSeekbar
-            android:id="@+id/levelBar"
+            android:id="@+id/masterLevel"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/addTrack"
             android:layout_alignBottom="@+id/addTrack"
-            android:layout_toRightOf="@+id/levelsLayout"
+            android:layout_toRightOf="@+id/masterLevels"
             android:layout_marginRight="4dp" />
         
     <LinearLayout
-        android:id="@+id/levelsLayout"
+        android:id="@+id/masterLevels"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/addTrack"
@@ -75,7 +75,7 @@
         android:orientation="horizontal" >
 
         <ToggleButton
-            android:id="@+id/volumeButton"
+            android:id="@+id/masterVolumeToggle"
             android:layout_width="60dp"
             android:layout_height="30dp"
             android:background="@drawable/volume_btn_src"
@@ -85,7 +85,7 @@
             android:textOn="" />
 
         <ToggleButton
-            android:id="@+id/panButton"
+            android:id="@+id/masterPanToggle"
             android:layout_width="60dp"
             android:layout_height="30dp"
             android:background="@drawable/pan_btn_src"
@@ -94,7 +94,7 @@
             android:textOn="" />
 
         <ToggleButton
-            android:id="@+id/pitchButton"
+            android:id="@+id/masterPitchToggle"
             android:layout_width="60dp"
             android:layout_height="30dp"
             android:background="@drawable/pitch_btn_src"
@@ -105,7 +105,7 @@
     
 	<android.support.v4.view.DirectionalViewPager
 	    android:layout_width="match_parent" 
-	    android:layout_height="80dp"
+	    android:layout_height="65dp"
 	    android:orientation="vertical"
 	    android:layout_alignParentBottom="true"
     	android:id="@+id/trackPager" />

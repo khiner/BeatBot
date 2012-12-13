@@ -14,6 +14,8 @@ public final class TrackPageFactory {
 	private TrackPageFactory() {}
 
 	public static void setTrack(Track track) {
+		if (TrackPage.track == track)
+			return;
 		for (TrackPage trackPage : instances.values()) {
 			trackPage.setTrack(track);
 		}

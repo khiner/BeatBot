@@ -73,11 +73,11 @@ public class BeatBotActivity extends Activity implements
 	private long lastTapTime = 0;
 
 	private void initLevelsIconGroup() {
-		levelsGroup = (ViewGroup) findViewById(R.id.levelsLayout);
-		volume = (ToggleButton) findViewById(R.id.volumeButton);
-		pan = (ToggleButton) findViewById(R.id.panButton);
-		pitch = (ToggleButton) findViewById(R.id.pitchButton);
-		levelBar = (TronSeekbar) findViewById(R.id.levelBar);
+		levelsGroup = (ViewGroup) findViewById(R.id.masterLevels);
+		volume = (ToggleButton) findViewById(R.id.masterVolumeToggle);
+		pan = (ToggleButton) findViewById(R.id.masterPanToggle);
+		pitch = (ToggleButton) findViewById(R.id.masterPitchToggle);
+		levelBar = (TronSeekbar) findViewById(R.id.masterLevel);
 		levelBar.addLevelListener(this);
 		setMasterVolume(GlobalVars.MASTER_VOL_LEVEL);
 		setMasterPan(GlobalVars.MASTER_PAN_LEVEL);

@@ -81,6 +81,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	public void setTrack(Track track) {
+		if (this.track == track)
+			return;
 		this.track = track;
 		setSampleFile(track.getInstrument().getCurrSampleFile());
 	}

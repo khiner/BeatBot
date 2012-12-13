@@ -27,9 +27,9 @@ public class LevelsPage extends TrackPage implements LevelListener {
         View view = layoutInflater.inflate(R.layout.levels_edit, this);
         trackLevel = (TronSeekbar) view.findViewById(R.id.trackLevel);
 		trackLevel.addLevelListener(this);
-		volumeToggle = (ToggleButton) view.findViewById(R.id.volumeToggle);
-		panToggle = (ToggleButton) view.findViewById(R.id.panToggle);
-		pitchToggle = (ToggleButton) view.findViewById(R.id.pitchToggle);
+		volumeToggle = (ToggleButton) view.findViewById(R.id.trackVolumeToggle);
+		panToggle = (ToggleButton) view.findViewById(R.id.trackPanToggle);
+		pitchToggle = (ToggleButton) view.findViewById(R.id.trackPitchToggle);
 		
 		volumeToggle.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {

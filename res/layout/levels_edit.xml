@@ -5,7 +5,7 @@
     android:orientation="horizontal" >
 
         <ToggleButton
-            android:id="@+id/volumeToggle"
+            android:id="@+id/trackVolumeToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/volume_btn_src"
@@ -14,7 +14,7 @@
             android:textOn="" />
 
         <ToggleButton
-            android:id="@+id/panToggle"
+            android:id="@+id/trackPanToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/pan_btn_src"
@@ -23,7 +23,7 @@
             android:textOn="" />
 
         <ToggleButton
-            android:id="@+id/pitchToggle"
+            android:id="@+id/trackPitchToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/pitch_btn_src"
