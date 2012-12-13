@@ -17,12 +17,10 @@
 
 package android.support.v4.view;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.os.Build;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.support.v4.os.ParcelableCompat;
-import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -31,8 +29,6 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.Scroller;
-
-import java.util.ArrayList;
 
 /**
  * Layout manager that allows the user to flip horizontally or vertically
@@ -59,9 +55,6 @@ public class DirectionalViewPager extends ViewPager {
 
     private PagerAdapter mAdapter;
     private int mCurItem; // Index of currently displayed page.
-    private int mRestoredCurItem = -1;
-    private Parcelable mRestoredAdapterState = null;
-    private ClassLoader mRestoredClassLoader = null;
     private Scroller mScroller;
 
     private int mChildWidthMeasureSpec;
@@ -70,7 +63,6 @@ public class DirectionalViewPager extends ViewPager {
 
     private boolean mScrollingCacheEnabled;
 
-    private boolean mPopulatePending;
     private boolean mScrolling;
 
     private boolean mIsBeingDragged;
@@ -146,29 +138,7 @@ public class DirectionalViewPager extends ViewPager {
     }
 
     public void setAdapter(PagerAdapter adapter) {
-        if (mAdapter != null) {
-
-            VerticalViewPagerCompat.setDataSetObserver(mAdapter, null);
-        }
-
         mAdapter = adapter;
-
-        if (mAdapter != null) {
-            if (mObserver == null) {
-                mObserver = new DataSetObserver();
-            }
-            VerticalViewPagerCompat.setDataSetObserver(mAdapter, mObserver);
-            mPopulatePending = false;
-            if (mRestoredCurItem >= 0) {
-                mAdapter.restoreState(mRestoredAdapterState, mRestoredClassLoader);
-                setCurrentItemInternal(mRestoredCurItem, false, true);
-                mRestoredCurItem = -1;
-                mRestoredAdapterState = null;
-                mRestoredClassLoader = null;
-            } else {
-                populate();
-            }
-        }
     }
 
     public PagerAdapter getAdapter() {
@@ -176,7 +146,6 @@ public class DirectionalViewPager extends ViewPager {
     }
 
     public void setCurrentItem(int item) {
-        mPopulatePending = false;
         setCurrentItemInternal(item, true, false);
     }
 
@@ -204,7 +173,7 @@ public class DirectionalViewPager extends ViewPager {
         }
         final boolean dispatchSelected = mCurItem != item;
         mCurItem = item;
-        populate();
+
         if (smoothScroll) {
             if (mOrientation == HORIZONTAL) {
                 smoothScrollTo(getWidth() * item, 0);
@@ -271,86 +240,6 @@ public class DirectionalViewPager extends ViewPager {
         return ii;
     }
 
-    void populate() {
-
-    }
-
-    public static class SavedState extends BaseSavedState {
-        int position;
-        Parcelable adapterState;
-        ClassLoader loader;
-
-        public SavedState(Parcelable superState) {
-            super(superState);
-        }
-
-        @Override
-        public void writeToParcel(Parcel out, int flags) {
-            super.writeToParcel(out, flags);
-            out.writeInt(position);
-            out.writeParcelable(adapterState, flags);
-        }
-
-        @Override
-        public String toString() {
-            return "FragmentPager.SavedState{"
-                    + Integer.toHexString(System.identityHashCode(this))
-                    + " position=" + position + "}";
-        }
-
-        public static final Parcelable.Creator<SavedState> CREATOR = ParcelableCompat
-                .newCreator(new ParcelableCompatCreatorCallbacks<SavedState>() {
-                    @Override
-                    public SavedState createFromParcel(Parcel in, ClassLoader loader) {
-                        return new SavedState(in, loader);
-                    }
-
-                    @Override
-                    public SavedState[] newArray(int size) {
-                        return new SavedState[size];
-                    }
-                });
-
-        SavedState(Parcel in, ClassLoader loader) {
-            super(in);
-            if (loader == null) {
-                loader = getClass().getClassLoader();
-            }
-            position = in.readInt();
-            adapterState = in.readParcelable(loader);
-            this.loader = loader;
-        }
-    }
-
-    @Override
-    public Parcelable onSaveInstanceState() {
-        Parcelable superState = super.onSaveInstanceState();
-        SavedState ss = new SavedState(superState);
-        ss.position = mCurItem;
-        ss.adapterState = mAdapter.saveState();
-        return ss;
-    }
-
-    @Override
-    public void onRestoreInstanceState(Parcelable state) {
-        if (!(state instanceof SavedState)) {
-            super.onRestoreInstanceState(state);
-            return;
-        }
-
-        SavedState ss = (SavedState) state;
-        super.onRestoreInstanceState(ss.getSuperState());
-
-        if (mAdapter != null) {
-            mAdapter.restoreState(ss.adapterState, ss.loader);
-            setCurrentItemInternal(ss.position, false, true);
-        } else {
-            mRestoredCurItem = ss.position;
-            mRestoredAdapterState = ss.adapterState;
-            mRestoredClassLoader = ss.loader;
-        }
-    }
-
     public int getOrientation() {
         return mOrientation;
     }
@@ -360,7 +249,6 @@ public class DirectionalViewPager extends ViewPager {
             case HORIZONTAL:
             case VERTICAL:
                 break;
-
             default:
                 throw new IllegalArgumentException(
                         "Only HORIZONTAL and VERTICAL are valid orientations.");
@@ -417,14 +305,6 @@ public class DirectionalViewPager extends ViewPager {
             }
         }
         return null;
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        if (mAdapter != null) {
-            populate();
-        }
     }
 
     @Override
@@ -572,7 +452,6 @@ public class DirectionalViewPager extends ViewPager {
             }
             setScrollState(SCROLL_STATE_IDLE);
         }
-        mPopulatePending = false;
         mScrolling = false;
         for (int i = 0; i < mItems.size(); i++) {
             ItemInfo ii = mItems.get(i);
@@ -868,8 +747,6 @@ public class DirectionalViewPager extends ViewPager {
                         lastMotion = mLastMotionY;
                         sizeOverThree = getHeight() / 3;
                     }
-
-                    mPopulatePending = true;
                     if ((Math.abs(initialVelocity) > mMinimumVelocity)
                             || Math.abs(mInitialMotion - lastMotion) >= sizeOverThree) {
                         if (lastMotion > mInitialMotion) {
