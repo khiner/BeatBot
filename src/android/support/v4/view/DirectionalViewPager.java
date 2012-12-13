@@ -58,7 +58,6 @@ public class DirectionalViewPager extends ViewPager {
 
     private int mChildWidthMeasureSpec;
     private int mChildHeightMeasureSpec;
-    private boolean mInLayout;
 
     private boolean mScrollingCacheEnabled;
 
@@ -94,7 +93,6 @@ public class DirectionalViewPager extends ViewPager {
 
     DataSetObserver mObserver;
 
-    private OnPageChangeListener mOnPageChangeListener;
 
     private int mScrollState = SCROLL_STATE_IDLE;
 
@@ -131,9 +129,6 @@ public class DirectionalViewPager extends ViewPager {
         }
 
         mScrollState = newState;
-        if (mOnPageChangeListener != null) {
-            mOnPageChangeListener.onPageScrollStateChanged(newState);
-        }
     }
 
     public void setCurrentItem(int item) {
@@ -158,7 +153,6 @@ public class DirectionalViewPager extends ViewPager {
                 mItems.get(i).scrolling = true;
             }
         }
-        final boolean dispatchSelected = mCurItem != item;
         mCurItem = item;
 
         if (smoothScroll) {
@@ -167,13 +161,7 @@ public class DirectionalViewPager extends ViewPager {
             } else {
                 smoothScrollTo(0, getHeight() * item);
             }
-            if (dispatchSelected && mOnPageChangeListener != null) {
-                mOnPageChangeListener.onPageSelected(item);
-            }
         } else {
-            if (dispatchSelected && mOnPageChangeListener != null) {
-                mOnPageChangeListener.onPageSelected(item);
-            }
             completeScroll();
             if (mOrientation == HORIZONTAL) {
                 scrollTo(getWidth() * item, 0);
@@ -181,10 +169,6 @@ public class DirectionalViewPager extends ViewPager {
                 scrollTo(0, getHeight() * item);
             }
         }
-    }
-
-    public void setOnPageChangeListener(OnPageChangeListener listener) {
-        mOnPageChangeListener = listener;
     }
 
     /**
@@ -279,12 +263,7 @@ public class DirectionalViewPager extends ViewPager {
 
     @Override
     public void addView(View child, int index, ViewGroup.LayoutParams params) {
-        if (mInLayout) {
-            addViewInLayout(child, index, params);
-            child.measure(mChildWidthMeasureSpec, mChildHeightMeasureSpec);
-        } else {
-            super.addView(child, index, params);
-        }
+    	super.addView(child, index, params);
 
         if (USE_CACHE) {
             if (child.getVisibility() != GONE) {
@@ -321,10 +300,6 @@ public class DirectionalViewPager extends ViewPager {
         mChildHeightMeasureSpec = MeasureSpec.makeMeasureSpec(getMeasuredHeight() -
                 getPaddingTop() - getPaddingBottom(), MeasureSpec.EXACTLY);
 
-        // Make sure we have created all fragments that we need to have shown.
-        mInLayout = true;
-        populate();
-        mInLayout = false;
 
         // Make sure all children have been properly measured.
         final int size = getChildCount();
@@ -361,10 +336,6 @@ public class DirectionalViewPager extends ViewPager {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        mInLayout = true;
-        populate();
-        mInLayout = false;
-
         final int count = getChildCount();
         final int size = (mOrientation == HORIZONTAL) ? r - l : b - t;
 
@@ -406,23 +377,6 @@ public class DirectionalViewPager extends ViewPager {
 
                 if (oldX != x || oldY != y) {
                     scrollTo(x, y);
-                }
-
-                if (mOnPageChangeListener != null) {
-                    int size;
-                    int value;
-                    if (mOrientation == HORIZONTAL) {
-                        size = getWidth();
-                        value = x;
-                    } else {
-                        size = getHeight();
-                        value = y;
-                    }
-
-                    final int position = value / size;
-                    final int offsetPixels = value % size;
-                    final float offset = (float) offsetPixels / size;
-                    mOnPageChangeListener.onPageScrolled(position, offset, offsetPixels);
                 }
 
                 // Keep on drawing until the animation has finished.
@@ -711,13 +665,6 @@ public class DirectionalViewPager extends ViewPager {
                         // Don't lose the rounded component
                         mLastMotionY += scroll - (int) scroll;
                         scrollTo(getScrollX(), (int) scroll);
-                    }
-                    if (mOnPageChangeListener != null) {
-                        final int position = (int) scroll / size;
-                        final int positionOffsetPixels = (int) scroll % size;
-                        final float positionOffset = (float) positionOffsetPixels / size;
-                        mOnPageChangeListener.onPageScrolled(position, positionOffset,
-                                positionOffsetPixels);
                     }
                 }
                 break;
