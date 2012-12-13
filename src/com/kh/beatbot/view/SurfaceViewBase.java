@@ -29,7 +29,6 @@ import android.view.SurfaceView;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.layout.page.TrackPageFactory;
 
 public abstract class SurfaceViewBase extends SurfaceView implements
 		SurfaceHolder.Callback, Runnable {

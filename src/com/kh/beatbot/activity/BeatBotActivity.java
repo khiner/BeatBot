@@ -27,7 +27,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -63,7 +62,7 @@ public class BeatBotActivity extends Activity implements
 	// frequently
 	private ToggleButton volume, pan, pitch;
 	private TronSeekbar levelBar;
-	private ViewGroup levelsGroup;
+
 	private DirectionalViewPager trackPager;
 	
 	private static AssetManager assetManager;
@@ -73,11 +72,10 @@ public class BeatBotActivity extends Activity implements
 	private long lastTapTime = 0;
 
 	private void initLevelsIconGroup() {
-		levelsGroup = (ViewGroup) findViewById(R.id.masterLevels);
 		volume = (ToggleButton) findViewById(R.id.masterVolumeToggle);
 		pan = (ToggleButton) findViewById(R.id.masterPanToggle);
 		pitch = (ToggleButton) findViewById(R.id.masterPitchToggle);
-		levelBar = (TronSeekbar) findViewById(R.id.masterLevel);
+		levelBar = (TronSeekbar) findViewById(R.id.masterLevelBar);
 		levelBar.addLevelListener(this);
 		setMasterVolume(GlobalVars.MASTER_VOL_LEVEL);
 		setMasterPan(GlobalVars.MASTER_PAN_LEVEL);
@@ -237,12 +235,6 @@ public class BeatBotActivity extends Activity implements
 		MidiTrackControlHelper.addListener(this);
 		if (savedInstanceState != null) {
 			GlobalVars.midiView.readFromBundle(savedInstanceState);
-			// if going to levels view or in levels view, level icons should be
-			// visible
-			int levelsVisibilityState = GlobalVars.midiView.getViewState() == MidiView.State.TO_LEVELS_VIEW
-					|| GlobalVars.midiView.getViewState() == MidiView.State.LEVELS_VIEW ? View.VISIBLE
-					: View.GONE;
-			levelsGroup.setVisibility(levelsVisibilityState);
 
 		}
 

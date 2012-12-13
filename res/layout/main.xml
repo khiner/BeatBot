@@ -55,16 +55,6 @@
         android:background="@drawable/plus_icon_large"
        	android:onClick="addTrack" />
         
-    <com.kh.beatbot.view.TronSeekbar
-            android:id="@+id/masterLevel"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/addTrack"
-            android:layout_alignBottom="@+id/addTrack"
-            android:layout_toRightOf="@+id/masterLevels"
-            android:layout_marginRight="4dp" />
-        
     <LinearLayout
         android:id="@+id/masterLevels"
         android:layout_width="wrap_content"
@@ -76,8 +66,8 @@
 
         <ToggleButton
             android:id="@+id/masterVolumeToggle"
-            android:layout_width="60dp"
-            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="@drawable/volume_btn_src"
             android:checked="true"
             android:onClick="volume"
@@ -86,8 +76,8 @@
 
         <ToggleButton
             android:id="@+id/masterPanToggle"
-            android:layout_width="60dp"
-            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="@drawable/pan_btn_src"
             android:onClick="pan"
             android:textOff=""
@@ -95,12 +85,19 @@
 
         <ToggleButton
             android:id="@+id/masterPitchToggle"
-            android:layout_width="60dp"
-            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="@drawable/pitch_btn_src"
             android:onClick="pitch"
             android:textOff=""
             android:textOn="" />
+        
+        <com.kh.beatbot.view.TronSeekbar
+            android:id="@+id/masterLevelBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginRight="4dp" />
+        
     </LinearLayout>
     
 	<android.support.v4.view.DirectionalViewPager
