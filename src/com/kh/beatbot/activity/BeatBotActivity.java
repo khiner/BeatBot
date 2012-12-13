@@ -22,9 +22,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Parcelable;
 import android.support.v4.view.DirectionalViewPager;
-import android.support.v4.view.PagerAdapter;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -58,82 +56,6 @@ import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
 public class BeatBotActivity extends Activity implements
 		MidiTrackControlListener, LevelListener {
-
-private class TrackPagerAdapter extends PagerAdapter {
-		@Override
-		public int getCount() {
-			return TrackPage.NUM_TRACK_PAGES;
-		}
-
-	    /**
-	     * Create the page for the given position.  The adapter is responsible
-	     * for adding the view to the container given here, although it only
-	     * must ensure this is done by the time it returns from
-	     * {@link #finishUpdate(android.view.ViewGroup)}.
-	     *
-	     * @param collection The containing View in which the page will be shown.
-	     * @param position The page position to be instantiated.
-	     * @return Returns an Object representing the new page.  This does not
-	     * need to be a View, but can be some other container of the page.
-	     */
-		@Override
-		public Object instantiateItem(ViewGroup collection, int position) {
-			return TrackPageFactory.createPage(cxt, collection, TrackPage.getPageType(position)); 
-		}
-
-	    /**
-	     * Remove a page for the given position.  The adapter is responsible
-	     * for removing the view from its container, although it only must ensure
-	     * this is done by the time it returns from {@link #finishUpdate(android.view.ViewGroup)}.
-	     *
-	     * @param collection The containing View from which the page will be removed.
-	     * @param position The page position to be removed.
-	     * @param view The same object that was returned by
-	     * {@link #instantiateItem(android.view.View, int)}.
-	     */
-		@Override
-		public void destroyItem(ViewGroup collection, int position, Object view) {
-			//collection.removeView((View)view);
-		}
-
-
-        /**
-         * Determines whether a page View is associated with a specific key object
-         * as returned by instantiateItem(ViewGroup, int). This method is required
-         * for a PagerAdapter to function properly.
-         * @param view Page View to check for association with object
-         * @param object Object to check for association with view
-         * @return
-         */
-		@Override
-		public boolean isViewFromObject(View view, Object object) {
-			return (view==object);
-		}
-
-		
-	    /**
-	     * Called when the a change in the shown pages has been completed.  At this
-	     * point you must ensure that all of the pages have actually been added or
-	     * removed from the container as appropriate.
-	     * @param arg0 The containing View which is displaying this adapter's
-	     * page views.
-	     */
-		@Override
-		public void finishUpdate(ViewGroup arg0) {}
-		
-
-		@Override
-		public void restoreState(Parcelable arg0, ClassLoader arg1) {}
-
-		@Override
-		public Parcelable saveState() {
-			return null;
-		}
-
-		@Override
-		public void startUpdate(ViewGroup arg0) {}
-    	
-    }
 	
 	private Context cxt = this;
 	private Animation fadeIn, fadeOut;
@@ -143,7 +65,6 @@ private class TrackPagerAdapter extends PagerAdapter {
 	private TronSeekbar levelBar;
 	private ViewGroup levelsGroup;
 	private DirectionalViewPager trackPager;
-	private TrackPagerAdapter trackPagerAdapter;
 	
 	private static AssetManager assetManager;
 
@@ -307,10 +228,8 @@ private class TrackPagerAdapter extends PagerAdapter {
 				"REDRING-1969-v03.ttf");
 		initManagers(savedInstanceState);
         trackPager = (DirectionalViewPager) findViewById(R.id.trackPager);
-        trackPagerAdapter = new TrackPagerAdapter();
-        trackPager.setAdapter(trackPagerAdapter);
 		for (int i = 0; i < TrackPage.NUM_TRACK_PAGES; i++) {
-			trackPager.addNewItem(i, i);
+			trackPager.addNewItem(i, TrackPageFactory.createPage(cxt, trackPager, TrackPage.getPageType(i)));
 		}
 		setEditIconsEnabled(false);
 		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));

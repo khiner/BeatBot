@@ -53,7 +53,6 @@ public class DirectionalViewPager extends ViewPager {
 
     private final ArrayList<ItemInfo> mItems = new ArrayList<ItemInfo>();
 
-    private PagerAdapter mAdapter;
     private int mCurItem; // Index of currently displayed page.
     private Scroller mScroller;
 
@@ -137,31 +136,19 @@ public class DirectionalViewPager extends ViewPager {
         }
     }
 
-    public void setAdapter(PagerAdapter adapter) {
-        mAdapter = adapter;
-    }
-
-    public PagerAdapter getAdapter() {
-        return mAdapter;
-    }
-
     public void setCurrentItem(int item) {
         setCurrentItemInternal(item, true, false);
     }
 
     void setCurrentItemInternal(int item, boolean smoothScroll, boolean always) {
-        if (mAdapter == null || mAdapter.getCount() <= 0) {
-            setScrollingCacheEnabled(false);
-            return;
-        }
         if (!always && mCurItem == item && mItems.size() != 0) {
             setScrollingCacheEnabled(false);
             return;
         }
         if (item < 0) {
             item = 0;
-        } else if (item >= mAdapter.getCount()) {
-            item = mAdapter.getCount() - 1;
+        } else if (item >= mItems.size()) {
+            item = mItems.size() - 1;
         }
         if (item > (mCurItem + 1) || item < (mCurItem - 1)) {
             // We are doing a jump by more than one page. To avoid
@@ -231,13 +218,24 @@ public class DirectionalViewPager extends ViewPager {
     public android.support.v4.view.ViewPager.ItemInfo addNewItem(int position, int index) {
         ItemInfo ii = new ItemInfo();
         ii.position = position;
-        ii.object = mAdapter.instantiateItem(this, position);
+        //ii.object = mAdapter.instantiateItem(this, position);
         if (index < 0) {
             mItems.add(ii);
         } else {
             mItems.add(index, ii);
         }
         return ii;
+    }
+    
+    public void addNewItem(int position, View view) {
+        ItemInfo ii = new ItemInfo();
+        ii.position = position;
+        ii.object = view;
+        if (position< 0) {
+            mItems.add(ii);
+        } else {
+            mItems.add(position, ii);
+        }
     }
 
     public int getOrientation() {
@@ -300,7 +298,7 @@ public class DirectionalViewPager extends ViewPager {
     android.support.v4.view.ViewPager.ItemInfo infoForChild(View child) {
         for (int i = 0; i < mItems.size(); i++) {
             ItemInfo ii = mItems.get(i);
-            if (mAdapter.isViewFromObject(child, ii.object)) {
+            if (child == ii.object) {
                 return ii;
             }
         }
@@ -619,11 +617,6 @@ public class DirectionalViewPager extends ViewPager {
             return false;
         }
 
-        if (mAdapter == null || mAdapter.getCount() == 0) {
-            // Nothing to present or scroll; nothing to touch.
-            return false;
-        }
-
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain();
         }
@@ -704,7 +697,7 @@ public class DirectionalViewPager extends ViewPager {
 
                     final float lowerBound = Math.max(0, (mCurItem - 1) * size);
                     final float upperBound =
-                            Math.min(mCurItem + 1, mAdapter.getCount() - 1) * size;
+                            Math.min(mCurItem + 1, mItems.size() - 1) * size;
                     if (scroll < lowerBound) {
                         scroll = lowerBound;
                     } else if (scroll > upperBound) {
