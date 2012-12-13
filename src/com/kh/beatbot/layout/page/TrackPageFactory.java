@@ -28,6 +28,7 @@ public final class TrackPageFactory {
 			TrackPage newPage = createPageInstance(context, pageType);
 			instances.put(pageType, newPage);
 			parent.addView(newPage);
+			parent.refreshDrawableState();
 		}
 		return instances.get(pageType);
 	}
@@ -38,6 +39,8 @@ public final class TrackPageFactory {
 			return new SampleEditPage(context);
 		case SELECT:
 			return new SampleSelectPage(context);
+		case LEVELS:
+			return new LevelsPage(context);
 		}
 		return null;
 	}

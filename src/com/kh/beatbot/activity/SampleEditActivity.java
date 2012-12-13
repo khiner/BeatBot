@@ -22,19 +22,15 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremelo;
-import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listenable.LabelListListenable;
-import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LabelListListener;
-import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
-import com.kh.beatbot.view.TronSeekbar;
 
-public class SampleEditActivity extends Activity implements LevelListener {
+public class SampleEditActivity extends Activity {
 	class EffectLabelListListener implements LabelListListener {
 		private AlertDialog selectEffectAlert = null;
 		private LabelListListenable labelList;
@@ -135,7 +131,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 	}
 
 	// private EditLevelsView editLevelsView = null;
-	private static TronSeekbar volumeLevel, panLevel, pitchLevel;
 	private static LabelListListenable effectLabelList = null,
 			sampleLabelList = null;
 
@@ -153,7 +148,6 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		// set text font
 		((TextView) findViewById(R.id.effectsLabel))
 				.setTypeface(GlobalVars.font);
-		initLevels();
 		initSampleLabelList();
 		initEffectLabelList();
 
@@ -237,61 +231,5 @@ public class SampleEditActivity extends Activity implements LevelListener {
 		if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
 			// if not currently playing, disarm the track
 			currTrack.disarm();
-	}
-
-	private void initLevels() {
-		volumeLevel = ((TronSeekbar) findViewById(R.id.volumeLevel));
-		panLevel = ((TronSeekbar) findViewById(R.id.panLevel));
-		pitchLevel = ((TronSeekbar) findViewById(R.id.pitchLevel));
-		volumeLevel.addLevelListener(this);
-		panLevel.addLevelListener(this);
-		pitchLevel.addLevelListener(this);
-	}
-
-	@Override
-	public void setLevel(LevelListenable levelBar, float level) {
-		if (levelBar.equals(volumeLevel)) {
-			currTrack.setPrimaryVolume(level);
-		} else if (levelBar.equals(panLevel)) {
-			currTrack.setPrimaryPan(level);
-		} else if (levelBar.equals(pitchLevel)) {
-			currTrack.setPrimaryPitch(level);
-		}
-	}
-
-	@Override
-	public void notifyInit(LevelListenable levelBar) {
-		if (levelBar.equals(volumeLevel)) {
-			volumeLevel.setLevelColor(Colors.VOLUME_COLOR);
-			volumeLevel.setLevel(currTrack.volume);
-		} else if (levelBar.equals(panLevel)) {
-			panLevel.setLevelColor(Colors.PAN_COLOR);
-			panLevel.setLevel(currTrack.pan);
-		} else if (levelBar.equals(pitchLevel)) {
-			pitchLevel.setLevelColor(Colors.PITCH_COLOR);
-			pitchLevel.setLevel(currTrack.pitch);
-		}
-	}
-
-	@Override
-	public void notifyPressed(LevelListenable levelBar, boolean pressed) {
-		if (levelBar.equals(volumeLevel)) {
-			((ToggleButton) findViewById(R.id.volumeView)).setChecked(pressed);
-		} else if (levelBar.equals(panLevel)) {
-			((ToggleButton) findViewById(R.id.panView)).setChecked(pressed);
-		} else if (levelBar.equals(pitchLevel)) {
-			((ToggleButton) findViewById(R.id.pitchView)).setChecked(pressed);
-		}
-	}
-
-	@Override
-	public void notifyClicked(LevelListenable levelListenable) {
-		// do nothing when levels are clicked
-	}
-
-	@Override
-	public void setLevel(LevelListenable levelListenable, float levelX,
-			float levelY) {
-		// for 2d seekbar. nothing to do
 	}
 }

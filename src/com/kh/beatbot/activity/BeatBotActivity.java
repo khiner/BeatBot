@@ -60,12 +60,9 @@ public class BeatBotActivity extends Activity implements
 		MidiTrackControlListener, LevelListener {
 
 private class TrackPagerAdapter extends PagerAdapter {
-		
-		private static final int NUM_TRACK_PAGES = 2;
-		
 		@Override
 		public int getCount() {
-			return NUM_TRACK_PAGES;
+			return TrackPage.NUM_TRACK_PAGES;
 		}
 
 	    /**
@@ -96,7 +93,7 @@ private class TrackPagerAdapter extends PagerAdapter {
 	     */
 		@Override
 		public void destroyItem(ViewGroup collection, int position, Object view) {
-			//collection.removeView((LinearLayout) view);
+			//collection.removeView((View)view);
 		}
 
 
@@ -309,9 +306,12 @@ private class TrackPagerAdapter extends PagerAdapter {
 		GlobalVars.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
 		initManagers(savedInstanceState);
-		trackPagerAdapter = new TrackPagerAdapter();
         trackPager = (DirectionalViewPager) findViewById(R.id.trackPager);
+        trackPagerAdapter = new TrackPagerAdapter();
         trackPager.setAdapter(trackPagerAdapter);
+		for (int i = 0; i < TrackPage.NUM_TRACK_PAGES; i++) {
+			trackPager.addNewItem(i, i);
+		}
 		setEditIconsEnabled(false);
 		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));
 		GlobalVars.midiView.initMeFirst();
@@ -592,7 +592,6 @@ private class TrackPagerAdapter extends PagerAdapter {
 
 	@Override
 	public void trackClicked(int track) {
-		//launchSampleEditActivity(track);
 		TrackPageFactory.setTrack(GlobalVars.tracks.get(track));
 	}
 

@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.SampleWaveformView;
 
 public class SampleEditPage extends TrackPage {

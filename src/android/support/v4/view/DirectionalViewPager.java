@@ -259,7 +259,7 @@ public class DirectionalViewPager extends ViewPager {
         invalidate();
     }
 
-    android.support.v4.view.ViewPager.ItemInfo addNewItem(int position, int index) {
+    public android.support.v4.view.ViewPager.ItemInfo addNewItem(int position, int index) {
         ItemInfo ii = new ItemInfo();
         ii.position = position;
         ii.object = mAdapter.instantiateItem(this, position);
@@ -271,137 +271,8 @@ public class DirectionalViewPager extends ViewPager {
         return ii;
     }
 
-    void dataSetChanged() {
-        // This method only gets called if our observer is attached, so mAdapter
-        // is non-null.
-
-        boolean needPopulate = mItems.isEmpty() && mAdapter.getCount() > 0;
-        int newCurrItem = -1;
-
-        for (int i = 0; i < mItems.size(); i++) {
-            final ItemInfo ii = mItems.get(i);
-            final int newPos = mAdapter.getItemPosition(ii.object);
-
-            if (newPos == PagerAdapter.POSITION_UNCHANGED) {
-                continue;
-            }
-
-            if (newPos == PagerAdapter.POSITION_NONE) {
-                mItems.remove(i);
-                i--;
-                mAdapter.destroyItem(this, ii.position, ii.object);
-                needPopulate = true;
-
-                if (mCurItem == ii.position) {
-                    // Keep the current item in the valid range
-                    newCurrItem = Math.max(0, Math.min(mCurItem, mAdapter.getCount() - 1));
-                }
-                continue;
-            }
-
-            if (ii.position != newPos) {
-                if (ii.position == mCurItem) {
-                    // Our current item changed position. Follow it.
-                    newCurrItem = newPos;
-                }
-
-                ii.position = newPos;
-                needPopulate = true;
-            }
-        }
-
-        if (newCurrItem >= 0) {
-            // TODO This currently causes a jump.
-            setCurrentItemInternal(newCurrItem, false, true);
-            needPopulate = true;
-        }
-        if (needPopulate) {
-            populate();
-            requestLayout();
-        }
-    }
-
     void populate() {
-        if (mAdapter == null) {
-            return;
-        }
 
-        // Bail now if we are waiting to populate. This is to hold off
-        // on creating views from the time the user releases their finger to
-        // fling to a new position until we have finished the scroll to
-        // that position, avoiding glitches from happening at that point.
-        if (mPopulatePending) {
-            if (DEBUG)
-                Log.i(TAG, "populate is pending, skipping for now...");
-            return;
-        }
-
-        // Also, don't populate until we are attached to a window. This is to
-        // avoid trying to populate before we have restored our view hierarchy
-        // state and conflicting with what is restored.
-        if (getWindowToken() == null) {
-            return;
-        }
-
-        mAdapter.startUpdate(this);
-
-        final int startPos = mCurItem > 0 ? mCurItem - 1 : mCurItem;
-        final int count = mAdapter.getCount();
-        final int endPos = mCurItem < (count - 1) ? mCurItem + 1 : count - 1;
-
-        if (DEBUG)
-            Log.v(TAG, "populating: startPos=" + startPos + " endPos=" + endPos);
-
-        // Add and remove pages in the existing list.
-        int lastPos = -1;
-        for (int i = 0; i < mItems.size(); i++) {
-            ItemInfo ii = mItems.get(i);
-            if ((ii.position < startPos || ii.position > endPos) && !ii.scrolling) {
-                if (DEBUG)
-                    Log.i(TAG, "removing: " + ii.position + " @ " + i);
-                mItems.remove(i);
-                i--;
-                mAdapter.destroyItem(this, ii.position, ii.object);
-            } else if (lastPos < endPos && ii.position > startPos) {
-                // The next item is outside of our range, but we have a gap
-                // between it and the last item where we want to have a page
-                // shown. Fill in the gap.
-                lastPos++;
-                if (lastPos < startPos) {
-                    lastPos = startPos;
-                }
-                while (lastPos <= endPos && lastPos < ii.position) {
-                    if (DEBUG)
-                        Log.i(TAG, "inserting: " + lastPos + " @ " + i);
-                    addNewItem(lastPos, i);
-                    lastPos++;
-                    i++;
-                }
-            }
-            lastPos = ii.position;
-        }
-
-        // Add any new pages we need at the end.
-        lastPos = mItems.size() > 0 ? mItems.get(mItems.size() - 1).position : -1;
-        if (lastPos < endPos) {
-            lastPos++;
-            lastPos = lastPos > startPos ? lastPos : startPos;
-            while (lastPos <= endPos) {
-                if (DEBUG)
-                    Log.i(TAG, "appending: " + lastPos);
-                addNewItem(lastPos, -1);
-                lastPos++;
-            }
-        }
-
-        if (DEBUG) {
-            Log.i(TAG, "Current page list:");
-            for (int i = 0; i < mItems.size(); i++) {
-                Log.i(TAG, "#" + i + ": page " + mItems.get(i).position);
-            }
-        }
-
-        mAdapter.finishUpdate(this);
     }
 
     public static class SavedState extends BaseSavedState {
