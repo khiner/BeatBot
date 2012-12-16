@@ -5,15 +5,13 @@ import java.nio.FloatBuffer;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 
 import com.kh.beatbot.listenable.LevelListenable;
 
 public class TronSeekbar extends LevelListenable {
-	protected static FloatBuffer levelBarVb = null;
+	protected FloatBuffer levelBarVb = null;
 	protected int numLevelVertices = 0;
 	protected float levelBarHeight = 8;
-	protected static float currWidth = 0;
 	
 	public TronSeekbar(Context c, AttributeSet as) {
 		super(c, as);
@@ -31,14 +29,10 @@ public class TronSeekbar extends LevelListenable {
 		levelBarVb = makeFloatBuffer(vertices);
 	}
 
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
-		super.surfaceChanged(holder, format, width, height);
-		// all seekbars share the same circle VBs, and they should only change when width or height changes
-		if (width != currWidth) {
-			initLevelBarVb();
-			currWidth = width;
-		}
+	protected void init() {
+		initLevelBarVb();
+		updateNumLevelVertices();
+		super.init();
 	}
 	
 	protected void drawBackgroundBar() {
@@ -116,6 +110,8 @@ public class TronSeekbar extends LevelListenable {
 	}
 
 	protected void updateNumLevelVertices() {
+		if (levelBarVb == null)
+			return;
 		numLevelVertices = (int) (level * (levelBarVb.capacity() / 2));
 		// want even number of vertices to avoid jagged ending
 		numLevelVertices += numLevelVertices % 2;

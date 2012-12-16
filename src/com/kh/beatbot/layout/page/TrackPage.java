@@ -6,12 +6,11 @@ import android.widget.LinearLayout;
 import com.kh.beatbot.global.Track;
 
 public abstract class TrackPage extends LinearLayout {
-	public static final int NUM_TRACK_PAGES = 3;
+	protected Context context;
+	public static enum Type {SELECT, EDIT, LEVELS, EFFECTS};
+	private static Type[] pageOrder = {Type.SELECT, Type.EDIT, Type.LEVELS, Type.EFFECTS};
+	public static final int NUM_TRACK_PAGES = pageOrder.length;
 	protected static Track track;
-	
-	public static enum Type {SELECT, EDIT, LEVELS};
-	
-	private static Type[] pageOrder = {Type.SELECT, Type.EDIT, Type.LEVELS};
 	
 	public static Type getPageType(int pageNum) {
 		if (pageNum >= pageOrder.length) {
@@ -22,6 +21,7 @@ public abstract class TrackPage extends LinearLayout {
 	
 	public TrackPage(Context context) {
 		super(context);
+		this.context = context;
 		inflate(context);
 	}
 	

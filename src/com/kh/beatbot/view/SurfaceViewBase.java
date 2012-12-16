@@ -40,7 +40,6 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	protected boolean running;
 	protected int width;
 	protected int height;
-	protected int fps;
 	protected float[] backgroundColor = Colors.BG_COLOR;
 	
 	private static Resources resources;
@@ -221,7 +220,6 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		super(c, as);
 		sHolder = getHolder();
 		sHolder.addCallback(this);
-		this.fps = fps;
 	}
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
@@ -276,20 +274,8 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glEnable(GL10.GL_POINT_SMOOTH);
 		init();
 
-		int delta = -1;
-		if (fps > 0) {
-			delta = 1000 / fps;
-		}
-		long time = System.currentTimeMillis();
-
 		running = true;
 		while (running) {
-			if (System.currentTimeMillis() - time < delta) {
-				try {
-					Thread.sleep(System.currentTimeMillis() - time);
-				} catch (InterruptedException ex) {
-				}
-			}
 			drawFrame(gl, width, height);
 			egl.eglSwapBuffers(dpy, surface);
 
@@ -299,7 +285,6 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 					((Activity) c).finish();
 				}
 			}
-			time = System.currentTimeMillis();
 		}
 		egl.eglMakeCurrent(dpy, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE,
 				EGL10.EGL_NO_CONTEXT);

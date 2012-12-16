@@ -6,8 +6,8 @@
     
     <ToggleButton
         android:id="@+id/playButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="@drawable/play_btn_src"
         android:contentDescription="@string/play"
         android:onClick="play"
@@ -16,16 +16,16 @@
 
     <ImageButton
         android:id="@+id/stopButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="@drawable/stop_btn_src"
         android:contentDescription="@string/stop"
         android:onClick="stop" />
 
     <ToggleButton
         android:id="@+id/recordButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="@drawable/rec_btn_src"
         android:contentDescription="@string/record"
         android:onClick="record"

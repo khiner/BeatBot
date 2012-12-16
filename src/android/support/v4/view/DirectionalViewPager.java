@@ -44,6 +44,8 @@ import android.widget.Scroller;
 public class DirectionalViewPager extends ViewPager {
     private static final String XML_NS = "http://schemas.android.com/apk/res/android";
 
+    private int measureCount = 0;
+    
     public static final int HORIZONTAL = 0;
     public static final int VERTICAL = 1;
 
@@ -51,9 +53,6 @@ public class DirectionalViewPager extends ViewPager {
 
     private int mCurItem; // Index of currently displayed page.
     private Scroller mScroller;
-
-    private int mChildWidthMeasureSpec;
-    private int mChildHeightMeasureSpec;
 
     private boolean mScrolling;
 
@@ -183,11 +182,7 @@ public class DirectionalViewPager extends ViewPager {
         ItemInfo ii = new ItemInfo();
         ii.position = position;
         ii.object = view;
-        if (position< 0) {
-            mItems.add(ii);
-        } else {
-            mItems.add(position, ii);
-        }
+        mItems.add(ii);
     }
 
     public int getOrientation() {
@@ -232,7 +227,7 @@ public class DirectionalViewPager extends ViewPager {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        // For simple implementation, or internal size is always 0.
+        // For simple implementation, our internal size is always 0.
         // We depend on the container to specify the layout size of
         // our view. We can't really know what it is since we will be
         // adding and removing different arbitrary views and do not
@@ -241,26 +236,27 @@ public class DirectionalViewPager extends ViewPager {
                 getDefaultSize(0, heightMeasureSpec));
 
         // Children are just made to fill our space.
-        mChildWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getMeasuredWidth() -
+        int mChildWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getMeasuredWidth() -
                 getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY);
-        mChildHeightMeasureSpec = MeasureSpec.makeMeasureSpec(getMeasuredHeight() -
+        int mChildHeightMeasureSpec = MeasureSpec.makeMeasureSpec(getMeasuredHeight() -
                 getPaddingTop() - getPaddingBottom(), MeasureSpec.EXACTLY);
 
 
         // Make sure all children have been properly measured.
+
+        if (measureCount++ >= 2) {
+        	return;
+        }
         final int size = getChildCount();
         for (int i = 0; i < size; ++i) {
-            final View child = getChildAt(i);
-            if (child.getVisibility() != GONE) {
-                child.measure(mChildWidthMeasureSpec, mChildHeightMeasureSpec);
-            }
+        	final View child = (View)mItems.get(i).object;
+            child.measure(mChildWidthMeasureSpec, mChildHeightMeasureSpec);
         }
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-
         // Make sure scroll position is set correctly.
         if (mOrientation == HORIZONTAL) {
             int scrollPos = mCurItem * w;
@@ -281,11 +277,10 @@ public class DirectionalViewPager extends ViewPager {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         final int count = getChildCount();
         final int size = (mOrientation == HORIZONTAL) ? r - l : b - t;
-
         for (int i = 0; i < count; i++) {
-            View child = getChildAt(i);
+            View child = (View)mItems.get(i).object;
             ItemInfo ii;
-            if (child.getVisibility() != GONE && (ii = infoForChild(child)) != null) {
+            if ((ii = infoForChild(child)) != null) {
                 int off = size * ii.position;
                 int childLeft = getPaddingLeft();
                 int childTop = getPaddingTop();
@@ -345,9 +340,6 @@ public class DirectionalViewPager extends ViewPager {
                 needPopulate = true;
                 ii.scrolling = false;
             }
-        }
-        if (needPopulate) {
-            populate();
         }
     }
 

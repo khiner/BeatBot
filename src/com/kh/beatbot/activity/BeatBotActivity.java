@@ -23,6 +23,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.view.DirectionalViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -33,6 +34,8 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.effect.Effect.EffectParam;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
@@ -60,7 +63,7 @@ public class BeatBotActivity extends Activity implements
 	private Animation fadeIn, fadeOut;
 	// these are used as variables for convenience, since they are reference
 	// frequently
-	private ToggleButton volume, pan, pitch;
+	private ImageButton volume, pan, pitch;
 	private TronSeekbar levelBar;
 
 	private DirectionalViewPager trackPager;
@@ -72,9 +75,9 @@ public class BeatBotActivity extends Activity implements
 	private long lastTapTime = 0;
 
 	private void initLevelsIconGroup() {
-		volume = (ToggleButton) findViewById(R.id.masterVolumeToggle);
-		pan = (ToggleButton) findViewById(R.id.masterPanToggle);
-		pitch = (ToggleButton) findViewById(R.id.masterPitchToggle);
+		volume = (ImageButton) findViewById(R.id.masterVolumeToggle);
+		pan = (ImageButton) findViewById(R.id.masterPanToggle);
+		pitch = (ImageButton) findViewById(R.id.masterPitchToggle);
 		levelBar = (TronSeekbar) findViewById(R.id.masterLevelBar);
 		levelBar.addLevelListener(this);
 		setMasterVolume(GlobalVars.MASTER_VOL_LEVEL);
@@ -97,11 +100,6 @@ public class BeatBotActivity extends Activity implements
 		instrumentSelectAlert = builder.create();
 		instrumentSelectAlert
 				.setOnShowListener(GlobalVars.instrumentSelectOnShowListener);
-	}
-
-	private void initManagers(Bundle savedInstanceState) {
-		Managers.init(savedInstanceState);
-		Managers.midiManager.setActivity(this);
 	}
 
 	private void copyFile(InputStream in, OutputStream out) throws IOException {
@@ -210,6 +208,7 @@ public class BeatBotActivity extends Activity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		GlobalVars.mainActivity = this;
 		GeneralUtils.initAndroidSettings(this);
 		initDataDir();
 		copyAllSamplesToStorage();
@@ -224,7 +223,7 @@ public class BeatBotActivity extends Activity implements
 		initInstrumentSelectAlert();
 		GlobalVars.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
-		initManagers(savedInstanceState);
+		Managers.init(savedInstanceState);
         trackPager = (DirectionalViewPager) findViewById(R.id.trackPager);
 		for (int i = 0; i < TrackPage.NUM_TRACK_PAGES; i++) {
 			trackPager.addNewItem(i, TrackPageFactory.createPage(cxt, trackPager, TrackPage.getPageType(i)));
@@ -235,7 +234,6 @@ public class BeatBotActivity extends Activity implements
 		MidiTrackControlHelper.addListener(this);
 		if (savedInstanceState != null) {
 			GlobalVars.midiView.readFromBundle(savedInstanceState);
-
 		}
 
 		// were we recording and/or playing before losing the instance?
@@ -323,6 +321,21 @@ public class BeatBotActivity extends Activity implements
 		}
 	}
 
+	public void quantizeEffectParams() {
+		for (int trackId = 0; trackId < GlobalVars.tracks.size(); trackId++) {
+			for (Effect effect : GlobalVars.tracks.get(trackId).effects) {
+				for (int paramNum = 0; paramNum < effect.getNumParams(); paramNum++) {
+					EffectParam param = effect.getParam(paramNum);
+					if (param.beatSync) {
+						effect.setParamLevel(param, param.viewLevel);
+						effect.setEffectParam(trackId, effect.getId(),
+								paramNum, param.level);
+					}
+				}
+			}
+		}
+	}
+
 	public void setEditIconsEnabled(final boolean enabled) {
 		setDeleteIconEnabled(enabled);
 		setCopyIconEnabled(enabled);
@@ -348,17 +361,6 @@ public class BeatBotActivity extends Activity implements
 		});
 	}
 
-	/**
-	 * Open new intent for sample edit view, passing the track number to the
-	 * intent as an extra.
-	 */
-	private void launchSampleEditActivity(int trackId) {
-		Intent intent = new Intent();
-		intent.setClass(this, SampleEditActivity.class);
-		intent.putExtra("trackId", trackId);
-		startActivity(intent);
-	}
-
 	public void record(View view) {
 		if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
 			// Managers.recordManager.stopListening();
@@ -368,6 +370,7 @@ public class BeatBotActivity extends Activity implements
 		} else {
 			GlobalVars.midiView.reset();
 			// if we're already playing, midiManager is already ticking away.
+			((ToggleButton)findViewById(R.id.playButton)).setChecked(true);
 			if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
 				play(findViewById(R.id.playButton));
 			Managers.recordManager.startRecordingNative();
@@ -376,7 +379,6 @@ public class BeatBotActivity extends Activity implements
 	}
 
 	public void play(View view) {
-		((ToggleButton) view).setChecked(true);
 		if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			Managers.playbackManager.reset();
 			Managers.midiManager.reset();
@@ -388,12 +390,12 @@ public class BeatBotActivity extends Activity implements
 	public void stop(View view) {
 		if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
 			ToggleButton recordButton = (ToggleButton) findViewById(R.id.recordButton);
-			record(recordButton);
 			recordButton.setChecked(false);
+			record(recordButton);
 		}
 		if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
+			((ToggleButton)findViewById(R.id.playButton)).setChecked(false);
 			Managers.playbackManager.stop();
-			((ToggleButton) findViewById(R.id.playButton)).setChecked(false);
 			Managers.midiManager.reset();
 		}
 	}
@@ -429,25 +431,25 @@ public class BeatBotActivity extends Activity implements
 	}
 
 	public void volume(View view) {
-		volume.setChecked(true);
-		pan.setChecked(false);
-		pitch.setChecked(false);
+		volume.setSelected(true);
+		pan.setSelected(false);
+		pitch.setSelected(false);
 		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.VOLUME);
 		updateLevelBar();
 	}
 
 	public void pan(View view) {
-		volume.setChecked(false);
-		pan.setChecked(true);
-		pitch.setChecked(false);
+		volume.setSelected(false);
+		pan.setSelected(true);
+		pitch.setSelected(false);
 		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.PAN);
 		updateLevelBar();
 	}
 
 	public void pitch(View view) {
-		volume.setChecked(false);
-		pan.setChecked(false);
-		pitch.setChecked(true);
+		volume.setSelected(false);
+		pan.setSelected(false);
+		pitch.setSelected(true);
 		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.PITCH);
 		updateLevelBar();
 	}
@@ -548,8 +550,7 @@ public class BeatBotActivity extends Activity implements
 		GlobalVars.tracks
 				.add(new Track(GlobalVars.tracks.size(), newInstrument));
 		GlobalVars.midiView.updateTracks();
-		// launch sample edit activity for the newly added track
-		launchSampleEditActivity(GlobalVars.tracks.size() - 1);
+		// TODO update track pages
 	}
 
 	public static native void addTrack(String sampleFileName);

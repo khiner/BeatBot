@@ -3,7 +3,7 @@ package com.kh.beatbot.layout.page;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ToggleButton;
+import android.widget.ImageButton;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.Colors;
@@ -14,7 +14,7 @@ import com.kh.beatbot.view.TronSeekbar;
 public class LevelsPage extends TrackPage implements LevelListener {
 	private enum LevelType {VOLUME, PAN, PITCH};
 	private TronSeekbar trackLevel;
-	private ToggleButton volumeToggle, panToggle, pitchToggle;
+	private ImageButton volumeToggle, panToggle, pitchToggle;
 	private LevelType activeLevelType = LevelType.VOLUME;
 	
 	public LevelsPage(Context context) {
@@ -27,32 +27,29 @@ public class LevelsPage extends TrackPage implements LevelListener {
         View view = layoutInflater.inflate(R.layout.levels_edit, this);
         trackLevel = (TronSeekbar) view.findViewById(R.id.trackLevel);
 		trackLevel.addLevelListener(this);
-		volumeToggle = (ToggleButton) view.findViewById(R.id.trackVolumeToggle);
-		panToggle = (ToggleButton) view.findViewById(R.id.trackPanToggle);
-		pitchToggle = (ToggleButton) view.findViewById(R.id.trackPitchToggle);
+		volumeToggle = (ImageButton) view.findViewById(R.id.trackVolumeToggle);
+		panToggle = (ImageButton) view.findViewById(R.id.trackPanToggle);
+		pitchToggle = (ImageButton) view.findViewById(R.id.trackPitchToggle);
 		
 		volumeToggle.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
             	activeLevelType = LevelType.VOLUME;
-            	panToggle.setChecked(false);
-            	pitchToggle.setChecked(false);
             	updateDisplay();
+            	volumeToggle.setSelected(true);
             }
         });
 		panToggle.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
             	activeLevelType = LevelType.PAN;
-            	volumeToggle.setChecked(false);
-            	pitchToggle.setChecked(false);
             	updateDisplay();
+            	panToggle.setSelected(true);
             }
         });
 		pitchToggle.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
             	activeLevelType = LevelType.PITCH;
-            	panToggle.setChecked(false);
-            	volumeToggle.setChecked(false);
             	updateDisplay();
+            	pitchToggle.setSelected(true);
             }
         });
 	}
@@ -75,7 +72,6 @@ public class LevelsPage extends TrackPage implements LevelListener {
 			track.setPrimaryPitch(level);
 			break;
 		}
-		track.setPrimaryVolume(level);
 	}
 
 	@Override
@@ -97,6 +93,12 @@ public class LevelsPage extends TrackPage implements LevelListener {
 	public void setLevel(LevelListenable levelListenable, float levelX,
 			float levelY) {
 		// for 2d seekbar. nothing to do
+	}
+	
+	private void deselectAll() {
+		volumeToggle.setSelected(false);
+		panToggle.setSelected(false);
+		pitchToggle.setSelected(false);
 	}
 	
 	private float[] getActiveLevelColor() {
@@ -124,6 +126,7 @@ public class LevelsPage extends TrackPage implements LevelListener {
 	}
 	
 	private void updateDisplay() {
+		deselectAll();
 		trackLevel.setLevelColor(getActiveLevelColor());
 		trackLevel.setLevel(getActiveLevel());
 	}

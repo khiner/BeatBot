@@ -13,8 +13,6 @@ import java.util.Stack;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.kh.beatbot.activity.BeatBotActivity;
-import com.kh.beatbot.activity.SampleEditActivity;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
@@ -34,8 +32,6 @@ public class MidiManager implements Parcelable {
 	// ticks per quarter note (I think)
 	public static final int RESOLUTION = MidiFile.DEFAULT_RESOLUTION;
 	public static final long TICKS_IN_ONE_MEASURE = RESOLUTION * 4;
-
-	private BeatBotActivity activity = null;
 
 	private static TimeSignature ts = new TimeSignature();
 	private static Tempo tempo = new Tempo();
@@ -74,10 +70,6 @@ public class MidiManager implements Parcelable {
 		return singletonInstance;
 	}
 
-	public void setActivity(BeatBotActivity activity) {
-		this.activity = activity;
-	}
-
 	public static float getBPM() {
 		return tempo.getBpm();
 	}
@@ -88,7 +80,7 @@ public class MidiManager implements Parcelable {
 		tempo.setBpm(bpm);
 		setNativeBPM(bpm);
 		setNativeMSPT(tempo.getMpqn() / RESOLUTION);
-		SampleEditActivity.quantizeEffectParams();
+		GlobalVars.mainActivity.quantizeEffectParams();
 	}
 
 	public List<MidiNote> getMidiNotes() {
@@ -240,7 +232,7 @@ public class MidiManager implements Parcelable {
 
 	private void updateEditIcons() {
 		boolean anyNoteSelected = anyNoteSelected();
-		activity.setEditIconsEnabled(anyNoteSelected);
+		GlobalVars.mainActivity.setEditIconsEnabled(anyNoteSelected);
 	}
 	
 	public void copy() {
@@ -258,7 +250,7 @@ public class MidiManager implements Parcelable {
 	}
 
 	public void paste(long startTick) {
-		activity.uncheckCopyButton();
+		GlobalVars.mainActivity.uncheckCopyButton();
 		if (copiedNotes.isEmpty())
 			return;
 		saveState();

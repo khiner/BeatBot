@@ -17,9 +17,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.view.MidiView;
 
 public class GlobalVars {
+	public static BeatBotActivity mainActivity;
+	
 	public static Typeface font;
 	// time (in millis) between pointer down and pointer up to be considered a
 	// tap

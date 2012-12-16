@@ -5,7 +5,7 @@
     android:gravity="center_vertical"
     android:orientation="horizontal" >
 
-        <ToggleButton
+        <ImageButton
             android:id="@+id/trackVolumeToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -14,7 +14,7 @@
             android:textOff=""
             android:textOn="" />
 
-        <ToggleButton
+        <ImageButton
             android:id="@+id/trackPanToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -23,7 +23,7 @@
             android:textOff=""
             android:textOn="" />
 
-        <ToggleButton
+        <ImageButton
             android:id="@+id/trackPitchToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

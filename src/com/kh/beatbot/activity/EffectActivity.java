@@ -144,7 +144,7 @@ public class EffectActivity extends Activity implements LevelListener,
 			initDelayKnobs();
 		}
 	}
-
+	
 	protected void initParamControls() {
 		int numParams = effect.getNumParams();
 		paramControls = new ArrayList<EffectControlLayout>();

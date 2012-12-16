@@ -9,7 +9,9 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ViewGroup.LayoutParams;
 
 import com.kh.beatbot.global.BeatBotButton;
 import com.kh.beatbot.global.Colors;
@@ -20,6 +22,8 @@ import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class SampleWaveformView extends SurfaceViewBase {
 
+	private int layoutCount = 0;
+	
 	private static final float[] ADSR_COLOR = Colors.PITCH_COLOR.clone();
 	private static final float[] ADSR_SELECTED_COLOR = { ADSR_COLOR[0],
 			ADSR_COLOR[1], ADSR_COLOR[2], .6f };
@@ -86,7 +90,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		this.track = track;
 		setSampleFile(track.getInstrument().getCurrSampleFile());
 	}
-
+		
 	private void setSampleFile(File sampleFile) {
 		WaveformHelper.setSampleFile(sampleFile);
 		numSamples = sampleFile.length() / 8 - 44;

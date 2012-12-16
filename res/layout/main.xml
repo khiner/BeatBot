@@ -5,6 +5,13 @@
     android:layout_height="fill_parent"
     android:background="@color/background" >
 
+    <android.support.v4.view.DirectionalViewPager
+        android:id="@+id/trackPager"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical" />
+
     <include
         android:id="@+id/leftControlButtons"
         android:layout_width="wrap_content"
@@ -21,7 +28,8 @@
         android:layout_alignParentTop="true"
         layout="@layout/right_control_buttons" />
 
-    <!-- <TextView
+    <!--
+    <TextView
         android:id="@+id/thresholdLabel"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
@@ -38,33 +46,34 @@
         android:layout_toRightOf="@+id/thresholdLabel"
         android:layout_toLeftOf="@+id/levelsLayout"
         android:layout_alignTop="@+id/thresholdLabel"
-        android:layout_alignBottom="@+id/thresholdLabel" /> --> 
+        android:layout_alignBottom="@+id/thresholdLabel" />
+    -->
 
     <com.kh.beatbot.view.MidiView
         android:id="@+id/midiView"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_below="@+id/rightControlButtons"
-        android:layout_above="@+id/addTrack"/>
-    
+        android:layout_above="@+id/addTrack"
+        android:layout_below="@+id/rightControlButtons" />
+
     <ImageButton
         android:id="@+id/addTrack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/trackPager"
         android:background="@drawable/plus_icon_large"
-       	android:onClick="addTrack" />
-        
+        android:onClick="addTrack" />
+
     <LinearLayout
         android:id="@+id/masterLevels"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/addTrack"
-        android:layout_alignTop="@+id/addTrack"
         android:layout_alignBottom="@+id/addTrack"
+        android:layout_alignTop="@+id/addTrack"
+        android:layout_toRightOf="@+id/addTrack"
         android:orientation="horizontal" >
 
-        <ToggleButton
+        <ImageButton
             android:id="@+id/masterVolumeToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -74,7 +83,7 @@
             android:textOff=""
             android:textOn="" />
 
-        <ToggleButton
+        <ImageButton
             android:id="@+id/masterPanToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -83,7 +92,7 @@
             android:textOff=""
             android:textOn="" />
 
-        <ToggleButton
+        <ImageButton
             android:id="@+id/masterPitchToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -91,20 +100,12 @@
             android:onClick="pitch"
             android:textOff=""
             android:textOn="" />
-        
+
         <com.kh.beatbot.view.TronSeekbar
             android:id="@+id/masterLevelBar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginRight="4dp" />
-        
     </LinearLayout>
-    
-	<android.support.v4.view.DirectionalViewPager
-	    android:layout_width="match_parent" 
-	    android:layout_height="65dp"
-	    android:orientation="vertical"
-	    android:layout_alignParentBottom="true"
-    	android:id="@+id/trackPager" />
-	
+
 </RelativeLayout>

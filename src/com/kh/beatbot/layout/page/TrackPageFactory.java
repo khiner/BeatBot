@@ -43,6 +43,8 @@ public final class TrackPageFactory {
 			return new SampleSelectPage(context);
 		case LEVELS:
 			return new LevelsPage(context);
+		case EFFECTS:
+			return new EffectsPage(context);
 		}
 		return null;
 	}
