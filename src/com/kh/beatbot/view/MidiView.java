@@ -17,6 +17,7 @@ import android.view.SurfaceHolder;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.layout.page.TrackPageFactory;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;

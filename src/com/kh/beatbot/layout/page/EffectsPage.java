@@ -7,7 +7,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
@@ -17,7 +16,6 @@ import com.kh.beatbot.effect.Chorus;
 import com.kh.beatbot.effect.Decimate;
 import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.effect.Effect.EffectParam;
 import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Reverb;
@@ -30,23 +28,22 @@ public class EffectsPage extends TrackPage {
 	private static LabelListListenable effectLabelList;
 	private static String[] effectNames;
 	
-	public EffectsPage(Context context) {
-		super(context);
-	}
-
-	@Override
-	protected void inflate(Context context) {
-		LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = layoutInflater.inflate(R.layout.track_effects, this);
-		effectNames = getResources().getStringArray(R.array.effect_names);
-		effectLabelList = (LabelListListenable) view.findViewById(R.id.effectList);
+	public EffectsPage(Context context, View layout) {
+		super(context, layout);
+		effectNames = context.getResources().getStringArray(R.array.effect_names);
+		effectLabelList = (LabelListListenable) layout.findViewById(R.id.effectList);
 		effectLabelList.setListener(new EffectLabelListListener(context));
-		((TextView) view.findViewById(R.id.effectsLabel)).setTypeface(GlobalVars.font);
+		((TextView) layout.findViewById(R.id.effectsLabel)).setTypeface(GlobalVars.font);
 	}
 
 	@Override
 	protected void trackUpdated() {
 		
+	}
+	
+	@Override
+	public void setVisibilityCode(int code) {
+		effectLabelList.setVisibility(code);
 	}
 	
 	class EffectLabelListListener implements LabelListListener {

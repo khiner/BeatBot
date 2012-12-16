@@ -53,6 +53,8 @@ public class GlobalVars {
 	public static final int NUM_EFFECTS = 7;
 	public static final short LEVEL_MAX = 127;
 
+	public static enum LevelType {VOLUME, PAN, PITCH};
+	
 	public static MidiView midiView;
 	public static String appDirectory;
 

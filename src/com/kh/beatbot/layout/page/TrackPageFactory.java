@@ -3,9 +3,10 @@ package com.kh.beatbot.layout.page;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.app.Activity;
 import android.content.Context;
-import android.view.ViewGroup;
 
+import com.kh.beatbot.R;
 import com.kh.beatbot.global.Track;
 
 public final class TrackPageFactory {
@@ -25,26 +26,24 @@ public final class TrackPageFactory {
 		return instances.get(type);
 	}
 	
-	public static TrackPage createPage(Context context, ViewGroup parent, TrackPage.Type pageType) {
+	public static TrackPage createPage(Context context, Activity parent, TrackPage.Type pageType) {
 		if (!instances.containsKey(pageType)) {
-			TrackPage newPage = createPageInstance(context, pageType);
+			TrackPage newPage = createPageInstance(context, parent, pageType);
 			instances.put(pageType, newPage);
-			parent.addView(newPage);
-			parent.refreshDrawableState();
 		}
 		return instances.get(pageType);
 	}
 	
-	private static TrackPage createPageInstance(Context context, TrackPage.Type pageType) {
+	private static TrackPage createPageInstance(Context context, Activity parent, TrackPage.Type pageType) {
 		switch (pageType) {
 		case EDIT:
-			return new SampleEditPage(context);
+			return new SampleEditPage(context, parent.findViewById(R.id.sampleEditPage));
 		case SELECT:
-			return new SampleSelectPage(context);
+			return new SampleSelectPage(context, parent.findViewById(R.id.sampleSelectPage));
 		case LEVELS:
-			return new LevelsPage(context);
+			return new LevelsPage(context, parent.findViewById(R.id.levelsPage));
 		case EFFECTS:
-			return new EffectsPage(context);
+			return new EffectsPage(context, parent.findViewById(R.id.effectsPage));
 		}
 		return null;
 	}

@@ -14,7 +14,7 @@
     
     <Button
         android:id="@+id/sampleSelect"
-	    android:layout_width="200dp"
+	    android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="selectSample" />
     

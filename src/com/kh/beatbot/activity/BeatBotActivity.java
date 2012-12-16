@@ -22,8 +22,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.view.DirectionalViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,6 +30,7 @@ import android.view.animation.Animation;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import android.widget.ViewFlipper;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
@@ -59,14 +58,15 @@ import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 public class BeatBotActivity extends Activity implements
 		MidiTrackControlListener, LevelListener {
 	
+	private int pageNum = 0;
 	private Context cxt = this;
 	private Animation fadeIn, fadeOut;
 	// these are used as variables for convenience, since they are reference
 	// frequently
-	private ImageButton volume, pan, pitch;
+	private ToggleButton volume, pan, pitch;
 	private TronSeekbar levelBar;
 
-	private DirectionalViewPager trackPager;
+	private ViewFlipper trackPager;
 	
 	private static AssetManager assetManager;
 
@@ -75,9 +75,9 @@ public class BeatBotActivity extends Activity implements
 	private long lastTapTime = 0;
 
 	private void initLevelsIconGroup() {
-		volume = (ImageButton) findViewById(R.id.masterVolumeToggle);
-		pan = (ImageButton) findViewById(R.id.masterPanToggle);
-		pitch = (ImageButton) findViewById(R.id.masterPitchToggle);
+		volume = (ToggleButton) findViewById(R.id.masterVolumeToggle);
+		pan = (ToggleButton) findViewById(R.id.masterPanToggle);
+		pitch = (ToggleButton) findViewById(R.id.masterPitchToggle);
 		levelBar = (TronSeekbar) findViewById(R.id.masterLevelBar);
 		levelBar.addLevelListener(this);
 		setMasterVolume(GlobalVars.MASTER_VOL_LEVEL);
@@ -224,9 +224,9 @@ public class BeatBotActivity extends Activity implements
 		GlobalVars.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
 		Managers.init(savedInstanceState);
-        trackPager = (DirectionalViewPager) findViewById(R.id.trackPager);
+        trackPager = (ViewFlipper) findViewById(R.id.trackFlipper);
 		for (int i = 0; i < TrackPage.NUM_TRACK_PAGES; i++) {
-			trackPager.addNewItem(i, TrackPageFactory.createPage(cxt, trackPager, TrackPage.getPageType(i)));
+			TrackPageFactory.createPage(cxt, this, TrackPage.getPageType(i));
 		}
 		setEditIconsEnabled(false);
 		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));
@@ -378,6 +378,15 @@ public class BeatBotActivity extends Activity implements
 		}
 	}
 
+	public void nextTrackPage(View view) {
+		int prevPageNum = pageNum;
+		pageNum++;
+		pageNum %= TrackPage.NUM_TRACK_PAGES;
+		TrackPageFactory.getTrackPage(TrackPage.getPageType(pageNum)).setVisible(true);
+		trackPager.showNext();
+		TrackPageFactory.getTrackPage(TrackPage.getPageType(prevPageNum)).setVisible(false);
+	}
+	
 	public void play(View view) {
 		if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			Managers.playbackManager.reset();
@@ -431,25 +440,25 @@ public class BeatBotActivity extends Activity implements
 	}
 
 	public void volume(View view) {
-		volume.setSelected(true);
-		pan.setSelected(false);
-		pitch.setSelected(false);
+		volume.setChecked(true);
+		pan.setChecked(false);
+		pitch.setChecked(false);
 		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.VOLUME);
 		updateLevelBar();
 	}
 
 	public void pan(View view) {
-		volume.setSelected(false);
-		pan.setSelected(true);
-		pitch.setSelected(false);
+		volume.setChecked(false);
+		pan.setChecked(true);
+		pitch.setChecked(false);
 		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.PAN);
 		updateLevelBar();
 	}
 
 	public void pitch(View view) {
-		volume.setSelected(false);
-		pan.setSelected(false);
-		pitch.setSelected(true);
+		volume.setChecked(false);
+		pan.setChecked(false);
+		pitch.setChecked(true);
 		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.PITCH);
 		updateLevelBar();
 	}

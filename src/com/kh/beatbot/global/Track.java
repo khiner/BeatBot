@@ -18,6 +18,7 @@ public class Track {
 	public float[][] adsrPoints;
 	public float sampleLoopBegin = 0;
 	public float sampleLoopEnd = 0;
+	public GlobalVars.LevelType activeLevelType = GlobalVars.LevelType.VOLUME;
 
 	public Track(int id, Instrument instrument) {
 		this.id = id;

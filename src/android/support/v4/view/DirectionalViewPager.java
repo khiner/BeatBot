@@ -232,14 +232,9 @@ public class DirectionalViewPager extends ViewPager {
         // our view. We can't really know what it is since we will be
         // adding and removing different arbitrary views and do not
         // want the layout to change as this happens.
-        setMeasuredDimension(getDefaultSize(0, widthMeasureSpec),
-                getDefaultSize(0, heightMeasureSpec));
-
-        // Children are just made to fill our space.
-        int mChildWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getMeasuredWidth() -
-                getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY);
-        int mChildHeightMeasureSpec = MeasureSpec.makeMeasureSpec(getMeasuredHeight() -
-                getPaddingTop() - getPaddingBottom(), MeasureSpec.EXACTLY);
+    	int w = getDefaultSize(0, widthMeasureSpec);
+    	int h = getDefaultSize(0, heightMeasureSpec);
+        setMeasuredDimension(w, h);
 
 
         // Make sure all children have been properly measured.
@@ -247,6 +242,12 @@ public class DirectionalViewPager extends ViewPager {
         if (measureCount++ >= 2) {
         	return;
         }
+        // Children are just made to fill our space.
+        int mChildWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getMeasuredWidth() -
+                getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY);
+        int mChildHeightMeasureSpec = MeasureSpec.makeMeasureSpec(getMeasuredHeight() -
+                getPaddingTop() - getPaddingBottom(), MeasureSpec.EXACTLY);
+
         final int size = getChildCount();
         for (int i = 0; i < size; ++i) {
         	final View child = (View)mItems.get(i).object;

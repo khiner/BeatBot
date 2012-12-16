@@ -41,6 +41,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	protected int width;
 	protected int height;
 	protected float[] backgroundColor = Colors.BG_COLOR;
+	protected float[] clearColor = Colors.BG_COLOR;
 	
 	private static Resources resources;
 	protected static GL10 gl;
@@ -326,7 +327,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 
 	protected void fillBackground() {
 		gl.glClearColor(backgroundColor[0], backgroundColor[1],
-				backgroundColor[2], backgroundColor[3]);
+					backgroundColor[2], backgroundColor[3]);
 	}
 	
 	protected void drawFrame(GL10 gl, int w, int h) {

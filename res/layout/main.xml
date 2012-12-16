@@ -5,13 +5,18 @@
     android:layout_height="fill_parent"
     android:background="@color/background" >
 
-    <android.support.v4.view.DirectionalViewPager
-        android:id="@+id/trackPager"
-        android:layout_width="match_parent"
+    <ViewFlipper
+        android:id="@+id/trackFlipper"
+        android:layout_width="fill_parent"
         android:layout_height="65dp"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical" />
-
+        android:layout_toLeftOf="@+id/nextTrackPageButton"
+        android:layout_alignParentBottom="true" >
+        <include android:id="@+id/sampleSelectPage" layout="@layout/track_sample_select" />
+        <include android:id="@+id/sampleEditPage" layout="@layout/track_sample_edit" />
+        <include android:id="@+id/levelsPage" layout="@layout/levels_edit" />
+        <include android:id="@+id/effectsPage" layout="@layout/track_effects" />
+    </ViewFlipper>
+    
     <include
         android:id="@+id/leftControlButtons"
         android:layout_width="wrap_content"
@@ -56,11 +61,19 @@
         android:layout_above="@+id/addTrack"
         android:layout_below="@+id/rightControlButtons" />
 
+    <Button
+        android:id="@+id/nextTrackPageButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:onClick="nextTrackPage" />
+    
     <ImageButton
         android:id="@+id/addTrack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/trackPager"
+        android:layout_above="@+id/trackFlipper"
         android:background="@drawable/plus_icon_large"
         android:onClick="addTrack" />
 
@@ -73,7 +86,7 @@
         android:layout_toRightOf="@+id/addTrack"
         android:orientation="horizontal" >
 
-        <ImageButton
+        <ToggleButton
             android:id="@+id/masterVolumeToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -83,7 +96,7 @@
             android:textOff=""
             android:textOn="" />
 
-        <ImageButton
+        <ToggleButton
             android:id="@+id/masterPanToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -92,7 +105,7 @@
             android:textOff=""
             android:textOn="" />
 
-        <ImageButton
+        <ToggleButton
             android:id="@+id/masterPitchToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -1,7 +1,6 @@
 package com.kh.beatbot.layout.page;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ToggleButton;
 
@@ -14,20 +13,12 @@ public class SampleEditPage extends TrackPage {
 	private ToggleButton loopButton; 
 	private ToggleButton reverseButton; 
 	
-	public SampleEditPage(Context context) {
-		super(context);
-	}
-
-	@Override
-	public void inflate(Context context) {
-		LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = layoutInflater.inflate(R.layout.track_sample_edit, this);
-
-        sampleWaveformView = (SampleWaveformView) view.findViewById(R.id.sample_waveform_view);
-        adsrButton = (ToggleButton) view.findViewById(R.id.adsr);
-        loopButton = (ToggleButton) view.findViewById(R.id.loop);
-        reverseButton = (ToggleButton) view.findViewById(R.id.reverse);
-        
+	public SampleEditPage(Context context, View layout) {
+		super(context, layout);
+        sampleWaveformView = (SampleWaveformView) layout.findViewById(R.id.sample_waveform_view);
+        adsrButton = (ToggleButton) layout.findViewById(R.id.adsr);
+        loopButton = (ToggleButton) layout.findViewById(R.id.loop);
+        reverseButton = (ToggleButton) layout.findViewById(R.id.reverse);
         adsrButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
             	track.setAdsrOn(adsrButton.isChecked());
@@ -51,5 +42,10 @@ public class SampleEditPage extends TrackPage {
 		adsrButton.setChecked(track.isAdsrEnabled());
 		loopButton.setChecked(track.isLooping());
 		reverseButton.setChecked(track.isReverse());
+	}
+	
+	@Override
+	public void setVisibilityCode(int code) {
+		sampleWaveformView.setVisibility(code);
 	}
 }

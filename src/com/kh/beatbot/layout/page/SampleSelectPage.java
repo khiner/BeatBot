@@ -3,7 +3,6 @@ package com.kh.beatbot.layout.page;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -20,16 +19,10 @@ public class SampleSelectPage extends TrackPage {
 	private AlertDialog instrumentSelectAlert, sampleSelectAlert;
 	private AlertDialog.Builder instrumentSelectAlertBuilder, sampleSelectAlertBuilder;
 	
-	public SampleSelectPage(Context context) {
-		super(context);
-	}
-	
-	public void inflate(Context context) {
-		LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = layoutInflater.inflate(R.layout.track_sample_select, this);
-
-        sampleSelectButton = (Button) view.findViewById(R.id.sampleSelect);
-        instrumentSelectButton = (ImageButton) view.findViewById(R.id.instrumentSelect);
+	public SampleSelectPage(Context context, View layout) {
+		super(context, layout);
+        sampleSelectButton = (Button) layout.findViewById(R.id.sampleSelect);
+        instrumentSelectButton = (ImageButton) layout.findViewById(R.id.instrumentSelect);
         sampleSelectButton.setTypeface(GlobalVars.font);
         instrumentSelectButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
@@ -45,11 +38,19 @@ public class SampleSelectPage extends TrackPage {
         initBuilders(context);
 	}
 	
+	public void inflate(Context context) {
+	}
+	
 	protected void trackUpdated() {
 		instrumentSelectButton.setBackgroundResource(track.getInstrument().getIconSource());
         sampleSelectButton.setText(track.getInstrument().getCurrSampleName());
         updateInstrumentSelectAlert();
 		updateSampleSelectAlert();
+	}
+	
+	@Override
+	public void setVisibilityCode(int code) {
+		// nothing to do
 	}
 	
 	private void setInstrument(Instrument instrument) {
