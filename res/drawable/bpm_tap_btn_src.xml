@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true"
-          android:drawable="@drawable/bpm_tap_selected_small" /> <!-- pressed -->
-    <item android:drawable="@drawable/bpm_tap_small" />  <!-- default -->
+          android:drawable="@drawable/bpm_tap_icon_selected" /> <!-- pressed -->
+    <item android:drawable="@drawable/bpm_tap_icon" />  <!-- default -->
 </selector>
