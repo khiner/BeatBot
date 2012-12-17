@@ -31,19 +31,18 @@ public class PlaybackManager {
 	
 	public void play() {
 		state = State.PLAYING;
-		armAllTracks();
+		playNative();
 	}
 
 	public void stop() {
 		state = State.STOPPED;
-		disarmAllTracks();
+		stopNative();
 	}
 
 	public void reset() {
-		disarmAllTracks();
-		armAllTracks();
+		playNative();
 	}
 	
-	public static native void armAllTracks();
-	public static native void disarmAllTracks();
+	public static native void playNative();
+	public static native void stopNative();
 }

@@ -9,6 +9,7 @@ static SLEngineItf engineEngine = NULL;
 // output mix interfaces
 static SLObjectItf outputMixObject = NULL;
 
+static bool playing = false;
 static bool recording = false;
 static FILE* recordOutFile = NULL;
 static pthread_mutex_t recordMutex, bufferFillMutex;
@@ -39,6 +40,10 @@ JNIEnv *getJniEnv() {
 		(*javaVm)->AttachCurrentThread(javaVm, &env, NULL);
 	}
 	return env;
+}
+
+bool isPlaying() {
+	return playing;
 }
 
 static inline void interleaveFloatsToShorts(float left[], float right[],
@@ -206,17 +211,12 @@ void stopAllTracks() {
 		stopTrack(cur_ptr->track);
 		cur_ptr = cur_ptr->next;
 	}
+	currSample = loopBeginSample;
 }
 
-void Java_com_kh_beatbot_manager_PlaybackManager_disarmAllTracks(JNIEnv *env,
-		jclass clazz) {
-	TrackNode *cur_ptr = trackHead;
+void disarmAllTracks() {
 	stopAllTracks();
-	while (cur_ptr != NULL) {
-		cur_ptr->track->armed = false;
-		cur_ptr = cur_ptr->next;
-	}
-	openSlOut->armed = openSlOut->anyTrackArmed = false;
+	openSlOut->armed = false;
 }
 
 static inline void generateNextBuffer() {
@@ -224,16 +224,11 @@ static inline void generateNextBuffer() {
 	for (samp = 0; samp < BUFF_SIZE; samp++) {
 		if (currSample > loopEndSample) {
 			stopAllTracks();
-			currSample = loopBeginSample;
 		}
 		TrackNode *cur_ptr = trackHead;
 		while (cur_ptr != NULL) {
 			Track *track = cur_ptr->track;
-			if (!track->armed) {
-				cur_ptr = cur_ptr->next;
-				continue;
-			}
-			if (currSample == track->nextStartSample) {
+			if (playing && currSample == track->nextStartSample) {
 				playTrack(track);
 			} else if (currSample == track->nextStopSample) {
 				stopTrack(track);
@@ -250,7 +245,7 @@ static inline void generateNextBuffer() {
 			}
 			cur_ptr = cur_ptr->next;
 		}
-		if (openSlOut->armed)
+		if (playing)
 			currSample++;
 	}
 }
@@ -269,12 +264,11 @@ void fillBuffer() {
 // this callback handler is called every time a buffer finishes playing
 void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	// enqueue the buffer
-	if (openSlOut->anyTrackArmed) {
+	if (openSlOut->armed) {
 		(*bq)->Enqueue(bq, openSlOut->currBufferShort,
 				BUFF_SIZE * 2 * sizeof(short));
-	} else {
-		(*javaVm)->DetachCurrentThread(NULL);
 	}
+
 	// fill the buffer
 	fillBuffer();
 	// write to wav file if recording
@@ -289,25 +283,30 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 void Java_com_kh_beatbot_global_Track_armTrack(JNIEnv *env, jclass clazz,
 		jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
-	track->armed = openSlOut->anyTrackArmed = true;
 	// start writing zeros to the track's audio out
 	bufferQueueCallback(openSlOut->outputBufferQueue, NULL);
 }
 
-void Java_com_kh_beatbot_manager_PlaybackManager_armAllTracks(JNIEnv *env,
-		jclass clazz) {
-	// arm each track, and
-	// trigger buffer queue callback to begin writing data to tracks
-	TrackNode *cur_ptr = trackHead;
-	while (cur_ptr != NULL) {
-		Track *track = cur_ptr->track;
-		track->armed = true;
-		cur_ptr = cur_ptr->next;
-	}
-	openSlOut->armed = openSlOut->anyTrackArmed = true;
+void armAllTracks() {
+	if (openSlOut->armed)
+		return; // only need to arm once
+	openSlOut->armed = true;
 	// we need to fill the buffer once before calling the OpenSL callback
 	fillBuffer();
 	bufferQueueCallback(openSlOut->outputBufferQueue, NULL);
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_playNative(JNIEnv *env,
+		jclass clazz) {
+	stopAllTracks();
+	playing = true;
+	armAllTracks();
+}
+
+void Java_com_kh_beatbot_manager_PlaybackManager_stopNative(JNIEnv *env,
+		jclass clazz) {
+	playing = false;
+	stopAllTracks();
 }
 
 // create the engine and output mix objects
@@ -346,7 +345,7 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 	openSlOut->currBufferFloat[0] = (float *) calloc(BUFF_SIZE, sizeof(float));
 	openSlOut->currBufferFloat[1] = (float *) calloc(BUFF_SIZE, sizeof(float));
 	memset(openSlOut->currBufferShort, 0, sizeof(openSlOut->currBufferShort));
-	openSlOut->armed = openSlOut->anyTrackArmed = false;
+	openSlOut->armed = false;
 	pthread_mutex_init(&openSlOut->trackMutex, NULL);
 
 	// configure audio sink

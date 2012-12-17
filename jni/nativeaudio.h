@@ -19,6 +19,7 @@ static inline long sampleToTick(long sample) {
 	return sample / SPT;
 }
 
+bool isPlaying();
 void updateNextNoteSamples();
 void updateNextNote(Track *track);
 void stopAll();

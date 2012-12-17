@@ -36,7 +36,7 @@ void Java_com_kh_beatbot_manager_MidiManager_setLoopBeginTickNative(JNIEnv *env,
 
 	loopBeginTick = _loopBeginTick;
 	loopBeginSample = tickToSample(loopBeginTick);
-	if (!getTrack(NULL, NULL, 0)->armed) {
+	if (!isPlaying()) {
 		currSample = tickToSample(loopBeginTick);
 	}
 }
@@ -57,7 +57,7 @@ void Java_com_kh_beatbot_manager_MidiManager_setLoopTicksNative(JNIEnv *env,
 	loopEndTick = _loopEndTick;
 	loopBeginSample = tickToSample(loopBeginTick);
 	loopEndSample = tickToSample(loopEndTick);
-	if (!getTrack(NULL, NULL, 0)->armed) {
+	if (!isPlaying()) {
 		currSample = tickToSample(loopBeginTick);
 	}
 }

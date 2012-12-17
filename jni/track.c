@@ -132,7 +132,6 @@ Track *initTrack() {
 	track->currBufferFloat = (float **) malloc(2 * sizeof(float *));
 	track->currBufferFloat[0] = (float *) calloc(BUFF_SIZE, sizeof(float));
 	track->currBufferFloat[1] = (float *) calloc(BUFF_SIZE, sizeof(float));
-	track->armed = false;
 	track->playing = track->previewing = false;
 	track->mute = track->solo = false;
 	track->shouldSound = true;
@@ -157,11 +156,6 @@ void initSample(Track *track, const char *sampleName) {
 void setSample(Track *track, const char *sampleName) {
 	WavFile *wavConfig = (WavFile *) track->generator->config;
 	wavfile_setSampleFile(wavConfig, sampleName);
-}
-
-void Java_com_kh_beatbot_global_Track_disarmTrack(JNIEnv *env, jclass clazz,
-		jint trackNum) {
-	getTrack(env, clazz, trackNum)->armed = openSlOut->anyTrackArmed = false;
 }
 
 int getSoloingTrackNum() {

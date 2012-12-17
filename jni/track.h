@@ -3,7 +3,7 @@
 
 typedef struct OpenSlOut_ {
 	float **currBufferFloat;
-	short currBufferShort[BUFF_SIZE * 2];bool armed;bool anyTrackArmed;
+	short currBufferShort[BUFF_SIZE * 2];bool armed;
 	SLObjectItf outputPlayerObject;
 	SLPlayItf outputPlayerPlay;
 	SLMuteSoloItf outputPlayerMuteSolo;
@@ -24,7 +24,7 @@ typedef struct Track_ {
 	long nextStartSample, nextStopSample;
 	float primaryVolume, primaryPan, primaryPitch;
 
-	int num;bool armed;bool playing;bool previewing;bool mute;bool solo;bool shouldSound;
+	int num;bool playing;bool previewing;bool mute;bool solo;bool shouldSound;
 } Track;
 
 typedef struct TrackNode_t {
