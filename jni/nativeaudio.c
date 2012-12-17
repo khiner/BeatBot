@@ -17,7 +17,6 @@ static pthread_cond_t bufferFillCond = PTHREAD_COND_INITIALIZER;
 static jclass midiClass = NULL;
 static jmethodID getNextMidiNote = NULL;
 static JavaVM* javaVm = NULL;
-static JNIEnv* currEnv = NULL;
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 	JNIEnv* env;
@@ -37,10 +36,8 @@ JNIEnv *getJniEnv() {
 	JNIEnv* env;
 	if ((*javaVm)->GetEnv(javaVm, (void**) &env,
 			JNI_VERSION_1_6) == JNI_EDETACHED) {
-		(*javaVm)->DetachCurrentThread(NULL);
 		(*javaVm)->AttachCurrentThread(javaVm, &env, NULL);
 	}
-	currEnv = env;
 	return env;
 }
 
@@ -275,6 +272,8 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	if (openSlOut->anyTrackArmed) {
 		(*bq)->Enqueue(bq, openSlOut->currBufferShort,
 				BUFF_SIZE * 2 * sizeof(short));
+	} else {
+		(*javaVm)->DetachCurrentThread(NULL);
 	}
 	// fill the buffer
 	fillBuffer();

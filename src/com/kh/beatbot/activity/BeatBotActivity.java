@@ -559,7 +559,7 @@ public class BeatBotActivity extends Activity implements
 		GlobalVars.tracks
 				.add(new Track(GlobalVars.tracks.size(), newInstrument));
 		GlobalVars.midiView.updateTracks();
-		// TODO update track pages
+		trackClicked(GlobalVars.tracks.size() - 1);
 	}
 
 	public static native void addTrack(String sampleFileName);

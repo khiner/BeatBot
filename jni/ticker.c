@@ -49,7 +49,7 @@ void Java_com_kh_beatbot_manager_MidiManager_setLoopEndTickNative(JNIEnv *env,
 	loopEndSample = tickToSample(loopEndTick);
 }
 
-void Java_com_kh_beatbot_manager_MidiManager_setLoopTicks(JNIEnv *env,
+void Java_com_kh_beatbot_manager_MidiManager_setLoopTicksNative(JNIEnv *env,
 		jclass clazz, jlong _loopBeginTick, jlong _loopEndTick) {
 	if (_loopBeginTick >= _loopEndTick)
 		return;
