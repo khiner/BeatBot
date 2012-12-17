@@ -6,7 +6,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.manager.Managers;
 
 public class BpmView extends SurfaceViewBase {
 	private static final float[] SEGMENT_ON_COLOR = {1, 0, 0, 1};
@@ -215,15 +215,15 @@ public class BpmView extends SurfaceViewBase {
 		lastFrameXLoc = x;
 		lastFrameYLoc = y;
 		if (Math.abs(currYDragTotal) > INC_BPM_THRESH) {
-			float newBPM = currYDragTotal < 0 ? MidiManager.getBPM() - 1 :
-				MidiManager.getBPM() + 1;
-			MidiManager.setBPM(newBPM);
+			float newBPM = currYDragTotal < 0 ? Managers.midiManager.getBPM() - 1 :
+				Managers.midiManager.getBPM() + 1;
+			Managers.midiManager.setBPM(newBPM);
 			setText(String.valueOf((int)newBPM));
 			currYDragTotal %= INC_BPM_THRESH;
 		} else if (Math.abs(currXDragTotal) > INC_BPM_THRESH) {
-			float newBPM = currXDragTotal < 0 ? MidiManager.getBPM() - 1 :
-				MidiManager.getBPM() + 1;
-			MidiManager.setBPM(newBPM);
+			float newBPM = currXDragTotal < 0 ? Managers.midiManager.getBPM() - 1 :
+				Managers.midiManager.getBPM() + 1;
+			Managers.midiManager.setBPM(newBPM);
 			setText(String.valueOf((int)newBPM));
 			currXDragTotal %= INC_BPM_THRESH;
 		}

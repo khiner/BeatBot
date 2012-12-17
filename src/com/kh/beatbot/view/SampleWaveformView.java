@@ -9,9 +9,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
-import android.view.ViewGroup.LayoutParams;
 
 import com.kh.beatbot.global.BeatBotButton;
 import com.kh.beatbot.global.Colors;

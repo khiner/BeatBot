@@ -490,7 +490,7 @@ public class BeatBotActivity extends Activity implements
 		// if it's under but close, set to MIN_BPM
 		if (bpm < MidiManager.MIN_BPM - 10)
 			return;
-		MidiManager.setBPM(bpm);
+		Managers.midiManager.setBPM(bpm);
 	}
 
 	public void addTrack(View view) {

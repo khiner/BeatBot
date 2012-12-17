@@ -27,12 +27,12 @@ public class MidiTrackControlHelper {
 
 		public ButtonRow(int trackNum, BeatBotIconSource instrumentIcon) {
 			this.trackNum = trackNum;
-			this.instrumentButton = new BeatBotButton(instrumentIcon);
+			this.instrumentButton = new BeatBotButton(instrumentIcon, trackHeight);
 
-			muteButton = new BeatBotToggleButton(GlobalVars.muteIcon);
-			soloButton = new BeatBotToggleButton(GlobalVars.soloIcon);
-			width = instrumentButton.getIconWidth() + muteButton.getIconWidth()
-					+ soloButton.getIconWidth();
+			muteButton = new BeatBotToggleButton(GlobalVars.muteIcon, trackHeight);
+			soloButton = new BeatBotToggleButton(GlobalVars.soloIcon, trackHeight);
+			width = instrumentButton.getWidth() + muteButton.getWidth()
+					+ soloButton.getWidth();
 		}
 
 		public void setIconSource(BeatBotIconSource instrumentIcon) {
@@ -41,10 +41,8 @@ public class MidiTrackControlHelper {
 		
 		public void draw(float y) {
 			instrumentButton.draw(0, y);
-			muteButton.draw(instrumentButton.getIconWidth(), y);
-			soloButton
-					.draw(instrumentButton.getIconWidth()
-							+ muteButton.getIconWidth(), y);
+			muteButton.draw(instrumentButton.getWidth(), y);
+			soloButton.draw(instrumentButton.getWidth() + muteButton.getWidth(), y);
 		}
 
 		public void handlePress(float x) {
@@ -106,10 +104,10 @@ public class MidiTrackControlHelper {
 		}
 
 		private BeatBotButton getButton(float x) {
-			if (x < buttonRows.get(0).instrumentButton.getIconWidth()) {
+			if (x < buttonRows.get(0).instrumentButton.getWidth()) {
 				return instrumentButton;
-			} else if (x < buttonRows.get(0).instrumentButton.getIconWidth()
-					+ buttonRows.get(0).muteButton.getIconWidth()) {
+			} else if (x < buttonRows.get(0).instrumentButton.getWidth()
+					+ buttonRows.get(0).muteButton.getWidth()) {
 				return muteButton;
 			} else if (x < width) {
 				return soloButton;
@@ -140,20 +138,19 @@ public class MidiTrackControlHelper {
 	private static List<ButtonRow> buttonRows = new ArrayList<ButtonRow>();
 	private static Map<Integer, ButtonRow> whichRowOwnsPointer = new HashMap<Integer, ButtonRow>();
 
-	public static void init() {
+	public static void init(MidiView midiView) {
 		if (!buttonRows.isEmpty()) {
 			// it is possible that this static class can be reinstantiated after switching between views.
 			// ensure we're not re-adding rows by exiting
 			return;
 		}
+		height = midiView.getBean().getTrackHeight();
+		trackHeight = height / GlobalVars.tracks.size();
 		for (int i = 0; i < GlobalVars.tracks.size(); i++) {
 			buttonRows.add(new ButtonRow(i,
 					GlobalVars.tracks.get(i).getInstrument().getBBIconSource()));
 		}
-		width = buttonRows.get(0).width;
-		MidiViewBean.X_OFFSET = width;
-		trackHeight = buttonRows.get(0).instrumentButton.getIconHeight();
-		height = trackHeight * buttonRows.size();
+		width = MidiViewBean.X_OFFSET = buttonRows.get(0).width;
 		initBgRectVb();
 	}
 

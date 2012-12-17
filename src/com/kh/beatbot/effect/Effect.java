@@ -6,7 +6,7 @@ import java.util.List;
 import android.util.FloatMath;
 
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.manager.Managers;
 
 public abstract class Effect implements Comparable<Effect> {
 	public class EffectParam {
@@ -125,7 +125,7 @@ public abstract class Effect implements Comparable<Effect> {
 	protected static void quantizeToBeat(EffectParam param, float level) {
 		param.topBeatNum = getTopBeatNum((int) FloatMath.ceil(level * 14));
 		param.bottomBeatNum = getBottomBeatNum((int) FloatMath.ceil(level * 14));
-		param.level = (60f / (MidiManager.getBPM()) * ((float) param.topBeatNum / (float) param.bottomBeatNum));
+		param.level = (60f / (Managers.midiManager.getBPM()) * ((float) param.topBeatNum / (float) param.bottomBeatNum));
 		if (param.hz)
 			param.level = 1 / param.level;
 	}

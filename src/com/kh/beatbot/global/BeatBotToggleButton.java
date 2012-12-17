@@ -7,6 +7,14 @@ public class BeatBotToggleButton extends BeatBotButton {
 	public BeatBotToggleButton(BeatBotIconSource iconSource) {
 		super(iconSource);
 	}
+	
+	public BeatBotToggleButton(BeatBotIconSource iconSource, float height) {
+		super(iconSource, height);
+	}
+	
+	public BeatBotToggleButton(BeatBotIconSource iconSource, float width, float height) {
+		super(iconSource, width, height);
+	}
 
 	@Override
 	public void touch() {

@@ -85,24 +85,24 @@ public class GlobalVars {
 		beatSyncIcon = new BeatBotIconSource(R.drawable.clock,
 				R.drawable.note_icon);
 		instruments[0].setIconResources(R.drawable.kick_icon_src,
-				R.drawable.kick_icon_small,
-				R.drawable.kick_icon_selected_small,
+				R.drawable.kick_icon,
+				R.drawable.kick_icon_selected,
 				R.drawable.kick_icon_listview);
 		instruments[1].setIconResources(R.drawable.snare_icon_src,
-				R.drawable.snare_icon_small,
-				R.drawable.snare_icon_selected_small,
+				R.drawable.snare_icon,
+				R.drawable.snare_icon_selected,
 				R.drawable.snare_icon_listview);
 		instruments[2].setIconResources(R.drawable.hh_closed_icon_src,
-				R.drawable.hh_closed_icon_small,
-				R.drawable.hh_closed_icon_selected_small,
+				R.drawable.hh_closed_icon,
+				R.drawable.hh_closed_icon_selected,
 				R.drawable.hh_closed_icon_listview);
 		instruments[3].setIconResources(R.drawable.hh_open_icon_src,
-				R.drawable.hh_open_icon_small,
-				R.drawable.hh_open_icon_selected_small,
+				R.drawable.hh_open_icon,
+				R.drawable.hh_open_icon_selected,
 				R.drawable.hh_open_icon_listview);
 		instruments[4].setIconResources(R.drawable.rimshot_icon_src,
-				R.drawable.rimshot_icon_small,
-				R.drawable.rimshot_icon_selected_small,
+				R.drawable.rimshot_icon,
+				R.drawable.rimshot_icon_selected,
 				R.drawable.rimshot_icon_listview);
 		instruments[5].setIconResources(R.drawable.microphone_icon_src,
 				R.drawable.microphone_icon_small,

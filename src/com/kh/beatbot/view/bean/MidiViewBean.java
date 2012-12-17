@@ -78,6 +78,10 @@ public class MidiViewBean {
 		this.height = height;
 	}
 
+	public float getTrackHeight() {
+		return height - Y_OFFSET;
+	}
+	
 	public float getLevelsHeight() {
 		return levelsHeight;
 	}

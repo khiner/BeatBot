@@ -17,7 +17,6 @@ import android.view.SurfaceHolder;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.layout.page.TrackPageFactory;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -32,7 +31,7 @@ import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class MidiView extends ClickableSurfaceView {
 
-	private static MidiManager midiManager;
+	private MidiManager midiManager;
 	private MidiViewBean bean = new MidiViewBean();
 
 	private static final int[] V_LINE_WIDTHS = new int[] { 5, 3, 2 };
@@ -203,8 +202,8 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	public void selectLoopMarker(int pointerId, float x) {
-		float loopBeginX = tickToX(midiManager.getLoopBeginTick());
-		float loopEndX = tickToX(midiManager.getLoopEndTick());
+		float loopBeginX = tickToX(Managers.midiManager.getLoopBeginTick());
+		float loopEndX = tickToX(Managers.midiManager.getLoopEndTick());
 		if (Math.abs(x - loopBeginX) <= MidiViewBean.LOOP_SELECT_SNAP_DIST) {
 			bean.setLoopPointerId(0, pointerId);
 		} else if (Math.abs(x - loopEndX) <= MidiViewBean.LOOP_SELECT_SNAP_DIST) {
@@ -485,7 +484,7 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	protected void init() {
-		MidiTrackControlHelper.init();
+		MidiTrackControlHelper.init(this);
 		LevelsViewHelper.init(this);
 		waveformHelper = new WaveformHelper();
 		TickWindowHelper.updateGranularity();

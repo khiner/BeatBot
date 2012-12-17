@@ -29,12 +29,7 @@ void Java_com_kh_beatbot_manager_MidiManager_setNativeMSPT(JNIEnv *env,
 	//updateNextNoteSamples();
 }
 
-jlong Java_com_kh_beatbot_manager_MidiManager_getLoopBeginTick(JNIEnv *env,
-		jclass clazz) {
-	return loopBeginTick;
-}
-
-void Java_com_kh_beatbot_manager_MidiManager_setLoopBeginTick(JNIEnv *env,
+void Java_com_kh_beatbot_manager_MidiManager_setLoopBeginTickNative(JNIEnv *env,
 		jclass clazz, jlong _loopBeginTick) {
 	if (_loopBeginTick >= loopEndTick || _loopBeginTick == loopBeginTick)
 		return;
@@ -46,12 +41,7 @@ void Java_com_kh_beatbot_manager_MidiManager_setLoopBeginTick(JNIEnv *env,
 	}
 }
 
-jlong Java_com_kh_beatbot_manager_MidiManager_getLoopEndTick(JNIEnv *env,
-		jclass clazz) {
-	return loopEndTick;
-}
-
-void Java_com_kh_beatbot_manager_MidiManager_setLoopEndTick(JNIEnv *env,
+void Java_com_kh_beatbot_manager_MidiManager_setLoopEndTickNative(JNIEnv *env,
 		jclass clazz, jlong _loopEndTick) {
 	if (_loopEndTick <= loopBeginTick || _loopEndTick == loopEndTick)
 		return;

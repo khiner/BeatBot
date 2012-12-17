@@ -51,6 +51,8 @@ public class MidiManager implements Parcelable {
 	private List<MidiNote> copiedNotes = new ArrayList<MidiNote>();
 	private List<MidiNote> currState = new ArrayList<MidiNote>();
 
+	private static long loopBeginTick, loopEndTick;
+	
 	private MidiManager() {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,
 				TimeSignature.DEFAULT_DIVISION);
@@ -70,11 +72,11 @@ public class MidiManager implements Parcelable {
 		return singletonInstance;
 	}
 
-	public static float getBPM() {
+	public float getBPM() {
 		return tempo.getBpm();
 	}
 
-	public static void setBPM(float bpm) {
+	public void setBPM(float bpm) {
 		bpm = bpm >= MIN_BPM ? (bpm <= MAX_BPM ? bpm : MAX_BPM) : MIN_BPM;
 		BpmView.setText(String.valueOf((int) bpm));
 		tempo.setBpm(bpm);
@@ -316,15 +318,15 @@ public class MidiManager implements Parcelable {
 		updateNextNote(midiNote.getNoteValue());
 	}
 
-	public static Tempo getTempo() {
+	public Tempo getTempo() {
 		return tempo;
 	}
 
-	public static long getTicksPerBeat(float beatDivision) {
+	public long getTicksPerBeat(float beatDivision) {
 		return (long) (RESOLUTION / beatDivision);
 	}
 
-	public static long millisToTick(long millis) {
+	public long millisToTick(long millis) {
 		return (long) ((RESOLUTION * 1000f / tempo.getMpqn()) * millis);
 	}
 
@@ -557,9 +559,33 @@ public class MidiManager implements Parcelable {
 		setLoopEndTick(in.readLong());
 	}
 
-	public static native void setNativeMSPT(long MSPT);
+	public void setLoopBeginTick(long loopBeginTick) {
+		this.loopBeginTick = loopBeginTick;
+		setLoopBeginTickNative(loopBeginTick);
+	}
+	
+	public void setLoopEndTick(long loopEndTick) {
+		this.loopEndTick = loopEndTick;
+		setLoopEndTickNative(loopEndTick);
+	}
+	
+	public void setLoopTicks(long loopBeginTick, long loopEndTick) {
+		this.loopBeginTick = loopBeginTick;
+		this.loopEndTick = loopEndTick;
+		setLoopTicksNative(loopBeginTick, loopEndTick);
+	}
+	
+	public long getLoopBeginTick() {
+		return loopBeginTick;
+	}
+	
+	public long getLoopEndTick() {
+		return loopEndTick;
+	}
+	
+	public native void setNativeMSPT(long MSPT);
 
-	public static native void setNativeBPM(float BPM);
+	public native void setNativeBPM(float BPM);
 
 	public native void reset();
 
@@ -567,15 +593,11 @@ public class MidiManager implements Parcelable {
 
 	public native long getCurrTick();
 
-	public static native long getLoopBeginTick();
+	public native void setLoopBeginTickNative(long loopBeginTick);
 
-	public native void setLoopBeginTick(long loopBeginTick);
+	public native void setLoopEndTickNative(long loopEndTick);
 
-	public static native long getLoopEndTick();
-
-	public native void setLoopEndTick(long loopEndTick);
-
-	public native void setLoopTicks(long loopBeginTick, long loopEndTick);
+	public native void setLoopTicksNative(long loopBeginTick, long loopEndTick);
 
 	public native void setNextNote(int trackNum, MidiNote midiNote);
 
@@ -595,12 +617,12 @@ public class MidiManager implements Parcelable {
 		List<MidiNote> trackNotes = GlobalVars.tracks.get(trackNum).notes;
 		for (MidiNote midiNote : trackNotes) {
 			if (midiNote.getOnTick() > currTick
-					&& midiNote.getOnTick() < getLoopEndTick()) {
+					&& midiNote.getOnTick() < loopEndTick) {
 				return midiNote;
 			}
 		}
 		for (MidiNote midiNote : trackNotes) {
-			if (midiNote.getOnTick() >= getLoopBeginTick()) {
+			if (midiNote.getOnTick() >= loopBeginTick) {
 				return midiNote;
 			}
 		}

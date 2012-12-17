@@ -18,7 +18,7 @@ import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.ThresholdBarView;
 
 public class RecordManager implements LevelListener {
-	public static final long RECORD_LATENCY_TICKS = MidiManager
+	public static final long RECORD_LATENCY_TICKS = Managers.midiManager
 			.millisToTick(250);
 	private static final int RECORDER_BPP = 16;
 	private static final String TEMP_FILE = "record_temp.raw";
