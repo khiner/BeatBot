@@ -104,14 +104,15 @@
     <LinearLayout
         android:id="@+id/trackPageSelect"
         android:layout_width="fill_parent"
-        android:layout_height="40dp"
+        android:layout_height="35dp"
         android:layout_above="@+id/trackFlipper"
         android:orientation="horizontal" >
 
         <com.kh.beatbot.view.SquareImageView
         	android:id="@+id/instrumentSelect"
         	android:layout_width="wrap_content"
-        	android:layout_height="match_parent" />
+        	android:layout_height="match_parent"
+        	android:background="@drawable/page_select_src" />
         
         <TextView
             android:id="@+id/sampleSelect"
@@ -119,6 +120,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/page_select_src"
+            android:textColor="@color/text_selector"
             android:text="SELECT" />
 
         <TextView
@@ -126,6 +128,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/page_select_src"
+            android:textColor="@color/text_selector"
             android:text="EDIT" />
 
         <TextView
@@ -133,6 +136,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/page_select_src"
+            android:textColor="@color/text_selector"
             android:text="LEVELS" />
 
         <TextView
@@ -140,6 +144,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/page_select_src"
+            android:textColor="@color/text_selector"
             android:text="EFFECTS" />
     </LinearLayout>
 

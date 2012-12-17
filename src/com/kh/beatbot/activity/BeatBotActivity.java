@@ -406,11 +406,13 @@ public class BeatBotActivity extends Activity implements
 	public void selectTrackPage(View view) {
 		int prevPageNum = pageNum;
 		pageNum = (Integer) view.getTag();
-		TrackPageFactory.getTrackPage(TrackPage.getPageType(pageNum))
-				.setVisible(true);
-		trackPager.setDisplayedChild(pageNum);
+		if (prevPageNum == pageNum)
+			return;
 		TrackPageFactory.getTrackPage(TrackPage.getPageType(prevPageNum))
-				.setVisible(false);
+			.setVisible(false);
+		trackPager.setDisplayedChild(pageNum);
+		TrackPageFactory.getTrackPage(TrackPage.getPageType(pageNum))
+			.setVisible(true);
 	}
 
 	public void play(View view) {

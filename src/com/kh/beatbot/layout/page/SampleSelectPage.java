@@ -42,7 +42,7 @@ public class SampleSelectPage extends TrackPage {
 	}
 	
 	protected void trackUpdated() {
-		instrumentSelect.setBackgroundResource(track.getInstrument().getIconSource());
+		updateInstrumentIcon();
         updateSampleText();
         updateInstrumentSelectAlert();
 		updateSampleSelectAlert();
@@ -51,6 +51,10 @@ public class SampleSelectPage extends TrackPage {
 	@Override
 	public void setVisibilityCode(int code) {
 		// nothing to do
+	}
+	
+	private void updateInstrumentIcon() {
+		instrumentSelect.setImageResource(track.getInstrument().getIconSource());
 	}
 	
 	private void updateSampleText() {
@@ -74,11 +78,9 @@ public class SampleSelectPage extends TrackPage {
 					public void onClick(DialogInterface dialog, int item) {
 						track.setInstrument(GlobalVars.getInstrument(item));
 						track.getInstrument().setCurrSampleNum(0);
-						track.getInstrument().getBBIconSource();
 						setInstrument(track.getInstrument());
 						// update instrument icon to reflect the change
-						instrumentSelect.setBackgroundResource(track
-										.getInstrument().getIconSource());
+						updateInstrumentIcon();
 						// update the sample select alert names with the new
 						// instrument samples
 						updateSampleSelectAlert();

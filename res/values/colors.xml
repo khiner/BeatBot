@@ -3,6 +3,8 @@
     <color name="black">#000000</color>
     <color name="background">#20303a</color>
     <color name="tronBlue">#69c9ff</color>
-    <color name="textSelected">#69c9ff</color>
-    <color name="textDefault">#FFEA69</color>
+    <color name="textPressed">#69c9ff</color>
+    <color name="textSelected">#FFEA69</color>
+    <!-- <color name="textDefault">#FFEA69</color> -->
+    <color name="textDefault">#778791</color>
 </resources>
