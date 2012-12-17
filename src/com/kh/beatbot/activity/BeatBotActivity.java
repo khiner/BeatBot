@@ -22,12 +22,15 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.widget.ViewFlipper;
@@ -57,7 +60,7 @@ import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
 public class BeatBotActivity extends Activity implements
 		MidiTrackControlListener, LevelListener {
-	
+
 	private int pageNum = 0;
 	private Context cxt = this;
 	private Animation fadeIn, fadeOut;
@@ -67,7 +70,7 @@ public class BeatBotActivity extends Activity implements
 	private TronSeekbar levelBar;
 
 	private ViewFlipper trackPager;
-	
+	private LinearLayout trackPageSelect;
 	private static AssetManager assetManager;
 
 	private static AlertDialog instrumentSelectAlert = null;
@@ -224,7 +227,29 @@ public class BeatBotActivity extends Activity implements
 		GlobalVars.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
 		Managers.init(savedInstanceState);
-        trackPager = (ViewFlipper) findViewById(R.id.trackFlipper);
+		trackPageSelect = (LinearLayout) findViewById(R.id.trackPageSelect);
+		for (int i = 1; i < trackPageSelect.getChildCount(); i++) {
+			TextView pageText = (TextView) trackPageSelect.getChildAt(i);
+			pageText.setTypeface(GlobalVars.font);
+			pageText.setGravity(Gravity.CENTER);
+			if (i <= 1) {
+				continue;
+			}
+			final int tag = i - 1;
+			pageText.setTag(tag);
+			pageText.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					for (int j = 2; j < trackPageSelect.getChildCount(); j++) {
+						TextView pageText = (TextView) trackPageSelect
+								.getChildAt(j);
+						pageText.setSelected(tag + 1 == j);
+					}
+					selectTrackPage(v);
+				}
+			});
+		}
+		trackPager = (ViewFlipper) findViewById(R.id.trackFlipper);
 		for (int i = 0; i < TrackPage.NUM_TRACK_PAGES; i++) {
 			TrackPageFactory.createPage(cxt, this, TrackPage.getPageType(i));
 		}
@@ -340,7 +365,7 @@ public class BeatBotActivity extends Activity implements
 		setDeleteIconEnabled(enabled);
 		setCopyIconEnabled(enabled);
 	}
-	
+
 	private void setDeleteIconEnabled(final boolean enabled) {
 		// need to change UI stuff on the UI thread.
 		Handler refresh = new Handler(Looper.getMainLooper());
@@ -350,7 +375,7 @@ public class BeatBotActivity extends Activity implements
 			}
 		});
 	}
-	
+
 	private void setCopyIconEnabled(final boolean enabled) {
 		// need to change UI stuff on the UI thread.
 		Handler refresh = new Handler(Looper.getMainLooper());
@@ -370,7 +395,7 @@ public class BeatBotActivity extends Activity implements
 		} else {
 			GlobalVars.midiView.reset();
 			// if we're already playing, midiManager is already ticking away.
-			((ToggleButton)findViewById(R.id.playButton)).setChecked(true);
+			((ToggleButton) findViewById(R.id.playButton)).setChecked(true);
 			if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
 				play(findViewById(R.id.playButton));
 			Managers.recordManager.startRecordingNative();
@@ -378,15 +403,16 @@ public class BeatBotActivity extends Activity implements
 		}
 	}
 
-	public void nextTrackPage(View view) {
+	public void selectTrackPage(View view) {
 		int prevPageNum = pageNum;
-		pageNum++;
-		pageNum %= TrackPage.NUM_TRACK_PAGES;
-		TrackPageFactory.getTrackPage(TrackPage.getPageType(pageNum)).setVisible(true);
-		trackPager.showNext();
-		TrackPageFactory.getTrackPage(TrackPage.getPageType(prevPageNum)).setVisible(false);
+		pageNum = (Integer) view.getTag();
+		TrackPageFactory.getTrackPage(TrackPage.getPageType(pageNum))
+				.setVisible(true);
+		trackPager.setDisplayedChild(pageNum);
+		TrackPageFactory.getTrackPage(TrackPage.getPageType(prevPageNum))
+				.setVisible(false);
 	}
-	
+
 	public void play(View view) {
 		if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			Managers.playbackManager.reset();
@@ -403,7 +429,7 @@ public class BeatBotActivity extends Activity implements
 			record(recordButton);
 		}
 		if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
-			((ToggleButton)findViewById(R.id.playButton)).setChecked(false);
+			((ToggleButton) findViewById(R.id.playButton)).setChecked(false);
 			Managers.playbackManager.stop();
 			Managers.midiManager.reset();
 		}
@@ -427,14 +453,13 @@ public class BeatBotActivity extends Activity implements
 			Managers.midiManager.cancelCopy();
 			msg = "Copy Cancelled";
 		}
-		Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT)
-		.show();
+		Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
 	}
 
 	public void uncheckCopyButton() {
 		((ToggleButton) findViewById(R.id.copy)).setChecked(false);
 	}
-	
+
 	public void delete(View view) {
 		Managers.midiManager.deleteSelectedNotes();
 	}

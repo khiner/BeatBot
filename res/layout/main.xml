@@ -5,18 +5,6 @@
     android:layout_height="fill_parent"
     android:background="@color/background" >
 
-    <ViewFlipper
-        android:id="@+id/trackFlipper"
-        android:layout_width="fill_parent"
-        android:layout_height="65dp"
-        android:layout_toLeftOf="@+id/nextTrackPageButton"
-        android:layout_alignParentBottom="true" >
-        <include android:id="@+id/sampleSelectPage" layout="@layout/track_sample_select" />
-        <include android:id="@+id/sampleEditPage" layout="@layout/track_sample_edit" />
-        <include android:id="@+id/levelsPage" layout="@layout/levels_edit" />
-        <include android:id="@+id/effectsPage" layout="@layout/track_effects" />
-    </ViewFlipper>
-    
     <include
         android:id="@+id/leftControlButtons"
         android:layout_width="wrap_content"
@@ -61,19 +49,11 @@
         android:layout_above="@+id/addTrack"
         android:layout_below="@+id/rightControlButtons" />
 
-    <Button
-        android:id="@+id/nextTrackPageButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:onClick="nextTrackPage" />
-    
     <ImageButton
         android:id="@+id/addTrack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/trackFlipper"
+        android:layout_above="@+id/trackPageSelect"
         android:background="@drawable/plus_icon_large"
         android:onClick="addTrack" />
 
@@ -120,5 +100,70 @@
             android:layout_height="match_parent"
             android:layout_marginRight="4dp" />
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/trackPageSelect"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_above="@+id/trackFlipper"
+        android:orientation="horizontal" >
+
+        <com.kh.beatbot.view.SquareImageView
+        	android:id="@+id/instrumentSelect"
+        	android:layout_width="wrap_content"
+        	android:layout_height="match_parent" />
+        
+        <TextView
+            android:id="@+id/sampleSelect"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/page_select_src"
+            android:text="SELECT" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/page_select_src"
+            android:text="EDIT" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/page_select_src"
+            android:text="LEVELS" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/page_select_src"
+            android:text="EFFECTS" />
+    </LinearLayout>
+
+    <ViewFlipper
+        android:id="@+id/trackFlipper"
+        android:layout_width="fill_parent"
+        android:layout_height="65dp"
+        android:layout_alignParentBottom="true" >
+
+        <include
+            android:id="@+id/sampleSelectPage"
+            layout="@layout/track_sample_select" />
+
+        <include
+            android:id="@+id/sampleEditPage"
+            layout="@layout/track_sample_edit" />
+
+        <include
+            android:id="@+id/levelsPage"
+            layout="@layout/levels_edit" />
+
+        <include
+            android:id="@+id/effectsPage"
+            layout="@layout/track_effects" />
+    </ViewFlipper>
 
 </RelativeLayout>

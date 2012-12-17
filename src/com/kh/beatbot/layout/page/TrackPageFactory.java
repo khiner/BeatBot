@@ -39,7 +39,7 @@ public final class TrackPageFactory {
 		case EDIT:
 			return new SampleEditPage(context, parent.findViewById(R.id.sampleEditPage));
 		case SELECT:
-			return new SampleSelectPage(context, parent.findViewById(R.id.sampleSelectPage));
+			return new SampleSelectPage(context, parent.findViewById(R.id.trackPageSelect));
 		case LEVELS:
 			return new LevelsPage(context, parent.findViewById(R.id.levelsPage));
 		case EFFECTS:

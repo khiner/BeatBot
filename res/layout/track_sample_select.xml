@@ -6,16 +6,4 @@
     android:gravity="center_vertical"
     android:background="@color/background" >
     
-    <ImageButton 
-        android:id="@+id/instrumentSelect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="selectInstrument" />
-    
-    <Button
-        android:id="@+id/sampleSelect"
-	    android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="selectSample" />
-    
 </LinearLayout>

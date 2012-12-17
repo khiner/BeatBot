@@ -3,4 +3,6 @@
     <color name="black">#000000</color>
     <color name="background">#20303a</color>
     <color name="tronBlue">#69c9ff</color>
+    <color name="textSelected">#69c9ff</color>
+    <color name="textDefault">#FFEA69</color>
 </resources>

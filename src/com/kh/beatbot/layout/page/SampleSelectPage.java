@@ -4,8 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.GlobalVars;
@@ -13,23 +13,23 @@ import com.kh.beatbot.global.Instrument;
 import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
 public class SampleSelectPage extends TrackPage {
-	private Button sampleSelectButton;
-	private ImageButton instrumentSelectButton;
+	private TextView sampleSelect;
+	private ImageView instrumentSelect;
 	
 	private AlertDialog instrumentSelectAlert, sampleSelectAlert;
 	private AlertDialog.Builder instrumentSelectAlertBuilder, sampleSelectAlertBuilder;
 	
 	public SampleSelectPage(Context context, View layout) {
 		super(context, layout);
-        sampleSelectButton = (Button) layout.findViewById(R.id.sampleSelect);
-        instrumentSelectButton = (ImageButton) layout.findViewById(R.id.instrumentSelect);
-        sampleSelectButton.setTypeface(GlobalVars.font);
-        instrumentSelectButton.setOnClickListener(new View.OnClickListener() {
+        sampleSelect = (TextView) layout.findViewById(R.id.sampleSelect);
+        instrumentSelect = (ImageView) layout.findViewById(R.id.instrumentSelect);
+        sampleSelect.setTypeface(GlobalVars.font);
+        instrumentSelect.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
         		instrumentSelectAlert.show();
             }
         });
-        sampleSelectButton.setOnClickListener(new View.OnClickListener() {
+        sampleSelect.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
             	sampleSelectAlert.show();
             }
@@ -42,8 +42,8 @@ public class SampleSelectPage extends TrackPage {
 	}
 	
 	protected void trackUpdated() {
-		instrumentSelectButton.setBackgroundResource(track.getInstrument().getIconSource());
-        sampleSelectButton.setText(track.getInstrument().getCurrSampleName());
+		instrumentSelect.setBackgroundResource(track.getInstrument().getIconSource());
+        updateSampleText();
         updateInstrumentSelectAlert();
 		updateSampleSelectAlert();
 	}
@@ -53,11 +53,17 @@ public class SampleSelectPage extends TrackPage {
 		// nothing to do
 	}
 	
+	private void updateSampleText() {
+		// update sample label text
+		// TODO handle all extensions
+		String formattedName = track.getInstrument().getCurrSampleName().replace(".raw", "").toUpperCase(); 
+		sampleSelect.setText(formattedName);
+	}
+	
 	private void setInstrument(Instrument instrument) {
 		// set native sample bytes through JNI
 		track.setSample(instrument.getCurrSamplePath());
-		// update sample label text
-		sampleSelectButton.setText(instrument.getCurrSampleName());
+		updateSampleText();
 		// update the midi view instrument icon for this track
 		MidiTrackControlHelper.updateInstrumentIcon(track.getId());
 	}
@@ -71,7 +77,7 @@ public class SampleSelectPage extends TrackPage {
 						track.getInstrument().getBBIconSource();
 						setInstrument(track.getInstrument());
 						// update instrument icon to reflect the change
-						instrumentSelectButton.setBackgroundResource(track
+						instrumentSelect.setBackgroundResource(track
 										.getInstrument().getIconSource());
 						// update the sample select alert names with the new
 						// instrument samples
