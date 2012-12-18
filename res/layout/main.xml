@@ -113,16 +113,26 @@
         	android:layout_width="wrap_content"
         	android:layout_height="match_parent"
         	android:background="@drawable/page_select_src" />
-        
-        <TextView
-            android:id="@+id/sampleSelect"
+		
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@drawable/page_select_src"
+            android:background="@drawable/page_select_src" > 
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:id="@+id/sampleSelect"
             android:textColor="@color/text_selector"
-            android:text="SELECT" />
-
+            android:text="SELECT"
+            android:lines="1"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+		</LinearLayout>
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"

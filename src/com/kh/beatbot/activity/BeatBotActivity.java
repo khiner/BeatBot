@@ -229,7 +229,12 @@ public class BeatBotActivity extends Activity implements
 		Managers.init(savedInstanceState);
 		trackPageSelect = (LinearLayout) findViewById(R.id.trackPageSelect);
 		for (int i = 1; i < trackPageSelect.getChildCount(); i++) {
-			TextView pageText = (TextView) trackPageSelect.getChildAt(i);
+			TextView pageText = null;
+			// TODO clean up
+			if (i == 1) // view 1 is a linear layout containing a sample select text view
+				pageText = (TextView) ((LinearLayout)trackPageSelect.getChildAt(1)).getChildAt(0);
+			else
+				pageText = (TextView) trackPageSelect.getChildAt(i);
 			pageText.setTypeface(GlobalVars.font);
 			pageText.setGravity(Gravity.CENTER);
 			if (i <= 1) {
