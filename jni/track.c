@@ -1,5 +1,32 @@
 #include "all.h"
 
+static jclass midiClass = NULL;
+static jmethodID getNextMidiNote = NULL;
+static JavaVM* javaVm = NULL;
+
+jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+	JNIEnv* env;
+	if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
+		return -1;
+
+	midiClass = (*env)->NewGlobalRef(env,
+			(*env)->FindClass(env, "com/kh/beatbot/manager/MidiManager"));
+	getNextMidiNote = (*env)->GetStaticMethodID(env, midiClass,
+			"getNextMidiNote", "(IJ)Lcom/kh/beatbot/midi/MidiNote;");
+
+	javaVm = vm;
+	return JNI_VERSION_1_6;
+}
+
+JNIEnv *getJniEnv() {
+	JNIEnv* env;
+	if ((*javaVm)->GetEnv(javaVm, (void**) &env,
+			JNI_VERSION_1_6) == JNI_EDETACHED) {
+		(*javaVm)->AttachCurrentThread(javaVm, &env, NULL);
+	}
+	return env;
+}
+
 jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size) {
 	jfloatArray result = (*env)->NewFloatArray(env, size);
 	(*env)->SetFloatArrayRegion(env, result, 0, size, floatAry);
@@ -209,6 +236,55 @@ void Java_com_kh_beatbot_global_Track_soloTrack(JNIEnv *env, jclass clazz,
 	}
 }
 
+void setNextNoteInfo(Track *track, jlong onTick, jlong offTick, jfloat vol,
+		jfloat pan, jfloat pitch) {
+	track->nextStartSample = onTick;
+	track->nextStopSample = offTick;
+	track->nextEvent->volume = vol;
+	track->nextEvent->pan = pan;
+	track->nextEvent->pitch = pitch;
+}
+
+void setNextNote(Track *track, jobject obj) {
+	JNIEnv* env = getJniEnv();
+	if (obj == NULL) {
+		track->nextStartSample = -1;
+		track->nextStopSample = -1;
+		return;
+	}
+	jclass cls = (*env)->GetObjectClass(env, obj);
+
+	long onTick = tickToSample(
+			(*env)->CallLongMethod(env, obj,
+					(*env)->GetMethodID(env, cls, "getOnTick", "()J")));
+	long offTick = tickToSample(
+			(*env)->CallLongMethod(env, obj,
+					(*env)->GetMethodID(env, cls, "getOffTick", "()J")));
+	float vol = (*env)->CallFloatMethod(env, obj,
+			(*env)->GetMethodID(env, cls, "getVelocity", "()F"));
+	float pan = (*env)->CallFloatMethod(env, obj,
+			(*env)->GetMethodID(env, cls, "getPan", "()F"));
+	float pitch = (*env)->CallFloatMethod(env, obj,
+			(*env)->GetMethodID(env, cls, "getPitch", "()F"));
+
+	setNextNoteInfo(track, onTick, offTick, vol, pan, pitch);
+	(*env)->DeleteLocalRef(env, cls);
+}
+
+void updateNextNote(Track *track) {
+	JNIEnv* env = getJniEnv();
+	jobject obj = (*env)->CallStaticObjectMethod(env, midiClass,
+			getNextMidiNote, track->num, (jlong) sampleToTick(currSample));
+	setNextNote(track, obj);
+	(*env)->DeleteLocalRef(env, obj);
+}
+
+void Java_com_kh_beatbot_global_Track_setNextNote(JNIEnv *env,
+		jclass clazz, jint trackNum, jobject midiNote) {
+	Track *track = getTrack(env, clazz, trackNum);
+	setNextNote(track, midiNote);
+}
+
 void updateLevels(Track *track) {
 	MidiEvent *midiEvent = track->nextEvent;
 	track->volPan->set(track->volPan->config,
@@ -309,6 +385,12 @@ jboolean Java_com_kh_beatbot_global_Track_isTrackLooping(JNIEnv *env,
 	Track *track = getTrack(env, clazz, trackNum);
 	WavFile *wavFile = (WavFile *) track->generator->config;
 	return wavFile->looping;
+}
+
+jboolean Java_com_kh_beatbot_global_Track_isTrackPlaying(JNIEnv *env,
+		jclass clazz, jint trackNum) {
+	Track *track = getTrack(env, clazz, trackNum);
+	return track->playing;
 }
 
 void Java_com_kh_beatbot_global_Track_setTrackLoopWindow(JNIEnv *env,

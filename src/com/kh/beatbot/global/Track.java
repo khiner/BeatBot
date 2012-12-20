@@ -1,9 +1,12 @@
 package com.kh.beatbot.global;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 
 public class Track {
@@ -43,7 +46,33 @@ public class Track {
 		adsrPoints[3][1] = .60f;
 		adsrPoints[4][1] = 0;
 	}
-
+	
+	public void updateNextNote() {
+		Collections.sort(notes);
+		long currTick = Managers.midiManager.getCurrTick();
+		if (isTrackPlaying(id)) {
+			// track is already in the middle of playing a note.  it will update after the note stops.
+			return;
+		}
+		MidiNote nextNote = getNextMidiNote(currTick);
+		setNextNote(id, nextNote);
+	}
+	
+	public MidiNote getNextMidiNote(long currTick) {
+		for (MidiNote midiNote : notes) {
+			if (midiNote.getOnTick() > currTick
+					&& midiNote.getOnTick() < MidiManager.loopEndTick) {
+				return midiNote;
+			}
+		}
+		for (MidiNote midiNote : notes) {
+			if (midiNote.getOnTick() >= MidiManager.loopBeginTick) {
+				return midiNote;
+			}
+		}
+		return null;
+	}
+	
 	public Effect findEffectById(int effectId) {
 		for (Effect effect : effects) {
 			if (effect.getId() == effectId) {
@@ -160,6 +189,8 @@ public class Track {
 	public static native void toggleTrackLooping(int trackNum);
 
 	public static native boolean isTrackLooping(int trackNum);
+	
+	public static native boolean isTrackPlaying(int trackNum);
 
 	public static native void setTrackLoopWindow(int trackNum, long loopBegin,
 			long loopEnd);
@@ -190,4 +221,6 @@ public class Track {
 			float y);
 
 	public static native void setSample(int trackId, String sampleName);
+	
+	public native void setNextNote(int trackId, MidiNote midiNote);
 }
