@@ -36,12 +36,12 @@ public final class TrackPageFactory {
 	
 	private static TrackPage createPageInstance(Context context, Activity parent, TrackPage.Type pageType) {
 		switch (pageType) {
-		case EDIT:
-			return new SampleEditPage(context, parent.findViewById(R.id.sampleEditPage));
 		case SELECT:
 			return new SampleSelectPage(context, parent.findViewById(R.id.trackPageSelect));
 		case LEVELS:
 			return new LevelsPage(context, parent.findViewById(R.id.levelsPage));
+		case EDIT:
+			return new SampleEditPage(context, parent.findViewById(R.id.sampleEditPage));
 		case EFFECTS:
 			return new EffectsPage(context, parent.findViewById(R.id.effectsPage));
 		}

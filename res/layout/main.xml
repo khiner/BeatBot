@@ -126,20 +126,28 @@
             android:layout_marginRight="4dp"
             android:id="@+id/sampleSelect"
             android:textColor="@color/text_selector"
-            android:text="SELECT"
+            android:text="@string/select"
             android:lines="1"
             android:ellipsize="marquee"
             android:marqueeRepeatLimit="marquee_forever"
             android:focusable="true"
             android:focusableInTouchMode="true" />
 		</LinearLayout>
+		<TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/page_select_src"
+            android:textColor="@color/text_selector"
+            android:text="@string/levels" />
+		
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/page_select_src"
             android:textColor="@color/text_selector"
-            android:text="EDIT" />
+            android:text="@string/edit" />
 
         <TextView
             android:layout_width="0dp"
@@ -147,15 +155,7 @@
             android:layout_weight="1"
             android:background="@drawable/page_select_src"
             android:textColor="@color/text_selector"
-            android:text="LEVELS" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/page_select_src"
-            android:textColor="@color/text_selector"
-            android:text="EFFECTS" />
+            android:text="@string/effects" />
     </LinearLayout>
 
     <ViewFlipper
@@ -169,12 +169,12 @@
             layout="@layout/track_sample_select" />
 
         <include
-            android:id="@+id/sampleEditPage"
-            layout="@layout/track_sample_edit" />
-
-        <include
             android:id="@+id/levelsPage"
             layout="@layout/levels_edit" />
+        
+        <include
+            android:id="@+id/sampleEditPage"
+            layout="@layout/track_sample_edit" />
 
         <include
             android:id="@+id/effectsPage"

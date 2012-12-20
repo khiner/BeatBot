@@ -240,15 +240,15 @@ public class BeatBotActivity extends Activity implements
 			if (i <= 1) {
 				continue;
 			}
-			final int tag = i - 1;
-			pageText.setTag(tag);
+			final int pageNum = i - 1;
+			pageText.setTag(pageNum);
 			pageText.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					for (int j = 2; j < trackPageSelect.getChildCount(); j++) {
 						TextView pageText = (TextView) trackPageSelect
 								.getChildAt(j);
-						pageText.setSelected(tag + 1 == j);
+						pageText.setSelected(pageNum + 1 == j);
 					}
 					selectTrackPage(v);
 				}

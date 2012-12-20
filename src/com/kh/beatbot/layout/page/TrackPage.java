@@ -8,8 +8,8 @@ import com.kh.beatbot.global.Track;
 public abstract class TrackPage {
 	protected Context context;
 	protected View layout;
-	public static enum Type {SELECT, EDIT, LEVELS, EFFECTS};
-	private static Type[] pageOrder = {Type.SELECT, Type.EDIT, Type.LEVELS, Type.EFFECTS};
+	public static enum Type {SELECT, LEVELS, EDIT, EFFECTS};
+	private static Type[] pageOrder = {Type.SELECT, Type.LEVELS, Type.EDIT, Type.EFFECTS};
 	public static final int NUM_TRACK_PAGES = pageOrder.length;
 	protected static Track track;
 	
