@@ -22,6 +22,7 @@ static inline long sampleToTick(long sample) {
 bool isPlaying();
 void updateNextNoteSamples();
 void updateNextNote(Track *track);
+void arm();
 void stopAll();
 
 #endif // NATIVEAUDIO_H

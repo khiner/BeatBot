@@ -144,7 +144,7 @@ void stopAllTracks() {
 	currSample = loopBeginSample;
 }
 
-void disarmAllTracks() {
+void disarm() {
 	stopAllTracks();
 	openSlOut->armed = false;
 }
@@ -217,7 +217,7 @@ void Java_com_kh_beatbot_global_Track_armTrack(JNIEnv *env, jclass clazz,
 	bufferQueueCallback(openSlOut->outputBufferQueue, NULL);
 }
 
-void armAllTracks() {
+void arm() {
 	if (openSlOut->armed)
 		return; // only need to arm once
 	openSlOut->armed = true;
@@ -230,7 +230,6 @@ void Java_com_kh_beatbot_manager_PlaybackManager_playNative(JNIEnv *env,
 		jclass clazz) {
 	stopAllTracks();
 	playing = true;
-	armAllTracks();
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_stopNative(JNIEnv *env,
@@ -323,6 +322,7 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 	(*(openSlOut->outputPlayerPlay))->SetPlayState(openSlOut->outputPlayerPlay,
 			SL_PLAYSTATE_PLAYING);
 
+	arm();
 	return JNI_TRUE;
 }
 
