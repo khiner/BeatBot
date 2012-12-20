@@ -334,26 +334,17 @@ public class LevelsViewHelper {
 	}
 
 	public static void singleTap(float x, float y) {
-		int track = MidiView.yToNote(y);
+		int trackNum = MidiView.yToNote(y);
 		float tick = midiView.xToTick(x);
 
-		MidiNote selectedNote = midiView.getMidiNote(track, tick);
-		if (selectedNote == null) {
-			selectedNote = midiView.addMidiNote(tick, track);
+		tappedLevelNote = midiView.getMidiNote(trackNum, tick);
+		if (tappedLevelNote != null) {
+			addToLevelViewSelected(tappedLevelNote);
 		}
-		addToLevelViewSelected(selectedNote);
-		tappedLevelNote = selectedNote;
 	}
 	
 	public static void doubleTap() {
-		if (tappedLevelNote == null)
-			return;
-		tappedLevelNote.setLevelSelected(false);
-		tappedLevelNote.setLevelViewSelected(false);
-		tappedLevelNote.setSelected(false);
-		Managers.midiManager.deleteNote(tappedLevelNote);
-		updateSelectedLevelNotes();
-		bean.setStateChanged(true);
+		// do nothing for double taps in levels mode
 	}
 
 	public static void resetSelected() {
