@@ -16,7 +16,6 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -161,7 +160,7 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	public MidiNote getMidiNote(int track, float tick) {
-		if (track < 0 || track >= GlobalVars.tracks.size()) {
+		if (track < 0 || track >= Managers.trackManager.getNumTracks()) {
 			return null;
 		}
 		for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
@@ -398,13 +397,13 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	private void initHLineVb() {
-		float[] hLines = new float[(GlobalVars.tracks.size() + 2) * 4];
+		float[] hLines = new float[(Managers.trackManager.getNumTracks() + 2) * 4];
 		hLines[0] = MidiViewBean.X_OFFSET;
 		hLines[1] = 0;
 		hLines[2] = width;
 		hLines[3] = 0;
 		float y = MidiViewBean.Y_OFFSET;
-		for (int i = 1; i < GlobalVars.tracks.size() + 2; i++) {
+		for (int i = 1; i < Managers.trackManager.getNumTracks() + 2; i++) {
 			hLines[i * 4] = MidiViewBean.X_OFFSET;
 			;
 			hLines[i * 4 + 1] = y;
@@ -492,9 +491,9 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	public void updateTracks() {
-		int newTrackIndex = GlobalVars.tracks.size() - 1;
+		int newTrackIndex = Managers.trackManager.getNumTracks() - 1;
 		MidiTrackControlHelper.addTrack(newTrackIndex,
-				GlobalVars.tracks.get(newTrackIndex).getInstrument()
+				Managers.trackManager.getTrack(newTrackIndex).getInstrument()
 						.getBBIconSource());
 		initAllVbs();
 	}
@@ -579,9 +578,9 @@ public class MidiView extends ClickableSurfaceView {
 				continue;
 			if (selectedNote.getNoteValue() < -adjustedNoteDiff) {
 				adjustedNoteDiff = -selectedNote.getNoteValue();
-			} else if (GlobalVars.tracks.size() - 1
+			} else if (Managers.trackManager.getNumTracks() - 1
 							- selectedNote.getNoteValue() < adjustedNoteDiff) {
-				adjustedNoteDiff = GlobalVars.tracks.size() - 1
+				adjustedNoteDiff = Managers.trackManager.getNumTracks() - 1
 						- selectedNote.getNoteValue();
 			}
 		}
@@ -724,7 +723,7 @@ public class MidiView extends ClickableSurfaceView {
 					midiManager.setLoopEndTick((long) Math.min(
 							TickWindowHelper.MAX_TICKS, majorTick));
 				}
-				midiManager.updateAllTrackNextNotes();
+				Managers.trackManager.updateAllTrackNextNotes();
 				TickWindowHelper.updateView(midiManager.getLoopBeginTick(),
 						midiManager.getLoopEndTick());
 			}
@@ -966,7 +965,7 @@ public class MidiView extends ClickableSurfaceView {
 				if (midiManager.anyNoteSelected()) {
 					midiManager.deselectAllNotes();
 				} else { // add a note based on the current tick granularity
-					if (note >= 0 && note < GlobalVars.tracks.size()) {
+					if (note >= 0 && note < Managers.trackManager.getNumTracks()) {
 						addMidiNote(tick, note);
 					}
 				}

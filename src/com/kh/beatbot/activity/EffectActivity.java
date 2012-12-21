@@ -22,10 +22,10 @@ import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Effect.EffectParam;
 import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.global.GeneralUtils;
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.layout.EffectControlLayout;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
+import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.TronKnob;
 import com.kh.beatbot.view.TronSeekbar2d;
 
@@ -120,7 +120,7 @@ public class EffectActivity extends Activity implements LevelListener,
 		GeneralUtils.initAndroidSettings(this);
 		int effectId = getIntent().getExtras().getInt("effectId");
 		int trackId = getIntent().getExtras().getInt("trackId");
-		effect = GlobalVars.tracks.get(trackId).findEffectById(effectId);
+		effect = Managers.trackManager.getTrack(trackId).findEffectById(effectId);
 		setContentView(R.layout.effect_layout);
 		ViewGroup parent = (ViewGroup) findViewById(R.id.effect_layout);
 		View paramWrapperLayout = initEffectLayout(parent);

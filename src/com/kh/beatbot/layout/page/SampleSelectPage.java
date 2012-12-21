@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Instrument;
+import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
 public class SampleSelectPage extends TrackPage {
@@ -71,7 +72,7 @@ public class SampleSelectPage extends TrackPage {
 		track.setInstrument(instrument);
 		// update instrument icon to reflect the change
 		updateInstrumentIcon();
-		GlobalVars.mainActivity.trackClicked(track.getId());
+		Managers.trackManager.trackClicked(track.getId());
 		TrackPageFactory.updatePages();
 	}
 	

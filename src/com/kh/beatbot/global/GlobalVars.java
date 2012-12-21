@@ -1,8 +1,5 @@
 package com.kh.beatbot.global;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -41,7 +38,7 @@ public class GlobalVars {
 	public static final String[] allInstrumentTypes = { "kick", "snare",
 			"hh_closed", "hh_open", "rim", "recorded" };
 
-	private static Instrument[] instruments = new Instrument[6];
+	public static Instrument[] instruments = new Instrument[6];
 
 	public static BeatBotIconSource muteIcon, soloIcon, previewIcon,
 			beatSyncIcon;
@@ -58,22 +55,7 @@ public class GlobalVars {
 	public static MidiView midiView;
 	public static String appDirectory;
 
-	// effect settings are stored here instead of in the effect activities
-	// because the activities are destroyed after clicking 'back', and we
-	// need to persist state
-	public static List<Track> tracks = new ArrayList<Track>();
 	public static float currBeatDivision;
-
-	public static void initTracks() {
-		for (int i = 0; i < allInstrumentTypes.length; i++) {
-			String instrumentName = allInstrumentTypes[i];
-			Instrument instrument = new Instrument(instrumentName,
-					new BeatBotIconSource());
-			instruments[i] = instrument;
-			if (!instrumentName.equals("recorded"))
-				tracks.add(new Track(tracks.size(), instrument));
-		}
-	}
 
 	public static void initIcons() {
 		muteIcon = new BeatBotIconSource(R.drawable.mute_icon,

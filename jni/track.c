@@ -1,6 +1,6 @@
 #include "all.h"
 
-static jclass midiClass = NULL;
+static jclass trackClass = NULL;
 static jmethodID getNextMidiNote = NULL;
 static JavaVM* javaVm = NULL;
 
@@ -9,9 +9,9 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 	if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
 		return -1;
 
-	midiClass = (*env)->NewGlobalRef(env,
-			(*env)->FindClass(env, "com/kh/beatbot/manager/MidiManager"));
-	getNextMidiNote = (*env)->GetStaticMethodID(env, midiClass,
+	trackClass = (*env)->NewGlobalRef(env,
+			(*env)->FindClass(env, "com/kh/beatbot/manager/TrackManager"));
+	getNextMidiNote = (*env)->GetStaticMethodID(env, trackClass,
 			"getNextMidiNote", "(IJ)Lcom/kh/beatbot/midi/MidiNote;");
 
 	javaVm = vm;
@@ -273,7 +273,7 @@ void setNextNote(Track *track, jobject obj) {
 
 void updateNextNote(Track *track) {
 	JNIEnv* env = getJniEnv();
-	jobject obj = (*env)->CallStaticObjectMethod(env, midiClass,
+	jobject obj = (*env)->CallStaticObjectMethod(env, trackClass,
 			getNextMidiNote, track->num, (jlong) sampleToTick(currSample));
 	setNextNote(track, obj);
 	(*env)->DeleteLocalRef(env, obj);
@@ -362,7 +362,7 @@ void Java_com_kh_beatbot_global_Track_setSample(JNIEnv *env, jclass clazz,
 	(*env)->ReleaseStringUTFChars(env, sampleName, nativeSampleName);
 }
 
-void Java_com_kh_beatbot_activity_BeatBotActivity_addTrack(JNIEnv *env,
+void Java_com_kh_beatbot_manager_TrackManager_addTrack(JNIEnv *env,
 		jclass clazz, jstring sampleName) {
 	Track *track = initTrack();
 	pthread_mutex_lock(&openSlOut->trackMutex);

@@ -41,13 +41,10 @@ import com.kh.beatbot.effect.Effect.EffectParam;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.global.Instrument;
-import com.kh.beatbot.global.Track;
 import com.kh.beatbot.layout.page.TrackPage;
 import com.kh.beatbot.layout.page.TrackPageFactory;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
-import com.kh.beatbot.listener.MidiTrackControlListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -56,10 +53,8 @@ import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.SurfaceViewBase;
 import com.kh.beatbot.view.TronSeekbar;
 import com.kh.beatbot.view.helper.LevelsViewHelper;
-import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
-public class BeatBotActivity extends Activity implements
-		MidiTrackControlListener, LevelListener {
+public class BeatBotActivity extends Activity implements LevelListener {
 
 	private int pageNum = 0;
 	private Context cxt = this;
@@ -97,7 +92,7 @@ public class BeatBotActivity extends Activity implements
 		builder.setAdapter(GlobalVars.instrumentSelectAdapter,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-						addTrack(item);
+						Managers.trackManager.addTrack(item);
 					}
 				});
 		instrumentSelectAlert = builder.create();
@@ -217,16 +212,15 @@ public class BeatBotActivity extends Activity implements
 		copyAllSamplesToStorage();
 		SurfaceViewBase.setResources(getResources());
 		setContentView(R.layout.main);
-		GlobalVars.initTracks();
 		GlobalVars.initInstrumentSelect(this);
 		if (savedInstanceState == null) {
 			initNativeAudio();
 		}
+		Managers.init(savedInstanceState);
 		initLevelsIconGroup();
 		initInstrumentSelectAlert();
 		GlobalVars.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
-		Managers.init(savedInstanceState);
 		trackPageSelect = (LinearLayout) findViewById(R.id.trackPageSelect);
 		for (int i = 1; i < trackPageSelect.getChildCount(); i++) {
 			TextView pageText = null;
@@ -261,7 +255,6 @@ public class BeatBotActivity extends Activity implements
 		setEditIconsEnabled(false);
 		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));
 		GlobalVars.midiView.initMeFirst();
-		MidiTrackControlHelper.addListener(this);
 		if (savedInstanceState != null) {
 			GlobalVars.midiView.readFromBundle(savedInstanceState);
 		}
@@ -274,7 +267,7 @@ public class BeatBotActivity extends Activity implements
 				play(findViewById(R.id.playButton));
 			}
 		}
-		trackClicked(0);
+		Managers.trackManager.trackClicked(0);
 	}
 
 	@Override
@@ -344,15 +337,11 @@ public class BeatBotActivity extends Activity implements
 	private void initNativeAudio() {
 		createEngine();
 		createAudioPlayer();
-		for (int trackId = 0; trackId < GlobalVars.tracks.size(); trackId++) {
-			Track track = GlobalVars.tracks.get(trackId); 
-			addTrack(track.getSamplePath());
-		}
 	}
 
 	public void quantizeEffectParams() {
-		for (int trackId = 0; trackId < GlobalVars.tracks.size(); trackId++) {
-			for (Effect effect : GlobalVars.tracks.get(trackId).effects) {
+		for (int trackId = 0; trackId < Managers.trackManager.getNumTracks(); trackId++) {
+			for (Effect effect : Managers.trackManager.getTrack(trackId).effects) {
 				for (int paramNum = 0; paramNum < effect.getNumParams(); paramNum++) {
 					EffectParam param = effect.getParam(paramNum);
 					if (param.beatSync) {
@@ -529,26 +518,6 @@ public class BeatBotActivity extends Activity implements
 	}
 
 	@Override
-	public void muteToggled(int track, boolean mute) {
-		GlobalVars.tracks.get(track).mute(mute);
-	}
-
-	@Override
-	public void soloToggled(int track, boolean solo) {
-		GlobalVars.tracks.get(track).solo(solo);
-	}
-
-	@Override
-	public void trackLongPressed(int track) {
-		Managers.midiManager.selectRow(track);
-	}
-
-	@Override
-	public void trackClicked(int track) {
-		TrackPageFactory.setTrack(GlobalVars.tracks.get(track));
-	}
-
-	@Override
 	public void notifyInit(LevelListenable levelBar) {
 		updateLevelBar();
 	}
@@ -583,18 +552,6 @@ public class BeatBotActivity extends Activity implements
 	public void setLevel(LevelListenable levelListenable, float levelX,
 			float levelY) {
 	}
-
-	private void addTrack(int instrumentType) {
-		Instrument newInstrument = GlobalVars.getInstrument(instrumentType);
-		Track newTrack = new Track(GlobalVars.tracks.size(), newInstrument); 
-		addTrack(newTrack.getSamplePath());
-		GlobalVars.tracks
-				.add(newTrack);
-		GlobalVars.midiView.updateTracks();
-		trackClicked(GlobalVars.tracks.size() - 1);
-	}
-
-	public static native void addTrack(String sampleFileName);
 
 	public static native void setMasterVolume(float level);
 

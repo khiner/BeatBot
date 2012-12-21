@@ -13,7 +13,9 @@ import com.kh.beatbot.global.BeatBotIconSource;
 import com.kh.beatbot.global.BeatBotToggleButton;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.MidiTrackControlListener;
+import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.SurfaceViewBase;
 import com.kh.beatbot.view.bean.MidiViewBean;
@@ -145,10 +147,10 @@ public class MidiTrackControlHelper {
 			return;
 		}
 		height = midiView.getBean().getTrackHeight();
-		trackHeight = height / GlobalVars.tracks.size();
-		for (int i = 0; i < GlobalVars.tracks.size(); i++) {
+		trackHeight = height / Managers.trackManager.getNumTracks();
+		for (int i = 0; i < Managers.trackManager.getNumTracks(); i++) {
 			buttonRows.add(new ButtonRow(i,
-					GlobalVars.tracks.get(i).getInstrument().getBBIconSource()));
+					Managers.trackManager.getTrack(i).getInstrument().getBBIconSource()));
 		}
 		width = MidiViewBean.X_OFFSET = buttonRows.get(0).width;
 		initBgRectVb();
@@ -158,7 +160,8 @@ public class MidiTrackControlHelper {
 		if (trackNum < 0 || trackNum >= buttonRows.size()) {
 			return;
 		}
-		buttonRows.get(trackNum).setIconSource(GlobalVars.tracks.get(trackNum).getInstrument().getBBIconSource());
+		Track track = Managers.trackManager.getTrack(trackNum);
+		buttonRows.get(trackNum).setIconSource(track.getInstrument().getBBIconSource());
 	}
 	
 	public static void addListener(MidiTrackControlListener listener) {
