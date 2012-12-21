@@ -210,13 +210,6 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	}
 }
 
-void Java_com_kh_beatbot_global_Track_armTrack(JNIEnv *env, jclass clazz,
-		jint trackNum) {
-	Track *track = getTrack(env, clazz, trackNum);
-	// start writing zeros to the track's audio out
-	bufferQueueCallback(openSlOut->outputBufferQueue, NULL);
-}
-
 void arm() {
 	if (openSlOut->armed)
 		return; // only need to arm once

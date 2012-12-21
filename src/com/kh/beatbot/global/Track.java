@@ -161,9 +161,6 @@ public class Track {
 		}
 	}
 	/** Wrappers around native JNI methods **/
-	public void disarm() {
-		disarmTrack(id);
-	}
 
 	public void play() {
 		playTrack(id);
@@ -179,10 +176,6 @@ public class Track {
 
 	public void solo(boolean solo) {
 		soloTrack(id, solo);
-	}
-
-	public void arm() {
-		armTrack(id);
 	}
 
 	public void toggleLooping() {
@@ -246,8 +239,6 @@ public class Track {
 		setSample(id, getSamplePath());
 	}
 
-	public static native void armTrack(int trackNum);
-
 	public static native void toggleTrackLooping(int trackNum);
 
 	public static native boolean isTrackLooping(int trackNum);
@@ -257,7 +248,6 @@ public class Track {
 	public static native void setTrackLoopWindow(int trackNum, long loopBegin,
 			long loopEnd);
 
-	public static native void disarmTrack(int trackNum);
 
 	public static native void playTrack(int trackNum);
 

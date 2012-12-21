@@ -347,7 +347,6 @@ public class BeatBotActivity extends Activity implements
 		for (int trackId = 0; trackId < GlobalVars.tracks.size(); trackId++) {
 			Track track = GlobalVars.tracks.get(trackId); 
 			addTrack(track.getSamplePath());
-			track.arm();
 		}
 	}
 
