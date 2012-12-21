@@ -8,8 +8,10 @@ import java.util.Map;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.view.MotionEvent;
+import android.widget.Toast;
 
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.MidiView;
@@ -39,6 +41,7 @@ public class LevelsViewHelper {
 		VOLUME, PAN, PITCH
 	};
 
+	private static final String noteRestrictionAlert = "Cannot create, delete or move notes in levels view.";
 	private static FloatBuffer levelBarVb = null;
 	private static final int LEVEL_BAR_WIDTH = MidiViewBean.LEVEL_POINT_SIZE / 2;
 	private static MidiView midiView;
@@ -338,13 +341,18 @@ public class LevelsViewHelper {
 		float tick = midiView.xToTick(x);
 
 		tappedLevelNote = midiView.getMidiNote(trackNum, tick);
-		if (tappedLevelNote != null) {
+		if (tappedLevelNote == null) {
+			Toast.makeText(GlobalVars.mainActivity,
+					noteRestrictionAlert, Toast.LENGTH_SHORT).show();
+		} else {
 			addToLevelViewSelected(tappedLevelNote);
 		}
 	}
 	
 	public static void doubleTap() {
 		// do nothing for double taps in levels mode
+		Toast.makeText(GlobalVars.mainActivity,
+				noteRestrictionAlert, Toast.LENGTH_SHORT).show();
 	}
 
 	public static void resetSelected() {
