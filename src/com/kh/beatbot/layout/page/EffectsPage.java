@@ -37,7 +37,7 @@ public class EffectsPage extends TrackPage {
 	}
 
 	@Override
-	protected void trackUpdated() {
+	protected void update() {
 		
 	}
 	

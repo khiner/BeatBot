@@ -274,6 +274,7 @@ public class BeatBotActivity extends Activity implements
 				play(findViewById(R.id.playButton));
 			}
 		}
+		trackClicked(0);
 	}
 
 	@Override

@@ -41,7 +41,7 @@ public class SampleSelectPage extends TrackPage {
 	public void inflate(Context context) {
 	}
 	
-	protected void trackUpdated() {
+	protected void update() {
 		updateInstrumentIcon();
         updateSampleText();
         updateInstrumentSelectAlert();
@@ -67,9 +67,10 @@ public class SampleSelectPage extends TrackPage {
 	private void setInstrument(Instrument instrument) {
 		// set native sample bytes through JNI
 		track.setSample(instrument.getCurrSamplePath());
-		updateSampleText();
 		// update the midi view instrument icon for this track
 		MidiTrackControlHelper.updateInstrumentIcon(track.getId());
+		GlobalVars.mainActivity.trackClicked(track.getId());
+		TrackPageFactory.updatePages();
 	}
 	
 	private void updateInstrumentSelectAlert() {

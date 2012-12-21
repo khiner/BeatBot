@@ -37,7 +37,7 @@ public class SampleEditPage extends TrackPage {
 	}
 
 	@Override
-	protected void trackUpdated() {
+	protected void update() {
 		sampleWaveformView.setTrack(track);
 		adsrButton.setChecked(track.isAdsrEnabled());
 		loopButton.setChecked(track.isLooping());

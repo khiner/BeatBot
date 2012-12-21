@@ -44,7 +44,7 @@ public class LevelsPage extends TrackPage implements LevelListener {
 	}
 
 	@Override
-	protected void trackUpdated() {
+	protected void update() {
 		updateDisplay();
 	}
 

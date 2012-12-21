@@ -112,7 +112,8 @@
         	android:id="@+id/instrumentSelect"
         	android:layout_width="wrap_content"
         	android:layout_height="match_parent"
-        	android:background="@drawable/page_select_src" />
+        	android:background="@drawable/page_select_src"
+        	android:src="@drawable/kick_icon" />
 		
         <LinearLayout
             android:layout_width="0dp"

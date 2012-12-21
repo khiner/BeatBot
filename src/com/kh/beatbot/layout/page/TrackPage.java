@@ -25,7 +25,7 @@ public abstract class TrackPage {
 		return pageOrder[pageNum];
 	}
 	
-	protected abstract void trackUpdated();
+	protected abstract void update();
 	protected abstract void setVisibilityCode(int code);
 	public void setVisible(boolean visible) {
 		int code = visible ? View.VISIBLE : View.INVISIBLE;
@@ -34,6 +34,6 @@ public abstract class TrackPage {
 	
 	public void setTrack(Track track) {
 		TrackPage.track = track;
-		trackUpdated();
+		update();
 	}
 }

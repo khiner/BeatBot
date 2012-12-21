@@ -22,6 +22,12 @@ public final class TrackPageFactory {
 		}
 	}
 	
+	public static void updatePages() {
+		for (TrackPage trackPage : instances.values()) {
+			trackPage.update();
+		}
+	}
+	
 	public static TrackPage getTrackPage(TrackPage.Type type) {
 		return instances.get(type);
 	}
