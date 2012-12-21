@@ -20,8 +20,6 @@ import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class SampleWaveformView extends SurfaceViewBase {
 
-	private int layoutCount = 0;
-	
 	private static final float[] ADSR_COLOR = Colors.PITCH_COLOR.clone();
 	private static final float[] ADSR_SELECTED_COLOR = { ADSR_COLOR[0],
 			ADSR_COLOR[1], ADSR_COLOR[2], .6f };
@@ -58,8 +56,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	private Track track;
 
-	private long numSamples = -1;
-
 	// which pointer id is touching which marker (-1 means no pointer)
 	private int beginLoopMarkerTouched = -1;
 	private int endLoopMarkerTouched = -1;
@@ -84,25 +80,15 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	public void setTrack(Track track) {
 		this.track = track;
-		setSampleFile(track.getInstrument().getCurrSampleFile());
-	}
-		
-	private void setSampleFile(File sampleFile) {
+		File sampleFile = track.getSampleFile(); 
 		WaveformHelper.setSampleFile(sampleFile);
-		numSamples = sampleFile.length() / 8 - 44;
-		sampleWidth = numSamples;
-		// if sample loop end is 0, the loop points haven't been set yet -
-		// default to end.
-		// otherwise, don't mess with them - keep the old values
-		if (track.sampleLoopEnd == 0) {
-			track.sampleLoopEnd = numSamples;
-		}
+		sampleWidth = track.getNumSamples();
 		if (height != 0 && sampleWidth != 0) {
 			updateWaveformVb();
 		}
 		updateLoopMarkers();
 	}
-
+		
 	private void initAdsrVb() {
 		float[] pointVertices = new float[10];
 		for (int i = 0; i < 5; i++) {
@@ -138,8 +124,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	private void initLoopMarkerVb() {
-		float xLoopBegin = sampleToX(track.sampleLoopBegin);
-		float xLoopEnd = sampleToX(track.sampleLoopEnd);
+		float xLoopBegin = sampleToX(track.getLoopBeginSample());
+		float xLoopEnd = sampleToX(track.getLoopEndSample());
 		float[] loopSelectionVertices = { xLoopBegin, 0, xLoopBegin, height,
 				xLoopEnd, height, xLoopEnd, 0 };
 
@@ -229,7 +215,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		// make preview button square
 		previewButtonWidth = height;
 		waveformWidth = width - previewButtonWidth - SNAP_DIST;
-		setSampleFile(track.getInstrument().getCurrSampleFile());
+		setTrack(track); // TODO try not updating track here.
 		initBackgroundOutlineVb();
 		initPreviewButtonSquareVb();
 		initLoopMarkerVb();
@@ -253,8 +239,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	private float adsrToX(float adsr) {
-		return sampleToX(track.sampleLoopBegin) * (1 - adsr) + adsr
-				* sampleToX(track.sampleLoopEnd);
+		return sampleToX(track.getLoopBeginSample()) * (1 - adsr) + adsr
+				* sampleToX(track.getLoopEndSample());
 	}
 
 	private float adsrToY(float adsr) {
@@ -263,8 +249,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	private float xToAdsr(float x) {
-		return (x - sampleToX(track.sampleLoopBegin))
-				/ (sampleToX(track.sampleLoopEnd) - sampleToX(track.sampleLoopBegin));
+		return (x - sampleToX(track.getLoopBeginSample()))
+				/ (sampleToX(track.getLoopEndSample()) - sampleToX(track.getLoopBeginSample()));
 	}
 
 	private float yToAdsr(float y) {
@@ -280,7 +266,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		float newSampleOffset = scrollAnchorSample - xToSample(scrollX)
 				+ sampleOffset;
 		sampleOffset = newSampleOffset < 0 ? 0
-				: (newSampleOffset + sampleWidth > numSamples ? numSamples
+				: (newSampleOffset + sampleWidth > track.getNumSamples() ? track.getNumSamples()
 						- sampleWidth : newSampleOffset);
 	}
 
@@ -292,41 +278,41 @@ public class SampleWaveformView extends SurfaceViewBase {
 		float newSampleOffset = zoomRightAnchorSample - newSampleWidth
 				* (x2 - previewButtonWidth - SNAP_DIST / 2) / waveformWidth;
 		if (newSampleOffset < 0
-				&& newSampleOffset + newSampleWidth > numSamples
+				&& newSampleOffset + newSampleWidth > track.getNumSamples()
 				|| newSampleWidth < MIN_LOOP_WINDOW) {
 			return;
 		}
 		if (newSampleOffset >= 0
-				&& newSampleOffset + newSampleWidth <= numSamples) {
+				&& newSampleOffset + newSampleWidth <= track.getNumSamples()) {
 			sampleOffset = newSampleOffset;
 			sampleWidth = newSampleWidth;
 		} else if (newSampleOffset < 0) {
 			sampleOffset = 0;
 			sampleWidth = zoomRightAnchorSample * waveformWidth
 					/ (x2 - previewButtonWidth);
-		} else if (newSampleOffset + newSampleWidth > numSamples) {
-			sampleWidth = waveformWidth * (zoomLeftAnchorSample - numSamples)
+		} else if (newSampleOffset + newSampleWidth > track.getNumSamples()) {
+			sampleWidth = waveformWidth * (zoomLeftAnchorSample - track.getNumSamples())
 					/ (x1 - previewButtonWidth - waveformWidth);
-			sampleOffset = numSamples - sampleWidth;
+			sampleOffset = track.getNumSamples() - sampleWidth;
 		}
 	}
 
 	private void updateLoopMarkers() {
 		float diff = 0;
-		if (track.sampleLoopBegin < sampleOffset
-				&& track.sampleLoopEnd > sampleOffset + sampleWidth) {
+		if (track.getLoopBeginSample() < sampleOffset
+				&& track.getLoopEndSample() > sampleOffset + sampleWidth) {
 			clipLoopToWindow();
-		} else if (track.sampleLoopBegin < sampleOffset)
-			diff = sampleOffset - track.sampleLoopBegin;
-		else if (track.sampleLoopEnd >= sampleOffset + sampleWidth)
-			diff = sampleOffset + sampleWidth - track.sampleLoopEnd;
+		} else if (track.getLoopBeginSample() < sampleOffset)
+			diff = sampleOffset - track.getLoopBeginSample();
+		else if (track.getLoopEndSample() >= sampleOffset + sampleWidth)
+			diff = sampleOffset + sampleWidth - track.getLoopEndSample();
 		if (diff != 0) {
-			track.sampleLoopBegin += diff;
-			track.sampleLoopEnd += diff;
+			track.setLoopBeginSample(track.getLoopBeginSample() + diff);
+			track.setLoopEndSample(track.getLoopEndSample() + diff);
 			clipLoopToWindow();
 		}
-		track.setLoopWindow((long) track.sampleLoopBegin,
-				(long) track.sampleLoopEnd);
+		track.setLoopWindow((long) track.getLoopBeginSample(),
+				(long) track.getLoopEndSample());
 		// update the display location of the loop markers
 		initLoopMarkerVb();
 		initAdsrVb();
@@ -359,11 +345,11 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	private boolean selectLoopMarker(int id, float x) {
-		if (Math.abs(x - sampleToX(track.sampleLoopBegin)) < SNAP_DIST) {
+		if (Math.abs(x - sampleToX(track.getLoopBeginSample())) < SNAP_DIST) {
 			// begin loop marker touched
 			beginLoopMarkerTouched = id;
 			return true;
-		} else if (Math.abs(x - sampleToX(track.sampleLoopEnd)) < SNAP_DIST) {
+		} else if (Math.abs(x - sampleToX(track.getLoopEndSample())) < SNAP_DIST) {
 			// end loop marker touched
 			endLoopMarkerTouched = id;
 			return true;
@@ -426,27 +412,27 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private boolean moveLoopMarker(int id, float x) {
 		if (beginLoopMarkerTouched == id) {
 			float newLoopBegin = xToSample(x);
-			track.sampleLoopBegin = newLoopBegin < 0 ? 0
-					: (newLoopBegin >= track.sampleLoopEnd - MIN_LOOP_WINDOW ? track.sampleLoopEnd
+			track.setLoopBeginSample(newLoopBegin < 0 ? 0
+					: (newLoopBegin >= track.getLoopEndSample() - MIN_LOOP_WINDOW ? track.getLoopEndSample()
 							- MIN_LOOP_WINDOW
-							: newLoopBegin);
+							: newLoopBegin));
 		} else if (endLoopMarkerTouched == id) {
 			float newLoopEnd = xToSample(x);
-			track.sampleLoopEnd = newLoopEnd >= numSamples ? numSamples - 1
-					: (newLoopEnd <= track.sampleLoopBegin + MIN_LOOP_WINDOW ? track.sampleLoopBegin
+			track.setLoopEndSample(newLoopEnd >= track.getNumSamples() ? track.getNumSamples() - 1
+					: (newLoopEnd <= track.getLoopBeginSample() + MIN_LOOP_WINDOW ? track.getLoopBeginSample()
 							+ MIN_LOOP_WINDOW
-							: newLoopEnd);
+							: newLoopEnd));
 		} else {
 			return false;
 		}
-		if (track.sampleLoopBegin < sampleOffset) {
-			sampleOffset = track.sampleLoopBegin;
-			if (track.sampleLoopEnd > sampleOffset + sampleWidth)
-				sampleWidth = track.sampleLoopEnd - track.sampleLoopBegin;
-		} else if (track.sampleLoopEnd > sampleOffset + sampleWidth) {
-			sampleWidth = track.sampleLoopEnd - sampleOffset;
-			if (sampleWidth + sampleOffset > numSamples)
-				sampleWidth = numSamples - sampleOffset;
+		if (track.getLoopBeginSample() < sampleOffset) {
+			sampleOffset = track.getLoopBeginSample();
+			if (track.getLoopEndSample() > sampleOffset + sampleWidth)
+				sampleWidth = track.getLoopEndSample() - track.getLoopBeginSample();
+		} else if (track.getLoopEndSample() > sampleOffset + sampleWidth) {
+			sampleWidth = track.getLoopEndSample() - sampleOffset;
+			if (sampleWidth + sampleOffset > track.getNumSamples())
+				sampleWidth = track.getNumSamples() - sampleOffset;
 		}
 		// update UI
 		initLoopMarkerVb();
@@ -488,10 +474,10 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	private void clipLoopToWindow() {
-		if (track.sampleLoopBegin < sampleOffset)
-			track.sampleLoopBegin = sampleOffset;
-		if (track.sampleLoopEnd > sampleOffset + sampleWidth)
-			track.sampleLoopEnd = sampleOffset + sampleWidth;
+		if (track.getLoopBeginSample() < sampleOffset)
+			track.setLoopBeginSample(sampleOffset);
+		if (track.getLoopEndSample() > sampleOffset + sampleWidth)
+			track.setLoopEndSample(sampleOffset + sampleWidth);
 	}
 
 	private void handleWaveActionDown(int id, float x, float y) {

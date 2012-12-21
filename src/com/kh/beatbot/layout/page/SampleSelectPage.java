@@ -54,21 +54,23 @@ public class SampleSelectPage extends TrackPage {
 	}
 	
 	private void updateInstrumentIcon() {
+		// update the track pager instrument icon
 		instrumentSelect.setImageResource(track.getInstrument().getIconSource());
+		// update the midi view instrument icon
+		MidiTrackControlHelper.updateInstrumentIcon(track.getId());
 	}
 	
 	private void updateSampleText() {
 		// update sample label text
 		// TODO handle all extensions
-		String formattedName = track.getInstrument().getCurrSampleName().replace(".raw", "").toUpperCase(); 
+		String formattedName = track.getSampleName().replace(".raw", "").toUpperCase(); 
 		sampleSelect.setText(formattedName);
 	}
 	
 	private void setInstrument(Instrument instrument) {
-		// set native sample bytes through JNI
-		track.setSample(instrument.getCurrSamplePath());
-		// update the midi view instrument icon for this track
-		MidiTrackControlHelper.updateInstrumentIcon(track.getId());
+		track.setInstrument(instrument);
+		// update instrument icon to reflect the change
+		updateInstrumentIcon();
 		GlobalVars.mainActivity.trackClicked(track.getId());
 		TrackPageFactory.updatePages();
 	}
@@ -77,11 +79,8 @@ public class SampleSelectPage extends TrackPage {
 		instrumentSelectAlertBuilder.setAdapter(GlobalVars.instrumentSelectAdapter,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-						track.setInstrument(GlobalVars.getInstrument(item));
-						track.getInstrument().setCurrSampleNum(0);
-						setInstrument(track.getInstrument());
-						// update instrument icon to reflect the change
-						updateInstrumentIcon();
+						Instrument newInstrument = GlobalVars.getInstrument(item); 
+						setInstrument(newInstrument);
 						// update the sample select alert names with the new
 						// instrument samples
 						updateSampleSelectAlert();
@@ -96,7 +95,7 @@ public class SampleSelectPage extends TrackPage {
 		sampleSelectAlertBuilder.setItems(track.getInstrument().getSampleNames(),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-						track.getInstrument().setCurrSampleNum(item);
+						track.setSampleNum(item);
 						setInstrument(track.getInstrument());
 					}
 				});

@@ -1,8 +1,11 @@
 package com.kh.beatbot.global;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.manager.Managers;
@@ -10,8 +13,21 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 
 public class Track {
+	class LoopSampleInfo {
+		public float loopBeginSample;
+		public float loopEndSample;
+		public float totalNumSamples;
+		
+		LoopSampleInfo(float totalNumSamples) {
+			this.loopBeginSample = 0;
+			this.loopEndSample = totalNumSamples;
+			this.totalNumSamples = totalNumSamples;
+		}
+	}
+	
 	private int id;
 	private Instrument instrument;
+	private int currSampleNum = 0;
 	private boolean adsrEnabled = false, reverse = false;
 	public List<MidiNote> notes = new ArrayList<MidiNote>();
 	public List<Effect> effects = new ArrayList<Effect>();
@@ -19,13 +35,15 @@ public class Track {
 	public float pan = .5f;
 	public float pitch = .5f;
 	public float[][] adsrPoints;
-	public float sampleLoopBegin = 0;
-	public float sampleLoopEnd = 0;
 	public GlobalVars.LevelType activeLevelType = GlobalVars.LevelType.VOLUME;
-
+	
+	private Map<Integer, LoopSampleInfo> sampleLoopPoints = new HashMap<Integer, LoopSampleInfo>();
+	
 	public Track(int id, Instrument instrument) {
 		this.id = id;
 		this.instrument = instrument;
+		this.currSampleNum = 0;
+		constructLoopPointMap();
 		initDefaultAdsrPoints();
 	}
 
@@ -96,9 +114,52 @@ public class Track {
 	}
 
 	public void setInstrument(Instrument instrument) {
+		if (this.instrument == instrument)
+			return;
 		this.instrument = instrument;
+		setSampleNum(0);
+		constructLoopPointMap();
 	}
 
+	public float getLoopBeginSample() {
+		return sampleLoopPoints.get(currSampleNum).loopBeginSample;
+	}
+	
+	public float getLoopEndSample() {
+		return sampleLoopPoints.get(currSampleNum).loopEndSample;
+	}
+	
+	public float getNumSamples() {
+		return sampleLoopPoints.get(currSampleNum).totalNumSamples;
+	}
+	
+	public void setLoopBeginSample(float loopBeginSample) {
+		sampleLoopPoints.get(currSampleNum).loopBeginSample = loopBeginSample;
+	}
+	
+	public void setLoopEndSample(float loopEndSample) {
+		sampleLoopPoints.get(currSampleNum).loopEndSample = loopEndSample;
+	}
+	
+	public String getSampleName() {
+		return instrument.getSampleName(currSampleNum);
+	}
+
+	public String getSamplePath() {
+		return instrument.getSamplePath(currSampleNum);
+	}
+	
+	public File getSampleFile() {
+		return instrument.getSampleFile(currSampleNum);
+	}
+
+	private void constructLoopPointMap() {
+		sampleLoopPoints.clear();
+		for (int sampleNum = 0; sampleNum < instrument.getSampleNames().length; sampleNum++) {
+			long numSamples = instrument.getNumSamples(sampleNum);
+			sampleLoopPoints.put(sampleNum, new LoopSampleInfo(numSamples));
+		}
+	}
 	/** Wrappers around native JNI methods **/
 	public void disarm() {
 		disarmTrack(id);
@@ -180,8 +241,9 @@ public class Track {
 		setAdsrPoint(id, adsrPointNum, x, y);
 	}
 
-	public void setSample(String sampleName) {
-		setSample(id, sampleName);
+	public void setSampleNum(int sampleNum) {
+		currSampleNum = sampleNum;
+		setSample(id, getSamplePath());
 	}
 
 	public static native void armTrack(int trackNum);

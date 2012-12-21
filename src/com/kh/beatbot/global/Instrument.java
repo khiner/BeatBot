@@ -7,7 +7,6 @@ public class Instrument {
 	private BeatBotIconSource bbIconSource;
 	private File[] sampleFiles;
 	private String[] sampleNames;
-	private int currSampleNum;
 	private int iconSource;
 
 	public Instrument(String instrumentName, BeatBotIconSource instrumentIcon) {
@@ -16,31 +15,10 @@ public class Instrument {
 		File dir = new File(GlobalVars.appDirectory + instrumentName);
 		sampleFiles = dir.listFiles();
 		sampleNames = dir.list();
-		currSampleNum = 0;
-	}
-
-	public void setCurrSampleNum(int currSampleNum) {
-		this.currSampleNum = currSampleNum;
-	}
-
-	public int getCurrSampleNum() {
-		return currSampleNum;
 	}
 
 	public String getName() {
 		return name;
-	}
-
-	public String getCurrSampleName() {
-		return getSampleName(currSampleNum);
-	}
-
-	public File getCurrSampleFile() {
-		return sampleFiles[currSampleNum];
-	}
-	
-	public String getCurrSamplePath() {
-		return GlobalVars.appDirectory + name + "/" + getCurrSampleName();
 	}
 	
 	public BeatBotIconSource getBBIconSource() {
@@ -68,5 +46,13 @@ public class Instrument {
 
 	public String getSampleName(int sampleNum) {
 		return sampleNames[sampleNum];
+	}
+	
+	public String getSamplePath(int sampleNum) {
+		return GlobalVars.appDirectory + name + "/" + getSampleName(sampleNum);
+	}
+	
+	public long getNumSamples(int sampleNum) {
+		return getSampleFile(sampleNum).length() / 8 - 44;
 	}
 }
