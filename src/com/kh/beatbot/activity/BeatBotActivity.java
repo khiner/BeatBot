@@ -254,7 +254,6 @@ public class BeatBotActivity extends Activity implements LevelListener {
 		}
 		setEditIconsEnabled(false);
 		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));
-		GlobalVars.midiView.initMeFirst();
 		if (savedInstanceState != null) {
 			GlobalVars.midiView.readFromBundle(savedInstanceState);
 		}

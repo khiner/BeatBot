@@ -2,11 +2,12 @@ package com.kh.beatbot.view.helper;
 
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.view.bean.MidiViewBean;
+import com.kh.beatbot.view.MidiView;
 
 public class TickWindowHelper {
-	public static MidiViewBean viewBean;
 
+	private static MidiView midiView = null;
+	
 	public static final float MIN_TICKS = MidiManager.TICKS_IN_ONE_MEASURE / 8;
 	public static final float MAX_TICKS = MidiManager.TICKS_IN_ONE_MEASURE * 4;
 	public static final int MIN_LINES_DISPLAYED = 8;
@@ -14,6 +15,8 @@ public class TickWindowHelper {
 
 	// leftmost tick to display
 	private static float currTickOffset = 0;
+	private static float currYOffset = 0;
+	
 	// current number of ticks within the window
 	private static float currNumTicks = MidiManager.TICKS_IN_ONE_MEASURE + 4;
 
@@ -27,11 +30,20 @@ public class TickWindowHelper {
 		return currTickOffset;
 	}
 
+	public static float getYOffset() {
+		return currYOffset;
+	}
+	
+	public static void init(MidiView _midiView) {
+		midiView = _midiView;
+		updateGranularity();
+	}
+	
 	public static void zoom(float leftX, float rightX) {
-		float ZLAT = viewBean.getZoomLeftAnchorTick();
-		float ZRAT = viewBean.getZoomRightAnchorTick();
+		float ZLAT = MidiView.zoomLeftAnchorTick;
+		float ZRAT = MidiView.zoomRightAnchorTick;
 		float newTOS = (ZRAT * leftX - ZLAT * rightX) / (leftX - rightX);
-		float newNumTicks = (ZLAT - newTOS) * viewBean.getWidth() / leftX;
+		float newNumTicks = (ZLAT - newTOS) * midiView.getWidth() / leftX;
 
 		if (newTOS < 0 && newTOS + newNumTicks > MAX_TICKS
 				|| newNumTicks < MIN_TICKS) {
@@ -42,45 +54,47 @@ public class TickWindowHelper {
 			currNumTicks = newNumTicks;
 		} else if (newTOS < 0) {
 			currTickOffset = 0;
-			currNumTicks = ZRAT * viewBean.getWidth() / rightX;
+			currNumTicks = ZRAT * midiView.getMidiWidth() / rightX;
 			currNumTicks = currNumTicks > MAX_TICKS ? MAX_TICKS : currNumTicks;
 		} else if (newTOS + newNumTicks > MAX_TICKS) {
 			currNumTicks = (ZLAT - MAX_TICKS) / (leftX
-					/ viewBean.getWidth() - 1);
+					/ midiView.getMidiWidth() - 1);
 			currTickOffset = MAX_TICKS - currNumTicks;
 		}
 		updateGranularity();
 	}
 
 	public static void scroll() {
-		float sv = ScrollBarHelper.scrollVelocity;
+		float sv = ScrollBarHelper.scrollXVelocity;
 		if (!ScrollBarHelper.scrolling && sv != 0) {
 			ScrollBarHelper.tickScrollVelocity();
 			setTickOffset(currTickOffset + sv);
 		}
 	}
 
-	public static void scroll(float x) {
-		float newTickOffset = viewBean.getScrollAnchorTick()
-				- (currNumTicks * x) / viewBean.getWidth();
-		float diff = newTickOffset - currTickOffset;
+	public static void scroll(float x, float y) {
+		float newTickOffset = MidiView.scrollAnchorTick
+				- (currNumTicks * x) / midiView.getMidiWidth();
+		float newYOffset = MidiView.scrollAnchorY - y;
+		float xDiff = newTickOffset - currTickOffset;
+		float yDiff = newYOffset - currYOffset;
 		setTickOffset(newTickOffset);
-		ScrollBarHelper.scrollVelocity = diff;
+		setYOffset(newYOffset);
+		ScrollBarHelper.scrollXVelocity = xDiff;
+		ScrollBarHelper.scrollYVelocity = yDiff;
 	}
 
 	public static void updateGranularity() {
 		// x-coord width of one eight note
-		float spacing = ((float) MidiManager.TICKS_IN_ONE_MEASURE * viewBean
-				.getWidth()) / (currNumTicks * 8);
+		float spacing = ((float) MidiManager.TICKS_IN_ONE_MEASURE * midiView.getMidiWidth()) / (currNumTicks * 8);
 		// after algebra, this condition says: if more than maxLines will
 		// display, reduce the granularity by one half, else if less than
 		// maxLines will display, increase the granularity by one half
 		// so that (minLinesDisplayed <= lines-displayed <=
 		// maxLinesDisplayed) at all times
-		if ((MAX_LINES_DISPLAYED * spacing) / granularity < viewBean.getWidth())
+		if ((MAX_LINES_DISPLAYED * spacing) / granularity < midiView.getMidiWidth())
 			granularity /= 2;
-		else if ((MIN_LINES_DISPLAYED * spacing) / granularity > viewBean
-				.getWidth() && granularity < 4)
+		else if ((MIN_LINES_DISPLAYED * spacing) / granularity > midiView.getMidiWidth() && granularity < 4)
 			granularity *= 2;
 		GlobalVars.currBeatDivision = granularity * 2;
 	}
@@ -92,6 +106,15 @@ public class TickWindowHelper {
 			currTickOffset = 0;
 		else if (tickOffset + currNumTicks > MAX_TICKS)
 			currTickOffset = MAX_TICKS - currNumTicks;
+	}
+	
+	public static void setYOffset(float yOffset) {
+		if (yOffset + midiView.getMidiHeight() <= MidiView.allTracksHeight && yOffset >= 0) {
+			currYOffset = yOffset;
+		} else if (yOffset < 0)
+			currYOffset = 0;
+		else if (yOffset + MidiView.trackHeight > MidiView.allTracksHeight)
+			currYOffset = MidiView.allTracksHeight - MidiView.trackHeight;
 	}
 
 	public static boolean setNumTicks(float numTicks) {

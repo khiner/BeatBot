@@ -18,7 +18,6 @@ import com.kh.beatbot.listener.MidiTrackControlListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.SurfaceViewBase;
-import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class MidiTrackControlHelper {
 	public static class ButtonRow {
@@ -29,10 +28,10 @@ public class MidiTrackControlHelper {
 
 		public ButtonRow(int trackNum, BeatBotIconSource instrumentIcon) {
 			this.trackNum = trackNum;
-			this.instrumentButton = new BeatBotButton(instrumentIcon, trackHeight);
+			this.instrumentButton = new BeatBotButton(instrumentIcon, MidiView.trackHeight);
 
-			muteButton = new BeatBotToggleButton(GlobalVars.muteIcon, trackHeight);
-			soloButton = new BeatBotToggleButton(GlobalVars.soloIcon, trackHeight);
+			muteButton = new BeatBotToggleButton(GlobalVars.muteIcon, MidiView.trackHeight);
+			soloButton = new BeatBotToggleButton(GlobalVars.soloIcon, MidiView.trackHeight);
 			width = instrumentButton.getWidth() + muteButton.getWidth()
 					+ soloButton.getWidth();
 		}
@@ -132,27 +131,27 @@ public class MidiTrackControlHelper {
 	}
 
 	public static final int NUM_CONTROLS = 3; // mute/solo/track settings
-	public static float width;
-	public static float height, trackHeight;
 
+	private static MidiView midiView = null;
 	private static MidiTrackControlListener listener;
 	private static FloatBuffer bgRectVb = null;
 	private static List<ButtonRow> buttonRows = new ArrayList<ButtonRow>();
 	private static Map<Integer, ButtonRow> whichRowOwnsPointer = new HashMap<Integer, ButtonRow>();
 
-	public static void init(MidiView midiView) {
+	public static void init(MidiView _midiView) {
 		if (!buttonRows.isEmpty()) {
 			// it is possible that this static class can be reinstantiated after switching between views.
 			// ensure we're not re-adding rows by exiting
 			return;
 		}
-		height = midiView.getBean().getTrackHeight();
-		trackHeight = height / Managers.trackManager.getNumTracks();
+		midiView = _midiView;
+		MidiView.allTracksHeight = midiView.getMidiHeight();
+		MidiView.trackHeight = midiView.getMidiHeight() / Managers.trackManager.getNumTracks();
 		for (int i = 0; i < Managers.trackManager.getNumTracks(); i++) {
 			buttonRows.add(new ButtonRow(i,
 					Managers.trackManager.getTrack(i).getInstrument().getBBIconSource()));
 		}
-		width = MidiViewBean.X_OFFSET = buttonRows.get(0).width;
+		MidiView.X_OFFSET = buttonRows.get(0).width;
 		initBgRectVb();
 	}
 
@@ -170,18 +169,17 @@ public class MidiTrackControlHelper {
 	
 	public static void addTrack(int trackNum, BeatBotIconSource instrumentIcon) {
 		buttonRows.add(new ButtonRow(trackNum, instrumentIcon));
-		height = trackHeight * buttonRows.size();
+		MidiView.allTracksHeight = MidiView.trackHeight * buttonRows.size();
 		initBgRectVb();
 	}
 	
 	/** draw background color & track control icons */
 	public static void draw() {
 		SurfaceViewBase.drawTriangleStrip(bgRectVb, Colors.BG_COLOR);
-		float y = GlobalVars.midiView.getBean().getHeight() - trackHeight
-				- MidiViewBean.Y_OFFSET;
+		float y = midiView.getMidiHeight() - MidiView.trackHeight;
 		for (ButtonRow buttonRow : buttonRows) {
 			buttonRow.draw(y);
-			y -= trackHeight;
+			y -= MidiView.trackHeight;
 		}
 	}
 
@@ -246,7 +244,6 @@ public class MidiTrackControlHelper {
 	}
 
 	private static void initBgRectVb() {
-		bgRectVb = SurfaceViewBase.makeRectFloatBuffer(0, 0, width, height
-				+ MidiViewBean.Y_OFFSET);
+		bgRectVb = SurfaceViewBase.makeRectFloatBuffer(0, 0, MidiView.X_OFFSET, midiView.getHeight());
 	}
 }

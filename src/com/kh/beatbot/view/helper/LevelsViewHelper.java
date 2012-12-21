@@ -16,7 +16,6 @@ import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.SurfaceViewBase;
-import com.kh.beatbot.view.bean.MidiViewBean;
 
 public class LevelsViewHelper {
 	private static class DragLine {
@@ -43,9 +42,7 @@ public class LevelsViewHelper {
 
 	private static final String noteRestrictionAlert = "Cannot create, delete or move notes in levels view.";
 	private static FloatBuffer levelBarVb = null;
-	private static final int LEVEL_BAR_WIDTH = MidiViewBean.LEVEL_POINT_SIZE / 2;
-	private static MidiView midiView;
-	private static MidiViewBean bean;
+	private static final int LEVEL_BAR_WIDTH = MidiView.LEVEL_POINT_SIZE / 2;
 	private static GL10 gl;
 
 	// map of pointerIds to the notes they are selecting
@@ -58,13 +55,14 @@ public class LevelsViewHelper {
 	// last single-tapped level-note
 	private static MidiNote tappedLevelNote = null;
 
+	private static MidiView midiView;
+	
 	private static LevelMode currLevelMode = LevelMode.VOLUME;
 
 	public static void init(MidiView _midiView) {
 		midiView = _midiView;
-		bean = midiView.getBean();
-		bean.setLevelsHeight(MidiViewBean.Y_OFFSET + MidiTrackControlHelper.height - MidiViewBean.LEVEL_POINT_SIZE);
-		gl = midiView.getGL10();
+		MidiView.levelsHeight = midiView.getHeight() - MidiView.LEVEL_POINT_SIZE;
+		gl = MidiView.getGL10();
 		initLevelBarVb();
 	}
 
@@ -88,9 +86,9 @@ public class LevelsViewHelper {
 		float[] vertices = new float[800];
 		for (int i = 0; i < vertices.length / 4; i++) {
 			vertices[i * 4] = -LEVEL_BAR_WIDTH / 2;
-			vertices[i * 4 + 1] = MidiViewBean.Y_OFFSET + MidiTrackControlHelper.height
+			vertices[i * 4 + 1] = midiView.getHeight()
 					- ((float) i / (vertices.length / 4))
-					* bean.getLevelsHeight();
+					* MidiView.levelsHeight;
 			vertices[i * 4 + 2] = LEVEL_BAR_WIDTH / 2;
 			vertices[i * 4 + 3] = vertices[i * 4 + 1];
 		}
@@ -283,8 +281,8 @@ public class LevelsViewHelper {
 		float[] color = new float[4];
 		boolean selected = midiNote.isSelected();
 		boolean levelViewSelected = midiNote.isLevelViewSelected();
-		float blackToWhite = (1 - bean.getBgColor() * 2);
-		float whiteToBlack = bean.getBgColor() * 2;
+		float blackToWhite = (1 - midiView.getBgColor() * 2);
+		float whiteToBlack = midiView.getBgColor() * 2;
 		if (!selected && levelViewSelected) {
 			// fade from red to white
 			color[0] = 1;
@@ -324,16 +322,16 @@ public class LevelsViewHelper {
 	}
 
 	private static float levelToY(float level) {
-		return MidiViewBean.Y_OFFSET + MidiTrackControlHelper.height - MidiViewBean.LEVEL_POINT_SIZE / 2 - level
-				* bean.getLevelsHeight();
+		return midiView.getHeight() - MidiView.LEVEL_POINT_SIZE / 2 - level
+				* MidiView.levelsHeight;
 	}
 
 	/*
 	 * map y value of level bar to a value in [0,1]
 	 */
 	private static float yToLevel(float y) {
-		return (MidiViewBean.Y_OFFSET + MidiTrackControlHelper.height - MidiViewBean.LEVEL_POINT_SIZE / 2 - y)
-				/ bean.getLevelsHeight();
+		return (midiView.getHeight() - MidiView.LEVEL_POINT_SIZE / 2 - y)
+				/ MidiView.levelsHeight;
 	}
 
 	public static void singleTap(float x, float y) {
@@ -376,7 +374,7 @@ public class LevelsViewHelper {
 			updateDragLine();
 			setLevelsToDragLine();
 			// velocity changes are valid undo events
-			bean.setStateChanged(true);
+			MidiView.stateChanged = true;
 		} else { // no midi selected. midiView can handle it.
 			midiView.noMidiMove(e);
 		}

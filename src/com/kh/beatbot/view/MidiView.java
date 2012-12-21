@@ -21,7 +21,6 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.midi.MidiNote;
-import com.kh.beatbot.view.bean.MidiViewBean;
 import com.kh.beatbot.view.helper.LevelsViewHelper;
 import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 import com.kh.beatbot.view.helper.ScrollBarHelper;
@@ -29,9 +28,97 @@ import com.kh.beatbot.view.helper.TickWindowHelper;
 import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class MidiView extends ClickableSurfaceView {
+	/**************** ATTRIBUTES ***************/
+	public static final float COLOR_TRANSITION_RATE = .02f;
+	public static float X_OFFSET; // dynamically determined
+	public static final float Y_OFFSET = 21;
 
+	public static final float LOOP_SELECT_SNAP_DIST = 30;
+	
+	// the size of the "dots" at the top of level display
+	public static final int LEVEL_POINT_SIZE = 16;
+	// the width of the lines for note levels
+	public static final int LEVEL_LINE_WIDTH = 7;
+
+	public static MidiView.State viewState = MidiView.State.NORMAL_VIEW;
+
+	public static float trackHeight, allTracksHeight;
+	public static float levelsHeight;
+	// the main background color for the view.
+	// this color can change when transitioning to/from LEVEL_VIEW
+	private static float bgColor = Colors.MIDI_VIEW_DEFAULT_BG_COLOR;
+	private static float[] bgColorRgb = {bgColor, bgColor, bgColor, 1};
+	
+	public static float dragOffsetTick[] = new float[5];
+
+	public static int pinchLeftPointerId = -1;
+	public static int pinchRightPointerId = -1;
+	public static float pinchLeftOffset = 0;
+	public static float pinchRightOffset = 0;
+	public static float zoomLeftAnchorTick = 0;
+	public static float zoomRightAnchorTick = 0;
+
+	public static int scrollPointerId = -1;
+	public static float scrollAnchorTick = 0;
+	public static float scrollAnchorY = 0;
+
+	public static boolean selectRegion = false;
+	public static float selectRegionStartTick = -1;
+	public static float selectRegionStartY = -1;
+
+	// true when a note is being "pinched" (two-fingers touching the note)
+	public static boolean pinch = false;
+
+	private static int[] loopPointerIds = { -1, -1, -1 };
+	public static float loopSelectionOffset = 0;
+
+	// set this to true after an event that can be undone (with undo btn)
+	public static boolean stateChanged = false;
+
+	// this option can be set via a menu item.
+	// if true, all midi note movements are rounded to the nearest major tick
+	public static boolean snapToGrid = true;
+
+	public float getBgColor() {
+		return bgColor;
+	}
+	
+	public float getMidiWidth() {
+		return width - X_OFFSET;
+	}
+
+	public float getMidiHeight() {
+		return height - Y_OFFSET;
+	}
+
+	public void setBgColor(float bgColor) {
+		MidiView.bgColor = bgColor;
+		bgColorRgb[0] = bgColorRgb[1] = bgColorRgb[2] = bgColor;
+	}
+
+	public void setLoopPointerId(int num, int id) {
+		if ((id != -1 && loopPointerIds[1] != -1 || num == 1
+				&& (loopPointerIds[0] != -1 || loopPointerIds[2] != -1)))
+			return; // can't select middle and left or right at the same time
+		loopPointerIds[num] = id;
+	}
+
+	public int getNumLoopMarkersSelected() {
+		int numSelected = 0;
+		for (int i = 0; i < 3; i++)
+			if (loopPointerIds[i] != -1)
+				numSelected++;
+		return numSelected;
+	}
+
+	public boolean toggleSnapToGrid() {
+		snapToGrid = !snapToGrid;
+		return snapToGrid;
+	}
+	
+	/**************** END ATTRIBUTES ****************/
+	
 	private MidiManager midiManager;
-	private MidiViewBean bean = new MidiViewBean();
 
 	private static final int[] V_LINE_WIDTHS = new int[] { 5, 3, 2 };
 	private static final float[] V_LINE_COLORS = new float[] { 0, .2f, .3f };
@@ -40,6 +127,7 @@ public class MidiView extends ClickableSurfaceView {
 	private FloatBuffer[] vLineVb = new FloatBuffer[3];
 	private FloatBuffer currTickVb = null;
 	private FloatBuffer hLineVb = null;
+	private FloatBuffer tickHLineVb = null;
 	private FloatBuffer tickFillVb = null;
 	private FloatBuffer selectRegionVb = null;
 	private FloatBuffer loopMarkerVb = null;
@@ -64,10 +152,8 @@ public class MidiView extends ClickableSurfaceView {
 
 	public MidiView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		bean.setHeight(height);
-		bean.setWidth(width);
 		for (int i = 0; i < 5; i++) {
-			bean.setDragOffsetTick(i, 0);
+			dragOffsetTick[i] = 0;
 		}
 	}
 
@@ -75,26 +161,16 @@ public class MidiView extends ClickableSurfaceView {
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		super.surfaceChanged(holder, format, width, height);
-		bean.setWidth(width);
-		bean.setHeight(height);
+		this.width = width;
+		this.height = height;
 	}
 
-	public void initMeFirst() {
-		midiManager = Managers.midiManager;
-		TickWindowHelper.viewBean = bean;
-		TickWindowHelper.updateGranularity();
-	}
-
-	public MidiViewBean getBean() {
-		return bean;
-	}
-
-	public GL10 getGL10() {
+	public static GL10 getGL10() {
 		return gl;
 	}
 
 	public State getViewState() {
-		return bean.getViewState();
+		return viewState;
 	}
 
 	public void handleUndo() {
@@ -105,11 +181,11 @@ public class MidiView extends ClickableSurfaceView {
 		if (viewState == State.TO_LEVELS_VIEW
 				|| viewState == State.TO_NORMAL_VIEW)
 			return;
-		bean.setViewState(viewState);
+		MidiView.viewState = viewState;
 		if (viewState == State.LEVELS_VIEW)
-			bean.setBgColor(0);
+			setBgColor(0);
 		else
-			bean.setBgColor(Colors.MIDI_VIEW_DEFAULT_BG_COLOR);
+			setBgColor(Colors.MIDI_VIEW_DEFAULT_BG_COLOR);
 	}
 
 	public LevelsViewHelper.LevelMode getLevelMode() {
@@ -134,16 +210,15 @@ public class MidiView extends ClickableSurfaceView {
 
 	private void selectRegion(float x, float y) {
 		float tick = xToTick(x);
-		float leftTick = Math.min(tick, bean.getSelectRegionStartTick());
-		float rightTick = Math.max(tick, bean.getSelectRegionStartTick());
-		float topY = Math.min(y, bean.getSelectRegionStartY());
-		float bottomY = Math.max(y, bean.getSelectRegionStartY());
+		float leftTick = Math.min(tick, selectRegionStartTick);
+		float rightTick = Math.max(tick, selectRegionStartTick);
+		float topY = Math.min(y, selectRegionStartY);
+		float bottomY = Math.max(y, selectRegionStartY);
 		// make sure select rect doesn't go into the tick view
-		topY = Math.max(topY, MidiViewBean.Y_OFFSET);
+		topY = Math.max(topY, Y_OFFSET);
 		// make sure select rect doesn't go past the last track/note
-		bottomY = Math.min(bottomY, MidiViewBean.Y_OFFSET
-				+ MidiTrackControlHelper.height - .01f);
-		if (bean.getViewState() == State.LEVELS_VIEW) {
+		bottomY = Math.min(bottomY, Y_OFFSET + allTracksHeight - .01f);
+		if (viewState == State.LEVELS_VIEW) {
 			LevelsViewHelper.selectRegion(leftTick, rightTick, topY, bottomY);
 		} else {
 			int topNote = yToNote(topY);
@@ -185,7 +260,7 @@ public class MidiView extends ClickableSurfaceView {
 
 		startOnTicks.put(pointerId, (float) selectedNote.getOnTick());
 		float leftOffset = tick - selectedNote.getOnTick();
-		bean.setDragOffsetTick(pointerId, leftOffset);
+		dragOffsetTick[pointerId] = leftOffset;
 		// don't need right offset for simple drag (one finger
 		// select)
 
@@ -203,31 +278,31 @@ public class MidiView extends ClickableSurfaceView {
 	public void selectLoopMarker(int pointerId, float x) {
 		float loopBeginX = tickToX(Managers.midiManager.getLoopBeginTick());
 		float loopEndX = tickToX(Managers.midiManager.getLoopEndTick());
-		if (Math.abs(x - loopBeginX) <= MidiViewBean.LOOP_SELECT_SNAP_DIST) {
-			bean.setLoopPointerId(0, pointerId);
-		} else if (Math.abs(x - loopEndX) <= MidiViewBean.LOOP_SELECT_SNAP_DIST) {
-			bean.setLoopPointerId(2, pointerId);
+		if (Math.abs(x - loopBeginX) <= LOOP_SELECT_SNAP_DIST) {
+			loopPointerIds[0] = pointerId;
+		} else if (Math.abs(x - loopEndX) <= LOOP_SELECT_SNAP_DIST) {
+			loopPointerIds[2] = pointerId;
 		} else if (x > loopBeginX && x < loopEndX) {
-			bean.setLoopPointerId(1, pointerId);
-			bean.setLoopSelectionOffset(x - loopBeginX);
+			loopPointerIds[1] = pointerId;
+			loopSelectionOffset = x - loopBeginX;
 		}
 	}
 
 	private void drawBgRect() {
-		drawTriangleStrip(bgRectVb, bean.getBgColorRgb());
+		drawTriangleStrip(bgRectVb, bgColorRgb);
 	}
 
 	private void drawHorizontalLines() {
-		gl.glColor4f(0, 0, 0, 1);
-		gl.glLineWidth(2);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, hLineVb);
-		gl.glDrawArrays(GL10.GL_LINES, 0, hLineVb.capacity() / 2);
+		drawLines(tickHLineVb, Colors.BLACK, 2, GL10.GL_LINES);
+		translate(0, -TickWindowHelper.getYOffset());
+		drawLines(hLineVb, Colors.BLACK, 2, GL10.GL_LINES);
+		translate(0, TickWindowHelper.getYOffset());
 	}
 
 	private void drawVerticalLines() {
 		// distance between one primary tick to the next
 		float translateDist = TickWindowHelper.getMajorTickSpacing() * 4f
-				* bean.getWidth() / TickWindowHelper.getNumTicks();
+				* getMidiWidth() / TickWindowHelper.getNumTicks();
 		// start at the first primary tick before display start
 		float startX = tickToX(TickWindowHelper
 				.getPrimaryTickToLeftOf(TickWindowHelper.getTickOffset()));
@@ -237,41 +312,41 @@ public class MidiView extends ClickableSurfaceView {
 						+ TickWindowHelper.getNumTicks()))
 				+ translateDist;
 
-		gl.glPushMatrix();
-		gl.glTranslatef(startX, 0, 0);
+		push();
+		translate(startX, 0);
 		for (int i = 0; i < 3; i++) {
 			float color = V_LINE_COLORS[i];
 			gl.glColor4f(color, color, color, 1); // appropriate line color
 			gl.glLineWidth(V_LINE_WIDTHS[i]); // appropriate line width
-			gl.glPushMatrix();
+			push();
 			for (float x = startX; x < endX; x += translateDist) {
 				gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vLineVb[i]);
 				gl.glDrawArrays(GL10.GL_LINES, 0, 2);
-				gl.glTranslatef(translateDist, 0, 0);
+				translate(translateDist, 0);
 			}
-			gl.glPopMatrix();
+			pop();
 			if (i == 0) {
-				gl.glTranslatef(translateDist / 2, 0, 0);
+				translate(translateDist / 2, 0);
 			} else if (i == 1) {
 				translateDist /= 2;
-				gl.glTranslatef(-translateDist / 2, 0, 0);
+				translate(-translateDist / 2, 0);
 			}
 		}
-		gl.glPopMatrix();
+		pop();
 	}
 
 	private void drawCurrentTick() {
 		float xLoc = tickToX(midiManager.getCurrTick());
-		gl.glTranslatef(xLoc, 0, 0);
+		translate(xLoc, 0);
 		drawLines(currTickVb, Colors.VOLUME_COLOR, 5, GL10.GL_LINES);
-		gl.glTranslatef(-xLoc, 0, 0);
+		translate(-xLoc, 0);
 	}
 
 	private void drawLoopMarker() {
 		float[][] color = new float[2][3];
-		color[0] = bean.getLoopPointerIds()[0] != -1 ? Colors.TICK_SELECTED_COLOR
+		color[0] = loopPointerIds[0] != -1 ? Colors.TICK_SELECTED_COLOR
 				: Colors.TICK_MARKER_COLOR;
-		color[1] = bean.getLoopPointerIds()[2] != -1 ? Colors.TICK_SELECTED_COLOR
+		color[1] = loopPointerIds[2] != -1 ? Colors.TICK_SELECTED_COLOR
 				: Colors.TICK_MARKER_COLOR;
 		gl.glLineWidth(6);
 		float[] loopMarkerLocs = { tickToX(midiManager.getLoopBeginTick()),
@@ -279,13 +354,13 @@ public class MidiView extends ClickableSurfaceView {
 		for (int i = 0; i < 2; i++) {
 			float loopMarkerLoc = loopMarkerLocs[i];
 			setColor(color[i]);
-			gl.glPushMatrix();
-			gl.glTranslatef(loopMarkerLoc, 0, 0);
+			push();
+			translate(loopMarkerLoc, 0);
 			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerVb);
 			gl.glDrawArrays(GL10.GL_TRIANGLES, i * 3, 3);
 			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerLineVb);
 			gl.glDrawArrays(GL10.GL_LINES, 0, 2);
-			gl.glPopMatrix();
+			pop();
 		}
 	}
 
@@ -295,16 +370,15 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	private void drawLoopBar() {
-		float[] color = bean.getLoopPointerIds()[1] == -1 ? Colors.TICKBAR_COLOR
+		float[] color = loopPointerIds[1] == -1 ? Colors.TICKBAR_COLOR
 				: Colors.TICK_SELECTED_COLOR;
 		// entire loop bar is selected. draw darker square
 		drawRectangle(tickToX(midiManager.getLoopBeginTick()), 0,
-				tickToX(midiManager.getLoopEndTick()), MidiViewBean.Y_OFFSET,
-				color);
+				tickToX(midiManager.getLoopEndTick()), Y_OFFSET, color);
 	}
 
 	private void drawLoopRect() {
-		float gray = bean.getBgColor() + .2f;
+		float gray = bgColor + .2f;
 		float[] color = new float[] { gray, gray, gray, 1 };
 		drawTriangleStrip(loopRectVb, color);
 	}
@@ -318,18 +392,16 @@ public class MidiView extends ClickableSurfaceView {
 			float noteWidth = tickToX(Managers.recordManager
 					.getRecordCurrTick()
 					- Managers.recordManager.getRecordStartTick()
-					+ RecordManager.RECORD_LATENCY_TICKS)
-					- MidiViewBean.X_OFFSET;
-			gl.glPushMatrix();
-			gl.glTranslatef(
-					tickToX(Managers.recordManager.getRecordStartTick()), 0, 0);
+					+ RecordManager.RECORD_LATENCY_TICKS) - X_OFFSET;
+			push();
+			translate(tickToX(Managers.recordManager.getRecordStartTick()), 0);
 			// scale drawing so entire waveform exactly fits in the note width
-			gl.glScalef(noteWidth / waveWidth, 1, 1);
+			scale(noteWidth / waveWidth, 1);
 			for (int i = 0; i < waveformVbs.size(); i++) {
 				drawLines(waveformVbs.get(i), Colors.WAVEFORM_COLOR, 1,
 						GL10.GL_LINE_STRIP);
 			}
-			gl.glPopMatrix();
+			pop();
 		}
 	}
 
@@ -340,7 +412,7 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	private void drawSelectRegion() {
-		if (!bean.isSelectRegion() || selectRegionVb == null)
+		if (!selectRegion || selectRegionVb == null)
 			return;
 		drawTriangleStrip(selectRegionVb, new float[] { .6f, .6f, 1, .7f });
 	}
@@ -364,59 +436,60 @@ public class MidiView extends ClickableSurfaceView {
 		float x1 = tickToX(midiNote.getOnTick());
 		float y1 = noteToY(midiNote.getNoteValue());
 		float x2 = tickToX(midiNote.getOffTick());
-		float y2 = y1 + MidiTrackControlHelper.trackHeight;
+		float y2 = y1 + trackHeight;
 		// fade outline from black to white
-		float baseColor = (1 - bean.getBgColor() * 2);
+		float baseColor = (1 - bgColor * 2);
 		drawRectangle(x1, y1, x2, y2, color);
 		drawRectangleOutline(x1, y1, x2, y2, new float[] { baseColor,
 				baseColor, baseColor, 1 }, 4);
 	}
 
 	private void initTickFillVb() {
-		tickFillVb = makeRectFloatBuffer(MidiViewBean.X_OFFSET, 0, width,
-				MidiViewBean.Y_OFFSET);
+		tickFillVb = makeRectFloatBuffer(X_OFFSET, 0, width, Y_OFFSET);
 	}
 
 	private void initBgRectVb() {
-		bgRectVb = makeRectFloatBuffer(MidiViewBean.X_OFFSET,
-				MidiViewBean.Y_OFFSET, width, MidiTrackControlHelper.height
-						+ MidiViewBean.Y_OFFSET);
+		bgRectVb = makeRectFloatBuffer(X_OFFSET, Y_OFFSET, width, height);
 	}
 
 	private void initLoopRectVb() {
 		loopRectVb = makeRectFloatBuffer(
-				tickToX(midiManager.getLoopBeginTick()), MidiViewBean.Y_OFFSET,
-				tickToX(midiManager.getLoopEndTick()),
-				MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET);
+				tickToX(midiManager.getLoopBeginTick()), Y_OFFSET,
+				tickToX(midiManager.getLoopEndTick()), height);
 	}
 
 	private void initCurrTickVb() {
-		float[] vertLine = new float[] { 0, MidiViewBean.Y_OFFSET, 0,
-				MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET };
+		float[] vertLine = new float[] { 0, Y_OFFSET, 0, height };
 		currTickVb = makeFloatBuffer(vertLine);
 	}
 
 	private void initHLineVb() {
-		float[] hLines = new float[(Managers.trackManager.getNumTracks() + 2) * 4];
-		hLines[0] = MidiViewBean.X_OFFSET;
-		hLines[1] = 0;
-		hLines[2] = width;
-		hLines[3] = 0;
-		float y = MidiViewBean.Y_OFFSET;
-		for (int i = 1; i < Managers.trackManager.getNumTracks() + 2; i++) {
-			hLines[i * 4] = MidiViewBean.X_OFFSET;
-			;
+		float[] hLines = new float[(Managers.trackManager.getNumTracks() + 1) * 4];
+		float[] tickHLines = new float[8];
+		tickHLines[0] = X_OFFSET;
+		tickHLines[1] = 0;
+		tickHLines[2] = width;
+		tickHLines[3] = 0;
+		tickHLines[4] = X_OFFSET;
+		tickHLines[5] = Y_OFFSET;
+		tickHLines[6] = width;
+		tickHLines[7] = Y_OFFSET;
+		
+		float y = Y_OFFSET;
+		for (int i = 1; i < Managers.trackManager.getNumTracks() + 1; i++) {
+			y += trackHeight;
+			hLines[i * 4] = X_OFFSET;
 			hLines[i * 4 + 1] = y;
 			hLines[i * 4 + 2] = width;
 			hLines[i * 4 + 3] = y;
-			y += MidiTrackControlHelper.trackHeight;
 		}
+		tickHLineVb = makeFloatBuffer(tickHLines);
 		hLineVb = makeFloatBuffer(hLines);
 	}
 
 	private void initVLineVbs() {
 		// height of the bottom of the record row
-		float y1 = MidiViewBean.Y_OFFSET;
+		float y1 = Y_OFFSET;
 
 		for (int i = 0; i < 3; i++) {
 			// 4 vertices per line
@@ -424,15 +497,14 @@ public class MidiView extends ClickableSurfaceView {
 			line[0] = 0;
 			line[1] = y1 - y1 / (i + 1.5f);
 			line[2] = 0;
-			line[3] = MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET;
+			line[3] = height;
 			vLineVb[i] = makeFloatBuffer(line);
 		}
 	}
 
 	private void initLoopMarkerVbs() {
-		float h = MidiViewBean.Y_OFFSET;
-		float[] loopMarkerLine = new float[] { 0, 0, 0,
-				MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET };
+		float h = Y_OFFSET;
+		float[] loopMarkerLine = new float[] { 0, 0, 0, height };
 		// loop begin triangle, pointing right, and
 		// loop end triangle, pointing left
 		float[] loopMarkerTriangles = new float[] { 0, 0, 0, h, h, h / 2, 0, 0,
@@ -443,24 +515,22 @@ public class MidiView extends ClickableSurfaceView {
 
 	public float tickToX(float tick) {
 		return (tick - TickWindowHelper.getTickOffset())
-				/ TickWindowHelper.getNumTicks() * bean.getWidth()
-				+ MidiViewBean.X_OFFSET;
+				/ TickWindowHelper.getNumTicks() * getMidiWidth() + X_OFFSET;
 	}
 
 	public float xToTick(float x) {
-		return TickWindowHelper.getNumTicks() * (x - MidiViewBean.X_OFFSET)
-				/ bean.getWidth() + TickWindowHelper.getTickOffset();
+		return TickWindowHelper.getNumTicks() * (x - X_OFFSET)
+				/ getMidiWidth() + TickWindowHelper.getTickOffset();
 	}
 
 	public static int yToNote(float y) {
-		if (y >= 0 && y < MidiViewBean.Y_OFFSET)
+		if (y >= 0 && y < Y_OFFSET)
 			return -1;
-		return (int) ((y - MidiViewBean.Y_OFFSET) / MidiTrackControlHelper.trackHeight);
+		return (int) ((y + TickWindowHelper.getYOffset() - Y_OFFSET) / trackHeight);
 	}
 
 	public static float noteToY(int note) {
-		return note * MidiTrackControlHelper.trackHeight
-				+ MidiViewBean.Y_OFFSET;
+		return note * trackHeight + Y_OFFSET - TickWindowHelper.getYOffset();
 	}
 
 	public void signalRecording() {
@@ -483,10 +553,11 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	protected void init() {
+		midiManager = Managers.midiManager;
+		TickWindowHelper.init(this);
 		MidiTrackControlHelper.init(this);
 		LevelsViewHelper.init(this);
 		waveformHelper = new WaveformHelper();
-		TickWindowHelper.updateGranularity();
 		initAllVbs();
 	}
 
@@ -499,15 +570,13 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	protected void calcBgColor() {
-		if (bean.getViewState() == State.TO_LEVELS_VIEW
-				|| bean.getViewState() == State.TO_NORMAL_VIEW) { // transitioning
-			bean.setBgColor(bean.getViewState() == State.TO_LEVELS_VIEW ? bean
-					.getBgColor() - MidiViewBean.COLOR_TRANSITION_RATE : bean
-					.getBgColor() + MidiViewBean.COLOR_TRANSITION_RATE);
-			if (bean.getBgColor() >= .5f) {
-				bean.setViewState(State.NORMAL_VIEW);
-			} else if (bean.getBgColor() <= 0) {
-				bean.setViewState(State.LEVELS_VIEW);
+		if (viewState == State.TO_LEVELS_VIEW
+				|| viewState == State.TO_NORMAL_VIEW) { // transitioning
+			setBgColor(viewState == State.TO_LEVELS_VIEW ? bgColor - COLOR_TRANSITION_RATE : bgColor + COLOR_TRANSITION_RATE);
+			if (bgColor >= .5f) {
+				viewState = State.NORMAL_VIEW;
+			} else if (bgColor <= 0) {
+				viewState = State.LEVELS_VIEW;
 			}
 		}
 	}
@@ -532,16 +601,14 @@ public class MidiView extends ClickableSurfaceView {
 					- TickWindowHelper.getTickOffset());
 		drawHorizontalLines();
 		drawVerticalLines();
-		if (bean.getViewState() != State.NORMAL_VIEW) {
+		if (viewState != State.NORMAL_VIEW) {
 			LevelsViewHelper.drawFrame();
 		} else {
 			drawAllMidiNotes();
 		}
 		drawLoopMarker();
 		drawSelectRegion();
-		ScrollBarHelper.drawScrollView(bean.getWidth(),
-				MidiTrackControlHelper.height + MidiViewBean.Y_OFFSET,
-				MidiViewBean.X_OFFSET);
+		ScrollBarHelper.drawScrollView(getMidiWidth(), height, X_OFFSET);
 		drawRecordingWaveforms();
 		if (playing || recording) {
 			drawCurrentTick();
@@ -596,22 +663,22 @@ public class MidiView extends ClickableSurfaceView {
 		if (midiNote.getOffTick() + offTickDiff <= TickWindowHelper.MAX_TICKS)
 			newOffTick += offTickDiff;
 		midiManager.setNoteTicks(midiNote, (long) newOnTick, (long) newOffTick,
-				bean.isSnapToGrid(), false);
-		bean.setStateChanged(true);
+				snapToGrid, false);
+		stateChanged = true;
 	}
 
 	private void startSelectRegion(float x, float y) {
-		bean.setSelectRegionStartTick(xToTick(x));
-		if (bean.getViewState() == State.LEVELS_VIEW)
-			bean.setSelectRegionStartY(y);
+		selectRegionStartTick = xToTick(x);
+		if (viewState == State.LEVELS_VIEW)
+			selectRegionStartY = y;
 		else
-			bean.setSelectRegionStartY(noteToY(yToNote(y)));
+			selectRegionStartY = noteToY(yToNote(y));
 		selectRegionVb = null;
-		bean.setSelectRegion(true);
+		selectRegion = true;
 	}
 
 	private void cancelSelectRegion() {
-		bean.setSelectRegion(false);
+		selectRegion = false;
 		selectRegionVb = null;
 	}
 
@@ -632,21 +699,17 @@ public class MidiView extends ClickableSurfaceView {
 		midiManager.handleMidiCollisions();
 		midiManager.mergeTempNotes();
 		midiManager.deselectNote(noteToAdd);
-		bean.setStateChanged(true);
+		stateChanged = true;
 		return noteToAdd;
 	}
 
-	public boolean toggleSnapToGrid() {
-		return bean.toggleSnapToGrid();
-	}
-
 	public void toggleLevelsView() {
-		if (bean.getViewState() == State.NORMAL_VIEW
-				|| bean.getViewState() == State.TO_NORMAL_VIEW) {
+		if (viewState == State.NORMAL_VIEW
+				|| viewState == State.TO_NORMAL_VIEW) {
 			LevelsViewHelper.resetSelected();
-			bean.setViewState(State.TO_LEVELS_VIEW);
+			viewState = State.TO_LEVELS_VIEW;
 		} else {
-			bean.setViewState(State.TO_NORMAL_VIEW);
+			viewState = State.TO_NORMAL_VIEW;
 		}
 	}
 
@@ -656,7 +719,7 @@ public class MidiView extends ClickableSurfaceView {
 		if (touchedNote == null)
 			return;
 		int noteDiff = currNote - touchedNote.getNoteValue();
-		float tickDiff = currTick - bean.getDragOffsetTick(pointerId)
+		float tickDiff = currTick - dragOffsetTick[pointerId]
 				- touchedNote.getOnTick();
 		if (noteDiff == 0 && tickDiff == 0)
 			return;
@@ -670,21 +733,18 @@ public class MidiView extends ClickableSurfaceView {
 		for (MidiNote midiNote : notesToDrag) {
 			midiManager.setNoteTicks(midiNote,
 					(long) (midiNote.getOnTick() + tickDiff),
-					(long) (midiNote.getOffTick() + tickDiff),
-					bean.isSnapToGrid(), true);
+					(long) (midiNote.getOffTick() + tickDiff), snapToGrid, true);
 			midiManager.setNoteValue(midiNote, midiNote.getNoteValue()
 					+ noteDiff);
 		}
-		bean.setStateChanged(true);
+		stateChanged = true;
 		midiManager.handleMidiCollisions();
 	}
 
 	private void pinchSelectedNotes(float currLeftTick, float currRightTick) {
 		MidiNote touchedNote = touchedNotes.values().iterator().next();
-		float onTickDiff = currLeftTick - touchedNote.getOnTick()
-				- bean.getPinchLeftOffset();
-		float offTickDiff = currRightTick - touchedNote.getOffTick()
-				+ bean.getPinchRightOffset();
+		float onTickDiff = currLeftTick - touchedNote.getOnTick() - pinchLeftOffset;
+		float offTickDiff = currRightTick - touchedNote.getOffTick() + pinchRightOffset;
 		if (onTickDiff == 0 && offTickDiff == 0)
 			return;
 		for (MidiNote midiNote : midiManager.getSelectedNotes()) {
@@ -695,9 +755,9 @@ public class MidiView extends ClickableSurfaceView {
 
 	public void updateLoopMarkers(MotionEvent e) {
 		for (int i = 0; i < 3; i++) {
-			if (bean.getLoopPointerIds()[i] != -1) {
+			if (loopPointerIds[i] != -1) {
 				float x = e
-						.getX(e.findPointerIndex(bean.getLoopPointerIds()[i]));
+						.getX(e.findPointerIndex(loopPointerIds[i]));
 				float majorTick = TickWindowHelper
 						.getMajorTickToLeftOf(xToTick(x));
 				if (i == 0) { // begin loop marker selected
@@ -708,7 +768,7 @@ public class MidiView extends ClickableSurfaceView {
 							- midiManager.getLoopBeginTick();
 					float newBeginTick = TickWindowHelper
 							.getMajorTickToLeftOf(xToTick(x
-									- bean.getLoopSelectionOffset()));
+									- loopSelectionOffset));
 					float newEndTick = newBeginTick + loopLength;
 					if (newBeginTick <= 0) {
 						newBeginTick = 0;
@@ -731,28 +791,28 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	public void noMidiMove(MotionEvent e) {
-		if (myPointers.size() - bean.getNumLoopMarkersSelected() == 1) {
-			if (bean.isSelectRegion()) { // update select region
+		if (myPointers.size() - getNumLoopMarkersSelected() == 1) {
+			if (selectRegion) { // update select region
 				int index = e.findPointerIndex(myPointers.get(0));
 				selectRegion(e.getX(index), e.getY(index));
 			} else { // one finger scroll
-				int index = e.findPointerIndex(bean.getScrollPointerId());
+				int index = e.findPointerIndex(scrollPointerId);
 				if (index < e.getPointerCount()) {
 					TickWindowHelper.scroll(e.getX(index)
-							- MidiViewBean.X_OFFSET);
+							- X_OFFSET, e.getY(index));
 				}
 			}
-		} else if (myPointers.size() - bean.getNumLoopMarkersSelected() == 2) {
+		} else if (myPointers.size() - getNumLoopMarkersSelected() == 2) {
 			// two finger zoom
 			float leftX = Math.min(e.getX(0), e.getX(1));
 			float rightX = Math.max(e.getX(0), e.getX(1));
-			TickWindowHelper.zoom(leftX - MidiViewBean.X_OFFSET, rightX
-					- MidiViewBean.X_OFFSET);
+			TickWindowHelper.zoom(leftX - X_OFFSET, rightX
+					- X_OFFSET);
 		}
 	}
 
 	public void writeToBundle(Bundle out) {
-		out.putInt("viewState", bean.getViewState().ordinal());
+		out.putInt("viewState", viewState.ordinal());
 	}
 
 	// use constructor first, and set the deets with this method
@@ -763,13 +823,13 @@ public class MidiView extends ClickableSurfaceView {
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
-		if (x < MidiViewBean.X_OFFSET) {
+		if (x < X_OFFSET) {
 			MidiTrackControlHelper.handlePress(id, x, yToNote(y));
 			return;
 		}
 		myPointers.add(id);
 		ScrollBarHelper.startScrollView();
-		if (bean.getViewState() == State.LEVELS_VIEW) {
+		if (viewState == State.LEVELS_VIEW) {
 			LevelsViewHelper.selectLevel(x, y, id);
 		} else {
 			selectMidiNote(x, y, id);
@@ -781,8 +841,9 @@ public class MidiView extends ClickableSurfaceView {
 				selectLoopMarker(id, x);
 			} else {
 				// otherwise, enable scrolling
-				bean.setScrollAnchorTick(xToTick(x));
-				bean.setScrollPointerId(id);
+				scrollAnchorTick = xToTick(x);
+				scrollAnchorY = y + TickWindowHelper.getYOffset();
+				scrollPointerId = id;
 			}
 		}
 	}
@@ -791,13 +852,13 @@ public class MidiView extends ClickableSurfaceView {
 	protected void handleActionPointerDown(MotionEvent e, int id, float x,
 			float y) {
 		super.handleActionPointerDown(e, id, x, y);
-		if (x < MidiViewBean.X_OFFSET) {
+		if (x < X_OFFSET) {
 			MidiTrackControlHelper.handlePress(id, x, yToNote(y));
 			return;
 		}
 		myPointers.add(id);
 		boolean noteAlreadySelected = false;
-		if (bean.getViewState() == State.LEVELS_VIEW) {
+		if (viewState == State.LEVELS_VIEW) {
 			LevelsViewHelper.selectLevel(x, y, id);
 		} else {
 			noteAlreadySelected = !touchedNotes.isEmpty();
@@ -806,7 +867,7 @@ public class MidiView extends ClickableSurfaceView {
 		if (myPointers.size() > 2)
 			return;
 		if (touchedNotes.get(id) == null
-				|| bean.getViewState() == State.LEVELS_VIEW
+				|| viewState == State.LEVELS_VIEW
 				&& LevelsViewHelper.getTouchedLevel(id) == null) {
 			if (yToNote(y) == -1) {
 				selectLoopMarker(id, x);
@@ -821,23 +882,22 @@ public class MidiView extends ClickableSurfaceView {
 					int leftId = e.getX(e.findPointerIndex(0)) <= e.getX(e
 							.findPointerIndex(1)) ? 0 : 1;
 					int rightId = (leftId + 1) % 2;
-					bean.setPinchLeftPointerId(leftId);
-					bean.setPinchRightPointerId(rightId);
-					bean.setPinchLeftOffset(leftTick - touchedNote.getOnTick());
-					bean.setPinchRightOffset(touchedNote.getOffTick()
-							- rightTick);
-					bean.setPinch(true);
-				} else if (myPointers.size() - bean.getNumLoopMarkersSelected() == 1) {
+					pinchLeftPointerId = leftId;
+					pinchRightPointerId = rightId;
+					pinchLeftOffset = leftTick - touchedNote.getOnTick();
+					pinchRightOffset = touchedNote.getOffTick() - rightTick;
+					pinch = true;
+				} else if (myPointers.size() - getNumLoopMarkersSelected() == 1) {
 					// otherwise, enable scrolling
-					bean.setScrollAnchorTick(xToTick(x));
-					bean.setScrollPointerId(id);
+					scrollAnchorTick = xToTick(x);
+					scrollPointerId = id;
 				} else {
 					// can never select region with two pointers in midi view
 					cancelSelectRegion();
 					// init zoom anchors (the same ticks should be under the
 					// fingers at all times)
-					bean.setZoomLeftAnchorTick(leftTick);
-					bean.setZoomRightAnchorTick(rightTick);
+					zoomLeftAnchorTick = leftTick;
+					zoomRightAnchorTick = rightTick;
 				}
 			}
 		}
@@ -847,13 +907,13 @@ public class MidiView extends ClickableSurfaceView {
 	protected void handleActionMove(MotionEvent e) {
 		super.handleActionMove(e);
 		MidiTrackControlHelper.handleMove(e);
-		if (bean.getViewState() == State.LEVELS_VIEW) {
+		if (viewState == State.LEVELS_VIEW) {
 			LevelsViewHelper.handleActionMove(e);
 			return;
 		}
-		if (bean.isPinch()) {
-			int leftIndex = e.findPointerIndex(bean.getPinchLeftPointerId());
-			int rightIndex = e.findPointerIndex(bean.getPinchRightPointerId());
+		if (pinch) {
+			int leftIndex = e.findPointerIndex(pinchLeftPointerId);
+			int rightIndex = e.findPointerIndex(pinchRightPointerId);
 			float leftTick = xToTick(e.getX(leftIndex));
 			float rightTick = xToTick(e.getX(rightIndex));
 			pinchSelectedNotes(leftTick, rightTick);
@@ -861,7 +921,7 @@ public class MidiView extends ClickableSurfaceView {
 												// or update select region
 			noMidiMove(e);
 		} else { // at least one midi selected
-			if (myPointers.size() - bean.getNumLoopMarkersSelected() == 1) {
+			if (myPointers.size() - getNumLoopMarkersSelected() == 1) {
 				// exactly one pointer not dragging loop markers - drag all
 				// selected notes together
 				dragNotes(true, myPointers.get(0),
@@ -887,21 +947,21 @@ public class MidiView extends ClickableSurfaceView {
 			MidiTrackControlHelper.handleRelease(id, x, yToNote(y));
 			return;
 		}
-		if (bean.getViewState() == State.LEVELS_VIEW) {
+		if (viewState == State.LEVELS_VIEW) {
 			LevelsViewHelper.handleActionPointerUp(e, id);
 		} else {
 			touchedNotes.remove(id);
 		}
-		if (bean.getScrollPointerId() == id)
-			bean.setScrollPointerId(-1);
+		if (scrollPointerId == id)
+			scrollPointerId = -1;
 		for (int i = 0; i < 3; i++)
-			if (bean.getLoopPointerIds()[i] == id)
-				bean.setLoopPointerId(i, -1);
+			if (loopPointerIds[i] == id)
+				loopPointerIds[i] = -1;
 		int index = e.getActionIndex() == 0 ? 1 : 0;
-		if (bean.getZoomLeftAnchorTick() != -1) {
-			bean.setPinch(false);
-			bean.setScrollAnchorTick(xToTick(e.getX(index)));
-			bean.setScrollPointerId(e.getPointerId(index));
+		if (zoomLeftAnchorTick != -1) {
+			pinch = false;
+			scrollAnchorTick = xToTick(e.getX(index));
+			scrollPointerId = e.getPointerId(index);
 		}
 		myPointers.remove((Object) id);
 	}
@@ -916,13 +976,13 @@ public class MidiView extends ClickableSurfaceView {
 		}
 		ScrollBarHelper.handleActionUp();
 		for (int i = 0; i < 3; i++)
-			bean.setLoopPointerId(i, -1);
-		bean.setSelectRegion(false);
+			loopPointerIds[i] = -1;
+		selectRegion = false;
 		midiManager.mergeTempNotes();
-		if (bean.isStateChanged())
+		if (stateChanged)
 			midiManager.saveState();
-		bean.setStateChanged(false);
-		if (bean.getViewState() == State.LEVELS_VIEW)
+		stateChanged = false;
+		if (viewState == State.LEVELS_VIEW)
 			LevelsViewHelper.clearTouchedLevels();
 		else {
 			startOnTicks.clear();
@@ -933,7 +993,7 @@ public class MidiView extends ClickableSurfaceView {
 
 	@Override
 	protected void longPress(int id, float x, float y) {
-		if (x < MidiViewBean.X_OFFSET) {
+		if (x < X_OFFSET) {
 			MidiTrackControlHelper.handleLongPress(id, x, yToNote(y));
 			return;
 		}
@@ -943,11 +1003,11 @@ public class MidiView extends ClickableSurfaceView {
 
 	@Override
 	protected void singleTap(int id, float x, float y) {
-		if (x < MidiViewBean.X_OFFSET) {
+		if (x < X_OFFSET) {
 			// MidiTrackControlHelper.handleClick(x, yToNote(y));
 			return;
 		}
-		if (bean.getViewState() == State.LEVELS_VIEW) {
+		if (viewState == State.LEVELS_VIEW) {
 			LevelsViewHelper.singleTap(x, y);
 		} else {
 			MidiNote touchedNote = touchedNotes.get(id);
@@ -976,13 +1036,13 @@ public class MidiView extends ClickableSurfaceView {
 	@Override
 	protected void doubleTap(int id, float x, float y) {
 		MidiNote touchedNote = touchedNotes.get(id);
-		if (bean.getViewState() == State.LEVELS_VIEW) {
+		if (viewState == State.LEVELS_VIEW) {
 			LevelsViewHelper.doubleTap();
 			return;
 		}
 		if (touchedNote != null) {
 			midiManager.deleteNote(touchedNote);
-			bean.setStateChanged(true);
+			stateChanged = true;
 		}
 	}
 }

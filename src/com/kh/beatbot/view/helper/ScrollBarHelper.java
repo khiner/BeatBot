@@ -27,7 +27,8 @@ public class ScrollBarHelper {
 	private static int outerScrollBarCornerRadius = 10;
 
 	public static boolean scrolling = false;
-	public static float scrollVelocity = 0;
+	public static float scrollXVelocity = 0;
+	public static float scrollYVelocity = 0;
 
 	private static FloatBuffer innerScrollBarVb = null;
 	private static FloatBuffer outerScrollBarVb = null;
@@ -35,7 +36,7 @@ public class ScrollBarHelper {
 
 	private static boolean shouldDrawScrollView() {
 		return scrolling
-				|| scrollVelocity != 0
+				|| scrollXVelocity != 0
 				|| Math.abs(System.currentTimeMillis() - scrollViewEndTime) <= GlobalVars.DOUBLE_TAP_TIME * 2;
 	}
 
@@ -78,10 +79,15 @@ public class ScrollBarHelper {
 	}
 
 	public static void tickScrollVelocity() {
-		scrollVelocity *= DAMP_CONSTANT; // dampen velocity
-		if (Math.abs(scrollVelocity) < 1) {
-			scrollVelocity = 0;
+		// dampen x/y velocity
+		scrollXVelocity *= DAMP_CONSTANT;
+		scrollYVelocity *= DAMP_CONSTANT;
+		if (Math.abs(scrollXVelocity) < 1) {
+			scrollXVelocity = 0;
 			scrollViewEndTime = System.currentTimeMillis();
+		}
+		if (Math.abs(scrollYVelocity) < 1) {
+			scrollYVelocity = 0;
 		}
 	}
 

@@ -70,6 +70,18 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glTranslatef(x, y, 0);
 	}
 	
+	public static void scale(float x, float y) {
+		gl.glScalef(x, y, 1);
+	}
+	
+	public static void push() {
+		gl.glPushMatrix();
+	}
+	
+	public static void pop() {
+		gl.glPopMatrix();
+	}
+	
 	public static FloatBuffer makeRectFloatBuffer(float x1, float y1, float x2, float y2) {
 		return makeFloatBuffer(new float[] { x1, y1, x2, y1, x1,
 											 y2, x2, y2 });		
