@@ -65,10 +65,15 @@ public class TickWindowHelper {
 	}
 
 	public static void scroll() {
-		float sv = ScrollBarHelper.scrollXVelocity;
-		if (!ScrollBarHelper.scrolling && sv != 0) {
-			ScrollBarHelper.tickScrollVelocity();
-			setTickOffset(currTickOffset + sv);
+		if (ScrollBarHelper.scrolling) {
+			return;
+		}
+		ScrollBarHelper.tickScrollVelocity();
+		if (ScrollBarHelper.scrollXVelocity != 0) {
+			setTickOffset(currTickOffset + ScrollBarHelper.scrollXVelocity);
+		}
+		if (ScrollBarHelper.scrollYVelocity != 0) {
+			setYOffset(currYOffset + ScrollBarHelper.scrollYVelocity);
 		}
 	}
 
@@ -113,8 +118,8 @@ public class TickWindowHelper {
 			currYOffset = yOffset;
 		} else if (yOffset < 0)
 			currYOffset = 0;
-		else if (yOffset + MidiView.trackHeight > MidiView.allTracksHeight)
-			currYOffset = MidiView.allTracksHeight - MidiView.trackHeight;
+		else if (yOffset + midiView.getMidiHeight() > MidiView.allTracksHeight)
+			currYOffset = MidiView.allTracksHeight - midiView.getMidiHeight();
 	}
 
 	public static boolean setNumTicks(float numTicks) {
@@ -144,9 +149,6 @@ public class TickWindowHelper {
 		return tick - tick % (getMajorTickSpacing() * 4);
 	}
 
-	// translates the tickOffset to ensure that leftTick and rightTick are
-	// in view
-	// @returns the amount translated
 	public static void updateView(float leftTick, float rightTick) {
 		// if we are dragging out of view, scroll appropriately
 		// if the right is out but the left is in, just scroll
@@ -164,6 +166,16 @@ public class TickWindowHelper {
 				&& rightTick >= currTickOffset + currNumTicks) {
 			setTickOffset(leftTick);
 			setNumTicks(rightTick - leftTick);
+		}
+	}
+	
+	// translates the tickOffset to ensure that leftTick, rightTick, topY and bottomY are all in view
+	public static void updateView(float leftTick, float rightTick, float topY, float bottomY) {
+		updateView(leftTick, rightTick);
+		if (topY < currYOffset && bottomY < currYOffset + midiView.getMidiHeight()) {
+			setYOffset(topY);
+		} else if (bottomY > currYOffset + midiView.getMidiHeight() && topY > currYOffset) {
+			setYOffset(bottomY - midiView.getMidiHeight());
 		}
 	}
 }

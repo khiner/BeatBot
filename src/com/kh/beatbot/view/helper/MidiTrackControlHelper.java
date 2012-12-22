@@ -176,8 +176,10 @@ public class MidiTrackControlHelper {
 	/** draw background color & track control icons */
 	public static void draw() {
 		SurfaceViewBase.drawTriangleStrip(bgRectVb, Colors.BG_COLOR);
-		float y = midiView.getMidiHeight() - MidiView.trackHeight;
-		for (ButtonRow buttonRow : buttonRows) {
+		float y = midiView.getMidiHeight() - MidiView.trackHeight + TickWindowHelper.getYOffset();
+		for (int i = 0; i < buttonRows.size(); i++) {
+			// avoid concurrent modification exception
+			ButtonRow buttonRow = buttonRows.get(i);
 			buttonRow.draw(y);
 			y -= MidiView.trackHeight;
 		}

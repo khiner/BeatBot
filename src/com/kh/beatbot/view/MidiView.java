@@ -230,7 +230,7 @@ public class MidiView extends ClickableSurfaceView {
 			bottomY = noteToY(bottomNote + 1);
 		}
 		// make room in the view window if we are dragging out of the view
-		TickWindowHelper.updateView(leftTick, rightTick);
+		TickWindowHelper.updateView(leftTick, rightTick, topY, bottomY);
 		initSelectRegionVb(leftTick, rightTick, topY, bottomY);
 	}
 
@@ -293,7 +293,6 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	private void drawHorizontalLines() {
-		drawLines(tickHLineVb, Colors.BLACK, 2, GL10.GL_LINES);
 		translate(0, -TickWindowHelper.getYOffset());
 		drawLines(hLineVb, Colors.BLACK, 2, GL10.GL_LINES);
 		translate(0, TickWindowHelper.getYOffset());
@@ -367,6 +366,7 @@ public class MidiView extends ClickableSurfaceView {
 	private void drawTickFill() {
 		drawTriangleStrip(tickFillVb, Colors.TICK_FILL_COLOR);
 		drawLoopBar();
+		drawLines(tickHLineVb, Colors.BLACK, 2, GL10.GL_LINES);
 	}
 
 	private void drawLoopBar() {
@@ -591,7 +591,6 @@ public class MidiView extends ClickableSurfaceView {
 		// we need to do this in every frame, because even if loop ticks aren't
 		// changing the tick window can change
 		initLoopRectVb();
-		drawTickFill();
 		drawLoopRect();
 		// if we're recording, keep the current recording tick in view.
 		if (recording
@@ -606,6 +605,7 @@ public class MidiView extends ClickableSurfaceView {
 		} else {
 			drawAllMidiNotes();
 		}
+		drawTickFill();
 		drawLoopMarker();
 		drawSelectRegion();
 		ScrollBarHelper.drawScrollView(getMidiWidth(), height, X_OFFSET);
