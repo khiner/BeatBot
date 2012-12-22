@@ -45,26 +45,20 @@ public class TickWindowHelper {
 		float newTOS = (ZRAT * leftX - ZLAT * rightX) / (leftX - rightX);
 		float newNumTicks = (ZLAT - newTOS) * midiView.getMidiWidth() / leftX;
 
-		if (newTOS < 0 && newNumTicks > MAX_TICKS) {
+		if (newTOS < 0) {
 			currTickOffset = 0;
 			currNumTicks = ZRAT * midiView.getMidiWidth() / rightX;
-			if (currNumTicks > MAX_TICKS) {
-				currNumTicks = MAX_TICKS;
-			}
+			currNumTicks = currNumTicks > MAX_TICKS ? MAX_TICKS : currNumTicks;
 		} else if (newNumTicks > MAX_TICKS) {
 			currTickOffset = newTOS;
 			currNumTicks = MAX_TICKS - currTickOffset;
 		} else if (newNumTicks < MIN_TICKS) {
 			currTickOffset = newTOS;
 			currNumTicks = MIN_TICKS;
-		} else if (newTOS >= 0 && newTOS + newNumTicks <= MAX_TICKS) {
+		} else if (newTOS + newNumTicks <= MAX_TICKS) {
 			currTickOffset = newTOS;
 			currNumTicks = newNumTicks;
-		} else if (newTOS < 0) {
-			currTickOffset = 0;
-			currNumTicks = ZRAT * midiView.getMidiWidth() / rightX;
-			currNumTicks = currNumTicks > MAX_TICKS ? MAX_TICKS : currNumTicks;
-		} else if (newTOS + newNumTicks > MAX_TICKS) {
+		} else {
 			currNumTicks = (ZLAT - MAX_TICKS) / (leftX
 					/ midiView.getMidiWidth() - 1);
 			currTickOffset = MAX_TICKS - currNumTicks;
