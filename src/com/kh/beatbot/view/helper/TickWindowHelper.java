@@ -55,13 +55,13 @@ public class TickWindowHelper {
 		} else if (newNumTicks < MIN_TICKS) {
 			currTickOffset = newTOS;
 			currNumTicks = MIN_TICKS;
-		} else if (newTOS + newNumTicks <= MAX_TICKS) {
-			currTickOffset = newTOS;
-			currNumTicks = newNumTicks;
-		} else {
+		} else if (newTOS + newNumTicks > MAX_TICKS) {
 			currNumTicks = (ZLAT - MAX_TICKS) / (leftX
 					/ midiView.getMidiWidth() - 1);
 			currTickOffset = MAX_TICKS - currNumTicks;
+		} else {
+			currTickOffset = newTOS;
+			currNumTicks = newNumTicks;
 		}
 		updateGranularity();
 	}
@@ -70,8 +70,8 @@ public class TickWindowHelper {
 		if (ScrollBarHelper.scrolling) {
 			return;
 		}
-		ScrollBarHelper.tickScrollVelocity();
 		if (ScrollBarHelper.scrollXVelocity != 0) {
+			ScrollBarHelper.tickScrollVelocity();
 			setTickOffset(currTickOffset + ScrollBarHelper.scrollXVelocity);
 		}
 		if (ScrollBarHelper.scrollYVelocity != 0) {
@@ -80,20 +80,17 @@ public class TickWindowHelper {
 	}
 
 	public static void scroll(float x, float y) {
-		float newTickOffset = MidiView.scrollAnchorTick
-				- (currNumTicks * x) / midiView.getMidiWidth();
+		float newTickOffset = MidiView.scrollAnchorTick - currNumTicks * x / midiView.getMidiWidth();
 		float newYOffset = MidiView.scrollAnchorY - y;
-		float xDiff = newTickOffset - currTickOffset;
-		float yDiff = newYOffset - currYOffset;
+		ScrollBarHelper.scrollXVelocity = newTickOffset - currTickOffset;
+		ScrollBarHelper.scrollYVelocity = newYOffset - currYOffset;
 		setTickOffset(newTickOffset);
 		setYOffset(newYOffset);
-		ScrollBarHelper.scrollXVelocity = xDiff;
-		ScrollBarHelper.scrollYVelocity = yDiff;
 	}
 
 	public static void updateGranularity() {
 		// x-coord width of one eight note
-		float spacing = ((float) MidiManager.TICKS_IN_ONE_MEASURE * midiView.getMidiWidth()) / (currNumTicks * 8);
+		float spacing = (MidiManager.TICKS_IN_ONE_MEASURE * midiView.getMidiWidth()) / (currNumTicks * 8);
 		// after algebra, this condition says: if more than maxLines will
 		// display, reduce the granularity by one half, else if less than
 		// maxLines will display, increase the granularity by one half
@@ -107,30 +104,31 @@ public class TickWindowHelper {
 	}
 
 	public static void setTickOffset(float tickOffset) {
-		if (tickOffset + currNumTicks <= MAX_TICKS && tickOffset >= 0) {
-			currTickOffset = tickOffset;
-		} else if (tickOffset < 0)
+		if (tickOffset < 0) {
 			currTickOffset = 0;
-		else if (tickOffset + currNumTicks > MAX_TICKS)
+		} else if (tickOffset + currNumTicks > MAX_TICKS) {
 			currTickOffset = MAX_TICKS - currNumTicks;
+		} else {
+			currTickOffset = tickOffset;
+		}
 	}
 	
 	public static void setYOffset(float yOffset) {
-		if (yOffset + midiView.getMidiHeight() <= MidiView.allTracksHeight && yOffset >= 0) {
-			currYOffset = yOffset;
-		} else if (yOffset < 0)
+		if (yOffset < 0) {
 			currYOffset = 0;
-		else if (yOffset + midiView.getMidiHeight() > MidiView.allTracksHeight)
+		} else if (yOffset + midiView.getMidiHeight() > MidiView.allTracksHeight) {
 			currYOffset = MidiView.allTracksHeight - midiView.getMidiHeight();
+		} else {
+			currYOffset = yOffset;
+		} 
 	}
 
-	public static boolean setNumTicks(float numTicks) {
-		if (numTicks <= MAX_TICKS && numTicks >= MIN_TICKS) {
-			currNumTicks = numTicks;
-			updateGranularity();
-			return true;
+	public static void setNumTicks(float numTicks) {
+		if (numTicks > MAX_TICKS || numTicks < MIN_TICKS) {
+			return;
 		}
-		return false;
+		currNumTicks = numTicks;
+		updateGranularity();
 	}
 
 	public static float getCurrentBeatDivision() {
@@ -153,21 +151,17 @@ public class TickWindowHelper {
 
 	public static void updateView(float leftTick, float rightTick) {
 		// if we are dragging out of view, scroll appropriately
-		// if the right is out but the left is in, just scroll
 		if (leftTick < currTickOffset
-				&& rightTick < currTickOffset + currNumTicks) {
-			setTickOffset(leftTick);
-
-			// if the left is out but the right is in, just scroll
-		} else if (rightTick > currTickOffset + currNumTicks
-				&& leftTick > currTickOffset) {
-			setTickOffset(rightTick - currNumTicks);
-
-			// if both left and right are out of view,
-		} else if (leftTick <= currTickOffset
-				&& rightTick >= currTickOffset + currNumTicks) {
+				&& rightTick > currTickOffset + currNumTicks) {
+			// both left and right are out of view, change view to fit
 			setTickOffset(leftTick);
 			setNumTicks(rightTick - leftTick);
+		} else if (leftTick < currTickOffset) {
+			// if the left is out but the right is in, just scroll
+			setTickOffset(leftTick);
+		} else if (rightTick > currTickOffset + currNumTicks) {
+			// if the right is out but the left is in, just scroll
+			setTickOffset(rightTick - currNumTicks);
 		}
 	}
 	

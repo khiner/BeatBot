@@ -13,8 +13,7 @@ public class ScrollBarHelper {
 	private static final int CORNER_RESOLUTION = 15;
 
 	private static float[] innerScrollBarColor = { 1, 1, 1, .8f };
-	private static float[] outerScrollBarColor = Colors.VOLUME_COLOR
-			.clone();
+	private static float[] outerScrollBarColor = Colors.VOLUME_COLOR.clone();
 
 	private static float translateX = 0;
 	private static float translateY = 0;
@@ -49,7 +48,8 @@ public class ScrollBarHelper {
 		scrolling = true;
 	}
 
-	public static void drawScrollView(float parentWidth, float parentHeight, float offset) {
+	public static void drawScrollView(float parentWidth, float parentHeight,
+			float offset) {
 		if (!shouldDrawScrollView())
 			return;
 		updateScrollBar(parentWidth, parentHeight, offset);
@@ -63,10 +63,11 @@ public class ScrollBarHelper {
 
 		float alpha = .8f;
 		if (!scrollingEnded && elapsedTime <= GlobalVars.DOUBLE_TAP_TIME)
+			// fade in
 			alpha *= elapsedTime / (float) GlobalVars.DOUBLE_TAP_TIME;
 		else if (scrollingEnded && elapsedTime > GlobalVars.DOUBLE_TAP_TIME)
-			alpha *= (GlobalVars.DOUBLE_TAP_TIME * 2 - elapsedTime)
-					/ (float) GlobalVars.DOUBLE_TAP_TIME;
+			// fade out
+			alpha *= 2 - elapsedTime / (float) GlobalVars.DOUBLE_TAP_TIME;
 		innerScrollBarColor[3] = alpha;
 		outerScrollBarColor[3] = alpha * .6f;
 		SurfaceViewBase.translate(0, translateY);
@@ -91,11 +92,13 @@ public class ScrollBarHelper {
 		}
 	}
 
-	public static void updateScrollBar(float parentWidth, float parentHeight, float offset) {
+	public static void updateScrollBar(float parentWidth, float parentHeight,
+			float offset) {
 		float x1 = TickWindowHelper.getTickOffset() * parentWidth
 				/ TickWindowHelper.MAX_TICKS + offset;
 		float x2 = (TickWindowHelper.getTickOffset() + TickWindowHelper
-				.getNumTicks()) * parentWidth / TickWindowHelper.MAX_TICKS  + offset;
+				.getNumTicks()) * parentWidth
+				/ TickWindowHelper.MAX_TICKS + offset;
 		float outerWidth = x2 - x1;
 		float innerWidth = outerWidth - 10;
 		translateX = (x2 + x1) / 2;
@@ -106,8 +109,8 @@ public class ScrollBarHelper {
 		outerScrollBarVb = SurfaceViewBase.makeRoundedCornerRectBuffer(
 				outerWidth, outerScrollBarHeight, outerScrollBarCornerRadius,
 				CORNER_RESOLUTION);
-		scrollBarLinesVb = SurfaceViewBase.makeFloatBuffer(new float[] { offset, 0,
-				x1, 0, x2, 0, parentWidth + offset, 0 });
+		scrollBarLinesVb = SurfaceViewBase.makeFloatBuffer(new float[] {
+				offset, 0, x1, 0, x2, 0, parentWidth + offset, 0 });
 	}
 
 	public static void handleActionUp() {
