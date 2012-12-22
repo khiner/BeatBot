@@ -43,13 +43,21 @@ public class TickWindowHelper {
 		float ZLAT = MidiView.zoomLeftAnchorTick;
 		float ZRAT = MidiView.zoomRightAnchorTick;
 		float newTOS = (ZRAT * leftX - ZLAT * rightX) / (leftX - rightX);
-		float newNumTicks = (ZLAT - newTOS) * midiView.getWidth() / leftX;
+		float newNumTicks = (ZLAT - newTOS) * midiView.getMidiWidth() / leftX;
 
-		if (newTOS < 0 && newTOS + newNumTicks > MAX_TICKS
-				|| newNumTicks < MIN_TICKS) {
-			return;
-		}
-		if (newTOS >= 0 && newTOS + newNumTicks <= MAX_TICKS) {
+		if (newTOS < 0 && newNumTicks > MAX_TICKS) {
+			currTickOffset = 0;
+			currNumTicks = ZRAT * midiView.getMidiWidth() / rightX;
+			if (currNumTicks > MAX_TICKS) {
+				currNumTicks = MAX_TICKS;
+			}
+		} else if (newNumTicks > MAX_TICKS) {
+			currTickOffset = newTOS;
+			currNumTicks = MAX_TICKS - currTickOffset;
+		} else if (newNumTicks < MIN_TICKS) {
+			currTickOffset = newTOS;
+			currNumTicks = MIN_TICKS;
+		} else if (newTOS >= 0 && newTOS + newNumTicks <= MAX_TICKS) {
 			currTickOffset = newTOS;
 			currNumTicks = newNumTicks;
 		} else if (newTOS < 0) {
