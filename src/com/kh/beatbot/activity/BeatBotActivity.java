@@ -173,7 +173,6 @@ public class BeatBotActivity extends Activity implements LevelListener {
 		SurfaceViewBase.setResources(getResources());
 		setContentView(R.layout.main);
 		Managers.initDirectoryManager();
-		Managers.directoryManager.initInstrumentSelect(this);
 		copyAllSamplesToStorage();
 		if (savedInstanceState == null) {
 			initNativeAudio();
@@ -477,7 +476,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 	}
 
 	public void addTrack(View view) {
-		Managers.directoryManager.showInstrumentSelectAlert();
+		Managers.directoryManager.showAddTrackAlert();
 	}
 
 	@Override

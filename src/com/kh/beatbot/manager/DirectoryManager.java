@@ -29,11 +29,6 @@ public class DirectoryManager {
 	public static final String[] drumNames = { "kick", "snare",
 		"hh_closed", "hh_open", "rim" };
 
-	private AlertDialog.Builder instrumentSelectAlertBuilder, sampleSelectAlertBuilder;
-	private AlertDialog instrumentSelectAlert = null, sampleSelectAlert = null;
-	private ListAdapter instrumentSelectAdapter = null;
-	private OnShowListener instrumentSelectOnShowListener = null;
-
 	public void initIcons() {
 		getDrumInstrument(0).setIconResources(R.drawable.kick_icon_src,
 				R.drawable.kick_icon,
@@ -62,10 +57,18 @@ public class DirectoryManager {
 	}
 	
 	private static DirectoryManager singletonInstance = null;
+	
+	private AlertDialog.Builder instrumentSelectAlertBuilder, sampleSelectAlertBuilder;
+	private AlertDialog instrumentSelectAlert = null, sampleSelectAlert = null;
+	private ListAdapter instrumentSelectAdapter = null;
+	private OnShowListener instrumentSelectOnShowListener = null;
+	
 	private BBDirectory internalDirectory = null;
 	private BBDirectory drumsDirectory = null;
 	private BBDirectory internalRecordDirectory = null;
 	private BBDirectory userRecordDirectory = null;
+	
+	private boolean addingTrack = false;
 	
 	public static DirectoryManager getInstance() {
 		if (singletonInstance == null) {
@@ -84,6 +87,9 @@ public class DirectoryManager {
 			new Instrument(drumsDirectory, drumName, new BeatBotIconSource());
 		}
 		initBuilders(GlobalVars.mainActivity);
+		initInstrumentSelectAdapter(GlobalVars.mainActivity);
+		initInstrumentSelectOnShowListener();
+		updateInstrumentSelectAlert();
 	}
 	
 	public void updateDirectories() {
@@ -106,26 +112,11 @@ public class DirectoryManager {
 		}
 	}
 	
-	public void initInstrumentSelect(final Activity activity) {
-		initInstrumentSelectAdapter(activity);
-		initInstrumentSelectOnShowListener();
-		initInstrumentSelectAlert(activity);
-	}
-	
-	/**
-	 * The Select Instrument Alert is shown when adding a new track
-	 */
-	private void initInstrumentSelectAlert(Activity activity) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		builder.setTitle("Choose Instrument");
-		builder.setAdapter(instrumentSelectAdapter,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						Managers.trackManager.addTrack(item);
-					}
-				});
-		instrumentSelectAlert = builder.create();
-		instrumentSelectAlert.setOnShowListener(instrumentSelectOnShowListener);
+	private void initBuilders(Context context) {
+		instrumentSelectAlertBuilder = new AlertDialog.Builder(context);
+		instrumentSelectAlertBuilder.setTitle("Choose Instrument");
+		sampleSelectAlertBuilder = new AlertDialog.Builder(context);
+		sampleSelectAlertBuilder.setTitle("Choose Sample");
 	}
 	
 	private void initInstrumentSelectAdapter(final Activity activity) {
@@ -150,8 +141,10 @@ public class DirectoryManager {
 	}
 
 	private void setInstrument(Instrument instrument) {
+		// update the sample select alert names with the new
+		// instrument samples
+		updateSampleSelectAlert();
 		TrackPage.getTrack().setInstrument(instrument);
-		Managers.trackManager.trackClicked(TrackPage.getTrack().getId());
 		TrackPageFactory.updatePages();
 	}
 	
@@ -159,11 +152,11 @@ public class DirectoryManager {
 		instrumentSelectAlertBuilder.setAdapter(instrumentSelectAdapter,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-						Instrument newInstrument = getDrumInstrument(item); 
-						setInstrument(newInstrument);
-						// update the sample select alert names with the new
-						// instrument samples
-						updateSampleSelectAlert();
+						if (addingTrack) {
+							Managers.trackManager.addTrack(item);
+						} else {
+							setInstrument(getDrumInstrument(item));
+						}
 					}
 				});
 		instrumentSelectAlert = instrumentSelectAlertBuilder.create();
@@ -182,7 +175,13 @@ public class DirectoryManager {
 		sampleSelectAlert = sampleSelectAlertBuilder.create();
 	}
 	
+	public void showAddTrackAlert() {
+		addingTrack = true;
+		instrumentSelectAlert.show();
+	}
+	
 	public void showInstrumentSelectAlert() {
+		addingTrack = false;
 		instrumentSelectAlert.show();
 	}
 	
@@ -208,13 +207,6 @@ public class DirectoryManager {
 	
 	public String getInternalRecordDirectory() {
 		return internalRecordDirectory.getPath();
-	}
-	
-	private void initBuilders(Context context) {
-		instrumentSelectAlertBuilder = new AlertDialog.Builder(context);
-		instrumentSelectAlertBuilder.setTitle("Choose Instrument");
-		sampleSelectAlertBuilder = new AlertDialog.Builder(context);
-		sampleSelectAlertBuilder.setTitle("Choose Sample");
 	}
 	
 	private void initInstrumentSelectOnShowListener() {

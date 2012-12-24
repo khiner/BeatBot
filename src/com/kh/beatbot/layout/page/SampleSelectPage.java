@@ -1,6 +1,5 @@
 package com.kh.beatbot.layout.page;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
@@ -38,8 +37,6 @@ public class SampleSelectPage extends TrackPage {
 	protected void update() {
 		updateInstrumentIcon();
         updateSampleText();
-        Managers.directoryManager.updateInstrumentSelectAlert();
-		Managers.directoryManager.updateSampleSelectAlert();
 	}
 	
 	@Override

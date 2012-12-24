@@ -20,6 +20,7 @@ public class BBDirectory {
 			path = DirectoryManager.appDirectoryPath + name + "/";
 		} else {
 			path = parent.path + name + "/";
+			parent.addChild(this);
 		}
 		new File(path).mkdirs();
 	}
