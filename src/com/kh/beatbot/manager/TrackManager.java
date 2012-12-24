@@ -3,7 +3,6 @@ package com.kh.beatbot.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kh.beatbot.global.BeatBotIconSource;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Instrument;
 import com.kh.beatbot.global.Track;
@@ -29,16 +28,10 @@ public class TrackManager implements MidiTrackControlListener {
 	}
 	
 	private TrackManager() {
-		for (int i = 0; i < GlobalVars.allInstrumentTypes.length; i++) {
-			String instrumentName = GlobalVars.allInstrumentTypes[i];
-			Instrument instrument = new Instrument(instrumentName,
-					new BeatBotIconSource());
-			GlobalVars.instruments[i] = instrument;
-			if (!instrumentName.equals("recorded")) {
-				Track track = new Track(tracks.size(), instrument); 
-				tracks.add(track);
-				addTrack(track.getSamplePath());
-			}
+		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
+			Track track = new Track(tracks.size(), Managers.directoryManager.getDrumInstrument(i));
+			tracks.add(track);
+			addTrack(track.getSamplePath());
 		}
 		MidiTrackControlHelper.addListener(this);
 	}
@@ -52,7 +45,7 @@ public class TrackManager implements MidiTrackControlListener {
 	}
 	
 	public void addTrack(int instrumentType) {
-		Instrument newInstrument = GlobalVars.getInstrument(instrumentType);
+		Instrument newInstrument = Managers.directoryManager.getDrumInstrument(instrumentType);
 		Track newTrack = new Track(tracks.size(), newInstrument); 
 		addTrack(newTrack.getSamplePath());
 		tracks.add(newTrack);

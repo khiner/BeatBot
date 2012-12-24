@@ -2,16 +2,16 @@ package com.kh.beatbot.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 
-public class SquareImageView extends ImageView {
+public class SquareImageButton extends ImageButton {
 	double ratio = 1;
 	
-	public SquareImageView(Context context) {
+	public SquareImageButton(Context context) {
 		super(context);
 	}
 	
-	public SquareImageView(Context context, AttributeSet attrs) {
+	public SquareImageButton(Context context, AttributeSet attrs) {
 	    super(context, attrs);
 	    ratio = (double) this.getBackground().getIntrinsicWidth()
 				/ (double) this.getBackground().getIntrinsicHeight();

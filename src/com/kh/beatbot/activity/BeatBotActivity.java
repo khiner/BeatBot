@@ -12,14 +12,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
@@ -45,6 +42,7 @@ import com.kh.beatbot.layout.page.TrackPage;
 import com.kh.beatbot.layout.page.TrackPageFactory;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
+import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -68,8 +66,6 @@ public class BeatBotActivity extends Activity implements LevelListener {
 	private LinearLayout trackPageSelect;
 	private static AssetManager assetManager;
 
-	private static AlertDialog instrumentSelectAlert = null;
-
 	private long lastTapTime = 0;
 
 	private void initLevelsIconGroup() {
@@ -83,24 +79,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 		setMasterPitch(GlobalVars.MASTER_PIT_LEVEL);
 	}
 
-	/**
-	 * The Select Instrument Alert is shown when adding a new track
-	 */
-	private void initInstrumentSelectAlert() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Choose Instrument");
-		builder.setAdapter(GlobalVars.instrumentSelectAdapter,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						Managers.trackManager.addTrack(item);
-					}
-				});
-		instrumentSelectAlert = builder.create();
-		instrumentSelectAlert
-				.setOnShowListener(GlobalVars.instrumentSelectOnShowListener);
-	}
-
-	private void copyFile(InputStream in, OutputStream out) throws IOException {
+	private static void copyFile(InputStream in, OutputStream out) throws IOException {
 		byte[] buffer = new byte[1024];
 		int read;
 		while ((read = in.read(buffer)) != -1) {
@@ -120,7 +99,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 	 * http://stackoverflow
 	 * .com/questions/8754111/how-to-read-the-data-in-a-wav-file-to-an-array
 	 */
-	private void convertWavToRaw(InputStream wavIn, FileOutputStream rawOut)
+	private static void convertWavToBB(InputStream wavIn, FileOutputStream bbOut)
 			throws IOException {
 		byte[] headerBytes = new byte[44];
 		wavIn.read(headerBytes);
@@ -135,40 +114,39 @@ public class BeatBotActivity extends Activity implements LevelListener {
 			// convert two bytes to a float (little endian)
 			short s = (short) (((inBytes[1] & 0xff) << 8) | (inBytes[0] & 0xff));
 			floatBuffer.putFloat(0, s / 32768.0f);
-			rawOut.write(floatBuffer.array());
+			bbOut.write(floatBuffer.array());
 			if (channels == 1) {
 				// if mono, left and right copies should be identical
-				rawOut.write(floatBuffer.array());
+				bbOut.write(floatBuffer.array());
 			}
 		}
 		// clean up
 		wavIn.close();
 		wavIn = null;
-		rawOut.flush();
-		rawOut.close();
-		rawOut = null;
+		bbOut.flush();
+		bbOut.close();
+		bbOut = null;
 	}
-
-	private void copyFromAssetsToExternal(String folderName) {
-		String newDirectory = GlobalVars.appDirectory + "/" + folderName + "/";
-		File newSampleFolder = new File(newDirectory);
-		newSampleFolder.mkdir();
+	
+	private static void copyFromAssetsToExternal(String newDirectory) {
 		List<String> existingFiles = new ArrayList<String>();
 		String[] filesToCopy = null;
-		String[] existingFilesAry = newSampleFolder.list();
+		String[] existingFilesAry = new File(newDirectory).list();
 		if (existingFilesAry != null) {
 			existingFiles = Arrays.asList(existingFilesAry);
 		}
 		try {
-			filesToCopy = assetManager.list(folderName);
-			for (String file : filesToCopy) {
-				// copy wav file exactly from assets to sdcard
-				if (!existingFiles.contains(file.replace(".wav", ".raw"))) {
-					InputStream in = assetManager.open(folderName + file);
-					FileOutputStream rawOut = new FileOutputStream(newDirectory
-							+ file.replace(".wav", ".raw"));
-					convertWavToRaw(in, rawOut);
+			String assetPath = newDirectory.replace(Managers.directoryManager.getInternalDirectory(), "");
+			assetPath = assetPath.substring(0, assetPath.length() - 1);
+			filesToCopy = assetManager.list(assetPath);
+			for (String filePath : filesToCopy) {
+				if (existingFiles.contains(filePath)) {
+					continue;
 				}
+				// copy wav file exactly from assets to sdcard
+				InputStream in = assetManager.open(assetPath + "/" + filePath);
+				FileOutputStream rawOut = new FileOutputStream(newDirectory + filePath);
+				copyFile(in, rawOut);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -177,29 +155,13 @@ public class BeatBotActivity extends Activity implements LevelListener {
 
 	private void copyAllSamplesToStorage() {
 		assetManager = getAssets();
-		for (String instrumentName : GlobalVars.allInstrumentTypes) {
+		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
+			String drumPath = Managers.directoryManager.getDrumInstrument(i).getPath();
 			// the sample folder for this sample type does not yet exist.
 			// create it and write all assets of this type to the folder
-			if (!instrumentName.equals("recorded")) {
-				copyFromAssetsToExternal(instrumentName);
-			}
+			copyFromAssetsToExternal(drumPath);
 		}
-	}
-
-	private void initDataDir() {
-		if (Environment.getExternalStorageState().equals(
-				Environment.MEDIA_MOUNTED)) {
-			// we can read and write to external storage
-			String extStorageDir = Environment.getExternalStorageDirectory()
-					.toString();
-			GlobalVars.appDirectory = extStorageDir + "/BeatBot/";
-			File appDirectoryFile = new File(GlobalVars.appDirectory);
-			// build the directory structure, if needed
-			appDirectoryFile.mkdirs();
-		} else { // we need read AND write access for this app - default to
-					// internal storage
-			GlobalVars.appDirectory = getFilesDir().toString() + "/";
-		}
+		Managers.directoryManager.updateDirectories();
 	}
 
 	/** Called when the activity is first created. */
@@ -208,17 +170,16 @@ public class BeatBotActivity extends Activity implements LevelListener {
 		super.onCreate(savedInstanceState);
 		GlobalVars.mainActivity = this;
 		GeneralUtils.initAndroidSettings(this);
-		initDataDir();
-		copyAllSamplesToStorage();
 		SurfaceViewBase.setResources(getResources());
 		setContentView(R.layout.main);
-		GlobalVars.initInstrumentSelect(this);
+		Managers.initDirectoryManager();
+		Managers.directoryManager.initInstrumentSelect(this);
+		copyAllSamplesToStorage();
 		if (savedInstanceState == null) {
 			initNativeAudio();
 		}
 		Managers.init(savedInstanceState);
 		initLevelsIconGroup();
-		initInstrumentSelectAlert();
 		GlobalVars.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
 		trackPageSelect = (LinearLayout) findViewById(R.id.trackPageSelect);
@@ -382,11 +343,14 @@ public class BeatBotActivity extends Activity implements LevelListener {
 		if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
 			// Managers.recordManager.stopListening();
 			String fileName = Managers.recordManager.stopRecordingAndWriteWav();
+			// make sure the recorded instrument shows the newly recorded "song"
+			Managers.directoryManager.updateRecordDirectory();
+			TrackPageFactory.updatePages();
+			
 			Toast.makeText(getApplicationContext(),
 					"Recorded file to " + fileName, Toast.LENGTH_SHORT).show();
 		} else {
 			GlobalVars.midiView.reset();
-			// if we're already playing, midiManager is already ticking away.
 			((ToggleButton) findViewById(R.id.playButton)).setChecked(true);
 			if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
 				play(findViewById(R.id.playButton));
@@ -513,7 +477,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 	}
 
 	public void addTrack(View view) {
-		instrumentSelectAlert.show();
+		Managers.directoryManager.showInstrumentSelectAlert();
 	}
 
 	@Override

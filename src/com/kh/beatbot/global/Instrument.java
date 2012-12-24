@@ -2,38 +2,17 @@ package com.kh.beatbot.global;
 
 import java.io.File;
 
-public class Instrument {
-	private String name;
-	private BeatBotIconSource bbIconSource;
+public class Instrument extends BBDirectory {
 	private File[] sampleFiles;
 	private String[] sampleNames;
-	private int iconSource;
 
-	public Instrument(String instrumentName, BeatBotIconSource instrumentIcon) {
-		this.name = instrumentName;
-		this.bbIconSource = instrumentIcon;
-		File dir = new File(GlobalVars.appDirectory + instrumentName);
-		sampleFiles = dir.listFiles();
-		sampleNames = dir.list();
+	public Instrument(BBDirectory parent, String name, BeatBotIconSource bbIconSource) {
+		super(parent, name, bbIconSource);
+		updateFiles();
 	}
 
-	public String getName() {
-		return name;
-	}
-	
 	public BeatBotIconSource getBBIconSource() {
 		return bbIconSource;
-	}
-
-	public int getIconSource() {
-		return iconSource;
-	}
-
-	public void setIconResources(int iconSource, int defaultIconResource,
-			int selectedIconResource, int listViewIconResource) {
-		this.iconSource = iconSource;
-		bbIconSource.set(defaultIconResource, selectedIconResource,
-				listViewIconResource);
 	}
 
 	public File getSampleFile(int sampleNum) {
@@ -49,10 +28,16 @@ public class Instrument {
 	}
 	
 	public String getSamplePath(int sampleNum) {
-		return GlobalVars.appDirectory + name + "/" + getSampleName(sampleNum);
+		return path + getSampleName(sampleNum);
 	}
 	
 	public long getNumSamples(int sampleNum) {
 		return getSampleFile(sampleNum).length() / 8 - 44;
+	}
+	
+	public void updateFiles() {
+		File dir = new File(path);
+		sampleFiles = dir.listFiles();
+		sampleNames = dir.list();
 	}
 }

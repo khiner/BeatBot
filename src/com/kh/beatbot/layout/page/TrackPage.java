@@ -36,4 +36,8 @@ public abstract class TrackPage {
 		TrackPage.track = track;
 		update();
 	}
+	
+	public static Track getTrack() {
+		return track;
+	}
 }

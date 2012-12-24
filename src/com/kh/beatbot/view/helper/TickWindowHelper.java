@@ -56,8 +56,8 @@ public class TickWindowHelper {
 			currTickOffset = newTOS;
 			currNumTicks = MIN_TICKS;
 		} else if (newTOS + newNumTicks > MAX_TICKS) {
-			currNumTicks = (ZLAT - MAX_TICKS) / (leftX
-					/ midiView.getMidiWidth() - 1);
+			currNumTicks = ((ZLAT - MAX_TICKS) * midiView.getMidiWidth()) / (leftX
+					- midiView.getMidiWidth());
 			currTickOffset = MAX_TICKS - currNumTicks;
 		} else {
 			currTickOffset = newTOS;

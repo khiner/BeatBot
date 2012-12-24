@@ -21,7 +21,7 @@ public class RecordManager implements LevelListener {
 	public static final long RECORD_LATENCY_TICKS = Managers.midiManager
 			.millisToTick(250);
 	private static final int RECORDER_BPP = 16;
-	private static final String TEMP_FILE = "record_temp.raw";
+	private static final String TEMP_FILE = "record_temp.bb";
 	private static final int RECORDER_SAMPLERATE = 44100;
 	private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
 	private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
@@ -30,9 +30,9 @@ public class RecordManager implements LevelListener {
 			* CHANNELS / 8;
 	private static final long LONG_SAMPLE_RATE = RECORDER_SAMPLERATE;
 
-	private String currFileName = null;
+	private String currWavFileName = null, currBBFileName = null;
 
-	private String recordDirectory = null;
+	private String wavRecordDirectory = null, bbRecordDirectory = null;
 
 	private static RecordManager singletonInstance = null;
 
@@ -67,8 +67,9 @@ public class RecordManager implements LevelListener {
 		bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
 				RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 		initRecorder();
-		recordDirectory = GlobalVars.appDirectory + "recorded/";
-		currSampleNum = findGreatestSampleNum(recordDirectory) + 1;
+		wavRecordDirectory = Managers.directoryManager.getUserRecordDirectory();
+		bbRecordDirectory = Managers.directoryManager.getInternalRecordDirectory();
+		currSampleNum = findGreatestSampleNum(wavRecordDirectory) + 1;
 		state = State.INITIALIZING;
 	}
 	
@@ -82,8 +83,8 @@ public class RecordManager implements LevelListener {
 
 	public void startRecording() throws IOException {
 		recordStartTick = getAdjustedRecordTick();
-		currFileName = createNextFileName();
-		os = writeWaveFileHeader(currFileName, 0, 0);
+		updateFileNames();
+		os = writeWaveFileHeader(currWavFileName, 0, 0);
 		state = State.RECORDING;
 	}
 
@@ -95,7 +96,7 @@ public class RecordManager implements LevelListener {
 		state = State.LISTENING;
 		// close output stream
 		os.close();
-		insertLengthDataIntoWavFile(currFileName);
+		insertLengthDataIntoWavFile(currWavFileName);
 	}
 
 	public void startListening() {
@@ -153,22 +154,22 @@ public class RecordManager implements LevelListener {
 	}
 
 	public void startRecordingNative() {
-		currFileName = createNextFileName();
+		updateFileNames();
 		try {
-			FileOutputStream out = writeWaveFileHeader(currFileName, 0, 0);
+			FileOutputStream out = writeWaveFileHeader(currWavFileName, 0, 0);
 			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		startRecordingNative(currFileName);
+		startRecordingNative(currWavFileName, currBBFileName);
 		state = State.RECORDING;
 	}
 
 	public String stopRecordingAndWriteWav() {
 		stopRecordingNative();
-		insertLengthDataIntoWavFile(currFileName);
+		insertLengthDataIntoWavFile(currWavFileName);
 		state = State.INITIALIZING;
-		return currFileName;
+		return currWavFileName;
 	}
 	
 	/**
@@ -207,8 +208,9 @@ public class RecordManager implements LevelListener {
 				RECORDER_AUDIO_ENCODING, bufferSize);
 	}
 	
-	private String createNextFileName() {
-		return recordDirectory + "R" + (currSampleNum++) + ".wav";
+	private void updateFileNames() {
+		currWavFileName = wavRecordDirectory + "R" + (currSampleNum) + ".wav";
+		currBBFileName = bbRecordDirectory + "R" + (currSampleNum++) + ".bb";
 	}
 
 	private void writeAudioDataToFile() {
@@ -409,7 +411,7 @@ public class RecordManager implements LevelListener {
 		// nothing - for level 2d
 	}
 
-	public native void startRecordingNative(String recordFileName);
+	public native void startRecordingNative(String wavRecordFileName, String bbRecordFileName);
 
 	public native void stopRecordingNative();
 }

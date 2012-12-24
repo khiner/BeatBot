@@ -7,6 +7,7 @@ public class Managers {
 	public static MidiManager midiManager = null;
 	public static PlaybackManager playbackManager = null;
 	public static RecordManager recordManager = null;
+	public static DirectoryManager directoryManager = null;
 	public static TrackManager trackManager = null;
 	
 	public static void init(Bundle savedInstanceState) {
@@ -21,5 +22,9 @@ public class Managers {
 		// get all Manager singletons
 		playbackManager = PlaybackManager.getInstance();
 		recordManager = RecordManager.getInstance();
+	}
+	
+	public static void initDirectoryManager() {
+		directoryManager = DirectoryManager.getInstance();
 	}
 }

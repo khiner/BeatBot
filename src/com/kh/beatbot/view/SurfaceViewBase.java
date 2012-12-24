@@ -29,6 +29,7 @@ import android.view.SurfaceView;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.manager.Managers;
 
 public abstract class SurfaceViewBase extends SurfaceView implements
 		SurfaceHolder.Callback, Runnable {
@@ -278,6 +279,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 
 		gl = (GL10) context.getGL();
 		GlobalVars.initIcons();
+		Managers.directoryManager.initIcons();
 		gl.glViewport(0, 0, width, height);
 		GLU.gluOrtho2D(gl, 0, width, height, 0);
 		
