@@ -87,7 +87,7 @@ public class DirectoryManager {
 			new Instrument(drumsDirectory, drumName, new BeatBotIconSource());
 		}
 		initBuilders(GlobalVars.mainActivity);
-		initInstrumentSelectAdapter(GlobalVars.mainActivity);
+		initInstrumentSelectAdapter(GlobalVars.mainActivity, drumsDirectory);
 		initInstrumentSelectOnShowListener();
 		updateInstrumentSelectAlert();
 	}
@@ -96,56 +96,6 @@ public class DirectoryManager {
 		for (BBDirectory dir : drumsDirectory.getChildren()) {
 			((Instrument)dir).updateFiles();
 		}
-	}
-	
-	private void initDataDir() {
-		if (Environment.getExternalStorageState().equals(
-				Environment.MEDIA_MOUNTED)) {
-			// we can read and write to external storage
-			String extStorageDir = Environment.getExternalStorageDirectory()
-					.toString();
-			appDirectoryPath = extStorageDir + "/BeatBot/";
-		} else { // we need read AND write access for this app - default to
-					// internal storage
-			//appDirectoryPath = getFilesDir().toString() + "/";
-			// TODO throw / catch exception - need External SD Card!
-		}
-	}
-	
-	private void initBuilders(Context context) {
-		instrumentSelectAlertBuilder = new AlertDialog.Builder(context);
-		instrumentSelectAlertBuilder.setTitle("Choose Instrument");
-		sampleSelectAlertBuilder = new AlertDialog.Builder(context);
-		sampleSelectAlertBuilder.setTitle("Choose Sample");
-	}
-	
-	private void initInstrumentSelectAdapter(final Activity activity) {
-		instrumentSelectAdapter = new ArrayAdapter<String>(activity,
-				android.R.layout.select_dialog_item, android.R.id.text1, drumNames) {
-			public View getView(int position, View convertView, ViewGroup parent) {
-				View v = super.getView(position, convertView, parent);
-				TextView tv = (TextView) v.findViewById(android.R.id.text1);
-				// Put the image on the TextView
-				tv.setCompoundDrawablesWithIntrinsicBounds(
-						getDrumInstrument(position).getBBIconSource().listViewIcon.resourceId,
-						0, 0, 0);
-				// Add margin between image and text (support various screen
-				// densities)
-				int dp5 = (int) (5 * activity.getResources()
-						.getDisplayMetrics().density + 0.5f);
-				tv.setCompoundDrawablePadding(dp5);
-
-				return v;
-			}
-		};
-	}
-
-	private void setInstrument(Instrument instrument) {
-		// update the sample select alert names with the new
-		// instrument samples
-		updateSampleSelectAlert();
-		TrackPage.getTrack().setInstrument(instrument);
-		TrackPageFactory.updatePages();
 	}
 	
 	public void updateInstrumentSelectAlert() {
@@ -207,6 +157,60 @@ public class DirectoryManager {
 	
 	public String getInternalRecordDirectory() {
 		return internalRecordDirectory.getPath();
+	}
+	
+	private void initDataDir() {
+		if (Environment.getExternalStorageState().equals(
+				Environment.MEDIA_MOUNTED)) {
+			// we can read and write to external storage
+			String extStorageDir = Environment.getExternalStorageDirectory()
+					.toString();
+			appDirectoryPath = extStorageDir + "/BeatBot/";
+		} else { // we need read AND write access for this app - default to
+					// internal storage
+			//appDirectoryPath = getFilesDir().toString() + "/";
+			// TODO throw / catch exception - need External SD Card!
+		}
+	}
+	
+	private void initBuilders(Context context) {
+		instrumentSelectAlertBuilder = new AlertDialog.Builder(context);
+		sampleSelectAlertBuilder = new AlertDialog.Builder(context);
+		instrumentSelectAlertBuilder.setTitle("Choose Instrument");
+		sampleSelectAlertBuilder.setTitle("Choose Sample");
+	}
+	
+	private void initInstrumentSelectAdapter(final Activity activity, final BBDirectory directory) {
+		instrumentSelectAdapter = new ArrayAdapter<String>(activity,
+				android.R.layout.select_dialog_item, android.R.id.text1, directory.getChildNames()) {
+			public View getView(int position, View convertView, ViewGroup parent) {
+				View v = super.getView(position, convertView, parent);
+				TextView tv = (TextView) v.findViewById(android.R.id.text1);
+				// Put the image on the TextView
+				BeatBotIconSource iconSource = directory.getChild(position).getBBIconSource();
+				if (iconSource == null) {
+					return v;
+				}
+				tv.setCompoundDrawablesWithIntrinsicBounds(
+						iconSource.listViewIcon.resourceId,
+						0, 0, 0);
+				// Add margin between image and text (support various screen
+				// densities)
+				int dp5 = (int) (5 * activity.getResources()
+						.getDisplayMetrics().density + 0.5f);
+				tv.setCompoundDrawablePadding(dp5);
+
+				return v;
+			}
+		};
+	}
+
+	private void setInstrument(Instrument instrument) {
+		// update the sample select alert names with the new
+		// instrument samples
+		updateSampleSelectAlert();
+		TrackPage.getTrack().setInstrument(instrument);
+		TrackPageFactory.updatePages();
 	}
 	
 	private void initInstrumentSelectOnShowListener() {

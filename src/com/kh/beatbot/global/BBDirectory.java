@@ -56,6 +56,14 @@ public class BBDirectory {
 		return children;
 	}
 	
+	public String[] getChildNames(){
+		String[] names = new String[children.size()];
+		for (int i = 0; i < names.length; i++) {
+			names[i] = children.get(i).name;
+		}
+		return names;
+	}
+	
 	public BBDirectory getChild(int childNum) {
 		return children.get(childNum);
 	}
