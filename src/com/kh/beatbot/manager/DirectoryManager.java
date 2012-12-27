@@ -58,8 +58,8 @@ public class DirectoryManager {
 	
 	private static DirectoryManager singletonInstance = null;
 	
-	private AlertDialog.Builder instrumentSelectAlertBuilder, sampleSelectAlertBuilder;
-	private AlertDialog instrumentSelectAlert = null, sampleSelectAlert = null;
+	private AlertDialog.Builder instrumentSelectAlertBuilder;
+	private AlertDialog instrumentSelectAlert = null;
 	private ListAdapter instrumentSelectAdapter = null;
 	private OnShowListener instrumentSelectOnShowListener = null;
 	
@@ -67,6 +67,8 @@ public class DirectoryManager {
 	private BBDirectory drumsDirectory = null;
 	private BBDirectory internalRecordDirectory = null;
 	private BBDirectory userRecordDirectory = null;
+	
+	private BBDirectory currDirectory = null;
 	
 	private boolean addingTrack = false;
 	
@@ -86,10 +88,10 @@ public class DirectoryManager {
 		for (String drumName : drumNames) {
 			new Instrument(drumsDirectory, drumName, new BeatBotIconSource());
 		}
+		currDirectory = internalDirectory;
 		initBuilders(GlobalVars.mainActivity);
-		initInstrumentSelectAdapter(GlobalVars.mainActivity, internalDirectory);
 		initInstrumentSelectOnShowListener();
-		updateInstrumentSelectAlert();
+		updateInstrumentSelectAlert(currDirectory);
 	}
 	
 	public void updateDirectories() {
@@ -98,31 +100,34 @@ public class DirectoryManager {
 		}
 	}
 	
-	public void updateInstrumentSelectAlert() {
+	public void updateInstrumentSelectAlert(BBDirectory newDirectory) {
+		initInstrumentSelectAdapter(GlobalVars.mainActivity, newDirectory);
 		instrumentSelectAlertBuilder.setAdapter(instrumentSelectAdapter,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-						if (addingTrack) {
-							Managers.trackManager.addTrack(item);
-						} else {
-							setInstrument(getDrumInstrument(item));
+						currDirectory = currDirectory.getChild(item);
+						if (currDirectory == null) {
+							// at a leaf - a sample
+							TrackPage.getTrack().setSampleNum(item);
+							setInstrument(TrackPage.getTrack().getInstrument());
+							currDirectory = internalDirectory;
+						} else if (currDirectory instanceof Instrument) {
+							// Instrument type
+							if (addingTrack) {
+								Managers.trackManager.addTrack(item);
+							} else {
+								setInstrument((Instrument)currDirectory);
+							}
+						}
+						updateInstrumentSelectAlert(currDirectory);
+						if (currDirectory != internalDirectory) {
+							instrumentSelectAlert.show();
 						}
 					}
 				});
 		instrumentSelectAlert = instrumentSelectAlertBuilder.create();
 		instrumentSelectAlert
 				.setOnShowListener(instrumentSelectOnShowListener);
-	}
-
-	public void updateSampleSelectAlert() {
-		sampleSelectAlertBuilder.setItems(TrackPage.getTrack().getInstrument().getSampleNames(),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						TrackPage.getTrack().setSampleNum(item);
-						setInstrument(TrackPage.getTrack().getInstrument());
-					}
-				});
-		sampleSelectAlert = sampleSelectAlertBuilder.create();
 	}
 	
 	public void showAddTrackAlert() {
@@ -136,7 +141,9 @@ public class DirectoryManager {
 	}
 	
 	public void showSampleSelectAlert() {
-		sampleSelectAlert.show();
+		currDirectory = TrackPage.getTrack().getInstrument();
+		updateInstrumentSelectAlert(currDirectory);
+		instrumentSelectAlert.show();
 	}
 	
 	public void updateRecordDirectory() {
@@ -175,18 +182,21 @@ public class DirectoryManager {
 	
 	private void initBuilders(Context context) {
 		instrumentSelectAlertBuilder = new AlertDialog.Builder(context);
-		sampleSelectAlertBuilder = new AlertDialog.Builder(context);
 		instrumentSelectAlertBuilder.setTitle("Choose Instrument");
-		sampleSelectAlertBuilder.setTitle("Choose Sample");
 	}
 	
 	private void initInstrumentSelectAdapter(final Activity activity, final BBDirectory directory) {
+		String[] list = directory instanceof Instrument ? ((Instrument)directory).getSampleNames() : directory.getChildNames(); 
 		instrumentSelectAdapter = new ArrayAdapter<String>(activity,
-				android.R.layout.select_dialog_item, android.R.id.text1, directory.getChildNames()) {
+				android.R.layout.select_dialog_item, android.R.id.text1, list) {
 			public View getView(int position, View convertView, ViewGroup parent) {
 				View v = super.getView(position, convertView, parent);
 				TextView tv = (TextView) v.findViewById(android.R.id.text1);
 				// Put the image on the TextView
+				if (directory instanceof Instrument) {
+					tv.setCompoundDrawables(null, null, null, null);
+					return v;
+				}
 				BeatBotIconSource iconSource = directory.getChild(position).getBBIconSource();
 				if (iconSource == null) {
 					tv.setCompoundDrawables(null, null, null, null);
@@ -207,9 +217,6 @@ public class DirectoryManager {
 	}
 
 	private void setInstrument(Instrument instrument) {
-		// update the sample select alert names with the new
-		// instrument samples
-		updateSampleSelectAlert();
 		TrackPage.getTrack().setInstrument(instrument);
 		TrackPageFactory.updatePages();
 	}
