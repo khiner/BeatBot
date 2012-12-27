@@ -65,6 +65,9 @@ public class BBDirectory {
 	}
 	
 	public BBDirectory getChild(int childNum) {
+		if (childNum >= children.size()) {
+			return null;
+		}
 		return children.get(childNum);
 	}
 }
