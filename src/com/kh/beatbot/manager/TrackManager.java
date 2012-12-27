@@ -46,7 +46,11 @@ public class TrackManager implements MidiTrackControlListener {
 	
 	public void addTrack(int instrumentType) {
 		Instrument newInstrument = Managers.directoryManager.getDrumInstrument(instrumentType);
-		Track newTrack = new Track(tracks.size(), newInstrument); 
+		addTrack(newInstrument);
+	}
+	
+	public void addTrack(Instrument instrument) {
+		Track newTrack = new Track(tracks.size(), instrument); 
 		addTrack(newTrack.getSamplePath());
 		tracks.add(newTrack);
 		GlobalVars.midiView.updateTracks();
