@@ -87,7 +87,7 @@ public class DirectoryManager {
 			new Instrument(drumsDirectory, drumName, new BeatBotIconSource());
 		}
 		initBuilders(GlobalVars.mainActivity);
-		initInstrumentSelectAdapter(GlobalVars.mainActivity, drumsDirectory);
+		initInstrumentSelectAdapter(GlobalVars.mainActivity, internalDirectory);
 		initInstrumentSelectOnShowListener();
 		updateInstrumentSelectAlert();
 	}
@@ -189,6 +189,7 @@ public class DirectoryManager {
 				// Put the image on the TextView
 				BeatBotIconSource iconSource = directory.getChild(position).getBBIconSource();
 				if (iconSource == null) {
+					tv.setCompoundDrawables(null, null, null, null);
 					return v;
 				}
 				tv.setCompoundDrawablesWithIntrinsicBounds(
