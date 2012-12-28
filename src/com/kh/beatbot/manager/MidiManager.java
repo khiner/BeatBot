@@ -257,12 +257,14 @@ public class MidiManager implements Parcelable {
 		if (copiedNotes.isEmpty())
 			return;
 		saveState();
+		deselectAllNotes();
 		long tickOffset = startTick - getLeftMostTick(copiedNotes);
 		for (MidiNote copiedNote : copiedNotes) {
 			long newOnTick = copiedNote.getOnTick() + tickOffset;
 			long newOffTick = copiedNote.getOffTick() + tickOffset;
 			setNoteTicks(copiedNote, newOnTick, newOffTick, false, true);
 			addNote(copiedNote);
+			selectNote(copiedNote);
 		}
 		handleMidiCollisions(copiedNotes);
 		mergeTempNotes();

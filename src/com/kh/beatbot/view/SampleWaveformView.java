@@ -136,8 +136,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private void updateWaveformVb() {
 		try {
 			waveformVb = WaveformHelper.floatFileToBuffer(width
-					- previewButtonWidth, height, (long) sampleOffset,
-					(long) sampleWidth, 0);
+					- previewButtonWidth - SNAP_DIST, height, (long) sampleOffset,
+					(long) sampleWidth, SNAP_DIST / 2);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -166,7 +166,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		gl.glEnable(GL10.GL_LINE_SMOOTH);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVb);
 		gl.glPushMatrix();
-		gl.glTranslatef(previewButtonWidth + SNAP_DIST / 2, 0, 0);
+		gl.glTranslatef(previewButtonWidth, 0, 0);
 		drawLines(waveformVb, Colors.VOLUME_COLOR, 10, GL10.GL_LINE_STRIP);
 		gl.glPopMatrix();
 		gl.glDisable(GL10.GL_LINE_SMOOTH);
@@ -393,28 +393,35 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	private boolean moveLoopMarker(int id, float x) {
 		if (beginLoopMarkerTouched == id) {
+			// update track loop begin
 			float newLoopBegin = xToSample(x);
 			track.setLoopBeginSample(newLoopBegin < 0 ? 0
 					: (newLoopBegin >= track.getLoopEndSample() - MIN_LOOP_WINDOW ? track.getLoopEndSample()
 							- MIN_LOOP_WINDOW
 							: newLoopBegin));
+			// update ui to fit the new begin point
+			if (track.getLoopBeginSample() < sampleOffset) {
+				sampleWidth += sampleOffset - track.getLoopBeginSample();
+				sampleOffset = track.getLoopBeginSample();
+			} else if (track.getLoopBeginSample() > sampleOffset + sampleWidth) {
+				sampleWidth = track.getLoopBeginSample() - sampleOffset;
+			}
 		} else if (endLoopMarkerTouched == id) {
+			// update track loop end
 			float newLoopEnd = xToSample(x);
 			track.setLoopEndSample(newLoopEnd >= track.getNumSamples() ? track.getNumSamples() - 1
 					: (newLoopEnd <= track.getLoopBeginSample() + MIN_LOOP_WINDOW ? track.getLoopBeginSample()
 							+ MIN_LOOP_WINDOW
 							: newLoopEnd));
+			// update ui to fit the new end point
+			if (track.getLoopEndSample() > sampleOffset + sampleWidth) {
+				sampleWidth = track.getLoopEndSample() - sampleOffset;
+			} else if (track.getLoopEndSample() < sampleOffset) {
+				sampleWidth += sampleOffset - track.getLoopEndSample();
+				sampleOffset = track.getLoopEndSample();
+			}
 		} else {
 			return false;
-		}
-		if (track.getLoopBeginSample() < sampleOffset) {
-			sampleOffset = track.getLoopBeginSample();
-			if (track.getLoopEndSample() > sampleOffset + sampleWidth)
-				sampleWidth = track.getLoopEndSample() - track.getLoopBeginSample();
-		} else if (track.getLoopEndSample() > sampleOffset + sampleWidth) {
-			sampleWidth = track.getLoopEndSample() - sampleOffset;
-			if (sampleWidth + sampleOffset > track.getNumSamples())
-				sampleWidth = track.getNumSamples() - sampleOffset;
 		}
 		updateVbs();
 		return true;
