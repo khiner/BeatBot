@@ -145,10 +145,12 @@ public class Track {
 	
 	public void setLoopBeginSample(float loopBeginSample) {
 		sampleLoopPoints.get(currSampleNum).loopBeginSample = loopBeginSample;
+		setLoopWindow((long)loopBeginSample, (long)sampleLoopPoints.get(currSampleNum).loopEndSample);
 	}
 	
 	public void setLoopEndSample(float loopEndSample) {
 		sampleLoopPoints.get(currSampleNum).loopEndSample = loopEndSample;
+		setLoopWindow((long)sampleLoopPoints.get(currSampleNum).loopBeginSample, (long)loopEndSample);
 	}
 	
 	public String getSampleName() {

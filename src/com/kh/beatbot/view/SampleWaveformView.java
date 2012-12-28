@@ -83,10 +83,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		File sampleFile = track.getSampleFile(); 
 		WaveformHelper.setSampleFile(sampleFile);
 		sampleWidth = track.getNumSamples();
-		if (height != 0 && sampleWidth != 0) {
-			updateWaveformVb();
-		}
-		updateLoopMarkers();
+		updateVbs();
 	}
 		
 	private void initAdsrVb() {
@@ -297,22 +294,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		}
 	}
 
-	private void updateLoopMarkers() {
-		float diff = 0;
-		if (track.getLoopBeginSample() < sampleOffset
-				&& track.getLoopEndSample() > sampleOffset + sampleWidth) {
-			clipLoopToWindow();
-		} else if (track.getLoopBeginSample() < sampleOffset)
-			diff = sampleOffset - track.getLoopBeginSample();
-		else if (track.getLoopEndSample() >= sampleOffset + sampleWidth)
-			diff = sampleOffset + sampleWidth - track.getLoopEndSample();
-		if (diff != 0) {
-			track.setLoopBeginSample(track.getLoopBeginSample() + diff);
-			track.setLoopEndSample(track.getLoopEndSample() + diff);
-			clipLoopToWindow();
-		}
-		track.setLoopWindow((long) track.getLoopBeginSample(),
-				(long) track.getLoopEndSample());
+	private void updateVbs() {
 		// update the display location of the loop markers
 		initLoopMarkerVb();
 		initAdsrVb();
@@ -321,13 +303,13 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	@Override
 	protected void drawFrame() {
-		drawTriangleStrip(previewButtonSquareVb, Colors.BG_COLOR);
-		previewButton.draw(0, 0, height, height);
 		drawWaveform();
 		drawLines(backgroundOutlineVb, Colors.WHITE, 4, GL10.GL_LINE_LOOP);
 		drawLoopSelectionMarkers();
 		if (track.isAdsrEnabled())
 			drawAdsr();
+		drawTriangleStrip(previewButtonSquareVb, Colors.BG_COLOR);
+		previewButton.draw(0, 0, height, height);
 	}
 
 	private boolean selectAdsrPoint(int id, float x, float y) {
@@ -434,11 +416,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 			if (sampleWidth + sampleOffset > track.getNumSamples())
 				sampleWidth = track.getNumSamples() - sampleOffset;
 		}
-		// update UI
-		initLoopMarkerVb();
-		initAdsrVb();
-		// update sample playback.
-		updateLoopMarkers();
+		updateVbs();
 		return true;
 	}
 
@@ -471,13 +449,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 		float rightX = Math.max(x1, x2);
 		updateZoom(leftX, rightX);
 		return true;
-	}
-
-	private void clipLoopToWindow() {
-		if (track.getLoopBeginSample() < sampleOffset)
-			track.setLoopBeginSample(sampleOffset);
-		if (track.getLoopEndSample() > sampleOffset + sampleWidth)
-			track.setLoopEndSample(sampleOffset + sampleWidth);
 	}
 
 	private void handleWaveActionDown(int id, float x, float y) {
@@ -555,7 +526,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 					&& !moveLoopMarker(id, e.getX(i)))
 				scroll(e.getX(i));
 		}
-		updateLoopMarkers();
+		updateVbs();
 	}
 
 	@Override
