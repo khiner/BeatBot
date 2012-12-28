@@ -29,7 +29,7 @@ public class Track {
 	private Instrument instrument;
 	private int currSampleNum = 0;
 	private boolean adsrEnabled = false, reverse = false;
-	public List<MidiNote> notes = new ArrayList<MidiNote>();
+	private List<MidiNote> notes = new ArrayList<MidiNote>();
 	public List<Effect> effects = new ArrayList<Effect>();
 	public float volume = .8f;
 	public float pan = .5f;
@@ -51,6 +51,20 @@ public class Track {
 		return id;
 	}
 
+	public void removeNote(MidiNote note) {
+		notes.remove(note);
+		updateNextNote();
+	}
+	
+	public void addNote(MidiNote note) {
+		notes.add(note);
+		updateNextNote();
+	}
+	
+	public void clearNotes() {
+		notes.clear();
+	}
+	
 	public void initDefaultAdsrPoints() {
 		adsrPoints = new float[5][2];
 		for (int i = 0; i < 5; i++) {
@@ -68,17 +82,13 @@ public class Track {
 	public void updateNextNote() {
 		Collections.sort(notes);
 		long currTick = Managers.midiManager.getCurrTick();
-		if (isTrackPlaying(id)) {
-			// track is already in the middle of playing a note.  it will update after the note stops.
-			return;
-		}
 		MidiNote nextNote = getNextMidiNote(currTick);
 		setNextNote(id, nextNote);
 	}
 	
 	public MidiNote getNextMidiNote(long currTick) {
 		for (MidiNote midiNote : notes) {
-			if (midiNote.getOnTick() > currTick
+			if (midiNote.getOffTick() > currTick
 					&& midiNote.getOnTick() < MidiManager.loopEndTick) {
 				return midiNote;
 			}

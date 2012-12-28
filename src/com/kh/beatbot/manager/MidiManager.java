@@ -217,8 +217,7 @@ public class MidiManager implements Parcelable {
 	private void addNote(MidiNote midiNote) {
 		midiNotes.add(midiNote);
 		Track track = Managers.trackManager.getTrack(midiNote.getNoteValue()); 
-		track.notes.add(midiNote);
-		track.updateNextNote();
+		track.addNote(midiNote);
 	}
 
 	public void putTempNote(int index, MidiNote midiNote) {
@@ -230,8 +229,7 @@ public class MidiManager implements Parcelable {
 			return;
 		midiNotes.remove(midiNote);
 		Track track = Managers.trackManager.getTrack(midiNote.getNoteValue()); 
-		track.notes.remove(midiNote);
-		track.updateNextNote();
+		track.removeNote(midiNote);
 		updateEditIcons();
 	}
 
@@ -295,10 +293,8 @@ public class MidiManager implements Parcelable {
 		midiNote.setNote(newNote);
 		Track oldTrack = Managers.trackManager.getTrack(oldNote); 
 		Track newTrack = Managers.trackManager.getTrack(newNote); 
-		oldTrack.notes.remove(midiNote);
-		newTrack.notes.add(midiNote);
-		oldTrack.updateNextNote();
-		newTrack.updateNextNote();
+		oldTrack.removeNote(midiNote);
+		newTrack.addNote(midiNote);
 	}
 
 	public void setNoteTicks(MidiNote midiNote, long onTick, long offTick,

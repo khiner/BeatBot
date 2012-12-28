@@ -59,7 +59,7 @@ public class TrackManager implements MidiTrackControlListener {
 	
 	public void clearNotes() {
 		for (Track track : tracks) {
-			track.notes.clear();
+			track.clearNotes();
 		}
 	}
 	
