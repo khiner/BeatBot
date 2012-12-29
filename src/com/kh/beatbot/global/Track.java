@@ -108,15 +108,6 @@ public class Track {
 		return null;
 	}
 
-	public Effect findEffectById(int effectId) {
-		for (Effect effect : effects) {
-			if (effect.getId() == effectId) {
-				return effect;
-			}
-		}
-		return null;
-	}
-
 	public Effect findEffectByPosition(int position) {
 		for (Effect effect : effects) {
 			if (effect.getPosition() == position) {

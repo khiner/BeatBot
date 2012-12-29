@@ -169,7 +169,7 @@ Track *initTrack() {
 	for (effectNum = 0; effectNum < MAX_EFFECTS_PER_TRACK; effectNum++) {
 		addEffect(track, NULL);
 	}
-	track->volPan = initEffect(-1, true, volumepanconfig_create(),
+	track->volPan = initEffect(true, volumepanconfig_create(),
 			volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
 	return track;
 }

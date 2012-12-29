@@ -26,7 +26,6 @@ public abstract class Effect implements Comparable<Effect> {
 
 	protected List<EffectParam> params = new ArrayList<EffectParam>();
 
-	protected int id;
 	protected int effectNum;
 	protected int trackNum;
 	protected int numParams;
@@ -36,22 +35,17 @@ public abstract class Effect implements Comparable<Effect> {
 	public boolean on = true;
 	protected boolean paramsLinked = false;
 
-	public Effect(int id, String name, int trackNum, int position) {
-		this.id = id;
+	public Effect(String name, int trackNum, int position) {
 		this.name = name;
 		this.trackNum = trackNum;
 		this.position = position;
 		initParams();
-		addEffect(trackNum, effectNum, id, position);
+		addEffect(trackNum, effectNum, position);
 	}
 
 	public void setOn(boolean on) {
 		this.on = on;
-		setEffectOn(trackNum, id, on);
-	}
-
-	public int getId() {
-		return id;
+		setEffectOn(trackNum, position, on);
 	}
 
 	public int getPosition() {
@@ -72,11 +66,6 @@ public abstract class Effect implements Comparable<Effect> {
 
 	public void setPosition(int position) {
 		this.position = position;
-		setEffectPosition(trackNum, id, position);
-	}
-
-	public void incPosition() {
-		this.position++;
 	}
 
 	public void setParamsLinked(boolean linked) {
@@ -102,7 +91,7 @@ public abstract class Effect implements Comparable<Effect> {
 		EffectParam param = getParam(paramNum);
 		param.viewLevel = level;
 		setParamLevel(param, level);
-		setEffectParam(trackNum, id, paramNum, param.level);
+		setEffectParam(trackNum, position, paramNum, param.level);
 	}
 
 	public void setParamLevel(EffectParam param, float level) {
@@ -199,21 +188,20 @@ public abstract class Effect implements Comparable<Effect> {
 	}
 
 	public void removeEffect() {
-		removeEffect(trackNum, id);
+		removeEffect(trackNum, position);
 		Managers.trackManager.getTrack(trackNum).effects.remove(this);
 	}
 
-	public native void addEffect(int trackNum, int effectNum, int effectId,
-			int position);
+	public native void addEffect(int trackNum, int effectNum, int position);
 
-	public native void removeEffect(int trackNum, int id);
+	public native void removeEffect(int trackNum, int position);
 
-	public native void setEffectPosition(int trackNum, int effectId,
-			int position);
+	public static native void setEffectPosition(int trackNum, int oldPosition,
+			int newPosition);
 
-	public native void setEffectOn(int trackNum, int effectId, boolean on);
+	public native void setEffectOn(int trackNum, int effectPosition, boolean on);
 
-	public native void setEffectParam(int trackNum, int effectId, int paramNum,
+	public native void setEffectParam(int trackNum, int effectPosition, int paramNum,
 			float paramLevel);
 
 	protected abstract void initParams();

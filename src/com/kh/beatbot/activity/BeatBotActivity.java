@@ -311,7 +311,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 					EffectParam param = effect.getParam(paramNum);
 					if (param.beatSync) {
 						effect.setParamLevel(param, param.viewLevel);
-						effect.setEffectParam(trackId, effect.getId(),
+						effect.setEffectParam(trackId, effect.getPosition(),
 								paramNum, param.level);
 					}
 				}

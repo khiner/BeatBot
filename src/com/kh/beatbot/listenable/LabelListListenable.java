@@ -34,12 +34,9 @@ public class LabelListListenable extends ClickableSurfaceView {
 		private FloatBuffer backgroundRectVb = null;
 		private String text = null;
 		private float x, textWidth, labelWidth;
-		private int id;
-		private int prevPosition;
-
-		Label(int id, String text, boolean on, float x) {
+		
+		Label(String text, boolean on, float x) {
 			this.text = text;
-			this.id = id;
 			this.x = x;
 			// empty text indicates empty label
 			state = text.isEmpty() ? LabelState.EMPTY : (on ? LabelState.ON
@@ -158,6 +155,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 	private LabelListListener listener = null;
 	private ArrayList<Label> labels = null;
 	private BBIcon plusIcon;
+	private int initialTouchedPosition;
 
 	// which label is currently being touched? (null for none)
 	private Label touchedLabel = null;
@@ -172,8 +170,8 @@ public class LabelListListenable extends ClickableSurfaceView {
 		this.listener = listener;
 	}
 
-	public void setLabelOn(int labelId, boolean on) {
-		Label label = findLabel(labelId);
+	public void setLabelOn(int position, boolean on) {
+		Label label = labels.get(position);
 		if (label != null) {
 			label.state = on ? LabelState.ON : LabelState.OFF;
 		}
@@ -181,18 +179,6 @@ public class LabelListListenable extends ClickableSurfaceView {
 
 	public Label getLabel(int index) {
 		return index < labels.size() ? labels.get(index) : null;
-	}
-
-	/*
-	 * Find the label with the given id
-	 */
-	private Label findLabel(int id) {
-		for (Label label : labels) {
-			if (label.id == id) {
-				return label;
-			}
-		}
-		return null;
 	}
 
 	/*
@@ -224,16 +210,16 @@ public class LabelListListenable extends ClickableSurfaceView {
 		}
 	}
 
-	public void addLabel(String text, int id, boolean on) {
-		labels.add(new Label(id, text, on, Float.MAX_VALUE));
+	public void addLabel(String text, boolean on) {
+		labels.add(new Label(text, on, Float.MAX_VALUE));
 		updateLabelSizes();
 		updateLabelLocations();
 	}
 
 	// callback function for listener to notify when the label text and id is
 	// known
-	public void setLabelText(int id, String text) {
-		Label label = findLabel(id);
+	public void setLabelText(int position, String text) {
+		Label label = labels.get(position);
 		if (label != null) {
 			label.setText(text);
 		}
@@ -251,23 +237,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 	private void touchLabel(Label label, float pointerX) {
 		touchedLabel = label;
 		dragOffset = touchedLabel.x - pointerX;
-		setAllLabelPrevPositions();
-	}
-
-	private void setAllLabelPrevPositions() {
-		for (int i = 0; i < labels.size(); i++) {
-			labels.get(i).prevPosition = i;
-		}
-	}
-
-	// notify listener of the given label's old and new position in list
-	private void updateLabelPositions() {
-		for (Label label : labels) {
-			int newPosition = labels.indexOf(label);
-			if (newPosition != label.prevPosition) {
-				listener.labelMoved(label.prevPosition, newPosition);
-			}
-		}
+		initialTouchedPosition = labels.indexOf(touchedLabel);
 	}
 
 	private void initBgRectVb() {
@@ -344,8 +314,12 @@ public class LabelListListenable extends ClickableSurfaceView {
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
 		super.handleActionUp(id, x, y);
+		// notify listener of the touched label's old and new position in list
+		int newPosition = labels.indexOf(touchedLabel);
+		if (newPosition != initialTouchedPosition) {
+			listener.labelMoved(initialTouchedPosition, newPosition);
+		}
 		touchedLabel = null;
-		updateLabelPositions();
 		updateLabelLocations();
 	}
 
@@ -363,16 +337,14 @@ public class LabelListListenable extends ClickableSurfaceView {
 	protected void longPress(int id, float x, float y) {
 		// notify listener that the label has been long-clicked
 		if (touchedLabel != null)
-			listener.labelLongClicked(touchedLabel.id,
-					labels.indexOf(touchedLabel));
+			listener.labelLongClicked(labels.indexOf(touchedLabel));
 	}
 
 	@Override
 	protected void singleTap(int id, float x, float y) {
 		// notify listener that the label has been single-clicked (tapped)
 		if (touchedLabel != null)
-			listener.labelClicked(touchedLabel.text, touchedLabel.id,
-					labels.indexOf(touchedLabel));
+			listener.labelClicked(touchedLabel.text, labels.indexOf(touchedLabel));
 	}
 
 	@Override

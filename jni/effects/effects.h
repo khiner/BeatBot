@@ -6,7 +6,6 @@ typedef struct Effect_t {
 	void (*set)(void *, float, float);
 	void (*process)(void *, float **, int);
 	void (*destroy)(void *);
-	int id;
 	bool on;
 } Effect;
 
@@ -15,7 +14,7 @@ typedef struct EffectNode_t {
 	struct EffectNode_t *next;
 } EffectNode;
 
-Effect *initEffect(int id, bool on, void *config,
+Effect *initEffect(bool on, void *config,
 		void (*set), void (*process), void (*destroy));
 
 void reverse(float buffer[], int begin, int end);

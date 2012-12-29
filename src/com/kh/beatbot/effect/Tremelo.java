@@ -4,8 +4,8 @@ import com.kh.beatbot.R;
 
 public class Tremelo extends Effect {
 
-	public Tremelo(int id, String name, int trackNum, int position) {
-		super(id, name, trackNum, position);
+	public Tremelo(String name, int trackNum, int position) {
+		super(name, trackNum, position);
 	}
 
 	@Override

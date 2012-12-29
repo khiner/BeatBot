@@ -7,7 +7,7 @@ public interface LabelListListener {
 
 	void labelMoved(int oldPosition, int newPosition);
 
-	void labelClicked(String text, int id, int position);
+	void labelClicked(String text, int position);
 
-	void labelLongClicked(int id, int position);
+	void labelLongClicked(int position);
 }

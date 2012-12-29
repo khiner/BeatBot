@@ -1,7 +1,6 @@
 package com.kh.beatbot.layout.page;
 
 import java.util.Collections;
-import java.util.Stack;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -46,8 +45,8 @@ public class EffectsPage extends TrackPage {
 		for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
 			Effect effect = track.findEffectByPosition(i);
 			if (effect != null) {
-				effectLabelList.setLabelText(effect.getId(), effect.getName());
-				effectLabelList.setLabelOn(effect.getId(), effect.on);
+				effectLabelList.setLabelText(i, effect.getName());
+				effectLabelList.setLabelOn(i, effect.on);
 			} else {
 				effectLabelList.setLabelTextByPosition(i, "");
 			}
@@ -61,7 +60,6 @@ public class EffectsPage extends TrackPage {
 
 	class EffectLabelListListener implements LabelListListener {
 		private AlertDialog selectEffectAlert = null;
-		private int lastClickedId = -1;
 		private int lastClickedPos = -1;
 
 		EffectLabelListListener(Context c) {
@@ -71,18 +69,20 @@ public class EffectsPage extends TrackPage {
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int item) {
 							if (effectNames[item].equals("NONE")) {
-								effectLabelList.setLabelText(lastClickedId, "");
+								effectLabelList
+										.setLabelText(lastClickedPos, "");
 								Effect effect = track
-										.findEffectById(lastClickedId);
+										.findEffectByPosition(lastClickedPos);
 								if (effect != null) {
 									effect.removeEffect();
 								}
 							} else {
-								effectLabelList.setLabelText(lastClickedId,
+								effectLabelList.setLabelText(lastClickedPos,
 										effectNames[item]);
-								effectLabelList.setLabelOn(lastClickedId, true);
+								effectLabelList
+										.setLabelOn(lastClickedPos, true);
 								launchEffectIntent(effectNames[item],
-										lastClickedId, lastClickedPos);
+										lastClickedPos);
 							}
 						}
 					});
@@ -93,7 +93,7 @@ public class EffectsPage extends TrackPage {
 		public void labelListInitialized(LabelListListenable labelList) {
 			effectLabelList = labelList;
 			for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
-				labelList.addLabel("", i, false);
+				labelList.addLabel("", false);
 			}
 		}
 
@@ -102,72 +102,74 @@ public class EffectsPage extends TrackPage {
 			Effect effect = track.findEffectByPosition(oldPosition);
 			if (effect != null) {
 				effect.setPosition(newPosition);
-				for (Effect other : track.effects) {
-					if (other.equals(effect))
-						continue;
-					if (other.getPosition() >= newPosition
-							&& other.getPosition() < oldPosition) {
-						other.incPosition();
-					}
-				}
-				Collections.sort(track.effects);
 			}
+			for (Effect other : track.effects) {
+				if (other.equals(effect))
+					continue;
+				if (other.getPosition() >= newPosition
+						&& other.getPosition() < oldPosition) {
+					other.setPosition(other.getPosition() + 1);
+				} else if (other.getPosition() <= newPosition
+						&& other.getPosition() > oldPosition) {
+					other.setPosition(other.getPosition() - 1);
+				}
+			}
+			Collections.sort(track.effects);
+
+			Effect.setEffectPosition(track.getId(), oldPosition, newPosition);
 		}
 
 		@Override
-		public void labelClicked(String text, int id, int position) {
-			lastClickedId = id;
+		public void labelClicked(String text, int position) {
 			lastClickedPos = position;
 			if (text.isEmpty()) {
 				selectEffectAlert.show();
 			} else {
-				launchEffectIntent(text, id, position);
+				launchEffectIntent(text, position);
 			}
 		}
 
 		@Override
-		public void labelLongClicked(int id, int position) {
-			lastClickedId = id;
+		public void labelLongClicked(int position) {
 			lastClickedPos = position;
 			selectEffectAlert.show();
 		}
 	}
 
-	private void launchEffectIntent(String effectName, int effectId,
-			int effectPosition) {
-		Effect effect = getEffect(effectName, effectId, effectPosition);
+	private void launchEffectIntent(String effectName, int effectPosition) {
+		Effect effect = getEffect(effectName, effectPosition);
 		if (effectName != effect.name) {
 			// different effect being added to the effect slot. need to replace
 			// it
 			effect.removeEffect();
-			effect = getEffect(effectName, effectId, effectPosition);
+			effect = getEffect(effectName, effectPosition);
 		}
 		Intent intent = new Intent();
 		intent.setClass(context, EffectActivity.class);
-		intent.putExtra("effectId", effect.getId());
+		intent.putExtra("effectPosition", effect.getPosition());
 		intent.putExtra("trackId", track.getId());
 
 		context.startActivity(intent);
 	}
 
-	private Effect getEffect(String effectName, int id, int position) {
-		Effect effect = track.findEffectById(id);
+	private Effect getEffect(String effectName, int position) {
+		Effect effect = track.findEffectByPosition(position);
 		if (effect != null)
 			return effect;
 		if (effectName.equals(context.getString(R.string.decimate)))
-			effect = new Decimate(id, effectName, track.getId(), position);
+			effect = new Decimate(effectName, track.getId(), position);
 		else if (effectName.equals(context.getString(R.string.chorus)))
-			effect = new Chorus(id, effectName, track.getId(), position);
+			effect = new Chorus(effectName, track.getId(), position);
 		else if (effectName.equals(context.getString(R.string.delay)))
-			effect = new Delay(id, effectName, track.getId(), position);
+			effect = new Delay(effectName, track.getId(), position);
 		else if (effectName.equals(context.getString(R.string.flanger)))
-			effect = new Flanger(id, effectName, track.getId(), position);
+			effect = new Flanger(effectName, track.getId(), position);
 		else if (effectName.equals(context.getString(R.string.filter)))
-			effect = new Filter(id, effectName, track.getId(), position);
+			effect = new Filter(effectName, track.getId(), position);
 		else if (effectName.equals(context.getString(R.string.reverb)))
-			effect = new Reverb(id, effectName, track.getId(), position);
+			effect = new Reverb(effectName, track.getId(), position);
 		else if (effectName.equals(context.getString(R.string.tremelo)))
-			effect = new Tremelo(id, effectName, track.getId(), position);
+			effect = new Tremelo(effectName, track.getId(), position);
 		track.effects.add(effect);
 		return effect;
 	}
