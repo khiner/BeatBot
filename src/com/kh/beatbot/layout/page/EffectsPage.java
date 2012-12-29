@@ -40,7 +40,7 @@ public class EffectsPage extends TrackPage {
 
 	@Override
 	protected void update() {
-		if (!effectLabelList.isRunning())
+		if (!effectLabelList.anyLabels())
 			return;
 		for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
 			Effect effect = track.findEffectByPosition(i);
