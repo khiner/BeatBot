@@ -17,7 +17,7 @@ public class BBSeekbar2d extends LevelListenable {
 	private static float minX, maxX, minY, maxY;
 	private float selectX = 0, selectY = 0;
 	private float borderRadius;
-	
+
 	private static FloatBuffer borderVb = null;
 	private static FloatBuffer lineVb = null;
 
@@ -31,8 +31,8 @@ public class BBSeekbar2d extends LevelListenable {
 		minY = borderRadius + 2;
 		maxX = width - borderRadius - 2;
 		maxY = height - borderRadius - 2;
-		borderVb = makeRoundedCornerRectBuffer(width
-				- DRAW_OFFSET * 2, height - DRAW_OFFSET * 2, borderRadius, 25);
+		borderVb = makeRoundedCornerRectBuffer(width - DRAW_OFFSET * 2, height
+				- DRAW_OFFSET * 2, borderRadius, 25);
 	}
 
 	public void setViewLevelX(float x) {

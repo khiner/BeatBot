@@ -27,7 +27,7 @@ public class Reverb extends Effect {
 	public int getOnDrawableId() {
 		return R.drawable.reverb_label_on;
 	}
-	
+
 	@Override
 	public int getOffDrawableId() {
 		return R.drawable.reverb_label_off;

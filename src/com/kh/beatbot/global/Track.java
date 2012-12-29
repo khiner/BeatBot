@@ -17,14 +17,14 @@ public class Track {
 		public float loopBeginSample;
 		public float loopEndSample;
 		public float totalNumSamples;
-		
+
 		LoopSampleInfo(float totalNumSamples) {
 			this.loopBeginSample = 0;
 			this.loopEndSample = totalNumSamples;
 			this.totalNumSamples = totalNumSamples;
 		}
 	}
-	
+
 	private int id;
 	private Instrument instrument;
 	private int currSampleNum = 0;
@@ -36,9 +36,9 @@ public class Track {
 	public float pitch = .5f;
 	public float[][] adsrPoints;
 	public GlobalVars.LevelType activeLevelType = GlobalVars.LevelType.VOLUME;
-	
+
 	private Map<Integer, LoopSampleInfo> sampleLoopPoints = new HashMap<Integer, LoopSampleInfo>();
-	
+
 	public Track(int id, Instrument instrument, int sampleNum) {
 		this.id = id;
 		this.instrument = instrument;
@@ -59,19 +59,19 @@ public class Track {
 				stopTrack(id);
 			}
 		}
-		
+
 		updateNextNote();
 	}
-	
+
 	public void addNote(MidiNote note) {
 		notes.add(note);
 		updateNextNote();
 	}
-	
+
 	public void clearNotes() {
 		notes.clear();
 	}
-	
+
 	public void initDefaultAdsrPoints() {
 		adsrPoints = new float[5][2];
 		for (int i = 0; i < 5; i++) {
@@ -85,14 +85,14 @@ public class Track {
 		adsrPoints[3][1] = .60f;
 		adsrPoints[4][1] = 0;
 	}
-	
+
 	public void updateNextNote() {
 		Collections.sort(notes);
 		long currTick = Managers.midiManager.getCurrTick();
 		MidiNote nextNote = getNextMidiNote(currTick);
 		setNextNote(id, nextNote);
 	}
-	
+
 	public MidiNote getNextMidiNote(long currTick) {
 		for (MidiNote midiNote : notes) {
 			if (midiNote.getOffTick() > currTick
@@ -107,7 +107,7 @@ public class Track {
 		}
 		return null;
 	}
-	
+
 	public Effect findEffectById(int effectId) {
 		for (Effect effect : effects) {
 			if (effect.getId() == effectId) {
@@ -141,25 +141,28 @@ public class Track {
 	public float getLoopBeginSample() {
 		return sampleLoopPoints.get(currSampleNum).loopBeginSample;
 	}
-	
+
 	public float getLoopEndSample() {
 		return sampleLoopPoints.get(currSampleNum).loopEndSample;
 	}
-	
+
 	public float getNumSamples() {
 		return sampleLoopPoints.get(currSampleNum).totalNumSamples;
 	}
-	
+
 	public void setLoopBeginSample(float loopBeginSample) {
 		sampleLoopPoints.get(currSampleNum).loopBeginSample = loopBeginSample;
-		setLoopWindow((long)loopBeginSample, (long)sampleLoopPoints.get(currSampleNum).loopEndSample);
+		setLoopWindow((long) loopBeginSample,
+				(long) sampleLoopPoints.get(currSampleNum).loopEndSample);
 	}
-	
+
 	public void setLoopEndSample(float loopEndSample) {
 		sampleLoopPoints.get(currSampleNum).loopEndSample = loopEndSample;
-		setLoopWindow((long)sampleLoopPoints.get(currSampleNum).loopBeginSample, (long)loopEndSample);
+		setLoopWindow(
+				(long) sampleLoopPoints.get(currSampleNum).loopBeginSample,
+				(long) loopEndSample);
 	}
-	
+
 	public String getSampleName() {
 		return instrument.getSampleName(currSampleNum);
 	}
@@ -167,7 +170,7 @@ public class Track {
 	public String getSamplePath() {
 		return instrument.getSamplePath(currSampleNum);
 	}
-	
+
 	public File getSampleFile() {
 		return instrument.getSampleFile(currSampleNum);
 	}
@@ -179,12 +182,13 @@ public class Track {
 			sampleLoopPoints.put(sampleNum, new LoopSampleInfo(numSamples));
 		}
 	}
+
 	/** Wrappers around native JNI methods **/
 
 	public void stop() {
 		stopTrack(id);
 	}
-	
+
 	public void preview() {
 		previewTrack(id);
 	}
@@ -208,7 +212,7 @@ public class Track {
 	public boolean isPlaying() {
 		return isTrackPlaying(id);
 	}
-	
+
 	public boolean isLooping() {
 		return isTrackLooping(id);
 	}
@@ -216,11 +220,11 @@ public class Track {
 	public boolean isAdsrEnabled() {
 		return adsrEnabled;
 	}
-	
+
 	public boolean isReverse() {
 		return reverse;
 	}
-	
+
 	public void setLoopWindow(long loopBegin, long loopEnd) {
 		setTrackLoopWindow(id, loopBegin, loopEnd);
 	}
@@ -269,15 +273,14 @@ public class Track {
 	public static native void toggleTrackLooping(int trackNum);
 
 	public static native boolean isTrackLooping(int trackNum);
-	
+
 	public static native boolean isTrackPlaying(int trackNum);
 
 	public static native void setTrackLoopWindow(int trackNum, long loopBegin,
 			long loopEnd);
 
-
 	public static native void stopTrack(int trackNum);
-	
+
 	public static native void previewTrack(int trackNum);
 
 	public static native void stopPreviewingTrack(int trackNum);
@@ -302,6 +305,6 @@ public class Track {
 			float y);
 
 	public static native void setSample(int trackId, String sampleName);
-	
+
 	public native void setNextNote(int trackId, MidiNote midiNote);
 }

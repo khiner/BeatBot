@@ -97,8 +97,10 @@ public class ScrollBarHelper {
 		float x1 = TickWindowHelper.getTickOffset() * parentWidth
 				/ TickWindowHelper.MAX_TICKS + offset;
 		float x2 = (TickWindowHelper.getTickOffset() + TickWindowHelper
-				.getNumTicks()) * parentWidth
-				/ TickWindowHelper.MAX_TICKS + offset;
+				.getNumTicks())
+				* parentWidth
+				/ TickWindowHelper.MAX_TICKS
+				+ offset;
 		float outerWidth = x2 - x1;
 		float innerWidth = outerWidth - 10;
 		translateX = (x2 + x1) / 2;

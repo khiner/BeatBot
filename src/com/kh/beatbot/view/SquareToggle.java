@@ -19,6 +19,6 @@ public class SquareToggle extends ToggleButton {
 
 	@Override
 	protected void onMeasure(int width, int height) {
-		super.onMeasure((int)ratio * height, height);
+		super.onMeasure((int) ratio * height, height);
 	}
 }

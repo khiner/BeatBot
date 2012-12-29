@@ -62,17 +62,18 @@ public class RecordManager implements LevelListener {
 		}
 		return singletonInstance;
 	}
-	
+
 	private RecordManager() {
 		bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
 				RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 		initRecorder();
 		wavRecordDirectory = Managers.directoryManager.getUserRecordDirectory();
-		bbRecordDirectory = Managers.directoryManager.getInternalRecordDirectory();
+		bbRecordDirectory = Managers.directoryManager
+				.getInternalRecordDirectory();
 		currSampleNum = findGreatestSampleNum(wavRecordDirectory) + 1;
 		state = State.INITIALIZING;
 	}
-	
+
 	public State getState() {
 		return state;
 	}
@@ -135,7 +136,7 @@ public class RecordManager implements LevelListener {
 			recorder.release();
 		}
 	}
-	
+
 	public long getRecordStartTick() {
 		return recordStartTick;
 	}
@@ -171,7 +172,7 @@ public class RecordManager implements LevelListener {
 		state = State.INITIALIZING;
 		return currWavFileName;
 	}
-	
+
 	/**
 	 * Look through all the sample names in the given record directory and find
 	 * the sample with the greatest number appended to the end (Recorded file
@@ -207,7 +208,7 @@ public class RecordManager implements LevelListener {
 				RECORDER_SAMPLERATE, RECORDER_CHANNELS,
 				RECORDER_AUDIO_ENCODING, bufferSize);
 	}
-	
+
 	private void updateFileNames() {
 		currWavFileName = wavRecordDirectory + "R" + (currSampleNum) + ".wav";
 		currBBFileName = bbRecordDirectory + "R" + (currSampleNum++) + ".bb";
@@ -274,8 +275,8 @@ public class RecordManager implements LevelListener {
 		return true;
 	}
 
-	private static FileOutputStream writeWaveFileHeader(String fileName, long totalAudioLen,
-			long totalDataLen) throws IOException {
+	private static FileOutputStream writeWaveFileHeader(String fileName,
+			long totalAudioLen, long totalDataLen) throws IOException {
 		byte[] header = new byte[44];
 
 		header[0] = 'R'; // RIFF/WAVE header
@@ -411,7 +412,8 @@ public class RecordManager implements LevelListener {
 		// nothing - for level 2d
 	}
 
-	public native void startRecordingNative(String wavRecordFileName, String bbRecordFileName);
+	public native void startRecordingNative(String wavRecordFileName,
+			String bbRecordFileName);
 
 	public native void stopRecordingNative();
 }

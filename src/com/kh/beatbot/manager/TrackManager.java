@@ -15,28 +15,29 @@ import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 public class TrackManager implements MidiTrackControlListener {
 
 	private static TrackManager singletonInstance = null;
-	
+
 	// effect settings are stored here instead of in the effect activities
 	// because the activities are destroyed after clicking 'back', and we
 	// need to persist state
 	private static List<Track> tracks = new ArrayList<Track>();
-	
+
 	public static TrackManager getInstance() {
 		if (singletonInstance == null) {
 			singletonInstance = new TrackManager();
 		}
 		return singletonInstance;
 	}
-	
+
 	private TrackManager() {
 		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
-			Track track = new Track(tracks.size(), Managers.directoryManager.getDrumInstrument(i), 0);
+			Track track = new Track(tracks.size(),
+					Managers.directoryManager.getDrumInstrument(i), 0);
 			tracks.add(track);
 			addTrack(track.getSamplePath());
 		}
 		MidiTrackControlHelper.addListener(this);
 	}
-	
+
 	public Track getTrack(int trackNum) {
 		return tracks.get(trackNum);
 	}
@@ -46,19 +47,19 @@ public class TrackManager implements MidiTrackControlListener {
 	}
 
 	public void addTrack(Instrument instrument, int sampleNum) {
-		Track newTrack = new Track(tracks.size(), instrument, sampleNum); 
+		Track newTrack = new Track(tracks.size(), instrument, sampleNum);
 		addTrack(newTrack.getSamplePath());
 		tracks.add(newTrack);
 		GlobalVars.midiView.updateTracks();
 		TrackPage.track = tracks.get(tracks.size() - 1);
 	}
-	
+
 	public void clearNotes() {
 		for (Track track : tracks) {
 			track.clearNotes();
 		}
 	}
-	
+
 	@Override
 	public void muteToggled(int track, boolean mute) {
 		tracks.get(track).mute(mute);
@@ -78,15 +79,15 @@ public class TrackManager implements MidiTrackControlListener {
 	public void trackClicked(int track) {
 		TrackPageFactory.setTrack(tracks.get(track));
 	}
-	
+
 	public static native void addTrack(String sampleFileName);
-	
+
 	/******* These methods are called FROM native code via JNI ********/
 
 	public static MidiNote getNextMidiNote(int trackNum, long currTick) {
 		return tracks.get(trackNum).getNextMidiNote(currTick);
 	}
-	
+
 	public void updateAllTrackNextNotes() {
 		for (Track track : tracks) {
 			track.updateNextNote();

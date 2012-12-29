@@ -28,15 +28,15 @@ public class Instrument extends BBDirectory {
 	public String getSampleName(int sampleNum) {
 		return sampleNames[sampleNum];
 	}
-	
+
 	public String getSamplePath(int sampleNum) {
 		return path + getSampleName(sampleNum);
 	}
-	
+
 	public long getNumSamples(int sampleNum) {
 		return getSampleFile(sampleNum).length() / 8 - 44;
 	}
-	
+
 	public void updateFiles() {
 		File dir = new File(path);
 		sampleFiles = dir.listFiles();

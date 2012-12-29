@@ -79,7 +79,8 @@ public class BeatBotActivity extends Activity implements LevelListener {
 		setMasterPitch(GlobalVars.MASTER_PIT_LEVEL);
 	}
 
-	private static void copyFile(InputStream in, OutputStream out) throws IOException {
+	private static void copyFile(InputStream in, OutputStream out)
+			throws IOException {
 		byte[] buffer = new byte[1024];
 		int read;
 		while ((read = in.read(buffer)) != -1) {
@@ -127,7 +128,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 		bbOut.close();
 		bbOut = null;
 	}
-	
+
 	private static void copyFromAssetsToExternal(String newDirectory) {
 		List<String> existingFiles = new ArrayList<String>();
 		String[] filesToCopy = null;
@@ -136,7 +137,8 @@ public class BeatBotActivity extends Activity implements LevelListener {
 			existingFiles = Arrays.asList(existingFilesAry);
 		}
 		try {
-			String assetPath = newDirectory.replace(Managers.directoryManager.getInternalDirectory(), "");
+			String assetPath = newDirectory.replace(
+					Managers.directoryManager.getInternalDirectory(), "");
 			assetPath = assetPath.substring(0, assetPath.length() - 1);
 			filesToCopy = assetManager.list(assetPath);
 			for (String filePath : filesToCopy) {
@@ -145,7 +147,8 @@ public class BeatBotActivity extends Activity implements LevelListener {
 				}
 				// copy wav file exactly from assets to sdcard
 				InputStream in = assetManager.open(assetPath + "/" + filePath);
-				FileOutputStream rawOut = new FileOutputStream(newDirectory + filePath);
+				FileOutputStream rawOut = new FileOutputStream(newDirectory
+						+ filePath);
 				copyFile(in, rawOut);
 			}
 		} catch (IOException e) {
@@ -156,7 +159,8 @@ public class BeatBotActivity extends Activity implements LevelListener {
 	private void copyAllSamplesToStorage() {
 		assetManager = getAssets();
 		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
-			String drumPath = Managers.directoryManager.getDrumInstrument(i).getPath();
+			String drumPath = Managers.directoryManager.getDrumInstrument(i)
+					.getPath();
 			// the sample folder for this sample type does not yet exist.
 			// create it and write all assets of this type to the folder
 			copyFromAssetsToExternal(drumPath);
@@ -185,8 +189,10 @@ public class BeatBotActivity extends Activity implements LevelListener {
 		for (int i = 1; i < trackPageSelect.getChildCount(); i++) {
 			TextView pageText = null;
 			// TODO clean up
-			if (i == 1) // view 1 is a linear layout containing a sample select text view
-				pageText = (TextView) ((LinearLayout)trackPageSelect.getChildAt(1)).getChildAt(0);
+			if (i == 1) // view 1 is a linear layout containing a sample select
+						// text view
+				pageText = (TextView) ((LinearLayout) trackPageSelect
+						.getChildAt(1)).getChildAt(0);
 			else
 				pageText = (TextView) trackPageSelect.getChildAt(i);
 			pageText.setTypeface(GlobalVars.font);
@@ -345,7 +351,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 			// make sure the recorded instrument shows the newly recorded "song"
 			Managers.directoryManager.updateRecordDirectory();
 			TrackPageFactory.updatePages();
-			
+
 			Toast.makeText(getApplicationContext(),
 					"Recorded file to " + fileName, Toast.LENGTH_SHORT).show();
 		} else {
@@ -364,14 +370,14 @@ public class BeatBotActivity extends Activity implements LevelListener {
 		if (prevPageNum == pageNum)
 			return;
 		TrackPageFactory.getTrackPage(TrackPage.getPageType(prevPageNum))
-			.setVisible(false);
+				.setVisible(false);
 		trackPager.setDisplayedChild(pageNum);
 		TrackPageFactory.getTrackPage(TrackPage.getPageType(pageNum))
-			.setVisible(true);
+				.setVisible(true);
 	}
 
 	public void play(View view) {
-		((ToggleButton)findViewById(R.id.playButton)).setChecked(true);
+		((ToggleButton) findViewById(R.id.playButton)).setChecked(true);
 		if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			Managers.playbackManager.reset();
 			Managers.midiManager.reset();
@@ -381,7 +387,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 	}
 
 	public void stop(View view) {
-		((ToggleButton)findViewById(R.id.playButton)).setChecked(false);
+		((ToggleButton) findViewById(R.id.playButton)).setChecked(false);
 		if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
 			ToggleButton recordButton = (ToggleButton) findViewById(R.id.recordButton);
 			recordButton.setChecked(false);

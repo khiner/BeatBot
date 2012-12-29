@@ -18,10 +18,9 @@ public class GlobalVars {
 				R.drawable.solo_icon_selected);
 		previewIcon = new BBIconSource(R.drawable.preview_icon,
 				R.drawable.preview_icon_selected);
-		beatSyncIcon = new BBIconSource(R.drawable.clock,
-				R.drawable.note_icon);
+		beatSyncIcon = new BBIconSource(R.drawable.clock, R.drawable.note_icon);
 	}
-	
+
 	public static Typeface font;
 	// time (in millis) between pointer down and pointer up to be considered a
 	// tap
@@ -31,8 +30,9 @@ public class GlobalVars {
 	// time (in millis) for a long press in one location
 	public final static long LONG_CLICK_TIME = 500;
 
-	public final static int MAX_EFFECTS_PER_TRACK = 3; // also in jni/Track.h, ugly but necessary
-	
+	public final static int MAX_EFFECTS_PER_TRACK = 3; // also in jni/Track.h,
+														// ugly but necessary
+
 	public static float MASTER_VOL_LEVEL = .8f;
 	public static float MASTER_PAN_LEVEL = .5f;
 	public static float MASTER_PIT_LEVEL = .5f;
@@ -41,8 +41,10 @@ public class GlobalVars {
 	public static final int NUM_EFFECTS = 7;
 	public static final short LEVEL_MAX = 127;
 
-	public static enum LevelType {VOLUME, PAN, PITCH};
-	
+	public static enum LevelType {
+		VOLUME, PAN, PITCH
+	};
+
 	public static MidiView midiView;
 
 	public static float currBeatDivision;

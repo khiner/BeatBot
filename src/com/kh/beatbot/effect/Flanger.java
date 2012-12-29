@@ -22,17 +22,17 @@ public class Flanger extends Effect {
 			params.add(new EffectParam(false, false, ""));
 		}
 	}
-	
+
 	@Override
 	public int getParamLayoutId() {
 		return R.layout.flanger_param_layout;
 	}
-	
+
 	@Override
 	public int getOnDrawableId() {
 		return R.drawable.flanger_label_on;
 	}
-	
+
 	@Override
 	public int getOffDrawableId() {
 		return R.drawable.flanger_label_off;

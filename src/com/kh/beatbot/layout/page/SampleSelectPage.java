@@ -13,48 +13,51 @@ import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 public class SampleSelectPage extends TrackPage {
 	private TextView sampleSelect;
 	private ImageView instrumentSelect;
-		
+
 	public SampleSelectPage(Context context, View layout) {
 		super(context, layout);
-        sampleSelect = (TextView) layout.findViewById(R.id.sampleSelect);
-        instrumentSelect = (ImageView) layout.findViewById(R.id.instrumentSelect);
-        sampleSelect.setTypeface(GlobalVars.font);
-        instrumentSelect.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View arg0) {
-            	Managers.directoryManager.showInstrumentSelectAlert();
-            }
-        });
-        sampleSelect.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View arg0) {
-            	Managers.directoryManager.showSampleSelectAlert();
-            }
-        });
+		sampleSelect = (TextView) layout.findViewById(R.id.sampleSelect);
+		instrumentSelect = (ImageView) layout
+				.findViewById(R.id.instrumentSelect);
+		sampleSelect.setTypeface(GlobalVars.font);
+		instrumentSelect.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View arg0) {
+				Managers.directoryManager.showInstrumentSelectAlert();
+			}
+		});
+		sampleSelect.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View arg0) {
+				Managers.directoryManager.showSampleSelectAlert();
+			}
+		});
 	}
-	
+
 	public void inflate(Context context) {
 	}
-	
+
 	protected void update() {
 		updateInstrumentIcon();
-        updateSampleText();
+		updateSampleText();
 	}
-	
+
 	@Override
 	public void setVisibilityCode(int code) {
 		// nothing to do
 	}
-	
+
 	private void updateInstrumentIcon() {
 		// update the track pager instrument icon
-		instrumentSelect.setImageResource(track.getInstrument().getIconSource());
+		instrumentSelect
+				.setImageResource(track.getInstrument().getIconSource());
 		// update the midi view instrument icon
 		MidiTrackControlHelper.updateInstrumentIcon(track.getId());
 	}
-	
+
 	private void updateSampleText() {
 		// update sample label text
 		// TODO handle all extensions
-		String formattedName = track.getSampleName().replace(".raw", "").toUpperCase(); 
+		String formattedName = track.getSampleName().replace(".raw", "")
+				.toUpperCase();
 		sampleSelect.setText(formattedName);
 	}
 }

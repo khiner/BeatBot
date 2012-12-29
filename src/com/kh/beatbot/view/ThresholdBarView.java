@@ -7,24 +7,25 @@ import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 
 public class ThresholdBarView extends BBSeekbar {
-	private static final float[] THRESHOLD_COLOR = { BG_COLOR[0] + .2f, BG_COLOR[1] + .2f, BG_COLOR[2] + .2f, 1};
+	private static final float[] THRESHOLD_COLOR = { BG_COLOR[0] + .2f,
+			BG_COLOR[1] + .2f, BG_COLOR[2] + .2f, 1 };
 	private static int maxGreenVertices, maxYellowVertices, maxRedVertices;
-	
+
 	private static int currAmpVertex = 0;
 	private static float currAmpLevel = 0;
-	
+
 	public ThresholdBarView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
-	
+
 	private void updateAmpVertex() {
 		if (levelBarVb == null)
 			return;
-		currAmpVertex = (int)(currAmpLevel * levelBarVb.capacity() / 2);
+		currAmpVertex = (int) (currAmpLevel * levelBarVb.capacity() / 2);
 		currAmpVertex += currAmpVertex % 2;
 		currAmpVertex = currAmpVertex > 2 ? currAmpVertex : 2;
 	}
-	
+
 	public void setChannelLevel(float channelDb) {
 		// map channel DB to range (0, 1)
 		float newChannelLevel = GeneralUtils.dbToUnit(channelDb);
@@ -40,7 +41,7 @@ public class ThresholdBarView extends BBSeekbar {
 		currAmpLevel = currAmpLevel < 0 ? 0 : currAmpLevel;
 		updateAmpVertex();
 	}
-	
+
 	private void initVerticesLimits() {
 		maxGreenVertices = (int) (.33f * (levelBarVb.capacity() / 2));
 		maxGreenVertices += maxGreenVertices % 2;
@@ -48,13 +49,13 @@ public class ThresholdBarView extends BBSeekbar {
 		maxYellowVertices += maxYellowVertices % 2;
 		maxRedVertices = (int) (levelBarVb.capacity() / 2);
 	}
-	
+
 	protected void init() {
 		super.init();
 		setLevel(0.8f);
 		initVerticesLimits();
 	}
-	
+
 	private void drawThresholdLevel() {
 		drawTriangleStrip(levelBarVb, THRESHOLD_COLOR, numLevelVertices);
 		translate(0, levelBarHeight / 2);
@@ -65,17 +66,20 @@ public class ThresholdBarView extends BBSeekbar {
 		drawPoint(levelBarHeight * 4, selectColor, numLevelVertices - 2);
 		translate(0, -levelBarHeight / 2);
 	}
-	
+
 	private void drawDbLevel() {
 		drawTriangleStrip(levelBarVb, Colors.GREEN, 0,
-				currAmpVertex <= maxGreenVertices ? currAmpVertex : maxGreenVertices);
+				currAmpVertex <= maxGreenVertices ? currAmpVertex
+						: maxGreenVertices);
 		if (currAmpVertex >= maxGreenVertices) {
 			drawTriangleStrip(levelBarVb, Colors.YELLOW, maxGreenVertices - 2,
-					currAmpVertex <= maxYellowVertices ? currAmpVertex : maxYellowVertices);
+					currAmpVertex <= maxYellowVertices ? currAmpVertex
+							: maxYellowVertices);
 		}
 		if (currAmpVertex >= maxYellowVertices) {
 			drawTriangleStrip(levelBarVb, Colors.RED, maxYellowVertices - 2,
-					currAmpVertex <= maxRedVertices ? currAmpVertex : maxRedVertices);
+					currAmpVertex <= maxRedVertices ? currAmpVertex
+							: maxRedVertices);
 		}
 		translate(0, levelBarHeight / 2);
 		if (currAmpVertex > 0) { // draw circle at beginning
@@ -86,7 +90,7 @@ public class ThresholdBarView extends BBSeekbar {
 		}
 		translate(0, -levelBarHeight / 2);
 	}
-	
+
 	@Override
 	protected void drawLevel() {
 		gl.glPushMatrix();

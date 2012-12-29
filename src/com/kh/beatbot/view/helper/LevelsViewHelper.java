@@ -56,12 +56,13 @@ public class LevelsViewHelper {
 	private static MidiNote tappedLevelNote = null;
 
 	private static MidiView midiView;
-	
+
 	private static LevelMode currLevelMode = LevelMode.VOLUME;
 
 	public static void init(MidiView _midiView) {
 		midiView = _midiView;
-		MidiView.levelsHeight = midiView.getHeight() - MidiView.LEVEL_POINT_SIZE;
+		MidiView.levelsHeight = midiView.getHeight()
+				- MidiView.LEVEL_POINT_SIZE;
 		gl = MidiView.getGL10();
 		initLevelBarVb();
 	}
@@ -69,7 +70,7 @@ public class LevelsViewHelper {
 	public static LevelMode getLevelMode() {
 		return currLevelMode;
 	}
-	
+
 	public static void setLevelMode(LevelMode levelMode) {
 		currLevelMode = levelMode;
 	}
@@ -214,7 +215,8 @@ public class LevelsViewHelper {
 			DragLine.b = touched.getLevel(currLevelMode);
 			DragLine.leftTick = 0;
 			DragLine.rightTick = Float.MAX_VALUE;
-			DragLine.leftLevel = DragLine.rightLevel = touched.getLevel(currLevelMode);
+			DragLine.leftLevel = DragLine.rightLevel = touched
+					.getLevel(currLevelMode);
 		} else if (touchedSize == 2) {
 			MidiNote leftLevel = touchedLevels.get(0).getOnTick() < touchedLevels
 					.get(1).getOnTick() ? touchedLevels.get(0) : touchedLevels
@@ -340,17 +342,17 @@ public class LevelsViewHelper {
 
 		tappedLevelNote = midiView.getMidiNote(trackNum, tick);
 		if (tappedLevelNote == null) {
-			Toast.makeText(GlobalVars.mainActivity,
-					noteRestrictionAlert, Toast.LENGTH_SHORT).show();
+			Toast.makeText(GlobalVars.mainActivity, noteRestrictionAlert,
+					Toast.LENGTH_SHORT).show();
 		} else {
 			addToLevelViewSelected(tappedLevelNote);
 		}
 	}
-	
+
 	public static void doubleTap() {
 		// do nothing for double taps in levels mode
-		Toast.makeText(GlobalVars.mainActivity,
-				noteRestrictionAlert, Toast.LENGTH_SHORT).show();
+		Toast.makeText(GlobalVars.mainActivity, noteRestrictionAlert,
+				Toast.LENGTH_SHORT).show();
 	}
 
 	public static void resetSelected() {

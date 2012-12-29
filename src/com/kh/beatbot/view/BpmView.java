@@ -9,10 +9,11 @@ import android.view.MotionEvent;
 import com.kh.beatbot.manager.Managers;
 
 public class BpmView extends SurfaceViewBase {
-	private static final float[] SEGMENT_ON_COLOR = {1, 0, 0, 1};
-	private static final float[] SEGMENT_OFF_COLOR = {1, 0, 0, .3f};
-	private static final float[] SEGMENT_ON_TOUCHED_COLOR = {1, .3f, .25f, 1};
-	private static final float[] SEGMENT_OFF_TOUCHED_COLOR = {1, .3f, .25f, .3f};
+	private static final float[] SEGMENT_ON_COLOR = { 1, 0, 0, 1 };
+	private static final float[] SEGMENT_OFF_COLOR = { 1, 0, 0, .3f };
+	private static final float[] SEGMENT_ON_TOUCHED_COLOR = { 1, .3f, .25f, 1 };
+	private static final float[] SEGMENT_OFF_TOUCHED_COLOR = { 1, .3f, .25f,
+			.3f };
 	private static final float INC_BPM_THRESH = 15;
 	private static boolean[][] segments = new boolean[3][7];
 	private static boolean touched = false;
@@ -23,7 +24,7 @@ public class BpmView extends SurfaceViewBase {
 	private static float lastFrameYLoc = -1;
 	private static float currXDragTotal = 0;
 	private static float currYDragTotal = 0;
-	
+
 	public BpmView(Context c, AttributeSet as) {
 		super(c, as);
 	}
@@ -215,16 +216,16 @@ public class BpmView extends SurfaceViewBase {
 		lastFrameXLoc = x;
 		lastFrameYLoc = y;
 		if (Math.abs(currYDragTotal) > INC_BPM_THRESH) {
-			float newBPM = currYDragTotal < 0 ? Managers.midiManager.getBPM() - 1 :
-				Managers.midiManager.getBPM() + 1;
+			float newBPM = currYDragTotal < 0 ? Managers.midiManager.getBPM() - 1
+					: Managers.midiManager.getBPM() + 1;
 			Managers.midiManager.setBPM(newBPM);
-			setText(String.valueOf((int)newBPM));
+			setText(String.valueOf((int) newBPM));
 			currYDragTotal %= INC_BPM_THRESH;
 		} else if (Math.abs(currXDragTotal) > INC_BPM_THRESH) {
-			float newBPM = currXDragTotal < 0 ? Managers.midiManager.getBPM() - 1 :
-				Managers.midiManager.getBPM() + 1;
+			float newBPM = currXDragTotal < 0 ? Managers.midiManager.getBPM() - 1
+					: Managers.midiManager.getBPM() + 1;
 			Managers.midiManager.setBPM(newBPM);
-			setText(String.valueOf((int)newBPM));
+			setText(String.valueOf((int) newBPM));
 			currXDragTotal %= INC_BPM_THRESH;
 		}
 	}

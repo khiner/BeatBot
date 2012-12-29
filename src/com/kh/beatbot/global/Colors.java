@@ -1,13 +1,13 @@
 package com.kh.beatbot.global;
 
 public class Colors {
-	public static final float[] BLACK = {0, 0, 0, 1};
+	public static final float[] BLACK = { 0, 0, 0, 1 };
 	public static final float[] BG_COLOR = { 0.12549f, 0.188235f, 0.227451f, 1 };
 	public static final float[] WHITE = { 1, 1, 1, 1 };
 	public static final float[] GREEN = { 0, 1, 0, 1 };
 	public static final float[] YELLOW = { 1, 1, 0, 1 };
 	public static final float[] RED = { 1, 0, 0, 1 };
-	
+
 	public final static float MIDI_VIEW_DEFAULT_BG_COLOR = .5f;
 	// main midi grid lines
 	public final static float[] GRID_LINE_COLOR = { 0, 0, 0, 1 };

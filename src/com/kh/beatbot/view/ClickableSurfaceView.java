@@ -12,16 +12,18 @@ public abstract class ClickableSurfaceView extends SurfaceViewBase {
 	private long lastTapTime = 0;
 	private float lastTapX = -1;
 	private float lastTapY = -1;
-	
+
 	public ClickableSurfaceView(Context c, AttributeSet as) {
 		super(c, as);
 	}
 
 	/****************** Clickable Methods ********************/
 	protected abstract void singleTap(int id, float x, float y);
+
 	protected abstract void doubleTap(int id, float x, float y);
+
 	protected abstract void longPress(int id, float x, float y);
-	
+
 	@Override
 	protected void init() {
 		// nothing to do
@@ -60,7 +62,7 @@ public abstract class ClickableSurfaceView extends SurfaceViewBase {
 	@Override
 	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
 		// nothing to do
-		
+
 	}
 
 	@Override

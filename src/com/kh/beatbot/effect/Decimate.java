@@ -17,17 +17,17 @@ public class Decimate extends Effect {
 			params.add(new EffectParam(true, false, "Bits"));
 		}
 	}
-	
+
 	@Override
 	public int getParamLayoutId() {
 		return R.layout.decimate_param_layout;
 	}
-	
+
 	@Override
 	public int getOnDrawableId() {
 		return R.drawable.bitcrush_label_on;
 	}
-	
+
 	@Override
 	public int getOffDrawableId() {
 		return R.drawable.bitcrush_label_off;

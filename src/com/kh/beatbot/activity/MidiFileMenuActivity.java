@@ -27,13 +27,13 @@ public class MidiFileMenuActivity extends Activity {
 	AlertDialog fileNotExistsAlert;
 	AlertDialog chooseFileAlert;
 	AlertDialog confirmImportAlert;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		GeneralUtils.initAndroidSettings(this);
 		setContentView(R.layout.midi_menu);
-		
+
 		baseFilePath = createBasePath();
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage("The file exists. Would you like to overwrite it?")
@@ -98,12 +98,11 @@ public class MidiFileMenuActivity extends Activity {
 		confirmImportAlert = builder.create();
 	}
 
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
-    }
-    
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+	}
+
 	public void saveMidi(View view) {
 		EditText editText = (EditText) findViewById(R.id.filePathEdit);
 		String fullPathName = getFullPathName(editText.getText().toString());
@@ -119,7 +118,7 @@ public class MidiFileMenuActivity extends Activity {
 	public void openMidi(View view) {
 		chooseFileAlert.show();
 	}
-	
+
 	private void importMidiFile(String fileName) {
 		String fullPath = baseFilePath + "/" + fileName;
 		try {

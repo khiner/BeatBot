@@ -17,10 +17,14 @@ public class MidiNote implements Comparable<MidiNote> {
 		this.noteOn = noteOn;
 		this.noteOff = noteOff;
 	}
-	
+
 	public MidiNote getCopy() {
-		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0, noteOn.getNoteValue(), noteOn.getVelocity(), noteOn.getPan(), noteOn.getPitch());
-		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0, noteOff.getNoteValue(), noteOff.getVelocity(), noteOff.getPan(), noteOn.getPitch());
+		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0,
+				noteOn.getNoteValue(), noteOn.getVelocity(), noteOn.getPan(),
+				noteOn.getPitch());
+		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0,
+				noteOff.getNoteValue(), noteOff.getVelocity(),
+				noteOff.getPan(), noteOn.getPitch());
 		MidiNote copy = new MidiNote(noteOnCopy, noteOffCopy);
 		copy.setSelected(selected);
 		copy.setLevelSelected(levelSelected);
@@ -28,19 +32,19 @@ public class MidiNote implements Comparable<MidiNote> {
 		copy.setTouched(touched);
 		return copy;
 	}
-	
+
 	public MidiEvent getOnEvent() {
 		return noteOn;
 	}
-	
+
 	public MidiEvent getOffEvent() {
 		return noteOff;
 	}
-	
+
 	public long getOnTick() {
 		return noteOn.getTick();
 	}
-	
+
 	public long getOffTick() {
 		return noteOff.getTick();
 	}
@@ -48,39 +52,39 @@ public class MidiNote implements Comparable<MidiNote> {
 	public int getNoteValue() {
 		return noteOn.getNoteValue();
 	}
-	
+
 	public float getVelocity() {
 		return noteOn.getVelocity();
 	}
-	
+
 	public float getPan() {
 		return noteOn.getPan();
 	}
-	
+
 	public float getPitch() {
 		return noteOn.getPitch();
 	}
-	
+
 	public boolean isSelected() {
 		return selected;
 	}
-	
+
 	public boolean isLevelSelected() {
 		return levelSelected;
 	}
-	
+
 	public boolean isLevelViewSelected() {
 		return levelViewSelected;
 	}
-	
+
 	public boolean isTouched() {
 		return touched;
 	}
-	
+
 	public void setSelected(boolean selected) {
 		this.selected = selected;
 	}
-	
+
 	public void setLevelSelected(boolean levelSelected) {
 		this.levelSelected = levelSelected;
 	}
@@ -88,29 +92,29 @@ public class MidiNote implements Comparable<MidiNote> {
 	public void setLevelViewSelected(boolean levelViewSelected) {
 		this.levelViewSelected = levelViewSelected;
 	}
-	
+
 	public void setTouched(boolean touched) {
 		this.touched = touched;
 	}
-	
+
 	public void setVelocity(float velocity) {
 		velocity = clipLevel(velocity);
 		noteOn.setVelocity(velocity);
 		noteOff.setVelocity(velocity);
 	}
-	
+
 	public void setPan(float pan) {
 		pan = clipLevel(pan);
 		noteOn.setPan(pan);
 		noteOff.setPan(pan);
 	}
-	
+
 	public void setPitch(float pitch) {
 		pitch = clipLevel(pitch);
 		noteOn.setPitch(pitch);
 		noteOff.setPitch(pitch);
 	}
-	
+
 	// clip the level to be within the min/max allowed
 	// (0-1)
 	private float clipLevel(float level) {
@@ -120,30 +124,30 @@ public class MidiNote implements Comparable<MidiNote> {
 			return 1;
 		return level;
 	}
-	
+
 	public void setOnTick(long onTick) {
 		if (onTick >= 0)
 			noteOn.setTick(onTick);
 		else
 			noteOn.setTick(0);
 	}
-	
+
 	public void setOffTick(long offTick) {
 		if (offTick > getOnTick())
 			this.noteOff.setTick(offTick);
 	}
-	
+
 	public void setNote(int note) {
 		if (note < 0)
 			return;
 		this.noteOn.setNoteValue(note);
 		this.noteOff.setNoteValue(note);
 	}
-	
+
 	public long getNoteLength() {
 		return noteOff.getTick() - noteOn.getTick();
 	}
-	
+
 	public float getLevel(LevelsViewHelper.LevelMode levelMode) {
 		if (levelMode == LevelsViewHelper.LevelMode.VOLUME)
 			return noteOn.getVelocity();
@@ -151,19 +155,17 @@ public class MidiNote implements Comparable<MidiNote> {
 			return noteOn.getPan();
 		else if (levelMode == LevelsViewHelper.LevelMode.PITCH)
 			return noteOn.getPitch();
-		
+
 		return 0;
 	}
-	
+
 	public void setLevel(LevelsViewHelper.LevelMode levelMode, float level) {
 		float clippedLevel = clipLevel(level);
 		if (levelMode == LevelsViewHelper.LevelMode.VOLUME) {
 			setVelocity(clippedLevel);
-		}
-		else if (levelMode == LevelsViewHelper.LevelMode.PAN) {
+		} else if (levelMode == LevelsViewHelper.LevelMode.PAN) {
 			setPan(clippedLevel);
-		}
-		else if (levelMode == LevelsViewHelper.LevelMode.PITCH) {
+		} else if (levelMode == LevelsViewHelper.LevelMode.PITCH) {
 			setPitch(clippedLevel);
 		}
 	}
@@ -173,6 +175,6 @@ public class MidiNote implements Comparable<MidiNote> {
 		if (this.getNoteValue() != otherNote.getNoteValue()) {
 			return this.getNoteValue() - otherNote.getNoteValue();
 		}
-		return (int)(this.getOnTick() - otherNote.getOnTick());
-	}	
+		return (int) (this.getOnTick() - otherNote.getOnTick());
+	}
 }

@@ -17,53 +17,60 @@ public class EffectControlLayout extends LinearLayout {
 	private TextView valueLabel = null;
 	private BBKnob knob = null;
 
-    public EffectControlLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        setOrientation(VERTICAL);
-        setGravity(Gravity.CENTER);
-        
-        LayoutInflater.from(context).inflate(R.layout.effect_control, this, true);
-        
-        TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.effect_control_styleable, 0, 0);
-        
-        String paramLabel = array.getString(R.styleable.effect_control_styleable_param_name);
-        String paramValue = array.getString(R.styleable.effect_control_styleable_param_value);
-        boolean beatSyncEnabled = array.getBoolean(R.styleable.effect_control_styleable_beatsync_enabled, false);
-        
-        array.recycle();
-        
-        if (paramLabel == null) paramLabel = "Param";
-        if (paramValue == null) paramValue = "0";
-        
-        label = (TextView)findViewById(R.id.param_label);
-        valueLabel = (TextView)findViewById(R.id.param_value_label);
-        knob = (BBKnob)findViewById(R.id.param_knob);
-        
-        label.setTypeface(GlobalVars.font);
-        valueLabel.setTypeface(GlobalVars.font);
-        
-        label.setText(paramLabel);
-        valueLabel.setText(paramValue);
-        knob.setClickable(beatSyncEnabled);
-    }
+	public EffectControlLayout(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		setOrientation(VERTICAL);
+		setGravity(Gravity.CENTER);
 
-    public BBKnob getKnob() {
-    	return knob;
-    }
-    
-    public float getLevel() {
-    	return knob.getLevel();
-    }
-    
-    public String getValueLabel() {
-    	return valueLabel.getText().toString();
-    }
-    
-    public void setLevel(float level) {
-    	knob.setViewLevel(level);
-    }
-    
-    public void setValueLabel(String valueLabelText) {
-    	valueLabel.setText(valueLabelText);
-    }
+		LayoutInflater.from(context).inflate(R.layout.effect_control, this,
+				true);
+
+		TypedArray array = context.obtainStyledAttributes(attrs,
+				R.styleable.effect_control_styleable, 0, 0);
+
+		String paramLabel = array
+				.getString(R.styleable.effect_control_styleable_param_name);
+		String paramValue = array
+				.getString(R.styleable.effect_control_styleable_param_value);
+		boolean beatSyncEnabled = array.getBoolean(
+				R.styleable.effect_control_styleable_beatsync_enabled, false);
+
+		array.recycle();
+
+		if (paramLabel == null)
+			paramLabel = "Param";
+		if (paramValue == null)
+			paramValue = "0";
+
+		label = (TextView) findViewById(R.id.param_label);
+		valueLabel = (TextView) findViewById(R.id.param_value_label);
+		knob = (BBKnob) findViewById(R.id.param_knob);
+
+		label.setTypeface(GlobalVars.font);
+		valueLabel.setTypeface(GlobalVars.font);
+
+		label.setText(paramLabel);
+		valueLabel.setText(paramValue);
+		knob.setClickable(beatSyncEnabled);
+	}
+
+	public BBKnob getKnob() {
+		return knob;
+	}
+
+	public float getLevel() {
+		return knob.getLevel();
+	}
+
+	public String getValueLabel() {
+		return valueLabel.getText().toString();
+	}
+
+	public void setLevel(float level) {
+		knob.setViewLevel(level);
+	}
+
+	public void setValueLabel(String valueLabelText) {
+		valueLabel.setText(valueLabelText);
+	}
 }

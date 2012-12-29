@@ -19,17 +19,17 @@ public class Tremelo extends Effect {
 			params.add(new EffectParam(false, false, ""));
 		}
 	}
-	
+
 	@Override
 	public int getParamLayoutId() {
 		return R.layout.tremelo_param_layout;
 	}
-	
+
 	@Override
 	public int getOnDrawableId() {
 		return R.drawable.tremelo_label_on;
 	}
-	
+
 	@Override
 	public int getOffDrawableId() {
 		return R.drawable.tremelo_label_off;

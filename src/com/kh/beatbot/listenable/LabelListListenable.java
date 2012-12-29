@@ -53,9 +53,11 @@ public class LabelListListenable extends ClickableSurfaceView {
 				state = LabelState.EMPTY;
 			this.textWidth = glText.getTextWidth(text);
 		}
-		
+
 		public void updateSize() {
-			labelWidth = state == LabelState.EMPTY ? (width - (labels.size() - 1) * GAP_BETWEEN_LABELS) / labels.size()
+			labelWidth = state == LabelState.EMPTY ? (width - (labels.size() - 1)
+					* GAP_BETWEEN_LABELS)
+					/ labels.size()
 					: textWidth + 20;
 			backgroundRectVb = makeRoundedCornerRectBuffer(labelWidth, height,
 					14, 16);
@@ -73,7 +75,8 @@ public class LabelListListenable extends ClickableSurfaceView {
 			drawTriangleFan(backgroundRectVb, whichColor());
 			gl.glPopMatrix();
 			if (state == LabelState.EMPTY) {
-				plusIcon.draw(x + labelWidth / 2 - addTextWidth / 2, 0, height, height);
+				plusIcon.draw(x + labelWidth / 2 - addTextWidth / 2, 0, height,
+						height);
 				glText.begin(); // Begin Text Rendering
 				setColor(Colors.WHITE);
 				// draw string in center of rect
@@ -209,7 +212,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 			label.updateSize();
 		}
 	}
-	
+
 	private void updateLabelLocations() {
 		Collections.sort(labels); // sort labels by x value
 		float xTotal = 0;

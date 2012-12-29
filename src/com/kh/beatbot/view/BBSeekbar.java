@@ -12,11 +12,11 @@ public class BBSeekbar extends LevelListenable {
 	protected FloatBuffer levelBarVb = null;
 	protected int numLevelVertices = 0;
 	protected float levelBarHeight = 8;
-	
+
 	public BBSeekbar(Context c, AttributeSet as) {
 		super(c, as);
 	}
-	
+
 	protected void initLevelBarVb() {
 		float[] vertices = new float[800];
 		for (int i = 0; i < vertices.length / 4; i++) {
@@ -34,7 +34,7 @@ public class BBSeekbar extends LevelListenable {
 		updateNumLevelVertices();
 		super.init();
 	}
-	
+
 	protected void drawBackgroundBar() {
 		gl.glPushMatrix();
 		translate(levelBarHeight * 2, height / 2);
@@ -53,12 +53,12 @@ public class BBSeekbar extends LevelListenable {
 		if (selected) {
 			drawSelectedLevel();
 		}
-		
+
 		translate(0, levelBarHeight / 2);
 		// draw level-colored circle at beginning and end of level
 		drawPoint(levelBarHeight, levelColor, 0);
 		drawPoint(levelBarHeight, levelColor, numLevelVertices - 2);
-		
+
 		drawLevelSelectionCircle();
 		gl.glPopMatrix();
 	}
@@ -67,11 +67,11 @@ public class BBSeekbar extends LevelListenable {
 		selectColor[3] = .7f;
 		drawPoint(levelBarHeight * 3, selectColor, numLevelVertices - 2);
 		selectColor[3] = .5f;
-		for (int i = (int)(levelBarHeight * 3); i < levelBarHeight * 4; i += 4) {
+		for (int i = (int) (levelBarHeight * 3); i < levelBarHeight * 4; i += 4) {
 			drawPoint(i, selectColor, numLevelVertices - 2);
 		}
 	}
-	
+
 	protected void drawLevelSelectionCircle() {
 		// draw bigger, translucent 'selection' circle at end of level
 		if (selected) {
@@ -81,7 +81,7 @@ public class BBSeekbar extends LevelListenable {
 			drawPoint(levelBarHeight * 2.5f, selectColor, numLevelVertices - 2);
 		}
 	}
-	
+
 	protected void drawSelectedLevel() {
 		gl.glPushMatrix();
 		selectColor[3] = .2f;
@@ -116,13 +116,14 @@ public class BBSeekbar extends LevelListenable {
 		// want even number of vertices to avoid jagged ending
 		numLevelVertices += numLevelVertices % 2;
 		// make sure we don't go have an out of bounds index
-		numLevelVertices = numLevelVertices > 2 ? (numLevelVertices < levelBarVb.capacity() / 2?
-				numLevelVertices : levelBarVb.capacity() / 2) : 2;
+		numLevelVertices = numLevelVertices > 2 ? (numLevelVertices < levelBarVb
+				.capacity() / 2 ? numLevelVertices : levelBarVb.capacity() / 2)
+				: 2;
 	}
 
 	protected float xToLevel(float x) {
 		if (x > width - levelBarHeight)
-			 return 1;
+			return 1;
 		float level = (x - levelBarHeight / 2) / (width - levelBarHeight * 4);
 		level = level < 0 ? 0 : (level > 1 ? 1 : level);
 		return level;

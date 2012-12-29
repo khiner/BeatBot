@@ -26,12 +26,12 @@ public class Chorus extends Effect {
 	public int getParamLayoutId() {
 		return R.layout.chorus_param_layout;
 	}
-	
+
 	@Override
 	public int getOnDrawableId() {
 		return R.drawable.chorus_label_on;
 	}
-	
+
 	@Override
 	public int getOffDrawableId() {
 		return R.drawable.chorus_label_off;

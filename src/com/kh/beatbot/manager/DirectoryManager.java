@@ -134,13 +134,16 @@ public class DirectoryManager {
 							currDirectory = internalDirectory;
 						}
 						updateInstrumentSelectAlert(currDirectory);
-						// if the current dir is the root directory, we've already selected a sample
+						// if the current dir is the root directory, we've
+						// already selected a sample
 						// do not display any select alert list.
 						if (currDirectory == internalDirectory) {
 							return;
 						}
-						// if the directory is empty, display the directory's empty message
-						// otherwise, show the next child directories in a select alert list
+						// if the directory is empty, display the directory's
+						// empty message
+						// otherwise, show the next child directories in a
+						// select alert list
 						if (currDirectory.getChildren().isEmpty()) {
 							Toast.makeText(GlobalVars.mainActivity,
 									currDirectory.getEmptyMsg(),

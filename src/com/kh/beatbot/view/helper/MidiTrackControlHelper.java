@@ -28,10 +28,13 @@ public class MidiTrackControlHelper {
 
 		public ButtonRow(int trackNum, BBIconSource instrumentIcon) {
 			this.trackNum = trackNum;
-			this.instrumentButton = new BBButton(instrumentIcon, MidiView.trackHeight);
+			this.instrumentButton = new BBButton(instrumentIcon,
+					MidiView.trackHeight);
 
-			muteButton = new BBToggleButton(GlobalVars.muteIcon, MidiView.trackHeight);
-			soloButton = new BBToggleButton(GlobalVars.soloIcon, MidiView.trackHeight);
+			muteButton = new BBToggleButton(GlobalVars.muteIcon,
+					MidiView.trackHeight);
+			soloButton = new BBToggleButton(GlobalVars.soloIcon,
+					MidiView.trackHeight);
 			width = instrumentButton.getWidth() + muteButton.getWidth()
 					+ soloButton.getWidth();
 		}
@@ -39,11 +42,12 @@ public class MidiTrackControlHelper {
 		public void setIconSource(BBIconSource instrumentIcon) {
 			this.instrumentButton.setIconSource(instrumentIcon);
 		}
-		
+
 		public void draw(float y) {
 			instrumentButton.draw(0, y);
 			muteButton.draw(instrumentButton.getWidth(), y);
-			soloButton.draw(instrumentButton.getWidth() + muteButton.getWidth(), y);
+			soloButton.draw(
+					instrumentButton.getWidth() + muteButton.getWidth(), y);
 		}
 
 		public void handlePress(float x) {
@@ -140,16 +144,18 @@ public class MidiTrackControlHelper {
 
 	public static void init(MidiView _midiView) {
 		if (!buttonRows.isEmpty()) {
-			// it is possible that this static class can be reinstantiated after switching between views.
+			// it is possible that this static class can be reinstantiated after
+			// switching between views.
 			// ensure we're not re-adding rows by exiting
 			return;
 		}
 		midiView = _midiView;
 		MidiView.allTracksHeight = midiView.getMidiHeight();
-		MidiView.trackHeight = midiView.getMidiHeight() / Managers.trackManager.getNumTracks();
+		MidiView.trackHeight = midiView.getMidiHeight()
+				/ Managers.trackManager.getNumTracks();
 		for (int i = 0; i < Managers.trackManager.getNumTracks(); i++) {
-			buttonRows.add(new ButtonRow(i,
-					Managers.trackManager.getTrack(i).getInstrument().getBBIconSource()));
+			buttonRows.add(new ButtonRow(i, Managers.trackManager.getTrack(i)
+					.getInstrument().getBBIconSource()));
 		}
 		MidiView.X_OFFSET = buttonRows.get(0).width;
 		initBgRectVb();
@@ -160,23 +166,25 @@ public class MidiTrackControlHelper {
 			return;
 		}
 		Track track = Managers.trackManager.getTrack(trackNum);
-		buttonRows.get(trackNum).setIconSource(track.getInstrument().getBBIconSource());
+		buttonRows.get(trackNum).setIconSource(
+				track.getInstrument().getBBIconSource());
 	}
-	
+
 	public static void addListener(MidiTrackControlListener listener) {
 		MidiTrackControlHelper.listener = listener;
 	}
-	
+
 	public static void addTrack(int trackNum, BBIconSource instrumentIcon) {
 		buttonRows.add(new ButtonRow(trackNum, instrumentIcon));
 		MidiView.allTracksHeight = MidiView.trackHeight * buttonRows.size();
 		initBgRectVb();
 	}
-	
+
 	/** draw background color & track control icons */
 	public static void draw() {
 		SurfaceViewBase.drawTriangleStrip(bgRectVb, Colors.BG_COLOR);
-		float y = midiView.getMidiHeight() - MidiView.trackHeight + TickWindowHelper.getYOffset();
+		float y = midiView.getMidiHeight() - MidiView.trackHeight
+				+ TickWindowHelper.getYOffset();
 		for (int i = 0; i < buttonRows.size(); i++) {
 			// avoid concurrent modification exception
 			ButtonRow buttonRow = buttonRows.get(i);
@@ -246,6 +254,7 @@ public class MidiTrackControlHelper {
 	}
 
 	private static void initBgRectVb() {
-		bgRectVb = SurfaceViewBase.makeRectFloatBuffer(0, 0, MidiView.X_OFFSET, midiView.getHeight());
+		bgRectVb = SurfaceViewBase.makeRectFloatBuffer(0, 0, MidiView.X_OFFSET,
+				midiView.getHeight());
 	}
 }

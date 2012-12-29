@@ -120,7 +120,8 @@ public class EffectActivity extends Activity implements LevelListener,
 		GeneralUtils.initAndroidSettings(this);
 		int effectId = getIntent().getExtras().getInt("effectId");
 		int trackId = getIntent().getExtras().getInt("trackId");
-		effect = Managers.trackManager.getTrack(trackId).findEffectById(effectId);
+		effect = Managers.trackManager.getTrack(trackId).findEffectById(
+				effectId);
 		setContentView(R.layout.effect_layout);
 		ViewGroup parent = (ViewGroup) findViewById(R.id.effect_layout);
 		View paramWrapperLayout = initEffectLayout(parent);
@@ -144,7 +145,7 @@ public class EffectActivity extends Activity implements LevelListener,
 			initDelayKnobs();
 		}
 	}
-	
+
 	protected void initParamControls() {
 		int numParams = effect.getNumParams();
 		paramControls = new ArrayList<EffectControlLayout>();

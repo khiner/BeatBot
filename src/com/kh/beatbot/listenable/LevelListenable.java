@@ -11,33 +11,35 @@ import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.SurfaceViewBase;
 
 public abstract class LevelListenable extends SurfaceViewBase {
-	public static final float[] BG_COLOR = new float[] {0.3275f, 0.3994f, 0.4465f, 1};
-	protected ArrayList<LevelListener> levelListeners = new ArrayList<LevelListener>();	
+	public static final float[] BG_COLOR = new float[] { 0.3275f, 0.3994f,
+			0.4465f, 1 };
+	protected ArrayList<LevelListener> levelListeners = new ArrayList<LevelListener>();
 	protected float level = .5f;
 	protected float[] levelColor = Colors.VOLUME_COLOR.clone();
-	protected float[] selectColor = {levelColor[0], levelColor[1], levelColor[2], .5f};
-	
+	protected float[] selectColor = { levelColor[0], levelColor[1],
+			levelColor[2], .5f };
+
 	protected boolean selected = false;
-	
+
 	public LevelListenable(Context c, AttributeSet as) {
 		super(c, as);
 	}
 
-	public void addLevelListener(LevelListener levelListener) {		
+	public void addLevelListener(LevelListener levelListener) {
 		levelListeners.add(levelListener);
 	}
-	
+
 	public void removeAllListeners() {
 		levelListeners.clear();
 	}
-	
+
 	@Override
 	protected void init() {
 		for (LevelListener levelListener : levelListeners) {
 			levelListener.notifyInit(this);
 		}
 	}
-	
+
 	public float getLevel() {
 		return level;
 	}
@@ -53,12 +55,13 @@ public abstract class LevelListenable extends SurfaceViewBase {
 			for (LevelListener levelListener : levelListeners)
 				levelListener.setLevel(this, level);
 	}
-	
+
 	public void setLevelColor(float[] newLevelColor) {
 		levelColor = newLevelColor;
-		selectColor = new float[] {levelColor[0], levelColor[1], levelColor[2], .5f};
+		selectColor = new float[] { levelColor[0], levelColor[1],
+				levelColor[2], .5f };
 	}
-	
+
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		for (LevelListener levelListener : levelListeners)
@@ -74,7 +77,7 @@ public abstract class LevelListenable extends SurfaceViewBase {
 
 	@Override
 	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
-		// no multitouch for this seekbar		
+		// no multitouch for this seekbar
 	}
 
 	@Override

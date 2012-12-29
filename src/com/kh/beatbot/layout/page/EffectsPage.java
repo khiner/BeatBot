@@ -27,25 +27,28 @@ import com.kh.beatbot.listener.LabelListListener;
 public class EffectsPage extends TrackPage {
 	private static LabelListListenable effectLabelList;
 	private static String[] effectNames;
-	
+
 	public EffectsPage(Context context, View layout) {
 		super(context, layout);
-		effectNames = context.getResources().getStringArray(R.array.effect_names);
-		effectLabelList = (LabelListListenable) layout.findViewById(R.id.effectList);
+		effectNames = context.getResources().getStringArray(
+				R.array.effect_names);
+		effectLabelList = (LabelListListenable) layout
+				.findViewById(R.id.effectList);
 		effectLabelList.setListener(new EffectLabelListListener(context));
-		((TextView) layout.findViewById(R.id.effectsLabel)).setTypeface(GlobalVars.font);
+		((TextView) layout.findViewById(R.id.effectsLabel))
+				.setTypeface(GlobalVars.font);
 	}
 
 	@Override
 	protected void update() {
-		
+
 	}
-	
+
 	@Override
 	public void setVisibilityCode(int code) {
 		effectLabelList.setVisibility(code);
 	}
-	
+
 	class EffectLabelListListener implements LabelListListener {
 		private AlertDialog selectEffectAlert = null;
 		private LabelListListenable labelList;
@@ -66,7 +69,8 @@ public class EffectsPage extends TrackPage {
 										lastClickedId, lastClickedPos);
 							} else {
 								labelList.setLabelText(lastClickedId, "");
-								Effect effect = track.findEffectById(lastClickedId);
+								Effect effect = track
+										.findEffectById(lastClickedId);
 								if (effect != null) {
 									effect.removeEffect();
 								}
@@ -84,7 +88,7 @@ public class EffectsPage extends TrackPage {
 			}
 			return uniqueIds;
 		}
-		
+
 		@Override
 		public void labelListInitialized(LabelListListenable labelList) {
 			this.labelList = labelList;
@@ -143,7 +147,7 @@ public class EffectsPage extends TrackPage {
 			selectEffectAlert.show();
 		}
 	}
-	
+
 	private void launchEffectIntent(String effectName, int effectId,
 			int effectPosition) {
 		Effect effect = getEffect(effectName, effectId, effectPosition);
@@ -160,7 +164,7 @@ public class EffectsPage extends TrackPage {
 
 		context.startActivity(intent);
 	}
-	
+
 	private Effect getEffect(String effectName, int id, int position) {
 		Effect effect = track.findEffectById(id);
 		if (effect != null)

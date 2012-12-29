@@ -7,11 +7,11 @@ public class BBToggleButton extends BBButton {
 	public BBToggleButton(BBIconSource iconSource) {
 		super(iconSource);
 	}
-	
+
 	public BBToggleButton(BBIconSource iconSource, float height) {
 		super(iconSource, height);
 	}
-	
+
 	public BBToggleButton(BBIconSource iconSource, float width, float height) {
 		super(iconSource, width, height);
 	}
@@ -32,16 +32,16 @@ public class BBToggleButton extends BBButton {
 		on = !on;
 		updateIcon();
 	}
-	
+
 	public boolean isOn() {
 		return on;
 	}
-	
+
 	public void setOn(boolean on) {
 		this.on = on;
 		updateIcon();
 	}
-	
+
 	private void updateIcon() {
 		currentIcon = on ? selectedIcon : defaultIcon;
 	}

@@ -14,33 +14,34 @@ import com.kh.beatbot.view.BBSeekbar;
 public class LevelsPage extends TrackPage implements LevelListener {
 	private BBSeekbar trackLevel;
 	private ToggleButton volumeToggle, panToggle, pitchToggle;
-	
+
 	public LevelsPage(Context context, View layout) {
 		super(context, layout);
-        trackLevel = (BBSeekbar) layout.findViewById(R.id.trackLevel);
+		trackLevel = (BBSeekbar) layout.findViewById(R.id.trackLevel);
 		trackLevel.addLevelListener(this);
-		volumeToggle = (ToggleButton) layout.findViewById(R.id.trackVolumeToggle);
+		volumeToggle = (ToggleButton) layout
+				.findViewById(R.id.trackVolumeToggle);
 		panToggle = (ToggleButton) layout.findViewById(R.id.trackPanToggle);
 		pitchToggle = (ToggleButton) layout.findViewById(R.id.trackPitchToggle);
-		
+
 		volumeToggle.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View arg0) {
-            	track.activeLevelType = LevelType.VOLUME;
-            	updateDisplay();
-            }
-        });
+			public void onClick(View arg0) {
+				track.activeLevelType = LevelType.VOLUME;
+				updateDisplay();
+			}
+		});
 		panToggle.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View arg0) {
-            	track.activeLevelType = LevelType.PAN;
-            	updateDisplay();
-            }
-        });
+			public void onClick(View arg0) {
+				track.activeLevelType = LevelType.PAN;
+				updateDisplay();
+			}
+		});
 		pitchToggle.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View arg0) {
-            	track.activeLevelType = LevelType.PITCH;
-            	updateDisplay();
-            }
-        });
+			public void onClick(View arg0) {
+				track.activeLevelType = LevelType.PITCH;
+				updateDisplay();
+			}
+		});
 	}
 
 	@Override
@@ -52,7 +53,7 @@ public class LevelsPage extends TrackPage implements LevelListener {
 	public void setVisibilityCode(int code) {
 		trackLevel.setVisibility(code);
 	}
-	
+
 	@Override
 	public void setLevel(LevelListenable levelBar, float level) {
 		switch (track.activeLevelType) {
@@ -88,13 +89,13 @@ public class LevelsPage extends TrackPage implements LevelListener {
 			float levelY) {
 		// for 2d seekbar. nothing to do
 	}
-	
+
 	private void deselectAll() {
 		volumeToggle.setChecked(false);
 		panToggle.setChecked(false);
 		pitchToggle.setChecked(false);
 	}
-	
+
 	private void selectActiveLevel() {
 		switch (track.activeLevelType) {
 		case VOLUME:
@@ -108,7 +109,7 @@ public class LevelsPage extends TrackPage implements LevelListener {
 			return;
 		}
 	}
-	
+
 	private float[] getActiveLevelColor() {
 		switch (track.activeLevelType) {
 		case VOLUME:
@@ -120,7 +121,7 @@ public class LevelsPage extends TrackPage implements LevelListener {
 		}
 		return Colors.VOLUME_COLOR;
 	}
-	
+
 	private float getActiveLevel() {
 		switch (track.activeLevelType) {
 		case VOLUME:
@@ -132,7 +133,7 @@ public class LevelsPage extends TrackPage implements LevelListener {
 		}
 		return track.volume;
 	}
-	
+
 	private void updateDisplay() {
 		deselectAll();
 		selectActiveLevel();

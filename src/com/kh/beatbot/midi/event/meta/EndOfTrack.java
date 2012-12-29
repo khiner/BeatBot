@@ -36,21 +36,21 @@ public class EndOfTrack extends MetaEvent {
 	@Override
 	public void writeToFile(OutputStream out) throws IOException {
 		super.writeToFile(out);
-		
+
 		out.write(0);
 	}
 
 	@Override
 	public int compareTo(MidiEvent other) {
-		
-		if(mTick != other.getTick()) {
+
+		if (mTick != other.getTick()) {
 			return mTick < other.getTick() ? -1 : 1;
 		}
-		if(mDelta.getValue() != other.getDelta()) {
+		if (mDelta.getValue() != other.getDelta()) {
 			return mDelta.getValue() < other.getDelta() ? 1 : -1;
 		}
-		
-		if(!(other instanceof EndOfTrack)) {
+
+		if (!(other instanceof EndOfTrack)) {
 			return 1;
 		}
 		return 0;
