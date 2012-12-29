@@ -11,7 +11,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import com.kh.beatbot.global.BeatBotButton;
+import com.kh.beatbot.global.BBButton;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
@@ -44,7 +44,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private static FloatBuffer adsrPointVb = null;
 	private static FloatBuffer[] adsrCurveVb = new FloatBuffer[4];
 
-	private BeatBotButton previewButton;
+	private BBButton previewButton;
 
 	// keep track of which pointer ids are selecting which ADSR points
 	// init to -1 to indicate no pointer is selecting
@@ -210,7 +210,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	@Override
 	protected void init() {
 		setBackgroundColor(BG_COLOR);
-		previewButton = new BeatBotButton(GlobalVars.previewIcon);
+		previewButton = new BBButton(GlobalVars.previewIcon);
 		// make preview button square
 		previewButtonWidth = height;
 		waveformWidth = width - previewButtonWidth - SNAP_DIST;

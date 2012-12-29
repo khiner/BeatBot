@@ -8,12 +8,12 @@ import android.view.MotionEvent;
 
 import com.kh.beatbot.listenable.LevelListenable;
 
-public class TronSeekbar extends LevelListenable {
+public class BBSeekbar extends LevelListenable {
 	protected FloatBuffer levelBarVb = null;
 	protected int numLevelVertices = 0;
 	protected float levelBarHeight = 8;
 	
-	public TronSeekbar(Context c, AttributeSet as) {
+	public BBSeekbar(Context c, AttributeSet as) {
 		super(c, as);
 	}
 	

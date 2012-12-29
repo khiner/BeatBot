@@ -8,9 +8,9 @@ import java.util.Map;
 
 import android.view.MotionEvent;
 
-import com.kh.beatbot.global.BeatBotButton;
-import com.kh.beatbot.global.BeatBotIconSource;
-import com.kh.beatbot.global.BeatBotToggleButton;
+import com.kh.beatbot.global.BBButton;
+import com.kh.beatbot.global.BBIconSource;
+import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Track;
@@ -23,20 +23,20 @@ public class MidiTrackControlHelper {
 	public static class ButtonRow {
 		int trackNum;
 		float width;
-		BeatBotButton instrumentButton;
-		BeatBotToggleButton muteButton, soloButton;
+		BBButton instrumentButton;
+		BBToggleButton muteButton, soloButton;
 
-		public ButtonRow(int trackNum, BeatBotIconSource instrumentIcon) {
+		public ButtonRow(int trackNum, BBIconSource instrumentIcon) {
 			this.trackNum = trackNum;
-			this.instrumentButton = new BeatBotButton(instrumentIcon, MidiView.trackHeight);
+			this.instrumentButton = new BBButton(instrumentIcon, MidiView.trackHeight);
 
-			muteButton = new BeatBotToggleButton(GlobalVars.muteIcon, MidiView.trackHeight);
-			soloButton = new BeatBotToggleButton(GlobalVars.soloIcon, MidiView.trackHeight);
+			muteButton = new BBToggleButton(GlobalVars.muteIcon, MidiView.trackHeight);
+			soloButton = new BBToggleButton(GlobalVars.soloIcon, MidiView.trackHeight);
 			width = instrumentButton.getWidth() + muteButton.getWidth()
 					+ soloButton.getWidth();
 		}
 
-		public void setIconSource(BeatBotIconSource instrumentIcon) {
+		public void setIconSource(BBIconSource instrumentIcon) {
 			this.instrumentButton.setIconSource(instrumentIcon);
 		}
 		
@@ -47,14 +47,14 @@ public class MidiTrackControlHelper {
 		}
 
 		public void handlePress(float x) {
-			BeatBotButton pressedButton = getButton(x);
+			BBButton pressedButton = getButton(x);
 			if (pressedButton != null) {
 				pressedButton.touch();
 			}
 		}
 
 		public void handleMove(float x) {
-			BeatBotButton currentSelected = getSelectedButton();
+			BBButton currentSelected = getSelectedButton();
 			if (currentSelected != null
 					&& !currentSelected.equals(getButton(x))) {
 				currentSelected.release();
@@ -62,7 +62,7 @@ public class MidiTrackControlHelper {
 		}
 
 		public void handleLongPress(float x) {
-			BeatBotButton pressedButton = getButton(x);
+			BBButton pressedButton = getButton(x);
 			if (pressedButton.equals(instrumentButton)
 					&& pressedButton.isTouched()) {
 				listener.trackLongPressed(trackNum);
@@ -71,17 +71,17 @@ public class MidiTrackControlHelper {
 		}
 
 		public void handleRelease(float x) {
-			BeatBotButton releasedButton = getButton(x);
+			BBButton releasedButton = getButton(x);
 			if (releasedButton != null) {
 				if (releasedButton.equals(instrumentButton)
 						&& releasedButton.isTouched()) {
 					listener.trackClicked(trackNum);
 				} else if (releasedButton.equals(muteButton)) {
-					((BeatBotToggleButton) releasedButton).toggle();
+					((BBToggleButton) releasedButton).toggle();
 					listener.muteToggled(trackNum,
-							((BeatBotToggleButton) releasedButton).isOn());
+							((BBToggleButton) releasedButton).isOn());
 				} else if (releasedButton.equals(soloButton)) {
-					BeatBotToggleButton soloButton = ((BeatBotToggleButton) releasedButton);
+					BBToggleButton soloButton = ((BBToggleButton) releasedButton);
 					soloButton.toggle();
 					listener.soloToggled(trackNum, soloButton.isOn());
 					if (soloButton.isOn()) {
@@ -104,7 +104,7 @@ public class MidiTrackControlHelper {
 			soloButton.release();
 		}
 
-		private BeatBotButton getButton(float x) {
+		private BBButton getButton(float x) {
 			if (x < buttonRows.get(0).instrumentButton.getWidth()) {
 				return instrumentButton;
 			} else if (x < buttonRows.get(0).instrumentButton.getWidth()
@@ -117,7 +117,7 @@ public class MidiTrackControlHelper {
 			}
 		}
 
-		private BeatBotButton getSelectedButton() {
+		private BBButton getSelectedButton() {
 			if (instrumentButton.isTouched()) {
 				return instrumentButton;
 			} else if (muteButton.isTouched()) {
@@ -167,7 +167,7 @@ public class MidiTrackControlHelper {
 		MidiTrackControlHelper.listener = listener;
 	}
 	
-	public static void addTrack(int trackNum, BeatBotIconSource instrumentIcon) {
+	public static void addTrack(int trackNum, BBIconSource instrumentIcon) {
 		buttonRows.add(new ButtonRow(trackNum, instrumentIcon));
 		MidiView.allTracksHeight = MidiView.trackHeight * buttonRows.size();
 		initBgRectVb();

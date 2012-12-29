@@ -26,16 +26,16 @@ import com.kh.beatbot.layout.EffectControlLayout;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.Managers;
-import com.kh.beatbot.view.TronKnob;
-import com.kh.beatbot.view.TronSeekbar2d;
+import com.kh.beatbot.view.BBKnob;
+import com.kh.beatbot.view.BBSeekbar2d;
 
 public class EffectActivity extends Activity implements LevelListener,
 		View.OnClickListener {
 	protected Effect effect;
 	private ToggleButton[] filterButtons = new ToggleButton[3];
 	protected List<EffectControlLayout> paramControls = new ArrayList<EffectControlLayout>();
-	protected TronKnob xParamKnob = null, yParamKnob = null;
-	protected TronSeekbar2d level2d = null;
+	protected BBKnob xParamKnob = null, yParamKnob = null;
+	protected BBSeekbar2d level2d = null;
 
 	private View initEffectToggleButton(ViewGroup parent) {
 		if (effect instanceof Filter) {
@@ -168,7 +168,7 @@ public class EffectActivity extends Activity implements LevelListener,
 			ecl.getKnob().removeAllListeners();
 			ecl.getKnob().addLevelListener(this);
 		}
-		level2d = (TronSeekbar2d) findViewById(R.id.xyParamBar);
+		level2d = (BBSeekbar2d) findViewById(R.id.xyParamBar);
 		level2d.removeAllListeners();
 		level2d.addLevelListener(this);
 	}
@@ -189,8 +189,8 @@ public class EffectActivity extends Activity implements LevelListener,
 	}
 
 	public void link(View view) {
-		TronKnob leftChannelKnob = paramControls.get(0).getKnob();
-		TronKnob rightChannelKnob = paramControls.get(1).getKnob();
+		BBKnob leftChannelKnob = paramControls.get(0).getKnob();
+		BBKnob rightChannelKnob = paramControls.get(1).getKnob();
 		float newRightChannelLevel = rightChannelKnob.getLevel();
 		boolean newRightChannelSynced = rightChannelKnob.isBeatSync();
 
@@ -254,10 +254,10 @@ public class EffectActivity extends Activity implements LevelListener,
 
 	@Override
 	public void notifyClicked(LevelListenable listenable) {
-		if (!(listenable instanceof TronSeekbar2d)) {
+		if (!(listenable instanceof BBSeekbar2d)) {
 			int paramNum = listenable.getId();
 			EffectParam param = effect.getParam(paramNum);
-			param.beatSync = ((TronKnob) listenable).isBeatSync();
+			param.beatSync = ((BBKnob) listenable).isBeatSync();
 			listenable.setLevel(param.viewLevel);
 			if (effect.paramsLinked()) {
 				if (paramNum == 0) {
@@ -281,15 +281,15 @@ public class EffectActivity extends Activity implements LevelListener,
 		Handler refresh = new Handler(Looper.getMainLooper());
 		refresh.post(new Runnable() {
 			public void run() {
-				if (!(listenable instanceof TronSeekbar2d)) {
+				if (!(listenable instanceof BBSeekbar2d)) {
 					EffectParam param = effect.getParam(listenable.getId());
 					listenable.setLevel(param.viewLevel);
 				}
 			}
 		});
-		if (effect.paramsLinked() && !(listenable instanceof TronSeekbar2d)) {
+		if (effect.paramsLinked() && !(listenable instanceof BBSeekbar2d)) {
 			EffectParam param = effect.getParam(listenable.getId());
-			((TronKnob) listenable).setBeatSync(param.beatSync);
+			((BBKnob) listenable).setBeatSync(param.beatSync);
 		}
 	}
 

@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 
-public class ThresholdBarView extends TronSeekbar {
+public class ThresholdBarView extends BBSeekbar {
 	private static final float[] THRESHOLD_COLOR = { BG_COLOR[0] + .2f, BG_COLOR[1] + .2f, BG_COLOR[2] + .2f, 1};
 	private static int maxGreenVertices, maxYellowVertices, maxRedVertices;
 	

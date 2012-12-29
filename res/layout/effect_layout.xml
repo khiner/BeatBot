@@ -5,7 +5,7 @@
     android:layout_height="fill_parent"
     android:background="@color/background" >
     
-    <com.kh.beatbot.view.TronSeekbar2d
+    <com.kh.beatbot.view.BBSeekbar2d
         android:id="@+id/xyParamBar"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

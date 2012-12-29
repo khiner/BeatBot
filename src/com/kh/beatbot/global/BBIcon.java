@@ -2,12 +2,12 @@ package com.kh.beatbot.global;
 
 import com.kh.beatbot.view.SurfaceViewBase;
 
-public class BeatBotIcon {
+public class BBIcon {
 	public int resourceId;
 	protected int[] textureHandlers = new int[1];
 	protected int[] crop = new int[4];
 	
-	public BeatBotIcon(int resourceId) {
+	public BBIcon(int resourceId) {
 		this.resourceId = resourceId;
 		SurfaceViewBase.loadTexture(resourceId, 0, textureHandlers, crop);
 	}

@@ -33,7 +33,7 @@
             android:textOff=""
             android:textOn="" />
 
-        <com.kh.beatbot.view.TronSeekbar
+        <com.kh.beatbot.view.BBSeekbar
             android:id="@+id/trackLevel"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

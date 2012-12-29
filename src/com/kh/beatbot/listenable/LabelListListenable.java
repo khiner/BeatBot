@@ -12,7 +12,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.BeatBotIcon;
+import com.kh.beatbot.global.BBIcon;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.view.ClickableSurfaceView;
@@ -154,7 +154,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 	private GLText glText = null; // A GLText Instance
 	private LabelListListener listener = null;
 	private ArrayList<Label> labels = null;
-	private BeatBotIcon plusIcon;
+	private BBIcon plusIcon;
 
 	// which label is currently being touched? (null for none)
 	private Label touchedLabel = null;
@@ -284,7 +284,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 
 	@Override
 	protected void init() {
-		plusIcon = new BeatBotIcon(R.drawable.plus_outline);
+		plusIcon = new BBIcon(R.drawable.plus_outline);
 		if (labels == null)
 			labels = new ArrayList<Label>();
 		initGlText();

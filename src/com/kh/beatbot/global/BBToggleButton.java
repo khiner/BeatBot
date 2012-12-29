@@ -1,18 +1,18 @@
 package com.kh.beatbot.global;
 
-public class BeatBotToggleButton extends BeatBotButton {
+public class BBToggleButton extends BBButton {
 	boolean on = false;
 	boolean touched = false;
 
-	public BeatBotToggleButton(BeatBotIconSource iconSource) {
+	public BBToggleButton(BBIconSource iconSource) {
 		super(iconSource);
 	}
 	
-	public BeatBotToggleButton(BeatBotIconSource iconSource, float height) {
+	public BBToggleButton(BBIconSource iconSource, float height) {
 		super(iconSource, height);
 	}
 	
-	public BeatBotToggleButton(BeatBotIconSource iconSource, float width, float height) {
+	public BBToggleButton(BBIconSource iconSource, float width, float height) {
 		super(iconSource, width, height);
 	}
 

@@ -12,7 +12,7 @@ import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 
-public class TronSeekbar2d extends LevelListenable {
+public class BBSeekbar2d extends LevelListenable {
 	private static final int DRAW_OFFSET = 8;
 	private static float minX, maxX, minY, maxY;
 	private float selectX = 0, selectY = 0;
@@ -21,7 +21,7 @@ public class TronSeekbar2d extends LevelListenable {
 	private static FloatBuffer borderVb = null;
 	private static FloatBuffer lineVb = null;
 
-	public TronSeekbar2d(Context c, AttributeSet as) {
+	public BBSeekbar2d(Context c, AttributeSet as) {
 		super(c, as);
 	}
 

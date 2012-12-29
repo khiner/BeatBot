@@ -9,15 +9,15 @@ import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
-import com.kh.beatbot.view.TronSeekbar;
+import com.kh.beatbot.view.BBSeekbar;
 
 public class LevelsPage extends TrackPage implements LevelListener {
-	private TronSeekbar trackLevel;
+	private BBSeekbar trackLevel;
 	private ToggleButton volumeToggle, panToggle, pitchToggle;
 	
 	public LevelsPage(Context context, View layout) {
 		super(context, layout);
-        trackLevel = (TronSeekbar) layout.findViewById(R.id.trackLevel);
+        trackLevel = (BBSeekbar) layout.findViewById(R.id.trackLevel);
 		trackLevel.addLevelListener(this);
 		volumeToggle = (ToggleButton) layout.findViewById(R.id.trackVolumeToggle);
 		panToggle = (ToggleButton) layout.findViewById(R.id.trackPanToggle);

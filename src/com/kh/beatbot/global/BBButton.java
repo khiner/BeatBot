@@ -1,21 +1,21 @@
 package com.kh.beatbot.global;
 
 
-public class BeatBotButton {
-	BeatBotIcon defaultIcon;
-	BeatBotIcon selectedIcon;
-	BeatBotIcon currentIcon;
+public class BBButton {
+	BBIcon defaultIcon;
+	BBIcon selectedIcon;
+	BBIcon currentIcon;
 	private float width, height;
 	
-	public BeatBotButton(BeatBotIconSource iconSource) {
+	public BBButton(BBIconSource iconSource) {
 		this(iconSource, iconSource.defaultIcon.getWidth(), iconSource.defaultIcon.getHeight());
 	}
 	
-	public BeatBotButton(BeatBotIconSource iconSource, float height) {
+	public BBButton(BBIconSource iconSource, float height) {
 		this(iconSource, iconSource.defaultIcon.getWidth() * height / iconSource.defaultIcon.getHeight(), height);
 	}
 	
-	public BeatBotButton(BeatBotIconSource iconSource, float width, float height) {
+	public BBButton(BBIconSource iconSource, float width, float height) {
 		defaultIcon = iconSource.defaultIcon;
 		selectedIcon = iconSource.selectedIcon;
 		currentIcon = defaultIcon;
@@ -31,7 +31,7 @@ public class BeatBotButton {
 		return height;
 	}
 	
-	public void setIconSource(BeatBotIconSource iconSource) {
+	public void setIconSource(BBIconSource iconSource) {
 		defaultIcon = iconSource.defaultIcon;
 		selectedIcon = iconSource.selectedIcon;
 		currentIcon = defaultIcon;

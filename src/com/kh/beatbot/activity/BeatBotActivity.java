@@ -49,7 +49,7 @@ import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.SurfaceViewBase;
-import com.kh.beatbot.view.TronSeekbar;
+import com.kh.beatbot.view.BBSeekbar;
 import com.kh.beatbot.view.helper.LevelsViewHelper;
 
 public class BeatBotActivity extends Activity implements LevelListener {
@@ -60,7 +60,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 	// these are used as variables for convenience, since they are reference
 	// frequently
 	private ToggleButton volume, pan, pitch;
-	private TronSeekbar levelBar;
+	private BBSeekbar levelBar;
 
 	private ViewFlipper trackPager;
 	private LinearLayout trackPageSelect;
@@ -72,7 +72,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 		volume = (ToggleButton) findViewById(R.id.masterVolumeToggle);
 		pan = (ToggleButton) findViewById(R.id.masterPanToggle);
 		pitch = (ToggleButton) findViewById(R.id.masterPitchToggle);
-		levelBar = (TronSeekbar) findViewById(R.id.masterLevelBar);
+		levelBar = (BBSeekbar) findViewById(R.id.masterLevelBar);
 		levelBar.addLevelListener(this);
 		setMasterVolume(GlobalVars.MASTER_VOL_LEVEL);
 		setMasterPan(GlobalVars.MASTER_PAN_LEVEL);

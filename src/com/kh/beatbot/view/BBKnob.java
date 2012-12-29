@@ -8,12 +8,12 @@ import android.util.FloatMath;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
-import com.kh.beatbot.global.BeatBotToggleButton;
+import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 
-public class TronKnob extends LevelListenable {
+public class BBKnob extends LevelListenable {
 	public static final float ¹ = (float) Math.PI;
 	private static FloatBuffer circleVb = null;
 	private static FloatBuffer selectCircleVb = null;
@@ -24,10 +24,10 @@ public class TronKnob extends LevelListenable {
 
 	private int drawIndex = 0;
 	private boolean levelSelected = false;
-	private BeatBotToggleButton centerButton = null;
+	private BBToggleButton centerButton = null;
 	private boolean clickable = false;
 
-	public TronKnob(Context c, AttributeSet as) {
+	public BBKnob(Context c, AttributeSet as) {
 		super(c, as);
 	}
 
@@ -39,7 +39,7 @@ public class TronKnob extends LevelListenable {
 	public void init() {
 		super.init();
 		if (clickable) {
-			centerButton = new BeatBotToggleButton(GlobalVars.beatSyncIcon);
+			centerButton = new BBToggleButton(GlobalVars.beatSyncIcon);
 			centerButton.setOn(true);
 		}
 	}

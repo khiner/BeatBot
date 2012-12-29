@@ -6,12 +6,12 @@ public class Instrument extends BBDirectory {
 	private File[] sampleFiles;
 	private String[] sampleNames;
 
-	public Instrument(BBDirectory parent, String name, BeatBotIconSource bbIconSource) {
+	public Instrument(BBDirectory parent, String name, BBIconSource bbIconSource) {
 		super(parent, name, bbIconSource);
 		updateFiles();
 	}
 
-	public BeatBotIconSource getBBIconSource() {
+	public BBIconSource getBBIconSource() {
 		if (bbIconSource == null)
 			return parent.bbIconSource;
 		return bbIconSource;

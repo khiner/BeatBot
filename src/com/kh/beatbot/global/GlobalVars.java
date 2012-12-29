@@ -9,16 +9,16 @@ import com.kh.beatbot.view.MidiView;
 public class GlobalVars {
 	public static BeatBotActivity mainActivity;
 
-	public static BeatBotIconSource muteIcon, soloIcon, previewIcon, beatSyncIcon;
+	public static BBIconSource muteIcon, soloIcon, previewIcon, beatSyncIcon;
 
 	public static void initIcons() {
-		muteIcon = new BeatBotIconSource(R.drawable.mute_icon,
+		muteIcon = new BBIconSource(R.drawable.mute_icon,
 				R.drawable.mute_icon_selected);
-		soloIcon = new BeatBotIconSource(R.drawable.solo_icon,
+		soloIcon = new BBIconSource(R.drawable.solo_icon,
 				R.drawable.solo_icon_selected);
-		previewIcon = new BeatBotIconSource(R.drawable.preview_icon,
+		previewIcon = new BBIconSource(R.drawable.preview_icon,
 				R.drawable.preview_icon_selected);
-		beatSyncIcon = new BeatBotIconSource(R.drawable.clock,
+		beatSyncIcon = new BBIconSource(R.drawable.clock,
 				R.drawable.note_icon);
 	}
 	
