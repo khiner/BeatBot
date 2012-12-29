@@ -53,7 +53,7 @@ public class MidiManager implements Parcelable {
 	private List<MidiNote> currState = new ArrayList<MidiNote>();
 
 	public static long loopBeginTick, loopEndTick;
-	
+
 	private MidiManager() {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,
 				TimeSignature.DEFAULT_DIVISION);
@@ -123,7 +123,7 @@ public class MidiManager implements Parcelable {
 		return tempNotes.keySet().contains(i) ? tempNotes.get(i) : midiNotes
 				.get(i);
 	}
-	
+
 	public void deselectAllNotes() {
 		for (MidiNote midiNote : midiNotes) {
 			midiNote.setSelected(false);
@@ -216,7 +216,7 @@ public class MidiManager implements Parcelable {
 
 	private void addNote(MidiNote midiNote) {
 		midiNotes.add(midiNote);
-		Track track = Managers.trackManager.getTrack(midiNote.getNoteValue()); 
+		Track track = Managers.trackManager.getTrack(midiNote.getNoteValue());
 		track.addNote(midiNote);
 	}
 
@@ -228,7 +228,7 @@ public class MidiManager implements Parcelable {
 		if (!midiNotes.contains(midiNote))
 			return;
 		midiNotes.remove(midiNote);
-		Track track = Managers.trackManager.getTrack(midiNote.getNoteValue()); 
+		Track track = Managers.trackManager.getTrack(midiNote.getNoteValue());
 		track.removeNote(midiNote);
 		updateEditIcons();
 	}
@@ -237,7 +237,7 @@ public class MidiManager implements Parcelable {
 		boolean anyNoteSelected = anyNoteSelected();
 		GlobalVars.mainActivity.setEditIconsEnabled(anyNoteSelected);
 	}
-	
+
 	public void copy() {
 		if (!anyNoteSelected())
 			return;
@@ -293,8 +293,8 @@ public class MidiManager implements Parcelable {
 		if (oldNote == newNote)
 			return;
 		midiNote.setNote(newNote);
-		Track oldTrack = Managers.trackManager.getTrack(oldNote); 
-		Track newTrack = Managers.trackManager.getTrack(newNote); 
+		Track oldTrack = Managers.trackManager.getTrack(oldNote);
+		Track newTrack = Managers.trackManager.getTrack(newNote);
 		oldTrack.removeNote(midiNote);
 		newTrack.addNote(midiNote);
 	}
@@ -316,10 +316,19 @@ public class MidiManager implements Parcelable {
 			offTick = midiNote.getOffTick() + onTick - midiNote.getOnTick();
 		if (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)
 			return;
+		long currTick = getCurrTick();
+		Track track = Managers.trackManager.getTrack(midiNote.getNoteValue());
+		// if we're changing the stop tick on a note that's already playing to a
+		// note before the current tick, stop the track
+		if (track.isPlaying() && currTick < midiNote.getOffTick()
+				&& currTick > offTick) {
+			track.stop();
+		}
 		// move Java note ticks
 		midiNote.setOnTick(onTick);
 		midiNote.setOffTick(offTick);
-		Managers.trackManager.getTrack(midiNote.getNoteValue()).updateNextNote();
+		Managers.trackManager.getTrack(midiNote.getNoteValue())
+				.updateNextNote();
 	}
 
 	public Tempo getTempo() {
@@ -567,28 +576,28 @@ public class MidiManager implements Parcelable {
 		MidiManager.loopBeginTick = loopBeginTick;
 		setLoopBeginTickNative(loopBeginTick);
 	}
-	
+
 	public void setLoopEndTick(long loopEndTick) {
 		MidiManager.loopEndTick = loopEndTick;
 		setLoopEndTickNative(loopEndTick);
 	}
-	
+
 	public void setLoopTicks(long loopBeginTick, long loopEndTick) {
 		MidiManager.loopBeginTick = loopBeginTick;
 		MidiManager.loopEndTick = loopEndTick;
 		setLoopTicksNative(loopBeginTick, loopEndTick);
 	}
-	
+
 	public long getLoopBeginTick() {
 		return loopBeginTick;
 	}
-	
+
 	public long getLoopEndTick() {
 		return loopEndTick;
 	}
-	
+
 	public native void isTrackPlaying(int trackNum);
-	
+
 	public native void setNativeMSPT(long MSPT);
 
 	public native void setNativeBPM(float BPM);

@@ -39,10 +39,10 @@ public class Track {
 	
 	private Map<Integer, LoopSampleInfo> sampleLoopPoints = new HashMap<Integer, LoopSampleInfo>();
 	
-	public Track(int id, Instrument instrument) {
+	public Track(int id, Instrument instrument, int sampleNum) {
 		this.id = id;
 		this.instrument = instrument;
-		this.currSampleNum = 0;
+		this.currSampleNum = sampleNum;
 		constructLoopPointMap();
 		initDefaultAdsrPoints();
 	}
@@ -53,6 +53,13 @@ public class Track {
 
 	public void removeNote(MidiNote note) {
 		notes.remove(note);
+		if (isTrackPlaying(id)) {
+			long currTick = Managers.midiManager.getCurrTick();
+			if (currTick >= note.getOnTick() && currTick <= note.getOffTick()) {
+				stopTrack(id);
+			}
+		}
+		
 		updateNextNote();
 	}
 	
@@ -123,11 +130,11 @@ public class Track {
 		return instrument;
 	}
 
-	public void setInstrument(Instrument instrument) {
-		if (this.instrument == instrument)
+	public void setInstrument(Instrument instrument, int sampleNum) {
+		if (this.instrument == instrument && this.currSampleNum == sampleNum)
 			return;
 		this.instrument = instrument;
-		setSampleNum(0);
+		setSampleNum(sampleNum);
 		constructLoopPointMap();
 	}
 
@@ -174,12 +181,16 @@ public class Track {
 	}
 	/** Wrappers around native JNI methods **/
 
-	public void play() {
-		playTrack(id);
-	}
-
 	public void stop() {
 		stopTrack(id);
+	}
+	
+	public void preview() {
+		previewTrack(id);
+	}
+
+	public void stopPreviewing() {
+		stopPreviewingTrack(id);
 	}
 
 	public void mute(boolean mute) {
@@ -194,6 +205,10 @@ public class Track {
 		toggleTrackLooping(id);
 	}
 
+	public boolean isPlaying() {
+		return isTrackPlaying(id);
+	}
+	
 	public boolean isLooping() {
 		return isTrackLooping(id);
 	}
@@ -261,9 +276,11 @@ public class Track {
 			long loopEnd);
 
 
-	public static native void playTrack(int trackNum);
-
 	public static native void stopTrack(int trackNum);
+	
+	public static native void previewTrack(int trackNum);
+
+	public static native void stopPreviewingTrack(int trackNum);
 
 	public static native void muteTrack(int trackNum, boolean mute);
 

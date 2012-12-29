@@ -105,11 +105,6 @@ void soundTrack(Track *track) {
 	resetAdsr(adsrConfig);
 }
 
-void playTrack(Track *track) {
-	track->playing = true;
-	soundTrack(track);
-}
-
 void stopSoundingTrack(Track *track) {
 	wavfile_reset((WavFile *) track->generator->config);
 }
@@ -123,29 +118,43 @@ void stopTrack(Track *track) {
 	stopSoundingTrack(track);
 }
 
-void previewTrack(int trackNum) {
-	Track *track = getTrack(NULL, NULL, trackNum);
+void playTrack(Track *track) {
+	if (track->playing) {
+		stopSoundingTrack(track);
+	}
+	track->playing = true;
+	soundTrack(track);
+}
+
+void previewTrack(Track *track) {
 	track->previewing = true;
 	if (!track->playing) {
 		soundTrack(track);
 	}
 }
 
-void stopPreviewingTrack(int trackNum) {
-	Track *track = getTrack(NULL, NULL, trackNum);
+void stopPreviewingTrack(Track *track) {
 	track->previewing = false;
 	if (!track->playing)
 		stopSoundingTrack(track);
 }
 
-void Java_com_kh_beatbot_global_Track_playTrack(JNIEnv *env, jclass clazz,
+void Java_com_kh_beatbot_global_Track_previewTrack(JNIEnv *env, jclass clazz,
 		jint trackNum) {
-	previewTrack(trackNum);
+	Track *track = getTrack(NULL, NULL, trackNum);
+	previewTrack(track);
+}
+
+void Java_com_kh_beatbot_global_Track_stopPreviewingTrack(JNIEnv *env, jclass clazz,
+		jint trackNum) {
+	Track *track = getTrack(NULL, NULL, trackNum);
+	stopPreviewingTrack(track);
 }
 
 void Java_com_kh_beatbot_global_Track_stopTrack(JNIEnv *env, jclass clazz,
 		jint trackNum) {
-	stopPreviewingTrack(trackNum);
+	Track *track = getTrack(NULL, NULL, trackNum);
+	stopTrack(track);
 }
 
 void stopAllTracks() {

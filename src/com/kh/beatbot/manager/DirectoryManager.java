@@ -108,12 +108,10 @@ public class DirectoryManager {
 						if (currDirectory == null) {
 							// Instrument type
 							if (addingTrack) {
-								Managers.trackManager.addTrack((Instrument)parent);
+								Managers.trackManager.addTrack((Instrument)parent, item);
 							} else {
-								TrackPage.getTrack().setInstrument((Instrument)parent);
+								TrackPage.getTrack().setInstrument((Instrument)parent, item);
 							}
-							// at a leaf - a sample
-							TrackPage.getTrack().setSampleNum(item);
 							TrackPageFactory.updatePages();
 							currDirectory = internalDirectory;
 						}

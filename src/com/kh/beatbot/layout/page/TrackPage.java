@@ -11,7 +11,7 @@ public abstract class TrackPage {
 	public static enum Type {SELECT, LEVELS, EDIT, EFFECTS};
 	private static Type[] pageOrder = {Type.SELECT, Type.LEVELS, Type.EDIT, Type.EFFECTS};
 	public static final int NUM_TRACK_PAGES = pageOrder.length;
-	protected static Track track;
+	public static Track track;
 	
 	TrackPage(Context context, View layout) {
 		this.context = context;

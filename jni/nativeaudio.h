@@ -23,6 +23,7 @@ bool isPlaying();
 void updateNextNoteSamples();
 void updateNextNote(Track *track);
 void arm();
+void stopTrack(Track *track);
 void stopAll();
 
 #endif // NATIVEAUDIO_H

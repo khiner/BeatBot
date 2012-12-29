@@ -29,14 +29,15 @@ void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName) {
 
 	// if a different sample was already loaded, destroy it.
 	wavfile_freeBuffers(wavFile);
-	// if sample is less than 8 seconds, load into memory from a separate, temporary file
-	if (wavFile->totalSamples <= 8 * SAMPLE_RATE) {
+	// if sample is less than 5 seconds, load into memory from a separate, temporary file
+	if (wavFile->totalSamples <= 5 * SAMPLE_RATE) {
+		__android_log_print(ANDROID_LOG_ERROR, "YourApp", "formatted message");
 		FILE *tempFile = fopen(sampleFileName, "rb");
 		/** allocate memory to hold samples (memory is freed in wavfile_destroy)
 		 *
 		 * NOTE: We don't directly write to wavFile sample buffer because we want to
 		 * completely load all samples from file before making wavFile->samples non-NULL.
-		 * That way, we can immediately still read from file on a per-sample basis, until
+		 * That way, we can still immediately read from file on a per-sample basis, until
 		 * wavFile->samples is non-null, at which point we can read directly from memory.
 		 */
 		float **tempSamples = malloc(2 * sizeof(void *));

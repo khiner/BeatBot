@@ -134,6 +134,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	private void updateWaveformVb() {
+		if (height == 0) // if height == 0, this view hasn't even been init()'d yet.
+			return;
 		try {
 			waveformVb = WaveformHelper.floatFileToBuffer(width
 					- previewButtonWidth - SNAP_DIST, height, (long) sampleOffset,
@@ -222,7 +224,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	private void stopPreviewing() {
 		previewPointerId = -1;
 		previewButton.release();
-		track.stop();
+		track.stopPreviewing();
 	}
 
 	private float sampleToX(float sample) {
@@ -491,7 +493,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 
 	public void handlePreviewActionDown(int id) {
 		previewButton.touch();
-		track.play();
+		track.preview();
 		previewPointerId = id;
 	}
 
@@ -542,7 +544,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 			handleWaveActionPointerUp(e, id);
 		else {
 			previewButton.release();
-			track.stop();
+			track.stopPreviewing();
 		}
 	}
 
@@ -550,7 +552,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 	protected void handleActionUp(int id, float x, float y) {
 		previewButton.release();
 		beginLoopMarkerTouched = endLoopMarkerTouched = -1;
-		track.stop();
+		track.stopPreviewing();
 		scrollAnchorSample = zoomLeftAnchorSample = zoomRightAnchorSample = -1;
 		clearAdsrSelected();
 	}

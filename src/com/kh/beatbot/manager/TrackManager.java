@@ -6,6 +6,7 @@ import java.util.List;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Instrument;
 import com.kh.beatbot.global.Track;
+import com.kh.beatbot.layout.page.TrackPage;
 import com.kh.beatbot.layout.page.TrackPageFactory;
 import com.kh.beatbot.listener.MidiTrackControlListener;
 import com.kh.beatbot.midi.MidiNote;
@@ -29,7 +30,7 @@ public class TrackManager implements MidiTrackControlListener {
 	
 	private TrackManager() {
 		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
-			Track track = new Track(tracks.size(), Managers.directoryManager.getDrumInstrument(i));
+			Track track = new Track(tracks.size(), Managers.directoryManager.getDrumInstrument(i), 0);
 			tracks.add(track);
 			addTrack(track.getSamplePath());
 		}
@@ -43,18 +44,13 @@ public class TrackManager implements MidiTrackControlListener {
 	public int getNumTracks() {
 		return tracks.size();
 	}
-	
-	public void addTrack(int instrumentType) {
-		Instrument newInstrument = Managers.directoryManager.getDrumInstrument(instrumentType);
-		addTrack(newInstrument);
-	}
-	
-	public void addTrack(Instrument instrument) {
-		Track newTrack = new Track(tracks.size(), instrument); 
+
+	public void addTrack(Instrument instrument, int sampleNum) {
+		Track newTrack = new Track(tracks.size(), instrument, sampleNum); 
 		addTrack(newTrack.getSamplePath());
 		tracks.add(newTrack);
 		GlobalVars.midiView.updateTracks();
-		trackClicked(tracks.size() - 1);
+		TrackPage.track = tracks.get(tracks.size() - 1);
 	}
 	
 	public void clearNotes() {

@@ -254,10 +254,10 @@ void setNextNote(Track *track, jobject obj) {
 	}
 	jclass cls = (*env)->GetObjectClass(env, obj);
 
-	long onTick = tickToSample(
+	long onSample = tickToSample(
 			(*env)->CallLongMethod(env, obj,
 					(*env)->GetMethodID(env, cls, "getOnTick", "()J")));
-	long offTick = tickToSample(
+	long offSample = tickToSample(
 			(*env)->CallLongMethod(env, obj,
 					(*env)->GetMethodID(env, cls, "getOffTick", "()J")));
 	float vol = (*env)->CallFloatMethod(env, obj,
@@ -267,7 +267,7 @@ void setNextNote(Track *track, jobject obj) {
 	float pitch = (*env)->CallFloatMethod(env, obj,
 			(*env)->GetMethodID(env, cls, "getPitch", "()F"));
 
-	setNextNoteInfo(track, onTick, offTick, vol, pan, pitch);
+	setNextNoteInfo(track, onSample, offSample, vol, pan, pitch);
 	(*env)->DeleteLocalRef(env, cls);
 }
 
