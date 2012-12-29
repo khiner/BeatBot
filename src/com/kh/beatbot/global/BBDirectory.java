@@ -12,8 +12,10 @@ public class BBDirectory {
 	protected BeatBotIconSource bbIconSource;
 	protected List<BBDirectory> children = new ArrayList<BBDirectory>();
 	protected int iconSource;
+	protected BBDirectory parent;
 	
 	public BBDirectory(BBDirectory parent, String name, BeatBotIconSource bbIconSource) {
+		this.parent = parent;
 		this.name = name;
 		this.bbIconSource = bbIconSource;
 		if (parent == null) { // root directory

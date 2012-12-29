@@ -64,9 +64,13 @@ public class DirectoryManager {
 	private OnShowListener instrumentSelectOnShowListener = null;
 	
 	private BBDirectory internalDirectory = null;
-	private BBDirectory drumsDirectory = null;
 	private BBDirectory internalRecordDirectory = null;
+	private BBDirectory internalBeatRecordDirectory = null;
+	private BBDirectory internalSampleRecordDirectory = null;
 	private BBDirectory userRecordDirectory = null;
+	private BBDirectory userBeatRecordDirectory = null;
+	private BBDirectory userSampleRecordDirectory = null;
+	private BBDirectory drumsDirectory = null;
 	
 	private BBDirectory currDirectory = null;
 	
@@ -82,9 +86,13 @@ public class DirectoryManager {
 	private DirectoryManager() {
 		initDataDir();
 		internalDirectory = new BBDirectory(null, "internal", null);
-		userRecordDirectory = new BBDirectory(null, "recorded", null);
 		drumsDirectory = new BBDirectory(internalDirectory, "drums", new BeatBotIconSource());
-		internalRecordDirectory = new Instrument(internalDirectory, "recorded", new BeatBotIconSource());
+		userRecordDirectory = new BBDirectory(null, "recorded", null);
+		userSampleRecordDirectory = new BBDirectory(userRecordDirectory, "samples", null);
+		userBeatRecordDirectory = new BBDirectory(userRecordDirectory, "beats", null);
+		internalRecordDirectory = new BBDirectory(internalDirectory, "recorded", new BeatBotIconSource());
+		internalSampleRecordDirectory = new Instrument(internalRecordDirectory, "samples", null);
+		internalBeatRecordDirectory = new Instrument(internalRecordDirectory, "beats", null);
 		for (String drumName : drumNames) {
 			new Instrument(drumsDirectory, drumName, new BeatBotIconSource());
 		}
@@ -149,7 +157,7 @@ public class DirectoryManager {
 	}
 	
 	public void updateRecordDirectory() {
-		((Instrument)internalRecordDirectory).updateFiles();
+		((Instrument)internalBeatRecordDirectory).updateFiles();
 	}
 	
 	public Instrument getDrumInstrument(int drumNum) {
@@ -161,11 +169,11 @@ public class DirectoryManager {
 	}
 	
 	public String getUserRecordDirectory() {
-		return userRecordDirectory.getPath();
+		return userBeatRecordDirectory.getPath();
 	}
 	
 	public String getInternalRecordDirectory() {
-		return internalRecordDirectory.getPath();
+		return internalBeatRecordDirectory.getPath();
 	}
 	
 	private void initDataDir() {

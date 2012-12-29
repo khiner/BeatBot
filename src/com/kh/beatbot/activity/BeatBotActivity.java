@@ -351,9 +351,9 @@ public class BeatBotActivity extends Activity implements LevelListener {
 		} else {
 			GlobalVars.midiView.reset();
 			((ToggleButton) findViewById(R.id.playButton)).setChecked(true);
+			Managers.recordManager.startRecordingNative();
 			if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
 				play(findViewById(R.id.playButton));
-			Managers.recordManager.startRecordingNative();
 			// Managers.recordManager.startListening();
 		}
 	}
@@ -371,6 +371,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 	}
 
 	public void play(View view) {
+		((ToggleButton)findViewById(R.id.playButton)).setChecked(true);
 		if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			Managers.playbackManager.reset();
 			Managers.midiManager.reset();
@@ -380,6 +381,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 	}
 
 	public void stop(View view) {
+		((ToggleButton)findViewById(R.id.playButton)).setChecked(false);
 		if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
 			ToggleButton recordButton = (ToggleButton) findViewById(R.id.recordButton);
 			recordButton.setChecked(false);

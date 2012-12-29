@@ -12,6 +12,8 @@ public class Instrument extends BBDirectory {
 	}
 
 	public BeatBotIconSource getBBIconSource() {
+		if (bbIconSource == null)
+			return parent.bbIconSource;
 		return bbIconSource;
 	}
 
