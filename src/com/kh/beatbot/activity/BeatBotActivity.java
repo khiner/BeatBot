@@ -12,7 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
@@ -47,9 +49,9 @@ import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
+import com.kh.beatbot.view.BBSeekbar;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.SurfaceViewBase;
-import com.kh.beatbot.view.BBSeekbar;
 import com.kh.beatbot.view.helper.LevelsViewHelper;
 
 public class BeatBotActivity extends Activity implements LevelListener {
@@ -243,6 +245,24 @@ public class BeatBotActivity extends Activity implements LevelListener {
 			shutdown();
 			android.os.Process.killProcess(android.os.Process.myPid());
 		}
+	}
+	
+	@Override
+	public void onBackPressed() {
+	    new AlertDialog.Builder(this)
+	        .setIcon(android.R.drawable.ic_dialog_alert)
+	        .setTitle("Closing " + getString(R.string.app_name))
+	        .setMessage("Are you sure you want to exit " + getString(R.string.app_name) + "?")
+	        .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+	    {
+	        @Override
+	        public void onClick(DialogInterface dialog, int which) {
+	            finish();    
+	        }
+
+	    })
+	    .setNegativeButton("No", null)
+	    .show();
 	}
 
 	@Override
