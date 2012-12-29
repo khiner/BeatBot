@@ -260,8 +260,11 @@ public class LabelListListenable extends ClickableSurfaceView {
 		addTextWidth = glText.getTextWidth("add") + height;
 		if (bgRectVb == null)
 			initBgRectVb();
-		if (labels.isEmpty())
-			listener.labelListInitialized(this);
+		listener.labelListInitialized(this);
+	}
+	
+	public boolean anyLabels() {
+		return labels != null && !labels.isEmpty();
 	}
 	
 	@Override

@@ -92,8 +92,16 @@ public class EffectsPage extends TrackPage {
 		@Override
 		public void labelListInitialized(LabelListListenable labelList) {
 			effectLabelList = labelList;
-			for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
-				labelList.addLabel("", false);
+			if (effectLabelList.anyLabels()) {
+				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
+					Effect effect = track.findEffectByPosition(i);
+					if (effect != null)
+						labelList.setLabelOn(i, effect.on);
+				}
+			} else {
+				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
+					labelList.addLabel("", false);
+				}
 			}
 		}
 
