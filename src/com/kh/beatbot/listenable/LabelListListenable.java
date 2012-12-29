@@ -230,10 +230,6 @@ public class LabelListListenable extends ClickableSurfaceView {
 		updateLabelLocations();
 	}
 
-	public boolean noLabels() {
-		return labels == null || labels.isEmpty();
-	}
-
 	// callback function for listener to notify when the label text and id is
 	// known
 	public void setLabelText(int id, String text) {
@@ -244,14 +240,14 @@ public class LabelListListenable extends ClickableSurfaceView {
 		updateLabelLocations();
 	}
 
-	public void setLabel(int id, String text) {
-		Label label = findLabel(id);
+	public void setLabelTextByPosition(int pos, String text) {
+		Label label = labels.get(pos);
 		if (label != null) {
 			label.setText(text);
 		}
 		updateLabelLocations();
 	}
-
+	
 	private void touchLabel(Label label, float pointerX) {
 		touchedLabel = label;
 		dragOffset = touchedLabel.x - pointerX;
@@ -269,7 +265,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 		for (Label label : labels) {
 			int newPosition = labels.indexOf(label);
 			if (newPosition != label.prevPosition) {
-				listener.labelMoved(label.id, label.prevPosition, newPosition);
+				listener.labelMoved(label.prevPosition, newPosition);
 			}
 		}
 	}
@@ -294,11 +290,10 @@ public class LabelListListenable extends ClickableSurfaceView {
 		addTextWidth = glText.getTextWidth("add") + height;
 		if (bgRectVb == null)
 			initBgRectVb();
-		while (listener == null)
-			; // wait for listener
-		listener.labelListInitialized(this);
+		if (labels.isEmpty())
+			listener.labelListInitialized(this);
 	}
-
+	
 	@Override
 	protected void drawFrame() {
 		translate(width / 2, height / 2);

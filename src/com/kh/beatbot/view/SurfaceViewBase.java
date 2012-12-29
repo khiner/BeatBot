@@ -67,6 +67,10 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		return fb;
 	}
 
+	public boolean isRunning() {
+		return running;
+	}
+	
 	public static void translate(float x, float y) {
 		gl.glTranslatef(x, y, 0);
 	}

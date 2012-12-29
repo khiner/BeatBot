@@ -25,7 +25,7 @@ import com.kh.beatbot.listenable.LabelListListenable;
 import com.kh.beatbot.listener.LabelListListener;
 
 public class EffectsPage extends TrackPage {
-	private static LabelListListenable effectLabelList;
+	private static LabelListListenable effectLabelList = null;
 	private static String[] effectNames;
 
 	public EffectsPage(Context context, View layout) {
@@ -41,7 +41,17 @@ public class EffectsPage extends TrackPage {
 
 	@Override
 	protected void update() {
-
+		if (!effectLabelList.isRunning())
+			return;
+		for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
+			Effect effect = track.findEffectByPosition(i);
+			if (effect != null) {
+				effectLabelList.setLabelText(effect.getId(), effect.getName());
+				effectLabelList.setLabelOn(effect.getId(), effect.on);
+			} else {
+				effectLabelList.setLabelTextByPosition(i, "");
+			}
+		}
 	}
 
 	@Override
@@ -51,7 +61,6 @@ public class EffectsPage extends TrackPage {
 
 	class EffectLabelListListener implements LabelListListener {
 		private AlertDialog selectEffectAlert = null;
-		private LabelListListenable labelList;
 		private int lastClickedId = -1;
 		private int lastClickedPos = -1;
 
@@ -61,60 +70,36 @@ public class EffectsPage extends TrackPage {
 			builder.setItems(effectNames,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int item) {
-							if (!effectNames[item].equals("NONE")) {
-								labelList.setLabelText(lastClickedId,
-										effectNames[item]);
-								labelList.setLabelOn(lastClickedId, true);
-								launchEffectIntent(effectNames[item],
-										lastClickedId, lastClickedPos);
-							} else {
-								labelList.setLabelText(lastClickedId, "");
+							if (effectNames[item].equals("NONE")) {
+								effectLabelList.setLabelText(lastClickedId, "");
 								Effect effect = track
 										.findEffectById(lastClickedId);
 								if (effect != null) {
 									effect.removeEffect();
 								}
+							} else {
+								effectLabelList.setLabelText(lastClickedId,
+										effectNames[item]);
+								effectLabelList.setLabelOn(lastClickedId, true);
+								launchEffectIntent(effectNames[item],
+										lastClickedId, lastClickedPos);
 							}
 						}
 					});
 			selectEffectAlert = builder.create();
 		}
 
-		private Stack<Integer> getUniqueIds() {
-			Stack<Integer> uniqueIds = new Stack<Integer>();
-			for (int id = 0; id < 4; id++) {
-				if (track.findEffectById(id) == null)
-					uniqueIds.add(id);
-			}
-			return uniqueIds;
-		}
-
 		@Override
 		public void labelListInitialized(LabelListListenable labelList) {
-			this.labelList = labelList;
-			Stack<Integer> uniqueIds = getUniqueIds();
-			if (labelList.noLabels()) {
-				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
-					Effect effect = track.findEffectByPosition(i);
-					if (effect != null) {
-						this.labelList.addLabel(effect.name, effect.getId(),
-								effect.on);
-					} else {
-						this.labelList.addLabel("", uniqueIds.pop(), false);
-					}
-				}
-			} else {
-				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
-					Effect effect = track.findEffectByPosition(i);
-					if (effect != null)
-						this.labelList.setLabelOn(effect.getId(), effect.on);
-				}
+			effectLabelList = labelList;
+			for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
+				labelList.addLabel("", i, false);
 			}
 		}
 
 		@Override
-		public void labelMoved(int id, int oldPosition, int newPosition) {
-			Effect effect = track.findEffectById(id);
+		public void labelMoved(int oldPosition, int newPosition) {
+			Effect effect = track.findEffectByPosition(oldPosition);
 			if (effect != null) {
 				effect.setPosition(newPosition);
 				for (Effect other : track.effects) {
