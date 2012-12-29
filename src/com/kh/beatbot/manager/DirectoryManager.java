@@ -49,6 +49,7 @@ public class DirectoryManager {
 				R.drawable.rimshot_icon,
 				R.drawable.rimshot_icon_selected,
 				R.drawable.rimshot_icon_listview);
+		drumsDirectory.setIconResources(-1, -1, -1, R.drawable.drums_icon_listview);
 		internalRecordDirectory.setIconResources(R.drawable.microphone_icon_src,
 				R.drawable.microphone_icon,
 				R.drawable.microphone_icon_selected,
@@ -82,7 +83,7 @@ public class DirectoryManager {
 		initDataDir();
 		internalDirectory = new BBDirectory(null, "internal", null);
 		userRecordDirectory = new BBDirectory(null, "recorded", null);
-		drumsDirectory = new BBDirectory(internalDirectory, "drums", null);
+		drumsDirectory = new BBDirectory(internalDirectory, "drums", new BeatBotIconSource());
 		internalRecordDirectory = new Instrument(internalDirectory, "recorded", new BeatBotIconSource());
 		for (String drumName : drumNames) {
 			new Instrument(drumsDirectory, drumName, new BeatBotIconSource());

@@ -40,6 +40,10 @@ public class BBDirectory {
 				listViewIconResource);
 	}
 	
+	public void setIconSource(int iconSource) {
+		this.iconSource = iconSource;
+	}
+	
 	public int getIconSource() {
 		return iconSource;
 	}

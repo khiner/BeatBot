@@ -24,13 +24,15 @@ public class BeatBotIconSource {
 	}
 	
 	public void set(int defaultIconResourceId, int selectedIconResourceId) {
-		this.defaultIcon = new BeatBotIcon(defaultIconResourceId);
-		this.selectedIcon = new BeatBotIcon(selectedIconResourceId);
+		if (defaultIconResourceId > 0)
+			this.defaultIcon = new BeatBotIcon(defaultIconResourceId);
+		if (selectedIconResourceId > 0)
+			this.selectedIcon = new BeatBotIcon(selectedIconResourceId);
 	}
 	
 	public void set(int defaultIconResourceId, int selectedIconResourceId, int listViewIconResourceId) {
-		this.defaultIcon = new BeatBotIcon(defaultIconResourceId);
-		this.selectedIcon = new BeatBotIcon(selectedIconResourceId);
-		this.listViewIcon = new BeatBotIcon(listViewIconResourceId);
+		set(defaultIconResourceId, selectedIconResourceId);
+		if (listViewIconResourceId > 0)
+			this.listViewIcon = new BeatBotIcon(listViewIconResourceId);
 	}
 }
