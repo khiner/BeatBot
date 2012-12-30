@@ -30,27 +30,31 @@ public class DirectoryManager {
 			"hh_open", "rim" };
 
 	public void initIcons() {
-		getDrumInstrument(0).setIconResources(R.drawable.kick_icon_src,
+		getDrumInstrument(0).getBBIconSource().set(R.drawable.kick_icon_src,
 				R.drawable.kick_icon, R.drawable.kick_icon_selected,
-				R.drawable.kick_icon_listview);
-		getDrumInstrument(1).setIconResources(R.drawable.snare_icon_src,
+				R.drawable.kick_icon_listview, R.drawable.kick_icon_list_title);
+		getDrumInstrument(1).getBBIconSource().set(R.drawable.snare_icon_src,
 				R.drawable.snare_icon, R.drawable.snare_icon_selected,
-				R.drawable.snare_icon_listview);
-		getDrumInstrument(2).setIconResources(R.drawable.hh_closed_icon_src,
+				R.drawable.snare_icon_listview, R.drawable.snare_icon_list_title);
+		getDrumInstrument(2).getBBIconSource().set(R.drawable.hh_closed_icon_src,
 				R.drawable.hh_closed_icon, R.drawable.hh_closed_icon_selected,
-				R.drawable.hh_closed_icon_listview);
-		getDrumInstrument(3).setIconResources(R.drawable.hh_open_icon_src,
+				R.drawable.hh_closed_icon_listview, R.drawable.hh_closed_icon_list_title);
+		getDrumInstrument(3).getBBIconSource().set(R.drawable.hh_open_icon_src,
 				R.drawable.hh_open_icon, R.drawable.hh_open_icon_selected,
-				R.drawable.hh_open_icon_listview);
-		getDrumInstrument(4).setIconResources(R.drawable.rimshot_icon_src,
+				R.drawable.hh_open_icon_listview, R.drawable.hh_open_icon_list_title);
+		getDrumInstrument(4).getBBIconSource().set(R.drawable.rimshot_icon_src,
 				R.drawable.rimshot_icon, R.drawable.rimshot_icon_selected,
-				R.drawable.rimshot_icon_listview);
-		drumsDirectory.setIconResources(-1, -1, -1,
-				R.drawable.drums_icon_listview);
-		internalRecordDirectory.setIconResources(
+				R.drawable.rimshot_icon_listview, R.drawable.rimshot_icon_list_title);
+		drumsDirectory.getBBIconSource().set(-1, -1, -1,
+				R.drawable.drums_icon_listview, R.drawable.drums_icon_list_title);
+		internalRecordDirectory.getBBIconSource().set(
 				R.drawable.microphone_icon_src, R.drawable.microphone_icon,
 				R.drawable.microphone_icon_selected,
-				R.drawable.microphone_icon_listview);
+				R.drawable.microphone_icon_listview, R.drawable.microphone_icon_list_title);
+		internalBeatRecordDirectory.getBBIconSource().set(-1, -1, -1, 
+				R.drawable.beat_icon_listview, R.drawable.beat_icon_list_title);
+		internalSampleRecordDirectory.getBBIconSource().set(-1, -1, -1, 
+				R.drawable.sample_icon_listview, R.drawable.sample_icon_list_title);
 	}
 
 	private static DirectoryManager singletonInstance = null;
@@ -93,9 +97,9 @@ public class DirectoryManager {
 		internalRecordDirectory = new BBDirectory(internalDirectory,
 				"recorded", new BBIconSource());
 		internalSampleRecordDirectory = new Instrument(internalRecordDirectory,
-				"samples", null);
+				"samples", new BBIconSource());
 		internalBeatRecordDirectory = new Instrument(internalRecordDirectory,
-				"beats", null);
+				"beats", new BBIconSource());
 		internalBeatRecordDirectory
 				.setEmptyMsg("You haven't recorded any beats yet!  Use the record button at the top to record your beats.");
 		for (String drumName : drumNames) {
@@ -103,7 +107,6 @@ public class DirectoryManager {
 		}
 		instrumentSelectAlertBuilder = new AlertDialog.Builder(
 				GlobalVars.mainActivity);
-		instrumentSelectAlertBuilder.setTitle("Choose Instrument");
 		initInstrumentSelectOnShowListener();
 	}
 
@@ -118,17 +121,16 @@ public class DirectoryManager {
 		instrumentSelectAlertBuilder.setAdapter(instrumentSelectAdapter,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
+						BBDirectory parent = currDirectory;
 						currDirectory = currDirectory.getChild(item);
 						if (currDirectory == null) {
 							// Instrument type
 							if (addingTrack) {
 								Managers.trackManager.addTrack(
-										(Instrument) currDirectory.getParent(),
-										item);
+										(Instrument) parent, item);
 							} else {
 								TrackPage.getTrack().setInstrument(
-										(Instrument) currDirectory.getParent(),
-										item);
+										(Instrument) parent, item);
 							}
 							TrackPageFactory.updatePages();
 							currDirectory = internalDirectory;
@@ -141,10 +143,9 @@ public class DirectoryManager {
 							return;
 						}
 						// if the directory is empty, display the directory's
-						// empty message
-						// otherwise, show the next child directories in a
-						// select alert list
-						if (currDirectory.getChildren().isEmpty()) {
+						// empty message. otherwise, show the next child
+						// directories in a select alert list
+						if (currDirectory.getChildNames().length == 0) {
 							Toast.makeText(GlobalVars.mainActivity,
 									currDirectory.getEmptyMsg(),
 									Toast.LENGTH_SHORT).show();
@@ -154,6 +155,16 @@ public class DirectoryManager {
 					}
 
 				});
+		if (currDirectory.getBBIconSource() != null
+				&& currDirectory.getBBIconSource().listTitleIconResource > 0) {
+			instrumentSelectAlertBuilder.setIcon(currDirectory
+					.getBBIconSource().listTitleIconResource)
+					.setTitle(currDirectory.getName().toUpperCase());
+		} else {
+			instrumentSelectAlertBuilder.setIcon(0)
+			.setTitle("Choose Instrument");
+		}
+		
 		instrumentSelectAlert = instrumentSelectAlertBuilder.create();
 		instrumentSelectAlert.setOnShowListener(instrumentSelectOnShowListener);
 	}
@@ -213,10 +224,17 @@ public class DirectoryManager {
 		}
 	}
 
+	private String[] formatNames(String[] names) {
+		String[] formattedNames = new String[names.length];
+		for (int i = 0; i < names.length; i++) {
+			formattedNames[i] = names[i].replace(".bb", "");
+		}
+		return formattedNames;
+	}
+	
 	private void initInstrumentSelectAdapter(final Activity activity,
 			final BBDirectory directory) {
-		String[] list = directory instanceof Instrument ? ((Instrument) directory)
-				.getSampleNames() : directory.getChildNames();
+		String[] list = formatNames(directory.getChildNames());
 		instrumentSelectAdapter = new ArrayAdapter<String>(activity,
 				android.R.layout.select_dialog_item, android.R.id.text1, list) {
 			public View getView(int position, View convertView, ViewGroup parent) {
@@ -234,7 +252,7 @@ public class DirectoryManager {
 					return v;
 				}
 				tv.setCompoundDrawablesWithIntrinsicBounds(
-						iconSource.listViewIcon.resourceId, 0, 0, 0);
+						iconSource.listViewIconResource, 0, 0, 0);
 				// Add margin between image and text (support various screen
 				// densities)
 				int dp5 = (int) (5 * activity.getResources()

@@ -31,7 +31,6 @@ void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName) {
 	wavfile_freeBuffers(wavFile);
 	// if sample is less than 5 seconds, load into memory from a separate, temporary file
 	if (wavFile->totalSamples <= 5 * SAMPLE_RATE) {
-		__android_log_print(ANDROID_LOG_ERROR, "YourApp", "formatted message");
 		FILE *tempFile = fopen(sampleFileName, "rb");
 		/** allocate memory to hold samples (memory is freed in wavfile_destroy)
 		 *

@@ -48,7 +48,7 @@ public class SampleSelectPage extends TrackPage {
 	private void updateInstrumentIcon() {
 		// update the track pager instrument icon
 		instrumentSelect
-				.setImageResource(track.getInstrument().getIconSource());
+				.setImageResource(track.getInstrument().getBBIconSource().iconSource);
 		// update the midi view instrument icon
 		MidiTrackControlHelper.updateInstrumentIcon(track.getId());
 	}

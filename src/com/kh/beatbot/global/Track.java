@@ -168,7 +168,7 @@ public class Track {
 
 	private void constructLoopPointMap() {
 		sampleLoopPoints.clear();
-		for (int sampleNum = 0; sampleNum < instrument.getSampleNames().length; sampleNum++) {
+		for (int sampleNum = 0; sampleNum < instrument.getChildNames().length; sampleNum++) {
 			long numSamples = instrument.getNumSamples(sampleNum);
 			sampleLoopPoints.put(sampleNum, new LoopSampleInfo(numSamples));
 		}

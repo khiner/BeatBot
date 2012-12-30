@@ -7,12 +7,11 @@ import java.util.List;
 import com.kh.beatbot.manager.DirectoryManager;
 
 public class BBDirectory {
-	protected String name;
-	protected String path;
-	protected BBIconSource bbIconSource;
+	protected String name = null;
+	protected String path = null;
+	protected BBIconSource bbIconSource = null;
 	protected List<BBDirectory> children = new ArrayList<BBDirectory>();
-	protected int iconSource;
-	protected BBDirectory parent;
+	protected BBDirectory parent = null;
 	protected String emptyMsg = "This directoy is empty.";
 
 	public BBDirectory(BBDirectory parent, String name,
@@ -37,22 +36,9 @@ public class BBDirectory {
 		return name;
 	}
 
-	public void setIconResources(int iconSource, int defaultIconResource,
-			int selectedIconResource, int listViewIconResource) {
-		this.iconSource = iconSource;
-		bbIconSource.set(defaultIconResource, selectedIconResource,
-				listViewIconResource);
-	}
-
-	public void setIconSource(int iconSource) {
-		this.iconSource = iconSource;
-	}
-
-	public int getIconSource() {
-		return iconSource;
-	}
-
 	public BBIconSource getBBIconSource() {
+		if (bbIconSource == null && parent != null)
+			return parent.bbIconSource;
 		return bbIconSource;
 	}
 

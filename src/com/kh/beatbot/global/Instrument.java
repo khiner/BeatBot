@@ -11,17 +11,12 @@ public class Instrument extends BBDirectory {
 		updateFiles();
 	}
 
-	public BBIconSource getBBIconSource() {
-		if (bbIconSource == null)
-			return parent.bbIconSource;
-		return bbIconSource;
-	}
-
 	public File getSampleFile(int sampleNum) {
 		return sampleFiles[sampleNum];
 	}
 
-	public String[] getSampleNames() {
+	@Override
+	public String[] getChildNames() {
 		return sampleNames;
 	}
 

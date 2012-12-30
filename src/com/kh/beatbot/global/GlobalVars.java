@@ -12,13 +12,13 @@ public class GlobalVars {
 	public static BBIconSource muteIcon, soloIcon, previewIcon, beatSyncIcon;
 
 	public static void initIcons() {
-		muteIcon = new BBIconSource(R.drawable.mute_icon,
+		muteIcon = new BBIconSource(-1, R.drawable.mute_icon,
 				R.drawable.mute_icon_selected);
-		soloIcon = new BBIconSource(R.drawable.solo_icon,
+		soloIcon = new BBIconSource(-1, R.drawable.solo_icon,
 				R.drawable.solo_icon_selected);
-		previewIcon = new BBIconSource(R.drawable.preview_icon,
+		previewIcon = new BBIconSource(-1, R.drawable.preview_icon,
 				R.drawable.preview_icon_selected);
-		beatSyncIcon = new BBIconSource(R.drawable.clock, R.drawable.note_icon);
+		beatSyncIcon = new BBIconSource(-1, R.drawable.clock, R.drawable.note_icon);
 	}
 
 	public static Typeface font;

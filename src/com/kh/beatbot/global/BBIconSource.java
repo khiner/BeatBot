@@ -3,41 +3,56 @@ package com.kh.beatbot.global;
 public class BBIconSource {
 	public BBIcon defaultIcon = null;
 	public BBIcon selectedIcon = null;
-	public BBIcon listViewIcon = null;
+	public int iconSource;
+	public int listViewIconResource = -1;
+	public int listTitleIconResource = -1;
 
 	public BBIconSource() {
 
 	}
 
-	public BBIconSource(int defaultIconResourceId, int selectedIconResourceId) {
-		this(new BBIcon(defaultIconResourceId), new BBIcon(
-				selectedIconResourceId), null);
+	public BBIconSource(int iconSource, int defaultIconResourceId, int selectedIconResourceId) {
+		this(iconSource, defaultIconResourceId, selectedIconResourceId, -1);
 	}
 
-	public BBIconSource(int defaultIconResourceId, int selectedIconResourceId,
+	public BBIconSource(int iconSource, int defaultIconResourceId, int selectedIconResourceId,
 			int listViewIconResourceId) {
-		this(new BBIcon(defaultIconResourceId), new BBIcon(
-				selectedIconResourceId), new BBIcon(listViewIconResourceId));
+		this(iconSource, new BBIcon(defaultIconResourceId), new BBIcon(
+				selectedIconResourceId), listViewIconResourceId, -1);
 	}
 
-	public BBIconSource(BBIcon defaultIcon, BBIcon selectedIcon,
-			BBIcon listViewIcon) {
+	public BBIconSource(int iconSource, int defaultIconResourceId, int selectedIconResourceId,
+			int listViewIconResourceId, int listTitleIconResourceId) {
+		this(iconSource, new BBIcon(defaultIconResourceId), new BBIcon(
+				selectedIconResourceId), listViewIconResourceId, listTitleIconResourceId);
+	}
+	
+	public BBIconSource(int iconSource, BBIcon defaultIcon, BBIcon selectedIcon,
+			int listViewIconResource, int listTitleIconResource) {
 		this.defaultIcon = defaultIcon;
 		this.selectedIcon = selectedIcon;
-		this.listViewIcon = listViewIcon;
+		this.iconSource = iconSource;
+		this.listViewIconResource = listViewIconResource;
+		this.listTitleIconResource = listTitleIconResource;
 	}
 
-	public void set(int defaultIconResourceId, int selectedIconResourceId) {
+	public void set(int iconSource, int defaultIconResourceId, int selectedIconResourceId) {
+		this.iconSource = iconSource;
 		if (defaultIconResourceId > 0)
 			this.defaultIcon = new BBIcon(defaultIconResourceId);
 		if (selectedIconResourceId > 0)
 			this.selectedIcon = new BBIcon(selectedIconResourceId);
 	}
 
-	public void set(int defaultIconResourceId, int selectedIconResourceId,
+	public void set(int iconSource, int defaultIconResourceId, int selectedIconResourceId,
 			int listViewIconResourceId) {
-		set(defaultIconResourceId, selectedIconResourceId);
-		if (listViewIconResourceId > 0)
-			this.listViewIcon = new BBIcon(listViewIconResourceId);
+		set(iconSource, defaultIconResourceId, selectedIconResourceId);
+		this.listViewIconResource = listViewIconResourceId;
+	}
+	
+	public void set(int iconSource, int defaultIconResourceId, int selectedIconResourceId,
+			int listViewIconResourceId, int listTitleIconResourceId) {
+		set(iconSource, defaultIconResourceId, selectedIconResourceId, listViewIconResourceId);
+		this.listTitleIconResource = listTitleIconResourceId;
 	}
 }
