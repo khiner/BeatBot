@@ -1,6 +1,5 @@
 package com.kh.beatbot.manager;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
@@ -25,10 +24,120 @@ import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
 public class DirectoryManager {
 
-	public static String appDirectoryPath;
+	private class SampleListOnClickAndShowListener implements
+			DialogInterface.OnClickListener, OnShowListener {
+		@Override
+		public void onClick(DialogInterface dialog, int item) {
+			BBDirectory parent = currDirectory;
+			currDirectory = currDirectory.getChild(item);
+			if (currDirectory == null) {
+				// Instrument type
+				if (addingTrack) {
+					Managers.trackManager.addTrack((Instrument) parent, item);
+				} else {
+					TrackPage.getTrack().setInstrument((Instrument) parent,
+							item);
+				}
+				MidiTrackControlHelper.updateInstrumentIcon(TrackPage
+						.getTrack().getId());
+				TrackPageFactory.updatePages();
+				currDirectory = internalDirectory;
+			}
+			updateInstrumentSelectAlert(currDirectory);
+			// if the current dir is the root directory, we've
+			// already selected a sample
+			// do not display any select alert list.
+			if (currDirectory == internalDirectory) {
+				return;
+			}
+			// if the directory is empty, display the directory's
+			// empty message. otherwise, show the next child
+			// directories in a select alert list
+			if (currDirectory.getChildNames().length == 0) {
+				Toast.makeText(GlobalVars.mainActivity,
+						currDirectory.getEmptyMsg(), Toast.LENGTH_SHORT).show();
+			} else {
+				instrumentSelectAlert.show();
+			}
+		}
 
-	public static final String[] drumNames = { "kick", "snare", "hh_closed",
-			"hh_open", "rim" };
+		@Override
+		public void onShow(DialogInterface alert) {
+			ListView listView = ((AlertDialog) alert).getListView();
+			final ListAdapter originalAdapter = listView.getAdapter();
+
+			listView.setAdapter(new ListAdapter() {
+				@Override
+				public int getCount() {
+					return originalAdapter.getCount();
+				}
+
+				@Override
+				public Object getItem(int id) {
+					return originalAdapter.getItem(id);
+				}
+
+				@Override
+				public long getItemId(int id) {
+					return originalAdapter.getItemId(id);
+				}
+
+				@Override
+				public int getItemViewType(int id) {
+					return originalAdapter.getItemViewType(id);
+				}
+
+				@Override
+				public View getView(int position, View convertView,
+						ViewGroup parent) {
+					View view = originalAdapter.getView(position, convertView,
+							parent);
+					TextView textView = (TextView) view;
+					textView.setTypeface(GlobalVars.font);
+					textView.setText(textView.getText().toString()
+							.toUpperCase());
+					return view;
+				}
+
+				@Override
+				public int getViewTypeCount() {
+					return originalAdapter.getViewTypeCount();
+				}
+
+				@Override
+				public boolean hasStableIds() {
+					return originalAdapter.hasStableIds();
+				}
+
+				@Override
+				public boolean isEmpty() {
+					return originalAdapter.isEmpty();
+				}
+
+				@Override
+				public void registerDataSetObserver(DataSetObserver observer) {
+					originalAdapter.registerDataSetObserver(observer);
+
+				}
+
+				@Override
+				public void unregisterDataSetObserver(DataSetObserver observer) {
+					originalAdapter.unregisterDataSetObserver(observer);
+
+				}
+
+				@Override
+				public boolean areAllItemsEnabled() {
+					return originalAdapter.areAllItemsEnabled();
+				}
+
+				@Override
+				public boolean isEnabled(int position) {
+					return originalAdapter.isEnabled(position);
+				}
+			});
+		}
+	}
 
 	public void initIcons() {
 		getDrumInstrument(0).getBBIconSource().set(R.drawable.kick_icon_src,
@@ -70,12 +179,17 @@ public class DirectoryManager {
 				R.drawable.sample_icon_list_title);
 	}
 
+	public static String appDirectoryPath;
+
+	public static final String[] drumNames = { "kick", "snare", "hh_closed",
+			"hh_open", "rim" };
+
 	private static DirectoryManager singletonInstance = null;
 
+	private SampleListOnClickAndShowListener sampleListOnClickAndShowListener = new SampleListOnClickAndShowListener();
 	private AlertDialog.Builder instrumentSelectAlertBuilder;
 	private AlertDialog instrumentSelectAlert = null;
 	private ListAdapter instrumentSelectAdapter = null;
-	private OnShowListener instrumentSelectOnShowListener = null;
 
 	private BBDirectory internalDirectory = null;
 	private BBDirectory internalRecordDirectory = null;
@@ -120,92 +234,38 @@ public class DirectoryManager {
 		}
 		instrumentSelectAlertBuilder = new AlertDialog.Builder(
 				GlobalVars.mainActivity);
-		initInstrumentSelectOnShowListener();
 	}
 
 	public void updateDirectories() {
 		for (BBDirectory dir : drumsDirectory.getChildren()) {
 			((Instrument) dir).updateFiles();
 		}
+		((Instrument) internalBeatRecordDirectory).updateFiles();
 	}
 
 	public void updateInstrumentSelectAlert(BBDirectory newDirectory) {
-		initInstrumentSelectAdapter(GlobalVars.mainActivity, newDirectory);
+		updateInstrumentSelectAdapter(newDirectory);
+		updateInstrumentSelectTitleBar();
 		instrumentSelectAlertBuilder.setAdapter(instrumentSelectAdapter,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						BBDirectory parent = currDirectory;
-						currDirectory = currDirectory.getChild(item);
-						if (currDirectory == null) {
-							// Instrument type
-							if (addingTrack) {
-								Managers.trackManager.addTrack(
-										(Instrument) parent, item);
-							} else {
-								TrackPage.getTrack().setInstrument(
-										(Instrument) parent, item);
-							}
-							MidiTrackControlHelper.updateInstrumentIcon(TrackPage.getTrack().getId());
-							TrackPageFactory.updatePages();
-							currDirectory = internalDirectory;
-						}
-						updateInstrumentSelectAlert(currDirectory);
-						// if the current dir is the root directory, we've
-						// already selected a sample
-						// do not display any select alert list.
-						if (currDirectory == internalDirectory) {
-							return;
-						}
-						// if the directory is empty, display the directory's
-						// empty message. otherwise, show the next child
-						// directories in a select alert list
-						if (currDirectory.getChildNames().length == 0) {
-							Toast.makeText(GlobalVars.mainActivity,
-									currDirectory.getEmptyMsg(),
-									Toast.LENGTH_SHORT).show();
-						} else {
-							instrumentSelectAlert.show();
-						}
-					}
-
-				});
-		if (currDirectory.getBBIconSource() != null
-				&& currDirectory.getBBIconSource().listTitleIconResource > 0) {
-			instrumentSelectAlertBuilder.setIcon(
-					currDirectory.getBBIconSource().listTitleIconResource)
-					.setTitle(currDirectory.getName().toUpperCase());
-		} else {
-			instrumentSelectAlertBuilder.setIcon(0).setTitle(
-					"Choose Instrument");
-		}
-
+				sampleListOnClickAndShowListener);
 		instrumentSelectAlert = instrumentSelectAlertBuilder.create();
-		instrumentSelectAlert.setOnShowListener(instrumentSelectOnShowListener);
+		instrumentSelectAlert
+				.setOnShowListener(sampleListOnClickAndShowListener);
 	}
 
 	public void showAddTrackAlert() {
 		addingTrack = true;
-		currDirectory = internalDirectory;
-		updateInstrumentSelectAlert(currDirectory);
-		instrumentSelectAlert.show();
+		show(internalDirectory);
 	}
 
 	public void showInstrumentSelectAlert() {
 		addingTrack = false;
-		currDirectory = internalDirectory;
-		updateInstrumentSelectAlert(currDirectory);
-		instrumentSelectAlert.show();
+		show(internalDirectory);
 	}
 
 	public void showSampleSelectAlert() {
 		addingTrack = false;
-		currDirectory = TrackPage.getTrack().getInstrument();
-		updateInstrumentSelectAlert(currDirectory);
-		instrumentSelectAlert.show();
-	}
-
-	public void updateRecordDirectory() {
-		((Instrument) internalBeatRecordDirectory).updateFiles();
+		show(TrackPage.getTrack().getInstrument());
 	}
 
 	public Instrument getDrumInstrument(int drumNum) {
@@ -222,6 +282,12 @@ public class DirectoryManager {
 
 	public String getInternalRecordDirectory() {
 		return internalBeatRecordDirectory.getPath();
+	}
+
+	private void show(BBDirectory directory) {
+		currDirectory = directory;
+		updateInstrumentSelectAlert(currDirectory);
+		instrumentSelectAlert.show();
 	}
 
 	private void initDataDir() {
@@ -246,116 +312,45 @@ public class DirectoryManager {
 		return formattedNames;
 	}
 
-	private void initInstrumentSelectAdapter(final Activity activity,
-			final BBDirectory directory) {
+	private void updateInstrumentSelectTitleBar() {
+		if (currDirectory.getBBIconSource() != null
+				&& currDirectory.getBBIconSource().listTitleIconResource > 0) {
+			instrumentSelectAlertBuilder.setIcon(
+					currDirectory.getBBIconSource().listTitleIconResource)
+					.setTitle(currDirectory.getName().toUpperCase());
+		} else {
+			instrumentSelectAlertBuilder.setIcon(0).setTitle(
+					"Choose Instrument");
+		}
+	}
+
+	private void updateInstrumentSelectAdapter(final BBDirectory directory) {
 		String[] list = formatNames(directory.getChildNames());
-		instrumentSelectAdapter = new ArrayAdapter<String>(activity,
-				android.R.layout.select_dialog_item, android.R.id.text1, list) {
+		instrumentSelectAdapter = new ArrayAdapter<String>(
+				GlobalVars.mainActivity, android.R.layout.select_dialog_item,
+				android.R.id.text1, list) {
 			public View getView(int position, View convertView, ViewGroup parent) {
 				View v = super.getView(position, convertView, parent);
 				TextView tv = (TextView) v.findViewById(android.R.id.text1);
-				// Put the image on the TextView
-				if (directory instanceof Instrument) {
+				// if the directory is a root directory (only sample children)
+				// or
+				// does not have an icon, no icon for this list element
+				if (directory instanceof Instrument
+						|| directory.getChild(position).getBBIconSource() == null) {
 					tv.setCompoundDrawables(null, null, null, null);
 					return v;
 				}
 				BBIconSource iconSource = directory.getChild(position)
 						.getBBIconSource();
-				if (iconSource == null) {
-					tv.setCompoundDrawables(null, null, null, null);
-					return v;
-				}
 				tv.setCompoundDrawablesWithIntrinsicBounds(
 						iconSource.listViewIconResource, 0, 0, 0);
 				// Add margin between image and text (support various screen
 				// densities)
-				int dpMargin = (int) (15 * activity.getResources()
-						.getDisplayMetrics().density + 0.5f);
+				int dpMargin = (int) (15 * GlobalVars.mainActivity
+						.getResources().getDisplayMetrics().density + 0.5f);
 				tv.setCompoundDrawablePadding(dpMargin);
 
 				return v;
-			}
-		};
-	}
-
-	private void initInstrumentSelectOnShowListener() {
-		instrumentSelectOnShowListener = new OnShowListener() {
-			@Override
-			public void onShow(DialogInterface alert) {
-				ListView listView = ((AlertDialog) alert).getListView();
-				final ListAdapter originalAdapter = listView.getAdapter();
-
-				listView.setAdapter(new ListAdapter() {
-					@Override
-					public int getCount() {
-						return originalAdapter.getCount();
-					}
-
-					@Override
-					public Object getItem(int id) {
-						return originalAdapter.getItem(id);
-					}
-
-					@Override
-					public long getItemId(int id) {
-						return originalAdapter.getItemId(id);
-					}
-
-					@Override
-					public int getItemViewType(int id) {
-						return originalAdapter.getItemViewType(id);
-					}
-
-					@Override
-					public View getView(int position, View convertView,
-							ViewGroup parent) {
-						View view = originalAdapter.getView(position,
-								convertView, parent);
-						TextView textView = (TextView) view;
-						textView.setTypeface(GlobalVars.font);
-						textView.setText(textView.getText().toString()
-								.toUpperCase());
-						return view;
-					}
-
-					@Override
-					public int getViewTypeCount() {
-						return originalAdapter.getViewTypeCount();
-					}
-
-					@Override
-					public boolean hasStableIds() {
-						return originalAdapter.hasStableIds();
-					}
-
-					@Override
-					public boolean isEmpty() {
-						return originalAdapter.isEmpty();
-					}
-
-					@Override
-					public void registerDataSetObserver(DataSetObserver observer) {
-						originalAdapter.registerDataSetObserver(observer);
-
-					}
-
-					@Override
-					public void unregisterDataSetObserver(
-							DataSetObserver observer) {
-						originalAdapter.unregisterDataSetObserver(observer);
-
-					}
-
-					@Override
-					public boolean areAllItemsEnabled() {
-						return originalAdapter.areAllItemsEnabled();
-					}
-
-					@Override
-					public boolean isEnabled(int position) {
-						return originalAdapter.isEnabled(position);
-					}
-				});
 			}
 		};
 	}

@@ -369,7 +369,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 			// Managers.recordManager.stopListening();
 			String fileName = Managers.recordManager.stopRecordingAndWriteWav();
 			// make sure the recorded instrument shows the newly recorded "song"
-			Managers.directoryManager.updateRecordDirectory();
+			Managers.directoryManager.updateDirectories();
 			TrackPageFactory.updatePages();
 
 			Toast.makeText(getApplicationContext(),
