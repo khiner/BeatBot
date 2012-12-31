@@ -21,6 +21,7 @@ import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Instrument;
 import com.kh.beatbot.layout.page.TrackPage;
 import com.kh.beatbot.layout.page.TrackPageFactory;
+import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
 public class DirectoryManager {
 
@@ -35,26 +36,38 @@ public class DirectoryManager {
 				R.drawable.kick_icon_listview, R.drawable.kick_icon_list_title);
 		getDrumInstrument(1).getBBIconSource().set(R.drawable.snare_icon_src,
 				R.drawable.snare_icon, R.drawable.snare_icon_selected,
-				R.drawable.snare_icon_listview, R.drawable.snare_icon_list_title);
-		getDrumInstrument(2).getBBIconSource().set(R.drawable.hh_closed_icon_src,
-				R.drawable.hh_closed_icon, R.drawable.hh_closed_icon_selected,
-				R.drawable.hh_closed_icon_listview, R.drawable.hh_closed_icon_list_title);
+				R.drawable.snare_icon_listview,
+				R.drawable.snare_icon_list_title);
+		getDrumInstrument(2).getBBIconSource().set(
+				R.drawable.hh_closed_icon_src, R.drawable.hh_closed_icon,
+				R.drawable.hh_closed_icon_selected,
+				R.drawable.hh_closed_icon_listview,
+				R.drawable.hh_closed_icon_list_title);
 		getDrumInstrument(3).getBBIconSource().set(R.drawable.hh_open_icon_src,
 				R.drawable.hh_open_icon, R.drawable.hh_open_icon_selected,
-				R.drawable.hh_open_icon_listview, R.drawable.hh_open_icon_list_title);
+				R.drawable.hh_open_icon_listview,
+				R.drawable.hh_open_icon_list_title);
 		getDrumInstrument(4).getBBIconSource().set(R.drawable.rimshot_icon_src,
-				R.drawable.rimshot_icon, R.drawable.rimshot_icon_selected,
-				R.drawable.rimshot_icon_listview, R.drawable.rimshot_icon_list_title);
+				R.drawable.rimshot_icon, R.drawable.rimshot_icon_selected2,
+				R.drawable.rimshot_icon_listview,
+				R.drawable.rimshot_icon_list_title);
 		drumsDirectory.getBBIconSource().set(-1, -1, -1,
-				R.drawable.drums_icon_listview, R.drawable.drums_icon_list_title);
+				R.drawable.drums_icon_listview,
+				R.drawable.drums_icon_list_title);
 		internalRecordDirectory.getBBIconSource().set(
 				R.drawable.microphone_icon_src, R.drawable.microphone_icon,
 				R.drawable.microphone_icon_selected,
-				R.drawable.microphone_icon_listview, R.drawable.microphone_icon_list_title);
-		internalBeatRecordDirectory.getBBIconSource().set(-1, -1, -1, 
-				R.drawable.beat_icon_listview, R.drawable.beat_icon_list_title);
-		internalSampleRecordDirectory.getBBIconSource().set(-1, -1, -1, 
-				R.drawable.sample_icon_listview, R.drawable.sample_icon_list_title);
+				R.drawable.microphone_icon_listview,
+				R.drawable.microphone_icon_list_title);
+		internalBeatRecordDirectory.getBBIconSource().set(
+				R.drawable.beat_icon_src, R.drawable.beat_icon,
+				R.drawable.beat_icon_selected, R.drawable.beat_icon_listview,
+				R.drawable.beat_icon_list_title);
+		internalSampleRecordDirectory.getBBIconSource().set(
+				R.drawable.sample_icon_src, R.drawable.sample_icon,
+				R.drawable.sample_icon_selected,
+				R.drawable.sample_icon_listview,
+				R.drawable.sample_icon_list_title);
 	}
 
 	private static DirectoryManager singletonInstance = null;
@@ -132,6 +145,7 @@ public class DirectoryManager {
 								TrackPage.getTrack().setInstrument(
 										(Instrument) parent, item);
 							}
+							MidiTrackControlHelper.updateInstrumentIcon(TrackPage.getTrack().getId());
 							TrackPageFactory.updatePages();
 							currDirectory = internalDirectory;
 						}
@@ -157,14 +171,14 @@ public class DirectoryManager {
 				});
 		if (currDirectory.getBBIconSource() != null
 				&& currDirectory.getBBIconSource().listTitleIconResource > 0) {
-			instrumentSelectAlertBuilder.setIcon(currDirectory
-					.getBBIconSource().listTitleIconResource)
+			instrumentSelectAlertBuilder.setIcon(
+					currDirectory.getBBIconSource().listTitleIconResource)
 					.setTitle(currDirectory.getName().toUpperCase());
 		} else {
-			instrumentSelectAlertBuilder.setIcon(0)
-			.setTitle("Choose Instrument");
+			instrumentSelectAlertBuilder.setIcon(0).setTitle(
+					"Choose Instrument");
 		}
-		
+
 		instrumentSelectAlert = instrumentSelectAlertBuilder.create();
 		instrumentSelectAlert.setOnShowListener(instrumentSelectOnShowListener);
 	}
@@ -231,7 +245,7 @@ public class DirectoryManager {
 		}
 		return formattedNames;
 	}
-	
+
 	private void initInstrumentSelectAdapter(final Activity activity,
 			final BBDirectory directory) {
 		String[] list = formatNames(directory.getChildNames());
@@ -255,9 +269,9 @@ public class DirectoryManager {
 						iconSource.listViewIconResource, 0, 0, 0);
 				// Add margin between image and text (support various screen
 				// densities)
-				int dp5 = (int) (5 * activity.getResources()
+				int dpMargin = (int) (15 * activity.getResources()
 						.getDisplayMetrics().density + 0.5f);
-				tv.setCompoundDrawablePadding(dp5);
+				tv.setCompoundDrawablePadding(dpMargin);
 
 				return v;
 			}

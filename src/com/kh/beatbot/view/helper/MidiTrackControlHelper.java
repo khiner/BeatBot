@@ -23,14 +23,12 @@ public class MidiTrackControlHelper {
 	public static class ButtonRow {
 		int trackNum;
 		float width;
-		BBButton instrumentButton;
-		BBToggleButton muteButton, soloButton;
+		BBToggleButton instrumentButton, muteButton, soloButton;
 
 		public ButtonRow(int trackNum, BBIconSource instrumentIcon) {
 			this.trackNum = trackNum;
-			this.instrumentButton = new BBButton(instrumentIcon,
+			instrumentButton = new BBToggleButton(instrumentIcon,
 					MidiView.trackHeight);
-
 			muteButton = new BBToggleButton(GlobalVars.muteIcon,
 					MidiView.trackHeight);
 			soloButton = new BBToggleButton(GlobalVars.soloIcon,
@@ -40,7 +38,7 @@ public class MidiTrackControlHelper {
 		}
 
 		public void setIconSource(BBIconSource instrumentIcon) {
-			this.instrumentButton.setIconSource(instrumentIcon);
+			instrumentButton.setIconSource(instrumentIcon);
 		}
 
 		public void draw(float y) {
@@ -66,28 +64,30 @@ public class MidiTrackControlHelper {
 		}
 
 		public void handleLongPress(float x) {
-			BBButton pressedButton = getButton(x);
-			if (pressedButton.equals(instrumentButton)
-					&& pressedButton.isTouched()) {
+			BBToggleButton pressedButton = getButton(x);
+			if (pressedButton.equals(instrumentButton)) {
 				listener.trackLongPressed(trackNum);
 			}
-			instrumentButton.release();
+			//instrumentButton.release();
 		}
 
 		public void handleRelease(float x) {
-			BBButton releasedButton = getButton(x);
+			BBToggleButton releasedButton = getButton(x);
 			if (releasedButton != null) {
-				if (releasedButton.equals(instrumentButton)
-						&& releasedButton.isTouched()) {
+				if (releasedButton.equals(instrumentButton) && !instrumentButton.isOn()) {
+					releasedButton.toggle();
 					listener.trackClicked(trackNum);
+					for (ButtonRow buttonRow : buttonRows) {
+						if (!buttonRow.equals(this)) {
+							buttonRow.instrumentButton.setOn(false);
+						}
+					}
 				} else if (releasedButton.equals(muteButton)) {
-					((BBToggleButton) releasedButton).toggle();
-					listener.muteToggled(trackNum,
-							((BBToggleButton) releasedButton).isOn());
+					releasedButton.toggle();
+					listener.muteToggled(trackNum, releasedButton.isOn());
 				} else if (releasedButton.equals(soloButton)) {
-					BBToggleButton soloButton = ((BBToggleButton) releasedButton);
-					soloButton.toggle();
-					listener.soloToggled(trackNum, soloButton.isOn());
+					releasedButton.toggle();
+					listener.soloToggled(trackNum, releasedButton.isOn());
 					if (soloButton.isOn()) {
 						// if this track is soloing, set all other solo icons to
 						// inactive.
@@ -108,7 +108,7 @@ public class MidiTrackControlHelper {
 			soloButton.release();
 		}
 
-		private BBButton getButton(float x) {
+		private BBToggleButton getButton(float x) {
 			if (x < buttonRows.get(0).instrumentButton.getWidth()) {
 				return instrumentButton;
 			} else if (x < buttonRows.get(0).instrumentButton.getWidth()

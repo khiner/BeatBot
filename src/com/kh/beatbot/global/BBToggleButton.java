@@ -16,6 +16,15 @@ public class BBToggleButton extends BBButton {
 		super(iconSource, width, height);
 	}
 
+	public void setIconSource(BBIconSource iconSource) {
+		defaultIcon = iconSource.defaultIcon;
+		selectedIcon = iconSource.selectedIcon;
+		if (on)
+			currentIcon = selectedIcon;
+		else
+			currentIcon = defaultIcon;
+	}
+	
 	@Override
 	public void touch() {
 		// don't change icon on touch event for toggle button.

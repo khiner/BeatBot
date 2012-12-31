@@ -1,9 +1,9 @@
 package com.kh.beatbot.global;
 
 public class BBButton {
-	BBIcon defaultIcon;
-	BBIcon selectedIcon;
-	BBIcon currentIcon;
+	BBIcon defaultIcon = null;
+	BBIcon selectedIcon = null;
+	BBIcon currentIcon = null;
 	private float width, height;
 
 	public BBButton(BBIconSource iconSource) {
