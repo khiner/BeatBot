@@ -9,6 +9,8 @@ import com.kh.beatbot.view.MidiView;
 public class GlobalVars {
 	public static BeatBotActivity mainActivity;
 
+	public static Track currTrack;
+	
 	public static BBIconSource muteIcon, soloIcon, previewIcon, beatSyncIcon;
 
 	public static void initIcons() {

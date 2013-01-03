@@ -43,7 +43,7 @@ public class EffectsPage extends TrackPage {
 		if (!effectLabelList.anyLabels())
 			return;
 		for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
-			Effect effect = track.findEffectByPosition(i);
+			Effect effect = GlobalVars.currTrack.findEffectByPosition(i);
 			if (effect != null) {
 				effectLabelList.setLabelText(i, effect.getName());
 				effectLabelList.setLabelOn(i, effect.on);
@@ -71,7 +71,7 @@ public class EffectsPage extends TrackPage {
 							if (effectNames[item].equals("NONE")) {
 								effectLabelList
 										.setLabelText(lastClickedPos, "");
-								Effect effect = track
+								Effect effect = GlobalVars.currTrack
 										.findEffectByPosition(lastClickedPos);
 								if (effect != null) {
 									effect.removeEffect();
@@ -94,7 +94,7 @@ public class EffectsPage extends TrackPage {
 			effectLabelList = labelList;
 			if (effectLabelList.anyLabels()) {
 				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
-					Effect effect = track.findEffectByPosition(i);
+					Effect effect = GlobalVars.currTrack.findEffectByPosition(i);
 					if (effect != null)
 						labelList.setLabelOn(i, effect.on);
 				}
@@ -107,11 +107,11 @@ public class EffectsPage extends TrackPage {
 
 		@Override
 		public void labelMoved(int oldPosition, int newPosition) {
-			Effect effect = track.findEffectByPosition(oldPosition);
+			Effect effect = GlobalVars.currTrack.findEffectByPosition(oldPosition);
 			if (effect != null) {
 				effect.setPosition(newPosition);
 			}
-			for (Effect other : track.effects) {
+			for (Effect other : GlobalVars.currTrack.effects) {
 				if (other.equals(effect))
 					continue;
 				if (other.getPosition() >= newPosition
@@ -122,9 +122,9 @@ public class EffectsPage extends TrackPage {
 					other.setPosition(other.getPosition() - 1);
 				}
 			}
-			Collections.sort(track.effects);
+			Collections.sort(GlobalVars.currTrack.effects);
 
-			Effect.setEffectPosition(track.getId(), oldPosition, newPosition);
+			Effect.setEffectPosition(GlobalVars.currTrack.getId(), oldPosition, newPosition);
 		}
 
 		@Override
@@ -155,30 +155,30 @@ public class EffectsPage extends TrackPage {
 		Intent intent = new Intent();
 		intent.setClass(context, EffectActivity.class);
 		intent.putExtra("effectPosition", effect.getPosition());
-		intent.putExtra("trackId", track.getId());
+		intent.putExtra("trackId", GlobalVars.currTrack.getId());
 
 		context.startActivity(intent);
 	}
 
 	private Effect getEffect(String effectName, int position) {
-		Effect effect = track.findEffectByPosition(position);
+		Effect effect = GlobalVars.currTrack.findEffectByPosition(position);
 		if (effect != null)
 			return effect;
 		if (effectName.equals(context.getString(R.string.decimate)))
-			effect = new Decimate(effectName, track.getId(), position);
+			effect = new Decimate(effectName, GlobalVars.currTrack.getId(), position);
 		else if (effectName.equals(context.getString(R.string.chorus)))
-			effect = new Chorus(effectName, track.getId(), position);
+			effect = new Chorus(effectName, GlobalVars.currTrack.getId(), position);
 		else if (effectName.equals(context.getString(R.string.delay)))
-			effect = new Delay(effectName, track.getId(), position);
+			effect = new Delay(effectName, GlobalVars.currTrack.getId(), position);
 		else if (effectName.equals(context.getString(R.string.flanger)))
-			effect = new Flanger(effectName, track.getId(), position);
+			effect = new Flanger(effectName, GlobalVars.currTrack.getId(), position);
 		else if (effectName.equals(context.getString(R.string.filter)))
-			effect = new Filter(effectName, track.getId(), position);
+			effect = new Filter(effectName, GlobalVars.currTrack.getId(), position);
 		else if (effectName.equals(context.getString(R.string.reverb)))
-			effect = new Reverb(effectName, track.getId(), position);
+			effect = new Reverb(effectName, GlobalVars.currTrack.getId(), position);
 		else if (effectName.equals(context.getString(R.string.tremelo)))
-			effect = new Tremelo(effectName, track.getId(), position);
-		track.effects.add(effect);
+			effect = new Tremelo(effectName, GlobalVars.currTrack.getId(), position);
+		GlobalVars.currTrack.effects.add(effect);
 		return effect;
 	}
 }

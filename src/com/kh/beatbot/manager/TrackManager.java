@@ -6,7 +6,6 @@ import java.util.List;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Instrument;
 import com.kh.beatbot.global.Track;
-import com.kh.beatbot.layout.page.TrackPage;
 import com.kh.beatbot.layout.page.TrackPageFactory;
 import com.kh.beatbot.listener.MidiTrackControlListener;
 import com.kh.beatbot.midi.MidiNote;
@@ -51,7 +50,7 @@ public class TrackManager implements MidiTrackControlListener {
 		addTrack(newTrack.getSamplePath());
 		tracks.add(newTrack);
 		GlobalVars.midiView.updateTracks();
-		TrackPage.track = tracks.get(tracks.size() - 1);
+		GlobalVars.currTrack = tracks.get(tracks.size() - 1);
 	}
 
 	public void clearNotes() {
@@ -77,7 +76,11 @@ public class TrackManager implements MidiTrackControlListener {
 
 	@Override
 	public void trackClicked(int track) {
-		TrackPageFactory.setTrack(tracks.get(track));
+		Track newTrack = tracks.get(track);
+		if (newTrack == GlobalVars.currTrack)
+			return;
+		GlobalVars.currTrack = newTrack;
+		TrackPageFactory.updatePages();
 	}
 
 	public static native void addTrack(String sampleFileName);

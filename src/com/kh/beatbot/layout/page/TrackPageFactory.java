@@ -7,20 +7,11 @@ import android.app.Activity;
 import android.content.Context;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.Track;
 
 public final class TrackPageFactory {
 	private static Map<TrackPage.Type, TrackPage> instances = new HashMap<TrackPage.Type, TrackPage>();
 
 	private TrackPageFactory() {
-	}
-
-	public static void setTrack(Track track) {
-		if (TrackPage.track == track)
-			return;
-		for (TrackPage trackPage : instances.values()) {
-			trackPage.setTrack(track);
-		}
 	}
 
 	public static void updatePages() {
@@ -45,9 +36,6 @@ public final class TrackPageFactory {
 	private static TrackPage createPageInstance(Context context,
 			Activity parent, TrackPage.Type pageType) {
 		switch (pageType) {
-		case SELECT:
-			return new SampleSelectPage(context,
-					parent.findViewById(R.id.trackPageSelect));
 		case LEVELS:
 			return new LevelsPage(context, parent.findViewById(R.id.levelsPage));
 		case EDIT:

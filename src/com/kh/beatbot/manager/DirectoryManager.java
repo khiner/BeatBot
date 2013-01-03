@@ -18,7 +18,6 @@ import com.kh.beatbot.global.BBDirectory;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Instrument;
-import com.kh.beatbot.layout.page.TrackPage;
 import com.kh.beatbot.layout.page.TrackPageFactory;
 import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
@@ -35,11 +34,10 @@ public class DirectoryManager {
 				if (addingTrack) {
 					Managers.trackManager.addTrack((Instrument) parent, item);
 				} else {
-					TrackPage.getTrack().setInstrument((Instrument) parent,
+					GlobalVars.currTrack.setInstrument((Instrument) parent,
 							item);
 				}
-				MidiTrackControlHelper.updateInstrumentIcon(TrackPage
-						.getTrack().getId());
+				MidiTrackControlHelper.updateInstrumentIcon(GlobalVars.currTrack.getId());
 				TrackPageFactory.updatePages();
 				currDirectory = internalDirectory;
 			}
@@ -265,7 +263,7 @@ public class DirectoryManager {
 
 	public void showSampleSelectAlert() {
 		addingTrack = false;
-		show(TrackPage.getTrack().getInstrument());
+		show(GlobalVars.currTrack.getInstrument());
 	}
 
 	public Instrument getDrumInstrument(int drumNum) {

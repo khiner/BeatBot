@@ -21,7 +21,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,10 +28,8 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import android.widget.ViewFlipper;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
@@ -42,6 +39,7 @@ import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.layout.page.TrackPage;
 import com.kh.beatbot.layout.page.TrackPageFactory;
+import com.kh.beatbot.layout.page.TrackPageSelect;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.DirectoryManager;
@@ -56,15 +54,13 @@ import com.kh.beatbot.view.helper.LevelsViewHelper;
 
 public class BeatBotActivity extends Activity implements LevelListener {
 
-	private int pageNum = 0;
 	private Context cxt = this;
 	private Animation fadeIn, fadeOut;
 	// these are used as variables for convenience, since they are reference
 	// frequently
 	private ToggleButton volume, pan, pitch;
 	private BBSeekbar levelBar;
-
-	private ViewFlipper trackPager;
+	
 	private LinearLayout trackPageSelect;
 	private static AssetManager assetManager;
 
@@ -175,6 +171,8 @@ public class BeatBotActivity extends Activity implements LevelListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		GlobalVars.mainActivity = this;
+		GlobalVars.font = Typeface.createFromAsset(getAssets(),
+				"REDRING-1969-v03.ttf");
 		GeneralUtils.initAndroidSettings(this);
 		SurfaceViewBase.setResources(getResources());
 		setContentView(R.layout.main);
@@ -184,39 +182,8 @@ public class BeatBotActivity extends Activity implements LevelListener {
 			initNativeAudio();
 		}
 		Managers.init(savedInstanceState);
+		((TrackPageSelect)findViewById(R.id.trackPageSelect)).init();
 		initLevelsIconGroup();
-		GlobalVars.font = Typeface.createFromAsset(getAssets(),
-				"REDRING-1969-v03.ttf");
-		trackPageSelect = (LinearLayout) findViewById(R.id.trackPageSelect);
-		for (int i = 1; i < trackPageSelect.getChildCount(); i++) {
-			TextView pageText = null;
-			// TODO clean up
-			if (i == 1) // view 1 is a linear layout containing a sample select
-						// text view
-				pageText = (TextView) ((LinearLayout) trackPageSelect
-						.getChildAt(1)).getChildAt(0);
-			else
-				pageText = (TextView) trackPageSelect.getChildAt(i);
-			pageText.setTypeface(GlobalVars.font);
-			pageText.setGravity(Gravity.CENTER);
-			if (i <= 1) {
-				continue;
-			}
-			final int pageNum = i - 1;
-			pageText.setTag(pageNum);
-			pageText.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					for (int j = 2; j < trackPageSelect.getChildCount(); j++) {
-						TextView pageText = (TextView) trackPageSelect
-								.getChildAt(j);
-						pageText.setSelected(pageNum + 1 == j);
-					}
-					selectTrackPage(v);
-				}
-			});
-		}
-		trackPager = (ViewFlipper) findViewById(R.id.trackFlipper);
 		for (int i = 0; i < TrackPage.NUM_TRACK_PAGES; i++) {
 			TrackPageFactory.createPage(cxt, this, TrackPage.getPageType(i));
 		}
@@ -382,18 +349,6 @@ public class BeatBotActivity extends Activity implements LevelListener {
 				play(findViewById(R.id.playButton));
 			// Managers.recordManager.startListening();
 		}
-	}
-
-	public void selectTrackPage(View view) {
-		int prevPageNum = pageNum;
-		pageNum = (Integer) view.getTag();
-		if (prevPageNum == pageNum)
-			return;
-		TrackPageFactory.getTrackPage(TrackPage.getPageType(prevPageNum))
-				.setVisible(false);
-		trackPager.setDisplayedChild(pageNum);
-		TrackPageFactory.getTrackPage(TrackPage.getPageType(pageNum))
-				.setVisible(true);
 	}
 
 	public void play(View view) {

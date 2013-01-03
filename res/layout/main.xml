@@ -3,8 +3,8 @@
     android:id="@+id/main"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:background="@color/background" >
+    android:background="@color/background"
+    android:orientation="vertical" >
 
     <RelativeLayout
         android:id="@+id/controlButtons"
@@ -32,7 +32,7 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight=".5" />
-    
+
     <LinearLayout
         android:id="@+id/masterLevels"
         android:layout_width="wrap_content"
@@ -93,7 +93,7 @@
             android:textOn="" />
     </LinearLayout>
 
-    <LinearLayout
+    <com.kh.beatbot.layout.page.TrackPageSelect
         android:id="@+id/trackPageSelect"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
@@ -147,29 +147,26 @@
             android:background="@drawable/page_select_src"
             android:text="@string/effects"
             android:textColor="@color/text_selector" />
-    </LinearLayout>
+    </com.kh.beatbot.layout.page.TrackPageSelect>
 
-    <ViewFlipper
-        android:id="@+id/trackFlipper"
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight=".2">
+<ViewFlipper
+    android:id="@+id/trackFlipper"
+    android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight=".2" >
 
-        <include
-            android:id="@+id/sampleSelectPage"
-            layout="@layout/track_sample_select" />
+    <include
+        android:id="@+id/levelsPage"
+        layout="@layout/levels_edit" />
 
-        <include
-            android:id="@+id/levelsPage"
-            layout="@layout/levels_edit" />
+    <include
+        android:id="@+id/sampleEditPage"
+        layout="@layout/track_sample_edit" />
 
-        <include
-            android:id="@+id/sampleEditPage"
-            layout="@layout/track_sample_edit" />
+    <include
+        android:id="@+id/effectsPage"
+        layout="@layout/track_effects" />
 
-        <include
-            android:id="@+id/effectsPage"
-            layout="@layout/track_effects" />
-    </ViewFlipper>
+</ViewFlipper>
 
 </LinearLayout>

@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.SampleWaveformView;
 
 public class SampleEditPage extends TrackPage {
@@ -22,27 +23,27 @@ public class SampleEditPage extends TrackPage {
 		reverseButton = (ToggleButton) layout.findViewById(R.id.reverse);
 		adsrButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
-				track.setAdsrOn(adsrButton.isChecked());
+				GlobalVars.currTrack.setAdsrOn(adsrButton.isChecked());
 			}
 		});
 		loopButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
-				track.toggleLooping();
+				GlobalVars.currTrack.toggleLooping();
 			}
 		});
 		reverseButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
-				track.setReverse(reverseButton.isChecked());
+				GlobalVars.currTrack.setReverse(reverseButton.isChecked());
 			}
 		});
 	}
 
 	@Override
 	protected void update() {
-		sampleWaveformView.setTrack(track);
-		adsrButton.setChecked(track.isAdsrEnabled());
-		loopButton.setChecked(track.isLooping());
-		reverseButton.setChecked(track.isReverse());
+		sampleWaveformView.update();
+		adsrButton.setChecked(GlobalVars.currTrack.isAdsrEnabled());
+		loopButton.setChecked(GlobalVars.currTrack.isLooping());
+		reverseButton.setChecked(GlobalVars.currTrack.isReverse());
 	}
 
 	@Override
