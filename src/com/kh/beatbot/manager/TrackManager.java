@@ -6,7 +6,6 @@ import java.util.List;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Instrument;
 import com.kh.beatbot.global.Track;
-import com.kh.beatbot.layout.page.TrackPageFactory;
 import com.kh.beatbot.listener.MidiTrackControlListener;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.helper.MidiTrackControlHelper;
@@ -80,7 +79,7 @@ public class TrackManager implements MidiTrackControlListener {
 		if (newTrack == GlobalVars.currTrack)
 			return;
 		GlobalVars.currTrack = newTrack;
-		TrackPageFactory.updatePages();
+		PageManager.updateTrackPages();
 	}
 
 	public static native void addTrack(String sampleFileName);

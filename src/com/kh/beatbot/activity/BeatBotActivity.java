@@ -37,14 +37,13 @@ import com.kh.beatbot.effect.Effect.EffectParam;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.layout.page.TrackPage;
-import com.kh.beatbot.layout.page.TrackPageFactory;
 import com.kh.beatbot.layout.page.TrackPageSelect;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.manager.PageManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.view.BBSeekbar;
@@ -184,9 +183,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 		Managers.init(savedInstanceState);
 		((TrackPageSelect)findViewById(R.id.trackPageSelect)).init();
 		initLevelsIconGroup();
-		for (int i = 0; i < TrackPage.NUM_TRACK_PAGES; i++) {
-			TrackPageFactory.createPage(cxt, this, TrackPage.getPageType(i));
-		}
+		PageManager.init(this);
 		setEditIconsEnabled(false);
 		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));
 		if (savedInstanceState != null) {
@@ -337,7 +334,7 @@ public class BeatBotActivity extends Activity implements LevelListener {
 			String fileName = Managers.recordManager.stopRecordingAndWriteWav();
 			// make sure the recorded instrument shows the newly recorded "song"
 			Managers.directoryManager.updateDirectories();
-			TrackPageFactory.updatePages();
+			PageManager.updateTrackPages();
 
 			Toast.makeText(getApplicationContext(),
 					"Recorded file to " + fileName, Toast.LENGTH_SHORT).show();

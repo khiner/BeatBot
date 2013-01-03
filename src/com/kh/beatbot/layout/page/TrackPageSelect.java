@@ -7,17 +7,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.ViewFlipper;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.PageManager;
 
 public class TrackPageSelect extends LinearLayout {
 	private TextView sampleSelect;
 	private ImageView instrumentSelect;
-	
-	private int pageNum = 0;
 
 	public TrackPageSelect(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -59,23 +57,10 @@ public class TrackPageSelect extends LinearLayout {
 						TextView pageText = (TextView) getChildAt(j);
 						pageText.setSelected(pageNum + 2 == j);
 					}
-					selectTrackPage(v);
+					PageManager.selectTrackPage((Integer)v.getTag());
 				}
 			});
 		}
-	}
-	
-	public void selectTrackPage(View view) {
-		int prevPageNum = pageNum;
-		pageNum = (Integer) view.getTag();
-		if (prevPageNum == pageNum)
-			return;
-		TrackPageFactory.getTrackPage(TrackPage.getPageType(prevPageNum))
-				.setVisible(false);
-		((ViewFlipper) GlobalVars.mainActivity.findViewById(R.id.trackFlipper))
-				.setDisplayedChild(pageNum);
-		TrackPageFactory.getTrackPage(TrackPage.getPageType(pageNum))
-				.setVisible(true);
 	}
 	
 	protected void update() {

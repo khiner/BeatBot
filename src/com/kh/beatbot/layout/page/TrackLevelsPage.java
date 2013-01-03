@@ -1,6 +1,7 @@
 package com.kh.beatbot.layout.page;
 
 import android.content.Context;
+import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ToggleButton;
 
@@ -12,42 +13,48 @@ import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.BBSeekbar;
 
-public class LevelsPage extends TrackPage implements LevelListener {
+public class TrackLevelsPage extends Page implements LevelListener {
+	
+	public TrackLevelsPage(Context context, AttributeSet attrs) {
+		super(context, attrs);
+	}
+
 	private BBSeekbar trackLevel;
 	private ToggleButton volumeToggle, panToggle, pitchToggle;
 
-	public LevelsPage(Context context, View layout) {
-		super(context, layout);
-		trackLevel = (BBSeekbar) layout.findViewById(R.id.trackLevel);
+	public void init() {
+		trackLevel = (BBSeekbar) findViewById(R.id.trackLevel);
 		trackLevel.addLevelListener(this);
-		volumeToggle = (ToggleButton) layout
-				.findViewById(R.id.trackVolumeToggle);
-		panToggle = (ToggleButton) layout.findViewById(R.id.trackPanToggle);
-		pitchToggle = (ToggleButton) layout.findViewById(R.id.trackPitchToggle);
+		volumeToggle = (ToggleButton) findViewById(R.id.trackVolumeToggle);
+		panToggle = (ToggleButton) findViewById(R.id.trackPanToggle);
+		pitchToggle = (ToggleButton) findViewById(R.id.trackPitchToggle);
 
 		volumeToggle.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
 				GlobalVars.currTrack.activeLevelType = LevelType.VOLUME;
-				updateDisplay();
+				update();
 			}
 		});
 		panToggle.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
 				GlobalVars.currTrack.activeLevelType = LevelType.PAN;
-				updateDisplay();
+				update();
 			}
 		});
 		pitchToggle.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
 				GlobalVars.currTrack.activeLevelType = LevelType.PITCH;
-				updateDisplay();
+				update();
 			}
 		});
 	}
-
+	
 	@Override
-	protected void update() {
-		updateDisplay();
+	public void update() {
+		deselectAll();
+		selectActiveLevel();
+		trackLevel.setLevelColor(getActiveLevelColor());
+		trackLevel.setLevel(getActiveLevel());
 	}
 
 	@Override
@@ -133,12 +140,5 @@ public class LevelsPage extends TrackPage implements LevelListener {
 			return GlobalVars.currTrack.pitch;
 		}
 		return GlobalVars.currTrack.volume;
-	}
-
-	private void updateDisplay() {
-		deselectAll();
-		selectActiveLevel();
-		trackLevel.setLevelColor(getActiveLevelColor());
-		trackLevel.setLevel(getActiveLevel());
 	}
 }
