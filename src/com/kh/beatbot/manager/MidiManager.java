@@ -108,15 +108,6 @@ public class MidiManager implements Parcelable {
 		return levelSelectedNotes;
 	}
 
-	public List<MidiNote> getLevelViewSelectedNotes() {
-		ArrayList<MidiNote> levelViewSelectedNotes = new ArrayList<MidiNote>();
-		for (MidiNote midiNote : midiNotes) {
-			if (midiNote.isLevelViewSelected())
-				levelViewSelectedNotes.add(midiNote);
-		}
-		return levelViewSelectedNotes;
-	}
-
 	public MidiNote getMidiNote(int i) {
 		// if there is a temporary (clipped or deleted) version of the note,
 		// return that version instead
@@ -172,12 +163,9 @@ public class MidiManager implements Parcelable {
 		for (MidiNote midiNote : midiNotes) {
 			if (midiNote.getNoteValue() == rowNum) {
 				midiNote.setSelected(true);
-				// midiNote.setLevelSelected(true);
-				midiNote.setLevelViewSelected(true);
 			} else {
 				midiNote.setSelected(false);
 				midiNote.setLevelSelected(false);
-				midiNote.setLevelViewSelected(false);
 			}
 		}
 		updateEditIcons();

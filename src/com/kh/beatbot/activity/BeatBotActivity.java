@@ -13,7 +13,6 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -21,12 +20,10 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -48,11 +45,6 @@ import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.SurfaceViewBase;
 
 public class BeatBotActivity extends Activity {
-
-	private Context cxt = this;
-	private Animation fadeIn, fadeOut;
-	// these are used as variables for convenience, since they are reference
-	// frequently
 	private LinearLayout trackPageSelect;
 	private static AssetManager assetManager;
 
@@ -168,9 +160,6 @@ public class BeatBotActivity extends Activity {
 		PageManager.init(this);
 		setEditIconsEnabled(false);
 		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));
-		if (savedInstanceState != null) {
-			GlobalVars.midiView.readFromBundle(savedInstanceState);
-		}
 
 		// were we recording and/or playing before losing the instance?
 		if (savedInstanceState != null) {
@@ -215,7 +204,6 @@ public class BeatBotActivity extends Activity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putParcelable("midiManager", Managers.midiManager);
-		GlobalVars.midiView.writeToBundle(outState);
 		outState.putBoolean(
 				"playing",
 				Managers.playbackManager.getState() == PlaybackManager.State.PLAYING);
@@ -356,11 +344,6 @@ public class BeatBotActivity extends Activity {
 
 	public void undo(View view) {
 		Managers.midiManager.undo();
-		GlobalVars.midiView.handleUndo();
-	}
-
-	public void levels(View view) {
-		GlobalVars.midiView.toggleLevelsView();
 	}
 
 	public void copy(View view) {
