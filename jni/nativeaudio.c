@@ -50,27 +50,31 @@ static inline void writeFloatsToFile(float **buffer, int size, FILE *out) {
 	}
 }
 
-static inline void processEffects(Track *track) {
-	track->levels->volPan->process(track->levels->volPan->config,
-			track->currBufferFloat, BUFF_SIZE);
-	pthread_mutex_lock(&track->levels->effectMutex);
-	EffectNode *effectNode = track->levels->effectHead;
+static inline void processEffects(Levels *levels, float **floatBuffer) {
+	levels->volPan->process(levels->volPan->config,
+			floatBuffer, BUFF_SIZE);
+	pthread_mutex_lock(&levels->effectMutex);
+	EffectNode *effectNode = levels->effectHead;
 	while (effectNode != NULL) {
 		if (effectNode->effect != NULL && effectNode->effect->on) {
 			effectNode->effect->process(effectNode->effect->config,
-					track->currBufferFloat, BUFF_SIZE);
+					floatBuffer, BUFF_SIZE);
 		}
 		effectNode = effectNode->next;
 	}
-	pthread_mutex_unlock(&track->levels->effectMutex);
+	pthread_mutex_unlock(&levels->effectMutex);
 }
 
 static inline void processEffectsForAllTracks() {
 	TrackNode *cur_ptr = trackHead;
 	while (cur_ptr != NULL) {
-		processEffects(cur_ptr->track);
+		processEffects(cur_ptr->track->levels, cur_ptr->track->currBufferFloat);
 		cur_ptr = cur_ptr->next;
 	}
+}
+
+static inline void processMasterEffects() {
+	processEffects(masterLevels, openSlOut->currBufferFloat);
 }
 
 static inline void mixTracks() {
@@ -92,11 +96,6 @@ static inline void mixTracks() {
 					total > -1 ? (total < 1 ? total : 1) : -1;
 		}
 	}
-	// combine the two channels of floats into one buffer of shorts,
-	// interleaving L and R samples
-	interleaveFloatsToShorts(openSlOut->currBufferFloat[0],
-			openSlOut->currBufferFloat[1], openSlOut->currBufferShort,
-			BUFF_SIZE);
 }
 
 void soundTrack(Track *track) {
@@ -210,6 +209,12 @@ void fillBuffer() {
 	generateNextBuffer();
 	processEffectsForAllTracks();
 	mixTracks();
+	processMasterEffects();
+	// combine the two channels of floats into one buffer of shorts,
+	// interleaving L and R samples
+	interleaveFloatsToShorts(openSlOut->currBufferFloat[0],
+			openSlOut->currBufferFloat[1], openSlOut->currBufferShort,
+			BUFF_SIZE);
 	pthread_mutex_unlock(&openSlOut->trackMutex);
 }
 

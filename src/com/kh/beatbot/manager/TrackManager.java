@@ -46,6 +46,12 @@ public class TrackManager implements MidiTrackControlListener {
 		return tracks.get(trackNum);
 	}
 
+	public BaseTrack getBaseTrack(int trackNum) {
+		if (trackNum == MASTER_TRACK_ID)
+			return masterTrack;
+		return tracks.get(trackNum);
+	}
+	
 	public int getNumTracks() {
 		return tracks.size();
 	}

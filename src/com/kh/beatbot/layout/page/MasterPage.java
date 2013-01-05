@@ -33,12 +33,12 @@ public class MasterPage extends Page {
 		for (Page page : pages) {
 			page.init();
 		}
+		effectsPage.setMasterMode(true);
+		levelsPage.setMasterMode(true);
 	}
 
 	@Override
 	public void update() {
-		effectsPage.setMasterMode(true);
-		levelsPage.setMasterMode(true);
 		for (Page page : pages) {
 			page.update();
 		}

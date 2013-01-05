@@ -39,7 +39,6 @@ public class PageManager {
 		((ViewFlipper) GlobalVars.mainActivity.findViewById(R.id.mainFlipper))
 				.setDisplayedChild(mainPageNum);
 		mainPages[mainPageNum].setVisible(true);
-		mainPages[mainPageNum].update();
 	}
 	
 	public static void selectMasterPage(int masterPageNum) {

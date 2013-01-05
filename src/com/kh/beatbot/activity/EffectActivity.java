@@ -120,7 +120,7 @@ public class EffectActivity extends Activity implements LevelListener,
 		GeneralUtils.initAndroidSettings(this);
 		int effectPosition = getIntent().getExtras().getInt("effectPosition");
 		int trackId = getIntent().getExtras().getInt("trackId");
-		effect = Managers.trackManager.getTrack(trackId).findEffectByPosition(
+		effect = Managers.trackManager.getBaseTrack(trackId).findEffectByPosition(
 				effectPosition);
 		setContentView(R.layout.effect_layout);
 		ViewGroup parent = (ViewGroup) findViewById(R.id.effect_layout);

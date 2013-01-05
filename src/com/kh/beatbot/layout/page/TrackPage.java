@@ -35,6 +35,8 @@ public class TrackPage extends Page {
 		for (Page trackPage : pages) {
 			trackPage.init();
 		}
+		effectsPage.setMasterMode(false);
+		levelsPage.setMasterMode(false);
 	}
 
 	@Override

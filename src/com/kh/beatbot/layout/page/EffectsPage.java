@@ -26,9 +26,9 @@ import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.manager.TrackManager;
 
 public class EffectsPage extends Page {
-	private static BaseTrack currTrack = null;
-	private static LabelListListenable effectLabelList = null;
-	private static String[] effectNames;
+	private BaseTrack currTrack = null;
+	private LabelListListenable effectLabelList = null;
+	private String[] effectNames;
 
 	public EffectsPage(Context context, AttributeSet attrs) {
 		super(context, attrs);

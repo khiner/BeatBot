@@ -15,7 +15,7 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.BBSeekbar;
 
 public class LevelsPage extends Page implements LevelListener {
-	private static BaseTrack currTrack = null;
+	private BaseTrack currTrack = null;
 	private BBSeekbar trackLevel;
 	private ToggleButton volumeToggle, panToggle, pitchToggle;
 	
