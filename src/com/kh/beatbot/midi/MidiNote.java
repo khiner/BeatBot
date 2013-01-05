@@ -1,9 +1,9 @@
 package com.kh.beatbot.midi;
 
+import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
-import com.kh.beatbot.view.helper.LevelsViewHelper;
 
 public class MidiNote implements Comparable<MidiNote> {
 	NoteOn noteOn;
@@ -148,25 +148,31 @@ public class MidiNote implements Comparable<MidiNote> {
 		return noteOff.getTick() - noteOn.getTick();
 	}
 
-	public float getLevel(LevelsViewHelper.LevelMode levelMode) {
-		if (levelMode == LevelsViewHelper.LevelMode.VOLUME)
+	public float getLevel(LevelType levelType) {
+		switch (levelType) {
+		case VOLUME:
 			return noteOn.getVelocity();
-		else if (levelMode == LevelsViewHelper.LevelMode.PAN)
+		case PAN:
 			return noteOn.getPan();
-		else if (levelMode == LevelsViewHelper.LevelMode.PITCH)
+		case PITCH:
 			return noteOn.getPitch();
-
-		return 0;
+		default:
+			return 0;
+		}
 	}
 
-	public void setLevel(LevelsViewHelper.LevelMode levelMode, float level) {
+	public void setLevel(LevelType levelType, float level) {
 		float clippedLevel = clipLevel(level);
-		if (levelMode == LevelsViewHelper.LevelMode.VOLUME) {
+		switch (levelType) {
+		case VOLUME:
 			setVelocity(clippedLevel);
-		} else if (levelMode == LevelsViewHelper.LevelMode.PAN) {
+			break;
+		case PAN:
 			setPan(clippedLevel);
-		} else if (levelMode == LevelsViewHelper.LevelMode.PITCH) {
+			break;
+		case PITCH:
 			setPitch(clippedLevel);
+			break;
 		}
 	}
 

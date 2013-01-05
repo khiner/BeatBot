@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -188,12 +189,12 @@ public class MidiView extends ClickableSurfaceView {
 			setBgColor(Colors.MIDI_VIEW_DEFAULT_BG_COLOR);
 	}
 
-	public LevelsViewHelper.LevelMode getLevelMode() {
-		return LevelsViewHelper.getLevelMode();
+	public LevelType getLevelType() {
+		return LevelsViewHelper.getLevelType();
 	}
 
-	public void setLevelMode(LevelsViewHelper.LevelMode levelMode) {
-		LevelsViewHelper.setLevelMode(levelMode);
+	public void setLevelMode(LevelType levelType) {
+		LevelsViewHelper.setLevelType(levelType);
 	}
 
 	public void reset() {

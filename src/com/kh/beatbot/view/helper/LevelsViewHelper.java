@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.MidiView;
@@ -36,10 +37,6 @@ public class LevelsViewHelper {
 		}
 	}
 
-	public enum LevelMode {
-		VOLUME, PAN, PITCH
-	};
-
 	private static final String noteRestrictionAlert = "Cannot create, delete or move notes in levels view.";
 	private static FloatBuffer levelBarVb = null;
 	private static final int LEVEL_BAR_WIDTH = MidiView.LEVEL_POINT_SIZE / 2;
@@ -57,7 +54,7 @@ public class LevelsViewHelper {
 
 	private static MidiView midiView;
 
-	private static LevelMode currLevelMode = LevelMode.VOLUME;
+	private static LevelType currLevelType = LevelType.VOLUME;
 
 	public static void init(MidiView _midiView) {
 		midiView = _midiView;
@@ -67,12 +64,12 @@ public class LevelsViewHelper {
 		initLevelBarVb();
 	}
 
-	public static LevelMode getLevelMode() {
-		return currLevelMode;
+	public static LevelType getLevelType() {
+		return currLevelType;
 	}
 
-	public static void setLevelMode(LevelMode levelMode) {
-		currLevelMode = levelMode;
+	public static void setLevelType(LevelType levelType) {
+		currLevelType = levelType;
 	}
 
 	public static void clearTouchedLevels() {
@@ -130,7 +127,7 @@ public class LevelsViewHelper {
 		if (selected) {
 			return Colors.LEVEL_SELECTED_COLOR;
 		} else {
-			switch (currLevelMode) {
+			switch (currLevelType) {
 			case VOLUME:
 				return Colors.VOLUME_COLOR;
 			case PAN:
@@ -147,7 +144,7 @@ public class LevelsViewHelper {
 		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
 			if (midiNote.isLevelViewSelected()) {
 				drawLevel(midiView.tickToX(midiNote.getOnTick()),
-						midiNote.getLevel(currLevelMode),
+						midiNote.getLevel(currLevelType),
 						calcLevelColor(midiNote.isLevelSelected()));
 			}
 		}
@@ -157,7 +154,7 @@ public class LevelsViewHelper {
 		for (MidiNote levelViewSelected : Managers.midiManager
 				.getLevelViewSelectedNotes()) {
 			float velocityY = levelToY(levelViewSelected
-					.getLevel(currLevelMode));
+					.getLevel(currLevelType));
 			if (Math.abs(midiView.tickToX(levelViewSelected.getOnTick()) - x) < 35
 					&& Math.abs(velocityY - y) < 35) {
 				// If this is the only touched level, and it hasn't yet
@@ -197,7 +194,7 @@ public class LevelsViewHelper {
 			float topY, float bottomY) {
 		for (MidiNote levelViewSelected : Managers.midiManager
 				.getLevelViewSelectedNotes()) {
-			float levelY = levelToY(levelViewSelected.getLevel(currLevelMode));
+			float levelY = levelToY(levelViewSelected.getLevel(currLevelType));
 			if (leftTick < levelViewSelected.getOnTick()
 					&& rightTick > levelViewSelected.getOnTick()
 					&& topY < levelY && bottomY > levelY)
@@ -212,11 +209,11 @@ public class LevelsViewHelper {
 		if (touchedSize == 1) {
 			DragLine.m = 0;
 			MidiNote touched = (MidiNote) touchedLevels.values().toArray()[0];
-			DragLine.b = touched.getLevel(currLevelMode);
+			DragLine.b = touched.getLevel(currLevelType);
 			DragLine.leftTick = 0;
 			DragLine.rightTick = Float.MAX_VALUE;
 			DragLine.leftLevel = DragLine.rightLevel = touched
-					.getLevel(currLevelMode);
+					.getLevel(currLevelType);
 		} else if (touchedSize == 2) {
 			MidiNote leftLevel = touchedLevels.get(0).getOnTick() < touchedLevels
 					.get(1).getOnTick() ? touchedLevels.get(0) : touchedLevels
@@ -224,15 +221,15 @@ public class LevelsViewHelper {
 			MidiNote rightLevel = touchedLevels.get(0).getOnTick() < touchedLevels
 					.get(1).getOnTick() ? touchedLevels.get(1) : touchedLevels
 					.get(0);
-			DragLine.m = (rightLevel.getLevel(currLevelMode) - leftLevel
-					.getLevel(currLevelMode))
+			DragLine.m = (rightLevel.getLevel(currLevelType) - leftLevel
+					.getLevel(currLevelType))
 					/ (rightLevel.getOnTick() - leftLevel.getOnTick());
-			DragLine.b = (leftLevel.getLevel(currLevelMode) - DragLine.m
+			DragLine.b = (leftLevel.getLevel(currLevelType) - DragLine.m
 					* leftLevel.getOnTick());
 			DragLine.leftTick = leftLevel.getOnTick();
 			DragLine.rightTick = rightLevel.getOnTick();
-			DragLine.leftLevel = leftLevel.getLevel(currLevelMode);
-			DragLine.rightLevel = rightLevel.getLevel(currLevelMode);
+			DragLine.leftLevel = leftLevel.getLevel(currLevelType);
+			DragLine.rightLevel = rightLevel.getLevel(currLevelType);
 		}
 	}
 
@@ -243,7 +240,7 @@ public class LevelsViewHelper {
 				.getLevelSelectedNotes()) {
 			levelOffsets.put(
 					levelSelected,
-					levelSelected.getLevel(currLevelMode)
+					levelSelected.getLevel(currLevelType)
 							- DragLine.getLevel(levelSelected.getOnTick()));
 		}
 	}
@@ -252,7 +249,7 @@ public class LevelsViewHelper {
 		for (MidiNote levelSelected : Managers.midiManager
 				.getLevelSelectedNotes()) {
 			if (levelOffsets.get(levelSelected) != null) {
-				levelSelected.setLevel(currLevelMode,
+				levelSelected.setLevel(currLevelType,
 						DragLine.getLevel(levelSelected.getOnTick())
 								+ levelOffsets.get(levelSelected));
 			}
@@ -370,7 +367,7 @@ public class LevelsViewHelper {
 			for (int i = 0; i < e.getPointerCount(); i++) {
 				MidiNote touched = touchedLevels.get(e.getPointerId(i));
 				if (touched != null) {
-					touched.setLevel(currLevelMode, yToLevel(e.getY(i)));
+					touched.setLevel(currLevelType, yToLevel(e.getY(i)));
 				}
 			}
 			updateDragLine();
