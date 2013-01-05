@@ -20,9 +20,10 @@ public class PageManager {
 	private static NoteLevelsPage levelsPage = null;
 	
 	public static void init(Activity context) {
+		masterPage = (MasterPage)context.findViewById(R.id.masterPage);
 		trackPage = (TrackPage)context.findViewById(R.id.trackPage);
 		levelsPage = (NoteLevelsPage)context.findViewById(R.id.levelsPage);
-		mainPages = new Page[] {trackPage, levelsPage};
+		mainPages = new Page[] {masterPage, trackPage, levelsPage};
 		
 		for (Page mainPage : mainPages) {
 			mainPage.init();
@@ -38,6 +39,7 @@ public class PageManager {
 		((ViewFlipper) GlobalVars.mainActivity.findViewById(R.id.mainFlipper))
 				.setDisplayedChild(mainPageNum);
 		mainPages[mainPageNum].setVisible(true);
+		mainPages[mainPageNum].update();
 	}
 	
 	public static void selectMasterPage(int masterPageNum) {

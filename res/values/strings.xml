@@ -35,6 +35,7 @@
 	</string-array>
 	<string name="default_midi_file_name">MyMidi</string>
 
+	<string name="master">MASTER</string>
 	<string name="track">TRACK</string>
 	<string name="select">SELECT</string>
 	<string name="levels">LEVELS</string>

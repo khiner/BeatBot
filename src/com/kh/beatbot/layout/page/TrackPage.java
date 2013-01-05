@@ -5,7 +5,6 @@ import android.util.AttributeSet;
 import android.widget.ViewFlipper;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.manager.TrackManager;
 
 public class TrackPage extends Page {
 	public TrackPageSelect trackPageSelect;
@@ -27,11 +26,12 @@ public class TrackPage extends Page {
 	public void init() {
 		trackPageSelect = (TrackPageSelect)findViewById(R.id.trackPageSelect);
 		pageFlipper = (ViewFlipper)findViewById(R.id.trackFlipper);
-		trackPageSelect.init();
 		levelsPage = (LevelsPage)pageFlipper.findViewById(R.id.trackLevelsPage);
 		sampleEditPage = (SampleEditPage)pageFlipper.findViewById(R.id.sampleEditPage);
 		effectsPage = (EffectsPage)pageFlipper.findViewById(R.id.trackEffectsPage);
 		pages = new Page[] {levelsPage, sampleEditPage, effectsPage };
+		
+		trackPageSelect.init();
 		for (Page trackPage : pages) {
 			trackPage.init();
 		}

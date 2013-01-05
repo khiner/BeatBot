@@ -16,7 +16,6 @@ public class MasterPageSelect extends PageSelect {
 	@Override
 	public void init() {
 		super.init();
-		
 	}
 	
 	@Override

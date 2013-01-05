@@ -307,9 +307,6 @@ void updateLevels(int trackNum) {
 
 	Track *track = getTrack(NULL, NULL, trackNum);
 	MidiEvent *midiEvent = track->nextEvent;
-	if (masterLevels == NULL)
-		__android_log_print(ANDROID_LOG_ERROR, "in UL", "master levels is NULL!");
-	__android_log_print(ANDROID_LOG_ERROR, "in UL", "mp = %f", masterLevels->pan);
 	track->levels->volPan->set(track->levels->volPan->config, midiEvent->volume,
 			(masterLevels->pan + track->levels->pan + midiEvent->pan) / 3);
 	((WavFile *) track->generator->config)->sampleRate = masterLevels->pitch
