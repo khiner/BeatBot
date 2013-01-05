@@ -3,6 +3,7 @@ package com.kh.beatbot.manager;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Instrument;
 import com.kh.beatbot.global.Track;
@@ -12,6 +13,7 @@ import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
 public class TrackManager implements MidiTrackControlListener {
 
+	public static final int MASTER_TRACK_ID = -1;
 	private static TrackManager singletonInstance = null;
 
 	// effect settings are stored here instead of in the effect activities
@@ -19,6 +21,10 @@ public class TrackManager implements MidiTrackControlListener {
 	// need to persist state
 	private static List<Track> tracks = new ArrayList<Track>();
 
+	public static BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
+	
+	public static Track currTrack;
+	
 	public static TrackManager getInstance() {
 		if (singletonInstance == null) {
 			singletonInstance = new TrackManager();
@@ -49,7 +55,7 @@ public class TrackManager implements MidiTrackControlListener {
 		addTrack(newTrack.getSamplePath());
 		tracks.add(newTrack);
 		GlobalVars.midiView.updateTracks();
-		GlobalVars.currTrack = tracks.get(tracks.size() - 1);
+		currTrack = tracks.get(tracks.size() - 1);
 	}
 
 	public void clearNotes() {
@@ -76,9 +82,9 @@ public class TrackManager implements MidiTrackControlListener {
 	@Override
 	public void trackClicked(int track) {
 		Track newTrack = tracks.get(track);
-		if (newTrack == GlobalVars.currTrack)
+		if (newTrack == currTrack)
 			return;
-		GlobalVars.currTrack = newTrack;
+		currTrack = newTrack;
 		PageManager.updateTrackPages();
 	}
 

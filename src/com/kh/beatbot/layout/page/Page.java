@@ -14,7 +14,7 @@ public abstract class Page extends LinearLayout {
 	public abstract void init();
 	public abstract void update();
 	public abstract void setVisibilityCode(int code);
-	
+
 	public void setVisible(boolean visible) {
 		setVisibilityCode(visible ? View.VISIBLE : View.INVISIBLE);
 	}

@@ -19,31 +19,37 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremelo;
+import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listenable.LabelListListenable;
 import com.kh.beatbot.listener.LabelListListener;
+import com.kh.beatbot.manager.TrackManager;
 
-public class TrackEffectsPage extends Page {
+public class EffectsPage extends Page {
+	private static BaseTrack currTrack = null;
 	private static LabelListListenable effectLabelList = null;
 	private static String[] effectNames;
-	
-	public TrackEffectsPage(Context context, AttributeSet attrs) {
+
+	public EffectsPage(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
 
 	public void init() {
+		currTrack = TrackManager.currTrack;
 		effectNames = getContext().getResources().getStringArray(
 				R.array.effect_names);
-		effectLabelList = (LabelListListenable)findViewById(R.id.effectList);
+		effectLabelList = (LabelListListenable) findViewById(R.id.effectList);
 		effectLabelList.setListener(new EffectLabelListListener(getContext()));
-		((TextView) findViewById(R.id.effectsLabel)).setTypeface(GlobalVars.font);
+		((TextView) findViewById(R.id.effectsLabel))
+				.setTypeface(GlobalVars.font);
 	}
+
 	@Override
 	public void update() {
 		if (!effectLabelList.anyLabels())
 			return;
 		for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
-			Effect effect = GlobalVars.currTrack.findEffectByPosition(i);
+			Effect effect = currTrack.findEffectByPosition(i);
 			if (effect != null) {
 				effectLabelList.setLabelText(i, effect.getName());
 				effectLabelList.setLabelOn(i, effect.on);
@@ -71,7 +77,7 @@ public class TrackEffectsPage extends Page {
 							if (effectNames[item].equals("NONE")) {
 								effectLabelList
 										.setLabelText(lastClickedPos, "");
-								Effect effect = GlobalVars.currTrack
+								Effect effect = currTrack
 										.findEffectByPosition(lastClickedPos);
 								if (effect != null) {
 									effect.removeEffect();
@@ -94,7 +100,7 @@ public class TrackEffectsPage extends Page {
 			effectLabelList = labelList;
 			if (effectLabelList.anyLabels()) {
 				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
-					Effect effect = GlobalVars.currTrack.findEffectByPosition(i);
+					Effect effect = currTrack.findEffectByPosition(i);
 					if (effect != null)
 						labelList.setLabelOn(i, effect.on);
 				}
@@ -107,11 +113,11 @@ public class TrackEffectsPage extends Page {
 
 		@Override
 		public void labelMoved(int oldPosition, int newPosition) {
-			Effect effect = GlobalVars.currTrack.findEffectByPosition(oldPosition);
+			Effect effect = currTrack.findEffectByPosition(oldPosition);
 			if (effect != null) {
 				effect.setPosition(newPosition);
 			}
-			for (Effect other : GlobalVars.currTrack.effects) {
+			for (Effect other : currTrack.effects) {
 				if (other.equals(effect))
 					continue;
 				if (other.getPosition() >= newPosition
@@ -122,9 +128,10 @@ public class TrackEffectsPage extends Page {
 					other.setPosition(other.getPosition() - 1);
 				}
 			}
-			Collections.sort(GlobalVars.currTrack.effects);
+			Collections.sort(currTrack.effects);
 
-			Effect.setEffectPosition(GlobalVars.currTrack.getId(), oldPosition, newPosition);
+			Effect.setEffectPosition(currTrack.getId(), oldPosition,
+					newPosition);
 		}
 
 		@Override
@@ -144,6 +151,11 @@ public class TrackEffectsPage extends Page {
 		}
 	}
 
+	public void setMasterMode(boolean masterMode) {
+		currTrack = masterMode ? TrackManager.masterTrack
+				: TrackManager.currTrack;
+	}
+
 	private void launchEffectIntent(String effectName, int effectPosition) {
 		Effect effect = getEffect(effectName, effectPosition);
 		if (effectName != effect.name) {
@@ -155,30 +167,30 @@ public class TrackEffectsPage extends Page {
 		Intent intent = new Intent();
 		intent.setClass(getContext(), EffectActivity.class);
 		intent.putExtra("effectPosition", effect.getPosition());
-		intent.putExtra("trackId", GlobalVars.currTrack.getId());
+		intent.putExtra("trackId", currTrack.getId());
 
 		getContext().startActivity(intent);
 	}
 
 	private Effect getEffect(String effectName, int position) {
-		Effect effect = GlobalVars.currTrack.findEffectByPosition(position);
+		Effect effect = currTrack.findEffectByPosition(position);
 		if (effect != null)
 			return effect;
 		if (effectName.equals(getContext().getString(R.string.decimate)))
-			effect = new Decimate(effectName, GlobalVars.currTrack.getId(), position);
+			effect = new Decimate(effectName, currTrack.getId(), position);
 		else if (effectName.equals(getContext().getString(R.string.chorus)))
-			effect = new Chorus(effectName, GlobalVars.currTrack.getId(), position);
+			effect = new Chorus(effectName, currTrack.getId(), position);
 		else if (effectName.equals(getContext().getString(R.string.delay)))
-			effect = new Delay(effectName, GlobalVars.currTrack.getId(), position);
+			effect = new Delay(effectName, currTrack.getId(), position);
 		else if (effectName.equals(getContext().getString(R.string.flanger)))
-			effect = new Flanger(effectName, GlobalVars.currTrack.getId(), position);
+			effect = new Flanger(effectName, currTrack.getId(), position);
 		else if (effectName.equals(getContext().getString(R.string.filter)))
-			effect = new Filter(effectName, GlobalVars.currTrack.getId(), position);
+			effect = new Filter(effectName, currTrack.getId(), position);
 		else if (effectName.equals(getContext().getString(R.string.reverb)))
-			effect = new Reverb(effectName, GlobalVars.currTrack.getId(), position);
+			effect = new Reverb(effectName, currTrack.getId(), position);
 		else if (effectName.equals(getContext().getString(R.string.tremelo)))
-			effect = new Tremelo(effectName, GlobalVars.currTrack.getId(), position);
-		GlobalVars.currTrack.effects.add(effect);
+			effect = new Tremelo(effectName, currTrack.getId(), position);
+		currTrack.effects.add(effect);
 		return effect;
 	}
 }

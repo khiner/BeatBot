@@ -5,48 +5,54 @@ import android.widget.ViewFlipper;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.layout.page.MasterPage;
+import com.kh.beatbot.layout.page.NoteLevelsPage;
 import com.kh.beatbot.layout.page.Page;
-import com.kh.beatbot.layout.page.SampleEditPage;
-import com.kh.beatbot.layout.page.TrackEffectsPage;
-import com.kh.beatbot.layout.page.TrackLevelsPage;
+import com.kh.beatbot.layout.page.TrackPage;
 
 public class PageManager {
-	private static int trackPageNum = 0;
+	private static int mainPageNum = 0;
 	
-	private static TrackLevelsPage trackLevelsPage = null;
-	private static SampleEditPage sampleEditPage = null;
-	private static TrackEffectsPage trackEffectsPage = null;
+	private static Page[] mainPages;
 	
-	private static Page[] trackPages;
+	private static MasterPage masterPage = null;
+	private static TrackPage trackPage = null;
+	private static NoteLevelsPage levelsPage = null;
 	
 	public static void init(Activity context) {
-		trackLevelsPage = (TrackLevelsPage)context.findViewById(R.id.trackLevelsPage);
-		sampleEditPage = (SampleEditPage)context.findViewById(R.id.sampleEditPage);
-		trackEffectsPage = (TrackEffectsPage)context.findViewById(R.id.trackEffectsPage);
-		trackPages = new Page[] {trackLevelsPage, sampleEditPage, trackEffectsPage };
-		for (Page trackPage : trackPages) {
-			trackPage.init();
+		trackPage = (TrackPage)context.findViewById(R.id.trackPage);
+		levelsPage = (NoteLevelsPage)context.findViewById(R.id.levelsPage);
+		mainPages = new Page[] {trackPage, levelsPage};
+		
+		for (Page mainPage : mainPages) {
+			mainPage.init();
 		}
+	}
+	
+	public static void selectMainPage(int mainPageNum) {
+		int prevPageNum = PageManager.mainPageNum;
+		PageManager.mainPageNum = mainPageNum;
+		if (prevPageNum == mainPageNum)
+			return;
+		mainPages[prevPageNum].setVisible(false);
+		((ViewFlipper) GlobalVars.mainActivity.findViewById(R.id.mainFlipper))
+				.setDisplayedChild(mainPageNum);
+		mainPages[mainPageNum].setVisible(true);
+	}
+	
+	public static void selectMasterPage(int masterPageNum) {
+		masterPage.selectPage(masterPageNum);
 	}
 	
 	public static void selectTrackPage(int trackPageNum) {
-		int prevPageNum = PageManager.trackPageNum;
-		PageManager.trackPageNum = trackPageNum;
-		if (prevPageNum == trackPageNum)
-			return;
-		getTrackPage(prevPageNum).setVisible(false);
-		((ViewFlipper) GlobalVars.mainActivity.findViewById(R.id.trackFlipper))
-				.setDisplayedChild(trackPageNum);
-		getTrackPage(trackPageNum).setVisible(true);
+		trackPage.selectPage(trackPageNum);
 	}
 	
 	public static Page getTrackPage(int trackPageNum) {
-		return trackPages[trackPageNum];
+		return trackPage.getPage(trackPageNum);
 	}
 	
 	public static void updateTrackPages() {
-		for (Page trackPage : trackPages) {
-			trackPage.update();
-		}
+		trackPage.update();
 	}
 }

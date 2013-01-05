@@ -7,12 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 
-public class Track {
+public class Track extends BaseTrack {
 	class LoopSampleInfo {
 		public float loopBeginSample;
 		public float loopEndSample;
@@ -25,30 +24,20 @@ public class Track {
 		}
 	}
 
-	private int id;
 	private Instrument instrument;
 	private int currSampleNum = 0;
 	private boolean adsrEnabled = false, reverse = false;
 	private List<MidiNote> notes = new ArrayList<MidiNote>();
-	public List<Effect> effects = new ArrayList<Effect>();
-	public float volume = .8f;
-	public float pan = .5f;
-	public float pitch = .5f;
 	public float[][] adsrPoints;
-	public GlobalVars.LevelType activeLevelType = GlobalVars.LevelType.VOLUME;
 
 	private Map<Integer, LoopSampleInfo> sampleLoopPoints = new HashMap<Integer, LoopSampleInfo>();
 
 	public Track(int id, Instrument instrument, int sampleNum) {
-		this.id = id;
+		super(id);
 		this.instrument = instrument;
 		this.currSampleNum = sampleNum;
 		constructLoopPointMap();
 		initDefaultAdsrPoints();
-	}
-
-	public int getId() {
-		return id;
 	}
 
 	public void removeNote(MidiNote note) {
@@ -103,15 +92,6 @@ public class Track {
 		for (MidiNote midiNote : notes) {
 			if (midiNote.getOnTick() >= MidiManager.loopBeginTick) {
 				return midiNote;
-			}
-		}
-		return null;
-	}
-
-	public Effect findEffectByPosition(int position) {
-		for (Effect effect : effects) {
-			if (effect.getPosition() == position) {
-				return effect;
 			}
 		}
 		return null;
@@ -231,21 +211,6 @@ public class Track {
 		return normalize(id);
 	}
 
-	public void setPrimaryVolume(float volume) {
-		this.volume = volume;
-		setPrimaryVolume(id, volume);
-	}
-
-	public void setPrimaryPan(float pan) {
-		this.pan = pan;
-		setPrimaryPan(id, pan);
-	}
-
-	public void setPrimaryPitch(float pitch) {
-		this.pitch = pitch;
-		setPrimaryPitch(id, pitch);
-	}
-
 	public void setAdsrOn(boolean on) {
 		adsrEnabled = on;
 		setAdsrOn(id, on);
@@ -283,12 +248,6 @@ public class Track {
 	public static native void setTrackReverse(int trackId, boolean reverse);
 
 	public static native float[] normalize(int trackId);
-
-	public static native void setPrimaryVolume(int trackId, float volume);
-
-	public static native void setPrimaryPan(int trackId, float pan);
-
-	public static native void setPrimaryPitch(int trackId, float pitch);
 
 	public static native void setAdsrOn(int trackId, boolean on);
 

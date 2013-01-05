@@ -6,23 +6,25 @@ import android.view.View;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.BBSeekbar;
 
-public class TrackLevelsPage extends Page implements LevelListener {
+public class LevelsPage extends Page implements LevelListener {
+	private static BaseTrack currTrack = null;
+	private BBSeekbar trackLevel;
+	private ToggleButton volumeToggle, panToggle, pitchToggle;
 	
-	public TrackLevelsPage(Context context, AttributeSet attrs) {
+	public LevelsPage(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
 
-	private BBSeekbar trackLevel;
-	private ToggleButton volumeToggle, panToggle, pitchToggle;
-
 	public void init() {
+		currTrack = TrackManager.currTrack;
 		trackLevel = (BBSeekbar) findViewById(R.id.trackLevel);
 		trackLevel.addLevelListener(this);
 		volumeToggle = (ToggleButton) findViewById(R.id.trackVolumeToggle);
@@ -31,19 +33,19 @@ public class TrackLevelsPage extends Page implements LevelListener {
 
 		volumeToggle.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
-				GlobalVars.currTrack.activeLevelType = LevelType.VOLUME;
+				currTrack.activeLevelType = LevelType.VOLUME;
 				update();
 			}
 		});
 		panToggle.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
-				GlobalVars.currTrack.activeLevelType = LevelType.PAN;
+				currTrack.activeLevelType = LevelType.PAN;
 				update();
 			}
 		});
 		pitchToggle.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
-				GlobalVars.currTrack.activeLevelType = LevelType.PITCH;
+				currTrack.activeLevelType = LevelType.PITCH;
 				update();
 			}
 		});
@@ -64,19 +66,23 @@ public class TrackLevelsPage extends Page implements LevelListener {
 
 	@Override
 	public void setLevel(LevelListenable levelBar, float level) {
-		switch (GlobalVars.currTrack.activeLevelType) {
+		switch (currTrack.activeLevelType) {
 		case VOLUME:
-			GlobalVars.currTrack.setPrimaryVolume(level);
+			currTrack.setVolume(level);
 			break;
 		case PAN:
-			GlobalVars.currTrack.setPrimaryPan(level);
+			currTrack.setPan(level);
 			break;
 		case PITCH:
-			GlobalVars.currTrack.setPrimaryPitch(level);
+			currTrack.setPitch(level);
 			break;
 		}
 	}
 
+	public void setMasterMode(boolean masterMode) {
+		currTrack = masterMode ? TrackManager.masterTrack : TrackManager.currTrack;
+	}
+	
 	@Override
 	public void notifyInit(LevelListenable levelBar) {
 		// do nothing when levelbar initialized
@@ -105,7 +111,7 @@ public class TrackLevelsPage extends Page implements LevelListener {
 	}
 
 	private void selectActiveLevel() {
-		switch (GlobalVars.currTrack.activeLevelType) {
+		switch (currTrack.activeLevelType) {
 		case VOLUME:
 			volumeToggle.setChecked(true);
 			return;
@@ -119,7 +125,7 @@ public class TrackLevelsPage extends Page implements LevelListener {
 	}
 
 	private float[] getActiveLevelColor() {
-		switch (GlobalVars.currTrack.activeLevelType) {
+		switch (currTrack.activeLevelType) {
 		case VOLUME:
 			return Colors.VOLUME_COLOR;
 		case PAN:
@@ -131,14 +137,14 @@ public class TrackLevelsPage extends Page implements LevelListener {
 	}
 
 	private float getActiveLevel() {
-		switch (GlobalVars.currTrack.activeLevelType) {
+		switch (currTrack.activeLevelType) {
 		case VOLUME:
-			return GlobalVars.currTrack.volume;
+			return currTrack.volume;
 		case PAN:
-			return GlobalVars.currTrack.pan;
+			return currTrack.pan;
 		case PITCH:
-			return GlobalVars.currTrack.pitch;
+			return currTrack.pitch;
 		}
-		return GlobalVars.currTrack.volume;
+		return currTrack.volume;
 	}
 }

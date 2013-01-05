@@ -21,6 +21,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,47 +35,28 @@ import android.widget.ToggleButton;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Effect.EffectParam;
-import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.layout.page.TrackPageSelect;
-import com.kh.beatbot.listenable.LevelListenable;
-import com.kh.beatbot.listener.LevelListener;
+import com.kh.beatbot.layout.page.MainPageSelect;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PageManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
-import com.kh.beatbot.view.BBSeekbar;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.SurfaceViewBase;
-import com.kh.beatbot.view.helper.LevelsViewHelper;
 
-public class BeatBotActivity extends Activity implements LevelListener {
+public class BeatBotActivity extends Activity {
 
 	private Context cxt = this;
 	private Animation fadeIn, fadeOut;
 	// these are used as variables for convenience, since they are reference
 	// frequently
-	private ToggleButton volume, pan, pitch;
-	private BBSeekbar levelBar;
-	
 	private LinearLayout trackPageSelect;
 	private static AssetManager assetManager;
 
 	private long lastTapTime = 0;
-
-	private void initLevelsIconGroup() {
-		volume = (ToggleButton) findViewById(R.id.masterVolumeToggle);
-		pan = (ToggleButton) findViewById(R.id.masterPanToggle);
-		pitch = (ToggleButton) findViewById(R.id.masterPitchToggle);
-		levelBar = (BBSeekbar) findViewById(R.id.masterLevelBar);
-		levelBar.addLevelListener(this);
-		setMasterVolume(GlobalVars.MASTER_VOL_LEVEL);
-		setMasterPan(GlobalVars.MASTER_PAN_LEVEL);
-		setMasterPitch(GlobalVars.MASTER_PIT_LEVEL);
-	}
 
 	private static void copyFile(InputStream in, OutputStream out)
 			throws IOException {
@@ -181,8 +163,8 @@ public class BeatBotActivity extends Activity implements LevelListener {
 			initNativeAudio();
 		}
 		Managers.init(savedInstanceState);
-		((TrackPageSelect)findViewById(R.id.trackPageSelect)).init();
-		initLevelsIconGroup();
+		((MainPageSelect)findViewById(R.id.mainPageSelect)).init();
+		//initLevelsIconGroup();
 		PageManager.init(this);
 		setEditIconsEnabled(false);
 		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));
@@ -401,47 +383,6 @@ public class BeatBotActivity extends Activity implements LevelListener {
 		Managers.midiManager.deleteSelectedNotes();
 	}
 
-	public void volume(View view) {
-		volume.setChecked(true);
-		pan.setChecked(false);
-		pitch.setChecked(false);
-		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.VOLUME);
-		updateLevelBar();
-	}
-
-	public void pan(View view) {
-		volume.setChecked(false);
-		pan.setChecked(true);
-		pitch.setChecked(false);
-		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.PAN);
-		updateLevelBar();
-	}
-
-	public void pitch(View view) {
-		volume.setChecked(false);
-		pan.setChecked(false);
-		pitch.setChecked(true);
-		GlobalVars.midiView.setLevelMode(LevelsViewHelper.LevelMode.PITCH);
-		updateLevelBar();
-	}
-
-	private void updateLevelBar() {
-		switch (GlobalVars.midiView.getLevelMode()) {
-		case VOLUME:
-			levelBar.setLevelColor(Colors.VOLUME_COLOR);
-			levelBar.setLevel(GlobalVars.MASTER_VOL_LEVEL);
-			break;
-		case PAN:
-			levelBar.setLevelColor(Colors.PAN_COLOR);
-			levelBar.setLevel(GlobalVars.MASTER_PAN_LEVEL);
-			break;
-		case PITCH:
-			levelBar.setLevelColor(Colors.PITCH_COLOR);
-			levelBar.setLevel(GlobalVars.MASTER_PIT_LEVEL);
-			break;
-		}
-	}
-
 	public void bpmTap(View view) {
 		long tapTime = System.currentTimeMillis();
 		float millisElapsed = tapTime - lastTapTime;
@@ -458,48 +399,6 @@ public class BeatBotActivity extends Activity implements LevelListener {
 	public void addTrack(View view) {
 		Managers.directoryManager.showAddTrackAlert();
 	}
-
-	@Override
-	public void notifyInit(LevelListenable levelBar) {
-		updateLevelBar();
-	}
-
-	@Override
-	public void notifyPressed(LevelListenable levelListenable, boolean pressed) {
-	}
-
-	@Override
-	public void notifyClicked(LevelListenable levelListenable) {
-	}
-
-	@Override
-	public void setLevel(LevelListenable levelListenable, float level) {
-		switch (GlobalVars.midiView.getLevelMode()) {
-		case VOLUME:
-			GlobalVars.MASTER_VOL_LEVEL = level;
-			setMasterVolume(level);
-			break;
-		case PAN:
-			GlobalVars.MASTER_PAN_LEVEL = level;
-			setMasterPan(level);
-			break;
-		case PITCH:
-			GlobalVars.MASTER_PIT_LEVEL = level;
-			setMasterPitch(level);
-			break;
-		}
-	}
-
-	@Override
-	public void setLevel(LevelListenable levelListenable, float levelX,
-			float levelY) {
-	}
-
-	public static native void setMasterVolume(float level);
-
-	public static native void setMasterPan(float level);
-
-	public static native void setMasterPitch(float level);
 
 	public static native boolean createAudioPlayer();
 

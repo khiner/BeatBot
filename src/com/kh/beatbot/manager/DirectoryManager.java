@@ -33,10 +33,11 @@ public class DirectoryManager {
 				if (addingTrack) {
 					Managers.trackManager.addTrack((Instrument) parent, item);
 				} else {
-					GlobalVars.currTrack.setInstrument((Instrument) parent,
+					TrackManager.currTrack.setInstrument((Instrument) parent,
 							item);
 				}
-				MidiTrackControlHelper.updateInstrumentIcon(GlobalVars.currTrack.getId());
+				MidiTrackControlHelper
+						.updateInstrumentIcon(TrackManager.currTrack.getId());
 				PageManager.updateTrackPages();
 				currDirectory = internalDirectory;
 			}
@@ -262,7 +263,7 @@ public class DirectoryManager {
 
 	public void showSampleSelectAlert() {
 		addingTrack = false;
-		show(GlobalVars.currTrack.getInstrument());
+		show(TrackManager.currTrack.getInstrument());
 	}
 
 	public Instrument getDrumInstrument(int drumNum) {

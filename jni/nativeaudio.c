@@ -51,10 +51,10 @@ static inline void writeFloatsToFile(float **buffer, int size, FILE *out) {
 }
 
 static inline void processEffects(Track *track) {
-	track->volPan->process(track->volPan->config, track->currBufferFloat,
-			BUFF_SIZE);
-	pthread_mutex_lock(&track->effectMutex);
-	EffectNode *effectNode = track->effectHead;
+	track->levels->volPan->process(track->levels->volPan->config,
+			track->currBufferFloat, BUFF_SIZE);
+	pthread_mutex_lock(&track->levels->effectMutex);
+	EffectNode *effectNode = track->levels->effectHead;
 	while (effectNode != NULL) {
 		if (effectNode->effect != NULL && effectNode->effect->on) {
 			effectNode->effect->process(effectNode->effect->config,
@@ -62,7 +62,7 @@ static inline void processEffects(Track *track) {
 		}
 		effectNode = effectNode->next;
 	}
-	pthread_mutex_unlock(&track->effectMutex);
+	pthread_mutex_unlock(&track->levels->effectMutex);
 }
 
 static inline void processEffectsForAllTracks() {
@@ -83,13 +83,13 @@ static inline void mixTracks() {
 			while (cur_ptr != NULL) {
 				if (cur_ptr->track->shouldSound) {
 					total += cur_ptr->track->currBufferFloat[channel][samp]
-							* cur_ptr->track->primaryVolume;
+							* cur_ptr->track->levels->volume;
 				}
 				cur_ptr = cur_ptr->next;
 			}
-			total *= masterVolume;
+			total *= masterLevels->volume;
 			openSlOut->currBufferFloat[channel][samp] =
-					total  > -1 ? (total < 1 ? total : 1) : -1;
+					total > -1 ? (total < 1 ? total : 1) : -1;
 		}
 	}
 	// combine the two channels of floats into one buffer of shorts,
@@ -100,8 +100,8 @@ static inline void mixTracks() {
 }
 
 void soundTrack(Track *track) {
-	updateLevels(track);
-	AdsrConfig *adsrConfig = ((WavFile *)track->generator->config)->adsr;
+	updateLevels(track->num);
+	AdsrConfig *adsrConfig = ((WavFile *) track->generator->config)->adsr;
 	resetAdsr(adsrConfig);
 }
 
@@ -145,8 +145,8 @@ void Java_com_kh_beatbot_global_Track_previewTrack(JNIEnv *env, jclass clazz,
 	previewTrack(track);
 }
 
-void Java_com_kh_beatbot_global_Track_stopPreviewingTrack(JNIEnv *env, jclass clazz,
-		jint trackNum) {
+void Java_com_kh_beatbot_global_Track_stopPreviewingTrack(JNIEnv *env,
+		jclass clazz, jint trackNum) {
 	Track *track = getTrack(NULL, NULL, trackNum);
 	stopPreviewingTrack(track);
 }
@@ -228,7 +228,8 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 		pthread_mutex_lock(&recordMutex);
 		writeBytesToFile(openSlOut->currBufferShort, BUFF_SIZE * 2,
 				wavRecordOutFile);
-		writeFloatsToFile(openSlOut->currBufferFloat, BUFF_SIZE, bbRecordOutFile);
+		writeFloatsToFile(openSlOut->currBufferFloat, BUFF_SIZE,
+				bbRecordOutFile);
 		pthread_mutex_unlock(&recordMutex);
 	}
 }
@@ -280,6 +281,7 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env,
 	// realize the output mix
 	result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
 	trackHead = NULL;
+	masterLevels = initLevels();
 	//pthread_create(&bufferFillThread, NULL, fillBuffer, (void *)bufferFillThreadId);
 }
 
@@ -342,24 +344,6 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 	return JNI_TRUE;
 }
 
-void Java_com_kh_beatbot_activity_BeatBotActivity_setMasterVolume(JNIEnv *env,
-		jclass clazz, jfloat level) {
-	masterVolume = level;
-	updateAllLevels();
-}
-
-void Java_com_kh_beatbot_activity_BeatBotActivity_setMasterPan(JNIEnv *env,
-		jclass clazz, jfloat level) {
-	masterPan = level;
-	updateAllLevels();
-}
-
-void Java_com_kh_beatbot_activity_BeatBotActivity_setMasterPitch(JNIEnv *env,
-		jclass clazz, jfloat level) {
-	masterPitch = level;
-	updateAllLevels();
-}
-
 // shut down the native audio system
 void Java_com_kh_beatbot_activity_BeatBotActivity_shutdown(JNIEnv *env,
 		jclass clazz) {
@@ -385,8 +369,8 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_shutdown(JNIEnv *env,
  ****************************************************************************************/
 void Java_com_kh_beatbot_manager_RecordManager_startRecordingNative(JNIEnv *env,
 		jclass clazz, jstring wavRecordFilePath, jstring bbRecordFilePath) {
-	const char *cRecordFilePath = (*env)->GetStringUTFChars(env, wavRecordFilePath,
-			0);
+	const char *cRecordFilePath = (*env)->GetStringUTFChars(env,
+			wavRecordFilePath, 0);
 	// append to end of file, since header is written in Java
 	wavRecordOutFile = fopen(cRecordFilePath, "a+");
 	cRecordFilePath = (*env)->GetStringUTFChars(env, bbRecordFilePath, 0);

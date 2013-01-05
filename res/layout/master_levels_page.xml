@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/masterLevels"
+    android:layout_width="wrap_content"
+    android:layout_height="0dp"
+    android:orientation="horizontal" >
+
+    <com.kh.beatbot.view.SquareToggle
+        android:id="@+id/masterVolumeToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/volume_btn_src"
+        android:checked="true"
+        android:onClick="volume"
+        android:textOff=""
+        android:textOn="" />
+
+    <com.kh.beatbot.view.SquareToggle
+        android:id="@+id/masterPanToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/pan_btn_src"
+        android:onClick="pan"
+        android:textOff=""
+        android:textOn="" />
+
+    <com.kh.beatbot.view.SquareToggle
+        android:id="@+id/masterPitchToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/pitch_btn_src"
+        android:onClick="pitch"
+        android:textOff=""
+        android:textOn="" />
+
+    <com.kh.beatbot.view.BBSeekbar
+        android:id="@+id/masterLevelBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginRight="40dp" />
+
+    <com.kh.beatbot.view.SquareToggle
+        android:id="@+id/levels"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="-40dp"
+        android:background="@drawable/levels_btn_src"
+        android:contentDescription="@string/levels"
+        android:onClick="levels"
+        android:textOff=""
+        android:textOn="" />
+
+</LinearLayout>

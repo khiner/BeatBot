@@ -33,140 +33,52 @@
         android:layout_height="0dp"
         android:layout_weight=".5" />
 
-    <LinearLayout
-        android:id="@+id/masterLevels"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight=".1"
+    <com.kh.beatbot.layout.page.MainPageSelect
+        android:id="@+id/mainPageSelect"
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
         android:orientation="horizontal" >
 
         <com.kh.beatbot.view.SquareImageButton
             android:id="@+id/addTrack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:background="@drawable/plus_icon_large"
             android:onClick="addTrack" />
 
-        <com.kh.beatbot.view.SquareToggle
-            android:id="@+id/masterVolumeToggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/volume_btn_src"
-            android:checked="true"
-            android:onClick="volume"
-            android:textOff=""
-            android:textOn="" />
-
-        <com.kh.beatbot.view.SquareToggle
-            android:id="@+id/masterPanToggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/pan_btn_src"
-            android:onClick="pan"
-            android:textOff=""
-            android:textOn="" />
-
-        <com.kh.beatbot.view.SquareToggle
-            android:id="@+id/masterPitchToggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/pitch_btn_src"
-            android:onClick="pitch"
-            android:textOff=""
-            android:textOn="" />
-
-        <com.kh.beatbot.view.BBSeekbar
-            android:id="@+id/masterLevelBar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginRight="40dp" />
-
-        <com.kh.beatbot.view.SquareToggle
-            android:id="@+id/levels"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_marginLeft="-40dp"
-            android:background="@drawable/levels_btn_src"
-            android:contentDescription="@string/levels"
-            android:onClick="levels"
-            android:textOff=""
-            android:textOn="" />
-    </LinearLayout>
-
-    <com.kh.beatbot.layout.page.TrackPageSelect
-        android:id="@+id/trackPageSelect"
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight=".1"
-        android:orientation="horizontal" >
-
-        <com.kh.beatbot.view.SquareImageView
-            android:id="@+id/instrumentSelect"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@drawable/page_select_src"
-            android:src="@drawable/kick_icon" />
-
-        <LinearLayout
+        <TextView
             android:layout_width="150dp"
             android:layout_height="match_parent"
-            android:background="@drawable/page_select_src" >
-
-            <TextView
-                android:id="@+id/sampleSelect"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:ellipsize="marquee"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:lines="1"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:text="@string/select"
-                android:textColor="@color/text_selector" />
-        </LinearLayout>
-
+            android:background="@drawable/page_select_src"
+            android:text="@string/track"
+            android:textColor="@color/text_selector" />
+        
         <TextView
             android:layout_width="150dp"
             android:layout_height="match_parent"
             android:background="@drawable/page_select_src"
             android:text="@string/levels"
             android:textColor="@color/text_selector" />
+        
+    </com.kh.beatbot.layout.page.MainPageSelect>
 
-        <TextView
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/page_select_src"
-            android:text="@string/edit"
-            android:textColor="@color/text_selector" />
+    <ViewFlipper
+        android:id="@+id/mainFlipper"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".3" >
 
-        <TextView
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/page_select_src"
-            android:text="@string/effects"
-            android:textColor="@color/text_selector" />
-    </com.kh.beatbot.layout.page.TrackPageSelect>
+        <include
+            android:id="@+id/masterPage"
+            layout="@layout/master_page" />
+        
+        <include
+            android:id="@+id/trackPage"
+            layout="@layout/track_page" />
 
-<ViewFlipper
-    android:id="@+id/trackFlipper"
-    android:layout_width="fill_parent"
-    android:layout_height="0dp"
-    android:layout_weight=".2" >
-
-    <include
-        android:id="@+id/trackLevelsPage"
-        layout="@layout/track_levels_page" />
-
-    <include
-        android:id="@+id/sampleEditPage"
-        layout="@layout/sample_edit_page" />
-
-    <include
-        android:id="@+id/trackEffectsPage"
-        layout="@layout/track_effects_page" />
-
-</ViewFlipper>
+        <include
+            android:id="@+id/levelsPage"
+            layout="@layout/levels_page" />
+    </ViewFlipper>
 
 </LinearLayout>

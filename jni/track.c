@@ -46,23 +46,23 @@ void printTracks(TrackNode *head) {
 	}
 }
 
-void addEffect(Track *track, Effect *effect) {
+void addEffect(Levels *levels, Effect *effect) {
 	EffectNode *new = (EffectNode *) malloc(sizeof(EffectNode));
 	new->effect = effect;
 	new->next = NULL;
-	pthread_mutex_lock(&track->effectMutex);
+	pthread_mutex_lock(&levels->effectMutex);
 	// check for first insertion
-	if (track->effectHead == NULL) {
-		track->effectHead = new;
+	if (levels->effectHead == NULL) {
+		levels->effectHead = new;
 	} else {
 		// insert as last effect
-		EffectNode *cur_ptr = track->effectHead;
+		EffectNode *cur_ptr = levels->effectHead;
 		while (cur_ptr->next != NULL) {
 			cur_ptr = cur_ptr->next;
 		}
 		cur_ptr->next = new;
 	}
-	pthread_mutex_unlock(&track->effectMutex);
+	pthread_mutex_unlock(&levels->effectMutex);
 }
 
 TrackNode *getTrackNode(int trackNum) {
@@ -81,6 +81,14 @@ Track *getTrack(JNIEnv *env, jclass clazz, int trackNum) {
 	(void *) clazz; // avoid warnings about unused paramaters
 	TrackNode *trackNode = getTrackNode(trackNum);
 	return trackNode->track;
+}
+
+Levels *getLevels(JNIEnv *env, jclass clazz, int trackNum) {
+	if (trackNum == -1) {
+		return masterLevels;
+	}
+	Track *track = getTrack(env, clazz, trackNum);
+	return track->levels;
 }
 
 void addTrack(Track *track) {
@@ -115,8 +123,8 @@ TrackNode *removeTrack(int trackNum) {
 	return node;
 }
 
-void freeEffects(Track *track) {
-	EffectNode *cur_ptr = track->effectHead;
+void freeEffects(Levels *levels) {
+	EffectNode *cur_ptr = levels->effectHead;
 	while (cur_ptr != NULL) {
 		cur_ptr->effect->destroy(cur_ptr->effect->config);
 		EffectNode *prev_ptr = cur_ptr;
@@ -133,11 +141,12 @@ void freeTracks() {
 		free(cur_ptr->track->currBufferFloat[1]);
 		free(cur_ptr->track->currBufferFloat);
 		cur_ptr->track->generator->destroy(cur_ptr->track->generator->config);
-		freeEffects(cur_ptr->track);
+		freeEffects(cur_ptr->track->levels);
 		TrackNode *prev_ptr = cur_ptr;
 		cur_ptr = cur_ptr->next;
 		free(prev_ptr); // free the entire Node
 	}
+	freeEffects(masterLevels);
 	free(openSlOut->currBufferFloat[0]);
 	free(openSlOut->currBufferFloat[1]);
 	free(openSlOut->currBufferFloat);
@@ -147,13 +156,26 @@ void freeTracks() {
 	openSlOut->outputPlayerPlay = NULL;
 }
 
+Levels *initLevels() {
+	Levels *levels = malloc(sizeof(Levels));
+	pthread_mutex_init(&levels->effectMutex, NULL);
+	levels->effectHead = NULL;
+	levels->volume = .8f;
+	levels->pan = levels->pitch = .5f;
+	int effectNum;
+	for (effectNum = 0; effectNum < MAX_EFFECTS_PER_TRACK; effectNum++) {
+		addEffect(levels, NULL);
+	}
+	levels->volPan = initEffect(true, volumepanconfig_create(),
+			volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
+	return levels;
+}
+
 Track *initTrack() {
 	Track *track = malloc(sizeof(Track));
-	// asset->getLength() returns size in bytes.  need size in shorts, minus 22 shorts of .wav header
-	pthread_mutex_init(&track->effectMutex, NULL);
 	track->num = trackCount;
-	track->effectHead = NULL;
 	track->generator = NULL;
+	track->levels = initLevels();
 	track->nextEvent = malloc(sizeof(MidiEvent));
 	track->nextStartSample = track->nextStopSample = -1;
 	track->currBufferFloat = (float **) malloc(2 * sizeof(float *));
@@ -162,15 +184,9 @@ Track *initTrack() {
 	track->playing = track->previewing = false;
 	track->mute = track->solo = false;
 	track->shouldSound = true;
-	track->primaryVolume = track->nextEvent->volume = .8f;
-	track->primaryPan = track->primaryPitch = track->nextEvent->pitch =
-			track->nextEvent->pan = .5f;
-	int effectNum;
-	for (effectNum = 0; effectNum < MAX_EFFECTS_PER_TRACK; effectNum++) {
-		addEffect(track, NULL);
-	}
-	track->volPan = initEffect(true, volumepanconfig_create(),
-			volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
+	track->nextEvent->volume = .8f;
+	track->nextEvent->pitch =
+				track->nextEvent->pan = .5f;
 	return track;
 }
 
@@ -279,60 +295,66 @@ void updateNextNote(Track *track) {
 	(*env)->DeleteLocalRef(env, obj);
 }
 
-void Java_com_kh_beatbot_global_Track_setNextNote(JNIEnv *env,
-		jclass clazz, jint trackNum, jobject midiNote) {
+void Java_com_kh_beatbot_global_Track_setNextNote(JNIEnv *env, jclass clazz,
+		jint trackNum, jobject midiNote) {
 	Track *track = getTrack(env, clazz, trackNum);
 	setNextNote(track, midiNote);
 }
 
-void updateLevels(Track *track) {
+void updateLevels(int trackNum) {
+	if (trackNum == -1)
+		return; // master track - no update needed
+
+	Track *track = getTrack(NULL, NULL, trackNum);
 	MidiEvent *midiEvent = track->nextEvent;
-	track->volPan->set(track->volPan->config,
-			midiEvent->volume,
-			(masterPan + track->primaryPan + midiEvent->pan) / 3);
-	((WavFile *) track->generator->config)->sampleRate = masterPitch
-			* track->primaryPitch * midiEvent->pitch * 8;
+	if (masterLevels == NULL)
+		__android_log_print(ANDROID_LOG_ERROR, "in UL", "master levels is NULL!");
+	__android_log_print(ANDROID_LOG_ERROR, "in UL", "mp = %f", masterLevels->pan);
+	track->levels->volPan->set(track->levels->volPan->config, midiEvent->volume,
+			(masterLevels->pan + track->levels->pan + midiEvent->pan) / 3);
+	((WavFile *) track->generator->config)->sampleRate = masterLevels->pitch
+			* track->levels->pitch * midiEvent->pitch * 8;
 }
 
 void updateAllLevels() {
 	TrackNode *cur_ptr = trackHead;
 	while (cur_ptr != NULL) {
-		updateLevels(cur_ptr->track);
+		updateLevels(cur_ptr->track->num);
 		cur_ptr = cur_ptr->next;
 	}
 }
 
-void Java_com_kh_beatbot_global_Track_setPrimaryVolume(JNIEnv *env,
+void Java_com_kh_beatbot_global_BaseTrack_setTrackVolume(JNIEnv *env,
 		jclass clazz, jint trackNum, jfloat volume) {
-	Track *track = getTrack(env, clazz, trackNum);
-	track->primaryVolume = volume;
-	updateLevels(track);
+	Levels *levels = getLevels(env, clazz, trackNum);
+	levels->volume = volume;
+	updateLevels(trackNum);
 }
 
-void Java_com_kh_beatbot_global_Track_setPrimaryPan(JNIEnv *env, jclass clazz,
+void Java_com_kh_beatbot_global_BaseTrack_setTrackPan(JNIEnv *env, jclass clazz,
 		jint trackNum, jfloat pan) {
-	Track *track = getTrack(env, clazz, trackNum);
-	track->primaryPan = pan;
-	updateLevels(track);
+	Levels *levels = getLevels(env, clazz, trackNum);
+	levels->pan = pan;
+	updateLevels(trackNum);
 }
 
-void Java_com_kh_beatbot_global_Track_setPrimaryPitch(JNIEnv *env, jclass clazz,
-		jint trackNum, jfloat pitch) {
-	Track *track = getTrack(env, clazz, trackNum);
-	track->primaryPitch = pitch;
-	updateLevels(track);
+void Java_com_kh_beatbot_global_BaseTrack_setTrackPitch(JNIEnv *env,
+		jclass clazz, jint trackNum, jfloat pitch) {
+	Levels *levels = getLevels(env, clazz, trackNum);
+	levels->pitch = pitch;
+	updateLevels(trackNum);
 }
 
 void Java_com_kh_beatbot_global_Track_setAdsrOn(JNIEnv *env, jclass clazz,
 		jint trackNum, jboolean on) {
 	Track *track = getTrack(env, clazz, trackNum);
-	((WavFile *)track->generator->config)->adsr->active = on;
+	((WavFile *) track->generator->config)->adsr->active = on;
 }
 
 void Java_com_kh_beatbot_global_Track_setAdsrPoint(JNIEnv *env, jclass clazz,
 		jint trackNum, jint adsrPointNum, jfloat x, jfloat y) {
 	Track *track = getTrack(env, clazz, trackNum);
-	AdsrConfig *config = ((WavFile *)track->generator->config)->adsr;
+	AdsrConfig *config = ((WavFile *) track->generator->config)->adsr;
 	config->adsrPoints[adsrPointNum].sampleCents = x;
 	if (adsrPointNum == 0)
 		config->initial = y;
