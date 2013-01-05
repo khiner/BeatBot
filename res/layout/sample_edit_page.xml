@@ -5,9 +5,27 @@
     android:background="@color/background"
     android:orientation="horizontal" >
 
+    <com.kh.beatbot.view.SampleWaveformView
+        android:id="@+id/sample_waveform_view"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_toLeftOf="@+id/adsr" />
+
+    <com.kh.beatbot.view.SquareToggle
+        android:id="@+id/adsr"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_toLeftOf="@+id/playbackToggles"
+        android:background="@drawable/adsr_btn_src"
+        android:text="@string/adsr"
+        android:textOff=""
+        android:textOn="" />
+
     <LinearLayout
+        android:id="@+id/playbackToggles"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
         android:orientation="vertical" >
 
         <com.kh.beatbot.view.SquareToggle
@@ -28,19 +46,5 @@
             android:textOff=""
             android:textOn="" />
     </LinearLayout>
-
-    <com.kh.beatbot.view.SquareToggle
-        android:id="@+id/adsr"
-        android:layout_width="0dp"
-        android:layout_height="fill_parent"
-        android:background="@drawable/adsr_btn_src"
-        android:text="@string/adsr"
-        android:textOff=""
-        android:textOn="" />
-    
-    <com.kh.beatbot.view.SampleWaveformView
-        android:id="@+id/sample_waveform_view"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent" />
 
 </com.kh.beatbot.layout.page.SampleEditPage>

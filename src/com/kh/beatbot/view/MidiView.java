@@ -27,16 +27,10 @@ import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class MidiView extends ClickableSurfaceView {
 	/**************** ATTRIBUTES ***************/
-	public static final float COLOR_TRANSITION_RATE = .02f;
 	public static float X_OFFSET; // dynamically determined
 	public static final float Y_OFFSET = 21;
 
 	public static final float LOOP_SELECT_SNAP_DIST = 30;
-
-	// the size of the "dots" at the top of level display
-	public static final int LEVEL_POINT_SIZE = 16;
-	// the width of the lines for note levels
-	public static final int LEVEL_LINE_WIDTH = 7;
 
 	public static float trackHeight, allTracksHeight;
 
@@ -311,9 +305,7 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	private void drawLoopRect() {
-		float gray = Colors.MIDI_VIEW_DEFAULT_BG_COLOR + .2f;
-		float[] color = new float[] { gray, gray, gray, 1 };
-		drawTriangleStrip(loopRectVb, color);
+		drawTriangleStrip(loopRectVb, Colors.MIDI_VIEW_LIGHT_BG_COLOR);
 	}
 
 	private void drawRecordingWaveforms() {
@@ -339,7 +331,7 @@ public class MidiView extends ClickableSurfaceView {
 		}
 	}
 
-	public void initSelectRegionVb(float leftTick, float rightTick, float topY,
+	private void initSelectRegionVb(float leftTick, float rightTick, float topY,
 			float bottomY) {
 		selectRegionVb = makeRectFloatBuffer(tickToX(leftTick), topY,
 				tickToX(rightTick), bottomY);
@@ -348,7 +340,7 @@ public class MidiView extends ClickableSurfaceView {
 	private void drawSelectRegion() {
 		if (!selectRegion || selectRegionVb == null)
 			return;
-		drawTriangleStrip(selectRegionVb, new float[] { .6f, .6f, 1, .7f });
+		drawTriangleStrip(selectRegionVb, Colors.SELECT_REGION_COLOR);
 	}
 
 	private void drawAllMidiNotes() {
@@ -479,9 +471,7 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	protected void init() {
-		setBackgroundColor(new float[] { Colors.MIDI_VIEW_DEFAULT_BG_COLOR,
-				Colors.MIDI_VIEW_DEFAULT_BG_COLOR,
-				Colors.MIDI_VIEW_DEFAULT_BG_COLOR, 1 });
+		setBackgroundColor(Colors.MIDI_VIEW_DEFAULT_BG_COLOR);
 		midiManager = Managers.midiManager;
 		TickWindowHelper.init(this);
 		MidiTrackControlHelper.init(this);
@@ -512,9 +502,9 @@ public class MidiView extends ClickableSurfaceView {
 			TickWindowHelper.setNumTicks(midiManager.getCurrTick()
 					- TickWindowHelper.getTickOffset());
 		drawHorizontalLines();
+		drawTickFill();
 		drawVerticalLines();
 		drawAllMidiNotes();
-		drawTickFill();
 		drawSelectRegion();
 		drawLoopMarker();
 		ScrollBarHelper.drawScrollView(getMidiWidth(), height, X_OFFSET);

@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.widget.RelativeLayout;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
@@ -38,7 +41,12 @@ public class LevelsView extends SurfaceViewBase {
 		}
 	}
 
-	private static final int LEVEL_BAR_WIDTH = MidiView.LEVEL_POINT_SIZE / 2;
+	// the size of the "dots" at the top of level display
+	public static final int LEVEL_POINT_SIZE = 16;
+	// the width of the lines for note levels
+	public static final int LEVEL_LINE_WIDTH = 7;
+
+	private static final int LEVEL_BAR_WIDTH = LEVEL_POINT_SIZE / 2;
 
 	private FloatBuffer levelBarVb = null, selectRegionVb = null;
 
@@ -83,6 +91,18 @@ public class LevelsView extends SurfaceViewBase {
 			vertices[i * 4 + 3] = vertices[i * 4 + 1];
 		}
 		levelBarVb = SurfaceViewBase.makeFloatBuffer(vertices);
+	}
+
+	private void drawSelectRegion() {
+		if (!selectRegion || selectRegionVb == null)
+			return;
+		drawTriangleStrip(selectRegionVb, Colors.SELECT_REGION_COLOR);
+	}
+
+	private void initSelectRegionVb(float leftTick, float rightTick,
+			float topY, float bottomY) {
+		selectRegionVb = makeRectFloatBuffer(tickToX(leftTick), topY,
+				tickToX(rightTick), bottomY);
 	}
 
 	private int calcVertex(float level) {
@@ -132,28 +152,27 @@ public class LevelsView extends SurfaceViewBase {
 	}
 
 	private void drawLevels() {
-		for (MidiNote midiNote : Managers.midiManager.getSelectedNotes()) {
-			drawLevel(GlobalVars.midiView.tickToX(midiNote.getOnTick()),
+		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
+			drawLevel(tickToX(midiNote.getOnTick()),
 					midiNote.getLevel(currLevelType),
-					calcLevelColor(midiNote.isLevelSelected()));
+					calcLevelColor(midiNote.isSelected()));
 		}
 	}
 
 	private boolean selectLevel(float x, float y, int pointerId) {
-		for (MidiNote selectedNote : Managers.midiManager.getSelectedNotes()) {
-			float velocityY = levelToY(selectedNote.getLevel(currLevelType));
-			if (Math.abs(GlobalVars.midiView.tickToX(selectedNote.getOnTick())
-					- x) < 35
+		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
+			float velocityY = levelToY(midiNote.getLevel(currLevelType));
+			if (Math.abs(tickToX(midiNote.getOnTick()) - x) < 35
 					&& Math.abs(velocityY - y) < 35) {
 				// If this is the only touched level, and it hasn't yet
 				// been selected, make it the only selected level.
 				// If we are multi-selecting, add it to the selected list
-				if (!selectedNote.isLevelSelected()) {
+				if (!midiNote.isSelected()) {
 					if (touchedLevels.isEmpty())
-						deselectAllLevels();
-					selectedNote.setLevelSelected(true);
+						Managers.midiManager.deselectAllNotes();
+					midiNote.setSelected(true);
 				}
-				touchedLevels.put(pointerId, selectedNote);
+				touchedLevels.put(pointerId, midiNote);
 				updateLevelOffsets();
 				return true;
 			}
@@ -162,20 +181,21 @@ public class LevelsView extends SurfaceViewBase {
 	}
 
 	public void selectRegion(float x, float y) {
-		float tick = GlobalVars.midiView.xToTick(x);
+		float tick = xToTick(x);
 		float leftTick = Math.min(tick, selectRegionStartTick);
 		float rightTick = Math.max(tick, selectRegionStartTick);
 		float topY = Math.min(y, selectRegionStartY);
 		float bottomY = Math.max(y, selectRegionStartY);
-		for (MidiNote selectedNote : Managers.midiManager.getSelectedNotes()) {
+		for (MidiNote selectedNote : Managers.midiManager.getMidiNotes()) {
 			float levelY = levelToY(selectedNote.getLevel(currLevelType));
 			if (leftTick < selectedNote.getOnTick()
 					&& rightTick > selectedNote.getOnTick() && topY < levelY
 					&& bottomY > levelY)
-				selectedNote.setLevelSelected(true);
+				selectedNote.setSelected(true);
 			else
-				selectedNote.setLevelSelected(false);
+				selectedNote.setSelected(false);
 		}
+		initSelectRegionVb(leftTick, rightTick, topY, bottomY);
 	}
 
 	private void updateDragLine() {
@@ -210,34 +230,24 @@ public class LevelsView extends SurfaceViewBase {
 	private void updateLevelOffsets() {
 		levelOffsets.clear();
 		updateDragLine();
-		for (MidiNote levelSelected : Managers.midiManager
-				.getLevelSelectedNotes()) {
-			levelOffsets.put(
-					levelSelected,
-					levelSelected.getLevel(currLevelType)
-							- DragLine.getLevel(levelSelected.getOnTick()));
+		for (MidiNote selectedNote : Managers.midiManager.getSelectedNotes()) {
+			levelOffsets.put(selectedNote, selectedNote.getLevel(currLevelType)
+					- DragLine.getLevel(selectedNote.getOnTick()));
 		}
 	}
 
 	private void setLevelsToDragLine() {
-		for (MidiNote levelSelected : Managers.midiManager
-				.getLevelSelectedNotes()) {
-			if (levelOffsets.get(levelSelected) != null) {
-				levelSelected.setLevel(currLevelType,
-						DragLine.getLevel(levelSelected.getOnTick())
-								+ levelOffsets.get(levelSelected));
+		for (MidiNote selectedNote : Managers.midiManager.getSelectedNotes()) {
+			if (levelOffsets.get(selectedNote) != null) {
+				selectedNote.setLevel(currLevelType,
+						DragLine.getLevel(selectedNote.getOnTick())
+								+ levelOffsets.get(selectedNote));
 			}
 		}
 	}
 
-	private void deselectAllLevels() {
-		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
-			midiNote.setLevelSelected(false);
-		}
-	}
-
 	private void startSelectRegion(float x, float y) {
-		selectRegionStartTick = GlobalVars.midiView.xToTick(x);
+		selectRegionStartTick = xToTick(x);
 		selectRegionStartY = y;
 		selectRegionVb = null;
 		selectRegion = true;
@@ -245,21 +255,28 @@ public class LevelsView extends SurfaceViewBase {
 
 	protected void drawFrame() {
 		drawLevels();
+		drawSelectRegion();
+	}
+	
+	private float tickToX(float tick) {
+		return GlobalVars.midiView.tickToX(tick) - MidiView.X_OFFSET;
 	}
 
+	private float xToTick(float x) {
+		return GlobalVars.midiView.xToTick(x + MidiView.X_OFFSET);
+	}
+	
 	private float levelToY(float level) {
-		return height - level * (height - MidiView.LEVEL_POINT_SIZE) - MidiView.LEVEL_POINT_SIZE / 2;
+		return height - level * (height - LEVEL_POINT_SIZE) - LEVEL_POINT_SIZE
+				/ 2;
 	}
 
 	/*
 	 * map y value of level bar to a value in [0,1]
 	 */
 	private float yToLevel(float y) {
-		return (height - y - MidiView.LEVEL_POINT_SIZE / 2) / (height - MidiView.LEVEL_POINT_SIZE);
-	}
-
-	public void resetSelected() {
-		deselectAllLevels();
+		return (height - y - LEVEL_POINT_SIZE / 2)
+				/ (height - LEVEL_POINT_SIZE);
 	}
 
 	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
@@ -284,12 +301,20 @@ public class LevelsView extends SurfaceViewBase {
 		}
 		GlobalVars.midiView.updateLoopMarkers(e);
 	}
-
+	
 	@Override
 	protected void init() {
-		setBackgroundColor(new float[] { Colors.MIDI_VIEW_DEFAULT_BG_COLOR,
-				Colors.MIDI_VIEW_DEFAULT_BG_COLOR,
-				Colors.MIDI_VIEW_DEFAULT_BG_COLOR, 1 });
+		final RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)getLayoutParams();
+		params.leftMargin = (int)MidiView.X_OFFSET;
+		Handler refresh = new Handler(Looper.getMainLooper());
+		refresh.post(new Runnable() {
+		    public void run()
+		    {
+		        setLayoutParams(params);
+		    }
+		});
+		
+		setBackgroundColor(Colors.MIDI_VIEW_DEFAULT_BG_COLOR);
 		gl = MidiView.getGL10();
 		initLevelBarVb();
 	}

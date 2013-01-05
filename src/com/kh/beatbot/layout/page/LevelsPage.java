@@ -30,7 +30,6 @@ public class LevelsPage extends Page implements LevelListener {
 		volumeToggle = (ToggleButton) findViewById(R.id.trackVolumeToggle);
 		panToggle = (ToggleButton) findViewById(R.id.trackPanToggle);
 		pitchToggle = (ToggleButton) findViewById(R.id.trackPitchToggle);
-
 		volumeToggle.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
 				currTrack.activeLevelType = LevelType.VOLUME;

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 
 import com.kh.beatbot.manager.PageManager;
-import com.kh.beatbot.manager.PageSelect;
 
 public class MasterPageSelect extends PageSelect {
 

@@ -9,7 +9,6 @@ public class MidiNote implements Comparable<MidiNote> {
 	NoteOn noteOn;
 	NoteOff noteOff;
 	boolean selected = false;
-	boolean levelSelected = false;
 	boolean touched = false;
 
 	public MidiNote(NoteOn noteOn, NoteOff noteOff) {
@@ -26,7 +25,6 @@ public class MidiNote implements Comparable<MidiNote> {
 				noteOff.getPan(), noteOn.getPitch());
 		MidiNote copy = new MidiNote(noteOnCopy, noteOffCopy);
 		copy.setSelected(selected);
-		copy.setLevelSelected(levelSelected);
 		copy.setTouched(touched);
 		return copy;
 	}
@@ -67,20 +65,12 @@ public class MidiNote implements Comparable<MidiNote> {
 		return selected;
 	}
 
-	public boolean isLevelSelected() {
-		return levelSelected;
-	}
-
 	public boolean isTouched() {
 		return touched;
 	}
 
 	public void setSelected(boolean selected) {
 		this.selected = selected;
-	}
-
-	public void setLevelSelected(boolean levelSelected) {
-		this.levelSelected = levelSelected;
 	}
 
 	public void setTouched(boolean touched) {

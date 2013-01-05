@@ -62,7 +62,8 @@
     <ViewFlipper
         android:id="@+id/trackFlipper"
         android:layout_width="fill_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:layout_below="@+id/trackPageSelect" >
 
         <include
             android:id="@+id/trackLevelsPage"

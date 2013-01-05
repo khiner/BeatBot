@@ -3,9 +3,9 @@ package com.kh.beatbot.layout.page;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
-public abstract class Page extends LinearLayout {
+public abstract class Page extends RelativeLayout {
 
 	public Page(Context context, AttributeSet attrs) {
 		super(context, attrs);

@@ -5,6 +5,7 @@ import android.widget.ViewFlipper;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.layout.page.MainPageSelect;
 import com.kh.beatbot.layout.page.MasterPage;
 import com.kh.beatbot.layout.page.NoteLevelsPage;
 import com.kh.beatbot.layout.page.Page;
@@ -20,6 +21,7 @@ public class PageManager {
 	private static NoteLevelsPage levelsPage = null;
 	
 	public static void init(Activity context) {
+		((MainPageSelect)context.findViewById(R.id.mainPageSelect)).init();
 		masterPage = (MasterPage)context.findViewById(R.id.masterPage);
 		trackPage = (TrackPage)context.findViewById(R.id.trackPage);
 		levelsPage = (NoteLevelsPage)context.findViewById(R.id.levelsPage);

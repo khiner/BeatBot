@@ -9,6 +9,7 @@
             android:id="@+id/trackVolumeToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:background="@drawable/volume_btn_src"
             android:checked="true"
             android:clickable="false"
@@ -19,8 +20,10 @@
             android:id="@+id/trackPanToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:background="@drawable/pan_btn_src"
             android:clickable="false"
+            android:layout_toRightOf="@+id/trackVolumeToggle"
             android:textOff=""
             android:textOn="" />
 
@@ -28,8 +31,10 @@
             android:id="@+id/trackPitchToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:background="@drawable/pitch_btn_src"
             android:clickable="false"
+            android:layout_toRightOf="@+id/trackPanToggle"
             android:textOff=""
             android:textOn="" />
 
@@ -37,6 +42,7 @@
             android:id="@+id/trackLevel"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/trackPitchToggle"
             android:layout_marginRight="6dp" />
     
 </com.kh.beatbot.layout.page.LevelsPage>

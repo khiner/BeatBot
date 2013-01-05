@@ -5,12 +5,43 @@
     android:orientation="horizontal" >
 
     <LinearLayout
-        android:id="@+id/masterLevelsSelect"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:orientation="vertical" >
-    </LinearLayout>
+        
+    <com.kh.beatbot.view.SquareToggle
+        android:id="@+id/trackVolumeToggle"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight=".333333333"
+        android:background="@drawable/volume_btn_src"
+        android:checked="true"
+        android:clickable="false"
+        android:textOff=""
+        android:textOn="" />
 
+    <com.kh.beatbot.view.SquareToggle
+        android:id="@+id/trackPanToggle"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight=".333333333"
+        android:background="@drawable/pan_btn_src"
+        android:clickable="false"
+        android:textOff=""
+        android:textOn="" />
+
+    <com.kh.beatbot.view.SquareToggle
+        android:id="@+id/trackPitchToggle"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight=".333333333"
+        android:background="@drawable/pitch_btn_src"
+        android:clickable="false"
+        android:textOff=""
+        android:textOn="" />
+
+    </LinearLayout>
+    
     <com.kh.beatbot.view.LevelsView
         android:id="@+id/levelsView"
         android:layout_width="match_parent"

@@ -5,7 +5,6 @@ import android.util.AttributeSet;
 import android.widget.ImageButton;
 
 import com.kh.beatbot.manager.PageManager;
-import com.kh.beatbot.manager.PageSelect;
 
 public class MainPageSelect extends PageSelect {
 	private ImageButton addTrackButton;

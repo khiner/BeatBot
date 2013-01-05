@@ -99,15 +99,6 @@ public class MidiManager implements Parcelable {
 		return selectedNotes;
 	}
 
-	public List<MidiNote> getLevelSelectedNotes() {
-		ArrayList<MidiNote> levelSelectedNotes = new ArrayList<MidiNote>();
-		for (MidiNote midiNote : midiNotes) {
-			if (midiNote.isLevelSelected())
-				levelSelectedNotes.add(midiNote);
-		}
-		return levelSelectedNotes;
-	}
-
 	public MidiNote getMidiNote(int i) {
 		// if there is a temporary (clipped or deleted) version of the note,
 		// return that version instead
@@ -161,12 +152,7 @@ public class MidiManager implements Parcelable {
 
 	public void selectRow(int rowNum) {
 		for (MidiNote midiNote : midiNotes) {
-			if (midiNote.getNoteValue() == rowNum) {
-				midiNote.setSelected(true);
-			} else {
-				midiNote.setSelected(false);
-				midiNote.setLevelSelected(false);
-			}
+			midiNote.setSelected(midiNote.getNoteValue() == rowNum);
 		}
 		updateEditIcons();
 	}

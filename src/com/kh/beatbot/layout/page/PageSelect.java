@@ -1,4 +1,4 @@
-package com.kh.beatbot.manager;
+package com.kh.beatbot.layout.page;
 
 import android.content.Context;
 import android.util.AttributeSet;

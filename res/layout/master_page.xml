@@ -28,7 +28,8 @@
     <ViewFlipper
         android:id="@+id/masterFlipper"
         android:layout_width="fill_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:layout_below="@+id/masterPageSelect" >
 
         <include
             android:id="@+id/masterLevelsPage"

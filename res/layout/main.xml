@@ -31,6 +31,7 @@
         android:id="@+id/midiView"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
+        android:layout_marginRight="15dp"
         android:layout_weight=".5" />
 
     <com.kh.beatbot.layout.page.MainPageSelect

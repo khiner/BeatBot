@@ -34,7 +34,6 @@ import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Effect.EffectParam;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.layout.page.MainPageSelect;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
@@ -155,11 +154,9 @@ public class BeatBotActivity extends Activity {
 			initNativeAudio();
 		}
 		Managers.init(savedInstanceState);
-		((MainPageSelect)findViewById(R.id.mainPageSelect)).init();
-		//initLevelsIconGroup();
-		PageManager.init(this);
-		setEditIconsEnabled(false);
 		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));
+		setEditIconsEnabled(false);
+		PageManager.init(this);
 
 		// were we recording and/or playing before losing the instance?
 		if (savedInstanceState != null) {
