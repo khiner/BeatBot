@@ -8,11 +8,11 @@ import java.util.Map;
 
 import android.view.MotionEvent;
 
+import com.kh.beatbot.R;
 import com.kh.beatbot.global.BBButton;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.MidiTrackControlListener;
 import com.kh.beatbot.manager.Managers;
@@ -29,10 +29,8 @@ public class MidiTrackControlHelper {
 			this.trackNum = trackNum;
 			instrumentButton = new BBToggleButton(instrumentIcon,
 					MidiView.trackHeight);
-			muteButton = new BBToggleButton(GlobalVars.muteIcon,
-					MidiView.trackHeight);
-			soloButton = new BBToggleButton(GlobalVars.soloIcon,
-					MidiView.trackHeight);
+			muteButton = new BBToggleButton(muteIcon, MidiView.trackHeight);
+			soloButton = new BBToggleButton(soloIcon, MidiView.trackHeight);
 			width = instrumentButton.getWidth() + muteButton.getWidth()
 					+ soloButton.getWidth();
 		}
@@ -136,12 +134,21 @@ public class MidiTrackControlHelper {
 
 	public static final int NUM_CONTROLS = 3; // mute/solo/track settings
 
+	private static BBIconSource muteIcon, soloIcon;
 	private static MidiView midiView = null;
 	private static MidiTrackControlListener listener;
 	private static FloatBuffer bgRectVb = null;
 	private static List<ButtonRow> buttonRows = new ArrayList<ButtonRow>();
 	private static Map<Integer, ButtonRow> whichRowOwnsPointer = new HashMap<Integer, ButtonRow>();
 
+	
+	public static void loadIcons() {
+		muteIcon = new BBIconSource(-1, R.drawable.mute_icon,
+				R.drawable.mute_icon_selected);
+		soloIcon = new BBIconSource(-1, R.drawable.solo_icon,
+				R.drawable.solo_icon_selected);
+	}
+	
 	public static void init(MidiView _midiView) {
 		if (!buttonRows.isEmpty()) {
 			// it is possible that this static class can be reinstantiated after

@@ -5,7 +5,6 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.egl.EGL10;
-import javax.microedition.khronos.egl.EGL11;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
@@ -14,7 +13,6 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 import javax.microedition.khronos.opengles.GL11Ext;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -26,14 +24,25 @@ import android.util.FloatMath;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.manager.Managers;
 
 public abstract class SurfaceViewBase extends SurfaceView implements
 		SurfaceHolder.Callback, Runnable {
 	public static final float ¹ = (float) Math.PI;
+
+	private static int[] version = new int[2];
+	private static int[] num_config = new int[1];
+	private static int[] configSpec = { EGL10.EGL_RED_SIZE, 4,
+			EGL10.EGL_GREEN_SIZE, 4, EGL10.EGL_BLUE_SIZE, 4, EGL10.EGL_NONE };
+	private static EGLConfig[] configs = new EGLConfig[1];
+	private static Resources resources;
+	private static EGL10 egl = (EGL10) EGLContext.getEGL();
+	private static EGLDisplay dpy = egl
+			.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
+	private EGLContext context;
+	private EGLSurface surface;
 
 	protected EGLContext glContext;
 	protected SurfaceHolder sHolder;
@@ -44,8 +53,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	protected float[] backgroundColor = Colors.BG_COLOR;
 	protected float[] clearColor = Colors.BG_COLOR;
 
-	private static Resources resources;
-	protected static GL10 gl;
+	protected static GL10 gl = null;
 
 	public static void setResources(Resources resources) {
 		SurfaceViewBase.resources = resources;
@@ -274,48 +282,21 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 
 	public void run() {
 		// Much of this code is from GLSurfaceView in the Google API Demos.
-		int[] version = new int[2];
-		int[] num_config = new int[1];
-		int[] configSpec = { EGL10.EGL_RED_SIZE, 4, EGL10.EGL_GREEN_SIZE, 4,
-				EGL10.EGL_BLUE_SIZE, 4, EGL10.EGL_NONE };
-
-		EGLConfig[] configs = new EGLConfig[1];
-		EGL10 egl = (EGL10) EGLContext.getEGL();
-
-		EGLDisplay dpy = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
 		egl.eglInitialize(dpy, version);
 		egl.eglChooseConfig(dpy, configSpec, configs, 1, num_config);
-		EGLConfig config = configs[0];
-		EGLContext context = egl.eglCreateContext(dpy, config,
-				EGL10.EGL_NO_CONTEXT, null);
-
-		EGLSurface surface = egl.eglCreateWindowSurface(dpy, config, sHolder,
+		context = egl.eglCreateContext(dpy, configs[0], EGL10.EGL_NO_CONTEXT,
 				null);
+
+		surface = egl.eglCreateWindowSurface(dpy, configs[0], sHolder, null);
+
 		egl.eglMakeCurrent(dpy, surface, surface, context);
-
-		gl = (GL10) context.getGL();
-		GlobalVars.initIcons();
-		Managers.directoryManager.initIcons();
-		gl.glViewport(0, 0, width, height);
-		GLU.gluOrtho2D(gl, 0, width, height, 0);
-
-		gl.glEnable(GL10.GL_BLEND);
-		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		gl.glEnable(GL10.GL_POINT_SMOOTH);
+		initGl(context);
 		init();
 
 		running = true;
 		while (running) {
 			drawFrame(gl, width, height);
 			egl.eglSwapBuffers(dpy, surface);
-
-			if (egl.eglGetError() == EGL11.EGL_CONTEXT_LOST) {
-				Context c = getContext();
-				if (c instanceof Activity) {
-					((Activity) c).finish();
-				}
-			}
 		}
 		egl.eglMakeCurrent(dpy, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE,
 				EGL10.EGL_NO_CONTEXT);
@@ -324,17 +305,20 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		egl.eglTerminate(dpy);
 	}
 
+	private void initGl(EGLContext context) {
+		gl = (GL10) context.getGL();
+		loadIcons();
+		gl.glViewport(0, 0, width, height);
+		GLU.gluOrtho2D(gl, 0, width, height, 0);
+
+		gl.glEnable(GL10.GL_POINT_SMOOTH);
+		gl.glEnable(GL10.GL_BLEND);
+		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+	}
+
 	/**
 	 * Create a texture and send it to the graphics system
-	 * 
-	 * @param gl
-	 *            The GL object
-	 * @param bmp
-	 *            The bitmap of the texture
-	 * @param reverseRGB
-	 *            Should the RGB values be reversed? (necessary workaround for
-	 *            loading .pngs...)
-	 * @return The newly created identifier for the texture.
 	 */
 	protected static void loadTexture(Bitmap bitmap, int[] textures) {
 		// generate one texture pointer
@@ -367,6 +351,8 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	}
 
 	protected abstract void init();
+
+	protected abstract void loadIcons();
 
 	protected abstract void drawFrame();
 

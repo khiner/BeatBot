@@ -302,6 +302,10 @@ public class LevelsView extends SurfaceViewBase {
 		GlobalVars.midiView.updateLoopMarkers(e);
 	}
 	
+	protected void loadIcons() {
+		// no icons to load
+	}
+	
 	@Override
 	protected void init() {
 		final RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)getLayoutParams();

@@ -29,6 +29,10 @@ public class BBSeekbar extends LevelListenable {
 		levelBarVb = makeFloatBuffer(vertices);
 	}
 
+	protected void loadIcons() {
+		// no icons to load
+	}
+	
 	protected void init() {
 		initLevelBarVb();
 		updateNumLevelVertices();

@@ -8,13 +8,16 @@ import android.util.FloatMath;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import com.kh.beatbot.R;
+import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.BBToggleButton;
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 
 public class BBKnob extends LevelListenable {
 	public static final float ¹ = (float) Math.PI;
+	
+	private static BBToggleButton centerButton = null;
 	private static FloatBuffer circleVb = null;
 	private static FloatBuffer selectCircleVb = null;
 	private static FloatBuffer selectCircleVb2 = null;
@@ -24,7 +27,6 @@ public class BBKnob extends LevelListenable {
 
 	private int drawIndex = 0;
 	private boolean levelSelected = false;
-	private BBToggleButton centerButton = null;
 	private boolean clickable = false;
 
 	public BBKnob(Context c, AttributeSet as) {
@@ -35,11 +37,14 @@ public class BBKnob extends LevelListenable {
 		this.clickable = clickable;
 	}
 
+	protected void loadIcons() {
+		centerButton = new BBToggleButton(new BBIconSource(-1, R.drawable.clock, R.drawable.note_icon));
+	}
+	
 	@Override
 	public void init() {
 		super.init();
 		if (clickable) {
-			centerButton = new BBToggleButton(GlobalVars.beatSyncIcon);
 			centerButton.setOn(true);
 		}
 	}
@@ -112,7 +117,7 @@ public class BBKnob extends LevelListenable {
 			drawTriangleStrip(selectCircleVb2, selectColor, drawIndex);
 			drawTriangleStrip(selectCircleVb, selectColor, drawIndex);
 		}
-		if (centerButton != null) {
+		if (clickable) {
 			centerButton.draw(0, 0, width, height);
 		}
 	}

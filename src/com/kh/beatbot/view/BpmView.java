@@ -155,6 +155,10 @@ public class BpmView extends SurfaceViewBase {
 		}
 	}
 
+	protected void loadIcons() {
+		// no icons to load
+	}
+	
 	@Override
 	protected void init() {
 		initSegmentVBs();

@@ -94,6 +94,7 @@ public class MidiView extends ClickableSurfaceView {
 	private static final int[] V_LINE_WIDTHS = new int[] { 5, 3, 2 };
 	private static final float[] V_LINE_COLORS = new float[] { 0, .2f, .3f };
 
+	
 	// NIO Buffers
 	private FloatBuffer[] vLineVb = new FloatBuffer[3];
 	private FloatBuffer currTickVb = null, hLineVb = null, tickHLineVb = null,
@@ -470,6 +471,11 @@ public class MidiView extends ClickableSurfaceView {
 		initTickFillVb();
 	}
 
+	protected void loadIcons() {
+		MidiTrackControlHelper.loadIcons();
+		Managers.directoryManager.loadIcons();
+	}
+	
 	protected void init() {
 		setBackgroundColor(Colors.MIDI_VIEW_DEFAULT_BG_COLOR);
 		midiManager = Managers.midiManager;

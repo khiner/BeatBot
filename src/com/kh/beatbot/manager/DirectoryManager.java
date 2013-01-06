@@ -137,7 +137,7 @@ public class DirectoryManager {
 		}
 	}
 
-	public void initIcons() {
+	public void loadIcons() {
 		getDrumInstrument(0).getBBIconSource().set(R.drawable.kick_icon_src,
 				R.drawable.kick_icon, R.drawable.kick_icon_selected,
 				R.drawable.kick_icon_listview, R.drawable.kick_icon_list_title);
@@ -201,7 +201,7 @@ public class DirectoryManager {
 	private BBDirectory currDirectory = null;
 
 	private boolean addingTrack = false;
-
+	
 	public static DirectoryManager getInstance() {
 		if (singletonInstance == null) {
 			singletonInstance = new DirectoryManager();

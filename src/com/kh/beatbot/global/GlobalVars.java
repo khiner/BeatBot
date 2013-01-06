@@ -2,24 +2,11 @@ package com.kh.beatbot.global;
 
 import android.graphics.Typeface;
 
-import com.kh.beatbot.R;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.view.MidiView;
 
 public class GlobalVars {
 	public static BeatBotActivity mainActivity;
-	
-	public static BBIconSource muteIcon, soloIcon, previewIcon, beatSyncIcon;
-
-	public static void initIcons() {
-		muteIcon = new BBIconSource(-1, R.drawable.mute_icon,
-				R.drawable.mute_icon_selected);
-		soloIcon = new BBIconSource(-1, R.drawable.solo_icon,
-				R.drawable.solo_icon_selected);
-		previewIcon = new BBIconSource(-1, R.drawable.preview_icon,
-				R.drawable.preview_icon_selected);
-		beatSyncIcon = new BBIconSource(-1, R.drawable.clock, R.drawable.note_icon);
-	}
 
 	public static Typeface font;
 	// time (in millis) between pointer down and pointer up to be considered a

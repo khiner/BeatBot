@@ -252,8 +252,12 @@ public class LabelListListenable extends ClickableSurfaceView {
 	}
 
 	@Override
-	protected void init() {
+	protected void loadIcons() {
 		plusIcon = new BBIcon(R.drawable.plus_outline);
+	}
+	
+	@Override
+	protected void init() {
 		if (labels == null)
 			labels = new ArrayList<Label>();
 		initGlText();

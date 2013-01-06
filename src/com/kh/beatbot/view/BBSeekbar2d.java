@@ -46,6 +46,10 @@ public class BBSeekbar2d extends LevelListenable {
 		initLines();
 	}
 
+	protected void loadIcons() {
+		// no icons to load
+	}
+	
 	@Override
 	public void init() {
 		super.init();
