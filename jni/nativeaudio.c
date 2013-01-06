@@ -51,14 +51,13 @@ static inline void writeFloatsToFile(float **buffer, int size, FILE *out) {
 }
 
 static inline void processEffects(Levels *levels, float **floatBuffer) {
-	levels->volPan->process(levels->volPan->config,
-			floatBuffer, BUFF_SIZE);
+	levels->volPan->process(levels->volPan->config, floatBuffer, BUFF_SIZE);
 	pthread_mutex_lock(&levels->effectMutex);
 	EffectNode *effectNode = levels->effectHead;
 	while (effectNode != NULL) {
 		if (effectNode->effect != NULL && effectNode->effect->on) {
-			effectNode->effect->process(effectNode->effect->config,
-					floatBuffer, BUFF_SIZE);
+			effectNode->effect->process(effectNode->effect->config, floatBuffer,
+					BUFF_SIZE);
 		}
 		effectNode = effectNode->next;
 	}
@@ -100,12 +99,13 @@ static inline void mixTracks() {
 
 void soundTrack(Track *track) {
 	updateLevels(track->num);
-	AdsrConfig *adsrConfig = ((WavFile *) track->generator->config)->adsr;
-	resetAdsr(adsrConfig);
+	resetAdsr(((WavFile *) track->generator->config)->adsr);
 }
 
 void stopSoundingTrack(Track *track) {
 	wavfile_reset((WavFile *) track->generator->config);
+	// in case the preview button is being held down, don't want to play the sound again from the beginning
+	track->previewing = false;
 }
 
 void stopTrack(Track *track) {
@@ -118,7 +118,7 @@ void stopTrack(Track *track) {
 }
 
 void playTrack(Track *track) {
-	if (track->playing) {
+	if (track->playing || track->previewing) {
 		stopSoundingTrack(track);
 	}
 	track->playing = true;
@@ -128,7 +128,8 @@ void playTrack(Track *track) {
 void previewTrack(Track *track) {
 	track->previewing = true;
 	if (!track->playing) {
-		soundTrack(track);
+		setPreviewLevels(track);
+		resetAdsr(((WavFile *) track->generator->config)->adsr);
 	}
 }
 
@@ -287,6 +288,9 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env,
 	result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
 	trackHead = NULL;
 	masterLevels = initLevels();
+	previewEvent = malloc(sizeof(MidiEvent));
+	previewEvent->volume = .8f;
+	previewEvent->pitch = previewEvent->pan = .5f;
 	//pthread_create(&bufferFillThread, NULL, fillBuffer, (void *)bufferFillThreadId);
 }
 

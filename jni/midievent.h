@@ -9,4 +9,6 @@ typedef struct MidiEvent_ {
 	long offTick;
 } MidiEvent;
 
+MidiEvent *previewEvent;
+
 #endif // MIDIEVENT_H

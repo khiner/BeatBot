@@ -62,6 +62,8 @@ TrackNode *removeTrack(int trackNum);
 
 void updateLevels(int trackNum);
 
+void setPreviewLevels(Track *track);
+
 void updateAllLevels();
 
 void freeEffects(Levels *levels);

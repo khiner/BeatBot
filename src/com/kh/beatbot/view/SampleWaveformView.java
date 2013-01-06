@@ -218,7 +218,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 		// make preview button square
 		previewButtonWidth = height;
 		waveformWidth = width - previewButtonWidth - SNAP_DIST;
-		update(); // TODO try not updating track here.
 		initBackgroundOutlineVb();
 		initPreviewButtonSquareVb();
 		initLoopMarkerVb();
@@ -454,7 +453,6 @@ public class SampleWaveformView extends SurfaceViewBase {
 		} else {
 			return false;
 		}
-		updateVbs();
 		return true;
 	}
 
@@ -521,8 +519,8 @@ public class SampleWaveformView extends SurfaceViewBase {
 	}
 
 	public void handlePreviewActionDown(int id) {
-		previewButton.touch();
 		TrackManager.currTrack.preview();
+		previewButton.touch();
 		previewPointerId = id;
 	}
 

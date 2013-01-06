@@ -150,11 +150,11 @@ public class LabelListListenable extends ClickableSurfaceView {
 
 	private static final float GAP_BETWEEN_LABELS = 5;
 	private static final float TEXT_Y_OFFSET = 3;
-	private FloatBuffer bgRectVb = null;
-	private GLText glText = null; // A GLText Instance
+	private static FloatBuffer bgRectVb = null;
+	private static GLText glText = null; // A GLText Instance
 	private LabelListListener listener = null;
 	private ArrayList<Label> labels = null;
-	private BBIcon plusIcon;
+	private static BBIcon plusIcon;
 	private int initialTouchedPosition;
 
 	// which label is currently being touched? (null for none)
@@ -254,13 +254,13 @@ public class LabelListListenable extends ClickableSurfaceView {
 	@Override
 	protected void loadIcons() {
 		plusIcon = new BBIcon(R.drawable.plus_outline);
+		initGlText();
 	}
 	
 	@Override
 	protected void init() {
 		if (labels == null)
 			labels = new ArrayList<Label>();
-		initGlText();
 		addTextWidth = glText.getTextWidth("add") + height;
 		if (bgRectVb == null)
 			initBgRectVb();

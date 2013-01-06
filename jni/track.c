@@ -301,16 +301,22 @@ void Java_com_kh_beatbot_global_Track_setNextNote(JNIEnv *env, jclass clazz,
 	setNextNote(track, midiNote);
 }
 
-void updateLevels(int trackNum) {
-	if (trackNum == -1)
-		return; // master track - no update needed
-
-	Track *track = getTrack(NULL, NULL, trackNum);
-	MidiEvent *midiEvent = track->nextEvent;
+void setLevels(Track *track, MidiEvent *midiEvent) {
 	track->levels->volPan->set(track->levels->volPan->config, midiEvent->volume,
 			(masterLevels->pan + track->levels->pan + midiEvent->pan) / 3);
 	((WavFile *) track->generator->config)->sampleRate = masterLevels->pitch
 			* track->levels->pitch * midiEvent->pitch * 8;
+}
+
+void updateLevels(int trackNum) {
+	if (trackNum == -1)
+		return; // master track - no update needed
+	Track *track = getTrack(NULL, NULL, trackNum);
+	setLevels(track, track->nextEvent);
+}
+
+void setPreviewLevels(Track *track) {
+	setLevels(track, previewEvent);
 }
 
 void updateAllLevels() {

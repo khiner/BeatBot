@@ -280,6 +280,8 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		t = null;
 	}
 
+	private boolean initialized = false;
+	
 	public void run() {
 		// Much of this code is from GLSurfaceView in the Google API Demos.
 		egl.eglInitialize(dpy, version);
@@ -291,7 +293,11 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 
 		egl.eglMakeCurrent(dpy, surface, surface, context);
 		initGl(context);
-		init();
+		
+		if (!initialized) {
+			init();
+			initialized = true;
+		}
 
 		running = true;
 		while (running) {
