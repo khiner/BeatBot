@@ -47,33 +47,45 @@ public abstract class PageSelect extends LinearLayout {
 	 * Override onLayout AND onMeasure to ensure cheap (no weight) even spacing
 	 * AND text centering
 	 ******/
-	@Override
-	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		int len = getChildCount() - firstPageLabelIndex;
+	
+	protected void onLayout(boolean changed, int l, int t, int r, int b, int firstPageLabel) {
+		super.onLayout(changed, l, t, r, b);
+		int len = getChildCount() - firstPageLabel;
 		int h = b - t;
 		int w = (r - l - h) / len;
 		getChildAt(0).layout(0, 0, h, h);
 		int pos = h;
-		for (int i = firstPageLabelIndex; i < getChildCount(); i++) {
+		for (int i = firstPageLabel; i < getChildCount(); i++) {
 			View c = getChildAt(i);
 			c.layout(pos, 0, pos + w, h);
 			pos += w;
 		}
 	}
-
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+	
+	protected void onMeasure(int w, int h, int firstPageLabel) {
+		super.onMeasure(w, h);
 		int wspec = MeasureSpec.makeMeasureSpec(
 				(getMeasuredWidth() - getMeasuredHeight())
-						/ (getChildCount() - firstPageLabelIndex),
+						/ (getChildCount() - firstPageLabel),
 				MeasureSpec.EXACTLY);
 		int hspec = MeasureSpec.makeMeasureSpec(getMeasuredHeight(),
 				MeasureSpec.EXACTLY);
-		getChildAt(0).measure(hspec, hspec);
-		for (int i = firstPageLabelIndex; i < getChildCount(); i++) {
+		for (int i = 0; i < firstPageLabel; i++) {
+			getChildAt(i).measure(hspec, hspec);
+		}
+		for (int i = firstPageLabel; i < getChildCount(); i++) {
 			View v = getChildAt(i);
 			v.measure(wspec, hspec);
 		}
+	}
+
+	@Override
+	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+		onLayout(changed, l, t, r, b, firstPageLabelIndex);
+	}
+
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		onMeasure(widthMeasureSpec, heightMeasureSpec, firstPageLabelIndex);
 	}
 }

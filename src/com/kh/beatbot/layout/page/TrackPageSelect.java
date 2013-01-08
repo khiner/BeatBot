@@ -65,4 +65,14 @@ public class TrackPageSelect extends PageSelect {
 				.toUpperCase();
 		sampleSelect.setText(formattedName);
 	}
+	
+	@Override
+	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+		onLayout(changed, l, t, r, b, 1);
+	}
+
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		onMeasure(widthMeasureSpec, heightMeasureSpec, 1);
+	}
 }

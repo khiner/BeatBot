@@ -220,8 +220,7 @@ public class SampleWaveformView extends SurfaceViewBase {
 		waveformWidth = width - previewButtonWidth - SNAP_DIST;
 		initBackgroundOutlineVb();
 		initPreviewButtonSquareVb();
-		initLoopMarkerVb();
-		initAdsrVb();
+		update();
 	}
 
 	private void stopPreviewing() {

@@ -43,6 +43,7 @@ public class TrackPage extends Page {
 	public void update() {
 		effectsPage.setMasterMode(false);
 		levelsPage.setMasterMode(false);
+		trackPageSelect.update();
 		for (Page trackPage : pages) {
 			trackPage.update();
 		}
@@ -62,8 +63,8 @@ public class TrackPage extends Page {
 	public void setVisibilityCode(int code) {
 		getPage(currPageNum).setVisibilityCode(code);
 	}
-
-	public Page getPage(int trackPageNum) {
-		return pages[trackPageNum];
+	
+	public Page getPage(int pageNum) {
+		return pages[pageNum];
 	}
 }

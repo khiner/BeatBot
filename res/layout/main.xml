@@ -32,12 +32,13 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_marginRight="15dp"
+        android:layout_marginTop="5dp"
         android:layout_weight=".5" />
 
     <com.kh.beatbot.layout.page.MainPageSelect
         android:id="@+id/mainPageSelect"
         android:layout_width="fill_parent"
-        android:layout_height="30dp"
+        android:layout_height="28dp"
         android:orientation="horizontal" >
 
         <com.kh.beatbot.view.SquareImageButton
@@ -48,21 +49,21 @@
             android:onClick="addTrack" />
 
         <TextView
-            android:layout_width="150dp"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:background="@drawable/page_select_src"
             android:text="@string/master"
             android:textColor="@color/text_selector" />
         
         <TextView
-            android:layout_width="150dp"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:background="@drawable/page_select_src"
             android:text="@string/track"
             android:textColor="@color/text_selector" />
         
         <TextView
-            android:layout_width="150dp"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:background="@drawable/page_select_src"
             android:text="@string/levels"

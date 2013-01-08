@@ -46,9 +46,7 @@ public class MasterPage extends Page {
 
 	@Override
 	public void setVisibilityCode(int code) {
-		for (Page page : pages) {
-			page.setVisibilityCode(code);
-		}
+		getPage(currPageNum).setVisibilityCode(code);
 	}
 	
 	public void selectPage(final int pageNum) {
@@ -61,7 +59,7 @@ public class MasterPage extends Page {
 		getPage(pageNum).setVisible(true);
 	}
 	
-	public Page getPage(final int pageNum) {
+	public Page getPage(int pageNum) {
 		return pages[pageNum];
 	}
 }
