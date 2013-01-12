@@ -11,16 +11,20 @@ import android.view.MotionEvent;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
+import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.manager.TrackManager;
 
 public class AdsrView extends TouchableSurfaceView {
+	private static final int DRAW_OFFSET = 6;
 	private static final int SNAP_DIST_SQUARED = 1024;
-	private static final float[] ADSR_COLOR = Colors.PITCH_COLOR.clone();
+	private static final float[] ADSR_COLOR = Colors.VOLUME_COLOR.clone();
 	private static final float[] ADSR_SELECTED_COLOR = { ADSR_COLOR[0],
 			ADSR_COLOR[1], ADSR_COLOR[2], .6f };
 	private static final float ADSR_POINT_RADIUS = 5;
 	private static FloatBuffer adsrPointVb = null;
 	private static FloatBuffer[] adsrCurveVb = new FloatBuffer[4];
+	private static ViewRect viewRect;
+	private static FloatBuffer borderVb = null;
 	// keep track of which pointer ids are selecting which ADSR points
 	// init to -1 to indicate no pointer is selecting
 	private int[] adsrSelected = new int[] { -1, -1, -1, -1, -1 };
@@ -29,6 +33,12 @@ public class AdsrView extends TouchableSurfaceView {
 		super(c, as);
 	}
 
+	private void initBorderVb() {
+		viewRect = new ViewRect(width, height, 0.18f);
+		borderVb = makeRoundedCornerRectBuffer(width - DRAW_OFFSET * 2, height
+				- DRAW_OFFSET * 2, viewRect.borderRadius, 25);
+	}
+	
 	private void initAdsrVb() {
 		float[] pointVertices = new float[10];
 		
@@ -171,6 +181,7 @@ public class AdsrView extends TouchableSurfaceView {
 	
 	@Override
 	protected void init() {
+		initBorderVb();
 		initAdsrVb();
 	}
 
@@ -178,9 +189,17 @@ public class AdsrView extends TouchableSurfaceView {
 	protected void loadIcons() {
 		
 	}
-
+	
+	private void drawRoundedBg() {
+		gl.glTranslatef(width / 2, height / 2, 0);
+		drawTriangleFan(borderVb, LevelListenable.BG_COLOR);
+		drawLines(borderVb, Colors.VOLUME_COLOR, 5, GL10.GL_LINE_LOOP);
+		gl.glTranslatef(-width / 2, -height / 2, 0);
+	}
+	
 	@Override
 	protected void drawFrame() {
+		drawRoundedBg();
 		drawAdsr();
 	}
 

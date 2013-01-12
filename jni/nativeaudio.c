@@ -208,6 +208,7 @@ static inline void generateNextBuffer() {
 // Process all effects for all tracks
 // Mix all tracks together into the OpenSL byte buffer
 void fillBuffer() {
+	return; // TODO temp bec of ADSR changes causing beeping noise
 	pthread_mutex_lock(&openSlOut->trackMutex);
 	generateNextBuffer();
 	processEffectsForAllTracks();

@@ -55,11 +55,11 @@ public class AdsrPage extends Page implements OnClickListener {
 			adsrButtons[i].setTag(i);
 			adsrButtons[i].setOnClickListener(this);
 		}
+		updateLabels();
 	}
 
 	@Override
 	public void update() {
-		
 	}
 
 	@Override
@@ -125,6 +125,16 @@ public class AdsrPage extends Page implements OnClickListener {
 		}
 	}
 	
+	private void updateLabels() {
+		updateLabel();
+		updateValueLabel();
+	}
+	
+	private void updateLabel() {
+		// update the displayed param name
+		paramLabel.setText(params[currParamId].name);		
+	}
+	
 	private void updateValueLabel() {
 		valueLabel.setText(params[currParamId].getFormattedValueString());
 	}
@@ -135,9 +145,7 @@ public class AdsrPage extends Page implements OnClickListener {
 		int paramId = (Integer)v.getTag();
 		// set the current parameter so we know what to do with SeekBar events.
 		currParamId = paramId;
-		// update the displayed param name
-		paramLabel.setText(params[currParamId].name);
-		updateValueLabel();
+		updateLabels();
 		switch (paramId) {
 		case ATTACK_ID:
 			break;

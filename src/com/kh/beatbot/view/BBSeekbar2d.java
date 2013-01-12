@@ -14,10 +14,8 @@ import com.kh.beatbot.listener.LevelListener;
 
 public class BBSeekbar2d extends LevelListenable {
 	private static final int DRAW_OFFSET = 8;
-	private static float minX, maxX, minY, maxY;
 	private float selectX = 0, selectY = 0;
-	private float borderRadius;
-
+	private static ViewRect viewRect;
 	private static FloatBuffer borderVb = null;
 	private static FloatBuffer lineVb = null;
 
@@ -26,23 +24,19 @@ public class BBSeekbar2d extends LevelListenable {
 	}
 
 	private void initBorderVb() {
-		borderRadius = Math.min(width, height) / 14;
-		minX = borderRadius + 2;
-		minY = borderRadius + 2;
-		maxX = width - borderRadius - 2;
-		maxY = height - borderRadius - 2;
+		viewRect = new ViewRect(width, height, 0.08f);
 		borderVb = makeRoundedCornerRectBuffer(width - DRAW_OFFSET * 2, height
-				- DRAW_OFFSET * 2, borderRadius, 25);
+				- DRAW_OFFSET * 2, viewRect.borderRadius, 25);
 	}
 
 	public void setViewLevelX(float x) {
-		selectX = x * (width - 2 * minX) + minX;
+		selectX = viewRect.viewX(x);
 		initLines();
 	}
 
 	public void setViewLevelY(float y) {
 		// top of screen lowest value in my OpenGl window
-		selectY = (1 - y) * (height - minY * 2) + minY;
+		selectY = viewRect.viewY(y);
 		initLines();
 	}
 
@@ -59,16 +53,20 @@ public class BBSeekbar2d extends LevelListenable {
 
 	@Override
 	protected void drawFrame() {
-		drawBackground();
+		drawRoundedBg();
+		levelColor[3] = 1; // completely opaque alpha
+		drawLines(lineVb, levelColor, 5, GL10.GL_LINES);
+		drawRoundedBgOutline();
 		drawSelection();
 	}
 
-	private void drawBackground() {
+	private void drawRoundedBg() {
 		gl.glTranslatef(width / 2, height / 2, 0);
 		drawTriangleFan(borderVb, BG_COLOR);
 		gl.glTranslatef(-width / 2, -height / 2, 0);
-		levelColor[3] = 1; // completely opaque alpha
-		drawLines(lineVb, levelColor, 5, GL10.GL_LINES);
+	}
+	
+	private void drawRoundedBgOutline() {
 		gl.glTranslatef(width / 2, height / 2, 0);
 		drawLines(borderVb, Colors.VOLUME_COLOR, 5, GL10.GL_LINE_LOOP);
 		gl.glTranslatef(-width / 2, -height / 2, 0);
@@ -84,23 +82,22 @@ public class BBSeekbar2d extends LevelListenable {
 		setColor(levelColor);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, makeFloatBuffer(new float[] {
 				selectX, selectY }));
-		gl.glPointSize(borderRadius);
+		gl.glPointSize(viewRect.borderRadius);
 		gl.glDrawArrays(GL10.GL_POINTS, 0, 1);
 		levelColor[3] = .4f;
 		setColor(levelColor);
-		for (float size = borderRadius; size < borderRadius * 1.5; size++) {
+		for (float size = viewRect.borderRadius; size < viewRect.borderRadius * 1.5; size++) {
 			gl.glPointSize(size);
 			gl.glDrawArrays(GL10.GL_POINTS, 0, 1);
 		}
 	}
 
 	private void selectLocation(float x, float y) {
-		selectX = x < minX ? minX : (x > maxX ? maxX : x);
-		selectY = y < minY ? minY : (y > maxY ? maxY : y);
+		selectX = viewRect.clipX(x);
+		selectY = viewRect.clipY(y);
 		initLines();
 		for (LevelListener listener : levelListeners) {
-			listener.setLevel(this, (selectX - minX) / (width - minX * 2),
-					((height - selectY) - minY) / (height - minY * 2));
+			listener.setLevel(this, viewRect.unitX(selectX), viewRect.unitY(height - selectY));
 		}
 	}
 

@@ -358,4 +358,44 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	protected abstract void loadIcons();
 
 	protected abstract void drawFrame();
+	
+	protected class ViewRect {
+		public float minX, maxX, minY, maxY, width, height, borderRadius;
+		
+		// radiusScale determines the size of the radius of the rounded border.
+		// radius will be the given percentage of the shortest side of the view rect.
+		ViewRect(float parentWidth, float parentHeight, float radiusScale) {
+			borderRadius = Math.min(parentWidth, parentHeight) * radiusScale;
+			minX = borderRadius + 2;
+			minY = borderRadius + 2;
+			maxX = parentWidth - borderRadius - 2;
+			maxY = parentHeight - borderRadius - 2;
+			width = parentWidth - 2 * minX;
+			height = parentHeight - 2 * minY;
+		}
+		
+		public float viewX(float x) {
+			 return x * width + minX;
+		}
+		
+		public float viewY(float y) {
+			return (1 - y) * height + minY;
+		}
+		
+		public float unitX(float viewX) {
+			return (viewX - minX) / width;
+		}
+		
+		public float unitY(float viewY) {
+			return (viewY - minY) / height;
+		}
+		
+		public float clipX(float x) {
+			return x < minX ? minX : (x > maxX ? maxX : x);
+		}
+		
+		public float clipY(float y) {
+			return y < minY ? minY : (y > maxY ? maxY : y);
+		}
+	}
 }

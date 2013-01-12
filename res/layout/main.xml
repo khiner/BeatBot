@@ -45,7 +45,7 @@
             android:id="@+id/addTrack"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:background="@drawable/plus_icon_large"
+            android:background="@drawable/plus_outline"
             android:onClick="addTrack" />
 
         <TextView
