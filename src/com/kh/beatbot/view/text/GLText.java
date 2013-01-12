@@ -76,7 +76,6 @@ public class GLText {
 		}
 		s[0] = CHAR_NONE;
 		paint.getTextWidths(s, 0, 1, w);
-
 		charWidths[cnt] = w[0]; // Get Width
 		if (charWidths[cnt] > charWidthMax)
 			charWidthMax = charWidths[cnt]; // Save New Max Width
@@ -100,27 +99,26 @@ public class GLText {
 
 		// create an empty bitmap (alpha only)
 		Bitmap bitmap = Bitmap.createBitmap(textureSize, textureSize,
-				Bitmap.Config.ALPHA_8); // Create Bitmap
-		Canvas canvas = new Canvas(bitmap); // Create Canvas for Rendering to
-											// Bitmap
+				Bitmap.Config.ALPHA_8);
+		Canvas canvas = new Canvas(bitmap);
 		bitmap.eraseColor(0x00000000); // Set Transparent Background (ARGB)
 		// render each of the characters to the canvas (ie. build the font map)
 		float x = 0;
 		float y = cellHeight - FloatMath.ceil(Math.abs(fm.descent)) - 1;
-		for (char c = CHAR_START; c <= CHAR_END; c++) { // FOR Each Character
-			s[0] = c; // Set Character to Draw
-			canvas.drawText(s, 0, 1, x, y, paint); // Draw Character
-			x += cellWidth; // Move to Next Character
+		for (char c = CHAR_START; c <= CHAR_END; c++) {
+			s[0] = c;
+			canvas.drawText(s, 0, 1, x, y, paint);
+			x += cellWidth;
 			if (x + cellWidth > textureSize) {
 				x = 0; // Set X for New Row
 				y += cellHeight; // Move Down a Row
 			}
 		}
-		s[0] = CHAR_NONE; // Set Character to Use for NONE
-		canvas.drawText(s, 0, 1, x, y, paint); // Draw Character
+		s[0] = CHAR_NONE;
+		canvas.drawText(s, 0, 1, x, y, paint);
 
 		// generate a new texture
-		textureIds = new int[1]; // Array to Get Texture Id
+		textureIds = new int[1];
 		// load bitmap texture in OpenGL
 		SurfaceViewBase.loadTexture(bitmap, textureIds, 0);
 
@@ -138,8 +136,26 @@ public class GLText {
 		}
 	}
 
+	// D: draw text at the specified x,y position
+	// A: text - the string to draw
+	// x, y - the x,y position to draw text at (bottom left of text; including
+	// descent)
 	public void init(String text, float x, float y) {
+		x += cellWidth / 2;
+		y += cellHeight / 2;
+		batch.beginBatch(textureIds[0]);
+		for (char character : text.toCharArray()) {
+			int c = (int) character - CHAR_START;
+			if (c < 0 || c >= CHAR_CNT)
+				c = CHAR_UNKNOWN;
+			batch.initSprite(x, y, cellWidth, cellHeight, charRgn[c]);
+			x += charWidths[c];
+		}
+		batch.complete();
+	}
 
+	public void draw() {
+		batch.endBatch(textureIds[0]);
 	}
 
 	// D: draw text at the specified x,y position
@@ -152,12 +168,13 @@ public class GLText {
 		batch.beginBatch(textureIds[0]);
 		for (char character : text.toCharArray()) {
 			int c = (int) character - CHAR_START;
-			if (c < 0 || c >= CHAR_CNT) // IF Character Not In Font
-				c = CHAR_UNKNOWN; // Set to Unknown Character Index
-			batch.drawSprite(x, y, cellWidth, cellHeight, charRgn[c]);
+			if (c < 0 || c >= CHAR_CNT)
+				c = CHAR_UNKNOWN;
+			batch.initSprite(x, y, cellWidth, cellHeight, charRgn[c]);
 			x += charWidths[c];
 		}
-		batch.endBatch();
+		batch.complete();
+		batch.endBatch(textureIds[0]);
 	}
 
 	// D: return the width/height of a character, or max character width

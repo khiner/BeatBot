@@ -4,10 +4,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import javax.microedition.khronos.opengles.GL10;
-
 import android.content.Context;
-import android.opengl.GLU;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
@@ -315,16 +312,6 @@ public class LabelListListenable extends ClickableSurfaceView {
 		}
 		touchedLabel = null;
 		updateLabelLocations();
-	}
-
-	@Override
-	protected void drawFrame(GL10 gl, int w, int h) {
-		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		gl.glLoadIdentity();
-		GLU.gluOrtho2D(gl, 0, width, 0, height);
-		fillBackground();
-		drawFrame();
-		GLU.gluOrtho2D(gl, 0, width, height, 0);
 	}
 
 	@Override

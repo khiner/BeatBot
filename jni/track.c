@@ -349,12 +349,6 @@ void Java_com_kh_beatbot_global_BaseTrack_setTrackPitch(JNIEnv *env,
 	updateLevels(trackNum);
 }
 
-void Java_com_kh_beatbot_global_Track_setAdsrOn(JNIEnv *env, jclass clazz,
-		jint trackNum, jboolean on) {
-	Track *track = getTrack(env, clazz, trackNum);
-	track->levels->adsr->active = on;
-}
-
 void Java_com_kh_beatbot_global_Track_setAdsrParam(JNIEnv *env, jclass clazz,
 		jint trackNum, jint adsrParamNum, jfloat value) {
 	Track *track = getTrack(env, clazz, trackNum);

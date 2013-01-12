@@ -156,8 +156,6 @@ public class AdsrView extends TouchableSurfaceView {
 	}
 	
 	private boolean selectAdsrPoint(int id, float x, float y) {
-		if (!TrackManager.currTrack.isAdsrEnabled())
-			return false;
 		for (int i = 0; i < 5; i++) {
 			if (i == 3)
 				continue; // release point not user changeable

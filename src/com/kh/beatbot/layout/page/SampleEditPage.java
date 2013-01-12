@@ -12,7 +12,6 @@ import com.kh.beatbot.view.SampleWaveformView;
 public class SampleEditPage extends Page {
 	
 	private SampleWaveformView sampleWaveformView;
-	private ToggleButton adsrButton;
 	private ToggleButton loopButton;
 	private ToggleButton reverseButton;
 	
@@ -22,14 +21,8 @@ public class SampleEditPage extends Page {
 
 	public void init() {
 		sampleWaveformView = (SampleWaveformView) findViewById(R.id.sample_waveform_view);
-		adsrButton = (ToggleButton) findViewById(R.id.adsr);
 		loopButton = (ToggleButton) findViewById(R.id.loop);
 		reverseButton = (ToggleButton) findViewById(R.id.reverse);
-		adsrButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View arg0) {
-				TrackManager.currTrack.setAdsrOn(adsrButton.isChecked());
-			}
-		});
 		loopButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
 				TrackManager.currTrack.toggleLooping();
@@ -45,7 +38,6 @@ public class SampleEditPage extends Page {
 	@Override
 	public void update() {
 		sampleWaveformView.update();
-		adsrButton.setChecked(TrackManager.currTrack.isAdsrEnabled());
 		loopButton.setChecked(TrackManager.currTrack.isLooping());
 		reverseButton.setChecked(TrackManager.currTrack.isReverse());
 	}

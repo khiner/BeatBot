@@ -13,17 +13,12 @@ typedef struct AdsrConfig_t {
 	float currLevel;
 	float currSample;
 	float stoppedSample;
-	bool active;
 } AdsrConfig;
 
 AdsrConfig *adsrconfig_create();
 void resetAdsr(AdsrConfig *config);
 
 static inline float adsr_tick(AdsrConfig *config) {
-	if (!config->active) {
-		return 1;
-	}
-
 	config->currSample++;
 	if (config->currSample > config->stoppedSample) { // note ended - in release phase
 		config->currLevel += (-config->sustain) / config->release;
@@ -36,8 +31,6 @@ static inline float adsr_tick(AdsrConfig *config) {
 }
 
 static inline void adsr_process(AdsrConfig *config, float **buffers, int size) {
-	if (!config->active)
-		return;
 	int i;
 	for (i = 0; i < size; i++) {
 		float gain = adsr_tick(config);

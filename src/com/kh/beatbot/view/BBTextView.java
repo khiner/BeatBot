@@ -1,9 +1,6 @@
 package com.kh.beatbot.view;
 
-import javax.microedition.khronos.opengles.GL10;
-
 import android.content.Context;
-import android.opengl.GLU;
 import android.util.AttributeSet;
 
 import com.kh.beatbot.global.Colors;
@@ -25,30 +22,20 @@ public class BBTextView extends SurfaceViewBase {
 	
 	@Override
 	protected void init() {
-		
+		// nothing to do
 	}
 
 	public void setText(String text) {
 		this.text = text;
-		textWidth = glText.getTextWidth(text);
+		textWidth = glText.getTextWidth(this.text);
 		textOffset = width / 2 - textWidth / 2;
+		glText.init(this.text, textOffset, 0);
 	}
 	
 	@Override
 	protected void drawFrame() {
 		setColor(Colors.VOLUME_COLOR);
 		// draw string in center of rect
-		glText.draw(text, textOffset, 0);
-	}
-	
-	// TODO get rid of this garbage (also in labellistlistenable
-	@Override
-	protected void drawFrame(GL10 gl, int w, int h) {
-		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		gl.glLoadIdentity();
-		GLU.gluOrtho2D(gl, 0, width, 0, height);
-		fillBackground();
-		drawFrame();
-		GLU.gluOrtho2D(gl, 0, width, height, 0);
+		glText.draw();
 	}
 }
