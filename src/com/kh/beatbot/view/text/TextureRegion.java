@@ -2,11 +2,9 @@ package com.kh.beatbot.view.text;
 
 class TextureRegion {
 
-	// --Members--//
 	public float u1, v1; // Top/Left U,V Coordinates
 	public float u2, v2; // Bottom/Right U,V Coordinates
 
-	// --Constructor--//
 	// D: calculate U,V coordinates from specified texture coordinates
 	// A: texWidth, texHeight - the width and height of the texture the region
 	// is for

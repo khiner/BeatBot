@@ -30,8 +30,8 @@ public class GLText {
 	public final static int CHAR_UNKNOWN = (CHAR_CNT - 1);
 	public final static int CHAR_BATCH_SIZE = 100;
 
-	private AssetManager assets; // Asset Manager
-	private SpriteBatch batch; // Batch Renderer
+	private AssetManager assets;
+	private SpriteBatch batch;
 	// region of each character (texture coordinates)
 	private TextureRegion[] charRgn = new TextureRegion[CHAR_CNT];
 
