@@ -16,7 +16,6 @@ import com.kh.beatbot.global.BBIcon;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.view.ClickableSurfaceView;
-import com.kh.beatbot.view.text.GLText;
 
 public class LabelListListenable extends ClickableSurfaceView {
 	private static float addTextWidth;
@@ -74,19 +73,15 @@ public class LabelListListenable extends ClickableSurfaceView {
 			if (state == LabelState.EMPTY) {
 				plusIcon.draw(x + labelWidth / 2 - addTextWidth / 2, 0, height,
 						height);
-				glText.begin(); // Begin Text Rendering
 				setColor(Colors.WHITE);
 				// draw string in center of rect
 				glText.draw("ADD", x + labelWidth / 2 - addTextWidth / 2
 						+ height, TEXT_Y_OFFSET);
-				glText.end();
 			} else {
-				glText.begin(); // Begin Text Rendering
 				setColor(Colors.WHITE);
 				// draw string in center of rect
 				glText.draw(text, x + labelWidth / 2 - textWidth / 2,
 						TEXT_Y_OFFSET);
-				glText.end();
 			}
 		}
 
@@ -151,7 +146,6 @@ public class LabelListListenable extends ClickableSurfaceView {
 	private static final float GAP_BETWEEN_LABELS = 5;
 	private static final float TEXT_Y_OFFSET = 3;
 	private static FloatBuffer bgRectVb = null;
-	private static GLText glText = null; // A GLText Instance
 	private LabelListListener listener = null;
 	private ArrayList<Label> labels = null;
 	private static BBIcon plusIcon;
@@ -242,13 +236,6 @@ public class LabelListListenable extends ClickableSurfaceView {
 
 	private void initBgRectVb() {
 		bgRectVb = makeRoundedCornerRectBuffer(width, height, 14, 15);
-	}
-
-	private void initGlText() {
-		glText = new GLText(gl, this.getContext().getAssets());
-		// Load the font from file with no padding, and height of 4/5 total
-		// height
-		glText.load("REDRING-1969-v03.ttf", height / 2, 0, 0);
 	}
 
 	@Override

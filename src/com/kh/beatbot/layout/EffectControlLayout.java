@@ -41,14 +41,13 @@ public class EffectControlLayout extends LinearLayout {
 			paramLabel = "Param";
 		if (paramValue == null)
 			paramValue = "0";
-
+		
 		label = (TextView) findViewById(R.id.param_label);
 		valueLabel = (TextView) findViewById(R.id.param_value_label);
 		knob = (BBKnob) findViewById(R.id.param_knob);
 
 		label.setTypeface(GlobalVars.font);
 		valueLabel.setTypeface(GlobalVars.font);
-
 		label.setText(paramLabel);
 		valueLabel.setText(paramValue);
 		knob.setClickable(beatSyncEnabled);

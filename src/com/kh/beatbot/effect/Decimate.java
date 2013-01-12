@@ -13,8 +13,8 @@ public class Decimate extends Effect {
 		numParams = 2;
 		effectNum = 1;
 		if (params.isEmpty()) {
-			params.add(new EffectParam(true, false, "Hz"));
-			params.add(new EffectParam(true, false, "Bits"));
+			params.add(new Param(true, false, "Hz"));
+			params.add(new Param(true, false, "Bits"));
 		}
 	}
 

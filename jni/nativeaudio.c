@@ -52,6 +52,7 @@ static inline void writeFloatsToFile(float **buffer, int size, FILE *out) {
 
 static inline void processEffects(Levels *levels, float **floatBuffer) {
 	levels->volPan->process(levels->volPan->config, floatBuffer, BUFF_SIZE);
+	adsr_process(levels->adsr, floatBuffer, BUFF_SIZE);
 	pthread_mutex_lock(&levels->effectMutex);
 	EffectNode *effectNode = levels->effectHead;
 	while (effectNode != NULL) {
@@ -99,11 +100,12 @@ static inline void mixTracks() {
 
 void soundTrack(Track *track) {
 	updateLevels(track->num);
-	resetAdsr(((WavFile *) track->generator->config)->adsr);
+	resetAdsr(track->levels->adsr);
 }
 
 void stopSoundingTrack(Track *track) {
 	wavfile_reset((WavFile *) track->generator->config);
+	track->levels->adsr->stoppedSample = track->levels->adsr->currSample;
 	// in case the preview button is being held down, don't want to play the sound again from the beginning
 	track->previewing = false;
 }
@@ -129,7 +131,7 @@ void previewTrack(Track *track) {
 	track->previewing = true;
 	if (!track->playing) {
 		setPreviewLevels(track);
-		resetAdsr(((WavFile *) track->generator->config)->adsr);
+		resetAdsr(track->levels->adsr);
 	}
 }
 

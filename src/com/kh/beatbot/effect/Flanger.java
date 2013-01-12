@@ -13,13 +13,13 @@ public class Flanger extends Effect {
 		numParams = 6;
 		effectNum = 4;
 		if (params.isEmpty()) {
-			params.add(new EffectParam(true, false, "ms"));
-			params.add(new EffectParam(false, false, ""));
-			params.add(new EffectParam(false, false, ""));
-			params.add(new EffectParam(true, true, "Hz"));
+			params.add(new Param(true, false, "ms"));
+			params.add(new Param(false, false, ""));
+			params.add(new Param(false, false, ""));
+			params.add(new Param(true, true, "Hz"));
 			getParam(3).hz = true;
-			params.add(new EffectParam(false, false, ""));
-			params.add(new EffectParam(false, false, ""));
+			params.add(new Param(false, false, ""));
+			params.add(new Param(false, false, ""));
 		}
 	}
 

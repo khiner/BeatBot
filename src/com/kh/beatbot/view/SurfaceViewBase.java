@@ -21,19 +21,18 @@ import android.opengl.GLU;
 import android.opengl.GLUtils;
 import android.util.AttributeSet;
 import android.util.FloatMath;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.view.text.GLText;
 
 public abstract class SurfaceViewBase extends SurfaceView implements
 		SurfaceHolder.Callback, Runnable {
 	public static final float ¹ = (float) Math.PI;
 
 	private static int[] version = new int[2];
-	private static int[] num_config = new int[1];
+	private static int[] numConfig = new int[1];
 	private static int[] configSpec = { EGL10.EGL_RED_SIZE, 4,
 			EGL10.EGL_GREEN_SIZE, 4, EGL10.EGL_BLUE_SIZE, 4, EGL10.EGL_NONE };
 	private static EGLConfig[] configs = new EGLConfig[1];
@@ -54,6 +53,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	protected float[] clearColor = Colors.BG_COLOR;
 
 	protected static GL10 gl = null;
+	protected GLText glText = null; // A GLText Instance
 
 	public static void setResources(Resources resources) {
 		SurfaceViewBase.resources = resources;
@@ -67,11 +67,15 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	 * @return The newly created FloatBuffer
 	 */
 	public static FloatBuffer makeFloatBuffer(float[] arr) {
+		return makeFloatBuffer(arr, 0);
+	}
+	
+	public static FloatBuffer makeFloatBuffer(float[] arr, int position) {
 		ByteBuffer bb = ByteBuffer.allocateDirect(arr.length * 4);
 		bb.order(ByteOrder.nativeOrder());
 		FloatBuffer fb = bb.asFloatBuffer();
 		fb.put(arr);
-		fb.position(0);
+		fb.position(position);
 		return fb;
 	}
 
@@ -183,6 +187,11 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glDrawArrays(GL10.GL_POINTS, vertex, 1);
 	}
 
+	protected float distanceFromCenterSquared(float x, float y) {
+		return (x - width / 2) * (x - width / 2) + (y - height / 2)
+				* (y - height / 2);
+	}
+	
 	protected void setBackgroundColor(float[] color) {
 		backgroundColor = color;
 	}
@@ -191,20 +200,12 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glColor4f(color[0], color[1], color[2], color[3]);
 	}
 
-	public static void loadTexture(int resourceId, int textureId,
-			int[] textureHandlers, int[] crop) {
+	public static void loadTexture(Bitmap bitmap, int[] textureHandlers, int textureId) {
 		// Generate Texture ID
 		gl.glGenTextures(1, textureHandlers, textureId);
 		// Bind texture id texturing target
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[textureId]);
-
-		Bitmap bitmap = BitmapFactory.decodeResource(resources, resourceId);
 		// Build our crop texture to be the size of the bitmap (ie full texture)
-		crop[0] = 0;
-		crop[1] = bitmap.getHeight();
-		crop[2] = bitmap.getWidth();
-		crop[3] = -bitmap.getHeight();
-
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
 				GL10.GL_LINEAR);
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
@@ -215,12 +216,19 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 				GL10.GL_REPEAT);
 
 		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, 0); // unbind texture
 		bitmap.recycle();
 	}
-
-	protected float distanceFromCenterSquared(float x, float y) {
-		return (x - width / 2) * (x - width / 2) + (y - height / 2)
-				* (y - height / 2);
+	
+	public static void loadTexture(int resourceId, int[] textureHandlers, int textureId, int[] crop) {
+		Bitmap bitmap = BitmapFactory.decodeResource(resources, resourceId);
+		
+		crop[0] = 0;
+		crop[1] = bitmap.getHeight();
+		crop[2] = bitmap.getWidth();
+		crop[3] = -bitmap.getHeight();
+		
+		loadTexture(bitmap, textureHandlers, textureId);
 	}
 
 	public static void drawTexture(int textureId, int[] textureHandlers,
@@ -285,7 +293,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	public void run() {
 		// Much of this code is from GLSurfaceView in the Google API Demos.
 		egl.eglInitialize(dpy, version);
-		egl.eglChooseConfig(dpy, configSpec, configs, 1, num_config);
+		egl.eglChooseConfig(dpy, configSpec, configs, 1, numConfig);
 		context = egl.eglCreateContext(dpy, configs[0], EGL10.EGL_NO_CONTEXT,
 				null);
 
@@ -322,27 +330,15 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 	}
-
-	/**
-	 * Create a texture and send it to the graphics system
-	 */
-	protected static void loadTexture(Bitmap bitmap, int[] textures) {
-		// generate one texture pointer
-		gl.glGenTextures(1, textures, 0);
-		// ...and bind it to our array
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
-
-		// create nearest filtered texture
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
-				GL10.GL_NEAREST);
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
-				GL10.GL_LINEAR);
-
-		// Use Android GLUtils to specify a two-dimensional texture image from
-		// our bitmap
-		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
-		// Clean up
-		bitmap.recycle();
+	
+	public static GL10 getGl() {
+		return gl;
+	}
+	
+	protected void initGlText() {
+		glText = new GLText(gl, getContext().getAssets());
+		// load font file
+		glText.load("REDRING-1969-v03.ttf", height / 2);
 	}
 
 	protected void fillBackground() {
@@ -361,45 +357,4 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	protected abstract void loadIcons();
 
 	protected abstract void drawFrame();
-
-	protected abstract void handleActionDown(int id, float x, float y);
-
-	protected abstract void handleActionPointerDown(MotionEvent e, int id,
-			float x, float y);
-
-	protected abstract void handleActionMove(MotionEvent e);
-
-	protected abstract void handleActionPointerUp(MotionEvent e, int id,
-			float x, float y);
-
-	protected abstract void handleActionUp(int id, float x, float y);
-
-	@Override
-	public boolean onTouchEvent(MotionEvent e) {
-		switch (e.getAction() & MotionEvent.ACTION_MASK) {
-		case MotionEvent.ACTION_CANCEL:
-			return false;
-		case MotionEvent.ACTION_DOWN:
-			handleActionDown(e.getPointerId(0), e.getX(0), e.getY(0));
-			break;
-		case MotionEvent.ACTION_POINTER_DOWN:
-			int index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-			handleActionPointerDown(e, e.getPointerId(index), e.getX(index),
-					e.getY(index));
-			break;
-		case MotionEvent.ACTION_MOVE:
-			index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-			handleActionMove(e);
-			break;
-		case MotionEvent.ACTION_POINTER_UP:
-			index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-			handleActionPointerUp(e, e.getPointerId(index), e.getX(index),
-					e.getY(index));
-			break;
-		case MotionEvent.ACTION_UP:
-			handleActionUp(e.getPointerId(0), e.getX(0), e.getY(0));
-			break;
-		}
-		return true;
-	}
 }

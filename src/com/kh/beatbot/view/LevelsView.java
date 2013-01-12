@@ -17,7 +17,7 @@ import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.midi.MidiNote;
 
-public class LevelsView extends SurfaceViewBase {
+public class LevelsView extends TouchableSurfaceView {
 
 	public LevelsView(Context c, AttributeSet as) {
 		super(c, as);

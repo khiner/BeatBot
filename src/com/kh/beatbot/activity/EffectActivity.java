@@ -19,8 +19,8 @@ import android.widget.ToggleButton;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.effect.Effect.EffectParam;
 import com.kh.beatbot.effect.Filter;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.layout.EffectControlLayout;
 import com.kh.beatbot.listenable.LevelListenable;
@@ -120,8 +120,9 @@ public class EffectActivity extends Activity implements LevelListener,
 		GeneralUtils.initAndroidSettings(this);
 		int effectPosition = getIntent().getExtras().getInt("effectPosition");
 		int trackId = getIntent().getExtras().getInt("trackId");
-		effect = Managers.trackManager.getBaseTrack(trackId).findEffectByPosition(
-				effectPosition);
+		// track could be master, so we need to be general and use BaseTrack
+		effect = Managers.trackManager.getBaseTrack(trackId)
+				.findEffectByPosition(effectPosition);
 		setContentView(R.layout.effect_layout);
 		ViewGroup parent = (ViewGroup) findViewById(R.id.effect_layout);
 		View paramWrapperLayout = initEffectLayout(parent);
@@ -134,16 +135,6 @@ public class EffectActivity extends Activity implements LevelListener,
 		findViewById(R.id.xyParamBar).setLayoutParams(layoutParams);
 		parent.addView(paramWrapperLayout);
 		initParamControls();
-
-		xParamKnob = paramControls.get(0).getKnob();
-		yParamKnob = paramControls.get(1).getKnob();
-		for (EffectControlLayout paramControl : paramControls) {
-			int paramNum = paramControl.getKnob().getId();
-			updateParamValueLabel(paramNum);
-		}
-		if (effect instanceof Delay) {
-			initDelayKnobs();
-		}
 	}
 
 	protected void initParamControls() {
@@ -172,6 +163,15 @@ public class EffectActivity extends Activity implements LevelListener,
 		level2d = (BBSeekbar2d) findViewById(R.id.xyParamBar);
 		level2d.removeAllListeners();
 		level2d.addLevelListener(this);
+		xParamKnob = paramControls.get(0).getKnob();
+		yParamKnob = paramControls.get(1).getKnob();
+		for (EffectControlLayout paramControl : paramControls) {
+			int paramNum = paramControl.getKnob().getId();
+			updateParamValueLabel(paramNum);
+		}
+		if (effect instanceof Delay) {
+			initDelayKnobs();
+		}
 	}
 
 	public void updateParamValueLabel(int paramNum) {
@@ -255,21 +255,22 @@ public class EffectActivity extends Activity implements LevelListener,
 
 	@Override
 	public void notifyClicked(LevelListenable listenable) {
-		if (!(listenable instanceof BBSeekbar2d)) {
-			int paramNum = listenable.getId();
-			EffectParam param = effect.getParam(paramNum);
-			param.beatSync = ((BBKnob) listenable).isBeatSync();
-			listenable.setLevel(param.viewLevel);
-			if (effect.paramsLinked()) {
-				if (paramNum == 0) {
-					effect.getParam(1).beatSync = param.beatSync;
-					paramControls.get(1).getKnob().setBeatSync(param.beatSync);
-					paramControls.get(1).getKnob().setLevel(param.viewLevel);
-				} else if (paramNum == 1) {
-					effect.getParam(0).beatSync = param.beatSync;
-					paramControls.get(0).getKnob().setBeatSync(param.beatSync);
-					paramControls.get(0).getKnob().setLevel(param.viewLevel);
-				}
+		if (listenable instanceof BBSeekbar2d) {
+			return;
+		}
+		int paramNum = listenable.getId();
+		Param param = effect.getParam(paramNum);
+		param.beatSync = ((BBKnob) listenable).isBeatSync();
+		listenable.setLevel(param.viewLevel);
+		if (effect.paramsLinked()) {
+			if (paramNum == 0) {
+				effect.getParam(1).beatSync = param.beatSync;
+				paramControls.get(1).getKnob().setBeatSync(param.beatSync);
+				paramControls.get(1).getKnob().setLevel(param.viewLevel);
+			} else if (paramNum == 1) {
+				effect.getParam(0).beatSync = param.beatSync;
+				paramControls.get(0).getKnob().setBeatSync(param.beatSync);
+				paramControls.get(0).getKnob().setLevel(param.viewLevel);
 			}
 		}
 	}
@@ -283,13 +284,13 @@ public class EffectActivity extends Activity implements LevelListener,
 		refresh.post(new Runnable() {
 			public void run() {
 				if (!(listenable instanceof BBSeekbar2d)) {
-					EffectParam param = effect.getParam(listenable.getId());
+					Param param = effect.getParam(listenable.getId());
 					listenable.setLevel(param.viewLevel);
 				}
 			}
 		});
 		if (effect.paramsLinked() && !(listenable instanceof BBSeekbar2d)) {
-			EffectParam param = effect.getParam(listenable.getId());
+			Param param = effect.getParam(listenable.getId());
 			((BBKnob) listenable).setBeatSync(param.beatSync);
 		}
 	}

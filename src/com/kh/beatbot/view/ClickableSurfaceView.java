@@ -6,7 +6,7 @@ import android.view.MotionEvent;
 
 import com.kh.beatbot.global.GlobalVars;
 
-public abstract class ClickableSurfaceView extends SurfaceViewBase {
+public abstract class ClickableSurfaceView extends TouchableSurfaceView {
 	/** State Variables for Clicking/Pressing **/
 	private long lastDownTime = 0;
 	private long lastTapTime = 0;

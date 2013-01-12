@@ -9,7 +9,7 @@ public class BBIcon {
 
 	public BBIcon(int resourceId) {
 		this.resourceId = resourceId;
-		SurfaceViewBase.loadTexture(resourceId, 0, textureHandlers, crop);
+		SurfaceViewBase.loadTexture(resourceId, textureHandlers, 0, crop);
 	}
 
 	public void draw(float x, float y) {

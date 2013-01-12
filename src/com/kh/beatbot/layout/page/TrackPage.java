@@ -15,6 +15,7 @@ public class TrackPage extends Page {
 	private LevelsPage levelsPage = null;
 	private SampleEditPage sampleEditPage = null;
 	private EffectsPage effectsPage = null;
+	private AdsrPage adsrPage = null;
 	
 	private int currPageNum = 0;
 	
@@ -29,7 +30,8 @@ public class TrackPage extends Page {
 		levelsPage = (LevelsPage)pageFlipper.findViewById(R.id.trackLevelsPage);
 		sampleEditPage = (SampleEditPage)pageFlipper.findViewById(R.id.sampleEditPage);
 		effectsPage = (EffectsPage)pageFlipper.findViewById(R.id.trackEffectsPage);
-		pages = new Page[] {levelsPage, sampleEditPage, effectsPage };
+		adsrPage = (AdsrPage) pageFlipper.findViewById(R.id.adsrPage);
+		pages = new Page[] {levelsPage, sampleEditPage, effectsPage, adsrPage };
 		
 		trackPageSelect.init();
 		for (Page trackPage : pages) {

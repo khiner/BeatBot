@@ -7,52 +7,30 @@ typedef struct AdsrPoint_t {
 } AdsrPoint;
 
 typedef struct AdsrConfig_t {
-	AdsrPoint adsrPoints[5];
-	float attackCoeff, decayCoeff, releaseCoeff;
+	// attack, decay, release all in samples.
+	// sustain / initial / peak are values between 0 and 1
+	float attack, decay, sustain, release, initial, peak;
 	float currLevel;
-	float sustain;
-	float initial, peak, end;
 	float currSample;
-	int gateSample; // sample to begin release
-	int totalSamples;
-	bool active, rising;
+	float stoppedSample;
+	bool active;
 } AdsrConfig;
 
-AdsrConfig *adsrconfig_create(int totalSamples);
-void adsrconfig_setNumSamples(AdsrConfig *config, int numSamples);
-
-void updateAdsr(AdsrConfig *config, int totalSamples);
+AdsrConfig *adsrconfig_create();
 void resetAdsr(AdsrConfig *config);
 
-static inline float adsr_tick(AdsrConfig *config, float sampleRate) {
+static inline float adsr_tick(AdsrConfig *config) {
 	if (!config->active) {
 		return 1;
 	}
 
-	config->currSample += sampleRate;
-	if (config->currSample < config->gateSample) {
-		if (config->rising) { // attack phase
-			config->currLevel += config->attackCoeff
-					* (config->peak / 0.63f - config->currLevel);
-			if (config->currLevel > 1.0f) {
-				config->currLevel = 1.0f;
-				config->rising = false;
-			}
-		} else { // decay/sustain
-			config->currLevel += config->decayCoeff
-					* (config->sustain - config->currLevel) / 0.63f;
-		}
-	} else if (config->currSample < config->adsrPoints[4].sampleNum) {
-		// past gate sample, go to release phase
-		config->currLevel += config->releaseCoeff
-				* (config->end - config->currLevel) / 0.63f;
-		if (config->currLevel < config->end) {
-			config->currLevel = config->end;
-		}
-	} else if (config->currSample < config->totalSamples) {
-		config->currLevel = 0;
-	} else {
-		resetAdsr(config);
+	config->currSample++;
+	if (config->currSample > config->stoppedSample) { // note ended - in release phase
+		config->currLevel += (-config->sustain) / config->release;
+	} else if (config->currSample < config->attack) {
+		config->currLevel += (config->peak - config->initial) / config->attack;
+	} else if (config->currSample < config->attack + config->decay) {
+		config->currLevel += (config->sustain - config->peak) / config->decay;
 	}
 	return config->currLevel;
 }
@@ -62,7 +40,7 @@ static inline void adsr_process(AdsrConfig *config, float **buffers, int size) {
 		return;
 	int i;
 	for (i = 0; i < size; i++) {
-		float gain = adsr_tick(config, 1);
+		float gain = adsr_tick(config);
 		buffers[0][i] *= gain;
 		buffers[1][i] *= gain;
 	}

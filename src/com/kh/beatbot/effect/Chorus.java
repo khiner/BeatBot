@@ -13,12 +13,12 @@ public class Chorus extends Effect {
 		effectNum = 0;
 		numParams = 5;
 		if (params.isEmpty()) {
-			params.add(new EffectParam(true, true, "Hz"));
+			params.add(new Param(true, true, "Hz"));
 			getParam(0).hz = true;
-			params.add(new EffectParam(false, false, ""));
-			params.add(new EffectParam(false, false, ""));
-			params.add(new EffectParam(true, true, "ms"));
-			params.add(new EffectParam(false, false, ""));
+			params.add(new Param(false, false, ""));
+			params.add(new Param(false, false, ""));
+			params.add(new Param(true, true, "ms"));
+			params.add(new Param(false, false, ""));
 		}
 	}
 

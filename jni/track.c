@@ -142,6 +142,7 @@ void freeTracks() {
 		free(cur_ptr->track->currBufferFloat);
 		cur_ptr->track->generator->destroy(cur_ptr->track->generator->config);
 		freeEffects(cur_ptr->track->levels);
+		adsrconfig_destroy(cur_ptr->track->levels->adsr);
 		TrackNode *prev_ptr = cur_ptr;
 		cur_ptr = cur_ptr->next;
 		free(prev_ptr); // free the entire Node
@@ -168,6 +169,7 @@ Levels *initLevels() {
 	}
 	levels->volPan = initEffect(true, volumepanconfig_create(),
 			volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
+	levels->adsr = adsrconfig_create();
 	return levels;
 }
 
@@ -185,8 +187,7 @@ Track *initTrack() {
 	track->mute = track->solo = false;
 	track->shouldSound = true;
 	track->nextEvent->volume = .8f;
-	track->nextEvent->pitch =
-				track->nextEvent->pan = .5f;
+	track->nextEvent->pitch = track->nextEvent->pan = .5f;
 	return track;
 }
 
@@ -351,23 +352,35 @@ void Java_com_kh_beatbot_global_BaseTrack_setTrackPitch(JNIEnv *env,
 void Java_com_kh_beatbot_global_Track_setAdsrOn(JNIEnv *env, jclass clazz,
 		jint trackNum, jboolean on) {
 	Track *track = getTrack(env, clazz, trackNum);
-	((WavFile *) track->generator->config)->adsr->active = on;
+	track->levels->adsr->active = on;
 }
 
-void Java_com_kh_beatbot_global_Track_setAdsrPoint(JNIEnv *env, jclass clazz,
-		jint trackNum, jint adsrPointNum, jfloat x, jfloat y) {
+void Java_com_kh_beatbot_global_Track_setAdsrParam(JNIEnv *env, jclass clazz,
+		jint trackNum, jint adsrParamNum, jfloat value) {
 	Track *track = getTrack(env, clazz, trackNum);
-	AdsrConfig *config = ((WavFile *) track->generator->config)->adsr;
-	config->adsrPoints[adsrPointNum].sampleCents = x;
-	if (adsrPointNum == 0)
-		config->initial = y;
-	else if (adsrPointNum == 1)
-		config->peak = y;
-	else if (adsrPointNum == 2)
-		config->sustain = y;
-	else if (adsrPointNum == 4)
-		config->end = y + 0.00001f;
-	updateAdsr(config, config->totalSamples);
+	AdsrConfig *config = track->levels->adsr;
+	value = value * SAMPLE_RATE;
+	switch (adsrParamNum) {
+	case 0:
+		config->attack = value;
+		break;
+	case 1:
+		config->decay = value;
+		break;
+	case 2:
+		config->sustain = value;
+		break;
+	case 3:
+		config->release = value;
+		break;
+	case 4:
+		config->peak = value;
+		break;
+	case 5:
+		config->initial = value;
+		break;
+	}
+
 }
 
 void Java_com_kh_beatbot_global_Track_setSample(JNIEnv *env, jclass clazz,

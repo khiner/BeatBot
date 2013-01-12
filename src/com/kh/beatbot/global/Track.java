@@ -28,7 +28,7 @@ public class Track extends BaseTrack {
 	private int currSampleNum = 0;
 	private boolean adsrEnabled = false, reverse = false;
 	private List<MidiNote> notes = new ArrayList<MidiNote>();
-	public float[][] adsrPoints;
+	private float[][] adsrPoints;
 
 	private Map<Integer, LoopSampleInfo> sampleLoopPoints = new HashMap<Integer, LoopSampleInfo>();
 
@@ -218,7 +218,25 @@ public class Track extends BaseTrack {
 
 	// set the native adsr point. x and y range from 0 to 1
 	public void setAdsrPoint(int adsrPointNum, float x, float y) {
+		adsrPoints[adsrPointNum][0] = x;
+		adsrPoints[adsrPointNum][1] = y;
 		setAdsrPoint(id, adsrPointNum, x, y);
+	}
+	
+	public float getAdsrX(int adsrPointNum) {
+		return adsrPoints[adsrPointNum][0];
+	}
+	
+	public float getAdsrY(int adsrPointNum) {
+		return adsrPoints[adsrPointNum][1];
+	}
+	
+	public void setAdsrX(int adsrPointNum, float x) {
+		setAdsrPoint(adsrPointNum, x, adsrPoints[adsrPointNum][1]);
+	}
+	
+	public void setAdsrY(int adsrPointNum, float y) {
+		setAdsrPoint(adsrPointNum, adsrPoints[adsrPointNum][0], y);
 	}
 
 	public void setSampleNum(int sampleNum) {

@@ -11,5 +11,5 @@
 	    android:id="@+id/param_knob" />
 	<include
 	    layout="@layout/param_value_label"
-	    android:id="@+id/param_value_label" />	
+	    android:id="@+id/param_value_label" />
 </merge>

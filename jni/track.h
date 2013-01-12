@@ -18,6 +18,7 @@ typedef struct Levels_ {
 	float volume, pan, pitch;
 	EffectNode *effectHead;
 	Effect *volPan;
+	AdsrConfig *adsr;
 	// mutex for effects since insertion/setting/removing effects happens on diff thread than processing
 	pthread_mutex_t effectMutex;
 } Levels;

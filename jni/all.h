@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <float.h>
 #include <pthread.h>
 #include <android/log.h>
 #include <android/asset_manager_jni.h>

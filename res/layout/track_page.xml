@@ -53,6 +53,14 @@
             android:background="@drawable/page_select_src"
             android:text="@string/effects"
             android:textColor="@color/text_selector" />
+        
+		<TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/page_select_src"
+            android:text="@string/adsr"
+            android:textColor="@color/text_selector" />
+		        
     </com.kh.beatbot.layout.page.TrackPageSelect>
 
     <ViewFlipper
@@ -72,6 +80,11 @@
         <include
             android:id="@+id/trackEffectsPage"
             layout="@layout/track_effects_page" />
+        
+        <include
+            android:id="@+id/adsrPage"
+            layout="@layout/adsr_page" />
+        
     </ViewFlipper>
 
 </com.kh.beatbot.layout.page.TrackPage>

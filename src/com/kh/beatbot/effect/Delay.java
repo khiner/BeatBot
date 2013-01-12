@@ -19,10 +19,10 @@ public class Delay extends Effect {
 		numParams = 4;
 		effectNum = 2;
 		if (params.isEmpty()) {
-			params.add(new EffectParam(true, true, "ms"));
-			params.add(new EffectParam(true, true, "ms"));
-			params.add(new EffectParam(false, false, ""));
-			params.add(new EffectParam(false, false, ""));
+			params.add(new Param(true, true, "ms"));
+			params.add(new Param(true, true, "ms"));
+			params.add(new Param(false, false, ""));
+			params.add(new Param(false, false, ""));
 		}
 	}
 

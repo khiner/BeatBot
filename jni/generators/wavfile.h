@@ -4,7 +4,6 @@
 typedef struct WavFile_t {
 	// mutex for buffer since setting the wav data happens on diff thread than processing
 	FILE *sampleFile;
-	AdsrConfig *adsr;
 	float tempSample[4];
 	float **samples;
 	float currSample;
@@ -66,9 +65,6 @@ static inline void wavfile_tick(WavFile *config, float *sample) {
 	} else {
 		config->currSample += config->sampleRate;
 	}
-	float gain = adsr_tick(config->adsr, config->sampleRate);
-	sample[0] *= gain;
-	sample[1] *= gain;
 }
 
 static inline void wavfile_generate(WavFile *config, float **inBuffer, int size) {

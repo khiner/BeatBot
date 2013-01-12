@@ -13,8 +13,8 @@ public class Reverb extends Effect {
 		numParams = 2;
 		effectNum = 5;
 		if (params.isEmpty()) {
-			params.add(new EffectParam(false, false, ""));
-			params.add(new EffectParam(false, false, ""));
+			params.add(new Param(false, false, ""));
+			params.add(new Param(false, false, ""));
 		}
 	}
 

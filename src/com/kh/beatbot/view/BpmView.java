@@ -8,7 +8,7 @@ import android.view.MotionEvent;
 
 import com.kh.beatbot.manager.Managers;
 
-public class BpmView extends SurfaceViewBase {
+public class BpmView extends TouchableSurfaceView {
 	private static final float[] SEGMENT_ON_COLOR = { 1, 0, 0, 1 };
 	private static final float[] SEGMENT_OFF_COLOR = { 1, 0, 0, .3f };
 	private static final float[] SEGMENT_ON_TOUCHED_COLOR = { 1, .3f, .25f, 1 };

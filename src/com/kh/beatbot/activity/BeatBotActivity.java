@@ -31,7 +31,7 @@ import android.widget.ToggleButton;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.effect.Effect.EffectParam;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.DirectoryManager;
@@ -259,9 +259,9 @@ public class BeatBotActivity extends Activity {
 		for (int trackId = 0; trackId < Managers.trackManager.getNumTracks(); trackId++) {
 			for (Effect effect : Managers.trackManager.getTrack(trackId).effects) {
 				for (int paramNum = 0; paramNum < effect.getNumParams(); paramNum++) {
-					EffectParam param = effect.getParam(paramNum);
+					Param param = effect.getParam(paramNum);
 					if (param.beatSync) {
-						effect.setParamLevel(param, param.viewLevel);
+						param.setLevel(param.viewLevel);
 						effect.setEffectParam(trackId, effect.getPosition(),
 								paramNum, param.level);
 					}

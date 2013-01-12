@@ -15,12 +15,12 @@ public class Filter extends Effect {
 		numParams = 4;
 		effectNum = 3;
 		if (params.isEmpty()) {
-			params.add(new EffectParam(true, false, "Hz"));
+			params.add(new Param(true, false, "Hz"));
 			getParam(0).scale = PlaybackManager.SAMPLE_RATE / 2;
-			params.add(new EffectParam(false, false, ""));
-			params.add(new EffectParam(true, true, "Hz"));
+			params.add(new Param(false, false, ""));
+			params.add(new Param(true, true, "Hz"));
 			getParam(2).hz = true;
-			params.add(new EffectParam(false, false, ""));
+			params.add(new Param(false, false, ""));
 		}
 	}
 

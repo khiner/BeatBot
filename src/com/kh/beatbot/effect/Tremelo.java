@@ -13,10 +13,10 @@ public class Tremelo extends Effect {
 		numParams = 3;
 		effectNum = 6;
 		if (params.isEmpty()) {
-			params.add(new EffectParam(true, true, "Hz"));
-			params.add(new EffectParam(false, false, ""));
+			params.add(new Param(true, true, "Hz"));
+			params.add(new Param(false, false, ""));
 			getParam(0).hz = true;
-			params.add(new EffectParam(false, false, ""));
+			params.add(new Param(false, false, ""));
 		}
 	}
 
