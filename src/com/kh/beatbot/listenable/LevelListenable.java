@@ -15,7 +15,7 @@ public abstract class LevelListenable extends TouchableSurfaceView {
 			0.4465f, 1 };
 	protected ArrayList<LevelListener> levelListeners = new ArrayList<LevelListener>();
 	protected float level = .5f;
-	protected float[] levelColor = Colors.VOLUME_COLOR.clone();
+	protected float[] levelColor = Colors.VOLUME.clone();
 	protected float[] selectColor = { levelColor[0], levelColor[1],
 			levelColor[2], .5f };
 

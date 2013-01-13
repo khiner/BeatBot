@@ -126,13 +126,13 @@ public class LevelsPage extends Page implements LevelListener {
 	private float[] getActiveLevelColor() {
 		switch (currTrack.activeLevelType) {
 		case VOLUME:
-			return Colors.VOLUME_COLOR;
+			return Colors.VOLUME;
 		case PAN:
-			return Colors.PAN_COLOR;
+			return Colors.PAN;
 		case PITCH:
-			return Colors.PITCH_COLOR;
+			return Colors.PITCH;
 		}
-		return Colors.VOLUME_COLOR;
+		return Colors.VOLUME;
 	}
 
 	private float getActiveLevel() {

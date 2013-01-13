@@ -23,8 +23,8 @@ public class SampleWaveformView extends TouchableSurfaceView {
 	private static final float[] LOOP_SELECTION_LINE_COLOR = { 1, 1, 1, 1 };
 	private static final float[] LOOP_SELECTION_RECT_COLOR = { .9f, .9f, 1, .5f };
 	private static final float[] LOOP_SELECTION_RECT_SELECT_COLOR = {
-			Colors.VOLUME_COLOR[0], Colors.VOLUME_COLOR[1],
-			Colors.VOLUME_COLOR[2], .6f };
+			Colors.VOLUME[0], Colors.VOLUME[1],
+			Colors.VOLUME[2], .6f };
 	private static final float[] BG_COLOR = { LOOP_HIGHLIGHT_COLOR[0] * .5f,
 			LOOP_HIGHLIGHT_COLOR[1] * .5f, LOOP_HIGHLIGHT_COLOR[2] * .5f, 1 };
 
@@ -115,7 +115,7 @@ public class SampleWaveformView extends TouchableSurfaceView {
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVb);
 		gl.glPushMatrix();
 		gl.glTranslatef(previewButtonWidth, 0, 0);
-		drawLines(waveformVb, Colors.VOLUME_COLOR, 10, GL10.GL_LINE_STRIP);
+		drawLines(waveformVb, Colors.VOLUME, 10, GL10.GL_LINE_STRIP);
 		gl.glPopMatrix();
 		gl.glDisable(GL10.GL_LINE_SMOOTH);
 	}

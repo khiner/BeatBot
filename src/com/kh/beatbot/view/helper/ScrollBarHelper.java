@@ -13,7 +13,7 @@ public class ScrollBarHelper {
 	private static final int CORNER_RESOLUTION = 15;
 
 	private static float[] innerScrollBarColor = { 1, 1, 1, .8f };
-	private static float[] outerScrollBarColor = Colors.VOLUME_COLOR.clone();
+	private static float[] outerScrollBarColor = Colors.VOLUME.clone();
 
 	private static float translateX = 0;
 	private static float translateY = 0;

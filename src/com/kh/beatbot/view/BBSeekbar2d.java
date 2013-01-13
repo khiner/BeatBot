@@ -68,7 +68,7 @@ public class BBSeekbar2d extends LevelListenable {
 	
 	private void drawRoundedBgOutline() {
 		gl.glTranslatef(width / 2, height / 2, 0);
-		drawLines(borderVb, Colors.VOLUME_COLOR, 5, GL10.GL_LINE_LOOP);
+		drawLines(borderVb, Colors.VOLUME, 5, GL10.GL_LINE_LOOP);
 		gl.glTranslatef(-width / 2, -height / 2, 0);
 	}
 
@@ -104,7 +104,7 @@ public class BBSeekbar2d extends LevelListenable {
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		selectLocation(x, y);
-		levelColor = Colors.LEVEL_SELECTED_COLOR.clone();
+		levelColor = Colors.LEVEL_SELECTED.clone();
 		super.handleActionDown(id, x, y);
 	}
 
@@ -115,7 +115,7 @@ public class BBSeekbar2d extends LevelListenable {
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		levelColor = Colors.VOLUME_COLOR.clone();
+		levelColor = Colors.VOLUME.clone();
 		super.handleActionUp(id, x, y);
 	}
 }

@@ -127,7 +127,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 			BG_RECT_COLOR[1] + .1f, BG_RECT_COLOR[2] + .1f, 1 };
 	private static final float[] LABEL_RECT_COLOR = { BG_RECT_COLOR[0] + .3f,
 			BG_RECT_COLOR[1] + .3f, BG_RECT_COLOR[2] + .3f, 1 };
-	private static final float[] LABEL_RECT_ON_COLOR = Colors.VOLUME_COLOR
+	private static final float[] LABEL_RECT_ON_COLOR = Colors.VOLUME
 			.clone();
 
 	private static final float[] SELECTED_EMPTY_RECT_COLOR = {

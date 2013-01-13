@@ -17,7 +17,7 @@ import com.kh.beatbot.manager.TrackManager;
 public class AdsrView extends TouchableSurfaceView {
 	private static final int DRAW_OFFSET = 6;
 	private static final int SNAP_DIST_SQUARED = 1024;
-	private static final float[] ADSR_COLOR = Colors.VOLUME_COLOR.clone();
+	private static final float[] ADSR_COLOR = Colors.VOLUME.clone();
 	private static final float[] ADSR_SELECTED_COLOR = { ADSR_COLOR[0],
 			ADSR_COLOR[1], ADSR_COLOR[2], .6f };
 	private static final float ADSR_POINT_RADIUS = 5;
@@ -193,7 +193,7 @@ public class AdsrView extends TouchableSurfaceView {
 	private void drawRoundedBg() {
 		gl.glTranslatef(width / 2, height / 2, 0);
 		drawTriangleFan(borderVb, LevelListenable.BG_COLOR);
-		drawLines(borderVb, Colors.VOLUME_COLOR, 5, GL10.GL_LINE_LOOP);
+		drawLines(borderVb, Colors.VOLUME, 5, GL10.GL_LINE_LOOP);
 		gl.glTranslatef(-width / 2, -height / 2, 0);
 	}
 	

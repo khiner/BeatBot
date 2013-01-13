@@ -265,16 +265,16 @@ public class MidiView extends ClickableSurfaceView {
 	private void drawCurrentTick() {
 		float xLoc = tickToX(midiManager.getCurrTick());
 		translate(xLoc, 0);
-		drawLines(currTickVb, Colors.VOLUME_COLOR, 5, GL10.GL_LINES);
+		drawLines(currTickVb, Colors.VOLUME, 5, GL10.GL_LINES);
 		translate(-xLoc, 0);
 	}
 
 	private void drawLoopMarker() {
 		float[][] color = new float[2][3];
-		color[0] = loopPointerIds[0] != -1 ? Colors.TICK_SELECTED_COLOR
-				: Colors.TICK_MARKER_COLOR;
-		color[1] = loopPointerIds[2] != -1 ? Colors.TICK_SELECTED_COLOR
-				: Colors.TICK_MARKER_COLOR;
+		color[0] = loopPointerIds[0] != -1 ? Colors.TICK_SELECTED
+				: Colors.TICK_MARKER;
+		color[1] = loopPointerIds[2] != -1 ? Colors.TICK_SELECTED
+				: Colors.TICK_MARKER;
 		gl.glLineWidth(6);
 		float[] loopMarkerLocs = { tickToX(midiManager.getLoopBeginTick()),
 				tickToX(midiManager.getLoopEndTick()) };
@@ -292,21 +292,21 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	private void drawTickFill() {
-		drawTriangleStrip(tickFillVb, Colors.TICK_FILL_COLOR);
+		drawTriangleStrip(tickFillVb, Colors.TICK_FILL);
 		drawLoopBar();
 		drawLines(tickHLineVb, Colors.BLACK, 2, GL10.GL_LINES);
 	}
 
 	private void drawLoopBar() {
-		float[] color = loopPointerIds[1] == -1 ? Colors.TICKBAR_COLOR
-				: Colors.TICK_SELECTED_COLOR;
+		float[] color = loopPointerIds[1] == -1 ? Colors.TICKBAR
+				: Colors.TICK_SELECTED;
 		// entire loop bar is selected. draw darker square
 		drawRectangle(tickToX(midiManager.getLoopBeginTick()), 0,
 				tickToX(midiManager.getLoopEndTick()), Y_OFFSET, color);
 	}
 
 	private void drawLoopRect() {
-		drawTriangleStrip(loopRectVb, Colors.MIDI_VIEW_LIGHT_BG_COLOR);
+		drawTriangleStrip(loopRectVb, Colors.MIDI_VIEW_LIGHT_BG);
 	}
 
 	private void drawRecordingWaveforms() {
@@ -325,7 +325,7 @@ public class MidiView extends ClickableSurfaceView {
 			// scale drawing so entire waveform exactly fits in the note width
 			scale(noteWidth / waveWidth, 1);
 			for (int i = 0; i < waveformVbs.size(); i++) {
-				drawLines(waveformVbs.get(i), Colors.WAVEFORM_COLOR, 1,
+				drawLines(waveformVbs.get(i), Colors.WAVEFORM, 1,
 						GL10.GL_LINE_STRIP);
 			}
 			pop();
@@ -341,7 +341,7 @@ public class MidiView extends ClickableSurfaceView {
 	private void drawSelectRegion() {
 		if (!selectRegion || selectRegionVb == null)
 			return;
-		drawTriangleStrip(selectRegionVb, Colors.SELECT_REGION_COLOR);
+		drawTriangleStrip(selectRegionVb, Colors.SELECT_REGION);
 	}
 
 	private void drawAllMidiNotes() {
@@ -352,8 +352,8 @@ public class MidiView extends ClickableSurfaceView {
 			MidiNote midiNote = midiManager.getMidiNote(i);
 			if (midiNote != null) {
 				drawMidiNote(midiNote,
-						midiNote.isSelected() ? Colors.NOTE_SELECTED_COLOR
-								: Colors.NOTE_COLOR);
+						midiNote.isSelected() ? Colors.NOTE_SELECTED
+								: Colors.NOTE);
 			}
 		}
 	}
@@ -477,7 +477,7 @@ public class MidiView extends ClickableSurfaceView {
 	}
 	
 	protected void init() {
-		setBackgroundColor(Colors.MIDI_VIEW_DEFAULT_BG_COLOR);
+		setBackgroundColor(Colors.MIDI_VIEW_BG);
 		midiManager = Managers.midiManager;
 		TickWindowHelper.init(this);
 		MidiTrackControlHelper.init(this);

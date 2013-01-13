@@ -32,6 +32,7 @@ import android.widget.ToggleButton;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.DirectoryManager;
@@ -143,6 +144,7 @@ public class BeatBotActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		GlobalVars.mainActivity = this;
+		Colors.initColors(this);
 		GlobalVars.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
 		GeneralUtils.initAndroidSettings(this);

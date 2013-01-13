@@ -96,7 +96,7 @@ public class LevelsView extends TouchableSurfaceView {
 	private void drawSelectRegion() {
 		if (!selectRegion || selectRegionVb == null)
 			return;
-		drawTriangleStrip(selectRegionVb, Colors.SELECT_REGION_COLOR);
+		drawTriangleStrip(selectRegionVb, Colors.SELECT_REGION);
 	}
 
 	private void initSelectRegionVb(float leftTick, float rightTick,
@@ -136,17 +136,17 @@ public class LevelsView extends TouchableSurfaceView {
 
 	private float[] calcLevelColor(boolean selected) {
 		if (selected) {
-			return Colors.LEVEL_SELECTED_COLOR;
+			return Colors.LEVEL_SELECTED;
 		} else {
 			switch (currLevelType) {
 			case VOLUME:
-				return Colors.VOLUME_COLOR;
+				return Colors.VOLUME;
 			case PAN:
-				return Colors.PAN_COLOR;
+				return Colors.PAN;
 			case PITCH:
-				return Colors.PITCH_COLOR;
+				return Colors.PITCH;
 			default:
-				return Colors.LEVEL_SELECTED_COLOR;
+				return Colors.LEVEL_SELECTED;
 			}
 		}
 	}
@@ -318,7 +318,7 @@ public class LevelsView extends TouchableSurfaceView {
 		    }
 		});
 		
-		setBackgroundColor(Colors.MIDI_VIEW_DEFAULT_BG_COLOR);
+		setBackgroundColor(Colors.MIDI_VIEW_BG);
 		gl = MidiView.getGL10();
 		initLevelBarVb();
 	}

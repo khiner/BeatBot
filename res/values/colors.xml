@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#000000</color>
-    <color name="background">#20303a</color>
-    <color name="tronBlue">#69c9ff</color>
-    <color name="textPressed">#69c9ff</color>
-    <color name="textSelected">#FFEA69</color>
-    <!-- <color name="textDefault">#FFEA69</color> -->
-    <color name="textDefault">#778791</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="red">#FFFF0000</color>
+    <color name="yellow">#FFFFFF00</color>
+    <color name="green">#FF00FF00</color>
+    <color name="gridLine">#FF000000</color>
+    <color name="waveform">#FF000000</color>
+    <color name="midiViewBg">#FF808080</color>
+    <color name="midiViewLightBg">#FFB3B3B3</color>
+    <color name="note">#FFFF0000</color>
+    <color name="noteSelected">#FF0000FF</color>
+    <color name="background">#FF20303a</color>
+    <color name="selectRegion">#B39999FF</color>
+    <color name="tronBlue">#FF69c9ff</color>
+    <color name="volume">#FF69c9ff</color> <!-- same as tronBlue -->
+    <color name="pan">#FFFFC964</color>
+    <color name="pitch">#FF71FF88</color>
+    <color name="levelSelected">#FFE60019</color>
+    <color name="textPressed">#FF69c9ff</color>
+    <color name="textSelected">#FFFFEA69</color>
+    <color name="textDefault">#FF778791</color>
+    <color name="tickBar">#FF999999</color>
+    <color name="tickFill">#FF4D4D4D</color>
+    <color name="tickMarker">#FFCCCCCC</color>
+    <color name="tickSelected">#FF69c9ff</color> <!-- same as tronBlue -->
 </resources>

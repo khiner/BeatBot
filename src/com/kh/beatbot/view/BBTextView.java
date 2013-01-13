@@ -46,7 +46,7 @@ public class BBTextView extends SurfaceViewBase {
 	protected void drawFrame() {
 		if (text == null)
 			return;
-		setColor(Colors.VOLUME_COLOR);
+		setColor(Colors.VOLUME);
 		// draw string in center of rect
 		glText.draw();
 	}
