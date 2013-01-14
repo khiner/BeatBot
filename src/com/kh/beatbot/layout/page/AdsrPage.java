@@ -7,22 +7,13 @@ import android.view.View.OnClickListener;
 import android.widget.ToggleButton;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.effect.ADSR;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.AdsrView;
 import com.kh.beatbot.view.BBSeekbar;
 import com.kh.beatbot.view.BBTextView;
 
 public class AdsrPage extends Page implements OnClickListener {
-	protected Param[] params = new Param[6];
-	
-	private final int ATTACK_ID = 0;
-	private final int DECAY_ID = 1;
-	private final int SUSTAIN_ID = 2;
-	private final int RELEASE_ID = 3;
-	private final int START_ID = 4;
-	private final int PEAK_ID = 5;
-
-	private int currParamId = ATTACK_ID;
 	
 	private ToggleButton[] adsrButtons = new ToggleButton[6];
 	private AdsrView adsrView = null;
@@ -35,22 +26,16 @@ public class AdsrPage extends Page implements OnClickListener {
 
 	@Override
 	public void init() {
-		params[ATTACK_ID] = new Param("ATTACK", true, false, "ms");
-		params[DECAY_ID] = new Param("DECAY", true, false, "ms");
-		params[SUSTAIN_ID] = new Param("SUSTAIN", false, false, "");
-		params[RELEASE_ID] = new Param("RELEASE", true, false, "ms");
-		params[START_ID] = new Param("START", false, false, "");
-		params[PEAK_ID] = new Param("PEAK", false, false, "");
 		adsrView = (AdsrView)findViewById(R.id.adsrView);
 		adsrBar = (BBSeekbar)findViewById(R.id.adsrBar);
 		paramLabel = (BBTextView)findViewById(R.id.paramLabel);
 		valueLabel = (BBTextView)findViewById(R.id.valueLabel);
-		adsrButtons[ATTACK_ID] = (ToggleButton)findViewById(R.id.attackButton);
-		adsrButtons[DECAY_ID] = (ToggleButton)findViewById(R.id.decayButton);
-		adsrButtons[SUSTAIN_ID] = (ToggleButton)findViewById(R.id.sustainButton);
-		adsrButtons[RELEASE_ID] = (ToggleButton)findViewById(R.id.releaseButton);
-		adsrButtons[START_ID] = (ToggleButton)findViewById(R.id.startButton);
-		adsrButtons[PEAK_ID] = (ToggleButton)findViewById(R.id.peakButton);
+		adsrButtons[ADSR.ATTACK_ID] = (ToggleButton)findViewById(R.id.attackButton);
+		adsrButtons[ADSR.DECAY_ID] = (ToggleButton)findViewById(R.id.decayButton);
+		adsrButtons[ADSR.SUSTAIN_ID] = (ToggleButton)findViewById(R.id.sustainButton);
+		adsrButtons[ADSR.RELEASE_ID] = (ToggleButton)findViewById(R.id.releaseButton);
+		adsrButtons[ADSR.START_ID] = (ToggleButton)findViewById(R.id.startButton);
+		adsrButtons[ADSR.PEAK_ID] = (ToggleButton)findViewById(R.id.peakButton);
 		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i].setTag(i);
 			adsrButtons[i].setOnClickListener(this);
@@ -132,11 +117,11 @@ public class AdsrPage extends Page implements OnClickListener {
 	
 	private void updateLabel() {
 		// update the displayed param name
-		paramLabel.setText(params[currParamId].name);		
+		paramLabel.setText(TrackManager.currTrack.adsr.getCurrParam().name);		
 	}
 	
 	private void updateValueLabel() {
-		valueLabel.setText(params[currParamId].getFormattedValueString());
+		valueLabel.setText(TrackManager.currTrack.adsr.getCurrParam().getFormattedValueString());
 	}
 	
 	@Override
@@ -144,21 +129,7 @@ public class AdsrPage extends Page implements OnClickListener {
 		check((ToggleButton)v);
 		int paramId = (Integer)v.getTag();
 		// set the current parameter so we know what to do with SeekBar events.
-		currParamId = paramId;
+		TrackManager.currTrack.adsr.setCurrParam(paramId);
 		updateLabels();
-		switch (paramId) {
-		case ATTACK_ID:
-			break;
-		case DECAY_ID:
-			break;
-		case SUSTAIN_ID:
-			break;
-		case RELEASE_ID:
-			break;
-		case START_ID:
-			break;
-		case PEAK_ID:
-			break;
-		}
 	}
 }

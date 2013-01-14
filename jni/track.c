@@ -351,29 +351,6 @@ void Java_com_kh_beatbot_global_BaseTrack_setTrackPitch(JNIEnv *env,
 
 void Java_com_kh_beatbot_global_Track_setAdsrParam(JNIEnv *env, jclass clazz,
 		jint trackNum, jint adsrParamNum, jfloat value) {
-	Track *track = getTrack(env, clazz, trackNum);
-	AdsrConfig *config = track->levels->adsr;
-	value = value * SAMPLE_RATE;
-	switch (adsrParamNum) {
-	case 0:
-		config->attack = value;
-		break;
-	case 1:
-		config->decay = value;
-		break;
-	case 2:
-		config->sustain = value;
-		break;
-	case 3:
-		config->release = value;
-		break;
-	case 4:
-		config->peak = value;
-		break;
-	case 5:
-		config->initial = value;
-		break;
-	}
 
 }
 

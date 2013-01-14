@@ -9,14 +9,17 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
+import com.kh.beatbot.global.Track;
 import com.kh.beatbot.manager.TrackManager;
 
 public class AdsrView extends TouchableSurfaceView {
 	private static final int DRAW_OFFSET = 6;
 	private static final int SNAP_DIST_SQUARED = 1024;
 	private static final float ADSR_POINT_RADIUS = 5;
+	private static float[] pointVertices = new float[10];
 	private static FloatBuffer adsrPointVb = null;
 	private static FloatBuffer[] adsrCurveVb = new FloatBuffer[4];
 	private static ViewRect viewRect;
@@ -36,14 +39,21 @@ public class AdsrView extends TouchableSurfaceView {
 	}
 	
 	private void initAdsrVb() {
-		float[] pointVertices = new float[10];
+		Track track = TrackManager.currTrack;
+		// TODO something like this
+		float attackX = getAttackX(track.adsr);
+		float decayX = getDecayX(track.adsr);
+		pointVertices[0] = 0; 
+		pointVertices[1] = viewRect.viewY(track.adsr.getStart());
+		pointVertices[2] = attackX;
+		pointVertices[3] = viewRect.viewY(track.adsr.getPeak());
+		pointVertices[4] = decayX;
+		pointVertices[5] = viewRect.viewY(track.adsr.getSustain());
+		pointVertices[6] = viewRect.viewX(2.0f / 3.0f); // fixed x for release begin
+		pointVertices[7] = viewRect.viewY(track.adsr.getSustain());
+		pointVertices[8] = getReleaseX(track.adsr);
+		pointVertices[9] = viewRect.viewY(0);
 		
-		for (int i = 0; i < 5; i++) {
-			for (int j = 0; j < 2; j++) {
-				pointVertices[i * 2 + j] = j == 1 ? adsrToY(TrackManager.currTrack.getAdsrY(i))
-						: adsrToX(TrackManager.currTrack.getAdsrX(i));
-			}
-		}
 		adsrPointVb = makeFloatBuffer(pointVertices);
 		for (int i = 0; i < 4; i++) {
 			ArrayList<Float> curveVertices = new ArrayList<Float>();
@@ -58,6 +68,18 @@ public class AdsrView extends TouchableSurfaceView {
 			}
 			adsrCurveVb[i] = makeFloatBuffer(converted);
 		}
+	}
+	
+	private float getAttackX(ADSR adsr) {
+		return viewRect.viewX(adsr.getAttack() / 3f);
+	}
+	
+	private float getDecayX(ADSR adsr) {
+		return getAttackX(adsr) + viewRect.viewX(adsr.getDecay() / 3f);
+	}
+	
+	private float getReleaseX(ADSR adsr) {
+		return viewRect.viewX(2.0f / 3.0f + adsr.getRelease() / 3f);
 	}
 	
 	private ArrayList<Float> makeExponentialCurveVertices(float x1, float y1,
@@ -94,25 +116,29 @@ public class AdsrView extends TouchableSurfaceView {
 			drawLines(adsrCurveVb[i], Colors.VOLUME, 3, GL10.GL_LINE_STRIP);
 		}
 	}
-
-	private float adsrToX(float adsr) {
-		return adsr * width;
+	
+	private float getAttackX() {
+		return pointVertices[2]; // x coord of 2nd point
 	}
 	
-	private float adsrToY(float adsr) {
-		return -(adsr - 1) * (height - 2 * ADSR_POINT_RADIUS)
-				+ ADSR_POINT_RADIUS;
+	private float xToAttack(float x) {
+		float unitX = viewRect.unitX(x) * 3;
+		return unitX > 0 ? (unitX < 1 ? unitX : 1) : 0;
 	}
-
-	private float xToAdsr(float x) {
-		return x / width;
+	
+	private float xToDecay(float x) {
+		if (x <= getAttackX()) {
+			return 0;
+		} else if (x >= getAttackX() + viewRect.width / 3) {
+			return 1;
+		} else {
+			return viewRect.unitX(x - getAttackX()) * 3;
+		}
 	}
-
-	private float yToAdsr(float y) {
-		// clip y to half an adsr circle above 0 and half a circle below height
-		y = y > ADSR_POINT_RADIUS ? (y < height - ADSR_POINT_RADIUS ? y
-				: height - ADSR_POINT_RADIUS) : ADSR_POINT_RADIUS;
-		return 1 - (y - ADSR_POINT_RADIUS) / (height - 2 * ADSR_POINT_RADIUS);
+	
+	private float xToRelease(float x) {
+		float unitX = (viewRect.unitX(x) - 2f / 3f) * 3;
+		return unitX > 0 ? (unitX < 1 ? unitX : 1) : 0;
 	}
 	
 	private void deselectAdsrPoint(int id) {
@@ -131,29 +157,24 @@ public class AdsrView extends TouchableSurfaceView {
 	private boolean moveAdsrPoint(int id, float x, float y) {
 		for (int i = 0; i < adsrSelected.length; i++) {
 			if (adsrSelected[i] == id) {
-				float adsrX = xToAdsr(x);
-				float adsrY = yToAdsr(y);
-				float prevX = i >= 2 ? TrackManager.currTrack.getAdsrX(i - 1)
-						: 0;
-				float nextX = i <= 3 ? TrackManager.currTrack.getAdsrX(i + 1)
-						: 1;
-				if (i == 0)
-					adsrX = 0;
-				// ADSR samples cannot go past the next ADSR sample or before
-				// the previous sample
-				TrackManager.currTrack.setAdsrX(i, adsrX > prevX ? (adsrX < nextX ? adsrX
-						: nextX )
-						: prevX);
-				if (i != 3) // can only change the x coord of the cutoff point
-					TrackManager.currTrack.setAdsrY(i, adsrY > 0 ? (adsrY < 1 ? adsrY
-							: 1)
-							: 0);
-				// points 2 and 3 must have the same y value, since these are
-				// the two ends
-				// of the sustain level, which must be linear.
-				// ie. adjusting either 2 or 3 will adjust both points' y values
-				if (i == 2)
-					TrackManager.currTrack.setAdsrY(3, TrackManager.currTrack.getAdsrY(2));
+				switch (adsrSelected[i]) {
+				case 0: // start level - only moves along y axis, always x == 0
+					TrackManager.currTrack.adsr.setStart(viewRect.unitY(y));
+					break;
+				case 1: // attack point - controls attack time and peak value
+					TrackManager.currTrack.adsr.setAttack(xToAttack(x));
+					TrackManager.currTrack.adsr.setPeak(viewRect.unitY(y));
+					break;
+				case 2: // decay point - controls decay time and sustain level
+					TrackManager.currTrack.adsr.setDecay(xToDecay(x));
+					TrackManager.currTrack.adsr.setSustain(viewRect.unitY(y));
+					break;
+				case 3: // beginning of release - user cannot set.
+					break;
+				case 4: // release time - y == 0 always.
+					TrackManager.currTrack.adsr.setRelease(xToRelease(x));
+					break;
+				}
 				initAdsrVb();
 				return true;
 			}
@@ -161,18 +182,18 @@ public class AdsrView extends TouchableSurfaceView {
 		return false;
 	}
 	
-	private boolean selectAdsrPoint(int id, float x, float y) {
+	private void selectAdsrPoint(int id, float x, float y) {
 		for (int i = 0; i < 5; i++) {
 			if (i == 3)
-				continue; // release point not user changeable
+				// cannot be set by user (beginning of release / end of sustain)
+				continue;
 			if (GeneralUtils.distanceFromPointSquared(
-					adsrToX(TrackManager.currTrack.getAdsrX(i)),
-					adsrToY(TrackManager.currTrack.getAdsrY(i)), x, y) < SNAP_DIST_SQUARED) {
+					pointVertices[i * 2], pointVertices[i * 2 + 1], x, y)
+					< SNAP_DIST_SQUARED) {
 				adsrSelected[i] = id;
-				return true;
+				return;
 			}
 		}
-		return false;
 	}
 	
 	@Override

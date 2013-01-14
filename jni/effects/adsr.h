@@ -39,6 +39,7 @@ static inline void adsr_process(AdsrConfig *config, float **buffers, int size) {
 	}
 }
 
+void adsrconfig_setParam(AdsrConfig *config, float floatParamNum, float paramValue);
 void adsrconfig_destroy(void *p);
 
 #endif // ADSR_H

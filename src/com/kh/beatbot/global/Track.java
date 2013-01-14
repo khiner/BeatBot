@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
@@ -28,7 +29,7 @@ public class Track extends BaseTrack {
 	private int currSampleNum = 0;
 	private boolean adsrEnabled = false, reverse = false;
 	private List<MidiNote> notes = new ArrayList<MidiNote>();
-	private float[][] adsrPoints;
+	public ADSR adsr;
 
 	private Map<Integer, LoopSampleInfo> sampleLoopPoints = new HashMap<Integer, LoopSampleInfo>();
 
@@ -36,8 +37,8 @@ public class Track extends BaseTrack {
 		super(id);
 		this.instrument = instrument;
 		this.currSampleNum = sampleNum;
+		this.adsr = new ADSR("ADSR", id);
 		constructLoopPointMap();
-		initDefaultAdsrPoints();
 	}
 
 	public void removeNote(MidiNote note) {
@@ -59,20 +60,6 @@ public class Track extends BaseTrack {
 
 	public void clearNotes() {
 		notes.clear();
-	}
-
-	public void initDefaultAdsrPoints() {
-		adsrPoints = new float[5][2];
-		for (int i = 0; i < 5; i++) {
-			// x coords
-			adsrPoints[i][0] = i / 4f;
-		}
-		// y coords
-		adsrPoints[0][1] = 0;
-		adsrPoints[1][1] = 1;
-		adsrPoints[2][1] = .60f;
-		adsrPoints[3][1] = .60f;
-		adsrPoints[4][1] = 0;
 	}
 
 	public void updateNextNote() {
@@ -207,29 +194,6 @@ public class Track extends BaseTrack {
 		return normalize(id);
 	}
 
-	// set the native adsr point. x and y range from 0 to 1
-	public void setAdsrPoint(int adsrPointNum, float x, float y) {
-		adsrPoints[adsrPointNum][0] = x;
-		adsrPoints[adsrPointNum][1] = y;
-		setAdsrPoint(id, adsrPointNum, x, y);
-	}
-	
-	public float getAdsrX(int adsrPointNum) {
-		return adsrPoints[adsrPointNum][0];
-	}
-	
-	public float getAdsrY(int adsrPointNum) {
-		return adsrPoints[adsrPointNum][1];
-	}
-	
-	public void setAdsrX(int adsrPointNum, float x) {
-		setAdsrPoint(adsrPointNum, x, adsrPoints[adsrPointNum][1]);
-	}
-	
-	public void setAdsrY(int adsrPointNum, float y) {
-		setAdsrPoint(adsrPointNum, adsrPoints[adsrPointNum][0], y);
-	}
-
 	public void setSampleNum(int sampleNum) {
 		currSampleNum = sampleNum;
 		setSample(id, getSamplePath());
@@ -257,9 +221,6 @@ public class Track extends BaseTrack {
 	public static native void setTrackReverse(int trackId, boolean reverse);
 
 	public static native float[] normalize(int trackId);
-
-	public native void setAdsrPoint(int trackId, int adsrPointNum, float x,
-			float y);
 
 	public static native void setSample(int trackId, String sampleName);
 

@@ -34,10 +34,7 @@ public class TrackManager implements MidiTrackControlListener {
 
 	private TrackManager() {
 		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
-			Track track = new Track(tracks.size(),
-					Managers.directoryManager.getDrumInstrument(i), 0);
-			tracks.add(track);
-			addTrack(track.getSamplePath());
+			addTrack(Managers.directoryManager.getDrumInstrument(i), 0);
 		}
 		MidiTrackControlHelper.addListener(this);
 	}
@@ -60,8 +57,9 @@ public class TrackManager implements MidiTrackControlListener {
 		Track newTrack = new Track(tracks.size(), instrument, sampleNum);
 		addTrack(newTrack.getSamplePath());
 		tracks.add(newTrack);
-		GlobalVars.midiView.updateTracks();
 		currTrack = tracks.get(tracks.size() - 1);
+		if (GlobalVars.midiView != null)
+			GlobalVars.midiView.updateTracks();
 	}
 
 	public void clearNotes() {

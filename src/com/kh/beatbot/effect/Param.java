@@ -19,7 +19,8 @@ public class Param {
 		this.logScale = logScale;
 		this.beatSync = beatSync;
 		this.unitString = unitString;
-		level = viewLevel = 0.5f;
+		viewLevel = 0.5f;
+		setLevel(viewLevel);
 	}
 
 	public Param(boolean logScale, boolean beatSync, String unitString) {

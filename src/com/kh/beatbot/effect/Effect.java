@@ -17,6 +17,12 @@ public abstract class Effect implements Comparable<Effect> {
 	public boolean on = true;
 	protected boolean paramsLinked = false;
 
+	public Effect(String name, int trackNum) {
+		this.name = name;
+		this.trackNum = trackNum;
+		initParams();
+	}
+	
 	public Effect(String name, int trackNum, int position) {
 		this.name = name;
 		this.trackNum = trackNum;
