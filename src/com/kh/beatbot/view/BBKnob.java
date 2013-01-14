@@ -11,6 +11,7 @@ import android.view.SurfaceHolder;
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.BBToggleButton;
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 
@@ -110,7 +111,7 @@ public class BBKnob extends LevelListenable {
 	@Override
 	protected void drawFrame() {
 		// background
-		drawTriangleStrip(circleVb, BG_COLOR);
+		drawTriangleStrip(circleVb, Colors.VIEW_BG);
 		// main selection
 		drawTriangleStrip(circleVb, levelColor, drawIndex);
 		if (levelSelected) { // selected glow

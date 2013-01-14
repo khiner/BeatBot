@@ -6,6 +6,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listenable.LevelListenable;
 
 public class BBSeekbar extends LevelListenable {
@@ -42,11 +43,11 @@ public class BBSeekbar extends LevelListenable {
 	protected void drawBackgroundBar() {
 		gl.glPushMatrix();
 		translate(levelBarHeight * 2, height / 2);
-		drawTriangleStrip(levelBarVb, BG_COLOR);
+		drawTriangleStrip(levelBarVb, Colors.VIEW_BG);
 		// circle at beginning and end of level for rounded edge
 		translate(0, levelBarHeight / 2);
-		drawPoint(levelBarHeight, BG_COLOR, 0);
-		drawPoint(levelBarHeight, BG_COLOR, levelBarVb.capacity() / 2 - 2);
+		drawPoint(levelBarHeight, Colors.VIEW_BG, 0);
+		drawPoint(levelBarHeight, Colors.VIEW_BG, levelBarVb.capacity() / 2 - 2);
 		gl.glPopMatrix();
 	}
 

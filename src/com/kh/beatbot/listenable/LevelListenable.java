@@ -11,8 +11,6 @@ import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
 public abstract class LevelListenable extends TouchableSurfaceView {
-	public static final float[] BG_COLOR = new float[] { 0.3275f, 0.3994f,
-			0.4465f, 1 };
 	protected ArrayList<LevelListener> levelListeners = new ArrayList<LevelListener>();
 	protected float level = .5f;
 	protected float[] levelColor = Colors.VOLUME.clone();

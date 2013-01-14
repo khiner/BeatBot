@@ -5,8 +5,15 @@
     <color name="red">#FFFF0000</color>
     <color name="yellow">#FFFFFF00</color>
     <color name="green">#FF00FF00</color>
+    <color name="bpmOn">#FFFF0000</color>
+    <color name="bpmOff">#4EFF0000</color>
+    <color name="bpmOnSelected">#FFFF4E3F</color>
+    <color name="bpmOffSelected">#4EFF4E3F</color>
     <color name="gridLine">#FF000000</color>
     <color name="waveform">#FF000000</color>
+    <color name="midiLineDark">#FF000000</color>
+    <color name="midiLineMed">#FF333333</color>
+    <color name="midiLineLight">#FF4E4E4E</color>
     <color name="midiViewBg">#FF808080</color>
     <color name="midiViewLightBg">#FFB3B3B3</color>
     <color name="note">#FFFF0000</color>
@@ -15,14 +22,26 @@
     <color name="selectRegion">#B39999FF</color>
     <color name="tronBlue">#FF69c9ff</color>
     <color name="volume">#FF69c9ff</color> <!-- same as tronBlue -->
+    <color name="volumeLight">#FF99E9FF</color>
     <color name="pan">#FFFFC964</color>
     <color name="pitch">#FF71FF88</color>
     <color name="levelSelected">#FFE60019</color>
-    <color name="textPressed">#FF69c9ff</color>
-    <color name="textSelected">#FFFFEA69</color>
-    <color name="textDefault">#FF778791</color>
+    
+    <color name="labelDark">#FF778791</color>
+    <color name="labelMed">#FF97A7B1</color>
+    <color name="labelLight">#FFA7B7C1</color>
+    <color name="labelVeryLight">#FFC7D7E1</color>
+    <color name="labelSelected">#FFFFEA69</color>
+    
     <color name="tickBar">#FF999999</color>
     <color name="tickFill">#FF4D4D4D</color>
     <color name="tickMarker">#FFCCCCCC</color>
     <color name="tickSelected">#FF69c9ff</color> <!-- same as tronBlue -->
+    <color name="viewBg">#FF546672</color>
+    
+    <color name="sampleLoopHighlight">#FFCA9D19</color>
+    <color name="sampleLoopSelect">#80FAFAFF</color>
+    <color name="sampleLoopSelectSelected">#80FAFAFF</color>
+    <color name="sampleLoopSelectOutline">#FFFFFFFF</color>
+    
 </resources>

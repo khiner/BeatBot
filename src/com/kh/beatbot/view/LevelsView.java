@@ -318,7 +318,7 @@ public class LevelsView extends TouchableSurfaceView {
 		    }
 		});
 		
-		setBackgroundColor(Colors.MIDI_VIEW_BG);
+		setBackgroundColor(Colors.VIEW_BG);
 		gl = MidiView.getGL10();
 		initLevelBarVb();
 	}

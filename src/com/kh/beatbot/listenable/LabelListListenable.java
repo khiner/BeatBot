@@ -86,24 +86,24 @@ public class LabelListListenable extends ClickableSurfaceView {
 			if (touchedLabel != null && this.equals(touchedLabel)) {
 				switch (state) {
 				case EMPTY:
-					return SELECTED_EMPTY_RECT_COLOR;
+					return Colors.LABEL_MED;
 				case OFF:
-					return SELECTED_LABEL_RECT_COLOR;
+					return Colors.LABEL_VERY_LIGHT;
 				case ON:
-					return SELECTED_LABEL_RECT_ON_COLOR;
+					return Colors.VOLUME_LIGHT;
 				default:
-					return SELECTED_LABEL_RECT_COLOR;
+					return Colors.VOLUME;
 				}
 			} else {
 				switch (state) {
 				case EMPTY:
-					return EMPTY_RECT_COLOR;
+					return Colors.LABEL_DARK;
 				case OFF:
-					return LABEL_RECT_COLOR;
+					return Colors.LABEL_LIGHT;
 				case ON:
-					return LABEL_RECT_ON_COLOR;
+					return Colors.VOLUME;
 				default:
-					return LABEL_RECT_COLOR;
+					return Colors.LABEL_LIGHT;
 				}
 			}
 		}
@@ -119,26 +119,6 @@ public class LabelListListenable extends ClickableSurfaceView {
 				return -1;
 		}
 	}
-
-	private static final float[] BG_RECT_COLOR = LevelListenable.BG_COLOR
-			.clone();
-
-	private static final float[] EMPTY_RECT_COLOR = { BG_RECT_COLOR[0] + .1f,
-			BG_RECT_COLOR[1] + .1f, BG_RECT_COLOR[2] + .1f, 1 };
-	private static final float[] LABEL_RECT_COLOR = { BG_RECT_COLOR[0] + .3f,
-			BG_RECT_COLOR[1] + .3f, BG_RECT_COLOR[2] + .3f, 1 };
-	private static final float[] LABEL_RECT_ON_COLOR = Colors.VOLUME
-			.clone();
-
-	private static final float[] SELECTED_EMPTY_RECT_COLOR = {
-			EMPTY_RECT_COLOR[0] + .2f, EMPTY_RECT_COLOR[1] + .2f,
-			EMPTY_RECT_COLOR[2] + .2f, 1 };
-	private static final float[] SELECTED_LABEL_RECT_COLOR = {
-			LABEL_RECT_COLOR[0] + .2f, LABEL_RECT_COLOR[1] + .2f,
-			LABEL_RECT_COLOR[2] + .2f, 1 };
-	private static final float[] SELECTED_LABEL_RECT_ON_COLOR = {
-			LABEL_RECT_ON_COLOR[0] + .1f, LABEL_RECT_ON_COLOR[1] + .1f,
-			LABEL_RECT_ON_COLOR[2] + .1f, 1 };
 
 	private static final float GAP_BETWEEN_LABELS = 5;
 	private static final float TEXT_Y_OFFSET = 3;
@@ -259,7 +239,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 	protected void drawFrame() {
 		translate(width / 2, height / 2);
 		// draw background rounded rect
-		drawTriangleFan(bgRectVb, BG_RECT_COLOR);
+		drawTriangleFan(bgRectVb, Colors.VIEW_BG);
 		translate(-width / 2, -height / 2);
 		// draw all other labels other than touched label first
 		for (Label label : labels) {

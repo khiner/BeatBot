@@ -62,7 +62,7 @@ public class BBSeekbar2d extends LevelListenable {
 
 	private void drawRoundedBg() {
 		gl.glTranslatef(width / 2, height / 2, 0);
-		drawTriangleFan(borderVb, BG_COLOR);
+		drawTriangleFan(borderVb, Colors.VIEW_BG);
 		gl.glTranslatef(-width / 2, -height / 2, 0);
 	}
 	

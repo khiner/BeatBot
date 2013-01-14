@@ -11,15 +11,11 @@ import android.view.MotionEvent;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
-import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.manager.TrackManager;
 
 public class AdsrView extends TouchableSurfaceView {
 	private static final int DRAW_OFFSET = 6;
 	private static final int SNAP_DIST_SQUARED = 1024;
-	private static final float[] ADSR_COLOR = Colors.VOLUME.clone();
-	private static final float[] ADSR_SELECTED_COLOR = { ADSR_COLOR[0],
-			ADSR_COLOR[1], ADSR_COLOR[2], .6f };
 	private static final float ADSR_POINT_RADIUS = 5;
 	private static FloatBuffer adsrPointVb = null;
 	private static FloatBuffer[] adsrCurveVb = new FloatBuffer[4];
@@ -82,7 +78,7 @@ public class AdsrView extends TouchableSurfaceView {
 	}
 	
 	private void drawAdsr() {
-		setColor(ADSR_COLOR);
+		setColor(Colors.VOLUME);
 		gl.glPointSize(ADSR_POINT_RADIUS * 2);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, adsrPointVb);
 		gl.glDrawArrays(GL10.GL_POINTS, 0, 3);
@@ -90,12 +86,12 @@ public class AdsrView extends TouchableSurfaceView {
 		for (int i = 0; i < 5; i++) {
 			if (adsrSelected[i] != -1) {
 				gl.glPointSize(ADSR_POINT_RADIUS * 4);
-				setColor(ADSR_SELECTED_COLOR);
+				setColor(Colors.VOLUME_SELECTED);
 				gl.glDrawArrays(GL10.GL_POINTS, i, 1);
 			}
 		}
 		for (int i = 0; i < adsrCurveVb.length; i++) {
-			drawLines(adsrCurveVb[i], ADSR_COLOR, 3, GL10.GL_LINE_STRIP);
+			drawLines(adsrCurveVb[i], Colors.VOLUME, 3, GL10.GL_LINE_STRIP);
 		}
 	}
 
@@ -192,7 +188,7 @@ public class AdsrView extends TouchableSurfaceView {
 	
 	private void drawRoundedBg() {
 		gl.glTranslatef(width / 2, height / 2, 0);
-		drawTriangleFan(borderVb, LevelListenable.BG_COLOR);
+		drawTriangleFan(borderVb, Colors.VIEW_BG);
 		drawLines(borderVb, Colors.VOLUME, 5, GL10.GL_LINE_LOOP);
 		gl.glTranslatef(-width / 2, -height / 2, 0);
 	}

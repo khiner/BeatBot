@@ -92,8 +92,10 @@ public class MidiView extends ClickableSurfaceView {
 	private MidiManager midiManager;
 
 	private static final int[] V_LINE_WIDTHS = new int[] { 5, 3, 2 };
-	private static final float[] V_LINE_COLORS = new float[] { 0, .2f, .3f };
-
+	private static final float[][] V_LINE_COLORS =
+			new float[][] { Colors.MIDI_LINE_DARK,
+						    Colors.MIDI_LINE_MED,
+						    Colors.MIDI_LINE_LIGHT};
 	
 	// NIO Buffers
 	private FloatBuffer[] vLineVb = new FloatBuffer[3];
@@ -242,8 +244,7 @@ public class MidiView extends ClickableSurfaceView {
 		push();
 		translate(startX, 0);
 		for (int i = 0; i < 3; i++) {
-			float color = V_LINE_COLORS[i];
-			gl.glColor4f(color, color, color, 1); // appropriate line color
+			setColor(V_LINE_COLORS[i]);
 			gl.glLineWidth(V_LINE_WIDTHS[i]); // appropriate line width
 			push();
 			for (float x = startX; x < endX; x += translateDist) {

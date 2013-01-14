@@ -19,15 +19,6 @@ import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class SampleWaveformView extends TouchableSurfaceView {
 
-	private static final float[] LOOP_HIGHLIGHT_COLOR = { 1, .64706f, 0, .4f };
-	private static final float[] LOOP_SELECTION_LINE_COLOR = { 1, 1, 1, 1 };
-	private static final float[] LOOP_SELECTION_RECT_COLOR = { .9f, .9f, 1, .5f };
-	private static final float[] LOOP_SELECTION_RECT_SELECT_COLOR = {
-			Colors.VOLUME[0], Colors.VOLUME[1],
-			Colors.VOLUME[2], .6f };
-	private static final float[] BG_COLOR = { LOOP_HIGHLIGHT_COLOR[0] * .5f,
-			LOOP_HIGHLIGHT_COLOR[1] * .5f, LOOP_HIGHLIGHT_COLOR[2] * .5f, 1 };
-
 	// min distance for pointer to select loop markers
 	private static final int SNAP_DIST = 32;
 	private static FloatBuffer waveformVb = null;
@@ -96,8 +87,7 @@ public class SampleWaveformView extends TouchableSurfaceView {
 	}
 
 	private void updateWaveformVb() {
-		if (height == 0) // if height == 0, this view hasn't even been init()'d
-							// yet.
+		if (height == 0) // this view hasn't even been init()'d yet.
 			return;
 		try {
 			waveformVb = WaveformHelper.floatFileToBuffer(width
@@ -120,18 +110,19 @@ public class SampleWaveformView extends TouchableSurfaceView {
 		gl.glDisable(GL10.GL_LINE_SMOOTH);
 	}
 
+	private void drawLoopSelectionHighlightRect() {
+		drawTriangleFan(loopSelectionLineVb, Colors.SAMPLE_LOOP_HIGHLIGHT);
+	}
+	
 	private void drawLoopSelectionMarkers() {
-		if (loopSelectionLineVb == null)
-			return;
-		drawLines(loopSelectionLineVb, LOOP_SELECTION_LINE_COLOR, 2,
+		drawLines(loopSelectionLineVb, Colors.SAMPLE_LOOP_SELECT_OUTLINE, 2,
 				GL10.GL_LINES);
-		drawTriangleFan(loopSelectionLineVb, LOOP_HIGHLIGHT_COLOR);
 		drawTriangleStrip(loopSelectionRectVbs[0],
-				beginLoopMarkerTouched == -1 ? LOOP_SELECTION_RECT_COLOR
-						: LOOP_SELECTION_RECT_SELECT_COLOR);
+				beginLoopMarkerTouched == -1 ? Colors.SAMPLE_LOOP_SELECT
+						: Colors.SAMPLE_LOOP_SELECT_SELECTED);
 		drawTriangleStrip(loopSelectionRectVbs[1],
-				endLoopMarkerTouched == -1 ? LOOP_SELECTION_RECT_COLOR
-						: LOOP_SELECTION_RECT_SELECT_COLOR);
+				endLoopMarkerTouched == -1 ? Colors.SAMPLE_LOOP_SELECT
+						: Colors.SAMPLE_LOOP_SELECT_SELECTED);
 	}
 
 	protected void loadIcons() {
@@ -141,7 +132,7 @@ public class SampleWaveformView extends TouchableSurfaceView {
 	
 	@Override
 	protected void init() {
-		setBackgroundColor(BG_COLOR);
+		setBackgroundColor(Colors.VIEW_BG);
 		// make preview button square
 		previewButtonWidth = height;
 		waveformWidth = width - previewButtonWidth - SNAP_DIST;
@@ -216,8 +207,9 @@ public class SampleWaveformView extends TouchableSurfaceView {
 
 	@Override
 	protected void drawFrame() {
-		drawWaveform();
 		drawLines(backgroundOutlineVb, Colors.WHITE, 4, GL10.GL_LINE_LOOP);
+		drawLoopSelectionHighlightRect();
+		drawWaveform();
 		drawLoopSelectionMarkers();
 		drawTriangleStrip(previewButtonSquareVb, Colors.BG_COLOR);
 		previewButton.draw(0, 0, height, height);

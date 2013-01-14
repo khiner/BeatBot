@@ -6,14 +6,10 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.manager.Managers;
 
 public class BpmView extends TouchableSurfaceView {
-	private static final float[] SEGMENT_ON_COLOR = { 1, 0, 0, 1 };
-	private static final float[] SEGMENT_OFF_COLOR = { 1, 0, 0, .3f };
-	private static final float[] SEGMENT_ON_TOUCHED_COLOR = { 1, .3f, .25f, 1 };
-	private static final float[] SEGMENT_OFF_TOUCHED_COLOR = { 1, .3f, .25f,
-			.3f };
 	private static final float INC_BPM_THRESH = 15;
 	private static boolean[][] segments = new boolean[3][7];
 	private static boolean touched = false;
@@ -149,9 +145,9 @@ public class BpmView extends TouchableSurfaceView {
 
 	private static float[] calculateColor(boolean on) {
 		if (on) {
-			return touched ? SEGMENT_ON_TOUCHED_COLOR : SEGMENT_ON_COLOR;
+			return touched ? Colors.BPM_ON_SELECTED : Colors.BPM_ON;
 		} else {
-			return touched ? SEGMENT_OFF_TOUCHED_COLOR : SEGMENT_OFF_COLOR;
+			return touched ? Colors.BPM_OFF_SELECTED : Colors.BPM_OFF;
 		}
 	}
 

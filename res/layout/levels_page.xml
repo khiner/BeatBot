@@ -45,6 +45,7 @@
     <com.kh.beatbot.view.LevelsView
         android:id="@+id/levelsView"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent" />
+        android:layout_height="fill_parent"
+        android:layout_marginRight="15dp" />
 
 </com.kh.beatbot.layout.page.NoteLevelsPage>

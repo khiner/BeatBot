@@ -7,8 +7,8 @@ import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 
 public class ThresholdBarView extends BBSeekbar {
-	private static final float[] THRESHOLD_COLOR = { BG_COLOR[0] + .2f,
-			BG_COLOR[1] + .2f, BG_COLOR[2] + .2f, 1 };
+	private static final float[] THRESHOLD_COLOR = { Colors.VIEW_BG[0] + .2f,
+		Colors.VIEW_BG[1] + .2f, Colors.VIEW_BG[2] + .2f, 1 };
 	private static int maxGreenVertices, maxYellowVertices, maxRedVertices;
 
 	private static int currAmpVertex = 0;
