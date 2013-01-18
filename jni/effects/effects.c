@@ -182,8 +182,8 @@ void Java_com_kh_beatbot_effect_Effect_setEffectParam(JNIEnv *env, jclass clazz,
 		jint trackNum, jint effectPosition, jint paramNum, jfloat paramValue) {
 	Levels *levels = getLevels(env, clazz, trackNum);
 	if (effectPosition == -1) { // -1 == ADSR
-		Levels *levels = getLevels(env, clazz, trackNum);
 		adsrconfig_setParam(levels->adsr, (float) paramNum, paramValue);
+		return;
 	}
 	EffectNode *effectNode = findEffectNodeByPosition(levels, effectPosition);
 	if (effectNode != NULL) {

@@ -360,18 +360,26 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	protected abstract void drawFrame();
 	
 	protected class ViewRect {
-		public float minX, maxX, minY, maxY, width, height, borderRadius;
+		public int drawOffset;
+		public float parentWidth, parentHeight, minX, maxX, minY, maxY, width, height, borderRadius;
+		
+		private FloatBuffer borderVb = null;
 		
 		// radiusScale determines the size of the radius of the rounded border.
 		// radius will be the given percentage of the shortest side of the view rect.
-		ViewRect(float parentWidth, float parentHeight, float radiusScale) {
+		ViewRect(float parentWidth, float parentHeight, float radiusScale, int drawOffset) {
+			this.parentWidth = parentWidth;
+			this.parentHeight = parentHeight;
+			this.drawOffset = drawOffset;
 			borderRadius = Math.min(parentWidth, parentHeight) * radiusScale;
-			minX = borderRadius + 2;
-			minY = borderRadius + 2;
-			maxX = parentWidth - borderRadius - 2;
-			maxY = parentHeight - borderRadius - 2;
+			minX = borderRadius;
+			minY = borderRadius;
+			maxX = parentWidth - borderRadius;
+			maxY = parentHeight - borderRadius;
 			width = parentWidth - 2 * minX;
 			height = parentHeight - 2 * minY;
+			borderVb = makeRoundedCornerRectBuffer(parentWidth - drawOffset * 2, parentHeight
+					- drawOffset * 2, borderRadius, 25);
 		}
 		
 		public float viewX(float x) {
@@ -387,7 +395,9 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		}
 		
 		public float unitY(float viewY) {
-			return (viewY - minY) / height;
+			// bottom == height in pixels == 0 in value
+			// top == 0 in pixels == 1 in value
+			return (parentHeight - viewY - minY) / height;
 		}
 		
 		public float clipX(float x) {
@@ -396,6 +406,18 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		
 		public float clipY(float y) {
 			return y < minY ? minY : (y > maxY ? maxY : y);
+		}
+		
+		public void drawRoundedBg() {
+			gl.glTranslatef(parentWidth / 2, parentHeight / 2, 0);
+			drawTriangleFan(borderVb, Colors.VIEW_BG);
+			gl.glTranslatef(-parentWidth / 2, -parentHeight / 2, 0);
+		}
+		
+		public void drawRoundedBgOutline() {
+			gl.glTranslatef(parentWidth / 2, parentHeight / 2, 0);
+			drawLines(borderVb, Colors.VOLUME, 5, GL10.GL_LINE_LOOP);
+			gl.glTranslatef(-parentWidth / 2, -parentHeight / 2, 0);
 		}
 	}
 }

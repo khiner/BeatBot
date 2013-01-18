@@ -13,20 +13,12 @@ import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 
 public class BBSeekbar2d extends LevelListenable {
-	private static final int DRAW_OFFSET = 8;
 	private float selectX = 0, selectY = 0;
 	private static ViewRect viewRect;
-	private static FloatBuffer borderVb = null;
 	private static FloatBuffer lineVb = null;
 
 	public BBSeekbar2d(Context c, AttributeSet as) {
 		super(c, as);
-	}
-
-	private void initBorderVb() {
-		viewRect = new ViewRect(width, height, 0.08f);
-		borderVb = makeRoundedCornerRectBuffer(width - DRAW_OFFSET * 2, height
-				- DRAW_OFFSET * 2, viewRect.borderRadius, 25);
 	}
 
 	public void setViewLevelX(float x) {
@@ -47,35 +39,23 @@ public class BBSeekbar2d extends LevelListenable {
 	@Override
 	public void init() {
 		super.init();
-		initBorderVb();
+		viewRect = new ViewRect(width, height, 0.08f, 8);
 		initLines();
 	}
 
 	@Override
 	protected void drawFrame() {
-		drawRoundedBg();
+		viewRect.drawRoundedBg();
 		levelColor[3] = 1; // completely opaque alpha
 		drawLines(lineVb, levelColor, 5, GL10.GL_LINES);
-		drawRoundedBgOutline();
+		viewRect.drawRoundedBgOutline();
 		drawSelection();
 	}
 
-	private void drawRoundedBg() {
-		gl.glTranslatef(width / 2, height / 2, 0);
-		drawTriangleFan(borderVb, Colors.VIEW_BG);
-		gl.glTranslatef(-width / 2, -height / 2, 0);
-	}
-	
-	private void drawRoundedBgOutline() {
-		gl.glTranslatef(width / 2, height / 2, 0);
-		drawLines(borderVb, Colors.VOLUME, 5, GL10.GL_LINE_LOOP);
-		gl.glTranslatef(-width / 2, -height / 2, 0);
-	}
-
 	private void initLines() {
-		lineVb = makeFloatBuffer(new float[] { DRAW_OFFSET, selectY,
-				width - DRAW_OFFSET, selectY, selectX, DRAW_OFFSET, selectX,
-				height - DRAW_OFFSET });
+		lineVb = makeFloatBuffer(new float[] { viewRect.drawOffset, selectY,
+				width - viewRect.drawOffset, selectY, selectX, viewRect.drawOffset, selectX,
+				height - viewRect.drawOffset});
 	}
 
 	private void drawSelection() {
@@ -97,7 +77,7 @@ public class BBSeekbar2d extends LevelListenable {
 		selectY = viewRect.clipY(y);
 		initLines();
 		for (LevelListener listener : levelListeners) {
-			listener.setLevel(this, viewRect.unitX(selectX), viewRect.unitY(height - selectY));
+			listener.setLevel(this, viewRect.unitX(selectX), viewRect.unitY(selectY));
 		}
 	}
 

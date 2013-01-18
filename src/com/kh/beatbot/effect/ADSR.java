@@ -74,27 +74,26 @@ public class ADSR extends Effect {
 	}
 	
 	public void setAttack(float attack) {
-		params.get(ATTACK_ID).setLevel(attack);
+		setParamLevel(ATTACK_ID, attack);
 	}
 	
 	public void setDecay(float decay) {
-		params.get(DECAY_ID).setLevel(decay);
+		setParamLevel(DECAY_ID, decay);
 	}
 
 	public void setSustain(float sustain) {
-		params.get(SUSTAIN_ID).setLevel(sustain);
+		setParamLevel(SUSTAIN_ID, sustain);
 	}
 	
 	public void setRelease(float release) {
-		params.get(RELEASE_ID).setLevel(release);
+		setParamLevel(RELEASE_ID, release);
 	}
 	
 	public void setStart(float start) {
-		params.get(START_ID).setLevel(start);
+		setParamLevel(START_ID, start);
 	}
 	
 	public void setPeak(float peak) {
-		params.get(PEAK_ID).setLevel(peak);
+		setParamLevel(PEAK_ID, peak);
 	}
-	
 }
