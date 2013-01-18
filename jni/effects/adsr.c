@@ -19,16 +19,16 @@ void adsrconfig_setParam(AdsrConfig *config, float paramNumFloat, float value) {
 	int paramNum = (int)paramNumFloat;
 	switch (paramNum) {
 	case 0:
-		config->attack = value;
+		config->attack = value * SAMPLE_RATE;
 		break;
 	case 1:
-		config->decay = value;
+		config->decay = value * SAMPLE_RATE;
 		break;
 	case 2:
 		config->sustain = value;
 		break;
 	case 3:
-		config->release = value;
+		config->release = value * SAMPLE_RATE;
 		break;
 	case 4:
 		config->peak = value;

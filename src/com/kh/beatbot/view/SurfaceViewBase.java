@@ -46,6 +46,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	protected EGLContext glContext;
 	protected SurfaceHolder sHolder;
 	protected Thread t;
+	protected boolean initialized = false;
 	protected boolean running;
 	protected int width;
 	protected int height;
@@ -286,9 +287,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		} catch (InterruptedException ex) {
 		}
 		t = null;
-	}
-
-	private boolean initialized = false;
+	}	
 	
 	public void run() {
 		// Much of this code is from GLSurfaceView in the Google API Demos.
@@ -416,7 +415,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		
 		public void drawRoundedBgOutline() {
 			gl.glTranslatef(parentWidth / 2, parentHeight / 2, 0);
-			drawLines(borderVb, Colors.VOLUME, 5, GL10.GL_LINE_LOOP);
+			drawLines(borderVb, Colors.VOLUME, drawOffset / 2, GL10.GL_LINE_LOOP);
 			gl.glTranslatef(-parentWidth / 2, -parentHeight / 2, 0);
 		}
 	}

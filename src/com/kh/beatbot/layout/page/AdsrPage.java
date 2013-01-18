@@ -8,16 +8,18 @@ import android.widget.ToggleButton;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.ADSR;
+import com.kh.beatbot.listenable.LevelListenable;
+import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.AdsrView;
 import com.kh.beatbot.view.BBSeekbar;
 import com.kh.beatbot.view.BBTextView;
 
-public class AdsrPage extends Page implements OnClickListener {
+public class AdsrPage extends Page implements OnClickListener, LevelListener {
 	
 	private ToggleButton[] adsrButtons = new ToggleButton[6];
 	private AdsrView adsrView = null;
-	private BBSeekbar adsrBar = null;
+	private BBSeekbar levelBar = null;
 	private BBTextView valueLabel = null, paramLabel = null;
 	
 	public AdsrPage(Context context, AttributeSet attrs) {
@@ -27,7 +29,8 @@ public class AdsrPage extends Page implements OnClickListener {
 	@Override
 	public void init() {
 		adsrView = (AdsrView)findViewById(R.id.adsrView);
-		adsrBar = (BBSeekbar)findViewById(R.id.adsrBar);
+		levelBar = (BBSeekbar)findViewById(R.id.adsrBar);
+		levelBar.addLevelListener(this);
 		paramLabel = (BBTextView)findViewById(R.id.paramLabel);
 		valueLabel = (BBTextView)findViewById(R.id.valueLabel);
 		adsrButtons[ADSR.ATTACK_ID] = (ToggleButton)findViewById(R.id.attackButton);
@@ -45,12 +48,15 @@ public class AdsrPage extends Page implements OnClickListener {
 
 	@Override
 	public void update() {
+		adsrView.update();
+		updateLevelBar();
+		updateLabels();
 	}
-
+	
 	@Override
 	public void setVisibilityCode(int code) {
 		adsrView.setVisibility(code);
-		adsrBar.setVisibility(code);
+		levelBar.setVisibility(code);
 		valueLabel.setVisibility(code);
 		paramLabel.setVisibility(code);
 	}
@@ -74,7 +80,7 @@ public class AdsrPage extends Page implements OnClickListener {
 		paramLabel.layout(pos, 0, pos + 2 * height, halfHeight);
 		valueLabel.layout(pos, halfHeight, pos + 2 * height, b);
 		pos += 2 * height;
-		adsrBar.layout(pos, halfHeight, width, b);
+		levelBar.layout(pos, halfHeight, width, b);
 		for (int i = 0; i < 4; i++) { // adsrBtns
 			adsrButtons[i].layout(pos, 0, pos + halfHeight, halfHeight);
 			pos += halfHeight;
@@ -98,7 +104,7 @@ public class AdsrPage extends Page implements OnClickListener {
 		}
 		paramLabel.measure(2 * height, halfHeight);
 		valueLabel.measure(2 * height, halfHeight);
-		adsrBar.measure(3 * halfHeight, halfHeight);
+		levelBar.measure(3 * halfHeight, halfHeight);
 	}
 
 	private void check(ToggleButton btn) {
@@ -110,7 +116,11 @@ public class AdsrPage extends Page implements OnClickListener {
 		}
 	}
 	
-	private void updateLabels() {
+	public void updateLevelBar() {
+		levelBar.setViewLevel(TrackManager.currTrack.adsr.getCurrParam().viewLevel);
+	}
+	
+	public void updateLabels() {
 		updateLabel();
 		updateValueLabel();
 	}
@@ -131,5 +141,35 @@ public class AdsrPage extends Page implements OnClickListener {
 		// set the current parameter so we know what to do with SeekBar events.
 		TrackManager.currTrack.adsr.setCurrParam(paramId);
 		updateLabels();
+		updateLevelBar();
+	}
+
+	@Override
+	public void notifyInit(LevelListenable levelListenable) {
+		updateLevelBar();
+	}
+
+	@Override
+	public void notifyPressed(LevelListenable levelListenable, boolean pressed) {
+		// nothing to do
+	}
+
+	@Override
+	public void notifyClicked(LevelListenable levelListenable) {
+		// nothing to do
+	}
+
+	@Override
+	public void setLevel(LevelListenable levelListenable, float level) {
+		TrackManager.currTrack.adsr.setCurrParamLevel(level);
+		// update everything except level bar, since it is the notifier
+		adsrView.update();
+		updateLabels();
+	}
+
+	@Override
+	public void setLevel(LevelListenable levelListenable, float levelX,
+			float levelY) {
+		// for 2d view.  not applicable
 	}
 }

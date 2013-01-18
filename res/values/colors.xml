@@ -41,7 +41,7 @@
     <color name="tickSelected">#FF69c9ff</color> <!-- same as tronBlue -->
     <color name="viewBg">#FF546672</color>
     
-    <color name="sampleLoopHighlight">#FFCA9D19</color>
+    <color name="sampleLoopHighlight">#FFCD9A19</color>
     <color name="sampleLoopSelect">#80FAFAFF</color>
     <color name="sampleLoopSelectSelected">#80FAFAFF</color>
     <color name="sampleLoopSelectOutline">#FFFFFFFF</color>

@@ -5,26 +5,34 @@ import android.util.FloatMath;
 import com.kh.beatbot.manager.Managers;
 
 public class Param {
-	public float level, viewLevel, scale = 1;
+	public float level, viewLevel, scale;
 	public int topBeatNum = 1, bottomBeatNum = 1;
 	public boolean hz = false;
 	public boolean beatSync;
-	public boolean logScale;
+	public boolean isLogScale;
+	public float logScale;
 	public String unitString;
 	public String name = null;
 
-	public Param(String name, boolean logScale, boolean beatSync,
-			String unitString) {
+	public Param(String name, boolean isLogScale, boolean beatSync,
+			float scale, float logScale, String unitString) {
 		this.name = name;
-		this.logScale = logScale;
+		this.isLogScale = isLogScale;
 		this.beatSync = beatSync;
+		this.scale = scale;
+		this.logScale = logScale;
 		this.unitString = unitString;
 		viewLevel = 0.5f;
 		setLevel(viewLevel);
 	}
+	
+	public Param(String name, boolean isLogScale, boolean beatSync,
+			String unitString) {
+		this(name, isLogScale, beatSync, 1, 8, unitString);
+	}
 
-	public Param(boolean logScale, boolean beatSync, String unitString) {
-		this(null, logScale, beatSync, unitString);
+	public Param(boolean isLogScale, boolean beatSync, String unitString) {
+		this(null, isLogScale, beatSync, unitString);
 	}
 
 	public String getFormattedValueString() {
@@ -36,26 +44,28 @@ public class Param {
 
 	public void setLevel(float level) {
 		if (beatSync) {
-			quantizeToBeat(level);
-		} else if (logScale) {
-			logScaleLevel(level);
+			this.level = quantizeToBeat(level);
+		} else if (isLogScale) {
+			this.level = logScaleLevel(level);
 		} else {
 			this.level = level;
 		}
 	}
 
-	private void logScaleLevel(float level) {
-		this.level = (float) (Math.pow(9, level) - 1) / 8;
+	private float logScaleLevel(float level) {
+		float scaled = (float) (Math.pow(logScale + 1, level) - 1) / logScale; 
 		if (hz)
-			this.level *= 32;
+			scaled *= 32;
+		return scaled;
 	}
 
-	private void quantizeToBeat(float level) {
+	private float quantizeToBeat(float level) {
 		topBeatNum = getTopBeatNum((int) FloatMath.ceil(level * 14));
 		bottomBeatNum = getBottomBeatNum((int) FloatMath.ceil(level * 14));
-		level = (60f / (Managers.midiManager.getBPM()) * ((float) topBeatNum / (float) bottomBeatNum));
+		float quantized = (60f / (Managers.midiManager.getBPM()) * ((float) topBeatNum / (float) bottomBeatNum));
 		if (hz)
-			level = 1 / level;
+			quantized = 1 / quantized;
+		return quantized;
 	}
 	
 	private static int getTopBeatNum(int which) {

@@ -5,6 +5,7 @@ import android.widget.ViewFlipper;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.layout.page.AdsrPage;
 import com.kh.beatbot.layout.page.MainPageSelect;
 import com.kh.beatbot.layout.page.MasterPage;
 import com.kh.beatbot.layout.page.NoteLevelsPage;
@@ -19,13 +20,15 @@ public class PageManager {
 	private static MasterPage masterPage = null;
 	private static TrackPage trackPage = null;
 	private static NoteLevelsPage levelsPage = null;
+	private static AdsrPage adsrPage = null;
 	
 	public static void init(Activity context) {
 		((MainPageSelect)context.findViewById(R.id.mainPageSelect)).init();
 		masterPage = (MasterPage)context.findViewById(R.id.masterPage);
 		trackPage = (TrackPage)context.findViewById(R.id.trackPage);
 		levelsPage = (NoteLevelsPage)context.findViewById(R.id.levelsPage);
-		mainPages = new Page[] {masterPage, trackPage, levelsPage};
+		adsrPage = (AdsrPage)context.findViewById(R.id.adsrPage);
+		mainPages = new Page[] {masterPage, trackPage, levelsPage, adsrPage};
 		
 		for (Page mainPage : mainPages) {
 			mainPage.init();
@@ -53,6 +56,10 @@ public class PageManager {
 	
 	public static Page getTrackPage(int trackPageNum) {
 		return trackPage.getPage(trackPageNum);
+	}
+	
+	public static AdsrPage getAdsrPage() {
+		return adsrPage;
 	}
 	
 	public static void updateTrackPages() {

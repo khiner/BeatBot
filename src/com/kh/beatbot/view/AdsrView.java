@@ -13,6 +13,7 @@ import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.Track;
+import com.kh.beatbot.manager.PageManager;
 import com.kh.beatbot.manager.TrackManager;
 
 public class AdsrView extends TouchableSurfaceView {
@@ -29,16 +30,17 @@ public class AdsrView extends TouchableSurfaceView {
 		super(c, as);
 	}
 
-	private void initBorderVb() {
-		viewRect = new ViewRect(width, height, 0.14f, 4);
+	public void update() {
+		if (initialized)
+			initAdsrVb();
 	}
-	
+		
 	private void initAdsrVb() {
 		Track track = TrackManager.currTrack;
 		// TODO something like this
 		float attackX = getAttackX(track.adsr);
 		float decayX = getDecayX(track.adsr);
-		pointVertices[0] = viewRect.viewX(0); 
+		pointVertices[0] = viewRect.viewX(0);
 		pointVertices[1] = viewRect.viewY(track.adsr.getStart());
 		pointVertices[2] = attackX;
 		pointVertices[3] = viewRect.viewY(track.adsr.getPeak());
@@ -122,13 +124,8 @@ public class AdsrView extends TouchableSurfaceView {
 	}
 	
 	private float xToDecay(float x) {
-		if (x <= getAttackX()) {
-			return 0;
-		} else if (x >= getAttackX() + viewRect.width / 3f) {
-			return 1;
-		} else {
-			return viewRect.unitX(x - getAttackX()) * 3f;
-		}
+		float decay = viewRect.unitX(x - getAttackX()) * 3;
+		return decay > 0 ? (decay < 1 ? decay : 1) : 0;
 	}
 	
 	private float xToRelease(float x) {
@@ -171,6 +168,8 @@ public class AdsrView extends TouchableSurfaceView {
 					break;
 				}
 				initAdsrVb();
+				PageManager.getAdsrPage().updateLevelBar();
+				PageManager.getAdsrPage().updateLabels();
 				return;
 			}
 		}
@@ -192,7 +191,7 @@ public class AdsrView extends TouchableSurfaceView {
 	
 	@Override
 	protected void init() {
-		initBorderVb();
+		viewRect = new ViewRect(width, height, 0.12f, 6);
 		initAdsrVb();
 	}
 
