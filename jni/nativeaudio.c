@@ -105,39 +105,26 @@ void soundTrack(Track *track) {
 void stopSoundingTrack(Track *track) {
 	WavFile *wavFile = (WavFile *) track->generator->config;
 	wavFile->adsr->stoppedSample = wavFile->adsr->currSample;
-	// in case the preview button is being held down, don't want to play the sound again from the beginning
-	track->previewing = false;
 }
 
 void stopTrack(Track *track) {
 	// update next track
 	updateNextNote(track);
-	if (!track->playing)
-		return;
-	track->playing = false;
 	stopSoundingTrack(track);
 }
 
 void playTrack(Track *track) {
-	if (track->playing || track->previewing) {
-		stopSoundingTrack(track);
-	}
-	track->playing = true;
+	stopSoundingTrack(track);
 	soundTrack(track);
 }
 
 void previewTrack(Track *track) {
-	track->previewing = true;
-	if (!track->playing) {
-		setPreviewLevels(track);
-		wavfile_reset((WavFile *) track->generator->config);
-	}
+	setPreviewLevels(track);
+	wavfile_reset((WavFile *) track->generator->config);
 }
 
 void stopPreviewingTrack(Track *track) {
-	track->previewing = false;
-	if (!track->playing)
-		stopSoundingTrack(track);
+	stopSoundingTrack(track);
 }
 
 void Java_com_kh_beatbot_global_Track_previewTrack(JNIEnv *env, jclass clazz,
@@ -186,12 +173,8 @@ static inline void generateNextBuffer() {
 			} else if (currSample == track->nextStopSample) {
 				stopTrack(track);
 			}
-			//if (track->playing || track->previewing) {
-				wavfile_tick((WavFile *) track->generator->config,
+			wavfile_tick((WavFile *) track->generator->config,
 						track->tempSample);
-			//} else {
-//				track->tempSample[0] = track->tempSample[1] = 0;
-//			}
 			for (channel = 0; channel < 2; channel++) {
 				track->currBufferFloat[channel][samp] =
 						track->tempSample[channel];

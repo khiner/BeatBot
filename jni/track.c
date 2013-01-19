@@ -181,7 +181,6 @@ Track *initTrack() {
 	track->currBufferFloat = (float **) malloc(2 * sizeof(float *));
 	track->currBufferFloat[0] = (float *) calloc(BUFF_SIZE, sizeof(float));
 	track->currBufferFloat[1] = (float *) calloc(BUFF_SIZE, sizeof(float));
-	track->playing = track->previewing = false;
 	track->mute = track->solo = false;
 	track->shouldSound = true;
 	track->nextEvent->volume = .8f;
@@ -347,11 +346,6 @@ void Java_com_kh_beatbot_global_BaseTrack_setTrackPitch(JNIEnv *env,
 	updateLevels(trackNum);
 }
 
-void Java_com_kh_beatbot_global_Track_setAdsrParam(JNIEnv *env, jclass clazz,
-		jint trackNum, jint adsrParamNum, jfloat value) {
-
-}
-
 void Java_com_kh_beatbot_global_Track_setSample(JNIEnv *env, jclass clazz,
 		jint trackNum, jstring sampleName) {
 	Track *track = getTrack(env, clazz, trackNum);
@@ -394,10 +388,21 @@ jboolean Java_com_kh_beatbot_global_Track_isTrackLooping(JNIEnv *env,
 	return wavFile->looping;
 }
 
-jboolean Java_com_kh_beatbot_global_Track_isTrackPlaying(JNIEnv *env,
-		jclass clazz, jint trackNum) {
+void Java_com_kh_beatbot_global_Track_notifyNoteMoved(JNIEnv *env,
+		jclass clazz, jint trackNum, jlong oldOnTick, jlong oldOffTick,
+		jlong newOnTick, jlong newOffTick) {
 	Track *track = getTrack(env, clazz, trackNum);
-	return track->playing;
+
+	if ((track->nextStartSample == tickToSample(oldOnTick) && tickToSample(newOnTick) > currSample) ||
+			(track->nextStopSample == tickToSample(oldOffTick) && tickToSample(newOffTick) < currSample))
+		stopTrack(track);
+}
+
+void Java_com_kh_beatbot_global_Track_notifyNoteRemoved(JNIEnv *env,
+		jclass clazz, jint trackNum, jlong onTick, jlong offTick) {
+	Track *track = getTrack(env, clazz, trackNum);
+	if (track->nextStartSample == tickToSample(onTick))
+		stopTrack(track);
 }
 
 void Java_com_kh_beatbot_global_Track_setTrackLoopWindow(JNIEnv *env,

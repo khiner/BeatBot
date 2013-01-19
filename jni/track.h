@@ -29,7 +29,7 @@ typedef struct Track_ {
 	Generator *generator;
 	MidiEvent *nextEvent;
 	long nextStartSample, nextStopSample;
-	int num;bool playing;bool previewing;bool mute;bool solo;bool shouldSound;
+	int num; bool mute;bool solo;bool shouldSound;
 } Track;
 
 typedef struct TrackNode_t {

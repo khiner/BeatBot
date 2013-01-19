@@ -43,13 +43,7 @@ public class Track extends BaseTrack {
 
 	public void removeNote(MidiNote note) {
 		notes.remove(note);
-		if (isTrackPlaying(id)) {
-			long currTick = Managers.midiManager.getCurrTick();
-			if (currTick >= note.getOnTick() && currTick <= note.getOffTick()) {
-				stopTrack(id);
-			}
-		}
-
+		notifyNoteRemoved(id, note.getOnTick(), note.getOffTick());
 		updateNextNote();
 	}
 
@@ -167,10 +161,6 @@ public class Track extends BaseTrack {
 		toggleTrackLooping(id);
 	}
 
-	public boolean isPlaying() {
-		return isTrackPlaying(id);
-	}
-
 	public boolean isLooping() {
 		return isTrackLooping(id);
 	}
@@ -183,6 +173,11 @@ public class Track extends BaseTrack {
 		setTrackLoopWindow(id, loopBegin, loopEnd);
 	}
 
+	public void notifyNoteMoved(long oldNoteOn, long oldNoteOff,
+			long newNoteOn, long newNoteOff) {
+		notifyNoteMoved(id, oldNoteOn, oldNoteOff, newNoteOn, newNoteOff);
+	}
+	
 	// set play mode to reverse
 	public void setReverse(boolean reverse) {
 		this.reverse = reverse;
@@ -203,7 +198,10 @@ public class Track extends BaseTrack {
 
 	public static native boolean isTrackLooping(int trackNum);
 
-	public static native boolean isTrackPlaying(int trackNum);
+	public static native void notifyNoteMoved(int trackNum, long oldNoteOn, long oldNoteOff,
+			long newNoteOn, long newNoteOff);
+	
+	public static native void notifyNoteRemoved(int trackNum, long noteOn, long noteOff);
 
 	public static native void setTrackLoopWindow(int trackNum, long loopBegin,
 			long loopEnd);

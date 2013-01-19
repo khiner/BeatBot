@@ -290,14 +290,10 @@ public class MidiManager implements Parcelable {
 			offTick = midiNote.getOffTick() + onTick - midiNote.getOnTick();
 		if (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)
 			return;
-		long currTick = getCurrTick();
 		Track track = Managers.trackManager.getTrack(midiNote.getNoteValue());
 		// if we're changing the stop tick on a note that's already playing to a
 		// note before the current tick, stop the track
-		if (track.isPlaying() && currTick < midiNote.getOffTick()
-				&& currTick > offTick) {
-			track.stop();
-		}
+		track.notifyNoteMoved(midiNote.getOnTick(), midiNote.getOffTick(), onTick, offTick);
 		// move Java note ticks
 		midiNote.setOnTick(onTick);
 		midiNote.setOffTick(offTick);
