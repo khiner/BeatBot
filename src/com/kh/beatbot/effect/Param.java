@@ -39,16 +39,16 @@ public class Param {
 		if (beatSync)
 			return topBeatNum + (bottomBeatNum == 1 ? "" : "/" + bottomBeatNum);
 		else
-			return String.format("%.2f", level * scale) + " " + unitString;
+			return String.format("%.2f", level) + " " + unitString;
 	}
 
 	public void setLevel(float level) {
 		if (beatSync) {
 			this.level = quantizeToBeat(level);
 		} else if (isLogScale) {
-			this.level = logScaleLevel(level);
+			this.level = scale * logScaleLevel(level);
 		} else {
-			this.level = level;
+			this.level = scale * level;
 		}
 	}
 

@@ -63,6 +63,7 @@ WavFile *wavfile_create(const char *sampleName) {
 	wavFile->samples = NULL;
 	wavfile_setSampleFile(wavFile, sampleName);
 	wavFile->looping = wavFile->reverse = false;
+	wavFile->adsr = adsrconfig_create();
 	return wavFile;
 }
 
@@ -89,13 +90,15 @@ void wavfile_setReverse(WavFile *wavFile, bool reverse) {
 void wavfile_reset(WavFile *config) {
 	config->currSample = config->reverse ? config->loopEnd : config->loopBegin;
 	fseek(config->sampleFile, config->currSample * TWO_FLOAT_SZ, SEEK_SET);
+	resetAdsr(config->adsr);
 }
 
 void wavfile_destroy(void *p) {
-	WavFile *config = (WavFile *) p;
-	fflush(config->sampleFile);
-	fclose(config->sampleFile);
-	wavfile_freeBuffers(config);
-	free(config);
-	config = NULL;
+	WavFile *wavFile = (WavFile *) p;
+	fflush(wavFile->sampleFile);
+	fclose(wavFile->sampleFile);
+	wavfile_freeBuffers(wavFile);
+	adsrconfig_destroy(wavFile->adsr);
+	free(wavFile);
+	wavFile = NULL;
 }

@@ -2,6 +2,12 @@
 
 AdsrConfig *adsrconfig_create() {
 	AdsrConfig *config = (AdsrConfig *) malloc(sizeof(AdsrConfig));
+	config->initial = 0;
+	config->peak = 1;
+	config->attack = .001 * SAMPLE_RATE;
+	config->decay = .1 * SAMPLE_RATE;
+	config->sustain = .7f;
+	config->release = .001 * SAMPLE_RATE;
 	return config;
 }
 
@@ -31,10 +37,10 @@ void adsrconfig_setParam(AdsrConfig *config, float paramNumFloat, float value) {
 		config->release = value * SAMPLE_RATE;
 		break;
 	case 4:
-		config->peak = value;
+		config->initial = value;
 		break;
 	case 5:
-		config->initial = value;
+		config->peak = value;
 		break;
 	}
 }

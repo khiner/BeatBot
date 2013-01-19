@@ -51,7 +51,6 @@ static inline void filterconfig_set(void *p, float f, float r) {
 	// provided cutoff is between 0 and 1.  map this to a value between
 	// 0 and samplerate/2 = 21950... - 50 because high frequencies are bad news
 	config->f = f;
-	f *= SAMPLE_RATE / 2;
 	f = f > 50 ? (f < SAMPLE_RATE / 2 - 50 ? f : SAMPLE_RATE / 2 - 50) : 50;
 	config->frequency = f;
 	config->r = r;

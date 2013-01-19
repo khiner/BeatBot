@@ -52,7 +52,6 @@ static inline void writeFloatsToFile(float **buffer, int size, FILE *out) {
 
 static inline void processEffects(Levels *levels, float **floatBuffer) {
 	levels->volPan->process(levels->volPan->config, floatBuffer, BUFF_SIZE);
-	adsr_process(levels->adsr, floatBuffer, BUFF_SIZE);
 	pthread_mutex_lock(&levels->effectMutex);
 	EffectNode *effectNode = levels->effectHead;
 	while (effectNode != NULL) {
@@ -100,12 +99,12 @@ static inline void mixTracks() {
 
 void soundTrack(Track *track) {
 	updateLevels(track->num);
-	resetAdsr(track->levels->adsr);
+	wavfile_reset((WavFile *) track->generator->config);
 }
 
 void stopSoundingTrack(Track *track) {
-	wavfile_reset((WavFile *) track->generator->config);
-	track->levels->adsr->stoppedSample = track->levels->adsr->currSample;
+	WavFile *wavFile = (WavFile *) track->generator->config;
+	wavFile->adsr->stoppedSample = wavFile->adsr->currSample;
 	// in case the preview button is being held down, don't want to play the sound again from the beginning
 	track->previewing = false;
 }
@@ -131,7 +130,7 @@ void previewTrack(Track *track) {
 	track->previewing = true;
 	if (!track->playing) {
 		setPreviewLevels(track);
-		resetAdsr(track->levels->adsr);
+		wavfile_reset((WavFile *) track->generator->config);
 	}
 }
 
@@ -187,12 +186,12 @@ static inline void generateNextBuffer() {
 			} else if (currSample == track->nextStopSample) {
 				stopTrack(track);
 			}
-			if (track->playing || track->previewing) {
+			//if (track->playing || track->previewing) {
 				wavfile_tick((WavFile *) track->generator->config,
 						track->tempSample);
-			} else {
-				track->tempSample[0] = track->tempSample[1] = 0;
-			}
+			//} else {
+//				track->tempSample[0] = track->tempSample[1] = 0;
+//			}
 			for (channel = 0; channel < 2; channel++) {
 				track->currBufferFloat[channel][samp] =
 						track->tempSample[channel];
@@ -208,7 +207,6 @@ static inline void generateNextBuffer() {
 // Process all effects for all tracks
 // Mix all tracks together into the OpenSL byte buffer
 void fillBuffer() {
-	return; // TODO temp bec of ADSR changes causing beeping noise
 	pthread_mutex_lock(&openSlOut->trackMutex);
 	generateNextBuffer();
 	processEffectsForAllTracks();

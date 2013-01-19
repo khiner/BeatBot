@@ -4,7 +4,7 @@ FilterConfig *filterconfig_create() {
 	FilterConfig *config = (FilterConfig *) malloc(sizeof(FilterConfig));
 	config->rScale = .7f;
 	config->mode = 0;
-	config->baseF = .5f;
+	config->baseF = SAMPLE_RATE / 4;
 	config->modDepth = .5f;
 	config->mod = sinewave_create();
 	sinewave_setFrequency(config->mod, .5f);

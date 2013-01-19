@@ -142,7 +142,6 @@ void freeTracks() {
 		free(cur_ptr->track->currBufferFloat);
 		cur_ptr->track->generator->destroy(cur_ptr->track->generator->config);
 		freeEffects(cur_ptr->track->levels);
-		adsrconfig_destroy(cur_ptr->track->levels->adsr);
 		TrackNode *prev_ptr = cur_ptr;
 		cur_ptr = cur_ptr->next;
 		free(prev_ptr); // free the entire Node
@@ -169,7 +168,6 @@ Levels *initLevels() {
 	}
 	levels->volPan = initEffect(true, volumepanconfig_create(),
 			volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
-	levels->adsr = adsrconfig_create();
 	return levels;
 }
 

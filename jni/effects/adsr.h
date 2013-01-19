@@ -19,14 +19,17 @@ AdsrConfig *adsrconfig_create();
 void resetAdsr(AdsrConfig *config);
 
 static inline float adsr_tick(AdsrConfig *config) {
-	config->currSample++;
-	if (config->currSample > config->stoppedSample) { // note ended - in release phase
+	if (config->currSample >= config->stoppedSample) { // note ended - in release phase
 		config->currLevel += (-config->sustain) / config->release;
-	} else if (config->currSample < config->attack) {
+	} else if (config->currSample < config->attack) { // rising
 		config->currLevel += (config->peak - config->initial) / config->attack;
-	} else if (config->currSample < config->attack + config->decay) {
+	} else if (config->currSample < config->attack + config->decay) { // decaying
 		config->currLevel += (config->sustain - config->peak) / config->decay;
 	}
+
+	config->currLevel = config->currLevel > 0 ? (config->currLevel < 1 ? config->currLevel : 1) : 0;
+
+	config->currSample++;
 	return config->currLevel;
 }
 
