@@ -14,8 +14,7 @@ typedef struct EffectNode_t {
 	struct EffectNode_t *next;
 } EffectNode;
 
-Effect *initEffect(bool on, void *config,
-		void (*set), void (*process), void (*destroy));
+Effect *initEffect(void *config, void (*set), void (*process), void (*destroy));
 
 void reverse(float buffer[], int begin, int end);
 void normalize(float buffer[], int size);

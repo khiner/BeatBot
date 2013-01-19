@@ -166,8 +166,9 @@ Levels *initLevels() {
 	for (effectNum = 0; effectNum < MAX_EFFECTS_PER_TRACK; effectNum++) {
 		addEffect(levels, NULL);
 	}
-	levels->volPan = initEffect(true, volumepanconfig_create(),
+	levels->volPan = initEffect(volumepanconfig_create(),
 			volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
+	levels->volPan->on = true;
 	return levels;
 }
 

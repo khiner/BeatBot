@@ -52,7 +52,7 @@ public class EffectsPage extends Page {
 			Effect effect = currTrack.findEffectByPosition(i);
 			if (effect != null) {
 				effectLabelList.setLabelText(i, effect.getName());
-				effectLabelList.setLabelOn(i, effect.on);
+				effectLabelList.setLabelOn(i, effect.isOn());
 			} else {
 				effectLabelList.setLabelTextByPosition(i, "");
 			}
@@ -83,12 +83,10 @@ public class EffectsPage extends Page {
 									effect.removeEffect();
 								}
 							} else {
+								launchEffectIntent(effectNames[item],
+										lastClickedPos, true);
 								effectLabelList.setLabelText(lastClickedPos,
 										effectNames[item]);
-								effectLabelList
-										.setLabelOn(lastClickedPos, true);
-								launchEffectIntent(effectNames[item],
-										lastClickedPos);
 							}
 						}
 					});
@@ -102,7 +100,7 @@ public class EffectsPage extends Page {
 				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
 					Effect effect = currTrack.findEffectByPosition(i);
 					if (effect != null)
-						labelList.setLabelOn(i, effect.on);
+						labelList.setLabelOn(i, effect.isOn());
 				}
 			} else {
 				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
@@ -140,7 +138,7 @@ public class EffectsPage extends Page {
 			if (text.isEmpty()) {
 				selectEffectAlert.show();
 			} else {
-				launchEffectIntent(text, position);
+				launchEffectIntent(text, position, false);
 			}
 		}
 
@@ -156,7 +154,7 @@ public class EffectsPage extends Page {
 				: TrackManager.currTrack;
 	}
 
-	private void launchEffectIntent(String effectName, int effectPosition) {
+	private void launchEffectIntent(String effectName, int effectPosition, boolean setOn) {
 		Effect effect = getEffect(effectName, effectPosition);
 		if (effectName != effect.name) {
 			// different effect being added to the effect slot. need to replace
@@ -168,7 +166,7 @@ public class EffectsPage extends Page {
 		intent.setClass(getContext(), EffectActivity.class);
 		intent.putExtra("effectPosition", effect.getPosition());
 		intent.putExtra("trackId", currTrack.getId());
-
+		intent.putExtra("setOn", setOn);
 		getContext().startActivity(intent);
 	}
 

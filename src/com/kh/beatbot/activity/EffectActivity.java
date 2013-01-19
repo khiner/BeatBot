@@ -50,7 +50,7 @@ public class EffectActivity extends Activity implements LevelListener,
 					.findViewById(R.id.bp_toggle);
 			filterButtons[((Filter) effect).getMode()].setChecked(true);
 			((ToggleButton) filterTypesLayout.findViewById(R.id.effectToggleOn))
-					.setChecked(effect.on);
+					.setChecked(effect.isOn());
 			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
 					RelativeLayout.LayoutParams.WRAP_CONTENT,
 					RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -70,7 +70,7 @@ public class EffectActivity extends Activity implements LevelListener,
 			effectToggleButton.setTextOn("");
 			effectToggleButton.setTextOff("");
 			effectToggleButton.setOnClickListener(this);
-			effectToggleButton.setChecked(effect.on);
+			effectToggleButton.setChecked(effect.isOn());
 			RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
 					effectToggleButton.getBackground().getIntrinsicWidth(),
 					effectToggleButton.getBackground().getIntrinsicHeight());
@@ -120,6 +120,7 @@ public class EffectActivity extends Activity implements LevelListener,
 		GeneralUtils.initAndroidSettings(this);
 		int effectPosition = getIntent().getExtras().getInt("effectPosition");
 		int trackId = getIntent().getExtras().getInt("trackId");
+		boolean setOn = getIntent().getExtras().getBoolean("setOn");
 		// track could be master, so we need to be general and use BaseTrack
 		effect = Managers.trackManager.getBaseTrack(trackId)
 				.findEffectByPosition(effectPosition);
@@ -135,6 +136,8 @@ public class EffectActivity extends Activity implements LevelListener,
 		findViewById(R.id.xyParamBar).setLayoutParams(layoutParams);
 		parent.addView(paramWrapperLayout);
 		initParamControls();
+		//if (setOn)
+//			effect.setOn(true);
 	}
 
 	protected void initParamControls() {

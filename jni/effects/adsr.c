@@ -2,12 +2,7 @@
 
 AdsrConfig *adsrconfig_create() {
 	AdsrConfig *config = (AdsrConfig *) malloc(sizeof(AdsrConfig));
-	config->initial = 0;
-	config->peak = 1;
-	config->attack = .001 * SAMPLE_RATE;
-	config->decay = .1 * SAMPLE_RATE;
-	config->sustain = .7f;
-	config->release = .001 * SAMPLE_RATE;
+	// default values injected from Java on init
 	return config;
 }
 
@@ -17,7 +12,7 @@ void adsrconfig_destroy(void *p) {
 
 void resetAdsr(AdsrConfig *config) {
 	config->currSample = 0;
-	config->currLevel = config->initial;
+	config->currLevel = config->start;
 	config->stoppedSample = FLT_MAX;
 }
 
@@ -43,7 +38,7 @@ void adsrconfig_setParam(AdsrConfig *config, float paramNumFloat, float value) {
 			config->release = 1;
 		break;
 	case 4:
-		config->initial = value;
+		config->start = value;
 		break;
 	case 5:
 		config->peak = value;

@@ -8,8 +8,8 @@ typedef struct AdsrPoint_t {
 
 typedef struct AdsrConfig_t {
 	// attack, decay, release all in samples.
-	// sustain / initial / peak are values between 0 and 1
-	float attack, decay, sustain, release, initial, peak;
+	// sustain / start / peak are values between 0 and 1
+	float attack, decay, sustain, release, start, peak;
 	float currLevel;
 	float currSample;
 	float stoppedSample;
@@ -22,7 +22,7 @@ static inline float adsr_tick(AdsrConfig *config) {
 	if (config->currSample >= config->stoppedSample) { // note ended - in release phase
 		config->currLevel += (-config->sustain) / config->release;
 	} else if (config->currSample < config->attack) { // rising
-		config->currLevel += (config->peak - config->initial) / config->attack;
+		config->currLevel += (config->peak - config->start) / config->attack;
 	} else if (config->currSample < config->attack + config->decay) { // decaying
 		config->currLevel += (config->sustain - config->peak) / config->decay;
 	}

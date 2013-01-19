@@ -12,10 +12,10 @@ public abstract class Effect implements Comparable<Effect> {
 	protected int trackNum;
 	protected int numParams;
 	protected int position;
-
-	public String name;
-	public boolean on = true;
 	protected boolean paramsLinked = false;
+	
+	public String name;
+	private boolean on = false;
 
 	public Effect(String name, int trackNum) {
 		this.name = name;
@@ -36,6 +36,10 @@ public abstract class Effect implements Comparable<Effect> {
 		setEffectOn(trackNum, position, on);
 	}
 
+	public boolean isOn() {
+		return on;
+	}
+	
 	public int getPosition() {
 		return position;
 	}

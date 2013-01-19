@@ -9,27 +9,33 @@ public class ADSR extends Effect {
 	public static final int START_ID = 4;
 	public static final int PEAK_ID = 5;
 
-	public static final int ATTACK_MAX_MS = 20; // 20s
-	public static final int DECAY_MAX_MS = 30; // 30s
-	public static final int RELEASE_MAX_MS = 20; // 30s
+	public static final int ATTACK_MAX_S = 20; // 20s
+	public static final int DECAY_MAX_S = 30; // 30s
+	public static final int RELEASE_MAX_S = 20; // 30s
 	
-	public static final int LOG_SCALE = 256;
+	public static final int LOG_SCALE = 512;
 	
 	private int currParamId = ATTACK_ID;
 	
 	public ADSR(String name, int trackNum) {
 		super(name, trackNum);
-		position = -1; // -1 native code understands that -1 == ADSR
 	}
 	
 	@Override
 	protected void initParams() {
-		params.add(new Param("ATTACK", true, false, ATTACK_MAX_MS, LOG_SCALE, "s"));
-		params.add(new Param("DECAY", true, false, DECAY_MAX_MS, LOG_SCALE, "s"));
+		position = -1; // -1 native code understands that -1 == ADSR
+		params.add(new Param("ATTACK", true, false, ATTACK_MAX_S, LOG_SCALE, "s"));
+		params.add(new Param("DECAY", true, false, DECAY_MAX_S, LOG_SCALE, "s"));
 		params.add(new Param("SUSTAIN", false, false, ""));
-		params.add(new Param("RELEASE", true, false, RELEASE_MAX_MS, LOG_SCALE, "s"));
+		params.add(new Param("RELEASE", true, false, RELEASE_MAX_S, LOG_SCALE, "s"));
 		params.add(new Param("START", false, false, ""));
 		params.add(new Param("PEAK", false, false, ""));
+		setAttack(0);
+		setDecay(1);
+		setSustain(1);
+		setRelease(0);
+		setStart(0);
+		setPeak(1);
 	}
 
 	@Override

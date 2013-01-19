@@ -54,8 +54,8 @@ public class TrackManager implements MidiTrackControlListener {
 	}
 
 	public void addTrack(Instrument instrument, int sampleNum) {
+		addTrack(instrument.getSamplePath(sampleNum));
 		Track newTrack = new Track(tracks.size(), instrument, sampleNum);
-		addTrack(newTrack.getSamplePath());
 		tracks.add(newTrack);
 		currTrack = tracks.get(tracks.size() - 1);
 		if (GlobalVars.midiView != null)

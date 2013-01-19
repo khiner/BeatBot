@@ -1,9 +1,9 @@
 #include "../all.h"
 
-Effect *initEffect(bool on, void *config, void (*set), void (*process),
+Effect *initEffect(void *config, void (*set), void (*process),
 		void (*destroy)) {
 	Effect *effect = malloc(sizeof(Effect));
-	effect->on = on;
+	effect->on = false;
 	effect->config = config;
 	effect->set = set;
 	effect->process = process;
@@ -70,26 +70,26 @@ EffectNode *findEffectNodeByPosition(Levels *levels, int position) {
 Effect *createEffect(int effectNum) {
 	switch (effectNum) {
 	case CHORUS:
-		return initEffect(true, chorusconfig_create(), chorusconfig_setParam,
+		return initEffect(chorusconfig_create(), chorusconfig_setParam,
 				chorus_process, chorusconfig_destroy);
 	case DECIMATE:
-		return initEffect(true, decimateconfig_create(),
+		return initEffect(decimateconfig_create(),
 				decimateconfig_setParam, decimate_process,
 				decimateconfig_destroy);
 	case DELAY:
-		return initEffect(true, delayconfigi_create(), delayconfigi_setParam,
+		return initEffect(delayconfigi_create(), delayconfigi_setParam,
 				delayi_process, delayconfigi_destroy);
 	case FILTER:
-		return initEffect(true, filterconfig_create(), filterconfig_setParam,
+		return initEffect(filterconfig_create(), filterconfig_setParam,
 				filter_process, filterconfig_destroy);
 	case FLANGER:
-		return initEffect(true, flangerconfig_create(), flangerconfig_setParam,
+		return initEffect(flangerconfig_create(), flangerconfig_setParam,
 				flanger_process, flangerconfig_destroy);
 	case REVERB:
-		return initEffect(true, reverbconfig_create(), reverbconfig_setParam,
+		return initEffect(reverbconfig_create(), reverbconfig_setParam,
 				reverb_process, reverbconfig_destroy);
 	case TREMELO:
-		return initEffect(true, tremeloconfig_create(), tremeloconfig_setParam,
+		return initEffect(tremeloconfig_create(), tremeloconfig_setParam,
 				tremelo_process, tremeloconfig_destroy);
 	}
 	return NULL;
