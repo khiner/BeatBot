@@ -13,18 +13,13 @@ public class Chorus extends Effect {
 		effectNum = 0;
 		numParams = 5;
 		if (params.isEmpty()) {
-			params.add(new Param(true, true, "Hz"));
+			params.add(new Param("MOD RATE", true, true, "Hz"));
 			getParam(0).hz = true;
-			params.add(new Param(false, false, ""));
-			params.add(new Param(false, false, ""));
-			params.add(new Param(true, true, "ms"));
-			params.add(new Param(false, false, ""));
+			params.add(new Param("MOD AMT", false, false, ""));
+			params.add(new Param("TIME", false, false, ""));
+			params.add(new Param("FEEDBACK", true, true, "ms"));
+			params.add(new Param("WET", false, false, ""));
 		}
-	}
-
-	@Override
-	public int getParamLayoutId() {
-		return R.layout.chorus_param_layout;
 	}
 
 	@Override

@@ -15,12 +15,12 @@ public class Filter extends Effect {
 		numParams = 4;
 		effectNum = 3;
 		if (params.isEmpty()) {
-			params.add(new Param(true, false, "Hz"));
+			params.add(new Param("FREQ", true, false, "Hz"));
 			getParam(0).scale = PlaybackManager.SAMPLE_RATE / 2;
-			params.add(new Param(false, false, ""));
-			params.add(new Param(true, true, "Hz"));
+			params.add(new Param("RES", false, false, ""));
+			params.add(new Param("MOD RATE", true, true, "Hz"));
 			getParam(2).hz = true;
-			params.add(new Param(false, false, ""));
+			params.add(new Param("MOD AMT", false, false, ""));
 		}
 	}
 
@@ -31,11 +31,6 @@ public class Filter extends Effect {
 	public void setMode(int mode) {
 		this.mode = mode;
 		setEffectParam(trackNum, position, 4, mode);
-	}
-
-	@Override
-	public int getParamLayoutId() {
-		return R.layout.filter_param_layout;
 	}
 
 	@Override

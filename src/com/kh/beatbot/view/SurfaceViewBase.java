@@ -54,7 +54,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	protected float[] clearColor = Colors.BG_COLOR;
 
 	protected static GL10 gl = null;
-	protected GLText glText = null; // A GLText Instance
+	protected static GLText glText; // A GLText Instance
 
 	public static void setResources(Resources resources) {
 		SurfaceViewBase.resources = resources;
@@ -218,7 +218,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 
 		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, 0); // unbind texture
-		bitmap.recycle();
+		//bitmap.recycle();
 	}
 	
 	public static void loadTexture(int resourceId, int[] textureHandlers, int textureId, int[] crop) {
@@ -243,32 +243,18 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glDisable(GL10.GL_TEXTURE_2D);
 	}
 
-	/**
-	 * Constructor
-	 * 
-	 * @param c
-	 *            The View's context.
-	 * @param as
-	 *            The View's Attribute Set
-	 */
-	public SurfaceViewBase(Context c, AttributeSet as) {
-		this(c, as, -1);
+	public SurfaceViewBase(Context c) {
+		super(c);
+		sHolder = getHolder();
+		sHolder.addCallback(this);
 	}
-
-	/**
-	 * Constructor for animated views
-	 * 
-	 * @param c
-	 *            The View's context
-	 * @param fps
-	 *            The frames per second for the animation.
-	 */
-	public SurfaceViewBase(Context c, AttributeSet as, int fps) {
+	
+	public SurfaceViewBase(Context c, AttributeSet as) {
 		super(c, as);
 		sHolder = getHolder();
 		sHolder.addCallback(this);
 	}
-
+	
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		this.width = width;
@@ -320,10 +306,10 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 
 	private void initGl(EGLContext context) {
 		gl = (GL10) context.getGL();
-		loadIcons();
 		gl.glViewport(0, 0, width, height);
 		GLU.gluOrtho2D(gl, 0, width, height, 0);
-
+		initGlText();
+		loadIcons();
 		gl.glEnable(GL10.GL_POINT_SMOOTH);
 		gl.glEnable(GL10.GL_BLEND);
 		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
@@ -335,10 +321,13 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		return gl;
 	}
 	
-	protected void initGlText() {
-		glText = new GLText(gl, getContext().getAssets());
-		// load font file
-		glText.load("REDRING-1969-v03.ttf", height / 2);
+	private static void initGlText() {
+		// load font file once, with static height
+		// to change height, simply use gl.scale()
+		glText = GLText.getInstance("REDRING-1969-v03.ttf", 50);
+		// since the GL10 instance potentially has changed,
+		// we need to reload the bitmap texture for the font
+		glText.loadTexture();
 	}
 
 	protected void fillBackground() {

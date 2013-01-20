@@ -98,8 +98,6 @@ public abstract class Effect implements Comparable<Effect> {
 
 	protected abstract void initParams();
 
-	public abstract int getParamLayoutId();
-
 	public abstract int getOnDrawableId();
 
 	public abstract int getOffDrawableId();

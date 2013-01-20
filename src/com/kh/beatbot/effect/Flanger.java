@@ -13,19 +13,14 @@ public class Flanger extends Effect {
 		numParams = 6;
 		effectNum = 4;
 		if (params.isEmpty()) {
-			params.add(new Param(true, false, "ms"));
-			params.add(new Param(false, false, ""));
-			params.add(new Param(false, false, ""));
-			params.add(new Param(true, true, "Hz"));
+			params.add(new Param("TIME", true, false, "ms"));
+			params.add(new Param("FEEDBACK", false, false, ""));
+			params.add(new Param("WET", false, false, ""));
+			params.add(new Param("MOD RATE", true, true, "Hz"));
 			getParam(3).hz = true;
-			params.add(new Param(false, false, ""));
-			params.add(new Param(false, false, ""));
+			params.add(new Param("MOD AMT", false, false, ""));
+			params.add(new Param("PHASE", false, false, ""));
 		}
-	}
-
-	@Override
-	public int getParamLayoutId() {
-		return R.layout.flanger_param_layout;
 	}
 
 	@Override

@@ -39,11 +39,6 @@ public class ADSR extends Effect {
 	}
 
 	@Override
-	public int getParamLayoutId() {
-		return 0;
-	}
-
-	@Override
 	public int getOnDrawableId() {
 		return 0;
 	}

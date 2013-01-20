@@ -6,6 +6,10 @@ import android.view.MotionEvent;
 
 public abstract class TouchableSurfaceView extends SurfaceViewBase {
 
+	public TouchableSurfaceView(Context c) {
+		super(c);
+	}
+	
 	public TouchableSurfaceView(Context c, AttributeSet as) {
 		super(c, as);
 	}

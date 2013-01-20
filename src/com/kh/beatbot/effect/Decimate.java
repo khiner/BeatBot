@@ -13,14 +13,9 @@ public class Decimate extends Effect {
 		numParams = 2;
 		effectNum = 1;
 		if (params.isEmpty()) {
-			params.add(new Param(true, false, "Hz"));
-			params.add(new Param(true, false, "Bits"));
+			params.add(new Param("RATE", true, false, "Hz"));
+			params.add(new Param("BITS", true, false, "Bits"));
 		}
-	}
-
-	@Override
-	public int getParamLayoutId() {
-		return R.layout.decimate_param_layout;
 	}
 
 	@Override

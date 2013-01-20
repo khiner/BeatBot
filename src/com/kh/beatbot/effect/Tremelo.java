@@ -13,16 +13,11 @@ public class Tremelo extends Effect {
 		numParams = 3;
 		effectNum = 6;
 		if (params.isEmpty()) {
-			params.add(new Param(true, true, "Hz"));
-			params.add(new Param(false, false, ""));
+			params.add(new Param("RATE", true, true, "Hz"));
+			params.add(new Param("PHASE", false, false, ""));
 			getParam(0).hz = true;
-			params.add(new Param(false, false, ""));
+			params.add(new Param("DEPTH", false, false, ""));
 		}
-	}
-
-	@Override
-	public int getParamLayoutId() {
-		return R.layout.tremelo_param_layout;
 	}
 
 	@Override

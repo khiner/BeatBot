@@ -60,52 +60,6 @@ public class AdsrPage extends Page implements OnClickListener, LevelListener {
 		valueLabel.setVisibility(code);
 		paramLabel.setVisibility(code);
 	}
-	
-	/**
-	 * Layout and Measure handled here since nested weights are needed,
-	 * and they are very expensive.
-	 * ___________________________________________
-	 * |               |Label| A | D | S | R |PEAK_|
-	 * |  ADSR         |_____|___|___|___|___|START|
-	 * |  VIEW         | VAL |=========<>--------- |
-	 * |_______________|_____|_____________________|
-	 */
-	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		super.onLayout(changed, l, t, r, b);
-		int width = (r - l);
-		int height = (b - t);
-		int halfHeight = height / 2;
-		adsrView.layout(0, 0, width - 9 * halfHeight, b);
-		int pos = width - 9 * halfHeight;
-		paramLabel.layout(pos, 0, pos + 2 * height, halfHeight);
-		valueLabel.layout(pos, halfHeight, pos + 2 * height, b);
-		pos += 2 * height;
-		levelBar.layout(pos, halfHeight, width, b);
-		for (int i = 0; i < 4; i++) { // adsrBtns
-			adsrButtons[i].layout(pos, 0, pos + halfHeight, halfHeight);
-			pos += halfHeight;
-		}
-		//start / peak btns
-		adsrButtons[4].layout(pos, halfHeight / 2, pos + halfHeight, halfHeight);
-		adsrButtons[5].layout(pos, 0, pos + halfHeight, halfHeight / 2);
-	}
-	
-	protected void onMeasure(int w, int h) {
-		super.onMeasure(w, h);
-		int width = MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY);
-		int height = MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY);
-		int halfHeight = height / 2;
-		adsrView.measure(width / 2, height);
-		for (int i = 0; i < 4; i++) { // adsrBtns
-			adsrButtons[i].measure(halfHeight, halfHeight);
-		}
-		for (int i = 4; i < adsrButtons.length; i++) {
-			adsrButtons[i].measure(halfHeight, height / 4);
-		}
-		paramLabel.measure(2 * height, halfHeight);
-		valueLabel.measure(2 * height, halfHeight);
-		levelBar.measure(3 * halfHeight, halfHeight);
-	}
 
 	private void check(ToggleButton btn) {
 		btn.setChecked(true);
@@ -171,5 +125,51 @@ public class AdsrPage extends Page implements OnClickListener, LevelListener {
 	public void setLevel(LevelListenable levelListenable, float levelX,
 			float levelY) {
 		// for 2d view.  not applicable
+	}
+	
+	/**
+	 * Layout and Measure handled here since nested weights are needed,
+	 * and they are very expensive.
+	 * ___________________________________________
+	 * |               |Label| A | D | S | R |PEAK_|
+	 * |  ADSR         |_____|___|___|___|___|START|
+	 * |  VIEW         | VAL |=========<>--------- |
+	 * |_______________|_____|_____________________|
+	 */
+	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+		super.onLayout(changed, l, t, r, b);
+		int width = (r - l);
+		int height = (b - t);
+		int halfHeight = height / 2;
+		adsrView.layout(0, 0, width - 9 * halfHeight, b);
+		int pos = width - 9 * halfHeight;
+		paramLabel.layout(pos, 0, pos + 2 * height, halfHeight);
+		valueLabel.layout(pos, halfHeight, pos + 2 * height, b);
+		pos += 2 * height;
+		levelBar.layout(pos, halfHeight, width, b);
+		for (int i = 0; i < 4; i++) { // adsrBtns
+			adsrButtons[i].layout(pos, 0, pos + halfHeight, halfHeight);
+			pos += halfHeight;
+		}
+		//start / peak btns
+		adsrButtons[4].layout(pos, halfHeight / 2, pos + halfHeight, halfHeight);
+		adsrButtons[5].layout(pos, 0, pos + halfHeight, halfHeight / 2);
+	}
+	
+	protected void onMeasure(int w, int h) {
+		super.onMeasure(w, h);
+		int width = MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY);
+		int height = MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY);
+		int halfHeight = height / 2;
+		adsrView.measure(width / 2, height);
+		for (int i = 0; i < 4; i++) { // adsrBtns
+			adsrButtons[i].measure(halfHeight, halfHeight);
+		}
+		for (int i = 4; i < adsrButtons.length; i++) {
+			adsrButtons[i].measure(halfHeight, height / 4);
+		}
+		paramLabel.measure(2 * height, halfHeight);
+		valueLabel.measure(2 * height, halfHeight);
+		levelBar.measure(3 * halfHeight, halfHeight);
 	}
 }

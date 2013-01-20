@@ -13,14 +13,9 @@ public class Reverb extends Effect {
 		numParams = 2;
 		effectNum = 5;
 		if (params.isEmpty()) {
-			params.add(new Param(false, false, ""));
-			params.add(new Param(false, false, ""));
+			params.add(new Param("HF DAMP", false, false, ""));
+			params.add(new Param("FEEDBACK", false, false, ""));
 		}
-	}
-
-	@Override
-	public int getParamLayoutId() {
-		return R.layout.reverb_param_layout;
 	}
 
 	@Override

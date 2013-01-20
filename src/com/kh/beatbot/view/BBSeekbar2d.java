@@ -17,6 +17,10 @@ public class BBSeekbar2d extends LevelListenable {
 	private static ViewRect viewRect;
 	private static FloatBuffer lineVb = null;
 
+	public BBSeekbar2d(Context c) {
+		super(c);
+	}
+	
 	public BBSeekbar2d(Context c, AttributeSet as) {
 		super(c, as);
 	}

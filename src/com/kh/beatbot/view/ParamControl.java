@@ -9,36 +9,50 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 
-public class BBKnob extends LevelListenable {
+public class ParamControl extends LevelListenable {
 	public static final float ¹ = (float) Math.PI;
 	
-	private static BBToggleButton centerButton = null;
 	private static FloatBuffer circleVb = null;
 	private static FloatBuffer selectCircleVb = null;
 	private static FloatBuffer selectCircleVb2 = null;
 	private static int circleWidth = 0, circleHeight = 0;
 
+	private BBToggleButton centerButton = null;
 	private static float snapDistSquared;
 
 	private int drawIndex = 0;
+	private float labelOffset = 0, valueLabelOffset = 0;
+	private float labelWidth = 0, valueLabelWidth = 0;
+
 	private boolean levelSelected = false;
 	private boolean clickable = false;
-
-	public BBKnob(Context c, AttributeSet as) {
+	
+	private Param param;
+	
+	private String label = "", valueLabel = "";
+	
+	public ParamControl(Context c, AttributeSet as) {
 		super(c, as);
 	}
 
+	public ParamControl(Context c, Param param){
+		super(c);
+		this.param = param;
+	}
+	
 	public void setClickable(boolean clickable) {
 		this.clickable = clickable;
 	}
 
 	protected void loadIcons() {
+		setParam(param);
 		centerButton = new BBToggleButton(new BBIconSource(-1, R.drawable.clock, R.drawable.note_icon));
 	}
 	
@@ -50,6 +64,31 @@ public class BBKnob extends LevelListenable {
 		}
 	}
 
+	public void setParam(Param param) {
+		this.param = param;
+		setViewLevel(param.viewLevel);
+		setLabel(param.name);
+		updateValue();
+	}
+	
+	public void updateValue() {
+		setValueLabel(param.getFormattedValueString());
+	}
+	
+	private void setLabel(String label) {
+		this.label = label;
+		labelWidth = glText.getTextWidth(label, width / 6);
+		labelOffset = width / 2 - labelWidth / 2;
+		glText.storeText(label);
+	}
+	
+	private void setValueLabel(String valueLabel) {
+		this.valueLabel = valueLabel;
+		valueLabelWidth = glText.getTextWidth(valueLabel, width / 6);
+		valueLabelOffset = width / 2 - valueLabelWidth / 2;
+		glText.storeText(valueLabel);
+	}
+	
 	private static void initCircleVbs(float width, float height) {
 		float[] circleVertices = new float[128];
 		float[] selectCircleVertices = new float[128];
@@ -62,33 +101,33 @@ public class BBKnob extends LevelListenable {
 			// main circles will show when user is not touching
 			circleVertices[i * 4] = FloatMath.cos(theta) * width / 2.3f + width
 					/ 2;
-			circleVertices[i * 4 + 1] = FloatMath.sin(theta) * height / 2.3f
-					+ height / 2;
+			circleVertices[i * 4 + 1] = FloatMath.sin(theta) * width / 2.3f
+					+ width / 2;
 			circleVertices[i * 4 + 2] = FloatMath.cos(theta) * width / 3.1f
 					+ width / 2;
-			circleVertices[i * 4 + 3] = FloatMath.sin(theta) * height / 3.1f
-					+ height / 2;
+			circleVertices[i * 4 + 3] = FloatMath.sin(theta) * width / 3.1f
+					+ width / 2;
 			// two dimmer circles are shown for a "glow" effect when the user
 			// touches the view
 			// this first one is slightly wider...
 			selectCircleVertices[i * 4] = FloatMath.cos(theta) * width / 2.2f
 					+ width / 2;
-			selectCircleVertices[i * 4 + 1] = FloatMath.sin(theta) * height
-					/ 2.2f + height / 2;
+			selectCircleVertices[i * 4 + 1] = FloatMath.sin(theta) * width
+					/ 2.2f + width / 2;
 			selectCircleVertices[i * 4 + 2] = FloatMath.cos(theta) * width
 					/ 3.2f + width / 2;
-			selectCircleVertices[i * 4 + 3] = FloatMath.sin(theta) * height
-					/ 3.2f + height / 2;
+			selectCircleVertices[i * 4 + 3] = FloatMath.sin(theta) * width
+					/ 3.2f + width / 2;
 			// and this one is even wider... use alpha channel to produce glow
 			// effect
 			selectCircle2Vertices[i * 4] = FloatMath.cos(theta) * width / 2.1f
 					+ width / 2;
-			selectCircle2Vertices[i * 4 + 1] = FloatMath.sin(theta) * height
-					/ 2.1f + height / 2;
+			selectCircle2Vertices[i * 4 + 1] = FloatMath.sin(theta) * width
+					/ 2.1f + width / 2;
 			selectCircle2Vertices[i * 4 + 2] = FloatMath.cos(theta) * width
 					/ 3.3f + width / 2;
-			selectCircle2Vertices[i * 4 + 3] = FloatMath.sin(theta) * height
-					/ 3.3f + height / 2;
+			selectCircle2Vertices[i * 4 + 3] = FloatMath.sin(theta) * width
+					/ 3.3f + width / 2;
 		}
 		circleVb = makeFloatBuffer(circleVertices);
 		selectCircleVb = makeFloatBuffer(selectCircleVertices);
@@ -110,7 +149,13 @@ public class BBKnob extends LevelListenable {
 
 	@Override
 	protected void drawFrame() {
-		// background
+		setColor(Colors.VOLUME);
+		// draw text
+		glText.draw(label, width / 6, labelOffset, 0);
+		glText.draw(valueLabel, width / 6, valueLabelOffset, 1.1f * width);
+		
+		translate(0, .2f * width);
+		// level background
 		drawTriangleStrip(circleVb, Colors.VIEW_BG);
 		// main selection
 		drawTriangleStrip(circleVb, levelColor, drawIndex);
@@ -119,8 +164,9 @@ public class BBKnob extends LevelListenable {
 			drawTriangleStrip(selectCircleVb, selectColor, drawIndex);
 		}
 		if (clickable) {
-			centerButton.draw(0, 0, width, height);
+			centerButton.draw(0, width, width, width);
 		}
+		translate(0, -.2f * width);
 	}
 
 	private void updateDrawIndex() {

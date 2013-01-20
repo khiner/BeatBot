@@ -44,7 +44,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 			this.text = text;
 			if (text.isEmpty())
 				state = LabelState.EMPTY;
-			this.textWidth = glText.getTextWidth(text);
+			this.textWidth = glText.getTextWidth(text, height / 2);
 		}
 
 		public void updateSize() {
@@ -72,12 +72,12 @@ public class LabelListListenable extends ClickableSurfaceView {
 						height);
 				setColor(Colors.WHITE);
 				// draw string in center of rect
-				glText.draw("ADD", x + labelWidth / 2 - addTextWidth / 2
+				glText.draw("ADD", height / 2, x + labelWidth / 2 - addTextWidth / 2
 						+ height, TEXT_Y_OFFSET);
 			} else {
 				setColor(Colors.WHITE);
 				// draw string in center of rect
-				glText.draw(text, x + labelWidth / 2 - textWidth / 2,
+				glText.draw(text, height / 2, x + labelWidth / 2 - textWidth / 2,
 						TEXT_Y_OFFSET);
 			}
 		}
@@ -218,14 +218,14 @@ public class LabelListListenable extends ClickableSurfaceView {
 	@Override
 	protected void loadIcons() {
 		plusIcon = new BBIcon(R.drawable.plus_outline);
-		initGlText();
 	}
 	
 	@Override
 	protected void init() {
 		if (labels == null)
 			labels = new ArrayList<Label>();
-		addTextWidth = glText.getTextWidth("add") + height;
+		addTextWidth = glText.getTextWidth("add", height / 2) + height;
+		glText.storeText("add");
 		if (bgRectVb == null)
 			initBgRectVb();
 		listener.labelListInitialized(this);

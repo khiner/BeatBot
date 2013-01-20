@@ -193,6 +193,10 @@ public class AdsrView extends TouchableSurfaceView {
 	protected void init() {
 		viewRect = new ViewRect(width, height, 0.12f, 6);
 		initAdsrVb();
+		ADSR adsr = TrackManager.currTrack.adsr;
+		for (int i = 0; i < adsr.getNumParams(); i++) {
+			glText.storeText(adsr.getParam(i).name);
+		}
 	}
 
 	@Override

@@ -19,16 +19,11 @@ public class Delay extends Effect {
 		numParams = 4;
 		effectNum = 2;
 		if (params.isEmpty()) {
-			params.add(new Param(true, true, "ms"));
-			params.add(new Param(true, true, "ms"));
-			params.add(new Param(false, false, ""));
-			params.add(new Param(false, false, ""));
+			params.add(new Param("TIME LEFT", true, true, "ms"));
+			params.add(new Param("TIME RIGHT", true, true, "ms"));
+			params.add(new Param("FEEDBACK", false, false, ""));
+			params.add(new Param("WET", false, false, ""));
 		}
-	}
-
-	@Override
-	public int getParamLayoutId() {
-		return R.layout.delay_param_layout;
 	}
 
 	@Override

@@ -7,8 +7,6 @@ import com.kh.beatbot.global.Colors;
 
 public class BBTextView extends SurfaceViewBase {
 	
-	private boolean textLoaded = false;
-	
 	private String text = null;
 	private float textWidth = 0;
 	private float textOffset = 0;
@@ -19,8 +17,6 @@ public class BBTextView extends SurfaceViewBase {
 	
 	@Override
 	protected void loadIcons() {
-		initGlText();
-		textLoaded = true;
 		if (text != null) {
 			setText(text);
 		}
@@ -30,15 +26,15 @@ public class BBTextView extends SurfaceViewBase {
 	protected void init() {
 		if (text == null)
 			return;
-		glText.init(text, textOffset, 0);
+		glText.storeText(text);
 	}
 
 	public void setText(String text) {
 		this.text = text;
-		if (textLoaded) {
-			textWidth = glText.getTextWidth(this.text);
+		if (glText != null) {
+			textWidth = glText.getTextWidth(text, height / 2);
 			textOffset = width / 2 - textWidth / 2;
-			glText.init(this.text, textOffset, 0);
+			glText.storeText(text);
 		}
 	}
 	
@@ -48,6 +44,6 @@ public class BBTextView extends SurfaceViewBase {
 			return;
 		setColor(Colors.VOLUME);
 		// draw string in center of rect
-		glText.draw();
+		glText.draw(text, height / 2, textOffset, 0);
 	}
 }

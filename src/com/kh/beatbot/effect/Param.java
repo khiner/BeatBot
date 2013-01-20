@@ -31,10 +31,6 @@ public class Param {
 		this(name, isLogScale, beatSync, 1, 8, unitString);
 	}
 
-	public Param(boolean isLogScale, boolean beatSync, String unitString) {
-		this(null, isLogScale, beatSync, unitString);
-	}
-
 	public String getFormattedValueString() {
 		if (beatSync)
 			return topBeatNum + (bottomBeatNum == 1 ? "" : "/" + bottomBeatNum);

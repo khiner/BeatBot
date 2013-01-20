@@ -9,15 +9,16 @@
 
 package com.kh.beatbot.view.text;
 
-import javax.microedition.khronos.opengles.GL10;
+import java.util.HashMap;
+import java.util.Map;
 
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.FloatMath;
 
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.SurfaceViewBase;
 
 public class GLText {
@@ -30,21 +31,36 @@ public class GLText {
 	public final static int CHAR_UNKNOWN = (CHAR_CNT - 1);
 	public final static int CHAR_BATCH_SIZE = 100;
 
-	private AssetManager assets;
-	private SpriteBatch batch;
+	private static Bitmap bitmap = null;
+
+	private static Map<String, SpriteBatch> batches;
+	private static SpriteBatch genericBatch;
 	// region of each character (texture coordinates)
-	private TextureRegion[] charRgn = new TextureRegion[CHAR_CNT];
+	private static TextureRegion[] charRgn = new TextureRegion[CHAR_CNT];
 
-	private int[] textureIds; // Font Texture ID
-	private int textureSize = 0; // Texture Size for Font (Square)
-	private int cellWidth = 0, cellHeight = 0; // Character Cell Width/Height
-	private float charWidthMax = 0; // Character Width (Maximum; Pixels)
+	private static int size = 0;
+
+	private static int[] textureIds; // Font Texture ID
+	private static int textureSize = 0; // Texture Size for Font (Square)
+	private static int cellWidth = 0, cellHeight = 0; // Character Cell
+														// Width/Height
+	private static float charWidthMax = 0; // Character Width (Maximum; Pixels)
 	// Width of Each Character (Actual; Pixels)
-	private final float[] charWidths = new float[CHAR_CNT];
+	private static final float[] charWidths = new float[CHAR_CNT];
 
-	public GLText(GL10 gl, AssetManager assets) {
-		this.assets = assets; // Save the Asset Manager Instance
-		batch = new SpriteBatch(gl);
+	private static GLText singletonInstance = null;
+
+	public static GLText getInstance(String file, int size) {
+		if (singletonInstance == null) {
+			singletonInstance = new GLText(file, size);
+		}
+		return singletonInstance;
+	}
+
+	private GLText(String file, int size) {
+		batches = new HashMap<String, SpriteBatch>();
+		genericBatch = new SpriteBatch();
+		load(file, size);
 	}
 
 	// this will load the specified font file, create a texture for the defined
@@ -52,13 +68,15 @@ public class GLText {
 	// file - Filename of the font (.ttf, .otf) to use. In 'Assets' folder.
 	// size - Requested pixel size of font (height)
 	public void load(String file, int size) {
+		GLText.size = size;
 		// load the font and setup paint instance for drawing
-		Typeface tf = Typeface.createFromAsset(assets, file);
-		Paint paint = new Paint(); // Create Android Paint Instance
-		paint.setAntiAlias(true); // Enable Anti Alias
-		paint.setTextSize(size); // Set Text Size
-		paint.setTypeface(tf); // Set Typeface
-		Paint.FontMetrics fm = paint.getFontMetrics(); // Get Font Metrics
+		Typeface tf = Typeface.createFromAsset(
+				GlobalVars.mainActivity.getAssets(), file);
+		Paint paint = new Paint();
+		paint.setAntiAlias(true);
+		paint.setTextSize(size);
+		paint.setTypeface(tf);
+		Paint.FontMetrics fm = paint.getFontMetrics();
 		cellHeight = (int) (FloatMath.ceil(Math.abs(fm.bottom)
 				+ Math.abs(fm.top)));
 		charWidthMax = 0;
@@ -66,7 +84,7 @@ public class GLText {
 		char[] s = new char[2]; // Create Character Array
 		float[] w = new float[2]; // Working Width Value
 		int cnt = 0; // Array Counter
-		for (char c = CHAR_START; c <= CHAR_END; c++) { // FOR Each Character
+		for (char c = CHAR_START; c <= CHAR_END; c++) {
 			s[0] = c; // Set Character
 			paint.getTextWidths(s, 0, 1, w); // Get Character Bounds
 			charWidths[cnt] = w[0]; // Get Width
@@ -98,7 +116,7 @@ public class GLText {
 			textureSize = 2048;
 
 		// create an empty bitmap (alpha only)
-		Bitmap bitmap = Bitmap.createBitmap(textureSize, textureSize,
+		bitmap = Bitmap.createBitmap(textureSize, textureSize,
 				Bitmap.Config.ALPHA_8);
 		Canvas canvas = new Canvas(bitmap);
 		bitmap.eraseColor(0x00000000); // Set Transparent Background (ARGB)
@@ -117,11 +135,6 @@ public class GLText {
 		s[0] = CHAR_NONE;
 		canvas.drawText(s, 0, 1, x, y, paint);
 
-		// generate a new texture
-		textureIds = new int[1];
-		// load bitmap texture in OpenGL
-		SurfaceViewBase.loadTexture(bitmap, textureIds, 0);
-
 		x = 0;
 		y = 0;
 		// setup the array of character texture regions
@@ -134,47 +147,55 @@ public class GLText {
 				y += cellHeight; // Move to Next Row (Cell)
 			}
 		}
+		// generate a new texture
+		textureIds = new int[1];
+	}
+
+	public void loadTexture() {
+		// load bitmap texture in OpenGL
+		SurfaceViewBase.loadTexture(bitmap, textureIds, 0);
 	}
 
 	// D: draw text at the specified x,y position
 	// A: text - the string to draw
 	// x, y - the x,y position to draw text at (bottom left of text; including
 	// descent)
-	public void init(String text, float x, float y) {
-		x += cellWidth / 2;
-		y += cellHeight / 2;
-		batch.beginBatch(textureIds[0]);
+	private void initTextInBatch(String text, SpriteBatch batch) {
+		float x = cellWidth / 2;
+		float y = cellHeight / 2;
+		batch.beginBatch();
 		for (char character : text.toCharArray()) {
 			int c = (int) character - CHAR_START;
-			if (c < 0 || c >= CHAR_CNT)
-				c = CHAR_UNKNOWN;
 			batch.initSprite(x, y, cellWidth, cellHeight, charRgn[c]);
 			x += charWidths[c];
 		}
 		batch.complete();
 	}
 
-	public void draw() {
-		batch.endBatch(textureIds[0]);
+	public void storeText(String text) {
+		if (batches.containsKey(text))
+			return;
+		SpriteBatch batch = new SpriteBatch();
+		initTextInBatch(text, batch);
+		batches.put(text, batch);
 	}
-
+	
 	// D: draw text at the specified x,y position
 	// A: text - the string to draw
 	// x, y - the x,y position to draw text at (bottom left of text; including
 	// descent)
-	public void draw(String text, float x, float y) {
-		x += cellWidth / 2;
-		y += cellHeight / 2;
-		batch.beginBatch(textureIds[0]);
-		for (char character : text.toCharArray()) {
-			int c = (int) character - CHAR_START;
-			if (c < 0 || c >= CHAR_CNT)
-				c = CHAR_UNKNOWN;
-			batch.initSprite(x, y, cellWidth, cellHeight, charRgn[c]);
-			x += charWidths[c];
+	public void draw(String text, int height, float x, float y) {
+		SurfaceViewBase.push();
+		SurfaceViewBase.translate(x, y);
+		float scale = (float) height / size;
+		SurfaceViewBase.scale(scale, scale);
+		if (batches.containsKey(text)) {
+			batches.get(text).endBatch(textureIds[0]);
+		} else {
+			initTextInBatch(text, genericBatch);
+			genericBatch.endBatch(textureIds[0]);
 		}
-		batch.complete();
-		batch.endBatch(textureIds[0]);
+		SurfaceViewBase.pop();
 	}
 
 	// D: return the width/height of a character, or max character width
@@ -188,11 +209,11 @@ public class GLText {
 		return charWidthMax;
 	}
 
-	public float getTextWidth(String text) {
+	public float getTextWidth(String text, float height) {
 		float total = 0;
 		for (char character : text.toCharArray()) {
 			total += getCharWidth(character);
 		}
-		return total;
+		return total * height / size;
 	}
 }

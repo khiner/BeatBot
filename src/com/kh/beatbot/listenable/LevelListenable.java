@@ -19,6 +19,10 @@ public abstract class LevelListenable extends TouchableSurfaceView {
 
 	protected boolean selected = false;
 
+	public LevelListenable(Context c) {
+		super(c);
+	}
+	
 	public LevelListenable(Context c, AttributeSet as) {
 		super(c, as);
 	}
