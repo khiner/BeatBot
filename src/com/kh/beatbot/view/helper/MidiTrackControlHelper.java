@@ -221,9 +221,9 @@ public class MidiTrackControlHelper {
 		selectedRow.handlePress(x);
 	}
 
-	public static void handleMove(MotionEvent e) {
+	public static void handleMove(MotionEvent e, int id, float x, float y) {
 		for (int i = 0; i < e.getPointerCount(); i++) {
-			int id = e.getPointerId(i);
+			id = e.getPointerId(i);
 			if (ownsPointer(id)) {
 				handleMove(id, e.getX(id), MidiView.yToNote(e.getY(id)));
 			}

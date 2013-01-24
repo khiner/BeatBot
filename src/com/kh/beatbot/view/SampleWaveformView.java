@@ -354,7 +354,7 @@ public class SampleWaveformView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
 		if (x > previewButtonWidth)
 			handleWaveActionDown(id, x, y);
 		else
@@ -371,12 +371,12 @@ public class SampleWaveformView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e) {
+	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
 		if (zoomLeftAnchorSample != -1 && zoomRightAnchorSample != -1
 				&& previewPointerId == -1)
-			zoom(e.getX(0), e.getX(1));
+			zoom(e.getX(0), e.getX(1)); // zoom always with pointers 1 & 2
 		for (int i = 0; i < e.getPointerCount(); i++) {
-			int id = e.getPointerId(i);
+			id = e.getPointerId(i);
 			if (id == previewPointerId) {
 				if (e.getX(i) > previewButtonWidth) {
 					// if a click goes down on the preview button,
@@ -401,7 +401,7 @@ public class SampleWaveformView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
 		previewButton.release();
 		beginLoopMarkerTouched = endLoopMarkerTouched = -1;
 		TrackManager.currTrack.stopPreviewing();

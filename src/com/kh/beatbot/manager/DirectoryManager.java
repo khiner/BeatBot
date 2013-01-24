@@ -155,7 +155,7 @@ public class DirectoryManager {
 				R.drawable.hh_open_icon_listview,
 				R.drawable.hh_open_icon_list_title);
 		getDrumInstrument(4).getBBIconSource().set(R.drawable.rimshot_icon_src,
-				R.drawable.rimshot_icon, R.drawable.rimshot_icon_selected2,
+				R.drawable.rimshot_icon, R.drawable.rimshot_icon_selected,
 				R.drawable.rimshot_icon_listview,
 				R.drawable.rimshot_icon_list_title);
 		drumsDirectory.getBBIconSource().set(-1, -1, -1,

@@ -87,8 +87,6 @@ public class MidiView extends ClickableSurfaceView {
 		return snapToGrid;
 	}
 
-	/**************** END ATTRIBUTES ****************/
-
 	private MidiManager midiManager;
 
 	private static final int[] V_LINE_WIDTHS = new int[] { 5, 3, 2 };
@@ -97,7 +95,6 @@ public class MidiView extends ClickableSurfaceView {
 						    Colors.MIDI_LINE_MED,
 						    Colors.MIDI_LINE_LIGHT};
 	
-	// NIO Buffers
 	private FloatBuffer[] vLineVb = new FloatBuffer[3];
 	private FloatBuffer currTickVb = null, hLineVb = null, tickHLineVb = null,
 			tickFillVb = null, selectRegionVb = null, loopMarkerVb = null,
@@ -708,8 +705,8 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
-		super.handleActionDown(id, x, y);
+	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
+		super.handleActionDown(e, id, x, y);
 		if (x < X_OFFSET) {
 			MidiTrackControlHelper.handlePress(id, x, yToNote(y));
 			return;
@@ -781,9 +778,13 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e) {
-		super.handleActionMove(e);
-		MidiTrackControlHelper.handleMove(e);
+	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
+		super.handleActionMove(e, id, x, y);
+		if (MidiTrackControlHelper.ownsPointer(id)) {
+			MidiTrackControlHelper.handleMove(e, id, x, y);
+			return;
+		}
+	
 		if (pinch) {
 			int leftIndex = e.findPointerIndex(pinchLeftPointerId);
 			int rightIndex = e.findPointerIndex(pinchRightPointerId);
@@ -834,8 +835,8 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
-		super.handleActionUp(id, x, y);
+	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
+		super.handleActionUp(e, id, x, y);
 		if (MidiTrackControlHelper.ownsPointer(id)) {
 			MidiTrackControlHelper.handleRelease(id, x, yToNote(y));
 			MidiTrackControlHelper.clearPointers();

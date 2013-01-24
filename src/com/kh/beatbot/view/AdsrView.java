@@ -25,7 +25,7 @@ public class AdsrView extends TouchableSurfaceView {
 	// keep track of which pointer ids are selecting which ADSR points
 	// init to -1 to indicate no pointer is selecting
 	private int[] adsrSelected = new int[] { -1, -1, -1, -1, -1 };
-	
+
 	public AdsrView(Context c, AttributeSet as) {
 		super(c, as);
 	}
@@ -34,7 +34,7 @@ public class AdsrView extends TouchableSurfaceView {
 		if (initialized)
 			initAdsrVb();
 	}
-		
+
 	private void initAdsrVb() {
 		Track track = TrackManager.currTrack;
 		// TODO something like this
@@ -50,7 +50,7 @@ public class AdsrView extends TouchableSurfaceView {
 		pointVertices[7] = viewRect.viewY(track.adsr.getSustain());
 		pointVertices[8] = getReleaseX(track.adsr);
 		pointVertices[9] = viewRect.viewY(0);
-		
+
 		adsrPointVb = makeFloatBuffer(pointVertices);
 		for (int i = 0; i < 4; i++) {
 			ArrayList<Float> curveVertices = new ArrayList<Float>();
@@ -66,19 +66,19 @@ public class AdsrView extends TouchableSurfaceView {
 			adsrCurveVb[i] = makeFloatBuffer(converted);
 		}
 	}
-	
+
 	private float getAttackX(ADSR adsr) {
 		return viewRect.viewX(adsr.getAttack() / 3f);
 	}
-	
+
 	private float getDecayX(ADSR adsr) {
 		return getAttackX(adsr) + adsr.getDecay() * viewRect.width / 3f;
 	}
-	
+
 	private float getReleaseX(ADSR adsr) {
 		return viewRect.viewX(2f / 3f + adsr.getRelease() / 3f);
 	}
-	
+
 	private ArrayList<Float> makeExponentialCurveVertices(float x1, float y1,
 			float x2, float y2) {
 		ArrayList<Float> vertices = new ArrayList<Float>();
@@ -95,44 +95,46 @@ public class AdsrView extends TouchableSurfaceView {
 		vertices.add(y2);
 		return vertices;
 	}
-	
+
 	private void drawAdsr() {
-		setColor(Colors.VOLUME);
-		gl.glPointSize(viewRect.borderRadius);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, adsrPointVb);
-		gl.glDrawArrays(GL10.GL_POINTS, 0, 3);
-		gl.glDrawArrays(GL10.GL_POINTS, 4, 1);
+		drawPoint(viewRect.borderRadius / 2, Colors.VOLUME, adsrPointVb.get(0),
+				adsrPointVb.get(1));
+		drawPoint(viewRect.borderRadius / 2, Colors.VOLUME, adsrPointVb.get(2),
+				adsrPointVb.get(3));
+		drawPoint(viewRect.borderRadius / 2, Colors.VOLUME, adsrPointVb.get(4),
+				adsrPointVb.get(5));
+		drawPoint(viewRect.borderRadius / 2, Colors.VOLUME, adsrPointVb.get(8),
+				adsrPointVb.get(9));
 		for (int i = 0; i < 5; i++) {
 			if (adsrSelected[i] != -1) {
-				gl.glPointSize(viewRect.borderRadius * 2);
-				setColor(Colors.VOLUME_SELECTED);
-				gl.glDrawArrays(GL10.GL_POINTS, i, 1);
+				drawPoint(viewRect.borderRadius, Colors.VOLUME_SELECTED,
+						adsrPointVb.get(i * 2), adsrPointVb.get(i * 2 + 1));
 			}
 		}
 		for (int i = 0; i < adsrCurveVb.length; i++) {
 			drawLines(adsrCurveVb[i], Colors.VOLUME, 3, GL10.GL_LINE_STRIP);
 		}
 	}
-	
+
 	private float getAttackX() {
 		return pointVertices[2]; // x coord of 2nd point
 	}
-	
+
 	private float xToAttack(float x) {
 		float unitX = viewRect.unitX(x) * 3;
 		return unitX > 0 ? (unitX < 1 ? unitX : 1) : 0;
 	}
-	
+
 	private float xToDecay(float x) {
 		float decay = viewRect.unitX(x - getAttackX()) * 3;
 		return decay > 0 ? (decay < 1 ? decay : 1) : 0;
 	}
-	
+
 	private float xToRelease(float x) {
 		float unitX = (viewRect.unitX(x) - 2f / 3f) * 3;
 		return unitX > 0 ? (unitX < 1 ? unitX : 1) : 0;
 	}
-	
+
 	private void deselectAdsrPoint(int id) {
 		for (int i = 0; i < adsrSelected.length; i++) {
 			if (adsrSelected[i] == id)
@@ -174,21 +176,20 @@ public class AdsrView extends TouchableSurfaceView {
 			}
 		}
 	}
-	
+
 	private void selectAdsrPoint(int id, float x, float y) {
 		for (int i = 0; i < 5; i++) {
 			if (i == 3)
 				// cannot be set by user (beginning of release / end of sustain)
 				continue;
-			if (GeneralUtils.distanceFromPointSquared(
-					pointVertices[i * 2], pointVertices[i * 2 + 1], x, y)
-					< SNAP_DIST_SQUARED) {
+			if (GeneralUtils.distanceFromPointSquared(pointVertices[i * 2],
+					pointVertices[i * 2 + 1], x, y) < SNAP_DIST_SQUARED) {
 				adsrSelected[i] = id;
 				return;
 			}
 		}
 	}
-	
+
 	@Override
 	protected void init() {
 		viewRect = new ViewRect(width, height, 0.12f, 6);
@@ -201,9 +202,9 @@ public class AdsrView extends TouchableSurfaceView {
 
 	@Override
 	protected void loadIcons() {
-		
+
 	}
-	
+
 	@Override
 	protected void drawFrame() {
 		viewRect.drawRoundedBg();
@@ -212,7 +213,7 @@ public class AdsrView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
 		selectAdsrPoint(id, viewRect.clipX(x), viewRect.clipY(y));
 	}
 
@@ -223,10 +224,11 @@ public class AdsrView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e) {
+	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
 		for (int i = 0; i < e.getPointerCount(); i++) {
-			int id = e.getPointerId(i);
-			moveAdsrPoint(id, viewRect.clipX(e.getX(i)), viewRect.clipY(e.getY(i)));
+			id = e.getPointerId(i);
+			moveAdsrPoint(id, viewRect.clipX(e.getX(i)),
+					viewRect.clipY(e.getY(i)));
 		}
 	}
 
@@ -236,7 +238,7 @@ public class AdsrView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
 		clearAdsrSelected();
 	}
 }

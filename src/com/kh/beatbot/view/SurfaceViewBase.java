@@ -56,6 +56,20 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	protected static GL10 gl = null;
 	protected static GLText glText; // A GLText Instance
 
+	private static FloatBuffer circleVb = null;
+	private static final float CIRCLE_RADIUS = 100;
+	
+	static { // init circle
+		float theta = 0;
+		float coords[] = new float[128];
+		for (int i = 0; i < 128; i += 2) {
+			  coords[i] = FloatMath.cos(theta) * CIRCLE_RADIUS;
+			  coords[i + 1] = FloatMath.sin(theta) * CIRCLE_RADIUS;
+			  theta += 2 * Math.PI / 64;
+			}
+			circleVb = makeFloatBuffer(coords);		
+	}
+	
 	public static void setResources(Resources resources) {
 		SurfaceViewBase.resources = resources;
 	}
@@ -181,11 +195,14 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 			int type) {
 		drawLines(vb, color, width, type, 0);
 	}
-
-	public static void drawPoint(float pointSize, float[] color, int vertex) {
-		setColor(color);
-		gl.glPointSize(pointSize);
-		gl.glDrawArrays(GL10.GL_POINTS, vertex, 1);
+	
+	public static void drawPoint(float pointSize, float[] color, float x, float y) {
+		push();
+		translate(x, y);
+		float scale = pointSize / CIRCLE_RADIUS;
+		scale(scale, scale);
+		drawTriangleFan(circleVb, color);
+		pop();
 	}
 
 	protected float distanceFromCenterSquared(float x, float y) {
@@ -206,24 +223,21 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glGenTextures(1, textureHandlers, textureId);
 		// Bind texture id texturing target
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[textureId]);
-		// Build our crop texture to be the size of the bitmap (ie full texture)
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
 				GL10.GL_LINEAR);
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
 				GL10.GL_LINEAR);
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
-				GL10.GL_REPEAT);
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
-				GL10.GL_REPEAT);
-
+		// allow non-power-of-2 images to render with hardware accelleration enabled
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_CLAMP_TO_EDGE);
+	    gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, 0); // unbind texture
 		//bitmap.recycle();
 	}
 	
 	public static void loadTexture(int resourceId, int[] textureHandlers, int textureId, int[] crop) {
 		Bitmap bitmap = BitmapFactory.decodeResource(resources, resourceId);
 		
+		// Build our crop texture to be the size of the bitmap (ie full texture)
 		crop[0] = 0;
 		crop[1] = bitmap.getHeight();
 		crop[2] = bitmap.getWidth();
@@ -293,8 +307,10 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		}
 
 		running = true;
+		initBackgroundColor();
 		while (running) {
-			drawFrame(gl, width, height);
+			gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+			drawFrame();
 			egl.eglSwapBuffers(dpy, surface);
 		}
 		egl.eglMakeCurrent(dpy, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE,
@@ -312,9 +328,9 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		loadIcons();
 		gl.glEnable(GL10.GL_POINT_SMOOTH);
 		gl.glEnable(GL10.GL_BLEND);
-		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
 	public static GL10 getGl() {
@@ -330,15 +346,9 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		glText.loadTexture();
 	}
 
-	protected void fillBackground() {
+	protected void initBackgroundColor() {
 		gl.glClearColor(backgroundColor[0], backgroundColor[1],
 				backgroundColor[2], backgroundColor[3]);
-	}
-
-	protected void drawFrame(GL10 gl, int w, int h) {
-		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		fillBackground();
-		drawFrame();
 	}
 
 	protected abstract void init();

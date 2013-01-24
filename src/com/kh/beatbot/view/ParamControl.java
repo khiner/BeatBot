@@ -199,26 +199,26 @@ public class ParamControl extends LevelListenable {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
 		if (distanceFromCenterSquared(x, y) > snapDistSquared) {
 			levelSelected = true;
 			setLevel(coordToLevel(x, y));
 		} else if (centerButton != null) {
 			centerButton.touch();
 		}
-		super.handleActionDown(id, x, y);
+		super.handleActionDown(e, id, x, y);
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e) {
+	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
 		if (!levelSelected)
 			return;
-		float newLevel = coordToLevel(e.getX(0), e.getY(0));
+		float newLevel = coordToLevel(x, y);
 		setLevel(newLevel);
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
 		levelSelected = false;
 		if (centerButton != null) {
 			if (distanceFromCenterSquared(x, y) <= snapDistSquared) {
@@ -229,7 +229,7 @@ public class ParamControl extends LevelListenable {
 			}
 			centerButton.release();
 		}
-		super.handleActionUp(id, x, y);
+		super.handleActionUp(e, id, x, y);
 	}
 
 	public boolean isClickable() {

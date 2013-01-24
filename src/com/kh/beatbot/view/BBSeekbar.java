@@ -13,7 +13,8 @@ public class BBSeekbar extends LevelListenable {
 	protected FloatBuffer levelBarVb = null;
 	protected int numLevelVertices = 0;
 	protected float levelBarHeight = 8;
-
+	private float middleY = 0;
+	
 	public BBSeekbar(Context c, AttributeSet as) {
 		super(c, as);
 	}
@@ -22,12 +23,13 @@ public class BBSeekbar extends LevelListenable {
 		float[] vertices = new float[800];
 		for (int i = 0; i < vertices.length / 4; i++) {
 			vertices[i * 4] = ((float) i / (vertices.length / 4))
-					* (width - levelBarHeight * 4);
-			vertices[i * 4 + 1] = -levelBarHeight / 2;
+					* (width - levelBarHeight * 4) + levelBarHeight * 2;
+			vertices[i * 4 + 1] = -levelBarHeight / 2 + height / 2;
 			vertices[i * 4 + 2] = vertices[i * 4];
-			vertices[i * 4 + 3] = levelBarHeight / 2;
+			vertices[i * 4 + 3] = levelBarHeight / 2 + height / 2;
 		}
 		levelBarVb = makeFloatBuffer(vertices);
+		middleY = levelBarVb.get(1) + levelBarHeight / 2;
 	}
 
 	protected void loadIcons() {
@@ -41,39 +43,27 @@ public class BBSeekbar extends LevelListenable {
 	}
 
 	protected void drawBackgroundBar() {
-		gl.glPushMatrix();
-		translate(levelBarHeight * 2, height / 2);
 		drawTriangleStrip(levelBarVb, Colors.VIEW_BG);
-		// circle at beginning and end of level for rounded edge
-		translate(0, levelBarHeight / 2);
-		drawPoint(levelBarHeight, Colors.VIEW_BG, 0);
-		drawPoint(levelBarHeight, Colors.VIEW_BG, levelBarVb.capacity() / 2 - 2);
-		gl.glPopMatrix();
+		// circle at end of level for rounded edge
+		drawPoint(levelBarHeight / 2, Colors.VIEW_BG, levelBarVb.get(levelBarVb.capacity() - 2), middleY);
 	}
 
 	protected void drawLevel() {
-		gl.glPushMatrix();
-		translate(levelBarHeight * 2, height / 2);
 		drawTriangleStrip(levelBarVb, levelColor, numLevelVertices);
-		if (selected) {
-			drawSelectedLevel();
-		}
 
-		translate(0, levelBarHeight / 2);
 		// draw level-colored circle at beginning and end of level
-		drawPoint(levelBarHeight, levelColor, 0);
-		drawPoint(levelBarHeight, levelColor, numLevelVertices - 2);
+		drawPoint(levelBarHeight / 2, levelColor, levelBarVb.get(0), middleY);
+		drawPoint(levelBarHeight / 2, levelColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
 
 		drawLevelSelectionCircle();
-		gl.glPopMatrix();
 	}
 
 	protected void drawTouchedLevelSelectionCircle() {
 		selectColor[3] = .7f;
-		drawPoint(levelBarHeight * 3, selectColor, numLevelVertices - 2);
+		drawPoint(3 * levelBarHeight / 2, selectColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
 		selectColor[3] = .5f;
-		for (int i = (int) (levelBarHeight * 3); i < levelBarHeight * 4; i += 4) {
-			drawPoint(i, selectColor, numLevelVertices - 2);
+		for (int i = (int) (5 * levelBarHeight / 4); i < levelBarHeight * 2; i += 2) {
+			drawPoint(i, selectColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
 		}
 	}
 
@@ -83,20 +73,8 @@ public class BBSeekbar extends LevelListenable {
 			drawTouchedLevelSelectionCircle();
 		} else {
 			selectColor[3] = .5f;
-			drawPoint(levelBarHeight * 2.5f, selectColor, numLevelVertices - 2);
+			drawPoint(5 * levelBarHeight / 4, selectColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
 		}
-	}
-
-	protected void drawSelectedLevel() {
-		gl.glPushMatrix();
-		selectColor[3] = .2f;
-		translate(-6f, 0);
-		gl.glScalef(1.01f, 1, 1);
-		for (int i = 0; i < 5; i++) {
-			gl.glScalef(1, 1.2f, 1);
-			drawTriangleStrip(levelBarVb, selectColor, numLevelVertices);
-		}
-		gl.glPopMatrix();
 	}
 
 	protected void drawBar() {
@@ -135,13 +113,15 @@ public class BBSeekbar extends LevelListenable {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
 		setLevel(xToLevel(x));
-		super.handleActionDown(id, x, y);
+		super.handleActionDown(e, id, x, y);
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e) {
-		setLevel(xToLevel(e.getX(0)));
+	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
+		if (id != 0)
+			return; // no multitouch for level - one pointer drags one level!
+		setLevel(xToLevel(x));
 	}
 }

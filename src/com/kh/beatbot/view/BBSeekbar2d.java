@@ -86,20 +86,22 @@ public class BBSeekbar2d extends LevelListenable {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
 		selectLocation(x, y);
 		levelColor = Colors.LEVEL_SELECTED.clone();
-		super.handleActionDown(id, x, y);
+		super.handleActionDown(e, id, x, y);
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e) {
-		selectLocation(e.getX(0), e.getY(0));
+	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
+		if (id != 0)
+			return;  // no multitouch for level - one pointer drags one level!
+		selectLocation(x, y);
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
 		levelColor = Colors.VOLUME.clone();
-		super.handleActionUp(id, x, y);
+		super.handleActionUp(e, id, x, y);
 	}
 }

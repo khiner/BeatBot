@@ -119,9 +119,9 @@ public class LevelsView extends TouchableSurfaceView {
 		SurfaceViewBase.translate(x, 0);
 		SurfaceViewBase.drawTriangleStrip(levelBarVb, levelColor, vertex);
 
-		SurfaceViewBase.translate(LEVEL_BAR_WIDTH / 2, 0);
+		SurfaceViewBase.translate(0, levelBarVb.get(vertex * 2 - 1));
 		// draw level-colored circle at beginning and end of level
-		SurfaceViewBase.drawPoint(LEVEL_BAR_WIDTH, levelColor, vertex - 2);
+		SurfaceViewBase.drawPoint(LEVEL_BAR_WIDTH / 2, levelColor, 0, 0);
 
 		drawLevelSelectionCircle(vertex - 2, levelColor);
 		gl.glPopMatrix();
@@ -130,7 +130,7 @@ public class LevelsView extends TouchableSurfaceView {
 	protected void drawLevelSelectionCircle(int vertex, float[] levelColor) {
 		// draw bigger, translucent 'selection' circle at end of level
 		levelColor[3] = .5f;
-		SurfaceViewBase.drawPoint(LEVEL_BAR_WIDTH * 2.5f, levelColor, vertex);
+		SurfaceViewBase.drawPoint(5 * LEVEL_BAR_WIDTH / 4, levelColor, 0, 0);
 		levelColor[3] = 1;
 	}
 
@@ -284,7 +284,7 @@ public class LevelsView extends TouchableSurfaceView {
 		updateLevelOffsets();
 	}
 
-	public void handleActionMove(MotionEvent e) {
+	public void handleActionMove(MotionEvent e, int id, float x, float y) {
 		if (!touchedLevels.isEmpty()) {
 			for (int i = 0; i < e.getPointerCount(); i++) {
 				MidiNote touched = touchedLevels.get(e.getPointerId(i));
@@ -296,8 +296,8 @@ public class LevelsView extends TouchableSurfaceView {
 			setLevelsToDragLine();
 			// velocity changes are valid undo events
 			MidiView.stateChanged = true;
-		} else { // no midi selected. midiView can handle it.
-			selectRegion(e.getX(0), e.getY(0));
+		} else if (id == 0){ // no midi selected. midiView can handle it.
+			selectRegion(x, y);
 		}
 		GlobalVars.midiView.updateLoopMarkers(e);
 	}
@@ -324,7 +324,7 @@ public class LevelsView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
 		if (!selectLevel(x, y, id)) {
 			startSelectRegion(x, y);
 		}
@@ -337,7 +337,7 @@ public class LevelsView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
 		clearTouchedLevels();
 		selectRegion = false;
 	}

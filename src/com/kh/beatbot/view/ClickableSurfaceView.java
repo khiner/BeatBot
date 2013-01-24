@@ -35,7 +35,7 @@ public abstract class ClickableSurfaceView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
 		lastDownTime = System.currentTimeMillis();
 		lastTapX = x;
 		lastTapY = y;
@@ -48,11 +48,11 @@ public abstract class ClickableSurfaceView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e) {
-		if (Math.abs(e.getX() - lastTapX) < 25
-				&& Math.abs(e.getY() - lastTapY) < 25) {
+	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
+		if (Math.abs(x - lastTapX) < 25
+				&& Math.abs(y - lastTapY) < 25) {
 			if (System.currentTimeMillis() - lastDownTime > GlobalVars.LONG_CLICK_TIME) {
-				longPress(0, e.getX(), e.getY());
+				longPress(id, x, y);
 			}
 		} else {
 			lastDownTime = Long.MAX_VALUE;
@@ -66,7 +66,7 @@ public abstract class ClickableSurfaceView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
 		long time = System.currentTimeMillis();
 		if (Math.abs(time - lastDownTime) < GlobalVars.SINGLE_TAP_TIME) {
 			// if the second tap is not in the same location as the first tap,

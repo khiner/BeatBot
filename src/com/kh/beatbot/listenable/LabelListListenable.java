@@ -252,8 +252,8 @@ public class LabelListListenable extends ClickableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
-		super.handleActionDown(id, x, y);
+	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
+		super.handleActionDown(e, id, x, y);
 		// clicking on an existing label will select label.
 		Label touched = findLabel(x, y);
 		if (touched != null) {
@@ -268,9 +268,9 @@ public class LabelListListenable extends ClickableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e) {
-		super.handleActionMove(e);
-		if (touchedLabel == null) {
+	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
+		super.handleActionMove(e, id, x, y);
+		if (touchedLabel == null || id != 0) {
 			return;
 		}
 		touchedLabel.x = e.getX(0) + dragOffset;
@@ -283,8 +283,8 @@ public class LabelListListenable extends ClickableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
-		super.handleActionUp(id, x, y);
+	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
+		super.handleActionUp(e, id, x, y);
 		// notify listener of the touched label's old and new position in list
 		int newPosition = labels.indexOf(touchedLabel);
 		if (newPosition != initialTouchedPosition) {

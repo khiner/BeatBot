@@ -195,7 +195,7 @@ public class BpmView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
 		touched = true;
 		lastFrameXLoc = x;
 		lastFrameYLoc = y;
@@ -208,9 +208,9 @@ public class BpmView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e) {
-		float x = e.getX(0);
-		float y = e.getY(0);
+	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
+		if (id != 0)
+			return; // only one pointer drags bpm
 		currXDragTotal += x - lastFrameXLoc;
 		currYDragTotal += lastFrameYLoc - y;
 		lastFrameXLoc = x;
@@ -236,7 +236,7 @@ public class BpmView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
 		touched = false;
 	}
 }

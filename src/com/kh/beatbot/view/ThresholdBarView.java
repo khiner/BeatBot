@@ -58,13 +58,11 @@ public class ThresholdBarView extends BBSeekbar {
 
 	private void drawThresholdLevel() {
 		drawTriangleStrip(levelBarVb, THRESHOLD_COLOR, numLevelVertices);
-		translate(0, levelBarHeight / 2);
 		// circles for rounded rect ends
-		drawPoint(levelBarHeight, THRESHOLD_COLOR, 0);
-		drawPoint(levelBarHeight, THRESHOLD_COLOR, numLevelVertices - 2);
+		drawPoint(levelBarHeight, THRESHOLD_COLOR, levelBarVb.get(0), levelBarHeight / 2);
+		drawPoint(levelBarHeight, THRESHOLD_COLOR, levelBarVb.get(numLevelVertices * 2 - 2), levelBarHeight / 2);
 		// bigger selection point
-		drawPoint(levelBarHeight * 4, selectColor, numLevelVertices - 2);
-		translate(0, -levelBarHeight / 2);
+		drawPoint(levelBarHeight * 4, selectColor, levelBarVb.get(numLevelVertices * 2 - 2), levelBarHeight / 2);
 	}
 
 	private void drawDbLevel() {
@@ -81,14 +79,12 @@ public class ThresholdBarView extends BBSeekbar {
 					currAmpVertex <= maxRedVertices ? currAmpVertex
 							: maxRedVertices);
 		}
-		translate(0, levelBarHeight / 2);
 		if (currAmpVertex > 0) { // draw circle at beginning
-			drawPoint(levelBarHeight, Colors.GREEN, 0);
+			drawPoint(levelBarHeight, Colors.GREEN, levelBarVb.get(0), levelBarHeight / 2);
 		}
 		if (currAmpVertex >= maxRedVertices) { // draw circle at end
-			drawPoint(levelBarHeight, Colors.RED, levelBarVb.capacity() - 2);
+			drawPoint(levelBarHeight, Colors.RED, levelBarVb.get(levelBarVb.capacity() * 2 - 2), levelBarHeight / 2);
 		}
-		translate(0, -levelBarHeight / 2);
 	}
 
 	@Override

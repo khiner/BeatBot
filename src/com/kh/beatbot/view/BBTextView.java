@@ -34,7 +34,7 @@ public class BBTextView extends SurfaceViewBase {
 		if (glText != null) {
 			textWidth = glText.getTextWidth(text, height / 2);
 			textOffset = width / 2 - textWidth / 2;
-			glText.storeText(text);
+			//glText.storeText(text);
 		}
 	}
 	
