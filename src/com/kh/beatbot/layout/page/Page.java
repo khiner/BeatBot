@@ -16,6 +16,6 @@ public abstract class Page extends RelativeLayout {
 	public abstract void setVisibilityCode(int code);
 
 	public void setVisible(boolean visible) {
-		setVisibilityCode(visible ? View.VISIBLE : View.INVISIBLE);
+		setVisibilityCode(visible ? View.VISIBLE : View.GONE);
 	}
 }

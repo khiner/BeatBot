@@ -87,5 +87,6 @@ public abstract class LevelListenable extends TouchableSurfaceView {
 		for (LevelListener levelListener : levelListeners)
 			levelListener.notifyPressed(this, false);
 		selected = false;
+		requestRender();
 	}
 }

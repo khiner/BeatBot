@@ -60,6 +60,11 @@ public class LevelsPage extends Page implements LevelListener {
 
 	@Override
 	public void setVisibilityCode(int code) {
+		if (code == View.VISIBLE) {
+			trackLevel.onResume();
+		} else {
+			trackLevel.onPause();
+		}
 		trackLevel.setVisibility(code);
 	}
 

@@ -13,6 +13,10 @@ public abstract class ClickableSurfaceView extends TouchableSurfaceView {
 	private float lastTapX = -1;
 	private float lastTapY = -1;
 
+	public ClickableSurfaceView(Context c) {
+		super(c);
+	}
+	
 	public ClickableSurfaceView(Context c, AttributeSet as) {
 		super(c, as);
 	}

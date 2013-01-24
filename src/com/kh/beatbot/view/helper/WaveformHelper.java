@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import com.kh.beatbot.view.SurfaceViewBase;
+import com.kh.beatbot.view.GLSurfaceViewBase;
 
 public class WaveformHelper extends Thread {
 	// holds a single float in the form of 4 bytes, used to input floats from a
@@ -130,7 +130,7 @@ public class WaveformHelper extends Thread {
 			outputAry[x] = percent * width + xOffset;
 			outputAry[x + 1] = y;
 		}
-		return SurfaceViewBase.makeFloatBuffer(outputAry);
+		return GLSurfaceViewBase.makeFloatBuffer(outputAry);
 	}
 
 	public static FloatBuffer floatsToFloatBuffer(float[] data, float width,
@@ -146,7 +146,7 @@ public class WaveformHelper extends Thread {
 			outputAry[x] = percent * width + xOffset;
 			outputAry[x + 1] = y;
 		}
-		return SurfaceViewBase.makeFloatBuffer(outputAry);
+		return GLSurfaceViewBase.makeFloatBuffer(outputAry);
 	}
 
 	public static float[] bytesToFloats(byte[] input, int skip) {

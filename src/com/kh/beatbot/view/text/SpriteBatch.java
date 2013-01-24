@@ -7,7 +7,7 @@ import java.nio.ShortBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import com.kh.beatbot.view.SurfaceViewBase;
+import com.kh.beatbot.view.GLSurfaceViewBase;
 
 public class SpriteBatch {
 	// number of characters to render per batch
@@ -59,7 +59,7 @@ public class SpriteBatch {
 	// D: signal the end of a batch. render the batched sprites
 	public void endBatch(int textureId) {
 		vertexBuffer.position(0);
-		GL10 gl = SurfaceViewBase.getGl();
+		GL10 gl = GLSurfaceViewBase.getGL10();
 		gl.glEnable(GL10.GL_TEXTURE_2D);
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureId);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, VERTEX_SIZE, vertexBuffer);

@@ -16,8 +16,8 @@ import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.MidiTrackControlListener;
 import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.view.GLSurfaceViewBase;
 import com.kh.beatbot.view.MidiView;
-import com.kh.beatbot.view.SurfaceViewBase;
 
 public class MidiTrackControlHelper {
 	public static class ButtonRow {
@@ -189,7 +189,7 @@ public class MidiTrackControlHelper {
 
 	/** draw background color & track control icons */
 	public static void draw() {
-		SurfaceViewBase.drawTriangleStrip(bgRectVb, Colors.BG_COLOR);
+		GLSurfaceViewBase.drawTriangleStrip(bgRectVb, Colors.BG_COLOR);
 		float y = midiView.getMidiHeight() - MidiView.trackHeight
 				+ TickWindowHelper.getYOffset();
 		for (int i = 0; i < buttonRows.size(); i++) {
@@ -261,7 +261,7 @@ public class MidiTrackControlHelper {
 	}
 
 	private static void initBgRectVb() {
-		bgRectVb = SurfaceViewBase.makeRectFloatBuffer(0, 0, MidiView.X_OFFSET,
+		bgRectVb = GLSurfaceViewBase.makeRectFloatBuffer(0, 0, MidiView.X_OFFSET,
 				midiView.getHeight());
 	}
 }

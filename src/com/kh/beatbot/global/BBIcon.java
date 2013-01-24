@@ -1,6 +1,7 @@
 package com.kh.beatbot.global;
 
-import com.kh.beatbot.view.SurfaceViewBase;
+import com.kh.beatbot.view.GLSurfaceViewBase;
+
 
 public class BBIcon {
 	public int resourceId;
@@ -9,7 +10,7 @@ public class BBIcon {
 
 	public BBIcon(int resourceId) {
 		this.resourceId = resourceId;
-		SurfaceViewBase.loadTexture(resourceId, textureHandlers, 0, crop);
+		GLSurfaceViewBase.loadTexture(resourceId, textureHandlers, 0, crop);
 	}
 
 	public void draw(float x, float y) {
@@ -17,7 +18,7 @@ public class BBIcon {
 	}
 
 	public void draw(float x, float y, float width, float height) {
-		SurfaceViewBase.drawTexture(0, textureHandlers, crop, x, y, width,
+		GLSurfaceViewBase.drawTexture(0, textureHandlers, crop, x, y, width,
 				height);
 	}
 

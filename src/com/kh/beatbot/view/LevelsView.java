@@ -90,7 +90,7 @@ public class LevelsView extends TouchableSurfaceView {
 			vertices[i * 4 + 2] = LEVEL_BAR_WIDTH / 2;
 			vertices[i * 4 + 3] = vertices[i * 4 + 1];
 		}
-		levelBarVb = SurfaceViewBase.makeFloatBuffer(vertices);
+		levelBarVb = makeFloatBuffer(vertices);
 	}
 
 	private void drawSelectRegion() {
@@ -116,12 +116,12 @@ public class LevelsView extends TouchableSurfaceView {
 	protected void drawLevel(float x, float level, float[] levelColor) {
 		int vertex = calcVertex(level);
 		gl.glPushMatrix();
-		SurfaceViewBase.translate(x, 0);
-		SurfaceViewBase.drawTriangleStrip(levelBarVb, levelColor, vertex);
+		translate(x, 0);
+		drawTriangleStrip(levelBarVb, levelColor, vertex);
 
-		SurfaceViewBase.translate(0, levelBarVb.get(vertex * 2 - 1));
+		translate(0, levelBarVb.get(vertex * 2 - 1));
 		// draw level-colored circle at beginning and end of level
-		SurfaceViewBase.drawPoint(LEVEL_BAR_WIDTH / 2, levelColor, 0, 0);
+		drawPoint(LEVEL_BAR_WIDTH / 2, levelColor, 0, 0);
 
 		drawLevelSelectionCircle(vertex - 2, levelColor);
 		gl.glPopMatrix();
@@ -130,7 +130,7 @@ public class LevelsView extends TouchableSurfaceView {
 	protected void drawLevelSelectionCircle(int vertex, float[] levelColor) {
 		// draw bigger, translucent 'selection' circle at end of level
 		levelColor[3] = .5f;
-		SurfaceViewBase.drawPoint(5 * LEVEL_BAR_WIDTH / 4, levelColor, 0, 0);
+		drawPoint(5 * LEVEL_BAR_WIDTH / 4, levelColor, 0, 0);
 		levelColor[3] = 1;
 	}
 

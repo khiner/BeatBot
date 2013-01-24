@@ -12,7 +12,6 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.manager.Managers;
@@ -117,18 +116,6 @@ public class MidiView extends ClickableSurfaceView {
 
 	public MidiView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-	}
-
-	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
-		super.surfaceChanged(holder, format, width, height);
-		this.width = width;
-		this.height = height;
-	}
-
-	public static GL10 getGL10() {
-		return gl;
 	}
 
 	public void reset() {

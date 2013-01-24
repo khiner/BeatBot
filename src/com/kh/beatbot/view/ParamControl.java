@@ -38,13 +38,13 @@ public class ParamControl extends LevelListenable {
 	
 	private String label = "", valueLabel = "";
 	
-	public ParamControl(Context c, AttributeSet as) {
-		super(c, as);
-	}
-
 	public ParamControl(Context c, Param param){
 		super(c);
 		this.param = param;
+	}
+	
+	public ParamControl(Context c, AttributeSet as) {
+		super(c, as);
 	}
 	
 	public void setClickable(boolean clickable) {

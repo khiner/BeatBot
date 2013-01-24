@@ -17,6 +17,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -42,7 +43,6 @@ import com.kh.beatbot.manager.PageManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.view.MidiView;
-import com.kh.beatbot.view.SurfaceViewBase;
 
 public class BeatBotActivity extends Activity {
 	private LinearLayout trackPageSelect;
@@ -148,7 +148,6 @@ public class BeatBotActivity extends Activity {
 		GlobalVars.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
 		GeneralUtils.initAndroidSettings(this);
-		SurfaceViewBase.setResources(getResources());
 		setContentView(R.layout.main);
 		Managers.initDirectoryManager();
 		copyAllSamplesToStorage();
@@ -157,6 +156,7 @@ public class BeatBotActivity extends Activity {
 		}
 		Managers.init(savedInstanceState);
 		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));
+		GlobalVars.midiView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 		setEditIconsEnabled(false);
 		PageManager.init(this);
 

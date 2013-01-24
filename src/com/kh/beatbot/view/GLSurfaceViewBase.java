@@ -4,48 +4,44 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.egl.EGLContext;
-import javax.microedition.khronos.egl.EGLDisplay;
-import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 import javax.microedition.khronos.opengles.GL11Ext;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
 import android.util.AttributeSet;
 import android.util.FloatMath;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.text.GLText;
 
-public abstract class SurfaceViewBase extends SurfaceView implements
-		SurfaceHolder.Callback, Runnable {
+public abstract class GLSurfaceViewBase extends GLSurfaceView implements
+		GLSurfaceView.Renderer {
+
+	public GLSurfaceViewBase(Context context) {
+		super(context);
+		setEGLConfigChooser(false);
+		setRenderer(this);
+		setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+	}
+
+	public GLSurfaceViewBase(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		setEGLConfigChooser(false);
+		setRenderer(this);
+		setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+	}
+
 	public static final float ¹ = (float) Math.PI;
 
-	private static int[] version = new int[2];
-	private static int[] numConfig = new int[1];
-	private static int[] configSpec = { EGL10.EGL_RED_SIZE, 4,
-			EGL10.EGL_GREEN_SIZE, 4, EGL10.EGL_BLUE_SIZE, 4, EGL10.EGL_NONE };
-	private static EGLConfig[] configs = new EGLConfig[1];
-	private static Resources resources;
-	private static EGL10 egl = (EGL10) EGLContext.getEGL();
-	private static EGLDisplay dpy = egl
-			.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
-	private EGLContext context;
-	private EGLSurface surface;
-
-	protected EGLContext glContext;
-	protected SurfaceHolder sHolder;
-	protected Thread t;
 	protected boolean initialized = false;
 	protected boolean running;
 	protected int width;
@@ -58,20 +54,16 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 
 	private static FloatBuffer circleVb = null;
 	private static final float CIRCLE_RADIUS = 100;
-	
+
 	static { // init circle
 		float theta = 0;
 		float coords[] = new float[128];
 		for (int i = 0; i < 128; i += 2) {
-			  coords[i] = FloatMath.cos(theta) * CIRCLE_RADIUS;
-			  coords[i + 1] = FloatMath.sin(theta) * CIRCLE_RADIUS;
-			  theta += 2 * Math.PI / 64;
-			}
-			circleVb = makeFloatBuffer(coords);		
-	}
-	
-	public static void setResources(Resources resources) {
-		SurfaceViewBase.resources = resources;
+			coords[i] = FloatMath.cos(theta) * CIRCLE_RADIUS;
+			coords[i + 1] = FloatMath.sin(theta) * CIRCLE_RADIUS;
+			theta += 2 * Math.PI / 64;
+		}
+		circleVb = makeFloatBuffer(coords);
 	}
 
 	/**
@@ -84,7 +76,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	public static FloatBuffer makeFloatBuffer(float[] arr) {
 		return makeFloatBuffer(arr, 0);
 	}
-	
+
 	public static FloatBuffer makeFloatBuffer(float[] arr, int position) {
 		ByteBuffer bb = ByteBuffer.allocateDirect(arr.length * 4);
 		bb.order(ByteOrder.nativeOrder());
@@ -195,8 +187,9 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 			int type) {
 		drawLines(vb, color, width, type, 0);
 	}
-	
-	public static void drawPoint(float pointSize, float[] color, float x, float y) {
+
+	public static void drawPoint(float pointSize, float[] color, float x,
+			float y) {
 		push();
 		translate(x, y);
 		float scale = pointSize / CIRCLE_RADIUS;
@@ -209,7 +202,7 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		return (x - width / 2) * (x - width / 2) + (y - height / 2)
 				* (y - height / 2);
 	}
-	
+
 	protected void setBackgroundColor(float[] color) {
 		backgroundColor = color;
 	}
@@ -218,7 +211,8 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glColor4f(color[0], color[1], color[2], color[3]);
 	}
 
-	public static void loadTexture(Bitmap bitmap, int[] textureHandlers, int textureId) {
+	public static void loadTexture(Bitmap bitmap, int[] textureHandlers,
+			int textureId) {
 		// Generate Texture ID
 		gl.glGenTextures(1, textureHandlers, textureId);
 		// Bind texture id texturing target
@@ -227,22 +221,27 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 				GL10.GL_LINEAR);
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
 				GL10.GL_LINEAR);
-		// allow non-power-of-2 images to render with hardware accelleration enabled
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_CLAMP_TO_EDGE);
-	    gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_CLAMP_TO_EDGE);
+		// allow non-power-of-2 images to render with hardware accelleration
+		// enabled
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
+				GL10.GL_CLAMP_TO_EDGE);
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
+				GL10.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
-		//bitmap.recycle();
+		// bitmap.recycle();
 	}
-	
-	public static void loadTexture(int resourceId, int[] textureHandlers, int textureId, int[] crop) {
-		Bitmap bitmap = BitmapFactory.decodeResource(resources, resourceId);
-		
+
+	public static void loadTexture(int resourceId, int[] textureHandlers,
+			int textureId, int[] crop) {
+		Bitmap bitmap = BitmapFactory.decodeResource(
+				GlobalVars.mainActivity.getResources(), resourceId);
+
 		// Build our crop texture to be the size of the bitmap (ie full texture)
 		crop[0] = 0;
 		crop[1] = bitmap.getHeight();
 		crop[2] = bitmap.getWidth();
 		crop[3] = -bitmap.getHeight();
-		
+
 		loadTexture(bitmap, textureHandlers, textureId);
 	}
 
@@ -257,73 +256,33 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glDisable(GL10.GL_TEXTURE_2D);
 	}
 
-	public SurfaceViewBase(Context c) {
-		super(c);
-		sHolder = getHolder();
-		sHolder.addCallback(this);
-	}
-	
-	public SurfaceViewBase(Context c, AttributeSet as) {
-		super(c, as);
-		sHolder = getHolder();
-		sHolder.addCallback(this);
-	}
-	
+	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
+		super.surfaceChanged(holder, format, width, height);
 		this.width = width;
 		this.height = height;
 	}
 
-	public void surfaceCreated(SurfaceHolder holder) {
-		t = new Thread(this);
-		t.start();
-	}
-
-	public void surfaceDestroyed(SurfaceHolder arg0) {
-		running = false;
-		try {
-			t.join();
-		} catch (InterruptedException ex) {
-		}
-		t = null;
-	}	
-	
-	public void run() {
-		// Much of this code is from GLSurfaceView in the Google API Demos.
-		egl.eglInitialize(dpy, version);
-		egl.eglChooseConfig(dpy, configSpec, configs, 1, numConfig);
-		context = egl.eglCreateContext(dpy, configs[0], EGL10.EGL_NO_CONTEXT,
-				null);
-
-		surface = egl.eglCreateWindowSurface(dpy, configs[0], sHolder, null);
-
-		egl.eglMakeCurrent(dpy, surface, surface, context);
-		initGl(context);
-		
-		if (!initialized) {
-			init();
-			initialized = true;
-		}
-
-		running = true;
-		initBackgroundColor();
-		while (running) {
-			gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-			drawFrame();
-			egl.eglSwapBuffers(dpy, surface);
-		}
-		egl.eglMakeCurrent(dpy, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE,
-				EGL10.EGL_NO_CONTEXT);
-		egl.eglDestroySurface(dpy, surface);
-		egl.eglDestroyContext(dpy, context);
-		egl.eglTerminate(dpy);
-	}
-
-	private void initGl(EGLContext context) {
-		gl = (GL10) context.getGL();
+	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		gl.glViewport(0, 0, width, height);
 		GLU.gluOrtho2D(gl, 0, width, height, 0);
+	}
+
+	public void onSurfaceCreated(GL10 _gl, EGLConfig config) {
+		gl = _gl;
+		initGl(_gl);
+		init();
+		initialized = true;
+		initBackgroundColor();
+	}
+
+	public void onDrawFrame(GL10 gl) {
+		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		drawFrame();
+	}
+
+	private void initGl(GL10 gl) {
 		initGlText();
 		loadIcons();
 		gl.glEnable(GL10.GL_POINT_SMOOTH);
@@ -332,11 +291,11 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 	}
-	
-	public static GL10 getGl() {
+
+	public static GL10 getGL10() {
 		return gl;
 	}
-	
+
 	private static void initGlText() {
 		// load font file once, with static height
 		// to change height, simply use gl.scale()
@@ -356,16 +315,19 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 	protected abstract void loadIcons();
 
 	protected abstract void drawFrame();
-	
+
 	protected class ViewRect {
 		public int drawOffset;
-		public float parentWidth, parentHeight, minX, maxX, minY, maxY, width, height, borderRadius;
-		
+		public float parentWidth, parentHeight, minX, maxX, minY, maxY, width,
+				height, borderRadius;
+
 		private FloatBuffer borderVb = null;
-		
+
 		// radiusScale determines the size of the radius of the rounded border.
-		// radius will be the given percentage of the shortest side of the view rect.
-		ViewRect(float parentWidth, float parentHeight, float radiusScale, int drawOffset) {
+		// radius will be the given percentage of the shortest side of the view
+		// rect.
+		ViewRect(float parentWidth, float parentHeight, float radiusScale,
+				int drawOffset) {
 			this.parentWidth = parentWidth;
 			this.parentHeight = parentHeight;
 			this.drawOffset = drawOffset;
@@ -376,45 +338,47 @@ public abstract class SurfaceViewBase extends SurfaceView implements
 			maxY = parentHeight - borderRadius;
 			width = parentWidth - 2 * minX;
 			height = parentHeight - 2 * minY;
-			borderVb = makeRoundedCornerRectBuffer(parentWidth - drawOffset * 2, parentHeight
-					- drawOffset * 2, borderRadius, 25);
+			borderVb = makeRoundedCornerRectBuffer(
+					parentWidth - drawOffset * 2,
+					parentHeight - drawOffset * 2, borderRadius, 25);
 		}
-		
+
 		public float viewX(float x) {
-			 return x * width + minX;
+			return x * width + minX;
 		}
-		
+
 		public float viewY(float y) {
 			return (1 - y) * height + minY;
 		}
-		
+
 		public float unitX(float viewX) {
 			return (viewX - minX) / width;
 		}
-		
+
 		public float unitY(float viewY) {
 			// bottom == height in pixels == 0 in value
 			// top == 0 in pixels == 1 in value
 			return (parentHeight - viewY - minY) / height;
 		}
-		
+
 		public float clipX(float x) {
 			return x < minX ? minX : (x > maxX ? maxX : x);
 		}
-		
+
 		public float clipY(float y) {
 			return y < minY ? minY : (y > maxY ? maxY : y);
 		}
-		
+
 		public void drawRoundedBg() {
 			gl.glTranslatef(parentWidth / 2, parentHeight / 2, 0);
 			drawTriangleFan(borderVb, Colors.VIEW_BG);
 			gl.glTranslatef(-parentWidth / 2, -parentHeight / 2, 0);
 		}
-		
+
 		public void drawRoundedBgOutline() {
 			gl.glTranslatef(parentWidth / 2, parentHeight / 2, 0);
-			drawLines(borderVb, Colors.VOLUME, drawOffset / 2, GL10.GL_LINE_LOOP);
+			drawLines(borderVb, Colors.VOLUME, drawOffset / 2,
+					GL10.GL_LINE_LOOP);
 			gl.glTranslatef(-parentWidth / 2, -parentHeight / 2, 0);
 		}
 	}

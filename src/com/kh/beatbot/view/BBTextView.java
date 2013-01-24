@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 
 import com.kh.beatbot.global.Colors;
 
-public class BBTextView extends SurfaceViewBase {
+public class BBTextView extends GLSurfaceViewBase {
 	
 	private String text = null;
 	private float textWidth = 0;

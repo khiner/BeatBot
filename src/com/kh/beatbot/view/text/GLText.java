@@ -19,7 +19,7 @@ import android.graphics.Typeface;
 import android.util.FloatMath;
 
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.view.SurfaceViewBase;
+import com.kh.beatbot.view.GLSurfaceViewBase;
 
 public class GLText {
 
@@ -153,7 +153,7 @@ public class GLText {
 
 	public void loadTexture() {
 		// load bitmap texture in OpenGL
-		SurfaceViewBase.loadTexture(bitmap, textureIds, 0);
+		GLSurfaceViewBase.loadTexture(bitmap, textureIds, 0);
 	}
 
 	// D: draw text at the specified x,y position
@@ -185,17 +185,17 @@ public class GLText {
 	// x, y - the x,y position to draw text at (bottom left of text; including
 	// descent)
 	public void draw(String text, int height, float x, float y) {
-		SurfaceViewBase.push();
-		SurfaceViewBase.translate(x, y);
+		GLSurfaceViewBase.push();
+		GLSurfaceViewBase.translate(x, y);
 		float scale = (float) height / size;
-		SurfaceViewBase.scale(scale, scale);
+		GLSurfaceViewBase.scale(scale, scale);
 		if (batches.containsKey(text)) {
 			batches.get(text).endBatch(textureIds[0]);
 		} else {
 			initTextInBatch(text, genericBatch);
 			genericBatch.endBatch(textureIds[0]);
 		}
-		SurfaceViewBase.pop();
+		GLSurfaceViewBase.pop();
 	}
 
 	// D: return the width/height of a character, or max character width

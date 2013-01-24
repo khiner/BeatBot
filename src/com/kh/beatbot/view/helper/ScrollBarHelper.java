@@ -6,7 +6,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.view.SurfaceViewBase;
+import com.kh.beatbot.view.GLSurfaceViewBase;
 
 public class ScrollBarHelper {
 	private static final float DAMP_CONSTANT = 0.9f;
@@ -70,13 +70,13 @@ public class ScrollBarHelper {
 			alpha *= 2 - elapsedTime / (float) GlobalVars.DOUBLE_TAP_TIME;
 		innerScrollBarColor[3] = alpha;
 		outerScrollBarColor[3] = alpha * .6f;
-		SurfaceViewBase.translate(0, translateY);
-		SurfaceViewBase.drawLines(scrollBarLinesVb, outerScrollBarColor, 3,
+		GLSurfaceViewBase.translate(0, translateY);
+		GLSurfaceViewBase.drawLines(scrollBarLinesVb, outerScrollBarColor, 3,
 				GL10.GL_LINES);
-		SurfaceViewBase.translate(translateX, 0);
-		SurfaceViewBase.drawTriangleFan(outerScrollBarVb, outerScrollBarColor);
-		SurfaceViewBase.drawTriangleFan(innerScrollBarVb, innerScrollBarColor);
-		SurfaceViewBase.translate(-translateX, -translateY);
+		GLSurfaceViewBase.translate(translateX, 0);
+		GLSurfaceViewBase.drawTriangleFan(outerScrollBarVb, outerScrollBarColor);
+		GLSurfaceViewBase.drawTriangleFan(innerScrollBarVb, innerScrollBarColor);
+		GLSurfaceViewBase.translate(-translateX, -translateY);
 	}
 
 	public static void tickScrollVelocity() {
@@ -105,13 +105,13 @@ public class ScrollBarHelper {
 		float innerWidth = outerWidth - 10;
 		translateX = (x2 + x1) / 2;
 		translateY = parentHeight - outerScrollBarHeight / 2;
-		innerScrollBarVb = SurfaceViewBase.makeRoundedCornerRectBuffer(
+		innerScrollBarVb = GLSurfaceViewBase.makeRoundedCornerRectBuffer(
 				innerWidth, innerScrollBarHeight, innerScrollBarCornerRadius,
 				CORNER_RESOLUTION);
-		outerScrollBarVb = SurfaceViewBase.makeRoundedCornerRectBuffer(
+		outerScrollBarVb = GLSurfaceViewBase.makeRoundedCornerRectBuffer(
 				outerWidth, outerScrollBarHeight, outerScrollBarCornerRadius,
 				CORNER_RESOLUTION);
-		scrollBarLinesVb = SurfaceViewBase.makeFloatBuffer(new float[] {
+		scrollBarLinesVb = GLSurfaceViewBase.makeFloatBuffer(new float[] {
 				offset, 0, x1, 0, x2, 0, parentWidth + offset, 0 });
 	}
 
