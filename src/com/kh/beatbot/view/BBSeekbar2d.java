@@ -60,6 +60,7 @@ public class BBSeekbar2d extends LevelListenable {
 		lineVb = makeFloatBuffer(new float[] { viewRect.drawOffset, selectY,
 				width - viewRect.drawOffset, selectY, selectX, viewRect.drawOffset, selectX,
 				height - viewRect.drawOffset});
+		requestRender();
 	}
 
 	private void drawSelection() {

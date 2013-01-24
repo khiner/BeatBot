@@ -42,6 +42,8 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PageManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
+import com.kh.beatbot.view.BpmView;
+import com.kh.beatbot.view.LevelsView;
 import com.kh.beatbot.view.MidiView;
 
 public class BeatBotActivity extends Activity {
@@ -154,9 +156,13 @@ public class BeatBotActivity extends Activity {
 		if (savedInstanceState == null) {
 			initNativeAudio();
 		}
+		GlobalVars.bpmView = ((BpmView) findViewById(R.id.bpm));
+		
 		Managers.init(savedInstanceState);
+		
 		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));
 		GlobalVars.midiView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+		
 		setEditIconsEnabled(false);
 		PageManager.init(this);
 

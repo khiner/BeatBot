@@ -203,6 +203,7 @@ public class SampleWaveformView extends TouchableSurfaceView {
 		// update the display location of the loop markers
 		initLoopMarkerVb();
 		updateWaveformVb();
+		requestRender();
 	}
 
 	@Override
@@ -347,6 +348,7 @@ public class SampleWaveformView extends TouchableSurfaceView {
 		TrackManager.currTrack.preview();
 		previewButton.touch();
 		previewPointerId = id;
+		requestRender();
 	}
 
 	public void handlePreviewActionPointerDown(int id) {
@@ -370,6 +372,8 @@ public class SampleWaveformView extends TouchableSurfaceView {
 			handlePreviewActionPointerDown(id);
 	}
 
+	int count = 0;
+	
 	@Override
 	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
 		if (zoomLeftAnchorSample != -1 && zoomRightAnchorSample != -1
@@ -406,5 +410,6 @@ public class SampleWaveformView extends TouchableSurfaceView {
 		beginLoopMarkerTouched = endLoopMarkerTouched = -1;
 		TrackManager.currTrack.stopPreviewing();
 		scrollAnchorSample = zoomLeftAnchorSample = zoomRightAnchorSample = -1;
+		requestRender();
 	}
 }

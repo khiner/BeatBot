@@ -80,6 +80,7 @@ public class ParamControl extends LevelListenable {
 		labelWidth = glText.getTextWidth(label, width / 6);
 		labelOffset = width / 2 - labelWidth / 2;
 		glText.storeText(label);
+		requestRender();
 	}
 	
 	private void setValueLabel(String valueLabel) {
@@ -87,6 +88,7 @@ public class ParamControl extends LevelListenable {
 		valueLabelWidth = glText.getTextWidth(valueLabel, width / 6);
 		valueLabelOffset = width / 2 - valueLabelWidth / 2;
 		glText.storeText(valueLabel);
+		requestRender();
 	}
 	
 	private static void initCircleVbs(float width, float height) {
@@ -174,6 +176,7 @@ public class ParamControl extends LevelListenable {
 			return;
 		drawIndex = (int) (circleVb.capacity() * level / 2);
 		drawIndex += drawIndex % 2;
+		requestRender();
 	}
 
 	@Override
@@ -185,7 +188,6 @@ public class ParamControl extends LevelListenable {
 	@Override
 	public void setLevel(float level) {
 		super.setLevel(level);
-		updateDrawIndex();
 	}
 
 	public void setBeatSync(boolean beatSync) {

@@ -37,7 +37,7 @@ public class BpmView extends TouchableSurfaceView {
 		shortSegmentVB = makeFloatBuffer(shortSegmentBuf);
 	}
 
-	public static void setText(String text) {
+	public void setText(String text) {
 		if (text.length() > 3)
 			return;
 		for (int i = 0; i < 3 - text.length(); i++) {
@@ -46,6 +46,7 @@ public class BpmView extends TouchableSurfaceView {
 		for (int i = 3 - text.length(), j = 0; i < 3; i++, j++) {
 			setSegments(i, Character.digit(text.charAt(j), 10));
 		}
+		requestRender();
 	}
 
 	private static void setSegments(int position, int digit) {
@@ -199,6 +200,7 @@ public class BpmView extends TouchableSurfaceView {
 		touched = true;
 		lastFrameXLoc = x;
 		lastFrameYLoc = y;
+		requestRender();
 	}
 
 	@Override
@@ -238,5 +240,6 @@ public class BpmView extends TouchableSurfaceView {
 	@Override
 	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
 		touched = false;
+		requestRender();
 	}
 }

@@ -59,7 +59,7 @@ public class TrackManager implements MidiTrackControlListener {
 		tracks.add(newTrack);
 		currTrack = tracks.get(tracks.size() - 1);
 		if (GlobalVars.midiView != null)
-			GlobalVars.midiView.updateTracks();
+			GlobalVars.midiView.updateTracks(this);
 	}
 
 	public void clearNotes() {

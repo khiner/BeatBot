@@ -308,18 +308,7 @@ public class LevelsView extends TouchableSurfaceView {
 	
 	@Override
 	protected void init() {
-		final RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)getLayoutParams();
-		params.leftMargin = (int)MidiView.X_OFFSET;
-		Handler refresh = new Handler(Looper.getMainLooper());
-		refresh.post(new Runnable() {
-		    public void run()
-		    {
-		        setLayoutParams(params);
-		    }
-		});
-		
 		setBackgroundColor(Colors.VIEW_BG);
-		gl = MidiView.getGL10();
 		initLevelBarVb();
 	}
 

@@ -18,6 +18,7 @@ import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 import com.kh.beatbot.view.helper.ScrollBarHelper;
@@ -470,9 +471,9 @@ public class MidiView extends ClickableSurfaceView {
 		initAllVbs();
 	}
 
-	public void updateTracks() {
-		int newTrackIndex = Managers.trackManager.getNumTracks() - 1;
-		MidiTrackControlHelper.addTrack(newTrackIndex, Managers.trackManager
+	public void updateTracks(TrackManager trackManager) {
+		int newTrackIndex = trackManager.getNumTracks() - 1;
+		MidiTrackControlHelper.addTrack(newTrackIndex, trackManager
 				.getTrack(newTrackIndex).getInstrument().getBBIconSource());
 		initAllVbs();
 	}

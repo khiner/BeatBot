@@ -179,6 +179,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 			}
 			xTotal += label.labelWidth + GAP_BETWEEN_LABELS;
 		}
+		requestRender();
 	}
 
 	public void addLabel(String text, boolean on) {
@@ -259,6 +260,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 		if (touched != null) {
 			touchLabel(touched, x);
 		}
+		requestRender();
 	}
 
 	@Override

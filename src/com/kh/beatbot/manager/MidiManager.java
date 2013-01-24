@@ -79,7 +79,7 @@ public class MidiManager implements Parcelable {
 
 	public void setBPM(float bpm) {
 		bpm = bpm >= MIN_BPM ? (bpm <= MAX_BPM ? bpm : MAX_BPM) : MIN_BPM;
-		BpmView.setText(String.valueOf((int) bpm));
+		GlobalVars.bpmView.setText(String.valueOf((int) bpm));
 		tempo.setBpm(bpm);
 		setNativeBPM(bpm);
 		setNativeMSPT(tempo.getMpqn() / RESOLUTION);

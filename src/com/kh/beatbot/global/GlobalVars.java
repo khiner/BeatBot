@@ -3,6 +3,7 @@ package com.kh.beatbot.global;
 import android.graphics.Typeface;
 
 import com.kh.beatbot.activity.BeatBotActivity;
+import com.kh.beatbot.view.BpmView;
 import com.kh.beatbot.view.MidiView;
 
 public class GlobalVars {
@@ -33,6 +34,7 @@ public class GlobalVars {
 	};
 
 	public static MidiView midiView;
+	public static BpmView bpmView;
 
 	public static float currBeatDivision;
 }

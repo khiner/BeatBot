@@ -65,6 +65,7 @@ public class AdsrView extends TouchableSurfaceView {
 			}
 			adsrCurveVb[i] = makeFloatBuffer(converted);
 		}
+		requestRender();
 	}
 
 	private float getAttackX(ADSR adsr) {

@@ -1,6 +1,7 @@
 package com.kh.beatbot.layout.page;
 
 import android.content.Context;
+import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ToggleButton;
@@ -8,6 +9,7 @@ import android.widget.ToggleButton;
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.view.LevelsView;
+import com.kh.beatbot.view.MidiView;
 
 public class NoteLevelsPage extends Page {
 	private LevelsView levelsView;
@@ -20,6 +22,7 @@ public class NoteLevelsPage extends Page {
 	@Override
 	public void init() {
 		levelsView = (LevelsView)findViewById(R.id.levelsView);
+		levelsView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 		volumeToggle = (ToggleButton) findViewById(R.id.trackVolumeToggle);
 		panToggle = (ToggleButton) findViewById(R.id.trackPanToggle);
 		pitchToggle = (ToggleButton) findViewById(R.id.trackPitchToggle);
@@ -74,4 +77,17 @@ public class NoteLevelsPage extends Page {
 		levelsView.setVisibility(code);
 	}
 
+	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+		super.onLayout(changed, l, t, r, b);
+		int w = r - l;
+		int h = b - t;
+		levelsView.layout((int)MidiView.X_OFFSET, 0, w, h);
+	}
+	
+	protected void onMeasure(int w, int h) {
+		super.onMeasure(w, h);
+		int width = MeasureSpec.makeMeasureSpec(w - (int)MidiView.X_OFFSET, MeasureSpec.EXACTLY);
+		int height = MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY);
+		levelsView.measure(width, height);
+	}
 }
