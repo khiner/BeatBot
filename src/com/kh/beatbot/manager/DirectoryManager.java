@@ -38,7 +38,7 @@ public class DirectoryManager {
 				}
 				MidiTrackControlHelper
 						.updateInstrumentIcon(TrackManager.currTrack.getId());
-				PageManager.updateTrackPages();
+				PageManager.notifyTrackChanged();
 				currDirectory = internalDirectory;
 			}
 			updateInstrumentSelectAlert(currDirectory);

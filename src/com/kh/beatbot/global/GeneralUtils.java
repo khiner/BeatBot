@@ -31,4 +31,13 @@ public class GeneralUtils {
 		// db range = -60 - 0, need range 0-1
 		return db <= -60 ? 0 : db / 60 + 1;
 	}
+	
+	public static boolean contains(int[] ary, int val) {
+		for (int i = 0; i < ary.length; i++) {
+			if (ary[i] == val) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

@@ -89,7 +89,7 @@ public class TrackManager implements MidiTrackControlListener {
 		if (newTrack == currTrack)
 			return;
 		currTrack = newTrack;
-		PageManager.updateTrackPages();
+		PageManager.notifyTrackChanged();
 	}
 
 	public static native void addTrack(String sampleFileName);

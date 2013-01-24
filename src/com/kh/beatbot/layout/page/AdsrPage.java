@@ -140,36 +140,36 @@ public class AdsrPage extends Page implements OnClickListener, LevelListener {
 		super.onLayout(changed, l, t, r, b);
 		int width = (r - l);
 		int height = (b - t);
-		int halfHeight = height / 2;
-		adsrView.layout(0, 0, width - 9 * halfHeight, b);
-		int pos = width - 9 * halfHeight;
-		paramLabel.layout(pos, 0, pos + 2 * height, halfHeight);
-		valueLabel.layout(pos, halfHeight, pos + 2 * height, b);
-		pos += 2 * height;
-		levelBar.layout(pos, halfHeight, width, b);
-		for (int i = 0; i < 4; i++) { // adsrBtns
-			adsrButtons[i].layout(pos, 0, pos + halfHeight, halfHeight);
-			pos += halfHeight;
+		int thirdHeight = height / 3;
+		int pos = width - thirdHeight * 6;
+		adsrView.layout(0, 0, pos, height);
+		int labelWidth = 6 * thirdHeight / 2;
+		paramLabel.layout(pos, thirdHeight, pos + labelWidth, 2 * thirdHeight);
+		valueLabel.layout(pos + labelWidth, thirdHeight, width, 2 * thirdHeight);
+		levelBar.layout(pos, 2 * thirdHeight, width, height);
+		pos = width - thirdHeight * 5;
+		for (int i = 0; i < 4; i++) {
+			adsrButtons[i].layout(pos, 0, pos + thirdHeight, thirdHeight);
+			pos += thirdHeight;
 		}
-		//start / peak btns
-		adsrButtons[4].layout(pos, halfHeight / 2, pos + halfHeight, halfHeight);
-		adsrButtons[5].layout(pos, 0, pos + halfHeight, halfHeight / 2);
+		adsrButtons[4].layout(pos, thirdHeight / 2, width, thirdHeight);
+		adsrButtons[5].layout(pos, 0, width, thirdHeight / 2);
 	}
 	
 	protected void onMeasure(int w, int h) {
 		super.onMeasure(w, h);
 		int width = MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY);
 		int height = MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY);
-		int halfHeight = height / 2;
-		adsrView.measure(width / 2, height);
-		for (int i = 0; i < 4; i++) { // adsrBtns
-			adsrButtons[i].measure(halfHeight, halfHeight);
+		int thirdHeight = height / 3;
+		adsrView.measure(width - thirdHeight * 6, height);
+		paramLabel.measure(6 * thirdHeight / 2, thirdHeight);
+		valueLabel.measure(6 * thirdHeight / 2, thirdHeight);
+		levelBar.measure(6 * thirdHeight, thirdHeight);
+		for (int i = 0; i < 4; i++) {
+			adsrButtons[i].measure(thirdHeight, thirdHeight);
 		}
-		for (int i = 4; i < adsrButtons.length; i++) {
-			adsrButtons[i].measure(halfHeight, height / 4);
+		for (int i = 4; i < 6; i++) {
+			adsrButtons[i].measure(thirdHeight, thirdHeight / 2);
 		}
-		paramLabel.measure(2 * height, halfHeight);
-		valueLabel.measure(2 * height, halfHeight);
-		levelBar.measure(3 * halfHeight, halfHeight);
 	}
 }

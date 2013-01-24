@@ -43,7 +43,6 @@ import com.kh.beatbot.manager.PageManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.view.BpmView;
-import com.kh.beatbot.view.LevelsView;
 import com.kh.beatbot.view.MidiView;
 
 public class BeatBotActivity extends Activity {
@@ -307,9 +306,8 @@ public class BeatBotActivity extends Activity {
 		if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
 			// Managers.recordManager.stopListening();
 			String fileName = Managers.recordManager.stopRecordingAndWriteWav();
-			// make sure the recorded instrument shows the newly recorded "song"
+			// make sure the recorded instrument shows the newly recorded beat
 			Managers.directoryManager.updateDirectories();
-			PageManager.updateTrackPages();
 
 			Toast.makeText(getApplicationContext(),
 					"Recorded file to " + fileName, Toast.LENGTH_SHORT).show();

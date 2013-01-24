@@ -477,7 +477,7 @@ public class MidiView extends ClickableSurfaceView {
 				.getTrack(newTrackIndex).getInstrument().getBBIconSource());
 		initAllVbs();
 	}
-
+	
 	@Override
 	protected void drawFrame() {
 		boolean recording = Managers.recordManager.getState() != RecordManager.State.INITIALIZING;

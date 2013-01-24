@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.kh.beatbot.layout.page.LevelsPage xmlns:android="http://schemas.android.com/apk/res/android"
+<com.kh.beatbot.layout.page.LevelsFXPage xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_vertical"
-    android:orientation="horizontal" >
-
+    android:orientation="horizontal"
+    android:gravity="center_vertical" >
+    
         <ToggleButton
             android:id="@+id/trackVolumeToggle"
             android:layout_width="wrap_content"
@@ -44,5 +44,22 @@
             android:layout_height="match_parent"
             android:layout_toRightOf="@+id/trackPitchToggle"
             android:layout_marginRight="6dp" />
+        
+    <TextView 
+        android:id="@+id/effectsLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:textSize="16dp"
+        android:gravity="center"
+        android:text="@string/effects" />
     
-</com.kh.beatbot.layout.page.LevelsPage>
+    <com.kh.beatbot.listenable.LabelListListenable
+        android:id="@+id/effectList"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_toRightOf="@+id/effectsLabel"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp" />
+
+</com.kh.beatbot.layout.page.LevelsFXPage>
