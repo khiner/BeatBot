@@ -479,7 +479,7 @@ public class MidiView extends ClickableSurfaceView {
 	}
 	
 	@Override
-	protected void drawFrame() {
+	protected void draw() {
 		boolean recording = Managers.recordManager.getState() != RecordManager.State.INITIALIZING;
 		boolean playing = Managers.playbackManager.getState() == PlaybackManager.State.PLAYING;
 		TickWindowHelper.scroll();

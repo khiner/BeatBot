@@ -7,11 +7,11 @@ import android.widget.ToggleButton;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.view.SampleWaveformView;
+import com.kh.beatbot.view.group.SampleEditGroup;
 
 public class SampleEditPage extends Page {
 	
-	private SampleWaveformView sampleWaveformView;
+	private SampleEditGroup sampleWaveformView;
 	private ToggleButton loopButton;
 	private ToggleButton reverseButton;
 	
@@ -20,7 +20,7 @@ public class SampleEditPage extends Page {
 	}
 
 	public void init() {
-		sampleWaveformView = (SampleWaveformView) findViewById(R.id.sample_waveform_view);
+		sampleWaveformView = (SampleEditGroup) findViewById(R.id.sample_waveform_view);
 		loopButton = (ToggleButton) findViewById(R.id.loop);
 		reverseButton = (ToggleButton) findViewById(R.id.reverse);
 		loopButton.setOnClickListener(new View.OnClickListener() {

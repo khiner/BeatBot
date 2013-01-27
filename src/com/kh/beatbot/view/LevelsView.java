@@ -5,11 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.widget.RelativeLayout;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
@@ -253,7 +250,7 @@ public class LevelsView extends TouchableSurfaceView {
 		selectRegion = true;
 	}
 
-	protected void drawFrame() {
+	protected void draw() {
 		drawLevels();
 		drawSelectRegion();
 	}

@@ -33,25 +33,27 @@ public abstract class TouchableSurfaceView extends GLSurfaceViewBase {
 	public boolean onTouchEvent(MotionEvent e) {
 		int index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 		int id = e.getPointerId(index);
-		float x = e.getX(index);
-		float y = e.getY(index);
 		switch (e.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_CANCEL:
 			return false;
 		case MotionEvent.ACTION_DOWN:
-			handleActionDown(e, id, x, y);
+			handleActionDown(e, id, e.getX(index), e.getY(index));
 			break;
 		case MotionEvent.ACTION_POINTER_DOWN:
-			handleActionPointerDown(e, id, x, y);
+			handleActionPointerDown(e, id, e.getX(index), e.getY(index));
 			break;
 		case MotionEvent.ACTION_MOVE:
-			handleActionMove(e, id, x, y);
+			// Move events are batched together for efficiency in Android.
+			// need to manually iterate through each event and broadcast
+	        for(int i = 0; i < e.getPointerCount(); i++) {
+	            handleActionMove(e, e.getPointerId(i), e.getX(i), e.getY(i));
+	        }
 			break;
 		case MotionEvent.ACTION_POINTER_UP:
-			handleActionPointerUp(e, id, x, y);
+			handleActionPointerUp(e, id, e.getX(index), e.getY(index));
 			break;
 		case MotionEvent.ACTION_UP:
-			handleActionUp(e, id, x, y);
+			handleActionUp(e, id, e.getX(index), e.getY(index));
 			break;
 		}
 		return true;

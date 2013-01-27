@@ -1,25 +1,20 @@
-package com.kh.beatbot.view;
-
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
+package com.kh.beatbot.view.window;
 
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.view.TouchableSurfaceView;
 
-public abstract class ClickableSurfaceView extends TouchableSurfaceView {
+public abstract class ClickableViewWindow extends TouchableViewWindow {
+
+	public ClickableViewWindow(TouchableSurfaceView parent) {
+		super(parent);
+	}
+
 	/** State Variables for Clicking/Pressing **/
 	private long lastDownTime = 0;
 	private long lastTapTime = 0;
 	private float lastTapX = -1;
 	private float lastTapY = -1;
 
-	public ClickableSurfaceView(Context c) {
-		super(c);
-	}
-	
-	public ClickableSurfaceView(Context c, AttributeSet as) {
-		super(c, as);
-	}
 
 	/****************** Clickable Methods ********************/
 	protected abstract void singleTap(int id, float x, float y);
@@ -29,20 +24,19 @@ public abstract class ClickableSurfaceView extends TouchableSurfaceView {
 	protected abstract void longPress(int id, float x, float y);
 
 	@Override
-	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
+	protected void handleActionDown(int id, float x, float y) {
 		lastDownTime = System.currentTimeMillis();
 		lastTapX = x;
 		lastTapY = y;
 	}
 
 	@Override
-	protected void handleActionPointerDown(MotionEvent e, int id, float x,
-			float y) {
+	protected void handleActionPointerDown(int id, float x, float y) {
 		// nothing to do
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
+	protected void handleActionMove(int id, float x, float y) {
 		if (Math.abs(x - lastTapX) < 25
 				&& Math.abs(y - lastTapY) < 25) {
 			if (System.currentTimeMillis() - lastDownTime > GlobalVars.LONG_CLICK_TIME) {
@@ -54,13 +48,13 @@ public abstract class ClickableSurfaceView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
+	protected void handleActionPointerUp(int id, float x, float y) {
 		// nothing to do
 
 	}
 
 	@Override
-	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
+	protected void handleActionUp(int id, float x, float y) {
 		long time = System.currentTimeMillis();
 		if (Math.abs(time - lastDownTime) < GlobalVars.SINGLE_TAP_TIME) {
 			// if the second tap is not in the same location as the first tap,
@@ -81,5 +75,4 @@ public abstract class ClickableSurfaceView extends TouchableSurfaceView {
 		}
 		lastDownTime = Long.MAX_VALUE;
 	}
-
 }

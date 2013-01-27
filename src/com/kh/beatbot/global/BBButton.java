@@ -1,35 +1,16 @@
 package com.kh.beatbot.global;
 
-public class BBButton {
+import com.kh.beatbot.view.TouchableSurfaceView;
+import com.kh.beatbot.view.window.TouchableViewWindow;
+
+public class BBButton extends TouchableViewWindow {
 	BBIcon defaultIcon = null;
 	BBIcon selectedIcon = null;
 	BBIcon currentIcon = null;
-	private float width, height;
 
-	public BBButton(BBIconSource iconSource) {
-		this(iconSource, iconSource.defaultIcon.getWidth(),
-				iconSource.defaultIcon.getHeight());
-	}
-
-	public BBButton(BBIconSource iconSource, float height) {
-		this(iconSource, iconSource.defaultIcon.getWidth() * height
-				/ iconSource.defaultIcon.getHeight(), height);
-	}
-
-	public BBButton(BBIconSource iconSource, float width, float height) {
-		defaultIcon = iconSource.defaultIcon;
-		selectedIcon = iconSource.selectedIcon;
-		currentIcon = defaultIcon;
-		this.width = width;
-		this.height = height;
-	}
-
-	public float getWidth() {
-		return width;
-	}
-
-	public float getHeight() {
-		return height;
+	
+	public BBButton(TouchableSurfaceView parent) {
+		super(parent);
 	}
 
 	public void setIconSource(BBIconSource iconSource) {
@@ -40,18 +21,12 @@ public class BBButton {
 
 	public void touch() {
 		currentIcon = selectedIcon;
+		requestRender();
 	}
 
 	public void release() {
 		currentIcon = defaultIcon;
-	}
-
-	public void draw(float x, float y) {
-		currentIcon.draw(x, y, width, height);
-	}
-
-	public void draw(float x, float y, float width, float height) {
-		currentIcon.draw(x, y, width, height);
+		requestRender();
 	}
 
 	public float getIconWidth() {
@@ -64,5 +39,47 @@ public class BBButton {
 
 	public boolean isTouched() {
 		return currentIcon.equals(selectedIcon);
+	}
+
+	@Override
+	public void loadIcons() {
+		//nothing to do
+	}
+
+	@Override
+	public void init() {
+		//nothing to do
+	}
+
+	@Override
+	public void draw() {
+		currentIcon.draw(0, 0, width, height);
+	}
+
+	@Override
+	protected void handleActionDown(int id, float x, float y) {
+		touch();
+	}
+
+	@Override
+	protected void handleActionUp(int id, float x, float y) {
+		release();
+	}
+
+	@Override
+	protected void handleActionPointerDown(int id, float x, float y) {
+		// only one pointer on button		
+	}
+
+	@Override
+	protected void handleActionPointerUp(int id, float x, float y) {
+		// only one pointer on button
+	}
+
+	@Override
+	protected void handleActionMove(int id, float x, float y) {
+		if (x < 0 || x > width || y < 0 || y > height) {
+			release();
+		}
 	}
 }

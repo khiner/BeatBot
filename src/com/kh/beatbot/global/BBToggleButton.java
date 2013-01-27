@@ -1,19 +1,13 @@
 package com.kh.beatbot.global;
 
+import com.kh.beatbot.view.TouchableSurfaceView;
+
 public class BBToggleButton extends BBButton {
 	boolean on = false;
 	boolean touched = false;
 
-	public BBToggleButton(BBIconSource iconSource) {
-		super(iconSource);
-	}
-
-	public BBToggleButton(BBIconSource iconSource, float height) {
-		super(iconSource, height);
-	}
-
-	public BBToggleButton(BBIconSource iconSource, float width, float height) {
-		super(iconSource, width, height);
+	public BBToggleButton(TouchableSurfaceView parent) {
+		super(parent);
 	}
 
 	public void setIconSource(BBIconSource iconSource) {

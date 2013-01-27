@@ -11,6 +11,14 @@ public class BBIconSource {
 
 	}
 
+	public float getWidth() {
+		return defaultIcon.getWidth();
+	}
+	
+	public float getHeight() {
+		return defaultIcon.getHeight();
+	}
+	
 	public BBIconSource(int iconSource, int defaultIconResourceId, int selectedIconResourceId) {
 		this(iconSource, defaultIconResourceId, selectedIconResourceId, -1);
 	}

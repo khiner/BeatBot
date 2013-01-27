@@ -27,12 +27,20 @@ public class MidiTrackControlHelper {
 
 		public ButtonRow(int trackNum, BBIconSource instrumentIcon) {
 			this.trackNum = trackNum;
-			instrumentButton = new BBToggleButton(instrumentIcon,
-					MidiView.trackHeight);
-			muteButton = new BBToggleButton(muteIcon, MidiView.trackHeight);
-			soloButton = new BBToggleButton(soloIcon, MidiView.trackHeight);
-			width = instrumentButton.getWidth() + muteButton.getWidth()
-					+ soloButton.getWidth();
+			instrumentButton = new BBToggleButton(midiView);
+			muteButton = new BBToggleButton(midiView);
+			soloButton = new BBToggleButton(midiView);
+			instrumentButton.setIconSource(instrumentIcon);
+			muteButton.setIconSource(muteIcon);
+			soloButton.setIconSource(soloIcon);
+			instrumentButton.layout(GLSurfaceViewBase.getGL10(), 0, MidiView.trackHeight,
+					instrumentIcon.getWidth(), MidiView.trackHeight);
+			muteButton.layout(GLSurfaceViewBase.getGL10(), 0, MidiView.trackHeight,
+					muteIcon.getWidth(), MidiView.trackHeight);
+			soloButton.layout(GLSurfaceViewBase.getGL10(), 0, MidiView.trackHeight,
+					soloIcon.getWidth(), MidiView.trackHeight);
+			width = instrumentButton.width + muteButton.width
+					+ soloButton.width;
 		}
 
 		public void setIconSource(BBIconSource instrumentIcon) {
@@ -40,10 +48,11 @@ public class MidiTrackControlHelper {
 		}
 
 		public void draw(float y) {
-			instrumentButton.draw(0, y);
-			muteButton.draw(instrumentButton.getWidth(), y);
-			soloButton.draw(
-					instrumentButton.getWidth() + muteButton.getWidth(), y);
+			GLSurfaceViewBase.translate(0, y);
+			instrumentButton.draw();
+			muteButton.draw();
+			soloButton.draw();
+			GLSurfaceViewBase.translate(0, -y);
 		}
 
 		public void handlePress(float x) {
@@ -107,10 +116,10 @@ public class MidiTrackControlHelper {
 		}
 
 		private BBToggleButton getButton(float x) {
-			if (x < buttonRows.get(0).instrumentButton.getWidth()) {
+			if (x < buttonRows.get(0).instrumentButton.width) {
 				return instrumentButton;
-			} else if (x < buttonRows.get(0).instrumentButton.getWidth()
-					+ buttonRows.get(0).muteButton.getWidth()) {
+			} else if (x < buttonRows.get(0).instrumentButton.width
+					+ buttonRows.get(0).muteButton.width) {
 				return muteButton;
 			} else if (x < width) {
 				return soloButton;

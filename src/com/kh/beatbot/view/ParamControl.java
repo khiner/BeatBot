@@ -25,6 +25,7 @@ public class ParamControl extends LevelListenable {
 	private static int circleWidth = 0, circleHeight = 0;
 
 	private BBToggleButton centerButton = null;
+	private BBIconSource centerButtonIcon = null;
 	private static float snapDistSquared;
 
 	private int drawIndex = 0;
@@ -53,12 +54,15 @@ public class ParamControl extends LevelListenable {
 
 	protected void loadIcons() {
 		setParam(param);
-		centerButton = new BBToggleButton(new BBIconSource(-1, R.drawable.clock, R.drawable.note_icon));
+		centerButtonIcon = new BBIconSource(-1, R.drawable.clock, R.drawable.note_icon);
 	}
 	
 	@Override
 	public void init() {
 		super.init();
+		centerButton = new BBToggleButton(this);
+		centerButton.setIconSource(centerButtonIcon);
+		centerButton.layout(gl, 0, 0, width, height);
 		if (clickable) {
 			centerButton.setOn(true);
 		}
@@ -150,7 +154,7 @@ public class ParamControl extends LevelListenable {
 	}
 
 	@Override
-	protected void drawFrame() {
+	protected void draw() {
 		setColor(Colors.VOLUME);
 		// draw text
 		glText.draw(label, width / 6, labelOffset, 0);
@@ -166,7 +170,7 @@ public class ParamControl extends LevelListenable {
 			drawTriangleStrip(selectCircleVb, selectColor, drawIndex);
 		}
 		if (clickable) {
-			centerButton.draw(0, width, width, width);
+			centerButton.draw();
 		}
 		translate(0, -.2f * width);
 	}

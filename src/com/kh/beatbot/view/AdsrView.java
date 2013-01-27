@@ -207,7 +207,7 @@ public class AdsrView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void drawFrame() {
+	protected void draw() {
 		viewRect.drawRoundedBg();
 		viewRect.drawRoundedBgOutline();
 		drawAdsr();

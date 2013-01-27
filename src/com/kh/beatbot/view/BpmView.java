@@ -191,7 +191,7 @@ public class BpmView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void drawFrame() {
+	protected void draw() {
 		drawSegments();
 	}
 

@@ -73,11 +73,11 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 	 *            The array
 	 * @return The newly created FloatBuffer
 	 */
-	public static FloatBuffer makeFloatBuffer(float[] arr) {
+	public static final FloatBuffer makeFloatBuffer(float[] arr) {
 		return makeFloatBuffer(arr, 0);
 	}
 
-	public static FloatBuffer makeFloatBuffer(float[] arr, int position) {
+	public static final FloatBuffer makeFloatBuffer(float[] arr, int position) {
 		ByteBuffer bb = ByteBuffer.allocateDirect(arr.length * 4);
 		bb.order(ByteOrder.nativeOrder());
 		FloatBuffer fb = bb.asFloatBuffer();
@@ -86,11 +86,11 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		return fb;
 	}
 
-	public static void translate(float x, float y) {
+	public static final void translate(float x, float y) {
 		gl.glTranslatef(x, y, 0);
 	}
 
-	public static void scale(float x, float y) {
+	public static final void scale(float x, float y) {
 		gl.glScalef(x, y, 1);
 	}
 
@@ -98,21 +98,21 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		gl.glPushMatrix();
 	}
 
-	public static void pop() {
+	public static final void pop() {
 		gl.glPopMatrix();
 	}
 
-	public static FloatBuffer makeRectFloatBuffer(float x1, float y1, float x2,
+	public static final FloatBuffer makeRectFloatBuffer(float x1, float y1, float x2,
 			float y2) {
 		return makeFloatBuffer(new float[] { x1, y1, x2, y1, x1, y2, x2, y2 });
 	}
 
-	public static FloatBuffer makeRectOutlineFloatBuffer(float x1, float y1,
+	public static final FloatBuffer makeRectOutlineFloatBuffer(float x1, float y1,
 			float x2, float y2) {
 		return makeFloatBuffer(new float[] { x1, y1, x1, y2, x2, y2, x2, y1 });
 	}
 
-	public static FloatBuffer makeRoundedCornerRectBuffer(float width,
+	public static final FloatBuffer makeRoundedCornerRectBuffer(float width,
 			float height, float cornerRadius, int resolution) {
 		float[] roundedRect = new float[resolution * 8];
 		float theta = 0, addX, addY;
@@ -137,7 +137,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		return makeFloatBuffer(roundedRect);
 	}
 
-	public static void drawRectangle(float x1, float y1, float x2, float y2,
+	public static final void drawRectangle(float x1, float y1, float x2, float y2,
 			float[] color) {
 		drawTriangleStrip(makeRectFloatBuffer(x1, y1, x2, y2), color);
 	}
@@ -148,18 +148,18 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 				GL10.GL_LINE_LOOP);
 	}
 
-	public static void drawTriangleStrip(FloatBuffer vb, float[] color,
+	public static final void drawTriangleStrip(FloatBuffer vb, float[] color,
 			int numVertices) {
 		drawTriangleStrip(vb, color, 0, numVertices);
 	}
 
-	public static void drawTriangleStrip(FloatBuffer vb, float[] color) {
+	public static final void drawTriangleStrip(FloatBuffer vb, float[] color) {
 		if (vb == null)
 			return;
 		drawTriangleStrip(vb, color, vb.capacity() / 2);
 	}
 
-	public static void drawTriangleStrip(FloatBuffer vb, float[] color,
+	public static final void drawTriangleStrip(FloatBuffer vb, float[] color,
 			int beginVertex, int endVertex) {
 		if (vb == null)
 			return;
@@ -169,13 +169,13 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 				- beginVertex);
 	}
 
-	public static void drawTriangleFan(FloatBuffer vb, float[] color) {
+	public static final void drawTriangleFan(FloatBuffer vb, float[] color) {
 		setColor(color);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_FAN, 0, vb.capacity() / 2);
 	}
 
-	public static void drawLines(FloatBuffer vb, float[] color, float width,
+	public static final void drawLines(FloatBuffer vb, float[] color, float width,
 			int type, int stride) {
 		setColor(color);
 		gl.glLineWidth(width);
@@ -183,12 +183,12 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		gl.glDrawArrays(type, 0, vb.capacity() / (2 + stride / 8));
 	}
 
-	public static void drawLines(FloatBuffer vb, float[] color, float width,
+	public static final void drawLines(FloatBuffer vb, float[] color, float width,
 			int type) {
 		drawLines(vb, color, width, type, 0);
 	}
 
-	public static void drawPoint(float pointSize, float[] color, float x,
+	public static final void drawPoint(float pointSize, float[] color, float x,
 			float y) {
 		push();
 		translate(x, y);
@@ -198,20 +198,20 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		pop();
 	}
 
-	protected float distanceFromCenterSquared(float x, float y) {
+	protected final float distanceFromCenterSquared(float x, float y) {
 		return (x - width / 2) * (x - width / 2) + (y - height / 2)
 				* (y - height / 2);
 	}
 
-	protected void setBackgroundColor(float[] color) {
+	public final void setBackgroundColor(float[] color) {
 		backgroundColor = color;
 	}
 
-	protected static void setColor(float[] color) {
+	public final static void setColor(float[] color) {
 		gl.glColor4f(color[0], color[1], color[2], color[3]);
 	}
 
-	public static void loadTexture(Bitmap bitmap, int[] textureHandlers,
+	public final static void loadTexture(Bitmap bitmap, int[] textureHandlers,
 			int textureId) {
 		// Generate Texture ID
 		gl.glGenTextures(1, textureHandlers, textureId);
@@ -231,7 +231,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		// bitmap.recycle();
 	}
 
-	public static void loadTexture(int resourceId, int[] textureHandlers,
+	public final static void loadTexture(int resourceId, int[] textureHandlers,
 			int textureId, int[] crop) {
 		Bitmap bitmap = BitmapFactory.decodeResource(
 				GlobalVars.mainActivity.getResources(), resourceId);
@@ -245,7 +245,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		loadTexture(bitmap, textureHandlers, textureId);
 	}
 
-	public static void drawTexture(int textureId, int[] textureHandlers,
+	public final static void drawTexture(int textureId, int[] textureHandlers,
 			int[] crop, float x, float y, float width, float height) {
 		gl.glEnable(GL10.GL_TEXTURE_2D);
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[textureId]);
@@ -269,20 +269,20 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		GLU.gluOrtho2D(gl, 0, width, height, 0);
 	}
 
-	public void onSurfaceCreated(GL10 _gl, EGLConfig config) {
+	public final void onSurfaceCreated(GL10 _gl, EGLConfig config) {
 		gl = _gl;
-		initGl(_gl);
+		initGl(gl);
 		init();
 		initialized = true;
 		initBackgroundColor();
 	}
 
-	public void onDrawFrame(GL10 gl) {
+	public final void onDrawFrame(GL10 gl) {
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		drawFrame();
+		draw();
 	}
 
-	private void initGl(GL10 gl) {
+	private final void initGl(GL10 gl) {
 		initGlText();
 		loadIcons();
 		gl.glEnable(GL10.GL_POINT_SMOOTH);
@@ -292,7 +292,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 	}
 
-	public static GL10 getGL10() {
+	public final static GL10 getGL10() {
 		return gl;
 	}
 
@@ -314,7 +314,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 
 	protected abstract void loadIcons();
 
-	protected abstract void drawFrame();
+	protected abstract void draw();
 
 	protected class ViewRect {
 		public int drawOffset;

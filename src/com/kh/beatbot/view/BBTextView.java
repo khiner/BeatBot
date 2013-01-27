@@ -40,7 +40,7 @@ public class BBTextView extends GLSurfaceViewBase {
 	}
 	
 	@Override
-	protected void drawFrame() {
+	protected void draw() {
 		if (text == null)
 			return;
 		setColor(Colors.VOLUME);

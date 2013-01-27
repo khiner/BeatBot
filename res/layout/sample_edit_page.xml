@@ -5,7 +5,7 @@
     android:background="@color/background"
     android:orientation="horizontal" >
 
-    <com.kh.beatbot.view.SampleWaveformView
+    <com.kh.beatbot.view.group.SampleEditGroup
         android:id="@+id/sample_waveform_view"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"

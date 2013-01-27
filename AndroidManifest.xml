@@ -30,7 +30,7 @@
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:name="com.kh.beatbot.activity.EffectActivity"
+            android:name=".activity.EffectActivity"
             android:screenOrientation="landscape" >
         </activity>
     </application>

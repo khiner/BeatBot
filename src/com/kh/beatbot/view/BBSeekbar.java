@@ -83,7 +83,7 @@ public class BBSeekbar extends LevelListenable {
 	}
 	
 	@Override
-	protected void drawFrame() {
+	protected void draw() {
 		drawBar();
 	}
 

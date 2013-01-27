@@ -237,7 +237,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 	}
 	
 	@Override
-	protected void drawFrame() {
+	protected void draw() {
 		translate(width / 2, height / 2);
 		// draw background rounded rect
 		drawTriangleFan(bgRectVb, Colors.VIEW_BG);

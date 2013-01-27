@@ -48,7 +48,7 @@ public class BBSeekbar2d extends LevelListenable {
 	}
 
 	@Override
-	protected void drawFrame() {
+	protected void draw() {
 		viewRect.drawRoundedBg();
 		levelColor[3] = 1; // completely opaque alpha
 		drawLines(lineVb, levelColor, 5, GL10.GL_LINES);

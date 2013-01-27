@@ -1,4 +1,4 @@
-package com.kh.beatbot.view;
+package com.kh.beatbot.view.window;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,54 +6,49 @@ import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-
-import com.kh.beatbot.R;
-import com.kh.beatbot.global.BBButton;
-import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.view.TouchableSurfaceView;
 import com.kh.beatbot.view.helper.WaveformHelper;
 
-public class SampleWaveformView extends TouchableSurfaceView {
+public class SampleEditViewWindow extends TouchableViewWindow {
 
+	public SampleEditViewWindow(TouchableSurfaceView parent) {
+		super(parent);
+	}
+
+	private float waveformWidth = 0;
+	
 	// min distance for pointer to select loop markers
 	private static final int SNAP_DIST = 32;
 	private static FloatBuffer waveformVb = null;
 	private static FloatBuffer backgroundOutlineVb = null;
-	private static FloatBuffer previewButtonSquareVb = null;
 	private static FloatBuffer loopSelectionLineVb = null;
 	private static FloatBuffer loopSelectionRectVbs[] = new FloatBuffer[2];
 
-	private static BBButton previewButton;
-
 	private final int MIN_LOOP_WINDOW = 32;
-	// the left of this view is a preview button
-	private float previewButtonWidth, waveformWidth;
 
 	// which pointer id is touching which marker (-1 means no pointer)
-	private int beginLoopMarkerTouched = -1;
-	private int endLoopMarkerTouched = -1;
+	private int beginLoopPointerId = -1;
+	private int endLoopPointerId = -1;
 
-	// keep track of which finger is touching the preview button,
-	// so we can handle pointer-up/ move events outside the button
-	private int previewPointerId = -1;
-
+	private int zoomLeftPointerId = -1;
+	private int zoomRightPointerId = -1;
+	
 	private float zoomLeftAnchorSample = -1;
 	private float zoomRightAnchorSample = -1;
 
+	private float zoomLeftPointerX = -1;
+	private float zoomRightPointerX = -1;
+	
+	private int scrollPointerId = -1;
 	private float scrollAnchorSample = -1;
+	
 
 	// zooming/scrolling will change the view window of the samples
 	// keep track of that with offset and width
 	private float sampleOffset = 0;
 	private float sampleWidth = 0;
-
-	public SampleWaveformView(Context c, AttributeSet as) {
-		super(c, as);
-	}
 
 	public void update() {
 		File sampleFile = TrackManager.currTrack.getSampleFile();
@@ -63,13 +58,8 @@ public class SampleWaveformView extends TouchableSurfaceView {
 	}
 
 	private void initBackgroundOutlineVb() {
-		backgroundOutlineVb = makeRectOutlineFloatBuffer(previewButtonWidth, 0,
+		backgroundOutlineVb = makeRectOutlineFloatBuffer(0, 0,
 				width - 2, height);
-	}
-
-	private void initPreviewButtonSquareVb() {
-		previewButtonSquareVb = makeRectFloatBuffer(0, 0, previewButtonWidth,
-				previewButtonWidth);
 	}
 
 	private void initLoopMarkerVb() {
@@ -90,8 +80,7 @@ public class SampleWaveformView extends TouchableSurfaceView {
 		if (height == 0) // this view hasn't even been init()'d yet.
 			return;
 		try {
-			waveformVb = WaveformHelper.floatFileToBuffer(width
-					- previewButtonWidth - SNAP_DIST, height,
+			waveformVb = WaveformHelper.floatFileToBuffer(width - SNAP_DIST, height,
 					(long) sampleOffset, (long) sampleWidth, SNAP_DIST / 2);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -103,10 +92,7 @@ public class SampleWaveformView extends TouchableSurfaceView {
 			return;
 		gl.glEnable(GL10.GL_LINE_SMOOTH);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVb);
-		gl.glPushMatrix();
-		gl.glTranslatef(previewButtonWidth, 0, 0);
 		drawLines(waveformVb, Colors.VOLUME, 10, GL10.GL_LINE_STRIP);
-		gl.glPopMatrix();
 		gl.glDisable(GL10.GL_LINE_SMOOTH);
 	}
 
@@ -118,43 +104,27 @@ public class SampleWaveformView extends TouchableSurfaceView {
 		drawLines(loopSelectionLineVb, Colors.SAMPLE_LOOP_SELECT_OUTLINE, 2,
 				GL10.GL_LINES);
 		drawTriangleStrip(loopSelectionRectVbs[0],
-				beginLoopMarkerTouched == -1 ? Colors.SAMPLE_LOOP_SELECT
+				beginLoopPointerId == -1 ? Colors.SAMPLE_LOOP_SELECT
 						: Colors.SAMPLE_LOOP_SELECT_SELECTED);
 		drawTriangleStrip(loopSelectionRectVbs[1],
-				endLoopMarkerTouched == -1 ? Colors.SAMPLE_LOOP_SELECT
+				endLoopPointerId == -1 ? Colors.SAMPLE_LOOP_SELECT
 						: Colors.SAMPLE_LOOP_SELECT_SELECTED);
-	}
-
-	protected void loadIcons() {
-		previewButton = new BBButton(new BBIconSource(-1, R.drawable.preview_icon,
-				R.drawable.preview_icon_selected));
 	}
 	
 	@Override
-	protected void init() {
+	public void init() {
 		setBackgroundColor(Colors.VIEW_BG);
-		// make preview button square
-		previewButtonWidth = height;
-		waveformWidth = width - previewButtonWidth - SNAP_DIST;
+		waveformWidth = width - SNAP_DIST;
 		initBackgroundOutlineVb();
-		initPreviewButtonSquareVb();
 		update();
 	}
-
-	private void stopPreviewing() {
-		previewPointerId = -1;
-		previewButton.release();
-		TrackManager.currTrack.stopPreviewing();
-	}
-
+	
 	private float sampleToX(float sample) {
-		return (sample - sampleOffset) * waveformWidth / sampleWidth
-				+ previewButtonWidth + SNAP_DIST / 2;
+		return (sample - sampleOffset) * waveformWidth / sampleWidth + SNAP_DIST / 2;
 	}
 
 	private float xToSample(float x) {
-		return (x - previewButtonWidth - SNAP_DIST / 2) * sampleWidth
-				/ waveformWidth + sampleOffset;
+		return (x - SNAP_DIST / 2) * sampleWidth / waveformWidth + sampleOffset;
 	}
 
 	private void updateSampleOffset(float scrollX) {
@@ -168,13 +138,15 @@ public class SampleWaveformView extends TouchableSurfaceView {
 						.getNumSamples() - sampleWidth : newSampleOffset);
 	}
 
-	private void updateZoom(float x1, float x2) {
+	private void updateZoom() {
+		float x1 = zoomLeftPointerX;
+		float x2 = zoomRightPointerX;
 		// set sampleOffset and sampleWidth such that the zoom
 		// anchor samples stay under x1 and x2
 		float newSampleWidth = waveformWidth
 				* (zoomRightAnchorSample - zoomLeftAnchorSample) / (x2 - x1);
 		float newSampleOffset = zoomRightAnchorSample - newSampleWidth
-				* (x2 - previewButtonWidth - SNAP_DIST / 2) / waveformWidth;
+				* (x2 - SNAP_DIST / 2) / waveformWidth;
 		if (newSampleOffset < 0
 				&& newSampleOffset + newSampleWidth > TrackManager.currTrack
 						.getNumSamples() || newSampleWidth < MIN_LOOP_WINDOW) {
@@ -187,16 +159,16 @@ public class SampleWaveformView extends TouchableSurfaceView {
 			sampleWidth = newSampleWidth;
 		} else if (newSampleOffset < 0) {
 			sampleOffset = 0;
-			sampleWidth = zoomRightAnchorSample * waveformWidth
-					/ (x2 - previewButtonWidth);
+			sampleWidth = zoomRightAnchorSample * waveformWidth / x2;
 		} else if (newSampleOffset + newSampleWidth > TrackManager.currTrack
 				.getNumSamples()) {
 			sampleWidth = waveformWidth
 					* (zoomLeftAnchorSample - TrackManager.currTrack
 							.getNumSamples())
-					/ (x1 - previewButtonWidth - waveformWidth);
+					/ (x1 - waveformWidth);
 			sampleOffset = TrackManager.currTrack.getNumSamples() - sampleWidth;
 		}
+		updateVbs();
 	}
 
 	private void updateVbs() {
@@ -207,39 +179,37 @@ public class SampleWaveformView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void drawFrame() {
+	public void draw() {
 		drawLines(backgroundOutlineVb, Colors.WHITE, 4, GL10.GL_LINE_LOOP);
 		drawLoopSelectionHighlightRect();
 		drawWaveform();
 		drawLoopSelectionMarkers();
-		drawTriangleStrip(previewButtonSquareVb, Colors.BG_COLOR);
-		previewButton.draw(0, 0, height, height);
 	}
 
 	private boolean selectLoopMarker(int id, float x) {
 		if (Math.abs(x - sampleToX(TrackManager.currTrack.getLoopBeginSample())) < SNAP_DIST) {
 			// begin loop marker touched
-			beginLoopMarkerTouched = id;
+			beginLoopPointerId = id;
 			return true;
 		} else if (Math.abs(x
 				- sampleToX(TrackManager.currTrack.getLoopEndSample())) < SNAP_DIST) {
 			// end loop marker touched
-			endLoopMarkerTouched = id;
+			endLoopPointerId = id;
 			return true;
 		}
 		return false;
 	}
 
 	private void deselectLoopMarker(int id) {
-		if (beginLoopMarkerTouched == id) {
-			beginLoopMarkerTouched = -1;
-		} else if (endLoopMarkerTouched == id) {
-			endLoopMarkerTouched = -1;
+		if (beginLoopPointerId == id) {
+			beginLoopPointerId = -1;
+		} else if (endLoopPointerId == id) {
+			endLoopPointerId = -1;
 		}
 	}
 
 	private boolean moveLoopMarker(int id, float x) {
-		if (beginLoopMarkerTouched == id) {
+		if (beginLoopPointerId == id) {
 			// update track loop begin
 			float newLoopBegin = xToSample(x);
 			TrackManager.currTrack
@@ -258,7 +228,7 @@ public class SampleWaveformView extends TouchableSurfaceView {
 				sampleWidth = TrackManager.currTrack.getLoopBeginSample()
 						- sampleOffset;
 			}
-		} else if (endLoopMarkerTouched == id) {
+		} else if (endLoopPointerId == id) {
 			// update track loop end
 			float newLoopEnd = xToSample(x);
 			TrackManager.currTrack
@@ -282,134 +252,90 @@ public class SampleWaveformView extends TouchableSurfaceView {
 		} else {
 			return false;
 		}
+		updateVbs();
 		return true;
 	}
 
-	private boolean setZoomAnchor(float x) {
-		if (scrollAnchorSample != -1) {
+	private boolean setZoomAnchor(int id, float x) {
+		if (scrollPointerId != -1) {
 			// one pointer is already scrolling.
-			zoomLeftAnchorSample = Math.min(scrollAnchorSample, xToSample(x));
-			zoomRightAnchorSample = Math.max(scrollAnchorSample, xToSample(x));
-			scrollAnchorSample = -1; // not scrolling anymore
+			
+			zoomLeftPointerX = Math.min(pointerIdToPos.get(scrollPointerId).x, x);
+			zoomRightPointerX = Math.max(pointerIdToPos.get(scrollPointerId).x, x);
+			zoomLeftAnchorSample = xToSample(zoomLeftPointerX);
+			zoomRightAnchorSample = xToSample(zoomRightPointerX);
+			zoomLeftPointerId = zoomRightAnchorSample == scrollAnchorSample ? id : scrollPointerId;
+			zoomRightPointerId = zoomLeftPointerId == scrollPointerId ? id : scrollPointerId;
+			scrollPointerId = -1; // not scrolling anymore
 			return true;
 		}
 		return false;
 	}
 
-	private void setScrollAnchor(float x) {
+	private void setScrollAnchor(int id, float x) {
+		scrollPointerId = id;
 		scrollAnchorSample = xToSample(x);
 	}
 
-	private boolean scroll(float scrollX) {
-		if (scrollAnchorSample == -1)
-			return false; // not scrolling
+	private void scroll(float scrollX) {
+		if (scrollPointerId == -1)
+			return; // not scrolling
 		updateSampleOffset(scrollX);
-		return true;
-	}
-
-	private boolean zoom(float x1, float x2) {
-		if (zoomLeftAnchorSample == -1 || zoomRightAnchorSample == -1)
-			return false; // not zooming
-		float leftX = Math.min(x1, x2);
-		float rightX = Math.max(x1, x2);
-		updateZoom(leftX, rightX);
-		return true;
-	}
-
-	private void handleWaveActionDown(int id, float x, float y) {
-		if (!selectLoopMarker(id, x)) {
-			// loop marker not close enough to select. start scroll
-			// (we know it's the first pointer down, so we're not zooming)
-			setScrollAnchor(x);
-		}
-	}
-
-	private void handleWaveActionPointerDown(int id, float x, float y) {
-		if (!selectLoopMarker(id, x) && !setZoomAnchor(x)) {
-			// loop marker not close enough to select, and first pointer down.
-			// start scrolling
-			setScrollAnchor(x);
-		}
-	}
-
-	private void handleWaveActionPointerUp(MotionEvent e, int id) {
-		deselectLoopMarker(id);
-		scrollAnchorSample = -1;
-		// stop zooming
-		if (zoomLeftAnchorSample != -1 && zoomRightAnchorSample != -1) {
-			int otherId = (id + 1) % 2;
-			if (otherId != previewPointerId)
-				setScrollAnchor(e.getX(otherId));
-		}
-		zoomLeftAnchorSample = zoomRightAnchorSample = -1;
-	}
-
-	public void handlePreviewActionDown(int id) {
-		TrackManager.currTrack.preview();
-		previewButton.touch();
-		previewPointerId = id;
-		requestRender();
-	}
-
-	public void handlePreviewActionPointerDown(int id) {
-		handlePreviewActionDown(id);
-	}
-
-	@Override
-	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
-		if (x > previewButtonWidth)
-			handleWaveActionDown(id, x, y);
-		else
-			handlePreviewActionDown(id);
-	}
-
-	@Override
-	protected void handleActionPointerDown(MotionEvent e, int id, float x,
-			float y) {
-		if (x > previewButtonWidth)
-			handleWaveActionPointerDown(id, x, y);
-		else
-			handlePreviewActionPointerDown(id);
-	}
-
-	int count = 0;
-	
-	@Override
-	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
-		if (zoomLeftAnchorSample != -1 && zoomRightAnchorSample != -1
-				&& previewPointerId == -1)
-			zoom(e.getX(0), e.getX(1)); // zoom always with pointers 1 & 2
-		for (int i = 0; i < e.getPointerCount(); i++) {
-			id = e.getPointerId(i);
-			if (id == previewPointerId) {
-				if (e.getX(i) > previewButtonWidth) {
-					// if a click goes down on the preview button,
-					// then moves out of it into wave, stop previewing
-					stopPreviewing();
-				}
-			} else if (!moveLoopMarker(id, e.getX(i))) {
-				scroll(e.getX(i));
-			}
-		}
 		updateVbs();
 	}
 
 	@Override
-	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
-		if (x > previewButtonWidth) {
-			handleWaveActionPointerUp(e, id);
-		} else {
-			previewButton.release();
-			TrackManager.currTrack.stopPreviewing();
+	protected void handleActionDown(int id, float x, float y) {
+		if (!selectLoopMarker(id, x)) {
+			// loop marker not close enough to select. start scroll
+			// (we know it's the first pointer down, so we're not zooming)
+			setScrollAnchor(id, x);
 		}
 	}
 
 	@Override
-	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
-		previewButton.release();
-		beginLoopMarkerTouched = endLoopMarkerTouched = -1;
-		TrackManager.currTrack.stopPreviewing();
+	protected void handleActionUp(int id, float x, float y) {
+		scrollPointerId = beginLoopPointerId = endLoopPointerId = zoomLeftPointerId = zoomRightPointerId = -1;
 		scrollAnchorSample = zoomLeftAnchorSample = zoomRightAnchorSample = -1;
 		requestRender();
+	}
+
+	@Override
+	protected void handleActionPointerDown(int id, float x, float y) {
+		if (!selectLoopMarker(id, x) && !setZoomAnchor(id, x)) {
+			// loop marker not close enough to select, and first pointer down.
+			// start scrolling
+			setScrollAnchor(id, x);
+		}
+	}
+
+	@Override
+	protected void handleActionPointerUp(int id, float x, float y) {
+		deselectLoopMarker(id);
+		// stop zooming
+		if (id == zoomLeftPointerId) {
+			setScrollAnchor(zoomRightPointerId, zoomRightPointerX);
+		} else if (id == zoomRightPointerId) {
+			setScrollAnchor(zoomLeftPointerId, zoomLeftPointerX);
+		}
+		zoomLeftPointerId = zoomRightPointerId = -1;
+		zoomLeftAnchorSample = zoomRightAnchorSample = -1;
+	}
+
+	@Override
+	protected void handleActionMove(int id, float x, float y) {
+		if (id == zoomLeftPointerId) {
+			zoomLeftPointerX = x;
+		} else if (id == zoomRightPointerId) {
+			zoomRightPointerX = x;
+			updateZoom(); // only zoom once both actions have been handled
+		} else if (!moveLoopMarker(id, x)) {
+			scroll(x);
+		}
+	}
+
+	@Override
+	public void loadIcons() {
+		//no icons
 	}
 }
