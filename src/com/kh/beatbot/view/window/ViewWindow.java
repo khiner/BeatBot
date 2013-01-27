@@ -1,6 +1,8 @@
 package com.kh.beatbot.view.window;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -22,6 +24,8 @@ public abstract class ViewWindow {
 		}
 	}
 
+	protected List<ViewWindow> children = new ArrayList<ViewWindow>();
+	
 	protected GLSurfaceViewBase parent = null;
 	protected GL10 gl = null;
 	public float x = 0, y = 0;
@@ -29,19 +33,52 @@ public abstract class ViewWindow {
 
 	public ViewWindow(GLSurfaceViewBase parent) {
 		this.parent = parent;
+		createChildren();
 	}
 
+	public void addChild(ViewWindow child) {
+		children.add(child);
+	}
+	
 	public boolean containsPoint(float x, float y) {
 		return x > this.x && x < this.x + width && y > this.y
 				&& y < this.y + height;
 	}
 
-	public abstract void loadIcons();
-
+	protected abstract void loadIcons();
+	
 	public abstract void init();
 
 	public abstract void draw();
+	
+	public void initAll() {
+		init();
+		for (ViewWindow child : children) {
+			child.init();
+		}
+	}
+	
+	public void drawAll() {
+		draw();
+		for (ViewWindow child : children) {
+			push();
+			translate(child.x, child.y);
+			child.drawAll();
+			pop();
+		}
+	}
 
+	protected abstract void createChildren();
+
+	protected abstract void layoutChildren();
+	
+	public void loadAllIcons() {
+		loadIcons();
+		for (ViewWindow child : children) {
+			child.loadAllIcons();
+		}
+	}
+	
 	protected void requestRender() {
 		parent.requestRender();
 	}
@@ -52,8 +89,18 @@ public abstract class ViewWindow {
 		this.y = y;
 		this.width = width;
 		this.height = height;
+		layoutChildren();
 	}
 
+	protected ViewWindow findChildAt(float x, float y) {
+		for (ViewWindow child : children) {
+			if (child.containsPoint(x, y)) {
+				return child;
+			}
+		}
+		return null;
+	}
+	
 	protected static final FloatBuffer makeFloatBuffer(float[] arr) {
 		return GLSurfaceViewBase.makeFloatBuffer(arr);
 	}

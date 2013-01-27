@@ -7,11 +7,13 @@ import android.widget.ToggleButton;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.view.group.GLSurfaceViewGroup;
 import com.kh.beatbot.view.group.SampleEditGroup;
 
 public class SampleEditPage extends Page {
 	
-	private SampleEditGroup sampleWaveformView;
+	private GLSurfaceViewGroup sampleEditView;
+	private SampleEditGroup sampleEditGroup;
 	private ToggleButton loopButton;
 	private ToggleButton reverseButton;
 	
@@ -20,7 +22,9 @@ public class SampleEditPage extends Page {
 	}
 
 	public void init() {
-		sampleWaveformView = (SampleEditGroup) findViewById(R.id.sample_waveform_view);
+		sampleEditView = (GLSurfaceViewGroup) findViewById(R.id.sample_waveform_view);
+		sampleEditGroup = new SampleEditGroup(sampleEditView);
+		sampleEditView.setBBRenderer(sampleEditGroup);
 		loopButton = (ToggleButton) findViewById(R.id.loop);
 		reverseButton = (ToggleButton) findViewById(R.id.reverse);
 		loopButton.setOnClickListener(new View.OnClickListener() {
@@ -37,13 +41,13 @@ public class SampleEditPage extends Page {
 	
 	@Override
 	public void update() {
-		sampleWaveformView.update();
+		sampleEditGroup.update();
 		loopButton.setChecked(TrackManager.currTrack.isLooping());
 		reverseButton.setChecked(TrackManager.currTrack.isReverse());
 	}
 
 	@Override
 	public void setVisibilityCode(int code) {
-		sampleWaveformView.setVisibility(code);
+		//sampleWaveformView.setVisibility(code);
 	}
 }

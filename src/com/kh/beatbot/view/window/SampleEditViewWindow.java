@@ -335,7 +335,17 @@ public class SampleEditViewWindow extends TouchableViewWindow {
 	}
 
 	@Override
-	public void loadIcons() {
-		//no icons
+	protected void loadIcons() {
+		// no icons
+	}
+
+	@Override
+	protected void createChildren() {
+		// no children
+	}
+
+	@Override
+	protected void layoutChildren() {
+		// no children to layout
 	}
 }

@@ -40,12 +40,7 @@ public class BBButton extends TouchableViewWindow {
 	public boolean isTouched() {
 		return currentIcon.equals(selectedIcon);
 	}
-
-	@Override
-	public void loadIcons() {
-		//nothing to do
-	}
-
+	
 	@Override
 	public void init() {
 		//nothing to do
@@ -81,5 +76,20 @@ public class BBButton extends TouchableViewWindow {
 		if (x < 0 || x > width || y < 0 || y > height) {
 			release();
 		}
+	}
+
+	@Override
+	protected void loadIcons() {
+		// TODO add icons eventually
+	}
+
+	@Override
+	protected void createChildren() {
+		// no children
+	}
+
+	@Override
+	protected void layoutChildren() {
+		// no children
 	}
 }
