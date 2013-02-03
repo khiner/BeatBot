@@ -10,12 +10,13 @@ import android.widget.TextView;
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.Managers;
-import com.kh.beatbot.manager.PageManager;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.view.group.PageFlipper;
 
 public class MainPageSelect extends PageSelect {
 	private TextView sampleSelect;
 	private ImageView instrumentSelect;
+	private boolean initialized = false;
 	
 	public MainPageSelect(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -38,15 +39,18 @@ public class MainPageSelect extends PageSelect {
 				Managers.directoryManager.showSampleSelectAlert();
 			}
 		});
+		initialized = true;
 	}
 	
 	public void update() {
+		if (!initialized)
+			return;
 		updateInstrumentIcon();
 		updateSampleText();
 	}
 	
 	public void selectPage(final int pageNum) {
-		PageManager.selectPage(pageNum);
+		((PageFlipper)GlobalVars.mainActivity.findViewById(R.id.mainFlipper)).setPage(pageNum);
 	}
 	
 	private void updateInstrumentIcon() {

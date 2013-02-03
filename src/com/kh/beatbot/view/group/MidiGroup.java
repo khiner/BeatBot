@@ -1,0 +1,54 @@
+package com.kh.beatbot.view.group;
+
+import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.view.MidiView;
+import com.kh.beatbot.view.TouchableSurfaceView;
+import com.kh.beatbot.view.helper.MidiTrackControlHelper;
+import com.kh.beatbot.view.window.TouchableViewWindow;
+
+public class MidiGroup extends TouchableViewWindow {
+
+	public MidiView midiView;
+	public MidiTrackControlHelper midiTrackControl;
+	
+	public MidiGroup(TouchableSurfaceView parent) {
+		super(parent);
+	}
+
+	public void trackAdded(int newTrackNum) {
+		midiTrackControl.trackAdded(newTrackNum);
+		midiView.trackAdded(newTrackNum);
+	}
+	
+	@Override
+	protected void loadIcons() {
+		// parent view - no icons to load
+	}
+
+	@Override
+	public void init() {
+		
+	}
+
+	public void draw() {
+		
+	}
+
+	@Override
+	protected void createChildren() {
+		midiView = new MidiView((TouchableSurfaceView)parent);
+		midiTrackControl = new MidiTrackControlHelper((TouchableSurfaceView)parent);
+		addChild(midiView);
+		addChild(midiTrackControl);
+	}
+
+	@Override
+	protected void layoutChildren() {
+		int numTracks = Managers.trackManager.getNumTracks();
+		MidiView.allTracksHeight = height - MidiView.Y_OFFSET;
+		MidiView.trackHeight = MidiView.allTracksHeight / numTracks;
+		float w = MidiView.trackHeight * 2.5f;
+		midiTrackControl.layout(this, 0, 0, w, height);
+		midiView.layout(this, w, 0, width - w, height);
+	}
+}

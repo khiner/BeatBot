@@ -2,15 +2,13 @@ package com.kh.beatbot.listenable;
 
 import java.util.ArrayList;
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.TouchableSurfaceView;
+import com.kh.beatbot.view.window.TouchableViewWindow;
 
-public abstract class LevelListenable extends TouchableSurfaceView {
+public abstract class LevelListenable extends TouchableViewWindow {
+
 	protected ArrayList<LevelListener> levelListeners = new ArrayList<LevelListener>();
 	protected float level = .5f;
 	protected float[] levelColor = Colors.VOLUME.clone();
@@ -19,14 +17,10 @@ public abstract class LevelListenable extends TouchableSurfaceView {
 
 	protected boolean selected = false;
 
-	public LevelListenable(Context c) {
-		super(c);
+	public LevelListenable(TouchableSurfaceView parent) {
+		super(parent);
 	}
 	
-	public LevelListenable(Context c, AttributeSet as) {
-		super(c, as);
-	}
-
 	public void addLevelListener(LevelListener levelListener) {
 		levelListeners.add(levelListener);
 	}
@@ -36,7 +30,7 @@ public abstract class LevelListenable extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void init() {
+	public void init() {
 		for (LevelListener levelListener : levelListeners) {
 			levelListener.notifyInit(this);
 		}
@@ -53,9 +47,8 @@ public abstract class LevelListenable extends TouchableSurfaceView {
 	/* level should be from 0 to 1 */
 	public void setLevel(float level) {
 		setViewLevel(level);
-		if (isEnabled()) // only notify listeners if enabled
-			for (LevelListener levelListener : levelListeners)
-				levelListener.setLevel(this, level);
+		for (LevelListener levelListener : levelListeners)
+			levelListener.setLevel(this, level);
 	}
 
 	public void setLevelColor(float[] newLevelColor) {
@@ -65,25 +58,14 @@ public abstract class LevelListenable extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
+	protected void handleActionDown(int id, float x, float y) {
 		for (LevelListener levelListener : levelListeners)
 			levelListener.notifyPressed(this, true);
 		selected = true;
 	}
 
 	@Override
-	protected void handleActionPointerDown(MotionEvent e, int id, float x,
-			float y) {
-		// no multitouch for this seekbar
-	}
-
-	@Override
-	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
-		// no multitouch for this seekbar
-	}
-
-	@Override
-	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
+	protected void handleActionUp(int id, float x, float y) {
 		for (LevelListener levelListener : levelListeners)
 			levelListener.notifyPressed(this, false);
 		selected = false;

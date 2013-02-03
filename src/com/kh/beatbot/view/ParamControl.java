@@ -2,10 +2,7 @@ package com.kh.beatbot.view;
 
 import java.nio.FloatBuffer;
 
-import android.content.Context;
-import android.util.AttributeSet;
 import android.util.FloatMath;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 import com.kh.beatbot.R;
@@ -14,7 +11,6 @@ import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listenable.LevelListenable;
-import com.kh.beatbot.listener.LevelListener;
 
 public class ParamControl extends LevelListenable {
 	public static final float ¹ = (float) Math.PI;
@@ -39,13 +35,13 @@ public class ParamControl extends LevelListenable {
 	
 	private String label = "", valueLabel = "";
 	
-	public ParamControl(Context c, Param param){
-		super(c);
-		this.param = param;
+	public ParamControl(TouchableSurfaceView parent) {
+		super(parent);
 	}
 	
-	public ParamControl(Context c, AttributeSet as) {
-		super(c, as);
+	public ParamControl(TouchableSurfaceView parent, Param param) {
+		super(parent);
+		this.param = param;
 	}
 	
 	public void setClickable(boolean clickable) {
@@ -60,9 +56,9 @@ public class ParamControl extends LevelListenable {
 	@Override
 	public void init() {
 		super.init();
-		centerButton = new BBToggleButton(this);
+		centerButton = new BBToggleButton((TouchableSurfaceView)parent);
 		centerButton.setIconSource(centerButtonIcon);
-		centerButton.layout(gl, 0, 0, width, height);
+		centerButton.layout(this, 0, 0, width, height);
 		if (clickable) {
 			centerButton.setOn(true);
 		}
@@ -81,17 +77,17 @@ public class ParamControl extends LevelListenable {
 	
 	private void setLabel(String label) {
 		this.label = label;
-		labelWidth = glText.getTextWidth(label, width / 6);
+		labelWidth = GLSurfaceViewBase.getTextWidth(label, width / 6);
 		labelOffset = width / 2 - labelWidth / 2;
-		glText.storeText(label);
+		GLSurfaceViewBase.storeText(label);
 		requestRender();
 	}
 	
 	private void setValueLabel(String valueLabel) {
 		this.valueLabel = valueLabel;
-		valueLabelWidth = glText.getTextWidth(valueLabel, width / 6);
+		valueLabelWidth = GLSurfaceViewBase.getTextWidth(valueLabel, width / 6);
 		valueLabelOffset = width / 2 - valueLabelWidth / 2;
-		glText.storeText(valueLabel);
+		GLSurfaceViewBase.storeText(valueLabel);
 		requestRender();
 	}
 	
@@ -142,7 +138,7 @@ public class ParamControl extends LevelListenable {
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
-		super.surfaceChanged(holder, format, width, height);
+		parent.surfaceChanged(holder, format, width, height);
 		snapDistSquared = (width / 4) * (width / 4);
 		// all knobs share the same circle VBs, and they should only change when
 		// width or height changes
@@ -154,11 +150,11 @@ public class ParamControl extends LevelListenable {
 	}
 
 	@Override
-	protected void draw() {
+	public void draw() {
 		setColor(Colors.VOLUME);
 		// draw text
-		glText.draw(label, width / 6, labelOffset, 0);
-		glText.draw(valueLabel, width / 6, valueLabelOffset, 1.1f * width);
+		GLSurfaceViewBase.drawText(this, label, (int)(width / 6), labelOffset, 0);
+		GLSurfaceViewBase.drawText(this, valueLabel, (int)(width / 6), valueLabelOffset, 1.1f * width);
 		
 		translate(0, .2f * width);
 		// level background
@@ -205,37 +201,39 @@ public class ParamControl extends LevelListenable {
 	}
 
 	@Override
-	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
+	protected void handleActionDown(int id, float x, float y) {
 		if (distanceFromCenterSquared(x, y) > snapDistSquared) {
 			levelSelected = true;
 			setLevel(coordToLevel(x, y));
 		} else if (centerButton != null) {
-			centerButton.touch();
+			// TODO need to make this a ViewWindow, and render both views on same square 
+			// centerButton.touch();
 		}
-		super.handleActionDown(e, id, x, y);
+		super.handleActionDown(id, x, y);
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
-		if (!levelSelected)
+	protected void handleActionMove(int id, float x, float y) {
+		if (!levelSelected || id != 0)
 			return;
 		float newLevel = coordToLevel(x, y);
 		setLevel(newLevel);
 	}
 
 	@Override
-	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
+	protected void handleActionUp(int id, float x, float y) {
 		levelSelected = false;
-		if (centerButton != null) {
-			if (distanceFromCenterSquared(x, y) <= snapDistSquared) {
-				centerButton.toggle();
-				for (LevelListener listener : levelListeners) {
-					listener.notifyClicked(this);
-				}
-			}
-			centerButton.release();
-		}
-		super.handleActionUp(e, id, x, y);
+		// TODO
+//		if (centerButton != null) {
+//			if (distanceFromCenterSquared(x, y) <= snapDistSquared) {
+//				centerButton.toggle();
+//				for (LevelListener listener : levelListeners) {
+//					listener.notifyClicked(this);
+//				}
+//			}
+//			centerButton.release();
+//		}
+		super.handleActionUp(id, x, y);
 	}
 
 	public boolean isClickable() {
@@ -254,5 +252,15 @@ public class ParamControl extends LevelListenable {
 		// convert to level - remember, min theta is ¹/4, max is 7¹/8
 		float level = (4 * theta / ¹ - 1) / 6;
 		return level > 0 ? (level < 1 ? level : 1) : 0;
+	}
+
+	@Override
+	protected void createChildren() {
+		// leaf child
+	}
+
+	@Override
+	protected void layoutChildren() {
+		// leaf child
 	}
 }

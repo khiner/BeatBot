@@ -1,48 +1,33 @@
 package com.kh.beatbot.layout.page;
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.ToggleButton;
-
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.ADSR;
+import com.kh.beatbot.global.BBButton;
+import com.kh.beatbot.global.BBIconSource;
+import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.listenable.LevelListenable;
+import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.AdsrView;
 import com.kh.beatbot.view.BBSeekbar;
 import com.kh.beatbot.view.BBTextView;
+import com.kh.beatbot.view.TouchableSurfaceView;
+import com.kh.beatbot.view.window.ViewWindow;
 
-public class AdsrPage extends Page implements OnClickListener, LevelListener {
+public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
+
+	private BBToggleButton[] adsrButtons;
+	private AdsrView adsrView;
+	private BBSeekbar levelBar;
+	private BBTextView valueLabel, paramLabel;
 	
-	private ToggleButton[] adsrButtons = new ToggleButton[6];
-	private AdsrView adsrView = null;
-	private BBSeekbar levelBar = null;
-	private BBTextView valueLabel = null, paramLabel = null;
-	
-	public AdsrPage(Context context, AttributeSet attrs) {
-		super(context, attrs);
+	public AdsrPage(TouchableSurfaceView parent) {
+		super(parent);
 	}
-
+	
 	@Override
 	public void init() {
-		adsrView = (AdsrView)findViewById(R.id.adsrView);
-		levelBar = (BBSeekbar)findViewById(R.id.adsrBar);
-		levelBar.addLevelListener(this);
-		paramLabel = (BBTextView)findViewById(R.id.paramLabel);
-		valueLabel = (BBTextView)findViewById(R.id.valueLabel);
-		adsrButtons[ADSR.ATTACK_ID] = (ToggleButton)findViewById(R.id.attackButton);
-		adsrButtons[ADSR.DECAY_ID] = (ToggleButton)findViewById(R.id.decayButton);
-		adsrButtons[ADSR.SUSTAIN_ID] = (ToggleButton)findViewById(R.id.sustainButton);
-		adsrButtons[ADSR.RELEASE_ID] = (ToggleButton)findViewById(R.id.releaseButton);
-		adsrButtons[ADSR.START_ID] = (ToggleButton)findViewById(R.id.startButton);
-		adsrButtons[ADSR.PEAK_ID] = (ToggleButton)findViewById(R.id.peakButton);
-		for (int i = 0; i < adsrButtons.length; i++) {
-			adsrButtons[i].setTag(i);
-			adsrButtons[i].setOnClickListener(this);
-		}
 		updateLabels();
 	}
 
@@ -53,19 +38,11 @@ public class AdsrPage extends Page implements OnClickListener, LevelListener {
 		updateLabels();
 	}
 	
-	@Override
-	public void setVisibilityCode(int code) {
-		adsrView.setVisibility(code);
-		levelBar.setVisibility(code);
-		valueLabel.setVisibility(code);
-		paramLabel.setVisibility(code);
-	}
-
-	private void check(ToggleButton btn) {
-		btn.setChecked(true);
-		for (ToggleButton otherBtn : adsrButtons) {
+	private void check(BBToggleButton btn) {
+		btn.setOn(true);
+		for (BBToggleButton otherBtn : adsrButtons) {
 			if (otherBtn != btn) {
-				otherBtn.setChecked(false);
+				otherBtn.setOn(false);
 			}
 		}
 	}
@@ -89,9 +66,9 @@ public class AdsrPage extends Page implements OnClickListener, LevelListener {
 	}
 	
 	@Override
-	public void onClick(View v) {
-		check((ToggleButton)v);
-		int paramId = (Integer)v.getTag();
+	public void onClick(BBButton button) {
+		check((BBToggleButton)button);
+		int paramId = button.getId();
 		// set the current parameter so we know what to do with SeekBar events.
 		TrackManager.currTrack.adsr.setCurrParam(paramId);
 		updateLabels();
@@ -136,40 +113,73 @@ public class AdsrPage extends Page implements OnClickListener, LevelListener {
 	 * |  VIEW         | VAL |=========<>--------- |
 	 * |_______________|_____|_____________________|
 	 */
-	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		super.onLayout(changed, l, t, r, b);
-		int width = (r - l);
-		int height = (b - t);
-		int thirdHeight = height / 3;
-		int pos = width - thirdHeight * 6;
-		adsrView.layout(0, 0, pos, height);
-		int labelWidth = 6 * thirdHeight / 2;
-		paramLabel.layout(pos, thirdHeight, pos + labelWidth, 2 * thirdHeight);
-		valueLabel.layout(pos + labelWidth, thirdHeight, width, 2 * thirdHeight);
-		levelBar.layout(pos, 2 * thirdHeight, width, height);
-		pos = width - thirdHeight * 5;
-		for (int i = 0; i < 4; i++) {
-			adsrButtons[i].layout(pos, 0, pos + thirdHeight, thirdHeight);
-			pos += thirdHeight;
+
+	@Override
+	protected void loadIcons() {
+		adsrButtons[0].setIconSource(new BBIconSource(-1, R.drawable.attack_icon, R.drawable.attack_icon_selected));
+		adsrButtons[1].setIconSource(new BBIconSource(-1, R.drawable.decay_icon, R.drawable.decay_icon_selected));
+		adsrButtons[2].setIconSource(new BBIconSource(-1, R.drawable.sustain_icon, R.drawable.sustain_icon_selected));
+		adsrButtons[3].setIconSource(new BBIconSource(-1, R.drawable.release_icon, R.drawable.release_icon_selected));
+		adsrButtons[4].setIconSource(new BBIconSource(-1, R.drawable.start_icon, R.drawable.start_icon_selected));
+		adsrButtons[5].setIconSource(new BBIconSource(-1, R.drawable.peak_icon, R.drawable.peak_icon_selected));
+	}
+
+	@Override
+	public void draw() {
+		// parent view, no drawing of its own
+	}
+
+	@Override
+	protected void createChildren() {
+		adsrView = new AdsrView((TouchableSurfaceView)parent);
+		levelBar = new BBSeekbar((TouchableSurfaceView)parent);
+		levelBar.addLevelListener(this);
+		paramLabel = new BBTextView((TouchableSurfaceView)parent);
+		valueLabel = new BBTextView((TouchableSurfaceView)parent);
+		adsrButtons = new BBToggleButton[6];
+		adsrButtons[ADSR.ATTACK_ID] = new BBToggleButton((TouchableSurfaceView)parent);
+		adsrButtons[ADSR.DECAY_ID] = new BBToggleButton((TouchableSurfaceView)parent);
+		adsrButtons[ADSR.SUSTAIN_ID] = new BBToggleButton((TouchableSurfaceView)parent);
+		adsrButtons[ADSR.RELEASE_ID] = new BBToggleButton((TouchableSurfaceView)parent);
+		adsrButtons[ADSR.START_ID] = new BBToggleButton((TouchableSurfaceView)parent);
+		adsrButtons[ADSR.PEAK_ID] = new BBToggleButton((TouchableSurfaceView)parent);
+		for (int i = 0; i < adsrButtons.length; i++) {
+			adsrButtons[i].setId(i);
+			adsrButtons[i].setOnClickListener(this);
 		}
-		adsrButtons[4].layout(pos, thirdHeight / 2, width, thirdHeight);
-		adsrButtons[5].layout(pos, 0, width, thirdHeight / 2);
+		addChild(adsrView);
+		addChild(levelBar);
+		addChild(paramLabel);
+		addChild(valueLabel);
+		for (BBToggleButton adsrButton : adsrButtons)
+			addChild(adsrButton);
+	}
+
+	public void drawAll() {
+		draw();
+		for (ViewWindow child : children) {
+			push();
+			translate(child.x, child.y);
+	 		child.drawAll();
+			pop();
+		}
 	}
 	
-	protected void onMeasure(int w, int h) {
-		super.onMeasure(w, h);
-		int width = MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY);
-		int height = MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY);
-		int thirdHeight = height / 3;
-		adsrView.measure(width - thirdHeight * 6, height);
-		paramLabel.measure(6 * thirdHeight / 2, thirdHeight);
-		valueLabel.measure(6 * thirdHeight / 2, thirdHeight);
-		levelBar.measure(6 * thirdHeight, thirdHeight);
+	@Override
+	protected void layoutChildren() {
+		float thirdHeight = height / 3;
+		float pos = width - thirdHeight * 6;
+		float labelWidth = 6 * thirdHeight / 2;
+		adsrView.layout(this, 0, 0, pos, height);
+		paramLabel.layout(this, pos, thirdHeight, labelWidth, thirdHeight);
+		valueLabel.layout(this, pos + labelWidth, thirdHeight, labelWidth, thirdHeight);
+		levelBar.layout(this, pos, 2 * thirdHeight, 6 * thirdHeight, thirdHeight);
+		pos = width - thirdHeight * 5;
 		for (int i = 0; i < 4; i++) {
-			adsrButtons[i].measure(thirdHeight, thirdHeight);
+			adsrButtons[i].layout(this, pos, 0, thirdHeight, thirdHeight);
+			pos += thirdHeight;
 		}
-		for (int i = 4; i < 6; i++) {
-			adsrButtons[i].measure(thirdHeight, thirdHeight / 2);
-		}
+		adsrButtons[4].layout(this, pos, thirdHeight / 2, thirdHeight, thirdHeight / 2);
+		adsrButtons[5].layout(this, pos, 0, thirdHeight, thirdHeight / 2);
 	}
 }

@@ -5,18 +5,16 @@ import java.util.ArrayList;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.Track;
-import com.kh.beatbot.manager.PageManager;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.view.group.PageFlipper;
+import com.kh.beatbot.view.window.TouchableViewWindow;
 
-public class AdsrView extends TouchableSurfaceView {
+public class AdsrView extends TouchableViewWindow {
+
 	private static final int SNAP_DIST_SQUARED = 1024;
 	private static float[] pointVertices = new float[10];
 	private static FloatBuffer adsrPointVb = null;
@@ -26,18 +24,18 @@ public class AdsrView extends TouchableSurfaceView {
 	// init to -1 to indicate no pointer is selecting
 	private int[] adsrSelected = new int[] { -1, -1, -1, -1, -1 };
 
-	public AdsrView(Context c, AttributeSet as) {
-		super(c, as);
+	public AdsrView(TouchableSurfaceView parent) {
+		super(parent);
 	}
-
+	
 	public void update() {
-		if (initialized)
-			initAdsrVb();
+		initAdsrVb();
 	}
 
 	private void initAdsrVb() {
+		if (viewRect == null)
+			return;
 		Track track = TrackManager.currTrack;
-		// TODO something like this
 		float attackX = getAttackX(track.adsr);
 		float decayX = getDecayX(track.adsr);
 		pointVertices[0] = viewRect.viewX(0);
@@ -171,8 +169,8 @@ public class AdsrView extends TouchableSurfaceView {
 					break;
 				}
 				initAdsrVb();
-				PageManager.getAdsrPage().updateLevelBar();
-				PageManager.getAdsrPage().updateLabels();
+				PageFlipper.getAdsrPage().updateLevelBar();
+				PageFlipper.getAdsrPage().updateLabels();
 				return;
 			}
 		}
@@ -192,12 +190,12 @@ public class AdsrView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void init() {
+	public void init() {
 		viewRect = new ViewRect(width, height, 0.12f, 6);
 		initAdsrVb();
 		ADSR adsr = TrackManager.currTrack.adsr;
 		for (int i = 0; i < adsr.getNumParams(); i++) {
-			glText.storeText(adsr.getParam(i).name);
+			GLSurfaceViewBase.storeText(adsr.getParam(i).name);
 		}
 	}
 
@@ -207,39 +205,44 @@ public class AdsrView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void draw() {
+	public void draw() {
 		viewRect.drawRoundedBg();
 		viewRect.drawRoundedBgOutline();
 		drawAdsr();
 	}
 
 	@Override
-	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
+	protected void handleActionDown(int id, float x, float y) {
 		selectAdsrPoint(id, viewRect.clipX(x), viewRect.clipY(y));
 	}
 
 	@Override
-	protected void handleActionPointerDown(MotionEvent e, int id, float x,
-			float y) {
+	protected void handleActionPointerDown(int id, float x, float y) {
 		selectAdsrPoint(id, viewRect.clipX(x), viewRect.clipY(y));
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
-		for (int i = 0; i < e.getPointerCount(); i++) {
-			id = e.getPointerId(i);
-			moveAdsrPoint(id, viewRect.clipX(e.getX(i)),
-					viewRect.clipY(e.getY(i)));
-		}
+	protected void handleActionMove(int id, float x, float y) {
+		moveAdsrPoint(id, viewRect.clipX(x), viewRect.clipY(y));
 	}
 
 	@Override
-	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
+	protected void handleActionPointerUp(int id, float x, float y) {
 		deselectAdsrPoint(id);
 	}
 
 	@Override
-	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
+	protected void handleActionUp(int id, float x, float y) {
 		clearAdsrSelected();
+	}
+
+	@Override
+	protected void createChildren() {
+		// leaf child
+	}
+
+	@Override
+	protected void layoutChildren() {
+		// leaf child
 	}
 }

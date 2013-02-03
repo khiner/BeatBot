@@ -1,49 +1,31 @@
 package com.kh.beatbot.layout.page;
 
-import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.util.AttributeSet;
-import android.view.View;
-import android.widget.ToggleButton;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.BBButton;
+import com.kh.beatbot.global.BBIconSource;
+import com.kh.beatbot.global.BBToggleButton;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
+import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.view.LevelsView;
-import com.kh.beatbot.view.MidiView;
+import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class NoteLevelsPage extends Page {
-	private LevelsView levelsView;
-	private ToggleButton volumeToggle, panToggle, pitchToggle;
-	
-	public NoteLevelsPage(Context context, AttributeSet attrs) {
-		super(context, attrs);
-	}
 
+	private LevelsView levelsView;
+	private BBToggleButton volumeToggle, panToggle, pitchToggle;
+
+	
+	public NoteLevelsPage(TouchableSurfaceView parent) {
+		super(parent);
+	}
+	
 	@Override
 	public void init() {
-		levelsView = (LevelsView)findViewById(R.id.levelsView);
-		levelsView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-		volumeToggle = (ToggleButton) findViewById(R.id.trackVolumeToggle);
-		panToggle = (ToggleButton) findViewById(R.id.trackPanToggle);
-		pitchToggle = (ToggleButton) findViewById(R.id.trackPitchToggle);
-		volumeToggle.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View arg0) {
-				levelsView.setLevelType(LevelType.VOLUME);
-				update();
-			}
-		});
-		panToggle.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View arg0) {
-				levelsView.setLevelType(LevelType.PAN);
-				update();
-			}
-		});
-		pitchToggle.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View arg0) {
-				levelsView.setLevelType(LevelType.PITCH);
-				update();
-			}
-		});
+		parent.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+		// TODO remember to turn off continuous mode when leaving
 	}
 
 	@Override
@@ -53,41 +35,75 @@ public class NoteLevelsPage extends Page {
 	}
 
 	private void deselectAll() {
-		volumeToggle.setChecked(false);
-		panToggle.setChecked(false);
-		pitchToggle.setChecked(false);
+		volumeToggle.setOn(false);
+		panToggle.setOn(false);
+		pitchToggle.setOn(false);
 	}
 
 	private void selectActiveLevel() {
 		switch (levelsView.getLevelType()) {
 		case VOLUME:
-			volumeToggle.setChecked(true);
+			volumeToggle.setOn(true);
 			return;
 		case PAN:
-			panToggle.setChecked(true);
+			panToggle.setOn(true);
 			return;
 		case PITCH:
-			pitchToggle.setChecked(true);
+			pitchToggle.setOn(true);
 			return;
 		}
 	}
-	
+
 	@Override
-	public void setVisibilityCode(int code) {
-		levelsView.setVisibility(code);
+	protected void loadIcons() {
+		volumeToggle.setIconSource(new BBIconSource(-1, R.drawable.volume_icon, R.drawable.volume_icon_selected));
+		panToggle.setIconSource(new BBIconSource(-1, R.drawable.pan_icon, R.drawable.pan_icon_selected));
+		pitchToggle.setIconSource(new BBIconSource(-1, R.drawable.pitch_icon, R.drawable.pitch_selected_icon));
 	}
 
-	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		super.onLayout(changed, l, t, r, b);
-		int w = r - l;
-		int h = b - t;
-		levelsView.layout((int)MidiView.X_OFFSET, 0, w, h);
+	@Override
+	public void draw() {
+		// parent - no drawing
+		
 	}
-	
-	protected void onMeasure(int w, int h) {
-		super.onMeasure(w, h);
-		int width = MeasureSpec.makeMeasureSpec(w - (int)MidiView.X_OFFSET, MeasureSpec.EXACTLY);
-		int height = MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY);
-		levelsView.measure(width, height);
+
+	@Override
+	protected void createChildren() {
+		levelsView = new LevelsView((TouchableSurfaceView)parent);
+		volumeToggle = new BBToggleButton((TouchableSurfaceView)parent);
+		panToggle = new BBToggleButton((TouchableSurfaceView)parent);
+		pitchToggle = new BBToggleButton((TouchableSurfaceView)parent);
+		volumeToggle.setOnClickListener(new BBOnClickListener() {
+			public void onClick(BBButton arg0) {
+				levelsView.setLevelType(LevelType.VOLUME);
+				update();
+			}
+		});
+		panToggle.setOnClickListener(new BBOnClickListener() {
+			public void onClick(BBButton arg0) {
+				levelsView.setLevelType(LevelType.PAN);
+				update();
+			}
+		});
+		pitchToggle.setOnClickListener(new BBOnClickListener() {
+			public void onClick(BBButton arg0) {
+				levelsView.setLevelType(LevelType.PITCH);
+				update();
+			}
+		});
+		addChild(levelsView);
+		addChild(volumeToggle);
+		addChild(panToggle);
+		addChild(pitchToggle);
+	}
+
+	@Override
+	protected void layoutChildren() {
+		float toggleHeight = height / 3;
+		float toggleWidth = 2 * toggleHeight;
+		volumeToggle.layout(this, 0, 0, toggleWidth, toggleHeight);
+		panToggle.layout(this, 0, toggleHeight, toggleWidth, toggleHeight);
+		pitchToggle.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
+		levelsView.layout(this, GlobalVars.midiGroup.midiTrackControl.width, 0, width - toggleWidth, height);
 	}
 }

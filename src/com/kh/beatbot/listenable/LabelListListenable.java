@@ -4,17 +4,17 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.BBIcon;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listener.LabelListListener;
-import com.kh.beatbot.view.ClickableSurfaceView;
+import com.kh.beatbot.view.GLSurfaceViewBase;
+import com.kh.beatbot.view.TouchableSurfaceView;
+import com.kh.beatbot.view.window.ClickableViewWindow;
+import com.kh.beatbot.view.window.ViewWindow;
 
-public class LabelListListenable extends ClickableSurfaceView {
+public class LabelListListenable extends ClickableViewWindow {
+
 	private static float addTextWidth;
 
 	static enum LabelState {
@@ -30,8 +30,10 @@ public class LabelListListenable extends ClickableSurfaceView {
 		private FloatBuffer backgroundRectVb = null;
 		private String text = null;
 		private float x, textWidth, labelWidth;
+		private ViewWindow view;
 		
-		Label(String text, boolean on, float x) {
+		Label(ViewWindow view, String text, boolean on, float x) {
+			this.view = view;
 			this.text = text;
 			this.x = x;
 			// empty text indicates empty label
@@ -44,7 +46,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 			this.text = text;
 			if (text.isEmpty())
 				state = LabelState.EMPTY;
-			this.textWidth = glText.getTextWidth(text, height / 2);
+			this.textWidth = GLSurfaceViewBase.getTextWidth(text, height / 2);
 		}
 
 		public void updateSize() {
@@ -68,16 +70,16 @@ public class LabelListListenable extends ClickableSurfaceView {
 			drawTriangleFan(backgroundRectVb, whichColor());
 			gl.glPopMatrix();
 			if (state == LabelState.EMPTY) {
-				plusIcon.draw(x + labelWidth / 2 - addTextWidth / 2, 0, height,
+				plusIcon.draw(absoluteX + x + labelWidth / 2 - addTextWidth / 2, parent.getHeight() - absoluteY - height, height,
 						height);
 				setColor(Colors.WHITE);
 				// draw string in center of rect
-				glText.draw("ADD", height / 2, x + labelWidth / 2 - addTextWidth / 2
+				GLSurfaceViewBase.drawText(view, "ADD", (int)(height / 2), x + labelWidth / 2 - addTextWidth / 2
 						+ height, TEXT_Y_OFFSET);
 			} else {
 				setColor(Colors.WHITE);
 				// draw string in center of rect
-				glText.draw(text, height / 2, x + labelWidth / 2 - textWidth / 2,
+				GLSurfaceViewBase.drawText(view, text, (int)(height / 2), x + labelWidth / 2 - textWidth / 2,
 						TEXT_Y_OFFSET);
 			}
 		}
@@ -133,10 +135,10 @@ public class LabelListListenable extends ClickableSurfaceView {
 
 	private float dragOffset = 0;
 
-	public LabelListListenable(Context c, AttributeSet as) {
-		super(c, as);
+	public LabelListListenable(TouchableSurfaceView parent) {
+		super(parent);
 	}
-
+	
 	public void setListener(LabelListListener listener) {
 		this.listener = listener;
 	}
@@ -183,7 +185,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 	}
 
 	public void addLabel(String text, boolean on) {
-		labels.add(new Label(text, on, Float.MAX_VALUE));
+		labels.add(new Label(this, text, on, Float.MAX_VALUE));
 		updateLabelSizes();
 		updateLabelLocations();
 	}
@@ -222,11 +224,11 @@ public class LabelListListenable extends ClickableSurfaceView {
 	}
 	
 	@Override
-	protected void init() {
+	public void init() {
 		if (labels == null)
 			labels = new ArrayList<Label>();
-		addTextWidth = glText.getTextWidth("add", height / 2) + height;
-		glText.storeText("add");
+		addTextWidth = GLSurfaceViewBase.getTextWidth("add", height / 2) + height;
+		GLSurfaceViewBase.storeText("add");
 		if (bgRectVb == null)
 			initBgRectVb();
 		listener.labelListInitialized(this);
@@ -237,7 +239,7 @@ public class LabelListListenable extends ClickableSurfaceView {
 	}
 	
 	@Override
-	protected void draw() {
+	public void draw() {
 		translate(width / 2, height / 2);
 		// draw background rounded rect
 		drawTriangleFan(bgRectVb, Colors.VIEW_BG);
@@ -253,8 +255,8 @@ public class LabelListListenable extends ClickableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
-		super.handleActionDown(e, id, x, y);
+	protected void handleActionDown(int id, float x, float y) {
+		super.handleActionDown(id, x, y);
 		// clicking on an existing label will select label.
 		Label touched = findLabel(x, y);
 		if (touched != null) {
@@ -264,29 +266,18 @@ public class LabelListListenable extends ClickableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionPointerDown(MotionEvent e, int id, float x,
-			float y) {
-		// no pointer for now - only handle one
-	}
-
-	@Override
-	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
-		super.handleActionMove(e, id, x, y);
+	protected void handleActionMove(int id, float x, float y) {
+		super.handleActionMove(id, x, y);
 		if (touchedLabel == null || id != 0) {
 			return;
 		}
-		touchedLabel.x = e.getX(0) + dragOffset;
+		touchedLabel.x = x + dragOffset;
 		updateLabelLocations();
 	}
 
 	@Override
-	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
-		// nothing for now
-	}
-
-	@Override
-	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
-		super.handleActionUp(e, id, x, y);
+	protected void handleActionUp(int id, float x, float y) {
+		super.handleActionUp(id, x, y);
 		// notify listener of the touched label's old and new position in list
 		int newPosition = labels.indexOf(touchedLabel);
 		if (newPosition != initialTouchedPosition) {
@@ -313,5 +304,15 @@ public class LabelListListenable extends ClickableSurfaceView {
 	@Override
 	protected void doubleTap(int id, float x, float y) {
 		// no double tap for this view
+	}
+
+	@Override
+	protected void createChildren() {
+		// leaf child
+	}
+
+	@Override
+	protected void layoutChildren() {
+		// leaf child
 	}
 }

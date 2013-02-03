@@ -1,31 +1,39 @@
 package com.kh.beatbot.global;
 
+import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.view.TouchableSurfaceView;
 import com.kh.beatbot.view.window.TouchableViewWindow;
 
 public class BBButton extends TouchableViewWindow {
+	BBOnClickListener listener;
+	
 	BBIcon defaultIcon = null;
 	BBIcon selectedIcon = null;
 	BBIcon currentIcon = null;
-
 	
 	public BBButton(TouchableSurfaceView parent) {
 		super(parent);
 	}
 
+	public void setOnClickListener(BBOnClickListener listener) {
+		this.listener = listener;
+	}
+	
 	public void setIconSource(BBIconSource iconSource) {
 		defaultIcon = iconSource.defaultIcon;
 		selectedIcon = iconSource.selectedIcon;
 		currentIcon = defaultIcon;
 	}
 
-	public void touch() {
+	protected void touch() {
 		currentIcon = selectedIcon;
+		notifyClicked();
 		requestRender();
 	}
 
-	public void release() {
+	protected void release(boolean sendEvent) {
 		currentIcon = defaultIcon;
+		notifyClicked();
 		requestRender();
 	}
 
@@ -41,6 +49,11 @@ public class BBButton extends TouchableViewWindow {
 		return currentIcon.equals(selectedIcon);
 	}
 	
+	protected void notifyClicked() {
+		if (listener != null)
+			listener.onClick(this);
+	}
+	
 	@Override
 	public void init() {
 		//nothing to do
@@ -48,7 +61,7 @@ public class BBButton extends TouchableViewWindow {
 
 	@Override
 	public void draw() {
-		currentIcon.draw(0, 0, width, height);
+		currentIcon.draw(absoluteX, parent.getHeight() - absoluteY - height, width, height);
 	}
 
 	@Override
@@ -58,7 +71,7 @@ public class BBButton extends TouchableViewWindow {
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		release();
+		release(x >= 0 && x <= width && y >= 0 && y <= height);
 	}
 
 	@Override
@@ -74,7 +87,7 @@ public class BBButton extends TouchableViewWindow {
 	@Override
 	protected void handleActionMove(int id, float x, float y) {
 		if (x < 0 || x > width || y < 0 || y > height) {
-			release();
+			release(false);
 		}
 	}
 

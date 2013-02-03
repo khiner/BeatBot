@@ -14,10 +14,10 @@ public class ThresholdBarView extends BBSeekbar {
 	private static int currAmpVertex = 0;
 	private static float currAmpLevel = 0;
 
-	public ThresholdBarView(Context context, AttributeSet attrs) {
-		super(context, attrs);
+	public ThresholdBarView(TouchableSurfaceView parent) {
+		super(parent);
 	}
-
+	
 	private void updateAmpVertex() {
 		if (levelBarVb == null)
 			return;
@@ -50,7 +50,7 @@ public class ThresholdBarView extends BBSeekbar {
 		maxRedVertices = (int) (levelBarVb.capacity() / 2);
 	}
 
-	protected void init() {
+	public void init() {
 		super.init();
 		setLevel(0.8f);
 		initVerticesLimits();

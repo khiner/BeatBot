@@ -2,14 +2,12 @@ package com.kh.beatbot.view;
 
 import java.nio.FloatBuffer;
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.view.window.TouchableViewWindow;
 
-public class BpmView extends TouchableSurfaceView {
+public class BpmView extends TouchableViewWindow {
+
 	private static final float INC_BPM_THRESH = 15;
 	private static boolean[][] segments = new boolean[3][7];
 	private static boolean touched = false;
@@ -21,10 +19,10 @@ public class BpmView extends TouchableSurfaceView {
 	private static float currXDragTotal = 0;
 	private static float currYDragTotal = 0;
 
-	public BpmView(Context c, AttributeSet as) {
-		super(c, as);
+	public BpmView(TouchableSurfaceView parent) {
+		super(parent);
 	}
-
+	
 	private void initSegmentVBs() {
 		// for use with GL_TRIANGLE_FAN - first is middle, the rest are edges
 		float[] longSegmentBuf = new float[] { 0, 0, -4, 4, 4, 4, -4,
@@ -157,7 +155,7 @@ public class BpmView extends TouchableSurfaceView {
 	}
 	
 	@Override
-	protected void init() {
+	public void init() {
 		initSegmentVBs();
 	}
 
@@ -191,12 +189,12 @@ public class BpmView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void draw() {
+	public void draw() {
 		drawSegments();
 	}
 
 	@Override
-	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
+	protected void handleActionDown(int id, float x, float y) {
 		touched = true;
 		lastFrameXLoc = x;
 		lastFrameYLoc = y;
@@ -204,13 +202,7 @@ public class BpmView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionPointerDown(MotionEvent e, int id, float x,
-			float y) {
-		return; // no pointer down events
-	}
-
-	@Override
-	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
+	protected void handleActionMove(int id, float x, float y) {
 		if (id != 0)
 			return; // only one pointer drags bpm
 		currXDragTotal += x - lastFrameXLoc;
@@ -233,13 +225,18 @@ public class BpmView extends TouchableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
-		return; // no pointer up events
+	protected void handleActionUp(int id, float x, float y) {
+		touched = false;
+		requestRender();
 	}
 
 	@Override
-	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
-		touched = false;
-		requestRender();
+	protected void createChildren() {
+		// leaf view
+	}
+
+	@Override
+	protected void layoutChildren() {
+		// leaf view
 	}
 }

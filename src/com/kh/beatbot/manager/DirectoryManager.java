@@ -18,7 +18,6 @@ import com.kh.beatbot.global.BBDirectory;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Instrument;
-import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
 public class DirectoryManager {
 
@@ -36,9 +35,6 @@ public class DirectoryManager {
 					TrackManager.currTrack.setInstrument((Instrument) parent,
 							item);
 				}
-				MidiTrackControlHelper
-						.updateInstrumentIcon(TrackManager.currTrack.getId());
-				PageManager.notifyTrackChanged();
 				currDirectory = internalDirectory;
 			}
 			updateInstrumentSelectAlert(currDirectory);

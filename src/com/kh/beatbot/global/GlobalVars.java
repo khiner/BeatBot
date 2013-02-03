@@ -4,7 +4,7 @@ import android.graphics.Typeface;
 
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.view.BpmView;
-import com.kh.beatbot.view.MidiView;
+import com.kh.beatbot.view.group.MidiGroup;
 
 public class GlobalVars {
 	public static BeatBotActivity mainActivity;
@@ -33,7 +33,7 @@ public class GlobalVars {
 		VOLUME, PAN, PITCH
 	};
 
-	public static MidiView midiView;
+	public static MidiGroup midiGroup;
 	public static BpmView bpmView;
 
 	public static float currBeatDivision;

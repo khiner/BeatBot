@@ -4,10 +4,6 @@ import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
@@ -17,14 +13,11 @@ public class BBSeekbar2d extends LevelListenable {
 	private static ViewRect viewRect;
 	private static FloatBuffer lineVb = null;
 
-	public BBSeekbar2d(Context c) {
-		super(c);
-	}
-	
-	public BBSeekbar2d(Context c, AttributeSet as) {
-		super(c, as);
+	public BBSeekbar2d(TouchableSurfaceView parent) {
+		super(parent);
 	}
 
+	
 	public void setViewLevelX(float x) {
 		selectX = viewRect.viewX(x);
 		initLines();
@@ -48,7 +41,7 @@ public class BBSeekbar2d extends LevelListenable {
 	}
 
 	@Override
-	protected void draw() {
+	public void draw() {
 		viewRect.drawRoundedBg();
 		levelColor[3] = 1; // completely opaque alpha
 		drawLines(lineVb, levelColor, 5, GL10.GL_LINES);
@@ -87,22 +80,32 @@ public class BBSeekbar2d extends LevelListenable {
 	}
 
 	@Override
-	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
+	protected void handleActionDown(int id, float x, float y) {
 		selectLocation(x, y);
 		levelColor = Colors.LEVEL_SELECTED.clone();
-		super.handleActionDown(e, id, x, y);
+		super.handleActionDown(id, x, y);
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
+	protected void handleActionMove(int id, float x, float y) {
 		if (id != 0)
 			return;  // no multitouch for level - one pointer drags one level!
 		selectLocation(x, y);
 	}
 
 	@Override
-	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
+	protected void handleActionUp(int id, float x, float y) {
 		levelColor = Colors.VOLUME.clone();
-		super.handleActionUp(e, id, x, y);
+		super.handleActionUp(id, x, y);
+	}
+
+	@Override
+	protected void createChildren() {
+		// leaf child
+	}
+
+	@Override
+	protected void layoutChildren() {
+		// leaf child
 	}
 }

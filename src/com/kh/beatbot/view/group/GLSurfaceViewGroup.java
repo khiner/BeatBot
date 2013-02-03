@@ -1,5 +1,7 @@
 package com.kh.beatbot.view.group;
 
+import javax.microedition.khronos.opengles.GL10;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -31,16 +33,16 @@ public class GLSurfaceViewGroup extends TouchableSurfaceView {
 	}
 	
 	@Override
-	protected void loadIcons() {
-		renderer.loadAllIcons();
-	}
-	
-	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		super.surfaceChanged(holder, format, w, h);
-		renderer.layout(gl, 0, 0, w, h);
+		renderer.layout(null, 0, 0, w, h);
 	}
 
+	public void initGl(GL10 gl) {
+		super.initGl(gl);
+		renderer.initGl(gl);
+	}
+	
 	@Override
 	protected void draw() {
 		renderer.drawAll();

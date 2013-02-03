@@ -1,18 +1,21 @@
 package com.kh.beatbot.view.window;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import android.graphics.Bitmap;
+import android.util.FloatMath;
 
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.view.GLSurfaceViewBase;
 
 public abstract class ViewWindow {
-	class Position {
-		float x, y;
+	public class Position {
+		public float x, y;
 
 		Position(float x, float y) {
 			set(x, y);
@@ -24,13 +27,35 @@ public abstract class ViewWindow {
 		}
 	}
 
+	public static final float ¹ = (float) Math.PI;
+
 	protected List<ViewWindow> children = new ArrayList<ViewWindow>();
 	
-	protected GLSurfaceViewBase parent = null;
-	protected GL10 gl = null;
+	protected GLSurfaceViewBase parent;
+	protected GL10 gl;
+	public float absoluteX = 0, absoluteY = 0;
 	public float x = 0, y = 0;
 	public float width = 0, height = 0;
 
+	protected float[] backgroundColor = Colors.BG_COLOR;
+	protected float[] clearColor = Colors.BG_COLOR;
+	
+	private int id = -1; // optional
+	
+	private static FloatBuffer circleVb = null;
+	private static final float CIRCLE_RADIUS = 100;
+
+	static { // init circle
+		float theta = 0;
+		float coords[] = new float[128];
+		for (int i = 0; i < 128; i += 2) {
+			coords[i] = FloatMath.cos(theta) * CIRCLE_RADIUS;
+			coords[i + 1] = FloatMath.sin(theta) * CIRCLE_RADIUS;
+			theta += 2 * Math.PI / 64;
+		}
+		circleVb = makeFloatBuffer(coords);
+	}
+	
 	public ViewWindow(GLSurfaceViewBase parent) {
 		this.parent = parent;
 		createChildren();
@@ -45,6 +70,14 @@ public abstract class ViewWindow {
 				&& y < this.y + height;
 	}
 
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
 	protected abstract void loadIcons();
 	
 	public abstract void init();
@@ -52,9 +85,10 @@ public abstract class ViewWindow {
 	public abstract void draw();
 	
 	public void initAll() {
+		initBackgroundColor();
 		init();
 		for (ViewWindow child : children) {
-			child.init();
+			child.initAll();
 		}
 	}
 	
@@ -72,6 +106,13 @@ public abstract class ViewWindow {
 
 	protected abstract void layoutChildren();
 	
+	public void initGl(GL10 gl) {
+		this.gl = gl;
+		for (ViewWindow child : children)
+			child.initGl(gl);
+		loadAllIcons();
+	}
+	
 	public void loadAllIcons() {
 		loadIcons();
 		for (ViewWindow child : children) {
@@ -83,8 +124,11 @@ public abstract class ViewWindow {
 		parent.requestRender();
 	}
 	
-	public void layout(GL10 gl, float x, float y, float width, float height) {
-		this.gl = gl;
+	public void layout(ViewWindow parent, float x, float y, float width, float height) {
+		if (parent != null) {
+			this.absoluteX = parent.absoluteX + x;
+			this.absoluteY = parent.absoluteY + y;
+		}
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -101,117 +145,213 @@ public abstract class ViewWindow {
 		return null;
 	}
 	
-	protected static final FloatBuffer makeFloatBuffer(float[] arr) {
-		return GLSurfaceViewBase.makeFloatBuffer(arr);
+	public static final FloatBuffer makeFloatBuffer(float[] arr) {
+		return makeFloatBuffer(arr, 0);
 	}
 
-	protected static final FloatBuffer makeFloatBuffer(float[] arr, int position) {
-		return GLSurfaceViewBase.makeFloatBuffer(arr, position);
+	public static final FloatBuffer makeFloatBuffer(float[] arr, int position) {
+		ByteBuffer bb = ByteBuffer.allocateDirect(arr.length * 4);
+		bb.order(ByteOrder.nativeOrder());
+		FloatBuffer fb = bb.asFloatBuffer();
+		fb.put(arr);
+		fb.position(position);
+		return fb;
 	}
 
-	protected static final void translate(float x, float y) {
-		GLSurfaceViewBase.translate(x, y);
+	public static final FloatBuffer makeRectFloatBuffer(float x1, float y1, float x2,
+			float y2) {
+		return makeFloatBuffer(new float[] { x1, y1, x2, y1, x1, y2, x2, y2 });
 	}
 
-	protected static final void scale(float x, float y) {
-		GLSurfaceViewBase.scale(x, y);
-	}
-
-	protected static void push() {
-		GLSurfaceViewBase.push();
-	}
-
-	protected static final void pop() {
-		GLSurfaceViewBase.pop();
-	}
-
-	protected static final FloatBuffer makeRectFloatBuffer(float x1, float y1,
+	public static final FloatBuffer makeRectOutlineFloatBuffer(float x1, float y1,
 			float x2, float y2) {
-		return GLSurfaceViewBase.makeRectFloatBuffer(x1, y1, x2, y2);
+		return makeFloatBuffer(new float[] { x1, y1, x1, y2, x2, y2, x2, y1 });
 	}
 
-	protected static final FloatBuffer makeRectOutlineFloatBuffer(float x1,
-			float y1, float x2, float y2) {
-		return GLSurfaceViewBase.makeRectOutlineFloatBuffer(x1, y1, x2, y2);
+	public final void translate(float x, float y) {
+		gl.glTranslatef(x, y, 0);
 	}
 
-	protected static final FloatBuffer makeRoundedCornerRectBuffer(float width,
+	public final void scale(float x, float y) {
+		gl.glScalef(x, y, 1);
+	}
+
+	public void push() {
+		gl.glPushMatrix();
+	}
+
+	public final void pop() {
+		gl.glPopMatrix();
+	}
+
+	public static final FloatBuffer makeRoundedCornerRectBuffer(float width,
 			float height, float cornerRadius, int resolution) {
-		return GLSurfaceViewBase.makeRoundedCornerRectBuffer(width, height,
-				cornerRadius, resolution);
+		float[] roundedRect = new float[resolution * 8];
+		float theta = 0, addX, addY;
+		for (int i = 0; i < roundedRect.length / 2; i++) {
+			theta += 4 * ¹ / roundedRect.length;
+			if (theta < ¹ / 2) { // lower right
+				addX = width / 2 - cornerRadius;
+				addY = height / 2 - cornerRadius;
+			} else if (theta < ¹) { // lower left
+				addX = -width / 2 + cornerRadius;
+				addY = height / 2 - cornerRadius;
+			} else if (theta < 3 * ¹ / 2) { // upper left
+				addX = -width / 2 + cornerRadius;
+				addY = -height / 2 + cornerRadius;
+			} else { // upper right
+				addX = width / 2 - cornerRadius;
+				addY = -height / 2 + cornerRadius;
+			}
+			roundedRect[i * 2] = FloatMath.cos(theta) * cornerRadius + addX;
+			roundedRect[i * 2 + 1] = FloatMath.sin(theta) * cornerRadius + addY;
+		}
+		return makeFloatBuffer(roundedRect);
 	}
 
-	protected static final void drawRectangle(float x1, float y1, float x2,
-			float y2, float[] color) {
-		GLSurfaceViewBase.drawRectangle(x1, y1, x2, y2, color);
+	public final void drawRectangle(float x1, float y1, float x2, float y2,
+			float[] color) {
+		drawTriangleStrip(makeRectFloatBuffer(x1, y1, x2, y2), color);
 	}
 
-	protected static void drawRectangleOutline(float x1, float y1, float x2,
+	public void drawRectangleOutline(float x1, float y1, float x2,
 			float y2, float[] color, float width) {
-		GLSurfaceViewBase.drawRectangleOutline(x1, y1, x2, y2, color, width);
+		drawLines(makeRectOutlineFloatBuffer(x1, y1, x2, y2), color, width,
+				GL10.GL_LINE_LOOP);
 	}
 
-	protected static final void drawTriangleStrip(FloatBuffer vb,
-			float[] color, int numVertices) {
-		GLSurfaceViewBase.drawTriangleStrip(vb, color, numVertices);
+	public final void drawTriangleStrip(FloatBuffer vb, float[] color,
+			int numVertices) {
+		drawTriangleStrip(vb, color, 0, numVertices);
 	}
 
-	protected static final void drawTriangleStrip(FloatBuffer vb, float[] color) {
-		GLSurfaceViewBase.drawTriangleStrip(vb, color);
+	public final void drawTriangleStrip(FloatBuffer vb, float[] color) {
+		if (vb == null)
+			return;
+		drawTriangleStrip(vb, color, vb.capacity() / 2);
 	}
 
-	protected static final void drawTriangleStrip(FloatBuffer vb,
-			float[] color, int beginVertex, int endVertex) {
-		GLSurfaceViewBase.drawTriangleStrip(vb, color, beginVertex, endVertex);
+	public final void drawTriangleStrip(FloatBuffer vb, float[] color,
+			int beginVertex, int endVertex) {
+		if (vb == null)
+			return;
+		setColor(color);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
+		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, beginVertex, endVertex
+				- beginVertex);
 	}
 
-	protected static final void drawTriangleFan(FloatBuffer vb, float[] color) {
-		GLSurfaceViewBase.drawTriangleFan(vb, color);
+	public final void drawTriangleFan(FloatBuffer vb, float[] color) {
+		setColor(color);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
+		gl.glDrawArrays(GL10.GL_TRIANGLE_FAN, 0, vb.capacity() / 2);
 	}
 
-	protected static final void drawLines(FloatBuffer vb, float[] color,
-			float width, int type, int stride) {
-		GLSurfaceViewBase.drawLines(vb, color, width, type, stride);
+	public final void drawLines(FloatBuffer vb, float[] color, float width,
+			int type, int stride) {
+		setColor(color);
+		gl.glLineWidth(width);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, stride, vb);
+		gl.glDrawArrays(type, 0, vb.capacity() / (2 + stride / 8));
 	}
 
-	protected static final void drawLines(FloatBuffer vb, float[] color,
-			float width, int type) {
-		GLSurfaceViewBase.drawLines(vb, color, width, type);
+	public final void drawLines(FloatBuffer vb, float[] color, float width,
+			int type) {
+		drawLines(vb, color, width, type, 0);
 	}
-
-	protected static final void drawPoint(float pointSize, float[] color,
-			float x, float y) {
-		GLSurfaceViewBase.drawPoint(pointSize, color, x, y);
+	
+	public final void drawPoint(float pointSize, float[] color, float x,
+			float y) {
+		push();
+		translate(x, y);
+		float scale = pointSize / CIRCLE_RADIUS;
+		scale(scale, scale);
+		drawTriangleFan(circleVb, color);
+		pop();
 	}
-
+	
 	protected final float distanceFromCenterSquared(float x, float y) {
 		return (x - width / 2) * (x - width / 2) + (y - height / 2)
 				* (y - height / 2);
 	}
 
-	protected final static void setColor(float[] color) {
-		GLSurfaceViewBase.setColor(color);
+	public final void setBackgroundColor(float[] color) {
+		backgroundColor = color;
+	}
+
+	public final void setColor(float[] color) {
+		gl.glColor4f(color[0], color[1], color[2], color[3]);
 	}
 	
-	protected final void setBackgroundColor(float[] color) {
-		parent.setBackgroundColor(color);
+	protected void initBackgroundColor() {
+		gl.glClearColor(backgroundColor[0], backgroundColor[1],
+				backgroundColor[2], backgroundColor[3]);
 	}
+	
+	protected class ViewRect {
+		public int drawOffset;
+		public float parentWidth, parentHeight, minX, maxX, minY, maxY, width,
+				height, borderRadius;
 
-	protected final static void loadTexture(Bitmap bitmap,
-			int[] textureHandlers, int textureId) {
-		GLSurfaceViewBase.loadTexture(bitmap, textureHandlers, textureId);
-	}
+		private FloatBuffer borderVb = null;
 
-	protected final static void loadTexture(int resourceId,
-			int[] textureHandlers, int textureId, int[] crop) {
-		GLSurfaceViewBase.loadTexture(resourceId, textureHandlers, textureId,
-				crop);
-	}
+		// radiusScale determines the size of the radius of the rounded border.
+		// radius will be the given percentage of the shortest side of the view
+		// rect.
+		public ViewRect(float parentWidth, float parentHeight, float radiusScale,
+				int drawOffset) {
+			this.parentWidth = parentWidth;
+			this.parentHeight = parentHeight;
+			this.drawOffset = drawOffset;
+			borderRadius = Math.min(parentWidth, parentHeight) * radiusScale;
+			minX = borderRadius;
+			minY = borderRadius;
+			maxX = parentWidth - borderRadius;
+			maxY = parentHeight - borderRadius;
+			width = parentWidth - 2 * minX;
+			height = parentHeight - 2 * minY;
+			borderVb = makeRoundedCornerRectBuffer(
+					parentWidth - drawOffset * 2,
+					parentHeight - drawOffset * 2, borderRadius, 25);
+		}
 
-	protected final static void drawTexture(int textureId,
-			int[] textureHandlers, int[] crop, float x, float y, float width,
-			float height) {
-		GLSurfaceViewBase.drawTexture(textureId, textureHandlers, crop, x, y,
-				width, height);
+		public float viewX(float x) {
+			return x * width + minX;
+		}
+
+		public float viewY(float y) {
+			return (1 - y) * height + minY;
+		}
+
+		public float unitX(float viewX) {
+			return (viewX - minX) / width;
+		}
+
+		public float unitY(float viewY) {
+			// bottom == height in pixels == 0 in value
+			// top == 0 in pixels == 1 in value
+			return (parentHeight - viewY - minY) / height;
+		}
+
+		public float clipX(float x) {
+			return x < minX ? minX : (x > maxX ? maxX : x);
+		}
+
+		public float clipY(float y) {
+			return y < minY ? minY : (y > maxY ? maxY : y);
+		}
+
+		public void drawRoundedBg() {
+			gl.glTranslatef(parentWidth / 2, parentHeight / 2, 0);
+			drawTriangleFan(borderVb, Colors.VIEW_BG);
+			gl.glTranslatef(-parentWidth / 2, -parentHeight / 2, 0);
+		}
+
+		public void drawRoundedBgOutline() {
+			gl.glTranslatef(parentWidth / 2, parentHeight / 2, 0);
+			drawLines(borderVb, Colors.VOLUME, drawOffset / 2,
+					GL10.GL_LINE_LOOP);
+			gl.glTranslatef(-parentWidth / 2, -parentHeight / 2, 0);
+		}
 	}
 }

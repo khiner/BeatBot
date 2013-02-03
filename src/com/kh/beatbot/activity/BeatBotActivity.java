@@ -36,19 +36,25 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.layout.page.MainPageSelect;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.manager.PageManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.view.BpmView;
-import com.kh.beatbot.view.MidiView;
+import com.kh.beatbot.view.TouchableSurfaceView;
+import com.kh.beatbot.view.group.GLSurfaceViewGroup;
+import com.kh.beatbot.view.group.MidiGroup;
+import com.kh.beatbot.view.group.PageFlipper;
 
 public class BeatBotActivity extends Activity {
 	private LinearLayout trackPageSelect;
+	private GLSurfaceViewGroup bpmSurface, midiSurface;
+	private PageFlipper mainPageFlipper;
+	
 	private static AssetManager assetManager;
-
+	
 	private long lastTapTime = 0;
 
 	private static void copyFile(InputStream in, OutputStream out)
@@ -155,16 +161,22 @@ public class BeatBotActivity extends Activity {
 		if (savedInstanceState == null) {
 			initNativeAudio();
 		}
-		GlobalVars.bpmView = ((BpmView) findViewById(R.id.bpm));
+		
+		bpmSurface = ((GLSurfaceViewGroup)findViewById(R.id.bpm));
+		GlobalVars.bpmView = new BpmView((TouchableSurfaceView)bpmSurface);
+		bpmSurface.setBBRenderer(GlobalVars.bpmView);
+		
+		midiSurface = (GLSurfaceViewGroup)findViewById(R.id.midiGroup);
+		GlobalVars.midiGroup = new MidiGroup(midiSurface);
+		midiSurface.setBBRenderer(GlobalVars.midiGroup);
+		midiSurface.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 		
 		Managers.init(savedInstanceState);
 		
-		GlobalVars.midiView = ((MidiView) findViewById(R.id.midiView));
-		GlobalVars.midiView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-		
 		setEditIconsEnabled(false);
-		PageManager.init(this);
-
+		// main page flipper labels
+		((MainPageSelect)findViewById(R.id.mainPageSelect)).init();
+		mainPageFlipper = ((PageFlipper)findViewById(R.id.mainFlipper));
 		// were we recording and/or playing before losing the instance?
 		if (savedInstanceState != null) {
 			if (savedInstanceState.getBoolean("recording")) {
@@ -173,7 +185,8 @@ public class BeatBotActivity extends Activity {
 				play(findViewById(R.id.playButton));
 			}
 		}
-		Managers.trackManager.trackClicked(0);
+		mainPageFlipper.setPage(0);
+		Managers.trackManager.setCurrTrack(0);
 	}
 
 	@Override
@@ -204,6 +217,20 @@ public class BeatBotActivity extends Activity {
 	    .show();
 	}
 
+	public void onPause() {
+		super.onPause();
+		bpmSurface.onPause();
+		midiSurface.onPause();
+		mainPageFlipper.onPause();
+	}
+	
+	public void onResume() {
+		super.onResume();
+		bpmSurface.onResume();
+		midiSurface.onResume();
+		mainPageFlipper.onResume();
+	}
+	
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
@@ -229,7 +256,7 @@ public class BeatBotActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.snap:
-			if (GlobalVars.midiView.toggleSnapToGrid())
+			if (GlobalVars.midiGroup.midiView.toggleSnapToGrid())
 				item.setIcon(R.drawable.btn_check_buttonless_on);
 			else
 				item.setIcon(R.drawable.btn_check_buttonless_off);
@@ -312,7 +339,7 @@ public class BeatBotActivity extends Activity {
 			Toast.makeText(getApplicationContext(),
 					"Recorded file to " + fileName, Toast.LENGTH_SHORT).show();
 		} else {
-			GlobalVars.midiView.reset();
+			GlobalVars.midiGroup.midiView.reset();
 			((ToggleButton) findViewById(R.id.playButton)).setChecked(true);
 			Managers.recordManager.startRecordingNative();
 			if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
@@ -386,6 +413,16 @@ public class BeatBotActivity extends Activity {
 		Managers.directoryManager.showAddTrackAlert();
 	}
 
+	public void notifyTrackAdded(int newTrackNum) {
+		GlobalVars.midiGroup.trackAdded(newTrackNum);
+		notifyTrackChanged();
+	}
+	
+	public void notifyTrackChanged() {
+		((MainPageSelect)findViewById(R.id.mainPageSelect)).update();
+		((PageFlipper)findViewById(R.id.mainFlipper)).notifyTrackChanged();
+	}
+	
 	public static native boolean createAudioPlayer();
 
 	public static native void createEngine();

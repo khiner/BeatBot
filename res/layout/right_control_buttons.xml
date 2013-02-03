@@ -40,7 +40,7 @@
         android:contentDescription="@string/bpm_tap"
         android:onClick="bpmTap" />
 
-    <com.kh.beatbot.view.BpmView
+    <com.kh.beatbot.view.group.GLSurfaceViewGroup
         android:id="@+id/bpm"
         android:layout_width="66dp"
         android:layout_height="fill_parent"

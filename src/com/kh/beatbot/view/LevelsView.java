@@ -4,21 +4,14 @@ import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.view.window.TouchableViewWindow;
 
-public class LevelsView extends TouchableSurfaceView {
-
-	public LevelsView(Context c, AttributeSet as) {
-		super(c, as);
-	}
+public class LevelsView extends TouchableViewWindow {
 
 	private static class DragLine {
 		private static float m = 0;
@@ -59,6 +52,10 @@ public class LevelsView extends TouchableSurfaceView {
 	private boolean selectRegion = false;
 	private float selectRegionStartTick = -1, selectRegionStartY = -1;
 
+	public LevelsView(TouchableSurfaceView parent) {
+		super(parent);
+	}
+
 	public LevelType getLevelType() {
 		return currLevelType;
 	}
@@ -98,8 +95,8 @@ public class LevelsView extends TouchableSurfaceView {
 
 	private void initSelectRegionVb(float leftTick, float rightTick,
 			float topY, float bottomY) {
-		selectRegionVb = makeRectFloatBuffer(tickToX(leftTick), topY,
-				tickToX(rightTick), bottomY);
+		selectRegionVb = makeRectFloatBuffer(GlobalVars.midiGroup.midiView.tickToX(leftTick), topY,
+				GlobalVars.midiGroup.midiView.tickToX(rightTick), bottomY);
 	}
 
 	private int calcVertex(float level) {
@@ -150,7 +147,7 @@ public class LevelsView extends TouchableSurfaceView {
 
 	private void drawLevels() {
 		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
-			drawLevel(tickToX(midiNote.getOnTick()),
+			drawLevel(GlobalVars.midiGroup.midiView.tickToX(midiNote.getOnTick()),
 					midiNote.getLevel(currLevelType),
 					calcLevelColor(midiNote.isSelected()));
 		}
@@ -159,7 +156,7 @@ public class LevelsView extends TouchableSurfaceView {
 	private boolean selectLevel(float x, float y, int pointerId) {
 		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
 			float velocityY = levelToY(midiNote.getLevel(currLevelType));
-			if (Math.abs(tickToX(midiNote.getOnTick()) - x) < 35
+			if (Math.abs(GlobalVars.midiGroup.midiView.tickToX(midiNote.getOnTick()) - x) < 35
 					&& Math.abs(velocityY - y) < 35) {
 				// If this is the only touched level, and it hasn't yet
 				// been selected, make it the only selected level.
@@ -178,7 +175,7 @@ public class LevelsView extends TouchableSurfaceView {
 	}
 
 	public void selectRegion(float x, float y) {
-		float tick = xToTick(x);
+		float tick = GlobalVars.midiGroup.midiView.xToTick(x);
 		float leftTick = Math.min(tick, selectRegionStartTick);
 		float rightTick = Math.max(tick, selectRegionStartTick);
 		float topY = Math.min(y, selectRegionStartY);
@@ -244,23 +241,15 @@ public class LevelsView extends TouchableSurfaceView {
 	}
 
 	private void startSelectRegion(float x, float y) {
-		selectRegionStartTick = xToTick(x);
+		selectRegionStartTick = GlobalVars.midiGroup.midiView.xToTick(x);
 		selectRegionStartY = y;
 		selectRegionVb = null;
 		selectRegion = true;
 	}
 
-	protected void draw() {
+	public void draw() {
 		drawLevels();
 		drawSelectRegion();
-	}
-	
-	private float tickToX(float tick) {
-		return GlobalVars.midiView.tickToX(tick) - MidiView.X_OFFSET;
-	}
-
-	private float xToTick(float x) {
-		return GlobalVars.midiView.xToTick(x + MidiView.X_OFFSET);
 	}
 	
 	private float levelToY(float level) {
@@ -276,27 +265,28 @@ public class LevelsView extends TouchableSurfaceView {
 				/ (height - LEVEL_POINT_SIZE);
 	}
 
-	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
+	protected void handleActionPointerUp(int id, float x, float y) {
 		touchedLevels.remove(id);
 		updateLevelOffsets();
 	}
 
-	public void handleActionMove(MotionEvent e, int id, float x, float y) {
+	public void handleActionMove(int id, float x, float y) {
 		if (!touchedLevels.isEmpty()) {
-			for (int i = 0; i < e.getPointerCount(); i++) {
-				MidiNote touched = touchedLevels.get(e.getPointerId(i));
-				if (touched != null) {
-					touched.setLevel(currLevelType, yToLevel(e.getY(i)));
-				}
+			MidiNote touched = touchedLevels.get(id);
+			if (touched != null) {
+				touched.setLevel(currLevelType, yToLevel(y));
 			}
-			updateDragLine();
-			setLevelsToDragLine();
-			// velocity changes are valid undo events
-			MidiView.stateChanged = true;
+			if (id == pointerIdToPos.size() - 1) {
+				updateDragLine();
+				setLevelsToDragLine();
+				// velocity changes are valid undo events
+				MidiView.stateChanged = true;
+			}
 		} else if (id == 0){ // no midi selected. midiView can handle it.
 			selectRegion(x, y);
 		}
-		GlobalVars.midiView.updateLoopMarkers(e);
+		//GlobalVars.midiView.updateLoopMarkers(e);
+		//TODO uncomment above after converting midiview to viewwindow
 	}
 	
 	protected void loadIcons() {
@@ -304,27 +294,36 @@ public class LevelsView extends TouchableSurfaceView {
 	}
 	
 	@Override
-	protected void init() {
-		setBackgroundColor(Colors.VIEW_BG);
+	public void init() {
+		//setBackgroundColor(Colors.VIEW_BG);
 		initLevelBarVb();
 	}
 
 	@Override
-	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
+	protected void handleActionDown(int id, float x, float y) {
 		if (!selectLevel(x, y, id)) {
 			startSelectRegion(x, y);
 		}
 	}
 
 	@Override
-	protected void handleActionPointerDown(MotionEvent e, int id, float x,
-			float y) {
+	protected void handleActionPointerDown(int id, float x, float y) {
 		selectLevel(x, y, id);
 	}
 
 	@Override
-	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
+	protected void handleActionUp(int id, float x, float y) {
 		clearTouchedLevels();
 		selectRegion = false;
+	}
+
+	@Override
+	protected void createChildren() {
+		// leaf child
+	}
+
+	@Override
+	protected void layoutChildren() {
+		// leaf child
 	}
 }

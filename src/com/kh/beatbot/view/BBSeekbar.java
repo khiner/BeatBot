@@ -2,23 +2,20 @@ package com.kh.beatbot.view;
 
 import java.nio.FloatBuffer;
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listenable.LevelListenable;
 
 public class BBSeekbar extends LevelListenable {
+
 	protected FloatBuffer levelBarVb = null;
 	protected int numLevelVertices = 0;
 	protected float levelBarHeight = 8;
 	private float middleY = 0;
 	
-	public BBSeekbar(Context c, AttributeSet as) {
-		super(c, as);
+	public BBSeekbar(TouchableSurfaceView parent) {
+		super(parent);
 	}
-
+	
 	protected void initLevelBarVb() {
 		float[] vertices = new float[800];
 		for (int i = 0; i < vertices.length / 4; i++) {
@@ -36,7 +33,7 @@ public class BBSeekbar extends LevelListenable {
 		// no icons to load
 	}
 	
-	protected void init() {
+	public void init() {
 		initLevelBarVb();
 		updateNumLevelVertices();
 		super.init();
@@ -83,7 +80,7 @@ public class BBSeekbar extends LevelListenable {
 	}
 	
 	@Override
-	protected void draw() {
+	public void draw() {
 		drawBar();
 	}
 
@@ -114,15 +111,25 @@ public class BBSeekbar extends LevelListenable {
 	}
 
 	@Override
-	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
+	protected void handleActionDown(int id, float x, float y) {
 		setLevel(xToLevel(x));
-		super.handleActionDown(e, id, x, y);
+		super.handleActionDown(id, x, y);
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
+	protected void handleActionMove(int id, float x, float y) {
 		if (id != 0)
 			return; // no multitouch for level - one pointer drags one level!
 		setLevel(xToLevel(x));
+	}
+
+	@Override
+	protected void createChildren() {
+		// leaf child
+	}
+
+	@Override
+	protected void layoutChildren() {
+		// leaf child
 	}
 }

@@ -6,7 +6,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.view.GLSurfaceViewBase;
+import com.kh.beatbot.view.window.ViewWindow;
 
 public class ScrollBarHelper {
 	private static final float DAMP_CONSTANT = 0.9f;
@@ -48,11 +48,10 @@ public class ScrollBarHelper {
 		scrolling = true;
 	}
 
-	public static void drawScrollView(float parentWidth, float parentHeight,
-			float offset) {
+	public static void drawScrollView(ViewWindow view) {
 		if (!shouldDrawScrollView())
 			return;
-		updateScrollBar(parentWidth, parentHeight, offset);
+		updateScrollBar(view);
 		// if scrolling is still in progress, elapsed time is relative to the
 		// time of scroll start,
 		// otherwise, elapsed time is relative to scroll end time
@@ -70,13 +69,13 @@ public class ScrollBarHelper {
 			alpha *= 2 - elapsedTime / (float) GlobalVars.DOUBLE_TAP_TIME;
 		innerScrollBarColor[3] = alpha;
 		outerScrollBarColor[3] = alpha * .6f;
-		GLSurfaceViewBase.translate(0, translateY);
-		GLSurfaceViewBase.drawLines(scrollBarLinesVb, outerScrollBarColor, 3,
+		view.translate(0, translateY);
+		view.drawLines(scrollBarLinesVb, outerScrollBarColor, 3,
 				GL10.GL_LINES);
-		GLSurfaceViewBase.translate(translateX, 0);
-		GLSurfaceViewBase.drawTriangleFan(outerScrollBarVb, outerScrollBarColor);
-		GLSurfaceViewBase.drawTriangleFan(innerScrollBarVb, innerScrollBarColor);
-		GLSurfaceViewBase.translate(-translateX, -translateY);
+		view.translate(translateX, 0);
+		view.drawTriangleFan(outerScrollBarVb, outerScrollBarColor);
+		view.drawTriangleFan(innerScrollBarVb, innerScrollBarColor);
+		view.translate(-translateX, -translateY);
 	}
 
 	public static void tickScrollVelocity() {
@@ -92,27 +91,22 @@ public class ScrollBarHelper {
 		}
 	}
 
-	public static void updateScrollBar(float parentWidth, float parentHeight,
-			float offset) {
-		float x1 = TickWindowHelper.getTickOffset() * parentWidth
-				/ TickWindowHelper.MAX_TICKS + offset;
+	public static void updateScrollBar(ViewWindow view) {
+		float x1 = TickWindowHelper.getTickOffset() * view.width
+				/ TickWindowHelper.MAX_TICKS;
 		float x2 = (TickWindowHelper.getTickOffset() + TickWindowHelper
-				.getNumTicks())
-				* parentWidth
-				/ TickWindowHelper.MAX_TICKS
-				+ offset;
+				.getNumTicks()) * view.width / TickWindowHelper.MAX_TICKS;
 		float outerWidth = x2 - x1;
 		float innerWidth = outerWidth - 10;
 		translateX = (x2 + x1) / 2;
-		translateY = parentHeight - outerScrollBarHeight / 2;
-		innerScrollBarVb = GLSurfaceViewBase.makeRoundedCornerRectBuffer(
+		translateY = view.height - outerScrollBarHeight / 2;
+		innerScrollBarVb = view.makeRoundedCornerRectBuffer(
 				innerWidth, innerScrollBarHeight, innerScrollBarCornerRadius,
 				CORNER_RESOLUTION);
-		outerScrollBarVb = GLSurfaceViewBase.makeRoundedCornerRectBuffer(
+		outerScrollBarVb = view.makeRoundedCornerRectBuffer(
 				outerWidth, outerScrollBarHeight, outerScrollBarCornerRadius,
 				CORNER_RESOLUTION);
-		scrollBarLinesVb = GLSurfaceViewBase.makeFloatBuffer(new float[] {
-				offset, 0, x1, 0, x2, 0, parentWidth + offset, 0 });
+		scrollBarLinesVb = view.makeFloatBuffer(new float[] { 0, 0, x1, 0, x2, 0, view.width, 0 });
 	}
 
 	public static void handleActionUp() {

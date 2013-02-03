@@ -2,7 +2,6 @@ package com.kh.beatbot.global;
 
 import com.kh.beatbot.view.GLSurfaceViewBase;
 
-
 public class BBIcon {
 	public int resourceId;
 	protected int[] textureHandlers = new int[1];

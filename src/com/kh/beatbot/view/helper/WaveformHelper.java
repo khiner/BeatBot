@@ -9,10 +9,8 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 
-import com.kh.beatbot.view.GLSurfaceViewBase;
+import com.kh.beatbot.view.window.ViewWindow;
 
 public class WaveformHelper extends Thread {
 	// holds a single float in the form of 4 bytes, used to input floats from a
@@ -23,7 +21,6 @@ public class WaveformHelper extends Thread {
 	}
 	private static RandomAccessFile sampleFile = null;
 
-	private boolean recording = false;
 
 	public static final int DEFAULT_HEIGHT = 100;
 
@@ -32,61 +29,8 @@ public class WaveformHelper extends Thread {
 	// into one large FloatBuffer and stored in completedWaveforms
 	private ArrayList<FloatBuffer> waveformSegmentsVB = new ArrayList<FloatBuffer>();
 
-	private Queue<byte[]> bytesQueue = new LinkedList<byte[]>();
-
-	private boolean completed;
-
 	public ArrayList<FloatBuffer> getCurrentWaveformVbs() {
 		return waveformSegmentsVB;
-	}
-
-	@Override
-	public void run() {
-		byte[] bytes = null;
-		int xOffset = 0;
-		recording = true;
-		while (recording) {
-			try {
-				synchronized (bytesQueue) {
-					while (bytesQueue.isEmpty()) {
-						if (!recording)
-							break;
-						bytesQueue.wait();
-					}
-					if (!recording)
-						break;
-					bytes = bytesQueue.remove();
-				}
-				waveformSegmentsVB.add(bytesToFloatBuffer(bytes,
-						DEFAULT_HEIGHT, xOffset));
-				xOffset += bytes.length / 2;
-				if (completed) {
-					xOffset = 0;
-					waveformSegmentsVB.clear();
-					completed = false;
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void addBytesToQueue(byte[] bytes) {
-		synchronized (bytesQueue) {
-			bytesQueue.add(bytes);
-			bytesQueue.notify();
-		}
-	}
-
-	public void endRecording() {
-		recording = false;
-		synchronized (bytesQueue) {
-			bytesQueue.notify();
-		}
-	}
-
-	public void endWaveform() {
-		completed = true;
 	}
 
 	public static void setSampleFile(File file) {
@@ -103,22 +47,19 @@ public class WaveformHelper extends Thread {
 
 	// default to 0 offset, used when only a single FloatBuffer is needed
 	// (for a static sample)
-	public static FloatBuffer bytesToFloatBuffer(byte[] bytes, float width,
-			float height) {
-		return bytesToFloatBuffer(bytes, width, height, 0);
+	public static FloatBuffer bytesToFloatBuffer(ViewWindow view, byte[] bytes) {
+		return bytesToFloatBuffer(view, bytes, 0);
 	}
 
-	public static FloatBuffer bytesToFloatBuffer(byte[] bytes, float width,
-			float height, int xOffset) {
+	public static FloatBuffer bytesToFloatBuffer(ViewWindow view, byte[] bytes, int xOffset) {
 		float[] floats = bytesToFloats(bytes, 0);
-		return floatsToFloatBuffer(floats, width, height, 0, (int) width,
-				xOffset);
+		return floatsToFloatBuffer(view, floats, 0, (int) view.width, xOffset);
 	}
 
-	public static FloatBuffer floatFileToBuffer(float width, float height,
+	public static FloatBuffer floatFileToBuffer(ViewWindow view,
 			long offset, long numFloats, int xOffset) throws IOException {
-		float spp = Math.min(2, numFloats / width);
-		float[] outputAry = new float[2 * (int) (width * spp)];
+		float spp = Math.min(2, numFloats / view.width);
+		float[] outputAry = new float[2 * (int) (view.width * spp)];
 		for (int x = 0; x < outputAry.length; x += 2) {
 			float percent = (float) x / outputAry.length;
 			int dataIndex = (int) (offset + percent * numFloats);
@@ -126,27 +67,26 @@ public class WaveformHelper extends Thread {
 											// sample = 8 bytes
 			sampleFile.read(floatBuffer.array()); // read in the float at the
 													// current position
-			float y = height * (floatBuffer.getFloat(0) + 1) / 2;
-			outputAry[x] = percent * width + xOffset;
+			float y = view.height * (floatBuffer.getFloat(0) + 1) / 2;
+			outputAry[x] = percent * view.width + xOffset;
 			outputAry[x + 1] = y;
 		}
-		return GLSurfaceViewBase.makeFloatBuffer(outputAry);
+		return view.makeFloatBuffer(outputAry);
 	}
 
-	public static FloatBuffer floatsToFloatBuffer(float[] data, float width,
-			float height, long offset, long numFloats, int xOffset) {
-		float spp = Math.min(2, numFloats / width);
-		float[] outputAry = new float[2 * (int) (width * spp)];
+	public static FloatBuffer floatsToFloatBuffer(ViewWindow view, float[] data, long offset, long numFloats, int xOffset) {
+		float spp = Math.min(2, numFloats / view.width);
+		float[] outputAry = new float[2 * (int) (view.width * spp)];
 		for (int x = 0; x < outputAry.length; x += 2) {
 			float percent = (float) x / outputAry.length;
 			int dataIndex = (int) (offset + percent * numFloats) * 2;
 			// sanity check - default to y = 0 if index out of bounds
-			float y = dataIndex < data.length && dataIndex >= 0 ? height
+			float y = dataIndex < data.length && dataIndex >= 0 ? view.height
 					* (data[(int) dataIndex] + 1) / 2 : 0;
-			outputAry[x] = percent * width + xOffset;
+			outputAry[x] = percent * view.width + xOffset;
 			outputAry[x + 1] = y;
 		}
-		return GLSurfaceViewBase.makeFloatBuffer(outputAry);
+		return view.makeFloatBuffer(outputAry);
 	}
 
 	public static float[] bytesToFloats(byte[] input, int skip) {

@@ -80,7 +80,7 @@ public class SampleEditViewWindow extends TouchableViewWindow {
 		if (height == 0) // this view hasn't even been init()'d yet.
 			return;
 		try {
-			waveformVb = WaveformHelper.floatFileToBuffer(width - SNAP_DIST, height,
+			waveformVb = WaveformHelper.floatFileToBuffer(this,
 					(long) sampleOffset, (long) sampleWidth, SNAP_DIST / 2);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -113,7 +113,7 @@ public class SampleEditViewWindow extends TouchableViewWindow {
 	
 	@Override
 	public void init() {
-		setBackgroundColor(Colors.VIEW_BG);
+		//setBackgroundColor(Colors.VIEW_BG);
 		waveformWidth = width - SNAP_DIST;
 		initBackgroundOutlineVb();
 		update();

@@ -1,18 +1,16 @@
 package com.kh.beatbot.view;
 
-import android.content.Context;
-import android.util.AttributeSet;
-
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.view.window.ViewWindow;
 
-public class BBTextView extends GLSurfaceViewBase {
-	
+public class BBTextView extends ViewWindow {
+
 	private String text = null;
 	private float textWidth = 0;
 	private float textOffset = 0;
-	
-	public BBTextView(Context c, AttributeSet as) {
-		super(c, as);
+
+	public BBTextView(GLSurfaceViewBase parent) {
+		super(parent);
 	}
 	
 	@Override
@@ -23,28 +21,36 @@ public class BBTextView extends GLSurfaceViewBase {
 	}
 	
 	@Override
-	protected void init() {
+	public void init() {
 		if (text == null)
 			return;
-		glText.storeText(text);
+		GLSurfaceViewBase.storeText(text);
 	}
 
 	public void setText(String text) {
 		this.text = text;
-		if (glText != null) {
-			textWidth = glText.getTextWidth(text, height / 2);
-			textOffset = width / 2 - textWidth / 2;
-			//glText.storeText(text);
-		}
+		textWidth = GLSurfaceViewBase.getTextWidth(text, height / 2);
+		textOffset = width / 2 - textWidth / 2;
+		//GLSurfaceViewBase.storeText(text);
 		requestRender();
 	}
 	
 	@Override
-	protected void draw() {
+	public void draw() {
 		if (text == null)
 			return;
 		setColor(Colors.VOLUME);
 		// draw string in center of rect
-		glText.draw(text, height / 2, textOffset, 0);
+		GLSurfaceViewBase.drawText(this, text, (int)(height / 2), textOffset, 0);
+	}
+
+	@Override
+	protected void createChildren() {
+		// leaf child
+	}
+
+	@Override
+	protected void layoutChildren() {
+		// leaf child
 	}
 }

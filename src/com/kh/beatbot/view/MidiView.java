@@ -9,25 +9,19 @@ import java.util.Map;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
-import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 import com.kh.beatbot.view.helper.ScrollBarHelper;
 import com.kh.beatbot.view.helper.TickWindowHelper;
-import com.kh.beatbot.view.helper.WaveformHelper;
+import com.kh.beatbot.view.window.ClickableViewWindow;
 
-public class MidiView extends ClickableSurfaceView {
+public class MidiView extends ClickableViewWindow {
+
 	/**************** ATTRIBUTES ***************/
-	public static float X_OFFSET; // dynamically determined
 	public static final float Y_OFFSET = 21;
 
 	public static final float LOOP_SELECT_SNAP_DIST = 30;
@@ -59,8 +53,8 @@ public class MidiView extends ClickableSurfaceView {
 	// if true, all midi note movements are rounded to the nearest major tick
 	public static boolean snapToGrid = true;
 
-	public float getMidiWidth() {
-		return width - X_OFFSET;
+	public MidiView(TouchableSurfaceView parent) {
+		super(parent);
 	}
 
 	public float getMidiHeight() {
@@ -113,22 +107,8 @@ public class MidiView extends ClickableSurfaceView {
 		LEVELS_VIEW, NORMAL_VIEW, TO_LEVELS_VIEW, TO_NORMAL_VIEW
 	};
 
-	private WaveformHelper waveformHelper;
-
-	public MidiView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-	}
-
 	public void reset() {
 		TickWindowHelper.setTickOffset(0);
-	}
-
-	public void drawWaveform(byte[] bytes) {
-		waveformHelper.addBytesToQueue(bytes);
-	}
-
-	public void endWaveform() {
-		waveformHelper.endWaveform();
 	}
 
 	private void selectRegion(float x, float y) {
@@ -216,7 +196,7 @@ public class MidiView extends ClickableSurfaceView {
 	private void drawVerticalLines() {
 		// distance between one primary tick to the next
 		float translateDist = TickWindowHelper.getMajorTickSpacing() * 4f
-				* getMidiWidth() / TickWindowHelper.getNumTicks();
+				* width / TickWindowHelper.getNumTicks();
 		// start at the first primary tick before display start
 		float startX = tickToX(TickWindowHelper
 				.getPrimaryTickToLeftOf(TickWindowHelper.getTickOffset()));
@@ -295,29 +275,6 @@ public class MidiView extends ClickableSurfaceView {
 		drawTriangleStrip(loopRectVb, Colors.MIDI_VIEW_LIGHT_BG);
 	}
 
-	private void drawRecordingWaveforms() {
-		ArrayList<FloatBuffer> waveformVbs = waveformHelper
-				.getCurrentWaveformVbs();
-		if (Managers.recordManager.isRecording() && !waveformVbs.isEmpty()) {
-			FloatBuffer last = waveformVbs.get(waveformVbs.size() - 1);
-			float waveWidth = last.get(last.capacity() - 2);
-			float noteWidth = tickToX(Managers.recordManager
-					.getRecordCurrTick()
-					- Managers.recordManager.getRecordStartTick()
-					+ RecordManager.RECORD_LATENCY_TICKS)
-					- X_OFFSET;
-			push();
-			translate(tickToX(Managers.recordManager.getRecordStartTick()), 0);
-			// scale drawing so entire waveform exactly fits in the note width
-			scale(noteWidth / waveWidth, 1);
-			for (int i = 0; i < waveformVbs.size(); i++) {
-				drawLines(waveformVbs.get(i), Colors.WAVEFORM, 1,
-						GL10.GL_LINE_STRIP);
-			}
-			pop();
-		}
-	}
-
 	private void initSelectRegionVb(float leftTick, float rightTick, float topY,
 			float bottomY) {
 		selectRegionVb = makeRectFloatBuffer(tickToX(leftTick), topY,
@@ -355,7 +312,7 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	private void initTickFillVb() {
-		tickFillVb = makeRectFloatBuffer(X_OFFSET, 0, width, Y_OFFSET);
+		tickFillVb = makeRectFloatBuffer(0, 0, width, Y_OFFSET);
 	}
 
 	private void initLoopRectVb() {
@@ -372,11 +329,11 @@ public class MidiView extends ClickableSurfaceView {
 	private void initHLineVb() {
 		float[] hLines = new float[(Managers.trackManager.getNumTracks() + 1) * 4];
 		float[] tickHLines = new float[8];
-		tickHLines[0] = X_OFFSET;
+		tickHLines[0] = 0;
 		tickHLines[1] = 0;
 		tickHLines[2] = width;
 		tickHLines[3] = 0;
-		tickHLines[4] = X_OFFSET;
+		tickHLines[4] = 0;
 		tickHLines[5] = Y_OFFSET;
 		tickHLines[6] = width;
 		tickHLines[7] = Y_OFFSET;
@@ -384,7 +341,7 @@ public class MidiView extends ClickableSurfaceView {
 		float y = Y_OFFSET;
 		for (int i = 1; i < Managers.trackManager.getNumTracks() + 1; i++) {
 			y += trackHeight;
-			hLines[i * 4] = X_OFFSET;
+			hLines[i * 4] = 0;
 			hLines[i * 4 + 1] = y;
 			hLines[i * 4 + 2] = width;
 			hLines[i * 4 + 3] = y;
@@ -420,13 +377,11 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	public float tickToX(float tick) {
-		return (tick - TickWindowHelper.getTickOffset())
-				/ TickWindowHelper.getNumTicks() * getMidiWidth() + X_OFFSET;
+		return (tick - TickWindowHelper.getTickOffset()) / TickWindowHelper.getNumTicks() * width;
 	}
 
 	public float xToTick(float x) {
-		return TickWindowHelper.getNumTicks() * (x - X_OFFSET) / getMidiWidth()
-				+ TickWindowHelper.getTickOffset();
+		return TickWindowHelper.getNumTicks() * x / width + TickWindowHelper.getTickOffset();
 	}
 
 	public static int yToNote(float y) {
@@ -439,15 +394,11 @@ public class MidiView extends ClickableSurfaceView {
 		return note * trackHeight + Y_OFFSET - TickWindowHelper.getYOffset();
 	}
 
-	public void signalRecording() {
-		waveformHelper = new WaveformHelper();
-		waveformHelper.start();
+	public void trackAdded(int trackNum) {
+		if (parent.initialized)
+			initAllVbs();
 	}
-
-	public void signalEndRecording() {
-		waveformHelper.endRecording();
-	}
-
+	
 	public void initAllVbs() {
 		initCurrTickVb();
 		initHLineVb();
@@ -458,28 +409,17 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	protected void loadIcons() {
-		MidiTrackControlHelper.loadIcons();
-		Managers.directoryManager.loadIcons();
+		// no icons
 	}
 	
-	protected void init() {
-		setBackgroundColor(Colors.MIDI_VIEW_BG);
+	public void init() {
 		midiManager = Managers.midiManager;
 		TickWindowHelper.init(this);
-		MidiTrackControlHelper.init(this);
-		waveformHelper = new WaveformHelper();
-		initAllVbs();
-	}
-
-	public void updateTracks(TrackManager trackManager) {
-		int newTrackIndex = trackManager.getNumTracks() - 1;
-		MidiTrackControlHelper.addTrack(newTrackIndex, trackManager
-				.getTrack(newTrackIndex).getInstrument().getBBIconSource());
 		initAllVbs();
 	}
 	
 	@Override
-	protected void draw() {
+	public void draw() {
 		boolean recording = Managers.recordManager.getState() != RecordManager.State.INITIALIZING;
 		boolean playing = Managers.playbackManager.getState() == PlaybackManager.State.PLAYING;
 		TickWindowHelper.scroll();
@@ -499,12 +439,10 @@ public class MidiView extends ClickableSurfaceView {
 		drawAllMidiNotes();
 		drawSelectRegion();
 		drawLoopMarker();
-		ScrollBarHelper.drawScrollView(getMidiWidth(), height, X_OFFSET);
-		drawRecordingWaveforms();
+		ScrollBarHelper.drawScrollView(this);
 		if (playing || recording) {
 			drawCurrentTick();
 		}
-		MidiTrackControlHelper.draw();
 	}
 
 	private float getAdjustedTickDiff(float tickDiff, int pointerId,
@@ -636,10 +574,10 @@ public class MidiView extends ClickableSurfaceView {
 		midiManager.handleMidiCollisions();
 	}
 
-	public void updateLoopMarkers(MotionEvent e) {
+	public void updateLoopMarkers() {
 		for (int i = 0; i < 3; i++) {
 			if (loopPointerIds[i] != -1) {
-				float x = e.getX(e.findPointerIndex(loopPointerIds[i]));
+				float x = pointerIdToPos.get(loopPointerIds[i]).x;
 				float majorTick = TickWindowHelper
 						.getMajorTickToLeftOf(xToTick(x));
 				if (i == 0) { // begin loop marker selected
@@ -672,33 +610,25 @@ public class MidiView extends ClickableSurfaceView {
 		}
 	}
 
-	public void noMidiMove(MotionEvent e) {
+	public void noMidiMove() {
 		if (myPointers.size() - getNumLoopMarkersSelected() == 1) {
 			if (selectRegion) { // update select region
-				int index = e.findPointerIndex(myPointers.get(0));
-				selectRegion(e.getX(index), e.getY(index));
+				selectRegion(pointerIdToPos.get(myPointers.get(0)).x, pointerIdToPos.get(myPointers.get(0)).y);
 			} else { // one finger scroll
-				int index = e.findPointerIndex(scrollPointerId);
-				if (index < e.getPointerCount()) {
-					TickWindowHelper.scroll(e.getX(index) - X_OFFSET,
-							e.getY(index));
-				}
+				TickWindowHelper.scroll(pointerIdToPos.get(scrollPointerId).x,
+						pointerIdToPos.get(scrollPointerId).y);
 			}
 		} else if (myPointers.size() - getNumLoopMarkersSelected() == 2) {
 			// two finger zoom
-			float leftX = Math.min(e.getX(0), e.getX(1));
-			float rightX = Math.max(e.getX(0), e.getX(1));
-			TickWindowHelper.zoom(leftX - X_OFFSET, rightX - X_OFFSET);
+			float leftX = Math.min(pointerIdToPos.get(myPointers.get(0)).x, pointerIdToPos.get(myPointers.get(1)).x);
+			float rightX = Math.max(pointerIdToPos.get(myPointers.get(0)).x, pointerIdToPos.get(myPointers.get(1)).x);
+			TickWindowHelper.zoom(leftX, rightX);
 		}
 	}
 
 	@Override
-	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
-		super.handleActionDown(e, id, x, y);
-		if (x < X_OFFSET) {
-			MidiTrackControlHelper.handlePress(id, x, yToNote(y));
-			return;
-		}
+	protected void handleActionDown(int id, float x, float y) {
+		super.handleActionDown(id, x, y);
 		myPointers.add(id);
 		ScrollBarHelper.startScrollView();
 		selectMidiNote(x, y, id);
@@ -717,13 +647,8 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionPointerDown(MotionEvent e, int id, float x,
-			float y) {
-		super.handleActionPointerDown(e, id, x, y);
-		if (x < X_OFFSET) {
-			MidiTrackControlHelper.handlePress(id, x, yToNote(y));
-			return;
-		}
+	protected void handleActionPointerDown(int id, float x, float y) {
+		super.handleActionPointerDown(id, x, y);
 		myPointers.add(id);
 		boolean noteAlreadySelected = false;
 		noteAlreadySelected = !touchedNotes.isEmpty();
@@ -734,15 +659,15 @@ public class MidiView extends ClickableSurfaceView {
 			if (yToNote(y) == -1) {
 				selectLoopMarker(id, x);
 			} else {
-				float leftTick = xToTick(Math.min(e.getX(0), e.getX(1)));
-				float rightTick = xToTick(Math.max(e.getX(0), e.getX(1)));
+				// TODO might cause problems
+				float leftTick = xToTick(Math.min(pointerIdToPos.get(0).x, pointerIdToPos.get(1).x));
+				float rightTick = xToTick(Math.max(pointerIdToPos.get(0).x, pointerIdToPos.get(1).x));
 				if (noteAlreadySelected) {
 					// note is selected with one pointer, but this pointer
 					// did not select a note. start pinching all selected notes.
 					MidiNote touchedNote = touchedNotes.values().iterator()
 							.next();
-					int leftId = e.getX(e.findPointerIndex(0)) <= e.getX(e
-							.findPointerIndex(1)) ? 0 : 1;
+					int leftId = pointerIdToPos.get(0).x <= pointerIdToPos.get(1).x ? 0 : 1;
 					int rightId = (leftId + 1) % 2;
 					pinchLeftPointerId = leftId;
 					pinchRightPointerId = rightId;
@@ -766,70 +691,51 @@ public class MidiView extends ClickableSurfaceView {
 	}
 
 	@Override
-	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
-		super.handleActionMove(e, id, x, y);
-		if (MidiTrackControlHelper.ownsPointer(id)) {
-			MidiTrackControlHelper.handleMove(e, id, x, y);
-			return;
-		}
-	
+	protected void handleActionMove(int id, float x, float y) {
+		super.handleActionMove(id, x, y);
 		if (pinch) {
-			int leftIndex = e.findPointerIndex(pinchLeftPointerId);
-			int rightIndex = e.findPointerIndex(pinchRightPointerId);
-			float leftTick = xToTick(e.getX(leftIndex));
-			float rightTick = xToTick(e.getX(rightIndex));
+			float leftTick = xToTick(pointerIdToPos.get(pinchLeftPointerId).x);
+			float rightTick = xToTick(pointerIdToPos.get(pinchRightPointerId).x);
 			pinchSelectedNotes(leftTick, rightTick);
-		} else if (touchedNotes.isEmpty()) { // no midi selected. scroll, zoom,
-												// or update select region
-			noMidiMove(e);
+		} else if (touchedNotes.isEmpty()) {
+			// no midi selected. scroll, zoom, or update select region
+			noMidiMove();
 		} else { // at least one midi selected
 			if (myPointers.size() - getNumLoopMarkersSelected() == 1) {
 				// exactly one pointer not dragging loop markers - drag all
 				// selected notes together
 				dragNotes(true, myPointers.get(0),
-						xToTick(e.getX(e.findPointerIndex(myPointers.get(0)))),
-						yToNote(e.getY(e.findPointerIndex(myPointers.get(0)))));
+						xToTick(pointerIdToPos.get(myPointers.get(0)).x),
+						yToNote(pointerIdToPos.get(myPointers.get(0)).y));
 			} else { // drag each touched note separately
-				for (int pointerId : myPointers) {
-					dragNotes(false, pointerId, xToTick(e.getX(pointerId)),
-							yToNote(e.getY(pointerId)));
-				}
+				dragNotes(false, id, xToTick(x), yToNote(y));
 			}
 			// make room in the view window if we are dragging out of the view
 			TickWindowHelper.updateView(midiManager.getLeftMostSelectedTick(),
 					midiManager.getRightMostSelectedTick());
 		}
-		updateLoopMarkers(e);
+		updateLoopMarkers();
 	}
 
 	@Override
-	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
-		if (MidiTrackControlHelper.ownsPointer(id)) {
-			MidiTrackControlHelper.handleRelease(id, x, yToNote(y));
-			return;
-		}
+	protected void handleActionPointerUp(int id, float x, float y) {
 		if (scrollPointerId == id)
 			scrollPointerId = -1;
 		for (int i = 0; i < 3; i++)
 			if (loopPointerIds[i] == id)
 				loopPointerIds[i] = -1;
-		int index = e.getActionIndex() == 0 ? 1 : 0;
 		if (zoomLeftAnchorTick != -1) {
+			int otherId = id == 0 ? 1 : 0;
 			pinch = false;
-			scrollAnchorTick = xToTick(e.getX(index));
-			scrollPointerId = e.getPointerId(index);
+			scrollAnchorTick = xToTick(pointerIdToPos.get(otherId).x);
+			scrollPointerId = otherId;
 		}
 		myPointers.remove((Object) id);
 	}
 
 	@Override
-	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
-		super.handleActionUp(e, id, x, y);
-		if (MidiTrackControlHelper.ownsPointer(id)) {
-			MidiTrackControlHelper.handleRelease(id, x, yToNote(y));
-			MidiTrackControlHelper.clearPointers();
-			return;
-		}
+	protected void handleActionUp(int id, float x, float y) {
+		super.handleActionUp(id, x, y);
 		ScrollBarHelper.handleActionUp();
 		for (int i = 0; i < 3; i++)
 			loopPointerIds[i] = -1;
@@ -845,20 +751,12 @@ public class MidiView extends ClickableSurfaceView {
 
 	@Override
 	protected void longPress(int id, float x, float y) {
-		if (x < X_OFFSET) {
-			MidiTrackControlHelper.handleLongPress(id, x, yToNote(y));
-			return;
-		}
 		if (myPointers.size() == 1)
 			startSelectRegion(x, y);
 	}
 
 	@Override
 	protected void singleTap(int id, float x, float y) {
-		if (x < X_OFFSET) {
-			// MidiTrackControlHelper.handleClick(x, yToNote(y));
-			return;
-		}
 		MidiNote touchedNote = touchedNotes.get(id);
 		if (midiManager.isCopying()) {
 			midiManager.paste((long) TickWindowHelper
@@ -889,5 +787,15 @@ public class MidiView extends ClickableSurfaceView {
 			midiManager.deleteNote(touchedNote);
 			stateChanged = true;
 		}
+	}
+
+	@Override
+	protected void createChildren() {
+		// leaf child - no children
+	}
+
+	@Override
+	protected void layoutChildren() {
+		// leaf child - no children
 	}
 }

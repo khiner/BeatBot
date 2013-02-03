@@ -92,7 +92,7 @@ public class RecordManager implements LevelListener {
 	public void stopRecording() throws IOException {
 		int trackNum = 0;
 		long recordEndTick = getAdjustedRecordTick();
-		GlobalVars.midiView.addMidiNote(recordStartTick, recordEndTick,
+		GlobalVars.midiGroup.midiView.addMidiNote(recordStartTick, recordEndTick,
 				trackNum);
 		state = State.LISTENING;
 		// close output stream
@@ -219,9 +219,6 @@ public class RecordManager implements LevelListener {
 		recorder.read(buffer, 0, bufferSize);
 		recorder.read(buffer, 0, bufferSize);
 
-		// let the midi view know recording has started
-		// so it can listen for byte buffers to draw them
-		GlobalVars.midiView.signalRecording();
 		try {
 			while (state != State.INITIALIZING) {
 				recorder.read(buffer, 0, bufferSize);
@@ -231,10 +228,8 @@ public class RecordManager implements LevelListener {
 				}
 				if (state == State.RECORDING) {
 					os.write(buffer); // write buffer to file
-					GlobalVars.midiView.drawWaveform(buffer); // draw waveform
 					if (underThreshold(buffer)) {
 						stopRecording();
-						GlobalVars.midiView.endWaveform();
 					}
 				}
 				// update threshold bar
@@ -249,7 +244,6 @@ public class RecordManager implements LevelListener {
 			}
 			e.printStackTrace();
 		}
-		GlobalVars.midiView.signalEndRecording();
 	}
 
 	private boolean overThreshold(byte[] buffer) {

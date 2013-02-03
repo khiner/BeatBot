@@ -4,7 +4,6 @@ import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class BBToggleButton extends BBButton {
 	boolean on = false;
-	boolean touched = false;
 
 	public BBToggleButton(TouchableSurfaceView parent) {
 		super(parent);
@@ -18,22 +17,20 @@ public class BBToggleButton extends BBButton {
 		else
 			currentIcon = defaultIcon;
 	}
-	
-	@Override
-	public void touch() {
-		// don't change icon on touch event for toggle button.
-		// wait for release to toggle icon
-		touched = true;
+
+	protected void touch() {
+		currentIcon = selectedIcon;
+		requestRender();
 	}
 
-	@Override
-	public void release() {
-		touched = false;
-	}
-
-	public void toggle() {
-		on = !on;
-		updateIcon();
+	protected void release(boolean sendEvent) {
+		if (sendEvent) {
+			setOn(!on);
+			notifyClicked();
+		} else if (!on) {
+			currentIcon = defaultIcon;
+		}
+		requestRender();
 	}
 
 	public boolean isOn() {
@@ -42,10 +39,6 @@ public class BBToggleButton extends BBButton {
 
 	public void setOn(boolean on) {
 		this.on = on;
-		updateIcon();
-	}
-
-	private void updateIcon() {
 		currentIcon = on ? selectedIcon : defaultIcon;
 	}
 }

@@ -43,11 +43,11 @@ public class TickWindowHelper {
 		float ZLAT = MidiView.zoomLeftAnchorTick;
 		float ZRAT = MidiView.zoomRightAnchorTick;
 		float newTOS = (ZRAT * leftX - ZLAT * rightX) / (leftX - rightX);
-		float newNumTicks = (ZLAT - newTOS) * midiView.getMidiWidth() / leftX;
+		float newNumTicks = (ZLAT - newTOS) * midiView.width / leftX;
 
 		if (newTOS < 0) {
 			currTickOffset = 0;
-			currNumTicks = ZRAT * midiView.getMidiWidth() / rightX;
+			currNumTicks = ZRAT * midiView.width / rightX;
 			currNumTicks = currNumTicks > MAX_TICKS ? MAX_TICKS : currNumTicks;
 		} else if (newNumTicks > MAX_TICKS) {
 			currTickOffset = newTOS;
@@ -56,8 +56,7 @@ public class TickWindowHelper {
 			currTickOffset = newTOS;
 			currNumTicks = MIN_TICKS;
 		} else if (newTOS + newNumTicks > MAX_TICKS) {
-			currNumTicks = ((ZLAT - MAX_TICKS) * midiView.getMidiWidth())
-					/ (leftX - midiView.getMidiWidth());
+			currNumTicks = ((ZLAT - MAX_TICKS) * midiView.width) / (leftX - midiView.width);
 			currTickOffset = MAX_TICKS - currNumTicks;
 		} else {
 			currTickOffset = newTOS;
@@ -80,8 +79,7 @@ public class TickWindowHelper {
 	}
 
 	public static void scroll(float x, float y) {
-		float newTickOffset = MidiView.scrollAnchorTick - currNumTicks * x
-				/ midiView.getMidiWidth();
+		float newTickOffset = MidiView.scrollAnchorTick - currNumTicks * x / midiView.width;
 		float newYOffset = MidiView.scrollAnchorY - y;
 		ScrollBarHelper.scrollXVelocity = newTickOffset - currTickOffset;
 		ScrollBarHelper.scrollYVelocity = newYOffset - currYOffset;
@@ -91,18 +89,15 @@ public class TickWindowHelper {
 
 	public static void updateGranularity() {
 		// x-coord width of one eight note
-		float spacing = (MidiManager.TICKS_IN_ONE_MEASURE * midiView
-				.getMidiWidth()) / (currNumTicks * 8);
+		float spacing = (MidiManager.TICKS_IN_ONE_MEASURE * midiView.width) / (currNumTicks * 8);
 		// after algebra, this condition says: if more than maxLines will
 		// display, reduce the granularity by one half, else if less than
 		// maxLines will display, increase the granularity by one half
 		// so that (minLinesDisplayed <= lines-displayed <=
 		// maxLinesDisplayed) at all times
-		if ((MAX_LINES_DISPLAYED * spacing) / granularity < midiView
-				.getMidiWidth())
+		if ((MAX_LINES_DISPLAYED * spacing) / granularity < midiView.width)
 			granularity /= 2;
-		else if ((MIN_LINES_DISPLAYED * spacing) / granularity > midiView
-				.getMidiWidth() && granularity < 4)
+		else if ((MIN_LINES_DISPLAYED * spacing) / granularity > midiView.width && granularity < 4)
 			granularity *= 2;
 		GlobalVars.currBeatDivision = granularity * 2;
 	}
