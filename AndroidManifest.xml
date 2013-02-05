@@ -29,10 +29,6 @@
             android:name="com.kh.activity.MidiFileMenuActivity"
             android:screenOrientation="landscape" >
         </activity>
-        <activity
-            android:name=".activity.EffectActivity"
-            android:screenOrientation="landscape" >
-        </activity>
     </application>
 
 </manifest>

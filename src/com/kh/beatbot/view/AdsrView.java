@@ -63,7 +63,6 @@ public class AdsrView extends TouchableViewWindow {
 			}
 			adsrCurveVb[i] = makeFloatBuffer(converted);
 		}
-		requestRender();
 	}
 
 	private float getAttackX(ADSR adsr) {
@@ -214,26 +213,31 @@ public class AdsrView extends TouchableViewWindow {
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		selectAdsrPoint(id, viewRect.clipX(x), viewRect.clipY(y));
+		requestRender();
 	}
 
 	@Override
 	protected void handleActionPointerDown(int id, float x, float y) {
 		selectAdsrPoint(id, viewRect.clipX(x), viewRect.clipY(y));
+		requestRender();
 	}
 
 	@Override
 	protected void handleActionMove(int id, float x, float y) {
 		moveAdsrPoint(id, viewRect.clipX(x), viewRect.clipY(y));
+		requestRender();
 	}
 
 	@Override
 	protected void handleActionPointerUp(int id, float x, float y) {
 		deselectAdsrPoint(id);
+		requestRender();
 	}
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
 		clearAdsrSelected();
+		requestRender();
 	}
 
 	@Override

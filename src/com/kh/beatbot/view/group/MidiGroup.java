@@ -1,5 +1,7 @@
 package com.kh.beatbot.view.group;
 
+import android.opengl.GLSurfaceView;
+
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.TouchableSurfaceView;
@@ -15,6 +17,11 @@ public class MidiGroup extends TouchableViewWindow {
 		super(parent);
 	}
 
+	public int getRenderMode() {
+		// needs to continuously render
+		return GLSurfaceView.RENDERMODE_CONTINUOUSLY;
+	}
+	
 	public void trackAdded(int newTrackNum) {
 		midiTrackControl.trackAdded(newTrackNum);
 		midiView.trackAdded(newTrackNum);

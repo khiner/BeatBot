@@ -36,6 +36,7 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.layout.EffectLayout;
 import com.kh.beatbot.layout.page.MainPageSelect;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.Managers;
@@ -421,6 +422,13 @@ public class BeatBotActivity extends Activity {
 	public void notifyTrackChanged() {
 		((MainPageSelect)findViewById(R.id.mainPageSelect)).update();
 		((PageFlipper)findViewById(R.id.mainFlipper)).notifyTrackChanged();
+	}
+	
+	public void launchEffect(Effect effect) {
+		setContentView(R.layout.empty_layout);
+		GLSurfaceViewGroup group = (GLSurfaceViewGroup)findViewById(R.id.empty_group);
+		EffectLayout renderer = new EffectLayout(group, effect);
+		group.setBBRenderer(renderer);
 	}
 	
 	public static native boolean createAudioPlayer();

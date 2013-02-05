@@ -13,6 +13,8 @@ public abstract class TouchableViewWindow extends ViewWindow {
 	// position relative to this window
 	protected Map<Integer, Position> pointerIdToPos = new HashMap<Integer, Position>();
 	
+	public TouchableViewWindow() {}
+	
 	public TouchableViewWindow(TouchableSurfaceView parent) {
 		super(parent);
 	}

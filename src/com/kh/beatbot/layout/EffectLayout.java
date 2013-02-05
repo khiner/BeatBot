@@ -15,6 +15,7 @@ import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
+import com.kh.beatbot.view.BBKnob;
 import com.kh.beatbot.view.BBSeekbar2d;
 import com.kh.beatbot.view.ParamControl;
 import com.kh.beatbot.view.TouchableSurfaceView;
@@ -25,7 +26,6 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 
 	private Effect effect = null;
 	private BBIconSource toggleButtonIcon = null;
-	private BBIconSource[] filterIcons = new BBIconSource[3];
 	private BBToggleButton[] filterToggles = new BBToggleButton[3];
 	private BBToggleButton toggleButton = null;
 	private BBToggleButton linkToggle = null;
@@ -33,10 +33,11 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 	private List<ParamControl> paramControls = new ArrayList<ParamControl>();
 	private ParamControl xParamControl = null, yParamControl = null;
 	private BBSeekbar2d level2d = null;
-	
+		
 	public EffectLayout(TouchableSurfaceView parent, Effect effect) {
-		super(parent);
 		this.effect = effect;
+		this.parent = parent;
+		createChildren();
 	}
 	
 	private void initEffectToggleButton() {
@@ -62,19 +63,16 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 		for (int i = 0; i < effect.getNumParams(); i++) {
 			ParamControl pc = new ParamControl((TouchableSurfaceView)parent, effect.getParam(i));
 			paramControls.add(pc);
-			pc.setId(i);
-			pc.removeAllListeners();
-			pc.addLevelListener(this);
+			pc.knob.setId(i);
+			pc.knob.removeAllListeners();
+			pc.knob.addLevelListener(this);
+			updateParamValueLabel(i);
 		}
 		level2d = new BBSeekbar2d((TouchableSurfaceView)parent);
 		level2d.removeAllListeners();
 		level2d.addLevelListener(this);
 		xParamControl = paramControls.get(0);
 		yParamControl = paramControls.get(1);
-		for (ParamControl paramControl : paramControls) {
-			int paramNum = paramControl.getId();
-			updateParamValueLabel(paramNum);
-		}
 		if (effect instanceof Delay) {
 			initDelayKnobs();
 		}
@@ -85,27 +83,27 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 	}
 
 	public void updateXYViewLevel() {
-		level2d.setViewLevelX(xParamControl.getLevel());
-		level2d.setViewLevelY(yParamControl.getLevel());
+		level2d.setViewLevelX(xParamControl.knob.getLevel());
+		level2d.setViewLevelY(yParamControl.knob.getLevel());
 	}
 	
 	public void link(View view) {
 		ParamControl leftChannelControl = paramControls.get(0);
 		ParamControl rightChannelControl = paramControls.get(1);
-		float newRightChannelLevel = rightChannelControl.getLevel();
-		boolean newRightChannelSynced = rightChannelControl.isBeatSync();
+		float newRightChannelLevel = rightChannelControl.knob.getLevel();
+		boolean newRightChannelSynced = rightChannelControl.knob.isBeatSync();
 
 		effect.setParamsLinked(((ToggleButton) view).isChecked());
 
 		if (effect.paramsLinked()) {
 			// y = feedback when linked
 			yParamControl = paramControls.get(2);
-			((Delay) effect).rightChannelLevelMemory = rightChannelControl
+			((Delay) effect).rightChannelLevelMemory = rightChannelControl.knob
 					.getLevel();
-			((Delay) effect).rightChannelBeatSyncMemory = rightChannelControl
+			((Delay) effect).rightChannelBeatSyncMemory = rightChannelControl.knob
 					.isBeatSync();
-			newRightChannelLevel = leftChannelControl.getLevel();
-			newRightChannelSynced = leftChannelControl.isBeatSync();
+			newRightChannelLevel = leftChannelControl.knob.getLevel();
+			newRightChannelSynced = leftChannelControl.knob.isBeatSync();
 		} else {
 			// y = right delay time when not linked
 			yParamControl = paramControls.get(1);
@@ -114,8 +112,8 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 				newRightChannelLevel = ((Delay) effect).rightChannelLevelMemory;
 		}
 		effect.getParam(1).beatSync = newRightChannelSynced;
-		rightChannelControl.setBeatSync(newRightChannelSynced);
-		rightChannelControl.setLevel(newRightChannelLevel);
+		rightChannelControl.knob.setBeatSync(newRightChannelSynced);
+		rightChannelControl.knob.setLevel(newRightChannelLevel);
 	}
 	
 	@Override
@@ -127,21 +125,19 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 		if (effect.paramsLinked()) {
 			if (levelListenable.getId() == 0) {
 				effect.setParamLevel(1, level);
-				paramControls.get(1).setViewLevel(level);
-//				paramControls.get(1).setValueLabel(
-//						paramControls.get(0).getValueLabel());
+				paramControls.get(1).knob.setViewLevel(level);
 			} else if (levelListenable.getId() == 1) {
-				paramControls.get(0).setLevel(level);
+				paramControls.get(0).knob.setLevel(level);
 			}
 		}
 	}
 
 	@Override
 	public void setLevel(LevelListenable level2d, float levelX, float levelY) {
-		xParamControl.setLevel(levelX);
-		yParamControl.setLevel(levelY);
-		updateParamValueLabel(xParamControl.getId());
-		updateParamValueLabel(yParamControl.getId());
+		xParamControl.knob.setLevel(levelX);
+		yParamControl.knob.setLevel(levelY);
+		updateParamValueLabel(xParamControl.knob.getId());
+		updateParamValueLabel(yParamControl.knob.getId());
 	}
 
 	@Override
@@ -156,17 +152,17 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 		}
 		int paramNum = listenable.getId();
 		Param param = effect.getParam(paramNum);
-		param.beatSync = ((ParamControl) listenable).isBeatSync();
+		param.beatSync = ((BBKnob) listenable).isBeatSync();
 		listenable.setLevel(param.viewLevel);
 		if (effect.paramsLinked()) {
 			if (paramNum == 0) {
 				effect.getParam(1).beatSync = param.beatSync;
-				paramControls.get(1).setBeatSync(param.beatSync);
-				paramControls.get(1).setLevel(param.viewLevel);
+				paramControls.get(1).knob.setBeatSync(param.beatSync);
+				paramControls.get(1).knob.setLevel(param.viewLevel);
 			} else if (paramNum == 1) {
 				effect.getParam(0).beatSync = param.beatSync;
-				paramControls.get(0).setBeatSync(param.beatSync);
-				paramControls.get(0).setLevel(param.viewLevel);
+				paramControls.get(0).knob.setBeatSync(param.beatSync);
+				paramControls.get(0).knob.setLevel(param.viewLevel);
 			}
 		}
 	}
@@ -179,7 +175,7 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 		}
 		if (effect.paramsLinked() && !(listenable instanceof BBSeekbar2d)) {
 			Param param = effect.getParam(listenable.getId());
-			((ParamControl) listenable).setBeatSync(param.beatSync);
+			((BBKnob) listenable).setBeatSync(param.beatSync);
 		}
 	}
 
@@ -207,13 +203,15 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 		toggleButtonIcon = new BBIconSource(-1, effect.getOffDrawableId(), effect.getOnDrawableId());
 		toggleButton.setIconSource(toggleButtonIcon);
 		toggleButton.setOn(effect.isOn());
-		filterIcons[0] = new BBIconSource(-1, R.drawable.lowpass_filter_icon, R.drawable.lowpass_filter_icon_selected);
-		filterIcons[1] = new BBIconSource(-1, R.drawable.bandpass_filter_icon, R.drawable.bandpass_filter_icon_selected);
-		filterIcons[2] = new BBIconSource(-1, R.drawable.highpass_filter_icon, R.drawable.highpass_filter_icon_selected);
-		for (int i = 0; i < 3; i++) {
-			filterToggles[i].setIconSource(filterIcons[i]);
+		if (effect instanceof Filter) {
+			filterToggles[0].setIconSource(new BBIconSource(-1, R.drawable.lowpass_filter_icon, R.drawable.lowpass_filter_icon_selected));
+			filterToggles[1].setIconSource(new BBIconSource(-1, R.drawable.bandpass_filter_icon, R.drawable.bandpass_filter_icon_selected));
+			filterToggles[2].setIconSource(new BBIconSource(-1, R.drawable.highpass_filter_icon, R.drawable.highpass_filter_icon_selected));
+			filterToggles[((Filter) effect).getMode()].setOn(true);
+			for (BBToggleButton filterToggle : filterToggles) {
+				addChild(filterToggle);
+			}
 		}
-		filterToggles[((Filter) effect).getMode()].setOn(true);
 	}
 
 	@Override
@@ -232,12 +230,16 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 		initEffectToggleButton();
 		initParamControls();
 		addChild(level2d);
-		
+		for (ParamControl paramControl : paramControls) {
+			addChild(paramControl);
+		}
 	}
 
 	@Override
 	protected void layoutChildren() {
-		// TODO Auto-generated method stub
-		
+		float paramW = (height / 2 - 10) / 2;
+		paramControls.get(0).layout(this, width / 30, height / 4, paramW, paramW * 2);
+		paramControls.get(1).layout(this, width - height - width / 30 - paramW, height / 4, paramW, paramW * 2);
+		level2d.layout(this, width - height, 0, height, height);
 	}
 }

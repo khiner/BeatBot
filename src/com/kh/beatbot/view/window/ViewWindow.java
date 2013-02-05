@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.opengl.GLSurfaceView;
 import android.util.FloatMath;
 
 import com.kh.beatbot.global.Colors;
@@ -56,6 +57,10 @@ public abstract class ViewWindow {
 		circleVb = makeFloatBuffer(coords);
 	}
 	
+	public ViewWindow() {
+		
+	}
+	
 	public ViewWindow(GLSurfaceViewBase parent) {
 		this.parent = parent;
 		createChildren();
@@ -78,11 +83,21 @@ public abstract class ViewWindow {
 		return id;
 	}
 	
-	protected abstract void loadIcons();
+	public int getRenderMode() {
+		// default render mode is 'when dirty'
+		// views needing continuous rendering can override this
+		return GLSurfaceView.RENDERMODE_WHEN_DIRTY;
+	}
 	
 	public abstract void init();
 
 	public abstract void draw();
+	
+	protected abstract void createChildren();
+	
+	protected abstract void layoutChildren();
+	
+	protected abstract void loadIcons();
 	
 	public void initAll() {
 		initBackgroundColor();
@@ -101,10 +116,6 @@ public abstract class ViewWindow {
 			pop();
 		}
 	}
-
-	protected abstract void createChildren();
-
-	protected abstract void layoutChildren();
 	
 	public void initGl(GL10 gl) {
 		this.gl = gl;
