@@ -4,8 +4,6 @@ import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.opengl.GLSurfaceView;
-
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
@@ -174,12 +172,6 @@ public class LevelsView extends TouchableViewWindow {
 			}
 		}
 		return false;
-	}
-
-	public int getRenderMode() {
-		// needs continous rendering, since it is linked with the movements
-		// of MidiView
-		return GLSurfaceView.RENDERMODE_CONTINUOUSLY;
 	}
 	
 	public void selectRegion(float x, float y) {

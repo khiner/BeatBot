@@ -5,8 +5,11 @@ import java.util.Collections;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.opengl.GLSurfaceView;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.activity.EffectActivity;
 import com.kh.beatbot.effect.Chorus;
 import com.kh.beatbot.effect.Decimate;
 import com.kh.beatbot.effect.Delay;
@@ -252,12 +255,19 @@ public class LevelsFXPage extends Page implements LevelListener {
 	private void launchEffectIntent(String effectName, int effectPosition, boolean setOn) {
 		Effect effect = getEffect(effectName, effectPosition);
 		if (effectName != effect.name) {
-			// different effect being added to effect slot. need to replace it
+			// different effect being added to the effect slot. need to replace
+			// it
 			effect.removeEffect();
 			effect = getEffect(effectName, effectPosition);
 		}
-		GlobalVars.mainActivity.launchEffect(effect);
+		Intent intent = new Intent();
+		intent.setClass(GlobalVars.mainActivity, EffectActivity.class);
+		intent.putExtra("effectPosition", effect.getPosition());
+		intent.putExtra("trackId", getCurrTrack().getId());
+		intent.putExtra("setOn", setOn);
+		GlobalVars.mainActivity.startActivity(intent);
 	}
+
 
 	private Effect getEffect(String effectName, int position) {
 		Effect effect = getCurrTrack().findEffectByPosition(position);
@@ -293,7 +303,7 @@ public class LevelsFXPage extends Page implements LevelListener {
 	public void draw() {
 		// parent view - no drawing
 	}
-
+	
 	@Override
 	protected void createChildren() {
 		effectLabel = new BBTextView((TouchableSurfaceView)parent);

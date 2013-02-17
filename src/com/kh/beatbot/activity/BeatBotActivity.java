@@ -36,7 +36,6 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.layout.EffectLayout;
 import com.kh.beatbot.layout.page.MainPageSelect;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.Managers;
@@ -206,23 +205,21 @@ public class BeatBotActivity extends Activity {
 	        .setIcon(android.R.drawable.ic_dialog_alert)
 	        .setTitle("Closing " + getString(R.string.app_name))
 	        .setMessage("Are you sure you want to exit " + getString(R.string.app_name) + "?")
-	        .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-	    {
-	        @Override
-	        public void onClick(DialogInterface dialog, int which) {
-	            finish();    
-	        }
-
+	        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+	        	@Override
+	        	public void onClick(DialogInterface dialog, int which) {
+	        		finish();    
+	        	}
 	    })
 	    .setNegativeButton("No", null)
 	    .show();
 	}
 
 	public void onPause() {
-		super.onPause();
 		bpmSurface.onPause();
 		midiSurface.onPause();
 		mainPageFlipper.onPause();
+		super.onPause();
 	}
 	
 	public void onResume() {
@@ -422,13 +419,6 @@ public class BeatBotActivity extends Activity {
 	public void notifyTrackChanged() {
 		((MainPageSelect)findViewById(R.id.mainPageSelect)).update();
 		((PageFlipper)findViewById(R.id.mainFlipper)).notifyTrackChanged();
-	}
-	
-	public void launchEffect(Effect effect) {
-		setContentView(R.layout.empty_layout);
-		GLSurfaceViewGroup group = (GLSurfaceViewGroup)findViewById(R.id.empty_group);
-		EffectLayout renderer = new EffectLayout(group, effect);
-		group.setBBRenderer(renderer);
 	}
 	
 	public static native boolean createAudioPlayer();

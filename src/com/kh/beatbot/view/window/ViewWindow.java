@@ -33,7 +33,7 @@ public abstract class ViewWindow {
 	protected List<ViewWindow> children = new ArrayList<ViewWindow>();
 	
 	protected GLSurfaceViewBase parent;
-	protected GL10 gl;
+	public static GL10 gl;
 	public float absoluteX = 0, absoluteY = 0;
 	public float x = 0, y = 0;
 	public float width = 0, height = 0;
@@ -117,10 +117,8 @@ public abstract class ViewWindow {
 		}
 	}
 	
-	public void initGl(GL10 gl) {
-		this.gl = gl;
-		for (ViewWindow child : children)
-			child.initGl(gl);
+	public void initGl(GL10 _gl) {
+		gl = _gl;
 		loadAllIcons();
 	}
 	

@@ -60,17 +60,14 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 	}
 
 	public void onSurfaceCreated(GL10 _gl, EGLConfig config) {
-		gl = _gl;
 	}
 
 	public final void onDrawFrame(GL10 _gl) {
-		gl = _gl;
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		draw();
 	}
 
 	protected void initGl(GL10 _gl) {
-		gl = _gl;
 		gl.glEnable(GL10.GL_POINT_SMOOTH);
 		gl.glEnable(GL10.GL_BLEND);
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);

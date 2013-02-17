@@ -28,6 +28,12 @@ public class NoteLevelsPage extends Page {
 		// TODO remember to turn off continuous mode when leaving
 	}
 
+	public int getRenderMode() {
+		// needs continous rendering, since it is linked with the movements
+		// of MidiView
+		return GLSurfaceView.RENDERMODE_CONTINUOUSLY;
+	}
+	
 	@Override
 	public void update() {
 		deselectAll();

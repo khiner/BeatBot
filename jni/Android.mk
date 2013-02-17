@@ -23,10 +23,12 @@ LOCAL_PATH = $(ROOT_PATH)
 FILE_LIST := $(wildcard $(LOCAL_PATH)/*.c)
 FILE_LIST += $(wildcard $(LOCAL_PATH)/effects/*.c)
 FILE_LIST += $(wildcard $(LOCAL_PATH)/generators/*.c)
-LOCAL_CFLAGS := -Wall -Wextra
 
+APP_ABI := armeabi armeabi-v7a 
 LOCAL_MODULE := nativeaudio
-LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -landroid -lOpenSLES 
+LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -landroid -lOpenSLES
+LOCAL_CFLAGS := -ffast-math -O3 -funroll-loops -Wall -Wextra
+LOCAL_ARM_MODE := arm
 LOCAL_SRC_FILES := $(FILE_LIST:$(LOCAL_PATH)/%=%)
 
 include $(BUILD_SHARED_LIBRARY)
