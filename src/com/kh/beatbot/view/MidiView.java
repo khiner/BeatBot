@@ -13,7 +13,6 @@ import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
-import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.helper.ScrollBarHelper;
 import com.kh.beatbot.view.helper.TickWindowHelper;
@@ -363,19 +362,12 @@ public class MidiView extends ClickableViewWindow {
 	
 	@Override
 	public void draw() {
-		boolean recording = Managers.recordManager.getState() != RecordManager.State.INITIALIZING;
 		boolean playing = Managers.playbackManager.getState() == PlaybackManager.State.PLAYING;
 		TickWindowHelper.scroll();
 		// we need to do this in every frame, because even if loop ticks aren't
 		// changing the tick window can change
 		initLoopRectVb();
 		drawLoopRect();
-		// if we're recording, keep the current recording tick in view.
-		if (recording
-				&& midiManager.getCurrTick() > TickWindowHelper.getTickOffset()
-						+ TickWindowHelper.getNumTicks())
-			TickWindowHelper.setNumTicks(midiManager.getCurrTick()
-					- TickWindowHelper.getTickOffset());
 		drawHorizontalLines();
 		drawTickFill();
 		
@@ -389,7 +381,7 @@ public class MidiView extends ClickableViewWindow {
 		drawSelectRegion();
 		drawLoopMarker();
 		ScrollBarHelper.drawScrollView(this);
-		if (playing || recording) {
+		if (playing) {
 			drawCurrentTick();
 		}
 	}
