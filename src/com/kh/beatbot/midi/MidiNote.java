@@ -1,11 +1,15 @@
 package com.kh.beatbot.midi;
 
+import java.nio.FloatBuffer;
+
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
 
 public class MidiNote implements Comparable<MidiNote> {
+	FloatBuffer vb; // vertex buffer for drawing
 	NoteOn noteOn;
 	NoteOff noteOff;
 	boolean selected = false;
@@ -14,8 +18,21 @@ public class MidiNote implements Comparable<MidiNote> {
 	public MidiNote(NoteOn noteOn, NoteOff noteOff) {
 		this.noteOn = noteOn;
 		this.noteOff = noteOff;
+		updateVb();
 	}
 
+	public void setVb(FloatBuffer vb) {
+		this.vb = vb;
+	}
+	
+	public FloatBuffer getVb() {
+		return vb;
+	}
+	
+	private void updateVb() {
+		GlobalVars.midiGroup.midiView.updateNoteVb(this);
+	}
+	
 	public MidiNote getCopy() {
 		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0,
 				noteOn.getNoteValue(), noteOn.getVelocity(), noteOn.getPan(),
@@ -110,11 +127,13 @@ public class MidiNote implements Comparable<MidiNote> {
 			noteOn.setTick(onTick);
 		else
 			noteOn.setTick(0);
+		updateVb();
 	}
 
 	public void setOffTick(long offTick) {
 		if (offTick > getOnTick())
 			this.noteOff.setTick(offTick);
+		updateVb();
 	}
 
 	public void setNote(int note) {
@@ -122,6 +141,7 @@ public class MidiNote implements Comparable<MidiNote> {
 			return;
 		this.noteOn.setNoteValue(note);
 		this.noteOff.setNoteValue(note);
+		updateVb();
 	}
 
 	public long getNoteLength() {

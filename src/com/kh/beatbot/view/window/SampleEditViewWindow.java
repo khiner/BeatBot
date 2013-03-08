@@ -58,8 +58,7 @@ public class SampleEditViewWindow extends TouchableViewWindow {
 	}
 
 	private void initBackgroundOutlineVb() {
-		backgroundOutlineVb = makeRectOutlineFloatBuffer(0, 0,
-				width - 2, height);
+		backgroundOutlineVb = makeRectFloatBuffer(0, 0, width - 2, height);
 	}
 
 	private void initLoopMarkerVb() {
@@ -103,10 +102,10 @@ public class SampleEditViewWindow extends TouchableViewWindow {
 	private void drawLoopSelectionMarkers() {
 		drawLines(loopSelectionLineVb, Colors.SAMPLE_LOOP_SELECT_OUTLINE, 2,
 				GL10.GL_LINES);
-		drawTriangleStrip(loopSelectionRectVbs[0],
+		drawTriangleFan(loopSelectionRectVbs[0],
 				beginLoopPointerId == -1 ? Colors.SAMPLE_LOOP_SELECT
 						: Colors.SAMPLE_LOOP_SELECT_SELECTED);
-		drawTriangleStrip(loopSelectionRectVbs[1],
+		drawTriangleFan(loopSelectionRectVbs[1],
 				endLoopPointerId == -1 ? Colors.SAMPLE_LOOP_SELECT
 						: Colors.SAMPLE_LOOP_SELECT_SELECTED);
 	}

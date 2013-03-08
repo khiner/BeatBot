@@ -169,11 +169,6 @@ public abstract class ViewWindow {
 
 	public static final FloatBuffer makeRectFloatBuffer(float x1, float y1, float x2,
 			float y2) {
-		return makeFloatBuffer(new float[] { x1, y1, x2, y1, x1, y2, x2, y2 });
-	}
-
-	public static final FloatBuffer makeRectOutlineFloatBuffer(float x1, float y1,
-			float x2, float y2) {
 		return makeFloatBuffer(new float[] { x1, y1, x1, y2, x2, y2, x2, y1 });
 	}
 
@@ -220,12 +215,12 @@ public abstract class ViewWindow {
 
 	public final void drawRectangle(float x1, float y1, float x2, float y2,
 			float[] color) {
-		drawTriangleStrip(makeRectFloatBuffer(x1, y1, x2, y2), color);
+		drawTriangleFan(makeRectFloatBuffer(x1, y1, x2, y2), color);
 	}
 
 	public void drawRectangleOutline(float x1, float y1, float x2,
 			float y2, float[] color, float width) {
-		drawLines(makeRectOutlineFloatBuffer(x1, y1, x2, y2), color, width,
+		drawLines(makeRectFloatBuffer(x1, y1, x2, y2), color, width,
 				GL10.GL_LINE_LOOP);
 	}
 

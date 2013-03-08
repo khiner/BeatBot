@@ -82,14 +82,7 @@ public class MidiView extends ClickableViewWindow {
 	}
 
 	private MidiManager midiManager;
-
-	private static final int[] V_LINE_WIDTHS = new int[] { 5, 3, 2 };
-	private static final float[][] V_LINE_COLORS =
-			new float[][] { Colors.MIDI_LINE_DARK,
-						    Colors.MIDI_LINE_MED,
-						    Colors.MIDI_LINE_LIGHT};
 	
-	private FloatBuffer[] vLineVb = new FloatBuffer[3];
 	private FloatBuffer currTickVb = null, hLineVb = null, tickHLineVb = null,
 			tickFillVb = null, selectRegionVb = null, loopMarkerVb = null,
 			loopMarkerLineVb = null, loopRectVb = null;
@@ -193,41 +186,6 @@ public class MidiView extends ClickableViewWindow {
 		translate(0, TickWindowHelper.getYOffset());
 	}
 
-	private void drawVerticalLines() {
-		// distance between one primary tick to the next
-		float translateDist = TickWindowHelper.getMajorTickSpacing() * 4f
-				* width / TickWindowHelper.getNumTicks();
-		// start at the first primary tick before display start
-		float startX = tickToX(TickWindowHelper
-				.getPrimaryTickToLeftOf(TickWindowHelper.getTickOffset()));
-		// end at the first primary tick after display end
-		float endX = tickToX(TickWindowHelper
-				.getPrimaryTickToLeftOf(TickWindowHelper.getTickOffset()
-						+ TickWindowHelper.getNumTicks()))
-				+ translateDist;
-
-		push();
-		translate(startX, 0);
-		for (int i = 0; i < 3; i++) {
-			setColor(V_LINE_COLORS[i]);
-			gl.glLineWidth(V_LINE_WIDTHS[i]); // appropriate line width
-			push();
-			for (float x = startX; x < endX; x += translateDist) {
-				gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vLineVb[i]);
-				gl.glDrawArrays(GL10.GL_LINES, 0, 2);
-				translate(translateDist, 0);
-			}
-			pop();
-			if (i == 0) {
-				translate(translateDist / 2, 0);
-			} else if (i == 1) {
-				translateDist /= 2;
-				translate(-translateDist / 2, 0);
-			}
-		}
-		pop();
-	}
-
 	private void drawCurrentTick() {
 		float xLoc = tickToX(midiManager.getCurrTick());
 		translate(xLoc, 0);
@@ -258,7 +216,7 @@ public class MidiView extends ClickableViewWindow {
 	}
 
 	private void drawTickFill() {
-		drawTriangleStrip(tickFillVb, Colors.TICK_FILL);
+		drawTriangleFan(tickFillVb, Colors.TICK_FILL);
 		drawLoopBar();
 		drawLines(tickHLineVb, Colors.BLACK, 2, GL10.GL_LINES);
 	}
@@ -272,7 +230,7 @@ public class MidiView extends ClickableViewWindow {
 	}
 
 	private void drawLoopRect() {
-		drawTriangleStrip(loopRectVb, Colors.MIDI_VIEW_LIGHT_BG);
+		drawTriangleFan(loopRectVb, Colors.MIDI_VIEW_LIGHT_BG);
 	}
 
 	private void initSelectRegionVb(float leftTick, float rightTick, float topY,
@@ -284,7 +242,7 @@ public class MidiView extends ClickableViewWindow {
 	private void drawSelectRegion() {
 		if (!selectRegion || selectRegionVb == null)
 			return;
-		drawTriangleStrip(selectRegionVb, Colors.SELECT_REGION);
+		drawTriangleFan(selectRegionVb, Colors.SELECT_REGION);
 	}
 
 	private void drawAllMidiNotes() {
@@ -302,13 +260,10 @@ public class MidiView extends ClickableViewWindow {
 	}
 
 	public void drawMidiNote(MidiNote midiNote, float[] color) {
-		// midi note rectangle coordinates
-		float x1 = tickToX(midiNote.getOnTick());
-		float y1 = noteToY(midiNote.getNoteValue());
-		float x2 = tickToX(midiNote.getOffTick());
-		float y2 = y1 + trackHeight;
-		drawRectangle(x1, y1, x2, y2, color);
-		drawRectangleOutline(x1, y1, x2, y2, Colors.BLACK, 4);
+		// fill
+		drawTriangleFan(midiNote.getVb(), color);
+		// outline
+		drawLines(midiNote.getVb(), Colors.BLACK, 4, GL10.GL_LINE_LOOP);
 	}
 
 	private void initTickFillVb() {
@@ -350,21 +305,6 @@ public class MidiView extends ClickableViewWindow {
 		hLineVb = makeFloatBuffer(hLines);
 	}
 
-	private void initVLineVbs() {
-		// height of the bottom of the record row
-		float y1 = Y_OFFSET;
-
-		for (int i = 0; i < 3; i++) {
-			// 4 vertices per line
-			float[] line = new float[4];
-			line[0] = 0;
-			line[1] = y1 - y1 / (i + 1.5f);
-			line[2] = 0;
-			line[3] = height;
-			vLineVb[i] = makeFloatBuffer(line);
-		}
-	}
-
 	private void initLoopMarkerVbs() {
 		float h = Y_OFFSET;
 		float[] loopMarkerLine = new float[] { 0, 0, 0, height };
@@ -376,6 +316,10 @@ public class MidiView extends ClickableViewWindow {
 		loopMarkerVb = makeFloatBuffer(loopMarkerTriangles);
 	}
 
+	public float tickToUnscaledX(float tick) {
+		return tick / TickWindowHelper.MAX_TICKS * width;
+	}
+	
 	public float tickToX(float tick) {
 		return (tick - TickWindowHelper.getTickOffset()) / TickWindowHelper.getNumTicks() * width;
 	}
@@ -402,7 +346,6 @@ public class MidiView extends ClickableViewWindow {
 	public void initAllVbs() {
 		initCurrTickVb();
 		initHLineVb();
-		initVLineVbs();
 		initLoopMarkerVbs();
 		initLoopRectVb();
 		initTickFillVb();
@@ -435,8 +378,14 @@ public class MidiView extends ClickableViewWindow {
 					- TickWindowHelper.getTickOffset());
 		drawHorizontalLines();
 		drawTickFill();
-		drawVerticalLines();
+		
+		push();
+		translate(-TickWindowHelper.getTickOffset() / TickWindowHelper.getNumTicks() * width, 0);
+		scale((float) TickWindowHelper.MAX_TICKS / (float) TickWindowHelper.getNumTicks(), 1);
+		TickWindowHelper.drawVerticalLines();
 		drawAllMidiNotes();
+		pop();
+		
 		drawSelectRegion();
 		drawLoopMarker();
 		ScrollBarHelper.drawScrollView(this);
@@ -518,7 +467,7 @@ public class MidiView extends ClickableViewWindow {
 		float offTick = onTick + spacing - 1;
 		return addMidiNote(onTick, offTick, track);
 	}
-
+	
 	public MidiNote addMidiNote(float onTick, float offTick, int track) {
 		MidiNote noteToAdd = midiManager.addNote((long) onTick, (long) offTick,
 				track, .75f, .5f, .5f);
@@ -530,6 +479,19 @@ public class MidiView extends ClickableViewWindow {
 		return noteToAdd;
 	}
 
+	public void updateNoteVb(MidiNote note) {
+		note.setVb(makeNoteVb(note));
+	}
+	
+	private FloatBuffer makeNoteVb(MidiNote note) {
+		// midi note rectangle coordinates
+		float x1 = tickToUnscaledX(note.getOnTick());
+		float y1 = noteToY(note.getNoteValue());
+		float x2 = tickToUnscaledX(note.getOffTick());
+		float y2 = y1 + trackHeight;
+		return makeRectFloatBuffer(x1, y1, x2, y2);	
+	}
+	
 	private void dragNotes(boolean dragAllSelected, int pointerId,
 			float currTick, int currNote) {
 		MidiNote touchedNote = touchedNotes.get(pointerId);

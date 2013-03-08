@@ -1,5 +1,10 @@
 package com.kh.beatbot.view.helper;
 
+import java.nio.FloatBuffer;
+
+import javax.microedition.khronos.opengles.GL10;
+
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.view.MidiView;
@@ -8,6 +13,7 @@ public class TickWindowHelper {
 
 	private static MidiView midiView = null;
 
+	public static final int NUM_VERTICAL_LINE_SETS = 6;
 	public static final float MIN_TICKS = MidiManager.TICKS_IN_ONE_MEASURE / 8;
 	public static final float MAX_TICKS = MidiManager.TICKS_IN_ONE_MEASURE * 4;
 	public static final int MIN_LINES_DISPLAYED = 8;
@@ -18,10 +24,18 @@ public class TickWindowHelper {
 	private static float currYOffset = 0;
 
 	// current number of ticks within the window
-	private static float currNumTicks = MidiManager.TICKS_IN_ONE_MEASURE + 4;
+	private static float currNumTicks = MAX_TICKS;
 
 	private static float granularity = 1;
 
+	private static FloatBuffer[] vLineVb = new FloatBuffer[NUM_VERTICAL_LINE_SETS];
+
+	public static void drawVerticalLines() {
+		for (FloatBuffer fb : vLineVb) {
+			midiView.drawLines(fb, Colors.BLACK, 2, GL10.GL_LINES);
+		}
+	}
+	
 	public static float getNumTicks() {
 		return currNumTicks;
 	}
@@ -36,6 +50,7 @@ public class TickWindowHelper {
 
 	public static void init(MidiView _midiView) {
 		midiView = _midiView;
+		initVLineVbs();
 		updateGranularity();
 	}
 
@@ -56,7 +71,8 @@ public class TickWindowHelper {
 			currTickOffset = newTOS;
 			currNumTicks = MIN_TICKS;
 		} else if (newTOS + newNumTicks > MAX_TICKS) {
-			currNumTicks = ((ZLAT - MAX_TICKS) * midiView.width) / (leftX - midiView.width);
+			currNumTicks = ((ZLAT - MAX_TICKS) * midiView.width)
+					/ (leftX - midiView.width);
 			currTickOffset = MAX_TICKS - currNumTicks;
 		} else {
 			currTickOffset = newTOS;
@@ -79,7 +95,8 @@ public class TickWindowHelper {
 	}
 
 	public static void scroll(float x, float y) {
-		float newTickOffset = MidiView.scrollAnchorTick - currNumTicks * x / midiView.width;
+		float newTickOffset = MidiView.scrollAnchorTick - currNumTicks * x
+				/ midiView.width;
 		float newYOffset = MidiView.scrollAnchorY - y;
 		ScrollBarHelper.scrollXVelocity = newTickOffset - currTickOffset;
 		ScrollBarHelper.scrollYVelocity = newYOffset - currYOffset;
@@ -89,7 +106,8 @@ public class TickWindowHelper {
 
 	public static void updateGranularity() {
 		// x-coord width of one eight note
-		float spacing = (MidiManager.TICKS_IN_ONE_MEASURE * midiView.width) / (currNumTicks * 8);
+		float spacing = (MidiManager.TICKS_IN_ONE_MEASURE * midiView.width)
+				/ (currNumTicks * 8);
 		// after algebra, this condition says: if more than maxLines will
 		// display, reduce the granularity by one half, else if less than
 		// maxLines will display, increase the granularity by one half
@@ -97,7 +115,8 @@ public class TickWindowHelper {
 		// maxLinesDisplayed) at all times
 		if ((MAX_LINES_DISPLAYED * spacing) / granularity < midiView.width)
 			granularity /= 2;
-		else if ((MIN_LINES_DISPLAYED * spacing) / granularity > midiView.width && granularity < 4)
+		else if ((MIN_LINES_DISPLAYED * spacing) / granularity > midiView.width
+				&& granularity < 4)
 			granularity *= 2;
 		GlobalVars.currBeatDivision = granularity * 2;
 	}
@@ -175,6 +194,27 @@ public class TickWindowHelper {
 		} else if (bottomY > currYOffset + midiView.getMidiHeight()
 				&& topY > currYOffset) {
 			setYOffset(bottomY - midiView.getMidiHeight());
+		}
+	}
+
+	private static void initVLineVbs() {
+		for (int setNum = 0; setNum < NUM_VERTICAL_LINE_SETS; setNum++) {
+			long tickSpacing = MidiManager.TICKS_IN_ONE_MEASURE >> setNum;
+			int numLines = (int)(MAX_TICKS / tickSpacing);
+			float[] lines = new float[4 * numLines];
+			long currTick = 0;
+			for (int i = 0; i < numLines; i++) {
+				float x = midiView.tickToX(currTick);
+				lines[i * 4] = x;
+				//lines[1] = y1 - y1 / (i + 1.5f);
+				//TODO incorporate height again
+				// height of the bottom of the record row
+				lines[i * 4 + 1] = MidiView.Y_OFFSET;
+				lines[i * 4 + 2] = x;
+				lines[i * 4 + 3] = midiView.height;
+				currTick += tickSpacing;
+			}
+			vLineVb[setNum] = MidiView.makeFloatBuffer(lines);
 		}
 	}
 }
