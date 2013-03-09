@@ -32,7 +32,7 @@ public class TickWindowHelper {
 
 	public static void drawVerticalLines() {
 		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
-			if (1 << i <= granularity * 4) {
+			if (1 << i <= granularity * 2) {
 				midiView.drawLines(vLineVbs[i], Colors.BLACK, 2, GL10.GL_LINES);
 			}
 		}
@@ -65,7 +65,7 @@ public class TickWindowHelper {
 		if (newTOS < 0) {
 			currTickOffset = 0;
 			currNumTicks = ZRAT * midiView.width / rightX;
-			currNumTicks = currNumTicks > MAX_TICKS ? MAX_TICKS : currNumTicks;
+			currNumTicks = currNumTicks <= MAX_TICKS ? (currNumTicks >= MIN_TICKS ? currNumTicks : MIN_TICKS) : MAX_TICKS;
 		} else if (newNumTicks > MAX_TICKS) {
 			currTickOffset = newTOS;
 			currNumTicks = MAX_TICKS - currTickOffset;
@@ -107,7 +107,7 @@ public class TickWindowHelper {
 	}
 
 	public static void updateGranularity() {
-		// x-coord width of one eight note
+		// x-coord width of one quarter note
 		float spacing = (MidiManager.TICKS_IN_ONE_MEASURE * midiView.width)
 				/ (currNumTicks * 8);
 		// after algebra, this condition says: if more than maxLines will
@@ -115,12 +115,12 @@ public class TickWindowHelper {
 		// maxLines will display, increase the granularity by one half
 		// so that (minLinesDisplayed <= lines-displayed <=
 		// maxLinesDisplayed) at all times
-		if ((MAX_LINES_DISPLAYED * spacing) / granularity < midiView.width)
+		if ((MAX_LINES_DISPLAYED * spacing * 2) / granularity < midiView.width)
 			granularity /= 2;
-		else if ((MIN_LINES_DISPLAYED * spacing) / granularity > midiView.width
-				&& granularity < 4)
+		else if ((MIN_LINES_DISPLAYED * spacing * 2) / granularity > midiView.width
+				&& granularity < 8)
 			granularity *= 2;
-		GlobalVars.currBeatDivision = granularity * 2;
+		GlobalVars.currBeatDivision = granularity;
 	}
 
 	public static void setTickOffset(float tickOffset) {
@@ -152,13 +152,12 @@ public class TickWindowHelper {
 	}
 
 	public static float getCurrentBeatDivision() {
-		// currently, granularity is relative to an eight note; x2 for quarter
-		// note
-		return granularity * 2;
+		// granularity is relative to one quarter note
+		return granularity;
 	}
 
 	public static float getMajorTickSpacing() {
-		return (MIN_TICKS * 2) / granularity;
+		return (MIN_TICKS * 4) / granularity;
 	}
 
 	public static float getMajorTickToLeftOf(float tick) {
