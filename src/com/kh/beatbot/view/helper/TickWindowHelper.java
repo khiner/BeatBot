@@ -28,11 +28,13 @@ public class TickWindowHelper {
 
 	private static float granularity = 1;
 
-	private static FloatBuffer[] vLineVb = new FloatBuffer[NUM_VERTICAL_LINE_SETS];
+	private static FloatBuffer[] vLineVbs = new FloatBuffer[NUM_VERTICAL_LINE_SETS];
 
 	public static void drawVerticalLines() {
-		for (FloatBuffer fb : vLineVb) {
-			midiView.drawLines(fb, Colors.BLACK, 2, GL10.GL_LINES);
+		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
+			if (1 << i <= granularity * 4) {
+				midiView.drawLines(vLineVbs[i], Colors.BLACK, 2, GL10.GL_LINES);
+			}
 		}
 	}
 	
@@ -156,7 +158,7 @@ public class TickWindowHelper {
 	}
 
 	public static float getMajorTickSpacing() {
-		return MIN_TICKS / granularity;
+		return (MIN_TICKS * 2) / granularity;
 	}
 
 	public static float getMajorTickToLeftOf(float tick) {
@@ -214,7 +216,7 @@ public class TickWindowHelper {
 				lines[i * 4 + 3] = midiView.height;
 				currTick += tickSpacing;
 			}
-			vLineVb[setNum] = MidiView.makeFloatBuffer(lines);
+			vLineVbs[setNum] = MidiView.makeFloatBuffer(lines);
 		}
 	}
 }
