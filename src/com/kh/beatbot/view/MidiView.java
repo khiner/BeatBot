@@ -83,9 +83,11 @@ public class MidiView extends ClickableViewWindow {
 	private MidiManager midiManager;
 	
 	private FloatBuffer currTickVb = null, hLineVb = null, tickHLineVb = null,
-			tickFillVb = null, selectRegionVb = null, loopMarkerVb = null,
-			loopMarkerLineVb = null, loopRectVb = null;
-
+			tickFillVb = null, selectRegionVb = null, loopRectVb = null, loopBarVb;
+	
+	private FloatBuffer[] loopMarkerVb = new FloatBuffer[2]; // loop triangle markers
+	private FloatBuffer[] loopMarkerLineVb = new FloatBuffer[2]; // vertical line loop markers
+	
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedNotes = new HashMap<Integer, MidiNote>();
 
@@ -193,24 +195,10 @@ public class MidiView extends ClickableViewWindow {
 	}
 
 	private void drawLoopMarker() {
-		float[][] color = new float[2][3];
-		color[0] = loopPointerIds[0] != -1 ? Colors.TICK_SELECTED
-				: Colors.TICK_MARKER;
-		color[1] = loopPointerIds[2] != -1 ? Colors.TICK_SELECTED
-				: Colors.TICK_MARKER;
-		gl.glLineWidth(6);
-		float[] loopMarkerLocs = { tickToX(midiManager.getLoopBeginTick()),
-				tickToX(midiManager.getLoopEndTick()) };
 		for (int i = 0; i < 2; i++) {
-			float loopMarkerLoc = loopMarkerLocs[i];
-			setColor(color[i]);
-			push();
-			translate(loopMarkerLoc, 0);
-			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerVb);
-			gl.glDrawArrays(GL10.GL_TRIANGLES, i * 3, 3);
-			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, loopMarkerLineVb);
-			gl.glDrawArrays(GL10.GL_LINES, 0, 2);
-			pop();
+			float[] color = loopPointerIds[i * 2] == -1 ? Colors.TICK_MARKER : Colors.TICK_SELECTED;
+			//drawTriangleStrip(loopMarkerVb[i], color);
+			drawLines(loopMarkerLineVb[i], color, 6, GL10.GL_LINES);
 		}
 	}
 
@@ -224,8 +212,7 @@ public class MidiView extends ClickableViewWindow {
 		float[] color = loopPointerIds[1] == -1 ? Colors.TICKBAR
 				: Colors.TICK_SELECTED;
 		// entire loop bar is selected. draw darker square
-		drawRectangle(tickToX(midiManager.getLoopBeginTick()), 0,
-				tickToX(midiManager.getLoopEndTick()), Y_OFFSET, color);
+		drawTriangleFan(loopBarVb, color);
 	}
 
 	private void drawLoopRect() {
@@ -234,8 +221,8 @@ public class MidiView extends ClickableViewWindow {
 
 	private void initSelectRegionVb(float leftTick, float rightTick, float topY,
 			float bottomY) {
-		selectRegionVb = makeRectFloatBuffer(tickToX(leftTick), topY,
-				tickToX(rightTick), bottomY);
+		selectRegionVb = makeRectFloatBuffer(tickToUnscaledX(leftTick), topY,
+				tickToUnscaledX(rightTick), bottomY);
 	}
 
 	private void drawSelectRegion() {
@@ -268,11 +255,16 @@ public class MidiView extends ClickableViewWindow {
 	private void initTickFillVb() {
 		tickFillVb = makeRectFloatBuffer(0, 0, width, Y_OFFSET);
 	}
+	
+	private void initLoopBarVb() {
+		loopBarVb = makeRectFloatBuffer(tickToUnscaledX(midiManager.getLoopBeginTick()), 0,
+						tickToUnscaledX(midiManager.getLoopEndTick()), Y_OFFSET);
+	}
 
 	private void initLoopRectVb() {
 		loopRectVb = makeRectFloatBuffer(
-				tickToX(midiManager.getLoopBeginTick()), Y_OFFSET,
-				tickToX(midiManager.getLoopEndTick()), height);
+				tickToUnscaledX(midiManager.getLoopBeginTick()), Y_OFFSET,
+				tickToUnscaledX(midiManager.getLoopEndTick()), height);
 	}
 
 	private void initCurrTickVb() {
@@ -305,14 +297,17 @@ public class MidiView extends ClickableViewWindow {
 	}
 
 	private void initLoopMarkerVbs() {
-		float h = Y_OFFSET;
-		float[] loopMarkerLine = new float[] { 0, 0, 0, height };
+		float x1 = tickToUnscaledX(midiManager.getLoopBeginTick());
+		float x2 = tickToUnscaledX(midiManager.getLoopEndTick());
+		float[][] loopMarkerLines = new float[][] {{ x1, 0, x1, height }, {x2, 0, x2, height}};
 		// loop begin triangle, pointing right, and
 		// loop end triangle, pointing left
-		float[] loopMarkerTriangles = new float[] { 0, 0, 0, h, h, h / 2, 0, 0,
-				0, h, -h, h / 2 };
-		loopMarkerLineVb = makeFloatBuffer(loopMarkerLine);
-		loopMarkerVb = makeFloatBuffer(loopMarkerTriangles);
+		float[][] loopMarkerTriangles = new float[][] { {x1, 0, x1, Y_OFFSET, x1 + Y_OFFSET, Y_OFFSET / 2},
+				{x2, 0, x2, Y_OFFSET, x2 - Y_OFFSET, Y_OFFSET / 2 }};
+		for (int i = 0; i < 2; i++) {
+			loopMarkerLineVb[i] = makeFloatBuffer(loopMarkerLines[i]);
+			loopMarkerVb[i] = makeFloatBuffer(loopMarkerTriangles[i]);
+		}
 	}
 
 	public float tickToUnscaledX(float tick) {
@@ -347,6 +342,7 @@ public class MidiView extends ClickableViewWindow {
 		initHLineVb();
 		initLoopMarkerVbs();
 		initLoopRectVb();
+		initLoopBarVb();
 		initTickFillVb();
 	}
 
@@ -362,26 +358,22 @@ public class MidiView extends ClickableViewWindow {
 	
 	@Override
 	public void draw() {
-		boolean playing = Managers.playbackManager.getState() == PlaybackManager.State.PLAYING;
-		TickWindowHelper.scroll();
-		// we need to do this in every frame, because even if loop ticks aren't
-		// changing the tick window can change
-		initLoopRectVb();
-		drawLoopRect();
-		drawHorizontalLines();
-		drawTickFill();
+		TickWindowHelper.scroll(); // take care of any momentum scrolling
 		
 		push();
 		translate(-TickWindowHelper.getTickOffset() / TickWindowHelper.getNumTicks() * width, 0);
 		scale((float) TickWindowHelper.MAX_TICKS / (float) TickWindowHelper.getNumTicks(), 1);
+		drawLoopRect();
+		drawHorizontalLines();
+		drawTickFill();
 		TickWindowHelper.drawVerticalLines();
 		drawAllMidiNotes();
-		pop();
-		
 		drawSelectRegion();
 		drawLoopMarker();
+		pop();
 		ScrollBarHelper.drawScrollView(this);
-		if (playing) {
+		if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
+			// if playing, draw curr tick
 			drawCurrentTick();
 		}
 	}
@@ -560,6 +552,9 @@ public class MidiView extends ClickableViewWindow {
 				Managers.trackManager.updateAllTrackNextNotes();
 				TickWindowHelper.updateView(midiManager.getLoopBeginTick(),
 						midiManager.getLoopEndTick());
+				initLoopRectVb();
+				initLoopMarkerVbs();
+				initLoopBarVb();
 			}
 		}
 	}

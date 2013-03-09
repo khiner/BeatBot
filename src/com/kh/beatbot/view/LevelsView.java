@@ -90,7 +90,7 @@ public class LevelsView extends TouchableViewWindow {
 	private void drawSelectRegion() {
 		if (!selectRegion || selectRegionVb == null)
 			return;
-		drawTriangleStrip(selectRegionVb, Colors.SELECT_REGION);
+		drawTriangleFan(selectRegionVb, Colors.SELECT_REGION);
 	}
 
 	private void initSelectRegionVb(float leftTick, float rightTick,
