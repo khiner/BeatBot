@@ -14,10 +14,10 @@ public class TickWindowHelper {
 	private static MidiView midiView = null;
 
 	public static final int NUM_VERTICAL_LINE_SETS = 6;
-	public static final float MIN_TICKS = MidiManager.TICKS_IN_ONE_MEASURE / 8;
-	public static final float MAX_TICKS = MidiManager.TICKS_IN_ONE_MEASURE * 4;
 	public static final int MIN_LINES_DISPLAYED = 8;
 	public static final int MAX_LINES_DISPLAYED = 32;
+	public static final float MIN_TICKS = MidiManager.TICKS_IN_ONE_MEASURE / 8;
+	public static final float MAX_TICKS = MidiManager.TICKS_IN_ONE_MEASURE * 4;
 
 	// leftmost tick to display
 	private static float currTickOffset = 0;
@@ -26,15 +26,17 @@ public class TickWindowHelper {
 	// current number of ticks within the window
 	private static float currNumTicks = MAX_TICKS;
 
-	private static float granularity = 1;
+	// number of quarter notes per beat division - i.e. the "current grid granularity"
+	// can be < 1
+	private static float currNumQuarterNotes = 1;
 
 	private static FloatBuffer[] vLineVbs = new FloatBuffer[NUM_VERTICAL_LINE_SETS];
 
 	public static void drawVerticalLines() {
 		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
-			if (1 << i <= granularity * 2) {
-				midiView.drawLines(vLineVbs[i], Colors.BLACK, 2, GL10.GL_LINES);
-			}
+			if (1 << (i - 1) > currNumQuarterNotes)
+				break; // break when lines go below current granulariy
+			midiView.drawLines(vLineVbs[i], Colors.MIDI_LINES[i], 2, GL10.GL_LINES);
 		}
 	}
 	
@@ -115,12 +117,12 @@ public class TickWindowHelper {
 		// maxLines will display, increase the granularity by one half
 		// so that (minLinesDisplayed <= lines-displayed <=
 		// maxLinesDisplayed) at all times
-		if ((MAX_LINES_DISPLAYED * spacing * 2) / granularity < midiView.width)
-			granularity /= 2;
-		else if ((MIN_LINES_DISPLAYED * spacing * 2) / granularity > midiView.width
-				&& granularity < 8)
-			granularity *= 2;
-		GlobalVars.currBeatDivision = granularity;
+		if ((MAX_LINES_DISPLAYED * spacing * 2) / currNumQuarterNotes < midiView.width)
+			currNumQuarterNotes /= 2;
+		else if ((MIN_LINES_DISPLAYED * spacing * 2) / currNumQuarterNotes > midiView.width
+				&& currNumQuarterNotes < 8)
+			currNumQuarterNotes *= 2;
+		GlobalVars.currBeatDivision = currNumQuarterNotes;
 	}
 
 	public static void setTickOffset(float tickOffset) {
@@ -153,11 +155,11 @@ public class TickWindowHelper {
 
 	public static float getCurrentBeatDivision() {
 		// granularity is relative to one quarter note
-		return granularity;
+		return currNumQuarterNotes;
 	}
 
 	public static float getMajorTickSpacing() {
-		return (MIN_TICKS * 4) / granularity;
+		return MidiManager.TICKS_IN_ONE_MEASURE / (currNumQuarterNotes * 2);
 	}
 
 	public static float getMajorTickToLeftOf(float tick) {

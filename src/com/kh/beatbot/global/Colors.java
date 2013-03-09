@@ -6,8 +6,7 @@ import android.app.Activity;
 
 public class Colors {
 	public static float[] BG_COLOR, BLACK, WHITE, GREEN, YELLOW,
-			RED, MIDI_LINE_DARK, MIDI_LINE_MED, MIDI_LINE_LIGHT,
-			MIDI_VIEW_BG, MIDI_VIEW_LIGHT_BG, GRID_LINE,
+			RED, MIDI_VIEW_BG, MIDI_VIEW_LIGHT_BG, GRID_LINE,
 			WAVEFORM, SELECT_REGION, NOTE, NOTE_SELECTED, VOLUME,
 			PAN, PITCH, LEVEL_SELECTED, TICK_FILL, TICK_MARKER,
 			TICKBAR, TICK_SELECTED, VOLUME_LIGHT, VOLUME_SELECTED, BPM_OFF,
@@ -15,6 +14,15 @@ public class Colors {
 			SAMPLE_LOOP_HIGHLIGHT, SAMPLE_LOOP_SELECT,
 			SAMPLE_LOOP_SELECT_SELECTED, SAMPLE_LOOP_SELECT_OUTLINE,
 			LABEL_DARK, LABEL_MED, LABEL_LIGHT, LABEL_VERY_LIGHT;
+	
+	public static float[][] MIDI_LINES = {
+		{0, 0, 0, 1},
+		{.1f, .1f, .1f, 1},
+		{.2f, .2f, .2f, 1},
+		{.3f, .3f, .3f, 1},
+		{.4f, .4f, .4f, 1},
+		{.5f, .5f, .5f, 1}
+	};
 	
 	public static void initColors(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
@@ -28,9 +36,6 @@ public class Colors {
 		
 		NOTE = colorResourceToFloats(activity, R.color.note);
 		NOTE_SELECTED = colorResourceToFloats(activity, R.color.noteSelected);
-		MIDI_LINE_DARK = colorResourceToFloats(activity, R.color.midiLineDark);
-		MIDI_LINE_MED = colorResourceToFloats(activity, R.color.midiLineMed);
-		MIDI_LINE_LIGHT = colorResourceToFloats(activity, R.color.midiLineLight);
 		MIDI_VIEW_BG = colorResourceToFloats(activity, R.color.midiViewBg);
 		MIDI_VIEW_LIGHT_BG = colorResourceToFloats(activity, R.color.midiViewLightBg);
 		GRID_LINE = colorResourceToFloats(activity, R.color.gridLine);
@@ -62,6 +67,10 @@ public class Colors {
 		LABEL_MED = colorResourceToFloats(activity, R.color.labelMed);
 		LABEL_LIGHT = colorResourceToFloats(activity, R.color.labelLight);
 		LABEL_VERY_LIGHT = colorResourceToFloats(activity, R.color.labelVeryLight);
+		
+		
+		// varying darkness for vertical midi lines
+		
 	}
 	
 	public static float[] colorResourceToFloats(Activity activity, int resourceId) {

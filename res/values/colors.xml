@@ -11,9 +11,6 @@
     <color name="bpmOffSelected">#4EFF4E3F</color>
     <color name="gridLine">#FF000000</color>
     <color name="waveform">#FF000000</color>
-    <color name="midiLineDark">#FF000000</color>
-    <color name="midiLineMed">#FF333333</color>
-    <color name="midiLineLight">#FF4E4E4E</color>
     <color name="midiViewBg">#FF808080</color>
     <color name="midiViewLightBg">#FFB3B3B3</color>
     <color name="note">#FFFF0000</color>
