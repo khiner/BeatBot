@@ -82,7 +82,7 @@ public class MidiView extends ClickableViewWindow {
 
 	private MidiManager midiManager;
 	
-	private FloatBuffer currTickVb = null, hLineVb = null, tickHLineVb = null,
+	private FloatBuffer bgVb = null, currTickVb = null, hLineVb = null, tickHLineVb = null,
 			tickFillVb = null, selectRegionVb = null, loopRectVb = null, loopBarVb;
 	
 	private FloatBuffer[] loopMarkerVb = new FloatBuffer[2]; // loop triangle markers
@@ -219,6 +219,10 @@ public class MidiView extends ClickableViewWindow {
 		drawTriangleFan(loopRectVb, Colors.MIDI_VIEW_LIGHT_BG);
 	}
 
+	private void initBgVb() {
+		bgVb = makeRectFloatBuffer(0, 0, width, height);
+	}
+	
 	private void initSelectRegionVb(float leftTick, float rightTick, float topY,
 			float bottomY) {
 		selectRegionVb = makeRectFloatBuffer(tickToUnscaledX(leftTick), topY,
@@ -338,6 +342,7 @@ public class MidiView extends ClickableViewWindow {
 	}
 	
 	public void initAllVbs() {
+		initBgVb();
 		initCurrTickVb();
 		initHLineVb();
 		initLoopMarkerVbs();
@@ -360,6 +365,7 @@ public class MidiView extends ClickableViewWindow {
 	public void draw() {
 		TickWindowHelper.scroll(); // take care of any momentum scrolling
 		
+		drawTriangleFan(bgVb, Colors.MIDI_VIEW_BG);
 		push();
 		translate(-TickWindowHelper.getTickOffset() / TickWindowHelper.getNumTicks() * width, 0);
 		scale((float) TickWindowHelper.MAX_TICKS / (float) TickWindowHelper.getNumTicks(), 1);
@@ -371,6 +377,7 @@ public class MidiView extends ClickableViewWindow {
 		drawSelectRegion();
 		drawLoopMarker();
 		pop();
+		drawLines(bgVb, Colors.BLACK, 3, GL10.GL_LINE_LOOP);
 		ScrollBarHelper.drawScrollView(this);
 		if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			// if playing, draw curr tick

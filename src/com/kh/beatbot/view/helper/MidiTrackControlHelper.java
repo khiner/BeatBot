@@ -1,5 +1,6 @@
 package com.kh.beatbot.view.helper;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.global.BBButton;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.BBToggleButton;
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.Managers;
@@ -19,7 +21,7 @@ public class MidiTrackControlHelper extends TouchableViewWindow {
 	public class ButtonRow extends TouchableViewWindow {
 		int trackNum;
 		BBToggleButton instrumentButton, muteButton, soloButton;
-
+		
 		public ButtonRow(TouchableSurfaceView parent, int trackNum) {
 			super(parent);
 			this.trackNum = trackNum;
@@ -100,6 +102,8 @@ public class MidiTrackControlHelper extends TouchableViewWindow {
 	private static BBIconSource muteIcon, soloIcon;
 	private static List<ButtonRow> buttonRows = new ArrayList<ButtonRow>();
 
+	private FloatBuffer bgVb = null;
+	
 	public MidiTrackControlHelper(TouchableSurfaceView parent) {
 		super(parent);
 	}
@@ -127,13 +131,18 @@ public class MidiTrackControlHelper extends TouchableViewWindow {
 		addChild(newRow);
 	}
 
-	/** draw background color & track control icons */
 	public void draw() {
-		//GLSurfaceViewBase.drawTriangleStrip(bgRectVb, Colors.BG_COLOR);
+		// draw background fill
+		drawTriangleFan(bgVb, Colors.BG_COLOR);
 	}
 
+	private void initBgVb() {
+		bgVb = makeRectFloatBuffer(0, 0, width, height);
+	}
+	
 	@Override
 	public void init() {
+		initBgVb();
 	}
 
 	@Override
