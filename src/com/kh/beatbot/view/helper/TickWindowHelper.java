@@ -163,19 +163,33 @@ public class TickWindowHelper {
 		return MidiManager.TICKS_IN_ONE_MEASURE / (currNumQuarterNotes * 2);
 	}
 
+	public static float getMajorTickNearestTo(float tick) {
+		float spacing = getMajorTickSpacing(); 
+		if (tick % spacing > spacing / 2) {
+			return tick + spacing - tick % spacing;
+		} else {
+			return tick - tick % spacing;
+		}
+	}
+	
 	public static float getMajorTickToLeftOf(float tick) {
 		return tick - tick % getMajorTickSpacing();
 	}
 
-	public static float getPrimaryTickToLeftOf(float tick) {
-		return tick - tick % (getMajorTickSpacing() * 4);
+	public static void updateView(float tick) {
+		// if we are dragging out of view, scroll appropriately
+		if (tick < currTickOffset) {
+			// if the left is out but the right is in, just scroll
+			setTickOffset(tick);
+		} else if (tick > currTickOffset + currNumTicks) {
+			// if the right is out but the left is in, just scroll
+			setTickOffset(tick - currNumTicks);
+		}
 	}
-
+	
 	public static void updateView(float leftTick, float rightTick) {
 		// if we are dragging out of view, scroll appropriately
-		if (leftTick < currTickOffset
-				&& rightTick > currTickOffset + currNumTicks) {
-			// both left and right are out of view, change view to fit
+		if (leftTick <= currTickOffset && rightTick >= currTickOffset + currNumTicks) {
 			setTickOffset(leftTick);
 			setNumTicks(rightTick - leftTick);
 		} else if (leftTick < currTickOffset) {
@@ -189,9 +203,9 @@ public class TickWindowHelper {
 
 	// translates the tickOffset to ensure that leftTick, rightTick, topY and
 	// bottomY are all in view
-	public static void updateView(float leftTick, float rightTick, float topY,
+	public static void updateView(float tick, float topY,
 			float bottomY) {
-		updateView(leftTick, rightTick);
+		updateView(tick);
 		if (topY < currYOffset
 				&& bottomY < currYOffset + midiView.getMidiHeight()) {
 			setYOffset(topY);

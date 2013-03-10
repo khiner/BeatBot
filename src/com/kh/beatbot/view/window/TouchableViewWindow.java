@@ -28,8 +28,7 @@ public abstract class TouchableViewWindow extends ViewWindow {
 	}
 	
 	public void notifyActionDown(int id, float x, float y) {
-		Position pos = new Position(x, y);
-		pointerIdToPos.put(id, pos);
+		pointerIdToPos.put(id, new Position(x, y));
 		handleActionDown(id, x, y);
 	}
 
@@ -39,8 +38,7 @@ public abstract class TouchableViewWindow extends ViewWindow {
 	}
 
 	public void notifyActionPointerDown(int id, float x, float y) {
-		Position pos = new Position(x, y);
-		pointerIdToPos.put(id, pos);
+		pointerIdToPos.put(id, new Position(x, y));
 		handleActionPointerDown(id, x, y);
 	}
 

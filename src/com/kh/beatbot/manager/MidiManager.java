@@ -543,11 +543,15 @@ public class MidiManager implements Parcelable {
 	}
 
 	public void setLoopBeginTick(long loopBeginTick) {
+		if (loopBeginTick >= loopEndTick)
+			return;
 		MidiManager.loopBeginTick = loopBeginTick;
 		setLoopBeginTickNative(loopBeginTick);
 	}
 
 	public void setLoopEndTick(long loopEndTick) {
+		if (loopEndTick <= loopBeginTick)
+			return;
 		MidiManager.loopEndTick = loopEndTick;
 		setLoopEndTickNative(loopEndTick);
 	}
