@@ -578,7 +578,7 @@ public class MidiView extends ClickableViewWindow {
 			// two finger zoom
 			float leftX = Math.min(pointerIdToPos.get(myPointers.get(0)).x, pointerIdToPos.get(myPointers.get(1)).x);
 			float rightX = Math.max(pointerIdToPos.get(myPointers.get(0)).x, pointerIdToPos.get(myPointers.get(1)).x);
-			TickWindowHelper.zoom(leftX, rightX);
+			TickWindowHelper.zoom(leftX, rightX, zoomLeftAnchorTick, zoomRightAnchorTick);
 		}
 	}
 

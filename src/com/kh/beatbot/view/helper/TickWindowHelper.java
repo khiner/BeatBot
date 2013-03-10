@@ -1,6 +1,8 @@
 package com.kh.beatbot.view.helper;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -24,7 +26,7 @@ public class TickWindowHelper {
 	private static float currYOffset = 0;
 
 	// current number of ticks within the window
-	private static float currNumTicks = MAX_TICKS;
+	private static float currNumTicks = MidiManager.TICKS_IN_ONE_MEASURE;
 
 	// number of quarter notes per beat division - i.e. the "current grid granularity"
 	// can be < 1
@@ -34,7 +36,7 @@ public class TickWindowHelper {
 
 	public static void drawVerticalLines() {
 		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
-			if (1 << (i - 1) > currNumQuarterNotes)
+			if (1 << i > currNumQuarterNotes * 4)
 				break; // break when lines go below current granulariy
 			midiView.drawLines(vLineVbs[i], Colors.MIDI_LINES[i], 2, GL10.GL_LINES);
 		}
@@ -58,28 +60,27 @@ public class TickWindowHelper {
 		updateGranularity();
 	}
 
-	public static void zoom(float leftX, float rightX) {
-		float ZLAT = MidiView.zoomLeftAnchorTick;
-		float ZRAT = MidiView.zoomRightAnchorTick;
-		float newTOS = (ZRAT * leftX - ZLAT * rightX) / (leftX - rightX);
-		float newNumTicks = (ZLAT - newTOS) * midiView.width / leftX;
+	public static void zoom(float leftX, float rightX, float ZLAT, float ZRAT) {
+		leftX = leftX == 0 ? 1 : leftX; // avoid divide by zero
+		float newTickOffset = (ZRAT * leftX - ZLAT * rightX) / (leftX - rightX);
+		float newNumTicks = (ZLAT - newTickOffset) * midiView.width / leftX;
 
-		if (newTOS < 0) {
+		if (newTickOffset < 0) {
 			currTickOffset = 0;
 			currNumTicks = ZRAT * midiView.width / rightX;
 			currNumTicks = currNumTicks <= MAX_TICKS ? (currNumTicks >= MIN_TICKS ? currNumTicks : MIN_TICKS) : MAX_TICKS;
 		} else if (newNumTicks > MAX_TICKS) {
-			currTickOffset = newTOS;
+			currTickOffset = newTickOffset;
 			currNumTicks = MAX_TICKS - currTickOffset;
 		} else if (newNumTicks < MIN_TICKS) {
-			currTickOffset = newTOS;
+			currTickOffset = newTickOffset;
 			currNumTicks = MIN_TICKS;
-		} else if (newTOS + newNumTicks > MAX_TICKS) {
+		} else if (newTickOffset + newNumTicks > MAX_TICKS) {
 			currNumTicks = ((ZLAT - MAX_TICKS) * midiView.width)
 					/ (leftX - midiView.width);
 			currTickOffset = MAX_TICKS - currNumTicks;
 		} else {
-			currTickOffset = newTOS;
+			currTickOffset = newTickOffset;
 			currNumTicks = newNumTicks;
 		}
 		updateGranularity();
@@ -201,23 +202,29 @@ public class TickWindowHelper {
 	}
 
 	private static void initVLineVbs() {
-		for (int setNum = 0; setNum < NUM_VERTICAL_LINE_SETS; setNum++) {
-			long tickSpacing = MidiManager.TICKS_IN_ONE_MEASURE >> setNum;
-			int numLines = (int)(MAX_TICKS / tickSpacing);
-			float[] lines = new float[4 * numLines];
-			long currTick = 0;
-			for (int i = 0; i < numLines; i++) {
-				float x = midiView.tickToX(currTick);
-				lines[i * 4] = x;
-				//lines[1] = y1 - y1 / (i + 1.5f);
-				//TODO incorporate height again
-				// height of the bottom of the record row
-				lines[i * 4 + 1] = MidiView.Y_OFFSET;
-				lines[i * 4 + 2] = x;
-				lines[i * 4 + 3] = midiView.height;
-				currTick += tickSpacing;
+		List<List<Float>> allVertices = new ArrayList<List<Float>>();
+		
+		long minTickSpacing = (long)(MIN_TICKS / 2);
+		long[] tickSpacings = new long[NUM_VERTICAL_LINE_SETS];
+		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
+			allVertices.add(new ArrayList<Float>());
+			tickSpacings[i] = minTickSpacing * (1 << (NUM_VERTICAL_LINE_SETS - i - 1));
+		}
+		for (long currTick = 0; currTick < MAX_TICKS; currTick += minTickSpacing) {
+			for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
+				if (currTick % tickSpacings[i] == 0) {
+					float x = midiView.tickToUnscaledX(currTick);
+					allVertices.get(i).add(x);
+					allVertices.get(i).add(MidiView.Y_OFFSET);
+					allVertices.get(i).add(x);
+					allVertices.get(i).add(midiView.height);
+					break; // each line goes in only ONE line set
+				}
 			}
-			vLineVbs[setNum] = MidiView.makeFloatBuffer(lines);
+		}
+		// convert the list of float lists into a list of FloatBuffers
+		for (int i = 0; i < allVertices.size(); i++) {
+			vLineVbs[i] = MidiView.makeFloatBuffer(allVertices.get(i));
 		}
 	}
 }

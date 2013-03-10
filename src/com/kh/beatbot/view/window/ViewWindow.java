@@ -12,6 +12,7 @@ import android.opengl.GLSurfaceView;
 import android.util.FloatMath;
 
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.view.GLSurfaceViewBase;
 
 public abstract class ViewWindow {
@@ -154,15 +155,19 @@ public abstract class ViewWindow {
 		return null;
 	}
 	
-	public static final FloatBuffer makeFloatBuffer(float[] arr) {
-		return makeFloatBuffer(arr, 0);
+	public static final FloatBuffer makeFloatBuffer(List<Float> vertices) {
+		return makeFloatBuffer(GeneralUtils.floatListToArray(vertices));
+	}
+	
+	public static final FloatBuffer makeFloatBuffer(float[] vertices) {
+		return makeFloatBuffer(vertices, 0);
 	}
 
-	public static final FloatBuffer makeFloatBuffer(float[] arr, int position) {
-		ByteBuffer bb = ByteBuffer.allocateDirect(arr.length * 4);
+	public static final FloatBuffer makeFloatBuffer(float[] vertices, int position) {
+		ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
 		bb.order(ByteOrder.nativeOrder());
 		FloatBuffer fb = bb.asFloatBuffer();
-		fb.put(arr);
+		fb.put(vertices);
 		fb.position(position);
 		return fb;
 	}

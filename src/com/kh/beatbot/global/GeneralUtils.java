@@ -1,5 +1,7 @@
 package com.kh.beatbot.global;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.media.AudioManager;
 import android.view.Window;
@@ -39,5 +41,13 @@ public class GeneralUtils {
 			}
 		}
 		return false;
+	}
+	
+	public static float[] floatListToArray(List<Float> list) {
+		float[] array = new float[list.size()];
+		for (int j = 0; j < list.size(); j++) {
+			array[j] = list.get(j);
+		}
+		return array;
 	}
 }
