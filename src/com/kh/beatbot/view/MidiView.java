@@ -693,15 +693,20 @@ public class MidiView extends ClickableViewWindow {
 		} else { // at least one midi selected
 			float tick = xToTick(x);
 			int note = yToNote(y);
-			if (myPointers.size() - getNumLoopMarkersSelected() == 1 && id == 0) {
+			if (touchedNotes.size() == 1 && id == 0) {
 				// exactly one pointer not dragging loop markers - drag all
 				// selected notes together
 				dragNotes(true, myPointers.get(0), tick, note);
-			} else { // drag each touched note separately
+				// make room in the view window if we are dragging out of the view
+				TickWindowHelper.updateView(tick);
+			} else if (touchedNotes.size() > 1){  // drag each touched note separately
 				dragNotes(false, id, tick, note);
+				if (id == 0) {
+					// need to make room for two pointers in this case.
+					float otherTick = xToTick(pointerIdToPos.get(1).x);
+					TickWindowHelper.updateView(Math.min(tick, otherTick), Math.max(tick, otherTick));
+				}
 			}
-			// make room in the view window if we are dragging out of the view
-			TickWindowHelper.updateView(tick);
 		}
 		updateLoopMarkers();
 	}
@@ -719,7 +724,8 @@ public class MidiView extends ClickableViewWindow {
 			scrollAnchorTick = xToTick(pointerIdToPos.get(otherId).x);
 			scrollPointerId = otherId;
 		}
-		myPointers.remove((Object) id);
+		myPointers.remove(id);
+		touchedNotes.remove(id);
 	}
 
 	@Override

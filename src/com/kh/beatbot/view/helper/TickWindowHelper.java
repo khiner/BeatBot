@@ -179,10 +179,8 @@ public class TickWindowHelper {
 	public static void updateView(float tick) {
 		// if we are dragging out of view, scroll appropriately
 		if (tick < currTickOffset) {
-			// if the left is out but the right is in, just scroll
 			setTickOffset(tick);
 		} else if (tick > currTickOffset + currNumTicks) {
-			// if the right is out but the left is in, just scroll
 			setTickOffset(tick - currNumTicks);
 		}
 	}
@@ -193,10 +191,8 @@ public class TickWindowHelper {
 			setTickOffset(leftTick);
 			setNumTicks(rightTick - leftTick);
 		} else if (leftTick < currTickOffset) {
-			// if the left is out but the right is in, just scroll
 			setTickOffset(leftTick);
 		} else if (rightTick > currTickOffset + currNumTicks) {
-			// if the right is out but the left is in, just scroll
 			setTickOffset(rightTick - currNumTicks);
 		}
 	}
