@@ -1,7 +1,6 @@
 package com.kh.beatbot.view;
 
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -98,8 +97,6 @@ public class MidiView extends ClickableViewWindow {
 	// map of pointerIds to the original on-ticks of the notes they are touching
 	// (before dragging)
 	private Map<Integer, Float> startOnTicks = new HashMap<Integer, Float>();
-
-	private List<Integer> myPointers = new ArrayList<Integer>();
 
 	public enum State {
 		LEVELS_VIEW, NORMAL_VIEW, TO_LEVELS_VIEW, TO_NORMAL_VIEW
@@ -594,20 +591,20 @@ public class MidiView extends ClickableViewWindow {
 	}
 
 	public void noMidiMove() {
-		if (myPointers.size() - getNumLoopMarkersSelected() == 1) {
+		if (pointerCount() - getNumLoopMarkersSelected() == 1) {
 			if (selectRegion) { // update select region
-				selectRegion(pointerIdToPos.get(myPointers.get(0)).x,
-						pointerIdToPos.get(myPointers.get(0)).y);
+				selectRegion(pointerIdToPos.get(0).x,
+						pointerIdToPos.get(0).y);
 			} else { // one finger scroll
 				TickWindowHelper.scroll(pointerIdToPos.get(scrollPointerId).x,
 						pointerIdToPos.get(scrollPointerId).y);
 			}
-		} else if (myPointers.size() - getNumLoopMarkersSelected() == 2) {
+		} else if (pointerCount() - getNumLoopMarkersSelected() == 2) {
 			// two finger zoom
-			float leftX = Math.min(pointerIdToPos.get(myPointers.get(0)).x,
-					pointerIdToPos.get(myPointers.get(1)).x);
-			float rightX = Math.max(pointerIdToPos.get(myPointers.get(0)).x,
-					pointerIdToPos.get(myPointers.get(1)).x);
+			float leftX = Math.min(pointerIdToPos.get(0).x,
+					pointerIdToPos.get(1).x);
+			float rightX = Math.max(pointerIdToPos.get(0).x,
+					pointerIdToPos.get(1).x);
 			TickWindowHelper.zoom(leftX, rightX, zoomLeftAnchorTick,
 					zoomRightAnchorTick);
 		}
@@ -616,7 +613,6 @@ public class MidiView extends ClickableViewWindow {
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
-		myPointers.add(id);
 		ScrollBarHelper.startScrollView();
 		selectMidiNote(x, y, id);
 		if (touchedNotes.get(id) == null) {
@@ -636,11 +632,10 @@ public class MidiView extends ClickableViewWindow {
 	@Override
 	protected void handleActionPointerDown(int id, float x, float y) {
 		super.handleActionPointerDown(id, x, y);
-		myPointers.add(id);
 		boolean noteAlreadySelected = false;
 		noteAlreadySelected = !touchedNotes.isEmpty();
 		selectMidiNote(x, y, id);
-		if (myPointers.size() > 2)
+		if (pointerCount() > 2)
 			return;
 		if (touchedNotes.get(id) == null) {
 			if (yToNote(y) == -1) {
@@ -664,7 +659,7 @@ public class MidiView extends ClickableViewWindow {
 					pinchLeftOffset = leftTick - touchedNote.getOnTick();
 					pinchRightOffset = touchedNote.getOffTick() - rightTick;
 					pinch = true;
-				} else if (myPointers.size() - getNumLoopMarkersSelected() == 1) {
+				} else if (pointerCount() - getNumLoopMarkersSelected() == 1) {
 					// otherwise, enable scrolling
 					scrollAnchorTick = xToTick(x);
 					scrollPointerId = id;
@@ -690,16 +685,16 @@ public class MidiView extends ClickableViewWindow {
 		} else if (touchedNotes.isEmpty()) {
 			// no midi selected. scroll, zoom, or update select region
 			noMidiMove();
-		} else { // at least one midi selected
+		} else if (touchedNotes.containsKey(id)) { // at least one midi selected
 			float tick = xToTick(x);
 			int note = yToNote(y);
-			if (touchedNotes.size() == 1 && id == 0) {
+			if (touchedNotes.size() == 1) {
 				// exactly one pointer not dragging loop markers - drag all
 				// selected notes together
-				dragNotes(true, myPointers.get(0), tick, note);
+				dragNotes(true, touchedNotes.keySet().iterator().next(), tick, note);
 				// make room in the view window if we are dragging out of the view
 				TickWindowHelper.updateView(tick);
-			} else if (touchedNotes.size() > 1){  // drag each touched note separately
+			} else if (touchedNotes.size() > 1) {  // drag each touched note separately
 				dragNotes(false, id, tick, note);
 				if (id == 0) {
 					// need to make room for two pointers in this case.
@@ -724,7 +719,6 @@ public class MidiView extends ClickableViewWindow {
 			scrollAnchorTick = xToTick(pointerIdToPos.get(otherId).x);
 			scrollPointerId = otherId;
 		}
-		myPointers.remove(id);
 		touchedNotes.remove(id);
 	}
 
@@ -741,12 +735,11 @@ public class MidiView extends ClickableViewWindow {
 		stateChanged = false;
 		startOnTicks.clear();
 		touchedNotes.clear();
-		myPointers.clear();
 	}
 
 	@Override
 	protected void longPress(int id, float x, float y) {
-		if (myPointers.size() == 1)
+		if (pointerCount() == 1)
 			startSelectRegion(x, y);
 	}
 

@@ -12,7 +12,6 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.ThresholdBarView;
@@ -48,7 +47,6 @@ public class RecordManager implements LevelListener {
 
 	private short currAmp = 0;
 	private short currThreshold;
-	private long recordStartTick = 0;
 	private int currSampleNum = 0;
 	static final Pattern lastIntPattern = Pattern.compile("[^0-9]+([0-9]+)$");
 
@@ -83,17 +81,12 @@ public class RecordManager implements LevelListener {
 	}
 
 	public void startRecording() throws IOException {
-		recordStartTick = getAdjustedRecordTick();
 		updateFileNames();
 		os = writeWaveFileHeader(currWavFileName, 0, 0);
 		state = State.RECORDING;
 	}
 
 	public void stopRecording() throws IOException {
-		int trackNum = 0;
-		long recordEndTick = getAdjustedRecordTick();
-		GlobalVars.midiGroup.midiView.addMidiNote(recordStartTick, recordEndTick,
-				trackNum);
 		state = State.LISTENING;
 		// close output stream
 		os.close();
@@ -135,23 +128,6 @@ public class RecordManager implements LevelListener {
 				stopListening();
 			recorder.release();
 		}
-	}
-
-	public long getRecordStartTick() {
-		return recordStartTick;
-	}
-
-	public long getRecordCurrTick() {
-		long recordCurrTick = Managers.midiManager.getCurrTick()
-				- RECORD_LATENCY_TICKS;
-		if (recordCurrTick < Managers.midiManager.getLoopBeginTick()
-				|| state == State.RECORDING && recordCurrTick < recordStartTick) {
-			// if recording past loop end, keep record note going as if there
-			// was no loop
-			recordCurrTick = Managers.midiManager.getLoopEndTick()
-					- Managers.midiManager.getLoopBeginTick() + recordCurrTick;
-		}
-		return recordCurrTick;
 	}
 
 	public void startRecordingNative() {
@@ -365,19 +341,6 @@ public class RecordManager implements LevelListener {
 
 	public static short dbToShort(float db) {
 		return (short) (32768 * Math.pow(10, db / 20));
-	}
-
-	private long getAdjustedRecordTick() {
-		long adjustedTick = getRecordCurrTick();
-		if (state != State.RECORDING) {
-			// 16th note quantization for note beginning (but not end)
-			adjustedTick = Managers.midiManager.getNearestMajorTick(
-					adjustedTick, 4);
-			if (adjustedTick >= Managers.midiManager.getLoopEndTick()) {
-				adjustedTick %= Managers.midiManager.getLoopEndTick();
-			}
-		}
-		return adjustedTick;
 	}
 
 	@Override

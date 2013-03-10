@@ -23,7 +23,7 @@ import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
-import com.kh.beatbot.view.BpmView;
+import com.kh.beatbot.view.helper.TickWindowHelper;
 
 public class MidiManager implements Parcelable {
 	private static MidiManager singletonInstance = null;
@@ -280,8 +280,8 @@ public class MidiManager implements Parcelable {
 		if (offTick <= onTick)
 			offTick = onTick + 4;
 		if (snapToGrid) {
-			onTick = getNearestMajorTick(onTick, GlobalVars.currBeatDivision);
-			offTick = getNearestMajorTick(offTick, GlobalVars.currBeatDivision) - 1;
+			onTick = (long)TickWindowHelper.getMajorTickNearestTo(onTick);
+			offTick = (long)TickWindowHelper.getMajorTickNearestTo(offTick) - 1;
 			if (offTick == onTick - 1) {
 				offTick += getTicksPerBeat(GlobalVars.currBeatDivision);
 			}
@@ -344,19 +344,10 @@ public class MidiManager implements Parcelable {
 	 * given the provided beat division
 	 */
 	public void quantize(MidiNote midiNote, float beatDivision) {
-		long diff = getNearestMajorTick(midiNote.getOnTick(), beatDivision)
+		long diff = (long)TickWindowHelper.getMajorTickNearestTo(midiNote.getOnTick())
 				- midiNote.getOnTick();
 		setNoteTicks(midiNote, midiNote.getOnTick() + diff,
 				midiNote.getOffTick() + diff, false, true);
-	}
-
-	public long getNearestMajorTick(long tick, float beatDivision) {
-		long ticksPerBeat = getTicksPerBeat(beatDivision);
-		long remainder = tick % ticksPerBeat;
-		long nearestMajorTick = tick - tick % ticksPerBeat;
-		if (remainder > ticksPerBeat / 2)
-			nearestMajorTick += ticksPerBeat;
-		return nearestMajorTick;
 	}
 
 	public void handleMidiCollisions() {
