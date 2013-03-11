@@ -32,7 +32,7 @@ import com.kh.beatbot.view.BBTextView;
 import com.kh.beatbot.view.TouchableSurfaceView;
 import com.kh.beatbot.view.control.ControlViewBase;
 import com.kh.beatbot.view.control.Seekbar;
-import com.kh.beatbot.view.list.EffectLabelList;
+import com.kh.beatbot.view.list.DraggableLabelList;
 import com.kh.beatbot.view.list.LabelList;
 
 public class LevelsFXPage extends Page implements LevelListener {
@@ -68,7 +68,7 @@ public class LevelsFXPage extends Page implements LevelListener {
 
 		@Override
 		public void labelListInitialized(LabelList labelList) {
-			effectLabelList = (EffectLabelList)labelList;
+			effectLabelList = (DraggableLabelList)labelList;
 			if (effectLabelList.anyLabels()) {
 				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
 					Effect effect = getCurrTrack().findEffectByPosition(i);
@@ -129,7 +129,7 @@ public class LevelsFXPage extends Page implements LevelListener {
 	private boolean masterMode = false;
 	
 	// effects attrs
-	private EffectLabelList effectLabelList;
+	private DraggableLabelList effectLabelList;
 	private String[] effectNames;
 	
 	public LevelsFXPage(TouchableSurfaceView parent) {
@@ -333,7 +333,7 @@ public class LevelsFXPage extends Page implements LevelListener {
 		// effects
 		effectNames = GlobalVars.mainActivity.getResources().getStringArray(
 				R.array.effect_names);
-		effectLabelList = new EffectLabelList((TouchableSurfaceView)root);
+		effectLabelList = new DraggableLabelList((TouchableSurfaceView)root);
 		effectLabelList.setListener(new EffectLabelListListener(GlobalVars.mainActivity));
 		
 		addChild(effectLabel);
