@@ -1,9 +1,8 @@
 package com.kh.beatbot.view;
 
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.view.window.TouchableViewWindow;
 
-public class ParamControl extends TouchableViewWindow {
+public class ParamControl extends TouchableBBView {
 	public static final float ¹ = (float) Math.PI;
 	
 	private Param param;

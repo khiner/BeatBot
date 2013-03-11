@@ -7,13 +7,13 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import com.kh.beatbot.view.BBView;
+import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
-import com.kh.beatbot.view.window.TouchableViewWindow;
-import com.kh.beatbot.view.window.ViewWindow;
 
 public class GLSurfaceViewGroup extends TouchableSurfaceView {
 
-	protected ViewWindow renderer;
+	protected BBView renderer;
 
 	public GLSurfaceViewGroup(Context context) {
 		super(context);
@@ -23,7 +23,7 @@ public class GLSurfaceViewGroup extends TouchableSurfaceView {
 		super(context, attr);
 	}
 
-	public void setBBRenderer(ViewWindow renderer) {
+	public void setBBRenderer(BBView renderer) {
 		this.renderer = renderer;
 		setRenderMode(renderer.getRenderMode());
 	}
@@ -54,33 +54,33 @@ public class GLSurfaceViewGroup extends TouchableSurfaceView {
 	 * child.
 	 */
 	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
-		if (renderer instanceof TouchableViewWindow) {
-			((TouchableViewWindow) renderer).handleActionDown(e, id, x, y);
+		if (renderer instanceof TouchableBBView) {
+			((TouchableBBView) renderer).handleActionDown(e, id, x, y);
 		}
 	}
 
 	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
-		if (renderer instanceof TouchableViewWindow) {
-			((TouchableViewWindow) renderer).handleActionUp(e, id, x, y);
+		if (renderer instanceof TouchableBBView) {
+			((TouchableBBView) renderer).handleActionUp(e, id, x, y);
 		}
 	}
 
 	protected void handleActionPointerDown(MotionEvent e, int id, float x,
 			float y) {
-		if (renderer instanceof TouchableViewWindow) {
-			((TouchableViewWindow) renderer).handleActionPointerDown(e, id, x, y);
+		if (renderer instanceof TouchableBBView) {
+			((TouchableBBView) renderer).handleActionPointerDown(e, id, x, y);
 		}
 	}
 
 	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
-		if (renderer instanceof TouchableViewWindow) {
-			((TouchableViewWindow) renderer).handleActionPointerUp(e, id, x, y);
+		if (renderer instanceof TouchableBBView) {
+			((TouchableBBView) renderer).handleActionPointerUp(e, id, x, y);
 		}
 	}
 	
 	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
-		if (renderer instanceof TouchableViewWindow) {
-			((TouchableViewWindow) renderer).handleActionMove(e, id, x, y);
+		if (renderer instanceof TouchableBBView) {
+			((TouchableBBView) renderer).handleActionMove(e, id, x, y);
 		}
 	}
 }

@@ -19,8 +19,8 @@ import android.graphics.Typeface;
 import android.util.FloatMath;
 
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.GLSurfaceViewBase;
-import com.kh.beatbot.view.window.ViewWindow;
 
 public class GLText {
 
@@ -185,7 +185,7 @@ public class GLText {
 	// A: text - the string to draw
 	// x, y - the x,y position to draw text at (bottom left of text; including
 	// descent)
-	public void draw(ViewWindow view, String text, int height, float x, float y) {
+	public void draw(BBView view, String text, int height, float x, float y) {
 		view.push();
 		view.translate(x, y);
 		float scale = (float) height / size;

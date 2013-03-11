@@ -4,11 +4,11 @@ import android.opengl.GLSurfaceView;
 
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.MidiView;
+import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
 import com.kh.beatbot.view.helper.MidiTrackControlHelper;
-import com.kh.beatbot.view.window.TouchableViewWindow;
 
-public class MidiGroup extends TouchableViewWindow {
+public class MidiGroup extends TouchableBBView {
 
 	public MidiView midiView;
 	public MidiTrackControlHelper midiTrackControl;

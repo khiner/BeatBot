@@ -11,9 +11,8 @@ import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.group.PageFlipper;
-import com.kh.beatbot.view.window.TouchableViewWindow;
 
-public class AdsrView extends TouchableViewWindow {
+public class AdsrView extends TouchableBBView {
 
 	private static final int SNAP_DIST_SQUARED = 1024;
 	private static float[] pointVertices = new float[10];

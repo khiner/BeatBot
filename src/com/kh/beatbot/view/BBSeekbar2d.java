@@ -5,10 +5,9 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 
-public class BBSeekbar2d extends LevelListenable {
+public class BBSeekbar2d extends LevelViewBase {
 	private float selectX = 0, selectY = 0;
 	private static ViewRect viewRect;
 	private static FloatBuffer lineVb = null;

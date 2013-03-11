@@ -1,4 +1,4 @@
-package com.kh.beatbot.listenable;
+package com.kh.beatbot.view;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -8,12 +8,8 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.global.BBIcon;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listener.LabelListListener;
-import com.kh.beatbot.view.GLSurfaceViewBase;
-import com.kh.beatbot.view.TouchableSurfaceView;
-import com.kh.beatbot.view.window.ClickableViewWindow;
-import com.kh.beatbot.view.window.ViewWindow;
 
-public class LabelList extends ClickableViewWindow {
+public class LabelList extends ClickableBBView {
 
 	private static float addTextWidth;
 
@@ -27,9 +23,9 @@ public class LabelList extends ClickableViewWindow {
 		public float x, textWidth, labelWidth;
 		public LabelState state;
 		public FloatBuffer backgroundRectVb = null;
-		public ViewWindow view;
+		public BBView view;
 		
-		Label(ViewWindow view, String text, boolean on, float x) {
+		Label(BBView view, String text, boolean on, float x) {
 			this.view = view;
 			this.text = text;
 			this.x = x;

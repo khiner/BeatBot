@@ -9,11 +9,11 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 
-import com.kh.beatbot.view.window.ViewWindow;
+import com.kh.beatbot.view.BBView;
 
 public abstract class GLSurfaceViewFlipper extends GLSurfaceViewGroup {
 
-	protected List<ViewWindow> pages = new ArrayList<ViewWindow>();
+	protected List<BBView> pages = new ArrayList<BBView>();
 	
 	public GLSurfaceViewFlipper(Context context, AttributeSet attr) {
 		super(context, attr);
@@ -22,7 +22,7 @@ public abstract class GLSurfaceViewFlipper extends GLSurfaceViewGroup {
 
 	protected abstract void createPages();
 	
-	public void addPage(ViewWindow page) {
+	public void addPage(BBView page) {
 		pages.add(page);
 	}
 	
@@ -33,7 +33,7 @@ public abstract class GLSurfaceViewFlipper extends GLSurfaceViewGroup {
 
 	@Override
 	protected void init() {
-		for (ViewWindow page : pages) {
+		for (BBView page : pages) {
 			page.initAll();
 		}
 	}
@@ -41,13 +41,13 @@ public abstract class GLSurfaceViewFlipper extends GLSurfaceViewGroup {
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		super.surfaceChanged(holder, format, w, h);
-		for (ViewWindow page : pages)
+		for (BBView page : pages)
 			page.layout(null, 0, 0, w, h);
 	}
 	
 	public void initGl(GL10 gl) {
 		super.initGl(gl);
-		for (ViewWindow page : pages)
+		for (BBView page : pages)
 			page.initGl(gl);
 	}
 }

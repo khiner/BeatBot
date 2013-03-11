@@ -3,9 +3,8 @@ package com.kh.beatbot.view;
 import java.nio.FloatBuffer;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.listenable.LevelListenable;
 
-public class BBSeekbar extends LevelListenable {
+public class BBSeekbar extends LevelViewBase {
 
 	protected FloatBuffer levelBarVb = null;
 	protected int numLevelVertices = 0;

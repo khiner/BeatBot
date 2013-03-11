@@ -1,6 +1,6 @@
 package com.kh.beatbot.listener;
 
-import com.kh.beatbot.listenable.LabelList;
+import com.kh.beatbot.view.LabelList;
 
 public interface LabelListListener {
 	void labelListInitialized(LabelList labelList);

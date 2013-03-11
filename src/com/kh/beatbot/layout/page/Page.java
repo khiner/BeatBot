@@ -1,9 +1,9 @@
 package com.kh.beatbot.layout.page;
 
+import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
-import com.kh.beatbot.view.window.TouchableViewWindow;
 
-public abstract class Page extends TouchableViewWindow {
+public abstract class Page extends TouchableBBView {
 	
 	public Page(TouchableSurfaceView parent) {
 		super(parent);

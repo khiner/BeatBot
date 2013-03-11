@@ -5,15 +5,15 @@ import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.global.BBButton;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.BBToggleButton;
-import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.AdsrView;
 import com.kh.beatbot.view.BBSeekbar;
 import com.kh.beatbot.view.BBTextView;
+import com.kh.beatbot.view.BBView;
+import com.kh.beatbot.view.LevelViewBase;
 import com.kh.beatbot.view.TouchableSurfaceView;
-import com.kh.beatbot.view.window.ViewWindow;
 
 public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 
@@ -76,22 +76,22 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 	}
 
 	@Override
-	public void notifyInit(LevelListenable levelListenable) {
+	public void notifyInit(LevelViewBase levelListenable) {
 		updateLevelBar();
 	}
 
 	@Override
-	public void notifyPressed(LevelListenable levelListenable, boolean pressed) {
+	public void notifyPressed(LevelViewBase levelListenable, boolean pressed) {
 		// nothing to do
 	}
 
 	@Override
-	public void notifyClicked(LevelListenable levelListenable) {
+	public void notifyClicked(LevelViewBase levelListenable) {
 		// nothing to do
 	}
 
 	@Override
-	public void setLevel(LevelListenable levelListenable, float level) {
+	public void setLevel(LevelViewBase levelListenable, float level) {
 		TrackManager.currTrack.adsr.setCurrParamLevel(level);
 		// update everything except level bar, since it is the notifier
 		adsrView.update();
@@ -99,7 +99,7 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 	}
 
 	@Override
-	public void setLevel(LevelListenable levelListenable, float levelX,
+	public void setLevel(LevelViewBase levelListenable, float levelX,
 			float levelY) {
 		// for 2d view.  not applicable
 	}
@@ -157,7 +157,7 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 
 	public void drawAll() {
 		draw();
-		for (ViewWindow child : children) {
+		for (BBView child : children) {
 			push();
 			translate(child.x, child.y);
 	 		child.drawAll();

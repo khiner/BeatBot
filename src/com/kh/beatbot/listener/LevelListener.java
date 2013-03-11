@@ -1,15 +1,15 @@
 package com.kh.beatbot.listener;
 
-import com.kh.beatbot.listenable.LevelListenable;
+import com.kh.beatbot.view.LevelViewBase;
 
 public interface LevelListener {
-	void notifyInit(LevelListenable levelListenable);
+	void notifyInit(LevelViewBase levelListenable);
 
-	void notifyPressed(LevelListenable levelListenable, boolean pressed);
+	void notifyPressed(LevelViewBase levelListenable, boolean pressed);
 
-	void notifyClicked(LevelListenable levelListenable);
+	void notifyClicked(LevelViewBase levelListenable);
 
-	void setLevel(LevelListenable levelListenable, float level);
+	void setLevel(LevelViewBase levelListenable, float level);
 
-	void setLevel(LevelListenable levelListenable, float levelX, float levelY);
+	void setLevel(LevelViewBase levelListenable, float levelX, float levelY);
 }

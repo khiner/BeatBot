@@ -8,9 +8,8 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.listenable.LevelListenable;
 
-public class BBKnob extends LevelListenable {
+public class BBKnob extends LevelViewBase {
 
 	private static FloatBuffer circleVb = null;
 	private static FloatBuffer selectCircleVb = null;

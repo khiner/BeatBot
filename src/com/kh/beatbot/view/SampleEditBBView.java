@@ -1,4 +1,4 @@
-package com.kh.beatbot.view.window;
+package com.kh.beatbot.view;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,12 +8,11 @@ import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.view.TouchableSurfaceView;
 import com.kh.beatbot.view.helper.WaveformHelper;
 
-public class SampleEditViewWindow extends TouchableViewWindow {
+public class SampleEditBBView extends TouchableBBView {
 
-	public SampleEditViewWindow(TouchableSurfaceView parent) {
+	public SampleEditBBView(TouchableSurfaceView parent) {
 		super(parent);
 	}
 

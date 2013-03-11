@@ -1,4 +1,4 @@
-package com.kh.beatbot.view.window;
+package com.kh.beatbot.view;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -13,9 +13,8 @@ import android.util.FloatMath;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
-import com.kh.beatbot.view.GLSurfaceViewBase;
 
-public abstract class ViewWindow {
+public abstract class BBView {
 	public class Position {
 		public float x, y;
 
@@ -31,10 +30,10 @@ public abstract class ViewWindow {
 
 	public static final float ¹ = (float) Math.PI;
 
-	protected List<ViewWindow> children = new ArrayList<ViewWindow>();
+	protected List<BBView> children = new ArrayList<BBView>();
 	
 	protected GLSurfaceViewBase root;
-	protected ViewWindow parent;
+	protected BBView parent;
 	public static GL10 gl;
 	public float absoluteX = 0, absoluteY = 0;
 	public float x = 0, y = 0;
@@ -61,16 +60,16 @@ public abstract class ViewWindow {
 		circleVb = makeFloatBuffer(coords);
 	}
 	
-	public ViewWindow() {
+	public BBView() {
 		
 	}
 	
-	public ViewWindow(GLSurfaceViewBase root) {
+	public BBView(GLSurfaceViewBase root) {
 		this.root = root;
 		createChildren();
 	}
 
-	public void addChild(ViewWindow child) {
+	public void addChild(BBView child) {
 		children.add(child);
 		if (initialized)
 			child.initAll();
@@ -108,7 +107,7 @@ public abstract class ViewWindow {
 	public void initAll() {
 		initBackgroundColor();
 		init();
-		for (ViewWindow child : children) {
+		for (BBView child : children) {
 			child.initAll();
 		}
 		initialized = true;
@@ -118,7 +117,7 @@ public abstract class ViewWindow {
 		draw();
 		for (int i = 0; i < children.size(); i++) {
 			// not using foreach to avoid concurrent modification
-			ViewWindow child = children.get(i);
+			BBView child = children.get(i);
 			push();
 			translate(child.x, child.y);
 			child.drawAll();
@@ -133,7 +132,7 @@ public abstract class ViewWindow {
 	
 	public void loadAllIcons() {
 		loadIcons();
-		for (ViewWindow child : children) {
+		for (BBView child : children) {
 			child.loadAllIcons();
 		}
 	}
@@ -142,7 +141,7 @@ public abstract class ViewWindow {
 		root.requestRender();
 	}
 	
-	public void layout(ViewWindow parent, float x, float y, float width, float height) {
+	public void layout(BBView parent, float x, float y, float width, float height) {
 		if (parent != null) {
 			this.absoluteX = parent.absoluteX + x;
 			this.absoluteY = parent.absoluteY + y;
@@ -154,8 +153,8 @@ public abstract class ViewWindow {
 		layoutChildren();
 	}
 
-	protected ViewWindow findChildAt(float x, float y) {
-		for (ViewWindow child : children) {
+	protected BBView findChildAt(float x, float y) {
+		for (BBView child : children) {
 			if (child.containsPoint(x, y)) {
 				return child;
 			}

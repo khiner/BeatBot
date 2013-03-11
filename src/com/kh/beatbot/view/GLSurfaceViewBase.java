@@ -16,7 +16,6 @@ import android.view.SurfaceHolder;
 
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.text.GLText;
-import com.kh.beatbot.view.window.ViewWindow;
 
 public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		GLSurfaceView.Renderer {
@@ -84,7 +83,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		glText.loadTexture(this);
 	}
 	
-	public static final void drawText(ViewWindow view, String text, int height, float x, float y) {
+	public static final void drawText(BBView view, String text, int height, float x, float y) {
 		glText.draw(view, text, height, x, y);
 	}
 	

@@ -6,12 +6,12 @@ import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.view.SampleEditBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
-import com.kh.beatbot.view.window.SampleEditViewWindow;
 
 public class SampleEditPage extends Page {
 
-	private SampleEditViewWindow sampleEdit;
+	private SampleEditBBView sampleEdit;
 	private BBButton previewButton;
 	private BBToggleButton loopButton, reverseButton;
 	
@@ -44,7 +44,7 @@ public class SampleEditPage extends Page {
 
 	@Override
 	protected void createChildren() {
-		sampleEdit = new SampleEditViewWindow((TouchableSurfaceView)root);
+		sampleEdit = new SampleEditBBView((TouchableSurfaceView)root);
 		previewButton = new BBButton((TouchableSurfaceView)root);
 		previewButton.setOnClickListener(new BBOnClickListener() {
 			@Override

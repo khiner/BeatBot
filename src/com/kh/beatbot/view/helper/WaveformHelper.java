@@ -10,7 +10,7 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 
-import com.kh.beatbot.view.window.ViewWindow;
+import com.kh.beatbot.view.BBView;
 
 public class WaveformHelper extends Thread {
 	// holds a single float in the form of 4 bytes, used to input floats from a
@@ -47,16 +47,16 @@ public class WaveformHelper extends Thread {
 
 	// default to 0 offset, used when only a single FloatBuffer is needed
 	// (for a static sample)
-	public static FloatBuffer bytesToFloatBuffer(ViewWindow view, byte[] bytes) {
+	public static FloatBuffer bytesToFloatBuffer(BBView view, byte[] bytes) {
 		return bytesToFloatBuffer(view, bytes, 0);
 	}
 
-	public static FloatBuffer bytesToFloatBuffer(ViewWindow view, byte[] bytes, int xOffset) {
+	public static FloatBuffer bytesToFloatBuffer(BBView view, byte[] bytes, int xOffset) {
 		float[] floats = bytesToFloats(bytes, 0);
 		return floatsToFloatBuffer(view, floats, 0, (int) view.width, xOffset);
 	}
 
-	public static FloatBuffer floatFileToBuffer(ViewWindow view,
+	public static FloatBuffer floatFileToBuffer(BBView view,
 			long offset, long numFloats, int xOffset) throws IOException {
 		float spp = Math.min(2, numFloats / view.width);
 		float[] outputAry = new float[2 * (int) (view.width * spp)];
@@ -74,7 +74,7 @@ public class WaveformHelper extends Thread {
 		return view.makeFloatBuffer(outputAry);
 	}
 
-	public static FloatBuffer floatsToFloatBuffer(ViewWindow view, float[] data, long offset, long numFloats, int xOffset) {
+	public static FloatBuffer floatsToFloatBuffer(BBView view, float[] data, long offset, long numFloats, int xOffset) {
 		float spp = Math.min(2, numFloats / view.width);
 		float[] outputAry = new float[2 * (int) (view.width * spp)];
 		for (int x = 0; x < outputAry.length; x += 2) {

@@ -1,10 +1,10 @@
 package com.kh.beatbot.global;
 
 import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
-import com.kh.beatbot.view.window.TouchableViewWindow;
 
-public class BBButton extends TouchableViewWindow {
+public class BBButton extends TouchableBBView {
 	BBOnClickListener listener;
 	
 	BBIcon defaultIcon = null;

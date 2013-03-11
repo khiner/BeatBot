@@ -13,12 +13,12 @@ import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.MidiView;
+import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
-import com.kh.beatbot.view.window.TouchableViewWindow;
 
-public class MidiTrackControlHelper extends TouchableViewWindow {
+public class MidiTrackControlHelper extends TouchableBBView {
 
-	public class ButtonRow extends TouchableViewWindow {
+	public class ButtonRow extends TouchableBBView {
 		int trackNum;
 		BBToggleButton instrumentButton, muteButton, soloButton;
 		

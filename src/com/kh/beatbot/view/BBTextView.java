@@ -1,9 +1,8 @@
 package com.kh.beatbot.view;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.view.window.ViewWindow;
 
-public class BBTextView extends ViewWindow {
+public class BBTextView extends BBView {
 
 	private String text = null;
 	private float textWidth = 0;

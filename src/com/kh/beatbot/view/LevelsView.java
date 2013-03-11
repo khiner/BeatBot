@@ -9,9 +9,8 @@ import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.midi.MidiNote;
-import com.kh.beatbot.view.window.TouchableViewWindow;
 
-public class LevelsView extends TouchableViewWindow {
+public class LevelsView extends TouchableBBView {
 
 	private static class DragLine {
 		private static float m = 0;

@@ -1,11 +1,10 @@
-package com.kh.beatbot.view.window;
+package com.kh.beatbot.view;
 
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
-public abstract class ClickableViewWindow extends TouchableViewWindow {
+public abstract class ClickableBBView extends TouchableBBView {
 
-	public ClickableViewWindow(TouchableSurfaceView parent) {
+	public ClickableBBView(TouchableSurfaceView parent) {
 		super(parent);
 	}
 

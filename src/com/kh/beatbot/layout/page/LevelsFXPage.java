@@ -24,8 +24,6 @@ import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
-import com.kh.beatbot.listenable.LabelList;
-import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.listener.LevelListener;
@@ -33,6 +31,8 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.BBSeekbar;
 import com.kh.beatbot.view.BBTextView;
 import com.kh.beatbot.view.EffectLabelList;
+import com.kh.beatbot.view.LabelList;
+import com.kh.beatbot.view.LevelViewBase;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class LevelsFXPage extends Page implements LevelListener {
@@ -164,7 +164,7 @@ public class LevelsFXPage extends Page implements LevelListener {
 	}
 
 	@Override
-	public void setLevel(LevelListenable levelBar, float level) {
+	public void setLevel(LevelViewBase levelBar, float level) {
 		switch (getCurrTrack().activeLevelType) {
 		case VOLUME:
 			getCurrTrack().setVolume(level);
@@ -187,22 +187,22 @@ public class LevelsFXPage extends Page implements LevelListener {
 	}
 	
 	@Override
-	public void notifyInit(LevelListenable levelBar) {
+	public void notifyInit(LevelViewBase levelBar) {
 		// do nothing when levelbar initialized
 	}
 
 	@Override
-	public void notifyPressed(LevelListenable levelBar, boolean pressed) {
+	public void notifyPressed(LevelViewBase levelBar, boolean pressed) {
 		// do nothing when level pressed
 	}
 
 	@Override
-	public void notifyClicked(LevelListenable levelListenable) {
+	public void notifyClicked(LevelViewBase levelListenable) {
 		// do nothing when levels are clicked
 	}
 
 	@Override
-	public void setLevel(LevelListenable levelListenable, float levelX,
+	public void setLevel(LevelViewBase levelListenable, float levelX,
 			float levelY) {
 		// for 2d seekbar. nothing to do
 	}

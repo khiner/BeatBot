@@ -4,9 +4,8 @@ import java.nio.FloatBuffer;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.manager.Managers;
-import com.kh.beatbot.view.window.TouchableViewWindow;
 
-public class BpmView extends TouchableViewWindow {
+public class BpmView extends TouchableBBView {
 
 	private static final float INC_BPM_THRESH = 15;
 	private static boolean[][] segments = new boolean[3][7];

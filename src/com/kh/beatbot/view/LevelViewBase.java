@@ -1,13 +1,11 @@
-package com.kh.beatbot.listenable;
+package com.kh.beatbot.view;
 
 import java.util.ArrayList;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listener.LevelListener;
-import com.kh.beatbot.view.TouchableSurfaceView;
-import com.kh.beatbot.view.window.TouchableViewWindow;
 
-public abstract class LevelListenable extends TouchableViewWindow {
+public abstract class LevelViewBase extends TouchableBBView {
 
 	protected ArrayList<LevelListener> levelListeners = new ArrayList<LevelListener>();
 	protected float level = .5f;
@@ -17,7 +15,7 @@ public abstract class LevelListenable extends TouchableViewWindow {
 
 	protected boolean selected = false;
 
-	public LevelListenable(TouchableSurfaceView parent) {
+	public LevelViewBase(TouchableSurfaceView parent) {
 		super(parent);
 	}
 	

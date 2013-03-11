@@ -13,15 +13,15 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.BBToggleButton;
-import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.BBKnob;
 import com.kh.beatbot.view.BBSeekbar2d;
+import com.kh.beatbot.view.LevelViewBase;
 import com.kh.beatbot.view.ParamControl;
+import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
-import com.kh.beatbot.view.window.TouchableViewWindow;
 
-public class EffectLayout extends TouchableViewWindow implements LevelListener,
+public class EffectLayout extends TouchableBBView implements LevelListener,
 	View.OnClickListener {
 
 	private Effect effect = null;
@@ -117,7 +117,7 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 	}
 	
 	@Override
-	public void setLevel(LevelListenable levelListenable, float level) {
+	public void setLevel(LevelViewBase levelListenable, float level) {
 		int paramNum = levelListenable.getId();
 		effect.setParamLevel(paramNum, level);
 		updateXYViewLevel();
@@ -133,7 +133,7 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 	}
 
 	@Override
-	public void setLevel(LevelListenable level2d, float levelX, float levelY) {
+	public void setLevel(LevelViewBase level2d, float levelX, float levelY) {
 		xParamControl.knob.setLevel(levelX);
 		yParamControl.knob.setLevel(levelY);
 		updateParamValueLabel(xParamControl.knob.getId());
@@ -141,12 +141,12 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 	}
 
 	@Override
-	public void notifyPressed(LevelListenable listenable, boolean pressed) {
+	public void notifyPressed(LevelViewBase listenable, boolean pressed) {
 		// do nothing
 	}
 
 	@Override
-	public void notifyClicked(LevelListenable listenable) {
+	public void notifyClicked(LevelViewBase listenable) {
 		if (listenable instanceof BBSeekbar2d) {
 			return;
 		}
@@ -168,7 +168,7 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 	}
 
 	@Override
-	public void notifyInit(final LevelListenable listenable) {
+	public void notifyInit(final LevelViewBase listenable) {
 		if (!(listenable instanceof BBSeekbar2d)) {
 			Param param = effect.getParam(listenable.getId());
 			listenable.setLevel(param.viewLevel);

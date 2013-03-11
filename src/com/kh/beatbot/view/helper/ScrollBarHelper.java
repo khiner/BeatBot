@@ -6,7 +6,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.view.window.ViewWindow;
+import com.kh.beatbot.view.BBView;
 
 public class ScrollBarHelper {
 	private static final float DAMP_CONSTANT = 0.9f;
@@ -48,7 +48,7 @@ public class ScrollBarHelper {
 		scrolling = true;
 	}
 
-	public static void drawScrollView(ViewWindow view) {
+	public static void drawScrollView(BBView view) {
 		if (!shouldDrawScrollView())
 			return;
 		updateScrollBar(view);
@@ -91,7 +91,7 @@ public class ScrollBarHelper {
 		}
 	}
 
-	public static void updateScrollBar(ViewWindow view) {
+	public static void updateScrollBar(BBView view) {
 		float x1 = TickWindowHelper.getTickOffset() * view.width
 				/ TickWindowHelper.MAX_TICKS;
 		float x2 = (TickWindowHelper.getTickOffset() + TickWindowHelper

@@ -16,9 +16,8 @@ import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.helper.ScrollBarHelper;
 import com.kh.beatbot.view.helper.TickWindowHelper;
-import com.kh.beatbot.view.window.ClickableViewWindow;
 
-public class MidiView extends ClickableViewWindow {
+public class MidiView extends ClickableBBView {
 
 	/**************** ATTRIBUTES ***************/
 	public static final float Y_OFFSET = 21;

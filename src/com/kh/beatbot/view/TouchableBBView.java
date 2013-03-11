@@ -1,21 +1,20 @@
-package com.kh.beatbot.view.window;
+package com.kh.beatbot.view;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import android.view.MotionEvent;
 
-import com.kh.beatbot.view.TouchableSurfaceView;
 
-public abstract class TouchableViewWindow extends ViewWindow {
+public abstract class TouchableBBView extends BBView {
 
 	// map of pointer ID #'s that this window is responsible for to their current
 	// position relative to this window
 	protected Map<Integer, Position> pointerIdToPos = new HashMap<Integer, Position>();
 	
-	public TouchableViewWindow() {}
+	public TouchableBBView() {}
 	
-	public TouchableViewWindow(TouchableSurfaceView parent) {
+	public TouchableBBView(TouchableSurfaceView parent) {
 		super(parent);
 	}
 
@@ -81,16 +80,16 @@ public abstract class TouchableViewWindow extends ViewWindow {
 	 */
 	public final void handleActionDown(MotionEvent e, int id, float x, float y) {
 		notifyActionDown(id, x, y);
-		ViewWindow child = findChildAt(x, y);
-		if (child instanceof TouchableViewWindow) {
-			((TouchableViewWindow) child).handleActionDown(e, id, x - child.x, y
+		BBView child = findChildAt(x, y);
+		if (child instanceof TouchableBBView) {
+			((TouchableBBView) child).handleActionDown(e, id, x - child.x, y
 					- child.y);
 		}
 	}
 
 	public final void handleActionUp(MotionEvent e, int id, float x, float y) {
 		notifyActionUp(id, x, y);
-		TouchableViewWindow child = findChildOwningPointer(id);
+		TouchableBBView child = findChildOwningPointer(id);
 		if (child != null)
 			child.handleActionUp(e, id, x - child.x, y - child.y);
 	}
@@ -98,9 +97,9 @@ public abstract class TouchableViewWindow extends ViewWindow {
 	public final void handleActionPointerDown(MotionEvent e, int id, float x,
 			float y) {
 		notifyActionPointerDown(id, x, y);
-		ViewWindow child = findChildAt(x, y);
-		if (child instanceof TouchableViewWindow) {
-			TouchableViewWindow touchableChild = (TouchableViewWindow)child;
+		BBView child = findChildAt(x, y);
+		if (child instanceof TouchableBBView) {
+			TouchableBBView touchableChild = (TouchableBBView)child;
 			if (touchableChild.pointerCount() == 0)
 				touchableChild.handleActionDown(e, id, x - child.x, y - child.y);
 			else
@@ -110,7 +109,7 @@ public abstract class TouchableViewWindow extends ViewWindow {
 
 	public final void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
 		notifyActionPointerUp(id, x, y);
-		TouchableViewWindow child = findChildOwningPointer(id);
+		TouchableBBView child = findChildOwningPointer(id);
 		if (child != null) {
 			if (child.pointerCount() == 1)
 				child.handleActionUp(e, id, x - child.x, y - child.y);
@@ -121,16 +120,16 @@ public abstract class TouchableViewWindow extends ViewWindow {
 	
 	public final void handleActionMove(MotionEvent e, int id, float x, float y) {
 		notifyActionMove(id, x, y);
-		TouchableViewWindow child = findChildOwningPointer(id);
+		TouchableBBView child = findChildOwningPointer(id);
 		if (child != null)
 			child.handleActionMove(e, id, x - child.x, y - child.y);
 	}
 
-	private TouchableViewWindow findChildOwningPointer(int id) {
-		for (ViewWindow child : children) {
-			if (child instanceof TouchableViewWindow
-					&& ((TouchableViewWindow) child).ownsPointer(id)) {
-				return (TouchableViewWindow) child;
+	private TouchableBBView findChildOwningPointer(int id) {
+		for (BBView child : children) {
+			if (child instanceof TouchableBBView
+					&& ((TouchableBBView) child).ownsPointer(id)) {
+				return (TouchableBBView) child;
 			}
 		}
 		return null;
