@@ -1,6 +1,7 @@
-package com.kh.beatbot.view;
+package com.kh.beatbot.view.list;
 
 import com.kh.beatbot.listener.DraggableLabelListListener;
+import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class DraggableLabelList extends LabelList {
 	private int initialTouchedPosition;

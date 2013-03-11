@@ -1,12 +1,13 @@
-package com.kh.beatbot.view;
+package com.kh.beatbot.view.control;
 
 import android.content.Context;
 import android.util.AttributeSet;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
+import com.kh.beatbot.view.TouchableSurfaceView;
 
-public class ThresholdBarView extends BBSeekbar {
+public class ThresholdBarView extends Seekbar {
 	private static final float[] THRESHOLD_COLOR = { Colors.VIEW_BG[0] + .2f,
 		Colors.VIEW_BG[1] + .2f, Colors.VIEW_BG[2] + .2f, 1 };
 	private static int maxGreenVertices, maxYellowVertices, maxRedVertices;

@@ -3,15 +3,15 @@ package com.kh.beatbot.view.group;
 import android.opengl.GLSurfaceView;
 
 import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.view.MidiTrackView;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
-import com.kh.beatbot.view.helper.MidiTrackControlHelper;
 
 public class MidiGroup extends TouchableBBView {
 
 	public MidiView midiView;
-	public MidiTrackControlHelper midiTrackControl;
+	public MidiTrackView midiTrackControl;
 	
 	public MidiGroup(TouchableSurfaceView parent) {
 		super(parent);
@@ -44,7 +44,7 @@ public class MidiGroup extends TouchableBBView {
 	@Override
 	protected void createChildren() {
 		midiView = new MidiView((TouchableSurfaceView)root);
-		midiTrackControl = new MidiTrackControlHelper((TouchableSurfaceView)root);
+		midiTrackControl = new MidiTrackView((TouchableSurfaceView)root);
 		addChild(midiView);
 		addChild(midiTrackControl);
 	}

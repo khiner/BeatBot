@@ -14,12 +14,12 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.listener.LevelListener;
-import com.kh.beatbot.view.BBKnob;
-import com.kh.beatbot.view.BBSeekbar2d;
-import com.kh.beatbot.view.LevelViewBase;
-import com.kh.beatbot.view.ParamControl;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
+import com.kh.beatbot.view.control.ControlViewBase;
+import com.kh.beatbot.view.control.Knob;
+import com.kh.beatbot.view.control.ParamControl;
+import com.kh.beatbot.view.control.Seekbar2d;
 
 public class EffectLayout extends TouchableBBView implements LevelListener,
 	View.OnClickListener {
@@ -32,7 +32,7 @@ public class EffectLayout extends TouchableBBView implements LevelListener,
 
 	private List<ParamControl> paramControls = new ArrayList<ParamControl>();
 	private ParamControl xParamControl = null, yParamControl = null;
-	private BBSeekbar2d level2d = null;
+	private Seekbar2d level2d = null;
 		
 	public EffectLayout(TouchableSurfaceView parent, Effect effect) {
 		this.effect = effect;
@@ -68,7 +68,7 @@ public class EffectLayout extends TouchableBBView implements LevelListener,
 			pc.knob.addLevelListener(this);
 			updateParamValueLabel(i);
 		}
-		level2d = new BBSeekbar2d((TouchableSurfaceView)root);
+		level2d = new Seekbar2d((TouchableSurfaceView)root);
 		level2d.removeAllListeners();
 		level2d.addLevelListener(this);
 		xParamControl = paramControls.get(0);
@@ -117,7 +117,7 @@ public class EffectLayout extends TouchableBBView implements LevelListener,
 	}
 	
 	@Override
-	public void setLevel(LevelViewBase levelListenable, float level) {
+	public void setLevel(ControlViewBase levelListenable, float level) {
 		int paramNum = levelListenable.getId();
 		effect.setParamLevel(paramNum, level);
 		updateXYViewLevel();
@@ -133,7 +133,7 @@ public class EffectLayout extends TouchableBBView implements LevelListener,
 	}
 
 	@Override
-	public void setLevel(LevelViewBase level2d, float levelX, float levelY) {
+	public void setLevel(ControlViewBase level2d, float levelX, float levelY) {
 		xParamControl.knob.setLevel(levelX);
 		yParamControl.knob.setLevel(levelY);
 		updateParamValueLabel(xParamControl.knob.getId());
@@ -141,18 +141,18 @@ public class EffectLayout extends TouchableBBView implements LevelListener,
 	}
 
 	@Override
-	public void notifyPressed(LevelViewBase listenable, boolean pressed) {
+	public void notifyPressed(ControlViewBase listenable, boolean pressed) {
 		// do nothing
 	}
 
 	@Override
-	public void notifyClicked(LevelViewBase listenable) {
-		if (listenable instanceof BBSeekbar2d) {
+	public void notifyClicked(ControlViewBase listenable) {
+		if (listenable instanceof Seekbar2d) {
 			return;
 		}
 		int paramNum = listenable.getId();
 		Param param = effect.getParam(paramNum);
-		param.beatSync = ((BBKnob) listenable).isBeatSync();
+		param.beatSync = ((Knob) listenable).isBeatSync();
 		listenable.setLevel(param.viewLevel);
 		if (effect.paramsLinked()) {
 			if (paramNum == 0) {
@@ -168,14 +168,14 @@ public class EffectLayout extends TouchableBBView implements LevelListener,
 	}
 
 	@Override
-	public void notifyInit(final LevelViewBase listenable) {
-		if (!(listenable instanceof BBSeekbar2d)) {
+	public void notifyInit(final ControlViewBase listenable) {
+		if (!(listenable instanceof Seekbar2d)) {
 			Param param = effect.getParam(listenable.getId());
 			listenable.setLevel(param.viewLevel);
 		}
-		if (effect.paramsLinked() && !(listenable instanceof BBSeekbar2d)) {
+		if (effect.paramsLinked() && !(listenable instanceof Seekbar2d)) {
 			Param param = effect.getParam(listenable.getId());
-			((BBKnob) listenable).setBeatSync(param.beatSync);
+			((Knob) listenable).setBeatSync(param.beatSync);
 		}
 	}
 

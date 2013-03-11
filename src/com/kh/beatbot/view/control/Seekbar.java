@@ -1,17 +1,18 @@
-package com.kh.beatbot.view;
+package com.kh.beatbot.view.control;
 
 import java.nio.FloatBuffer;
 
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.view.TouchableSurfaceView;
 
-public class BBSeekbar extends LevelViewBase {
+public class Seekbar extends ControlViewBase {
 
 	protected FloatBuffer levelBarVb = null;
 	protected int numLevelVertices = 0;
 	protected float levelBarHeight = 8;
 	private float middleY = 0;
 	
-	public BBSeekbar(TouchableSurfaceView parent) {
+	public Seekbar(TouchableSurfaceView parent) {
 		super(parent);
 	}
 	

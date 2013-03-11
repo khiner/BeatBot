@@ -1,4 +1,4 @@
-package com.kh.beatbot.view;
+package com.kh.beatbot.view.control;
 
 import java.nio.FloatBuffer;
 
@@ -8,8 +8,9 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.view.TouchableSurfaceView;
 
-public class BBKnob extends LevelViewBase {
+public class Knob extends ControlViewBase {
 
 	private static FloatBuffer circleVb = null;
 	private static FloatBuffer selectCircleVb = null;
@@ -24,7 +25,7 @@ public class BBKnob extends LevelViewBase {
 	private boolean levelSelected = false;
 	private boolean clickable = false;
 	
-	public BBKnob(TouchableSurfaceView parent) {
+	public Knob(TouchableSurfaceView parent) {
 		super(parent);
 	}
 	

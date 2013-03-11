@@ -1,4 +1,4 @@
-package com.kh.beatbot.view;
+package com.kh.beatbot.view.list;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -8,6 +8,10 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.global.BBIcon;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listener.LabelListListener;
+import com.kh.beatbot.view.BBView;
+import com.kh.beatbot.view.ClickableBBView;
+import com.kh.beatbot.view.GLSurfaceViewBase;
+import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class LabelList extends ClickableBBView {
 

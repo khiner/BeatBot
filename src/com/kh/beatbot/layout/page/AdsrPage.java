@@ -9,17 +9,17 @@ import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.AdsrView;
-import com.kh.beatbot.view.BBSeekbar;
 import com.kh.beatbot.view.BBTextView;
 import com.kh.beatbot.view.BBView;
-import com.kh.beatbot.view.LevelViewBase;
 import com.kh.beatbot.view.TouchableSurfaceView;
+import com.kh.beatbot.view.control.ControlViewBase;
+import com.kh.beatbot.view.control.Seekbar;
 
 public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 
 	private BBToggleButton[] adsrButtons;
 	private AdsrView adsrView;
-	private BBSeekbar levelBar;
+	private Seekbar levelBar;
 	private BBTextView valueLabel, paramLabel;
 	
 	public AdsrPage(TouchableSurfaceView parent) {
@@ -76,22 +76,22 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 	}
 
 	@Override
-	public void notifyInit(LevelViewBase levelListenable) {
+	public void notifyInit(ControlViewBase levelListenable) {
 		updateLevelBar();
 	}
 
 	@Override
-	public void notifyPressed(LevelViewBase levelListenable, boolean pressed) {
+	public void notifyPressed(ControlViewBase levelListenable, boolean pressed) {
 		// nothing to do
 	}
 
 	@Override
-	public void notifyClicked(LevelViewBase levelListenable) {
+	public void notifyClicked(ControlViewBase levelListenable) {
 		// nothing to do
 	}
 
 	@Override
-	public void setLevel(LevelViewBase levelListenable, float level) {
+	public void setLevel(ControlViewBase levelListenable, float level) {
 		TrackManager.currTrack.adsr.setCurrParamLevel(level);
 		// update everything except level bar, since it is the notifier
 		adsrView.update();
@@ -99,7 +99,7 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 	}
 
 	@Override
-	public void setLevel(LevelViewBase levelListenable, float levelX,
+	public void setLevel(ControlViewBase levelListenable, float levelX,
 			float levelY) {
 		// for 2d view.  not applicable
 	}
@@ -132,7 +132,7 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 	@Override
 	protected void createChildren() {
 		adsrView = new AdsrView((TouchableSurfaceView)root);
-		levelBar = new BBSeekbar((TouchableSurfaceView)root);
+		levelBar = new Seekbar((TouchableSurfaceView)root);
 		levelBar.addLevelListener(this);
 		paramLabel = new BBTextView((TouchableSurfaceView)root);
 		valueLabel = new BBTextView((TouchableSurfaceView)root);

@@ -13,8 +13,8 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 
 import com.kh.beatbot.listener.LevelListener;
-import com.kh.beatbot.view.LevelViewBase;
-import com.kh.beatbot.view.ThresholdBarView;
+import com.kh.beatbot.view.control.ControlViewBase;
+import com.kh.beatbot.view.control.ThresholdBarView;
 
 public class RecordManager implements LevelListener {
 	public static final long RECORD_LATENCY_TICKS = Managers.midiManager
@@ -344,27 +344,27 @@ public class RecordManager implements LevelListener {
 	}
 
 	@Override
-	public void notifyInit(LevelViewBase levelListenable) {
+	public void notifyInit(ControlViewBase levelListenable) {
 		thresholdBar = (ThresholdBarView) levelListenable;
 	}
 
 	@Override
-	public void notifyPressed(LevelViewBase levelListenable, boolean pressed) {
+	public void notifyPressed(ControlViewBase levelListenable, boolean pressed) {
 		// TODO make threshold label light up
 	}
 
 	@Override
-	public void notifyClicked(LevelViewBase levelListenable) {
+	public void notifyClicked(ControlViewBase levelListenable) {
 		// do nothing for clicks
 	}
 
 	@Override
-	public void setLevel(LevelViewBase levelListenable, float level) {
+	public void setLevel(ControlViewBase levelListenable, float level) {
 		currThreshold = dbToShort((level - 1.001f) * 60);
 	}
 
 	@Override
-	public void setLevel(LevelViewBase levelListenable, float levelX,
+	public void setLevel(ControlViewBase levelListenable, float levelX,
 			float levelY) {
 		// nothing - for level 2d
 	}

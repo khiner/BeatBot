@@ -1,4 +1,4 @@
-package com.kh.beatbot.view.helper;
+package com.kh.beatbot.view;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -12,11 +12,9 @@ import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.Managers;
-import com.kh.beatbot.view.MidiView;
-import com.kh.beatbot.view.TouchableBBView;
-import com.kh.beatbot.view.TouchableSurfaceView;
+import com.kh.beatbot.view.helper.TickWindowHelper;
 
-public class MidiTrackControlHelper extends TouchableBBView {
+public class MidiTrackView extends TouchableBBView {
 
 	public class ButtonRow extends TouchableBBView {
 		int trackNum;
@@ -104,7 +102,7 @@ public class MidiTrackControlHelper extends TouchableBBView {
 
 	private FloatBuffer bgVb = null;
 	
-	public MidiTrackControlHelper(TouchableSurfaceView parent) {
+	public MidiTrackView(TouchableSurfaceView parent) {
 		super(parent);
 	}
 	

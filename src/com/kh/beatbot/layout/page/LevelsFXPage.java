@@ -28,12 +28,12 @@ import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.view.BBSeekbar;
 import com.kh.beatbot.view.BBTextView;
-import com.kh.beatbot.view.EffectLabelList;
-import com.kh.beatbot.view.LabelList;
-import com.kh.beatbot.view.LevelViewBase;
 import com.kh.beatbot.view.TouchableSurfaceView;
+import com.kh.beatbot.view.control.ControlViewBase;
+import com.kh.beatbot.view.control.Seekbar;
+import com.kh.beatbot.view.list.EffectLabelList;
+import com.kh.beatbot.view.list.LabelList;
 
 public class LevelsFXPage extends Page implements LevelListener {
 
@@ -123,7 +123,7 @@ public class LevelsFXPage extends Page implements LevelListener {
 	}
 	
 	// levels attrs
-	private BBSeekbar levelBar;
+	private Seekbar levelBar;
 	private BBToggleButton volumeToggle, panToggle, pitchToggle;
 	private BBTextView effectLabel;
 	private boolean masterMode = false;
@@ -164,7 +164,7 @@ public class LevelsFXPage extends Page implements LevelListener {
 	}
 
 	@Override
-	public void setLevel(LevelViewBase levelBar, float level) {
+	public void setLevel(ControlViewBase levelBar, float level) {
 		switch (getCurrTrack().activeLevelType) {
 		case VOLUME:
 			getCurrTrack().setVolume(level);
@@ -187,22 +187,22 @@ public class LevelsFXPage extends Page implements LevelListener {
 	}
 	
 	@Override
-	public void notifyInit(LevelViewBase levelBar) {
+	public void notifyInit(ControlViewBase levelBar) {
 		// do nothing when levelbar initialized
 	}
 
 	@Override
-	public void notifyPressed(LevelViewBase levelBar, boolean pressed) {
+	public void notifyPressed(ControlViewBase levelBar, boolean pressed) {
 		// do nothing when level pressed
 	}
 
 	@Override
-	public void notifyClicked(LevelViewBase levelListenable) {
+	public void notifyClicked(ControlViewBase levelListenable) {
 		// do nothing when levels are clicked
 	}
 
 	@Override
-	public void setLevel(LevelViewBase levelListenable, float levelX,
+	public void setLevel(ControlViewBase levelListenable, float levelX,
 			float levelY) {
 		// for 2d seekbar. nothing to do
 	}
@@ -307,7 +307,7 @@ public class LevelsFXPage extends Page implements LevelListener {
 	@Override
 	protected void createChildren() {
 		effectLabel = new BBTextView((TouchableSurfaceView)root);
-		levelBar = new BBSeekbar((TouchableSurfaceView)root);
+		levelBar = new Seekbar((TouchableSurfaceView)root);
 		levelBar.addLevelListener(this);
 		volumeToggle = new BBToggleButton((TouchableSurfaceView)root);
 		panToggle = new BBToggleButton((TouchableSurfaceView)root);

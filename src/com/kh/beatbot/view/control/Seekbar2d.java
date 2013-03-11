@@ -1,4 +1,4 @@
-package com.kh.beatbot.view;
+package com.kh.beatbot.view.control;
 
 import java.nio.FloatBuffer;
 
@@ -6,13 +6,14 @@ import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.listener.LevelListener;
+import com.kh.beatbot.view.TouchableSurfaceView;
 
-public class BBSeekbar2d extends LevelViewBase {
+public class Seekbar2d extends ControlViewBase {
 	private float selectX = 0, selectY = 0;
 	private static ViewRect viewRect;
 	private static FloatBuffer lineVb = null;
 
-	public BBSeekbar2d(TouchableSurfaceView parent) {
+	public Seekbar2d(TouchableSurfaceView parent) {
 		super(parent);
 	}
 

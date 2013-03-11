@@ -304,7 +304,7 @@ public abstract class BBView {
 				backgroundColor[2], backgroundColor[3]);
 	}
 	
-	protected class ViewRect {
+	public class ViewRect {
 		public int drawOffset;
 		public float parentWidth, parentHeight, minX, maxX, minY, maxY, width,
 				height, borderRadius;
