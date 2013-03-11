@@ -55,16 +55,16 @@ public class ParamControl extends TouchableViewWindow {
 
 	@Override
 	protected void createChildren() {
-		knob = new BBKnob((TouchableSurfaceView)parent);
-		label = new BBTextView(parent);
-		valueLabel = new BBTextView(parent);
+		knob = new BBKnob((TouchableSurfaceView)root);
+		label = new BBTextView(root);
+		valueLabel = new BBTextView(root);
 		addChild(knob);
 		addChild(label);
 		addChild(valueLabel);
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		label.layout(this, 0, 0, width, height / 4);
 		knob.layout(this, 0, height / 4, width, height / 2);
 		valueLabel.layout(this, 0, 4 * height / 5, width, height / 5);

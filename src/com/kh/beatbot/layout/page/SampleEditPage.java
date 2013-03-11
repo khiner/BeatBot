@@ -44,8 +44,8 @@ public class SampleEditPage extends Page {
 
 	@Override
 	protected void createChildren() {
-		sampleEdit = new SampleEditViewWindow((TouchableSurfaceView)parent);
-		previewButton = new BBButton((TouchableSurfaceView)parent);
+		sampleEdit = new SampleEditViewWindow((TouchableSurfaceView)root);
+		previewButton = new BBButton((TouchableSurfaceView)root);
 		previewButton.setOnClickListener(new BBOnClickListener() {
 			@Override
 			public void onClick(BBButton button) {
@@ -56,8 +56,8 @@ public class SampleEditPage extends Page {
 				}
 			}
 		});
-		loopButton = new BBToggleButton((TouchableSurfaceView)parent);
-		reverseButton = new BBToggleButton((TouchableSurfaceView)parent);
+		loopButton = new BBToggleButton((TouchableSurfaceView)root);
+		reverseButton = new BBToggleButton((TouchableSurfaceView)root);
 		loopButton.setOnClickListener(new BBOnClickListener() {
 			public void onClick(BBButton arg0) {
 				TrackManager.currTrack.toggleLooping();
@@ -75,7 +75,7 @@ public class SampleEditPage extends Page {
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		float halfHeight = height / 2;
 		previewButton.layout(this, 0, 0, height, height);
 		sampleEdit.layout(this, height, 0, width - height - halfHeight, height);

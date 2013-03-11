@@ -327,8 +327,7 @@ public class DirectoryManager {
 				View v = super.getView(position, convertView, parent);
 				TextView tv = (TextView) v.findViewById(android.R.id.text1);
 				// if the directory is a root directory (only sample children)
-				// or
-				// does not have an icon, no icon for this list element
+				// or does not have an icon, no icon for this list element
 				if (directory instanceof Instrument
 						|| directory.getChild(position).getBBIconSource() == null) {
 					tv.setCompoundDrawables(null, null, null, null);

@@ -33,7 +33,8 @@ public abstract class ViewWindow {
 
 	protected List<ViewWindow> children = new ArrayList<ViewWindow>();
 	
-	protected GLSurfaceViewBase parent;
+	protected GLSurfaceViewBase root;
+	protected ViewWindow parent;
 	public static GL10 gl;
 	public float absoluteX = 0, absoluteY = 0;
 	public float x = 0, y = 0;
@@ -47,6 +48,8 @@ public abstract class ViewWindow {
 	private static FloatBuffer circleVb = null;
 	private static final float CIRCLE_RADIUS = 100;
 
+	private boolean initialized = false;
+	
 	static { // init circle
 		float theta = 0;
 		float coords[] = new float[128];
@@ -62,13 +65,15 @@ public abstract class ViewWindow {
 		
 	}
 	
-	public ViewWindow(GLSurfaceViewBase parent) {
-		this.parent = parent;
+	public ViewWindow(GLSurfaceViewBase root) {
+		this.root = root;
 		createChildren();
 	}
 
 	public void addChild(ViewWindow child) {
 		children.add(child);
+		if (initialized)
+			child.initAll();
 	}
 	
 	public boolean containsPoint(float x, float y) {
@@ -83,7 +88,7 @@ public abstract class ViewWindow {
 	public int getId() {
 		return id;
 	}
-	
+		
 	public int getRenderMode() {
 		// default render mode is 'when dirty'
 		// views needing continuous rendering can override this
@@ -96,7 +101,7 @@ public abstract class ViewWindow {
 	
 	protected abstract void createChildren();
 	
-	protected abstract void layoutChildren();
+	public abstract void layoutChildren();
 	
 	protected abstract void loadIcons();
 	
@@ -106,11 +111,14 @@ public abstract class ViewWindow {
 		for (ViewWindow child : children) {
 			child.initAll();
 		}
+		initialized = true;
 	}
 	
 	public void drawAll() {
 		draw();
-		for (ViewWindow child : children) {
+		for (int i = 0; i < children.size(); i++) {
+			// not using foreach to avoid concurrent modification
+			ViewWindow child = children.get(i);
 			push();
 			translate(child.x, child.y);
 			child.drawAll();
@@ -131,7 +139,7 @@ public abstract class ViewWindow {
 	}
 	
 	protected void requestRender() {
-		parent.requestRender();
+		root.requestRender();
 	}
 	
 	public void layout(ViewWindow parent, float x, float y, float width, float height) {

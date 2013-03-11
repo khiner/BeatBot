@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -185,9 +186,7 @@ public class MidiView extends ClickableViewWindow {
 	}
 
 	private void drawHorizontalLines() {
-		translate(0, -TickWindowHelper.getYOffset());
 		drawLines(hLineVb, Colors.BLACK, 2, GL10.GL_LINES);
-		translate(0, TickWindowHelper.getYOffset());
 	}
 
 	private void drawCurrentTick() {
@@ -257,7 +256,7 @@ public class MidiView extends ClickableViewWindow {
 		// fill
 		drawTriangleFan(midiNote.getVb(), color);
 		// outline
-		drawLines(midiNote.getVb(), Colors.BLACK, 4, GL10.GL_LINE_LOOP);
+		drawLines(midiNote.getVb(), Colors.BLACK, 3, GL10.GL_LINE_LOOP);
 	}
 
 	private void initTickFillVb() {
@@ -345,8 +344,13 @@ public class MidiView extends ClickableViewWindow {
 		return note * trackHeight + Y_OFFSET - TickWindowHelper.getYOffset();
 	}
 
+	public static float noteToUnscaledY(int note) {
+		return note * trackHeight + Y_OFFSET;
+	}
+	
 	public void trackAdded(int trackNum) {
-		if (parent.initialized)
+		allTracksHeight += trackHeight;
+		if (root.initialized)
 			initAllVbs();
 	}
 
@@ -376,16 +380,21 @@ public class MidiView extends ClickableViewWindow {
 
 		drawTriangleFan(bgVb, Colors.MIDI_VIEW_BG);
 		push();
-		translate(
-				-TickWindowHelper.getTickOffset()
+		translate(-TickWindowHelper.getTickOffset()
 						/ TickWindowHelper.getNumTicks() * width, 0);
 		scale((float) TickWindowHelper.MAX_TICKS
 				/ (float) TickWindowHelper.getNumTicks(), 1);
+		
 		drawLoopRect();
+		
+		push();
+		translate(0, -TickWindowHelper.getYOffset());
 		drawHorizontalLines();
+		drawAllMidiNotes();
+		pop();
+		
 		drawTickFill();
 		TickWindowHelper.drawVerticalLines();
-		drawAllMidiNotes();
 		drawSelectRegion();
 		drawLoopMarker();
 		pop();
@@ -482,14 +491,10 @@ public class MidiView extends ClickableViewWindow {
 		return noteToAdd;
 	}
 
-	public void updateNoteVb(MidiNote note) {
-		note.setVb(makeNoteVb(note));
-	}
-
-	private FloatBuffer makeNoteVb(MidiNote note) {
+	public FloatBuffer makeNoteVb(MidiNote note) {
 		// midi note rectangle coordinates
 		float x1 = tickToUnscaledX(note.getOnTick());
-		float y1 = noteToY(note.getNoteValue());
+		float y1 = noteToUnscaledY(note.getNoteValue());
 		float x2 = tickToUnscaledX(note.getOffTick());
 		float y2 = y1 + trackHeight;
 		return makeRectFloatBuffer(x1, y1, x2, y2);
@@ -598,6 +603,7 @@ public class MidiView extends ClickableViewWindow {
 			} else { // one finger scroll
 				TickWindowHelper.scroll(pointerIdToPos.get(scrollPointerId).x,
 						pointerIdToPos.get(scrollPointerId).y);
+				GlobalVars.midiGroup.midiTrackControl.layoutChildren();
 			}
 		} else if (pointerCount() - getNumLoopMarkersSelected() == 2) {
 			// two finger zoom
@@ -783,7 +789,7 @@ public class MidiView extends ClickableViewWindow {
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		// leaf child - no children
 	}
 }

@@ -131,18 +131,18 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 
 	@Override
 	protected void createChildren() {
-		adsrView = new AdsrView((TouchableSurfaceView)parent);
-		levelBar = new BBSeekbar((TouchableSurfaceView)parent);
+		adsrView = new AdsrView((TouchableSurfaceView)root);
+		levelBar = new BBSeekbar((TouchableSurfaceView)root);
 		levelBar.addLevelListener(this);
-		paramLabel = new BBTextView((TouchableSurfaceView)parent);
-		valueLabel = new BBTextView((TouchableSurfaceView)parent);
+		paramLabel = new BBTextView((TouchableSurfaceView)root);
+		valueLabel = new BBTextView((TouchableSurfaceView)root);
 		adsrButtons = new BBToggleButton[6];
-		adsrButtons[ADSR.ATTACK_ID] = new BBToggleButton((TouchableSurfaceView)parent);
-		adsrButtons[ADSR.DECAY_ID] = new BBToggleButton((TouchableSurfaceView)parent);
-		adsrButtons[ADSR.SUSTAIN_ID] = new BBToggleButton((TouchableSurfaceView)parent);
-		adsrButtons[ADSR.RELEASE_ID] = new BBToggleButton((TouchableSurfaceView)parent);
-		adsrButtons[ADSR.START_ID] = new BBToggleButton((TouchableSurfaceView)parent);
-		adsrButtons[ADSR.PEAK_ID] = new BBToggleButton((TouchableSurfaceView)parent);
+		adsrButtons[ADSR.ATTACK_ID] = new BBToggleButton((TouchableSurfaceView)root);
+		adsrButtons[ADSR.DECAY_ID] = new BBToggleButton((TouchableSurfaceView)root);
+		adsrButtons[ADSR.SUSTAIN_ID] = new BBToggleButton((TouchableSurfaceView)root);
+		adsrButtons[ADSR.RELEASE_ID] = new BBToggleButton((TouchableSurfaceView)root);
+		adsrButtons[ADSR.START_ID] = new BBToggleButton((TouchableSurfaceView)root);
+		adsrButtons[ADSR.PEAK_ID] = new BBToggleButton((TouchableSurfaceView)root);
 		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i].setId(i);
 			adsrButtons[i].setOnClickListener(this);
@@ -166,7 +166,7 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 	}
 	
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		float thirdHeight = height / 3;
 		float pos = width - thirdHeight * 6;
 		float labelWidth = 6 * thirdHeight / 2;

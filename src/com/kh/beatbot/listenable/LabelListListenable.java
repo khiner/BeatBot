@@ -70,7 +70,7 @@ public class LabelListListenable extends ClickableViewWindow {
 			drawTriangleFan(backgroundRectVb, whichColor());
 			gl.glPopMatrix();
 			if (state == LabelState.EMPTY) {
-				plusIcon.draw(absoluteX + x + labelWidth / 2 - addTextWidth / 2, parent.getHeight() - absoluteY - height, height,
+				plusIcon.draw(absoluteX + x + labelWidth / 2 - addTextWidth / 2, root.getHeight() - absoluteY - height, height,
 						height);
 				setColor(Colors.WHITE);
 				// draw string in center of rect
@@ -312,7 +312,7 @@ public class LabelListListenable extends ClickableViewWindow {
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		// leaf child
 	}
 }

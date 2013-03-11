@@ -40,7 +40,7 @@ public class BBKnob extends LevelListenable {
 	@Override
 	public void init() {
 		super.init();
-		centerButton = new BBToggleButton((TouchableSurfaceView)parent);
+		centerButton = new BBToggleButton((TouchableSurfaceView)root);
 		centerButton.setIconSource(centerButtonIcon);
 		centerButton.layout(this, 0, 0, width, height);
 		snapDistSquared = (width / 4) * (width / 4);
@@ -202,7 +202,7 @@ public class BBKnob extends LevelListenable {
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		// leaf child
 	}
 }

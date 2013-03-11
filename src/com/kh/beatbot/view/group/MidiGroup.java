@@ -43,14 +43,14 @@ public class MidiGroup extends TouchableViewWindow {
 
 	@Override
 	protected void createChildren() {
-		midiView = new MidiView((TouchableSurfaceView)parent);
-		midiTrackControl = new MidiTrackControlHelper((TouchableSurfaceView)parent);
+		midiView = new MidiView((TouchableSurfaceView)root);
+		midiTrackControl = new MidiTrackControlHelper((TouchableSurfaceView)root);
 		addChild(midiView);
 		addChild(midiTrackControl);
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		int numTracks = Managers.trackManager.getNumTracks();
 		MidiView.allTracksHeight = height - MidiView.Y_OFFSET;
 		MidiView.trackHeight = MidiView.allTracksHeight / numTracks;

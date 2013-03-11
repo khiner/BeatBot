@@ -24,7 +24,7 @@ public class NoteLevelsPage extends Page {
 	
 	@Override
 	public void init() {
-		parent.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+		root.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 		// TODO remember to turn off continuous mode when leaving
 	}
 
@@ -75,10 +75,10 @@ public class NoteLevelsPage extends Page {
 
 	@Override
 	protected void createChildren() {
-		levelsView = new LevelsView((TouchableSurfaceView)parent);
-		volumeToggle = new BBToggleButton((TouchableSurfaceView)parent);
-		panToggle = new BBToggleButton((TouchableSurfaceView)parent);
-		pitchToggle = new BBToggleButton((TouchableSurfaceView)parent);
+		levelsView = new LevelsView((TouchableSurfaceView)root);
+		volumeToggle = new BBToggleButton((TouchableSurfaceView)root);
+		panToggle = new BBToggleButton((TouchableSurfaceView)root);
+		pitchToggle = new BBToggleButton((TouchableSurfaceView)root);
 		volumeToggle.setOnClickListener(new BBOnClickListener() {
 			public void onClick(BBButton arg0) {
 				levelsView.setLevelType(LevelType.VOLUME);
@@ -104,7 +104,7 @@ public class NoteLevelsPage extends Page {
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		float toggleHeight = height / 3;
 		float toggleWidth = 2 * toggleHeight;
 		volumeToggle.layout(this, 0, 0, toggleWidth, toggleHeight);

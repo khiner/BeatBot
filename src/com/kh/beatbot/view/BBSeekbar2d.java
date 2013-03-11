@@ -105,7 +105,7 @@ public class BBSeekbar2d extends LevelListenable {
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		// leaf child
 	}
 }

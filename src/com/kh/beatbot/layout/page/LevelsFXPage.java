@@ -306,12 +306,12 @@ public class LevelsFXPage extends Page implements LevelListener {
 	
 	@Override
 	protected void createChildren() {
-		effectLabel = new BBTextView((TouchableSurfaceView)parent);
-		levelBar = new BBSeekbar((TouchableSurfaceView)parent);
+		effectLabel = new BBTextView((TouchableSurfaceView)root);
+		levelBar = new BBSeekbar((TouchableSurfaceView)root);
 		levelBar.addLevelListener(this);
-		volumeToggle = new BBToggleButton((TouchableSurfaceView)parent);
-		panToggle = new BBToggleButton((TouchableSurfaceView)parent);
-		pitchToggle = new BBToggleButton((TouchableSurfaceView)parent);
+		volumeToggle = new BBToggleButton((TouchableSurfaceView)root);
+		panToggle = new BBToggleButton((TouchableSurfaceView)root);
+		pitchToggle = new BBToggleButton((TouchableSurfaceView)root);
 		volumeToggle.setOnClickListener(new BBOnClickListener() {
 			public void onClick(BBButton button) {
 				getCurrTrack().activeLevelType = LevelType.VOLUME;
@@ -333,7 +333,7 @@ public class LevelsFXPage extends Page implements LevelListener {
 		// effects
 		effectNames = GlobalVars.mainActivity.getResources().getStringArray(
 				R.array.effect_names);
-		effectLabelList = new LabelListListenable((TouchableSurfaceView)parent);
+		effectLabelList = new LabelListListenable((TouchableSurfaceView)root);
 		effectLabelList.setListener(new EffectLabelListListener(GlobalVars.mainActivity));
 		
 		addChild(effectLabel);
@@ -345,7 +345,7 @@ public class LevelsFXPage extends Page implements LevelListener {
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		float thirdHeight = height / 3;
 		float levelHeight = height / 12;
 		float effectHeight = height - height / 12 - thirdHeight;

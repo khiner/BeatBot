@@ -61,7 +61,8 @@ public class BBButton extends TouchableViewWindow {
 
 	@Override
 	public void draw() {
-		currentIcon.draw(absoluteX, parent.getHeight() - absoluteY - height, width, height);
+		if (currentIcon != null)
+			currentIcon.draw(absoluteX, root.getHeight() - absoluteY - height, width, height);
 	}
 
 	@Override
@@ -102,7 +103,7 @@ public class BBButton extends TouchableViewWindow {
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		// no children
 	}
 }

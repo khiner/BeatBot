@@ -344,7 +344,7 @@ public class SampleEditViewWindow extends TouchableViewWindow {
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		// no children to layout
 	}
 }

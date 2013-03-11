@@ -236,7 +236,7 @@ public class BpmView extends TouchableViewWindow {
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		// leaf view
 	}
 }

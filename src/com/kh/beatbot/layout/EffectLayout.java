@@ -36,17 +36,17 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 		
 	public EffectLayout(TouchableSurfaceView parent, Effect effect) {
 		this.effect = effect;
-		this.parent = parent;
+		this.root = parent;
 		createChildren();
 	}
 	
 	private void initEffectToggleButton() {
 		if (effect instanceof Filter) {
-			filterToggles[0] = new BBToggleButton((TouchableSurfaceView)parent);
-			filterToggles[1] = new BBToggleButton((TouchableSurfaceView)parent);
-			filterToggles[2] = new BBToggleButton((TouchableSurfaceView)parent);
+			filterToggles[0] = new BBToggleButton((TouchableSurfaceView)root);
+			filterToggles[1] = new BBToggleButton((TouchableSurfaceView)root);
+			filterToggles[2] = new BBToggleButton((TouchableSurfaceView)root);
 		}
-		toggleButton = new BBToggleButton((TouchableSurfaceView)parent);
+		toggleButton = new BBToggleButton((TouchableSurfaceView)root);
 	}
 
 	private void initDelayKnobs() {
@@ -61,14 +61,14 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 	protected void initParamControls() {
 		paramControls = new ArrayList<ParamControl>();
 		for (int i = 0; i < effect.getNumParams(); i++) {
-			ParamControl pc = new ParamControl((TouchableSurfaceView)parent, effect.getParam(i));
+			ParamControl pc = new ParamControl((TouchableSurfaceView)root, effect.getParam(i));
 			paramControls.add(pc);
 			pc.knob.setId(i);
 			pc.knob.removeAllListeners();
 			pc.knob.addLevelListener(this);
 			updateParamValueLabel(i);
 		}
-		level2d = new BBSeekbar2d((TouchableSurfaceView)parent);
+		level2d = new BBSeekbar2d((TouchableSurfaceView)root);
 		level2d.removeAllListeners();
 		level2d.addLevelListener(this);
 		xParamControl = paramControls.get(0);
@@ -236,7 +236,7 @@ public class EffectLayout extends TouchableViewWindow implements LevelListener,
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		float paramW = (height / 2 - 10) / 2;
 		paramControls.get(0).layout(this, width / 30, height / 4, paramW, paramW * 2);
 		paramControls.get(1).layout(this, width - height - width / 30 - paramW, height / 4, paramW, paramW * 2);

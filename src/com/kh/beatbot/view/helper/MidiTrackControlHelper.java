@@ -83,16 +83,16 @@ public class MidiTrackControlHelper extends TouchableViewWindow {
 
 		@Override
 		protected void createChildren() {
-			instrumentButton = new BBToggleButton((TouchableSurfaceView)parent);
-			muteButton = new BBToggleButton((TouchableSurfaceView)parent);
-			soloButton = new BBToggleButton((TouchableSurfaceView)parent);
+			instrumentButton = new BBToggleButton((TouchableSurfaceView)root);
+			muteButton = new BBToggleButton((TouchableSurfaceView)root);
+			soloButton = new BBToggleButton((TouchableSurfaceView)root);
 			addChild(instrumentButton);
 			addChild(muteButton);
 			addChild(soloButton);
 		}
 
 		@Override
-		protected void layoutChildren() {
+		public void layoutChildren() {
 			instrumentButton.layout(this, 0, 0, height, height);
 			muteButton.layout(this, height, 0, height * .75f, height);
 			soloButton.layout(this, height + muteButton.width, 0, height * .75f, height);
@@ -126,7 +126,7 @@ public class MidiTrackControlHelper extends TouchableViewWindow {
 	}
 
 	public void trackAdded(int trackNum) {
-		ButtonRow newRow = new ButtonRow((TouchableSurfaceView)parent, trackNum); 
+		ButtonRow newRow = new ButtonRow((TouchableSurfaceView)root, trackNum); 
 		buttonRows.add(newRow);
 		addChild(newRow);
 	}
@@ -135,7 +135,7 @@ public class MidiTrackControlHelper extends TouchableViewWindow {
 		// draw background fill
 		drawTriangleFan(bgVb, Colors.BG_COLOR);
 	}
-
+	
 	private void initBgVb() {
 		bgVb = makeRectFloatBuffer(0, 0, width, height);
 	}
@@ -150,9 +150,10 @@ public class MidiTrackControlHelper extends TouchableViewWindow {
 		// all button rows are added dynamically as tracks are added
 	}
 
+	
 	@Override
-	protected void layoutChildren() {
-		float yPos = MidiView.Y_OFFSET;
+	public void layoutChildren() {
+		float yPos = MidiView.Y_OFFSET - TickWindowHelper.getYOffset();
 		for (ButtonRow buttonRow : buttonRows) {
 			buttonRow.layout(this, 0, yPos, width, MidiView.trackHeight);
 			yPos += MidiView.trackHeight;
