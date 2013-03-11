@@ -389,12 +389,12 @@ public class MidiView extends ClickableViewWindow {
 		
 		push();
 		translate(0, -TickWindowHelper.getYOffset());
+		TickWindowHelper.drawVerticalLines();
 		drawHorizontalLines();
 		drawAllMidiNotes();
 		pop();
 		
 		drawTickFill();
-		TickWindowHelper.drawVerticalLines();
 		drawSelectRegion();
 		drawLoopMarker();
 		pop();
