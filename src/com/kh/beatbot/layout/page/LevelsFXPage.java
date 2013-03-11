@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.opengl.GLSurfaceView;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.activity.EffectActivity;
@@ -25,19 +24,20 @@ import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
-import com.kh.beatbot.listenable.LabelListListenable;
+import com.kh.beatbot.listenable.LabelList;
 import com.kh.beatbot.listenable.LevelListenable;
 import com.kh.beatbot.listener.BBOnClickListener;
-import com.kh.beatbot.listener.LabelListListener;
+import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.BBSeekbar;
 import com.kh.beatbot.view.BBTextView;
+import com.kh.beatbot.view.EffectLabelList;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class LevelsFXPage extends Page implements LevelListener {
 
-	class EffectLabelListListener implements LabelListListener {
+	class EffectLabelListListener implements DraggableLabelListListener {
 		private AlertDialog selectEffectAlert = null;
 		private int lastClickedPos = -1;
 
@@ -67,8 +67,8 @@ public class LevelsFXPage extends Page implements LevelListener {
 		}
 
 		@Override
-		public void labelListInitialized(LabelListListenable labelList) {
-			effectLabelList = labelList;
+		public void labelListInitialized(LabelList labelList) {
+			effectLabelList = (EffectLabelList)labelList;
 			if (effectLabelList.anyLabels()) {
 				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
 					Effect effect = getCurrTrack().findEffectByPosition(i);
@@ -129,7 +129,7 @@ public class LevelsFXPage extends Page implements LevelListener {
 	private boolean masterMode = false;
 	
 	// effects attrs
-	private LabelListListenable effectLabelList;
+	private EffectLabelList effectLabelList;
 	private String[] effectNames;
 	
 	public LevelsFXPage(TouchableSurfaceView parent) {
@@ -158,7 +158,7 @@ public class LevelsFXPage extends Page implements LevelListener {
 				effectLabelList.setLabelText(i, effect.getName());
 				effectLabelList.setLabelOn(i, effect.isOn());
 			} else {
-				effectLabelList.setLabelTextByPosition(i, "");
+				effectLabelList.setLabelText(i, "");
 			}
 		}
 	}
@@ -333,7 +333,7 @@ public class LevelsFXPage extends Page implements LevelListener {
 		// effects
 		effectNames = GlobalVars.mainActivity.getResources().getStringArray(
 				R.array.effect_names);
-		effectLabelList = new LabelListListenable((TouchableSurfaceView)root);
+		effectLabelList = new EffectLabelList((TouchableSurfaceView)root);
 		effectLabelList.setListener(new EffectLabelListListener(GlobalVars.mainActivity));
 		
 		addChild(effectLabel);

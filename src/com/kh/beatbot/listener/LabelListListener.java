@@ -1,11 +1,9 @@
 package com.kh.beatbot.listener;
 
-import com.kh.beatbot.listenable.LabelListListenable;
+import com.kh.beatbot.listenable.LabelList;
 
 public interface LabelListListener {
-	void labelListInitialized(LabelListListenable labelList);
-
-	void labelMoved(int oldPosition, int newPosition);
+	void labelListInitialized(LabelList labelList);
 
 	void labelClicked(String text, int position);
 
