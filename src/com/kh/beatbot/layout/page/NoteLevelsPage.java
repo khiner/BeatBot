@@ -3,19 +3,19 @@ package com.kh.beatbot.layout.page;
 import android.opengl.GLSurfaceView;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.BBButton;
 import com.kh.beatbot.global.BBIconSource;
-import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.view.Button;
+import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.LevelsView;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class NoteLevelsPage extends Page {
 
 	private LevelsView levelsView;
-	private BBToggleButton volumeToggle, panToggle, pitchToggle;
+	private ToggleButton volumeToggle, panToggle, pitchToggle;
 
 	
 	public NoteLevelsPage(TouchableSurfaceView parent) {
@@ -76,23 +76,23 @@ public class NoteLevelsPage extends Page {
 	@Override
 	protected void createChildren() {
 		levelsView = new LevelsView((TouchableSurfaceView)root);
-		volumeToggle = new BBToggleButton((TouchableSurfaceView)root);
-		panToggle = new BBToggleButton((TouchableSurfaceView)root);
-		pitchToggle = new BBToggleButton((TouchableSurfaceView)root);
+		volumeToggle = new ToggleButton((TouchableSurfaceView)root);
+		panToggle = new ToggleButton((TouchableSurfaceView)root);
+		pitchToggle = new ToggleButton((TouchableSurfaceView)root);
 		volumeToggle.setOnClickListener(new BBOnClickListener() {
-			public void onClick(BBButton arg0) {
+			public void onClick(Button arg0) {
 				levelsView.setLevelType(LevelType.VOLUME);
 				update();
 			}
 		});
 		panToggle.setOnClickListener(new BBOnClickListener() {
-			public void onClick(BBButton arg0) {
+			public void onClick(Button arg0) {
 				levelsView.setLevelType(LevelType.PAN);
 				update();
 			}
 		});
 		pitchToggle.setOnClickListener(new BBOnClickListener() {
-			public void onClick(BBButton arg0) {
+			public void onClick(Button arg0) {
 				levelsView.setLevelType(LevelType.PITCH);
 				update();
 			}
@@ -110,6 +110,7 @@ public class NoteLevelsPage extends Page {
 		volumeToggle.layout(this, 0, 0, toggleWidth, toggleHeight);
 		panToggle.layout(this, 0, toggleHeight, toggleWidth, toggleHeight);
 		pitchToggle.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
-		levelsView.layout(this, GlobalVars.midiGroup.midiTrackControl.width, 0, width - toggleWidth, height);
+		levelsView.layout(this, GlobalVars.mainPage.getMidiGroup().midiTrackControl.width,
+				0, width - toggleWidth, height);
 	}
 }

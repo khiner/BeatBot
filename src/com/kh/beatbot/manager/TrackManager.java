@@ -63,7 +63,7 @@ public class TrackManager {
 		Track newTrack = new Track(tracks.size(), instrument, sampleNum);
 		tracks.add(newTrack);
 		currTrack = tracks.get(tracks.size() - 1);
-		if (GlobalVars.midiGroup.midiView != null)
+		if (GlobalVars.mainPage.getMidiGroup().midiView != null)
 			GlobalVars.mainActivity.notifyTrackAdded(tracks.size() - 1);
 	}
 

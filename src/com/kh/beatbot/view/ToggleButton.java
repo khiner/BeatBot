@@ -1,11 +1,11 @@
-package com.kh.beatbot.global;
+package com.kh.beatbot.view;
 
-import com.kh.beatbot.view.TouchableSurfaceView;
+import com.kh.beatbot.global.BBIconSource;
 
-public class BBToggleButton extends BBButton {
+public class ToggleButton extends Button {
 	boolean on = false;
 
-	public BBToggleButton(TouchableSurfaceView parent) {
+	public ToggleButton(TouchableSurfaceView parent) {
 		super(parent);
 	}
 

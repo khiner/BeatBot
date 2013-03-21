@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.BBButton;
 import com.kh.beatbot.global.BBIconSource;
-import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.BBOnClickListener;
@@ -18,7 +16,7 @@ public class MidiTrackView extends TouchableBBView {
 
 	public class ButtonRow extends TouchableBBView {
 		int trackNum;
-		BBToggleButton instrumentButton, muteButton, soloButton;
+		ToggleButton instrumentButton, muteButton, soloButton;
 		
 		public ButtonRow(TouchableSurfaceView parent, int trackNum) {
 			super(parent);
@@ -41,7 +39,7 @@ public class MidiTrackView extends TouchableBBView {
 			soloButton.setIconSource(soloIcon);
 			instrumentButton.setOnClickListener(new BBOnClickListener() {
 				@Override
-				public void onClick(BBButton button) {
+				public void onClick(Button button) {
 					Managers.trackManager.setCurrTrack(trackNum);
 					instrumentButton.setOn(true);
 					for (ButtonRow buttonRow : buttonRows) {
@@ -53,13 +51,13 @@ public class MidiTrackView extends TouchableBBView {
 			});
 			muteButton.setOnClickListener(new BBOnClickListener() {
 				@Override
-				public void onClick(BBButton button) {
+				public void onClick(Button button) {
 					Managers.trackManager.getTrack(trackNum).mute(muteButton.isOn());
 				}
 			});
 			soloButton.setOnClickListener(new BBOnClickListener() {
 				@Override
-				public void onClick(BBButton button) {
+				public void onClick(Button button) {
 					Managers.trackManager.getTrack(trackNum).solo(soloButton.isOn());
 					if (soloButton.isOn()) {
 						// if this track is soloing, set all other solo icons to
@@ -81,9 +79,9 @@ public class MidiTrackView extends TouchableBBView {
 
 		@Override
 		protected void createChildren() {
-			instrumentButton = new BBToggleButton((TouchableSurfaceView)root);
-			muteButton = new BBToggleButton((TouchableSurfaceView)root);
-			soloButton = new BBToggleButton((TouchableSurfaceView)root);
+			instrumentButton = new ToggleButton((TouchableSurfaceView)root);
+			muteButton = new ToggleButton((TouchableSurfaceView)root);
+			soloButton = new ToggleButton((TouchableSurfaceView)root);
 			addChild(instrumentButton);
 			addChild(muteButton);
 			addChild(soloButton);

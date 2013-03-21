@@ -1,7 +1,7 @@
 package com.kh.beatbot.view.control;
 
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.view.BBTextView;
+import com.kh.beatbot.view.TextView;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
@@ -11,7 +11,7 @@ public class ParamControl extends TouchableBBView {
 	private Param param;
 	
 	public Knob knob;
-	private BBTextView label, valueLabel;
+	private TextView label, valueLabel;
 	
 	public ParamControl(TouchableSurfaceView parent) {
 		super(parent);
@@ -58,8 +58,8 @@ public class ParamControl extends TouchableBBView {
 	@Override
 	protected void createChildren() {
 		knob = new Knob((TouchableSurfaceView)root);
-		label = new BBTextView(root);
-		valueLabel = new BBTextView(root);
+		label = new TextView(root);
+		valueLabel = new TextView(root);
 		addChild(knob);
 		addChild(label);
 		addChild(valueLabel);

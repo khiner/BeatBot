@@ -17,9 +17,7 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremelo;
-import com.kh.beatbot.global.BBButton;
 import com.kh.beatbot.global.BBIconSource;
-import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
@@ -28,7 +26,9 @@ import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.view.BBTextView;
+import com.kh.beatbot.view.Button;
+import com.kh.beatbot.view.TextView;
+import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableSurfaceView;
 import com.kh.beatbot.view.control.ControlViewBase;
 import com.kh.beatbot.view.control.Seekbar;
@@ -124,8 +124,8 @@ public class LevelsFXPage extends Page implements LevelListener {
 	
 	// levels attrs
 	private Seekbar levelBar;
-	private BBToggleButton volumeToggle, panToggle, pitchToggle;
-	private BBTextView effectLabel;
+	private ToggleButton volumeToggle, panToggle, pitchToggle;
+	private TextView effectLabel;
 	private boolean masterMode = false;
 	
 	// effects attrs
@@ -306,26 +306,26 @@ public class LevelsFXPage extends Page implements LevelListener {
 	
 	@Override
 	protected void createChildren() {
-		effectLabel = new BBTextView((TouchableSurfaceView)root);
+		effectLabel = new TextView((TouchableSurfaceView)root);
 		levelBar = new Seekbar((TouchableSurfaceView)root);
 		levelBar.addLevelListener(this);
-		volumeToggle = new BBToggleButton((TouchableSurfaceView)root);
-		panToggle = new BBToggleButton((TouchableSurfaceView)root);
-		pitchToggle = new BBToggleButton((TouchableSurfaceView)root);
+		volumeToggle = new ToggleButton((TouchableSurfaceView)root);
+		panToggle = new ToggleButton((TouchableSurfaceView)root);
+		pitchToggle = new ToggleButton((TouchableSurfaceView)root);
 		volumeToggle.setOnClickListener(new BBOnClickListener() {
-			public void onClick(BBButton button) {
+			public void onClick(Button button) {
 				getCurrTrack().activeLevelType = LevelType.VOLUME;
 				update();
 			}
 		});
 		panToggle.setOnClickListener(new BBOnClickListener() {
-			public void onClick(BBButton button) {
+			public void onClick(Button button) {
 				getCurrTrack().activeLevelType = LevelType.PAN;
 				update();
 			}
 		});
 		pitchToggle.setOnClickListener(new BBOnClickListener() {
-			public void onClick(BBButton button) {
+			public void onClick(Button button) {
 				getCurrTrack().activeLevelType = LevelType.PITCH;
 				update();
 			}

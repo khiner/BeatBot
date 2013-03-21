@@ -602,7 +602,7 @@ public class MidiView extends ClickableBBView {
 			} else { // one finger scroll
 				TickWindowHelper.scroll(pointerIdToPos.get(scrollPointerId).x,
 						pointerIdToPos.get(scrollPointerId).y);
-				GlobalVars.midiGroup.midiTrackControl.layoutChildren();
+				GlobalVars.mainPage.getMidiGroup().midiTrackControl.layoutChildren();
 			}
 		} else if (pointerCount() - getNumLoopMarkersSelected() == 2) {
 			// two finger zoom

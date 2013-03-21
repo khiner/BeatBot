@@ -8,9 +8,9 @@ import javax.microedition.khronos.opengles.GL10;
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.view.group.PageFlipper;
 
 public class AdsrView extends TouchableBBView {
 
@@ -167,8 +167,7 @@ public class AdsrView extends TouchableBBView {
 					break;
 				}
 				initAdsrVb();
-				PageFlipper.getAdsrPage().updateLevelBar();
-				PageFlipper.getAdsrPage().updateLabels();
+				GlobalVars.mainPage.getPageSelectGroup().updateAdsrPage();
 				return;
 			}
 		}

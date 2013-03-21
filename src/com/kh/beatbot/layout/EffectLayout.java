@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.view.View;
-import android.widget.ToggleButton;
+
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Delay;
@@ -12,8 +12,8 @@ import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.global.BBIconSource;
-import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.listener.LevelListener;
+import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
 import com.kh.beatbot.view.control.ControlViewBase;
@@ -26,9 +26,9 @@ public class EffectLayout extends TouchableBBView implements LevelListener,
 
 	private Effect effect = null;
 	private BBIconSource toggleButtonIcon = null;
-	private BBToggleButton[] filterToggles = new BBToggleButton[3];
-	private BBToggleButton toggleButton = null;
-	private BBToggleButton linkToggle = null;
+	private ToggleButton[] filterToggles = new ToggleButton[3];
+	private ToggleButton toggleButton = null;
+	private ToggleButton linkToggle = null;
 
 	private List<ParamControl> paramControls = new ArrayList<ParamControl>();
 	private ParamControl xParamControl = null, yParamControl = null;
@@ -42,11 +42,11 @@ public class EffectLayout extends TouchableBBView implements LevelListener,
 	
 	private void initEffectToggleButton() {
 		if (effect instanceof Filter) {
-			filterToggles[0] = new BBToggleButton((TouchableSurfaceView)root);
-			filterToggles[1] = new BBToggleButton((TouchableSurfaceView)root);
-			filterToggles[2] = new BBToggleButton((TouchableSurfaceView)root);
+			filterToggles[0] = new ToggleButton((TouchableSurfaceView)root);
+			filterToggles[1] = new ToggleButton((TouchableSurfaceView)root);
+			filterToggles[2] = new ToggleButton((TouchableSurfaceView)root);
 		}
-		toggleButton = new BBToggleButton((TouchableSurfaceView)root);
+		toggleButton = new ToggleButton((TouchableSurfaceView)root);
 	}
 
 	private void initDelayKnobs() {
@@ -93,7 +93,7 @@ public class EffectLayout extends TouchableBBView implements LevelListener,
 		float newRightChannelLevel = rightChannelControl.knob.getLevel();
 		boolean newRightChannelSynced = rightChannelControl.knob.isBeatSync();
 
-		effect.setParamsLinked(((ToggleButton) view).isChecked());
+		effect.setParamsLinked(((android.widget.ToggleButton) view).isChecked());
 
 		if (effect.paramsLinked()) {
 			// y = feedback when linked
@@ -195,7 +195,7 @@ public class EffectLayout extends TouchableBBView implements LevelListener,
 	}
 
 	public void toggleOn(View view) {
-		effect.setOn(((ToggleButton) view).isChecked());
+		effect.setOn(((android.widget.ToggleButton) view).isChecked());
 	}
 	
 	@Override
@@ -208,7 +208,7 @@ public class EffectLayout extends TouchableBBView implements LevelListener,
 			filterToggles[1].setIconSource(new BBIconSource(-1, R.drawable.bandpass_filter_icon, R.drawable.bandpass_filter_icon_selected));
 			filterToggles[2].setIconSource(new BBIconSource(-1, R.drawable.highpass_filter_icon, R.drawable.highpass_filter_icon_selected));
 			filterToggles[((Filter) effect).getMode()].setOn(true);
-			for (BBToggleButton filterToggle : filterToggles) {
+			for (ToggleButton filterToggle : filterToggles) {
 				addChild(filterToggle);
 			}
 		}

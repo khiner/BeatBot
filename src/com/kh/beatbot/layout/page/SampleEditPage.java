@@ -1,19 +1,19 @@
 package com.kh.beatbot.layout.page;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.BBButton;
 import com.kh.beatbot.global.BBIconSource;
-import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.view.Button;
+import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.SampleEditBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class SampleEditPage extends Page {
 
 	private SampleEditBBView sampleEdit;
-	private BBButton previewButton;
-	private BBToggleButton loopButton, reverseButton;
+	private Button previewButton;
+	private ToggleButton loopButton, reverseButton;
 	
 	public SampleEditPage(TouchableSurfaceView parent) {
 		super(parent);
@@ -45,10 +45,10 @@ public class SampleEditPage extends Page {
 	@Override
 	protected void createChildren() {
 		sampleEdit = new SampleEditBBView((TouchableSurfaceView)root);
-		previewButton = new BBButton((TouchableSurfaceView)root);
+		previewButton = new Button((TouchableSurfaceView)root);
 		previewButton.setOnClickListener(new BBOnClickListener() {
 			@Override
-			public void onClick(BBButton button) {
+			public void onClick(Button button) {
 				if (button.isTouched()) {
 					TrackManager.currTrack.preview();
 				} else {
@@ -56,15 +56,15 @@ public class SampleEditPage extends Page {
 				}
 			}
 		});
-		loopButton = new BBToggleButton((TouchableSurfaceView)root);
-		reverseButton = new BBToggleButton((TouchableSurfaceView)root);
+		loopButton = new ToggleButton((TouchableSurfaceView)root);
+		reverseButton = new ToggleButton((TouchableSurfaceView)root);
 		loopButton.setOnClickListener(new BBOnClickListener() {
-			public void onClick(BBButton arg0) {
+			public void onClick(Button arg0) {
 				TrackManager.currTrack.toggleLooping();
 			}
 		});
 		reverseButton.setOnClickListener(new BBOnClickListener() {
-			public void onClick(BBButton arg0) {
+			public void onClick(Button arg0) {
 				TrackManager.currTrack.setReverse(reverseButton.isOn());
 			}
 		});

@@ -2,13 +2,13 @@ package com.kh.beatbot.view;
 
 import com.kh.beatbot.global.Colors;
 
-public class BBTextView extends BBView {
+public class TextButton extends Button {
 
 	private String text = null;
 	private float textWidth = 0;
 	private float textOffset = 0;
-
-	public BBTextView(GLSurfaceViewBase parent) {
+	
+	public TextButton(TouchableSurfaceView parent) {
 		super(parent);
 	}
 	

@@ -51,6 +51,8 @@ public class LevelsView extends TouchableBBView {
 	private boolean selectRegion = false;
 	private float selectRegionStartTick = -1, selectRegionStartY = -1;
 
+	private MidiView midiView;
+	
 	public LevelsView(TouchableSurfaceView parent) {
 		super(parent);
 	}
@@ -94,8 +96,8 @@ public class LevelsView extends TouchableBBView {
 
 	private void initSelectRegionVb(float leftTick, float rightTick,
 			float topY, float bottomY) {
-		selectRegionVb = makeRectFloatBuffer(GlobalVars.midiGroup.midiView.tickToX(leftTick), topY,
-				GlobalVars.midiGroup.midiView.tickToX(rightTick), bottomY);
+		selectRegionVb = makeRectFloatBuffer(midiView.tickToX(leftTick), topY,
+				midiView.tickToX(rightTick), bottomY);
 	}
 
 	private int calcVertex(float level) {
@@ -146,7 +148,7 @@ public class LevelsView extends TouchableBBView {
 
 	private void drawLevels() {
 		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
-			drawLevel(GlobalVars.midiGroup.midiView.tickToX(midiNote.getOnTick()),
+			drawLevel(midiView.tickToX(midiNote.getOnTick()),
 					midiNote.getLevel(currLevelType),
 					calcLevelColor(midiNote.isSelected()));
 		}
@@ -155,7 +157,7 @@ public class LevelsView extends TouchableBBView {
 	private boolean selectLevel(float x, float y, int pointerId) {
 		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
 			float velocityY = levelToY(midiNote.getLevel(currLevelType));
-			if (Math.abs(GlobalVars.midiGroup.midiView.tickToX(midiNote.getOnTick()) - x) < 35
+			if (Math.abs(midiView.tickToX(midiNote.getOnTick()) - x) < 35
 					&& Math.abs(velocityY - y) < 35) {
 				// If this is the only touched level, and it hasn't yet
 				// been selected, make it the only selected level.
@@ -174,7 +176,7 @@ public class LevelsView extends TouchableBBView {
 	}
 	
 	public void selectRegion(float x, float y) {
-		float tick = GlobalVars.midiGroup.midiView.xToTick(x);
+		float tick = midiView.xToTick(x);
 		float leftTick = Math.min(tick, selectRegionStartTick);
 		float rightTick = Math.max(tick, selectRegionStartTick);
 		float topY = Math.min(y, selectRegionStartY);
@@ -240,7 +242,7 @@ public class LevelsView extends TouchableBBView {
 	}
 
 	private void startSelectRegion(float x, float y) {
-		selectRegionStartTick = GlobalVars.midiGroup.midiView.xToTick(x);
+		selectRegionStartTick = midiView.xToTick(x);
 		selectRegionStartY = y;
 		selectRegionVb = null;
 		selectRegion = true;
@@ -295,6 +297,7 @@ public class LevelsView extends TouchableBBView {
 	@Override
 	public void init() {
 		//setBackgroundColor(Colors.VIEW_BG);
+		midiView = GlobalVars.mainPage.getMidiGroup().midiView;
 		initLevelBarVb();
 	}
 

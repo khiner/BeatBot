@@ -2,14 +2,14 @@ package com.kh.beatbot.layout.page;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.ADSR;
-import com.kh.beatbot.global.BBButton;
 import com.kh.beatbot.global.BBIconSource;
-import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.AdsrView;
-import com.kh.beatbot.view.BBTextView;
+import com.kh.beatbot.view.Button;
+import com.kh.beatbot.view.TextView;
+import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
 import com.kh.beatbot.view.control.ControlViewBase;
@@ -17,10 +17,10 @@ import com.kh.beatbot.view.control.Seekbar;
 
 public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 
-	private BBToggleButton[] adsrButtons;
+	private ToggleButton[] adsrButtons;
 	private AdsrView adsrView;
 	private Seekbar levelBar;
-	private BBTextView valueLabel, paramLabel;
+	private TextView valueLabel, paramLabel;
 	
 	public AdsrPage(TouchableSurfaceView parent) {
 		super(parent);
@@ -38,9 +38,9 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 		updateLabels();
 	}
 	
-	private void check(BBToggleButton btn) {
+	private void check(ToggleButton btn) {
 		btn.setOn(true);
-		for (BBToggleButton otherBtn : adsrButtons) {
+		for (ToggleButton otherBtn : adsrButtons) {
 			if (otherBtn != btn) {
 				otherBtn.setOn(false);
 			}
@@ -66,8 +66,8 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 	}
 	
 	@Override
-	public void onClick(BBButton button) {
-		check((BBToggleButton)button);
+	public void onClick(Button button) {
+		check((ToggleButton)button);
 		int paramId = button.getId();
 		// set the current parameter so we know what to do with SeekBar events.
 		TrackManager.currTrack.adsr.setCurrParam(paramId);
@@ -134,15 +134,15 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 		adsrView = new AdsrView((TouchableSurfaceView)root);
 		levelBar = new Seekbar((TouchableSurfaceView)root);
 		levelBar.addLevelListener(this);
-		paramLabel = new BBTextView((TouchableSurfaceView)root);
-		valueLabel = new BBTextView((TouchableSurfaceView)root);
-		adsrButtons = new BBToggleButton[6];
-		adsrButtons[ADSR.ATTACK_ID] = new BBToggleButton((TouchableSurfaceView)root);
-		adsrButtons[ADSR.DECAY_ID] = new BBToggleButton((TouchableSurfaceView)root);
-		adsrButtons[ADSR.SUSTAIN_ID] = new BBToggleButton((TouchableSurfaceView)root);
-		adsrButtons[ADSR.RELEASE_ID] = new BBToggleButton((TouchableSurfaceView)root);
-		adsrButtons[ADSR.START_ID] = new BBToggleButton((TouchableSurfaceView)root);
-		adsrButtons[ADSR.PEAK_ID] = new BBToggleButton((TouchableSurfaceView)root);
+		paramLabel = new TextView((TouchableSurfaceView)root);
+		valueLabel = new TextView((TouchableSurfaceView)root);
+		adsrButtons = new ToggleButton[6];
+		adsrButtons[ADSR.ATTACK_ID] = new ToggleButton((TouchableSurfaceView)root);
+		adsrButtons[ADSR.DECAY_ID] = new ToggleButton((TouchableSurfaceView)root);
+		adsrButtons[ADSR.SUSTAIN_ID] = new ToggleButton((TouchableSurfaceView)root);
+		adsrButtons[ADSR.RELEASE_ID] = new ToggleButton((TouchableSurfaceView)root);
+		adsrButtons[ADSR.START_ID] = new ToggleButton((TouchableSurfaceView)root);
+		adsrButtons[ADSR.PEAK_ID] = new ToggleButton((TouchableSurfaceView)root);
 		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i].setId(i);
 			adsrButtons[i].setOnClickListener(this);
@@ -151,7 +151,7 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 		addChild(levelBar);
 		addChild(paramLabel);
 		addChild(valueLabel);
-		for (BBToggleButton adsrButton : adsrButtons)
+		for (ToggleButton adsrButton : adsrButtons)
 			addChild(adsrButton);
 	}
 

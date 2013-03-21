@@ -28,90 +28,11 @@
     </RelativeLayout>
 
     <com.kh.beatbot.view.group.GLSurfaceViewGroup
-        android:id="@+id/midiGroup"
+        android:id="@+id/mainSurface"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_marginRight="15dp"
         android:layout_marginTop="5dp"
         android:layout_weight=".5" />
-
-    <com.kh.beatbot.layout.page.MainPageSelect
-        android:id="@+id/mainPageSelect"
-        android:layout_width="fill_parent"
-        android:layout_height="28dp"
-        android:orientation="horizontal" >
-
-        <com.kh.beatbot.view.SquareImageButton
-            android:id="@+id/addTrack"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/plus_outline"
-            android:onClick="addTrack" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/page_select_src"
-            android:text="@string/master"
-            android:textColor="@color/text_selector" />
-        
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/page_select_src"
-            android:text="@string/levels"
-            android:textColor="@color/text_selector" />
-                
-        <com.kh.beatbot.view.SquareImageView
-            android:id="@+id/instrumentSelect"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@drawable/page_select_src"
-            android:src="@drawable/kick_icon" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/page_select_src" >
-
-            <com.kh.beatbot.view.ScrollingTextView
-                android:id="@+id/sampleSelect"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:ellipsize="marquee"
-                android:text="@string/select"
-                android:textColor="@color/text_selector" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/page_select_src"
-            android:text="@string/edit"
-            android:textColor="@color/text_selector" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/page_select_src"
-            android:text="FX"
-            android:textColor="@color/text_selector" />
-        
-		<TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/page_select_src"
-            android:text="@string/adsr"
-            android:textColor="@color/text_selector" />
-        
-    </com.kh.beatbot.layout.page.MainPageSelect>
-
-    <com.kh.beatbot.view.group.PageFlipper
-        android:id="@+id/mainFlipper"
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight=".3" />
 
 </LinearLayout>

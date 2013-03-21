@@ -6,8 +6,8 @@ import android.util.FloatMath;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.BBIconSource;
-import com.kh.beatbot.global.BBToggleButton;
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class Knob extends ControlViewBase {
@@ -16,7 +16,7 @@ public class Knob extends ControlViewBase {
 	private static FloatBuffer selectCircleVb = null;
 	private static FloatBuffer selectCircleVb2 = null;
 
-	private BBToggleButton centerButton = null;
+	private ToggleButton centerButton = null;
 	private BBIconSource centerButtonIcon = null;
 	private float snapDistSquared;
 
@@ -40,7 +40,7 @@ public class Knob extends ControlViewBase {
 	@Override
 	public void init() {
 		super.init();
-		centerButton = new BBToggleButton((TouchableSurfaceView)root);
+		centerButton = new ToggleButton((TouchableSurfaceView)root);
 		centerButton.setIconSource(centerButtonIcon);
 		centerButton.layout(this, 0, 0, width, height);
 		snapDistSquared = (width / 4) * (width / 4);

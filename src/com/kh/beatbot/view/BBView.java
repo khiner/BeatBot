@@ -47,7 +47,7 @@ public abstract class BBView {
 	private static FloatBuffer circleVb = null;
 	private static final float CIRCLE_RADIUS = 100;
 
-	private boolean initialized = false;
+	protected boolean initialized = false;
 	
 	static { // init circle
 		float theta = 0;

@@ -4,10 +4,9 @@ import android.graphics.Typeface;
 
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.view.BpmView;
-import com.kh.beatbot.view.group.MidiGroup;
+import com.kh.beatbot.view.group.MainPage;
 
 public class GlobalVars {
-	public static BeatBotActivity mainActivity;
 
 	public static Typeface font;
 	// time (in millis) between pointer down and pointer up to be considered a
@@ -33,8 +32,8 @@ public class GlobalVars {
 		VOLUME, PAN, PITCH
 	};
 
-	public static MidiGroup midiGroup;
+	public static BeatBotActivity mainActivity;
+	public static MainPage mainPage;
 	public static BpmView bpmView;
-
 	public static float currBeatDivision;
 }
