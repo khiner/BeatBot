@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import android.opengl.GLSurfaceView;
 import android.util.FloatMath;
 
 import com.kh.beatbot.global.Colors;
@@ -87,12 +86,6 @@ public abstract class BBView {
 	public int getId() {
 		return id;
 	}
-		
-	public int getRenderMode() {
-		// default render mode is 'when dirty'
-		// views needing continuous rendering can override this
-		return GLSurfaceView.RENDERMODE_WHEN_DIRTY;
-	}
 	
 	public abstract void init();
 
@@ -135,10 +128,6 @@ public abstract class BBView {
 		for (BBView child : children) {
 			child.loadAllIcons();
 		}
-	}
-	
-	protected void requestRender() {
-		root.requestRender();
 	}
 	
 	public void layout(BBView parent, float x, float y, float width, float height) {

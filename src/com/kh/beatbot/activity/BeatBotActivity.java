@@ -17,7 +17,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -165,7 +164,6 @@ public class BeatBotActivity extends Activity {
 		mainSurface = (GLSurfaceViewGroup)findViewById(R.id.mainSurface);
 		GlobalVars.mainPage = new MainPage(mainSurface);
 		mainSurface.setBBRenderer(GlobalVars.mainPage);
-		mainSurface.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 		
 		Managers.init(savedInstanceState);
 		
@@ -246,7 +244,7 @@ public class BeatBotActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.snap:
-			if (GlobalVars.mainPage.getMidiGroup().midiView.toggleSnapToGrid())
+			if (GlobalVars.mainPage.midiView.toggleSnapToGrid())
 				item.setIcon(R.drawable.btn_check_buttonless_on);
 			else
 				item.setIcon(R.drawable.btn_check_buttonless_off);
@@ -329,7 +327,7 @@ public class BeatBotActivity extends Activity {
 			Toast.makeText(getApplicationContext(),
 					"Recorded file to " + fileName, Toast.LENGTH_SHORT).show();
 		} else {
-			GlobalVars.mainPage.getMidiGroup().midiView.reset();
+			GlobalVars.mainPage.midiView.reset();
 			((ToggleButton) findViewById(R.id.playButton)).setChecked(true);
 			Managers.recordManager.startRecordingNative();
 			if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
@@ -399,17 +397,13 @@ public class BeatBotActivity extends Activity {
 		Managers.midiManager.setBPM(bpm);
 	}
 
-	public void addTrack(View view) {
-		Managers.directoryManager.showAddTrackAlert();
-	}
-
 	public void notifyTrackAdded(int newTrackNum) {
-		GlobalVars.mainPage.getMidiGroup().trackAdded(newTrackNum);
+		GlobalVars.mainPage.trackAdded(newTrackNum);
 		notifyTrackChanged();
 	}
 	
 	public void notifyTrackChanged() {
-		GlobalVars.mainPage.getPageSelectGroup().notifyTrackChanged();
+		GlobalVars.mainPage.pageSelectGroup.notifyTrackChanged();
 	}
 	
 	public static native boolean createAudioPlayer();

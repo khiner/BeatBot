@@ -22,18 +22,20 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 
 	public GLSurfaceViewBase(Context context) {
 		super(context);
-		setEGLConfigChooser(false);
-		setRenderer(this);
-		setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+		initSettings();
 	}
 
 	public GLSurfaceViewBase(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		setEGLConfigChooser(false);
-		setRenderer(this);
-		setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+		initSettings();
 	}
 
+	private void initSettings() {
+		setEGLConfigChooser(false);
+		setRenderer(this);
+		setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+	}
+	
 	protected boolean initialized = false;
 	protected boolean running;
 	protected int width;

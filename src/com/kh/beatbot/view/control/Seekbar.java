@@ -99,7 +99,6 @@ public class Seekbar extends ControlViewBase {
 		numLevelVertices = numLevelVertices > 2 ? (numLevelVertices < levelBarVb
 				.capacity() / 2 ? numLevelVertices : levelBarVb.capacity() / 2)
 				: 2;
-		requestRender();
 	}
 
 	protected float xToLevel(float x) {

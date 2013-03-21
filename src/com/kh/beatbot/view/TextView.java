@@ -31,7 +31,6 @@ public class TextView extends BBView {
 		textWidth = GLSurfaceViewBase.getTextWidth(text, height / 2);
 		textOffset = width / 2 - textWidth / 2;
 		//GLSurfaceViewBase.storeText(text);
-		requestRender();
 	}
 	
 	@Override

@@ -27,6 +27,7 @@ public class PageSelectGroup extends TouchableBBView {
 	private static final int MASTER_PAGE_ID = 3;
 	private static final int NOTE_LEVELS_PAGE_ID = 4;
 	
+	Button addTrackButton;
 	Button instrumentSelectButton;
 	TextButton sampleSelectButton;
 	TextButton levelsFxButton;
@@ -84,6 +85,7 @@ public class PageSelectGroup extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
+		addTrackButton = new Button((TouchableSurfaceView) root);
 		instrumentSelectButton = new Button((TouchableSurfaceView) root);
 		sampleSelectButton = new TextButton((TouchableSurfaceView) root);
 		levelsFxButton = new TextButton((TouchableSurfaceView) root);
@@ -91,6 +93,13 @@ public class PageSelectGroup extends TouchableBBView {
 		adsrButton = new TextButton((TouchableSurfaceView) root);
 		masterButton = new TextButton((TouchableSurfaceView) root);
 		levelsButton = new Button((TouchableSurfaceView) root);
+		
+		addTrackButton.setOnClickListener(new BBOnClickListener() {
+			@Override
+			public void onClick(Button button) {
+				Managers.directoryManager.showAddTrackAlert();
+			}
+		});
 		
 		instrumentSelectButton.setOnClickListener(new BBOnClickListener() {
 			@Override
@@ -158,6 +167,7 @@ public class PageSelectGroup extends TouchableBBView {
 		pager.addPage(levelsPage);
 		pager.setPage(LEVELS_FX_PAGE_ID);
 		
+		addChild(addTrackButton);
 		addChild(instrumentSelectButton);
 		addChild(sampleSelectButton);
 		addChild(levelsFxButton);
@@ -173,18 +183,20 @@ public class PageSelectGroup extends TouchableBBView {
 	public void layoutChildren() {
 		float buttonHeight = height / 4;
 		float labelWidth = (width - 2 * buttonHeight) / 5;
-		instrumentSelectButton.layout(this, 0, 0, buttonHeight, buttonHeight);
-		sampleSelectButton.layout(this, buttonHeight, 0, labelWidth, buttonHeight);
-		levelsFxButton.layout(this, buttonHeight + labelWidth, 0, labelWidth, buttonHeight);
-		editButton.layout(this, buttonHeight + 2 * labelWidth, 0, labelWidth, buttonHeight);
-		adsrButton.layout(this, buttonHeight + 3 * labelWidth, 0, labelWidth, buttonHeight);
-		masterButton.layout(this, buttonHeight + 4 * labelWidth, 0, labelWidth, buttonHeight);
-		levelsButton.layout(this, buttonHeight + 5 * labelWidth, 0, buttonHeight, buttonHeight);
+		addTrackButton.layout(this, 0, 0, buttonHeight, buttonHeight);
+		instrumentSelectButton.layout(this, buttonHeight, 0, buttonHeight, buttonHeight);
+		sampleSelectButton.layout(this, buttonHeight * 2, 0, labelWidth, buttonHeight);
+		levelsFxButton.layout(this, buttonHeight * 2 + labelWidth, 0, labelWidth, buttonHeight);
+		editButton.layout(this, buttonHeight * 2 + 2 * labelWidth, 0, labelWidth, buttonHeight);
+		adsrButton.layout(this, buttonHeight * 2 + 3 * labelWidth, 0, labelWidth, buttonHeight);
+		masterButton.layout(this, buttonHeight * 2 + 4 * labelWidth, 0, labelWidth, buttonHeight);
+		levelsButton.layout(this, buttonHeight * 2 + 5 * labelWidth, 0, buttonHeight, buttonHeight);
 		pager.layout(this, 0, buttonHeight, width, height - buttonHeight);
 	}
 
 	@Override
 	protected void loadIcons() {
+		addTrackButton.setIconSource(new BBIconSource(R.drawable.plus_outline, R.drawable.plus_outline, R.drawable.plus_outline));
 		levelsFxButton.setText("FX");
 		editButton.setText("EDIT");
 		adsrButton.setText("ADSR");

@@ -173,7 +173,6 @@ public class SampleEditBBView extends TouchableBBView {
 		// update the display location of the loop markers
 		initLoopMarkerVb();
 		updateWaveformVb();
-		requestRender();
 	}
 
 	@Override
@@ -295,7 +294,6 @@ public class SampleEditBBView extends TouchableBBView {
 	protected void handleActionUp(int id, float x, float y) {
 		scrollPointerId = beginLoopPointerId = endLoopPointerId = zoomLeftPointerId = zoomRightPointerId = -1;
 		scrollAnchorSample = zoomLeftAnchorSample = zoomRightAnchorSample = -1;
-		requestRender();
 	}
 
 	@Override

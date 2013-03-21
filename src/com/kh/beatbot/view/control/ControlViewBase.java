@@ -69,6 +69,5 @@ public abstract class ControlViewBase extends TouchableBBView {
 		for (LevelListener levelListener : levelListeners)
 			levelListener.notifyPressed(this, false);
 		selected = false;
-		requestRender();
 	}
 }

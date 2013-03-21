@@ -20,7 +20,6 @@ public class ToggleButton extends Button {
 
 	protected void touch() {
 		currentIcon = selectedIcon;
-		requestRender();
 	}
 
 	protected void release(boolean sendEvent) {
@@ -30,7 +29,6 @@ public class ToggleButton extends Button {
 		} else if (!on) {
 			currentIcon = defaultIcon;
 		}
-		requestRender();
 	}
 
 	public boolean isOn() {

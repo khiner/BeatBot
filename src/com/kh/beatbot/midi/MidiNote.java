@@ -30,7 +30,7 @@ public class MidiNote implements Comparable<MidiNote> {
 	}
 	
 	private void updateVb() {
-		setVb(GlobalVars.mainPage.getMidiGroup().midiView.makeNoteVb(this));
+		setVb(GlobalVars.mainPage.midiView.makeNoteVb(this));
 	}
 	
 	public MidiNote getCopy() {

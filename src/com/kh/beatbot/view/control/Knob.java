@@ -118,7 +118,6 @@ public class Knob extends ControlViewBase {
 			return;
 		drawIndex = (int) (circleVb.capacity() * level / 2);
 		drawIndex += drawIndex % 2;
-		requestRender();
 	}
 
 	public void setBeatSync(boolean beatSync) {

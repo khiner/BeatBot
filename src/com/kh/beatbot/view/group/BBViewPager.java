@@ -22,7 +22,7 @@ public class BBViewPager extends TouchableBBView {
 	@Override
 	public void layoutChildren() {
 		for (BBView page : children)
-			page.layout(null, 0, 0, width, height);
+			page.layout(this, 0, 0, width, height);
 	}
 
 	@Override
@@ -48,5 +48,10 @@ public class BBViewPager extends TouchableBBView {
 	@Override
 	public void init() {
 		// noop 
+	}
+	
+	@Override
+	protected BBView findChildAt(float x, float y) {
+		return currPage;
 	}
 }

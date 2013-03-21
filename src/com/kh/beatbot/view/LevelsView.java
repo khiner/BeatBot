@@ -297,7 +297,7 @@ public class LevelsView extends TouchableBBView {
 	@Override
 	public void init() {
 		//setBackgroundColor(Colors.VIEW_BG);
-		midiView = GlobalVars.mainPage.getMidiGroup().midiView;
+		midiView = GlobalVars.mainPage.midiView;
 		initLevelBarVb();
 	}
 

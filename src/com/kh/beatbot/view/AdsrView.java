@@ -167,7 +167,7 @@ public class AdsrView extends TouchableBBView {
 					break;
 				}
 				initAdsrVb();
-				GlobalVars.mainPage.getPageSelectGroup().updateAdsrPage();
+				GlobalVars.mainPage.pageSelectGroup.updateAdsrPage();
 				return;
 			}
 		}
@@ -211,31 +211,26 @@ public class AdsrView extends TouchableBBView {
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		selectAdsrPoint(id, viewRect.clipX(x), viewRect.clipY(y));
-		requestRender();
 	}
 
 	@Override
 	protected void handleActionPointerDown(int id, float x, float y) {
 		selectAdsrPoint(id, viewRect.clipX(x), viewRect.clipY(y));
-		requestRender();
 	}
 
 	@Override
 	protected void handleActionMove(int id, float x, float y) {
 		moveAdsrPoint(id, viewRect.clipX(x), viewRect.clipY(y));
-		requestRender();
 	}
 
 	@Override
 	protected void handleActionPointerUp(int id, float x, float y) {
 		deselectAdsrPoint(id);
-		requestRender();
 	}
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
 		clearAdsrSelected();
-		requestRender();
 	}
 
 	@Override

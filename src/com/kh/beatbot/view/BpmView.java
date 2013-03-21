@@ -43,7 +43,6 @@ public class BpmView extends TouchableBBView {
 		for (int i = 3 - text.length(), j = 0; i < 3; i++, j++) {
 			setSegments(i, Character.digit(text.charAt(j), 10));
 		}
-		requestRender();
 	}
 
 	private static void setSegments(int position, int digit) {
@@ -197,7 +196,6 @@ public class BpmView extends TouchableBBView {
 		touched = true;
 		lastFrameXLoc = x;
 		lastFrameYLoc = y;
-		requestRender();
 	}
 
 	@Override
@@ -226,7 +224,6 @@ public class BpmView extends TouchableBBView {
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
 		touched = false;
-		requestRender();
 	}
 
 	@Override

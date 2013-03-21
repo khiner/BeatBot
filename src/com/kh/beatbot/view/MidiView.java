@@ -386,9 +386,9 @@ public class MidiView extends ClickableBBView {
 		
 		drawLoopRect();
 		
+		TickWindowHelper.drawVerticalLines();
 		push();
 		translate(0, -TickWindowHelper.getYOffset());
-		TickWindowHelper.drawVerticalLines();
 		drawHorizontalLines();
 		drawAllMidiNotes();
 		pop();
@@ -602,7 +602,7 @@ public class MidiView extends ClickableBBView {
 			} else { // one finger scroll
 				TickWindowHelper.scroll(pointerIdToPos.get(scrollPointerId).x,
 						pointerIdToPos.get(scrollPointerId).y);
-				GlobalVars.mainPage.getMidiGroup().midiTrackControl.layoutChildren();
+				GlobalVars.mainPage.midiTrackControl.layoutChildren();
 			}
 		} else if (pointerCount() - getNumLoopMarkersSelected() == 2) {
 			// two finger zoom

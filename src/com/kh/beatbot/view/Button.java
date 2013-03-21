@@ -28,13 +28,11 @@ public class Button extends TouchableBBView {
 	protected void touch() {
 		currentIcon = selectedIcon;
 		notifyClicked();
-		requestRender();
 	}
 
 	protected void release(boolean sendEvent) {
 		currentIcon = defaultIcon;
 		notifyClicked();
-		requestRender();
 	}
 
 	public float getIconWidth() {

@@ -175,7 +175,6 @@ public class LabelList extends ClickableBBView {
 			}
 			xTotal += label.labelWidth + GAP_BETWEEN_LABELS;
 		}
-		requestRender();
 	}
 
 	public void addLabel(String text, boolean on) {
@@ -246,7 +245,6 @@ public class LabelList extends ClickableBBView {
 		if (touched != null) {
 			touchLabel(touched, x);
 		}
-		requestRender();
 	}
 
 	@Override

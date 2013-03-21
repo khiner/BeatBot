@@ -25,7 +25,6 @@ public class GLSurfaceViewGroup extends TouchableSurfaceView {
 
 	public void setBBRenderer(BBView renderer) {
 		this.renderer = renderer;
-		setRenderMode(renderer.getRenderMode());
 	}
 	
 	@Override

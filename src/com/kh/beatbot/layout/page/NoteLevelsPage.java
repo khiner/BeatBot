@@ -24,14 +24,7 @@ public class NoteLevelsPage extends Page {
 	
 	@Override
 	public void init() {
-		root.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-		// TODO remember to turn off continuous mode when leaving
-	}
-
-	public int getRenderMode() {
-		// needs continous rendering, since it is linked with the movements
-		// of MidiView
-		return GLSurfaceView.RENDERMODE_CONTINUOUSLY;
+		// nothing to do
 	}
 	
 	@Override
@@ -110,7 +103,7 @@ public class NoteLevelsPage extends Page {
 		volumeToggle.layout(this, 0, 0, toggleWidth, toggleHeight);
 		panToggle.layout(this, 0, toggleHeight, toggleWidth, toggleHeight);
 		pitchToggle.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
-		levelsView.layout(this, GlobalVars.mainPage.getMidiGroup().midiTrackControl.width,
+		levelsView.layout(this, GlobalVars.mainPage.midiTrackControl.width,
 				0, width - toggleWidth, height);
 	}
 }

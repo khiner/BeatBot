@@ -1,23 +1,24 @@
 package com.kh.beatbot.view.group;
 
+import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.view.MidiTrackView;
+import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class MainPage extends TouchableBBView {
 	
-	private MidiGroup midiGroup;
-	private PageSelectGroup pageSelectGroup;
+	public MidiView midiView;
+	public MidiTrackView midiTrackControl;
+	public PageSelectGroup pageSelectGroup;
 	
 	public MainPage(TouchableSurfaceView parent) {
 		super(parent);
 	}
 	
-	public MidiGroup getMidiGroup() {
-		return midiGroup;
-	}
-	
-	public PageSelectGroup getPageSelectGroup() {
-		return pageSelectGroup;
+	public void trackAdded(int newTrackNum) {
+		midiTrackControl.trackAdded(newTrackNum);
+		midiView.trackAdded(newTrackNum);
 	}
 	
 	@Override
@@ -32,17 +33,27 @@ public class MainPage extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		midiGroup = new MidiGroup((TouchableSurfaceView)root);
+		midiView = new MidiView((TouchableSurfaceView)root);
+		midiTrackControl = new MidiTrackView((TouchableSurfaceView)root);
 		pageSelectGroup = new PageSelectGroup((TouchableSurfaceView)root);
 		
-		addChild(midiGroup);
+		addChild(midiView);
+		addChild(midiTrackControl);
 		addChild(pageSelectGroup);
 	}
 
 	@Override
 	public void layoutChildren() {
-		midiGroup.layout(this, 0, 0, width, 3 * height / 4);
-		pageSelectGroup.layout(this, 0, 3 * height / 4, width, 1 * height / 4);
+		float midiHeight = 2 * height / 3;
+		int numTracks = Managers.trackManager.getNumTracks();
+		MidiView.allTracksHeight = midiHeight - MidiView.Y_OFFSET;
+		MidiView.trackHeight = MidiView.allTracksHeight / numTracks;
+		
+		float trackControlWidth = MidiView.trackHeight * 2.5f;
+		
+		midiTrackControl.layout(this, 0, 0, trackControlWidth, midiHeight);
+		midiView.layout(this, trackControlWidth, 0, width - trackControlWidth, midiHeight);
+		pageSelectGroup.layout(this, 0, midiHeight, width, height - midiHeight);
 	}
 
 	@Override
