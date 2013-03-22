@@ -15,7 +15,7 @@ public class TickWindowHelper {
 
 	private static MidiView midiView = null;
 
-	public static final int NUM_VERTICAL_LINE_SETS = 6;
+	public static final int NUM_VERTICAL_LINE_SETS = 8;
 	public static final int MIN_LINES_DISPLAYED = 8;
 	public static final int MAX_LINES_DISPLAYED = 32;
 	public static final float MIN_TICKS = MidiManager.TICKS_IN_ONE_MEASURE / 8;
@@ -120,8 +120,7 @@ public class TickWindowHelper {
 		// maxLinesDisplayed) at all times
 		if ((MAX_LINES_DISPLAYED * spacing * 2) / currNumQuarterNotes < midiView.width)
 			currNumQuarterNotes /= 2;
-		else if ((MIN_LINES_DISPLAYED * spacing * 2) / currNumQuarterNotes > midiView.width
-				&& currNumQuarterNotes < 8)
+		else if ((MIN_LINES_DISPLAYED * spacing * 2) / currNumQuarterNotes > midiView.width)
 			currNumQuarterNotes *= 2;
 		GlobalVars.currBeatDivision = currNumQuarterNotes;
 	}
@@ -214,7 +213,7 @@ public class TickWindowHelper {
 	private static void initVLineVbs() {
 		List<List<Float>> allVertices = new ArrayList<List<Float>>();
 		
-		long minTickSpacing = (long)(MIN_TICKS / 2);
+		long minTickSpacing = (long)(MIN_TICKS / 8);
 		long[] tickSpacings = new long[NUM_VERTICAL_LINE_SETS];
 		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
 			allVertices.add(new ArrayList<Float>());

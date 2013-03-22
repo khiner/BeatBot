@@ -18,8 +18,8 @@ import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class ControlButtonGroup extends TouchableBBView {
 
-	ToggleButton playButton, recordButton, copyButton;
-	Button stopButton, deleteButton, undoButton, bpmTapButton;
+	ToggleButton playButton, recordButton, copyButton, stopButton;
+	Button deleteButton, undoButton, bpmTapButton;
 	BpmView bpmView;
 
 	public ControlButtonGroup(TouchableSurfaceView parent) {
@@ -39,7 +39,7 @@ public class ControlButtonGroup extends TouchableBBView {
 	@Override
 	protected void createChildren() {
 		playButton = new ToggleButton((TouchableSurfaceView) root);
-		stopButton = new Button((TouchableSurfaceView) root);
+		stopButton = new ToggleButton((TouchableSurfaceView) root);
 		recordButton = new ToggleButton((TouchableSurfaceView) root);
 		copyButton = new ToggleButton((TouchableSurfaceView) root);
 		deleteButton = new Button((TouchableSurfaceView) root);
@@ -89,6 +89,7 @@ public class ControlButtonGroup extends TouchableBBView {
 			@Override
 			public void onClick(Button button) {
 				playButton.setOn(false);
+				stopButton.setOn(false);
 				if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
 					recordButton.setOn(false);
 					playButton.getOnClickListener().onClick(playButton);
@@ -133,7 +134,6 @@ public class ControlButtonGroup extends TouchableBBView {
 		});
 
 		bpmTapButton.setOnClickListener(new BBOnClickListener() {
-
 			private long lastTapTime = 0;
 
 			@Override
@@ -142,9 +142,7 @@ public class ControlButtonGroup extends TouchableBBView {
 				float millisElapsed = tapTime - lastTapTime;
 				lastTapTime = tapTime;
 				float bpm = 60000 / millisElapsed;
-				if (bpm < MidiManager.MIN_BPM)
-					return;
-				Managers.midiManager.setBPM(bpm);
+				bpmView.setText(String.valueOf(Managers.midiManager.setBPM(bpm)));
 			}
 		});
 		
@@ -156,10 +154,6 @@ public class ControlButtonGroup extends TouchableBBView {
 		addChild(undoButton);
 		addChild(bpmTapButton);
 		addChild(bpmView);
-	}
-
-	public void setBpmText(String bpmText) {
-		bpmView.setText(bpmText);
 	}
 	
 	public void setEditIconsEnabled(final boolean enabled) {

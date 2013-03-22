@@ -21,7 +21,9 @@ public class Colors {
 		{.2f, .2f, .2f, 1},
 		{.3f, .3f, .3f, 1},
 		{.4f, .4f, .4f, 1},
-		{.5f, .5f, .5f, 1}
+		{.5f, .5f, .5f, 1},
+		{.6f, .6f, .6f, 1},
+		{.7f, .7f, .7f, 1}
 	};
 	
 	public static void initColors(Activity activity) {

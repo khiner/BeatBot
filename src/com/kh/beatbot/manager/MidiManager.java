@@ -77,13 +77,13 @@ public class MidiManager implements Parcelable {
 		return tempo.getBpm();
 	}
 
-	public void setBPM(float bpm) {
+	public int setBPM(float bpm) {
 		bpm = bpm >= MIN_BPM ? (bpm <= MAX_BPM ? bpm : MAX_BPM) : MIN_BPM;
-		GlobalVars.mainPage.controlButtonGroup.setBpmText(String.valueOf((int) bpm));
 		tempo.setBpm(bpm);
 		setNativeBPM(bpm);
 		setNativeMSPT(tempo.getMpqn() / RESOLUTION);
 		GlobalVars.mainActivity.quantizeEffectParams();
+		return (int)bpm;
 	}
 
 	public List<MidiNote> getMidiNotes() {

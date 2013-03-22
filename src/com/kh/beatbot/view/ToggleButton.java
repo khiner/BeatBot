@@ -30,8 +30,8 @@ public class ToggleButton extends Button {
 		if (sendEvent) {
 			setOn(!on);
 			notifyClicked();
-		} else if (!on) {
-			currentIcon = iconSource.defaultIcon;
+		} else {
+			currentIcon = on ? iconSource.selectedIcon : iconSource.defaultIcon;
 		}
 	}
 
