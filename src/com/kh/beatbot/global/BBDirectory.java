@@ -36,12 +36,16 @@ public class BBDirectory {
 		return name;
 	}
 
-	public BBIconSource getBBIconSource() {
+	public BBIconSource getIconSource() {
 		if (bbIconSource == null && parent != null)
 			return parent.bbIconSource;
 		return bbIconSource;
 	}
 
+	public void setIconSource(BBIconSource iconSource) {
+		this.bbIconSource = iconSource;
+	}
+	
 	public BBDirectory getParent() {
 		return parent;
 	}

@@ -200,13 +200,13 @@ public class EffectLayout extends TouchableBBView implements LevelListener,
 	
 	@Override
 	protected void loadIcons() {
-		toggleButtonIcon = new BBIconSource(-1, effect.getOffDrawableId(), effect.getOnDrawableId());
+		toggleButtonIcon = new BBIconSource(effect.getOffDrawableId(), effect.getOnDrawableId());
 		toggleButton.setIconSource(toggleButtonIcon);
 		toggleButton.setOn(effect.isOn());
 		if (effect instanceof Filter) {
-			filterToggles[0].setIconSource(new BBIconSource(-1, R.drawable.lowpass_filter_icon, R.drawable.lowpass_filter_icon_selected));
-			filterToggles[1].setIconSource(new BBIconSource(-1, R.drawable.bandpass_filter_icon, R.drawable.bandpass_filter_icon_selected));
-			filterToggles[2].setIconSource(new BBIconSource(-1, R.drawable.highpass_filter_icon, R.drawable.highpass_filter_icon_selected));
+			filterToggles[0].setIconSource(new BBIconSource(R.drawable.lowpass_filter_icon, R.drawable.lowpass_filter_icon_selected));
+			filterToggles[1].setIconSource(new BBIconSource(R.drawable.bandpass_filter_icon, R.drawable.bandpass_filter_icon_selected));
+			filterToggles[2].setIconSource(new BBIconSource(R.drawable.highpass_filter_icon, R.drawable.highpass_filter_icon_selected));
 			filterToggles[((Filter) effect).getMode()].setOn(true);
 			for (ToggleButton filterToggle : filterToggles) {
 				addChild(filterToggle);

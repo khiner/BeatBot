@@ -6,32 +6,41 @@ import com.kh.beatbot.listener.BBOnClickListener;
 
 public class Button extends TouchableBBView {
 	BBOnClickListener listener;
-	
-	BBIcon defaultIcon = null;
-	BBIcon selectedIcon = null;
-	BBIcon currentIcon = null;
+	BBIconSource iconSource;
+	BBIcon currentIcon;
 	
 	public Button(TouchableSurfaceView parent) {
 		super(parent);
 	}
 
+	public BBOnClickListener getOnClickListener() {
+		return listener;
+	}
+	
 	public void setOnClickListener(BBOnClickListener listener) {
 		this.listener = listener;
 	}
 	
+	public BBIconSource getIconSource() {
+		return iconSource;
+	}
+	
 	public void setIconSource(BBIconSource iconSource) {
-		defaultIcon = iconSource.defaultIcon;
-		selectedIcon = iconSource.selectedIcon;
-		currentIcon = defaultIcon;
+		this.iconSource = iconSource;
+		if (iconSource.disabledIcon != null) {
+			currentIcon = iconSource.disabledIcon;
+		} else {
+			currentIcon = iconSource.defaultIcon;
+		}
 	}
 
 	protected void touch() {
-		currentIcon = selectedIcon;
+		currentIcon = iconSource.selectedIcon;
 		notifyClicked();
 	}
 
 	protected void release(boolean sendEvent) {
-		currentIcon = defaultIcon;
+		currentIcon = iconSource.defaultIcon;
 		notifyClicked();
 	}
 
@@ -43,8 +52,17 @@ public class Button extends TouchableBBView {
 		return currentIcon.getHeight();
 	}
 
+	public void setEnabled(boolean enabled) {
+		currentIcon = enabled ? iconSource.defaultIcon : (iconSource.disabledIcon != null ?
+				iconSource.disabledIcon : null);
+	}
+	
+	public boolean isEnabled() {
+		return currentIcon != iconSource.defaultIcon;
+	}
+	
 	public boolean isTouched() {
-		return currentIcon.equals(selectedIcon);
+		return currentIcon.equals(iconSource.selectedIcon);
 	}
 	
 	protected void notifyClicked() {

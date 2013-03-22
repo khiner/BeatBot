@@ -79,7 +79,7 @@ public class MidiManager implements Parcelable {
 
 	public void setBPM(float bpm) {
 		bpm = bpm >= MIN_BPM ? (bpm <= MAX_BPM ? bpm : MAX_BPM) : MIN_BPM;
-		GlobalVars.bpmView.setText(String.valueOf((int) bpm));
+		GlobalVars.mainPage.controlButtonGroup.setBpmText(String.valueOf((int) bpm));
 		tempo.setBpm(bpm);
 		setNativeBPM(bpm);
 		setNativeMSPT(tempo.getMpqn() / RESOLUTION);
@@ -209,7 +209,7 @@ public class MidiManager implements Parcelable {
 
 	private void updateEditIcons() {
 		boolean anyNoteSelected = anyNoteSelected();
-		GlobalVars.mainActivity.setEditIconsEnabled(anyNoteSelected);
+		GlobalVars.mainPage.controlButtonGroup.setEditIconsEnabled(anyNoteSelected);
 	}
 
 	public void copy() {
@@ -227,7 +227,7 @@ public class MidiManager implements Parcelable {
 	}
 
 	public void paste(long startTick) {
-		GlobalVars.mainActivity.uncheckCopyButton();
+		GlobalVars.mainPage.controlButtonGroup.uncheckCopyButton();
 		if (copiedNotes.isEmpty())
 			return;
 		saveState();

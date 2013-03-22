@@ -34,7 +34,7 @@ public class Knob extends ControlViewBase {
 	}
 
 	protected void loadIcons() {
-		centerButtonIcon = new BBIconSource(-1, R.drawable.clock, R.drawable.note_icon);
+		centerButtonIcon = new BBIconSource(R.drawable.clock, R.drawable.note_icon);
 	}
 	
 	@Override

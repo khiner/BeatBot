@@ -10,16 +10,20 @@ public class ToggleButton extends Button {
 	}
 
 	public void setIconSource(BBIconSource iconSource) {
-		defaultIcon = iconSource.defaultIcon;
-		selectedIcon = iconSource.selectedIcon;
+		this.iconSource = iconSource;
 		if (on)
-			currentIcon = selectedIcon;
-		else
-			currentIcon = defaultIcon;
+			currentIcon = iconSource.selectedIcon;
+		else {
+			if (iconSource.disabledIcon != null) {
+				currentIcon = iconSource.disabledIcon;
+			} else {
+				currentIcon = iconSource.defaultIcon;
+			}
+		}
 	}
 
 	protected void touch() {
-		currentIcon = selectedIcon;
+		currentIcon = iconSource.pressedIcon != null ? iconSource.pressedIcon : iconSource.selectedIcon;
 	}
 
 	protected void release(boolean sendEvent) {
@@ -27,7 +31,7 @@ public class ToggleButton extends Button {
 			setOn(!on);
 			notifyClicked();
 		} else if (!on) {
-			currentIcon = defaultIcon;
+			currentIcon = iconSource.defaultIcon;
 		}
 	}
 
@@ -37,6 +41,6 @@ public class ToggleButton extends Button {
 
 	public void setOn(boolean on) {
 		this.on = on;
-		currentIcon = on ? selectedIcon : defaultIcon;
+		currentIcon = on ? iconSource.selectedIcon : iconSource.defaultIcon;
 	}
 }

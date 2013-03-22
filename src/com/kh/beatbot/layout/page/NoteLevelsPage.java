@@ -55,9 +55,9 @@ public class NoteLevelsPage extends Page {
 
 	@Override
 	protected void loadIcons() {
-		volumeToggle.setIconSource(new BBIconSource(-1, R.drawable.volume_icon, R.drawable.volume_icon_selected));
-		panToggle.setIconSource(new BBIconSource(-1, R.drawable.pan_icon, R.drawable.pan_icon_selected));
-		pitchToggle.setIconSource(new BBIconSource(-1, R.drawable.pitch_icon, R.drawable.pitch_selected_icon));
+		volumeToggle.setIconSource(new BBIconSource( R.drawable.volume_icon, R.drawable.volume_icon_selected));
+		panToggle.setIconSource(new BBIconSource(R.drawable.pan_icon, R.drawable.pan_icon_selected));
+		pitchToggle.setIconSource(new BBIconSource(R.drawable.pitch_icon, R.drawable.pitch_selected_icon));
 	}
 
 	@Override

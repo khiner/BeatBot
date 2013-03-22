@@ -9,8 +9,10 @@ import com.kh.beatbot.view.TouchableSurfaceView;
 public class MainPage extends TouchableBBView {
 	
 	public MidiView midiView;
+	public ControlButtonGroup controlButtonGroup;
 	public MidiTrackView midiTrackControl;
 	public PageSelectGroup pageSelectGroup;
+	
 	
 	public MainPage(TouchableSurfaceView parent) {
 		super(parent);
@@ -34,9 +36,11 @@ public class MainPage extends TouchableBBView {
 	@Override
 	protected void createChildren() {
 		midiView = new MidiView((TouchableSurfaceView)root);
+		controlButtonGroup = new ControlButtonGroup((TouchableSurfaceView)root);
 		midiTrackControl = new MidiTrackView((TouchableSurfaceView)root);
 		pageSelectGroup = new PageSelectGroup((TouchableSurfaceView)root);
 		
+		addChild(controlButtonGroup);
 		addChild(midiView);
 		addChild(midiTrackControl);
 		addChild(pageSelectGroup);
@@ -44,16 +48,17 @@ public class MainPage extends TouchableBBView {
 
 	@Override
 	public void layoutChildren() {
-		float midiHeight = 2 * height / 3;
+		float controlButtonHeight = height / 10;
+		float midiHeight = 2 * (height - controlButtonHeight) / 3;
 		int numTracks = Managers.trackManager.getNumTracks();
 		MidiView.allTracksHeight = midiHeight - MidiView.Y_OFFSET;
 		MidiView.trackHeight = MidiView.allTracksHeight / numTracks;
-		
 		float trackControlWidth = MidiView.trackHeight * 2.5f;
 		
-		midiTrackControl.layout(this, 0, 0, trackControlWidth, midiHeight);
-		midiView.layout(this, trackControlWidth, 0, width - trackControlWidth, midiHeight);
-		pageSelectGroup.layout(this, 0, midiHeight, width, height - midiHeight);
+		controlButtonGroup.layout(this, 0, 0, width, controlButtonHeight);
+		midiTrackControl.layout(this, 0, controlButtonHeight, trackControlWidth, midiHeight);
+		midiView.layout(this, trackControlWidth, controlButtonHeight, width - trackControlWidth, midiHeight);
+		pageSelectGroup.layout(this, 0, controlButtonHeight + midiHeight, width, height - midiHeight - controlButtonHeight);
 	}
 
 	@Override

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<com.kh.beatbot.view.control.Knob xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/param_knob"
-    android:layout_width="80dp"
-    android:layout_height="80dp"
-/>

@@ -116,12 +116,12 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 
 	@Override
 	protected void loadIcons() {
-		adsrButtons[0].setIconSource(new BBIconSource(-1, R.drawable.attack_icon, R.drawable.attack_icon_selected));
-		adsrButtons[1].setIconSource(new BBIconSource(-1, R.drawable.decay_icon, R.drawable.decay_icon_selected));
-		adsrButtons[2].setIconSource(new BBIconSource(-1, R.drawable.sustain_icon, R.drawable.sustain_icon_selected));
-		adsrButtons[3].setIconSource(new BBIconSource(-1, R.drawable.release_icon, R.drawable.release_icon_selected));
-		adsrButtons[4].setIconSource(new BBIconSource(-1, R.drawable.start_icon, R.drawable.start_icon_selected));
-		adsrButtons[5].setIconSource(new BBIconSource(-1, R.drawable.peak_icon, R.drawable.peak_icon_selected));
+		adsrButtons[0].setIconSource(new BBIconSource(R.drawable.attack_icon, R.drawable.attack_icon_selected));
+		adsrButtons[1].setIconSource(new BBIconSource(R.drawable.decay_icon, R.drawable.decay_icon_selected));
+		adsrButtons[2].setIconSource(new BBIconSource(R.drawable.sustain_icon, R.drawable.sustain_icon_selected));
+		adsrButtons[3].setIconSource(new BBIconSource(R.drawable.release_icon, R.drawable.release_icon_selected));
+		adsrButtons[4].setIconSource(new BBIconSource(R.drawable.start_icon, R.drawable.start_icon_selected));
+		adsrButtons[5].setIconSource(new BBIconSource(R.drawable.peak_icon, R.drawable.peak_icon_selected));
 	}
 
 	@Override

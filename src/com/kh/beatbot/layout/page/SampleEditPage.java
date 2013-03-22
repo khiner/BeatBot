@@ -32,9 +32,9 @@ public class SampleEditPage extends Page {
 
 	@Override
 	protected void loadIcons() {
-		previewButton.setIconSource(new BBIconSource(-1 , R.drawable.preview_icon, R.drawable.preview_icon_selected));
-		loopButton.setIconSource(new BBIconSource(-1, R.drawable.loop_icon, R.drawable.loop_selected_icon));
-		reverseButton.setIconSource(new BBIconSource(-1, R.drawable.reverse_icon, R.drawable.reverse_selected_icon));
+		previewButton.setIconSource(new BBIconSource(R.drawable.preview_icon, R.drawable.preview_icon_selected));
+		loopButton.setIconSource(new BBIconSource(R.drawable.loop_icon, R.drawable.loop_selected_icon));
+		reverseButton.setIconSource(new BBIconSource(R.drawable.reverse_icon, R.drawable.reverse_selected_icon));
 	}
 
 	@Override

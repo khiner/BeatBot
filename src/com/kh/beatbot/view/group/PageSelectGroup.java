@@ -63,11 +63,11 @@ public class PageSelectGroup extends TouchableBBView {
 	
 	private void updateInstrumentIcon() {
 		// update the track pager instrument icon
-		if (TrackManager.currTrack.getInstrument().getBBIconSource().defaultIcon == null) {
+		if (TrackManager.currTrack.getInstrument().getIconSource().defaultIcon == null) {
 			return;
 		}
 		instrumentSelectButton
-				.setIconSource(TrackManager.currTrack.getInstrument().getBBIconSource());
+				.setIconSource(TrackManager.currTrack.getInstrument().getIconSource());
 	}
 
 	private void updateSampleText() {
@@ -196,12 +196,12 @@ public class PageSelectGroup extends TouchableBBView {
 
 	@Override
 	protected void loadIcons() {
-		addTrackButton.setIconSource(new BBIconSource(R.drawable.plus_outline, R.drawable.plus_outline, R.drawable.plus_outline));
+		addTrackButton.setIconSource(new BBIconSource(R.drawable.plus_outline, R.drawable.plus_outline));
 		levelsFxButton.setText("FX");
 		editButton.setText("EDIT");
 		adsrButton.setText("ADSR");
 		masterButton.setText("MASTER");
-		levelsButton.setIconSource(new BBIconSource(R.drawable.levels_btn_src, R.drawable.levels_icon, R.drawable.levels_icon_selected));
+		levelsButton.setIconSource(new BBIconSource(R.drawable.levels_icon, R.drawable.levels_icon_selected));
 	}
 
 	@Override

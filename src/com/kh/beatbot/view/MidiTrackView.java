@@ -34,7 +34,7 @@ public class MidiTrackView extends TouchableBBView {
 
 		@Override
 		public void init() {
-			instrumentButton.setIconSource(Managers.trackManager.getTrack(trackNum).getInstrument().getBBIconSource());
+			instrumentButton.setIconSource(Managers.trackManager.getTrack(trackNum).getInstrument().getIconSource());
 			muteButton.setIconSource(muteIcon);
 			soloButton.setIconSource(soloIcon);
 			instrumentButton.setOnClickListener(new BBOnClickListener() {
@@ -106,9 +106,9 @@ public class MidiTrackView extends TouchableBBView {
 	
 	protected void loadIcons() {
 		Managers.directoryManager.loadIcons();
-		muteIcon = new BBIconSource(-1, R.drawable.mute_icon,
+		muteIcon = new BBIconSource(R.drawable.mute_icon,
 				R.drawable.mute_icon_selected);
-		soloIcon = new BBIconSource(-1, R.drawable.solo_icon,
+		soloIcon = new BBIconSource(R.drawable.solo_icon,
 				R.drawable.solo_icon_selected);
 	}
 
@@ -118,7 +118,7 @@ public class MidiTrackView extends TouchableBBView {
 		}
 		Track track = Managers.trackManager.getTrack(trackNum);
 		buttonRows.get(trackNum).setIconSource(
-				track.getInstrument().getBBIconSource());
+				track.getInstrument().getIconSource());
 	}
 
 	public void trackAdded(int trackNum) {

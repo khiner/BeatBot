@@ -6,33 +6,11 @@
     android:background="@color/background"
     android:orientation="vertical" >
 
-    <RelativeLayout
-        android:id="@+id/controlButtons"
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight=".1" >
-
-        <include
-            android:id="@+id/leftControlButtons"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            layout="@layout/left_control_buttons" />
-
-        <include
-            android:id="@+id/rightControlButtons"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            layout="@layout/right_control_buttons" />
-    </RelativeLayout>
-
     <com.kh.beatbot.view.group.GLSurfaceViewGroup
         android:id="@+id/mainSurface"
         android:layout_width="fill_parent"
-        android:layout_height="0dp"
+        android:layout_height="fill_parent"
         android:layout_marginRight="15dp"
-        android:layout_marginTop="5dp"
-        android:layout_weight=".9" />
+        android:layout_marginTop="5dp" />
 
 </LinearLayout>

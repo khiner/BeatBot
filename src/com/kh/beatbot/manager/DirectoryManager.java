@@ -134,43 +134,50 @@ public class DirectoryManager {
 	}
 
 	public void loadIcons() {
-		getDrumInstrument(0).getBBIconSource().set(R.drawable.kick_icon_src,
-				R.drawable.kick_icon, R.drawable.kick_icon_selected,
-				R.drawable.kick_icon_listview, R.drawable.kick_icon_list_title);
-		getDrumInstrument(1).getBBIconSource().set(R.drawable.snare_icon_src,
-				R.drawable.snare_icon, R.drawable.snare_icon_selected,
+		getDrumInstrument(0).setIconSource(new BBIconSource(
+				R.drawable.kick_icon,
+				R.drawable.kick_icon_selected,
+				R.drawable.kick_icon_listview,
+				R.drawable.kick_icon_list_title));
+		getDrumInstrument(1).setIconSource(new BBIconSource(
+				R.drawable.snare_icon,
+				R.drawable.snare_icon_selected,
 				R.drawable.snare_icon_listview,
-				R.drawable.snare_icon_list_title);
-		getDrumInstrument(2).getBBIconSource().set(
-				R.drawable.hh_closed_icon_src, R.drawable.hh_closed_icon,
+				R.drawable.snare_icon_list_title));
+		getDrumInstrument(2).setIconSource(new BBIconSource(
+				R.drawable.hh_closed_icon,
 				R.drawable.hh_closed_icon_selected,
 				R.drawable.hh_closed_icon_listview,
-				R.drawable.hh_closed_icon_list_title);
-		getDrumInstrument(3).getBBIconSource().set(R.drawable.hh_open_icon_src,
-				R.drawable.hh_open_icon, R.drawable.hh_open_icon_selected,
+				R.drawable.hh_closed_icon_list_title));
+		getDrumInstrument(3).setIconSource(new BBIconSource(
+				R.drawable.hh_open_icon,
+				R.drawable.hh_open_icon_selected,
 				R.drawable.hh_open_icon_listview,
-				R.drawable.hh_open_icon_list_title);
-		getDrumInstrument(4).getBBIconSource().set(R.drawable.rimshot_icon_src,
-				R.drawable.rimshot_icon, R.drawable.rimshot_icon_selected,
+				R.drawable.hh_open_icon_list_title));
+		getDrumInstrument(4).setIconSource(new BBIconSource(
+				R.drawable.rimshot_icon,
+				R.drawable.rimshot_icon_selected,
 				R.drawable.rimshot_icon_listview,
-				R.drawable.rimshot_icon_list_title);
-		drumsDirectory.getBBIconSource().set(-1, -1, -1,
+				R.drawable.rimshot_icon_list_title));
+		drumsDirectory.setIconSource(new BBIconSource(
+				-1,
+				-1,
 				R.drawable.drums_icon_listview,
-				R.drawable.drums_icon_list_title);
-		internalRecordDirectory.getBBIconSource().set(
-				R.drawable.microphone_icon_src, R.drawable.microphone_icon,
+				R.drawable.drums_icon_list_title));
+		internalRecordDirectory.setIconSource(new BBIconSource(
+				R.drawable.microphone_icon,
 				R.drawable.microphone_icon_selected,
 				R.drawable.microphone_icon_listview,
-				R.drawable.microphone_icon_list_title);
-		internalBeatRecordDirectory.getBBIconSource().set(
-				R.drawable.beat_icon_src, R.drawable.beat_icon,
+				R.drawable.microphone_icon_list_title));
+		internalBeatRecordDirectory.setIconSource(new BBIconSource(
+				R.drawable.beat_icon,
 				R.drawable.beat_icon_selected, R.drawable.beat_icon_listview,
-				R.drawable.beat_icon_list_title);
-		internalSampleRecordDirectory.getBBIconSource().set(
-				R.drawable.sample_icon_src, R.drawable.sample_icon,
+				R.drawable.beat_icon_list_title));
+		internalSampleRecordDirectory.setIconSource(new BBIconSource(
+				R.drawable.sample_icon,
 				R.drawable.sample_icon_selected,
 				R.drawable.sample_icon_listview,
-				R.drawable.sample_icon_list_title);
+				R.drawable.sample_icon_list_title));
 	}
 
 	public static String appDirectoryPath;
@@ -208,23 +215,22 @@ public class DirectoryManager {
 	private DirectoryManager() {
 		initDataDir();
 		internalDirectory = new BBDirectory(null, "internal", null);
-		drumsDirectory = new BBDirectory(internalDirectory, "drums",
-				new BBIconSource());
+		drumsDirectory = new BBDirectory(internalDirectory, "drums", null);
 		userRecordDirectory = new BBDirectory(null, "recorded", null);
 		userSampleRecordDirectory = new BBDirectory(userRecordDirectory,
 				"samples", null);
 		userBeatRecordDirectory = new BBDirectory(userRecordDirectory, "beats",
 				null);
 		internalRecordDirectory = new BBDirectory(internalDirectory,
-				"recorded", new BBIconSource());
+				"recorded", null);
 		internalSampleRecordDirectory = new Instrument(internalRecordDirectory,
-				"samples", new BBIconSource());
+				"samples", null);
 		internalBeatRecordDirectory = new Instrument(internalRecordDirectory,
-				"beats", new BBIconSource());
+				"beats", null);
 		internalBeatRecordDirectory
 				.setEmptyMsg("You haven't recorded any beats yet!  Use the record button at the top to record your beats.");
 		for (String drumName : drumNames) {
-			new Instrument(drumsDirectory, drumName, new BBIconSource());
+			new Instrument(drumsDirectory, drumName, null);
 		}
 		instrumentSelectAlertBuilder = new AlertDialog.Builder(
 				GlobalVars.mainActivity);
@@ -307,10 +313,10 @@ public class DirectoryManager {
 	}
 
 	private void updateInstrumentSelectTitleBar() {
-		if (currDirectory.getBBIconSource() != null
-				&& currDirectory.getBBIconSource().listTitleIconResource > 0) {
+		if (currDirectory.getIconSource() != null
+				&& currDirectory.getIconSource().listTitleIconResource > 0) {
 			instrumentSelectAlertBuilder.setIcon(
-					currDirectory.getBBIconSource().listTitleIconResource)
+					currDirectory.getIconSource().listTitleIconResource)
 					.setTitle(currDirectory.getName().toUpperCase());
 		} else {
 			instrumentSelectAlertBuilder.setIcon(0).setTitle(
@@ -329,12 +335,12 @@ public class DirectoryManager {
 				// if the directory is a root directory (only sample children)
 				// or does not have an icon, no icon for this list element
 				if (directory instanceof Instrument
-						|| directory.getChild(position).getBBIconSource() == null) {
+						|| directory.getChild(position).getIconSource() == null) {
 					tv.setCompoundDrawables(null, null, null, null);
 					return v;
 				}
 				BBIconSource iconSource = directory.getChild(position)
-						.getBBIconSource();
+						.getIconSource();
 				tv.setCompoundDrawablesWithIntrinsicBounds(
 						iconSource.listViewIconResource, 0, 0, 0);
 				// Add margin between image and text (support various screen
