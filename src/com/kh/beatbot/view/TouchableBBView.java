@@ -26,34 +26,6 @@ public abstract class TouchableBBView extends BBView {
 		return pointerIdToPos.size();
 	}
 	
-	private final void consumeActionDown(int id, float x, float y) {
-		pointerIdToPos.put(id, new Position(x, y));
-		handleActionDown(id, x, y);
-	}
-
-	private final void consumeActionUp(int id, float x, float y) {
-		handleActionUp(id, x, y);
-		pointerIdToPos.clear();
-	}
-
-	private final void consumeActionPointerDown(int id, float x, float y) {
-		pointerIdToPos.put(id, new Position(x, y));
-		handleActionPointerDown(id, x, y);
-	}
-
-	private final void consumeActionPointerUp(int id, float x, float y) {
-		handleActionPointerUp(id, x, y);
-		pointerIdToPos.remove(id);
-	}
-
-	private final void consumeActionMove(int id, float x, float y) {
-		if (!ownsPointer(id))
-			return;
-		pointerIdToPos.get(id).set(x, y);
-		handleActionMove(id, x, y);
-	}
-	
-	
 	/********************************************************
 	 * These are the handlers that implementations should
 	 * override to actually handle touch events.  They are
@@ -83,10 +55,13 @@ public abstract class TouchableBBView extends BBView {
 	}
 	
 	
-	/*
-	 * Touch events are delegated to children, using coordinates relative to
-	 * child.
-	 */
+	/**********************************************************************
+	 * Touch events are propogated to children, using coordinates relative 
+	 * to child.
+	 * 
+	 * These methods also "consume" the actions, in case the view wants
+	 * to do something with these touch events.
+	 **********************************************************************/
 	public final void propogateActionDown(MotionEvent e, int id, float x, float y) {
 		consumeActionDown(id, x, y);
 		BBView child = findChildAt(x, y);
@@ -98,7 +73,7 @@ public abstract class TouchableBBView extends BBView {
 
 	public final void propogateActionUp(MotionEvent e, int id, float x, float y) {
 		consumeActionUp(id, x, y);
-		TouchableBBView child = findChildOwningPointer(id);
+		TouchableBBView child = whichChildOwnsPointer(id);
 		if (child != null)
 			child.propogateActionUp(e, id, x - child.x, y - child.y);
 	}
@@ -118,7 +93,7 @@ public abstract class TouchableBBView extends BBView {
 
 	public final void propogateActionPointerUp(MotionEvent e, int id, float x, float y) {
 		consumeActionPointerUp(id, x, y);
-		TouchableBBView child = findChildOwningPointer(id);
+		TouchableBBView child = whichChildOwnsPointer(id);
 		if (child != null) {
 			if (child.pointerCount() == 1)
 				child.propogateActionUp(e, id, x - child.x, y - child.y);
@@ -129,12 +104,53 @@ public abstract class TouchableBBView extends BBView {
 	
 	public final void propogateActionMove(MotionEvent e, int id, float x, float y) {
 		consumeActionMove(id, x, y);
-		TouchableBBView child = findChildOwningPointer(id);
+		TouchableBBView child = whichChildOwnsPointer(id);
 		if (child != null)
 			child.propogateActionMove(e, id, x - child.x, y - child.y);
 	}
 
-	private TouchableBBView findChildOwningPointer(int id) {
+	/***************************************************************
+	 * These "consume" methods are essentially wrappers around
+	 * handler methods that also take care of the business of
+	 * properly storing the pointers in the "id to position" map.
+	 ***************************************************************/
+	private final void consumeActionDown(int id, float x, float y) {
+		pointerIdToPos.put(id, new Position(x, y));
+		handleActionDown(id, x, y);
+	}
+
+	private final void consumeActionUp(int id, float x, float y) {
+		handleActionUp(id, x, y);
+		pointerIdToPos.clear();
+	}
+
+	private final void consumeActionPointerDown(int id, float x, float y) {
+		pointerIdToPos.put(id, new Position(x, y));
+		handleActionPointerDown(id, x, y);
+	}
+
+	private final void consumeActionPointerUp(int id, float x, float y) {
+		handleActionPointerUp(id, x, y);
+		pointerIdToPos.remove(id);
+	}
+
+	private final void consumeActionMove(int id, float x, float y) {
+		if (!ownsPointer(id))
+			return;
+		pointerIdToPos.get(id).set(x, y);
+		handleActionMove(id, x, y);
+	}
+	
+	/**
+	 * Find which child is responsible for touch events from
+	 * the pointer with the given id.
+	 *  
+	 * @param id the pointer id
+	 * @return the Touchable view child responsible for
+	 * handling actions from the given pointer id, or null
+	 * if no such Touchable child view exists
+	 */
+	private TouchableBBView whichChildOwnsPointer(int id) {
 		for (BBView child : children) {
 			if (child instanceof TouchableBBView
 					&& ((TouchableBBView) child).ownsPointer(id)) {
