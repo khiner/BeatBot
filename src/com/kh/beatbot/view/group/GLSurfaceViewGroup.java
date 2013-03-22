@@ -54,32 +54,32 @@ public class GLSurfaceViewGroup extends TouchableSurfaceView {
 	 */
 	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
 		if (renderer instanceof TouchableBBView) {
-			((TouchableBBView) renderer).handleActionDown(e, id, x, y);
+			((TouchableBBView) renderer).propogateActionDown(e, id, x, y);
 		}
 	}
 
 	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
 		if (renderer instanceof TouchableBBView) {
-			((TouchableBBView) renderer).handleActionUp(e, id, x, y);
+			((TouchableBBView) renderer).propogateActionUp(e, id, x, y);
 		}
 	}
 
 	protected void handleActionPointerDown(MotionEvent e, int id, float x,
 			float y) {
 		if (renderer instanceof TouchableBBView) {
-			((TouchableBBView) renderer).handleActionPointerDown(e, id, x, y);
+			((TouchableBBView) renderer).propogateActionPointerDown(e, id, x, y);
 		}
 	}
 
 	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
 		if (renderer instanceof TouchableBBView) {
-			((TouchableBBView) renderer).handleActionPointerUp(e, id, x, y);
+			((TouchableBBView) renderer).propogateActionPointerUp(e, id, x, y);
 		}
 	}
 	
 	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
 		if (renderer instanceof TouchableBBView) {
-			((TouchableBBView) renderer).handleActionMove(e, id, x, y);
+			((TouchableBBView) renderer).propogateActionMove(e, id, x, y);
 		}
 	}
 }
