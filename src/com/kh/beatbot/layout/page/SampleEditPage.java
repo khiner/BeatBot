@@ -5,14 +5,15 @@ import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.Button;
-import com.kh.beatbot.view.ToggleButton;
+import com.kh.beatbot.view.ImageButton;
 import com.kh.beatbot.view.SampleEditBBView;
+import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class SampleEditPage extends Page {
 
 	private SampleEditBBView sampleEdit;
-	private Button previewButton;
+	private ImageButton previewButton;
 	private ToggleButton loopButton, reverseButton;
 	
 	public SampleEditPage(TouchableSurfaceView parent) {
@@ -26,8 +27,8 @@ public class SampleEditPage extends Page {
 	public void update() {
 		if (sampleEdit != null)
 			sampleEdit.update();
-		loopButton.setOn(TrackManager.currTrack.isLooping());
-		reverseButton.setOn(TrackManager.currTrack.isReverse());
+		loopButton.setChecked(TrackManager.currTrack.isLooping());
+		reverseButton.setChecked(TrackManager.currTrack.isReverse());
 	}
 
 	@Override
@@ -45,7 +46,7 @@ public class SampleEditPage extends Page {
 	@Override
 	protected void createChildren() {
 		sampleEdit = new SampleEditBBView((TouchableSurfaceView)root);
-		previewButton = new Button((TouchableSurfaceView)root);
+		previewButton = new ImageButton((TouchableSurfaceView)root);
 		previewButton.setOnClickListener(new BBOnClickListener() {
 			@Override
 			public void onClick(Button button) {
@@ -65,7 +66,7 @@ public class SampleEditPage extends Page {
 		});
 		reverseButton.setOnClickListener(new BBOnClickListener() {
 			public void onClick(Button arg0) {
-				TrackManager.currTrack.setReverse(reverseButton.isOn());
+				TrackManager.currTrack.setReverse(reverseButton.isChecked());
 			}
 		});
 		addChild(sampleEdit);

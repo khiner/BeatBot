@@ -7,22 +7,24 @@ import android.util.FloatMath;
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.listener.KnobListener;
+import com.kh.beatbot.listener.Level1dListener;
+import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
-public class Knob extends ControlViewBase {
+public class Knob extends ControlView1dBase implements BBOnClickListener {
 
-	private static FloatBuffer circleVb = null;
-	private static FloatBuffer selectCircleVb = null;
-	private static FloatBuffer selectCircleVb2 = null;
+	private FloatBuffer circleVb;
+	private FloatBuffer selectCircleVb;
+	private FloatBuffer selectCircleVb2;
 
-	private ToggleButton centerButton = null;
-	private BBIconSource centerButtonIcon = null;
+	private ToggleButton centerButton;
 	private float snapDistSquared;
 
 	private int drawIndex = 0;
 
-	private boolean levelSelected = false;
 	private boolean clickable = false;
 	
 	public Knob(TouchableSurfaceView parent) {
@@ -34,22 +36,7 @@ public class Knob extends ControlViewBase {
 	}
 
 	protected void loadIcons() {
-		centerButtonIcon = new BBIconSource(R.drawable.clock, R.drawable.note_icon);
-	}
-	
-	@Override
-	public void init() {
-		super.init();
-		centerButton = new ToggleButton((TouchableSurfaceView)root);
-		centerButton.setIconSource(centerButtonIcon);
-		centerButton.layout(this, 0, 0, width, height);
-		snapDistSquared = (width / 4) * (width / 4);
-		// all knobs share the same circle VBs, and they should only change when
-		// width or height changes
-		initCircleVbs(width, height);
-		if (clickable) {
-			centerButton.setOn(true);
-		}
+		centerButton.setIconSource(new BBIconSource(R.drawable.clock, R.drawable.note_icon));
 	}
 	
 	private void initCircleVbs(float width, float height) {
@@ -99,12 +86,11 @@ public class Knob extends ControlViewBase {
 
 	@Override
 	public void draw() {
-		setColor(Colors.VOLUME);
 		// level background
 		drawTriangleStrip(circleVb, Colors.VIEW_BG);
 		// main selection
 		drawTriangleStrip(circleVb, levelColor, drawIndex);
-		if (levelSelected) { // selected glow
+		if (selected) { // selected glow
 			drawTriangleStrip(selectCircleVb2, selectColor, drawIndex);
 			drawTriangleStrip(selectCircleVb, selectColor, drawIndex);
 		}
@@ -122,48 +108,19 @@ public class Knob extends ControlViewBase {
 
 	public void setBeatSync(boolean beatSync) {
 		if (centerButton != null) {
-			centerButton.setOn(beatSync);
+			centerButton.setChecked(beatSync);
 		}
 	}
 
 	public boolean isBeatSync() {
-		return centerButton != null && centerButton.isOn();
+		return centerButton != null && centerButton.isChecked();
 	}
 
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
 		if (distanceFromCenterSquared(x, y) > snapDistSquared) {
-			levelSelected = true;
-			setLevel(coordToLevel(x, y));
-		} else if (centerButton != null) {
-			// TODO need to make this a ViewWindow, and render both views on same square 
-			// centerButton.touch();
+			super.handleActionDown(id, x, y);
 		}
-		super.handleActionDown(id, x, y);
-	}
-
-	@Override
-	protected void handleActionMove(int id, float x, float y) {
-		if (!levelSelected || id != 0)
-			return;
-		float newLevel = coordToLevel(x, y);
-		setLevel(newLevel);
-	}
-
-	@Override
-	protected void handleActionUp(int id, float x, float y) {
-		levelSelected = false;
-		// TODO
-//		if (centerButton != null) {
-//			if (distanceFromCenterSquared(x, y) <= snapDistSquared) {
-//				centerButton.toggle();
-//				for (LevelListener listener : levelListeners) {
-//					listener.notifyClicked(this);
-//				}
-//			}
-//			centerButton.release();
-//		}
-		super.handleActionUp(id, x, y);
 	}
 
 	public boolean isClickable() {
@@ -175,13 +132,9 @@ public class Knob extends ControlViewBase {
 		super.setViewLevel(level);
 		updateDrawIndex();
 	}
-
-	@Override
-	public void setLevel(float level) {
-		super.setLevel(level);
-	}
 	
-	private float coordToLevel(float x, float y) {
+	@Override
+	protected float posToLevel(float x, float y) {
 		float unitX = (x - width / 2) / width;
 		float unitY = (y - height / 2) / height;
 		float theta = (float) Math.atan(unitY / unitX) + ¹ / 2;
@@ -197,11 +150,26 @@ public class Knob extends ControlViewBase {
 
 	@Override
 	protected void createChildren() {
-		// leaf child
+		centerButton = new ToggleButton((TouchableSurfaceView)root);
+		centerButton.setOnClickListener(this);
 	}
-
+	
 	@Override
 	public void layoutChildren() {
-		// leaf child
+		centerButton.layout(this, 0, 0, width, height);
+		snapDistSquared = (width / 4) * (width / 4);
+		initCircleVbs(width, height);
+		if (clickable) {
+			centerButton.setChecked(true);
+		}
+	}
+	
+	@Override
+	public void onClick(Button button) {
+		if (distanceFromCenterSquared(x, y) <= snapDistSquared) {
+			for (Level1dListener listener : levelListeners) {
+				((KnobListener)listener).onClick(this);
+			}
+		}
 	}
 }

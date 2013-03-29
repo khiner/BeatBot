@@ -13,7 +13,6 @@ public class MainPage extends TouchableBBView {
 	public MidiTrackView midiTrackControl;
 	public PageSelectGroup pageSelectGroup;
 	
-	
 	public MainPage(TouchableSurfaceView parent) {
 		super(parent);
 	}

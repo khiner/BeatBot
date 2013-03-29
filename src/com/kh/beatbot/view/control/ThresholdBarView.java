@@ -1,8 +1,5 @@
 package com.kh.beatbot.view.control;
 
-import android.content.Context;
-import android.util.AttributeSet;
-
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.view.TouchableSurfaceView;

@@ -2,8 +2,8 @@ package com.kh.beatbot.view;
 
 import com.kh.beatbot.global.BBIconSource;
 
-public class ToggleButton extends Button {
-	boolean on = false;
+public class ToggleButton extends ImageButton {
+	boolean checked = false;
 
 	public ToggleButton(TouchableSurfaceView parent) {
 		super(parent);
@@ -11,7 +11,7 @@ public class ToggleButton extends Button {
 
 	public void setIconSource(BBIconSource iconSource) {
 		this.iconSource = iconSource;
-		if (on)
+		if (checked)
 			currentIcon = iconSource.selectedIcon;
 		else {
 			if (iconSource.disabledIcon != null) {
@@ -22,25 +22,27 @@ public class ToggleButton extends Button {
 		}
 	}
 
+	public boolean isChecked() {
+		return checked;
+	}
+
+	public void setChecked(boolean checked) {
+		this.checked = checked;
+		currentIcon = checked ? iconSource.selectedIcon : iconSource.defaultIcon;
+	}
+	
 	protected void touch() {
+		touched = true;
 		currentIcon = iconSource.pressedIcon != null ? iconSource.pressedIcon : iconSource.selectedIcon;
 	}
 
 	protected void release(boolean sendEvent) {
+		touched = false;
 		if (sendEvent) {
-			setOn(!on);
+			setChecked(!checked);
 			notifyClicked();
 		} else {
-			currentIcon = on ? iconSource.selectedIcon : iconSource.defaultIcon;
+			currentIcon = checked ? iconSource.selectedIcon : iconSource.defaultIcon;
 		}
-	}
-
-	public boolean isOn() {
-		return on;
-	}
-
-	public void setOn(boolean on) {
-		this.on = on;
-		currentIcon = on ? iconSource.selectedIcon : iconSource.defaultIcon;
 	}
 }

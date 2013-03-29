@@ -4,18 +4,18 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
-import com.kh.beatbot.listener.LevelListener;
+import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.AdsrView;
+import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.TextView;
 import com.kh.beatbot.view.ToggleButton;
-import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
 import com.kh.beatbot.view.control.ControlViewBase;
 import com.kh.beatbot.view.control.Seekbar;
 
-public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
+public class AdsrPage extends Page implements BBOnClickListener, Level1dListener {
 
 	private ToggleButton[] adsrButtons;
 	private AdsrView adsrView;
@@ -28,6 +28,7 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 	
 	@Override
 	public void init() {
+		updateLevelBar();
 		updateLabels();
 	}
 
@@ -39,10 +40,10 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 	}
 	
 	private void check(ToggleButton btn) {
-		btn.setOn(true);
+		btn.setChecked(true);
 		for (ToggleButton otherBtn : adsrButtons) {
 			if (otherBtn != btn) {
-				otherBtn.setOn(false);
+				otherBtn.setChecked(false);
 			}
 		}
 	}
@@ -76,34 +77,13 @@ public class AdsrPage extends Page implements BBOnClickListener, LevelListener {
 	}
 
 	@Override
-	public void notifyInit(ControlViewBase levelListenable) {
-		updateLevelBar();
-	}
-
-	@Override
-	public void notifyPressed(ControlViewBase levelListenable, boolean pressed) {
-		// nothing to do
-	}
-
-	@Override
-	public void notifyClicked(ControlViewBase levelListenable) {
-		// nothing to do
-	}
-
-	@Override
-	public void setLevel(ControlViewBase levelListenable, float level) {
+	public void onLevelChange(ControlViewBase levelListenable, float level) {
 		TrackManager.currTrack.adsr.setCurrParamLevel(level);
 		// update everything except level bar, since it is the notifier
 		adsrView.update();
 		updateLabels();
 	}
 
-	@Override
-	public void setLevel(ControlViewBase levelListenable, float levelX,
-			float levelY) {
-		// for 2d view.  not applicable
-	}
-	
 	/**
 	 * Layout and Measure handled here since nested weights are needed,
 	 * and they are very expensive.

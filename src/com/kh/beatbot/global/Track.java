@@ -37,7 +37,7 @@ public class Track extends BaseTrack {
 		super(id);
 		this.instrument = instrument;
 		this.currSampleNum = sampleNum;
-		this.adsr = new ADSR("ADSR", id);
+		this.adsr = new ADSR(id);
 		constructLoopPointMap();
 	}
 

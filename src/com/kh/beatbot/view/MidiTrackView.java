@@ -41,10 +41,10 @@ public class MidiTrackView extends TouchableBBView {
 				@Override
 				public void onClick(Button button) {
 					Managers.trackManager.setCurrTrack(trackNum);
-					instrumentButton.setOn(true);
+					instrumentButton.setChecked(true);
 					for (ButtonRow buttonRow : buttonRows) {
 						if (!buttonRow.instrumentButton.equals(instrumentButton)) {
-							buttonRow.instrumentButton.setOn(false);
+							buttonRow.instrumentButton.setChecked(false);
 						}
 					}
 				}
@@ -52,19 +52,19 @@ public class MidiTrackView extends TouchableBBView {
 			muteButton.setOnClickListener(new BBOnClickListener() {
 				@Override
 				public void onClick(Button button) {
-					Managers.trackManager.getTrack(trackNum).mute(muteButton.isOn());
+					Managers.trackManager.getTrack(trackNum).mute(muteButton.isChecked());
 				}
 			});
 			soloButton.setOnClickListener(new BBOnClickListener() {
 				@Override
 				public void onClick(Button button) {
-					Managers.trackManager.getTrack(trackNum).solo(soloButton.isOn());
-					if (soloButton.isOn()) {
+					Managers.trackManager.getTrack(trackNum).solo(soloButton.isChecked());
+					if (soloButton.isChecked()) {
 						// if this track is soloing, set all other solo icons to
 						// inactive.
 						for (ButtonRow buttonRow : buttonRows) {
 							if (!buttonRow.soloButton.equals(soloButton)) {
-								buttonRow.soloButton.setOn(false);
+								buttonRow.soloButton.setChecked(false);
 							}
 						}
 					}

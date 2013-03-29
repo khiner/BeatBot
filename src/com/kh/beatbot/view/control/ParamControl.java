@@ -6,34 +6,25 @@ import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class ParamControl extends TouchableBBView {
-	public static final float ¹ = (float) Math.PI;
-	
-	private Param param;
-	
 	public Knob knob;
 	private TextView label, valueLabel;
-	
+
 	public ParamControl(TouchableSurfaceView parent) {
 		super(parent);
 	}
 	
-	public ParamControl(TouchableSurfaceView parent, Param param) {
-		super(parent);
-		this.param = param;
-	}
-	
 	public void setParam(Param param) {
-		this.param = param;
 		knob.setViewLevel(param.viewLevel);
+		knob.setBeatSync(param.beatSync);
 		setLabel(param.name);
-		updateValue();
+		updateValueLabel(param);
 	}
 	
 	public void loadIcons() {
-		setParam(param);
+		// no icons
 	}
 	
-	public void updateValue() {
+	public void updateValueLabel(Param param) {
 		setValueLabel(param.getFormattedValueString());
 	}
 	
@@ -57,18 +48,18 @@ public class ParamControl extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		knob = new Knob((TouchableSurfaceView)root);
 		label = new TextView(root);
+		knob = new Knob((TouchableSurfaceView)root);
 		valueLabel = new TextView(root);
-		addChild(knob);
 		addChild(label);
+		addChild(knob);
 		addChild(valueLabel);
 	}
 
 	@Override
 	public void layoutChildren() {
-		label.layout(this, 0, 0, width, height / 4);
-		knob.layout(this, 0, height / 4, width, height / 2);
-		valueLabel.layout(this, 0, 4 * height / 5, width, height / 5);
+		label.layout(this, 0, 0, width, height / 6);
+		knob.layout(this, 0, height / 6, width, width);
+		valueLabel.layout(this, 0, 5 * height / 6, width, height / 6);
 	}
 }

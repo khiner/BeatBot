@@ -1,7 +1,15 @@
 package com.kh.beatbot.effect;
 
+
+import com.kh.beatbot.R;
+import com.kh.beatbot.global.GlobalVars;
+
 public class ADSR extends Effect {
 
+	public static final String NAME = GlobalVars.mainActivity.getString(R.string.adsr);
+	public static final int EFFECT_NUM = -1;
+	public static final int NUM_PARAMS = 6;
+	
 	public static final int ATTACK_ID = 0;
 	public static final int DECAY_ID = 1;
 	public static final int SUSTAIN_ID = 2;
@@ -17,13 +25,25 @@ public class ADSR extends Effect {
 	
 	private int currParamId = ATTACK_ID;
 	
-	public ADSR(String name, int trackNum) {
-		super(name, trackNum);
+	public ADSR(int trackNum) {
+		super(trackNum);
+	}
+	
+	public int getNum() {
+		return EFFECT_NUM;
+	}
+	
+	public String getName() {
+		return NAME;
+	}
+	
+	public int numParams() {
+		return NUM_PARAMS;
 	}
 	
 	@Override
 	protected void initParams() {
-		position = -1; // -1 native code understands that -1 == ADSR
+		position = -1; // native code understands that -1 == ADSR
 		params.add(new Param("ATTACK", true, false, ATTACK_MAX_S, LOG_SCALE, "s"));
 		params.add(new Param("DECAY", true, false, DECAY_MAX_S, LOG_SCALE, "s"));
 		params.add(new Param("SUSTAIN", false, false, ""));
@@ -36,16 +56,6 @@ public class ADSR extends Effect {
 		setRelease(0);
 		setStart(0);
 		setPeak(1);
-	}
-
-	@Override
-	public int getOnDrawableId() {
-		return 0;
-	}
-
-	@Override
-	public int getOffDrawableId() {
-		return 0;
 	}
 	
 	public void setCurrParam(int paramId) {

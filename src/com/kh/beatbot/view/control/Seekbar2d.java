@@ -5,30 +5,40 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
-public class Seekbar2d extends ControlViewBase {
-	private float selectX = 0, selectY = 0;
+public class Seekbar2d extends ControlView2dBase {
 	private static ViewRect viewRect;
-	private static FloatBuffer lineVb = null;
+	private static FloatBuffer lineVb;
 
 	public Seekbar2d(TouchableSurfaceView parent) {
 		super(parent);
+		selectColor = Colors.RED;
 	}
 
+	protected float xToLevel(float x) {
+		return viewRect.unitX(viewRect.clipX(x));
+	}
+	
+	protected float yToLevel(float y) {
+		return viewRect.unitY(viewRect.clipY(y));
+	}
 	
 	public void setViewLevelX(float x) {
-		selectX = viewRect.viewX(x);
+		super.setViewLevelX(x);
 		initLines();
 	}
 
 	public void setViewLevelY(float y) {
-		// top of screen lowest value in my OpenGl window
-		selectY = viewRect.viewY(y);
+		super.setViewLevelY(y);
 		initLines();
 	}
 
+	public void setViewLevel(float x, float y) {
+		super.setViewLevel(x, y);
+		initLines();
+	}
+	
 	protected void loadIcons() {
 		// no icons to load
 	}
@@ -43,59 +53,16 @@ public class Seekbar2d extends ControlViewBase {
 	@Override
 	public void draw() {
 		viewRect.drawRoundedBg();
-		levelColor[3] = 1; // completely opaque alpha
-		drawLines(lineVb, levelColor, 5, GL10.GL_LINES);
 		viewRect.drawRoundedBgOutline();
-		drawSelection();
+		float[] color = selected ? selectColor : levelColor;
+		drawLines(lineVb, color, 5, GL10.GL_LINES);
+		drawPoint(2 * viewRect.borderRadius / 3, color, viewRect.viewX(xLevel), viewRect.viewY(yLevel));
 	}
 
 	private void initLines() {
-		lineVb = makeFloatBuffer(new float[] { viewRect.drawOffset, selectY,
-				width - viewRect.drawOffset, selectY, selectX, viewRect.drawOffset, selectX,
+		lineVb = makeFloatBuffer(new float[] { viewRect.drawOffset, viewRect.viewY(yLevel),
+				width - viewRect.drawOffset, viewRect.viewY(yLevel), viewRect.viewX(xLevel), viewRect.drawOffset, viewRect.viewX(xLevel),
 				height - viewRect.drawOffset});
-	}
-
-	private void drawSelection() {
-		setColor(levelColor);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, makeFloatBuffer(new float[] {
-				selectX, selectY }));
-		gl.glPointSize(viewRect.borderRadius);
-		gl.glDrawArrays(GL10.GL_POINTS, 0, 1);
-		levelColor[3] = .4f;
-		setColor(levelColor);
-		for (float size = viewRect.borderRadius; size < viewRect.borderRadius * 1.5; size++) {
-			gl.glPointSize(size);
-			gl.glDrawArrays(GL10.GL_POINTS, 0, 1);
-		}
-	}
-
-	private void selectLocation(float x, float y) {
-		selectX = viewRect.clipX(x);
-		selectY = viewRect.clipY(y);
-		initLines();
-		for (LevelListener listener : levelListeners) {
-			listener.setLevel(this, viewRect.unitX(selectX), viewRect.unitY(selectY));
-		}
-	}
-
-	@Override
-	protected void handleActionDown(int id, float x, float y) {
-		selectLocation(x, y);
-		levelColor = Colors.LEVEL_SELECTED.clone();
-		super.handleActionDown(id, x, y);
-	}
-
-	@Override
-	protected void handleActionMove(int id, float x, float y) {
-		if (id != 0)
-			return;  // no multitouch for level - one pointer drags one level!
-		selectLocation(x, y);
-	}
-
-	@Override
-	protected void handleActionUp(int id, float x, float y) {
-		levelColor = Colors.VOLUME.clone();
-		super.handleActionUp(id, x, y);
 	}
 
 	@Override

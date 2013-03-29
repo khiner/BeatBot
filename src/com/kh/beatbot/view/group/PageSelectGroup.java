@@ -11,6 +11,7 @@ import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.Button;
+import com.kh.beatbot.view.ImageButton;
 import com.kh.beatbot.view.TextButton;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
@@ -20,6 +21,7 @@ public class PageSelectGroup extends TouchableBBView {
 	private static LevelsFXPage masterLevelsFxPage, trackLevelsFxPage;
 	private static SampleEditPage sampleEditPage;
 	private static AdsrPage adsrPage;
+	private static BBViewPager pager;
 	
 	private static final int LEVELS_FX_PAGE_ID = 0;
 	private static final int EDIT_PAGE_ID = 1;
@@ -27,16 +29,14 @@ public class PageSelectGroup extends TouchableBBView {
 	private static final int MASTER_PAGE_ID = 3;
 	private static final int NOTE_LEVELS_PAGE_ID = 4;
 	
-	Button addTrackButton;
-	Button instrumentSelectButton;
+	ImageButton addTrackButton;
+	ImageButton instrumentSelectButton;
 	TextButton sampleSelectButton;
 	TextButton levelsFxButton;
 	TextButton editButton;
 	TextButton adsrButton;
 	TextButton masterButton;
-	Button levelsButton;
-	
-	BBViewPager pager;
+	ImageButton levelsButton;
 	
 	public PageSelectGroup(TouchableSurfaceView parent) {
 		super(parent);
@@ -73,7 +73,7 @@ public class PageSelectGroup extends TouchableBBView {
 	private void updateSampleText() {
 		// update sample label text
 		// TODO handle all extensions
-		String formattedName = TrackManager.currTrack.getSampleName().replace(".raw", "")
+		String formattedName = TrackManager.currTrack.getSampleName().replace(".bb", "")
 				.toUpperCase();
 		sampleSelectButton.setText(formattedName);
 	}
@@ -85,14 +85,14 @@ public class PageSelectGroup extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		addTrackButton = new Button((TouchableSurfaceView) root);
-		instrumentSelectButton = new Button((TouchableSurfaceView) root);
+		addTrackButton = new ImageButton((TouchableSurfaceView) root);
+		instrumentSelectButton = new ImageButton((TouchableSurfaceView) root);
 		sampleSelectButton = new TextButton((TouchableSurfaceView) root);
 		levelsFxButton = new TextButton((TouchableSurfaceView) root);
 		editButton = new TextButton((TouchableSurfaceView) root);
 		adsrButton = new TextButton((TouchableSurfaceView) root);
 		masterButton = new TextButton((TouchableSurfaceView) root);
-		levelsButton = new Button((TouchableSurfaceView) root);
+		levelsButton = new ImageButton((TouchableSurfaceView) root);
 		
 		addTrackButton.setOnClickListener(new BBOnClickListener() {
 			@Override

@@ -7,11 +7,11 @@ import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.Managers;
-import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.view.BpmView;
 import com.kh.beatbot.view.Button;
+import com.kh.beatbot.view.ImageButton;
 import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
@@ -19,7 +19,7 @@ import com.kh.beatbot.view.TouchableSurfaceView;
 public class ControlButtonGroup extends TouchableBBView {
 
 	ToggleButton playButton, recordButton, copyButton, stopButton;
-	Button deleteButton, undoButton, bpmTapButton;
+	ImageButton deleteButton, undoButton, bpmTapButton;
 	BpmView bpmView;
 
 	public ControlButtonGroup(TouchableSurfaceView parent) {
@@ -42,15 +42,15 @@ public class ControlButtonGroup extends TouchableBBView {
 		stopButton = new ToggleButton((TouchableSurfaceView) root);
 		recordButton = new ToggleButton((TouchableSurfaceView) root);
 		copyButton = new ToggleButton((TouchableSurfaceView) root);
-		deleteButton = new Button((TouchableSurfaceView) root);
-		undoButton = new Button((TouchableSurfaceView) root);
-		bpmTapButton = new Button((TouchableSurfaceView) root);
+		deleteButton = new ImageButton((TouchableSurfaceView) root);
+		undoButton = new ImageButton((TouchableSurfaceView) root);
+		bpmTapButton = new ImageButton((TouchableSurfaceView) root);
 		bpmView = new BpmView((TouchableSurfaceView) root);
 
 		playButton.setOnClickListener(new BBOnClickListener() {
 			@Override
 			public void onClick(Button button) {
-				((ToggleButton) button).setOn(true);
+				((ToggleButton) button).setChecked(true);
 				if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
 					Managers.playbackManager.reset();
 					Managers.midiManager.reset();
@@ -77,7 +77,7 @@ public class ControlButtonGroup extends TouchableBBView {
 							.show();
 				} else {
 					GlobalVars.mainPage.midiView.reset();
-					playButton.setOn(true);
+					playButton.setChecked(true);
 					Managers.recordManager.startRecordingNative();
 					if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
 						playButton.getOnClickListener().onClick(playButton);
@@ -88,15 +88,15 @@ public class ControlButtonGroup extends TouchableBBView {
 		stopButton.setOnClickListener(new BBOnClickListener() {
 			@Override
 			public void onClick(Button button) {
-				playButton.setOn(false);
-				stopButton.setOn(false);
+				playButton.setChecked(false);
+				stopButton.setChecked(false);
 				if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
-					recordButton.setOn(false);
+					recordButton.setChecked(false);
 					playButton.getOnClickListener().onClick(playButton);
 					recordButton.getOnClickListener().onClick(recordButton);
 				}
 				if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
-					playButton.setOn(false);
+					playButton.setChecked(false);
 					Managers.playbackManager.stop();
 					Managers.midiManager.reset();
 				}
@@ -114,7 +114,7 @@ public class ControlButtonGroup extends TouchableBBView {
 			@Override
 			public void onClick(Button button) {
 				String msg = null;
-				if (((ToggleButton) button).isOn()) {
+				if (((ToggleButton) button).isChecked()) {
 					Managers.midiManager.copy();
 					msg = "Tap To Paste";
 				} else {
@@ -162,7 +162,7 @@ public class ControlButtonGroup extends TouchableBBView {
 	}
 
 	public void uncheckCopyButton() {
-		copyButton.setOn(false);
+		copyButton.setChecked(false);
 	}
 
 	@Override

@@ -5,8 +5,8 @@ import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class BBViewPager extends TouchableBBView {
-	BBView currPage;
-
+	private int currPageNum;
+	
 	public BBViewPager(TouchableSurfaceView parent) {
 		super(parent);
 	}
@@ -15,8 +15,20 @@ public class BBViewPager extends TouchableBBView {
 		addChild(page);
 	}
 	
+	public int numPages() {
+		return children.size();
+	}
+	
+	public BBView getCurrPage() {
+		return children.get(currPageNum);
+	}
+	
+	public int getCurrPageNum() {
+		return currPageNum;
+	}
+	
 	public void setPage(int num) {
-		currPage = children.get(num);
+		currPageNum = num;
 	}
 	
 	@Override
@@ -32,7 +44,7 @@ public class BBViewPager extends TouchableBBView {
 
 	@Override
 	public void drawAll() {
-		currPage.drawAll();
+		getCurrPage().drawAll();
 	}
 	
 	@Override
@@ -52,6 +64,6 @@ public class BBViewPager extends TouchableBBView {
 	
 	@Override
 	protected BBView findChildAt(float x, float y) {
-		return currPage;
+		return children.get(currPageNum);
 	}
 }

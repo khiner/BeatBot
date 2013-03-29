@@ -5,10 +5,8 @@ import java.util.Collections;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.activity.EffectActivity;
 import com.kh.beatbot.effect.Chorus;
 import com.kh.beatbot.effect.Decimate;
 import com.kh.beatbot.effect.Delay;
@@ -24,7 +22,7 @@ import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.DraggableLabelListListener;
-import com.kh.beatbot.listener.LevelListener;
+import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.TextView;
@@ -35,7 +33,7 @@ import com.kh.beatbot.view.control.Seekbar;
 import com.kh.beatbot.view.list.DraggableLabelList;
 import com.kh.beatbot.view.list.LabelList;
 
-public class LevelsFXPage extends Page implements LevelListener {
+public class LevelsFXPage extends Page implements Level1dListener {
 
 	class EffectLabelListListener implements DraggableLabelListListener {
 		private AlertDialog selectEffectAlert = null;
@@ -68,7 +66,7 @@ public class LevelsFXPage extends Page implements LevelListener {
 
 		@Override
 		public void labelListInitialized(LabelList labelList) {
-			effectLabelList = (DraggableLabelList)labelList;
+			effectLabelList = (DraggableLabelList) labelList;
 			if (effectLabelList.anyLabels()) {
 				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
 					Effect effect = getCurrTrack().findEffectByPosition(i);
@@ -121,25 +119,25 @@ public class LevelsFXPage extends Page implements LevelListener {
 			selectEffectAlert.show();
 		}
 	}
-	
+
 	// levels attrs
 	private Seekbar levelBar;
 	private ToggleButton volumeToggle, panToggle, pitchToggle;
 	private TextView effectLabel;
 	private boolean masterMode = false;
-	
+
 	// effects attrs
 	private DraggableLabelList effectLabelList;
 	private String[] effectNames;
-	
+
 	public LevelsFXPage(TouchableSurfaceView parent) {
 		super(parent);
 	}
-	
+
 	public void init() {
 		effectLabel.setText("EFFECTS");
 	}
-	
+
 	@Override
 	public void update() {
 		// levels
@@ -148,23 +146,23 @@ public class LevelsFXPage extends Page implements LevelListener {
 		selectActiveLevel();
 		levelBar.setLevelColor(getActiveLevelColor());
 		levelBar.setLevel(getActiveLevel());
-		
+
 		// effects
 		if (!effectLabelList.anyLabels())
 			return;
 		for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
 			Effect effect = getCurrTrack().findEffectByPosition(i);
-			if (effect != null) {
+			if (effect == null) {
+				effectLabelList.setLabelText(i, "");
+			} else {
 				effectLabelList.setLabelText(i, effect.getName());
 				effectLabelList.setLabelOn(i, effect.isOn());
-			} else {
-				effectLabelList.setLabelText(i, "");
 			}
 		}
 	}
 
 	@Override
-	public void setLevel(ControlViewBase levelBar, float level) {
+	public void onLevelChange(ControlViewBase levelBar, float level) {
 		switch (getCurrTrack().activeLevelType) {
 		case VOLUME:
 			getCurrTrack().setVolume(level);
@@ -181,48 +179,27 @@ public class LevelsFXPage extends Page implements LevelListener {
 	public void setMasterMode(boolean masterMode) {
 		this.masterMode = masterMode;
 	}
-	
+
 	public BaseTrack getCurrTrack() {
 		return masterMode ? TrackManager.masterTrack : TrackManager.currTrack;
 	}
-	
-	@Override
-	public void notifyInit(ControlViewBase levelBar) {
-		// do nothing when levelbar initialized
-	}
-
-	@Override
-	public void notifyPressed(ControlViewBase levelBar, boolean pressed) {
-		// do nothing when level pressed
-	}
-
-	@Override
-	public void notifyClicked(ControlViewBase levelListenable) {
-		// do nothing when levels are clicked
-	}
-
-	@Override
-	public void setLevel(ControlViewBase levelListenable, float levelX,
-			float levelY) {
-		// for 2d seekbar. nothing to do
-	}
 
 	private void deselectAll() {
-		volumeToggle.setOn(false);
-		panToggle.setOn(false);
-		pitchToggle.setOn(false);
+		volumeToggle.setChecked(false);
+		panToggle.setChecked(false);
+		pitchToggle.setChecked(false);
 	}
 
 	private void selectActiveLevel() {
 		switch (getCurrTrack().activeLevelType) {
 		case VOLUME:
-			volumeToggle.setOn(true);
+			volumeToggle.setChecked(true);
 			return;
 		case PAN:
-			panToggle.setOn(true);
+			panToggle.setChecked(true);
 			return;
 		case PITCH:
-			pitchToggle.setOn(true);
+			pitchToggle.setChecked(true);
 			return;
 		}
 	}
@@ -250,68 +227,65 @@ public class LevelsFXPage extends Page implements LevelListener {
 		}
 		return getCurrTrack().volume;
 	}
-	
+
 	// effects methods
-	private void launchEffectIntent(String effectName, int effectPosition, boolean setOn) {
+	private void launchEffectIntent(String effectName, int effectPosition,
+			boolean setOn) {
 		Effect effect = getEffect(effectName, effectPosition);
-		if (effectName != effect.name) {
-			// different effect being added to the effect slot. need to replace
-			// it
+		if (effectName != effect.getName()) {
+			// different effect being added to effect slot. need to replace it
 			effect.removeEffect();
 			effect = getEffect(effectName, effectPosition);
 		}
-		Intent intent = new Intent();
-		intent.setClass(GlobalVars.mainActivity, EffectActivity.class);
-		intent.putExtra("effectPosition", effect.getPosition());
-		intent.putExtra("trackId", getCurrTrack().getId());
-		intent.putExtra("setOn", setOn);
-		GlobalVars.mainActivity.startActivity(intent);
+		GlobalVars.mainActivity.launchEffect(effect);
 	}
-
 
 	private Effect getEffect(String effectName, int position) {
 		Effect effect = getCurrTrack().findEffectByPosition(position);
-		Context c = GlobalVars.mainActivity;
 		if (effect != null)
 			return effect;
-		if (effectName.equals(c.getString(R.string.decimate)))
-			effect = new Decimate(effectName, getCurrTrack().getId(), position);
-		else if (effectName.equals(c.getString(R.string.chorus)))
-			effect = new Chorus(effectName, getCurrTrack().getId(), position);
-		else if (effectName.equals(c.getString(R.string.delay)))
-			effect = new Delay(effectName, getCurrTrack().getId(), position);
-		else if (effectName.equals(c.getString(R.string.flanger)))
-			effect = new Flanger(effectName, getCurrTrack().getId(), position);
-		else if (effectName.equals(c.getString(R.string.filter)))
-			effect = new Filter(effectName, getCurrTrack().getId(), position);
-		else if (effectName.equals(c.getString(R.string.reverb)))
-			effect = new Reverb(effectName, getCurrTrack().getId(), position);
-		else if (effectName.equals(c.getString(R.string.tremelo)))
-			effect = new Tremelo(effectName, getCurrTrack().getId(), position);
+		int trackId = getCurrTrack().getId();
+		if (effectName.equals(Decimate.NAME))
+			effect = new Decimate(trackId, position);
+		else if (effectName.equals(Chorus.NAME))
+			effect = new Chorus(trackId, position);
+		else if (effectName.equals(Delay.NAME))
+			effect = new Delay(trackId, position);
+		else if (effectName.equals(Flanger.NAME))
+			effect = new Flanger(trackId, position);
+		else if (effectName.equals(Filter.NAME))
+			effect = new Filter(trackId, position);
+		else if (effectName.equals(Reverb.NAME))
+			effect = new Reverb(trackId, position);
+		else if (effectName.equals(Tremelo.NAME))
+			effect = new Tremelo(trackId, position);
 		getCurrTrack().effects.add(effect);
 		return effect;
 	}
 
 	@Override
 	protected void loadIcons() {
-		volumeToggle.setIconSource(new BBIconSource(R.drawable.volume_icon, R.drawable.volume_icon_selected));
-		panToggle.setIconSource(new BBIconSource(R.drawable.pan_icon, R.drawable.pan_icon_selected));
-		pitchToggle.setIconSource(new BBIconSource(R.drawable.pitch_icon, R.drawable.pitch_selected_icon));
+		volumeToggle.setIconSource(new BBIconSource(R.drawable.volume_icon,
+				R.drawable.volume_icon_selected));
+		panToggle.setIconSource(new BBIconSource(R.drawable.pan_icon,
+				R.drawable.pan_icon_selected));
+		pitchToggle.setIconSource(new BBIconSource(R.drawable.pitch_icon,
+				R.drawable.pitch_selected_icon));
 	}
 
 	@Override
 	public void draw() {
 		// parent view - no drawing
 	}
-	
+
 	@Override
 	protected void createChildren() {
-		effectLabel = new TextView((TouchableSurfaceView)root);
-		levelBar = new Seekbar((TouchableSurfaceView)root);
+		effectLabel = new TextView((TouchableSurfaceView) root);
+		levelBar = new Seekbar((TouchableSurfaceView) root);
 		levelBar.addLevelListener(this);
-		volumeToggle = new ToggleButton((TouchableSurfaceView)root);
-		panToggle = new ToggleButton((TouchableSurfaceView)root);
-		pitchToggle = new ToggleButton((TouchableSurfaceView)root);
+		volumeToggle = new ToggleButton((TouchableSurfaceView) root);
+		panToggle = new ToggleButton((TouchableSurfaceView) root);
+		pitchToggle = new ToggleButton((TouchableSurfaceView) root);
 		volumeToggle.setOnClickListener(new BBOnClickListener() {
 			public void onClick(Button button) {
 				getCurrTrack().activeLevelType = LevelType.VOLUME;
@@ -333,9 +307,10 @@ public class LevelsFXPage extends Page implements LevelListener {
 		// effects
 		effectNames = GlobalVars.mainActivity.getResources().getStringArray(
 				R.array.effect_names);
-		effectLabelList = new DraggableLabelList((TouchableSurfaceView)root);
-		effectLabelList.setListener(new EffectLabelListListener(GlobalVars.mainActivity));
-		
+		effectLabelList = new DraggableLabelList((TouchableSurfaceView) root);
+		effectLabelList.setListener(new EffectLabelListListener(
+				GlobalVars.mainActivity));
+
 		addChild(effectLabel);
 		addChild(levelBar);
 		addChild(volumeToggle);
@@ -349,12 +324,16 @@ public class LevelsFXPage extends Page implements LevelListener {
 		float thirdHeight = height / 3;
 		float levelHeight = height / 12;
 		float effectHeight = height - height / 12 - thirdHeight;
-		
+
 		volumeToggle.layout(this, 0, levelHeight, 2 * thirdHeight, thirdHeight);
-		panToggle.layout(this, 2 * thirdHeight, levelHeight, 2 * thirdHeight, thirdHeight);
-		pitchToggle.layout(this, 4 * thirdHeight, levelHeight, 2 * thirdHeight, thirdHeight);
-		levelBar.layout(this, 2 * height, levelHeight, width - 2 * height, thirdHeight);
+		panToggle.layout(this, 2 * thirdHeight, levelHeight, 2 * thirdHeight,
+				thirdHeight);
+		pitchToggle.layout(this, 4 * thirdHeight, levelHeight, 2 * thirdHeight,
+				thirdHeight);
+		levelBar.layout(this, 2 * height, levelHeight, width - 2 * height,
+				thirdHeight);
 		effectLabel.layout(this, 0, effectHeight, width / 5, thirdHeight);
-		effectLabelList.layout(this, width / 5, effectHeight, 4 * width / 5, thirdHeight);
+		effectLabelList.layout(this, width / 5, effectHeight, 4 * width / 5,
+				thirdHeight);
 	}
 }

@@ -1,15 +1,13 @@
 package com.kh.beatbot.layout.page;
 
-import android.opengl.GLSurfaceView;
-
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.view.Button;
-import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.LevelsView;
+import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class NoteLevelsPage extends Page {
@@ -34,21 +32,21 @@ public class NoteLevelsPage extends Page {
 	}
 
 	private void deselectAll() {
-		volumeToggle.setOn(false);
-		panToggle.setOn(false);
-		pitchToggle.setOn(false);
+		volumeToggle.setChecked(false);
+		panToggle.setChecked(false);
+		pitchToggle.setChecked(false);
 	}
 
 	private void selectActiveLevel() {
 		switch (levelsView.getLevelType()) {
 		case VOLUME:
-			volumeToggle.setOn(true);
+			volumeToggle.setChecked(true);
 			return;
 		case PAN:
-			panToggle.setOn(true);
+			panToggle.setChecked(true);
 			return;
 		case PITCH:
-			pitchToggle.setOn(true);
+			pitchToggle.setChecked(true);
 			return;
 		}
 	}

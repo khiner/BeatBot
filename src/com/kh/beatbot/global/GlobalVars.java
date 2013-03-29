@@ -3,6 +3,7 @@ package com.kh.beatbot.global;
 import android.graphics.Typeface;
 
 import com.kh.beatbot.activity.BeatBotActivity;
+import com.kh.beatbot.view.group.EffectPage;
 import com.kh.beatbot.view.group.MainPage;
 
 public class GlobalVars {
@@ -33,5 +34,7 @@ public class GlobalVars {
 
 	public static BeatBotActivity mainActivity;
 	public static MainPage mainPage;
+	public static EffectPage effectPage;
+	
 	public static float currBeatDivision;
 }

@@ -8,29 +8,27 @@ import com.kh.beatbot.manager.Managers;
 public abstract class Effect implements Comparable<Effect> {
 	protected List<Param> params = new ArrayList<Param>();
 
-	protected int effectNum;
 	protected int trackNum;
-	protected int numParams;
 	protected int position;
 	protected boolean paramsLinked = false;
-	
-	public String name;
-	private boolean on = false;
+	protected boolean on = false;
 
-	public Effect(String name, int trackNum) {
-		this.name = name;
+	public Effect(int trackNum) {
 		this.trackNum = trackNum;
 		initParams();
 	}
-	
-	public Effect(String name, int trackNum, int position) {
-		this.name = name;
+
+	public Effect(int trackNum, int position) {
 		this.trackNum = trackNum;
 		this.position = position;
 		initParams();
-		addEffect(trackNum, effectNum, position);
+		addEffect(trackNum, getNum(), position);
 	}
 
+	public abstract int getNum();
+	public abstract int numParams();
+	public abstract String getName();
+	
 	public void setOn(boolean on) {
 		this.on = on;
 		setEffectOn(trackNum, position, on);
@@ -39,17 +37,9 @@ public abstract class Effect implements Comparable<Effect> {
 	public boolean isOn() {
 		return on;
 	}
-	
+
 	public int getPosition() {
 		return position;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public int getNumParams() {
-		return numParams;
 	}
 
 	public boolean paramsLinked() {
@@ -74,14 +64,24 @@ public abstract class Effect implements Comparable<Effect> {
 		param.setLevel(level);
 		setEffectParam(trackNum, position, paramNum, param.level);
 	}
-	
+
 	public String getParamValueString(int paramNum) {
 		return getParam(paramNum).getFormattedValueString();
 	}
 
 	public void removeEffect() {
 		removeEffect(trackNum, position);
-		Managers.trackManager.getTrack(trackNum).effects.remove(this);
+		Managers.trackManager.getBaseTrack(trackNum).effects.remove(this);
+	}
+
+	public void quantizeParams() {
+		for (int i = 0; i < params.size(); i++) {
+			Param param = params.get(i);
+			if (param.beatSync) {
+				param.setLevel(param.viewLevel);
+				setEffectParam(trackNum, position, i, param.level);
+			}
+		}
 	}
 
 	public native void addEffect(int trackNum, int effectNum, int position);
@@ -97,10 +97,6 @@ public abstract class Effect implements Comparable<Effect> {
 			int paramNum, float paramLevel);
 
 	protected abstract void initParams();
-
-	public abstract int getOnDrawableId();
-
-	public abstract int getOffDrawableId();
 
 	@Override
 	public int compareTo(Effect effect) {

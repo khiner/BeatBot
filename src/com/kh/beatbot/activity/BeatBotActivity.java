@@ -21,25 +21,30 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
-import com.kh.beatbot.manager.RecordManager;
+import com.kh.beatbot.view.group.BBViewPager;
+import com.kh.beatbot.view.group.EffectPage;
 import com.kh.beatbot.view.group.GLSurfaceViewGroup;
 import com.kh.beatbot.view.group.MainPage;
 
 public class BeatBotActivity extends Activity {
 	private GLSurfaceViewGroup mainSurface;
-	
+	private BBViewPager activityPager;
+
 	private static AssetManager assetManager;
-	
+
+	private static final int MAIN_PAGE_NUM = 0;
+	private static final int EFFECT_PAGE_NUM = 1;
+
 	private static void copyFile(InputStream in, OutputStream out)
 			throws IOException {
 		byte[] buffer = new byte[1024];
@@ -138,17 +143,31 @@ public class BeatBotActivity extends Activity {
 		GlobalVars.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
 		GeneralUtils.initAndroidSettings(this);
-		setContentView(R.layout.main);
+		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.FILL_PARENT,
+                LinearLayout.LayoutParams.FILL_PARENT);
+		LinearLayout layout = new LinearLayout(this);
+		mainSurface = new GLSurfaceViewGroup(this);
+		mainSurface.setLayoutParams(lp);
+		layout.addView(mainSurface);
+		setContentView(layout, lp);
+
 		Managers.initDirectoryManager();
 		copyAllSamplesToStorage();
 		if (savedInstanceState == null) {
 			initNativeAudio();
 		}
-		
-		mainSurface = (GLSurfaceViewGroup)findViewById(R.id.mainSurface);
+
 		GlobalVars.mainPage = new MainPage(mainSurface);
-		mainSurface.setBBRenderer(GlobalVars.mainPage);
+		GlobalVars.effectPage = new EffectPage(mainSurface);
+
+		activityPager = new BBViewPager(mainSurface);
+		activityPager.addPage(GlobalVars.mainPage);
+		activityPager.addPage(GlobalVars.effectPage);
+		activityPager.setPage(0);
 		
+		mainSurface.setBBRenderer(activityPager);
+
 		Managers.init(savedInstanceState);
 		Managers.trackManager.setCurrTrack(0);
 	}
@@ -162,33 +181,41 @@ public class BeatBotActivity extends Activity {
 			android.os.Process.killProcess(android.os.Process.myPid());
 		}
 	}
-	
+
 	@Override
 	public void onBackPressed() {
-	    new AlertDialog.Builder(this)
-	        .setIcon(android.R.drawable.ic_dialog_alert)
-	        .setTitle("Closing " + getString(R.string.app_name))
-	        .setMessage("Are you sure you want to exit " + getString(R.string.app_name) + "?")
-	        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-	        	@Override
-	        	public void onClick(DialogInterface dialog, int which) {
-	        		finish();    
-	        	}
-	    })
-	    .setNegativeButton("No", null)
-	    .show();
+		if (activityPager.getCurrPageNum() == MAIN_PAGE_NUM) {
+			new AlertDialog.Builder(this)
+					.setIcon(android.R.drawable.ic_dialog_alert)
+					.setTitle("Closing " + getString(R.string.app_name))
+					.setMessage(
+							"Are you sure you want to exit "
+									+ getString(R.string.app_name) + "?")
+					.setPositiveButton("Yes",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									finish();
+								}
+							}).setNegativeButton("No", null).show();
+		} else if (activityPager.getCurrPageNum() == EFFECT_PAGE_NUM) {
+			activityPager.setPage(MAIN_PAGE_NUM);
+		}
 	}
 
+	@Override
 	public void onPause() {
 		mainSurface.onPause();
 		super.onPause();
 	}
-	
+
+	@Override
 	public void onResume() {
 		super.onResume();
 		mainSurface.onResume();
 	}
-	
+
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
@@ -196,9 +223,6 @@ public class BeatBotActivity extends Activity {
 		outState.putBoolean(
 				"playing",
 				Managers.playbackManager.getState() == PlaybackManager.State.PLAYING);
-		outState.putBoolean(
-				"recording",
-				Managers.recordManager.getState() != RecordManager.State.INITIALIZING);
 	}
 
 	@Override
@@ -242,6 +266,11 @@ public class BeatBotActivity extends Activity {
 		}
 	}
 
+	public void launchEffect(Effect effect) {
+		activityPager.setPage(EFFECT_PAGE_NUM);
+		GlobalVars.effectPage.loadEffect(effect);
+	}
+	
 	private void initNativeAudio() {
 		createEngine();
 		createAudioPlayer();
@@ -250,14 +279,7 @@ public class BeatBotActivity extends Activity {
 	public void quantizeEffectParams() {
 		for (int trackId = 0; trackId < Managers.trackManager.getNumTracks(); trackId++) {
 			for (Effect effect : Managers.trackManager.getTrack(trackId).effects) {
-				for (int paramNum = 0; paramNum < effect.getNumParams(); paramNum++) {
-					Param param = effect.getParam(paramNum);
-					if (param.beatSync) {
-						param.setLevel(param.viewLevel);
-						effect.setEffectParam(trackId, effect.getPosition(),
-								paramNum, param.level);
-					}
-				}
+				effect.quantizeParams();
 			}
 		}
 	}
@@ -266,11 +288,11 @@ public class BeatBotActivity extends Activity {
 		GlobalVars.mainPage.trackAdded(newTrackNum);
 		notifyTrackChanged();
 	}
-	
+
 	public void notifyTrackChanged() {
 		GlobalVars.mainPage.pageSelectGroup.notifyTrackChanged();
 	}
-	
+
 	public static native boolean createAudioPlayer();
 
 	public static native void createEngine();

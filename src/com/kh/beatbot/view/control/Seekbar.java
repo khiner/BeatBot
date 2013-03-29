@@ -5,7 +5,7 @@ import java.nio.FloatBuffer;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
-public class Seekbar extends ControlViewBase {
+public class Seekbar extends ControlView1dBase {
 
 	protected FloatBuffer levelBarVb = null;
 	protected int numLevelVertices = 0;
@@ -101,25 +101,11 @@ public class Seekbar extends ControlViewBase {
 				: 2;
 	}
 
-	protected float xToLevel(float x) {
+	protected float posToLevel(float x, float y) {
 		if (x > width - levelBarHeight)
 			return 1;
 		float level = (x - levelBarHeight / 2) / (width - levelBarHeight * 4);
-		level = level < 0 ? 0 : (level > 1 ? 1 : level);
-		return level;
-	}
-
-	@Override
-	protected void handleActionDown(int id, float x, float y) {
-		setLevel(xToLevel(x));
-		super.handleActionDown(id, x, y);
-	}
-
-	@Override
-	protected void handleActionMove(int id, float x, float y) {
-		if (id != 0)
-			return; // no multitouch for level - one pointer drags one level!
-		setLevel(xToLevel(x));
+		return level < 0 ? 0 : (level > 1 ? 1 : level);
 	}
 
 	@Override

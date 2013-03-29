@@ -1,16 +1,11 @@
 package com.kh.beatbot.view.control;
 
-import java.util.ArrayList;
-
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.listener.LevelListener;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
 public abstract class ControlViewBase extends TouchableBBView {
 
-	protected ArrayList<LevelListener> levelListeners = new ArrayList<LevelListener>();
-	protected float level = .5f;
 	protected float[] levelColor = Colors.VOLUME.clone();
 	protected float[] selectColor = { levelColor[0], levelColor[1],
 			levelColor[2], .5f };
@@ -21,34 +16,9 @@ public abstract class ControlViewBase extends TouchableBBView {
 		super(parent);
 	}
 	
-	public void addLevelListener(LevelListener levelListener) {
-		levelListeners.add(levelListener);
-	}
-
-	public void removeAllListeners() {
-		levelListeners.clear();
-	}
-
 	@Override
 	public void init() {
-		for (LevelListener levelListener : levelListeners) {
-			levelListener.notifyInit(this);
-		}
-	}
-
-	public float getLevel() {
-		return level;
-	}
-
-	public void setViewLevel(float level) {
-		this.level = level;
-	}
-
-	/* level should be from 0 to 1 */
-	public void setLevel(float level) {
-		setViewLevel(level);
-		for (LevelListener levelListener : levelListeners)
-			levelListener.setLevel(this, level);
+		// nothing to do
 	}
 
 	public void setLevelColor(float[] newLevelColor) {
@@ -59,15 +29,11 @@ public abstract class ControlViewBase extends TouchableBBView {
 
 	@Override
 	protected void handleActionDown(int id, float x, float y) {
-		for (LevelListener levelListener : levelListeners)
-			levelListener.notifyPressed(this, true);
 		selected = true;
 	}
 
 	@Override
 	protected void handleActionUp(int id, float x, float y) {
-		for (LevelListener levelListener : levelListeners)
-			levelListener.notifyPressed(this, false);
 		selected = false;
 	}
 }
