@@ -616,7 +616,7 @@ public class MidiView extends ClickableBBView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
 		ScrollBarHelper.startScrollView();
 		selectMidiNote(x, y, id);
@@ -635,7 +635,7 @@ public class MidiView extends ClickableBBView {
 	}
 
 	@Override
-	protected void handleActionPointerDown(int id, float x, float y) {
+	public void handleActionPointerDown(int id, float x, float y) {
 		super.handleActionPointerDown(id, x, y);
 		boolean noteAlreadySelected = false;
 		noteAlreadySelected = !touchedNotes.isEmpty();
@@ -681,7 +681,7 @@ public class MidiView extends ClickableBBView {
 	}
 
 	@Override
-	protected void handleActionMove(int id, float x, float y) {
+	public void handleActionMove(int id, float x, float y) {
 		super.handleActionMove(id, x, y);
 		if (pinch) {
 			float leftTick = xToTick(pointerIdToPos.get(pinchLeftPointerId).x);
@@ -712,7 +712,7 @@ public class MidiView extends ClickableBBView {
 	}
 
 	@Override
-	protected void handleActionPointerUp(int id, float x, float y) {
+	public void handleActionPointerUp(int id, float x, float y) {
 		if (scrollPointerId == id)
 			scrollPointerId = -1;
 		for (int i = 0; i < 3; i++)
@@ -728,7 +728,7 @@ public class MidiView extends ClickableBBView {
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	public void handleActionUp(int id, float x, float y) {
 		super.handleActionUp(id, x, y);
 		ScrollBarHelper.handleActionUp();
 		for (int i = 0; i < 3; i++)

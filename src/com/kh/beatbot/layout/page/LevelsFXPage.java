@@ -1,7 +1,5 @@
 package com.kh.beatbot.layout.page;
 
-import java.util.Collections;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -82,25 +80,7 @@ public class LevelsFXPage extends Page implements Level1dListener {
 
 		@Override
 		public void labelMoved(int oldPosition, int newPosition) {
-			Effect effect = getCurrTrack().findEffectByPosition(oldPosition);
-			if (effect != null) {
-				effect.setPosition(newPosition);
-			}
-			for (Effect other : getCurrTrack().effects) {
-				if (other.equals(effect))
-					continue;
-				if (other.getPosition() >= newPosition
-						&& other.getPosition() < oldPosition) {
-					other.setPosition(other.getPosition() + 1);
-				} else if (other.getPosition() <= newPosition
-						&& other.getPosition() > oldPosition) {
-					other.setPosition(other.getPosition() - 1);
-				}
-			}
-			Collections.sort(getCurrTrack().effects);
-
-			Effect.setEffectPosition(getCurrTrack().getId(), oldPosition,
-					newPosition);
+			getCurrTrack().moveEffect(oldPosition, newPosition);
 		}
 
 		@Override
@@ -137,28 +117,11 @@ public class LevelsFXPage extends Page implements Level1dListener {
 	public void init() {
 		effectLabel.setText("EFFECTS");
 	}
-
+	
 	@Override
 	public void update() {
-		// levels
-		setMasterMode(masterMode);
-		deselectAll();
-		selectActiveLevel();
-		levelBar.setLevelColor(getActiveLevelColor());
-		levelBar.setLevel(getActiveLevel());
-
-		// effects
-		if (!effectLabelList.anyLabels())
-			return;
-		for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
-			Effect effect = getCurrTrack().findEffectByPosition(i);
-			if (effect == null) {
-				effectLabelList.setLabelText(i, "");
-			} else {
-				effectLabelList.setLabelText(i, effect.getName());
-				effectLabelList.setLabelOn(i, effect.isOn());
-			}
-		}
+		updateLevels();
+		updateEffects();
 	}
 
 	@Override
@@ -184,6 +147,28 @@ public class LevelsFXPage extends Page implements Level1dListener {
 		return masterMode ? TrackManager.masterTrack : TrackManager.currTrack;
 	}
 
+	private void updateLevels() {
+		setMasterMode(masterMode);
+		deselectAll();
+		selectActiveLevel();
+		levelBar.setLevelColor(getActiveLevelColor());
+		levelBar.setLevel(getActiveLevel());
+	}
+	
+	private void updateEffects() {
+		if (!effectLabelList.anyLabels())
+			return;
+		for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
+			Effect effect = getCurrTrack().findEffectByPosition(i);
+			if (effect == null) {
+				effectLabelList.setLabelText(i, "");
+			} else {
+				effectLabelList.setLabelText(i, effect.getName());
+				effectLabelList.setLabelOn(i, effect.isOn());
+			}
+		}		
+	}
+	
 	private void deselectAll() {
 		volumeToggle.setChecked(false);
 		panToggle.setChecked(false);
@@ -259,7 +244,7 @@ public class LevelsFXPage extends Page implements Level1dListener {
 			effect = new Reverb(trackId, position);
 		else if (effectName.equals(Tremelo.NAME))
 			effect = new Tremelo(trackId, position);
-		getCurrTrack().effects.add(effect);
+		getCurrTrack().addEffect(effect);
 		return effect;
 	}
 
@@ -289,19 +274,19 @@ public class LevelsFXPage extends Page implements Level1dListener {
 		volumeToggle.setOnClickListener(new BBOnClickListener() {
 			public void onClick(Button button) {
 				getCurrTrack().activeLevelType = LevelType.VOLUME;
-				update();
+				updateLevels();
 			}
 		});
 		panToggle.setOnClickListener(new BBOnClickListener() {
 			public void onClick(Button button) {
 				getCurrTrack().activeLevelType = LevelType.PAN;
-				update();
+				updateLevels();
 			}
 		});
 		pitchToggle.setOnClickListener(new BBOnClickListener() {
 			public void onClick(Button button) {
 				getCurrTrack().activeLevelType = LevelType.PITCH;
-				update();
+				updateLevels();
 			}
 		});
 		// effects

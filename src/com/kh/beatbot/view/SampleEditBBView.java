@@ -282,7 +282,7 @@ public class SampleEditBBView extends TouchableBBView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	public void handleActionDown(int id, float x, float y) {
 		if (!selectLoopMarker(id, x)) {
 			// loop marker not close enough to select. start scroll
 			// (we know it's the first pointer down, so we're not zooming)
@@ -291,13 +291,13 @@ public class SampleEditBBView extends TouchableBBView {
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	public void handleActionUp(int id, float x, float y) {
 		scrollPointerId = beginLoopPointerId = endLoopPointerId = zoomLeftPointerId = zoomRightPointerId = -1;
 		scrollAnchorSample = zoomLeftAnchorSample = zoomRightAnchorSample = -1;
 	}
 
 	@Override
-	protected void handleActionPointerDown(int id, float x, float y) {
+	public void handleActionPointerDown(int id, float x, float y) {
 		if (!selectLoopMarker(id, x) && !setZoomAnchor(id, x)) {
 			// loop marker not close enough to select, and first pointer down.
 			// start scrolling
@@ -306,7 +306,7 @@ public class SampleEditBBView extends TouchableBBView {
 	}
 
 	@Override
-	protected void handleActionPointerUp(int id, float x, float y) {
+	public void handleActionPointerUp(int id, float x, float y) {
 		deselectLoopMarker(id);
 		// stop zooming
 		if (id == zoomLeftPointerId) {
@@ -319,7 +319,7 @@ public class SampleEditBBView extends TouchableBBView {
 	}
 
 	@Override
-	protected void handleActionMove(int id, float x, float y) {
+	public void handleActionMove(int id, float x, float y) {
 		if (id == zoomLeftPointerId) {
 			zoomLeftPointerX = x;
 		} else if (id == zoomRightPointerId) {

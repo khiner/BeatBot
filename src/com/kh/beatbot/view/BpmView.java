@@ -192,14 +192,14 @@ public class BpmView extends TouchableBBView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	public void handleActionDown(int id, float x, float y) {
 		touched = true;
 		lastFrameXLoc = x;
 		lastFrameYLoc = y;
 	}
 
 	@Override
-	protected void handleActionMove(int id, float x, float y) {
+	public void handleActionMove(int id, float x, float y) {
 		if (id != 0)
 			return; // only one pointer drags bpm
 		currXDragTotal += x - lastFrameXLoc;
@@ -222,7 +222,7 @@ public class BpmView extends TouchableBBView {
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	public void handleActionUp(int id, float x, float y) {
 		touched = false;
 	}
 

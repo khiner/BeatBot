@@ -9,6 +9,14 @@ public class Flanger extends Effect {
 	public static final String NAME = GlobalVars.mainActivity.getString(R.string.flanger);
 	public static final int EFFECT_NUM = 4;
 	public static final int NUM_PARAMS = 6;
+	public static final ParamData[] PARAMS_DATA = {
+		new ParamData("TIME", true, false, "ms"),
+		new ParamData("FEEDBACK", false, false, ""),
+		new ParamData("WET", false, false, ""),
+		new ParamData("MOD RATE", true, true, "Hz"),
+		new ParamData("MOD AMT", false, false, ""),
+		new ParamData("PHASE", false, false, "")
+	};
 	
 	public Flanger(int trackNum, int position) {
 		super(trackNum, position);
@@ -25,17 +33,8 @@ public class Flanger extends Effect {
 	public int numParams() {
 		return NUM_PARAMS;
 	}
-
-	@Override
-	public void initParams() {
-		if (params.isEmpty()) {
-			params.add(new Param("TIME", true, false, "ms"));
-			params.add(new Param("FEEDBACK", false, false, ""));
-			params.add(new Param("WET", false, false, ""));
-			params.add(new Param("MOD RATE", true, true, "Hz"));
-			getParam(3).hz = true;
-			params.add(new Param("MOD AMT", false, false, ""));
-			params.add(new Param("PHASE", false, false, ""));
-		}
+	
+	public ParamData[] getParamsData() {
+		return PARAMS_DATA;
 	}
 }

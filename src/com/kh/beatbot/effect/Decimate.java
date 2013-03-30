@@ -9,6 +9,10 @@ public class Decimate extends Effect {
 	public static final String NAME = GlobalVars.mainActivity.getString(R.string.decimate);
 	public static final int EFFECT_NUM = 1;
 	public static final int NUM_PARAMS = 2;
+	public static final ParamData[] PARAMS_DATA = {
+		new ParamData("RATE", true, false, "Hz"),
+		new ParamData("BITS", true, false, "Bits")
+	};
 	
 	public Decimate(int trackNum, int position) {
 		super(trackNum, position);
@@ -25,12 +29,8 @@ public class Decimate extends Effect {
 	public int numParams() {
 		return NUM_PARAMS;
 	}
-	
-	@Override
-	protected void initParams() {
-		if (params.isEmpty()) {
-			params.add(new Param("RATE", true, false, "Hz"));
-			params.add(new Param("BITS", true, false, "Bits"));
-		}
+
+	public ParamData[] getParamsData() {
+		return PARAMS_DATA;
 	}
 }

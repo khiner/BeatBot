@@ -28,12 +28,12 @@ public abstract class ControlViewBase extends TouchableBBView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	public void handleActionDown(int id, float x, float y) {
 		selected = true;
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	public void handleActionUp(int id, float x, float y) {
 		selected = false;
 	}
 }

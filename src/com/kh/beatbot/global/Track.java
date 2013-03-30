@@ -88,7 +88,7 @@ public class Track extends BaseTrack {
 		this.instrument = instrument;
 		setSampleNum(sampleNum);
 		constructLoopPointMap();
-		GlobalVars.mainActivity.notifyTrackChanged();
+		GlobalVars.mainPage.pageSelectGroup.notifyTrackChanged();
 	}
 
 	public float getLoopBeginSample() {

@@ -238,7 +238,7 @@ public class LabelList extends ClickableBBView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
 		// clicking on an existing label will select label.
 		Label touched = findLabel(x, y);

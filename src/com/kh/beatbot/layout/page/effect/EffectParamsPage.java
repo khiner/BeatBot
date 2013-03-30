@@ -2,18 +2,19 @@ package com.kh.beatbot.layout.page.effect;
 
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listener.BBOnClickListener;
-import com.kh.beatbot.listener.KnobListener;
+import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
 import com.kh.beatbot.view.control.ControlViewBase;
-import com.kh.beatbot.view.control.Knob;
 import com.kh.beatbot.view.control.ParamControl;
+import com.kh.beatbot.view.control.ToggleKnob;
 
-public abstract class EffectParamsPage extends TouchableBBView implements KnobListener {
+public abstract class EffectParamsPage extends TouchableBBView implements Level1dListener, BBOnClickListener {
 	protected ParamControl[] paramControls;
 	protected Effect effect;
 	protected int xParamIndex = 0, yParamIndex = 1; 
@@ -24,6 +25,7 @@ public abstract class EffectParamsPage extends TouchableBBView implements KnobLi
 	}
 	
 	protected abstract int getNumParams();
+	protected abstract ParamData[] getParamsData();
 	
 	public final void setXLevel(float level) {
 		getXParamControl().knob.setLevel(level);
@@ -112,19 +114,19 @@ public abstract class EffectParamsPage extends TouchableBBView implements KnobLi
 	}
 	
 	@Override
-	public void onClick(Knob knob) {
-		int paramNum = knob.getId();
+	public void onClick(Button button) {
+		int paramNum = button.getId();
 		Param param = effect.getParam(paramNum);
-		param.beatSync = knob.isBeatSync();
-		knob.setLevel(param.viewLevel);
+		param.beatSync = ((ToggleButton)button).isChecked();
+		paramControls[paramNum].knob.setLevel(param.viewLevel);
 		if (effect.paramsLinked()) {
 			if (paramNum == 0) {
 				effect.getParam(1).beatSync = param.beatSync;
-				paramControls[1].knob.setBeatSync(param.beatSync);
-				paramControls[1].knob.setLevel(param.viewLevel);
+				((ToggleKnob)paramControls[1].knob).setBeatSync(param.beatSync);
+				((ToggleKnob)paramControls[1].knob).setLevel(param.viewLevel);
 			} else if (paramNum == 1) {
 				effect.getParam(0).beatSync = param.beatSync;
-				paramControls[0].knob.setBeatSync(param.beatSync);
+				((ToggleKnob)paramControls[0].knob).setBeatSync(param.beatSync);
 				paramControls[0].knob.setLevel(param.viewLevel);
 			}
 		}
@@ -133,9 +135,8 @@ public abstract class EffectParamsPage extends TouchableBBView implements KnobLi
 	private void createParamControls() {
 		paramControls = new ParamControl[getNumParams()];
 		for (int i = 0; i < paramControls.length; i++) {
-			paramControls[i] = new ParamControl((TouchableSurfaceView)root);
+			paramControls[i] = new ParamControl((TouchableSurfaceView)root, getParamsData()[i].beatSyncable);
 			paramControls[i].knob.setId(i);
-			paramControls[i].knob.clearListeners();
 			paramControls[i].knob.addLevelListener(this);
 		}
 	}

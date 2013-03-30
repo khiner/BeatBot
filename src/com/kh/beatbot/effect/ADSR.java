@@ -23,6 +23,15 @@ public class ADSR extends Effect {
 	
 	public static final int LOG_SCALE = 512;
 	
+	public static final ParamData[] paramsData = {
+		new ParamData("ATTACK", true, false, ATTACK_MAX_S, LOG_SCALE, "s"),
+		new ParamData("DECAY", true, false, DECAY_MAX_S, LOG_SCALE, "s"),
+		new ParamData("SUSTAIN", false, false, ""),
+		new ParamData("RELEASE", true, false, RELEASE_MAX_S, LOG_SCALE, "s"),
+		new ParamData("START", false, false, ""),
+		new ParamData("PEAK", false, false, "")
+	};
+	
 	private int currParamId = ATTACK_ID;
 	
 	public ADSR(int trackNum) {
@@ -41,15 +50,14 @@ public class ADSR extends Effect {
 		return NUM_PARAMS;
 	}
 	
+	public ParamData[] getParamsData() {
+		return paramsData;
+	}
+	
 	@Override
 	protected void initParams() {
+		super.initParams();
 		position = -1; // native code understands that -1 == ADSR
-		params.add(new Param("ATTACK", true, false, ATTACK_MAX_S, LOG_SCALE, "s"));
-		params.add(new Param("DECAY", true, false, DECAY_MAX_S, LOG_SCALE, "s"));
-		params.add(new Param("SUSTAIN", false, false, ""));
-		params.add(new Param("RELEASE", true, false, RELEASE_MAX_S, LOG_SCALE, "s"));
-		params.add(new Param("START", false, false, ""));
-		params.add(new Param("PEAK", false, false, ""));
 		setAttack(0);
 		setDecay(1);
 		setSustain(1);

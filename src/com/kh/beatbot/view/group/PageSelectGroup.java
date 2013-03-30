@@ -52,6 +52,10 @@ public class PageSelectGroup extends TouchableBBView {
 		adsrPage.updateLabels();
 	}
 	
+	public void updateLevelsFXPage() {
+		masterLevelsFxPage.update();
+		trackLevelsFxPage.update();
+	}
 	public void notifyTrackChanged() {
 		if (!initialized)
 			return;

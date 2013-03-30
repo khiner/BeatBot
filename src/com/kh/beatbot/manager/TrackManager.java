@@ -40,12 +40,18 @@ public class TrackManager {
 		return tracks.get(trackNum);
 	}
 
+	public void quantizeEffectParams() {
+		for (Track track : tracks) {
+			track.quantizeEffectParams();
+		}
+	}
+	
 	public void setCurrTrack(int trackNum) {
 		Track newTrack = tracks.get(trackNum);
 		if (newTrack == currTrack)
 			return;
 		currTrack = newTrack;
-		GlobalVars.mainActivity.notifyTrackChanged();
+		GlobalVars.mainPage.pageSelectGroup.notifyTrackChanged();
 	}
 	
 	public BaseTrack getBaseTrack(int trackNum) {
@@ -63,8 +69,7 @@ public class TrackManager {
 		Track newTrack = new Track(tracks.size(), instrument, sampleNum);
 		tracks.add(newTrack);
 		currTrack = tracks.get(tracks.size() - 1);
-		if (GlobalVars.mainPage.midiView != null)
-			GlobalVars.mainActivity.notifyTrackAdded(tracks.size() - 1);
+		GlobalVars.mainPage.trackAdded(tracks.size() - 1);
 	}
 
 	public void clearNotes() {

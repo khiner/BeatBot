@@ -4,45 +4,25 @@ import java.nio.FloatBuffer;
 
 import android.util.FloatMath;
 
-import com.kh.beatbot.R;
-import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.listener.BBOnClickListener;
-import com.kh.beatbot.listener.KnobListener;
-import com.kh.beatbot.listener.Level1dListener;
-import com.kh.beatbot.view.Button;
-import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
-public class Knob extends ControlView1dBase implements BBOnClickListener {
+public class Knob extends ControlView1dBase {
 
 	private FloatBuffer circleVb;
-	private FloatBuffer selectCircleVb;
-	private FloatBuffer selectCircleVb2;
-
-	private ToggleButton centerButton;
-	private float snapDistSquared;
 
 	private int drawIndex = 0;
 
-	private boolean clickable = false;
-	
 	public Knob(TouchableSurfaceView parent) {
 		super(parent);
 	}
-	
-	public void setClickable(boolean clickable) {
-		this.clickable = clickable;
-	}
 
 	protected void loadIcons() {
-		centerButton.setIconSource(new BBIconSource(R.drawable.clock, R.drawable.note_icon));
+		// none
 	}
 	
 	private void initCircleVbs(float width, float height) {
 		float[] circleVertices = new float[128];
-		float[] selectCircleVertices = new float[128];
-		float[] selectCircle2Vertices = new float[128];
 		float theta = 3 * ¹ / 4; // start at 1/8 around the circle
 		for (int i = 0; i < circleVertices.length / 4; i++) {
 			// theta will range from ¹/4 to 7¹/8,
@@ -57,31 +37,8 @@ public class Knob extends ControlView1dBase implements BBOnClickListener {
 					+ width / 2;
 			circleVertices[i * 4 + 3] = FloatMath.sin(theta) * width / 3.1f
 					+ width / 2;
-			// two dimmer circles are shown for a "glow" effect when the user
-			// touches the view
-			// this first one is slightly wider...
-			selectCircleVertices[i * 4] = FloatMath.cos(theta) * width / 2.2f
-					+ width / 2;
-			selectCircleVertices[i * 4 + 1] = FloatMath.sin(theta) * width
-					/ 2.2f + width / 2;
-			selectCircleVertices[i * 4 + 2] = FloatMath.cos(theta) * width
-					/ 3.2f + width / 2;
-			selectCircleVertices[i * 4 + 3] = FloatMath.sin(theta) * width
-					/ 3.2f + width / 2;
-			// and this one is even wider... use alpha channel to produce glow
-			// effect
-			selectCircle2Vertices[i * 4] = FloatMath.cos(theta) * width / 2.1f
-					+ width / 2;
-			selectCircle2Vertices[i * 4 + 1] = FloatMath.sin(theta) * width
-					/ 2.1f + width / 2;
-			selectCircle2Vertices[i * 4 + 2] = FloatMath.cos(theta) * width
-					/ 3.3f + width / 2;
-			selectCircle2Vertices[i * 4 + 3] = FloatMath.sin(theta) * width
-					/ 3.3f + width / 2;
 		}
 		circleVb = makeFloatBuffer(circleVertices);
-		selectCircleVb = makeFloatBuffer(selectCircleVertices);
-		selectCircleVb2 = makeFloatBuffer(selectCircle2Vertices);
 	}
 
 	@Override
@@ -89,14 +46,7 @@ public class Knob extends ControlView1dBase implements BBOnClickListener {
 		// level background
 		drawTriangleStrip(circleVb, Colors.VIEW_BG);
 		// main selection
-		drawTriangleStrip(circleVb, levelColor, drawIndex);
-		if (selected) { // selected glow
-			drawTriangleStrip(selectCircleVb2, selectColor, drawIndex);
-			drawTriangleStrip(selectCircleVb, selectColor, drawIndex);
-		}
-		if (clickable) {
-			centerButton.draw();
-		}
+		drawTriangleStrip(circleVb, selected ? Colors.RED : levelColor, drawIndex);
 	}
 
 	private void updateDrawIndex() {
@@ -104,27 +54,6 @@ public class Knob extends ControlView1dBase implements BBOnClickListener {
 			return;
 		drawIndex = (int) (circleVb.capacity() * level / 2);
 		drawIndex += drawIndex % 2;
-	}
-
-	public void setBeatSync(boolean beatSync) {
-		if (centerButton != null) {
-			centerButton.setChecked(beatSync);
-		}
-	}
-
-	public boolean isBeatSync() {
-		return centerButton != null && centerButton.isChecked();
-	}
-
-	@Override
-	protected void handleActionDown(int id, float x, float y) {
-		if (distanceFromCenterSquared(x, y) > snapDistSquared) {
-			super.handleActionDown(id, x, y);
-		}
-	}
-
-	public boolean isClickable() {
-		return centerButton != null;
 	}
 
 	@Override
@@ -150,26 +79,11 @@ public class Knob extends ControlView1dBase implements BBOnClickListener {
 
 	@Override
 	protected void createChildren() {
-		centerButton = new ToggleButton((TouchableSurfaceView)root);
-		centerButton.setOnClickListener(this);
+		// none
 	}
 	
 	@Override
 	public void layoutChildren() {
-		centerButton.layout(this, 0, 0, width, height);
-		snapDistSquared = (width / 4) * (width / 4);
 		initCircleVbs(width, height);
-		if (clickable) {
-			centerButton.setChecked(true);
-		}
-	}
-	
-	@Override
-	public void onClick(Button button) {
-		if (distanceFromCenterSquared(x, y) <= snapDistSquared) {
-			for (Level1dListener listener : levelListeners) {
-				((KnobListener)listener).onClick(this);
-			}
-		}
 	}
 }

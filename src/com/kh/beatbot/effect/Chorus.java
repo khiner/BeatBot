@@ -8,6 +8,13 @@ public class Chorus extends Effect {
 	public static final String NAME = GlobalVars.mainActivity.getString(R.string.chorus);
 	public static final int EFFECT_NUM = 0;
 	public static final int NUM_PARAMS = 5;
+	public static final ParamData[] PARAMS_DATA = {
+		new ParamData("MOD RATE", true, true, "Hz"),
+		new ParamData("MOD AMT", false, false, ""),
+		new ParamData("TIME", false, false, ""),
+		new ParamData("FEEDBACK", true, true, "ms"),
+		new ParamData("WET", false, false, "")
+	};
 	
 	public Chorus(int trackNum, int position) {
 		super(trackNum, position);
@@ -25,15 +32,7 @@ public class Chorus extends Effect {
 		return NAME;
 	}
 	
-	@Override
-	protected void initParams() {
-		if (params.isEmpty()) {
-			params.add(new Param("MOD RATE", true, true, "Hz"));
-			getParam(0).hz = true;
-			params.add(new Param("MOD AMT", false, false, ""));
-			params.add(new Param("TIME", false, false, ""));
-			params.add(new Param("FEEDBACK", true, true, "ms"));
-			params.add(new Param("WET", false, false, ""));
-		}
+	public ParamData[] getParamsData() {
+		return PARAMS_DATA;
 	}
 }

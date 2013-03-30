@@ -34,26 +34,25 @@ public abstract class TouchableBBView extends BBView {
 	 * a view may not handle multi-touch events like pointer
 	 * up/down events.
 	 ********************************************************/
-	protected void handleActionDown(int id, float x, float y) {
+	public void handleActionDown(int id, float x, float y) {
 		
 	}
 
-	protected void handleActionUp(int id, float x, float y) {
+	public void handleActionUp(int id, float x, float y) {
 		
 	}
 
-	protected void handleActionPointerDown(int id, float x, float y) {
+	public void handleActionPointerDown(int id, float x, float y) {
 		
 	}
 
-	protected void handleActionPointerUp(int id, float x, float y) {
+	public void handleActionPointerUp(int id, float x, float y) {
 		
 	}
 
-	protected void handleActionMove(int id, float x, float y) {
+	public void handleActionMove(int id, float x, float y) {
 		
 	}
-	
 	
 	/**********************************************************************
 	 * Touch events are propogated to children, using coordinates relative 

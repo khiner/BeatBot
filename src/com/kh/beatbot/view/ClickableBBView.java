@@ -23,19 +23,19 @@ public abstract class ClickableBBView extends TouchableBBView {
 	protected abstract void longPress(int id, float x, float y);
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	public void handleActionDown(int id, float x, float y) {
 		lastDownTime = System.currentTimeMillis();
 		lastTapX = x;
 		lastTapY = y;
 	}
 
 	@Override
-	protected void handleActionPointerDown(int id, float x, float y) {
+	public void handleActionPointerDown(int id, float x, float y) {
 		// nothing to do
 	}
 
 	@Override
-	protected void handleActionMove(int id, float x, float y) {
+	public void handleActionMove(int id, float x, float y) {
 		if (Math.abs(x - lastTapX) < 25
 				&& Math.abs(y - lastTapY) < 25) {
 			if (System.currentTimeMillis() - lastDownTime > GlobalVars.LONG_CLICK_TIME) {
@@ -47,13 +47,13 @@ public abstract class ClickableBBView extends TouchableBBView {
 	}
 
 	@Override
-	protected void handleActionPointerUp(int id, float x, float y) {
+	public void handleActionPointerUp(int id, float x, float y) {
 		// nothing to do
 
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	public void handleActionUp(int id, float x, float y) {
 		long time = System.currentTimeMillis();
 		if (Math.abs(time - lastDownTime) < GlobalVars.SINGLE_TAP_TIME) {
 			// if the second tap is not in the same location as the first tap,

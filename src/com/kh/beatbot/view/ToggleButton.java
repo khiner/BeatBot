@@ -28,12 +28,14 @@ public class ToggleButton extends ImageButton {
 
 	public void setChecked(boolean checked) {
 		this.checked = checked;
-		currentIcon = checked ? iconSource.selectedIcon : iconSource.defaultIcon;
+		currentIcon = checked ? iconSource.selectedIcon
+				: iconSource.defaultIcon;
 	}
-	
+
 	protected void touch() {
 		touched = true;
-		currentIcon = iconSource.pressedIcon != null ? iconSource.pressedIcon : iconSource.selectedIcon;
+		currentIcon = iconSource.pressedIcon != null ? iconSource.pressedIcon
+				: checked ? iconSource.defaultIcon : iconSource.selectedIcon;
 	}
 
 	protected void release(boolean sendEvent) {
@@ -42,7 +44,8 @@ public class ToggleButton extends ImageButton {
 			setChecked(!checked);
 			notifyClicked();
 		} else {
-			currentIcon = checked ? iconSource.selectedIcon : iconSource.defaultIcon;
+			currentIcon = checked ? iconSource.selectedIcon
+					: iconSource.defaultIcon;
 		}
 	}
 }

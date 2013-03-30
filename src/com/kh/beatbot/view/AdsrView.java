@@ -192,7 +192,7 @@ public class AdsrView extends TouchableBBView {
 		initAdsrVb();
 		ADSR adsr = TrackManager.currTrack.adsr;
 		for (int i = 0; i < adsr.numParams(); i++) {
-			GLSurfaceViewBase.storeText(adsr.getParam(i).name);
+			GLSurfaceViewBase.storeText(adsr.getParam(i).getName());
 		}
 	}
 
@@ -209,27 +209,27 @@ public class AdsrView extends TouchableBBView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	public void handleActionDown(int id, float x, float y) {
 		selectAdsrPoint(id, viewRect.clipX(x), viewRect.clipY(y));
 	}
 
 	@Override
-	protected void handleActionPointerDown(int id, float x, float y) {
+	public void handleActionPointerDown(int id, float x, float y) {
 		selectAdsrPoint(id, viewRect.clipX(x), viewRect.clipY(y));
 	}
 
 	@Override
-	protected void handleActionMove(int id, float x, float y) {
+	public void handleActionMove(int id, float x, float y) {
 		moveAdsrPoint(id, viewRect.clipX(x), viewRect.clipY(y));
 	}
 
 	@Override
-	protected void handleActionPointerUp(int id, float x, float y) {
+	public void handleActionPointerUp(int id, float x, float y) {
 		deselectAdsrPoint(id);
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	public void handleActionUp(int id, float x, float y) {
 		clearAdsrSelected();
 	}
 

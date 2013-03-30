@@ -82,7 +82,7 @@ public class MidiManager implements Parcelable {
 		tempo.setBpm(bpm);
 		setNativeBPM(bpm);
 		setNativeMSPT(tempo.getMpqn() / RESOLUTION);
-		GlobalVars.mainActivity.quantizeEffectParams();
+		Managers.trackManager.quantizeEffectParams();
 		return (int)bpm;
 	}
 

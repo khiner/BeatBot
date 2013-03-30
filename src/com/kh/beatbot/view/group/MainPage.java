@@ -20,6 +20,7 @@ public class MainPage extends TouchableBBView {
 	public void trackAdded(int newTrackNum) {
 		midiTrackControl.trackAdded(newTrackNum);
 		midiView.trackAdded(newTrackNum);
+		pageSelectGroup.notifyTrackChanged();
 	}
 	
 	@Override

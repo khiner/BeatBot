@@ -48,17 +48,17 @@ public abstract class Button extends TouchableBBView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	public void handleActionDown(int id, float x, float y) {
 		touch();
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	public void handleActionUp(int id, float x, float y) {
 		release(x >= 0 && x <= width && y >= 0 && y <= height);
 	}
 
 	@Override
-	protected void handleActionMove(int id, float x, float y) {
+	public void handleActionMove(int id, float x, float y) {
 		if (x < 0 || x > width || y < 0 || y > height) {
 			release(false);
 		}

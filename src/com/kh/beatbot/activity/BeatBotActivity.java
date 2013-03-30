@@ -200,6 +200,7 @@ public class BeatBotActivity extends Activity {
 								}
 							}).setNegativeButton("No", null).show();
 		} else if (activityPager.getCurrPageNum() == EFFECT_PAGE_NUM) {
+			GlobalVars.mainPage.pageSelectGroup.updateLevelsFXPage();
 			activityPager.setPage(MAIN_PAGE_NUM);
 		}
 	}
@@ -274,23 +275,6 @@ public class BeatBotActivity extends Activity {
 	private void initNativeAudio() {
 		createEngine();
 		createAudioPlayer();
-	}
-
-	public void quantizeEffectParams() {
-		for (int trackId = 0; trackId < Managers.trackManager.getNumTracks(); trackId++) {
-			for (Effect effect : Managers.trackManager.getTrack(trackId).effects) {
-				effect.quantizeParams();
-			}
-		}
-	}
-
-	public void notifyTrackAdded(int newTrackNum) {
-		GlobalVars.mainPage.trackAdded(newTrackNum);
-		notifyTrackChanged();
-	}
-
-	public void notifyTrackChanged() {
-		GlobalVars.mainPage.pageSelectGroup.notifyTrackChanged();
 	}
 
 	public static native boolean createAudioPlayer();

@@ -266,7 +266,7 @@ public class LevelsView extends TouchableBBView {
 				/ (height - LEVEL_POINT_SIZE);
 	}
 
-	protected void handleActionPointerUp(int id, float x, float y) {
+	public void handleActionPointerUp(int id, float x, float y) {
 		touchedLevels.remove(id);
 		updateLevelOffsets();
 	}
@@ -302,19 +302,19 @@ public class LevelsView extends TouchableBBView {
 	}
 
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	public void handleActionDown(int id, float x, float y) {
 		if (!selectLevel(x, y, id)) {
 			startSelectRegion(x, y);
 		}
 	}
 
 	@Override
-	protected void handleActionPointerDown(int id, float x, float y) {
+	public void handleActionPointerDown(int id, float x, float y) {
 		selectLevel(x, y, id);
 	}
 
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	public void handleActionUp(int id, float x, float y) {
 		clearTouchedLevels();
 		selectRegion = false;
 	}

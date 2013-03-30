@@ -19,7 +19,7 @@ public class DraggableLabelList extends LabelList {
 	}
 	
 	@Override
-	protected void handleActionMove(int id, float x, float y) {
+	public void handleActionMove(int id, float x, float y) {
 		super.handleActionMove(id, x, y);
 		if (touchedLabel == null || id != 0) {
 			return;
@@ -29,7 +29,7 @@ public class DraggableLabelList extends LabelList {
 	}
 	
 	@Override
-	protected void handleActionUp(int id, float x, float y) {
+	public void handleActionUp(int id, float x, float y) {
 		super.handleActionUp(id, x, y);
 		// notify listener of the touched label's old and new position in list
 		int newPosition = labels.indexOf(touchedLabel);

@@ -10,8 +10,8 @@ public abstract class Effect implements Comparable<Effect> {
 
 	protected int trackNum;
 	protected int position;
+	protected boolean on;
 	protected boolean paramsLinked = false;
-	protected boolean on = false;
 
 	public Effect(int trackNum) {
 		this.trackNum = trackNum;
@@ -21,17 +21,19 @@ public abstract class Effect implements Comparable<Effect> {
 	public Effect(int trackNum, int position) {
 		this.trackNum = trackNum;
 		this.position = position;
+		this.on = true;
 		initParams();
 		addEffect(trackNum, getNum(), position);
+		setEffectOn(trackNum, position, on);
 	}
 
 	public abstract int getNum();
 	public abstract int numParams();
 	public abstract String getName();
+	public abstract ParamData[] getParamsData();
 	
 	public void setOn(boolean on) {
-		this.on = on;
-		setEffectOn(trackNum, position, on);
+		
 	}
 
 	public boolean isOn() {
@@ -71,7 +73,7 @@ public abstract class Effect implements Comparable<Effect> {
 
 	public void removeEffect() {
 		removeEffect(trackNum, position);
-		Managers.trackManager.getBaseTrack(trackNum).effects.remove(this);
+		Managers.trackManager.getBaseTrack(trackNum).removeEffect(this);
 	}
 
 	public void quantizeParams() {
@@ -84,6 +86,19 @@ public abstract class Effect implements Comparable<Effect> {
 		}
 	}
 
+	@Override
+	public int compareTo(Effect effect) {
+		return this.position - effect.position;
+	}
+	
+	protected void initParams() {
+		if (params.isEmpty()) {
+			for (ParamData paramData : getParamsData()) {
+				params.add(new Param(paramData));
+			}
+		}
+	}
+	
 	public native void addEffect(int trackNum, int effectNum, int position);
 
 	public native void removeEffect(int trackNum, int position);
@@ -95,11 +110,4 @@ public abstract class Effect implements Comparable<Effect> {
 
 	public native void setEffectParam(int trackNum, int effectPosition,
 			int paramNum, float paramLevel);
-
-	protected abstract void initParams();
-
-	@Override
-	public int compareTo(Effect effect) {
-		return this.position - effect.position;
-	}
 }

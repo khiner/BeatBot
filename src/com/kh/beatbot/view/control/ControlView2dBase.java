@@ -47,13 +47,13 @@ public abstract class ControlView2dBase extends ControlViewBase {
 	}
 	
 	@Override
-	protected void handleActionDown(int id, float x, float y) {
+	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
 		setLevel(xToLevel(x), yToLevel(y));
 	}
 	
 	@Override
-	protected void handleActionMove(int id, float x, float y) {
+	public void handleActionMove(int id, float x, float y) {
 		setLevel(xToLevel(x), yToLevel(y));
 	}
 }

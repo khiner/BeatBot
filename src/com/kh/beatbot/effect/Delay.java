@@ -9,6 +9,12 @@ public class Delay extends Effect {
 	public static final String NAME = GlobalVars.mainActivity.getString(R.string.delay);
 	public static final int EFFECT_NUM = 4;
 	public static final int NUM_PARAMS = 2;
+	public static final ParamData[] PARAMS_DATA = {
+		new ParamData("TIME LEFT", true, true, "ms"),
+		new ParamData("TIME RIGHT", true, true, "ms"),
+		new ParamData("FEEDBACK", false, false, ""),
+		new ParamData("WET", false, false, "")
+	};
 
 	// keep track of what right channel was before linking
 	// so we can go back after disabling link
@@ -33,20 +39,13 @@ public class Delay extends Effect {
 		return NAME;
 	}
 	
-	@Override
-	public void initParams() {
-		paramsLinked = true;
-		if (params.isEmpty()) {
-			params.add(new Param("TIME LEFT", true, true, "ms"));
-			params.add(new Param("TIME RIGHT", true, true, "ms"));
-			params.add(new Param("FEEDBACK", false, false, ""));
-			params.add(new Param("WET", false, false, ""));
-		}
+	public ParamData[] getParamsData() {
+		return PARAMS_DATA;
 	}
 
 	@Override
 	public void setParamsLinked(boolean linked) {
 		super.setParamsLinked(linked);
-		setEffectParam(trackNum, position, 4, linked ? 1 : 0);
+		setEffectParam(trackNum, position, EFFECT_NUM, linked ? 1 : 0);
 	}
 }

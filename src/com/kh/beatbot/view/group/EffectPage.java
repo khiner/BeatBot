@@ -32,6 +32,15 @@ public class EffectPage extends TouchableBBView {
 		super(parent);
 	}
 	
+	public Seekbar2d getLevel2d() {
+		return level2d;
+	}
+	
+	public void loadEffect(Effect effect) {
+		paramsPager.setPage(effect.getNum());
+		((EffectParamsPage)paramsPager.getCurrPage()).setEffect(effect);
+	}
+	
 	@Override
 	protected void loadIcons() {
 		// parent
@@ -45,15 +54,6 @@ public class EffectPage extends TouchableBBView {
 	@Override
 	public void draw() {
 		// parent
-	}
-
-	public Seekbar2d getLevel2d() {
-		return level2d;
-	}
-	
-	public void loadEffect(Effect effect) {
-		paramsPager.setPage(effect.getNum());
-		((EffectParamsPage)paramsPager.getCurrPage()).setEffect(effect);
 	}
 	
 	@Override

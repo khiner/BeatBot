@@ -4,6 +4,7 @@ import android.view.View;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Filter;
+import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableSurfaceView;
@@ -54,5 +55,10 @@ public class FilterParamsPage extends EffectParamsPage {
 			} else
 				filterToggles[i].setChecked(false);
 		}
+	}
+	
+	@Override
+	protected ParamData[] getParamsData() {
+		return Filter.PARAMS_DATA;
 	}
 }

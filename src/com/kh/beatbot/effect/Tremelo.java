@@ -9,6 +9,11 @@ public class Tremelo extends Effect {
 	public static final String NAME = GlobalVars.mainActivity.getString(R.string.tremelo);
 	public static final int EFFECT_NUM = 6;
 	public static final int NUM_PARAMS = 3;
+	public static final ParamData[] PARAMS_DATA = {
+		new ParamData("RATE", true, true, "Hz"),
+		new ParamData("PHASE", false, false, ""),
+		new ParamData("DEPTH", false, false, "")
+	};
 	
 	public Tremelo(int trackNum, int position) {
 		super(trackNum, position);
@@ -25,14 +30,9 @@ public class Tremelo extends Effect {
 	public int numParams() {
 		return NUM_PARAMS;
 	}
-
+	
 	@Override
-	public void initParams() {
-		if (params.isEmpty()) {
-			params.add(new Param("RATE", true, true, "Hz"));
-			params.add(new Param("PHASE", false, false, ""));
-			getParam(0).hz = true;
-			params.add(new Param("DEPTH", false, false, ""));
-		}
+	public ParamData[] getParamsData() {
+		return PARAMS_DATA;
 	}
 }

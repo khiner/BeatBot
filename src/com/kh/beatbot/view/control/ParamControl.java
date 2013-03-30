@@ -8,15 +8,20 @@ import com.kh.beatbot.view.TouchableSurfaceView;
 public class ParamControl extends TouchableBBView {
 	public Knob knob;
 	private TextView label, valueLabel;
-
-	public ParamControl(TouchableSurfaceView parent) {
-		super(parent);
+	private boolean beatSync;
+	
+	public ParamControl(TouchableSurfaceView root, boolean beatSync) {
+		this.root = root;
+		this.beatSync = beatSync;
+		createChildren();
 	}
 	
 	public void setParam(Param param) {
 		knob.setViewLevel(param.viewLevel);
-		knob.setBeatSync(param.beatSync);
-		setLabel(param.name);
+		if (beatSync) {
+			((ToggleKnob)knob).setBeatSync(param.beatSync);
+		}
+		setLabel(param.getName());
 		updateValueLabel(param);
 	}
 	
@@ -49,7 +54,8 @@ public class ParamControl extends TouchableBBView {
 	@Override
 	protected void createChildren() {
 		label = new TextView(root);
-		knob = new Knob((TouchableSurfaceView)root);
+		knob = beatSync ? new ToggleKnob((TouchableSurfaceView)root) : 
+			new Knob((TouchableSurfaceView)root);
 		valueLabel = new TextView(root);
 		addChild(label);
 		addChild(knob);

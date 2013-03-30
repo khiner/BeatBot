@@ -59,7 +59,7 @@ public class AdsrPage extends Page implements BBOnClickListener, Level1dListener
 	
 	private void updateLabel() {
 		// update the displayed param name
-		paramLabel.setText(TrackManager.currTrack.adsr.getCurrParam().name);		
+		paramLabel.setText(TrackManager.currTrack.adsr.getCurrParam().getName());		
 	}
 	
 	private void updateValueLabel() {
