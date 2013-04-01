@@ -1,7 +1,7 @@
 package com.kh.beatbot.layout.page;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.BBIconSource;
+import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.Button;
@@ -33,9 +33,9 @@ public class SampleEditPage extends Page {
 
 	@Override
 	protected void loadIcons() {
-		previewButton.setIconSource(new BBIconSource(R.drawable.preview_icon, R.drawable.preview_icon_selected));
-		loopButton.setIconSource(new BBIconSource(R.drawable.loop_icon, R.drawable.loop_selected_icon));
-		reverseButton.setIconSource(new BBIconSource(R.drawable.reverse_icon, R.drawable.reverse_selected_icon));
+		previewButton.setIconSource(new ImageIconSource(R.drawable.preview_icon, R.drawable.preview_icon_selected));
+		loopButton.setIconSource(new ImageIconSource(R.drawable.loop_icon, R.drawable.loop_selected_icon));
+		reverseButton.setIconSource(new ImageIconSource(R.drawable.reverse_icon, R.drawable.reverse_selected_icon));
 	}
 
 	@Override

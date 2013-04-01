@@ -13,7 +13,8 @@ public class Colors {
 			BPM_ON, BPM_ON_SELECTED, BPM_OFF_SELECTED, VIEW_BG,
 			SAMPLE_LOOP_HIGHLIGHT, SAMPLE_LOOP_SELECT,
 			SAMPLE_LOOP_SELECT_SELECTED, SAMPLE_LOOP_SELECT_OUTLINE,
-			LABEL_DARK, LABEL_MED, LABEL_LIGHT, LABEL_VERY_LIGHT;
+			LABEL_DARK, LABEL_MED, LABEL_LIGHT, LABEL_VERY_LIGHT, 
+			LABEL_SELECTED;
 	
 	public static float[][] MIDI_LINES = {
 		{0, 0, 0, 1},
@@ -69,6 +70,7 @@ public class Colors {
 		LABEL_MED = colorResourceToFloats(activity, R.color.labelMed);
 		LABEL_LIGHT = colorResourceToFloats(activity, R.color.labelLight);
 		LABEL_VERY_LIGHT = colorResourceToFloats(activity, R.color.labelVeryLight);
+		LABEL_SELECTED = colorResourceToFloats(activity, R.color.labelSelected);
 		
 		
 		// varying darkness for vertical midi lines

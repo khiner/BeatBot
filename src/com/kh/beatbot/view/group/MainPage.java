@@ -49,7 +49,7 @@ public class MainPage extends TouchableBBView {
 	@Override
 	public void layoutChildren() {
 		float controlButtonHeight = height / 10;
-		float midiHeight = 2 * (height - controlButtonHeight) / 3;
+		float midiHeight = 3 * (height - controlButtonHeight) / 5;
 		int numTracks = Managers.trackManager.getNumTracks();
 		MidiView.allTracksHeight = midiHeight - MidiView.Y_OFFSET;
 		MidiView.trackHeight = MidiView.allTracksHeight / numTracks;

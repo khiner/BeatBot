@@ -1,0 +1,51 @@
+package com.kh.beatbot.global;
+
+import java.nio.FloatBuffer;
+
+import javax.microedition.khronos.opengles.GL10;
+
+import com.kh.beatbot.view.BBView;
+
+public class RoundedRectIcon extends Icon {
+
+	private FloatBuffer roundedRectBuffer;
+	private float borderWeight;
+	private float[] bgColor;
+	private float[] borderColor;
+	private float width, height, xScaleFactor, yScaleFactor;
+	public RoundedRectIcon(FloatBuffer roundedRectBuffer, float width, float height, float borderWeight, float[] bgColor, float[] borderColor) {
+		this.roundedRectBuffer = roundedRectBuffer;
+		this.width = width;
+		this.height = height;
+		this.borderWeight = borderWeight;
+		this.bgColor = bgColor;
+		this.borderColor = borderColor;
+		xScaleFactor = width / (borderWeight + width);
+		yScaleFactor = height / (borderWeight + height);
+	}
+	
+	@Override
+	public void draw(float x, float y) {
+		draw(x, y, width, height);
+	}
+
+	@Override
+	public void draw(float x, float y, float width, float height) {
+		BBView.push();
+		BBView.translate(width / 2, height / 2);
+		BBView.scale(xScaleFactor, yScaleFactor);
+		BBView.drawTriangleFan(roundedRectBuffer, bgColor);
+		BBView.drawLines(roundedRectBuffer, borderColor, borderWeight, GL10.GL_LINE_LOOP);
+		BBView.pop();
+	}
+
+	@Override
+	public float getWidth() {
+		return width;
+	}
+
+	@Override
+	public float getHeight() {
+		return height;
+	}
+}

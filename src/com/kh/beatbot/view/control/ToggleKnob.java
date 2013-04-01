@@ -1,7 +1,7 @@
 package com.kh.beatbot.view.control;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.BBIconSource;
+import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.view.Button;
@@ -40,7 +40,7 @@ public class ToggleKnob extends Knob {
 
 	protected void loadIcons() {
 		super.loadIcons();
-		centerButton.setIconSource(new BBIconSource(R.drawable.clock, R.drawable.note_icon));
+		centerButton.setIconSource(new ImageIconSource(R.drawable.clock, R.drawable.note_icon));
 		centerButton.setChecked(true);
 	}
 

@@ -5,7 +5,7 @@ import android.view.View;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.ParamData;
-import com.kh.beatbot.global.BBIconSource;
+import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
@@ -40,10 +40,10 @@ public class FilterParamsPage extends EffectParamsPage {
 
 	@Override
 	protected void loadIcons() {
-		toggleButton.setIconSource(new BBIconSource(R.drawable.filter_label_off, R.drawable.filter_label_on));
-		filterToggles[0].setIconSource(new BBIconSource(R.drawable.lowpass_filter_icon, R.drawable.lowpass_filter_icon_selected));
-		filterToggles[1].setIconSource(new BBIconSource(R.drawable.bandpass_filter_icon, R.drawable.bandpass_filter_icon_selected));
-		filterToggles[2].setIconSource(new BBIconSource(R.drawable.highpass_filter_icon, R.drawable.highpass_filter_icon_selected));
+		toggleButton.setIconSource(new ImageIconSource(R.drawable.filter_label_off, R.drawable.filter_label_on));
+		filterToggles[0].setIconSource(new ImageIconSource(R.drawable.lowpass_filter_icon, R.drawable.lowpass_filter_icon_selected));
+		filterToggles[1].setIconSource(new ImageIconSource(R.drawable.bandpass_filter_icon, R.drawable.bandpass_filter_icon_selected));
+		filterToggles[2].setIconSource(new ImageIconSource(R.drawable.highpass_filter_icon, R.drawable.highpass_filter_icon_selected));
 		filterToggles[0].setChecked(true);
 	}
 	

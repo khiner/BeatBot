@@ -185,18 +185,18 @@ public class GLText {
 	// A: text - the string to draw
 	// x, y - the x,y position to draw text at (bottom left of text; including
 	// descent)
-	public void draw(BBView view, String text, int height, float x, float y) {
-		view.push();
-		view.translate(x, y);
+	public void draw(String text, int height, float x, float y) {
+		BBView.push();
+		BBView.translate(x, y);
 		float scale = (float) height / size;
-		view.scale(scale, scale);
+		BBView.scale(scale, scale);
 		if (batches.containsKey(text)) {
 			batches.get(text).endBatch(textureIds[0]);
 		} else {
 			initTextInBatch(text, genericBatch);
 			genericBatch.endBatch(textureIds[0]);
 		}
-		view.pop();
+		BBView.pop();
 	}
 
 	// D: return the width/height of a character, or max character width

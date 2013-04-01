@@ -37,9 +37,8 @@ public class TextView extends BBView {
 	public void draw() {
 		if (text == null)
 			return;
-		setColor(Colors.VOLUME);
 		// draw string in center of rect
-		GLSurfaceViewBase.drawText(this, text, (int)(height / 2), textOffset, 0);
+		drawText(text, Colors.BLACK, (int)(height / 2), textOffset, 0);
 	}
 
 	@Override

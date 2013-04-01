@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.BBIcon;
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.Icon;
+import com.kh.beatbot.global.ImageIcon;
 import com.kh.beatbot.listener.LabelListListener;
-import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.ClickableBBView;
 import com.kh.beatbot.view.GLSurfaceViewBase;
 import com.kh.beatbot.view.TouchableSurfaceView;
@@ -27,10 +27,9 @@ public class LabelList extends ClickableBBView {
 		public float x, textWidth, labelWidth;
 		public LabelState state;
 		public FloatBuffer backgroundRectVb = null;
-		public BBView view;
+
 		
-		Label(BBView view, String text, boolean on, float x) {
-			this.view = view;
+		Label(String text, boolean on, float x) {
 			this.text = text;
 			this.x = x;
 			// empty text indicates empty label
@@ -69,14 +68,12 @@ public class LabelList extends ClickableBBView {
 			if (state == LabelState.EMPTY) {
 				plusIcon.draw(absoluteX + x + labelWidth / 2 - addTextWidth / 2, root.getHeight() - absoluteY - height, height,
 						height);
-				setColor(Colors.WHITE);
 				// draw string in center of rect
-				GLSurfaceViewBase.drawText(view, "ADD", (int)(height / 2), x + labelWidth / 2 - addTextWidth / 2
+				drawText("ADD", Colors.WHITE, (int)(height / 2), x + labelWidth / 2 - addTextWidth / 2
 						+ height, TEXT_Y_OFFSET);
 			} else {
-				setColor(Colors.WHITE);
 				// draw string in center of rect
-				GLSurfaceViewBase.drawText(view, text, (int)(height / 2), x + labelWidth / 2 - textWidth / 2,
+				drawText(text, Colors.WHITE, (int)(height / 2), x + labelWidth / 2 - textWidth / 2,
 						TEXT_Y_OFFSET);
 			}
 		}
@@ -124,7 +121,7 @@ public class LabelList extends ClickableBBView {
 	protected static FloatBuffer bgRectVb = null;
 	protected LabelListListener listener = null;
 	protected ArrayList<Label> labels = null;
-	protected static BBIcon plusIcon;
+	protected static Icon plusIcon;
 
 	// which label is currently being touched? (null for none)
 	protected Label touchedLabel = null;
@@ -178,7 +175,7 @@ public class LabelList extends ClickableBBView {
 	}
 
 	public void addLabel(String text, boolean on) {
-		labels.add(new Label(this, text, on, Float.MAX_VALUE));
+		labels.add(new Label(text, on, Float.MAX_VALUE));
 		updateLabelSizes();
 		updateLabelLocations();
 	}
@@ -203,7 +200,7 @@ public class LabelList extends ClickableBBView {
 
 	@Override
 	protected void loadIcons() {
-		plusIcon = new BBIcon(R.drawable.plus_outline);
+		plusIcon = new ImageIcon(R.drawable.plus_outline);
 	}
 	
 	@Override

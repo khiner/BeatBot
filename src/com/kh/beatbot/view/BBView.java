@@ -59,9 +59,7 @@ public abstract class BBView {
 		circleVb = makeFloatBuffer(coords);
 	}
 	
-	public BBView() {
-		
-	}
+	public BBView() {}
 	
 	public BBView(GLSurfaceViewBase root) {
 		this.root = root;
@@ -173,19 +171,19 @@ public abstract class BBView {
 		return makeFloatBuffer(new float[] { x1, y1, x1, y2, x2, y2, x2, y1 });
 	}
 
-	public final void translate(float x, float y) {
+	public static final void translate(float x, float y) {
 		gl.glTranslatef(x, y, 0);
 	}
 
-	public final void scale(float x, float y) {
+	public static final void scale(float x, float y) {
 		gl.glScalef(x, y, 1);
 	}
 
-	public void push() {
+	public static final void push() {
 		gl.glPushMatrix();
 	}
 
-	public final void pop() {
+	public static final void pop() {
 		gl.glPopMatrix();
 	}
 
@@ -214,29 +212,34 @@ public abstract class BBView {
 		return makeFloatBuffer(roundedRect);
 	}
 
-	public final void drawRectangle(float x1, float y1, float x2, float y2,
+	public static final void drawText(String text, float[] color, int height, float x, float y)  {
+		setColor(color);
+		GLSurfaceViewBase.drawText(text, height, x, y);
+	}
+	
+	public static final void drawRectangle(float x1, float y1, float x2, float y2,
 			float[] color) {
 		drawTriangleFan(makeRectFloatBuffer(x1, y1, x2, y2), color);
 	}
 
-	public void drawRectangleOutline(float x1, float y1, float x2,
+	public static void drawRectangleOutline(float x1, float y1, float x2,
 			float y2, float[] color, float width) {
 		drawLines(makeRectFloatBuffer(x1, y1, x2, y2), color, width,
 				GL10.GL_LINE_LOOP);
 	}
 
-	public final void drawTriangleStrip(FloatBuffer vb, float[] color,
+	public static final void drawTriangleStrip(FloatBuffer vb, float[] color,
 			int numVertices) {
 		drawTriangleStrip(vb, color, 0, numVertices);
 	}
 
-	public final void drawTriangleStrip(FloatBuffer vb, float[] color) {
+	public static final void drawTriangleStrip(FloatBuffer vb, float[] color) {
 		if (vb == null)
 			return;
 		drawTriangleStrip(vb, color, vb.capacity() / 2);
 	}
 
-	public final void drawTriangleStrip(FloatBuffer vb, float[] color,
+	public static final void drawTriangleStrip(FloatBuffer vb, float[] color,
 			int beginVertex, int endVertex) {
 		if (vb == null)
 			return;
@@ -246,13 +249,13 @@ public abstract class BBView {
 				- beginVertex);
 	}
 
-	public final void drawTriangleFan(FloatBuffer vb, float[] color) {
+	public static final void drawTriangleFan(FloatBuffer vb, float[] color) {
 		setColor(color);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_FAN, 0, vb.capacity() / 2);
 	}
 
-	public final void drawLines(FloatBuffer vb, float[] color, float width,
+	public static final void drawLines(FloatBuffer vb, float[] color, float width,
 			int type, int stride) {
 		setColor(color);
 		gl.glLineWidth(width);
@@ -260,12 +263,12 @@ public abstract class BBView {
 		gl.glDrawArrays(type, 0, vb.capacity() / (2 + stride / 8));
 	}
 
-	public final void drawLines(FloatBuffer vb, float[] color, float width,
+	public static final void drawLines(FloatBuffer vb, float[] color, float width,
 			int type) {
 		drawLines(vb, color, width, type, 0);
 	}
 	
-	public final void drawPoint(float pointSize, float[] color, float x,
+	public static final void drawPoint(float pointSize, float[] color, float x,
 			float y) {
 		push();
 		translate(x, y);
@@ -284,7 +287,7 @@ public abstract class BBView {
 		backgroundColor = color;
 	}
 
-	public final void setColor(float[] color) {
+	public static final void setColor(float[] color) {
 		gl.glColor4f(color[0], color[1], color[2], color[3]);
 	}
 	

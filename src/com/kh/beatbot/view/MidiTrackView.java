@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.IconSource;
+import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.Managers;
@@ -23,7 +24,7 @@ public class MidiTrackView extends TouchableBBView {
 			this.trackNum = trackNum;
 		}
 		
-		public void setIconSource(BBIconSource instrumentIcon) {
+		public void setIconSource(IconSource instrumentIcon) {
 			instrumentButton.setIconSource(instrumentIcon);
 		}
 		
@@ -95,7 +96,7 @@ public class MidiTrackView extends TouchableBBView {
 		}
 	}
 
-	private static BBIconSource muteIcon, soloIcon;
+	private static IconSource muteIcon, soloIcon;
 	private static List<ButtonRow> buttonRows = new ArrayList<ButtonRow>();
 
 	private FloatBuffer bgVb = null;
@@ -106,9 +107,9 @@ public class MidiTrackView extends TouchableBBView {
 	
 	protected void loadIcons() {
 		Managers.directoryManager.loadIcons();
-		muteIcon = new BBIconSource(R.drawable.mute_icon,
+		muteIcon = new ImageIconSource(R.drawable.mute_icon,
 				R.drawable.mute_icon_selected);
-		soloIcon = new BBIconSource(R.drawable.solo_icon,
+		soloIcon = new ImageIconSource(R.drawable.solo_icon,
 				R.drawable.solo_icon_selected);
 	}
 

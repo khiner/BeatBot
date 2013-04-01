@@ -15,8 +15,8 @@ import android.widget.Toast;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.BBDirectory;
-import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.global.Instrument;
 
 public class DirectoryManager {
@@ -134,46 +134,46 @@ public class DirectoryManager {
 	}
 
 	public void loadIcons() {
-		getDrumInstrument(0).setIconSource(new BBIconSource(
+		getDrumInstrument(0).setIconSource(new ImageIconSource(
 				R.drawable.kick_icon,
 				R.drawable.kick_icon_selected,
 				R.drawable.kick_icon_listview,
 				R.drawable.kick_icon_list_title));
-		getDrumInstrument(1).setIconSource(new BBIconSource(
+		getDrumInstrument(1).setIconSource(new ImageIconSource(
 				R.drawable.snare_icon,
 				R.drawable.snare_icon_selected,
 				R.drawable.snare_icon_listview,
 				R.drawable.snare_icon_list_title));
-		getDrumInstrument(2).setIconSource(new BBIconSource(
+		getDrumInstrument(2).setIconSource(new ImageIconSource(
 				R.drawable.hh_closed_icon,
 				R.drawable.hh_closed_icon_selected,
 				R.drawable.hh_closed_icon_listview,
 				R.drawable.hh_closed_icon_list_title));
-		getDrumInstrument(3).setIconSource(new BBIconSource(
+		getDrumInstrument(3).setIconSource(new ImageIconSource(
 				R.drawable.hh_open_icon,
 				R.drawable.hh_open_icon_selected,
 				R.drawable.hh_open_icon_listview,
 				R.drawable.hh_open_icon_list_title));
-		getDrumInstrument(4).setIconSource(new BBIconSource(
+		getDrumInstrument(4).setIconSource(new ImageIconSource(
 				R.drawable.rimshot_icon,
 				R.drawable.rimshot_icon_selected,
 				R.drawable.rimshot_icon_listview,
 				R.drawable.rimshot_icon_list_title));
-		drumsDirectory.setIconSource(new BBIconSource(
+		drumsDirectory.setIconSource(new ImageIconSource(
 				-1,
 				-1,
 				R.drawable.drums_icon_listview,
 				R.drawable.drums_icon_list_title));
-		internalRecordDirectory.setIconSource(new BBIconSource(
+		internalRecordDirectory.setIconSource(new ImageIconSource(
 				R.drawable.microphone_icon,
 				R.drawable.microphone_icon_selected,
 				R.drawable.microphone_icon_listview,
 				R.drawable.microphone_icon_list_title));
-		internalBeatRecordDirectory.setIconSource(new BBIconSource(
+		internalBeatRecordDirectory.setIconSource(new ImageIconSource(
 				R.drawable.beat_icon,
 				R.drawable.beat_icon_selected, R.drawable.beat_icon_listview,
 				R.drawable.beat_icon_list_title));
-		internalSampleRecordDirectory.setIconSource(new BBIconSource(
+		internalSampleRecordDirectory.setIconSource(new ImageIconSource(
 				R.drawable.sample_icon,
 				R.drawable.sample_icon_selected,
 				R.drawable.sample_icon_listview,
@@ -313,10 +313,10 @@ public class DirectoryManager {
 	}
 
 	private void updateInstrumentSelectTitleBar() {
+		int listTitleIconResource = ((ImageIconSource)currDirectory.getIconSource()).listTitleIconResource;
 		if (currDirectory.getIconSource() != null
-				&& currDirectory.getIconSource().listTitleIconResource > 0) {
-			instrumentSelectAlertBuilder.setIcon(
-					currDirectory.getIconSource().listTitleIconResource)
+				&& listTitleIconResource > 0) {
+			instrumentSelectAlertBuilder.setIcon(listTitleIconResource)
 					.setTitle(currDirectory.getName().toUpperCase());
 		} else {
 			instrumentSelectAlertBuilder.setIcon(0).setTitle(
@@ -339,7 +339,7 @@ public class DirectoryManager {
 					tv.setCompoundDrawables(null, null, null, null);
 					return v;
 				}
-				BBIconSource iconSource = directory.getChild(position)
+				ImageIconSource iconSource = (ImageIconSource)directory.getChild(position)
 						.getIconSource();
 				tv.setCompoundDrawablesWithIntrinsicBounds(
 						iconSource.listViewIconResource, 0, 0, 0);

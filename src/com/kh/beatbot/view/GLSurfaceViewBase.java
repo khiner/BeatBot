@@ -85,8 +85,8 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		glText.loadTexture(this);
 	}
 	
-	public static final void drawText(BBView view, String text, int height, float x, float y) {
-		glText.draw(view, text, height, x, y);
+	public static final void drawText(String text, int height, float x, float y) {
+		glText.draw(text, height, x, y);
 	}
 	
 	public static final void storeText(String text) {
@@ -94,7 +94,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 	}
 	
 	public static final float getTextWidth(String text, float height) {
-		return glText != null ? glText.getTextWidth(text, height) : 0;
+		return glText.getTextWidth(text, height);
 	}
 	
 	public static final void loadTexture(Bitmap bitmap, int[] textureHandlers,

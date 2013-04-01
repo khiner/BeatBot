@@ -1,22 +1,22 @@
 package com.kh.beatbot.view;
 
-import com.kh.beatbot.global.BBIcon;
-import com.kh.beatbot.global.BBIconSource;
+import com.kh.beatbot.global.Icon;
+import com.kh.beatbot.global.IconSource;
 
 public class ImageButton extends Button {
 
-	BBIconSource iconSource;
-	BBIcon currentIcon;
+	protected IconSource iconSource;
+	protected Icon currentIcon;
 	
 	public ImageButton(TouchableSurfaceView parent) {
 		super(parent);
 	}
 	
-	public BBIconSource getIconSource() {
+	public IconSource getIconSource() {
 		return iconSource;
 	}
 	
-	public void setIconSource(BBIconSource iconSource) {
+	public void setIconSource(IconSource iconSource) {
 		this.iconSource = iconSource;
 		if (iconSource.disabledIcon != null) {
 			currentIcon = iconSource.disabledIcon;

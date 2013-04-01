@@ -2,7 +2,9 @@ package com.kh.beatbot.view.group;
 
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.BBIconSource;
+import com.kh.beatbot.global.ColorSet;
+import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.layout.page.AdsrPage;
 import com.kh.beatbot.layout.page.LevelsFXPage;
 import com.kh.beatbot.layout.page.NoteLevelsPage;
@@ -29,14 +31,11 @@ public class PageSelectGroup extends TouchableBBView {
 	private static final int MASTER_PAGE_ID = 3;
 	private static final int NOTE_LEVELS_PAGE_ID = 4;
 	
-	ImageButton addTrackButton;
-	ImageButton instrumentSelectButton;
-	TextButton sampleSelectButton;
-	TextButton levelsFxButton;
-	TextButton editButton;
-	TextButton adsrButton;
-	TextButton masterButton;
-	ImageButton levelsButton;
+	private static ImageButton addTrackButton;
+	private static ImageButton instrumentSelectButton;
+	private static TextButton sampleSelectButton;
+	private static TextButton[] textButtons = new TextButton[4];
+	private static ImageButton levelsButton;
 	
 	public PageSelectGroup(TouchableSurfaceView parent) {
 		super(parent);
@@ -65,23 +64,6 @@ public class PageSelectGroup extends TouchableBBView {
 		adsrPage.update();
 	}
 	
-	private void updateInstrumentIcon() {
-		// update the track pager instrument icon
-		if (TrackManager.currTrack.getInstrument().getIconSource().defaultIcon == null) {
-			return;
-		}
-		instrumentSelectButton
-				.setIconSource(TrackManager.currTrack.getInstrument().getIconSource());
-	}
-
-	private void updateSampleText() {
-		// update sample label text
-		// TODO handle all extensions
-		String formattedName = TrackManager.currTrack.getSampleName().replace(".bb", "")
-				.toUpperCase();
-		sampleSelectButton.setText(formattedName);
-	}
-
 	@Override
 	public void draw() {
 		// Parent
@@ -89,13 +71,15 @@ public class PageSelectGroup extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
+		ColorSet bgColorSet = new ColorSet(Colors.LABEL_DARK, Colors.VOLUME, Colors.LABEL_SELECTED);
+		ColorSet strokeColorSet = new ColorSet(Colors.WHITE, Colors.WHITE, Colors.BLACK);
 		addTrackButton = new ImageButton((TouchableSurfaceView) root);
 		instrumentSelectButton = new ImageButton((TouchableSurfaceView) root);
-		sampleSelectButton = new TextButton((TouchableSurfaceView) root);
-		levelsFxButton = new TextButton((TouchableSurfaceView) root);
-		editButton = new TextButton((TouchableSurfaceView) root);
-		adsrButton = new TextButton((TouchableSurfaceView) root);
-		masterButton = new TextButton((TouchableSurfaceView) root);
+		sampleSelectButton = new TextButton((TouchableSurfaceView) root, bgColorSet, strokeColorSet);
+		textButtons[LEVELS_FX_PAGE_ID] = new TextButton((TouchableSurfaceView) root, bgColorSet, strokeColorSet);
+		textButtons[EDIT_PAGE_ID] = new TextButton((TouchableSurfaceView) root, bgColorSet, strokeColorSet);
+		textButtons[ADSR_PAGE_ID] = new TextButton((TouchableSurfaceView) root, bgColorSet, strokeColorSet);
+		textButtons[MASTER_PAGE_ID] = new TextButton((TouchableSurfaceView) root, bgColorSet, strokeColorSet);
 		levelsButton = new ImageButton((TouchableSurfaceView) root);
 		
 		addTrackButton.setOnClickListener(new BBOnClickListener() {
@@ -119,33 +103,21 @@ public class PageSelectGroup extends TouchableBBView {
 			}
 		});
 		
-		levelsFxButton.setOnClickListener(new BBOnClickListener() {
-			@Override
-			public void onClick(Button button) {
-				pager.setPage(LEVELS_FX_PAGE_ID);
-			}
-		});
-		
-		editButton.setOnClickListener(new BBOnClickListener() {
-			@Override
-			public void onClick(Button button) {
-				pager.setPage(EDIT_PAGE_ID);
-			}
-		});
-		
-		adsrButton.setOnClickListener(new BBOnClickListener() {
-			@Override
-			public void onClick(Button button) {
-				pager.setPage(ADSR_PAGE_ID);
-			}
-		});
-		
-		masterButton.setOnClickListener(new BBOnClickListener() {
-			@Override
-			public void onClick(Button button) {
-				pager.setPage(MASTER_PAGE_ID);
-			}
-		});
+		for (int i = 0; i < textButtons.length; i++) {
+			final int id = i;
+			textButtons[i].setOnClickListener(new BBOnClickListener() {
+				@Override
+				public void onClick(Button button) {
+					pager.setPage(id);
+					// deselect all buttons except this one.
+					for (TextButton otherTextButton : textButtons) {
+						if (!button.equals(otherTextButton)) {
+							otherTextButton.setChecked(false);
+						}
+					}
+				}
+			});
+		}
 		
 		levelsButton.setOnClickListener(new BBOnClickListener() {
 			@Override
@@ -174,42 +146,57 @@ public class PageSelectGroup extends TouchableBBView {
 		addChild(addTrackButton);
 		addChild(instrumentSelectButton);
 		addChild(sampleSelectButton);
-		addChild(levelsFxButton);
-		addChild(editButton);
-		addChild(adsrButton);
-		addChild(masterButton);
+		for (TextButton textButton : textButtons) {
+			addChild(textButton);
+		}
 		addChild(levelsButton);
-		
 		addChild(pager);
 	}
 
 	@Override
 	public void layoutChildren() {
-		float buttonHeight = height / 4;
-		float labelWidth = (width - 2 * buttonHeight) / 5;
-		addTrackButton.layout(this, 0, 0, buttonHeight, buttonHeight);
-		instrumentSelectButton.layout(this, buttonHeight, 0, buttonHeight, buttonHeight);
-		sampleSelectButton.layout(this, buttonHeight * 2, 0, labelWidth, buttonHeight);
-		levelsFxButton.layout(this, buttonHeight * 2 + labelWidth, 0, labelWidth, buttonHeight);
-		editButton.layout(this, buttonHeight * 2 + 2 * labelWidth, 0, labelWidth, buttonHeight);
-		adsrButton.layout(this, buttonHeight * 2 + 3 * labelWidth, 0, labelWidth, buttonHeight);
-		masterButton.layout(this, buttonHeight * 2 + 4 * labelWidth, 0, labelWidth, buttonHeight);
-		levelsButton.layout(this, buttonHeight * 2 + 5 * labelWidth, 0, buttonHeight, buttonHeight);
-		pager.layout(this, 0, buttonHeight, width, height - buttonHeight);
+		float buttonHeight = height / 5;
+		float labelWidth = (width - 3 * buttonHeight) / 5;
+		float labelYOffset = 2;
+		addTrackButton.layout(this, 0, labelYOffset, buttonHeight, buttonHeight);
+		instrumentSelectButton.layout(this, buttonHeight, labelYOffset, buttonHeight, buttonHeight);
+		sampleSelectButton.layout(this, buttonHeight * 2, labelYOffset, labelWidth, buttonHeight);
+		for (int i = 0; i < textButtons.length; i++) {
+			textButtons[i].layout(this, buttonHeight * 2 + (i + 1) * labelWidth, labelYOffset, labelWidth, buttonHeight);
+		}
+		levelsButton.layout(this, buttonHeight * 2 + 5 * labelWidth, labelYOffset, buttonHeight, buttonHeight);
+		pager.layout(this, 0, buttonHeight + 2 * labelYOffset, width, height - buttonHeight - 2 * labelYOffset);
 	}
 
 	@Override
 	protected void loadIcons() {
-		addTrackButton.setIconSource(new BBIconSource(R.drawable.plus_outline, R.drawable.plus_outline));
-		levelsFxButton.setText("FX");
-		editButton.setText("EDIT");
-		adsrButton.setText("ADSR");
-		masterButton.setText("MASTER");
-		levelsButton.setIconSource(new BBIconSource(R.drawable.levels_icon, R.drawable.levels_icon_selected));
+		addTrackButton.setIconSource(new ImageIconSource(R.drawable.plus_outline, R.drawable.plus_outline));
+		textButtons[LEVELS_FX_PAGE_ID].setText("FX");
+		textButtons[EDIT_PAGE_ID].setText("EDIT");
+		textButtons[ADSR_PAGE_ID].setText("ADSR");
+		textButtons[MASTER_PAGE_ID].setText("MASTER");
+		levelsButton.setIconSource(new ImageIconSource(R.drawable.levels_icon, R.drawable.levels_icon_selected));
 	}
 
 	@Override
 	public void init() {
 		// Parent
+	}
+	
+	private void updateInstrumentIcon() {
+		// update the track pager instrument icon
+		if (TrackManager.currTrack.getInstrument().getIconSource().defaultIcon == null) {
+			return;
+		}
+		instrumentSelectButton
+				.setIconSource(TrackManager.currTrack.getInstrument().getIconSource());
+	}
+
+	private void updateSampleText() {
+		// update sample label text
+		// TODO handle all extensions
+		String formattedName = TrackManager.currTrack.getSampleName().replace(".bb", "")
+				.toUpperCase();
+		sampleSelectButton.setText(formattedName);
 	}
 }

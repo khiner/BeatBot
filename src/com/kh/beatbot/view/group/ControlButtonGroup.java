@@ -3,8 +3,8 @@ package com.kh.beatbot.view.group;
 import android.widget.Toast;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -182,13 +182,13 @@ public class ControlButtonGroup extends TouchableBBView {
 
 	@Override
 	protected void loadIcons() {
-		BBIconSource playButtonIcon = new BBIconSource(R.drawable.play_icon, R.drawable.play_icon_selected);
-		BBIconSource stopButtonIcon = new BBIconSource(R.drawable.stop_icon, R.drawable.stop_icon_selected);
-		BBIconSource recButtonIcon = new BBIconSource(R.drawable.rec_off_icon, R.drawable.rec_on_icon_selected);
-		BBIconSource copyButtonIcon = new BBIconSource(R.drawable.copy_icon, R.drawable.copy_icon_selected);
-		BBIconSource deleteButtonIcon = new BBIconSource(R.drawable.delete_icon, R.drawable.delete_icon_selected);
-		BBIconSource undoButtonIcon = new BBIconSource(R.drawable.undo_icon, R.drawable.undo_icon_selected);
-		BBIconSource bpmTapButtonIcon = new BBIconSource(R.drawable.bpm_tap_icon, R.drawable.bpm_tap_icon_selected);
+		ImageIconSource playButtonIcon = new ImageIconSource(R.drawable.play_icon, R.drawable.play_icon_selected);
+		ImageIconSource stopButtonIcon = new ImageIconSource(R.drawable.stop_icon, R.drawable.stop_icon_selected);
+		ImageIconSource recButtonIcon = new ImageIconSource(R.drawable.rec_off_icon, R.drawable.rec_on_icon_selected);
+		ImageIconSource copyButtonIcon = new ImageIconSource(R.drawable.copy_icon, R.drawable.copy_icon_selected);
+		ImageIconSource deleteButtonIcon = new ImageIconSource(R.drawable.delete_icon, R.drawable.delete_icon_selected);
+		ImageIconSource undoButtonIcon = new ImageIconSource(R.drawable.undo_icon, R.drawable.undo_icon_selected);
+		ImageIconSource bpmTapButtonIcon = new ImageIconSource(R.drawable.bpm_tap_icon, R.drawable.bpm_tap_icon_selected);
 		
 		playButtonIcon.setPressedIcon(R.drawable.play_icon_pressed);
 		recButtonIcon.setPressedIcon(R.drawable.rec_icon_pressed);

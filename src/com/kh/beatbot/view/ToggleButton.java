@@ -1,6 +1,6 @@
 package com.kh.beatbot.view;
 
-import com.kh.beatbot.global.BBIconSource;
+import com.kh.beatbot.global.IconSource;
 
 public class ToggleButton extends ImageButton {
 	boolean checked = false;
@@ -9,7 +9,7 @@ public class ToggleButton extends ImageButton {
 		super(parent);
 	}
 
-	public void setIconSource(BBIconSource iconSource) {
+	public void setIconSource(IconSource iconSource) {
 		this.iconSource = iconSource;
 		if (checked)
 			currentIcon = iconSource.selectedIcon;

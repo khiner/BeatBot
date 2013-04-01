@@ -13,11 +13,11 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremelo;
-import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
+import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.listener.Level1dListener;
@@ -250,11 +250,11 @@ public class LevelsFXPage extends Page implements Level1dListener {
 
 	@Override
 	protected void loadIcons() {
-		volumeToggle.setIconSource(new BBIconSource(R.drawable.volume_icon,
+		volumeToggle.setIconSource(new ImageIconSource(R.drawable.volume_icon,
 				R.drawable.volume_icon_selected));
-		panToggle.setIconSource(new BBIconSource(R.drawable.pan_icon,
+		panToggle.setIconSource(new ImageIconSource(R.drawable.pan_icon,
 				R.drawable.pan_icon_selected));
-		pitchToggle.setIconSource(new BBIconSource(R.drawable.pitch_icon,
+		pitchToggle.setIconSource(new ImageIconSource(R.drawable.pitch_icon,
 				R.drawable.pitch_selected_icon));
 	}
 

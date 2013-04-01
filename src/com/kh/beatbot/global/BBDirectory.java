@@ -9,13 +9,13 @@ import com.kh.beatbot.manager.DirectoryManager;
 public class BBDirectory {
 	protected String name = null;
 	protected String path = null;
-	protected BBIconSource bbIconSource = null;
+	protected IconSource bbIconSource = null;
 	protected List<BBDirectory> children = new ArrayList<BBDirectory>();
 	protected BBDirectory parent = null;
 	protected String emptyMsg = "This directoy is empty.";
 
 	public BBDirectory(BBDirectory parent, String name,
-			BBIconSource bbIconSource) {
+			IconSource bbIconSource) {
 		this.parent = parent;
 		this.name = name;
 		this.bbIconSource = bbIconSource;
@@ -36,13 +36,13 @@ public class BBDirectory {
 		return name;
 	}
 
-	public BBIconSource getIconSource() {
+	public IconSource getIconSource() {
 		if (bbIconSource == null && parent != null)
 			return parent.bbIconSource;
 		return bbIconSource;
 	}
 
-	public void setIconSource(BBIconSource iconSource) {
+	public void setIconSource(IconSource iconSource) {
 		this.bbIconSource = iconSource;
 	}
 	

@@ -3,7 +3,7 @@ package com.kh.beatbot.layout.page.effect;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.ParamData;
-import com.kh.beatbot.global.BBIconSource;
+import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.ToggleButton;
@@ -34,8 +34,8 @@ public class DelayParamsPage extends EffectParamsPage {
 
 	@Override
 	protected void loadIcons() {
-		toggleButton.setIconSource(new BBIconSource(R.drawable.delay_label_off, R.drawable.delay_label_on));
-		linkToggle.setIconSource(new BBIconSource(R.drawable.link_broken, R.drawable.link));
+		toggleButton.setIconSource(new ImageIconSource(R.drawable.delay_label_off, R.drawable.delay_label_on));
+		linkToggle.setIconSource(new ImageIconSource(R.drawable.link_broken, R.drawable.link));
 	}
 
 	@Override

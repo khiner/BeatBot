@@ -3,7 +3,7 @@ package com.kh.beatbot.layout.page.effect;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.effect.Reverb;
-import com.kh.beatbot.global.BBIconSource;
+import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
 
@@ -20,7 +20,7 @@ public class ReverbParamsPage extends EffectParamsPage {
 	
 	@Override
 	protected void loadIcons() {
-		toggleButton.setIconSource(new BBIconSource(R.drawable.reverb_label_off, R.drawable.reverb_label_on));
+		toggleButton.setIconSource(new ImageIconSource(R.drawable.reverb_label_off, R.drawable.reverb_label_on));
 	}
 	
 	@Override

@@ -1,9 +1,9 @@
 package com.kh.beatbot.layout.page;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.BBIconSource;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
+import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.LevelsView;
@@ -53,9 +53,9 @@ public class NoteLevelsPage extends Page {
 
 	@Override
 	protected void loadIcons() {
-		volumeToggle.setIconSource(new BBIconSource( R.drawable.volume_icon, R.drawable.volume_icon_selected));
-		panToggle.setIconSource(new BBIconSource(R.drawable.pan_icon, R.drawable.pan_icon_selected));
-		pitchToggle.setIconSource(new BBIconSource(R.drawable.pitch_icon, R.drawable.pitch_selected_icon));
+		volumeToggle.setIconSource(new ImageIconSource( R.drawable.volume_icon, R.drawable.volume_icon_selected));
+		panToggle.setIconSource(new ImageIconSource(R.drawable.pan_icon, R.drawable.pan_icon_selected));
+		pitchToggle.setIconSource(new ImageIconSource(R.drawable.pitch_icon, R.drawable.pitch_selected_icon));
 	}
 
 	@Override
