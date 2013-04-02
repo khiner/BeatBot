@@ -13,14 +13,17 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.method.DigitsKeyListener;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.kh.beatbot.R;
@@ -37,11 +40,16 @@ import com.kh.beatbot.view.group.GLSurfaceViewGroup;
 import com.kh.beatbot.view.group.MainPage;
 
 public class BeatBotActivity extends Activity {
+	
+	public static final int BPM_DIALOG_ID = 0;
+	public static final int EXIT_DIALOG_ID = 1;
+	
 	private GLSurfaceViewGroup mainSurface;
 	private BBViewPager activityPager;
-
 	private static AssetManager assetManager;
 
+	private EditText bpmInput;
+	
 	private static final int MAIN_PAGE_NUM = 0;
 	private static final int EFFECT_PAGE_NUM = 1;
 
@@ -185,20 +193,7 @@ public class BeatBotActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 		if (activityPager.getCurrPageNum() == MAIN_PAGE_NUM) {
-			new AlertDialog.Builder(this)
-					.setIcon(android.R.drawable.ic_dialog_alert)
-					.setTitle("Closing " + getString(R.string.app_name))
-					.setMessage(
-							"Are you sure you want to exit "
-									+ getString(R.string.app_name) + "?")
-					.setPositiveButton("Yes",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									finish();
-								}
-							}).setNegativeButton("No", null).show();
+			showDialog(EXIT_DIALOG_ID);
 		} else if (activityPager.getCurrPageNum() == EFFECT_PAGE_NUM) {
 			GlobalVars.mainPage.pageSelectGroup.updateLevelsFXPage();
 			activityPager.setPage(MAIN_PAGE_NUM);
@@ -226,6 +221,63 @@ public class BeatBotActivity extends Activity {
 				Managers.playbackManager.getState() == PlaybackManager.State.PLAYING);
 	}
 
+	
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog) {
+		switch(id){
+	    case BPM_DIALOG_ID:
+	    	bpmInput.setText(String.valueOf((int)Managers.midiManager.getBPM()));
+			break;
+	    case EXIT_DIALOG_ID:
+			break;
+	    }	
+	}
+	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+	    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+	    switch(id){
+	    case BPM_DIALOG_ID:
+	    	bpmInput = new EditText(this);
+			builder = new AlertDialog.Builder(GlobalVars.mainActivity);
+			
+			bpmInput.setKeyListener(DigitsKeyListener.getInstance("0123456789"));
+	        builder.setTitle("Set BPM").setView(bpmInput)
+	        .setPositiveButton("OK", new DialogInterface.OnClickListener() { 
+			    @Override
+			    public void onClick(DialogInterface dialog, int which) {
+			    	String bpmString = bpmInput.getText().toString();
+			    	if (!bpmString.isEmpty()) {
+			    		GlobalVars.mainPage.controlButtonGroup.bpmView.setBPM(Integer.valueOf(bpmString));
+			    	}
+			    }
+			}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			    @Override
+			    public void onClick(DialogInterface dialog, int which) {
+			        dialog.cancel();
+			    }
+			});
+			break;
+	    case EXIT_DIALOG_ID:
+	    	builder.setIcon(android.R.drawable.ic_dialog_alert)
+			.setTitle("Closing " + getString(R.string.app_name))
+			.setMessage("Are you sure you want to exit "
+							+ getString(R.string.app_name) + "?")
+			.setPositiveButton("Yes",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,
+								int which) {
+							finish();
+						}
+					})
+			.setNegativeButton("No", null);
+			break;
+	    }
+	    return builder.create();
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();

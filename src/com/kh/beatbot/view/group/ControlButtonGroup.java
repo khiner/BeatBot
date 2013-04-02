@@ -19,8 +19,8 @@ import com.kh.beatbot.view.TouchableSurfaceView;
 public class ControlButtonGroup extends TouchableBBView {
 
 	ToggleButton playButton, recordButton, copyButton, stopButton;
-	ImageButton deleteButton, undoButton, bpmTapButton;
-	BpmView bpmView;
+	ImageButton deleteButton, undoButton;
+	public BpmView bpmView;
 
 	public ControlButtonGroup(TouchableSurfaceView parent) {
 		super(parent);
@@ -28,7 +28,7 @@ public class ControlButtonGroup extends TouchableBBView {
 	
 	@Override
 	public void init() {
-		// nothing to do
+		bpmView.setBPM(Managers.midiManager.getBPM());
 	}
 
 	@Override
@@ -44,7 +44,6 @@ public class ControlButtonGroup extends TouchableBBView {
 		copyButton = new ToggleButton((TouchableSurfaceView) root);
 		deleteButton = new ImageButton((TouchableSurfaceView) root);
 		undoButton = new ImageButton((TouchableSurfaceView) root);
-		bpmTapButton = new ImageButton((TouchableSurfaceView) root);
 		bpmView = new BpmView((TouchableSurfaceView) root);
 
 		playButton.setOnClickListener(new BBOnClickListener() {
@@ -132,19 +131,6 @@ public class ControlButtonGroup extends TouchableBBView {
 				Managers.midiManager.deleteSelectedNotes();
 			}
 		});
-
-		bpmTapButton.setOnClickListener(new BBOnClickListener() {
-			private long lastTapTime = 0;
-
-			@Override
-			public void onClick(Button button) {
-				long tapTime = System.currentTimeMillis();
-				float millisElapsed = tapTime - lastTapTime;
-				lastTapTime = tapTime;
-				float bpm = 60000 / millisElapsed;
-				bpmView.setText(String.valueOf(Managers.midiManager.setBPM(bpm)));
-			}
-		});
 		
 		addChild(playButton);
 		addChild(stopButton);
@@ -152,7 +138,6 @@ public class ControlButtonGroup extends TouchableBBView {
 		addChild(copyButton);
 		addChild(deleteButton);
 		addChild(undoButton);
-		addChild(bpmTapButton);
 		addChild(bpmView);
 	}
 	
@@ -174,10 +159,9 @@ public class ControlButtonGroup extends TouchableBBView {
 		
 		// right-aligned buttons
 		bpmView.layout(this, width - 2 * height, 0, 2 * height, height);
-		bpmTapButton.layout(this, width - 3 * height, 0, height, height);
-		undoButton.layout(this, width - 4 * height, 0, height, height);
-		deleteButton.layout(this, width - 5 * height, 0, height, height);
-		copyButton.layout(this, width - 6 * height, 0, height, height);
+		undoButton.layout(this, width - 3 * height, 0, height, height);
+		deleteButton.layout(this, width - 4 * height, 0, height, height);
+		copyButton.layout(this, width - 5 * height, 0, height, height);
 	}
 
 	@Override
@@ -188,7 +172,6 @@ public class ControlButtonGroup extends TouchableBBView {
 		ImageIconSource copyButtonIcon = new ImageIconSource(R.drawable.copy_icon, R.drawable.copy_icon_selected);
 		ImageIconSource deleteButtonIcon = new ImageIconSource(R.drawable.delete_icon, R.drawable.delete_icon_selected);
 		ImageIconSource undoButtonIcon = new ImageIconSource(R.drawable.undo_icon, R.drawable.undo_icon_selected);
-		ImageIconSource bpmTapButtonIcon = new ImageIconSource(R.drawable.bpm_tap_icon, R.drawable.bpm_tap_icon_selected);
 		
 		playButtonIcon.setPressedIcon(R.drawable.play_icon_pressed);
 		recButtonIcon.setPressedIcon(R.drawable.rec_icon_pressed);
@@ -201,6 +184,5 @@ public class ControlButtonGroup extends TouchableBBView {
 		copyButton.setIconSource(copyButtonIcon);
 		deleteButton.setIconSource(deleteButtonIcon);
 		undoButton.setIconSource(undoButtonIcon);
-		bpmTapButton.setIconSource(bpmTapButtonIcon);
 	}
 }

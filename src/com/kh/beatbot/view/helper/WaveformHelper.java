@@ -71,7 +71,7 @@ public class WaveformHelper extends Thread {
 			outputAry[x] = percent * view.width + xOffset;
 			outputAry[x + 1] = y;
 		}
-		return view.makeFloatBuffer(outputAry);
+		return BBView.makeFloatBuffer(outputAry);
 	}
 
 	public static FloatBuffer floatsToFloatBuffer(BBView view, float[] data, long offset, long numFloats, int xOffset) {
@@ -86,7 +86,7 @@ public class WaveformHelper extends Thread {
 			outputAry[x] = percent * view.width + xOffset;
 			outputAry[x + 1] = y;
 		}
-		return view.makeFloatBuffer(outputAry);
+		return BBView.makeFloatBuffer(outputAry);
 	}
 
 	public static float[] bytesToFloats(byte[] input, int skip) {

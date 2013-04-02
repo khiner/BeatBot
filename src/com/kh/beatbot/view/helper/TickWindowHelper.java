@@ -9,6 +9,7 @@ import javax.microedition.khronos.opengles.GL10;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.MidiView;
 
 public class TickWindowHelper {
@@ -38,7 +39,7 @@ public class TickWindowHelper {
 		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
 			if (1 << i > currNumQuarterNotes * 4)
 				break; // break when lines go below current granulariy
-			midiView.drawLines(vLineVbs[i], Colors.MIDI_LINES[i], 2, GL10.GL_LINES);
+			BBView.drawLines(vLineVbs[i], Colors.MIDI_LINES[i], 2, GL10.GL_LINES);
 		}
 	}
 	

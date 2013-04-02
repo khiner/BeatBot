@@ -5,8 +5,8 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.view.BBView;
+import com.kh.beatbot.view.ClickableBBView;
 
 public class ScrollBarHelper {
 	private static final float DAMP_CONSTANT = 0.9f;
@@ -36,12 +36,12 @@ public class ScrollBarHelper {
 	private static boolean shouldDrawScrollView() {
 		return scrolling
 				|| scrollXVelocity != 0
-				|| Math.abs(System.currentTimeMillis() - scrollViewEndTime) <= GlobalVars.DOUBLE_TAP_TIME * 2;
+				|| Math.abs(System.currentTimeMillis() - scrollViewEndTime) <= ClickableBBView.DOUBLE_TAP_TIME * 2;
 	}
 
 	public static void startScrollView() {
 		long now = System.currentTimeMillis();
-		if (now - scrollViewEndTime > GlobalVars.DOUBLE_TAP_TIME * 2)
+		if (now - scrollViewEndTime > ClickableBBView.DOUBLE_TAP_TIME * 2)
 			scrollViewStartTime = now;
 		else
 			scrollViewEndTime = Long.MAX_VALUE;
@@ -61,21 +61,21 @@ public class ScrollBarHelper {
 				- scrollViewStartTime;
 
 		float alpha = .8f;
-		if (!scrollingEnded && elapsedTime <= GlobalVars.DOUBLE_TAP_TIME)
+		if (!scrollingEnded && elapsedTime <= ClickableBBView.DOUBLE_TAP_TIME)
 			// fade in
-			alpha *= elapsedTime / (float) GlobalVars.DOUBLE_TAP_TIME;
-		else if (scrollingEnded && elapsedTime > GlobalVars.DOUBLE_TAP_TIME)
+			alpha *= elapsedTime / (float) ClickableBBView.DOUBLE_TAP_TIME;
+		else if (scrollingEnded && elapsedTime > ClickableBBView.DOUBLE_TAP_TIME)
 			// fade out
-			alpha *= 2 - elapsedTime / (float) GlobalVars.DOUBLE_TAP_TIME;
+			alpha *= 2 - elapsedTime / (float) ClickableBBView.DOUBLE_TAP_TIME;
 		innerScrollBarColor[3] = alpha;
 		outerScrollBarColor[3] = alpha * .6f;
-		view.translate(0, translateY);
-		view.drawLines(scrollBarLinesVb, outerScrollBarColor, 3,
+		BBView.translate(0, translateY);
+		BBView.drawLines(scrollBarLinesVb, outerScrollBarColor, 3,
 				GL10.GL_LINES);
-		view.translate(translateX, 0);
-		view.drawTriangleFan(outerScrollBarVb, outerScrollBarColor);
-		view.drawTriangleFan(innerScrollBarVb, innerScrollBarColor);
-		view.translate(-translateX, -translateY);
+		BBView.translate(translateX, 0);
+		BBView.drawTriangleFan(outerScrollBarVb, outerScrollBarColor);
+		BBView.drawTriangleFan(innerScrollBarVb, innerScrollBarColor);
+		BBView.translate(-translateX, -translateY);
 	}
 
 	public static void tickScrollVelocity() {
@@ -100,13 +100,13 @@ public class ScrollBarHelper {
 		float innerWidth = outerWidth - 10;
 		translateX = (x2 + x1) / 2;
 		translateY = view.height - outerScrollBarHeight / 2;
-		innerScrollBarVb = view.makeRoundedCornerRectBuffer(
+		innerScrollBarVb = BBView.makeRoundedCornerRectBuffer(
 				innerWidth, innerScrollBarHeight, innerScrollBarCornerRadius,
 				CORNER_RESOLUTION);
-		outerScrollBarVb = view.makeRoundedCornerRectBuffer(
+		outerScrollBarVb = BBView.makeRoundedCornerRectBuffer(
 				outerWidth, outerScrollBarHeight, outerScrollBarCornerRadius,
 				CORNER_RESOLUTION);
-		scrollBarLinesVb = view.makeFloatBuffer(new float[] { 0, 0, x1, 0, x2, 0, view.width, 0 });
+		scrollBarLinesVb = BBView.makeFloatBuffer(new float[] { 0, 0, x1, 0, x2, 0, view.width, 0 });
 	}
 
 	public static void handleActionUp() {

@@ -2,24 +2,105 @@ package com.kh.beatbot.view;
 
 import java.nio.FloatBuffer;
 
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.MidiManager;
 
-public class BpmView extends TouchableBBView {
+public class BpmView extends ClickableBBView {
 
 	private static final float INC_BPM_THRESH = 15;
 	private static boolean[][] segments = new boolean[3][7];
-	private static boolean touched = false;
 	private static FloatBuffer longSegmentVB = null;
 	private static FloatBuffer shortSegmentVB = null;
 
-	private static float lastFrameXLoc = -1;
-	private static float lastFrameYLoc = -1;
-	private static float currXDragTotal = 0;
+	private static float lastFrameY = -1;
 	private static float currYDragTotal = 0;
 
+	private long lastTapTime = 0;
+	
 	public BpmView(TouchableSurfaceView parent) {
 		super(parent);
+	}
+	
+	public void setBPM(float bpm) {
+		setText(String.valueOf((int) Managers.midiManager.setBPM(bpm)));
+	}
+	
+	@Override
+	public void init() {
+		initSegmentVBs();
+	}
+
+	@Override
+	public void draw() {
+		drawSegments();
+	}
+
+	protected void loadIcons() {
+		// no icons to load
+	}
+	
+	@Override
+	protected void createChildren() {
+		// leaf view
+	}
+
+	@Override
+	public void layoutChildren() {
+		// leaf view
+	}
+
+	@Override
+	public void handleActionDown(int id, float x, float y) {
+		super.handleActionDown(id, x, y);
+		lastFrameY = y;
+	}
+
+	@Override
+	public void handleActionMove(int id, float x, float y) {
+		super.handleActionMove(id, x, y);
+		if (id != 0)
+			return; // only one pointer drags bpm
+		currYDragTotal += lastFrameY - y;
+		lastFrameY = y;
+		if (Math.abs(currYDragTotal) > INC_BPM_THRESH) {
+			if (currYDragTotal <= 0) {
+				setBPM(Managers.midiManager.getBPM() - 1);
+			} else {
+				setBPM(Managers.midiManager.getBPM() + 1);
+			}
+			currYDragTotal %= INC_BPM_THRESH;
+		}
+	}
+
+	@Override
+	public void handleActionUp(int id, float x, float y) {
+		super.handleActionUp(id, x, y);
+	}
+	
+	@Override
+	protected void singleTap(int id, float x, float y) {
+		long tapTime = System.currentTimeMillis();
+		float millisElapsed = tapTime - lastTapTime;
+		lastTapTime = tapTime;
+		float bpm = 60000 / millisElapsed;
+		if (bpm <= MidiManager.MAX_BPM + 20 && bpm >= MidiManager.MIN_BPM - 20) {
+			// if we are far outside of the range, don't change the tempo.
+			// otherwise, midiManager will take care of clipping the result
+			setBPM(bpm);
+		}
+	}
+
+	@Override
+	protected void doubleTap(int id, float x, float y) {
+		singleTap(id, x, y);
+	}
+
+	@Override
+	protected void longPress(int id, float x, float y) {
+		GlobalVars.mainActivity.showDialog(BeatBotActivity.BPM_DIALOG_ID);
 	}
 	
 	private void initSegmentVBs() {
@@ -34,7 +115,7 @@ public class BpmView extends TouchableBBView {
 		shortSegmentVB = makeFloatBuffer(shortSegmentBuf);
 	}
 
-	public void setText(String text) {
+	private void setText(String text) {
 		if (text.length() > 3)
 			return;
 		for (int i = 0; i < 3 - text.length(); i++) {
@@ -140,99 +221,36 @@ public class BpmView extends TouchableBBView {
 		}
 	}
 
-	private static float[] calculateColor(boolean on) {
-		if (on) {
-			return touched ? Colors.BPM_ON_SELECTED : Colors.BPM_ON;
-		} else {
-			return touched ? Colors.BPM_OFF_SELECTED : Colors.BPM_OFF;
-		}
-	}
-
-	protected void loadIcons() {
-		// no icons to load
-	}
-	
-	@Override
-	public void init() {
-		initSegmentVBs();
-	}
-
 	private void drawSegments() {
 		gl.glPushMatrix();
 		for (int i = 0; i < 3; i++) {
 			gl.glPushMatrix();
 			// long segments
 			gl.glTranslatef(4, 4, 0);
-			drawTriangleStrip(longSegmentVB, calculateColor(segments[i][0]));
+			drawTriangleStrip(longSegmentVB, calculateSegmentColor(segments[i][0]));
 			gl.glPushMatrix();
 			gl.glTranslatef(0, (height - 9) / 2, 0);
-			drawTriangleStrip(longSegmentVB, calculateColor(segments[i][1]));
+			drawTriangleStrip(longSegmentVB, calculateSegmentColor(segments[i][1]));
 			gl.glTranslatef((width - 10) / 3 - 10, -(height - 9) / 2, 0);
-			drawTriangleStrip(longSegmentVB, calculateColor(segments[i][2]));
+			drawTriangleStrip(longSegmentVB, calculateSegmentColor(segments[i][2]));
 			gl.glTranslatef(0, (height - 9) / 2, 0);
-			drawTriangleStrip(longSegmentVB, calculateColor(segments[i][3]));
+			drawTriangleStrip(longSegmentVB, calculateSegmentColor(segments[i][3]));
 			// short segments
 			gl.glPopMatrix();
 			gl.glTranslatef(1, 0, 0);
-			drawTriangleStrip(shortSegmentVB, calculateColor(segments[i][4]));
+			drawTriangleStrip(shortSegmentVB, calculateSegmentColor(segments[i][4]));
 			gl.glTranslatef(0, (height - 9) / 2 - 1, 0);
-			drawTriangleStrip(shortSegmentVB, calculateColor(segments[i][5]));
+			drawTriangleStrip(shortSegmentVB, calculateSegmentColor(segments[i][5]));
 			gl.glTranslatef(0, (height - 9) / 2, 0);
-			drawTriangleStrip(shortSegmentVB, calculateColor(segments[i][6]));
+			drawTriangleStrip(shortSegmentVB, calculateSegmentColor(segments[i][6]));
 			gl.glPopMatrix();
 			// translate for next digit
 			gl.glTranslatef((width - 8) / 3, 0, 0);
 		}
 		gl.glPopMatrix();
 	}
-
-	@Override
-	public void draw() {
-		drawSegments();
-	}
-
-	@Override
-	public void handleActionDown(int id, float x, float y) {
-		touched = true;
-		lastFrameXLoc = x;
-		lastFrameYLoc = y;
-	}
-
-	@Override
-	public void handleActionMove(int id, float x, float y) {
-		if (id != 0)
-			return; // only one pointer drags bpm
-		currXDragTotal += x - lastFrameXLoc;
-		currYDragTotal += lastFrameYLoc - y;
-		lastFrameXLoc = x;
-		lastFrameYLoc = y;
-		if (Math.abs(currYDragTotal) > INC_BPM_THRESH) {
-			float newBPM = currYDragTotal < 0 ? Managers.midiManager.getBPM() - 1
-					: Managers.midiManager.getBPM() + 1;
-			Managers.midiManager.setBPM(newBPM);
-			setText(String.valueOf((int) newBPM));
-			currYDragTotal %= INC_BPM_THRESH;
-		} else if (Math.abs(currXDragTotal) > INC_BPM_THRESH) {
-			float newBPM = currXDragTotal < 0 ? Managers.midiManager.getBPM() - 1
-					: Managers.midiManager.getBPM() + 1;
-			Managers.midiManager.setBPM(newBPM);
-			setText(String.valueOf((int) newBPM));
-			currXDragTotal %= INC_BPM_THRESH;
-		}
-	}
-
-	@Override
-	public void handleActionUp(int id, float x, float y) {
-		touched = false;
-	}
-
-	@Override
-	protected void createChildren() {
-		// leaf view
-	}
-
-	@Override
-	public void layoutChildren() {
-		// leaf view
+	
+	private float[] calculateSegmentColor(boolean on) {
+		return pointerCount() > 0 ? on ? Colors.BPM_ON_SELECTED : Colors.BPM_OFF_SELECTED : on ? Colors.BPM_ON : Colors.BPM_OFF;
 	}
 }

@@ -9,13 +9,6 @@ import com.kh.beatbot.view.group.MainPage;
 public class GlobalVars {
 
 	public static Typeface font;
-	// time (in millis) between pointer down and pointer up to be considered a
-	// tap
-	public final static long SINGLE_TAP_TIME = 200;
-	// time (in millis) between taps before handling as a double-tap
-	public final static long DOUBLE_TAP_TIME = 300;
-	// time (in millis) for a long press in one location
-	public final static long LONG_CLICK_TIME = 500;
 
 	public final static int MAX_EFFECTS_PER_TRACK = 3; // also in jni/Track.h,
 														// ugly but necessary
