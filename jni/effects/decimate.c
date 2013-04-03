@@ -5,8 +5,8 @@ DecimateConfig *decimateconfig_create() {
 			sizeof(DecimateConfig));
 	decimateConfig->cnt = 0;
 	decimateConfig->y = 0;
-	decimateConfig->bits = 16;
 	decimateConfig->rate = .5f;
+	decimateconfig_setParam(decimateConfig, 1, 16);
 	return decimateConfig;
 }
 
@@ -18,13 +18,10 @@ void decimateconfig_destroy(void *p) {
 void decimateconfig_setParam(void *p, float paramNumFloat, float param) {
 	int paramNum = (int)paramNumFloat;
 	DecimateConfig *config = (DecimateConfig *) p;
-	if (paramNum == 0) { // rate
-		config->rate = param;
+	if (paramNum == 0) { // rate converted to 0-1 range
+		config->rate = param * INV_SAMPLE_RATE;
 	} else if (paramNum == 1) { // bits
-		// bits range from 4 to 32
-		param *= 28;
-		param += 4;
-		if ((int) param != 0)
-			config->bits = (int) param;
+		config->bits = (int) param;
+		config->m = 1 << (config->bits - 1); // m = 2^bits
 	}
 }

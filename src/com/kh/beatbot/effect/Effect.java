@@ -8,10 +8,8 @@ import com.kh.beatbot.manager.Managers;
 public abstract class Effect implements Comparable<Effect> {
 	protected List<Param> params = new ArrayList<Param>();
 
-	protected int trackNum;
-	protected int position;
-	protected boolean on;
-	protected boolean paramsLinked = false;
+	protected int trackNum, position;
+	protected boolean on, paramsLinked;
 
 	public Effect(int trackNum) {
 		this.trackNum = trackNum;
@@ -21,10 +19,10 @@ public abstract class Effect implements Comparable<Effect> {
 	public Effect(int trackNum, int position) {
 		this.trackNum = trackNum;
 		this.position = position;
-		this.on = true;
+		paramsLinked = false;
 		initParams();
 		addEffect(trackNum, getNum(), position);
-		setEffectOn(trackNum, position, on);
+		setOn(true);
 	}
 
 	public abstract int getNum();
@@ -33,7 +31,8 @@ public abstract class Effect implements Comparable<Effect> {
 	public abstract ParamData[] getParamsData();
 	
 	public void setOn(boolean on) {
-		
+		this.on = on;
+		setEffectOn(trackNum, position, on);
 	}
 
 	public boolean isOn() {

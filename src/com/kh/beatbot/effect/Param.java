@@ -30,9 +30,9 @@ public class Param {
 		if (beatSync) {
 			this.level = quantizeToBeat(level);
 		} else if (paramData.logScale) {
-			this.level = paramData.scaleValue * logScaleLevel(level);
+			this.level = paramData.addValue + paramData.scaleValue * logScaleLevel(level);
 		} else {
-			this.level = paramData.scaleValue * level;
+			this.level = paramData.addValue + paramData.scaleValue * level;
 		}
 	}
 
