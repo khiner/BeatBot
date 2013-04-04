@@ -18,8 +18,9 @@ import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class ControlButtonGroup extends TouchableBBView {
 
-	ToggleButton playButton, recordButton, copyButton, stopButton;
-	ImageButton deleteButton, undoButton;
+	ToggleButton playButton, recordButton, copyButton;
+	ImageButton stopButton, undoButton, deleteButton;
+	
 	public BpmView bpmView;
 
 	public ControlButtonGroup(TouchableSurfaceView parent) {
@@ -39,7 +40,7 @@ public class ControlButtonGroup extends TouchableBBView {
 	@Override
 	protected void createChildren() {
 		playButton = new ToggleButton((TouchableSurfaceView) root);
-		stopButton = new ToggleButton((TouchableSurfaceView) root);
+		stopButton = new ImageButton((TouchableSurfaceView) root);
 		recordButton = new ToggleButton((TouchableSurfaceView) root);
 		copyButton = new ToggleButton((TouchableSurfaceView) root);
 		deleteButton = new ImageButton((TouchableSurfaceView) root);
@@ -88,7 +89,6 @@ public class ControlButtonGroup extends TouchableBBView {
 			@Override
 			public void onClick(Button button) {
 				playButton.setChecked(false);
-				stopButton.setChecked(false);
 				if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
 					recordButton.setChecked(false);
 					playButton.getOnClickListener().onClick(playButton);
@@ -166,17 +166,16 @@ public class ControlButtonGroup extends TouchableBBView {
 
 	@Override
 	protected void loadIcons() {
-		ImageIconSource playButtonIcon = new ImageIconSource(R.drawable.play_icon, R.drawable.play_icon_selected);
-		ImageIconSource stopButtonIcon = new ImageIconSource(R.drawable.stop_icon, R.drawable.stop_icon_selected);
-		ImageIconSource recButtonIcon = new ImageIconSource(R.drawable.rec_off_icon, R.drawable.rec_on_icon_selected);
-		ImageIconSource copyButtonIcon = new ImageIconSource(R.drawable.copy_icon, R.drawable.copy_icon_selected);
-		ImageIconSource deleteButtonIcon = new ImageIconSource(R.drawable.delete_icon, R.drawable.delete_icon_selected);
-		ImageIconSource undoButtonIcon = new ImageIconSource(R.drawable.undo_icon, R.drawable.undo_icon_selected);
-		
-		playButtonIcon.setPressedIcon(R.drawable.play_icon_pressed);
-		recButtonIcon.setPressedIcon(R.drawable.rec_icon_pressed);
-		copyButtonIcon.setDisabledIcon(R.drawable.copy_icon_inactive);
-		deleteButtonIcon.setDisabledIcon(R.drawable.delete_icon_inactive);
+		ImageIconSource playButtonIcon = new ImageIconSource(R.drawable.play_icon, R.drawable.play_icon_pressed, 
+				R.drawable.play_icon_selected, -1);
+		ImageIconSource stopButtonIcon = new ImageIconSource(R.drawable.stop_icon, R.drawable.stop_icon_pressed);
+		ImageIconSource recButtonIcon = new ImageIconSource(R.drawable.rec_off_icon, R.drawable.rec_icon_pressed,
+				R.drawable.rec_on_icon_selected);
+		ImageIconSource copyButtonIcon = new ImageIconSource(R.drawable.copy_icon, R.drawable.copy_icon_pressed,
+				R.drawable.copy_icon_pressed, R.drawable.copy_icon_inactive);
+		ImageIconSource deleteButtonIcon = new ImageIconSource(R.drawable.delete_icon, R.drawable.delete_icon_pressed, 
+				-1, R.drawable.delete_icon_inactive);
+		ImageIconSource undoButtonIcon = new ImageIconSource(R.drawable.undo_icon, R.drawable.undo_icon_pressed);
 		
 		playButton.setIconSource(playButtonIcon);
 		stopButton.setIconSource(stopButtonIcon);

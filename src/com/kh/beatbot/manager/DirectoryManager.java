@@ -137,29 +137,41 @@ public class DirectoryManager {
 		getDrumInstrument(0).setIconSource(new ImageIconSource(
 				R.drawable.kick_icon,
 				R.drawable.kick_icon_selected,
+				-1,
+				-1,
 				R.drawable.kick_icon_listview,
 				R.drawable.kick_icon_list_title));
 		getDrumInstrument(1).setIconSource(new ImageIconSource(
 				R.drawable.snare_icon,
 				R.drawable.snare_icon_selected,
+				-1,
+				-1,
 				R.drawable.snare_icon_listview,
 				R.drawable.snare_icon_list_title));
 		getDrumInstrument(2).setIconSource(new ImageIconSource(
 				R.drawable.hh_closed_icon,
 				R.drawable.hh_closed_icon_selected,
+				-1,
+				-1,
 				R.drawable.hh_closed_icon_listview,
 				R.drawable.hh_closed_icon_list_title));
 		getDrumInstrument(3).setIconSource(new ImageIconSource(
 				R.drawable.hh_open_icon,
 				R.drawable.hh_open_icon_selected,
+				-1,
+				-1,
 				R.drawable.hh_open_icon_listview,
 				R.drawable.hh_open_icon_list_title));
 		getDrumInstrument(4).setIconSource(new ImageIconSource(
 				R.drawable.rimshot_icon,
 				R.drawable.rimshot_icon_selected,
+				-1,
+				-1,
 				R.drawable.rimshot_icon_listview,
 				R.drawable.rimshot_icon_list_title));
 		drumsDirectory.setIconSource(new ImageIconSource(
+				-1,
+				-1,
 				-1,
 				-1,
 				R.drawable.drums_icon_listview,
@@ -167,15 +179,22 @@ public class DirectoryManager {
 		internalRecordDirectory.setIconSource(new ImageIconSource(
 				R.drawable.microphone_icon,
 				R.drawable.microphone_icon_selected,
+				-1,
+				-1,
 				R.drawable.microphone_icon_listview,
 				R.drawable.microphone_icon_list_title));
 		internalBeatRecordDirectory.setIconSource(new ImageIconSource(
 				R.drawable.beat_icon,
-				R.drawable.beat_icon_selected, R.drawable.beat_icon_listview,
+				R.drawable.beat_icon_selected,
+				-1,
+				-1,
+				R.drawable.beat_icon_listview,
 				R.drawable.beat_icon_list_title));
 		internalSampleRecordDirectory.setIconSource(new ImageIconSource(
 				R.drawable.sample_icon,
 				R.drawable.sample_icon_selected,
+				-1,
+				-1,
 				R.drawable.sample_icon_listview,
 				R.drawable.sample_icon_list_title));
 	}

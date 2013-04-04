@@ -43,7 +43,7 @@ public class TextButton extends ToggleButton {
 		if (text == null)
 			return;
 		// draw string in center of rect
-		float[] textColor = touched ? strokeColorSet.pressedColor : checked ? strokeColorSet.selectedColor : strokeColorSet.defaultColor;
+		float[] textColor = pressed ? strokeColorSet.pressedColor : checked ? strokeColorSet.selectedColor : strokeColorSet.defaultColor;
 		drawText(text, textColor, (int)textHeight, textXOffset, textYOffset);
 	}
 

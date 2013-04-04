@@ -57,7 +57,7 @@ public class MainPage extends TouchableBBView {
 		
 		controlButtonGroup.layout(this, 0, 0, width, controlButtonHeight);
 		midiTrackControl.layout(this, 0, controlButtonHeight, trackControlWidth, midiHeight);
-		midiView.layout(this, trackControlWidth, controlButtonHeight, width - trackControlWidth, midiHeight);
+		midiView.layout(this, trackControlWidth, controlButtonHeight, width - trackControlWidth - 15, midiHeight);
 		pageSelectGroup.layout(this, 0, controlButtonHeight + midiHeight, width, height - midiHeight - controlButtonHeight);
 	}
 

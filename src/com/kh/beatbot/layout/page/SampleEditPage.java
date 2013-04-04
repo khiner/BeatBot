@@ -50,7 +50,7 @@ public class SampleEditPage extends Page {
 		previewButton.setOnClickListener(new BBOnClickListener() {
 			@Override
 			public void onClick(Button button) {
-				if (button.isTouched()) {
+				if (button.isPressed()) {
 					TrackManager.currTrack.preview();
 				} else {
 					TrackManager.currTrack.stopPreviewing();

@@ -5,17 +5,11 @@ public abstract class IconSource {
 	
 	public IconSource() {}
 	
-	public IconSource(Icon defaultIcon, Icon selectedIcon) {
+	public IconSource(Icon defaultIcon, Icon pressedIcon, Icon selectedIcon, Icon disabledIcon) {
 		this.defaultIcon = defaultIcon;
-		this.selectedIcon = selectedIcon;
-	}
-
-	public void setDisabledIcon(Icon disabledIcon) {
-		this.disabledIcon = disabledIcon;
-	}
-	
-	public void setPressedIcon(Icon pressedIcon) {
 		this.pressedIcon = pressedIcon;
+		this.selectedIcon = selectedIcon;
+		this.disabledIcon = disabledIcon;
 	}
 	
 	public float getWidth() {

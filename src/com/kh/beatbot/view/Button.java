@@ -5,7 +5,7 @@ import com.kh.beatbot.listener.BBOnClickListener;
 public abstract class Button extends TouchableBBView {
 	private BBOnClickListener listener;
 	
-	protected boolean enabled = false, touched = false;
+	protected boolean enabled = true, pressed = false;
 	
 	public Button(TouchableSurfaceView parent) {
 		super(parent);
@@ -19,15 +19,12 @@ public abstract class Button extends TouchableBBView {
 		this.listener = listener;
 	}
 	
-	protected void touch() {
-		touched = true;
-		notifyClicked();
+	protected void press() {
+		pressed = true;
 	}
 
-	protected void release(boolean sendEvent) {
-		touched = false;
-		if (sendEvent)
-			notifyClicked();
+	protected void release() {
+		pressed = false;
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -38,29 +35,47 @@ public abstract class Button extends TouchableBBView {
 		return enabled;
 	}
 	
-	public boolean isTouched() {
-		return touched;
+	public boolean isPressed() {
+		return pressed;
 	}
 	
-	protected final void notifyClicked() {
+	protected void notifyClicked() {
 		if (listener != null)
 			listener.onClick(this);
 	}
 
 	@Override
 	public void handleActionDown(int id, float x, float y) {
-		touch();
+		if (!enabled) {
+			return;
+		}
+		press();
 	}
 
 	@Override
 	public void handleActionUp(int id, float x, float y) {
-		release(x >= 0 && x <= width && y >= 0 && y <= height);
+		if (!enabled) {
+			return;
+		}
+		if (pressed) {
+			release();
+			notifyClicked();
+		}
 	}
 
 	@Override
 	public void handleActionMove(int id, float x, float y) {
-		if (x < 0 || x > width || y < 0 || y > height) {
-			release(false);
+		if (!enabled) {
+			return;
+		}
+		if (x < 0 || x >= width || y < 0 || y > height) {
+			if (pressed) { // pointer dragged away from button - signal release
+				release();
+			}
+		} else { // pointer inside button
+			if (!pressed) { // pointer was dragged away and back IN to button
+				press();
+			}
 		}
 	}
 }

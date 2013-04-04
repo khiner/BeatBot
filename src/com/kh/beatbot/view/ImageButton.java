@@ -26,21 +26,21 @@ public class ImageButton extends Button {
 	}
 
 	@Override
-	protected void touch() {
-		currentIcon = iconSource.selectedIcon;
-		super.touch();
+	protected void press() {
+		super.press();
+		currentIcon = iconSource.pressedIcon;
 	}
 	
 	@Override
-	protected void release(boolean sendEvent) {
+	protected void release() {
+		super.release();
 		currentIcon = iconSource.defaultIcon;
-		super.release(sendEvent);
 	}
 	
 	public void setEnabled(boolean enabled) {
+		super.setEnabled(enabled);
 		currentIcon = enabled ? iconSource.defaultIcon : (iconSource.disabledIcon != null ?
 				iconSource.disabledIcon : null);
-		super.setEnabled(enabled);
 	}
 
 	public float getIconWidth() {
