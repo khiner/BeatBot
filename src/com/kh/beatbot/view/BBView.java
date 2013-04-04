@@ -105,6 +105,9 @@ public abstract class BBView {
 	}
 	
 	public void drawAll() {
+		// scissor ensures that each view can only draw within its rect
+		gl.glEnable(GL10.GL_SCISSOR_TEST);
+		gl.glScissor((int)absoluteX, (int)(root.getHeight() - absoluteY - height), (int)width, (int)height);
 		draw();
 		for (int i = 0; i < children.size(); i++) {
 			// not using foreach to avoid concurrent modification
@@ -114,6 +117,7 @@ public abstract class BBView {
 			child.drawAll();
 			pop();
 		}
+		gl.glDisable(GL10.GL_SCISSOR_TEST);
 	}
 	
 	public void initGl(GL10 _gl) {

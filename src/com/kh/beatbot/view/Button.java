@@ -18,7 +18,7 @@ public abstract class Button extends TouchableBBView {
 	public final void setOnClickListener(BBOnClickListener listener) {
 		this.listener = listener;
 	}
-
+	
 	protected void touch() {
 		touched = true;
 		notifyClicked();

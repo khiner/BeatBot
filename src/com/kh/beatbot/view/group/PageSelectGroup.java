@@ -167,7 +167,7 @@ public class PageSelectGroup extends TouchableBBView {
 		levelsButton.layout(this, buttonHeight * 2 + 5 * labelWidth, labelYOffset, buttonHeight, buttonHeight);
 		pager.layout(this, 0, buttonHeight + 2 * labelYOffset, width, height - buttonHeight - 2 * labelYOffset);
 	}
-
+	
 	@Override
 	protected void loadIcons() {
 		addTrackButton.setIconSource(new ImageIconSource(R.drawable.plus_outline, R.drawable.plus_outline));

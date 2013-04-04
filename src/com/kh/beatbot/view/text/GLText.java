@@ -152,9 +152,9 @@ public class GLText {
 		textureIds = new int[1];
 	}
 
-	public void loadTexture(GLSurfaceViewBase view) {
+	public void loadTexture() {
 		// load bitmap texture in OpenGL
-		view.loadTexture(bitmap, textureIds, 0);
+		GLSurfaceViewBase.loadTexture(bitmap, textureIds, 0);
 	}
 
 	// D: draw text at the specified x,y position

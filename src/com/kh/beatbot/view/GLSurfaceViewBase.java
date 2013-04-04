@@ -69,7 +69,6 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 	}
 
 	protected void initGl(GL10 _gl) {
-		gl.glEnable(GL10.GL_POINT_SMOOTH);
 		gl.glEnable(GL10.GL_BLEND);
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
@@ -82,7 +81,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		glText = GLText.getInstance("REDRING-1969-v03.ttf", 50);
 		// since the GL10 instance potentially has changed,
 		// we need to reload the bitmap texture for the font
-		glText.loadTexture(this);
+		glText.loadTexture();
 	}
 	
 	public static final void drawText(String text, int height, float x, float y) {
@@ -114,7 +113,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
 				GL10.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
-		// bitmap.recycle();
+		bitmap.recycle();
 	}
 
 	public static final void loadTexture(int resourceId, int[] textureHandlers,

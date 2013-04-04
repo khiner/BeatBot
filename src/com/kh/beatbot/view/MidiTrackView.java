@@ -1,11 +1,9 @@
 package com.kh.beatbot.view;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.IconSource;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.global.Track;
@@ -99,8 +97,6 @@ public class MidiTrackView extends TouchableBBView {
 	private static IconSource muteIcon, soloIcon;
 	private static List<ButtonRow> buttonRows = new ArrayList<ButtonRow>();
 
-	private FloatBuffer bgVb = null;
-	
 	public MidiTrackView(TouchableSurfaceView parent) {
 		super(parent);
 	}
@@ -129,17 +125,12 @@ public class MidiTrackView extends TouchableBBView {
 	}
 
 	public void draw() {
-		// draw background fill
-		drawTriangleFan(bgVb, Colors.BG_COLOR);
-	}
-	
-	private void initBgVb() {
-		bgVb = makeRectFloatBuffer(0, 0, width, height);
+		// parent
 	}
 	
 	@Override
 	public void init() {
-		initBgVb();
+		// nothing
 	}
 
 	@Override

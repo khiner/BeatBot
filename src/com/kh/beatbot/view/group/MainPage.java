@@ -41,8 +41,8 @@ public class MainPage extends TouchableBBView {
 		pageSelectGroup = new PageSelectGroup((TouchableSurfaceView)root);
 		
 		addChild(controlButtonGroup);
-		addChild(midiView);
 		addChild(midiTrackControl);
+		addChild(midiView);
 		addChild(pageSelectGroup);
 	}
 

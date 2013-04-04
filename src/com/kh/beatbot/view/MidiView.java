@@ -374,7 +374,7 @@ public class MidiView extends ClickableBBView {
 	}
 
 	@Override
-	public void draw() {
+	public void draw() {	
 		TickWindowHelper.scroll(); // take care of any momentum scrolling
 
 		drawTriangleFan(bgVb, Colors.MIDI_VIEW_BG);
