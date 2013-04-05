@@ -1,9 +1,7 @@
 package com.kh.beatbot.layout.page.effect;
 
-import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Chorus;
 import com.kh.beatbot.effect.ParamData;
-import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.view.TouchableSurfaceView;
 
 
@@ -14,13 +12,13 @@ public class ChorusParamsPage extends EffectParamsPage {
 	}
 	
 	@Override
+	protected String getName() {
+		return Chorus.NAME;
+	}
+	
+	@Override
 	protected int getNumParams() {
 		return Chorus.NUM_PARAMS;
-	}
-
-	@Override
-	protected void loadIcons() {
-		toggleButton.setIconSource(new ImageIconSource(R.drawable.chorus_label_off, R.drawable.chorus_label_on));
 	}
 
 	@Override

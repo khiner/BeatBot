@@ -50,7 +50,7 @@
 	<string name="reverse">Reverse</string>
 	<string name="normalize">Normalize</string>
 	<string name="chorus">CHORUS</string>
-	<string name="decimate">DECIMATE</string>
+	<string name="decimate">CRUSH</string>
 	<string name="delay">DELAY</string>
 	<string name="flanger">FLANGER</string>
 	<string name="filter">FILTER</string>
@@ -59,7 +59,7 @@
 
 	<string-array name="effect_names">
 		<item name="chorus">CHORUS</item>
-		<item name="decimate">DECIMATE</item>
+		<item name="decimate">CRUSH</item>
 		<item name="delay">DELAY</item>>
 		<item name="flanger">FLANGER</item>
 		<item name="filter">FILTER</item>

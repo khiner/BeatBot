@@ -1,8 +1,8 @@
 package com.kh.beatbot.global;
 
-import com.kh.beatbot.R;
-
 import android.app.Activity;
+
+import com.kh.beatbot.R;
 
 public class Colors {
 	public static float[] BG_COLOR, BLACK, WHITE, GREEN, YELLOW,
@@ -26,6 +26,8 @@ public class Colors {
 		{.6f, .6f, .6f, 1},
 		{.7f, .7f, .7f, 1}
 	};
+	
+	public static ColorSet labelBgColorSet, labelStrokeColorSet;
 	
 	public static void initColors(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
@@ -72,9 +74,8 @@ public class Colors {
 		LABEL_VERY_LIGHT = colorResourceToFloats(activity, R.color.labelVeryLight);
 		LABEL_SELECTED = colorResourceToFloats(activity, R.color.labelSelected);
 		
-		
-		// varying darkness for vertical midi lines
-		
+		labelBgColorSet = new ColorSet(Colors.LABEL_DARK, Colors.VOLUME, Colors.LABEL_SELECTED);
+		labelStrokeColorSet = new ColorSet(Colors.WHITE, Colors.WHITE, Colors.BLACK);
 	}
 	
 	public static float[] colorResourceToFloats(Activity activity, int resourceId) {

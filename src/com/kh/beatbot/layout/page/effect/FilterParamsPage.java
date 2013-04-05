@@ -19,6 +19,11 @@ public class FilterParamsPage extends EffectParamsPage {
 	}
 
 	@Override
+	protected String getName() {
+		return Filter.NAME;
+	}
+	
+	@Override
 	protected int getNumParams() {
 		return Filter.NUM_PARAMS;
 	}
@@ -40,7 +45,6 @@ public class FilterParamsPage extends EffectParamsPage {
 
 	@Override
 	protected void loadIcons() {
-		toggleButton.setIconSource(new ImageIconSource(R.drawable.filter_label_off, R.drawable.filter_label_on));
 		filterToggles[0].setIconSource(new ImageIconSource(R.drawable.lowpass_filter_icon, R.drawable.lowpass_filter_icon_selected));
 		filterToggles[1].setIconSource(new ImageIconSource(R.drawable.bandpass_filter_icon, R.drawable.bandpass_filter_icon_selected));
 		filterToggles[2].setIconSource(new ImageIconSource(R.drawable.highpass_filter_icon, R.drawable.highpass_filter_icon_selected));

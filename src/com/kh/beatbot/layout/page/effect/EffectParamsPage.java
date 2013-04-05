@@ -1,12 +1,15 @@
 package com.kh.beatbot.layout.page.effect;
 
+import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.effect.ParamData;
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.view.Button;
+import com.kh.beatbot.view.TextButton;
 import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.TouchableSurfaceView;
@@ -18,13 +21,14 @@ public abstract class EffectParamsPage extends TouchableBBView implements Level1
 	protected ParamControl[] paramControls;
 	protected Effect effect;
 	protected int xParamIndex = 0, yParamIndex = 1; 
-	protected ToggleButton toggleButton;
+	protected TextButton toggleButton;
 	
 	public EffectParamsPage(TouchableSurfaceView parent) {
 		super(parent);
 	}
 	
 	protected abstract int getNumParams();
+	protected abstract String getName();
 	protected abstract ParamData[] getParamsData();
 	
 	public final void setXLevel(float level) {
@@ -52,6 +56,11 @@ public abstract class EffectParamsPage extends TouchableBBView implements Level1
 	}
 	
 	@Override
+	protected void loadIcons() {
+		toggleButton.setText(getName());
+	}
+	
+	@Override
 	public void init() {
 		// parent
 	}
@@ -63,7 +72,7 @@ public abstract class EffectParamsPage extends TouchableBBView implements Level1
 	
 	@Override
 	public void createChildren() {
-		toggleButton = new ToggleButton((TouchableSurfaceView)root);
+		toggleButton = new TextButton((TouchableSurfaceView) root, Colors.labelBgColorSet, Colors.labelStrokeColorSet, R.drawable.off_icon, -1, R.drawable.on_icon);
 		toggleButton.setOnClickListener(new BBOnClickListener() {
 			@Override
 			public void onClick(Button button) {
@@ -79,7 +88,7 @@ public abstract class EffectParamsPage extends TouchableBBView implements Level1
 	
 	@Override
 	public void layoutChildren() {
-		toggleButton.layout(this, width / 6, 0,  2 * width / 3, 2 * width / 9);
+		toggleButton.layout(this, 0, 0, width, width / 5);
 		int halfParams = (getNumParams() + 1) / 2;
 		float paramW = getNumParams() <= 3 ? width / getNumParams() : width / halfParams;
 		float paramH = 3 * paramW / 2;

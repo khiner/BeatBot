@@ -2,7 +2,6 @@ package com.kh.beatbot.view.group;
 
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.ColorSet;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.layout.page.AdsrPage;
@@ -71,15 +70,13 @@ public class PageSelectGroup extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		ColorSet bgColorSet = new ColorSet(Colors.LABEL_DARK, Colors.VOLUME, Colors.LABEL_SELECTED);
-		ColorSet strokeColorSet = new ColorSet(Colors.WHITE, Colors.WHITE, Colors.BLACK);
 		addTrackButton = new ImageButton((TouchableSurfaceView) root);
 		instrumentSelectButton = new ImageButton((TouchableSurfaceView) root);
-		sampleSelectButton = new TextButton((TouchableSurfaceView) root, bgColorSet, strokeColorSet);
-		textButtons[LEVELS_FX_PAGE_ID] = new TextButton((TouchableSurfaceView) root, bgColorSet, strokeColorSet);
-		textButtons[EDIT_PAGE_ID] = new TextButton((TouchableSurfaceView) root, bgColorSet, strokeColorSet);
-		textButtons[ADSR_PAGE_ID] = new TextButton((TouchableSurfaceView) root, bgColorSet, strokeColorSet);
-		textButtons[MASTER_PAGE_ID] = new TextButton((TouchableSurfaceView) root, bgColorSet, strokeColorSet);
+		sampleSelectButton = new TextButton((TouchableSurfaceView) root, Colors.labelBgColorSet, Colors.labelStrokeColorSet);
+		for (int i = 0; i < textButtons.length; i++) {
+			textButtons[i] = new TextButton((TouchableSurfaceView) root, Colors.labelBgColorSet, Colors.labelStrokeColorSet);
+		}
+
 		levelsButton = new ImageButton((TouchableSurfaceView) root);
 		
 		addTrackButton.setOnClickListener(new BBOnClickListener() {

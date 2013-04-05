@@ -19,11 +19,11 @@ public abstract class Button extends TouchableBBView {
 		this.listener = listener;
 	}
 	
-	protected void press() {
+	public void press() {
 		pressed = true;
 	}
 
-	protected void release() {
+	public void release() {
 		pressed = false;
 	}
 

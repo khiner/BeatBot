@@ -26,13 +26,13 @@ public class ImageButton extends Button {
 	}
 
 	@Override
-	protected void press() {
+	public void press() {
 		super.press();
 		currentIcon = iconSource.pressedIcon;
 	}
 	
 	@Override
-	protected void release() {
+	public void release() {
 		super.release();
 		currentIcon = iconSource.defaultIcon;
 	}

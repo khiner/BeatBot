@@ -20,6 +20,11 @@ public class DelayParamsPage extends EffectParamsPage {
 	}
 
 	@Override
+	protected String getName() {
+		return Delay.NAME;
+	}
+	
+	@Override
 	protected int getNumParams() {
 		return Delay.NUM_PARAMS;
 	}
@@ -34,7 +39,6 @@ public class DelayParamsPage extends EffectParamsPage {
 
 	@Override
 	protected void loadIcons() {
-		toggleButton.setIconSource(new ImageIconSource(R.drawable.delay_label_off, R.drawable.delay_label_on));
 		linkToggle.setIconSource(new ImageIconSource(R.drawable.link_broken, R.drawable.link));
 	}
 

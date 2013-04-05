@@ -78,7 +78,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 	public void initGlText() {
 		// load font file once, with static height
 		// to change height, simply use gl.scale()
-		glText = GLText.getInstance("REDRING-1969-v03.ttf", 50);
+		glText = GLText.getInstance("REDRING-1969-v03.ttf", 30);
 		// since the GL10 instance potentially has changed,
 		// we need to reload the bitmap texture for the font
 		glText.loadTexture();

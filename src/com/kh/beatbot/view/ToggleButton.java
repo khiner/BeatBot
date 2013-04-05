@@ -22,7 +22,7 @@ public class ToggleButton extends ImageButton {
 		}
 	}
 
-	protected void release() {
+	public void release() {
 		super.release();
 		currentIcon = checked ? iconSource.selectedIcon != null ? iconSource.selectedIcon : iconSource.pressedIcon : iconSource.defaultIcon;
 	}
@@ -36,7 +36,7 @@ public class ToggleButton extends ImageButton {
 		release();
 	}
 
-	protected void press() {
+	public void press() {
 		super.press();
 		currentIcon = iconSource.pressedIcon != null ? iconSource.pressedIcon
 				: checked ? iconSource.defaultIcon : iconSource.selectedIcon;

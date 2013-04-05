@@ -13,6 +13,7 @@ public class RoundedRectIcon extends Icon {
 	private float[] bgColor;
 	private float[] borderColor;
 	private float width, height, xScaleFactor, yScaleFactor;
+	
 	public RoundedRectIcon(FloatBuffer roundedRectBuffer, float width, float height, float borderWeight, float[] bgColor, float[] borderColor) {
 		this.roundedRectBuffer = roundedRectBuffer;
 		this.width = width;
