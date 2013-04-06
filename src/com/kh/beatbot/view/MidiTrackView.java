@@ -3,9 +3,8 @@ package com.kh.beatbot.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kh.beatbot.R;
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.IconSource;
-import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.Managers;
@@ -15,7 +14,8 @@ public class MidiTrackView extends TouchableBBView {
 
 	public class ButtonRow extends TouchableBBView {
 		int trackNum;
-		ToggleButton instrumentButton, muteButton, soloButton;
+		ToggleButton instrumentButton;
+		TextButton muteButton, soloButton;
 		
 		public ButtonRow(TouchableSurfaceView parent, int trackNum) {
 			super(parent);
@@ -34,8 +34,8 @@ public class MidiTrackView extends TouchableBBView {
 		@Override
 		public void init() {
 			instrumentButton.setIconSource(Managers.trackManager.getTrack(trackNum).getInstrument().getIconSource());
-			muteButton.setIconSource(muteIcon);
-			soloButton.setIconSource(soloIcon);
+			muteButton.setText("M");
+			soloButton.setText("S");
 			instrumentButton.setOnClickListener(new BBOnClickListener() {
 				@Override
 				public void onClick(Button button) {
@@ -79,8 +79,10 @@ public class MidiTrackView extends TouchableBBView {
 		@Override
 		protected void createChildren() {
 			instrumentButton = new ToggleButton((TouchableSurfaceView)root);
-			muteButton = new ToggleButton((TouchableSurfaceView)root);
-			soloButton = new ToggleButton((TouchableSurfaceView)root);
+			muteButton = new TextButton((TouchableSurfaceView) root,
+					Colors.muteButtonColorSet, Colors.labelStrokeColorSet);
+			soloButton = new TextButton((TouchableSurfaceView) root,
+					Colors.soloButtonColorSet, Colors.labelStrokeColorSet);
 			addChild(instrumentButton);
 			addChild(muteButton);
 			addChild(soloButton);
@@ -94,7 +96,6 @@ public class MidiTrackView extends TouchableBBView {
 		}
 	}
 
-	private static IconSource muteIcon, soloIcon;
 	private static List<ButtonRow> buttonRows = new ArrayList<ButtonRow>();
 
 	public MidiTrackView(TouchableSurfaceView parent) {
@@ -103,10 +104,6 @@ public class MidiTrackView extends TouchableBBView {
 	
 	protected void loadIcons() {
 		Managers.directoryManager.loadIcons();
-		muteIcon = new ImageIconSource(R.drawable.mute_icon,
-				R.drawable.mute_icon_selected);
-		soloIcon = new ImageIconSource(R.drawable.solo_icon,
-				R.drawable.solo_icon_selected);
 	}
 
 	public void updateInstrumentIcon(int trackNum) {

@@ -91,7 +91,7 @@ public class LevelsView extends TouchableBBView {
 	private void drawSelectRegion() {
 		if (!selectRegion || selectRegionVb == null)
 			return;
-		drawTriangleFan(selectRegionVb, Colors.SELECT_REGION);
+		drawTriangleStrip(selectRegionVb, Colors.SELECT_REGION);
 	}
 
 	private void initSelectRegionVb(float leftTick, float rightTick,

@@ -21,8 +21,8 @@ public class RoundedRectIcon extends Icon {
 		this.borderWeight = borderWeight;
 		this.bgColor = bgColor;
 		this.borderColor = borderColor;
-		xScaleFactor = width / (borderWeight + width);
-		yScaleFactor = height / (borderWeight + height);
+		xScaleFactor = width / (borderWeight + width + 1);
+		yScaleFactor = height / (borderWeight + height + 1);
 	}
 	
 	@Override

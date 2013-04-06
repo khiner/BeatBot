@@ -14,7 +14,7 @@ public class Colors {
 			SAMPLE_LOOP_HIGHLIGHT, SAMPLE_LOOP_SELECT,
 			SAMPLE_LOOP_SELECT_SELECTED, SAMPLE_LOOP_SELECT_OUTLINE,
 			LABEL_DARK, LABEL_MED, LABEL_LIGHT, LABEL_VERY_LIGHT, 
-			LABEL_SELECTED;
+			LABEL_SELECTED, TRANSPARANT = {0,0,0,0};
 	
 	public static float[][] MIDI_LINES = {
 		{0, 0, 0, 1},
@@ -27,7 +27,7 @@ public class Colors {
 		{.7f, .7f, .7f, 1}
 	};
 	
-	public static ColorSet labelBgColorSet, labelStrokeColorSet;
+	public static ColorSet labelBgColorSet, labelStrokeColorSet, muteButtonColorSet, soloButtonColorSet;
 	
 	public static void initColors(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
@@ -76,6 +76,8 @@ public class Colors {
 		
 		labelBgColorSet = new ColorSet(Colors.LABEL_DARK, Colors.VOLUME, Colors.LABEL_SELECTED);
 		labelStrokeColorSet = new ColorSet(Colors.WHITE, Colors.WHITE, Colors.BLACK);
+		muteButtonColorSet = new ColorSet(Colors.TRANSPARANT, Colors.TRANSPARANT, Colors.LEVEL_SELECTED);
+		soloButtonColorSet = new ColorSet(Colors.TRANSPARANT, Colors.TRANSPARANT, Colors.PITCH);
 	}
 	
 	public static float[] colorResourceToFloats(Activity activity, int resourceId) {
