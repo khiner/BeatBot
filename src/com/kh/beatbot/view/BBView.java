@@ -113,7 +113,7 @@ public abstract class BBView {
 			// not using foreach to avoid concurrent modification
 			BBView child = children.get(i);
 			push();
-			translate(child.x, child.y);
+			//translate(child.x, child.y);
 			child.drawAll();
 			pop();
 		}

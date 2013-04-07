@@ -62,7 +62,7 @@ public class TextButton extends ToggleButton {
 
 	@Override
 	protected void loadIcons() {
-		setIconSource(new RoundedRectIconSource(width, height, bgColorSet,
+		setIconSource(new RoundedRectIconSource(absoluteX, absoluteY, width, height, bgColorSet,
 				strokeColorSet));
 		setText(text);
 

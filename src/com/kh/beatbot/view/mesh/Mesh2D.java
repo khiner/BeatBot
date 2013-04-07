@@ -18,6 +18,8 @@ public class Mesh2D {
 	/** The gl instance **/
 	private GL10 gl;
 
+	protected float outlineVertices[];
+	
 	/** vertex position buffer and array **/
 	protected float vertices[];
 	private int vertexHandle = -1;
@@ -29,7 +31,7 @@ public class Mesh2D {
 	private FloatBuffer colorBuffer;
 
 	/** vertex index at which the next vertex gets inserted **/
-	private int index = 0;
+	private int index = 0, outlineIndex = 0;
 
 	/** number of vertices defined for the mesh **/
 	protected int numVertices = 0;
@@ -43,9 +45,11 @@ public class Mesh2D {
 	/** mesh count **/
 	public static int meshes = 0;
 
-	public Mesh2D(GL10 gl, int numVertices, boolean hasColors) {
+	public Mesh2D(GL10 gl, int numVertices, int numOutlineVertices, boolean hasColors) {
 		this.gl = gl;
+		this.numVertices = numVertices;
 		vertices = new float[numVertices * 2];
+		outlineVertices = new float[numOutlineVertices * 2];
 		int[] buffer = new int[1];
 
 		((GL11) gl).glGenBuffers(1, buffer, 0);
@@ -78,7 +82,6 @@ public class Mesh2D {
 
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
 
-		numVertices = index;
 		index = 0;
 		dirty = false;
 	}
@@ -101,6 +104,8 @@ public class Mesh2D {
 
 		if (this == lastMesh && !wasDirty) {
 			gl.glDrawArrays(primitiveType, offset, numVertices);
+			gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+			((GL11) gl).glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
 			return;
 		}
 
@@ -147,6 +152,14 @@ public class Mesh2D {
 		index++;
 	}
 
+	public void outlineVertex(float x, float y) {
+		dirty = true;
+		int offset = outlineIndex * 2;
+		outlineVertices[offset] = x;
+		outlineVertices[offset + 1] = y;
+		outlineIndex++;
+	}
+	
 	/**
 	 * Sets the color of the current vertex
 	 * 
@@ -161,20 +174,14 @@ public class Mesh2D {
 	 */
 	public void color(float[] colors) {
 		dirty = true;
-		int offset = 0;
-		this.colors[offset] = colors[0];
-		this.colors[offset + 1] = colors[1];
-		this.colors[offset + 2] = colors[2];
-		this.colors[offset + 3] = colors[3];
+		this.colors[0] = colors[0];
+		this.colors[1] = colors[1];
+		this.colors[2] = colors[2];
+		this.colors[3] = colors[3];
 	}
 
 	public int getMaximumVertices() {
 		return vertices.length / 2;
-	}
-
-	public void reset() {
-		dirty = true;
-		index = 0;
 	}
 
 	public void dispose() {

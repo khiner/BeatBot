@@ -4,39 +4,56 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.util.FloatMath;
 
-import com.kh.beatbot.global.Colors;
-
 public class RoundedRectMesh extends Mesh2D {
 
-	private float width, height, cornerRadius;
+	private float x, y, width, height, cornerRadius;
+	private float[] color;
 	
-	public RoundedRectMesh(GL10 gl, float width, float height, float cornerRadius, int resolution) {
-		super(gl, resolution * 4, true);
+	public RoundedRectMesh(GL10 gl, float x, float y, float width, float height, float cornerRadius, int resolution, float[] color) {
+		super(gl, resolution * 4 * 3, resolution * 4, true);
+		this.x = x;
+		this.y = y;
 		this.width = width;
 		this.height = height;
 		this.cornerRadius = cornerRadius;
+		this.color = color;
 		addVertices();
 	}
 
 	private void addVertices() {
 		float theta = 0, addX, addY;
-		for (int i = 0; i < vertices.length / 2; i++) {
-			theta += 4 * ¹ / vertices.length;
+		float centerX = x + width / 2;
+		float centerY = y + height / 2;
+		float lastX = 0, lastY = 0;
+		for (int i = 0; i < vertices.length / 6; i++) {
+			theta += 4 * ¹ / (vertices.length / 3);
 			if (theta < ¹ / 2) { // lower right
-				addX = width / 2 - cornerRadius;
-				addY = height / 2 - cornerRadius;
+				addX = width - cornerRadius;
+				addY = height - cornerRadius;
 			} else if (theta < ¹) { // lower left
-				addX = -width / 2 + cornerRadius;
-				addY = height / 2 - cornerRadius;
+				addX =  cornerRadius;
+				addY = height - cornerRadius;
 			} else if (theta < 3 * ¹ / 2) { // upper left
-				addX = -width / 2 + cornerRadius;
-				addY = -height / 2 + cornerRadius;
+				addX =  cornerRadius;
+				addY =  cornerRadius;
 			} else { // upper right
-				addX = width / 2 - cornerRadius;
-				addY = -height / 2 + cornerRadius;
+				addX = width - cornerRadius;
+				addY = cornerRadius;
 			}
-			color(Colors.GREEN);
-			vertex(FloatMath.cos(theta) * cornerRadius + addX, FloatMath.sin(theta) * cornerRadius + addY); 
+			float vertexX = FloatMath.cos(theta) * cornerRadius + addX + x;
+			float vertexY = FloatMath.sin(theta) * cornerRadius + addY + y;
+			if (lastX != 0 && lastY != 0) {
+				vertex(vertexX, vertexY);
+				vertex(lastX, lastY);
+				vertex(centerX, centerY);
+			}
+			lastX = vertexX;
+			lastY = vertexY;
+			outlineVertex(vertexX, vertexY); 
 		}
+		vertex(vertices[0], vertices[1]);
+		vertex(lastX, lastY);
+		vertex(centerX, centerY);
+		color(color);
 	}
 }
