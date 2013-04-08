@@ -1,23 +1,20 @@
 package com.kh.beatbot.global;
 
-import javax.microedition.khronos.opengles.GL10;
-
 import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.mesh.RoundedRectMesh;
+import com.kh.beatbot.view.mesh.RoundedRectOutlineMesh;
 
 public class RoundedRectIcon extends Icon {
 
 	private RoundedRectMesh roundedRectMesh;
-	private float borderWeight;
-	private float[] borderColor;
+	private RoundedRectOutlineMesh roundedRectOutlineMesh;
 	private float width, height;
 	
-	public RoundedRectIcon(float x, float y, float width, float height, float cornerRadius, float borderWeight, float[] bgColor, float[] borderColor) {
-		roundedRectMesh = new RoundedRectMesh(BBView.gl, x, y, width, height, cornerRadius, 16, bgColor);
+	public RoundedRectIcon(float x, float y, float width, float height, float cornerRadius, float[] bgColor, float[] borderColor) {
 		this.width = width;
 		this.height = height;
-		this.borderWeight = borderWeight;
-		this.borderColor = borderColor;
+		roundedRectMesh = new RoundedRectMesh(x, y, width, height, cornerRadius, 16, bgColor);
+		roundedRectOutlineMesh = new RoundedRectOutlineMesh(x, y, width, height, cornerRadius, 32, borderColor);
 	}
 	
 	@Override
@@ -27,7 +24,9 @@ public class RoundedRectIcon extends Icon {
 
 	@Override
 	public void draw(float x, float y, float width, float height) {
-		roundedRectMesh.render(GL10.GL_TRIANGLES);
+		roundedRectMesh.render();
+		BBView.gl.glLineWidth(1);
+		roundedRectOutlineMesh.render();
 	}
 
 	@Override

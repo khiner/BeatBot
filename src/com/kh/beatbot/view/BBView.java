@@ -8,8 +8,6 @@ import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import android.util.FloatMath;
-
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 
@@ -52,8 +50,8 @@ public abstract class BBView {
 		float theta = 0;
 		float coords[] = new float[128];
 		for (int i = 0; i < 128; i += 2) {
-			coords[i] = FloatMath.cos(theta) * CIRCLE_RADIUS;
-			coords[i + 1] = FloatMath.sin(theta) * CIRCLE_RADIUS;
+			coords[i] = (float) Math.cos(theta) * CIRCLE_RADIUS;
+			coords[i + 1] = (float) Math.sin(theta) * CIRCLE_RADIUS;
 			theta += 2 * Math.PI / 64;
 		}
 		circleVb = makeFloatBuffer(coords);
@@ -210,8 +208,8 @@ public abstract class BBView {
 				addX = width / 2 - cornerRadius;
 				addY = -height / 2 + cornerRadius;
 			}
-			roundedRect[i * 2] = FloatMath.cos(theta) * cornerRadius + addX;
-			roundedRect[i * 2 + 1] = FloatMath.sin(theta) * cornerRadius + addY;
+			roundedRect[i * 2] = (float) Math.cos(theta) * cornerRadius + addX;
+			roundedRect[i * 2 + 1] = (float) Math.sin(theta) * cornerRadius + addY;
 		}
 		return makeFloatBuffer(roundedRect);
 	}

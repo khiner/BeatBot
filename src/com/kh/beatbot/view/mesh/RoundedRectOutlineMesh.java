@@ -2,13 +2,13 @@ package com.kh.beatbot.view.mesh;
 
 import javax.microedition.khronos.opengles.GL10;
 
-public class RoundedRectMesh extends Mesh2D {
+public class RoundedRectOutlineMesh extends Mesh2D {
 
 	private float x, y, width, height, cornerRadius;
 
-	public RoundedRectMesh(float x, float y, float width, float height,
+	public RoundedRectOutlineMesh(float x, float y, float width, float height,
 			float cornerRadius, int resolution, float[] color) {
-		super(GL10.GL_TRIANGLES, resolution * 4 * 3);
+		super(GL10.GL_LINES, resolution * 4 * 2);
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -21,8 +21,6 @@ public class RoundedRectMesh extends Mesh2D {
 
 	private void createVertices() {
 		float theta = 0, addX, addY;
-		float centerX = x + width / 2;
-		float centerY = y + height / 2;
 		float lastX = 0, lastY = 0;
 		for (int i = 0; i < vertices.length / 6; i++) {
 			theta += 4 * ¹ / (vertices.length / 3);
@@ -44,7 +42,6 @@ public class RoundedRectMesh extends Mesh2D {
 			if (lastX != 0 && lastY != 0) {
 				vertex(vertexX, vertexY);
 				vertex(lastX, lastY);
-				vertex(centerX, centerY);
 			}
 			lastX = vertexX;
 			lastY = vertexY;
@@ -52,6 +49,5 @@ public class RoundedRectMesh extends Mesh2D {
 		}
 		vertex(vertices[0], vertices[1]);
 		vertex(lastX, lastY);
-		vertex(centerX, centerY);
 	}
 }
