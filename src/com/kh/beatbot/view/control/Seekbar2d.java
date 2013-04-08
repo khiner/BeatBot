@@ -5,14 +5,13 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class Seekbar2d extends ControlView2dBase {
 	private static ViewRect viewRect;
 	private static FloatBuffer lineVb;
 
-	public Seekbar2d(TouchableSurfaceView parent) {
-		super(parent);
+	public Seekbar2d() {
+		super();
 		selectColor = Colors.RED;
 	}
 

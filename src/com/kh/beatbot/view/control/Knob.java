@@ -5,17 +5,12 @@ import java.nio.FloatBuffer;
 import android.util.FloatMath;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class Knob extends ControlView1dBase {
 
 	private FloatBuffer circleVb;
 
 	private int drawIndex = 0;
-
-	public Knob(TouchableSurfaceView parent) {
-		super(parent);
-	}
 
 	protected void loadIcons() {
 		// none

@@ -7,10 +7,6 @@ public class TextView extends BBView {
 	private String text = null;
 	private float textWidth = 0;
 	private float textOffset = 0;
-
-	public TextView(GLSurfaceViewBase parent) {
-		super(parent);
-	}
 	
 	@Override
 	protected void loadIcons() {

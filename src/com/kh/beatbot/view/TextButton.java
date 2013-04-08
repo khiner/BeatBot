@@ -1,10 +1,16 @@
 package com.kh.beatbot.view;
 
+import javax.microedition.khronos.opengles.GL11;
+
 import com.kh.beatbot.global.ColorSet;
 import com.kh.beatbot.global.ImageIconSource;
+import com.kh.beatbot.global.RoundedRectIcon;
 import com.kh.beatbot.global.RoundedRectIconSource;
+import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class TextButton extends ToggleButton {
+
+	private ShapeGroup globalGroup;
 
 	private String text = "";
 	private float iconOffset = 0, textWidth = 0, textHeight = 0;
@@ -14,15 +20,25 @@ public class TextButton extends ToggleButton {
 
 	private int defaultIconResource, pressedIconResource, selectedIconResource;
 
-	public TextButton(TouchableSurfaceView parent, ColorSet bgColorSet,
+	private RoundedRectIcon prevIcon;
+
+	private boolean shouldDrawShape = false;
+	
+	public TextButton(ShapeGroup globalGroup, ColorSet bgColorSet,
 			ColorSet strokeColorSet) {
-		this(parent, bgColorSet, strokeColorSet, -1, -1, -1);
+		this(globalGroup, bgColorSet, strokeColorSet, -1, -1, -1);
 	}
 
-	public TextButton(TouchableSurfaceView parent, ColorSet bgColorSet,
+	public TextButton(ShapeGroup globalGroup, ColorSet bgColorSet,
 			ColorSet strokeColorSet, int defaultIconResource,
 			int pressedIconResource, int selectedIconResource) {
-		super(parent);
+		super();
+		if (globalGroup == null) {
+			shouldDrawShape = true;
+			this.globalGroup = new ShapeGroup();
+		} else {
+			this.globalGroup = globalGroup;
+		}
 		this.bgColorSet = bgColorSet;
 		this.strokeColorSet = strokeColorSet;
 		this.defaultIconResource = defaultIconResource;
@@ -30,7 +46,7 @@ public class TextButton extends ToggleButton {
 		this.selectedIconResource = selectedIconResource;
 		if (defaultIconResource != -1 || pressedIconResource != -1
 				|| selectedIconResource != -1) {
-			iconButton = new ToggleButton((TouchableSurfaceView) root);
+			iconButton = new ToggleButton();
 		} else {
 			iconButton = null;
 		}
@@ -38,18 +54,22 @@ public class TextButton extends ToggleButton {
 
 	@Override
 	public void press() {
+		prevIcon = (RoundedRectIcon) currentIcon;
 		super.press();
 		if (iconButton != null) {
 			iconButton.press();
 		}
+		updateGlobalMeshGroup();
 	}
 
 	@Override
 	public void release() {
+		prevIcon = (RoundedRectIcon) currentIcon;
 		super.release();
 		if (iconButton != null) {
 			iconButton.release();
 		}
+		updateGlobalMeshGroup();
 	}
 
 	@Override
@@ -62,14 +82,15 @@ public class TextButton extends ToggleButton {
 
 	@Override
 	protected void loadIcons() {
-		setIconSource(new RoundedRectIconSource(absoluteX, absoluteY, width, height, bgColorSet,
-				strokeColorSet));
+		setIconSource(new RoundedRectIconSource(absoluteX, absoluteY, width,
+				height, bgColorSet, strokeColorSet));
 		setText(text);
 
 		if (iconButton != null) {
 			iconButton.setIconSource(new ImageIconSource(defaultIconResource,
 					pressedIconResource, selectedIconResource));
 		}
+		addToGlobalMeshGroup();
 	}
 
 	@Override
@@ -83,9 +104,9 @@ public class TextButton extends ToggleButton {
 		textXOffset = (iconButton != null ? iconOffset + iconButton.width
 				+ (width - iconButton.width - iconOffset) / 2 : width / 2)
 				- textWidth / 2;
-		textXOffset += 2; // cludgy magic number correction,
-						  // but it corrects for something wierd in
-						  // GLSurfaceViewBase.getTextWidth
+		textXOffset += 2; // kludgey magic number correction,
+							// but it corrects for something weird in
+							// GLSurfaceViewBase.getTextWidth
 		textYOffset = 0;
 	}
 
@@ -98,6 +119,9 @@ public class TextButton extends ToggleButton {
 	@Override
 	public void draw() {
 		super.draw();
+		if (shouldDrawShape) {
+			globalGroup.render((GL11)gl, 1);
+		}
 		if (iconButton != null) { // draw optional icon
 			iconButton.draw();
 		}
@@ -117,5 +141,18 @@ public class TextButton extends ToggleButton {
 			iconButton.layout(this, iconOffset, iconOffset, 3 * height / 4,
 					3 * height / 4);
 		}
+	}
+
+	private void addToGlobalMeshGroup() {
+		globalGroup.addMeshPair(
+				((RoundedRectIcon) currentIcon).roundedRectMesh,
+				((RoundedRectIcon) currentIcon).roundedRectOutlineMesh);
+	}
+
+	private void updateGlobalMeshGroup() {
+		globalGroup.replaceMeshPair(prevIcon.roundedRectMesh,
+				prevIcon.roundedRectOutlineMesh,
+				((RoundedRectIcon) currentIcon).roundedRectMesh,
+				((RoundedRectIcon) currentIcon).roundedRectOutlineMesh);
 	}
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.IconSource;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.BBOnClickListener;
@@ -16,16 +17,15 @@ public class MidiTrackView extends TouchableBBView {
 		int trackNum;
 		ToggleButton instrumentButton;
 		TextButton muteButton, soloButton;
-		
-		public ButtonRow(TouchableSurfaceView parent, int trackNum) {
-			super(parent);
+
+		public ButtonRow(int trackNum) {
 			this.trackNum = trackNum;
 		}
-		
+
 		public void setIconSource(IconSource instrumentIcon) {
 			instrumentButton.setIconSource(instrumentIcon);
 		}
-		
+
 		@Override
 		protected void loadIcons() {
 			// parent loads all button icons
@@ -33,7 +33,8 @@ public class MidiTrackView extends TouchableBBView {
 
 		@Override
 		public void init() {
-			instrumentButton.setIconSource(Managers.trackManager.getTrack(trackNum).getInstrument().getIconSource());
+			instrumentButton.setIconSource(Managers.trackManager
+					.getTrack(trackNum).getInstrument().getIconSource());
 			muteButton.setText("M");
 			soloButton.setText("S");
 			instrumentButton.setOnClickListener(new BBOnClickListener() {
@@ -41,7 +42,8 @@ public class MidiTrackView extends TouchableBBView {
 				public void onClick(Button button) {
 					instrumentButton.setChecked(true);
 					for (ButtonRow buttonRow : buttonRows) {
-						if (!buttonRow.instrumentButton.equals(instrumentButton)) {
+						if (!buttonRow.instrumentButton
+								.equals(instrumentButton)) {
 							buttonRow.instrumentButton.setChecked(false);
 						}
 					}
@@ -51,7 +53,8 @@ public class MidiTrackView extends TouchableBBView {
 			muteButton.setOnClickListener(new BBOnClickListener() {
 				@Override
 				public void onClick(Button button) {
-					Managers.trackManager.getTrack(trackNum).mute(muteButton.isChecked());
+					Managers.trackManager.getTrack(trackNum).mute(
+							muteButton.isChecked());
 				}
 			});
 			soloButton.setOnClickListener(new BBOnClickListener() {
@@ -66,7 +69,8 @@ public class MidiTrackView extends TouchableBBView {
 							}
 						}
 					}
-					Managers.trackManager.getTrack(trackNum).solo(soloButton.isChecked());
+					Managers.trackManager.getTrack(trackNum).solo(
+							soloButton.isChecked());
 				}
 			});
 		}
@@ -78,10 +82,10 @@ public class MidiTrackView extends TouchableBBView {
 
 		@Override
 		protected void createChildren() {
-			instrumentButton = new ToggleButton((TouchableSurfaceView)root);
-			muteButton = new TextButton((TouchableSurfaceView) root,
+			instrumentButton = new ToggleButton();
+			muteButton = new TextButton(GlobalVars.mainPage.roundedRectGroup,
 					Colors.muteButtonColorSet, Colors.labelStrokeColorSet);
-			soloButton = new TextButton((TouchableSurfaceView) root,
+			soloButton = new TextButton(GlobalVars.mainPage.roundedRectGroup,
 					Colors.soloButtonColorSet, Colors.labelStrokeColorSet);
 			addChild(instrumentButton);
 			addChild(muteButton);
@@ -92,16 +96,13 @@ public class MidiTrackView extends TouchableBBView {
 		public void layoutChildren() {
 			instrumentButton.layout(this, 0, 0, height, height);
 			muteButton.layout(this, height, 0, height * .75f, height);
-			soloButton.layout(this, height + muteButton.width, 0, height * .75f, height);
+			soloButton.layout(this, height + muteButton.width, 0,
+					height * .75f, height);
 		}
 	}
 
 	private static List<ButtonRow> buttonRows = new ArrayList<ButtonRow>();
 
-	public MidiTrackView(TouchableSurfaceView parent) {
-		super(parent);
-	}
-	
 	protected void loadIcons() {
 		Managers.directoryManager.loadIcons();
 	}
@@ -116,7 +117,7 @@ public class MidiTrackView extends TouchableBBView {
 	}
 
 	public void trackAdded(int trackNum) {
-		ButtonRow newRow = new ButtonRow((TouchableSurfaceView)root, trackNum); 
+		ButtonRow newRow = new ButtonRow(trackNum);
 		buttonRows.add(newRow);
 		addChild(newRow);
 	}
@@ -124,7 +125,7 @@ public class MidiTrackView extends TouchableBBView {
 	public void draw() {
 		// parent
 	}
-	
+
 	@Override
 	public void init() {
 		// nothing
@@ -135,7 +136,6 @@ public class MidiTrackView extends TouchableBBView {
 		// all button rows are added dynamically as tracks are added
 	}
 
-	
 	@Override
 	public void layoutChildren() {
 		float yPos = MidiView.Y_OFFSET - TickWindowHelper.getYOffset();

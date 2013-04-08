@@ -10,8 +10,7 @@ public class ParamControl extends TouchableBBView {
 	private TextView label, valueLabel;
 	private boolean beatSync;
 	
-	public ParamControl(TouchableSurfaceView root, boolean beatSync) {
-		this.root = root;
+	public ParamControl(boolean beatSync) {
 		this.beatSync = beatSync;
 		createChildren();
 	}
@@ -53,10 +52,9 @@ public class ParamControl extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		label = new TextView(root);
-		knob = beatSync ? new ToggleKnob((TouchableSurfaceView)root) : 
-			new Knob((TouchableSurfaceView)root);
-		valueLabel = new TextView(root);
+		label = new TextView();
+		knob = beatSync ? new ToggleKnob() : new Knob();
+		valueLabel = new TextView();
 		addChild(label);
 		addChild(knob);
 		addChild(valueLabel);

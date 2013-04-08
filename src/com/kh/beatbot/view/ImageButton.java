@@ -8,10 +8,6 @@ public class ImageButton extends Button {
 	protected IconSource iconSource;
 	protected Icon currentIcon;
 	
-	public ImageButton(TouchableSurfaceView parent) {
-		super(parent);
-	}
-	
 	public IconSource getIconSource() {
 		return iconSource;
 	}

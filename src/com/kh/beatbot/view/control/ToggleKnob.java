@@ -6,17 +6,12 @@ import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.ToggleButton;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class ToggleKnob extends Knob {
 
 	private ToggleButton centerButton;
 	private float snapDistSquared;
 	private boolean centerButtonTouched = false;
-	
-	public ToggleKnob(TouchableSurfaceView parent) {
-		super(parent);
-	}
 
 	@Override
 	public void setId(int id) {
@@ -47,7 +42,7 @@ public class ToggleKnob extends Knob {
 	@Override
 	protected void createChildren() {
 		super.createChildren();
-		centerButton = new ToggleButton((TouchableSurfaceView)root);
+		centerButton = new ToggleButton();
 		centerButton.setOnClickListener(new BBOnClickListener() {
 			@Override
 			public void onClick(Button button) {

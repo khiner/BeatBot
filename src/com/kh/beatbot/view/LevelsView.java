@@ -53,10 +53,6 @@ public class LevelsView extends TouchableBBView {
 
 	private MidiView midiView;
 	
-	public LevelsView(TouchableSurfaceView parent) {
-		super(parent);
-	}
-
 	public LevelType getLevelType() {
 		return currLevelType;
 	}

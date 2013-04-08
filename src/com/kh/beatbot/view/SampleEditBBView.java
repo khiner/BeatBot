@@ -12,10 +12,6 @@ import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class SampleEditBBView extends TouchableBBView {
 
-	public SampleEditBBView(TouchableSurfaceView parent) {
-		super(parent);
-	}
-
 	private float waveformWidth = 0;
 	
 	// min distance for pointer to select loop markers

@@ -2,7 +2,6 @@ package com.kh.beatbot.view.control;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class ThresholdBarView extends Seekbar {
 	private static final float[] THRESHOLD_COLOR = { Colors.VIEW_BG[0] + .2f,
@@ -11,10 +10,6 @@ public class ThresholdBarView extends Seekbar {
 
 	private static int currAmpVertex = 0;
 	private static float currAmpLevel = 0;
-
-	public ThresholdBarView(TouchableSurfaceView parent) {
-		super(parent);
-	}
 	
 	private void updateAmpVertex() {
 		if (levelBarVb == null)

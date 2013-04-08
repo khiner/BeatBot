@@ -2,6 +2,7 @@ package com.kh.beatbot.view.group;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.layout.page.AdsrPage;
 import com.kh.beatbot.layout.page.LevelsFXPage;
@@ -14,7 +15,7 @@ import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.ImageButton;
 import com.kh.beatbot.view.TextButton;
 import com.kh.beatbot.view.TouchableBBView;
-import com.kh.beatbot.view.TouchableSurfaceView;
+import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class PageSelectGroup extends TouchableBBView {
 	private static NoteLevelsPage levelsPage;
@@ -33,10 +34,6 @@ public class PageSelectGroup extends TouchableBBView {
 	private static ImageButton instrumentSelectButton;
 	private static TextButton sampleSelectButton;
 	private static TextButton[] textButtons = new TextButton[5];
-
-	public PageSelectGroup(TouchableSurfaceView parent) {
-		super(parent);
-	}
 
 	public void update() {
 		updateInstrumentIcon();
@@ -69,16 +66,17 @@ public class PageSelectGroup extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		addTrackButton = new ImageButton((TouchableSurfaceView) root);
-		instrumentSelectButton = new ImageButton((TouchableSurfaceView) root);
-		sampleSelectButton = new TextButton((TouchableSurfaceView) root,
+		ShapeGroup globalGroup = GlobalVars.mainPage.roundedRectGroup;
+		addTrackButton = new ImageButton();
+		instrumentSelectButton = new ImageButton();
+		sampleSelectButton = new TextButton(globalGroup,
 				Colors.labelBgColorSet, Colors.labelStrokeColorSet);
 		for (int i = 0; i < textButtons.length; i++) {
-			textButtons[i] = new TextButton((TouchableSurfaceView) root,
+			textButtons[i] = new TextButton(globalGroup,
 					Colors.labelBgColorSet, Colors.labelStrokeColorSet);
 		}
 
-		textButtons[NOTE_LEVELS_PAGE_ID] = new TextButton((TouchableSurfaceView) root,
+		textButtons[NOTE_LEVELS_PAGE_ID] = new TextButton(globalGroup,
 				Colors.labelBgColorSet, Colors.labelStrokeColorSet,
 				R.drawable.levels_icon, -1, R.drawable.levels_icon_selected);
 
@@ -120,16 +118,16 @@ public class PageSelectGroup extends TouchableBBView {
 			});
 		}
 
-		trackLevelsFxPage = new LevelsFXPage((TouchableSurfaceView) root);
-		sampleEditPage = new SampleEditPage((TouchableSurfaceView) root);
-		adsrPage = new AdsrPage((TouchableSurfaceView) root);
-		masterLevelsFxPage = new LevelsFXPage((TouchableSurfaceView) root);
-		levelsPage = new NoteLevelsPage((TouchableSurfaceView) root);
+		trackLevelsFxPage = new LevelsFXPage();
+		sampleEditPage = new SampleEditPage();
+		adsrPage = new AdsrPage();
+		masterLevelsFxPage = new LevelsFXPage();
+		levelsPage = new NoteLevelsPage();
 
 		masterLevelsFxPage.setMasterMode(true);
 		trackLevelsFxPage.setMasterMode(false);
 
-		pager = new BBViewPager((TouchableSurfaceView) root);
+		pager = new BBViewPager();
 		pager.addPage(trackLevelsFxPage);
 		pager.addPage(sampleEditPage);
 		pager.addPage(adsrPage);
@@ -162,8 +160,8 @@ public class PageSelectGroup extends TouchableBBView {
 					buttonHeight * 2 + (i + 1) * labelWidth, labelYOffset,
 					labelWidth, buttonHeight);
 		}
-		textButtons[NOTE_LEVELS_PAGE_ID].layout(this, buttonHeight * 2 + 5 * labelWidth,
-				labelYOffset, buttonHeight, buttonHeight);
+		textButtons[NOTE_LEVELS_PAGE_ID].layout(this, buttonHeight * 2 + 5
+				* labelWidth, labelYOffset, buttonHeight, buttonHeight);
 		pager.layout(this, 0, buttonHeight + 2 * labelYOffset, width, height
 				- buttonHeight - 2 * labelYOffset);
 	}

@@ -51,10 +51,6 @@ public class MidiView extends ClickableBBView {
 	// if true, all midi note movements are rounded to the nearest major tick
 	public static boolean snapToGrid = true;
 
-	public MidiView(TouchableSurfaceView parent) {
-		super(parent);
-	}
-
 	public float getMidiHeight() {
 		return height - Y_OFFSET;
 	}

@@ -7,17 +7,12 @@ import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.ToggleButton;
-import com.kh.beatbot.view.TouchableSurfaceView;
 import com.kh.beatbot.view.control.ParamControl;
 import com.kh.beatbot.view.control.ToggleKnob;
 
 public class DelayParamsPage extends EffectParamsPage {
 
 	private ToggleButton linkToggle;
-	
-	public DelayParamsPage(TouchableSurfaceView parent) {
-		super(parent);
-	}
 
 	@Override
 	protected String getName() {
@@ -45,7 +40,7 @@ public class DelayParamsPage extends EffectParamsPage {
 	@Override
 	public void createChildren() {
 		super.createChildren();
-		linkToggle = new ToggleButton((TouchableSurfaceView) root);
+		linkToggle = new ToggleButton();
 		linkToggle.setOnClickListener(new BBOnClickListener() {
 			@Override
 			public void onClick(Button button) {

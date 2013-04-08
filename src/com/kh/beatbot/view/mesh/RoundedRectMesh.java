@@ -5,6 +5,8 @@ import javax.microedition.khronos.opengles.GL10;
 public class RoundedRectMesh extends Mesh2D {
 
 	private float x, y, width, height, cornerRadius;
+	
+	private float[] mColor;
 
 	public RoundedRectMesh(float x, float y, float width, float height,
 			float cornerRadius, int resolution, float[] color) {
@@ -14,9 +16,8 @@ public class RoundedRectMesh extends Mesh2D {
 		this.width = width;
 		this.height = height;
 		this.cornerRadius = cornerRadius;
+		mColor = color;
 		createVertices();
-		setColor(color);
-		update();
 	}
 
 	private void createVertices() {
@@ -42,16 +43,16 @@ public class RoundedRectMesh extends Mesh2D {
 			float vertexX = (float) Math.cos(theta) * cornerRadius + addX + x;
 			float vertexY = (float) Math.sin(theta) * cornerRadius + addY + y;
 			if (lastX != 0 && lastY != 0) {
-				vertex(vertexX, vertexY);
-				vertex(lastX, lastY);
-				vertex(centerX, centerY);
+				vertex(vertexX, vertexY, mColor);
+				vertex(lastX, lastY, mColor);
+				vertex(centerX, centerY, mColor);
 			}
 			lastX = vertexX;
 			lastY = vertexY;
 
 		}
-		vertex(vertices[0], vertices[1]);
-		vertex(lastX, lastY);
-		vertex(centerX, centerY);
+		vertex(vertices[0], vertices[1], mColor);
+		vertex(lastX, lastY, mColor);
+		vertex(centerX, centerY, mColor);
 	}
 }

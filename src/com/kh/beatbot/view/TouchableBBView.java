@@ -12,12 +12,6 @@ public abstract class TouchableBBView extends BBView {
 	// position relative to this window
 	protected Map<Integer, Position> pointerIdToPos = new HashMap<Integer, Position>();
 	
-	public TouchableBBView() {}
-	
-	public TouchableBBView(TouchableSurfaceView parent) {
-		super(parent);
-	}
-
 	public final boolean ownsPointer(int id) {
 		return pointerIdToPos.containsKey(id);
 	}

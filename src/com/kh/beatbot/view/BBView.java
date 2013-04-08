@@ -27,10 +27,11 @@ public abstract class BBView {
 
 	public static final float ¹ = (float) Math.PI;
 
-	protected List<BBView> children = new ArrayList<BBView>();
+	public static GLSurfaceViewBase root;
 	
-	protected GLSurfaceViewBase root;
+	protected List<BBView> children = new ArrayList<BBView>();
 	protected BBView parent;
+	
 	public static GL10 gl;
 	public float absoluteX = 0, absoluteY = 0;
 	public float x = 0, y = 0;
@@ -57,10 +58,7 @@ public abstract class BBView {
 		circleVb = makeFloatBuffer(coords);
 	}
 	
-	public BBView() {}
-	
-	public BBView(GLSurfaceViewBase root) {
-		this.root = root;
+	public BBView() {
 		createChildren();
 	}
 
@@ -111,7 +109,7 @@ public abstract class BBView {
 			// not using foreach to avoid concurrent modification
 			BBView child = children.get(i);
 			push();
-			//translate(child.x, child.y);
+			translate(child.x, child.y);
 			child.drawAll();
 			pop();
 		}

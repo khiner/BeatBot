@@ -1,13 +1,12 @@
 package com.kh.beatbot.global;
 
-import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.mesh.RoundedRectMesh;
 import com.kh.beatbot.view.mesh.RoundedRectOutlineMesh;
 
 public class RoundedRectIcon extends Icon {
 
-	private RoundedRectMesh roundedRectMesh;
-	private RoundedRectOutlineMesh roundedRectOutlineMesh;
+	public RoundedRectMesh roundedRectMesh;
+	public RoundedRectOutlineMesh roundedRectOutlineMesh;
 	private float width, height;
 	
 	public RoundedRectIcon(float x, float y, float width, float height, float cornerRadius, float[] bgColor, float[] borderColor) {
@@ -24,9 +23,7 @@ public class RoundedRectIcon extends Icon {
 
 	@Override
 	public void draw(float x, float y, float width, float height) {
-		roundedRectMesh.render();
-		BBView.gl.glLineWidth(1);
-		roundedRectOutlineMesh.render();
+		// rendering of meshes is done globally
 	}
 
 	@Override

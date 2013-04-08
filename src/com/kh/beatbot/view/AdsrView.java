@@ -23,10 +23,6 @@ public class AdsrView extends TouchableBBView {
 	// init to -1 to indicate no pointer is selecting
 	private int[] adsrSelected = new int[] { -1, -1, -1, -1, -1 };
 
-	public AdsrView(TouchableSurfaceView parent) {
-		super(parent);
-	}
-	
 	public void update() {
 		initAdsrVb();
 	}

@@ -4,11 +4,7 @@ import com.kh.beatbot.global.IconSource;
 
 public class ToggleButton extends ImageButton {
 	boolean checked = false;
-
-	public ToggleButton(TouchableSurfaceView parent) {
-		super(parent);
-	}
-
+	
 	public void setIconSource(IconSource iconSource) {
 		this.iconSource = iconSource;
 		if (checked)

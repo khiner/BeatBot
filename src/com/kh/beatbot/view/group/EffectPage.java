@@ -11,7 +11,6 @@ import com.kh.beatbot.layout.page.effect.ReverbParamsPage;
 import com.kh.beatbot.layout.page.effect.TremeloParamsPage;
 import com.kh.beatbot.listener.Level2dListener;
 import com.kh.beatbot.view.TouchableBBView;
-import com.kh.beatbot.view.TouchableSurfaceView;
 import com.kh.beatbot.view.control.ControlViewBase;
 import com.kh.beatbot.view.control.Seekbar2d;
 
@@ -27,10 +26,6 @@ public class EffectPage extends TouchableBBView {
 	private FlangerParamsPage flangerPage;
 	private ReverbParamsPage reverbPage;
 	private TremeloParamsPage tremeloPage;
-	
-	public EffectPage(TouchableSurfaceView parent) {
-		super(parent);
-	}
 	
 	public Seekbar2d getLevel2d() {
 		return level2d;
@@ -58,17 +53,17 @@ public class EffectPage extends TouchableBBView {
 	
 	@Override
 	protected void createChildren() {
-		paramsPager = new BBViewPager((TouchableSurfaceView)root);
-		level2d = new Seekbar2d((TouchableSurfaceView)root);
+		paramsPager = new BBViewPager();
+		level2d = new Seekbar2d();
 		
 		
-		chorusPage = new ChorusParamsPage((TouchableSurfaceView)root);
-		decimatePage = new DecimateParamsPage((TouchableSurfaceView)root);
-		delayPage = new DelayParamsPage((TouchableSurfaceView)root);
-		filterPage = new FilterParamsPage((TouchableSurfaceView)root);
-		flangerPage = new FlangerParamsPage((TouchableSurfaceView)root);
-		reverbPage = new ReverbParamsPage((TouchableSurfaceView)root);
-		tremeloPage = new TremeloParamsPage((TouchableSurfaceView)root);
+		chorusPage = new ChorusParamsPage();
+		decimatePage = new DecimateParamsPage();
+		delayPage = new DelayParamsPage();
+		filterPage = new FilterParamsPage();
+		flangerPage = new FlangerParamsPage();
+		reverbPage = new ReverbParamsPage();
+		tremeloPage = new TremeloParamsPage();
 		
 		paramsPager.addPage(chorusPage);
 		paramsPager.addPage(decimatePage);

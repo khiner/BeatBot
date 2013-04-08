@@ -34,6 +34,7 @@ import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
+import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.group.BBViewPager;
 import com.kh.beatbot.view.group.EffectPage;
 import com.kh.beatbot.view.group.GLSurfaceViewGroup;
@@ -166,10 +167,11 @@ public class BeatBotActivity extends Activity {
 			initNativeAudio();
 		}
 
-		GlobalVars.mainPage = new MainPage(mainSurface);
-		GlobalVars.effectPage = new EffectPage(mainSurface);
+		BBView.root = mainSurface;
+		GlobalVars.mainPage = new MainPage();
+		GlobalVars.effectPage = new EffectPage();
 
-		activityPager = new BBViewPager(mainSurface);
+		activityPager = new BBViewPager();
 		activityPager.addPage(GlobalVars.mainPage);
 		activityPager.addPage(GlobalVars.effectPage);
 		activityPager.setPage(0);

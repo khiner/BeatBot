@@ -20,10 +20,6 @@ public class BpmView extends ClickableBBView {
 
 	private long lastTapTime = 0;
 	
-	public BpmView(TouchableSurfaceView parent) {
-		super(parent);
-	}
-	
 	public void setBPM(float bpm) {
 		setText(String.valueOf((int) Managers.midiManager.setBPM(bpm)));
 	}

@@ -8,17 +8,11 @@ import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.LevelsView;
 import com.kh.beatbot.view.ToggleButton;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class NoteLevelsPage extends Page {
 
 	private LevelsView levelsView;
 	private ToggleButton volumeToggle, panToggle, pitchToggle;
-
-	
-	public NoteLevelsPage(TouchableSurfaceView parent) {
-		super(parent);
-	}
 	
 	@Override
 	public void init() {
@@ -66,10 +60,10 @@ public class NoteLevelsPage extends Page {
 
 	@Override
 	protected void createChildren() {
-		levelsView = new LevelsView((TouchableSurfaceView)root);
-		volumeToggle = new ToggleButton((TouchableSurfaceView)root);
-		panToggle = new ToggleButton((TouchableSurfaceView)root);
-		pitchToggle = new ToggleButton((TouchableSurfaceView)root);
+		levelsView = new LevelsView();
+		volumeToggle = new ToggleButton();
+		panToggle = new ToggleButton();
+		pitchToggle = new ToggleButton();
 		volumeToggle.setOnClickListener(new BBOnClickListener() {
 			public void onClick(Button arg0) {
 				levelsView.setLevelType(LevelType.VOLUME);

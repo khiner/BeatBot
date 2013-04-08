@@ -1,15 +1,10 @@
 package com.kh.beatbot.view.list;
 
 import com.kh.beatbot.listener.DraggableLabelListListener;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class DraggableLabelList extends LabelList {
 	private int initialTouchedPosition;
 	private float dragOffset = 0;
-	
-	public DraggableLabelList(TouchableSurfaceView parent) {
-		super(parent);
-	}
 
 	@Override
 	protected void touchLabel(Label label, float pointerX) {

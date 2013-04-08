@@ -25,7 +25,6 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.TextView;
 import com.kh.beatbot.view.ToggleButton;
-import com.kh.beatbot.view.TouchableSurfaceView;
 import com.kh.beatbot.view.control.ControlViewBase;
 import com.kh.beatbot.view.control.Seekbar;
 import com.kh.beatbot.view.list.DraggableLabelList;
@@ -109,10 +108,6 @@ public class LevelsFXPage extends Page implements Level1dListener {
 	// effects attrs
 	private DraggableLabelList effectLabelList;
 	private String[] effectNames;
-
-	public LevelsFXPage(TouchableSurfaceView parent) {
-		super(parent);
-	}
 
 	public void init() {
 		effectLabel.setText("EFFECTS");
@@ -265,12 +260,12 @@ public class LevelsFXPage extends Page implements Level1dListener {
 
 	@Override
 	protected void createChildren() {
-		effectLabel = new TextView((TouchableSurfaceView) root);
-		levelBar = new Seekbar((TouchableSurfaceView) root);
+		effectLabel = new TextView();
+		levelBar = new Seekbar();
 		levelBar.addLevelListener(this);
-		volumeToggle = new ToggleButton((TouchableSurfaceView) root);
-		panToggle = new ToggleButton((TouchableSurfaceView) root);
-		pitchToggle = new ToggleButton((TouchableSurfaceView) root);
+		volumeToggle = new ToggleButton();
+		panToggle = new ToggleButton();
+		pitchToggle = new ToggleButton();
 		volumeToggle.setOnClickListener(new BBOnClickListener() {
 			public void onClick(Button button) {
 				getCurrTrack().activeLevelType = LevelType.VOLUME;
@@ -292,7 +287,7 @@ public class LevelsFXPage extends Page implements Level1dListener {
 		// effects
 		effectNames = GlobalVars.mainActivity.getResources().getStringArray(
 				R.array.effect_names);
-		effectLabelList = new DraggableLabelList((TouchableSurfaceView) root);
+		effectLabelList = new DraggableLabelList();
 		effectLabelList.setListener(new EffectLabelListListener(
 				GlobalVars.mainActivity));
 

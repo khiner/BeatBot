@@ -14,7 +14,6 @@ import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.ImageButton;
 import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableBBView;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class ControlButtonGroup extends TouchableBBView {
 
@@ -22,10 +21,6 @@ public class ControlButtonGroup extends TouchableBBView {
 	ImageButton stopButton, undoButton, deleteButton;
 	
 	public BpmView bpmView;
-
-	public ControlButtonGroup(TouchableSurfaceView parent) {
-		super(parent);
-	}
 	
 	@Override
 	public void init() {
@@ -39,13 +34,13 @@ public class ControlButtonGroup extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		playButton = new ToggleButton((TouchableSurfaceView) root);
-		stopButton = new ImageButton((TouchableSurfaceView) root);
-		recordButton = new ToggleButton((TouchableSurfaceView) root);
-		copyButton = new ToggleButton((TouchableSurfaceView) root);
-		deleteButton = new ImageButton((TouchableSurfaceView) root);
-		undoButton = new ImageButton((TouchableSurfaceView) root);
-		bpmView = new BpmView((TouchableSurfaceView) root);
+		playButton = new ToggleButton();
+		stopButton = new ImageButton();
+		recordButton = new ToggleButton();
+		copyButton = new ToggleButton();
+		deleteButton = new ImageButton();
+		undoButton = new ImageButton();
+		bpmView = new BpmView();
 
 		playButton.setOnClickListener(new BBOnClickListener() {
 			@Override

@@ -6,10 +6,6 @@ public abstract class Button extends TouchableBBView {
 	private BBOnClickListener listener;
 	
 	protected boolean enabled = true, pressed = false;
-	
-	public Button(TouchableSurfaceView parent) {
-		super(parent);
-	}
 
 	public final BBOnClickListener getOnClickListener() {
 		return listener;

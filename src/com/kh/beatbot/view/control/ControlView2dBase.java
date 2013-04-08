@@ -3,17 +3,12 @@ package com.kh.beatbot.view.control;
 import java.util.ArrayList;
 
 import com.kh.beatbot.listener.Level2dListener;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 public abstract class ControlView2dBase extends ControlViewBase {
 
 	protected ArrayList<Level2dListener> levelListeners = new ArrayList<Level2dListener>();
 
 	protected float xLevel = .5f, yLevel = .5f;
-	
-	public ControlView2dBase(TouchableSurfaceView parent) {
-		super(parent);
-	}
 
 	protected abstract float xToLevel(float x);
 	protected abstract float yToLevel(float y);

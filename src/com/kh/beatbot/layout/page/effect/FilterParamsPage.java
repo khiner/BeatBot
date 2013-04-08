@@ -7,16 +7,11 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.view.ToggleButton;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 
 public class FilterParamsPage extends EffectParamsPage {
 
 	private ToggleButton[] filterToggles;
-	
-	public FilterParamsPage(TouchableSurfaceView parent) {
-		super(parent);
-	}
 
 	@Override
 	protected String getName() {
@@ -38,7 +33,7 @@ public class FilterParamsPage extends EffectParamsPage {
 		super.createChildren();
 		filterToggles = new ToggleButton[3];
 		for (int i = 0; i < filterToggles.length; i++) {
-			filterToggles[i] = new ToggleButton((TouchableSurfaceView)root);
+			filterToggles[i] = new ToggleButton();
 			addChild(filterToggles[i]);
 		}
 	}

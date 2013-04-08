@@ -8,18 +8,13 @@ import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.ImageButton;
 import com.kh.beatbot.view.SampleEditBBView;
 import com.kh.beatbot.view.ToggleButton;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class SampleEditPage extends Page {
 
 	private SampleEditBBView sampleEdit;
 	private ImageButton previewButton;
 	private ToggleButton loopButton, reverseButton;
-	
-	public SampleEditPage(TouchableSurfaceView parent) {
-		super(parent);
-	}
-	
+
 	public void init() {
 	}
 	
@@ -45,8 +40,8 @@ public class SampleEditPage extends Page {
 
 	@Override
 	protected void createChildren() {
-		sampleEdit = new SampleEditBBView((TouchableSurfaceView)root);
-		previewButton = new ImageButton((TouchableSurfaceView)root);
+		sampleEdit = new SampleEditBBView();
+		previewButton = new ImageButton();
 		previewButton.setOnClickListener(new BBOnClickListener() {
 			@Override
 			public void onClick(Button button) {
@@ -57,8 +52,8 @@ public class SampleEditPage extends Page {
 				}
 			}
 		});
-		loopButton = new ToggleButton((TouchableSurfaceView)root);
-		reverseButton = new ToggleButton((TouchableSurfaceView)root);
+		loopButton = new ToggleButton();
+		reverseButton = new ToggleButton();
 		loopButton.setOnClickListener(new BBOnClickListener() {
 			public void onClick(Button arg0) {
 				TrackManager.currTrack.toggleLooping();

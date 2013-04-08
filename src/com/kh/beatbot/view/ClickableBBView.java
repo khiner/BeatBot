@@ -14,10 +14,6 @@ public abstract class ClickableBBView extends TouchableBBView {
 	    }   
 	};
 	
-	public ClickableBBView(TouchableSurfaceView parent) {
-		super(parent);
-	}
-	
 	// time (in millis) between pointer down and pointer up to be considered a
 	// tap
 	public final static long SINGLE_TAP_TIME = 200;

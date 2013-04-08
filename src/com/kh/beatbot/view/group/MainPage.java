@@ -1,10 +1,12 @@
 package com.kh.beatbot.view.group;
 
+import javax.microedition.khronos.opengles.GL11;
+
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.MidiTrackView;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.TouchableBBView;
-import com.kh.beatbot.view.TouchableSurfaceView;
+import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class MainPage extends TouchableBBView {
 	
@@ -13,9 +15,7 @@ public class MainPage extends TouchableBBView {
 	public MidiTrackView midiTrackControl;
 	public PageSelectGroup pageSelectGroup;
 	
-	public MainPage(TouchableSurfaceView parent) {
-		super(parent);
-	}
+	public static ShapeGroup roundedRectGroup  = new ShapeGroup();
 	
 	public void trackAdded(int newTrackNum) {
 		midiTrackControl.trackAdded(newTrackNum);
@@ -30,15 +30,15 @@ public class MainPage extends TouchableBBView {
 
 	@Override
 	public void draw() {
-		// parent group
+		roundedRectGroup.render((GL11)gl, 1);
 	}
 
 	@Override
 	protected void createChildren() {
-		midiView = new MidiView((TouchableSurfaceView)root);
-		controlButtonGroup = new ControlButtonGroup((TouchableSurfaceView)root);
-		midiTrackControl = new MidiTrackView((TouchableSurfaceView)root);
-		pageSelectGroup = new PageSelectGroup((TouchableSurfaceView)root);
+		midiView = new MidiView();
+		controlButtonGroup = new ControlButtonGroup();
+		midiTrackControl = new MidiTrackView();
+		pageSelectGroup = new PageSelectGroup();
 		
 		addChild(controlButtonGroup);
 		addChild(midiTrackControl);
@@ -46,6 +46,11 @@ public class MainPage extends TouchableBBView {
 		addChild(pageSelectGroup);
 	}
 
+	@Override
+	protected void loadIcons() {
+		// parent
+	}
+	
 	@Override
 	public void layoutChildren() {
 		float controlButtonHeight = height / 10;
@@ -59,10 +64,5 @@ public class MainPage extends TouchableBBView {
 		midiTrackControl.layout(this, 0, controlButtonHeight, trackControlWidth, midiHeight);
 		midiView.layout(this, trackControlWidth, controlButtonHeight, width - trackControlWidth - 15, midiHeight);
 		pageSelectGroup.layout(this, 0, controlButtonHeight + midiHeight, width, height - midiHeight - controlButtonHeight);
-	}
-
-	@Override
-	protected void loadIcons() {
-		// parent group
 	}
 }

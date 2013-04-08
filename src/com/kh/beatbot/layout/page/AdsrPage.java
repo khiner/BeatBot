@@ -22,10 +22,6 @@ public class AdsrPage extends Page implements BBOnClickListener, Level1dListener
 	private Seekbar levelBar;
 	private TextView valueLabel, paramLabel;
 	
-	public AdsrPage(TouchableSurfaceView parent) {
-		super(parent);
-	}
-	
 	@Override
 	public void init() {
 		updateLevelBar();
@@ -111,18 +107,18 @@ public class AdsrPage extends Page implements BBOnClickListener, Level1dListener
 
 	@Override
 	protected void createChildren() {
-		adsrView = new AdsrView((TouchableSurfaceView)root);
-		levelBar = new Seekbar((TouchableSurfaceView)root);
+		adsrView = new AdsrView();
+		levelBar = new Seekbar();
 		levelBar.addLevelListener(this);
-		paramLabel = new TextView((TouchableSurfaceView)root);
-		valueLabel = new TextView((TouchableSurfaceView)root);
+		paramLabel = new TextView();
+		valueLabel = new TextView();
 		adsrButtons = new ToggleButton[6];
-		adsrButtons[ADSR.ATTACK_ID] = new ToggleButton((TouchableSurfaceView)root);
-		adsrButtons[ADSR.DECAY_ID] = new ToggleButton((TouchableSurfaceView)root);
-		adsrButtons[ADSR.SUSTAIN_ID] = new ToggleButton((TouchableSurfaceView)root);
-		adsrButtons[ADSR.RELEASE_ID] = new ToggleButton((TouchableSurfaceView)root);
-		adsrButtons[ADSR.START_ID] = new ToggleButton((TouchableSurfaceView)root);
-		adsrButtons[ADSR.PEAK_ID] = new ToggleButton((TouchableSurfaceView)root);
+		adsrButtons[ADSR.ATTACK_ID] = new ToggleButton();
+		adsrButtons[ADSR.DECAY_ID] = new ToggleButton();
+		adsrButtons[ADSR.SUSTAIN_ID] = new ToggleButton();
+		adsrButtons[ADSR.RELEASE_ID] = new ToggleButton();
+		adsrButtons[ADSR.START_ID] = new ToggleButton();
+		adsrButtons[ADSR.PEAK_ID] = new ToggleButton();
 		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i].setId(i);
 			adsrButtons[i].setOnClickListener(this);

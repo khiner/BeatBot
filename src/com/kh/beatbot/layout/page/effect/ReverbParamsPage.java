@@ -2,14 +2,9 @@ package com.kh.beatbot.layout.page.effect;
 
 import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.effect.Reverb;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 
 public class ReverbParamsPage extends EffectParamsPage {
-
-	public ReverbParamsPage(TouchableSurfaceView parent) {
-		super(parent);
-	}
 
 	@Override
 	protected String getName() {

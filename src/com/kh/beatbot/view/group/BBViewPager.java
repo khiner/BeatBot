@@ -2,14 +2,9 @@ package com.kh.beatbot.view.group;
 
 import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.TouchableBBView;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class BBViewPager extends TouchableBBView {
 	private int currPageNum;
-	
-	public BBViewPager(TouchableSurfaceView parent) {
-		super(parent);
-	}
 	
 	public void addPage(BBView page) {
 		addChild(page);

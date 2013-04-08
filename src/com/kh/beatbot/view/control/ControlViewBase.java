@@ -2,7 +2,6 @@ package com.kh.beatbot.view.control;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.view.TouchableBBView;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 public abstract class ControlViewBase extends TouchableBBView {
 
@@ -11,10 +10,6 @@ public abstract class ControlViewBase extends TouchableBBView {
 			levelColor[2], .5f };
 
 	protected boolean selected = false;
-
-	public ControlViewBase(TouchableSurfaceView parent) {
-		super(parent);
-	}
 	
 	@Override
 	public void init() {

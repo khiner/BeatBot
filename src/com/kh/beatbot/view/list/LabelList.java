@@ -11,7 +11,6 @@ import com.kh.beatbot.global.ImageIcon;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.view.ClickableBBView;
 import com.kh.beatbot.view.GLSurfaceViewBase;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class LabelList extends ClickableBBView {
 
@@ -125,10 +124,6 @@ public class LabelList extends ClickableBBView {
 
 	// which label is currently being touched? (null for none)
 	protected Label touchedLabel = null;
-
-	public LabelList(TouchableSurfaceView parent) {
-		super(parent);
-	}
 	
 	public void setListener(LabelListListener listener) {
 		this.listener = listener;

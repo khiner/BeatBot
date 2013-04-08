@@ -3,7 +3,6 @@ package com.kh.beatbot.view.control;
 import java.nio.FloatBuffer;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class Seekbar extends ControlView1dBase {
 
@@ -11,10 +10,6 @@ public class Seekbar extends ControlView1dBase {
 	protected int numLevelVertices = 0;
 	protected float levelBarHeight = 8;
 	private float middleY = 0;
-	
-	public Seekbar(TouchableSurfaceView parent) {
-		super(parent);
-	}
 	
 	protected void initLevelBarVb() {
 		float[] vertices = new float[800];
