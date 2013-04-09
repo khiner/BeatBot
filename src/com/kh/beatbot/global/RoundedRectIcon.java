@@ -13,7 +13,15 @@ public class RoundedRectIcon extends Icon {
 		this.width = width;
 		this.height = height;
 		roundedRectMesh = new RoundedRectMesh(x, y, width, height, cornerRadius, 16, bgColor);
-		roundedRectOutlineMesh = new RoundedRectOutlineMesh(x, y, width, height, cornerRadius, 32, borderColor);
+		roundedRectOutlineMesh = new RoundedRectOutlineMesh(x, y, width, height, cornerRadius, 16, borderColor);
+	}
+	
+	public RoundedRectIcon(float width, float height, RoundedRectMesh roundedRectMesh,
+			RoundedRectOutlineMesh roundedRectOutlineMesh) {
+		this.width = width;
+		this.height = height;
+		this.roundedRectMesh = roundedRectMesh;
+		this.roundedRectOutlineMesh = roundedRectOutlineMesh; 
 	}
 	
 	@Override

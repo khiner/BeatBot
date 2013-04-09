@@ -46,7 +46,7 @@ public class MeshGroup {
 		gl.glDrawArrays(primitiveType, 0, numVertices * 2);
 		
 		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
-		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);	
+		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
 	}
 	
 	public void addMesh(Mesh2D mesh) {

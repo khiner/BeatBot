@@ -1,6 +1,7 @@
 package com.kh.beatbot.view.mesh;
 
-import javax.microedition.khronos.opengles.GL10;
+import android.util.Log;
+
 
 public class RoundedRectOutlineMesh extends Mesh2D {
 
@@ -10,7 +11,7 @@ public class RoundedRectOutlineMesh extends Mesh2D {
 	
 	public RoundedRectOutlineMesh(float x, float y, float width, float height,
 			float cornerRadius, int resolution, float[] color) {
-		super(GL10.GL_LINES, resolution * 4 * 2);
+		super(resolution * 4 * 2);
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -18,13 +19,19 @@ public class RoundedRectOutlineMesh extends Mesh2D {
 		this.cornerRadius = cornerRadius;
 		mColor = color;
 		createVertices();
+		if (index < numVertices) {
+			Log.e("RoundedRectOutlineMesh", "Did not fill vertices! " + index + ", " + numVertices);
+		}
 	}
 
+	public RoundedRectOutlineMesh(float[] vertices, float[] color) {
+		super(vertices, color);
+	}
+	
 	private void createVertices() {
 		float theta = 0, addX, addY;
 		float lastX = 0, lastY = 0;
-		for (int i = 0; i < vertices.length / 6; i++) {
-			theta += 4 * ¹ / (vertices.length / 3);
+		for (int i = 0; i < vertices.length / 4; i++) {
 			if (theta < ¹ / 2) { // lower right
 				addX = width - cornerRadius;
 				addY = height - cornerRadius;
@@ -46,7 +53,7 @@ public class RoundedRectOutlineMesh extends Mesh2D {
 			}
 			lastX = vertexX;
 			lastY = vertexY;
-
+			theta += 4 * ¹ / (vertices.length / 2);
 		}
 		vertex(vertices[0], vertices[1], mColor);
 		vertex(lastX, lastY, mColor);

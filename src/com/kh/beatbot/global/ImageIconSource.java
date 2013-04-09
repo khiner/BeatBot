@@ -5,10 +5,6 @@ public class ImageIconSource extends IconSource {
 	public int listViewIconResource = -1;
 	public int listTitleIconResource = -1;
 
-	public ImageIconSource() {
-		
-	}
-	
 	public ImageIconSource(int defaultIconResourceId, int pressedIconResourceId) {
 		this(defaultIconResourceId, pressedIconResourceId, -1);
 	}
