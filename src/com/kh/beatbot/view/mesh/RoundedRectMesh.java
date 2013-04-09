@@ -20,9 +20,7 @@ public class RoundedRectMesh extends Mesh2D {
 		mColor = color;
 		createVertices();
 		if (index < numVertices) {
-			Log.e("RoundedRectMesh", "Did not fill vertices!");
-		} else if (index == numVertices){
-			Log.e("RoundedRectMesh", "filled!");
+			Log.e("RoundedRectMesh", "Did not fill vertices! " + index + ", " + numVertices);
 		}
 	}
 

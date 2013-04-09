@@ -1,6 +1,8 @@
 package com.kh.beatbot.view.group;
 
+import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.layout.page.effect.ChorusParamsPage;
 import com.kh.beatbot.layout.page.effect.DecimateParamsPage;
 import com.kh.beatbot.layout.page.effect.DelayParamsPage;
@@ -9,7 +11,10 @@ import com.kh.beatbot.layout.page.effect.FilterParamsPage;
 import com.kh.beatbot.layout.page.effect.FlangerParamsPage;
 import com.kh.beatbot.layout.page.effect.ReverbParamsPage;
 import com.kh.beatbot.layout.page.effect.TremeloParamsPage;
+import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.Level2dListener;
+import com.kh.beatbot.view.Button;
+import com.kh.beatbot.view.TextButton;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.control.ControlViewBase;
 import com.kh.beatbot.view.control.Seekbar2d;
@@ -18,6 +23,7 @@ public class EffectPage extends TouchableBBView {
 
 	private BBViewPager paramsPager;
 	private Seekbar2d level2d;
+	private TextButton toggleButton;
 	
 	private ChorusParamsPage chorusPage;
 	private DecimateParamsPage decimatePage;
@@ -32,6 +38,8 @@ public class EffectPage extends TouchableBBView {
 	}
 	
 	public void loadEffect(Effect effect) {
+		toggleButton.setChecked(effect.isOn());
+		toggleButton.setText(effect.getName());
 		paramsPager.setPage(effect.getNum());
 		((EffectParamsPage)paramsPager.getCurrPage()).setEffect(effect);
 	}
@@ -73,6 +81,16 @@ public class EffectPage extends TouchableBBView {
 		paramsPager.addPage(reverbPage);
 		paramsPager.addPage(tremeloPage);
 		
+		toggleButton = new TextButton(null,
+				Colors.labelBgColorSet, Colors.labelStrokeColorSet,
+				R.drawable.off_icon, -1, R.drawable.on_icon);
+		toggleButton.setOnClickListener(new BBOnClickListener() {
+			@Override
+			public void onClick(Button button) {
+				((EffectParamsPage)paramsPager.getCurrPage()).getEffect().setOn(toggleButton.isChecked());
+			}
+		});
+		
 		level2d.addLevelListener(new Level2dListener() {
 			@Override
 			public void onLevelChange(ControlViewBase levelListenable, float levelX,
@@ -82,13 +100,15 @@ public class EffectPage extends TouchableBBView {
 			}
 		});
 		
+		addChild(toggleButton);
 		addChild(level2d);
 		addChild(paramsPager);
 	}
 
 	@Override
 	public void layoutChildren() {
-		paramsPager.layout(this, 0, 0, width - height, height);
+		toggleButton.layout(this, 0, 0, (width - height), (width - height) / 5);
+		paramsPager.layout(this, 0, (width - height) / 5, width - height, height - (width - height) / 5);
 		level2d.layout(this, width - height, 0, height, height);
 	}
 }

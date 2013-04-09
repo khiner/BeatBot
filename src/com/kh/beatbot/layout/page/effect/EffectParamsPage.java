@@ -1,15 +1,12 @@
 package com.kh.beatbot.layout.page.effect;
 
-import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.effect.ParamData;
-import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.view.Button;
-import com.kh.beatbot.view.TextButton;
 import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.control.ControlViewBase;
@@ -21,7 +18,6 @@ public abstract class EffectParamsPage extends TouchableBBView implements
 	protected ParamControl[] paramControls;
 	protected Effect effect;
 	protected int xParamIndex = 0, yParamIndex = 1;
-	protected TextButton toggleButton;
 
 	protected abstract int getNumParams();
 
@@ -47,15 +43,18 @@ public abstract class EffectParamsPage extends TouchableBBView implements
 
 	public void setEffect(Effect effect) {
 		this.effect = effect;
-		toggleButton.setChecked(effect.isOn());
 		for (ParamControl paramControl : paramControls) {
 			paramControl.setParam(effect.getParam(paramControl.knob.getId()));
 		}
 	}
 
+	public Effect getEffect() {
+		return effect;
+	}
+	
 	@Override
 	protected void loadIcons() {
-		toggleButton.setText(getName());
+		// parent
 	}
 
 	@Override
@@ -70,17 +69,7 @@ public abstract class EffectParamsPage extends TouchableBBView implements
 
 	@Override
 	public void createChildren() {
-		toggleButton = new TextButton(null,
-				Colors.labelBgColorSet, Colors.labelStrokeColorSet,
-				R.drawable.off_icon, -1, R.drawable.on_icon);
-		toggleButton.setOnClickListener(new BBOnClickListener() {
-			@Override
-			public void onClick(Button button) {
-				effect.setOn(toggleButton.isChecked());
-			}
-		});
 		createParamControls();
-		addChild(toggleButton);
 		for (ParamControl paramControl : paramControls) {
 			addChild(paramControl);
 		}
@@ -88,7 +77,6 @@ public abstract class EffectParamsPage extends TouchableBBView implements
 
 	@Override
 	public void layoutChildren() {
-		toggleButton.layout(this, 0, 0, width, width / 5);
 		int halfParams = (getNumParams() + 1) / 2;
 		float paramW = getNumParams() <= 3 ? width / getNumParams() : width
 				/ halfParams;
