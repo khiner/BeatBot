@@ -1,6 +1,7 @@
-package com.kh.beatbot.view;
+package com.kh.beatbot.view.control;
 
 import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.view.TouchableBBView;
 
 public abstract class Button extends TouchableBBView {
 	private BBOnClickListener listener;

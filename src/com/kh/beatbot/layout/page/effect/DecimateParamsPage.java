@@ -5,11 +5,6 @@ import com.kh.beatbot.effect.ParamData;
 
 
 public class DecimateParamsPage extends EffectParamsPage {
-
-	@Override
-	protected String getName() {
-		return Decimate.NAME;
-	}
 	
 	@Override
 	protected int getNumParams() {

@@ -6,18 +6,13 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.global.ImageIconSource;
-import com.kh.beatbot.view.ToggleButton;
+import com.kh.beatbot.view.control.ToggleButton;
 
 
 public class FilterParamsPage extends EffectParamsPage {
 
 	private ToggleButton[] filterToggles;
 
-	@Override
-	protected String getName() {
-		return Filter.NAME;
-	}
-	
 	@Override
 	protected int getNumParams() {
 		return Filter.NUM_PARAMS;

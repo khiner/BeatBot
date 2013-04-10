@@ -7,11 +7,6 @@ import com.kh.beatbot.effect.Tremelo;
 public class TremeloParamsPage extends EffectParamsPage {
 
 	@Override
-	protected String getName() {
-		return Tremelo.NAME;
-	}
-	
-	@Override
 	protected int getNumParams() {
 		return Tremelo.NUM_PARAMS;
 	}

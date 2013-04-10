@@ -18,10 +18,10 @@ public class ImageIconSource extends IconSource {
 	public ImageIconSource(int defaultIconResourceId,
 			int pressedIconResourceId, int selectedIconResourceId,
 			int disabledIconResourceId) {
-		super(defaultIconResourceId == -1 ? null : new ImageIcon(defaultIconResourceId),
-				pressedIconResourceId == -1 ? null : new ImageIcon(pressedIconResourceId),
-				selectedIconResourceId == -1 ? null : new ImageIcon(selectedIconResourceId),
-				disabledIconResourceId == -1 ? null : new ImageIcon(disabledIconResourceId));
+		super(defaultIconResourceId == -1 ? null : new Image(defaultIconResourceId),
+				pressedIconResourceId == -1 ? null : new Image(pressedIconResourceId),
+				selectedIconResourceId == -1 ? null : new Image(selectedIconResourceId),
+				disabledIconResourceId == -1 ? null : new Image(disabledIconResourceId));
 	}
 	
 	public ImageIconSource(int defaultIconResourceId,

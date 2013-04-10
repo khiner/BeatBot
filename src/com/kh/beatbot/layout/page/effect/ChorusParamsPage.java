@@ -7,11 +7,6 @@ import com.kh.beatbot.effect.ParamData;
 public class ChorusParamsPage extends EffectParamsPage {
 	
 	@Override
-	protected String getName() {
-		return Chorus.NAME;
-	}
-	
-	@Override
 	protected int getNumParams() {
 		return Chorus.NUM_PARAMS;
 	}

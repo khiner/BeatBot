@@ -9,6 +9,9 @@ import com.kh.beatbot.global.IconSource;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.view.control.Button;
+import com.kh.beatbot.view.control.TextButton;
+import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.helper.TickWindowHelper;
 
 public class MidiTrackView extends TouchableBBView {

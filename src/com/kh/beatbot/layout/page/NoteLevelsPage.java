@@ -5,9 +5,9 @@ import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
-import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.LevelsView;
-import com.kh.beatbot.view.ToggleButton;
+import com.kh.beatbot.view.control.Button;
+import com.kh.beatbot.view.control.ToggleButton;
 
 public class NoteLevelsPage extends Page {
 

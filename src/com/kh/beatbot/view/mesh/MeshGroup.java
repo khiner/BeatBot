@@ -23,7 +23,7 @@ public class MeshGroup {
 	
 	private boolean dirty = false;
 	
-	public void render(int primitiveType) {
+	public void draw(int primitiveType) {
 		GL11 gl = (GL11)BBView.gl;
 		
 		if (children.isEmpty()) {

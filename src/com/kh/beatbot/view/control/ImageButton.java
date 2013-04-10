@@ -1,12 +1,10 @@
-package com.kh.beatbot.view;
+package com.kh.beatbot.view.control;
 
-import com.kh.beatbot.global.Icon;
 import com.kh.beatbot.global.IconSource;
 
 public class ImageButton extends Button {
 
 	protected IconSource iconSource;
-	protected Icon currentIcon;
 	
 	public IconSource getIconSource() {
 		return iconSource;
@@ -14,48 +12,42 @@ public class ImageButton extends Button {
 	
 	public void setIconSource(IconSource iconSource) {
 		this.iconSource = iconSource;
-		if (iconSource.disabledIcon != null) {
-			currentIcon = iconSource.disabledIcon;
-		} else {
-			currentIcon = iconSource.defaultIcon;
-		}
 	}
 
 	@Override
 	public void press() {
 		super.press();
-		currentIcon = iconSource.pressedIcon;
+		iconSource.setState(IconSource.State.PRESSED);
 	}
 	
 	@Override
 	public void release() {
 		super.release();
-		currentIcon = iconSource.defaultIcon;
+		iconSource.setState(IconSource.State.DEFAULT);
 	}
 	
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
-		currentIcon = enabled ? iconSource.defaultIcon : (iconSource.disabledIcon != null ?
-				iconSource.disabledIcon : null);
+		iconSource.setState(enabled ? IconSource.State.DEFAULT : IconSource.State.DISABLED);
 	}
 
 	public float getIconWidth() {
-		return currentIcon.getWidth();
+		return iconSource.getWidth();
 	}
 
 	public float getIconHeight() {
-		return currentIcon.getHeight();
+		return iconSource.getWidth();
 	}
 	
 	@Override
 	public void init() {
-		//nothing to do
+		// nothing to do
 	}
 
 	@Override
 	public void draw() {
-		if (currentIcon != null) {
-			currentIcon.draw(absoluteX, root.getHeight() - absoluteY - height, width, height);
+		if (iconSource != null) {
+			iconSource.draw(absoluteX, root.getHeight() - absoluteY - height, width, height);
 		}
 	}
 

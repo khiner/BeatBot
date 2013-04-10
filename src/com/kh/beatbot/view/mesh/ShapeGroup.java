@@ -12,25 +12,24 @@ public class ShapeGroup {
 		outlineGroup = new MeshGroup();
 	}
 	
-	public void render(GL11 gl, int borderWidth) {
-		fillGroup.render(GL10.GL_TRIANGLES);
+	public void draw(GL11 gl, int borderWidth) {
+		fillGroup.draw(GL10.GL_TRIANGLES);
 		gl.glLineWidth(borderWidth);
-		outlineGroup.render(GL10.GL_LINES);
+		outlineGroup.draw(GL10.GL_LINES);
 	}
 	
-	public void addMeshPair(Mesh2D fillMesh, Mesh2D outlineMesh) {
-		fillGroup.addMesh(fillMesh);
-		outlineGroup.addMesh(outlineMesh);
+	public void addShape(Shape shape) {
+		fillGroup.addMesh(shape.fillMesh);
+		outlineGroup.addMesh(shape.outlineMesh);
 	}
 	
-	public void removeMeshPair(Mesh2D fillMesh, Mesh2D outlineMesh) {
-		fillGroup.removeMesh(fillMesh);
-		outlineGroup.removeMesh(outlineMesh);
+	public void removeShape(Shape shape) {
+		fillGroup.removeMesh(shape.fillMesh);
+		outlineGroup.removeMesh(shape.outlineMesh);
 	}
 	
-	public void replaceMeshPair(Mesh2D oldFillMesh, Mesh2D oldOutlineMesh,
-			Mesh2D newFillMesh, Mesh2D newOutlineMesh) {
-		fillGroup.replaceMesh(oldFillMesh, newFillMesh);
-		outlineGroup.replaceMesh(oldOutlineMesh, newOutlineMesh);
+	public void replaceShape(Shape oldShape, Shape newShape) {
+		fillGroup.replaceMesh(oldShape.fillMesh, newShape.fillMesh);
+		outlineGroup.replaceMesh(oldShape.outlineMesh, newShape.outlineMesh);
 	}
 }

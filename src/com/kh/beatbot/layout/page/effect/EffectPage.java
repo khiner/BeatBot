@@ -1,23 +1,16 @@
-package com.kh.beatbot.view.group;
+package com.kh.beatbot.layout.page.effect;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.layout.page.effect.ChorusParamsPage;
-import com.kh.beatbot.layout.page.effect.DecimateParamsPage;
-import com.kh.beatbot.layout.page.effect.DelayParamsPage;
-import com.kh.beatbot.layout.page.effect.EffectParamsPage;
-import com.kh.beatbot.layout.page.effect.FilterParamsPage;
-import com.kh.beatbot.layout.page.effect.FlangerParamsPage;
-import com.kh.beatbot.layout.page.effect.ReverbParamsPage;
-import com.kh.beatbot.layout.page.effect.TremeloParamsPage;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.Level2dListener;
-import com.kh.beatbot.view.Button;
-import com.kh.beatbot.view.TextButton;
 import com.kh.beatbot.view.TouchableBBView;
+import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.ControlViewBase;
 import com.kh.beatbot.view.control.Seekbar2d;
+import com.kh.beatbot.view.control.TextButton;
+import com.kh.beatbot.view.group.BBViewPager;
 
 public class EffectPage extends TouchableBBView {
 

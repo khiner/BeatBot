@@ -10,10 +10,10 @@ import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.view.BpmView;
-import com.kh.beatbot.view.Button;
-import com.kh.beatbot.view.ImageButton;
-import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableBBView;
+import com.kh.beatbot.view.control.Button;
+import com.kh.beatbot.view.control.ImageButton;
+import com.kh.beatbot.view.control.ToggleButton;
 
 public class ControlButtonGroup extends TouchableBBView {
 

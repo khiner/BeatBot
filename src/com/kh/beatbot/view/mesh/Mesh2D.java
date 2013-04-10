@@ -8,10 +8,9 @@ package com.kh.beatbot.view.mesh;
  * @author mzechner, adapted by Karl Hiner
  * 
  */
-public abstract class Mesh2D {
-	public static final float ¹ = (float) Math.PI;
+public class Mesh2D {
 	
-	public MeshGroup parent;
+	private MeshGroup parent;
 	
 	public int parentVertexIndex = -1;
 	protected float vertices[];
@@ -78,5 +77,9 @@ public abstract class Mesh2D {
 			this.color[i * 4 + 2] = color[2];
 			this.color[i * 4 + 3] = color[3];
 		}
+	}
+	
+	public boolean hasParent() {
+		return parent != null;
 	}
 }

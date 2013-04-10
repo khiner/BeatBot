@@ -4,8 +4,6 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.Level1dListener;
-import com.kh.beatbot.view.Button;
-import com.kh.beatbot.view.ToggleButton;
 
 public class ToggleKnob extends Knob {
 

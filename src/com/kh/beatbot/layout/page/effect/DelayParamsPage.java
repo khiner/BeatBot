@@ -5,19 +5,14 @@ import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
-import com.kh.beatbot.view.Button;
-import com.kh.beatbot.view.ToggleButton;
+import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.ParamControl;
+import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.control.ToggleKnob;
 
 public class DelayParamsPage extends EffectParamsPage {
 
 	private ToggleButton linkToggle;
-
-	@Override
-	protected String getName() {
-		return Delay.NAME;
-	}
 	
 	@Override
 	protected int getNumParams() {

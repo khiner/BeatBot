@@ -1,4 +1,4 @@
-package com.kh.beatbot.view.group;
+package com.kh.beatbot.layout.page;
 
 import javax.microedition.khronos.opengles.GL11;
 
@@ -6,6 +6,8 @@ import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.MidiTrackView;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.TouchableBBView;
+import com.kh.beatbot.view.group.ControlButtonGroup;
+import com.kh.beatbot.view.group.PageSelectGroup;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class MainPage extends TouchableBBView {
@@ -30,7 +32,7 @@ public class MainPage extends TouchableBBView {
 
 	@Override
 	public void draw() {
-		roundedRectGroup.render((GL11)gl, 1);
+		roundedRectGroup.draw((GL11)gl, 1);
 	}
 
 	@Override

@@ -4,10 +4,10 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.view.Button;
-import com.kh.beatbot.view.ImageButton;
 import com.kh.beatbot.view.SampleEditBBView;
-import com.kh.beatbot.view.ToggleButton;
+import com.kh.beatbot.view.control.Button;
+import com.kh.beatbot.view.control.ImageButton;
+import com.kh.beatbot.view.control.ToggleButton;
 
 public class SampleEditPage extends Page {
 

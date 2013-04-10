@@ -7,11 +7,6 @@ import com.kh.beatbot.effect.Reverb;
 public class ReverbParamsPage extends EffectParamsPage {
 
 	@Override
-	protected String getName() {
-		return Reverb.NAME;
-	}
-	
-	@Override
 	protected int getNumParams() {
 		return Reverb.NUM_PARAMS;
 	}

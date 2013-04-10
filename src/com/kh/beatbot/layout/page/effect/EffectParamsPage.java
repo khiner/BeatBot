@@ -6,11 +6,11 @@ import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.Level1dListener;
-import com.kh.beatbot.view.Button;
-import com.kh.beatbot.view.ToggleButton;
 import com.kh.beatbot.view.TouchableBBView;
+import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.ControlViewBase;
 import com.kh.beatbot.view.control.ParamControl;
+import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.control.ToggleKnob;
 
 public abstract class EffectParamsPage extends TouchableBBView implements
@@ -20,8 +20,6 @@ public abstract class EffectParamsPage extends TouchableBBView implements
 	protected int xParamIndex = 0, yParamIndex = 1;
 
 	protected abstract int getNumParams();
-
-	protected abstract String getName();
 
 	protected abstract ParamData[] getParamsData();
 

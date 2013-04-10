@@ -3,8 +3,8 @@ package com.kh.beatbot.global;
 import android.graphics.Typeface;
 
 import com.kh.beatbot.activity.BeatBotActivity;
-import com.kh.beatbot.view.group.EffectPage;
-import com.kh.beatbot.view.group.MainPage;
+import com.kh.beatbot.layout.page.MainPage;
+import com.kh.beatbot.layout.page.effect.EffectPage;
 
 public class GlobalVars {
 

@@ -6,11 +6,6 @@ import com.kh.beatbot.effect.ParamData;
 public class FlangerParamsPage extends EffectParamsPage {
 
 	@Override
-	protected String getName() {
-		return Flanger.NAME;
-	}
-	
-	@Override
 	protected int getNumParams() {
 		return Flanger.NUM_PARAMS;
 	}

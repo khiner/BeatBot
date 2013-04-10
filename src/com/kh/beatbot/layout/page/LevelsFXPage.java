@@ -22,11 +22,11 @@ import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.view.Button;
 import com.kh.beatbot.view.TextView;
-import com.kh.beatbot.view.ToggleButton;
+import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.ControlViewBase;
 import com.kh.beatbot.view.control.Seekbar;
+import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.list.DraggableLabelList;
 import com.kh.beatbot.view.list.LabelList;
 

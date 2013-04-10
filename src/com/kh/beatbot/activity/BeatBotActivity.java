@@ -31,14 +31,14 @@ import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.layout.page.MainPage;
+import com.kh.beatbot.layout.page.effect.EffectPage;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.group.BBViewPager;
-import com.kh.beatbot.view.group.EffectPage;
 import com.kh.beatbot.view.group.GLSurfaceViewGroup;
-import com.kh.beatbot.view.group.MainPage;
 
 public class BeatBotActivity extends Activity {
 	

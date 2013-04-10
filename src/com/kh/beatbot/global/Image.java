@@ -2,15 +2,19 @@ package com.kh.beatbot.global;
 
 import com.kh.beatbot.view.GLSurfaceViewBase;
 
-public class ImageIcon extends Icon {
+public class Image implements Drawable {
 
 	protected int resourceId;
 	protected int[] textureHandlers = new int[1];
 	protected int[] crop = new int[4];
 	
-	public ImageIcon(int resourceId) {
+	public Image(int resourceId) {
 		this.resourceId = resourceId;
 		GLSurfaceViewBase.loadTexture(resourceId, textureHandlers, 0, crop);
+	}
+	
+	public void draw() {
+		draw(0, 0);
 	}
 	
 	public void draw(float x, float y) {
@@ -22,6 +26,14 @@ public class ImageIcon extends Icon {
 				height);
 	}
 
+	public float getX() {
+		return 0;
+	}
+	
+	public float getY() {
+		return 0;
+	}
+	
 	public float getWidth() {
 		return crop[2];
 	}

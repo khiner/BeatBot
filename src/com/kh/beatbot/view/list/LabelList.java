@@ -6,8 +6,8 @@ import java.util.Collections;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.Icon;
-import com.kh.beatbot.global.ImageIcon;
+import com.kh.beatbot.global.Drawable;
+import com.kh.beatbot.global.Image;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.view.ClickableBBView;
 import com.kh.beatbot.view.GLSurfaceViewBase;
@@ -120,7 +120,7 @@ public class LabelList extends ClickableBBView {
 	protected static FloatBuffer bgRectVb = null;
 	protected LabelListListener listener = null;
 	protected ArrayList<Label> labels = null;
-	protected static Icon plusIcon;
+	protected static Drawable plusIcon;
 
 	// which label is currently being touched? (null for none)
 	protected Label touchedLabel = null;
@@ -195,7 +195,7 @@ public class LabelList extends ClickableBBView {
 
 	@Override
 	protected void loadIcons() {
-		plusIcon = new ImageIcon(R.drawable.plus_outline);
+		plusIcon = new Image(R.drawable.plus_outline);
 	}
 	
 	@Override
