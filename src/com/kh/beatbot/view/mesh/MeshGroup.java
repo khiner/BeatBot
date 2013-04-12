@@ -13,13 +13,10 @@ import com.kh.beatbot.view.BBView;
 
 public class MeshGroup {
 	private List<Mesh2D> children = new ArrayList<Mesh2D>();
-	private FloatBuffer vertexBuffer;
-	private FloatBuffer colorBuffer;
+	private FloatBuffer vertexBuffer, colorBuffer;
 	private float[] vertices;
 	private float[] colors;
-	private int vertexHandle, colorHandle;
-	
-	private int numVertices = -1;
+	private int vertexHandle, colorHandle, numVertices = -1;
 	
 	private boolean dirty = false;
 	
@@ -43,7 +40,7 @@ public class MeshGroup {
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, colorHandle);
 		gl.glColorPointer(4, GL10.GL_FLOAT, 0, 0);
 
-		gl.glDrawArrays(primitiveType, 0, numVertices * 2);
+		gl.glDrawArrays(primitiveType, 0, numVertices);
 		
 		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
