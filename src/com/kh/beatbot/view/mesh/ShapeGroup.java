@@ -18,18 +18,23 @@ public class ShapeGroup {
 		outlineGroup.draw(GL10.GL_LINES);
 	}
 	
-	public void addShape(Shape shape) {
+	public void add(Shape shape) {
 		fillGroup.addMesh(shape.fillMesh);
 		outlineGroup.addMesh(shape.outlineMesh);
 	}
 	
-	public void removeShape(Shape shape) {
+	public void remove(Shape shape) {
 		fillGroup.removeMesh(shape.fillMesh);
 		outlineGroup.removeMesh(shape.outlineMesh);
 	}
 	
-	public void replaceShape(Shape oldShape, Shape newShape) {
+	public void replace(Shape oldShape, Shape newShape) {
 		fillGroup.replaceMesh(oldShape.fillMesh, newShape.fillMesh);
 		outlineGroup.replaceMesh(oldShape.outlineMesh, newShape.outlineMesh);
+	}
+	
+	public void update(Shape shape) {
+		fillGroup.updateVertices(shape.fillMesh);
+		outlineGroup.updateVertices(shape.outlineMesh);
 	}
 }

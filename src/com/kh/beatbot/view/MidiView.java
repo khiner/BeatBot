@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
@@ -16,6 +17,8 @@ import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.helper.ScrollBarHelper;
 import com.kh.beatbot.view.helper.TickWindowHelper;
+import com.kh.beatbot.view.mesh.Rectangle;
+import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class MidiView extends ClickableBBView {
 
@@ -50,6 +53,9 @@ public class MidiView extends ClickableBBView {
 	// this option can be set via a menu item.
 	// if true, all midi note movements are rounded to the nearest major tick
 	public static boolean snapToGrid = true;
+
+	// single ShapeGroup to handle drawing of all midi rectangles at once
+	private ShapeGroup midiRectangles = new ShapeGroup();
 
 	public float getMidiHeight() {
 		return height - Y_OFFSET;
@@ -234,24 +240,7 @@ public class MidiView extends ClickableBBView {
 	}
 
 	private void drawAllMidiNotes() {
-		// not using for-each to avoid concurrent modification
-		for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
-			if (midiManager.getMidiNotes().size() <= i)
-				break;
-			MidiNote midiNote = midiManager.getMidiNote(i);
-			if (midiNote != null) {
-				drawMidiNote(midiNote,
-						midiNote.isSelected() ? Colors.NOTE_SELECTED
-								: Colors.NOTE);
-			}
-		}
-	}
-
-	public void drawMidiNote(MidiNote midiNote, float[] color) {
-		// fill
-		drawTriangleFan(midiNote.getVb(), color);
-		// outline
-		drawLines(midiNote.getVb(), Colors.BLACK, 3, GL10.GL_LINE_LOOP);
+		midiRectangles.draw((GL11) gl, 2);
 	}
 
 	private void initTickFillVb() {
@@ -342,7 +331,7 @@ public class MidiView extends ClickableBBView {
 	public static float noteToUnscaledY(int note) {
 		return note * trackHeight + Y_OFFSET;
 	}
-	
+
 	public void trackAdded(int trackNum) {
 		allTracksHeight += trackHeight;
 		if (root.initialized)
@@ -370,25 +359,26 @@ public class MidiView extends ClickableBBView {
 	}
 
 	@Override
-	public void draw() {	
+	public void draw() {
 		TickWindowHelper.scroll(); // take care of any momentum scrolling
 
 		drawTriangleFan(bgVb, Colors.MIDI_VIEW_BG);
 		push();
-		translate(-TickWindowHelper.getTickOffset()
+		translate(
+				-TickWindowHelper.getTickOffset()
 						/ TickWindowHelper.getNumTicks() * width, 0);
 		scale((float) TickWindowHelper.MAX_TICKS
 				/ (float) TickWindowHelper.getNumTicks(), 1);
-		
+
 		drawLoopRect();
-		
+
 		TickWindowHelper.drawVerticalLines();
 		push();
 		translate(0, -TickWindowHelper.getYOffset());
 		drawHorizontalLines();
 		drawAllMidiNotes();
 		pop();
-		
+
 		drawTickFill();
 		drawSelectRegion();
 		drawLoopMarker();
@@ -486,15 +476,31 @@ public class MidiView extends ClickableBBView {
 		return noteToAdd;
 	}
 
-	public FloatBuffer makeNoteVb(MidiNote note) {
-		// midi note rectangle coordinates
+	public void updateNoteUI(MidiNote note) {
+		// note coords
 		float x1 = tickToUnscaledX(note.getOnTick());
 		float y1 = noteToUnscaledY(note.getNoteValue());
-		float x2 = tickToUnscaledX(note.getOffTick());
-		float y2 = y1 + trackHeight;
-		return makeRectFloatBuffer(x1, y1, x2, y2);
+		float width = tickToUnscaledX(note.getOffTick()) - x1;
+
+		float[] color = note.isSelected() ? Colors.NOTE_SELECTED : Colors.NOTE;
+
+		if (note.getRectangle() != null) {
+			note.getRectangle().update(x1, y1, width, trackHeight, color,
+						Colors.BLACK);
+		}
 	}
 
+	public Rectangle makeNoteRectangle(MidiNote note) {
+		float x1 = tickToUnscaledX(note.getOnTick());
+		float y1 = noteToUnscaledY(note.getNoteValue());
+		float width = tickToUnscaledX(note.getOffTick()) - x1;
+		
+		float[] color = note.isSelected() ? Colors.NOTE_SELECTED : Colors.NOTE;
+		
+		return new Rectangle(midiRectangles, x1, y1, width,
+				trackHeight, color, Colors.BLACK);
+	}
+	
 	private void dragNotes(boolean dragAllSelected, int pointerId,
 			float currTick, int currNote) {
 		MidiNote touchedNote = touchedNotes.get(pointerId);
@@ -593,8 +599,7 @@ public class MidiView extends ClickableBBView {
 	public void noMidiMove() {
 		if (pointerCount() - getNumLoopMarkersSelected() == 1) {
 			if (selectRegion) { // update select region
-				selectRegion(pointerIdToPos.get(0).x,
-						pointerIdToPos.get(0).y);
+				selectRegion(pointerIdToPos.get(0).x, pointerIdToPos.get(0).y);
 			} else { // one finger scroll
 				TickWindowHelper.scroll(pointerIdToPos.get(scrollPointerId).x,
 						pointerIdToPos.get(scrollPointerId).y);
@@ -692,15 +697,19 @@ public class MidiView extends ClickableBBView {
 			if (touchedNotes.size() == 1) {
 				// exactly one pointer not dragging loop markers - drag all
 				// selected notes together
-				dragNotes(true, touchedNotes.keySet().iterator().next(), tick, note);
-				// make room in the view window if we are dragging out of the view
+				dragNotes(true, touchedNotes.keySet().iterator().next(), tick,
+						note);
+				// make room in the view window if we are dragging out of the
+				// view
 				TickWindowHelper.updateView(tick);
-			} else if (touchedNotes.size() > 1) {  // drag each touched note separately
+			} else if (touchedNotes.size() > 1) { // drag each touched note
+													// separately
 				dragNotes(false, id, tick, note);
 				if (id == 0) {
 					// need to make room for two pointers in this case.
 					float otherTick = xToTick(pointerIdToPos.get(1).x);
-					TickWindowHelper.updateView(Math.min(tick, otherTick), Math.max(tick, otherTick));
+					TickWindowHelper.updateView(Math.min(tick, otherTick),
+							Math.max(tick, otherTick));
 				}
 			}
 		}

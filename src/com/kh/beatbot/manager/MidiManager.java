@@ -24,6 +24,7 @@ import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
 import com.kh.beatbot.view.helper.TickWindowHelper;
+import com.kh.beatbot.view.mesh.Rectangle;
 
 public class MidiManager implements Parcelable {
 	private static MidiManager singletonInstance = null;
@@ -192,6 +193,9 @@ public class MidiManager implements Parcelable {
 		midiNotes.add(midiNote);
 		Track track = Managers.trackManager.getTrack(midiNote.getNoteValue());
 		track.addNote(midiNote);
+		Rectangle noteRect = GlobalVars.mainPage.midiView.makeNoteRectangle(midiNote);
+		midiNote.setRectangle(noteRect);
+		noteRect.getGroup().add(midiNote.getRectangle());
 	}
 
 	public void putTempNote(int index, MidiNote midiNote) {
@@ -201,6 +205,7 @@ public class MidiManager implements Parcelable {
 	public void deleteNote(MidiNote midiNote) {
 		if (!midiNotes.contains(midiNote))
 			return;
+		midiNote.getRectangle().getGroup().remove(midiNote.getRectangle());
 		midiNotes.remove(midiNote);
 		Track track = Managers.trackManager.getTrack(midiNote.getNoteValue());
 		track.removeNote(midiNote);

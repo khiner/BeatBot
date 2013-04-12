@@ -19,9 +19,9 @@ public class ShapeIconSource extends IconSource {
 		prevShape = (Shape) currentIcon;
 		super.setIcon(icon);
 		if (prevShape == null) {
-			((RoundedRect) currentIcon).getGroup().addShape((Shape)currentIcon);
+			((RoundedRect) currentIcon).getGroup().add((Shape)currentIcon);
 		} else {
-			((RoundedRect) currentIcon).getGroup().replaceShape(prevShape, (Shape)currentIcon);
+			((RoundedRect) currentIcon).getGroup().replace(prevShape, (Shape)currentIcon);
 		}
 	}
 }

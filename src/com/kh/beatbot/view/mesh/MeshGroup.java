@@ -16,21 +16,21 @@ public class MeshGroup {
 	private FloatBuffer vertexBuffer, colorBuffer;
 	private float[] vertices;
 	private float[] colors;
-	private int vertexHandle, colorHandle, numVertices = -1;
+	private int vertexHandle = -1, colorHandle = -1, numVertices = -1;
 	
 	private boolean dirty = false;
 	
 	public void draw(int primitiveType) {
-		GL11 gl = (GL11)BBView.gl;
-		
 		if (children.isEmpty()) {
 			return;
 		}
-		
+	
 		if (dirty) {
 			updateBuffers();
 			dirty = false;
 		}
+		
+		GL11 gl = (GL11)BBView.gl;
 		
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, 0);
@@ -48,12 +48,12 @@ public class MeshGroup {
 	
 	public void addMesh(Mesh2D mesh) {
 		children.add(mesh);
-		update();
+		updateVertices();
 	}
 	
 	public void removeMesh(Mesh2D mesh) {
 		children.remove(mesh);
-		update();
+		updateVertices();
 	}
 	
 	public void replaceMesh(Mesh2D oldMesh, Mesh2D newMesh) {
@@ -68,21 +68,27 @@ public class MeshGroup {
 		
 		newMesh.parentVertexIndex = oldMesh.parentVertexIndex;
 		children.set(children.indexOf(oldMesh), newMesh);
-		update(newMesh);
+		updateVertices(newMesh);
 	}
 	
-	private void update() {
-		initBuffers();
+	private void updateVertices() {
+		numVertices = calcNumVertices();
+		
+		vertices = new float[numVertices * 2];
+		vertexBuffer = FloatBuffer.wrap(vertices);
+		
+		colors = new float[numVertices * 4];
+		colorBuffer = FloatBuffer.wrap(colors);
 		
 		int currVertexIndex = 0;
 		for (Mesh2D child : children) {
 			child.parentVertexIndex = currVertexIndex;
-			update(child);
+			updateVertices(child);
 			currVertexIndex += child.getNumVertices();
 		}
 	}
 	
-	private void update(Mesh2D child) {
+	public void updateVertices(Mesh2D child) {
 		if (!children.contains(child)) {
 			Log.e("MeshGroup", "Attempting to update a mesh that is not a child.");
 			return;
@@ -100,6 +106,7 @@ public class MeshGroup {
 	}
 	
 	private void updateBuffers() {
+		initHandles();
 		GL11 gl = (GL11)BBView.gl;
 		
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
@@ -113,22 +120,18 @@ public class MeshGroup {
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
 	}
 	
-	private void initBuffers() {
+	private void initHandles() {
+		if (vertexHandle != -1 && colorHandle != -1) {
+			return; // already initialized
+		}
 		GL11 gl = (GL11)BBView.gl;
-		
 		int[] buffer = new int[1];
 		
-		numVertices = calcNumVertices();
-		
-		vertices = new float[numVertices * 2];
 		gl.glGenBuffers(1, buffer, 0);
 		vertexHandle = buffer[0];
-		vertexBuffer = FloatBuffer.wrap(vertices);
 		
-		colors = new float[numVertices * 4];
 		gl.glGenBuffers(1, buffer, 0);
 		colorHandle = buffer[0];
-		colorBuffer = FloatBuffer.wrap(colors);
 	}
 	
 	private int calcNumVertices() {

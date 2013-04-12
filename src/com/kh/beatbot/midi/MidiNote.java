@@ -1,15 +1,14 @@
 package com.kh.beatbot.midi;
 
-import java.nio.FloatBuffer;
-
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
+import com.kh.beatbot.view.mesh.Rectangle;
 
 public class MidiNote implements Comparable<MidiNote> {
-	FloatBuffer vb; // vertex buffer for drawing
+	Rectangle rectangle; // rectangle for drawing
 	NoteOn noteOn;
 	NoteOff noteOff;
 	boolean selected = false;
@@ -18,19 +17,18 @@ public class MidiNote implements Comparable<MidiNote> {
 	public MidiNote(NoteOn noteOn, NoteOff noteOff) {
 		this.noteOn = noteOn;
 		this.noteOff = noteOff;
-		updateVb();
-	}
-
-	public void setVb(FloatBuffer vb) {
-		this.vb = vb;
 	}
 	
-	public FloatBuffer getVb() {
-		return vb;
+	public Rectangle getRectangle() {
+		return rectangle;
 	}
 	
-	private void updateVb() {
-		setVb(GlobalVars.mainPage.midiView.makeNoteVb(this));
+	public void setRectangle(Rectangle rectangle) {
+		this.rectangle = rectangle;
+	}
+	
+	private void updateUI() {
+		GlobalVars.mainPage.midiView.updateNoteUI(this);
 	}
 	
 	public MidiNote getCopy() {
@@ -45,7 +43,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		copy.setTouched(touched);
 		return copy;
 	}
-
+	
 	public MidiEvent getOnEvent() {
 		return noteOn;
 	}
@@ -88,6 +86,7 @@ public class MidiNote implements Comparable<MidiNote> {
 
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+		updateUI(); // color change
 	}
 
 	public void setTouched(boolean touched) {
@@ -127,13 +126,13 @@ public class MidiNote implements Comparable<MidiNote> {
 			noteOn.setTick(onTick);
 		else
 			noteOn.setTick(0);
-		updateVb();
+		updateUI();
 	}
 
 	public void setOffTick(long offTick) {
 		if (offTick > getOnTick())
 			this.noteOff.setTick(offTick);
-		updateVb();
+		updateUI();
 	}
 
 	public void setNote(int note) {
@@ -141,7 +140,7 @@ public class MidiNote implements Comparable<MidiNote> {
 			return;
 		this.noteOn.setNoteValue(note);
 		this.noteOff.setNoteValue(note);
-		updateVb();
+		updateUI();
 	}
 
 	public long getNoteLength() {

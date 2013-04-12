@@ -1,24 +1,20 @@
 package com.kh.beatbot.view.mesh;
 
-import android.util.Log;
-
-
-
 public class RoundedRect extends Shape {
 	private float cornerRadius;
 	
-	public RoundedRect(ShapeGroup group, float x, float y, float width, float height, float cornerRadius, float[] bgColor, float[] borderColor) {
+	public RoundedRect(ShapeGroup group, float x, float y, float width,
+			float height, float cornerRadius, float[] fillColor,
+			float[] outlineColor) {
 		super(group, x, y, width, height, new Mesh2D(16 * 4 * 3), new Mesh2D(16 * 4 * 2));
 		this.cornerRadius = cornerRadius;
-		createVertices(bgColor, borderColor);
-		Log.e("Rounded Rect", "fill: " + fillMesh.getNumVertices() + ", " + fillMesh.index);
-		Log.e("Rounded Rect", "outline: " + outlineMesh.getNumVertices() + ", " + outlineMesh.index);
+		createVertices(fillColor, outlineColor);
 	}
 	
 	public RoundedRect(ShapeGroup group, float x, float y, float width, float height, Mesh2D fillMesh, Mesh2D outlineMesh) {
 		super(group, x, y, width, height, fillMesh, outlineMesh);
 	}
-
+	
 	private void createVertices(float[] fillColor, float[] outlineColor) {
 		float theta = 0, addX, addY;
 		float centerX = x + width / 2;
