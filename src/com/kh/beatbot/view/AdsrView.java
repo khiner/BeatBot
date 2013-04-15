@@ -17,7 +17,7 @@ public class AdsrView extends TouchableBBView {
 	private static final int SNAP_DIST_SQUARED = 1024;
 	private static float[] pointVertices = new float[10];
 	private static FloatBuffer adsrPointVb = null;
-	private static FloatBuffer[] adsrCurveVb = new FloatBuffer[4];
+	private static FloatBuffer adsrCurveVb;
 	private static ViewRect viewRect;
 	// keep track of which pointer ids are selecting which ADSR points
 	// init to -1 to indicate no pointer is selecting
@@ -45,19 +45,19 @@ public class AdsrView extends TouchableBBView {
 		pointVertices[9] = viewRect.viewY(0);
 
 		adsrPointVb = makeFloatBuffer(pointVertices);
+		ArrayList<Float> curveVertices = new ArrayList<Float>();
 		for (int i = 0; i < 4; i++) {
-			ArrayList<Float> curveVertices = new ArrayList<Float>();
 			curveVertices
 					.addAll(makeExponentialCurveVertices(pointVertices[i * 2],
 							pointVertices[i * 2 + 1],
 							pointVertices[(i + 1) * 2],
 							pointVertices[(i + 1) * 2 + 1]));
-			float[] converted = new float[curveVertices.size()];
-			for (int j = 0; j < curveVertices.size(); j++) {
-				converted[j] = curveVertices.get(j);
-			}
-			adsrCurveVb[i] = makeFloatBuffer(converted);
 		}
+		float[] converted = new float[curveVertices.size()];
+		for (int j = 0; j < curveVertices.size(); j++) {
+			converted[j] = curveVertices.get(j);
+		}
+		adsrCurveVb = makeFloatBuffer(converted);
 	}
 
 	private float getAttackX(ADSR adsr) {
@@ -104,9 +104,7 @@ public class AdsrView extends TouchableBBView {
 						adsrPointVb.get(i * 2), adsrPointVb.get(i * 2 + 1));
 			}
 		}
-		for (int i = 0; i < adsrCurveVb.length; i++) {
-			drawLines(adsrCurveVb[i], Colors.VOLUME, 3, GL10.GL_LINE_STRIP);
-		}
+		drawLines(adsrCurveVb, Colors.VOLUME, 3, GL10.GL_LINE_STRIP);
 	}
 
 	private float getAttackX() {
