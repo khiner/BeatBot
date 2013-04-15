@@ -160,10 +160,7 @@ public class DirectoryManager {
 				R.drawable.rimshot_icon_listview,
 				R.drawable.rimshot_icon_list_title));
 		drumsDirectory.setIconSource(new ImageIconSource(
-				-1,
-				-1,
-				-1,
-				-1,
+				-1, -1, -1, -1,
 				R.drawable.drums_icon_listview,
 				R.drawable.drums_icon_list_title));
 		internalRecordDirectory.setIconSource(new ImageIconSource(
@@ -175,16 +172,12 @@ public class DirectoryManager {
 				R.drawable.microphone_icon_list_title));
 		internalBeatRecordDirectory.setIconSource(new ImageIconSource(
 				R.drawable.beat_icon,
-				R.drawable.beat_icon_selected,
-				-1,
-				-1,
+				-1, -1, -1,
 				R.drawable.beat_icon_listview,
 				R.drawable.beat_icon_list_title));
 		internalSampleRecordDirectory.setIconSource(new ImageIconSource(
 				R.drawable.sample_icon,
-				R.drawable.sample_icon_selected,
-				-1,
-				-1,
+				-1, -1, -1,
 				R.drawable.sample_icon_listview,
 				R.drawable.sample_icon_list_title));
 	}
