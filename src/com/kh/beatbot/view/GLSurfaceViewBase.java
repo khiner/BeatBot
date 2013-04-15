@@ -36,8 +36,8 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 	}
 	
-	protected boolean initialized = false;
-	protected boolean running;
+	protected static boolean initialized = false;
+	protected static boolean running;
 	protected int width;
 	protected int height;
 
@@ -56,10 +56,14 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		GLU.gluOrtho2D(gl, 0, this.width, this.height, 0);
 		initGl(gl);
 		initGlText();
-		init();
 		initialized = true;
+		init();
 	}
 
+	public static boolean isInitialized() {
+		return initialized;
+	}
+	
 	public void onSurfaceCreated(GL10 _gl, EGLConfig config) {
 	}
 
@@ -73,6 +77,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+		//gl.glBlendFunc(GL10.GL_ONE_MINUS_DST_COLOR, GL10.GL_ONE_MINUS_SRC_COLOR);
 	}
 
 	public void initGlText() {

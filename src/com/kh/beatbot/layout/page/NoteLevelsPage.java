@@ -1,18 +1,22 @@
 package com.kh.beatbot.layout.page;
 
-import com.kh.beatbot.R;
+import javax.microedition.khronos.opengles.GL11;
+
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
-import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.LevelsView;
 import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.ToggleButton;
+import com.kh.beatbot.view.control.TextButton;
+import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class NoteLevelsPage extends Page {
 
+	private static ShapeGroup labelGroup = new ShapeGroup();
 	private LevelsView levelsView;
-	private ToggleButton volumeToggle, panToggle, pitchToggle;
+	private TextButton volumeToggle, panToggle, pitchToggle;
 	
 	@Override
 	public void init() {
@@ -47,23 +51,26 @@ public class NoteLevelsPage extends Page {
 
 	@Override
 	protected void loadIcons() {
-		volumeToggle.setIconSource(new ImageIconSource( R.drawable.volume_icon, R.drawable.volume_icon_selected));
-		panToggle.setIconSource(new ImageIconSource(R.drawable.pan_icon, R.drawable.pan_icon_selected));
-		pitchToggle.setIconSource(new ImageIconSource(R.drawable.pitch_icon, R.drawable.pitch_selected_icon));
+		volumeToggle.setText("VOL");
+		panToggle.setText("PAN");
+		pitchToggle.setText("PIT");
 	}
 
 	@Override
 	public void draw() {
-		// parent - no drawing
-		
+		push();
+		translate(-absoluteX, -absoluteY);
+		labelGroup.draw((GL11)BBView.gl, 2);
+		pop();
 	}
 
 	@Override
 	protected void createChildren() {
 		levelsView = new LevelsView();
-		volumeToggle = new ToggleButton();
-		panToggle = new ToggleButton();
-		pitchToggle = new ToggleButton();
+		volumeToggle = new TextButton(labelGroup, Colors.volumeBgColorSet, Colors.volumeStrokeColorSet);
+		panToggle = new TextButton(labelGroup, Colors.panBgColorSet, Colors.panStrokeColorSet);
+		pitchToggle = new TextButton(labelGroup, Colors.pitchBgColorSet, Colors.pitchStrokeColorSet);
+		
 		volumeToggle.setOnClickListener(new BBOnClickListener() {
 			public void onClick(Button arg0) {
 				levelsView.setLevelType(LevelType.VOLUME);

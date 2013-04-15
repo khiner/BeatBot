@@ -136,37 +136,27 @@ public class DirectoryManager {
 	public void loadIcons() {
 		getDrumInstrument(0).setIconSource(new ImageIconSource(
 				R.drawable.kick_icon,
-				R.drawable.kick_icon_selected,
-				-1,
-				-1,
+				R.drawable.kick_icon, -1, -1,
 				R.drawable.kick_icon_listview,
 				R.drawable.kick_icon_list_title));
 		getDrumInstrument(1).setIconSource(new ImageIconSource(
 				R.drawable.snare_icon,
-				R.drawable.snare_icon_selected,
-				-1,
-				-1,
+				-1, -1, -1,
 				R.drawable.snare_icon_listview,
 				R.drawable.snare_icon_list_title));
 		getDrumInstrument(2).setIconSource(new ImageIconSource(
 				R.drawable.hh_closed_icon,
-				R.drawable.hh_closed_icon_selected,
-				-1,
-				-1,
+				-1, -1, -1,
 				R.drawable.hh_closed_icon_listview,
 				R.drawable.hh_closed_icon_list_title));
 		getDrumInstrument(3).setIconSource(new ImageIconSource(
 				R.drawable.hh_open_icon,
-				R.drawable.hh_open_icon_selected,
-				-1,
-				-1,
+				-1, -1, -1,
 				R.drawable.hh_open_icon_listview,
 				R.drawable.hh_open_icon_list_title));
 		getDrumInstrument(4).setIconSource(new ImageIconSource(
 				R.drawable.rimshot_icon,
-				R.drawable.rimshot_icon_selected,
-				-1,
-				-1,
+				-1, -1, -1,
 				R.drawable.rimshot_icon_listview,
 				R.drawable.rimshot_icon_list_title));
 		drumsDirectory.setIconSource(new ImageIconSource(
@@ -332,11 +322,12 @@ public class DirectoryManager {
 	}
 
 	private void updateInstrumentSelectTitleBar() {
-		int listTitleIconResource = ((ImageIconSource)currDirectory.getIconSource()).listTitleIconResource;
-		if (currDirectory.getIconSource() != null
-				&& listTitleIconResource > 0) {
-			instrumentSelectAlertBuilder.setIcon(listTitleIconResource)
-					.setTitle(currDirectory.getName().toUpperCase());
+		if (currDirectory.getIconSource() != null) {
+			int listTitleIconResource = ((ImageIconSource)currDirectory.getIconSource()).listTitleIconResource;
+			if (listTitleIconResource != -1) {
+				instrumentSelectAlertBuilder.setIcon(listTitleIconResource)
+						.setTitle(currDirectory.getName().toUpperCase());
+			}
 		} else {
 			instrumentSelectAlertBuilder.setIcon(0).setTitle(
 					"Choose Instrument");

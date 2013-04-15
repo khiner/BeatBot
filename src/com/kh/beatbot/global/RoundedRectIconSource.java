@@ -35,8 +35,8 @@ public class RoundedRectIconSource extends ShapeIconSource {
 		float scaledH = height - 2;
 
 		float dim = Math.min(width, height);
-		float downW = scaledW - dim * .15f;
-		float downH = scaledH - dim * .15f;
+		float downW = scaledW - dim * .10f;
+		float downH = scaledH - dim * .10f;
 
 		defaultIcon = new RoundedRect(this.shapeGroup, x + 1, y + 1, scaledW,
 				scaledH, cornerRadius, bgColorSet.defaultColor,

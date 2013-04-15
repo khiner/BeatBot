@@ -1,13 +1,11 @@
 package com.kh.beatbot.view.control;
 
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.view.TextView;
 import com.kh.beatbot.view.TouchableBBView;
-import com.kh.beatbot.view.TouchableSurfaceView;
 
 public class ParamControl extends TouchableBBView {
 	public Knob knob;
-	private TextView label, valueLabel;
+	private TextButton label, valueLabel;
 	private boolean beatSync;
 	
 	public ParamControl(boolean beatSync) {
@@ -52,9 +50,9 @@ public class ParamControl extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		label = new TextView();
+		label = new TextButton();
 		knob = beatSync ? new ToggleKnob() : new Knob();
-		valueLabel = new TextView();
+		valueLabel = new TextButton();
 		addChild(label);
 		addChild(knob);
 		addChild(valueLabel);

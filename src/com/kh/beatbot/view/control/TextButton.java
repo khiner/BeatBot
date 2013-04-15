@@ -1,6 +1,8 @@
 package com.kh.beatbot.view.control;
 
 import com.kh.beatbot.global.ColorSet;
+import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.IconSource;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.view.GLSurfaceViewBase;
@@ -18,6 +20,13 @@ public class TextButton extends ToggleButton {
 
 	private int defaultIconResource, pressedIconResource, selectedIconResource;
 
+	public TextButton() {
+		strokeColorSet = Colors.defaultStrokeColorSet;
+		globalGroup = null;
+		bgColorSet = null;
+		iconButton = null;
+	}
+	
 	public TextButton(ShapeGroup globalGroup, ColorSet bgColorSet,
 			ColorSet strokeColorSet) {
 		this(globalGroup, bgColorSet, strokeColorSet, -1, -1, -1);
@@ -41,6 +50,14 @@ public class TextButton extends ToggleButton {
 		}
 	}
 
+	public void setForegroundIconSource(IconSource iconSource) {
+		if (iconButton == null) {
+			iconButton = new ToggleButton();
+			layoutChildren();
+		}
+		iconButton.setIconSource(iconSource);
+	}
+	
 	@Override
 	public void press() {
 		super.press();
@@ -67,11 +84,14 @@ public class TextButton extends ToggleButton {
 
 	@Override
 	protected void loadIcons() {
-		setIconSource(new RoundedRectIconSource(globalGroup, absoluteX, absoluteY, width,
-				height, bgColorSet, strokeColorSet));
 		setText(text);
+		
+		if (bgColorSet != null && strokeColorSet != null) {
+			setIconSource(new RoundedRectIconSource(globalGroup, absoluteX, absoluteY, width,
+					height, bgColorSet, strokeColorSet));
+		}
 
-		if (iconButton != null) {
+		if (iconButton != null && iconButton.getIconSource() == null) {
 			iconButton.setIconSource(new ImageIconSource(defaultIconResource,
 					pressedIconResource, selectedIconResource));
 		}
@@ -79,7 +99,7 @@ public class TextButton extends ToggleButton {
 
 	@Override
 	public void init() {
-		if (text.isEmpty()) {
+		if (text.isEmpty() || !GLSurfaceViewBase.isInitialized()) {
 			return;
 		}
 		GLSurfaceViewBase.storeText(text);
@@ -96,8 +116,7 @@ public class TextButton extends ToggleButton {
 
 	public void setText(String text) {
 		this.text = text;
-		if (initialized)
-			init();
+		init();
 	}
 
 	@Override
@@ -118,9 +137,9 @@ public class TextButton extends ToggleButton {
 	@Override
 	public void layoutChildren() {
 		if (iconButton != null) { // layout optional icon
-			iconOffset = height / 8;
-			iconButton.layout(this, iconOffset, iconOffset, 3 * height / 4,
-					3 * height / 4);
+			iconOffset = height / 10;
+			iconButton.layout(this, iconOffset, iconOffset, 4 * height / 5,
+					4 * height / 5);
 		}
 	}
 }

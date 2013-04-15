@@ -3,43 +3,56 @@ package com.kh.beatbot.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.microedition.khronos.opengles.GL11;
+
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.global.IconSource;
-import com.kh.beatbot.global.Track;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.TextButton;
-import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.helper.TickWindowHelper;
+import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class MidiTrackView extends TouchableBBView {
 
 	public class ButtonRow extends TouchableBBView {
 		int trackNum;
-		ToggleButton instrumentButton;
-		TextButton muteButton, soloButton;
+		TextButton instrumentButton, muteButton, soloButton;
 
 		public ButtonRow(int trackNum) {
 			this.trackNum = trackNum;
 		}
 
-		public void setIconSource(IconSource instrumentIcon) {
-			instrumentButton.setIconSource(instrumentIcon);
+		public void updateInstrumentIcon() {
+			instrumentButton.setForegroundIconSource(Managers.trackManager
+					.getTrack(trackNum).getInstrument().getIconSource());	
 		}
-
+		
 		@Override
 		protected void loadIcons() {
-			// parent loads all button icons
+			updateInstrumentIcon();
+			muteButton.setText("M");
+			soloButton.setText("S");
 		}
 
 		@Override
 		public void init() {
-			instrumentButton.setIconSource(Managers.trackManager
-					.getTrack(trackNum).getInstrument().getIconSource());
-			muteButton.setText("M");
-			soloButton.setText("S");
+			// nothing to do
+		}
+
+		@Override
+		public void draw() {
+			// parent view, no drawing
+		}
+
+		@Override
+		protected void createChildren() {
+			instrumentButton = new TextButton(roundedRectGroup,
+					Colors.instrumentBgColorSet, Colors.instrumentStrokeColorSet);
+			muteButton = new TextButton(roundedRectGroup,
+					Colors.muteButtonColorSet, Colors.labelStrokeColorSet);
+			soloButton = new TextButton(roundedRectGroup,
+					Colors.soloButtonColorSet, Colors.labelStrokeColorSet);
 			instrumentButton.setOnClickListener(new BBOnClickListener() {
 				@Override
 				public void onClick(Button button) {
@@ -76,20 +89,6 @@ public class MidiTrackView extends TouchableBBView {
 							soloButton.isChecked());
 				}
 			});
-		}
-
-		@Override
-		public void draw() {
-			// parent view, no drawing
-		}
-
-		@Override
-		protected void createChildren() {
-			instrumentButton = new ToggleButton();
-			muteButton = new TextButton(GlobalVars.mainPage.roundedRectGroup,
-					Colors.muteButtonColorSet, Colors.labelStrokeColorSet);
-			soloButton = new TextButton(GlobalVars.mainPage.roundedRectGroup,
-					Colors.soloButtonColorSet, Colors.labelStrokeColorSet);
 			addChild(instrumentButton);
 			addChild(muteButton);
 			addChild(soloButton);
@@ -105,7 +104,8 @@ public class MidiTrackView extends TouchableBBView {
 	}
 
 	private static List<ButtonRow> buttonRows = new ArrayList<ButtonRow>();
-
+	private static ShapeGroup roundedRectGroup = new ShapeGroup();
+	
 	protected void loadIcons() {
 		Managers.directoryManager.loadIcons();
 	}
@@ -114,19 +114,24 @@ public class MidiTrackView extends TouchableBBView {
 		if (trackNum < 0 || trackNum >= buttonRows.size()) {
 			return;
 		}
-		Track track = Managers.trackManager.getTrack(trackNum);
-		buttonRows.get(trackNum).setIconSource(
-				track.getInstrument().getIconSource());
+		buttonRows.get(trackNum).updateInstrumentIcon();
 	}
 
 	public void trackAdded(int trackNum) {
 		ButtonRow newRow = new ButtonRow(trackNum);
 		buttonRows.add(newRow);
 		addChild(newRow);
+		if (initialized) {
+			layoutChildren();
+			newRow.loadAllIcons();
+		}
 	}
 
 	public void draw() {
-		// parent
+		push();
+		translate(-absoluteX, -absoluteY - TickWindowHelper.getYOffset());
+		roundedRectGroup.draw((GL11)BBView.gl, 1);
+		pop();
 	}
 
 	@Override

@@ -1,26 +1,30 @@
 package com.kh.beatbot.layout.page;
 
+import javax.microedition.khronos.opengles.GL11;
+
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.ADSR;
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.AdsrView;
 import com.kh.beatbot.view.BBView;
-import com.kh.beatbot.view.TextView;
-import com.kh.beatbot.view.TouchableSurfaceView;
 import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.ControlViewBase;
 import com.kh.beatbot.view.control.Seekbar;
+import com.kh.beatbot.view.control.TextButton;
 import com.kh.beatbot.view.control.ToggleButton;
+import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class AdsrPage extends Page implements BBOnClickListener, Level1dListener {
 
-	private ToggleButton[] adsrButtons;
+	private TextButton[] adsrButtons;
 	private AdsrView adsrView;
 	private Seekbar levelBar;
-	private TextView valueLabel, paramLabel;
+	private TextButton valueLabel, paramLabel;
+	private static ShapeGroup iconGroup = new ShapeGroup();
 	
 	@Override
 	public void init() {
@@ -92,17 +96,29 @@ public class AdsrPage extends Page implements BBOnClickListener, Level1dListener
 
 	@Override
 	protected void loadIcons() {
-		adsrButtons[0].setIconSource(new ImageIconSource(R.drawable.attack_icon, R.drawable.attack_icon_selected));
-		adsrButtons[1].setIconSource(new ImageIconSource(R.drawable.decay_icon, R.drawable.decay_icon_selected));
-		adsrButtons[2].setIconSource(new ImageIconSource(R.drawable.sustain_icon, R.drawable.sustain_icon_selected));
-		adsrButtons[3].setIconSource(new ImageIconSource(R.drawable.release_icon, R.drawable.release_icon_selected));
-		adsrButtons[4].setIconSource(new ImageIconSource(R.drawable.start_icon, R.drawable.start_icon_selected));
-		adsrButtons[5].setIconSource(new ImageIconSource(R.drawable.peak_icon, R.drawable.peak_icon_selected));
+		for (int i = 0; i < adsrButtons.length - 2; i++) {
+			adsrButtons[i].setForegroundIconSource(new ImageIconSource(whichAdsrIcon(i)));
+		}
+		adsrButtons[ADSR.START_ID].setText("S");
+		adsrButtons[ADSR.PEAK_ID].setText("P");
 	}
 
+	private int whichAdsrIcon(int adsrParamId) {
+		switch (adsrParamId) {
+		case ADSR.ATTACK_ID: return R.drawable.attack_icon;
+		case ADSR.DECAY_ID: return R.drawable.decay_icon;
+		case ADSR.SUSTAIN_ID: return R.drawable.sustain_icon;
+		case ADSR.RELEASE_ID: return R.drawable.release_icon;
+		default: return -1;
+		}
+	}
 	@Override
 	public void draw() {
-		// parent view, no drawing of its own
+		// draw all icon background rects in one call
+		push();
+		translate(-absoluteX, -absoluteY);
+		iconGroup.draw((GL11)BBView.gl, 1);
+		pop();
 	}
 
 	@Override
@@ -110,16 +126,11 @@ public class AdsrPage extends Page implements BBOnClickListener, Level1dListener
 		adsrView = new AdsrView();
 		levelBar = new Seekbar();
 		levelBar.addLevelListener(this);
-		paramLabel = new TextView();
-		valueLabel = new TextView();
-		adsrButtons = new ToggleButton[6];
-		adsrButtons[ADSR.ATTACK_ID] = new ToggleButton();
-		adsrButtons[ADSR.DECAY_ID] = new ToggleButton();
-		adsrButtons[ADSR.SUSTAIN_ID] = new ToggleButton();
-		adsrButtons[ADSR.RELEASE_ID] = new ToggleButton();
-		adsrButtons[ADSR.START_ID] = new ToggleButton();
-		adsrButtons[ADSR.PEAK_ID] = new ToggleButton();
+		paramLabel = new TextButton();
+		valueLabel = new TextButton();
+		adsrButtons = new TextButton[ADSR.NUM_PARAMS];
 		for (int i = 0; i < adsrButtons.length; i++) {
+			adsrButtons[i] = new TextButton(iconGroup, Colors.instrumentBgColorSet, Colors.instrumentStrokeColorSet);
 			adsrButtons[i].setId(i);
 			adsrButtons[i].setOnClickListener(this);
 		}
@@ -144,18 +155,16 @@ public class AdsrPage extends Page implements BBOnClickListener, Level1dListener
 	@Override
 	public void layoutChildren() {
 		float thirdHeight = height / 3;
-		float pos = width - thirdHeight * 6;
-		float labelWidth = 6 * thirdHeight / 2;
+		float pos = width - thirdHeight * adsrButtons.length;
+		float labelWidth = adsrButtons.length * thirdHeight / 2;
 		adsrView.layout(this, 0, 0, pos, height);
 		paramLabel.layout(this, pos, thirdHeight, labelWidth, thirdHeight);
 		valueLabel.layout(this, pos + labelWidth, thirdHeight, labelWidth, thirdHeight);
-		levelBar.layout(this, pos, 2 * thirdHeight, 6 * thirdHeight, thirdHeight);
-		pos = width - thirdHeight * 5;
-		for (int i = 0; i < 4; i++) {
+		levelBar.layout(this, pos, thirdHeight * 2, labelWidth * 2, thirdHeight);
+		pos = width - thirdHeight * adsrButtons.length;
+		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i].layout(this, pos, 0, thirdHeight, thirdHeight);
 			pos += thirdHeight;
 		}
-		adsrButtons[4].layout(this, pos, thirdHeight / 2, thirdHeight, thirdHeight / 2);
-		adsrButtons[5].layout(this, pos, 0, thirdHeight, thirdHeight / 2);
 	}
 }

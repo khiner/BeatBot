@@ -1,19 +1,20 @@
 package com.kh.beatbot.view.group;
 
+import javax.microedition.khronos.opengles.GL11;
+
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.layout.page.AdsrPage;
 import com.kh.beatbot.layout.page.LevelsFXPage;
-import com.kh.beatbot.layout.page.MainPage;
 import com.kh.beatbot.layout.page.NoteLevelsPage;
 import com.kh.beatbot.layout.page.SampleEditPage;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.ImageButton;
 import com.kh.beatbot.view.control.TextButton;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
@@ -30,11 +31,13 @@ public class PageSelectGroup extends TouchableBBView {
 	private static final int MASTER_PAGE_ID = 3;
 	private static final int NOTE_LEVELS_PAGE_ID = 4;
 
-	private static ImageButton addTrackButton;
-	private static ImageButton instrumentSelectButton;
+	private static TextButton addTrackButton;
+	private static TextButton instrumentSelectButton;
 	private static TextButton sampleSelectButton;
 	private static TextButton[] textButtons = new TextButton[5];
 
+	private static ShapeGroup roundedRectGroup = new ShapeGroup();
+	
 	public void update() {
 		updateInstrumentIcon();
 		updateSampleText();
@@ -61,28 +64,33 @@ public class PageSelectGroup extends TouchableBBView {
 
 	@Override
 	public void draw() {
-		// Parent
+		translate(-absoluteX, -absoluteY);
+		roundedRectGroup.draw((GL11)BBView.gl, 1);
+		translate(absoluteX, absoluteY);
 	}
 
 	@Override
 	protected void createChildren() {
-		ShapeGroup globalGroup = MainPage.roundedRectGroup;
-		addTrackButton = new ImageButton();
-		instrumentSelectButton = new ImageButton();
-		sampleSelectButton = new TextButton(globalGroup,
+		addTrackButton = new TextButton(roundedRectGroup,
+				Colors.labelBgColorSet, Colors.labelStrokeColorSet);
+		instrumentSelectButton = new TextButton(roundedRectGroup,
+				Colors.labelBgColorSet, Colors.labelStrokeColorSet);
+		sampleSelectButton = new TextButton(roundedRectGroup,
 				Colors.labelBgColorSet, Colors.labelStrokeColorSet);
 		for (int i = 0; i < textButtons.length; i++) {
-			textButtons[i] = new TextButton(globalGroup,
+			textButtons[i] = new TextButton(roundedRectGroup,
 					Colors.labelBgColorSet, Colors.labelStrokeColorSet);
 		}
 
-		textButtons[NOTE_LEVELS_PAGE_ID] = new TextButton(globalGroup,
+		textButtons[NOTE_LEVELS_PAGE_ID] = new TextButton(roundedRectGroup,
 				Colors.labelBgColorSet, Colors.labelStrokeColorSet,
 				R.drawable.levels_icon, -1, R.drawable.levels_icon_selected);
 
 		addTrackButton.setOnClickListener(new BBOnClickListener() {
 			@Override
 			public void onClick(Button button) {
+				// add track should not behave as a toggle
+				addTrackButton.setChecked(false);
 				Managers.directoryManager.showAddTrackAlert();
 			}
 		});
@@ -90,6 +98,8 @@ public class PageSelectGroup extends TouchableBBView {
 		instrumentSelectButton.setOnClickListener(new BBOnClickListener() {
 			@Override
 			public void onClick(Button button) {
+				// instr select should not behave as a toggle
+				instrumentSelectButton.setChecked(false);
 				Managers.directoryManager.showInstrumentSelectAlert();
 			}
 		});
@@ -97,6 +107,8 @@ public class PageSelectGroup extends TouchableBBView {
 		sampleSelectButton.setOnClickListener(new BBOnClickListener() {
 			@Override
 			public void onClick(Button button) {
+				// sample select should not behave as a toggle
+				sampleSelectButton.setChecked(false);
 				Managers.directoryManager.showSampleSelectAlert();
 			}
 		});
@@ -168,7 +180,7 @@ public class PageSelectGroup extends TouchableBBView {
 
 	@Override
 	protected void loadIcons() {
-		addTrackButton.setIconSource(new ImageIconSource(
+		addTrackButton.setForegroundIconSource(new ImageIconSource(
 				R.drawable.plus_outline, R.drawable.plus_outline));
 		textButtons[LEVELS_FX_PAGE_ID].setText("FX");
 		textButtons[EDIT_PAGE_ID].setText("EDIT");
@@ -183,7 +195,7 @@ public class PageSelectGroup extends TouchableBBView {
 
 	private void updateInstrumentIcon() {
 		// update the track pager instrument icon
-		instrumentSelectButton.setIconSource(TrackManager.currTrack
+		instrumentSelectButton.setForegroundIconSource(TrackManager.currTrack
 				.getInstrument().getIconSource());
 	}
 

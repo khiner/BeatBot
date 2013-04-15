@@ -1,5 +1,7 @@
 package com.kh.beatbot.layout.page;
 
+import javax.microedition.khronos.opengles.GL11;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,18 +19,18 @@ import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
-import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.view.TextView;
+import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.ControlViewBase;
 import com.kh.beatbot.view.control.Seekbar;
-import com.kh.beatbot.view.control.ToggleButton;
+import com.kh.beatbot.view.control.TextButton;
 import com.kh.beatbot.view.list.DraggableLabelList;
 import com.kh.beatbot.view.list.LabelList;
+import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class LevelsFXPage extends Page implements Level1dListener {
 
@@ -101,16 +103,17 @@ public class LevelsFXPage extends Page implements Level1dListener {
 
 	// levels attrs
 	private Seekbar levelBar;
-	private ToggleButton volumeToggle, panToggle, pitchToggle;
-	private TextView effectLabel;
+	private TextButton volumeToggle, panToggle, pitchToggle;
+	private TextButton effectLabel;
 	private boolean masterMode = false;
 
+	private ShapeGroup labelGroup;
+	
 	// effects attrs
 	private DraggableLabelList effectLabelList;
 	private String[] effectNames;
-
+	
 	public void init() {
-		effectLabel.setText("EFFECTS");
 	}
 	
 	@Override
@@ -245,27 +248,29 @@ public class LevelsFXPage extends Page implements Level1dListener {
 
 	@Override
 	protected void loadIcons() {
-		volumeToggle.setIconSource(new ImageIconSource(R.drawable.volume_icon,
-				R.drawable.volume_icon_selected));
-		panToggle.setIconSource(new ImageIconSource(R.drawable.pan_icon,
-				R.drawable.pan_icon_selected));
-		pitchToggle.setIconSource(new ImageIconSource(R.drawable.pitch_icon,
-				R.drawable.pitch_selected_icon));
+		effectLabel.setText("EFFECTS");
+		volumeToggle.setText("VOL");
+		panToggle.setText("PAN");
+		pitchToggle.setText("PIT");
 	}
 
 	@Override
 	public void draw() {
-		// parent view - no drawing
+		push();
+		translate(-absoluteX, -absoluteY);
+		labelGroup.draw((GL11)BBView.gl, 2);
+		pop();
 	}
 
 	@Override
 	protected void createChildren() {
-		effectLabel = new TextView();
+		labelGroup = new ShapeGroup();
+		effectLabel = new TextButton();
 		levelBar = new Seekbar();
 		levelBar.addLevelListener(this);
-		volumeToggle = new ToggleButton();
-		panToggle = new ToggleButton();
-		pitchToggle = new ToggleButton();
+		volumeToggle = new TextButton(labelGroup, Colors.volumeBgColorSet, Colors.volumeStrokeColorSet);
+		panToggle = new TextButton(labelGroup, Colors.panBgColorSet, Colors.panStrokeColorSet);
+		pitchToggle = new TextButton(labelGroup, Colors.pitchBgColorSet, Colors.pitchStrokeColorSet);
 		volumeToggle.setOnClickListener(new BBOnClickListener() {
 			public void onClick(Button button) {
 				getCurrTrack().activeLevelType = LevelType.VOLUME;

@@ -17,26 +17,24 @@ public class ImageButton extends Button {
 	@Override
 	public void press() {
 		super.press();
-		iconSource.setState(IconSource.State.PRESSED);
+		if (iconSource != null) {
+			iconSource.setState(IconSource.State.PRESSED);
+		}
 	}
 	
 	@Override
 	public void release() {
 		super.release();
-		iconSource.setState(IconSource.State.DEFAULT);
+		if (iconSource != null) {
+			iconSource.setState(IconSource.State.DEFAULT);
+		}
 	}
 	
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
-		iconSource.setState(enabled ? IconSource.State.DEFAULT : IconSource.State.DISABLED);
-	}
-
-	public float getIconWidth() {
-		return iconSource.getWidth();
-	}
-
-	public float getIconHeight() {
-		return iconSource.getWidth();
+		if (iconSource != null) {
+			iconSource.setState(enabled ? IconSource.State.DEFAULT : IconSource.State.DISABLED);
+		}
 	}
 	
 	@Override
