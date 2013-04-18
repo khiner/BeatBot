@@ -33,7 +33,15 @@ public abstract class BBView {
 	protected BBView parent;
 	
 	public static GL10 gl;
-	public float absoluteX = 0, absoluteY = 0;
+	
+	// where is the view currently clipped to?
+	// used to keep track of SCISSOR clipping of parent views,
+	// so child views don't draw outside of any parent (granparent, etc)
+	// this should be reset every frame by the parent using resetClipWindow()
+	public int currClipX = Integer.MIN_VALUE, currClipY = Integer.MIN_VALUE,
+			currClipW = Integer.MAX_VALUE, currClipH = Integer.MAX_VALUE;
+	
+	public float absoluteX = -1, absoluteY = -1;
 	public float x = 0, y = 0;
 	public float width = 0, height = 0;
 
@@ -91,6 +99,30 @@ public abstract class BBView {
 	
 	protected abstract void loadIcons();
 	
+	public void clipWindow(int parentClipX, int parentClipY, int parentClipW, int parentClipH) {
+		currClipX = (int) absoluteX;
+		currClipY = (int) (root.getHeight() - absoluteY - height);
+		currClipW = (int) width;
+		currClipH = (int) height;
+		if (currClipX < parentClipX) {
+			currClipW -= parentClipX - currClipX;
+			currClipX = parentClipX;
+		}
+		if (currClipW > parentClipW) {
+			currClipW = parentClipW;
+		}
+		if (currClipY < parentClipY) {
+			currClipH -= parentClipY - currClipY;
+			currClipY = parentClipY;
+		}
+		float parentMaxY = parentClipY + parentClipH;
+		if (parentMaxY > 1 && currClipY + currClipH > parentMaxY) {
+			currClipH = parentClipY + parentClipH - currClipY;
+		}
+		
+		gl.glScissor(currClipX, currClipY, currClipW, currClipH);
+	}
+	
 	public void initAll() {
 		initBackgroundColor();
 		init();
@@ -103,7 +135,11 @@ public abstract class BBView {
 	public void drawAll() {
 		// scissor ensures that each view can only draw within its rect
 		gl.glEnable(GL10.GL_SCISSOR_TEST);
-		gl.glScissor((int)absoluteX, (int)(root.getHeight() - absoluteY - height), (int)width, (int)height);
+		if (parent != null) {
+			clipWindow(parent.currClipX, parent.currClipY, parent.currClipW, parent.currClipH);
+		} else {
+			clipWindow(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+		}
 		draw();
 		for (int i = 0; i < children.size(); i++) {
 			// not using foreach to avoid concurrent modification
@@ -129,6 +165,7 @@ public abstract class BBView {
 	}
 	
 	public void layout(BBView parent, float x, float y, float width, float height) {
+		this.parent = parent;
 		if (parent != null) {
 			this.absoluteX = parent.absoluteX + x;
 			this.absoluteY = parent.absoluteY + y;

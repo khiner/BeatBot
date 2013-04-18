@@ -10,7 +10,6 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -603,7 +602,6 @@ public class MidiView extends ClickableBBView {
 			} else { // one finger scroll
 				TickWindowHelper.scroll(pointerIdToPos.get(scrollPointerId).x,
 						pointerIdToPos.get(scrollPointerId).y);
-				GlobalVars.mainPage.midiTrackControl.layoutChildren();
 			}
 		} else if (pointerCount() - getNumLoopMarkersSelected() == 2) {
 			// two finger zoom

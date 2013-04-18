@@ -97,14 +97,15 @@ public class MidiTrackView extends TouchableBBView {
 		@Override
 		public void layoutChildren() {
 			instrumentButton.layout(this, 0, 0, height, height);
-			muteButton.layout(this, height, 0, height * .75f, height);
+			muteButton.layout(this, height, 0, height * .72f, height);
 			soloButton.layout(this, height + muteButton.width, 0,
-					height * .75f, height);
+					height * .72f, height);
 		}
 	}
 
 	private static List<ButtonRow> buttonRows = new ArrayList<ButtonRow>();
 	private static ShapeGroup roundedRectGroup = new ShapeGroup();
+	private float lastY = 0;
 	
 	protected void loadIcons() {
 		Managers.directoryManager.loadIcons();
@@ -128,10 +129,15 @@ public class MidiTrackView extends TouchableBBView {
 	}
 
 	public void draw() {
+		float newY = -absoluteY - TickWindowHelper.getYOffset();
+		if (newY != lastY) {
+			layoutChildren();
+		}
 		push();
-		translate(-absoluteX, -absoluteY - TickWindowHelper.getYOffset());
+		translate(-absoluteX, newY);
 		roundedRectGroup.draw((GL11)BBView.gl, 1);
 		pop();
+		lastY = newY; 
 	}
 
 	@Override
