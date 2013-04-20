@@ -17,6 +17,7 @@ public class Filter extends Effect {
 	
 	static {
 		PARAMS_DATA[0].scaleValue = PlaybackManager.SAMPLE_RATE / 2;
+		PARAMS_DATA[0].hz = false;
 	}
 	
 	private int mode = 0;

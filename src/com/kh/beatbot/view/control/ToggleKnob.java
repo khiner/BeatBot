@@ -33,7 +33,7 @@ public class ToggleKnob extends Knob {
 
 	protected void loadIcons() {
 		super.loadIcons();
-		centerButton.setIconSource(new ImageIconSource(R.drawable.clock, R.drawable.note_icon));
+		centerButton.setIconSource(new ImageIconSource(R.drawable.clock, -1, R.drawable.note_icon));
 		centerButton.setChecked(true);
 	}
 

@@ -7,6 +7,7 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.ImageIconSource;
+import com.kh.beatbot.listener.BBOnClickListener;
 import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.TextButton;
 import com.kh.beatbot.view.mesh.ShapeGroup;
@@ -14,8 +15,23 @@ import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class FilterParamsPage extends EffectParamsPage {
 
+	private class FilterToggleListener implements BBOnClickListener {
+		@Override
+		public void onClick(Button button) {
+			for (int i = 0; i < filterToggles.length; i++) {
+				if (button.equals(filterToggles[i])) {
+					((Filter) effect).setMode(i);
+					filterToggles[i].setChecked(true);
+				} else {
+					filterToggles[i].setChecked(false);
+				}
+			}
+		}
+	}
+	
 	private TextButton[] filterToggles;
 	private ShapeGroup iconGroup;
+	private FilterToggleListener filterToggleListener;
 	
 	@Override
 	protected int getNumParams() {
@@ -36,9 +52,10 @@ public class FilterParamsPage extends EffectParamsPage {
 		super.createChildren();
 		iconGroup = new ShapeGroup();
 		filterToggles = new TextButton[3];
+		filterToggleListener = new FilterToggleListener();
 		for (int i = 0; i < filterToggles.length; i++) {
 			filterToggles[i] = new TextButton(iconGroup, Colors.instrumentBgColorSet, Colors.instrumentStrokeColorSet);
-			filterToggles[i].setOnClickListener(this);
+			filterToggles[i].setOnClickListener(filterToggleListener);
 			addChild(filterToggles[i]);
 		}
 	}
@@ -49,16 +66,6 @@ public class FilterParamsPage extends EffectParamsPage {
 		filterToggles[1].setForegroundIconSource(new ImageIconSource(R.drawable.bandpass_filter_icon));
 		filterToggles[2].setForegroundIconSource(new ImageIconSource(R.drawable.highpass_filter_icon));
 		filterToggles[0].setChecked(true);
-	}
-	
-	public void onClick(Button button) {
-		for (int i = 0; i < filterToggles.length; i++) {
-			if (button.equals(filterToggles[i])) {
-				((Filter) effect).setMode(i);
-				filterToggles[i].setChecked(true);
-			} else
-				filterToggles[i].setChecked(false);
-		}
 	}
 	
 	@Override

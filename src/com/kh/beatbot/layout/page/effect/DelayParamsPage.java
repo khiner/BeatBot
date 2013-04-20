@@ -13,7 +13,7 @@ import com.kh.beatbot.view.control.ToggleKnob;
 public class DelayParamsPage extends EffectParamsPage {
 
 	private ToggleButton linkToggle;
-	
+
 	@Override
 	protected int getNumParams() {
 		return Delay.NUM_PARAMS;
@@ -29,7 +29,8 @@ public class DelayParamsPage extends EffectParamsPage {
 
 	@Override
 	protected void loadIcons() {
-		linkToggle.setIconSource(new ImageIconSource(R.drawable.link_broken, R.drawable.link));
+		linkToggle.setIconSource(new ImageIconSource(R.drawable.link_broken,
+				-1, R.drawable.link));
 	}
 
 	@Override
@@ -41,9 +42,9 @@ public class DelayParamsPage extends EffectParamsPage {
 			public void onClick(Button button) {
 				ParamControl leftChannelControl = paramControls[0];
 				ParamControl rightChannelControl = paramControls[1];
-				ToggleKnob rightKnob = (ToggleKnob)rightChannelControl.knob;
-				ToggleKnob leftKnob = (ToggleKnob)leftChannelControl.knob;
-				
+				ToggleKnob rightKnob = (ToggleKnob) rightChannelControl.knob;
+				ToggleKnob leftKnob = (ToggleKnob) leftChannelControl.knob;
+
 				float newRightChannelLevel = rightKnob.getLevel();
 				boolean newRightChannelSynced = rightKnob.isBeatSync();
 
@@ -52,8 +53,10 @@ public class DelayParamsPage extends EffectParamsPage {
 				if (effect.paramsLinked()) {
 					// y = feedback when linked
 					yParamIndex = 2;
-					((Delay) effect).rightChannelLevelMemory = rightKnob.getLevel();
-					((Delay) effect).rightChannelBeatSyncMemory = rightKnob.isBeatSync();
+					((Delay) effect).rightChannelLevelMemory = rightKnob
+							.getLevel();
+					((Delay) effect).rightChannelBeatSyncMemory = rightKnob
+							.isBeatSync();
 					newRightChannelLevel = leftChannelControl.knob.getLevel();
 					newRightChannelSynced = leftKnob.isBeatSync();
 				} else {
@@ -68,10 +71,30 @@ public class DelayParamsPage extends EffectParamsPage {
 				rightKnob.setLevel(newRightChannelLevel);
 			}
 		});
+		
+		addChild(linkToggle);
 	}
-	
+
 	@Override
 	protected ParamData[] getParamsData() {
 		return Delay.PARAMS_DATA;
+	}
+
+	public void layoutChildren() {
+		float paramY = 10;
+		float paramH = (height - paramY) / 2 - 10;
+		float paramW = 2 * paramH / 3;
+
+		paramControls[0].layout(this, width / 2 - paramW - 30, paramY, paramW,
+				paramH);
+		paramControls[1].layout(this, width / 2 + 30, paramY, paramW, paramH);
+		paramControls[2].layout(this, width / 2 - paramW - 30, paramY + paramH,
+				paramW, paramH);
+		paramControls[3].layout(this, width / 2 + 30, paramY + paramH, paramW,
+				paramH);
+		float linkH = paramH / 6;
+		float linkW = linkH * 2;
+		linkToggle.layout(this, width / 2 - linkW / 2, paramY + paramH / 2 - linkH / 2,
+				linkW, linkH);
 	}
 }

@@ -7,8 +7,8 @@ import com.kh.beatbot.global.GlobalVars;
 public class Delay extends Effect {
 	
 	public static final String NAME = GlobalVars.mainActivity.getString(R.string.delay);
-	public static final int EFFECT_NUM = 4;
-	public static final int NUM_PARAMS = 2;
+	public static final int EFFECT_NUM = 2;
+	public static final int NUM_PARAMS = 4;
 	public static final ParamData[] PARAMS_DATA = {
 		new ParamData("TIME LEFT", true, true, "ms"),
 		new ParamData("TIME RIGHT", true, true, "ms"),
