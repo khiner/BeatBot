@@ -98,6 +98,7 @@ public abstract class EffectParamsPage extends TouchableBBView implements
 			if (levelListenable.getId() == 0) {
 				effect.setParamLevel(1, level);
 				paramControls[1].knob.setViewLevel(level);
+				paramControls[1].updateValueLabel(effect.getParam(paramNum));
 			} else if (levelListenable.getId() == 1) {
 				paramControls[0].knob.setLevel(level);
 			}

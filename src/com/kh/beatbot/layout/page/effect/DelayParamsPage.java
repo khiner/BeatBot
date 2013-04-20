@@ -2,6 +2,7 @@ package com.kh.beatbot.layout.page.effect;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Delay;
+import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.BBOnClickListener;
@@ -75,6 +76,12 @@ public class DelayParamsPage extends EffectParamsPage {
 		addChild(linkToggle);
 	}
 
+	@Override
+	public void setEffect(Effect effect) {
+		super.setEffect(effect);
+		linkToggle.setChecked(((Delay)effect).paramsLinked());
+	}
+	
 	@Override
 	protected ParamData[] getParamsData() {
 		return Delay.PARAMS_DATA;

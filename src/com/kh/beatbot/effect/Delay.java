@@ -3,7 +3,6 @@ package com.kh.beatbot.effect;
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.GlobalVars;
 
-
 public class Delay extends Effect {
 	
 	public static final String NAME = GlobalVars.mainActivity.getString(R.string.delay);
@@ -19,12 +18,14 @@ public class Delay extends Effect {
 	// keep track of what right channel was before linking
 	// so we can go back after disabling link
 	// by default, channels are linked, so no memory is needed
-	public float rightChannelLevelMemory = -1;
-	public boolean rightChannelBeatSyncMemory = true;
-	public static boolean PARAMS_LINKED = true;
+	public float rightChannelLevelMemory;
+	public boolean rightChannelBeatSyncMemory;
 	
 	public Delay(int trackNum, int position) {
 		super(trackNum, position);
+		rightChannelLevelMemory = -1;
+		rightChannelBeatSyncMemory = true;
+		paramsLinked = true;
 	}
 
 	public int getNum() {
@@ -46,6 +47,7 @@ public class Delay extends Effect {
 	@Override
 	public void setParamsLinked(boolean linked) {
 		super.setParamsLinked(linked);
-		setEffectParam(trackNum, position, EFFECT_NUM, linked ? 1 : 0);
+		// last effect param for delay sets linked natively: 1 is true, 0 is false
+		setEffectParam(trackNum, position, NUM_PARAMS, linked ? 1 : 0);
 	}
 }
