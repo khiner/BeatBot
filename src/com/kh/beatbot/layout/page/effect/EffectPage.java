@@ -100,8 +100,8 @@ public class EffectPage extends TouchableBBView {
 
 	@Override
 	public void layoutChildren() {
-		toggleButton.layout(this, 0, 0, (width - height), (width - height) / 5);
-		paramsPager.layout(this, 0, (width - height) / 5, width - height, height - (width - height) / 5);
+		toggleButton.layout(this, 5, 5, (width - height) - 10, (width - height) / 5 );
+		paramsPager.layout(this, 0, (width - height) / 5 + 5, width - height, height - (width - height) / 5 - 5);
 		level2d.layout(this, width - height, 0, height, height);
 	}
 }

@@ -108,8 +108,9 @@ public abstract class BBView {
 			currClipW -= parentClipX - currClipX;
 			currClipX = parentClipX;
 		}
-		if (currClipW > parentClipW) {
-			currClipW = parentClipW;
+		float parentMaxX = parentClipX + parentClipW;
+		if (parentMaxX > 1 && currClipX + currClipW > parentMaxX) {
+			currClipW = parentClipW + parentClipW - currClipW;
 		}
 		if (currClipY < parentClipY) {
 			currClipH -= parentClipY - currClipY;

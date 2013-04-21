@@ -64,7 +64,7 @@ public class MidiManager implements Parcelable {
 		setLoopBeginTick(0);
 		setLoopEndTick(RESOLUTION * 4);
 
-		saveState();
+		//saveState();
 	}
 
 	public static MidiManager getInstance() {
@@ -220,7 +220,7 @@ public class MidiManager implements Parcelable {
 	public void copy() {
 		if (!anyNoteSelected())
 			return;
-		copiedNotes = this.copyMidiList(getSelectedNotes());
+		copiedNotes = copyMidiList(getSelectedNotes());
 	}
 
 	public boolean isCopying() {
@@ -259,7 +259,9 @@ public class MidiManager implements Parcelable {
 	}
 
 	public void clearNotes() {
-		midiNotes.clear();
+		while (!midiNotes.isEmpty()) {
+			deleteNote(midiNotes.get(0)); // avoid concurrent mod error
+		}
 		Managers.trackManager.clearNotes();
 	}
 

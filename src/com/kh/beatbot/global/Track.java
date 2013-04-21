@@ -64,12 +64,14 @@ public class Track extends BaseTrack {
 	}
 
 	public MidiNote getNextMidiNote(long currTick) {
+		// is there another note starting between the current tick and the end of the loop?
 		for (MidiNote midiNote : notes) {
-			if (midiNote.getOffTick() > currTick
+			if (midiNote.getOnTick() >= currTick
 					&& midiNote.getOnTick() < MidiManager.loopEndTick) {
 				return midiNote;
 			}
 		}
+		// otherwise, get the first note that starts after loop begin
 		for (MidiNote midiNote : notes) {
 			if (midiNote.getOnTick() >= MidiManager.loopBeginTick) {
 				return midiNote;

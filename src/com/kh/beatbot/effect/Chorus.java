@@ -11,8 +11,8 @@ public class Chorus extends Effect {
 	public static final ParamData[] PARAMS_DATA = {
 		new ParamData("MOD RATE", true, true, "Hz"),
 		new ParamData("MOD AMT", false, false, ""),
-		new ParamData("TIME", false, false, ""),
-		new ParamData("FEEDBACK", true, true, "ms"),
+		new ParamData("TIME", true, false, "ms"),
+		new ParamData("FEEDBACK", false, false, ""),
 		new ParamData("WET", false, false, "")
 	};
 	

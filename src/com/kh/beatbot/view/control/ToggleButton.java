@@ -8,14 +8,16 @@ public class ToggleButton extends ImageButton {
 	public void setIconSource(IconSource iconSource) {
 		this.iconSource = iconSource;
 		if (iconSource != null) {
-			iconSource.setState(checked ? IconSource.State.SELECTED : IconSource.State.DEFAULT);
+			iconSource.setState(enabled ? (checked ? IconSource.State.SELECTED : IconSource.State.DEFAULT) :
+				IconSource.State.DISABLED);
 		}
 	}
 
 	public void release() {
 		pressed = false;
 		if (iconSource != null) {
-			iconSource.setState(checked ? IconSource.State.SELECTED : IconSource.State.DEFAULT);
+			iconSource.setState(enabled ? (checked ? IconSource.State.SELECTED : IconSource.State.DEFAULT) :
+					IconSource.State.DISABLED);
 		}
 	}
 	

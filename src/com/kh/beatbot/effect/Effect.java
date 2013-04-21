@@ -22,6 +22,7 @@ public abstract class Effect implements Comparable<Effect> {
 		paramsLinked = false;
 		initParams();
 		addEffect(trackNum, getNum(), position);
+		setDefaultParams();
 		setOn(true);
 	}
 
@@ -88,6 +89,13 @@ public abstract class Effect implements Comparable<Effect> {
 	@Override
 	public int compareTo(Effect effect) {
 		return this.position - effect.position;
+	}
+	
+	private void setDefaultParams() {
+		for (int i = 0; i < params.size(); i++) {
+			Param param = params.get(i);
+			setEffectParam(trackNum, position, i, param.level);
+		}
 	}
 	
 	protected void initParams() {

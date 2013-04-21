@@ -178,5 +178,7 @@ public class ControlButtonGroup extends TouchableBBView {
 		copyButton.setIconSource(copyButtonIcon);
 		deleteButton.setIconSource(deleteButtonIcon);
 		undoButton.setIconSource(undoButtonIcon);
+		
+		setEditIconsEnabled(false);
 	}
 }

@@ -26,7 +26,7 @@ public class TextButton extends ToggleButton {
 		bgColorSet = null;
 		iconButton = null;
 	}
-	
+
 	public TextButton(ShapeGroup globalGroup, ColorSet bgColorSet,
 			ColorSet strokeColorSet) {
 		this(globalGroup, bgColorSet, strokeColorSet, -1, -1, -1);
@@ -57,7 +57,7 @@ public class TextButton extends ToggleButton {
 		}
 		iconButton.setIconSource(iconSource);
 	}
-	
+
 	@Override
 	public void press() {
 		super.press();
@@ -85,10 +85,12 @@ public class TextButton extends ToggleButton {
 	@Override
 	protected void loadIcons() {
 		setText(text);
-		
+
 		if (bgColorSet != null && strokeColorSet != null) {
-			setIconSource(new RoundedRectIconSource(globalGroup, absoluteX, absoluteY, width,
-					height, bgColorSet, strokeColorSet));
+			setIconSource(new RoundedRectIconSource(globalGroup,
+					globalGroup == null ? 0 : absoluteX,
+					globalGroup == null ? 0 : absoluteY, width, height,
+					bgColorSet, strokeColorSet));
 		}
 
 		if (iconButton != null && iconButton.getIconSource() == null) {
