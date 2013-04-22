@@ -473,9 +473,10 @@ public class MidiView extends ClickableBBView {
 	public MidiNote addMidiNote(float onTick, float offTick, int track) {
 		MidiNote noteToAdd = midiManager.addNote((long) onTick, (long) offTick,
 				track, .75f, .5f, .5f);
+		midiManager.saveNoteTicks();
 		midiManager.selectNote(noteToAdd);
 		midiManager.handleMidiCollisions();
-		midiManager.mergeTempNotes();
+		midiManager.finalizeNoteTicks();
 		midiManager.deselectNote(noteToAdd);
 		stateChanged = true;
 		return noteToAdd;
@@ -495,17 +496,6 @@ public class MidiView extends ClickableBBView {
 		return new Rectangle(note.isSelected() ? selectedRectangles
 				: unselectedRectangles, x1, y1, width, trackHeight,
 				whichColor(note), Colors.BLACK);
-	}
-
-	public void updateNoteViews() {
-		unselectedRectangles.clear();
-		selectedRectangles.clear();
-		for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
-			MidiNote note = midiManager.getMidiNote(i);
-			if (note != null) {
-				createNoteView(note);
-			}
-		}
 	}
 
 	public void updateNoteView(MidiNote note) {
@@ -661,6 +651,7 @@ public class MidiView extends ClickableBBView {
 	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
 		ScrollBarHelper.startScrollView();
+		midiManager.saveNoteTicks();
 		selectMidiNote(x, y, id);
 		if (touchedNotes.get(id) == null) {
 			// no note selected.
@@ -780,7 +771,7 @@ public class MidiView extends ClickableBBView {
 		for (int i = 0; i < 3; i++)
 			loopPointerIds[i] = -1;
 		selectRegion = false;
-		midiManager.mergeTempNotes();
+		midiManager.finalizeNoteTicks();
 		if (stateChanged)
 			midiManager.saveState();
 		stateChanged = false;

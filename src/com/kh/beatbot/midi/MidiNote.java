@@ -14,9 +14,32 @@ public class MidiNote implements Comparable<MidiNote> {
 	boolean selected = false;
 	boolean touched = false;
 
+	// while moving notes in the ui, they can overlap, but we keep 
+	// a memory of the old note ticks while we manipulate the new note ticks
+	long savedOnTick, savedOffTick;
+	
 	public MidiNote(NoteOn noteOn, NoteOff noteOff) {
 		this.noteOn = noteOn;
 		this.noteOff = noteOff;
+		savedOnTick = savedOffTick = -1;
+	}
+	
+	public void saveTicks() {
+		savedOnTick = getOnTick();
+		savedOffTick = getOffTick();
+	}
+	
+	public long getSavedOnTick() {
+		return savedOnTick;
+	}
+	
+	public long getSavedOffTick() {
+		return savedOffTick;
+	}
+	
+	public void finalizeTicks() {
+		// erase memory of temp 'old' ticks
+		savedOnTick = savedOffTick = -1;
 	}
 	
 	public Rectangle getRectangle() {
@@ -27,7 +50,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		this.rectangle = rectangle;
 	}
 	
-	private void updateUI() {
+	private void updateView() {
 		GlobalVars.mainPage.midiView.updateNoteView(this);
 	}
 	
@@ -41,6 +64,8 @@ public class MidiNote implements Comparable<MidiNote> {
 		MidiNote copy = new MidiNote(noteOnCopy, noteOffCopy);
 		copy.setSelected(selected);
 		copy.setTouched(touched);
+		copy.savedOnTick = this.savedOnTick;
+		copy.savedOffTick = this.savedOffTick;
 		return copy;
 	}
 	
@@ -86,7 +111,7 @@ public class MidiNote implements Comparable<MidiNote> {
 
 	public void setSelected(boolean selected) {
 		this.selected = selected;
-		updateUI(); // color change
+		updateView(); // color change
 	}
 
 	public void setTouched(boolean touched) {
@@ -126,13 +151,13 @@ public class MidiNote implements Comparable<MidiNote> {
 			noteOn.setTick(onTick);
 		else
 			noteOn.setTick(0);
-		updateUI();
+		updateView();
 	}
 
 	public void setOffTick(long offTick) {
 		if (offTick > getOnTick())
 			this.noteOff.setTick(offTick);
-		updateUI();
+		updateView();
 	}
 
 	public void setNote(int note) {
@@ -140,7 +165,7 @@ public class MidiNote implements Comparable<MidiNote> {
 			return;
 		this.noteOn.setNoteValue(note);
 		this.noteOff.setNoteValue(note);
-		updateUI();
+		updateView();
 	}
 
 	public long getNoteLength() {

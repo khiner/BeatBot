@@ -72,12 +72,6 @@ public class TrackManager {
 		GlobalVars.mainPage.trackAdded(tracks.size() - 1);
 	}
 
-	public void clearNotes() {
-		for (Track track : tracks) {
-			track.clearNotes();
-		}
-	}
-
 	public static native void addTrack(String sampleFileName);
 
 	/******* These methods are called FROM native code via JNI ********/
