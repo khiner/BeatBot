@@ -37,4 +37,9 @@ public class ShapeGroup {
 		fillGroup.updateVertices(shape.fillMesh);
 		outlineGroup.updateVertices(shape.outlineMesh);
 	}
+	
+	public void clear() {
+		fillGroup.clear();
+		outlineGroup.clear();
+	}
 }

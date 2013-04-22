@@ -26,6 +26,8 @@ public class MidiView extends ClickableBBView {
 
 	public static final float LOOP_SELECT_SNAP_DIST = 30;
 
+	public static final int NOTE_BORDER_WIDTH = 2;
+
 	public static float trackHeight, allTracksHeight;
 
 	public static float dragOffsetTick[] = { 0, 0, 0, 0, 0 };
@@ -53,8 +55,10 @@ public class MidiView extends ClickableBBView {
 	// if true, all midi note movements are rounded to the nearest major tick
 	public static boolean snapToGrid = true;
 
-	// single ShapeGroup to handle drawing of all midi rectangles at once
-	private ShapeGroup midiRectangles = new ShapeGroup();
+	// two ShapeGroups handle drawing of all midi rectangles
+	// (in four calls - ouline and fill for each group)
+	private static ShapeGroup unselectedRectangles = new ShapeGroup();
+	private static ShapeGroup selectedRectangles = new ShapeGroup();
 
 	public float getMidiHeight() {
 		return height - Y_OFFSET;
@@ -163,8 +167,9 @@ public class MidiView extends ClickableBBView {
 		// been selected, make it the only selected note.
 		// If we are multi-selecting, add it to the selected list
 		if (!selectedNote.isSelected()) {
-			if (touchedNotes.isEmpty())
+			if (touchedNotes.isEmpty()) {
 				midiManager.deselectAllNotes();
+			}
 			midiManager.selectNote(selectedNote);
 		}
 		touchedNotes.put(pointerId, selectedNote);
@@ -239,7 +244,8 @@ public class MidiView extends ClickableBBView {
 	}
 
 	private void drawAllMidiNotes() {
-		midiRectangles.draw((GL11) gl, 2);
+		unselectedRectangles.draw((GL11) gl, NOTE_BORDER_WIDTH);
+		selectedRectangles.draw((GL11) gl, NOTE_BORDER_WIDTH);
 	}
 
 	private void initTickFillVb() {
@@ -333,7 +339,7 @@ public class MidiView extends ClickableBBView {
 
 	public void trackAdded(int trackNum) {
 		allTracksHeight += trackHeight;
-		if (root.initialized)
+		if (initialized)
 			initAllVbs();
 	}
 
@@ -475,7 +481,34 @@ public class MidiView extends ClickableBBView {
 		return noteToAdd;
 	}
 
-	public void updateNoteUI(MidiNote note) {
+	public void createNoteView(MidiNote note) {
+		Rectangle noteRect = makeNoteRectangle(note);
+		note.setRectangle(noteRect);
+		noteRect.getGroup().add(note.getRectangle());
+	}
+
+	private Rectangle makeNoteRectangle(MidiNote note) {
+		float x1 = tickToUnscaledX(note.getOnTick());
+		float y1 = noteToUnscaledY(note.getNoteValue());
+		float width = tickToUnscaledX(note.getOffTick()) - x1;
+
+		return new Rectangle(note.isSelected() ? selectedRectangles
+				: unselectedRectangles, x1, y1, width, trackHeight,
+				whichColor(note), Colors.BLACK);
+	}
+
+	public void updateNoteViews() {
+		unselectedRectangles.clear();
+		selectedRectangles.clear();
+		for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
+			MidiNote note = midiManager.getMidiNote(i);
+			if (note != null) {
+				createNoteView(note);
+			}
+		}
+	}
+
+	public void updateNoteView(MidiNote note) {
 		// note coords
 		float x1 = tickToUnscaledX(note.getOnTick());
 		float y1 = noteToUnscaledY(note.getNoteValue());
@@ -485,21 +518,23 @@ public class MidiView extends ClickableBBView {
 
 		if (note.getRectangle() != null) {
 			note.getRectangle().update(x1, y1, width, trackHeight, color,
-						Colors.BLACK);
+					Colors.BLACK);
 		}
 	}
 
-	public Rectangle makeNoteRectangle(MidiNote note) {
-		float x1 = tickToUnscaledX(note.getOnTick());
-		float y1 = noteToUnscaledY(note.getNoteValue());
-		float width = tickToUnscaledX(note.getOffTick()) - x1;
-		
-		float[] color = note.isSelected() ? Colors.NOTE_SELECTED : Colors.NOTE;
-		
-		return new Rectangle(midiRectangles, x1, y1, width,
-				trackHeight, color, Colors.BLACK);
+	public void updateNoteFillColor(MidiNote note) {
+		note.getRectangle().setColors(whichColor(note), Colors.BLACK);
+		note.getRectangle().setGroup(whichRectangleGroup(note));
 	}
-	
+
+	private static float[] whichColor(MidiNote note) {
+		return note.isSelected() ? Colors.NOTE_SELECTED : Colors.NOTE;
+	}
+
+	private static ShapeGroup whichRectangleGroup(MidiNote note) {
+		return note.isSelected() ? selectedRectangles : unselectedRectangles;
+	}
+
 	private void dragNotes(boolean dragAllSelected, int pointerId,
 			float currTick, int currNote) {
 		MidiNote touchedNote = touchedNotes.get(pointerId);
@@ -514,20 +549,28 @@ public class MidiView extends ClickableBBView {
 				dragAllSelected ? null : touchedNote);
 		noteDiff = getAdjustedNoteDiff(noteDiff, dragAllSelected ? null
 				: touchedNote);
+		if (noteDiff == 0 && tickDiff == 0)
+			return;
 		List<MidiNote> notesToDrag = dragAllSelected ? midiManager
 				.getSelectedNotes() : Arrays.asList(touchedNote);
+				
 		// dragging one note - drag all selected notes together
+		boolean changed = false;
 		for (MidiNote midiNote : notesToDrag) {
-			midiManager
+			// check if we are actually changing note lengths
+			changed = midiManager
 					.setNoteTicks(midiNote,
 							(long) (midiNote.getOnTick() + tickDiff),
 							(long) (midiNote.getOffTick() + tickDiff),
-							snapToGrid, true);
-			midiManager.setNoteValue(midiNote, midiNote.getNoteValue()
-					+ noteDiff);
+							snapToGrid, true) || changed;
+			// check if we are actually changing note values
+			changed = midiManager.setNoteValue(midiNote, midiNote.getNoteValue()
+					+ noteDiff) || changed;
 		}
-		stateChanged = true;
-		midiManager.handleMidiCollisions();
+		if (changed) {
+			stateChanged = true;
+			midiManager.handleMidiCollisions();
+		}
 	}
 
 	private void pinchSelectedNotes(float currLeftTick, float currRightTick) {

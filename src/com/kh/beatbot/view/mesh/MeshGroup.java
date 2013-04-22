@@ -105,6 +105,11 @@ public class MeshGroup {
 		}
 	}
 	
+	public void clear() {
+		children.clear();
+		updateVertices();
+	}
+	
 	private void updateBuffers() {
 		initHandles();
 		GL11 gl = (GL11)BBView.gl;

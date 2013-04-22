@@ -28,7 +28,7 @@ public class MidiNote implements Comparable<MidiNote> {
 	}
 	
 	private void updateUI() {
-		GlobalVars.mainPage.midiView.updateNoteUI(this);
+		GlobalVars.mainPage.midiView.updateNoteView(this);
 	}
 	
 	public MidiNote getCopy() {

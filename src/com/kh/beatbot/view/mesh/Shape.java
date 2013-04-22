@@ -30,6 +30,17 @@ public abstract class Shape implements Drawable {
 		this.outlineMesh = outlineMesh;
 	}
 	
+	public void setGroup(ShapeGroup group) {
+		if (this.group == group) {
+			return; // already a member of this group
+		}
+		if (this.group != null) {
+			this.group.remove(this);
+		}
+		this.group = group;
+		group.add(this);
+	}
+	
 	public Mesh2D getFillMesh() {
 		return fillMesh;
 	}

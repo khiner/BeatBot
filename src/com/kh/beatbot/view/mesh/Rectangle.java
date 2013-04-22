@@ -1,5 +1,7 @@
 package com.kh.beatbot.view.mesh;
 
+import com.kh.beatbot.global.Colors;
+
 public class Rectangle extends Shape {
 	public Rectangle(ShapeGroup group, float x, float y, float width,
 			float height, float[] fillColor, float[] outlineColor) {
@@ -22,6 +24,12 @@ public class Rectangle extends Shape {
 		group.update(this);
 	}
 
+	public void setColors(float[] fillColor, float[] outlineColor) {
+		fillMesh.index = 0;
+		outlineMesh.index = 0;
+		createVertices(fillColor, outlineColor);
+	}
+	
 	private void createVertices(float[] fillColor, float[] outlineColor) {
 		/********
 		 * ^--^ *
