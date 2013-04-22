@@ -33,7 +33,7 @@ public class MidiView extends ClickableBBView {
 	public static float dragOffsetTick[] = { 0, 0, 0, 0, 0 };
 
 	public static int pinchLeftPointerId = -1, pinchRightPointerId = -1;
-	public static float pinchLeftOffset = 0, pinchRightOffset = 0,
+	public static float pinchLeftAnchor = 0, pinchRightAnchor = 0,
 			zoomLeftAnchorTick = 0, zoomRightAnchorTick = 0;
 
 	public static int scrollPointerId = -1;
@@ -118,9 +118,9 @@ public class MidiView extends ClickableBBView {
 		float topY = Math.min(y, selectRegionStartY);
 		float bottomY = Math.max(y, selectRegionStartY);
 		// make sure select rect doesn't go into the tick view
-		topY = Math.max(topY, Y_OFFSET);
+		topY = Math.max(topY + .01f, Y_OFFSET);
 		// make sure select rect doesn't go past the last track/note
-		bottomY = Math.min(bottomY, Y_OFFSET + allTracksHeight - .01f);
+		bottomY = Math.min(bottomY + .01f, Y_OFFSET + allTracksHeight - .01f);
 		int topNote = yToNote(topY);
 		int bottomNote = yToNote(bottomY);
 		midiManager.selectRegion((long) leftTick, (long) rightTick, topNote,
@@ -324,8 +324,6 @@ public class MidiView extends ClickableBBView {
 	}
 
 	public static int yToNote(float y) {
-		if (y >= 0 && y < Y_OFFSET)
-			return -1;
 		return (int) ((y + TickWindowHelper.getYOffset() - Y_OFFSET) / trackHeight);
 	}
 
@@ -435,7 +433,7 @@ public class MidiView extends ClickableBBView {
 		return adjustedNoteDiff;
 	}
 
-	private void pinchNote(MidiNote midiNote, float onTickDiff,
+	private boolean pinchNote(MidiNote midiNote, float onTickDiff,
 			float offTickDiff) {
 		float newOnTick = midiNote.getOnTick();
 		float newOffTick = midiNote.getOffTick();
@@ -443,9 +441,8 @@ public class MidiView extends ClickableBBView {
 			newOnTick += onTickDiff;
 		if (midiNote.getOffTick() + offTickDiff <= TickWindowHelper.MAX_TICKS)
 			newOffTick += offTickDiff;
-		midiManager.setNoteTicks(midiNote, (long) newOnTick, (long) newOffTick,
+		return midiManager.setNoteTicks(midiNote, (long) newOnTick, (long) newOffTick,
 				snapToGrid, false);
-		stateChanged = true;
 	}
 
 	private void startSelectRegion(float x, float y) {
@@ -564,16 +561,20 @@ public class MidiView extends ClickableBBView {
 	}
 
 	private void pinchSelectedNotes(float currLeftTick, float currRightTick) {
-		MidiNote touchedNote = touchedNotes.values().iterator().next();
-		float onTickDiff = currLeftTick - touchedNote.getOnTick()
-				- pinchLeftOffset;
-		float offTickDiff = currRightTick - touchedNote.getOffTick()
-				+ pinchRightOffset;
+		float onTickDiff = currLeftTick - pinchLeftAnchor;
+		float offTickDiff = currRightTick - pinchRightAnchor;
 		if (onTickDiff == 0 && offTickDiff == 0)
 			return;
+		
+		boolean changed = false;
 		for (MidiNote midiNote : midiManager.getSelectedNotes()) {
-			pinchNote(midiNote, onTickDiff, offTickDiff);
+			changed = pinchNote(midiNote, onTickDiff, offTickDiff) || changed;
 		}
+		if (changed) {
+			pinchLeftAnchor = currLeftTick;
+			pinchRightAnchor = currRightTick;
+		}
+		stateChanged = changed || stateChanged;
 		midiManager.handleMidiCollisions();
 	}
 
@@ -694,8 +695,8 @@ public class MidiView extends ClickableBBView {
 					int rightId = (leftId + 1) % 2;
 					pinchLeftPointerId = leftId;
 					pinchRightPointerId = rightId;
-					pinchLeftOffset = leftTick - touchedNote.getOnTick();
-					pinchRightOffset = touchedNote.getOffTick() - rightTick;
+					pinchLeftAnchor = leftTick;
+					pinchRightAnchor = rightTick;
 					pinch = true;
 				} else if (pointerCount() - getNumLoopMarkersSelected() == 1) {
 					// otherwise, enable scrolling

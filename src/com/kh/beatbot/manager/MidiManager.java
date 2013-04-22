@@ -138,7 +138,7 @@ public class MidiManager implements Parcelable {
 
 	public void selectRegion(long leftTick, long rightTick, int topNote,
 			int bottomNote) {
-		for (int i = topNote; i < bottomNote; i++) {
+		for (int i = 0; i < Managers.trackManager.getNumTracks(); i++) {
 			Track track = Managers.trackManager.getTrack(i);
 			for (MidiNote midiNote : track.getMidiNotes()) {
 				// conditions for region selection
@@ -146,7 +146,8 @@ public class MidiManager implements Parcelable {
 				boolean b = rightTick > midiNote.getOffTick();
 				boolean c = leftTick < midiNote.getOnTick();
 				boolean d = rightTick > midiNote.getOnTick();
-				if (a && b || c && d || !b && !c) {
+				if (i >= topNote && i <= bottomNote
+						&& ((a && b) || (c && d) || (!b && !c))) {
 					selectNote(midiNote);
 				} else {
 					deselectNote(midiNote);
@@ -277,7 +278,7 @@ public class MidiManager implements Parcelable {
 		Track track = Managers.trackManager.getTrack(midiNote.getNoteValue());
 		return track.setNoteTicks(midiNote, onTick, offTick);
 	}
-	
+
 	public Tempo getTempo() {
 		return tempo;
 	}
@@ -351,7 +352,7 @@ public class MidiManager implements Parcelable {
 			}
 		}
 	}
-	
+
 	/*
 	 * Translate all midi notes to their on-ticks' nearest major ticks given the
 	 * provided beat division

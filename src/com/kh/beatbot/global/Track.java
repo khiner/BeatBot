@@ -72,7 +72,7 @@ public class Track extends BaseTrack {
 		for (int i = 0; i < notes.size(); i++) {
 			MidiNote note = notes.get(i);
 			long newOffTick = note.getOffTick();
-			for (int j = i; j < notes.size(); j++) {
+			for (int j = i + 1; j < notes.size(); j++) {
 				MidiNote otherNote = notes.get(j);
 				if (!note.isSelected() || !otherNote.isSelected()) {
 					continue;
@@ -82,7 +82,7 @@ public class Track extends BaseTrack {
 				if (otherNote.getOnTick() > note.getOnTick()
 						&& otherNote.getOnTick() - 1 < newOffTick) {
 					newOffTick = otherNote.getOnTick() - 1;
-				} 
+				}
 			}
 			setNoteTicks(note, note.getOnTick(), newOffTick);
 		}
