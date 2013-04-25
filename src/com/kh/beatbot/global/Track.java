@@ -54,55 +54,44 @@ public class Track extends BaseTrack {
 	}
 
 	public boolean setNoteTicks(MidiNote midiNote, long onTick, long offTick) {
-		if (!notes.contains(midiNote) ||
-				(midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)) {
+		if (!notes.contains(midiNote)
+				|| (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)) {
 			return false;
 		}
 		// if we're changing the stop tick on a note that's already playing to a
 		// note before the current tick, stop the track
-		notifyNoteMoved(midiNote.getOnTick(), midiNote.getOffTick(), onTick, offTick);
+		notifyNoteMoved(midiNote.getOnTick(), midiNote.getOffTick(), onTick,
+				offTick);
 		// move Java note ticks
 		midiNote.setOnTick(onTick);
 		midiNote.setOffTick(offTick);
 		updateNextNote();
 		return true;
 	}
-	
+
 	public void handleNoteCollisions() {
 		for (int i = 0; i < notes.size(); i++) {
 			MidiNote note = notes.get(i);
-			long newOffTick = note.getOffTick();
-			for (int j = i + 1; j < notes.size(); j++) {
+			long newOnTick = note.isSelected() ? note.getOnTick() : note
+					.getSavedOnTick();
+			long newOffTick = note.isSelected() ? note.getOffTick() : note
+					.getSavedOffTick();
+			for (int j = 0; j < notes.size(); j++) {
 				MidiNote otherNote = notes.get(j);
-				if (!note.isSelected() || !otherNote.isSelected()) {
+				if (note.equals(otherNote) || !otherNote.isSelected()) {
 					continue;
 				}
 				// if a selected note begins in the middle of another note,
 				// clip the covered note
-				if (otherNote.getOnTick() > note.getOnTick()
+				if (otherNote.getOnTick() > newOnTick
 						&& otherNote.getOnTick() - 1 < newOffTick) {
 					newOffTick = otherNote.getOnTick() - 1;
-				}
-			}
-			setNoteTicks(note, note.getOnTick(), newOffTick);
-		}
-		for (MidiNote unselected : notes) {
-			if (unselected.isSelected())
-				continue;
-			long newOnTick = unselected.getSavedOnTick();
-			long newOffTick = unselected.getSavedOffTick();
-			for (MidiNote selected : notes) {
-				if (!selected.isSelected()) 
-					continue;
-				// if a selected note begins in the middle of another note,
-				// clip the covered note
-				if (selected.getOnTick() > unselected.getSavedOnTick()
-						&& selected.getOnTick() - 1 < newOffTick) {
-					newOffTick = selected.getOnTick() - 1;
-				// otherwise, if a selected note overlaps with the beginning
-				// of another note, delete the note
-				} else if (selected.getOnTick() <= unselected.getSavedOnTick()
-						&& selected.getOffTick() >= unselected.getSavedOnTick()) {
+					// otherwise, if a selected note overlaps with the beginning
+					// of another note, delete the note
+					// (CAN NEVER DELETE SELECTED NOTES THIS WAY!)
+				} else if (!note.isSelected()
+						&& otherNote.getOnTick() <= newOnTick
+						&& otherNote.getOffTick() > newOnTick) {
 					// we 'delete' the note temporarily by moving
 					// it offscreen, so it won't ever be played or drawn
 					newOnTick = (long) TickWindowHelper.MAX_TICKS * 2;
@@ -110,10 +99,10 @@ public class Track extends BaseTrack {
 					break;
 				}
 			}
-			setNoteTicks(unselected, newOnTick, newOffTick);
+			setNoteTicks(note, newOnTick, newOffTick);
 		}
 	}
-	
+
 	public List<MidiNote> getMidiNotes() {
 		return notes;
 	}
