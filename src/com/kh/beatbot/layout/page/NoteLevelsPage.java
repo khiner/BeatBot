@@ -5,7 +5,7 @@ import javax.microedition.khronos.opengles.GL11;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
-import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.LevelsView;
 import com.kh.beatbot.view.control.Button;
@@ -71,20 +71,20 @@ public class NoteLevelsPage extends Page {
 		panToggle = new TextButton(labelGroup, Colors.panBgColorSet, Colors.panStrokeColorSet);
 		pitchToggle = new TextButton(labelGroup, Colors.pitchBgColorSet, Colors.pitchStrokeColorSet);
 		
-		volumeToggle.setOnClickListener(new BBOnClickListener() {
-			public void onClick(Button arg0) {
+		volumeToggle.setOnReleaseListener(new OnReleaseListener() {
+			public void onRelease(Button arg0) {
 				levelsView.setLevelType(LevelType.VOLUME);
 				update();
 			}
 		});
-		panToggle.setOnClickListener(new BBOnClickListener() {
-			public void onClick(Button arg0) {
+		panToggle.setOnReleaseListener(new OnReleaseListener() {
+			public void onRelease(Button arg0) {
 				levelsView.setLevelType(LevelType.PAN);
 				update();
 			}
 		});
-		pitchToggle.setOnClickListener(new BBOnClickListener() {
-			public void onClick(Button arg0) {
+		pitchToggle.setOnReleaseListener(new OnReleaseListener() {
+			public void onRelease(Button arg0) {
 				levelsView.setLevelType(LevelType.PITCH);
 				update();
 			}

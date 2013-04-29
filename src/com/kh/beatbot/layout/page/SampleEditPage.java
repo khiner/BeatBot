@@ -2,7 +2,7 @@ package com.kh.beatbot.layout.page;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.ImageIconSource;
-import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.SampleEditBBView;
 import com.kh.beatbot.view.control.Button;
@@ -42,9 +42,9 @@ public class SampleEditPage extends Page {
 	protected void createChildren() {
 		sampleEdit = new SampleEditBBView();
 		previewButton = new ImageButton();
-		previewButton.setOnClickListener(new BBOnClickListener() {
+		previewButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
-			public void onClick(Button button) {
+			public void onRelease(Button button) {
 				if (button.isPressed()) {
 					TrackManager.currTrack.preview();
 				} else {
@@ -54,13 +54,13 @@ public class SampleEditPage extends Page {
 		});
 		loopButton = new ToggleButton();
 		reverseButton = new ToggleButton();
-		loopButton.setOnClickListener(new BBOnClickListener() {
-			public void onClick(Button arg0) {
+		loopButton.setOnReleaseListener(new OnReleaseListener() {
+			public void onRelease(Button arg0) {
 				TrackManager.currTrack.toggleLooping();
 			}
 		});
-		reverseButton.setOnClickListener(new BBOnClickListener() {
-			public void onClick(Button arg0) {
+		reverseButton.setOnReleaseListener(new OnReleaseListener() {
+			public void onRelease(Button arg0) {
 				TrackManager.currTrack.setReverse(reverseButton.isChecked());
 			}
 		});

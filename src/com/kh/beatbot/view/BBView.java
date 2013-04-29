@@ -11,7 +11,7 @@ import javax.microedition.khronos.opengles.GL10;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GeneralUtils;
 
-public abstract class BBView {
+public abstract class BBView implements Comparable<BBView> {
 	public class Position {
 		public float x, y;
 
@@ -74,6 +74,25 @@ public abstract class BBView {
 		children.add(child);
 		if (initialized)
 			child.initAll();
+	}
+	
+	public int numChildren() {
+		return children.size();
+	}
+	
+	public void setDimensions(float width, float height) {
+		this.width = width;
+		this.height = height;
+	}
+	
+	public void setPosition(float x, float y) {
+		this.x = x;
+		this.y = y;
+		if (parent != null) {
+			this.absoluteX = parent.absoluteX + x;
+			this.absoluteY = parent.absoluteY + y;
+		}
+		layoutChildren();
 	}
 	
 	public boolean containsPoint(float x, float y) {
@@ -167,15 +186,8 @@ public abstract class BBView {
 	
 	public void layout(BBView parent, float x, float y, float width, float height) {
 		this.parent = parent;
-		if (parent != null) {
-			this.absoluteX = parent.absoluteX + x;
-			this.absoluteY = parent.absoluteY + y;
-		}
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		layoutChildren();
+		setDimensions(width, height);
+		setPosition(x, y);
 	}
 
 	protected BBView findChildAt(float x, float y) {
@@ -399,5 +411,17 @@ public abstract class BBView {
 					GL10.GL_LINE_LOOP);
 			gl.glTranslatef(-parentWidth / 2, -parentHeight / 2, 0);
 		}
+	}
+	
+	
+	@Override
+	public int compareTo(BBView another) {
+		float diff = this.x - another.x;
+		if (diff == 0)
+			return 0;
+		else if (diff > 0)
+			return 1;
+		else
+			return -1;
 	}
 }

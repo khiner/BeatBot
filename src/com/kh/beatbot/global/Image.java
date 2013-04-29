@@ -41,4 +41,13 @@ public class Image implements Drawable {
 	public float getHeight() {
 		return crop[1];
 	}
+	
+	public void setPosition(float x, float y) {
+		// no-op
+	}
+	
+	public void setDimensions(float width, float height) {
+		crop[2] = (int) width;
+		crop[1] = (int) height;
+	}
 }

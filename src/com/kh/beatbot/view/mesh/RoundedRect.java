@@ -11,11 +11,7 @@ public class RoundedRect extends Shape {
 		createVertices(fillColor, outlineColor);
 	}
 	
-	public RoundedRect(ShapeGroup group, float x, float y, float width, float height, Mesh2D fillMesh, Mesh2D outlineMesh) {
-		super(group, x, y, width, height, fillMesh, outlineMesh);
-	}
-	
-	private void createVertices(float[] fillColor, float[] outlineColor) {
+	protected void createVertices(float[] fillColor, float[] outlineColor) {
 		float theta = 0, addX, addY;
 		float centerX = x + width / 2;
 		float centerY = y + height / 2;
@@ -37,20 +33,23 @@ public class RoundedRect extends Shape {
 			float vertexX = (float) Math.cos(theta) * cornerRadius + addX + x;
 			float vertexY = (float) Math.sin(theta) * cornerRadius + addY + y;
 			if (lastX != 0 && lastY != 0) {
-				fillMesh.vertex(vertexX, vertexY, fillColor);
-				fillMesh.vertex(lastX, lastY, fillColor);
-				fillMesh.vertex(centerX, centerY, fillColor);
-				outlineMesh.vertex(vertexX, vertexY, outlineColor);
-				outlineMesh.vertex(lastX, lastY, outlineColor);
+				fillMesh.vertex(vertexX, vertexY);
+				fillMesh.vertex(lastX, lastY);
+				fillMesh.vertex(centerX, centerY);
+				outlineMesh.vertex(vertexX, vertexY);
+				outlineMesh.vertex(lastX, lastY);
 			}
 			lastX = vertexX;
 			lastY = vertexY;
 			theta += 4 * ¹ / outlineMesh.getNumVertices();
 		}
-		fillMesh.vertex(fillMesh.getVertices()[0], fillMesh.getVertices()[1], fillColor);
-		fillMesh.vertex(lastX, lastY, fillColor);
-		fillMesh.vertex(centerX, centerY, fillColor);
-		outlineMesh.vertex(outlineMesh.getVertices()[0], outlineMesh.getVertices()[1], outlineColor);
-		outlineMesh.vertex(lastX, lastY, outlineColor);
+		fillMesh.vertex(fillMesh.getVertices()[0], fillMesh.getVertices()[1]);
+		fillMesh.vertex(lastX, lastY);
+		fillMesh.vertex(centerX, centerY);
+		outlineMesh.vertex(outlineMesh.getVertices()[0], outlineMesh.getVertices()[1]);
+		outlineMesh.vertex(lastX, lastY);
+		
+		fillMesh.setColor(fillColor);
+		outlineMesh.setColor(outlineColor);
 	}
 }

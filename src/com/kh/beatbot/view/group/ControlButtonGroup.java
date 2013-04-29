@@ -5,7 +5,7 @@ import android.widget.Toast;
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.ImageIconSource;
-import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
@@ -42,9 +42,9 @@ public class ControlButtonGroup extends TouchableBBView {
 		undoButton = new ImageButton();
 		bpmView = new BpmView();
 
-		playButton.setOnClickListener(new BBOnClickListener() {
+		playButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
-			public void onClick(Button button) {
+			public void onRelease(Button button) {
 				((ToggleButton) button).setChecked(true);
 				if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
 					Managers.playbackManager.reset();
@@ -55,9 +55,9 @@ public class ControlButtonGroup extends TouchableBBView {
 			}
 		});
 
-		recordButton.setOnClickListener(new BBOnClickListener() {
+		recordButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
-			public void onClick(Button button) {
+			public void onRelease(Button button) {
 				if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
 					// Managers.recordManager.stopListening();
 					String fileName = Managers.recordManager
@@ -75,19 +75,19 @@ public class ControlButtonGroup extends TouchableBBView {
 					playButton.setChecked(true);
 					Managers.recordManager.startRecordingNative();
 					if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
-						playButton.getOnClickListener().onClick(playButton);
+						playButton.getOnReleaseListener().onRelease(playButton);
 				}
 			}
 		});
 
-		stopButton.setOnClickListener(new BBOnClickListener() {
+		stopButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
-			public void onClick(Button button) {
+			public void onRelease(Button button) {
 				playButton.setChecked(false);
 				if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
 					recordButton.setChecked(false);
-					playButton.getOnClickListener().onClick(playButton);
-					recordButton.getOnClickListener().onClick(recordButton);
+					playButton.getOnReleaseListener().onRelease(playButton);
+					recordButton.getOnReleaseListener().onRelease(recordButton);
 				}
 				if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
 					playButton.setChecked(false);
@@ -97,16 +97,16 @@ public class ControlButtonGroup extends TouchableBBView {
 			}
 		});
 
-		undoButton.setOnClickListener(new BBOnClickListener() {
+		undoButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
-			public void onClick(Button button) {
+			public void onRelease(Button button) {
 				Managers.midiManager.undo();
 			}
 		});
 
-		copyButton.setOnClickListener(new BBOnClickListener() {
+		copyButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
-			public void onClick(Button button) {
+			public void onRelease(Button button) {
 				String msg = null;
 				if (((ToggleButton) button).isChecked()) {
 					Managers.midiManager.copy();
@@ -120,9 +120,9 @@ public class ControlButtonGroup extends TouchableBBView {
 			}
 		});
 
-		deleteButton.setOnClickListener(new BBOnClickListener() {
+		deleteButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
-			public void onClick(Button button) {
+			public void onRelease(Button button) {
 				Managers.midiManager.deleteSelectedNotes();
 			}
 		});

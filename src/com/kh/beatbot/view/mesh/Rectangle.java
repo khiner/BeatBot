@@ -1,6 +1,5 @@
 package com.kh.beatbot.view.mesh;
 
-import com.kh.beatbot.global.Colors;
 
 public class Rectangle extends Shape {
 	public Rectangle(ShapeGroup group, float x, float y, float width,
@@ -17,20 +16,18 @@ public class Rectangle extends Shape {
 		this.y = y;
 		this.width = width;
 		this.height = height;
-		
-		fillMesh.index = 0;
-		outlineMesh.index = 0;
-		createVertices(fillColor, outlineColor);
-		group.update(this);
+		fillMesh.color = fillColor;
+		outlineMesh.color = outlineColor;
+		update();
 	}
 
 	public void setColors(float[] fillColor, float[] outlineColor) {
-		fillMesh.index = 0;
-		outlineMesh.index = 0;
-		createVertices(fillColor, outlineColor);
+		fillMesh.color = fillColor;
+		outlineMesh.color = outlineColor;
+		update();
 	}
 	
-	private void createVertices(float[] fillColor, float[] outlineColor) {
+	protected void createVertices(float[] fillColor, float[] outlineColor) {
 		/********
 		 * ^--^ *
 		 * |1/| *
@@ -38,22 +35,26 @@ public class Rectangle extends Shape {
 		 * ^--^ *
 		 ********/
 		// fill triangle 1
-		fillMesh.vertex(x, y, fillColor);
-		fillMesh.vertex(x + width, y, fillColor);
-		fillMesh.vertex(x, y + height, fillColor);
+		fillMesh.vertex(x, y);
+		fillMesh.vertex(x + width, y);
+		fillMesh.vertex(x, y + height);
 		// fill triangle 2
-		fillMesh.vertex(x, y + height, fillColor);
-		fillMesh.vertex(x + width, y, fillColor);
-		fillMesh.vertex(x + width, y + height, fillColor);
+		fillMesh.vertex(x, y + height);
+		fillMesh.vertex(x + width, y);
+		fillMesh.vertex(x + width, y + height);
+		
+		fillMesh.setColor(fillColor);
 		
 		// outline
-		outlineMesh.vertex(x, y, outlineColor);
-		outlineMesh.vertex(x + width, y, outlineColor);
-		outlineMesh.vertex(x + width, y, outlineColor);
-		outlineMesh.vertex(x + width, y + height, outlineColor);
-		outlineMesh.vertex(x + width, y + height, outlineColor);
-		outlineMesh.vertex(x, y + height, outlineColor);
-		outlineMesh.vertex(x, y + height, outlineColor);
-		outlineMesh.vertex(x, y, outlineColor);
+		outlineMesh.vertex(x, y);
+		outlineMesh.vertex(x + width, y);
+		outlineMesh.vertex(x + width, y);
+		outlineMesh.vertex(x + width, y + height);
+		outlineMesh.vertex(x + width, y + height);
+		outlineMesh.vertex(x, y + height);
+		outlineMesh.vertex(x, y + height);
+		outlineMesh.vertex(x, y);
+		
+		outlineMesh.setColor(outlineColor);
 	}
 }

@@ -20,6 +20,8 @@ public class TextButton extends ToggleButton {
 
 	private int defaultIconResource, pressedIconResource, selectedIconResource;
 
+	private boolean iconEnabled = true;
+	
 	public TextButton() {
 		strokeColorSet = Colors.defaultStrokeColorSet;
 		globalGroup = null;
@@ -58,6 +60,11 @@ public class TextButton extends ToggleButton {
 		iconButton.setIconSource(iconSource);
 	}
 
+	public void setIconEnabled(boolean iconEnabled) {
+		this.iconEnabled = iconEnabled;
+		init();
+	}
+	
 	@Override
 	public void press() {
 		super.press();
@@ -107,7 +114,7 @@ public class TextButton extends ToggleButton {
 		GLSurfaceViewBase.storeText(text);
 		textHeight = 5 * height / 8;
 		textWidth = GLSurfaceViewBase.getTextWidth(text, textHeight);
-		textXOffset = (iconButton != null ? iconOffset + iconButton.width
+		textXOffset = (iconButton != null && iconEnabled ? iconOffset + iconButton.width
 				+ (width - iconButton.width - iconOffset) / 2 : width / 2)
 				- textWidth / 2;
 		textXOffset += 2; // kludgey magic number correction,
@@ -116,15 +123,34 @@ public class TextButton extends ToggleButton {
 		textYOffset = 0;
 	}
 
+	public String getText() {
+		return text;
+	}
+	
 	public void setText(String text) {
 		this.text = text;
 		init();
 	}
-
+	
+	public void setPosition(float x, float y) {
+		super.setPosition(x, y);
+		if (iconSource != null) {
+			iconSource.setPosition(x, y);
+		}
+	}
+	
+	public void setDimensions(float width, float height) {
+		super.setDimensions(width, height);
+		init();
+		if (iconSource != null) {
+			iconSource.setDimensions(width, height);
+		}
+	}
+	
 	@Override
 	public void draw() {
 		super.draw();
-		if (iconButton != null) { // draw optional icon
+		if (iconButton != null && iconEnabled) { // draw optional icon
 			iconButton.draw();
 		}
 		if (text != null) { // draw optional text
@@ -138,7 +164,7 @@ public class TextButton extends ToggleButton {
 
 	@Override
 	public void layoutChildren() {
-		if (iconButton != null) { // layout optional icon
+		if (iconButton != null && iconEnabled) { // layout optional icon
 			iconOffset = height / 10;
 			iconButton.layout(this, iconOffset, iconOffset, 4 * height / 5,
 					4 * height / 5);

@@ -9,7 +9,7 @@ import com.kh.beatbot.layout.page.AdsrPage;
 import com.kh.beatbot.layout.page.LevelsFXPage;
 import com.kh.beatbot.layout.page.NoteLevelsPage;
 import com.kh.beatbot.layout.page.SampleEditPage;
-import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.BBView;
@@ -86,27 +86,27 @@ public class PageSelectGroup extends TouchableBBView {
 				Colors.labelBgColorSet, Colors.labelStrokeColorSet,
 				R.drawable.levels_icon, -1, R.drawable.levels_icon_selected);
 
-		addTrackButton.setOnClickListener(new BBOnClickListener() {
+		addTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
-			public void onClick(Button button) {
+			public void onRelease(Button button) {
 				// add track should not behave as a toggle
 				addTrackButton.setChecked(false);
 				Managers.directoryManager.showAddTrackAlert();
 			}
 		});
 
-		instrumentSelectButton.setOnClickListener(new BBOnClickListener() {
+		instrumentSelectButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
-			public void onClick(Button button) {
+			public void onRelease(Button button) {
 				// instr select should not behave as a toggle
 				instrumentSelectButton.setChecked(false);
 				Managers.directoryManager.showInstrumentSelectAlert();
 			}
 		});
 
-		sampleSelectButton.setOnClickListener(new BBOnClickListener() {
+		sampleSelectButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
-			public void onClick(Button button) {
+			public void onRelease(Button button) {
 				// sample select should not behave as a toggle
 				sampleSelectButton.setChecked(false);
 				Managers.directoryManager.showSampleSelectAlert();
@@ -115,9 +115,9 @@ public class PageSelectGroup extends TouchableBBView {
 
 		for (int i = 0; i < textButtons.length; i++) {
 			final int id = i;
-			textButtons[i].setOnClickListener(new BBOnClickListener() {
+			textButtons[i].setOnReleaseListener(new OnReleaseListener() {
 				@Override
-				public void onClick(Button button) {
+				public void onRelease(Button button) {
 					textButtons[id].setChecked(true);
 					// deselect all buttons except this one.
 					for (TextButton otherTextButton : textButtons) {

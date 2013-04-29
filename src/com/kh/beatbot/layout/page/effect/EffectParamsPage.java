@@ -4,7 +4,7 @@ import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.control.Button;
@@ -14,7 +14,7 @@ import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.control.ToggleKnob;
 
 public abstract class EffectParamsPage extends TouchableBBView implements
-		Level1dListener, BBOnClickListener {
+		Level1dListener, OnReleaseListener {
 	protected ParamControl[] paramControls;
 	protected Effect effect;
 	protected int xParamIndex = 0, yParamIndex = 1;
@@ -112,7 +112,7 @@ public abstract class EffectParamsPage extends TouchableBBView implements
 	}
 
 	@Override
-	public void onClick(Button button) {
+	public void onRelease(Button button) {
 		int paramNum = button.getId();
 		Param param = effect.getParam(paramNum);
 		param.beatSync = ((ToggleButton) button).isChecked();

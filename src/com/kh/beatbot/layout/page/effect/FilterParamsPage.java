@@ -7,7 +7,7 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.ImageIconSource;
-import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.TextButton;
 import com.kh.beatbot.view.mesh.ShapeGroup;
@@ -15,9 +15,9 @@ import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class FilterParamsPage extends EffectParamsPage {
 
-	private class FilterToggleListener implements BBOnClickListener {
+	private class FilterToggleListener implements OnReleaseListener {
 		@Override
-		public void onClick(Button button) {
+		public void onRelease(Button button) {
 			for (int i = 0; i < filterToggles.length; i++) {
 				if (button.equals(filterToggles[i])) {
 					((Filter) effect).setMode(i);
@@ -55,7 +55,7 @@ public class FilterParamsPage extends EffectParamsPage {
 		filterToggleListener = new FilterToggleListener();
 		for (int i = 0; i < filterToggles.length; i++) {
 			filterToggles[i] = new TextButton(iconGroup, Colors.instrumentBgColorSet, Colors.instrumentStrokeColorSet);
-			filterToggles[i].setOnClickListener(filterToggleListener);
+			filterToggles[i].setOnReleaseListener(filterToggleListener);
 			addChild(filterToggles[i]);
 		}
 	}

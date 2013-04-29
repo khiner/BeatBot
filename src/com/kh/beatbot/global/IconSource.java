@@ -24,6 +24,25 @@ public abstract class IconSource implements Drawable {
 		return defaultIcon.getHeight();
 	}
 	
+	public void setDimensions(float width, float height) {
+		if (defaultIcon != null) {
+			defaultIcon.setDimensions(width, height);
+		}
+		if (selectedIcon != null) {
+			selectedIcon.setDimensions(width, height);
+		}
+		if (disabledIcon != null) {
+			disabledIcon.setDimensions(width, height);
+		}
+		if (pressedIcon != null) {
+			pressedIcon.setDimensions(width, height);
+		}
+	}
+	
+	public void setPosition(float x, float y) {
+		// TODO
+	}
+	
 	public void setState(State state) {
 		setIcon(whichIcon(state));
 	}

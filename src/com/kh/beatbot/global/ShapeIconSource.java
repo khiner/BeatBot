@@ -2,6 +2,7 @@ package com.kh.beatbot.global;
 
 import com.kh.beatbot.view.mesh.RoundedRect;
 import com.kh.beatbot.view.mesh.Shape;
+import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class ShapeIconSource extends IconSource {
 
@@ -23,5 +24,9 @@ public class ShapeIconSource extends IconSource {
 		} else {
 			((RoundedRect) currentIcon).getGroup().replace(prevShape, (Shape)currentIcon);
 		}
+	}
+	
+	public void setShapeGroup(ShapeGroup shapeGroup) {
+		((RoundedRect) currentIcon).setGroup(shapeGroup);
 	}
 }

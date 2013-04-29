@@ -19,7 +19,7 @@ import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
-import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.manager.TrackManager;
@@ -66,11 +66,11 @@ public class LevelsFXPage extends Page implements Level1dListener {
 		@Override
 		public void labelListInitialized(LabelList labelList) {
 			effectLabelList = (DraggableLabelList) labelList;
-			if (effectLabelList.anyLabels()) {
+			if (effectLabelList.numChildren() > 0) {
 				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
 					Effect effect = getCurrTrack().findEffectByPosition(i);
 					if (effect != null)
-						labelList.setLabelOn(i, effect.isOn());
+						labelList.checkLabel(i, effect.isOn());
 				}
 			} else {
 				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
@@ -87,7 +87,7 @@ public class LevelsFXPage extends Page implements Level1dListener {
 		@Override
 		public void labelClicked(String text, int position) {
 			lastClickedPos = position;
-			if (text.isEmpty()) {
+			if (text.isEmpty() || text.equals("ADD")) {
 				selectEffectAlert.show();
 			} else {
 				launchEffectIntent(text, position, false);
@@ -154,7 +154,7 @@ public class LevelsFXPage extends Page implements Level1dListener {
 	}
 	
 	private void updateEffects() {
-		if (!effectLabelList.anyLabels())
+		if (effectLabelList.numChildren() <= 0)
 			return;
 		for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
 			Effect effect = getCurrTrack().findEffectByPosition(i);
@@ -162,7 +162,7 @@ public class LevelsFXPage extends Page implements Level1dListener {
 				effectLabelList.setLabelText(i, "");
 			} else {
 				effectLabelList.setLabelText(i, effect.getName());
-				effectLabelList.setLabelOn(i, effect.isOn());
+				effectLabelList.checkLabel(i, effect.isOn());
 			}
 		}		
 	}
@@ -271,20 +271,20 @@ public class LevelsFXPage extends Page implements Level1dListener {
 		volumeToggle = new TextButton(labelGroup, Colors.volumeBgColorSet, Colors.volumeStrokeColorSet);
 		panToggle = new TextButton(labelGroup, Colors.panBgColorSet, Colors.panStrokeColorSet);
 		pitchToggle = new TextButton(labelGroup, Colors.pitchBgColorSet, Colors.pitchStrokeColorSet);
-		volumeToggle.setOnClickListener(new BBOnClickListener() {
-			public void onClick(Button button) {
+		volumeToggle.setOnReleaseListener(new OnReleaseListener() {
+			public void onRelease(Button button) {
 				getCurrTrack().activeLevelType = LevelType.VOLUME;
 				updateLevels();
 			}
 		});
-		panToggle.setOnClickListener(new BBOnClickListener() {
-			public void onClick(Button button) {
+		panToggle.setOnReleaseListener(new OnReleaseListener() {
+			public void onRelease(Button button) {
 				getCurrTrack().activeLevelType = LevelType.PAN;
 				updateLevels();
 			}
 		});
-		pitchToggle.setOnClickListener(new BBOnClickListener() {
-			public void onClick(Button button) {
+		pitchToggle.setOnReleaseListener(new OnReleaseListener() {
+			public void onRelease(Button button) {
 				getCurrTrack().activeLevelType = LevelType.PITCH;
 				updateLevels();
 			}

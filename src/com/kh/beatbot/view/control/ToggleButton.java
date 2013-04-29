@@ -31,8 +31,8 @@ public class ToggleButton extends ImageButton {
 	}
 
 	@Override
-	protected void notifyClicked() {
+	protected void notifyReleased() {
 		setChecked(!checked);
-		super.notifyClicked();
+		super.notifyReleased();
 	}
 }

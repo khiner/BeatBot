@@ -14,6 +14,7 @@ public class Mesh2D {
 	
 	public int parentVertexIndex = -1;
 	protected float vertices[];
+	protected float colors[];
 	protected float color[];
 	
 	/** vertex index at which the next vertex gets inserted **/
@@ -21,19 +22,28 @@ public class Mesh2D {
 
 	/** number of vertices defined for the mesh **/
 	protected int numVertices = 0;
-
+	
 	public Mesh2D(int numVertices) {
 		this.numVertices = numVertices;
 		
 		vertices = new float[numVertices * 2];
-		color = new float[numVertices * 4];
+		colors = new float[numVertices * 4];
+		color = new float[4];
 	}
 
 	public Mesh2D(float[] vertices, float[] color) {
 		this.numVertices = vertices.length / 2;
 		this.vertices = vertices;
-		this.color = new float[numVertices * 4];
+		this.colors = new float[numVertices * 4];
+		this.color = new float[4];
 		setColor(color);
+	}
+	
+	public void vertex(float x, float y) {
+		int vertexOffset = index * 2;
+		vertices[vertexOffset] = x;
+		vertices[vertexOffset + 1] = y;
+		index++;
 	}
 	
 	/**
@@ -50,10 +60,10 @@ public class Mesh2D {
 		int colorOffset = index * 4;
 		vertices[vertexOffset] = x;
 		vertices[vertexOffset + 1] = y;
-		this.color[colorOffset] = color[0];
-		this.color[colorOffset + 1] = color[1];
-		this.color[colorOffset + 2] = color[2];
-		this.color[colorOffset + 3] = color[3];
+		this.colors[colorOffset] = color[0];
+		this.colors[colorOffset + 1] = color[1];
+		this.colors[colorOffset + 2] = color[2];
+		this.colors[colorOffset + 3] = color[3];
 		index++;
 	}
 
@@ -66,16 +76,17 @@ public class Mesh2D {
 	}
 	
 	public float[] getColor() {
-		return color;
+		return colors;
 	}
 	
 	/** set all vertices to this color **/
 	public void setColor(float[] color) {
+		this.color = color;
 		for (int i = 0; i < numVertices; i++) {
-			this.color[i * 4] = color[0];
-			this.color[i * 4 + 1] = color[1];
-			this.color[i * 4 + 2] = color[2];
-			this.color[i * 4 + 3] = color[3];
+			this.colors[i * 4] = color[0];
+			this.colors[i * 4 + 1] = color[1];
+			this.colors[i * 4 + 2] = color[2];
+			this.colors[i * 4 + 3] = color[3];
 		}
 	}
 	

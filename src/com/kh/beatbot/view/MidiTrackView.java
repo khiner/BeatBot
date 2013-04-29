@@ -6,7 +6,7 @@ import java.util.List;
 import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.TextButton;
@@ -53,9 +53,9 @@ public class MidiTrackView extends TouchableBBView {
 					Colors.muteButtonColorSet, Colors.labelStrokeColorSet);
 			soloButton = new TextButton(roundedRectGroup,
 					Colors.soloButtonColorSet, Colors.labelStrokeColorSet);
-			instrumentButton.setOnClickListener(new BBOnClickListener() {
+			instrumentButton.setOnReleaseListener(new OnReleaseListener() {
 				@Override
-				public void onClick(Button button) {
+				public void onRelease(Button button) {
 					instrumentButton.setChecked(true);
 					for (ButtonRow buttonRow : buttonRows) {
 						if (!buttonRow.instrumentButton
@@ -66,16 +66,16 @@ public class MidiTrackView extends TouchableBBView {
 					Managers.trackManager.setCurrTrack(trackNum);
 				}
 			});
-			muteButton.setOnClickListener(new BBOnClickListener() {
+			muteButton.setOnReleaseListener(new OnReleaseListener() {
 				@Override
-				public void onClick(Button button) {
+				public void onRelease(Button button) {
 					Managers.trackManager.getTrack(trackNum).mute(
 							muteButton.isChecked());
 				}
 			});
-			soloButton.setOnClickListener(new BBOnClickListener() {
+			soloButton.setOnReleaseListener(new OnReleaseListener() {
 				@Override
-				public void onClick(Button button) {
+				public void onRelease(Button button) {
 					if (soloButton.isChecked()) {
 						// if this track is soloing, set all other solo icons to
 						// inactive.

@@ -6,7 +6,7 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.ImageIconSource;
-import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.AdsrView;
@@ -18,7 +18,7 @@ import com.kh.beatbot.view.control.TextButton;
 import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
-public class AdsrPage extends Page implements BBOnClickListener, Level1dListener {
+public class AdsrPage extends Page implements OnReleaseListener, Level1dListener {
 
 	private TextButton[] adsrButtons;
 	private AdsrView adsrView;
@@ -67,7 +67,7 @@ public class AdsrPage extends Page implements BBOnClickListener, Level1dListener
 	}
 	
 	@Override
-	public void onClick(Button button) {
+	public void onRelease(Button button) {
 		check((ToggleButton)button);
 		int paramId = button.getId();
 		// set the current parameter so we know what to do with SeekBar events.
@@ -132,7 +132,7 @@ public class AdsrPage extends Page implements BBOnClickListener, Level1dListener
 		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i] = new TextButton(iconGroup, Colors.instrumentBgColorSet, Colors.instrumentStrokeColorSet);
 			adsrButtons[i].setId(i);
-			adsrButtons[i].setOnClickListener(this);
+			adsrButtons[i].setOnReleaseListener(this);
 		}
 		addChild(adsrView);
 		addChild(levelBar);

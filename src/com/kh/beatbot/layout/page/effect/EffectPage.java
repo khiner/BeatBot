@@ -3,7 +3,7 @@ package com.kh.beatbot.layout.page.effect;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.Level2dListener;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.control.Button;
@@ -77,9 +77,9 @@ public class EffectPage extends TouchableBBView {
 		toggleButton = new TextButton(null,
 				Colors.labelBgColorSet, Colors.labelStrokeColorSet,
 				R.drawable.off_icon, -1, R.drawable.on_icon);
-		toggleButton.setOnClickListener(new BBOnClickListener() {
+		toggleButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
-			public void onClick(Button button) {
+			public void onRelease(Button button) {
 				((EffectParamsPage)paramsPager.getCurrPage()).getEffect().setOn(toggleButton.isChecked());
 			}
 		});

@@ -100,7 +100,7 @@ public class MeshGroup {
 		}
 		
 		int colorIndex = child.parentVertexIndex * 4;
-		for (float colorValue : child.color) {
+		for (float colorValue : child.colors) {
 			colors[colorIndex++] = colorValue;
 		}
 	}

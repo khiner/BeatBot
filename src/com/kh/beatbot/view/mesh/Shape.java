@@ -30,6 +30,15 @@ public abstract class Shape implements Drawable {
 		this.outlineMesh = outlineMesh;
 	}
 	
+	protected abstract void createVertices(float[] fillColor, float[] outlineColor);
+
+	protected void update() {
+		fillMesh.index = 0;
+		outlineMesh.index = 0;
+		createVertices(fillMesh.color, outlineMesh.color);
+		group.update(this);
+	}
+	
 	public void setGroup(ShapeGroup group) {
 		if (this.group == group) {
 			return; // already a member of this group
@@ -67,6 +76,18 @@ public abstract class Shape implements Drawable {
 	@Override
 	public float getHeight() {
 		return height;
+	}
+
+	public void setPosition(float x, float y) {
+		this.x = x;
+		this.y = y;
+		update();
+	}
+	
+	public void setDimensions(float width, float height) {
+		this.width = width;
+		this.height = height;
+		update();
 	}
 	
 	@Override

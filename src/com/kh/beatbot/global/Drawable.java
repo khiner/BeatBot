@@ -9,4 +9,6 @@ public interface Drawable {
 	public abstract float getY();
 	public abstract float getWidth();
 	public abstract float getHeight();
+	public abstract void setDimensions(float width, float height);
+	public abstract void setPosition(float x, float y);
 }

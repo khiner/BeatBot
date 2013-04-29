@@ -19,7 +19,7 @@ public abstract class TouchableBBView extends BBView {
 	public final int pointerCount() {
 		return pointerIdToPos.size();
 	}
-	
+
 	/********************************************************
 	 * These are the handlers that implementations should
 	 * override to actually handle touch events.  They are

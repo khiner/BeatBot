@@ -3,7 +3,6 @@ package com.kh.beatbot.global;
 import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.view.BBView;
-import com.kh.beatbot.view.mesh.Mesh2D;
 import com.kh.beatbot.view.mesh.RoundedRect;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
@@ -11,6 +10,8 @@ public class RoundedRectIconSource extends ShapeIconSource {
 
 	private ShapeGroup shapeGroup;
 	private boolean shouldDraw;
+
+	private float width, height;
 	
 	public RoundedRectIconSource(ShapeGroup shapeGroup, float x, float y,
 			float width, float height, ColorSet bgColorSet,
@@ -27,6 +28,9 @@ public class RoundedRectIconSource extends ShapeIconSource {
 		// otherwise, we create a new group to share amongst all icons
 		shouldDraw = shapeGroup == null;
 		this.shapeGroup = shouldDraw ? new ShapeGroup() : shapeGroup;
+
+		this.width = width;
+		this.height = height;
 		
 		float centerX = width / 2;
 		float centerY = height / 2;
@@ -41,32 +45,44 @@ public class RoundedRectIconSource extends ShapeIconSource {
 		defaultIcon = new RoundedRect(this.shapeGroup, x + 1, y + 1, scaledW,
 				scaledH, cornerRadius, bgColorSet.defaultColor,
 				borderColorSet.defaultColor);
-		pressedIcon = new RoundedRect(this.shapeGroup, x + centerX - downW / 2, y
-				+ centerY - downH / 2, downW, downH, cornerRadius,
+		pressedIcon = new RoundedRect(this.shapeGroup, x + centerX - downW / 2,
+				y + centerY - downH / 2, downW, downH, cornerRadius,
 				bgColorSet.pressedColor, borderColorSet.pressedColor);
 
-		// copy vertices from pressed mesh into selected mesh (same size) but
-		// use different colors
-		Mesh2D pressedMesh = ((RoundedRect) pressedIcon).getFillMesh();
-		Mesh2D pressedOutlineMesh = ((RoundedRect) pressedIcon)
-				.getOutlineMesh();
-
-		Mesh2D selectedMesh = new Mesh2D(pressedMesh.getVertices(),
-				bgColorSet.selectedColor);
-		Mesh2D selectedOutlineMesh = new Mesh2D(
-				pressedOutlineMesh.getVertices(), borderColorSet.selectedColor);
-
 		selectedIcon = new RoundedRect(this.shapeGroup, pressedIcon.getX(),
-				pressedIcon.getY(), downW, downH, selectedMesh,
-				selectedOutlineMesh);
+				pressedIcon.getY(), downW, downH, cornerRadius,
+				bgColorSet.selectedColor, borderColorSet.selectedColor);
 
 		setState(State.DEFAULT);
 	}
-	
+
 	@Override
 	public void draw(float x, float y, float width, float height) {
 		if (shouldDraw) {
 			shapeGroup.draw((GL11) BBView.gl, 1);
 		}
+	}
+
+	public void setPosition(float x, float y) {
+		// TODO
+	}
+	
+	public void setDimensions(float width, float height) {
+		this.width = width;
+		this.height = height;
+		float scaledW = width - 2;
+		float scaledH = height - 2;
+
+		float dim = Math.min(width, height);
+		float downW = scaledW - dim * .10f;
+		float downH = scaledH - dim * .10f;
+
+		setIcon(defaultIcon);
+		defaultIcon.setDimensions(scaledW, scaledH);
+		setIcon(pressedIcon);
+		pressedIcon.setDimensions(downW, downH);
+		setIcon(selectedIcon);
+		selectedIcon.setDimensions(downW, downH);
+		setIcon(defaultIcon);
 	}
 }

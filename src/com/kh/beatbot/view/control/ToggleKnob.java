@@ -2,7 +2,7 @@ package com.kh.beatbot.view.control;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.ImageIconSource;
-import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.Level1dListener;
 
 public class ToggleKnob extends Knob {
@@ -41,11 +41,11 @@ public class ToggleKnob extends Knob {
 	protected void createChildren() {
 		super.createChildren();
 		centerButton = new ToggleButton();
-		centerButton.setOnClickListener(new BBOnClickListener() {
+		centerButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
-			public void onClick(Button button) {
+			public void onRelease(Button button) {
 				for (Level1dListener listener : levelListeners) {
-					((BBOnClickListener)listener).onClick(centerButton);
+					((OnReleaseListener)listener).onRelease(centerButton);
 				}
 			}
 		});

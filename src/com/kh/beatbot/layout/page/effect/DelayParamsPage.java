@@ -5,7 +5,7 @@ import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.global.ImageIconSource;
-import com.kh.beatbot.listener.BBOnClickListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.ParamControl;
 import com.kh.beatbot.view.control.ToggleButton;
@@ -38,9 +38,9 @@ public class DelayParamsPage extends EffectParamsPage {
 	public void createChildren() {
 		super.createChildren();
 		linkToggle = new ToggleButton();
-		linkToggle.setOnClickListener(new BBOnClickListener() {
+		linkToggle.setOnReleaseListener(new OnReleaseListener() {
 			@Override
-			public void onClick(Button button) {
+			public void onRelease(Button button) {
 				ParamControl leftChannelControl = paramControls[0];
 				ParamControl rightChannelControl = paramControls[1];
 				ToggleKnob rightKnob = (ToggleKnob) rightChannelControl.knob;
