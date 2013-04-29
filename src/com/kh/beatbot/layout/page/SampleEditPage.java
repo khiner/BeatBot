@@ -2,6 +2,7 @@ package com.kh.beatbot.layout.page;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.ImageIconSource;
+import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.SampleEditBBView;
@@ -42,14 +43,18 @@ public class SampleEditPage extends Page {
 	protected void createChildren() {
 		sampleEdit = new SampleEditBBView();
 		previewButton = new ImageButton();
+		
+		previewButton.setOnPressListener(new OnPressListener() {
+			@Override
+			public void onPress(Button button) {
+				TrackManager.currTrack.preview();
+			}
+		});
+		
 		previewButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				if (button.isPressed()) {
-					TrackManager.currTrack.preview();
-				} else {
-					TrackManager.currTrack.stopPreviewing();
-				}
+				TrackManager.currTrack.stopPreviewing();
 			}
 		});
 		loopButton = new ToggleButton();
