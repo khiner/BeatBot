@@ -8,30 +8,17 @@ import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class RoundedRectIconSource extends ShapeIconSource {
 
-	private ShapeGroup shapeGroup;
-	private boolean shouldDraw;
-
-	private float width, height;
-	
 	public RoundedRectIconSource(ShapeGroup shapeGroup, float x, float y,
 			float width, float height, ColorSet bgColorSet,
 			ColorSet borderColorSet) {
 		this(shapeGroup, x, y, width, height, width > height ? height / 5
 				: width / 5, bgColorSet, borderColorSet);
 	}
-
+	
 	public RoundedRectIconSource(ShapeGroup shapeGroup, float x, float y,
 			float width, float height, float cornerRadius, ColorSet bgColorSet,
 			ColorSet borderColorSet) {
-
-		// if there is already a global group, then it will be drawn elsewhere.
-		// otherwise, we create a new group to share amongst all icons
-		shouldDraw = shapeGroup == null;
-		this.shapeGroup = shouldDraw ? new ShapeGroup() : shapeGroup;
-
-		this.width = width;
-		this.height = height;
-		
+		super(shapeGroup, x, y, width, height, cornerRadius, bgColorSet, borderColorSet);
 		float centerX = width / 2;
 		float centerY = height / 2;
 
@@ -68,8 +55,6 @@ public class RoundedRectIconSource extends ShapeIconSource {
 	}
 	
 	public void setDimensions(float width, float height) {
-		this.width = width;
-		this.height = height;
 		float scaledW = width - 2;
 		float scaledH = height - 2;
 

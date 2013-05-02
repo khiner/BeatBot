@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.ShapeIconSource;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -36,8 +37,9 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 	}
 
 	public TextButton addLabel(String text, boolean on) {
-		TextButton newLabel = new TextButton(null, Colors.labelBgColorSet,
-				Colors.labelStrokeColorSet, R.drawable.plus_outline, -1, -1);
+		TextButton newLabel = new TextButton(null,
+				Colors.effectLabelBgColorSet, Colors.effectLabelStrokeColorSet,
+				R.drawable.plus_outline, -1, -1);
 		// need onPressListener as well as the onReleaseListener to notify
 		// when a label becomes touched
 		newLabel.setOnPressListener(this);
@@ -53,9 +55,16 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 	// known
 	public void setLabelText(int position, String text) {
 		TextButton label = (TextButton) children.get(position);
-		if (label != null) {
-			label.setText(text.isEmpty() ? "ADD" : text);
-			label.setIconEnabled(text.isEmpty());
+		if (label == null) {
+			return;
+		}
+		if (text.isEmpty()) {
+			label.setText("ADD");
+			label.setIconEnabled(true);
+			label.setChecked(false);
+		} else {
+			label.setText(text);
+			label.setIconEnabled(false);
 		}
 	}
 
@@ -126,12 +135,34 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 	}
 
 	@Override
+	public void drawAll() {
+		draw();
+		for (BBView label : children) {
+			// not using foreach to avoid concurrent modification
+			if (touchedLabel == null || !label.equals(touchedLabel)) {
+				push();
+				translate(label.x, label.y);
+				label.drawAll();
+				pop();
+			}
+		}
+		if (touchedLabel != null) { // draw touched last
+			push();
+			translate(touchedLabel.x, touchedLabel.y);
+			touchedLabel.drawAll();
+			pop();
+		}
+	}
+
+	@Override
 	public void onPress(Button button) {
 		touchedLabel = (TextButton) button;
+		//((ShapeIconSource)((TextButton)touchedLabel).getIconSource()).setColors(Colors.effectLabelTouchedBgColorSet, Colors.effectLabelTouchedStrokeColorSet);
 	}
 
 	@Override
 	public void onRelease(Button button) {
+		//((ShapeIconSource)((TextButton)touchedLabel).getIconSource()).setColors(Colors.effectLabelBgColorSet, Colors.effectLabelStrokeColorSet);
 		touchedLabel = null;
 	}
 }

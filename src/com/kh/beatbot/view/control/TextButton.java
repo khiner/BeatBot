@@ -5,6 +5,7 @@ import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.IconSource;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.global.RoundedRectIconSource;
+import com.kh.beatbot.global.ShapeIconSource;
 import com.kh.beatbot.view.GLSurfaceViewBase;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
@@ -63,6 +64,7 @@ public class TextButton extends ToggleButton {
 	public void setIconEnabled(boolean iconEnabled) {
 		this.iconEnabled = iconEnabled;
 		init();
+		layoutChildren();
 	}
 	
 	@Override

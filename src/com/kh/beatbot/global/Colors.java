@@ -25,7 +25,8 @@ public class Colors {
 			muteButtonColorSet, soloButtonColorSet, instrumentBgColorSet, 
 			instrumentStrokeColorSet, panBgColorSet, panStrokeColorSet,
 			pitchBgColorSet, pitchStrokeColorSet, volumeBgColorSet,
-			volumeStrokeColorSet;
+			volumeStrokeColorSet, effectLabelBgColorSet, effectLabelStrokeColorSet,
+			effectLabelTouchedBgColorSet, effectLabelTouchedStrokeColorSet;
 
 	public static void initColors(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
@@ -78,11 +79,16 @@ public class Colors {
 				R.color.labelVeryLight);
 		LABEL_SELECTED = colorResourceToFloats(activity, R.color.labelSelected);
 
-		labelBgColorSet = new ColorSet(Colors.LABEL_DARK, Colors.VOLUME,
-				Colors.LABEL_SELECTED);
+		labelBgColorSet = new ColorSet(LABEL_DARK, VOLUME, LABEL_SELECTED);
 		labelStrokeColorSet = new ColorSet(WHITE, WHITE, BLACK);
-		muteButtonColorSet = new ColorSet(Colors.TRANSPARANT,
-				TRANSPARANT, LEVEL_SELECTED);
+		
+		effectLabelBgColorSet = new ColorSet(LABEL_DARK, LABEL_LIGHT, VOLUME);
+		effectLabelStrokeColorSet = new ColorSet(WHITE, WHITE, WHITE);
+		
+		effectLabelTouchedBgColorSet = new ColorSet(LABEL_MED, LABEL_VERY_LIGHT, VOLUME_LIGHT);
+		effectLabelTouchedStrokeColorSet = new ColorSet(WHITE, WHITE, WHITE);
+		
+		muteButtonColorSet = new ColorSet(TRANSPARANT, TRANSPARANT, LEVEL_SELECTED);
 		soloButtonColorSet = new ColorSet(TRANSPARANT,
 				TRANSPARANT, PITCH);
 

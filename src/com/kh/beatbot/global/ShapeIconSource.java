@@ -4,17 +4,21 @@ import com.kh.beatbot.view.mesh.RoundedRect;
 import com.kh.beatbot.view.mesh.Shape;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
-public class ShapeIconSource extends IconSource {
+public abstract class ShapeIconSource extends IconSource {
 
 	private Shape prevShape;
-	
-	public ShapeIconSource() {};
-	
-	public ShapeIconSource(Shape defaultIcon, Shape pressedIcon,
-			Shape selectedIcon, Shape disabledIcon) {
-		super(defaultIcon, pressedIcon, selectedIcon, disabledIcon);
-	}
+	protected ShapeGroup shapeGroup;
+	protected boolean shouldDraw;
 
+	public ShapeIconSource(ShapeGroup shapeGroup, float x, float y,
+			float width, float height, float cornerRadius, ColorSet bgColorSet,
+			ColorSet borderColorSet) {
+		// if there is already a global group, then it will be drawn elsewhere.
+		// otherwise, we create a new group to share amongst all icons
+		shouldDraw = shapeGroup == null;
+		this.shapeGroup = shouldDraw ? new ShapeGroup() : shapeGroup;
+	}
+		
 	@Override
 	protected void setIcon(Drawable icon) {
 		prevShape = (Shape) currentIcon;
@@ -28,5 +32,11 @@ public class ShapeIconSource extends IconSource {
 	
 	public void setShapeGroup(ShapeGroup shapeGroup) {
 		((RoundedRect) currentIcon).setGroup(shapeGroup);
+	}
+	
+	public void setColors(ColorSet fillColorSet, ColorSet outlineColorSet) {
+		((Shape)defaultIcon).setColors(fillColorSet.defaultColor, outlineColorSet.defaultColor);
+		((Shape)pressedIcon).setColors(fillColorSet.pressedColor, outlineColorSet.pressedColor);
+		((Shape)selectedIcon).setColors(fillColorSet.selectedColor, outlineColorSet.selectedColor);
 	}
 }

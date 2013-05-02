@@ -20,12 +20,6 @@ public class Rectangle extends Shape {
 		outlineMesh.color = outlineColor;
 		update();
 	}
-
-	public void setColors(float[] fillColor, float[] outlineColor) {
-		fillMesh.color = fillColor;
-		outlineMesh.color = outlineColor;
-		update();
-	}
 	
 	protected void createVertices(float[] fillColor, float[] outlineColor) {
 		/********

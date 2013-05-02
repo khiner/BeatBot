@@ -39,6 +39,12 @@ public abstract class Shape implements Drawable {
 		group.update(this);
 	}
 	
+	public void setColors(float[] fillColor, float[] outlineColor) {
+		fillMesh.color = fillColor;
+		outlineMesh.color = outlineColor;
+		update();
+	}
+	
 	public void setGroup(ShapeGroup group) {
 		if (this.group == group) {
 			return; // already a member of this group
