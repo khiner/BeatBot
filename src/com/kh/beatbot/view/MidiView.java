@@ -490,9 +490,10 @@ public class MidiView extends ClickableBBView {
 		float y1 = noteToUnscaledY(note.getNoteValue());
 		float width = tickToUnscaledX(note.getOffTick()) - x1;
 
-		return new Rectangle(note.isSelected() ? selectedRectangles
-				: unselectedRectangles, x1, y1, width, trackHeight,
-				whichColor(note), Colors.BLACK);
+		Rectangle newRect = new Rectangle(note.isSelected() ? selectedRectangles
+				: unselectedRectangles, whichColor(note), Colors.BLACK);
+		newRect.layout(x1, y1, width, trackHeight);
+		return newRect;
 	}
 
 	public void updateNoteView(MidiNote note) {

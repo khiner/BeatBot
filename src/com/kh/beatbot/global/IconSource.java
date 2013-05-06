@@ -1,10 +1,10 @@
 package com.kh.beatbot.global;
 
-public abstract class IconSource implements Drawable {
+public abstract class IconSource extends Drawable {
 	public enum State {DEFAULT, PRESSED, SELECTED, DISABLED}
 	
 	protected Drawable currentIcon, defaultIcon, selectedIcon, disabledIcon, pressedIcon;
-
+	
 	public IconSource() {};
 	
 	public IconSource(Drawable defaultIcon, Drawable pressedIcon,
@@ -16,31 +16,21 @@ public abstract class IconSource implements Drawable {
 		setState(State.DISABLED);
 	}
 	
-	public float getWidth() {
-		return defaultIcon.getWidth();
-	}
-
-	public float getHeight() {
-		return defaultIcon.getHeight();
-	}
-	
-	public void setDimensions(float width, float height) {
+	@Override
+	public void layout(float x, float y, float width, float height) {
+		super.layout(x, y, width, height);
 		if (defaultIcon != null) {
-			defaultIcon.setDimensions(width, height);
+			defaultIcon.layout(x, y, width, height);
 		}
 		if (selectedIcon != null) {
-			selectedIcon.setDimensions(width, height);
+			selectedIcon.layout(x, y, width, height);
 		}
 		if (disabledIcon != null) {
-			disabledIcon.setDimensions(width, height);
+			disabledIcon.layout(x, y, width, height);
 		}
 		if (pressedIcon != null) {
-			pressedIcon.setDimensions(width, height);
+			pressedIcon.layout(x, y, width, height);
 		}
-	}
-	
-	public void setPosition(float x, float y) {
-		// TODO
 	}
 	
 	public void setState(State state) {
@@ -64,26 +54,10 @@ public abstract class IconSource implements Drawable {
 		default: return defaultIcon;
 		}
 	}
-	
-	public float getX() {
-		return defaultIcon.getX();
-	}
-	
-	public float getY() {
-		return defaultIcon.getX();
-	}
-	
+
 	public void draw() {
-		draw(getWidth(), getHeight());
-	}
-	
-	public void draw(float width, float height) {
-		draw(getX(), getY(), width, height);
-	}
-	
-	public void draw(float x, float y, float width, float height) {
 		if (currentIcon != null) {
-			currentIcon.draw(x, y, width, height);
+			currentIcon.draw();
 		}
 	}
 }

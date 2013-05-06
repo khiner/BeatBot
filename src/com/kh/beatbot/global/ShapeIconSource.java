@@ -1,6 +1,8 @@
 package com.kh.beatbot.global;
 
-import com.kh.beatbot.view.mesh.RoundedRect;
+import javax.microedition.khronos.opengles.GL11;
+
+import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.mesh.Shape;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
@@ -9,34 +11,48 @@ public abstract class ShapeIconSource extends IconSource {
 	private Shape prevShape;
 	protected ShapeGroup shapeGroup;
 	protected boolean shouldDraw;
-
-	public ShapeIconSource(ShapeGroup shapeGroup, float x, float y,
-			float width, float height, float cornerRadius, ColorSet bgColorSet,
+	
+	public ShapeIconSource(ShapeGroup shapeGroup, ColorSet bgColorSet,
 			ColorSet borderColorSet) {
 		// if there is already a global group, then it will be drawn elsewhere.
 		// otherwise, we create a new group to share amongst all icons
-		shouldDraw = shapeGroup == null;
+		shouldDraw = (shapeGroup == null);
 		this.shapeGroup = shouldDraw ? new ShapeGroup() : shapeGroup;
 	}
 		
+	@Override
+	public void draw() {
+		if (shouldDraw) {
+			shapeGroup.draw((GL11) BBView.gl, 1);
+		}
+	}
+	
 	@Override
 	protected void setIcon(Drawable icon) {
 		prevShape = (Shape) currentIcon;
 		super.setIcon(icon);
 		if (prevShape == null) {
-			((RoundedRect) currentIcon).getGroup().add((Shape)currentIcon);
+			((Shape) currentIcon).getGroup().add((Shape)currentIcon);
 		} else {
-			((RoundedRect) currentIcon).getGroup().replace(prevShape, (Shape)currentIcon);
+			((Shape) currentIcon).getGroup().replace(prevShape, (Shape)currentIcon);
 		}
 	}
 	
 	public void setShapeGroup(ShapeGroup shapeGroup) {
-		((RoundedRect) currentIcon).setGroup(shapeGroup);
+		((Shape) currentIcon).setGroup(shapeGroup);
 	}
 	
 	public void setColors(ColorSet fillColorSet, ColorSet outlineColorSet) {
 		((Shape)defaultIcon).setColors(fillColorSet.defaultColor, outlineColorSet.defaultColor);
 		((Shape)pressedIcon).setColors(fillColorSet.pressedColor, outlineColorSet.pressedColor);
 		((Shape)selectedIcon).setColors(fillColorSet.selectedColor, outlineColorSet.selectedColor);
+	}
+	
+	public float[] getCurrStrokeColor() {
+		return ((Shape)currentIcon).getStrokeColor();
+	}
+	
+	public float[] getCurrFillColor() {
+		return ((Shape)currentIcon).getFillColor();
 	}
 }

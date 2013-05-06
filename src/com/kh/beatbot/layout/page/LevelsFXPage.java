@@ -19,9 +19,10 @@ import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
-import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.listener.Level1dListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.control.Button;
@@ -252,6 +253,9 @@ public class LevelsFXPage extends Page implements Level1dListener {
 		volumeToggle.setText("VOL");
 		panToggle.setText("PAN");
 		pitchToggle.setText("PIT");
+		volumeToggle.setBgIconSource(new RoundedRectIconSource(labelGroup, Colors.volumeBgColorSet, Colors.volumeStrokeColorSet));
+		panToggle.setBgIconSource(new RoundedRectIconSource(labelGroup, Colors.panBgColorSet, Colors.panStrokeColorSet));
+		pitchToggle.setBgIconSource(new RoundedRectIconSource(labelGroup, Colors.pitchBgColorSet, Colors.pitchStrokeColorSet));
 	}
 
 	@Override
@@ -268,9 +272,9 @@ public class LevelsFXPage extends Page implements Level1dListener {
 		effectLabel = new TextButton();
 		levelBar = new Seekbar();
 		levelBar.addLevelListener(this);
-		volumeToggle = new TextButton(labelGroup, Colors.volumeBgColorSet, Colors.volumeStrokeColorSet);
-		panToggle = new TextButton(labelGroup, Colors.panBgColorSet, Colors.panStrokeColorSet);
-		pitchToggle = new TextButton(labelGroup, Colors.pitchBgColorSet, Colors.pitchStrokeColorSet);
+		volumeToggle = new TextButton();
+		panToggle = new TextButton();
+		pitchToggle = new TextButton();
 		volumeToggle.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button button) {
 				getCurrTrack().activeLevelType = LevelType.VOLUME;

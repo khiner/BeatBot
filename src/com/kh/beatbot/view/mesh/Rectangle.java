@@ -2,12 +2,10 @@ package com.kh.beatbot.view.mesh;
 
 
 public class Rectangle extends Shape {
-	public Rectangle(ShapeGroup group, float x, float y, float width,
-			float height, float[] fillColor, float[] outlineColor) {
+	public Rectangle(ShapeGroup group, float[] fillColor, float[] outlineColor) {
 		// 6 vertices for rect fill (two triangles)
 		// 8 vertices for rect outline (4 sides * 2 vertices per side)
-		super(group, x, y, width, height, new Mesh2D(6), new Mesh2D(8));
-		createVertices(fillColor, outlineColor);
+		super(group, new Mesh2D(6, fillColor), new Mesh2D(8, outlineColor));
 	}
 
 

@@ -41,7 +41,7 @@ public abstract class BBView implements Comparable<BBView> {
 	public int currClipX = Integer.MIN_VALUE, currClipY = Integer.MIN_VALUE,
 			currClipW = Integer.MAX_VALUE, currClipH = Integer.MAX_VALUE;
 	
-	public float absoluteX = -1, absoluteY = -1;
+	public float absoluteX = 0 , absoluteY = 0;
 	public float x = 0, y = 0;
 	public float width = 0, height = 0;
 

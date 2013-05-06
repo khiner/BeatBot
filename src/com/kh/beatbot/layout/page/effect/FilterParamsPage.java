@@ -7,6 +7,7 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.ImageIconSource;
+import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.TextButton;
@@ -54,7 +55,7 @@ public class FilterParamsPage extends EffectParamsPage {
 		filterToggles = new TextButton[3];
 		filterToggleListener = new FilterToggleListener();
 		for (int i = 0; i < filterToggles.length; i++) {
-			filterToggles[i] = new TextButton(iconGroup, Colors.instrumentBgColorSet, Colors.instrumentStrokeColorSet);
+			filterToggles[i] = new TextButton();
 			filterToggles[i].setOnReleaseListener(filterToggleListener);
 			addChild(filterToggles[i]);
 		}
@@ -62,9 +63,12 @@ public class FilterParamsPage extends EffectParamsPage {
 
 	@Override
 	protected void loadIcons() {
-		filterToggles[0].setForegroundIconSource(new ImageIconSource(R.drawable.lowpass_filter_icon));
-		filterToggles[1].setForegroundIconSource(new ImageIconSource(R.drawable.bandpass_filter_icon));
-		filterToggles[2].setForegroundIconSource(new ImageIconSource(R.drawable.highpass_filter_icon));
+		for (TextButton filterToggle : filterToggles) {
+			filterToggle.setBgIconSource(new RoundedRectIconSource(iconGroup, Colors.instrumentBgColorSet, Colors.instrumentStrokeColorSet));
+		}
+		filterToggles[0].setIconSource(new ImageIconSource(R.drawable.lowpass_filter_icon));
+		filterToggles[1].setIconSource(new ImageIconSource(R.drawable.bandpass_filter_icon));
+		filterToggles[2].setIconSource(new ImageIconSource(R.drawable.highpass_filter_icon));
 		filterToggles[0].setChecked(true);
 	}
 	

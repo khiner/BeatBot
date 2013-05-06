@@ -28,8 +28,9 @@ public class BBViewPager extends TouchableBBView {
 	
 	@Override
 	public void layoutChildren() {
-		for (BBView page : children)
+		for (BBView page : children) {
 			page.layout(this, 0, 0, width, height);
+		}
 	}
 
 	@Override

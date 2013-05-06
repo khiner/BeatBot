@@ -6,8 +6,9 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.ImageIconSource;
-import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.Level1dListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.AdsrView;
 import com.kh.beatbot.view.BBView;
@@ -97,7 +98,8 @@ public class AdsrPage extends Page implements OnReleaseListener, Level1dListener
 	@Override
 	protected void loadIcons() {
 		for (int i = 0; i < adsrButtons.length - 2; i++) {
-			adsrButtons[i].setForegroundIconSource(new ImageIconSource(whichAdsrIcon(i)));
+			adsrButtons[i].setIconSource(new ImageIconSource(whichAdsrIcon(i)));
+			adsrButtons[i].setBgIconSource(new RoundedRectIconSource(iconGroup, Colors.instrumentBgColorSet, Colors.instrumentStrokeColorSet));
 		}
 		adsrButtons[ADSR.START_ID].setText("S");
 		adsrButtons[ADSR.PEAK_ID].setText("P");
@@ -130,7 +132,7 @@ public class AdsrPage extends Page implements OnReleaseListener, Level1dListener
 		valueLabel = new TextButton();
 		adsrButtons = new TextButton[ADSR.NUM_PARAMS];
 		for (int i = 0; i < adsrButtons.length; i++) {
-			adsrButtons[i] = new TextButton(iconGroup, Colors.instrumentBgColorSet, Colors.instrumentStrokeColorSet);
+			adsrButtons[i] = new TextButton();
 			adsrButtons[i].setId(i);
 			adsrButtons[i].setOnReleaseListener(this);
 		}

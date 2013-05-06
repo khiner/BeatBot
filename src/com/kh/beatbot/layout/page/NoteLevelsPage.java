@@ -5,6 +5,7 @@ import javax.microedition.khronos.opengles.GL11;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
+import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.LevelsView;
@@ -54,6 +55,9 @@ public class NoteLevelsPage extends Page {
 		volumeToggle.setText("VOL");
 		panToggle.setText("PAN");
 		pitchToggle.setText("PIT");
+		volumeToggle.setBgIconSource(new RoundedRectIconSource(labelGroup, Colors.volumeBgColorSet, Colors.volumeStrokeColorSet));
+		panToggle.setBgIconSource(new RoundedRectIconSource(labelGroup, Colors.panBgColorSet, Colors.panStrokeColorSet));
+		pitchToggle.setBgIconSource(new RoundedRectIconSource(labelGroup, Colors.pitchBgColorSet, Colors.pitchStrokeColorSet));
 	}
 
 	@Override
@@ -67,9 +71,9 @@ public class NoteLevelsPage extends Page {
 	@Override
 	protected void createChildren() {
 		levelsView = new LevelsView();
-		volumeToggle = new TextButton(labelGroup, Colors.volumeBgColorSet, Colors.volumeStrokeColorSet);
-		panToggle = new TextButton(labelGroup, Colors.panBgColorSet, Colors.panStrokeColorSet);
-		pitchToggle = new TextButton(labelGroup, Colors.pitchBgColorSet, Colors.pitchStrokeColorSet);
+		volumeToggle = new TextButton();
+		panToggle = new TextButton();
+		pitchToggle = new TextButton();
 		
 		volumeToggle.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {

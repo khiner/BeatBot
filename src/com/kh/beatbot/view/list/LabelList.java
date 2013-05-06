@@ -5,7 +5,8 @@ import java.util.Collections;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.ShapeIconSource;
+import com.kh.beatbot.global.ImageIconSource;
+import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -37,16 +38,18 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 	}
 
 	public TextButton addLabel(String text, boolean on) {
-		TextButton newLabel = new TextButton(null,
-				Colors.effectLabelBgColorSet, Colors.effectLabelStrokeColorSet,
-				R.drawable.plus_outline, -1, -1);
+		TextButton newLabel = new TextButton();
 		// need onPressListener as well as the onReleaseListener to notify
 		// when a label becomes touched
 		newLabel.setOnPressListener(this);
 		newLabel.setOnReleaseListener(this);
 		addChild(newLabel);
 		layoutChildren();
+		newLabel.setIconSource(new ImageIconSource(R.drawable.plus_outline, -1, -1));
+		newLabel.setBgIconSource(new RoundedRectIconSource(null,
+		Colors.effectLabelBgColorSet, Colors.effectLabelStrokeColorSet));
 		newLabel.setText("ADD");
+		//newLabel.setBgI
 		newLabel.loadAllIcons();
 		return newLabel;
 	}
@@ -60,11 +63,11 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 		}
 		if (text.isEmpty()) {
 			label.setText("ADD");
-			label.setIconEnabled(true);
+			label.setIconSource(new ImageIconSource(R.drawable.plus_outline, -1, -1));
 			label.setChecked(false);
 		} else {
 			label.setText(text);
-			label.setIconEnabled(false);
+			label.setIconSource(null);
 		}
 	}
 

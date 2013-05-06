@@ -2,7 +2,7 @@ package com.kh.beatbot.global;
 
 import com.kh.beatbot.view.GLSurfaceViewBase;
 
-public class Image implements Drawable {
+public class Image extends Drawable {
 
 	protected int resourceId;
 	protected int[] textureHandlers = new int[1];
@@ -12,42 +12,9 @@ public class Image implements Drawable {
 		this.resourceId = resourceId;
 		GLSurfaceViewBase.loadTexture(resourceId, textureHandlers, 0, crop);
 	}
-	
-	public void draw() {
-		draw(0, 0);
-	}
-	
-	public void draw(float x, float y) {
-		draw(x, y, getWidth(), getHeight());
-	}
 
-	public void draw(float x, float y, float width, float height) {
+	public void draw() {
 		GLSurfaceViewBase.drawTexture(0, textureHandlers, crop, x, y, width,
 				height);
-	}
-
-	public float getX() {
-		return 0;
-	}
-	
-	public float getY() {
-		return 0;
-	}
-	
-	public float getWidth() {
-		return crop[2];
-	}
-
-	public float getHeight() {
-		return crop[1];
-	}
-	
-	public void setPosition(float x, float y) {
-		// no-op
-	}
-	
-	public void setDimensions(float width, float height) {
-		crop[2] = (int) width;
-		crop[1] = (int) height;
 	}
 }

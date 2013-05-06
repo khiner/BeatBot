@@ -1,14 +1,31 @@
 package com.kh.beatbot.global;
 
 
-public interface Drawable {
+public abstract class Drawable {
+	protected float x, y, width, height;
+	
 	public abstract void draw();
-	public abstract void draw(float x, float y);
-	public abstract void draw(float x, float y, float width, float height);
-	public abstract float getX();
-	public abstract float getY();
-	public abstract float getWidth();
-	public abstract float getHeight();
-	public abstract void setDimensions(float width, float height);
-	public abstract void setPosition(float x, float y);
+	
+	public float getX() {
+		return x;
+	}
+	
+	public float getY() {
+		return y;
+	}
+	
+	public float getWidth() {
+		return width;
+	}
+	
+	public float getHeight() {
+		return height;
+	}
+	
+	public void layout(float x, float y, float width, float height) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+	}
 }

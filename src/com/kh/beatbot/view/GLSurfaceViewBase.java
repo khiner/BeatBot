@@ -35,7 +35,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		setRenderer(this);
 		setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 	}
-	
+
 	protected static boolean initialized = false;
 	protected static boolean running;
 	protected int width;
@@ -43,13 +43,14 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 
 	protected static GL10 gl = null;
 	protected static GLText glText;
-	
-	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-		super.surfaceChanged(holder, format, w, h);
-		this.width = w;
-		this.height = h;
+
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,
+			int height) {
+		super.surfaceChanged(holder, format, width, height);
+		this.width = width;
+		this.height = height;
 	}
-	
+
 	public void onSurfaceChanged(GL10 _gl, int width, int height) {
 		gl = _gl;
 		gl.glViewport(0, 0, this.width, this.height);
@@ -63,7 +64,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 	public static boolean isInitialized() {
 		return initialized;
 	}
-	
+
 	public void onSurfaceCreated(GL10 _gl, EGLConfig config) {
 	}
 
@@ -77,7 +78,8 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-		//gl.glBlendFunc(GL10.GL_ONE_MINUS_DST_COLOR, GL10.GL_ONE_MINUS_SRC_COLOR);
+		// gl.glBlendFunc(GL10.GL_ONE_MINUS_DST_COLOR,
+		// GL10.GL_ONE_MINUS_SRC_COLOR);
 	}
 
 	public void initGlText() {
@@ -88,19 +90,19 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		// we need to reload the bitmap texture for the font
 		glText.loadTexture();
 	}
-	
+
 	public static final void drawText(String text, int height, float x, float y) {
 		glText.draw(text, height, x, y);
 	}
-	
+
 	public static final void storeText(String text) {
 		glText.storeText(text);
 	}
-	
+
 	public static final float getTextWidth(String text, float height) {
 		return glText.getTextWidth(text, height);
 	}
-	
+
 	public static final void loadTexture(Bitmap bitmap, int[] textureHandlers,
 			int textureId) {
 		// Generate Texture ID
@@ -145,7 +147,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		((GL11Ext) gl).glDrawTexfOES(x, y, 0, width, height);
 		gl.glDisable(GL10.GL_TEXTURE_2D);
 	}
-	
+
 	public final static GL10 getGL10() {
 		return gl;
 	}

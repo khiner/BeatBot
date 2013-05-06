@@ -5,6 +5,7 @@ import javax.microedition.khronos.opengles.GL11;
 import com.kh.beatbot.R;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.ImageIconSource;
+import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.layout.page.AdsrPage;
 import com.kh.beatbot.layout.page.LevelsFXPage;
 import com.kh.beatbot.layout.page.NoteLevelsPage;
@@ -71,20 +72,14 @@ public class PageSelectGroup extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		addTrackButton = new TextButton(roundedRectGroup,
-				Colors.labelBgColorSet, Colors.labelStrokeColorSet);
-		instrumentSelectButton = new TextButton(roundedRectGroup,
-				Colors.labelBgColorSet, Colors.labelStrokeColorSet);
-		sampleSelectButton = new TextButton(roundedRectGroup,
-				Colors.labelBgColorSet, Colors.labelStrokeColorSet);
+		addTrackButton = new TextButton();
+		instrumentSelectButton = new TextButton();
+		sampleSelectButton = new TextButton();
 		for (int i = 0; i < textButtons.length; i++) {
-			textButtons[i] = new TextButton(roundedRectGroup,
-					Colors.labelBgColorSet, Colors.labelStrokeColorSet);
+			textButtons[i] = new TextButton();
 		}
 
-		textButtons[NOTE_LEVELS_PAGE_ID] = new TextButton(roundedRectGroup,
-				Colors.labelBgColorSet, Colors.labelStrokeColorSet,
-				R.drawable.levels_icon, -1, R.drawable.levels_icon_selected);
+		textButtons[NOTE_LEVELS_PAGE_ID] = new TextButton();
 
 		addTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
@@ -180,8 +175,19 @@ public class PageSelectGroup extends TouchableBBView {
 
 	@Override
 	protected void loadIcons() {
-		addTrackButton.setForegroundIconSource(new ImageIconSource(
+		addTrackButton.setIconSource(new ImageIconSource(
 				R.drawable.plus_outline, R.drawable.plus_outline));
+		textButtons[NOTE_LEVELS_PAGE_ID].setIconSource(new ImageIconSource(R.drawable.levels_icon, -1, R.drawable.levels_icon_selected));
+		addTrackButton.setBgIconSource(new RoundedRectIconSource(roundedRectGroup,
+				Colors.labelBgColorSet, Colors.labelStrokeColorSet));
+		instrumentSelectButton.setBgIconSource(new RoundedRectIconSource(roundedRectGroup,
+				Colors.labelBgColorSet, Colors.labelStrokeColorSet));
+		sampleSelectButton.setBgIconSource(new RoundedRectIconSource(roundedRectGroup,
+				Colors.labelBgColorSet, Colors.labelStrokeColorSet));
+		for (int i = 0; i < textButtons.length; i++) {
+			textButtons[i].setBgIconSource(new RoundedRectIconSource(roundedRectGroup,
+					Colors.labelBgColorSet, Colors.labelStrokeColorSet));
+		}
 		textButtons[LEVELS_FX_PAGE_ID].setText("FX");
 		textButtons[EDIT_PAGE_ID].setText("EDIT");
 		textButtons[ADSR_PAGE_ID].setText("ADSR");
@@ -195,7 +201,7 @@ public class PageSelectGroup extends TouchableBBView {
 
 	private void updateInstrumentIcon() {
 		// update the track pager instrument icon
-		instrumentSelectButton.setForegroundIconSource(TrackManager.currTrack
+		instrumentSelectButton.setIconSource(TrackManager.currTrack
 				.getInstrument().getIconSource());
 	}
 

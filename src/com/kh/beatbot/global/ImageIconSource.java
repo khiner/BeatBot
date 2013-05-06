@@ -37,5 +37,4 @@ public class ImageIconSource extends IconSource {
 		this.listViewIconResource = listViewIconResourceId;
 		this.listTitleIconResource = listTitleIconResourceId;
 	}
-	
 }

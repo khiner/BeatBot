@@ -4,23 +4,31 @@ import com.kh.beatbot.global.IconSource;
 
 public class ToggleButton extends ImageButton {
 	boolean checked = false;
-	
-	public void setIconSource(IconSource iconSource) {
-		this.iconSource = iconSource;
-		if (iconSource != null) {
-			iconSource.setState(enabled ? (checked ? IconSource.State.SELECTED : IconSource.State.DEFAULT) :
-				IconSource.State.DISABLED);
+
+	public void setIconSource(IconSource newIconSource) {
+		super.setIconSource(newIconSource);
+		for (IconSource iconSource : iconSources) {
+			if (iconSource != null) {
+				iconSource
+						.setState(enabled ? (checked ? IconSource.State.SELECTED
+								: IconSource.State.DEFAULT)
+								: IconSource.State.DISABLED);
+			}
 		}
 	}
 
 	public void release() {
 		pressed = false;
-		if (iconSource != null) {
-			iconSource.setState(enabled ? (checked ? IconSource.State.SELECTED : IconSource.State.DEFAULT) :
-					IconSource.State.DISABLED);
+		for (IconSource iconSource : iconSources) {
+			if (iconSource != null) {
+				iconSource
+						.setState(enabled ? (checked ? IconSource.State.SELECTED
+								: IconSource.State.DEFAULT)
+								: IconSource.State.DISABLED);
+			}
 		}
 	}
-	
+
 	public boolean isChecked() {
 		return checked;
 	}

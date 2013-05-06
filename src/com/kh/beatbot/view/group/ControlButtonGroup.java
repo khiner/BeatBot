@@ -1,5 +1,7 @@
 package com.kh.beatbot.view.group;
 
+import javax.microedition.khronos.opengles.GL10;
+
 import android.widget.Toast;
 
 import com.kh.beatbot.R;
@@ -9,6 +11,7 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
+import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.BpmView;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.control.Button;

@@ -23,12 +23,12 @@ public class Mesh2D {
 	/** number of vertices defined for the mesh **/
 	protected int numVertices = 0;
 	
-	public Mesh2D(int numVertices) {
+	public Mesh2D(int numVertices, float[] color) {
 		this.numVertices = numVertices;
 		
 		vertices = new float[numVertices * 2];
 		colors = new float[numVertices * 4];
-		color = new float[4];
+		this.color = color;
 	}
 
 	public Mesh2D(float[] vertices, float[] color) {

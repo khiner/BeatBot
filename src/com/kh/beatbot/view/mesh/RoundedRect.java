@@ -3,12 +3,8 @@ package com.kh.beatbot.view.mesh;
 public class RoundedRect extends Shape {
 	private float cornerRadius;
 	
-	public RoundedRect(ShapeGroup group, float x, float y, float width,
-			float height, float cornerRadius, float[] fillColor,
-			float[] outlineColor) {
-		super(group, x, y, width, height, new Mesh2D(16 * 4 * 3), new Mesh2D(16 * 4 * 2));
-		this.cornerRadius = cornerRadius;
-		createVertices(fillColor, outlineColor);
+	public RoundedRect(ShapeGroup group, float[] fillColor, float[] outlineColor) {
+		super(group, new Mesh2D(16 * 4 * 3, fillColor), new Mesh2D(16 * 4 * 2, outlineColor));
 	}
 	
 	protected void createVertices(float[] fillColor, float[] outlineColor) {
@@ -51,5 +47,11 @@ public class RoundedRect extends Shape {
 		
 		fillMesh.setColor(fillColor);
 		outlineMesh.setColor(outlineColor);
+	}
+	
+	@Override
+	public void layout(float x, float y, float width, float height) {
+		cornerRadius = width > height ? height / 5 : width / 5;
+		super.layout(x, y, width, height);
 	}
 }
