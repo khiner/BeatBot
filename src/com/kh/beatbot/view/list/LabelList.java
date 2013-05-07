@@ -14,7 +14,7 @@ import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.ClickableBBView;
 import com.kh.beatbot.view.GLSurfaceViewBase;
 import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.TextButton;
+import com.kh.beatbot.view.control.ToggleButton;
 
 public class LabelList extends ClickableBBView implements OnPressListener,
 		OnReleaseListener {
@@ -24,7 +24,7 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 	protected static FloatBuffer bgRectVb = null;
 	protected LabelListListener listener = null;
 
-	protected TextButton touchedLabel = null;
+	protected ToggleButton touchedLabel = null;
 
 	protected ImageIconSource plusIconSource;
 	
@@ -33,14 +33,14 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 	}
 
 	public void checkLabel(int position, boolean checked) {
-		TextButton label = (TextButton) children.get(position);
+		ToggleButton label = (ToggleButton) children.get(position);
 		if (label != null) {
 			label.setChecked(checked);
 		}
 	}
 
-	public TextButton addLabel(String text, boolean on) {
-		TextButton newLabel = new TextButton();
+	public ToggleButton addLabel(String text, boolean on) {
+		ToggleButton newLabel = new ToggleButton();
 		// need onPressListener as well as the onReleaseListener to notify
 		// when a label becomes touched
 		newLabel.setOnPressListener(this);
@@ -59,7 +59,7 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 	// callback function for listener to notify when the label text and id is
 	// known
 	public void setLabelText(int position, String text) {
-		TextButton label = (TextButton) children.get(position);
+		ToggleButton label = (ToggleButton) children.get(position);
 		if (label == null) {
 			return;
 		}
@@ -162,13 +162,13 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 
 	@Override
 	public void onPress(Button button) {
-		touchedLabel = (TextButton) button;
-		//((ShapeIconSource)((TextButton)touchedLabel).getIconSource()).setColors(Colors.effectLabelTouchedBgColorSet, Colors.effectLabelTouchedStrokeColorSet);
+		touchedLabel = (ToggleButton) button;
+		//((ShapeIconSource)((ToggleButton)touchedLabel).getIconSource()).setColors(Colors.effectLabelTouchedBgColorSet, Colors.effectLabelTouchedStrokeColorSet);
 	}
 
 	@Override
 	public void onRelease(Button button) {
-		//((ShapeIconSource)((TextButton)touchedLabel).getIconSource()).setColors(Colors.effectLabelBgColorSet, Colors.effectLabelStrokeColorSet);
+		//((ShapeIconSource)((ToggleButton)touchedLabel).getIconSource()).setColors(Colors.effectLabelBgColorSet, Colors.effectLabelStrokeColorSet);
 		touchedLabel = null;
 	}
 }

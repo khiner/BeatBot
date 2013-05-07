@@ -15,16 +15,15 @@ import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.ControlViewBase;
 import com.kh.beatbot.view.control.Seekbar;
-import com.kh.beatbot.view.control.TextButton;
 import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class AdsrPage extends Page implements OnReleaseListener, Level1dListener {
 
-	private TextButton[] adsrButtons;
+	private ToggleButton[] adsrButtons;
 	private AdsrView adsrView;
 	private Seekbar levelBar;
-	private TextButton valueLabel, paramLabel;
+	private ToggleButton valueLabel, paramLabel;
 	private static ShapeGroup iconGroup = new ShapeGroup();
 	
 	@Override
@@ -130,11 +129,11 @@ public class AdsrPage extends Page implements OnReleaseListener, Level1dListener
 		adsrView = new AdsrView();
 		levelBar = new Seekbar();
 		levelBar.addLevelListener(this);
-		paramLabel = new TextButton();
-		valueLabel = new TextButton();
-		adsrButtons = new TextButton[ADSR.NUM_PARAMS];
+		paramLabel = new ToggleButton();
+		valueLabel = new ToggleButton();
+		adsrButtons = new ToggleButton[ADSR.NUM_PARAMS];
 		for (int i = 0; i < adsrButtons.length; i++) {
-			adsrButtons[i] = new TextButton();
+			adsrButtons[i] = new ToggleButton();
 			adsrButtons[i].setId(i);
 			adsrButtons[i].setOnReleaseListener(this);
 		}

@@ -16,7 +16,8 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.TextButton;
+import com.kh.beatbot.view.control.ImageButton;
+import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class PageSelectGroup extends TouchableBBView {
@@ -32,10 +33,8 @@ public class PageSelectGroup extends TouchableBBView {
 	private static AdsrPage adsrPage;
 	private static BBViewPager pager;
 
-	private static TextButton addTrackButton;
-	private static TextButton instrumentSelectButton;
-	private static TextButton sampleSelectButton;
-	private static TextButton[] textButtons = new TextButton[5];
+	private static ImageButton addTrackButton, instrumentSelectButton, sampleSelectButton;
+	private static ToggleButton[] toggleButtons = new ToggleButton[5];
 
 	private static ShapeGroup roundedRectGroup = new ShapeGroup();
 
@@ -72,20 +71,18 @@ public class PageSelectGroup extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		addTrackButton = new TextButton();
-		instrumentSelectButton = new TextButton();
-		sampleSelectButton = new TextButton();
-		for (int i = 0; i < textButtons.length; i++) {
-			textButtons[i] = new TextButton();
+		addTrackButton = new ImageButton();
+		instrumentSelectButton = new ImageButton();
+		sampleSelectButton = new ImageButton();
+		for (int i = 0; i < toggleButtons.length; i++) {
+			toggleButtons[i] = new ToggleButton();
 		}
 
-		textButtons[NOTE_LEVELS_PAGE_ID] = new TextButton();
+		toggleButtons[NOTE_LEVELS_PAGE_ID] = new ToggleButton();
 
 		addTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				// add track should not behave as a toggle
-				addTrackButton.setChecked(false);
 				Managers.directoryManager.showAddTrackAlert();
 			}
 		});
@@ -93,8 +90,6 @@ public class PageSelectGroup extends TouchableBBView {
 		instrumentSelectButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				// instr select should not behave as a toggle
-				instrumentSelectButton.setChecked(false);
 				Managers.directoryManager.showInstrumentSelectAlert();
 			}
 		});
@@ -102,22 +97,20 @@ public class PageSelectGroup extends TouchableBBView {
 		sampleSelectButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				// sample select should not behave as a toggle
-				sampleSelectButton.setChecked(false);
 				Managers.directoryManager.showSampleSelectAlert();
 			}
 		});
 
-		for (int i = 0; i < textButtons.length; i++) {
+		for (int i = 0; i < toggleButtons.length; i++) {
 			final int id = i;
-			textButtons[i].setOnReleaseListener(new OnReleaseListener() {
+			toggleButtons[i].setOnReleaseListener(new OnReleaseListener() {
 				@Override
 				public void onRelease(Button button) {
-					textButtons[id].setChecked(true);
+					toggleButtons[id].setChecked(true);
 					// deselect all buttons except this one.
-					for (TextButton otherTextButton : textButtons) {
-						if (!button.equals(otherTextButton)) {
-							otherTextButton.setChecked(false);
+					for (ToggleButton otherToggleButton : toggleButtons) {
+						if (!button.equals(otherToggleButton)) {
+							otherToggleButton.setChecked(false);
 						}
 					}
 					pager.setPage(id);
@@ -145,8 +138,8 @@ public class PageSelectGroup extends TouchableBBView {
 		addChild(addTrackButton);
 		addChild(instrumentSelectButton);
 		addChild(sampleSelectButton);
-		for (TextButton textButton : textButtons) {
-			addChild(textButton);
+		for (ToggleButton ToggleButton : toggleButtons) {
+			addChild(ToggleButton);
 		}
 		addChild(pager);
 	}
@@ -162,12 +155,12 @@ public class PageSelectGroup extends TouchableBBView {
 				buttonHeight, buttonHeight);
 		sampleSelectButton.layout(this, buttonHeight * 2, labelYOffset,
 				labelWidth, buttonHeight);
-		for (int i = 0; i < textButtons.length - 1; i++) {
-			textButtons[i].layout(this,
+		for (int i = 0; i < toggleButtons.length - 1; i++) {
+			toggleButtons[i].layout(this,
 					buttonHeight * 2 + (i + 1) * labelWidth, labelYOffset,
 					labelWidth, buttonHeight);
 		}
-		textButtons[NOTE_LEVELS_PAGE_ID].layout(this, buttonHeight * 2 + 5
+		toggleButtons[NOTE_LEVELS_PAGE_ID].layout(this, buttonHeight * 2 + 5
 				* labelWidth, labelYOffset, buttonHeight, buttonHeight);
 		pager.layout(this, 0, buttonHeight + 2 * labelYOffset, width, height
 				- buttonHeight - 2 * labelYOffset);
@@ -177,7 +170,7 @@ public class PageSelectGroup extends TouchableBBView {
 	protected void loadIcons() {
 		addTrackButton.setIconSource(new ImageIconSource(
 				R.drawable.plus_outline, R.drawable.plus_outline));
-		textButtons[NOTE_LEVELS_PAGE_ID].setIconSource(new ImageIconSource(
+		toggleButtons[NOTE_LEVELS_PAGE_ID].setIconSource(new ImageIconSource(
 				R.drawable.levels_icon, -1, R.drawable.levels_icon_selected));
 		addTrackButton.setBgIconSource(new RoundedRectIconSource(
 				roundedRectGroup, Colors.labelBgColorSet,
@@ -188,15 +181,15 @@ public class PageSelectGroup extends TouchableBBView {
 		sampleSelectButton.setBgIconSource(new RoundedRectIconSource(
 				roundedRectGroup, Colors.labelBgColorSet,
 				Colors.labelStrokeColorSet));
-		for (int i = 0; i < textButtons.length; i++) {
-			textButtons[i].setBgIconSource(new RoundedRectIconSource(
+		for (int i = 0; i < toggleButtons.length; i++) {
+			toggleButtons[i].setBgIconSource(new RoundedRectIconSource(
 					roundedRectGroup, Colors.labelBgColorSet,
 					Colors.labelStrokeColorSet));
 		}
-		textButtons[LEVELS_FX_PAGE_ID].setText("FX");
-		textButtons[EDIT_PAGE_ID].setText("EDIT");
-		textButtons[ADSR_PAGE_ID].setText("ADSR");
-		textButtons[MASTER_PAGE_ID].setText("MASTER");
+		toggleButtons[LEVELS_FX_PAGE_ID].setText("FX");
+		toggleButtons[EDIT_PAGE_ID].setText("EDIT");
+		toggleButtons[ADSR_PAGE_ID].setText("ADSR");
+		toggleButtons[MASTER_PAGE_ID].setText("MASTER");
 	}
 
 	@Override

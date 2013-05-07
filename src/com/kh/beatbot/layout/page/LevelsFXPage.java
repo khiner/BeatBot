@@ -28,7 +28,7 @@ import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.ControlViewBase;
 import com.kh.beatbot.view.control.Seekbar;
-import com.kh.beatbot.view.control.TextButton;
+import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.list.DraggableLabelList;
 import com.kh.beatbot.view.list.LabelList;
 import com.kh.beatbot.view.mesh.ShapeGroup;
@@ -104,8 +104,8 @@ public class LevelsFXPage extends Page implements Level1dListener {
 
 	// levels attrs
 	private Seekbar levelBar;
-	private TextButton volumeToggle, panToggle, pitchToggle;
-	private TextButton effectLabel;
+	private ToggleButton volumeToggle, panToggle, pitchToggle;
+	private ToggleButton effectLabel;
 	private boolean masterMode = false;
 
 	private ShapeGroup labelGroup;
@@ -269,12 +269,12 @@ public class LevelsFXPage extends Page implements Level1dListener {
 	@Override
 	protected void createChildren() {
 		labelGroup = new ShapeGroup();
-		effectLabel = new TextButton();
+		effectLabel = new ToggleButton();
 		levelBar = new Seekbar();
 		levelBar.addLevelListener(this);
-		volumeToggle = new TextButton();
-		panToggle = new TextButton();
-		pitchToggle = new TextButton();
+		volumeToggle = new ToggleButton();
+		panToggle = new ToggleButton();
+		pitchToggle = new ToggleButton();
 		volumeToggle.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button button) {
 				getCurrTrack().activeLevelType = LevelType.VOLUME;

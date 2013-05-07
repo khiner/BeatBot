@@ -10,7 +10,7 @@ import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.TextButton;
+import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
 
@@ -30,7 +30,7 @@ public class FilterParamsPage extends EffectParamsPage {
 		}
 	}
 	
-	private TextButton[] filterToggles;
+	private ToggleButton[] filterToggles;
 	private ShapeGroup iconGroup;
 	private FilterToggleListener filterToggleListener;
 	
@@ -52,10 +52,10 @@ public class FilterParamsPage extends EffectParamsPage {
 	public void createChildren() {
 		super.createChildren();
 		iconGroup = new ShapeGroup();
-		filterToggles = new TextButton[3];
+		filterToggles = new ToggleButton[3];
 		filterToggleListener = new FilterToggleListener();
 		for (int i = 0; i < filterToggles.length; i++) {
-			filterToggles[i] = new TextButton();
+			filterToggles[i] = new ToggleButton();
 			filterToggles[i].setOnReleaseListener(filterToggleListener);
 			addChild(filterToggles[i]);
 		}
@@ -63,7 +63,7 @@ public class FilterParamsPage extends EffectParamsPage {
 
 	@Override
 	protected void loadIcons() {
-		for (TextButton filterToggle : filterToggles) {
+		for (ToggleButton filterToggle : filterToggles) {
 			filterToggle.setBgIconSource(new RoundedRectIconSource(iconGroup, Colors.instrumentBgColorSet, Colors.instrumentStrokeColorSet));
 		}
 		filterToggles[0].setIconSource(new ImageIconSource(R.drawable.lowpass_filter_icon));

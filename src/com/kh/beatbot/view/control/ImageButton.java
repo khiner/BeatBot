@@ -1,12 +1,20 @@
 package com.kh.beatbot.view.control;
 
+import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.IconSource;
+import com.kh.beatbot.global.ShapeIconSource;
+import com.kh.beatbot.view.BBView;
+import com.kh.beatbot.view.GLSurfaceViewBase;
 
 public class ImageButton extends Button {
 
 	protected final int BACKGROUND_ICON_INDEX = 0;
 	protected final int FOREGROUND_ICON_INDEX = 1;
 	protected float iconOffset = 0, iconW = 0, iconH = 0;
+
+	private String text = "";
+	private float textWidth = 0, textHeight = 0;
+	private float textXOffset = 0, textYOffset = 0;
 
 	// two icon sources - foreground and background
 	protected IconSource[] iconSources;
@@ -61,11 +69,6 @@ public class ImageButton extends Button {
 	}
 
 	@Override
-	public void init() {
-		// nothing to do
-	}
-
-	@Override
 	public void draw() {
 		IconSource bgIconSource = iconSources[BACKGROUND_ICON_INDEX];
 		IconSource foregroundIconSource = iconSources[FOREGROUND_ICON_INDEX];
@@ -77,11 +80,18 @@ public class ImageButton extends Button {
 					root.getHeight() - absoluteY - height + iconOffset, iconW,
 					iconH);
 		}
+		
+		if (text != null) { // draw optional text
+			float[] textColor = calcStrokeColor();
+			drawText(text, textColor, (int) textHeight, textXOffset,
+					textYOffset);
+		}
 	}
 
 	@Override
 	protected void loadIcons() {
-		// icon is set from elsewhere.
+		setText(text);
+		init();
 	}
 
 	@Override
@@ -108,6 +118,51 @@ public class ImageButton extends Button {
 		}
 		if (bgIconSource != null) {
 			bgIconSource.layout(absoluteX, absoluteY, width, height);
+		}
+	}
+
+	@Override
+	public void init() {
+		if (text.isEmpty() || !GLSurfaceViewBase.isInitialized()) {
+			return;
+		}
+		GLSurfaceViewBase.storeText(text);
+		textHeight = 5 * height / 8;
+		textWidth = GLSurfaceViewBase.getTextWidth(text, textHeight);
+		textXOffset = (iconSources[FOREGROUND_ICON_INDEX] != null ? iconOffset
+				+ iconW + (width - iconW - iconOffset) / 2 : width / 2)
+				- textWidth / 2;
+		textXOffset += 2; // kludgey magic number correction,
+							// but it corrects for something weird in
+							// GLSurfaceViewBase.getTextWidth
+		textYOffset = 0;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+		init();
+	}
+
+	public void layout(BBView parent, float x, float y, float width,
+			float height) {
+		super.layout(parent, x, y, width, height);
+		init();
+	}
+
+	private float[] calcStrokeColor() {
+		IconSource bgIconSource = iconSources[BACKGROUND_ICON_INDEX];
+		if (bgIconSource != null && bgIconSource instanceof ShapeIconSource) {
+			return ((ShapeIconSource) bgIconSource).getCurrStrokeColor();
+		} else {
+			if (pressed) {
+				return Colors.defaultStrokeColorSet.pressedColor;
+			} else {
+				return Colors.defaultStrokeColorSet.defaultColor;
+			}
 		}
 	}
 }

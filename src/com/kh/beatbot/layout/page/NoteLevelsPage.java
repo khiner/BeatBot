@@ -10,14 +10,14 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.LevelsView;
 import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.TextButton;
+import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class NoteLevelsPage extends Page {
 
 	private static ShapeGroup labelGroup = new ShapeGroup();
 	private LevelsView levelsView;
-	private TextButton volumeToggle, panToggle, pitchToggle;
+	private ToggleButton volumeToggle, panToggle, pitchToggle;
 	
 	@Override
 	public void init() {
@@ -71,9 +71,9 @@ public class NoteLevelsPage extends Page {
 	@Override
 	protected void createChildren() {
 		levelsView = new LevelsView();
-		volumeToggle = new TextButton();
-		panToggle = new TextButton();
-		pitchToggle = new TextButton();
+		volumeToggle = new ToggleButton();
+		panToggle = new ToggleButton();
+		pitchToggle = new ToggleButton();
 		
 		volumeToggle.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {

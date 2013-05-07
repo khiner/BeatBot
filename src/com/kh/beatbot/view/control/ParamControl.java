@@ -5,7 +5,7 @@ import com.kh.beatbot.view.TouchableBBView;
 
 public class ParamControl extends TouchableBBView {
 	public Knob knob;
-	private TextButton label, valueLabel;
+	private ImageButton label, valueLabel;
 	private boolean beatSync;
 	
 	public ParamControl(boolean beatSync) {
@@ -50,9 +50,9 @@ public class ParamControl extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		label = new TextButton();
+		label = new ImageButton();
 		knob = beatSync ? new ToggleKnob() : new Knob();
-		valueLabel = new TextButton();
+		valueLabel = new ImageButton();
 		addChild(label);
 		addChild(knob);
 		addChild(valueLabel);

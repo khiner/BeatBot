@@ -11,14 +11,14 @@ import com.kh.beatbot.view.TouchableBBView;
 import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.ControlViewBase;
 import com.kh.beatbot.view.control.Seekbar2d;
-import com.kh.beatbot.view.control.TextButton;
+import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.group.BBViewPager;
 
 public class EffectPage extends TouchableBBView {
 
 	private BBViewPager paramsPager;
 	private Seekbar2d level2d;
-	private TextButton toggleButton;
+	private ToggleButton toggleButton;
 
 	private ChorusParamsPage chorusPage;
 	private DecimateParamsPage decimatePage;
@@ -78,7 +78,7 @@ public class EffectPage extends TouchableBBView {
 		paramsPager.addPage(reverbPage);
 		paramsPager.addPage(tremeloPage);
 
-		toggleButton = new TextButton();
+		toggleButton = new ToggleButton();
 		toggleButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {

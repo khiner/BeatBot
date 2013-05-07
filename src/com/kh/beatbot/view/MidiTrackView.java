@@ -10,7 +10,6 @@ import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.TextButton;
 import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.helper.TickWindowHelper;
 import com.kh.beatbot.view.mesh.ShapeGroup;
@@ -20,7 +19,7 @@ public class MidiTrackView extends TouchableBBView {
 	public class ButtonRow extends TouchableBBView {
 		int trackNum;
 		ToggleButton instrumentButton;
-		TextButton muteButton, soloButton;
+		ToggleButton muteButton, soloButton;
 
 		public ButtonRow(int trackNum) {
 			this.trackNum = trackNum;
@@ -56,9 +55,9 @@ public class MidiTrackView extends TouchableBBView {
 
 		@Override
 		protected void createChildren() {
-			instrumentButton = new TextButton();
-			muteButton = new TextButton();
-			soloButton = new TextButton();
+			instrumentButton = new ToggleButton();
+			muteButton = new ToggleButton();
+			soloButton = new ToggleButton();
 			instrumentButton.setOnReleaseListener(new OnReleaseListener() {
 				@Override
 				public void onRelease(Button button) {
