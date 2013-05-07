@@ -26,6 +26,8 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 
 	protected TextButton touchedLabel = null;
 
+	protected ImageIconSource plusIconSource;
+	
 	public void setListener(LabelListListener listener) {
 		this.listener = listener;
 	}
@@ -45,7 +47,7 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 		newLabel.setOnReleaseListener(this);
 		addChild(newLabel);
 		layoutChildren();
-		newLabel.setIconSource(new ImageIconSource(R.drawable.plus_outline, -1, -1));
+		newLabel.setIconSource(plusIconSource);
 		newLabel.setBgIconSource(new RoundedRectIconSource(null,
 		Colors.effectLabelBgColorSet, Colors.effectLabelStrokeColorSet));
 		newLabel.setText("ADD");
@@ -63,7 +65,7 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 		}
 		if (text.isEmpty()) {
 			label.setText("ADD");
-			label.setIconSource(new ImageIconSource(R.drawable.plus_outline, -1, -1));
+			label.setIconSource(plusIconSource);
 			label.setChecked(false);
 		} else {
 			label.setText(text);
@@ -77,6 +79,7 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 
 	@Override
 	protected void loadIcons() {
+		plusIconSource = new ImageIconSource(R.drawable.plus_outline, -1, -1);
 	}
 
 	@Override
@@ -121,7 +124,7 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 
 	@Override
 	protected void createChildren() {
-		// leaf child
+		// leaf
 	}
 
 	@Override
