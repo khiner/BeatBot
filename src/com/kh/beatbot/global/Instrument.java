@@ -6,7 +6,7 @@ public class Instrument extends BBDirectory {
 	private File[] sampleFiles;
 	private String[] sampleNames;
 
-	public Instrument(BBDirectory parent, String name, IconSource bbIconSource) {
+	public Instrument(BBDirectory parent, String name, ImageIconSource bbIconSource) {
 		super(parent, name, bbIconSource);
 		updateFiles();
 	}

@@ -20,17 +20,17 @@ import com.kh.beatbot.view.control.TextButton;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class PageSelectGroup extends TouchableBBView {
-	private static NoteLevelsPage levelsPage;
-	private static LevelsFXPage masterLevelsFxPage, trackLevelsFxPage;
-	private static SampleEditPage sampleEditPage;
-	private static AdsrPage adsrPage;
-	private static BBViewPager pager;
-
 	private static final int LEVELS_FX_PAGE_ID = 0;
 	private static final int EDIT_PAGE_ID = 1;
 	private static final int ADSR_PAGE_ID = 2;
 	private static final int MASTER_PAGE_ID = 3;
 	private static final int NOTE_LEVELS_PAGE_ID = 4;
+	
+	private static NoteLevelsPage levelsPage;
+	private static LevelsFXPage masterLevelsFxPage, trackLevelsFxPage;
+	private static SampleEditPage sampleEditPage;
+	private static AdsrPage adsrPage;
+	private static BBViewPager pager;
 
 	private static TextButton addTrackButton;
 	private static TextButton instrumentSelectButton;
@@ -38,7 +38,7 @@ public class PageSelectGroup extends TouchableBBView {
 	private static TextButton[] textButtons = new TextButton[5];
 
 	private static ShapeGroup roundedRectGroup = new ShapeGroup();
-	
+
 	public void update() {
 		updateInstrumentIcon();
 		updateSampleText();
@@ -66,7 +66,7 @@ public class PageSelectGroup extends TouchableBBView {
 	@Override
 	public void draw() {
 		translate(-absoluteX, -absoluteY);
-		roundedRectGroup.draw((GL11)BBView.gl, 1);
+		roundedRectGroup.draw((GL11) BBView.gl, 1);
 		translate(absoluteX, absoluteY);
 	}
 
@@ -177,16 +177,21 @@ public class PageSelectGroup extends TouchableBBView {
 	protected void loadIcons() {
 		addTrackButton.setIconSource(new ImageIconSource(
 				R.drawable.plus_outline, R.drawable.plus_outline));
-		textButtons[NOTE_LEVELS_PAGE_ID].setIconSource(new ImageIconSource(R.drawable.levels_icon, -1, R.drawable.levels_icon_selected));
-		addTrackButton.setBgIconSource(new RoundedRectIconSource(roundedRectGroup,
-				Colors.labelBgColorSet, Colors.labelStrokeColorSet));
-		instrumentSelectButton.setBgIconSource(new RoundedRectIconSource(roundedRectGroup,
-				Colors.labelBgColorSet, Colors.labelStrokeColorSet));
-		sampleSelectButton.setBgIconSource(new RoundedRectIconSource(roundedRectGroup,
-				Colors.labelBgColorSet, Colors.labelStrokeColorSet));
+		textButtons[NOTE_LEVELS_PAGE_ID].setIconSource(new ImageIconSource(
+				R.drawable.levels_icon, -1, R.drawable.levels_icon_selected));
+		addTrackButton.setBgIconSource(new RoundedRectIconSource(
+				roundedRectGroup, Colors.labelBgColorSet,
+				Colors.labelStrokeColorSet));
+		instrumentSelectButton.setBgIconSource(new RoundedRectIconSource(
+				roundedRectGroup, Colors.labelBgColorSet,
+				Colors.labelStrokeColorSet));
+		sampleSelectButton.setBgIconSource(new RoundedRectIconSource(
+				roundedRectGroup, Colors.labelBgColorSet,
+				Colors.labelStrokeColorSet));
 		for (int i = 0; i < textButtons.length; i++) {
-			textButtons[i].setBgIconSource(new RoundedRectIconSource(roundedRectGroup,
-					Colors.labelBgColorSet, Colors.labelStrokeColorSet));
+			textButtons[i].setBgIconSource(new RoundedRectIconSource(
+					roundedRectGroup, Colors.labelBgColorSet,
+					Colors.labelStrokeColorSet));
 		}
 		textButtons[LEVELS_FX_PAGE_ID].setText("FX");
 		textButtons[EDIT_PAGE_ID].setText("EDIT");
@@ -201,8 +206,8 @@ public class PageSelectGroup extends TouchableBBView {
 
 	private void updateInstrumentIcon() {
 		// update the track pager instrument icon
-		instrumentSelectButton.setIconSource(TrackManager.currTrack
-				.getInstrument().getIconSource());
+		instrumentSelectButton.setIconSource(TrackManager.currTrack.getInstrument()
+				.getIconSource());
 	}
 
 	private void updateSampleText() {

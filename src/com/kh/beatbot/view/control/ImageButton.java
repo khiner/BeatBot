@@ -9,8 +9,13 @@ public class ImageButton extends Button {
 	protected float iconOffset = 0, iconW = 0, iconH = 0;
 
 	// two icon sources - foreground and background
-	protected IconSource[] iconSources = new IconSource[2];
+	protected IconSource[] iconSources;
 
+	public ImageButton() {
+		super();
+		iconSources = new IconSource[2];
+	}
+	
 	public IconSource getIconSource() {
 		return iconSources[FOREGROUND_ICON_INDEX];
 	}
@@ -62,10 +67,15 @@ public class ImageButton extends Button {
 
 	@Override
 	public void draw() {
-		for (IconSource iconSource : iconSources) {
-			if (iconSource != null) {
-				iconSource.draw();
-			}
+		IconSource bgIconSource = iconSources[BACKGROUND_ICON_INDEX];
+		IconSource foregroundIconSource = iconSources[FOREGROUND_ICON_INDEX];
+		if (bgIconSource != null) {
+			bgIconSource.draw();
+		}
+		if (foregroundIconSource != null) {
+			foregroundIconSource.draw(absoluteX + iconOffset,
+					root.getHeight() - absoluteY - height + iconOffset, iconW,
+					iconH);
 		}
 	}
 
@@ -86,7 +96,6 @@ public class ImageButton extends Button {
 
 	protected void layoutIcons() {
 		IconSource bgIconSource = iconSources[BACKGROUND_ICON_INDEX];
-		IconSource foregroundIconSource = iconSources[FOREGROUND_ICON_INDEX];
 		if (bgIconSource != null) {
 			// if there is a bg shape, we shrink the icon a bit to avoid overlap
 			iconOffset = height / 10;
@@ -99,11 +108,6 @@ public class ImageButton extends Button {
 		}
 		if (bgIconSource != null) {
 			bgIconSource.layout(absoluteX, absoluteY, width, height);
-		}
-		if (foregroundIconSource != null) {
-			foregroundIconSource.layout(absoluteX + iconOffset,
-					root.getHeight() - absoluteY - height + iconOffset, iconW,
-					iconH);
 		}
 	}
 }

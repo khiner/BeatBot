@@ -315,12 +315,9 @@ public class DirectoryManager {
 	}
 
 	private void updateInstrumentSelectTitleBar() {
-		if (currDirectory.getIconSource() != null) {
-			int listTitleIconResource = ((ImageIconSource)currDirectory.getIconSource()).listTitleIconResource;
-			if (listTitleIconResource != -1) {
-				instrumentSelectAlertBuilder.setIcon(listTitleIconResource)
-						.setTitle(currDirectory.getName().toUpperCase());
-			}
+		if (currDirectory.getListTitleResource() != -1) {
+			instrumentSelectAlertBuilder.setIcon(currDirectory.getListTitleResource())
+			.setTitle(currDirectory.getName().toUpperCase());
 		} else {
 			instrumentSelectAlertBuilder.setIcon(0).setTitle(
 					"Choose Instrument");
@@ -342,10 +339,8 @@ public class DirectoryManager {
 					tv.setCompoundDrawables(null, null, null, null);
 					return v;
 				}
-				ImageIconSource iconSource = (ImageIconSource)directory.getChild(position)
-						.getIconSource();
 				tv.setCompoundDrawablesWithIntrinsicBounds(
-						iconSource.listViewIconResource, 0, 0, 0);
+						directory.getChild(position).getListViewResource(), 0, 0, 0);
 				// Add margin between image and text (support various screen
 				// densities)
 				int dpMargin = (int) (15 * GlobalVars.mainActivity

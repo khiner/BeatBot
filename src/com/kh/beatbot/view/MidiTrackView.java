@@ -124,7 +124,7 @@ public class MidiTrackView extends TouchableBBView {
 		buttonRows.get(trackNum).updateInstrumentIcon();
 	}
 
-	public void trackAdded(int trackNum) {
+	public void notifyTrackAdded(int trackNum) {
 		ButtonRow newRow = new ButtonRow(trackNum);
 		buttonRows.add(newRow);
 		addChild(newRow);

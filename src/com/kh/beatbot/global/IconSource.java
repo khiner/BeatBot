@@ -16,23 +16,6 @@ public abstract class IconSource extends Drawable {
 		setState(State.DISABLED);
 	}
 	
-	@Override
-	public void layout(float x, float y, float width, float height) {
-		super.layout(x, y, width, height);
-		if (defaultIcon != null) {
-			defaultIcon.layout(x, y, width, height);
-		}
-		if (selectedIcon != null) {
-			selectedIcon.layout(x, y, width, height);
-		}
-		if (disabledIcon != null) {
-			disabledIcon.layout(x, y, width, height);
-		}
-		if (pressedIcon != null) {
-			pressedIcon.layout(x, y, width, height);
-		}
-	}
-	
 	public void setState(State state) {
 		setIcon(whichIcon(state));
 	}
@@ -57,7 +40,13 @@ public abstract class IconSource extends Drawable {
 
 	public void draw() {
 		if (currentIcon != null) {
-			currentIcon.draw();
+			currentIcon.draw(x, y, width, height);
+		}
+	}
+	
+	public void draw(float x, float y, float width, float height) {
+		if (currentIcon != null) {
+			currentIcon.draw(x, y, width, height);
 		}
 	}
 }

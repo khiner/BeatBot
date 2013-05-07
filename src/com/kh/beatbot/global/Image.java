@@ -13,7 +13,7 @@ public class Image extends Drawable {
 		GLSurfaceViewBase.loadTexture(resourceId, textureHandlers, 0, crop);
 	}
 
-	public void draw() {
+	public void draw(float x, float y, float width, float height) {
 		GLSurfaceViewBase.drawTexture(0, textureHandlers, crop, x, y, width,
 				height);
 	}

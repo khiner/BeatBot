@@ -15,7 +15,7 @@ public class MainPage extends TouchableBBView {
 	public PageSelectGroup pageSelectGroup;
 	
 	public void trackAdded(int newTrackNum) {
-		midiTrackControl.trackAdded(newTrackNum);
+		midiTrackControl.notifyTrackAdded(newTrackNum);
 		midiView.trackAdded(newTrackNum);
 		pageSelectGroup.notifyTrackChanged();
 	}

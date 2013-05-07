@@ -77,7 +77,7 @@ public abstract class Shape extends Drawable {
 	}
 	
 	@Override
-	public void draw() {
+	public void draw(float x, float y, float width, float height) {
 		if (shouldDraw) {
 			group.draw((GL11)BBView.gl, 1);
 		}
