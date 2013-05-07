@@ -97,9 +97,11 @@ public class AdsrPage extends Page implements OnReleaseListener, Level1dListener
 
 	@Override
 	protected void loadIcons() {
-		for (int i = 0; i < adsrButtons.length - 2; i++) {
-			adsrButtons[i].setIconSource(new ImageIconSource(whichAdsrIcon(i)));
+		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i].setBgIconSource(new RoundedRectIconSource(iconGroup, Colors.instrumentBgColorSet, Colors.instrumentStrokeColorSet));
+			if (i < adsrButtons.length - 2) {
+				adsrButtons[i].setIconSource(new ImageIconSource(whichAdsrIcon(i)));
+			}
 		}
 		adsrButtons[ADSR.START_ID].setText("S");
 		adsrButtons[ADSR.PEAK_ID].setText("P");

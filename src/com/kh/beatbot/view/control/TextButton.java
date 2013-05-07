@@ -16,9 +16,6 @@ public class TextButton extends ToggleButton {
 	protected void loadIcons() {
 		setText(text);
 		init();
-		// globalGroup == null ? 0 : absoluteX,
-		// globalGroup == null ? 0 : absoluteY, width, height,
-		// bgColorSet, strokeColorSet));
 	}
 
 	@Override
@@ -47,7 +44,8 @@ public class TextButton extends ToggleButton {
 		init();
 	}
 
-	public void layout(BBView parent, float x, float y, float width, float height) {
+	public void layout(BBView parent, float x, float y, float width,
+			float height) {
 		super.layout(parent, x, y, width, height);
 		init();
 	}
@@ -63,7 +61,7 @@ public class TextButton extends ToggleButton {
 	}
 
 	private float[] calcStrokeColor() {
-		IconSource bgIconSource = iconSources[BACKGROUND_ICON_INDEX]; 
+		IconSource bgIconSource = iconSources[BACKGROUND_ICON_INDEX];
 		if (bgIconSource != null && bgIconSource instanceof ShapeIconSource) {
 			return ((ShapeIconSource) bgIconSource).getCurrStrokeColor();
 		} else {
