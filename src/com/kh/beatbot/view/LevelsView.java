@@ -8,6 +8,7 @@ import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 
 public class LevelsView extends TouchableBBView {
@@ -89,7 +90,7 @@ public class LevelsView extends TouchableBBView {
 	private void drawSelectRegion() {
 		if (!selectRegion || selectRegionVb == null)
 			return;
-		drawTriangleStrip(selectRegionVb, Colors.SELECT_REGION);
+		drawTriangleFan(selectRegionVb, Colors.SELECT_REGION);
 	}
 
 	private void initSelectRegionVb(float leftTick, float rightTick,
@@ -145,7 +146,7 @@ public class LevelsView extends TouchableBBView {
 	}
 
 	private void drawLevels() {
-		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
+		for (MidiNote midiNote : TrackManager.currTrack.getMidiNotes()) {
 			drawLevel(tickToX(midiNote.getOnTick()),
 					midiNote.getLevel(currLevelType),
 					calcLevelColor(midiNote.isSelected()));
@@ -153,7 +154,7 @@ public class LevelsView extends TouchableBBView {
 	}
 
 	private boolean selectLevel(float x, float y, int pointerId) {
-		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
+		for (MidiNote midiNote : TrackManager.currTrack.getMidiNotes()) {
 			float velocityY = levelToY(midiNote.getLevel(currLevelType));
 			if (Math.abs(tickToX(midiNote.getOnTick()) - x) < 35
 					&& Math.abs(velocityY - y) < 35) {
@@ -161,14 +162,18 @@ public class LevelsView extends TouchableBBView {
 				// been selected, make it the only selected level.
 				// If we are multi-selecting, add it to the selected list
 				if (!midiNote.isSelected()) {
-					if (touchedLevels.isEmpty())
+					if (touchedLevels.isEmpty()) {
 						Managers.midiManager.deselectAllNotes();
+					}
 					midiNote.setSelected(true);
 				}
 				touchedLevels.put(pointerId, midiNote);
 				updateLevelOffsets();
 				return true;
 			}
+		}
+		if (touchedLevels.isEmpty()) {
+			Managers.midiManager.deselectAllNotes();
 		}
 		return false;
 	}
@@ -179,14 +184,14 @@ public class LevelsView extends TouchableBBView {
 		float rightTick = Math.max(tick, selectRegionStartTick);
 		float topY = Math.min(y, selectRegionStartY);
 		float bottomY = Math.max(y, selectRegionStartY);
-		for (MidiNote selectedNote : Managers.midiManager.getMidiNotes()) {
+		Managers.midiManager.deselectAllNotes();
+		for (MidiNote selectedNote : TrackManager.currTrack.getMidiNotes()) {
 			float levelY = levelToY(selectedNote.getLevel(currLevelType));
 			if (leftTick < selectedNote.getOnTick()
 					&& rightTick > selectedNote.getOnTick() && topY < levelY
-					&& bottomY > levelY)
+					&& bottomY > levelY) {
 				selectedNote.setSelected(true);
-			else
-				selectedNote.setSelected(false);
+			}
 		}
 		initSelectRegionVb(leftTick, rightTick, topY, bottomY);
 	}
