@@ -3,7 +3,6 @@ package com.kh.beatbot.layout.page;
 import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.GlobalVars.LevelType;
 import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -103,10 +102,10 @@ public class NoteLevelsPage extends Page {
 	public void layoutChildren() {
 		float toggleHeight = height / 3;
 		float toggleWidth = 2 * toggleHeight;
+		float viewW = toggleWidth + 5;
 		volumeToggle.layout(this, 0, 0, toggleWidth, toggleHeight);
 		panToggle.layout(this, 0, toggleHeight, toggleWidth, toggleHeight);
 		pitchToggle.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
-		levelsView.layout(this, GlobalVars.mainPage.midiTrackControl.width,
-				0, width - toggleWidth, height);
+		levelsView.layout(this, viewW, 0, width - viewW, height);
 	}
 }

@@ -51,6 +51,8 @@ public class LevelsView extends TouchableBBView {
 	private boolean selectRegion = false;
 	private float selectRegionStartTick = -1, selectRegionStartY = -1;
 
+	private float xOffset = 0;
+	
 	private MidiView midiView;
 	
 	public LevelType getLevelType() {
@@ -92,8 +94,8 @@ public class LevelsView extends TouchableBBView {
 
 	private void initSelectRegionVb(float leftTick, float rightTick,
 			float topY, float bottomY) {
-		selectRegionVb = makeRectFloatBuffer(midiView.tickToX(leftTick), topY,
-				midiView.tickToX(rightTick), bottomY);
+		selectRegionVb = makeRectFloatBuffer(tickToX(leftTick), topY,
+				tickToX(rightTick), bottomY);
 	}
 
 	private int calcVertex(float level) {
@@ -144,7 +146,7 @@ public class LevelsView extends TouchableBBView {
 
 	private void drawLevels() {
 		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
-			drawLevel(midiView.tickToX(midiNote.getOnTick()),
+			drawLevel(tickToX(midiNote.getOnTick()),
 					midiNote.getLevel(currLevelType),
 					calcLevelColor(midiNote.isSelected()));
 		}
@@ -153,7 +155,7 @@ public class LevelsView extends TouchableBBView {
 	private boolean selectLevel(float x, float y, int pointerId) {
 		for (MidiNote midiNote : Managers.midiManager.getMidiNotes()) {
 			float velocityY = levelToY(midiNote.getLevel(currLevelType));
-			if (Math.abs(midiView.tickToX(midiNote.getOnTick()) - x) < 35
+			if (Math.abs(tickToX(midiNote.getOnTick()) - x) < 35
 					&& Math.abs(velocityY - y) < 35) {
 				// If this is the only touched level, and it hasn't yet
 				// been selected, make it the only selected level.
@@ -262,6 +264,10 @@ public class LevelsView extends TouchableBBView {
 				/ (height - LEVEL_POINT_SIZE);
 	}
 
+	private float tickToX(float tick) {
+		return midiView.tickToX(tick) + xOffset;
+	}
+	
 	public void handleActionPointerUp(int id, float x, float y) {
 		touchedLevels.remove(id);
 		updateLevelOffsets();
@@ -317,11 +323,13 @@ public class LevelsView extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		// leaf child
+		initBgRect();
 	}
 
 	@Override
 	public void layoutChildren() {
-		// leaf child
+		BBView alignXView = GlobalVars.mainPage.midiView;
+		xOffset = alignXView.absoluteX - absoluteX;
+		layoutBgRect(3, height / 8);
 	}
 }
