@@ -56,6 +56,10 @@ public class MeshGroup {
 	}
 	
 	public void removeMesh(Mesh2D mesh) {
+		if (!children.contains(mesh)) {
+			Log.e("MeshGroup", "Attempting to remove a mesh that is not a child.");
+			return;
+		}
 		children.remove(mesh);
 		updateVertices();
 	}

@@ -36,7 +36,9 @@ public abstract class Shape extends Drawable {
 		fillMesh.index = 0;
 		outlineMesh.index = 0;
 		createVertices(fillMesh.color, outlineMesh.color);
-		setGroup(group);
+		if (shouldDraw && !group.contains(this)) {
+			this.group.add(this);
+		}
 		group.update(this);
 	}
 	
@@ -61,9 +63,6 @@ public abstract class Shape extends Drawable {
 	
 	public void setGroup(ShapeGroup group) {
 		if (this.group == group) {
-			if (!group.contains(this)) {
-				this.group.add(this);
-			}
 			return; // already a member of this group
 		}
 		if (this.group != null) {

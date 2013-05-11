@@ -64,10 +64,10 @@ public abstract class BBView implements Comparable<BBView> {
 	static { // init circle
 		float theta = 0;
 		float coords[] = new float[128];
-		for (int i = 0; i < 128; i += 2) {
+		for (int i = 0; i < coords.length; i += 2) {
 			coords[i] = (float) Math.cos(theta) * CIRCLE_RADIUS;
 			coords[i + 1] = (float) Math.sin(theta) * CIRCLE_RADIUS;
-			theta += 2 * Math.PI / 64;
+			theta += 4 * Math.PI / coords.length;
 		}
 		circleVb = makeFloatBuffer(coords);
 	}
