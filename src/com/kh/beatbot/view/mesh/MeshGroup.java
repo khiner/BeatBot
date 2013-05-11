@@ -46,6 +46,10 @@ public class MeshGroup {
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
 	}
 	
+	public boolean contains(Mesh2D mesh) {
+		return children.contains(mesh);
+	}
+	
 	public void addMesh(Mesh2D mesh) {
 		children.add(mesh);
 		updateVertices();

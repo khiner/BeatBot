@@ -7,7 +7,6 @@ import javax.microedition.khronos.opengles.GL10;
 import com.kh.beatbot.global.Colors;
 
 public class Seekbar2d extends ControlView2dBase {
-	private static ViewRect viewRect;
 	private static FloatBuffer lineVb;
 
 	public Seekbar2d() {
@@ -16,13 +15,13 @@ public class Seekbar2d extends ControlView2dBase {
 	}
 
 	protected float xToLevel(float x) {
-		return viewRect.unitX(viewRect.clipX(x));
+		return unitX(clipX(x));
 	}
-	
+
 	protected float yToLevel(float y) {
-		return viewRect.unitY(viewRect.clipY(y));
+		return unitY(clipY(y));
 	}
-	
+
 	public void setViewLevelX(float x) {
 		super.setViewLevelX(x);
 		initLines();
@@ -37,40 +36,37 @@ public class Seekbar2d extends ControlView2dBase {
 		super.setViewLevel(x, y);
 		initLines();
 	}
-	
+
 	protected void loadIcons() {
 		// no icons to load
 	}
-	
+
 	@Override
 	public void init() {
 		super.init();
-		viewRect = new ViewRect(width, height, 0.08f, 8);
 		initLines();
 	}
 
 	@Override
 	public void draw() {
-		viewRect.drawRoundedBg();
-		viewRect.drawRoundedBgOutline();
 		float[] color = selected ? selectColor : levelColor;
 		drawLines(lineVb, color, 5, GL10.GL_LINES);
-		drawPoint(2 * viewRect.borderRadius / 3, color, viewRect.viewX(xLevel), viewRect.viewY(yLevel));
+		drawPoint(2 * getBgRectRadius() / 3, color, viewX(xLevel), viewY(yLevel));
 	}
 
 	private void initLines() {
-		lineVb = makeFloatBuffer(new float[] { viewRect.drawOffset, viewRect.viewY(yLevel),
-				width - viewRect.drawOffset, viewRect.viewY(yLevel), viewRect.viewX(xLevel), viewRect.drawOffset, viewRect.viewX(xLevel),
-				height - viewRect.drawOffset});
+		lineVb = makeFloatBuffer(new float[] { borderOffset, viewY(yLevel),
+				width - borderOffset, viewY(yLevel), viewX(xLevel),
+				borderOffset, viewX(xLevel), height - borderOffset });
 	}
 
 	@Override
 	protected void createChildren() {
-		// leaf child
+		initBgRect();
 	}
 
 	@Override
 	public void layoutChildren() {
-		// leaf child
+		layoutBgRect(3, width / 15);
 	}
 }

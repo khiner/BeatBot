@@ -1,9 +1,6 @@
 package com.kh.beatbot.view.list;
 
-import java.util.Collections;
-
 import com.kh.beatbot.listener.DraggableLabelListListener;
-import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.control.Button;
 
 public class DraggableLabelList extends LabelList {
@@ -19,7 +16,7 @@ public class DraggableLabelList extends LabelList {
 			return;
 		}
 		touchedLabel.setPosition(x + dragOffset, touchedLabel.y);
-		updateLabelPositions();
+		layoutChildren();
 	}
 	
 	@Override
@@ -39,32 +36,6 @@ public class DraggableLabelList extends LabelList {
 		}
 		touchedLabel.setState(prevTouchedLabelState);
 		touchedLabel = null;
-		updateLabelPositions();
-	}
-
-	protected void updateLabelPositions() {
-		Collections.sort(children); // sort labels by x value
-		float xTotal = 0;
-		for (BBView label : children) {
-			if (touchedLabel == null || !label.equals(touchedLabel)) {
-				label.setPosition(xTotal, label.y);
-			}
-			xTotal += label.width + GAP_BETWEEN_LABELS;
-		}
-	}
-	
-	@Override
-	public void layoutChildren() {
-		float labelW = (width - (children.size() - 1)
-				* GAP_BETWEEN_LABELS) / children.size();
-		
-		Collections.sort(children); // sort labels by position
-		float xTotal = 0;
-		for (BBView label : children) {
-			if (touchedLabel == null || !label.equals(touchedLabel)) {
-				label.layout(this, xTotal, 0, labelW, height);
-			}
-			xTotal += labelW + GAP_BETWEEN_LABELS;
-		}
+		layoutChildren();
 	}
 }

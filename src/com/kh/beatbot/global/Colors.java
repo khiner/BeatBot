@@ -20,13 +20,13 @@ public class Colors {
 			{ .4f, .4f, .4f, 1 }, { .5f, .5f, .5f, 1 }, { .6f, .6f, .6f, 1 },
 			{ .7f, .7f, .7f, 1 } };
 
-	public static ColorSet defaultStrokeColorSet, 
-			labelBgColorSet, labelStrokeColorSet,
-			muteButtonColorSet, soloButtonColorSet, instrumentBgColorSet, 
-			instrumentStrokeColorSet, panBgColorSet, panStrokeColorSet,
-			pitchBgColorSet, pitchStrokeColorSet, volumeBgColorSet,
-			volumeStrokeColorSet, effectLabelBgColorSet, effectLabelStrokeColorSet,
-			effectLabelTouchedBgColorSet, effectLabelTouchedStrokeColorSet;
+	public static ColorSet defaultStrokeColorSet, labelBgColorSet,
+			labelStrokeColorSet, muteButtonColorSet, soloButtonColorSet,
+			instrumentBgColorSet, instrumentStrokeColorSet, panBgColorSet,
+			panStrokeColorSet, pitchBgColorSet, pitchStrokeColorSet,
+			volumeBgColorSet, volumeStrokeColorSet, effectLabelBgColorSet,
+			effectLabelStrokeColorSet, effectLabelTouchedBgColorSet,
+			effectLabelTouchedStrokeColorSet;
 
 	public static void initColors(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
@@ -81,29 +81,28 @@ public class Colors {
 
 		labelBgColorSet = new ColorSet(LABEL_DARK, VOLUME, LABEL_SELECTED);
 		labelStrokeColorSet = new ColorSet(WHITE, WHITE, BLACK);
-		
+
 		effectLabelBgColorSet = new ColorSet(LABEL_DARK, LABEL_LIGHT, VOLUME);
 		effectLabelStrokeColorSet = new ColorSet(WHITE, WHITE, WHITE);
-		
-		effectLabelTouchedBgColorSet = new ColorSet(LABEL_MED, LABEL_VERY_LIGHT, VOLUME_LIGHT);
-		effectLabelTouchedStrokeColorSet = new ColorSet(WHITE, WHITE, WHITE);
-		
-		muteButtonColorSet = new ColorSet(TRANSPARANT, TRANSPARANT, LEVEL_SELECTED);
-		soloButtonColorSet = new ColorSet(TRANSPARANT,
-				TRANSPARANT, PITCH);
 
-		instrumentBgColorSet = new ColorSet(TRANSPARANT,
-				LABEL_SELECTED, VOLUME);
+		effectLabelTouchedBgColorSet = new ColorSet(LABEL_MED,
+				LABEL_VERY_LIGHT, VOLUME_LIGHT);
+		effectLabelTouchedStrokeColorSet = new ColorSet(WHITE, WHITE, WHITE);
+
+		muteButtonColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, LEVEL_SELECTED);
+		soloButtonColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, PITCH);
+
+		instrumentBgColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, VOLUME);
 		instrumentStrokeColorSet = new ColorSet(WHITE, BLACK, WHITE);
-		
+
 		panBgColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, PAN);
 		pitchBgColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, PITCH);
 		volumeBgColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, VOLUME);
-		
+
 		panStrokeColorSet = new ColorSet(PAN, PAN, WHITE);
 		pitchStrokeColorSet = new ColorSet(PITCH, PITCH, WHITE);
 		volumeStrokeColorSet = new ColorSet(VOLUME, VOLUME, WHITE);
-		
+
 		defaultStrokeColorSet = new ColorSet(VOLUME, VOLUME, VOLUME);
 	}
 

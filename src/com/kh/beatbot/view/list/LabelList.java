@@ -1,6 +1,5 @@
 package com.kh.beatbot.view.list;
 
-import java.nio.FloatBuffer;
 import java.util.Collections;
 
 import com.kh.beatbot.R;
@@ -65,7 +64,6 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 	
 	protected static final float GAP_BETWEEN_LABELS = 5;
 	protected static final float TEXT_Y_OFFSET = 3;
-	protected static FloatBuffer bgRectVb = null;
 	protected static ImageIconSource plusIconSource;
 	protected LabelListListener listener = null;
 
@@ -116,10 +114,6 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 		}
 	}
 
-	protected void initBgRectVb() {
-		bgRectVb = makeRoundedCornerRectBuffer(width, height, 14, 15);
-	}
-
 	@Override
 	protected void loadIcons() {
 		plusIconSource = new ImageIconSource(R.drawable.plus_outline, -1, -1);
@@ -128,19 +122,12 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 	@Override
 	public void init() {
 		GLSurfaceViewBase.storeText("ADD");
-		if (bgRectVb == null) {
-			initBgRectVb();
-		}
 		listener.labelListInitialized(this);
 	}
 
 	@Override
 	public void draw() {
-		// draw background rounded rect
-		push();
-		translate(width / 2, height / 2);
-		drawTriangleFan(bgRectVb, Colors.VIEW_BG);
-		pop();
+		bgRect.draw();
 	}
 
 	@Override
@@ -167,22 +154,25 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 
 	@Override
 	protected void createChildren() {
-		// leaf
+		initBgRect();
 	}
 
 	@Override
 	public void layoutChildren() {
-		float labelW = (width - (children.size() - 1) * GAP_BETWEEN_LABELS)
-				/ children.size();
-
+		layoutBgRect(2, height / 5);
+		float labelW = (width - 6 - (children.size() - 1)
+				* GAP_BETWEEN_LABELS) / children.size();
+		
 		Collections.sort(children); // sort labels by position
-		float xTotal = 0;
+		float xTotal = 3;
 		for (BBView label : children) {
-			xTotal += label.width + GAP_BETWEEN_LABELS;
-			label.layout(this, xTotal, 0, labelW, height);
+			if (touchedLabel == null || !label.equals(touchedLabel)) {
+				label.layout(this, xTotal, 3, labelW, height - 6);
+			}
+			xTotal += labelW + GAP_BETWEEN_LABELS;
 		}
 	}
-
+	
 	@Override
 	public void drawAll() {
 		draw();

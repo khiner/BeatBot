@@ -64,7 +64,8 @@ public class ScrollBarHelper {
 		if (!scrollingEnded && elapsedTime <= ClickableBBView.DOUBLE_TAP_TIME)
 			// fade in
 			alpha *= elapsedTime / (float) ClickableBBView.DOUBLE_TAP_TIME;
-		else if (scrollingEnded && elapsedTime > ClickableBBView.DOUBLE_TAP_TIME)
+		else if (scrollingEnded
+				&& elapsedTime > ClickableBBView.DOUBLE_TAP_TIME)
 			// fade out
 			alpha *= 2 - elapsedTime / (float) ClickableBBView.DOUBLE_TAP_TIME;
 		innerScrollBarColor[3] = alpha;
@@ -100,13 +101,15 @@ public class ScrollBarHelper {
 		float innerWidth = outerWidth - 10;
 		translateX = (x2 + x1) / 2;
 		translateY = view.height - outerScrollBarHeight / 2;
-		innerScrollBarVb = BBView.makeRoundedCornerRectBuffer(
-				innerWidth, innerScrollBarHeight, innerScrollBarCornerRadius,
+
+		innerScrollBarVb = BBView.makeRectFloatBuffer(innerWidth,
+				innerScrollBarHeight, innerScrollBarCornerRadius,
 				CORNER_RESOLUTION);
-		outerScrollBarVb = BBView.makeRoundedCornerRectBuffer(
-				outerWidth, outerScrollBarHeight, outerScrollBarCornerRadius,
+		outerScrollBarVb = BBView.makeRectFloatBuffer(outerWidth,
+				outerScrollBarHeight, outerScrollBarCornerRadius,
 				CORNER_RESOLUTION);
-		scrollBarLinesVb = BBView.makeFloatBuffer(new float[] { 0, 0, x1, 0, x2, 0, view.width, 0 });
+		scrollBarLinesVb = BBView.makeFloatBuffer(new float[] { 0, 0, x1, 0,
+				x2, 0, view.width, 0 });
 	}
 
 	public static void handleActionUp() {

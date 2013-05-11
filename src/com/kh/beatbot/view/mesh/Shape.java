@@ -11,6 +11,7 @@ public abstract class Shape extends Drawable {
 	protected ShapeGroup group;
 	protected Mesh2D fillMesh, outlineMesh;
 	protected boolean shouldDraw;
+	protected int borderWeight = 2;
 	
 	public Shape(ShapeGroup group) {
 		// must draw via some parent group.  if one is given, use that, 
@@ -25,12 +26,17 @@ public abstract class Shape extends Drawable {
 		this.outlineMesh = outlineMesh;
 	}
 	
+	public void setBorderWeight(float borderWeight) {
+		this.borderWeight = (int) borderWeight;
+	}
+	
 	protected abstract void createVertices(float[] fillColor, float[] outlineColor);
 
 	protected void update() {
 		fillMesh.index = 0;
 		outlineMesh.index = 0;
 		createVertices(fillMesh.color, outlineMesh.color);
+		setGroup(group);
 		group.update(this);
 	}
 	
@@ -55,6 +61,9 @@ public abstract class Shape extends Drawable {
 	
 	public void setGroup(ShapeGroup group) {
 		if (this.group == group) {
+			if (!group.contains(this)) {
+				this.group.add(this);
+			}
 			return; // already a member of this group
 		}
 		if (this.group != null) {
@@ -84,7 +93,7 @@ public abstract class Shape extends Drawable {
 	@Override
 	public void draw(float x, float y, float width, float height) {
 		if (shouldDraw) {
-			group.draw((GL11)BBView.gl, 1);
+			group.draw((GL11)BBView.gl, borderWeight);
 		}
 	}
 }
