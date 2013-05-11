@@ -83,7 +83,9 @@ public abstract class Button extends TouchableBBView {
 		if (!enabled) {
 			return;
 		}
-		if (x < 0 || x >= width || y < 0 || y > height) {
+
+		// x / y are relative to this view but containsPoint is absolute
+		if (!containsPoint(this.x + x, this.y + y)) {
 			if (pressed) { // pointer dragged away from button - signal release
 				release();
 				// if there is a press-listener, we must notify them

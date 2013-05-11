@@ -34,6 +34,11 @@ public abstract class Shape extends Drawable {
 		group.update(this);
 	}
 	
+	public void setFillColor(float[] fillColor) {
+		fillMesh.color = fillColor;
+		update();
+	}
+	
 	public void setColors(float[] fillColor, float[] outlineColor) {
 		fillMesh.color = fillColor;
 		outlineMesh.color = outlineColor;

@@ -4,9 +4,11 @@ import java.nio.FloatBuffer;
 import java.util.Collections;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.ColorSet;
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.global.RoundedRectIconSource;
+import com.kh.beatbot.global.ShapeIconSource;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -14,44 +16,85 @@ import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.ClickableBBView;
 import com.kh.beatbot.view.GLSurfaceViewBase;
 import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.ToggleButton;
+import com.kh.beatbot.view.control.ImageButton;
 
 public class LabelList extends ClickableBBView implements OnPressListener,
 		OnReleaseListener {
 
+	static enum LabelState { ON, OFF, EMPTY };
+	
+	protected static class Label extends ImageButton {
+		private LabelState state = LabelState.EMPTY;
+		
+		private static final ColorSet onColorSet = new ColorSet(Colors.VOLUME, Colors.VOLUME_LIGHT);
+		private static final ColorSet offColorSet = new ColorSet(Colors.LABEL_LIGHT, Colors.LABEL_VERY_LIGHT);
+		private static final ColorSet emptyColorSet = new ColorSet(Colors.LABEL_DARK, Colors.LABEL_MED);
+		private static final ColorSet outlineColorSet = new ColorSet(Colors.WHITE, Colors.WHITE);
+		
+		public Label() {
+			super();
+			setIconSource(plusIconSource);
+			setBgIconSource(new RoundedRectIconSource(null, emptyColorSet, outlineColorSet));
+			setText("ADD");
+		}
+		
+		public void setState(LabelState state) {
+			ShapeIconSource bgShape = ((ShapeIconSource)this.getBgIconSource()); 
+			this.state = state;
+			switch (state) {
+			case ON: bgShape.setColors(onColorSet, outlineColorSet);
+			break;
+			case OFF: bgShape.setColors(offColorSet, outlineColorSet);
+			break;
+			case EMPTY: bgShape.setColors(emptyColorSet, outlineColorSet);
+			break;
+			}
+		}
+		
+		public LabelState getState() {
+			return state;
+		}
+		
+		// we don't want labels to 'snap' back into place
+		// when dragging out of parent view after touching
+		@Override
+		public boolean containsPoint(float x, float y) {
+			return x > this.x && x < this.x + width;
+		}
+	}
+	
 	protected static final float GAP_BETWEEN_LABELS = 5;
 	protected static final float TEXT_Y_OFFSET = 3;
 	protected static FloatBuffer bgRectVb = null;
+	protected static ImageIconSource plusIconSource;
 	protected LabelListListener listener = null;
 
-	protected ToggleButton touchedLabel = null;
+	protected Label touchedLabel = null;
 
-	protected ImageIconSource plusIconSource;
 	
 	public void setListener(LabelListListener listener) {
 		this.listener = listener;
 	}
 
-	public void checkLabel(int position, boolean checked) {
-		ToggleButton label = (ToggleButton) children.get(position);
+	public Label getLabel(int position) {
+		return (Label) children.get(position);
+	}
+
+	public void setLabelOn(int position, boolean on) {
+		Label label = getLabel(position);
 		if (label != null) {
-			label.setChecked(checked);
+			label.setState(on ? LabelState.ON : LabelState.OFF);
 		}
 	}
 
-	public ToggleButton addLabel(String text, boolean on) {
-		ToggleButton newLabel = new ToggleButton();
+	public Label addLabel(String text, boolean on) {
+		Label newLabel = new Label();
 		// need onPressListener as well as the onReleaseListener to notify
 		// when a label becomes touched
 		newLabel.setOnPressListener(this);
 		newLabel.setOnReleaseListener(this);
 		addChild(newLabel);
 		layoutChildren();
-		newLabel.setIconSource(plusIconSource);
-		newLabel.setBgIconSource(new RoundedRectIconSource(null,
-		Colors.effectLabelBgColorSet, Colors.effectLabelStrokeColorSet));
-		newLabel.setText("ADD");
-		//newLabel.setBgI
 		newLabel.loadAllIcons();
 		return newLabel;
 	}
@@ -59,14 +102,14 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 	// callback function for listener to notify when the label text and id is
 	// known
 	public void setLabelText(int position, String text) {
-		ToggleButton label = (ToggleButton) children.get(position);
+		Label label = getLabel(position);
 		if (label == null) {
 			return;
 		}
 		if (text.isEmpty()) {
 			label.setText("ADD");
 			label.setIconSource(plusIconSource);
-			label.setChecked(false);
+			label.setState(LabelState.EMPTY);
 		} else {
 			label.setText(text);
 			label.setIconSource(null);
@@ -103,9 +146,9 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 	@Override
 	protected void longPress(int id, float x, float y) {
 		// notify listener that the label has been long-clicked
-		if (touchedLabel != null)
+		if (touchedLabel != null) {
 			listener.labelLongClicked(children.indexOf(touchedLabel));
-
+		}
 	}
 
 	@Override
@@ -162,13 +205,11 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 
 	@Override
 	public void onPress(Button button) {
-		touchedLabel = (ToggleButton) button;
-		//((ShapeIconSource)((ToggleButton)touchedLabel).getIconSource()).setColors(Colors.effectLabelTouchedBgColorSet, Colors.effectLabelTouchedStrokeColorSet);
+		touchedLabel = (Label) button;
 	}
 
 	@Override
 	public void onRelease(Button button) {
-		//((ShapeIconSource)((ToggleButton)touchedLabel).getIconSource()).setColors(Colors.effectLabelBgColorSet, Colors.effectLabelStrokeColorSet);
 		touchedLabel = null;
 	}
 }

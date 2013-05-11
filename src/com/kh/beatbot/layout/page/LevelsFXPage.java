@@ -71,7 +71,7 @@ public class LevelsFXPage extends Page implements Level1dListener {
 				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
 					Effect effect = getCurrTrack().findEffectByPosition(i);
 					if (effect != null)
-						labelList.checkLabel(i, effect.isOn());
+						labelList.setLabelOn(i, effect.isOn());
 				}
 			} else {
 				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
@@ -163,7 +163,7 @@ public class LevelsFXPage extends Page implements Level1dListener {
 				effectLabelList.setLabelText(i, "");
 			} else {
 				effectLabelList.setLabelText(i, effect.getName());
-				effectLabelList.checkLabel(i, effect.isOn());
+				effectLabelList.setLabelOn(i, effect.isOn());
 			}
 		}		
 	}

@@ -41,11 +41,18 @@ public abstract class ShapeIconSource extends IconSource {
 	public void setShapeGroup(ShapeGroup shapeGroup) {
 		((Shape) currentIcon).setGroup(shapeGroup);
 	}
-	
+		
 	public void setColors(ColorSet fillColorSet, ColorSet outlineColorSet) {
+		Drawable prevIcon = currentIcon;
+		setIcon(defaultIcon);
 		((Shape)defaultIcon).setColors(fillColorSet.defaultColor, outlineColorSet.defaultColor);
+		setIcon(pressedIcon);
 		((Shape)pressedIcon).setColors(fillColorSet.pressedColor, outlineColorSet.pressedColor);
-		((Shape)selectedIcon).setColors(fillColorSet.selectedColor, outlineColorSet.selectedColor);
+		if (fillColorSet.selectedColor != null && outlineColorSet.selectedColor != null) {
+			setIcon(selectedIcon);
+			((Shape)selectedIcon).setColors(fillColorSet.selectedColor, outlineColorSet.selectedColor);
+		}
+		setIcon(prevIcon);
 	}
 	
 	public float[] getCurrStrokeColor() {

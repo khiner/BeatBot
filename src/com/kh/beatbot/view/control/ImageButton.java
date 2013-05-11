@@ -28,6 +28,10 @@ public class ImageButton extends Button {
 		return iconSources[FOREGROUND_ICON_INDEX];
 	}
 
+	public IconSource getBgIconSource() {
+		return iconSources[BACKGROUND_ICON_INDEX];
+	}
+	
 	public void setIconSource(IconSource iconSource) {
 		iconSources[FOREGROUND_ICON_INDEX] = iconSource;
 		layoutIcons();
@@ -37,7 +41,7 @@ public class ImageButton extends Button {
 		iconSources[BACKGROUND_ICON_INDEX] = bgIconSource;
 		layoutIcons();
 	}
-
+	
 	@Override
 	public void press() {
 		super.press();
@@ -70,8 +74,9 @@ public class ImageButton extends Button {
 
 	@Override
 	public void draw() {
-		IconSource bgIconSource = iconSources[BACKGROUND_ICON_INDEX];
-		IconSource foregroundIconSource = iconSources[FOREGROUND_ICON_INDEX];
+		IconSource foregroundIconSource = getIconSource();
+		IconSource bgIconSource = getBgIconSource();
+		
 		if (bgIconSource != null) {
 			bgIconSource.draw();
 		}
@@ -105,7 +110,7 @@ public class ImageButton extends Button {
 	}
 
 	protected void layoutIcons() {
-		IconSource bgIconSource = iconSources[BACKGROUND_ICON_INDEX];
+		IconSource bgIconSource = getBgIconSource();
 		if (bgIconSource != null) {
 			// if there is a bg shape, we shrink the icon a bit to avoid overlap
 			iconOffset = height / 10;
@@ -154,7 +159,7 @@ public class ImageButton extends Button {
 	}
 
 	private float[] calcStrokeColor() {
-		IconSource bgIconSource = iconSources[BACKGROUND_ICON_INDEX];
+		IconSource bgIconSource = getBgIconSource();
 		if (bgIconSource != null && bgIconSource instanceof ShapeIconSource) {
 			return ((ShapeIconSource) bgIconSource).getCurrStrokeColor();
 		} else {

@@ -5,13 +5,12 @@ import java.util.Collections;
 import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.ToggleButton;
 
 public class DraggableLabelList extends LabelList {
 	
 	private int initialTouchedPosition = -1;
 	private float dragOffset = 0;
-	private boolean wasTouchedLabelChecked = false;
+	private LabelState prevTouchedLabelState = LabelState.EMPTY;
 	
 	@Override
 	public void handleActionMove(int id, float x, float y) {
@@ -25,7 +24,7 @@ public class DraggableLabelList extends LabelList {
 	
 	@Override
 	public void onPress(Button button) {
-		wasTouchedLabelChecked = ((ToggleButton)button).isChecked();
+		prevTouchedLabelState = ((Label)button).getState();
 		super.onPress(button);
 		initialTouchedPosition = children.indexOf(button);
 		dragOffset = touchedLabel.x - this.pointerIdToPos.get(0).x;
@@ -38,7 +37,7 @@ public class DraggableLabelList extends LabelList {
 		if (newPosition != initialTouchedPosition) {
 			((DraggableLabelListListener)listener).labelMoved(initialTouchedPosition, newPosition);
 		}
-		touchedLabel.setChecked(wasTouchedLabelChecked);
+		touchedLabel.setState(prevTouchedLabelState);
 		touchedLabel = null;
 		updateLabelPositions();
 	}
