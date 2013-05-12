@@ -20,6 +20,10 @@ public abstract class Shape extends Drawable {
 		this.group = group != null ? group : new ShapeGroup();
 	}
 	
+	public Shape(ShapeGroup group, Mesh2D fillMesh) {
+		this(group, fillMesh, null);
+	}
+	
 	public Shape(ShapeGroup group, Mesh2D fillMesh, Mesh2D outlineMesh) {
 		this(group);
 		this.fillMesh = fillMesh;
@@ -30,12 +34,19 @@ public abstract class Shape extends Drawable {
 		this.borderWeight = (int) borderWeight;
 	}
 	
+	protected abstract void createVertices(float[] fillColor);
 	protected abstract void createVertices(float[] fillColor, float[] outlineColor);
 
 	protected void update() {
 		fillMesh.index = 0;
-		outlineMesh.index = 0;
-		createVertices(fillMesh.color, outlineMesh.color);
+		if (outlineMesh != null) {
+			outlineMesh.index = 0;
+		}
+		if (outlineMesh != null) {
+			createVertices(fillMesh.color, outlineMesh.color);
+		} else {
+			createVertices(fillMesh.color);
+		}
 		if (shouldDraw && !group.contains(this)) {
 			this.group.add(this);
 		}
@@ -54,7 +65,7 @@ public abstract class Shape extends Drawable {
 	}
 	
 	public float[] getStrokeColor() {
-		return outlineMesh.color;
+		return outlineMesh != null ? outlineMesh.color : null;
 	}
 	
 	public float[] getFillColor() {

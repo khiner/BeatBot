@@ -181,6 +181,11 @@ public abstract class BBView implements Comparable<BBView> {
 			bgRect.draw();
 		}
 		draw();
+		drawChildren();
+		gl.glDisable(GL10.GL_SCISSOR_TEST);
+	}
+
+	protected void drawChildren() {
 		for (int i = 0; i < children.size(); i++) {
 			// not using foreach to avoid concurrent modification
 			BBView child = children.get(i);
@@ -189,9 +194,8 @@ public abstract class BBView implements Comparable<BBView> {
 			child.drawAll();
 			pop();
 		}
-		gl.glDisable(GL10.GL_SCISSOR_TEST);
 	}
-
+	
 	public void initGl(GL10 _gl) {
 		gl = _gl;
 		loadAllIcons();

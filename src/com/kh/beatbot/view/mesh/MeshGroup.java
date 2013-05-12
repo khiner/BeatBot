@@ -50,12 +50,12 @@ public class MeshGroup {
 		return children.contains(mesh);
 	}
 	
-	public void addMesh(Mesh2D mesh) {
+	public void add(Mesh2D mesh) {
 		children.add(mesh);
 		updateVertices();
 	}
-	
-	public void removeMesh(Mesh2D mesh) {
+
+	public void remove(Mesh2D mesh) {
 		if (!children.contains(mesh)) {
 			Log.e("MeshGroup", "Attempting to remove a mesh that is not a child.");
 			return;
@@ -64,7 +64,7 @@ public class MeshGroup {
 		updateVertices();
 	}
 	
-	public void replaceMesh(Mesh2D oldMesh, Mesh2D newMesh) {
+	public void replace(Mesh2D oldMesh, Mesh2D newMesh) {
 		if (oldMesh.getNumVertices() != newMesh.getNumVertices()) {
 			Log.e("MeshGroup", "Attempting to replace a mesh with a new one with different num vertices");
 			return;

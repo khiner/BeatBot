@@ -218,10 +218,9 @@ public class MidiView extends ClickableBBView {
 		float width = tickToUnscaledX(TickWindowHelper.MAX_TICKS - 1);
 		if (bgRect == null) {
 			bgRect = makeRectangle(bgShapeGroup, 0, 0, width, height,
-					Colors.MIDI_VIEW_BG, Colors.BLACK);
+					Colors.MIDI_VIEW_BG);
 		} else {
-			bgRect.update(0, 0, width, height, Colors.MIDI_VIEW_BG,
-					Colors.BLACK);
+			bgRect.update(0, 0, width, height, Colors.MIDI_VIEW_BG);
 		}
 		updateLoopRect();
 	}
@@ -274,10 +273,9 @@ public class MidiView extends ClickableBBView {
 				: Colors.TICK_SELECTED;
 		if (loopBarRect == null) {
 			loopBarRect = makeRectangle(tickBarShapeGroup, x, 0, width, height,
-					fillColor, Colors.TRANSPARANT);
+					fillColor);
 		} else {
-			loopBarRect.update(x, 0, width, height, fillColor,
-					Colors.TRANSPARANT);
+			loopBarRect.update(x, 0, width, height, fillColor);
 		}
 	}
 
@@ -287,10 +285,9 @@ public class MidiView extends ClickableBBView {
 		float width = tickToUnscaledX(midiManager.getLoopEndTick()) - x;
 		if (loopRect == null) {
 			loopRect = makeRectangle(bgShapeGroup, x, y, width, height,
-					Colors.MIDI_VIEW_LIGHT_BG, Colors.TRANSPARANT);
+					Colors.MIDI_VIEW_LIGHT_BG);
 		} else {
-			loopRect.update(x, y, width, height, Colors.MIDI_VIEW_LIGHT_BG,
-					Colors.TRANSPARANT);
+			loopRect.update(x, y, width, height, Colors.MIDI_VIEW_LIGHT_BG);
 		}
 	}
 
@@ -397,7 +394,7 @@ public class MidiView extends ClickableBBView {
 				/ (float) TickWindowHelper.getNumTicks(), 1);
 
 		// draws background and loop-background in one call
-		bgShapeGroup.draw((GL11) gl, 1);
+		bgShapeGroup.draw((GL11) gl, -1);
 
 		push();
 
@@ -418,7 +415,6 @@ public class MidiView extends ClickableBBView {
 		drawSelectRegion();
 		drawLoopMarker();
 		pop();
-		// drawLines(bgVb, Colors.BLACK, 3, GL10.GL_LINE_LOOP);
 		// ScrollBarHelper.drawScrollView(this);
 		if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			// if playing, draw curr tick
@@ -527,8 +523,18 @@ public class MidiView extends ClickableBBView {
 	}
 
 	private Rectangle makeRectangle(ShapeGroup group, float x1, float y1,
+			float width, float height, float[] fillColor) {
+		return makeRectangle(group, x1, y1, width, height, fillColor, null);
+	}
+	
+	private Rectangle makeRectangle(ShapeGroup group, float x1, float y1,
 			float width, float height, float[] fillColor, float[] outlineColor) {
-		Rectangle newRect = new Rectangle(group, fillColor, Colors.BLACK);
+		Rectangle newRect;
+		if (outlineColor == null) {
+			newRect = new Rectangle(group, fillColor);
+		} else {
+			newRect = new Rectangle(group, fillColor, outlineColor);
+		}
 		newRect.getGroup().add(newRect);
 		newRect.layout(x1, y1, width, height);
 		return newRect;

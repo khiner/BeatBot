@@ -12,6 +12,10 @@ public abstract class ShapeIconSource extends IconSource {
 	protected ShapeGroup shapeGroup;
 	protected boolean shouldDraw;
 	
+	public ShapeIconSource(ShapeGroup shapeGroup, ColorSet bgColorSet) {
+		this(shapeGroup, bgColorSet, null);
+	}
+	
 	public ShapeIconSource(ShapeGroup shapeGroup, ColorSet bgColorSet,
 			ColorSet borderColorSet) {
 		// if there is already a global group, then it will be drawn elsewhere.
@@ -41,7 +45,20 @@ public abstract class ShapeIconSource extends IconSource {
 	public void setShapeGroup(ShapeGroup shapeGroup) {
 		((Shape) currentIcon).setGroup(shapeGroup);
 	}
-		
+	
+	public void setFillColorSet(ColorSet fillColorSet) {
+		Drawable prevIcon = currentIcon;
+		setIcon(defaultIcon);
+		((Shape)defaultIcon).setFillColor(fillColorSet.defaultColor);
+		setIcon(pressedIcon);
+		((Shape)pressedIcon).setFillColor(fillColorSet.pressedColor);
+		if (fillColorSet.selectedColor != null) {
+			setIcon(selectedIcon);
+			((Shape)selectedIcon).setFillColor(fillColorSet.selectedColor);
+		}
+		setIcon(prevIcon);
+	}
+	
 	public void setColors(ColorSet fillColorSet, ColorSet outlineColorSet) {
 		Drawable prevIcon = currentIcon;
 		setIcon(defaultIcon);

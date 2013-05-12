@@ -2,6 +2,12 @@ package com.kh.beatbot.view.mesh;
 
 
 public class Rectangle extends Shape {
+	
+	public Rectangle(ShapeGroup group, float[] fillColor) {
+		// 6 vertices for rect fill (two triangles)
+		super(group, new Mesh2D(6, fillColor));
+	}
+	
 	public Rectangle(ShapeGroup group, float[] fillColor, float[] outlineColor) {
 		// 6 vertices for rect fill (two triangles)
 		// 8 vertices for rect outline (4 sides * 2 vertices per side)
@@ -9,23 +15,29 @@ public class Rectangle extends Shape {
 	}
 
 
+	public void update(float x, float y, float width, float height, float[] fillColor) {
+		update(x, y, width, height, fillColor, null);
+	}
+	
 	public void update(float x, float y, float width, float height, float[] fillColor, float[] outlineColor) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
 		fillMesh.color = fillColor;
-		outlineMesh.color = outlineColor;
+		if (outlineColor != null) {
+			outlineMesh.color = outlineColor;
+		}
 		update();
 	}
 	
-	protected void createVertices(float[] fillColor, float[] outlineColor) {
-		/********
-		 * ^--^ *
-		 * |1/| *
-		 * |/2| *
-		 * ^--^ *
-		 ********/
+	/********
+	 * ^--^ *
+	 * |1/| *
+	 * |/2| *
+	 * ^--^ *
+	 ********/
+	protected void createVertices(float[] fillColor) {
 		// fill triangle 1
 		fillMesh.vertex(x, y);
 		fillMesh.vertex(x + width, y);
@@ -35,8 +47,11 @@ public class Rectangle extends Shape {
 		fillMesh.vertex(x + width, y);
 		fillMesh.vertex(x + width, y + height);
 		
-		fillMesh.setColor(fillColor);
-		
+		fillMesh.setColor(fillColor);	
+	}
+	
+	protected void createVertices(float[] fillColor, float[] outlineColor) {
+		createVertices(fillColor);
 		// outline
 		outlineMesh.vertex(x, y);
 		outlineMesh.vertex(x + width, y);

@@ -134,7 +134,7 @@ public class ImageButton extends Button {
 		GLSurfaceViewBase.storeText(text);
 		textHeight = 5 * height / 8;
 		textWidth = GLSurfaceViewBase.getTextWidth(text, textHeight);
-		textXOffset = (iconSources[FOREGROUND_ICON_INDEX] != null ? iconOffset
+		textXOffset = (getIconSource() != null ? iconOffset
 				+ iconW + (width - iconW - iconOffset) / 2 : width / 2)
 				- textWidth / 2;
 		textXOffset += 2; // kludgey magic number correction,
@@ -161,7 +161,8 @@ public class ImageButton extends Button {
 	private float[] calcStrokeColor() {
 		IconSource bgIconSource = getBgIconSource();
 		if (bgIconSource != null && bgIconSource instanceof ShapeIconSource) {
-			return ((ShapeIconSource) bgIconSource).getCurrStrokeColor();
+			float[] color = ((ShapeIconSource) bgIconSource).getCurrStrokeColor();
+			return color != null ? color : Colors.WHITE;
 		} else {
 			if (pressed) {
 				return Colors.defaultStrokeColorSet.pressedColor;

@@ -14,33 +14,41 @@ public class ShapeGroup {
 
 	public void draw(GL11 gl, int borderWidth) {
 		fillGroup.draw(GL10.GL_TRIANGLES);
-		gl.glLineWidth(borderWidth);
-		outlineGroup.draw(GL10.GL_LINES);
+		if (borderWidth > 0) {
+			gl.glLineWidth(borderWidth);
+			outlineGroup.draw(GL10.GL_LINES);
+		}
 	}
 
 	public boolean contains(Shape shape) {
-		return fillGroup.contains(shape.fillMesh)
-				&& outlineGroup.contains(shape.outlineMesh);
+		return fillGroup.contains(shape.fillMesh) && (shape.outlineMesh == null
+				|| outlineGroup.contains(shape.outlineMesh));
 	}
 
 	public void add(Shape shape) {
-		fillGroup.addMesh(shape.fillMesh);
-		outlineGroup.addMesh(shape.outlineMesh);
+		fillGroup.add(shape.fillMesh);
+		if (shape.outlineMesh != null) {
+			outlineGroup.add(shape.outlineMesh);
+		}
 	}
 
 	public void remove(Shape shape) {
-		fillGroup.removeMesh(shape.fillMesh);
-		outlineGroup.removeMesh(shape.outlineMesh);
+		fillGroup.remove(shape.fillMesh);
+		outlineGroup.remove(shape.outlineMesh);
 	}
 
 	public void replace(Shape oldShape, Shape newShape) {
-		fillGroup.replaceMesh(oldShape.fillMesh, newShape.fillMesh);
-		outlineGroup.replaceMesh(oldShape.outlineMesh, newShape.outlineMesh);
+		fillGroup.replace(oldShape.fillMesh, newShape.fillMesh);
+		if (oldShape.outlineMesh != null && newShape.outlineMesh != null) {
+			outlineGroup.replace(oldShape.outlineMesh, newShape.outlineMesh);
+		}
 	}
 
 	public void update(Shape shape) {
 		fillGroup.updateVertices(shape.fillMesh);
-		outlineGroup.updateVertices(shape.outlineMesh);
+		if (shape.outlineMesh != null) {
+			outlineGroup.updateVertices(shape.outlineMesh);
+		}
 	}
 
 	public void clear() {

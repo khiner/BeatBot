@@ -10,8 +10,6 @@ package com.kh.beatbot.view.mesh;
  */
 public class Mesh2D {
 	
-	private MeshGroup parent;
-	
 	public int parentVertexIndex = -1;
 	protected float vertices[];
 	protected float colors[];
@@ -88,9 +86,5 @@ public class Mesh2D {
 			this.colors[i * 4 + 2] = color[2];
 			this.colors[i * 4 + 3] = color[3];
 		}
-	}
-	
-	public boolean hasParent() {
-		return parent != null;
 	}
 }

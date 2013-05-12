@@ -146,7 +146,8 @@ public class LevelsView extends TouchableBBView {
 	}
 
 	private void drawLevels() {
-		for (MidiNote midiNote : TrackManager.currTrack.getMidiNotes()) {
+		for (int i = 0; i < TrackManager.currTrack.getMidiNotes().size(); i++) {
+			MidiNote midiNote = TrackManager.currTrack.getMidiNotes().get(i);
 			drawLevel(tickToX(midiNote.getOnTick()),
 					midiNote.getLevel(currLevelType),
 					calcLevelColor(midiNote.isSelected()));

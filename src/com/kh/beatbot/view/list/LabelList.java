@@ -20,48 +20,55 @@ import com.kh.beatbot.view.control.ImageButton;
 public class LabelList extends ClickableBBView implements OnPressListener,
 		OnReleaseListener {
 
-	static enum LabelState { ON, OFF, EMPTY };
-	
-	protected static class Label extends ImageButton {
+	static enum LabelState {
+		ON, OFF, EMPTY
+	};
+
+	private static final ColorSet onColorSet = new ColorSet(Colors.VOLUME,
+			Colors.VOLUME_LIGHT);
+	private static final ColorSet offColorSet = new ColorSet(
+			Colors.LABEL_LIGHT, Colors.LABEL_VERY_LIGHT);
+	private static final ColorSet emptyColorSet = new ColorSet(
+			Colors.LABEL_DARK, Colors.LABEL_MED);
+
+	protected class Label extends ImageButton {
 		private LabelState state = LabelState.EMPTY;
-		
-		private static final ColorSet onColorSet = new ColorSet(Colors.VOLUME, Colors.VOLUME_LIGHT);
-		private static final ColorSet offColorSet = new ColorSet(Colors.LABEL_LIGHT, Colors.LABEL_VERY_LIGHT);
-		private static final ColorSet emptyColorSet = new ColorSet(Colors.LABEL_DARK, Colors.LABEL_MED);
-		private static final ColorSet outlineColorSet = new ColorSet(Colors.WHITE, Colors.WHITE);
-		
+
 		public Label() {
 			super();
 			setIconSource(plusIconSource);
-			setBgIconSource(new RoundedRectIconSource(null, emptyColorSet, outlineColorSet));
+			setBgIconSource(new RoundedRectIconSource(null, emptyColorSet));
 			setText("ADD");
 		}
-		
+
 		public void setState(LabelState state) {
-			ShapeIconSource bgShape = ((ShapeIconSource)this.getBgIconSource()); 
+			ShapeIconSource bgShape = ((ShapeIconSource) getBgIconSource());
 			this.state = state;
 			switch (state) {
-			case ON: bgShape.setColors(onColorSet, outlineColorSet);
-			break;
-			case OFF: bgShape.setColors(offColorSet, outlineColorSet);
-			break;
-			case EMPTY: bgShape.setColors(emptyColorSet, outlineColorSet);
-			break;
+			case ON:
+				bgShape.setFillColorSet(onColorSet);
+				break;
+			case OFF:
+				bgShape.setFillColorSet(offColorSet);
+				break;
+			case EMPTY:
+				bgShape.setFillColorSet(emptyColorSet);
+				break;
 			}
 		}
-		
+
 		public LabelState getState() {
 			return state;
 		}
-		
-		// we don't want labels to 'snap' back into place
+
+		// we don't want children to 'snap' back into place
 		// when dragging out of parent view after touching
 		@Override
 		public boolean containsPoint(float x, float y) {
 			return x > this.x && x < this.x + width;
 		}
 	}
-	
+
 	protected static final float GAP_BETWEEN_LABELS = 5;
 	protected static final float TEXT_Y_OFFSET = 3;
 	protected static ImageIconSource plusIconSource;
@@ -69,7 +76,6 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 
 	protected Label touchedLabel = null;
 
-	
 	public void setListener(LabelListListener listener) {
 		this.listener = listener;
 	}
@@ -91,7 +97,7 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 		// when a label becomes touched
 		newLabel.setOnPressListener(this);
 		newLabel.setOnReleaseListener(this);
-		addChild(newLabel);
+		children.add(newLabel);
 		layoutChildren();
 		newLabel.loadAllIcons();
 		return newLabel;
@@ -105,12 +111,12 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 			return;
 		}
 		if (text.isEmpty()) {
-			label.setText("ADD");
 			label.setIconSource(plusIconSource);
+			label.setText("ADD");
 			label.setState(LabelState.EMPTY);
 		} else {
-			label.setText(text);
 			label.setIconSource(null);
+			label.setText(text);
 		}
 	}
 
@@ -127,7 +133,7 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 
 	@Override
 	public void draw() {
-		bgRect.draw();
+
 	}
 
 	@Override
@@ -154,16 +160,16 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 
 	@Override
 	protected void createChildren() {
-		initBgRect(Colors.VIEW_BG, Colors.TRANSPARANT);
+		initBgRect(Colors.VIEW_BG, Colors.VOLUME);
 	}
 
 	@Override
 	public void layoutChildren() {
 		layoutBgRect(2, height / 5);
-		float labelW = (width - 6 - (children.size() - 1)
-				* GAP_BETWEEN_LABELS) / children.size();
-		
-		Collections.sort(children); // sort labels by position
+		float labelW = (width - 6 - (children.size() - 1) * GAP_BETWEEN_LABELS)
+				/ children.size();
+
+		Collections.sort(children); // sort children by position
 		float xTotal = 3;
 		for (BBView label : children) {
 			if (touchedLabel == null || !label.equals(touchedLabel)) {
@@ -172,20 +178,20 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 			xTotal += labelW + GAP_BETWEEN_LABELS;
 		}
 	}
-	
-	@Override
-	public void drawAll() {
-		draw();
-		for (BBView label : children) {
+
+	protected void drawChildren() {
+		for (int i = 0; i < children.size(); i++) {
 			// not using foreach to avoid concurrent modification
-			if (touchedLabel == null || !label.equals(touchedLabel)) {
-				push();
-				translate(label.x, label.y);
-				label.drawAll();
-				pop();
-			}
+			BBView child = children.get(i);
+			if (child.equals(touchedLabel))
+				continue;
+			push();
+			translate(child.x, child.y);
+			child.drawAll();
+			pop();
 		}
-		if (touchedLabel != null) { // draw touched last
+		// draw touched label last (ontop of others)
+		if (touchedLabel != null) {
 			push();
 			translate(touchedLabel.x, touchedLabel.y);
 			touchedLabel.drawAll();
