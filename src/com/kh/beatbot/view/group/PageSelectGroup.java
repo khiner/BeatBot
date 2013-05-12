@@ -21,11 +21,11 @@ import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class PageSelectGroup extends TouchableBBView {
-	private static final int LEVELS_FX_PAGE_ID = 0;
-	private static final int EDIT_PAGE_ID = 1;
-	private static final int ADSR_PAGE_ID = 2;
-	private static final int MASTER_PAGE_ID = 3;
-	private static final int NOTE_LEVELS_PAGE_ID = 4;
+	public static final int LEVELS_FX_PAGE_ID = 0;
+	public static final int EDIT_PAGE_ID = 1;
+	public static final int ADSR_PAGE_ID = 2;
+	public static final int MASTER_PAGE_ID = 3;
+	public static final int NOTE_LEVELS_PAGE_ID = 4;
 	
 	private static NoteLevelsPage levelsPage;
 	private static LevelsFXPage masterLevelsFxPage, trackLevelsFxPage;
@@ -34,10 +34,17 @@ public class PageSelectGroup extends TouchableBBView {
 	private static BBViewPager pager;
 
 	private static ImageButton addTrackButton, instrumentSelectButton, sampleSelectButton;
-	private static ToggleButton[] toggleButtons = new ToggleButton[5];
+	private static ToggleButton[] pageButtons = new ToggleButton[5];
 
 	private static ShapeGroup roundedRectGroup = new ShapeGroup();
 
+	public void selectPage(int pageNum) {
+		if (pageNum < 0 || pageNum >= pageButtons.length) {
+			return;
+		}
+		pageButtons[pageNum].trigger();
+	}
+	
 	public void update() {
 		updateInstrumentIcon();
 		updateSampleText();
@@ -74,11 +81,11 @@ public class PageSelectGroup extends TouchableBBView {
 		addTrackButton = new ImageButton();
 		instrumentSelectButton = new ImageButton();
 		sampleSelectButton = new ImageButton();
-		for (int i = 0; i < toggleButtons.length; i++) {
-			toggleButtons[i] = new ToggleButton();
+		for (int i = 0; i < pageButtons.length; i++) {
+			pageButtons[i] = new ToggleButton();
 		}
 
-		toggleButtons[NOTE_LEVELS_PAGE_ID] = new ToggleButton();
+		pageButtons[NOTE_LEVELS_PAGE_ID] = new ToggleButton();
 
 		addTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
@@ -101,14 +108,14 @@ public class PageSelectGroup extends TouchableBBView {
 			}
 		});
 
-		for (int i = 0; i < toggleButtons.length; i++) {
+		for (int i = 0; i < pageButtons.length; i++) {
 			final int id = i;
-			toggleButtons[i].setOnReleaseListener(new OnReleaseListener() {
+			pageButtons[i].setOnReleaseListener(new OnReleaseListener() {
 				@Override
 				public void onRelease(Button button) {
-					toggleButtons[id].setChecked(true);
+					pageButtons[id].setChecked(true);
 					// deselect all buttons except this one.
-					for (ToggleButton otherToggleButton : toggleButtons) {
+					for (ToggleButton otherToggleButton : pageButtons) {
 						if (!button.equals(otherToggleButton)) {
 							otherToggleButton.setChecked(false);
 						}
@@ -138,7 +145,7 @@ public class PageSelectGroup extends TouchableBBView {
 		addChild(addTrackButton);
 		addChild(instrumentSelectButton);
 		addChild(sampleSelectButton);
-		for (ToggleButton ToggleButton : toggleButtons) {
+		for (ToggleButton ToggleButton : pageButtons) {
 			addChild(ToggleButton);
 		}
 		addChild(pager);
@@ -155,12 +162,12 @@ public class PageSelectGroup extends TouchableBBView {
 				buttonHeight, buttonHeight);
 		sampleSelectButton.layout(this, buttonHeight * 2, labelYOffset,
 				labelWidth, buttonHeight);
-		for (int i = 0; i < toggleButtons.length - 1; i++) {
-			toggleButtons[i].layout(this,
+		for (int i = 0; i < pageButtons.length - 1; i++) {
+			pageButtons[i].layout(this,
 					buttonHeight * 2 + (i + 1) * labelWidth, labelYOffset,
 					labelWidth, buttonHeight);
 		}
-		toggleButtons[NOTE_LEVELS_PAGE_ID].layout(this, buttonHeight * 2 + 5
+		pageButtons[NOTE_LEVELS_PAGE_ID].layout(this, buttonHeight * 2 + 5
 				* labelWidth, labelYOffset, buttonHeight, buttonHeight);
 		pager.layout(this, 0, buttonHeight + 2 * labelYOffset, width, height
 				- buttonHeight - 2 * labelYOffset);
@@ -170,7 +177,7 @@ public class PageSelectGroup extends TouchableBBView {
 	protected void loadIcons() {
 		addTrackButton.setIconSource(new ImageIconSource(
 				R.drawable.plus_outline, R.drawable.plus_outline));
-		toggleButtons[NOTE_LEVELS_PAGE_ID].setIconSource(new ImageIconSource(
+		pageButtons[NOTE_LEVELS_PAGE_ID].setIconSource(new ImageIconSource(
 				R.drawable.levels_icon, -1, R.drawable.levels_icon_selected));
 		addTrackButton.setBgIconSource(new RoundedRectIconSource(
 				roundedRectGroup, Colors.labelBgColorSet,
@@ -181,15 +188,15 @@ public class PageSelectGroup extends TouchableBBView {
 		sampleSelectButton.setBgIconSource(new RoundedRectIconSource(
 				roundedRectGroup, Colors.labelBgColorSet,
 				Colors.labelStrokeColorSet));
-		for (int i = 0; i < toggleButtons.length; i++) {
-			toggleButtons[i].setBgIconSource(new RoundedRectIconSource(
+		for (int i = 0; i < pageButtons.length; i++) {
+			pageButtons[i].setBgIconSource(new RoundedRectIconSource(
 					roundedRectGroup, Colors.labelBgColorSet,
 					Colors.labelStrokeColorSet));
 		}
-		toggleButtons[LEVELS_FX_PAGE_ID].setText("FX");
-		toggleButtons[EDIT_PAGE_ID].setText("EDIT");
-		toggleButtons[ADSR_PAGE_ID].setText("ADSR");
-		toggleButtons[MASTER_PAGE_ID].setText("MASTER");
+		pageButtons[LEVELS_FX_PAGE_ID].setText("FX");
+		pageButtons[EDIT_PAGE_ID].setText("EDIT");
+		pageButtons[ADSR_PAGE_ID].setText("ADSR");
+		pageButtons[MASTER_PAGE_ID].setText("MASTER");
 	}
 
 	@Override

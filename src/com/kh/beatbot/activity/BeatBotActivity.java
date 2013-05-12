@@ -41,16 +41,16 @@ import com.kh.beatbot.view.group.BBViewPager;
 import com.kh.beatbot.view.group.GLSurfaceViewGroup;
 
 public class BeatBotActivity extends Activity {
-	
+
 	public static final int BPM_DIALOG_ID = 0;
 	public static final int EXIT_DIALOG_ID = 1;
-	
+
 	private GLSurfaceViewGroup mainSurface;
 	private BBViewPager activityPager;
 	private static AssetManager assetManager;
 
 	private EditText bpmInput;
-	
+
 	private static final int MAIN_PAGE_NUM = 0;
 	private static final int EFFECT_PAGE_NUM = 1;
 
@@ -153,8 +153,8 @@ public class BeatBotActivity extends Activity {
 				"REDRING-1969-v03.ttf");
 		GeneralUtils.initAndroidSettings(this);
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.FILL_PARENT,
-                LinearLayout.LayoutParams.FILL_PARENT);
+				LinearLayout.LayoutParams.FILL_PARENT,
+				LinearLayout.LayoutParams.FILL_PARENT);
 		LinearLayout layout = new LinearLayout(this);
 		mainSurface = new GLSurfaceViewGroup(this);
 		mainSurface.setLayoutParams(lp);
@@ -175,11 +175,10 @@ public class BeatBotActivity extends Activity {
 		activityPager.addPage(GlobalVars.mainPage);
 		activityPager.addPage(GlobalVars.effectPage);
 		activityPager.setPage(0);
-		
+
 		mainSurface.setBBRenderer(activityPager);
 
 		Managers.init(savedInstanceState);
-		Managers.trackManager.setTrack(0);
 	}
 
 	@Override
@@ -223,63 +222,71 @@ public class BeatBotActivity extends Activity {
 				Managers.playbackManager.getState() == PlaybackManager.State.PLAYING);
 	}
 
-	
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog) {
-		switch(id){
-	    case BPM_DIALOG_ID:
-	    	bpmInput.setText(String.valueOf((int)Managers.midiManager.getBPM()));
+		switch (id) {
+		case BPM_DIALOG_ID:
+			bpmInput.setText(String.valueOf((int) Managers.midiManager.getBPM()));
 			break;
-	    case EXIT_DIALOG_ID:
+		case EXIT_DIALOG_ID:
 			break;
-	    }	
+		}
 	}
-	
+
 	@Override
 	protected Dialog onCreateDialog(int id) {
-	    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-	    switch(id){
-	    case BPM_DIALOG_ID:
-	    	bpmInput = new EditText(this);
+		switch (id) {
+		case BPM_DIALOG_ID:
+			bpmInput = new EditText(this);
 			builder = new AlertDialog.Builder(GlobalVars.mainActivity);
-			
+
 			bpmInput.setKeyListener(DigitsKeyListener.getInstance("0123456789"));
-	        builder.setTitle("Set BPM").setView(bpmInput)
-	        .setPositiveButton("OK", new DialogInterface.OnClickListener() { 
-			    @Override
-			    public void onClick(DialogInterface dialog, int which) {
-			    	String bpmString = bpmInput.getText().toString();
-			    	if (!bpmString.isEmpty()) {
-			    		GlobalVars.mainPage.controlButtonGroup.bpmView.setBPM(Integer.valueOf(bpmString));
-			    	}
-			    }
-			}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			    @Override
-			    public void onClick(DialogInterface dialog, int which) {
-			        dialog.cancel();
-			    }
-			});
+			builder.setTitle("Set BPM")
+					.setView(bpmInput)
+					.setPositiveButton("OK",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									String bpmString = bpmInput.getText()
+											.toString();
+									if (!bpmString.isEmpty()) {
+										GlobalVars.mainPage.controlButtonGroup.bpmView
+												.setBPM(Integer
+														.valueOf(bpmString));
+									}
+								}
+							})
+					.setNegativeButton("Cancel",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dialog.cancel();
+								}
+							});
 			break;
-	    case EXIT_DIALOG_ID:
-	    	builder.setIcon(android.R.drawable.ic_dialog_alert)
-			.setTitle("Closing " + getString(R.string.app_name))
-			.setMessage("Are you sure you want to exit "
-							+ getString(R.string.app_name) + "?")
-			.setPositiveButton("Yes",
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog,
-								int which) {
-							finish();
-						}
-					})
-			.setNegativeButton("No", null);
+		case EXIT_DIALOG_ID:
+			builder.setIcon(android.R.drawable.ic_dialog_alert)
+					.setTitle("Closing " + getString(R.string.app_name))
+					.setMessage(
+							"Are you sure you want to exit "
+									+ getString(R.string.app_name) + "?")
+					.setPositiveButton("Yes",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									finish();
+								}
+							}).setNegativeButton("No", null);
 			break;
-	    }
-	    return builder.create();
+		}
+		return builder.create();
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -321,11 +328,20 @@ public class BeatBotActivity extends Activity {
 		}
 	}
 
+	/*
+	 * Set up the project.
+	 * For now, this just means setting track to #1
+	 */
+	public void setupProject() {
+		GlobalVars.mainPage.midiTrackControl.selectTrack(0);
+		GlobalVars.mainPage.pageSelectGroup.selectPage(0);
+	}
+
 	public void launchEffect(Effect effect) {
 		activityPager.setPage(EFFECT_PAGE_NUM);
 		GlobalVars.effectPage.loadEffect(effect);
 	}
-	
+
 	private void initNativeAudio() {
 		createEngine();
 		createAudioPlayer();

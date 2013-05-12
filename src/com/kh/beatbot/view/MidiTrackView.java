@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.microedition.khronos.opengles.GL11;
 
+import android.util.Log;
+
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -27,20 +29,23 @@ public class MidiTrackView extends TouchableBBView {
 
 		public void updateInstrumentIcon() {
 			instrumentButton.setIconSource(Managers.trackManager
-					.getTrack(trackNum).getInstrument().getIconSource());	
+					.getTrack(trackNum).getInstrument().getIconSource());
 		}
-		
+
 		@Override
 		protected void loadIcons() {
 			updateInstrumentIcon();
 			muteButton.setText("M");
 			soloButton.setText("S");
-			instrumentButton.setBgIconSource(new RoundedRectIconSource(roundedRectGroup,
-					Colors.instrumentBgColorSet, Colors.instrumentStrokeColorSet));
-			muteButton.setBgIconSource(new RoundedRectIconSource(roundedRectGroup,
-					Colors.muteButtonColorSet, Colors.labelStrokeColorSet));
-			soloButton.setBgIconSource(new RoundedRectIconSource(roundedRectGroup,
-					Colors.soloButtonColorSet, Colors.labelStrokeColorSet));
+			instrumentButton.setBgIconSource(new RoundedRectIconSource(
+					roundedRectGroup, Colors.instrumentBgColorSet,
+					Colors.instrumentStrokeColorSet));
+			muteButton.setBgIconSource(new RoundedRectIconSource(
+					roundedRectGroup, Colors.muteButtonColorSet,
+					Colors.labelStrokeColorSet));
+			soloButton.setBgIconSource(new RoundedRectIconSource(
+					roundedRectGroup, Colors.soloButtonColorSet,
+					Colors.labelStrokeColorSet));
 		}
 
 		@Override
@@ -111,13 +116,9 @@ public class MidiTrackView extends TouchableBBView {
 	private static List<ButtonRow> buttonRows = new ArrayList<ButtonRow>();
 	private static ShapeGroup roundedRectGroup = new ShapeGroup();
 	private float lastY = 0;
-	
-	protected void loadIcons() {
-		Managers.directoryManager.loadIcons();
-	}
 
 	public void updateInstrumentIcon(int trackNum) {
-		if (trackNum < 0 || trackNum >= buttonRows.size()) {
+		if (!checkTrackNum(trackNum)) {
 			return;
 		}
 		buttonRows.get(trackNum).updateInstrumentIcon();
@@ -133,6 +134,15 @@ public class MidiTrackView extends TouchableBBView {
 		}
 	}
 
+	public void selectTrack(int trackNum) {
+		if (!checkTrackNum(trackNum)) {
+			return;
+		}
+
+		ButtonRow row = buttonRows.get(trackNum);
+		row.instrumentButton.trigger();
+	}
+
 	public void draw() {
 		float newY = -absoluteY - TickWindowHelper.getYOffset();
 		if (newY != lastY) {
@@ -140,9 +150,9 @@ public class MidiTrackView extends TouchableBBView {
 		}
 		push();
 		translate(-absoluteX, -absoluteY);
-		roundedRectGroup.draw((GL11)BBView.gl, 1);
+		roundedRectGroup.draw((GL11) BBView.gl, 1);
 		pop();
-		lastY = newY; 
+		lastY = newY;
 	}
 
 	@Override
@@ -150,6 +160,10 @@ public class MidiTrackView extends TouchableBBView {
 		// nothing
 	}
 
+	protected void loadIcons() {
+		Managers.directoryManager.loadIcons();
+	}
+	
 	@Override
 	protected void createChildren() {
 		// all button rows are added dynamically as tracks are added
@@ -162,5 +176,14 @@ public class MidiTrackView extends TouchableBBView {
 			buttonRow.layout(this, 0, yPos, width, MidiView.trackHeight);
 			yPos += MidiView.trackHeight;
 		}
+	}
+	
+	private boolean checkTrackNum(int trackNum) {
+		if (trackNum < 0 || trackNum >= buttonRows.size()) {
+			Log.d("MidiTrackView", "Attempting to select track " + trackNum
+					+ "; curr num tracks = " + buttonRows.size());
+			return false;
+		}
+		return true;
 	}
 }
