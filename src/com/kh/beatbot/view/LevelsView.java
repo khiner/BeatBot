@@ -328,7 +328,7 @@ public class LevelsView extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		initBgRect();
+		initBgRect(Colors.VIEW_BG, Colors.VOLUME);
 	}
 
 	@Override

@@ -68,7 +68,7 @@ public class MidiTrackView extends TouchableBBView {
 							buttonRow.instrumentButton.setChecked(false);
 						}
 					}
-					Managers.trackManager.setCurrTrack(trackNum);
+					Managers.trackManager.setTrack(trackNum);
 				}
 			});
 			muteButton.setOnReleaseListener(new OnReleaseListener() {
@@ -139,7 +139,7 @@ public class MidiTrackView extends TouchableBBView {
 			layoutChildren();
 		}
 		push();
-		translate(-absoluteX, newY);
+		translate(-absoluteX, -absoluteY);
 		roundedRectGroup.draw((GL11)BBView.gl, 1);
 		pop();
 		lastY = newY; 

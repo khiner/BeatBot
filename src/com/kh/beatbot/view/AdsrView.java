@@ -220,7 +220,7 @@ public class AdsrView extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		initBgRect();
+		initBgRect(Colors.VIEW_BG, Colors.VOLUME);
 	}
 
 	@Override

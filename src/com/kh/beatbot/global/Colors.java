@@ -13,7 +13,8 @@ public class Colors {
 			BPM_OFF_SELECTED, VIEW_BG, SAMPLE_LOOP_HIGHLIGHT,
 			SAMPLE_LOOP_SELECT, SAMPLE_LOOP_SELECT_SELECTED,
 			SAMPLE_LOOP_SELECT_OUTLINE, LABEL_DARK, LABEL_MED, LABEL_LIGHT,
-			LABEL_VERY_LIGHT, LABEL_SELECTED, TRANSPARANT = { 0, 0, 0, 0 };
+			LABEL_VERY_LIGHT, LABEL_SELECTED, MIDI_SELECTED_TRACK,
+			TRANSPARANT = { 0, 0, 0, 0 };
 
 	public static float[][] MIDI_LINES = { { 0, 0, 0, 1 },
 			{ .1f, .1f, .1f, 1 }, { .2f, .2f, .2f, 1 }, { .3f, .3f, .3f, 1 },
@@ -78,7 +79,7 @@ public class Colors {
 		LABEL_VERY_LIGHT = colorResourceToFloats(activity,
 				R.color.labelVeryLight);
 		LABEL_SELECTED = colorResourceToFloats(activity, R.color.labelSelected);
-
+		MIDI_SELECTED_TRACK = new float[] { YELLOW[0], YELLOW[1], YELLOW[2], .38f };
 		labelBgColorSet = new ColorSet(LABEL_DARK, VOLUME, LABEL_SELECTED);
 		labelStrokeColorSet = new ColorSet(WHITE, WHITE, BLACK);
 
@@ -89,7 +90,8 @@ public class Colors {
 				LABEL_VERY_LIGHT, VOLUME_LIGHT);
 		effectLabelTouchedStrokeColorSet = new ColorSet(WHITE, WHITE, WHITE);
 
-		muteButtonColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, LEVEL_SELECTED);
+		muteButtonColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED,
+				LEVEL_SELECTED);
 		soloButtonColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, PITCH);
 
 		instrumentBgColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, VOLUME);

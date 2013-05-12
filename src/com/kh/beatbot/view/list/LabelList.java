@@ -154,7 +154,7 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 
 	@Override
 	protected void createChildren() {
-		initBgRect();
+		initBgRect(Colors.VIEW_BG, Colors.TRANSPARANT);
 	}
 
 	@Override

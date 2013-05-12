@@ -59,6 +59,8 @@ public class MidiView extends ClickableBBView {
 	// (in four calls - ouline and fill for each group)
 	private static ShapeGroup unselectedRectangles = new ShapeGroup();
 	private static ShapeGroup selectedRectangles = new ShapeGroup();
+	private static ShapeGroup bgShapeGroup = new ShapeGroup();
+	private static ShapeGroup tickBarShapeGroup = new ShapeGroup();
 
 	public float getMidiHeight() {
 		return height - Y_OFFSET;
@@ -86,15 +88,17 @@ public class MidiView extends ClickableBBView {
 
 	private MidiManager midiManager;
 
-	private FloatBuffer bgVb = null, currTickVb = null, hLineVb = null,
-			tickHLineVb = null, tickFillVb = null, selectRegionVb = null,
-			loopRectVb = null, loopBarVb;
+	private FloatBuffer currTickVb = null, hLineVb = null,
+			selectRegionVb = null;
 
 	private FloatBuffer[] loopMarkerVb = new FloatBuffer[2]; // loop triangle
 																// markers
 	private FloatBuffer[] loopMarkerLineVb = new FloatBuffer[2]; // vertical
 																	// line loop
 																	// markers
+
+	private Rectangle selectedNoteRect = null, bgRect = null, loopRect = null,
+			tickBarRect, loopBarRect;
 
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedNotes = new HashMap<Integer, MidiNote>();
@@ -210,25 +214,29 @@ public class MidiView extends ClickableBBView {
 		}
 	}
 
-	private void drawTickFill() {
-		drawTriangleFan(tickFillVb, Colors.TICK_FILL);
-		drawLoopBar();
-		drawLines(tickHLineVb, Colors.BLACK, 2, GL10.GL_LINES);
+	private void updateBgRect() {
+		float width = tickToUnscaledX(TickWindowHelper.MAX_TICKS - 1);
+		if (bgRect == null) {
+			bgRect = makeRectangle(bgShapeGroup, 0, 0, width, height,
+					Colors.MIDI_VIEW_BG, Colors.BLACK);
+		} else {
+			bgRect.update(0, 0, width, height, Colors.MIDI_VIEW_BG,
+					Colors.BLACK);
+		}
+		updateLoopRect();
 	}
 
-	private void drawLoopBar() {
-		float[] color = loopPointerIds[1] == -1 ? Colors.TICKBAR
-				: Colors.TICK_SELECTED;
-		// entire loop bar is selected. draw darker square
-		drawTriangleFan(loopBarVb, color);
-	}
-
-	private void drawLoopRect() {
-		drawTriangleFan(loopRectVb, Colors.MIDI_VIEW_LIGHT_BG);
-	}
-
-	private void initBgVb() {
-		bgVb = makeRectFloatBuffer(0, 0, width, height);
+	private void initSelectedNoteVb(int selectedNote) {
+		float x1 = 0;
+		float y1 = noteToUnscaledY(selectedNote);
+		float width = tickToUnscaledX(TickWindowHelper.MAX_TICKS - 1);
+		if (selectedNoteRect == null) {
+			selectedNoteRect = makeRectangle(null, x1, y1, width, trackHeight,
+					Colors.MIDI_SELECTED_TRACK, Colors.BLACK);
+		} else {
+			selectedNoteRect.update(x1, y1, width, trackHeight,
+					Colors.MIDI_SELECTED_TRACK, Colors.BLACK);
+		}
 	}
 
 	private void initSelectRegionVb(float leftTick, float rightTick,
@@ -248,20 +256,42 @@ public class MidiView extends ClickableBBView {
 		selectedRectangles.draw((GL11) gl, NOTE_BORDER_WIDTH);
 	}
 
-	private void initTickFillVb() {
-		tickFillVb = makeRectFloatBuffer(0, 0, width, Y_OFFSET);
+	private void updateTickFillRect() {
+		if (tickBarRect == null) {
+			tickBarRect = makeRectangle(tickBarShapeGroup, 0, 0, width,
+					Y_OFFSET, Colors.TICK_FILL, Colors.BLACK);
+		} else {
+			tickBarRect.update(0, 0, width, Y_OFFSET, Colors.TICK_FILL,
+					Colors.BLACK);
+		}
 	}
 
 	private void initLoopBarVb() {
-		loopBarVb = makeRectFloatBuffer(
-				tickToUnscaledX(midiManager.getLoopBeginTick()), 0,
-				tickToUnscaledX(midiManager.getLoopEndTick()), Y_OFFSET);
+		float x = tickToUnscaledX(midiManager.getLoopBeginTick());
+		float width = tickToUnscaledX(midiManager.getLoopEndTick()) - x;
+		float height = Y_OFFSET;
+		float[] fillColor = loopPointerIds[1] == -1 ? Colors.TICKBAR
+				: Colors.TICK_SELECTED;
+		if (loopBarRect == null) {
+			loopBarRect = makeRectangle(tickBarShapeGroup, x, 0, width, height,
+					fillColor, Colors.TRANSPARANT);
+		} else {
+			loopBarRect.update(x, 0, width, height, fillColor,
+					Colors.TRANSPARANT);
+		}
 	}
 
-	private void initLoopRectVb() {
-		loopRectVb = makeRectFloatBuffer(
-				tickToUnscaledX(midiManager.getLoopBeginTick()), Y_OFFSET,
-				tickToUnscaledX(midiManager.getLoopEndTick()), height);
+	private void updateLoopRect() {
+		float x = tickToUnscaledX(midiManager.getLoopBeginTick());
+		float y = Y_OFFSET;
+		float width = tickToUnscaledX(midiManager.getLoopEndTick()) - x;
+		if (loopRect == null) {
+			loopRect = makeRectangle(bgShapeGroup, x, y, width, height,
+					Colors.MIDI_VIEW_LIGHT_BG, Colors.TRANSPARANT);
+		} else {
+			loopRect.update(x, y, width, height, Colors.MIDI_VIEW_LIGHT_BG,
+					Colors.TRANSPARANT);
+		}
 	}
 
 	private void initCurrTickVb() {
@@ -271,15 +301,6 @@ public class MidiView extends ClickableBBView {
 
 	private void initHLineVb() {
 		float[] hLines = new float[(Managers.trackManager.getNumTracks() + 1) * 4];
-		float[] tickHLines = new float[8];
-		tickHLines[0] = 0;
-		tickHLines[1] = 0;
-		tickHLines[2] = width;
-		tickHLines[3] = 0;
-		tickHLines[4] = 0;
-		tickHLines[5] = Y_OFFSET;
-		tickHLines[6] = width;
-		tickHLines[7] = Y_OFFSET;
 
 		float y = Y_OFFSET;
 		for (int i = 1; i < Managers.trackManager.getNumTracks() + 1; i++) {
@@ -289,7 +310,6 @@ public class MidiView extends ClickableBBView {
 			hLines[i * 4 + 2] = width;
 			hLines[i * 4 + 3] = y;
 		}
-		tickHLineVb = makeFloatBuffer(tickHLines);
 		hLineVb = makeFloatBuffer(hLines);
 	}
 
@@ -324,7 +344,8 @@ public class MidiView extends ClickableBBView {
 	}
 
 	public static int yToNote(float y) {
-		return (int) ((y + TickWindowHelper.getYOffset() - Y_OFFSET) / trackHeight);
+		float f = ((y + TickWindowHelper.getYOffset() - Y_OFFSET) / trackHeight);
+		return f < 0 ? -1 : (int) f;
 	}
 
 	public static float noteToY(int note) {
@@ -335,20 +356,23 @@ public class MidiView extends ClickableBBView {
 		return note * trackHeight + Y_OFFSET;
 	}
 
-	public void trackAdded(int trackNum) {
+	public void notifyTrackAdded(int trackNum) {
 		allTracksHeight += trackHeight;
 		if (initialized)
 			initAllVbs();
 	}
 
+	public void notifyTrackChanged(int newTrackNum) {
+		initSelectedNoteVb(newTrackNum);
+	}
+
 	public void initAllVbs() {
-		initBgVb();
+		updateBgRect();
 		initCurrTickVb();
 		initHLineVb();
 		initLoopMarkerVbs();
-		initLoopRectVb();
+		updateTickFillRect();
 		initLoopBarVb();
-		initTickFillVb();
 	}
 
 	protected void loadIcons() {
@@ -365,7 +389,6 @@ public class MidiView extends ClickableBBView {
 	public void draw() {
 		TickWindowHelper.scroll(); // take care of any momentum scrolling
 
-		drawTriangleFan(bgVb, Colors.MIDI_VIEW_BG);
 		push();
 		translate(
 				-TickWindowHelper.getTickOffset()
@@ -373,21 +396,30 @@ public class MidiView extends ClickableBBView {
 		scale((float) TickWindowHelper.MAX_TICKS
 				/ (float) TickWindowHelper.getNumTicks(), 1);
 
-		drawLoopRect();
+		// draws background and loop-background in one call
+		bgShapeGroup.draw((GL11) gl, 1);
+
+		push();
+
+		push();
+		translate(0, -TickWindowHelper.getYOffset());
+		selectedNoteRect.draw();
+		pop();
 
 		TickWindowHelper.drawVerticalLines();
-		push();
 		translate(0, -TickWindowHelper.getYOffset());
 		drawHorizontalLines();
 		drawAllMidiNotes();
 		pop();
 
-		drawTickFill();
+		// draws tick rect and loop rect in one call
+		tickBarShapeGroup.draw((GL11) gl, 2);
+
 		drawSelectRegion();
 		drawLoopMarker();
 		pop();
-		drawLines(bgVb, Colors.BLACK, 3, GL10.GL_LINE_LOOP);
-		ScrollBarHelper.drawScrollView(this);
+		// drawLines(bgVb, Colors.BLACK, 3, GL10.GL_LINE_LOOP);
+		// ScrollBarHelper.drawScrollView(this);
 		if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
 			// if playing, draw curr tick
 			drawCurrentTick();
@@ -441,8 +473,8 @@ public class MidiView extends ClickableBBView {
 			newOnTick += onTickDiff;
 		if (midiNote.getOffTick() + offTickDiff <= TickWindowHelper.MAX_TICKS)
 			newOffTick += offTickDiff;
-		return midiManager.setNoteTicks(midiNote, (long) newOnTick, (long) newOffTick,
-				snapToGrid, false);
+		return midiManager.setNoteTicks(midiNote, (long) newOnTick,
+				(long) newOffTick, snapToGrid, false);
 	}
 
 	private void startSelectRegion(float x, float y) {
@@ -482,7 +514,6 @@ public class MidiView extends ClickableBBView {
 	public void createNoteView(MidiNote note) {
 		Rectangle noteRect = makeNoteRectangle(note);
 		note.setRectangle(noteRect);
-		noteRect.getGroup().add(note.getRectangle());
 	}
 
 	private Rectangle makeNoteRectangle(MidiNote note) {
@@ -490,9 +521,16 @@ public class MidiView extends ClickableBBView {
 		float y1 = noteToUnscaledY(note.getNoteValue());
 		float width = tickToUnscaledX(note.getOffTick()) - x1;
 
-		Rectangle newRect = new Rectangle(note.isSelected() ? selectedRectangles
-				: unselectedRectangles, whichColor(note), Colors.BLACK);
-		newRect.layout(x1, y1, width, trackHeight);
+		return makeRectangle(note.isSelected() ? selectedRectangles
+				: unselectedRectangles, x1, y1, width, trackHeight,
+				whichColor(note), Colors.BLACK);
+	}
+
+	private Rectangle makeRectangle(ShapeGroup group, float x1, float y1,
+			float width, float height, float[] fillColor, float[] outlineColor) {
+		Rectangle newRect = new Rectangle(group, fillColor, Colors.BLACK);
+		newRect.getGroup().add(newRect);
+		newRect.layout(x1, y1, width, height);
 		return newRect;
 	}
 
@@ -541,7 +579,7 @@ public class MidiView extends ClickableBBView {
 			return;
 		List<MidiNote> notesToDrag = dragAllSelected ? midiManager
 				.getSelectedNotes() : Arrays.asList(touchedNote);
-				
+
 		// dragging one note - drag all selected notes together
 		boolean changed = false;
 		for (MidiNote midiNote : notesToDrag) {
@@ -550,10 +588,12 @@ public class MidiView extends ClickableBBView {
 					.setNoteTicks(midiNote,
 							(long) (midiNote.getOnTick() + tickDiff),
 							(long) (midiNote.getOffTick() + tickDiff),
-							snapToGrid, true) || changed;
+							snapToGrid, true)
+					|| changed;
 			// check if we are actually changing note values
-			changed = midiManager.setNoteValue(midiNote, midiNote.getNoteValue()
-					+ noteDiff) || changed;
+			changed = midiManager.setNoteValue(midiNote,
+					midiNote.getNoteValue() + noteDiff)
+					|| changed;
 		}
 		if (changed) {
 			stateChanged = true;
@@ -566,7 +606,7 @@ public class MidiView extends ClickableBBView {
 		float offTickDiff = currRightTick - pinchRightAnchor;
 		if (onTickDiff == 0 && offTickDiff == 0)
 			return;
-		
+
 		boolean changed = false;
 		for (MidiNote midiNote : midiManager.getSelectedNotes()) {
 			changed = pinchNote(midiNote, onTickDiff, offTickDiff) || changed;
@@ -625,7 +665,7 @@ public class MidiView extends ClickableBBView {
 			return;
 		}
 		Managers.trackManager.updateAllTrackNextNotes();
-		initLoopRectVb();
+		updateLoopRect();
 		initLoopMarkerVbs();
 		initLoopBarVb();
 	}
@@ -779,6 +819,7 @@ public class MidiView extends ClickableBBView {
 		stateChanged = false;
 		startOnTicks.clear();
 		touchedNotes.clear();
+		initLoopBarVb();
 	}
 
 	@Override

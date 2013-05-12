@@ -179,7 +179,7 @@ public class BeatBotActivity extends Activity {
 		mainSurface.setBBRenderer(activityPager);
 
 		Managers.init(savedInstanceState);
-		Managers.trackManager.setCurrTrack(0);
+		Managers.trackManager.setTrack(0);
 	}
 
 	@Override

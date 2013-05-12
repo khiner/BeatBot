@@ -76,8 +76,8 @@ public abstract class BBView implements Comparable<BBView> {
 		createChildren();
 	}
 
-	public void initBgRect() {
-		bgRect = new RoundedRect(null, Colors.VIEW_BG, Colors.VOLUME);
+	public void initBgRect(float[] fillColor, float[] borderColor) {
+		bgRect = new RoundedRect(null, fillColor, borderColor);
 	}
 	
 	public float getBgRectRadius() {

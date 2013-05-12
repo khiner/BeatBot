@@ -46,11 +46,12 @@ public class TrackManager {
 		}
 	}
 	
-	public void setCurrTrack(int trackNum) {
+	public void setTrack(int trackNum) {
 		Track newTrack = tracks.get(trackNum);
 		if (newTrack == currTrack)
 			return;
 		currTrack = newTrack;
+		GlobalVars.mainPage.midiView.notifyTrackChanged(trackNum);
 		GlobalVars.mainPage.pageSelectGroup.notifyTrackChanged();
 	}
 	
