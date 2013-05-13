@@ -3,7 +3,7 @@ package com.kh.beatbot.effect;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.TrackManager;
 
 public abstract class Effect implements Comparable<Effect> {
 	protected List<Param> params = new ArrayList<Param>();
@@ -73,7 +73,7 @@ public abstract class Effect implements Comparable<Effect> {
 
 	public void removeEffect() {
 		removeEffect(trackNum, position);
-		Managers.trackManager.getBaseTrack(trackNum).removeEffect(this);
+		TrackManager.getBaseTrack(trackNum).removeEffect(this);
 	}
 
 	public void quantizeParams() {

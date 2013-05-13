@@ -13,6 +13,7 @@ import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.helper.ScrollBarHelper;
 import com.kh.beatbot.view.helper.TickWindowHelper;
@@ -138,7 +139,7 @@ public class MidiView extends ClickableBBView {
 	}
 
 	public MidiNote getMidiNote(int track, float tick) {
-		if (track < 0 || track >= Managers.trackManager.getNumTracks()) {
+		if (track < 0 || track >= TrackManager.getNumTracks()) {
 			return null;
 		}
 		for (int i = 0; i < midiManager.getMidiNotes().size(); i++) {
@@ -297,10 +298,10 @@ public class MidiView extends ClickableBBView {
 	}
 
 	private void initHLineVb() {
-		float[] hLines = new float[(Managers.trackManager.getNumTracks() + 1) * 4];
+		float[] hLines = new float[(TrackManager.getNumTracks() + 1) * 4];
 
 		float y = Y_OFFSET;
-		for (int i = 1; i < Managers.trackManager.getNumTracks() + 1; i++) {
+		for (int i = 1; i < TrackManager.getNumTracks() + 1; i++) {
 			y += trackHeight;
 			hLines[i * 4] = 0;
 			hLines[i * 4 + 1] = y;
@@ -452,9 +453,9 @@ public class MidiView extends ClickableBBView {
 				continue;
 			if (selectedNote.getNoteValue() < -adjustedNoteDiff) {
 				adjustedNoteDiff = -selectedNote.getNoteValue();
-			} else if (Managers.trackManager.getNumTracks() - 1
+			} else if (TrackManager.getNumTracks() - 1
 					- selectedNote.getNoteValue() < adjustedNoteDiff) {
-				adjustedNoteDiff = Managers.trackManager.getNumTracks() - 1
+				adjustedNoteDiff = TrackManager.getNumTracks() - 1
 						- selectedNote.getNoteValue();
 			}
 		}
@@ -670,7 +671,7 @@ public class MidiView extends ClickableBBView {
 		} else {
 			return;
 		}
-		Managers.trackManager.updateAllTrackNextNotes();
+		TrackManager.updateAllTrackNextNotes();
 		updateLoopRect();
 		initLoopMarkerVbs();
 		initLoopBarVb();
@@ -852,7 +853,7 @@ public class MidiView extends ClickableBBView {
 			if (midiManager.anyNoteSelected()) {
 				midiManager.deselectAllNotes();
 			} else { // add a note based on the current tick granularity
-				if (note >= 0 && note < Managers.trackManager.getNumTracks()) {
+				if (note >= 0 && note < TrackManager.getNumTracks()) {
 					addMidiNote(tick, note);
 				}
 			}

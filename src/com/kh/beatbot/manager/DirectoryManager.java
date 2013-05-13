@@ -30,7 +30,7 @@ public class DirectoryManager {
 			if (currDirectory == null) {
 				// Instrument type
 				if (addingTrack) {
-					Managers.trackManager.addTrack((Instrument) parent, item);
+					TrackManager.addTrack((Instrument) parent, item);
 				} else {
 					TrackManager.currTrack.setInstrument((Instrument) parent,
 							item);
@@ -162,12 +162,13 @@ public class DirectoryManager {
 						R.drawable.rimshot_icon_selected, -1,
 						R.drawable.rimshot_icon_selected,
 						R.drawable.rimshot_icon));
-		drumsDirectory.setIconSource(new ImageIconSource(-1, -1, -1, -1,
-				R.drawable.drums_icon_listview,
-				R.drawable.drums_icon_list_title));
+		drumsDirectory.setIconSource(new ImageIconSource(R.drawable.drums_icon,
+				R.drawable.drums_icon_selected, R.drawable.drums_icon_selected,
+				-1, R.drawable.drums_icon_selected, R.drawable.drums_icon));
 		internalRecordDirectory
 				.setIconSource(new ImageIconSource(R.drawable.microphone_icon,
-						R.drawable.microphone_icon_selected, -1, -1,
+						R.drawable.microphone_icon_selected,
+						R.drawable.microphone_icon_selected, -1,
 						R.drawable.microphone_icon_selected,
 						R.drawable.microphone_icon));
 		internalBeatRecordDirectory.setIconSource(new ImageIconSource(

@@ -36,17 +36,17 @@ public class TrackManager {
 		}
 	}
 
-	public Track getTrack(int trackNum) {
+	public static Track getTrack(int trackNum) {
 		return tracks.get(trackNum);
 	}
 
-	public void quantizeEffectParams() {
+	public static void quantizeEffectParams() {
 		for (Track track : tracks) {
 			track.quantizeEffectParams();
 		}
 	}
 	
-	public void setTrack(int trackNum) {
+	public static void setTrack(int trackNum) {
 		Track newTrack = tracks.get(trackNum);
 		if (newTrack == currTrack)
 			return;
@@ -55,17 +55,17 @@ public class TrackManager {
 		GlobalVars.mainPage.pageSelectGroup.notifyTrackChanged();
 	}
 	
-	public BaseTrack getBaseTrack(int trackNum) {
+	public static BaseTrack getBaseTrack(int trackNum) {
 		if (trackNum == MASTER_TRACK_ID)
 			return masterTrack;
 		return tracks.get(trackNum);
 	}
 	
-	public int getNumTracks() {
+	public static int getNumTracks() {
 		return tracks.size();
 	}
 
-	public void addTrack(Instrument instrument, int sampleNum) {
+	public static void addTrack(Instrument instrument, int sampleNum) {
 		addTrack(instrument.getSamplePath(sampleNum));
 		Track newTrack = new Track(tracks.size(), instrument, sampleNum);
 		tracks.add(newTrack);
@@ -73,17 +73,22 @@ public class TrackManager {
 		GlobalVars.mainPage.trackAdded(tracks.size() - 1);
 	}
 
-	public static native void addTrack(String sampleFileName);
-
-	/******* These methods are called FROM native code via JNI ********/
-
+	public static void deleteCurrTrack() {
+		// TODO
+	}
+	
 	public static MidiNote getNextMidiNote(int trackNum, long currTick) {
 		return tracks.get(trackNum).getNextMidiNote(currTick);
 	}
 
-	public void updateAllTrackNextNotes() {
+	public static void updateAllTrackNextNotes() {
 		for (Track track : tracks) {
 			track.updateNextNote();
 		}
 	}
+	
+	/******* These methods are called FROM native code via JNI ********/
+	
+	public static native void addTrack(String sampleFileName);
+
 }

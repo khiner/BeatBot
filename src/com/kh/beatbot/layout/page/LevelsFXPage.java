@@ -315,18 +315,16 @@ public class LevelsFXPage extends Page implements Level1dListener {
 	public void layoutChildren() {
 		float thirdHeight = height / 3;
 		float levelHeight = height / 12;
-		float effectHeight = height - height / 12 - thirdHeight;
-		float gapBetweenLabels = 5;
 
 		volumeToggle.layout(this, 0, levelHeight, 2 * thirdHeight, thirdHeight);
-		panToggle.layout(this, gapBetweenLabels + 2 * thirdHeight, levelHeight,
-				2 * thirdHeight, thirdHeight);
-		pitchToggle.layout(this, gapBetweenLabels * 2 + 4 * thirdHeight,
-				levelHeight, 2 * thirdHeight, thirdHeight);
-		levelBar.layout(this, gapBetweenLabels * 3 + 6 * thirdHeight, levelHeight, width - 2 * height,
+		panToggle.layout(this, 2 * thirdHeight, levelHeight, 2 * thirdHeight,
 				thirdHeight);
-		effectLabel.layout(this, 0, effectHeight, width / 5, thirdHeight);
-		effectLabelList.layout(this, width / 5, effectHeight, 4 * width / 5,
+		pitchToggle.layout(this, 4 * thirdHeight, levelHeight, 2 * thirdHeight,
 				thirdHeight);
+		levelBar.layout(this, 6 * thirdHeight, levelHeight, width - 2 * height,
+				thirdHeight);
+		effectLabel.layout(this, 0, 13 * height / 24, width / 5, thirdHeight);
+		effectLabelList.layout(this, width / 5, height / 2, 4 * width / 5,
+				5 * height / 12);
 	}
 }

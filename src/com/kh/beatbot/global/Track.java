@@ -174,6 +174,10 @@ public class Track extends BaseTrack {
 		return instrument.getSampleName(currSampleNum);
 	}
 
+	public void setCurrSampleName(String name) {
+		instrument.setSampleName(currSampleNum, name);
+	}
+	
 	public String getSamplePath() {
 		return instrument.getSamplePath(currSampleNum);
 	}

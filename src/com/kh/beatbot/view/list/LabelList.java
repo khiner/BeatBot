@@ -128,6 +128,7 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 	@Override
 	public void init() {
 		GLSurfaceViewBase.storeText("ADD");
+		layoutBgRect(2, height / 6);
 		listener.labelListInitialized(this);
 	}
 
@@ -165,15 +166,14 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 
 	@Override
 	public void layoutChildren() {
-		layoutBgRect(2, height / 5);
-		float labelW = (width - 6 - (children.size() - 1) * GAP_BETWEEN_LABELS)
+		float labelW = (width - borderOffset * 3 - (children.size() - 1) * GAP_BETWEEN_LABELS)
 				/ children.size();
 
 		Collections.sort(children); // sort children by position
-		float xTotal = 3;
+		float xTotal = 3 * borderOffset / 2;
 		for (BBView label : children) {
 			if (touchedLabel == null || !label.equals(touchedLabel)) {
-				label.layout(this, xTotal, 3, labelW, height - 6);
+				label.layout(this, xTotal, 3 * borderOffset / 2, labelW, height - borderOffset * 3);
 			}
 			xTotal += labelW + GAP_BETWEEN_LABELS;
 		}

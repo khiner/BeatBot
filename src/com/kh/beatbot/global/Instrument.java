@@ -24,6 +24,10 @@ public class Instrument extends BBDirectory {
 		return sampleNames[sampleNum];
 	}
 
+	public void setSampleName(int sampleNum, String name) {
+		// TODO
+	}
+	
 	public String getSamplePath(int sampleNum) {
 		return path + getSampleName(sampleNum);
 	}

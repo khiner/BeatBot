@@ -210,7 +210,7 @@ public abstract class BBView implements Comparable<BBView> {
 
 	protected void layoutBgRect(float borderWeight, float borderRadius) {
 		if (bgRect != null) {
-			borderOffset = borderWeight / 2;
+			borderOffset = borderWeight * 2;
 			bgRect.setBorderWeight(borderWeight);
 			bgRect.setCornerRadius(borderRadius);
 			bgRect.layout(borderOffset, borderOffset, width - borderOffset * 2,

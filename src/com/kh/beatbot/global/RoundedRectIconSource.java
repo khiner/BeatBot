@@ -40,8 +40,8 @@ public class RoundedRectIconSource extends ShapeIconSource {
 		float centerX = width / 2;
 		float centerY = height / 2;
 
-		float scaledW = width - 2;
-		float scaledH = height - 2;
+		float scaledW = width - 4;
+		float scaledH = height - 4;
 
 		float dim = Math.min(width, height);
 		float downW = scaledW - dim * .10f;
@@ -49,7 +49,7 @@ public class RoundedRectIconSource extends ShapeIconSource {
 
 		Drawable prevIcon = currentIcon;
 		setIcon(defaultIcon);
-		defaultIcon.layout(this.x + 1, this.y + 1, scaledW, scaledH);
+		defaultIcon.layout(this.x + 2, this.y + 2, scaledW, scaledH);
 		setIcon(pressedIcon);
 		pressedIcon.layout(this.x + centerX - downW / 2, this.y + centerY
 				- downH / 2, downW, downH);

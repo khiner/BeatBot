@@ -1,7 +1,7 @@
 package com.kh.beatbot.layout.page;
 
 import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.MidiTrackView;
 import com.kh.beatbot.view.MidiView;
 import com.kh.beatbot.view.TouchableBBView;
@@ -59,7 +59,7 @@ public class MainPage extends TouchableBBView {
 	public void layoutChildren() {
 		float controlButtonHeight = height / 10;
 		float midiHeight = 3 * (height - controlButtonHeight) / 5;
-		int numTracks = Managers.trackManager.getNumTracks();
+		int numTracks = TrackManager.getNumTracks();
 		MidiView.allTracksHeight = midiHeight - MidiView.Y_OFFSET;
 		MidiView.trackHeight = MidiView.allTracksHeight / numTracks;
 		float trackControlWidth = MidiView.trackHeight * 2.5f;

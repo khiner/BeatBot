@@ -10,7 +10,7 @@ public class DraggableLabelList extends LabelList {
 	private LabelState prevTouchedLabelState = LabelState.EMPTY;
 	
 	@Override
-	public void handleActionMove(int id, float x, float y) {
+	public synchronized void handleActionMove(int id, float x, float y) {
 		super.handleActionMove(id, x, y);
 		if (touchedLabel == null || id != 0) {
 			return;

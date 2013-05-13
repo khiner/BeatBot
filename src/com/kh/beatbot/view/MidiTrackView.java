@@ -11,6 +11,7 @@ import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.control.Button;
 import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.helper.TickWindowHelper;
@@ -28,7 +29,7 @@ public class MidiTrackView extends TouchableBBView {
 		}
 
 		public void updateInstrumentIcon() {
-			instrumentButton.setIconSource(Managers.trackManager
+			instrumentButton.setIconSource(TrackManager
 					.getTrack(trackNum).getInstrument().getIconSource());
 		}
 
@@ -73,13 +74,13 @@ public class MidiTrackView extends TouchableBBView {
 							buttonRow.instrumentButton.setChecked(false);
 						}
 					}
-					Managers.trackManager.setTrack(trackNum);
+					TrackManager.setTrack(trackNum);
 				}
 			});
 			muteButton.setOnReleaseListener(new OnReleaseListener() {
 				@Override
 				public void onRelease(Button button) {
-					Managers.trackManager.getTrack(trackNum).mute(
+					TrackManager.getTrack(trackNum).mute(
 							muteButton.isChecked());
 				}
 			});
@@ -95,7 +96,7 @@ public class MidiTrackView extends TouchableBBView {
 							}
 						}
 					}
-					Managers.trackManager.getTrack(trackNum).solo(
+					TrackManager.getTrack(trackNum).solo(
 							soloButton.isChecked());
 				}
 			});

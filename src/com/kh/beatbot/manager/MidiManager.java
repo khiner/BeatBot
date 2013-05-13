@@ -73,14 +73,14 @@ public class MidiManager implements Parcelable {
 		tempo.setBpm(bpm);
 		setNativeBPM(bpm);
 		setNativeMSPT(tempo.getMpqn() / RESOLUTION);
-		Managers.trackManager.quantizeEffectParams();
+		TrackManager.quantizeEffectParams();
 		return (int) bpm;
 	}
 
 	public List<MidiNote> getMidiNotes() {
 		List<MidiNote> midiNotes = new ArrayList<MidiNote>();
-		for (int i = 0; i < Managers.trackManager.getNumTracks(); i++) {
-			Track track = Managers.trackManager.getTrack(i);
+		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
+			Track track = TrackManager.getTrack(i);
 			for (MidiNote midiNote : track.getMidiNotes()) {
 				midiNotes.add(midiNote);
 			}
@@ -90,8 +90,8 @@ public class MidiManager implements Parcelable {
 
 	public List<MidiNote> getSelectedNotes() {
 		ArrayList<MidiNote> selectedNotes = new ArrayList<MidiNote>();
-		for (int i = 0; i < Managers.trackManager.getNumTracks(); i++) {
-			Track track = Managers.trackManager.getTrack(i);
+		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
+			Track track = TrackManager.getTrack(i);
 			for (MidiNote midiNote : track.getMidiNotes()) {
 				if (midiNote.isSelected()) {
 					selectedNotes.add(midiNote);
@@ -102,8 +102,8 @@ public class MidiManager implements Parcelable {
 	}
 
 	public void deselectAllNotes() {
-		for (int i = 0; i < Managers.trackManager.getNumTracks(); i++) {
-			Track track = Managers.trackManager.getTrack(i);
+		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
+			Track track = TrackManager.getTrack(i);
 			for (MidiNote midiNote : track.getMidiNotes()) {
 				deselectNote(midiNote);
 			}
@@ -112,8 +112,8 @@ public class MidiManager implements Parcelable {
 
 	// return true if any Midi note is selected
 	public boolean anyNoteSelected() {
-		for (int i = 0; i < Managers.trackManager.getNumTracks(); i++) {
-			Track track = Managers.trackManager.getTrack(i);
+		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
+			Track track = TrackManager.getTrack(i);
 			for (MidiNote midiNote : track.getMidiNotes()) {
 				if (midiNote.isSelected()) {
 					return true;
@@ -138,8 +138,8 @@ public class MidiManager implements Parcelable {
 
 	public void selectRegion(long leftTick, long rightTick, int topNote,
 			int bottomNote) {
-		for (int i = 0; i < Managers.trackManager.getNumTracks(); i++) {
-			Track track = Managers.trackManager.getTrack(i);
+		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
+			Track track = TrackManager.getTrack(i);
 			for (MidiNote midiNote : track.getMidiNotes()) {
 				// conditions for region selection
 				boolean a = leftTick < midiNote.getOffTick();
@@ -158,7 +158,7 @@ public class MidiManager implements Parcelable {
 
 	public void selectRow(int rowNum) {
 		deselectAllNotes();
-		for (MidiNote midiNote : Managers.trackManager.getTrack(rowNum)
+		for (MidiNote midiNote : TrackManager.getTrack(rowNum)
 				.getMidiNotes()) {
 			selectNote(midiNote);
 		}
@@ -178,14 +178,14 @@ public class MidiManager implements Parcelable {
 	}
 
 	private void addNote(MidiNote midiNote) {
-		Track track = Managers.trackManager.getTrack(midiNote.getNoteValue());
+		Track track = TrackManager.getTrack(midiNote.getNoteValue());
 		track.addNote(midiNote);
 		GlobalVars.mainPage.midiView.createNoteView(midiNote);
 	}
 
 	public void deleteNote(MidiNote midiNote) {
 		midiNote.getRectangle().getGroup().remove(midiNote.getRectangle());
-		Track track = Managers.trackManager.getTrack(midiNote.getNoteValue());
+		Track track = TrackManager.getTrack(midiNote.getNoteValue());
 		track.removeNote(midiNote);
 		updateEditIcons();
 	}
@@ -239,8 +239,8 @@ public class MidiManager implements Parcelable {
 	}
 
 	public void clearNotes() {
-		for (int i = 0; i < Managers.trackManager.getNumTracks(); i++) {
-			Track track = Managers.trackManager.getTrack(i);
+		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
+			Track track = TrackManager.getTrack(i);
 			while (!track.getMidiNotes().isEmpty()) {
 				deleteNote(track.getMidiNotes().get(0)); // avoid concurrent mod
 															// error
@@ -253,8 +253,8 @@ public class MidiManager implements Parcelable {
 		if (oldNote == newNote)
 			return false;
 		midiNote.setNote(newNote);
-		Track oldTrack = Managers.trackManager.getTrack(oldNote);
-		Track newTrack = Managers.trackManager.getTrack(newNote);
+		Track oldTrack = TrackManager.getTrack(oldNote);
+		Track newTrack = TrackManager.getTrack(newNote);
 		oldTrack.removeNote(midiNote);
 		newTrack.addNote(midiNote);
 		return true;
@@ -275,7 +275,7 @@ public class MidiManager implements Parcelable {
 		}
 		if (maintainNoteLength)
 			offTick = midiNote.getOffTick() + onTick - midiNote.getOnTick();
-		Track track = Managers.trackManager.getTrack(midiNote.getNoteValue());
+		Track track = TrackManager.getTrack(midiNote.getNoteValue());
 		return track.setNoteTicks(midiNote, onTick, offTick);
 	}
 
@@ -335,8 +335,8 @@ public class MidiManager implements Parcelable {
 	}
 
 	public void handleMidiCollisions() {
-		for (int trackNum = 0; trackNum < Managers.trackManager.getNumTracks(); trackNum++) {
-			Managers.trackManager.getTrack(trackNum).handleNoteCollisions();
+		for (int trackNum = 0; trackNum < TrackManager.getNumTracks(); trackNum++) {
+			TrackManager.getTrack(trackNum).handleNoteCollisions();
 		}
 	}
 
