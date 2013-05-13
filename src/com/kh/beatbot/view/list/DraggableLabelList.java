@@ -28,7 +28,7 @@ public class DraggableLabelList extends LabelList {
 	}
 	
 	@Override
-	public void onRelease(Button button) {
+	public synchronized void onRelease(Button button) {
 		// notify listener of the touched label's old and new position in list
 		int newPosition = children.indexOf(button);
 		if (newPosition != initialTouchedPosition) {

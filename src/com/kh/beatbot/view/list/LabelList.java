@@ -179,15 +179,13 @@ public class LabelList extends ClickableBBView implements OnPressListener,
 		}
 	}
 
-	protected void drawChildren() {
-		for (int i = 0; i < children.size(); i++) {
-			// not using foreach to avoid concurrent modification
-			BBView child = children.get(i);
-			if (child.equals(touchedLabel))
+	protected synchronized void drawChildren() {
+		for (BBView label : children) {
+			if (label.equals(touchedLabel))
 				continue;
 			push();
-			translate(child.x, child.y);
-			child.drawAll();
+			translate(label.x, label.y);
+			label.drawAll();
 			pop();
 		}
 		// draw touched label last (ontop of others)

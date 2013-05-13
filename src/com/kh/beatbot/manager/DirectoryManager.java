@@ -134,52 +134,50 @@ public class DirectoryManager {
 	}
 
 	public void loadIcons() {
-		getDrumInstrument(0).setIconSource(new ImageIconSource(
-				R.drawable.kick_icon,
-				R.drawable.kick_icon, -1, -1,
-				R.drawable.kick_icon_listview,
-				R.drawable.kick_icon_list_title));
-		getDrumInstrument(1).setIconSource(new ImageIconSource(
-				R.drawable.snare_icon,
-				-1, -1, -1,
-				R.drawable.snare_icon_listview,
-				R.drawable.snare_icon_list_title));
-		getDrumInstrument(2).setIconSource(new ImageIconSource(
-				R.drawable.hh_closed_icon,
-				-1, -1, -1,
-				R.drawable.hh_closed_icon_listview,
-				R.drawable.hh_closed_icon_list_title));
-		getDrumInstrument(3).setIconSource(new ImageIconSource(
-				R.drawable.hh_open_icon,
-				-1, -1, -1,
-				R.drawable.hh_open_icon_listview,
-				R.drawable.hh_open_icon_list_title));
-		getDrumInstrument(4).setIconSource(new ImageIconSource(
-				R.drawable.rimshot_icon,
-				-1, -1, -1,
-				R.drawable.rimshot_icon_listview,
-				R.drawable.rimshot_icon_list_title));
-		drumsDirectory.setIconSource(new ImageIconSource(
-				-1, -1, -1, -1,
+		getDrumInstrument(0).setIconSource(
+				new ImageIconSource(R.drawable.kick_icon,
+						R.drawable.kick_icon_selected,
+						R.drawable.kick_icon_selected, -1,
+						R.drawable.kick_icon_selected, R.drawable.kick_icon));
+		getDrumInstrument(1).setIconSource(
+				new ImageIconSource(R.drawable.snare_icon,
+						R.drawable.snare_icon_selected,
+						R.drawable.snare_icon_selected, -1,
+						R.drawable.snare_icon_selected, R.drawable.snare_icon));
+		getDrumInstrument(2).setIconSource(
+				new ImageIconSource(R.drawable.hh_closed_icon,
+						R.drawable.hh_closed_icon_selected,
+						R.drawable.hh_closed_icon_selected, -1,
+						R.drawable.hh_closed_icon_selected,
+						R.drawable.hh_closed_icon));
+		getDrumInstrument(3).setIconSource(
+				new ImageIconSource(R.drawable.hh_open_icon,
+						R.drawable.hh_open_icon_selected,
+						R.drawable.hh_open_icon_selected, -1,
+						R.drawable.hh_open_icon_selected,
+						R.drawable.hh_open_icon));
+		getDrumInstrument(4).setIconSource(
+				new ImageIconSource(R.drawable.rimshot_icon,
+						R.drawable.rimshot_icon_selected,
+						R.drawable.rimshot_icon_selected, -1,
+						R.drawable.rimshot_icon_selected,
+						R.drawable.rimshot_icon));
+		drumsDirectory.setIconSource(new ImageIconSource(-1, -1, -1, -1,
 				R.drawable.drums_icon_listview,
 				R.drawable.drums_icon_list_title));
-		internalRecordDirectory.setIconSource(new ImageIconSource(
-				R.drawable.microphone_icon,
-				R.drawable.microphone_icon_selected,
-				-1,
-				-1,
-				R.drawable.microphone_icon_listview,
-				R.drawable.microphone_icon_list_title));
+		internalRecordDirectory
+				.setIconSource(new ImageIconSource(R.drawable.microphone_icon,
+						R.drawable.microphone_icon_selected, -1, -1,
+						R.drawable.microphone_icon_selected,
+						R.drawable.microphone_icon));
 		internalBeatRecordDirectory.setIconSource(new ImageIconSource(
-				R.drawable.beat_icon,
-				-1, -1, -1,
-				R.drawable.beat_icon_listview,
-				R.drawable.beat_icon_list_title));
+				R.drawable.beat_icon, R.drawable.beat_icon_selected,
+				R.drawable.beat_icon_selected, -1,
+				R.drawable.beat_icon_selected, R.drawable.beat_icon));
 		internalSampleRecordDirectory.setIconSource(new ImageIconSource(
-				R.drawable.sample_icon,
-				-1, -1, -1,
-				R.drawable.sample_icon_listview,
-				R.drawable.sample_icon_list_title));
+				R.drawable.sample_icon, R.drawable.sample_icon_selected,
+				R.drawable.sample_icon_selected, -1,
+				R.drawable.sample_icon_selected, R.drawable.sample_icon));
 	}
 
 	public static String appDirectoryPath;
@@ -206,7 +204,7 @@ public class DirectoryManager {
 	private BBDirectory currDirectory = null;
 
 	private boolean addingTrack = false;
-	
+
 	public static DirectoryManager getInstance() {
 		if (singletonInstance == null) {
 			singletonInstance = new DirectoryManager();
@@ -316,8 +314,9 @@ public class DirectoryManager {
 
 	private void updateInstrumentSelectTitleBar() {
 		if (currDirectory.getListTitleResource() != -1) {
-			instrumentSelectAlertBuilder.setIcon(currDirectory.getListTitleResource())
-			.setTitle(currDirectory.getName().toUpperCase());
+			instrumentSelectAlertBuilder.setIcon(
+					currDirectory.getListTitleResource()).setTitle(
+					currDirectory.getName().toUpperCase());
 		} else {
 			instrumentSelectAlertBuilder.setIcon(0).setTitle(
 					"Choose Instrument");
@@ -340,7 +339,8 @@ public class DirectoryManager {
 					return v;
 				}
 				tv.setCompoundDrawablesWithIntrinsicBounds(
-						directory.getChild(position).getListViewResource(), 0, 0, 0);
+						directory.getChild(position).getListViewResource(), 0,
+						0, 0);
 				// Add margin between image and text (support various screen
 				// densities)
 				int dpMargin = (int) (15 * GlobalVars.mainActivity

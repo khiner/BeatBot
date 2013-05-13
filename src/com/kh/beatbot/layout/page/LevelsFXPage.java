@@ -103,20 +103,20 @@ public class LevelsFXPage extends Page implements Level1dListener {
 	}
 
 	// levels attrs
-	private Seekbar levelBar;
-	private ToggleButton volumeToggle, panToggle, pitchToggle;
-	private ToggleButton effectLabel;
-	private boolean masterMode = false;
+	protected Seekbar levelBar;
+	protected ToggleButton volumeToggle, panToggle, pitchToggle;
+	protected ToggleButton effectLabel;
+	protected boolean masterMode = false;
 
-	private ShapeGroup labelGroup;
-	
+	protected ShapeGroup labelGroup;
+
 	// effects attrs
-	private DraggableLabelList effectLabelList;
-	private String[] effectNames;
-	
+	protected DraggableLabelList effectLabelList;
+	protected String[] effectNames;
+
 	public void init() {
 	}
-	
+
 	@Override
 	public void update() {
 		updateLevels();
@@ -153,7 +153,7 @@ public class LevelsFXPage extends Page implements Level1dListener {
 		levelBar.setLevelColor(getActiveLevelColor());
 		levelBar.setLevel(getActiveLevel());
 	}
-	
+
 	private void updateEffects() {
 		if (effectLabelList.numChildren() <= 0)
 			return;
@@ -165,9 +165,9 @@ public class LevelsFXPage extends Page implements Level1dListener {
 				effectLabelList.setLabelText(i, effect.getName());
 				effectLabelList.setLabelOn(i, effect.isOn());
 			}
-		}		
+		}
 	}
-	
+
 	private void deselectAll() {
 		volumeToggle.setChecked(false);
 		panToggle.setChecked(false);
@@ -253,16 +253,19 @@ public class LevelsFXPage extends Page implements Level1dListener {
 		volumeToggle.setText("VOL");
 		panToggle.setText("PAN");
 		pitchToggle.setText("PIT");
-		volumeToggle.setBgIconSource(new RoundedRectIconSource(labelGroup, Colors.volumeBgColorSet, Colors.volumeStrokeColorSet));
-		panToggle.setBgIconSource(new RoundedRectIconSource(labelGroup, Colors.panBgColorSet, Colors.panStrokeColorSet));
-		pitchToggle.setBgIconSource(new RoundedRectIconSource(labelGroup, Colors.pitchBgColorSet, Colors.pitchStrokeColorSet));
+		volumeToggle.setBgIconSource(new RoundedRectIconSource(labelGroup,
+				Colors.volumeBgColorSet, Colors.volumeStrokeColorSet));
+		panToggle.setBgIconSource(new RoundedRectIconSource(labelGroup,
+				Colors.panBgColorSet, Colors.panStrokeColorSet));
+		pitchToggle.setBgIconSource(new RoundedRectIconSource(labelGroup,
+				Colors.pitchBgColorSet, Colors.pitchStrokeColorSet));
 	}
 
 	@Override
 	public void draw() {
 		push();
 		translate(-absoluteX, -absoluteY);
-		labelGroup.draw((GL11)BBView.gl, 2);
+		labelGroup.draw((GL11) BBView.gl, 2);
 		pop();
 	}
 
@@ -313,13 +316,14 @@ public class LevelsFXPage extends Page implements Level1dListener {
 		float thirdHeight = height / 3;
 		float levelHeight = height / 12;
 		float effectHeight = height - height / 12 - thirdHeight;
+		float gapBetweenLabels = 5;
 
 		volumeToggle.layout(this, 0, levelHeight, 2 * thirdHeight, thirdHeight);
-		panToggle.layout(this, 2 * thirdHeight, levelHeight, 2 * thirdHeight,
-				thirdHeight);
-		pitchToggle.layout(this, 4 * thirdHeight, levelHeight, 2 * thirdHeight,
-				thirdHeight);
-		levelBar.layout(this, 2 * height, levelHeight, width - 2 * height,
+		panToggle.layout(this, gapBetweenLabels + 2 * thirdHeight, levelHeight,
+				2 * thirdHeight, thirdHeight);
+		pitchToggle.layout(this, gapBetweenLabels * 2 + 4 * thirdHeight,
+				levelHeight, 2 * thirdHeight, thirdHeight);
+		levelBar.layout(this, gapBetweenLabels * 3 + 6 * thirdHeight, levelHeight, width - 2 * height,
 				thirdHeight);
 		effectLabel.layout(this, 0, effectHeight, width / 5, thirdHeight);
 		effectLabelList.layout(this, width / 5, effectHeight, 4 * width / 5,
