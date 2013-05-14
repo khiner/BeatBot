@@ -7,9 +7,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -104,25 +101,26 @@ public class BeatBotActivity extends Activity {
 		bbOut = null;
 	}
 
-	private static void copyFromAssetsToExternal(String newDirectory) {
-		List<String> existingFiles = new ArrayList<String>();
-		String[] filesToCopy = null;
-		String[] existingFilesAry = new File(newDirectory).list();
-		if (existingFilesAry != null) {
-			existingFiles = Arrays.asList(existingFilesAry);
+	private static void copyFromAssetsToExternal(String newDirectoryPath) {
+		File newDirectory = new File(newDirectoryPath);
+		if (newDirectory.listFiles() == null || newDirectory.listFiles().length > 0) {
+			// only copy files into this dir if it is empty
+			// files can be renamed, so we can't make assumptions
+			// about whether an individual file already exists
+			return;
 		}
+
+		// create the dir (we know it doesn't exist yet at this point)
+		newDirectory.mkdirs();
+
 		try {
-			String assetPath = newDirectory.replace(
+			String assetPath = newDirectoryPath.replace(
 					Managers.directoryManager.getInternalDirectory(), "");
 			assetPath = assetPath.substring(0, assetPath.length() - 1);
-			filesToCopy = assetManager.list(assetPath);
-			for (String filePath : filesToCopy) {
-				if (existingFiles.contains(filePath)) {
-					continue;
-				}
-				// copy wav file exactly from assets to sdcard
+			for (String filePath : assetManager.list(assetPath)) {
+				// copy audio file exactly from assets to sdcard
 				InputStream in = assetManager.open(assetPath + "/" + filePath);
-				FileOutputStream rawOut = new FileOutputStream(newDirectory
+				FileOutputStream rawOut = new FileOutputStream(newDirectoryPath
 						+ filePath);
 				copyFile(in, rawOut);
 			}
@@ -185,7 +183,6 @@ public class BeatBotActivity extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		if (isFinishing()) {
-			Managers.recordManager.release();
 			shutdown();
 			android.os.Process.killProcess(android.os.Process.myPid());
 		}
@@ -329,8 +326,7 @@ public class BeatBotActivity extends Activity {
 	}
 
 	/*
-	 * Set up the project.
-	 * For now, this just means setting track 0, page 0 view
+	 * Set up the project. For now, this just means setting track 0, page 0 view
 	 */
 	public void setupProject() {
 		GlobalVars.mainPage.midiTrackControl.selectTrack(0);

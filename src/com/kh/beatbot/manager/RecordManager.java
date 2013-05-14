@@ -1,11 +1,9 @@
 package com.kh.beatbot.manager;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.media.AudioFormat;
@@ -29,9 +27,9 @@ public class RecordManager implements Level1dListener {
 			* CHANNELS / 8;
 	private static final long LONG_SAMPLE_RATE = RECORDER_SAMPLERATE;
 
-	private String currWavFileName = null, currBBFileName = null;
+	private String currBBFileName = null;
 
-	private String wavRecordDirectory = null, bbRecordDirectory = null;
+	private String bbRecordDirectory = null;
 
 	private static RecordManager singletonInstance = null;
 
@@ -65,118 +63,26 @@ public class RecordManager implements Level1dListener {
 		bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
 				RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 		initRecorder();
-		wavRecordDirectory = Managers.directoryManager.getUserRecordDirectory();
 		bbRecordDirectory = Managers.directoryManager
 				.getInternalRecordDirectory();
-		currSampleNum = findGreatestSampleNum(wavRecordDirectory) + 1;
 		state = State.INITIALIZING;
-	}
-
-	public State getState() {
-		return state;
 	}
 
 	public boolean isRecording() {
 		return state == State.RECORDING;
 	}
 
-	public void startRecording() throws IOException {
+
+	public void startRecording() {
 		updateFileNames();
-		os = writeWaveFileHeader(currWavFileName, 0, 0);
+		startRecordingNative(currBBFileName);
 		state = State.RECORDING;
 	}
 
-	public void stopRecording() throws IOException {
-		state = State.LISTENING;
-		// close output stream
-		os.close();
-		insertLengthDataIntoWavFile(currWavFileName);
-	}
-
-	public void startListening() {
-		if (recorder.getState() != AudioRecord.STATE_INITIALIZED)
-			initRecorder();
-		recorder.startRecording();
-		recordingThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				writeAudioDataToFile();
-			}
-		}, "AudioRecorder Thread");
-		state = State.LISTENING;
-		recordingThread.start();
-	}
-
-	public void stopListening() {
-		boolean recording = (state == State.RECORDING);
-		state = State.INITIALIZING;
-		if (recorder != null) {
-			recorder.stop();
-			try {
-				if (recording) {
-					stopRecording();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void release() {
-		if (recorder != null) {
-			if (state == State.LISTENING || state == State.RECORDING)
-				stopListening();
-			recorder.release();
-		}
-	}
-
-	public void startRecordingNative() {
-		updateFileNames();
-		try {
-			FileOutputStream out = writeWaveFileHeader(currWavFileName, 0, 0);
-			out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		startRecordingNative(currWavFileName, currBBFileName);
-		state = State.RECORDING;
-	}
-
-	public String stopRecordingAndWriteWav() {
+	public String stopRecording() {
 		stopRecordingNative();
-		insertLengthDataIntoWavFile(currWavFileName);
 		state = State.INITIALIZING;
-		return currWavFileName;
-	}
-
-	/**
-	 * Look through all the sample names in the given record directory and find
-	 * the sample with the greatest number appended to the end (Recorded file
-	 * naming convention is "R1, R2, R3, ...")
-	 * 
-	 * @param recordDirectoryName
-	 * @return the greatest appended sample num in all the recorded sample file
-	 *         names in the given dir
-	 */
-	private static int findGreatestSampleNum(String recordDirectoryName) {
-		File recordDirectoryFile = new File(recordDirectoryName);
-		recordDirectoryFile.mkdir(); // just in case the record dir does not
-										// exist yet
-		String[] allRecordedFileNames = recordDirectoryFile.list();
-		int maxSampleNum = 0;
-		for (String recordedFileName : allRecordedFileNames) {
-			// strip ".wav" from end (and any other occurrences, which would be
-			// weird)
-			recordedFileName = recordedFileName.replace(".wav", "");
-			Matcher matcher = lastIntPattern.matcher(recordedFileName);
-			if (matcher.find()) {
-				String numberString = matcher.group(1);
-				// get ending integer
-				int sampleNum = Integer.parseInt(numberString);
-				maxSampleNum = Math.max(sampleNum, maxSampleNum);
-			}
-		}
-		return maxSampleNum;
+		return currBBFileName;
 	}
 
 	private void initRecorder() {
@@ -186,63 +92,7 @@ public class RecordManager implements Level1dListener {
 	}
 
 	private void updateFileNames() {
-		currWavFileName = wavRecordDirectory + "R" + (currSampleNum) + ".wav";
 		currBBFileName = bbRecordDirectory + "R" + (currSampleNum++) + ".bb";
-	}
-
-	private void writeAudioDataToFile() {
-		byte buffer[] = new byte[bufferSize];
-		recorder.read(buffer, 0, bufferSize);
-		recorder.read(buffer, 0, bufferSize);
-
-		try {
-			while (state != State.INITIALIZING) {
-				recorder.read(buffer, 0, bufferSize);
-
-				if (state == State.LISTENING && overThreshold(buffer)) {
-					startRecording();
-				}
-				if (state == State.RECORDING) {
-					os.write(buffer); // write buffer to file
-					if (underThreshold(buffer)) {
-						stopRecording();
-					}
-				}
-				// update threshold bar
-				float Db = shortToDb(currAmp);
-				thresholdBar.setChannelLevel(Db);
-			}
-		} catch (IOException e) {
-			try {
-				stopRecording();
-			} catch (IOException e2) {
-				e.printStackTrace();
-			}
-			e.printStackTrace();
-		}
-	}
-
-	private boolean overThreshold(byte[] buffer) {
-		for (int i = 0; i < bufferSize / 32; i++) {
-			// 16bit sample size
-			currAmp = getShort(buffer[i * 32], buffer[i * 32 + 1]);
-			if (currAmp > currThreshold) { // Check amplitude
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean underThreshold(byte[] buffer) {
-		short offThreshold = (short) (currThreshold * .8f);
-		for (int i = 0; i < bufferSize / 32; i++) {
-			// 16bit sample size
-			currAmp = getShort(buffer[i * 32], buffer[i * 32 + 1]);
-			if (currAmp > offThreshold) { // Check amplitude
-				return false;
-			}
-		}
-		return true;
 	}
 
 	private static FileOutputStream writeWaveFileHeader(String fileName,
@@ -348,8 +198,7 @@ public class RecordManager implements Level1dListener {
 		currThreshold = dbToShort((level - 1.001f) * 60);
 	}
 
-	public native void startRecordingNative(String wavRecordFileName,
-			String bbRecordFileName);
+	public native void startRecordingNative(String bbRecordFileName);
 
 	public native void stopRecordingNative();
 }

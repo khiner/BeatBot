@@ -11,7 +11,7 @@ static SLObjectItf outputMixObject = NULL;
 
 static bool playing = false;
 static bool recording = false;
-static FILE *wavRecordOutFile = NULL, *bbRecordOutFile = NULL;
+static FILE *bbRecordOutFile = NULL;
 static pthread_mutex_t recordMutex, bufferFillMutex;
 static pthread_cond_t bufferFillCond = PTHREAD_COND_INITIALIZER;
 
@@ -213,11 +213,9 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 
 	// fill the buffer
 	fillBuffer();
-	// write to wav file if recording
-	if (recording && wavRecordOutFile != NULL && bbRecordOutFile != NULL) {
+	// write to bb file if recording
+	if (recording && bbRecordOutFile != NULL) {
 		pthread_mutex_lock(&recordMutex);
-		writeBytesToFile(openSlOut->currBufferShort, BUFF_SIZE * 2,
-				wavRecordOutFile);
 		writeFloatsToFile(openSlOut->currBufferFloat, BUFF_SIZE,
 				bbRecordOutFile);
 		pthread_mutex_unlock(&recordMutex);
@@ -361,11 +359,9 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_shutdown(JNIEnv *env,
  Java RecordManager JNI methods
  ****************************************************************************************/
 void Java_com_kh_beatbot_manager_RecordManager_startRecordingNative(JNIEnv *env,
-		jclass clazz, jstring wavRecordFilePath, jstring bbRecordFilePath) {
+		jclass clazz, jstring bbRecordFilePath) {
 	const char *cRecordFilePath = (*env)->GetStringUTFChars(env,
-			wavRecordFilePath, 0);
-	// append to end of file, since header is written in Java
-	wavRecordOutFile = fopen(cRecordFilePath, "a+");
+			bbRecordFilePath, 0);
 	cRecordFilePath = (*env)->GetStringUTFChars(env, bbRecordFilePath, 0);
 	bbRecordOutFile = fopen(cRecordFilePath, "a+");
 	recording = true;
@@ -377,8 +373,7 @@ void Java_com_kh_beatbot_manager_RecordManager_stopRecordingNative(JNIEnv *env,
 	recording = false;
 	// file cleanup
 	pthread_mutex_lock(&recordMutex);
-	fflush(wavRecordOutFile);
-	fclose(wavRecordOutFile);
-	wavRecordOutFile = NULL;
+	fflush(bbRecordOutFile);
+	fclose(bbRecordOutFile);
 	pthread_mutex_unlock(&recordMutex);
 }

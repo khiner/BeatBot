@@ -58,10 +58,10 @@ public class ControlButtonGroup extends TouchableBBView {
 		recordButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
+				if (Managers.recordManager.isRecording()) {
 					// Managers.recordManager.stopListening();
 					String fileName = Managers.recordManager
-							.stopRecordingAndWriteWav();
+							.stopRecording();
 					// make sure the recorded instrument shows the newly
 					// recorded beat
 					Managers.directoryManager.updateDirectories();
@@ -73,7 +73,7 @@ public class ControlButtonGroup extends TouchableBBView {
 				} else {
 					GlobalVars.mainPage.midiView.reset();
 					playButton.setChecked(true);
-					Managers.recordManager.startRecordingNative();
+					Managers.recordManager.startRecording();
 					if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
 						playButton.getOnReleaseListener().onRelease(playButton);
 				}
@@ -84,7 +84,7 @@ public class ControlButtonGroup extends TouchableBBView {
 			@Override
 			public void onRelease(Button button) {
 				playButton.setChecked(false);
-				if (Managers.recordManager.getState() != RecordManager.State.INITIALIZING) {
+				if (Managers.recordManager.isRecording()) {
 					recordButton.setChecked(false);
 					playButton.getOnReleaseListener().onRelease(playButton);
 					recordButton.getOnReleaseListener().onRelease(recordButton);
