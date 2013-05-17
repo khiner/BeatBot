@@ -33,6 +33,7 @@ import com.kh.beatbot.layout.page.effect.EffectPage;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.BBView;
 import com.kh.beatbot.view.group.BBViewPager;
 import com.kh.beatbot.view.group.GLSurfaceViewGroup;
@@ -41,12 +42,13 @@ public class BeatBotActivity extends Activity {
 
 	public static final int BPM_DIALOG_ID = 0;
 	public static final int EXIT_DIALOG_ID = 1;
+	public static final int SAMPLE_NAME_EDIT_DIALOG_ID = 2;
 
 	private GLSurfaceViewGroup mainSurface;
 	private BBViewPager activityPager;
 	private static AssetManager assetManager;
 
-	private EditText bpmInput;
+	private EditText bpmInput, sampleNameInput;
 
 	private static final int MAIN_PAGE_NUM = 0;
 	private static final int EFFECT_PAGE_NUM = 1;
@@ -103,7 +105,8 @@ public class BeatBotActivity extends Activity {
 
 	private static void copyFromAssetsToExternal(String newDirectoryPath) {
 		File newDirectory = new File(newDirectoryPath);
-		if (newDirectory.listFiles() == null || newDirectory.listFiles().length > 0) {
+		if (newDirectory.listFiles() == null
+				|| newDirectory.listFiles().length > 0) {
 			// only copy files into this dir if it is empty
 			// files can be renamed, so we can't make assumptions
 			// about whether an individual file already exists
@@ -225,6 +228,9 @@ public class BeatBotActivity extends Activity {
 		case BPM_DIALOG_ID:
 			bpmInput.setText(String.valueOf((int) Managers.midiManager.getBPM()));
 			break;
+		case SAMPLE_NAME_EDIT_DIALOG_ID:
+			sampleNameInput.setText(TrackManager.currTrack.getCurrSampleName());
+			break;
 		case EXIT_DIALOG_ID:
 			break;
 		}
@@ -237,7 +243,6 @@ public class BeatBotActivity extends Activity {
 		switch (id) {
 		case BPM_DIALOG_ID:
 			bpmInput = new EditText(this);
-			builder = new AlertDialog.Builder(GlobalVars.mainActivity);
 
 			bpmInput.setKeyListener(DigitsKeyListener.getInstance("0123456789"));
 			builder.setTitle("Set BPM")
@@ -253,6 +258,34 @@ public class BeatBotActivity extends Activity {
 										GlobalVars.mainPage.controlButtonGroup.bpmView
 												.setBPM(Integer
 														.valueOf(bpmString));
+									}
+								}
+							})
+					.setNegativeButton("Cancel",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dialog.cancel();
+								}
+							});
+			break;
+		case SAMPLE_NAME_EDIT_DIALOG_ID:
+			sampleNameInput = new EditText(this);
+			
+			builder.setTitle("Edit Sample Name")
+					.setView(sampleNameInput)
+					.setPositiveButton("OK",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									String sampleName = sampleNameInput
+											.getText().toString();
+									if (!sampleName.isEmpty()) {
+										TrackManager.currTrack
+												.setCurrSampleName(sampleName);
+										GlobalVars.mainPage.pageSelectGroup.update();
 									}
 								}
 							})

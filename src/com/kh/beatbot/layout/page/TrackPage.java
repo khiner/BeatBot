@@ -1,8 +1,10 @@
 package com.kh.beatbot.layout.page;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.global.ColorSet;
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -30,13 +32,14 @@ public class TrackPage extends LevelsFXPage {
 		editButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				String name = "TODO";
-				TrackManager.currTrack.setCurrSampleName(name);
+				GlobalVars.mainActivity
+						.showDialog(BeatBotActivity.SAMPLE_NAME_EDIT_DIALOG_ID);
 			}
 		});
 		deleteButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
+				// TODO if (MainActivity.prompt)
 				TrackManager.deleteCurrTrack();
 			}
 		});
@@ -79,19 +82,21 @@ public class TrackPage extends LevelsFXPage {
 		float topRowY = height / 12;
 		float gapBetweenLabels = 5;
 
-		browseButton.layout(this, 0, topRowY, thirdHeight, thirdHeight);
-		editButton.layout(this, thirdHeight, topRowY, thirdHeight, thirdHeight);
-		
-		volumeToggle.layout(this, gapBetweenLabels + thirdHeight * 2, topRowY,
-				2 * thirdHeight, thirdHeight);
-		panToggle.layout(this, gapBetweenLabels + 4 * thirdHeight, topRowY,
-				2 * thirdHeight, thirdHeight);
-		pitchToggle.layout(this, gapBetweenLabels + 6 * thirdHeight,
-				topRowY, 2 * thirdHeight, thirdHeight);
-
-		float levelX = 8 * thirdHeight + gapBetweenLabels;
-		levelBar.layout(this, levelX, topRowY, width - levelX - thirdHeight,
+		volumeToggle.layout(this, 0, topRowY, 2 * thirdHeight, thirdHeight);
+		panToggle.layout(this, 2 * thirdHeight, topRowY, 2 * thirdHeight,
 				thirdHeight);
+		pitchToggle.layout(this, 4 * thirdHeight, topRowY, 2 * thirdHeight,
+				thirdHeight);
+
+		float levelX = 6 * thirdHeight + gapBetweenLabels;
+		levelBar.layout(this, levelX, topRowY,
+				width - levelX - thirdHeight * 3, thirdHeight);
+
+		browseButton.layout(this, width - thirdHeight * 3, topRowY,
+				thirdHeight, thirdHeight);
+		editButton.layout(this, width - thirdHeight * 2, topRowY, thirdHeight,
+				thirdHeight);
+
 		deleteButton.layout(this, width - thirdHeight, topRowY, thirdHeight,
 				thirdHeight);
 

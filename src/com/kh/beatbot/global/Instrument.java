@@ -25,7 +25,8 @@ public class Instrument extends BBDirectory {
 	}
 
 	public void setSampleName(int sampleNum, String name) {
-		// TODO
+		sampleNames[sampleNum] = name;
+		getSampleFile(sampleNum).renameTo(new File(path + name));
 	}
 	
 	public String getSamplePath(int sampleNum) {
