@@ -35,13 +35,13 @@ public class DirectoryManager {
 					TrackManager.currTrack.setInstrument((Instrument) parent,
 							item);
 				}
-				currDirectory = internalDirectory;
+				currDirectory = audioDirectory;
 			}
 			updateInstrumentSelectAlert(currDirectory);
 			// if the current dir is the root directory, we've
 			// already selected a sample
 			// do not display any select alert list.
-			if (currDirectory == internalDirectory) {
+			if (currDirectory == audioDirectory) {
 				return;
 			}
 			// if the directory is empty, display the directory's
@@ -165,17 +165,17 @@ public class DirectoryManager {
 		drumsDirectory.setIconSource(new ImageIconSource(R.drawable.drums_icon,
 				R.drawable.drums_icon_selected, R.drawable.drums_icon_selected,
 				-1, R.drawable.drums_icon_selected, R.drawable.drums_icon));
-		internalRecordDirectory
+		recordDirectory
 				.setIconSource(new ImageIconSource(R.drawable.microphone_icon,
 						R.drawable.microphone_icon_selected,
 						R.drawable.microphone_icon_selected, -1,
 						R.drawable.microphone_icon_selected,
 						R.drawable.microphone_icon));
-		internalBeatRecordDirectory.setIconSource(new ImageIconSource(
+		beatRecordDirectory.setIconSource(new ImageIconSource(
 				R.drawable.beat_icon, R.drawable.beat_icon_selected,
 				R.drawable.beat_icon_selected, -1,
 				R.drawable.beat_icon_selected, R.drawable.beat_icon));
-		internalSampleRecordDirectory.setIconSource(new ImageIconSource(
+		sampleRecordDirectory.setIconSource(new ImageIconSource(
 				R.drawable.sample_icon, R.drawable.sample_icon_selected,
 				R.drawable.sample_icon_selected, -1,
 				R.drawable.sample_icon_selected, R.drawable.sample_icon));
@@ -193,16 +193,8 @@ public class DirectoryManager {
 	private AlertDialog instrumentSelectAlert = null;
 	private ListAdapter instrumentSelectAdapter = null;
 
-	private BBDirectory internalDirectory = null;
-	private BBDirectory internalRecordDirectory = null;
-	private BBDirectory internalBeatRecordDirectory = null;
-	private BBDirectory internalSampleRecordDirectory = null;
-	private BBDirectory userRecordDirectory = null;
-	private BBDirectory userBeatRecordDirectory = null;
-	private BBDirectory userSampleRecordDirectory = null;
-	private BBDirectory drumsDirectory = null;
-
-	private BBDirectory currDirectory = null;
+	private BBDirectory audioDirectory, recordDirectory, beatRecordDirectory,
+			sampleRecordDirectory, drumsDirectory, currDirectory = null;
 
 	private boolean addingTrack = false;
 
@@ -215,20 +207,12 @@ public class DirectoryManager {
 
 	private DirectoryManager() {
 		initDataDir();
-		internalDirectory = new BBDirectory(null, "internal", null);
-		drumsDirectory = new BBDirectory(internalDirectory, "drums", null);
-		userRecordDirectory = new BBDirectory(null, "recorded", null);
-		userSampleRecordDirectory = new BBDirectory(userRecordDirectory,
-				"samples", null);
-		userBeatRecordDirectory = new BBDirectory(userRecordDirectory, "beats",
-				null);
-		internalRecordDirectory = new BBDirectory(internalDirectory,
-				"recorded", null);
-		internalSampleRecordDirectory = new Instrument(internalRecordDirectory,
-				"samples", null);
-		internalBeatRecordDirectory = new Instrument(internalRecordDirectory,
-				"beats", null);
-		internalBeatRecordDirectory
+		audioDirectory = new BBDirectory(null, "audio", null);
+		drumsDirectory = new BBDirectory(audioDirectory, "drums", null);
+		recordDirectory = new BBDirectory(audioDirectory, "recorded", null);
+		sampleRecordDirectory = new Instrument(recordDirectory, "samples", null);
+		beatRecordDirectory = new Instrument(recordDirectory, "beats", null);
+		beatRecordDirectory
 				.setEmptyMsg("You haven't recorded any beats yet!  Use the record button at the top to record your beats.");
 		for (String drumName : drumNames) {
 			new Instrument(drumsDirectory, drumName, null);
@@ -241,7 +225,7 @@ public class DirectoryManager {
 		for (BBDirectory dir : drumsDirectory.getChildren()) {
 			((Instrument) dir).updateFiles();
 		}
-		((Instrument) internalBeatRecordDirectory).updateFiles();
+		((Instrument) beatRecordDirectory).updateFiles();
 	}
 
 	public void updateInstrumentSelectAlert(BBDirectory newDirectory) {
@@ -256,12 +240,12 @@ public class DirectoryManager {
 
 	public void showAddTrackAlert() {
 		addingTrack = true;
-		show(internalDirectory);
+		show(audioDirectory);
 	}
 
 	public void showInstrumentSelectAlert() {
 		addingTrack = false;
-		show(internalDirectory);
+		show(audioDirectory);
 	}
 
 	public void showSampleSelectAlert() {
@@ -273,16 +257,12 @@ public class DirectoryManager {
 		return (Instrument) drumsDirectory.getChild(drumNum);
 	}
 
-	public String getInternalDirectory() {
-		return internalDirectory.getPath();
+	public String getAudioPath() {
+		return audioDirectory.getPath();
 	}
 
-	public String getUserRecordDirectory() {
-		return userBeatRecordDirectory.getPath();
-	}
-
-	public String getInternalRecordDirectory() {
-		return internalBeatRecordDirectory.getPath();
+	public String getBeatRecordPath() {
+		return beatRecordDirectory.getPath();
 	}
 
 	private void show(BBDirectory directory) {
@@ -308,7 +288,7 @@ public class DirectoryManager {
 	private String[] formatNames(String[] names) {
 		String[] formattedNames = new String[names.length];
 		for (int i = 0; i < names.length; i++) {
-			formattedNames[i] = names[i].replace(".bb", "");
+			formattedNames[i] = names[i].replace(".wav", "");
 		}
 		return formattedNames;
 	}

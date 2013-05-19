@@ -18,7 +18,6 @@ public class RecordManager implements Level1dListener {
 	public static final long RECORD_LATENCY_TICKS = Managers.midiManager
 			.millisToTick(250);
 	private static final int RECORDER_BPP = 16;
-	private static final String TEMP_FILE = "record_temp.bb";
 	private static final int RECORDER_SAMPLERATE = 44100;
 	private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
 	private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
@@ -27,7 +26,7 @@ public class RecordManager implements Level1dListener {
 			* CHANNELS / 8;
 	private static final long LONG_SAMPLE_RATE = RECORDER_SAMPLERATE;
 
-	private String currBBFileName = null;
+	private String currRecordFileName = null;
 
 	private String bbRecordDirectory = null;
 
@@ -63,8 +62,7 @@ public class RecordManager implements Level1dListener {
 		bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
 				RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 		initRecorder();
-		bbRecordDirectory = Managers.directoryManager
-				.getInternalRecordDirectory();
+		bbRecordDirectory = Managers.directoryManager.getBeatRecordPath();
 		state = State.INITIALIZING;
 	}
 
@@ -72,17 +70,23 @@ public class RecordManager implements Level1dListener {
 		return state == State.RECORDING;
 	}
 
-
 	public void startRecording() {
 		updateFileNames();
-		startRecordingNative(currBBFileName);
+		try {
+			FileOutputStream out = writeWaveFileHeader(currRecordFileName, 0, 0);
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		startRecordingNative(currRecordFileName);
 		state = State.RECORDING;
 	}
 
 	public String stopRecording() {
 		stopRecordingNative();
+		insertLengthDataIntoWavFile(currRecordFileName);
 		state = State.INITIALIZING;
-		return currBBFileName;
+		return currRecordFileName;
 	}
 
 	private void initRecorder() {
@@ -92,7 +96,7 @@ public class RecordManager implements Level1dListener {
 	}
 
 	private void updateFileNames() {
-		currBBFileName = bbRecordDirectory + "R" + (currSampleNum++) + ".bb";
+		currRecordFileName = bbRecordDirectory + "R" + (currSampleNum++) + ".wav";
 	}
 
 	private static FileOutputStream writeWaveFileHeader(String fileName,
@@ -198,7 +202,7 @@ public class RecordManager implements Level1dListener {
 		currThreshold = dbToShort((level - 1.001f) * 60);
 	}
 
-	public native void startRecordingNative(String bbRecordFileName);
+	public native void startRecordingNative(String recordFileName);
 
 	public native void stopRecordingNative();
 }

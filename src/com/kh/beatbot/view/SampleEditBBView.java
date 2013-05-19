@@ -1,6 +1,5 @@
 package com.kh.beatbot.view;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
@@ -8,12 +7,11 @@ import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.view.helper.WaveformHelper;
 
 public class SampleEditBBView extends TouchableBBView {
 
 	private float waveformWidth = 0;
-	
+
 	// min distance for pointer to select loop markers
 	private static final int SNAP_DIST = 32;
 	private static FloatBuffer waveformVb = null;
@@ -29,16 +27,15 @@ public class SampleEditBBView extends TouchableBBView {
 
 	private int zoomLeftPointerId = -1;
 	private int zoomRightPointerId = -1;
-	
+
 	private float zoomLeftAnchorSample = -1;
 	private float zoomRightAnchorSample = -1;
 
 	private float zoomLeftPointerX = -1;
 	private float zoomRightPointerX = -1;
-	
+
 	private int scrollPointerId = -1;
 	private float scrollAnchorSample = -1;
-	
 
 	// zooming/scrolling will change the view window of the samples
 	// keep track of that with offset and width
@@ -46,8 +43,6 @@ public class SampleEditBBView extends TouchableBBView {
 	private float sampleWidth = 0;
 
 	public void update() {
-		File sampleFile = TrackManager.currTrack.getSampleFile();
-		WaveformHelper.setSampleFile(sampleFile);
 		sampleWidth = TrackManager.currTrack.getNumSamples();
 		updateVbs();
 	}
@@ -74,8 +69,9 @@ public class SampleEditBBView extends TouchableBBView {
 		if (height == 0) // this view hasn't even been init()'d yet.
 			return;
 		try {
-			waveformVb = WaveformHelper.floatFileToBuffer(this,
-					(long) sampleOffset, (long) sampleWidth, SNAP_DIST / 2);
+			waveformVb = TrackManager.currTrack.getCurrSampleFile()
+					.floatFileToBuffer(this, (long) sampleOffset,
+							(long) sampleWidth, SNAP_DIST / 2);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -93,7 +89,7 @@ public class SampleEditBBView extends TouchableBBView {
 	private void drawLoopSelectionHighlightRect() {
 		drawTriangleFan(loopSelectionLineVb, Colors.SAMPLE_LOOP_HIGHLIGHT);
 	}
-	
+
 	private void drawLoopSelectionMarkers() {
 		drawLines(loopSelectionLineVb, Colors.SAMPLE_LOOP_SELECT_OUTLINE, 2,
 				GL10.GL_LINES);
@@ -104,17 +100,18 @@ public class SampleEditBBView extends TouchableBBView {
 				endLoopPointerId == -1 ? Colors.SAMPLE_LOOP_SELECT
 						: Colors.SAMPLE_LOOP_SELECT_SELECTED);
 	}
-	
+
 	@Override
 	public void init() {
-		//setBackgroundColor(Colors.VIEW_BG);
+		// setBackgroundColor(Colors.VIEW_BG);
 		waveformWidth = width - SNAP_DIST;
 		initBackgroundOutlineVb();
 		update();
 	}
-	
+
 	private float sampleToX(float sample) {
-		return (sample - sampleOffset) * waveformWidth / sampleWidth + SNAP_DIST / 2;
+		return (sample - sampleOffset) * waveformWidth / sampleWidth
+				+ SNAP_DIST / 2;
 	}
 
 	private float xToSample(float x) {
@@ -158,8 +155,7 @@ public class SampleEditBBView extends TouchableBBView {
 				.getNumSamples()) {
 			sampleWidth = waveformWidth
 					* (zoomLeftAnchorSample - TrackManager.currTrack
-							.getNumSamples())
-					/ (x1 - waveformWidth);
+							.getNumSamples()) / (x1 - waveformWidth);
 			sampleOffset = TrackManager.currTrack.getNumSamples() - sampleWidth;
 		}
 		updateVbs();
@@ -252,13 +248,17 @@ public class SampleEditBBView extends TouchableBBView {
 	private boolean setZoomAnchor(int id, float x) {
 		if (scrollPointerId != -1) {
 			// one pointer is already scrolling.
-			
-			zoomLeftPointerX = Math.min(pointerIdToPos.get(scrollPointerId).x, x);
-			zoomRightPointerX = Math.max(pointerIdToPos.get(scrollPointerId).x, x);
+
+			zoomLeftPointerX = Math.min(pointerIdToPos.get(scrollPointerId).x,
+					x);
+			zoomRightPointerX = Math.max(pointerIdToPos.get(scrollPointerId).x,
+					x);
 			zoomLeftAnchorSample = xToSample(zoomLeftPointerX);
 			zoomRightAnchorSample = xToSample(zoomRightPointerX);
-			zoomLeftPointerId = zoomRightAnchorSample == scrollAnchorSample ? id : scrollPointerId;
-			zoomRightPointerId = zoomLeftPointerId == scrollPointerId ? id : scrollPointerId;
+			zoomLeftPointerId = zoomRightAnchorSample == scrollAnchorSample ? id
+					: scrollPointerId;
+			zoomRightPointerId = zoomLeftPointerId == scrollPointerId ? id
+					: scrollPointerId;
 			scrollPointerId = -1; // not scrolling anymore
 			return true;
 		}

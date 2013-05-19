@@ -79,7 +79,8 @@ public class Colors {
 		LABEL_VERY_LIGHT = colorResourceToFloats(activity,
 				R.color.labelVeryLight);
 		LABEL_SELECTED = colorResourceToFloats(activity, R.color.labelSelected);
-		MIDI_SELECTED_TRACK = new float[] { YELLOW[0], YELLOW[1], YELLOW[2], .38f };
+		MIDI_SELECTED_TRACK = new float[] { YELLOW[0], YELLOW[1], YELLOW[2],
+				.38f };
 		labelBgColorSet = new ColorSet(LABEL_DARK, VOLUME, LABEL_SELECTED);
 		labelStrokeColorSet = new ColorSet(WHITE, WHITE, BLACK);
 

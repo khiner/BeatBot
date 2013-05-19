@@ -27,7 +27,7 @@ public class PageSelectGroup extends TouchableBBView {
 	public static final int ADSR_PAGE_ID = 2;
 	public static final int MASTER_PAGE_ID = 3;
 	public static final int NOTE_LEVELS_PAGE_ID = 4;
-	
+
 	private static NoteLevelsPage levelsPage;
 	private static LevelsFXPage masterPage;
 	private static TrackPage trackPage;
@@ -46,7 +46,7 @@ public class PageSelectGroup extends TouchableBBView {
 		}
 		pageButtons[pageNum].trigger();
 	}
-	
+
 	public void update() {
 		updateInstrumentIcon();
 		updateSampleText();
@@ -138,16 +138,14 @@ public class PageSelectGroup extends TouchableBBView {
 	@Override
 	public void layoutChildren() {
 		float labelHeight = height / 5;
-		float labelWidth = (width -  2 * labelHeight) / 5;
+		float labelWidth = (width - 2 * labelHeight) / 5;
 		float labelYOffset = 2;
-		addTrackButton
-				.layout(this, 0, labelYOffset, labelHeight, labelHeight);
+		addTrackButton.layout(this, 0, labelYOffset, labelHeight, labelHeight);
 		pageButtons[LEVELS_FX_PAGE_ID].layout(this, labelHeight, labelYOffset,
 				labelWidth * 2, labelHeight);
 		for (int i = 1; i < pageButtons.length - 1; i++) {
-			pageButtons[i].layout(this,
-					labelHeight + (i + 1) * labelWidth, labelYOffset,
-					labelWidth, labelHeight);
+			pageButtons[i].layout(this, labelHeight + (i + 1) * labelWidth,
+					labelYOffset, labelWidth, labelHeight);
 		}
 		pageButtons[NOTE_LEVELS_PAGE_ID].layout(this, labelHeight + 5
 				* labelWidth, labelYOffset, labelHeight, labelHeight);
@@ -181,15 +179,15 @@ public class PageSelectGroup extends TouchableBBView {
 
 	private void updateInstrumentIcon() {
 		// update the track pager instrument icon
-		pageButtons[LEVELS_FX_PAGE_ID].setIconSource(TrackManager.currTrack.getInstrument()
-				.getIconSource());
+		pageButtons[LEVELS_FX_PAGE_ID].setIconSource(TrackManager.currTrack
+				.getInstrument().getIconSource());
 	}
 
 	private void updateSampleText() {
 		// update sample label text
 		// TODO handle all extensions
-		String formattedName = TrackManager.currTrack.getSampleName()
-				.replace(".bb", "").toUpperCase();
+		String formattedName = TrackManager.currTrack.getCurrSampleName()
+				.toUpperCase();
 		pageButtons[LEVELS_FX_PAGE_ID].setText(formattedName);
 	}
 }

@@ -5,8 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -53,9 +51,10 @@ public class BeatBotActivity extends Activity {
 	private static final int MAIN_PAGE_NUM = 0;
 	private static final int EFFECT_PAGE_NUM = 1;
 
+	private static byte[] buffer = new byte[1024];
+	
 	private static void copyFile(InputStream in, OutputStream out)
 			throws IOException {
-		byte[] buffer = new byte[1024];
 		int read;
 		while ((read = in.read(buffer)) != -1) {
 			out.write(buffer, 0, read);
@@ -65,42 +64,6 @@ public class BeatBotActivity extends Activity {
 		out.flush();
 		out.close();
 		out = null;
-	}
-
-	/**
-	 * Copy the wavFile into a file with raw PCM Wav bytes. Works with
-	 * mono/stereo (for mono, duplicate each sample to the left/right channels)
-	 * Method for detecting/adapting to stereo/mono adapted from
-	 * http://stackoverflow
-	 * .com/questions/8754111/how-to-read-the-data-in-a-wav-file-to-an-array
-	 */
-	private static void convertWavToBB(InputStream wavIn, FileOutputStream bbOut)
-			throws IOException {
-		byte[] headerBytes = new byte[44];
-		wavIn.read(headerBytes);
-		// Determine if mono or stereo
-		int channels = headerBytes[22]; // Forget byte 23 as 99.999% of WAVs are
-										// 1 or 2 channels
-
-		byte[] inBytes = new byte[2];
-		ByteBuffer floatBuffer = ByteBuffer.allocate(4);
-		floatBuffer.order(ByteOrder.LITTLE_ENDIAN);
-		while (wavIn.read(inBytes) != -1) {
-			// convert two bytes to a float (little endian)
-			short s = (short) (((inBytes[1] & 0xff) << 8) | (inBytes[0] & 0xff));
-			floatBuffer.putFloat(0, s / 32768.0f);
-			bbOut.write(floatBuffer.array());
-			if (channels == 1) {
-				// if mono, left and right copies should be identical
-				bbOut.write(floatBuffer.array());
-			}
-		}
-		// clean up
-		wavIn.close();
-		wavIn = null;
-		bbOut.flush();
-		bbOut.close();
-		bbOut = null;
 	}
 
 	private static void copyFromAssetsToExternal(String newDirectoryPath) {
@@ -118,7 +81,7 @@ public class BeatBotActivity extends Activity {
 
 		try {
 			String assetPath = newDirectoryPath.replace(
-					Managers.directoryManager.getInternalDirectory(), "");
+					Managers.directoryManager.getAudioPath(), "");
 			assetPath = assetPath.substring(0, assetPath.length() - 1);
 			for (String filePath : assetManager.list(assetPath)) {
 				// copy audio file exactly from assets to sdcard

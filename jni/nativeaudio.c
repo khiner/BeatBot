@@ -11,7 +11,7 @@ static SLObjectItf outputMixObject = NULL;
 
 static bool playing = false;
 static bool recording = false;
-static FILE *bbRecordOutFile = NULL;
+static FILE *recordOutFile = NULL;
 static pthread_mutex_t recordMutex, bufferFillMutex;
 static pthread_cond_t bufferFillCond = PTHREAD_COND_INITIALIZER;
 
@@ -213,11 +213,11 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 
 	// fill the buffer
 	fillBuffer();
-	// write to bb file if recording
-	if (recording && bbRecordOutFile != NULL) {
+	// write to record out file if recording
+	if (recording && recordOutFile != NULL) {
 		pthread_mutex_lock(&recordMutex);
-		writeFloatsToFile(openSlOut->currBufferFloat, BUFF_SIZE,
-				bbRecordOutFile);
+		writeBytesToFile(openSlOut->currBufferShort, BUFF_SIZE * 2,
+				recordOutFile);
 		pthread_mutex_unlock(&recordMutex);
 	}
 }
@@ -359,11 +359,12 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_shutdown(JNIEnv *env,
  Java RecordManager JNI methods
  ****************************************************************************************/
 void Java_com_kh_beatbot_manager_RecordManager_startRecordingNative(JNIEnv *env,
-		jclass clazz, jstring bbRecordFilePath) {
+		jclass clazz, jstring recordFilePath) {
 	const char *cRecordFilePath = (*env)->GetStringUTFChars(env,
-			bbRecordFilePath, 0);
-	cRecordFilePath = (*env)->GetStringUTFChars(env, bbRecordFilePath, 0);
-	bbRecordOutFile = fopen(cRecordFilePath, "a+");
+			recordFilePath, 0);
+	cRecordFilePath = (*env)->GetStringUTFChars(env, recordFilePath, 0);
+	// append to end of file, since header is written in Java
+	recordOutFile = fopen(cRecordFilePath, "a+");
 	recording = true;
 }
 
@@ -373,7 +374,8 @@ void Java_com_kh_beatbot_manager_RecordManager_stopRecordingNative(JNIEnv *env,
 	recording = false;
 	// file cleanup
 	pthread_mutex_lock(&recordMutex);
-	fflush(bbRecordOutFile);
-	fclose(bbRecordOutFile);
+	fflush(recordOutFile);
+	fclose(recordOutFile);
+	recordOutFile = NULL;
 	pthread_mutex_unlock(&recordMutex);
 }

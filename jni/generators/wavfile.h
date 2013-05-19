@@ -58,9 +58,16 @@ static inline void wavfile_tick(WavFile *config, float *sample) {
 		}
 	} else {
 		for (channel = 0; channel < 2; channel++) {
-			sample[channel] = (1.0f - remainder)
-					* config->samples[channel][sampleIndex]
-					+ remainder * config->samples[channel][sampleIndex + 1];
+			// copy left channel to right channel if mono
+			float samp1 =
+					config->samples[1] == NULL ?
+							config->samples[0][sampleIndex] :
+							config->samples[channel][sampleIndex];
+			float samp2 =
+					config->samples[1] == NULL ?
+							config->samples[0][sampleIndex + 1] :
+							config->samples[channel][sampleIndex + 1];
+			sample[channel] = (1.0f - remainder) * samp1 + remainder * samp2;
 		}
 	}
 

@@ -1,6 +1,5 @@
 package com.kh.beatbot.global;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -175,19 +174,19 @@ public class Track extends BaseTrack {
 	}
 
 	public String getCurrSampleName() {
-		return instrument.getSampleName(currSampleNum).replace(".bb", "");
+		return instrument.getSampleName(currSampleNum).replace(".wav", "");
 	}
 	
 	public void setCurrSampleName(String name) {
-		instrument.setSampleName(currSampleNum, name + ".bb");
+		instrument.setSampleName(currSampleNum, name + ".wav");
 	}
 	
-	public String getSamplePath() {
+	public String getCurrSamplePath() {
 		return instrument.getSamplePath(currSampleNum);
 	}
 
-	public File getSampleFile() {
-		return instrument.getSampleFile(currSampleNum);
+	public WavFile getCurrSampleFile() {
+		return instrument.getWavFile(currSampleNum);
 	}
 
 	private void constructLoopPointMap() {
@@ -254,7 +253,7 @@ public class Track extends BaseTrack {
 
 	public void setSampleNum(int sampleNum) {
 		currSampleNum = sampleNum;
-		setSample(id, getSamplePath());
+		setSample(id, getCurrSamplePath());
 	}
 
 	public static native void toggleTrackLooping(int trackNum);
