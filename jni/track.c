@@ -22,7 +22,7 @@ JNIEnv *getJniEnv() {
 	JNIEnv* env;
 	if ((*javaVm)->GetEnv(javaVm, (void**) &env,
 			JNI_VERSION_1_6) == JNI_EDETACHED) {
-		(*javaVm)->AttachCurrentThread(javaVm, &env, NULL);
+		(*javaVm)->AttachCurrentThread(javaVm, &env, NULL );
 	}
 	return env;
 }
@@ -36,8 +36,8 @@ jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size) {
 void printTracks(TrackNode *head) {
 	__android_log_print(ANDROID_LOG_ERROR, "tracks", "Elements:");
 	TrackNode *cur_ptr = head;
-	while (cur_ptr != NULL) {
-		if (cur_ptr->track != NULL)
+	while (cur_ptr != NULL ) {
+		if (cur_ptr->track != NULL )
 			__android_log_print(ANDROID_LOG_ERROR, "track num = ", "%d, ",
 					cur_ptr->track->num);
 		else
@@ -52,12 +52,12 @@ void addEffect(Levels *levels, Effect *effect) {
 	new->next = NULL;
 	pthread_mutex_lock(&levels->effectMutex);
 	// check for first insertion
-	if (levels->effectHead == NULL) {
+	if (levels->effectHead == NULL ) {
 		levels->effectHead = new;
 	} else {
 		// insert as last effect
 		EffectNode *cur_ptr = levels->effectHead;
-		while (cur_ptr->next != NULL) {
+		while (cur_ptr->next != NULL ) {
 			cur_ptr = cur_ptr->next;
 		}
 		cur_ptr->next = new;
@@ -67,13 +67,13 @@ void addEffect(Levels *levels, Effect *effect) {
 
 TrackNode *getTrackNode(int trackNum) {
 	TrackNode *trackNode = trackHead;
-	while (trackNode != NULL) {
+	while (trackNode != NULL ) {
 		if (trackNode->track != NULL && trackNode->track->num == trackNum) {
 			return trackNode;
 		}
 		trackNode = trackNode->next;
 	}
-	return NULL;
+	return NULL ;
 }
 
 Track *getTrack(JNIEnv *env, jclass clazz, int trackNum) {
@@ -96,12 +96,12 @@ void addTrack(Track *track) {
 	new->track = track;
 	new->next = NULL;
 	// check for first insertion
-	if (trackHead == NULL) {
+	if (trackHead == NULL ) {
 		trackHead = new;
 	} else {
 		// insert as last effect
 		TrackNode *cur_ptr = trackHead;
-		while (cur_ptr->next != NULL) {
+		while (cur_ptr->next != NULL ) {
 			cur_ptr = cur_ptr->next;
 		}
 		cur_ptr->next = new;
@@ -125,18 +125,20 @@ TrackNode *removeTrack(int trackNum) {
 
 void freeEffects(Levels *levels) {
 	EffectNode *cur_ptr = levels->effectHead;
-	while (cur_ptr != NULL) {
-		cur_ptr->effect->destroy(cur_ptr->effect->config);
+	while (cur_ptr != NULL ) {
+		if (cur_ptr->effect != NULL && cur_ptr->effect->destroy != NULL ) {
+			cur_ptr->effect->destroy(cur_ptr->effect->config);
+		}
 		EffectNode *prev_ptr = cur_ptr;
 		cur_ptr = cur_ptr->next;
 		free(prev_ptr); // free the entire Node
 	}
 }
 
-void freeTracks() {
-	// destroy all tracks
+void freeTracks() {	// destroy all tracks
+
 	TrackNode *cur_ptr = trackHead;
-	while (cur_ptr != NULL) {
+	while (cur_ptr != NULL ) {
 		free(cur_ptr->track->currBufferFloat[0]);
 		free(cur_ptr->track->currBufferFloat[1]);
 		free(cur_ptr->track->currBufferFloat);
@@ -147,27 +149,23 @@ void freeTracks() {
 		free(prev_ptr); // free the entire Node
 	}
 	freeEffects(masterLevels);
-	free(openSlOut->currBufferFloat[0]);
-	free(openSlOut->currBufferFloat[1]);
-	free(openSlOut->currBufferFloat);
-	free(openSlOut->currBufferShort);
-	(*openSlOut->outputBufferQueue)->Clear(openSlOut->outputBufferQueue);
-	openSlOut->outputBufferQueue = NULL;
-	openSlOut->outputPlayerPlay = NULL;
+
+	// (We never unlock the mutex --
+	// this should only be called on activity closed)
 }
 
 Levels *initLevels() {
 	Levels *levels = malloc(sizeof(Levels));
-	pthread_mutex_init(&levels->effectMutex, NULL);
+	pthread_mutex_init(&levels->effectMutex, NULL );
 	levels->effectHead = NULL;
 	levels->volume = .8f;
 	levels->pan = levels->pitch = .5f;
 	int effectNum;
 	for (effectNum = 0; effectNum < MAX_EFFECTS_PER_TRACK; effectNum++) {
-		addEffect(levels, NULL);
+		addEffect(levels, NULL );
 	}
-	levels->volPan = initEffect(volumepanconfig_create(),
-			volumepanconfig_set, volumepan_process, volumepanconfig_destroy);
+	levels->volPan = initEffect(volumepanconfig_create(), volumepanconfig_set,
+			volumepan_process, volumepanconfig_destroy);
 	levels->volPan->on = true;
 	return levels;
 }
@@ -202,7 +200,7 @@ void setSample(Track *track, const char *sampleName) {
 
 int getSoloingTrackNum() {
 	TrackNode *cur_ptr = trackHead;
-	while (cur_ptr != NULL) {
+	while (cur_ptr != NULL ) {
 		if (cur_ptr->track->solo) {
 			return cur_ptr->track->num;
 		}
@@ -233,7 +231,7 @@ void Java_com_kh_beatbot_global_Track_soloTrack(JNIEnv *env, jclass clazz,
 			track->shouldSound = true;
 		}
 		TrackNode *cur_ptr = trackHead;
-		while (cur_ptr != NULL) {
+		while (cur_ptr != NULL ) {
 			if (cur_ptr->track->num != trackNum) {
 				cur_ptr->track->shouldSound = false;
 				cur_ptr->track->solo = false;
@@ -242,7 +240,7 @@ void Java_com_kh_beatbot_global_Track_soloTrack(JNIEnv *env, jclass clazz,
 		}
 	} else {
 		TrackNode *cur_ptr = trackHead;
-		while (cur_ptr != NULL) {
+		while (cur_ptr != NULL ) {
 			if (!cur_ptr->track->mute) {
 				cur_ptr->track->shouldSound = true;
 			}
@@ -262,7 +260,7 @@ void setNextNoteInfo(Track *track, jlong onTick, jlong offTick, jfloat vol,
 
 void setNextNote(Track *track, jobject obj) {
 	JNIEnv* env = getJniEnv();
-	if (obj == NULL) {
+	if (obj == NULL ) {
 		track->nextStartSample = -1;
 		track->nextStopSample = -1;
 		return;
@@ -320,7 +318,7 @@ void setPreviewLevels(Track *track) {
 
 void updateAllLevels() {
 	TrackNode *cur_ptr = trackHead;
-	while (cur_ptr != NULL) {
+	while (cur_ptr != NULL ) {
 		updateLevels(cur_ptr->track->num);
 		cur_ptr = cur_ptr->next;
 	}
@@ -354,7 +352,7 @@ void Java_com_kh_beatbot_global_Track_setSample(JNIEnv *env, jclass clazz,
 	const char *nativeSampleName = (*env)->GetStringUTFChars(env, sampleName,
 			0);
 
-	if (track->generator == NULL) {
+	if (track->generator == NULL ) {
 		initSample(track, nativeSampleName);
 	} else {
 		setSample(track, nativeSampleName);
@@ -389,13 +387,15 @@ jboolean Java_com_kh_beatbot_global_Track_isTrackLooping(JNIEnv *env,
 	return wavFile->looping;
 }
 
-void Java_com_kh_beatbot_global_Track_notifyNoteMoved(JNIEnv *env,
-		jclass clazz, jint trackNum, jlong oldOnTick, jlong oldOffTick,
-		jlong newOnTick, jlong newOffTick) {
+void Java_com_kh_beatbot_global_Track_notifyNoteMoved(JNIEnv *env, jclass clazz,
+		jint trackNum, jlong oldOnTick, jlong oldOffTick, jlong newOnTick,
+		jlong newOffTick) {
 	Track *track = getTrack(env, clazz, trackNum);
 
-	if ((track->nextStartSample == tickToSample(oldOnTick) && tickToSample(newOnTick) > currSample) ||
-			(track->nextStopSample == tickToSample(oldOffTick) && tickToSample(newOffTick) < currSample))
+	if ((track->nextStartSample == tickToSample(oldOnTick)
+			&& tickToSample(newOnTick) > currSample)
+			|| (track->nextStopSample == tickToSample(oldOffTick)
+					&& tickToSample(newOffTick) < currSample))
 		stopTrack(track);
 }
 

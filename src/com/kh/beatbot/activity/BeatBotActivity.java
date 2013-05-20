@@ -15,6 +15,7 @@ import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.method.DigitsKeyListener;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -52,7 +53,7 @@ public class BeatBotActivity extends Activity {
 	private static final int EFFECT_PAGE_NUM = 1;
 
 	private static byte[] buffer = new byte[1024];
-	
+
 	private static void copyFile(InputStream in, OutputStream out)
 			throws IOException {
 		int read;
@@ -150,7 +151,8 @@ public class BeatBotActivity extends Activity {
 		super.onDestroy();
 		if (isFinishing()) {
 			shutdown();
-			android.os.Process.killProcess(android.os.Process.myPid());
+			Log.e("Main Activity", "finishing");
+			// android.os.Process.killProcess(android.os.Process.myPid());
 		}
 	}
 
@@ -235,7 +237,7 @@ public class BeatBotActivity extends Activity {
 			break;
 		case SAMPLE_NAME_EDIT_DIALOG_ID:
 			sampleNameInput = new EditText(this);
-			
+
 			builder.setTitle("Edit Sample Name")
 					.setView(sampleNameInput)
 					.setPositiveButton("OK",
@@ -248,7 +250,8 @@ public class BeatBotActivity extends Activity {
 									if (!sampleName.isEmpty()) {
 										TrackManager.currTrack
 												.setCurrSampleName(sampleName);
-										GlobalVars.mainPage.pageSelectGroup.update();
+										GlobalVars.mainPage.pageSelectGroup
+												.update();
 									}
 								}
 							})

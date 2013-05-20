@@ -15,6 +15,8 @@ typedef struct WavFile_t {
 	bool looping;
 	bool reverse;
 	float sampleRate;
+	int channels;
+	char *sampleFileName;
 } WavFile;
 
 WavFile *wavfile_create(const char *sampleName);
@@ -49,25 +51,25 @@ static inline void wavfile_tick(WavFile *config, float *sample) {
 	// read next two samples from current sample (rounded down)
 	int channel;
 	if (config->samples == NULL) {
-		fseek(config->sampleFile, sampleIndex * TWO_FLOAT_SZ, SEEK_SET);
-		fread(config->tempSample, 1, FOUR_FLOAT_SZ, config->sampleFile);
-		for (channel = 0; channel < 2; channel++) {
+		fseek(config->sampleFile, sampleIndex * config->channels * ONE_FLOAT_SZ, SEEK_SET);
+		fread(config->tempSample, config->channels, TWO_FLOAT_SZ, config->sampleFile);
+		for (channel = 0; channel < config->channels; channel++) {
 			// interpolate the next two samples linearly
 			sample[channel] = (1.0f - remainder) * config->tempSample[channel]
-					+ remainder * config->tempSample[2 + channel];
+					+ remainder * config->tempSample[config->channels + channel];
+		}
+		if (config->channels == 1) {
+			sample[1] = sample[0];
 		}
 	} else {
-		for (channel = 0; channel < 2; channel++) {
+		for (channel = 0; channel < config->channels; channel++) {
 			// copy left channel to right channel if mono
-			float samp1 =
-					config->samples[1] == NULL ?
-							config->samples[0][sampleIndex] :
-							config->samples[channel][sampleIndex];
-			float samp2 =
-					config->samples[1] == NULL ?
-							config->samples[0][sampleIndex + 1] :
-							config->samples[channel][sampleIndex + 1];
+			float samp1 = config->samples[channel][sampleIndex];
+			float samp2 = config->samples[channel][sampleIndex + 1];
 			sample[channel] = (1.0f - remainder) * samp1 + remainder * samp2;
+		}
+		if (config->channels == 1) {
+			sample[1] = sample[0];
 		}
 	}
 
