@@ -33,7 +33,7 @@ import com.kh.beatbot.view.list.DraggableLabelList;
 import com.kh.beatbot.view.list.LabelList;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
-public class LevelsFXPage extends Page implements Level1dListener {
+public abstract class LevelsFXPage extends Page implements Level1dListener {
 
 	class EffectLabelListListener implements DraggableLabelListListener {
 		private AlertDialog selectEffectAlert = null;
@@ -310,21 +310,6 @@ public class LevelsFXPage extends Page implements Level1dListener {
 		addChild(pitchToggle);
 		addChild(effectLabelList);
 	}
-
-	@Override
-	public void layoutChildren() {
-		float thirdHeight = height / 3;
-		float levelHeight = height / 12;
-
-		volumeToggle.layout(this, 0, levelHeight, 2 * thirdHeight, thirdHeight);
-		panToggle.layout(this, 2 * thirdHeight, levelHeight, 2 * thirdHeight,
-				thirdHeight);
-		pitchToggle.layout(this, 4 * thirdHeight, levelHeight, 2 * thirdHeight,
-				thirdHeight);
-		levelBar.layout(this, 6 * thirdHeight, levelHeight, width - 2 * height,
-				thirdHeight);
-		effectLabel.layout(this, 0, 13 * height / 24, width / 5, thirdHeight);
-		effectLabelList.layout(this, width / 5, height / 2, 4 * width / 5,
-				5 * height / 12);
-	}
+	
+	
 }

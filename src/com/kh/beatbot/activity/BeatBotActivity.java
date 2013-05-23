@@ -220,7 +220,8 @@ public class BeatBotActivity extends Activity {
 									String bpmString = bpmInput.getText()
 											.toString();
 									if (!bpmString.isEmpty()) {
-										GlobalVars.mainPage.controlButtonGroup.bpmView
+										GlobalVars.mainPage.pageSelectGroup
+												.getMasterPage()
 												.setBPM(Integer
 														.valueOf(bpmString));
 									}

@@ -7,7 +7,7 @@ import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.layout.page.AdsrPage;
-import com.kh.beatbot.layout.page.LevelsFXPage;
+import com.kh.beatbot.layout.page.MasterPage;
 import com.kh.beatbot.layout.page.NoteLevelsPage;
 import com.kh.beatbot.layout.page.SampleEditPage;
 import com.kh.beatbot.layout.page.TrackPage;
@@ -29,7 +29,7 @@ public class PageSelectGroup extends TouchableBBView {
 	public static final int NOTE_LEVELS_PAGE_ID = 4;
 
 	private static NoteLevelsPage levelsPage;
-	private static LevelsFXPage masterPage;
+	private static MasterPage masterPage;
 	private static TrackPage trackPage;
 	private static SampleEditPage sampleEditPage;
 	private static AdsrPage adsrPage;
@@ -47,6 +47,10 @@ public class PageSelectGroup extends TouchableBBView {
 		pageButtons[pageNum].trigger();
 	}
 
+	public MasterPage getMasterPage() {
+		return masterPage;
+	}
+	
 	public void update() {
 		updateInstrumentIcon();
 		updateSampleText();
@@ -114,7 +118,7 @@ public class PageSelectGroup extends TouchableBBView {
 		trackPage = new TrackPage();
 		sampleEditPage = new SampleEditPage();
 		adsrPage = new AdsrPage();
-		masterPage = new LevelsFXPage();
+		masterPage = new MasterPage();
 		levelsPage = new NoteLevelsPage();
 
 		masterPage.setMasterMode(true);
