@@ -35,6 +35,7 @@ public class ImageButton extends Button {
 	public void setIconSource(IconSource iconSource) {
 		iconSources[FOREGROUND_ICON_INDEX] = iconSource;
 		layoutIcons();
+		init();
 	}
 
 	public void setBgIconSource(IconSource bgIconSource) {

@@ -22,7 +22,7 @@ import com.kh.beatbot.view.control.ToggleButton;
 import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class PageSelectGroup extends TouchableBBView {
-	public static final int LEVELS_FX_PAGE_ID = 0;
+	public static final int TRACK_PAGE_ID = 0;
 	public static final int EDIT_PAGE_ID = 1;
 	public static final int ADSR_PAGE_ID = 2;
 	public static final int MASTER_PAGE_ID = 3;
@@ -50,7 +50,7 @@ public class PageSelectGroup extends TouchableBBView {
 	public MasterPage getMasterPage() {
 		return masterPage;
 	}
-	
+
 	public void update() {
 		updateInstrumentIcon();
 		updateSampleText();
@@ -130,7 +130,7 @@ public class PageSelectGroup extends TouchableBBView {
 		pager.addPage(adsrPage);
 		pager.addPage(masterPage);
 		pager.addPage(levelsPage);
-		pager.setPage(LEVELS_FX_PAGE_ID);
+		pager.setPage(TRACK_PAGE_ID);
 
 		addChild(addTrackButton);
 		for (ToggleButton ToggleButton : pageButtons) {
@@ -142,16 +142,15 @@ public class PageSelectGroup extends TouchableBBView {
 	@Override
 	public void layoutChildren() {
 		float labelHeight = height / 5;
-		float labelWidth = (width - 2 * labelHeight) / 5;
+		float labelWidth = (width - 2 * labelHeight) / 4;
 		float labelYOffset = 2;
 		addTrackButton.layout(this, 0, labelYOffset, labelHeight, labelHeight);
-		pageButtons[LEVELS_FX_PAGE_ID].layout(this, labelHeight, labelYOffset,
-				labelWidth * 2, labelHeight);
-		for (int i = 1; i < pageButtons.length - 1; i++) {
-			pageButtons[i].layout(this, labelHeight + (i + 1) * labelWidth,
-					labelYOffset, labelWidth, labelHeight);
+		for (int i = 0; i < pageButtons.length - 1; i++) {
+			float x = labelHeight + i * labelWidth;
+			pageButtons[i].layout(this, x, labelYOffset, labelWidth,
+					labelHeight);
 		}
-		pageButtons[NOTE_LEVELS_PAGE_ID].layout(this, labelHeight + 5
+		pageButtons[NOTE_LEVELS_PAGE_ID].layout(this, labelHeight + 4
 				* labelWidth, labelYOffset, labelHeight, labelHeight);
 		pager.layout(this, 0, labelHeight + 2 * labelYOffset, width, height
 				- labelHeight - 2 * labelYOffset);
@@ -161,17 +160,18 @@ public class PageSelectGroup extends TouchableBBView {
 	protected void loadIcons() {
 		addTrackButton.setIconSource(new ImageIconSource(
 				R.drawable.plus_outline, R.drawable.plus_outline));
-		pageButtons[NOTE_LEVELS_PAGE_ID].setIconSource(new ImageIconSource(
-				R.drawable.levels_icon, -1, R.drawable.levels_icon_selected));
 		addTrackButton.setBgIconSource(new RoundedRectIconSource(
 				roundedRectGroup, Colors.labelBgColorSet,
 				Colors.labelStrokeColorSet));
+
+		pageButtons[NOTE_LEVELS_PAGE_ID].setIconSource(new ImageIconSource(
+				R.drawable.levels_icon, -1, R.drawable.levels_icon_selected));
 		for (int i = 0; i < pageButtons.length; i++) {
 			pageButtons[i].setBgIconSource(new RoundedRectIconSource(
 					roundedRectGroup, Colors.labelBgColorSet,
 					Colors.labelStrokeColorSet));
 		}
-		pageButtons[EDIT_PAGE_ID].setText("EDIT");
+		pageButtons[TRACK_PAGE_ID].setText("TRACK");
 		pageButtons[ADSR_PAGE_ID].setText("ADSR");
 		pageButtons[MASTER_PAGE_ID].setText("MASTER");
 	}
@@ -183,7 +183,7 @@ public class PageSelectGroup extends TouchableBBView {
 
 	private void updateInstrumentIcon() {
 		// update the track pager instrument icon
-		pageButtons[LEVELS_FX_PAGE_ID].setIconSource(TrackManager.currTrack
+		pageButtons[TRACK_PAGE_ID].setIconSource(TrackManager.currTrack
 				.getInstrument().getIconSource());
 	}
 
@@ -192,6 +192,6 @@ public class PageSelectGroup extends TouchableBBView {
 		// TODO handle all extensions
 		String formattedName = TrackManager.currTrack.getCurrSampleName()
 				.toUpperCase();
-		pageButtons[LEVELS_FX_PAGE_ID].setText(formattedName);
+		pageButtons[EDIT_PAGE_ID].setText(formattedName);
 	}
 }

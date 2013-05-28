@@ -27,7 +27,8 @@ public class Colors {
 			panStrokeColorSet, pitchBgColorSet, pitchStrokeColorSet,
 			volumeBgColorSet, volumeStrokeColorSet, effectLabelBgColorSet,
 			effectLabelStrokeColorSet, effectLabelTouchedBgColorSet,
-			effectLabelTouchedStrokeColorSet;
+			effectLabelTouchedStrokeColorSet, iconFillColorSet,
+			iconBorderColorSet, deleteFillColorSet, deleteBorderColorSet;
 
 	public static void initColors(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
@@ -105,6 +106,12 @@ public class Colors {
 		panStrokeColorSet = new ColorSet(PAN, PAN, WHITE);
 		pitchStrokeColorSet = new ColorSet(PITCH, PITCH, WHITE);
 		volumeStrokeColorSet = new ColorSet(VOLUME, VOLUME, WHITE);
+
+		iconFillColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED);
+		iconBorderColorSet = new ColorSet(WHITE, BLACK);
+
+		deleteFillColorSet = new ColorSet(TRANSPARANT, RED);
+		deleteBorderColorSet = new ColorSet(RED, BLACK);
 
 		defaultStrokeColorSet = new ColorSet(VOLUME, VOLUME, VOLUME);
 	}
