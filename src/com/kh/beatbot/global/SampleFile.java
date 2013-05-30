@@ -10,7 +10,8 @@ import java.nio.ShortBuffer;
 
 import com.kh.beatbot.view.BBView;
 
-public class WavFile {
+public class SampleFile {
+
 	private File file;
 	private RandomAccessFile sampleFile = null;
 	// holds a single float in the form of 4 bytes, used to input floats from a
@@ -19,7 +20,9 @@ public class WavFile {
 	private byte[] inBytes = new byte[2];
 	private int bytesPerSample = 0;
 
-	public WavFile(File file) {
+	private float loopBeginSample, loopEndSample;
+
+	public SampleFile(File file) {
 		this.file = file;
 		try {
 			sampleFile = new RandomAccessFile(file, "r");
@@ -27,17 +30,35 @@ public class WavFile {
 			sampleFile.seek(22);
 			int channels = sampleFile.readUnsignedByte();
 			bytesPerSample = channels * 2;
+			loopBeginSample = 0;
+			loopEndSample = getNumSamples();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
+	public float getLoopBeginSample() {
+		return loopBeginSample;
+	}
+	
+	public float getLoopEndSample() {
+		return loopEndSample;
+	}
+
+	public void setLoopBeginSample(float loopBeginSample) {
+		this.loopBeginSample = loopBeginSample;
+	}
+	
+	public void setLoopEndSample(float loopEndSample) {
+		this.loopEndSample = loopEndSample;
+	}
+	
 	public void renameTo(String name) {
 		file.renameTo(new File(name));
 	}
-	
+
 	public long getNumSamples() {
-		long numSamples = 0; 
+		long numSamples = 0;
 		try {
 			numSamples = (sampleFile.length() - 44) / bytesPerSample;
 		} catch (IOException e) {
@@ -77,5 +98,13 @@ public class WavFile {
 			floatData[i] = ((float) shortData[i + skip]) / 0x8000;
 		}
 		return floatData;
+	}
+	
+	public String getName() {
+		return file.getName();
+	}
+	
+	public String getFullPath() {
+		return file.getAbsolutePath();
 	}
 }

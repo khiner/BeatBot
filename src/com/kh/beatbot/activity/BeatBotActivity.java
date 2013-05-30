@@ -105,7 +105,6 @@ public class BeatBotActivity extends Activity {
 			// create it and write all assets of this type to the folder
 			copyFromAssetsToExternal(drumPath);
 		}
-		Managers.directoryManager.updateDirectories();
 	}
 
 	/** Called when the activity is first created. */
@@ -150,8 +149,12 @@ public class BeatBotActivity extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		if (isFinishing()) {
-			shutdown();
-			Log.e("Main Activity", "finishing");
+			try {
+				shutdown();
+			} finally {
+				Managers.directoryManager.clearTempFiles();
+				Log.e("Main Activity", "finishing");
+			}
 			// android.os.Process.killProcess(android.os.Process.myPid());
 		}
 	}

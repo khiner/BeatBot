@@ -66,8 +66,9 @@ public class TrackManager {
 	}
 
 	public static void addTrack(Instrument instrument, int sampleNum) {
-		addTrack(instrument.getSamplePath(sampleNum));
-		Track newTrack = new Track(tracks.size(), instrument, sampleNum);
+		addTrack(instrument.getFullPath(sampleNum));
+		Track newTrack = new Track(tracks.size());
+		newTrack.setInstrument(instrument, sampleNum);
 		tracks.add(newTrack);
 		currTrack = tracks.get(tracks.size() - 1);
 		GlobalVars.mainPage.trackAdded(tracks.size() - 1);

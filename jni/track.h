@@ -68,7 +68,7 @@ void updateAllLevels();
 
 void freeEffects(Levels *levels);
 
-void freeTracks();
+void destroyTracks();
 
 Levels *initLevels();
 

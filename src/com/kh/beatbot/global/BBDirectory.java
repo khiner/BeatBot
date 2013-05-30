@@ -88,4 +88,15 @@ public class BBDirectory {
 	public void setEmptyMsg(String emptyMsg) {
 		this.emptyMsg = emptyMsg;
 	}
+	
+	public void clearTempFiles() {
+		for (File sampleFile : new File(path).listFiles()) {
+			if (sampleFile.getAbsolutePath().contains(".raw")) {
+				sampleFile.delete();
+			}
+		}
+		for (BBDirectory child : children) {
+			child.clearTempFiles();
+		}
+	}
 }

@@ -365,7 +365,7 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_shutdown(JNIEnv *env,
 		engineEngine = NULL;
 	}
 
-	freeTracks();
+	destroyTracks();
 
 	pthread_mutex_destroy(&openSlOut->trackMutex);
 	pthread_mutex_destroy(&bufferFillMutex);

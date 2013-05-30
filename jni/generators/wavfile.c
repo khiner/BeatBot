@@ -173,7 +173,7 @@ void wavfile_destroy(void *p) {
 		fflush(wavFile->sampleFile);
 		fclose(wavFile->sampleFile);
 		wavFile->sampleFile = NULL;
-		remove(wavFile->sampleFileName);
+		free(wavFile->sampleFileName);
 	}
 	wavfile_freeBuffers(wavFile);
 	adsrconfig_destroy(wavFile->adsr);

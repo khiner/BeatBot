@@ -135,8 +135,7 @@ void freeEffects(Levels *levels) {
 	}
 }
 
-void freeTracks() {	// destroy all tracks
-
+void destroyTracks() {	// destroy all tracks
 	TrackNode *cur_ptr = trackHead;
 	while (cur_ptr != NULL ) {
 		free(cur_ptr->track->currBufferFloat[0]);
@@ -149,9 +148,6 @@ void freeTracks() {	// destroy all tracks
 		free(prev_ptr); // free the entire Node
 	}
 	freeEffects(masterLevels);
-
-	// (We never unlock the mutex --
-	// this should only be called on activity closed)
 }
 
 Levels *initLevels() {

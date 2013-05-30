@@ -221,13 +221,6 @@ public class DirectoryManager {
 				GlobalVars.mainActivity);
 	}
 
-	public void updateDirectories() {
-		for (BBDirectory dir : drumsDirectory.getChildren()) {
-			((Instrument) dir).updateFiles();
-		}
-		((Instrument) beatRecordDirectory).updateFiles();
-	}
-
 	public void updateInstrumentSelectAlert(BBDirectory newDirectory) {
 		updateInstrumentSelectAdapter(newDirectory);
 		updateInstrumentSelectTitleBar();
@@ -265,6 +258,10 @@ public class DirectoryManager {
 		return beatRecordDirectory.getPath();
 	}
 
+	public void clearTempFiles() {
+		audioDirectory.clearTempFiles();
+	}
+	
 	private void show(BBDirectory directory) {
 		currDirectory = directory;
 		updateInstrumentSelectAlert(currDirectory);

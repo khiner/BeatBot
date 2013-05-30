@@ -56,9 +56,6 @@ public class ControlButtonGroup extends TouchableBBView {
 				if (Managers.recordManager.isRecording()) {
 					// Managers.recordManager.stopListening();
 					String fileName = Managers.recordManager.stopRecording();
-					// make sure the recorded instrument shows the newly
-					// recorded beat
-					Managers.directoryManager.updateDirectories();
 
 					Toast.makeText(
 							GlobalVars.mainActivity.getApplicationContext(),

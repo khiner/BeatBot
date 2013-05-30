@@ -2,9 +2,7 @@ package com.kh.beatbot.global;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.manager.Managers;
@@ -13,32 +11,20 @@ import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.view.helper.TickWindowHelper;
 
 public class Track extends BaseTrack {
-	class LoopSampleInfo {
-		public float loopBeginSample;
-		public float loopEndSample;
-		public float totalNumSamples;
-
-		LoopSampleInfo(float totalNumSamples) {
-			this.loopBeginSample = 0;
-			this.loopEndSample = totalNumSamples;
-			this.totalNumSamples = totalNumSamples;
-		}
-	}
 
 	private Instrument instrument;
-	private int currSampleNum = 0;
+
 	private boolean adsrEnabled = false, reverse = false;
 	private List<MidiNote> notes = new ArrayList<MidiNote>();
+	private List<SampleFile> sampleFiles = new ArrayList<SampleFile>();
+
+	private SampleFile currSampleFile;
 	public ADSR adsr;
 
-	private Map<Integer, LoopSampleInfo> sampleLoopPoints = new HashMap<Integer, LoopSampleInfo>();
-
-	public Track(int id, Instrument instrument, int sampleNum) {
+	public Track(int id) {
 		super(id);
-		this.instrument = instrument;
-		this.currSampleNum = sampleNum;
+		this.currSampleFile = null;
 		this.adsr = new ADSR(id);
-		constructLoopPointMap();
 	}
 
 	public void removeNote(MidiNote note) {
@@ -136,65 +122,69 @@ public class Track extends BaseTrack {
 	}
 
 	public void setInstrument(Instrument instrument, int sampleNum) {
-		if (this.instrument == instrument && this.currSampleNum == sampleNum)
-			return;
 		this.instrument = instrument;
+		// if we already have this sample in our list, reuse it
+		// otherwise, create a new one and add it to the list
+		String fileName = instrument.getFullPath(sampleNum);
+		SampleFile sampleFile = findSampleFile(fileName);
+		if (sampleFile == null) { // haven't created sample file yet
+			currSampleFile = instrument.createSampleFile(sampleNum);
+			sampleFiles.add(currSampleFile);
+		} else if (!sampleFile.equals(currSampleFile)) {
+			currSampleFile = sampleFile;
+		} else {
+			return; // same file, nothing to do
+		}
 		setSampleNum(sampleNum);
-		constructLoopPointMap();
+		updateLoopWindow();
 		GlobalVars.mainPage.pageSelectGroup.notifyTrackChanged();
 	}
 
+	private SampleFile findSampleFile(String fileName) {
+		for (SampleFile sampleFile : sampleFiles) {
+			if (sampleFile.getFullPath().equals(fileName)) {
+				return sampleFile;
+			}
+		}
+		return null;
+	}
+
 	public float getLoopBeginSample() {
-		return sampleLoopPoints.get(currSampleNum).loopBeginSample;
+		return getCurrSampleFile().getLoopBeginSample();
 	}
 
 	public float getLoopEndSample() {
-		return sampleLoopPoints.get(currSampleNum).loopEndSample;
+		return getCurrSampleFile().getLoopEndSample();
 	}
 
 	public float getNumSamples() {
-		return sampleLoopPoints.get(currSampleNum).totalNumSamples;
+		return getCurrSampleFile().getNumSamples();
 	}
 
 	public void setLoopBeginSample(float loopBeginSample) {
-		sampleLoopPoints.get(currSampleNum).loopBeginSample = loopBeginSample;
-		setLoopWindow((long) loopBeginSample,
-				(long) sampleLoopPoints.get(currSampleNum).loopEndSample);
+		getCurrSampleFile().setLoopBeginSample(loopBeginSample);
+		updateLoopWindow();
 	}
 
 	public void setLoopEndSample(float loopEndSample) {
-		sampleLoopPoints.get(currSampleNum).loopEndSample = loopEndSample;
-		setLoopWindow(
-				(long) sampleLoopPoints.get(currSampleNum).loopBeginSample,
-				(long) loopEndSample);
-	}
-
-	public String getSampleName() {
-		return instrument.getSampleName(currSampleNum);
+		getCurrSampleFile().setLoopEndSample(loopEndSample);
+		updateLoopWindow();
 	}
 
 	public String getCurrSampleName() {
-		return instrument.getSampleName(currSampleNum).replace(".wav", "");
+		return currSampleFile.getName().replace(".wav", "");
 	}
-	
+
 	public void setCurrSampleName(String name) {
-		instrument.setSampleName(currSampleNum, name + ".wav");
+		currSampleFile.renameTo(instrument.getBasePath() + name + ".wav");
 	}
-	
+
 	public String getCurrSamplePath() {
-		return instrument.getSamplePath(currSampleNum);
+		return currSampleFile.getFullPath();
 	}
 
-	public WavFile getCurrSampleFile() {
-		return instrument.getWavFile(currSampleNum);
-	}
-
-	private void constructLoopPointMap() {
-		sampleLoopPoints.clear();
-		for (int sampleNum = 0; sampleNum < instrument.getChildNames().length; sampleNum++) {
-			long numSamples = instrument.getNumSamples(sampleNum);
-			sampleLoopPoints.put(sampleNum, new LoopSampleInfo(numSamples));
-		}
+	public SampleFile getCurrSampleFile() {
+		return currSampleFile;
 	}
 
 	/** Wrappers around native JNI methods **/
@@ -231,8 +221,9 @@ public class Track extends BaseTrack {
 		return reverse;
 	}
 
-	public void setLoopWindow(long loopBegin, long loopEnd) {
-		setTrackLoopWindow(id, loopBegin, loopEnd);
+	private void updateLoopWindow() {
+		setTrackLoopWindow(id, (long) getLoopBeginSample(),
+				(long) getLoopEndSample());
 	}
 
 	public void notifyNoteMoved(long oldNoteOn, long oldNoteOff,
@@ -252,7 +243,6 @@ public class Track extends BaseTrack {
 	}
 
 	public void setSampleNum(int sampleNum) {
-		currSampleNum = sampleNum;
 		setSample(id, getCurrSamplePath());
 	}
 
