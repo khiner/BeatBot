@@ -8,12 +8,14 @@ import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.view.TrackButtonRow;
 import com.kh.beatbot.view.helper.TickWindowHelper;
 
 public class Track extends BaseTrack {
 
 	private Instrument instrument;
-
+	private TrackButtonRow buttonRow;
+	
 	private boolean adsrEnabled = false, reverse = false;
 	private List<MidiNote> notes = new ArrayList<MidiNote>();
 	private List<SampleFile> sampleFiles = new ArrayList<SampleFile>();
@@ -25,10 +27,23 @@ public class Track extends BaseTrack {
 		super(id);
 		this.currSampleFile = null;
 		this.adsr = new ADSR(id);
+		this.buttonRow = new TrackButtonRow(this);
 	}
 
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	public void select() {
+		buttonRow.instrumentButton.trigger(false);
+	}
+	
+	public TrackButtonRow getButtonRow() {
+		return buttonRow;
+	}
+	
+	public void updateInstrumentIcon() {
+		buttonRow.updateInstrumentIcon();
 	}
 	
 	public void removeNote(MidiNote note) {

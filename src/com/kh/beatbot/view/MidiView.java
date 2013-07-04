@@ -10,6 +10,7 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.global.Colors;
+import com.kh.beatbot.global.Track;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -294,7 +295,7 @@ public class MidiView extends ClickableBBView {
 	}
 
 	private void initCurrTickVb() {
-		float[] vertLine = new float[] { 0, Y_OFFSET, 0, allTracksHeight};
+		float[] vertLine = new float[] { 0, Y_OFFSET, 0, Y_OFFSET + allTracksHeight};
 		currTickVb = makeFloatBuffer(vertLine);
 	}
 
@@ -315,8 +316,8 @@ public class MidiView extends ClickableBBView {
 	private void initLoopMarkerVbs() {
 		float x1 = tickToUnscaledX(midiManager.getLoopBeginTick());
 		float x2 = tickToUnscaledX(midiManager.getLoopEndTick());
-		float[][] loopMarkerLines = new float[][] { { x1, 0, x1, Y_OFFSET + allTracksHeight },
-				{ x2, 0, x2, Y_OFFSET + allTracksHeight } };
+		float[][] loopMarkerLines = new float[][] { { x1, Y_OFFSET, x1, Y_OFFSET + allTracksHeight },
+				{ x2, Y_OFFSET, x2, Y_OFFSET + allTracksHeight } };
 		// loop begin triangle, pointing right, and
 		// loop end triangle, pointing left
 		float[][] loopMarkerTriangles = new float[][] {
@@ -355,14 +356,14 @@ public class MidiView extends ClickableBBView {
 		return note * trackHeight + Y_OFFSET;
 	}
 
-	public void notifyTrackCreated(int trackNum) {
+	public void notifyTrackCreated(Track track) {
 		allTracksHeight += trackHeight;
 		if (initialized) {
 			initAllVbs();
 		}
 	}
 
-	public void notifyTrackDeleted(int trackNum) {
+	public void notifyTrackDeleted(Track track) {
 		allTracksHeight -= trackHeight;
 		initAllVbs();
 	}

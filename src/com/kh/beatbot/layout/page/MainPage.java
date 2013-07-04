@@ -1,6 +1,7 @@
 package com.kh.beatbot.layout.page;
 
 import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.global.Track;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.view.MidiTrackView;
 import com.kh.beatbot.view.MidiView;
@@ -15,15 +16,15 @@ public class MainPage extends TouchableBBView {
 	public MidiTrackView midiTrackView;
 	public PageSelectGroup pageSelectGroup;
 	
-	public void trackCreated(int newTrackNum) {
-		midiTrackView.notifyTrackCreated(newTrackNum);
-		midiView.notifyTrackCreated(newTrackNum);
+	public void trackCreated(Track track) {
+		midiTrackView.notifyTrackCreated(track);
+		midiView.notifyTrackCreated(track);
 		pageSelectGroup.notifyTrackChanged();
 	}
 	
-	public void notifyTrackDeleted(int newTrackNum) {
-		midiTrackView.notifyTrackDeleted(newTrackNum);
-		midiView.notifyTrackDeleted(newTrackNum);
+	public void notifyTrackDeleted(Track track) {
+		midiTrackView.notifyTrackDeleted(track);
+		midiView.notifyTrackDeleted(track);
 	}
 	
 	@Override

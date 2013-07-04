@@ -8,6 +8,8 @@ import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.global.Instrument;
 import com.kh.beatbot.global.Track;
 import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.view.TrackButtonRow;
+import com.kh.beatbot.view.control.ToggleButton;
 
 public class TrackManager {
 
@@ -71,18 +73,18 @@ public class TrackManager {
 		newTrack.setInstrument(instrument, sampleNum);
 		tracks.add(newTrack);
 		currTrack = tracks.get(tracks.size() - 1);
-		GlobalVars.mainPage.trackCreated(tracks.size() - 1);
+		GlobalVars.mainPage.trackCreated(newTrack);
 	}
 
 	public static void deleteCurrTrack() {
+		GlobalVars.mainPage.notifyTrackDeleted(currTrack);
 		int currTrackNum = tracks.indexOf(currTrack);
-		GlobalVars.mainPage.notifyTrackDeleted(currTrackNum);
 		tracks.remove(currTrackNum);
 		for (int i = currTrackNum; i < tracks.size(); i++) {
 			tracks.get(i).setId(i);
 		}
 		int selectedTrackNum = Math.min(currTrackNum, tracks.size() - 1);
-		GlobalVars.mainPage.midiTrackView.selectTrack(selectedTrackNum);
+		tracks.get(selectedTrackNum).select();
 		setTrack(selectedTrackNum);
 		deleteTrack(currTrackNum);
 	}
@@ -94,6 +96,26 @@ public class TrackManager {
 	public static void updateAllTrackNextNotes() {
 		for (Track track : tracks) {
 			track.updateNextNote();
+		}
+	}
+	
+	public static void selectInstrumentButton(ToggleButton button) {
+		button.setChecked(true);
+		for (Track track : tracks) {
+			TrackButtonRow buttonRow = track.getButtonRow();
+			if (!button.equals(buttonRow.instrumentButton)) {
+				buttonRow.instrumentButton.setChecked(false);
+			}
+		}
+	}
+	
+	public static void selectSoloButton(ToggleButton button) {
+		button.setChecked(true);
+		for (Track track : tracks) {
+			TrackButtonRow buttonRow = track.getButtonRow();
+			if (!button.equals(buttonRow.instrumentButton)) {
+				buttonRow.soloButton.setChecked(false);
+			}
 		}
 	}
 	

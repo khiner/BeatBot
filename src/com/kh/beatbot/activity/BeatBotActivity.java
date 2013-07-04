@@ -335,7 +335,7 @@ public class BeatBotActivity extends Activity {
 	 * Set up the project. For now, this just means setting track 0, page 0 view
 	 */
 	public void setupProject() {
-		GlobalVars.mainPage.midiTrackView.selectTrack(0);
+		TrackManager.getTrack(0).select();
 		GlobalVars.mainPage.pageSelectGroup.selectPage(0);
 	}
 
