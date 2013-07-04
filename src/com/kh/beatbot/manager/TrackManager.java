@@ -77,12 +77,12 @@ public class TrackManager {
 	}
 
 	public static void deleteCurrTrack() {
-		GlobalVars.mainPage.notifyTrackDeleted(currTrack);
 		int currTrackNum = tracks.indexOf(currTrack);
 		tracks.remove(currTrackNum);
 		for (int i = currTrackNum; i < tracks.size(); i++) {
 			tracks.get(i).setId(i);
 		}
+		GlobalVars.mainPage.notifyTrackDeleted(currTrack);
 		int selectedTrackNum = Math.min(currTrackNum, tracks.size() - 1);
 		tracks.get(selectedTrackNum).select();
 		setTrack(selectedTrackNum);

@@ -24,9 +24,7 @@ import com.kh.beatbot.view.mesh.ShapeGroup;
 public class MidiView extends ClickableBBView {
 
 	/**************** ATTRIBUTES ***************/
-	public static final float Y_OFFSET = 21;
-
-	public static final float LOOP_SELECT_SNAP_DIST = 30;
+	public static final float Y_OFFSET = 21, LOOP_SELECT_SNAP_DIST = 30;
 
 	public static final int NOTE_BORDER_WIDTH = 2;
 
@@ -34,12 +32,12 @@ public class MidiView extends ClickableBBView {
 
 	public static float dragOffsetTick[] = { 0, 0, 0, 0, 0 };
 
-	public static int pinchLeftPointerId = -1, pinchRightPointerId = -1;
-	public static float pinchLeftAnchor = 0, pinchRightAnchor = 0,
-			zoomLeftAnchorTick = 0, zoomRightAnchorTick = 0;
+	public static int pinchLeftPointerId = -1, pinchRightPointerId = -1,
+			scrollPointerId = -1;
 
-	public static int scrollPointerId = -1;
-	public static float scrollAnchorTick = 0, scrollAnchorY = 0;
+	public static float pinchLeftAnchor = 0, pinchRightAnchor = 0,
+			zoomLeftAnchorTick = 0, zoomRightAnchorTick = 0,
+			scrollAnchorTick = 0, scrollAnchorY = 0;
 
 	private static boolean selectRegion = false;
 	private static float selectRegionStartTick = -1, selectRegionStartY = -1;
@@ -219,10 +217,11 @@ public class MidiView extends ClickableBBView {
 	private void updateBgRect() {
 		float width = tickToUnscaledX(TickWindowHelper.MAX_TICKS - 1);
 		if (bgRect == null) {
-			bgRect = makeRectangle(bgShapeGroup, 0, Y_OFFSET, width, allTracksHeight,
-					Colors.MIDI_VIEW_BG);
+			bgRect = makeRectangle(bgShapeGroup, 0, Y_OFFSET, width,
+					allTracksHeight, Colors.MIDI_VIEW_BG);
 		} else {
-			bgRect.update(0, Y_OFFSET, width, allTracksHeight, Colors.MIDI_VIEW_BG);
+			bgRect.update(0, Y_OFFSET, width, allTracksHeight,
+					Colors.MIDI_VIEW_BG);
 		}
 		updateLoopRect();
 	}
@@ -295,7 +294,8 @@ public class MidiView extends ClickableBBView {
 	}
 
 	private void initCurrTickVb() {
-		float[] vertLine = new float[] { 0, Y_OFFSET, 0, Y_OFFSET + allTracksHeight};
+		float[] vertLine = new float[] { 0, Y_OFFSET, 0,
+				Y_OFFSET + allTracksHeight };
 		currTickVb = makeFloatBuffer(vertLine);
 	}
 
@@ -316,7 +316,8 @@ public class MidiView extends ClickableBBView {
 	private void initLoopMarkerVbs() {
 		float x1 = tickToUnscaledX(midiManager.getLoopBeginTick());
 		float x2 = tickToUnscaledX(midiManager.getLoopEndTick());
-		float[][] loopMarkerLines = new float[][] { { x1, Y_OFFSET, x1, Y_OFFSET + allTracksHeight },
+		float[][] loopMarkerLines = new float[][] {
+				{ x1, Y_OFFSET, x1, Y_OFFSET + allTracksHeight },
 				{ x2, Y_OFFSET, x2, Y_OFFSET + allTracksHeight } };
 		// loop begin triangle, pointing right, and
 		// loop end triangle, pointing left
@@ -366,6 +367,10 @@ public class MidiView extends ClickableBBView {
 	public void notifyTrackDeleted(Track track) {
 		allTracksHeight -= trackHeight;
 		initAllVbs();
+		for (MidiNote note : track.getMidiNotes()) {
+			note.getRectangle().getGroup().remove(note.getRectangle());
+		}
+		updateNoteRects();
 	}
 
 	public void notifyTrackChanged(int newTrackNum) {
@@ -564,6 +569,17 @@ public class MidiView extends ClickableBBView {
 		}
 	}
 
+	public void updateNoteRects() {
+		//unselectedRectangles.clear();
+		//selectedRectangles.clear();
+		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
+			Track track = TrackManager.getTrack(i);
+			for (MidiNote note : track.getMidiNotes()) {
+				updateNoteView(note);
+			}
+		}
+	}
+	
 	public void updateNoteFillColor(MidiNote note) {
 		note.getRectangle().setColors(whichColor(note), Colors.BLACK);
 		note.getRectangle().setGroup(whichRectangleGroup(note));

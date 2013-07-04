@@ -32,6 +32,9 @@ public class Track extends BaseTrack {
 
 	public void setId(int id) {
 		this.id = id;
+		for (MidiNote note : notes) {
+			note.setNote(id);
+		}
 	}
 	
 	public void select() {
