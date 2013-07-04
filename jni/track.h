@@ -54,7 +54,7 @@ void addEffect(Levels *levels, Effect *effect);
 
 void freeMidiEvents(Track *track);
 
-void printTracks(TrackNode *head);
+void printTracks();
 
 void addTrack(Track *track);
 

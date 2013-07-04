@@ -44,7 +44,7 @@ public class PageSelectGroup extends TouchableBBView {
 		if (pageNum < 0 || pageNum >= pageButtons.length) {
 			return;
 		}
-		pageButtons[pageNum].trigger();
+		pageButtons[pageNum].trigger(false);
 	}
 
 	public MasterPage getMasterPage() {

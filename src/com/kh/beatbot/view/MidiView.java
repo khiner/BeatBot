@@ -218,10 +218,10 @@ public class MidiView extends ClickableBBView {
 	private void updateBgRect() {
 		float width = tickToUnscaledX(TickWindowHelper.MAX_TICKS - 1);
 		if (bgRect == null) {
-			bgRect = makeRectangle(bgShapeGroup, 0, 0, width, height,
+			bgRect = makeRectangle(bgShapeGroup, 0, Y_OFFSET, width, allTracksHeight,
 					Colors.MIDI_VIEW_BG);
 		} else {
-			bgRect.update(0, 0, width, height, Colors.MIDI_VIEW_BG);
+			bgRect.update(0, Y_OFFSET, width, allTracksHeight, Colors.MIDI_VIEW_BG);
 		}
 		updateLoopRect();
 	}
@@ -285,23 +285,24 @@ public class MidiView extends ClickableBBView {
 		float y = Y_OFFSET;
 		float width = tickToUnscaledX(midiManager.getLoopEndTick()) - x;
 		if (loopRect == null) {
-			loopRect = makeRectangle(bgShapeGroup, x, y, width, height,
-					Colors.MIDI_VIEW_LIGHT_BG);
+			loopRect = makeRectangle(bgShapeGroup, x, y, width,
+					allTracksHeight, Colors.MIDI_VIEW_LIGHT_BG);
 		} else {
-			loopRect.update(x, y, width, height, Colors.MIDI_VIEW_LIGHT_BG);
+			loopRect.update(x, y, width, allTracksHeight,
+					Colors.MIDI_VIEW_LIGHT_BG);
 		}
 	}
 
 	private void initCurrTickVb() {
-		float[] vertLine = new float[] { 0, Y_OFFSET, 0, height };
+		float[] vertLine = new float[] { 0, Y_OFFSET, 0, allTracksHeight};
 		currTickVb = makeFloatBuffer(vertLine);
 	}
 
 	private void initHLineVb() {
-		float[] hLines = new float[(TrackManager.getNumTracks() + 1) * 4];
+		float[] hLines = new float[(TrackManager.getNumTracks()) * 4];
 
 		float y = Y_OFFSET;
-		for (int i = 1; i < TrackManager.getNumTracks() + 1; i++) {
+		for (int i = 1; i < TrackManager.getNumTracks(); i++) {
 			y += trackHeight;
 			hLines[i * 4] = 0;
 			hLines[i * 4 + 1] = y;
@@ -314,8 +315,8 @@ public class MidiView extends ClickableBBView {
 	private void initLoopMarkerVbs() {
 		float x1 = tickToUnscaledX(midiManager.getLoopBeginTick());
 		float x2 = tickToUnscaledX(midiManager.getLoopEndTick());
-		float[][] loopMarkerLines = new float[][] { { x1, 0, x1, height },
-				{ x2, 0, x2, height } };
+		float[][] loopMarkerLines = new float[][] { { x1, 0, x1, Y_OFFSET + allTracksHeight },
+				{ x2, 0, x2, Y_OFFSET + allTracksHeight } };
 		// loop begin triangle, pointing right, and
 		// loop end triangle, pointing left
 		float[][] loopMarkerTriangles = new float[][] {
@@ -354,10 +355,16 @@ public class MidiView extends ClickableBBView {
 		return note * trackHeight + Y_OFFSET;
 	}
 
-	public void notifyTrackAdded(int trackNum) {
+	public void notifyTrackCreated(int trackNum) {
 		allTracksHeight += trackHeight;
-		if (initialized)
+		if (initialized) {
 			initAllVbs();
+		}
+	}
+
+	public void notifyTrackDeleted(int trackNum) {
+		allTracksHeight -= trackHeight;
+		initAllVbs();
 	}
 
 	public void notifyTrackChanged(int newTrackNum) {
@@ -371,6 +378,7 @@ public class MidiView extends ClickableBBView {
 		initLoopMarkerVbs();
 		updateTickFillRect();
 		initLoopBarVb();
+		TickWindowHelper.initVLineVbs();
 	}
 
 	protected void loadIcons() {
@@ -527,7 +535,7 @@ public class MidiView extends ClickableBBView {
 			float width, float height, float[] fillColor) {
 		return makeRectangle(group, x1, y1, width, height, fillColor, null);
 	}
-	
+
 	private Rectangle makeRectangle(ShapeGroup group, float x1, float y1,
 			float width, float height, float[] fillColor, float[] outlineColor) {
 		Rectangle newRect;

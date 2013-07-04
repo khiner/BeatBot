@@ -33,9 +33,9 @@ jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size) {
 	return result;
 }
 
-void printTracks(TrackNode *head) {
+void printTracks() {
 	__android_log_print(ANDROID_LOG_ERROR, "tracks", "Elements:");
-	TrackNode *cur_ptr = head;
+	TrackNode *cur_ptr = trackHead;
 	while (cur_ptr != NULL ) {
 		if (cur_ptr->track != NULL )
 			__android_log_print(ANDROID_LOG_ERROR, "track num = ", "%d, ",
@@ -91,7 +91,7 @@ Levels *getLevels(JNIEnv *env, jclass clazz, int trackNum) {
 	return track->levels;
 }
 
-void addTrack(Track *track) {
+void createTrack(Track *track) {
 	TrackNode *new = (TrackNode *) malloc(sizeof(TrackNode));
 	new->track = track;
 	new->next = NULL;
@@ -120,6 +120,14 @@ TrackNode *removeTrack(int trackNum) {
 		}
 		one_back->next = node->next;
 	}
+
+	// renumber tracks
+	node = trackHead;
+	int count = 0;
+	while (node != NULL) {
+		node->track->num = count++;
+		node = node->next;
+	}
 	return node;
 }
 
@@ -138,11 +146,7 @@ void freeEffects(Levels *levels) {
 void destroyTracks() {	// destroy all tracks
 	TrackNode *cur_ptr = trackHead;
 	while (cur_ptr != NULL ) {
-		free(cur_ptr->track->currBufferFloat[0]);
-		free(cur_ptr->track->currBufferFloat[1]);
-		free(cur_ptr->track->currBufferFloat);
-		cur_ptr->track->generator->destroy(cur_ptr->track->generator->config);
-		freeEffects(cur_ptr->track->levels);
+		destroyTrack(cur_ptr->track);
 		TrackNode *prev_ptr = cur_ptr;
 		cur_ptr = cur_ptr->next;
 		free(prev_ptr); // free the entire Node
@@ -181,6 +185,14 @@ Track *initTrack() {
 	track->nextEvent->volume = .8f;
 	track->nextEvent->pitch = track->nextEvent->pan = .5f;
 	return track;
+}
+
+void destroyTrack(Track *track) {
+	free(track->currBufferFloat[0]);
+	free(track->currBufferFloat[1]);
+	free(track->currBufferFloat);
+	track->generator->destroy(track->generator->config);
+	freeEffects(track->levels);
 }
 
 void initSample(Track *track, const char *sampleName) {
@@ -358,15 +370,25 @@ void Java_com_kh_beatbot_global_Track_setSample(JNIEnv *env, jclass clazz,
 	(*env)->ReleaseStringUTFChars(env, sampleName, nativeSampleName);
 }
 
-void Java_com_kh_beatbot_manager_TrackManager_addTrack(JNIEnv *env,
+void Java_com_kh_beatbot_manager_TrackManager_createTrack(JNIEnv *env,
 		jclass clazz, jstring sampleName) {
 	Track *track = initTrack();
 	pthread_mutex_lock(&openSlOut->trackMutex);
-	addTrack(track);
+	createTrack(track);
 	Java_com_kh_beatbot_global_Track_setSample(env, clazz, trackCount,
 			sampleName);
-	pthread_mutex_unlock(&openSlOut->trackMutex);
 	trackCount++;
+	pthread_mutex_unlock(&openSlOut->trackMutex);
+}
+
+void Java_com_kh_beatbot_manager_TrackManager_deleteTrack(JNIEnv *env,
+		jclass clazz, int trackNum) {
+	Track *track = getTrack(env, clazz, trackNum);
+	pthread_mutex_lock(&openSlOut->trackMutex);
+	removeTrack(trackNum);
+	destroyTrack(track);
+	trackCount--;
+	pthread_mutex_unlock(&openSlOut->trackMutex);
 }
 
 void Java_com_kh_beatbot_global_Track_toggleTrackLooping(JNIEnv *env,

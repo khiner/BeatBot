@@ -12,13 +12,18 @@ public class MainPage extends TouchableBBView {
 	
 	public MidiView midiView;
 	public ControlButtonGroup controlButtonGroup;
-	public MidiTrackView midiTrackControl;
+	public MidiTrackView midiTrackView;
 	public PageSelectGroup pageSelectGroup;
 	
-	public void trackAdded(int newTrackNum) {
-		midiTrackControl.notifyTrackAdded(newTrackNum);
-		midiView.notifyTrackAdded(newTrackNum);
+	public void trackCreated(int newTrackNum) {
+		midiTrackView.notifyTrackCreated(newTrackNum);
+		midiView.notifyTrackCreated(newTrackNum);
 		pageSelectGroup.notifyTrackChanged();
+	}
+	
+	public void notifyTrackDeleted(int newTrackNum) {
+		midiTrackView.notifyTrackDeleted(newTrackNum);
+		midiView.notifyTrackDeleted(newTrackNum);
 	}
 	
 	@Override
@@ -41,11 +46,11 @@ public class MainPage extends TouchableBBView {
 	protected void createChildren() {
 		midiView = new MidiView();
 		controlButtonGroup = new ControlButtonGroup();
-		midiTrackControl = new MidiTrackView();
+		midiTrackView = new MidiTrackView();
 		pageSelectGroup = new PageSelectGroup();
 		
 		addChild(controlButtonGroup);
-		addChild(midiTrackControl);
+		addChild(midiTrackView);
 		addChild(midiView);
 		addChild(pageSelectGroup);
 	}
@@ -64,7 +69,7 @@ public class MainPage extends TouchableBBView {
 		MidiView.trackHeight = MidiView.allTracksHeight / numTracks;
 		float trackControlWidth = MidiView.trackHeight * 2.5f;
 		
-		midiTrackControl.layout(this, 0, controlButtonHeight, trackControlWidth, midiHeight);
+		midiTrackView.layout(this, 0, controlButtonHeight, trackControlWidth, midiHeight);
 		midiView.layout(this, trackControlWidth, controlButtonHeight, width - trackControlWidth - 15, midiHeight);
 		controlButtonGroup.layout(this, 0, 0, width, controlButtonHeight);
 		pageSelectGroup.layout(this, 0, controlButtonHeight + midiHeight, width, height - midiHeight - controlButtonHeight);

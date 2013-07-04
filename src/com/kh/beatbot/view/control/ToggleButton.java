@@ -41,8 +41,8 @@ public class ToggleButton extends ImageButton {
 	/*
 	 * Set the state to 'checked' and notify any listeners to trigger an event
 	 */
-	public void trigger() {
-		setChecked(true);
+	public void trigger(boolean checked) {
+		setChecked(checked);
 		super.notifyReleased();
 	}
 	

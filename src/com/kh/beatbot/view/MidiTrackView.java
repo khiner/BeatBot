@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.kh.beatbot.global.Colors;
 import com.kh.beatbot.global.RoundedRectIconSource;
+import com.kh.beatbot.global.ShapeIconSource;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.TrackManager;
@@ -112,6 +113,12 @@ public class MidiTrackView extends TouchableBBView {
 			soloButton.layout(this, height + muteButton.width, 0,
 					height * .72f, height);
 		}
+		
+		public void destroy() {
+			((ShapeIconSource)muteButton.getBgIconSource()).destroy();
+			((ShapeIconSource)soloButton.getBgIconSource()).destroy();
+			((ShapeIconSource)instrumentButton.getBgIconSource()).destroy();
+		}
 	}
 
 	private static List<ButtonRow> buttonRows = new ArrayList<ButtonRow>();
@@ -125,7 +132,7 @@ public class MidiTrackView extends TouchableBBView {
 		buttonRows.get(trackNum).updateInstrumentIcon();
 	}
 
-	public void notifyTrackAdded(int trackNum) {
+	public void notifyTrackCreated(int trackNum) {
 		ButtonRow newRow = new ButtonRow(trackNum);
 		buttonRows.add(newRow);
 		addChild(newRow);
@@ -134,14 +141,23 @@ public class MidiTrackView extends TouchableBBView {
 			newRow.loadAllIcons();
 		}
 	}
+	
+	public void notifyTrackDeleted(int trackNum) {
+		ButtonRow deleted = buttonRows.remove(trackNum);
+		for (int i = trackNum; i < buttonRows.size(); i++) {
+			buttonRows.get(i).trackNum = i;
+		}
+		deleted.destroy();
+		removeChild(deleted);
+		layoutChildren();
+	}
 
 	public void selectTrack(int trackNum) {
 		if (!checkTrackNum(trackNum)) {
 			return;
 		}
-
 		ButtonRow row = buttonRows.get(trackNum);
-		row.instrumentButton.trigger();
+		row.instrumentButton.trigger(false);
 	}
 
 	public void draw() {

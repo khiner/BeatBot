@@ -15,7 +15,6 @@ import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.method.DigitsKeyListener;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -147,15 +146,14 @@ public class BeatBotActivity extends Activity {
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
-		if (isFinishing()) {
-			try {
+		try {
+			super.onDestroy();
+			if (isFinishing()) {
 				shutdown();
-			} finally {
-				Managers.directoryManager.clearTempFiles();
-				Log.e("Main Activity", "finishing");
+				// android.os.Process.killProcess(android.os.Process.myPid());
 			}
-			// android.os.Process.killProcess(android.os.Process.myPid());
+		} finally {
+			Managers.directoryManager.clearTempFiles();
 		}
 	}
 
@@ -279,7 +277,12 @@ public class BeatBotActivity extends Activity {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									finish();
+									try {
+										finish();
+									} catch (Exception e) {
+										Managers.directoryManager
+												.clearTempFiles();
+									}
 								}
 							}).setNegativeButton("No", null);
 			break;
@@ -332,7 +335,7 @@ public class BeatBotActivity extends Activity {
 	 * Set up the project. For now, this just means setting track 0, page 0 view
 	 */
 	public void setupProject() {
-		GlobalVars.mainPage.midiTrackControl.selectTrack(0);
+		GlobalVars.mainPage.midiTrackView.selectTrack(0);
 		GlobalVars.mainPage.pageSelectGroup.selectPage(0);
 	}
 
@@ -346,11 +349,15 @@ public class BeatBotActivity extends Activity {
 		createAudioPlayer();
 	}
 
+	private void shutdown() {
+		nativeShutdown();
+	}
+
 	public static native boolean createAudioPlayer();
 
 	public static native void createEngine();
 
-	public static native void shutdown();
+	public static native void nativeShutdown();
 
 	/** Load jni .so on initialization */
 	static {

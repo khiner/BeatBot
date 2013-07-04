@@ -211,7 +211,7 @@ public class TickWindowHelper {
 		}
 	}
 
-	private static void initVLineVbs() {
+	public static void initVLineVbs() {
 		List<List<Float>> allVertices = new ArrayList<List<Float>>();
 		
 		long minTickSpacing = (long)(MIN_TICKS / 8);
@@ -227,7 +227,7 @@ public class TickWindowHelper {
 					allVertices.get(i).add(x);
 					allVertices.get(i).add(MidiView.Y_OFFSET);
 					allVertices.get(i).add(x);
-					allVertices.get(i).add(midiView.height);
+					allVertices.get(i).add(MidiView.Y_OFFSET + MidiView.allTracksHeight);
 					break; // each line goes in only ONE line set
 				}
 			}

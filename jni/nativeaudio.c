@@ -205,7 +205,6 @@ void fillBuffer() {
 
 // this callback handler is called every time a buffer finishes playing
 void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
-
 	// enqueue the buffer
 	if (openSlOut->armed) {
 		(*bq)->Enqueue(bq, openSlOut->currBufferShort,
@@ -336,8 +335,10 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 }
 
 // shut down the native audio system
-void Java_com_kh_beatbot_activity_BeatBotActivity_shutdown(JNIEnv *env,
+void Java_com_kh_beatbot_activity_BeatBotActivity_nativeShutdown(JNIEnv *env,
 		jclass clazz) {
+	playing = false;
+	stopAllTracks();
 
 	// lock the mutex, so openSL doesn't try to grab from empty buffers
 	pthread_mutex_lock(&openSlOut->trackMutex);
@@ -357,7 +358,6 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_shutdown(JNIEnv *env,
 		(*outputMixObject)->Destroy(outputMixObject);
 		outputMixObject = NULL;
 	}
-
 	// destroy engine object, and invalidate all associated interfaces
 	if (engineObject != NULL ) {
 		(*engineObject)->Destroy(engineObject);

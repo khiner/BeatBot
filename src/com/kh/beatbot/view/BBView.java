@@ -86,10 +86,15 @@ public abstract class BBView implements Comparable<BBView> {
 	
 	public void addChild(BBView child) {
 		children.add(child);
-		if (initialized)
+		if (initialized) {
 			child.initAll();
+		}
 	}
 
+	public void removeChild(BBView child) {
+		children.remove(child);
+	}
+	
 	public int numChildren() {
 		return children.size();
 	}

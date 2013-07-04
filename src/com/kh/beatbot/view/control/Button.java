@@ -47,6 +47,13 @@ public abstract class Button extends TouchableBBView {
 		return pressed;
 	}
 	
+	/*
+	 * Trigger a touch event (calls the onReleaseListener())
+	 */
+	public void trigger() {
+		notifyReleased();
+	}
+	
 	protected void notifyPressed() {
 		if (pressListener != null) {
 			pressListener.onPress(this);

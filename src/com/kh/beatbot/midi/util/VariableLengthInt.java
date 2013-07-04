@@ -30,12 +30,10 @@ public class VariableLengthInt {
 	}
 
 	public VariableLengthInt(InputStream in) throws IOException {
-
 		parseBytes(in);
 	}
 
 	public VariableLengthInt(byte[] buffer, int off) {
-
 		parseBytes(buffer, off);
 	}
 
@@ -91,7 +89,6 @@ public class VariableLengthInt {
 	}
 
 	private void parseBytes(byte[] buffer, int off) {
-
 		int[] ints = new int[4];
 
 		int i = off;
@@ -125,7 +122,6 @@ public class VariableLengthInt {
 	}
 
 	private void buildBytes() {
-
 		if (mValue == 0) {
 			mBytes = new byte[1];
 			mBytes[0] = 0x00;

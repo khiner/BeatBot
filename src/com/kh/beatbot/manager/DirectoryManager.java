@@ -30,7 +30,7 @@ public class DirectoryManager {
 			if (currDirectory == null) {
 				// Instrument type
 				if (addingTrack) {
-					TrackManager.addTrack((Instrument) parent, item);
+					TrackManager.createTrack((Instrument) parent, item);
 				} else {
 					TrackManager.currTrack.setInstrument((Instrument) parent,
 							item);

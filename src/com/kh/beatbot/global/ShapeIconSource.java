@@ -79,4 +79,8 @@ public abstract class ShapeIconSource extends IconSource {
 	public float[] getCurrFillColor() {
 		return ((Shape)currentIcon).getFillColor();
 	}
+	
+	public void destroy() {
+		shapeGroup.remove((Shape)currentIcon);
+	}
 }

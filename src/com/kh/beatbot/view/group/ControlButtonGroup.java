@@ -15,8 +15,8 @@ import com.kh.beatbot.view.control.ToggleButton;
 
 public class ControlButtonGroup extends TouchableBBView {
 
-	ToggleButton playButton, recordButton, copyButton;
-	ImageButton stopButton, undoButton, deleteButton;
+	public ToggleButton playButton, recordButton, copyButton;
+	public ImageButton stopButton, undoButton, deleteButton;
 
 	@Override
 	public void init() {
@@ -76,9 +76,8 @@ public class ControlButtonGroup extends TouchableBBView {
 			public void onRelease(Button button) {
 				playButton.setChecked(false);
 				if (Managers.recordManager.isRecording()) {
-					recordButton.setChecked(false);
-					playButton.getOnReleaseListener().onRelease(playButton);
-					recordButton.getOnReleaseListener().onRelease(recordButton);
+					recordButton.trigger(false);
+					playButton.setChecked(false);
 				}
 				if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
 					playButton.setChecked(false);
@@ -166,7 +165,7 @@ public class ControlButtonGroup extends TouchableBBView {
 
 	@Override
 	public void layoutChildren() {
-		float leftMargin = GlobalVars.mainPage.midiTrackControl.width;
+		float leftMargin = GlobalVars.mainPage.midiTrackView.width;
 		// left-aligned buttons
 		playButton.layout(this, leftMargin, 0, height, height);
 		stopButton.layout(this, leftMargin + height, 0, height, height);

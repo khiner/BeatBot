@@ -32,7 +32,7 @@ public class TrackManager {
 
 	private TrackManager() {
 		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
-			addTrack(Managers.directoryManager.getDrumInstrument(i), 0);
+			createTrack(Managers.directoryManager.getDrumInstrument(i), 0);
 		}
 	}
 
@@ -65,17 +65,26 @@ public class TrackManager {
 		return tracks.size();
 	}
 
-	public static void addTrack(Instrument instrument, int sampleNum) {
-		addTrack(instrument.getFullPath(sampleNum));
+	public static void createTrack(Instrument instrument, int sampleNum) {
+		createTrack(instrument.getFullPath(sampleNum));
 		Track newTrack = new Track(tracks.size());
 		newTrack.setInstrument(instrument, sampleNum);
 		tracks.add(newTrack);
 		currTrack = tracks.get(tracks.size() - 1);
-		GlobalVars.mainPage.trackAdded(tracks.size() - 1);
+		GlobalVars.mainPage.trackCreated(tracks.size() - 1);
 	}
 
 	public static void deleteCurrTrack() {
-		// TODO
+		int currTrackNum = tracks.indexOf(currTrack);
+		GlobalVars.mainPage.notifyTrackDeleted(currTrackNum);
+		tracks.remove(currTrackNum);
+		for (int i = currTrackNum; i < tracks.size(); i++) {
+			tracks.get(i).setId(i);
+		}
+		int selectedTrackNum = Math.min(currTrackNum, tracks.size() - 1);
+		GlobalVars.mainPage.midiTrackView.selectTrack(selectedTrackNum);
+		setTrack(selectedTrackNum);
+		deleteTrack(currTrackNum);
 	}
 	
 	public static MidiNote getNextMidiNote(int trackNum, long currTick) {
@@ -90,6 +99,6 @@ public class TrackManager {
 	
 	/******* These methods are called FROM native code via JNI ********/
 	
-	public static native void addTrack(String sampleFileName);
-
+	public static native void createTrack(String sampleFileName);
+	public static native void deleteTrack(int trackNum);
 }

@@ -27,6 +27,10 @@ public class Track extends BaseTrack {
 		this.adsr = new ADSR(id);
 	}
 
+	public void setId(int id) {
+		this.id = id;
+	}
+	
 	public void removeNote(MidiNote note) {
 		notes.remove(note);
 		notifyNoteRemoved(id, note.getOnTick(), note.getOffTick());
