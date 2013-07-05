@@ -1,6 +1,7 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.GlobalVars;
 
 public class Delay extends Effect {
@@ -21,8 +22,8 @@ public class Delay extends Effect {
 	public float rightChannelLevelMemory;
 	public boolean rightChannelBeatSyncMemory;
 	
-	public Delay(int trackNum, int position) {
-		super(trackNum, position);
+	public Delay(BaseTrack track, int position) {
+		super(track, position);
 		rightChannelLevelMemory = -1;
 		rightChannelBeatSyncMemory = true;
 		paramsLinked = true;
@@ -48,6 +49,6 @@ public class Delay extends Effect {
 	public void setParamsLinked(boolean linked) {
 		super.setParamsLinked(linked);
 		// last effect param for delay sets linked natively: 1 is true, 0 is false
-		setEffectParam(trackNum, position, NUM_PARAMS, linked ? 1 : 0);
+		setEffectParam(track.getId(), position, NUM_PARAMS, linked ? 1 : 0);
 	}
 }

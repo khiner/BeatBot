@@ -1,6 +1,7 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.GlobalVars;
 
 
@@ -18,8 +19,8 @@ public class Flanger extends Effect {
 		new ParamData("PHASE", false, false, "")
 	};
 	
-	public Flanger(int trackNum, int position) {
-		super(trackNum, position);
+	public Flanger(BaseTrack track, int position) {
+		super(track, position);
 	}
 
 	public String getName() {

@@ -53,6 +53,7 @@ public class TrackManager {
 		if (newTrack == currTrack)
 			return;
 		currTrack = newTrack;
+		newTrack.select();
 		GlobalVars.mainPage.midiView.notifyTrackChanged(trackNum);
 		GlobalVars.mainPage.pageSelectGroup.notifyTrackChanged();
 	}
@@ -72,11 +73,14 @@ public class TrackManager {
 		Track newTrack = new Track(tracks.size());
 		newTrack.setInstrument(instrument, sampleNum);
 		tracks.add(newTrack);
-		currTrack = tracks.get(tracks.size() - 1);
 		GlobalVars.mainPage.trackCreated(newTrack);
+		setTrack(newTrack.getId());
 	}
 
 	public static void deleteCurrTrack() {
+		if (tracks.size() <= 1) {
+			return; // not allowed to delete last track
+		}
 		int currTrackNum = tracks.indexOf(currTrack);
 		tracks.remove(currTrackNum);
 		for (int i = currTrackNum; i < tracks.size(); i++) {
@@ -84,7 +88,6 @@ public class TrackManager {
 		}
 		GlobalVars.mainPage.notifyTrackDeleted(currTrack);
 		int selectedTrackNum = Math.min(currTrackNum, tracks.size() - 1);
-		tracks.get(selectedTrackNum).select();
 		setTrack(selectedTrackNum);
 		deleteTrack(currTrackNum);
 	}

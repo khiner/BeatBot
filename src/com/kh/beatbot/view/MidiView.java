@@ -23,47 +23,33 @@ import com.kh.beatbot.view.mesh.ShapeGroup;
 
 public class MidiView extends ClickableBBView {
 
-	/**************** ATTRIBUTES ***************/
 	public static final float Y_OFFSET = 21, LOOP_SELECT_SNAP_DIST = 30;
-
-	public static final int NOTE_BORDER_WIDTH = 2;
-
 	public static float trackHeight, allTracksHeight;
-
-	public static float dragOffsetTick[] = { 0, 0, 0, 0, 0 };
-
-	public static int pinchLeftPointerId = -1, pinchRightPointerId = -1,
-			scrollPointerId = -1;
-
-	public static float pinchLeftAnchor = 0, pinchRightAnchor = 0,
-			zoomLeftAnchorTick = 0, zoomRightAnchorTick = 0,
-			scrollAnchorTick = 0, scrollAnchorY = 0;
-
-	private static boolean selectRegion = false;
-	private static float selectRegionStartTick = -1, selectRegionStartY = -1;
-
-	// true when a note is being "pinched" (two-fingers touching the note)
-	public static boolean pinch = false;
-
-	private static int[] loopPointerIds = { -1, -1, -1 };
-	public static float loopSelectionOffset = 0;
-
 	// set this to true after an event that can be undone (with undo btn)
 	public static boolean stateChanged = false;
 
-	// this option can be set via a menu item.
-	// if true, all midi note movements are rounded to the nearest major tick
-	public static boolean snapToGrid = true;
+	private static float dragOffsetTick[] = { 0, 0, 0, 0, 0 };
 
-	// two ShapeGroups handle drawing of all midi rectangles
-	// (in four calls - ouline and fill for each group)
-	private static ShapeGroup unselectedRectangles = new ShapeGroup();
-	private static ShapeGroup selectedRectangles = new ShapeGroup();
-	private static ShapeGroup bgShapeGroup = new ShapeGroup();
-	private static ShapeGroup tickBarShapeGroup = new ShapeGroup();
+	private static int pinchLeftPointerId = -1, pinchRightPointerId = -1,
+			scrollPointerId = -1;
+
+	private static float pinchLeftAnchor = 0, pinchRightAnchor = 0,
+			zoomLeftAnchorTick = 0, zoomRightAnchorTick = 0,
+			loopSelectionOffset = 0, selectRegionStartTick = -1,
+			selectRegionStartY = -1;
+
+	private static boolean pinch = false, snapToGrid = true,
+			selectRegion = false;
+
+	private static int[] loopPointerIds = { -1, -1, -1 };
+
+	private static ShapeGroup unselectedRectangles = new ShapeGroup(),
+			selectedRectangles = new ShapeGroup(),
+			bgShapeGroup = new ShapeGroup(),
+			tickBarShapeGroup = new ShapeGroup();
 
 	public float getMidiHeight() {
-		return height - Y_OFFSET;
+		return Math.min(height - Y_OFFSET, allTracksHeight);
 	}
 
 	public void setLoopPointerId(int num, int id) {
@@ -252,8 +238,8 @@ public class MidiView extends ClickableBBView {
 	}
 
 	private void drawAllMidiNotes() {
-		unselectedRectangles.draw((GL11) gl, NOTE_BORDER_WIDTH);
-		selectedRectangles.draw((GL11) gl, NOTE_BORDER_WIDTH);
+		unselectedRectangles.draw((GL11) gl, MidiNote.BORDER_WIDTH);
+		selectedRectangles.draw((GL11) gl, MidiNote.BORDER_WIDTH);
 	}
 
 	private void updateTickFillRect() {
@@ -317,8 +303,8 @@ public class MidiView extends ClickableBBView {
 		float x1 = tickToUnscaledX(midiManager.getLoopBeginTick());
 		float x2 = tickToUnscaledX(midiManager.getLoopEndTick());
 		float[][] loopMarkerLines = new float[][] {
-				{ x1, Y_OFFSET, x1, Y_OFFSET + allTracksHeight },
-				{ x2, Y_OFFSET, x2, Y_OFFSET + allTracksHeight } };
+				{ x1, 0, x1, Y_OFFSET + allTracksHeight },
+				{ x2, 0, x2, Y_OFFSET + allTracksHeight } };
 		// loop begin triangle, pointing right, and
 		// loop end triangle, pointing left
 		float[][] loopMarkerTriangles = new float[][] {
@@ -361,12 +347,14 @@ public class MidiView extends ClickableBBView {
 		allTracksHeight += trackHeight;
 		if (initialized) {
 			initAllVbs();
+			TickWindowHelper.setYOffset(Float.MAX_VALUE);
 		}
 	}
 
 	public void notifyTrackDeleted(Track track) {
 		allTracksHeight -= trackHeight;
 		initAllVbs();
+		TickWindowHelper.setYOffset(TickWindowHelper.getYOffset());
 		for (MidiNote note : track.getMidiNotes()) {
 			note.getRectangle().getGroup().remove(note.getRectangle());
 		}
@@ -570,8 +558,8 @@ public class MidiView extends ClickableBBView {
 	}
 
 	public void updateNoteRects() {
-		//unselectedRectangles.clear();
-		//selectedRectangles.clear();
+		// unselectedRectangles.clear();
+		// selectedRectangles.clear();
 		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
 			Track track = TrackManager.getTrack(i);
 			for (MidiNote note : track.getMidiNotes()) {
@@ -579,7 +567,7 @@ public class MidiView extends ClickableBBView {
 			}
 		}
 	}
-	
+
 	public void updateNoteFillColor(MidiNote note) {
 		note.getRectangle().setColors(whichColor(note), Colors.BLACK);
 		note.getRectangle().setGroup(whichRectangleGroup(note));
@@ -734,8 +722,9 @@ public class MidiView extends ClickableBBView {
 				selectLoopMarker(id, x);
 			} else {
 				// otherwise, enable scrolling
-				scrollAnchorTick = xToTick(x);
-				scrollAnchorY = y + TickWindowHelper.getYOffset();
+				TickWindowHelper.scrollAnchorTick = xToTick(x);
+				TickWindowHelper.scrollAnchorY = y
+						+ TickWindowHelper.getYOffset();
 				scrollPointerId = id;
 			}
 		}
@@ -773,7 +762,7 @@ public class MidiView extends ClickableBBView {
 					pinch = true;
 				} else if (pointerCount() - getNumLoopMarkersSelected() == 1) {
 					// otherwise, enable scrolling
-					scrollAnchorTick = xToTick(x);
+					TickWindowHelper.scrollAnchorTick = xToTick(x);
 					scrollPointerId = id;
 				} else {
 					// can never select region with two pointers in midi view
@@ -832,7 +821,8 @@ public class MidiView extends ClickableBBView {
 		if (zoomLeftAnchorTick != -1) {
 			int otherId = id == 0 ? 1 : 0;
 			pinch = false;
-			scrollAnchorTick = xToTick(pointerIdToPos.get(otherId).x);
+			TickWindowHelper.scrollAnchorTick = xToTick(pointerIdToPos
+					.get(otherId).x);
 			scrollPointerId = otherId;
 		}
 		touchedNotes.remove(id);
@@ -842,8 +832,9 @@ public class MidiView extends ClickableBBView {
 	public void handleActionUp(int id, float x, float y) {
 		super.handleActionUp(id, x, y);
 		ScrollBarHelper.handleActionUp();
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++) {
 			loopPointerIds[i] = -1;
+		}
 		selectRegion = false;
 		midiManager.finalizeNoteTicks();
 		if (stateChanged)
@@ -856,8 +847,9 @@ public class MidiView extends ClickableBBView {
 
 	@Override
 	protected void longPress(int id, float x, float y) {
-		if (pointerCount() == 1)
+		if (pointerCount() == 1) {
 			startSelectRegion(x, y);
+		}
 	}
 
 	@Override
@@ -868,8 +860,9 @@ public class MidiView extends ClickableBBView {
 					.getMajorTickToLeftOf(xToTick(x)));
 		} else if (touchedNote != null) {
 			// single tapping a note always makes it the only selected note
-			if (touchedNote.isSelected())
+			if (touchedNote.isSelected()) {
 				midiManager.deselectAllNotes();
+			}
 			midiManager.selectNote(touchedNote);
 		} else {
 			int note = yToNote(y);

@@ -26,7 +26,7 @@ public class Track extends BaseTrack {
 	public Track(int id) {
 		super(id);
 		this.currSampleFile = null;
-		this.adsr = new ADSR(id);
+		this.adsr = new ADSR(this);
 		this.buttonRow = new TrackButtonRow(this);
 	}
 

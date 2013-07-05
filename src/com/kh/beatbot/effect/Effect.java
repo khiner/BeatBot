@@ -3,25 +3,27 @@ package com.kh.beatbot.effect;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.manager.TrackManager;
 
 public abstract class Effect implements Comparable<Effect> {
 	protected List<Param> params = new ArrayList<Param>();
 
-	protected int trackNum, position;
+	protected BaseTrack track;
+	protected int position;
 	protected boolean on, paramsLinked;
 
-	public Effect(int trackNum) {
-		this.trackNum = trackNum;
+	public Effect(BaseTrack track) {
+		this.track = track;
 		initParams();
 	}
 
-	public Effect(int trackNum, int position) {
-		this.trackNum = trackNum;
+	public Effect(BaseTrack track, int position) {
+		this.track = track;
 		this.position = position;
 		paramsLinked = false;
 		initParams();
-		addEffect(trackNum, getNum(), position);
+		addEffect(track.getId(), getNum(), position);
 		setDefaultParams();
 		setOn(true);
 	}
@@ -33,7 +35,7 @@ public abstract class Effect implements Comparable<Effect> {
 	
 	public void setOn(boolean on) {
 		this.on = on;
-		setEffectOn(trackNum, position, on);
+		setEffectOn(track.getId(), position, on);
 	}
 
 	public boolean isOn() {
@@ -64,7 +66,7 @@ public abstract class Effect implements Comparable<Effect> {
 		Param param = getParam(paramNum);
 		param.viewLevel = level;
 		param.setLevel(level);
-		setEffectParam(trackNum, position, paramNum, param.level);
+		setEffectParam(track.getId(), position, paramNum, param.level);
 	}
 
 	public String getParamValueString(int paramNum) {
@@ -72,8 +74,8 @@ public abstract class Effect implements Comparable<Effect> {
 	}
 
 	public void removeEffect() {
-		removeEffect(trackNum, position);
-		TrackManager.getBaseTrack(trackNum).removeEffect(this);
+		removeEffect(track.getId(), position);
+		TrackManager.getBaseTrack(track.getId()).removeEffect(this);
 	}
 
 	public void quantizeParams() {
@@ -81,7 +83,7 @@ public abstract class Effect implements Comparable<Effect> {
 			Param param = params.get(i);
 			if (param.beatSync) {
 				param.setLevel(param.viewLevel);
-				setEffectParam(trackNum, position, i, param.level);
+				setEffectParam(track.getId(), position, i, param.level);
 			}
 		}
 	}
@@ -94,7 +96,7 @@ public abstract class Effect implements Comparable<Effect> {
 	private void setDefaultParams() {
 		for (int i = 0; i < params.size(); i++) {
 			Param param = params.get(i);
-			setEffectParam(trackNum, position, i, param.level);
+			setEffectParam(track.getId(), position, i, param.level);
 		}
 	}
 	

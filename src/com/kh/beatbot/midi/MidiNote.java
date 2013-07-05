@@ -8,6 +8,8 @@ import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.view.mesh.Rectangle;
 
 public class MidiNote implements Comparable<MidiNote> {
+	public static final int BORDER_WIDTH = 2;
+	
 	Rectangle rectangle; // rectangle for drawing
 	NoteOn noteOn;
 	NoteOff noteOff;

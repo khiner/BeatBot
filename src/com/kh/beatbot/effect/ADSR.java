@@ -2,6 +2,7 @@ package com.kh.beatbot.effect;
 
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.GlobalVars;
 
 public class ADSR extends Effect {
@@ -34,8 +35,8 @@ public class ADSR extends Effect {
 	
 	private int currParamId = ATTACK_ID;
 	
-	public ADSR(int trackNum) {
-		super(trackNum);
+	public ADSR(BaseTrack track) {
+		super(track);
 	}
 	
 	public int getNum() {

@@ -20,7 +20,7 @@ public class MeshGroup {
 	
 	private boolean dirty = false;
 	
-	public void draw(int primitiveType) {
+	public synchronized void draw(int primitiveType) {
 		if (children.isEmpty()) {
 			return;
 		}
@@ -46,16 +46,16 @@ public class MeshGroup {
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
 	}
 	
-	public boolean contains(Mesh2D mesh) {
+	public synchronized boolean contains(Mesh2D mesh) {
 		return children.contains(mesh);
 	}
 	
-	public void add(Mesh2D mesh) {
+	public synchronized void add(Mesh2D mesh) {
 		children.add(mesh);
 		updateVertices();
 	}
 
-	public void remove(Mesh2D mesh) {
+	public synchronized void remove(Mesh2D mesh) {
 		if (!children.contains(mesh)) {
 			Log.e("MeshGroup", "Attempting to remove a mesh that is not a child.");
 			return;
@@ -64,7 +64,7 @@ public class MeshGroup {
 		updateVertices();
 	}
 	
-	public void replace(Mesh2D oldMesh, Mesh2D newMesh) {
+	public synchronized void replace(Mesh2D oldMesh, Mesh2D newMesh) {
 		if (oldMesh.getNumVertices() != newMesh.getNumVertices()) {
 			Log.e("MeshGroup", "Attempting to replace a mesh with a new one with different num vertices");
 			return;
@@ -79,7 +79,7 @@ public class MeshGroup {
 		updateVertices(newMesh);
 	}
 	
-	private void updateVertices() {
+	private synchronized void updateVertices() {
 		numVertices = calcNumVertices();
 		
 		vertices = new float[numVertices * 2];
@@ -96,7 +96,7 @@ public class MeshGroup {
 		}
 	}
 	
-	public void updateVertices(Mesh2D child) {
+	public synchronized void updateVertices(Mesh2D child) {
 		if (!children.contains(child)) {
 			Log.e("MeshGroup", "Attempting to update a mesh that is not a child.");
 			return;
@@ -113,12 +113,12 @@ public class MeshGroup {
 		}
 	}
 	
-	public void clear() {
+	public synchronized void clear() {
 		children.clear();
 		updateVertices();
 	}
 	
-	private void updateBuffers() {
+	private synchronized void updateBuffers() {
 		initHandles();
 		GL11 gl = (GL11)BBView.gl;
 		

@@ -22,6 +22,8 @@ public class TickWindowHelper {
 	public static final float MIN_TICKS = MidiManager.TICKS_IN_ONE_MEASURE / 8;
 	public static final float MAX_TICKS = MidiManager.TICKS_IN_ONE_MEASURE * 4;
 
+	public static float scrollAnchorTick = 0, scrollAnchorY = 0;
+			
 	// leftmost tick to display
 	private static float currTickOffset = 0;
 	private static float currYOffset = 0;
@@ -101,9 +103,9 @@ public class TickWindowHelper {
 	}
 
 	public static void scroll(float x, float y) {
-		float newTickOffset = MidiView.scrollAnchorTick - currNumTicks * x
+		float newTickOffset = scrollAnchorTick - currNumTicks * x
 				/ midiView.width;
-		float newYOffset = MidiView.scrollAnchorY - y;
+		float newYOffset = scrollAnchorY - y;
 		ScrollBarHelper.scrollXVelocity = newTickOffset - currTickOffset;
 		ScrollBarHelper.scrollYVelocity = newYOffset - currYOffset;
 		setTickOffset(newTickOffset);

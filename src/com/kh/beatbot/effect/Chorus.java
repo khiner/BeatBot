@@ -1,6 +1,7 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.GlobalVars;
 
 
@@ -16,8 +17,8 @@ public class Chorus extends Effect {
 		new ParamData("WET", false, false, "")
 	};
 	
-	public Chorus(int trackNum, int position) {
-		super(trackNum, position);
+	public Chorus(BaseTrack track, int position) {
+		super(track, position);
 	}
 
 	public int getNum() {

@@ -1,6 +1,7 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.PlaybackManager;
 
@@ -22,8 +23,8 @@ public class Filter extends Effect {
 	
 	private int mode = 0;
 	
-	public Filter(int trackNum, int position) {
-		super(trackNum, position);
+	public Filter(BaseTrack track, int position) {
+		super(track, position);
 	}
 
 	public int getNum() {
@@ -48,6 +49,6 @@ public class Filter extends Effect {
 
 	public void setMode(int mode) {
 		this.mode = mode;
-		setEffectParam(trackNum, position, 4, mode);
+		setEffectParam(track.getId(), position, 4, mode);
 	}
 }

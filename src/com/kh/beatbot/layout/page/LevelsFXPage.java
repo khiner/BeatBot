@@ -228,21 +228,21 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 		Effect effect = getCurrTrack().findEffectByPosition(position);
 		if (effect != null)
 			return effect;
-		int trackId = getCurrTrack().getId();
+		BaseTrack track = getCurrTrack();
 		if (effectName.equals(Decimate.NAME))
-			effect = new Decimate(trackId, position);
+			effect = new Decimate(track, position);
 		else if (effectName.equals(Chorus.NAME))
-			effect = new Chorus(trackId, position);
+			effect = new Chorus(track, position);
 		else if (effectName.equals(Delay.NAME))
-			effect = new Delay(trackId, position);
+			effect = new Delay(track, position);
 		else if (effectName.equals(Flanger.NAME))
-			effect = new Flanger(trackId, position);
+			effect = new Flanger(track, position);
 		else if (effectName.equals(Filter.NAME))
-			effect = new Filter(trackId, position);
+			effect = new Filter(track, position);
 		else if (effectName.equals(Reverb.NAME))
-			effect = new Reverb(trackId, position);
+			effect = new Reverb(track, position);
 		else if (effectName.equals(Tremelo.NAME))
-			effect = new Tremelo(trackId, position);
+			effect = new Tremelo(track, position);
 		getCurrTrack().addEffect(effect);
 		return effect;
 	}

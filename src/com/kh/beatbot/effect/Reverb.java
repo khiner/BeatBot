@@ -1,6 +1,7 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.GlobalVars;
 
 
@@ -15,8 +16,8 @@ public class Reverb extends Effect {
 		new ParamData("FEEDBACK", false, false, "")
 	};
 	
-	public Reverb(int trackNum, int position) {
-		super(trackNum, position);
+	public Reverb(BaseTrack track, int position) {
+		super(track, position);
 	}
 
 	public String getName() {

@@ -38,18 +38,17 @@ import com.kh.beatbot.view.group.GLSurfaceViewGroup;
 
 public class BeatBotActivity extends Activity {
 
-	public static final int BPM_DIALOG_ID = 0;
-	public static final int EXIT_DIALOG_ID = 1;
-	public static final int SAMPLE_NAME_EDIT_DIALOG_ID = 2;
-
+	public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1,
+			SAMPLE_NAME_EDIT_DIALOG_ID = 2;
+	
+	private static final int MAIN_PAGE_NUM = 0, EFFECT_PAGE_NUM = 1;
+	
 	private GLSurfaceViewGroup mainSurface;
 	private BBViewPager activityPager;
 	private static AssetManager assetManager;
 
 	private EditText bpmInput, sampleNameInput;
 
-	private static final int MAIN_PAGE_NUM = 0;
-	private static final int EFFECT_PAGE_NUM = 1;
 
 	private static byte[] buffer = new byte[1024];
 

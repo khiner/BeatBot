@@ -1,6 +1,7 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.GlobalVars;
 
 
@@ -15,8 +16,8 @@ public class Tremelo extends Effect {
 		new ParamData("DEPTH", false, false, "")
 	};
 	
-	public Tremelo(int trackNum, int position) {
-		super(trackNum, position);
+	public Tremelo(BaseTrack track, int position) {
+		super(track, position);
 	}
 
 	public String getName() {

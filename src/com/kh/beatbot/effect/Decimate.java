@@ -1,6 +1,7 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.global.BaseTrack;
 import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.manager.PlaybackManager;
 
@@ -19,8 +20,8 @@ public class Decimate extends Effect {
 		PARAMS_DATA[0].hz = false;  // params do automatic scaling on hz params that we don't want.
 	}
 	
-	public Decimate(int trackNum, int position) {
-		super(trackNum, position);
+	public Decimate(BaseTrack track, int position) {
+		super(track, position);
 	}
 
 	public String getName() {
