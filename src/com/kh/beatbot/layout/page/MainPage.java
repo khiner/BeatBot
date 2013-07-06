@@ -1,15 +1,15 @@
 package com.kh.beatbot.layout.page;
 
-import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.global.Track;
+import com.kh.beatbot.GlobalVars;
+import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.view.MidiTrackView;
-import com.kh.beatbot.view.MidiView;
-import com.kh.beatbot.view.TouchableBBView;
-import com.kh.beatbot.view.group.ControlButtonGroup;
-import com.kh.beatbot.view.group.PageSelectGroup;
+import com.kh.beatbot.ui.view.MidiTrackView;
+import com.kh.beatbot.ui.view.MidiView;
+import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.group.ControlButtonGroup;
+import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
-public class MainPage extends TouchableBBView {
+public class MainPage extends TouchableView {
 	
 	public MidiView midiView;
 	public ControlButtonGroup controlButtonGroup;

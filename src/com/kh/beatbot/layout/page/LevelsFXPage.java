@@ -6,7 +6,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
+import com.kh.beatbot.BaseTrack;
+import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.R;
+import com.kh.beatbot.GlobalVars.LevelType;
 import com.kh.beatbot.effect.Chorus;
 import com.kh.beatbot.effect.Decimate;
 import com.kh.beatbot.effect.Delay;
@@ -15,23 +18,20 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremelo;
-import com.kh.beatbot.global.BaseTrack;
-import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.global.GlobalVars.LevelType;
-import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.view.BBView;
-import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.ControlViewBase;
-import com.kh.beatbot.view.control.Seekbar;
-import com.kh.beatbot.view.control.ToggleButton;
-import com.kh.beatbot.view.list.DraggableLabelList;
-import com.kh.beatbot.view.list.LabelList;
-import com.kh.beatbot.view.mesh.ShapeGroup;
+import com.kh.beatbot.ui.RoundedRectIcon;
+import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.view.View;
+import com.kh.beatbot.ui.view.control.Button;
+import com.kh.beatbot.ui.view.control.ControlViewBase;
+import com.kh.beatbot.ui.view.control.Seekbar;
+import com.kh.beatbot.ui.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.list.DraggableLabelList;
+import com.kh.beatbot.ui.view.list.LabelList;
 
 public abstract class LevelsFXPage extends Page implements Level1dListener {
 
@@ -253,11 +253,11 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 		volumeToggle.setText("VOL");
 		panToggle.setText("PAN");
 		pitchToggle.setText("PIT");
-		volumeToggle.setBgIconSource(new RoundedRectIconSource(labelGroup,
+		volumeToggle.setBgIcon(new RoundedRectIcon(labelGroup,
 				Colors.volumeBgColorSet, Colors.volumeStrokeColorSet));
-		panToggle.setBgIconSource(new RoundedRectIconSource(labelGroup,
+		panToggle.setBgIcon(new RoundedRectIcon(labelGroup,
 				Colors.panBgColorSet, Colors.panStrokeColorSet));
-		pitchToggle.setBgIconSource(new RoundedRectIconSource(labelGroup,
+		pitchToggle.setBgIcon(new RoundedRectIcon(labelGroup,
 				Colors.pitchBgColorSet, Colors.pitchStrokeColorSet));
 	}
 
@@ -265,7 +265,7 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 	public void draw() {
 		push();
 		translate(-absoluteX, -absoluteY);
-		labelGroup.draw((GL11) BBView.gl, 2);
+		labelGroup.draw((GL11) View.gl, 2);
 		pop();
 	}
 

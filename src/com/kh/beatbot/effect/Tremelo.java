@@ -1,8 +1,8 @@
 package com.kh.beatbot.effect;
 
+import com.kh.beatbot.BaseTrack;
+import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.BaseTrack;
-import com.kh.beatbot.global.GlobalVars;
 
 
 public class Tremelo extends Effect {

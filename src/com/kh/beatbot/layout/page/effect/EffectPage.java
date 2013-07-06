@@ -1,22 +1,22 @@
 package com.kh.beatbot.layout.page.effect;
 
-import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.ImageIconSource;
-import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.Level2dListener;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.view.TouchableBBView;
-import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.ControlViewBase;
-import com.kh.beatbot.view.control.Seekbar2d;
-import com.kh.beatbot.view.control.ToggleButton;
-import com.kh.beatbot.view.group.BBViewPager;
+import com.kh.beatbot.ui.Icon;
+import com.kh.beatbot.ui.IconResources;
+import com.kh.beatbot.ui.RoundedRectIcon;
+import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.control.Button;
+import com.kh.beatbot.ui.view.control.ControlViewBase;
+import com.kh.beatbot.ui.view.control.Seekbar2d;
+import com.kh.beatbot.ui.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.group.ViewPager;
 
-public class EffectPage extends TouchableBBView {
+public class EffectPage extends TouchableView {
 
-	private BBViewPager paramsPager;
+	private ViewPager paramsPager;
 	private Seekbar2d level2d;
 	private ToggleButton toggleButton;
 
@@ -41,9 +41,8 @@ public class EffectPage extends TouchableBBView {
 
 	@Override
 	protected void loadIcons() {
-		toggleButton.setIconSource(new ImageIconSource(R.drawable.off_icon, -1,
-				R.drawable.on_icon));
-		toggleButton.setBgIconSource(new RoundedRectIconSource(null,
+		toggleButton.setIcon(new Icon(IconResources.ON_OFF));
+		toggleButton.setBgIcon(new RoundedRectIcon(null,
 				Colors.labelBgColorSet, Colors.labelStrokeColorSet));
 	}
 
@@ -59,7 +58,7 @@ public class EffectPage extends TouchableBBView {
 
 	@Override
 	protected void createChildren() {
-		paramsPager = new BBViewPager();
+		paramsPager = new ViewPager();
 		level2d = new Seekbar2d();
 
 		chorusPage = new ChorusParamsPage();

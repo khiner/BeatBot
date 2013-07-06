@@ -21,20 +21,20 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.kh.beatbot.GeneralUtils;
+import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GeneralUtils;
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.layout.page.MainPage;
 import com.kh.beatbot.layout.page.effect.EffectPage;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.view.BBView;
-import com.kh.beatbot.view.group.BBViewPager;
-import com.kh.beatbot.view.group.GLSurfaceViewGroup;
+import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.view.View;
+import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
+import com.kh.beatbot.ui.view.group.ViewPager;
 
 public class BeatBotActivity extends Activity {
 
@@ -43,14 +43,13 @@ public class BeatBotActivity extends Activity {
 	
 	private static final int MAIN_PAGE_NUM = 0, EFFECT_PAGE_NUM = 1;
 	
-	private GLSurfaceViewGroup mainSurface;
-	private BBViewPager activityPager;
 	private static AssetManager assetManager;
-
-	private EditText bpmInput, sampleNameInput;
-
-
 	private static byte[] buffer = new byte[1024];
+	
+	private static GLSurfaceViewGroup mainSurface;
+	private static ViewPager activityPager;
+	
+	private EditText bpmInput, sampleNameInput;
 
 	private static void copyFile(InputStream in, OutputStream out)
 			throws IOException {
@@ -129,11 +128,11 @@ public class BeatBotActivity extends Activity {
 			initNativeAudio();
 		}
 
-		BBView.root = mainSurface;
+		View.root = mainSurface;
 		GlobalVars.mainPage = new MainPage();
 		GlobalVars.effectPage = new EffectPage();
 
-		activityPager = new BBViewPager();
+		activityPager = new ViewPager();
 		activityPager.addPage(GlobalVars.mainPage);
 		activityPager.addPage(GlobalVars.effectPage);
 		activityPager.setPage(0);
@@ -302,10 +301,11 @@ public class BeatBotActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.snap:
-			if (GlobalVars.mainPage.midiView.toggleSnapToGrid())
+			if (GlobalVars.mainPage.midiView.toggleSnapToGrid()) {
 				item.setIcon(R.drawable.btn_check_buttonless_on);
-			else
+			} else {
 				item.setIcon(R.drawable.btn_check_buttonless_off);
+			}
 			return true;
 		case R.id.quantize_current:
 			Managers.midiManager.quantize(GlobalVars.currBeatDivision);
@@ -353,9 +353,7 @@ public class BeatBotActivity extends Activity {
 	}
 
 	public static native boolean createAudioPlayer();
-
 	public static native void createEngine();
-
 	public static native void nativeShutdown();
 
 	/** Load jni .so on initialization */

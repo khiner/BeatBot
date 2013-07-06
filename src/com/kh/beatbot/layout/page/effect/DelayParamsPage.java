@@ -1,15 +1,15 @@
 package com.kh.beatbot.layout.page.effect;
 
-import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.ParamData;
-import com.kh.beatbot.global.ImageIconSource;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.ParamControl;
-import com.kh.beatbot.view.control.ToggleButton;
-import com.kh.beatbot.view.control.ToggleKnob;
+import com.kh.beatbot.ui.Icon;
+import com.kh.beatbot.ui.IconResources;
+import com.kh.beatbot.ui.view.control.Button;
+import com.kh.beatbot.ui.view.control.ParamControl;
+import com.kh.beatbot.ui.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.control.ToggleKnob;
 
 public class DelayParamsPage extends EffectParamsPage {
 
@@ -30,8 +30,7 @@ public class DelayParamsPage extends EffectParamsPage {
 
 	@Override
 	protected void loadIcons() {
-		linkToggle.setIconSource(new ImageIconSource(R.drawable.link_broken,
-				-1, R.drawable.link));
+		linkToggle.setIcon(new Icon(IconResources.LINK));
 	}
 
 	@Override
@@ -72,16 +71,16 @@ public class DelayParamsPage extends EffectParamsPage {
 				rightKnob.setLevel(newRightChannelLevel);
 			}
 		});
-		
+
 		addChild(linkToggle);
 	}
 
 	@Override
 	public void setEffect(Effect effect) {
 		super.setEffect(effect);
-		linkToggle.setChecked(((Delay)effect).paramsLinked());
+		linkToggle.setChecked(((Delay) effect).paramsLinked());
 	}
-	
+
 	@Override
 	protected ParamData[] getParamsData() {
 		return Delay.PARAMS_DATA;
@@ -101,7 +100,7 @@ public class DelayParamsPage extends EffectParamsPage {
 				paramH);
 		float linkH = paramH / 6;
 		float linkW = linkH * 2;
-		linkToggle.layout(this, width / 2 - linkW / 2, paramY + paramH / 2 - linkH / 2,
-				linkW, linkH);
+		linkToggle.layout(this, width / 2 - linkW / 2, paramY + paramH / 2
+				- linkH / 2, linkW, linkH);
 	}
 }

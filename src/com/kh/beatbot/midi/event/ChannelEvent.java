@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.kh.beatbot.global.GlobalVars;
+import com.kh.beatbot.GlobalVars;
 
 public class ChannelEvent extends MidiEvent {
 

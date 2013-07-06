@@ -3,7 +3,7 @@ package com.kh.beatbot.effect;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kh.beatbot.global.BaseTrack;
+import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.manager.TrackManager;
 
 public abstract class Effect implements Comparable<Effect> {

@@ -13,11 +13,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kh.beatbot.R;
-import com.kh.beatbot.global.BBDirectory;
-import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.global.ImageIconSource;
-import com.kh.beatbot.global.Instrument;
+import com.kh.beatbot.Directory;
+import com.kh.beatbot.GlobalVars;
+import com.kh.beatbot.Instrument;
+import com.kh.beatbot.ui.IconResources;
 
 public class DirectoryManager {
 
@@ -25,7 +24,7 @@ public class DirectoryManager {
 			DialogInterface.OnClickListener, OnShowListener {
 		@Override
 		public void onClick(DialogInterface dialog, int item) {
-			BBDirectory parent = currDirectory;
+			Directory parent = currDirectory;
 			currDirectory = currDirectory.getChild(item);
 			if (currDirectory == null) {
 				// Instrument type
@@ -134,58 +133,22 @@ public class DirectoryManager {
 	}
 
 	public void loadIcons() {
-		getDrumInstrument(0).setIconSource(
-				new ImageIconSource(R.drawable.kick_icon,
-						R.drawable.kick_icon_selected,
-						R.drawable.kick_icon_selected, -1,
-						R.drawable.kick_icon_selected, R.drawable.kick_icon));
-		getDrumInstrument(1).setIconSource(
-				new ImageIconSource(R.drawable.snare_icon,
-						R.drawable.snare_icon_selected,
-						R.drawable.snare_icon_selected, -1,
-						R.drawable.snare_icon_selected, R.drawable.snare_icon));
-		getDrumInstrument(2).setIconSource(
-				new ImageIconSource(R.drawable.hh_closed_icon,
-						R.drawable.hh_closed_icon_selected,
-						R.drawable.hh_closed_icon_selected, -1,
-						R.drawable.hh_closed_icon_selected,
-						R.drawable.hh_closed_icon));
-		getDrumInstrument(3).setIconSource(
-				new ImageIconSource(R.drawable.hh_open_icon,
-						R.drawable.hh_open_icon_selected,
-						R.drawable.hh_open_icon_selected, -1,
-						R.drawable.hh_open_icon_selected,
-						R.drawable.hh_open_icon));
-		getDrumInstrument(4).setIconSource(
-				new ImageIconSource(R.drawable.rimshot_icon,
-						R.drawable.rimshot_icon_selected,
-						R.drawable.rimshot_icon_selected, -1,
-						R.drawable.rimshot_icon_selected,
-						R.drawable.rimshot_icon));
-		drumsDirectory.setIconSource(new ImageIconSource(R.drawable.drums_icon,
-				R.drawable.drums_icon_selected, R.drawable.drums_icon_selected,
-				-1, R.drawable.drums_icon_selected, R.drawable.drums_icon));
-		recordDirectory
-				.setIconSource(new ImageIconSource(R.drawable.microphone_icon,
-						R.drawable.microphone_icon_selected,
-						R.drawable.microphone_icon_selected, -1,
-						R.drawable.microphone_icon_selected,
-						R.drawable.microphone_icon));
-		beatRecordDirectory.setIconSource(new ImageIconSource(
-				R.drawable.beat_icon, R.drawable.beat_icon_selected,
-				R.drawable.beat_icon_selected, -1,
-				R.drawable.beat_icon_selected, R.drawable.beat_icon));
-		sampleRecordDirectory.setIconSource(new ImageIconSource(
-				R.drawable.sample_icon, R.drawable.sample_icon_selected,
-				R.drawable.sample_icon_selected, -1,
-				R.drawable.sample_icon_selected, R.drawable.sample_icon));
+		getDrumInstrument(0).setIconResource(IconResources.KICK);
+		getDrumInstrument(1).setIconResource(IconResources.SNARE);
+		getDrumInstrument(2).setIconResource(IconResources.HH_CLOSED);
+		getDrumInstrument(3).setIconResource(IconResources.HH_OPEN);
+		getDrumInstrument(4).setIconResource(IconResources.RIMSHOT);
+		drumsDirectory.setIconResource(IconResources.DRUMS);
+		recordDirectory.setIconResource(IconResources.MICROPHONE);
+		beatRecordDirectory.setIconResource(IconResources.BEAT);
+		sampleRecordDirectory.setIconResource(IconResources.SAMPLE);
 	}
-
-	public static String appDirectoryPath;
 
 	public static final String[] drumNames = { "kick", "snare", "hh_closed",
 			"hh_open", "rim" };
 
+	public static String appDirectoryPath;
+	
 	private static DirectoryManager singletonInstance = null;
 
 	private SampleListOnClickAndShowListener sampleListOnClickAndShowListener = new SampleListOnClickAndShowListener();
@@ -193,7 +156,7 @@ public class DirectoryManager {
 	private AlertDialog instrumentSelectAlert = null;
 	private ListAdapter instrumentSelectAdapter = null;
 
-	private BBDirectory audioDirectory, recordDirectory, beatRecordDirectory,
+	private Directory audioDirectory, recordDirectory, beatRecordDirectory,
 			sampleRecordDirectory, drumsDirectory, currDirectory = null;
 
 	private boolean addingTrack = false;
@@ -207,9 +170,9 @@ public class DirectoryManager {
 
 	private DirectoryManager() {
 		initDataDir();
-		audioDirectory = new BBDirectory(null, "audio", null);
-		drumsDirectory = new BBDirectory(audioDirectory, "drums", null);
-		recordDirectory = new BBDirectory(audioDirectory, "recorded", null);
+		audioDirectory = new Directory(null, "audio", null);
+		drumsDirectory = new Directory(audioDirectory, "drums", null);
+		recordDirectory = new Directory(audioDirectory, "recorded", null);
 		sampleRecordDirectory = new Instrument(recordDirectory, "samples", null);
 		beatRecordDirectory = new Instrument(recordDirectory, "beats", null);
 		beatRecordDirectory
@@ -221,7 +184,7 @@ public class DirectoryManager {
 				GlobalVars.mainActivity);
 	}
 
-	public void updateInstrumentSelectAlert(BBDirectory newDirectory) {
+	public void updateInstrumentSelectAlert(Directory newDirectory) {
 		updateInstrumentSelectAdapter(newDirectory);
 		updateInstrumentSelectTitleBar();
 		instrumentSelectAlertBuilder.setAdapter(instrumentSelectAdapter,
@@ -261,8 +224,8 @@ public class DirectoryManager {
 	public void clearTempFiles() {
 		audioDirectory.clearTempFiles();
 	}
-	
-	private void show(BBDirectory directory) {
+
+	private void show(Directory directory) {
 		currDirectory = directory;
 		updateInstrumentSelectAlert(currDirectory);
 		instrumentSelectAlert.show();
@@ -301,7 +264,7 @@ public class DirectoryManager {
 		}
 	}
 
-	private void updateInstrumentSelectAdapter(final BBDirectory directory) {
+	private void updateInstrumentSelectAdapter(final Directory directory) {
 		String[] list = formatNames(directory.getChildNames());
 		instrumentSelectAdapter = new ArrayAdapter<String>(
 				GlobalVars.mainActivity, android.R.layout.select_dialog_item,
@@ -312,7 +275,7 @@ public class DirectoryManager {
 				// if the directory is a root directory (only sample children)
 				// or does not have an icon, no icon for this list element
 				if (directory instanceof Instrument
-						|| directory.getChild(position).getIconSource() == null) {
+						|| directory.getChild(position).getIconResource() == null) {
 					tv.setCompoundDrawables(null, null, null, null);
 					return v;
 				}

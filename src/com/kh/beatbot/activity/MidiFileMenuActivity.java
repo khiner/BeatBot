@@ -13,8 +13,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.R;
-import com.kh.beatbot.global.GeneralUtils;
 import com.kh.beatbot.manager.Managers;
 
 public class MidiFileMenuActivity extends Activity {

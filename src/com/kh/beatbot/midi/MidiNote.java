@@ -1,11 +1,11 @@
 package com.kh.beatbot.midi;
 
-import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.global.GlobalVars.LevelType;
+import com.kh.beatbot.GlobalVars;
+import com.kh.beatbot.GlobalVars.LevelType;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
-import com.kh.beatbot.view.mesh.Rectangle;
+import com.kh.beatbot.ui.mesh.Rectangle;
 
 public class MidiNote implements Comparable<MidiNote> {
 	public static final int BORDER_WIDTH = 2;

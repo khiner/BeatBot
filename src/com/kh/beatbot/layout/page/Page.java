@@ -1,8 +1,8 @@
 package com.kh.beatbot.layout.page;
 
-import com.kh.beatbot.view.TouchableBBView;
+import com.kh.beatbot.ui.view.TouchableView;
 
-public abstract class Page extends TouchableBBView {
+public abstract class Page extends TouchableView {
 	
 	public abstract void update();
 }

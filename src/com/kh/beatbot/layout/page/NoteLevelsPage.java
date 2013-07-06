@@ -2,15 +2,15 @@ package com.kh.beatbot.layout.page;
 
 import javax.microedition.khronos.opengles.GL11;
 
-import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GlobalVars.LevelType;
-import com.kh.beatbot.global.RoundedRectIconSource;
+import com.kh.beatbot.GlobalVars.LevelType;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.view.BBView;
-import com.kh.beatbot.view.LevelsView;
-import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.ToggleButton;
-import com.kh.beatbot.view.mesh.ShapeGroup;
+import com.kh.beatbot.ui.RoundedRectIcon;
+import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.view.LevelsView;
+import com.kh.beatbot.ui.view.View;
+import com.kh.beatbot.ui.view.control.Button;
+import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class NoteLevelsPage extends Page {
 
@@ -54,16 +54,16 @@ public class NoteLevelsPage extends Page {
 		volumeToggle.setText("VOL");
 		panToggle.setText("PAN");
 		pitchToggle.setText("PIT");
-		volumeToggle.setBgIconSource(new RoundedRectIconSource(labelGroup, Colors.volumeBgColorSet, Colors.volumeStrokeColorSet));
-		panToggle.setBgIconSource(new RoundedRectIconSource(labelGroup, Colors.panBgColorSet, Colors.panStrokeColorSet));
-		pitchToggle.setBgIconSource(new RoundedRectIconSource(labelGroup, Colors.pitchBgColorSet, Colors.pitchStrokeColorSet));
+		volumeToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.volumeBgColorSet, Colors.volumeStrokeColorSet));
+		panToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.panBgColorSet, Colors.panStrokeColorSet));
+		pitchToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.pitchBgColorSet, Colors.pitchStrokeColorSet));
 	}
 
 	@Override
 	public void draw() {
 		push();
 		translate(-absoluteX, -absoluteY);
-		labelGroup.draw((GL11)BBView.gl, 2);
+		labelGroup.draw((GL11)View.gl, 2);
 		pop();
 	}
 

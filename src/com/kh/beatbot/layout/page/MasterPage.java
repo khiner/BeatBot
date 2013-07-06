@@ -1,8 +1,8 @@
 package com.kh.beatbot.layout.page;
 
 import com.kh.beatbot.manager.Managers;
-import com.kh.beatbot.view.BpmView;
-import com.kh.beatbot.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.BpmView;
+import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class MasterPage extends LevelsFXPage {
 

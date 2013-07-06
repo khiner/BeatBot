@@ -1,19 +1,19 @@
 package com.kh.beatbot.layout.page.effect;
 
+import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.effect.ParamData;
-import com.kh.beatbot.global.GlobalVars;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.Level1dListener;
-import com.kh.beatbot.view.TouchableBBView;
-import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.ControlViewBase;
-import com.kh.beatbot.view.control.ParamControl;
-import com.kh.beatbot.view.control.ToggleButton;
-import com.kh.beatbot.view.control.ToggleKnob;
+import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.control.Button;
+import com.kh.beatbot.ui.view.control.ControlViewBase;
+import com.kh.beatbot.ui.view.control.ParamControl;
+import com.kh.beatbot.ui.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.control.ToggleKnob;
 
-public abstract class EffectParamsPage extends TouchableBBView implements
+public abstract class EffectParamsPage extends TouchableView implements
 		Level1dListener, OnReleaseListener {
 	protected ParamControl[] paramControls;
 	protected Effect effect;

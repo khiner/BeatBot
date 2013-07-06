@@ -12,8 +12,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.global.Track;
+import com.kh.beatbot.GlobalVars;
+import com.kh.beatbot.Track;
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiTrack;
@@ -22,7 +22,7 @@ import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
-import com.kh.beatbot.view.helper.TickWindowHelper;
+import com.kh.beatbot.ui.view.helper.TickWindowHelper;
 
 public class MidiManager implements Parcelable {
 	private static MidiManager singletonInstance = null;

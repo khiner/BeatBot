@@ -127,19 +127,19 @@ void stopPreviewingTrack(Track *track) {
 	stopSoundingTrack(track);
 }
 
-void Java_com_kh_beatbot_global_Track_previewTrack(JNIEnv *env, jclass clazz,
+void Java_com_kh_beatbot_Track_previewTrack(JNIEnv *env, jclass clazz,
 		jint trackNum) {
 	Track *track = getTrack(NULL, NULL, trackNum);
 	previewTrack(track);
 }
 
-void Java_com_kh_beatbot_global_Track_stopPreviewingTrack(JNIEnv *env,
+void Java_com_kh_beatbot_Track_stopPreviewingTrack(JNIEnv *env,
 		jclass clazz, jint trackNum) {
 	Track *track = getTrack(NULL, NULL, trackNum);
 	stopPreviewingTrack(track);
 }
 
-void Java_com_kh_beatbot_global_Track_stopTrack(JNIEnv *env, jclass clazz,
+void Java_com_kh_beatbot_Track_stopTrack(JNIEnv *env, jclass clazz,
 		jint trackNum) {
 	Track *track = getTrack(NULL, NULL, trackNum);
 	stopTrack(track);

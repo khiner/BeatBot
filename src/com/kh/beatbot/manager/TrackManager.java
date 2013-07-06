@@ -3,13 +3,13 @@ package com.kh.beatbot.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kh.beatbot.global.BaseTrack;
-import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.global.Instrument;
-import com.kh.beatbot.global.Track;
+import com.kh.beatbot.BaseTrack;
+import com.kh.beatbot.GlobalVars;
+import com.kh.beatbot.Instrument;
+import com.kh.beatbot.Track;
 import com.kh.beatbot.midi.MidiNote;
-import com.kh.beatbot.view.TrackButtonRow;
-import com.kh.beatbot.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.TrackButtonRow;
+import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class TrackManager {
 

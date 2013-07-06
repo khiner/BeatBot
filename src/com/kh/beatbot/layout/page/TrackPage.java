@@ -1,13 +1,13 @@
 package com.kh.beatbot.layout.page;
 
-import com.kh.beatbot.R;
-import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.ImageIconSource;
-import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.ImageButton;
+import com.kh.beatbot.ui.Icon;
+import com.kh.beatbot.ui.IconResources;
+import com.kh.beatbot.ui.RoundedRectIcon;
+import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.view.control.Button;
+import com.kh.beatbot.ui.view.control.ImageButton;
 
 public class TrackPage extends LevelsFXPage {
 
@@ -25,7 +25,7 @@ public class TrackPage extends LevelsFXPage {
 				TrackManager.deleteCurrTrack();
 			}
 		});
-		
+
 		children.add(deleteButton);
 	}
 
@@ -33,11 +33,9 @@ public class TrackPage extends LevelsFXPage {
 	public void loadIcons() {
 		super.loadIcons();
 
-		deleteButton.setBgIconSource(new RoundedRectIconSource(labelGroup,
+		deleteButton.setBgIcon(new RoundedRectIcon(labelGroup,
 				Colors.deleteFillColorSet, Colors.deleteBorderColorSet));
-		deleteButton.setIconSource(new ImageIconSource(
-				R.drawable.delete_track_icon,
-				R.drawable.delete_track_icon_selected));
+		deleteButton.setIcon(new Icon(IconResources.DELETE_TRACK));
 	}
 
 	@Override
@@ -52,9 +50,9 @@ public class TrackPage extends LevelsFXPage {
 				thirdHeight);
 
 		float levelX = 6 * thirdHeight;
-		levelBar.layout(this, levelX, topRowY,
-				width - levelX - thirdHeight, thirdHeight);
-		
+		levelBar.layout(this, levelX, topRowY, width - levelX - thirdHeight,
+				thirdHeight);
+
 		deleteButton.layout(this, width - thirdHeight, topRowY, thirdHeight,
 				thirdHeight);
 

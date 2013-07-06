@@ -1,26 +1,26 @@
 package com.kh.beatbot.layout.page;
 
-import com.kh.beatbot.R;
+import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.activity.BeatBotActivity;
-import com.kh.beatbot.global.Colors;
-import com.kh.beatbot.global.GlobalVars;
-import com.kh.beatbot.global.ImageIconSource;
-import com.kh.beatbot.global.RoundedRectIconSource;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.view.SampleEditBBView;
-import com.kh.beatbot.view.control.Button;
-import com.kh.beatbot.view.control.ImageButton;
-import com.kh.beatbot.view.control.ToggleButton;
-import com.kh.beatbot.view.mesh.ShapeGroup;
+import com.kh.beatbot.ui.Icon;
+import com.kh.beatbot.ui.IconResources;
+import com.kh.beatbot.ui.RoundedRectIcon;
+import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.view.SampleEditView;
+import com.kh.beatbot.ui.view.control.Button;
+import com.kh.beatbot.ui.view.control.ImageButton;
+import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class SampleEditPage extends Page {
 
 	private ShapeGroup labelGroup;
 
-	private SampleEditBBView sampleEdit;
+	private SampleEditView sampleEdit;
 	private ImageButton previewButton, browseButton, editButton;
 	private ToggleButton loopButton, reverseButton;
 
@@ -37,22 +37,17 @@ public class SampleEditPage extends Page {
 
 	@Override
 	protected void loadIcons() {
-		previewButton.setIconSource(new ImageIconSource(
-				R.drawable.preview_icon, R.drawable.preview_icon_selected));
-		loopButton.setIconSource(new ImageIconSource(R.drawable.loop_icon,
-				R.drawable.loop_selected_icon));
-		reverseButton.setIconSource(new ImageIconSource(
-				R.drawable.reverse_icon, R.drawable.reverse_selected_icon));
+		previewButton.setIcon(new Icon(IconResources.PREVIEW));
+		loopButton.setIcon(new Icon(IconResources.LOOP));
+		reverseButton.setIcon(new Icon(IconResources.REVERSE));
 
-		browseButton.setBgIconSource(new RoundedRectIconSource(labelGroup,
+		browseButton.setBgIcon(new RoundedRectIcon(labelGroup,
 				Colors.iconFillColorSet, Colors.iconBorderColorSet));
-		browseButton.setIconSource(new ImageIconSource(R.drawable.browse_icon,
-				R.drawable.browse_icon_selected));
+		browseButton.setIcon(new Icon(IconResources.BROWSE));
 
-		editButton.setBgIconSource(new RoundedRectIconSource(labelGroup,
+		editButton.setBgIcon(new RoundedRectIcon(labelGroup,
 				Colors.iconFillColorSet, Colors.iconBorderColorSet));
-		editButton.setIconSource(new ImageIconSource(R.drawable.edit_icon,
-				R.drawable.edit_icon_selected));
+		editButton.setIcon(new Icon(IconResources.EDIT));
 	}
 
 	@Override
@@ -62,7 +57,7 @@ public class SampleEditPage extends Page {
 
 	@Override
 	protected void createChildren() {
-		sampleEdit = new SampleEditBBView();
+		sampleEdit = new SampleEditView();
 		previewButton = new ImageButton();
 		loopButton = new ToggleButton();
 		reverseButton = new ToggleButton();

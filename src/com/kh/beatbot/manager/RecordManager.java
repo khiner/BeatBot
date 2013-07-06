@@ -11,8 +11,8 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 
 import com.kh.beatbot.listener.Level1dListener;
-import com.kh.beatbot.view.control.ControlViewBase;
-import com.kh.beatbot.view.control.ThresholdBarView;
+import com.kh.beatbot.ui.view.control.ControlViewBase;
+import com.kh.beatbot.ui.view.control.ThresholdBarView;
 
 public class RecordManager implements Level1dListener {
 	public static final long RECORD_LATENCY_TICKS = Managers.midiManager
