@@ -18,7 +18,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.FloatMath;
 
-import com.kh.beatbot.GlobalVars;
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.ui.view.GLSurfaceViewBase;
 import com.kh.beatbot.ui.view.View;
 
@@ -72,7 +72,7 @@ public class GLText {
 		GLText.size = size;
 		// load the font and setup paint instance for drawing
 		Typeface tf = Typeface.createFromAsset(
-				GlobalVars.mainActivity.getAssets(), file);
+				BeatBotActivity.mainActivity.getAssets(), file);
 		Paint paint = new Paint();
 		paint.setAntiAlias(true);
 		paint.setTextSize(size);

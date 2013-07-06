@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.GeneralUtils;
-import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.view.page.Page;
 
 public class AdsrView extends TouchableView {
 
@@ -141,7 +141,7 @@ public class AdsrView extends TouchableView {
 					break;
 				}
 				initAdsrVb();
-				GlobalVars.mainPage.pageSelectGroup.updateAdsrPage();
+				Page.mainPage.pageSelectGroup.updateAdsrPage();
 				return;
 			}
 		}

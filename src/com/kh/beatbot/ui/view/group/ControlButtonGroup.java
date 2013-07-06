@@ -2,7 +2,7 @@ package com.kh.beatbot.ui.view.group;
 
 import android.widget.Toast;
 
-import com.kh.beatbot.GlobalVars;
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -13,6 +13,7 @@ import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.page.Page;
 
 public class ControlButtonGroup extends TouchableView {
 
@@ -54,11 +55,11 @@ public class ControlButtonGroup extends TouchableView {
 					String fileName = RecordManager.stopRecording();
 
 					Toast.makeText(
-							GlobalVars.mainActivity.getApplicationContext(),
+							BeatBotActivity.mainActivity.getApplicationContext(),
 							"Recorded file to " + fileName, Toast.LENGTH_SHORT)
 							.show();
 				} else {
-					GlobalVars.mainPage.midiView.reset();
+					Page.mainPage.midiView.reset();
 					playButton.setChecked(true);
 					RecordManager.startRecording();
 					if (PlaybackManager.getState() != PlaybackManager.State.PLAYING)
@@ -100,7 +101,7 @@ public class ControlButtonGroup extends TouchableView {
 					MidiManager.cancelCopy();
 					msg = "Copy Cancelled";
 				}
-				Toast.makeText(GlobalVars.mainActivity.getApplicationContext(),
+				Toast.makeText(BeatBotActivity.mainActivity.getApplicationContext(),
 						msg, Toast.LENGTH_SHORT).show();
 			}
 		});
@@ -143,7 +144,7 @@ public class ControlButtonGroup extends TouchableView {
 
 	@Override
 	public void layoutChildren() {
-		float leftMargin = GlobalVars.mainPage.midiTrackView.width;
+		float leftMargin = Page.mainPage.midiTrackView.width;
 		// left-aligned buttons
 		playButton.layout(this, leftMargin, 0, height, height);
 		stopButton.layout(this, leftMargin + height, 0, height, height);

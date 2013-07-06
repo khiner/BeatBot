@@ -1,17 +1,10 @@
 package com.kh.beatbot.activity;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.method.DigitsKeyListener;
@@ -21,8 +14,8 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.kh.beatbot.FileHelper;
 import com.kh.beatbot.GeneralUtils;
-import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.manager.DirectoryManager;
@@ -34,6 +27,7 @@ import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
 import com.kh.beatbot.ui.view.group.ViewPager;
 import com.kh.beatbot.ui.view.page.MainPage;
+import com.kh.beatbot.ui.view.page.Page;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
 public class BeatBotActivity extends Activity {
@@ -43,100 +37,46 @@ public class BeatBotActivity extends Activity {
 
 	private static final int MAIN_PAGE_NUM = 0, EFFECT_PAGE_NUM = 1;
 
-	private static byte[] buffer = new byte[1024];
-
-	private static AssetManager assetManager;
-	private static GLSurfaceViewGroup mainSurface;
 	private static ViewPager activityPager;
 	private static EditText bpmInput, sampleNameInput;
 
-	private static void copyFile(InputStream in, OutputStream out)
-			throws IOException {
-		int read;
-		while ((read = in.read(buffer)) != -1) {
-			out.write(buffer, 0, read);
-		}
-		in.close();
-		in = null;
-		out.flush();
-		out.close();
-		out = null;
-	}
-
-	private static void copyFromAssetsToExternal(String newDirectoryPath) {
-		File newDirectory = new File(newDirectoryPath);
-		if (newDirectory.listFiles() == null
-				|| newDirectory.listFiles().length > 0) {
-			// only copy files into this dir if it is empty
-			// files can be renamed, so we can't make assumptions
-			// about whether an individual file already exists
-			return;
-		}
-
-		// create the dir (we know it doesn't exist yet at this point)
-		newDirectory.mkdirs();
-
-		try {
-			String assetPath = newDirectoryPath.replace(
-					DirectoryManager.getAudioPath(), "");
-			assetPath = assetPath.substring(0, assetPath.length() - 1);
-			for (String filePath : assetManager.list(assetPath)) {
-				// copy audio file exactly from assets to sdcard
-				InputStream in = assetManager.open(assetPath + "/" + filePath);
-				FileOutputStream rawOut = new FileOutputStream(newDirectoryPath
-						+ filePath);
-				copyFile(in, rawOut);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void copyAllSamplesToStorage() {
-		assetManager = getAssets();
-		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
-			String drumPath = DirectoryManager.getDrumInstrument(i).getPath();
-			// the sample folder for this sample type does not yet exist.
-			// create it and write all assets of this type to the folder
-			copyFromAssetsToExternal(drumPath);
-		}
-	}
-
+	public static BeatBotActivity mainActivity;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		GlobalVars.mainActivity = this;
-		Colors.initColors(this);
-		GlobalVars.font = Typeface.createFromAsset(getAssets(),
-				"REDRING-1969-v03.ttf");
 		GeneralUtils.initAndroidSettings(this);
+		mainActivity = this;
+		View.font = Typeface.createFromAsset(getAssets(),
+				"REDRING-1969-v03.ttf");
+		Colors.initColors(this);
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.FILL_PARENT,
 				LinearLayout.LayoutParams.FILL_PARENT);
+		View.root = new GLSurfaceViewGroup(this);
+		View.root.setLayoutParams(lp);
+
 		LinearLayout layout = new LinearLayout(this);
-		mainSurface = new GLSurfaceViewGroup(this);
-		mainSurface.setLayoutParams(lp);
-		layout.addView(mainSurface);
+		layout.addView(View.root);
 		setContentView(layout, lp);
 
 		DirectoryManager.init();
 
-		copyAllSamplesToStorage();
+		FileHelper.copyAllSamplesToStorage();
 		if (savedInstanceState == null) {
 			initNativeAudio();
 		}
 
-		View.root = mainSurface;
-		GlobalVars.mainPage = new MainPage();
-		GlobalVars.effectPage = new EffectPage();
+		Page.mainPage = new MainPage();
+		Page.effectPage = new EffectPage();
 
 		activityPager = new ViewPager();
-		activityPager.addPage(GlobalVars.mainPage);
-		activityPager.addPage(GlobalVars.effectPage);
+		activityPager.addPage(Page.mainPage);
+		activityPager.addPage(Page.effectPage);
 		activityPager.setPage(0);
 
-		mainSurface.setBBRenderer(activityPager);
+		((GLSurfaceViewGroup) View.root).setBBRenderer(activityPager);
 
 		TrackManager.init();
 		MidiManager.init();
@@ -160,21 +100,21 @@ public class BeatBotActivity extends Activity {
 		if (activityPager.getCurrPageNum() == MAIN_PAGE_NUM) {
 			showDialog(EXIT_DIALOG_ID);
 		} else if (activityPager.getCurrPageNum() == EFFECT_PAGE_NUM) {
-			GlobalVars.mainPage.pageSelectGroup.updateLevelsFXPage();
+			Page.mainPage.pageSelectGroup.updateLevelsFXPage();
 			activityPager.setPage(MAIN_PAGE_NUM);
 		}
 	}
 
 	@Override
 	public void onPause() {
-		mainSurface.onPause();
+		View.root.onPause();
 		super.onPause();
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		mainSurface.onResume();
+		View.root.onResume();
 	}
 
 	@Override
@@ -217,7 +157,7 @@ public class BeatBotActivity extends Activity {
 									String bpmString = bpmInput.getText()
 											.toString();
 									if (!bpmString.isEmpty()) {
-										GlobalVars.mainPage.pageSelectGroup
+										Page.mainPage.pageSelectGroup
 												.getMasterPage()
 												.setBPM(Integer
 														.valueOf(bpmString));
@@ -248,8 +188,7 @@ public class BeatBotActivity extends Activity {
 									if (!sampleName.isEmpty()) {
 										TrackManager.currTrack
 												.setCurrSampleName(sampleName);
-										GlobalVars.mainPage.pageSelectGroup
-												.update();
+										Page.mainPage.pageSelectGroup.update();
 									}
 								}
 							})
@@ -298,14 +237,14 @@ public class BeatBotActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.snap:
-			if (GlobalVars.mainPage.midiView.toggleSnapToGrid()) {
+			if (Page.mainPage.midiView.toggleSnapToGrid()) {
 				item.setIcon(R.drawable.btn_check_buttonless_on);
 			} else {
 				item.setIcon(R.drawable.btn_check_buttonless_off);
 			}
 			return true;
 		case R.id.quantize_current:
-			MidiManager.quantize(GlobalVars.currBeatDivision);
+			MidiManager.quantize();
 			return true;
 		case R.id.quantize_quarter:
 			MidiManager.quantize(1);
@@ -332,12 +271,12 @@ public class BeatBotActivity extends Activity {
 	 */
 	public void setupProject() {
 		TrackManager.getTrack(0).select();
-		GlobalVars.mainPage.pageSelectGroup.selectPage(0);
+		Page.mainPage.pageSelectGroup.selectPage(0);
 	}
 
 	public void launchEffect(Effect effect) {
 		activityPager.setPage(EFFECT_PAGE_NUM);
-		GlobalVars.effectPage.loadEffect(effect);
+		Page.effectPage.loadEffect(effect);
 	}
 
 	private void initNativeAudio() {

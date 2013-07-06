@@ -1,11 +1,11 @@
 package com.kh.beatbot.midi;
 
-import com.kh.beatbot.GlobalVars;
-import com.kh.beatbot.GlobalVars.LevelType;
+import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.ui.mesh.Rectangle;
+import com.kh.beatbot.ui.view.page.Page;
 
 public class MidiNote implements Comparable<MidiNote> {
 	public static final int BORDER_WIDTH = 2;
@@ -53,7 +53,7 @@ public class MidiNote implements Comparable<MidiNote> {
 	}
 	
 	private void updateView() {
-		GlobalVars.mainPage.midiView.updateNoteView(this);
+		Page.mainPage.midiView.updateNoteView(this);
 	}
 	
 	public MidiNote getCopy() {

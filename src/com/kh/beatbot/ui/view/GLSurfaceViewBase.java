@@ -14,7 +14,7 @@ import android.opengl.GLUtils;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 
-import com.kh.beatbot.GlobalVars;
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.ui.view.text.GLText;
 
 public abstract class GLSurfaceViewBase extends GLSurfaceView implements
@@ -127,7 +127,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 			int textureId, int[] crop) {
 		
 		Bitmap bitmap = BitmapFactory.decodeResource(
-				GlobalVars.mainActivity.getResources(), resourceId);
+				BeatBotActivity.mainActivity.getResources(), resourceId);
 
 		// Build our crop texture to be the size of the bitmap (ie full texture)
 		crop[0] = 0;

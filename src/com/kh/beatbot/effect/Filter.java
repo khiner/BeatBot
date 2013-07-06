@@ -1,12 +1,12 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.BaseTrack;
-import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.R;
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.manager.PlaybackManager;
 
 public class Filter extends Effect {
-	public static final String NAME = GlobalVars.mainActivity.getString(R.string.filter);
+	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.filter);
 	public static final int EFFECT_NUM = 3;
 	public static final int NUM_PARAMS = 4;
 	public static final ParamData[] PARAMS_DATA = {

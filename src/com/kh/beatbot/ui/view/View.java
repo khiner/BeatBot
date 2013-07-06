@@ -8,6 +8,8 @@ import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.graphics.Typeface;
+
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.RoundedRect;
@@ -29,7 +31,8 @@ public abstract class View implements Comparable<View> {
 	public static final float ¹ = (float) Math.PI;
 
 	public static GLSurfaceViewBase root;
-
+	public static Typeface font;
+	
 	protected List<View> children = new ArrayList<View>();
 	protected View parent;
 

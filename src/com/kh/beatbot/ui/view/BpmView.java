@@ -2,7 +2,6 @@ package com.kh.beatbot.ui.view;
 
 import java.nio.FloatBuffer;
 
-import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Colors;
@@ -95,7 +94,7 @@ public class BpmView extends ClickableView {
 
 	@Override
 	protected void longPress(int id, float x, float y) {
-		GlobalVars.mainActivity.showDialog(BeatBotActivity.BPM_DIALOG_ID);
+		BeatBotActivity.mainActivity.showDialog(BeatBotActivity.BPM_DIALOG_ID);
 	}
 	
 	private void initSegmentVBs() {

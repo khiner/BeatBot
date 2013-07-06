@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.view.page;
 
-import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -97,7 +96,7 @@ public class SampleEditPage extends Page {
 		editButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				GlobalVars.mainActivity
+				BeatBotActivity.mainActivity
 						.showDialog(BeatBotActivity.SAMPLE_NAME_EDIT_DIALOG_ID);
 			}
 		});

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.effect.Effect.LevelType;
 
 public class BaseTrack {
 	protected int id;
@@ -12,7 +13,7 @@ public class BaseTrack {
 	public float volume = .8f;
 	public float pan = .5f;
 	public float pitch = .5f;
-	public GlobalVars.LevelType activeLevelType = GlobalVars.LevelType.VOLUME;
+	public LevelType activeLevelType = LevelType.VOLUME;
 
 	public BaseTrack(int id) {
 		this.id = id;

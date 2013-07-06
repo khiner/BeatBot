@@ -25,6 +25,8 @@ import com.kh.beatbot.midi.util.VariableLengthInt;
 
 public abstract class MidiEvent implements Comparable<MidiEvent> {
 
+	public static final short LEVEL_MAX = 127;
+	
 	protected long mTick;
 	protected VariableLengthInt mDelta;
 

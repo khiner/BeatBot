@@ -7,6 +7,13 @@ import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.manager.TrackManager;
 
 public abstract class Effect implements Comparable<Effect> {
+	
+	public static enum LevelType {
+		VOLUME, PAN, PITCH
+	};
+
+	// also in jni/Track.h: ugly but necessary
+	public final static int MAX_EFFECTS_PER_TRACK = 3;
 	protected List<Param> params = new ArrayList<Param>();
 
 	protected BaseTrack track;

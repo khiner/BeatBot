@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.MidiView;
@@ -125,7 +124,7 @@ public class TickWindowHelper {
 			currNumQuarterNotes /= 2;
 		else if ((MIN_LINES_DISPLAYED * spacing * 2) / currNumQuarterNotes > midiView.width)
 			currNumQuarterNotes *= 2;
-		GlobalVars.currBeatDivision = currNumQuarterNotes;
+		MidiManager.currBeatDivision = currNumQuarterNotes;
 	}
 
 	public static void setTickOffset(float tickOffset) {

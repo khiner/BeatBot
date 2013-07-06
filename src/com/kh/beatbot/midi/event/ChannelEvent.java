@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.kh.beatbot.GlobalVars;
-
 public class ChannelEvent extends MidiEvent {
 
 	protected int mType;
@@ -156,8 +154,8 @@ public class ChannelEvent extends MidiEvent {
 
 		out.write(note);
 		if (mType != PROGRAM_CHANGE && mType != CHANNEL_AFTERTOUCH) {
-			int int_vel = (int) (velocity * GlobalVars.LEVEL_MAX) & 0xFF;
-			int int_pan = (int) (pan * GlobalVars.LEVEL_MAX) & 0xFF;
+			int int_vel = (int) (velocity * LEVEL_MAX) & 0xFF;
+			int int_pan = (int) (pan * LEVEL_MAX) & 0xFF;
 			out.write(int_vel);
 			out.write(int_pan);
 		}
@@ -167,8 +165,8 @@ public class ChannelEvent extends MidiEvent {
 			int type, int channel, InputStream in) throws IOException {
 
 		int note = in.read();
-		float velocity = (float) in.read() / (float) GlobalVars.LEVEL_MAX;
-		float pan = (float) in.read() / (float) GlobalVars.LEVEL_MAX;
+		float velocity = (float) in.read() / (float) LEVEL_MAX;
+		float pan = (float) in.read() / (float) LEVEL_MAX;
 
 		switch (type) {
 		case NOTE_OFF:

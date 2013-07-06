@@ -4,12 +4,12 @@ import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.kh.beatbot.GlobalVars;
-import com.kh.beatbot.GlobalVars.LevelType;
+import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.view.page.Page;
 
 public class LevelsView extends TouchableView {
 
@@ -305,7 +305,7 @@ public class LevelsView extends TouchableView {
 	@Override
 	public void init() {
 		//setBackgroundColor(Colors.VIEW_BG);
-		midiView = GlobalVars.mainPage.midiView;
+		midiView = Page.mainPage.midiView;
 		initLevelBarVb();
 	}
 
@@ -334,7 +334,7 @@ public class LevelsView extends TouchableView {
 
 	@Override
 	public void layoutChildren() {
-		View alignXView = GlobalVars.mainPage.midiView;
+		View alignXView = Page.mainPage.midiView;
 		xOffset = alignXView.absoluteX - absoluteX;
 		layoutBgRect(3, height / 8);
 	}

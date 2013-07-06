@@ -10,7 +10,6 @@ import java.util.Stack;
 
 import android.util.Log;
 
-import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
@@ -21,14 +20,17 @@ import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
+import com.kh.beatbot.ui.view.page.Page;
 
 public class MidiManager {
 
 	public static final int MIN_BPM = 45, MAX_BPM = 300,
 	// ticks per quarter note (I think)
-			RESOLUTION = MidiFile.DEFAULT_RESOLUTION;
+			RESOLUTION = MidiFile.DEFAULT_RESOLUTION, UNDO_STACK_SIZE = 40;
 
 	public static final long TICKS_IN_ONE_MEASURE = RESOLUTION * 4;
+
+	public static float currBeatDivision;
 
 	private static TimeSignature ts = new TimeSignature();
 	private static Tempo tempo = new Tempo();
@@ -114,13 +116,13 @@ public class MidiManager {
 	public static void selectNote(MidiNote midiNote) {
 		midiNote.setSelected(true);
 
-		GlobalVars.mainPage.midiView.updateNoteFillColor(midiNote);
+		Page.mainPage.midiView.updateNoteFillColor(midiNote);
 		updateEditIcons();
 	}
 
 	public static void deselectNote(MidiNote midiNote) {
 		midiNote.setSelected(false);
-		GlobalVars.mainPage.midiView.updateNoteFillColor(midiNote);
+		Page.mainPage.midiView.updateNoteFillColor(midiNote);
 		updateEditIcons();
 	}
 
@@ -167,7 +169,7 @@ public class MidiManager {
 	private static void addNote(MidiNote midiNote) {
 		Track track = TrackManager.getTrack(midiNote.getNoteValue());
 		track.addNote(midiNote);
-		GlobalVars.mainPage.midiView.createNoteView(midiNote);
+		Page.mainPage.midiView.createNoteView(midiNote);
 	}
 
 	public static void deleteNote(MidiNote midiNote) {
@@ -179,7 +181,7 @@ public class MidiManager {
 
 	private static void updateEditIcons() {
 		boolean anyNoteSelected = anyNoteSelected();
-		GlobalVars.mainPage.controlButtonGroup
+		Page.mainPage.controlButtonGroup
 				.setEditIconsEnabled(anyNoteSelected);
 	}
 
@@ -198,7 +200,7 @@ public class MidiManager {
 	}
 
 	public static void paste(long startTick) {
-		GlobalVars.mainPage.controlButtonGroup.uncheckCopyButton();
+		Page.mainPage.controlButtonGroup.uncheckCopyButton();
 		if (copiedNotes.isEmpty())
 			return;
 		saveState();
@@ -257,7 +259,7 @@ public class MidiManager {
 			onTick = (long) TickWindowHelper.getMajorTickNearestTo(onTick);
 			offTick = (long) TickWindowHelper.getMajorTickNearestTo(offTick) - 1;
 			if (offTick == onTick - 1) {
-				offTick += getTicksPerBeat(GlobalVars.currBeatDivision);
+				offTick += getTicksPerBeat(currBeatDivision);
 			}
 		}
 		if (maintainNoteLength)
@@ -340,6 +342,10 @@ public class MidiManager {
 		}
 	}
 
+	public static void quantize() {
+		quantize(currBeatDivision);
+	}
+
 	/*
 	 * Translate all midi notes to their on-ticks' nearest major ticks given the
 	 * provided beat division
@@ -354,7 +360,7 @@ public class MidiManager {
 		undoStack.push(currState);
 		currState = copyMidiList(getMidiNotes());
 		// enforce max undo stack size
-		if (undoStack.size() > GlobalVars.UNDO_STACK_SIZE)
+		if (undoStack.size() > UNDO_STACK_SIZE)
 			undoStack.remove(0);
 	}
 

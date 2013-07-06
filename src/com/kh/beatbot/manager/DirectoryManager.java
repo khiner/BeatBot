@@ -14,8 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kh.beatbot.Directory;
-import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.Instrument;
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.ui.IconResources;
 
 public class DirectoryManager {
@@ -47,7 +47,7 @@ public class DirectoryManager {
 			// empty message. otherwise, show the next child
 			// directories in a select alert list
 			if (currDirectory.getChildNames().length == 0) {
-				Toast.makeText(GlobalVars.mainActivity,
+				Toast.makeText(BeatBotActivity.mainActivity,
 						currDirectory.getEmptyMsg(), Toast.LENGTH_SHORT).show();
 			} else {
 				instrumentSelectAlert.show();
@@ -86,7 +86,7 @@ public class DirectoryManager {
 					View view = originalAdapter.getView(position, convertView,
 							parent);
 					TextView textView = (TextView) view;
-					textView.setTypeface(GlobalVars.font);
+					textView.setTypeface(com.kh.beatbot.ui.view.View.font);
 					textView.setText(textView.getText().toString()
 							.toUpperCase());
 					return view;
@@ -173,7 +173,7 @@ public class DirectoryManager {
 			new Instrument(drumsDirectory, drumName, null);
 		}
 		instrumentSelectAlertBuilder = new AlertDialog.Builder(
-				GlobalVars.mainActivity);
+				BeatBotActivity.mainActivity);
 	}
 
 	public static void updateInstrumentSelectAlert(Directory newDirectory) {
@@ -259,7 +259,7 @@ public class DirectoryManager {
 	private static void updateInstrumentSelectAdapter(final Directory directory) {
 		String[] list = formatNames(directory.getChildNames());
 		instrumentSelectAdapter = new ArrayAdapter<String>(
-				GlobalVars.mainActivity, android.R.layout.select_dialog_item,
+				BeatBotActivity.mainActivity, android.R.layout.select_dialog_item,
 				android.R.id.text1, list) {
 			public View getView(int position, View convertView, ViewGroup parent) {
 				View v = super.getView(position, convertView, parent);
@@ -276,7 +276,7 @@ public class DirectoryManager {
 						0, 0);
 				// Add margin between image and text (support various screen
 				// densities)
-				int dpMargin = (int) (15 * GlobalVars.mainActivity
+				int dpMargin = (int) (15 * BeatBotActivity.mainActivity
 						.getResources().getDisplayMetrics().density + 0.5f);
 				tv.setCompoundDrawablePadding(dpMargin);
 

@@ -2,7 +2,7 @@ package com.kh.beatbot.ui.view.page;
 
 import javax.microedition.khronos.opengles.GL11;
 
-import com.kh.beatbot.GlobalVars.LevelType;
+import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;

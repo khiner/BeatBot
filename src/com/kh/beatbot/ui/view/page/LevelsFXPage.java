@@ -7,13 +7,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 
 import com.kh.beatbot.BaseTrack;
-import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.R;
-import com.kh.beatbot.GlobalVars.LevelType;
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.effect.Chorus;
 import com.kh.beatbot.effect.Decimate;
 import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Reverb;
@@ -68,13 +68,13 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 		public void labelListInitialized(LabelList labelList) {
 			effectLabelList = (DraggableLabelList) labelList;
 			if (effectLabelList.numChildren() > 0) {
-				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
+				for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {
 					Effect effect = getCurrTrack().findEffectByPosition(i);
 					if (effect != null)
 						labelList.setLabelOn(i, effect.isOn());
 				}
 			} else {
-				for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
+				for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {
 					labelList.addLabel("", false);
 				}
 			}
@@ -157,7 +157,7 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 	private void updateEffects() {
 		if (effectLabelList.numChildren() <= 0)
 			return;
-		for (int i = 0; i < GlobalVars.MAX_EFFECTS_PER_TRACK; i++) {
+		for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {
 			Effect effect = getCurrTrack().findEffectByPosition(i);
 			if (effect == null) {
 				effectLabelList.setLabelText(i, "");
@@ -221,7 +221,7 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 			effect.removeEffect();
 			effect = getEffect(effectName, effectPosition);
 		}
-		GlobalVars.mainActivity.launchEffect(effect);
+		BeatBotActivity.mainActivity.launchEffect(effect);
 	}
 
 	private Effect getEffect(String effectName, int position) {
@@ -297,11 +297,11 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 			}
 		});
 		// effects
-		effectNames = GlobalVars.mainActivity.getResources().getStringArray(
+		effectNames = BeatBotActivity.mainActivity.getResources().getStringArray(
 				R.array.effect_names);
 		effectLabelList = new DraggableLabelList();
 		effectLabelList.setListener(new EffectLabelListListener(
-				GlobalVars.mainActivity));
+				BeatBotActivity.mainActivity));
 
 		addChild(effectLabel);
 		addChild(levelBar);

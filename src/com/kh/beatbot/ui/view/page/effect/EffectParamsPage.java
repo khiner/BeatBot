@@ -1,17 +1,17 @@
 package com.kh.beatbot.ui.view.page.effect;
 
-import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.effect.ParamData;
-import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.Level1dListener;
+import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
 import com.kh.beatbot.ui.view.control.ParamControl;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.ToggleKnob;
+import com.kh.beatbot.ui.view.page.Page;
 
 public abstract class EffectParamsPage extends TouchableView implements
 		Level1dListener, OnReleaseListener {
@@ -105,9 +105,9 @@ public abstract class EffectParamsPage extends TouchableView implements
 		}
 
 		if (paramNum == xParamIndex) {
-			GlobalVars.effectPage.getLevel2d().setViewLevelX(level);
+			Page.effectPage.getLevel2d().setViewLevelX(level);
 		} else if (paramNum == yParamIndex) {
-			GlobalVars.effectPage.getLevel2d().setViewLevelY(level);
+			Page.effectPage.getLevel2d().setViewLevelY(level);
 		}
 	}
 

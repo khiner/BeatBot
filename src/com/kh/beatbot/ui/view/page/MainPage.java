@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.view.page;
 
-import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.Track;
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.view.MidiTrackView;
 import com.kh.beatbot.ui.view.MidiView;
@@ -30,7 +30,7 @@ public class MainPage extends TouchableView {
 	@Override
 	public void initAll() {
 		super.initAll();
-		GlobalVars.mainActivity.setupProject();
+		BeatBotActivity.mainActivity.setupProject();
 	}
 	
 	@Override

@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.BaseTrack;
-import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.Instrument;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.view.TrackButtonRow;
 import com.kh.beatbot.ui.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.page.Page;
 
 public class TrackManager {
 
@@ -44,8 +44,8 @@ public class TrackManager {
 			return;
 		currTrack = newTrack;
 		newTrack.select();
-		GlobalVars.mainPage.midiView.notifyTrackChanged(trackNum);
-		GlobalVars.mainPage.pageSelectGroup.notifyTrackChanged();
+		Page.mainPage.midiView.notifyTrackChanged(trackNum);
+		Page.mainPage.pageSelectGroup.notifyTrackChanged();
 	}
 	
 	public static BaseTrack getBaseTrack(int trackNum) {
@@ -63,7 +63,7 @@ public class TrackManager {
 		Track newTrack = new Track(tracks.size());
 		newTrack.setInstrument(instrument, sampleNum);
 		tracks.add(newTrack);
-		GlobalVars.mainPage.trackCreated(newTrack);
+		Page.mainPage.trackCreated(newTrack);
 		setTrack(newTrack.getId());
 	}
 
@@ -76,7 +76,7 @@ public class TrackManager {
 		for (int i = currTrackNum; i < tracks.size(); i++) {
 			tracks.get(i).setId(i);
 		}
-		GlobalVars.mainPage.notifyTrackDeleted(currTrack);
+		Page.mainPage.notifyTrackDeleted(currTrack);
 		int selectedTrackNum = Math.min(currTrackNum, tracks.size() - 1);
 		setTrack(selectedTrackNum);
 		deleteTrack(currTrackNum);
