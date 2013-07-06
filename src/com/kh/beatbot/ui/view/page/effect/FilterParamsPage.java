@@ -1,4 +1,4 @@
-package com.kh.beatbot.layout.page.effect;
+package com.kh.beatbot.ui.view.page.effect;
 
 import javax.microedition.khronos.opengles.GL11;
 

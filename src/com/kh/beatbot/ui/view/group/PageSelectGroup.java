@@ -2,11 +2,6 @@ package com.kh.beatbot.ui.view.group;
 
 import javax.microedition.khronos.opengles.GL11;
 
-import com.kh.beatbot.layout.page.AdsrPage;
-import com.kh.beatbot.layout.page.MasterPage;
-import com.kh.beatbot.layout.page.NoteLevelsPage;
-import com.kh.beatbot.layout.page.SampleEditPage;
-import com.kh.beatbot.layout.page.TrackPage;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.TrackManager;
@@ -21,6 +16,11 @@ import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.page.AdsrPage;
+import com.kh.beatbot.ui.view.page.MasterPage;
+import com.kh.beatbot.ui.view.page.NoteLevelsPage;
+import com.kh.beatbot.ui.view.page.SampleEditPage;
+import com.kh.beatbot.ui.view.page.TrackPage;
 
 public class PageSelectGroup extends TouchableView {
 	public static final int TRACK_PAGE_ID = 0;

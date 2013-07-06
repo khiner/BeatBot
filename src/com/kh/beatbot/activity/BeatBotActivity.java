@@ -25,8 +25,6 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.layout.page.MainPage;
-import com.kh.beatbot.layout.page.effect.EffectPage;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -35,6 +33,8 @@ import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
 import com.kh.beatbot.ui.view.group.ViewPager;
+import com.kh.beatbot.ui.view.page.MainPage;
+import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
 public class BeatBotActivity extends Activity {
 

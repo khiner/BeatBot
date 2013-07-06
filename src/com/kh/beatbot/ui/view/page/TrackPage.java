@@ -1,4 +1,4 @@
-package com.kh.beatbot.layout.page;
+package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;

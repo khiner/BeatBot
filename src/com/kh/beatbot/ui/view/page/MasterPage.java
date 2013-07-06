@@ -1,4 +1,4 @@
-package com.kh.beatbot.layout.page;
+package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.ui.view.BpmView;

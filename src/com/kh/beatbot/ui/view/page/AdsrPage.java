@@ -1,4 +1,4 @@
-package com.kh.beatbot.layout.page;
+package com.kh.beatbot.ui.view.page;
 
 import javax.microedition.khronos.opengles.GL11;
 
