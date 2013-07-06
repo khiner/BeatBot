@@ -59,7 +59,7 @@ public class PageSelectGroup extends TouchableView {
 
 	public void updateAdsrPage() {
 		adsrPage.updateLevelBar();
-		adsrPage.updateLabels();
+		adsrPage.updateParamView();
 	}
 
 	public void updateLevelsFXPage() {

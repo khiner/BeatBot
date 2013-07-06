@@ -22,47 +22,42 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 public class AdsrPage extends Page implements OnReleaseListener,
 		Level1dListener {
 
+	private static ShapeGroup iconGroup = new ShapeGroup();
+
 	private ToggleButton[] adsrButtons;
 	private AdsrView adsrView;
 	private Seekbar levelBar;
 	private ToggleButton valueLabel, paramLabel;
-	private static ShapeGroup iconGroup = new ShapeGroup();
 
 	@Override
 	public void init() {
 		updateLevelBar();
-		updateLabels();
+		updateParamView();
 	}
 
 	@Override
 	public void update() {
 		adsrView.update();
 		updateLevelBar();
-		updateLabels();
-	}
-
-	private void check(ToggleButton btn) {
-		btn.setChecked(true);
-		for (ToggleButton otherBtn : adsrButtons) {
-			if (otherBtn != btn) {
-				otherBtn.setChecked(false);
-			}
-		}
+		updateParamView();
 	}
 
 	public void updateLevelBar() {
 		levelBar.setViewLevel(TrackManager.currTrack.adsr.getCurrParam().viewLevel);
 	}
 
-	public void updateLabels() {
+	public void updateParamView() {
+		// update the displayed param label, value and checked button
+		int paramId = TrackManager.currTrack.adsr.getCurrParamId();
+		for (ToggleButton adsrButton : adsrButtons) {
+			adsrButton.setChecked(adsrButton.getId() == paramId);
+		}
 		updateLabel();
 		updateValueLabel();
 	}
 
 	private void updateLabel() {
-		// update the displayed param name
-		paramLabel
-				.setText(TrackManager.currTrack.adsr.getCurrParam().getName());
+		paramLabel.setText(TrackManager.currTrack.adsr.getCurrParam().getName());
 	}
 
 	private void updateValueLabel() {
@@ -72,20 +67,18 @@ public class AdsrPage extends Page implements OnReleaseListener,
 
 	@Override
 	public void onRelease(Button button) {
-		check((ToggleButton) button);
 		int paramId = button.getId();
 		// set the current parameter so we know what to do with SeekBar events.
 		TrackManager.currTrack.adsr.setCurrParam(paramId);
-		updateLabels();
 		updateLevelBar();
+		updateParamView();
 	}
 
 	@Override
 	public void onLevelChange(ControlViewBase levelListenable, float level) {
 		TrackManager.currTrack.adsr.setCurrParamLevel(level);
-		// update everything except level bar, since it is the notifier
 		adsrView.update();
-		updateLabels();
+		updateValueLabel();
 	}
 
 	/**

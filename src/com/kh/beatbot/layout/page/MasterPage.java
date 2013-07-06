@@ -15,7 +15,8 @@ public class MasterPage extends LevelsFXPage {
 	
 	@Override
 	public void init() {
-		bpmView.setBPM(Managers.midiManager.getBPM());
+		setBPM(Managers.midiManager.getBPM());
+		update();
 	}
 
 	@Override

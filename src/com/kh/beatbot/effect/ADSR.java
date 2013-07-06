@@ -75,6 +75,10 @@ public class ADSR extends Effect {
 		return getParam(currParamId);
 	}
 	
+	public int getCurrParamId() {
+		return currParamId;
+	}
+	
 	public float getAttack() {
 		return params.get(ATTACK_ID).viewLevel;
 	}
