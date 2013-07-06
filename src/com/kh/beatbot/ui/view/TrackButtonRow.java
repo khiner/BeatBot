@@ -39,11 +39,11 @@ public class TrackButtonRow extends TouchableView {
 		muteButton.setText("M");
 		soloButton.setText("S");
 		instrumentButton.setBgIcon(new RoundedRectIcon(roundedRectGroup,
-				Colors.instrumentBgColorSet, Colors.instrumentStrokeColorSet));
+				Colors.instrumentBgColorSet, Colors.buttonRowStrokeColorSet));
 		muteButton.setBgIcon(new RoundedRectIcon(roundedRectGroup,
-				Colors.muteButtonColorSet, Colors.labelStrokeColorSet));
+				Colors.muteButtonColorSet, Colors.buttonRowStrokeColorSet));
 		soloButton.setBgIcon(new RoundedRectIcon(roundedRectGroup,
-				Colors.soloButtonColorSet, Colors.labelStrokeColorSet));
+				Colors.soloButtonColorSet, Colors.buttonRowStrokeColorSet));
 	}
 
 	@Override

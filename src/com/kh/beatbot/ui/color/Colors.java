@@ -23,7 +23,7 @@ public class Colors {
 
 	public static ColorSet defaultStrokeColorSet, labelBgColorSet,
 			labelStrokeColorSet, muteButtonColorSet, soloButtonColorSet,
-			instrumentBgColorSet, instrumentStrokeColorSet, panBgColorSet,
+			buttonRowStrokeColorSet, instrumentBgColorSet, panBgColorSet,
 			panStrokeColorSet, pitchBgColorSet, pitchStrokeColorSet,
 			volumeBgColorSet, volumeStrokeColorSet, effectLabelBgColorSet,
 			effectLabelStrokeColorSet, effectLabelTouchedBgColorSet,
@@ -84,6 +84,7 @@ public class Colors {
 				.38f };
 		labelBgColorSet = new ColorSet(LABEL_DARK, VOLUME, LABEL_SELECTED);
 		labelStrokeColorSet = new ColorSet(WHITE, WHITE, BLACK);
+		buttonRowStrokeColorSet = new ColorSet(WHITE, BLACK, BLACK);
 
 		effectLabelBgColorSet = new ColorSet(LABEL_DARK, LABEL_LIGHT, VOLUME);
 		effectLabelStrokeColorSet = new ColorSet(WHITE, WHITE, WHITE);
@@ -97,7 +98,6 @@ public class Colors {
 		soloButtonColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, PITCH);
 
 		instrumentBgColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, VOLUME);
-		instrumentStrokeColorSet = new ColorSet(WHITE, BLACK, WHITE);
 
 		panBgColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, PAN);
 		pitchBgColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, PITCH);

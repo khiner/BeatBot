@@ -8,6 +8,11 @@ public class IconResources {
 		HIGHPASS_FILTER = new IconResource(R.drawable.highpass_filter_icon),
 		LOWPASS_FILTER = new IconResource(R.drawable.lowpass_filter_icon),
 		
+		ATTACK = new IconResource(R.drawable.attack_icon, R.drawable.attack_icon_selected, R.drawable.attack_icon_selected),
+		DECAY = new IconResource(R.drawable.decay_icon, R.drawable.decay_icon_selected, R.drawable.decay_icon_selected),
+		SUSTAIN = new IconResource(R.drawable.sustain_icon, R.drawable.sustain_icon_selected, R.drawable.sustain_icon_selected),
+		RELEASE = new IconResource(R.drawable.release_icon, R.drawable.release_icon_selected, R.drawable.release_icon_selected),
+		
 		BEAT_SYNC = new IconResource(R.drawable.clock, -1, R.drawable.note_icon),
 		LINK = new IconResource(R.drawable.link_broken, -1, R.drawable.link),
 		ON_OFF = new IconResource(R.drawable.off_icon, -1, R.drawable.on_icon),
@@ -16,7 +21,7 @@ public class IconResources {
 		RECORD = new IconResource(R.drawable.rec_off_icon, R.drawable.rec_icon_pressed, R.drawable.rec_on_icon_selected),
 		STOP = new IconResource(R.drawable.stop_icon, R.drawable.stop_icon_pressed),
 		
-		ADD = new IconResource(R.drawable.plus_outline, R.drawable.plus_outline),
+		ADD = new IconResource(R.drawable.plus_outline),
 		COPY = new IconResource(R.drawable.copy_icon, R.drawable.copy_icon_pressed, R.drawable.copy_icon_pressed, R.drawable.copy_icon_inactive),
 		DELETE_NOTE = new IconResource(R.drawable.delete_icon, R.drawable.delete_icon_pressed, -1, R.drawable.delete_icon_inactive),
 		DELETE_TRACK = new IconResource(R.drawable.delete_track_icon, R.drawable.delete_track_icon_selected),

@@ -2,13 +2,13 @@ package com.kh.beatbot.layout.page;
 
 import javax.microedition.khronos.opengles.GL11;
 
-import com.kh.beatbot.R;
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResource;
+import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
@@ -98,30 +98,30 @@ public class AdsrPage extends Page implements OnReleaseListener,
 	@Override
 	protected void loadIcons() {
 		for (int i = 0; i < adsrButtons.length; i++) {
-			adsrButtons[i].setBgIcon(new RoundedRectIcon(iconGroup,
-					Colors.instrumentBgColorSet,
-					Colors.instrumentStrokeColorSet));
+			adsrButtons[i]
+					.setBgIcon(new RoundedRectIcon(iconGroup,
+							Colors.instrumentBgColorSet,
+							Colors.buttonRowStrokeColorSet));
 			if (i < adsrButtons.length - 2) {
-				adsrButtons[i].setIcon(new Icon(new IconResource(
-						whichAdsrIcon(i))));
+				adsrButtons[i].setIcon(new Icon(whichAdsrIconResource(i)));
 			}
 		}
 		adsrButtons[ADSR.START_ID].setText("S");
 		adsrButtons[ADSR.PEAK_ID].setText("P");
 	}
 
-	private int whichAdsrIcon(int adsrParamId) {
+	private IconResource whichAdsrIconResource(int adsrParamId) {
 		switch (adsrParamId) {
 		case ADSR.ATTACK_ID:
-			return R.drawable.attack_icon;
+			return IconResources.ATTACK;
 		case ADSR.DECAY_ID:
-			return R.drawable.decay_icon;
+			return IconResources.DECAY;
 		case ADSR.SUSTAIN_ID:
-			return R.drawable.sustain_icon;
+			return IconResources.SUSTAIN;
 		case ADSR.RELEASE_ID:
-			return R.drawable.release_icon;
+			return IconResources.RELEASE;
 		default:
-			return -1;
+			return null;
 		}
 	}
 

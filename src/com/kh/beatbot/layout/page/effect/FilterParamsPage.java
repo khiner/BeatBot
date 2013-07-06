@@ -65,7 +65,7 @@ public class FilterParamsPage extends EffectParamsPage {
 		for (ToggleButton filterToggle : filterToggles) {
 			filterToggle.setBgIcon(new RoundedRectIcon(iconGroup,
 					Colors.instrumentBgColorSet,
-					Colors.instrumentStrokeColorSet));
+					Colors.buttonRowStrokeColorSet));
 		}
 		filterToggles[0].setIcon(new Icon(IconResources.LOWPASS_FILTER));
 		filterToggles[1].setIcon(new Icon(IconResources.BANDPASS_FILTER));

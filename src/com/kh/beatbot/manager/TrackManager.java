@@ -116,7 +116,7 @@ public class TrackManager {
 		button.setChecked(true);
 		for (Track track : tracks) {
 			TrackButtonRow buttonRow = track.getButtonRow();
-			if (!button.equals(buttonRow.instrumentButton)) {
+			if (!button.equals(buttonRow.soloButton)) {
 				buttonRow.soloButton.setChecked(false);
 			}
 		}
