@@ -14,27 +14,17 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 public class TrackManager {
 
 	public static final int MASTER_TRACK_ID = -1;
-	private static TrackManager singletonInstance = null;
-
+	
 	// effect settings are stored here instead of in the effect activities
 	// because the activities are destroyed after clicking 'back', and we
 	// need to persist state
 	private static List<Track> tracks = new ArrayList<Track>();
-
 	public static BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
-	
 	public static Track currTrack;
 	
-	public static TrackManager getInstance() {
-		if (singletonInstance == null) {
-			singletonInstance = new TrackManager();
-		}
-		return singletonInstance;
-	}
-
-	private TrackManager() {
+	public static void init() {
 		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
-			createTrack(Managers.directoryManager.getDrumInstrument(i), 0);
+			createTrack(DirectoryManager.getDrumInstrument(i), 0);
 		}
 	}
 

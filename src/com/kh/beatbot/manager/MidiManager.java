@@ -8,8 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 
 import com.kh.beatbot.GlobalVars;
@@ -24,13 +22,12 @@ import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
 
-public class MidiManager implements Parcelable {
-	private static MidiManager singletonInstance = null;
+public class MidiManager {
 
-	public static final int MIN_BPM = 45;
-	public static final int MAX_BPM = 300;
+	public static final int MIN_BPM = 45, MAX_BPM = 300,
 	// ticks per quarter note (I think)
-	public static final int RESOLUTION = MidiFile.DEFAULT_RESOLUTION;
+			RESOLUTION = MidiFile.DEFAULT_RESOLUTION;
+
 	public static final long TICKS_IN_ONE_MEASURE = RESOLUTION * 4;
 
 	private static TimeSignature ts = new TimeSignature();
@@ -38,14 +35,14 @@ public class MidiManager implements Parcelable {
 	private static MidiTrack tempoTrack = new MidiTrack();
 
 	// stack of MidiNote lists, for undo
-	private Stack<List<MidiNote>> undoStack = new Stack<List<MidiNote>>();
+	private static Stack<List<MidiNote>> undoStack = new Stack<List<MidiNote>>();
 
-	private List<MidiNote> copiedNotes = new ArrayList<MidiNote>();
-	private List<MidiNote> currState = new ArrayList<MidiNote>();
+	private static List<MidiNote> copiedNotes = new ArrayList<MidiNote>(),
+			currState = new ArrayList<MidiNote>();
 
 	public static long loopBeginTick, loopEndTick;
 
-	private MidiManager() {
+	public static void init() {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,
 				TimeSignature.DEFAULT_DIVISION);
 		setBPM(120);
@@ -53,22 +50,13 @@ public class MidiManager implements Parcelable {
 		tempoTrack.insertEvent(tempo);
 		setLoopBeginTick(0);
 		setLoopEndTick(RESOLUTION * 4);
-
-		// saveState();
 	}
 
-	public static MidiManager getInstance() {
-		if (singletonInstance == null) {
-			singletonInstance = new MidiManager();
-		}
-		return singletonInstance;
-	}
-
-	public float getBPM() {
+	public static float getBPM() {
 		return tempo.getBpm();
 	}
 
-	public int setBPM(float bpm) {
+	public static int setBPM(float bpm) {
 		bpm = bpm >= MIN_BPM ? (bpm <= MAX_BPM ? bpm : MAX_BPM) : MIN_BPM;
 		tempo.setBpm(bpm);
 		setNativeBPM(bpm);
@@ -77,7 +65,7 @@ public class MidiManager implements Parcelable {
 		return (int) bpm;
 	}
 
-	public List<MidiNote> getMidiNotes() {
+	public static List<MidiNote> getMidiNotes() {
 		List<MidiNote> midiNotes = new ArrayList<MidiNote>();
 		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
 			Track track = TrackManager.getTrack(i);
@@ -88,7 +76,7 @@ public class MidiManager implements Parcelable {
 		return midiNotes;
 	}
 
-	public List<MidiNote> getSelectedNotes() {
+	public static List<MidiNote> getSelectedNotes() {
 		ArrayList<MidiNote> selectedNotes = new ArrayList<MidiNote>();
 		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
 			Track track = TrackManager.getTrack(i);
@@ -101,7 +89,7 @@ public class MidiManager implements Parcelable {
 		return selectedNotes;
 	}
 
-	public void deselectAllNotes() {
+	public static void deselectAllNotes() {
 		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
 			Track track = TrackManager.getTrack(i);
 			for (MidiNote midiNote : track.getMidiNotes()) {
@@ -111,7 +99,7 @@ public class MidiManager implements Parcelable {
 	}
 
 	// return true if any Midi note is selected
-	public boolean anyNoteSelected() {
+	public static boolean anyNoteSelected() {
 		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
 			Track track = TrackManager.getTrack(i);
 			for (MidiNote midiNote : track.getMidiNotes()) {
@@ -123,20 +111,20 @@ public class MidiManager implements Parcelable {
 		return false;
 	}
 
-	public void selectNote(MidiNote midiNote) {
+	public static void selectNote(MidiNote midiNote) {
 		midiNote.setSelected(true);
 
 		GlobalVars.mainPage.midiView.updateNoteFillColor(midiNote);
 		updateEditIcons();
 	}
 
-	public void deselectNote(MidiNote midiNote) {
+	public static void deselectNote(MidiNote midiNote) {
 		midiNote.setSelected(false);
 		GlobalVars.mainPage.midiView.updateNoteFillColor(midiNote);
 		updateEditIcons();
 	}
 
-	public void selectRegion(long leftTick, long rightTick, int topNote,
+	public static void selectRegion(long leftTick, long rightTick, int topNote,
 			int bottomNote) {
 		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
 			Track track = TrackManager.getTrack(i);
@@ -156,61 +144,60 @@ public class MidiManager implements Parcelable {
 		}
 	}
 
-	public void selectRow(int rowNum) {
+	public static void selectRow(int rowNum) {
 		deselectAllNotes();
-		for (MidiNote midiNote : TrackManager.getTrack(rowNum)
-				.getMidiNotes()) {
+		for (MidiNote midiNote : TrackManager.getTrack(rowNum).getMidiNotes()) {
 			selectNote(midiNote);
 		}
 	}
 
-	public MidiNote addNote(long onTick, long offTick, int note,
+	public static MidiNote addNote(long onTick, long offTick, int note,
 			float velocity, float pan, float pitch) {
 		NoteOn on = new NoteOn(onTick, 0, note, velocity, pan, pitch);
 		NoteOff off = new NoteOff(offTick, 0, note, velocity, pan, pitch);
 		return addNote(on, off);
 	}
 
-	private MidiNote addNote(NoteOn on, NoteOff off) {
+	private static MidiNote addNote(NoteOn on, NoteOff off) {
 		MidiNote midiNote = new MidiNote(on, off);
 		addNote(midiNote);
 		return midiNote;
 	}
 
-	private void addNote(MidiNote midiNote) {
+	private static void addNote(MidiNote midiNote) {
 		Track track = TrackManager.getTrack(midiNote.getNoteValue());
 		track.addNote(midiNote);
 		GlobalVars.mainPage.midiView.createNoteView(midiNote);
 	}
 
-	public void deleteNote(MidiNote midiNote) {
+	public static void deleteNote(MidiNote midiNote) {
 		midiNote.getRectangle().getGroup().remove(midiNote.getRectangle());
 		Track track = TrackManager.getTrack(midiNote.getNoteValue());
 		track.removeNote(midiNote);
 		updateEditIcons();
 	}
 
-	private void updateEditIcons() {
+	private static void updateEditIcons() {
 		boolean anyNoteSelected = anyNoteSelected();
 		GlobalVars.mainPage.controlButtonGroup
 				.setEditIconsEnabled(anyNoteSelected);
 	}
 
-	public void copy() {
+	public static void copy() {
 		if (!anyNoteSelected())
 			return;
 		copiedNotes = copyMidiList(getSelectedNotes());
 	}
 
-	public boolean isCopying() {
+	public static boolean isCopying() {
 		return !copiedNotes.isEmpty();
 	}
 
-	public void cancelCopy() {
+	public static void cancelCopy() {
 		copiedNotes.clear();
 	}
 
-	public void paste(long startTick) {
+	public static void paste(long startTick) {
 		GlobalVars.mainPage.controlButtonGroup.uncheckCopyButton();
 		if (copiedNotes.isEmpty())
 			return;
@@ -230,7 +217,7 @@ public class MidiManager implements Parcelable {
 		copiedNotes.clear();
 	}
 
-	public void deleteSelectedNotes() {
+	public static void deleteSelectedNotes() {
 		if (anyNoteSelected())
 			saveState();
 		for (MidiNote selected : getSelectedNotes()) {
@@ -238,7 +225,7 @@ public class MidiManager implements Parcelable {
 		}
 	}
 
-	public void clearNotes() {
+	public static void clearNotes() {
 		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
 			Track track = TrackManager.getTrack(i);
 			while (!track.getMidiNotes().isEmpty()) {
@@ -248,7 +235,7 @@ public class MidiManager implements Parcelable {
 		}
 	}
 
-	public boolean setNoteValue(MidiNote midiNote, int newNote) {
+	public static boolean setNoteValue(MidiNote midiNote, int newNote) {
 		int oldNote = midiNote.getNoteValue();
 		if (oldNote == newNote)
 			return false;
@@ -260,8 +247,8 @@ public class MidiManager implements Parcelable {
 		return true;
 	}
 
-	public boolean setNoteTicks(MidiNote midiNote, long onTick, long offTick,
-			boolean snapToGrid, boolean maintainNoteLength) {
+	public static boolean setNoteTicks(MidiNote midiNote, long onTick,
+			long offTick, boolean snapToGrid, boolean maintainNoteLength) {
 		if (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)
 			return false;
 		if (offTick <= onTick)
@@ -279,19 +266,19 @@ public class MidiManager implements Parcelable {
 		return track.setNoteTicks(midiNote, onTick, offTick);
 	}
 
-	public Tempo getTempo() {
+	public static Tempo getTempo() {
 		return tempo;
 	}
 
-	public long getTicksPerBeat(float beatDivision) {
+	public static long getTicksPerBeat(float beatDivision) {
 		return (long) (RESOLUTION / beatDivision);
 	}
 
-	public long millisToTick(long millis) {
+	public static long millisToTick(long millis) {
 		return (long) ((RESOLUTION * 1000f / tempo.getMpqn()) * millis);
 	}
 
-	public long getLeftMostTick(List<MidiNote> notes) {
+	public static long getLeftMostTick(List<MidiNote> notes) {
 		long leftMostTick = Long.MAX_VALUE;
 		for (MidiNote midiNote : notes) {
 			if (midiNote.getOnTick() < leftMostTick)
@@ -300,7 +287,7 @@ public class MidiManager implements Parcelable {
 		return leftMostTick;
 	}
 
-	public long getRightMostTick(List<MidiNote> notes) {
+	public static long getRightMostTick(List<MidiNote> notes) {
 		long rightMostTick = Long.MIN_VALUE;
 		for (MidiNote midiNote : notes) {
 			if (midiNote.getOffTick() > rightMostTick)
@@ -309,11 +296,11 @@ public class MidiManager implements Parcelable {
 		return rightMostTick;
 	}
 
-	public long getLeftMostSelectedTick() {
+	public static long getLeftMostSelectedTick() {
 		return getLeftMostTick(getSelectedNotes());
 	}
 
-	public long getRightMostSelectedTick() {
+	public static long getRightMostSelectedTick() {
 		return getRightMostTick(getSelectedNotes());
 	}
 
@@ -321,20 +308,20 @@ public class MidiManager implements Parcelable {
 	 * Translate the provided midi note to its on-tick's nearest major tick
 	 * given the provided beat division
 	 */
-	public void quantize(MidiNote midiNote, float beatDivision) {
+	public static void quantize(MidiNote midiNote, float beatDivision) {
 		long diff = (long) TickWindowHelper.getMajorTickNearestTo(midiNote
 				.getOnTick()) - midiNote.getOnTick();
 		setNoteTicks(midiNote, midiNote.getOnTick() + diff,
 				midiNote.getOffTick() + diff, false, true);
 	}
 
-	public void saveNoteTicks() {
+	public static void saveNoteTicks() {
 		for (MidiNote note : getMidiNotes()) {
 			note.saveTicks();
 		}
 	}
 
-	public void handleMidiCollisions() {
+	public static void handleMidiCollisions() {
 		for (int trackNum = 0; trackNum < TrackManager.getNumTracks(); trackNum++) {
 			TrackManager.getTrack(trackNum).handleNoteCollisions();
 		}
@@ -342,7 +329,7 @@ public class MidiManager implements Parcelable {
 
 	// called after release of touch event - this
 	// finalizes the note on/off ticks of all notes
-	public void finalizeNoteTicks() {
+	public static void finalizeNoteTicks() {
 		for (MidiNote midiNote : getMidiNotes()) {
 			if (midiNote.getOnTick() > TickWindowHelper.MAX_TICKS) {
 				Log.e("MidiManager", "Deleting note in finalize!");
@@ -357,13 +344,13 @@ public class MidiManager implements Parcelable {
 	 * Translate all midi notes to their on-ticks' nearest major ticks given the
 	 * provided beat division
 	 */
-	public void quantize(float beatDivision) {
+	public static void quantize(float beatDivision) {
 		for (MidiNote midiNote : getMidiNotes()) {
 			quantize(midiNote, beatDivision);
 		}
 	}
 
-	public void saveState() {
+	public static void saveState() {
 		undoStack.push(currState);
 		currState = copyMidiList(getMidiNotes());
 		// enforce max undo stack size
@@ -371,7 +358,7 @@ public class MidiManager implements Parcelable {
 			undoStack.remove(0);
 	}
 
-	public void undo() {
+	public static void undo() {
 		if (undoStack.isEmpty())
 			return;
 		List<MidiNote> lastState = undoStack.pop();
@@ -382,7 +369,7 @@ public class MidiManager implements Parcelable {
 		currState = copyMidiList(getMidiNotes());
 	}
 
-	private List<MidiNote> copyMidiList(List<MidiNote> midiList) {
+	private static List<MidiNote> copyMidiList(List<MidiNote> midiList) {
 		List<MidiNote> copy = new ArrayList<MidiNote>();
 		for (int i = 0; i < midiList.size(); i++) {
 			// avoid concurrent modification exception
@@ -394,7 +381,7 @@ public class MidiManager implements Parcelable {
 		return copy;
 	}
 
-	public void writeToFile(File outFile) {
+	public static void writeToFile(File outFile) {
 		// 3. Create a MidiFile with the tracks we created
 		ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
 		midiTracks.add(tempoTrack);
@@ -416,7 +403,7 @@ public class MidiManager implements Parcelable {
 		}
 	}
 
-	public void importFromFile(FileInputStream in) {
+	public static void importFromFile(FileInputStream in) {
 		try {
 			MidiFile midiFile = new MidiFile(in);
 			ArrayList<MidiTrack> midiTracks = midiFile.getTracks();
@@ -453,101 +440,48 @@ public class MidiManager implements Parcelable {
 		}
 	}
 
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel out, int flags) {
-		out.writeIntArray(new int[] { 4, 4, TimeSignature.DEFAULT_METER,
-				TimeSignature.DEFAULT_DIVISION });
-		out.writeFloat(tempo.getBpm());
-		out.writeLong(Tempo.DEFAULT_MPQN / RESOLUTION);
-
-		List<MidiNote> midiNotes = getMidiNotes();
-		// on-tick, off-tick, note, and velocity for each midiNote
-		float[] noteInfo = new float[midiNotes.size() * 6];
-		for (int i = 0; i < midiNotes.size(); i++) {
-			noteInfo[i * 6] = midiNotes.get(i).getOnTick();
-			noteInfo[i * 6 + 1] = midiNotes.get(i).getOffTick();
-			noteInfo[i * 6 + 2] = midiNotes.get(i).getNoteValue();
-			noteInfo[i * 6 + 3] = midiNotes.get(i).getVelocity();
-			noteInfo[i * 6 + 4] = midiNotes.get(i).getPan();
-			noteInfo[i * 6 + 5] = midiNotes.get(i).getPitch();
-		}
-		out.writeInt(noteInfo.length);
-		out.writeFloatArray(noteInfo);
-		out.writeLong(getCurrTick());
-		out.writeLong(getLoopBeginTick());
-		out.writeLong(getLoopEndTick());
-	}
-
-	private MidiManager(Parcel in) {
-		int[] timeSigInfo = new int[4];
-		in.readIntArray(timeSigInfo);
-		ts.setTimeSignature(timeSigInfo[0], timeSigInfo[1], timeSigInfo[2],
-				timeSigInfo[3]);
-		setBPM(in.readInt());
-		tempoTrack.insertEvent(ts);
-		tempoTrack.insertEvent(tempo);
-		setNativeMSPT(in.readLong());
-		float[] noteInfo = new float[in.readInt()];
-		in.readFloatArray(noteInfo);
-		for (int i = 0; i < noteInfo.length; i += 4) {
-			addNote((long) noteInfo[i], (long) noteInfo[i + 1],
-					(int) noteInfo[i + 2], noteInfo[i + 3], noteInfo[i + 4],
-					noteInfo[i + 5]);
-		}
-		setCurrTick(in.readLong());
-		setLoopBeginTick(in.readLong());
-		setLoopEndTick(in.readLong());
-	}
-
-	public void setLoopBeginTick(long loopBeginTick) {
+	public static void setLoopBeginTick(long loopBeginTick) {
 		if (loopBeginTick >= loopEndTick)
 			return;
 		MidiManager.loopBeginTick = loopBeginTick;
 		setLoopBeginTickNative(loopBeginTick);
 	}
 
-	public void setLoopEndTick(long loopEndTick) {
+	public static void setLoopEndTick(long loopEndTick) {
 		if (loopEndTick <= loopBeginTick)
 			return;
 		MidiManager.loopEndTick = loopEndTick;
 		setLoopEndTickNative(loopEndTick);
 	}
 
-	public void setLoopTicks(long loopBeginTick, long loopEndTick) {
+	public static void setLoopTicks(long loopBeginTick, long loopEndTick) {
 		MidiManager.loopBeginTick = loopBeginTick;
 		MidiManager.loopEndTick = loopEndTick;
 		setLoopTicksNative(loopBeginTick, loopEndTick);
 	}
 
-	public long getLoopBeginTick() {
+	public static long getLoopBeginTick() {
 		return loopBeginTick;
 	}
 
-	public long getLoopEndTick() {
+	public static long getLoopEndTick() {
 		return loopEndTick;
 	}
 
-	public native void isTrackPlaying(int trackNum);
+	public static native void isTrackPlaying(int trackNum);
 
-	public native void setNativeMSPT(long MSPT);
+	public static native void setNativeMSPT(long MSPT);
 
-	public native void setNativeBPM(float BPM);
+	public static native void setNativeBPM(float BPM);
 
-	public native void reset();
+	public static native void setCurrTick(long currTick);
 
-	public native void setCurrTick(long currTick);
+	public static native long getCurrTick();
 
-	public native long getCurrTick();
+	public static native void setLoopBeginTickNative(long loopBeginTick);
 
-	public native void setLoopBeginTickNative(long loopBeginTick);
+	public static native void setLoopEndTickNative(long loopEndTick);
 
-	public native void setLoopEndTickNative(long loopEndTick);
-
-	public native void setLoopTicksNative(long loopBeginTick, long loopEndTick);
-
+	public static native void setLoopTicksNative(long loopBeginTick,
+			long loopEndTick);
 }

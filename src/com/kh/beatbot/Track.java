@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.kh.beatbot.effect.ADSR;
-import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.Icon;
@@ -16,7 +15,7 @@ public class Track extends BaseTrack {
 
 	private Instrument instrument;
 	private TrackButtonRow buttonRow;
-	
+
 	private boolean adsrEnabled = false, reverse = false;
 	private List<MidiNote> notes = new ArrayList<MidiNote>();
 	private List<SampleFile> sampleFiles = new ArrayList<SampleFile>();
@@ -37,23 +36,23 @@ public class Track extends BaseTrack {
 			note.setNote(id);
 		}
 	}
-	
+
 	public void select() {
 		buttonRow.instrumentButton.trigger(false);
 	}
-	
+
 	public TrackButtonRow getButtonRow() {
 		return buttonRow;
 	}
-	
+
 	public Icon getIcon() {
 		return buttonRow.instrumentButton.getIcon();
 	}
-	
+
 	public void updateIcon() {
 		buttonRow.updateInstrumentIcon();
 	}
-	
+
 	public void removeNote(MidiNote note) {
 		notes.remove(note);
 		notifyNoteRemoved(id, note.getOnTick(), note.getOffTick());
@@ -121,7 +120,7 @@ public class Track extends BaseTrack {
 
 	public void updateNextNote() {
 		Collections.sort(notes);
-		long currTick = Managers.midiManager.getCurrTick();
+		long currTick = MidiManager.getCurrTick();
 		MidiNote nextNote = getNextMidiNote(currTick);
 		setNextNote(id, nextNote);
 	}

@@ -4,8 +4,9 @@ import android.widget.Toast;
 
 import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
+import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.view.TouchableView;
@@ -41,21 +42,16 @@ public class ControlButtonGroup extends TouchableView {
 			@Override
 			public void onRelease(Button button) {
 				((ToggleButton) button).setChecked(true);
-				if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
-					Managers.playbackManager.reset();
-					Managers.midiManager.reset();
-				} else if (Managers.playbackManager.getState() == PlaybackManager.State.STOPPED) {
-					Managers.playbackManager.play();
-				}
+				PlaybackManager.play();
 			}
 		});
 
 		recordButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				if (Managers.recordManager.isRecording()) {
+				if (RecordManager.isRecording()) {
 					// Managers.recordManager.stopListening();
-					String fileName = Managers.recordManager.stopRecording();
+					String fileName = RecordManager.stopRecording();
 
 					Toast.makeText(
 							GlobalVars.mainActivity.getApplicationContext(),
@@ -64,8 +60,8 @@ public class ControlButtonGroup extends TouchableView {
 				} else {
 					GlobalVars.mainPage.midiView.reset();
 					playButton.setChecked(true);
-					Managers.recordManager.startRecording();
-					if (Managers.playbackManager.getState() != PlaybackManager.State.PLAYING)
+					RecordManager.startRecording();
+					if (PlaybackManager.getState() != PlaybackManager.State.PLAYING)
 						playButton.getOnReleaseListener().onRelease(playButton);
 				}
 			}
@@ -75,14 +71,13 @@ public class ControlButtonGroup extends TouchableView {
 			@Override
 			public void onRelease(Button button) {
 				playButton.setChecked(false);
-				if (Managers.recordManager.isRecording()) {
+				if (RecordManager.isRecording()) {
 					recordButton.trigger(false);
 					playButton.setChecked(false);
 				}
-				if (Managers.playbackManager.getState() == PlaybackManager.State.PLAYING) {
+				if (PlaybackManager.getState() == PlaybackManager.State.PLAYING) {
 					playButton.setChecked(false);
-					Managers.playbackManager.stop();
-					Managers.midiManager.reset();
+					PlaybackManager.stop();
 				}
 			}
 		});
@@ -90,7 +85,7 @@ public class ControlButtonGroup extends TouchableView {
 		undoButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				Managers.midiManager.undo();
+				MidiManager.undo();
 			}
 		});
 
@@ -99,10 +94,10 @@ public class ControlButtonGroup extends TouchableView {
 			public void onRelease(Button button) {
 				String msg = null;
 				if (((ToggleButton) button).isChecked()) {
-					Managers.midiManager.copy();
+					MidiManager.copy();
 					msg = "Tap To Paste";
 				} else {
-					Managers.midiManager.cancelCopy();
+					MidiManager.cancelCopy();
 					msg = "Copy Cancelled";
 				}
 				Toast.makeText(GlobalVars.mainActivity.getApplicationContext(),
@@ -113,7 +108,7 @@ public class ControlButtonGroup extends TouchableView {
 		deleteButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				Managers.midiManager.deleteSelectedNotes();
+				MidiManager.deleteSelectedNotes();
 			}
 		});
 

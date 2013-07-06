@@ -1,6 +1,6 @@
 package com.kh.beatbot.effect;
 
-import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.MidiManager;
 
 public class Param {
 	private ParamData paramData;
@@ -46,7 +46,7 @@ public class Param {
 	private float quantizeToBeat(float level) {
 		topBeatNum = getTopBeatNum((int) Math.ceil(level * 14));
 		bottomBeatNum = getBottomBeatNum((int) Math.ceil(level * 14));
-		float quantized = (60f / (Managers.midiManager.getBPM()) * ((float) topBeatNum / (float) bottomBeatNum));
+		float quantized = (60f / (MidiManager.getBPM()) * ((float) topBeatNum / (float) bottomBeatNum));
 		if (paramData.hz)
 			quantized = 1 / quantized;
 		return quantized;

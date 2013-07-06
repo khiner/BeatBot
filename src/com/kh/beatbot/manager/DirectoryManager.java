@@ -20,7 +20,7 @@ import com.kh.beatbot.ui.IconResources;
 
 public class DirectoryManager {
 
-	private class SampleListOnClickAndShowListener implements
+	private static class SampleListOnClickAndShowListener implements
 			DialogInterface.OnClickListener, OnShowListener {
 		@Override
 		public void onClick(DialogInterface dialog, int item) {
@@ -132,7 +132,7 @@ public class DirectoryManager {
 		}
 	}
 
-	public void loadIcons() {
+	public static void loadIcons() {
 		getDrumInstrument(0).setIconResource(IconResources.KICK);
 		getDrumInstrument(1).setIconResource(IconResources.SNARE);
 		getDrumInstrument(2).setIconResource(IconResources.HH_CLOSED);
@@ -148,27 +148,19 @@ public class DirectoryManager {
 			"hh_open", "rim" };
 
 	public static String appDirectoryPath;
-	
-	private static DirectoryManager singletonInstance = null;
 
-	private SampleListOnClickAndShowListener sampleListOnClickAndShowListener = new SampleListOnClickAndShowListener();
-	private AlertDialog.Builder instrumentSelectAlertBuilder;
-	private AlertDialog instrumentSelectAlert = null;
-	private ListAdapter instrumentSelectAdapter = null;
+	private static SampleListOnClickAndShowListener sampleListOnClickAndShowListener = new SampleListOnClickAndShowListener();
+	private static AlertDialog.Builder instrumentSelectAlertBuilder;
+	private static AlertDialog instrumentSelectAlert = null;
+	private static ListAdapter instrumentSelectAdapter = null;
 
-	private Directory audioDirectory, recordDirectory, beatRecordDirectory,
-			sampleRecordDirectory, drumsDirectory, currDirectory = null;
+	private static Directory audioDirectory, recordDirectory,
+			beatRecordDirectory, sampleRecordDirectory, drumsDirectory,
+			currDirectory = null;
 
-	private boolean addingTrack = false;
+	private static boolean addingTrack = false;
 
-	public static DirectoryManager getInstance() {
-		if (singletonInstance == null) {
-			singletonInstance = new DirectoryManager();
-		}
-		return singletonInstance;
-	}
-
-	private DirectoryManager() {
+	public static void init() {
 		initDataDir();
 		audioDirectory = new Directory(null, "audio", null);
 		drumsDirectory = new Directory(audioDirectory, "drums", null);
@@ -184,7 +176,7 @@ public class DirectoryManager {
 				GlobalVars.mainActivity);
 	}
 
-	public void updateInstrumentSelectAlert(Directory newDirectory) {
+	public static void updateInstrumentSelectAlert(Directory newDirectory) {
 		updateInstrumentSelectAdapter(newDirectory);
 		updateInstrumentSelectTitleBar();
 		instrumentSelectAlertBuilder.setAdapter(instrumentSelectAdapter,
@@ -194,44 +186,44 @@ public class DirectoryManager {
 				.setOnShowListener(sampleListOnClickAndShowListener);
 	}
 
-	public void showAddTrackAlert() {
+	public static void showAddTrackAlert() {
 		addingTrack = true;
 		show(audioDirectory);
 	}
 
-	public void showInstrumentSelectAlert() {
+	public static void showInstrumentSelectAlert() {
 		addingTrack = false;
 		show(audioDirectory);
 	}
 
-	public void showSampleSelectAlert() {
+	public static void showSampleSelectAlert() {
 		addingTrack = false;
 		show(TrackManager.currTrack.getInstrument());
 	}
 
-	public Instrument getDrumInstrument(int drumNum) {
+	public static Instrument getDrumInstrument(int drumNum) {
 		return (Instrument) drumsDirectory.getChild(drumNum);
 	}
 
-	public String getAudioPath() {
+	public static String getAudioPath() {
 		return audioDirectory.getPath();
 	}
 
-	public String getBeatRecordPath() {
+	public static String getBeatRecordPath() {
 		return beatRecordDirectory.getPath();
 	}
 
-	public void clearTempFiles() {
+	public static void clearTempFiles() {
 		audioDirectory.clearTempFiles();
 	}
 
-	private void show(Directory directory) {
+	private static void show(Directory directory) {
 		currDirectory = directory;
 		updateInstrumentSelectAlert(currDirectory);
 		instrumentSelectAlert.show();
 	}
 
-	private void initDataDir() {
+	private static void initDataDir() {
 		if (Environment.getExternalStorageState().equals(
 				Environment.MEDIA_MOUNTED)) {
 			// we can read and write to external storage
@@ -245,7 +237,7 @@ public class DirectoryManager {
 		}
 	}
 
-	private String[] formatNames(String[] names) {
+	private static String[] formatNames(String[] names) {
 		String[] formattedNames = new String[names.length];
 		for (int i = 0; i < names.length; i++) {
 			formattedNames[i] = names[i].replace(".wav", "");
@@ -253,7 +245,7 @@ public class DirectoryManager {
 		return formattedNames;
 	}
 
-	private void updateInstrumentSelectTitleBar() {
+	private static void updateInstrumentSelectTitleBar() {
 		if (currDirectory.getListTitleResource() != -1) {
 			instrumentSelectAlertBuilder.setIcon(
 					currDirectory.getListTitleResource()).setTitle(
@@ -264,7 +256,7 @@ public class DirectoryManager {
 		}
 	}
 
-	private void updateInstrumentSelectAdapter(final Directory directory) {
+	private static void updateInstrumentSelectAdapter(final Directory directory) {
 		String[] list = formatNames(directory.getChildNames());
 		instrumentSelectAdapter = new ArrayAdapter<String>(
 				GlobalVars.mainActivity, android.R.layout.select_dialog_item,

@@ -4,7 +4,7 @@ import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
@@ -91,7 +91,7 @@ public class SampleEditPage extends Page {
 		browseButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				Managers.directoryManager.showInstrumentSelectAlert();
+				DirectoryManager.showInstrumentSelectAlert();
 			}
 		});
 		editButton.setOnReleaseListener(new OnReleaseListener() {

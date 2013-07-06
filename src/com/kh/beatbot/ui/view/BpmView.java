@@ -4,7 +4,6 @@ import java.nio.FloatBuffer;
 
 import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.activity.BeatBotActivity;
-import com.kh.beatbot.manager.Managers;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Colors;
 
@@ -21,7 +20,7 @@ public class BpmView extends ClickableView {
 	private long lastTapTime = 0;
 	
 	public void setBPM(float bpm) {
-		setText(String.valueOf((int) Managers.midiManager.setBPM(bpm)));
+		setText(String.valueOf((int) MidiManager.setBPM(bpm)));
 	}
 	
 	@Override
@@ -63,9 +62,9 @@ public class BpmView extends ClickableView {
 		lastFrameY = y;
 		if (Math.abs(currYDragTotal) > INC_BPM_THRESH) {
 			if (currYDragTotal <= 0) {
-				setBPM(Managers.midiManager.getBPM() - 1);
+				setBPM(MidiManager.getBPM() - 1);
 			} else {
-				setBPM(Managers.midiManager.getBPM() + 1);
+				setBPM(MidiManager.getBPM() + 1);
 			}
 			currYDragTotal %= INC_BPM_THRESH;
 		}

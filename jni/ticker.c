@@ -62,7 +62,4 @@ void Java_com_kh_beatbot_manager_MidiManager_setLoopTicksNative(JNIEnv *env,
 	}
 }
 
-void Java_com_kh_beatbot_manager_MidiManager_reset(JNIEnv *env, jclass clazz) {
-	currSample = tickToSample(loopBeginTick);
-}
 

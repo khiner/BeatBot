@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.GlobalVars.LevelType;
-import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Colors;
@@ -164,7 +164,7 @@ public class LevelsView extends TouchableView {
 				// If we are multi-selecting, add it to the selected list
 				if (!midiNote.isSelected()) {
 					if (touchedLevels.isEmpty()) {
-						Managers.midiManager.deselectAllNotes();
+						MidiManager.deselectAllNotes();
 					}
 					midiNote.setSelected(true);
 				}
@@ -174,7 +174,7 @@ public class LevelsView extends TouchableView {
 			}
 		}
 		if (touchedLevels.isEmpty()) {
-			Managers.midiManager.deselectAllNotes();
+			MidiManager.deselectAllNotes();
 		}
 		return false;
 	}
@@ -185,7 +185,7 @@ public class LevelsView extends TouchableView {
 		float rightTick = Math.max(tick, selectRegionStartTick);
 		float topY = Math.min(y, selectRegionStartY);
 		float bottomY = Math.max(y, selectRegionStartY);
-		Managers.midiManager.deselectAllNotes();
+		MidiManager.deselectAllNotes();
 		for (MidiNote selectedNote : TrackManager.currTrack.getMidiNotes()) {
 			float levelY = levelToY(selectedNote.getLevel(currLevelType));
 			if (leftTick < selectedNote.getOnTick()
@@ -229,14 +229,14 @@ public class LevelsView extends TouchableView {
 	private void updateLevelOffsets() {
 		levelOffsets.clear();
 		updateDragLine();
-		for (MidiNote selectedNote : Managers.midiManager.getSelectedNotes()) {
+		for (MidiNote selectedNote : MidiManager.getSelectedNotes()) {
 			levelOffsets.put(selectedNote, selectedNote.getLevel(currLevelType)
 					- DragLine.getLevel(selectedNote.getOnTick()));
 		}
 	}
 
 	private void setLevelsToDragLine() {
-		for (MidiNote selectedNote : Managers.midiManager.getSelectedNotes()) {
+		for (MidiNote selectedNote : MidiManager.getSelectedNotes()) {
 			if (levelOffsets.get(selectedNote) != null) {
 				selectedNote.setLevel(currLevelType,
 						DragLine.getLevel(selectedNote.getOnTick())

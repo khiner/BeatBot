@@ -15,8 +15,12 @@ import com.kh.beatbot.ui.view.control.ControlViewBase;
 import com.kh.beatbot.ui.view.control.ThresholdBarView;
 
 public class RecordManager implements Level1dListener {
-	public static final long RECORD_LATENCY_TICKS = Managers.midiManager
-			.millisToTick(250);
+
+	public static enum State {
+		LISTENING, RECORDING, INITIALIZING
+	};
+
+	public static final long RECORD_LATENCY_TICKS = MidiManager.millisToTick(250);
 	private static final int RECORDER_BPP = 16;
 	private static final int RECORDER_SAMPLERATE = 44100;
 	private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
@@ -26,51 +30,38 @@ public class RecordManager implements Level1dListener {
 			* CHANNELS / 8;
 	private static final long LONG_SAMPLE_RATE = RECORDER_SAMPLERATE;
 
-	private String currRecordFileName = null;
+	private static String currRecordFileName = null;
 
-	private String bbRecordDirectory = null;
+	private static String bbRecordDirectory = DirectoryManager
+			.getBeatRecordPath();
 
-	private static RecordManager singletonInstance = null;
+	private static ThresholdBarView thresholdBar;
 
-	private ThresholdBarView thresholdBar;
+	private static int bufferSize = AudioRecord.getMinBufferSize(
+			RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 
-	private AudioRecord recorder = null;
-	private int bufferSize = 0;
+	private static AudioRecord recorder = new AudioRecord(
+			MediaRecorder.AudioSource.MIC, RECORDER_SAMPLERATE,
+			RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, bufferSize);
+
 	// queue of paths to raw audio data to process
 	// private static Queue<Long> recordTickQueue = new LinkedList<Long>();
-	private Thread recordingThread = null;
-	private State state;
-	private FileOutputStream os = null;
+	private static Thread recordingThread = null;
+	private static State state = State.INITIALIZING;
+	private static FileOutputStream os = null;
 
-	private short currAmp = 0;
-	private short currThreshold;
-	private int currSampleNum = 0;
-	static final Pattern lastIntPattern = Pattern.compile("[^0-9]+([0-9]+)$");
+	private static short currAmp = 0;
+	private static short currThreshold;
+	private static int currSampleNum = 0;
 
-	public static enum State {
-		LISTENING, RECORDING, INITIALIZING
-	};
+	private static final Pattern lastIntPattern = Pattern
+			.compile("[^0-9]+([0-9]+)$");
 
-	public static RecordManager getInstance() {
-		if (singletonInstance == null) {
-			singletonInstance = new RecordManager();
-		}
-		return singletonInstance;
-	}
-
-	private RecordManager() {
-		bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
-				RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
-		initRecorder();
-		bbRecordDirectory = Managers.directoryManager.getBeatRecordPath();
-		state = State.INITIALIZING;
-	}
-
-	public boolean isRecording() {
+	public static boolean isRecording() {
 		return state == State.RECORDING;
 	}
 
-	public void startRecording() {
+	public static void startRecording() {
 		updateFileNames();
 		try {
 			FileOutputStream out = writeWaveFileHeader(currRecordFileName, 0, 0);
@@ -82,21 +73,16 @@ public class RecordManager implements Level1dListener {
 		state = State.RECORDING;
 	}
 
-	public String stopRecording() {
+	public static String stopRecording() {
 		stopRecordingNative();
 		insertLengthDataIntoWavFile(currRecordFileName);
 		state = State.INITIALIZING;
 		return currRecordFileName;
 	}
 
-	private void initRecorder() {
-		recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-				RECORDER_SAMPLERATE, RECORDER_CHANNELS,
-				RECORDER_AUDIO_ENCODING, bufferSize);
-	}
-
-	private void updateFileNames() {
-		currRecordFileName = bbRecordDirectory + "R" + (currSampleNum++) + ".wav";
+	private static void updateFileNames() {
+		currRecordFileName = bbRecordDirectory + "R" + (currSampleNum++)
+				+ ".wav";
 	}
 
 	private static FileOutputStream writeWaveFileHeader(String fileName,
@@ -202,7 +188,7 @@ public class RecordManager implements Level1dListener {
 		currThreshold = dbToShort((level - 1.001f) * 60);
 	}
 
-	public native void startRecordingNative(String recordFileName);
+	public static native void startRecordingNative(String recordFileName);
 
-	public native void stopRecordingNative();
+	public static native void stopRecordingNative();
 }

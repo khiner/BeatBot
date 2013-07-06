@@ -1,6 +1,6 @@
 package com.kh.beatbot.ui.view.page;
 
-import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.view.BpmView;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -15,7 +15,7 @@ public class MasterPage extends LevelsFXPage {
 	
 	@Override
 	public void init() {
-		setBPM(Managers.midiManager.getBPM());
+		setBPM(MidiManager.getBPM());
 		update();
 	}
 

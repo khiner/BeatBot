@@ -3,7 +3,7 @@ package com.kh.beatbot.ui.view.group;
 import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResource;
@@ -95,7 +95,7 @@ public class PageSelectGroup extends TouchableView {
 		addTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				Managers.directoryManager.showAddTrackAlert();
+				DirectoryManager.showAddTrackAlert();
 			}
 		});
 

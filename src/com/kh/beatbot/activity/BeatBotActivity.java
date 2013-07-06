@@ -26,7 +26,7 @@ import com.kh.beatbot.GlobalVars;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.manager.DirectoryManager;
-import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
@@ -40,16 +40,15 @@ public class BeatBotActivity extends Activity {
 
 	public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1,
 			SAMPLE_NAME_EDIT_DIALOG_ID = 2;
-	
+
 	private static final int MAIN_PAGE_NUM = 0, EFFECT_PAGE_NUM = 1;
-	
-	private static AssetManager assetManager;
+
 	private static byte[] buffer = new byte[1024];
-	
+
+	private static AssetManager assetManager;
 	private static GLSurfaceViewGroup mainSurface;
 	private static ViewPager activityPager;
-	
-	private EditText bpmInput, sampleNameInput;
+	private static EditText bpmInput, sampleNameInput;
 
 	private static void copyFile(InputStream in, OutputStream out)
 			throws IOException {
@@ -79,7 +78,7 @@ public class BeatBotActivity extends Activity {
 
 		try {
 			String assetPath = newDirectoryPath.replace(
-					Managers.directoryManager.getAudioPath(), "");
+					DirectoryManager.getAudioPath(), "");
 			assetPath = assetPath.substring(0, assetPath.length() - 1);
 			for (String filePath : assetManager.list(assetPath)) {
 				// copy audio file exactly from assets to sdcard
@@ -96,8 +95,7 @@ public class BeatBotActivity extends Activity {
 	private void copyAllSamplesToStorage() {
 		assetManager = getAssets();
 		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
-			String drumPath = Managers.directoryManager.getDrumInstrument(i)
-					.getPath();
+			String drumPath = DirectoryManager.getDrumInstrument(i).getPath();
 			// the sample folder for this sample type does not yet exist.
 			// create it and write all assets of this type to the folder
 			copyFromAssetsToExternal(drumPath);
@@ -122,7 +120,8 @@ public class BeatBotActivity extends Activity {
 		layout.addView(mainSurface);
 		setContentView(layout, lp);
 
-		Managers.initDirectoryManager();
+		DirectoryManager.init();
+
 		copyAllSamplesToStorage();
 		if (savedInstanceState == null) {
 			initNativeAudio();
@@ -139,7 +138,8 @@ public class BeatBotActivity extends Activity {
 
 		mainSurface.setBBRenderer(activityPager);
 
-		Managers.init(savedInstanceState);
+		TrackManager.init();
+		MidiManager.init();
 	}
 
 	@Override
@@ -151,7 +151,7 @@ public class BeatBotActivity extends Activity {
 				// android.os.Process.killProcess(android.os.Process.myPid());
 			}
 		} finally {
-			Managers.directoryManager.clearTempFiles();
+			DirectoryManager.clearTempFiles();
 		}
 	}
 
@@ -180,17 +180,15 @@ public class BeatBotActivity extends Activity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putParcelable("midiManager", Managers.midiManager);
-		outState.putBoolean(
-				"playing",
-				Managers.playbackManager.getState() == PlaybackManager.State.PLAYING);
+		outState.putBoolean("playing",
+				PlaybackManager.getState() == PlaybackManager.State.PLAYING);
 	}
 
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog) {
 		switch (id) {
 		case BPM_DIALOG_ID:
-			bpmInput.setText(String.valueOf((int) Managers.midiManager.getBPM()));
+			bpmInput.setText(String.valueOf((int) MidiManager.getBPM()));
 			break;
 		case SAMPLE_NAME_EDIT_DIALOG_ID:
 			sampleNameInput.setText(TrackManager.currTrack.getCurrSampleName());
@@ -278,8 +276,7 @@ public class BeatBotActivity extends Activity {
 									try {
 										finish();
 									} catch (Exception e) {
-										Managers.directoryManager
-												.clearTempFiles();
+										DirectoryManager.clearTempFiles();
 									}
 								}
 							}).setNegativeButton("No", null);
@@ -308,18 +305,18 @@ public class BeatBotActivity extends Activity {
 			}
 			return true;
 		case R.id.quantize_current:
-			Managers.midiManager.quantize(GlobalVars.currBeatDivision);
+			MidiManager.quantize(GlobalVars.currBeatDivision);
 			return true;
 		case R.id.quantize_quarter:
-			Managers.midiManager.quantize(1);
+			MidiManager.quantize(1);
 		case R.id.quantize_eighth:
-			Managers.midiManager.quantize(2);
+			MidiManager.quantize(2);
 			return true;
 		case R.id.quantize_sixteenth:
-			Managers.midiManager.quantize(4);
+			MidiManager.quantize(4);
 			return true;
 		case R.id.quantize_thirty_second:
-			Managers.midiManager.quantize(8);
+			MidiManager.quantize(8);
 			return true;
 		case R.id.save_wav:
 			return true;
@@ -353,7 +350,9 @@ public class BeatBotActivity extends Activity {
 	}
 
 	public static native boolean createAudioPlayer();
+
 	public static native void createEngine();
+
 	public static native void nativeShutdown();
 
 	/** Load jni .so on initialization */

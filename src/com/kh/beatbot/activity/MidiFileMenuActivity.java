@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.R;
-import com.kh.beatbot.manager.Managers;
+import com.kh.beatbot.manager.MidiManager;
 
 public class MidiFileMenuActivity extends Activity {
 	private static final String SAVE_FOLDER = "BeatBot/MIDI";
@@ -41,7 +41,7 @@ public class MidiFileMenuActivity extends Activity {
 				.setPositiveButton("Yes",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								Managers.midiManager.writeToFile(outFile);
+								MidiManager.writeToFile(outFile);
 							}
 						})
 				.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -87,7 +87,7 @@ public class MidiFileMenuActivity extends Activity {
 				.setPositiveButton("Yes",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								Managers.midiManager.importFromFile(inFile);
+								MidiManager.importFromFile(inFile);
 							}
 						})
 				.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -108,7 +108,7 @@ public class MidiFileMenuActivity extends Activity {
 		String fullPathName = getFullPathName(editText.getText().toString());
 		outFile = new File(fullPathName);
 		if (!outFile.exists())
-			Managers.midiManager.writeToFile(outFile);
+			MidiManager.writeToFile(outFile);
 		else {
 			// file exists - popup dialog confirming overwrite of existing file
 			fileExistsAlert.show();
@@ -123,10 +123,11 @@ public class MidiFileMenuActivity extends Activity {
 		String fullPath = baseFilePath + "/" + fileName;
 		try {
 			inFile = new FileInputStream(fullPath);
-			if (Managers.midiManager.getMidiNotes().isEmpty())
-				Managers.midiManager.importFromFile(inFile);
-			else
+			if (MidiManager.getMidiNotes().isEmpty()) {
+				MidiManager.importFromFile(inFile);
+			} else {
 				confirmImportAlert.show();
+			}
 		} catch (FileNotFoundException e) {
 			fileNotExistsAlert.setMessage("Sorry, but the file \"" + fullPath
 					+ "\" does not exist.");
