@@ -9,10 +9,9 @@ import com.kh.beatbot.effect.Effect.LevelType;
 
 public class BaseTrack {
 	protected int id;
+	public float volume = .8f, pan = .5f, pitch = .5f;
+	
 	protected List<Effect> effects = new ArrayList<Effect>();
-	public float volume = .8f;
-	public float pan = .5f;
-	public float pitch = .5f;
 	public LevelType activeLevelType = LevelType.VOLUME;
 
 	public BaseTrack(int id) {

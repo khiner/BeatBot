@@ -9,15 +9,13 @@ import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.Image;
 
 public class Directory {
-	protected String name = null;
-	protected String path = null;
+	protected String name = null, path = null,
+			emptyMsg = "This directoy is empty.";
 	protected IconResource iconResource = null;
 	protected List<Directory> children = new ArrayList<Directory>();
 	protected Directory parent = null;
-	protected String emptyMsg = "This directoy is empty.";
 
-	public Directory(Directory parent, String name,
-			IconResource iconResource) {
+	public Directory(Directory parent, String name, IconResource iconResource) {
 		this.parent = parent;
 		this.name = name;
 		this.iconResource = iconResource;

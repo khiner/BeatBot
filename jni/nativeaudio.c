@@ -129,29 +129,29 @@ void stopPreviewingTrack(Track *track) {
 
 void Java_com_kh_beatbot_Track_previewTrack(JNIEnv *env, jclass clazz,
 		jint trackNum) {
-	Track *track = getTrack(NULL, NULL, trackNum);
+	Track *track = getTrack(env, clazz, trackNum);
 	previewTrack(track);
 }
 
 void Java_com_kh_beatbot_Track_stopPreviewingTrack(JNIEnv *env,
 		jclass clazz, jint trackNum) {
-	Track *track = getTrack(NULL, NULL, trackNum);
+	Track *track = getTrack(env, clazz, trackNum);
 	stopPreviewingTrack(track);
 }
 
 void Java_com_kh_beatbot_Track_stopTrack(JNIEnv *env, jclass clazz,
 		jint trackNum) {
-	Track *track = getTrack(NULL, NULL, trackNum);
+	Track *track = getTrack(env, clazz, trackNum);
 	stopTrack(track);
 }
 
 void stopAllTracks() {
+	currSample = loopBeginSample;
 	TrackNode *cur_ptr = trackHead;
 	while (cur_ptr != NULL ) {
 		stopTrack(cur_ptr->track);
 		cur_ptr = cur_ptr->next;
 	}
-	currSample = loopBeginSample;
 }
 
 void disarm() {
@@ -246,6 +246,7 @@ void Java_com_kh_beatbot_manager_PlaybackManager_stopNative(JNIEnv *env,
 void Java_com_kh_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env,
 		jclass clazz) {
 	SLresult result;
+	(void *) env;
 	(void *) clazz; // avoid warnings about unused paramaters
 	initTicker();
 
