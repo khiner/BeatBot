@@ -54,7 +54,9 @@ public class SampleFile {
 	}
 	
 	public void renameTo(String name) {
-		file.renameTo(new File(name));
+		File newFile = new File(name);
+		file.renameTo(newFile);
+		file = newFile;
 	}
 
 	public long getNumSamples() {
