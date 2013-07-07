@@ -28,9 +28,9 @@ public class IconResources {
 		UNDO = new IconResource(R.drawable.undo_icon, R.drawable.undo_icon_pressed, -1, R.drawable.undo_icon_disabled),
 		
 		LEVELS = new IconResource(R.drawable.levels_icon, -1, R.drawable.levels_icon_selected),
-		LOOP = new IconResource(R.drawable.loop_icon, R.drawable.loop_selected_icon),
+		LOOP = new IconResource(R.drawable.loop_icon, -1, R.drawable.loop_icon_selected),
 		PREVIEW = new IconResource(R.drawable.preview_icon, R.drawable.preview_icon_selected),
-		REVERSE = new IconResource(R.drawable.reverse_icon, R.drawable.reverse_selected_icon),
+		REVERSE = new IconResource(R.drawable.reverse_icon, -1, R.drawable.reverse_icon_selected),
 		
 		BROWSE = new IconResource(R.drawable.browse_icon, R.drawable.browse_icon_selected),
 		EDIT = new IconResource(R.drawable.edit_icon, R.drawable.edit_icon_selected),

@@ -41,11 +41,11 @@ public class SampleEditPage extends Page {
 		reverseButton.setIcon(new Icon(IconResources.REVERSE));
 
 		browseButton.setBgIcon(new RoundedRectIcon(labelGroup,
-				Colors.iconFillColorSet, Colors.iconBorderColorSet));
+				Colors.iconFillColorSet));
 		browseButton.setIcon(new Icon(IconResources.BROWSE));
 
 		editButton.setBgIcon(new RoundedRectIcon(labelGroup,
-				Colors.iconFillColorSet, Colors.iconBorderColorSet));
+				Colors.iconFillColorSet));
 		editButton.setIcon(new Icon(IconResources.EDIT));
 	}
 
@@ -62,7 +62,7 @@ public class SampleEditPage extends Page {
 		reverseButton = new ToggleButton();
 		browseButton = new ImageButton();
 		editButton = new ImageButton();
-		
+
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override
 			public void onPress(Button button) {
@@ -112,10 +112,12 @@ public class SampleEditPage extends Page {
 	@Override
 	public void layoutChildren() {
 		float thirdHeight = height / 3;
+		float margin = 7;
 		previewButton.layout(this, 0, 0, thirdHeight, thirdHeight);
-		loopButton.layout(this, thirdHeight, 0, thirdHeight, thirdHeight);
-		reverseButton
-				.layout(this, thirdHeight * 2, 0, thirdHeight, thirdHeight);
+		loopButton.layout(this, thirdHeight + margin, 0, thirdHeight,
+				thirdHeight);
+		reverseButton.layout(this, thirdHeight * 2 + margin * 2, 0,
+				thirdHeight, thirdHeight);
 
 		browseButton.layout(this, width - thirdHeight * 2, 0, thirdHeight,
 				thirdHeight);

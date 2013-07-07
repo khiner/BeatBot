@@ -28,7 +28,7 @@ public class Colors {
 			volumeBgColorSet, volumeStrokeColorSet, effectLabelBgColorSet,
 			effectLabelStrokeColorSet, effectLabelTouchedBgColorSet,
 			effectLabelTouchedStrokeColorSet, iconFillColorSet,
-			iconBorderColorSet, deleteFillColorSet, deleteBorderColorSet;
+			deleteFillColorSet, deleteBorderColorSet;
 
 	public static void initColors(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
@@ -108,7 +108,6 @@ public class Colors {
 		volumeStrokeColorSet = new ColorSet(VOLUME, VOLUME, WHITE);
 
 		iconFillColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED);
-		iconBorderColorSet = new ColorSet(WHITE, BLACK);
 
 		deleteFillColorSet = new ColorSet(TRANSPARANT, RED);
 		deleteBorderColorSet = new ColorSet(RED, BLACK);

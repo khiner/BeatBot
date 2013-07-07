@@ -4,8 +4,9 @@ public class Icon extends Drawable {
 	protected Drawable currentDrawable;
 	protected IconResource resource;
 	protected IconResource.State state;
-	
-	public Icon() {};
+
+	public Icon() {
+	};
 
 	public Icon(IconResource resource) {
 		this.resource = resource;
@@ -16,7 +17,7 @@ public class Icon extends Drawable {
 		this.resource = resource;
 		setState(state);
 	}
-	
+
 	public void setState(IconResource.State state) {
 		this.state = state;
 		setDrawable(resource.whichIcon(state));
@@ -35,6 +36,14 @@ public class Icon extends Drawable {
 	}
 
 	protected void setDrawable(Drawable drawable) {
-		currentDrawable = drawable != null ? drawable : resource.defaultDrawable;
+		if (drawable == null && currentDrawable != null) {
+			boolean selected = currentDrawable
+					.equals(resource.selectedDrawable);
+			currentDrawable = !selected && resource.selectedDrawable != null ? resource.selectedDrawable
+					: resource.defaultDrawable;
+		} else {
+			currentDrawable = drawable != null ? drawable
+					: resource.defaultDrawable;
+		}
 	}
 }
