@@ -31,6 +31,7 @@ public class SampleEditView extends TouchableView {
 	private float sampleOffset = 0, numSamples = 0, waveformWidth = 0;
 
 	public void update() {
+		sampleOffset = 0;
 		numSamples = TrackManager.currTrack.getNumSamples();
 		updateVbs();
 	}
