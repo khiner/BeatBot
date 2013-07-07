@@ -93,6 +93,7 @@ public class SampleEditPage extends Page {
 				DirectoryManager.showInstrumentSelectAlert();
 			}
 		});
+		
 		editButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {

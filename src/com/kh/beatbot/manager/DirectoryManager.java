@@ -31,8 +31,7 @@ public class DirectoryManager {
 				if (addingTrack) {
 					TrackManager.createTrack((Instrument) parent, item);
 				} else {
-					TrackManager.currTrack.setInstrument((Instrument) parent,
-							item);
+					TrackManager.setInstrument((Instrument) parent, item);
 				}
 				currDirectory = audioDirectory;
 			}
@@ -259,8 +258,8 @@ public class DirectoryManager {
 	private static void updateInstrumentSelectAdapter(final Directory directory) {
 		String[] list = formatNames(directory.getChildNames());
 		instrumentSelectAdapter = new ArrayAdapter<String>(
-				BeatBotActivity.mainActivity, android.R.layout.select_dialog_item,
-				android.R.id.text1, list) {
+				BeatBotActivity.mainActivity,
+				android.R.layout.select_dialog_item, android.R.id.text1, list) {
 			public View getView(int position, View convertView, ViewGroup parent) {
 				View v = super.getView(position, convertView, parent);
 				TextView tv = (TextView) v.findViewById(android.R.id.text1);

@@ -16,10 +16,21 @@ public class MainPage extends TouchableView {
 	public MidiTrackView midiTrackView;
 	public PageSelectGroup pageSelectGroup;
 	
-	public void trackCreated(Track track) {
+	public void notifyTrackCreated(Track track) {
 		midiTrackView.notifyTrackCreated(track);
 		midiView.notifyTrackCreated(track);
-		pageSelectGroup.notifyTrackChanged();
+		pageSelectGroup.updateAll();
+	}
+	
+	public void notifyTrackChanged(Track track) {
+		midiView.notifyTrackChanged(track.getId());
+		pageSelectGroup.updateAll();
+	}
+	
+	public void notifyTrackUpdated(Track track) {
+		midiView.notifyTrackChanged(track.getId());
+		midiTrackView.notifyTrackUpdated(track);
+		pageSelectGroup.updateAll();
 	}
 	
 	public void notifyTrackDeleted(Track track) {

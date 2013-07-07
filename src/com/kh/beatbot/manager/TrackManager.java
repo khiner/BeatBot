@@ -8,20 +8,21 @@ import com.kh.beatbot.Instrument;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.view.TrackButtonRow;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.page.Page;
 
 public class TrackManager {
 
 	public static final int MASTER_TRACK_ID = -1;
-	
+
 	// effect settings are stored here instead of in the effect activities
 	// because the activities are destroyed after clicking 'back', and we
 	// need to persist state
 	private static List<Track> tracks = new ArrayList<Track>();
 	public static BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
 	public static Track currTrack;
-	
+
 	public static void init() {
 		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
 			createTrack(DirectoryManager.getDrumInstrument(i), 0);
@@ -37,34 +38,44 @@ public class TrackManager {
 			track.quantizeEffectParams();
 		}
 	}
-	
-	public static void setTrack(int trackNum) {
-		Track newTrack = tracks.get(trackNum);
-		if (newTrack == currTrack)
+
+	public static void setTrack(Track track) {
+		if (track == currTrack)
 			return;
-		currTrack = newTrack;
-		newTrack.select();
-		Page.mainPage.midiView.notifyTrackChanged(trackNum);
-		Page.mainPage.pageSelectGroup.notifyTrackChanged();
+		currTrack = track;
+		track.select();
+		Page.mainPage.notifyTrackChanged(currTrack);
 	}
-	
+
 	public static BaseTrack getBaseTrack(int trackNum) {
 		if (trackNum == MASTER_TRACK_ID)
 			return masterTrack;
 		return tracks.get(trackNum);
 	}
-	
+
 	public static int getNumTracks() {
 		return tracks.size();
 	}
 
+	public static void setInstrument(Instrument instrument, int sampleNum) {
+		currTrack.setInstrument(instrument, sampleNum);
+		Page.mainPage.notifyTrackUpdated(currTrack);
+	}
+
 	public static void createTrack(Instrument instrument, int sampleNum) {
 		createTrack(instrument.getFullPath(sampleNum));
-		Track newTrack = new Track(tracks.size());
+		final Track newTrack = new Track(tracks.size());
 		newTrack.setInstrument(instrument, sampleNum);
 		tracks.add(newTrack);
-		Page.mainPage.trackCreated(newTrack);
-		setTrack(newTrack.getId());
+		
+		// needed to avoid "no current context" opengl error
+		View.root.queueEvent(new Runnable() {
+			@Override
+			public void run() {
+				Page.mainPage.notifyTrackCreated(newTrack);
+				setTrack(newTrack);
+			}
+		});
 	}
 
 	public static void deleteCurrTrack() {
@@ -77,11 +88,10 @@ public class TrackManager {
 			tracks.get(i).setId(i);
 		}
 		Page.mainPage.notifyTrackDeleted(currTrack);
-		int selectedTrackNum = Math.min(currTrackNum, tracks.size() - 1);
-		setTrack(selectedTrackNum);
+		setTrack(tracks.get(Math.min(currTrackNum, tracks.size() - 1)));
 		deleteTrack(currTrackNum);
 	}
-	
+
 	public static MidiNote getNextMidiNote(int trackNum, long currTick) {
 		return tracks.get(trackNum).getNextMidiNote(currTick);
 	}
@@ -91,7 +101,7 @@ public class TrackManager {
 			track.updateNextNote();
 		}
 	}
-	
+
 	public static void selectInstrumentButton(ToggleButton button) {
 		button.setChecked(true);
 		for (Track track : tracks) {
@@ -101,7 +111,7 @@ public class TrackManager {
 			}
 		}
 	}
-	
+
 	public static void selectSoloButton(ToggleButton button) {
 		button.setChecked(true);
 		for (Track track : tracks) {
@@ -111,9 +121,10 @@ public class TrackManager {
 			}
 		}
 	}
-	
+
 	/******* These methods are called FROM native code via JNI ********/
-	
+
 	public static native void createTrack(String sampleFileName);
+
 	public static native void deleteTrack(int trackNum);
 }

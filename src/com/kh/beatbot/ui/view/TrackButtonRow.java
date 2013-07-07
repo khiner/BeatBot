@@ -65,7 +65,7 @@ public class TrackButtonRow extends TouchableView {
 			@Override
 			public void onRelease(Button button) {
 				TrackManager.selectInstrumentButton(instrumentButton);
-				TrackManager.setTrack(track.getId());
+				TrackManager.setTrack(track);
 			}
 		});
 		muteButton.setOnReleaseListener(new OnReleaseListener() {

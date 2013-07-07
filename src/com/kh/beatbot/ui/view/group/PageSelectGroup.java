@@ -67,7 +67,7 @@ public class PageSelectGroup extends TouchableView {
 		trackPage.update();
 	}
 
-	public void notifyTrackChanged() {
+	public void updateAll() {
 		if (!initialized)
 			return;
 		update();

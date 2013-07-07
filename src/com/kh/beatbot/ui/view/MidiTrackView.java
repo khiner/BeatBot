@@ -24,6 +24,10 @@ public class MidiTrackView extends TouchableView {
 		layoutChildren();
 	}
 
+	public void notifyTrackUpdated(Track track) {
+		track.updateIcon();
+	}
+	
 	public void draw() {
 		float newY = -absoluteY - TickWindowHelper.getYOffset();
 		if (newY != lastY) {
