@@ -25,7 +25,7 @@ public class IconResources {
 		COPY = new IconResource(R.drawable.copy_icon, R.drawable.copy_icon_pressed, R.drawable.copy_icon_pressed, R.drawable.copy_icon_inactive),
 		DELETE_NOTE = new IconResource(R.drawable.delete_icon, R.drawable.delete_icon_pressed, -1, R.drawable.delete_icon_inactive),
 		DELETE_TRACK = new IconResource(R.drawable.delete_track_icon, R.drawable.delete_track_icon_selected),
-		UNDO = new IconResource(R.drawable.undo_icon, R.drawable.undo_icon_pressed),
+		UNDO = new IconResource(R.drawable.undo_icon, R.drawable.undo_icon_pressed, -1, R.drawable.undo_icon_disabled),
 		
 		LEVELS = new IconResource(R.drawable.levels_icon, -1, R.drawable.levels_icon_selected),
 		LOOP = new IconResource(R.drawable.loop_icon, R.drawable.loop_selected_icon),

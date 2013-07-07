@@ -55,7 +55,8 @@ public class ControlButtonGroup extends TouchableView {
 					String fileName = RecordManager.stopRecording();
 
 					Toast.makeText(
-							BeatBotActivity.mainActivity.getApplicationContext(),
+							BeatBotActivity.mainActivity
+									.getApplicationContext(),
 							"Recorded file to " + fileName, Toast.LENGTH_SHORT)
 							.show();
 				} else {
@@ -101,7 +102,8 @@ public class ControlButtonGroup extends TouchableView {
 					MidiManager.cancelCopy();
 					msg = "Copy Cancelled";
 				}
-				Toast.makeText(BeatBotActivity.mainActivity.getApplicationContext(),
+				Toast.makeText(
+						BeatBotActivity.mainActivity.getApplicationContext(),
 						msg, Toast.LENGTH_SHORT).show();
 			}
 		});
@@ -126,6 +128,10 @@ public class ControlButtonGroup extends TouchableView {
 		copyButton.setEnabled(enabled);
 	}
 
+	public void setUndoIconEnabled(final boolean enabled) {
+		undoButton.setEnabled(enabled);
+	}
+	
 	public void uncheckCopyButton() {
 		copyButton.setChecked(false);
 	}

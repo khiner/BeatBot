@@ -181,8 +181,7 @@ public class MidiManager {
 
 	private static void updateEditIcons() {
 		boolean anyNoteSelected = anyNoteSelected();
-		Page.mainPage.controlButtonGroup
-				.setEditIconsEnabled(anyNoteSelected);
+		Page.mainPage.controlButtonGroup.setEditIconsEnabled(anyNoteSelected);
 	}
 
 	public static void copy() {
@@ -362,17 +361,24 @@ public class MidiManager {
 		// enforce max undo stack size
 		if (undoStack.size() > UNDO_STACK_SIZE)
 			undoStack.remove(0);
+
+		Page.mainPage.controlButtonGroup.setUndoIconEnabled(true);
 	}
 
 	public static void undo() {
-		if (undoStack.isEmpty())
+		if (undoStack.isEmpty()) {
 			return;
+		}
+
 		List<MidiNote> lastState = undoStack.pop();
 		clearNotes();
 		for (MidiNote midiNote : lastState) {
 			addNote(midiNote);
 		}
 		currState = copyMidiList(getMidiNotes());
+		if (undoStack.isEmpty()) {
+			Page.mainPage.controlButtonGroup.setUndoIconEnabled(false);
+		}
 	}
 
 	private static List<MidiNote> copyMidiList(List<MidiNote> midiList) {
