@@ -10,40 +10,28 @@ import com.kh.beatbot.ui.color.Colors;
 
 public class SampleEditView extends TouchableView {
 
-	private float waveformWidth = 0;
-
 	// min distance for pointer to select loop markers
-	private static final int SNAP_DIST = 32;
-	private static FloatBuffer waveformVb = null;
-	private static FloatBuffer backgroundOutlineVb = null;
-	private static FloatBuffer loopSelectionLineVb = null;
-	private static FloatBuffer loopSelectionRectVbs[] = new FloatBuffer[2];
+	private static final int SNAP_DIST = 32, MIN_LOOP_WINDOW = 32;
 
-	private final int MIN_LOOP_WINDOW = 32;
+	private static FloatBuffer waveformVb = null, backgroundOutlineVb = null,
+			loopSelectionLineVb = null,
+			loopSelectionRectVbs[] = new FloatBuffer[2];
 
 	// which pointer id is touching which marker (-1 means no pointer)
-	private int beginLoopPointerId = -1;
-	private int endLoopPointerId = -1;
+	private int beginLoopPointerId = -1, endLoopPointerId = -1;
 
-	private int zoomLeftPointerId = -1;
-	private int zoomRightPointerId = -1;
+	private int scrollPointerId = -1, zoomLeftPointerId = -1,
+			zoomRightPointerId = -1;
 
-	private float zoomLeftAnchorSample = -1;
-	private float zoomRightAnchorSample = -1;
-
-	private float zoomLeftPointerX = -1;
-	private float zoomRightPointerX = -1;
-
-	private int scrollPointerId = -1;
-	private float scrollAnchorSample = -1;
+	private float scrollAnchorSample = -1, zoomLeftAnchorSample = -1,
+			zoomRightAnchorSample = -1;
 
 	// zooming/scrolling will change the view window of the samples
 	// keep track of that with offset and width
-	private float sampleOffset = 0;
-	private float sampleWidth = 0;
+	private float sampleOffset = 0, numSamples = 0, waveformWidth = 0;
 
 	public void update() {
-		sampleWidth = TrackManager.currTrack.getNumSamples();
+		numSamples = TrackManager.currTrack.getNumSamples();
 		updateVbs();
 	}
 
@@ -66,12 +54,10 @@ public class SampleEditView extends TouchableView {
 	}
 
 	private void updateWaveformVb() {
-		if (height == 0) // this view hasn't even been init()'d yet.
-			return;
 		try {
 			waveformVb = TrackManager.currTrack.getCurrSampleFile()
 					.floatFileToBuffer(this, (long) sampleOffset,
-							(long) sampleWidth, SNAP_DIST / 2);
+							(long) numSamples, SNAP_DIST / 2);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -110,12 +96,12 @@ public class SampleEditView extends TouchableView {
 	}
 
 	private float sampleToX(float sample) {
-		return (sample - sampleOffset) * waveformWidth / sampleWidth
-				+ SNAP_DIST / 2;
+		return (sample - sampleOffset) * waveformWidth / numSamples + SNAP_DIST
+				/ 2;
 	}
 
 	private float xToSample(float x) {
-		return (x - SNAP_DIST / 2) * sampleWidth / waveformWidth + sampleOffset;
+		return (x - SNAP_DIST / 2) * numSamples / waveformWidth + sampleOffset;
 	}
 
 	private void updateSampleOffset(float scrollX) {
@@ -124,39 +110,46 @@ public class SampleEditView extends TouchableView {
 		float newSampleOffset = scrollAnchorSample - xToSample(scrollX)
 				+ sampleOffset;
 		sampleOffset = newSampleOffset < 0 ? 0
-				: (newSampleOffset + sampleWidth > TrackManager.currTrack
+				: (newSampleOffset + numSamples > TrackManager.currTrack
 						.getNumSamples() ? TrackManager.currTrack
-						.getNumSamples() - sampleWidth : newSampleOffset);
+						.getNumSamples() - numSamples : newSampleOffset);
 	}
 
 	private void updateZoom() {
-		float x1 = zoomLeftPointerX;
-		float x2 = zoomRightPointerX;
+		float x1 = pointerIdToPos.get(zoomLeftPointerId).x;
+		float x2 = pointerIdToPos.get(zoomRightPointerId).x;
+
+		if (x1 >= x2)
+			return; // sanity check
+
+		float ZLAS = zoomLeftAnchorSample, ZRAS = zoomRightAnchorSample;
+
+		float MAX_LOOP_WINDOW = TrackManager.currTrack.getNumSamples();
 		// set sampleOffset and sampleWidth such that the zoom
 		// anchor samples stay under x1 and x2
-		float newSampleWidth = waveformWidth
-				* (zoomRightAnchorSample - zoomLeftAnchorSample) / (x2 - x1);
-		float newSampleOffset = zoomRightAnchorSample - newSampleWidth
-				* (x2 - SNAP_DIST / 2) / waveformWidth;
-		if (newSampleOffset < 0
-				&& newSampleOffset + newSampleWidth > TrackManager.currTrack
-						.getNumSamples() || newSampleWidth < MIN_LOOP_WINDOW) {
-			return;
-		}
-		if (newSampleOffset >= 0
-				&& newSampleOffset + newSampleWidth <= TrackManager.currTrack
-						.getNumSamples()) {
-			sampleOffset = newSampleOffset;
-			sampleWidth = newSampleWidth;
-		} else if (newSampleOffset < 0) {
+		float newNumSamples = waveformWidth * (ZRAS - ZLAS) / (x2 - x1);
+		float newSampleOffset = ZRAS - newNumSamples * (x2 - SNAP_DIST / 2)
+				/ waveformWidth;
+
+		if (newSampleOffset < 0) {
 			sampleOffset = 0;
-			sampleWidth = zoomRightAnchorSample * waveformWidth / x2;
-		} else if (newSampleOffset + newSampleWidth > TrackManager.currTrack
-				.getNumSamples()) {
-			sampleWidth = waveformWidth
-					* (zoomLeftAnchorSample - TrackManager.currTrack
-							.getNumSamples()) / (x1 - waveformWidth);
-			sampleOffset = TrackManager.currTrack.getNumSamples() - sampleWidth;
+			numSamples = ZRAS * waveformWidth / (x2 - SNAP_DIST / 2);
+			numSamples = numSamples <= MAX_LOOP_WINDOW ? (numSamples >= MIN_LOOP_WINDOW ? numSamples
+					: MIN_LOOP_WINDOW)
+					: MAX_LOOP_WINDOW;
+		} else if (newNumSamples > MAX_LOOP_WINDOW) {
+			sampleOffset = newSampleOffset;
+			numSamples = MAX_LOOP_WINDOW - sampleOffset;
+		} else if (newNumSamples < MIN_LOOP_WINDOW) {
+			sampleOffset = newSampleOffset;
+			numSamples = MIN_LOOP_WINDOW;
+		} else if (newSampleOffset + newNumSamples > MAX_LOOP_WINDOW) {
+			numSamples = ((ZLAS - MAX_LOOP_WINDOW) * waveformWidth)
+					/ (x1 - SNAP_DIST / 2 - waveformWidth);
+			sampleOffset = MAX_LOOP_WINDOW - numSamples;
+		} else {
+			sampleOffset = newSampleOffset;
+			numSamples = newNumSamples;
 		}
 		updateVbs();
 	}
@@ -198,7 +191,10 @@ public class SampleEditView extends TouchableView {
 	}
 
 	private boolean moveLoopMarker(int id, float x) {
-		if (beginLoopPointerId == id) {
+		float LBS = TrackManager.currTrack.getLoopBeginSample();
+		float LES = TrackManager.currTrack.getLoopEndSample();
+
+		if (id == beginLoopPointerId) {
 			// update track loop begin
 			float newLoopBegin = xToSample(x);
 			TrackManager.currTrack
@@ -208,35 +204,27 @@ public class SampleEditView extends TouchableView {
 									.getLoopEndSample() - MIN_LOOP_WINDOW
 									: newLoopBegin));
 			// update ui to fit the new begin point
-			if (TrackManager.currTrack.getLoopBeginSample() < sampleOffset) {
-				sampleWidth += sampleOffset
-						- TrackManager.currTrack.getLoopBeginSample();
-				sampleOffset = TrackManager.currTrack.getLoopBeginSample();
-			} else if (TrackManager.currTrack.getLoopBeginSample() > sampleOffset
-					+ sampleWidth) {
-				sampleWidth = TrackManager.currTrack.getLoopBeginSample()
-						- sampleOffset;
+			if (LBS < sampleOffset) {
+				numSamples += sampleOffset - LBS;
+				sampleOffset = LBS;
+			} else if (LBS > sampleOffset + numSamples) {
+				numSamples = LBS - sampleOffset;
 			}
-		} else if (endLoopPointerId == id) {
+		} else if (id == endLoopPointerId) {
 			// update track loop end
 			float newLoopEnd = xToSample(x);
 			TrackManager.currTrack
 					.setLoopEndSample(newLoopEnd >= TrackManager.currTrack
 							.getNumSamples() ? TrackManager.currTrack
-							.getNumSamples() - 1
-							: (newLoopEnd <= TrackManager.currTrack
-									.getLoopBeginSample() + MIN_LOOP_WINDOW ? TrackManager.currTrack
-									.getLoopBeginSample() + MIN_LOOP_WINDOW
-									: newLoopEnd));
+							.getNumSamples() - 1 : (newLoopEnd <= LBS
+							+ MIN_LOOP_WINDOW ? LBS + MIN_LOOP_WINDOW
+							: newLoopEnd));
 			// update ui to fit the new end point
-			if (TrackManager.currTrack.getLoopEndSample() > sampleOffset
-					+ sampleWidth) {
-				sampleWidth = TrackManager.currTrack.getLoopEndSample()
-						- sampleOffset;
-			} else if (TrackManager.currTrack.getLoopEndSample() < sampleOffset) {
-				sampleWidth += sampleOffset
-						- TrackManager.currTrack.getLoopEndSample();
-				sampleOffset = TrackManager.currTrack.getLoopEndSample();
+			if (LES > sampleOffset + numSamples) {
+				numSamples = LES - sampleOffset;
+			} else if (LES < sampleOffset) {
+				numSamples += sampleOffset - LES;
+				sampleOffset = LES;
 			}
 		} else {
 			return false;
@@ -245,29 +233,28 @@ public class SampleEditView extends TouchableView {
 		return true;
 	}
 
-	private boolean setZoomAnchor(int id, float x) {
-		if (scrollPointerId != -1) {
-			// one pointer is already scrolling.
-
-			zoomLeftPointerX = Math.min(pointerIdToPos.get(scrollPointerId).x,
-					x);
-			zoomRightPointerX = Math.max(pointerIdToPos.get(scrollPointerId).x,
-					x);
-			zoomLeftAnchorSample = xToSample(zoomLeftPointerX);
-			zoomRightAnchorSample = xToSample(zoomRightPointerX);
-			zoomLeftPointerId = zoomRightAnchorSample == scrollAnchorSample ? id
-					: scrollPointerId;
-			zoomRightPointerId = zoomLeftPointerId == scrollPointerId ? id
-					: scrollPointerId;
-			scrollPointerId = -1; // not scrolling anymore
-			return true;
+	private boolean setZoomAnchor(int id) {
+		if (scrollPointerId == -1) {
+			return false; // need to be scrolling to start zooming
 		}
-		return false;
+		if (pointerIdToPos.get(scrollPointerId).x > pointerIdToPos.get(id).x) {
+			zoomLeftPointerId = id;
+			zoomRightPointerId = scrollPointerId;
+		} else {
+			zoomLeftPointerId = scrollPointerId;
+			zoomRightPointerId = id;
+		}
+		scrollPointerId = -1; // not scrolling anymore
+
+		zoomLeftAnchorSample = xToSample(pointerIdToPos.get(zoomLeftPointerId).x);
+		zoomRightAnchorSample = xToSample(pointerIdToPos
+				.get(zoomRightPointerId).x);
+		return true;
 	}
 
-	private void setScrollAnchor(int id, float x) {
+	private void setScrollAnchor(int id) {
 		scrollPointerId = id;
-		scrollAnchorSample = xToSample(x);
+		scrollAnchorSample = xToSample(pointerIdToPos.get(id).x);
 	}
 
 	private void scroll(float scrollX) {
@@ -282,7 +269,7 @@ public class SampleEditView extends TouchableView {
 		if (!selectLoopMarker(id, x)) {
 			// loop marker not close enough to select. start scroll
 			// (we know it's the first pointer down, so we're not zooming)
-			setScrollAnchor(id, x);
+			setScrollAnchor(id);
 		}
 	}
 
@@ -294,10 +281,10 @@ public class SampleEditView extends TouchableView {
 
 	@Override
 	public void handleActionPointerDown(int id, float x, float y) {
-		if (!selectLoopMarker(id, x) && !setZoomAnchor(id, x)) {
+		if (!selectLoopMarker(id, x) && !setZoomAnchor(id)) {
 			// loop marker not close enough to select, and first pointer down.
 			// start scrolling
-			setScrollAnchor(id, x);
+			setScrollAnchor(id);
 		}
 	}
 
@@ -306,9 +293,9 @@ public class SampleEditView extends TouchableView {
 		deselectLoopMarker(id);
 		// stop zooming
 		if (id == zoomLeftPointerId) {
-			setScrollAnchor(zoomRightPointerId, zoomRightPointerX);
+			setScrollAnchor(zoomRightPointerId);
 		} else if (id == zoomRightPointerId) {
-			setScrollAnchor(zoomLeftPointerId, zoomLeftPointerX);
+			setScrollAnchor(zoomLeftPointerId);
 		}
 		zoomLeftPointerId = zoomRightPointerId = -1;
 		zoomLeftAnchorSample = zoomRightAnchorSample = -1;
@@ -317,10 +304,9 @@ public class SampleEditView extends TouchableView {
 	@Override
 	public void handleActionMove(int id, float x, float y) {
 		if (id == zoomLeftPointerId) {
-			zoomLeftPointerX = x;
+			// no-op: only zoom once both actions have been handled
 		} else if (id == zoomRightPointerId) {
-			zoomRightPointerX = x;
-			updateZoom(); // only zoom once both actions have been handled
+			updateZoom();
 		} else if (!moveLoopMarker(id, x)) {
 			scroll(x);
 		}
