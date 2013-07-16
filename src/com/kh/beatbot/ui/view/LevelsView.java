@@ -298,10 +298,6 @@ public class LevelsView extends TouchableView {
 		//TODO uncomment above after converting midiview to viewwindow
 	}
 	
-	protected void loadIcons() {
-		// no icons to load
-	}
-	
 	@Override
 	public void init() {
 		//setBackgroundColor(Colors.VIEW_BG);
@@ -329,13 +325,12 @@ public class LevelsView extends TouchableView {
 
 	@Override
 	protected void createChildren() {
-		initBgRect(Colors.VIEW_BG, Colors.VOLUME);
+		initBgRect(null, Colors.VIEW_BG, Colors.VOLUME);
 	}
 
 	@Override
 	public void layoutChildren() {
 		View alignXView = Page.mainPage.midiView;
 		xOffset = alignXView.absoluteX - absoluteX;
-		layoutBgRect(3, height / 8);
 	}
 }

@@ -23,10 +23,6 @@ public class Seekbar extends ControlView1dBase {
 		levelBarVb = makeFloatBuffer(vertices);
 		middleY = levelBarVb.get(1) + levelBarHeight / 2;
 	}
-
-	protected void loadIcons() {
-		// no icons to load
-	}
 	
 	public void init() {
 		initLevelBarVb();
@@ -76,6 +72,7 @@ public class Seekbar extends ControlView1dBase {
 	
 	@Override
 	public void draw() {
+		super.draw();
 		drawBar();
 	}
 
@@ -101,15 +98,5 @@ public class Seekbar extends ControlView1dBase {
 			return 1;
 		float level = (x - levelBarHeight / 2) / (width - levelBarHeight * 4);
 		return level < 0 ? 0 : (level > 1 ? 1 : level);
-	}
-
-	@Override
-	protected void createChildren() {
-		// leaf child
-	}
-
-	@Override
-	public void layoutChildren() {
-		// leaf child
 	}
 }

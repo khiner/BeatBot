@@ -22,10 +22,6 @@ public class ParamControl extends TouchableView {
 		updateValueLabel(param);
 	}
 	
-	public void loadIcons() {
-		// no icons
-	}
-	
 	public void updateValueLabel(Param param) {
 		setValueLabel(param.getFormattedValueString());
 	}
@@ -36,16 +32,6 @@ public class ParamControl extends TouchableView {
 	
 	private void setValueLabel(String valueLabel) {
 		this.valueLabel.setText(valueLabel);
-	}
-
-	@Override
-	public void init() {
-		
-	}
-
-	@Override
-	public void draw() {
-		
 	}
 
 	@Override

@@ -1,7 +1,5 @@
 package com.kh.beatbot.ui.view.group;
 
-import javax.microedition.khronos.opengles.GL11;
-
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.TrackManager;
@@ -12,7 +10,6 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.TouchableView;
-import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
@@ -78,9 +75,7 @@ public class PageSelectGroup extends TouchableView {
 
 	@Override
 	public void draw() {
-		translate(-absoluteX, -absoluteY);
-		roundedRectGroup.draw((GL11) View.gl, 1);
-		translate(absoluteX, absoluteY);
+		roundedRectGroup.draw(this, 1);
 	}
 
 	@Override

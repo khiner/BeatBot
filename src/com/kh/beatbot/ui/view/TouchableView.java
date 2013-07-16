@@ -6,7 +6,7 @@ import java.util.Map;
 import android.view.MotionEvent;
 
 
-public abstract class TouchableView extends View {
+public abstract class TouchableView extends TextView {
 
 	// map of pointer ID #'s that this window is responsible for to their current
 	// position relative to this window

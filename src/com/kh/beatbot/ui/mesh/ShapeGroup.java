@@ -1,21 +1,29 @@
 package com.kh.beatbot.ui.mesh;
 
 import javax.microedition.khronos.opengles.GL10;
-import javax.microedition.khronos.opengles.GL11;
+
+import com.kh.beatbot.ui.view.View;
 
 public class ShapeGroup {
 
 	private MeshGroup fillGroup, outlineGroup;
-
+	
 	public ShapeGroup() {
 		fillGroup = new MeshGroup();
 		outlineGroup = new MeshGroup();
 	}
 
-	public void draw(GL11 gl, int borderWidth) {
+	public void draw(View parent, int borderWidth) {
+		View.push();
+		View.translate(-parent.absoluteX, -parent.absoluteY);
+		draw(borderWidth);
+		View.pop();
+	}
+	
+	public void draw(int borderWidth) {
 		fillGroup.draw(GL10.GL_TRIANGLES);
 		if (borderWidth > 0) {
-			gl.glLineWidth(borderWidth);
+			View.gl.glLineWidth(borderWidth);
 			outlineGroup.draw(GL10.GL_LINES);
 		}
 	}

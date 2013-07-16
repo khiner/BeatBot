@@ -43,16 +43,6 @@ public class MainPage extends TouchableView {
 		super.initAll();
 		BeatBotActivity.mainActivity.setupProject();
 	}
-	
-	@Override
-	public void init() {
-		// nothing to do.
-	}
-
-	@Override
-	public void draw() {
-		// parent view
-	}
 
 	@Override
 	protected void createChildren() {
@@ -67,11 +57,6 @@ public class MainPage extends TouchableView {
 		addChild(pageSelectGroup);
 	}
 
-	@Override
-	protected void loadIcons() {
-		// parent
-	}
-	
 	@Override
 	public void layoutChildren() {
 		float controlButtonHeight = height / 10;

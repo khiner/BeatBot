@@ -1,11 +1,8 @@
 package com.kh.beatbot.ui;
 
-import javax.microedition.khronos.opengles.GL11;
-
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
-import com.kh.beatbot.ui.view.View;
 
 public abstract class ShapeIcon extends Icon {
 
@@ -28,7 +25,7 @@ public abstract class ShapeIcon extends Icon {
 	@Override
 	public void draw() {
 		if (shouldDraw) {
-			shapeGroup.draw((GL11) View.gl, 1);
+			shapeGroup.draw(1);
 		}
 	}
 

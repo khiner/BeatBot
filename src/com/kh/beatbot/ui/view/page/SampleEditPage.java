@@ -11,21 +11,22 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.SampleEditView;
+import com.kh.beatbot.ui.view.TextView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.control.ValueLabel;
 
 public class SampleEditPage extends Page {
 
-	private ShapeGroup labelGroup;
+	private ShapeGroup labelGroup = new ShapeGroup();
 
 	private SampleEditView sampleEdit;
 	private ImageButton previewButton, browseButton, editButton;
 	private ToggleButton loopButton, reverseButton;
-
-	public void init() {
-	}
-
+	private TextView loopBeginLabel, loopEndLabel;
+	private ValueLabel loopBeginControl, loopEndControl;
+	
 	@Override
 	public void update() {
 		if (sampleEdit != null)
@@ -51,7 +52,7 @@ public class SampleEditPage extends Page {
 
 	@Override
 	public void draw() {
-		// parent view - no drawing to do
+		labelGroup.draw(this, 1);
 	}
 
 	@Override
@@ -63,6 +64,11 @@ public class SampleEditPage extends Page {
 		browseButton = new ImageButton();
 		editButton = new ImageButton();
 
+		loopBeginLabel = new ImageButton();
+		loopEndLabel = new ImageButton();
+		loopBeginControl = new ValueLabel();
+		loopEndControl = new ValueLabel();
+				
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override
 			public void onPress(Button button) {
@@ -93,7 +99,7 @@ public class SampleEditPage extends Page {
 				DirectoryManager.showInstrumentSelectAlert();
 			}
 		});
-		
+
 		editButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
@@ -102,12 +108,20 @@ public class SampleEditPage extends Page {
 			}
 		});
 
+		loopBeginLabel.setText("Begin");
+		loopEndLabel.setText("End");
+		loopBeginControl.initBgRect(labelGroup, Colors.LABEL_VERY_LIGHT, Colors.BLACK);
+		loopEndControl.initBgRect(labelGroup, Colors.LABEL_VERY_LIGHT, Colors.BLACK);
 		addChild(previewButton);
 		addChild(loopButton);
 		addChild(reverseButton);
 		addChild(sampleEdit);
 		addChild(browseButton);
 		addChild(editButton);
+		addChild(loopBeginLabel);
+		addChild(loopEndLabel);
+		addChild(loopBeginControl);
+		addChild(loopEndControl);
 	}
 
 	@Override
@@ -120,6 +134,14 @@ public class SampleEditPage extends Page {
 		reverseButton.layout(this, thirdHeight * 2 + margin * 2, 0,
 				thirdHeight, thirdHeight);
 
+		loopBeginLabel.layout(this, width - thirdHeight * 15, 0,
+				thirdHeight * 3, thirdHeight);
+		loopBeginControl.layout(this, width - thirdHeight * 12, 0,
+				thirdHeight * 3, thirdHeight);
+		loopEndLabel.layout(this, width - thirdHeight * 9, 0, thirdHeight * 3,
+				thirdHeight);
+		loopEndControl.layout(this, width - thirdHeight * 6, 0,
+				thirdHeight * 3, thirdHeight);
 		browseButton.layout(this, width - thirdHeight * 2, 0, thirdHeight,
 				thirdHeight);
 		editButton.layout(this, width - thirdHeight, 0, thirdHeight,

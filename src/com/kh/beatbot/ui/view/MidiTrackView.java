@@ -1,7 +1,5 @@
 package com.kh.beatbot.ui.view;
 
-import javax.microedition.khronos.opengles.GL11;
-
 import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
@@ -33,25 +31,12 @@ public class MidiTrackView extends TouchableView {
 		if (newY != lastY) {
 			layoutChildren();
 		}
-		push();
-		translate(-absoluteX, -absoluteY);
-		TrackButtonRow.roundedRectGroup.draw((GL11) View.gl, 1);
-		pop();
+		TrackButtonRow.roundedRectGroup.draw(this, 1);
 		lastY = newY;
-	}
-
-	@Override
-	public void init() {
-		// nothing
 	}
 
 	protected void loadIcons() {
 		DirectoryManager.loadIcons();
-	}
-	
-	@Override
-	protected void createChildren() {
-		// all button rows are added dynamically as tracks are added
 	}
 
 	@Override

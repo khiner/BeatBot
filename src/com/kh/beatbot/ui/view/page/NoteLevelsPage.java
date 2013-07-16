@@ -1,14 +1,11 @@
 package com.kh.beatbot.ui.view.page;
 
-import javax.microedition.khronos.opengles.GL11;
-
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.LevelsView;
-import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -17,11 +14,6 @@ public class NoteLevelsPage extends Page {
 	private static ShapeGroup labelGroup = new ShapeGroup();
 	private LevelsView levelsView;
 	private ToggleButton volumeToggle, panToggle, pitchToggle;
-	
-	@Override
-	public void init() {
-		// nothing to do
-	}
 	
 	@Override
 	public void update() {
@@ -61,10 +53,7 @@ public class NoteLevelsPage extends Page {
 
 	@Override
 	public void draw() {
-		push();
-		translate(-absoluteX, -absoluteY);
-		labelGroup.draw((GL11)View.gl, 2);
-		pop();
+		labelGroup.draw(this, 2);
 	}
 
 	@Override

@@ -28,7 +28,6 @@ public abstract class ControlView1dBase extends ControlViewBase {
 		levelListeners.clear();
 	}
 	
-	/* level should be from 0 to 1 */
 	public void setLevel(float level) {
 		setViewLevel(level);
 		for (Level1dListener levelListener : levelListeners) {

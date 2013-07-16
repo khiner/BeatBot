@@ -2,8 +2,6 @@ package com.kh.beatbot.ui.view.control;
 
 import java.nio.FloatBuffer;
 
-import android.util.FloatMath;
-
 import com.kh.beatbot.ui.color.Colors;
 
 public class Knob extends ControlView1dBase {
@@ -12,10 +10,6 @@ public class Knob extends ControlView1dBase {
 
 	private int drawIndex = 0;
 
-	protected void loadIcons() {
-		// none
-	}
-	
 	private void initCircleVbs(float width, float height) {
 		float[] circleVertices = new float[128];
 		float theta = 3 * ¹ / 4; // start at 1/8 around the circle
@@ -24,13 +18,13 @@ public class Knob extends ControlView1dBase {
 			// with the ¹/8 gap at the "bottom" of the view
 			theta += 6 * ¹ / circleVertices.length;
 			// main circles will show when user is not touching
-			circleVertices[i * 4] = FloatMath.cos(theta) * width / 2.3f + width
-					/ 2;
-			circleVertices[i * 4 + 1] = FloatMath.sin(theta) * width / 2.3f
+			circleVertices[i * 4] = (float) Math.cos(theta) * width / 2.3f
 					+ width / 2;
-			circleVertices[i * 4 + 2] = FloatMath.cos(theta) * width / 3.1f
+			circleVertices[i * 4 + 1] = (float) Math.sin(theta) * width / 2.3f
 					+ width / 2;
-			circleVertices[i * 4 + 3] = FloatMath.sin(theta) * width / 3.1f
+			circleVertices[i * 4 + 2] = (float) Math.cos(theta) * width / 3.1f
+					+ width / 2;
+			circleVertices[i * 4 + 3] = (float) Math.sin(theta) * width / 3.1f
 					+ width / 2;
 		}
 		circleVb = makeFloatBuffer(circleVertices);
@@ -41,7 +35,8 @@ public class Knob extends ControlView1dBase {
 		// level background
 		drawTriangleStrip(circleVb, Colors.VIEW_BG);
 		// main selection
-		drawTriangleStrip(circleVb, selected ? Colors.RED : levelColor, drawIndex);
+		drawTriangleStrip(circleVb, selected ? Colors.RED : levelColor,
+				drawIndex);
 	}
 
 	private void updateDrawIndex() {
@@ -56,7 +51,7 @@ public class Knob extends ControlView1dBase {
 		super.setViewLevel(level);
 		updateDrawIndex();
 	}
-	
+
 	@Override
 	protected float posToLevel(float x, float y) {
 		float unitX = (x - width / 2) / width;
@@ -72,11 +67,6 @@ public class Knob extends ControlView1dBase {
 		return level > 0 ? (level < 1 ? level : 1) : 0;
 	}
 
-	@Override
-	protected void createChildren() {
-		// none
-	}
-	
 	@Override
 	public void layoutChildren() {
 		initCircleVbs(width, height);

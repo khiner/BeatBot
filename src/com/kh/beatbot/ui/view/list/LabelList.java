@@ -12,7 +12,6 @@ import com.kh.beatbot.ui.ShapeIcon;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.ClickableView;
-import com.kh.beatbot.ui.view.GLSurfaceViewBase;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
@@ -121,19 +120,14 @@ public class LabelList extends ClickableView implements OnPressListener,
 
 	@Override
 	protected void loadIcons() {
+		super.loadIcons();
 		addIcon = new Icon(IconResources.ADD);
 	}
 
 	@Override
 	public void init() {
-		GLSurfaceViewBase.storeText("ADD");
-		layoutBgRect(2, height / 6);
+		super.init();
 		listener.labelListInitialized(this);
-	}
-
-	@Override
-	public void draw() {
-
 	}
 
 	@Override
@@ -160,7 +154,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 
 	@Override
 	protected void createChildren() {
-		initBgRect(Colors.VIEW_BG, Colors.VOLUME);
+		initBgRect(null, Colors.VIEW_BG, Colors.VOLUME);
 	}
 
 	@Override

@@ -1,7 +1,5 @@
 package com.kh.beatbot.ui.view.page.effect;
 
-import javax.microedition.khronos.opengles.GL11;
-
 import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -41,10 +39,7 @@ public class FilterParamsPage extends EffectParamsPage {
 	@Override
 	public void draw() {
 		super.draw();
-		push();
-		translate(-absoluteX, -absoluteY);
-		iconGroup.draw((GL11) gl, 2);
-		pop();
+		iconGroup.draw(this, 2);
 	}
 
 	@Override

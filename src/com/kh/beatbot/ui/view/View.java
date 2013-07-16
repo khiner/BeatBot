@@ -13,6 +13,7 @@ import android.graphics.Typeface;
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.RoundedRect;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public abstract class View implements Comparable<View> {
 	public class Position {
@@ -28,15 +29,11 @@ public abstract class View implements Comparable<View> {
 		}
 	}
 
-	public static final float ¹ = (float) Math.PI;
-
+	public static final float ¹ = (float) Math.PI, CIRCLE_RADIUS = 100;
+	public static GL10 gl;
 	public static GLSurfaceViewBase root;
 	public static Typeface font;
-	
-	protected List<View> children = new ArrayList<View>();
-	protected View parent;
-
-	public static GL10 gl;
+	private static FloatBuffer circleVb = null;
 
 	// where is the view currently clipped to?
 	// used to keep track of SCISSOR clipping of parent views,
@@ -45,25 +42,22 @@ public abstract class View implements Comparable<View> {
 	public int currClipX = Integer.MIN_VALUE, currClipY = Integer.MIN_VALUE,
 			currClipW = Integer.MAX_VALUE, currClipH = Integer.MAX_VALUE;
 
-	public float absoluteX = 0, absoluteY = 0;
-	public float x = 0, y = 0;
-	public float width = 0, height = 0;
+	public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0,
+			height = 0;
 
-	protected float[] backgroundColor = Colors.BG_COLOR;
-	protected float[] clearColor = Colors.BG_COLOR;
-
-	private int id = -1; // optional
-
-	private static FloatBuffer circleVb = null;
-	private static final float CIRCLE_RADIUS = 100;
-
-	protected boolean initialized = false;
-
+	protected List<View> children = new ArrayList<View>();
+	protected View parent;
 	protected RoundedRect bgRect = null;
 
-	protected float minX = 0, maxX = 0, minY = 0, maxY = 0;
-	protected float borderWidth = 0, borderHeight = 0, borderOffset = 0;
+	protected float[] backgroundColor = Colors.BG_COLOR,
+			clearColor = Colors.BG_COLOR, strokeColor = Colors.WHITE;
 
+	protected boolean initialized = false;
+	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0,
+			borderHeight = 0, borderOffset = 0;
+	public int id = -1; // optional
+
+	
 	static { // init circle
 		float theta = 0;
 		float coords[] = new float[128];
@@ -79,14 +73,15 @@ public abstract class View implements Comparable<View> {
 		createChildren();
 	}
 
-	public void initBgRect(float[] fillColor, float[] borderColor) {
-		bgRect = new RoundedRect(null, fillColor, borderColor);
+	public void initBgRect(ShapeGroup group, float[] fillColor,
+			float[] borderColor) {
+		bgRect = new RoundedRect(group, fillColor, borderColor);
 	}
-	
+
 	public float getBgRectRadius() {
 		return bgRect.cornerRadius;
 	}
-	
+
 	public void addChild(View child) {
 		children.add(child);
 		if (initialized) {
@@ -97,7 +92,7 @@ public abstract class View implements Comparable<View> {
 	public void removeChild(View child) {
 		children.remove(child);
 	}
-	
+
 	public int numChildren() {
 		return children.size();
 	}
@@ -203,7 +198,7 @@ public abstract class View implements Comparable<View> {
 			pop();
 		}
 	}
-	
+
 	public void initGl(GL10 _gl) {
 		gl = _gl;
 		loadAllIcons();
@@ -216,26 +211,28 @@ public abstract class View implements Comparable<View> {
 		}
 	}
 
-	protected void layoutBgRect(float borderWeight, float borderRadius) {
-		if (bgRect != null) {
-			borderOffset = borderWeight * 2;
-			bgRect.setBorderWeight(borderWeight);
-			bgRect.setCornerRadius(borderRadius);
-			bgRect.layout(borderOffset, borderOffset, width - borderOffset * 2,
-					height - borderOffset * 2);
-			minX = minY = bgRect.cornerRadius + borderOffset;
-			maxX = width - bgRect.cornerRadius - borderOffset;
-			maxY = height - bgRect.cornerRadius - borderOffset;
-			borderWidth = width - 2 * minX;
-			borderHeight = height - 2 * minY;
-		}
+	private void layoutBgRect() {
+		if (bgRect == null)
+			return;
+		float borderWeight = 3;
+		float borderRadius = Math.max(height / 9, 10);
+		borderOffset = borderWeight * 2;
+		bgRect.setBorderWeight(borderWeight);
+		bgRect.setCornerRadius(borderRadius);
+		bgRect.layout(borderOffset, borderOffset, width - borderOffset * 2,
+				height - borderOffset * 2);
+		minX = minY = bgRect.cornerRadius + borderOffset;
+		maxX = width - bgRect.cornerRadius - borderOffset;
+		maxY = height - bgRect.cornerRadius - borderOffset;
+		borderWidth = width - 2 * minX;
+		borderHeight = height - 2 * minY;
 	}
-	
-	public void layout(View parent, float x, float y, float width,
-			float height) {
+
+	public void layout(View parent, float x, float y, float width, float height) {
 		this.parent = parent;
 		setDimensions(width, height);
 		setPosition(x, y);
+		layoutBgRect();
 	}
 
 	protected View findChildAt(float x, float y) {
@@ -396,6 +393,15 @@ public abstract class View implements Comparable<View> {
 	public float clipY(float y) {
 		return y < minY ? minY : (y > maxY ? maxY : y);
 	}
+
+	public void setStrokeColor(float[] strokeColor) {
+		this.strokeColor = strokeColor;
+	}
+	
+	public float[] getStrokeColor() {
+		return strokeColor;
+	}
+
 
 	@Override
 	public int compareTo(View another) {

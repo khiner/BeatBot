@@ -170,11 +170,6 @@ public class AdsrView extends TouchableView {
 	}
 
 	@Override
-	protected void loadIcons() {
-		// parent
-	}
-
-	@Override
 	public void draw() {
 		drawPoint(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(0),
 				adsrPointVb.get(1));
@@ -220,11 +215,6 @@ public class AdsrView extends TouchableView {
 
 	@Override
 	protected void createChildren() {
-		initBgRect(Colors.VIEW_BG, Colors.VOLUME);
-	}
-
-	@Override
-	public void layoutChildren() {
-		layoutBgRect(3, height / 8);
+		initBgRect(null, Colors.VIEW_BG, Colors.VOLUME);
 	}
 }

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.microedition.khronos.opengles.GL10;
-import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.MidiManager;
@@ -235,8 +234,8 @@ public class MidiView extends ClickableView {
 	}
 
 	private void drawAllMidiNotes() {
-		unselectedRectangles.draw((GL11) gl, MidiNote.BORDER_WIDTH);
-		selectedRectangles.draw((GL11) gl, MidiNote.BORDER_WIDTH);
+		unselectedRectangles.draw(MidiNote.BORDER_WIDTH);
+		selectedRectangles.draw(MidiNote.BORDER_WIDTH);
 	}
 
 	private void updateTickFillRect() {
@@ -393,7 +392,7 @@ public class MidiView extends ClickableView {
 				/ (float) TickWindowHelper.getNumTicks(), 1);
 
 		// draws background and loop-background in one call
-		bgShapeGroup.draw((GL11) gl, -1);
+		bgShapeGroup.draw(-1);
 
 		push();
 
@@ -409,7 +408,7 @@ public class MidiView extends ClickableView {
 		pop();
 
 		// draws tick rect and loop rect in one call
-		tickBarShapeGroup.draw((GL11) gl, 2);
+		tickBarShapeGroup.draw(2);
 
 		drawSelectRegion();
 		drawLoopMarker();
@@ -881,15 +880,5 @@ public class MidiView extends ClickableView {
 			MidiManager.deleteNote(touchedNote);
 			stateChanged = true;
 		}
-	}
-
-	@Override
-	protected void createChildren() {
-		// leaf child - no children
-	}
-
-	@Override
-	public void layoutChildren() {
-		// leaf child - no children
 	}
 }

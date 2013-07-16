@@ -1,7 +1,5 @@
 package com.kh.beatbot.ui.view.page;
 
-import javax.microedition.khronos.opengles.GL11;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,7 +23,7 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
-import com.kh.beatbot.ui.view.View;
+import com.kh.beatbot.ui.view.TextView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
 import com.kh.beatbot.ui.view.control.Seekbar;
@@ -105,7 +103,7 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 	// levels attrs
 	protected Seekbar levelBar;
 	protected ToggleButton volumeToggle, panToggle, pitchToggle;
-	protected ToggleButton effectLabel;
+	protected TextView effectLabel;
 	protected boolean masterMode = false;
 
 	protected ShapeGroup labelGroup;
@@ -113,9 +111,6 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 	// effects attrs
 	protected DraggableLabelList effectLabelList;
 	protected String[] effectNames;
-
-	public void init() {
-	}
 
 	@Override
 	public void update() {
@@ -263,10 +258,7 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 
 	@Override
 	public void draw() {
-		push();
-		translate(-absoluteX, -absoluteY);
-		labelGroup.draw((GL11) View.gl, 2);
-		pop();
+		labelGroup.draw(this, 2);
 	}
 
 	@Override

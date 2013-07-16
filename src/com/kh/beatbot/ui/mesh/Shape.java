@@ -1,9 +1,6 @@
 package com.kh.beatbot.ui.mesh;
 
-import javax.microedition.khronos.opengles.GL11;
-
 import com.kh.beatbot.ui.Drawable;
-import com.kh.beatbot.ui.view.View;
 
 public abstract class Shape extends Drawable {
 	public static final float ¹ = (float) Math.PI;
@@ -103,7 +100,7 @@ public abstract class Shape extends Drawable {
 	@Override
 	public void draw(float x, float y, float width, float height) {
 		if (shouldDraw) {
-			group.draw((GL11)View.gl, borderWeight);
+			group.draw(borderWeight);
 		}
 	}
 }

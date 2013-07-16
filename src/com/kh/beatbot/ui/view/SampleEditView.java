@@ -312,19 +312,4 @@ public class SampleEditView extends TouchableView {
 			scroll(x);
 		}
 	}
-
-	@Override
-	protected void loadIcons() {
-		// no icons
-	}
-
-	@Override
-	protected void createChildren() {
-		// no children
-	}
-
-	@Override
-	public void layoutChildren() {
-		// no children to layout
-	}
 }

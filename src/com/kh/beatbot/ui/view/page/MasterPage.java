@@ -2,11 +2,12 @@ package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.view.BpmView;
+import com.kh.beatbot.ui.view.TextView;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class MasterPage extends LevelsFXPage {
 
-	private ToggleButton bpmLabel;
+	private TextView bpmLabel;
 	private BpmView bpmView;
 	
 	public void setBPM(float bpm) {

@@ -21,7 +21,6 @@ public class TrackPage extends LevelsFXPage {
 		deleteButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				// TODO if (MainActivity.prompt)
 				TrackManager.deleteCurrTrack();
 			}
 		});

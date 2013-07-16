@@ -47,16 +47,6 @@ public class TrackButtonRow extends TouchableView {
 	}
 
 	@Override
-	public void init() {
-		// nothing to do
-	}
-
-	@Override
-	public void draw() {
-		// parent view, no drawing
-	}
-
-	@Override
 	protected void createChildren() {
 		instrumentButton = new ToggleButton();
 		muteButton = new ToggleButton();

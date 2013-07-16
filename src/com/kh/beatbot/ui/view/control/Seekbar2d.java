@@ -37,9 +37,6 @@ public class Seekbar2d extends ControlView2dBase {
 		initLines();
 	}
 
-	protected void loadIcons() {
-		// no icons to load
-	}
 
 	@Override
 	public void init() {
@@ -62,11 +59,6 @@ public class Seekbar2d extends ControlView2dBase {
 
 	@Override
 	protected void createChildren() {
-		initBgRect(Colors.VIEW_BG, Colors.VOLUME);
-	}
-
-	@Override
-	public void layoutChildren() {
-		layoutBgRect(3, width / 15);
+		initBgRect(null, Colors.VIEW_BG, Colors.VOLUME);
 	}
 }

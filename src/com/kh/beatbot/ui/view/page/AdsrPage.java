@@ -1,7 +1,5 @@
 package com.kh.beatbot.ui.view.page;
 
-import javax.microedition.khronos.opengles.GL11;
-
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -13,6 +11,7 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.AdsrView;
+import com.kh.beatbot.ui.view.TextView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
@@ -27,7 +26,7 @@ public class AdsrPage extends Page implements OnReleaseListener,
 	private ToggleButton[] adsrButtons;
 	private AdsrView adsrView;
 	private Seekbar levelBar;
-	private ToggleButton valueLabel, paramLabel;
+	private TextView valueLabel, paramLabel;
 
 	@Override
 	public void init() {
@@ -121,10 +120,7 @@ public class AdsrPage extends Page implements OnReleaseListener,
 	@Override
 	public void draw() {
 		// draw all icon background rects in one call
-		push();
-		translate(-absoluteX, -absoluteY);
-		iconGroup.draw((GL11) View.gl, 1);
-		pop();
+		iconGroup.draw(this, 1);
 	}
 
 	@Override

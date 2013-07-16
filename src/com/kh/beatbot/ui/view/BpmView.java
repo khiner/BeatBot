@@ -32,20 +32,6 @@ public class BpmView extends ClickableView {
 		drawSegments();
 	}
 
-	protected void loadIcons() {
-		// no icons to load
-	}
-	
-	@Override
-	protected void createChildren() {
-		// leaf view
-	}
-
-	@Override
-	public void layoutChildren() {
-		// leaf view
-	}
-
 	@Override
 	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
@@ -109,7 +95,7 @@ public class BpmView extends ClickableView {
 		shortSegmentVB = makeFloatBuffer(shortSegmentBuf);
 	}
 
-	private void setText(String text) {
+	public void setText(String text) {
 		if (text.length() > 3)
 			return;
 		for (int i = 0; i < 3 - text.length(); i++) {
