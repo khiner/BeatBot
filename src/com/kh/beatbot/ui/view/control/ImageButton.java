@@ -69,7 +69,6 @@ public class ImageButton extends Button {
 
 	@Override
 	public void draw() {
-		super.draw();
 		Icon foregroundIconSource = getIcon(), bgIconSource = getBgIcon();
 
 		if (bgIconSource != null) {
@@ -79,6 +78,7 @@ public class ImageButton extends Button {
 			foregroundIconSource.draw(absoluteX + iconOffset, root.getHeight()
 					- absoluteY - height + iconOffset, iconW, iconH);
 		}
+		super.draw();
 	}
 
 	@Override

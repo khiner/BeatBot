@@ -95,7 +95,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 		// when a label becomes touched
 		newLabel.setOnPressListener(this);
 		newLabel.setOnReleaseListener(this);
-		children.add(newLabel);
+		addChild(newLabel);
 		layoutChildren();
 		newLabel.loadAllIcons();
 		return newLabel;
@@ -105,9 +105,8 @@ public class LabelList extends ClickableView implements OnPressListener,
 	// known
 	public void setLabelText(int position, String text) {
 		Label label = getLabel(position);
-		if (label == null) {
+		if (label == null)
 			return;
-		}
 		if (text.isEmpty()) {
 			label.setIcon(addIcon);
 			label.setText("ADD");
