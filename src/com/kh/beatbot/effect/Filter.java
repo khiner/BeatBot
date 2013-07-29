@@ -10,10 +10,10 @@ public class Filter extends Effect {
 	public static final int EFFECT_NUM = 3;
 	public static final int NUM_PARAMS = 4;
 	public static final ParamData[] PARAMS_DATA = {
-		new ParamData("FREQ", true, false, "Hz"),
-		new ParamData("RES", false, false, ""),
-		new ParamData("MOD RATE", true, true, "Hz"),
-		new ParamData("MOD AMT", false, false, "")
+		new ParamData("Freq", true, false, "Hz"),
+		new ParamData("Res", false, false, ""),
+		new ParamData("Mod Rate", true, true, "Hz"),
+		new ParamData("Mod Amt", false, false, "")
 	};
 	
 	static {

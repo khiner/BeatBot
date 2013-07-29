@@ -43,9 +43,9 @@ public class NoteLevelsPage extends Page {
 
 	@Override
 	protected void loadIcons() {
-		volumeToggle.setText("VOL");
-		panToggle.setText("PAN");
-		pitchToggle.setText("PIT");
+		volumeToggle.setText("Vol");
+		panToggle.setText("Pan");
+		pitchToggle.setText("Pit");
 		volumeToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.volumeBgColorSet, Colors.volumeStrokeColorSet));
 		panToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.panBgColorSet, Colors.panStrokeColorSet));
 		pitchToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.pitchBgColorSet, Colors.pitchStrokeColorSet));

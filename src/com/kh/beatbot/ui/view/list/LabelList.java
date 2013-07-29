@@ -37,7 +37,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 			super();
 			setIcon(addIcon);
 			setBgIcon(new RoundedRectIcon(null, emptyColorSet));
-			setText("ADD");
+			setText("Add");
 		}
 
 		public void setState(LabelState state) {
@@ -109,7 +109,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 			return;
 		if (text.isEmpty()) {
 			label.setIcon(addIcon);
-			label.setText("ADD");
+			label.setText("Add");
 			label.setState(LabelState.EMPTY);
 		} else {
 			label.setIcon(null);

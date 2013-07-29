@@ -11,12 +11,12 @@ public class Flanger extends Effect {
 	public static final int EFFECT_NUM = 4;
 	public static final int NUM_PARAMS = 6;
 	public static final ParamData[] PARAMS_DATA = {
-		new ParamData("TIME", true, false, "ms"),
-		new ParamData("FEEDBACK", false, false, ""),
-		new ParamData("WET", false, false, ""),
-		new ParamData("MOD RATE", true, true, "Hz"),
-		new ParamData("MOD AMT", false, false, ""),
-		new ParamData("PHASE", false, false, "")
+		new ParamData("Time", true, false, "ms"),
+		new ParamData("Feedback", false, false, ""),
+		new ParamData("Wet", false, false, ""),
+		new ParamData("Mod Rate", true, true, "Hz"),
+		new ParamData("Mod Amt", false, false, ""),
+		new ParamData("Phase", false, false, "")
 	};
 	
 	public Flanger(BaseTrack track, int position) {

@@ -19,13 +19,13 @@ public class ADSR extends Effect {
 	public static final int LOG_SCALE = 512;
 
 	public static final ParamData[] paramsData = {
-			new ParamData("ATTACK", true, false, 0, ATTACK_MAX_S, LOG_SCALE,
+			new ParamData("Attack", true, false, 0, ATTACK_MAX_S, LOG_SCALE,
 					"s"),
-			new ParamData("DECAY", true, false, 0, DECAY_MAX_S, LOG_SCALE, "s"),
-			new ParamData("SUSTAIN", false, false, ""),
-			new ParamData("RELEASE", true, false, 0, RELEASE_MAX_S, LOG_SCALE,
-					"s"), new ParamData("START", false, false, ""),
-			new ParamData("PEAK", false, false, "") };
+			new ParamData("Decay", true, false, 0, DECAY_MAX_S, LOG_SCALE, "s"),
+			new ParamData("Sustain", false, false, ""),
+			new ParamData("Release", true, false, 0, RELEASE_MAX_S, LOG_SCALE,
+					"s"), new ParamData("Start", false, false, ""),
+			new ParamData("Peak", false, false, "") };
 
 	private int currParamId = ATTACK_ID;
 

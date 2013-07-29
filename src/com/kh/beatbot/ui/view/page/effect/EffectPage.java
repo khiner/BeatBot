@@ -47,16 +47,6 @@ public class EffectPage extends TouchableView {
 	}
 
 	@Override
-	public void init() {
-		// parent
-	}
-
-	@Override
-	public void draw() {
-		// parent
-	}
-
-	@Override
 	protected void createChildren() {
 		paramsPager = new ViewPager();
 		level2d = new Seekbar2d();

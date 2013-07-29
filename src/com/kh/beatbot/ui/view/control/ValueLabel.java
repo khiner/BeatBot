@@ -1,10 +1,17 @@
 package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class ValueLabel extends ControlView1dBase {
 
 	float anchorY = 0, anchorLevel;
+	ShapeGroup shapeGroup;
+	
+	public ValueLabel(ShapeGroup shapeGroup) {
+		this.shapeGroup = shapeGroup;
+		initBgRect(shapeGroup, Colors.LABEL_VERY_LIGHT, Colors.BLACK);
+	}
 	
 	@Override
 	public void init() {

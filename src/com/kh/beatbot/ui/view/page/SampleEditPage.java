@@ -64,10 +64,10 @@ public class SampleEditPage extends Page {
 		browseButton = new ImageButton();
 		editButton = new ImageButton();
 
-		loopBeginLabel = new ImageButton();
-		loopEndLabel = new ImageButton();
-		loopBeginControl = new ValueLabel();
-		loopEndControl = new ValueLabel();
+		loopBeginLabel = new TextView();
+		loopEndLabel = new TextView();
+		loopBeginControl = new ValueLabel(labelGroup);
+		loopEndControl = new ValueLabel(labelGroup);
 				
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override
@@ -110,8 +110,6 @@ public class SampleEditPage extends Page {
 
 		loopBeginLabel.setText("Begin");
 		loopEndLabel.setText("End");
-		loopBeginControl.initBgRect(labelGroup, Colors.LABEL_VERY_LIGHT, Colors.BLACK);
-		loopEndControl.initBgRect(labelGroup, Colors.LABEL_VERY_LIGHT, Colors.BLACK);
 		addChild(previewButton);
 		addChild(loopButton);
 		addChild(reverseButton);

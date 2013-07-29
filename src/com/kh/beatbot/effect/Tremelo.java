@@ -11,9 +11,9 @@ public class Tremelo extends Effect {
 	public static final int EFFECT_NUM = 6;
 	public static final int NUM_PARAMS = 3;
 	public static final ParamData[] PARAMS_DATA = {
-		new ParamData("RATE", true, true, "Hz"),
-		new ParamData("PHASE", false, false, ""),
-		new ParamData("DEPTH", false, false, "")
+		new ParamData("Rate", true, true, "Hz"),
+		new ParamData("Phase", false, false, ""),
+		new ParamData("Depth", false, false, "")
 	};
 	
 	public Tremelo(BaseTrack track, int position) {

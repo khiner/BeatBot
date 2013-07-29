@@ -35,37 +35,29 @@
 	</string-array>
 	<string name="default_midi_file_name">MyMidi</string>
 
-	<string name="master">MASTER</string>
-	<string name="track">TRACK</string>
-	<string name="select">SELECT</string>
-	<string name="levels">LEVELS</string>
-	<string name="edit">EDIT</string>
-	<string name="effects">EFFECTS</string>
-	<string name="threshold">THRESH</string>
-	
 	<string name="sample_edit_activity">Sample Edit</string>
 	<string name="preview_sample">Preview</string>
 	<string name="loop_sample">Loop Sample</string>
 	<string name="adsr">ADSR</string>
 	<string name="reverse">Reverse</string>
 	<string name="normalize">Normalize</string>
-	<string name="chorus">CHORUS</string>
-	<string name="decimate">CRUSH</string>
-	<string name="delay">DELAY</string>
-	<string name="flanger">FLANGER</string>
-	<string name="filter">FILTER</string>
-	<string name="reverb">REVERB</string>
-	<string name="tremelo">TREMELO</string>
+	<string name="chorus">Chorus</string>
+	<string name="decimate">Crush</string>
+	<string name="delay">Delay</string>
+	<string name="flanger">Flanger</string>
+	<string name="filter">Filter</string>
+	<string name="reverb">Reverb</string>
+	<string name="tremelo">Tremelo</string>
 
 	<string-array name="effect_names">
-		<item name="chorus">CHORUS</item>
-		<item name="decimate">CRUSH</item>
-		<item name="delay">DELAY</item>>
-		<item name="flanger">FLANGER</item>
-		<item name="filter">FILTER</item>
-		<item name="reverb">REVERB</item>
-		<item name="tremelo">TREMELO</item>
-		<item name="none">NONE</item>
+		<item name="chorus">Chorus</item>
+		<item name="decimate">Crush</item>
+		<item name="delay">Delay</item>>
+		<item name="flanger">Flanger</item>
+		<item name="filter">Filter</item>
+		<item name="reverb">Reverb</item>
+		<item name="tremelo">Tremelo</item>
+		<item name="none">None</item>
 	</string-array>
 	
 </resources>

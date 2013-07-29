@@ -86,7 +86,7 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 		@Override
 		public void labelClicked(String text, int position) {
 			lastClickedPos = position;
-			if (text.isEmpty() || text.equals("ADD")) {
+			if (text.isEmpty() || text.equalsIgnoreCase("Add")) {
 				selectEffectAlert.show();
 			} else {
 				launchEffectIntent(text, position, false);
@@ -244,10 +244,10 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 
 	@Override
 	protected void loadIcons() {
-		effectLabel.setText("EFFECTS");
-		volumeToggle.setText("VOL");
-		panToggle.setText("PAN");
-		pitchToggle.setText("PIT");
+		effectLabel.setText("Effects");
+		volumeToggle.setText("Vol");
+		panToggle.setText("Pan");
+		pitchToggle.setText("Pit");
 		volumeToggle.setBgIcon(new RoundedRectIcon(labelGroup,
 				Colors.volumeBgColorSet, Colors.volumeStrokeColorSet));
 		panToggle.setBgIcon(new RoundedRectIcon(labelGroup,
@@ -264,7 +264,7 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 	@Override
 	protected void createChildren() {
 		labelGroup = new ShapeGroup();
-		effectLabel = new ToggleButton();
+		effectLabel = new TextView();
 		levelBar = new Seekbar();
 		levelBar.addLevelListener(this);
 		volumeToggle = new ToggleButton();

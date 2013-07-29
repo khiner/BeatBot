@@ -3,7 +3,6 @@ package com.kh.beatbot.ui.view.page;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.view.BpmView;
 import com.kh.beatbot.ui.view.TextView;
-import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class MasterPage extends LevelsFXPage {
 
@@ -23,7 +22,7 @@ public class MasterPage extends LevelsFXPage {
 	@Override
 	public void createChildren() {
 		super.createChildren();
-		bpmLabel = new ToggleButton();
+		bpmLabel = new TextView();
 		bpmView = new BpmView();
 		addChild(bpmView);
 		addChild(bpmLabel);

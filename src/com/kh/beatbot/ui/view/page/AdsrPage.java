@@ -12,24 +12,26 @@ import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.AdsrView;
 import com.kh.beatbot.ui.view.TextView;
-import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
 import com.kh.beatbot.ui.view.control.Seekbar;
 import com.kh.beatbot.ui.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.control.ValueLabel;
 
 public class AdsrPage extends Page implements OnReleaseListener,
 		Level1dListener {
 
-	private static ShapeGroup iconGroup = new ShapeGroup();
+	private ShapeGroup iconGroup = new ShapeGroup();
 
 	private ToggleButton[] adsrButtons;
 	private AdsrView adsrView;
 	private Seekbar levelBar;
-	private TextView valueLabel, paramLabel;
+	private TextView paramLabel;
+	private ValueLabel valueLabel;
 
 	@Override
 	public void init() {
+		super.init();
 		updateLevelBar();
 		updateParamView();
 	}
@@ -56,7 +58,8 @@ public class AdsrPage extends Page implements OnReleaseListener,
 	}
 
 	private void updateLabel() {
-		paramLabel.setText(TrackManager.currTrack.adsr.getCurrParam().getName());
+		paramLabel
+				.setText(TrackManager.currTrack.adsr.getCurrParam().getName());
 	}
 
 	private void updateValueLabel() {
@@ -79,13 +82,6 @@ public class AdsrPage extends Page implements OnReleaseListener,
 		adsrView.update();
 		updateValueLabel();
 	}
-
-	/**
-	 * Layout and Measure handled here since nested weights are needed, and they
-	 * are very expensive. ___________________________________________ | |Label|
-	 * A | D | S | R |PEAK_| | ADSR |_____|___|___|___|___|START| | VIEW | VAL
-	 * |=========<>--------- | |_______________|_____|_____________________|
-	 */
 
 	@Override
 	protected void loadIcons() {
@@ -119,7 +115,6 @@ public class AdsrPage extends Page implements OnReleaseListener,
 
 	@Override
 	public void draw() {
-		// draw all icon background rects in one call
 		iconGroup.draw(this, 1);
 	}
 
@@ -128,8 +123,8 @@ public class AdsrPage extends Page implements OnReleaseListener,
 		adsrView = new AdsrView();
 		levelBar = new Seekbar();
 		levelBar.addLevelListener(this);
-		paramLabel = new ToggleButton();
-		valueLabel = new ToggleButton();
+		paramLabel = new TextView();
+		valueLabel = new ValueLabel(iconGroup);
 		adsrButtons = new ToggleButton[ADSR.NUM_PARAMS];
 		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i] = new ToggleButton();
@@ -140,31 +135,23 @@ public class AdsrPage extends Page implements OnReleaseListener,
 		addChild(levelBar);
 		addChild(paramLabel);
 		addChild(valueLabel);
-		for (ToggleButton adsrButton : adsrButtons)
+		for (ToggleButton adsrButton : adsrButtons) {
 			addChild(adsrButton);
-	}
-
-	public void drawAll() {
-		draw();
-		for (View child : children) {
-			push();
-			translate(child.x, child.y);
-			child.drawAll();
-			pop();
 		}
 	}
 
 	@Override
 	public void layoutChildren() {
 		float thirdHeight = height / 3;
-		float pos = width - thirdHeight * adsrButtons.length;
-		float labelWidth = adsrButtons.length * thirdHeight / 2;
+		float pos = width - thirdHeight * (adsrButtons.length + 1);
+		float labelWidth = (width - pos) / 2;
 		adsrView.layout(this, 0, 0, pos, height);
 		paramLabel.layout(this, pos, thirdHeight, labelWidth, thirdHeight);
 		valueLabel.layout(this, pos + labelWidth, thirdHeight, labelWidth,
 				thirdHeight);
-		levelBar.layout(this, pos, thirdHeight * 2, labelWidth * 2, thirdHeight);
-		pos = width - thirdHeight * adsrButtons.length;
+		pos += thirdHeight / 2;
+		levelBar.layout(this, pos, thirdHeight * 2, thirdHeight
+				* adsrButtons.length, thirdHeight);
 		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i].layout(this, pos, 0, thirdHeight, thirdHeight);
 			pos += thirdHeight;

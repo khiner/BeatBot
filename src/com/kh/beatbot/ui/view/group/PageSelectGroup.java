@@ -164,9 +164,9 @@ public class PageSelectGroup extends TouchableView {
 			pageButtons[i].setBgIcon(new RoundedRectIcon(roundedRectGroup,
 					Colors.labelBgColorSet, Colors.labelStrokeColorSet));
 		}
-		pageButtons[TRACK_PAGE_ID].setText("TRACK");
+		pageButtons[TRACK_PAGE_ID].setText("Track");
 		pageButtons[ADSR_PAGE_ID].setText("ADSR");
-		pageButtons[MASTER_PAGE_ID].setText("MASTER");
+		pageButtons[MASTER_PAGE_ID].setText("Master");
 	}
 
 	@Override

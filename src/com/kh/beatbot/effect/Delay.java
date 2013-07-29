@@ -10,10 +10,10 @@ public class Delay extends Effect {
 	public static final int EFFECT_NUM = 2;
 	public static final int NUM_PARAMS = 4;
 	public static final ParamData[] PARAMS_DATA = {
-		new ParamData("TIME LEFT", true, true, "ms"),
-		new ParamData("TIME RIGHT", true, true, "ms"),
-		new ParamData("FEEDBACK", false, false, ""),
-		new ParamData("WET", false, false, "")
+		new ParamData("Time Left", true, true, "ms"),
+		new ParamData("Time Right", true, true, "ms"),
+		new ParamData("Feedback", false, false, ""),
+		new ParamData("Wet", false, false, "")
 	};
 
 	// keep track of what right channel was before linking
