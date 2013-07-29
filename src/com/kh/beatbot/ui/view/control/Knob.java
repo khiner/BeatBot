@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.view.control;
 
 import java.nio.FloatBuffer;
 
+import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.ui.color.Colors;
 
 public class Knob extends ControlView1dBase {
@@ -35,8 +36,8 @@ public class Knob extends ControlView1dBase {
 		// level background
 		drawTriangleStrip(circleVb, Colors.VIEW_BG);
 		// main selection
-		drawTriangleStrip(circleVb, selected ? Colors.RED : levelColor,
-				drawIndex);
+		drawTriangleStrip(circleVb, selected ? Colors.LABEL_SELECTED
+				: levelColor, drawIndex);
 	}
 
 	private void updateDrawIndex() {
@@ -64,7 +65,7 @@ public class Knob extends ControlView1dBase {
 			theta += ¹;
 		// convert to level - remember, min theta is ¹/4, max is 7¹/8
 		float level = (4 * theta / ¹ - 1) / 6;
-		return level > 0 ? (level < 1 ? level : 1) : 0;
+		return GeneralUtils.clipToUnit(level);
 	}
 
 	@Override

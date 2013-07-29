@@ -92,18 +92,15 @@ public class AdsrView extends TouchableView {
 	}
 
 	private float xToAttack(float x) {
-		float unitX = unitX(x) * 3;
-		return unitX > 0 ? (unitX < 1 ? unitX : 1) : 0;
+		return GeneralUtils.clipToUnit(unitX(x) * 3);
 	}
 
 	private float xToDecay(float x) {
-		float decay = unitX(x - getAttackX()) * 3;
-		return decay > 0 ? (decay < 1 ? decay : 1) : 0;
+		return GeneralUtils.clipToUnit(unitX(x - getAttackX()) * 3);
 	}
 
 	private float xToRelease(float x) {
-		float unitX = (unitX(x) - 2f / 3f) * 3;
-		return unitX > 0 ? (unitX < 1 ? unitX : 1) : 0;
+		return GeneralUtils.clipToUnit((unitX(x) - 2f / 3f) * 3);
 	}
 
 	private void deselectAdsrPoint(int id) {

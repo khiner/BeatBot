@@ -55,7 +55,6 @@ public class PageSelectGroup extends TouchableView {
 	}
 
 	public void updateAdsrPage() {
-		adsrPage.updateLevelBar();
 		adsrPage.updateParamView();
 	}
 

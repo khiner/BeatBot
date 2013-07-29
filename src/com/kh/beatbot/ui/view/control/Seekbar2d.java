@@ -11,7 +11,7 @@ public class Seekbar2d extends ControlView2dBase {
 
 	public Seekbar2d() {
 		super();
-		selectColor = Colors.RED;
+		selectColor = Colors.LABEL_SELECTED;
 	}
 
 	protected float xToLevel(float x) {

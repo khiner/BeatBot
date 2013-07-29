@@ -50,4 +50,8 @@ public class GeneralUtils {
 		}
 		return array;
 	}
+	
+	public static float clipToUnit(float value) {
+		return value > 0 ? (value < 1 ? value: 1) : 0;
+	}
 }

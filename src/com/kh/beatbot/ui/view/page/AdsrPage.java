@@ -11,40 +11,28 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.AdsrView;
-import com.kh.beatbot.ui.view.TextView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
-import com.kh.beatbot.ui.view.control.Seekbar;
+import com.kh.beatbot.ui.view.control.SeekbarParamControl;
 import com.kh.beatbot.ui.view.control.ToggleButton;
-import com.kh.beatbot.ui.view.control.ValueLabel;
 
-public class AdsrPage extends Page implements OnReleaseListener,
-		Level1dListener {
+public class AdsrPage extends Page implements OnReleaseListener {
 
 	private ShapeGroup iconGroup = new ShapeGroup();
-
 	private ToggleButton[] adsrButtons;
 	private AdsrView adsrView;
-	private Seekbar levelBar;
-	private TextView paramLabel;
-	private ValueLabel valueLabel;
+	private SeekbarParamControl paramControl;
 
 	@Override
 	public void init() {
 		super.init();
-		updateLevelBar();
 		updateParamView();
 	}
 
 	@Override
 	public void update() {
 		adsrView.update();
-		updateLevelBar();
 		updateParamView();
-	}
-
-	public void updateLevelBar() {
-		levelBar.setViewLevel(TrackManager.currTrack.adsr.getCurrParam().viewLevel);
 	}
 
 	public void updateParamView() {
@@ -53,18 +41,7 @@ public class AdsrPage extends Page implements OnReleaseListener,
 		for (ToggleButton adsrButton : adsrButtons) {
 			adsrButton.setChecked(adsrButton.getId() == paramId);
 		}
-		updateLabel();
-		updateValueLabel();
-	}
-
-	private void updateLabel() {
-		paramLabel
-				.setText(TrackManager.currTrack.adsr.getCurrParam().getName());
-	}
-
-	private void updateValueLabel() {
-		valueLabel.setText(TrackManager.currTrack.adsr.getCurrParam()
-				.getFormattedValueString());
+		paramControl.setParam(TrackManager.currTrack.adsr.getCurrParam());
 	}
 
 	@Override
@@ -72,15 +49,7 @@ public class AdsrPage extends Page implements OnReleaseListener,
 		int paramId = button.getId();
 		// set the current parameter so we know what to do with SeekBar events.
 		TrackManager.currTrack.adsr.setCurrParam(paramId);
-		updateLevelBar();
 		updateParamView();
-	}
-
-	@Override
-	public void onLevelChange(ControlViewBase levelListenable, float level) {
-		TrackManager.currTrack.adsr.setCurrParamLevel(level);
-		adsrView.update();
-		updateValueLabel();
 	}
 
 	@Override
@@ -121,10 +90,15 @@ public class AdsrPage extends Page implements OnReleaseListener,
 	@Override
 	protected void createChildren() {
 		adsrView = new AdsrView();
-		levelBar = new Seekbar();
-		levelBar.addLevelListener(this);
-		paramLabel = new TextView();
-		valueLabel = new ValueLabel(iconGroup);
+		paramControl = new SeekbarParamControl();
+		paramControl.addLevelListener(new Level1dListener() {
+			@Override
+			public void onLevelChange(ControlViewBase levelListenable,
+					float level) {
+				TrackManager.currTrack.adsr.setCurrParamLevel(level);
+				adsrView.update();
+			}
+		});
 		adsrButtons = new ToggleButton[ADSR.NUM_PARAMS];
 		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i] = new ToggleButton();
@@ -132,9 +106,7 @@ public class AdsrPage extends Page implements OnReleaseListener,
 			adsrButtons[i].setOnReleaseListener(this);
 		}
 		addChild(adsrView);
-		addChild(levelBar);
-		addChild(paramLabel);
-		addChild(valueLabel);
+		addChild(paramControl);
 		for (ToggleButton adsrButton : adsrButtons) {
 			addChild(adsrButton);
 		}
@@ -144,14 +116,9 @@ public class AdsrPage extends Page implements OnReleaseListener,
 	public void layoutChildren() {
 		float thirdHeight = height / 3;
 		float pos = width - thirdHeight * (adsrButtons.length + 1);
-		float labelWidth = (width - pos) / 2;
 		adsrView.layout(this, 0, 0, pos, height);
-		paramLabel.layout(this, pos, thirdHeight, labelWidth, thirdHeight);
-		valueLabel.layout(this, pos + labelWidth, thirdHeight, labelWidth,
-				thirdHeight);
+		paramControl.layout(this, pos, thirdHeight, width - pos, 2 * thirdHeight);
 		pos += thirdHeight / 2;
-		levelBar.layout(this, pos, thirdHeight * 2, thirdHeight
-				* adsrButtons.length, thirdHeight);
 		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i].layout(this, pos, 0, thirdHeight, thirdHeight);
 			pos += thirdHeight;

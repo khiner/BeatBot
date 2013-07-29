@@ -45,7 +45,9 @@ public class ToggleKnob extends Knob {
 			@Override
 			public void onRelease(Button button) {
 				for (Level1dListener listener : levelListeners) {
-					((OnReleaseListener) listener).onRelease(centerButton);
+					if (listener instanceof OnReleaseListener) {
+						((OnReleaseListener) listener).onRelease(centerButton);
+					}
 				}
 			}
 		});

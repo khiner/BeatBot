@@ -745,8 +745,6 @@ public class MidiView extends ClickableView {
 				if (noteAlreadySelected) {
 					// note is selected with one pointer, but this pointer
 					// did not select a note. start pinching all selected notes.
-					MidiNote touchedNote = touchedNotes.values().iterator()
-							.next();
 					int leftId = pointerIdToPos.get(0).x <= pointerIdToPos
 							.get(1).x ? 0 : 1;
 					int rightId = (leftId + 1) % 2;

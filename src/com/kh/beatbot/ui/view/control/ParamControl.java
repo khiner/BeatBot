@@ -1,53 +1,71 @@
 package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.listener.Level1dListener;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.view.TextView;
 import com.kh.beatbot.ui.view.TouchableView;
 
-public class ParamControl extends TouchableView {
-	public Knob knob;
-	private ImageButton label, valueLabel;
-	private boolean beatSync;
+public abstract class ParamControl extends TouchableView implements Level1dListener {
+	protected static ShapeGroup shapeGroup;
 	
-	public ParamControl(boolean beatSync) {
-		this.beatSync = beatSync;
-		createChildren();
+	protected ControlView1dBase levelControl;
+	protected ValueLabel valueLabel;
+	protected TextView label;
+	protected Param param;
+	
+	public ParamControl() {
+		if (shapeGroup == null) {
+			shapeGroup = new ShapeGroup();
+		}
+		label = new TextView();
+		valueLabel = new ValueLabel(null, param);
+		addChild(label);
+		addChild(valueLabel);
+	}
+	
+	@Override
+	public void setId(int id) {
+		super.setId(id);
+		levelControl.setId(id);
+		valueLabel.setId(id);
 	}
 	
 	public void setParam(Param param) {
-		knob.setViewLevel(param.viewLevel);
-		if (beatSync) {
-			((ToggleKnob)knob).setBeatSync(param.beatSync);
-		}
-		setLabel(param.getName());
-		updateValueLabel(param);
+		this.param = param;
+		valueLabel.setParam(param);
+		levelControl.setViewLevel(param.viewLevel);
+		label.setText(param.getName());
 	}
 	
-	public void updateValueLabel(Param param) {
-		setValueLabel(param.getFormattedValueString());
+	public void setViewLevel(float viewLevel) {
+		levelControl.setViewLevel(viewLevel);
+		valueLabel.setViewLevel(viewLevel);
 	}
 	
-	private void setLabel(String label) {
-		this.label.setText(label);
-	}
-	
-	private void setValueLabel(String valueLabel) {
-		this.valueLabel.setText(valueLabel);
-	}
-
-	@Override
-	protected void createChildren() {
-		label = new ImageButton();
-		knob = beatSync ? new ToggleKnob() : new Knob();
-		valueLabel = new ImageButton();
-		addChild(label);
-		addChild(knob);
-		addChild(valueLabel);
-	}
-
 	@Override
 	public void layoutChildren() {
 		label.layout(this, 0, 0, width, height / 6);
-		knob.layout(this, 0, height / 6, width, width);
-		valueLabel.layout(this, 0, 5 * height / 6, width, height / 6);
+		levelControl.layout(this, 0, height / 6, width, width);
+		valueLabel.layout(this, 0, 4 * height / 5, width, height / 5);
+	}
+
+	public void addLevelListener(Level1dListener listener) {
+		levelControl.addLevelListener(listener);
+		valueLabel.addLevelListener(listener);
+	}
+	
+	public float getLevel() {
+		return levelControl.getLevel();
+	}
+
+	public void setLevel(float level) {
+		levelControl.setLevel(level); // only need only control to send the actual event
+	}
+
+	@Override
+	public void onLevelChange(ControlViewBase levelListenable, float level) {
+		levelControl.setViewLevel(level);
+		valueLabel.setViewLevel(level);
 	}
 }

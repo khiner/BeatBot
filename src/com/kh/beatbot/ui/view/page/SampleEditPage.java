@@ -66,8 +66,8 @@ public class SampleEditPage extends Page {
 
 		loopBeginLabel = new TextView();
 		loopEndLabel = new TextView();
-		loopBeginControl = new ValueLabel(labelGroup);
-		loopEndControl = new ValueLabel(labelGroup);
+		loopBeginControl = new ValueLabel(labelGroup, null);
+		loopEndControl = new ValueLabel(labelGroup, null);
 				
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override

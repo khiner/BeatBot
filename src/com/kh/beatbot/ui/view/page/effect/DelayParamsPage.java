@@ -7,9 +7,8 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.ParamControl;
+import com.kh.beatbot.ui.view.control.KnobParamControl;
 import com.kh.beatbot.ui.view.control.ToggleButton;
-import com.kh.beatbot.ui.view.control.ToggleKnob;
 
 public class DelayParamsPage extends EffectParamsPage {
 
@@ -40,25 +39,22 @@ public class DelayParamsPage extends EffectParamsPage {
 		linkToggle.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				ParamControl leftChannelControl = paramControls[0];
-				ParamControl rightChannelControl = paramControls[1];
-				ToggleKnob rightKnob = (ToggleKnob) rightChannelControl.knob;
-				ToggleKnob leftKnob = (ToggleKnob) leftChannelControl.knob;
+				KnobParamControl leftControl = paramControls[0];
+				KnobParamControl rightControl = paramControls[1];
 
-				float newRightChannelLevel = rightKnob.getLevel();
-				boolean newRightChannelSynced = rightKnob.isBeatSync();
+				float newRightChannelLevel = rightControl.getLevel();
+				boolean newRightChannelSynced = rightControl.isBeatSync();
 
 				effect.setParamsLinked(linkToggle.isChecked());
 
 				if (effect.paramsLinked()) {
 					// y = feedback when linked
 					yParamIndex = 2;
-					((Delay) effect).rightChannelLevelMemory = rightKnob
-							.getLevel();
-					((Delay) effect).rightChannelBeatSyncMemory = rightKnob
+					((Delay) effect).rightChannelLevelMemory = newRightChannelLevel;
+					((Delay) effect).rightChannelBeatSyncMemory = rightControl
 							.isBeatSync();
-					newRightChannelLevel = leftChannelControl.knob.getLevel();
-					newRightChannelSynced = leftKnob.isBeatSync();
+					newRightChannelLevel = leftControl.getLevel();
+					newRightChannelSynced = leftControl.isBeatSync();
 				} else {
 					// y = right delay time when not linked
 					yParamIndex = 1;
@@ -67,8 +63,8 @@ public class DelayParamsPage extends EffectParamsPage {
 						newRightChannelLevel = ((Delay) effect).rightChannelLevelMemory;
 				}
 				effect.getParam(1).beatSync = newRightChannelSynced;
-				rightKnob.setBeatSync(newRightChannelSynced);
-				rightKnob.setLevel(newRightChannelLevel);
+				rightControl.setBeatSync(newRightChannelSynced);
+				rightControl.setLevel(newRightChannelLevel);
 			}
 		});
 

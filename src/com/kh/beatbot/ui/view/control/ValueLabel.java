@@ -1,55 +1,62 @@
 package com.kh.beatbot.ui.view.control;
 
+import com.kh.beatbot.GeneralUtils;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class ValueLabel extends ControlView1dBase {
+	private float anchorY = 0, anchorLevel;
+	private Param param;
 
-	float anchorY = 0, anchorLevel;
-	ShapeGroup shapeGroup;
-	
-	public ValueLabel(ShapeGroup shapeGroup) {
-		this.shapeGroup = shapeGroup;
-		initBgRect(shapeGroup, Colors.LABEL_VERY_LIGHT, Colors.BLACK);
+	public ValueLabel(ShapeGroup shapeGroup, Param param) {
+		initBgRect(shapeGroup, Colors.LABEL_VERY_LIGHT, Colors.VOLUME);
 	}
-	
+
 	@Override
 	public void init() {
 		super.init();
 		setStrokeColor(Colors.BLACK);
-		setText(formatLevel());
+		update();
 	}
-	
+
+	public void setParam(Param param) {
+		this.param = param;
+		update();
+	}
+
+	public void update() {
+		if (param != null) {
+			setText(param.getFormattedValueString());
+		}
+	}
+
 	@Override
 	protected float posToLevel(float x, float y) {
-		return anchorLevel + (anchorY - y) / (root.getHeight() * 4);
+		return GeneralUtils.clipToUnit(anchorLevel + (anchorY - y)
+				/ (root.getHeight() * 2));
 	}
 
 	public void setViewLevel(float level) {
 		super.setViewLevel(level);
-		setText(formatLevel());
+		if (param != null) {
+			param.setLevel(level);
+		} else {
+			setText(String.format("%.2f", level));
+		}
+		update();
 	}
 
-	@Override
-	protected void loadIcons() {
-		if (bgRect != null)
-			bgRect.setFillColor(Colors.LABEL_VERY_LIGHT);
-	}
-	
 	@Override
 	public void handleActionDown(int id, float x, float y) {
 		anchorY = y;
 		anchorLevel = level;
-		bgRect.setFillColor(Colors.VOLUME_LIGHT);
+		bgRect.setFillColor(Colors.LABEL_SELECTED);
 		super.handleActionDown(id, x, y);
 	}
-	
+
 	public void handleActionUp(int id, float x, float y) {
 		bgRect.setFillColor(Colors.LABEL_VERY_LIGHT);
 		super.handleActionUp(id, x, y);
-	}
-	
-	private String formatLevel() {
-		return String.format("%.2f", level);
 	}
 }
