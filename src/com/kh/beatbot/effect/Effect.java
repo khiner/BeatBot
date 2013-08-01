@@ -36,9 +36,13 @@ public abstract class Effect implements Comparable<Effect> {
 	}
 
 	public abstract int getNum();
-	public abstract int numParams();
 	public abstract String getName();
-	public abstract ParamData[] getParamsData();
+	
+	public int getNumParams() {
+		return params.size();
+	}
+	
+	protected abstract void initParams();
 	
 	public void setOn(boolean on) {
 		this.on = on;
@@ -104,14 +108,6 @@ public abstract class Effect implements Comparable<Effect> {
 		for (int i = 0; i < params.size(); i++) {
 			Param param = params.get(i);
 			setEffectParam(track.getId(), position, i, param.level);
-		}
-	}
-	
-	protected void initParams() {
-		if (params.isEmpty()) {
-			for (ParamData paramData : getParamsData()) {
-				params.add(new Param(paramData));
-			}
 		}
 	}
 	

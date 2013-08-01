@@ -3,42 +3,58 @@ package com.kh.beatbot.effect;
 import com.kh.beatbot.manager.MidiManager;
 
 public class Param {
-	private ParamData paramData;
+	public float addValue, scaleValue, logScaleValue;
+	public boolean hz, beatSyncable, logScale;
+	public String unitString, name;
+	
 	public float level, viewLevel;
 	public int topBeatNum = 1, bottomBeatNum = 1;
 	public boolean beatSync;
 
-	public Param(ParamData paramData) {
-		this.paramData = paramData;
-		this.beatSync = paramData.beatSyncable;
+	public Param(String name, boolean logScale, boolean beatSyncable,
+			float addValue, float scaleValue, float logScaleValue, String unitString) {
+		this.name = name;
+		this.beatSync = beatSyncable;
+		this.logScale = logScale;
+		this.logScaleValue = logScaleValue;
+		this.addValue = addValue;
+		this.scaleValue = scaleValue;
+		this.unitString = unitString;
+		this.hz = unitString.equalsIgnoreCase("hz");
 		viewLevel = 0.5f;
 		setLevel(viewLevel);
 	}
 
+	public Param(String name, boolean logScale, boolean beatSyncable,
+			String unitString) {
+		this(name, logScale, beatSyncable, 0, 1, 8, unitString);
+	}
+	
 	public String getName() {
-		return paramData.name;
+		return name;
 	}
 	
 	public String getFormattedValueString() {
-		if (beatSync)
+		if (beatSync) {
 			return topBeatNum + (bottomBeatNum == 1 ? "" : "/" + bottomBeatNum);
-		else
-			return String.format("%.2f", level) + " " + paramData.unitString;
+		} else {
+			return String.format("%.2f", level) + " " + unitString;
+		}
 	}
 
 	public void setLevel(float level) {
 		if (beatSync) {
 			this.level = quantizeToBeat(level);
-		} else if (paramData.logScale) {
-			this.level = paramData.addValue + paramData.scaleValue * logScaleLevel(level);
+		} else if (logScale) {
+			this.level = addValue + scaleValue * logScaleLevel(level);
 		} else {
-			this.level = paramData.addValue + paramData.scaleValue * level;
+			this.level = addValue + scaleValue * level;
 		}
 	}
 
 	private float logScaleLevel(float level) {
-		float scaled = (float) (Math.pow(paramData.logScaleValue + 1, level) - 1) / paramData.logScaleValue; 
-		if (paramData.hz)
+		float scaled = (float) (Math.pow(logScaleValue + 1, level) - 1) / logScaleValue; 
+		if (hz)
 			scaled *= 32;
 		return scaled;
 	}
@@ -47,9 +63,7 @@ public class Param {
 		topBeatNum = getTopBeatNum((int) Math.ceil(level * 14));
 		bottomBeatNum = getBottomBeatNum((int) Math.ceil(level * 14));
 		float quantized = (60f / (MidiManager.getBPM()) * ((float) topBeatNum / (float) bottomBeatNum));
-		if (paramData.hz)
-			quantized = 1 / quantized;
-		return quantized;
+		return hz ? 1 / quantized : quantized;
 	}
 	
 	private static int getTopBeatNum(int which) {

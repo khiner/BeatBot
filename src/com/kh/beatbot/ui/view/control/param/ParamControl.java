@@ -1,10 +1,13 @@
-package com.kh.beatbot.ui.view.control;
+package com.kh.beatbot.ui.view.control.param;
 
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.TextView;
 import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.control.ControlView1dBase;
+import com.kh.beatbot.ui.view.control.ControlViewBase;
+import com.kh.beatbot.ui.view.control.ValueLabel;
 
 public abstract class ParamControl extends TouchableView implements Level1dListener {
 	protected static ShapeGroup shapeGroup;
@@ -65,7 +68,6 @@ public abstract class ParamControl extends TouchableView implements Level1dListe
 
 	@Override
 	public void onLevelChange(ControlViewBase levelListenable, float level) {
-		levelControl.setViewLevel(level);
-		valueLabel.setViewLevel(level);
+		setViewLevel(level);
 	}
 }

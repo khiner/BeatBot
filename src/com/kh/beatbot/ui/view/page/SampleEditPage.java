@@ -1,6 +1,7 @@
 package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.activity.BeatBotActivity;
+import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.DirectoryManager;
@@ -13,6 +14,7 @@ import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.SampleEditView;
 import com.kh.beatbot.ui.view.TextView;
 import com.kh.beatbot.ui.view.control.Button;
+import com.kh.beatbot.ui.view.control.ControlViewBase;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.ValueLabel;
@@ -68,7 +70,29 @@ public class SampleEditPage extends Page {
 		loopEndLabel = new TextView();
 		loopBeginControl = new ValueLabel(labelGroup, null);
 		loopEndControl = new ValueLabel(labelGroup, null);
-				
+		
+		loopBeginControl.addLevelListener(new Level1dListener() {
+			@Override
+			public void onLevelChange(ControlViewBase levelListenable,
+					float level) {
+				float numSamples = loopBeginControl.getLevel() * TrackManager.currTrack.getNumSamples();
+				TrackManager.currTrack.setLoopBeginSample(numSamples);
+				sampleEdit.update();
+				loopBeginControl.setText(String.valueOf((long)numSamples));
+			}
+		});
+		
+		loopEndControl.addLevelListener(new Level1dListener() {
+			@Override
+			public void onLevelChange(ControlViewBase levelListenable,
+					float level) {
+				float numSamples = loopEndControl.getLevel() * TrackManager.currTrack.getNumSamples();
+				TrackManager.currTrack.setLoopEndSample(numSamples);
+				sampleEdit.update();
+				loopEndControl.setText(String.valueOf((long)numSamples));
+			}
+		});
+		
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override
 			public void onPress(Button button) {

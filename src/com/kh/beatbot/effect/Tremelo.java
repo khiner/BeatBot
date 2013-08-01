@@ -8,13 +8,11 @@ import com.kh.beatbot.activity.BeatBotActivity;
 public class Tremelo extends Effect {
 
 	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.tremelo);
-	public static final int EFFECT_NUM = 6;
-	public static final int NUM_PARAMS = 3;
-	public static final ParamData[] PARAMS_DATA = {
-		new ParamData("Rate", true, true, "Hz"),
-		new ParamData("Phase", false, false, ""),
-		new ParamData("Depth", false, false, "")
-	};
+	public static final int EFFECT_NUM = 6, NUM_PARAMS = 3;
+
+	public Tremelo(BaseTrack track) {
+		super(track);
+	}
 	
 	public Tremelo(BaseTrack track, int position) {
 		super(track, position);
@@ -27,13 +25,11 @@ public class Tremelo extends Effect {
 	public int getNum() {
 		return EFFECT_NUM;
 	}
-
-	public int numParams() {
-		return NUM_PARAMS;
-	}
 	
 	@Override
-	public ParamData[] getParamsData() {
-		return PARAMS_DATA;
+	protected void initParams() {
+		params.add(new Param("Rate", true, true, "Hz"));
+		params.add(new Param("Phase", false, false, ""));
+		params.add(new Param("Depth", false, false, ""));
 	}
 }

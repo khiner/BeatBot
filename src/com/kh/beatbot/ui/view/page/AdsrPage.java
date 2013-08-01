@@ -13,8 +13,8 @@ import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.AdsrView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
-import com.kh.beatbot.ui.view.control.SeekbarParamControl;
 import com.kh.beatbot.ui.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.control.param.SeekbarParamControl;
 
 public class AdsrPage extends Page implements OnReleaseListener {
 

@@ -2,27 +2,27 @@ package com.kh.beatbot.ui.view.page.effect;
 
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
-import com.kh.beatbot.ui.view.control.KnobParamControl;
-import com.kh.beatbot.ui.view.control.ParamControl;
 import com.kh.beatbot.ui.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.control.param.KnobParamControl;
+import com.kh.beatbot.ui.view.control.param.ParamControl;
 import com.kh.beatbot.ui.view.page.Page;
 
-public abstract class EffectParamsPage extends TouchableView implements
+public class EffectParamsPage extends TouchableView implements
 		Level1dListener, OnReleaseListener {
 	protected KnobParamControl[] paramControls;
 	protected Effect effect;
 	protected int xParamIndex = 0, yParamIndex = 1;
 
-	protected abstract int getNumParams();
-
-	protected abstract ParamData[] getParamsData();
-
+	public EffectParamsPage(Effect effect) {
+		this.effect = effect;
+		createChildren();
+	}
+	
 	public final void setXLevel(float level) {
 		getXParamControl().setLevel(level);
 	}
@@ -44,6 +44,8 @@ public abstract class EffectParamsPage extends TouchableView implements
 
 	@Override
 	public void createChildren() {
+		if (effect == null)
+			return;
 		createParamControls();
 		for (ParamControl paramControl : paramControls) {
 			addChild(paramControl);
@@ -52,16 +54,16 @@ public abstract class EffectParamsPage extends TouchableView implements
 
 	@Override
 	public void layoutChildren() {
-		int halfParams = (getNumParams() + 1) / 2;
-		float paramW = getNumParams() <= 3 ? width / getNumParams() : width
+		int halfParams = (effect.getNumParams() + 1) / 2;
+		float paramW = effect.getNumParams() <= 3 ? width / effect.getNumParams() : width
 				/ halfParams;
 		float paramH = 3 * paramW / 2;
-		float y = getNumParams() <= 3 ? height / 2 - paramH / 2 : height / 2
+		float y = effect.getNumParams() <= 3 ? height / 2 - paramH / 2 : height / 2
 				- paramH;
-		for (int i = 0; i < getNumParams(); i++) {
+		for (int i = 0; i < effect.getNumParams(); i++) {
 			if (i == 3)
 				y += paramH;
-			int index = getNumParams() <= 3 ? i : i % halfParams;
+			int index = effect.getNumParams() <= 3 ? i : i % halfParams;
 			paramControls[i].layout(this, index * paramW, y, paramW, paramH);
 		}
 	}
@@ -106,9 +108,9 @@ public abstract class EffectParamsPage extends TouchableView implements
 	}
 
 	private void createParamControls() {
-		paramControls = new KnobParamControl[getNumParams()];
+		paramControls = new KnobParamControl[effect.getNumParams()];
 		for (int i = 0; i < paramControls.length; i++) {
-			paramControls[i] = new KnobParamControl(getParamsData()[i].beatSyncable);
+			paramControls[i] = new KnobParamControl(effect.getParam(i).beatSyncable);
 			paramControls[i].setId(i);
 			paramControls[i].addLevelListener(this);
 		}

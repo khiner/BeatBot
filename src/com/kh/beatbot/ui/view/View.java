@@ -214,7 +214,7 @@ public abstract class View implements Comparable<View> {
 	private void layoutBgRect() {
 		if (bgRect == null)
 			return;
-		float borderWeight = 3;
+		float borderWeight = 2;
 		float borderRadius = Math.max(height / 9, 10);
 		borderOffset = borderWeight * 2;
 		bgRect.setBorderWeight(borderWeight);

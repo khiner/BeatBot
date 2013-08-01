@@ -1,6 +1,8 @@
-package com.kh.beatbot.ui.view.control;
+package com.kh.beatbot.ui.view.control.param;
 
 import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.ui.view.control.Knob;
+import com.kh.beatbot.ui.view.control.ToggleKnob;
 
 public class KnobParamControl extends ParamControl {
 	

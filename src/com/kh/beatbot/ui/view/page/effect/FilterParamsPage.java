@@ -1,7 +1,6 @@
 package com.kh.beatbot.ui.view.page.effect;
 
 import com.kh.beatbot.effect.Filter;
-import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
@@ -13,6 +12,10 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class FilterParamsPage extends EffectParamsPage {
 
+	public FilterParamsPage(Filter filter) {
+		super(filter);
+	}
+	
 	private class FilterToggleListener implements OnReleaseListener {
 		@Override
 		public void onRelease(Button button) {
@@ -30,11 +33,6 @@ public class FilterParamsPage extends EffectParamsPage {
 	private ToggleButton[] filterToggles;
 	private ShapeGroup iconGroup;
 	private FilterToggleListener filterToggleListener;
-
-	@Override
-	protected int getNumParams() {
-		return Filter.NUM_PARAMS;
-	}
 
 	@Override
 	public void draw() {
@@ -66,11 +64,6 @@ public class FilterParamsPage extends EffectParamsPage {
 		filterToggles[1].setIcon(new Icon(IconResources.BANDPASS_FILTER));
 		filterToggles[2].setIcon(new Icon(IconResources.HIGHPASS_FILTER));
 		filterToggles[0].setChecked(true);
-	}
-
-	@Override
-	protected ParamData[] getParamsData() {
-		return Filter.PARAMS_DATA;
 	}
 
 	public void layoutChildren() {

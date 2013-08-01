@@ -11,6 +11,7 @@ public class ValueLabel extends ControlView1dBase {
 
 	public ValueLabel(ShapeGroup shapeGroup, Param param) {
 		initBgRect(shapeGroup, Colors.LABEL_VERY_LIGHT, Colors.VOLUME);
+		setParam(param);
 	}
 
 	@Override
@@ -41,16 +42,14 @@ public class ValueLabel extends ControlView1dBase {
 		super.setViewLevel(level);
 		if (param != null) {
 			param.setLevel(level);
-		} else {
-			setText(String.format("%.2f", level));
+			setText(param.getFormattedValueString());
 		}
-		update();
 	}
 
 	@Override
 	public void handleActionDown(int id, float x, float y) {
 		anchorY = y;
-		anchorLevel = level;
+		anchorLevel = param.viewLevel;
 		bgRect.setFillColor(Colors.LABEL_SELECTED);
 		super.handleActionDown(id, x, y);
 	}

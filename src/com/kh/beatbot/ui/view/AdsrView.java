@@ -161,7 +161,7 @@ public class AdsrView extends TouchableView {
 	public void init() {
 		initAdsrVb();
 		ADSR adsr = TrackManager.currTrack.adsr;
-		for (int i = 0; i < adsr.numParams(); i++) {
+		for (int i = 0; i < ADSR.NUM_PARAMS; i++) {
 			GLSurfaceViewBase.storeText(adsr.getParam(i).getName());
 		}
 	}

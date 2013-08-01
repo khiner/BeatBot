@@ -18,15 +18,6 @@ public class ADSR extends Effect {
 
 	public static final int LOG_SCALE = 512;
 
-	public static final ParamData[] paramsData = {
-			new ParamData("Attack", true, false, 0, ATTACK_MAX_S, LOG_SCALE,
-					"s"),
-			new ParamData("Decay", true, false, 0, DECAY_MAX_S, LOG_SCALE, "s"),
-			new ParamData("Sustain", false, false, ""),
-			new ParamData("Release", true, false, 0, RELEASE_MAX_S, LOG_SCALE,
-					"s"), new ParamData("Start", false, false, ""),
-			new ParamData("Peak", false, false, "") };
-
 	private int currParamId = ATTACK_ID;
 
 	public ADSR(BaseTrack track) {
@@ -41,17 +32,16 @@ public class ADSR extends Effect {
 		return NAME;
 	}
 
-	public int numParams() {
-		return NUM_PARAMS;
-	}
-
-	public ParamData[] getParamsData() {
-		return paramsData;
-	}
-
 	@Override
 	protected void initParams() {
-		super.initParams();
+		params.add(new Param("Attack", true, false, 0, ATTACK_MAX_S, LOG_SCALE,
+					"s"));
+		params.add(new Param("Decay", true, false, 0, DECAY_MAX_S, LOG_SCALE, "s"));
+		params.add(new Param("Sustain", false, false, ""));
+		params.add(new Param("Release", true, false, 0, RELEASE_MAX_S, LOG_SCALE,
+					"s"));
+		params.add(new Param("Start", false, false, ""));
+		params.add(new Param("Peak", false, false, ""));
 		position = -1; // native code understands that -1 == ADSR
 		setAttack(0);
 		setDecay(1);

@@ -1,6 +1,13 @@
 package com.kh.beatbot.ui.view.page.effect;
 
+import com.kh.beatbot.effect.Chorus;
+import com.kh.beatbot.effect.Decimate;
+import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.effect.Filter;
+import com.kh.beatbot.effect.Flanger;
+import com.kh.beatbot.effect.Reverb;
+import com.kh.beatbot.effect.Tremelo;
 import com.kh.beatbot.listener.Level2dListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.Icon;
@@ -20,13 +27,7 @@ public class EffectPage extends TouchableView {
 	private Seekbar2d level2d;
 	private ToggleButton toggleButton;
 
-	private ChorusParamsPage chorusPage;
-	private DecimateParamsPage decimatePage;
-	private DelayParamsPage delayPage;
-	private FilterParamsPage filterPage;
-	private FlangerParamsPage flangerPage;
-	private ReverbParamsPage reverbPage;
-	private TremeloParamsPage tremeloPage;
+	private EffectParamsPage chorusPage, decimatePage, delayPage, filterPage, flangerPage, reverbPage, tremeloPage;
 
 	public Seekbar2d getLevel2d() {
 		return level2d;
@@ -51,13 +52,13 @@ public class EffectPage extends TouchableView {
 		paramsPager = new ViewPager();
 		level2d = new Seekbar2d();
 
-		chorusPage = new ChorusParamsPage();
-		decimatePage = new DecimateParamsPage();
-		delayPage = new DelayParamsPage();
-		filterPage = new FilterParamsPage();
-		flangerPage = new FlangerParamsPage();
-		reverbPage = new ReverbParamsPage();
-		tremeloPage = new TremeloParamsPage();
+		chorusPage = new EffectParamsPage(new Chorus(null));
+		decimatePage = new EffectParamsPage(new Decimate(null));
+		delayPage = new DelayParamsPage(new Delay(null));
+		filterPage = new FilterParamsPage(new Filter(null));
+		flangerPage = new EffectParamsPage(new Flanger(null));
+		reverbPage = new EffectParamsPage(new Reverb(null));
+		tremeloPage = new EffectParamsPage(new Tremelo(null));
 
 		paramsPager.addPage(chorusPage);
 		paramsPager.addPage(decimatePage);

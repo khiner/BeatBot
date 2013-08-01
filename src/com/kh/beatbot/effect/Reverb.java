@@ -8,13 +8,11 @@ import com.kh.beatbot.activity.BeatBotActivity;
 public class Reverb extends Effect {
 
 	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.reverb);
-	public static final int EFFECT_NUM = 5;
-	public static final int NUM_PARAMS = 2;
+	public static final int EFFECT_NUM = 5, NUM_PARAMS = 2;
 	
-	public static final ParamData[] PARAMS_DATA = {
-		new ParamData("HF DAMP", false, false, ""),
-		new ParamData("FEEDBACK", false, false, "")
-	};
+	public Reverb(BaseTrack track) {
+		super(track);
+	}
 	
 	public Reverb(BaseTrack track, int position) {
 		super(track, position);
@@ -28,12 +26,9 @@ public class Reverb extends Effect {
 		return EFFECT_NUM;
 	}
 
-	public int numParams() {
-		return NUM_PARAMS;
-	}
-
 	@Override
-	public ParamData[] getParamsData() {
-		return PARAMS_DATA;
+	protected void initParams() {
+		params.add(new Param("HF DAMP", false, false, ""));
+		params.add(new Param("FEEDBACK", false, false, ""));
 	}
 }

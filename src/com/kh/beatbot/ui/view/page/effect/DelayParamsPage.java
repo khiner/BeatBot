@@ -2,23 +2,21 @@ package com.kh.beatbot.ui.view.page.effect;
 
 import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.effect.ParamData;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.KnobParamControl;
 import com.kh.beatbot.ui.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.control.param.KnobParamControl;
 
 public class DelayParamsPage extends EffectParamsPage {
 
 	private ToggleButton linkToggle;
-
-	@Override
-	protected int getNumParams() {
-		return Delay.NUM_PARAMS;
+	
+	public DelayParamsPage(Delay delay) {
+		super(delay);
 	}
-
+	
 	@Override
 	public void init() {
 		// since left/right delay times are linked by default,
@@ -75,11 +73,6 @@ public class DelayParamsPage extends EffectParamsPage {
 	public void setEffect(Effect effect) {
 		super.setEffect(effect);
 		linkToggle.setChecked(((Delay) effect).paramsLinked());
-	}
-
-	@Override
-	protected ParamData[] getParamsData() {
-		return Delay.PARAMS_DATA;
 	}
 
 	public void layoutChildren() {
