@@ -9,11 +9,10 @@ import android.view.SurfaceHolder;
 
 import com.kh.beatbot.ui.view.TouchableSurfaceView;
 import com.kh.beatbot.ui.view.TouchableView;
-import com.kh.beatbot.ui.view.View;
 
 public class GLSurfaceViewGroup extends TouchableSurfaceView {
 
-	protected View renderer;
+	protected TouchableView renderer;
 
 	public GLSurfaceViewGroup(Context context) {
 		super(context);
@@ -23,7 +22,7 @@ public class GLSurfaceViewGroup extends TouchableSurfaceView {
 		super(context, attr);
 	}
 
-	public void setBBRenderer(View renderer) {
+	public void setBBRenderer(TouchableView renderer) {
 		this.renderer = renderer;
 	}
 	
@@ -53,33 +52,23 @@ public class GLSurfaceViewGroup extends TouchableSurfaceView {
 	 * child.
 	 */
 	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
-		if (renderer instanceof TouchableView) {
-			((TouchableView) renderer).propogateActionDown(e, id, x, y);
-		}
+		renderer.propogateActionDown(e, id, x, y);
 	}
 
 	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
-		if (renderer instanceof TouchableView) {
-			((TouchableView) renderer).propogateActionUp(e, id, x, y);
-		}
+		renderer.propogateActionUp(e, id, x, y);
 	}
 
 	protected void handleActionPointerDown(MotionEvent e, int id, float x,
 			float y) {
-		if (renderer instanceof TouchableView) {
-			((TouchableView) renderer).propogateActionPointerDown(e, id, x, y);
-		}
+		renderer.propogateActionPointerDown(e, id, x, y);
 	}
 
 	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
-		if (renderer instanceof TouchableView) {
-			((TouchableView) renderer).propogateActionPointerUp(e, id, x, y);
-		}
+		renderer.propogateActionPointerUp(e, id, x, y);
 	}
 	
 	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
-		if (renderer instanceof TouchableView) {
-			((TouchableView) renderer).propogateActionMove(e, id, x, y);
-		}
+		renderer.propogateActionMove(e, id, x, y);
 	}
 }
