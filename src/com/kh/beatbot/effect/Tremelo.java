@@ -28,8 +28,8 @@ public class Tremelo extends Effect {
 	
 	@Override
 	protected void initParams() {
-		params.add(new Param("Rate", true, true, "Hz"));
-		params.add(new Param("Phase", false, false, ""));
-		params.add(new Param("Depth", false, false, ""));
+		params.add(new EffectParam("Rate", "Hz", true, true));
+		params.add(new EffectParam("Phase", "", false, false));
+		params.add(new EffectParam("Depth", "", false, false));
 	}
 }

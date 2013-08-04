@@ -12,12 +12,11 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.SampleEditView;
-import com.kh.beatbot.ui.view.TextView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
-import com.kh.beatbot.ui.view.control.ValueLabel;
+import com.kh.beatbot.ui.view.control.param.ParamControl;
 
 public class SampleEditPage extends Page {
 
@@ -26,8 +25,7 @@ public class SampleEditPage extends Page {
 	private SampleEditView sampleEdit;
 	private ImageButton previewButton, browseButton, editButton;
 	private ToggleButton loopButton, reverseButton;
-	private TextView loopBeginLabel, loopEndLabel;
-	private ValueLabel loopBeginControl, loopEndControl;
+	private ParamControl loopBeginControl, loopEndControl;
 	
 	@Override
 	public void update() {
@@ -35,6 +33,8 @@ public class SampleEditPage extends Page {
 			sampleEdit.update();
 		loopButton.setChecked(TrackManager.currTrack.isLooping());
 		reverseButton.setChecked(TrackManager.currTrack.isReverse());
+		loopBeginControl.setParam(TrackManager.currTrack.getLoopBeginParam());
+		loopEndControl.setParam(TrackManager.currTrack.getLoopEndParam());
 	}
 
 	@Override
@@ -66,19 +66,14 @@ public class SampleEditPage extends Page {
 		browseButton = new ImageButton();
 		editButton = new ImageButton();
 
-		loopBeginLabel = new TextView();
-		loopEndLabel = new TextView();
-		loopBeginControl = new ValueLabel(labelGroup, null);
-		loopEndControl = new ValueLabel(labelGroup, null);
+		loopBeginControl = new ParamControl(labelGroup);
+		loopEndControl = new ParamControl(labelGroup);
 		
 		loopBeginControl.addLevelListener(new Level1dListener() {
 			@Override
 			public void onLevelChange(ControlViewBase levelListenable,
 					float level) {
-				float numSamples = loopBeginControl.getLevel() * TrackManager.currTrack.getNumSamples();
-				TrackManager.currTrack.setLoopBeginSample(numSamples);
 				sampleEdit.update();
-				loopBeginControl.setText(String.valueOf((long)numSamples));
 			}
 		});
 		
@@ -86,10 +81,7 @@ public class SampleEditPage extends Page {
 			@Override
 			public void onLevelChange(ControlViewBase levelListenable,
 					float level) {
-				float numSamples = loopEndControl.getLevel() * TrackManager.currTrack.getNumSamples();
-				TrackManager.currTrack.setLoopEndSample(numSamples);
 				sampleEdit.update();
-				loopEndControl.setText(String.valueOf((long)numSamples));
 			}
 		});
 		
@@ -106,11 +98,13 @@ public class SampleEditPage extends Page {
 				TrackManager.currTrack.stopPreviewing();
 			}
 		});
+		
 		loopButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
 				TrackManager.currTrack.toggleLooping();
 			}
 		});
+		
 		reverseButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
 				TrackManager.currTrack.setReverse(reverseButton.isChecked());
@@ -132,16 +126,12 @@ public class SampleEditPage extends Page {
 			}
 		});
 
-		loopBeginLabel.setText("Begin");
-		loopEndLabel.setText("End");
 		addChild(previewButton);
 		addChild(loopButton);
 		addChild(reverseButton);
 		addChild(sampleEdit);
 		addChild(browseButton);
 		addChild(editButton);
-		addChild(loopBeginLabel);
-		addChild(loopEndLabel);
 		addChild(loopBeginControl);
 		addChild(loopEndControl);
 	}
@@ -156,14 +146,10 @@ public class SampleEditPage extends Page {
 		reverseButton.layout(this, thirdHeight * 2 + margin * 2, 0,
 				thirdHeight, thirdHeight);
 
-		loopBeginLabel.layout(this, width - thirdHeight * 15, 0,
-				thirdHeight * 3, thirdHeight);
-		loopBeginControl.layout(this, width - thirdHeight * 12, 0,
-				thirdHeight * 3, thirdHeight);
-		loopEndLabel.layout(this, width - thirdHeight * 9, 0, thirdHeight * 3,
-				thirdHeight);
-		loopEndControl.layout(this, width - thirdHeight * 6, 0,
-				thirdHeight * 3, thirdHeight);
+		loopBeginControl.layout(this, width - thirdHeight * 15, 0,
+				thirdHeight * 6, thirdHeight);
+		loopEndControl.layout(this, width - thirdHeight * 9, 0,
+				thirdHeight * 6, thirdHeight);
 		browseButton.layout(this, width - thirdHeight * 2, 0, thirdHeight,
 				thirdHeight);
 		editButton.layout(this, width - thirdHeight, 0, thirdHeight,

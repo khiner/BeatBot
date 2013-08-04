@@ -36,10 +36,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 	}
 
-	protected static boolean initialized = false;
-	protected static boolean running;
-	protected int width;
-	protected int height;
+	protected int width, height;
 
 	protected static GL10 gl = null;
 	protected static GLText glText;
@@ -55,14 +52,9 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		gl = _gl;
 		gl.glViewport(0, 0, this.width, this.height);
 		GLU.gluOrtho2D(gl, 0, this.width, this.height, 0);
-		initGl(gl);
 		initGlText();
-		initialized = true;
+		initGl(gl);
 		init();
-	}
-
-	public static boolean isInitialized() {
-		return initialized;
 	}
 
 	public void onSurfaceCreated(GL10 _gl, EGLConfig config) {
@@ -125,7 +117,6 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 
 	public static final void loadTexture(int resourceId, int[] textureHandlers,
 			int textureId, int[] crop) {
-		
 		Bitmap bitmap = BitmapFactory.decodeResource(
 				BeatBotActivity.mainActivity.getResources(), resourceId);
 

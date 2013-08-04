@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.kh.beatbot.effect.ADSR;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.Icon;
@@ -174,16 +175,24 @@ public class Track extends BaseTrack {
 		return null;
 	}
 
-	public float getLoopBeginSample() {
-		return getCurrSampleFile().getLoopBeginSample();
+	public Param getLoopBeginParam() {
+		return currSampleFile.getLoopBeginParam();
 	}
 
+	public Param getLoopEndParam() {
+		return currSampleFile.getLoopEndParam();
+	}
+
+	public float getLoopBeginSample() {
+		return currSampleFile.getLoopBeginParam().level;
+	}
+	
 	public float getLoopEndSample() {
-		return getCurrSampleFile().getLoopEndSample();
+		return currSampleFile.getLoopEndParam().level;
 	}
 
 	public float getNumSamples() {
-		return getCurrSampleFile().getNumSamples();
+		return currSampleFile.getLoopBeginParam().getLevel(1);
 	}
 
 	public void setLoopBeginSample(float loopBeginSample) {
@@ -247,8 +256,8 @@ public class Track extends BaseTrack {
 	}
 
 	private void updateLoopWindow() {
-		setTrackLoopWindow(id, (long) getLoopBeginSample(),
-				(long) getLoopEndSample());
+		setTrackLoopWindow(id, (long) getLoopBeginParam().level,
+				(long) getLoopEndParam().level);
 	}
 
 	public void notifyNoteMoved(long oldNoteOn, long oldNoteOff,

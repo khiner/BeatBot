@@ -16,7 +16,6 @@ public class TextView extends View {
 	
 	@Override
 	public void init() {
-		initText();
 	}
 	
 	@Override
@@ -31,12 +30,12 @@ public class TextView extends View {
 
 	@Override
 	public void layoutChildren() {
-
+		
 	}
 
 	@Override
 	protected void loadIcons() {
-
+		initText();
 	}
 	
 	protected float calcTextOffset() {
@@ -51,7 +50,7 @@ public class TextView extends View {
 	}
 	
 	private void initText() {
-		if (text.isEmpty() || !GLSurfaceViewBase.isInitialized()) {
+		if (text == null || text.isEmpty()) {
 			return;
 		}
 		GLSurfaceViewBase.storeText(text);

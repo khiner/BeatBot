@@ -19,7 +19,7 @@ public abstract class View implements Comparable<View> {
 	public class Position {
 		public float x, y;
 
-		Position(float x, float y) {
+		public Position(float x, float y) {
 			set(x, y);
 		}
 
@@ -33,7 +33,6 @@ public abstract class View implements Comparable<View> {
 	public static GL10 gl;
 	public static GLSurfaceViewBase root;
 	public static Typeface font;
-	private static FloatBuffer circleVb = null;
 
 	// where is the view currently clipped to?
 	// used to keep track of SCISSOR clipping of parent views,
@@ -41,6 +40,8 @@ public abstract class View implements Comparable<View> {
 	// this should be reset every frame by the parent using resetClipWindow()
 	public int currClipX = Integer.MIN_VALUE, currClipY = Integer.MIN_VALUE,
 			currClipW = Integer.MAX_VALUE, currClipH = Integer.MAX_VALUE;
+
+	public int id = -1; // optional
 
 	public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0,
 			height = 0;
@@ -55,9 +56,10 @@ public abstract class View implements Comparable<View> {
 	protected boolean initialized = false;
 	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0,
 			borderHeight = 0, borderOffset = 0;
-	public int id = -1; // optional
 
-	
+	// just scale and translate this circle to draw any circle for efficiency
+	private static FloatBuffer circleVb = null;
+
 	static { // init circle
 		float theta = 0;
 		float coords[] = new float[128];
@@ -171,6 +173,8 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public void drawAll() {
+		if (!initialized)
+			return;
 		// scissor ensures that each view can only draw within its rect
 		gl.glEnable(GL10.GL_SCISSOR_TEST);
 		if (parent != null) {
@@ -340,7 +344,7 @@ public abstract class View implements Comparable<View> {
 		drawLines(vb, color, width, type, 0);
 	}
 
-	public static final void drawPoint(float pointSize, float[] color, float x,
+	public static final void drawCircle(float pointSize, float[] color, float x,
 			float y) {
 		push();
 		translate(x, y);
@@ -357,6 +361,7 @@ public abstract class View implements Comparable<View> {
 
 	public final void setBackgroundColor(float[] color) {
 		backgroundColor = color;
+		initBackgroundColor();
 	}
 
 	public static final void setColor(float[] color) {
@@ -397,11 +402,10 @@ public abstract class View implements Comparable<View> {
 	public void setStrokeColor(float[] strokeColor) {
 		this.strokeColor = strokeColor;
 	}
-	
+
 	public float[] getStrokeColor() {
 		return strokeColor;
 	}
-
 
 	@Override
 	public int compareTo(View another) {

@@ -2,7 +2,7 @@ package com.kh.beatbot.ui.view.control.param;
 
 import com.kh.beatbot.ui.view.control.Seekbar;
 
-public class SeekbarParamControl extends ParamControl {
+public class SeekbarParamControl extends LevelParamControl {
 
 	public SeekbarParamControl() {
 		super();

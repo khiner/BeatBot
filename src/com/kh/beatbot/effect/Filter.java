@@ -38,10 +38,10 @@ public class Filter extends Effect {
 	
 	@Override
 	protected void initParams() {
-		params.add(new Param("Freq", true, false, "Hz"));
-		params.add(new Param("Res", false, false, ""));
-		params.add(new Param("Mod Rate", true, true, "Hz"));
-		params.add(new Param("Mod Amt", false, false, ""));
+		params.add(new EffectParam("Freq", "Hz", true, false));
+		params.add(new EffectParam("Res", "", false, false));
+		params.add(new EffectParam("Mod Rate", "Hz", true, true));
+		params.add(new EffectParam("Mod Amt", "", false, false));
 		params.get(0).scaleValue = PlaybackManager.SAMPLE_RATE / 2;
 		params.get(0).hz = false;
 	}

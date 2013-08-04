@@ -34,14 +34,15 @@ public class ADSR extends Effect {
 
 	@Override
 	protected void initParams() {
-		params.add(new Param("Attack", true, false, 0, ATTACK_MAX_S, LOG_SCALE,
-					"s"));
-		params.add(new Param("Decay", true, false, 0, DECAY_MAX_S, LOG_SCALE, "s"));
-		params.add(new Param("Sustain", false, false, ""));
-		params.add(new Param("Release", true, false, 0, RELEASE_MAX_S, LOG_SCALE,
-					"s"));
-		params.add(new Param("Start", false, false, ""));
-		params.add(new Param("Peak", false, false, ""));
+		params.add(new EffectParam("Attack", "s", 0, ATTACK_MAX_S, LOG_SCALE,
+				true, false));
+		params.add(new EffectParam("Decay", "s", 0, DECAY_MAX_S, LOG_SCALE,
+				true, false));
+		params.add(new EffectParam("Sustain", "", false, false));
+		params.add(new EffectParam("Release", "s", 0, RELEASE_MAX_S, LOG_SCALE,
+				true, false));
+		params.add(new EffectParam("Start", "", false, false));
+		params.add(new EffectParam("Peak", "", false, false));
 		position = -1; // native code understands that -1 == ADSR
 		setAttack(0);
 		setDecay(1);
@@ -55,7 +56,7 @@ public class ADSR extends Effect {
 		currParamId = paramId;
 	}
 
-	public Param getCurrParam() {
+	public EffectParam getCurrParam() {
 		return getParam(currParamId);
 	}
 

@@ -115,7 +115,7 @@ public class LevelsView extends TouchableView {
 
 		translate(0, levelBarVb.get(vertex * 2 - 1));
 		// draw level-colored circle at beginning and end of level
-		drawPoint(LEVEL_BAR_WIDTH / 2, levelColor, 0, 0);
+		drawCircle(LEVEL_BAR_WIDTH / 2, levelColor, 0, 0);
 
 		drawLevelSelectionCircle(vertex - 2, levelColor);
 		gl.glPopMatrix();
@@ -124,7 +124,7 @@ public class LevelsView extends TouchableView {
 	protected void drawLevelSelectionCircle(int vertex, float[] levelColor) {
 		// draw bigger, translucent 'selection' circle at end of level
 		levelColor[3] = .5f;
-		drawPoint(5 * LEVEL_BAR_WIDTH / 4, levelColor, 0, 0);
+		drawCircle(5 * LEVEL_BAR_WIDTH / 4, levelColor, 0, 0);
 		levelColor[3] = 1;
 	}
 

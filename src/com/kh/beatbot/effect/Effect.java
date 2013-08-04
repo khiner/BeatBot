@@ -14,7 +14,7 @@ public abstract class Effect implements Comparable<Effect> {
 
 	// also in jni/Track.h: ugly but necessary
 	public final static int MAX_EFFECTS_PER_TRACK = 3;
-	protected List<Param> params = new ArrayList<Param>();
+	protected List<EffectParam> params = new ArrayList<EffectParam>();
 
 	protected BaseTrack track;
 	protected int position;
@@ -69,19 +69,19 @@ public abstract class Effect implements Comparable<Effect> {
 		this.paramsLinked = linked;
 	}
 
-	public Param getParam(int paramNum) {
+	public EffectParam getParam(int paramNum) {
 		return params.get(paramNum);
 	}
 
 	public final void setParamLevel(int paramNum, float level) {
-		Param param = getParam(paramNum);
+		EffectParam param = getParam(paramNum);
 		param.viewLevel = level;
 		param.setLevel(level);
 		setEffectParam(track.getId(), position, paramNum, param.level);
 	}
 
 	public String getParamValueString(int paramNum) {
-		return getParam(paramNum).getFormattedValueString();
+		return getParam(paramNum).getFormattedValue();
 	}
 
 	public void removeEffect() {
@@ -91,7 +91,7 @@ public abstract class Effect implements Comparable<Effect> {
 
 	public void quantizeParams() {
 		for (int i = 0; i < params.size(); i++) {
-			Param param = params.get(i);
+			EffectParam param = params.get(i);
 			if (param.beatSync) {
 				param.setLevel(param.viewLevel);
 				setEffectParam(track.getId(), position, i, param.level);
@@ -106,7 +106,7 @@ public abstract class Effect implements Comparable<Effect> {
 	
 	private void setDefaultParams() {
 		for (int i = 0; i < params.size(); i++) {
-			Param param = params.get(i);
+			EffectParam param = params.get(i);
 			setEffectParam(track.getId(), position, i, param.level);
 		}
 	}

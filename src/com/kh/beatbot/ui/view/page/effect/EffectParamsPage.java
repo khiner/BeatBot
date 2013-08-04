@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.view.page.effect;
 
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.effect.EffectParam;
 import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.view.TouchableView;
@@ -9,7 +9,7 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.KnobParamControl;
-import com.kh.beatbot.ui.view.control.param.ParamControl;
+import com.kh.beatbot.ui.view.control.param.LevelParamControl;
 import com.kh.beatbot.ui.view.page.Page;
 
 public class EffectParamsPage extends TouchableView implements
@@ -37,7 +37,7 @@ public class EffectParamsPage extends TouchableView implements
 
 	public void setEffect(Effect effect) {
 		this.effect = effect;
-		for (ParamControl paramControl : paramControls) {
+		for (LevelParamControl paramControl : paramControls) {
 			paramControl.setParam(effect.getParam(paramControl.getId()));
 		}
 	}
@@ -47,7 +47,7 @@ public class EffectParamsPage extends TouchableView implements
 		if (effect == null)
 			return;
 		createParamControls();
-		for (ParamControl paramControl : paramControls) {
+		for (LevelParamControl paramControl : paramControls) {
 			addChild(paramControl);
 		}
 	}
@@ -91,7 +91,7 @@ public class EffectParamsPage extends TouchableView implements
 	@Override
 	public void onRelease(Button button) {
 		int paramNum = button.getId();
-		Param param = effect.getParam(paramNum);
+		EffectParam param = effect.getParam(paramNum);
 		param.beatSync = ((ToggleButton) button).isChecked();
 		paramControls[paramNum].setLevel(param.viewLevel);
 		if (effect.paramsLinked()) {
@@ -116,11 +116,11 @@ public class EffectParamsPage extends TouchableView implements
 		}
 	}
 
-	private final ParamControl getXParamControl() {
+	private final LevelParamControl getXParamControl() {
 		return paramControls[xParamIndex];
 	}
 
-	private final ParamControl getYParamControl() {
+	private final LevelParamControl getYParamControl() {
 		return paramControls[yParamIndex];
 	}
 

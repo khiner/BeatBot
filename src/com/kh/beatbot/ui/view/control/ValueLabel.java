@@ -8,7 +8,7 @@ import com.kh.beatbot.ui.mesh.ShapeGroup;
 public class ValueLabel extends ControlView1dBase {
 	private float anchorY = 0, anchorLevel;
 	private Param param;
-
+	
 	public ValueLabel(ShapeGroup shapeGroup, Param param) {
 		initBgRect(shapeGroup, Colors.LABEL_VERY_LIGHT, Colors.VOLUME);
 		setParam(param);
@@ -28,7 +28,7 @@ public class ValueLabel extends ControlView1dBase {
 
 	public void update() {
 		if (param != null) {
-			setText(param.getFormattedValueString());
+			setText(param.getFormattedValue());
 		}
 	}
 
@@ -42,7 +42,7 @@ public class ValueLabel extends ControlView1dBase {
 		super.setViewLevel(level);
 		if (param != null) {
 			param.setLevel(level);
-			setText(param.getFormattedValueString());
+			setText(param.getFormattedValue());
 		}
 	}
 

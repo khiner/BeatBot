@@ -8,6 +8,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.view.View;
 
 public class SampleFile {
@@ -20,7 +21,7 @@ public class SampleFile {
 	private byte[] inBytes = new byte[2];
 	private int bytesPerSample = 0;
 
-	private float loopBeginSample, loopEndSample;
+	private Param loopBeginParam, loopEndParam;
 
 	public SampleFile(File file) {
 		this.file = file;
@@ -30,27 +31,33 @@ public class SampleFile {
 			sampleFile.seek(22);
 			int channels = sampleFile.readUnsignedByte();
 			bytesPerSample = channels * 2;
-			loopBeginSample = 0;
-			loopEndSample = getNumSamples();
+			loopBeginParam = new Param("Begin", "", 0, getNumSamples());
+			loopEndParam = new Param("End", "", 0, getNumSamples());
+			loopBeginParam.setFormat("%.0f");
+			loopEndParam.setFormat("%.0f");
+			loopBeginParam.setLevel(0);
+			loopEndParam.setLevel(1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public float getLoopBeginSample() {
-		return loopBeginSample;
+	public Param getLoopBeginParam() {
+		return loopBeginParam;
 	}
 	
-	public float getLoopEndSample() {
-		return loopEndSample;
+	public Param getLoopEndParam() {
+		return loopEndParam;
 	}
 
 	public void setLoopBeginSample(float loopBeginSample) {
-		this.loopBeginSample = loopBeginSample;
+		// TODO this will be wrong unless lbs ~ [0,1]
+		this.loopBeginParam.setLevel(loopBeginSample);
 	}
 	
 	public void setLoopEndSample(float loopEndSample) {
-		this.loopEndSample = loopEndSample;
+		// TODO this will be wrong unless lbs ~ [0,1]
+		this.loopEndParam.setLevel(loopEndSample);
 	}
 	
 	public void renameTo(String name) {

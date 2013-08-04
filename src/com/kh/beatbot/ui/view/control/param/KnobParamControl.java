@@ -1,10 +1,10 @@
 package com.kh.beatbot.ui.view.control.param;
 
-import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.effect.EffectParam;
 import com.kh.beatbot.ui.view.control.Knob;
 import com.kh.beatbot.ui.view.control.ToggleKnob;
 
-public class KnobParamControl extends ParamControl {
+public class KnobParamControl extends LevelParamControl {
 	
 	public KnobParamControl(boolean beatSync) {
 		super();
@@ -27,7 +27,7 @@ public class KnobParamControl extends ParamControl {
 	}
 	
 	@Override
-	public void setParam(Param param) {
+	public void setParam(EffectParam param) {
 		super.setParam(param);
 		setBeatSync(param.beatSync);
 	}

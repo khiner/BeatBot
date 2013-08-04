@@ -51,9 +51,11 @@ public class BeatBotActivity extends Activity {
 		View.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
 		Colors.initColors(this);
+		
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.FILL_PARENT,
 				LinearLayout.LayoutParams.FILL_PARENT);
+		
 		View.root = new GLSurfaceViewGroup(this);
 		View.root.setLayoutParams(lp);
 

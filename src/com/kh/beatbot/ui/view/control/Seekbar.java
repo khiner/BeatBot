@@ -33,25 +33,25 @@ public class Seekbar extends ControlView1dBase {
 	protected void drawBackgroundBar() {
 		drawTriangleStrip(levelBarVb, Colors.VIEW_BG);
 		// circle at end of level for rounded edge
-		drawPoint(levelBarHeight / 2, Colors.VIEW_BG, levelBarVb.get(levelBarVb.capacity() - 2), middleY);
+		drawCircle(levelBarHeight / 2, Colors.VIEW_BG, levelBarVb.get(levelBarVb.capacity() - 2), middleY);
 	}
 
 	protected void drawLevel() {
 		drawTriangleStrip(levelBarVb, levelColor, numLevelVertices);
 
 		// draw level-colored circle at beginning and end of level
-		drawPoint(levelBarHeight / 2, levelColor, levelBarVb.get(0), middleY);
-		drawPoint(levelBarHeight / 2, levelColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
+		drawCircle(levelBarHeight / 2, levelColor, levelBarVb.get(0), middleY);
+		drawCircle(levelBarHeight / 2, levelColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
 
 		drawLevelSelectionCircle();
 	}
 
 	protected void drawTouchedLevelSelectionCircle() {
 		selectColor[3] = .7f;
-		drawPoint(3 * levelBarHeight / 2, selectColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
+		drawCircle(3 * levelBarHeight / 2, selectColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
 		selectColor[3] = .5f;
 		for (int i = (int) (5 * levelBarHeight / 4); i < levelBarHeight * 2; i += 2) {
-			drawPoint(i, selectColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
+			drawCircle(i, selectColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
 		}
 	}
 
@@ -61,7 +61,7 @@ public class Seekbar extends ControlView1dBase {
 			drawTouchedLevelSelectionCircle();
 		} else {
 			selectColor[3] = .5f;
-			drawPoint(5 * levelBarHeight / 4, selectColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
+			drawCircle(5 * levelBarHeight / 4, selectColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
 		}
 	}
 

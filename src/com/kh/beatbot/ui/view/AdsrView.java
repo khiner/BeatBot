@@ -162,23 +162,23 @@ public class AdsrView extends TouchableView {
 		initAdsrVb();
 		ADSR adsr = TrackManager.currTrack.adsr;
 		for (int i = 0; i < ADSR.NUM_PARAMS; i++) {
-			GLSurfaceViewBase.storeText(adsr.getParam(i).getName());
+			GLSurfaceViewBase.storeText(adsr.getParam(i).name);
 		}
 	}
 
 	@Override
 	public void draw() {
-		drawPoint(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(0),
+		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(0),
 				adsrPointVb.get(1));
-		drawPoint(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(2),
+		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(2),
 				adsrPointVb.get(3));
-		drawPoint(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(4),
+		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(4),
 				adsrPointVb.get(5));
-		drawPoint(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(8),
+		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(8),
 				adsrPointVb.get(9));
 		for (int i = 0; i < 5; i++) {
 			if (adsrSelected[i] != -1) {
-				drawPoint(getBgRectRadius(), Colors.VOLUME_SELECTED,
+				drawCircle(getBgRectRadius(), Colors.VOLUME_SELECTED,
 						adsrPointVb.get(i * 2), adsrPointVb.get(i * 2 + 1));
 			}
 		}

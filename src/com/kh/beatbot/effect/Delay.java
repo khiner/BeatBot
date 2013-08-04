@@ -43,9 +43,9 @@ public class Delay extends Effect {
 	
 	@Override
 	protected void initParams() {
-		params.add(new Param("Time Left", true, true, "ms"));
-		params.add(new Param("Time Right", true, true, "ms"));
-		params.add(new Param("Feedback", false, false, ""));
-		params.add(new Param("Wet", false, false, ""));
+		params.add(new EffectParam("Time Left", "ms", true, true));
+		params.add(new EffectParam("Time Right", "ms", true, true));
+		params.add(new EffectParam("Feedback", "", false, false));
+		params.add(new EffectParam("Wet", "", false, false));
 	}
 }

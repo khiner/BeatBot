@@ -48,7 +48,7 @@ public class Seekbar2d extends ControlView2dBase {
 	public void draw() {
 		float[] color = selected ? selectColor : levelColor;
 		drawLines(lineVb, color, 5, GL10.GL_LINES);
-		drawPoint(2 * getBgRectRadius() / 3, color, viewX(xLevel), viewY(yLevel));
+		drawCircle(2 * getBgRectRadius() / 3, color, viewX(xLevel), viewY(yLevel));
 	}
 
 	private void initLines() {
