@@ -1,6 +1,6 @@
 package com.kh.beatbot.ui.view.control.param;
 
-import com.kh.beatbot.effect.EffectParam;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.view.control.Knob;
 import com.kh.beatbot.ui.view.control.ToggleKnob;
 
@@ -10,25 +10,16 @@ public class KnobParamControl extends LevelParamControl {
 		super();
 		levelControl = beatSync ? new ToggleKnob() : new Knob();
 		addChild(levelControl);
-		addLevelListener(this);
 	}
 	
-	public void setBeatSync(boolean beatSync) {
-		if (levelControl instanceof ToggleKnob) {
-			((ToggleKnob) levelControl).setBeatSync(beatSync);
-		}
-	}
-	
-	public boolean isBeatSync() {
-		if (levelControl instanceof ToggleKnob) {
-			return ((ToggleKnob) levelControl).isBeatSync();
-		}
-		return false;
+	public void setParam(Param param) {
+		super.setParam(param);
 	}
 	
 	@Override
-	public void setParam(EffectParam param) {
-		super.setParam(param);
-		setBeatSync(param.beatSync);
+	public void layoutChildren() {
+		label.layout(this, 0, 0, width, height / 5);
+		levelControl.layout(this, 0, height / 5, width, 3 * height / 5);
+		valueLabel.layout(this, 0, 5 * height / 6, width, height / 6); // a little shorter
 	}
 }

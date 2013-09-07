@@ -1,35 +1,20 @@
 package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.GeneralUtils;
-import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class ValueLabel extends ControlView1dBase {
 	private float anchorY = 0, anchorLevel;
-	private Param param;
 	
-	public ValueLabel(ShapeGroup shapeGroup, Param param) {
+	public ValueLabel(ShapeGroup shapeGroup) {
 		initBgRect(shapeGroup, Colors.LABEL_VERY_LIGHT, Colors.VOLUME);
-		setParam(param);
 	}
 
 	@Override
 	public void init() {
 		super.init();
 		setStrokeColor(Colors.BLACK);
-		update();
-	}
-
-	public void setParam(Param param) {
-		this.param = param;
-		update();
-	}
-
-	public void update() {
-		if (param != null) {
-			setText(param.getFormattedValue());
-		}
 	}
 
 	@Override
@@ -39,9 +24,7 @@ public class ValueLabel extends ControlView1dBase {
 	}
 
 	public void setViewLevel(float level) {
-		super.setViewLevel(level);
 		if (param != null) {
-			param.setLevel(level);
 			setText(param.getFormattedValue());
 		}
 	}

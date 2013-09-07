@@ -1,31 +1,33 @@
 package com.kh.beatbot.effect;
 
+import com.kh.beatbot.listener.ParamListener;
+import com.kh.beatbot.listener.ParamToggleListener;
 import com.kh.beatbot.manager.MidiManager;
 
 public class EffectParam extends Param {
 	public float logScaleValue;
 	public int topBeatNum = 1, bottomBeatNum = 1;
-	public boolean hz, beatSyncable, logScale, beatSync;
+	public boolean hz, beatSyncable, logScale;
+	private boolean beatSync;
 
-	public EffectParam(String name, String unitString, float addValue,
+	public EffectParam(int id, String name, String unitString, float addValue,
 			float scaleValue, float logScaleValue, boolean logScale,
 			boolean beatSyncable) {
-		super(name, unitString, addValue, scaleValue);
+		super(id, name, unitString, addValue, scaleValue);
 		this.name = name;
 		this.unitString = unitString;
 		this.addValue = addValue;
 		this.scaleValue = scaleValue;
-		this.beatSync = beatSyncable;
+		this.beatSync = this.beatSyncable = beatSyncable;
 		this.logScale = logScale;
 		this.logScaleValue = logScaleValue;
 		this.hz = unitString.equalsIgnoreCase("hz");
-		viewLevel = 0.5f;
-		setLevel(viewLevel);
+		setLevel(0.5f);
 	}
 
-	public EffectParam(String name, String unitString, boolean logScale,
-			boolean beatSyncable) {
-		this(name, unitString, 0, 1, 8, logScale, beatSyncable);
+	public EffectParam(int id, String name, String unitString,
+			boolean logScale, boolean beatSyncable) {
+		this(id, name, unitString, 0, 1, 8, logScale, beatSyncable);
 	}
 
 	public String getFormattedValue() {
@@ -37,13 +39,24 @@ public class EffectParam extends Param {
 	}
 
 	public void setLevel(float level) {
+		viewLevel = level;
 		if (beatSync) {
 			this.level = quantizeToBeat(level);
-		} else if (logScale) {
-			this.level = addValue + scaleValue * logScaleLevel(level);
 		} else {
-			super.setLevel(level);
+			this.level = addValue + scaleValue
+					* (logScale ? logScaleLevel(level) : level);
 		}
+		notifyListeners();
+	}
+
+	public boolean isBeatSync() {
+		return beatSync;
+	}
+
+	public void toggle(boolean state) {
+		beatSync = state;
+		notifyToggleListeners();
+		notifyListeners();
 	}
 
 	private float logScaleLevel(float level) {
@@ -59,6 +72,15 @@ public class EffectParam extends Param {
 		bottomBeatNum = getBottomBeatNum((int) Math.ceil(level * 14));
 		float quantized = (60f / (MidiManager.getBPM()) * ((float) topBeatNum / (float) bottomBeatNum));
 		return hz ? 1 / quantized : quantized;
+	}
+
+	private synchronized void notifyToggleListeners() {
+		for (ParamListener listener : listeners) {
+			if (listener instanceof ParamToggleListener
+					&& !ignoredListeners.contains(listener)) {
+				((ParamToggleListener) listener).onParamToggled(this);
+			}
+		}
 	}
 
 	private static int getTopBeatNum(int which) {

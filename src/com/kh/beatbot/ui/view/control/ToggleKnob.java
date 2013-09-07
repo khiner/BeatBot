@@ -1,11 +1,12 @@
 package com.kh.beatbot.ui.view.control;
 
-import com.kh.beatbot.listener.Level1dListener;
+import com.kh.beatbot.effect.EffectParam;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.listener.ParamToggleListener;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
 
-public class ToggleKnob extends Knob {
+public class ToggleKnob extends Knob implements ParamToggleListener {
 
 	private ToggleButton centerButton;
 	private float snapDistSquared;
@@ -15,14 +16,6 @@ public class ToggleKnob extends Knob {
 	public void setId(int id) {
 		super.setId(id);
 		centerButton.setId(id);
-	}
-
-	public void setBeatSync(boolean beatSync) {
-		centerButton.setChecked(beatSync);
-	}
-
-	public boolean isBeatSync() {
-		return centerButton.isChecked();
 	}
 
 	@Override
@@ -44,11 +37,7 @@ public class ToggleKnob extends Knob {
 		centerButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				for (Level1dListener listener : levelListeners) {
-					if (listener instanceof OnReleaseListener) {
-						((OnReleaseListener) listener).onRelease(centerButton);
-					}
-				}
+				((EffectParam)param).toggle(((ToggleButton)button).isChecked());
 			}
 		});
 		// not adding center button as child, instead manually drawing and
@@ -58,8 +47,8 @@ public class ToggleKnob extends Knob {
 	@Override
 	public void layoutChildren() {
 		super.layoutChildren();
-		centerButton.layout(this, 0, 0, width, height);
-		snapDistSquared = (width / 3) * (width / 3);
+		centerButton.layout(this, width / 16, width / 16, 7 * width / 8, 7 * width / 8);
+		snapDistSquared = (width / 4) * (width / 4);
 	}
 
 	@Override
@@ -89,5 +78,10 @@ public class ToggleKnob extends Knob {
 			super.handleActionUp(id, x, y);
 		}
 		centerButtonTouched = false;
+	}
+
+	@Override
+	public void onParamToggled(EffectParam param) {
+		centerButton.setChecked(param.isBeatSync());
 	}
 }

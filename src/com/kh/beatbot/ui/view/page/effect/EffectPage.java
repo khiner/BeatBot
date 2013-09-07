@@ -6,9 +6,9 @@ import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremelo;
-import com.kh.beatbot.listener.Level2dListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
@@ -16,7 +16,6 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.ControlViewBase;
 import com.kh.beatbot.ui.view.control.Seekbar2d;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.group.ViewPager;
@@ -37,6 +36,7 @@ public class EffectPage extends TouchableView {
 		toggleButton.setChecked(effect.isOn());
 		toggleButton.setText(effect.getName());
 		paramsPager.setPage(effect.getNum());
+		setLevel2dParams(effect.getXParam(), effect.getYParam());
 		((EffectParamsPage) paramsPager.getCurrPage()).setEffect(effect);
 	}
 
@@ -77,17 +77,6 @@ public class EffectPage extends TouchableView {
 			}
 		});
 
-		level2d.addLevelListener(new Level2dListener() {
-			@Override
-			public void onLevelChange(ControlViewBase levelListenable,
-					float levelX, float levelY) {
-				((EffectParamsPage) paramsPager.getCurrPage())
-						.setXLevel(levelX);
-				((EffectParamsPage) paramsPager.getCurrPage())
-						.setYLevel(levelY);
-			}
-		});
-
 		addChild(toggleButton);
 		addChild(level2d);
 		addChild(paramsPager);
@@ -100,5 +89,9 @@ public class EffectPage extends TouchableView {
 		paramsPager.layout(this, 0, (width - height) / 5 + 5, width - height,
 				height - (width - height) / 5 - 5);
 		level2d.layout(this, width - height, 0, height, height);
+	}
+	
+	public void setLevel2dParams(Param xParam, Param yParam) {
+		level2d.setParams(xParam, yParam);
 	}
 }

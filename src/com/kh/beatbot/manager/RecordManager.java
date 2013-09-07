@@ -10,11 +10,11 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 
-import com.kh.beatbot.listener.Level1dListener;
-import com.kh.beatbot.ui.view.control.ControlViewBase;
+import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.ui.view.control.ThresholdBarView;
 
-public class RecordManager implements Level1dListener {
+public class RecordManager implements ParamListener {
 
 	public static enum State {
 		LISTENING, RECORDING, INITIALIZING
@@ -184,8 +184,8 @@ public class RecordManager implements Level1dListener {
 	}
 
 	@Override
-	public void onLevelChange(ControlViewBase levelListenable, float level) {
-		currThreshold = dbToShort((level - 1.001f) * 60);
+	public void onParamChanged(Param param) {
+		currThreshold = dbToShort((param.viewLevel - 1.001f) * 60);
 	}
 
 	public static native void startRecordingNative(String recordFileName);

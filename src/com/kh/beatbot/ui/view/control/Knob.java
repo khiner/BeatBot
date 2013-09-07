@@ -23,9 +23,9 @@ public class Knob extends ControlView1dBase {
 					+ width / 2;
 			circleVertices[i * 4 + 1] = (float) Math.sin(theta) * width / 2.3f
 					+ width / 2;
-			circleVertices[i * 4 + 2] = (float) Math.cos(theta) * width / 3.1f
+			circleVertices[i * 4 + 2] = (float) Math.cos(theta) * width / 3.3f
 					+ width / 2;
-			circleVertices[i * 4 + 3] = (float) Math.sin(theta) * width / 3.1f
+			circleVertices[i * 4 + 3] = (float) Math.sin(theta) * width / 3.3f
 					+ width / 2;
 		}
 		circleVb = makeFloatBuffer(circleVertices);
@@ -43,20 +43,19 @@ public class Knob extends ControlView1dBase {
 	private void updateDrawIndex() {
 		if (circleVb == null)
 			return;
-		drawIndex = (int) (circleVb.capacity() * level / 2);
+		drawIndex = (int) (circleVb.capacity() * param.viewLevel / 2);
 		drawIndex += drawIndex % 2;
 	}
 
 	@Override
 	public void setViewLevel(float level) {
-		super.setViewLevel(level);
 		updateDrawIndex();
 	}
 
 	@Override
 	protected float posToLevel(float x, float y) {
-		float unitX = (x - width / 2) / width;
-		float unitY = (y - height / 2) / height;
+		float unitX = x / width - .5f;
+		float unitY = y / height - .5f;
 		float theta = (float) Math.atan(unitY / unitX) + ¹ / 2;
 		// atan ranges from 0 to ¹, and produces symmetric results around the y
 		// axis.

@@ -7,7 +7,7 @@ import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
-import com.kh.beatbot.ui.view.control.param.KnobParamControl;
+import com.kh.beatbot.ui.view.page.Page;
 
 public class DelayParamsPage extends EffectParamsPage {
 
@@ -17,14 +17,6 @@ public class DelayParamsPage extends EffectParamsPage {
 		super(delay);
 	}
 	
-	@Override
-	public void init() {
-		// since left/right delay times are linked by default,
-		// xy view is set to x = left channel, y = feedback
-		xParamIndex = 0;
-		yParamIndex = 2;
-	}
-
 	@Override
 	protected void loadIcons() {
 		linkToggle.setIcon(new Icon(IconResources.LINK));
@@ -37,32 +29,23 @@ public class DelayParamsPage extends EffectParamsPage {
 		linkToggle.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				KnobParamControl leftControl = paramControls[0];
-				KnobParamControl rightControl = paramControls[1];
-
-				float newRightChannelLevel = rightControl.getLevel();
-				boolean newRightChannelSynced = rightControl.isBeatSync();
+				boolean newRightChannelSynced = effect.getParam(1).isBeatSync();
+				float newRightChannelLevel = effect.getParam(1).viewLevel;
 
 				effect.setParamsLinked(linkToggle.isChecked());
 
 				if (effect.paramsLinked()) {
-					// y = feedback when linked
-					yParamIndex = 2;
+					((Delay) effect).rightChannelBeatSyncMemory = newRightChannelSynced;
 					((Delay) effect).rightChannelLevelMemory = newRightChannelLevel;
-					((Delay) effect).rightChannelBeatSyncMemory = rightControl
-							.isBeatSync();
-					newRightChannelLevel = leftControl.getLevel();
-					newRightChannelSynced = leftControl.isBeatSync();
-				} else {
-					// y = right delay time when not linked
-					yParamIndex = 1;
+					newRightChannelSynced = effect.getParam(0).isBeatSync();
+					newRightChannelLevel = effect.getParam(0).viewLevel;
+				} else if (((Delay) effect).rightChannelLevelMemory >= 0){
 					newRightChannelSynced = ((Delay) effect).rightChannelBeatSyncMemory;
-					if (((Delay) effect).rightChannelLevelMemory > 0)
-						newRightChannelLevel = ((Delay) effect).rightChannelLevelMemory;
+					newRightChannelLevel = ((Delay) effect).rightChannelLevelMemory;
 				}
-				effect.getParam(1).beatSync = newRightChannelSynced;
-				rightControl.setBeatSync(newRightChannelSynced);
-				rightControl.setLevel(newRightChannelLevel);
+				effect.getParam(1).toggle(newRightChannelSynced);
+				effect.getParam(1).setLevel(newRightChannelLevel);
+				Page.effectPage.setLevel2dParams(effect.getXParam(), effect.getYParam());
 			}
 		});
 
@@ -72,7 +55,7 @@ public class DelayParamsPage extends EffectParamsPage {
 	@Override
 	public void setEffect(Effect effect) {
 		super.setEffect(effect);
-		linkToggle.setChecked(((Delay) effect).paramsLinked());
+		linkToggle.setChecked(effect.paramsLinked());
 	}
 
 	public void layoutChildren() {

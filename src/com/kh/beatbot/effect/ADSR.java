@@ -22,6 +22,12 @@ public class ADSR extends Effect {
 
 	public ADSR(BaseTrack track) {
 		super(track);
+		setAttack(0);
+		setDecay(1);
+		setSustain(1);
+		setRelease(0);
+		setStart(0);
+		setPeak(1);
 	}
 
 	public int getNum() {
@@ -34,22 +40,16 @@ public class ADSR extends Effect {
 
 	@Override
 	protected void initParams() {
-		params.add(new EffectParam("Attack", "s", 0, ATTACK_MAX_S, LOG_SCALE,
+		params.add(new EffectParam(0, "Attack", "s", 0, ATTACK_MAX_S, LOG_SCALE,
 				true, false));
-		params.add(new EffectParam("Decay", "s", 0, DECAY_MAX_S, LOG_SCALE,
+		params.add(new EffectParam(1, "Decay", "s", 0, DECAY_MAX_S, LOG_SCALE,
 				true, false));
-		params.add(new EffectParam("Sustain", "", false, false));
-		params.add(new EffectParam("Release", "s", 0, RELEASE_MAX_S, LOG_SCALE,
+		params.add(new EffectParam(2, "Sustain", "", false, false));
+		params.add(new EffectParam(3, "Release", "s", 0, RELEASE_MAX_S, LOG_SCALE,
 				true, false));
-		params.add(new EffectParam("Start", "", false, false));
-		params.add(new EffectParam("Peak", "", false, false));
+		params.add(new EffectParam(4, "Start", "", false, false));
+		params.add(new EffectParam(5, "Peak", "", false, false));
 		position = -1; // native code understands that -1 == ADSR
-		setAttack(0);
-		setDecay(1);
-		setSustain(1);
-		setRelease(0);
-		setStart(0);
-		setPeak(1);
 	}
 
 	public void setCurrParam(int paramId) {
@@ -89,30 +89,30 @@ public class ADSR extends Effect {
 	}
 
 	public void setCurrParamLevel(float level) {
-		setParamLevel(currParamId, level);
+		getParam(currParamId).setLevel(level);
 	}
 
 	public void setAttack(float attack) {
-		setParamLevel(ATTACK_ID, attack);
+		getParam(ATTACK_ID).setLevel(attack);
 	}
 
 	public void setDecay(float decay) {
-		setParamLevel(DECAY_ID, decay);
+		getParam(DECAY_ID).setLevel(decay);
 	}
 
 	public void setSustain(float sustain) {
-		setParamLevel(SUSTAIN_ID, sustain);
+		getParam(SUSTAIN_ID).setLevel(sustain);
 	}
 
 	public void setRelease(float release) {
-		setParamLevel(RELEASE_ID, release);
+		getParam(RELEASE_ID).setLevel(release);
 	}
 
 	public void setStart(float start) {
-		setParamLevel(START_ID, start);
+		getParam(START_ID).setLevel(start);
 	}
 
 	public void setPeak(float peak) {
-		setParamLevel(PEAK_ID, peak);
+		getParam(PEAK_ID).setLevel(peak);
 	}
 }

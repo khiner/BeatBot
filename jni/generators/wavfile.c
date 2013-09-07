@@ -22,7 +22,6 @@ void wavfile_freeBuffers(WavFile *wavFile) {
 }
 
 void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName) {
-
 	// if a different sample was already loaded, destroy it.
 	wavfile_freeBuffers(wavFile);
 	FILE *file = fopen(sampleFileName, "rb");

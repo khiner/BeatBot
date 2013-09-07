@@ -45,7 +45,6 @@ public class ThresholdBarView extends Seekbar {
 
 	public void init() {
 		super.init();
-		setLevel(0.8f);
 		initVerticesLimits();
 	}
 

@@ -2,33 +2,22 @@ package com.kh.beatbot.ui.view.page.effect;
 
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.EffectParam;
-import com.kh.beatbot.listener.Level1dListener;
-import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.listener.ParamListener;
+import com.kh.beatbot.listener.ParamToggleListener;
 import com.kh.beatbot.ui.view.TouchableView;
-import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.ControlViewBase;
-import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.KnobParamControl;
 import com.kh.beatbot.ui.view.control.param.LevelParamControl;
-import com.kh.beatbot.ui.view.page.Page;
+import com.kh.beatbot.ui.view.control.param.ParamControl;
 
 public class EffectParamsPage extends TouchableView implements
-		Level1dListener, OnReleaseListener {
+		ParamListener, ParamToggleListener {
 	protected KnobParamControl[] paramControls;
 	protected Effect effect;
-	protected int xParamIndex = 0, yParamIndex = 1;
 
 	public EffectParamsPage(Effect effect) {
 		this.effect = effect;
 		createChildren();
-	}
-	
-	public final void setXLevel(float level) {
-		getXParamControl().setLevel(level);
-	}
-
-	public final void setYLevel(float level) {
-		getYParamControl().setLevel(level);
 	}
 
 	public Effect getEffect() {
@@ -36,9 +25,16 @@ public class EffectParamsPage extends TouchableView implements
 	}
 
 	public void setEffect(Effect effect) {
+		if (this.effect != null) {
+			for (ParamControl paramControl : paramControls) {
+				effect.getParam(paramControl.getId()).removeListener(this);
+			}
+		}
 		this.effect = effect;
-		for (LevelParamControl paramControl : paramControls) {
-			paramControl.setParam(effect.getParam(paramControl.getId()));
+		for (ParamControl paramControl : paramControls) {
+			Param param = effect.getParam(paramControl.getId());
+			paramControl.setParam(param);
+			param.addListener(this);
 		}
 	}
 
@@ -69,40 +65,27 @@ public class EffectParamsPage extends TouchableView implements
 	}
 
 	@Override
-	public void onLevelChange(ControlViewBase levelListenable, float level) {
-		int paramNum = levelListenable.getId();
-		effect.setParamLevel(paramNum, level);
+	public void onParamChanged(Param param) {
 		if (effect.paramsLinked()) {
-			if (levelListenable.getId() == 0) {
-				effect.setParamLevel(1, level);
-				paramControls[1].setViewLevel(level);
-			} else if (levelListenable.getId() == 1) {
-				paramControls[0].setLevel(level);
+			if (param.id == 0) {
+				effect.getParam(1).setLevel(param.viewLevel);
+			} else if (param.id == 1) {
+				effect.getParam(0).ignoreListener(this);
+				effect.getParam(0).setLevel(param.viewLevel);
+				effect.getParam(0).unignoreListener(this);
 			}
-		}
-
-		if (paramNum == xParamIndex) {
-			Page.effectPage.getLevel2d().setViewLevelX(level);
-		} else if (paramNum == yParamIndex) {
-			Page.effectPage.getLevel2d().setViewLevelY(level);
 		}
 	}
 
 	@Override
-	public void onRelease(Button button) {
-		int paramNum = button.getId();
-		EffectParam param = effect.getParam(paramNum);
-		param.beatSync = ((ToggleButton) button).isChecked();
-		paramControls[paramNum].setLevel(param.viewLevel);
+	public void onParamToggled(EffectParam param) {
 		if (effect.paramsLinked()) {
-			if (paramNum == 0) {
-				effect.getParam(1).beatSync = param.beatSync;
-				paramControls[1].setBeatSync(param.beatSync);
-				paramControls[1].setLevel(param.viewLevel);
-			} else if (paramNum == 1) {
-				effect.getParam(0).beatSync = param.beatSync;
-				paramControls[0].setBeatSync(param.beatSync);
-				paramControls[0].setLevel(param.viewLevel);
+			if (param.id == 0) {
+				effect.getParam(1).toggle(param.isBeatSync());
+			} else if (param.id == 1) {
+				effect.getParam(0).ignoreListener(this);
+				effect.getParam(0).toggle(param.isBeatSync());
+				effect.getParam(0).unignoreListener(this);
 			}
 		}
 	}
@@ -112,16 +95,7 @@ public class EffectParamsPage extends TouchableView implements
 		for (int i = 0; i < paramControls.length; i++) {
 			paramControls[i] = new KnobParamControl(effect.getParam(i).beatSyncable);
 			paramControls[i].setId(i);
-			paramControls[i].addLevelListener(this);
 		}
+		setEffect(effect);
 	}
-
-	private final LevelParamControl getXParamControl() {
-		return paramControls[xParamIndex];
-	}
-
-	private final LevelParamControl getYParamControl() {
-		return paramControls[yParamIndex];
-	}
-
 }

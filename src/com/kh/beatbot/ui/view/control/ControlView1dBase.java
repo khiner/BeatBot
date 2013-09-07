@@ -1,44 +1,36 @@
 package com.kh.beatbot.ui.view.control;
 
-import java.util.ArrayList;
+import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.listener.ParamListener;
 
-import com.kh.beatbot.listener.Level1dListener;
 
-public abstract class ControlView1dBase extends ControlViewBase {
+public abstract class ControlView1dBase extends ControlViewBase implements ParamListener {
 
-	protected ArrayList<Level1dListener> levelListeners = new ArrayList<Level1dListener>();
-	
-	protected float level = .5f;
-	
+	protected Param param;
+	protected abstract void setViewLevel(float viewLevel);
 	protected abstract float posToLevel(float x, float y);
 	
-	public float getLevel() {
-		return level;
-	}
-
-	public void setViewLevel(float level) {
-		this.level = level;
-	}
-	
-	public void addLevelListener(Level1dListener levelListener) {
-		levelListeners.add(levelListener);
-	}
-
-	public void clearListeners() {
-		levelListeners.clear();
-	}
-	
-	public void setLevel(float level) {
-		setViewLevel(level);
-		for (Level1dListener levelListener : levelListeners) {
-			levelListener.onLevelChange(this, level);
+	public void setParam(Param param) {
+		if (this.param != null) {
+			this.param.removeListener(this);
 		}
+		this.param = param;
+		this.param.addListener(this);
+		onParamChanged(param);
 	}
 	
+	public float getLevel() {
+		return param.level;
+	}
+	
+	public Param getParam() {
+		return param;
+	}
+
 	@Override
 	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
-		setLevel(posToLevel(x, y));
+		param.setLevel(posToLevel(x, y));
 	}
 	
 	@Override
@@ -46,6 +38,11 @@ public abstract class ControlView1dBase extends ControlViewBase {
 		super.handleActionMove(id, x, y);
 		if (!selected)
 			return;
-		setLevel(posToLevel(x, y));
+		param.setLevel(posToLevel(x, y));
+	}
+	
+	@Override
+	public void onParamChanged(Param param) {
+		setViewLevel(param.viewLevel);
 	}
 }

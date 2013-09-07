@@ -31,8 +31,8 @@ public class SampleFile {
 			sampleFile.seek(22);
 			int channels = sampleFile.readUnsignedByte();
 			bytesPerSample = channels * 2;
-			loopBeginParam = new Param("Begin", "", 0, getNumSamples());
-			loopEndParam = new Param("End", "", 0, getNumSamples());
+			loopBeginParam = new Param(0, "Begin", "", 0, getNumSamples());
+			loopEndParam = new Param(1, "End", "", 0, getNumSamples());
 			loopBeginParam.setFormat("%.0f");
 			loopEndParam.setFormat("%.0f");
 			loopBeginParam.setLevel(0);

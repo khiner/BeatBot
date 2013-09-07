@@ -1,9 +1,11 @@
 package com.kh.beatbot.ui.view.page;
 
+import com.kh.beatbot.Track;
 import com.kh.beatbot.activity.BeatBotActivity;
-import com.kh.beatbot.listener.Level1dListener;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
@@ -13,12 +15,11 @@ import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.SampleEditView;
 import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.ControlViewBase;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
 
-public class SampleEditPage extends Page {
+public class SampleEditPage extends Page implements ParamListener {
 
 	private ShapeGroup labelGroup = new ShapeGroup();
 
@@ -29,12 +30,14 @@ public class SampleEditPage extends Page {
 	
 	@Override
 	public void update() {
+		Track currTrack = TrackManager.currTrack;
+		loopButton.setChecked(currTrack.isLooping());
+		reverseButton.setChecked(currTrack.isReverse());
+		loopBeginControl.setParam(currTrack.getLoopBeginParam());
+		loopEndControl.setParam(currTrack.getLoopEndParam());
+		sampleEdit.setParams(currTrack.getLoopBeginParam(), currTrack.getLoopEndParam());
 		if (sampleEdit != null)
 			sampleEdit.update();
-		loopButton.setChecked(TrackManager.currTrack.isLooping());
-		reverseButton.setChecked(TrackManager.currTrack.isReverse());
-		loopBeginControl.setParam(TrackManager.currTrack.getLoopBeginParam());
-		loopEndControl.setParam(TrackManager.currTrack.getLoopEndParam());
 	}
 
 	@Override
@@ -68,22 +71,6 @@ public class SampleEditPage extends Page {
 
 		loopBeginControl = new ParamControl(labelGroup);
 		loopEndControl = new ParamControl(labelGroup);
-		
-		loopBeginControl.addLevelListener(new Level1dListener() {
-			@Override
-			public void onLevelChange(ControlViewBase levelListenable,
-					float level) {
-				sampleEdit.update();
-			}
-		});
-		
-		loopEndControl.addLevelListener(new Level1dListener() {
-			@Override
-			public void onLevelChange(ControlViewBase levelListenable,
-					float level) {
-				sampleEdit.update();
-			}
-		});
 		
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override
@@ -156,5 +143,17 @@ public class SampleEditPage extends Page {
 				thirdHeight);
 
 		sampleEdit.layout(this, 0, thirdHeight, width, 2 * thirdHeight);
+	}
+
+	@Override
+	public void init() {
+		TrackManager.currTrack.getLoopBeginParam().addListener(this);
+		TrackManager.currTrack.getLoopEndParam().addListener(this);
+		update();
+	}
+
+	@Override
+	public void onParamChanged(Param param) {
+		sampleEdit.update();
 	}
 }

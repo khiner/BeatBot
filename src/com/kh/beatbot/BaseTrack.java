@@ -5,17 +5,35 @@ import java.util.Collections;
 import java.util.List;
 
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.effect.Effect.LevelType;
+import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.listener.ParamListener;
 
 public class BaseTrack {
 	protected int id;
-	public float volume = .8f, pan = .5f, pitch = .5f;
-	
 	protected List<Effect> effects = new ArrayList<Effect>();
-	public LevelType activeLevelType = LevelType.VOLUME;
+	public Param volumeParam, panParam, pitchParam, currLevelParam;
 
-	public BaseTrack(int id) {
+	public BaseTrack(final int id) {
 		this.id = id;
+		volumeParam = new Param(0, "Volume", "");
+		panParam = new Param(1, "Pan", "");
+		pitchParam = new Param(2, "Pitch", "");
+		volumeParam.setLevel(.8f); // pan/pitch default to .5
+		volumeParam.addListener(new ParamListener() {
+			public void onParamChanged(Param param) {
+				setTrackVolume(id, param.level);
+			}
+		});
+		panParam.addListener(new ParamListener() {
+			public void onParamChanged(Param param) {
+				setTrackPan(id, param.level);
+			}
+		});
+		pitchParam.addListener(new ParamListener() {
+			public void onParamChanged(Param param) {
+				setTrackPitch(id, param.level);
+			}
+		});
 	}
 
 	public int getId() {
@@ -66,20 +84,29 @@ public class BaseTrack {
 		return null;
 	}
 
-	/** Wrappers around native JNI methods **/
-	
-	public void setVolume(float volume) {
-		this.volume = volume;
-		setTrackVolume(id, volume);
+	public Param getCurrentLevelParam() {
+		if (currLevelParam == null) {
+			setLevelType(Effect.LevelType.VOLUME);
+		}
+		return currLevelParam;
 	}
 
+	public void setLevelType(Effect.LevelType levelType) {
+		switch(levelType) {
+		case VOLUME: currLevelParam = volumeParam; break;
+		case PAN: currLevelParam = panParam; break;
+		case PITCH: currLevelParam = pitchParam; break;
+		}
+	}
+
+	/** Wrappers around native JNI methods **/
+	
+
 	public void setPan(float pan) {
-		this.pan = pan;
 		setTrackPan(id, pan);
 	}
 
 	public void setPitch(float pitch) {
-		this.pitch = pitch;
 		setTrackPitch(id, pitch);
 	}
 

@@ -22,39 +22,18 @@ public class Seekbar2d extends ControlView2dBase {
 		return unitY(clipY(y));
 	}
 
-	public void setViewLevelX(float x) {
-		super.setViewLevelX(x);
-		initLines();
-	}
-
-	public void setViewLevelY(float y) {
-		super.setViewLevelY(y);
-		initLines();
-	}
-
 	public void setViewLevel(float x, float y) {
-		super.setViewLevel(x, y);
-		initLines();
-	}
-
-
-	@Override
-	public void init() {
-		super.init();
-		initLines();
+		lineVb = makeFloatBuffer(new float[] { borderOffset, viewY(y),
+				width - borderOffset, viewY(y), viewX(x), borderOffset,
+				viewX(x), height - borderOffset });
 	}
 
 	@Override
 	public void draw() {
 		float[] color = selected ? selectColor : levelColor;
 		drawLines(lineVb, color, 5, GL10.GL_LINES);
-		drawCircle(2 * getBgRectRadius() / 3, color, viewX(xLevel), viewY(yLevel));
-	}
-
-	private void initLines() {
-		lineVb = makeFloatBuffer(new float[] { borderOffset, viewY(yLevel),
-				width - borderOffset, viewY(yLevel), viewX(xLevel),
-				borderOffset, viewX(xLevel), height - borderOffset });
+		drawCircle(2 * getBgRectRadius() / 3, color,
+				viewX(params[0].viewLevel), viewY(params[1].viewLevel));
 	}
 
 	@Override

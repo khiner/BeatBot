@@ -11,13 +11,12 @@ import com.kh.beatbot.effect.Chorus;
 import com.kh.beatbot.effect.Decimate;
 import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremelo;
 import com.kh.beatbot.listener.DraggableLabelListListener;
-import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.RoundedRectIcon;
@@ -25,13 +24,12 @@ import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.TextView;
 import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.ControlViewBase;
 import com.kh.beatbot.ui.view.control.Seekbar;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.list.DraggableLabelList;
 import com.kh.beatbot.ui.view.list.LabelList;
 
-public abstract class LevelsFXPage extends Page implements Level1dListener {
+public abstract class LevelsFXPage extends Page {
 
 	class EffectLabelListListener implements DraggableLabelListListener {
 		private AlertDialog selectEffectAlert = null;
@@ -118,20 +116,6 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 		updateEffects();
 	}
 
-	@Override
-	public void onLevelChange(ControlViewBase levelBar, float level) {
-		switch (getCurrTrack().activeLevelType) {
-		case VOLUME:
-			getCurrTrack().setVolume(level);
-			break;
-		case PAN:
-			getCurrTrack().setPan(level);
-			break;
-		case PITCH:
-			getCurrTrack().setPitch(level);
-			break;
-		}
-	}
 
 	public void setMasterMode(boolean masterMode) {
 		this.masterMode = masterMode;
@@ -143,10 +127,11 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 
 	private void updateLevels() {
 		setMasterMode(masterMode);
+		Param currParam = getCurrTrack().getCurrentLevelParam();
+		levelBar.setParam(currParam);
+		levelBar.setLevelColor(getLevelColor(currParam));
 		deselectAll();
-		selectActiveLevel();
-		levelBar.setLevelColor(getActiveLevelColor());
-		levelBar.setLevel(getActiveLevel());
+		selectLevel(currParam);
 	}
 
 	private void updateEffects() {
@@ -169,42 +154,25 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 		pitchToggle.setChecked(false);
 	}
 
-	private void selectActiveLevel() {
-		switch (getCurrTrack().activeLevelType) {
-		case VOLUME:
+	private void selectLevel(Param currParam) {
+		if (currParam.equals(getCurrTrack().volumeParam)) {
 			volumeToggle.setChecked(true);
-			return;
-		case PAN:
+		} else if (currParam.equals(getCurrTrack().panParam)) {
 			panToggle.setChecked(true);
-			return;
-		case PITCH:
+		} else if (currParam.equals(getCurrTrack().pitchParam)) {
 			pitchToggle.setChecked(true);
-			return;
 		}
 	}
 
-	private float[] getActiveLevelColor() {
-		switch (getCurrTrack().activeLevelType) {
-		case VOLUME:
+	private float[] getLevelColor(Param currParam) {
+		if (currParam.equals(getCurrTrack().volumeParam)) {
 			return Colors.VOLUME;
-		case PAN:
+		} else if (currParam.equals(getCurrTrack().panParam)) {
 			return Colors.PAN;
-		case PITCH:
+		} else if (currParam.equals(getCurrTrack().pitchParam)) {
 			return Colors.PITCH;
 		}
 		return Colors.VOLUME;
-	}
-
-	private float getActiveLevel() {
-		switch (getCurrTrack().activeLevelType) {
-		case VOLUME:
-			return getCurrTrack().volume;
-		case PAN:
-			return getCurrTrack().pan;
-		case PITCH:
-			return getCurrTrack().pitch;
-		}
-		return getCurrTrack().volume;
 	}
 
 	// effects methods
@@ -266,25 +234,24 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 		labelGroup = new ShapeGroup();
 		effectLabel = new TextView();
 		levelBar = new Seekbar();
-		levelBar.addLevelListener(this);
 		volumeToggle = new ToggleButton();
 		panToggle = new ToggleButton();
 		pitchToggle = new ToggleButton();
 		volumeToggle.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button button) {
-				getCurrTrack().activeLevelType = LevelType.VOLUME;
+				getCurrTrack().setLevelType(Effect.LevelType.VOLUME);
 				updateLevels();
 			}
 		});
 		panToggle.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button button) {
-				getCurrTrack().activeLevelType = LevelType.PAN;
+				getCurrTrack().setLevelType(Effect.LevelType.PAN);
 				updateLevels();
 			}
 		});
 		pitchToggle.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button button) {
-				getCurrTrack().activeLevelType = LevelType.PITCH;
+				getCurrTrack().setLevelType(Effect.LevelType.PITCH);
 				updateLevels();
 			}
 		});
@@ -302,6 +269,4 @@ public abstract class LevelsFXPage extends Page implements Level1dListener {
 		addChild(pitchToggle);
 		addChild(effectLabelList);
 	}
-	
-	
 }

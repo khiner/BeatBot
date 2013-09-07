@@ -29,10 +29,10 @@ public class Decimate extends Effect {
 
 	@Override
 	protected void initParams() {
-		params.add(new EffectParam("Rate", "Hz", 0,
+		params.add(new EffectParam(0, "Rate", "Hz", 0,
 				PlaybackManager.SAMPLE_RATE, 8, true, false));
 		// bits in range [4, 32]
-		params.add(new EffectParam("Bits", "Bits", 4, 28, 32, true, false));
+		params.add(new EffectParam(1, "Bits", "Bits", 4, 28, 32, true, false));
 		// params do automatic scaling on hz params that we don't want.
 		params.get(0).hz = false;
 	}

@@ -20,11 +20,8 @@ import com.kh.beatbot.ui.view.page.SampleEditPage;
 import com.kh.beatbot.ui.view.page.TrackPage;
 
 public class PageSelectGroup extends TouchableView {
-	public static final int TRACK_PAGE_ID = 0;
-	public static final int EDIT_PAGE_ID = 1;
-	public static final int ADSR_PAGE_ID = 2;
-	public static final int MASTER_PAGE_ID = 3;
-	public static final int NOTE_LEVELS_PAGE_ID = 4;
+	public static final int TRACK_PAGE_ID = 0, EDIT_PAGE_ID = 1,
+			ADSR_PAGE_ID = 2, MASTER_PAGE_ID = 3, NOTE_LEVELS_PAGE_ID = 4;
 
 	private static NoteLevelsPage levelsPage;
 	private static MasterPage masterPage;
@@ -39,10 +36,9 @@ public class PageSelectGroup extends TouchableView {
 	private static ShapeGroup roundedRectGroup = new ShapeGroup();
 
 	public void selectPage(int pageNum) {
-		if (pageNum < 0 || pageNum >= pageButtons.length) {
-			return;
+		if (pageNum >= 0 && pageNum < pageButtons.length) {
+			pageButtons[pageNum].trigger(false);
 		}
-		pageButtons[pageNum].trigger(false);
 	}
 
 	public MasterPage getMasterPage() {
@@ -55,7 +51,7 @@ public class PageSelectGroup extends TouchableView {
 	}
 
 	public void updateAdsrPage() {
-		adsrPage.updateParamView();
+		adsrPage.update();
 	}
 
 	public void updateLevelsFXPage() {
@@ -67,7 +63,7 @@ public class PageSelectGroup extends TouchableView {
 		if (!initialized)
 			return;
 		update();
-		trackPage.update();
+		updateLevelsFXPage();
 		sampleEditPage.update();
 		adsrPage.update();
 	}
@@ -168,17 +164,14 @@ public class PageSelectGroup extends TouchableView {
 		pageButtons[MASTER_PAGE_ID].setText("Master");
 	}
 
-	@Override
-	public void init() {
-		// Parent
-	}
-
 	private void updateInstrumentIcon() {
 		// update the track pager instrument icon
-		IconResource instrumentIconResource = TrackManager.currTrack.getInstrument().getIconResource();
+		IconResource instrumentIconResource = TrackManager.currTrack
+				.getInstrument().getIconResource();
 		Icon instrumentIcon = pageButtons[TRACK_PAGE_ID].getIcon();
 		if (instrumentIcon == null) {
-			pageButtons[TRACK_PAGE_ID].setIcon(new Icon(instrumentIconResource));
+			pageButtons[TRACK_PAGE_ID]
+					.setIcon(new Icon(instrumentIconResource));
 		} else {
 			instrumentIcon.setResource(instrumentIconResource);
 		}

@@ -12,7 +12,6 @@ DelayConfigI *delayconfigi_create() {
 	delayconfigi_setDelayTime(p, .5f, .5f);
 	delayconfigi_setFeedback(p, .5f);
 	p->wet = 0.5f;
-	p->linkChannels = true;
 	return p;
 }
 
@@ -41,8 +40,5 @@ void delayconfigi_setParam(void *p, float paramNumFloat, float param) {
 		delayconfigi_setFeedback(config, param);
 	} else if (paramNum == 3) { // wet/dry
 		config->wet = param;
-	} else if (paramNum == 4) { // link channels
-		config->linkChannels = (int)param == 0 ? false : true;
-		delayconfigi_updateDelayTime(config);
 	}
 }

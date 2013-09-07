@@ -1,7 +1,6 @@
 package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.effect.ADSR;
-import com.kh.beatbot.listener.Level1dListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
@@ -12,7 +11,6 @@ import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.AdsrView;
 import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.ControlViewBase;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.SeekbarParamControl;
 
@@ -35,7 +33,7 @@ public class AdsrPage extends Page implements OnReleaseListener {
 		updateParamView();
 	}
 
-	public void updateParamView() {
+	private void updateParamView() {
 		// update the displayed param label, value and checked button
 		int paramId = TrackManager.currTrack.adsr.getCurrParamId();
 		for (ToggleButton adsrButton : adsrButtons) {
@@ -91,14 +89,6 @@ public class AdsrPage extends Page implements OnReleaseListener {
 	protected void createChildren() {
 		adsrView = new AdsrView();
 		paramControl = new SeekbarParamControl();
-		paramControl.addLevelListener(new Level1dListener() {
-			@Override
-			public void onLevelChange(ControlViewBase levelListenable,
-					float level) {
-				TrackManager.currTrack.adsr.setCurrParamLevel(level);
-				adsrView.update();
-			}
-		});
 		adsrButtons = new ToggleButton[ADSR.NUM_PARAMS];
 		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i] = new ToggleButton();

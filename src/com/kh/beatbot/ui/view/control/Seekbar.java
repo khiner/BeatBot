@@ -26,7 +26,6 @@ public class Seekbar extends ControlView1dBase {
 	
 	public void init() {
 		initLevelBarVb();
-		updateNumLevelVertices();
 		super.init();
 	}
 
@@ -77,14 +76,13 @@ public class Seekbar extends ControlView1dBase {
 	}
 
 	public void setViewLevel(float level) {
-		super.setViewLevel(level);
 		updateNumLevelVertices();
 	}
 
 	protected void updateNumLevelVertices() {
 		if (levelBarVb == null)
 			return;
-		numLevelVertices = (int) (level * (levelBarVb.capacity() / 2));
+		numLevelVertices = (int) (param.viewLevel * (levelBarVb.capacity() / 2));
 		// want even number of vertices to avoid jagged ending
 		numLevelVertices += numLevelVertices % 2;
 		// make sure we don't go have an out of bounds index

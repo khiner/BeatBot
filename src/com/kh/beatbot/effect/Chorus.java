@@ -27,10 +27,10 @@ public class Chorus extends Effect {
 	
 	@Override
 	protected void initParams() {
-		params.add(new EffectParam("Mod Rate", "Hz", true, true));
-		params.add(new EffectParam("Mod Amt", "", false, false));
-		params.add(new EffectParam("Time", "ms", true, false));
-		params.add(new EffectParam("Feedback", "", false, false));
-		params.add(new EffectParam("Wet", "", false, false));
+		params.add(new EffectParam(0, "Mod Rate", "Hz", true, true));
+		params.add(new EffectParam(1, "Mod Amt", "", false, false));
+		params.add(new EffectParam(2, "Time", "ms", true, false));
+		params.add(new EffectParam(3, "Feedback", "", false, false));
+		params.add(new EffectParam(4, "Wet", "", false, false));
 	}
 }

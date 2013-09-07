@@ -8,7 +8,6 @@ public class SeekbarParamControl extends LevelParamControl {
 		super();
 		levelControl = new Seekbar();
 		addChild(levelControl);
-		addLevelListener(this);
 	}
 	
 	@Override

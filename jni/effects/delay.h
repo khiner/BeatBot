@@ -46,8 +46,6 @@ static inline void delayconfigi_setDelaySamples(DelayConfigI *config,
 
 static inline void delayconfigi_setDelayTime(DelayConfigI *config, float lDelay,
 		float rDelay) {
-	if (config->linkChannels)
-		rDelay = lDelay;  // if channels are linked, follow left channel
 	pthread_mutex_lock(&config->mutex);
 	config->delayTime[0] = lDelay;
 	config->delayTime[1] = rDelay;

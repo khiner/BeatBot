@@ -1,54 +1,44 @@
 package com.kh.beatbot.ui.view.control;
 
-import java.util.ArrayList;
+import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.listener.ParamListener;
 
-import com.kh.beatbot.listener.Level2dListener;
 
-public abstract class ControlView2dBase extends ControlViewBase {
+public abstract class ControlView2dBase extends ControlViewBase implements ParamListener {
 
-	protected ArrayList<Level2dListener> levelListeners = new ArrayList<Level2dListener>();
-
-	protected float xLevel = .5f, yLevel = .5f;
+	protected Param[] params = new Param[2];
 
 	protected abstract float xToLevel(float x);
 	protected abstract float yToLevel(float y);
-	
-	public void addLevelListener(Level2dListener levelListener) {
-		levelListeners.add(levelListener);
-	}
-
-	public void clearListeners() {
-		levelListeners.clear();
-	}
-	
-	public void setLevel(float xLevel, float yLevel) {
-		setViewLevel(xLevel, yLevel);
-		for (Level2dListener listener : levelListeners) {
-			listener.onLevelChange(this, xLevel, yLevel);
+		
+	public void setParams(Param xParam, Param yParam) {
+		for (int i = 0; i < params.length; i++) {
+			if (params[i] != null) {
+				params[i].removeListener(this);
+			}
+			params[i] = (i == 0) ? xParam : (i == 1 ? yParam : null);
+			params[i].addListener(this);
 		}
-	}
-	
-	public void setViewLevelX(float x) {
-		xLevel = x;
-	}
-
-	public void setViewLevelY(float y) {
-		yLevel = y;
-	}
-
-	public void setViewLevel(float x, float y) {
-		xLevel = x;
-		yLevel = y;
+		onParamChanged(params[0]);
 	}
 	
 	@Override
 	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
-		setLevel(xToLevel(x), yToLevel(y));
+		params[0].setLevel(xToLevel(x));
+		params[1].setLevel(yToLevel(y));
 	}
 	
 	@Override
 	public void handleActionMove(int id, float x, float y) {
-		setLevel(xToLevel(x), yToLevel(y));
+		params[0].setLevel(xToLevel(x));
+		params[1].setLevel(yToLevel(y));
 	}
+	
+	@Override
+	public void onParamChanged(Param param) {
+		setViewLevel(params[0].viewLevel, params[1].viewLevel);
+	}
+
+	protected abstract void setViewLevel(float xViewLevel, float yViewLevel);
 }

@@ -8,11 +8,13 @@ import javax.microedition.khronos.opengles.GL10;
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.ADSR;
+import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.page.Page;
 
-public class AdsrView extends TouchableView {
+public class AdsrView extends TouchableView implements ParamListener {
 
 	private static final int SNAP_DIST_SQUARED = 1024;
 	private static float[] pointVertices = new float[10];
@@ -24,9 +26,76 @@ public class AdsrView extends TouchableView {
 	private int[] adsrSelected = new int[] { -1, -1, -1, -1, -1 };
 
 	public void update() {
+		for (int i = 0; i < ADSR.NUM_PARAMS; i++) {
+			TrackManager.currTrack.adsr.getParam(i).removeListener(this);
+			TrackManager.currTrack.adsr.getParam(i).addListener(this);
+		}
 		initAdsrVb();
 	}
 
+	@Override
+	public void init() {
+		initAdsrVb();
+		ADSR adsr = TrackManager.currTrack.adsr;
+		for (int i = 0; i < ADSR.NUM_PARAMS; i++) {
+			GLSurfaceViewBase.storeText(adsr.getParam(i).name);
+		}
+	}
+
+	@Override
+	public void draw() {
+		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(0),
+				adsrPointVb.get(1));
+		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(2),
+				adsrPointVb.get(3));
+		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(4),
+				adsrPointVb.get(5));
+		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(8),
+				adsrPointVb.get(9));
+		for (int i = 0; i < 5; i++) {
+			if (adsrSelected[i] != -1) {
+				drawCircle(getBgRectRadius(), Colors.VOLUME_SELECTED,
+						adsrPointVb.get(i * 2), adsrPointVb.get(i * 2 + 1));
+			}
+		}
+		drawLines(adsrCurveVb, Colors.VOLUME, 3, GL10.GL_LINE_STRIP);
+	}
+
+	@Override
+	public void handleActionDown(int id, float x, float y) {
+		selectAdsrPoint(id, clipX(x), clipY(y));
+	}
+
+	@Override
+	public void handleActionPointerDown(int id, float x, float y) {
+		selectAdsrPoint(id, clipX(x), clipY(y));
+	}
+
+	@Override
+	public void handleActionMove(int id, float x, float y) {
+		moveAdsrPoint(id, clipX(x), clipY(y));
+	}
+
+	@Override
+	public void handleActionPointerUp(int id, float x, float y) {
+		deselectAdsrPoint(id);
+	}
+
+	@Override
+	public void handleActionUp(int id, float x, float y) {
+		clearAdsrSelected();
+	}
+
+	@Override
+	public void onParamChanged(Param param) {
+		initAdsrVb();
+	}
+
+	@Override
+	protected void createChildren() {
+		initBgRect(null, Colors.VIEW_BG, Colors.VOLUME);
+	}
+	
 	private void initAdsrVb() {
 		Track track = TrackManager.currTrack;
 		float attackX = getAttackX(track.adsr);
@@ -105,8 +174,10 @@ public class AdsrView extends TouchableView {
 
 	private void deselectAdsrPoint(int id) {
 		for (int i = 0; i < adsrSelected.length; i++) {
-			if (adsrSelected[i] == id)
+			if (adsrSelected[i] == id) {
 				adsrSelected[i] = -1;
+				return;
+			}
 		}
 	}
 
@@ -137,7 +208,6 @@ public class AdsrView extends TouchableView {
 					TrackManager.currTrack.adsr.setRelease(xToRelease(x));
 					break;
 				}
-				initAdsrVb();
 				Page.mainPage.pageSelectGroup.updateAdsrPage();
 				return;
 			}
@@ -155,63 +225,5 @@ public class AdsrView extends TouchableView {
 				return;
 			}
 		}
-	}
-
-	@Override
-	public void init() {
-		initAdsrVb();
-		ADSR adsr = TrackManager.currTrack.adsr;
-		for (int i = 0; i < ADSR.NUM_PARAMS; i++) {
-			GLSurfaceViewBase.storeText(adsr.getParam(i).name);
-		}
-	}
-
-	@Override
-	public void draw() {
-		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(0),
-				adsrPointVb.get(1));
-		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(2),
-				adsrPointVb.get(3));
-		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(4),
-				adsrPointVb.get(5));
-		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(8),
-				adsrPointVb.get(9));
-		for (int i = 0; i < 5; i++) {
-			if (adsrSelected[i] != -1) {
-				drawCircle(getBgRectRadius(), Colors.VOLUME_SELECTED,
-						adsrPointVb.get(i * 2), adsrPointVb.get(i * 2 + 1));
-			}
-		}
-		drawLines(adsrCurveVb, Colors.VOLUME, 3, GL10.GL_LINE_STRIP);
-	}
-
-	@Override
-	public void handleActionDown(int id, float x, float y) {
-		selectAdsrPoint(id, clipX(x), clipY(y));
-	}
-
-	@Override
-	public void handleActionPointerDown(int id, float x, float y) {
-		selectAdsrPoint(id, clipX(x), clipY(y));
-	}
-
-	@Override
-	public void handleActionMove(int id, float x, float y) {
-		moveAdsrPoint(id, clipX(x), clipY(y));
-	}
-
-	@Override
-	public void handleActionPointerUp(int id, float x, float y) {
-		deselectAdsrPoint(id);
-	}
-
-	@Override
-	public void handleActionUp(int id, float x, float y) {
-		clearAdsrSelected();
-	}
-
-	@Override
-	protected void createChildren() {
-		initBgRect(null, Colors.VIEW_BG, Colors.VOLUME);
 	}
 }
