@@ -5,7 +5,7 @@ import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import com.kh.beatbot.manager.PlaybackManager;
+import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
@@ -13,9 +13,10 @@ import com.kh.beatbot.ui.view.control.ControlView2dBase;
 public class SampleEditView extends ControlView2dBase {
 
 	// min distance for pointer to select loop markers
-	private static final float SNAP_DIST = 32f,
-			MIN_LOOP_WINDOW = 32f / PlaybackManager.SAMPLE_RATE;
+	private static final float SNAP_DIST = 32f;
 
+	private static float minLoopWindow;
+	
 	private static FloatBuffer waveformVb = null, backgroundOutlineVb = null,
 			loopSelectionLineVb = null,
 			loopSelectionRectVbs[] = new FloatBuffer[2];
@@ -36,6 +37,7 @@ public class SampleEditView extends ControlView2dBase {
 	public void update() {
 		levelOffset = 0;
 		levelWidth = 1;
+		minLoopWindow = params[0].getViewLevel(Track.MIN_LOOP_WINDOW); // find view level for 32 samples
 		updateVbs();
 	}
 
@@ -43,6 +45,11 @@ public class SampleEditView extends ControlView2dBase {
 		backgroundOutlineVb = makeRectFloatBuffer(0, 0, width - 2, height);
 	}
 
+	private void updateVbs() {
+		updateWaveformVb();
+		updateLoopSelectionVbs();
+	}
+	
 	private void updateWaveformVb() {
 		try {
 			waveformVb = TrackManager.currTrack.getCurrSampleFile()
@@ -53,6 +60,19 @@ public class SampleEditView extends ControlView2dBase {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void updateLoopSelectionVbs() {
+		float beginX = levelToX(params[0].viewLevel);
+		float endX = levelToX(params[1].viewLevel);
+		float[] loopSelectionVertices = { beginX, 0, beginX, height, endX,
+				height, endX, 0 };
+
+		loopSelectionLineVb = makeFloatBuffer(loopSelectionVertices);
+		loopSelectionRectVbs[0] = makeRectFloatBuffer(beginX - SNAP_DIST / 2,
+				height, beginX + SNAP_DIST / 2, 0);
+		loopSelectionRectVbs[1] = makeRectFloatBuffer(endX - SNAP_DIST / 2,
+				height, endX + SNAP_DIST / 2, 0);
 	}
 
 	private void drawWaveform() {
@@ -115,15 +135,15 @@ public class SampleEditView extends ControlView2dBase {
 		if (newLevelOffset < 0) {
 			levelOffset = 0;
 			levelWidth = ZRAL * waveformWidth / (x2 - SNAP_DIST / 2);
-			levelWidth = levelWidth <= 1 ? (levelWidth >= MIN_LOOP_WINDOW ? levelWidth
-					: MIN_LOOP_WINDOW)
+			levelWidth = levelWidth <= 1 ? (levelWidth >= minLoopWindow ? levelWidth
+					: minLoopWindow)
 					: 1;
 		} else if (newLevelWidth > 1) {
 			levelOffset = newLevelOffset;
 			levelWidth = 1 - levelOffset;
-		} else if (newLevelWidth < MIN_LOOP_WINDOW) {
+		} else if (newLevelWidth < minLoopWindow) {
 			levelOffset = newLevelOffset;
-			levelWidth = MIN_LOOP_WINDOW;
+			levelWidth = minLoopWindow;
 		} else if (newLevelOffset + newLevelWidth > 1) {
 			levelWidth = ((ZLAL - 1) * waveformWidth)
 					/ (x1 - SNAP_DIST / 2 - waveformWidth);
@@ -133,11 +153,6 @@ public class SampleEditView extends ControlView2dBase {
 			levelWidth = newLevelWidth;
 		}
 		updateVbs();
-	}
-
-	private void updateVbs() {
-		updateWaveformVb();
-		setViewLevel(params[0].viewLevel, params[1].viewLevel);
 	}
 
 	@Override
@@ -175,10 +190,7 @@ public class SampleEditView extends ControlView2dBase {
 
 		if (id == beginLoopPointerId) {
 			// update track loop begin
-			float newLoopBegin = xToLevel(x);
-			params[0].setLevel(newLoopBegin < 0 ? 0
-					: (newLoopBegin >= beginLevel - MIN_LOOP_WINDOW ? endLevel
-							- MIN_LOOP_WINDOW : newLoopBegin));
+			params[0].setLevel(xToLevel(x));
 			// update ui to fit the new begin point
 			if (beginLevel < levelOffset) {
 				levelWidth += levelOffset - beginLevel;
@@ -188,10 +200,7 @@ public class SampleEditView extends ControlView2dBase {
 			}
 		} else if (id == endLoopPointerId) {
 			// update track loop end
-			float newLoopEnd = xToLevel(x);
-			params[1].setLevel(newLoopEnd >= 1 ? 1 : (newLoopEnd <= beginLevel
-					+ MIN_LOOP_WINDOW ? beginLevel + MIN_LOOP_WINDOW
-					: newLoopEnd));
+			params[1].setLevel(xToLevel(x));
 			// update ui to fit the new end point
 			if (endLevel > levelOffset + levelWidth) {
 				levelWidth = endLevel - levelOffset;
@@ -202,7 +211,7 @@ public class SampleEditView extends ControlView2dBase {
 		} else {
 			return false;
 		}
-		updateVbs();
+		updateWaveformVb();
 		return true;
 	}
 
@@ -234,6 +243,7 @@ public class SampleEditView extends ControlView2dBase {
 			return; // not scrolling
 		updateLevelOffset(scrollX);
 		updateVbs();
+		
 	}
 
 	@Override
@@ -286,29 +296,20 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	protected void setViewLevel(float beginLevel, float endLevel) {
-		float beginX = levelToX(beginLevel);
-		float endX = levelToX(endLevel);
-		float[] loopSelectionVertices = { beginX, 0, beginX, height, endX,
-				height, endX, 0 };
-
-		loopSelectionLineVb = makeFloatBuffer(loopSelectionVertices);
-		loopSelectionRectVbs[0] = makeRectFloatBuffer(beginX - SNAP_DIST / 2,
-				height, beginX + SNAP_DIST / 2, 0);
-		loopSelectionRectVbs[1] = makeRectFloatBuffer(endX - SNAP_DIST / 2,
-				height, endX + SNAP_DIST / 2, 0);
+		updateLoopSelectionVbs();
 	}
 
 	@Override
 	protected float xToLevel(float x) {
-		return (x - SNAP_DIST / 2) / waveformWidth + levelOffset;
-	}
-
-	protected float levelToX(float level) {
-		return SNAP_DIST / 2 + (level - levelOffset) * waveformWidth;
+		return (x - SNAP_DIST / 2) * levelWidth / waveformWidth + levelOffset;
 	}
 
 	@Override
 	protected float yToLevel(float y) {
 		return 0;
+	}
+
+	protected float levelToX(float level) {
+		return SNAP_DIST / 2 + (level - levelOffset) * waveformWidth / levelWidth;
 	}
 }

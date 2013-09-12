@@ -52,6 +52,10 @@ public class GeneralUtils {
 	}
 	
 	public static float clipToUnit(float value) {
-		return value > 0 ? (value < 1 ? value: 1) : 0;
+		return clipTo(value, 0, 1);
+	}
+	
+	public static float clipTo(float value, float min, float max) {
+		return value > min ? (value < max ? value: max) : min;
 	}
 }

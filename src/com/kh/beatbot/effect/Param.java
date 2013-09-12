@@ -3,6 +3,7 @@ package com.kh.beatbot.effect;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.listener.ParamListener;
 
 public class Param {
@@ -13,6 +14,8 @@ public class Param {
 	public String unitString, name, format = "%.2f";
 	public float level, viewLevel, addValue, scaleValue;
 	
+	public float minViewLevel = 0, maxViewLevel = 1;
+
 	public Param(int id, String name, String unitString) {
 		this(id, name, unitString, 0, 1);
 	}
@@ -27,6 +30,7 @@ public class Param {
 	}
 	
 	public void setLevel(float level) {
+		level = GeneralUtils.clipTo(level, minViewLevel, maxViewLevel);
 		viewLevel = level;
 		this.level = addValue + scaleValue * level;
 		notifyListeners();
@@ -35,7 +39,11 @@ public class Param {
 	public float getLevel(float value) {
 		return addValue + scaleValue * value;
 	}
-		
+	
+	public float getViewLevel(float value) {
+		return (value - addValue) / scaleValue;
+	}
+
 	public void setFormat(String format) {
 		this.format = format;
 	}

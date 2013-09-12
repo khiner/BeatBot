@@ -6,14 +6,17 @@ import java.util.List;
 
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.view.TrackButtonRow;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
 
-public class Track extends BaseTrack {
+public class Track extends BaseTrack implements ParamListener {
 
+	public static float MIN_LOOP_WINDOW = 32f;
+	
 	private Instrument instrument;
 	private TrackButtonRow buttonRow;
 
@@ -158,12 +161,15 @@ public class Track extends BaseTrack {
 			currSampleFile = instrument.createSampleFile(sampleNum);
 			sampleFiles.add(currSampleFile);
 		} else if (!sampleFile.equals(currSampleFile)) {
+			currSampleFile.getLoopBeginParam().removeListener(this);
+			currSampleFile.getLoopEndParam().removeListener(this);
 			currSampleFile = sampleFile;
 		} else {
 			return; // same file, nothing to do
 		}
 		setSampleNum(sampleNum);
-		updateLoopWindow();
+		currSampleFile.getLoopBeginParam().addListener(this);
+		currSampleFile.getLoopEndParam().addListener(this);
 	}
 
 	private SampleFile findSampleFile(String fileName) {
@@ -183,26 +189,12 @@ public class Track extends BaseTrack {
 		return currSampleFile.getLoopEndParam();
 	}
 
-	public float getLoopBeginSample() {
-		return currSampleFile.getLoopBeginParam().level;
-	}
-	
-	public float getLoopEndSample() {
-		return currSampleFile.getLoopEndParam().level;
+	public Param getGainParam() {
+		return currSampleFile.getGainParam();
 	}
 
 	public float getNumSamples() {
 		return currSampleFile.getLoopBeginParam().getLevel(1);
-	}
-
-	public void setLoopBeginSample(float loopBeginSample) {
-		getCurrSampleFile().setLoopBeginSample(loopBeginSample);
-		updateLoopWindow();
-	}
-
-	public void setLoopEndSample(float loopEndSample) {
-		getCurrSampleFile().setLoopEndSample(loopEndSample);
-		updateLoopWindow();
 	}
 
 	public String getCurrSampleName() {
@@ -255,6 +247,14 @@ public class Track extends BaseTrack {
 		return reverse;
 	}
 
+	@Override
+	public void onParamChanged(Param param) {
+		float minLoopWindow = getLoopEndParam().getViewLevel(MIN_LOOP_WINDOW);
+		getLoopBeginParam().maxViewLevel = getLoopEndParam().viewLevel - minLoopWindow;
+		getLoopEndParam().minViewLevel = getLoopBeginParam().viewLevel + minLoopWindow;
+		updateLoopWindow();
+	}
+	
 	private void updateLoopWindow() {
 		setTrackLoopWindow(id, (long) getLoopBeginParam().level,
 				(long) getLoopEndParam().level);

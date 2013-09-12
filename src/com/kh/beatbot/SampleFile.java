@@ -21,7 +21,7 @@ public class SampleFile {
 	private byte[] inBytes = new byte[2];
 	private int bytesPerSample = 0;
 
-	private Param loopBeginParam, loopEndParam;
+	private Param loopBeginParam, loopEndParam, gainParam;
 
 	public SampleFile(File file) {
 		this.file = file;
@@ -37,6 +37,10 @@ public class SampleFile {
 			loopEndParam.setFormat("%.0f");
 			loopBeginParam.setLevel(0);
 			loopEndParam.setLevel(1);
+			
+			gainParam = new Param(2, "Gain", "", 0, 1);
+			gainParam.setLevel(0.5f);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -50,14 +54,8 @@ public class SampleFile {
 		return loopEndParam;
 	}
 
-	public void setLoopBeginSample(float loopBeginSample) {
-		// TODO this will be wrong unless lbs ~ [0,1]
-		this.loopBeginParam.setLevel(loopBeginSample);
-	}
-	
-	public void setLoopEndSample(float loopEndSample) {
-		// TODO this will be wrong unless lbs ~ [0,1]
-		this.loopEndParam.setLevel(loopEndSample);
+	public Param getGainParam() {
+		return gainParam;
 	}
 	
 	public void renameTo(String name) {

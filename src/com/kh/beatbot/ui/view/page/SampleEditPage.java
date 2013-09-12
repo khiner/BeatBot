@@ -26,8 +26,8 @@ public class SampleEditPage extends Page implements ParamListener {
 	private SampleEditView sampleEdit;
 	private ImageButton previewButton, browseButton, editButton;
 	private ToggleButton loopButton, reverseButton;
-	private ParamControl loopBeginControl, loopEndControl;
-	
+	private ParamControl loopBeginControl, loopEndControl, gainControl;
+
 	@Override
 	public void update() {
 		Track currTrack = TrackManager.currTrack;
@@ -35,7 +35,9 @@ public class SampleEditPage extends Page implements ParamListener {
 		reverseButton.setChecked(currTrack.isReverse());
 		loopBeginControl.setParam(currTrack.getLoopBeginParam());
 		loopEndControl.setParam(currTrack.getLoopEndParam());
-		sampleEdit.setParams(currTrack.getLoopBeginParam(), currTrack.getLoopEndParam());
+		gainControl.setParam(currTrack.getGainParam());
+		sampleEdit.setParams(currTrack.getLoopBeginParam(),
+				currTrack.getLoopEndParam());
 		if (sampleEdit != null)
 			sampleEdit.update();
 	}
@@ -71,7 +73,8 @@ public class SampleEditPage extends Page implements ParamListener {
 
 		loopBeginControl = new ParamControl(labelGroup);
 		loopEndControl = new ParamControl(labelGroup);
-		
+		gainControl = new ParamControl(labelGroup);
+
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override
 			public void onPress(Button button) {
@@ -85,13 +88,13 @@ public class SampleEditPage extends Page implements ParamListener {
 				TrackManager.currTrack.stopPreviewing();
 			}
 		});
-		
+
 		loopButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
 				TrackManager.currTrack.toggleLooping();
 			}
 		});
-		
+
 		reverseButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
 				TrackManager.currTrack.setReverse(reverseButton.isChecked());
@@ -121,28 +124,30 @@ public class SampleEditPage extends Page implements ParamListener {
 		addChild(editButton);
 		addChild(loopBeginControl);
 		addChild(loopEndControl);
+		addChild(gainControl);
 	}
 
 	@Override
 	public void layoutChildren() {
-		float thirdHeight = height / 3;
-		float margin = 7;
-		previewButton.layout(this, 0, 0, thirdHeight, thirdHeight);
-		loopButton.layout(this, thirdHeight + margin, 0, thirdHeight,
-				thirdHeight);
-		reverseButton.layout(this, thirdHeight * 2 + margin * 2, 0,
-				thirdHeight, thirdHeight);
-
-		loopBeginControl.layout(this, width - thirdHeight * 15, 0,
-				thirdHeight * 6, thirdHeight);
-		loopEndControl.layout(this, width - thirdHeight * 9, 0,
-				thirdHeight * 6, thirdHeight);
-		browseButton.layout(this, width - thirdHeight * 2, 0, thirdHeight,
-				thirdHeight);
-		editButton.layout(this, width - thirdHeight, 0, thirdHeight,
-				thirdHeight);
-
-		sampleEdit.layout(this, 0, thirdHeight, width, 2 * thirdHeight);
+		float topBarH = height * .29f;
+		float fillH = height - topBarH;
+		float margin = width * .02f;
+		previewButton.layout(this, 0, topBarH, fillH, fillH);
+		loopButton.layout(this, width - fillH / 2 - margin, topBarH, fillH / 2,
+				fillH / 2);
+		reverseButton.layout(this, width - fillH / 2 - margin, height - fillH / 2,
+				fillH / 2, fillH / 2);
+		
+		gainControl.layout(this, 0, 0, topBarH * 6, topBarH);
+		loopBeginControl.layout(this, topBarH * 6, 0, topBarH * 6,
+				topBarH);
+		loopEndControl.layout(this, topBarH * 12, 0, topBarH * 6,
+				topBarH);
+		browseButton.layout(this, width - topBarH * 2, 0, topBarH, topBarH);
+		editButton.layout(this, width - topBarH, 0, topBarH, topBarH);
+		
+		sampleEdit.layout(this, fillH, topBarH, width - fillH / 2 - fillH - margin * 2,
+				fillH);
 	}
 
 	@Override
