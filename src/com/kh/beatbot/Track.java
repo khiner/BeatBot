@@ -1,5 +1,7 @@
 package com.kh.beatbot;
 
+import java.io.IOException;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,11 +13,14 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.view.TrackButtonRow;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
 
 public class Track extends BaseTrack implements ParamListener {
 
 	public static float MIN_LOOP_WINDOW = 32f;
+	
+	private Param loopBeginParam, loopEndParam, gainParam;
 	
 	private Instrument instrument;
 	private TrackButtonRow buttonRow;
@@ -157,19 +162,37 @@ public class Track extends BaseTrack implements ParamListener {
 		// otherwise, create a new one and add it to the list
 		String fileName = instrument.getFullPath(sampleNum);
 		SampleFile sampleFile = findSampleFile(fileName);
+
 		if (sampleFile == null) { // haven't created sample file yet
 			currSampleFile = instrument.createSampleFile(sampleNum);
 			sampleFiles.add(currSampleFile);
+			
+			setSampleNum(sampleNum);
+
+			loopBeginParam = new Param(0, "Begin", "", 0, getNumSamples(id));
+			loopEndParam = new Param(1, "End", "", 0, getNumSamples(id));
+			loopBeginParam.setFormat("%.0f");
+			loopEndParam.setFormat("%.0f");
+			loopBeginParam.setLevel(0);
+			loopEndParam.setLevel(1);
+			
+			gainParam = new Param(2, "Gain", "", 0, 1);
+			gainParam.setLevel(0.5f);
+			
 		} else if (!sampleFile.equals(currSampleFile)) {
-			currSampleFile.getLoopBeginParam().removeListener(this);
-			currSampleFile.getLoopEndParam().removeListener(this);
+			
+			setSampleNum(sampleNum);
+			
+			gainParam.removeListener(this);
+			loopBeginParam.removeListener(this);
+			loopEndParam.removeListener(this);
 			currSampleFile = sampleFile;
 		} else {
 			return; // same file, nothing to do
 		}
-		setSampleNum(sampleNum);
-		currSampleFile.getLoopBeginParam().addListener(this);
-		currSampleFile.getLoopEndParam().addListener(this);
+		gainParam.addListener(this);
+		loopBeginParam.addListener(this);
+		loopEndParam.addListener(this);
 	}
 
 	private SampleFile findSampleFile(String fileName) {
@@ -182,19 +205,15 @@ public class Track extends BaseTrack implements ParamListener {
 	}
 
 	public Param getLoopBeginParam() {
-		return currSampleFile.getLoopBeginParam();
+		return loopBeginParam;
 	}
 
 	public Param getLoopEndParam() {
-		return currSampleFile.getLoopEndParam();
+		return loopEndParam;
 	}
 
 	public Param getGainParam() {
-		return currSampleFile.getGainParam();
-	}
-
-	public float getNumSamples() {
-		return currSampleFile.getLoopBeginParam().getLevel(1);
+		return gainParam;
 	}
 
 	public String getCurrSampleName() {
@@ -249,10 +268,14 @@ public class Track extends BaseTrack implements ParamListener {
 
 	@Override
 	public void onParamChanged(Param param) {
-		float minLoopWindow = getLoopEndParam().getViewLevel(MIN_LOOP_WINDOW);
-		getLoopBeginParam().maxViewLevel = getLoopEndParam().viewLevel - minLoopWindow;
-		getLoopEndParam().minViewLevel = getLoopBeginParam().viewLevel + minLoopWindow;
-		updateLoopWindow();
+		if (param.equals(getGainParam())) {
+			setTrackGain(id, param.level);
+		} else {
+			float minLoopWindow = getLoopEndParam().getViewLevel(MIN_LOOP_WINDOW);
+			getLoopBeginParam().maxViewLevel = getLoopEndParam().viewLevel - minLoopWindow;
+			getLoopEndParam().minViewLevel = getLoopBeginParam().viewLevel + minLoopWindow;
+			updateLoopWindow();
+		}
 	}
 	
 	private void updateLoopWindow() {
@@ -271,15 +294,25 @@ public class Track extends BaseTrack implements ParamListener {
 		setTrackReverse(id, reverse);
 	}
 
-	// scale all samples so that the sample with the highest amplitude is at 1
-	public float[] normalize() {
-		return normalize(id);
-	}
-
 	public void setSampleNum(int sampleNum) {
 		setSample(id, getCurrSamplePath());
 	}
 
+	public FloatBuffer floatFileToBuffer(View view, long offset,
+			long numFloats, int xOffset) throws IOException {
+		float spp = Math.min(2, numFloats / view.width);
+		float[] outputAry = new float[2 * (int) (view.width * spp)];
+
+		for (int x = 0; x < outputAry.length; x += 2) {
+			float percent = (float) x / outputAry.length;
+			int dataIndex = (int) (offset + percent * numFloats);
+			float sample = getFloatSample(id, dataIndex, 0);
+			float y = view.height * (sample + 1) / 2;
+			outputAry[x] = percent * view.width + xOffset;
+			outputAry[x + 1] = y;
+		}
+		return View.makeFloatBuffer(outputAry);
+	}
 	public static native void toggleTrackLooping(int trackNum);
 
 	public static native boolean isTrackLooping(int trackNum);
@@ -305,9 +338,13 @@ public class Track extends BaseTrack implements ParamListener {
 
 	public static native void setTrackReverse(int trackId, boolean reverse);
 
-	public static native float[] normalize(int trackId);
+	public static native void setTrackGain(int trackId, float gain);
 
 	public static native void setSample(int trackId, String sampleName);
+
+	public static native float getFloatSample(int trackId, int sampleIndex, int channel);
+
+	public static native float getNumSamples(int trackId);
 
 	public native void setNextNote(int trackId, MidiNote midiNote);
 }

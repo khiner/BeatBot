@@ -16,7 +16,7 @@ public class SampleEditView extends ControlView2dBase {
 	private static final float SNAP_DIST = 32f;
 
 	private static float minLoopWindow;
-	
+
 	private static FloatBuffer waveformVb = null, backgroundOutlineVb = null,
 			loopSelectionLineVb = null,
 			loopSelectionRectVbs[] = new FloatBuffer[2];
@@ -37,7 +37,12 @@ public class SampleEditView extends ControlView2dBase {
 	public void update() {
 		levelOffset = 0;
 		levelWidth = 1;
-		minLoopWindow = params[0].getViewLevel(Track.MIN_LOOP_WINDOW); // find view level for 32 samples
+		minLoopWindow = params[0].getViewLevel(Track.MIN_LOOP_WINDOW); // find
+																		// view
+																		// level
+																		// for
+																		// 32
+																		// samples
 		updateVbs();
 	}
 
@@ -49,14 +54,13 @@ public class SampleEditView extends ControlView2dBase {
 		updateWaveformVb();
 		updateLoopSelectionVbs();
 	}
-	
+
 	private void updateWaveformVb() {
 		try {
-			waveformVb = TrackManager.currTrack.getCurrSampleFile()
-					.floatFileToBuffer(this,
-							(long) params[0].getLevel(levelOffset),
-							(long) params[0].getLevel(levelWidth),
-							(int) (SNAP_DIST / 2));
+			waveformVb = TrackManager.currTrack.floatFileToBuffer(this,
+					(long) params[0].getLevel(levelOffset),
+					(long) params[0].getLevel(levelWidth),
+					(int) (SNAP_DIST / 2));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -243,7 +247,7 @@ public class SampleEditView extends ControlView2dBase {
 			return; // not scrolling
 		updateLevelOffset(scrollX);
 		updateVbs();
-		
+
 	}
 
 	@Override
@@ -310,6 +314,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	protected float levelToX(float level) {
-		return SNAP_DIST / 2 + (level - levelOffset) * waveformWidth / levelWidth;
+		return SNAP_DIST / 2 + (level - levelOffset) * waveformWidth
+				/ levelWidth;
 	}
 }

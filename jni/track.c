@@ -124,7 +124,7 @@ TrackNode *removeTrack(int trackNum) {
 	// renumber tracks
 	node = trackHead;
 	int count = 0;
-	while (node != NULL) {
+	while (node != NULL ) {
 		node->track->num = count++;
 		node = node->next;
 	}
@@ -332,8 +332,8 @@ void updateAllLevels() {
 	}
 }
 
-void Java_com_kh_beatbot_BaseTrack_setTrackVolume(JNIEnv *env,
-		jclass clazz, jint trackNum, jfloat volume) {
+void Java_com_kh_beatbot_BaseTrack_setTrackVolume(JNIEnv *env, jclass clazz,
+		jint trackNum, jfloat volume) {
 	Levels *levels = getLevels(env, clazz, trackNum);
 	levels->volume = volume;
 	updateLevels(trackNum);
@@ -346,8 +346,8 @@ void Java_com_kh_beatbot_BaseTrack_setTrackPan(JNIEnv *env, jclass clazz,
 	updateLevels(trackNum);
 }
 
-void Java_com_kh_beatbot_BaseTrack_setTrackPitch(JNIEnv *env,
-		jclass clazz, jint trackNum, jfloat pitch) {
+void Java_com_kh_beatbot_BaseTrack_setTrackPitch(JNIEnv *env, jclass clazz,
+		jint trackNum, jfloat pitch) {
 	Levels *levels = getLevels(env, clazz, trackNum);
 	levels->pitch = pitch;
 	updateLevels(trackNum);
@@ -375,8 +375,7 @@ void Java_com_kh_beatbot_manager_TrackManager_createTrack(JNIEnv *env,
 	Track *track = initTrack();
 	pthread_mutex_lock(&openSlOut->trackMutex);
 	createTrack(track);
-	Java_com_kh_beatbot_Track_setSample(env, clazz, trackCount,
-			sampleName);
+	Java_com_kh_beatbot_Track_setSample(env, clazz, trackCount, sampleName);
 	trackCount++;
 	pthread_mutex_unlock(&openSlOut->trackMutex);
 }
@@ -391,15 +390,15 @@ void Java_com_kh_beatbot_manager_TrackManager_deleteTrack(JNIEnv *env,
 	pthread_mutex_unlock(&openSlOut->trackMutex);
 }
 
-void Java_com_kh_beatbot_Track_toggleTrackLooping(JNIEnv *env,
-		jclass clazz, jint trackNum) {
+void Java_com_kh_beatbot_Track_toggleTrackLooping(JNIEnv *env, jclass clazz,
+		jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
 	WavFile *wavFile = (WavFile *) track->generator->config;
 	wavFile->looping = !wavFile->looping;
 }
 
-jboolean Java_com_kh_beatbot_Track_isTrackLooping(JNIEnv *env,
-		jclass clazz, jint trackNum) {
+jboolean Java_com_kh_beatbot_Track_isTrackLooping(JNIEnv *env, jclass clazz,
+		jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
 	WavFile *wavFile = (WavFile *) track->generator->config;
 	return wavFile->looping;
@@ -417,15 +416,15 @@ void Java_com_kh_beatbot_Track_notifyNoteMoved(JNIEnv *env, jclass clazz,
 		stopTrack(track);
 }
 
-void Java_com_kh_beatbot_Track_notifyNoteRemoved(JNIEnv *env,
-		jclass clazz, jint trackNum, jlong onTick, jlong offTick) {
+void Java_com_kh_beatbot_Track_notifyNoteRemoved(JNIEnv *env, jclass clazz,
+		jint trackNum, jlong onTick, jlong offTick) {
 	Track *track = getTrack(env, clazz, trackNum);
 	if (track->nextStartSample == tickToSample(onTick))
 		stopTrack(track);
 }
 
-void Java_com_kh_beatbot_Track_setTrackLoopWindow(JNIEnv *env,
-		jclass clazz, jint trackNum, jlong loopBeginSample, jlong loopEndSample) {
+void Java_com_kh_beatbot_Track_setTrackLoopWindow(JNIEnv *env, jclass clazz,
+		jint trackNum, jlong loopBeginSample, jlong loopEndSample) {
 	Track *track = getTrack(env, clazz, trackNum);
 	WavFile *wavFile = (WavFile *) track->generator->config;
 	wavfile_setLoopWindow(wavFile, loopBeginSample, loopEndSample);
@@ -436,4 +435,23 @@ void Java_com_kh_beatbot_Track_setTrackReverse(JNIEnv *env, jclass clazz,
 	Track *track = getTrack(env, clazz, trackNum);
 	WavFile *wavFile = (WavFile *) track->generator->config;
 	wavfile_setReverse(wavFile, reverse);
+}
+
+void Java_com_kh_beatbot_Track_setTrackGain(JNIEnv *env, jclass clazz,
+		jint trackNum, jfloat gain) {
+	Track *track = getTrack(env, clazz, trackNum);
+	WavFile *wavFile = (WavFile *) track->generator->config;
+}
+
+float Java_com_kh_beatbot_Track_getFloatSample(JNIEnv *env, jclass clazz,
+		jint trackNum, jint sampleIndex, jint channel) {
+	Track *track = getTrack(env, clazz, trackNum);
+	return wavfile_getSample((WavFile *) track->generator->config, sampleIndex,
+			channel);
+}
+
+float Java_com_kh_beatbot_Track_getNumSamples(JNIEnv *env, jclass clazz,
+		jint trackNum) {
+	Track *track = getTrack(env, clazz, trackNum);
+	return ((WavFile *) track->generator->config)->totalSamples;
 }

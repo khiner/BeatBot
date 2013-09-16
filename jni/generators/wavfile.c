@@ -61,7 +61,7 @@ void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName) {
 	// 2 bytes per sample per channel
 	wavFile->totalSamples = (length - pos) / (2 * wavFile->channels);
 
-	if (wavFile->totalSamples <= SAMPLE_RATE / 20) {
+	if (wavFile->totalSamples <= SAMPLE_RATE * 10) {
 		/** allocate memory to hold samples (memory is freed in wavfile_destroy)
 		 *
 		 * NOTE: We don't directly write to wavFile sample buffer because we want to
@@ -138,6 +138,17 @@ WavFile *wavfile_create(const char *sampleName) {
 	wavFile->looping = wavFile->reverse = false;
 	wavFile->adsr = adsrconfig_create();
 	return wavFile;
+}
+
+float wavfile_getSample(WavFile *wavFile, int sampleIndex, int channel) {
+	if (wavFile->samples != NULL) {
+		return wavFile->samples[channel][sampleIndex];
+	} else {
+		float ret;
+		fseek(wavFile->sampleFile, sampleIndex * wavFile->channels * ONE_FLOAT_SZ, SEEK_SET);
+		fread(&ret, wavFile->channels, ONE_FLOAT_SZ, wavFile->sampleFile);
+		return ret;
+	}
 }
 
 void wavfile_setLoopWindow(WavFile *wavFile, long loopBeginSample,

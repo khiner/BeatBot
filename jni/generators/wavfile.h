@@ -20,6 +20,7 @@ typedef struct WavFile_t {
 } WavFile;
 
 WavFile *wavfile_create(const char *sampleName);
+float wavfile_getSample(WavFile *wavFile, int sampleIndex, int channel);
 void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName);
 void wavfile_setLoopWindow(WavFile *wavFile, long loopBeginSample,
 		long loopEndSample);
