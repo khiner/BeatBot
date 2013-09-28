@@ -23,12 +23,12 @@ public class PageSelectGroup extends TouchableView {
 	public static final int TRACK_PAGE_ID = 0, EDIT_PAGE_ID = 1,
 			ADSR_PAGE_ID = 2, MASTER_PAGE_ID = 3, NOTE_LEVELS_PAGE_ID = 4;
 
-	private static NoteLevelsPage levelsPage;
-	private static MasterPage masterPage;
-	private static TrackPage trackPage;
-	private static SampleEditPage sampleEditPage;
-	private static AdsrPage adsrPage;
-	private static ViewPager pager;
+	public static NoteLevelsPage levelsPage;
+	public static MasterPage masterPage;
+	public static TrackPage trackPage;
+	public static SampleEditPage sampleEditPage;
+	public static AdsrPage adsrPage;
+	public static ViewPager pager;
 
 	private static ImageButton addTrackButton;
 	private static ToggleButton[] pageButtons = new ToggleButton[5];

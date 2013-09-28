@@ -11,6 +11,7 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.view.TrackButtonRow;
+import com.kh.beatbot.ui.view.group.PageSelectGroup;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
 
 public class Track extends BaseTrack implements ParamListener {
@@ -173,11 +174,10 @@ public class Track extends BaseTrack implements ParamListener {
 			loopBeginParam.setLevel(0);
 			loopEndParam.setLevel(1);
 			
-			gainParam = new Param(2, "Gain", "", 0, 1);
-			gainParam.setLevel(0.5f);
-			
+			gainParam = new Param(2, "Gain", "", 0, 2);
+			gainParam.setLevel(1);
+
 		} else if (!sampleFile.equals(currSampleFile)) {
-			
 			setSampleNum(sampleNum);
 			
 			gainParam.removeListener(this);
@@ -267,6 +267,7 @@ public class Track extends BaseTrack implements ParamListener {
 	public void onParamChanged(Param param) {
 		if (param.equals(getGainParam())) {
 			setTrackGain(id, param.level);
+			PageSelectGroup.sampleEditPage.update();
 		} else {
 			float minLoopWindow = getLoopEndParam().getViewLevel(MIN_LOOP_WINDOW);
 			getLoopBeginParam().maxViewLevel = getLoopEndParam().viewLevel - minLoopWindow;

@@ -441,6 +441,7 @@ void Java_com_kh_beatbot_Track_setTrackGain(JNIEnv *env, jclass clazz,
 		jint trackNum, jfloat gain) {
 	Track *track = getTrack(env, clazz, trackNum);
 	WavFile *wavFile = (WavFile *) track->generator->config;
+	wavFile->gain = gain;
 }
 
 float Java_com_kh_beatbot_Track_getSample(JNIEnv *env, jclass clazz,

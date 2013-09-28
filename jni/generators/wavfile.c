@@ -132,6 +132,7 @@ void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName) {
 WavFile *wavfile_create(const char *sampleName) {
 	WavFile *wavFile = (WavFile *) malloc(sizeof(WavFile));
 	wavFile->currSample = 0;
+	wavFile->gain = 1;
 	wavFile->samples = NULL;
 	wavFile->sampleFile = NULL;
 	wavfile_setSampleFile(wavFile, sampleName);
@@ -141,14 +142,14 @@ WavFile *wavfile_create(const char *sampleName) {
 }
 
 float wavfile_getSample(WavFile *wavFile, int sampleIndex, int channel) {
+	float ret;
 	if (wavFile->samples != NULL) {
-		return wavFile->samples[channel][sampleIndex];
+		ret = wavFile->samples[channel][sampleIndex];
 	} else {
-		float ret;
 		fseek(wavFile->sampleFile, sampleIndex * wavFile->channels * ONE_FLOAT_SZ, SEEK_SET);
 		fread(&ret, wavFile->channels, ONE_FLOAT_SZ, wavFile->sampleFile);
-		return ret;
 	}
+	return ret * wavFile->gain;
 }
 
 void wavfile_setLoopWindow(WavFile *wavFile, long loopBeginSample,

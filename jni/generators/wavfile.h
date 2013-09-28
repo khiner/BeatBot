@@ -15,6 +15,7 @@ typedef struct WavFile_t {
 	bool looping;
 	bool reverse;
 	float sampleRate;
+	float gain;
 	int channels;
 	char *sampleFileName;
 } WavFile;
@@ -80,7 +81,7 @@ static inline void wavfile_tick(WavFile *config, float *sample) {
 	} else {
 		config->currSample += config->sampleRate;
 	}
-	float gain = adsr_tick(config->adsr);
+	float gain = adsr_tick(config->adsr) * config->gain;
 	sample[0] *= gain;
 	sample[1] *= gain;
 }
