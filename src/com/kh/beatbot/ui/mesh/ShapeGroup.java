@@ -13,17 +13,17 @@ public class ShapeGroup {
 		outlineGroup = new MeshGroup();
 	}
 
-	public void draw(View parent, int borderWidth) {
+	public void draw(View parent, int borderWeight) {
 		View.push();
 		View.translate(-parent.absoluteX, -parent.absoluteY);
-		draw(borderWidth);
+		draw(borderWeight);
 		View.pop();
 	}
 	
-	public void draw(int borderWidth) {
+	public void draw(int borderWeight) {
 		fillGroup.draw(GL10.GL_TRIANGLES);
-		if (borderWidth > 0) {
-			View.gl.glLineWidth(borderWidth);
+		if (borderWeight > 0) {
+			View.gl.glLineWidth(borderWeight);
 			outlineGroup.draw(GL10.GL_LINES);
 		}
 	}

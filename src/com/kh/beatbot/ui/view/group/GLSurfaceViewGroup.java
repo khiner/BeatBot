@@ -1,6 +1,7 @@
 package com.kh.beatbot.ui.view.group;
 
 import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.opengles.GL11;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -39,7 +40,7 @@ public class GLSurfaceViewGroup extends TouchableSurfaceView {
 
 	public void initGl(GL10 gl) {
 		super.initGl(gl);
-		renderer.initGl(gl);
+		renderer.initGl((GL11)gl);
 	}
 	
 	@Override

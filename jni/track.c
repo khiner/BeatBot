@@ -443,11 +443,11 @@ void Java_com_kh_beatbot_Track_setTrackGain(JNIEnv *env, jclass clazz,
 	WavFile *wavFile = (WavFile *) track->generator->config;
 }
 
-float Java_com_kh_beatbot_Track_getFloatSample(JNIEnv *env, jclass clazz,
+float Java_com_kh_beatbot_Track_getSample(JNIEnv *env, jclass clazz,
 		jint trackNum, jint sampleIndex, jint channel) {
 	Track *track = getTrack(env, clazz, trackNum);
-	return wavfile_getSample((WavFile *) track->generator->config, sampleIndex,
-			channel);
+	WavFile *wavFile = (WavFile *) track->generator->config;
+	return wavfile_getSample(wavFile, sampleIndex, channel);
 }
 
 float Java_com_kh_beatbot_Track_getNumSamples(JNIEnv *env, jclass clazz,

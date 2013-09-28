@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.opengles.GL11;
 
 import android.graphics.Typeface;
 
@@ -30,7 +31,7 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public static final float ¹ = (float) Math.PI, CIRCLE_RADIUS = 100;
-	public static GL10 gl;
+	public static GL11 gl;
 	public static GLSurfaceViewBase root;
 	public static Typeface font;
 
@@ -203,7 +204,7 @@ public abstract class View implements Comparable<View> {
 		}
 	}
 
-	public void initGl(GL10 _gl) {
+	public void initGl(GL11 _gl) {
 		gl = _gl;
 		loadAllIcons();
 	}

@@ -9,24 +9,20 @@ package com.kh.beatbot.ui.mesh;
  * 
  */
 public class Mesh2D {
+
+	protected float vertices[], colors[], color[];
 	
-	public int parentVertexIndex = -1;
-	protected float vertices[];
-	protected float colors[];
-	protected float color[];
-	
-	/** vertex index at which the next vertex gets inserted **/
-	protected int index = 0;
+	/** vertex index at which the next vertex gets inserted (and parent)**/
+	protected int index = 0, parentVertexIndex = -1;
 
 	/** number of vertices defined for the mesh **/
 	protected int numVertices = 0;
 	
 	public Mesh2D(int numVertices, float[] color) {
 		this.numVertices = numVertices;
-		
+		this.color = color;
 		vertices = new float[numVertices * 2];
 		colors = new float[numVertices * 4];
-		this.color = color;
 	}
 
 	public Mesh2D(float[] vertices, float[] color) {
@@ -58,10 +54,10 @@ public class Mesh2D {
 		int colorOffset = index * 4;
 		vertices[vertexOffset] = x;
 		vertices[vertexOffset + 1] = y;
-		this.colors[colorOffset] = color[0];
-		this.colors[colorOffset + 1] = color[1];
-		this.colors[colorOffset + 2] = color[2];
-		this.colors[colorOffset + 3] = color[3];
+		colors[colorOffset] = color[0];
+		colors[colorOffset + 1] = color[1];
+		colors[colorOffset + 2] = color[2];
+		colors[colorOffset + 3] = color[3];
 		index++;
 	}
 
@@ -72,11 +68,7 @@ public class Mesh2D {
 	public float[] getVertices() {
 		return vertices;
 	}
-	
-	public float[] getColor() {
-		return colors;
-	}
-	
+
 	/** set all vertices to this color **/
 	public void setColor(float[] color) {
 		this.color = color;

@@ -1,7 +1,5 @@
 package com.kh.beatbot;
 
-import java.io.IOException;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,7 +11,6 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.view.TrackButtonRow;
-import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
 
 public class Track extends BaseTrack implements ParamListener {
@@ -298,21 +295,10 @@ public class Track extends BaseTrack implements ParamListener {
 		setSample(id, getCurrSamplePath());
 	}
 
-	public FloatBuffer floatFileToBuffer(View view, long offset,
-			long numFloats, int xOffset) throws IOException {
-		float spp = Math.min(2, numFloats / view.width);
-		float[] outputAry = new float[2 * (int) (view.width * spp)];
-
-		for (int x = 0; x < outputAry.length; x += 2) {
-			float percent = (float) x / outputAry.length;
-			int dataIndex = (int) (offset + percent * numFloats);
-			float sample = getFloatSample(id, dataIndex, 0);
-			float y = view.height * (sample + 1) / 2;
-			outputAry[x] = percent * view.width + xOffset;
-			outputAry[x + 1] = y;
-		}
-		return View.makeFloatBuffer(outputAry);
+	public float getSample(int sampleIndex, int channel) {
+		return getSample(id, sampleIndex, channel);
 	}
+
 	public static native void toggleTrackLooping(int trackNum);
 
 	public static native boolean isTrackLooping(int trackNum);
@@ -342,7 +328,7 @@ public class Track extends BaseTrack implements ParamListener {
 
 	public static native void setSample(int trackId, String sampleName);
 
-	public static native float getFloatSample(int trackId, int sampleIndex, int channel);
+	public static native float getSample(int trackId, int sampleIndex, int channel);
 
 	public static native float getNumSamples(int trackId);
 

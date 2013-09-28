@@ -12,6 +12,8 @@ import android.util.Log;
 import com.kh.beatbot.ui.view.View;
 
 public class MeshGroup {
+	private static GL11 gl;
+
 	private List<Mesh2D> children = new ArrayList<Mesh2D>();
 	private FloatBuffer vertexBuffer, colorBuffer;
 	private float[] vertices;
@@ -29,8 +31,6 @@ public class MeshGroup {
 			updateBuffers();
 			dirty = false;
 		}
-		
-		GL11 gl = (GL11)View.gl;
 		
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, 0);
@@ -120,7 +120,6 @@ public class MeshGroup {
 	
 	private synchronized void updateBuffers() {
 		initHandles();
-		GL11 gl = (GL11)View.gl;
 		
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
 		gl.glBufferData(GL11.GL_ARRAY_BUFFER, vertices.length * 4,
@@ -134,10 +133,10 @@ public class MeshGroup {
 	}
 	
 	private void initHandles() {
+		gl = View.gl;
 		if (vertexHandle != -1 && colorHandle != -1) {
 			return; // already initialized
 		}
-		GL11 gl = (GL11)View.gl;
 		int[] buffer = new int[1];
 		
 		gl.glGenBuffers(1, buffer, 0);

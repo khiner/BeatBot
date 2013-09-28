@@ -79,14 +79,6 @@ public abstract class Shape extends Drawable {
 		this.group = group;
 		group.add(this);
 	}
-	
-	public Mesh2D getFillMesh() {
-		return fillMesh;
-	}
-	
-	public Mesh2D getOutlineMesh() {
-		return outlineMesh;
-	}
 
 	public ShapeGroup getGroup() {
 		return group;

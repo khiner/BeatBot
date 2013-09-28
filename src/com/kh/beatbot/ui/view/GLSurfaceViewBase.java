@@ -38,7 +38,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 
 	protected int width, height;
 
-	protected static GL10 gl = null;
+	protected static GL11 gl = null;
 	protected static GLText glText;
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
@@ -49,7 +49,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 	}
 
 	public void onSurfaceChanged(GL10 _gl, int width, int height) {
-		gl = _gl;
+		gl = (GL11)_gl;
 		gl.glViewport(0, 0, this.width, this.height);
 		GLU.gluOrtho2D(gl, 0, this.width, this.height, 0);
 		initGlText();
@@ -136,7 +136,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 			int[] crop, float x, float y, float width, float height) {
 		gl.glEnable(GL10.GL_TEXTURE_2D);
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[textureId]);
-		((GL11) gl).glTexParameteriv(GL10.GL_TEXTURE_2D,
+		gl.glTexParameteriv(GL10.GL_TEXTURE_2D,
 				GL11Ext.GL_TEXTURE_CROP_RECT_OES, crop, 0);
 		gl.glColor4f(1, 1, 1, 1);
 		((GL11Ext) gl).glDrawTexfOES(x, y, 0, width, height);

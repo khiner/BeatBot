@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.view;
 
-import java.io.IOException;
 import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -13,8 +12,7 @@ import com.kh.beatbot.ui.view.control.ControlView2dBase;
 public class SampleEditView extends ControlView2dBase {
 
 	// min distance for pointer to select loop markers
-	private static final float SNAP_DIST = 32f;
-
+	private static final float SNAP_DIST = 32f, X_OFFSET = SNAP_DIST / 2;
 	private static float minLoopWindow;
 
 	private static FloatBuffer waveformVb = null, backgroundOutlineVb = null,
@@ -37,12 +35,8 @@ public class SampleEditView extends ControlView2dBase {
 	public void update() {
 		levelOffset = 0;
 		levelWidth = 1;
-		minLoopWindow = params[0].getViewLevel(Track.MIN_LOOP_WINDOW); // find
-																		// view
-																		// level
-																		// for
-																		// 32
-																		// samples
+		// find view level for 32 samples
+		minLoopWindow = params[0].getViewLevel(Track.MIN_LOOP_WINDOW);
 		updateVbs();
 	}
 
@@ -56,14 +50,22 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	private void updateWaveformVb() {
-		try {
-			waveformVb = TrackManager.currTrack.floatFileToBuffer(this,
-					(long) params[0].getLevel(levelOffset),
-					(long) params[0].getLevel(levelWidth),
-					(int) (SNAP_DIST / 2));
-		} catch (IOException e) {
-			e.printStackTrace();
+		long offset = (long) params[0].getLevel(levelOffset);
+		long numFloats = (long) params[0].getLevel(levelWidth);
+
+		float spp = Math.min(2.0f, numFloats / width);
+		float[] outputAry = new float[2 * (int) (width * spp)];
+
+		for (int x = 0; x < outputAry.length; x += 2) {
+			float percent = (float) x / outputAry.length;
+			outputAry[x] = percent * width + X_OFFSET;
+
+			int dataIndex = (int) (offset + percent * numFloats);
+			float sample = TrackManager.currTrack.getSample(dataIndex, 0);
+			outputAry[x + 1] = height * (1 - sample) / 2;
 		}
+
+		waveformVb = makeFloatBuffer(outputAry);
 	}
 
 	private void updateLoopSelectionVbs() {
@@ -73,10 +75,10 @@ public class SampleEditView extends ControlView2dBase {
 				height, endX, 0 };
 
 		loopSelectionLineVb = makeFloatBuffer(loopSelectionVertices);
-		loopSelectionRectVbs[0] = makeRectFloatBuffer(beginX - SNAP_DIST / 2,
-				height, beginX + SNAP_DIST / 2, 0);
-		loopSelectionRectVbs[1] = makeRectFloatBuffer(endX - SNAP_DIST / 2,
-				height, endX + SNAP_DIST / 2, 0);
+		loopSelectionRectVbs[0] = makeRectFloatBuffer(beginX - X_OFFSET,
+				height, beginX + X_OFFSET, 0);
+		loopSelectionRectVbs[1] = makeRectFloatBuffer(endX - X_OFFSET, height,
+				endX + X_OFFSET, 0);
 	}
 
 	private void drawWaveform() {
@@ -133,12 +135,12 @@ public class SampleEditView extends ControlView2dBase {
 		// set levelOffset and levelWidth such that the zoom
 		// anchor levels stay under x1 and x2
 		float newLevelWidth = waveformWidth * (ZRAL - ZLAL) / (x2 - x1);
-		float newLevelOffset = ZRAL - newLevelWidth * (x2 - SNAP_DIST / 2)
+		float newLevelOffset = ZRAL - newLevelWidth * (x2 - X_OFFSET)
 				/ waveformWidth;
 
 		if (newLevelOffset < 0) {
 			levelOffset = 0;
-			levelWidth = ZRAL * waveformWidth / (x2 - SNAP_DIST / 2);
+			levelWidth = ZRAL * waveformWidth / (x2 - X_OFFSET);
 			levelWidth = levelWidth <= 1 ? (levelWidth >= minLoopWindow ? levelWidth
 					: minLoopWindow)
 					: 1;
@@ -150,7 +152,7 @@ public class SampleEditView extends ControlView2dBase {
 			levelWidth = minLoopWindow;
 		} else if (newLevelOffset + newLevelWidth > 1) {
 			levelWidth = ((ZLAL - 1) * waveformWidth)
-					/ (x1 - SNAP_DIST / 2 - waveformWidth);
+					/ (x1 - X_OFFSET - waveformWidth);
 			levelOffset = 1 - levelWidth;
 		} else {
 			levelOffset = newLevelOffset;
@@ -305,7 +307,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	protected float xToLevel(float x) {
-		return (x - SNAP_DIST / 2) * levelWidth / waveformWidth + levelOffset;
+		return (x - X_OFFSET) * levelWidth / waveformWidth + levelOffset;
 	}
 
 	@Override
@@ -314,7 +316,6 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	protected float levelToX(float level) {
-		return SNAP_DIST / 2 + (level - levelOffset) * waveformWidth
-				/ levelWidth;
+		return X_OFFSET + (level - levelOffset) * waveformWidth / levelWidth;
 	}
 }
