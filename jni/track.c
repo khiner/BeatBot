@@ -314,8 +314,11 @@ void setLevels(Track *track, MidiEvent *midiEvent) {
 }
 
 void updateLevels(int trackNum) {
-	if (trackNum == -1)
-		return; // master track - no update needed
+	if (trackNum == -1) {
+		// master track - update all levels
+		updateAllLevels();
+		return;
+	}
 	Track *track = getTrack(NULL, NULL, trackNum);
 	setLevels(track, track->nextEvent);
 }
