@@ -11,10 +11,10 @@ public class Colors {
 			LEVEL_SELECTED, TICK_FILL, TICK_MARKER, TICKBAR, TICK_SELECTED,
 			VOLUME_LIGHT, VOLUME_SELECTED, BPM_OFF, BPM_ON, BPM_ON_SELECTED,
 			BPM_OFF_SELECTED, VIEW_BG, SAMPLE_LOOP_HIGHLIGHT,
-			SAMPLE_LOOP_SELECT, SAMPLE_LOOP_SELECT_SELECTED,
-			SAMPLE_LOOP_SELECT_OUTLINE, LABEL_DARK, LABEL_MED, LABEL_LIGHT,
-			LABEL_VERY_LIGHT, LABEL_SELECTED, MIDI_SELECTED_TRACK,
-			TRANSPARANT = { 0, 0, 0, 0 };
+			SAMPLE_LOOP_SELECT, SAMPLE_LOOP_SELECT_OUTLINE, LABEL_DARK,
+			LABEL_MED, LABEL_LIGHT, LABEL_VERY_LIGHT, LABEL_SELECTED,
+			LABEL_SELECTED_TRANS, MIDI_SELECTED_TRACK, TRANSPARANT = { 0, 0, 0,
+					0 };
 
 	public static float[][] MIDI_LINES = { { 0, 0, 0, 1 },
 			{ .1f, .1f, .1f, 1 }, { .2f, .2f, .2f, 1 }, { .3f, .3f, .3f, 1 },
@@ -72,7 +72,6 @@ public class Colors {
 				R.color.sampleLoopSelect);
 		SAMPLE_LOOP_SELECT_OUTLINE = colorResourceToFloats(activity,
 				R.color.sampleLoopSelectOutline);
-		SAMPLE_LOOP_SELECT_SELECTED = VOLUME_SELECTED;
 
 		LABEL_DARK = colorResourceToFloats(activity, R.color.labelDark);
 		LABEL_MED = colorResourceToFloats(activity, R.color.labelMed);
@@ -80,6 +79,9 @@ public class Colors {
 		LABEL_VERY_LIGHT = colorResourceToFloats(activity,
 				R.color.labelVeryLight);
 		LABEL_SELECTED = colorResourceToFloats(activity, R.color.labelSelected);
+		LABEL_SELECTED_TRANS = new float[] { LABEL_SELECTED[0],
+				LABEL_SELECTED[1], LABEL_SELECTED[2], .38f };
+
 		MIDI_SELECTED_TRACK = new float[] { YELLOW[0], YELLOW[1], YELLOW[2],
 				.38f };
 		labelBgColorSet = new ColorSet(LABEL_DARK, VOLUME, LABEL_SELECTED);

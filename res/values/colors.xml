@@ -40,7 +40,6 @@
     
     <color name="sampleLoopHighlight">#FFCD9A19</color>
     <color name="sampleLoopSelect">#80FAFAFF</color>
-    <color name="sampleLoopSelectSelected">#80FAFAFF</color>
     <color name="sampleLoopSelectOutline">#FFFFFFFF</color>
     
 </resources>

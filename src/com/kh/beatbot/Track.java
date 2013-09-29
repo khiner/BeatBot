@@ -23,7 +23,7 @@ public class Track extends BaseTrack implements ParamListener {
 	private Instrument instrument;
 	private TrackButtonRow buttonRow;
 
-	private boolean adsrEnabled = false, reverse = false;
+	private boolean adsrEnabled = false, reverse = false, previewing = false;
 	private List<MidiNote> notes = new ArrayList<MidiNote>();
 	private List<SampleFile> sampleFiles = new ArrayList<SampleFile>();
 
@@ -236,11 +236,13 @@ public class Track extends BaseTrack implements ParamListener {
 	}
 
 	public void preview() {
+		previewing = true;
 		previewTrack(id);
 	}
 
 	public void stopPreviewing() {
 		stopPreviewingTrack(id);
+		previewing = false;
 	}
 
 	public void mute(boolean mute) {
@@ -261,6 +263,10 @@ public class Track extends BaseTrack implements ParamListener {
 
 	public boolean isReverse() {
 		return reverse;
+	}
+
+	public boolean isPreviewing() {
+		return previewing;
 	}
 
 	@Override
@@ -300,6 +306,10 @@ public class Track extends BaseTrack implements ParamListener {
 		return getSample(id, sampleIndex, channel);
 	}
 
+	public float getCurrentSampleIndex() {
+		return getCurrentSampleIndex(id);
+	}
+
 	public static native void toggleTrackLooping(int trackNum);
 
 	public static native boolean isTrackLooping(int trackNum);
@@ -330,6 +340,8 @@ public class Track extends BaseTrack implements ParamListener {
 	public static native void setSample(int trackId, String sampleName);
 
 	public static native float getSample(int trackId, int sampleIndex, int channel);
+	
+	public static native float getCurrentSampleIndex(int trackId);
 
 	public static native float getNumSamples(int trackId);
 

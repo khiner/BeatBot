@@ -451,6 +451,13 @@ float Java_com_kh_beatbot_Track_getSample(JNIEnv *env, jclass clazz,
 	return wavfile_getSample(wavFile, sampleIndex, channel);
 }
 
+float Java_com_kh_beatbot_Track_getCurrentSampleIndex(JNIEnv *env, jclass clazz,
+		jint trackNum) {
+	Track *track = getTrack(env, clazz, trackNum);
+	WavFile *wavFile = (WavFile *) track->generator->config;
+	return wavFile->currSample;
+}
+
 float Java_com_kh_beatbot_Track_getNumSamples(JNIEnv *env, jclass clazz,
 		jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
