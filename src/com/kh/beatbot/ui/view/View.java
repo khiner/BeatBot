@@ -288,7 +288,7 @@ public abstract class View implements Comparable<View> {
 		gl.glPopMatrix();
 	}
 
-	public static final void drawText(String text, float[] color, int height,
+	public static final void drawText(String text, float[] color, float height,
 			float x, float y) {
 		setColor(color);
 		GLSurfaceViewBase.drawText(text, height, x, y);

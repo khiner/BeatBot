@@ -1,6 +1,11 @@
 package com.kh.beatbot.ui.view;
 
 public class TextView extends View {
+	// kludgey magic number
+	// but it corrects for something weird in
+	// GLSurfaceViewBase.getTextWidth
+	private final float X_OFFSET = 2;
+	
 	protected String text = "";
 	protected float textWidth = 0, textHeight = 0, textXOffset = 0,
 			textYOffset = 0;
@@ -25,7 +30,7 @@ public class TextView extends View {
 
 	@Override
 	protected void createChildren() {
-
+		
 	}
 
 	@Override
@@ -38,10 +43,14 @@ public class TextView extends View {
 		initText();
 	}
 	
-	protected float calcTextOffset() {
-		return width / 2 - textWidth / 2;
+	protected float calcTextXOffset() {
+		return (width - textWidth) / 2;
 	}
 	
+	protected float calcTextYOffset() {
+		return (height - textHeight) / 2;
+	}
+
 	private void drawText() {
 		if (text == null || text.isEmpty())
 			return;
@@ -54,12 +63,14 @@ public class TextView extends View {
 			return;
 		}
 		GLSurfaceViewBase.storeText(text);
-		textHeight = 5 * height / 8;
+		textHeight = height;
 		textWidth = GLSurfaceViewBase.getTextWidth(text, textHeight);
-		textXOffset = calcTextOffset();
-		textXOffset += 2; // kludgey magic number
-							// but it corrects for something weird in
-							// GLSurfaceViewBase.getTextWidth
-		textYOffset = 0;
+		if (textWidth > width - X_OFFSET * 3) {
+			float scaleRatio = (width - X_OFFSET * 3) / textWidth;
+			textWidth *= scaleRatio;
+			textHeight *= scaleRatio;
+		}
+		textXOffset = calcTextXOffset() + X_OFFSET;
+		textYOffset = calcTextYOffset();
 	}
 }

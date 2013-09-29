@@ -16,7 +16,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.util.FloatMath;
 
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.ui.view.GLSurfaceViewBase;
@@ -38,8 +37,6 @@ public class GLText {
 	private static SpriteBatch genericBatch;
 	// region of each character (texture coordinates)
 	private static TextureRegion[] charRgn = new TextureRegion[CHAR_CNT];
-
-	private static int size = 0;
 
 	private static int[] textureIds; // Font Texture ID
 	private static int textureSize = 0; // Texture Size for Font (Square)
@@ -69,7 +66,6 @@ public class GLText {
 	// file - Filename of the font (.ttf, .otf) to use. In 'Assets' folder.
 	// size - Requested pixel size of font (height)
 	public void load(String file, int size) {
-		GLText.size = size;
 		// load the font and setup paint instance for drawing
 		Typeface tf = Typeface.createFromAsset(
 				BeatBotActivity.mainActivity.getAssets(), file);
@@ -78,8 +74,7 @@ public class GLText {
 		paint.setTextSize(size);
 		paint.setTypeface(tf);
 		Paint.FontMetrics fm = paint.getFontMetrics();
-		cellHeight = (int) (FloatMath.ceil(Math.abs(fm.bottom)
-				+ Math.abs(fm.top)));
+		cellHeight = (int) (Math.ceil(Math.abs(fm.bottom) + Math.abs(fm.top)));
 		charWidthMax = 0;
 
 		char[] s = new char[2]; // Create Character Array
@@ -123,7 +118,7 @@ public class GLText {
 		bitmap.eraseColor(0x00000000); // Set Transparent Background (ARGB)
 		// render each of the characters to the canvas (ie. build the font map)
 		float x = 0;
-		float y = cellHeight - FloatMath.ceil(Math.abs(fm.descent)) - 1;
+		float y = cellHeight - (float)Math.ceil(Math.abs(fm.descent)) - 1;
 		for (char c = CHAR_START; c <= CHAR_END; c++) {
 			s[0] = c;
 			canvas.drawText(s, 0, 1, x, y, paint);
@@ -180,15 +175,15 @@ public class GLText {
 		initTextInBatch(text, batch);
 		batches.put(text, batch);
 	}
-	
+
 	// D: draw text at the specified x,y position
 	// A: text - the string to draw
 	// x, y - the x,y position to draw text at (bottom left of text; including
 	// descent)
-	public void draw(String text, int height, float x, float y) {
+	public void draw(String text, float height, float x, float y) {
 		View.push();
 		View.translate(x, y);
-		float scale = (float) height / size;
+		float scale = height / cellHeight;
 		View.scale(scale, scale);
 		if (batches.containsKey(text)) {
 			batches.get(text).endBatch(textureIds[0]);
@@ -215,6 +210,6 @@ public class GLText {
 		for (char character : text.toCharArray()) {
 			total += getCharWidth(character);
 		}
-		return total * height / size;
+		return total * height / cellHeight;
 	}
 }

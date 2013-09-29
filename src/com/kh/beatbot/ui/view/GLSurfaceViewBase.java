@@ -83,7 +83,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		glText.loadTexture();
 	}
 
-	public static final void drawText(String text, int height, float x, float y) {
+	public static final void drawText(String text, float height, float x, float y) {
 		if (glText != null) {
 			glText.draw(text, height, x, y);
 		}
