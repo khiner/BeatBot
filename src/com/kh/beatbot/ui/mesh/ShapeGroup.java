@@ -7,10 +7,14 @@ import com.kh.beatbot.ui.view.View;
 public class ShapeGroup {
 
 	private MeshGroup fillGroup, outlineGroup;
-	
+
 	public ShapeGroup() {
-		fillGroup = new MeshGroup();
-		outlineGroup = new MeshGroup();
+		fillGroup = new MeshGroup(GL10.GL_TRIANGLES);
+		outlineGroup = new MeshGroup(GL10.GL_LINES);
+	}
+
+	public void setOutlinePrimitiveType(int primitiveType) {
+		outlineGroup.setPrimitiveType(primitiveType);
 	}
 
 	public void draw(View parent, int borderWeight) {
@@ -19,18 +23,19 @@ public class ShapeGroup {
 		draw(borderWeight);
 		View.pop();
 	}
-	
+
 	public void draw(int borderWeight) {
-		fillGroup.draw(GL10.GL_TRIANGLES);
+		fillGroup.draw();
 		if (borderWeight > 0) {
 			View.gl.glLineWidth(borderWeight);
-			outlineGroup.draw(GL10.GL_LINES);
+			outlineGroup.draw();
 		}
 	}
 
 	public boolean contains(Shape shape) {
-		return fillGroup.contains(shape.fillMesh) && (shape.outlineMesh == null
-				|| outlineGroup.contains(shape.outlineMesh));
+		return fillGroup.contains(shape.fillMesh)
+				&& (shape.outlineMesh == null || outlineGroup
+						.contains(shape.outlineMesh));
 	}
 
 	public void add(Shape shape) {

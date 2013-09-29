@@ -14,7 +14,6 @@ public class Rectangle extends Shape {
 		super(group, new Mesh2D(6, fillColor), new Mesh2D(8, outlineColor));
 	}
 
-
 	public void update(float x, float y, float width, float height, float[] fillColor) {
 		update(x, y, width, height, fillColor, null);
 	}

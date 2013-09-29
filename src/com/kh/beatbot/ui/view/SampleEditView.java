@@ -5,8 +5,9 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.Track;
-import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.WaveformShape;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
 
 public class SampleEditView extends ControlView2dBase {
@@ -15,8 +16,9 @@ public class SampleEditView extends ControlView2dBase {
 	private static final float SNAP_DIST = 32f, X_OFFSET = SNAP_DIST / 2;
 	private static float minLoopWindow;
 
-	private static FloatBuffer waveformVb = null, backgroundOutlineVb = null,
-			loopSelectionLineVb = null,
+	private static WaveformShape waveformShape;
+
+	private static FloatBuffer backgroundOutlineVb = null,
 			loopSelectionRectVbs[] = new FloatBuffer[2];
 
 	// which pointer id is touching which marker (-1 means no pointer)
@@ -50,31 +52,15 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	private void updateWaveformVb() {
-		long offset = (long) params[0].getLevel(levelOffset);
-		long numFloats = (long) params[0].getLevel(levelWidth);
-
-		float spp = Math.min(2.0f, numFloats / width);
-		float[] outputAry = new float[2 * (int) (width * spp)];
-
-		for (int x = 0; x < outputAry.length; x += 2) {
-			float percent = (float) x / outputAry.length;
-			outputAry[x] = percent * width + X_OFFSET;
-
-			int dataIndex = (int) (offset + percent * numFloats);
-			float sample = TrackManager.currTrack.getSample(dataIndex, 0);
-			outputAry[x + 1] = height * (1 - sample) / 2;
-		}
-
-		waveformVb = makeFloatBuffer(outputAry);
+		waveformShape.update((long) params[0].getLevel(levelOffset),
+				(long) params[0].getLevel(levelWidth), X_OFFSET);
 	}
 
 	private void updateLoopSelectionVbs() {
 		float beginX = levelToX(params[0].viewLevel);
 		float endX = levelToX(params[1].viewLevel);
-		float[] loopSelectionVertices = { beginX, 0, beginX, height, endX,
-				height, endX, 0 };
+		waveformShape.updateLoopSelection(beginX, endX);
 
-		loopSelectionLineVb = makeFloatBuffer(loopSelectionVertices);
 		loopSelectionRectVbs[0] = makeRectFloatBuffer(beginX - X_OFFSET,
 				height, beginX + X_OFFSET, 0);
 		loopSelectionRectVbs[1] = makeRectFloatBuffer(endX - X_OFFSET, height,
@@ -82,21 +68,12 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	private void drawWaveform() {
-		if (waveformVb == null)
+		if (waveformShape == null)
 			return;
-		gl.glEnable(GL10.GL_LINE_SMOOTH);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, waveformVb);
-		drawLines(waveformVb, Colors.VOLUME, 10, GL10.GL_LINE_STRIP);
-		gl.glDisable(GL10.GL_LINE_SMOOTH);
-	}
-
-	private void drawLoopSelectionHighlightRect() {
-		drawTriangleFan(loopSelectionLineVb, Colors.SAMPLE_LOOP_HIGHLIGHT);
+		waveformShape.draw();
 	}
 
 	private void drawLoopSelectionMarkers() {
-		drawLines(loopSelectionLineVb, Colors.SAMPLE_LOOP_SELECT_OUTLINE, 2,
-				GL10.GL_LINES);
 		drawTriangleFan(loopSelectionRectVbs[0],
 				beginLoopPointerId == -1 ? Colors.SAMPLE_LOOP_SELECT
 						: Colors.SAMPLE_LOOP_SELECT_SELECTED);
@@ -105,10 +82,14 @@ public class SampleEditView extends ControlView2dBase {
 						: Colors.SAMPLE_LOOP_SELECT_SELECTED);
 	}
 
+	public void layout(View parent, float x, float y, float width, float height) {
+		waveformShape = new WaveformShape(null, Colors.SAMPLE_LOOP_HIGHLIGHT, Colors.VOLUME, width);
+		waveformWidth = width - SNAP_DIST;
+		super.layout(parent, x, y, width, height);
+	}
+
 	@Override
 	public void init() {
-		// setBackgroundColor(Colors.VIEW_BG);
-		waveformWidth = width - SNAP_DIST;
 		initBackgroundOutlineVb();
 		update();
 	}
@@ -164,7 +145,6 @@ public class SampleEditView extends ControlView2dBase {
 	@Override
 	public void draw() {
 		drawLines(backgroundOutlineVb, Colors.WHITE, 4, GL10.GL_LINE_LOOP);
-		drawLoopSelectionHighlightRect();
 		drawWaveform();
 		drawLoopSelectionMarkers();
 	}
@@ -317,5 +297,15 @@ public class SampleEditView extends ControlView2dBase {
 
 	protected float levelToX(float level) {
 		return X_OFFSET + (level - levelOffset) * waveformWidth / levelWidth;
+	}
+
+	@Override
+	public void onParamChanged(Param param) {
+		super.onParamChanged(param);
+		updateVbs();
+	}
+	
+	public void layoutChildren() {
+		waveformShape.layout(0, 0, width, height);
 	}
 }

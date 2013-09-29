@@ -19,10 +19,18 @@ public class MeshGroup {
 	private float[] vertices;
 	private float[] colors;
 	private int vertexHandle = -1, colorHandle = -1, numVertices = -1;
-	
+	private int primitiveType;
 	private boolean dirty = false;
-	
-	public synchronized void draw(int primitiveType) {
+
+	public MeshGroup(int primitiveType) {
+		this.primitiveType = primitiveType;
+	}
+
+	public void setPrimitiveType(int primitiveType) {
+		this.primitiveType = primitiveType;
+	}
+
+	public synchronized void draw() {
 		if (children.isEmpty()) {
 			return;
 		}

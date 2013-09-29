@@ -267,7 +267,7 @@ public class Track extends BaseTrack implements ParamListener {
 	public void onParamChanged(Param param) {
 		if (param.equals(getGainParam())) {
 			setTrackGain(id, param.level);
-			PageSelectGroup.sampleEditPage.update();
+			PageSelectGroup.sampleEditPage.sampleEdit.onParamChanged(param);
 		} else {
 			float minLoopWindow = getLoopEndParam().getViewLevel(MIN_LOOP_WINDOW);
 			getLoopBeginParam().maxViewLevel = getLoopEndParam().viewLevel - minLoopWindow;

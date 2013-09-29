@@ -2,10 +2,8 @@ package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.Track;
 import com.kh.beatbot.activity.BeatBotActivity;
-import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
@@ -19,11 +17,11 @@ import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
 
-public class SampleEditPage extends Page implements ParamListener {
+public class SampleEditPage extends Page {
 
 	private ShapeGroup labelGroup = new ShapeGroup();
 
-	private SampleEditView sampleEdit;
+	public SampleEditView sampleEdit;
 	private ImageButton previewButton, browseButton, editButton;
 	private ToggleButton loopButton, reverseButton;
 	private ParamControl loopBeginControl, loopEndControl, gainControl;
@@ -152,13 +150,6 @@ public class SampleEditPage extends Page implements ParamListener {
 
 	@Override
 	public void init() {
-		TrackManager.currTrack.getLoopBeginParam().addListener(this);
-		TrackManager.currTrack.getLoopEndParam().addListener(this);
 		update();
-	}
-
-	@Override
-	public void onParamChanged(Param param) {
-		sampleEdit.update();
 	}
 }

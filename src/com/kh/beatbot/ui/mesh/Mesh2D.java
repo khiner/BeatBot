@@ -73,10 +73,14 @@ public class Mesh2D {
 	public void setColor(float[] color) {
 		this.color = color;
 		for (int i = 0; i < numVertices; i++) {
-			this.colors[i * 4] = color[0];
-			this.colors[i * 4 + 1] = color[1];
-			this.colors[i * 4 + 2] = color[2];
-			this.colors[i * 4 + 3] = color[3];
+			setColor(i, color);
 		}
+	}
+	
+	public void setColor(int index, float[] color) {
+		this.colors[index * 4] = color[0];
+		this.colors[index * 4 + 1] = color[1];
+		this.colors[index * 4 + 2] = color[2];
+		this.colors[index * 4 + 3] = color[3];
 	}
 }
