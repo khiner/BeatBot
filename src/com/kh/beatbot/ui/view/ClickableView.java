@@ -29,10 +29,8 @@ public abstract class ClickableView extends TouchableView {
 	private final Handler handler = new Handler();
 	
 	/** State Variables for Clicking/Pressing **/
-	private long lastDownTime = 0;
-	private long lastTapTime = 0;
-	private float lastTapX = -1;
-	private float lastTapY = -1;
+	private long lastDownTime = 0, lastTapTime = 0;
+	private float lastTapX = -1, lastTapY = -1;
 
 
 	/****************** Clickable Methods ********************/

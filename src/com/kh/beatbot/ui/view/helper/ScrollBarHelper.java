@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.ClickableView;
 import com.kh.beatbot.ui.view.View;
@@ -64,15 +65,13 @@ public class ScrollBarHelper {
 		if (!scrollingEnded && elapsedTime <= ClickableView.DOUBLE_TAP_TIME)
 			// fade in
 			alpha *= elapsedTime / (float) ClickableView.DOUBLE_TAP_TIME;
-		else if (scrollingEnded
-				&& elapsedTime > ClickableView.DOUBLE_TAP_TIME)
+		else if (scrollingEnded && elapsedTime > ClickableView.DOUBLE_TAP_TIME)
 			// fade out
 			alpha *= 2 - elapsedTime / (float) ClickableView.DOUBLE_TAP_TIME;
 		innerScrollBarColor[3] = alpha;
 		outerScrollBarColor[3] = alpha * .6f;
 		View.translate(0, translateY);
-		View.drawLines(scrollBarLinesVb, outerScrollBarColor, 3,
-				GL10.GL_LINES);
+		View.drawLines(scrollBarLinesVb, outerScrollBarColor, 3, GL10.GL_LINES);
 		View.translate(translateX, 0);
 		View.drawTriangleFan(outerScrollBarVb, outerScrollBarColor);
 		View.drawTriangleFan(innerScrollBarVb, innerScrollBarColor);
@@ -94,9 +93,9 @@ public class ScrollBarHelper {
 
 	public static void updateScrollBar(View view) {
 		float x1 = TickWindowHelper.getTickOffset() * view.width
-				/ TickWindowHelper.MAX_TICKS;
+				/ MidiManager.MAX_TICKS;
 		float x2 = (TickWindowHelper.getTickOffset() + TickWindowHelper
-				.getNumTicks()) * view.width / TickWindowHelper.MAX_TICKS;
+				.getNumTicks()) * view.width / MidiManager.MAX_TICKS;
 		float outerWidth = x2 - x1;
 		float innerWidth = outerWidth - 10;
 		translateX = (x2 + x1) / 2;
@@ -108,8 +107,8 @@ public class ScrollBarHelper {
 		outerScrollBarVb = View.makeRectFloatBuffer(outerWidth,
 				outerScrollBarHeight, outerScrollBarCornerRadius,
 				CORNER_RESOLUTION);
-		scrollBarLinesVb = View.makeFloatBuffer(new float[] { 0, 0, x1, 0,
-				x2, 0, view.width, 0 });
+		scrollBarLinesVb = View.makeFloatBuffer(new float[] { 0, 0, x1, 0, x2,
+				0, view.width, 0 });
 	}
 
 	public static void handleActionUp() {

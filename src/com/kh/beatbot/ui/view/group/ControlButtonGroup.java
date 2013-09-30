@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view.group;
 import android.widget.Toast;
 
 import com.kh.beatbot.activity.BeatBotActivity;
+import com.kh.beatbot.event.Event;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -18,17 +19,7 @@ import com.kh.beatbot.ui.view.page.Page;
 public class ControlButtonGroup extends TouchableView {
 
 	public ToggleButton playButton, recordButton, copyButton;
-	public ImageButton stopButton, undoButton, deleteButton;
-
-	@Override
-	public void init() {
-
-	}
-
-	@Override
-	public void draw() {
-		// parent
-	}
+	public ImageButton stopButton, undoButton, redoButton, deleteButton;
 
 	@Override
 	protected void createChildren() {
@@ -38,6 +29,7 @@ public class ControlButtonGroup extends TouchableView {
 		copyButton = new ToggleButton();
 		deleteButton = new ImageButton();
 		undoButton = new ImageButton();
+		redoButton = new ImageButton(); // TODO layout & addChild
 
 		playButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
@@ -87,7 +79,7 @@ public class ControlButtonGroup extends TouchableView {
 		undoButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				MidiManager.undo();
+				Event.undo();
 			}
 		});
 
@@ -132,6 +124,10 @@ public class ControlButtonGroup extends TouchableView {
 		undoButton.setEnabled(enabled);
 	}
 	
+	public void setRedoIconEnabled(final boolean enabled) {
+		redoButton.setEnabled(enabled);
+	}
+
 	public void uncheckCopyButton() {
 		copyButton.setChecked(false);
 	}

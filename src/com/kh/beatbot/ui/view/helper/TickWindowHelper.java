@@ -18,8 +18,6 @@ public class TickWindowHelper {
 	public static final int NUM_VERTICAL_LINE_SETS = 8;
 	public static final int MIN_LINES_DISPLAYED = 8;
 	public static final int MAX_LINES_DISPLAYED = 32;
-	public static final float MIN_TICKS = MidiManager.TICKS_IN_ONE_MEASURE / 8;
-	public static final float MAX_TICKS = MidiManager.TICKS_IN_ONE_MEASURE * 4;
 
 	public static float scrollAnchorTick = 0, scrollAnchorY = 0;
 			
@@ -70,17 +68,17 @@ public class TickWindowHelper {
 		if (newTickOffset < 0) {
 			currTickOffset = 0;
 			currNumTicks = ZRAT * midiView.width / rightX;
-			currNumTicks = currNumTicks <= MAX_TICKS ? (currNumTicks >= MIN_TICKS ? currNumTicks : MIN_TICKS) : MAX_TICKS;
-		} else if (newNumTicks > MAX_TICKS) {
+			currNumTicks = currNumTicks <= MidiManager.MAX_TICKS ? (currNumTicks >= MidiManager.MIN_TICKS ? currNumTicks : MidiManager.MIN_TICKS) : MidiManager.MAX_TICKS;
+		} else if (newNumTicks > MidiManager.MAX_TICKS) {
 			currTickOffset = newTickOffset;
-			currNumTicks = MAX_TICKS - currTickOffset;
-		} else if (newNumTicks < MIN_TICKS) {
+			currNumTicks = MidiManager.MAX_TICKS - currTickOffset;
+		} else if (newNumTicks < MidiManager.MIN_TICKS) {
 			currTickOffset = newTickOffset;
-			currNumTicks = MIN_TICKS;
-		} else if (newTickOffset + newNumTicks > MAX_TICKS) {
-			currNumTicks = ((ZLAT - MAX_TICKS) * midiView.width)
+			currNumTicks = MidiManager.MIN_TICKS;
+		} else if (newTickOffset + newNumTicks > MidiManager.MAX_TICKS) {
+			currNumTicks = ((ZLAT - MidiManager.MAX_TICKS) * midiView.width)
 					/ (leftX - midiView.width);
-			currTickOffset = MAX_TICKS - currNumTicks;
+			currTickOffset = MidiManager.MAX_TICKS - currNumTicks;
 		} else {
 			currTickOffset = newTickOffset;
 			currNumTicks = newNumTicks;
@@ -130,8 +128,8 @@ public class TickWindowHelper {
 	public static void setTickOffset(float tickOffset) {
 		if (tickOffset < 0) {
 			currTickOffset = 0;
-		} else if (tickOffset + currNumTicks > MAX_TICKS) {
-			currTickOffset = MAX_TICKS - currNumTicks;
+		} else if (tickOffset + currNumTicks > MidiManager.MAX_TICKS) {
+			currTickOffset = MidiManager.MAX_TICKS - currNumTicks;
 		} else {
 			currTickOffset = tickOffset;
 		}
@@ -148,7 +146,7 @@ public class TickWindowHelper {
 	}
 
 	public static void setNumTicks(float numTicks) {
-		if (numTicks > MAX_TICKS || numTicks < MIN_TICKS) {
+		if (numTicks > MidiManager.MAX_TICKS || numTicks < MidiManager.MIN_TICKS) {
 			return;
 		}
 		currNumTicks = numTicks;
@@ -215,13 +213,13 @@ public class TickWindowHelper {
 	public static void initVLineVbs() {
 		List<List<Float>> allVertices = new ArrayList<List<Float>>();
 		
-		long minTickSpacing = (long)(MIN_TICKS / 8);
+		long minTickSpacing = (long)(MidiManager.MIN_TICKS / 8);
 		long[] tickSpacings = new long[NUM_VERTICAL_LINE_SETS];
 		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
 			allVertices.add(new ArrayList<Float>());
 			tickSpacings[i] = minTickSpacing * (1 << (NUM_VERTICAL_LINE_SETS - i - 1));
 		}
-		for (long currTick = 0; currTick < MAX_TICKS; currTick += minTickSpacing) {
+		for (long currTick = 0; currTick < MidiManager.MAX_TICKS; currTick += minTickSpacing) {
 			for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
 				if (currTick % tickSpacings[i] == 0) {
 					float x = midiView.tickToUnscaledX(currTick);

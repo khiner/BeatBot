@@ -23,21 +23,18 @@ public class MidiView extends ClickableView {
 
 	public static final float Y_OFFSET = 21, LOOP_SELECT_SNAP_DIST = 30;
 	public static float trackHeight, allTracksHeight;
-	// set this to true after an event that can be undone (with undo btn)
-	public static boolean stateChanged = false;
 
 	private static float dragOffsetTick[] = { 0, 0, 0, 0, 0 };
 
 	private static int pinchLeftPointerId = -1, pinchRightPointerId = -1,
 			scrollPointerId = -1;
 
-	private static float pinchLeftAnchor = 0, pinchRightAnchor = 0,
+	private static float pinchLeftOffset = 0, pinchRightOffset = 0,
 			zoomLeftAnchorTick = 0, zoomRightAnchorTick = 0,
 			loopSelectionOffset = 0, selectRegionStartTick = -1,
 			selectRegionStartY = -1;
 
-	private static boolean pinch = false, snapToGrid = true,
-			selectRegion = false;
+	private static boolean selectRegion = false;
 
 	private static int[] loopPointerIds = { -1, -1, -1 };
 
@@ -63,11 +60,6 @@ public class MidiView extends ClickableView {
 			if (loopPointerIds[i] != -1)
 				numSelected++;
 		return numSelected;
-	}
-
-	public boolean toggleSnapToGrid() {
-		snapToGrid = !snapToGrid;
-		return snapToGrid;
 	}
 
 	private FloatBuffer currTickVb = null, hLineVb = null,
@@ -197,7 +189,7 @@ public class MidiView extends ClickableView {
 	}
 
 	private void updateBgRect() {
-		float width = tickToUnscaledX(TickWindowHelper.MAX_TICKS - 1);
+		float width = tickToUnscaledX(MidiManager.MAX_TICKS - 1);
 		if (bgRect == null) {
 			bgRect = makeRectangle(bgShapeGroup, 0, Y_OFFSET, width,
 					allTracksHeight, Colors.MIDI_VIEW_BG);
@@ -211,7 +203,7 @@ public class MidiView extends ClickableView {
 	private void initSelectedNoteVb(int selectedNote) {
 		float x1 = 0;
 		float y1 = noteToUnscaledY(selectedNote);
-		float width = tickToUnscaledX(TickWindowHelper.MAX_TICKS - 1);
+		float width = tickToUnscaledX(MidiManager.MAX_TICKS - 1);
 		if (selectedNoteRect == null) {
 			selectedNoteRect = makeRectangle(null, x1, y1, width, trackHeight,
 					Colors.MIDI_SELECTED_TRACK, Colors.BLACK);
@@ -313,7 +305,7 @@ public class MidiView extends ClickableView {
 	}
 
 	public float tickToUnscaledX(float tick) {
-		return tick / TickWindowHelper.MAX_TICKS * width;
+		return tick / MidiManager.MAX_TICKS * width;
 	}
 
 	public float tickToX(float tick) {
@@ -388,7 +380,7 @@ public class MidiView extends ClickableView {
 		translate(
 				-TickWindowHelper.getTickOffset()
 						/ TickWindowHelper.getNumTicks() * width, 0);
-		scale((float) TickWindowHelper.MAX_TICKS
+		scale((float) MidiManager.MAX_TICKS
 				/ (float) TickWindowHelper.getNumTicks(), 1);
 
 		// draws background and loop-background in one call
@@ -435,8 +427,8 @@ public class MidiView extends ClickableView {
 			}
 			if (selectedNote.getOnTick() < -adjustedTickDiff) {
 				adjustedTickDiff = -selectedNote.getOnTick();
-			} else if (TickWindowHelper.MAX_TICKS - selectedNote.getOffTick() < adjustedTickDiff) {
-				adjustedTickDiff = TickWindowHelper.MAX_TICKS
+			} else if (MidiManager.MAX_TICKS - selectedNote.getOffTick() < adjustedTickDiff) {
+				adjustedTickDiff = MidiManager.MAX_TICKS
 						- selectedNote.getOffTick();
 			}
 		}
@@ -459,18 +451,6 @@ public class MidiView extends ClickableView {
 		return adjustedNoteDiff;
 	}
 
-	private boolean pinchNote(MidiNote midiNote, float onTickDiff,
-			float offTickDiff) {
-		float newOnTick = midiNote.getOnTick();
-		float newOffTick = midiNote.getOffTick();
-		if (midiNote.getOnTick() + onTickDiff >= 0)
-			newOnTick += onTickDiff;
-		if (midiNote.getOffTick() + offTickDiff <= TickWindowHelper.MAX_TICKS)
-			newOffTick += offTickDiff;
-		return MidiManager.setNoteTicks(midiNote, (long) newOnTick,
-				(long) newOffTick, snapToGrid, false);
-	}
-
 	private void startSelectRegion(float x, float y) {
 		selectRegionStartTick = xToTick(x);
 		selectRegionStartY = noteToY(yToNote(y));
@@ -486,23 +466,12 @@ public class MidiView extends ClickableView {
 	// adds a note starting at the nearest major tick (nearest displayed
 	// grid line) to the left and ending one tick before the nearest major
 	// tick to the right of the given tick
-	public MidiNote addMidiNote(float tick, int track) {
+	private MidiNote addMidiNote(float tick, int track) {
 		float spacing = TickWindowHelper.getMajorTickSpacing();
 		float onTick = tick - tick % spacing;
 		float offTick = onTick + spacing - 1;
-		return addMidiNote(onTick, offTick, track);
-	}
-
-	public MidiNote addMidiNote(float onTick, float offTick, int track) {
-		MidiNote noteToAdd = MidiManager.addNote((long) onTick, (long) offTick,
-				track, .75f, .5f, .5f);
-		MidiManager.saveNoteTicks();
-		MidiManager.selectNote(noteToAdd);
-		MidiManager.handleMidiCollisions();
-		MidiManager.finalizeNoteTicks();
-		MidiManager.deselectNote(noteToAdd);
-		stateChanged = true;
-		return noteToAdd;
+		return MidiManager.addNote((long) onTick, (long) offTick, track, .75f,
+				.5f, .5f);
 	}
 
 	public void createNoteView(MidiNote note) {
@@ -527,12 +496,8 @@ public class MidiView extends ClickableView {
 
 	private Rectangle makeRectangle(ShapeGroup group, float x1, float y1,
 			float width, float height, float[] fillColor, float[] outlineColor) {
-		Rectangle newRect;
-		if (outlineColor == null) {
-			newRect = new Rectangle(group, fillColor);
-		} else {
-			newRect = new Rectangle(group, fillColor, outlineColor);
-		}
+		Rectangle newRect = outlineColor == null ? new Rectangle(group,
+				fillColor) : new Rectangle(group, fillColor, outlineColor);
 		newRect.getGroup().add(newRect);
 		newRect.layout(x1, y1, width, height);
 		return newRect;
@@ -590,48 +555,17 @@ public class MidiView extends ClickableView {
 				dragAllSelected ? null : touchedNote);
 		noteDiff = getAdjustedNoteDiff(noteDiff, dragAllSelected ? null
 				: touchedNote);
-		if (noteDiff == 0 && tickDiff == 0)
-			return;
 		List<MidiNote> notesToDrag = dragAllSelected ? MidiManager
 				.getSelectedNotes() : Arrays.asList(touchedNote);
 
-		// dragging one note - drag all selected notes together
-		boolean changed = false;
-		for (MidiNote midiNote : notesToDrag) {
-			// check if we are actually changing note lengths
-			changed = MidiManager
-					.setNoteTicks(midiNote,
-							(long) (midiNote.getOnTick() + tickDiff),
-							(long) (midiNote.getOffTick() + tickDiff),
-							snapToGrid, true)
-					|| changed;
-			// check if we are actually changing note values
-			changed = MidiManager.setNoteValue(midiNote,
-					midiNote.getNoteValue() + noteDiff)
-					|| changed;
-		}
-		if (changed) {
-			stateChanged = true;
-			MidiManager.handleMidiCollisions();
-		}
+		MidiManager.moveNotes(notesToDrag, (long) tickDiff, noteDiff);
 	}
 
-	private void pinchSelectedNotes(float currLeftTick, float currRightTick) {
-		float onTickDiff = currLeftTick - pinchLeftAnchor;
-		float offTickDiff = currRightTick - pinchRightAnchor;
+	private void pinchSelectedNotes(float onTickDiff, float offTickDiff) {
 		if (onTickDiff == 0 && offTickDiff == 0)
 			return;
-
-		boolean changed = false;
-		for (MidiNote midiNote : MidiManager.getSelectedNotes()) {
-			changed = pinchNote(midiNote, onTickDiff, offTickDiff) || changed;
-		}
-		if (changed) {
-			pinchLeftAnchor = currLeftTick;
-			pinchRightAnchor = currRightTick;
-		}
-		stateChanged = changed || stateChanged;
-		MidiManager.handleMidiCollisions();
+		MidiManager.pinchNotes(MidiManager.getSelectedNotes(),
+				(long) onTickDiff, (long) offTickDiff);
 	}
 
 	public void updateLoopMarkers() {
@@ -669,8 +603,8 @@ public class MidiView extends ClickableView {
 					- MidiManager.getLoopBeginTick();
 			float newBeginTick = TickWindowHelper
 					.getMajorTickToLeftOf(xToTick(x - loopSelectionOffset));
-			newBeginTick = newBeginTick >= 0 ? (newBeginTick <= TickWindowHelper.MAX_TICKS
-					- loopLength ? newBeginTick : TickWindowHelper.MAX_TICKS
+			newBeginTick = newBeginTick >= 0 ? (newBeginTick <= MidiManager.MAX_TICKS
+					- loopLength ? newBeginTick : MidiManager.MAX_TICKS
 					- loopLength)
 					: 0;
 			MidiManager.setLoopTicks((long) newBeginTick,
@@ -708,7 +642,6 @@ public class MidiView extends ClickableView {
 	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
 		ScrollBarHelper.startScrollView();
-		MidiManager.saveNoteTicks();
 		selectMidiNote(x, y, id);
 		if (touchedNotes.get(id) == null) {
 			// no note selected.
@@ -745,14 +678,13 @@ public class MidiView extends ClickableView {
 				if (noteAlreadySelected) {
 					// note is selected with one pointer, but this pointer
 					// did not select a note. start pinching all selected notes.
-					int leftId = pointerIdToPos.get(0).x <= pointerIdToPos
+					pinchLeftPointerId = pointerIdToPos.get(0).x <= pointerIdToPos
 							.get(1).x ? 0 : 1;
-					int rightId = (leftId + 1) % 2;
-					pinchLeftPointerId = leftId;
-					pinchRightPointerId = rightId;
-					pinchLeftAnchor = leftTick;
-					pinchRightAnchor = rightTick;
-					pinch = true;
+					pinchRightPointerId = (pinchLeftPointerId + 1) % 2;
+					pinchLeftOffset = leftTick
+							- MidiManager.getLeftmostSelectedTick();
+					pinchRightOffset = MidiManager.getRightmostSelectedTick()
+							- rightTick;
 				} else if (pointerCount() - getNumLoopMarkersSelected() == 1) {
 					// otherwise, enable scrolling
 					TickWindowHelper.scrollAnchorTick = xToTick(x);
@@ -772,10 +704,17 @@ public class MidiView extends ClickableView {
 	@Override
 	public void handleActionMove(int id, float x, float y) {
 		super.handleActionMove(id, x, y);
-		if (pinch) {
-			float leftTick = xToTick(pointerIdToPos.get(pinchLeftPointerId).x);
-			float rightTick = xToTick(pointerIdToPos.get(pinchRightPointerId).x);
-			pinchSelectedNotes(leftTick, rightTick);
+		if (id == pinchLeftPointerId) {
+			float leftTick = xToTick(x);
+			pinchSelectedNotes(
+					leftTick - pinchLeftOffset
+							- MidiManager.getLeftmostSelectedTick(), 0);
+		} else if (id == pinchRightPointerId) {
+			float rightTick = xToTick(x);
+			pinchSelectedNotes(
+					0,
+					rightTick + pinchRightOffset
+							- MidiManager.getRightmostSelectedTick());
 		} else if (touchedNotes.isEmpty()) {
 			// no midi selected. scroll, zoom, or update select region
 			noMidiMove();
@@ -806,14 +745,15 @@ public class MidiView extends ClickableView {
 
 	@Override
 	public void handleActionPointerUp(int id, float x, float y) {
-		if (scrollPointerId == id)
+		if (id == scrollPointerId)
 			scrollPointerId = -1;
+		if (id == pinchLeftPointerId || id == pinchRightPointerId)
+			pinchLeftPointerId = pinchRightPointerId = -1;
 		for (int i = 0; i < 3; i++)
 			if (loopPointerIds[i] == id)
 				loopPointerIds[i] = -1;
 		if (zoomLeftAnchorTick != -1) {
 			int otherId = id == 0 ? 1 : 0;
-			pinch = false;
 			TickWindowHelper.scrollAnchorTick = xToTick(pointerIdToPos
 					.get(otherId).x);
 			scrollPointerId = otherId;
@@ -828,14 +768,12 @@ public class MidiView extends ClickableView {
 		for (int i = 0; i < 3; i++) {
 			loopPointerIds[i] = -1;
 		}
+		pinchLeftPointerId = pinchRightPointerId = -1;
 		selectRegion = false;
-		MidiManager.finalizeNoteTicks();
-		if (stateChanged)
-			MidiManager.saveState();
-		stateChanged = false;
 		startOnTicks.clear();
 		touchedNotes.clear();
 		initLoopBarVb();
+		MidiManager.endMidiEvent();
 	}
 
 	@Override
@@ -876,7 +814,6 @@ public class MidiView extends ClickableView {
 		MidiNote touchedNote = touchedNotes.get(id);
 		if (touchedNote != null) {
 			MidiManager.deleteNote(touchedNote);
-			stateChanged = true;
 		}
 	}
 }

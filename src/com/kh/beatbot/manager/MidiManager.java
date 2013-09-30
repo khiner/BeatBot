@@ -6,11 +6,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Stack;
 
 import android.util.Log;
 
+import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.Track;
+import com.kh.beatbot.event.CreateMidiNotesEvent;
+import com.kh.beatbot.event.DestroyMidiNotesEvent;
+import com.kh.beatbot.event.MidiNotesGroupEvent;
+import com.kh.beatbot.event.MoveMidiNotesEvent;
+import com.kh.beatbot.event.PinchMidiNotesEvent;
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiTrack;
@@ -29,20 +34,23 @@ public class MidiManager {
 			RESOLUTION = MidiFile.DEFAULT_RESOLUTION, UNDO_STACK_SIZE = 40;
 
 	public static final long TICKS_IN_ONE_MEASURE = RESOLUTION * 4;
+	public static final float MIN_TICKS = TICKS_IN_ONE_MEASURE / 8;
+	public static final float MAX_TICKS = TICKS_IN_ONE_MEASURE * 4;
 
 	public static float currBeatDivision;
+
+	private static boolean snapToGrid = true;
 
 	private static TimeSignature ts = new TimeSignature();
 	private static Tempo tempo = new Tempo();
 	private static MidiTrack tempoTrack = new MidiTrack();
 
-	// stack of MidiNote lists, for undo
-	private static Stack<List<MidiNote>> undoStack = new Stack<List<MidiNote>>();
-
 	private static List<MidiNote> copiedNotes = new ArrayList<MidiNote>(),
 			currState = new ArrayList<MidiNote>();
 
-	public static long loopBeginTick, loopEndTick;
+	private static long loopBeginTick, loopEndTick;
+
+	private static MidiNotesGroupEvent currEvent;
 
 	public static void init() {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,
@@ -54,17 +62,29 @@ public class MidiManager {
 		setLoopEndTick(RESOLUTION * 4);
 	}
 
+	public static boolean toggleSnapToGrid() {
+		snapToGrid = !snapToGrid;
+		return snapToGrid;
+	}
+
 	public static float getBPM() {
 		return tempo.getBpm();
 	}
 
 	public static int setBPM(float bpm) {
-		bpm = bpm >= MIN_BPM ? (bpm <= MAX_BPM ? bpm : MAX_BPM) : MIN_BPM;
+		bpm = GeneralUtils.clipTo(bpm, MIN_BPM, MAX_BPM);
 		tempo.setBpm(bpm);
 		setNativeBPM(bpm);
 		setNativeMSPT(tempo.getMpqn() / RESOLUTION);
 		TrackManager.quantizeEffectParams();
 		return (int) bpm;
+	}
+
+	public static void endMidiEvent() {
+		if (currEvent != null) {
+			currEvent.end();
+			currEvent = new MidiNotesGroupEvent();
+		}
 	}
 
 	public static List<MidiNote> getMidiNotes() {
@@ -117,13 +137,13 @@ public class MidiManager {
 		midiNote.setSelected(true);
 
 		Page.mainPage.midiView.updateNoteFillColor(midiNote);
-		updateEditIcons();
+		Page.mainPage.controlButtonGroup.setEditIconsEnabled(anyNoteSelected());
 	}
 
 	public static void deselectNote(MidiNote midiNote) {
 		midiNote.setSelected(false);
 		Page.mainPage.midiView.updateNoteFillColor(midiNote);
-		updateEditIcons();
+		Page.mainPage.controlButtonGroup.setEditIconsEnabled(anyNoteSelected());
 	}
 
 	public static void selectRegion(long leftTick, long rightTick, int topNote,
@@ -167,21 +187,11 @@ public class MidiManager {
 	}
 
 	private static void addNote(MidiNote midiNote) {
-		Track track = TrackManager.getTrack(midiNote.getNoteValue());
-		track.addNote(midiNote);
-		Page.mainPage.midiView.createNoteView(midiNote);
+		getCurrEvent().executeEvent(new CreateMidiNotesEvent(midiNote));
 	}
 
 	public static void deleteNote(MidiNote midiNote) {
-		midiNote.getRectangle().getGroup().remove(midiNote.getRectangle());
-		Track track = TrackManager.getTrack(midiNote.getNoteValue());
-		track.removeNote(midiNote);
-		updateEditIcons();
-	}
-
-	private static void updateEditIcons() {
-		boolean anyNoteSelected = anyNoteSelected();
-		Page.mainPage.controlButtonGroup.setEditIconsEnabled(anyNoteSelected);
+		getCurrEvent().executeEvent(new DestroyMidiNotesEvent(midiNote));
 	}
 
 	public static void copy() {
@@ -202,56 +212,37 @@ public class MidiManager {
 		Page.mainPage.controlButtonGroup.uncheckCopyButton();
 		if (copiedNotes.isEmpty())
 			return;
-		saveState();
-		saveNoteTicks();
-		deselectAllNotes();
-		long tickOffset = startTick - getLeftMostTick(copiedNotes);
+
+		long tickOffset = startTick - getLeftmostTick(copiedNotes);
 		for (MidiNote copiedNote : copiedNotes) {
-			long newOnTick = copiedNote.getOnTick() + tickOffset;
-			long newOffTick = copiedNote.getOffTick() + tickOffset;
-			addNote(copiedNote);
-			setNoteTicks(copiedNote, newOnTick, newOffTick, false, true);
-			selectNote(copiedNote);
+			copiedNote.setOnTick(copiedNote.getOnTick() + tickOffset);
+			copiedNote.setOffTick(copiedNote.getOffTick() + tickOffset);
 		}
-		handleMidiCollisions();
-		finalizeNoteTicks();
+
+		getCurrEvent().executeEvent(
+				new CreateMidiNotesEvent(copyMidiList(copiedNotes)));
+		endMidiEvent();
 		copiedNotes.clear();
 	}
 
 	public static void deleteSelectedNotes() {
-		if (anyNoteSelected())
-			saveState();
-		for (MidiNote selected : getSelectedNotes()) {
-			deleteNote(selected);
-		}
+		getCurrEvent().executeEvent(
+				new DestroyMidiNotesEvent(getSelectedNotes()));
 	}
 
-	public static void clearNotes() {
-		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
-			Track track = TrackManager.getTrack(i);
-			while (!track.getMidiNotes().isEmpty()) {
-				deleteNote(track.getMidiNotes().get(0)); // avoid concurrent mod
-															// error
-			}
-		}
-	}
-
-	public static boolean setNoteValue(MidiNote midiNote, int newNote) {
+	public static void setNoteValue(MidiNote midiNote, int newNote) {
 		int oldNote = midiNote.getNoteValue();
 		if (oldNote == newNote)
-			return false;
+			return;
 		midiNote.setNote(newNote);
-		Track oldTrack = TrackManager.getTrack(oldNote);
-		Track newTrack = TrackManager.getTrack(newNote);
-		oldTrack.removeNote(midiNote);
-		newTrack.addNote(midiNote);
-		return true;
+		TrackManager.getTrack(oldNote).removeNote(midiNote);
+		TrackManager.getTrack(newNote).addNote(midiNote);
 	}
 
-	public static boolean setNoteTicks(MidiNote midiNote, long onTick,
-			long offTick, boolean snapToGrid, boolean maintainNoteLength) {
+	public static void setNoteTicks(MidiNote midiNote, long onTick,
+			long offTick, boolean maintainNoteLength) {
 		if (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)
-			return false;
+			return;
 		if (offTick <= onTick)
 			offTick = onTick + 4;
 		if (snapToGrid) {
@@ -264,11 +255,20 @@ public class MidiManager {
 		if (maintainNoteLength)
 			offTick = midiNote.getOffTick() + onTick - midiNote.getOnTick();
 		Track track = TrackManager.getTrack(midiNote.getNoteValue());
-		return track.setNoteTicks(midiNote, onTick, offTick);
+		track.setNoteTicks(midiNote, onTick, offTick);
 	}
 
-	public static Tempo getTempo() {
-		return tempo;
+	public static void moveNotes(List<MidiNote> notes, long tickDiff,
+			int noteDiff) {
+		getCurrEvent().executeEvent(
+				new MoveMidiNotesEvent(notes, tickDiff, noteDiff));
+	}
+
+	public static void pinchNotes(List<MidiNote> notes, long onTickDiff,
+			long offTickDiff) {
+		getCurrEvent().executeEvent(
+				new PinchMidiNotesEvent(getSelectedNotes(), onTickDiff,
+						offTickDiff));
 	}
 
 	public static long getTicksPerBeat(float beatDivision) {
@@ -279,30 +279,12 @@ public class MidiManager {
 		return (long) ((RESOLUTION * 1000f / tempo.getMpqn()) * millis);
 	}
 
-	public static long getLeftMostTick(List<MidiNote> notes) {
-		long leftMostTick = Long.MAX_VALUE;
-		for (MidiNote midiNote : notes) {
-			if (midiNote.getOnTick() < leftMostTick)
-				leftMostTick = midiNote.getOnTick();
-		}
-		return leftMostTick;
+	public static long getLeftmostSelectedTick() {
+		return getLeftmostTick(getSelectedNotes());
 	}
 
-	public static long getRightMostTick(List<MidiNote> notes) {
-		long rightMostTick = Long.MIN_VALUE;
-		for (MidiNote midiNote : notes) {
-			if (midiNote.getOffTick() > rightMostTick)
-				rightMostTick = midiNote.getOffTick();
-		}
-		return rightMostTick;
-	}
-
-	public static long getLeftMostSelectedTick() {
-		return getLeftMostTick(getSelectedNotes());
-	}
-
-	public static long getRightMostSelectedTick() {
-		return getRightMostTick(getSelectedNotes());
+	public static long getRightmostSelectedTick() {
+		return getRightmostTick(getSelectedNotes());
 	}
 
 	/*
@@ -313,7 +295,7 @@ public class MidiManager {
 		long diff = (long) TickWindowHelper.getMajorTickNearestTo(midiNote
 				.getOnTick()) - midiNote.getOnTick();
 		setNoteTicks(midiNote, midiNote.getOnTick() + diff,
-				midiNote.getOffTick() + diff, false, true);
+				midiNote.getOffTick() + diff, true);
 	}
 
 	public static void saveNoteTicks() {
@@ -332,7 +314,7 @@ public class MidiManager {
 	// finalizes the note on/off ticks of all notes
 	public static void finalizeNoteTicks() {
 		for (MidiNote midiNote : getMidiNotes()) {
-			if (midiNote.getOnTick() > TickWindowHelper.MAX_TICKS) {
+			if (midiNote.getOnTick() > MAX_TICKS) {
 				Log.e("MidiManager", "Deleting note in finalize!");
 				deleteNote(midiNote);
 			} else {
@@ -355,33 +337,7 @@ public class MidiManager {
 		}
 	}
 
-	public static void saveState() {
-		undoStack.push(currState);
-		currState = copyMidiList(getMidiNotes());
-		// enforce max undo stack size
-		if (undoStack.size() > UNDO_STACK_SIZE)
-			undoStack.remove(0);
-
-		Page.mainPage.controlButtonGroup.setUndoIconEnabled(true);
-	}
-
-	public static void undo() {
-		if (undoStack.isEmpty()) {
-			return;
-		}
-
-		List<MidiNote> lastState = undoStack.pop();
-		clearNotes();
-		for (MidiNote midiNote : lastState) {
-			addNote(midiNote);
-		}
-		currState = copyMidiList(getMidiNotes());
-		if (undoStack.isEmpty()) {
-			Page.mainPage.controlButtonGroup.setUndoIconEnabled(false);
-		}
-	}
-
-	private static List<MidiNote> copyMidiList(List<MidiNote> midiList) {
+	public static List<MidiNote> copyMidiList(List<MidiNote> midiList) {
 		List<MidiNote> copy = new ArrayList<MidiNote>();
 		for (int i = 0; i < midiList.size(); i++) {
 			// avoid concurrent modification exception
@@ -424,7 +380,7 @@ public class MidiManager {
 			tempo = (Tempo) tempoTrack.getEvents().get(1);
 			setNativeMSPT(tempo.getMpqn() / RESOLUTION);
 			ArrayList<MidiEvent> events = midiTracks.get(1).getEvents();
-			clearNotes();
+			new DestroyMidiNotesEvent(getMidiNotes()).doExecute();
 			// midiEvents are ordered by tick, so on/off events don't
 			// necessarily
 			// alternate if there are interleaving notes (with different "notes"
@@ -440,6 +396,8 @@ public class MidiManager {
 					for (int j = 0; j < unfinishedNotes.size(); j++) {
 						NoteOn on = unfinishedNotes.get(j);
 						if (on.getNoteValue() == off.getNoteValue()) {
+							// TODO stoe all midi notes and then add them
+							// together in one event
 							addNote(on, off);
 							unfinishedNotes.remove(j);
 							break;
@@ -478,6 +436,31 @@ public class MidiManager {
 
 	public static long getLoopEndTick() {
 		return loopEndTick;
+	}
+
+	private static MidiNotesGroupEvent getCurrEvent() {
+		if (currEvent == null) {
+			currEvent = new MidiNotesGroupEvent();
+		}
+		return currEvent;
+	}
+
+	private static long getLeftmostTick(List<MidiNote> notes) {
+		long leftMostTick = Long.MAX_VALUE;
+		for (MidiNote midiNote : notes) {
+			if (midiNote.getOnTick() < leftMostTick)
+				leftMostTick = midiNote.getOnTick();
+		}
+		return leftMostTick;
+	}
+
+	private static long getRightmostTick(List<MidiNote> notes) {
+		long rightMostTick = Long.MIN_VALUE;
+		for (MidiNote midiNote : notes) {
+			if (midiNote.getOffTick() > rightMostTick)
+				rightMostTick = midiNote.getOffTick();
+		}
+		return rightMostTick;
 	}
 
 	public static native void isTrackPlaying(int trackNum);

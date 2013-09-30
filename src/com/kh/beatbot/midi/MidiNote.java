@@ -149,10 +149,7 @@ public class MidiNote implements Comparable<MidiNote> {
 	}
 
 	public void setOnTick(long onTick) {
-		if (onTick >= 0)
-			noteOn.setTick(onTick);
-		else
-			noteOn.setTick(0);
+		noteOn.setTick(onTick >= 0 ? onTick : 0);
 		updateView();
 	}
 

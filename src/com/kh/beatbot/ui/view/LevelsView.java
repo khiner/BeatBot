@@ -288,8 +288,6 @@ public class LevelsView extends TouchableView {
 			if (id == pointerIdToPos.size() - 1) {
 				updateDragLine();
 				setLevelsToDragLine();
-				// velocity changes are valid undo events
-				MidiView.stateChanged = true;
 			}
 		} else if (id == 0){ // no midi selected. midiView can handle it.
 			selectRegion(x, y);

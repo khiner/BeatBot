@@ -12,7 +12,6 @@ import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.view.TrackButtonRow;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
-import com.kh.beatbot.ui.view.helper.TickWindowHelper;
 
 public class Track extends BaseTrack implements ParamListener {
 
@@ -71,10 +70,10 @@ public class Track extends BaseTrack implements ParamListener {
 		updateNextNote();
 	}
 
-	public boolean setNoteTicks(MidiNote midiNote, long onTick, long offTick) {
+	public void setNoteTicks(MidiNote midiNote, long onTick, long offTick) {
 		if (!notes.contains(midiNote)
 				|| (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)) {
-			return false;
+			return;
 		}
 		// if we're changing the stop tick on a note that's already playing to a
 		// note before the current tick, stop the track
@@ -84,7 +83,6 @@ public class Track extends BaseTrack implements ParamListener {
 		midiNote.setOnTick(onTick);
 		midiNote.setOffTick(offTick);
 		updateNextNote();
-		return true;
 	}
 
 	public void handleNoteCollisions() {
@@ -112,8 +110,8 @@ public class Track extends BaseTrack implements ParamListener {
 						&& otherNote.getOffTick() > newOnTick) {
 					// we 'delete' the note temporarily by moving
 					// it offscreen, so it won't ever be played or drawn
-					newOnTick = (long) TickWindowHelper.MAX_TICKS * 2;
-					newOffTick = (long) TickWindowHelper.MAX_TICKS * 2 + 100;
+					newOnTick = (long) MidiManager.MAX_TICKS * 2;
+					newOffTick = (long) MidiManager.MAX_TICKS * 2 + 100;
 					break;
 				}
 			}
@@ -137,13 +135,13 @@ public class Track extends BaseTrack implements ParamListener {
 		// of the loop?
 		for (MidiNote midiNote : notes) {
 			if (midiNote.getOnTick() >= currTick
-					&& midiNote.getOnTick() < MidiManager.loopEndTick) {
+					&& midiNote.getOnTick() < MidiManager.getLoopEndTick()) {
 				return midiNote;
 			}
 		}
 		// otherwise, get the first note that starts after loop begin
 		for (MidiNote midiNote : notes) {
-			if (midiNote.getOnTick() >= MidiManager.loopBeginTick) {
+			if (midiNote.getOnTick() >= MidiManager.getLoopBeginTick()) {
 				return midiNote;
 			}
 		}
