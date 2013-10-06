@@ -37,4 +37,14 @@ public class CreateMidiNotesEvent extends MidiNotesEvent {
 		Page.mainPage.midiView.createNoteView(midiNote);
 		MidiManager.selectNote(midiNote);
 	}
+
+	@Override
+	protected boolean merge(MidiNotesEvent other) {
+		return false;
+	}
+
+	@Override
+	protected boolean hasEffect() {
+		return true;
+	}
 }

@@ -31,4 +31,14 @@ public class DestroyMidiNotesEvent extends MidiNotesEvent {
 		Track track = TrackManager.getTrack(midiNote.getNoteValue());
 		track.removeNote(midiNote);
 	}
+
+	@Override
+	protected boolean merge(MidiNotesEvent other) {
+		return false;
+	}
+
+	@Override
+	protected boolean hasEffect() {
+		return true;
+	}
 }

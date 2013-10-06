@@ -8,8 +8,8 @@ import com.kh.beatbot.midi.MidiNote;
 
 public class MoveMidiNotesEvent extends MidiNotesEvent {
 
-	private long tickDiff;
-	private int noteDiff;
+	protected long tickDiff;
+	protected int noteDiff;
 
 	public MoveMidiNotesEvent(MidiNote midiNote, long tickDiff, int noteDiff,
 			boolean snapToGrid) {
@@ -43,5 +43,20 @@ public class MoveMidiNotesEvent extends MidiNotesEvent {
 			MidiManager.setNoteValue(midiNote, midiNote.getNoteValue()
 					+ noteDiff);
 		}
+	}
+
+	@Override
+	protected boolean merge(MidiNotesEvent other) {
+		if (!(other instanceof MoveMidiNotesEvent)) {
+			return false;
+		}
+		noteDiff += ((MoveMidiNotesEvent)other).noteDiff;
+		tickDiff += ((MoveMidiNotesEvent)other).tickDiff;
+		return true;
+	}
+
+	@Override
+	protected boolean hasEffect() {
+		return noteDiff != 0 || tickDiff != 0;
 	}
 }

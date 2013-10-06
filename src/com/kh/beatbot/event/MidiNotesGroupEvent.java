@@ -12,7 +12,7 @@ public class MidiNotesGroupEvent extends Event {
 	private List<MidiNote> savedState = null;
 	private List<MidiNotesEvent> subEvents = new ArrayList<MidiNotesEvent>();
 
-	public final void execute() {
+	protected final void execute() {
 		begin();
 		doExecute();
 		end();
@@ -24,12 +24,11 @@ public class MidiNotesGroupEvent extends Event {
 	}
 
 	public synchronized final void end() {
-		boolean anyNoteSelected = MidiManager.anyNoteSelected();
-		Page.mainPage.controlButtonGroup.setEditIconsEnabled(anyNoteSelected);
 		MidiManager.finalizeNoteTicks();
 		if (!subEvents.isEmpty()) {
 			eventCompleted(this);
 		}
+		updateUi();
 	}
 
 	public synchronized final void executeEvent(MidiNotesEvent event) {
@@ -37,7 +36,14 @@ public class MidiNotesGroupEvent extends Event {
 			begin();
 		}
 		event.doExecute();
-		subEvents.add(event);
+		if (subEvents.isEmpty()
+				|| !subEvents.get(subEvents.size() - 1).merge(event)) {
+			subEvents.add(event);
+		}
+		MidiNotesEvent lastEvent = subEvents.get(subEvents.size() - 1);
+		if (!lastEvent.hasEffect()) {
+			subEvents.remove(lastEvent);
+		}
 	}
 
 	@Override
@@ -52,10 +58,16 @@ public class MidiNotesGroupEvent extends Event {
 		// restore previous midi state
 		new DestroyMidiNotesEvent(MidiManager.getMidiNotes()).doExecute();
 		new CreateMidiNotesEvent(savedState).doExecute();
+		updateUi();
 	}
 
 	@Override
 	protected Event opposite() {
 		return null;
+	}
+
+	private void updateUi() {
+		Page.mainPage.controlButtonGroup.setEditIconsEnabled(MidiManager
+				.anyNoteSelected());
 	}
 }

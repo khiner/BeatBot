@@ -8,7 +8,7 @@ import com.kh.beatbot.midi.MidiNote;
 
 public class PinchMidiNotesEvent extends MidiNotesEvent {
 
-	private long onTickDiff, offTickDiff;
+	protected long onTickDiff, offTickDiff;
 
 	public PinchMidiNotesEvent(MidiNote midiNote, long onTickDiff,
 			long offTickDiff) {
@@ -42,5 +42,20 @@ public class PinchMidiNotesEvent extends MidiNotesEvent {
 			newOffTick += offTickDiff;
 		MidiManager.setNoteTicks(midiNote, (long) newOnTick, (long) newOffTick,
 				false);
+	}
+	
+	@Override
+	protected boolean merge(MidiNotesEvent other) {
+		if (!(other instanceof PinchMidiNotesEvent)) {
+			return false;
+		}
+		onTickDiff += ((PinchMidiNotesEvent)other).onTickDiff;
+		offTickDiff += ((PinchMidiNotesEvent)other).offTickDiff;
+		return true;
+	}
+
+	@Override
+	protected boolean hasEffect() {
+		return onTickDiff != 0 || offTickDiff != 0;
 	}
 }

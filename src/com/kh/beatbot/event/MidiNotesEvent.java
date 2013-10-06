@@ -20,4 +20,7 @@ public abstract class MidiNotesEvent extends Event {
 	public void doUndo() {
 		opposite().doExecute();
 	}
+	
+	protected abstract boolean merge(MidiNotesEvent other);
+	protected abstract boolean hasEffect();
 }

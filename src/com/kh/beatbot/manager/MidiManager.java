@@ -228,6 +228,7 @@ public class MidiManager {
 	public static void deleteSelectedNotes() {
 		getCurrEvent().executeEvent(
 				new DestroyMidiNotesEvent(getSelectedNotes()));
+		endMidiEvent();
 	}
 
 	public static void setNoteValue(MidiNote midiNote, int newNote) {
