@@ -13,8 +13,7 @@ public class MidiNote implements Comparable<MidiNote> {
 	Rectangle rectangle; // rectangle for drawing
 	NoteOn noteOn;
 	NoteOff noteOff;
-	boolean selected = false;
-	boolean touched = false;
+	boolean selected = false, touched = false;
 
 	// while moving notes in the ui, they can overlap, but we keep 
 	// a memory of the old note ticks while we manipulate the new note ticks
@@ -203,7 +202,10 @@ public class MidiNote implements Comparable<MidiNote> {
 	public int compareTo(MidiNote otherNote) {
 		if (this.getNoteValue() != otherNote.getNoteValue()) {
 			return this.getNoteValue() - otherNote.getNoteValue();
+		} else if (this.getOnTick() != otherNote.getOnTick()) {
+			return (int) (this.getOnTick() - otherNote.getOnTick());
+		} else {
+			return (int) (this.getOffTick() - otherNote.getOffTick());
 		}
-		return (int) (this.getOnTick() - otherNote.getOnTick());
 	}
 }

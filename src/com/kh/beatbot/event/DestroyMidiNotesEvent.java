@@ -16,29 +16,15 @@ public class DestroyMidiNotesEvent extends MidiNotesEvent {
 		super(midiNotes);
 	}
 
-	public void doExecute() {
+	public void execute() {
 		for (MidiNote midiNote : midiNotes) {
 			destroyMidiNote(midiNote);
 		}
 	}
-	
-	protected Event opposite() {
-		return new CreateMidiNotesEvent(midiNotes);
-	}
-	
+
 	private void destroyMidiNote(MidiNote midiNote) {
 		midiNote.getRectangle().getGroup().remove(midiNote.getRectangle());
 		Track track = TrackManager.getTrack(midiNote.getNoteValue());
 		track.removeNote(midiNote);
-	}
-
-	@Override
-	protected boolean merge(MidiNotesEvent other) {
-		return false;
-	}
-
-	@Override
-	protected boolean hasEffect() {
-		return true;
 	}
 }

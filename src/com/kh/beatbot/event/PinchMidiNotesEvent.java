@@ -22,15 +22,11 @@ public class PinchMidiNotesEvent extends MidiNotesEvent {
 		this.offTickDiff = offTickDiff;
 	}
 
-	protected void doExecute() {
+	protected void execute() {
 		for (MidiNote midiNote : MidiManager.getSelectedNotes()) {
 			pinchNote(midiNote);
 		}
 		MidiManager.handleMidiCollisions();
-	}
-
-	protected Event opposite() {
-		return new PinchMidiNotesEvent(midiNotes, -onTickDiff, -offTickDiff);
 	}
 
 	private void pinchNote(MidiNote midiNote) {
@@ -42,20 +38,5 @@ public class PinchMidiNotesEvent extends MidiNotesEvent {
 			newOffTick += offTickDiff;
 		MidiManager.setNoteTicks(midiNote, (long) newOnTick, (long) newOffTick,
 				false);
-	}
-	
-	@Override
-	protected boolean merge(MidiNotesEvent other) {
-		if (!(other instanceof PinchMidiNotesEvent)) {
-			return false;
-		}
-		onTickDiff += ((PinchMidiNotesEvent)other).onTickDiff;
-		offTickDiff += ((PinchMidiNotesEvent)other).offTickDiff;
-		return true;
-	}
-
-	@Override
-	protected boolean hasEffect() {
-		return onTickDiff != 0 || offTickDiff != 0;
 	}
 }

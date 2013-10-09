@@ -23,17 +23,13 @@ public class MoveMidiNotesEvent extends MidiNotesEvent {
 		this.noteDiff = noteDiff;
 	}
 
-	protected void doExecute() {
+	protected void execute() {
 		for (MidiNote midiNote : midiNotes) {
 			moveMidiNote(midiNote);
 		}
 		MidiManager.handleMidiCollisions();
 	}
 
-	protected Event opposite() {
-		return new MoveMidiNotesEvent(midiNotes, -tickDiff, -noteDiff);
-	}
-	
 	private void moveMidiNote(MidiNote midiNote) {
 		if (tickDiff != 0) {
 			MidiManager.setNoteTicks(midiNote, midiNote.getOnTick()
@@ -43,20 +39,5 @@ public class MoveMidiNotesEvent extends MidiNotesEvent {
 			MidiManager.setNoteValue(midiNote, midiNote.getNoteValue()
 					+ noteDiff);
 		}
-	}
-
-	@Override
-	protected boolean merge(MidiNotesEvent other) {
-		if (!(other instanceof MoveMidiNotesEvent)) {
-			return false;
-		}
-		noteDiff += ((MoveMidiNotesEvent)other).noteDiff;
-		tickDiff += ((MoveMidiNotesEvent)other).tickDiff;
-		return true;
-	}
-
-	@Override
-	protected boolean hasEffect() {
-		return noteDiff != 0 || tickDiff != 0;
 	}
 }

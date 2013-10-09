@@ -29,7 +29,7 @@ public class ControlButtonGroup extends TouchableView {
 		copyButton = new ToggleButton();
 		deleteButton = new ImageButton();
 		undoButton = new ImageButton();
-		redoButton = new ImageButton(); // TODO layout & addChild
+		redoButton = new ImageButton();
 
 		playButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
@@ -83,6 +83,13 @@ public class ControlButtonGroup extends TouchableView {
 			}
 		});
 
+		redoButton.setOnReleaseListener(new OnReleaseListener() {
+			@Override
+			public void onRelease(Button button) {
+				Event.redo();
+			}
+		});
+
 		copyButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
@@ -113,6 +120,7 @@ public class ControlButtonGroup extends TouchableView {
 		addChild(copyButton);
 		addChild(deleteButton);
 		addChild(undoButton);
+		addChild(redoButton);
 	}
 
 	public void setEditIconsEnabled(final boolean enabled) {
@@ -123,7 +131,7 @@ public class ControlButtonGroup extends TouchableView {
 	public void setUndoIconEnabled(final boolean enabled) {
 		undoButton.setEnabled(enabled);
 	}
-	
+
 	public void setRedoIconEnabled(final boolean enabled) {
 		redoButton.setEnabled(enabled);
 	}
@@ -140,6 +148,7 @@ public class ControlButtonGroup extends TouchableView {
 		copyButton.setIcon(new Icon(IconResources.COPY));
 		deleteButton.setIcon(new Icon(IconResources.DELETE_NOTE));
 		undoButton.setIcon(new Icon(IconResources.UNDO));
+		redoButton.setIcon(new Icon(IconResources.REDO));
 
 		setEditIconsEnabled(false);
 	}
@@ -154,9 +163,11 @@ public class ControlButtonGroup extends TouchableView {
 
 		float rightMargin = 10;
 		// right-aligned buttons
-		copyButton.layout(this, width - 3 * height - rightMargin, 0, height,
+		copyButton.layout(this, width - 4 * height - rightMargin, 0, height,
 				height);
-		undoButton.layout(this, width - 2 * height - rightMargin, 0, height,
+		undoButton.layout(this, width - 3 * height - rightMargin, 0, height,
+				height);
+		redoButton.layout(this, width - 2 * height - rightMargin, 0, height,
 				height);
 		deleteButton.layout(this, width - height - rightMargin, 0, height,
 				height);

@@ -18,7 +18,7 @@ public class CreateMidiNotesEvent extends MidiNotesEvent {
 		super(midiNotes);
 	}
 
-	protected void doExecute() {
+	protected void execute() {
 		MidiManager.deselectAllNotes();
 		for (MidiNote midiNote : midiNotes) {
 			createNote(midiNote);
@@ -26,25 +26,11 @@ public class CreateMidiNotesEvent extends MidiNotesEvent {
 		MidiManager.handleMidiCollisions();
 		MidiManager.deselectAllNotes();
 	}
-	
-	protected Event opposite() {
-		return new DestroyMidiNotesEvent(midiNotes);
-	}
-	
+
 	private void createNote(MidiNote midiNote) {
 		Track track = TrackManager.getTrack(midiNote.getNoteValue());
 		track.addNote(midiNote);
 		Page.mainPage.midiView.createNoteView(midiNote);
 		MidiManager.selectNote(midiNote);
-	}
-
-	@Override
-	protected boolean merge(MidiNotesEvent other) {
-		return false;
-	}
-
-	@Override
-	protected boolean hasEffect() {
-		return true;
 	}
 }

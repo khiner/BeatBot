@@ -6,7 +6,7 @@ import java.util.List;
 import com.kh.beatbot.ui.view.page.Page;
 
 public abstract class Event {
-	private static final int MAX_EVENTS = 150;
+	private static final int MAX_EVENTS = 100;
 	private static List<Event> events = new ArrayList<Event>();
 	private static int currEventIndex = -1;
 
@@ -14,22 +14,16 @@ public abstract class Event {
 		if (events.isEmpty() || events.size() <= currEventIndex) {
 			return;
 		}
-
 		events.get(currEventIndex--).doUndo();
-		if (currEventIndex < 0) {
-			Page.mainPage.controlButtonGroup.setUndoIconEnabled(false);
-		}
+		updateUi();
 	}
 
 	public static final void redo() {
 		if (events.isEmpty() || currEventIndex >= events.size() - 1) {
 			return;
 		}
-		
-		events.get(++currEventIndex).doExecute();
-		if (currEventIndex >= events.size()) {
-			Page.mainPage.controlButtonGroup.setRedoIconEnabled(false);	
-		}
+		events.get(++currEventIndex).doRedo();
+		updateUi();
 	}
 
 	protected static void eventCompleted(Event event) {
@@ -40,12 +34,17 @@ public abstract class Event {
 		events.add(event);
 		if (events.size() > MAX_EVENTS) {
 			events.remove(0); // drop the oldest event to save space
+			currEventIndex--;
 		}
-		Page.mainPage.controlButtonGroup.setUndoIconEnabled(true);
-		Page.mainPage.controlButtonGroup.setRedoIconEnabled(false);
+		updateUi();
 	}
 
-	protected abstract void doExecute();
+	private static void updateUi() {
+		Page.mainPage.controlButtonGroup.setUndoIconEnabled(currEventIndex >= 0);
+		Page.mainPage.controlButtonGroup.setRedoIconEnabled(currEventIndex < events.size() - 1);
+	}
+
+	protected abstract void execute();
 	protected abstract void doUndo();
-	protected abstract Event opposite();
+	protected abstract void doRedo();
 }

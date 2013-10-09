@@ -381,7 +381,7 @@ public class MidiManager {
 			tempo = (Tempo) tempoTrack.getEvents().get(1);
 			setNativeMSPT(tempo.getMpqn() / RESOLUTION);
 			ArrayList<MidiEvent> events = midiTracks.get(1).getEvents();
-			new DestroyMidiNotesEvent(getMidiNotes()).doExecute();
+			new DestroyMidiNotesEvent(getMidiNotes()).execute();
 			// midiEvents are ordered by tick, so on/off events don't
 			// necessarily
 			// alternate if there are interleaving notes (with different "notes"

@@ -1,6 +1,5 @@
 package com.kh.beatbot.event;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.manager.MidiManager;
@@ -10,13 +9,6 @@ import com.kh.beatbot.ui.view.page.Page;
 public class MidiNotesGroupEvent extends Event {
 
 	private List<MidiNote> savedState = null;
-	private List<MidiNotesEvent> subEvents = new ArrayList<MidiNotesEvent>();
-
-	protected final void execute() {
-		begin();
-		doExecute();
-		end();
-	}
 
 	public synchronized final void begin() {
 		savedState = MidiManager.copyMidiList(MidiManager.getMidiNotes());
@@ -25,7 +17,7 @@ public class MidiNotesGroupEvent extends Event {
 
 	public synchronized final void end() {
 		MidiManager.finalizeNoteTicks();
-		if (!subEvents.isEmpty()) {
+		if (savedState != null && !notesEqual(savedState, MidiManager.getMidiNotes())) {
 			eventCompleted(this);
 		}
 		updateUi();
@@ -35,39 +27,49 @@ public class MidiNotesGroupEvent extends Event {
 		if (savedState == null) {
 			begin();
 		}
-		event.doExecute();
-		if (subEvents.isEmpty()
-				|| !subEvents.get(subEvents.size() - 1).merge(event)) {
-			subEvents.add(event);
-		}
-		MidiNotesEvent lastEvent = subEvents.get(subEvents.size() - 1);
-		if (!lastEvent.hasEffect()) {
-			subEvents.remove(lastEvent);
-		}
+		event.execute();
 	}
 
 	@Override
-	protected synchronized void doExecute() {
-		for (MidiNotesEvent event : subEvents) {
-			event.doExecute();
-		}
+	protected synchronized void execute() {
+	}
+
+	@Override
+	protected synchronized void doRedo() {
+		restore();
 	}
 
 	@Override
 	protected synchronized void doUndo() {
+		restore();
+	}
+
+	private synchronized void restore() {
+		List<MidiNote> newSavedState = MidiManager.copyMidiList(MidiManager
+				.getMidiNotes());
 		// restore previous midi state
-		new DestroyMidiNotesEvent(MidiManager.getMidiNotes()).doExecute();
-		new CreateMidiNotesEvent(savedState).doExecute();
+		new DestroyMidiNotesEvent(MidiManager.getMidiNotes()).execute();
+		new CreateMidiNotesEvent(savedState).execute();
 		updateUi();
+		savedState = newSavedState;
 	}
 
-	@Override
-	protected Event opposite() {
-		return null;
-	}
-
-	private void updateUi() {
+	private static void updateUi() {
 		Page.mainPage.controlButtonGroup.setEditIconsEnabled(MidiManager
 				.anyNoteSelected());
+	}
+
+	private synchronized boolean notesEqual(List<MidiNote> notes,
+			List<MidiNote> otherNotes) {
+		if (notes.size() != otherNotes.size()) {
+			return false;
+		}
+
+		for (int i = 0; i < notes.size(); i++) {
+			if (notes.get(i).compareTo(otherNotes.get(i)) != 0) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
