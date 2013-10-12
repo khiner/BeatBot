@@ -204,8 +204,14 @@ public class MidiNote implements Comparable<MidiNote> {
 			return this.getNoteValue() - otherNote.getNoteValue();
 		} else if (this.getOnTick() != otherNote.getOnTick()) {
 			return (int) (this.getOnTick() - otherNote.getOnTick());
-		} else {
+		} else if (this.getOffTick() != otherNote.getOffTick()) {
 			return (int) (this.getOffTick() - otherNote.getOffTick());
+		} else if (this.getVelocity() != otherNote.getVelocity()) {
+			return this.getVelocity() - otherNote.getVelocity() < 0 ? -1 : 1;
+		} else if (this.getPan() != otherNote.getPan()) {
+			return this.getPan() - otherNote.getPan() < 0 ? -1 : 1;
+		} else {
+			return this.getPitch() - otherNote.getPitch() < 0 ? -1 : 1; 
 		}
 	}
 }

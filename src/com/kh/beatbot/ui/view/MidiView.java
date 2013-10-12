@@ -641,6 +641,7 @@ public class MidiView extends ClickableView {
 	@Override
 	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
+		MidiManager.beginMidiEvent(null);
 		ScrollBarHelper.startScrollView();
 		selectMidiNote(x, y, id);
 		if (touchedNotes.get(id) == null) {

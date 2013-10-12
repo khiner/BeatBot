@@ -258,8 +258,7 @@ public class LevelsView extends TouchableView {
 	}
 	
 	private float levelToY(float level) {
-		return height - level * (height - LEVEL_POINT_SIZE) - LEVEL_POINT_SIZE
-				/ 2;
+		return height - level * (height - LEVEL_POINT_SIZE) - LEVEL_POINT_SIZE / 2;
 	}
 
 	/*
@@ -289,22 +288,20 @@ public class LevelsView extends TouchableView {
 				updateDragLine();
 				setLevelsToDragLine();
 			}
-		} else if (id == 0){ // no midi selected. midiView can handle it.
+		} else if (id == 0) {
 			selectRegion(x, y);
 		}
-		//GlobalVars.midiView.updateLoopMarkers(e);
-		//TODO uncomment above after converting midiview to viewwindow
 	}
 	
 	@Override
 	public void init() {
-		//setBackgroundColor(Colors.VIEW_BG);
 		midiView = Page.mainPage.midiView;
 		initLevelBarVb();
 	}
 
 	@Override
 	public void handleActionDown(int id, float x, float y) {
+		MidiManager.beginMidiEvent(TrackManager.currTrack);
 		if (!selectLevel(x, y, id)) {
 			startSelectRegion(x, y);
 		}
@@ -319,6 +316,7 @@ public class LevelsView extends TouchableView {
 	public void handleActionUp(int id, float x, float y) {
 		clearTouchedLevels();
 		selectRegion = false;
+		MidiManager.endMidiEvent();
 	}
 
 	@Override
@@ -328,7 +326,6 @@ public class LevelsView extends TouchableView {
 
 	@Override
 	public void layoutChildren() {
-		View alignXView = Page.mainPage.midiView;
-		xOffset = alignXView.absoluteX - absoluteX;
+		xOffset = Page.mainPage.midiView.absoluteX - absoluteX;
 	}
 }

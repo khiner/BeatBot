@@ -16,12 +16,4 @@ public abstract class MidiNotesEvent extends Event {
 	public MidiNotesEvent(List<MidiNote> midiNotes) {
 		this.midiNotes = midiNotes;
 	}
-
-	public void doUndo() {
-		
-	}
-
-	public void doRedo() {
-		
-	}
 }

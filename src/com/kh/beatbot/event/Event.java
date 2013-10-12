@@ -7,7 +7,7 @@ import com.kh.beatbot.ui.view.page.Page;
 
 public abstract class Event {
 	private static final int MAX_EVENTS = 100;
-	private static List<Event> events = new ArrayList<Event>();
+	private static List<StateEvent> events = new ArrayList<StateEvent>();
 	private static int currEventIndex = -1;
 
 	public static final void undo() {
@@ -26,7 +26,7 @@ public abstract class Event {
 		updateUi();
 	}
 
-	protected static void eventCompleted(Event event) {
+	protected static void eventCompleted(StateEvent event) {
 		currEventIndex++;
 		while (events.size() > currEventIndex) {
 			events.remove(events.size() - 1);
@@ -44,7 +44,5 @@ public abstract class Event {
 		Page.mainPage.controlButtonGroup.setRedoIconEnabled(currEventIndex < events.size() - 1);
 	}
 
-	protected abstract void execute();
-	protected abstract void doUndo();
-	protected abstract void doRedo();
+	public abstract void execute();
 }

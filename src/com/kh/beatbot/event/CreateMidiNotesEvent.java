@@ -18,7 +18,7 @@ public class CreateMidiNotesEvent extends MidiNotesEvent {
 		super(midiNotes);
 	}
 
-	protected void execute() {
+	public void execute() {
 		MidiManager.deselectAllNotes();
 		for (MidiNote midiNote : midiNotes) {
 			createNote(midiNote);

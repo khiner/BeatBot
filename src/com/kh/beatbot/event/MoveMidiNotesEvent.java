@@ -23,7 +23,7 @@ public class MoveMidiNotesEvent extends MidiNotesEvent {
 		this.noteDiff = noteDiff;
 	}
 
-	protected void execute() {
+	public void execute() {
 		for (MidiNote midiNote : midiNotes) {
 			moveMidiNote(midiNote);
 		}

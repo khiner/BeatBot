@@ -16,6 +16,7 @@ import com.kh.beatbot.event.DestroyMidiNotesEvent;
 import com.kh.beatbot.event.MidiNotesGroupEvent;
 import com.kh.beatbot.event.MoveMidiNotesEvent;
 import com.kh.beatbot.event.PinchMidiNotesEvent;
+import com.kh.beatbot.event.SetMidiNotesLevelsEvent;
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiTrack;
@@ -80,10 +81,18 @@ public class MidiManager {
 		return (int) bpm;
 	}
 
-	public static void endMidiEvent() {
+	public static synchronized void beginMidiEvent(Track track) {
+		if (currEvent != null) {
+			endMidiEvent();
+		}
+		currEvent = track == null ? new MidiNotesGroupEvent() : new SetMidiNotesLevelsEvent(track);
+		currEvent.begin();
+	}
+
+	public static synchronized void endMidiEvent() {
 		if (currEvent != null) {
 			currEvent.end();
-			currEvent = new MidiNotesGroupEvent();
+			currEvent = null;
 		}
 	}
 
@@ -187,11 +196,11 @@ public class MidiManager {
 	}
 
 	private static void addNote(MidiNote midiNote) {
-		getCurrEvent().executeEvent(new CreateMidiNotesEvent(midiNote));
+		new CreateMidiNotesEvent(midiNote).execute();
 	}
 
 	public static void deleteNote(MidiNote midiNote) {
-		getCurrEvent().executeEvent(new DestroyMidiNotesEvent(midiNote));
+		new DestroyMidiNotesEvent(midiNote).execute();
 	}
 
 	public static void copy() {
@@ -219,15 +228,15 @@ public class MidiManager {
 			copiedNote.setOffTick(copiedNote.getOffTick() + tickOffset);
 		}
 
-		getCurrEvent().executeEvent(
-				new CreateMidiNotesEvent(copyMidiList(copiedNotes)));
+		beginMidiEvent(null);
+		new CreateMidiNotesEvent(copyMidiList(copiedNotes)).execute();
 		endMidiEvent();
 		copiedNotes.clear();
 	}
 
 	public static void deleteSelectedNotes() {
-		getCurrEvent().executeEvent(
-				new DestroyMidiNotesEvent(getSelectedNotes()));
+		beginMidiEvent(null);
+		new DestroyMidiNotesEvent(getSelectedNotes()).execute();
 		endMidiEvent();
 	}
 
@@ -261,15 +270,13 @@ public class MidiManager {
 
 	public static void moveNotes(List<MidiNote> notes, long tickDiff,
 			int noteDiff) {
-		getCurrEvent().executeEvent(
-				new MoveMidiNotesEvent(notes, tickDiff, noteDiff));
+		new MoveMidiNotesEvent(notes, tickDiff, noteDiff).execute();
 	}
 
 	public static void pinchNotes(List<MidiNote> notes, long onTickDiff,
 			long offTickDiff) {
-		getCurrEvent().executeEvent(
-				new PinchMidiNotesEvent(getSelectedNotes(), onTickDiff,
-						offTickDiff));
+		new PinchMidiNotesEvent(getSelectedNotes(), onTickDiff, offTickDiff)
+				.execute();
 	}
 
 	public static long getTicksPerBeat(float beatDivision) {
@@ -437,13 +444,6 @@ public class MidiManager {
 
 	public static long getLoopEndTick() {
 		return loopEndTick;
-	}
-
-	private static MidiNotesGroupEvent getCurrEvent() {
-		if (currEvent == null) {
-			currEvent = new MidiNotesGroupEvent();
-		}
-		return currEvent;
 	}
 
 	private static long getLeftmostTick(List<MidiNote> notes) {

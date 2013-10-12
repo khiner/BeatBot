@@ -22,7 +22,7 @@ public class PinchMidiNotesEvent extends MidiNotesEvent {
 		this.offTickDiff = offTickDiff;
 	}
 
-	protected void execute() {
+	public void execute() {
 		for (MidiNote midiNote : MidiManager.getSelectedNotes()) {
 			pinchNote(midiNote);
 		}

@@ -6,7 +6,7 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.view.page.Page;
 
-public class MidiNotesGroupEvent extends Event {
+public class MidiNotesGroupEvent extends StateEvent {
 
 	private List<MidiNote> savedState = null;
 
@@ -23,15 +23,8 @@ public class MidiNotesGroupEvent extends Event {
 		updateUi();
 	}
 
-	public synchronized final void executeEvent(MidiNotesEvent event) {
-		if (savedState == null) {
-			begin();
-		}
-		event.execute();
-	}
-
 	@Override
-	protected synchronized void execute() {
+	public synchronized void execute() {
 	}
 
 	@Override
@@ -44,19 +37,19 @@ public class MidiNotesGroupEvent extends Event {
 		restore();
 	}
 
+	protected void updateUi() {
+		Page.mainPage.controlButtonGroup.setEditIconsEnabled(MidiManager
+				.anyNoteSelected());
+	}
+
 	private synchronized void restore() {
 		List<MidiNote> newSavedState = MidiManager.copyMidiList(MidiManager
 				.getMidiNotes());
 		// restore previous midi state
 		new DestroyMidiNotesEvent(MidiManager.getMidiNotes()).execute();
 		new CreateMidiNotesEvent(savedState).execute();
-		updateUi();
 		savedState = newSavedState;
-	}
-
-	private static void updateUi() {
-		Page.mainPage.controlButtonGroup.setEditIconsEnabled(MidiManager
-				.anyNoteSelected());
+		updateUi();
 	}
 
 	private synchronized boolean notesEqual(List<MidiNote> notes,
