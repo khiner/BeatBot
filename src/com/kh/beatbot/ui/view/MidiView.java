@@ -613,7 +613,10 @@ public class MidiView extends ClickableView {
 		} else {
 			return;
 		}
-		TrackManager.updateAllTrackNextNotes();
+		updateLoopUi();
+	}
+
+	public void updateLoopUi() {
 		updateLoopRect();
 		initLoopMarkerVbs();
 		initLoopBarVb();

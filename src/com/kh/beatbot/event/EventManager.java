@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.kh.beatbot.ui.view.page.Page;
 
-public abstract class Event {
+public class EventManager {
 	private static final int MAX_EVENTS = 100;
-	private static List<StateEvent> events = new ArrayList<StateEvent>();
+	private static List<Stateful> events = new ArrayList<Stateful>();
 	private static int currEventIndex = -1;
 
 	public static final void undo() {
@@ -26,7 +26,7 @@ public abstract class Event {
 		updateUi();
 	}
 
-	protected static void eventCompleted(StateEvent event) {
+	protected static void eventCompleted(Stateful event) {
 		currEventIndex++;
 		while (events.size() > currEventIndex) {
 			events.remove(events.size() - 1);
@@ -43,6 +43,4 @@ public abstract class Event {
 		Page.mainPage.controlButtonGroup.setUndoIconEnabled(currEventIndex >= 0);
 		Page.mainPage.controlButtonGroup.setRedoIconEnabled(currEventIndex < events.size() - 1);
 	}
-
-	public abstract void execute();
 }

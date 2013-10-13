@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.kh.beatbot.midi.MidiNote;
 
-public abstract class MidiNotesEvent extends Event {
+public abstract class MidiNotesEvent implements Executable {
 
 	protected List<MidiNote> midiNotes;
 

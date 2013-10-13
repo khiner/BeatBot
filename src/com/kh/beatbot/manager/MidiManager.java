@@ -16,6 +16,7 @@ import com.kh.beatbot.event.DestroyMidiNotesEvent;
 import com.kh.beatbot.event.MidiNotesGroupEvent;
 import com.kh.beatbot.event.MoveMidiNotesEvent;
 import com.kh.beatbot.event.PinchMidiNotesEvent;
+import com.kh.beatbot.event.SetLoopWindowEvent;
 import com.kh.beatbot.event.SetMidiNotesLevelsEvent;
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
@@ -51,7 +52,8 @@ public class MidiManager {
 
 	private static long loopBeginTick, loopEndTick;
 
-	private static MidiNotesGroupEvent currEvent;
+	private static MidiNotesGroupEvent currNoteEvent;
+	private static SetLoopWindowEvent currLoopWindowEvent;
 
 	public static void init() {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,
@@ -82,17 +84,21 @@ public class MidiManager {
 	}
 
 	public static synchronized void beginMidiEvent(Track track) {
-		if (currEvent != null) {
-			endMidiEvent();
-		}
-		currEvent = track == null ? new MidiNotesGroupEvent() : new SetMidiNotesLevelsEvent(track);
-		currEvent.begin();
+		endMidiEvent();
+		currNoteEvent = track == null ? new MidiNotesGroupEvent() : new SetMidiNotesLevelsEvent(track);
+		currNoteEvent.begin();
+		currLoopWindowEvent = new SetLoopWindowEvent();
+		currLoopWindowEvent.begin();
 	}
 
 	public static synchronized void endMidiEvent() {
-		if (currEvent != null) {
-			currEvent.end();
-			currEvent = null;
+		if (currNoteEvent != null) {
+			currNoteEvent.end();
+			currNoteEvent = null;
+		}
+		if (currLoopWindowEvent != null) {
+			currLoopWindowEvent.end();
+			currLoopWindowEvent = null;
 		}
 	}
 
@@ -421,21 +427,20 @@ public class MidiManager {
 	public static void setLoopBeginTick(long loopBeginTick) {
 		if (loopBeginTick >= loopEndTick)
 			return;
-		MidiManager.loopBeginTick = loopBeginTick;
-		setLoopBeginTickNative(loopBeginTick);
+		setLoopTicks(loopBeginTick, loopEndTick);
 	}
 
 	public static void setLoopEndTick(long loopEndTick) {
 		if (loopEndTick <= loopBeginTick)
 			return;
-		MidiManager.loopEndTick = loopEndTick;
-		setLoopEndTickNative(loopEndTick);
+		setLoopTicks(loopBeginTick, loopEndTick);
 	}
 
 	public static void setLoopTicks(long loopBeginTick, long loopEndTick) {
 		MidiManager.loopBeginTick = loopBeginTick;
 		MidiManager.loopEndTick = loopEndTick;
 		setLoopTicksNative(loopBeginTick, loopEndTick);
+		TrackManager.updateAllTrackNextNotes();
 	}
 
 	public static long getLoopBeginTick() {
@@ -473,10 +478,6 @@ public class MidiManager {
 	public static native void setCurrTick(long currTick);
 
 	public static native long getCurrTick();
-
-	public static native void setLoopBeginTickNative(long loopBeginTick);
-
-	public static native void setLoopEndTickNative(long loopEndTick);
 
 	public static native void setLoopTicksNative(long loopBeginTick,
 			long loopEndTick);

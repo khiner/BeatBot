@@ -3,7 +3,7 @@ package com.kh.beatbot.ui.view.group;
 import android.widget.Toast;
 
 import com.kh.beatbot.activity.BeatBotActivity;
-import com.kh.beatbot.event.Event;
+import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -79,14 +79,14 @@ public class ControlButtonGroup extends TouchableView {
 		undoButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				Event.undo();
+				EventManager.undo();
 			}
 		});
 
 		redoButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				Event.redo();
+				EventManager.redo();
 			}
 		});
 

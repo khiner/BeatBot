@@ -13,7 +13,7 @@ public class SetMidiNotesLevelsEvent extends MidiNotesGroupEvent {
 	}
 
 	@Override
-	protected void updateUi() {
+	public void updateUi() {
 		super.updateUi();
 		Page.mainPage.pageSelectGroup
 				.selectPage(PageSelectGroup.NOTE_LEVELS_PAGE_ID);
