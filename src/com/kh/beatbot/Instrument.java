@@ -8,43 +8,39 @@ import com.kh.beatbot.ui.IconResource;
 
 public class Instrument extends Directory {
 
+	private List<SampleFile> samples = new ArrayList<SampleFile>();
+
 	public Instrument(Directory parent, String name, IconResource iconResource) {
 		super(parent, name, iconResource);
+		initSampleFiles();
 	}
 
-	public SampleFile createSampleFile(int sampleNum) {
-		return new SampleFile(getSampleFiles().get(sampleNum));
+	public SampleFile getSample(int sampleNum) {
+		return samples.get(sampleNum);
 	}
 
 	@Override
 	public String[] getChildNames() {
-		List<File> sampleFiles = getSampleFiles();
-		String[] sampleNames = new String[sampleFiles.size()];
-		for (int i = 0; i < sampleFiles.size(); i++) {
-			sampleNames[i] = sampleFiles.get(i).getName();
+		String[] sampleNames = new String[samples.size()];
+		for (int i = 0; i < samples.size(); i++) {
+			sampleNames[i] = samples.get(i).getName();
 		}
 		return sampleNames;
 	}
 
 	public String getSampleName(int sampleNum) {
-		return getSampleFiles().get(sampleNum).getName();
+		return samples.get(sampleNum).getName();
 	}
 
 	public String getBasePath() {
 		return path;
 	}
 
-	public String getFullPath(int sampleNum) {
-		return getSampleFiles().get(sampleNum).getAbsolutePath();
-	}
-
-	private List<File> getSampleFiles() {
-		List<File> sampleFiles = new ArrayList<File>();
+	private void initSampleFiles() {
 		for (File sampleFile : new File(path).listFiles()) {
 			if (!sampleFile.getAbsolutePath().contains(".raw")) {
-				sampleFiles.add(sampleFile);
+				samples.add(new SampleFile(this, sampleFile));
 			}
 		}
-		return sampleFiles;
 	}
 }

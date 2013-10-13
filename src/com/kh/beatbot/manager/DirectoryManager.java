@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.kh.beatbot.Directory;
 import com.kh.beatbot.Instrument;
 import com.kh.beatbot.activity.BeatBotActivity;
+import com.kh.beatbot.event.SampleSetEvent;
 import com.kh.beatbot.ui.IconResources;
 
 public class DirectoryManager {
@@ -29,9 +30,9 @@ public class DirectoryManager {
 			if (currDirectory == null) {
 				// Instrument type
 				if (addingTrack) {
-					TrackManager.createTrack((Instrument) parent, item);
+					TrackManager.createTrack(((Instrument) parent).getSample(item));
 				} else {
-					TrackManager.setInstrument((Instrument) parent, item);
+					new SampleSetEvent(TrackManager.currTrack, ((Instrument) parent).getSample(item)).execute();
 				}
 				currDirectory = audioDirectory;
 			}

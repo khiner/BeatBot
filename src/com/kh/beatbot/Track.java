@@ -2,7 +2,9 @@ package com.kh.beatbot;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;
@@ -13,20 +15,16 @@ import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.view.TrackButtonRow;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
-public class Track extends BaseTrack implements ParamListener {
+public class Track extends BaseTrack {
 
 	public static float MIN_LOOP_WINDOW = 32f;
-	
-	private Param loopBeginParam, loopEndParam, gainParam;
-	
-	private Instrument instrument;
-	private TrackButtonRow buttonRow;
 
 	private boolean adsrEnabled = false, reverse = false, previewing = false;
+	private TrackButtonRow buttonRow;
 	private List<MidiNote> notes = new ArrayList<MidiNote>();
-	private List<SampleFile> sampleFiles = new ArrayList<SampleFile>();
-
+	private Map<SampleFile, SampleParams> paramsForSample = new HashMap<SampleFile, SampleParams>();
 	private SampleFile currSampleFile;
+
 	public ADSR adsr;
 
 	public Track(int id) {
@@ -149,66 +147,31 @@ public class Track extends BaseTrack implements ParamListener {
 	}
 
 	public Instrument getInstrument() {
-		return instrument;
+		return currSampleFile.getInstrument();
 	}
 
-	public void setInstrument(Instrument instrument, int sampleNum) {
-		this.instrument = instrument;
-		// if we already have this sample in our list, reuse it
-		// otherwise, create a new one and add it to the list
-		String fileName = instrument.getFullPath(sampleNum);
-		SampleFile sampleFile = findSampleFile(fileName);
+	public void setSample(SampleFile sample) {
+		currSampleFile = sample;
+		setSample(id, getCurrSamplePath());
 
-		if (sampleFile == null) { // haven't created sample file yet
-			currSampleFile = instrument.createSampleFile(sampleNum);
-			sampleFiles.add(currSampleFile);
-			
-			setSampleNum(sampleNum);
-
-			loopBeginParam = new Param(0, "Begin", "", 0, getNumSamples(id));
-			loopEndParam = new Param(1, "End", "", 0, getNumSamples(id));
-			loopBeginParam.setFormat("%.0f");
-			loopEndParam.setFormat("%.0f");
-			loopBeginParam.setLevel(0);
-			loopEndParam.setLevel(1);
-			
-			gainParam = new Param(2, "Gain", "", 0, 2);
-			gainParam.setLevel(1);
-
-		} else if (!sampleFile.equals(currSampleFile)) {
-			setSampleNum(sampleNum);
-			
-			gainParam.removeListener(this);
-			loopBeginParam.removeListener(this);
-			loopEndParam.removeListener(this);
-			currSampleFile = sampleFile;
-		} else {
-			return; // same file, nothing to do
+		if (!paramsForSample.containsKey(currSampleFile)) {
+			paramsForSample.put(currSampleFile, new SampleParams(
+					getNumSamples(id)));
 		}
-		gainParam.addListener(this);
-		loopBeginParam.addListener(this);
-		loopEndParam.addListener(this);
-	}
 
-	private SampleFile findSampleFile(String fileName) {
-		for (SampleFile sampleFile : sampleFiles) {
-			if (sampleFile.getFullPath().equals(fileName)) {
-				return sampleFile;
-			}
-		}
-		return null;
+		updateLoopWindow();
 	}
 
 	public Param getLoopBeginParam() {
-		return loopBeginParam;
+		return paramsForSample.get(currSampleFile).loopBeginParam;
 	}
 
 	public Param getLoopEndParam() {
-		return loopEndParam;
+		return paramsForSample.get(currSampleFile).loopEndParam;
 	}
 
 	public Param getGainParam() {
-		return gainParam;
+		return paramsForSample.get(currSampleFile).gainParam;
 	}
 
 	public String getCurrSampleName() {
@@ -216,7 +179,7 @@ public class Track extends BaseTrack implements ParamListener {
 	}
 
 	public void setCurrSampleName(String name) {
-		currSampleFile.renameTo(instrument.getBasePath() + name + ".wav");
+		currSampleFile.renameTo(name + ".wav");
 	}
 
 	public String getCurrSamplePath() {
@@ -267,19 +230,6 @@ public class Track extends BaseTrack implements ParamListener {
 		return previewing;
 	}
 
-	@Override
-	public void onParamChanged(Param param) {
-		if (param.equals(getGainParam())) {
-			setTrackGain(id, param.level);
-			PageSelectGroup.sampleEditPage.sampleEdit.onParamChanged(param);
-		} else {
-			float minLoopWindow = getLoopEndParam().getViewLevel(MIN_LOOP_WINDOW);
-			getLoopBeginParam().maxViewLevel = getLoopEndParam().viewLevel - minLoopWindow;
-			getLoopEndParam().minViewLevel = getLoopBeginParam().viewLevel + minLoopWindow;
-			updateLoopWindow();
-		}
-	}
-	
 	private void updateLoopWindow() {
 		setTrackLoopWindow(id, (long) getLoopBeginParam().level,
 				(long) getLoopEndParam().level);
@@ -294,10 +244,6 @@ public class Track extends BaseTrack implements ParamListener {
 	public void setReverse(boolean reverse) {
 		this.reverse = reverse;
 		setTrackReverse(id, reverse);
-	}
-
-	public void setSampleNum(int sampleNum) {
-		setSample(id, getCurrSamplePath());
 	}
 
 	public float getSample(int sampleIndex, int channel) {
@@ -337,11 +283,49 @@ public class Track extends BaseTrack implements ParamListener {
 
 	public static native void setSample(int trackId, String sampleName);
 
-	public static native float getSample(int trackId, int sampleIndex, int channel);
-	
+	public static native float getSample(int trackId, int sampleIndex,
+			int channel);
+
 	public static native float getCurrentSampleIndex(int trackId);
 
 	public static native float getNumSamples(int trackId);
 
 	public native void setNextNote(int trackId, MidiNote midiNote);
+
+	private class SampleParams implements ParamListener {
+		private Param loopBeginParam, loopEndParam, gainParam;
+
+		public SampleParams(float numSamples) {
+			loopBeginParam = new Param(0, "Begin", "", 0, numSamples);
+			loopBeginParam.setFormat("%.0f");
+			loopBeginParam.setLevel(0);
+
+			loopEndParam = new Param(1, "End", "", 0, numSamples);
+			loopEndParam.setFormat("%.0f");
+			loopEndParam.setLevel(1);
+
+			gainParam = new Param(2, "Gain", "", 0, 2);
+			gainParam.setLevel(1);
+
+			gainParam.addListener(this);
+			loopBeginParam.addListener(this);
+			loopEndParam.addListener(this);
+		}
+
+		@Override
+		public void onParamChanged(Param param) {
+			if (param.equals(gainParam)) {
+				setTrackGain(id, param.level);
+				PageSelectGroup.sampleEditPage.sampleEdit.onParamChanged(param);
+			} else {
+				float minLoopWindow = loopEndParam
+						.getViewLevel(MIN_LOOP_WINDOW);
+				loopBeginParam.maxViewLevel = loopEndParam.viewLevel
+						- minLoopWindow;
+				loopEndParam.minViewLevel = loopBeginParam.viewLevel
+						+ minLoopWindow;
+				updateLoopWindow();
+			}
+		}
+	}
 }

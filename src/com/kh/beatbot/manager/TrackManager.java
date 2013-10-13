@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.BaseTrack;
-import com.kh.beatbot.Instrument;
+import com.kh.beatbot.SampleFile;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.view.TrackButtonRow;
@@ -25,7 +25,7 @@ public class TrackManager {
 
 	public static void init() {
 		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
-			createTrack(DirectoryManager.getDrumInstrument(i), 0);
+			createTrack(DirectoryManager.getDrumInstrument(i).getSample(0));
 		}
 	}
 
@@ -57,15 +57,10 @@ public class TrackManager {
 		return tracks.size();
 	}
 
-	public static void setInstrument(Instrument instrument, int sampleNum) {
-		currTrack.setInstrument(instrument, sampleNum);
-		Page.mainPage.notifyTrackUpdated(currTrack);
-	}
-
-	public static void createTrack(Instrument instrument, int sampleNum) {
-		createTrack(instrument.getFullPath(sampleNum));
+	public static void createTrack(SampleFile sample) {
+		createTrack(sample.getFullPath());
 		final Track newTrack = new Track(tracks.size());
-		newTrack.setInstrument(instrument, sampleNum);
+		newTrack.setSample(sample);
 		tracks.add(newTrack);
 		
 		// needed to avoid "no current context" opengl error
