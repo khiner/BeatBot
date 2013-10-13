@@ -6,7 +6,8 @@ import com.kh.beatbot.ui.view.page.Page;
 
 public class SetLoopWindowEvent implements Stateful, Temporal {
 
-	private long initialBeginTick, initialEndTick, finalBeginTick, finalEndTick;
+	private long initialBeginTick, initialEndTick, finalBeginTick,
+			finalEndTick;
 
 	@Override
 	public void begin() {
@@ -19,7 +20,8 @@ public class SetLoopWindowEvent implements Stateful, Temporal {
 		finalBeginTick = MidiManager.getLoopBeginTick();
 		finalEndTick = MidiManager.getLoopEndTick();
 
-		if (initialBeginTick != finalBeginTick || initialEndTick != finalEndTick) {
+		if (initialBeginTick != finalBeginTick
+				|| initialEndTick != finalEndTick) {
 			EventManager.eventCompleted(this);
 		}
 	}
@@ -27,18 +29,17 @@ public class SetLoopWindowEvent implements Stateful, Temporal {
 	@Override
 	public void doUndo() {
 		MidiManager.setLoopTicks(initialBeginTick, initialEndTick);
-		updateUi();
 	}
 
 	@Override
 	public void doRedo() {
 		MidiManager.setLoopTicks(finalBeginTick, finalEndTick);
-		updateUi();
 	}
 
 	@Override
 	public void updateUi() {
 		Page.mainPage.midiView.updateLoopUi();
-		TickWindowHelper.updateView(finalBeginTick, finalEndTick);
+		TickWindowHelper.updateView(MidiManager.getLoopBeginTick(),
+				MidiManager.getLoopEndTick());
 	}
 }

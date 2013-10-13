@@ -45,7 +45,6 @@ public class MidiNotesGroupEvent implements Stateful, Temporal {
 		new DestroyMidiNotesEvent(MidiManager.getMidiNotes()).execute();
 		new CreateMidiNotesEvent(savedState).execute();
 		savedState = newSavedState;
-		updateUi();
 	}
 
 	private synchronized boolean notesEqual(List<MidiNote> notes,

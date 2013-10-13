@@ -178,10 +178,7 @@ public class PageSelectGroup extends TouchableView {
 	}
 
 	private void updateSampleText() {
-		// update sample label text
-		// TODO handle all extensions
-		String formattedName = TrackManager.currTrack.getCurrSampleName()
-				.toUpperCase();
-		pageButtons[EDIT_PAGE_ID].setText(formattedName);
+		pageButtons[EDIT_PAGE_ID].setText(TrackManager.currTrack
+				.getCurrSampleName());
 	}
 }

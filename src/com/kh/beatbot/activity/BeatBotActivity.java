@@ -18,6 +18,7 @@ import com.kh.beatbot.FileHelper;
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.event.SampleRenameEvent;
 import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -41,7 +42,7 @@ public class BeatBotActivity extends Activity {
 	private static EditText bpmInput, sampleNameInput;
 
 	public static BeatBotActivity mainActivity;
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -51,11 +52,11 @@ public class BeatBotActivity extends Activity {
 		View.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
 		Colors.initColors(this);
-		
+
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.FILL_PARENT,
 				LinearLayout.LayoutParams.FILL_PARENT);
-		
+
 		View.root = new GLSurfaceViewGroup(this);
 		View.root.setLayoutParams(lp);
 
@@ -187,11 +188,9 @@ public class BeatBotActivity extends Activity {
 										int which) {
 									String sampleName = sampleNameInput
 											.getText().toString();
-									if (!sampleName.isEmpty()) {
-										TrackManager.currTrack
-												.setCurrSampleName(sampleName);
-										Page.mainPage.pageSelectGroup.update();
-									}
+									new SampleRenameEvent(
+											TrackManager.currTrack, sampleName)
+											.execute();
 								}
 							})
 					.setNegativeButton("Cancel",
