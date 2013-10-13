@@ -1,4 +1,4 @@
-package com.kh.beatbot.event;
+package com.kh.beatbot.event.midinotes;
 
 import java.util.List;
 
@@ -6,13 +6,13 @@ import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 
-public class DestroyMidiNotesEvent extends MidiNotesEvent {
+public class MidiNotesDestroyEvent extends MidiNotesEvent {
 
-	public DestroyMidiNotesEvent(MidiNote midiNote) {
+	public MidiNotesDestroyEvent(MidiNote midiNote) {
 		super(midiNote);
 	}
 
-	public DestroyMidiNotesEvent(List<MidiNote> midiNotes) {
+	public MidiNotesDestroyEvent(List<MidiNote> midiNotes) {
 		super(midiNotes);
 	}
 

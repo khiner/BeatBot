@@ -1,4 +1,4 @@
-package com.kh.beatbot.event;
+package com.kh.beatbot.event.midinotes;
 
 import java.util.Arrays;
 import java.util.List;
@@ -6,16 +6,16 @@ import java.util.List;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 
-public class PinchMidiNotesEvent extends MidiNotesEvent {
+public class MidiNotesPinchEvent extends MidiNotesEvent {
 
 	protected long onTickDiff, offTickDiff;
 
-	public PinchMidiNotesEvent(MidiNote midiNote, long onTickDiff,
+	public MidiNotesPinchEvent(MidiNote midiNote, long onTickDiff,
 			long offTickDiff) {
 		this(Arrays.asList(midiNote), onTickDiff, offTickDiff);
 	}
 
-	public PinchMidiNotesEvent(List<MidiNote> midiNotes, long onTickDiff,
+	public MidiNotesPinchEvent(List<MidiNote> midiNotes, long onTickDiff,
 			long offTickDiff) {
 		super(midiNotes);
 		this.onTickDiff = onTickDiff;

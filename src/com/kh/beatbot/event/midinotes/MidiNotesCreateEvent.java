@@ -1,4 +1,4 @@
-package com.kh.beatbot.event;
+package com.kh.beatbot.event.midinotes;
 
 import java.util.List;
 
@@ -8,13 +8,13 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.view.page.Page;
 
-public class CreateMidiNotesEvent extends MidiNotesEvent {
+public class MidiNotesCreateEvent extends MidiNotesEvent {
 	
-	public CreateMidiNotesEvent(MidiNote midiNote) {
+	public MidiNotesCreateEvent(MidiNote midiNote) {
 		super(midiNote);
 	}
 	
-	public CreateMidiNotesEvent(List<MidiNote> midiNotes) {
+	public MidiNotesCreateEvent(List<MidiNote> midiNotes) {
 		super(midiNotes);
 	}
 

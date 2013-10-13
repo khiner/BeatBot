@@ -1,7 +1,10 @@
-package com.kh.beatbot.event;
+package com.kh.beatbot.event.midinotes;
 
 import java.util.List;
 
+import com.kh.beatbot.event.EventManager;
+import com.kh.beatbot.event.Stateful;
+import com.kh.beatbot.event.Temporal;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.view.page.Page;
@@ -42,8 +45,8 @@ public class MidiNotesGroupEvent implements Stateful, Temporal {
 		List<MidiNote> newSavedState = MidiManager.copyMidiList(MidiManager
 				.getMidiNotes());
 		// restore previous midi state
-		new DestroyMidiNotesEvent(MidiManager.getMidiNotes()).execute();
-		new CreateMidiNotesEvent(savedState).execute();
+		new MidiNotesDestroyEvent(MidiManager.getMidiNotes()).execute();
+		new MidiNotesCreateEvent(savedState).execute();
 		savedState = newSavedState;
 	}
 

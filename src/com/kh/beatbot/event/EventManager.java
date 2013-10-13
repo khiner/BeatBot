@@ -28,7 +28,7 @@ public class EventManager {
 		updateUi();
 	}
 
-	protected static void eventCompleted(Stateful event) {
+	public static void eventCompleted(Stateful event) {
 		currEventIndex++;
 		while (events.size() > currEventIndex) {
 			events.remove(events.size() - 1);

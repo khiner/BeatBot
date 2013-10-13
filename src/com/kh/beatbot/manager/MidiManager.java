@@ -11,13 +11,13 @@ import android.util.Log;
 
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.Track;
-import com.kh.beatbot.event.CreateMidiNotesEvent;
-import com.kh.beatbot.event.DestroyMidiNotesEvent;
-import com.kh.beatbot.event.MidiNotesGroupEvent;
-import com.kh.beatbot.event.MoveMidiNotesEvent;
-import com.kh.beatbot.event.PinchMidiNotesEvent;
-import com.kh.beatbot.event.SetLoopWindowEvent;
-import com.kh.beatbot.event.SetMidiNotesLevelsEvent;
+import com.kh.beatbot.event.LoopWindowSetEvent;
+import com.kh.beatbot.event.midinotes.MidiNotesCreateEvent;
+import com.kh.beatbot.event.midinotes.MidiNotesDestroyEvent;
+import com.kh.beatbot.event.midinotes.MidiNotesGroupEvent;
+import com.kh.beatbot.event.midinotes.MidiNotesLevelsSetEvent;
+import com.kh.beatbot.event.midinotes.MidiNotesMoveEvent;
+import com.kh.beatbot.event.midinotes.MidiNotesPinchEvent;
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiTrack;
@@ -53,7 +53,7 @@ public class MidiManager {
 	private static long loopBeginTick, loopEndTick;
 
 	private static MidiNotesGroupEvent currNoteEvent;
-	private static SetLoopWindowEvent currLoopWindowEvent;
+	private static LoopWindowSetEvent currLoopWindowEvent;
 
 	public static void init() {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,
@@ -85,9 +85,9 @@ public class MidiManager {
 
 	public static synchronized void beginMidiEvent(Track track) {
 		endMidiEvent();
-		currNoteEvent = track == null ? new MidiNotesGroupEvent() : new SetMidiNotesLevelsEvent(track);
+		currNoteEvent = track == null ? new MidiNotesGroupEvent() : new MidiNotesLevelsSetEvent(track);
 		currNoteEvent.begin();
-		currLoopWindowEvent = new SetLoopWindowEvent();
+		currLoopWindowEvent = new LoopWindowSetEvent();
 		currLoopWindowEvent.begin();
 	}
 
@@ -202,11 +202,11 @@ public class MidiManager {
 	}
 
 	private static void addNote(MidiNote midiNote) {
-		new CreateMidiNotesEvent(midiNote).execute();
+		new MidiNotesCreateEvent(midiNote).execute();
 	}
 
 	public static void deleteNote(MidiNote midiNote) {
-		new DestroyMidiNotesEvent(midiNote).execute();
+		new MidiNotesDestroyEvent(midiNote).execute();
 	}
 
 	public static void copy() {
@@ -235,14 +235,14 @@ public class MidiManager {
 		}
 
 		beginMidiEvent(null);
-		new CreateMidiNotesEvent(copyMidiList(copiedNotes)).execute();
+		new MidiNotesCreateEvent(copyMidiList(copiedNotes)).execute();
 		endMidiEvent();
 		copiedNotes.clear();
 	}
 
 	public static void deleteSelectedNotes() {
 		beginMidiEvent(null);
-		new DestroyMidiNotesEvent(getSelectedNotes()).execute();
+		new MidiNotesDestroyEvent(getSelectedNotes()).execute();
 		endMidiEvent();
 	}
 
@@ -276,12 +276,12 @@ public class MidiManager {
 
 	public static void moveNotes(List<MidiNote> notes, long tickDiff,
 			int noteDiff) {
-		new MoveMidiNotesEvent(notes, tickDiff, noteDiff).execute();
+		new MidiNotesMoveEvent(notes, tickDiff, noteDiff).execute();
 	}
 
 	public static void pinchNotes(List<MidiNote> notes, long onTickDiff,
 			long offTickDiff) {
-		new PinchMidiNotesEvent(getSelectedNotes(), onTickDiff, offTickDiff)
+		new MidiNotesPinchEvent(getSelectedNotes(), onTickDiff, offTickDiff)
 				.execute();
 	}
 
@@ -394,7 +394,7 @@ public class MidiManager {
 			tempo = (Tempo) tempoTrack.getEvents().get(1);
 			setNativeMSPT(tempo.getMpqn() / RESOLUTION);
 			ArrayList<MidiEvent> events = midiTracks.get(1).getEvents();
-			new DestroyMidiNotesEvent(getMidiNotes()).execute();
+			new MidiNotesDestroyEvent(getMidiNotes()).execute();
 			// midiEvents are ordered by tick, so on/off events don't
 			// necessarily
 			// alternate if there are interleaving notes (with different "notes"

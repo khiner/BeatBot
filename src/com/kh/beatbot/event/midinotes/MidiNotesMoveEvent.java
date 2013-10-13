@@ -1,4 +1,4 @@
-package com.kh.beatbot.event;
+package com.kh.beatbot.event.midinotes;
 
 import java.util.Arrays;
 import java.util.List;
@@ -6,17 +6,17 @@ import java.util.List;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 
-public class MoveMidiNotesEvent extends MidiNotesEvent {
+public class MidiNotesMoveEvent extends MidiNotesEvent {
 
 	protected long tickDiff;
 	protected int noteDiff;
 
-	public MoveMidiNotesEvent(MidiNote midiNote, long tickDiff, int noteDiff,
+	public MidiNotesMoveEvent(MidiNote midiNote, long tickDiff, int noteDiff,
 			boolean snapToGrid) {
 		this(Arrays.asList(midiNote), tickDiff, noteDiff);
 	}
 
-	public MoveMidiNotesEvent(List<MidiNote> midiNotes, long tickDiff,
+	public MidiNotesMoveEvent(List<MidiNote> midiNotes, long tickDiff,
 			int noteDiff) {
 		super(midiNotes);
 		this.tickDiff = tickDiff;

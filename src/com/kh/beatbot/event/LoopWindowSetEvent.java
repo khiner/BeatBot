@@ -4,7 +4,7 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
 import com.kh.beatbot.ui.view.page.Page;
 
-public class SetLoopWindowEvent implements Stateful, Temporal {
+public class LoopWindowSetEvent implements Stateful, Temporal {
 
 	private long initialBeginTick, initialEndTick, finalBeginTick,
 			finalEndTick;

@@ -1,8 +1,9 @@
-package com.kh.beatbot.event;
+package com.kh.beatbot.event.midinotes;
 
 import java.util.Arrays;
 import java.util.List;
 
+import com.kh.beatbot.event.Executable;
 import com.kh.beatbot.midi.MidiNote;
 
 public abstract class MidiNotesEvent implements Executable {
