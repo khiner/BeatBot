@@ -27,11 +27,13 @@ public class Track extends BaseTrack {
 
 	public ADSR adsr;
 
-	public Track(int id) {
+	public Track(int id, SampleFile sample) {
 		super(id);
-		this.currSampleFile = null;
+		this.currSampleFile = sample;
 		this.adsr = new ADSR(this);
 		this.buttonRow = new TrackButtonRow(this);
+		
+		update();
 	}
 
 	public void setId(int id) {
@@ -158,12 +160,7 @@ public class Track extends BaseTrack {
 		currSampleFile = sample;
 		setSample(id, getCurrSamplePath());
 
-		if (!paramsForSample.containsKey(currSampleFile)) {
-			paramsForSample.put(currSampleFile, new SampleParams(
-					getNumSamples(id)));
-		}
-
-		updateLoopWindow();
+		update();
 	}
 
 	public Param getLoopBeginParam() {
@@ -234,9 +231,21 @@ public class Track extends BaseTrack {
 		return previewing;
 	}
 
+	private void update() {
+		updateSampleParams();
+		updateLoopWindow();
+	}
+
 	private void updateLoopWindow() {
 		setTrackLoopWindow(id, (long) getLoopBeginParam().level,
 				(long) getLoopEndParam().level);
+	}
+
+	private void updateSampleParams() {
+		if (!paramsForSample.containsKey(currSampleFile)) {
+			paramsForSample.put(currSampleFile, new SampleParams(
+					getNumSamples(id)));
+		}
 	}
 
 	public void notifyNoteMoved(long oldNoteOn, long oldNoteOff,

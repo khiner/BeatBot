@@ -61,8 +61,7 @@ public class TrackManager {
 
 	public static Track createTrack(SampleFile sample) {
 		createTrack(sample.getFullPath());
-		final Track newTrack = new Track(tracks.size());
-		newTrack.setSample(sample);
+		final Track newTrack = new Track(tracks.size(), sample);
 		tracks.add(newTrack);
 		return newTrack;
 	}
