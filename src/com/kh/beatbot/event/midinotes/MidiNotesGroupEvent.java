@@ -29,11 +29,13 @@ public class MidiNotesGroupEvent implements Stateful, Temporal {
 	@Override
 	public synchronized void doRedo() {
 		restore();
+		updateUi();
 	}
 
 	@Override
 	public synchronized void doUndo() {
 		restore();
+		updateUi();
 	}
 
 	public void updateUi() {

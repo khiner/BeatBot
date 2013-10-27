@@ -14,8 +14,7 @@ public class EventManager {
 		if (events.isEmpty() || events.size() <= currEventIndex) {
 			return;
 		}
-		events.get(currEventIndex).doUndo();
-		events.get(currEventIndex--).updateUi();
+		events.get(currEventIndex--).doUndo();
 		updateUi();
 	}
 
@@ -24,7 +23,6 @@ public class EventManager {
 			return;
 		}
 		events.get(++currEventIndex).doRedo();
-		events.get(currEventIndex).updateUi();
 		updateUi();
 	}
 

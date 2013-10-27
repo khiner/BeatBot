@@ -336,6 +336,9 @@ public class MidiView extends ClickableView {
 		if (initialized) {
 			initAllVbs();
 			TickWindowHelper.setYOffset(Float.MAX_VALUE);
+			for (MidiNote note : track.getMidiNotes()) {
+				createNoteView(note);
+			}
 		}
 	}
 

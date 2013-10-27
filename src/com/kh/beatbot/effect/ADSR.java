@@ -30,6 +30,15 @@ public class ADSR extends Effect {
 		setPeak(1);
 	}
 
+	public void update() {
+		setAttack(getAttack());
+		setDecay(getDecay());
+		setSustain(getSustain());
+		setRelease(getRelease());
+		setStart(getStart());
+		setPeak(getPeak());
+	}
+
 	public int getNum() {
 		return EFFECT_NUM;
 	}

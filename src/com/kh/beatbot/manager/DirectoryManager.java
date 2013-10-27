@@ -17,6 +17,7 @@ import com.kh.beatbot.Directory;
 import com.kh.beatbot.Instrument;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.event.SampleSetEvent;
+import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.ui.IconResources;
 
 public class DirectoryManager {
@@ -30,7 +31,7 @@ public class DirectoryManager {
 			if (currDirectory == null) {
 				// Instrument type
 				if (addingTrack) {
-					TrackManager.createTrack(((Instrument) parent).getSample(item));
+					new TrackCreateEvent(((Instrument) parent).getSample(item)).execute();
 				} else {
 					new SampleSetEvent(TrackManager.currTrack, ((Instrument) parent).getSample(item)).execute();
 				}

@@ -18,11 +18,13 @@ public class SampleSetEvent implements Executable, Stateful {
 	@Override
 	public void doUndo() {
 		doExecute(originalSample);
+		updateUi();
 	}
 
 	@Override
 	public void doRedo() {
 		doExecute(newSample);
+		updateUi();
 	}
 
 	@Override

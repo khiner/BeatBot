@@ -40,7 +40,6 @@ typedef struct TrackNode_t {
 Levels *masterLevels;
 TrackNode *trackHead;
 OpenSlOut *openSlOut;
-int trackCount;
 
 jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size);
 
@@ -58,7 +57,7 @@ void printTracks();
 
 void addTrack(Track *track);
 
-TrackNode *removeTrack(int trackNum);
+void removeTrack(TrackNode *trackNode);
 
 void updateLevels(int trackNum);
 

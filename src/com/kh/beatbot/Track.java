@@ -41,6 +41,10 @@ public class Track extends BaseTrack {
 		}
 	}
 
+	public void updateADSR() {
+		adsr.update();
+	}
+
 	public void select() {
 		buttonRow.instrumentButton.trigger(false);
 	}

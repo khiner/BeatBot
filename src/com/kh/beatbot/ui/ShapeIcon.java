@@ -64,11 +64,11 @@ public abstract class ShapeIcon extends Icon {
 	public void setColors(ColorSet fillColorSet, ColorSet outlineColorSet) {
 		Drawable prevIcon = currentDrawable;
 		setDrawable(resource.defaultDrawable);
-		((Shape) resource.defaultDrawable).setColors(
-				fillColorSet.defaultColor, outlineColorSet.defaultColor);
+		((Shape) resource.defaultDrawable).setColors(fillColorSet.defaultColor,
+				outlineColorSet.defaultColor);
 		setDrawable(resource.pressedDrawable);
-		((Shape) resource.pressedDrawable).setColors(
-				fillColorSet.pressedColor, outlineColorSet.pressedColor);
+		((Shape) resource.pressedDrawable).setColors(fillColorSet.pressedColor,
+				outlineColorSet.pressedColor);
 		if (fillColorSet.selectedColor != null
 				&& outlineColorSet.selectedColor != null) {
 			setDrawable(resource.selectedDrawable);

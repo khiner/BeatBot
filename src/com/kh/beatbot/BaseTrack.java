@@ -21,17 +21,17 @@ public class BaseTrack {
 		volumeParam.setLevel(.8f); // pan/pitch default to .5
 		volumeParam.addListener(new ParamListener() {
 			public void onParamChanged(Param param) {
-				setTrackVolume(id, param.level);
+				setTrackVolume(getId(), param.level);
 			}
 		});
 		panParam.addListener(new ParamListener() {
 			public void onParamChanged(Param param) {
-				setTrackPan(id, param.level);
+				setTrackPan(getId(), param.level);
 			}
 		});
 		pitchParam.addListener(new ParamListener() {
 			public void onParamChanged(Param param) {
-				setTrackPitch(id, param.level);
+				setTrackPitch(getId(), param.level);
 			}
 		});
 	}
@@ -97,17 +97,6 @@ public class BaseTrack {
 		case PAN: currLevelParam = panParam; break;
 		case PITCH: currLevelParam = pitchParam; break;
 		}
-	}
-
-	/** Wrappers around native JNI methods **/
-	
-
-	public void setPan(float pan) {
-		setTrackPan(id, pan);
-	}
-
-	public void setPitch(float pitch) {
-		setTrackPitch(id, pitch);
 	}
 
 	public static native void setTrackVolume(int trackId, float volume);

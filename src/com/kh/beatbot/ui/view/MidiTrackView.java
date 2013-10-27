@@ -11,9 +11,10 @@ public class MidiTrackView extends TouchableView {
 	public void notifyTrackCreated(Track track) {
 		addChild(track.getButtonRow());
 		if (initialized) {
-			layoutChildren();
 			track.getButtonRow().loadAllIcons();
+			layoutChildren();
 		}
+		track.select();
 	}
 	
 	public void notifyTrackDeleted(Track track) {

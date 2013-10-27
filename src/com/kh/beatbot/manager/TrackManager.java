@@ -6,9 +6,9 @@ import java.util.List;
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.SampleFile;
 import com.kh.beatbot.Track;
+import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.view.TrackButtonRow;
-import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.page.Page;
 
@@ -25,7 +25,9 @@ public class TrackManager {
 
 	public static void init() {
 		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
-			createTrack(DirectoryManager.getDrumInstrument(i).getSample(0));
+			TrackCreateEvent trackCreateEvent = new TrackCreateEvent(DirectoryManager.getDrumInstrument(i).getSample(0));
+			trackCreateEvent.doExecute();
+			trackCreateEvent.updateUi();
 		}
 	}
 
@@ -57,34 +59,37 @@ public class TrackManager {
 		return tracks.size();
 	}
 
-	public static void createTrack(SampleFile sample) {
+	public static Track createTrack(SampleFile sample) {
 		createTrack(sample.getFullPath());
 		final Track newTrack = new Track(tracks.size());
 		newTrack.setSample(sample);
 		tracks.add(newTrack);
-		
-		// needed to avoid "no current context" opengl error
-		View.root.queueEvent(new Runnable() {
-			@Override
-			public void run() {
-				Page.mainPage.notifyTrackCreated(newTrack);
-				setTrack(newTrack);
-			}
-		});
+		return newTrack;
+	}
+
+	public static void createTrack(Track track) {
+		createTrack(track.getCurrSampleFile().getFullPath());
+		track.setId(tracks.size());
+		tracks.add(track);
+		track.updateADSR();
+		track.updateNextNote();
 	}
 
 	public static void deleteCurrTrack() {
 		if (tracks.size() <= 1) {
 			return; // not allowed to delete last track
 		}
-		int currTrackNum = tracks.indexOf(currTrack);
-		tracks.remove(currTrackNum);
+		int currTrackNum = currTrack.getId();
+		tracks.remove(currTrack);
 		for (int i = currTrackNum; i < tracks.size(); i++) {
 			tracks.get(i).setId(i);
 		}
-		Page.mainPage.notifyTrackDeleted(currTrack);
 		setTrack(tracks.get(Math.min(currTrackNum, tracks.size() - 1)));
 		deleteTrack(currTrackNum);
+	}
+
+	public static boolean trackExists(Track track) {
+		return tracks.contains(track);
 	}
 
 	public static MidiNote getNextMidiNote(int trackNum, long currTick) {

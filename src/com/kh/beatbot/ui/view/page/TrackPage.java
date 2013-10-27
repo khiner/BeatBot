@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.view.page;
 
+import com.kh.beatbot.event.TrackDestroyEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
@@ -21,7 +22,7 @@ public class TrackPage extends LevelsFXPage {
 		deleteButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				TrackManager.deleteCurrTrack();
+				new TrackDestroyEvent(TrackManager.currTrack).execute();
 			}
 		});
 
