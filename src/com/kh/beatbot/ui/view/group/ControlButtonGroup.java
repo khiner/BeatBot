@@ -155,11 +155,10 @@ public class ControlButtonGroup extends TouchableView {
 
 	@Override
 	public void layoutChildren() {
-		float leftMargin = Page.mainPage.midiTrackView.width;
 		// left-aligned buttons
-		playButton.layout(this, leftMargin, 0, height, height);
-		stopButton.layout(this, leftMargin + height, 0, height, height);
-		recordButton.layout(this, leftMargin + 2 * height, 0, height, height);
+		playButton.layout(this, 0, 0, height, height);
+		stopButton.layout(this, height, 0, height, height);
+		recordButton.layout(this, 2 * height, 0, height, height);
 
 		float rightMargin = 10;
 		// right-aligned buttons

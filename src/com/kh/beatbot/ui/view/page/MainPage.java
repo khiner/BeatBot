@@ -5,6 +5,7 @@ import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.view.MidiTrackView;
 import com.kh.beatbot.ui.view.MidiView;
+import com.kh.beatbot.ui.view.SlideMenu;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.group.ControlButtonGroup;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
@@ -15,7 +16,8 @@ public class MainPage extends TouchableView {
 	public ControlButtonGroup controlButtonGroup;
 	public MidiTrackView midiTrackView;
 	public PageSelectGroup pageSelectGroup;
-	
+	public SlideMenu slideMenu;
+
 	public void notifyTrackCreated(Track track) {
 		midiTrackView.notifyTrackCreated(track);
 		midiView.notifyTrackCreated(track);
@@ -50,11 +52,13 @@ public class MainPage extends TouchableView {
 		controlButtonGroup = new ControlButtonGroup();
 		midiTrackView = new MidiTrackView();
 		pageSelectGroup = new PageSelectGroup();
-		
+		slideMenu = new SlideMenu();
+
 		addChild(controlButtonGroup);
 		addChild(midiTrackView);
 		addChild(midiView);
 		addChild(pageSelectGroup);
+		addChild(slideMenu);
 	}
 
 	@Override
@@ -68,7 +72,9 @@ public class MainPage extends TouchableView {
 		
 		midiTrackView.layout(this, 0, controlButtonHeight, trackControlWidth, midiHeight);
 		midiView.layout(this, trackControlWidth, controlButtonHeight, width - trackControlWidth - 15, midiHeight);
-		controlButtonGroup.layout(this, 0, 0, width, controlButtonHeight);
+		slideMenu.layout(this, 0, 0, trackControlWidth, controlButtonHeight);
+		controlButtonGroup.layout(this, trackControlWidth, 0, width - trackControlWidth, controlButtonHeight);
 		pageSelectGroup.layout(this, 0, controlButtonHeight + midiHeight, width, height - midiHeight - controlButtonHeight);
+		
 	}
 }

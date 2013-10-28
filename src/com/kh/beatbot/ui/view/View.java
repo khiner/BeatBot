@@ -54,7 +54,7 @@ public abstract class View implements Comparable<View> {
 	protected float[] backgroundColor = Colors.BG_COLOR,
 			clearColor = Colors.BG_COLOR, strokeColor = Colors.WHITE;
 
-	protected boolean initialized = false;
+	protected boolean initialized = false, shouldClip = true;
 	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0,
 			borderHeight = 0, borderOffset = 0;
 
@@ -177,16 +177,18 @@ public abstract class View implements Comparable<View> {
 		if (!initialized)
 			return;
 		// scissor ensures that each view can only draw within its rect
-		gl.glEnable(GL10.GL_SCISSOR_TEST);
-		if (parent != null) {
-			clipWindow(parent.currClipX, parent.currClipY, parent.currClipW,
-					parent.currClipH);
-		} else {
-			clipWindow(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE,
-					Integer.MAX_VALUE);
-		}
-		if (bgRect != null) {
-			bgRect.draw();
+		if (shouldClip) {
+			gl.glEnable(GL10.GL_SCISSOR_TEST);
+			if (parent != null) {
+				clipWindow(parent.currClipX, parent.currClipY, parent.currClipW,
+						parent.currClipH);
+			} else {
+				clipWindow(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE,
+						Integer.MAX_VALUE);
+			}
+			if (bgRect != null) {
+				bgRect.draw();
+			}
 		}
 		draw();
 		drawChildren();
@@ -241,7 +243,9 @@ public abstract class View implements Comparable<View> {
 	}
 
 	protected View findChildAt(float x, float y) {
-		for (View child : children) {
+		// reverse order to respect z-index (children are drawn in position order
+		for (int i = children.size() - 1; i >= 0; i--) {
+			View child = children.get(i);
 			if (child.containsPoint(x, y)) {
 				return child;
 			}

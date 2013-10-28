@@ -13,6 +13,10 @@ public class ShapeGroup {
 		outlineGroup = new MeshGroup(GL10.GL_LINES);
 	}
 
+	public void setFillPrimitiveType(int primitiveType) {
+		fillGroup.setPrimitiveType(primitiveType);
+	}
+
 	public void setOutlinePrimitiveType(int primitiveType) {
 		outlineGroup.setPrimitiveType(primitiveType);
 	}
