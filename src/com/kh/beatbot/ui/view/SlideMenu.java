@@ -7,6 +7,7 @@ import com.kh.beatbot.ui.mesh.SlideTab;
 public class SlideMenu extends TouchableView {
 	private SlideTab tab;
 	private ShapeGroup shapeGroup;
+
 	private Position downPosition = new Position(0, 0);
 
 	private final float SPRING_CONST = .1f, DAMP = .65f, STOP_THRESH = 0.001f;
@@ -14,10 +15,14 @@ public class SlideMenu extends TouchableView {
 	private float menuWidth = 0, velocity = 0, lastX = 0, goalX = 0;
 	private boolean snap = false;
 
-	public void createChildren() {
+	public void init() {
 		shouldClip = false;
+		menuWidth = parent.width / 5;
+	}
+
+	public void createChildren() {
 		shapeGroup = new ShapeGroup();
-		tab = new SlideTab(shapeGroup, Colors.LABEL_MED, Colors.WHITE);
+		tab = new SlideTab(shapeGroup, Colors.LABEL_MED);
 	}
 
 	public void draw() {
@@ -34,8 +39,7 @@ public class SlideMenu extends TouchableView {
 	}
 
 	public void layoutChildren() {
-		menuWidth = parent.width / 5;
-		tab.layout(this.absoluteX - parent.width, 0, width, height);
+		tab.layout(absoluteX - parent.width, absoluteY, width, height);
 	}
 
 	public void handleActionDown(int pointerId, float x, float y) {

@@ -4,12 +4,10 @@ import com.kh.beatbot.ui.view.page.Page;
 
 public class SlideTab extends Shape {
 
-	public SlideTab(ShapeGroup group, float[] fillColor) {
-		super(group, new Mesh2D(12, fillColor));
-	}
+	private float cornerRadius = 7;
 
-	public SlideTab(ShapeGroup group, float[] fillColor, float[] outlineColor) {
-		super(group, new Mesh2D(12, fillColor), new Mesh2D(12, outlineColor));
+	public SlideTab(ShapeGroup group, float[] fillColor) {
+		super(group, new Mesh2D(16 * 4 * 3 * 2, fillColor));
 	}
 
 	@Override
@@ -22,32 +20,22 @@ public class SlideTab extends Shape {
 		float parentWidth = Page.mainPage.width;
 		float parentHeight = Page.mainPage.height;
 
-		float[][] vertices = {
-				{ x + width + parentWidth, 0 },
-				{ x + parentWidth, 0 },
-				{ x + width + parentWidth, height },
+		RoundedRect roundedRect = new RoundedRect(null, fillColor);		
+		roundedRect.setCornerRadius(cornerRadius);
+		roundedRect.layout(x + parentWidth - cornerRadius * 2, y, width, height);
+		
+		float[] vertices = roundedRect.fillMesh.vertices;
+		for (int i = 0; i < vertices.length / 2; i++) {
+			fillMesh.vertex(vertices[i * 2], vertices[i * 2 + 1]);
+		}
 
-				{ x + parentWidth, 0 },
-				{ x + width + parentWidth, height },
-				{ x + parentWidth, height },
+		roundedRect.setCornerRadius(cornerRadius);
+		roundedRect.layout(x, y, parentWidth, parentHeight - y);
 
-				{ x + parentWidth, 0 },
-				{ x, 0 },
-				{ x + parentWidth, parentHeight },
-
-				{ x, 0 },
-				{ x + parentWidth, parentHeight },
-				{ x, parentHeight }
-		};
-
-		for (float[] vertex : vertices) {
-			fillMesh.vertex(vertex[0], vertex[1]);
-			outlineMesh.vertex(vertex[0], vertex[1]);
+		for (int i = 0; i < roundedRect.fillMesh.vertices.length / 2; i++) {
+			fillMesh.vertex(roundedRect.fillMesh.vertices[i * 2], roundedRect.fillMesh.vertices[i * 2 + 1]);
 		}
 
 		fillMesh.setColor(fillColor);
-		if (outlineColor != null) {
-			outlineMesh.setColor(outlineColor);
-		}
 	}
 }

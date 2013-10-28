@@ -70,9 +70,10 @@ public class MainPage extends TouchableView {
 		MidiView.trackHeight = MidiView.allTracksHeight / numTracks;
 		float trackControlWidth = MidiView.trackHeight * 2.5f;
 		
+		float offset = MidiView.Y_OFFSET / 4;
 		midiTrackView.layout(this, 0, controlButtonHeight, trackControlWidth, midiHeight);
 		midiView.layout(this, trackControlWidth, controlButtonHeight, width - trackControlWidth - 15, midiHeight);
-		slideMenu.layout(this, 0, 0, trackControlWidth, controlButtonHeight);
+		slideMenu.layout(this, 0, offset / 2, trackControlWidth - offset * 2, controlButtonHeight + offset * 2);
 		controlButtonGroup.layout(this, trackControlWidth, 0, width - trackControlWidth, controlButtonHeight);
 		pageSelectGroup.layout(this, 0, controlButtonHeight + midiHeight, width, height - midiHeight - controlButtonHeight);
 		
