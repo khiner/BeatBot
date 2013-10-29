@@ -8,7 +8,7 @@ public class SlideTab extends Shape {
 	private RoundedRect roundedRect;
 
 	public SlideTab(ShapeGroup group, float[] fillColor) {
-		super(group, new Mesh2D(16 * 5 * 3 * 2, fillColor));
+		super(group, new Mesh2D(RoundedRect.NUM_CORNER_VERTICES * 5 * 3 * 2, fillColor));
 		roundedRect = new RoundedRect(null, fillColor);
 	}
 
@@ -39,7 +39,7 @@ public class SlideTab extends Shape {
 		float centerX = x + Page.mainPage.width;
 		float centerY = y + height;
 		float lastX = 0, lastY = 0;
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < RoundedRect.NUM_CORNER_VERTICES; i++) {
 			addX = addY = cornerRadius;
 			float vertexX = (float) Math.cos(theta) * cornerRadius + addX + x + Page.mainPage.width;
 			float vertexY = (float) Math.sin(theta) * cornerRadius + addY + y + height ;
@@ -50,7 +50,7 @@ public class SlideTab extends Shape {
 			}
 			lastX = vertexX;
 			lastY = vertexY;
-			theta += ¹ / 32;
+			theta += ¹ / (RoundedRect.NUM_CORNER_VERTICES * 2);
 		}
 
 		fillMesh.setColor(fillColor);

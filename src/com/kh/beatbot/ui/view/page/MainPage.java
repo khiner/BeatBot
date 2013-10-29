@@ -1,12 +1,16 @@
 package com.kh.beatbot.ui.view.page;
 
+import java.nio.FloatBuffer;
+
 import com.kh.beatbot.Track;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.MidiTrackView;
 import com.kh.beatbot.ui.view.MidiView;
 import com.kh.beatbot.ui.view.SlideMenu;
 import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.group.ControlButtonGroup;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
@@ -17,6 +21,14 @@ public class MainPage extends TouchableView {
 	public MidiTrackView midiTrackView;
 	public PageSelectGroup pageSelectGroup;
 	public SlideMenu slideMenu;
+
+	private FloatBuffer foregroundRectBuffer;
+	
+	private float[] foregroundColor = Colors.TRANSPARANT;
+
+	public final void setForegroundColor(float[] color) {
+		foregroundColor = color;
+	}
 
 	public void notifyTrackCreated(Track track) {
 		midiTrackView.notifyTrackCreated(track);
@@ -38,6 +50,11 @@ public class MainPage extends TouchableView {
 	public void notifyTrackDeleted(Track track) {
 		midiTrackView.notifyTrackDeleted(track);
 		midiView.notifyTrackDeleted(track);
+	}
+	
+	@Override
+	public void init() {
+		foregroundRectBuffer = makeRectFloatBuffer(0, 0, width, height);
 	}
 	
 	@Override
@@ -76,6 +93,16 @@ public class MainPage extends TouchableView {
 		slideMenu.layout(this, 0, offset / 2, trackControlWidth - offset * 2, controlButtonHeight + offset * 2);
 		controlButtonGroup.layout(this, trackControlWidth, 0, width - trackControlWidth, controlButtonHeight);
 		pageSelectGroup.layout(this, 0, controlButtonHeight + midiHeight, width, height - midiHeight - controlButtonHeight);
-		
+	}
+	
+	@Override
+	public void drawChildren() {
+		for (View child : children) {
+			if (!child.equals(slideMenu)) {
+				drawChild(child);
+			}
+		}
+		drawTriangleFan(foregroundRectBuffer, foregroundColor);
+		drawChild(slideMenu);
 	}
 }

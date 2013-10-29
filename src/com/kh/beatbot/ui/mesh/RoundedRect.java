@@ -1,14 +1,15 @@
 package com.kh.beatbot.ui.mesh;
 
 public class RoundedRect extends Shape {
-	public float cornerRadius = -1;
+	public static final int NUM_CORNER_VERTICES = 16;
 
+	public float cornerRadius = -1;
 	public RoundedRect(ShapeGroup group, float[] fillColor) {
-		super(group, new Mesh2D(16 * 4 * 3, fillColor));
+		super(group, new Mesh2D(NUM_CORNER_VERTICES * 4 * 3, fillColor));
 	}
 
 	public RoundedRect(ShapeGroup group, float[] fillColor, float[] outlineColor) {
-		super(group, new Mesh2D(16 * 4 * 3, fillColor), new Mesh2D(16 * 4 * 2,
+		super(group, new Mesh2D(NUM_CORNER_VERTICES * 4 * 3, fillColor), new Mesh2D(16 * 4 * 2,
 				outlineColor));
 	}
 

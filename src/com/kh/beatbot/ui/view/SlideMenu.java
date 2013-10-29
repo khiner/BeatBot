@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.view;
 
+import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.mesh.SlideTab;
@@ -15,6 +16,8 @@ public class SlideMenu extends TouchableView {
 
 	private float menuWidth = 0, velocity = 0, lastX = 0, goalX = 0;
 	private boolean snap = false;
+
+	private float[] fadeColor = new float[] {0, 0, 0, 0};
 
 	public void init() {
 		shouldClip = false;
@@ -62,6 +65,7 @@ public class SlideMenu extends TouchableView {
 	
 	public void setPosition(float x, float y) {
 		super.setPosition(x, y);
-		Page.mainPage.setForegroundColor(Colors.WHITE);
+		fadeColor[3] = GeneralUtils.clipToUnit(x / menuWidth) * .8f;
+		Page.mainPage.setForegroundColor(fadeColor);
 	}
 }

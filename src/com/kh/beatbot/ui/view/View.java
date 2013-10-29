@@ -180,11 +180,11 @@ public abstract class View implements Comparable<View> {
 		if (shouldClip) {
 			gl.glEnable(GL10.GL_SCISSOR_TEST);
 			if (parent != null) {
-				clipWindow(parent.currClipX, parent.currClipY, parent.currClipW,
-						parent.currClipH);
+				clipWindow(parent.currClipX, parent.currClipY,
+						parent.currClipW, parent.currClipH);
 			} else {
-				clipWindow(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE,
-						Integer.MAX_VALUE);
+				clipWindow(Integer.MIN_VALUE, Integer.MIN_VALUE,
+						Integer.MAX_VALUE, Integer.MAX_VALUE);
 			}
 			if (bgRect != null) {
 				bgRect.draw();
@@ -198,12 +198,15 @@ public abstract class View implements Comparable<View> {
 	protected void drawChildren() {
 		for (int i = 0; i < children.size(); i++) {
 			// not using foreach to avoid concurrent modification
-			View child = children.get(i);
-			push();
-			translate(child.x, child.y);
-			child.drawAll();
-			pop();
+			drawChild(children.get(i));
 		}
+	}
+
+	protected final void drawChild(View child) {
+		push();
+		translate(child.x, child.y);
+		child.drawAll();
+		pop();
 	}
 
 	public void initGl(GL11 _gl) {
@@ -243,7 +246,8 @@ public abstract class View implements Comparable<View> {
 	}
 
 	protected View findChildAt(float x, float y) {
-		// reverse order to respect z-index (children are drawn in position order
+		// reverse order to respect z-index (children are drawn in position
+		// order
 		for (int i = children.size() - 1; i >= 0; i--) {
 			View child = children.get(i);
 			if (child.containsPoint(x, y)) {
@@ -349,8 +353,8 @@ public abstract class View implements Comparable<View> {
 		drawLines(vb, color, width, type, 0);
 	}
 
-	public static final void drawCircle(float pointSize, float[] color, float x,
-			float y) {
+	public static final void drawCircle(float pointSize, float[] color,
+			float x, float y) {
 		push();
 		translate(x, y);
 		float scale = pointSize / CIRCLE_RADIUS;
@@ -367,10 +371,6 @@ public abstract class View implements Comparable<View> {
 	public final void setBackgroundColor(float[] color) {
 		backgroundColor = color;
 		initBackgroundColor();
-	}
-
-	public final void setForegroundColor(float[] color) {
-		
 	}
 
 	public static final void setColor(float[] color) {
