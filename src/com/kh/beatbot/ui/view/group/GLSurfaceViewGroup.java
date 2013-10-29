@@ -4,7 +4,6 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
 import android.content.Context;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
@@ -17,10 +16,6 @@ public class GLSurfaceViewGroup extends TouchableSurfaceView {
 
 	public GLSurfaceViewGroup(Context context) {
 		super(context);
-	}
-
-	public GLSurfaceViewGroup(Context context, AttributeSet attr) {
-		super(context, attr);
 	}
 
 	public void setBBRenderer(TouchableView renderer) {

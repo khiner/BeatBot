@@ -369,6 +369,10 @@ public abstract class View implements Comparable<View> {
 		initBackgroundColor();
 	}
 
+	public final void setForegroundColor(float[] color) {
+		
+	}
+
 	public static final void setColor(float[] color) {
 		gl.glColor4f(color[0], color[1], color[2], color[3]);
 	}

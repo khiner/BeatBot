@@ -36,10 +36,6 @@ public class AdsrView extends TouchableView implements ParamListener {
 	@Override
 	public void init() {
 		initAdsrVb();
-		ADSR adsr = TrackManager.currTrack.adsr;
-		for (int i = 0; i < ADSR.NUM_PARAMS; i++) {
-			GLSurfaceViewBase.storeText(adsr.getParam(i).name);
-		}
 	}
 
 	@Override

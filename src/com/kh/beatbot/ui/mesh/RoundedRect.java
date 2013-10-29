@@ -33,8 +33,7 @@ public class RoundedRect extends Shape {
 				addX = cornerRadius;
 				addY = height - cornerRadius;
 			} else if (theta < 3 * ¹ / 2) { // upper left
-				addX = cornerRadius;
-				addY = cornerRadius;
+				addX = addY = cornerRadius;
 			} else { // upper right
 				addX = width - cornerRadius;
 				addY = cornerRadius;

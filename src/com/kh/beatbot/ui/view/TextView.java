@@ -62,7 +62,7 @@ public class TextView extends View {
 		if (text == null || text.isEmpty()) {
 			return;
 		}
-		GLSurfaceViewBase.storeText(text);
+
 		textHeight = height;
 		textWidth = GLSurfaceViewBase.getTextWidth(text, textHeight);
 		if (textWidth > width - X_OFFSET * 3) {

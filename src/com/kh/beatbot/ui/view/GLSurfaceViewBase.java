@@ -11,7 +11,6 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
-import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 
 import com.kh.beatbot.activity.BeatBotActivity;
@@ -22,16 +21,6 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 
 	public GLSurfaceViewBase(Context context) {
 		super(context);
-		initSettings();
-	}
-
-	public GLSurfaceViewBase(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		initSettings();
-	}
-
-	private void initSettings() {
-		setEGLConfigChooser(false);
 		setRenderer(this);
 		setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 	}
@@ -49,10 +38,9 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 	}
 
 	public void onSurfaceChanged(GL10 _gl, int width, int height) {
-		gl = (GL11)_gl;
+		gl = (GL11) _gl;
 		gl.glViewport(0, 0, this.width, this.height);
 		GLU.gluOrtho2D(gl, 0, this.width, this.height, 0);
-		initGlText();
 		initGl(gl);
 		init();
 	}
@@ -70,11 +58,6 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-		// gl.glBlendFunc(GL10.GL_ONE_MINUS_DST_COLOR,
-		// GL10.GL_ONE_MINUS_SRC_COLOR);
-	}
-
-	public void initGlText() {
 		// load font file once, with static height
 		// to change height, simply use gl.scale()
 		glText = GLText.getInstance("REDRING-1969-v03.ttf", 30);
@@ -83,15 +66,10 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		glText.loadTexture();
 	}
 
-	public static final void drawText(String text, float height, float x, float y) {
+	public static final void drawText(String text, float height, float x,
+			float y) {
 		if (glText != null) {
 			glText.draw(text, height, x, y);
-		}
-	}
-
-	public static final void storeText(String text) {
-		if (glText != null) {
-			glText.storeText(text);
 		}
 	}
 

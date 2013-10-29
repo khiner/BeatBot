@@ -11,13 +11,14 @@ import com.kh.beatbot.ui.view.GLSurfaceViewBase;
 
 public class SpriteBatch {
 	// number of characters to render per batch
-	final static int CHAR_BATCH_SIZE = 100;
-	final static int VERTICES_PER_SPRITE = 4; // Vertices Per Sprite
-	final static int INDICES_PER_SPRITE = 6; // Indices Per Sprite
-	final static int VERTEX_SIZE = 16; // Bytesize of a Single Vertex
+	private final static int CHAR_BATCH_SIZE = 100,
+			VERTICES_PER_SPRITE = 4, // Vertices Per Sprite
+			INDICES_PER_SPRITE = 6, // Indices Per Sprite
+			VERTEX_SIZE = 16; // Bytesize of a Single Vertex
 
-	private int vertexBufferIndex = 0;
-	private int numSprites = 0; // Number of Sprites Currently in Buffer
+	private int vertexBufferIndex = 0,
+			numSprites = 0; // Number of Sprites Currently in Buffer
+
 	private float[] vertices;
 
 	private FloatBuffer vertexBuffer;

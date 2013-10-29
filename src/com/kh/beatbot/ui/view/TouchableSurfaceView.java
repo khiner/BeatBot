@@ -1,17 +1,12 @@
 package com.kh.beatbot.ui.view;
 
 import android.content.Context;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 public abstract class TouchableSurfaceView extends GLSurfaceViewBase {
 
 	public TouchableSurfaceView(Context c) {
 		super(c);
-	}
-	
-	public TouchableSurfaceView(Context c, AttributeSet as) {
-		super(c, as);
 	}
 
 	protected abstract void handleActionDown(MotionEvent e, int id, float x,

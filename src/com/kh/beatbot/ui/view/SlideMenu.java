@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.mesh.SlideTab;
+import com.kh.beatbot.ui.view.page.Page;
 
 public class SlideMenu extends TouchableView {
 	private SlideTab tab;
@@ -22,7 +23,7 @@ public class SlideMenu extends TouchableView {
 
 	public void createChildren() {
 		shapeGroup = new ShapeGroup();
-		tab = new SlideTab(shapeGroup, Colors.LABEL_MED);
+		tab = new SlideTab(shapeGroup, Colors.LABEL_SELECTED);
 	}
 
 	public void draw() {
@@ -57,5 +58,10 @@ public class SlideMenu extends TouchableView {
 	public void handleActionUp(int pointerId, float x, float y) {
 		goalX = velocity >= 0 ? menuWidth : 0;
 		snap = true;
+	}
+	
+	public void setPosition(float x, float y) {
+		super.setPosition(x, y);
+		Page.mainPage.setForegroundColor(Colors.WHITE);
 	}
 }

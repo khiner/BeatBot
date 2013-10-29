@@ -9,9 +9,6 @@
 
 package com.kh.beatbot.ui.view.text;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -23,26 +20,23 @@ import com.kh.beatbot.ui.view.View;
 
 public class GLText {
 
-	public final static int CHAR_START = 32; // First Character (ASCII Code)
-	public final static int CHAR_END = 126; // Last Character (ASCII Code)
-	public final static int CHAR_CNT = CHAR_END - CHAR_START + 2;
-	// Character to Use for Unknown (ASCII Code)
-	public final static int CHAR_NONE = 32;
-	public final static int CHAR_UNKNOWN = (CHAR_CNT - 1);
-	public final static int CHAR_BATCH_SIZE = 100;
+	public final static int CHAR_START = 32, // First Character (ASCII Code)
+			CHAR_END = 126, // Last Character (ASCII Code)
+			CHAR_CNT = CHAR_END - CHAR_START + 2,
+			CHAR_NONE = 32,	// Character to Use for Unknown (ASCII Code)
+			CHAR_UNKNOWN = (CHAR_CNT - 1),
+			CHAR_BATCH_SIZE = 100;
 
 	private static Bitmap bitmap = null;
 
-	private static Map<String, SpriteBatch> batches;
 	private static SpriteBatch genericBatch;
 	// region of each character (texture coordinates)
 	private static TextureRegion[] charRgn = new TextureRegion[CHAR_CNT];
 
 	private static int[] textureIds; // Font Texture ID
-	private static int textureSize = 0; // Texture Size for Font (Square)
-	private static int cellWidth = 0, cellHeight = 0; // Character Cell
-														// Width/Height
-	private static float charWidthMax = 0; // Character Width (Maximum; Pixels)
+	private static int textureSize = 0, // Texture Size for Font (Square)
+			cellWidth = 0, cellHeight = 0;
+
 	// Width of Each Character (Actual; Pixels)
 	private static final float[] charWidths = new float[CHAR_CNT];
 
@@ -56,7 +50,6 @@ public class GLText {
 	}
 
 	private GLText(String file, int size) {
-		batches = new HashMap<String, SpriteBatch>();
 		genericBatch = new SpriteBatch();
 		load(file, size);
 	}
@@ -75,38 +68,23 @@ public class GLText {
 		paint.setTypeface(tf);
 		Paint.FontMetrics fm = paint.getFontMetrics();
 		cellHeight = (int) (Math.ceil(Math.abs(fm.bottom) + Math.abs(fm.top)));
-		charWidthMax = 0;
 
-		char[] s = new char[2]; // Create Character Array
-		float[] w = new float[2]; // Working Width Value
-		int cnt = 0; // Array Counter
-		for (char c = CHAR_START; c <= CHAR_END; c++) {
-			s[0] = c; // Set Character
-			paint.getTextWidths(s, 0, 1, w); // Get Character Bounds
-			charWidths[cnt] = w[0]; // Get Width
-			if (charWidths[cnt] > charWidthMax)
-				charWidthMax = charWidths[cnt];
-			cnt++;
+		float[] w = new float[1]; // Working Width Value
+
+		for (int i = 0; i <= CHAR_END - CHAR_START; i++) {
+			paint.getTextWidths(String.valueOf((char) (i + CHAR_START)), w);
+			charWidths[i] = w[0];
+			cellWidth = (int) Math.max((int) cellWidth, charWidths[i]);
 		}
-		s[0] = CHAR_NONE;
-		paint.getTextWidths(s, 0, 1, w);
-		charWidths[cnt] = w[0]; // Get Width
-		if (charWidths[cnt] > charWidthMax)
-			charWidthMax = charWidths[cnt]; // Save New Max Width
-		cnt++;
 
-		// find the maximum size, validate, and setup cell sizes
-		cellWidth = (int) charWidthMax;
-		int maxSize = Math.max(cellWidth, cellHeight);
-		// set texture size based on max font size (width or height)
 		// NOTE: these values are fixed, based on the defined characters. when
 		// changing start/end characters (CHAR_START/CHAR_END) this will need
 		// adjustment too!
-		if (maxSize <= 24)
+		if (cellHeight <= 24)
 			textureSize = 256;
-		else if (maxSize <= 40)
+		else if (cellHeight <= 40)
 			textureSize = 512;
-		else if (maxSize <= 80)
+		else if (cellHeight <= 80)
 			textureSize = 1024;
 		else
 			textureSize = 2048;
@@ -118,21 +96,17 @@ public class GLText {
 		bitmap.eraseColor(0x00000000); // Set Transparent Background (ARGB)
 		// render each of the characters to the canvas (ie. build the font map)
 		float x = 0;
-		float y = cellHeight - (float)Math.ceil(Math.abs(fm.descent)) - 1;
+		float y = cellHeight - (float) Math.ceil(Math.abs(fm.descent)) - 1;
 		for (char c = CHAR_START; c <= CHAR_END; c++) {
-			s[0] = c;
-			canvas.drawText(s, 0, 1, x, y, paint);
+			canvas.drawText(String.valueOf(c), x, y, paint);
 			x += cellWidth;
 			if (x + cellWidth > textureSize) {
 				x = 0; // Set X for New Row
 				y += cellHeight; // Move Down a Row
 			}
 		}
-		s[0] = CHAR_NONE;
-		canvas.drawText(s, 0, 1, x, y, paint);
 
-		x = 0;
-		y = 0;
+		x = y = 0;
 		// setup the array of character texture regions
 		for (int c = 0; c < CHAR_CNT; c++) {
 			charRgn[c] = new TextureRegion(textureSize, textureSize, x, y,
@@ -157,8 +131,7 @@ public class GLText {
 	// x, y - the x,y position to draw text at (bottom left of text; including
 	// descent)
 	private void initTextInBatch(String text, SpriteBatch batch) {
-		float x = cellWidth / 2;
-		float y = cellHeight / 2;
+		float x = cellWidth / 2, y = cellHeight / 2;
 		batch.beginBatch();
 		for (char character : text.toCharArray()) {
 			int c = (int) character - CHAR_START;
@@ -168,29 +141,17 @@ public class GLText {
 		batch.complete();
 	}
 
-	public void storeText(String text) {
-		if (batches.containsKey(text))
-			return;
-		SpriteBatch batch = new SpriteBatch();
-		initTextInBatch(text, batch);
-		batches.put(text, batch);
-	}
-
 	// D: draw text at the specified x,y position
 	// A: text - the string to draw
 	// x, y - the x,y position to draw text at (bottom left of text; including
 	// descent)
 	public void draw(String text, float height, float x, float y) {
+		final float scale = height / cellHeight;
 		View.push();
 		View.translate(x, y);
-		float scale = height / cellHeight;
 		View.scale(scale, scale);
-		if (batches.containsKey(text)) {
-			batches.get(text).endBatch(textureIds[0]);
-		} else {
-			initTextInBatch(text, genericBatch);
-			genericBatch.endBatch(textureIds[0]);
-		}
+		initTextInBatch(text, genericBatch);
+		genericBatch.endBatch(textureIds[0]);
 		View.pop();
 	}
 
@@ -199,10 +160,6 @@ public class GLText {
 	// R: the requested character size (scaled)
 	public float getCharWidth(char chr) {
 		return charWidths[chr - CHAR_START];
-	}
-
-	public float getCharWidthMax() {
-		return charWidthMax;
 	}
 
 	public float getTextWidth(String text, float height) {
