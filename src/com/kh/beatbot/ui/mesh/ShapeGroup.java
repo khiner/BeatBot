@@ -38,33 +38,33 @@ public class ShapeGroup {
 
 	public boolean contains(Shape shape) {
 		return fillGroup.contains(shape.fillMesh)
-				&& (shape.outlineMesh == null || outlineGroup
-						.contains(shape.outlineMesh));
+				&& (shape.strokeMesh == null || outlineGroup
+						.contains(shape.strokeMesh));
 	}
 
 	public void add(Shape shape) {
 		fillGroup.add(shape.fillMesh);
-		if (shape.outlineMesh != null) {
-			outlineGroup.add(shape.outlineMesh);
+		if (shape.strokeMesh != null) {
+			outlineGroup.add(shape.strokeMesh);
 		}
 	}
 
 	public void remove(Shape shape) {
 		fillGroup.remove(shape.fillMesh);
-		outlineGroup.remove(shape.outlineMesh);
+		outlineGroup.remove(shape.strokeMesh);
 	}
 
 	public void replace(Shape oldShape, Shape newShape) {
 		fillGroup.replace(oldShape.fillMesh, newShape.fillMesh);
-		if (oldShape.outlineMesh != null && newShape.outlineMesh != null) {
-			outlineGroup.replace(oldShape.outlineMesh, newShape.outlineMesh);
+		if (oldShape.strokeMesh != null && newShape.strokeMesh != null) {
+			outlineGroup.replace(oldShape.strokeMesh, newShape.strokeMesh);
 		}
 	}
 
 	public void update(Shape shape) {
 		fillGroup.updateVertices(shape.fillMesh);
-		if (shape.outlineMesh != null) {
-			outlineGroup.updateVertices(shape.outlineMesh);
+		if (shape.strokeMesh != null) {
+			outlineGroup.updateVertices(shape.strokeMesh);
 		}
 	}
 

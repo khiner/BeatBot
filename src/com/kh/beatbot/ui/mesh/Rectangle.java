@@ -25,7 +25,7 @@ public class Rectangle extends Shape {
 		this.height = height;
 		fillMesh.color = fillColor;
 		if (outlineColor != null) {
-			outlineMesh.color = outlineColor;
+			strokeMesh.color = outlineColor;
 		}
 		update();
 	}
@@ -52,15 +52,15 @@ public class Rectangle extends Shape {
 	protected void createVertices(float[] fillColor, float[] outlineColor) {
 		createVertices(fillColor);
 		// outline
-		outlineMesh.vertex(x, y);
-		outlineMesh.vertex(x + width, y);
-		outlineMesh.vertex(x + width, y);
-		outlineMesh.vertex(x + width, y + height);
-		outlineMesh.vertex(x + width, y + height);
-		outlineMesh.vertex(x, y + height);
-		outlineMesh.vertex(x, y + height);
-		outlineMesh.vertex(x, y);
+		strokeMesh.vertex(x, y);
+		strokeMesh.vertex(x + width, y);
+		strokeMesh.vertex(x + width, y);
+		strokeMesh.vertex(x + width, y + height);
+		strokeMesh.vertex(x + width, y + height);
+		strokeMesh.vertex(x, y + height);
+		strokeMesh.vertex(x, y + height);
+		strokeMesh.vertex(x, y);
 		
-		outlineMesh.setColor(outlineColor);
+		strokeMesh.setColor(outlineColor);
 	}
 }

@@ -46,8 +46,8 @@ public class RoundedRect extends Shape {
 				fillMesh.vertex(lastX, lastY);
 				fillMesh.vertex(centerX, centerY);
 				if (outlineColor != null) {
-					outlineMesh.vertex(vertexX, vertexY);
-					outlineMesh.vertex(lastX, lastY);
+					strokeMesh.vertex(vertexX, vertexY);
+					strokeMesh.vertex(lastX, lastY);
 				}
 			}
 			lastX = vertexX;
@@ -58,14 +58,14 @@ public class RoundedRect extends Shape {
 		fillMesh.vertex(lastX, lastY);
 		fillMesh.vertex(centerX, centerY);
 		if (outlineColor != null) {
-			outlineMesh.vertex(outlineMesh.getVertices()[0],
-					outlineMesh.getVertices()[1]);
-			outlineMesh.vertex(lastX, lastY);
+			strokeMesh.vertex(strokeMesh.getVertices()[0],
+					strokeMesh.getVertices()[1]);
+			strokeMesh.vertex(lastX, lastY);
 		}
 
 		fillMesh.setColor(fillColor);
 		if (outlineColor != null) {
-			outlineMesh.setColor(outlineColor);
+			strokeMesh.setColor(outlineColor);
 		}
 	}
 

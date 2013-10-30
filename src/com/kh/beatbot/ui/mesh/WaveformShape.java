@@ -59,11 +59,11 @@ public class WaveformShape extends Shape {
 			int sampleIndex = (int) (offset + percent * numFloats);
 			float sample = TrackManager.currTrack.getSample(sampleIndex, 0);
 			
-			outlineMesh.vertex(percent * width + xOffset, height * (1 - sample) / 2);
+			strokeMesh.vertex(percent * width + xOffset, height * (1 - sample) / 2);
 		}
-		outlineMesh.setColor(outlineColor);
-		for (int i = (int)numSamples - 1; i >= 0 && i < outlineMesh.numVertices; i++) {
-			outlineMesh.setColor(i, Colors.TRANSPARANT);
+		strokeMesh.setColor(outlineColor);
+		for (int i = (int)numSamples - 1; i >= 0 && i < strokeMesh.numVertices; i++) {
+			strokeMesh.setColor(i, Colors.TRANSPARANT);
 		}
 		createVertices(fillColor);
 	}

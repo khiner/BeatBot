@@ -4,7 +4,6 @@ import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.ShapeIcon;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.view.View;
 
 public class ImageButton extends Button {
 
@@ -99,11 +98,6 @@ public class ImageButton extends Button {
 			iconW = width;
 			iconH = height;
 		}
-	}
-
-	public void layout(View parent, float x, float y, float width, float height) {
-		super.layout(parent, x, y, width, height);
-		init();
 	}
 
 	@Override // text goes to the right of the icon

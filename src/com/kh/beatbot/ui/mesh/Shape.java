@@ -6,7 +6,7 @@ public abstract class Shape extends Drawable {
 	public static final float ¹ = (float) Math.PI;
 	
 	protected ShapeGroup group;
-	protected Mesh2D fillMesh, outlineMesh;
+	protected Mesh2D fillMesh, strokeMesh;
 	protected boolean shouldDraw;
 	protected int borderWeight = 2;
 	
@@ -21,10 +21,10 @@ public abstract class Shape extends Drawable {
 		this(group, fillMesh, null);
 	}
 	
-	public Shape(ShapeGroup group, Mesh2D fillMesh, Mesh2D outlineMesh) {
+	public Shape(ShapeGroup group, Mesh2D fillMesh, Mesh2D strokeMesh) {
 		this(group);
 		this.fillMesh = fillMesh;
-		this.outlineMesh = outlineMesh;
+		this.strokeMesh = strokeMesh;
 	}
 	
 	public void setBorderWeight(float borderWeight) {
@@ -32,15 +32,15 @@ public abstract class Shape extends Drawable {
 	}
 	
 	protected abstract void createVertices(float[] fillColor);
-	protected abstract void createVertices(float[] fillColor, float[] outlineColor);
+	protected abstract void createVertices(float[] fillColor, float[] strokeColor);
 
 	protected void update() {
 		fillMesh.index = 0;
-		if (outlineMesh != null) {
-			outlineMesh.index = 0;
+		if (strokeMesh != null) {
+			strokeMesh.index = 0;
 		}
-		if (outlineMesh != null) {
-			createVertices(fillMesh.color, outlineMesh.color);
+		if (strokeMesh != null) {
+			createVertices(fillMesh.color, strokeMesh.color);
 		} else {
 			createVertices(fillMesh.color);
 		}
@@ -55,14 +55,22 @@ public abstract class Shape extends Drawable {
 		update();
 	}
 	
-	public void setColors(float[] fillColor, float[] outlineColor) {
+	public void setColors(float[] fillColor, float[] strokeColor) {
 		fillMesh.color = fillColor;
-		outlineMesh.color = outlineColor;
+		strokeMesh.color = strokeColor;
 		update();
 	}
 	
+	public Mesh2D getFillMesh() {
+		return fillMesh;
+	}
+	
+	public Mesh2D getStrokeMesh() {
+		return strokeMesh;
+	}
+
 	public float[] getStrokeColor() {
-		return outlineMesh != null ? outlineMesh.color : null;
+		return strokeMesh != null ? strokeMesh.color : null;
 	}
 	
 	public float[] getFillColor() {
