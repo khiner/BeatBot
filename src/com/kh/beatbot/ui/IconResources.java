@@ -45,5 +45,7 @@ public class IconResources {
 		
 		MICROPHONE = new IconResource(R.drawable.microphone_icon, R.drawable.microphone_icon_selected, R.drawable.microphone_icon_selected, -1, R.drawable.microphone_icon_selected, R.drawable.microphone_icon),
 		BEAT = new IconResource(R.drawable.beat_icon, R.drawable.beat_icon_selected, R.drawable.beat_icon_selected, -1, R.drawable.beat_icon_selected, R.drawable.beat_icon),
-		SAMPLE = new IconResource(R.drawable.sample_icon, R.drawable.sample_icon_selected, R.drawable.sample_icon_selected, -1, R.drawable.sample_icon_selected, R.drawable.sample_icon);
+		SAMPLE = new IconResource(R.drawable.sample_icon, R.drawable.sample_icon_selected, R.drawable.sample_icon_selected, -1, R.drawable.sample_icon_selected, R.drawable.sample_icon),
+		
+		MENU = new IconResource(R.drawable.menu_icon);
 }

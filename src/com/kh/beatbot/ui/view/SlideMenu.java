@@ -1,9 +1,12 @@
 package com.kh.beatbot.ui.view;
 
 import com.kh.beatbot.GeneralUtils;
+import com.kh.beatbot.ui.Icon;
+import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.mesh.SlideTab;
+import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.page.Page;
 
 public class SlideMenu extends TouchableView {
@@ -19,6 +22,8 @@ public class SlideMenu extends TouchableView {
 
 	private float[] fadeColor = new float[] {0, 0, 0, 0};
 
+	private ImageButton menuButton;
+
 	public void init() {
 		shouldClip = false;
 		menuWidth = parent.width / 5;
@@ -27,6 +32,13 @@ public class SlideMenu extends TouchableView {
 	public void createChildren() {
 		shapeGroup = new ShapeGroup();
 		tab = new SlideTab(shapeGroup, Colors.LABEL_SELECTED);
+		menuButton = new ImageButton();
+
+		addChild(menuButton);
+	}
+
+	public void loadIcons() {
+		menuButton.setIcon(new Icon(IconResources.MENU));
 	}
 
 	public void draw() {
@@ -43,6 +55,7 @@ public class SlideMenu extends TouchableView {
 	}
 
 	public void layoutChildren() {
+		menuButton.layout(this, height * .25f, 0, height, height);
 		tab.layout(absoluteX - parent.width, absoluteY, width, height);
 	}
 
