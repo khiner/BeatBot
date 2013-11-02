@@ -82,6 +82,7 @@ public class ImageButton extends Button {
 
 	@Override
 	public void layoutChildren() {
+		super.layoutChildren();
 		layoutIcons();
 	}
 
@@ -95,7 +96,7 @@ public class ImageButton extends Button {
 			bgIconSource.layout(absoluteX, absoluteY, width, height);
 		} else {
 			iconOffset = 0;
-			iconW = width;
+			iconW = height;
 			iconH = height;
 		}
 	}

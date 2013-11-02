@@ -44,7 +44,7 @@ public abstract class Shape extends Drawable {
 		} else {
 			createVertices(fillMesh.color);
 		}
-		if (!group.contains(this)) {
+		if (shouldDraw && !group.contains(this)) {
 			this.group.add(this);
 		}
 		group.update(this);

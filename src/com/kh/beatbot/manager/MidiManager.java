@@ -65,9 +65,12 @@ public class MidiManager {
 		setLoopEndTick(RESOLUTION * 4);
 	}
 
-	public static boolean toggleSnapToGrid() {
-		snapToGrid = !snapToGrid;
+	public static boolean isSnapToGrid() {
 		return snapToGrid;
+	}
+
+	public static void setSnapToGrid(boolean snapToGrid) {
+		MidiManager.snapToGrid = snapToGrid;
 	}
 
 	public static float getBPM() {

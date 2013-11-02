@@ -5,7 +5,7 @@ public class TextView extends View {
 	// but it corrects for something weird in
 	// GLSurfaceViewBase.getTextWidth
 	private final float X_OFFSET = 2;
-	
+
 	protected String text = "";
 	protected float textWidth = 0, textHeight = 0, textXOffset = 0,
 			textYOffset = 0;
@@ -13,16 +13,16 @@ public class TextView extends View {
 	public String getText() {
 		return text;
 	}
-	
+
 	public void setText(String text) {
 		this.text = text;
 		initText();
 	}
-	
+
 	@Override
 	public void init() {
 	}
-	
+
 	@Override
 	public void draw() {
 		drawText();
@@ -30,23 +30,22 @@ public class TextView extends View {
 
 	@Override
 	protected void createChildren() {
-		
 	}
 
 	@Override
 	public void layoutChildren() {
-		
+		initText();
 	}
 
 	@Override
 	protected void loadIcons() {
 		initText();
 	}
-	
+
 	protected float calcTextXOffset() {
 		return (width - textWidth) / 2;
 	}
-	
+
 	protected float calcTextYOffset() {
 		return (height - textHeight) / 2;
 	}
@@ -57,7 +56,7 @@ public class TextView extends View {
 		drawText(text, getStrokeColor(), (int) textHeight, textXOffset,
 				textYOffset);
 	}
-	
+
 	private void initText() {
 		if (text == null || text.isEmpty()) {
 			return;

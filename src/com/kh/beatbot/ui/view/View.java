@@ -54,7 +54,10 @@ public abstract class View implements Comparable<View> {
 	protected float[] backgroundColor = Colors.BG_COLOR,
 			clearColor = Colors.BG_COLOR, strokeColor = Colors.WHITE;
 
-	protected boolean initialized = false, shouldClip = true;
+	protected boolean initialized = false;
+	
+	protected boolean shouldClip = true;
+	
 	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0,
 			borderHeight = 0, borderOffset = 0;
 
@@ -113,6 +116,10 @@ public abstract class View implements Comparable<View> {
 			this.absoluteY = parent.absoluteY + y;
 		}
 		layoutChildren();
+	}
+
+	public void setClip(boolean shouldClip) {
+		this.shouldClip = shouldClip;
 	}
 
 	public boolean containsPoint(float x, float y) {

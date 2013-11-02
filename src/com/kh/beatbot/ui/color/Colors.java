@@ -28,7 +28,7 @@ public class Colors {
 			volumeBgColorSet, volumeStrokeColorSet, effectLabelBgColorSet,
 			effectLabelStrokeColorSet, effectLabelTouchedBgColorSet,
 			effectLabelTouchedStrokeColorSet, iconFillColorSet,
-			deleteFillColorSet, deleteBorderColorSet;
+			deleteFillColorSet, deleteStrokeColorSet, menuItemFillColorSet;
 
 	public static void initColors(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
@@ -112,9 +112,11 @@ public class Colors {
 		iconFillColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED);
 
 		deleteFillColorSet = new ColorSet(TRANSPARANT, RED);
-		deleteBorderColorSet = new ColorSet(RED, BLACK);
+		deleteStrokeColorSet = new ColorSet(RED, BLACK);
 
 		defaultStrokeColorSet = new ColorSet(VOLUME, VOLUME, VOLUME);
+		
+		menuItemFillColorSet = new ColorSet(LABEL_MED, LABEL_LIGHT, VOLUME);
 	}
 
 	public static float[] colorResourceToFloats(Activity activity,

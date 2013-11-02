@@ -34,7 +34,7 @@ public class TrackPage extends LevelsFXPage {
 		super.loadIcons();
 
 		deleteButton.setBgIcon(new RoundedRectIcon(labelGroup,
-				Colors.deleteFillColorSet, Colors.deleteBorderColorSet));
+				Colors.deleteFillColorSet, Colors.deleteStrokeColorSet));
 		deleteButton.setIcon(new Icon(IconResources.DELETE_TRACK));
 	}
 

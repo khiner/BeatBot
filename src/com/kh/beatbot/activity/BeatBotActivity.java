@@ -237,13 +237,6 @@ public class BeatBotActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.snap:
-			if (MidiManager.toggleSnapToGrid()) {
-				item.setIcon(R.drawable.btn_check_buttonless_on);
-			} else {
-				item.setIcon(R.drawable.btn_check_buttonless_off);
-			}
-			return true;
 		case R.id.quantize_current:
 			MidiManager.quantize();
 			return true;
