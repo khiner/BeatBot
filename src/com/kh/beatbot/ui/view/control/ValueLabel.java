@@ -12,7 +12,7 @@ public class ValueLabel extends ControlView1dBase {
 	}
 
 	@Override
-	public void init() {
+	public synchronized void init() {
 		super.init();
 		setStrokeColor(Colors.BLACK);
 	}

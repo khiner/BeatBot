@@ -41,7 +41,7 @@ public class SampleEditPage extends Page {
 	}
 
 	@Override
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		previewButton.setIcon(new Icon(IconResources.PREVIEW));
 		loopButton.setIcon(new Icon(IconResources.LOOP));
 		reverseButton.setIcon(new Icon(IconResources.REVERSE));
@@ -61,7 +61,7 @@ public class SampleEditPage extends Page {
 	}
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 		sampleEdit = new SampleEditView();
 		previewButton = new ImageButton();
 		loopButton = new ToggleButton();
@@ -126,7 +126,7 @@ public class SampleEditPage extends Page {
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		float topBarH = height * .29f;
 		float fillH = height - topBarH;
 		float margin = width * .02f;
@@ -149,7 +149,7 @@ public class SampleEditPage extends Page {
 	}
 
 	@Override
-	public void init() {
+	public synchronized void init() {
 		update();
 	}
 }

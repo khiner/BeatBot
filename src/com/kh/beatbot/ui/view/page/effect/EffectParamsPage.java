@@ -39,7 +39,7 @@ public class EffectParamsPage extends TouchableView implements
 	}
 
 	@Override
-	public void createChildren() {
+	public synchronized void createChildren() {
 		if (effect == null)
 			return;
 		createParamControls();
@@ -49,7 +49,7 @@ public class EffectParamsPage extends TouchableView implements
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		int halfParams = (effect.getNumParams() + 1) / 2;
 		float paramW = effect.getNumParams() <= 3 ? width / effect.getNumParams() : width
 				/ halfParams;

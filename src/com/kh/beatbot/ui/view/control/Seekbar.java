@@ -24,7 +24,7 @@ public class Seekbar extends ControlView1dBase {
 		middleY = levelBarVb.get(1) + levelBarHeight / 2;
 	}
 	
-	public void init() {
+	public synchronized void init() {
 		initLevelBarVb();
 		super.init();
 	}

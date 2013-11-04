@@ -74,7 +74,7 @@ public class PageSelectGroup extends TouchableView {
 	}
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 		addTrackButton = new ImageButton();
 		for (int i = 0; i < pageButtons.length; i++) {
 			pageButtons[i] = new ToggleButton();
@@ -131,7 +131,7 @@ public class PageSelectGroup extends TouchableView {
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		float labelHeight = height / 5;
 		float labelWidth = (width - 2 * labelHeight) / 4;
 		float labelYOffset = 2;
@@ -148,7 +148,7 @@ public class PageSelectGroup extends TouchableView {
 	}
 
 	@Override
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		addTrackButton.setIcon(new Icon(IconResources.ADD));
 		addTrackButton.setBgIcon(new RoundedRectIcon(roundedRectGroup,
 				Colors.labelBgColorSet, Colors.labelStrokeColorSet));

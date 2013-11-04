@@ -20,7 +20,11 @@ public class TextView extends View {
 	}
 
 	@Override
-	public void init() {
+	public synchronized void init() {
+	}
+
+	@Override
+	public synchronized void destroy() {
 	}
 
 	@Override
@@ -29,16 +33,16 @@ public class TextView extends View {
 	}
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		initText();
 	}
 
 	@Override
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		initText();
 	}
 

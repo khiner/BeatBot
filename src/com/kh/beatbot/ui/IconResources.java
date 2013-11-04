@@ -47,7 +47,11 @@ public class IconResources {
 		BEAT = new IconResource(R.drawable.beat_icon, R.drawable.beat_icon_selected, R.drawable.beat_icon_selected, -1, R.drawable.beat_icon_selected, R.drawable.beat_icon),
 		SAMPLE = new IconResource(R.drawable.sample_icon, R.drawable.sample_icon_selected, R.drawable.sample_icon_selected, -1, R.drawable.sample_icon_selected, R.drawable.sample_icon),
 		
+		FILE = new IconResource(R.drawable.browse_icon_selected, -1, R.drawable.browse_icon),
 		MENU = new IconResource(R.drawable.menu_icon),
 		SETTINGS = new IconResource(R.drawable.settings_icon, -1, R.drawable.settings_icon_selected),
-		SNAP_TO_GRID = new IconResource(R.drawable.snap_to_grid_icon);
+		SNAP_TO_GRID = new IconResource(R.drawable.snap_to_grid_icon),
+		
+		MIDI_IMPORT = new IconResource(R.drawable.midi_import_icon),
+		MIDI_EXPORT = new IconResource(R.drawable.midi_export_icon);
 }

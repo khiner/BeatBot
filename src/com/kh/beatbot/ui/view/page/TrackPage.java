@@ -15,7 +15,7 @@ public class TrackPage extends LevelsFXPage {
 	private ImageButton deleteButton;
 
 	@Override
-	public void createChildren() {
+	public synchronized void createChildren() {
 		super.createChildren();
 		deleteButton = new ImageButton();
 
@@ -30,7 +30,7 @@ public class TrackPage extends LevelsFXPage {
 	}
 
 	@Override
-	public void loadIcons() {
+	public synchronized void loadIcons() {
 		super.loadIcons();
 
 		deleteButton.setBgIcon(new RoundedRectIcon(labelGroup,
@@ -39,7 +39,7 @@ public class TrackPage extends LevelsFXPage {
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		float thirdHeight = height / 3;
 		float topRowY = height / 12;
 

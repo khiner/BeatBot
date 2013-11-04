@@ -17,7 +17,7 @@ public class KnobParamControl extends LevelParamControl {
 	}
 	
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		label.layout(this, 0, 0, width, height / 5);
 		levelControl.layout(this, 0, height / 5, width, 3 * height / 5);
 		valueLabel.layout(this, 0, 5 * height / 6, width, height / 6); // a little shorter

@@ -41,7 +41,7 @@ public class FilterParamsPage extends EffectParamsPage {
 	}
 
 	@Override
-	public void createChildren() {
+	public synchronized void createChildren() {
 		super.createChildren();
 		iconGroup = new ShapeGroup();
 		filterToggles = new ToggleButton[3];
@@ -54,7 +54,7 @@ public class FilterParamsPage extends EffectParamsPage {
 	}
 
 	@Override
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		for (ToggleButton filterToggle : filterToggles) {
 			filterToggle.setBgIcon(new RoundedRectIcon(iconGroup,
 					Colors.instrumentBgColorSet,
@@ -66,7 +66,7 @@ public class FilterParamsPage extends EffectParamsPage {
 		filterToggles[0].setChecked(true);
 	}
 
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		float toggleY = 5;
 		float toggleW = width / 6;
 		float paramH = (height - toggleY - toggleW) / 2 - 10;

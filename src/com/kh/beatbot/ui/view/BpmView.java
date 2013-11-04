@@ -23,7 +23,7 @@ public class BpmView extends ClickableView {
 	}
 	
 	@Override
-	public void init() {
+	public synchronized void init() {
 		initSegmentVBs();
 	}
 

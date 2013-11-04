@@ -68,7 +68,7 @@ public class Knob extends ControlView1dBase {
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		initCircleVbs(width, height);
 	}
 }

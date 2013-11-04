@@ -43,7 +43,7 @@ public class ThresholdBarView extends Seekbar {
 		maxRedVertices = (int) (levelBarVb.capacity() / 2);
 	}
 
-	public void init() {
+	public synchronized void init() {
 		super.init();
 		initVerticesLimits();
 	}

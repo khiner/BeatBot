@@ -8,7 +8,7 @@ import com.kh.beatbot.ui.color.Colors;
 public class ImageButton extends Button {
 
 	protected final int BACKGROUND_ICON_INDEX = 0, FOREGROUND_ICON_INDEX = 1;
-	protected float iconOffset = 0, iconW = 0, iconH = 0;
+	protected float iconXOffset = 0, iconYOffset = 0, iconW = 0, iconH = 0;
 	// two icon sources - foreground and background
 	protected Icon[] icons;
 
@@ -28,7 +28,6 @@ public class ImageButton extends Button {
 	public void setIcon(Icon icon) {
 		icons[FOREGROUND_ICON_INDEX] = icon;
 		layoutIcons();
-		init();
 	}
 
 	public void setBgIcon(Icon bgIcon) {
@@ -74,14 +73,14 @@ public class ImageButton extends Button {
 			bgIconSource.draw();
 		}
 		if (foregroundIconSource != null) {
-			foregroundIconSource.draw(absoluteX + iconOffset, root.getHeight()
-					- absoluteY - height + iconOffset, iconW, iconH);
+			foregroundIconSource.draw(absoluteX + iconXOffset, root.getHeight()
+					- absoluteY - height + iconYOffset, iconW, iconH);
 		}
 		super.draw();
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		super.layoutChildren();
 		layoutIcons();
 	}
@@ -90,12 +89,13 @@ public class ImageButton extends Button {
 		Icon bgIconSource = getBgIcon();
 		if (bgIconSource != null) {
 			// if there is a bg shape, we shrink the icon a bit to avoid overlap
-			iconOffset = height / 10;
+			iconXOffset = iconYOffset = height / 10;
 			iconW = 4 * height / 5;
 			iconH = 4 * height / 5;
 			bgIconSource.layout(absoluteX, absoluteY, width, height);
 		} else {
-			iconOffset = 0;
+			iconXOffset = (width - height) / 2;
+			iconYOffset = 0;
 			iconW = height;
 			iconH = height;
 		}
@@ -103,8 +103,8 @@ public class ImageButton extends Button {
 
 	@Override // text goes to the right of the icon
 	protected float calcTextXOffset() {
-		return (getIcon() != null ? iconOffset + iconW
-				+ (width - iconW - iconOffset) / 2 : width / 2)
+		return (getIcon() != null ? iconXOffset + iconW
+				+ (width - iconW - iconXOffset) / 2 : width / 2)
 				- textWidth / 2;
 	}
 
@@ -117,6 +117,13 @@ public class ImageButton extends Button {
 		} else {
 			return pressed ? Colors.defaultStrokeColorSet.pressedColor
 					: Colors.defaultStrokeColorSet.defaultColor;
+		}
+	}
+
+	@Override
+	public synchronized void destroy() {
+		if (getBgIcon() instanceof ShapeIcon) {
+			((ShapeIcon)getBgIcon()).destroy();
 		}
 	}
 }

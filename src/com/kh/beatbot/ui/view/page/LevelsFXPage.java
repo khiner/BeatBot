@@ -211,7 +211,7 @@ public abstract class LevelsFXPage extends Page {
 	}
 
 	@Override
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		effectLabel.setText("Effects");
 		volumeToggle.setText("Vol");
 		panToggle.setText("Pan");
@@ -230,7 +230,7 @@ public abstract class LevelsFXPage extends Page {
 	}
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 		labelGroup = new ShapeGroup();
 		effectLabel = new TextView();
 		levelBar = new Seekbar();

@@ -51,7 +51,9 @@ public class ShapeGroup {
 
 	public void remove(Shape shape) {
 		fillGroup.remove(shape.fillMesh);
-		outlineGroup.remove(shape.strokeMesh);
+		if (shape.strokeMesh != null) {
+			outlineGroup.remove(shape.strokeMesh);
+		}
 	}
 
 	public void replace(Shape oldShape, Shape newShape) {

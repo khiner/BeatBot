@@ -42,7 +42,7 @@ public class NoteLevelsPage extends Page {
 	}
 
 	@Override
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		volumeToggle.setText("Vol");
 		panToggle.setText("Pan");
 		pitchToggle.setText("Pit");
@@ -57,7 +57,7 @@ public class NoteLevelsPage extends Page {
 	}
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 		levelsView = new LevelsView();
 		volumeToggle = new ToggleButton();
 		panToggle = new ToggleButton();
@@ -88,7 +88,7 @@ public class NoteLevelsPage extends Page {
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		float toggleHeight = height / 3;
 		float toggleWidth = 2 * toggleHeight;
 		float viewW = toggleWidth + 5;

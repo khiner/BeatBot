@@ -22,7 +22,7 @@ public class AdsrPage extends Page implements OnReleaseListener {
 	private SeekbarParamControl paramControl;
 
 	@Override
-	public void init() {
+	public synchronized void init() {
 		super.init();
 		updateParamView();
 	}
@@ -51,7 +51,7 @@ public class AdsrPage extends Page implements OnReleaseListener {
 	}
 
 	@Override
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i]
 					.setBgIcon(new RoundedRectIcon(iconGroup,
@@ -86,7 +86,7 @@ public class AdsrPage extends Page implements OnReleaseListener {
 	}
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 		adsrView = new AdsrView();
 		paramControl = new SeekbarParamControl();
 		adsrButtons = new ToggleButton[ADSR.NUM_PARAMS];
@@ -103,7 +103,7 @@ public class AdsrPage extends Page implements OnReleaseListener {
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		float thirdHeight = height / 3;
 		float pos = width - thirdHeight * (adsrButtons.length + 1);
 		adsrView.layout(this, 0, 0, pos, height);

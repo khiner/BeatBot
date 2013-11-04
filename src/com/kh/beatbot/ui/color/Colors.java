@@ -116,7 +116,7 @@ public class Colors {
 
 		defaultStrokeColorSet = new ColorSet(VOLUME, VOLUME, VOLUME);
 		
-		menuItemFillColorSet = new ColorSet(LABEL_MED, LABEL_LIGHT, VOLUME);
+		menuItemFillColorSet = new ColorSet(TRANSPARANT, LABEL_LIGHT, VOLUME);
 	}
 
 	public static float[] colorResourceToFloats(Activity activity,

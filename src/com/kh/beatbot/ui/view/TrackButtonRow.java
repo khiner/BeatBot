@@ -34,7 +34,7 @@ public class TrackButtonRow extends TouchableView {
 	}
 
 	@Override
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		updateInstrumentIcon();
 		muteButton.setText("M");
 		soloButton.setText("S");
@@ -47,7 +47,7 @@ public class TrackButtonRow extends TouchableView {
 	}
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 		instrumentButton = new ToggleButton();
 		muteButton = new ToggleButton();
 		soloButton = new ToggleButton();
@@ -81,14 +81,14 @@ public class TrackButtonRow extends TouchableView {
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		instrumentButton.layout(this, 0, 0, height, height);
 		muteButton.layout(this, height, 0, height * .72f, height);
 		soloButton.layout(this, height + muteButton.width, 0, height * .72f,
 				height);
 	}
 
-	public void destroy() {
+	public synchronized void destroy() {
 		((ShapeIcon) muteButton.getBgIcon()).destroy();
 		((ShapeIcon) soloButton.getBgIcon()).destroy();
 		((ShapeIcon) instrumentButton.getBgIcon()).destroy();

@@ -118,13 +118,13 @@ public class LabelList extends ClickableView implements OnPressListener,
 	}
 
 	@Override
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		super.loadIcons();
 		addIcon = new Icon(IconResources.ADD);
 	}
 
 	@Override
-	public void init() {
+	public synchronized void init() {
 		super.init();
 		listener.labelListInitialized(this);
 	}
@@ -152,12 +152,12 @@ public class LabelList extends ClickableView implements OnPressListener,
 	}
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 		initBgRect(null, Colors.VIEW_BG, Colors.VOLUME);
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		float labelW = (width - borderOffset * 3 - (children.size() - 1)
 				* GAP_BETWEEN_LABELS)
 				/ children.size();

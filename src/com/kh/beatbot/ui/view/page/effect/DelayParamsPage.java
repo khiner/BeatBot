@@ -18,12 +18,12 @@ public class DelayParamsPage extends EffectParamsPage {
 	}
 	
 	@Override
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		linkToggle.setIcon(new Icon(IconResources.LINK));
 	}
 
 	@Override
-	public void createChildren() {
+	public synchronized void createChildren() {
 		super.createChildren();
 		linkToggle = new ToggleButton();
 		linkToggle.setOnReleaseListener(new OnReleaseListener() {
@@ -58,7 +58,7 @@ public class DelayParamsPage extends EffectParamsPage {
 		linkToggle.setChecked(effect.paramsLinked());
 	}
 
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		float paramY = 10;
 		float paramH = (height - paramY) / 2 - 10;
 		float paramW = 2 * paramH / 3;

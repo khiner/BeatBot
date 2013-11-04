@@ -36,12 +36,12 @@ public class MidiTrackView extends TouchableView {
 		lastY = newY;
 	}
 
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		DirectoryManager.loadIcons();
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		float yPos = MidiView.Y_OFFSET - TickWindowHelper.getYOffset();
 		for (View child : children) {
 			child.layout(this, 0, yPos, width, MidiView.trackHeight);

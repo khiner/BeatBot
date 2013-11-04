@@ -88,18 +88,21 @@ public abstract class View implements Comparable<View> {
 		return bgRect.cornerRadius;
 	}
 
-	public void addChild(View child) {
+	public synchronized void addChild(View child) {
 		children.add(child);
 		if (initialized) {
 			child.initAll();
 		}
 	}
 
-	public void removeChild(View child) {
+	public synchronized void removeChild(View child) {
+		if (!children.contains(child))
+			return;
+		child.destroy();
 		children.remove(child);
 	}
 
-	public int numChildren() {
+	public synchronized int numChildren() {
 		return children.size();
 	}
 
@@ -136,6 +139,8 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public abstract void init();
+
+	public abstract void destroy();
 
 	public abstract void draw();
 
@@ -202,7 +207,7 @@ public abstract class View implements Comparable<View> {
 		gl.glDisable(GL10.GL_SCISSOR_TEST);
 	}
 
-	protected void drawChildren() {
+	protected synchronized void drawChildren() {
 		for (int i = 0; i < children.size(); i++) {
 			// not using foreach to avoid concurrent modification
 			drawChild(children.get(i));
@@ -221,7 +226,7 @@ public abstract class View implements Comparable<View> {
 		loadAllIcons();
 	}
 
-	public void loadAllIcons() {
+	public synchronized void loadAllIcons() {
 		loadIcons();
 		for (View child : children) {
 			child.loadAllIcons();
@@ -252,7 +257,7 @@ public abstract class View implements Comparable<View> {
 		layoutBgRect();
 	}
 
-	protected View findChildAt(float x, float y) {
+	protected synchronized View findChildAt(float x, float y) {
 		// reverse order to respect z-index (children are drawn in position
 		// order
 		for (int i = children.size() - 1; i >= 0; i--) {

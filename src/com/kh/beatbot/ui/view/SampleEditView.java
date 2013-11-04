@@ -105,7 +105,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void init() {
+	public synchronized void init() {
 		initBackgroundOutlineVb();
 		initCurrSampleLineVb();
 		update();
@@ -325,7 +325,7 @@ public class SampleEditView extends ControlView2dBase {
 		updateVbs();
 	}
 
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		waveformShape.layout(0, 0, width, height);
 	}
 }

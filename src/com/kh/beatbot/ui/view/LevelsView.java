@@ -294,7 +294,7 @@ public class LevelsView extends TouchableView {
 	}
 	
 	@Override
-	public void init() {
+	public synchronized void init() {
 		midiView = Page.mainPage.midiView;
 		initLevelBarVb();
 	}
@@ -320,12 +320,12 @@ public class LevelsView extends TouchableView {
 	}
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 		initBgRect(null, Colors.VIEW_BG, Colors.VOLUME);
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		xOffset = Page.mainPage.midiView.absoluteX - absoluteX;
 	}
 }

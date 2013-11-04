@@ -33,7 +33,7 @@ public abstract class ShapeIcon extends Icon {
 	protected void setDrawable(Drawable icon) {
 		prevShape = (Shape) currentDrawable;
 		super.setDrawable(icon);
-		if (prevShape == null) {
+		if (prevShape == null || !prevShape.getGroup().contains(prevShape)) {
 			((Shape) currentDrawable).getGroup().add((Shape) currentDrawable);
 		} else {
 			((Shape) currentDrawable).getGroup().replace(prevShape,
@@ -87,6 +87,8 @@ public abstract class ShapeIcon extends Icon {
 	}
 
 	public void destroy() {
-		shapeGroup.remove((Shape) currentDrawable);
+		if (currentDrawable != null) {
+			shapeGroup.remove((Shape) currentDrawable);
+		}
 	}
 }

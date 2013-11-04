@@ -37,7 +37,7 @@ public class Seekbar2d extends ControlView2dBase {
 	}
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 		initBgRect(null, Colors.VIEW_BG, Colors.VOLUME);
 	}
 }

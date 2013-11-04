@@ -14,13 +14,13 @@ public class MasterPage extends LevelsFXPage {
 	}
 	
 	@Override
-	public void init() {
+	public synchronized void init() {
 		setBPM(MidiManager.getBPM());
 		update();
 	}
 
 	@Override
-	public void createChildren() {
+	public synchronized void createChildren() {
 		super.createChildren();
 		bpmLabel = new TextView();
 		bpmView = new BpmView();
@@ -29,13 +29,13 @@ public class MasterPage extends LevelsFXPage {
 	}
 	
 	@Override
-	public void loadIcons() {
+	public synchronized void loadIcons() {
 		super.loadIcons();
 		bpmLabel.setText("BPM");
 	}
 	
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		float thirdHeight = height / 3;
 		float levelHeight = height / 12;
 

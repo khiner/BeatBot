@@ -36,7 +36,7 @@ public class ParamControl extends TouchableView {
 	}
 	
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		label.layout(this, 0, 0, width / 2, height);
 		valueLabel.layout(this, width / 2, 0, width / 2, height);
 	}

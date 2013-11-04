@@ -22,7 +22,7 @@ public class ControlButtonGroup extends TouchableView {
 	public ImageButton stopButton, undoButton, redoButton, deleteButton;
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 		playButton = new ToggleButton();
 		stopButton = new ImageButton();
 		recordButton = new ToggleButton();
@@ -141,7 +141,7 @@ public class ControlButtonGroup extends TouchableView {
 	}
 
 	@Override
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		playButton.setIcon(new Icon(IconResources.PLAY));
 		stopButton.setIcon(new Icon(IconResources.STOP));
 		recordButton.setIcon(new Icon(IconResources.RECORD));
@@ -154,7 +154,7 @@ public class ControlButtonGroup extends TouchableView {
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		// left-aligned buttons
 		playButton.layout(this, 0, 0, height, height);
 		stopButton.layout(this, height, 0, height, height);

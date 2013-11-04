@@ -41,14 +41,14 @@ public class EffectPage extends TouchableView {
 	}
 
 	@Override
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		toggleButton.setIcon(new Icon(IconResources.ON_OFF));
 		toggleButton.setBgIcon(new RoundedRectIcon(null,
 				Colors.labelBgColorSet, Colors.labelStrokeColorSet));
 	}
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 		paramsPager = new ViewPager();
 		level2d = new Seekbar2d();
 
@@ -83,7 +83,7 @@ public class EffectPage extends TouchableView {
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		toggleButton.layout(this, 5, 5, (width - height) - 10,
 				(width - height) / 5);
 		paramsPager.layout(this, 0, (width - height) / 5 + 5, width - height,

@@ -366,11 +366,11 @@ public class MidiView extends ClickableView {
 		TickWindowHelper.initVLineVbs();
 	}
 
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		// no icons
 	}
 
-	public void init() {
+	public synchronized void init() {
 		TickWindowHelper.init(this);
 		initAllVbs();
 	}

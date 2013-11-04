@@ -28,9 +28,7 @@ public class MainPage extends TouchableView {
 	public SlideMenu slideMenu;
 
 	private SlideTab tab;
-
 	private MenuButton menuButton;
-
 	private FloatBuffer foregroundRectBuffer;
 
 	private float[] foregroundColor = Colors.TRANSPARANT.clone();
@@ -65,7 +63,7 @@ public class MainPage extends TouchableView {
 	}
 
 	@Override
-	public void init() {
+	public synchronized void init() {
 		foregroundRectBuffer = makeRectFloatBuffer(0, 0, width, height);
 	}
 
@@ -76,12 +74,12 @@ public class MainPage extends TouchableView {
 	}
 
 	@Override
-	public void loadIcons() {
+	public synchronized void loadIcons() {
 		menuButton.setIcon(new Icon(IconResources.MENU));
 	}
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 		tab = new SlideTab(null, Colors.LABEL_SELECTED);
 
 		midiView = new MidiView();
@@ -103,7 +101,7 @@ public class MainPage extends TouchableView {
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		controlButtonHeight = height / 10;
 		float midiHeight = 3 * (height - controlButtonHeight) / 5;
 		MidiView.allTracksHeight = midiHeight - MidiView.Y_OFFSET;
@@ -122,10 +120,10 @@ public class MainPage extends TouchableView {
 		pageSelectGroup.layout(this, 0, controlButtonHeight + midiHeight,
 				width, height - midiHeight - controlButtonHeight);
 
-		slideMenu.layout(this, 0, 0, trackControlWidth + menuOffset * 2,
-				controlButtonHeight + menuOffset * 2);
-		tab.layout(0, 0, slideMenu.width, slideMenu.height);
-		menuButton.layout(this, 0, 0, slideMenu.height, slideMenu.height);
+		slideMenu
+				.layout(this, 0, 0, trackControlWidth + menuOffset * 2, height);
+		tab.layout(0, 0, slideMenu.width, controlButtonHeight + menuOffset * 2);
+		menuButton.layout(this, 0, 0, tab.height * 1.5f, tab.height);
 
 		setMenuPosition(0, 0);
 	}
@@ -139,12 +137,8 @@ public class MainPage extends TouchableView {
 		}
 	}
 
-	public View findChildAt(float x, float y) {
-		return super.findChildAt(x, y);
-	}
-
 	@Override
-	public void drawChildren() {
+	public synchronized void drawChildren() {
 		for (View child : children) {
 			if (!child.equals(slideMenu) && !child.equals(menuButton)) {
 				drawChild(child);
@@ -156,7 +150,7 @@ public class MainPage extends TouchableView {
 		drawChild(menuButton);
 	}
 
-	private void setMenuPosition(float x, float y) {
+	private synchronized void setMenuPosition(float x, float y) {
 		slideMenu.setPosition(Math.min(0, x - slideMenu.width), y + menuOffset
 				/ 2);
 		menuButton.setPosition(x + menuOffset * 2, y + menuOffset / 2);
@@ -202,7 +196,7 @@ public class MainPage extends TouchableView {
 		public void handleActionUp(int pointerId, float x, float y) {
 			snap(velocity);
 		}
-		
+
 		public void snap(float velocity) {
 			goalX = velocity >= 0 ? slideMenu.width : 0;
 			snap = true;

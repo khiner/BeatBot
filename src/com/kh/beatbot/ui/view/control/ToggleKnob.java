@@ -24,14 +24,14 @@ public class ToggleKnob extends Knob implements ParamToggleListener {
 		centerButton.draw();
 	}
 
-	protected void loadIcons() {
+	protected synchronized void loadIcons() {
 		super.loadIcons();
 		centerButton.setIcon(new Icon(IconResources.BEAT_SYNC));
 		centerButton.setChecked(true);
 	}
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 		super.createChildren();
 		centerButton = new ToggleButton();
 		centerButton.setOnReleaseListener(new OnReleaseListener() {
@@ -45,7 +45,7 @@ public class ToggleKnob extends Knob implements ParamToggleListener {
 	}
 
 	@Override
-	public void layoutChildren() {
+	public synchronized void layoutChildren() {
 		super.layoutChildren();
 		centerButton.layout(this, width / 16, width / 16, 7 * width / 8, 7 * width / 8);
 		snapDistSquared = (width / 4) * (width / 4);

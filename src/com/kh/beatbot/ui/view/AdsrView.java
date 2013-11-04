@@ -34,7 +34,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	}
 
 	@Override
-	public void init() {
+	public synchronized void init() {
 		initAdsrVb();
 	}
 
@@ -88,7 +88,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	}
 
 	@Override
-	protected void createChildren() {
+	protected synchronized void createChildren() {
 		initBgRect(null, Colors.VIEW_BG, Colors.VOLUME);
 	}
 	
