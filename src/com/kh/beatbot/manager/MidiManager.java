@@ -1,7 +1,5 @@
 package com.kh.beatbot.manager;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -369,42 +367,47 @@ public class MidiManager {
 		return copy;
 	}
 
-	public static void importFromFile(FileInputStream in) {
-		try {
-			MidiFile midiFile = new MidiFile(in);
-			ArrayList<MidiTrack> midiTracks = midiFile.getTracks();
-			tempoTrack = midiTracks.get(0);
-			ts = (TimeSignature) tempoTrack.getEvents().get(0);
-			tempo = (Tempo) tempoTrack.getEvents().get(1);
-			setNativeMSPT(tempo.getMpqn() / RESOLUTION);
-			ArrayList<MidiEvent> events = midiTracks.get(1).getEvents();
-			new MidiNotesDestroyEvent(getMidiNotes()).execute();
-			// midiEvents are ordered by tick, so on/off events don't
-			// necessarily
-			// alternate if there are interleaving notes (with different "notes"
-			// - pitches)
-			// thus, we need to keep track of notes that have an on event, but
-			// are waiting for the off event
-			ArrayList<NoteOn> unfinishedNotes = new ArrayList<NoteOn>();
-			for (int i = 0; i < events.size(); i++) {
-				if (events.get(i) instanceof NoteOn)
-					unfinishedNotes.add((NoteOn) events.get(i));
-				else if (events.get(i) instanceof NoteOff) {
-					NoteOff off = (NoteOff) events.get(i);
-					for (int j = 0; j < unfinishedNotes.size(); j++) {
-						NoteOn on = unfinishedNotes.get(j);
-						if (on.getNoteValue() == off.getNoteValue()) {
-							// TODO stoe all midi notes and then add them
-							// together in one event
-							addNote(on, off);
-							unfinishedNotes.remove(j);
-							break;
-						}
+	public static void importFromFile(MidiFile midiFile) {
+		List<MidiNote> newNotes = new ArrayList<MidiNote>();
+		ArrayList<MidiTrack> midiTracks = midiFile.getTracks();
+		tempoTrack = midiTracks.get(0);
+		ts = (TimeSignature) tempoTrack.getEvents().get(0);
+		tempo = (Tempo) tempoTrack.getEvents().get(1);
+		setNativeMSPT(tempo.getMpqn() / RESOLUTION);
+		ArrayList<MidiEvent> events = midiTracks.get(1).getEvents();
+		beginMidiEvent(null);
+		new MidiNotesDestroyEvent(getMidiNotes()).execute();
+		endMidiEvent();
+		// midiEvents are ordered by tick, so on/off events don't
+		// necessarily
+		// alternate if there are interleaving notes (with different "notes"
+		// - pitches)
+		// thus, we need to keep track of notes that have an on event, but
+		// are waiting for the off event
+		ArrayList<NoteOn> unfinishedNotes = new ArrayList<NoteOn>();
+		for (int i = 0; i < events.size(); i++) {
+			if (events.get(i) instanceof NoteOn)
+				unfinishedNotes.add((NoteOn) events.get(i));
+			else if (events.get(i) instanceof NoteOff) {
+				NoteOff off = (NoteOff) events.get(i);
+				for (int j = 0; j < unfinishedNotes.size(); j++) {
+					NoteOn on = unfinishedNotes.get(j);
+					if (on.getNoteValue() == off.getNoteValue()) {
+						// TODO store all midi notes and then add them
+						// together in one event
+						MidiNote note = new MidiNote(on, off);
+						newNotes.add(note);
+						unfinishedNotes.remove(j);
+						break;
 					}
 				}
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		}
+		
+		if (!newNotes.isEmpty()) {
+			beginMidiEvent(null);
+			new MidiNotesCreateEvent(newNotes).execute();
+			endMidiEvent();
 		}
 	}
 

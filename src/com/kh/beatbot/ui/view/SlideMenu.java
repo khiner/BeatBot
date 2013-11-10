@@ -65,6 +65,13 @@ public class SlideMenu extends TouchableView {
 			}
 		});
 
+		midiImportButton.setOnReleaseListener(new OnReleaseListener() {
+			@Override
+			public void onRelease(Button button) {
+				MidiFileManager.chooseMidiFile();
+			}
+		});
+
 		midiExportButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {

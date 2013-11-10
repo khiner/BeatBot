@@ -73,13 +73,12 @@ public class MidiTrack {
 		long totalTicks = 0;
 
 		while (true) {
-
 			VariableLengthInt delta = new VariableLengthInt(in);
 			totalTicks += delta.getValue();
 
-			MidiEvent E = MidiEvent
+			MidiEvent event = MidiEvent
 					.parseEvent(totalTicks, delta.getValue(), in);
-			if (E == null) {
+			if (event == null) {
 				System.out.println("Event skipped!");
 				continue;
 			}
@@ -87,11 +86,10 @@ public class MidiTrack {
 			// Not adding the EndOfTrack event here allows the track to be
 			// edited
 			// after being read in from file.
-			if (E.getClass().equals(EndOfTrack.class)) {
+			if (event.getClass().equals(EndOfTrack.class)) {
 				break;
 			}
-			mEvents.add(E);
-
+			mEvents.add(event);
 		}
 	}
 
