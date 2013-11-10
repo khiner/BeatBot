@@ -89,6 +89,10 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public synchronized void addChild(View child) {
+		if (children.contains(child)) {
+			return;
+		}
+
 		children.add(child);
 		if (initialized) {
 			child.initAll();

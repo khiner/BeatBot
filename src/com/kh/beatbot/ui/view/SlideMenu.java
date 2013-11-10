@@ -1,19 +1,17 @@
 package com.kh.beatbot.ui.view;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
@@ -21,149 +19,223 @@ import com.kh.beatbot.ui.view.page.Page;
 
 public class SlideMenu extends TouchableView {
 
-	private class MenuItemReleaseListener implements OnReleaseListener {
+	private class OnMidiItemReleaseListener implements OnReleaseListener {
+
 		@Override
 		public void onRelease(Button button) {
-			selectMenuItem((ToggleButton) button);
-			width = columnWidth * 3;
+			MidiFileManager.importMidi(button.getText());
+		}
+	}
+
+	private class MenuItem {
+		private MenuItem parent = null;
+		private ImageButton button;
+		private List<MenuItem> subMenuItems = new ArrayList<MenuItem>();
+
+		public MenuItem(final boolean toggle) {
+			final MenuItem menuItem = this;
+			button = toggle ? new ToggleButton() : new ImageButton();
+			button.setOnReleaseListener(new OnReleaseListener() {
+				@Override
+				public void onRelease(Button button) {
+					menuItem.onRelease(button);
+				}
+			});
+		}
+
+		public void onRelease(Button button) {
+			selectMenuItem(this);
+			layoutChildren();
+			adjustWidth();
 			Page.mainPage.notifyMenuExpanded();
+		}
+
+		public void addSubMenuItems(final MenuItem... subMenuItems) {
+			for (MenuItem menuItem : subMenuItems) {
+				this.subMenuItems.add(menuItem);
+				menuItem.parent = this;
+			}
+		}
+
+		public void layout(View parent, float x, float y, float width,
+				float height) {
+			button.layout(parent, x, y, width, height);
+			layoutSubMenuItems(parent);
+		}
+
+		public void layoutSubMenuItems(View parent) {
+			for (int i = 0; i < subMenuItems.size(); i++) {
+				subMenuItems.get(i).layout(parent, button.x + button.width,
+						offset + textHeight * i, columnWidth * 2 - offset,
+						textHeight);
+			}
+		}
+
+		public void loadIcons() {
+			for (MenuItem subMenuItem : subMenuItems) {
+				subMenuItem.button.setBgIcon(new RoundedRectIcon(null,
+						Colors.menuItemFillColorSet));
+				subMenuItem.button.setStrokeColor(Colors.BLACK);
+				subMenuItem.button.destroy(); // remove it from its ShapeGroup
+				subMenuItem.loadIcons();
+			}
+		}
+
+		public void setIcon(final Icon icon) {
+			button.setIcon(icon);
+		}
+
+		public void setText(final String text) {
+			button.setText(text);
+		}
+
+		public void setChecked(final boolean checked) {
+			if (button instanceof ToggleButton) {
+				((ToggleButton) button).setChecked(checked);
+			}
+		}
+
+		public boolean isChecked() {
+			if (button instanceof ToggleButton) {
+				return ((ToggleButton) button).isChecked();
+			}
+
+			return false;
+		}
+
+		public void remove() {
+			removeChild(button);
+			for (MenuItem child : subMenuItems) {
+				child.remove();
+			}
+		}
+
+		public void select() {
+			for (MenuItem sibling : getSiblings()) {
+				if (sibling.equals(this)) {
+					setChecked(true);
+					for (MenuItem subMenuItem : subMenuItems) {
+						addChild(subMenuItem.button);
+						if (subMenuItem.isChecked()) {
+							subMenuItem.select();
+						}
+					}
+				} else {
+					sibling.setChecked(false);
+					for (MenuItem nephew : sibling.subMenuItems) {
+						nephew.remove();
+					}
+				}
+			}
+
+			selectedItem = this;
+		}
+
+		private List<MenuItem> getSiblings() {
+			return parent == null ? topLevelItems : parent.subMenuItems;
 		}
 	}
 
 	private float offset = 0, columnWidth = 0, iconWidth, textHeight;
 
-	private ShapeGroup shapeGroup;
+	private MenuItem fileItem, settingsItem, snapToGridItem, midiImportItem,
+			midiExportItem, selectedItem = null;
 
-	private ToggleButton fileButton, settingsButton, snapToGridButton,
-			selectedMenuItem = null;
+	private List<MenuItem> topLevelItems;
 
-	private ImageButton midiImportButton, midiExportButton;
-
-	private Map<ToggleButton, List<ImageButton>> menuHeirarchy;
-
-	private MenuItemReleaseListener menuItemReleaseListener;
+	private OnMidiItemReleaseListener midiItemReleaseListener;
 
 	public synchronized void createChildren() {
-		menuItemReleaseListener = new MenuItemReleaseListener();
-		shapeGroup = new ShapeGroup();
+		topLevelItems = new ArrayList<MenuItem>();
+		midiItemReleaseListener = new OnMidiItemReleaseListener();
 
-		fileButton = new ToggleButton();
-		settingsButton = new ToggleButton();
-		snapToGridButton = new ToggleButton();
-		midiImportButton = new ImageButton();
-		midiExportButton = new ImageButton();
+		fileItem = new MenuItem(true);
+		settingsItem = new MenuItem(true);
+		snapToGridItem = new MenuItem(true);
+		midiImportItem = new MenuItem(true);
+		midiExportItem = new MenuItem(false);
 
-		menuHeirarchy = new HashMap<ToggleButton, List<ImageButton>>();
+		topLevelItems.add(fileItem);
+		topLevelItems.add(settingsItem);
 
-		fileButton.setOnReleaseListener(menuItemReleaseListener);
-		settingsButton.setOnReleaseListener(menuItemReleaseListener);
-
-		snapToGridButton.setOnReleaseListener(new OnReleaseListener() {
+		snapToGridItem.button.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				MidiManager.setSnapToGrid(snapToGridButton.isChecked());
+				MidiManager
+						.setSnapToGrid(((ToggleButton) snapToGridItem.button)
+								.isChecked());
 			}
 		});
 
-		midiImportButton.setOnReleaseListener(new OnReleaseListener() {
+		midiExportItem.button.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				MidiFileManager.chooseMidiFile();
-			}
-		});
-
-		midiExportButton.setOnReleaseListener(new OnReleaseListener() {
-			@Override
-			public void onRelease(Button button) {
+				midiExportItem.onRelease(button);
 				BeatBotActivity.mainActivity
 						.showDialog(BeatBotActivity.MIDI_FILE_NAME_EDIT_DIALOG_ID);
 			}
 		});
 
-		menuHeirarchy.put(fileButton,
-				Arrays.asList(midiImportButton, midiExportButton));
-		menuHeirarchy.put(settingsButton,
-				Arrays.asList((ImageButton) snapToGridButton));
+		fileItem.addSubMenuItems(midiImportItem, midiExportItem);
+		settingsItem.addSubMenuItems(snapToGridItem);
 
-		for (ToggleButton menuButton : menuHeirarchy.keySet()) {
-			addChild(menuButton);
+		for (MenuItem menuItem : topLevelItems) {
+			addChild(menuItem.button);
+		}
+
+		final String[] fileNames = DirectoryManager.midiDirectory.list();
+		for (String fileName : fileNames) {
+			MenuItem midiMenuItem = new MenuItem(false);
+			midiMenuItem.button.setOnReleaseListener(midiItemReleaseListener);
+			midiMenuItem.button.setText(fileName);
+			midiImportItem.addSubMenuItems(midiMenuItem);
 		}
 	}
 
 	public synchronized void loadIcons() {
 		columnWidth = width;
 		offset = width / 6;
-		fileButton.setIcon(new Icon(IconResources.FILE));
-		settingsButton.setIcon(new Icon(IconResources.SETTINGS));
+		fileItem.setIcon(new Icon(IconResources.FILE));
+		settingsItem.setIcon(new Icon(IconResources.SETTINGS));
 
-		snapToGridButton.setIcon(new Icon(IconResources.SNAP_TO_GRID));
-		snapToGridButton.setChecked(MidiManager.isSnapToGrid());
-		snapToGridButton.setText("SNAP-TO-GRID");
+		snapToGridItem.setIcon(new Icon(IconResources.SNAP_TO_GRID));
+		snapToGridItem.setChecked(MidiManager.isSnapToGrid());
+		snapToGridItem.setText("SNAP-TO-GRID");
 
-		midiImportButton.setIcon(new Icon(IconResources.MIDI_IMPORT));
-		midiExportButton.setIcon(new Icon(IconResources.MIDI_EXPORT));
-		midiImportButton.setText("IMPORT MIDI");
-		midiExportButton.setText("EXPORT MIDI");
+		midiImportItem.setIcon(new Icon(IconResources.MIDI_IMPORT));
+		midiExportItem.setIcon(new Icon(IconResources.MIDI_EXPORT));
+		midiImportItem.setText("IMPORT MIDI");
+		midiExportItem.setText("EXPORT MIDI");
 
-		for (ToggleButton menuButton : menuHeirarchy.keySet()) {
-			addChild(menuButton);
-			for (ImageButton subMenuButton : menuHeirarchy.get(menuButton)) {
-				subMenuButton.setBgIcon(new RoundedRectIcon(shapeGroup,
-						Colors.menuItemFillColorSet));
-				subMenuButton.setStrokeColor(Colors.BLACK);
-				subMenuButton.destroy(); // remove it from its ShapeGroup
-			}
+		for (MenuItem menuItem : topLevelItems) {
+			menuItem.loadIcons();
 		}
-
-	}
-
-	@Override
-	public synchronized void draw() {
-		shapeGroup.draw(this, -1);
 	}
 
 	public synchronized void layoutChildren() {
 		iconWidth = columnWidth - offset * 2;
 		textHeight = columnWidth / 4;
-		fileButton.layout(this, offset, 0, iconWidth, iconWidth);
-		settingsButton.layout(this, offset, iconWidth + offset, iconWidth,
+		fileItem.layout(this, offset, 0, iconWidth, iconWidth);
+		settingsItem.layout(this, offset, iconWidth + offset, iconWidth,
 				iconWidth);
-		if (selectedMenuItem != null) {
-			layoutSubMenuItems(selectedMenuItem);
-		}
 	}
 
-	private synchronized void selectMenuItem(ToggleButton menuItem) {
+	private synchronized void selectMenuItem(MenuItem menuItem) {
 		menuItem.setChecked(true);
 
-		if (menuItem.equals(selectedMenuItem))
-			return;
-
-		for (ToggleButton menuButton : menuHeirarchy.keySet()) {
-			if (!menuButton.equals(menuItem)) {
-				menuButton.setChecked(false);
-			}
-			for (ImageButton subMenuButton : menuHeirarchy.get(menuButton)) {
-				removeChild(subMenuButton);
-			}
+		if (!menuItem.equals(selectedItem)) {
+			menuItem.select();
 		}
-
-		for (ImageButton subMenuButton : menuHeirarchy.get(menuItem)) {
-			addChild(subMenuButton);
-			if (subMenuButton instanceof ToggleButton) {
-				((ToggleButton) subMenuButton)
-						.setChecked(((ToggleButton) subMenuButton).isChecked());
-			}
-		}
-		selectedMenuItem = menuItem;
 	}
 
-	private synchronized void layoutSubMenuItems(ToggleButton parentMenuItem) {
-		List<ImageButton> subMenuItems = menuHeirarchy.get(parentMenuItem);
-		for (int i = 0; i < subMenuItems.size(); i++) {
-			subMenuItems.get(i).layout(this, columnWidth,
-					offset + textHeight * i, columnWidth * 2 - offset,
-					textHeight);
+	// adjust width of this view to fit all children
+	private synchronized void adjustWidth() {
+		float maxX = 0;
+		for (View child : children) {
+			if (child.absoluteX + child.width > maxX) {
+				maxX = child.absoluteX + child.width;
+			}
 		}
+		width = maxX;
 	}
 }

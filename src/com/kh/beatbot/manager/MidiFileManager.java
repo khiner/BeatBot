@@ -19,8 +19,7 @@ public class MidiFileManager {
 
 	private static String inFileName, outFileName;
 
-	private static AlertDialog chooseFileAlert, confirmImportAlert,
-			fileExistsAlert;
+	private static AlertDialog confirmImportAlert, fileExistsAlert;
 
 	public static void init() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(
@@ -39,17 +38,6 @@ public class MidiFileManager {
 					}
 				});
 		fileExistsAlert = builder.create();
-
-		final String[] fileNames = DirectoryManager.midiDirectory.list();
-
-		builder = new AlertDialog.Builder(BeatBotActivity.mainActivity);
-		builder.setTitle("Choose MIDI File");
-		builder.setItems(fileNames, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				importMidi(fileNames[item]);
-			}
-		});
-		chooseFileAlert = builder.create();
 
 		builder = new AlertDialog.Builder(BeatBotActivity.mainActivity);
 		builder.setMessage(
@@ -70,10 +58,6 @@ public class MidiFileManager {
 		confirmImportAlert = builder.create();
 	}
 
-	public static void chooseMidiFile() {
-		chooseFileAlert.show();
-	}
-
 	public static void exportMidi(String fileName) {
 		outFileName = fileName;
 		if (!new File(getFullPathName(fileName)).exists()) {
@@ -84,7 +68,7 @@ public class MidiFileManager {
 		}
 	}
 
-	private static void importMidi(String fileName) {
+	public static void importMidi(String fileName) {
 		inFileName = fileName;
 		if (MidiManager.getMidiNotes().isEmpty()) {
 			completeImport();
