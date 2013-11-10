@@ -14,6 +14,7 @@ public class Directory {
 	protected IconResource iconResource = null;
 	protected List<Directory> children = new ArrayList<Directory>();
 	protected Directory parent = null;
+	protected File file = null;
 
 	public Directory(Directory parent, String name, IconResource iconResource) {
 		this.parent = parent;
@@ -25,7 +26,8 @@ public class Directory {
 			path = parent.path + name + "/";
 			parent.addChild(this);
 		}
-		new File(path).mkdirs();
+		file = new File(path);
+		file.mkdirs();
 	}
 
 	public String getPath() {
@@ -67,6 +69,10 @@ public class Directory {
 		return children;
 	}
 
+	public String[] list() {
+		return file.list();
+	}
+
 	public String[] getChildNames() {
 		String[] names = new String[children.size()];
 		for (int i = 0; i < names.length; i++) {
@@ -91,7 +97,7 @@ public class Directory {
 	}
 
 	public void clearTempFiles() {
-		for (File sampleFile : new File(path).listFiles()) {
+		for (File sampleFile : file.listFiles()) {
 			if (sampleFile.getAbsolutePath().contains(".raw")) {
 				sampleFile.delete();
 			}

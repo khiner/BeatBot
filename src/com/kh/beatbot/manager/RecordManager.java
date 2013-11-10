@@ -32,9 +32,6 @@ public class RecordManager implements ParamListener {
 
 	private static String currRecordFileName = null;
 
-	private static String bbRecordDirectory = DirectoryManager
-			.getBeatRecordPath();
-
 	private static ThresholdBarView thresholdBar;
 
 	private static int bufferSize = AudioRecord.getMinBufferSize(
@@ -81,7 +78,7 @@ public class RecordManager implements ParamListener {
 	}
 
 	private static void updateFileNames() {
-		currRecordFileName = bbRecordDirectory + "R" + (currSampleNum++)
+		currRecordFileName = DirectoryManager.beatRecordDirectory.getPath() + "R" + (currSampleNum++)
 				+ ".wav";
 	}
 

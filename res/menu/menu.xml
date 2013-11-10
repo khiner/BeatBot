@@ -23,13 +23,4 @@
                 android:title="@string/thirty_second_note"/>
         </menu>
     </item>
-    <item
-        android:id="@+id/midi_menu_item"
-        android:icon="@drawable/midi"
-        android:title="@string/import_export_midi" />
-    <item
-        android:id="@+id/save_wav"
-        android:icon="@drawable/wav"
-        android:title="@string/save_wav"/>
-
 </menu>

@@ -1,47 +1,37 @@
-package com.kh.beatbot.activity;
+package com.kh.beatbot.manager;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.os.Bundle;
-import android.os.Environment;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
-import com.kh.beatbot.GeneralUtils;
-import com.kh.beatbot.R;
-import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.activity.BeatBotActivity;
+import com.kh.beatbot.midi.MidiFile;
+import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.midi.MidiTrack;
 
-public class MidiFileMenuActivity extends Activity {
-	private static final String SAVE_FOLDER = "BeatBot/MIDI";
-	private String baseFilePath = null;
-	File outFile;
-	FileInputStream inFile;
-	String[] fileNames;
-	AlertDialog fileExistsAlert;
-	AlertDialog fileNotExistsAlert;
-	AlertDialog chooseFileAlert;
-	AlertDialog confirmImportAlert;
+public class MidiFileManager {
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		GeneralUtils.initAndroidSettings(this);
-		setContentView(R.layout.midi_menu);
+	private static File outFile;
+	private static FileInputStream inFile;
+	private static AlertDialog fileNotExistsAlert, chooseFileAlert,
+			confirmImportAlert, fileExistsAlert;
 
-		baseFilePath = createBasePath();
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	public static void init() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(
+				BeatBotActivity.mainActivity);
 		builder.setMessage("The file exists. Would you like to overwrite it?")
 				.setCancelable(false)
 				.setPositiveButton("Yes",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								MidiManager.writeToFile(outFile);
+								writeToFile(outFile);
 							}
 						})
 				.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -51,7 +41,7 @@ public class MidiFileMenuActivity extends Activity {
 				});
 		fileExistsAlert = builder.create();
 
-		builder = new AlertDialog.Builder(this);
+		builder = new AlertDialog.Builder(BeatBotActivity.mainActivity);
 		builder.setMessage("Sorry, but the chosen file does not exist.")
 				.setCancelable(false)
 				.setNeutralButton("Okay",
@@ -62,24 +52,21 @@ public class MidiFileMenuActivity extends Activity {
 						});
 		fileNotExistsAlert = builder.create();
 
-		File[] files = new File(baseFilePath).listFiles();
-		fileNames = new String[files.length];
-		for (int i = 0; i < files.length; i++) {
-			fileNames[i] = files[i].getName();
-		}
-
-		builder = new AlertDialog.Builder(this);
+		final String[] fileNames = DirectoryManager.midiDirectory.list();
+		
+		builder = new AlertDialog.Builder(BeatBotActivity.mainActivity);
 		builder.setTitle("Choose MIDI File");
 		builder.setItems(fileNames, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
-				Toast.makeText(getApplicationContext(), fileNames[item],
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(
+						BeatBotActivity.mainActivity.getApplicationContext(),
+						fileNames[item], Toast.LENGTH_SHORT).show();
 				importMidiFile(fileNames[item]);
 			}
 		});
 		chooseFileAlert = builder.create();
 
-		builder = new AlertDialog.Builder(this);
+		builder = new AlertDialog.Builder(BeatBotActivity.mainActivity);
 		builder.setMessage(
 				"Are you sure you want to import this MIDI file? "
 						+ "Your current project will be lost.")
@@ -98,29 +85,23 @@ public class MidiFileMenuActivity extends Activity {
 		confirmImportAlert = builder.create();
 	}
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-	}
-
-	public void saveMidi(View view) {
-		EditText editText = (EditText) findViewById(R.id.filePathEdit);
-		String fullPathName = getFullPathName(editText.getText().toString());
+	public static void exportMidi(String midiFileName) {
+		String fullPathName = getFullPathName(midiFileName);
 		outFile = new File(fullPathName);
-		if (!outFile.exists())
-			MidiManager.writeToFile(outFile);
-		else {
+		if (!outFile.exists()) {
+			writeToFile(outFile);
+		} else {
 			// file exists - popup dialog confirming overwrite of existing file
 			fileExistsAlert.show();
 		}
 	}
 
-	public void openMidi(View view) {
+	public static void chooseMidiFile() {
 		chooseFileAlert.show();
 	}
 
-	private void importMidiFile(String fileName) {
-		String fullPath = baseFilePath + "/" + fileName;
+	private static void importMidiFile(String fileName) {
+		String fullPath = DirectoryManager.midiDirectory.getPath() + "/" + fileName;
 		try {
 			inFile = new FileInputStream(fullPath);
 			if (MidiManager.getMidiNotes().isEmpty()) {
@@ -135,18 +116,30 @@ public class MidiFileMenuActivity extends Activity {
 		}
 	}
 
-	private String createBasePath() {
-		String filepath = Environment.getExternalStorageDirectory().getPath();
-		File file = new File(filepath, SAVE_FOLDER);
-
-		if (!file.exists()) {
-			file.mkdirs();
+	private static String getFullPathName(String fileName) {
+		return DirectoryManager.midiDirectory.getPath() + "/" + fileName + ".MIDI";
+	}
+	
+	private static void writeToFile(File outFile) {
+		// 3. Create a MidiFile with the tracks we created
+		ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
+		midiTracks.add(MidiManager.getTempoTrack());
+		midiTracks.add(new MidiTrack());
+		for (MidiNote midiNote : MidiManager.getMidiNotes()) {
+			midiTracks.get(1).insertEvent(midiNote.getOnEvent());
+			midiTracks.get(1).insertEvent(midiNote.getOffEvent());
 		}
+		Collections.sort(midiTracks.get(1).getEvents());
+		midiTracks.get(1).recalculateDeltas();
 
-		return file.getAbsolutePath();
+		MidiFile midi = new MidiFile(MidiManager.RESOLUTION, midiTracks);
+
+		// 4. Write the MIDI data to a file
+		try {
+			midi.writeToFile(outFile);
+		} catch (IOException e) {
+			System.err.println(e);
+		}
 	}
 
-	private String getFullPathName(String fileName) {
-		return baseFilePath + "/" + fileName + ".MIDI";
-	}
 }

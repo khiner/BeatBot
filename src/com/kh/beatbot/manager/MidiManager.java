@@ -1,10 +1,8 @@
 package com.kh.beatbot.manager;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import android.util.Log;
@@ -36,8 +34,8 @@ public class MidiManager {
 			RESOLUTION = MidiFile.DEFAULT_RESOLUTION, UNDO_STACK_SIZE = 40;
 
 	public static final long TICKS_IN_ONE_MEASURE = RESOLUTION * 4;
-	public static final float MIN_TICKS = TICKS_IN_ONE_MEASURE / 8;
-	public static final float MAX_TICKS = TICKS_IN_ONE_MEASURE * 4;
+	public static final float MIN_TICKS = TICKS_IN_ONE_MEASURE / 8,
+			MAX_TICKS = TICKS_IN_ONE_MEASURE * 4;
 
 	public static float currBeatDivision;
 
@@ -73,6 +71,10 @@ public class MidiManager {
 		MidiManager.snapToGrid = snapToGrid;
 	}
 
+	public static MidiTrack getTempoTrack() {
+		return tempoTrack;
+	}
+
 	public static float getBPM() {
 		return tempo.getBpm();
 	}
@@ -88,7 +90,8 @@ public class MidiManager {
 
 	public static synchronized void beginMidiEvent(Track track) {
 		endMidiEvent();
-		currNoteEvent = track == null ? new MidiNotesGroupEvent() : new MidiNotesLevelsSetEvent(track);
+		currNoteEvent = track == null ? new MidiNotesGroupEvent()
+				: new MidiNotesLevelsSetEvent(track);
 		currNoteEvent.begin();
 		currLoopWindowEvent = new LoopWindowSetEvent();
 		currLoopWindowEvent.begin();
@@ -364,28 +367,6 @@ public class MidiManager {
 			}
 		}
 		return copy;
-	}
-
-	public static void writeToFile(File outFile) {
-		// 3. Create a MidiFile with the tracks we created
-		ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
-		midiTracks.add(tempoTrack);
-		midiTracks.add(new MidiTrack());
-		for (MidiNote midiNote : getMidiNotes()) {
-			midiTracks.get(1).insertEvent(midiNote.getOnEvent());
-			midiTracks.get(1).insertEvent(midiNote.getOffEvent());
-		}
-		Collections.sort(midiTracks.get(1).getEvents());
-		midiTracks.get(1).recalculateDeltas();
-
-		MidiFile midi = new MidiFile(RESOLUTION, midiTracks);
-
-		// 4. Write the MIDI data to a file
-		try {
-			midi.writeToFile(outFile);
-		} catch (IOException e) {
-			System.err.println(e);
-		}
 	}
 
 	public static void importFromFile(FileInputStream in) {

@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
@@ -13,6 +15,7 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.control.Button;
+import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.page.Page;
 
@@ -32,9 +35,11 @@ public class SlideMenu extends TouchableView {
 	private ShapeGroup shapeGroup;
 
 	private ToggleButton fileButton, settingsButton, snapToGridButton,
-			midiImportButton, midiExportButton, selectedMenuItem = null;
+			selectedMenuItem = null;
 
-	private Map<ToggleButton, List<ToggleButton>> menuHeirarchy;
+	private ImageButton midiImportButton, midiExportButton;
+
+	private Map<ToggleButton, List<ImageButton>> menuHeirarchy;
 
 	private MenuItemReleaseListener menuItemReleaseListener;
 
@@ -45,10 +50,10 @@ public class SlideMenu extends TouchableView {
 		fileButton = new ToggleButton();
 		settingsButton = new ToggleButton();
 		snapToGridButton = new ToggleButton();
-		midiImportButton = new ToggleButton();
-		midiExportButton = new ToggleButton();
+		midiImportButton = new ImageButton();
+		midiExportButton = new ImageButton();
 
-		menuHeirarchy = new HashMap<ToggleButton, List<ToggleButton>>();
+		menuHeirarchy = new HashMap<ToggleButton, List<ImageButton>>();
 
 		fileButton.setOnReleaseListener(menuItemReleaseListener);
 		settingsButton.setOnReleaseListener(menuItemReleaseListener);
@@ -60,9 +65,18 @@ public class SlideMenu extends TouchableView {
 			}
 		});
 
+		midiExportButton.setOnReleaseListener(new OnReleaseListener() {
+			@Override
+			public void onRelease(Button button) {
+				BeatBotActivity.mainActivity
+						.showDialog(BeatBotActivity.MIDI_FILE_NAME_EDIT_DIALOG_ID);
+			}
+		});
+
 		menuHeirarchy.put(fileButton,
 				Arrays.asList(midiImportButton, midiExportButton));
-		menuHeirarchy.put(settingsButton, Arrays.asList(snapToGridButton));
+		menuHeirarchy.put(settingsButton,
+				Arrays.asList((ImageButton) snapToGridButton));
 
 		for (ToggleButton menuButton : menuHeirarchy.keySet()) {
 			addChild(menuButton);
@@ -86,7 +100,7 @@ public class SlideMenu extends TouchableView {
 
 		for (ToggleButton menuButton : menuHeirarchy.keySet()) {
 			addChild(menuButton);
-			for (ToggleButton subMenuButton : menuHeirarchy.get(menuButton)) {
+			for (ImageButton subMenuButton : menuHeirarchy.get(menuButton)) {
 				subMenuButton.setBgIcon(new RoundedRectIcon(shapeGroup,
 						Colors.menuItemFillColorSet));
 				subMenuButton.setStrokeColor(Colors.BLACK);
@@ -122,20 +136,23 @@ public class SlideMenu extends TouchableView {
 			if (!menuButton.equals(menuItem)) {
 				menuButton.setChecked(false);
 			}
-			for (ToggleButton subMenuButton : menuHeirarchy.get(menuButton)) {
+			for (ImageButton subMenuButton : menuHeirarchy.get(menuButton)) {
 				removeChild(subMenuButton);
 			}
 		}
 
-		for (ToggleButton subMenuButton : menuHeirarchy.get(menuItem)) {
+		for (ImageButton subMenuButton : menuHeirarchy.get(menuItem)) {
 			addChild(subMenuButton);
-			subMenuButton.setChecked(subMenuButton.isChecked());
+			if (subMenuButton instanceof ToggleButton) {
+				((ToggleButton) subMenuButton)
+						.setChecked(((ToggleButton) subMenuButton).isChecked());
+			}
 		}
 		selectedMenuItem = menuItem;
 	}
 
 	private synchronized void layoutSubMenuItems(ToggleButton parentMenuItem) {
-		List<ToggleButton> subMenuItems = menuHeirarchy.get(parentMenuItem);
+		List<ImageButton> subMenuItems = menuHeirarchy.get(parentMenuItem);
 		for (int i = 0; i < subMenuItems.size(); i++) {
 			subMenuItems.get(i).layout(this, columnWidth,
 					offset + textHeight * i, columnWidth * 2 - offset,

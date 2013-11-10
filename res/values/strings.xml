@@ -20,11 +20,6 @@
 	<string name="eighth_note">1/8</string>
 	<string name="sixteenth_note">1/16</string>
 	<string name="thirty_second_note">1/32</string>
-	<string name="save">Save</string>
-	<string name="save_midi">Save MIDI</string>
-	<string name="open_midi">Open MIDI</string>
-	<string name="save_wav">Export as WAV</string>
-	<string name="import_export_midi">Import/Export as MIDI</string>
 	<string-array name="sample_types">
 		<item name="kick">Kick</item>
 		<item name="snare">Snare</item>

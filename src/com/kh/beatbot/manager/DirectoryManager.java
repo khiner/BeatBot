@@ -155,7 +155,7 @@ public class DirectoryManager {
 	private static AlertDialog instrumentSelectAlert = null;
 	private static ListAdapter instrumentSelectAdapter = null;
 
-	private static Directory audioDirectory, recordDirectory,
+	public static Directory audioDirectory, midiDirectory, recordDirectory,
 			beatRecordDirectory, sampleRecordDirectory, drumsDirectory,
 			currDirectory = null;
 
@@ -164,6 +164,7 @@ public class DirectoryManager {
 	public static void init() {
 		initDataDir();
 		audioDirectory = new Directory(null, "audio", null);
+		midiDirectory = new Directory(null, "midi", null);
 		drumsDirectory = new Directory(audioDirectory, "drums", null);
 		recordDirectory = new Directory(audioDirectory, "recorded", null);
 		sampleRecordDirectory = new Instrument(recordDirectory, "samples", null);
@@ -204,14 +205,6 @@ public class DirectoryManager {
 
 	public static Instrument getDrumInstrument(int drumNum) {
 		return (Instrument) drumsDirectory.getChild(drumNum);
-	}
-
-	public static String getAudioPath() {
-		return audioDirectory.getPath();
-	}
-
-	public static String getBeatRecordPath() {
-		return beatRecordDirectory.getPath();
 	}
 
 	public static void clearTempFiles() {

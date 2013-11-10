@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.method.DigitsKeyListener;
@@ -20,6 +19,7 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.event.SampleRenameEvent;
 import com.kh.beatbot.manager.DirectoryManager;
+import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.TrackManager;
@@ -34,12 +34,12 @@ import com.kh.beatbot.ui.view.page.effect.EffectPage;
 public class BeatBotActivity extends Activity {
 
 	public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1,
-			SAMPLE_NAME_EDIT_DIALOG_ID = 2;
+			SAMPLE_NAME_EDIT_DIALOG_ID = 2, MIDI_FILE_NAME_EDIT_DIALOG_ID = 3;
 
 	private static final int MAIN_PAGE_NUM = 0, EFFECT_PAGE_NUM = 1;
 
 	private static ViewPager activityPager;
-	private static EditText bpmInput, sampleNameInput;
+	private static EditText bpmInput, midiFileNameInput, sampleNameInput;
 
 	public static BeatBotActivity mainActivity;
 
@@ -83,6 +83,7 @@ public class BeatBotActivity extends Activity {
 
 		TrackManager.init();
 		MidiManager.init();
+		MidiFileManager.init();
 	}
 
 	@Override
@@ -136,6 +137,8 @@ public class BeatBotActivity extends Activity {
 		case SAMPLE_NAME_EDIT_DIALOG_ID:
 			sampleNameInput.setText(TrackManager.currTrack.getCurrSampleName());
 			break;
+		case MIDI_FILE_NAME_EDIT_DIALOG_ID:
+
 		case EXIT_DIALOG_ID:
 			break;
 		}
@@ -202,6 +205,30 @@ public class BeatBotActivity extends Activity {
 								}
 							});
 			break;
+		case MIDI_FILE_NAME_EDIT_DIALOG_ID:
+			midiFileNameInput = new EditText(this);
+
+			builder.setTitle("Save MIDI as:")
+					.setView(midiFileNameInput)
+					.setPositiveButton("OK",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									String midiFileName = midiFileNameInput
+											.getText().toString();
+									MidiFileManager.exportMidi(midiFileName);
+								}
+							})
+					.setNegativeButton("Cancel",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dialog.cancel();
+								}
+							});
+			break;
 		case EXIT_DIALOG_ID:
 			builder.setIcon(android.R.drawable.ic_dialog_alert)
 					.setTitle("Closing " + getString(R.string.app_name))
@@ -222,6 +249,7 @@ public class BeatBotActivity extends Activity {
 							}).setNegativeButton("No", null);
 			break;
 		}
+
 		return builder.create();
 	}
 
@@ -229,8 +257,6 @@ public class BeatBotActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
-		Intent midiFileMenuIntent = new Intent(this, MidiFileMenuActivity.class);
-		menu.findItem(R.id.midi_menu_item).setIntent(midiFileMenuIntent);
 		return true;
 	}
 
@@ -251,10 +277,6 @@ public class BeatBotActivity extends Activity {
 		case R.id.quantize_thirty_second:
 			MidiManager.quantize(8);
 			return true;
-		case R.id.save_wav:
-			return true;
-			// midi import/export menu item is handled as an intent -
-			// MidiFileMenuActivity.class
 		default:
 			return super.onOptionsItemSelected(item);
 		}

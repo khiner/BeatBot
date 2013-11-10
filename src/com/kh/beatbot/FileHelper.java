@@ -14,9 +14,9 @@ import com.kh.beatbot.manager.DirectoryManager;
 public class FileHelper {
 
 	private static AssetManager assetManager;
-	
+
 	private static byte[] copyBuffer = new byte[1024];
-	
+
 	private static void copyFile(InputStream in, OutputStream out)
 			throws IOException {
 		int read;
@@ -45,7 +45,7 @@ public class FileHelper {
 
 		try {
 			String assetPath = newDirectoryPath.replace(
-					DirectoryManager.getAudioPath(), "");
+					DirectoryManager.audioDirectory.getPath(), "");
 			assetPath = assetPath.substring(0, assetPath.length() - 1);
 			for (String filePath : assetManager.list(assetPath)) {
 				// copy audio file exactly from assets to sdcard
