@@ -20,7 +20,6 @@ import com.kh.beatbot.ui.view.page.Page;
 public class SlideMenu extends TouchableView {
 
 	private class OnMidiItemReleaseListener implements OnReleaseListener {
-
 		@Override
 		public void onRelease(Button button) {
 			MidiFileManager.importMidi(button.getText());
@@ -74,7 +73,7 @@ public class SlideMenu extends TouchableView {
 		public void loadIcons() {
 			for (MenuItem subMenuItem : subMenuItems) {
 				subMenuItem.button.setBgIcon(new RoundedRectIcon(null,
-						Colors.menuItemFillColorSet));
+						Colors.menuItemFillColorSet, null));
 				subMenuItem.button.setStrokeColor(Colors.BLACK);
 				subMenuItem.button.destroy(); // remove it from its ShapeGroup
 				subMenuItem.loadIcons();

@@ -34,68 +34,85 @@ public class MeshGroup {
 		if (children.isEmpty()) {
 			return;
 		}
-	
+
 		if (dirty) {
 			updateBuffers();
 			dirty = false;
 		}
-		
+
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
 		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, 0);
 
 		gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
-		
+
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, colorHandle);
 		gl.glColorPointer(4, GL10.GL_FLOAT, 0, 0);
 
 		gl.glDrawArrays(primitiveType, 0, numVertices);
-		
+
 		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
 	}
-	
+
 	public synchronized boolean contains(Mesh2D mesh) {
 		return children.contains(mesh);
 	}
-	
+
 	public synchronized void add(Mesh2D mesh) {
+		if (mesh == null) {
+			return;
+		}
 		children.add(mesh);
 		updateVertices();
 	}
 
 	public synchronized void remove(Mesh2D mesh) {
-		if (!children.contains(mesh)) {
-			Log.e("MeshGroup", "Attempting to remove a mesh that is not a child.");
+		if (mesh == null) {
+			return;
+		} else if (!children.contains(mesh)) {
+			Log.e("MeshGroup",
+					"Attempting to remove a mesh that is not a child.");
+			return;
+		} else {
+			children.remove(mesh);
+			updateVertices();
+		}
+	}
+
+	public synchronized void replace(Mesh2D oldMesh, Mesh2D newMesh) {
+		if (newMesh == null) {
+			remove(oldMesh);
 			return;
 		}
-		children.remove(mesh);
-		updateVertices();
-	}
-	
-	public synchronized void replace(Mesh2D oldMesh, Mesh2D newMesh) {
+		if (oldMesh == null) {
+			add(newMesh);
+			return;
+		}
 		if (oldMesh.getNumVertices() != newMesh.getNumVertices()) {
-			Log.e("MeshGroup", "Attempting to replace a mesh with a new one with different num vertices");
+			Log.e("MeshGroup",
+					"Attempting to replace a mesh with a new one with different num vertices");
 			return;
 		}
 		if (!children.contains(oldMesh)) {
-			Log.e("MeshGroup", "Attempting to update a mesh that is not a child.");
+			Log.e("MeshGroup",
+					"Attempting to update a mesh that is not a child.");
 			return;
 		}
-		
+
 		newMesh.parentVertexIndex = oldMesh.parentVertexIndex;
 		children.set(children.indexOf(oldMesh), newMesh);
 		updateVertices(newMesh);
 	}
-	
+
 	private synchronized void updateVertices() {
 		numVertices = calcNumVertices();
-		
+
 		vertices = new float[numVertices * 2];
 		vertexBuffer = FloatBuffer.wrap(vertices);
-		
+
 		colors = new float[numVertices * 4];
 		colorBuffer = FloatBuffer.wrap(colors);
-		
+
 		int currVertexIndex = 0;
 		for (Mesh2D child : children) {
 			child.parentVertexIndex = currVertexIndex;
@@ -103,10 +120,13 @@ public class MeshGroup {
 			currVertexIndex += child.getNumVertices();
 		}
 	}
-	
+
 	public synchronized void updateVertices(Mesh2D child) {
-		if (!children.contains(child)) {
-			Log.e("MeshGroup", "Attempting to update a mesh that is not a child.");
+		if (child == null) {
+			return;
+		} else if (!children.contains(child)) {
+			Log.e("MeshGroup",
+					"Attempting to update a mesh that is not a child.");
 			return;
 		}
 		dirty = true;
@@ -114,52 +134,52 @@ public class MeshGroup {
 		for (float vertex : child.vertices) {
 			vertices[vertexIndex++] = vertex;
 		}
-		
+
 		int colorIndex = child.parentVertexIndex * 4;
 		for (float colorValue : child.colors) {
 			colors[colorIndex++] = colorValue;
 		}
 	}
-	
+
 	public synchronized void clear() {
 		children.clear();
 		updateVertices();
 	}
-	
+
 	private synchronized void updateBuffers() {
 		initHandles();
-		
+
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
 		gl.glBufferData(GL11.GL_ARRAY_BUFFER, vertices.length * 4,
 				vertexBuffer, GL11.GL_DYNAMIC_DRAW);
-		
+
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, colorHandle);
-		gl.glBufferData(GL11.GL_ARRAY_BUFFER, colors.length * 4,
-				colorBuffer, GL11.GL_DYNAMIC_DRAW);
-		
+		gl.glBufferData(GL11.GL_ARRAY_BUFFER, colors.length * 4, colorBuffer,
+				GL11.GL_DYNAMIC_DRAW);
+
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
 	}
-	
+
 	private void initHandles() {
 		gl = View.gl;
 		if (vertexHandle != -1 && colorHandle != -1) {
 			return; // already initialized
 		}
 		int[] buffer = new int[1];
-		
+
 		gl.glGenBuffers(1, buffer, 0);
 		vertexHandle = buffer[0];
-		
+
 		gl.glGenBuffers(1, buffer, 0);
 		colorHandle = buffer[0];
 	}
-	
+
 	private int calcNumVertices() {
 		int totalVertices = 0;
 		for (Mesh2D child : children) {
 			totalVertices += child.getNumVertices();
 		}
-		
+
 		return totalVertices;
 	}
 }

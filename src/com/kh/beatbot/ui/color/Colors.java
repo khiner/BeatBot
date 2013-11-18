@@ -95,28 +95,28 @@ public class Colors {
 				LABEL_VERY_LIGHT, VOLUME_LIGHT);
 		effectLabelTouchedStrokeColorSet = new ColorSet(WHITE, WHITE, WHITE);
 
-		muteButtonColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED,
+		muteButtonColorSet = new ColorSet(null, LABEL_SELECTED,
 				LEVEL_SELECTED);
-		soloButtonColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, PITCH);
+		soloButtonColorSet = new ColorSet(null, LABEL_SELECTED, PITCH);
 
-		instrumentBgColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, VOLUME);
+		instrumentBgColorSet = new ColorSet(null, LABEL_SELECTED, VOLUME);
 
-		panBgColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, PAN);
-		pitchBgColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, PITCH);
-		volumeBgColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED, VOLUME);
+		panBgColorSet = new ColorSet(null, LABEL_SELECTED, PAN);
+		pitchBgColorSet = new ColorSet(null, LABEL_SELECTED, PITCH);
+		volumeBgColorSet = new ColorSet(null, LABEL_SELECTED, VOLUME);
 
 		panStrokeColorSet = new ColorSet(PAN, PAN, WHITE);
 		pitchStrokeColorSet = new ColorSet(PITCH, PITCH, WHITE);
 		volumeStrokeColorSet = new ColorSet(VOLUME, VOLUME, WHITE);
 
-		iconFillColorSet = new ColorSet(TRANSPARANT, LABEL_SELECTED);
+		iconFillColorSet = new ColorSet(null, LABEL_SELECTED);
 
-		deleteFillColorSet = new ColorSet(TRANSPARANT, RED);
+		deleteFillColorSet = new ColorSet(null, RED);
 		deleteStrokeColorSet = new ColorSet(RED, BLACK);
 
 		defaultStrokeColorSet = new ColorSet(VOLUME, VOLUME, VOLUME);
 		
-		menuItemFillColorSet = new ColorSet(TRANSPARANT, LABEL_LIGHT, VOLUME);
+		menuItemFillColorSet = new ColorSet(null, LABEL_LIGHT, VOLUME);
 	}
 
 	public static float[] colorResourceToFloats(Activity activity,

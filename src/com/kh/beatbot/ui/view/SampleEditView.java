@@ -8,6 +8,7 @@ import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.WaveformShape;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
 
@@ -90,7 +91,8 @@ public class SampleEditView extends ControlView2dBase {
 
 	private void drawCurrSampleLine() {
 		push();
-		float level = params[0].getViewLevel(TrackManager.currTrack.getCurrentSampleIndex());
+		float level = params[0].getViewLevel(TrackManager.currTrack
+				.getCurrentSampleIndex());
 		float x = levelToX(level);
 		translate(x, 0);
 		drawLines(currSampleLineVb, Colors.LABEL_SELECTED, 4, GL10.GL_LINES);
@@ -98,8 +100,8 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	public void layout(View parent, float x, float y, float width, float height) {
-		waveformShape = new WaveformShape(null, Colors.SAMPLE_LOOP_HIGHLIGHT,
-				Colors.VOLUME, width);
+		waveformShape = Shape.createWaveform(null, width,
+				Colors.SAMPLE_LOOP_HIGHLIGHT, Colors.VOLUME);
 		waveformWidth = width - SNAP_DIST;
 		super.layout(parent, x, y, width, height);
 	}

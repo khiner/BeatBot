@@ -1,58 +1,87 @@
 package com.kh.beatbot.ui;
 
 import com.kh.beatbot.ui.color.ColorSet;
+import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public abstract class ShapeIcon extends Icon {
 
-	private Shape prevShape;
 	protected ShapeGroup shapeGroup;
 	protected boolean shouldDraw;
 
-	public ShapeIcon(ShapeGroup shapeGroup, ColorSet bgColorSet) {
-		this(shapeGroup, bgColorSet, null);
+	protected ShapeIcon(ShapeGroup shapeGroup, Shape.Type type,
+			ColorSet bgColorSet) {
+		this(shapeGroup, type, bgColorSet, null);
 	}
 
-	public ShapeIcon(ShapeGroup shapeGroup, ColorSet bgColorSet,
-			ColorSet borderColorSet) {
+	protected ShapeIcon(ShapeGroup shapeGroup, Shape.Type type,
+			ColorSet bgColorSet, ColorSet strokeColorSet) {
 		// if there is already a global group, then it will be drawn elsewhere.
 		// otherwise, we create a new group to share amongst all icons
 		shouldDraw = (shapeGroup == null);
 		this.shapeGroup = shouldDraw ? new ShapeGroup() : shapeGroup;
+		this.shapeGroup.setStrokeWeight(1);
+		Shape defaultShape = Shape.get(type, this.shapeGroup,
+				bgColorSet == null ? null : bgColorSet.defaultColor,
+				strokeColorSet == null ? null : strokeColorSet.defaultColor);
+
+		Shape pressedShape = Shape.get(type, this.shapeGroup,
+				bgColorSet == null ? null : bgColorSet.pressedColor,
+				strokeColorSet == null ? null : strokeColorSet.pressedColor);
+
+		Shape selectedShape = Shape.get(type, this.shapeGroup,
+				bgColorSet == null ? null : bgColorSet.selectedColor,
+				strokeColorSet == null ? null : strokeColorSet.selectedColor);
+
+		this.resource = new IconResource(defaultShape, pressedShape,
+				selectedShape, null, null, null);
+		setState(IconResource.State.DEFAULT);
 	}
 
 	@Override
 	public void draw() {
 		if (shouldDraw) {
-			shapeGroup.draw(1);
+			shapeGroup.draw();
 		}
 	}
 
 	@Override
 	protected void setDrawable(Drawable icon) {
-		prevShape = (Shape) currentDrawable;
+		Shape prevShape = (Shape) currentDrawable;
 		super.setDrawable(icon);
-		if (prevShape == null || !prevShape.getGroup().contains(prevShape)) {
-			((Shape) currentDrawable).getGroup().add((Shape) currentDrawable);
+		Shape currShape = (Shape) currentDrawable;
+		if (currShape == null) {
+			if (prevShape != null) {
+				prevShape.getGroup().remove(prevShape);
+			}
+			return;
+		} else if (prevShape == null
+				|| !prevShape.getGroup().contains(prevShape)) {
+			currShape.getGroup().add(currShape);
 		} else {
-			((Shape) currentDrawable).getGroup().replace(prevShape,
-					(Shape) currentDrawable);
+			currShape.getGroup().replace(prevShape, currShape);
 		}
 	}
 
 	public void setShapeGroup(ShapeGroup shapeGroup) {
-		((Shape) currentDrawable).setGroup(shapeGroup);
+		if (currentDrawable != null) {
+			((Shape) currentDrawable).setGroup(shapeGroup);
+		}
 	}
 
 	public void setFillColorSet(ColorSet fillColorSet) {
 		Drawable prevIcon = currentDrawable;
-		setDrawable(resource.defaultDrawable);
-		((Shape) resource.defaultDrawable)
-				.setFillColor(fillColorSet.defaultColor);
-		setDrawable(resource.pressedDrawable);
-		((Shape) resource.pressedDrawable)
-				.setFillColor(fillColorSet.pressedColor);
+		if (resource.defaultDrawable != null) {
+			setDrawable(resource.defaultDrawable);
+			((Shape) resource.defaultDrawable)
+					.setFillColor(fillColorSet.defaultColor);
+		}
+		if (resource.pressedDrawable != null) {
+			setDrawable(resource.pressedDrawable);
+			((Shape) resource.pressedDrawable)
+					.setFillColor(fillColorSet.pressedColor);
+		}
 		if (fillColorSet.selectedColor != null) {
 			setDrawable(resource.selectedDrawable);
 			((Shape) resource.selectedDrawable)
@@ -63,12 +92,16 @@ public abstract class ShapeIcon extends Icon {
 
 	public void setColors(ColorSet fillColorSet, ColorSet outlineColorSet) {
 		Drawable prevIcon = currentDrawable;
-		setDrawable(resource.defaultDrawable);
-		((Shape) resource.defaultDrawable).setColors(fillColorSet.defaultColor,
-				outlineColorSet.defaultColor);
-		setDrawable(resource.pressedDrawable);
-		((Shape) resource.pressedDrawable).setColors(fillColorSet.pressedColor,
-				outlineColorSet.pressedColor);
+		if (resource.defaultDrawable != null) {
+			setDrawable(resource.defaultDrawable);
+			((Shape) resource.defaultDrawable).setColors(
+					fillColorSet.defaultColor, outlineColorSet.defaultColor);
+		}
+		if (resource.pressedDrawable != null) {
+			setDrawable(resource.pressedDrawable);
+			((Shape) resource.pressedDrawable).setColors(
+					fillColorSet.pressedColor, outlineColorSet.pressedColor);
+		}
 		if (fillColorSet.selectedColor != null
 				&& outlineColorSet.selectedColor != null) {
 			setDrawable(resource.selectedDrawable);
@@ -79,11 +112,19 @@ public abstract class ShapeIcon extends Icon {
 	}
 
 	public float[] getCurrStrokeColor() {
-		return ((Shape) currentDrawable).getStrokeColor();
+		if (currentDrawable != null) {
+			return ((Shape) currentDrawable).getStrokeColor();
+		} else {
+			return Colors.GREEN; // TODO this is to make it stand out, to fix
+		}
 	}
 
 	public float[] getCurrFillColor() {
-		return ((Shape) currentDrawable).getFillColor();
+		if (currentDrawable != null) {
+			return ((Shape) currentDrawable).getFillColor();
+		} else {
+			return Colors.GREEN; // TODO this is to make it stand out, to fix
+		}
 	}
 
 	public void destroy() {

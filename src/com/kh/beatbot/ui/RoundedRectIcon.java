@@ -1,32 +1,18 @@
 package com.kh.beatbot.ui;
 
 import com.kh.beatbot.ui.color.ColorSet;
-import com.kh.beatbot.ui.mesh.RoundedRect;
+import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class RoundedRectIcon extends ShapeIcon {
 
 	public RoundedRectIcon(ShapeGroup shapeGroup, ColorSet bgColorSet) {
-		super(shapeGroup, bgColorSet);
-		this.resource = new IconResource(
-				new RoundedRect(this.shapeGroup, bgColorSet.defaultColor),
-				new RoundedRect(this.shapeGroup, bgColorSet.pressedColor),
-				bgColorSet.selectedColor != null ?
-						new RoundedRect(this.shapeGroup, bgColorSet.selectedColor) : null,
-				null, null, null);
-		setState(IconResource.State.DEFAULT);
+		super(shapeGroup, Shape.Type.ROUNDED_RECT, bgColorSet);
 	}
 
 	public RoundedRectIcon(ShapeGroup shapeGroup, ColorSet bgColorSet,
-			ColorSet borderColorSet) {
-		super(shapeGroup, bgColorSet, borderColorSet);
-		this.resource = new IconResource(
-				new RoundedRect(this.shapeGroup, bgColorSet.defaultColor, borderColorSet.defaultColor),
-				new RoundedRect(this.shapeGroup, bgColorSet.pressedColor, borderColorSet.pressedColor),
-				bgColorSet.selectedColor != null ?
-						new RoundedRect(this.shapeGroup, bgColorSet.selectedColor, borderColorSet.selectedColor) : null,
-				null, null, null);
-		setState(IconResource.State.DEFAULT);
+			ColorSet strokeColorSet) {
+		super(shapeGroup, Shape.Type.ROUNDED_RECT, bgColorSet, strokeColorSet);
 	}
 
 	@Override
@@ -47,11 +33,16 @@ public class RoundedRectIcon extends ShapeIcon {
 		float downH = scaledH - dim * .10f;
 
 		Drawable prevIcon = currentDrawable;
-		setDrawable(resource.defaultDrawable);
-		resource.defaultDrawable.layout(this.x + 2, this.y + 2, scaledW, scaledH);
-		setDrawable(resource.pressedDrawable);
-		resource.pressedDrawable.layout(this.x + centerX - downW / 2, this.y + centerY
-				- downH / 2, downW, downH);
+		if (resource.defaultDrawable != null) {
+			setDrawable(resource.defaultDrawable);
+			resource.defaultDrawable.layout(this.x + 2, this.y + 2, scaledW,
+					scaledH);
+		}
+		if (resource.pressedDrawable != null) {
+			setDrawable(resource.pressedDrawable);
+			resource.pressedDrawable.layout(this.x + centerX - downW / 2,
+					this.y + centerY - downH / 2, downW, downH);
+		}
 		if (resource.selectedDrawable != null) {
 			setDrawable(resource.selectedDrawable);
 			resource.selectedDrawable.layout(resource.pressedDrawable.x,

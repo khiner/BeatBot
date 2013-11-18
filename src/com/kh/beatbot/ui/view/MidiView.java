@@ -15,6 +15,7 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Rectangle;
+import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.helper.ScrollBarHelper;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
@@ -226,8 +227,8 @@ public class MidiView extends ClickableView {
 	}
 
 	private void drawAllMidiNotes() {
-		unselectedRectangles.draw(MidiNote.BORDER_WIDTH);
-		selectedRectangles.draw(MidiNote.BORDER_WIDTH);
+		unselectedRectangles.draw();
+		selectedRectangles.draw();
 	}
 
 	private void updateTickFillRect() {
@@ -372,6 +373,9 @@ public class MidiView extends ClickableView {
 
 	public synchronized void init() {
 		TickWindowHelper.init(this);
+		selectedRectangles.setStrokeWeight(MidiNote.BORDER_WIDTH);
+		unselectedRectangles.setStrokeWeight(MidiNote.BORDER_WIDTH);
+		tickBarShapeGroup.setStrokeWeight(2);
 		initAllVbs();
 	}
 
@@ -387,7 +391,7 @@ public class MidiView extends ClickableView {
 				/ (float) TickWindowHelper.getNumTicks(), 1);
 
 		// draws background and loop-background in one call
-		bgShapeGroup.draw(-1);
+		bgShapeGroup.draw();
 
 		push();
 
@@ -403,7 +407,7 @@ public class MidiView extends ClickableView {
 		pop();
 
 		// draws tick rect and loop rect in one call
-		tickBarShapeGroup.draw(2);
+		tickBarShapeGroup.draw();
 
 		drawSelectRegion();
 		drawLoopMarker();
@@ -499,8 +503,8 @@ public class MidiView extends ClickableView {
 
 	private Rectangle makeRectangle(ShapeGroup group, float x1, float y1,
 			float width, float height, float[] fillColor, float[] outlineColor) {
-		Rectangle newRect = outlineColor == null ? new Rectangle(group,
-				fillColor) : new Rectangle(group, fillColor, outlineColor);
+		Rectangle newRect = (Rectangle) Shape.get(Shape.Type.RECTANGLE, group,
+				fillColor, outlineColor);
 		newRect.getGroup().add(newRect);
 		newRect.layout(x1, y1, width, height);
 		return newRect;
@@ -521,8 +525,6 @@ public class MidiView extends ClickableView {
 	}
 
 	public void updateNoteRects() {
-		// unselectedRectangles.clear();
-		// selectedRectangles.clear();
 		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
 			Track track = TrackManager.getTrack(i);
 			for (MidiNote note : track.getMidiNotes()) {

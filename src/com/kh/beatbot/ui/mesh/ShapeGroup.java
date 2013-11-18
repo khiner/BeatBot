@@ -7,13 +7,18 @@ import com.kh.beatbot.ui.view.View;
 public class ShapeGroup {
 
 	private MeshGroup fillGroup, outlineGroup;
+	private int strokeWeight = 0;
 
 	public ShapeGroup() {
 		fillGroup = new MeshGroup(GL10.GL_TRIANGLES);
 		outlineGroup = new MeshGroup(GL10.GL_LINES);
 	}
 
-	public void setFillPrimitiveType(int primitiveType) {
+	public void setStrokeWeight(final int strokeWeight) {
+		this.strokeWeight = strokeWeight;
+	}
+
+	public void setFillPrimitiveType(final int primitiveType) {
 		fillGroup.setPrimitiveType(primitiveType);
 	}
 
@@ -24,50 +29,40 @@ public class ShapeGroup {
 	public void draw(View parent, int borderWeight) {
 		View.push();
 		View.translate(-parent.absoluteX, -parent.absoluteY);
-		draw(borderWeight);
+		draw();
 		View.pop();
 	}
 
-	public void draw(int borderWeight) {
+	public void draw() {
 		fillGroup.draw();
-		if (borderWeight > 0) {
-			View.gl.glLineWidth(borderWeight);
-			outlineGroup.draw();
-		}
+		View.gl.glLineWidth(strokeWeight);
+		outlineGroup.draw();
 	}
 
 	public boolean contains(Shape shape) {
-		return fillGroup.contains(shape.fillMesh)
-				&& (shape.strokeMesh == null || outlineGroup
-						.contains(shape.strokeMesh));
+		return fillGroup.contains(shape.getFillMesh())
+				|| outlineGroup.contains(shape.getStrokeMesh());
 	}
 
 	public void add(Shape shape) {
-		fillGroup.add(shape.fillMesh);
-		if (shape.strokeMesh != null) {
-			outlineGroup.add(shape.strokeMesh);
-		}
+		fillGroup.add(shape.getFillMesh());
+		outlineGroup.add(shape.getStrokeMesh());
 	}
 
 	public void remove(Shape shape) {
-		fillGroup.remove(shape.fillMesh);
-		if (shape.strokeMesh != null) {
-			outlineGroup.remove(shape.strokeMesh);
-		}
+		fillGroup.remove(shape.getFillMesh());
+		outlineGroup.remove(shape.getStrokeMesh());
 	}
 
 	public void replace(Shape oldShape, Shape newShape) {
-		fillGroup.replace(oldShape.fillMesh, newShape.fillMesh);
-		if (oldShape.strokeMesh != null && newShape.strokeMesh != null) {
-			outlineGroup.replace(oldShape.strokeMesh, newShape.strokeMesh);
-		}
+		fillGroup.replace(oldShape.getFillMesh(), newShape.getFillMesh());
+		outlineGroup
+				.replace(oldShape.getStrokeMesh(), newShape.getStrokeMesh());
 	}
 
 	public void update(Shape shape) {
-		fillGroup.updateVertices(shape.fillMesh);
-		if (shape.strokeMesh != null) {
-			outlineGroup.updateVertices(shape.strokeMesh);
-		}
+		fillGroup.updateVertices(shape.getFillMesh());
+		outlineGroup.updateVertices(shape.getStrokeMesh());
 	}
 
 	public void clear() {

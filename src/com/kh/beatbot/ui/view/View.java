@@ -14,6 +14,7 @@ import android.graphics.Typeface;
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.RoundedRect;
+import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public abstract class View implements Comparable<View> {
@@ -55,9 +56,9 @@ public abstract class View implements Comparable<View> {
 			clearColor = Colors.BG_COLOR, strokeColor = Colors.WHITE;
 
 	protected boolean initialized = false;
-	
+
 	protected boolean shouldClip = true;
-	
+
 	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0,
 			borderHeight = 0, borderOffset = 0;
 
@@ -80,8 +81,12 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public void initBgRect(ShapeGroup group, float[] fillColor,
-			float[] borderColor) {
-		bgRect = new RoundedRect(group, fillColor, borderColor);
+			float[] strokeColor) {
+		if (group != null) {
+			group.setStrokeWeight(2);
+		}
+		bgRect = (RoundedRect) Shape.get(Shape.Type.ROUNDED_RECT, group,
+				fillColor, strokeColor);
 	}
 
 	public float getBgRectRadius() {
@@ -240,11 +245,8 @@ public abstract class View implements Comparable<View> {
 	private void layoutBgRect() {
 		if (bgRect == null)
 			return;
-		float borderWeight = 2;
-		float borderRadius = Math.max(height / 9, 10);
-		borderOffset = borderWeight * 2;
-		bgRect.setBorderWeight(borderWeight);
-		bgRect.setCornerRadius(borderRadius);
+		borderOffset = 4; // TODO should be a ratio
+		bgRect.setCornerRadius(Math.max(height / 9, 10));
 		bgRect.layout(borderOffset, borderOffset, width - borderOffset * 2,
 				height - borderOffset * 2);
 		minX = minY = bgRect.cornerRadius + borderOffset;

@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.mesh;
 
+import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.page.Page;
 
 public class SlideTab extends Shape {
@@ -7,32 +8,37 @@ public class SlideTab extends Shape {
 	private float cornerRadius = 12;
 	private RoundedRect roundedRect;
 
-	public SlideTab(ShapeGroup group, float[] fillColor) {
-		super(group, new Mesh2D(RoundedRect.NUM_CORNER_VERTICES * 5 * 3 * 2, fillColor));
-		roundedRect = new RoundedRect(null, fillColor);
+	protected int getNumFillVertices() {
+		return RoundedRect.NUM_CORNER_VERTICES * 5 * 3 * 2;
+	}
+
+	protected int getNumStrokeVertices() {
+		return 0;
+	}
+
+	public SlideTab(ShapeGroup group) {
+		super(group);
+		roundedRect = (RoundedRect) Shape.get(Type.ROUNDED_RECT, group,
+				Colors.LABEL_SELECTED, null);
 	}
 
 	@Override
-	protected void createVertices(float[] fillColor) {
-		createVertices(fillColor, null);
-	}
-
-	@Override
-	protected void createVertices(float[] fillColor, float[] outlineColor) {
+	protected void updateVertices() {
 		roundedRect.setCornerRadius(cornerRadius);
-		roundedRect.layout(x + Page.mainPage.width - cornerRadius * 2, y, width, height);
+		roundedRect.layout(x + Page.mainPage.width - cornerRadius * 2, y,
+				width, height);
 
-		float[] vertices = roundedRect.fillMesh.vertices;
+		float[] vertices = roundedRect.getFillMesh().vertices;
 		for (int i = 0; i < vertices.length / 2; i++) {
-			fillMesh.vertex(vertices[i * 2], vertices[i * 2 + 1]);
+			fillVertex(vertices[i * 2], vertices[i * 2 + 1]);
 		}
 
 		roundedRect.setCornerRadius(cornerRadius);
 		roundedRect.layout(x, y, Page.mainPage.width, Page.mainPage.height - y);
 
-		for (int i = 0; i < roundedRect.fillMesh.vertices.length / 2; i++) {
-			fillMesh.vertex(roundedRect.fillMesh.vertices[i * 2],
-					roundedRect.fillMesh.vertices[i * 2 + 1]);
+		vertices = roundedRect.getFillMesh().vertices;
+		for (int i = 0; i < vertices.length / 2; i++) {
+			fillVertex(vertices[i * 2], vertices[i * 2 + 1]);
 		}
 
 		float theta = ¹, addX, addY;
@@ -41,18 +47,18 @@ public class SlideTab extends Shape {
 		float lastX = 0, lastY = 0;
 		for (int i = 0; i < RoundedRect.NUM_CORNER_VERTICES; i++) {
 			addX = addY = cornerRadius;
-			float vertexX = (float) Math.cos(theta) * cornerRadius + addX + x + Page.mainPage.width;
-			float vertexY = (float) Math.sin(theta) * cornerRadius + addY + y + height ;
+			float vertexX = (float) Math.cos(theta) * cornerRadius + addX + x
+					+ Page.mainPage.width;
+			float vertexY = (float) Math.sin(theta) * cornerRadius + addY + y
+					+ height;
 			if (lastX != 0 && lastY != 0) {
-				fillMesh.vertex(vertexX, vertexY);
-				fillMesh.vertex(lastX, lastY);
-				fillMesh.vertex(centerX, centerY);
+				fillVertex(vertexX, vertexY);
+				fillVertex(lastX, lastY);
+				fillVertex(centerX, centerY);
 			}
 			lastX = vertexX;
 			lastY = vertexY;
 			theta += ¹ / (RoundedRect.NUM_CORNER_VERTICES * 2);
 		}
-
-		fillMesh.setColor(fillColor);
 	}
 }

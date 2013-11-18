@@ -4,29 +4,25 @@ public class RoundedRect extends Shape {
 	public static final int NUM_CORNER_VERTICES = 16;
 
 	public float cornerRadius = -1;
-	public RoundedRect(ShapeGroup group, float[] fillColor) {
-		super(group, new Mesh2D(NUM_CORNER_VERTICES * 4 * 3, fillColor));
+
+	protected RoundedRect(ShapeGroup group) {
+		super(group);
 	}
 
-	public RoundedRect(ShapeGroup group, float[] fillColor, float[] outlineColor) {
-		super(group, new Mesh2D(NUM_CORNER_VERTICES * 4 * 3, fillColor), new Mesh2D(16 * 4 * 2,
-				outlineColor));
+	protected int getNumFillVertices() {
+		return NUM_CORNER_VERTICES * 4 * 3;
 	}
 
-	public void setCornerRadius(float cornerRadius) {
-		this.cornerRadius = cornerRadius;
+	protected int getNumStrokeVertices() {
+		return NUM_CORNER_VERTICES * 4 * 2;
 	}
 
-	protected void createVertices(float[] fillColor) {
-		createVertices(fillColor, null);
-	}
-
-	protected void createVertices(float[] fillColor, float[] outlineColor) {
+	protected void updateVertices() {
 		float theta = 0, addX, addY;
 		float centerX = x + width / 2;
 		float centerY = y + height / 2;
-		float lastX = 0, lastY = 0;
-		for (int i = 0; i < fillMesh.getNumVertices() / 3; i++) {
+		float firstX = 0, firstY = 0, lastX = 0, lastY = 0;
+		for (int i = 0; i < getNumFillVertices() / 3; i++) {
 			if (theta < ¹ / 2) { // lower right
 				addX = width - cornerRadius;
 				addY = height - cornerRadius;
@@ -39,34 +35,32 @@ public class RoundedRect extends Shape {
 				addX = width - cornerRadius;
 				addY = cornerRadius;
 			}
+
 			float vertexX = (float) Math.cos(theta) * cornerRadius + addX + x;
 			float vertexY = (float) Math.sin(theta) * cornerRadius + addY + y;
 			if (lastX != 0 && lastY != 0) {
-				fillMesh.vertex(vertexX, vertexY);
-				fillMesh.vertex(lastX, lastY);
-				fillMesh.vertex(centerX, centerY);
-				if (outlineColor != null) {
-					strokeMesh.vertex(vertexX, vertexY);
-					strokeMesh.vertex(lastX, lastY);
-				}
+				fillVertex(vertexX, vertexY);
+				fillVertex(lastX, lastY);
+				fillVertex(centerX, centerY);
+				strokeVertex(vertexX, vertexY);
+				strokeVertex(lastX, lastY);
+			} else {
+				firstX = vertexX;
+				firstY = vertexY;
 			}
 			lastX = vertexX;
 			lastY = vertexY;
-			theta += 6 * ¹ / fillMesh.getNumVertices();
+			theta += 6 * ¹ / getNumFillVertices();
 		}
-		fillMesh.vertex(fillMesh.getVertices()[0], fillMesh.getVertices()[1]);
-		fillMesh.vertex(lastX, lastY);
-		fillMesh.vertex(centerX, centerY);
-		if (outlineColor != null) {
-			strokeMesh.vertex(strokeMesh.getVertices()[0],
-					strokeMesh.getVertices()[1]);
-			strokeMesh.vertex(lastX, lastY);
-		}
+		fillVertex(firstX, firstY);
+		fillVertex(lastX, lastY);
+		fillVertex(centerX, centerY);
+		strokeVertex(firstX, firstY);
+		strokeVertex(lastX, lastY);
+	}
 
-		fillMesh.setColor(fillColor);
-		if (outlineColor != null) {
-			strokeMesh.setColor(outlineColor);
-		}
+	public void setCornerRadius(float cornerRadius) {
+		this.cornerRadius = cornerRadius;
 	}
 
 	@Override
