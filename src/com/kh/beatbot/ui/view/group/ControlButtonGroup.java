@@ -19,7 +19,8 @@ import com.kh.beatbot.ui.view.page.Page;
 public class ControlButtonGroup extends TouchableView {
 
 	public ToggleButton playButton, recordButton, copyButton;
-	public ImageButton stopButton, undoButton, redoButton, deleteButton;
+	public ImageButton stopButton, undoButton, redoButton, deleteButton,
+			quantizeButton;
 
 	@Override
 	protected synchronized void createChildren() {
@@ -28,6 +29,7 @@ public class ControlButtonGroup extends TouchableView {
 		recordButton = new ToggleButton();
 		copyButton = new ToggleButton();
 		deleteButton = new ImageButton();
+		quantizeButton = new ImageButton();
 		undoButton = new ImageButton();
 		redoButton = new ImageButton();
 
@@ -114,11 +116,20 @@ public class ControlButtonGroup extends TouchableView {
 			}
 		});
 
+		quantizeButton.setOnReleaseListener(new OnReleaseListener() {
+			@Override
+			public void onRelease(Button button) {
+				MidiManager.quantize(); // TODO bring back quantize list (1/4,
+										// 1/8, 1/16, 1/32)
+			}
+		});
+
 		addChild(playButton);
 		addChild(stopButton);
 		addChild(recordButton);
 		addChild(copyButton);
 		addChild(deleteButton);
+		addChild(quantizeButton);
 		addChild(undoButton);
 		addChild(redoButton);
 	}
@@ -126,6 +137,10 @@ public class ControlButtonGroup extends TouchableView {
 	public void setEditIconsEnabled(final boolean enabled) {
 		deleteButton.setEnabled(enabled);
 		copyButton.setEnabled(enabled);
+	}
+
+	public void setQuantizeIconEnabled(final boolean enabled) {
+		quantizeButton.setEnabled(enabled);
 	}
 
 	public void setUndoIconEnabled(final boolean enabled) {
@@ -147,10 +162,12 @@ public class ControlButtonGroup extends TouchableView {
 		recordButton.setIcon(new Icon(IconResources.RECORD));
 		copyButton.setIcon(new Icon(IconResources.COPY));
 		deleteButton.setIcon(new Icon(IconResources.DELETE_NOTE));
+		quantizeButton.setIcon(new Icon(IconResources.QUANTIZE));
 		undoButton.setIcon(new Icon(IconResources.UNDO));
 		redoButton.setIcon(new Icon(IconResources.REDO));
 
 		setEditIconsEnabled(false);
+		setQuantizeIconEnabled(false);
 	}
 
 	@Override
@@ -162,6 +179,8 @@ public class ControlButtonGroup extends TouchableView {
 
 		float rightMargin = 10;
 		// right-aligned buttons
+		quantizeButton.layout(this, width - 5 * height - rightMargin, 0,
+				height, height);
 		copyButton.layout(this, width - 4 * height - rightMargin, 0, height,
 				height);
 		undoButton.layout(this, width - 3 * height - rightMargin, 0, height,

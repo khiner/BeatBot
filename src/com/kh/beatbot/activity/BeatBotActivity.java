@@ -7,9 +7,6 @@ import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.method.DigitsKeyListener;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -229,6 +226,7 @@ public class BeatBotActivity extends Activity {
 								}
 							});
 			break;
+			
 		case EXIT_DIALOG_ID:
 			builder.setIcon(android.R.drawable.ic_dialog_alert)
 					.setTitle("Closing " + getString(R.string.app_name))
@@ -251,35 +249,6 @@ public class BeatBotActivity extends Activity {
 		}
 
 		return builder.create();
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.quantize_current:
-			MidiManager.quantize();
-			return true;
-		case R.id.quantize_quarter:
-			MidiManager.quantize(1);
-		case R.id.quantize_eighth:
-			MidiManager.quantize(2);
-			return true;
-		case R.id.quantize_sixteenth:
-			MidiManager.quantize(4);
-			return true;
-		case R.id.quantize_thirty_second:
-			MidiManager.quantize(8);
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
 	}
 
 	/*

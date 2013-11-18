@@ -27,6 +27,7 @@ public class IconResources {
 		DELETE_TRACK = new IconResource(R.drawable.delete_track_icon, R.drawable.delete_track_icon_selected),
 		UNDO = new IconResource(R.drawable.undo_icon, R.drawable.undo_icon_selected, -1, R.drawable.undo_icon_disabled),
 		REDO = new IconResource(R.drawable.redo_icon, R.drawable.redo_icon_selected, -1, R.drawable.redo_icon_disabled),
+		QUANTIZE = new IconResource(R.drawable.quantize_icon, R.drawable.quantize_icon_selected, -1, R.drawable.quantize_icon_disabled),
 
 		LEVELS = new IconResource(R.drawable.levels_icon, -1, R.drawable.levels_icon_selected),
 		LOOP = new IconResource(R.drawable.loop_icon, -1, R.drawable.loop_icon_selected),

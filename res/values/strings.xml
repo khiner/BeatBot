@@ -2,24 +2,6 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<string name="app_name">BeatBot</string>
-	<string name="control">Control</string>
-	<string name="midi_menu">Midi Menu</string>
-	<string name="start_listening">Start Listening</string>
-	<string name="stop_listening">Stop Listening</string>
-	<string name="record">Record</string>
-	<string name="play">Play</string>
-	<string name="stop">Stop</string>
-	<string name="undo">Undo</string>
-	<string name="copy">Copy</string>
-	<string name="delete">Delete</string>
-	<string name="bpm_tap">BPM Tap</string>
-	<string name="snap">Snap to Grid</string>
-	<string name="quantize">Quantize</string>
-	<string name="current_grid">Current Grid</string>
-	<string name="quarter_note">1/4</string>
-	<string name="eighth_note">1/8</string>
-	<string name="sixteenth_note">1/16</string>
-	<string name="thirty_second_note">1/32</string>
 	<string-array name="sample_types">
 		<item name="kick">Kick</item>
 		<item name="snare">Snare</item>
