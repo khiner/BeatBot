@@ -50,21 +50,11 @@ public abstract class ShapeIcon extends Icon {
 	protected void setDrawable(Drawable icon) {
 		Shape prevShape = (Shape) currentDrawable;
 		super.setDrawable(icon);
-		Shape currShape = (Shape) currentDrawable;
-		if (currShape == null) {
-			if (prevShape != null) {
-				prevShape.getGroup().remove(prevShape);
-			}
-			return;
-		} else if (prevShape == null
-				|| !prevShape.getGroup().contains(prevShape)) {
-			currShape.getGroup().add(currShape);
-		} else {
-			currShape.getGroup().replace(prevShape, currShape);
-		}
+		shapeGroup.replace(prevShape, (Shape) currentDrawable);
 	}
 
 	public void setShapeGroup(ShapeGroup shapeGroup) {
+		this.shapeGroup = shapeGroup;
 		if (currentDrawable != null) {
 			((Shape) currentDrawable).setGroup(shapeGroup);
 		}

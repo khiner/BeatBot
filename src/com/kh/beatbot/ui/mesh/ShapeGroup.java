@@ -40,21 +40,36 @@ public class ShapeGroup {
 	}
 
 	public boolean contains(Shape shape) {
+		if (shape == null) {
+			return false;
+		}
 		return fillGroup.contains(shape.getFillMesh())
 				|| outlineGroup.contains(shape.getStrokeMesh());
 	}
 
 	public void add(Shape shape) {
-		fillGroup.add(shape.getFillMesh());
-		outlineGroup.add(shape.getStrokeMesh());
+		if (shape != null) {
+			fillGroup.add(shape.getFillMesh());
+			outlineGroup.add(shape.getStrokeMesh());
+		}
 	}
 
 	public void remove(Shape shape) {
-		fillGroup.remove(shape.getFillMesh());
-		outlineGroup.remove(shape.getStrokeMesh());
+		if (shape != null) {
+			fillGroup.remove(shape.getFillMesh());
+			outlineGroup.remove(shape.getStrokeMesh());
+		}
 	}
 
 	public void replace(Shape oldShape, Shape newShape) {
+		if (newShape == null) {
+			remove(oldShape);
+			return;
+		}
+		if (oldShape == null) {
+			add(newShape);
+			return;
+		}
 		fillGroup.replace(oldShape.getFillMesh(), newShape.getFillMesh());
 		outlineGroup
 				.replace(oldShape.getStrokeMesh(), newShape.getStrokeMesh());
