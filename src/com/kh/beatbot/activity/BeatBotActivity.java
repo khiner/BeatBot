@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.method.DigitsKeyListener;
+import android.view.KeyEvent;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -249,6 +250,15 @@ public class BeatBotActivity extends Activity {
 		}
 
 		return builder.create();
+	}
+
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+	    if (keyCode == KeyEvent.KEYCODE_MENU) {
+	    	Page.mainPage.notifyMenuExpanded();
+	        return true;
+	    }
+	    return super.onKeyUp(keyCode, event);
 	}
 
 	/*
