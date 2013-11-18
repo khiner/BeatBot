@@ -31,9 +31,9 @@ public class SlideMenu extends TouchableView {
 		private ImageButton button;
 		private List<MenuItem> subMenuItems = new ArrayList<MenuItem>();
 
-		public MenuItem(final boolean toggle) {
+		public MenuItem(ImageButton button) {
 			final MenuItem menuItem = this;
-			button = toggle ? new ToggleButton() : new ImageButton();
+			this.button = button;
 			button.setOnReleaseListener(new OnReleaseListener() {
 				@Override
 				public void onRelease(Button button) {
@@ -65,17 +65,21 @@ public class SlideMenu extends TouchableView {
 		public void layoutSubMenuItems(View parent) {
 			for (int i = 0; i < subMenuItems.size(); i++) {
 				subMenuItems.get(i).layout(parent, button.x + button.width,
-						offset + textHeight * i, columnWidth * 2 - offset,
-						textHeight);
+						offset + LABEL_HEIGHT * i, columnWidth * 2 - offset,
+						LABEL_HEIGHT);
 			}
 		}
 
 		public void loadIcons() {
+			if (parent != null) {
+				button.setBgIcon(new RoundedRectIcon(
+						null,
+						button instanceof ToggleButton ? Colors.menuToggleFillColorSet
+								: Colors.menuItemFillColorSet));
+				button.setStrokeColor(Colors.BLACK);
+			}
+
 			for (MenuItem subMenuItem : subMenuItems) {
-				subMenuItem.button.setBgIcon(new RoundedRectIcon(null,
-						Colors.menuItemFillColorSet, null));
-				subMenuItem.button.setStrokeColor(Colors.BLACK);
-				subMenuItem.button.destroy(); // remove it from its ShapeGroup
 				subMenuItem.loadIcons();
 			}
 		}
@@ -135,7 +139,7 @@ public class SlideMenu extends TouchableView {
 		}
 	}
 
-	private float offset = 0, columnWidth = 0, iconWidth, textHeight;
+	private float offset = 0, columnWidth = 0, iconWidth;
 
 	private MenuItem fileItem, settingsItem, snapToGridItem, midiImportItem,
 			midiExportItem, selectedItem = null;
@@ -148,11 +152,11 @@ public class SlideMenu extends TouchableView {
 		topLevelItems = new ArrayList<MenuItem>();
 		midiItemReleaseListener = new OnMidiItemReleaseListener();
 
-		fileItem = new MenuItem(true);
-		settingsItem = new MenuItem(true);
-		snapToGridItem = new MenuItem(true);
-		midiImportItem = new MenuItem(true);
-		midiExportItem = new MenuItem(false);
+		fileItem = new MenuItem(new ToggleButton());
+		settingsItem = new MenuItem(new ToggleButton());
+		snapToGridItem = new MenuItem(new ToggleButton());
+		midiImportItem = new MenuItem(new ToggleButton());
+		midiExportItem = new MenuItem(new ImageButton());
 
 		topLevelItems.add(fileItem);
 		topLevelItems.add(settingsItem);
@@ -184,7 +188,7 @@ public class SlideMenu extends TouchableView {
 
 		final String[] fileNames = DirectoryManager.midiDirectory.list();
 		for (String fileName : fileNames) {
-			MenuItem midiMenuItem = new MenuItem(false);
+			MenuItem midiMenuItem = new MenuItem(new ImageButton());
 			midiMenuItem.button.setOnReleaseListener(midiItemReleaseListener);
 			midiMenuItem.button.setText(fileName);
 			midiImportItem.addSubMenuItems(midiMenuItem);
@@ -213,7 +217,7 @@ public class SlideMenu extends TouchableView {
 
 	public synchronized void layoutChildren() {
 		iconWidth = columnWidth - offset * 2;
-		textHeight = columnWidth / 4;
+
 		fileItem.layout(this, offset, 0, iconWidth, iconWidth);
 		settingsItem.layout(this, offset, iconWidth + offset, iconWidth,
 				iconWidth);

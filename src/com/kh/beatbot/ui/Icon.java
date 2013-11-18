@@ -36,14 +36,7 @@ public class Icon extends Drawable {
 	}
 
 	protected void setDrawable(Drawable drawable) {
-		if (drawable == null && currentDrawable != null) {
-			boolean selected = currentDrawable
-					.equals(resource.selectedDrawable);
-			currentDrawable = !selected && resource.selectedDrawable != null ? resource.selectedDrawable
-					: resource.defaultDrawable;
-		} else {
-			currentDrawable = drawable != null ? drawable
-					: resource.defaultDrawable;
-		}
+		currentDrawable = drawable != null ? drawable
+				: resource.defaultDrawable;
 	}
 }

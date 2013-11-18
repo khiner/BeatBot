@@ -28,7 +28,8 @@ public class Colors {
 			volumeBgColorSet, volumeStrokeColorSet, effectLabelBgColorSet,
 			effectLabelStrokeColorSet, effectLabelTouchedBgColorSet,
 			effectLabelTouchedStrokeColorSet, iconFillColorSet,
-			deleteFillColorSet, deleteStrokeColorSet, menuItemFillColorSet;
+			deleteFillColorSet, deleteStrokeColorSet, menuItemFillColorSet,
+			menuToggleFillColorSet;
 
 	public static void initColors(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
@@ -95,8 +96,7 @@ public class Colors {
 				LABEL_VERY_LIGHT, VOLUME_LIGHT);
 		effectLabelTouchedStrokeColorSet = new ColorSet(WHITE, WHITE, WHITE);
 
-		muteButtonColorSet = new ColorSet(null, LABEL_SELECTED,
-				LEVEL_SELECTED);
+		muteButtonColorSet = new ColorSet(null, LABEL_SELECTED, LEVEL_SELECTED);
 		soloButtonColorSet = new ColorSet(null, LABEL_SELECTED, PITCH);
 
 		instrumentBgColorSet = new ColorSet(null, LABEL_SELECTED, VOLUME);
@@ -115,8 +115,9 @@ public class Colors {
 		deleteStrokeColorSet = new ColorSet(RED, BLACK);
 
 		defaultStrokeColorSet = new ColorSet(VOLUME, VOLUME, VOLUME);
-		
-		menuItemFillColorSet = new ColorSet(null, LABEL_LIGHT, VOLUME);
+
+		menuItemFillColorSet = new ColorSet(null, LABEL_LIGHT, null);
+		menuToggleFillColorSet = new ColorSet(null, LABEL_LIGHT, VOLUME);
 	}
 
 	public static float[] colorResourceToFloats(Activity activity,

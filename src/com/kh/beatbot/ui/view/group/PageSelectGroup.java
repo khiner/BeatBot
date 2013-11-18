@@ -132,19 +132,19 @@ public class PageSelectGroup extends TouchableView {
 
 	@Override
 	public synchronized void layoutChildren() {
-		float labelHeight = height / 5;
-		float labelWidth = (width - 2 * labelHeight) / 4;
+		float labelWidth = (width - 2 * LABEL_HEIGHT) / 4;
 		float labelYOffset = 2;
-		addTrackButton.layout(this, 0, labelYOffset, labelHeight, labelHeight);
+		addTrackButton
+				.layout(this, 0, labelYOffset, LABEL_HEIGHT, LABEL_HEIGHT);
 		for (int i = 0; i < pageButtons.length - 1; i++) {
-			float x = labelHeight + i * labelWidth;
+			float x = LABEL_HEIGHT + i * labelWidth;
 			pageButtons[i].layout(this, x, labelYOffset, labelWidth,
-					labelHeight);
+					LABEL_HEIGHT);
 		}
-		pageButtons[NOTE_LEVELS_PAGE_ID].layout(this, labelHeight + 4
-				* labelWidth, labelYOffset, labelHeight, labelHeight);
-		pager.layout(this, 0, labelHeight + 2 * labelYOffset, width, height
-				- labelHeight - 2 * labelYOffset);
+		pageButtons[NOTE_LEVELS_PAGE_ID].layout(this, LABEL_HEIGHT + 4
+				* labelWidth, labelYOffset, LABEL_HEIGHT, LABEL_HEIGHT);
+		pager.layout(this, 0, LABEL_HEIGHT + 2 * labelYOffset, width, height
+				- LABEL_HEIGHT - 2 * labelYOffset);
 	}
 
 	@Override

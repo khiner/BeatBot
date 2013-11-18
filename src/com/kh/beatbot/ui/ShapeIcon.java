@@ -115,7 +115,7 @@ public abstract class ShapeIcon extends Icon {
 		if (currentDrawable != null) {
 			return ((Shape) currentDrawable).getStrokeColor();
 		} else {
-			return Colors.GREEN; // TODO this is to make it stand out, to fix
+			return Colors.BLACK;
 		}
 	}
 
@@ -123,7 +123,7 @@ public abstract class ShapeIcon extends Icon {
 		if (currentDrawable != null) {
 			return ((Shape) currentDrawable).getFillColor();
 		} else {
-			return Colors.GREEN; // TODO this is to make it stand out, to fix
+			return Colors.WHITE;
 		}
 	}
 

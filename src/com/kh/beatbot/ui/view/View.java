@@ -48,6 +48,8 @@ public abstract class View implements Comparable<View> {
 	public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0,
 			height = 0;
 
+	protected static float LABEL_HEIGHT = 0; 
+	
 	protected List<View> children = new ArrayList<View>();
 	protected View parent;
 	protected RoundedRect bgRect = null;
