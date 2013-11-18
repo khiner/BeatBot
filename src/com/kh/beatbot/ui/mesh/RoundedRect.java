@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.mesh;
 
 public class RoundedRect extends Shape {
-	public static final int NUM_CORNER_VERTICES = 16;
+	public static final int NUM_CORNER_VERTICES = 12;
 
 	public float cornerRadius = -1;
 
