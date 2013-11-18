@@ -133,8 +133,8 @@ public class ControlButtonGroup extends TouchableView {
 		copyButton.setEnabled(enabled);
 	}
 
-	public void setQuantizeIconEnabled(final boolean enabled) {
-		quantizeButton.setEnabled(enabled);
+	public void notifyMidiChange() {
+		quantizeButton.setEnabled(!MidiManager.getMidiNotes().isEmpty());
 	}
 
 	public void setUndoIconEnabled(final boolean enabled) {
@@ -161,7 +161,7 @@ public class ControlButtonGroup extends TouchableView {
 		redoButton.setIcon(new Icon(IconResources.REDO));
 
 		setEditIconsEnabled(false);
-		setQuantizeIconEnabled(false);
+		notifyMidiChange();
 	}
 
 	@Override

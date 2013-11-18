@@ -25,6 +25,7 @@ public class MidiNotesCreateEvent extends MidiNotesEvent {
 		}
 		MidiManager.handleMidiCollisions();
 		MidiManager.deselectAllNotes();
+		Page.mainPage.controlButtonGroup.notifyMidiChange();
 	}
 
 	private void createNote(MidiNote midiNote) {
