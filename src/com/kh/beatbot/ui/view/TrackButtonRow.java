@@ -75,9 +75,7 @@ public class TrackButtonRow extends TouchableView {
 				track.solo(soloButton.isChecked());
 			}
 		});
-		addChild(instrumentButton);
-		addChild(muteButton);
-		addChild(soloButton);
+		addChildren(instrumentButton, muteButton, soloButton);
 	}
 
 	@Override

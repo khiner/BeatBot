@@ -116,7 +116,6 @@ public abstract class LevelsFXPage extends Page {
 		updateEffects();
 	}
 
-
 	public void setMasterMode(boolean masterMode) {
 		this.masterMode = masterMode;
 	}
@@ -256,17 +255,13 @@ public abstract class LevelsFXPage extends Page {
 			}
 		});
 		// effects
-		effectNames = BeatBotActivity.mainActivity.getResources().getStringArray(
-				R.array.effect_names);
+		effectNames = BeatBotActivity.mainActivity.getResources()
+				.getStringArray(R.array.effect_names);
 		effectLabelList = new DraggableLabelList();
 		effectLabelList.setListener(new EffectLabelListListener(
 				BeatBotActivity.mainActivity));
 
-		addChild(effectLabel);
-		addChild(levelBar);
-		addChild(volumeToggle);
-		addChild(panToggle);
-		addChild(pitchToggle);
-		addChild(effectLabelList);
+		addChildren(effectLabel, levelBar, volumeToggle, panToggle,
+				pitchToggle, effectLabelList);
 	}
 }

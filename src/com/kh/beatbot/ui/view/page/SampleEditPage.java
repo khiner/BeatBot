@@ -114,15 +114,9 @@ public class SampleEditPage extends Page {
 			}
 		});
 
-		addChild(previewButton);
-		addChild(loopButton);
-		addChild(reverseButton);
-		addChild(sampleEdit);
-		addChild(browseButton);
-		addChild(editButton);
-		addChild(loopBeginControl);
-		addChild(loopEndControl);
-		addChild(gainControl);
+		addChildren(previewButton, loopButton, reverseButton, sampleEdit,
+				browseButton, editButton, loopBeginControl, loopEndControl,
+				gainControl);
 	}
 
 	@Override
@@ -133,19 +127,17 @@ public class SampleEditPage extends Page {
 		previewButton.layout(this, 0, topBarH, fillH, fillH);
 		loopButton.layout(this, width - fillH / 2 - margin, topBarH, fillH / 2,
 				fillH / 2);
-		reverseButton.layout(this, width - fillH / 2 - margin, height - fillH / 2,
-				fillH / 2, fillH / 2);
-		
+		reverseButton.layout(this, width - fillH / 2 - margin, height - fillH
+				/ 2, fillH / 2, fillH / 2);
+
 		gainControl.layout(this, 0, 0, topBarH * 6, topBarH);
-		loopBeginControl.layout(this, topBarH * 6, 0, topBarH * 6,
-				topBarH);
-		loopEndControl.layout(this, topBarH * 12, 0, topBarH * 6,
-				topBarH);
+		loopBeginControl.layout(this, topBarH * 6, 0, topBarH * 6, topBarH);
+		loopEndControl.layout(this, topBarH * 12, 0, topBarH * 6, topBarH);
 		browseButton.layout(this, width - topBarH * 2, 0, topBarH, topBarH);
 		editButton.layout(this, width - topBarH, 0, topBarH, topBarH);
-		
-		sampleEdit.layout(this, fillH, topBarH, width - fillH / 2 - fillH - margin * 2,
-				fillH);
+
+		sampleEdit.layout(this, fillH, topBarH, width - fillH / 2 - fillH
+				- margin * 2, fillH);
 	}
 
 	@Override

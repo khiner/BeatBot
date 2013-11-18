@@ -81,10 +81,7 @@ public class NoteLevelsPage extends Page {
 				update();
 			}
 		});
-		addChild(levelsView);
-		addChild(volumeToggle);
-		addChild(panToggle);
-		addChild(pitchToggle);
+		addChildren(levelsView, volumeToggle, panToggle, pitchToggle);
 	}
 
 	@Override

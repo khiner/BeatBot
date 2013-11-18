@@ -123,11 +123,8 @@ public class PageSelectGroup extends TouchableView {
 		pager.addPage(levelsPage);
 		pager.setPage(TRACK_PAGE_ID);
 
-		addChild(addTrackButton);
-		for (ToggleButton ToggleButton : pageButtons) {
-			addChild(ToggleButton);
-		}
-		addChild(pager);
+		addChildren(addTrackButton, pager);
+		addChildren(pageButtons);
 	}
 
 	@Override

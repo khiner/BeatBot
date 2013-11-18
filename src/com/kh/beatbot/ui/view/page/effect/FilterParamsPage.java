@@ -49,8 +49,8 @@ public class FilterParamsPage extends EffectParamsPage {
 		for (int i = 0; i < filterToggles.length; i++) {
 			filterToggles[i] = new ToggleButton();
 			filterToggles[i].setOnReleaseListener(filterToggleListener);
-			addChild(filterToggles[i]);
 		}
+		addChildren(filterToggles);
 	}
 
 	@Override

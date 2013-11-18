@@ -94,12 +94,8 @@ public class MainPage extends TouchableView {
 		slideMenu.setClip(false);
 		menuButton.setClip(false);
 
-		addChild(controlButtonGroup);
-		addChild(midiTrackView);
-		addChild(midiView);
-		addChild(pageSelectGroup);
-		addChild(slideMenu);
-		addChild(menuButton);
+		addChildren(controlButtonGroup, midiTrackView, midiView,
+				pageSelectGroup, slideMenu, menuButton);
 	}
 
 	@Override

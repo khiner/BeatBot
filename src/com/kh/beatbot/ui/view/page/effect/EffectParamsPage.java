@@ -7,7 +7,6 @@ import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.listener.ParamToggleListener;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.param.KnobParamControl;
-import com.kh.beatbot.ui.view.control.param.LevelParamControl;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
 
 public class EffectParamsPage extends TouchableView implements
@@ -43,9 +42,7 @@ public class EffectParamsPage extends TouchableView implements
 		if (effect == null)
 			return;
 		createParamControls();
-		for (LevelParamControl paramControl : paramControls) {
-			addChild(paramControl);
-		}
+		addChildren(paramControls);
 	}
 
 	@Override

@@ -24,8 +24,7 @@ public class MasterPage extends LevelsFXPage {
 		super.createChildren();
 		bpmLabel = new TextView();
 		bpmView = new BpmView();
-		addChild(bpmView);
-		addChild(bpmLabel);
+		addChildren(bpmView, bpmLabel);
 	}
 	
 	@Override

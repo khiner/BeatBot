@@ -95,11 +95,8 @@ public class AdsrPage extends Page implements OnReleaseListener {
 			adsrButtons[i].setId(i);
 			adsrButtons[i].setOnReleaseListener(this);
 		}
-		addChild(adsrView);
-		addChild(paramControl);
-		for (ToggleButton adsrButton : adsrButtons) {
-			addChild(adsrButton);
-		}
+		addChildren(adsrView, paramControl);
+		addChildren(adsrButtons);
 	}
 
 	@Override

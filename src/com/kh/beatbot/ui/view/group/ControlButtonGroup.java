@@ -124,14 +124,8 @@ public class ControlButtonGroup extends TouchableView {
 			}
 		});
 
-		addChild(playButton);
-		addChild(stopButton);
-		addChild(recordButton);
-		addChild(copyButton);
-		addChild(deleteButton);
-		addChild(quantizeButton);
-		addChild(undoButton);
-		addChild(redoButton);
+		addChildren(playButton, stopButton, recordButton, copyButton,
+				deleteButton, quantizeButton, undoButton, redoButton);
 	}
 
 	public void setEditIconsEnabled(final boolean enabled) {

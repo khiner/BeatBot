@@ -77,9 +77,7 @@ public class EffectPage extends TouchableView {
 			}
 		});
 
-		addChild(toggleButton);
-		addChild(level2d);
-		addChild(paramsPager);
+		addChildren(toggleButton, level2d, paramsPager);
 	}
 
 	@Override

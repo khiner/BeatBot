@@ -20,8 +20,7 @@ public class ParamControl extends TouchableView {
 		this.shapeGroup = shapeGroup == null ? new ShapeGroup() : shapeGroup;
 		label = new TextView();
 		valueLabel = new ValueLabel(null);
-		addChild(label);
-		addChild(valueLabel);
+		addChildren(label, valueLabel);
 	}
 	
 	@Override
