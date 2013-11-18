@@ -124,7 +124,7 @@ public class MainPage extends TouchableView {
 		slideMenu
 				.layout(this, 0, 0, trackControlWidth + menuOffset * 2, height);
 		tab.layout(0, 0, slideMenu.width, controlButtonHeight + menuOffset * 2);
-		menuButton.layout(this, 0, 0, tab.height * 1.5f, tab.height);
+		menuButton.layout(this, 0, 0, tab.height * 1.75f, tab.height);
 
 		setMenuPosition(0, 0);
 	}
@@ -133,8 +133,7 @@ public class MainPage extends TouchableView {
 	public void draw() {
 		menuButton.updateState();
 		if (menuButton.snap) {
-			setMenuPosition(menuButton.x + menuButton.velocity - 13
-					* menuOffset / 8, y);
+			setMenuPosition(menuButton.x, y);
 		}
 	}
 
@@ -154,7 +153,7 @@ public class MainPage extends TouchableView {
 	private synchronized void setMenuPosition(float x, float y) {
 		slideMenu.setPosition(Math.min(0, x - slideMenu.width), y + menuOffset
 				/ 2);
-		menuButton.setPosition(x + menuOffset * 2, y + menuOffset / 2);
+		menuButton.setPosition(x + menuButton.velocity, y + menuOffset / 2);
 		tab.layout(x - width, y + menuOffset / 2, tab.width, tab.height);
 
 		foregroundColor[3] = GeneralUtils.clipToUnit(menuButton.x
@@ -188,9 +187,9 @@ public class MainPage extends TouchableView {
 
 		@Override
 		public void handleActionMove(int pointerId, float x, float y) {
-			setMenuPosition(this.x + x - downX, 0);
 			velocity = this.x - lastX;
 			lastX = this.x;
+			setMenuPosition(this.x + x - downX - velocity, 0);
 		}
 
 		@Override

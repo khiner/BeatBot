@@ -45,8 +45,9 @@ public class BeatBotActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		GeneralUtils.initAndroidSettings(this);
 		mainActivity = this;
+
+		GeneralUtils.initAndroidSettings(this);
 		View.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
 		Colors.initColors(this);
@@ -55,19 +56,20 @@ public class BeatBotActivity extends Activity {
 				LinearLayout.LayoutParams.FILL_PARENT,
 				LinearLayout.LayoutParams.FILL_PARENT);
 
+		DirectoryManager.init();
+		FileHelper.copyAllSamplesToStorage();
+		MidiFileManager.init();
+
+		if (savedInstanceState == null) {
+			initNativeAudio();
+		}
+
 		View.root = new GLSurfaceViewGroup(this);
 		View.root.setLayoutParams(lp);
 
 		LinearLayout layout = new LinearLayout(this);
 		layout.addView(View.root);
 		setContentView(layout, lp);
-
-		DirectoryManager.init();
-
-		FileHelper.copyAllSamplesToStorage();
-		if (savedInstanceState == null) {
-			initNativeAudio();
-		}
 
 		Page.mainPage = new MainPage();
 		Page.effectPage = new EffectPage();
@@ -81,7 +83,6 @@ public class BeatBotActivity extends Activity {
 
 		TrackManager.init();
 		MidiManager.init();
-		MidiFileManager.init();
 	}
 
 	@Override
@@ -216,6 +217,7 @@ public class BeatBotActivity extends Activity {
 									String midiFileName = midiFileNameInput
 											.getText().toString();
 									MidiFileManager.exportMidi(midiFileName);
+									Page.mainPage.slideMenu.updateMidiList();
 								}
 							})
 					.setNegativeButton("Cancel",

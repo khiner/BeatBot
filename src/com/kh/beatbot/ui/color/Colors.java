@@ -116,7 +116,7 @@ public class Colors {
 
 		defaultStrokeColorSet = new ColorSet(VOLUME, VOLUME, VOLUME);
 
-		menuItemFillColorSet = new ColorSet(null, LABEL_LIGHT, null);
+		menuItemFillColorSet = new ColorSet(null, VOLUME);
 		menuToggleFillColorSet = new ColorSet(null, LABEL_LIGHT, VOLUME);
 	}
 

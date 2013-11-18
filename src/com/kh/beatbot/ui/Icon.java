@@ -1,16 +1,17 @@
 package com.kh.beatbot.ui;
 
+import com.kh.beatbot.ui.IconResource.State;
+
 public class Icon extends Drawable {
 	protected Drawable currentDrawable;
 	protected IconResource resource;
-	protected IconResource.State state;
+	protected IconResource.State state = State.DEFAULT;
 
 	public Icon() {
 	};
 
 	public Icon(IconResource resource) {
-		this.resource = resource;
-		setState(IconResource.State.DISABLED);
+		setResource(resource);
 	}
 
 	public void setResource(IconResource resource) {
@@ -24,9 +25,7 @@ public class Icon extends Drawable {
 	}
 
 	public void draw() {
-		if (currentDrawable != null) {
-			currentDrawable.draw(x, y, width, height);
-		}
+		draw(x, y, width, height);
 	}
 
 	public void draw(float x, float y, float width, float height) {

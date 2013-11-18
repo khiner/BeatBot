@@ -113,9 +113,6 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public synchronized void removeChild(View child) {
-		if (!children.contains(child))
-			return;
-		child.destroy();
 		children.remove(child);
 	}
 

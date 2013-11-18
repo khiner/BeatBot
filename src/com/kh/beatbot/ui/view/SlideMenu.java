@@ -58,8 +58,10 @@ public class SlideMenu extends TouchableView {
 
 		public void layout(View parent, float x, float y, float width,
 				float height) {
-			button.layout(parent, x, y, width, height);
-			layoutSubMenuItems(parent);
+			if (children.contains(button)) {
+				button.layout(parent, x, y, width, height);
+				layoutSubMenuItems(parent);
+			}
 		}
 
 		public void layoutSubMenuItems(View parent) {
@@ -111,6 +113,13 @@ public class SlideMenu extends TouchableView {
 			for (MenuItem child : subMenuItems) {
 				child.remove();
 			}
+		}
+
+		public void clearSubMenuItems() {
+			for (MenuItem child : subMenuItems) {
+				child.remove();
+			}
+			subMenuItems.clear();
 		}
 
 		public void select() {
@@ -186,6 +195,11 @@ public class SlideMenu extends TouchableView {
 			addChild(menuItem.button);
 		}
 
+		updateMidiList();
+	}
+
+	public void updateMidiList() {
+		midiImportItem.clearSubMenuItems();
 		final String[] fileNames = DirectoryManager.midiDirectory.list();
 		for (String fileName : fileNames) {
 			MenuItem midiMenuItem = new MenuItem(new ImageButton());
@@ -193,6 +207,8 @@ public class SlideMenu extends TouchableView {
 			midiMenuItem.button.setText(fileName);
 			midiImportItem.addSubMenuItems(midiMenuItem);
 		}
+		if (initialized)
+			midiImportItem.loadIcons(); // XXX
 	}
 
 	public synchronized void loadIcons() {
