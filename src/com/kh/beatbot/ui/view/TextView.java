@@ -24,10 +24,6 @@ public class TextView extends View {
 	}
 
 	@Override
-	public synchronized void destroy() {
-	}
-
-	@Override
 	public void draw() {
 		drawText();
 	}

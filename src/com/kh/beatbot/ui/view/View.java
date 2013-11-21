@@ -154,8 +154,6 @@ public abstract class View implements Comparable<View> {
 
 	public abstract void init();
 
-	public abstract void destroy();
-
 	public abstract void draw();
 
 	protected abstract void createChildren();

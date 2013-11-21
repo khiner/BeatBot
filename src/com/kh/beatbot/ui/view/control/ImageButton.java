@@ -119,11 +119,4 @@ public class ImageButton extends Button {
 					: Colors.defaultStrokeColorSet.defaultColor;
 		}
 	}
-
-	@Override
-	public synchronized void destroy() {
-		if (getBgIcon() instanceof ShapeIcon) {
-			((ShapeIcon)getBgIcon()).destroy();
-		}
-	}
 }
