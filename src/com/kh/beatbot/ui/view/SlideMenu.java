@@ -30,8 +30,12 @@ public class SlideMenu extends TouchableView {
 		private MenuItem parent = null;
 		private ImageButton button;
 		private List<MenuItem> subMenuItems = new ArrayList<MenuItem>();
+		private int level = 0;
+		private ListView container = null;
 
-		public MenuItem(ImageButton button) {
+		public MenuItem(MenuItem parent, ImageButton button) {
+			this.parent = parent;
+			this.level = parent == null ? 0 : parent.level + 1;
 			final MenuItem menuItem = this;
 			this.button = button;
 			button.setOnReleaseListener(new OnReleaseListener() {
@@ -40,6 +44,8 @@ public class SlideMenu extends TouchableView {
 					menuItem.onRelease(button);
 				}
 			});
+
+			container = menuLists.get(level);
 		}
 
 		public void onRelease(Button button) {
@@ -52,30 +58,12 @@ public class SlideMenu extends TouchableView {
 		public void addSubMenuItems(final MenuItem... subMenuItems) {
 			for (MenuItem menuItem : subMenuItems) {
 				this.subMenuItems.add(menuItem);
-				menuItem.parent = this;
-			}
-		}
-
-		public void layout(View parent, float x, float y, float width,
-				float height) {
-			if (children.contains(button)) {
-				button.layout(parent, x, y, width, height);
-				layoutSubMenuItems(parent);
-			}
-		}
-
-		public void layoutSubMenuItems(View parent) {
-			for (int i = 0; i < subMenuItems.size(); i++) {
-				subMenuItems.get(i).layout(parent, button.x + button.width,
-						offset + LABEL_HEIGHT * i, columnWidth * 2 - offset,
-						LABEL_HEIGHT);
 			}
 		}
 
 		public void loadIcons() {
 			if (parent != null) {
-				button.setBgIcon(new RoundedRectIcon(
-						null,
+				button.setBgIcon(new RoundedRectIcon(null,
 						button instanceof ToggleButton ? Colors.menuToggleFillColorSet
 								: Colors.menuItemFillColorSet));
 				button.setStrokeColor(Colors.BLACK);
@@ -108,16 +96,26 @@ public class SlideMenu extends TouchableView {
 			return false;
 		}
 
-		public void remove() {
-			removeChild(button);
+		public void show() {
+			container.add(button);
+			if (!children.contains(container)) {
+				addChild(container);
+			}
+		}
+
+		public void hide() {
+			container.remove(button);
 			for (MenuItem child : subMenuItems) {
-				child.remove();
+				child.hide();
+			}
+			if (container.children.isEmpty()) {
+				removeChild(container);
 			}
 		}
 
 		public void clearSubMenuItems() {
 			for (MenuItem child : subMenuItems) {
-				child.remove();
+				child.hide();
 			}
 			subMenuItems.clear();
 		}
@@ -125,9 +123,10 @@ public class SlideMenu extends TouchableView {
 		public void select() {
 			for (MenuItem sibling : getSiblings()) {
 				if (sibling.equals(this)) {
+					show();
 					setChecked(true);
 					for (MenuItem subMenuItem : subMenuItems) {
-						addChild(subMenuItem.button);
+						subMenuItem.show();
 						if (subMenuItem.isChecked()) {
 							subMenuItem.select();
 						}
@@ -135,7 +134,7 @@ public class SlideMenu extends TouchableView {
 				} else {
 					sibling.setChecked(false);
 					for (MenuItem nephew : sibling.subMenuItems) {
-						nephew.remove();
+						nephew.hide();
 					}
 				}
 			}
@@ -148,24 +147,31 @@ public class SlideMenu extends TouchableView {
 		}
 	}
 
-	private float offset = 0, columnWidth = 0, iconWidth;
+	private float columnWidth = 0;
 
 	private MenuItem fileItem, settingsItem, snapToGridItem, midiImportItem,
 			midiExportItem, selectedItem = null;
 
+	private List<ListView> menuLists;
 	private List<MenuItem> topLevelItems;
 
 	private OnMidiItemReleaseListener midiItemReleaseListener;
 
 	public synchronized void createChildren() {
-		topLevelItems = new ArrayList<MenuItem>();
 		midiItemReleaseListener = new OnMidiItemReleaseListener();
 
-		fileItem = new MenuItem(new ToggleButton());
-		settingsItem = new MenuItem(new ToggleButton());
-		snapToGridItem = new MenuItem(new ToggleButton());
-		midiImportItem = new MenuItem(new ToggleButton());
-		midiExportItem = new MenuItem(new ImageButton());
+		menuLists = new ArrayList<ListView>();
+		for (int i = 0; i < 3; i++) {
+			menuLists.add(new ListView());
+		}
+
+		topLevelItems = new ArrayList<MenuItem>();
+
+		fileItem = new MenuItem(null, new ToggleButton());
+		settingsItem = new MenuItem(null, new ToggleButton());
+		snapToGridItem = new MenuItem(settingsItem, new ToggleButton());
+		midiImportItem = new MenuItem(fileItem, new ToggleButton());
+		midiExportItem = new MenuItem(fileItem, new ImageButton());
 
 		topLevelItems.add(fileItem);
 		topLevelItems.add(settingsItem);
@@ -191,10 +197,10 @@ public class SlideMenu extends TouchableView {
 		fileItem.addSubMenuItems(midiImportItem, midiExportItem);
 		settingsItem.addSubMenuItems(snapToGridItem);
 
-		for (MenuItem menuItem : topLevelItems) {
-			addChild(menuItem.button);
-		}
+		addChild(menuLists.get(0));
 
+		fileItem.show();
+		settingsItem.show();
 		updateMidiList();
 	}
 
@@ -202,29 +208,30 @@ public class SlideMenu extends TouchableView {
 		midiImportItem.clearSubMenuItems();
 		final String[] fileNames = DirectoryManager.midiDirectory.list();
 		for (String fileName : fileNames) {
-			MenuItem midiMenuItem = new MenuItem(new ImageButton());
+			MenuItem midiMenuItem = new MenuItem(midiImportItem,
+					new ImageButton());
 			midiMenuItem.button.setOnReleaseListener(midiItemReleaseListener);
 			midiMenuItem.button.setText(fileName);
 			midiImportItem.addSubMenuItems(midiMenuItem);
 		}
-		if (initialized)
-			midiImportItem.loadIcons(); // XXX
+		if (initialized) {
+			midiImportItem.loadIcons();
+		}
 	}
 
 	public synchronized void loadIcons() {
 		columnWidth = width;
-		offset = width / 6;
 		fileItem.setIcon(new Icon(IconResources.FILE));
 		settingsItem.setIcon(new Icon(IconResources.SETTINGS));
 
 		snapToGridItem.setIcon(new Icon(IconResources.SNAP_TO_GRID));
 		snapToGridItem.setChecked(MidiManager.isSnapToGrid());
-		snapToGridItem.setText("SNAP-TO-GRID");
+		snapToGridItem.setText("Snap-to-grid");
 
 		midiImportItem.setIcon(new Icon(IconResources.MIDI_IMPORT));
 		midiExportItem.setIcon(new Icon(IconResources.MIDI_EXPORT));
-		midiImportItem.setText("IMPORT MIDI");
-		midiExportItem.setText("EXPORT MIDI");
+		midiImportItem.setText("Import MIDI");
+		midiExportItem.setText("Export MIDI");
 
 		for (MenuItem menuItem : topLevelItems) {
 			menuItem.loadIcons();
@@ -232,11 +239,10 @@ public class SlideMenu extends TouchableView {
 	}
 
 	public synchronized void layoutChildren() {
-		iconWidth = columnWidth - offset * 2;
-
-		fileItem.layout(this, offset, 0, iconWidth, iconWidth);
-		settingsItem.layout(this, offset, iconWidth + offset, iconWidth,
-				iconWidth);
+		menuLists.get(0).layout(this, 0, 0, columnWidth, height);
+		menuLists.get(1).layout(this, columnWidth, 0, 2 * columnWidth, height);
+		menuLists.get(2).layout(this, 3 * columnWidth, 0, 2 * columnWidth,
+				height);
 	}
 
 	private synchronized void selectMenuItem(MenuItem menuItem) {
