@@ -11,7 +11,9 @@ public abstract class TouchableView extends TextView {
 	// map of pointer ID #'s that this window is responsible for to their current
 	// position relative to this window
 	protected Map<Integer, Position> pointerIdToPos = new HashMap<Integer, Position>();
-	
+
+	protected boolean shouldPropogateTouchEvents = true;
+
 	public final boolean ownsPointer(int id) {
 		return pointerIdToPos.containsKey(id);
 	}
@@ -57,6 +59,9 @@ public abstract class TouchableView extends TextView {
 	 **********************************************************************/
 	public final void propogateActionDown(MotionEvent e, int id, float x, float y) {
 		consumeActionDown(id, x, y);
+		if (!shouldPropogateTouchEvents) {
+			return;
+		}
 		View child = findChildAt(x, y);
 		if (child instanceof TouchableView) {
 			((TouchableView) child).propogateActionDown(e, id, x - child.x, y
@@ -66,6 +71,9 @@ public abstract class TouchableView extends TextView {
 
 	public final void propogateActionUp(MotionEvent e, int id, float x, float y) {
 		consumeActionUp(id, x, y);
+		if (!shouldPropogateTouchEvents) {
+			return;
+		}
 		TouchableView child = whichChildOwnsPointer(id);
 		if (child != null)
 			child.propogateActionUp(e, id, x - child.x, y - child.y);
@@ -74,6 +82,9 @@ public abstract class TouchableView extends TextView {
 	public final void propogateActionPointerDown(MotionEvent e, int id, float x,
 			float y) {
 		consumeActionPointerDown(id, x, y);
+		if (!shouldPropogateTouchEvents) {
+			return;
+		}
 		View child = findChildAt(x, y);
 		if (child instanceof TouchableView) {
 			TouchableView touchableChild = (TouchableView)child;
@@ -86,6 +97,9 @@ public abstract class TouchableView extends TextView {
 
 	public final void propogateActionPointerUp(MotionEvent e, int id, float x, float y) {
 		consumeActionPointerUp(id, x, y);
+		if (!shouldPropogateTouchEvents) {
+			return;
+		}
 		TouchableView child = whichChildOwnsPointer(id);
 		if (child != null) {
 			if (child.pointerCount() == 1)
@@ -97,6 +111,9 @@ public abstract class TouchableView extends TextView {
 	
 	public final void propogateActionMove(MotionEvent e, int id, float x, float y) {
 		consumeActionMove(id, x, y);
+		if (!shouldPropogateTouchEvents) {
+			return;
+		}
 		TouchableView child = whichChildOwnsPointer(id);
 		if (child != null)
 			child.propogateActionMove(e, id, x - child.x, y - child.y);

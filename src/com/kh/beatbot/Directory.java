@@ -2,6 +2,7 @@ package com.kh.beatbot;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.kh.beatbot.manager.DirectoryManager;
@@ -70,7 +71,9 @@ public class Directory {
 	}
 
 	public String[] list() {
-		return file.list();
+		String[] list = file.list();
+		Arrays.sort(list);
+		return list;
 	}
 
 	public String[] getChildNames() {

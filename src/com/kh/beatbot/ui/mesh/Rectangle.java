@@ -21,7 +21,7 @@ public class Rectangle extends Shape {
 	 * |/2| *
 	 * ^--^ *
 	 ********/
-	protected void updateVertices() {
+	protected synchronized void updateVertices() {
 		// fill triangle 1
 		fillVertex(x, y);
 		fillVertex(x + width, y);

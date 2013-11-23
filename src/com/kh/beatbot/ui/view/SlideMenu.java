@@ -30,8 +30,8 @@ public class SlideMenu extends TouchableView {
 		private MenuItem parent = null;
 		private ImageButton button;
 		private List<MenuItem> subMenuItems = new ArrayList<MenuItem>();
-		private int level = 0;
 		private ListView container = null;
+		private int level = 0;
 
 		public MenuItem(MenuItem parent, ImageButton button) {
 			this.parent = parent;
@@ -63,7 +63,8 @@ public class SlideMenu extends TouchableView {
 
 		public void loadIcons() {
 			if (parent != null) {
-				button.setBgIcon(new RoundedRectIcon(null,
+				button.setBgIcon(new RoundedRectIcon(
+						null,
 						button instanceof ToggleButton ? Colors.menuToggleFillColorSet
 								: Colors.menuItemFillColorSet));
 				button.setStrokeColor(Colors.BLACK);
@@ -239,10 +240,14 @@ public class SlideMenu extends TouchableView {
 	}
 
 	public synchronized void layoutChildren() {
-		menuLists.get(0).layout(this, 0, 0, columnWidth, height);
-		menuLists.get(1).layout(this, columnWidth, 0, 2 * columnWidth, height);
-		menuLists.get(2).layout(this, 3 * columnWidth, 0, 2 * columnWidth,
-				height);
+		float yOffset = LABEL_HEIGHT / 3;
+		ListView.displayOffset = yOffset;
+		float displayHeight = height - 2 * yOffset;
+		menuLists.get(0).layout(this, 0, yOffset, columnWidth, displayHeight);
+		menuLists.get(1).layout(this, columnWidth, yOffset, 2 * columnWidth,
+				displayHeight);
+		menuLists.get(2).layout(this, 3 * columnWidth, yOffset,
+				2 * columnWidth, displayHeight);
 	}
 
 	private synchronized void selectMenuItem(MenuItem menuItem) {

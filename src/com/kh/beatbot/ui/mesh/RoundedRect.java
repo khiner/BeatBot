@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.mesh;
 
 public class RoundedRect extends Shape {
-	public static final int NUM_CORNER_VERTICES = 12;
+	public static final int NUM_CORNER_VERTICES = 6;
 
 	public float cornerRadius = -1;
 
@@ -17,7 +17,7 @@ public class RoundedRect extends Shape {
 		return NUM_CORNER_VERTICES * 4 * 2;
 	}
 
-	protected void updateVertices() {
+	protected synchronized void updateVertices() {
 		float theta = 0, addX, addY;
 		float centerX = x + width / 2;
 		float centerY = y + height / 2;
@@ -59,12 +59,12 @@ public class RoundedRect extends Shape {
 		strokeVertex(lastX, lastY);
 	}
 
-	public void setCornerRadius(float cornerRadius) {
+	public synchronized void setCornerRadius(float cornerRadius) {
 		this.cornerRadius = cornerRadius;
 	}
 
 	@Override
-	public void layout(float x, float y, float width, float height) {
+	public synchronized void layout(float x, float y, float width, float height) {
 		if (cornerRadius < 0) {
 			cornerRadius = width > height ? height / 5 : width / 5;
 		}

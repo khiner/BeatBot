@@ -54,12 +54,12 @@ public abstract class Shape extends Drawable {
 		return (WaveformShape) waveform;
 	}
 
-	public void update(float x, float y, float width, float height,
+	public synchronized void update(float x, float y, float width, float height,
 			float[] fillColor) {
 		update(x, y, width, height, fillColor, null);
 	}
 
-	public void update(float x, float y, float width, float height,
+	public synchronized void update(float x, float y, float width, float height,
 			float[] fillColor, float[] outlineColor) {
 		this.x = x;
 		this.y = y;
@@ -78,13 +78,13 @@ public abstract class Shape extends Drawable {
 
 	protected abstract int getNumStrokeVertices();
 
-	protected void fillVertex(float x, float y) {
+	protected synchronized void fillVertex(float x, float y) {
 		if (fillMesh != null) {
 			fillMesh.vertex(x, y);
 		}
 	}
 
-	protected void strokeVertex(float x, float y) {
+	protected synchronized void strokeVertex(float x, float y) {
 		if (strokeMesh != null) {
 			strokeMesh.vertex(x, y);
 		}
@@ -99,7 +99,7 @@ public abstract class Shape extends Drawable {
 
 	protected abstract void updateVertices();
 
-	protected void update() {
+	protected synchronized void update() {
 		if (fillMesh != null) {
 			fillMesh.index = 0;
 		}
@@ -120,34 +120,34 @@ public abstract class Shape extends Drawable {
 		}
 	}
 
-	public void setFillColor(float[] fillColor) {
+	public synchronized void setFillColor(float[] fillColor) {
 		fillMesh.color = fillColor;
 		update();
 	}
 
-	public void setColors(float[] fillColor, float[] strokeColor) {
+	public synchronized void setColors(float[] fillColor, float[] strokeColor) {
 		fillMesh.color = fillColor;
 		strokeMesh.color = strokeColor;
 		update();
 	}
 
-	public Mesh2D getFillMesh() {
+	public synchronized Mesh2D getFillMesh() {
 		return fillMesh;
 	}
 
-	public Mesh2D getStrokeMesh() {
+	public synchronized Mesh2D getStrokeMesh() {
 		return strokeMesh;
 	}
 
-	public float[] getStrokeColor() {
+	public synchronized float[] getStrokeColor() {
 		return strokeMesh != null ? strokeMesh.color : null;
 	}
 
-	public float[] getFillColor() {
+	public synchronized float[] getFillColor() {
 		return fillMesh.color;
 	}
 
-	public void setGroup(ShapeGroup group) {
+	public synchronized void setGroup(ShapeGroup group) {
 		if (this.group == group) {
 			return; // already a member of this group
 		}
@@ -158,17 +158,17 @@ public abstract class Shape extends Drawable {
 		group.add(this);
 	}
 
-	public ShapeGroup getGroup() {
+	public synchronized ShapeGroup getGroup() {
 		return group;
 	}
 
-	public void layout(float x, float y, float width, float height) {
+	public synchronized void layout(float x, float y, float width, float height) {
 		super.layout(x, y, width, height);
 		update();
 	}
 
 	@Override
-	public void draw(float x, float y, float width, float height) {
+	public synchronized void draw(float x, float y, float width, float height) {
 		if (shouldDraw) {
 			group.draw();
 		}
