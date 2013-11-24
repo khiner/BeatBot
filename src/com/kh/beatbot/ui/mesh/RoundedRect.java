@@ -2,7 +2,7 @@ package com.kh.beatbot.ui.mesh;
 
 public class RoundedRect extends Shape {
 	public static final int NUM_CORNER_VERTICES = 6;
-
+	public float roundThresh = 0;
 	public float cornerRadius = -1;
 
 	protected RoundedRect(ShapeGroup group) {
@@ -18,7 +18,8 @@ public class RoundedRect extends Shape {
 	}
 
 	protected synchronized void updateVertices() {
-		float theta = 0, addX, addY;
+		roundThresh = cornerRadius / 20;
+		float theta = 0, addX, addY, vertexX, vertexY;
 		float centerX = x + width / 2;
 		float centerY = y + height / 2;
 		float firstX = 0, firstY = 0, lastX = 0, lastY = 0;
@@ -36,8 +37,8 @@ public class RoundedRect extends Shape {
 				addY = cornerRadius;
 			}
 
-			float vertexX = (float) Math.cos(theta) * cornerRadius + addX + x;
-			float vertexY = (float) Math.sin(theta) * cornerRadius + addY + y;
+			vertexX = roundX((float) Math.cos(theta) * cornerRadius + addX + x);
+			vertexY = roundY((float) Math.sin(theta) * cornerRadius + addY + y);
 			if (lastX != 0 && lastY != 0) {
 				fillVertex(vertexX, vertexY);
 				fillVertex(lastX, lastY);
@@ -69,5 +70,32 @@ public class RoundedRect extends Shape {
 			cornerRadius = width > height ? height / 5 : width / 5;
 		}
 		super.layout(x, y, width, height);
+	}
+	
+	private float roundX(float vertexX) {
+		if (Math.abs(vertexX - x) < roundThresh) {
+			return x;
+		} else if (Math.abs(vertexX - width - x) < roundThresh) {
+			return width + x;
+		} else if (Math.abs(vertexX - x - width + cornerRadius) < roundThresh) {
+			return x + width - cornerRadius;
+		} else if (Math.abs(vertexX - x - cornerRadius) < roundThresh) {
+			return x + cornerRadius;
+		}
+			
+		return vertexX;
+	}
+	
+	private float roundY(float vertexY) {
+		if (Math.abs(vertexY - y) < roundThresh) {
+			return y;
+		} else if (Math.abs(vertexY - height - y) < roundThresh) {
+			return height + y;
+		} else if (Math.abs(vertexY - y - height + cornerRadius) < roundThresh) {
+			return y + height - cornerRadius;
+		} else if (Math.abs(vertexY - y - cornerRadius) < roundThresh) {
+			return y + cornerRadius;
+		}
+		return vertexY;
 	}
 }
