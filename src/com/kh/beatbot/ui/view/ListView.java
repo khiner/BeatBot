@@ -17,18 +17,19 @@ public class ListView extends TouchableView implements OnPressListener {
 	public static float displayOffset = 0;
 
 	private float yAnchor = 0, yOffset = 0, childHeight = 0;
-	private RoundedRect scrollTab = null;
+	private RoundedRect scrollBar = null;
 	private ColorTransition tabColorTransition = new ColorTransition(20, 20,
 			Colors.TRANSPARANT, END_TRANS_COLOR);
 
 	private Button pressedButton = null;
 
-	public void draw() {
+	public synchronized void drawChildren() {
+		super.drawChildren();
 		tabColorTransition.tick();
-		if (scrollTab != null
+		if (scrollBar != null
 				&& tabColorTransition.getState() != Transition.State.OFF) {
-			scrollTab.setFillColor(tabColorTransition.getColor());
-			scrollTab.draw();
+			scrollBar.setFillColor(tabColorTransition.getColor());
+			scrollBar.draw();
 		}
 	}
 
@@ -80,11 +81,11 @@ public class ListView extends TouchableView implements OnPressListener {
 	}
 
 	private RoundedRect getScrollTab() {
-		if (scrollTab == null) {
-			scrollTab = (RoundedRect) Shape.get(Type.ROUNDED_RECT, null,
+		if (scrollBar == null) {
+			scrollBar = (RoundedRect) Shape.get(Type.ROUNDED_RECT, null,
 					Colors.TRANSPARANT, null);
 		}
-		return scrollTab;
+		return scrollBar;
 	}
 
 	private void layoutScrollTab() {
