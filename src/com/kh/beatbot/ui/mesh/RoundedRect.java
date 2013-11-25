@@ -22,7 +22,7 @@ public class RoundedRect extends Shape {
 		float theta = 0, addX, addY, vertexX, vertexY;
 		float centerX = x + width / 2;
 		float centerY = y + height / 2;
-		float firstX = 0, firstY = 0, lastX = 0, lastY = 0;
+		float firstX = 0, firstY = 0, lastX = Float.MIN_VALUE, lastY = Float.MIN_VALUE;
 		for (int i = 0; i < getNumFillVertices() / 3; i++) {
 			if (theta < ¹ / 2) { // lower right
 				addX = width - cornerRadius;
@@ -39,7 +39,7 @@ public class RoundedRect extends Shape {
 
 			vertexX = roundX((float) Math.cos(theta) * cornerRadius + addX + x);
 			vertexY = roundY((float) Math.sin(theta) * cornerRadius + addY + y);
-			if (lastX != 0 && lastY != 0) {
+			if (lastX != Float.MIN_VALUE && lastY != Float.MIN_VALUE) {
 				fillVertex(vertexX, vertexY);
 				fillVertex(lastX, lastY);
 				fillVertex(centerX, centerY);

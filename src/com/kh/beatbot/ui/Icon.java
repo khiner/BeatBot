@@ -36,6 +36,7 @@ public class Icon extends Drawable {
 
 	protected void setDrawable(Drawable drawable) {
 		currentDrawable = drawable != null ? drawable
-				: resource.defaultDrawable;
+				: (state == State.PRESSED && resource.selectedDrawable != null) ? resource.selectedDrawable
+						: resource.defaultDrawable;
 	}
 }
