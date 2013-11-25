@@ -51,8 +51,12 @@ public class MidiNote implements Comparable<MidiNote> {
 		this.rectangle = rectangle;
 	}
 	
-	private void updateView() {
+	private void updateViewPosition() {
 		Page.mainPage.midiView.updateNoteView(this);
+	}
+	
+	private void updateViewSelected() {
+		Page.mainPage.midiView.updateNoteViewSelected(this);
 	}
 	
 	public MidiNote getCopy() {
@@ -112,7 +116,7 @@ public class MidiNote implements Comparable<MidiNote> {
 
 	public void setSelected(boolean selected) {
 		this.selected = selected;
-		updateView(); // color change
+		updateViewSelected(); // color change
 	}
 
 	public void setTouched(boolean touched) {
@@ -149,13 +153,13 @@ public class MidiNote implements Comparable<MidiNote> {
 
 	public void setOnTick(long onTick) {
 		noteOn.setTick(onTick >= 0 ? onTick : 0);
-		updateView();
+		updateViewPosition();
 	}
 
 	public void setOffTick(long offTick) {
 		if (offTick > getOnTick())
 			this.noteOff.setTick(offTick);
-		updateView();
+		updateViewPosition();
 	}
 
 	public void setNote(int note) {
@@ -163,7 +167,7 @@ public class MidiNote implements Comparable<MidiNote> {
 			return;
 		this.noteOn.setNoteValue(note);
 		this.noteOff.setNoteValue(note);
-		updateView();
+		updateViewPosition();
 	}
 
 	public long getNoteLength() {

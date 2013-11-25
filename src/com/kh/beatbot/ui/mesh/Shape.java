@@ -54,29 +54,11 @@ public abstract class Shape extends Drawable {
 		return (WaveformShape) waveform;
 	}
 
-	public synchronized void update(float x, float y, float width, float height,
-			float[] fillColor) {
-		update(x, y, width, height, fillColor, null);
-	}
-
-	public synchronized void update(float x, float y, float width, float height,
-			float[] fillColor, float[] outlineColor) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		if (fillMesh != null) {
-			fillMesh.color = fillColor;
-		}
-		if (strokeMesh != null) {
-			strokeMesh.color = outlineColor;
-		}
-		update();
-	}
-
 	protected abstract int getNumFillVertices();
 
 	protected abstract int getNumStrokeVertices();
+
+	protected abstract void updateVertices();
 
 	protected synchronized void fillVertex(float x, float y) {
 		if (fillMesh != null) {
@@ -97,22 +79,16 @@ public abstract class Shape extends Drawable {
 		this.group = group != null ? group : new ShapeGroup();
 	}
 
-	protected abstract void updateVertices();
-
-	protected synchronized void update() {
+	protected synchronized void resetIndices() {
 		if (fillMesh != null) {
 			fillMesh.index = 0;
 		}
 		if (strokeMesh != null) {
 			strokeMesh.index = 0;
 		}
-		updateVertices();
-		if (fillMesh != null) {
-			fillMesh.setColor(fillMesh.color);
-		}
-		if (strokeMesh != null) {
-			strokeMesh.setColor(strokeMesh.color);
-		}
+	}
+
+	protected synchronized void updateGroup() {
 		if (shouldDraw && !group.contains(this)) {
 			group.add(this);
 		} else {
@@ -120,15 +96,34 @@ public abstract class Shape extends Drawable {
 		}
 	}
 
+	protected synchronized void update() {
+		resetIndices();
+		updateVertices();
+		updateGroup();
+	}
+
 	public synchronized void setFillColor(float[] fillColor) {
-		fillMesh.color = fillColor;
-		update();
+		if (fillMesh != null) {
+			fillMesh.setColor(fillColor);
+		}
+		updateGroup();
+	}
+
+	public synchronized void setStrokeColor(float[] strokeColor) {
+		if (strokeMesh != null) {
+			strokeMesh.setColor(strokeColor);
+		}
+		updateGroup();
 	}
 
 	public synchronized void setColors(float[] fillColor, float[] strokeColor) {
-		fillMesh.color = fillColor;
-		strokeMesh.color = strokeColor;
-		update();
+		if (fillMesh != null) {
+			fillMesh.setColor(fillColor);
+		}
+		if (strokeMesh != null) {
+			strokeMesh.setColor(strokeColor);
+		}
+		updateGroup();
 	}
 
 	public synchronized Mesh2D getFillMesh() {
@@ -140,11 +135,11 @@ public abstract class Shape extends Drawable {
 	}
 
 	public synchronized float[] getStrokeColor() {
-		return strokeMesh != null ? strokeMesh.color : null;
+		return strokeMesh != null ? strokeMesh.getColor() : null;
 	}
 
 	public synchronized float[] getFillColor() {
-		return fillMesh.color;
+		return fillMesh != null ? fillMesh.getColor() : null;
 	}
 
 	public synchronized void setGroup(ShapeGroup group) {
@@ -162,9 +157,24 @@ public abstract class Shape extends Drawable {
 		return group;
 	}
 
+	public synchronized void setPosition(float x, float y) {
+		if (fillMesh != null) {
+			fillMesh.translate(x - this.x, y - this.y);
+		}
+		if (strokeMesh != null) {
+			strokeMesh.translate(x - this.x, y - this.y);
+		}
+		super.setPosition(x, y);
+	}
+
 	public synchronized void layout(float x, float y, float width, float height) {
-		super.layout(x, y, width, height);
-		update();
+		if (width != this.width || height != this.height) {
+			super.layout(x, y, width, height);
+			update();
+		} else {
+			setPosition(x, y);
+			updateGroup();
+		}
 	}
 
 	@Override

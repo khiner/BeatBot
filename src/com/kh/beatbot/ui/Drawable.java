@@ -9,7 +9,12 @@ public abstract class Drawable {
 	public void draw() {
 		draw(x, y, width, height);
 	}
-		
+	
+	public void setPosition(float x, float y) {
+		this.x = x;
+		this.y = y;
+	}
+
 	public void layout(float x, float y, float width, float height) {
 		this.x = x;
 		this.y = y;

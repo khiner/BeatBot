@@ -123,7 +123,7 @@ public class MainPage extends TouchableView {
 
 		slideMenu
 				.layout(this, 0, 0, trackControlWidth + menuOffset * 2, height);
-		tab.layout(0, 0, slideMenu.width, controlButtonHeight + menuOffset * 2);
+		tab.layout(1, 1, slideMenu.width, controlButtonHeight + menuOffset * 2);
 		menuButton.layout(this, 0, 0, tab.height * 1.75f, tab.height);
 
 		setMenuPosition(0, 0);

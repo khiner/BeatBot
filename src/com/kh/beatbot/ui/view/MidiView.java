@@ -195,8 +195,7 @@ public class MidiView extends ClickableView {
 			bgRect = makeRectangle(bgShapeGroup, 0, Y_OFFSET, width,
 					allTracksHeight, Colors.MIDI_VIEW_BG);
 		} else {
-			bgRect.update(0, Y_OFFSET, width, allTracksHeight,
-					Colors.MIDI_VIEW_BG);
+			bgRect.layout(0, Y_OFFSET, width, allTracksHeight);
 		}
 		updateLoopRect();
 	}
@@ -209,8 +208,7 @@ public class MidiView extends ClickableView {
 			selectedNoteRect = makeRectangle(null, x1, y1, width, trackHeight,
 					Colors.MIDI_SELECTED_TRACK, Colors.BLACK);
 		} else {
-			selectedNoteRect.update(x1, y1, width, trackHeight,
-					Colors.MIDI_SELECTED_TRACK, Colors.BLACK);
+			selectedNoteRect.layout(x1, y1, width, trackHeight);
 		}
 	}
 
@@ -236,8 +234,7 @@ public class MidiView extends ClickableView {
 			tickBarRect = makeRectangle(tickBarShapeGroup, 0, 0, width,
 					Y_OFFSET, Colors.TICK_FILL, Colors.BLACK);
 		} else {
-			tickBarRect.update(0, 0, width, Y_OFFSET, Colors.TICK_FILL,
-					Colors.BLACK);
+			tickBarRect.layout(0, 0, width, Y_OFFSET);
 		}
 	}
 
@@ -251,7 +248,8 @@ public class MidiView extends ClickableView {
 			loopBarRect = makeRectangle(tickBarShapeGroup, x, 0, width, height,
 					fillColor);
 		} else {
-			loopBarRect.update(x, 0, width, height, fillColor);
+			loopBarRect.layout(x, 0, width, height);
+			loopBarRect.setFillColor(fillColor);
 		}
 	}
 
@@ -263,8 +261,7 @@ public class MidiView extends ClickableView {
 			loopRect = makeRectangle(bgShapeGroup, x, y, width,
 					allTracksHeight, Colors.MIDI_VIEW_LIGHT_BG);
 		} else {
-			loopRect.update(x, y, width, allTracksHeight,
-					Colors.MIDI_VIEW_LIGHT_BG);
+			loopRect.layout(x, y, width, allTracksHeight);
 		}
 	}
 
@@ -365,10 +362,6 @@ public class MidiView extends ClickableView {
 		updateTickFillRect();
 		initLoopBarVb();
 		TickWindowHelper.initVLineVbs();
-	}
-
-	protected synchronized void loadIcons() {
-		// no icons
 	}
 
 	public synchronized void init() {
@@ -511,16 +504,19 @@ public class MidiView extends ClickableView {
 	}
 
 	public void updateNoteView(MidiNote note) {
-		// note coords
 		float x1 = tickToUnscaledX(note.getOnTick());
 		float y1 = noteToUnscaledY(note.getNoteValue());
 		float width = tickToUnscaledX(note.getOffTick()) - x1;
 
-		float[] color = note.isSelected() ? Colors.NOTE_SELECTED : Colors.NOTE;
-
 		if (note.getRectangle() != null) {
-			note.getRectangle().update(x1, y1, width, trackHeight, color,
-					Colors.BLACK);
+			note.getRectangle().layout(x1, y1, width, trackHeight);
+		}
+	}
+
+	public void updateNoteViewSelected(MidiNote note) {
+		if (note.getRectangle() != null) {
+			note.getRectangle().setFillColor(
+					note.isSelected() ? Colors.NOTE_SELECTED : Colors.NOTE);
 		}
 	}
 
