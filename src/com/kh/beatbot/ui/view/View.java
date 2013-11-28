@@ -95,7 +95,11 @@ public abstract class View implements Comparable<View> {
 		return bgRect.cornerRadius;
 	}
 
-	protected synchronized void addChild(View child) {
+	public boolean hasChildren() {
+		return !children.isEmpty();
+	}
+
+	public synchronized void addChild(View child) {
 		if (children.contains(child)) {
 			return;
 		}

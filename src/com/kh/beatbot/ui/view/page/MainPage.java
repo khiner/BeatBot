@@ -13,12 +13,12 @@ import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.SlideTab;
 import com.kh.beatbot.ui.view.MidiTrackView;
 import com.kh.beatbot.ui.view.MidiView;
-import com.kh.beatbot.ui.view.SlideMenu;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.group.ControlButtonGroup;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
+import com.kh.beatbot.ui.view.menu.MainMenu;
 
 public class MainPage extends TouchableView {
 
@@ -26,7 +26,7 @@ public class MainPage extends TouchableView {
 	public ControlButtonGroup controlButtonGroup;
 	public MidiTrackView midiTrackView;
 	public PageSelectGroup pageSelectGroup;
-	public SlideMenu slideMenu;
+	public MainMenu slideMenu;
 
 	private SlideTab tab;
 	private MenuButton menuButton;
@@ -88,7 +88,7 @@ public class MainPage extends TouchableView {
 		controlButtonGroup = new ControlButtonGroup();
 		midiTrackView = new MidiTrackView();
 		pageSelectGroup = new PageSelectGroup();
-		slideMenu = new SlideMenu();
+		slideMenu = new MainMenu();
 		menuButton = new MenuButton();
 
 		slideMenu.setClip(false);
