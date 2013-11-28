@@ -3,7 +3,7 @@ package com.kh.beatbot.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kh.beatbot.ui.view.page.Page;
+import com.kh.beatbot.ui.view.View;
 
 public class EventManager {
 	private static final int MAX_EVENTS = 100;
@@ -40,7 +40,7 @@ public class EventManager {
 	}
 
 	private static void updateUi() {
-		Page.mainPage.controlButtonGroup.setUndoIconEnabled(currEventIndex >= 0);
-		Page.mainPage.controlButtonGroup.setRedoIconEnabled(currEventIndex < events.size() - 1);
+		View.mainPage.controlButtonGroup.setUndoIconEnabled(currEventIndex >= 0);
+		View.mainPage.controlButtonGroup.setRedoIconEnabled(currEventIndex < events.size() - 1);
 	}
 }

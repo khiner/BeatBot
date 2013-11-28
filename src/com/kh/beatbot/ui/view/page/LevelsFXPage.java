@@ -23,13 +23,14 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.TextView;
+import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.Seekbar;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.list.DraggableLabelList;
 import com.kh.beatbot.ui.view.list.LabelList;
 
-public abstract class LevelsFXPage extends Page {
+public abstract class LevelsFXPage extends TouchableView {
 
 	class EffectLabelListListener implements DraggableLabelListListener {
 		private AlertDialog selectEffectAlert = null;
@@ -111,7 +112,7 @@ public abstract class LevelsFXPage extends Page {
 	protected String[] effectNames;
 
 	@Override
-	public void update() {
+	public synchronized void update() {
 		updateLevels();
 		updateEffects();
 	}

@@ -12,7 +12,6 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.view.page.Page;
 
 public class AdsrView extends TouchableView implements ParamListener {
 
@@ -25,7 +24,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	// init to -1 to indicate no pointer is selecting
 	private int[] adsrSelected = new int[] { -1, -1, -1, -1, -1 };
 
-	public void update() {
+	public synchronized void update() {
 		for (int i = 0; i < ADSR.NUM_PARAMS; i++) {
 			TrackManager.currTrack.adsr.getParam(i).removeListener(this);
 			TrackManager.currTrack.adsr.getParam(i).addListener(this);
@@ -204,7 +203,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 					TrackManager.currTrack.adsr.setRelease(xToRelease(x));
 					break;
 				}
-				Page.mainPage.pageSelectGroup.updateAdsrPage();
+				mainPage.pageSelectGroup.updateAdsrPage();
 				return;
 			}
 		}

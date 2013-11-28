@@ -9,8 +9,8 @@ import com.kh.beatbot.Track;
 import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.view.TrackButtonRow;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.ToggleButton;
-import com.kh.beatbot.ui.view.page.Page;
 
 public class TrackManager {
 
@@ -46,7 +46,7 @@ public class TrackManager {
 			return;
 		currTrack = track;
 		track.select();
-		Page.mainPage.notifyTrackChanged(currTrack);
+		View.mainPage.notifyTrackChanged(currTrack);
 	}
 
 	public static BaseTrack getBaseTrack(int trackNum) {

@@ -26,7 +26,6 @@ import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
 import com.kh.beatbot.ui.view.group.ViewPager;
 import com.kh.beatbot.ui.view.page.MainPage;
-import com.kh.beatbot.ui.view.page.Page;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
 public class BeatBotActivity extends Activity {
@@ -71,12 +70,12 @@ public class BeatBotActivity extends Activity {
 		layout.addView(View.root);
 		setContentView(layout, lp);
 
-		Page.mainPage = new MainPage();
-		Page.effectPage = new EffectPage();
+		View.mainPage = new MainPage();
+		View.effectPage = new EffectPage();
 
 		activityPager = new ViewPager();
-		activityPager.addPage(Page.mainPage);
-		activityPager.addPage(Page.effectPage);
+		activityPager.addPage(View.mainPage);
+		activityPager.addPage(View.effectPage);
 		activityPager.setPage(0);
 
 		((GLSurfaceViewGroup) View.root).setBBRenderer(activityPager);
@@ -103,7 +102,7 @@ public class BeatBotActivity extends Activity {
 		if (activityPager.getCurrPageNum() == MAIN_PAGE_NUM) {
 			showDialog(EXIT_DIALOG_ID);
 		} else if (activityPager.getCurrPageNum() == EFFECT_PAGE_NUM) {
-			Page.mainPage.pageSelectGroup.updateLevelsFXPage();
+			View.mainPage.pageSelectGroup.updateLevelsFXPage();
 			activityPager.setPage(MAIN_PAGE_NUM);
 		}
 	}
@@ -162,7 +161,7 @@ public class BeatBotActivity extends Activity {
 									String bpmString = bpmInput.getText()
 											.toString();
 									if (!bpmString.isEmpty()) {
-										Page.mainPage.pageSelectGroup
+										View.mainPage.pageSelectGroup
 												.getMasterPage()
 												.setBPM(Integer
 														.valueOf(bpmString));
@@ -217,7 +216,7 @@ public class BeatBotActivity extends Activity {
 									String midiFileName = midiFileNameInput
 											.getText().toString();
 									MidiFileManager.exportMidi(midiFileName);
-									Page.mainPage.slideMenu.updateMidiList();
+									View.mainPage.slideMenu.updateMidiList();
 								}
 							})
 					.setNegativeButton("Cancel",
@@ -257,7 +256,7 @@ public class BeatBotActivity extends Activity {
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 	    if (keyCode == KeyEvent.KEYCODE_MENU) {
-	    	Page.mainPage.notifyMenuExpanded();
+	    	View.mainPage.notifyMenuExpanded();
 	        return true;
 	    }
 	    return super.onKeyUp(keyCode, event);
@@ -268,11 +267,11 @@ public class BeatBotActivity extends Activity {
 	 */
 	public void setupProject() {
 		TrackManager.getTrack(0).select();
-		Page.mainPage.pageSelectGroup.selectPage(0);
+		View.mainPage.pageSelectGroup.selectPage(0);
 	}
 
 	public void launchEffect(Effect effect) {
-		Page.effectPage.loadEffect(effect);
+		View.effectPage.loadEffect(effect);
 		activityPager.setPage(EFFECT_PAGE_NUM);
 	}
 

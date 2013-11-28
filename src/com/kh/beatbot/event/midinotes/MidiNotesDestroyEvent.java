@@ -5,7 +5,7 @@ import java.util.List;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
-import com.kh.beatbot.ui.view.page.Page;
+import com.kh.beatbot.ui.view.View;
 
 public class MidiNotesDestroyEvent extends MidiNotesEvent {
 
@@ -21,7 +21,7 @@ public class MidiNotesDestroyEvent extends MidiNotesEvent {
 		for (MidiNote midiNote : midiNotes) {
 			destroyMidiNote(midiNote);
 		}
-		Page.mainPage.controlButtonGroup.notifyMidiChange();
+		View.mainPage.controlButtonGroup.notifyMidiChange();
 	}
 
 	private void destroyMidiNote(MidiNote midiNote) {

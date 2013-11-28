@@ -12,12 +12,13 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.SampleEditView;
+import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
 
-public class SampleEditPage extends Page {
+public class SampleEditPage extends TouchableView {
 
 	private ShapeGroup labelGroup = new ShapeGroup();
 
@@ -27,7 +28,7 @@ public class SampleEditPage extends Page {
 	private ParamControl loopBeginControl, loopEndControl, gainControl;
 
 	@Override
-	public void update() {
+	public synchronized void update() {
 		Track currTrack = TrackManager.currTrack;
 		loopButton.setChecked(currTrack.isLooping());
 		reverseButton.setChecked(currTrack.isReverse());

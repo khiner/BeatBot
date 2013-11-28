@@ -7,7 +7,7 @@ import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.event.Temporal;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
-import com.kh.beatbot.ui.view.page.Page;
+import com.kh.beatbot.ui.view.View;
 
 public class MidiNotesGroupEvent implements Stateful, Temporal {
 
@@ -39,7 +39,7 @@ public class MidiNotesGroupEvent implements Stateful, Temporal {
 	}
 
 	public void updateUi() {
-		Page.mainPage.controlButtonGroup.setEditIconsEnabled(MidiManager
+		View.mainPage.controlButtonGroup.setEditIconsEnabled(MidiManager
 				.anyNoteSelected());
 	}
 

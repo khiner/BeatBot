@@ -10,11 +10,12 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.AdsrView;
+import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.SeekbarParamControl;
 
-public class AdsrPage extends Page implements OnReleaseListener {
+public class AdsrPage extends TouchableView implements OnReleaseListener {
 
 	private ShapeGroup iconGroup = new ShapeGroup();
 	private ToggleButton[] adsrButtons;
@@ -28,7 +29,7 @@ public class AdsrPage extends Page implements OnReleaseListener {
 	}
 
 	@Override
-	public void update() {
+	public synchronized void update() {
 		adsrView.update();
 		updateParamView();
 	}

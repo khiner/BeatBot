@@ -45,7 +45,7 @@ public class PageSelectGroup extends TouchableView {
 		return masterPage;
 	}
 
-	public void update() {
+	public synchronized void update() {
 		updateInstrumentIcon();
 		updateSampleText();
 	}

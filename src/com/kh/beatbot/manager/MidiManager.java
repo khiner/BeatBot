@@ -22,8 +22,8 @@ import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
-import com.kh.beatbot.ui.view.page.Page;
 
 public class MidiManager {
 
@@ -155,14 +155,14 @@ public class MidiManager {
 	public static void selectNote(MidiNote midiNote) {
 		midiNote.setSelected(true);
 
-		Page.mainPage.midiView.updateNoteFillColor(midiNote);
-		Page.mainPage.controlButtonGroup.setEditIconsEnabled(anyNoteSelected());
+		View.mainPage.midiView.updateNoteFillColor(midiNote);
+		View.mainPage.controlButtonGroup.setEditIconsEnabled(anyNoteSelected());
 	}
 
 	public static void deselectNote(MidiNote midiNote) {
 		midiNote.setSelected(false);
-		Page.mainPage.midiView.updateNoteFillColor(midiNote);
-		Page.mainPage.controlButtonGroup.setEditIconsEnabled(anyNoteSelected());
+		View.mainPage.midiView.updateNoteFillColor(midiNote);
+		View.mainPage.controlButtonGroup.setEditIconsEnabled(anyNoteSelected());
 	}
 
 	public static void selectRegion(long leftTick, long rightTick, int topNote,
@@ -228,7 +228,7 @@ public class MidiManager {
 	}
 
 	public static void paste(long startTick) {
-		Page.mainPage.controlButtonGroup.uncheckCopyButton();
+		View.mainPage.controlButtonGroup.uncheckCopyButton();
 		if (copiedNotes.isEmpty())
 			return;
 

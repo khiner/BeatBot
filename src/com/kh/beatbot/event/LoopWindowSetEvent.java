@@ -1,8 +1,8 @@
 package com.kh.beatbot.event;
 
 import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
-import com.kh.beatbot.ui.view.page.Page;
 
 public class LoopWindowSetEvent implements Stateful, Temporal {
 
@@ -40,7 +40,7 @@ public class LoopWindowSetEvent implements Stateful, Temporal {
 
 	@Override
 	public void updateUi() {
-		Page.mainPage.midiView.updateLoopUi();
+		View.mainPage.midiView.updateLoopUi();
 		TickWindowHelper.updateView(MidiManager.getLoopBeginTick(),
 				MidiManager.getLoopEndTick());
 	}

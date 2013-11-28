@@ -4,7 +4,6 @@ import com.kh.beatbot.SampleFile;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.page.Page;
 
 public class TrackCreateEvent implements Executable, Stateful {
 
@@ -43,7 +42,7 @@ public class TrackCreateEvent implements Executable, Stateful {
 		View.root.queueEvent(new Runnable() {
 			@Override
 			public void run() {
-				Page.mainPage.notifyTrackCreated(createdTrack);
+				View.mainPage.notifyTrackCreated(createdTrack);
 				TrackManager.setTrack(createdTrack);
 			}
 		});

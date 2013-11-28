@@ -5,9 +5,9 @@ import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
-import com.kh.beatbot.ui.view.page.Page;
 
 public class DelayParamsPage extends EffectParamsPage {
 
@@ -45,7 +45,7 @@ public class DelayParamsPage extends EffectParamsPage {
 				}
 				effect.getParam(1).toggle(newRightChannelSynced);
 				effect.getParam(1).setLevel(newRightChannelLevel);
-				Page.effectPage.setLevel2dParams(effect.getXParam(), effect.getYParam());
+				effectPage.setLevel2dParams(effect.getXParam(), effect.getYParam());
 			}
 		});
 

@@ -6,17 +6,18 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.LevelsView;
+import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
-public class NoteLevelsPage extends Page {
+public class NoteLevelsPage extends TouchableView {
 
 	private static ShapeGroup labelGroup = new ShapeGroup();
 	private LevelsView levelsView;
 	private ToggleButton volumeToggle, panToggle, pitchToggle;
 	
 	@Override
-	public void update() {
+	public synchronized void update() {
 		deselectAll();
 		selectActiveLevel();
 	}

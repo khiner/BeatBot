@@ -9,10 +9,10 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.ListView;
 import com.kh.beatbot.ui.view.Menu;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
-import com.kh.beatbot.ui.view.page.Page;
 
 
 public class MenuItem {
@@ -43,7 +43,7 @@ public class MenuItem {
 		menu.selectMenuItem(this);
 		menu.layoutChildren();
 		menu.adjustWidth();
-		Page.mainPage.notifyMenuExpanded();
+		View.mainPage.notifyMenuExpanded();
 	}
 
 	public void addSubMenuItems(final MenuItem... subMenuItems) {

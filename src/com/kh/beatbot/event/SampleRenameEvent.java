@@ -1,7 +1,7 @@
 package com.kh.beatbot.event;
 
 import com.kh.beatbot.Track;
-import com.kh.beatbot.ui.view.page.Page;
+import com.kh.beatbot.ui.view.View;
 
 public class SampleRenameEvent implements Executable, Stateful {
 
@@ -28,7 +28,7 @@ public class SampleRenameEvent implements Executable, Stateful {
 
 	@Override
 	public void updateUi() {
-		Page.mainPage.pageSelectGroup.update();
+		View.mainPage.pageSelectGroup.update();
 	}
 
 	@Override

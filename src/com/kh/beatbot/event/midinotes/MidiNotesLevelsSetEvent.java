@@ -2,8 +2,8 @@ package com.kh.beatbot.event.midinotes;
 
 import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
-import com.kh.beatbot.ui.view.page.Page;
 
 public class MidiNotesLevelsSetEvent extends MidiNotesGroupEvent {
 
@@ -16,7 +16,7 @@ public class MidiNotesLevelsSetEvent extends MidiNotesGroupEvent {
 	@Override
 	public void updateUi() {
 		super.updateUi();
-		Page.mainPage.pageSelectGroup
+		View.mainPage.pageSelectGroup
 				.selectPage(PageSelectGroup.NOTE_LEVELS_PAGE_ID);
 		if (track != null) {
 			TrackManager.setTrack(track);

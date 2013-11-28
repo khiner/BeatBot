@@ -37,7 +37,7 @@ public class SampleEditView extends ControlView2dBase {
 	// keep track of that with offset and width
 	private float levelOffset = 0, levelWidth = 0, waveformWidth = 0;
 
-	public void update() {
+	public synchronized void update() {
 		levelOffset = 0;
 		levelWidth = 1;
 		// find view level for 32 samples

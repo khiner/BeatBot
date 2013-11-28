@@ -6,7 +6,7 @@ import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
-import com.kh.beatbot.ui.view.page.Page;
+import com.kh.beatbot.ui.view.View;
 
 public class MidiNotesCreateEvent extends MidiNotesEvent {
 	
@@ -25,13 +25,13 @@ public class MidiNotesCreateEvent extends MidiNotesEvent {
 		}
 		MidiManager.handleMidiCollisions();
 		MidiManager.deselectAllNotes();
-		Page.mainPage.controlButtonGroup.notifyMidiChange();
+		View.mainPage.controlButtonGroup.notifyMidiChange();
 	}
 
 	private void createNote(MidiNote midiNote) {
 		Track track = TrackManager.getTrack(midiNote.getNoteValue());
 		track.addNote(midiNote);
-		Page.mainPage.midiView.createNoteView(midiNote);
+		View.mainPage.midiView.createNoteView(midiNote);
 		MidiManager.selectNote(midiNote);
 	}
 }

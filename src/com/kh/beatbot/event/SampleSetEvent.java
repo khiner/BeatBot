@@ -2,7 +2,7 @@ package com.kh.beatbot.event;
 
 import com.kh.beatbot.SampleFile;
 import com.kh.beatbot.Track;
-import com.kh.beatbot.ui.view.page.Page;
+import com.kh.beatbot.ui.view.View;
 
 public class SampleSetEvent implements Executable, Stateful {
 
@@ -29,7 +29,7 @@ public class SampleSetEvent implements Executable, Stateful {
 
 	@Override
 	public void updateUi() {
-		Page.mainPage.notifyTrackUpdated(track);
+		View.mainPage.notifyTrackUpdated(track);
 	}
 
 	@Override

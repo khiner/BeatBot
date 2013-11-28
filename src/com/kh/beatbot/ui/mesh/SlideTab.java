@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.mesh;
 
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.view.page.Page;
+import com.kh.beatbot.ui.view.View;
 
 public class SlideTab extends Shape {
 
@@ -25,7 +25,7 @@ public class SlideTab extends Shape {
 	@Override
 	protected void updateVertices() {
 		roundedRect.setCornerRadius(cornerRadius);
-		roundedRect.layout(x + Page.mainPage.width - cornerRadius * 2, y,
+		roundedRect.layout(x + View.mainPage.width - cornerRadius * 2, y,
 				width, height);
 
 		float[] vertices = roundedRect.getFillMesh().vertices;
@@ -34,7 +34,7 @@ public class SlideTab extends Shape {
 		}
 
 		roundedRect.setCornerRadius(cornerRadius);
-		roundedRect.layout(x, y, Page.mainPage.width, Page.mainPage.height - y);
+		roundedRect.layout(x, y, View.mainPage.width, View.mainPage.height - y);
 
 		vertices = roundedRect.getFillMesh().vertices;
 		for (int i = 0; i < vertices.length / 2; i++) {
@@ -42,13 +42,13 @@ public class SlideTab extends Shape {
 		}
 
 		float theta = ¹, addX, addY;
-		float centerX = x + Page.mainPage.width;
+		float centerX = x + View.mainPage.width;
 		float centerY = y + height;
 		float lastX = 0, lastY = 0;
 		for (int i = 0; i < RoundedRect.NUM_CORNER_VERTICES; i++) {
 			addX = addY = cornerRadius;
 			float vertexX = (float) Math.cos(theta) * cornerRadius + addX + x
-					+ Page.mainPage.width;
+					+ View.mainPage.width;
 			float vertexY = (float) Math.sin(theta) * cornerRadius + addY + y
 					+ height;
 			if (lastX != 0 && lastY != 0) {

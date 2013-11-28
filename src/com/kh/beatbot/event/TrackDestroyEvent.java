@@ -2,7 +2,7 @@ package com.kh.beatbot.event;
 
 import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.view.page.Page;
+import com.kh.beatbot.ui.view.View;
 
 public class TrackDestroyEvent implements Executable, Stateful {
 
@@ -27,7 +27,7 @@ public class TrackDestroyEvent implements Executable, Stateful {
 
 	@Override
 	public void updateUi() {
-		Page.mainPage.notifyTrackDeleted(track);
+		View.mainPage.notifyTrackDeleted(track);
 	}
 
 	@Override

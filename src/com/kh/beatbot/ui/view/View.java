@@ -16,6 +16,8 @@ import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.RoundedRect;
 import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.view.page.MainPage;
+import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
 public abstract class View implements Comparable<View> {
 	public class Position {
@@ -30,6 +32,9 @@ public abstract class View implements Comparable<View> {
 			this.y = y;
 		}
 	}
+
+	public static MainPage mainPage;
+	public static EffectPage effectPage;
 
 	public static final float ¹ = (float) Math.PI, CIRCLE_RADIUS = 100;
 	public static GL11 gl;
@@ -157,6 +162,8 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public abstract void init();
+
+	public abstract void update();
 
 	public abstract void draw();
 

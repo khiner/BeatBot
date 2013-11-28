@@ -5,7 +5,7 @@ import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.ui.mesh.Rectangle;
-import com.kh.beatbot.ui.view.page.Page;
+import com.kh.beatbot.ui.view.View;
 
 public class MidiNote implements Comparable<MidiNote> {
 	public static final int BORDER_WIDTH = 2;
@@ -52,11 +52,11 @@ public class MidiNote implements Comparable<MidiNote> {
 	}
 	
 	private void updateViewPosition() {
-		Page.mainPage.midiView.updateNoteView(this);
+		View.mainPage.midiView.updateNoteView(this);
 	}
 	
 	private void updateViewSelected() {
-		Page.mainPage.midiView.updateNoteViewSelected(this);
+		View.mainPage.midiView.updateNoteViewSelected(this);
 	}
 	
 	public MidiNote getCopy() {

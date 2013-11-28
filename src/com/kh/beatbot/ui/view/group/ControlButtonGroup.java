@@ -11,10 +11,10 @@ import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
-import com.kh.beatbot.ui.view.page.Page;
 
 public class ControlButtonGroup extends TouchableView {
 
@@ -54,7 +54,7 @@ public class ControlButtonGroup extends TouchableView {
 							"Recorded file to " + fileName, Toast.LENGTH_SHORT)
 							.show();
 				} else {
-					Page.mainPage.midiView.reset();
+					mainPage.midiView.reset();
 					playButton.setChecked(true);
 					RecordManager.startRecording();
 					if (PlaybackManager.getState() != PlaybackManager.State.PLAYING)
