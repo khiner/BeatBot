@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view.menu;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.RoundedRectIcon;
@@ -13,12 +14,11 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
-
 public class MenuItem {
 	protected Menu menu = null;
 	private MenuItem parent = null;
-	private ImageButton button;
-	private List<MenuItem> subMenuItems = new ArrayList<MenuItem>();
+	protected ImageButton button;
+	protected List<MenuItem> subMenuItems = new ArrayList<MenuItem>();
 	private ListView container = null;
 	private int level = 0;
 
@@ -28,6 +28,14 @@ public class MenuItem {
 		this.level = parent == null ? 0 : parent.level + 1;
 		final MenuItem menuItem = this;
 		this.button = button;
+
+		button.setOnPressListener(new OnPressListener() {
+			@Override
+			public void onPress(Button button) {
+				menuItem.onPress(button);
+			}
+		});
+
 		button.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
@@ -35,14 +43,19 @@ public class MenuItem {
 			}
 		});
 
-		container = menu.getListAtLevel(level);
+		container = menu.getListAtLevel(this, level);
+	}
+
+	public void onPress(Button button) {
+		updateIcon();
+		menu.onMenuItemPressed(this);
+		container.onPress(button);
 	}
 
 	public void onRelease(Button button) {
 		setChecked(true);
 		select();
-		menu.layoutChildren();
-		menu.adjustWidth();
+		menu.onMenuItemReleased(this);
 	}
 
 	public void addSubMenuItems(final MenuItem... subMenuItems) {
@@ -53,10 +66,6 @@ public class MenuItem {
 
 	public void loadIcons() {
 		if (!button.getText().isEmpty()) {
-			button.setBgIcon(new RoundedRectIcon(
-					null,
-					button instanceof ToggleButton ? Colors.menuToggleFillColorSet
-							: Colors.menuItemFillColorSet));
 			button.setStrokeColor(Colors.BLACK);
 		}
 
@@ -85,6 +94,7 @@ public class MenuItem {
 		if (button instanceof ToggleButton) {
 			((ToggleButton) button).setChecked(checked);
 		}
+		updateIcon();
 	}
 
 	public boolean isChecked() {
@@ -120,7 +130,6 @@ public class MenuItem {
 	public void select() {
 		for (MenuItem sibling : getSiblings()) {
 			if (sibling.equals(this)) {
-				show();
 				setChecked(true);
 				for (MenuItem subMenuItem : subMenuItems) {
 					subMenuItem.show();
@@ -139,5 +148,21 @@ public class MenuItem {
 
 	private List<MenuItem> getSiblings() {
 		return parent == null ? menu.getTopLevelItems() : parent.subMenuItems;
+	}
+
+	private void updateIcon() {
+		if ((button.isPressed() || isChecked()) && !button.getText().isEmpty()) {
+			if (((ImageButton) button).getBgIcon() == null) {
+				if (button instanceof ToggleButton) {
+					((ToggleButton) button).setBgIcon(new RoundedRectIcon(null,
+							Colors.menuToggleFillColorSet));
+				} else if (button instanceof ImageButton) {
+					((ImageButton) button).setBgIcon(new RoundedRectIcon(null,
+							Colors.menuItemFillColorSet));
+				}
+			}
+		} else {
+			button.setBgIcon(null);
+		}
 	}
 }

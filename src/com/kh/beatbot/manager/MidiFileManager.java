@@ -113,7 +113,7 @@ public class MidiFileManager {
 	}
 
 	private static String getFullPathName(String fileName) {
-		String fullPathName = DirectoryManager.midiDirectory.getPath() + "/"
+		String fullPathName = FileManager.midiDirectory.getPath() + "/"
 				+ fileName;
 		if (!fileName.toLowerCase().endsWith(".midi")) {
 			fullPathName = fullPathName.concat(".MIDI");

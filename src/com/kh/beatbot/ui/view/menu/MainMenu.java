@@ -4,7 +4,7 @@ import java.io.File;
 
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.manager.DirectoryManager;
+import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.Icon;
@@ -25,7 +25,7 @@ public class MainMenu extends Menu {
 		settingsItem = new MenuItem(this, null, new ToggleButton());
 		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton());
 		midiImportItem = new FileMenuItem(this, fileItem, new File(
-				DirectoryManager.midiDirectory.getPath()));
+				FileManager.midiDirectory.getPath()));
 		midiExportItem = new MenuItem(this, fileItem, new ImageButton());
 
 		topLevelItems.add(fileItem);
@@ -71,12 +71,25 @@ public class MainMenu extends Menu {
 		midiExportItem.setIcon(new Icon(IconResources.MIDI_EXPORT));
 	}
 
+	// adjust width of this view to fit all children
 	public synchronized void adjustWidth() {
-		super.adjustWidth();
-		View.mainPage.notifyMenuExpanded();
+		float maxX = 0;
+		for (View child : children) {
+			if (child.absoluteX + child.width > maxX) {
+				maxX = child.absoluteX + child.width;
+			}
+		}
+		width = maxX;
 	}
 
 	public void fileItemReleased(FileMenuItem fileItem) {
 		MidiFileManager.importMidi(fileItem.getText());
+	}
+
+	@Override
+	public void onMenuItemReleased(MenuItem menuItem) {
+		super.onMenuItemReleased(menuItem);
+		adjustWidth();
+		View.mainPage.notifyMenuExpanded();
 	}
 }

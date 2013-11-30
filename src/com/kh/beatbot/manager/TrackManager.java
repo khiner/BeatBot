@@ -24,7 +24,7 @@ public class TrackManager {
 	public static Track currTrack;
 
 	public static synchronized void init() {
-		for (File drumDirectory : DirectoryManager.drumsDirectory.listFiles()) {
+		for (File drumDirectory : FileManager.drumsDirectory.listFiles()) {
 			TrackCreateEvent trackCreateEvent = new TrackCreateEvent(drumDirectory.listFiles()[0]);
 			trackCreateEvent.doExecute();
 			trackCreateEvent.updateUi();

@@ -6,7 +6,7 @@ public class IconResource {
 	}
 	
 	public Drawable defaultDrawable, pressedDrawable, selectedDrawable,
-			disabledDrawable, listViewDrawable, listTitleDrawable;
+			disabledDrawable;
 
 	public IconResource(int defaultIcon) {
 		this(defaultIcon, -1);
@@ -23,30 +23,18 @@ public class IconResource {
 
 	public IconResource(int defaultResource, int pressedResource,
 			int selectedResource, int disabledResource) {
-		this(defaultResource, pressedResource, selectedResource,
-				disabledResource, -1, -1);
-	}
-
-	public IconResource(int defaultResource, int pressedResource,
-			int selectedResource, int disabledResource, int listViewResource,
-			int listTitleResource) {
 		this(defaultResource == -1 ? null : new Image(defaultResource),
 			 pressedResource == -1 ? null : new Image(pressedResource),
 			 selectedResource == -1 ? null : new Image(selectedResource),
-			 disabledResource == -1 ? null : new Image(disabledResource),
-			 listViewResource == -1 ? null : new Image(listViewResource),
-			 listTitleResource == -1 ? null : new Image(listViewResource));
+			 disabledResource == -1 ? null : new Image(disabledResource));
 	}
 
 	public IconResource(Drawable defaultDrawable, Drawable pressedDrawable,
-			Drawable selectedDrawable, Drawable disabledDrawable, Drawable listViewDrawable,
-			Drawable listTitleDrawable) {
+			Drawable selectedDrawable, Drawable disabledDrawable) {
 		this.defaultDrawable = defaultDrawable;
 		this.pressedDrawable = pressedDrawable;
 		this.selectedDrawable = selectedDrawable;
 		this.disabledDrawable = disabledDrawable;
-		this.listViewDrawable = listViewDrawable;
-		this.listTitleDrawable = listTitleDrawable;
 	}
 	
 	public Drawable whichIcon(State state) {

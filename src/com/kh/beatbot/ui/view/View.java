@@ -208,7 +208,7 @@ public abstract class View implements Comparable<View> {
 		initialized = true;
 	}
 
-	public void drawAll() {
+	public synchronized void drawAll() {
 		if (!initialized)
 			return;
 		// scissor ensures that each view can only draw within its rect

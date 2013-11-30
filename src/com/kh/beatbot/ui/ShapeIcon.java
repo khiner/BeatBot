@@ -35,7 +35,7 @@ public abstract class ShapeIcon extends Icon {
 				strokeColorSet == null ? null : strokeColorSet.selectedColor);
 
 		this.resource = new IconResource(defaultShape, pressedShape,
-				selectedShape, null, null, null);
+				selectedShape, null);
 		setState(IconResource.State.DEFAULT);
 	}
 

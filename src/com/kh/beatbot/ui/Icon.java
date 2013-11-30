@@ -6,6 +6,7 @@ public class Icon extends Drawable {
 	protected Drawable currentDrawable;
 	protected IconResource resource;
 	protected IconResource.State state = State.DEFAULT;
+	protected IconResource.State lockedState = null;
 
 	public Icon() {
 	};
@@ -20,8 +21,8 @@ public class Icon extends Drawable {
 	}
 
 	public void setState(IconResource.State state) {
-		this.state = state;
-		setDrawable(resource.whichIcon(state));
+		this.state = lockedState != null ? lockedState : state;
+		setDrawable(resource.whichIcon(this.state));
 	}
 
 	public void draw() {
@@ -38,5 +39,10 @@ public class Icon extends Drawable {
 		currentDrawable = drawable != null ? drawable
 				: (state == State.PRESSED && resource.selectedDrawable != null) ? resource.selectedDrawable
 						: resource.defaultDrawable;
+	}
+	
+	public void lockState(State state) {
+		lockedState = state;
+		setState(lockedState);
 	}
 }

@@ -11,12 +11,11 @@ import android.view.KeyEvent;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.kh.beatbot.FileHelper;
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.event.SampleRenameEvent;
-import com.kh.beatbot.manager.DirectoryManager;
+import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -55,8 +54,7 @@ public class BeatBotActivity extends Activity {
 				LinearLayout.LayoutParams.FILL_PARENT,
 				LinearLayout.LayoutParams.FILL_PARENT);
 
-		DirectoryManager.init();
-		FileHelper.copyAllSamplesToStorage();
+		FileManager.init();
 		MidiFileManager.init();
 
 		if (savedInstanceState == null) {
@@ -92,7 +90,7 @@ public class BeatBotActivity extends Activity {
 				// android.os.Process.killProcess(android.os.Process.myPid());
 			}
 		} finally {
-			DirectoryManager.clearTempFiles();
+			FileManager.clearTempFiles();
 		}
 	}
 
@@ -241,7 +239,7 @@ public class BeatBotActivity extends Activity {
 									try {
 										finish();
 									} catch (Exception e) {
-										DirectoryManager.clearTempFiles();
+										FileManager.clearTempFiles();
 									}
 								}
 							}).setNegativeButton("No", null);

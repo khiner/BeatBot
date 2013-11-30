@@ -78,7 +78,7 @@ public class RecordManager implements ParamListener {
 	}
 
 	private static void updateFileNames() {
-		currRecordFileName = DirectoryManager.beatRecordDirectory.getPath() + "R" + (currSampleNum++)
+		currRecordFileName = FileManager.beatRecordDirectory.getPath() + "R" + (currSampleNum++)
 				+ ".wav";
 	}
 

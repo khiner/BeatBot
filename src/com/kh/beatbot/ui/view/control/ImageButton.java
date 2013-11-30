@@ -1,9 +1,8 @@
 package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.ui.Icon;
-import com.kh.beatbot.ui.IconResource;
+import com.kh.beatbot.ui.IconResource.State;
 import com.kh.beatbot.ui.ShapeIcon;
-import com.kh.beatbot.ui.color.Colors;
 
 public class ImageButton extends Button {
 
@@ -40,7 +39,7 @@ public class ImageButton extends Button {
 		super.press();
 		for (Icon iconSource : icons) {
 			if (iconSource != null) {
-				iconSource.setState(IconResource.State.PRESSED);
+				iconSource.setState(State.PRESSED);
 			}
 		}
 	}
@@ -50,7 +49,7 @@ public class ImageButton extends Button {
 		super.release();
 		for (Icon iconSource : icons) {
 			if (iconSource != null) {
-				iconSource.setState(IconResource.State.DEFAULT);
+				iconSource.setState(State.DEFAULT);
 			}
 		}
 	}
@@ -59,8 +58,7 @@ public class ImageButton extends Button {
 		super.setEnabled(enabled);
 		for (Icon iconSource : icons) {
 			if (iconSource != null) {
-				iconSource.setState(enabled ? IconResource.State.DEFAULT
-						: IconResource.State.DISABLED);
+				iconSource.setState(enabled ? State.DEFAULT : State.DISABLED);
 			}
 		}
 	}
@@ -94,14 +92,15 @@ public class ImageButton extends Button {
 			iconH = 4 * height / 5;
 			bgIconSource.layout(absoluteX, absoluteY, width, height);
 		} else {
-			iconXOffset = (width - height) / 2;
+			iconXOffset = text.isEmpty() ? (width - height) / 2 : 0;
 			iconYOffset = 0;
 			iconW = height;
 			iconH = height;
 		}
 	}
 
-	@Override // text goes to the right of the icon
+	@Override
+	// text goes to the right of the icon
 	protected float calcTextXOffset() {
 		return (getIcon() != null ? iconXOffset + iconW
 				+ (width - iconW - iconXOffset) / 2 : width / 2)
@@ -113,10 +112,10 @@ public class ImageButton extends Button {
 		Icon bgIconSource = getBgIcon();
 		if (bgIconSource != null && bgIconSource instanceof ShapeIcon) {
 			float[] color = ((ShapeIcon) bgIconSource).getCurrStrokeColor();
-			return color != null ? color : super.getStrokeColor();
-		} else {
-			return pressed ? Colors.defaultStrokeColorSet.pressedColor
-					: Colors.defaultStrokeColorSet.defaultColor;
+			if (color != null) {
+				return color;
+			}
 		}
+		return super.getStrokeColor();
 	}
 }

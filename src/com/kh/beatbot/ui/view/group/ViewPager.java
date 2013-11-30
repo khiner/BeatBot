@@ -34,7 +34,7 @@ public class ViewPager extends TouchableView {
 	}
 
 	@Override
-	public void drawAll() {
+	public synchronized void drawAll() {
 		getCurrPage().drawAll();
 	}
 

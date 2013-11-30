@@ -21,11 +21,11 @@ public class Colors {
 			{ .4f, .4f, .4f, 1 }, { .5f, .5f, .5f, 1 }, { .6f, .6f, .6f, 1 },
 			{ .7f, .7f, .7f, 1 } };
 
-	public static ColorSet defaultStrokeColorSet, labelBgColorSet,
-			labelStrokeColorSet, muteButtonColorSet, soloButtonColorSet,
-			buttonRowStrokeColorSet, instrumentBgColorSet, panBgColorSet,
-			panStrokeColorSet, pitchBgColorSet, pitchStrokeColorSet,
-			volumeBgColorSet, volumeStrokeColorSet, effectLabelBgColorSet,
+	public static ColorSet labelBgColorSet, labelStrokeColorSet,
+			muteButtonColorSet, soloButtonColorSet, buttonRowStrokeColorSet,
+			instrumentBgColorSet, panBgColorSet, panStrokeColorSet,
+			pitchBgColorSet, pitchStrokeColorSet, volumeBgColorSet,
+			volumeStrokeColorSet, effectLabelBgColorSet,
 			effectLabelStrokeColorSet, effectLabelTouchedBgColorSet,
 			effectLabelTouchedStrokeColorSet, iconFillColorSet,
 			deleteFillColorSet, deleteStrokeColorSet, menuItemFillColorSet,
@@ -86,7 +86,7 @@ public class Colors {
 		MIDI_SELECTED_TRACK = new float[] { YELLOW[0], YELLOW[1], YELLOW[2],
 				.38f };
 		labelBgColorSet = new ColorSet(LABEL_DARK, VOLUME, LABEL_SELECTED);
-		labelStrokeColorSet = new ColorSet(WHITE, WHITE, BLACK);
+		labelStrokeColorSet = new ColorSet(WHITE, BLACK, BLACK);
 		buttonRowStrokeColorSet = new ColorSet(WHITE, BLACK, BLACK);
 
 		effectLabelBgColorSet = new ColorSet(LABEL_DARK, LABEL_LIGHT, VOLUME);
@@ -96,7 +96,7 @@ public class Colors {
 				LABEL_VERY_LIGHT, VOLUME_LIGHT);
 		effectLabelTouchedStrokeColorSet = new ColorSet(WHITE, WHITE, WHITE);
 
-		muteButtonColorSet = new ColorSet(null, LABEL_SELECTED, LEVEL_SELECTED);
+		muteButtonColorSet = new ColorSet(null, LABEL_SELECTED, PAN);
 		soloButtonColorSet = new ColorSet(null, LABEL_SELECTED, PITCH);
 
 		instrumentBgColorSet = new ColorSet(null, LABEL_SELECTED, VOLUME);
@@ -105,16 +105,14 @@ public class Colors {
 		pitchBgColorSet = new ColorSet(null, LABEL_SELECTED, PITCH);
 		volumeBgColorSet = new ColorSet(null, LABEL_SELECTED, VOLUME);
 
-		panStrokeColorSet = new ColorSet(PAN, PAN, WHITE);
-		pitchStrokeColorSet = new ColorSet(PITCH, PITCH, WHITE);
-		volumeStrokeColorSet = new ColorSet(VOLUME, VOLUME, WHITE);
+		panStrokeColorSet = new ColorSet(PAN, PAN, BLACK);
+		pitchStrokeColorSet = new ColorSet(PITCH, PITCH, BLACK);
+		volumeStrokeColorSet = new ColorSet(VOLUME, VOLUME, BLACK);
 
 		iconFillColorSet = new ColorSet(null, LABEL_SELECTED);
 
 		deleteFillColorSet = new ColorSet(null, RED);
 		deleteStrokeColorSet = new ColorSet(RED, BLACK);
-
-		defaultStrokeColorSet = new ColorSet(VOLUME, VOLUME, VOLUME);
 
 		menuItemFillColorSet = new ColorSet(null, VOLUME);
 		menuToggleFillColorSet = new ColorSet(null, LABEL_LIGHT, VOLUME);

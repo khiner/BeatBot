@@ -51,6 +51,7 @@ public abstract class Button extends TouchableView {
 	 * Trigger a touch event (calls the onReleaseListener())
 	 */
 	public void trigger() {
+		release();
 		notifyReleased();
 	}
 	

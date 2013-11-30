@@ -5,8 +5,9 @@ import java.util.List;
 
 import com.kh.beatbot.ui.view.menu.FileMenuItem;
 import com.kh.beatbot.ui.view.menu.MenuItem;
+import com.kh.beatbot.ui.view.menu.MenuItemListener;
 
-public abstract class Menu extends TouchableView {
+public abstract class Menu extends TouchableView implements MenuItemListener {
 	protected List<ListView> menuLists;
 	protected List<MenuItem> topLevelItems;
 	protected float columnWidth = 0;
@@ -21,9 +22,13 @@ public abstract class Menu extends TouchableView {
 		return topLevelItems;
 	}
 
-	public ListView getListAtLevel(final int level) {
+	public ListView getListAtLevel(final MenuItem item, final int level) {
 		while (level >= menuLists.size()) {
-			menuLists.add(new ListView());
+			ListView menuList = new ListView();
+			if (initialized) {
+				menuList.loadIcons();
+			}
+			menuLists.add(menuList);
 		}
 
 		return menuLists.get(level);
@@ -38,17 +43,6 @@ public abstract class Menu extends TouchableView {
 		}
 	}
 
-	// adjust width of this view to fit all children
-	public synchronized void adjustWidth() {
-		float maxX = 0;
-		for (View child : children) {
-			if (child.absoluteX + child.width > maxX) {
-				maxX = child.absoluteX + child.width;
-			}
-		}
-		width = maxX;
-	}
-
 	public synchronized void loadIcons() {
 		columnWidth = width;
 		for (MenuItem menuItem : topLevelItems) {
@@ -58,7 +52,6 @@ public abstract class Menu extends TouchableView {
 
 	public synchronized void layoutChildren() {
 		float yOffset = LABEL_HEIGHT / 3;
-		ListView.displayOffset = yOffset;
 		float displayHeight = height - 2 * yOffset;
 		float x = 0;
 		for (int i = 0; i < menuLists.size(); i++) {
@@ -66,5 +59,14 @@ public abstract class Menu extends TouchableView {
 			list.layout(this, x, yOffset, getWidthForLevel(i), displayHeight);
 			x += list.width;
 		}
+	}
+
+	@Override
+	public void onMenuItemPressed(MenuItem menuItem) {
+	}
+
+	@Override
+	public void onMenuItemReleased(MenuItem menuItem) {
+		layoutChildren();
 	}
 }
