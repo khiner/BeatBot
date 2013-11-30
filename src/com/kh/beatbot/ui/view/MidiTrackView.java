@@ -1,7 +1,6 @@
 package com.kh.beatbot.ui.view;
 
 import com.kh.beatbot.Track;
-import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
 
 public class MidiTrackView extends TouchableView {
@@ -34,10 +33,6 @@ public class MidiTrackView extends TouchableView {
 		}
 		TrackButtonRow.roundedRectGroup.draw(this, 1);
 		lastY = newY;
-	}
-
-	protected synchronized void loadIcons() {
-		DirectoryManager.loadIcons();
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.kh.beatbot;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,6 +13,8 @@ import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.Icon;
+import com.kh.beatbot.ui.IconResource;
+import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.view.TrackButtonRow;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
@@ -22,17 +25,17 @@ public class Track extends BaseTrack {
 	private boolean adsrEnabled = false, reverse = false, previewing = false;
 	private TrackButtonRow buttonRow;
 	private List<MidiNote> notes = new ArrayList<MidiNote>();
-	private Map<SampleFile, SampleParams> paramsForSample = new HashMap<SampleFile, SampleParams>();
-	private SampleFile currSampleFile;
+	private Map<File, SampleParams> paramsForSample = new HashMap<File, SampleParams>();
+	private File currSampleFile;
 
 	public ADSR adsr;
 
-	public Track(int id, SampleFile sample) {
+	public Track(int id, File sampleFile) {
 		super(id);
-		this.currSampleFile = sample;
+		this.currSampleFile = sampleFile;
 		this.adsr = new ADSR(this);
 		this.buttonRow = new TrackButtonRow(this);
-		
+
 		update();
 	}
 
@@ -41,6 +44,10 @@ public class Track extends BaseTrack {
 		for (MidiNote note : notes) {
 			note.setNote(id);
 		}
+	}
+
+	public IconResource getIconResource() {
+		return IconResources.forDirectory(currSampleFile.getParentFile().getName());
 	}
 
 	public void updateADSR() {
@@ -152,13 +159,9 @@ public class Track extends BaseTrack {
 		return null;
 	}
 
-	public Instrument getInstrument() {
-		return currSampleFile.getInstrument();
-	}
-
-	public void setSample(SampleFile sample) {
-		currSampleFile = sample;
-		setSample(id, getCurrSamplePath());
+	public void setSample(File sampleFile) {
+		currSampleFile = sampleFile;
+		setSample(id, getCurrSampleFile().getPath());
 
 		update();
 	}
@@ -180,14 +183,12 @@ public class Track extends BaseTrack {
 	}
 
 	public void setCurrSampleName(String name) {
-		currSampleFile.renameTo(name + ".wav");
+		File newFile = new File(currSampleFile.getParent() + name + ".wav");
+		currSampleFile.renameTo(newFile);
+		currSampleFile = newFile;
 	}
 
-	public String getCurrSamplePath() {
-		return currSampleFile.getFullPath();
-	}
-
-	public SampleFile getCurrSampleFile() {
+	public File getCurrSampleFile() {
 		return currSampleFile;
 	}
 

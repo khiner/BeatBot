@@ -2,10 +2,7 @@ package com.kh.beatbot.ui.view.page;
 
 import java.io.File;
 
-import com.kh.beatbot.Instrument;
-import com.kh.beatbot.event.SampleSetEvent;
 import com.kh.beatbot.manager.DirectoryManager;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.Menu;
 import com.kh.beatbot.ui.view.menu.FileMenuItem;

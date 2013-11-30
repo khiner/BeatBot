@@ -24,7 +24,7 @@ public class TrackButtonRow extends TouchableView {
 	}
 
 	public void updateInstrumentIcon() {
-		IconResource newResource = track.getInstrument().getIconResource();
+		IconResource newResource = track.getIconResource();
 		Icon instrumentIcon = instrumentButton.getIcon();
 		if (instrumentIcon == null) {
 			instrumentButton.setIcon(new Icon(newResource));

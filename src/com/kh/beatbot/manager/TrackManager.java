@@ -1,10 +1,10 @@
 package com.kh.beatbot.manager;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.BaseTrack;
-import com.kh.beatbot.SampleFile;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.midi.MidiNote;
@@ -23,25 +23,25 @@ public class TrackManager {
 	public static BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
 	public static Track currTrack;
 
-	public static void init() {
-		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
-			TrackCreateEvent trackCreateEvent = new TrackCreateEvent(DirectoryManager.getDrumInstrument(i).getSample(0));
+	public static synchronized void init() {
+		for (File drumDirectory : DirectoryManager.drumsDirectory.listFiles()) {
+			TrackCreateEvent trackCreateEvent = new TrackCreateEvent(drumDirectory.listFiles()[0]);
 			trackCreateEvent.doExecute();
 			trackCreateEvent.updateUi();
 		}
 	}
 
-	public static Track getTrack(int trackNum) {
+	public static synchronized Track getTrack(int trackNum) {
 		return tracks.get(trackNum);
 	}
 
-	public static void quantizeEffectParams() {
+	public static synchronized void quantizeEffectParams() {
 		for (Track track : tracks) {
 			track.quantizeEffectParams();
 		}
 	}
 
-	public static void setTrack(Track track) {
+	public static synchronized void setTrack(Track track) {
 		if (track == currTrack)
 			return;
 		currTrack = track;
@@ -49,32 +49,32 @@ public class TrackManager {
 		View.mainPage.notifyTrackChanged(currTrack);
 	}
 
-	public static BaseTrack getBaseTrack(int trackNum) {
+	public static synchronized BaseTrack getBaseTrack(int trackNum) {
 		if (trackNum == MASTER_TRACK_ID)
 			return masterTrack;
 		return tracks.get(trackNum);
 	}
 
-	public static int getNumTracks() {
+	public static synchronized int getNumTracks() {
 		return tracks.size();
 	}
 
-	public static Track createTrack(SampleFile sample) {
-		createTrack(sample.getFullPath());
-		final Track newTrack = new Track(tracks.size(), sample);
+	public static synchronized Track createTrack(File sampleFile) {
+		createTrack(sampleFile.getPath());
+		final Track newTrack = new Track(tracks.size(), sampleFile);
 		tracks.add(newTrack);
 		return newTrack;
 	}
 
-	public static void createTrack(Track track) {
-		createTrack(track.getCurrSampleFile().getFullPath());
+	public static synchronized void createTrack(Track track) {
+		createTrack(track.getCurrSampleFile().getPath());
 		track.setId(tracks.size());
 		tracks.add(track);
 		track.updateADSR();
 		track.updateNextNote();
 	}
 
-	public static void deleteCurrTrack() {
+	public static synchronized void deleteCurrTrack() {
 		if (tracks.size() <= 1) {
 			return; // not allowed to delete last track
 		}
@@ -95,13 +95,13 @@ public class TrackManager {
 		return tracks.get(trackNum).getNextMidiNote(currTick);
 	}
 
-	public static void updateAllTrackNextNotes() {
+	public static synchronized void updateAllTrackNextNotes() {
 		for (Track track : tracks) {
 			track.updateNextNote();
 		}
 	}
 
-	public static void selectInstrumentButton(ToggleButton button) {
+	public static synchronized void selectInstrumentButton(ToggleButton button) {
 		button.setChecked(true);
 		for (Track track : tracks) {
 			TrackButtonRow buttonRow = track.getButtonRow();
@@ -111,7 +111,7 @@ public class TrackManager {
 		}
 	}
 
-	public static void selectSoloButton(ToggleButton button) {
+	public static synchronized void selectSoloButton(ToggleButton button) {
 		button.setChecked(true);
 		for (Track track : tracks) {
 			TrackButtonRow buttonRow = track.getButtonRow();

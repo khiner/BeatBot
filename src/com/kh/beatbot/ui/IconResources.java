@@ -1,5 +1,8 @@
 package com.kh.beatbot.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.kh.beatbot.R;
 
 public class IconResources {
@@ -55,4 +58,20 @@ public class IconResources {
 		
 		MIDI_IMPORT = new IconResource(R.drawable.midi_import_icon),
 		MIDI_EXPORT = new IconResource(R.drawable.midi_export_icon);
+	
+	private static final Map<String, IconResource> DIRECTORY_ICON_RESOURCES = new HashMap<String, IconResource>() {{
+		put("drums", IconResources.DRUMS);
+		put("recorded", IconResources.MICROPHONE);
+		put("beats", IconResources.BEAT);
+		put("samples", IconResources.SAMPLE);
+		put("kick", IconResources.KICK);
+		put("snare", IconResources.SNARE);
+		put("hh_closed", IconResources.HH_CLOSED);
+		put("hh_open", IconResources.HH_OPEN);
+		put("rim", IconResources.RIMSHOT);
+	}};
+
+	public static final IconResource forDirectory(String directoryName) {
+		return DIRECTORY_ICON_RESOURCES.get(directoryName);
+	}
 }

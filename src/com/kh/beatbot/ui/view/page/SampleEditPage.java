@@ -4,7 +4,6 @@ import com.kh.beatbot.Track;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
@@ -23,7 +22,7 @@ public class SampleEditPage extends TouchableView {
 	private ShapeGroup labelGroup = new ShapeGroup();
 
 	public SampleEditView sampleEdit;
-	private ImageButton previewButton, browseButton, editButton;
+	private ImageButton previewButton, editButton;
 	private ToggleButton loopButton, reverseButton;
 	private ParamControl loopBeginControl, loopEndControl, gainControl;
 
@@ -47,10 +46,6 @@ public class SampleEditPage extends TouchableView {
 		loopButton.setIcon(new Icon(IconResources.LOOP));
 		reverseButton.setIcon(new Icon(IconResources.REVERSE));
 
-		browseButton.setBgIcon(new RoundedRectIcon(labelGroup,
-				Colors.iconFillColorSet));
-		browseButton.setIcon(new Icon(IconResources.BROWSE));
-
 		editButton.setBgIcon(new RoundedRectIcon(labelGroup,
 				Colors.iconFillColorSet));
 		editButton.setIcon(new Icon(IconResources.EDIT));
@@ -67,7 +62,6 @@ public class SampleEditPage extends TouchableView {
 		previewButton = new ImageButton();
 		loopButton = new ToggleButton();
 		reverseButton = new ToggleButton();
-		browseButton = new ImageButton();
 		editButton = new ImageButton();
 
 		loopBeginControl = new ParamControl(labelGroup);
@@ -100,13 +94,6 @@ public class SampleEditPage extends TouchableView {
 			}
 		});
 
-		browseButton.setOnReleaseListener(new OnReleaseListener() {
-			@Override
-			public void onRelease(Button button) {
-				DirectoryManager.showInstrumentSelectAlert();
-			}
-		});
-
 		editButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
@@ -116,8 +103,7 @@ public class SampleEditPage extends TouchableView {
 		});
 
 		addChildren(previewButton, loopButton, reverseButton, sampleEdit,
-				browseButton, editButton, loopBeginControl, loopEndControl,
-				gainControl);
+				editButton, loopBeginControl, loopEndControl, gainControl);
 	}
 
 	@Override
@@ -134,7 +120,6 @@ public class SampleEditPage extends TouchableView {
 		gainControl.layout(this, 0, 0, topBarH * 6, topBarH);
 		loopBeginControl.layout(this, topBarH * 6, 0, topBarH * 6, topBarH);
 		loopEndControl.layout(this, topBarH * 12, 0, topBarH * 6, topBarH);
-		browseButton.layout(this, width - topBarH * 2, 0, topBarH, topBarH);
 		editButton.layout(this, width - topBarH, 0, topBarH, topBarH);
 
 		sampleEdit.layout(this, fillH, topBarH, width - fillH / 2 - fillH

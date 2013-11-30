@@ -1,18 +1,19 @@
 package com.kh.beatbot.event;
 
-import com.kh.beatbot.SampleFile;
+import java.io.File;
+
 import com.kh.beatbot.Track;
 import com.kh.beatbot.ui.view.View;
 
 public class SampleSetEvent implements Executable, Stateful {
 
 	private Track track;
-	private SampleFile originalSample, newSample;
+	private File originalSample, newSample;
 
-	public SampleSetEvent(Track track, SampleFile sample) {
+	public SampleSetEvent(Track track, File sampleFile) {
 		this.track = track;
 		originalSample = track.getCurrSampleFile();
-		newSample = sample;
+		newSample = sampleFile;
 	}
 
 	@Override
@@ -40,7 +41,7 @@ public class SampleSetEvent implements Executable, Stateful {
 		}
 	}
 
-	public boolean doExecute(SampleFile sample) {
+	public boolean doExecute(File sample) {
 		if (sample == null || track.getCurrSampleFile().equals(sample)) {
 			return false;
 		}

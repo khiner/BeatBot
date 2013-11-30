@@ -61,12 +61,11 @@ public class FileHelper {
 
 	public static void copyAllSamplesToStorage() {
 		assetManager = BeatBotActivity.mainActivity.getAssets();
-		for (int i = 0; i < DirectoryManager.drumNames.length; i++) {
-			String drumPath = DirectoryManager.getDrumInstrument(i).getPath();
+		
+		for (File drumDirectory : DirectoryManager.drumsDirectory.listFiles()) {
 			// the sample folder for this sample type does not yet exist.
 			// create it and write all assets of this type to the folder
-			copyFromAssetsToExternal(drumPath);
+			copyFromAssetsToExternal(drumDirectory.getPath());
 		}
 	}
-
 }

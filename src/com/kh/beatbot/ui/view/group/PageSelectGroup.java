@@ -1,7 +1,6 @@
 package com.kh.beatbot.ui.view.group;
 
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.manager.DirectoryManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResource;
@@ -86,7 +85,7 @@ public class PageSelectGroup extends TouchableView {
 		addTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				DirectoryManager.showAddTrackAlert();
+				//DirectoryManager.showAddTrackAlert();
 			}
 		});
 
@@ -165,7 +164,7 @@ public class PageSelectGroup extends TouchableView {
 	private void updateInstrumentIcon() {
 		// update the browse pager instrument icon
 		IconResource instrumentIconResource = TrackManager.currTrack
-				.getInstrument().getIconResource();
+				.getIconResource();
 		ToggleButton button = pageButtons[BROWSE_PAGE_ID];
 		Icon instrumentIcon = button.getIcon();
 		if (instrumentIcon == null) {
