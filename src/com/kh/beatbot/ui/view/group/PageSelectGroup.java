@@ -14,24 +14,27 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.page.AdsrPage;
+import com.kh.beatbot.ui.view.page.BrowsePage;
 import com.kh.beatbot.ui.view.page.MasterPage;
 import com.kh.beatbot.ui.view.page.NoteLevelsPage;
 import com.kh.beatbot.ui.view.page.SampleEditPage;
 import com.kh.beatbot.ui.view.page.TrackPage;
 
 public class PageSelectGroup extends TouchableView {
-	public static final int TRACK_PAGE_ID = 0, EDIT_PAGE_ID = 1,
-			ADSR_PAGE_ID = 2, MASTER_PAGE_ID = 3, NOTE_LEVELS_PAGE_ID = 4;
+	public static final int BROWSE_PAGE_ID = 0, TRACK_PAGE_ID = 1,
+			EDIT_PAGE_ID = 2, ADSR_PAGE_ID = 3, MASTER_PAGE_ID = 4,
+			NOTE_LEVELS_PAGE_ID = 5;
 
 	public static NoteLevelsPage levelsPage;
 	public static MasterPage masterPage;
 	public static TrackPage trackPage;
-	public static SampleEditPage sampleEditPage;
+	public static BrowsePage browsePage;
+	public static SampleEditPage editPage;
 	public static AdsrPage adsrPage;
 	public static ViewPager pager;
 
 	private static ImageButton addTrackButton;
-	private static ToggleButton[] pageButtons = new ToggleButton[5];
+	private static ToggleButton[] pageButtons = new ToggleButton[6];
 
 	private static ShapeGroup roundedRectGroup = new ShapeGroup();
 
@@ -64,7 +67,7 @@ public class PageSelectGroup extends TouchableView {
 			return;
 		update();
 		updateLevelsFXPage();
-		sampleEditPage.update();
+		editPage.update();
 		adsrPage.update();
 	}
 
@@ -79,8 +82,6 @@ public class PageSelectGroup extends TouchableView {
 		for (int i = 0; i < pageButtons.length; i++) {
 			pageButtons[i] = new ToggleButton();
 		}
-
-		pageButtons[NOTE_LEVELS_PAGE_ID] = new ToggleButton();
 
 		addTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
@@ -107,7 +108,8 @@ public class PageSelectGroup extends TouchableView {
 		}
 
 		trackPage = new TrackPage();
-		sampleEditPage = new SampleEditPage();
+		browsePage = new BrowsePage();
+		editPage = new SampleEditPage();
 		adsrPage = new AdsrPage();
 		masterPage = new MasterPage();
 		levelsPage = new NoteLevelsPage();
@@ -116,12 +118,12 @@ public class PageSelectGroup extends TouchableView {
 		trackPage.setMasterMode(false);
 
 		pager = new ViewPager();
-		pager.addPage(trackPage);
-		pager.addPage(sampleEditPage);
-		pager.addPage(adsrPage);
-		pager.addPage(masterPage);
-		pager.addPage(levelsPage);
-		pager.setPage(TRACK_PAGE_ID);
+		pager.addPages(browsePage, trackPage, editPage, adsrPage, masterPage,
+				levelsPage);
+
+		pageButtons[TRACK_PAGE_ID].setText("Track");
+		pageButtons[ADSR_PAGE_ID].setText("ADSR");
+		pageButtons[MASTER_PAGE_ID].setText("Master");
 
 		addChildren(addTrackButton, pager);
 		addChildren(pageButtons);
@@ -129,17 +131,18 @@ public class PageSelectGroup extends TouchableView {
 
 	@Override
 	public synchronized void layoutChildren() {
-		float labelWidth = (width - 2 * LABEL_HEIGHT) / 4;
+		float labelWidth = (width - 3 * LABEL_HEIGHT) / 4;
 		float labelYOffset = 2;
 		addTrackButton
 				.layout(this, 0, labelYOffset, LABEL_HEIGHT, LABEL_HEIGHT);
-		for (int i = 0; i < pageButtons.length - 1; i++) {
-			float x = LABEL_HEIGHT + i * labelWidth;
-			pageButtons[i].layout(this, x, labelYOffset, labelWidth,
-					LABEL_HEIGHT);
+
+		float x = addTrackButton.width;
+		for (int i = 0; i < pageButtons.length; i++) {
+			float w = pageButtons[i].getText().isEmpty() && i != BROWSE_PAGE_ID ? LABEL_HEIGHT
+					: labelWidth;
+			pageButtons[i].layout(this, x, labelYOffset, w, LABEL_HEIGHT);
+			x += pageButtons[i].width;
 		}
-		pageButtons[NOTE_LEVELS_PAGE_ID].layout(this, LABEL_HEIGHT + 4
-				* labelWidth, labelYOffset, LABEL_HEIGHT, LABEL_HEIGHT);
 		pager.layout(this, 0, LABEL_HEIGHT + 2 * labelYOffset, width, height
 				- LABEL_HEIGHT - 2 * labelYOffset);
 	}
@@ -150,32 +153,30 @@ public class PageSelectGroup extends TouchableView {
 		addTrackButton.setBgIcon(new RoundedRectIcon(roundedRectGroup,
 				Colors.labelBgColorSet, Colors.labelStrokeColorSet));
 
+		pageButtons[EDIT_PAGE_ID].setIcon(new Icon(IconResources.SAMPLE));
 		pageButtons[NOTE_LEVELS_PAGE_ID]
 				.setIcon(new Icon(IconResources.LEVELS));
 		for (int i = 0; i < pageButtons.length; i++) {
 			pageButtons[i].setBgIcon(new RoundedRectIcon(roundedRectGroup,
 					Colors.labelBgColorSet, Colors.labelStrokeColorSet));
 		}
-		pageButtons[TRACK_PAGE_ID].setText("Track");
-		pageButtons[ADSR_PAGE_ID].setText("ADSR");
-		pageButtons[MASTER_PAGE_ID].setText("Master");
 	}
 
 	private void updateInstrumentIcon() {
-		// update the track pager instrument icon
+		// update the browse pager instrument icon
 		IconResource instrumentIconResource = TrackManager.currTrack
 				.getInstrument().getIconResource();
-		Icon instrumentIcon = pageButtons[TRACK_PAGE_ID].getIcon();
+		ToggleButton button = pageButtons[BROWSE_PAGE_ID];
+		Icon instrumentIcon = button.getIcon();
 		if (instrumentIcon == null) {
-			pageButtons[TRACK_PAGE_ID]
-					.setIcon(new Icon(instrumentIconResource));
+			button.setIcon(new Icon(instrumentIconResource));
 		} else {
 			instrumentIcon.setResource(instrumentIconResource);
 		}
 	}
 
 	private void updateSampleText() {
-		pageButtons[EDIT_PAGE_ID].setText(TrackManager.currTrack
+		pageButtons[BROWSE_PAGE_ID].setText(TrackManager.currTrack
 				.getCurrSampleName());
 	}
 }

@@ -1,6 +1,6 @@
 package com.kh.beatbot.ui.view.menu;
 
-import java.util.ArrayList;
+import java.io.File;
 
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -9,40 +9,23 @@ import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
-import com.kh.beatbot.ui.view.ListView;
 import com.kh.beatbot.ui.view.Menu;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class MainMenu extends Menu {
 
-	private class OnMidiItemReleaseListener implements OnReleaseListener {
-		@Override
-		public void onRelease(Button button) {
-			MidiFileManager.importMidi(button.getText());
-		}
-	}
-
 	private MenuItem fileItem, settingsItem, snapToGridItem, midiImportItem,
 			midiExportItem;
 
-	private OnMidiItemReleaseListener midiItemReleaseListener;
-
-	public synchronized void createChildren() {
-		midiItemReleaseListener = new OnMidiItemReleaseListener();
-
-		menuLists = new ArrayList<ListView>();
-		for (int i = 0; i < 3; i++) {
-			menuLists.add(new ListView());
-		}
-
-		topLevelItems = new ArrayList<MenuItem>();
-
+	protected synchronized void createMenuItems() {
 		fileItem = new MenuItem(this, null, new ToggleButton());
 		settingsItem = new MenuItem(this, null, new ToggleButton());
 		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton());
-		midiImportItem = new MenuItem(this, fileItem, new ToggleButton());
+		midiImportItem = new FileMenuItem(this, fileItem, new File(
+				DirectoryManager.midiDirectory.getPath()));
 		midiExportItem = new MenuItem(this, fileItem, new ImageButton());
 
 		topLevelItems.add(fileItem);
@@ -67,26 +50,13 @@ public class MainMenu extends Menu {
 		fileItem.addSubMenuItems(midiImportItem, midiExportItem);
 		settingsItem.addSubMenuItems(snapToGridItem);
 
-		addChild(menuLists.get(0));
-
-		fileItem.show();
-		settingsItem.show();
-		updateMidiList();
+		snapToGridItem.setText("Snap-to-grid");
+		midiImportItem.setText("Import MIDI");
+		midiExportItem.setText("Export MIDI");
 	}
 
-	public void updateMidiList() {
-		midiImportItem.clearSubMenuItems();
-		final String[] fileNames = DirectoryManager.midiDirectory.list();
-		for (String fileName : fileNames) {
-			MenuItem midiMenuItem = new MenuItem(this, midiImportItem,
-					new ImageButton());
-			midiMenuItem.setOnReleaseListener(midiItemReleaseListener);
-			midiMenuItem.setText(fileName);
-			midiImportItem.addSubMenuItems(midiMenuItem);
-		}
-		if (initialized) {
-			midiImportItem.loadIcons();
-		}
+	protected float getWidthForLevel(int level) {
+		return level == 0 ? columnWidth : 2 * columnWidth;
 	}
 
 	public synchronized void loadIcons() {
@@ -96,11 +66,17 @@ public class MainMenu extends Menu {
 
 		snapToGridItem.setIcon(new Icon(IconResources.SNAP_TO_GRID));
 		snapToGridItem.setChecked(MidiManager.isSnapToGrid());
-		snapToGridItem.setText("Snap-to-grid");
 
 		midiImportItem.setIcon(new Icon(IconResources.MIDI_IMPORT));
 		midiExportItem.setIcon(new Icon(IconResources.MIDI_EXPORT));
-		midiImportItem.setText("Import MIDI");
-		midiExportItem.setText("Export MIDI");
+	}
+
+	public synchronized void adjustWidth() {
+		super.adjustWidth();
+		View.mainPage.notifyMenuExpanded();
+	}
+
+	public void fileItemReleased(FileMenuItem fileItem) {
+		MidiFileManager.importMidi(fileItem.getText());
 	}
 }

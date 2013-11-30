@@ -329,7 +329,7 @@ public class Track extends BaseTrack {
 		public void onParamChanged(Param param) {
 			if (param.equals(gainParam)) {
 				setTrackGain(id, param.level);
-				PageSelectGroup.sampleEditPage.sampleEdit.onParamChanged(param);
+				PageSelectGroup.editPage.sampleEdit.onParamChanged(param);
 			} else {
 				float minLoopWindow = loopEndParam
 						.getViewLevel(MIN_LOOP_WINDOW);

@@ -9,14 +9,13 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.ListView;
 import com.kh.beatbot.ui.view.Menu;
-import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 
 public class MenuItem {
-	private Menu menu = null;
+	protected Menu menu = null;
 	private MenuItem parent = null;
 	private ImageButton button;
 	private List<MenuItem> subMenuItems = new ArrayList<MenuItem>();
@@ -40,10 +39,10 @@ public class MenuItem {
 	}
 
 	public void onRelease(Button button) {
-		menu.selectMenuItem(this);
+		setChecked(true);
+		select();
 		menu.layoutChildren();
 		menu.adjustWidth();
-		View.mainPage.notifyMenuExpanded();
 	}
 
 	public void addSubMenuItems(final MenuItem... subMenuItems) {
@@ -53,7 +52,7 @@ public class MenuItem {
 	}
 
 	public void loadIcons() {
-		if (parent != null) {
+		if (!button.getText().isEmpty()) {
 			button.setBgIcon(new RoundedRectIcon(
 					null,
 					button instanceof ToggleButton ? Colors.menuToggleFillColorSet
@@ -76,6 +75,10 @@ public class MenuItem {
 
 	public void setText(final String text) {
 		button.setText(text);
+	}
+
+	public String getText() {
+		return button.getText();
 	}
 
 	public void setChecked(final boolean checked) {

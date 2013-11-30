@@ -74,8 +74,7 @@ public class BeatBotActivity extends Activity {
 		View.effectPage = new EffectPage();
 
 		activityPager = new ViewPager();
-		activityPager.addPage(View.mainPage);
-		activityPager.addPage(View.effectPage);
+		activityPager.addPages(View.mainPage, View.effectPage);
 		activityPager.setPage(0);
 
 		((GLSurfaceViewGroup) View.root).setBBRenderer(activityPager);
@@ -216,7 +215,6 @@ public class BeatBotActivity extends Activity {
 									String midiFileName = midiFileNameInput
 											.getText().toString();
 									MidiFileManager.exportMidi(midiFileName);
-									View.mainPage.slideMenu.updateMidiList();
 								}
 							})
 					.setNegativeButton("Cancel",
@@ -228,7 +226,7 @@ public class BeatBotActivity extends Activity {
 								}
 							});
 			break;
-			
+
 		case EXIT_DIALOG_ID:
 			builder.setIcon(android.R.drawable.ic_dialog_alert)
 					.setTitle("Closing " + getString(R.string.app_name))
@@ -255,11 +253,11 @@ public class BeatBotActivity extends Activity {
 
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
-	    if (keyCode == KeyEvent.KEYCODE_MENU) {
-	    	View.mainPage.notifyMenuExpanded();
-	        return true;
-	    }
-	    return super.onKeyUp(keyCode, event);
+		if (keyCode == KeyEvent.KEYCODE_MENU) {
+			View.mainPage.notifyMenuExpanded();
+			return true;
+		}
+		return super.onKeyUp(keyCode, event);
 	}
 
 	/*

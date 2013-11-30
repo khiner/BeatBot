@@ -6,8 +6,8 @@ import com.kh.beatbot.ui.view.View;
 public class ViewPager extends TouchableView {
 	private int currPageNum;
 
-	public void addPage(View page) {
-		addChild(page);
+	public void addPages(View ...pages) {
+		addChildren(pages);
 	}
 
 	public int numPages() {

@@ -26,7 +26,8 @@ public class EffectPage extends TouchableView {
 	private Seekbar2d level2d;
 	private ToggleButton toggleButton;
 
-	private EffectParamsPage chorusPage, decimatePage, delayPage, filterPage, flangerPage, reverbPage, tremeloPage;
+	private EffectParamsPage chorusPage, decimatePage, delayPage, filterPage,
+			flangerPage, reverbPage, tremeloPage;
 
 	public Seekbar2d getLevel2d() {
 		return level2d;
@@ -60,13 +61,8 @@ public class EffectPage extends TouchableView {
 		reverbPage = new EffectParamsPage(new Reverb(null));
 		tremeloPage = new EffectParamsPage(new Tremelo(null));
 
-		paramsPager.addPage(chorusPage);
-		paramsPager.addPage(decimatePage);
-		paramsPager.addPage(delayPage);
-		paramsPager.addPage(filterPage);
-		paramsPager.addPage(flangerPage);
-		paramsPager.addPage(reverbPage);
-		paramsPager.addPage(tremeloPage);
+		paramsPager.addPages(chorusPage, decimatePage, delayPage, filterPage,
+				flangerPage, reverbPage, tremeloPage);
 
 		toggleButton = new ToggleButton();
 		toggleButton.setOnReleaseListener(new OnReleaseListener() {
@@ -88,7 +84,7 @@ public class EffectPage extends TouchableView {
 				height - (width - height) / 5 - 5);
 		level2d.layout(this, width - height, 0, height, height);
 	}
-	
+
 	public void setLevel2dParams(Param xParam, Param yParam) {
 		level2d.setParams(xParam, yParam);
 	}
