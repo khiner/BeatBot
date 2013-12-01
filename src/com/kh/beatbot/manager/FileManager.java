@@ -13,6 +13,8 @@ import com.kh.beatbot.activity.BeatBotActivity;
 
 public class FileManager {
 
+	public static final String[] ASSET_TYPES = { "drums" };
+
 	public static File rootDirectory, audioDirectory, midiDirectory,
 			recordDirectory, drumsDirectory, beatRecordDirectory,
 			sampleRecordDirectory;
@@ -26,13 +28,18 @@ public class FileManager {
 
 		rootDirectory = new File("/");
 		audioDirectory = new File(appDirectoryPath + "/audio");
+
+		try {
+			copyAllSamplesToStorage();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		midiDirectory = new File(appDirectoryPath + "/midi");
 		drumsDirectory = new File(audioDirectory.getPath() + "/drums");
 		recordDirectory = new File(audioDirectory.getPath() + "/recorded");
 		beatRecordDirectory = new File(recordDirectory.getPath() + "/beats");
 		sampleRecordDirectory = new File(recordDirectory.getPath() + "/samples");
-
-		copyAllSamplesToStorage();
 	}
 
 	public static void clearTempFiles() {
@@ -79,42 +86,38 @@ public class FileManager {
 		out = null;
 	}
 
-	private static void copyFromAssetsToExternal(String newDirectoryPath) {
-		File newDirectory = new File(newDirectoryPath);
-		if (newDirectory.listFiles() == null
-				|| newDirectory.listFiles().length > 0) {
-			// only copy files into this dir if it is empty
-			// files can be renamed, so we can't make assumptions
+	private static void copyFromAssetsToExternal(String assetPath)
+			throws IOException {
+		File destDir = new File(audioDirectory.getPath() + "/" + assetPath
+				+ "/");
+
+		// create the dir
+		destDir.mkdirs();
+		if (destDir.listFiles().length > 0) {
+			// Only copy files into this dir if it is empty.
+			// Files can be renamed, so we can't make assumptions
 			// about whether an individual file already exists
 			return;
 		}
 
-		// create the dir (we know it doesn't exist yet at this point)
-		newDirectory.mkdirs();
-
-		try {
-			String assetPath = newDirectoryPath.replace(
-					FileManager.audioDirectory.getPath(), "");
-			assetPath = assetPath.substring(0, assetPath.length() - 1);
-			for (String filePath : assetManager.list(assetPath)) {
-				// copy audio file exactly from assets to sdcard
-				InputStream in = assetManager.open(assetPath + "/" + filePath);
-				FileOutputStream rawOut = new FileOutputStream(newDirectoryPath
-						+ filePath);
-				copyFile(in, rawOut);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		for (String fileName : assetManager.list(assetPath)) {
+			// copy audio file exactly from assets to sdcard
+			InputStream in = assetManager.open(assetPath + "/" + fileName);
+			String outPath = destDir.getPath() + "/" + fileName;
+			FileOutputStream rawOut = new FileOutputStream(outPath);
+			copyFile(in, rawOut);
 		}
 	}
 
-	private static void copyAllSamplesToStorage() {
+	private static void copyAllSamplesToStorage() throws IOException {
 		assetManager = BeatBotActivity.mainActivity.getAssets();
 
-		for (File drumDirectory : FileManager.drumsDirectory.listFiles()) {
-			// the sample folder for this sample type does not yet exist.
-			// create it and write all assets of this type to the folder
-			copyFromAssetsToExternal(drumDirectory.getPath());
+		for (String assetType : ASSET_TYPES) {
+			for (String fileName : assetManager.list(assetType)) {
+				// the sample folder for this sample type does not yet exist.
+				// create it and write all assets of this type to the folder
+				copyFromAssetsToExternal(assetType + "/" + fileName);
+			}
 		}
 	}
 }

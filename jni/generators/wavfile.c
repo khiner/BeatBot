@@ -61,7 +61,7 @@ void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName) {
 	// 2 bytes per sample per channel
 	wavFile->totalSamples = (length - pos) / (2 * wavFile->channels);
 
-	if (wavFile->totalSamples <= SAMPLE_RATE * 10) {
+	if (wavFile->totalSamples <= SAMPLE_RATE / 10) {
 		/** allocate memory to hold samples (memory is freed in wavfile_destroy)
 		 *
 		 * NOTE: We don't directly write to wavFile sample buffer because we want to
