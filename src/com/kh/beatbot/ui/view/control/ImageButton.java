@@ -97,6 +97,7 @@ public class ImageButton extends Button {
 			iconW = height;
 			iconH = height;
 		}
+		updateTextOffset();
 	}
 
 	@Override

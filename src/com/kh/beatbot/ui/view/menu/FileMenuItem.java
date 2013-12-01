@@ -51,14 +51,13 @@ public class FileMenuItem extends MenuItem {
 		super.loadIcons();
 
 		if (file.isDirectory()) {
-			IconResource resource = IconResources.forDirectory(file.getName());
+			IconResource resource = IconResources.forDirectory(getText());
 			if (resource != null) {
 				Icon icon = new Icon(resource);
 				icon.lockState(State.PRESSED);
 				setIcon(icon);
 			}
 		}
-
 	}
 	
 	public File getFile() {

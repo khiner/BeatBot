@@ -73,6 +73,10 @@ public class TextView extends View {
 			textWidth *= scaleRatio;
 			textHeight *= scaleRatio;
 		}
+		updateTextOffset();
+	}
+	
+	protected void updateTextOffset() {
 		textXOffset = calcTextXOffset() + X_OFFSET;
 		textYOffset = calcTextYOffset();
 	}

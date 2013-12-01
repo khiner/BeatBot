@@ -60,6 +60,7 @@ public class IconResources {
 		MIDI_EXPORT = new IconResource(R.drawable.midi_export_icon);
 	
 	private static final Map<String, IconResource> DIRECTORY_ICON_RESOURCES = new HashMap<String, IconResource>() {{
+		put("/", IconResources.BROWSE);
 		put("drums", IconResources.DRUMS);
 		put("recorded", IconResources.MICROPHONE);
 		put("beats", IconResources.BEAT);
