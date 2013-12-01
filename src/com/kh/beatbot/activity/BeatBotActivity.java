@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.method.DigitsKeyListener;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -38,6 +39,21 @@ public class BeatBotActivity extends Activity {
 	private static EditText bpmInput, midiFileNameInput, sampleNameInput;
 
 	public static BeatBotActivity mainActivity;
+
+	private Thread janitor;
+
+	private final Runnable cleanup = new Runnable() {
+		@Override
+		public void run() {
+			try {
+				Log.d("Janitor", "shutting down");
+				shutdown();
+			} finally {
+				Log.d("Janitor", "clearing temp files");
+				FileManager.clearTempFiles();
+			}
+		}
+	};
 
 	/** Called when the activity is first created. */
 	@Override
@@ -79,21 +95,19 @@ public class BeatBotActivity extends Activity {
 
 		TrackManager.init();
 		MidiManager.init();
-		
+
 		arm();
 	}
 
 	@Override
 	public void onDestroy() {
-		try {
-			super.onDestroy();
-			if (isFinishing()) {
-				shutdown();
-				// android.os.Process.killProcess(android.os.Process.myPid());
+		if (isFinishing()) {
+			if (janitor == null) {
+				janitor = new Thread(cleanup);
 			}
-		} finally {
-			FileManager.clearTempFiles();
+			janitor.start();
 		}
+		super.onDestroy();
 	}
 
 	@Override
