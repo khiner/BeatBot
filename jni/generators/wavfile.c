@@ -1,6 +1,6 @@
 #include "../all.h"
 
-int count = 0;
+static char tempChar;
 
 static inline float bytesToFloat(unsigned char firstByte,
 		unsigned char secondByte) {
@@ -13,6 +13,11 @@ static inline float bytesToFloat(unsigned char firstByte,
 static inline int fileExists(char *filename) {
 	struct stat buffer;
 	return (stat(filename, &buffer) == 0);
+}
+
+static inline char nextChar(FILE *file) {
+	fscanf(file, "%c", &tempChar);
+	return tempChar;
 }
 
 void wavfile_freeBuffers(WavFile *wavFile) {
@@ -28,47 +33,48 @@ void wavfile_freeBuffers(WavFile *wavFile) {
 	}
 }
 
-void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName) {
+void wavfile_setSampleFile(WavFile *config, const char *sampleFileName) {
 	// if a different sample was already loaded, destroy it.
-	wavfile_freeBuffers(wavFile);
-	FILE *file = fopen(sampleFileName, "rb");
+	wavfile_freeBuffers(config);
 
-	fseek(file, 0, SEEK_END);
-	int length = ftell(file);
-	fseek(file, 0, SEEK_SET);
-
-	/* allocate memory for entire content */
-	char *wav = calloc(1, length + 1);
-
-	/* copy the file into the buffer */
-	fread(wav, length, 1, file);
-	fclose(file);
+	FILE *wavFile = fopen(sampleFileName, "rb");
+	fseek(wavFile, 0, SEEK_END);
+	int length = ftell(wavFile);
 
 	// Determine if mono or stereo
-	wavFile->channels = wav[22]; // Forget byte 23 as 99.999% of WAVs are 1 or 2 channels
+	fseek(wavFile, 22, SEEK_SET); // Forget byte 23 as 99.999% of WAVs are 1 or 2 channels
+	config->channels = nextChar(wavFile);
 
 	// Get past all the other sub chunks to get to the data subchunk:
-	int pos = 12; // First Subchunk ID from 12 to 16
+	fseek(wavFile, 12, SEEK_SET); // First Subchunk ID from 12 to 16
+
+	char first = nextChar(wavFile);
+	char second = nextChar(wavFile);
+	char third = nextChar(wavFile);
+	char fourth = nextChar(wavFile);
 
 	// Keep iterating until we find the data chunk (i.e. 64 61 74 61 ...... (i.e. 100 97 116 97 in decimal))
-	while (wav[pos] != 100 || wav[pos + 1] != 97 || wav[pos + 2] != 116
-			|| wav[pos + 3] != 97) {
-		pos += 4;
-		int chunkSize = wav[pos] + wav[pos + 1] * 256 + wav[pos + 2] * 65536
-				+ wav[pos + 3] * 16777216;
-		pos += 4 + chunkSize;
-	}
-	pos += 8;
+	while (first != 100 || second != 97 || third != 116 || fourth != 97) {
+		int chunkSize = nextChar(wavFile) + nextChar(wavFile) * 256
+				+ nextChar(wavFile) * 65536 + nextChar(wavFile) * 16777216;
+		fseek(wavFile, chunkSize, SEEK_CUR);
 
-	if (wavFile->channels == 1) {
+		first = nextChar(wavFile);
+		second = nextChar(wavFile);
+		third = nextChar(wavFile);
+		fourth = nextChar(wavFile);
+	}
+	fseek(wavFile, 4, SEEK_CUR);
+
+	if (config->channels == 1) {
 		length -= 32; // don't know why the end of mono file is garbage
 	}
 
 	// pos is now positioned to start of actual sound data.
 	// 2 bytes per sample per channel
-	wavFile->totalSamples = (length - pos) / (2 * wavFile->channels);
+	config->totalSamples = (length - ftell(wavFile)) / (2 * config->channels);
 
-	if (wavFile->totalSamples >= SAMPLE_RATE * 5) {
+	if (config->totalSamples <= SAMPLE_RATE * 5) {
 		/** allocate memory to hold samples (memory is freed in wavfile_destroy)
 		 *
 		 * NOTE: We don't directly write to wavFile sample buffer because we want to
@@ -77,67 +83,64 @@ void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName) {
 		 * wavFile->samples is non-null, at which point we can read directly from memory.
 		 */
 		float **tempSamples = malloc(2 * sizeof(void *));
-		tempSamples[0] = malloc(wavFile->totalSamples * sizeof(float));
+		tempSamples[0] = malloc(config->totalSamples * sizeof(float));
 		// (right channel will be null if only mono sound)
 		tempSamples[1] =
-				wavFile->channels == 2 ?
-						malloc(wavFile->totalSamples * sizeof(float)) : NULL;
+				config->channels == 2 ?
+						malloc(config->totalSamples * sizeof(float)) : NULL;
 
 		// write to wavFile float buffers
 		int i = 0;
-		while (pos < length) {
-			tempSamples[0][i] = bytesToFloat(wav[pos], wav[pos + 1]);
-			pos += 2;
-			if (wavFile->channels == 2) {
-				tempSamples[1][i] = bytesToFloat(wav[pos], wav[pos + 1]);
-				pos += 2;
+		int pos = ftell(wavFile);
+		while (ftell(wavFile) < length) {
+			tempSamples[0][i] = bytesToFloat(nextChar(wavFile), nextChar(wavFile));
+			if (config->channels == 2) {
+				tempSamples[1][i] = bytesToFloat(nextChar(wavFile), nextChar(wavFile));
 			}
 			i++;
 		}
 		// make wavFile->samples point to fully-loaded sample buffer in memory
-		wavFile->samples = tempSamples;
+		config->samples = tempSamples;
 		// cleanup
 		tempSamples = NULL;
 	} else { // file too big for memory. write to temp file in external storage
 
 		// concat sampleFileName with ".raw" extension
 		const char* extension = ".raw";
-		wavFile->sampleFileName = malloc(strlen(sampleFileName) + 1 + 4);
-		strcpy(wavFile->sampleFileName, sampleFileName); /* copy name into the new var */
-		strcat(wavFile->sampleFileName, extension); /* add the extension */
+		config->sampleFileName = malloc(strlen(sampleFileName) + 1 + 4);
+		strcpy(config->sampleFileName, sampleFileName); /* copy name into the new var */
+		strcat(config->sampleFileName, extension); /* add the extension */
 
-		if (!fileExists(wavFile->sampleFileName)) {
+		if (!fileExists(config->sampleFileName)) {
 			// open *.raw file next to *.wav file - we will read directly from this file
-			FILE *tempFile = fopen(wavFile->sampleFileName, "wb");
+			FILE *tempFile = fopen(config->sampleFileName, "wb");
 
 			// copy all wav bytes to floats on disk
-			while (pos < length) {
-				float samp = bytesToFloat(wav[pos], wav[pos + 1]);
+			while (ftell(wavFile) < length) {
+				float samp = bytesToFloat(nextChar(wavFile), nextChar(wavFile));
 				fwrite(&samp, sizeof(float), 1, tempFile);
-				pos += 2;
-				if (wavFile->channels == 2) {
-					samp = bytesToFloat(wav[pos], wav[pos + 1]);
+				if (config->channels == 2) {
+					samp = bytesToFloat(nextChar(wavFile), nextChar(wavFile));
 					fwrite(&samp, sizeof(float), 1, tempFile);
-					pos += 2;
 				}
 			}
 			fflush(tempFile);
 			fclose(tempFile);
 		}
-		wavFile->sampleFile = fopen(wavFile->sampleFileName, "rb");
+		config->sampleFile = fopen(config->sampleFileName, "rb");
 	}
-	free(wav);
-	wav = NULL;
+
+	fclose(wavFile);
 
 	// init loop / currSample position data
-	wavFile->loopBegin = 0;
-	wavFile->loopEnd = wavFile->totalSamples;
-	if (wavFile->currSample >= wavFile->loopEnd) {
+	config->loopBegin = 0;
+	config->loopEnd = config->totalSamples;
+	if (config->currSample >= config->loopEnd) {
 		// TODO maybe should be currSample = loopEnd
 		// TODO this could cause unwanted repeat
-		wavFile->currSample = 0;
+		config->currSample = 0;
 	}
-	wavFile->loopLength = wavFile->loopEnd - wavFile->loopBegin;
+	config->loopLength = config->loopEnd - config->loopBegin;
 }
 
 WavFile *wavfile_create(const char *sampleName) {
