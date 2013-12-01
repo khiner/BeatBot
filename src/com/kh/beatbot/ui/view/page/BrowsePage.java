@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.view.page;
 
 import java.io.File;
 
+import android.annotation.SuppressLint;
 import com.kh.beatbot.event.SampleSetEvent;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
@@ -25,6 +26,17 @@ public class BrowsePage extends Menu {
 	public void fileItemReleased(FileMenuItem fileItem) {
 		new SampleSetEvent(TrackManager.currTrack, fileItem.getFile())
 				.execute();
+	}
+
+	@SuppressLint("DefaultLocale")
+	@Override
+	public boolean accept(File file) {
+		if (file.isDirectory()) {
+			File[] children = file.listFiles();
+			return children != null && children.length > 0;
+		} else {
+			return file.getName().toLowerCase().endsWith(".wav");
+		}
 	}
 
 	protected float getWidthForLevel(int level) {

@@ -1,5 +1,7 @@
 package com.kh.beatbot.ui.view;
 
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,10 +9,12 @@ import com.kh.beatbot.ui.view.menu.FileMenuItem;
 import com.kh.beatbot.ui.view.menu.MenuItem;
 import com.kh.beatbot.ui.view.menu.MenuItemListener;
 
-public abstract class Menu extends TouchableView implements MenuItemListener {
+public abstract class Menu extends TouchableView implements MenuItemListener, FileFilter {
 	protected List<ListView> menuLists;
 	protected List<MenuItem> topLevelItems;
 	protected float columnWidth = 0;
+
+	protected FilenameFilter filenameFilter;
 
 	protected abstract void createMenuItems();
 

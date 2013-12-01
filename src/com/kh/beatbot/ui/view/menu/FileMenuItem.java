@@ -35,7 +35,7 @@ public class FileMenuItem extends MenuItem {
 
 	private void expand() {
 		clearSubMenuItems();
-		File[] files = file.listFiles();
+		File[] files = file.listFiles(menu);
 		Arrays.sort(files);
 		FileMenuItem[] subMenuItems = new FileMenuItem[files.length];
 		for (int i = 0; i < files.length; i++) {
@@ -59,7 +59,7 @@ public class FileMenuItem extends MenuItem {
 			}
 		}
 	}
-	
+
 	public File getFile() {
 		return file;
 	}
