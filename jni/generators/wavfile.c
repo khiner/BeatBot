@@ -10,6 +10,11 @@ static inline float bytesToFloat(unsigned char firstByte,
 	return s / 32768.0;
 }
 
+static inline int fileExists(char *filename) {
+	struct stat buffer;
+	return (stat(filename, &buffer) == 0);
+}
+
 void wavfile_freeBuffers(WavFile *wavFile) {
 	// if this sample was short enough, it was also loaded into memory, and will be non-null
 	if (wavFile->samples != NULL ) {
@@ -101,22 +106,24 @@ void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName) {
 		strcpy(wavFile->sampleFileName, sampleFileName); /* copy name into the new var */
 		strcat(wavFile->sampleFileName, extension); /* add the extension */
 
-		// open *.raw file next to *.wav file - we will read directly from this file
-		FILE *tempFile = fopen(wavFile->sampleFileName, "wb");
+		if (!fileExists(wavFile->sampleFileName)) {
+			// open *.raw file next to *.wav file - we will read directly from this file
+			FILE *tempFile = fopen(wavFile->sampleFileName, "wb");
 
-		// copy all wav bytes to floats on disk
-		while (pos < length) {
-			float samp = bytesToFloat(wav[pos], wav[pos + 1]);
-			fwrite(&samp, sizeof(float), 1, tempFile);
-			pos += 2;
-			if (wavFile->channels == 2) {
-				samp = bytesToFloat(wav[pos], wav[pos + 1]);
+			// copy all wav bytes to floats on disk
+			while (pos < length) {
+				float samp = bytesToFloat(wav[pos], wav[pos + 1]);
 				fwrite(&samp, sizeof(float), 1, tempFile);
 				pos += 2;
+				if (wavFile->channels == 2) {
+					samp = bytesToFloat(wav[pos], wav[pos + 1]);
+					fwrite(&samp, sizeof(float), 1, tempFile);
+					pos += 2;
+				}
 			}
+			fflush(tempFile);
+			fclose(tempFile);
 		}
-		fflush(tempFile);
-		fclose(tempFile);
 		wavFile->sampleFile = fopen(wavFile->sampleFileName, "rb");
 	}
 	free(wav);
@@ -147,10 +154,11 @@ WavFile *wavfile_create(const char *sampleName) {
 
 float wavfile_getSample(WavFile *wavFile, int sampleIndex, int channel) {
 	float ret;
-	if (wavFile->samples != NULL) {
+	if (wavFile->samples != NULL ) {
 		ret = wavFile->samples[channel][sampleIndex];
 	} else {
-		fseek(wavFile->sampleFile, sampleIndex * wavFile->channels * ONE_FLOAT_SZ, SEEK_SET);
+		fseek(wavFile->sampleFile,
+				sampleIndex * wavFile->channels * ONE_FLOAT_SZ, SEEK_SET);
 		fread(&ret, 1, ONE_FLOAT_SZ, wavFile->sampleFile);
 	}
 	return ret * wavFile->gain;
