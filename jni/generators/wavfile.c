@@ -1,6 +1,7 @@
 #include "../all.h"
 
 static char tempChar;
+static int i;
 
 static inline float bytesToFloat(unsigned char firstByte,
 		unsigned char secondByte) {
@@ -74,7 +75,7 @@ void wavfile_setSampleFile(WavFile *config, const char *sampleFileName) {
 	// 2 bytes per sample per channel
 	config->totalSamples = (length - ftell(wavFile)) / (2 * config->channels);
 
-	if (config->totalSamples <= SAMPLE_RATE * 5) {
+	if (config->totalSamples >= SAMPLE_RATE * 5) {
 		/** allocate memory to hold samples (memory is freed in wavfile_destroy)
 		 *
 		 * NOTE: We don't directly write to wavFile sample buffer because we want to
@@ -90,21 +91,17 @@ void wavfile_setSampleFile(WavFile *config, const char *sampleFileName) {
 						malloc(config->totalSamples * sizeof(float)) : NULL;
 
 		// write to wavFile float buffers
-		int i = 0;
-		int pos = ftell(wavFile);
-		while (ftell(wavFile) < length) {
+		for (i = 0; i < config->totalSamples; i++) {
 			tempSamples[0][i] = bytesToFloat(nextChar(wavFile), nextChar(wavFile));
 			if (config->channels == 2) {
 				tempSamples[1][i] = bytesToFloat(nextChar(wavFile), nextChar(wavFile));
 			}
-			i++;
 		}
 		// make wavFile->samples point to fully-loaded sample buffer in memory
 		config->samples = tempSamples;
 		// cleanup
 		tempSamples = NULL;
 	} else { // file too big for memory. write to temp file in external storage
-
 		// concat sampleFileName with ".raw" extension
 		const char* extension = ".raw";
 		config->sampleFileName = malloc(strlen(sampleFileName) + 1 + 4);
@@ -116,7 +113,7 @@ void wavfile_setSampleFile(WavFile *config, const char *sampleFileName) {
 			FILE *tempFile = fopen(config->sampleFileName, "wb");
 
 			// copy all wav bytes to floats on disk
-			while (ftell(wavFile) < length) {
+			for (i = 0; i < config->totalSamples; i++) {
 				float samp = bytesToFloat(nextChar(wavFile), nextChar(wavFile));
 				fwrite(&samp, sizeof(float), 1, tempFile);
 				if (config->channels == 2) {
