@@ -101,12 +101,10 @@ public class BeatBotActivity extends Activity {
 
 	@Override
 	public void onDestroy() {
-		if (isFinishing()) {
-			if (janitor == null) {
-				janitor = new Thread(cleanup);
-			}
-			janitor.start();
+		if (janitor == null) {
+			janitor = new Thread(cleanup);
 		}
+		janitor.start();
 		super.onDestroy();
 	}
 
