@@ -1,14 +1,22 @@
 #include "../all.h"
 
+static const char* rawExtension = ".raw";
+
 static char tempChar;
 static int i;
+static float tempSample[2];
+static unsigned char tempSampleBytes[4];
 
-static inline float bytesToFloat(unsigned char firstByte,
-		unsigned char secondByte) {
-	// convert two bytes to one short (little endian)
-	short s = (secondByte << 8) | firstByte;
-	// convert to range from -1 to (just below) 1
+static inline float bytesToFloat(unsigned char c1, unsigned char c2) {
+	short s = (c2 << 8) | c1;
 	return s / 32768.0;
+}
+
+static inline void nextSample(FILE *file) {
+	fread(tempSampleBytes, 4, sizeof(unsigned char), file);
+	// convert two bytes to one short (little endian)
+	tempSample[0] = bytesToFloat(tempSampleBytes[0], tempSampleBytes[1]);
+	tempSample[1] = bytesToFloat(tempSampleBytes[2], tempSampleBytes[3]);
 }
 
 static inline int fileExists(char *filename) {
@@ -75,7 +83,7 @@ void wavfile_setSampleFile(WavFile *config, const char *sampleFileName) {
 	// 2 bytes per sample per channel
 	config->totalSamples = (length - ftell(wavFile)) / (2 * config->channels);
 
-	if (config->totalSamples >= SAMPLE_RATE * 5) {
+	if (config->totalSamples <= SAMPLE_RATE * 5) {
 		/** allocate memory to hold samples (memory is freed in wavfile_destroy)
 		 *
 		 * NOTE: We don't directly write to wavFile sample buffer because we want to
@@ -84,17 +92,20 @@ void wavfile_setSampleFile(WavFile *config, const char *sampleFileName) {
 		 * wavFile->samples is non-null, at which point we can read directly from memory.
 		 */
 		float **tempSamples = malloc(2 * sizeof(void *));
-		tempSamples[0] = malloc(config->totalSamples * sizeof(float));
+		tempSamples[0] = malloc(config->totalSamples * ONE_FLOAT_SZ);
 		// (right channel will be null if only mono sound)
 		tempSamples[1] =
 				config->channels == 2 ?
-						malloc(config->totalSamples * sizeof(float)) : NULL;
+						malloc(config->totalSamples * ONE_FLOAT_SZ) : NULL;
 
 		// write to wavFile float buffers
 		for (i = 0; i < config->totalSamples; i++) {
-			tempSamples[0][i] = bytesToFloat(nextChar(wavFile), nextChar(wavFile));
+			nextSample(wavFile);
+			tempSamples[0][i] = tempSample[0];
 			if (config->channels == 2) {
-				tempSamples[1][i] = bytesToFloat(nextChar(wavFile), nextChar(wavFile));
+				tempSamples[1][i] = tempSample[1];
+			} else if (++i < config->totalSamples) {
+				tempSamples[0][i] = tempSample[1];
 			}
 		}
 		// make wavFile->samples point to fully-loaded sample buffer in memory
@@ -103,10 +114,9 @@ void wavfile_setSampleFile(WavFile *config, const char *sampleFileName) {
 		tempSamples = NULL;
 	} else { // file too big for memory. write to temp file in external storage
 		// concat sampleFileName with ".raw" extension
-		const char* extension = ".raw";
 		config->sampleFileName = malloc(strlen(sampleFileName) + 1 + 4);
 		strcpy(config->sampleFileName, sampleFileName); /* copy name into the new var */
-		strcat(config->sampleFileName, extension); /* add the extension */
+		strcat(config->sampleFileName, rawExtension); /* add the extension */
 
 		if (!fileExists(config->sampleFileName)) {
 			// open *.raw file next to *.wav file - we will read directly from this file
@@ -114,15 +124,14 @@ void wavfile_setSampleFile(WavFile *config, const char *sampleFileName) {
 
 			// copy all wav bytes to floats on disk
 			for (i = 0; i < config->totalSamples; i++) {
-				float samp = bytesToFloat(nextChar(wavFile), nextChar(wavFile));
-				fwrite(&samp, sizeof(float), 1, tempFile);
-				if (config->channels == 2) {
-					samp = bytesToFloat(nextChar(wavFile), nextChar(wavFile));
-					fwrite(&samp, sizeof(float), 1, tempFile);
-				}
+				nextSample(wavFile);
+				fwrite(tempSample, ONE_FLOAT_SZ, config->channels, tempFile);
 			}
 			fflush(tempFile);
 			fclose(tempFile);
+		} else {
+			__android_log_print(ANDROID_LOG_INFO, "wavfile",
+					"Reusing existing sample");
 		}
 		config->sampleFile = fopen(config->sampleFileName, "rb");
 	}
