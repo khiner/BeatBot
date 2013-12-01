@@ -221,15 +221,6 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	}
 }
 
-void arm() {
-	if (openSlOut->armed)
-		return; // only need to arm once
-	openSlOut->armed = true;
-	// we need to fill the buffer once before calling the OpenSL callback
-	fillBuffer();
-	bufferQueueCallback(openSlOut->outputBufferQueue, NULL );
-}
-
 void Java_com_kh_beatbot_manager_PlaybackManager_playNative(JNIEnv *env,
 		jclass clazz) {
 	stopAllTracks();
@@ -331,8 +322,17 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 	(*(openSlOut->outputPlayerPlay))->SetPlayState(openSlOut->outputPlayerPlay,
 			SL_PLAYSTATE_PLAYING );
 
-	arm();
 	return JNI_TRUE;
+}
+
+void Java_com_kh_beatbot_activity_BeatBotActivity_arm(JNIEnv *env,
+		jclass clazz) {
+	if (openSlOut->armed)
+		return; // only need to arm once
+	openSlOut->armed = true;
+	// we need to fill the buffer once before calling the OpenSL callback
+	fillBuffer();
+	bufferQueueCallback(openSlOut->outputBufferQueue, NULL );
 }
 
 // shut down the native audio system

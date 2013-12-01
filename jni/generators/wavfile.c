@@ -1,5 +1,7 @@
 #include "../all.h"
 
+int count = 0;
+
 static inline float bytesToFloat(unsigned char firstByte,
 		unsigned char secondByte) {
 	// convert two bytes to one short (little endian)
@@ -61,7 +63,7 @@ void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName) {
 	// 2 bytes per sample per channel
 	wavFile->totalSamples = (length - pos) / (2 * wavFile->channels);
 
-	if (wavFile->totalSamples <= SAMPLE_RATE / 10) {
+	if (count == 0) {
 		/** allocate memory to hold samples (memory is freed in wavfile_destroy)
 		 *
 		 * NOTE: We don't directly write to wavFile sample buffer because we want to
@@ -124,6 +126,8 @@ void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName) {
 	wavFile->loopBegin = 0;
 	wavFile->loopEnd = wavFile->totalSamples;
 	if (wavFile->currSample >= wavFile->loopEnd) {
+		// TODO maybe should be currSample = loopEnd
+		// TODO this could cause unwanted repeat
 		wavFile->currSample = 0;
 	}
 	wavFile->loopLength = wavFile->loopEnd - wavFile->loopBegin;
@@ -147,7 +151,7 @@ float wavfile_getSample(WavFile *wavFile, int sampleIndex, int channel) {
 		ret = wavFile->samples[channel][sampleIndex];
 	} else {
 		fseek(wavFile->sampleFile, sampleIndex * wavFile->channels * ONE_FLOAT_SZ, SEEK_SET);
-		fread(&ret, wavFile->channels, ONE_FLOAT_SZ, wavFile->sampleFile);
+		fread(&ret, 1, ONE_FLOAT_SZ, wavFile->sampleFile);
 	}
 	return ret * wavFile->gain;
 }

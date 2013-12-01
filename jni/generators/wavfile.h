@@ -55,11 +55,13 @@ static inline void wavfile_tick(WavFile *config, float *sample) {
 	if (config->samples == NULL) {
 		fseek(config->sampleFile, sampleIndex * config->channels * ONE_FLOAT_SZ, SEEK_SET);
 		fread(config->tempSample, config->channels, TWO_FLOAT_SZ, config->sampleFile);
+
 		for (channel = 0; channel < config->channels; channel++) {
 			// interpolate the next two samples linearly
 			sample[channel] = (1.0f - remainder) * config->tempSample[channel]
 					+ remainder * config->tempSample[config->channels + channel];
 		}
+
 		if (config->channels == 1) {
 			sample[1] = sample[0];
 		}

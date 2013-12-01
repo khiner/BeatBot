@@ -57,10 +57,6 @@ public class BeatBotActivity extends Activity {
 		FileManager.init();
 		MidiFileManager.init();
 
-		if (savedInstanceState == null) {
-			initNativeAudio();
-		}
-
 		View.root = new GLSurfaceViewGroup(this);
 		View.root.setLayoutParams(lp);
 
@@ -77,8 +73,14 @@ public class BeatBotActivity extends Activity {
 
 		((GLSurfaceViewGroup) View.root).setBBRenderer(activityPager);
 
+		if (savedInstanceState == null) {
+			initNativeAudio();
+		}
+
 		TrackManager.init();
 		MidiManager.init();
+		
+		arm();
 	}
 
 	@Override
@@ -283,6 +285,8 @@ public class BeatBotActivity extends Activity {
 	public static native boolean createAudioPlayer();
 
 	public static native void createEngine();
+
+	public static native void arm();
 
 	public static native void nativeShutdown();
 
