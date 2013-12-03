@@ -304,6 +304,7 @@ public class BeatBotActivity extends Activity {
 
 	/** Load jni .so on initialization */
 	static {
+		System.loadLibrary("sndfile");
 		System.loadLibrary("nativeaudio");
 	}
 }

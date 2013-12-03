@@ -1,32 +1,12 @@
 #include "../all.h"
+#include "libsndfile/sndfile.h"
 
 static const char* rawExtension = ".raw";
-
-static char tempChar;
-static int i;
-static float tempSample[2];
-static unsigned char tempSampleBytes[4];
-
-static inline float bytesToFloat(unsigned char c1, unsigned char c2) {
-	short s = (c2 << 8) | c1;
-	return s / 32768.0;
-}
-
-static inline void nextSample(FILE *file) {
-	fread(tempSampleBytes, 4, sizeof(unsigned char), file);
-	// convert two bytes to one short (little endian)
-	tempSample[0] = bytesToFloat(tempSampleBytes[0], tempSampleBytes[1]);
-	tempSample[1] = bytesToFloat(tempSampleBytes[2], tempSampleBytes[3]);
-}
+static float data[BUFF_SIZE];
 
 static inline int fileExists(char *filename) {
 	struct stat buffer;
 	return (stat(filename, &buffer) == 0);
-}
-
-static inline char nextChar(FILE *file) {
-	fscanf(file, "%c", &tempChar);
-	return tempChar;
 }
 
 void wavfile_freeBuffers(WavFile *wavFile) {
@@ -43,47 +23,29 @@ void wavfile_freeBuffers(WavFile *wavFile) {
 }
 
 void wavfile_setSampleFile(WavFile *config, const char *sampleFileName) {
+	SNDFILE *infile;
+	SF_INFO sfinfo;
+	int readcount, samp = 0, chan = 0, i = 0;
+
+	if (!(infile = sf_open(sampleFileName, SFM_READ, &sfinfo))) { /* Open failed so print an error message. */
+		__android_log_print(ANDROID_LOG_INFO, "wavfile", "Not able to open input file %s.\n", "input.wav");
+		/* Print the error message fron libsndfile. */
+		sf_perror(NULL );
+		//return 1;
+	};
+
+	if (sfinfo.channels > MAX_CHANNELS) {
+		__android_log_print(ANDROID_LOG_INFO, "wavfile", "Not able to process more than %d channels\n", MAX_CHANNELS);
+		//return 1;
+	};
+
+	config->channels = sfinfo.channels;
+	config->totalSamples = sfinfo.frames;
+
 	// if a different sample was already loaded, destroy it.
 	wavfile_freeBuffers(config);
 
-	FILE *wavFile = fopen(sampleFileName, "rb");
-	fseek(wavFile, 0, SEEK_END);
-	int length = ftell(wavFile);
-
-	// Determine if mono or stereo
-	fseek(wavFile, 22, SEEK_SET); // Forget byte 23 as 99.999% of WAVs are 1 or 2 channels
-	config->channels = nextChar(wavFile);
-
-	// Get past all the other sub chunks to get to the data subchunk:
-	fseek(wavFile, 12, SEEK_SET); // First Subchunk ID from 12 to 16
-
-	char first = nextChar(wavFile);
-	char second = nextChar(wavFile);
-	char third = nextChar(wavFile);
-	char fourth = nextChar(wavFile);
-
-	// Keep iterating until we find the data chunk (i.e. 64 61 74 61 ...... (i.e. 100 97 116 97 in decimal))
-	while (first != 100 || second != 97 || third != 116 || fourth != 97) {
-		int chunkSize = nextChar(wavFile) + nextChar(wavFile) * 256
-				+ nextChar(wavFile) * 65536 + nextChar(wavFile) * 16777216;
-		fseek(wavFile, chunkSize, SEEK_CUR);
-
-		first = nextChar(wavFile);
-		second = nextChar(wavFile);
-		third = nextChar(wavFile);
-		fourth = nextChar(wavFile);
-	}
-	fseek(wavFile, 4, SEEK_CUR);
-
-	if (config->channels == 1) {
-		length -= 32; // don't know why the end of mono file is garbage
-	}
-
-	// pos is now positioned to start of actual sound data.
-	// 2 bytes per sample per channel
-	config->totalSamples = (length - ftell(wavFile)) / (2 * config->channels);
-
-	if (config->totalSamples <= SAMPLE_RATE * 5) {
+	if (false) {
 		/** allocate memory to hold samples (memory is freed in wavfile_destroy)
 		 *
 		 * NOTE: We don't directly write to wavFile sample buffer because we want to
@@ -99,15 +61,14 @@ void wavfile_setSampleFile(WavFile *config, const char *sampleFileName) {
 						malloc(config->totalSamples * ONE_FLOAT_SZ) : NULL;
 
 		// write to wavFile float buffers
-		for (i = 0; i < config->totalSamples; i++) {
-			nextSample(wavFile);
-			tempSamples[0][i] = tempSample[0];
-			if (config->channels == 2) {
-				tempSamples[1][i] = tempSample[1];
-			} else if (++i < config->totalSamples) {
-				tempSamples[0][i] = tempSample[1];
-			}
-		}
+		while ((readcount = sf_read_float(infile, data, BUFF_SIZE))) {
+	        for (i = 0; i < readcount;) {
+	        	for (chan = 0; chan < config->channels; chan++) {
+		        	tempSamples[chan][samp] = data[i++];
+		        }
+	        	samp++;
+		    }
+		};
 		// make wavFile->samples point to fully-loaded sample buffer in memory
 		config->samples = tempSamples;
 		// cleanup
@@ -123,10 +84,11 @@ void wavfile_setSampleFile(WavFile *config, const char *sampleFileName) {
 			FILE *tempFile = fopen(config->sampleFileName, "wb");
 
 			// copy all wav bytes to floats on disk
-			for (i = 0; i < config->totalSamples; i++) {
-				nextSample(wavFile);
-				fwrite(tempSample, ONE_FLOAT_SZ, config->channels, tempFile);
-			}
+			while ((readcount = sf_read_float(infile, data, BUFF_SIZE))) {
+				for (i = 0; i < readcount; i++) {
+					fwrite(&data[i], ONE_FLOAT_SZ, 1, tempFile);
+			    }
+			};
 			fflush(tempFile);
 			fclose(tempFile);
 		} else {
@@ -136,7 +98,7 @@ void wavfile_setSampleFile(WavFile *config, const char *sampleFileName) {
 		config->sampleFile = fopen(config->sampleFileName, "rb");
 	}
 
-	fclose(wavFile);
+	sf_close(infile);
 
 	// init loop / currSample position data
 	config->loopBegin = 0;

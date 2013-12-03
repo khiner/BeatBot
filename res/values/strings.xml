@@ -24,7 +24,7 @@
 	<string name="flanger">Flanger</string>
 	<string name="filter">Filter</string>
 	<string name="reverb">Reverb</string>
-	<string name="tremelo">Tremelo</string>
+	<string name="tremelo">Tremolo</string>
 
 	<string-array name="effect_names">
 		<item name="chorus">Chorus</item>
