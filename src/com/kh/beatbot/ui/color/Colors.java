@@ -5,8 +5,8 @@ import android.app.Activity;
 import com.kh.beatbot.R;
 
 public class Colors {
-	public static float[] BG_COLOR, BLACK, WHITE, DARK_GREY, GREEN, YELLOW,
-			RED, MIDI_VIEW_BG, MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM,
+	public static float[] BG_COLOR, BLACK, WHITE, GREEN, YELLOW, RED,
+			MIDI_VIEW_BG, MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM,
 			SELECT_REGION, NOTE, NOTE_SELECTED, VOLUME, PAN, PITCH,
 			LEVEL_SELECTED, TICK_FILL, TICK_MARKER, TICKBAR, TICK_SELECTED,
 			VOLUME_LIGHT, VOLUME_SELECTED, BPM_OFF, BPM_ON, BPM_ON_SELECTED,
@@ -32,7 +32,6 @@ public class Colors {
 
 	public static void initColors(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
-		DARK_GREY = colorResourceToFloats(activity, R.color.darkGrey); 
 		WHITE = colorResourceToFloats(activity, R.color.white);
 		RED = colorResourceToFloats(activity, R.color.red);
 		YELLOW = colorResourceToFloats(activity, R.color.yellow);

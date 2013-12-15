@@ -42,6 +42,7 @@ public class ValueLabel extends ControlView1dBase {
 		if (param == null) {
 			enabled = false;
 			bgRect.setFillColor(fillColorSet.disabledColor);
+			setText("");
 		} else {
 			enabled = true;
 			bgRect.setFillColor(fillColorSet.defaultColor);

@@ -162,7 +162,9 @@ public class Track extends BaseTrack {
 
 	public void setSample(File sampleFile) {
 		currSampleFile = sampleFile;
-		setSample(id, getCurrSampleFile().getPath());
+		if (currSampleFile != null) {
+			setSample(id, currSampleFile.getPath());
+		}
 
 		update();
 	}

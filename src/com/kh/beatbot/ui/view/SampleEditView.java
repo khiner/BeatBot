@@ -101,7 +101,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	public void layout(View parent, float x, float y, float width, float height) {
 		waveformShape = Shape.createWaveform(null, width,
-				Colors.LABEL_SELECTED, Colors.DARK_GREY);
+				Colors.LABEL_SELECTED, Colors.BLACK);
 		waveformShape.setStrokeWeight(2);
 		waveformWidth = width - SNAP_DIST;
 		super.layout(parent, x, y, width, height);
@@ -166,11 +166,14 @@ public class SampleEditView extends ControlView2dBase {
 		updateVbs();
 	}
 
+	// if the params are null, then there is no sample file for this track.
+	private boolean hasSample() {
+		return params[0] != null && params[1] != null;
+	}
+
 	@Override
 	public void draw() {
-		if (params[0] == null || params[1] == null) {
-			// if the params are null, then there is no sample file for this
-			// track.
+		if (!hasSample()) {
 			setText(NO_SAMPLE_MESSAGE);
 			super.draw();
 			return;
@@ -267,6 +270,8 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void handleActionDown(int id, float x, float y) {
+		if (!hasSample())
+			return;
 		if (!selectLoopMarker(id, x)) {
 			// loop marker not close enough to select. start scroll
 			// (we know it's the first pointer down, so we're not zooming)
@@ -276,12 +281,16 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void handleActionUp(int id, float x, float y) {
+		if (!hasSample())
+			return;
 		scrollPointerId = beginLoopPointerId = endLoopPointerId = zoomLeftPointerId = zoomRightPointerId = -1;
 		scrollAnchorLevel = zoomLeftAnchorLevel = zoomRightAnchorLevel = -1;
 	}
 
 	@Override
 	public void handleActionPointerDown(int id, float x, float y) {
+		if (!hasSample())
+			return;
 		if (!selectLoopMarker(id, x) && !setZoomAnchor(id)) {
 			// loop marker not close enough to select, and first pointer down.
 			// start scrolling
@@ -291,6 +300,8 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void handleActionPointerUp(int id, float x, float y) {
+		if (!hasSample())
+			return;
 		deselectLoopMarker(id);
 		// stop zooming
 		if (id == zoomLeftPointerId) {
@@ -304,6 +315,8 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void handleActionMove(int id, float x, float y) {
+		if (!hasSample())
+			return;
 		if (id == zoomLeftPointerId) {
 			// no-op: only zoom once both actions have been handled
 		} else if (id == zoomRightPointerId) {

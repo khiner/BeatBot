@@ -23,9 +23,7 @@ public class ParamControl extends TouchableView {
 	
 	public void setParam(Param param) {
 		valueLabel.setParam(param);
-		if (param != null) {
-			label.setText(param.name);
-		}
+		label.setText(param == null ? "" : param.name);
 	}
 	
 	public void setLabelText(String text) {

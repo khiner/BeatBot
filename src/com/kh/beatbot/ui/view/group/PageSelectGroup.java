@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.view.group;
 
+import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
@@ -85,7 +86,7 @@ public class PageSelectGroup extends TouchableView {
 		addTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				//DirectoryManager.showAddTrackAlert();
+				new TrackCreateEvent().execute();
 			}
 		});
 
