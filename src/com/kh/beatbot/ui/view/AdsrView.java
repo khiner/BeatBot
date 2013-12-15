@@ -12,6 +12,7 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Shape.Type;
 
 public class AdsrView extends TouchableView implements ParamListener {
 
@@ -88,9 +89,9 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	@Override
 	protected synchronized void createChildren() {
-		initBgRect(null, Colors.VIEW_BG, Colors.VOLUME);
+		initBgRect(Type.ROUNDED_RECT, null, Colors.VIEW_BG, Colors.VOLUME);
 	}
-	
+
 	private void initAdsrVb() {
 		Track track = TrackManager.currTrack;
 		float attackX = getAttackX(track.adsr);

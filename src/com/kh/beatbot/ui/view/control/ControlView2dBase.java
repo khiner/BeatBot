@@ -3,41 +3,46 @@ package com.kh.beatbot.ui.view.control;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
 
-
-public abstract class ControlView2dBase extends ControlViewBase implements ParamListener {
+public abstract class ControlView2dBase extends ControlViewBase implements
+		ParamListener {
 
 	protected Param[] params = new Param[2];
 
 	protected abstract float xToLevel(float x);
+
 	protected abstract float yToLevel(float y);
-		
-	public void setParams(Param xParam, Param yParam) {
+
+	public synchronized void setParams(Param xParam, Param yParam) {
 		for (int i = 0; i < params.length; i++) {
 			if (params[i] != null) {
 				params[i].removeListener(this);
 			}
 			params[i] = (i == 0) ? xParam : (i == 1 ? yParam : null);
-			params[i].addListener(this);
+			if (params[i] != null) {
+				params[i].addListener(this);
+			}
 		}
 		onParamChanged(params[0]);
 	}
-	
+
 	@Override
 	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
 		params[0].setLevel(xToLevel(x));
 		params[1].setLevel(yToLevel(y));
 	}
-	
+
 	@Override
 	public void handleActionMove(int id, float x, float y) {
 		params[0].setLevel(xToLevel(x));
 		params[1].setLevel(yToLevel(y));
 	}
-	
+
 	@Override
 	public void onParamChanged(Param param) {
-		setViewLevel(params[0].viewLevel, params[1].viewLevel);
+		if (params[0] != null && params[1] != null) {
+			setViewLevel(params[0].viewLevel, params[1].viewLevel);
+		}
 	}
 
 	protected abstract void setViewLevel(float xViewLevel, float yViewLevel);

@@ -5,13 +5,12 @@ import android.app.Activity;
 import com.kh.beatbot.R;
 
 public class Colors {
-	public static float[] BG_COLOR, BLACK, WHITE, GREEN, YELLOW, RED,
-			MIDI_VIEW_BG, MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM,
+	public static float[] BG_COLOR, BLACK, WHITE, DARK_GREY, GREEN, YELLOW,
+			RED, MIDI_VIEW_BG, MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM,
 			SELECT_REGION, NOTE, NOTE_SELECTED, VOLUME, PAN, PITCH,
 			LEVEL_SELECTED, TICK_FILL, TICK_MARKER, TICKBAR, TICK_SELECTED,
 			VOLUME_LIGHT, VOLUME_SELECTED, BPM_OFF, BPM_ON, BPM_ON_SELECTED,
-			BPM_OFF_SELECTED, VIEW_BG, SAMPLE_LOOP_HIGHLIGHT,
-			SAMPLE_LOOP_SELECT, SAMPLE_LOOP_SELECT_OUTLINE, LABEL_DARK,
+			BPM_OFF_SELECTED, VIEW_BG, SAMPLE_LOOP_SELECT_OUTLINE, LABEL_DARK,
 			LABEL_MED, LABEL_LIGHT, LABEL_VERY_LIGHT, LABEL_SELECTED,
 			LABEL_SELECTED_TRANS, MIDI_SELECTED_TRACK, TRANSPARANT = { 0, 0, 0,
 					0 };
@@ -22,10 +21,10 @@ public class Colors {
 			{ .7f, .7f, .7f, 1 } };
 
 	public static ColorSet labelBgColorSet, labelStrokeColorSet,
-			muteButtonColorSet, soloButtonColorSet, buttonRowStrokeColorSet,
-			instrumentBgColorSet, panBgColorSet, panStrokeColorSet,
-			pitchBgColorSet, pitchStrokeColorSet, volumeBgColorSet,
-			volumeStrokeColorSet, effectLabelBgColorSet,
+			valueLabelBgColorSet, muteButtonColorSet, soloButtonColorSet,
+			buttonRowStrokeColorSet, instrumentBgColorSet, panBgColorSet,
+			panStrokeColorSet, pitchBgColorSet, pitchStrokeColorSet,
+			volumeBgColorSet, volumeStrokeColorSet, effectLabelBgColorSet,
 			effectLabelStrokeColorSet, effectLabelTouchedBgColorSet,
 			effectLabelTouchedStrokeColorSet, iconFillColorSet,
 			deleteFillColorSet, deleteStrokeColorSet, menuItemFillColorSet,
@@ -33,6 +32,7 @@ public class Colors {
 
 	public static void initColors(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
+		DARK_GREY = colorResourceToFloats(activity, R.color.darkGrey); 
 		WHITE = colorResourceToFloats(activity, R.color.white);
 		RED = colorResourceToFloats(activity, R.color.red);
 		YELLOW = colorResourceToFloats(activity, R.color.yellow);
@@ -67,10 +67,7 @@ public class Colors {
 		BPM_OFF_SELECTED = colorResourceToFloats(activity,
 				R.color.bpmOffSelected);
 		// VIEW_BG = new float[] { 0.3275f, 0.3994f, 0.4465f, 1 };
-		SAMPLE_LOOP_HIGHLIGHT = colorResourceToFloats(activity,
-				R.color.sampleLoopHighlight);
-		SAMPLE_LOOP_SELECT = colorResourceToFloats(activity,
-				R.color.sampleLoopSelect);
+
 		SAMPLE_LOOP_SELECT_OUTLINE = colorResourceToFloats(activity,
 				R.color.sampleLoopSelectOutline);
 
@@ -87,6 +84,10 @@ public class Colors {
 				.38f };
 		labelBgColorSet = new ColorSet(LABEL_DARK, VOLUME, LABEL_SELECTED);
 		labelStrokeColorSet = new ColorSet(WHITE, BLACK, BLACK);
+
+		valueLabelBgColorSet = new ColorSet(LABEL_VERY_LIGHT, LABEL_SELECTED,
+				null, LABEL_DARK);
+
 		buttonRowStrokeColorSet = new ColorSet(WHITE, BLACK, BLACK);
 
 		effectLabelBgColorSet = new ColorSet(LABEL_DARK, LABEL_LIGHT, VOLUME);

@@ -10,9 +10,12 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.WaveformShape;
+import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
 
 public class SampleEditView extends ControlView2dBase {
+
+	private static final String NO_SAMPLE_MESSAGE = "Use the browse tab to load a sample.";
 
 	// min distance for pointer to select loop markers
 	private static final float SNAP_DIST = 32f, X_OFFSET = SNAP_DIST / 2;
@@ -20,8 +23,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	private static WaveformShape waveformShape;
 
-	private static FloatBuffer backgroundOutlineVb = null,
-			currSampleLineVb = null,
+	private static FloatBuffer currSampleLineVb = null,
 			loopSelectionRectVbs[] = new FloatBuffer[2];
 
 	// which pointer id is touching which marker (-1 means no pointer)
@@ -38,15 +40,13 @@ public class SampleEditView extends ControlView2dBase {
 	private float levelOffset = 0, levelWidth = 0, waveformWidth = 0;
 
 	public synchronized void update() {
+		if (params[0] == null && params[1] == null)
+			return;
 		levelOffset = 0;
 		levelWidth = 1;
 		// find view level for 32 samples
 		minLoopWindow = params[0].getViewLevel(Track.MIN_LOOP_WINDOW);
 		updateVbs();
-	}
-
-	private void initBackgroundOutlineVb() {
-		backgroundOutlineVb = makeRectFloatBuffer(0, 0, width - 2, height);
 	}
 
 	private void initCurrSampleLineVb() {
@@ -82,11 +82,11 @@ public class SampleEditView extends ControlView2dBase {
 
 	private void drawLoopSelectionMarkers() {
 		drawTriangleFan(loopSelectionRectVbs[0],
-				beginLoopPointerId == -1 ? Colors.SAMPLE_LOOP_SELECT
-						: Colors.LABEL_SELECTED_TRANS);
+				beginLoopPointerId == -1 ? Colors.LABEL_SELECTED_TRANS
+						: Colors.VOLUME_SELECTED);
 		drawTriangleFan(loopSelectionRectVbs[1],
-				endLoopPointerId == -1 ? Colors.SAMPLE_LOOP_SELECT
-						: Colors.LABEL_SELECTED_TRANS);
+				endLoopPointerId == -1 ? Colors.LABEL_SELECTED_TRANS
+						: Colors.VOLUME_SELECTED);
 	}
 
 	private void drawCurrSampleLine() {
@@ -101,16 +101,21 @@ public class SampleEditView extends ControlView2dBase {
 
 	public void layout(View parent, float x, float y, float width, float height) {
 		waveformShape = Shape.createWaveform(null, width,
-				Colors.SAMPLE_LOOP_HIGHLIGHT, Colors.VOLUME);
+				Colors.LABEL_SELECTED, Colors.DARK_GREY);
+		waveformShape.setStrokeWeight(2);
 		waveformWidth = width - SNAP_DIST;
 		super.layout(parent, x, y, width, height);
 	}
 
 	@Override
 	public synchronized void init() {
-		initBackgroundOutlineVb();
+		setStrokeColor(Colors.BLACK);
 		initCurrSampleLineVb();
 		update();
+	}
+
+	public synchronized void createChildren() {
+		initBgRect(Type.RECTANGLE, null, Colors.LABEL_VERY_LIGHT, Colors.WHITE);
 	}
 
 	private void updateLevelOffset(float scrollX) {
@@ -163,12 +168,18 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void draw() {
+		if (params[0] == null || params[1] == null) {
+			// if the params are null, then there is no sample file for this
+			// track.
+			setText(NO_SAMPLE_MESSAGE);
+			super.draw();
+			return;
+		}
 		drawWaveform();
 		drawLoopSelectionMarkers();
 		if (TrackManager.currTrack.isPreviewing()) {
 			drawCurrSampleLine();
 		}
-		drawLines(backgroundOutlineVb, Colors.WHITE, 4, GL10.GL_LINE_LOOP);
 	}
 
 	private boolean selectLoopMarker(int id, float x) {
@@ -324,7 +335,9 @@ public class SampleEditView extends ControlView2dBase {
 	@Override
 	public void onParamChanged(Param param) {
 		super.onParamChanged(param);
-		updateVbs();
+		if (param != null) {
+			updateVbs();
+		}
 	}
 
 	public synchronized void layoutChildren() {

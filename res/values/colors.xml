@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
+    <color name="darkGrey">#FF55647C</color>
     <color name="white">#FFFFFFFF</color>
     <color name="red">#FFFF0000</color>
     <color name="yellow">#FFFFFF00</color>
@@ -38,8 +39,6 @@
     <color name="tickSelected">#FF69c9ff</color> <!-- same as tronBlue -->
     <color name="viewBg">#FF546672</color>
     
-    <color name="sampleLoopHighlight">#FFCD9A19</color>
-    <color name="sampleLoopSelect">#80FAFAFF</color>
     <color name="sampleLoopSelectOutline">#FFFFFFFF</color>
     
 </resources>

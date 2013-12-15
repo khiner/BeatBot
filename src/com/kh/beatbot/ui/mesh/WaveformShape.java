@@ -61,8 +61,4 @@ public class WaveformShape extends Shape {
 		loopEndX = endX;
 		update();
 	}
-
-	protected void createVertices(float[] fillColor, float[] outlineColor) {
-
-	}
 }

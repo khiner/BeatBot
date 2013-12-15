@@ -2,7 +2,6 @@ package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.Track;
 import com.kh.beatbot.activity.BeatBotActivity;
-import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
@@ -10,7 +9,6 @@ import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.SampleEditView;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
@@ -20,32 +18,24 @@ import com.kh.beatbot.ui.view.control.param.ParamControl;
 
 public class SampleEditPage extends TouchableView {
 
-	private ShapeGroup labelGroup = new ShapeGroup();
-
 	public SampleEditView sampleEdit;
 	private ImageButton previewButton, editButton;
 	private ToggleButton loopButton, reverseButton;
 	private ParamControl loopBeginControl, loopEndControl, gainControl;
-
-	private Param defaultLoopBeginParam = new Param(0, "Begin", "");
-	private Param defaultLoopEndParam = new Param(0, "End", "");
-	private Param defaultGainParam = new Param(0, "Gain", "");
 
 	@Override
 	public synchronized void update() {
 		Track currTrack = TrackManager.currTrack;
 		loopButton.setChecked(currTrack.isLooping());
 		reverseButton.setChecked(currTrack.isReverse());
-		Param loopBeginParam = currTrack.getLoopBeginParam() == null ? defaultLoopBeginParam
-				: currTrack.getLoopBeginParam();
-		Param loopEndParam = currTrack.getLoopEndParam() == null ? defaultLoopEndParam
-				: currTrack.getLoopEndParam();
-		Param gainParam = currTrack.getGainParam() == null ? defaultGainParam
-				: currTrack.getGainParam();
-		loopBeginControl.setParam(loopBeginParam);
-		loopEndControl.setParam(loopEndParam);
-		gainControl.setParam(gainParam);
-		sampleEdit.setParams(loopBeginParam, loopEndParam);
+		loopBeginControl.setParam(currTrack.getLoopBeginParam());
+		loopEndControl.setParam(currTrack.getLoopEndParam());
+		gainControl.setParam(currTrack.getGainParam());
+		sampleEdit.setParams(currTrack.getLoopBeginParam(), currTrack.getLoopEndParam());
+		loopBeginControl.setLabelText("Begin");
+		loopEndControl.setLabelText("End");
+		gainControl.setLabelText("Gain");
+
 		if (sampleEdit != null)
 			sampleEdit.update();
 	}
@@ -56,14 +46,9 @@ public class SampleEditPage extends TouchableView {
 		loopButton.setIcon(new Icon(IconResources.LOOP));
 		reverseButton.setIcon(new Icon(IconResources.REVERSE));
 
-		editButton.setBgIcon(new RoundedRectIcon(labelGroup,
-				Colors.iconFillColorSet));
+		editButton
+				.setBgIcon(new RoundedRectIcon(null, Colors.iconFillColorSet));
 		editButton.setIcon(new Icon(IconResources.EDIT));
-	}
-
-	@Override
-	public void draw() {
-		labelGroup.draw(this, 1);
 	}
 
 	@Override
@@ -74,9 +59,9 @@ public class SampleEditPage extends TouchableView {
 		reverseButton = new ToggleButton();
 		editButton = new ImageButton();
 
-		loopBeginControl = new ParamControl(labelGroup);
-		loopEndControl = new ParamControl(labelGroup);
-		gainControl = new ParamControl(labelGroup);
+		loopBeginControl = new ParamControl();
+		loopEndControl = new ParamControl();
+		gainControl = new ParamControl();
 
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override

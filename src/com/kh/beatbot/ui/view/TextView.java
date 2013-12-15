@@ -75,7 +75,7 @@ public class TextView extends View {
 		}
 		updateTextOffset();
 	}
-	
+
 	protected void updateTextOffset() {
 		textXOffset = calcTextXOffset() + X_OFFSET;
 		textYOffset = calcTextYOffset();

@@ -1,14 +1,21 @@
 package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.GeneralUtils;
+import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.mesh.Shape.Type;
 
 public class ValueLabel extends ControlView1dBase {
 	private float anchorY = 0, anchorLevel;
-	
+	private boolean enabled = false;
+
+	private static ColorSet fillColorSet = Colors.valueLabelBgColorSet;
+
 	public ValueLabel(ShapeGroup shapeGroup) {
-		initBgRect(shapeGroup, Colors.LABEL_VERY_LIGHT, Colors.VOLUME);
+		initBgRect(Type.ROUNDED_RECT, shapeGroup, fillColorSet.disabledColor,
+				Colors.VOLUME);
 	}
 
 	@Override
@@ -30,15 +37,31 @@ public class ValueLabel extends ControlView1dBase {
 	}
 
 	@Override
+	public synchronized void setParam(Param param) {
+		super.setParam(param);
+		if (param == null) {
+			enabled = false;
+			bgRect.setFillColor(fillColorSet.disabledColor);
+		} else {
+			enabled = true;
+			bgRect.setFillColor(fillColorSet.defaultColor);
+		}
+	}
+
+	@Override
 	public void handleActionDown(int id, float x, float y) {
+		if (!enabled)
+			return;
 		anchorY = y;
 		anchorLevel = param.viewLevel;
-		bgRect.setFillColor(Colors.LABEL_SELECTED);
+		bgRect.setFillColor(fillColorSet.pressedColor);
 		super.handleActionDown(id, x, y);
 	}
 
 	public void handleActionUp(int id, float x, float y) {
-		bgRect.setFillColor(Colors.LABEL_VERY_LIGHT);
+		if (!enabled)
+			return;
+		bgRect.setFillColor(fillColorSet.defaultColor);
 		super.handleActionUp(id, x, y);
 	}
 }

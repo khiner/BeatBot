@@ -10,13 +10,15 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 	protected abstract void setViewLevel(float viewLevel);
 	protected abstract float posToLevel(float x, float y);
 	
-	public void setParam(Param param) {
+	public synchronized void setParam(Param param) {
 		if (this.param != null) {
 			this.param.removeListener(this);
 		}
 		this.param = param;
-		this.param.addListener(this);
-		onParamChanged(param);
+		if (this.param != null) {
+			this.param.addListener(this);
+			onParamChanged(param);
+		}
 	}
 	
 	public float getLevel() {

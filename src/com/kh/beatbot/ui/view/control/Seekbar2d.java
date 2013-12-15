@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Shape.Type;
 
 public class Seekbar2d extends ControlView2dBase {
 	private static FloatBuffer lineVb;
@@ -38,6 +39,6 @@ public class Seekbar2d extends ControlView2dBase {
 
 	@Override
 	protected synchronized void createChildren() {
-		initBgRect(null, Colors.VIEW_BG, Colors.VOLUME);
+		initBgRect(Type.ROUNDED_RECT, null, Colors.VIEW_BG, Colors.VOLUME);
 	}
 }

@@ -9,6 +9,7 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Shape.Type;
 
 public class LevelsView extends TouchableView {
 
@@ -52,7 +53,7 @@ public class LevelsView extends TouchableView {
 	private float selectRegionStartTick = -1, selectRegionStartY = -1;
 
 	private float xOffset = 0;
-	
+
 	public LevelType getLevelType() {
 		return currLevelType;
 	}
@@ -175,7 +176,7 @@ public class LevelsView extends TouchableView {
 		}
 		return false;
 	}
-	
+
 	public void selectRegion(float x, float y) {
 		float tick = mainPage.midiView.xToTick(x);
 		float leftTick = Math.min(tick, selectRegionStartTick);
@@ -253,9 +254,10 @@ public class LevelsView extends TouchableView {
 		drawLevels();
 		drawSelectRegion();
 	}
-	
+
 	private float levelToY(float level) {
-		return height - level * (height - LEVEL_POINT_SIZE) - LEVEL_POINT_SIZE / 2;
+		return height - level * (height - LEVEL_POINT_SIZE) - LEVEL_POINT_SIZE
+				/ 2;
 	}
 
 	/*
@@ -269,7 +271,7 @@ public class LevelsView extends TouchableView {
 	private float tickToX(float tick) {
 		return mainPage.midiView.tickToX(tick) + xOffset;
 	}
-	
+
 	public void handleActionPointerUp(int id, float x, float y) {
 		touchedLevels.remove(id);
 		updateLevelOffsets();
@@ -289,7 +291,7 @@ public class LevelsView extends TouchableView {
 			selectRegion(x, y);
 		}
 	}
-	
+
 	@Override
 	public synchronized void init() {
 		initLevelBarVb();
@@ -317,7 +319,7 @@ public class LevelsView extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		initBgRect(null, Colors.VIEW_BG, Colors.VOLUME);
+		initBgRect(Type.ROUNDED_RECT, null, Colors.VIEW_BG, Colors.VOLUME);
 	}
 
 	@Override

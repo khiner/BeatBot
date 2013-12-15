@@ -423,13 +423,11 @@ void Java_com_kh_beatbot_Track_setSample(JNIEnv *env, jclass clazz,
 
 void Java_com_kh_beatbot_manager_TrackManager_createTrackNative(JNIEnv *env,
 		jclass clazz) {
-	__android_log_print(ANDROID_LOG_INFO, "createTrack", "begin");
 	Track *track = initTrack();
 	pthread_mutex_lock(&openSlOut->trackMutex);
 	createTrack(track);
 	numberTracks();
 	pthread_mutex_unlock(&openSlOut->trackMutex);
-	__android_log_print(ANDROID_LOG_INFO, "createTrack", "end");
 }
 
 void Java_com_kh_beatbot_manager_TrackManager_deleteTrack(JNIEnv *env,

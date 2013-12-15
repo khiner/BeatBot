@@ -126,6 +126,10 @@ public abstract class Shape extends Drawable {
 		updateGroup();
 	}
 
+	public synchronized void setStrokeWeight(int strokeWeight) {
+		group.setStrokeWeight(strokeWeight);
+	}
+
 	public synchronized Mesh2D getFillMesh() {
 		return fillMesh;
 	}

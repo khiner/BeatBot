@@ -7,6 +7,7 @@ import com.kh.beatbot.event.SampleSetEvent;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.view.Menu;
 import com.kh.beatbot.ui.view.menu.FileMenuItem;
 
@@ -20,7 +21,7 @@ public class BrowsePage extends Menu {
 			topLevelItems.add(new FileMenuItem(this, null, topLevelDir));
 		}
 
-		initBgRect(null, Colors.LABEL_SELECTED, null);
+		initBgRect(Type.ROUNDED_RECT, null, Colors.LABEL_SELECTED, null);
 	}
 
 	public void fileItemReleased(FileMenuItem fileItem) {

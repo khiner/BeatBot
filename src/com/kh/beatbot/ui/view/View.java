@@ -15,6 +15,7 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.RoundedRect;
 import com.kh.beatbot.ui.mesh.Shape;
+import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.page.MainPage;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
@@ -53,11 +54,11 @@ public abstract class View implements Comparable<View> {
 	public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0,
 			height = 0;
 
-	protected static float LABEL_HEIGHT = 0; 
-	
+	protected static float LABEL_HEIGHT = 0;
+
 	protected List<View> children = new ArrayList<View>();
 	protected View parent;
-	protected RoundedRect bgRect = null;
+	protected Shape bgRect = null;
 
 	protected float[] backgroundColor = Colors.BG_COLOR,
 			clearColor = Colors.BG_COLOR, strokeColor = Colors.WHITE;
@@ -87,17 +88,14 @@ public abstract class View implements Comparable<View> {
 		createChildren();
 	}
 
-	public void initBgRect(ShapeGroup group, float[] fillColor,
+	public void initBgRect(Type type, ShapeGroup group, float[] fillColor,
 			float[] strokeColor) {
-		if (group != null) {
-			group.setStrokeWeight(2);
-		}
-		bgRect = (RoundedRect) Shape.get(Shape.Type.ROUNDED_RECT, group,
-				fillColor, strokeColor);
+		bgRect = Shape.get(type, group, fillColor, strokeColor);
 	}
 
 	public float getBgRectRadius() {
-		return bgRect.cornerRadius;
+		return bgRect instanceof RoundedRect ? ((RoundedRect) bgRect).cornerRadius
+				: 0;
 	}
 
 	public boolean hasChildren() {
@@ -115,7 +113,7 @@ public abstract class View implements Comparable<View> {
 		}
 	}
 
-	protected synchronized void addChildren(View ...children) {
+	protected synchronized void addChildren(View... children) {
 		for (View child : children) {
 			addChild(child);
 		}
@@ -260,12 +258,14 @@ public abstract class View implements Comparable<View> {
 		if (bgRect == null)
 			return;
 		borderOffset = 4; // TODO should be a ratio
-		bgRect.setCornerRadius(Math.max(height / 9, 10));
+		if (bgRect instanceof RoundedRect) {
+			((RoundedRect) bgRect).setCornerRadius(Math.max(height / 9, 10));
+		}
 		bgRect.layout(borderOffset, borderOffset, width - borderOffset * 2,
 				height - borderOffset * 2);
-		minX = minY = bgRect.cornerRadius + borderOffset;
-		maxX = width - bgRect.cornerRadius - borderOffset;
-		maxY = height - bgRect.cornerRadius - borderOffset;
+		minX = minY = getBgRectRadius() + borderOffset;
+		maxX = width - getBgRectRadius() - borderOffset;
+		maxY = height - getBgRectRadius() - borderOffset;
 		borderWidth = width - 2 * minX;
 		borderHeight = height - 2 * minY;
 	}
