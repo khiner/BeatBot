@@ -408,9 +408,10 @@ void Java_com_kh_beatbot_Track_setSample(JNIEnv *env, jclass clazz,
 		jint trackNum, jstring sampleName) {
 	Track *track = getTrack(env, clazz, trackNum);
 
+	pthread_mutex_lock(&openSlOut->trackMutex);
+
 	const char *nativeSampleName = (*env)->GetStringUTFChars(env, sampleName,
 			0);
-
 	if (track->generator == NULL ) {
 		initSample(track, nativeSampleName);
 	} else {
@@ -419,6 +420,8 @@ void Java_com_kh_beatbot_Track_setSample(JNIEnv *env, jclass clazz,
 
 	// release string memory
 	(*env)->ReleaseStringUTFChars(env, sampleName, nativeSampleName);
+
+	pthread_mutex_unlock(&openSlOut->trackMutex);
 }
 
 void Java_com_kh_beatbot_manager_TrackManager_createTrackNative(JNIEnv *env,
