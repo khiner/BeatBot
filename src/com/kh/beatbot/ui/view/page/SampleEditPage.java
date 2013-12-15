@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.Track;
 import com.kh.beatbot.activity.BeatBotActivity;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
@@ -26,16 +27,25 @@ public class SampleEditPage extends TouchableView {
 	private ToggleButton loopButton, reverseButton;
 	private ParamControl loopBeginControl, loopEndControl, gainControl;
 
+	private Param defaultLoopBeginParam = new Param(0, "Begin", "");
+	private Param defaultLoopEndParam = new Param(0, "End", "");
+	private Param defaultGainParam = new Param(0, "Gain", "");
+
 	@Override
 	public synchronized void update() {
 		Track currTrack = TrackManager.currTrack;
 		loopButton.setChecked(currTrack.isLooping());
 		reverseButton.setChecked(currTrack.isReverse());
-		loopBeginControl.setParam(currTrack.getLoopBeginParam());
-		loopEndControl.setParam(currTrack.getLoopEndParam());
-		gainControl.setParam(currTrack.getGainParam());
-		sampleEdit.setParams(currTrack.getLoopBeginParam(),
-				currTrack.getLoopEndParam());
+		Param loopBeginParam = currTrack.getLoopBeginParam() == null ? defaultLoopBeginParam
+				: currTrack.getLoopBeginParam();
+		Param loopEndParam = currTrack.getLoopEndParam() == null ? defaultLoopEndParam
+				: currTrack.getLoopEndParam();
+		Param gainParam = currTrack.getGainParam() == null ? defaultGainParam
+				: currTrack.getGainParam();
+		loopBeginControl.setParam(loopBeginParam);
+		loopEndControl.setParam(loopEndParam);
+		gainControl.setParam(gainParam);
+		sampleEdit.setParams(loopBeginParam, loopEndParam);
 		if (sampleEdit != null)
 			sampleEdit.update();
 	}

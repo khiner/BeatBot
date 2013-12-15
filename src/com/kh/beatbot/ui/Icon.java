@@ -22,7 +22,9 @@ public class Icon extends Drawable {
 
 	public void setState(IconResource.State state) {
 		this.state = lockedState != null ? lockedState : state;
-		setDrawable(resource.whichIcon(this.state));
+		if (resource != null) {
+			setDrawable(resource.whichIcon(this.state));
+		}
 	}
 
 	public void draw() {

@@ -45,7 +45,7 @@ public class Track extends BaseTrack {
 
 	public IconResource getIconResource() {
 		if (currSampleFile == null) {
-			return IconResources.forDirectory("snare");
+			return null;
 		}
 		return IconResources.forDirectory(currSampleFile.getParentFile()
 				.getName());
@@ -168,19 +168,26 @@ public class Track extends BaseTrack {
 	}
 
 	public Param getLoopBeginParam() {
-		return paramsForSample.get(currSampleFile).loopBeginParam;
+		SampleParams sampleParams = getCurrSampleParams();
+		return sampleParams == null ? null : sampleParams.loopBeginParam;
 	}
 
 	public Param getLoopEndParam() {
-		return paramsForSample.get(currSampleFile).loopEndParam;
+		SampleParams sampleParams = getCurrSampleParams();
+		return sampleParams == null ? null : sampleParams.loopEndParam;
 	}
 
 	public Param getGainParam() {
-		return paramsForSample.get(currSampleFile).gainParam;
+		SampleParams sampleParams = getCurrSampleParams();
+		return sampleParams == null ? null : sampleParams.gainParam;
+	}
+
+	public SampleParams getCurrSampleParams() {
+		return paramsForSample.get(currSampleFile);
 	}
 
 	public String getCurrSampleName() {
-		return currSampleFile.getName();
+		return currSampleFile == null ? "" : currSampleFile.getName();
 	}
 
 	public void setCurrSampleName(String name) {
