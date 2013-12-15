@@ -39,17 +39,6 @@ static inline void writeBytesToFile(short buffer[], int size, FILE *out) {
 	}
 }
 
-static inline void writeFloatsToFile(float **buffer, int size, FILE *out) {
-	int i = 0, channel = 0;
-	float scaled = 0;
-	for (i = 0; i < size; i++) {
-		for (channel = 0; channel < 2; channel++) {
-			scaled = buffer[channel][i] * 2;
-			fwrite(&scaled, sizeof(float), 1, out);
-		}
-	}
-}
-
 static inline void processEffects(Levels *levels, float **floatBuffer) {
 	levels->volPan->process(levels->volPan->config, floatBuffer, BUFF_SIZE);
 	pthread_mutex_lock(&levels->effectMutex);
@@ -97,44 +86,14 @@ static inline void mixTracks() {
 	}
 }
 
-void soundTrack(Track *track) {
-	updateLevels(track->num);
-	wavfile_reset((WavFile *) track->generator->config);
-}
-
-void stopSoundingTrack(Track *track) {
-	WavFile *wavFile = (WavFile *) track->generator->config;
-	wavFile->adsr->stoppedSample = wavFile->adsr->currSample;
-}
-
-void stopTrack(Track *track) {
-	// update next track
-	updateNextNote(track);
-	stopSoundingTrack(track);
-}
-
-void playTrack(Track *track) {
-	stopSoundingTrack(track);
-	soundTrack(track);
-}
-
-void previewTrack(Track *track) {
-	setPreviewLevels(track);
-	wavfile_reset((WavFile *) track->generator->config);
-}
-
-void stopPreviewingTrack(Track *track) {
-	stopSoundingTrack(track);
-}
-
 void Java_com_kh_beatbot_Track_previewTrack(JNIEnv *env, jclass clazz,
 		jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
 	previewTrack(track);
 }
 
-void Java_com_kh_beatbot_Track_stopPreviewingTrack(JNIEnv *env,
-		jclass clazz, jint trackNum) {
+void Java_com_kh_beatbot_Track_stopPreviewingTrack(JNIEnv *env, jclass clazz,
+		jint trackNum) {
 	Track *track = getTrack(env, clazz, trackNum);
 	stopPreviewingTrack(track);
 }
@@ -173,8 +132,7 @@ static inline void generateNextBuffer() {
 			} else if (currSample == track->nextStopSample) {
 				stopTrack(track);
 			}
-			wavfile_tick((WavFile *) track->generator->config,
-					track->tempSample);
+			fillTempSample(track);
 			for (channel = 0; channel < 2; channel++) {
 				track->currBufferFloat[channel][samp] =
 						track->tempSample[channel];
@@ -325,8 +283,7 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 	return JNI_TRUE;
 }
 
-void Java_com_kh_beatbot_activity_BeatBotActivity_arm(JNIEnv *env,
-		jclass clazz) {
+void Java_com_kh_beatbot_activity_BeatBotActivity_arm(JNIEnv *env, jclass clazz) {
 	if (openSlOut->armed)
 		return; // only need to arm once
 	openSlOut->armed = true;
@@ -344,13 +301,14 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_nativeShutdown(JNIEnv *env,
 	// lock the mutex, so openSL doesn't try to grab from empty buffers
 	pthread_mutex_lock(&openSlOut->trackMutex);
 
-	if (openSlOut->outputBufferQueue != NULL) {
+	if (openSlOut->outputBufferQueue != NULL ) {
 		(*openSlOut->outputBufferQueue)->Clear(openSlOut->outputBufferQueue);
 		openSlOut->outputBufferQueue = NULL;
 	}
 
-	if (openSlOut->outputPlayerObject != NULL) {
-		(*openSlOut->outputPlayerObject)->Destroy(openSlOut->outputPlayerObject);
+	if (openSlOut->outputPlayerObject != NULL ) {
+		(*openSlOut->outputPlayerObject)->Destroy(
+				openSlOut->outputPlayerObject);
 		openSlOut->outputPlayerPlay = NULL;
 	}
 

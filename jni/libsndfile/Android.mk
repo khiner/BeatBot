@@ -9,7 +9,7 @@ LOCAL_CFLAGS := -DHAVE_EXTERNAL_LIBS
 LOCAL_CPPFLAGS += -std=c++11 -pthread -frtti -fexceptions
 LOCAL_C_INCLUDES := $(OGG_ROOT) $(VORBIS_ROOT)
 
-LOCAL_MODULE   := sndfile
+LOCAL_MODULE := sndfile
 
 OGG_SRC_FILES := ../deps/libogg/src/bitwise.c ../deps/libogg/src/framing.c
 V_SRC := ../deps/libvorbis/src
@@ -23,9 +23,8 @@ LOCAL_SRC_FILES := mat5.c windows.c G72x/g723_24.c G72x/g72x.c \
        G72x/g723_40.c G72x/g721.c G72x/g723_16.c \
        float32.c chanmap.c rf64.c sndfile.c htk.c dither.c \
        txw.c ms_adpcm.c ima_adpcm.c flac.c aiff.c \
-       wav.c macbinary3.c mat4.c pcm.c caf.c \
+       wav.c macbinary3.c mat4.c pcm.c caf.c raw.c \
        audio_detect.c id3.c alaw.c macos.c file_io.c broadcast.c double64.c \
-       raw.c \
        g72x.c command.c chunk.c avr.c sd2.c voc.c \
        mpc2k.c gsm610.c dwd.c \
        interleave.c common.c sds.c pvf.c paf.c au.c \
@@ -39,6 +38,5 @@ LOCAL_SRC_FILES := mat5.c windows.c G72x/g723_24.c G72x/g72x.c \
        ircam.c xi.c ima_oki_adpcm.c \
        $(OGG_SRC_FILES) $(VORBIS_SRC_FILES)
 
-#LOCAL_LDLIBS += -llog -ldl
 include $(BUILD_SHARED_LIBRARY)
 

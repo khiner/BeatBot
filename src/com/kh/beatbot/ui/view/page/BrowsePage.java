@@ -35,7 +35,12 @@ public class BrowsePage extends Menu {
 			File[] children = file.listFiles();
 			return children != null && children.length > 0;
 		} else {
-			return file.getName().toLowerCase().endsWith(".wav");
+			for (String extension : FileManager.SUPPORTED_EXTENSIONS) {
+				if (file.getName().toLowerCase().endsWith(extension)) {
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 

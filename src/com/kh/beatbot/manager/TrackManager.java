@@ -25,8 +25,9 @@ public class TrackManager {
 
 	public static synchronized void init() {
 		for (File drumDirectory : FileManager.drumsDirectory.listFiles()) {
-			TrackCreateEvent trackCreateEvent = new TrackCreateEvent(drumDirectory.listFiles()[0]);
+			final TrackCreateEvent trackCreateEvent = new TrackCreateEvent();
 			trackCreateEvent.doExecute();
+			tracks.get(tracks.size() - 1).setSample(drumDirectory.listFiles()[0]);
 			trackCreateEvent.updateUi();
 		}
 	}
@@ -59,18 +60,18 @@ public class TrackManager {
 		return tracks.size();
 	}
 
-	public static synchronized Track createTrack(File sampleFile) {
-		createTrack(sampleFile.getPath());
-		final Track newTrack = new Track(tracks.size(), sampleFile);
+	public static synchronized Track createTrack() {
+		createTrackNative();
+		final Track newTrack = new Track(tracks.size());
 		tracks.add(newTrack);
 		return newTrack;
 	}
 
 	public static synchronized void createTrack(Track track) {
-		createTrack(track.getCurrSampleFile().getPath());
+		createTrackNative();
 		track.setId(tracks.size());
 		tracks.add(track);
-		track.updateADSR();
+		track.setSample(track.getCurrSampleFile());
 		track.updateNextNote();
 	}
 
@@ -123,7 +124,7 @@ public class TrackManager {
 
 	/******* These methods are called FROM native code via JNI ********/
 
-	public static native void createTrack(String sampleFileName);
+	public static native void createTrackNative();
 
 	public static native void deleteTrack(int trackNum);
 }

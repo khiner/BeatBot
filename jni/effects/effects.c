@@ -181,7 +181,11 @@ void Java_com_kh_beatbot_effect_Effect_setEffectOn(JNIEnv *env, jclass clazz,
 void Java_com_kh_beatbot_effect_Effect_setEffectParam(JNIEnv *env, jclass clazz,
 		jint trackNum, jint effectPosition, jint paramNum, jfloat paramValue) {
 	if (effectPosition == -1) { // -1 == ADSR
-		adsrconfig_setParam(((WavFile *)getTrack(env, clazz, trackNum)->generator->config)->adsr, (float) paramNum, paramValue);
+		Track *track = getTrack(env, clazz, trackNum);
+		if (track->generator == NULL) {
+			return;
+		}
+		adsrconfig_setParam(((FileGen *)track->generator->config)->adsr, (float) paramNum, paramValue);
 		return;
 	}
 	Levels *levels = getLevels(env, clazz, trackNum);

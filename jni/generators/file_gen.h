@@ -1,14 +1,14 @@
-#ifndef WAVFILE_H
-#define WAVFILE_H
+#ifndef FILEGEN_H
+#define FILEGEN_H
 
-typedef struct WavFile_t {
-	// mutex for buffer since setting the wav data happens on diff thread than processing
+typedef struct FileGen_t {
+	// mutex for buffer since setting the data happens on diff thread than processing
 	FILE *sampleFile;
 	AdsrConfig *adsr;
 	float tempSample[4];
 	float **samples;
 	float currSample;
-	long totalSamples;
+	long frames;
 	long loopBegin;
 	long loopEnd;
 	long loopLength;
@@ -18,18 +18,18 @@ typedef struct WavFile_t {
 	float gain;
 	int channels;
 	char *sampleFileName;
-} WavFile;
+} FileGen;
 
-WavFile *wavfile_create(const char *sampleName);
-float wavfile_getSample(WavFile *wavFile, int sampleIndex, int channel);
-void wavfile_setSampleFile(WavFile *wavFile, const char *sampleFileName);
-void wavfile_setLoopWindow(WavFile *wavFile, long loopBeginSample,
+FileGen *filegen_create(const char *sampleName);
+float filegen_getSample(FileGen *fileGen, int sampleIndex, int channel);
+void filegen_setSampleFile(FileGen *fileGen, const char *sampleFileName);
+void filegen_setLoopWindow(FileGen *fileGen, long loopBeginSample,
 		long loopEndSample);
-void wavfile_setReverse(WavFile *wavFile, bool reverse);
-void wavfile_reset(WavFile *config);
-void freeBuffers(WavFile *config);
+void filegen_setReverse(FileGen *fileGen, bool reverse);
+void filegen_reset(FileGen *config);
+void freeBuffers(FileGen *config);
 
-static inline void wavfile_tick(WavFile *config, float *sample) {
+static inline void filegen_tick(FileGen *config, float *sample) {
 	// wrap sample around loop window
 	if (config->looping) {
 		if (config->currSample >= config->loopEnd) {
@@ -88,17 +88,17 @@ static inline void wavfile_tick(WavFile *config, float *sample) {
 	sample[1] *= gain;
 }
 
-static inline void wavfile_generate(WavFile *config, float **inBuffer,
+static inline void filegen_generate(FileGen *config, float **inBuffer,
 		int size) {
 	int i, channel;
 	for (i = 0; i < size; i++) {
-		wavfile_tick(config, config->tempSample);
+		filegen_tick(config, config->tempSample);
 		for (channel = 0; channel < 2; channel++) {
 			inBuffer[channel][i] = config->tempSample[channel];
 		}
 	}
 }
 
-void wavfile_destroy(void *config);
+void filegen_destroy(void *config);
 
-#endif // WAVFILE_H
+#endif // FILEGEN_H

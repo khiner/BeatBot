@@ -30,13 +30,10 @@ public class Track extends BaseTrack {
 
 	public ADSR adsr;
 
-	public Track(int id, File sampleFile) {
+	public Track(int id) {
 		super(id);
-		this.currSampleFile = sampleFile;
 		this.adsr = new ADSR(this);
 		this.buttonRow = new TrackButtonRow(this);
-
-		update();
 	}
 
 	public void setId(int id) {
@@ -47,10 +44,14 @@ public class Track extends BaseTrack {
 	}
 
 	public IconResource getIconResource() {
-		return IconResources.forDirectory(currSampleFile.getParentFile().getName());
+		if (currSampleFile == null) {
+			return IconResources.forDirectory("snare");
+		}
+		return IconResources.forDirectory(currSampleFile.getParentFile()
+				.getName());
 	}
 
-	public void updateADSR() {
+	private void updateADSR() {
 		adsr.update();
 	}
 
@@ -179,11 +180,11 @@ public class Track extends BaseTrack {
 	}
 
 	public String getCurrSampleName() {
-		return currSampleFile.getName().replace(".wav", "");
+		return currSampleFile.getName();
 	}
 
 	public void setCurrSampleName(String name) {
-		File newFile = new File(currSampleFile.getParent() + name + ".wav");
+		File newFile = new File(currSampleFile.getParent() + name);
 		currSampleFile.renameTo(newFile);
 		currSampleFile = newFile;
 	}
@@ -235,6 +236,7 @@ public class Track extends BaseTrack {
 	private void update() {
 		updateSampleParams();
 		updateLoopWindow();
+		updateADSR();
 	}
 
 	private void updateLoopWindow() {
@@ -244,8 +246,8 @@ public class Track extends BaseTrack {
 
 	private void updateSampleParams() {
 		if (!paramsForSample.containsKey(currSampleFile)) {
-			paramsForSample.put(currSampleFile, new SampleParams(
-					getNumSamples(id)));
+			paramsForSample
+					.put(currSampleFile, new SampleParams(getFrames(id)));
 		}
 	}
 
@@ -302,7 +304,7 @@ public class Track extends BaseTrack {
 
 	public static native float getCurrentSampleIndex(int trackId);
 
-	public static native float getNumSamples(int trackId);
+	public static native float getFrames(int trackId);
 
 	public native void setNextNote(int trackId, MidiNote midiNote);
 

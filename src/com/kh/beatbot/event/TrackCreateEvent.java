@@ -1,22 +1,18 @@
 package com.kh.beatbot.event;
 
-import java.io.File;
-
 import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.view.View;
 
 public class TrackCreateEvent implements Executable, Stateful {
 
-	private File sampleFile;
 	private Track createdTrack = null;
 
 	public TrackCreateEvent(Track track) {
 		this.createdTrack = track;
 	}
 
-	public TrackCreateEvent(File sample) {
-		this.sampleFile = sample;
+	public TrackCreateEvent() {
 	}
 
 	@Override
@@ -58,7 +54,7 @@ public class TrackCreateEvent implements Executable, Stateful {
 
 	public void doExecute() {
 		if (createdTrack == null) {
-			createdTrack = TrackManager.createTrack(sampleFile);
+			createdTrack = TrackManager.createTrack();
 		} else {
 			TrackManager.createTrack(createdTrack);
 		}

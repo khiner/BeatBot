@@ -53,7 +53,7 @@
 #include "effects/volpan.h"
 #include "generators/generators.h"
 #include "generators/sinewave.h"
-#include "generators/wavfile.h"
+#include "generators/file_gen.h"
 #include "midievent.h"
 #include "nativeaudio.h"
 #include "ticker.h"

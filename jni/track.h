@@ -49,6 +49,20 @@ Track *getTrack(JNIEnv *env, jclass clazz, int trackNum);
 
 Levels *getLevels(JNIEnv *env, jclass clazz, int trackNum);
 
+void fillTempSample(Track *track);
+
+void soundTrack(Track *track);
+
+void stopSoundingTrack(Track *track);
+
+void stopTrack(Track *track);
+
+void playTrack(Track *track);
+
+void previewTrack(Track *track);
+
+void stopPreviewingTrack(Track *track);
+
 void addEffect(Levels *levels, Effect *effect);
 
 void freeMidiEvents(Track *track);
