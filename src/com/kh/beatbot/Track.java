@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.app.AlertDialog;
+
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
@@ -21,6 +24,12 @@ import com.kh.beatbot.ui.view.group.PageSelectGroup;
 public class Track extends BaseTrack {
 
 	public static float MIN_LOOP_WINDOW = 32f;
+	private static final AlertDialog.Builder ERROR_ALERT = new AlertDialog.Builder(
+			BeatBotActivity.mainActivity);
+
+	static {
+		ERROR_ALERT.setPositiveButton("OK", null);
+	}
 
 	private boolean adsrEnabled = false, reverse = false, previewing = false;
 	private TrackButtonRow buttonRow;
@@ -161,12 +170,17 @@ public class Track extends BaseTrack {
 	}
 
 	public void setSample(File sampleFile) {
-		currSampleFile = sampleFile;
-		if (currSampleFile != null) {
-			setSample(id, currSampleFile.getPath());
+		if (sampleFile == null)
+			return;
+		String error = setSample(id, sampleFile.getPath());
+		if (!error.equals("No Error.")) {
+			ERROR_ALERT.setTitle("Error loading " + sampleFile.getName() + ".")
+					.setMessage(error).create().show();
+		} else {
+			currSampleFile = sampleFile;
+			update();
 		}
 
-		update();
 	}
 
 	public Param getLoopBeginParam() {
@@ -306,7 +320,7 @@ public class Track extends BaseTrack {
 
 	public static native void setTrackGain(int trackId, float gain);
 
-	public static native void setSample(int trackId, String sampleName);
+	public static native String setSample(int trackId, String sampleName);
 
 	public static native float getSample(int trackId, long sampleIndex,
 			int channel);

@@ -8,15 +8,10 @@ void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 	sf_close(config->sampleFile);
 
 	if (!(infile = sf_open(sampleFileName, SFM_READ, &sfinfo))) { /* Open failed so print an error message. */
-		__android_log_print(ANDROID_LOG_ERROR, "sndfile error",
-				"Not able to open input file %s: %s.\n", sampleFileName,
-				sf_strerror(NULL ));
 		return;
 	};
 
 	if (sfinfo.channels > MAX_CHANNELS) {
-		__android_log_print(ANDROID_LOG_ERROR, "filegen",
-				"Not able to process more than %d channels\n", MAX_CHANNELS);
 		return;
 	};
 
@@ -36,14 +31,13 @@ void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 	config->bufferStartFrame = LONG_MIN; // forces the buffer to be reloaded
 }
 
-FileGen *filegen_create(const char *sampleName) {
+FileGen *filegen_create() {
 	FileGen *fileGen = (FileGen *) malloc(sizeof(FileGen));
 	pthread_mutex_init(&fileGen->fileMutex, NULL );
 	fileGen->currFrame = 0;
 	fileGen->gain = 1;
 	fileGen->sampleFile = NULL;
 	fileGen->looping = fileGen->reverse = false;
-	filegen_setSampleFile(fileGen, sampleName);
 	fileGen->adsr = adsrconfig_create();
 	return fileGen;
 }

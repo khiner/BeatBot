@@ -1,4 +1,5 @@
 #include "all.h"
+#include "libsndfile/sndfile.h"
 
 static jclass trackClass = NULL;
 static jmethodID getNextMidiNote = NULL;
@@ -195,12 +196,6 @@ void destroyTrack(Track *track) {
 	freeEffects(track->levels);
 	if (track->generator != NULL )
 		track->generator->destroy(track->generator->config);
-}
-
-void initSample(Track *track, const char *sampleName) {
-	track->generator = malloc(sizeof(Generator));
-	initGenerator(track->generator, filegen_create(sampleName), filegen_reset,
-			filegen_generate, filegen_destroy);
 }
 
 void setSample(Track *track, const char *sampleName) {
@@ -404,24 +399,28 @@ void Java_com_kh_beatbot_BaseTrack_setTrackPitch(JNIEnv *env, jclass clazz,
 	updateLevels(trackNum);
 }
 
-void Java_com_kh_beatbot_Track_setSample(JNIEnv *env, jclass clazz,
+jstring Java_com_kh_beatbot_Track_setSample(JNIEnv *env, jclass clazz,
 		jint trackNum, jstring sampleName) {
 	Track *track = getTrack(env, clazz, trackNum);
-
 	pthread_mutex_lock(&openSlOut->trackMutex);
+	if (track->generator == NULL ) {
+		track->generator = malloc(sizeof(Generator));
+		initGenerator(track->generator, filegen_create(), filegen_reset,
+				filegen_generate, filegen_destroy);
+	}
 
 	const char *nativeSampleName = (*env)->GetStringUTFChars(env, sampleName,
 			0);
-	if (track->generator == NULL ) {
-		initSample(track, nativeSampleName);
-	} else {
-		setSample(track, nativeSampleName);
-	}
+
+	setSample(track, nativeSampleName);
 
 	// release string memory
 	(*env)->ReleaseStringUTFChars(env, sampleName, nativeSampleName);
+	pthread_mutex_unlock(&openSlOut->trackMutex); // TODO try moving up
 
-	pthread_mutex_unlock(&openSlOut->trackMutex);
+	jstring retn = (*env)->NewStringUTF(env, sf_strerror(NULL));
+
+	return retn;
 }
 
 void Java_com_kh_beatbot_manager_TrackManager_createTrackNative(JNIEnv *env,

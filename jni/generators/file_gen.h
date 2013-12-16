@@ -24,7 +24,7 @@ typedef struct FileGen_t {
 	int channels;
 } FileGen;
 
-FileGen *filegen_create(const char *sampleName);
+FileGen *filegen_create();
 float filegen_getSample(FileGen *fileGen, long frame, int channel);
 void filegen_setSampleFile(FileGen *fileGen, const char *sampleFileName);
 void filegen_setLoopWindow(FileGen *fileGen, long loopBeginSample,
