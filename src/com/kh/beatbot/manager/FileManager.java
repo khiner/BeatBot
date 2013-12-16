@@ -14,7 +14,7 @@ import com.kh.beatbot.activity.BeatBotActivity;
 public class FileManager {
 
 	public static final String[] SUPPORTED_EXTENSIONS = { ".wav", ".flac",
-			".ogg", ".oga", ".aiff", ".aifc", ".au", ".snd", ".raw", ".paf",
+			".ogg", ".oga", ".aif", ".aiff", ".aifc", ".au", ".snd", ".raw", ".paf",
 			".iff", ".svx", ".sf", ".voc", ".w64", ".mat4", ".mat5", ".pvf",
 			".xi", ".htk", ".caf", ".sd2" };
 
