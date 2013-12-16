@@ -27,7 +27,7 @@ public class TrackManager {
 		for (File drumDirectory : FileManager.drumsDirectory.listFiles()) {
 			final TrackCreateEvent trackCreateEvent = new TrackCreateEvent();
 			trackCreateEvent.doExecute();
-			//tracks.get(tracks.size() - 1).setSample(drumDirectory.listFiles()[0]);
+			tracks.get(tracks.size() - 1).setSample(drumDirectory.listFiles()[0]);
 			trackCreateEvent.updateUi();
 		}
 	}
