@@ -32,6 +32,8 @@ void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 		config->currFrame = config->loopBegin;
 	}
 	config->loopLength = config->loopEnd - config->loopBegin;
+
+	config->bufferStartFrame = LONG_MIN; // forces the buffer to be reloaded
 }
 
 FileGen *filegen_create(const char *sampleName) {
@@ -40,7 +42,6 @@ FileGen *filegen_create(const char *sampleName) {
 	fileGen->currFrame = 0;
 	fileGen->gain = 1;
 	fileGen->sampleFile = NULL;
-	fileGen->bufferStartFrame = -1;
 	fileGen->looping = fileGen->reverse = false;
 	filegen_setSampleFile(fileGen, sampleName);
 	fileGen->adsr = adsrconfig_create();
