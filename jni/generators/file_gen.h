@@ -11,7 +11,7 @@ typedef struct FileGen_t {
 	float tempSample[2];
 	float otherTempSample[2];
 	float *buffer;
-	float **samples;
+	float *samples;
 	float currFrame;
 	long frames;
 	long loopBegin;
@@ -32,7 +32,6 @@ void filegen_setLoopWindow(FileGen *fileGen, long loopBeginSample,
 		long loopEndSample);
 void filegen_setReverse(FileGen *fileGen, bool reverse);
 void filegen_reset(FileGen *config);
-void freeBuffers(FileGen *config);
 
 static inline void filegen_sndFileRead(FileGen *config, long frame,
 		float *sample) {
@@ -89,8 +88,8 @@ static inline void filegen_tick(FileGen *config, float *sample) {
 		}
 	} else {
 		for (channel = 0; channel < config->channels; channel++) {
-			float samp1 = config->samples[channel][frame];
-			float samp2 = config->samples[channel][frame + 1];
+			float samp1 = config->samples[frame * config->channels];
+			float samp2 = config->samples[frame * config->channels + 1];
 			sample[channel] = (1.0f - remainder) * samp1 + remainder * samp2;
 		}
 	}

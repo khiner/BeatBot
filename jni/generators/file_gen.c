@@ -1,25 +1,19 @@
 #include "../all.h"
 #include "libsndfile/sndfile.h"
 
-static float data[BUFF_SIZE];
-
 void filegen_freeBuffers(FileGen *fileGen) {
 	// if this sample was short enough, it was also loaded into memory, and will be non-null
 	if (fileGen->samples != NULL ) {
-		// use temp sample so there is no period when fileGen->samples is non-NULL but has freed memory
-		float **temp = fileGen->samples;
+		free(fileGen->samples);
 		fileGen->samples = NULL;
-		free(temp[0]);
-		free(temp[1]);
-		free(temp);
-		temp = NULL;
 	}
 }
 
 void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 	SNDFILE *infile;
 	SF_INFO sfinfo;
-	int readcount, samp = 0, chan = 0, i = 0;
+
+	sf_close(config->sampleFile);
 
 	if (!(infile = sf_open(sampleFileName, SFM_READ, &sfinfo))) { /* Open failed so print an error message. */
 		__android_log_print(ANDROID_LOG_ERROR, "sndfile error",
@@ -40,34 +34,12 @@ void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 	// if a different sample was already loaded, destroy it.
 	filegen_freeBuffers(config);
 
-	if (false) {
-		/** allocate memory to hold samples (memory is freed in filegen_destroy)
-		 *
-		 * NOTE: We don't directly write to fileGen sample buffer because we want to
-		 * completely load all samples from file before making fileGen->samples non-NULL.
-		 * That way, we can still immediately read from file on a per-sample basis, until
-		 * fileGen->samples is non-null, at which point we can read directly from memory.
-		 */
-		float **tempSamples = malloc(2 * sizeof(void *));
-		tempSamples[0] = malloc(config->frames * ONE_FLOAT_SZ);
-		// (right channel will be null if only mono sound)
-		tempSamples[1] =
-				config->channels == 2 ?
-						malloc(config->frames * ONE_FLOAT_SZ) : NULL;
-
+	if (false/*config->frames < MAX_IN_MEMORY_SAMPLES */) {
+		config->samples = malloc(config->frames * config->channels * ONE_FLOAT_SZ);
 		// write to fileGen float buffers
-		while ((readcount = sf_read_float(infile, data, BUFF_SIZE))) {
-			for (i = 0; i < readcount;) {
-				for (chan = 0; chan < config->channels; chan++) {
-					tempSamples[chan][samp] = data[i++];
-				}
-				samp++;
-			}
-		};
-		// make fileGen->samples point to fully-loaded sample buffer in memory
-		config->samples = tempSamples;
+		sf_readf_float(infile, config->samples, config->frames);
+
 		// cleanup
-		tempSamples = NULL;
 		sf_close(infile);
 	} else { // file too big for memory. write to temp file in external storage
 		config->sampleFile = infile;
@@ -102,7 +74,7 @@ FileGen *filegen_create(const char *sampleName) {
 float filegen_getSample(FileGen *fileGen, long frame, int channel) {
 	float ret;
 	if (fileGen->samples != NULL ) {
-		ret = fileGen->samples[channel][frame];
+		ret = fileGen->samples[frame * fileGen->channels + channel];
 	} else {
 		pthread_mutex_lock(&fileGen->fileMutex);
 		sf_seek(fileGen->sampleFile, frame, SEEK_SET);
