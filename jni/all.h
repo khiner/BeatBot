@@ -7,7 +7,6 @@
 
 #define SAMPLE_RATE 44100.0f
 #define INV_SAMPLE_RATE 1.0f / SAMPLE_RATE
-#define MAX_IN_MEMORY_SAMPLES 5 * SAMPLE_RATE // 5 sec
 
 #define CHORUS   0
 #define DECIMATE 1

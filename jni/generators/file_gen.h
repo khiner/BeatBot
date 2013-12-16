@@ -11,7 +11,6 @@ typedef struct FileGen_t {
 	float tempSample[2];
 	float otherTempSample[2];
 	float *buffer;
-	float *samples;
 	float currFrame;
 	long frames;
 	long loopBegin;
@@ -78,20 +77,13 @@ static inline void filegen_tick(FileGen *config, float *sample) {
 
 	// read next two samples from current sample (rounded down)
 	int channel;
-	if (config->samples == NULL) {
-		filegen_sndFileRead(config, frame, config->tempSample);
-		filegen_sndFileRead(config, frame + 1, config->otherTempSample);
-		for (channel = 0; channel < config->channels; channel++) {
-			float samp1 = config->tempSample[channel];
-			float samp2 = config->otherTempSample[channel];
-			sample[channel] = (1.0f - remainder) * samp1 + remainder * samp2;
-		}
-	} else {
-		for (channel = 0; channel < config->channels; channel++) {
-			float samp1 = config->samples[frame * config->channels];
-			float samp2 = config->samples[frame * config->channels + 1];
-			sample[channel] = (1.0f - remainder) * samp1 + remainder * samp2;
-		}
+
+	filegen_sndFileRead(config, frame, config->tempSample);
+	filegen_sndFileRead(config, frame + 1, config->otherTempSample);
+	for (channel = 0; channel < config->channels; channel++) {
+		float samp1 = config->tempSample[channel];
+		float samp2 = config->otherTempSample[channel];
+		sample[channel] = (1.0f - remainder) * samp1 + remainder * samp2;
 	}
 
 	// copy left channel to right channel if mono

@@ -1,14 +1,6 @@
 #include "../all.h"
 #include "libsndfile/sndfile.h"
 
-void filegen_freeBuffers(FileGen *fileGen) {
-	// if this sample was short enough, it was also loaded into memory, and will be non-null
-	if (fileGen->samples != NULL ) {
-		free(fileGen->samples);
-		fileGen->samples = NULL;
-	}
-}
-
 void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 	SNDFILE *infile;
 	SF_INFO sfinfo;
@@ -30,29 +22,14 @@ void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 
 	config->channels = sfinfo.channels;
 	config->frames = sfinfo.frames;
-
-	// if a different sample was already loaded, destroy it.
-	filegen_freeBuffers(config);
-
-	if (false/*config->frames < MAX_IN_MEMORY_SAMPLES */) {
-		config->samples = malloc(config->frames * config->channels * ONE_FLOAT_SZ);
-		// write to fileGen float buffers
-		sf_readf_float(infile, config->samples, config->frames);
-
-		// cleanup
-		sf_close(infile);
-	} else { // file too big for memory. write to temp file in external storage
-		config->sampleFile = infile;
-		config->buffer = malloc(BUFF_SIZE * config->channels * ONE_FLOAT_SZ);
-	}
-
-	// init loop / currFrame position data
+	config->sampleFile = infile;
+	config->buffer = malloc(BUFF_SIZE * config->channels * ONE_FLOAT_SZ);
 	config->loopBegin = 0;
 	config->loopEnd = config->frames;
-	if (config->currFrame >= config->loopEnd) {
-		// TODO maybe should be currFrame = loopEnd
-		// TODO this could cause unwanted repeat
-		config->currFrame = 0;
+	if (config->currFrame > config->loopEnd) {
+		config->currFrame = config->loopEnd;
+	} else if (config->currFrame < config->loopBegin) {
+		config->currFrame = config->loopBegin;
 	}
 	config->loopLength = config->loopEnd - config->loopBegin;
 }
@@ -62,7 +39,6 @@ FileGen *filegen_create(const char *sampleName) {
 	pthread_mutex_init(&fileGen->fileMutex, NULL );
 	fileGen->currFrame = 0;
 	fileGen->gain = 1;
-	fileGen->samples = NULL;
 	fileGen->sampleFile = NULL;
 	fileGen->bufferStartFrame = -1;
 	fileGen->looping = fileGen->reverse = false;
@@ -72,17 +48,12 @@ FileGen *filegen_create(const char *sampleName) {
 }
 
 float filegen_getSample(FileGen *fileGen, long frame, int channel) {
-	float ret;
-	if (fileGen->samples != NULL ) {
-		ret = fileGen->samples[frame * fileGen->channels + channel];
-	} else {
-		pthread_mutex_lock(&fileGen->fileMutex);
-		sf_seek(fileGen->sampleFile, frame, SEEK_SET);
-		sf_readf_float(fileGen->sampleFile, fileGen->tempSample, 1);
-		ret = fileGen->tempSample[channel];
-		pthread_mutex_unlock(&fileGen->fileMutex);
-	}
-	return ret * fileGen->gain;
+	pthread_mutex_lock(&fileGen->fileMutex);
+	sf_seek(fileGen->sampleFile, frame, SEEK_SET);
+	sf_readf_float(fileGen->sampleFile, fileGen->tempSample, 1);
+	pthread_mutex_unlock(&fileGen->fileMutex);
+
+	return fileGen->tempSample[channel] * fileGen->gain;
 }
 
 void filegen_setLoopWindow(FileGen *fileGen, long loopBeginSample,
@@ -117,7 +88,6 @@ void filegen_destroy(void *p) {
 		sf_close(fileGen->sampleFile);
 		fileGen->sampleFile = NULL;
 	}
-	filegen_freeBuffers(fileGen);
 	adsrconfig_destroy(fileGen->adsr);
 	free(fileGen);
 	fileGen = NULL;
