@@ -158,7 +158,7 @@ void destroyTracks() {	// destroy all tracks
 
 Levels *initLevels() {
 	Levels *levels = malloc(sizeof(Levels));
-	pthread_mutex_init(&levels->effectMutex, NULL );
+	pthread_mutex_init(&levels->effectMutex, NULL);
 	levels->effectHead = NULL;
 	levels->volume = .8f;
 	levels->pan = levels->pitch = .5f;

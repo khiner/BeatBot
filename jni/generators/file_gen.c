@@ -1,13 +1,7 @@
 #include "../all.h"
 #include "libsndfile/sndfile.h"
 
-static const char* rawExtension = ".raw";
 static float data[BUFF_SIZE];
-
-static inline int fileExists(char *filename) {
-	struct stat buffer;
-	return (stat(filename, &buffer) == 0);
-}
 
 void filegen_freeBuffers(FileGen *fileGen) {
 	// if this sample was short enough, it was also loaded into memory, and will be non-null
@@ -74,31 +68,10 @@ void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 		config->samples = tempSamples;
 		// cleanup
 		tempSamples = NULL;
+		sf_close(infile);
 	} else { // file too big for memory. write to temp file in external storage
-		// concat sampleFileName with ".raw" extension
-		config->sampleFileName = malloc(strlen(sampleFileName) + 1 + 4);
-		strcpy(config->sampleFileName, sampleFileName); /* copy name into the new var */
-		strcat(config->sampleFileName, rawExtension); /* add the extension */
-
-		if (!fileExists(config->sampleFileName)) {
-			// open *.raw file next to sample file - we will read directly from this file
-			FILE *tempFile = fopen(config->sampleFileName, "wb");
-
-			while ((readcount = sf_read_float(infile, data, BUFF_SIZE))) {
-				for (i = 0; i < readcount; i++) {
-					fwrite(&data[i], ONE_FLOAT_SZ, 1, tempFile);
-				}
-			};
-			fflush(tempFile);
-			fclose(tempFile);
-		} else {
-			__android_log_print(ANDROID_LOG_INFO, "filegen",
-					"Reusing existing sample");
-		}
-		config->sampleFile = fopen(config->sampleFileName, "rb");
+		config->sampleFile = infile;
 	}
-
-	sf_close(infile);
 
 	// init loop / currFrame position data
 	config->loopBegin = 0;
@@ -113,24 +86,27 @@ void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 
 FileGen *filegen_create(const char *sampleName) {
 	FileGen *fileGen = (FileGen *) malloc(sizeof(FileGen));
+	pthread_mutex_init(&fileGen->fileMutex, NULL);
 	fileGen->currFrame = 0;
 	fileGen->gain = 1;
 	fileGen->samples = NULL;
 	fileGen->sampleFile = NULL;
+	fileGen->bufferStartFrame = -1;
 	fileGen->looping = fileGen->reverse = false;
 	filegen_setSampleFile(fileGen, sampleName);
 	fileGen->adsr = adsrconfig_create();
 	return fileGen;
 }
 
-float filegen_getSample(FileGen *fileGen, int sampleIndex, int channel) {
+float filegen_getSample(FileGen *fileGen, int frame, int channel) {
 	float ret;
 	if (fileGen->samples != NULL ) {
-		ret = fileGen->samples[channel][sampleIndex];
+		ret = fileGen->samples[channel][frame];
 	} else {
-		fseek(fileGen->sampleFile,
-				sampleIndex * fileGen->channels * ONE_FLOAT_SZ, SEEK_SET);
-		fread(&ret, 1, ONE_FLOAT_SZ, fileGen->sampleFile);
+		pthread_mutex_lock(&fileGen->fileMutex);
+		sf_seek(fileGen->sampleFile, frame, SEEK_SET);
+		sf_read_float(fileGen->sampleFile, &ret, 1);
+		pthread_mutex_unlock(&fileGen->fileMutex);
 	}
 	return ret * fileGen->gain;
 }
@@ -162,11 +138,10 @@ void filegen_reset(FileGen *config) {
 
 void filegen_destroy(void *p) {
 	FileGen *fileGen = (FileGen *) p;
+	pthread_mutex_destroy(&fileGen->fileMutex);
 	if (fileGen->sampleFile != NULL ) {
-		fflush(fileGen->sampleFile);
-		fclose(fileGen->sampleFile);
+		sf_close(fileGen->sampleFile);
 		fileGen->sampleFile = NULL;
-		free(fileGen->sampleFileName);
 	}
 	filegen_freeBuffers(fileGen);
 	adsrconfig_destroy(fileGen->adsr);
