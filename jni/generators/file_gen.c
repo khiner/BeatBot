@@ -71,10 +71,15 @@ void filegen_setReverse(FileGen *fileGen, bool reverse) {
 		fileGen->currFrame = fileGen->loopBegin;
 }
 
-void filegen_reset(FileGen *config) {
+void filegen_start(FileGen *config) {
 	config->currFrame = config->reverse ? config->loopEnd : config->loopBegin;
 	resetAdsr(config->adsr);
 }
+
+void filegen_reset(FileGen *config) {
+	config->adsr->stoppedSample = config->adsr->currSample;
+}
+
 
 void filegen_destroy(void *p) {
 	FileGen *fileGen = (FileGen *) p;

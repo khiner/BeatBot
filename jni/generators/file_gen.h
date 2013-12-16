@@ -30,6 +30,7 @@ void filegen_setSampleFile(FileGen *fileGen, const char *sampleFileName);
 void filegen_setLoopWindow(FileGen *fileGen, long loopBeginSample,
 		long loopEndSample);
 void filegen_setReverse(FileGen *fileGen, bool reverse);
+void filegen_start(FileGen *config);
 void filegen_reset(FileGen *config);
 
 static inline void filegen_sndFileRead(FileGen *config, long frame,
@@ -54,6 +55,7 @@ static inline void filegen_sndFileRead(FileGen *config, long frame,
 }
 
 static inline void filegen_tick(FileGen *config, float *sample) {
+
 	// wrap sample around loop window
 	if (config->looping) {
 		if (config->currFrame >= config->loopEnd) {

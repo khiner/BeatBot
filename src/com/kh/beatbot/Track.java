@@ -256,6 +256,10 @@ public class Track extends BaseTrack {
 		return previewing;
 	}
 
+	public boolean isPlaying() {
+		return isTrackPlaying(id);
+	}
+
 	private void update() {
 		updateSampleParams();
 		updateLoopWindow();
@@ -296,6 +300,8 @@ public class Track extends BaseTrack {
 	public static native void toggleTrackLooping(int trackNum);
 
 	public static native boolean isTrackLooping(int trackNum);
+
+	public static native boolean isTrackPlaying(int trackNum);
 
 	public static native void notifyNoteMoved(int trackNum, long oldNoteOn,
 			long oldNoteOff, long newNoteOn, long newNoteOff);

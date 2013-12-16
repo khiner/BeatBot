@@ -215,14 +215,13 @@ void soundTrack(Track *track) {
 	if (track->generator == NULL )
 		return;
 	updateLevels(track->num);
-	filegen_reset((FileGen *) track->generator->config);
+	filegen_start((FileGen *) track->generator->config);
 }
 
 void stopSoundingTrack(Track *track) {
 	if (track->generator == NULL )
 		return;
-	FileGen *fileGen = (FileGen *) track->generator->config;
-	fileGen->adsr->stoppedSample = fileGen->adsr->currSample;
+	filegen_reset((FileGen *) track->generator->config);
 }
 
 void stopTrack(Track *track) {
@@ -240,7 +239,7 @@ void previewTrack(Track *track) {
 	setPreviewLevels(track);
 	if (track->generator == NULL )
 		return;
-	filegen_reset((FileGen *) track->generator->config);
+	filegen_start((FileGen *) track->generator->config);
 }
 
 void stopPreviewingTrack(Track *track) {
@@ -418,7 +417,7 @@ jstring Java_com_kh_beatbot_Track_setSample(JNIEnv *env, jclass clazz,
 	(*env)->ReleaseStringUTFChars(env, sampleName, nativeSampleName);
 	pthread_mutex_unlock(&openSlOut->trackMutex); // TODO try moving up
 
-	jstring retn = (*env)->NewStringUTF(env, sf_strerror(NULL));
+	jstring retn = (*env)->NewStringUTF(env, sf_strerror(NULL ));
 
 	return retn;
 }
@@ -448,6 +447,16 @@ void Java_com_kh_beatbot_Track_toggleTrackLooping(JNIEnv *env, jclass clazz,
 		return;
 	FileGen *fileGen = (FileGen *) track->generator->config;
 	fileGen->looping = !fileGen->looping;
+}
+
+jboolean Java_com_kh_beatbot_Track_isTrackPlaying(JNIEnv *env, jclass clazz,
+		jint trackNum) {
+	Track *track = getTrack(env, clazz, trackNum);
+	if (track->generator == NULL ) {
+		return false;
+	}
+
+	return currSample >= track->nextStartSample && currSample <= track->nextStopSample;
 }
 
 jboolean Java_com_kh_beatbot_Track_isTrackLooping(JNIEnv *env, jclass clazz,

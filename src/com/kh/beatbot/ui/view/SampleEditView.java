@@ -95,7 +95,7 @@ public class SampleEditView extends ControlView2dBase {
 				.getCurrentFrame());
 		float x = levelToX(level);
 		translate(x, 0);
-		drawLines(currSampleLineVb, Colors.LABEL_SELECTED, 4, GL10.GL_LINES);
+		drawLines(currSampleLineVb, Colors.VOLUME, 4, GL10.GL_LINES);
 		pop();
 	}
 
@@ -180,7 +180,8 @@ public class SampleEditView extends ControlView2dBase {
 		}
 		drawWaveform();
 		drawLoopSelectionMarkers();
-		if (TrackManager.currTrack.isPreviewing()) {
+		if (TrackManager.currTrack.isPlaying()
+				|| TrackManager.currTrack.isPreviewing()) {
 			drawCurrSampleLine();
 		}
 	}
