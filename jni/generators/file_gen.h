@@ -10,7 +10,7 @@ typedef struct FileGen_t {
 	AdsrConfig *adsr;
 	float tempSample[2];
 	float otherTempSample[2];
-	float buffer[BUFF_SIZE];
+	float *buffer;
 	float **samples;
 	float currFrame;
 	long frames;
@@ -26,7 +26,7 @@ typedef struct FileGen_t {
 } FileGen;
 
 FileGen *filegen_create(const char *sampleName);
-float filegen_getSample(FileGen *fileGen, int sampleIndex, int channel);
+float filegen_getSample(FileGen *fileGen, long frame, int channel);
 void filegen_setSampleFile(FileGen *fileGen, const char *sampleFileName);
 void filegen_setLoopWindow(FileGen *fileGen, long loopBeginSample,
 		long loopEndSample);
@@ -36,6 +36,7 @@ void freeBuffers(FileGen *config);
 
 static inline void filegen_sndFileRead(FileGen *config, long frame,
 		float *sample) {
+
 	if (frame >= config->bufferStartFrame + BUFF_SIZE
 			|| frame < config->bufferStartFrame) {
 		long seekTo =
@@ -43,7 +44,7 @@ static inline void filegen_sndFileRead(FileGen *config, long frame,
 						(frame - BUFF_SIZE >= 0 ? frame - BUFF_SIZE : 0) :
 						frame;
 		sf_seek(config->sampleFile, seekTo, SEEK_SET);
-		sf_read_float(config->sampleFile, config->buffer, BUFF_SIZE);
+		sf_readf_float(config->sampleFile, config->buffer, BUFF_SIZE);
 		config->bufferStartFrame = seekTo;
 	}
 	frame -= config->bufferStartFrame;
@@ -79,24 +80,22 @@ static inline void filegen_tick(FileGen *config, float *sample) {
 	// read next two samples from current sample (rounded down)
 	int channel;
 	if (config->samples == NULL) {
+		filegen_sndFileRead(config, frame, config->tempSample);
+		filegen_sndFileRead(config, frame + 1, config->otherTempSample);
 		for (channel = 0; channel < config->channels; channel++) {
-			filegen_sndFileRead(config, frame, config->otherTempSample);
-			// copy left channel to right channel if mono
-			float samp1 = config->otherTempSample[channel];
-
-			filegen_sndFileRead(config, frame + 1, config->otherTempSample);
+			float samp1 = config->tempSample[channel];
 			float samp2 = config->otherTempSample[channel];
 			sample[channel] = (1.0f - remainder) * samp1 + remainder * samp2;
 		}
 	} else {
 		for (channel = 0; channel < config->channels; channel++) {
-			// copy left channel to right channel if mono
 			float samp1 = config->samples[channel][frame];
 			float samp2 = config->samples[channel][frame + 1];
 			sample[channel] = (1.0f - remainder) * samp1 + remainder * samp2;
 		}
 	}
 
+	// copy left channel to right channel if mono
 	if (config->channels == 1) {
 		sample[1] = sample[0];
 	}

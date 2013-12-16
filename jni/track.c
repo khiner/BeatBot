@@ -158,7 +158,7 @@ void destroyTracks() {	// destroy all tracks
 
 Levels *initLevels() {
 	Levels *levels = malloc(sizeof(Levels));
-	pthread_mutex_init(&levels->effectMutex, NULL);
+	pthread_mutex_init(&levels->effectMutex, NULL );
 	levels->effectHead = NULL;
 	levels->volume = .8f;
 	levels->pan = levels->pitch = .5f;
@@ -508,12 +508,12 @@ void Java_com_kh_beatbot_Track_setTrackGain(JNIEnv *env, jclass clazz,
 }
 
 float Java_com_kh_beatbot_Track_getSample(JNIEnv *env, jclass clazz,
-		jint trackNum, jint sampleIndex, jint channel) {
+		jint trackNum, jlong frame, jint channel) {
 	Track *track = getTrack(env, clazz, trackNum);
 	if (track->generator == NULL )
 		return 0;
 	FileGen *fileGen = (FileGen *) track->generator->config;
-	return filegen_getSample(fileGen, sampleIndex, channel);
+	return filegen_getSample(fileGen, frame, channel);
 }
 
 float Java_com_kh_beatbot_Track_getCurrentFrame(JNIEnv *env, jclass clazz,

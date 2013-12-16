@@ -45,13 +45,8 @@ public class BeatBotActivity extends Activity {
 	private final Runnable cleanup = new Runnable() {
 		@Override
 		public void run() {
-			try {
-				Log.d("Janitor", "shutting down");
-				shutdown();
-			} finally {
-				Log.d("Janitor", "clearing temp files");
-				FileManager.clearTempFiles();
-			}
+			Log.d("Janitor", "shutting down");
+			shutdown();
 		}
 	};
 
@@ -250,11 +245,7 @@ public class BeatBotActivity extends Activity {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									try {
-										finish();
-									} catch (Exception e) {
-										FileManager.clearTempFiles();
-									}
+									finish();
 								}
 							}).setNegativeButton("No", null);
 			break;

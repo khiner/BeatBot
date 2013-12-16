@@ -71,6 +71,7 @@ void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 		sf_close(infile);
 	} else { // file too big for memory. write to temp file in external storage
 		config->sampleFile = infile;
+		config->buffer = malloc(BUFF_SIZE * config->channels * ONE_FLOAT_SZ);
 	}
 
 	// init loop / currFrame position data
@@ -86,7 +87,7 @@ void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 
 FileGen *filegen_create(const char *sampleName) {
 	FileGen *fileGen = (FileGen *) malloc(sizeof(FileGen));
-	pthread_mutex_init(&fileGen->fileMutex, NULL);
+	pthread_mutex_init(&fileGen->fileMutex, NULL );
 	fileGen->currFrame = 0;
 	fileGen->gain = 1;
 	fileGen->samples = NULL;
@@ -98,14 +99,15 @@ FileGen *filegen_create(const char *sampleName) {
 	return fileGen;
 }
 
-float filegen_getSample(FileGen *fileGen, int frame, int channel) {
+float filegen_getSample(FileGen *fileGen, long frame, int channel) {
 	float ret;
 	if (fileGen->samples != NULL ) {
 		ret = fileGen->samples[channel][frame];
 	} else {
 		pthread_mutex_lock(&fileGen->fileMutex);
 		sf_seek(fileGen->sampleFile, frame, SEEK_SET);
-		sf_read_float(fileGen->sampleFile, &ret, 1);
+		sf_readf_float(fileGen->sampleFile, fileGen->tempSample, 1);
+		ret = fileGen->tempSample[channel];
 		pthread_mutex_unlock(&fileGen->fileMutex);
 	}
 	return ret * fileGen->gain;

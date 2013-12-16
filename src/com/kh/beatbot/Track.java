@@ -271,7 +271,7 @@ public class Track extends BaseTrack {
 		setTrackReverse(id, reverse);
 	}
 
-	public float getSample(int sampleIndex, int channel) {
+	public float getSample(long sampleIndex, int channel) {
 		return getSample(id, sampleIndex, channel);
 	}
 
@@ -308,7 +308,7 @@ public class Track extends BaseTrack {
 
 	public static native void setSample(int trackId, String sampleName);
 
-	public static native float getSample(int trackId, int sampleIndex,
+	public static native float getSample(int trackId, long sampleIndex,
 			int channel);
 
 	public static native float getCurrentFrame(int trackId);

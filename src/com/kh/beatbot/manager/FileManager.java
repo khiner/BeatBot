@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import android.annotation.SuppressLint;
 import android.content.res.AssetManager;
 import android.os.Environment;
 
@@ -36,7 +35,6 @@ public class FileManager {
 		audioDirectory = new File(appDirectoryPath + "/audio");
 
 		try {
-			clearTempFiles();
 			copyAllSamplesToStorage();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -47,24 +45,6 @@ public class FileManager {
 		recordDirectory = new File(audioDirectory.getPath() + "/recorded");
 		beatRecordDirectory = new File(recordDirectory.getPath() + "/beats");
 		sampleRecordDirectory = new File(recordDirectory.getPath() + "/samples");
-	}
-
-	public static void clearTempFiles() {
-		clearTempFiles(audioDirectory);
-	}
-
-	@SuppressLint("DefaultLocale")
-	private static void clearTempFiles(File directory) {
-		for (File sampleFile : directory.listFiles()) {
-			if (sampleFile.getName().toLowerCase().endsWith(".raw")) {
-				sampleFile.delete();
-			}
-		}
-		for (File child : directory.listFiles()) {
-			if (child.isDirectory()) {
-				clearTempFiles(child);
-			}
-		}
 	}
 
 	private static void initDataDir() {
