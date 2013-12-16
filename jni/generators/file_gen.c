@@ -100,20 +100,20 @@ void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 
 	sf_close(infile);
 
-	// init loop / currSample position data
+	// init loop / currFrame position data
 	config->loopBegin = 0;
 	config->loopEnd = config->frames;
-	if (config->currSample >= config->loopEnd) {
-		// TODO maybe should be currSample = loopEnd
+	if (config->currFrame >= config->loopEnd) {
+		// TODO maybe should be currFrame = loopEnd
 		// TODO this could cause unwanted repeat
-		config->currSample = 0;
+		config->currFrame = 0;
 	}
 	config->loopLength = config->loopEnd - config->loopBegin;
 }
 
 FileGen *filegen_create(const char *sampleName) {
 	FileGen *fileGen = (FileGen *) malloc(sizeof(FileGen));
-	fileGen->currSample = 0;
+	fileGen->currFrame = 0;
 	fileGen->gain = 1;
 	fileGen->samples = NULL;
 	fileGen->sampleFile = NULL;
@@ -149,14 +149,14 @@ void filegen_setReverse(FileGen *fileGen, bool reverse) {
 	fileGen->reverse = reverse;
 	// if the track is not looping, the fileGen generator will not loop to the beginning/end
 	// after enabling/disabling reverse
-	if (reverse && fileGen->currSample == fileGen->loopBegin)
-		fileGen->currSample = fileGen->loopEnd;
-	else if (!reverse && fileGen->currSample == fileGen->loopEnd)
-		fileGen->currSample = fileGen->loopBegin;
+	if (reverse && fileGen->currFrame == fileGen->loopBegin)
+		fileGen->currFrame = fileGen->loopEnd;
+	else if (!reverse && fileGen->currFrame == fileGen->loopEnd)
+		fileGen->currFrame = fileGen->loopBegin;
 }
 
 void filegen_reset(FileGen *config) {
-	config->currSample = config->reverse ? config->loopEnd : config->loopBegin;
+	config->currFrame = config->reverse ? config->loopEnd : config->loopBegin;
 	resetAdsr(config->adsr);
 }
 

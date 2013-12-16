@@ -7,7 +7,7 @@ typedef struct FileGen_t {
 	AdsrConfig *adsr;
 	float tempSample[4];
 	float **samples;
-	float currSample;
+	float currFrame;
 	long frames;
 	long loopBegin;
 	long loopEnd;
@@ -32,15 +32,15 @@ void freeBuffers(FileGen *config);
 static inline void filegen_tick(FileGen *config, float *sample) {
 	// wrap sample around loop window
 	if (config->looping) {
-		if (config->currSample >= config->loopEnd) {
-			config->currSample -= config->loopLength;
-		} else if (config->currSample <= config->loopBegin) {
-			config->currSample += config->loopLength;
+		if (config->currFrame >= config->loopEnd) {
+			config->currFrame -= config->loopLength;
+		} else if (config->currFrame <= config->loopBegin) {
+			config->currFrame += config->loopLength;
 		}
 	}
 
-	if (config->currSample > config->loopEnd
-			|| config->currSample < config->loopBegin) {
+	if (config->currFrame > config->loopEnd
+			|| config->currFrame < config->loopBegin) {
 		sample[0] = sample[1] = 0;
 		return;
 	}
@@ -48,18 +48,21 @@ static inline void filegen_tick(FileGen *config, float *sample) {
 	// perform linear interpolation on the next two samples
 	// (ignoring wrapping around loop - this is close enough and we avoid an extra
 	//  read from disk)
-	long sampleIndex = (long) config->currSample;
-	float remainder = config->currSample - sampleIndex;
+	long frame = (long) config->currFrame;
+	float remainder = config->currFrame - frame;
 	// read next two samples from current sample (rounded down)
 	int channel;
 	if (config->samples == NULL) {
-		fseek(config->sampleFile, sampleIndex * config->channels * ONE_FLOAT_SZ, SEEK_SET);
-		fread(config->tempSample, config->channels, TWO_FLOAT_SZ, config->sampleFile);
+		fseek(config->sampleFile, frame * config->channels * ONE_FLOAT_SZ,
+				SEEK_SET);
+		fread(config->tempSample, config->channels, TWO_FLOAT_SZ,
+				config->sampleFile);
 
 		for (channel = 0; channel < config->channels; channel++) {
 			// interpolate the next two samples linearly
 			sample[channel] = (1.0f - remainder) * config->tempSample[channel]
-					+ remainder * config->tempSample[config->channels + channel];
+					+ remainder
+							* config->tempSample[config->channels + channel];
 		}
 
 		if (config->channels == 1) {
@@ -68,8 +71,8 @@ static inline void filegen_tick(FileGen *config, float *sample) {
 	} else {
 		for (channel = 0; channel < config->channels; channel++) {
 			// copy left channel to right channel if mono
-			float samp1 = config->samples[channel][sampleIndex];
-			float samp2 = config->samples[channel][sampleIndex + 1];
+			float samp1 = config->samples[channel][frame];
+			float samp2 = config->samples[channel][frame + 1];
 			sample[channel] = (1.0f - remainder) * samp1 + remainder * samp2;
 		}
 		if (config->channels == 1) {
@@ -79,9 +82,9 @@ static inline void filegen_tick(FileGen *config, float *sample) {
 
 	// get next sample.  if reverse, go backwards, else go forwards
 	if (config->reverse) {
-		config->currSample -= config->sampleRate;
+		config->currFrame -= config->sampleRate;
 	} else {
-		config->currSample += config->sampleRate;
+		config->currFrame += config->sampleRate;
 	}
 	float gain = adsr_tick(config->adsr) * config->gain;
 	sample[0] *= gain;

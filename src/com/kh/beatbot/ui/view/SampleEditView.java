@@ -92,7 +92,7 @@ public class SampleEditView extends ControlView2dBase {
 	private void drawCurrSampleLine() {
 		push();
 		float level = params[0].getViewLevel(TrackManager.currTrack
-				.getCurrentSampleIndex());
+				.getCurrentFrame());
 		float x = levelToX(level);
 		translate(x, 0);
 		drawLines(currSampleLineVb, Colors.LABEL_SELECTED, 4, GL10.GL_LINES);

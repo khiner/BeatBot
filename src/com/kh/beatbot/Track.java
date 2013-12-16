@@ -275,8 +275,8 @@ public class Track extends BaseTrack {
 		return getSample(id, sampleIndex, channel);
 	}
 
-	public float getCurrentSampleIndex() {
-		return getCurrentSampleIndex(id);
+	public float getCurrentFrame() {
+		return getCurrentFrame(id);
 	}
 
 	public static native void toggleTrackLooping(int trackNum);
@@ -311,7 +311,7 @@ public class Track extends BaseTrack {
 	public static native float getSample(int trackId, int sampleIndex,
 			int channel);
 
-	public static native float getCurrentSampleIndex(int trackId);
+	public static native float getCurrentFrame(int trackId);
 
 	public static native float getFrames(int trackId);
 
