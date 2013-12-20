@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.view.group;
 
 import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResource;
@@ -176,7 +177,7 @@ public class PageSelectGroup extends TouchableView {
 	}
 
 	private void updateSampleText() {
-		pageButtons[BROWSE_PAGE_ID].setText(TrackManager.currTrack
-				.getCurrSampleName());
+		pageButtons[BROWSE_PAGE_ID].setText(FileManager
+				.formatSampleName(TrackManager.currTrack.getCurrSampleName()));
 	}
 }

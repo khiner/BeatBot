@@ -47,6 +47,15 @@ public class FileManager {
 		sampleRecordDirectory = new File(recordDirectory.getPath() + "/samples");
 	}
 
+	public static String formatSampleName(String sampleName) {
+		for (String extension : SUPPORTED_EXTENSIONS) {
+			if (sampleName.endsWith(extension)) {
+				return sampleName.replace(extension, "");
+			}
+		}
+		return sampleName;
+	}
+
 	private static void initDataDir() {
 		if (Environment.getExternalStorageState().equals(
 				Environment.MEDIA_MOUNTED)) {
