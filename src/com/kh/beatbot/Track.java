@@ -350,7 +350,7 @@ public class Track extends BaseTrack {
 			loopEndParam.setLevel(1);
 
 			gainParam = new Param(2, "Gain", "", 0, 2);
-			gainParam.setLevel(1);
+			gainParam.setLevel(0.5f);
 
 			gainParam.addListener(this);
 			loopBeginParam.addListener(this);
