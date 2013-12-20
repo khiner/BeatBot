@@ -12,10 +12,11 @@ import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.WaveformShape;
 import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
+import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
 public class SampleEditView extends ControlView2dBase {
 
-	private static final String NO_SAMPLE_MESSAGE = "Use the browse tab to load a sample.";
+	private static final String NO_SAMPLE_MESSAGE = "Tap to load a sample.";
 
 	// min distance for pointer to select loop markers
 	private static final float SNAP_DIST = 32f, X_OFFSET = SNAP_DIST / 2;
@@ -26,6 +27,7 @@ public class SampleEditView extends ControlView2dBase {
 	private static FloatBuffer currSampleLineVb = null,
 			loopSelectionRectVbs[] = new FloatBuffer[2];
 
+	private boolean pressed = false;
 	// which pointer id is touching which marker (-1 means no pointer)
 	private int beginLoopPointerId = -1, endLoopPointerId = -1;
 
@@ -271,8 +273,10 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void handleActionDown(int id, float x, float y) {
-		if (!hasSample())
+		if (!hasSample()) {
+			press();
 			return;
+		}
 		if (!selectLoopMarker(id, x)) {
 			// loop marker not close enough to select. start scroll
 			// (we know it's the first pointer down, so we're not zooming)
@@ -282,8 +286,14 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void handleActionUp(int id, float x, float y) {
-		if (!hasSample())
+		if (!hasSample()) {
+			if (pressed) {
+				View.mainPage.pageSelectGroup
+						.selectPage(PageSelectGroup.BROWSE_PAGE_ID);
+			}
+			release();
 			return;
+		}
 		scrollPointerId = beginLoopPointerId = endLoopPointerId = zoomLeftPointerId = zoomRightPointerId = -1;
 		scrollAnchorLevel = zoomLeftAnchorLevel = zoomRightAnchorLevel = -1;
 	}
@@ -316,8 +326,18 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void handleActionMove(int id, float x, float y) {
-		if (!hasSample())
+		if (!hasSample()) {
+			if (!containsPoint(this.x + x, this.y + y)) {
+				if (pressed) {
+					release();
+				}
+			} else { // pointer inside button
+				if (!pressed) {
+					press();
+				}
+			}
 			return;
+		}
 		if (id == zoomLeftPointerId) {
 			// no-op: only zoom once both actions have been handled
 		} else if (id == zoomRightPointerId) {
@@ -325,6 +345,16 @@ public class SampleEditView extends ControlView2dBase {
 		} else if (!moveLoopMarker(id, x)) {
 			scroll(x);
 		}
+	}
+
+	private void press() {
+		pressed = true;
+		bgRect.setFillColor(Colors.LABEL_SELECTED);
+	}
+
+	private void release() {
+		bgRect.setFillColor(Colors.LABEL_VERY_LIGHT);
+		pressed = false;
 	}
 
 	@Override
