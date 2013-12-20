@@ -70,6 +70,7 @@ public class PageSelectGroup extends TouchableView {
 		updateLevelsFXPage();
 		editPage.update();
 		adsrPage.update();
+		levelsPage.update();
 	}
 
 	@Override
