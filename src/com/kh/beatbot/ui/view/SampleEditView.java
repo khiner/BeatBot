@@ -48,10 +48,6 @@ public class SampleEditView extends ControlView2dBase {
 		updateLoopSelectionVbs();
 	}
 
-	private void initCurrSampleLineVb() {
-		currSampleLineVb = makeFloatBuffer(new float[] { 0, 0, 0, height });
-	}
-
 	private void updateWaveformVb() {
 		waveformShape.update((long) params[0].getLevel(levelOffset),
 				(long) params[0].getLevel(levelWidth), X_OFFSET);
@@ -66,27 +62,6 @@ public class SampleEditView extends ControlView2dBase {
 				height, beginX + X_OFFSET, 0);
 		loopSelectionRectVbs[1] = makeRectFloatBuffer(endX - X_OFFSET, height,
 				endX + X_OFFSET, 0);
-	}
-
-	public void layout(View parent, float x, float y, float width, float height) {
-		waveformShape = Shape.createWaveform(null, width,
-				Colors.LABEL_SELECTED, Colors.BLACK);
-		waveformShape.setStrokeWeight(2);
-		waveformWidth = width - SNAP_DIST;
-		super.layout(parent, x, y, width, height);
-	}
-
-	@Override
-	public synchronized void init() {
-		setStrokeColor(Colors.BLACK);
-		initCurrSampleLineVb();
-		// find view level for 32 samples
-		minLoopWindow = params[0].getViewLevel(Track.MIN_LOOP_WINDOW);
-		update();
-	}
-
-	public synchronized void createChildren() {
-		initBgRect(Type.RECTANGLE, null, Colors.LABEL_VERY_LIGHT, Colors.WHITE);
 	}
 
 	private void updateZoom() {
@@ -124,9 +99,33 @@ public class SampleEditView extends ControlView2dBase {
 		updateLoopSelectionVbs();
 	}
 
-	// if the params are null, then there is no sample file for this track.
-	private boolean hasSample() {
-		return params[0] != null && params[1] != null;
+	private void initCurrSampleLineVb() {
+		currSampleLineVb = makeFloatBuffer(new float[] { 0, 0, 0, height });
+	}
+
+	@Override
+	public synchronized void init() {
+		setStrokeColor(Colors.BLACK);
+		initCurrSampleLineVb();
+		// find view level for 32 samples
+		minLoopWindow = params[0].getViewLevel(Track.MIN_LOOP_WINDOW);
+		update();
+	}
+
+	public synchronized void createChildren() {
+		initBgRect(Type.RECTANGLE, null, Colors.LABEL_VERY_LIGHT, Colors.WHITE);
+	}
+
+	public void layout(View parent, float x, float y, float width, float height) {
+		waveformShape = Shape.createWaveform(null, width,
+				Colors.LABEL_SELECTED, Colors.BLACK);
+		waveformShape.setStrokeWeight(2);
+		waveformWidth = width - SNAP_DIST;
+		super.layout(parent, x, y, width, height);
+	}
+
+	public synchronized void layoutChildren() {
+		waveformShape.layout(0, 0, width, height);
 	}
 
 	private void drawLoopSelectionMarkers() {
@@ -365,8 +364,9 @@ public class SampleEditView extends ControlView2dBase {
 			updateLoopSelectionVbs();
 		}
 	}
-
-	public synchronized void layoutChildren() {
-		waveformShape.layout(0, 0, width, height);
+	
+	// if the params are null, then there is no sample file for this track.
+	private boolean hasSample() {
+		return params[0] != null && params[1] != null;
 	}
 }
