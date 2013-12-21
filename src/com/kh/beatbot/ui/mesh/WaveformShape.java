@@ -51,7 +51,7 @@ public class WaveformShape extends Shape {
 		this.offset = offset;
 		this.numFloats = numFloats;
 		this.xOffset = xOffset;
-		float spp = Math.min(.5f, numFloats / width);
+		float spp = Math.min(1, numFloats / width);
 		numSamples = (int) (width * spp);
 		update();
 	}
