@@ -154,14 +154,11 @@ public class MidiManager {
 
 	public static void selectNote(MidiNote midiNote) {
 		midiNote.setSelected(true);
-
-		View.mainPage.midiView.updateNoteFillColor(midiNote);
 		View.mainPage.controlButtonGroup.setEditIconsEnabled(anyNoteSelected());
 	}
 
 	public static void deselectNote(MidiNote midiNote) {
 		midiNote.setSelected(false);
-		View.mainPage.midiView.updateNoteFillColor(midiNote);
 		View.mainPage.controlButtonGroup.setEditIconsEnabled(anyNoteSelected());
 	}
 

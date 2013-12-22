@@ -12,8 +12,6 @@ import android.util.Log;
 import com.kh.beatbot.ui.view.View;
 
 public class MeshGroup {
-	private static GL11 gl;
-
 	private List<Mesh2D> children = new ArrayList<Mesh2D>();
 	private FloatBuffer vertexBuffer, colorBuffer;
 	private float[] vertices;
@@ -40,18 +38,18 @@ public class MeshGroup {
 			dirty = false;
 		}
 
-		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, 0);
+		View.gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
+		View.gl.glVertexPointer(2, GL10.GL_FLOAT, 0, 0);
 
-		gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
+		View.gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 
-		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, colorHandle);
-		gl.glColorPointer(4, GL10.GL_FLOAT, 0, 0);
+		View.gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, colorHandle);
+		View.gl.glColorPointer(4, GL10.GL_FLOAT, 0, 0);
 
-		gl.glDrawArrays(primitiveType, 0, numVertices);
+		View.gl.glDrawArrays(primitiveType, 0, numVertices);
 
-		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
-		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
+		View.gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+		View.gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
 	}
 
 	public synchronized boolean contains(Mesh2D mesh) {
@@ -149,28 +147,25 @@ public class MeshGroup {
 	private synchronized void updateBuffers() {
 		initHandles();
 
-		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
-		gl.glBufferData(GL11.GL_ARRAY_BUFFER, vertices.length * 4,
+		View.gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
+		View.gl.glBufferData(GL11.GL_ARRAY_BUFFER, vertices.length * 4,
 				vertexBuffer, GL11.GL_DYNAMIC_DRAW);
 
-		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, colorHandle);
-		gl.glBufferData(GL11.GL_ARRAY_BUFFER, colors.length * 4, colorBuffer,
-				GL11.GL_DYNAMIC_DRAW);
-
-		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
+		View.gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, colorHandle);
+		View.gl.glBufferData(GL11.GL_ARRAY_BUFFER, colors.length * 4,
+				colorBuffer, GL11.GL_DYNAMIC_DRAW);
 	}
 
 	private void initHandles() {
-		gl = View.gl;
 		if (vertexHandle != -1 && colorHandle != -1) {
 			return; // already initialized
 		}
 		int[] buffer = new int[1];
 
-		gl.glGenBuffers(1, buffer, 0);
+		View.gl.glGenBuffers(1, buffer, 0);
 		vertexHandle = buffer[0];
 
-		gl.glGenBuffers(1, buffer, 0);
+		View.gl.glGenBuffers(1, buffer, 0);
 		colorHandle = buffer[0];
 	}
 

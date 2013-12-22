@@ -26,7 +26,9 @@ public abstract class Shape extends Drawable {
 			if (strokeColor != null) {
 				shape.strokeMesh = new Mesh2D(shape.getNumStrokeVertices(),
 						strokeColor);
+				
 			}
+			shape.updateGroup();
 			return shape;
 		}
 	}
@@ -89,7 +91,7 @@ public abstract class Shape extends Drawable {
 	}
 
 	protected synchronized void updateGroup() {
-		if (shouldDraw && !group.contains(this)) {
+		if (!group.contains(this)) {
 			group.add(this);
 		} else {
 			group.update(this);
@@ -169,6 +171,7 @@ public abstract class Shape extends Drawable {
 			strokeMesh.translate(x - this.x, y - this.y);
 		}
 		super.setPosition(x, y);
+		updateGroup();
 	}
 
 	public synchronized void layout(float x, float y, float width, float height) {
@@ -177,7 +180,6 @@ public abstract class Shape extends Drawable {
 			update();
 		} else {
 			setPosition(x, y);
-			updateGroup();
 		}
 	}
 

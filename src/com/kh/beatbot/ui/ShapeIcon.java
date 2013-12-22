@@ -26,14 +26,15 @@ public abstract class ShapeIcon extends Icon {
 				bgColorSet == null ? null : bgColorSet.defaultColor,
 				strokeColorSet == null ? null : strokeColorSet.defaultColor);
 
+		this.shapeGroup.remove(defaultShape);
 		Shape pressedShape = Shape.get(type, this.shapeGroup,
 				bgColorSet == null ? null : bgColorSet.pressedColor,
 				strokeColorSet == null ? null : strokeColorSet.pressedColor);
-
+		this.shapeGroup.remove(pressedShape);
 		Shape selectedShape = Shape.get(type, this.shapeGroup,
 				bgColorSet == null ? null : bgColorSet.selectedColor,
 				strokeColorSet == null ? null : strokeColorSet.selectedColor);
-
+		this.shapeGroup.remove(selectedShape);
 		this.resource = new IconResource(defaultShape, pressedShape,
 				selectedShape, null);
 		setState(IconResource.State.DEFAULT);

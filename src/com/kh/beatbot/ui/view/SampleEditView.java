@@ -8,9 +8,11 @@ import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.Shape;
-import com.kh.beatbot.ui.mesh.WaveformShape;
 import com.kh.beatbot.ui.mesh.Shape.Type;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.mesh.WaveformShape;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
@@ -22,10 +24,10 @@ public class SampleEditView extends ControlView2dBase {
 	private static final float SNAP_DIST = 32f, X_OFFSET = SNAP_DIST / 2;
 	private static float minLoopWindow;
 
+	private static ShapeGroup shapeGroup = new ShapeGroup();
 	private static WaveformShape waveformShape;
-
-	private static FloatBuffer currSampleLineVb = null,
-			loopSelectionRectVbs[] = new FloatBuffer[2];
+	private static Shape loopSelectionRects[] = new Shape[2];
+	private static FloatBuffer currSampleLineVb = null;
 
 	private boolean pressed = false;
 	// which pointer id is touching which marker (-1 means no pointer)
@@ -57,11 +59,8 @@ public class SampleEditView extends ControlView2dBase {
 		float beginX = levelToX(params[0].viewLevel);
 		float endX = levelToX(params[1].viewLevel);
 		waveformShape.updateLoopSelection(beginX, endX);
-
-		loopSelectionRectVbs[0] = makeRectFloatBuffer(beginX - X_OFFSET,
-				height, beginX + X_OFFSET, 0);
-		loopSelectionRectVbs[1] = makeRectFloatBuffer(endX - X_OFFSET, height,
-				endX + X_OFFSET, 0);
+		loopSelectionRects[0].setPosition(beginX - X_OFFSET, 0);
+		loopSelectionRects[1].setPosition(endX - X_OFFSET, 0);
 	}
 
 	private void updateZoom() {
@@ -112,13 +111,15 @@ public class SampleEditView extends ControlView2dBase {
 		update();
 	}
 
-	public synchronized void createChildren() {
-		initBgRect(Type.RECTANGLE, null, Colors.LABEL_VERY_LIGHT, Colors.WHITE);
-	}
-
 	public void layout(View parent, float x, float y, float width, float height) {
-		waveformShape = Shape.createWaveform(null, width,
+		initBgRect(Type.RECTANGLE, shapeGroup, Colors.LABEL_VERY_LIGHT,
+				Colors.WHITE);
+		waveformShape = Shape.createWaveform(shapeGroup, width,
 				Colors.LABEL_SELECTED, Colors.BLACK);
+		loopSelectionRects[0] = (Rectangle) Shape.get(Type.RECTANGLE,
+				shapeGroup, Colors.LABEL_SELECTED_TRANS, null);
+		loopSelectionRects[1] = (Rectangle) Shape.get(Type.RECTANGLE,
+				shapeGroup, Colors.LABEL_SELECTED_TRANS, null);
 		waveformShape.setStrokeWeight(2);
 		waveformWidth = width - SNAP_DIST;
 		super.layout(parent, x, y, width, height);
@@ -126,15 +127,9 @@ public class SampleEditView extends ControlView2dBase {
 
 	public synchronized void layoutChildren() {
 		waveformShape.layout(0, 0, width, height);
-	}
-
-	private void drawLoopSelectionMarkers() {
-		drawTriangleFan(loopSelectionRectVbs[0],
-				beginLoopPointerId == -1 ? Colors.LABEL_SELECTED_TRANS
-						: Colors.VOLUME_SELECTED);
-		drawTriangleFan(loopSelectionRectVbs[1],
-				endLoopPointerId == -1 ? Colors.LABEL_SELECTED_TRANS
-						: Colors.VOLUME_SELECTED);
+		for (Shape selectionRect : loopSelectionRects) {
+			selectionRect.layout(0, 0, X_OFFSET * 2, height);
+		}
 	}
 
 	private void drawCurrSampleLine() {
@@ -152,8 +147,7 @@ public class SampleEditView extends ControlView2dBase {
 			super.draw();
 			return;
 		}
-		waveformShape.draw();
-		drawLoopSelectionMarkers();
+		shapeGroup.draw();
 		if (TrackManager.currTrack.isPlaying()
 				|| TrackManager.currTrack.isPreviewing()) {
 			drawCurrSampleLine();
@@ -345,7 +339,8 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	protected float xToLevel(float x) {
-		return (x - X_OFFSET) * levelWidth / waveformWidth + levelOffset;
+		return (x - X_OFFSET)
+				* checkedDivide(levelWidth, waveformWidth + levelOffset);
 	}
 
 	@Override
@@ -354,7 +349,9 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	protected float levelToX(float level) {
-		return X_OFFSET + (level - levelOffset) * waveformWidth / levelWidth;
+		return X_OFFSET
+				+ checkedDivide((level - levelOffset) * waveformWidth,
+						levelWidth);
 	}
 
 	@Override
@@ -364,7 +361,11 @@ public class SampleEditView extends ControlView2dBase {
 			updateLoopSelectionVbs();
 		}
 	}
-	
+
+	private float checkedDivide(float num, float den) {
+		return den == 0 ? 0 : num / den;
+	}
+
 	// if the params are null, then there is no sample file for this track.
 	private boolean hasSample() {
 		return params[0] != null && params[1] != null;

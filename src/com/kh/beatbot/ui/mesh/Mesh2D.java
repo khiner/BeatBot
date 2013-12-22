@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.mesh;
 
-
 /**
  * A simple Mesh class that wraps OpenGL ES Vertex Buffer Arrays
  */

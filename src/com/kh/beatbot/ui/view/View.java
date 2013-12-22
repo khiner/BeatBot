@@ -88,12 +88,12 @@ public abstract class View implements Comparable<View> {
 		createChildren();
 	}
 
-	public void initBgRect(Type type, ShapeGroup group, float[] fillColor,
+	protected void initBgRect(Type type, ShapeGroup group, float[] fillColor,
 			float[] strokeColor) {
 		bgRect = Shape.get(type, group, fillColor, strokeColor);
 	}
 
-	public float getBgRectRadius() {
+	protected float getBgRectRadius() {
 		return bgRect instanceof RoundedRect ? ((RoundedRect) bgRect).cornerRadius
 				: 0;
 	}
