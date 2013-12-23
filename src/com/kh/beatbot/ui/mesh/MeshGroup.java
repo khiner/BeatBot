@@ -15,10 +15,9 @@ import com.kh.beatbot.ui.view.View;
 public class MeshGroup {
 	private List<Mesh2D> children = new ArrayList<Mesh2D>();
 	private FloatBuffer vertexBuffer, colorBuffer;
-	private float[] vertices = new float[0];
-	private float[] colors = new float[0];
-	private int vertexHandle = -1, colorHandle = -1, numVertices = -1;
-	private int primitiveType;
+	private float[] vertices = new float[0], colors = new float[0];
+	private int vertexHandle = -1, colorHandle = -1, numVertices = -1,
+			primitiveType;
 	private boolean dirty = false;
 
 	public MeshGroup(int primitiveType) {
@@ -28,13 +27,14 @@ public class MeshGroup {
 	protected float getVertexX(int index) {
 		return vertices[index * 2];
 	}
-	
+
 	protected float getVertexY(int index) {
 		return vertices[index * 2 + 1];
 	}
 
-	protected void vertex(int index, float x, float y, float[] color) {
+	protected synchronized void vertex(Mesh2D mesh, float x, float y, float[] color) {
 		dirty = true;
+		int index = mesh.index + mesh.parentVertexIndex;
 		int vertexOffset = index * 2;
 		int colorOffset = index * 4;
 		vertices[vertexOffset] = x;
@@ -45,10 +45,13 @@ public class MeshGroup {
 		colors[colorOffset + 3] = color[3];
 	}
 
-	protected void translate(int index, float x, float y) {
+	protected synchronized void translate(Mesh2D mesh, float x, float y) {
 		dirty = true;
-		vertices[index * 2] += x;
-		vertices[index * 2 + 1] += y;
+		for (int i = 0; i < mesh.numVertices; i++) {
+			int index = (i + mesh.parentVertexIndex) * 2;
+			vertices[index] += x;
+			vertices[index + 1] += y;
+		}
 	}
 
 	public void setPrimitiveType(int primitiveType) {
@@ -101,7 +104,7 @@ public class MeshGroup {
 			return;
 		}
 		children.remove(mesh);
-		
+
 		for (int i = mesh.parentVertexIndex; i < numVertices - mesh.numVertices; i++) {
 			vertices[i * 2] = vertices[(i + mesh.numVertices) * 2];
 			vertices[i * 2 + 1] = vertices[(i + mesh.numVertices) * 2 + 1];
@@ -151,6 +154,7 @@ public class MeshGroup {
 
 		colors = Arrays.copyOf(colors, numVertices * 4);
 		colorBuffer = FloatBuffer.wrap(colors);
+		dirty = true;
 	}
 
 	private synchronized void updateBuffers() {

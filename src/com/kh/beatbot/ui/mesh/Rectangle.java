@@ -3,8 +3,8 @@ package com.kh.beatbot.ui.mesh;
 
 public class Rectangle extends Shape {
 	
-	protected Rectangle(ShapeGroup group) {
-		super(group);
+	protected Rectangle(ShapeGroup group, float[] fillColor, float[] strokeColor) {
+		super(group, fillColor, strokeColor);
 	}
 
 	protected int getNumFillVertices() {

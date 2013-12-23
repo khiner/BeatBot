@@ -8,40 +8,49 @@ public abstract class Shape extends Drawable {
 	};
 
 	public static final float ¹ = (float) Math.PI;
+	private Mesh2D fillMesh, strokeMesh;
+	private float[] fillColor, strokeColor;
 
-	public Mesh2D fillMesh, strokeMesh;
 	protected ShapeGroup group;
-	protected boolean shouldDraw;
+	private boolean shouldDraw;
+	
+
+	protected Shape(ShapeGroup group) {
+		// must draw via some parent group. if one is given, use that,
+		// otherwise create a new group and render upon request using that group
+		shouldDraw = group == null;
+		this.group = group != null ? group : new ShapeGroup();
+	}
+
+	protected Shape(ShapeGroup group, float[] fillColor, float[] strokeColor) {
+		this(group);
+		if (fillColor != null) {
+			fillMesh = new Mesh2D(this.group.fillGroup, getNumFillVertices());
+			this.fillColor = fillColor;
+		}
+		if (strokeColor != null) {
+			strokeMesh = new Mesh2D(this.group.strokeGroup,
+					getNumStrokeVertices());
+			this.strokeColor = strokeColor;
+		}
+		this.group.add(this);
+	}
 
 	public static Shape get(Type type, ShapeGroup group, float[] fillColor,
 			float[] strokeColor) {
-		if (fillColor == null && strokeColor == null) {
-			return null;
-		} else {
-			Shape shape = create(type, group);
-			if (fillColor != null) {
-				shape.fillMesh = new Mesh2D(shape.group.fillGroup,
-						shape.getNumFillVertices(), fillColor);
-			}
-			if (strokeColor != null) {
-				shape.strokeMesh = new Mesh2D(shape.group.strokeGroup,
-						shape.getNumStrokeVertices(), strokeColor);
-
-			}
-			shape.updateGroup();
-			return shape;
-		}
+		return fillColor == null && strokeColor == null ? null : create(type,
+				group, fillColor, strokeColor);
 	}
 
-	protected static Shape create(Type type, ShapeGroup group) {
+	protected static Shape create(Type type, ShapeGroup group,
+			float[] fillColor, float[] strokeColor) {
 		switch (type) {
 		case RECTANGLE:
-			return new Rectangle(group);
+			return new Rectangle(group, fillColor, strokeColor);
 		case ROUNDED_RECT:
-			return new RoundedRect(group);
+			return new RoundedRect(group, fillColor, strokeColor);
 		case SLIDE_TAB:
-			return new SlideTab(group);
-
+			return new SlideTab(group, fillColor, strokeColor);
 		default:
 			return null;
 		}
@@ -51,9 +60,10 @@ public abstract class Shape extends Drawable {
 			float[] fillColor, float[] strokeColor) {
 		Shape waveform = new WaveformShape(group, width);
 		waveform.fillMesh = new Mesh2D(waveform.group.fillGroup,
-				waveform.getNumFillVertices(), fillColor);
+				waveform.getNumFillVertices());
 		waveform.strokeMesh = new Mesh2D(waveform.group.strokeGroup,
-				waveform.getNumStrokeVertices(), strokeColor);
+				waveform.getNumStrokeVertices());
+		waveform.setColors(fillColor, strokeColor);
 		return (WaveformShape) waveform;
 	}
 
@@ -63,9 +73,17 @@ public abstract class Shape extends Drawable {
 
 	protected abstract void updateVertices();
 
+	protected float getFillVertexX(int i) {
+		return fillMesh.group.getVertexX(i);
+	}
+
+	protected float getFillVertexY(int i) {
+		return fillMesh.group.getVertexY(i);
+	}
+
 	protected synchronized void fillVertex(float x, float y) {
 		if (fillMesh != null) {
-			fillMesh.vertex(x, y, fillMesh.getColor());
+			fillMesh.vertex(x, y, fillColor);
 		}
 	}
 
@@ -77,21 +95,14 @@ public abstract class Shape extends Drawable {
 
 	protected synchronized void strokeVertex(float x, float y) {
 		if (strokeMesh != null) {
-			strokeMesh.vertex(x, y, strokeMesh.getColor());
+			strokeMesh.vertex(x, y, strokeColor);
 		}
 	}
-	
+
 	protected synchronized void strokeVertex(float x, float y, float[] color) {
 		if (strokeMesh != null) {
 			strokeMesh.vertex(x, y, color);
 		}
-	}
-
-	protected Shape(ShapeGroup group) {
-		// must draw via some parent group. if one is given, use that,
-		// otherwise create a new group and render upon request using that group
-		shouldDraw = group == null;
-		this.group = group != null ? group : new ShapeGroup();
 	}
 
 	protected synchronized void resetIndices() {
@@ -117,26 +128,18 @@ public abstract class Shape extends Drawable {
 	}
 
 	public synchronized void setFillColor(float[] fillColor) {
-		if (fillMesh != null) {
-			fillMesh.setColor(fillColor);
-		}
+		this.fillColor = fillColor;
 		updateGroup();
 	}
 
 	public synchronized void setStrokeColor(float[] strokeColor) {
-		if (strokeMesh != null) {
-			strokeMesh.setColor(strokeColor);
-		}
+		this.strokeColor = strokeColor;
 		updateGroup();
 	}
 
 	public synchronized void setColors(float[] fillColor, float[] strokeColor) {
-		if (fillMesh != null) {
-			fillMesh.setColor(fillColor);
-		}
-		if (strokeMesh != null) {
-			strokeMesh.setColor(strokeColor);
-		}
+		this.fillColor = fillColor;
+		this.strokeColor = strokeColor;
 		updateGroup();
 	}
 
@@ -152,12 +155,12 @@ public abstract class Shape extends Drawable {
 		return strokeMesh;
 	}
 
-	public synchronized float[] getStrokeColor() {
-		return strokeMesh != null ? strokeMesh.getColor() : null;
+	public synchronized float[] getFillColor() {
+		return fillColor;
 	}
 
-	public synchronized float[] getFillColor() {
-		return fillMesh != null ? fillMesh.getColor() : null;
+	public synchronized float[] getStrokeColor() {
+		return strokeColor;
 	}
 
 	public synchronized void setGroup(ShapeGroup group) {
@@ -169,10 +172,6 @@ public abstract class Shape extends Drawable {
 		}
 		this.group = group;
 		group.add(this);
-	}
-
-	public synchronized ShapeGroup getGroup() {
-		return group;
 	}
 
 	public synchronized void setPosition(float x, float y) {
@@ -200,5 +199,9 @@ public abstract class Shape extends Drawable {
 		if (shouldDraw) {
 			group.draw();
 		}
+	}
+
+	public void destroy() {
+		group.remove(this);
 	}
 }

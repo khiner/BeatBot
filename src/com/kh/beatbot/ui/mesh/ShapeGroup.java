@@ -6,7 +6,7 @@ import com.kh.beatbot.ui.view.View;
 
 public class ShapeGroup {
 
-	public MeshGroup fillGroup, strokeGroup;
+	protected MeshGroup fillGroup, strokeGroup;
 	private int strokeWeight = 0;
 
 	public ShapeGroup() {

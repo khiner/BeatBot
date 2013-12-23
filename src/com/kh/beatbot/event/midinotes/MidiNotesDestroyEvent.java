@@ -25,7 +25,7 @@ public class MidiNotesDestroyEvent extends MidiNotesEvent {
 	}
 
 	private void destroyMidiNote(MidiNote midiNote) {
-		midiNote.getRectangle().getGroup().remove(midiNote.getRectangle());
+		midiNote.getRectangle().destroy();
 		Track track = TrackManager.getTrack(midiNote.getNoteValue());
 		track.removeNote(midiNote);
 	}

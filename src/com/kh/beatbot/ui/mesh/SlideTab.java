@@ -5,8 +5,14 @@ import com.kh.beatbot.ui.view.View;
 
 public class SlideTab extends Shape {
 
+	private static RoundedRect roundedRect = (RoundedRect) Shape.get(
+			Type.ROUNDED_RECT, null, Colors.LABEL_SELECTED, null);
+
 	private float cornerRadius = 12;
-	private RoundedRect roundedRect;
+
+	protected SlideTab(ShapeGroup group, float[] fillColor, float[] strokeColor) {
+		super(group, fillColor, strokeColor);
+	}
 
 	protected int getNumFillVertices() {
 		return RoundedRect.NUM_CORNER_VERTICES * 5 * 3 * 2;
@@ -14,12 +20,6 @@ public class SlideTab extends Shape {
 
 	protected int getNumStrokeVertices() {
 		return 0;
-	}
-
-	public SlideTab(ShapeGroup group) {
-		super(group);
-		roundedRect = (RoundedRect) Shape.get(Type.ROUNDED_RECT, group,
-				Colors.LABEL_SELECTED, null);
 	}
 
 	@Override
@@ -30,17 +30,17 @@ public class SlideTab extends Shape {
 		roundedRect.layout(x + View.mainPage.width - cornerRadius * 2, y,
 				width, height);
 
-		for (int i = roundedRect.fillMesh.parentVertexIndex; i < roundedRect.fillMesh.numVertices; i++) {
-			fillVertex(roundedRect.fillMesh.group.getVertexX(i),
-					roundedRect.fillMesh.group.getVertexY(i));
+		for (int i = 0; i < roundedRect.getNumFillVertices(); i++) {
+			fillVertex(roundedRect.getFillVertexX(i),
+					roundedRect.getFillVertexY(i));
 		}
 
 		roundedRect.setCornerRadius(cornerRadius);
 		roundedRect.layout(x, y, View.mainPage.width, View.mainPage.height - y);
 
-		for (int i = roundedRect.fillMesh.parentVertexIndex; i < roundedRect.fillMesh.numVertices; i++) {
-			fillVertex(roundedRect.fillMesh.group.getVertexX(i),
-					roundedRect.fillMesh.group.getVertexY(i));
+		for (int i = 0; i < roundedRect.getNumFillVertices(); i++) {
+			fillVertex(roundedRect.getFillVertexX(i),
+					roundedRect.getFillVertexY(i));
 		}
 
 		float theta = ¹, addX, addY;

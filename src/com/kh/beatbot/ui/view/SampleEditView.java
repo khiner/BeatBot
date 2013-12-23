@@ -58,7 +58,7 @@ public class SampleEditView extends ControlView2dBase {
 	private void updateLoopSelectionVbs() {
 		float beginX = levelToX(params[0].viewLevel);
 		float endX = levelToX(params[1].viewLevel);
-		waveformShape.updateLoopSelection(beginX, endX);
+		waveformShape.setLoopPoints(beginX, endX);
 		loopSelectionRects[0].setPosition(beginX - X_OFFSET, 0);
 		loopSelectionRects[1].setPosition(endX - X_OFFSET, 0);
 	}

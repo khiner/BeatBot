@@ -344,7 +344,7 @@ public class MidiView extends ClickableView {
 		initAllVbs();
 		TickWindowHelper.setYOffset(TickWindowHelper.getYOffset());
 		for (MidiNote note : track.getMidiNotes()) {
-			note.getRectangle().getGroup().remove(note.getRectangle());
+			note.getRectangle().destroy();
 		}
 		updateNoteRects();
 	}
@@ -485,7 +485,7 @@ public class MidiView extends ClickableView {
 
 		Rectangle rect = makeRectangle(whichRectangleGroup(note), x1, y1, width,
 				trackHeight, whichColor(note), Colors.BLACK);
-		rect.getGroup().remove(rect);
+		rect.destroy();
 		return rect;
 	}
 
@@ -498,7 +498,6 @@ public class MidiView extends ClickableView {
 			float width, float height, float[] fillColor, float[] outlineColor) {
 		Rectangle newRect = (Rectangle) Shape.get(Shape.Type.RECTANGLE, group,
 				fillColor, outlineColor);
-		newRect.getGroup().add(newRect);
 		newRect.layout(x1, y1, width, height);
 		return newRect;
 	}

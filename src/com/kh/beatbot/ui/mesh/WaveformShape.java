@@ -59,7 +59,7 @@ public class WaveformShape extends Shape {
 		update();
 	}
 
-	public void updateLoopSelection(float beginX, float endX) {
+	public void setLoopPoints(float beginX, float endX) {
 		loopBeginX = beginX;
 		loopEndX = endX;
 		update();
