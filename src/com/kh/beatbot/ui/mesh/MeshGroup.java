@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.mesh;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -14,8 +15,8 @@ import com.kh.beatbot.ui.view.View;
 public class MeshGroup {
 	private List<Mesh2D> children = new ArrayList<Mesh2D>();
 	private FloatBuffer vertexBuffer, colorBuffer;
-	private float[] vertices;
-	private float[] colors;
+	private float[] vertices = new float[0];
+	private float[] colors = new float[0];
 	private int vertexHandle = -1, colorHandle = -1, numVertices = -1;
 	private int primitiveType;
 	private boolean dirty = false;
@@ -60,8 +61,10 @@ public class MeshGroup {
 		if (mesh == null) {
 			return;
 		}
+		mesh.parentVertexIndex = getNumVertices();
 		children.add(mesh);
 		updateVertices();
+		updateVertices(mesh);
 	}
 
 	public synchronized void remove(Mesh2D mesh) {
@@ -71,10 +74,24 @@ public class MeshGroup {
 			Log.e("MeshGroup",
 					"Attempting to remove a mesh that is not a child.");
 			return;
-		} else {
-			children.remove(mesh);
-			updateVertices();
 		}
+		children.remove(mesh);
+		
+		for (int i = mesh.parentVertexIndex; i < numVertices - mesh.numVertices; i++) {
+			vertices[i * 2] = vertices[(i + mesh.numVertices) * 2];
+			vertices[i * 2 + 1] = vertices[(i + mesh.numVertices) * 2 + 1];
+			colors[i * 4] = colors[(i + mesh.numVertices) * 4];
+			colors[i * 4 + 1] = colors[(i + mesh.numVertices) * 4 + 1];
+			colors[i * 4 + 2] = colors[(i + mesh.numVertices) * 4 + 2];
+			colors[i * 4 + 3] = colors[(i + mesh.numVertices) * 4 + 3];
+		}
+
+		int currVertexIndex = 0;
+		for (Mesh2D child : children) {
+			child.parentVertexIndex = currVertexIndex;
+			currVertexIndex += child.getNumVertices();
+		}
+		updateVertices();
 	}
 
 	public synchronized void replace(Mesh2D oldMesh, Mesh2D newMesh) {
@@ -103,20 +120,13 @@ public class MeshGroup {
 	}
 
 	private synchronized void updateVertices() {
-		numVertices = calcNumVertices();
+		numVertices = getNumVertices();
 
-		vertices = new float[numVertices * 2];
+		vertices = Arrays.copyOf(vertices, numVertices * 2);
 		vertexBuffer = FloatBuffer.wrap(vertices);
 
-		colors = new float[numVertices * 4];
+		colors = Arrays.copyOf(colors, numVertices * 4);
 		colorBuffer = FloatBuffer.wrap(colors);
-
-		int currVertexIndex = 0;
-		for (Mesh2D child : children) {
-			child.parentVertexIndex = currVertexIndex;
-			currVertexIndex += child.getNumVertices();
-			updateVertices(child);
-		}
 	}
 
 	public synchronized void updateVertices(Mesh2D child) {
@@ -168,7 +178,7 @@ public class MeshGroup {
 		colorHandle = buffer[0];
 	}
 
-	private int calcNumVertices() {
+	private int getNumVertices() {
 		int totalVertices = 0;
 		for (Mesh2D child : children) {
 			totalVertices += child.getNumVertices();
