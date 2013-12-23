@@ -21,14 +21,7 @@ public class Mesh2D {
 		this.numVertices = numVertices;
 		vertices = new float[numVertices * 2];
 		colors = new float[numVertices * 4];
-		setColor(color);
-	}
-
-	public void vertex(float x, float y) {
-		int vertexOffset = index * 2;
-		vertices[vertexOffset] = x;
-		vertices[vertexOffset + 1] = y;
-		index++;
+		this.color = color;
 	}
 
 	/**
@@ -60,19 +53,8 @@ public class Mesh2D {
 		return vertices;
 	}
 
-	/** set all vertices to this color **/
 	public void setColor(float[] color) {
 		this.color = color;
-		for (int i = 0; i < numVertices; i++) {
-			setColor(i, color);
-		}
-	}
-
-	public void setColor(int index, float[] color) {
-		this.colors[index * 4] = color[0];
-		this.colors[index * 4 + 1] = color[1];
-		this.colors[index * 4 + 2] = color[2];
-		this.colors[index * 4 + 3] = color[3];
 	}
 
 	public float[] getColor() {

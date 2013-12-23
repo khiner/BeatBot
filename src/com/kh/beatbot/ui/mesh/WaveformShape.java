@@ -34,16 +34,19 @@ public class WaveformShape extends Shape {
 		fillVertex(loopEndX, 0);
 		fillVertex(loopEndX, height);
 
-		for (int x = 0; x < numSamples; x++) {
-			float percent = (float) x / numSamples;
+		for (int s = 0; s < numSamples; s++) {
+			float percent = (float) s / numSamples;
 			int sampleIndex = (int) (offset + percent * numFloats);
 			float sample = TrackManager.currTrack.getSample(sampleIndex, 0);
 
-			strokeVertex(percent * width + xOffset, height * (1 - sample) / 2);
-		}
-
-		for (int i = (int) numSamples - 1; i >= 0 && i < getNumStrokeVertices(); i++) {
-			getStrokeMesh().setColor(i, Colors.TRANSPARANT);
+			float x = percent * width + xOffset;
+			float y = height * (1 - sample) / 2;
+			
+			if (s > numSamples - 2) {
+				strokeVertex(x, y, Colors.TRANSPARANT);
+			} else {
+				strokeVertex(x, y);
+			}
 		}
 	}
 

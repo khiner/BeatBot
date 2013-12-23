@@ -65,13 +65,25 @@ public abstract class Shape extends Drawable {
 
 	protected synchronized void fillVertex(float x, float y) {
 		if (fillMesh != null) {
-			fillMesh.vertex(x, y);
+			fillMesh.vertex(x, y, fillMesh.getColor());
+		}
+	}
+
+	protected synchronized void fillVertex(float x, float y, float[] color) {
+		if (fillMesh != null) {
+			fillMesh.vertex(x, y, color);
 		}
 	}
 
 	protected synchronized void strokeVertex(float x, float y) {
 		if (strokeMesh != null) {
-			strokeMesh.vertex(x, y);
+			strokeMesh.vertex(x, y, strokeMesh.getColor());
+		}
+	}
+	
+	protected synchronized void strokeVertex(float x, float y, float[] color) {
+		if (strokeMesh != null) {
+			strokeMesh.vertex(x, y, color);
 		}
 	}
 

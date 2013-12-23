@@ -128,14 +128,18 @@ public class MeshGroup {
 			return;
 		}
 		dirty = true;
+
 		int vertexIndex = child.parentVertexIndex * 2;
 		for (float vertex : child.vertices) {
 			vertices[vertexIndex++] = vertex;
 		}
 
-		int colorIndex = child.parentVertexIndex * 4;
-		for (float colorValue : child.colors) {
-			colors[colorIndex++] = colorValue;
+		int colorIndex = child.parentVertexIndex;
+		for (int i = colorIndex; i < colorIndex + child.numVertices; i++) {
+			colors[i * 4] = child.getColor()[0];
+			colors[i * 4 + 1] = child.getColor()[1];
+			colors[i * 4 + 2] = child.getColor()[2];
+			colors[i * 4 + 3] = child.getColor()[3];
 		}
 	}
 
