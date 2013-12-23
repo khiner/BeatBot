@@ -24,21 +24,23 @@ public class SlideTab extends Shape {
 
 	@Override
 	protected void updateVertices() {
+		if (View.mainPage == null)
+			return;
 		roundedRect.setCornerRadius(cornerRadius);
 		roundedRect.layout(x + View.mainPage.width - cornerRadius * 2, y,
 				width, height);
 
-		float[] vertices = roundedRect.getFillMesh().vertices;
-		for (int i = 0; i < vertices.length / 2; i++) {
-			fillVertex(vertices[i * 2], vertices[i * 2 + 1]);
+		for (int i = roundedRect.fillMesh.parentVertexIndex; i < roundedRect.fillMesh.numVertices; i++) {
+			fillVertex(roundedRect.fillMesh.group.getVertexX(i),
+					roundedRect.fillMesh.group.getVertexY(i));
 		}
 
 		roundedRect.setCornerRadius(cornerRadius);
 		roundedRect.layout(x, y, View.mainPage.width, View.mainPage.height - y);
 
-		vertices = roundedRect.getFillMesh().vertices;
-		for (int i = 0; i < vertices.length / 2; i++) {
-			fillVertex(vertices[i * 2], vertices[i * 2 + 1]);
+		for (int i = roundedRect.fillMesh.parentVertexIndex; i < roundedRect.fillMesh.numVertices; i++) {
+			fillVertex(roundedRect.fillMesh.group.getVertexX(i),
+					roundedRect.fillMesh.group.getVertexY(i));
 		}
 
 		float theta = ¹, addX, addY;

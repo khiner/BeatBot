@@ -9,7 +9,7 @@ public abstract class Shape extends Drawable {
 
 	public static final float ¹ = (float) Math.PI;
 
-	private Mesh2D fillMesh, strokeMesh;
+	public Mesh2D fillMesh, strokeMesh;
 	protected ShapeGroup group;
 	protected boolean shouldDraw;
 
@@ -107,14 +107,13 @@ public abstract class Shape extends Drawable {
 		if (!group.contains(this)) {
 			group.add(this);
 		} else {
-			group.update(this);
+			update();
 		}
 	}
 
 	protected synchronized void update() {
 		resetIndices();
 		updateVertices();
-		updateGroup();
 	}
 
 	public synchronized void setFillColor(float[] fillColor) {

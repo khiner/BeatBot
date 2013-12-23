@@ -6,8 +6,6 @@ package com.kh.beatbot.ui.mesh;
 public class Mesh2D {
 
 	protected MeshGroup group;
-
-	protected float vertices[], colors[];
 	private float color[];
 
 	/** vertex index at which the next vertex gets inserted (and parent) **/
@@ -17,11 +15,14 @@ public class Mesh2D {
 	protected int numVertices = 0;
 
 	public Mesh2D(MeshGroup group, int numVertices, float[] color) {
-		this.group = group;
 		this.numVertices = numVertices;
-		vertices = new float[numVertices * 2];
-		colors = new float[numVertices * 4];
 		this.color = color;
+		setGroup(group);
+	}
+
+	public void setGroup(MeshGroup group) {
+		this.group = group;
+		group.add(this);
 	}
 
 	/**
@@ -34,23 +35,12 @@ public class Mesh2D {
 	 *            the y coordinate
 	 */
 	public void vertex(float x, float y, float[] color) {
-		int vertexOffset = index * 2;
-		int colorOffset = index * 4;
-		vertices[vertexOffset] = x;
-		vertices[vertexOffset + 1] = y;
-		colors[colorOffset] = color[0];
-		colors[colorOffset + 1] = color[1];
-		colors[colorOffset + 2] = color[2];
-		colors[colorOffset + 3] = color[3];
+		group.vertex(parentVertexIndex + index, x, y, color);
 		index++;
 	}
 
 	public int getNumVertices() {
 		return numVertices;
-	}
-
-	public float[] getVertices() {
-		return vertices;
 	}
 
 	public void setColor(float[] color) {
@@ -63,8 +53,7 @@ public class Mesh2D {
 
 	public void translate(float x, float y) {
 		for (int i = 0; i < numVertices; i++) {
-			vertices[i * 2] += x;
-			vertices[i * 2 + 1] += y;
+			group.translate(i + parentVertexIndex, x, y);
 		}
 	}
 }

@@ -25,6 +25,32 @@ public class MeshGroup {
 		this.primitiveType = primitiveType;
 	}
 
+	protected float getVertexX(int index) {
+		return vertices[index * 2];
+	}
+	
+	protected float getVertexY(int index) {
+		return vertices[index * 2 + 1];
+	}
+
+	protected void vertex(int index, float x, float y, float[] color) {
+		dirty = true;
+		int vertexOffset = index * 2;
+		int colorOffset = index * 4;
+		vertices[vertexOffset] = x;
+		vertices[vertexOffset + 1] = y;
+		colors[colorOffset] = color[0];
+		colors[colorOffset + 1] = color[1];
+		colors[colorOffset + 2] = color[2];
+		colors[colorOffset + 3] = color[3];
+	}
+
+	protected void translate(int index, float x, float y) {
+		dirty = true;
+		vertices[index * 2] += x;
+		vertices[index * 2 + 1] += y;
+	}
+
 	public void setPrimitiveType(int primitiveType) {
 		this.primitiveType = primitiveType;
 	}
@@ -58,7 +84,7 @@ public class MeshGroup {
 	}
 
 	public synchronized void add(Mesh2D mesh) {
-		if (mesh == null) {
+		if (mesh == null || children.contains(mesh)) {
 			return;
 		}
 		mesh.parentVertexIndex = getNumVertices();
@@ -125,30 +151,6 @@ public class MeshGroup {
 
 		colors = Arrays.copyOf(colors, numVertices * 4);
 		colorBuffer = FloatBuffer.wrap(colors);
-	}
-
-	public synchronized void updateVertices(Mesh2D child) {
-		if (child == null) {
-			return;
-		} else if (!children.contains(child)) {
-			Log.e("MeshGroup",
-					"Attempting to update a mesh that is not a child.");
-			return;
-		}
-		dirty = true;
-		
-		int vertexIndex = child.parentVertexIndex * 2;
-		for (float vertex : child.vertices) {
-			vertices[vertexIndex++] = vertex;
-		}
-
-		int colorIndex = child.parentVertexIndex;
-		for (int i = colorIndex; i < colorIndex + child.numVertices; i++) {
-			colors[i * 4] = child.getColor()[0];
-			colors[i * 4 + 1] = child.getColor()[1];
-			colors[i * 4 + 2] = child.getColor()[2];
-			colors[i * 4 + 3] = child.getColor()[3];
-		}
 	}
 
 	private synchronized void updateBuffers() {

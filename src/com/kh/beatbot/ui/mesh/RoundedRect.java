@@ -18,6 +18,9 @@ public class RoundedRect extends Shape {
 	}
 
 	protected synchronized void updateVertices() {
+		if (width == 0.0f || height == 0.0f) {
+			return;
+		}
 		roundThresh = cornerRadius / 20;
 		float theta = 0, addX, addY, vertexX, vertexY;
 		float centerX = x + width / 2;
