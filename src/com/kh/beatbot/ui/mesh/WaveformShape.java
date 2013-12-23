@@ -20,7 +20,7 @@ public class WaveformShape extends Shape {
 
 	public WaveformShape(ShapeGroup group, float width) {
 		super(group);
-		this.group.setOutlinePrimitiveType(GL10.GL_LINE_STRIP);
+		this.group.setStrokePrimitiveType(GL10.GL_LINE_STRIP);
 		this.width = width;
 	}
 

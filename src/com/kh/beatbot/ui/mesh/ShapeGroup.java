@@ -6,12 +6,12 @@ import com.kh.beatbot.ui.view.View;
 
 public class ShapeGroup {
 
-	private MeshGroup fillGroup, outlineGroup;
+	public MeshGroup fillGroup, strokeGroup;
 	private int strokeWeight = 0;
 
 	public ShapeGroup() {
 		fillGroup = new MeshGroup(GL10.GL_TRIANGLES);
-		outlineGroup = new MeshGroup(GL10.GL_LINES);
+		strokeGroup = new MeshGroup(GL10.GL_LINES);
 	}
 
 	public void setStrokeWeight(final int strokeWeight) {
@@ -22,8 +22,8 @@ public class ShapeGroup {
 		fillGroup.setPrimitiveType(primitiveType);
 	}
 
-	public void setOutlinePrimitiveType(int primitiveType) {
-		outlineGroup.setPrimitiveType(primitiveType);
+	public void setStrokePrimitiveType(int primitiveType) {
+		strokeGroup.setPrimitiveType(primitiveType);
 	}
 
 	public void draw(View parent, int borderWeight) {
@@ -36,7 +36,7 @@ public class ShapeGroup {
 	public void draw() {
 		fillGroup.draw();
 		View.gl.glLineWidth(strokeWeight);
-		outlineGroup.draw();
+		strokeGroup.draw();
 	}
 
 	public boolean contains(Shape shape) {
@@ -44,20 +44,20 @@ public class ShapeGroup {
 			return false;
 		}
 		return fillGroup.contains(shape.getFillMesh())
-				|| outlineGroup.contains(shape.getStrokeMesh());
+				|| strokeGroup.contains(shape.getStrokeMesh());
 	}
 
 	public void add(Shape shape) {
 		if (shape != null) {
 			fillGroup.add(shape.getFillMesh());
-			outlineGroup.add(shape.getStrokeMesh());
+			strokeGroup.add(shape.getStrokeMesh());
 		}
 	}
 
 	public void remove(Shape shape) {
 		if (shape != null) {
 			fillGroup.remove(shape.getFillMesh());
-			outlineGroup.remove(shape.getStrokeMesh());
+			strokeGroup.remove(shape.getStrokeMesh());
 		}
 	}
 
@@ -71,17 +71,17 @@ public class ShapeGroup {
 			return;
 		}
 		fillGroup.replace(oldShape.getFillMesh(), newShape.getFillMesh());
-		outlineGroup
+		strokeGroup
 				.replace(oldShape.getStrokeMesh(), newShape.getStrokeMesh());
 	}
 
 	public void update(Shape shape) {
 		fillGroup.updateVertices(shape.getFillMesh());
-		outlineGroup.updateVertices(shape.getStrokeMesh());
+		strokeGroup.updateVertices(shape.getStrokeMesh());
 	}
 
 	public void clear() {
 		fillGroup.clear();
-		outlineGroup.clear();
+		strokeGroup.clear();
 	}
 }

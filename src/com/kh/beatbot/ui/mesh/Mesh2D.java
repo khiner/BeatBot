@@ -5,6 +5,8 @@ package com.kh.beatbot.ui.mesh;
  */
 public class Mesh2D {
 
+	protected MeshGroup group;
+
 	protected float vertices[], colors[];
 	private float color[];
 
@@ -14,7 +16,8 @@ public class Mesh2D {
 	/** number of vertices defined for the mesh **/
 	protected int numVertices = 0;
 
-	public Mesh2D(int numVertices, float[] color) {
+	public Mesh2D(MeshGroup group, int numVertices, float[] color) {
+		this.group = group;
 		this.numVertices = numVertices;
 		vertices = new float[numVertices * 2];
 		colors = new float[numVertices * 4];

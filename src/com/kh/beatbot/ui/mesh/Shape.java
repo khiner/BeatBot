@@ -20,13 +20,13 @@ public abstract class Shape extends Drawable {
 		} else {
 			Shape shape = create(type, group);
 			if (fillColor != null) {
-				shape.fillMesh = new Mesh2D(shape.getNumFillVertices(),
-						fillColor);
+				shape.fillMesh = new Mesh2D(shape.group.fillGroup,
+						shape.getNumFillVertices(), fillColor);
 			}
 			if (strokeColor != null) {
-				shape.strokeMesh = new Mesh2D(shape.getNumStrokeVertices(),
-						strokeColor);
-				
+				shape.strokeMesh = new Mesh2D(shape.group.strokeGroup,
+						shape.getNumStrokeVertices(), strokeColor);
+
 			}
 			shape.updateGroup();
 			return shape;
@@ -50,9 +50,10 @@ public abstract class Shape extends Drawable {
 	public static WaveformShape createWaveform(ShapeGroup group, float width,
 			float[] fillColor, float[] strokeColor) {
 		Shape waveform = new WaveformShape(group, width);
-		waveform.fillMesh = new Mesh2D(waveform.getNumFillVertices(), fillColor);
-		waveform.strokeMesh = new Mesh2D(waveform.getNumStrokeVertices(),
-				strokeColor);
+		waveform.fillMesh = new Mesh2D(waveform.group.fillGroup,
+				waveform.getNumFillVertices(), fillColor);
+		waveform.strokeMesh = new Mesh2D(waveform.group.strokeGroup,
+				waveform.getNumStrokeVertices(), strokeColor);
 		return (WaveformShape) waveform;
 	}
 
