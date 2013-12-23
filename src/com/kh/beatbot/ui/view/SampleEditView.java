@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.manager.TrackManager;
@@ -46,7 +47,7 @@ public class SampleEditView extends ControlView2dBase {
 	public synchronized void update() {
 		if (params[0] == null && params[1] == null)
 			return;
-		setLevel(1, 0);
+		setLevel(0, 1);
 		updateLoopSelectionVbs();
 	}
 
@@ -83,17 +84,17 @@ public class SampleEditView extends ControlView2dBase {
 			newLevelWidth = newLevelWidth <= 1 ? (newLevelWidth >= minLoopWindow ? newLevelWidth
 					: minLoopWindow)
 					: 1;
-			setLevel(newLevelWidth, 0);
+			setLevel(0, newLevelWidth);
 		} else if (newLevelWidth > 1) {
-			setLevel(1 - newLevelOffset, newLevelOffset);
+			setLevel(newLevelOffset, 1 - newLevelOffset);
 		} else if (newLevelWidth < minLoopWindow) {
-			setLevel(minLoopWindow, newLevelOffset);
+			setLevel(newLevelOffset, minLoopWindow);
 		} else if (newLevelOffset + newLevelWidth > 1) {
 			newLevelWidth = ((ZLAL - 1) * waveformWidth)
 					/ (x1 - X_OFFSET - waveformWidth);
-			setLevel(newLevelWidth, 1 - newLevelWidth);
+			setLevel(1 - newLevelWidth, newLevelWidth);
 		} else {
-			setLevel(newLevelWidth, newLevelOffset);
+			setLevel(newLevelOffset, newLevelWidth);
 		}
 		updateLoopSelectionVbs();
 	}
@@ -184,18 +185,18 @@ public class SampleEditView extends ControlView2dBase {
 			params[0].setLevel(xToLevel(x));
 			// update ui to fit the new begin point
 			if (beginLevel < levelOffset) {
-				setLevel(levelWidth + levelOffset - beginLevel, beginLevel);
+				setLevel(beginLevel, levelWidth + levelOffset - beginLevel);
 			} else if (beginLevel > levelOffset + levelWidth) {
-				setLevel(beginLevel - levelOffset, levelOffset);
+				setLevel(levelOffset, beginLevel - levelOffset);
 			}
 		} else if (id == endLoopPointerId) {
 			// update track loop end
 			params[1].setLevel(xToLevel(x));
 			// update ui to fit the new end point
 			if (endLevel > levelOffset + levelWidth) {
-				setLevel(endLevel - levelOffset, levelOffset);
+				setLevel(levelOffset, endLevel - levelOffset);
 			} else if (endLevel < levelOffset) {
-				setLevel(levelWidth + levelOffset - endLevel, endLevel);
+				setLevel(endLevel, levelWidth + levelOffset - endLevel);
 			}
 		} else {
 			return false;
@@ -221,9 +222,9 @@ public class SampleEditView extends ControlView2dBase {
 		return true;
 	}
 
-	private void setLevel(float levelWidth, float levelOffset) {
-		this.levelWidth = levelWidth;
+	private void setLevel(float levelOffset, float levelWidth) {
 		this.levelOffset = levelOffset;
+		this.levelWidth = levelWidth;
 		updateWaveformVb();
 	}
 
@@ -238,12 +239,10 @@ public class SampleEditView extends ControlView2dBase {
 
 		// set levelOffset such that the scroll anchor level stays under
 		// scrollX
-		float newLevelOffset = scrollAnchorLevel - xToLevel(scrollX)
-				+ levelOffset;
-		newLevelOffset = newLevelOffset < 0 ? 0
-				: (newLevelOffset + levelWidth > 1 ? 1 - levelWidth
-						: newLevelOffset);
-		setLevel(levelWidth, newLevelOffset);
+		float newLevelOffset = GeneralUtils.clipTo(scrollAnchorLevel
+				- xToLevel(scrollX) + levelOffset, 0, 1 - levelWidth);
+		setLevel(newLevelOffset, levelWidth);
+		updateLoopSelectionVbs();
 	}
 
 	@Override
@@ -339,8 +338,8 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	protected float xToLevel(float x) {
-		return (x - X_OFFSET)
-				* checkedDivide(levelWidth, waveformWidth + levelOffset);
+		return (x - X_OFFSET) * checkedDivide(levelWidth, waveformWidth)
+				+ levelOffset;
 	}
 
 	@Override
