@@ -25,15 +25,11 @@ public class WaveformShape extends Shape {
 	}
 
 	protected void updateVertices() {
-		// fill triangle 1
-		fillVertex(loopBeginX, 0);
-		fillVertex(loopEndX, 0);
-		fillVertex(loopBeginX, height);
-		// fill triangle 2
-		fillVertex(loopBeginX, height);
-		fillVertex(loopEndX, 0);
-		fillVertex(loopEndX, height);
+		updateLoopSelectionVertices();
+		updateWaveformVertices();
+	}
 
+	private void updateWaveformVertices() {
 		for (int s = 0; s < numSamples; s++) {
 			float percent = (float) s / numSamples;
 			int sampleIndex = (int) (offset + percent * numFloats);
@@ -50,18 +46,31 @@ public class WaveformShape extends Shape {
 		}
 	}
 
+	private void updateLoopSelectionVertices() {
+		// fill triangle 1
+		fillVertex(loopBeginX, 0);
+		fillVertex(loopEndX, 0);
+		fillVertex(loopBeginX, height);
+		// fill triangle 2
+		fillVertex(loopBeginX, height);
+		fillVertex(loopEndX, 0);
+		fillVertex(loopEndX, height);
+	}
+
 	public void update(long offset, long numFloats, float xOffset) {
 		this.offset = offset;
 		this.numFloats = numFloats;
 		this.xOffset = xOffset;
 		float spp = Math.min(1, numFloats / width);
 		numSamples = (int) (width * spp);
-		update();
+		resetIndices();
+		updateWaveformVertices();
 	}
 
 	public void setLoopPoints(float beginX, float endX) {
 		loopBeginX = beginX;
 		loopEndX = endX;
-		update();
+		resetIndices();
+		updateLoopSelectionVertices();
 	}
 }
