@@ -64,7 +64,6 @@ public class MeshGroup {
 		mesh.parentVertexIndex = getNumVertices();
 		children.add(mesh);
 		updateVertices();
-		updateVertices(mesh);
 	}
 
 	public synchronized void remove(Mesh2D mesh) {
@@ -116,7 +115,6 @@ public class MeshGroup {
 
 		newMesh.parentVertexIndex = oldMesh.parentVertexIndex;
 		children.set(children.indexOf(oldMesh), newMesh);
-		updateVertices(newMesh);
 	}
 
 	private synchronized void updateVertices() {

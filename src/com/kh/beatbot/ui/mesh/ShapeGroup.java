@@ -48,10 +48,12 @@ public class ShapeGroup {
 	}
 
 	public void add(Shape shape) {
-		if (shape != null) {
-			fillGroup.add(shape.getFillMesh());
-			strokeGroup.add(shape.getStrokeMesh());
-		}
+		if (shape == null)
+			return;
+		fillGroup.add(shape.getFillMesh());
+		strokeGroup.add(shape.getStrokeMesh());
+		fillGroup.updateVertices(shape.getFillMesh());
+		strokeGroup.updateVertices(shape.getStrokeMesh());
 	}
 
 	public void remove(Shape shape) {
@@ -71,8 +73,16 @@ public class ShapeGroup {
 			return;
 		}
 		fillGroup.replace(oldShape.getFillMesh(), newShape.getFillMesh());
-		strokeGroup
-				.replace(oldShape.getStrokeMesh(), newShape.getStrokeMesh());
+		strokeGroup.replace(oldShape.getStrokeMesh(), newShape.getStrokeMesh());
+
+		if (oldShape.getFillMesh() == null || newShape.getFillMesh() != null) {
+			fillGroup.updateVertices(newShape.getFillMesh());
+		}
+
+		if (oldShape.getStrokeMesh() == null
+				|| newShape.getStrokeMesh() != null) {
+			strokeGroup.updateVertices(newShape.getStrokeMesh());
+		}
 	}
 
 	public void update(Shape shape) {
