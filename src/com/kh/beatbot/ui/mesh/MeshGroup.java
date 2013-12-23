@@ -114,8 +114,8 @@ public class MeshGroup {
 		int currVertexIndex = 0;
 		for (Mesh2D child : children) {
 			child.parentVertexIndex = currVertexIndex;
-			updateVertices(child);
 			currVertexIndex += child.getNumVertices();
+			updateVertices(child);
 		}
 	}
 
@@ -128,7 +128,7 @@ public class MeshGroup {
 			return;
 		}
 		dirty = true;
-
+		
 		int vertexIndex = child.parentVertexIndex * 2;
 		for (float vertex : child.vertices) {
 			vertices[vertexIndex++] = vertex;
@@ -141,11 +141,6 @@ public class MeshGroup {
 			colors[i * 4 + 2] = child.getColor()[2];
 			colors[i * 4 + 3] = child.getColor()[3];
 		}
-	}
-
-	public synchronized void clear() {
-		children.clear();
-		updateVertices();
 	}
 
 	private synchronized void updateBuffers() {

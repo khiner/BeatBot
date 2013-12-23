@@ -79,9 +79,4 @@ public class ShapeGroup {
 		fillGroup.updateVertices(shape.getFillMesh());
 		strokeGroup.updateVertices(shape.getStrokeMesh());
 	}
-
-	public void clear() {
-		fillGroup.clear();
-		strokeGroup.clear();
-	}
 }
