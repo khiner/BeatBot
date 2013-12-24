@@ -1,7 +1,5 @@
 package com.kh.beatbot.ui.mesh;
 
-import javax.microedition.khronos.opengles.GL10;
-
 import android.util.SparseArray;
 
 import com.kh.beatbot.manager.TrackManager;
@@ -11,10 +9,9 @@ public class WaveformShape extends Shape {
 	private long offsetInSamples, widthInSamples;
 	private float xOffset, numSamples, loopBeginX, loopEndX;
 	private SparseArray<Float> sampleBuffer = new SparseArray<Float>();
-
+	
 	public WaveformShape(ShapeGroup group, float width) {
 		super(group);
-		this.group.setStrokePrimitiveType(GL10.GL_LINE_STRIP);
 		this.width = width;
 	}
 
@@ -23,7 +20,7 @@ public class WaveformShape extends Shape {
 	}
 
 	protected int getNumStrokeVertices() {
-		return (int) (width * 3 * MAX_SPP);
+		return (int) (width * MAX_SPP * 3 * 2); // 3 window-lengths, 2 vertices for each sample
 	}
 
 	/*
@@ -52,6 +49,8 @@ public class WaveformShape extends Shape {
 	}
 
 	private synchronized void updateWaveformVertices() {
+		float lastX = 0;
+		float lastY = height / 2;
 		for (int i = 0; i < sampleBuffer.size(); i++) {
 			int sampleIndex = sampleBuffer.keyAt(i);
 			float sample = sampleBuffer.get(sampleIndex);
@@ -62,6 +61,9 @@ public class WaveformShape extends Shape {
 			float y = height * (1 - sample) / 2;
 
 			strokeVertex(x, y);
+			strokeVertex(lastX, lastY);
+			lastX = x;
+			lastY = y;
 		}
 		while (strokeMesh.index < strokeMesh.numVertices) {
 			strokeVertex(Float.MAX_VALUE, height / 2);
