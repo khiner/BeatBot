@@ -38,6 +38,8 @@ public abstract class View implements Comparable<View> {
 	public static EffectPage effectPage;
 
 	public static final float ¹ = (float) Math.PI, CIRCLE_RADIUS = 100;
+	public static final float BG_OFFSET = 4;
+
 	public static GL11 gl;
 	public static GLSurfaceViewBase root;
 	public static Typeface font;
@@ -68,7 +70,7 @@ public abstract class View implements Comparable<View> {
 	protected boolean shouldClip = true;
 
 	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0,
-			borderHeight = 0, borderOffset = 0;
+			borderHeight = 0;
 
 	// just scale and translate this circle to draw any circle for efficiency
 	private static FloatBuffer circleVb = null;
@@ -257,15 +259,14 @@ public abstract class View implements Comparable<View> {
 	private void layoutBgRect() {
 		if (bgRect == null)
 			return;
-		borderOffset = 4; // TODO should be a ratio
 		if (bgRect instanceof RoundedRect) {
 			((RoundedRect) bgRect).setCornerRadius(Math.max(height / 9, 10));
 		}
-		bgRect.layout(borderOffset, borderOffset, width - borderOffset * 2,
-				height - borderOffset * 2);
-		minX = minY = getBgRectRadius() + borderOffset;
-		maxX = width - getBgRectRadius() - borderOffset;
-		maxY = height - getBgRectRadius() - borderOffset;
+		bgRect.layout(BG_OFFSET, BG_OFFSET, width - BG_OFFSET
+				* 2, height - BG_OFFSET * 2);
+		minX = minY = getBgRectRadius() + BG_OFFSET;
+		maxX = width - getBgRectRadius() - BG_OFFSET;
+		maxY = height - getBgRectRadius() - BG_OFFSET;
 		borderWidth = width - 2 * minX;
 		borderHeight = height - 2 * minY;
 	}

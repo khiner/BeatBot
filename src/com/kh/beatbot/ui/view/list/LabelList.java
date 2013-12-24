@@ -159,16 +159,16 @@ public class LabelList extends ClickableView implements OnPressListener,
 
 	@Override
 	public synchronized void layoutChildren() {
-		float labelW = (width - borderOffset * 3 - (children.size() - 1)
+		float labelW = (width - BG_OFFSET * 3 - (children.size() - 1)
 				* GAP_BETWEEN_LABELS)
 				/ children.size();
 
 		Collections.sort(children); // sort children by position
-		float xTotal = 3 * borderOffset / 2;
+		float xTotal = 3 * BG_OFFSET / 2;
 		for (View label : children) {
 			if (touchedLabel == null || !label.equals(touchedLabel)) {
-				label.layout(this, xTotal, 3 * borderOffset / 2, labelW, height
-						- borderOffset * 3);
+				label.layout(this, xTotal, 3 * BG_OFFSET / 2, labelW,
+						height - BG_OFFSET * 3);
 			}
 			xTotal += labelW + GAP_BETWEEN_LABELS;
 		}

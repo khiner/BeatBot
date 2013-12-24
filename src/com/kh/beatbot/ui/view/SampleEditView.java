@@ -9,7 +9,7 @@ import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.Rectangle;
+import com.kh.beatbot.ui.mesh.RoundedRect;
 import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
@@ -118,10 +118,10 @@ public class SampleEditView extends ControlView2dBase {
 				Colors.WHITE);
 		waveformShape = Shape.createWaveform(shapeGroup, width,
 				Colors.LABEL_SELECTED, Colors.BLACK);
-		loopSelectionRects[0] = (Rectangle) Shape.get(Type.RECTANGLE,
-				shapeGroup, Colors.LABEL_SELECTED_TRANS, null);
-		loopSelectionRects[1] = (Rectangle) Shape.get(Type.RECTANGLE,
-				shapeGroup, Colors.LABEL_SELECTED_TRANS, null);
+		loopSelectionRects[0] = (RoundedRect) Shape.get(Type.ROUNDED_RECT,
+				shapeGroup, Colors.VOLUME_SELECTED, null);
+		loopSelectionRects[1] = (RoundedRect) Shape.get(Type.ROUNDED_RECT,
+				shapeGroup, Colors.VOLUME_SELECTED, null);
 		waveformShape.setStrokeWeight(2);
 		waveformWidth = width - SNAP_DIST;
 		super.layout(parent, x, y, width, height);

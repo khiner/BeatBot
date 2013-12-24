@@ -24,9 +24,9 @@ public class Seekbar2d extends ControlView2dBase {
 	}
 
 	public void setViewLevel(float x, float y) {
-		lineVb = makeFloatBuffer(new float[] { borderOffset, viewY(y),
-				width - borderOffset, viewY(y), viewX(x), borderOffset,
-				viewX(x), height - borderOffset });
+		lineVb = makeFloatBuffer(new float[] { BG_OFFSET, viewY(y),
+				width - BG_OFFSET, viewY(y), viewX(x), BG_OFFSET,
+				viewX(x), height - BG_OFFSET });
 	}
 
 	@Override
