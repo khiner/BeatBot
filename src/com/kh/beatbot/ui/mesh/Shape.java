@@ -8,7 +8,7 @@ public abstract class Shape extends Drawable {
 	};
 
 	public static final float ¹ = (float) Math.PI;
-	private Mesh2D fillMesh, strokeMesh;
+	protected Mesh2D fillMesh, strokeMesh;
 	private float[] fillColor, strokeColor;
 
 	protected ShapeGroup group;

@@ -277,6 +277,10 @@ public class Track extends BaseTrack {
 					.put(currSampleFile, new SampleParams(getFrames(id)));
 		}
 	}
+	
+	public float getNumFrames() {
+		return getFrames(id);
+	}
 
 	public void notifyNoteMoved(long oldNoteOn, long oldNoteOff,
 			long newNoteOn, long newNoteOff) {

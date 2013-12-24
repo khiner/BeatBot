@@ -49,6 +49,7 @@ public class SampleEditView extends ControlView2dBase {
 			return;
 		setLevel(0, 1);
 		updateLoopSelectionVbs();
+		waveformShape.resample();
 	}
 
 	private void updateWaveformVb() {
@@ -268,6 +269,7 @@ public class SampleEditView extends ControlView2dBase {
 			release();
 			return;
 		}
+		waveformShape.resample();
 		scrollPointerId = beginLoopPointerId = endLoopPointerId = zoomLeftPointerId = zoomRightPointerId = -1;
 		scrollAnchorLevel = zoomLeftAnchorLevel = zoomRightAnchorLevel = -1;
 	}
