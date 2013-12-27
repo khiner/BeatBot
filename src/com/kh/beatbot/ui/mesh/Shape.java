@@ -4,7 +4,7 @@ import com.kh.beatbot.ui.Drawable;
 
 public abstract class Shape extends Drawable {
 	public static enum Type {
-		RECTANGLE, ROUNDED_RECT, SLIDE_TAB
+		RECTANGLE, ROUNDED_RECT, CIRCLE, SLIDE_TAB
 	};
 
 	public static final float ¹ = (float) Math.PI;
@@ -13,7 +13,6 @@ public abstract class Shape extends Drawable {
 
 	protected ShapeGroup group;
 	private boolean shouldDraw;
-	
 
 	protected Shape(ShapeGroup group) {
 		// must draw via some parent group. if one is given, use that,
@@ -49,6 +48,8 @@ public abstract class Shape extends Drawable {
 			return new Rectangle(group, fillColor, strokeColor);
 		case ROUNDED_RECT:
 			return new RoundedRect(group, fillColor, strokeColor);
+		case CIRCLE:
+			return new Circle(group, fillColor, strokeColor);
 		case SLIDE_TAB:
 			return new SlideTab(group, fillColor, strokeColor);
 		default:
@@ -182,14 +183,27 @@ public abstract class Shape extends Drawable {
 			strokeMesh.translate(x - this.x, y - this.y);
 		}
 		super.setPosition(x, y);
-		updateGroup();
+	}
+
+	public synchronized void setDimensions(float width, float height) {
+		boolean dimChanged = width != this.width || height != this.height;
+		if (width == 0 || height == 0 || !dimChanged)
+			return;
+		super.setDimensions(width, height);
+		update();
 	}
 
 	public synchronized void layout(float x, float y, float width, float height) {
-		if (width != this.width || height != this.height) {
+		if (width == 0 || height == 0)
+			return;
+		boolean dimChanged = width != this.width || height != this.height;
+		boolean posChanged = x != this.x || y != this.y;
+		if (dimChanged && posChanged) {
 			super.layout(x, y, width, height);
 			update();
-		} else {
+		} else if (dimChanged) {
+			setDimensions(width, height);
+		} else if (posChanged) {
 			setPosition(x, y);
 		}
 	}

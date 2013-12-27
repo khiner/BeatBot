@@ -1,94 +1,60 @@
 package com.kh.beatbot.ui.view.control;
 
-import java.nio.FloatBuffer;
-
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Circle;
+import com.kh.beatbot.ui.mesh.RoundedRect;
+import com.kh.beatbot.ui.mesh.Shape;
+import com.kh.beatbot.ui.mesh.Shape.Type;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class Seekbar extends ControlView1dBase {
 
-	protected FloatBuffer levelBarVb = null;
-	protected int numLevelVertices = 0;
-	protected float levelBarHeight = 8;
-	private float middleY = 0;
-	
-	protected void initLevelBarVb() {
-		float[] vertices = new float[800];
-		for (int i = 0; i < vertices.length / 4; i++) {
-			vertices[i * 4] = ((float) i / (vertices.length / 4))
-					* (width - levelBarHeight * 4) + levelBarHeight * 2;
-			vertices[i * 4 + 1] = -levelBarHeight / 2 + height / 2;
-			vertices[i * 4 + 2] = vertices[i * 4];
-			vertices[i * 4 + 3] = levelBarHeight / 2 + height / 2;
-		}
-		levelBarVb = makeFloatBuffer(vertices);
-		middleY = levelBarVb.get(1) + levelBarHeight / 2;
-	}
-	
-	public synchronized void init() {
-		initLevelBarVb();
-		super.init();
+	private ShapeGroup shapeGroup;
+	private RoundedRect backgroundRect, foregroundRect;
+	private Circle levelCircle;
+	protected float levelBarHeight;
+
+	@Override
+	protected synchronized void createChildren() {
+		shapeGroup = new ShapeGroup();
+		backgroundRect = (RoundedRect) Shape.get(Type.ROUNDED_RECT, shapeGroup,
+				Colors.VIEW_BG, null);
+		foregroundRect = (RoundedRect) Shape.get(Type.ROUNDED_RECT, shapeGroup,
+				Colors.VOLUME, null);
+		levelCircle = (Circle) Shape.get(Type.CIRCLE, shapeGroup,
+				Colors.VOLUME, null);
 	}
 
-	protected void drawBackgroundBar() {
-		drawTriangleStrip(levelBarVb, Colors.VIEW_BG);
-		// circle at end of level for rounded edge
-		drawCircle(levelBarHeight / 2, Colors.VIEW_BG, levelBarVb.get(levelBarVb.capacity() - 2), middleY);
+	@Override
+	public void setLevelColor(float[] newLevelColor) {
+		super.setLevelColor(newLevelColor);
+		foregroundRect.setFillColor(levelColor);
+		levelCircle.setFillColor(selectColor);
 	}
 
-	protected void drawLevel() {
-		drawTriangleStrip(levelBarVb, levelColor, numLevelVertices);
-
-		// draw level-colored circle at beginning and end of level
-		drawCircle(levelBarHeight / 2, levelColor, levelBarVb.get(0), middleY);
-		drawCircle(levelBarHeight / 2, levelColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
-
-		drawLevelSelectionCircle();
-	}
-
-	protected void drawTouchedLevelSelectionCircle() {
-		selectColor[3] = .7f;
-		drawCircle(3 * levelBarHeight / 2, selectColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
-		selectColor[3] = .5f;
-		for (int i = (int) (5 * levelBarHeight / 4); i < levelBarHeight * 2; i += 2) {
-			drawCircle(i, selectColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
-		}
-	}
-
-	protected void drawLevelSelectionCircle() {
-		// draw bigger, translucent 'selection' circle at end of level
-		if (selected) {
-			drawTouchedLevelSelectionCircle();
-		} else {
-			selectColor[3] = .5f;
-			drawCircle(5 * levelBarHeight / 4, selectColor, levelBarVb.get(numLevelVertices * 2 - 2), middleY);
-		}
-	}
-
-	protected void drawBar() {
-		drawBackgroundBar();
-		drawLevel();
-	}
-	
 	@Override
 	public void draw() {
-		super.draw();
-		drawBar();
+		shapeGroup.draw();
 	}
 
-	public void setViewLevel(float level) {
-		updateNumLevelVertices();
+	@Override
+	public synchronized void layoutChildren() {
+		levelBarHeight = height / 4;
+		foregroundRect.setCornerRadius(levelBarHeight / 2);
+		backgroundRect.setCornerRadius(levelBarHeight / 2);
+
+		backgroundRect.layout(levelBarHeight, (height - levelBarHeight) / 2,
+				width - levelBarHeight * 2, levelBarHeight);
+		foregroundRect.layout(levelBarHeight, (height - levelBarHeight) / 2,
+				width - levelBarHeight * 2, levelBarHeight);
+		levelCircle.layout(0, 0, levelBarHeight * 2.5f, levelBarHeight * 2.5f);
 	}
 
-	protected void updateNumLevelVertices() {
-		if (levelBarVb == null)
-			return;
-		numLevelVertices = (int) (param.viewLevel * (levelBarVb.capacity() / 2));
-		// want even number of vertices to avoid jagged ending
-		numLevelVertices += numLevelVertices % 2;
-		// make sure we don't go have an out of bounds index
-		numLevelVertices = numLevelVertices > 2 ? (numLevelVertices < levelBarVb
-				.capacity() / 2 ? numLevelVertices : levelBarVb.capacity() / 2)
-				: 2;
+	public void setViewLevel(float viewLevel) {
+		float w = levelBarHeight + viewLevel * (width - levelBarHeight * 3);
+		foregroundRect.setDimensions(w, levelBarHeight);
+		levelCircle.setPosition(w - levelCircle.width / 4,
+				(height - levelCircle.height) / 2);
 	}
 
 	protected float posToLevel(float x, float y) {
@@ -96,5 +62,19 @@ public class Seekbar extends ControlView1dBase {
 			return 1;
 		float level = (x - levelBarHeight / 2) / (width - levelBarHeight * 4);
 		return level < 0 ? 0 : (level > 1 ? 1 : level);
+	}
+
+	@Override
+	public void handleActionDown(int id, float x, float y) {
+		super.handleActionDown(id, x, y);
+		foregroundRect.setFillColor(selectColor);
+		levelCircle.setFillColor(levelColor);
+	}
+
+	@Override
+	public void handleActionUp(int id, float x, float y) {
+		super.handleActionUp(id, x, y);
+		foregroundRect.setFillColor(levelColor);
+		levelCircle.setFillColor(selectColor);
 	}
 }

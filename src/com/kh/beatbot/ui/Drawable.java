@@ -15,6 +15,11 @@ public abstract class Drawable {
 		this.y = y;
 	}
 
+	public void setDimensions(float width, float height) {
+		this.width = width;
+		this.height = height;
+	}
+
 	public void layout(float x, float y, float width, float height) {
 		this.x = x;
 		this.y = y;

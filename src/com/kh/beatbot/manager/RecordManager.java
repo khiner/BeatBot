@@ -12,7 +12,7 @@ import android.media.MediaRecorder;
 
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
-import com.kh.beatbot.ui.view.control.ThresholdBarView;
+import com.kh.beatbot.ui.view.control.Seekbar;
 
 public class RecordManager implements ParamListener {
 
@@ -32,7 +32,7 @@ public class RecordManager implements ParamListener {
 
 	private static String currRecordFileName = null;
 
-	private static ThresholdBarView thresholdBar;
+	private static Seekbar thresholdBar;
 
 	private static int bufferSize = AudioRecord.getMinBufferSize(
 			RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
