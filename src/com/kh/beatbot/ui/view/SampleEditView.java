@@ -27,7 +27,6 @@ public class SampleEditView extends ControlView2dBase {
 	// min distance for pointer to select loop markers
 	private static final float SNAP_DIST = 32f, X_OFFSET = SNAP_DIST / 2;
 	private static float minLoopWindow;
-
 	private static ShapeGroup shapeGroup = new ShapeGroup();
 	private static WaveformShape waveformShape;
 	private static ImageButton[] loopButtons = new ImageButton[2];
@@ -46,7 +45,7 @@ public class SampleEditView extends ControlView2dBase {
 	private float levelOffset = 0, levelWidth = 0, waveformWidth = 0;
 
 	public synchronized void update() {
-		if (params[0] == null && params[1] == null)
+		if (!hasSample())
 			return;
 		setLevel(0, 1);
 		updateLoopSelectionVbs();
@@ -145,7 +144,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	public void layout(View parent, float x, float y, float width, float height) {
-		initBgRect(Type.RECTANGLE, shapeGroup, Colors.LABEL_VERY_LIGHT, null);
+		initBgRect(Type.RECTANGLE, null, Colors.LABEL_VERY_LIGHT, null);
 		waveformShape = Shape.createWaveform(shapeGroup, width,
 				Colors.LABEL_SELECTED, Colors.BLACK);
 		waveformShape.setStrokeWeight(2);
