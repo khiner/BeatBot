@@ -61,8 +61,8 @@ public class MainMenu extends Menu {
 		return level == 0 ? columnWidth : 2 * columnWidth;
 	}
 
-	public synchronized void loadIcons() {
-		super.loadIcons();
+	public synchronized void initIcons() {
+		super.initIcons();
 		fileItem.setIcon(new Icon(IconResources.FILE));
 		settingsItem.setIcon(new Icon(IconResources.SETTINGS));
 

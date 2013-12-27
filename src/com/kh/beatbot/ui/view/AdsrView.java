@@ -50,7 +50,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 				adsrPointVb.get(9));
 		for (int i = 0; i < 5; i++) {
 			if (adsrSelected[i] != -1) {
-				drawCircle(getBgRectRadius(), Colors.VOLUME_SELECTED,
+				drawCircle(getBgRectRadius(), Colors.VOLUME_TRANS,
 						adsrPointVb.get(i * 2), adsrPointVb.get(i * 2 + 1));
 			}
 		}

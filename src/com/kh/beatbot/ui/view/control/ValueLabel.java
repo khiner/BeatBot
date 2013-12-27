@@ -11,7 +11,7 @@ public class ValueLabel extends ControlView1dBase {
 	private float anchorY = 0, anchorLevel;
 	private boolean enabled = false;
 
-	private static ColorSet fillColorSet = Colors.valueLabelBgColorSet;
+	private static ColorSet fillColorSet = Colors.valueLabelFillColorSet;
 
 	public ValueLabel(ShapeGroup shapeGroup) {
 		initBgRect(Type.ROUNDED_RECT, shapeGroup, fillColorSet.disabledColor,

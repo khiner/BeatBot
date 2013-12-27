@@ -30,7 +30,7 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 		while (level >= menuLists.size()) {
 			ListView menuList = new ListView();
 			if (initialized) {
-				menuList.loadIcons();
+				menuList.initIcons();
 			}
 			menuLists.add(menuList);
 		}
@@ -47,7 +47,7 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 		}
 	}
 
-	public synchronized void loadIcons() {
+	public synchronized void initIcons() {
 		columnWidth = width;
 		for (MenuItem menuItem : topLevelItems) {
 			menuItem.loadIcons();

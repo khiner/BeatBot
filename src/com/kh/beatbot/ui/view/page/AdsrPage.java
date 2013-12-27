@@ -52,11 +52,11 @@ public class AdsrPage extends TouchableView implements OnReleaseListener {
 	}
 
 	@Override
-	protected synchronized void loadIcons() {
+	protected synchronized void initIcons() {
 		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i]
 					.setBgIcon(new RoundedRectIcon(iconGroup,
-							Colors.instrumentBgColorSet,
+							Colors.instrumentFillColorSet,
 							Colors.buttonRowStrokeColorSet));
 			if (i < adsrButtons.length - 2) {
 				adsrButtons[i].setIcon(new Icon(whichAdsrIconResource(i)));

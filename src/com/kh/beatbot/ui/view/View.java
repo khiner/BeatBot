@@ -140,6 +140,9 @@ public abstract class View implements Comparable<View> {
 		if (parent != null) {
 			this.absoluteX = parent.absoluteX + x;
 			this.absoluteY = parent.absoluteY + y;
+		} else {
+			this.absoluteX = x;
+			this.absoluteY = y;
 		}
 		layoutChildren();
 	}
@@ -171,7 +174,7 @@ public abstract class View implements Comparable<View> {
 
 	public abstract void layoutChildren();
 
-	protected abstract void loadIcons();
+	protected abstract void initIcons();
 
 	public void clipWindow(int parentClipX, int parentClipY, int parentClipW,
 			int parentClipH) {
@@ -250,7 +253,7 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public synchronized void loadAllIcons() {
-		loadIcons();
+		initIcons();
 		for (View child : children) {
 			child.loadAllIcons();
 		}

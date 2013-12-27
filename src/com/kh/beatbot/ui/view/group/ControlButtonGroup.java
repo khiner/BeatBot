@@ -150,7 +150,7 @@ public class ControlButtonGroup extends TouchableView {
 	}
 
 	@Override
-	protected synchronized void loadIcons() {
+	protected synchronized void initIcons() {
 		playButton.setIcon(new Icon(IconResources.PLAY));
 		stopButton.setIcon(new Icon(IconResources.STOP));
 		recordButton.setIcon(new Icon(IconResources.RECORD));

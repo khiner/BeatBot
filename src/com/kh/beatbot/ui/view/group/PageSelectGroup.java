@@ -150,17 +150,17 @@ public class PageSelectGroup extends TouchableView {
 	}
 
 	@Override
-	protected synchronized void loadIcons() {
+	protected synchronized void initIcons() {
 		addTrackButton.setIcon(new Icon(IconResources.ADD));
 		addTrackButton.setBgIcon(new RoundedRectIcon(roundedRectGroup,
-				Colors.labelBgColorSet, Colors.labelStrokeColorSet));
+				Colors.labelFillColorSet, Colors.labelStrokeColorSet));
 
 		pageButtons[EDIT_PAGE_ID].setIcon(new Icon(IconResources.SAMPLE));
 		pageButtons[NOTE_LEVELS_PAGE_ID]
 				.setIcon(new Icon(IconResources.LEVELS));
 		for (int i = 0; i < pageButtons.length; i++) {
 			pageButtons[i].setBgIcon(new RoundedRectIcon(roundedRectGroup,
-					Colors.labelBgColorSet, Colors.labelStrokeColorSet));
+					Colors.labelFillColorSet, Colors.labelStrokeColorSet));
 		}
 	}
 

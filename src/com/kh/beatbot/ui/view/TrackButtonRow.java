@@ -34,12 +34,12 @@ public class TrackButtonRow extends TouchableView {
 	}
 
 	@Override
-	protected synchronized void loadIcons() {
+	protected synchronized void initIcons() {
 		updateInstrumentIcon();
 		muteButton.setText("M");
 		soloButton.setText("S");
 		instrumentButton.setBgIcon(new RoundedRectIcon(roundedRectGroup,
-				Colors.instrumentBgColorSet, Colors.buttonRowStrokeColorSet));
+				Colors.instrumentFillColorSet, Colors.buttonRowStrokeColorSet));
 		muteButton.setBgIcon(new RoundedRectIcon(roundedRectGroup,
 				Colors.muteButtonColorSet, Colors.buttonRowStrokeColorSet));
 		soloButton.setBgIcon(new RoundedRectIcon(roundedRectGroup,

@@ -42,7 +42,7 @@ public class TextView extends View {
 	}
 
 	@Override
-	protected synchronized void loadIcons() {
+	protected synchronized void initIcons() {
 		initText();
 	}
 

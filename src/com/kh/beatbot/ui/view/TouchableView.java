@@ -12,6 +12,8 @@ public abstract class TouchableView extends TextView {
 	// position relative to this window
 	protected Map<Integer, Position> pointerIdToPos = new HashMap<Integer, Position>();
 
+	protected float touchOffsetX = 0;
+
 	protected boolean shouldPropogateTouchEvents = true;
 
 	public final boolean ownsPointer(int id) {
@@ -126,6 +128,7 @@ public abstract class TouchableView extends TextView {
 	 ***************************************************************/
 	private final void consumeActionDown(int id, float x, float y) {
 		pointerIdToPos.put(id, new Position(x, y));
+		touchOffsetX = x - this.x;
 		handleActionDown(id, x, y);
 	}
 

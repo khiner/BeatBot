@@ -119,8 +119,8 @@ public class LabelList extends ClickableView implements OnPressListener,
 	}
 
 	@Override
-	protected synchronized void loadIcons() {
-		super.loadIcons();
+	protected synchronized void initIcons() {
+		super.initIcons();
 		addIcon = new Icon(IconResources.ADD);
 	}
 

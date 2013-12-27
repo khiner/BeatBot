@@ -41,7 +41,7 @@ public class SampleEditPage extends TouchableView {
 	}
 
 	@Override
-	protected synchronized void loadIcons() {
+	protected synchronized void initIcons() {
 		previewButton.setIcon(new Icon(IconResources.PREVIEW));
 		loopButton.setIcon(new Icon(IconResources.LOOP));
 		reverseButton.setIcon(new Icon(IconResources.REVERSE));

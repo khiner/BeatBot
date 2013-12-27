@@ -30,8 +30,8 @@ public class TrackPage extends LevelsFXPage {
 	}
 
 	@Override
-	public synchronized void loadIcons() {
-		super.loadIcons();
+	public synchronized void initIcons() {
+		super.initIcons();
 
 		deleteButton.setBgIcon(new RoundedRectIcon(labelGroup,
 				Colors.deleteFillColorSet, Colors.deleteStrokeColorSet));

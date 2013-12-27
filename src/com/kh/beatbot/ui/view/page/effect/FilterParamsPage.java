@@ -54,10 +54,10 @@ public class FilterParamsPage extends EffectParamsPage {
 	}
 
 	@Override
-	protected synchronized void loadIcons() {
+	protected synchronized void initIcons() {
 		for (ToggleButton filterToggle : filterToggles) {
 			filterToggle.setBgIcon(new RoundedRectIcon(iconGroup,
-					Colors.instrumentBgColorSet,
+					Colors.instrumentFillColorSet,
 					Colors.buttonRowStrokeColorSet));
 		}
 		filterToggles[0].setIcon(new Icon(IconResources.LOWPASS_FILTER));

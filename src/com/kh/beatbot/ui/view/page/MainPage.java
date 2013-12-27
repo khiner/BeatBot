@@ -75,7 +75,7 @@ public class MainPage extends TouchableView {
 	}
 
 	@Override
-	public synchronized void loadIcons() {
+	public synchronized void initIcons() {
 		menuButton.setIcon(new Icon(IconResources.MENU));
 	}
 

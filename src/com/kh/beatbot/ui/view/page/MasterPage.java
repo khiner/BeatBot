@@ -28,8 +28,8 @@ public class MasterPage extends LevelsFXPage {
 	}
 	
 	@Override
-	public synchronized void loadIcons() {
-		super.loadIcons();
+	public synchronized void initIcons() {
+		super.initIcons();
 		bpmLabel.setText("BPM");
 	}
 	

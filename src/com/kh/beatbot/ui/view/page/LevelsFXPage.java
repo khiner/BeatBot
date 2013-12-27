@@ -211,17 +211,17 @@ public abstract class LevelsFXPage extends TouchableView {
 	}
 
 	@Override
-	protected synchronized void loadIcons() {
+	protected synchronized void initIcons() {
 		effectLabel.setText("Effects");
 		volumeToggle.setText("Vol");
 		panToggle.setText("Pan");
 		pitchToggle.setText("Pit");
 		volumeToggle.setBgIcon(new RoundedRectIcon(labelGroup,
-				Colors.volumeBgColorSet, Colors.volumeStrokeColorSet));
+				Colors.volumeFillColorSet, Colors.volumeStrokeColorSet));
 		panToggle.setBgIcon(new RoundedRectIcon(labelGroup,
-				Colors.panBgColorSet, Colors.panStrokeColorSet));
+				Colors.panFillColorSet, Colors.panStrokeColorSet));
 		pitchToggle.setBgIcon(new RoundedRectIcon(labelGroup,
-				Colors.pitchBgColorSet, Colors.pitchStrokeColorSet));
+				Colors.pitchFillColorSet, Colors.pitchStrokeColorSet));
 	}
 
 	@Override

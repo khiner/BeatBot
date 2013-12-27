@@ -43,13 +43,13 @@ public class NoteLevelsPage extends TouchableView {
 	}
 
 	@Override
-	protected synchronized void loadIcons() {
+	protected synchronized void initIcons() {
 		volumeToggle.setText("Vol");
 		panToggle.setText("Pan");
 		pitchToggle.setText("Pit");
-		volumeToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.volumeBgColorSet, Colors.volumeStrokeColorSet));
-		panToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.panBgColorSet, Colors.panStrokeColorSet));
-		pitchToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.pitchBgColorSet, Colors.pitchStrokeColorSet));
+		volumeToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.volumeFillColorSet, Colors.volumeStrokeColorSet));
+		panToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.panFillColorSet, Colors.panStrokeColorSet));
+		pitchToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.pitchFillColorSet, Colors.pitchStrokeColorSet));
 	}
 
 	@Override

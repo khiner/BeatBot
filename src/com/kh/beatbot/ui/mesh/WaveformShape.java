@@ -44,7 +44,7 @@ public class WaveformShape extends Shape {
 		updateWaveformVertices();
 	}
 
-	protected void updateVertices() {
+	protected synchronized void updateVertices() {
 		updateLoopSelectionVertices();
 		updateWaveformVertices();
 	}
@@ -71,7 +71,7 @@ public class WaveformShape extends Shape {
 		}
 	}
 
-	private void updateLoopSelectionVertices() {
+	private synchronized void updateLoopSelectionVertices() {
 		// fill triangle 1
 		fillVertex(loopBeginX, View.BG_OFFSET);
 		fillVertex(loopEndX, View.BG_OFFSET);
@@ -82,7 +82,7 @@ public class WaveformShape extends Shape {
 		fillVertex(loopEndX, height - View.BG_OFFSET);
 	}
 
-	public void update(long offsetInSamples, long widthInSamples, float xOffset) {
+	public synchronized void update(long offsetInSamples, long widthInSamples, float xOffset) {
 		this.offsetInSamples = offsetInSamples;
 		this.widthInSamples = widthInSamples;
 		this.xOffset = xOffset;
@@ -92,7 +92,7 @@ public class WaveformShape extends Shape {
 		updateWaveformVertices();
 	}
 
-	public void setLoopPoints(float beginX, float endX) {
+	public synchronized void setLoopPoints(float beginX, float endX) {
 		loopBeginX = beginX;
 		loopEndX = endX;
 		resetIndices();

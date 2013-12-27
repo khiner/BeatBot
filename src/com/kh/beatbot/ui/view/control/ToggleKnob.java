@@ -24,8 +24,8 @@ public class ToggleKnob extends Knob implements ParamToggleListener {
 		centerButton.draw();
 	}
 
-	protected synchronized void loadIcons() {
-		super.loadIcons();
+	protected synchronized void initIcons() {
+		super.initIcons();
 		centerButton.setIcon(new Icon(IconResources.BEAT_SYNC));
 		centerButton.setChecked(true);
 	}

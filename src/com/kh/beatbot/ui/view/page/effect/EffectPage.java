@@ -42,10 +42,10 @@ public class EffectPage extends TouchableView {
 	}
 
 	@Override
-	protected synchronized void loadIcons() {
+	protected synchronized void initIcons() {
 		toggleButton.setIcon(new Icon(IconResources.ON_OFF));
 		toggleButton.setBgIcon(new RoundedRectIcon(null,
-				Colors.labelBgColorSet, Colors.labelStrokeColorSet));
+				Colors.labelFillColorSet, Colors.labelStrokeColorSet));
 	}
 
 	@Override
