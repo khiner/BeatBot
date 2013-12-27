@@ -4,7 +4,7 @@ import com.kh.beatbot.ui.Drawable;
 
 public abstract class Shape extends Drawable {
 	public static enum Type {
-		RECTANGLE, ROUNDED_RECT, CIRCLE, SLIDE_TAB
+		RECTANGLE, ROUNDED_RECT, CIRCLE, SLIDE_TAB, INTERSECTING_LINES
 	};
 
 	public static final float ¹ = (float) Math.PI;
@@ -52,6 +52,8 @@ public abstract class Shape extends Drawable {
 			return new Circle(group, fillColor, strokeColor);
 		case SLIDE_TAB:
 			return new SlideTab(group, fillColor, strokeColor);
+		case INTERSECTING_LINES:
+			return new IntersectingLines(group, fillColor, strokeColor);
 		default:
 			return null;
 		}
@@ -187,14 +189,14 @@ public abstract class Shape extends Drawable {
 
 	public synchronized void setDimensions(float width, float height) {
 		boolean dimChanged = width != this.width || height != this.height;
-		if (width == 0 || height == 0 || !dimChanged)
+		if (width <= 0 || height <= 0 || !dimChanged)
 			return;
 		super.setDimensions(width, height);
 		update();
 	}
 
 	public synchronized void layout(float x, float y, float width, float height) {
-		if (width == 0 || height == 0)
+		if (width <= 0 || height <= 0)
 			return;
 		boolean dimChanged = width != this.width || height != this.height;
 		boolean posChanged = x != this.x || y != this.y;

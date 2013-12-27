@@ -277,8 +277,8 @@ public abstract class View implements Comparable<View> {
 	public void layout(View parent, float x, float y, float width, float height) {
 		this.parent = parent;
 		setDimensions(width, height);
-		setPosition(x, y);
 		layoutBgRect();
+		setPosition(x, y);
 	}
 
 	protected synchronized View findChildAt(float x, float y) {
