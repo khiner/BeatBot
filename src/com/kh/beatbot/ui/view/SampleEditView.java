@@ -7,7 +7,7 @@ import javax.microedition.khronos.opengles.GL10;
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
@@ -30,7 +30,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	private static ShapeGroup shapeGroup = new ShapeGroup();
 	private static WaveformShape waveformShape;
-	private static ImageButton loopBeginButton, loopEndButton;
+	private static ImageButton[] loopButtons = new ImageButton[2];
 	private static FloatBuffer currSampleLineVb = null;
 
 	private boolean pressed = false;
@@ -62,8 +62,8 @@ public class SampleEditView extends ControlView2dBase {
 		float beginX = levelToX(params[0].viewLevel);
 		float endX = levelToX(params[1].viewLevel);
 		waveformShape.setLoopPoints(beginX, endX);
-		loopBeginButton.setPosition(beginX - X_OFFSET, 0);
-		loopEndButton.setPosition(endX - X_OFFSET, 0);
+		loopButtons[0].setPosition(beginX - X_OFFSET, 0);
+		loopButtons[1].setPosition(endX - X_OFFSET, 0);
 	}
 
 	private void updateZoom() {
@@ -116,31 +116,32 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public synchronized void initIcons() {
-		loopBeginButton.setBgIcon(new RoundedRectIcon(shapeGroup,
-				Colors.loopSelectionColorSet));
-		loopEndButton.setBgIcon(new RoundedRectIcon(shapeGroup,
-				Colors.loopSelectionColorSet));
+		for (ImageButton loopButton : loopButtons) {
+			loopButton.setBgIcon(new RoundedRectIcon(shapeGroup,
+					Colors.loopSelectionColorSet));
+		}
 	}
 
 	@Override
 	public synchronized void createChildren() {
-		loopBeginButton = new ImageButton();
-		loopEndButton = new ImageButton();
-		loopBeginButton.setOnReleaseListener(new OnReleaseListener() {
-			@Override
-			public void onRelease(Button button) {
-
-			}
-		});
-
-		loopEndButton.setOnReleaseListener(new OnReleaseListener() {
-			@Override
-			public void onRelease(Button button) {
-
-			}
-		});
-
-		addChildren(loopBeginButton, loopEndButton);
+		for (int i = 0; i < loopButtons.length; i++) {
+			loopButtons[i] = new ImageButton();
+			loopButtons[i].setOnPressListener(new OnPressListener() {
+				@Override
+				public void onPress(Button button) {
+					if (button.ownsPointer(scrollPointerId)) {
+						scrollPointerId = -1;
+					} else if (button.ownsPointer(zoomLeftPointerId)) {
+						scrollPointerId = zoomRightPointerId;
+						zoomLeftPointerId = zoomRightPointerId = -1;
+					} else if (button.ownsPointer(zoomRightPointerId)) {
+						scrollPointerId = zoomLeftPointerId;
+						zoomLeftPointerId = zoomRightPointerId = -1;
+					}
+				}
+			});
+		}
+		addChildren(loopButtons);
 	}
 
 	public void layout(View parent, float x, float y, float width, float height) {
@@ -154,8 +155,8 @@ public class SampleEditView extends ControlView2dBase {
 
 	public synchronized void layoutChildren() {
 		waveformShape.layout(0, 0, width, height);
-		loopBeginButton.layout(null, 0, 0, X_OFFSET * 2, height);
-		loopEndButton.layout(null, width - X_OFFSET, 0, X_OFFSET * 2, height);
+		loopButtons[0].layout(null, 0, 0, X_OFFSET * 2, height);
+		loopButtons[1].layout(null, width - X_OFFSET, 0, X_OFFSET * 2, height);
 	}
 
 	private void drawCurrSampleLine() {
@@ -180,36 +181,32 @@ public class SampleEditView extends ControlView2dBase {
 		}
 	}
 
-	private boolean isLoopMarkerSelected(int id) {
-		return loopBeginButton.ownsPointer(id) || loopEndButton.ownsPointer(id);
-	}
-
 	private boolean moveLoopMarker(int id, float x) {
-		float beginLevel = params[0].viewLevel;
-		float endLevel = params[1].viewLevel;
-
-		if (loopBeginButton.ownsPointer(id)) {
+		if (loopButtons[0].isPressed() && loopButtons[0].ownsPointer(id)) {
 			// update track loop begin
 			params[0].setLevel(xToLevel(x));
 			// update ui to fit the new begin point
-			if (beginLevel < levelOffset) {
-				setLevel(beginLevel, levelWidth + levelOffset - beginLevel);
-			} else if (beginLevel > levelOffset + levelWidth) {
-				setLevel(levelOffset, beginLevel - levelOffset);
+			if (params[0].viewLevel < levelOffset) {
+				setLevel(params[0].viewLevel, levelWidth + levelOffset
+						- params[0].viewLevel);
+			} else if (params[0].viewLevel > levelOffset + levelWidth) {
+				setLevel(levelOffset, params[0].viewLevel - levelOffset);
 			}
-		} else if (loopEndButton.ownsPointer(id)) {
+			return true;
+		} else if (loopButtons[1].isPressed() && loopButtons[1].ownsPointer(id)) {
 			// update track loop end
 			params[1].setLevel(xToLevel(x));
 			// update ui to fit the new end point
-			if (endLevel > levelOffset + levelWidth) {
-				setLevel(levelOffset, endLevel - levelOffset);
-			} else if (endLevel < levelOffset) {
-				setLevel(endLevel, levelWidth + levelOffset - endLevel);
+			if (params[1].viewLevel > levelOffset + levelWidth) {
+				setLevel(levelOffset, params[1].viewLevel - levelOffset);
+			} else if (params[1].viewLevel < levelOffset) {
+				setLevel(params[1].viewLevel, levelWidth + levelOffset
+						- params[1].viewLevel);
 			}
+			return true;
 		} else {
 			return false;
 		}
-		return true;
 	}
 
 	private boolean setZoomAnchor(int id) {
@@ -259,11 +256,7 @@ public class SampleEditView extends ControlView2dBase {
 			press();
 			return;
 		}
-		if (!isLoopMarkerSelected(id)) {
-			// loop marker not close enough to select. start scroll
-			// (we know it's the first pointer down, so we're not zooming)
-			setScrollAnchor(id);
-		}
+		setScrollAnchor(id);
 	}
 
 	@Override
@@ -278,14 +271,13 @@ public class SampleEditView extends ControlView2dBase {
 		}
 		waveformShape.resample();
 		scrollPointerId = zoomLeftPointerId = zoomRightPointerId = -1;
-		scrollAnchorLevel = zoomLeftAnchorLevel = zoomRightAnchorLevel = -1;
 	}
 
 	@Override
 	public void handleActionPointerDown(int id, float x, float y) {
 		if (!hasSample())
 			return;
-		if (!isLoopMarkerSelected(id) && !setZoomAnchor(id)) {
+		if (!setZoomAnchor(id)) {
 			// loop marker not close enough to select, and first pointer down.
 			// start scrolling
 			setScrollAnchor(id);
@@ -303,7 +295,6 @@ public class SampleEditView extends ControlView2dBase {
 			setScrollAnchor(zoomLeftPointerId);
 		}
 		zoomLeftPointerId = zoomRightPointerId = -1;
-		zoomLeftAnchorLevel = zoomRightAnchorLevel = -1;
 	}
 
 	@Override

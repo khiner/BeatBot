@@ -48,23 +48,23 @@ public class GLSurfaceViewGroup extends TouchableSurfaceView {
 	 * child.
 	 */
 	protected void handleActionDown(MotionEvent e, int id, float x, float y) {
-		renderer.propogateActionDown(e, id, x, y);
+		renderer.propagateActionDown(e, id, x, y);
 	}
 
 	protected void handleActionUp(MotionEvent e, int id, float x, float y) {
-		renderer.propogateActionUp(e, id, x, y);
+		renderer.propagateActionUp(e, id, x, y);
 	}
 
 	protected void handleActionPointerDown(MotionEvent e, int id, float x,
 			float y) {
-		renderer.propogateActionPointerDown(e, id, x, y);
+		renderer.propagateActionPointerDown(e, id, x, y);
 	}
 
 	protected void handleActionPointerUp(MotionEvent e, int id, float x, float y) {
-		renderer.propogateActionPointerUp(e, id, x, y);
+		renderer.propagateActionPointerUp(e, id, x, y);
 	}
 	
 	protected void handleActionMove(MotionEvent e, int id, float x, float y) {
-		renderer.propogateActionMove(e, id, x, y);
+		renderer.propagateActionMove(e, id, x, y);
 	}
 }

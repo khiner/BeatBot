@@ -14,7 +14,7 @@ public abstract class TouchableView extends TextView {
 
 	protected float touchOffsetX = 0;
 
-	protected boolean shouldPropogateTouchEvents = true;
+	protected boolean shouldPropagateTouchEvents = true;
 
 	public final boolean ownsPointer(int id) {
 		return pointerIdToPos.containsKey(id);
@@ -53,72 +53,72 @@ public abstract class TouchableView extends TextView {
 	}
 	
 	/**********************************************************************
-	 * Touch events are propogated to children, using coordinates relative 
+	 * Touch events are propagated to children, using coordinates relative 
 	 * to child.
 	 * 
 	 * These methods also "consume" the actions, in case the view wants
 	 * to do something with these touch events.
 	 **********************************************************************/
-	public final void propogateActionDown(MotionEvent e, int id, float x, float y) {
+	public final void propagateActionDown(MotionEvent e, int id, float x, float y) {
 		consumeActionDown(id, x, y);
-		if (!shouldPropogateTouchEvents) {
+		if (!shouldPropagateTouchEvents) {
 			return;
 		}
 		View child = findChildAt(x, y);
 		if (child instanceof TouchableView) {
-			((TouchableView) child).propogateActionDown(e, id, x - child.x, y
+			((TouchableView) child).propagateActionDown(e, id, x - child.x, y
 					- child.y);
 		}
 	}
 
-	public final void propogateActionUp(MotionEvent e, int id, float x, float y) {
+	public final void propagateActionUp(MotionEvent e, int id, float x, float y) {
 		consumeActionUp(id, x, y);
-		if (!shouldPropogateTouchEvents) {
+		if (!shouldPropagateTouchEvents) {
 			return;
 		}
 		TouchableView child = whichChildOwnsPointer(id);
 		if (child != null)
-			child.propogateActionUp(e, id, x - child.x, y - child.y);
+			child.propagateActionUp(e, id, x - child.x, y - child.y);
 	}
 
-	public final void propogateActionPointerDown(MotionEvent e, int id, float x,
+	public final void propagateActionPointerDown(MotionEvent e, int id, float x,
 			float y) {
 		consumeActionPointerDown(id, x, y);
-		if (!shouldPropogateTouchEvents) {
+		if (!shouldPropagateTouchEvents) {
 			return;
 		}
 		View child = findChildAt(x, y);
 		if (child instanceof TouchableView) {
 			TouchableView touchableChild = (TouchableView)child;
 			if (touchableChild.pointerCount() == 0)
-				touchableChild.propogateActionDown(e, id, x - child.x, y - child.y);
+				touchableChild.propagateActionDown(e, id, x - child.x, y - child.y);
 			else
-				touchableChild.propogateActionPointerDown(e, id, x - child.x, y - child.y);
+				touchableChild.propagateActionPointerDown(e, id, x - child.x, y - child.y);
 		}
 	}
 
-	public final void propogateActionPointerUp(MotionEvent e, int id, float x, float y) {
+	public final void propagateActionPointerUp(MotionEvent e, int id, float x, float y) {
 		consumeActionPointerUp(id, x, y);
-		if (!shouldPropogateTouchEvents) {
+		if (!shouldPropagateTouchEvents) {
 			return;
 		}
 		TouchableView child = whichChildOwnsPointer(id);
 		if (child != null) {
 			if (child.pointerCount() == 1)
-				child.propogateActionUp(e, id, x - child.x, y - child.y);
+				child.propagateActionUp(e, id, x - child.x, y - child.y);
 			else
-				child.propogateActionPointerUp(e, id, x - child.x, y - child.y);
+				child.propagateActionPointerUp(e, id, x - child.x, y - child.y);
 		}
 	}
 	
-	public final void propogateActionMove(MotionEvent e, int id, float x, float y) {
+	public final void propagateActionMove(MotionEvent e, int id, float x, float y) {
 		consumeActionMove(id, x, y);
-		if (!shouldPropogateTouchEvents) {
+		if (!shouldPropagateTouchEvents) {
 			return;
 		}
 		TouchableView child = whichChildOwnsPointer(id);
 		if (child != null)
-			child.propogateActionMove(e, id, x - child.x, y - child.y);
+			child.propagateActionMove(e, id, x - child.x, y - child.y);
 	}
 
 	/***************************************************************
@@ -163,7 +163,7 @@ public abstract class TouchableView extends TextView {
 	 * handling actions from the given pointer id, or null
 	 * if no such Touchable child view exists
 	 */
-	private TouchableView whichChildOwnsPointer(int id) {
+	protected TouchableView whichChildOwnsPointer(int id) {
 		for (View child : children) {
 			if (child instanceof TouchableView
 					&& ((TouchableView) child).ownsPointer(id)) {

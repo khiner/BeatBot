@@ -74,7 +74,7 @@ public class ListView extends TouchableView implements OnPressListener {
 			velocity = 0;
 		}
 		tabColorTransition.end();
-		shouldPropogateTouchEvents = true;
+		shouldPropagateTouchEvents = true;
 	}
 
 	public void handleActionMove(int index, float x, float y) {
@@ -90,7 +90,7 @@ public class ListView extends TouchableView implements OnPressListener {
 			// scrolling, release the pressed button
 			selectedButton.release();
 			selectedButton.setBgIcon(null);
-			shouldPropogateTouchEvents = false;
+			shouldPropagateTouchEvents = false;
 		}
 		lastY = y;
 	}
