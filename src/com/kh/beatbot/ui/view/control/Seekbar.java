@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.view.control;
 
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Circle;
 import com.kh.beatbot.ui.mesh.RoundedRect;
@@ -50,8 +51,8 @@ public class Seekbar extends ControlView1dBase {
 		levelCircle.layout(0, 0, levelBarHeight * 2.5f, levelBarHeight * 2.5f);
 	}
 
-	public void setViewLevel(float viewLevel) {
-		float w = levelBarHeight + viewLevel * (width - levelBarHeight * 3);
+	public void onParamChanged(Param param) {
+		float w = levelBarHeight + param.viewLevel * (width - levelBarHeight * 3);
 		foregroundRect.setDimensions(w, levelBarHeight);
 		levelCircle.setPosition(w - levelCircle.width / 4,
 				(height - levelCircle.height) / 2);

@@ -7,7 +7,6 @@ import com.kh.beatbot.listener.ParamListener;
 public abstract class ControlView1dBase extends ControlViewBase implements ParamListener {
 
 	protected Param param;
-	protected abstract void setViewLevel(float viewLevel);
 	protected abstract float posToLevel(float x, float y);
 
 	public synchronized void setParam(Param param) {
@@ -43,8 +42,5 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 		param.setLevel(posToLevel(x, y));
 	}
 	
-	@Override
-	public void onParamChanged(Param param) {
-		setViewLevel(param.viewLevel);
-	}
+	public abstract void onParamChanged(Param param);
 }

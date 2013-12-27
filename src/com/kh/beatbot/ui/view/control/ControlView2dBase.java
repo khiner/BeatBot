@@ -37,13 +37,4 @@ public abstract class ControlView2dBase extends ControlViewBase implements
 		params[0].setLevel(xToLevel(x));
 		params[1].setLevel(yToLevel(y));
 	}
-
-	@Override
-	public void onParamChanged(Param param) {
-		if (params[0] != null && params[1] != null) {
-			setViewLevel(params[0].viewLevel, params[1].viewLevel);
-		}
-	}
-
-	protected abstract void setViewLevel(float xViewLevel, float yViewLevel);
 }

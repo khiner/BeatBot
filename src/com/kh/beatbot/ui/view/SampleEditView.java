@@ -330,11 +330,6 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	protected void setViewLevel(float beginLevel, float endLevel) {
-		updateLoopSelectionVbs();
-	}
-
-	@Override
 	protected float xToLevel(float x) {
 		return (x - X_OFFSET) * checkedDivide(levelWidth, waveformWidth)
 				+ levelOffset;
@@ -353,7 +348,6 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void onParamChanged(Param param) {
-		super.onParamChanged(param);
 		if (param == null)
 			return;
 		if (param.equals(TrackManager.currTrack.getGainParam())) {

@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Shape.Type;
 
@@ -23,10 +24,11 @@ public class Seekbar2d extends ControlView2dBase {
 		return unitY(clipY(y));
 	}
 
-	public void setViewLevel(float x, float y) {
-		lineVb = makeFloatBuffer(new float[] { BG_OFFSET, viewY(y),
-				width - BG_OFFSET, viewY(y), viewX(x), BG_OFFSET,
-				viewX(x), height - BG_OFFSET });
+	public void onParamChanged(Param param) {
+		lineVb = makeFloatBuffer(new float[] { BG_OFFSET,
+				viewY(params[1].viewLevel), width - BG_OFFSET,
+				viewY(params[1].viewLevel), viewX(params[0].viewLevel),
+				BG_OFFSET, viewX(params[0].viewLevel), height - BG_OFFSET });
 	}
 
 	@Override

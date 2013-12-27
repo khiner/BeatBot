@@ -4,8 +4,8 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.mesh.Shape.Type;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class ValueLabel extends ControlView1dBase {
 	private float anchorY = 0, anchorLevel;
@@ -30,10 +30,8 @@ public class ValueLabel extends ControlView1dBase {
 				/ (root.getHeight() * 2));
 	}
 
-	public void setViewLevel(float level) {
-		if (param != null) {
-			setText(param.getFormattedValue());
-		}
+	public void onParamChanged(Param param) {
+		setText(param.getFormattedValue());
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view.control;
 import java.nio.FloatBuffer;
 
 import com.kh.beatbot.GeneralUtils;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Colors;
 
 public class Knob extends ControlView1dBase {
@@ -40,16 +41,12 @@ public class Knob extends ControlView1dBase {
 				: levelColor, drawIndex);
 	}
 
-	private void updateDrawIndex() {
+	@Override
+	public void onParamChanged(Param param) {
 		if (circleVb == null)
 			return;
 		drawIndex = (int) (circleVb.capacity() * param.viewLevel / 2);
 		drawIndex += drawIndex % 2;
-	}
-
-	@Override
-	public void setViewLevel(float level) {
-		updateDrawIndex();
 	}
 
 	@Override
