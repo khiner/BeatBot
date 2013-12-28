@@ -16,7 +16,6 @@
     <color name="note">#FFFF0000</color>
     <color name="noteSelected">#FF0000FF</color>
     <color name="background">#FF20303a</color>
-    <color name="selectRegion">#B39999FF</color>
     
     <color name="tronBlue">#FF69c9ff</color>
     <color name="volume">#FF69c9ff</color> <!-- same as tronBlue -->

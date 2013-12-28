@@ -9,17 +9,16 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Rectangle;
+import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.Shape.Type;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class LevelsView extends TouchableView {
 
 	private static class DragLine {
-		private static float m = 0;
-		private static float b = 0;
-		private static float leftTick = 0;
-		private static float rightTick = Float.MAX_VALUE;
-		private static float leftLevel = 0;
-		private static float rightLevel = 0;
+		private static float m = 0, b = 0, leftTick = 0,
+				rightTick = Float.MAX_VALUE, leftLevel = 0, rightLevel = 0;
 
 		public static float getLevel(float tick) {
 			if (tick <= leftTick)
@@ -38,7 +37,7 @@ public class LevelsView extends TouchableView {
 
 	private static final int LEVEL_BAR_WIDTH = LEVEL_POINT_SIZE / 2;
 
-	private FloatBuffer levelBarVb = null, selectRegionVb = null;
+	private FloatBuffer levelBarVb = null;
 
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedLevels = new HashMap<Integer, MidiNote>();
@@ -49,10 +48,10 @@ public class LevelsView extends TouchableView {
 
 	private LevelType currLevelType = LevelType.VOLUME;
 
-	private boolean selectRegion = false;
 	private float selectRegionStartTick = -1, selectRegionStartY = -1;
 
-	private float xOffset = 0;
+	private ShapeGroup shapeGroup;
+	private Rectangle selectRegionShape;
 
 	public LevelType getLevelType() {
 		return currLevelType;
@@ -83,18 +82,6 @@ public class LevelsView extends TouchableView {
 			vertices[i * 4 + 3] = vertices[i * 4 + 1];
 		}
 		levelBarVb = makeFloatBuffer(vertices);
-	}
-
-	private void drawSelectRegion() {
-		if (!selectRegion || selectRegionVb == null)
-			return;
-		drawTriangleFan(selectRegionVb, Colors.SELECT_REGION);
-	}
-
-	private void initSelectRegionVb(float leftTick, float rightTick,
-			float topY, float bottomY) {
-		selectRegionVb = makeRectFloatBuffer(tickToX(leftTick), topY,
-				tickToX(rightTick), bottomY);
 	}
 
 	private int calcVertex(float level) {
@@ -183,16 +170,19 @@ public class LevelsView extends TouchableView {
 		float rightTick = Math.max(tick, selectRegionStartTick);
 		float topY = Math.min(y, selectRegionStartY);
 		float bottomY = Math.max(y, selectRegionStartY);
-		MidiManager.deselectAllNotes();
+
 		for (MidiNote selectedNote : TrackManager.currTrack.getMidiNotes()) {
 			float levelY = levelToY(selectedNote.getLevel(currLevelType));
-			if (leftTick < selectedNote.getOnTick()
+			boolean selected = leftTick < selectedNote.getOnTick()
 					&& rightTick > selectedNote.getOnTick() && topY < levelY
-					&& bottomY > levelY) {
-				selectedNote.setSelected(true);
-			}
+					&& bottomY > levelY;
+			selectedNote.setSelected(selected);
 		}
-		initSelectRegionVb(leftTick, rightTick, topY, bottomY);
+		selectRegionShape.layout(tickToX(leftTick), topY, tickToX(rightTick
+				- leftTick), bottomY - topY);
+		if (selectRegionShape.getFillColor() != Colors.VOLUME_TRANS) {
+			selectRegionShape.setFillColor(Colors.VOLUME_TRANS);
+		}
 	}
 
 	private void updateDragLine() {
@@ -246,13 +236,11 @@ public class LevelsView extends TouchableView {
 	private void startSelectRegion(float x, float y) {
 		selectRegionStartTick = mainPage.midiView.xToTick(x);
 		selectRegionStartY = y;
-		selectRegionVb = null;
-		selectRegion = true;
 	}
 
 	public void draw() {
+		shapeGroup.draw();
 		drawLevels();
-		drawSelectRegion();
 	}
 
 	private float levelToY(float level) {
@@ -269,7 +257,8 @@ public class LevelsView extends TouchableView {
 	}
 
 	private float tickToX(float tick) {
-		return mainPage.midiView.tickToX(tick) + xOffset;
+		return mainPage.midiView.tickToX(tick) + mainPage.midiView.absoluteX
+				- absoluteX;
 	}
 
 	public void handleActionPointerUp(int id, float x, float y) {
@@ -315,17 +304,15 @@ public class LevelsView extends TouchableView {
 	public void handleActionUp(int id, float x, float y) {
 		super.handleActionUp(id, x, y);
 		clearTouchedLevels();
-		selectRegion = false;
+		selectRegionShape.setFillColor(Colors.TRANSPARANT);
 		MidiManager.endMidiEvent();
 	}
 
 	@Override
 	protected synchronized void createChildren() {
-		initBgRect(Type.ROUNDED_RECT, null);
-	}
-
-	@Override
-	public synchronized void layoutChildren() {
-		xOffset = mainPage.midiView.absoluteX - absoluteX;
+		shapeGroup = new ShapeGroup();
+		initBgRect(Type.ROUNDED_RECT, shapeGroup);
+		selectRegionShape = (Rectangle) Shape.get(Type.RECTANGLE, shapeGroup,
+				Colors.TRANSPARANT, null);
 	}
 }

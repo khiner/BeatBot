@@ -6,10 +6,10 @@ import com.kh.beatbot.R;
 
 public class Colors {
 	public static float[] BG, BLACK, WHITE, GREEN, YELLOW, RED, MIDI_VIEW_BG,
-			MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM, SELECT_REGION, NOTE,
-			NOTE_SELECTED, VOLUME, PAN, PITCH, LEVEL_SELECTED, TICK_FILL,
-			TICK_MARKER, TICKBAR, TICK_SELECTED, VOLUME_LIGHT, VOLUME_TRANS,
-			BPM_OFF, BPM_ON, BPM_ON_SELECTED, BPM_OFF_SELECTED, VIEW_BG,
+			MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM, NOTE, NOTE_SELECTED,
+			VOLUME, PAN, PITCH, LEVEL_SELECTED, TICK_FILL, TICK_MARKER,
+			TICKBAR, TICK_SELECTED, VOLUME_LIGHT, VOLUME_TRANS, BPM_OFF,
+			BPM_ON, BPM_ON_SELECTED, BPM_OFF_SELECTED, VIEW_BG,
 			VIEW_BG_SELECTED, LABEL_DARK, LABEL_MED, LABEL_LIGHT,
 			LABEL_VERY_LIGHT, LABEL_SELECTED, LABEL_SELECTED_TRANS,
 			MIDI_SELECTED_TRACK, TRANSPARANT = { 0, 0, 0, 0 };
@@ -28,7 +28,8 @@ public class Colors {
 			effectLabelTouchedStrokeColorSet, iconFillColorSet,
 			deleteFillColorSet, deleteStrokeColorSet, menuItemFillColorSet,
 			menuToggleFillColorSet, loopSelectionColorSet,
-			loopSelectionStrokeColorSet, defaultBgFillColorSet, defaultBgStrokeColorSet;
+			loopSelectionStrokeColorSet, defaultBgFillColorSet,
+			defaultBgStrokeColorSet;
 
 	public static void initColors(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
@@ -47,7 +48,6 @@ public class Colors {
 		MIDI_VIEW_LIGHT_BG = colorResourceToFloats(activity,
 				R.color.midiViewLightBg);
 		GRID_LINE = colorResourceToFloats(activity, R.color.gridLine);
-		SELECT_REGION = colorResourceToFloats(activity, R.color.selectRegion);
 		VOLUME = colorResourceToFloats(activity, R.color.volume);
 		WAVEFORM = colorResourceToFloats(activity, R.color.waveform);
 		PAN = colorResourceToFloats(activity, R.color.pan);
@@ -117,7 +117,7 @@ public class Colors {
 
 		loopSelectionColorSet = new ColorSet(VOLUME_TRANS, VOLUME);
 		loopSelectionStrokeColorSet = new ColorSet(VOLUME, VOLUME);
-		
+
 		defaultBgFillColorSet = new ColorSet(VIEW_BG, VIEW_BG_SELECTED);
 		defaultBgStrokeColorSet = new ColorSet(VOLUME);
 	}

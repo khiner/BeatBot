@@ -1,6 +1,7 @@
 package com.kh.beatbot.midi;
 
 import com.kh.beatbot.effect.Effect.LevelType;
+import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
@@ -9,56 +10,52 @@ import com.kh.beatbot.ui.view.View;
 
 public class MidiNote implements Comparable<MidiNote> {
 	public static final int BORDER_WIDTH = 2;
-	
+
 	Rectangle rectangle; // rectangle for drawing
 	NoteOn noteOn;
 	NoteOff noteOff;
 	boolean selected = false, touched = false;
 
-	// while moving notes in the ui, they can overlap, but we keep 
+	// while moving notes in the ui, they can overlap, but we keep
 	// a memory of the old note ticks while we manipulate the new note ticks
 	long savedOnTick, savedOffTick;
-	
+
 	public MidiNote(NoteOn noteOn, NoteOff noteOff) {
 		this.noteOn = noteOn;
 		this.noteOff = noteOff;
 		savedOnTick = savedOffTick = -1;
 	}
-	
+
 	public void saveTicks() {
 		savedOnTick = getOnTick();
 		savedOffTick = getOffTick();
 	}
-	
+
 	public long getSavedOnTick() {
 		return savedOnTick;
 	}
-	
+
 	public long getSavedOffTick() {
 		return savedOffTick;
 	}
-	
+
 	public void finalizeTicks() {
 		// erase memory of temp 'old' ticks
 		savedOnTick = savedOffTick = -1;
 	}
-	
+
 	public Rectangle getRectangle() {
 		return rectangle;
 	}
-	
+
 	public void setRectangle(Rectangle rectangle) {
 		this.rectangle = rectangle;
 	}
-	
+
 	private void updateViewPosition() {
 		View.mainPage.midiView.updateNoteView(this);
 	}
-	
-	private void updateViewSelected() {
-		View.mainPage.midiView.updateNoteViewSelected(this);
-	}
-	
+
 	public MidiNote getCopy() {
 		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0,
 				noteOn.getNoteValue(), noteOn.getVelocity(), noteOn.getPan(),
@@ -73,7 +70,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		copy.savedOffTick = this.savedOffTick;
 		return copy;
 	}
-	
+
 	public MidiEvent getOnEvent() {
 		return noteOn;
 	}
@@ -115,8 +112,13 @@ public class MidiNote implements Comparable<MidiNote> {
 	}
 
 	public void setSelected(boolean selected) {
+		if (this.selected == selected)
+			return;
 		this.selected = selected;
-		updateViewSelected(); // color change
+		View.mainPage.controlButtonGroup.setEditIconsEnabled(MidiManager
+				.anyNoteSelected());
+		View.mainPage.midiView.updateNoteViewSelected(this); // color change
+
 	}
 
 	public void setTouched(boolean touched) {
@@ -215,7 +217,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		} else if (this.getPan() != otherNote.getPan()) {
 			return this.getPan() - otherNote.getPan() < 0 ? -1 : 1;
 		} else {
-			return this.getPitch() - otherNote.getPitch() < 0 ? -1 : 1; 
+			return this.getPitch() - otherNote.getPitch() < 0 ? -1 : 1;
 		}
 	}
 }

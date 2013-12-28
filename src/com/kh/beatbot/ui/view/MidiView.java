@@ -148,7 +148,7 @@ public class MidiView extends ClickableView {
 			if (touchedNotes.isEmpty()) {
 				MidiManager.deselectAllNotes();
 			}
-			MidiManager.selectNote(selectedNote);
+			selectedNote.setSelected(true);
 		}
 		touchedNotes.put(pointerId, selectedNote);
 	}
@@ -220,7 +220,7 @@ public class MidiView extends ClickableView {
 	private void drawSelectRegion() {
 		if (!selectRegion || selectRegionVb == null)
 			return;
-		drawTriangleFan(selectRegionVb, Colors.SELECT_REGION);
+		drawTriangleFan(selectRegionVb, Colors.VOLUME_TRANS);
 	}
 
 	private void drawAllMidiNotes() {
@@ -793,7 +793,7 @@ public class MidiView extends ClickableView {
 			if (touchedNote.isSelected()) {
 				MidiManager.deselectAllNotes();
 			}
-			MidiManager.selectNote(touchedNote);
+			touchedNote.setSelected(true);
 		} else {
 			int note = yToNote(y);
 			float tick = xToTick(x);

@@ -134,7 +134,7 @@ public class MidiManager {
 		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
 			Track track = TrackManager.getTrack(i);
 			for (MidiNote midiNote : track.getMidiNotes()) {
-				deselectNote(midiNote);
+				midiNote.setSelected(false);
 			}
 		}
 	}
@@ -152,16 +152,6 @@ public class MidiManager {
 		return false;
 	}
 
-	public static void selectNote(MidiNote midiNote) {
-		midiNote.setSelected(true);
-		View.mainPage.controlButtonGroup.setEditIconsEnabled(anyNoteSelected());
-	}
-
-	public static void deselectNote(MidiNote midiNote) {
-		midiNote.setSelected(false);
-		View.mainPage.controlButtonGroup.setEditIconsEnabled(anyNoteSelected());
-	}
-
 	public static void selectRegion(long leftTick, long rightTick, int topNote,
 			int bottomNote) {
 		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
@@ -172,12 +162,9 @@ public class MidiManager {
 				boolean b = rightTick > midiNote.getOffTick();
 				boolean c = leftTick < midiNote.getOnTick();
 				boolean d = rightTick > midiNote.getOnTick();
-				if (i >= topNote && i <= bottomNote
-						&& ((a && b) || (c && d) || (!b && !c))) {
-					selectNote(midiNote);
-				} else {
-					deselectNote(midiNote);
-				}
+				boolean selected = i >= topNote && i <= bottomNote
+						&& ((a && b) || (c && d) || (!b && !c));
+				midiNote.setSelected(selected);
 			}
 		}
 	}
@@ -185,7 +172,7 @@ public class MidiManager {
 	public static void selectRow(int rowNum) {
 		deselectAllNotes();
 		for (MidiNote midiNote : TrackManager.getTrack(rowNum).getMidiNotes()) {
-			selectNote(midiNote);
+			midiNote.setSelected(true);
 		}
 	}
 

@@ -9,7 +9,7 @@ public class Circle extends Shape {
 
 	@Override
 	protected int getNumFillVertices() {
-		return 24 * 3;
+		return 18 * 3;
 	}
 
 	@Override
