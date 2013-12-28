@@ -12,7 +12,7 @@ import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.Shape.Type;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.view.page.NoteLevelsPage;
 
 public class LevelsView extends TouchableView {
 
@@ -50,7 +50,6 @@ public class LevelsView extends TouchableView {
 
 	private float selectRegionStartTick = -1, selectRegionStartY = -1;
 
-	private ShapeGroup shapeGroup;
 	private Rectangle selectRegionShape;
 
 	public LevelType getLevelType() {
@@ -168,7 +167,7 @@ public class LevelsView extends TouchableView {
 		float tick = mainPage.midiView.xToTick(x);
 		float leftTick = Math.min(tick, selectRegionStartTick);
 		float rightTick = Math.max(tick, selectRegionStartTick);
-		float topY = Math.min(y, selectRegionStartY);
+		float topY = Math.max(BG_OFFSET, Math.min(y, selectRegionStartY));
 		float bottomY = Math.max(y, selectRegionStartY);
 
 		for (MidiNote selectedNote : TrackManager.currTrack.getMidiNotes()) {
@@ -239,7 +238,6 @@ public class LevelsView extends TouchableView {
 	}
 
 	public void draw() {
-		shapeGroup.draw();
 		drawLevels();
 	}
 
@@ -310,9 +308,15 @@ public class LevelsView extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		shapeGroup = new ShapeGroup();
-		initBgRect(Type.ROUNDED_RECT, shapeGroup);
-		selectRegionShape = (Rectangle) Shape.get(Type.RECTANGLE, shapeGroup,
-				Colors.TRANSPARANT, null);
+		initBgRect(Type.ROUNDED_RECT, NoteLevelsPage.shapeGroup);
+		selectRegionShape = (Rectangle) Shape.get(Type.RECTANGLE,
+				NoteLevelsPage.shapeGroup, Colors.TRANSPARANT, null);
+	}
+	
+	@Override
+	public void layoutBgRect() {
+		super.layoutBgRect();
+		// XXX need to be more general
+		bgRect.setPosition(x + BG_OFFSET, y + BG_OFFSET);
 	}
 }

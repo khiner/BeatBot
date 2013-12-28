@@ -237,12 +237,11 @@ public abstract class View implements Comparable<View> {
 				clipWindow(parent.currClipX, parent.currClipY,
 						parent.currClipW, parent.currClipH);
 			} else {
-				clipWindow(Integer.MIN_VALUE, Integer.MIN_VALUE,
-						Integer.MAX_VALUE, Integer.MAX_VALUE);
+				gl.glDisable(GL10.GL_SCISSOR_TEST);
 			}
-			if (bgRect != null) {
-				bgRect.draw();
-			}
+		}
+		if (bgRect != null) {
+			bgRect.draw();
 		}
 		draw();
 		drawChildren();
@@ -275,7 +274,7 @@ public abstract class View implements Comparable<View> {
 		}
 	}
 
-	private void layoutBgRect() {
+	protected void layoutBgRect() {
 		if (bgRect == null)
 			return;
 		if (bgRect instanceof RoundedRect) {
@@ -293,8 +292,8 @@ public abstract class View implements Comparable<View> {
 	public void layout(View parent, float x, float y, float width, float height) {
 		this.parent = parent;
 		setDimensions(width, height);
-		layoutBgRect();
 		setPosition(x, y);
+		layoutBgRect();
 	}
 
 	protected synchronized View findChildAt(float x, float y) {

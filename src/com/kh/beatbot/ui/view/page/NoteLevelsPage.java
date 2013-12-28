@@ -12,12 +12,13 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class NoteLevelsPage extends TouchableView {
 
-	private static ShapeGroup labelGroup = new ShapeGroup();
+	public static ShapeGroup shapeGroup = new ShapeGroup();
 	private LevelsView levelsView;
 	private ToggleButton volumeToggle, panToggle, pitchToggle;
 	
 	@Override
 	public synchronized void update() {
+		shouldClip = false;
 		deselectAll();
 		selectActiveLevel();
 	}
@@ -47,14 +48,18 @@ public class NoteLevelsPage extends TouchableView {
 		volumeToggle.setText("Vol");
 		panToggle.setText("Pan");
 		pitchToggle.setText("Pit");
-		volumeToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.volumeFillColorSet, Colors.volumeStrokeColorSet));
-		panToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.panFillColorSet, Colors.panStrokeColorSet));
-		pitchToggle.setBgIcon(new RoundedRectIcon(labelGroup, Colors.pitchFillColorSet, Colors.pitchStrokeColorSet));
+		volumeToggle.setBgIcon(new RoundedRectIcon(shapeGroup, Colors.volumeFillColorSet, Colors.volumeStrokeColorSet));
+		panToggle.setBgIcon(new RoundedRectIcon(shapeGroup, Colors.panFillColorSet, Colors.panStrokeColorSet));
+		pitchToggle.setBgIcon(new RoundedRectIcon(shapeGroup, Colors.pitchFillColorSet, Colors.pitchStrokeColorSet));
 	}
 
 	@Override
 	public void draw() {
-		labelGroup.draw(this, 2);
+		shapeGroup.draw();
+	}
+
+	public synchronized void drawChildren() {
+		super.drawChildren();
 	}
 
 	@Override
@@ -90,9 +95,9 @@ public class NoteLevelsPage extends TouchableView {
 		float toggleHeight = height / 3;
 		float toggleWidth = 2 * toggleHeight;
 		float viewW = toggleWidth + 5;
-		volumeToggle.layout(this, 0, 0, toggleWidth, toggleHeight);
-		panToggle.layout(this, 0, toggleHeight, toggleWidth, toggleHeight);
-		pitchToggle.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
+		volumeToggle.layout(null, 0, 0, toggleWidth, toggleHeight);
+		panToggle.layout(null, 0, toggleHeight, toggleWidth, toggleHeight);
+		pitchToggle.layout(null, 0, toggleHeight * 2, toggleWidth, toggleHeight);
 		levelsView.layout(this, viewW, 0, width - viewW, height);
 	}
 }
