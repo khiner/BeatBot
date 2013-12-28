@@ -1,10 +1,5 @@
 package com.kh.beatbot.ui.view;
 
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-
-import javax.microedition.khronos.opengles.GL10;
-
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.ADSR;
@@ -12,18 +7,22 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.AdsrShape;
+import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.Shape.Type;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class AdsrView extends TouchableView implements ParamListener {
 
 	private static final int SNAP_DIST_SQUARED = 1024;
 	private static float[] pointVertices = new float[10];
-	private static FloatBuffer adsrPointVb = null;
-	private static FloatBuffer adsrCurveVb;
 
 	// keep track of which pointer ids are selecting which ADSR points
 	// init to -1 to indicate no pointer is selecting
 	private int[] adsrSelected = new int[] { -1, -1, -1, -1, -1 };
+
+	private ShapeGroup shapeGroup;
+	private AdsrShape adsrShape;
 
 	public synchronized void update() {
 		for (int i = 0; i < ADSR.NUM_PARAMS; i++) {
@@ -34,27 +33,8 @@ public class AdsrView extends TouchableView implements ParamListener {
 	}
 
 	@Override
-	public synchronized void init() {
-		initAdsrVb();
-	}
-
-	@Override
 	public void draw() {
-		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(0),
-				adsrPointVb.get(1));
-		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(2),
-				adsrPointVb.get(3));
-		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(4),
-				adsrPointVb.get(5));
-		drawCircle(getBgRectRadius() / 2, Colors.VOLUME, adsrPointVb.get(8),
-				adsrPointVb.get(9));
-		for (int i = 0; i < 5; i++) {
-			if (adsrSelected[i] != -1) {
-				drawCircle(getBgRectRadius(), Colors.VOLUME_TRANS,
-						adsrPointVb.get(i * 2), adsrPointVb.get(i * 2 + 1));
-			}
-		}
-		drawLines(adsrCurveVb, Colors.VOLUME, 3, GL10.GL_LINE_STRIP);
+		shapeGroup.draw();
 	}
 
 	@Override
@@ -89,7 +69,16 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	@Override
 	protected synchronized void createChildren() {
-		initBgRect(Type.ROUNDED_RECT, null, Colors.VIEW_BG, Colors.VOLUME);
+		shapeGroup = new ShapeGroup();
+		shapeGroup.setStrokeWeight(3);
+		initBgRect(Type.ROUNDED_RECT, shapeGroup, Colors.VIEW_BG, Colors.VOLUME);
+		adsrShape = (AdsrShape) Shape.get(Type.BEZIER, shapeGroup,
+				Colors.VOLUME, Colors.VOLUME);
+	}
+
+	@Override
+	public synchronized void layoutChildren() {
+		adsrShape.layout(0, 0, width, height);
 	}
 
 	private void initAdsrVb() {
@@ -107,20 +96,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 		pointVertices[8] = getReleaseX(track.adsr);
 		pointVertices[9] = viewY(0);
 
-		adsrPointVb = makeFloatBuffer(pointVertices);
-		ArrayList<Float> curveVertices = new ArrayList<Float>();
-		for (int i = 0; i < 4; i++) {
-			curveVertices
-					.addAll(makeExponentialCurveVertices(pointVertices[i * 2],
-							pointVertices[i * 2 + 1],
-							pointVertices[(i + 1) * 2],
-							pointVertices[(i + 1) * 2 + 1]));
-		}
-		float[] converted = new float[curveVertices.size()];
-		for (int j = 0; j < curveVertices.size(); j++) {
-			converted[j] = curveVertices.get(j);
-		}
-		adsrCurveVb = makeFloatBuffer(converted);
+		adsrShape.update(pointVertices);
 	}
 
 	private float getAttackX(ADSR adsr) {
@@ -135,33 +111,12 @@ public class AdsrView extends TouchableView implements ParamListener {
 		return viewX(2f / 3f + adsr.getRelease() / 3f);
 	}
 
-	private ArrayList<Float> makeExponentialCurveVertices(float x1, float y1,
-			float x2, float y2) {
-		ArrayList<Float> vertices = new ArrayList<Float>();
-		// fake it w/ Bezier curve
-		for (float t = 0; t <= 1; t += 0.05) {
-			float bezierX = x1;
-			float bezierY = y2;
-			vertices.add((1 - t) * (1 - t) * x1 + 2 * (1 - t) * t * bezierX + t
-					* t * x2);
-			vertices.add((1 - t) * (1 - t) * y1 + 2 * (1 - t) * t * bezierY + t
-					* t * y2);
-		}
-		vertices.add(x2);
-		vertices.add(y2);
-		return vertices;
-	}
-
-	private float getAttackX() {
-		return pointVertices[2]; // x coord of 2nd point
-	}
-
 	private float xToAttack(float x) {
 		return GeneralUtils.clipToUnit(unitX(x) * 3);
 	}
 
 	private float xToDecay(float x) {
-		return GeneralUtils.clipToUnit(unitX(x - getAttackX()) * 3);
+		return GeneralUtils.clipToUnit(unitX(x - pointVertices[2]) * 3);
 	}
 
 	private float xToRelease(float x) {

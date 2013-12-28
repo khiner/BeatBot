@@ -4,7 +4,7 @@ import com.kh.beatbot.ui.Drawable;
 
 public abstract class Shape extends Drawable {
 	public static enum Type {
-		RECTANGLE, ROUNDED_RECT, CIRCLE, SLIDE_TAB, INTERSECTING_LINES
+		RECTANGLE, ROUNDED_RECT, CIRCLE, SLIDE_TAB, INTERSECTING_LINES, BEZIER
 	};
 
 	public static final float ¹ = (float) Math.PI;
@@ -54,6 +54,8 @@ public abstract class Shape extends Drawable {
 			return new SlideTab(group, fillColor, strokeColor);
 		case INTERSECTING_LINES:
 			return new IntersectingLines(group, fillColor, strokeColor);
+		case BEZIER:
+			return new AdsrShape(group, fillColor, strokeColor);
 		default:
 			return null;
 		}

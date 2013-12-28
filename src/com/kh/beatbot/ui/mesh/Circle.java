@@ -24,11 +24,11 @@ public class Circle extends Shape {
 		float lastY = -1;
 		for (int i = 0; i < getNumFillVertices() / 3 + 1; i++) {
 			theta = (float) (2 * i * Math.PI / (getNumFillVertices() / 3));
-			float x = (float) Math.cos(theta) * width / 2 + this.x + width / 2;
-			float y = (float) Math.sin(theta) * height / 2 + this.y + height / 2;
+			float x = (float) Math.cos(theta) * width / 2 + this.x;
+			float y = (float) Math.sin(theta) * height / 2 + this.y;
 			if (lastX != -1 && lastY != -1) {
 				fillVertex(lastX, lastY);
-				fillVertex(this.x + width / 2, this.y + height / 2);
+				fillVertex(this.x, this.y);
 				fillVertex(x, y);
 			}
 			lastX = x;

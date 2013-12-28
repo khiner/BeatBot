@@ -52,10 +52,10 @@ public class Seekbar extends ControlView1dBase {
 	}
 
 	public void onParamChanged(Param param) {
-		float w = levelBarHeight + param.viewLevel * (width - levelBarHeight * 3);
+		float w = levelBarHeight + param.viewLevel
+				* (width - levelBarHeight * 3);
 		foregroundRect.setDimensions(w, levelBarHeight);
-		levelCircle.setPosition(w - levelCircle.width / 4,
-				(height - levelCircle.height) / 2);
+		levelCircle.setPosition(w + levelCircle.width / 4, height / 2);
 	}
 
 	protected float posToLevel(float x, float y) {
