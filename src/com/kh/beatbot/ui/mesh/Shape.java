@@ -132,12 +132,21 @@ public abstract class Shape extends Drawable {
 		updateVertices();
 	}
 
+	public synchronized void setFillAlpha(float alpha) {
+		fillColor[3] = alpha;
+		updateGroup();
+	}
+
 	public synchronized void setFillColor(float[] fillColor) {
+		if (this.fillColor == fillColor)
+			return;
 		this.fillColor = fillColor;
 		updateGroup();
 	}
 
 	public synchronized void setStrokeColor(float[] strokeColor) {
+		if (this.strokeColor == strokeColor)
+			return;
 		this.strokeColor = strokeColor;
 		updateGroup();
 	}

@@ -27,8 +27,8 @@ public class Seekbar extends ControlView1dBase {
 	}
 
 	@Override
-	public void setLevelColor(float[] newLevelColor) {
-		super.setLevelColor(newLevelColor);
+	public void setLevelColor(float[] newLevelColor, float[] newLevelColorTrans) {
+		super.setLevelColor(newLevelColor, newLevelColorTrans);
 		foregroundRect.setFillColor(levelColor);
 		levelCircle.setFillColor(levelColorTrans);
 	}

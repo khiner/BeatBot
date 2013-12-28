@@ -13,10 +13,9 @@ public abstract class ControlViewBase extends TouchableView {
 
 	protected boolean selected = false;
 
-	public void setLevelColor(float[] newLevelColor) {
+	public void setLevelColor(float[] newLevelColor, float[] newLevelColorTrans) {
 		levelColor = newLevelColor;
-		levelColorTrans = new float[] { levelColor[0],
-				levelColor[1], levelColor[2], .6f };
+		levelColorTrans = newLevelColorTrans;
 	}
 
 	@Override

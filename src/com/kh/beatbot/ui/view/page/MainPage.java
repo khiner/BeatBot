@@ -1,7 +1,5 @@
 package com.kh.beatbot.ui.view.page;
 
-import java.nio.FloatBuffer;
-
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.activity.BeatBotActivity;
@@ -9,7 +7,9 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.Shape;
+import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.mesh.SlideTab;
 import com.kh.beatbot.ui.view.MidiTrackView;
 import com.kh.beatbot.ui.view.MidiView;
@@ -30,9 +30,7 @@ public class MainPage extends TouchableView {
 
 	private SlideTab tab;
 	private MenuButton menuButton;
-	private FloatBuffer foregroundRectBuffer;
-
-	private float[] foregroundColor = Colors.TRANSPARANT.clone();
+	private Rectangle foregroundRect;
 
 	private float trackControlWidth = 0, controlButtonHeight = 0,
 			menuOffset = 0;
@@ -64,11 +62,6 @@ public class MainPage extends TouchableView {
 	}
 
 	@Override
-	public synchronized void init() {
-		foregroundRectBuffer = makeRectFloatBuffer(0, 0, width, height);
-	}
-
-	@Override
 	public void initAll() {
 		super.initAll();
 		BeatBotActivity.mainActivity.setupProject();
@@ -81,6 +74,8 @@ public class MainPage extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
+		foregroundRect = (Rectangle) Shape.get(Type.RECTANGLE, null,
+				Colors.TRANSPARANT, null);
 		tab = (SlideTab) Shape.get(Shape.Type.SLIDE_TAB, null,
 				Colors.LABEL_SELECTED, null);
 
@@ -100,6 +95,7 @@ public class MainPage extends TouchableView {
 
 	@Override
 	public synchronized void layoutChildren() {
+		foregroundRect.layout(0, 0, width, height);
 		controlButtonHeight = height / 10;
 		float midiHeight = 3 * (height - controlButtonHeight) / 5;
 		float pageSelectGroupHeight = height - midiHeight - controlButtonHeight;
@@ -144,7 +140,7 @@ public class MainPage extends TouchableView {
 				drawChild(child);
 			}
 		}
-		drawTriangleFan(foregroundRectBuffer, foregroundColor);
+		foregroundRect.draw();
 		tab.draw();
 		drawChild(slideMenu);
 		drawChild(menuButton);
@@ -156,8 +152,8 @@ public class MainPage extends TouchableView {
 		menuButton.setPosition(x + menuButton.velocity, y + menuOffset / 2);
 		tab.layout(x - width, y + menuOffset / 2, tab.width, tab.height);
 
-		foregroundColor[3] = GeneralUtils.clipToUnit(menuButton.x
-				/ slideMenu.width) * .8f;
+		foregroundRect.setFillAlpha(GeneralUtils.clipToUnit(menuButton.x
+				/ slideMenu.width) * .8f);
 	}
 
 	private class MenuButton extends ImageButton {

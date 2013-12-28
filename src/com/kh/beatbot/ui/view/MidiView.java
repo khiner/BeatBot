@@ -16,6 +16,7 @@ import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.Shape;
+import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.helper.ScrollBarHelper;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
@@ -35,45 +36,19 @@ public class MidiView extends ClickableView {
 			loopSelectionOffset = 0, selectRegionStartTick = -1,
 			selectRegionStartY = -1;
 
-	private static boolean selectRegion = false;
-
 	private static int[] loopPointerIds = { -1, -1, -1 };
 
 	private static ShapeGroup unselectedRectangles = new ShapeGroup(),
 			selectedRectangles = new ShapeGroup(),
-			bgShapeGroup = new ShapeGroup(),
-			tickBarShapeGroup = new ShapeGroup();
+			bgShapeGroup = new ShapeGroup();
 
-	public float getMidiHeight() {
-		return Math.min(height - Y_OFFSET, allTracksHeight);
-	}
+	private FloatBuffer currTickVb = null, hLineVb = null;
 
-	public void setLoopPointerId(int num, int id) {
-		if ((id != -1 && loopPointerIds[1] != -1 || num == 1
-				&& (loopPointerIds[0] != -1 || loopPointerIds[2] != -1)))
-			return; // can't select middle and left or right at the same time
-		loopPointerIds[num] = id;
-	}
+	// vertical line loop markers
+	private FloatBuffer[] loopMarkerLineVb = new FloatBuffer[2];
 
-	public int getNumLoopMarkersSelected() {
-		int numSelected = 0;
-		for (int i = 0; i < 3; i++)
-			if (loopPointerIds[i] != -1)
-				numSelected++;
-		return numSelected;
-	}
-
-	private FloatBuffer currTickVb = null, hLineVb = null,
-			selectRegionVb = null;
-
-	private FloatBuffer[] loopMarkerVb = new FloatBuffer[2]; // loop triangle
-																// markers
-	private FloatBuffer[] loopMarkerLineVb = new FloatBuffer[2]; // vertical
-																	// line loop
-																	// markers
-
-	private Rectangle selectedTrackRect = null, bgRect = null, loopRect = null,
-			tickBarRect, loopBarRect;
+	private Rectangle selectedTrackRect, bgRect, loopRect, tickBarRect,
+			loopBarRect, selectRegionRect;
 
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedNotes = new HashMap<Integer, MidiNote>();
@@ -85,6 +60,18 @@ public class MidiView extends ClickableView {
 	public enum State {
 		LEVELS_VIEW, NORMAL_VIEW, TO_LEVELS_VIEW, TO_NORMAL_VIEW
 	};
+
+	public float getMidiHeight() {
+		return Math.min(height - Y_OFFSET, allTracksHeight);
+	}
+
+	public int getNumLoopMarkersSelected() {
+		int numSelected = 0;
+		for (int i = 0; i < 3; i++)
+			if (loopPointerIds[i] != -1)
+				numSelected++;
+		return numSelected;
+	}
 
 	public void reset() {
 		TickWindowHelper.setTickOffset(0);
@@ -109,7 +96,9 @@ public class MidiView extends ClickableView {
 		bottomY = noteToY(bottomNote + 1);
 		// make room in the view window if we are dragging out of the view
 		TickWindowHelper.updateView(tick, topY, bottomY);
-		initSelectRegionVb(leftTick, rightTick, topY, bottomY);
+		selectRegionRect.layout(tickToUnscaledX(leftTick), topY,
+				tickToUnscaledX(rightTick - leftTick), bottomY - topY);
+		selectRegionRect.setFillColor(Colors.VOLUME_TRANS);
 	}
 
 	public MidiNote getMidiNote(int track, float tick) {
@@ -165,6 +154,7 @@ public class MidiView extends ClickableView {
 		} else if (x > loopBeginX && x < loopEndX) {
 			loopPointerIds[1] = pointerId;
 			loopSelectionOffset = x - loopBeginX;
+			loopBarRect.setFillColor(Colors.VOLUME);
 		}
 	}
 
@@ -182,86 +172,21 @@ public class MidiView extends ClickableView {
 	private void drawLoopMarker() {
 		for (int i = 0; i < 2; i++) {
 			float[] color = loopPointerIds[i * 2] == -1 ? Colors.TICK_MARKER
-					: Colors.TICK_SELECTED;
-			// drawTriangleStrip(loopMarkerVb[i], color);
+					: Colors.VOLUME;
 			drawLines(loopMarkerLineVb[i], color, 6, GL10.GL_LINES);
 		}
-	}
-
-	private void updateBgRect() {
-		float width = tickToUnscaledX(MidiManager.MAX_TICKS - 1);
-		if (bgRect == null) {
-			bgRect = makeRectangle(bgShapeGroup, 0, Y_OFFSET, width,
-					allTracksHeight, Colors.MIDI_VIEW_BG);
-		} else {
-			bgRect.layout(0, Y_OFFSET, width, allTracksHeight);
-		}
-		updateLoopRect();
 	}
 
 	private void initSelectedTrackVb(int selectedTrack) {
 		float x1 = 0;
 		float y1 = noteToUnscaledY(selectedTrack);
 		float width = tickToUnscaledX(MidiManager.MAX_TICKS - 1);
-		if (selectedTrackRect == null) {
-			selectedTrackRect = makeRectangle(null, x1, y1, width, trackHeight,
-					Colors.MIDI_SELECTED_TRACK, Colors.BLACK);
-		} else {
-			selectedTrackRect.layout(x1, y1, width, trackHeight);
-		}
-	}
-
-	private void initSelectRegionVb(float leftTick, float rightTick,
-			float topY, float bottomY) {
-		selectRegionVb = makeRectFloatBuffer(tickToUnscaledX(leftTick), topY,
-				tickToUnscaledX(rightTick), bottomY);
-	}
-
-	private void drawSelectRegion() {
-		if (!selectRegion || selectRegionVb == null)
-			return;
-		drawTriangleFan(selectRegionVb, Colors.VOLUME_TRANS);
+		selectedTrackRect.layout(x1, y1, width, trackHeight);
 	}
 
 	private void drawAllMidiNotes() {
 		unselectedRectangles.draw();
 		selectedRectangles.draw();
-	}
-
-	private void updateTickFillRect() {
-		if (tickBarRect == null) {
-			tickBarRect = makeRectangle(tickBarShapeGroup, 0, 0, width,
-					Y_OFFSET, Colors.TICK_FILL, Colors.BLACK);
-		} else {
-			tickBarRect.layout(0, 0, width, Y_OFFSET);
-		}
-	}
-
-	private void initLoopBarVb() {
-		float x = tickToUnscaledX(MidiManager.getLoopBeginTick());
-		float width = tickToUnscaledX(MidiManager.getLoopEndTick()) - x;
-		float height = Y_OFFSET;
-		float[] fillColor = loopPointerIds[1] == -1 ? Colors.TICKBAR
-				: Colors.TICK_SELECTED;
-		if (loopBarRect == null) {
-			loopBarRect = makeRectangle(tickBarShapeGroup, x, 0, width, height,
-					fillColor);
-		} else {
-			loopBarRect.layout(x, 0, width, height);
-			loopBarRect.setFillColor(fillColor);
-		}
-	}
-
-	private void updateLoopRect() {
-		float x = tickToUnscaledX(MidiManager.getLoopBeginTick());
-		float y = Y_OFFSET;
-		float width = tickToUnscaledX(MidiManager.getLoopEndTick()) - x;
-		if (loopRect == null) {
-			loopRect = makeRectangle(bgShapeGroup, x, y, width,
-					allTracksHeight, Colors.MIDI_VIEW_LIGHT_BG);
-		} else {
-			loopRect.layout(x, y, width, allTracksHeight);
-		}
 	}
 
 	private void initCurrTickVb() {
@@ -282,23 +207,6 @@ public class MidiView extends ClickableView {
 			hLines[i * 4 + 3] = y;
 		}
 		hLineVb = makeFloatBuffer(hLines);
-	}
-
-	private void initLoopMarkerVbs() {
-		float x1 = tickToUnscaledX(MidiManager.getLoopBeginTick());
-		float x2 = tickToUnscaledX(MidiManager.getLoopEndTick());
-		float[][] loopMarkerLines = new float[][] {
-				{ x1, 0, x1, Y_OFFSET + allTracksHeight },
-				{ x2, 0, x2, Y_OFFSET + allTracksHeight } };
-		// loop begin triangle, pointing right, and
-		// loop end triangle, pointing left
-		float[][] loopMarkerTriangles = new float[][] {
-				{ x1, 0, x1, Y_OFFSET, x1 + Y_OFFSET, Y_OFFSET / 2 },
-				{ x2, 0, x2, Y_OFFSET, x2 - Y_OFFSET, Y_OFFSET / 2 } };
-		for (int i = 0; i < 2; i++) {
-			loopMarkerLineVb[i] = makeFloatBuffer(loopMarkerLines[i]);
-			loopMarkerVb[i] = makeFloatBuffer(loopMarkerTriangles[i]);
-		}
 	}
 
 	public float tickToUnscaledX(float tick) {
@@ -354,12 +262,9 @@ public class MidiView extends ClickableView {
 	}
 
 	public void initAllVbs() {
-		updateBgRect();
 		initCurrTickVb();
 		initHLineVb();
-		initLoopMarkerVbs();
-		updateTickFillRect();
-		initLoopBarVb();
+		updateLoopUi();
 		TickWindowHelper.initVLineVbs();
 	}
 
@@ -367,8 +272,30 @@ public class MidiView extends ClickableView {
 		TickWindowHelper.init(this);
 		selectedRectangles.setStrokeWeight(MidiNote.BORDER_WIDTH);
 		unselectedRectangles.setStrokeWeight(MidiNote.BORDER_WIDTH);
-		tickBarShapeGroup.setStrokeWeight(2);
 		initAllVbs();
+	}
+
+	@Override
+	public synchronized void createChildren() {
+		bgRect = (Rectangle) Shape.get(Type.RECTANGLE, bgShapeGroup,
+				Colors.MIDI_VIEW_BG, null);
+		loopRect = (Rectangle) Shape.get(Type.RECTANGLE, bgShapeGroup,
+				Colors.MIDI_VIEW_LIGHT_BG, null);
+		selectedTrackRect = (Rectangle) Shape.get(Type.RECTANGLE, bgShapeGroup,
+				Colors.MIDI_SELECTED_TRACK, Colors.BLACK);
+		tickBarRect = (Rectangle) Shape.get(Type.RECTANGLE, bgShapeGroup,
+				Colors.TICK_FILL, Colors.BLACK);
+		loopBarRect = (Rectangle) Shape.get(Type.RECTANGLE, bgShapeGroup,
+				Colors.TICKBAR, null);
+		selectRegionRect = (Rectangle) Shape.get(Type.RECTANGLE, bgShapeGroup,
+				Colors.TRANSPARANT, null);
+	}
+
+	@Override
+	public synchronized void layoutChildren() {
+		tickBarRect.layout(0, 0, width, Y_OFFSET);
+		bgRect.layout(0, Y_OFFSET, tickToUnscaledX(MidiManager.MAX_TICKS - 1),
+				allTracksHeight);
 	}
 
 	@Override
@@ -382,29 +309,18 @@ public class MidiView extends ClickableView {
 		scale((float) MidiManager.MAX_TICKS
 				/ (float) TickWindowHelper.getNumTicks(), 1);
 
-		// draws background and loop-background in one call
+		// draws all rect children in one call
 		bgShapeGroup.draw();
-
-		push();
-
-		push();
-		translate(0, -TickWindowHelper.getYOffset());
-		selectedTrackRect.draw();
-		pop();
-
 		TickWindowHelper.drawVerticalLines();
+
+		push();
 		translate(0, -TickWindowHelper.getYOffset());
 		drawHorizontalLines();
 		drawAllMidiNotes();
 		pop();
 
-		// draws tick rect and loop rect in one call
-		tickBarShapeGroup.draw();
-
-		drawSelectRegion();
 		drawLoopMarker();
 		pop();
-		// ScrollBarHelper.drawScrollView(this);
 		if (PlaybackManager.getState() == PlaybackManager.State.PLAYING) {
 			// if playing, draw curr tick
 			drawCurrentTick();
@@ -453,13 +369,6 @@ public class MidiView extends ClickableView {
 	private void startSelectRegion(float x, float y) {
 		selectRegionStartTick = xToTick(x);
 		selectRegionStartY = noteToY(yToNote(y));
-		selectRegionVb = null;
-		selectRegion = true;
-	}
-
-	private void cancelSelectRegion() {
-		selectRegion = false;
-		selectRegionVb = null;
 	}
 
 	// adds a note starting at the nearest major tick (nearest displayed
@@ -483,23 +392,11 @@ public class MidiView extends ClickableView {
 		float y1 = noteToUnscaledY(note.getNoteValue());
 		float width = tickToUnscaledX(note.getOffTick()) - x1;
 
-		Rectangle rect = makeRectangle(whichRectangleGroup(note), x1, y1, width,
-				trackHeight, whichColor(note), Colors.BLACK);
+		Rectangle rect = (Rectangle) Shape.get(Shape.Type.RECTANGLE,
+				whichRectangleGroup(note), whichColor(note), Colors.BLACK);
+		rect.layout(x1, y1, width, trackHeight);
 		rect.destroy();
 		return rect;
-	}
-
-	private Rectangle makeRectangle(ShapeGroup group, float x1, float y1,
-			float width, float height, float[] fillColor) {
-		return makeRectangle(group, x1, y1, width, height, fillColor, null);
-	}
-
-	private Rectangle makeRectangle(ShapeGroup group, float x1, float y1,
-			float width, float height, float[] fillColor, float[] outlineColor) {
-		Rectangle newRect = (Rectangle) Shape.get(Shape.Type.RECTANGLE, group,
-				fillColor, outlineColor);
-		newRect.layout(x1, y1, width, height);
-		return newRect;
 	}
 
 	public void updateNoteView(MidiNote note) {
@@ -612,14 +509,24 @@ public class MidiView extends ClickableView {
 	}
 
 	public void updateLoopUi() {
-		updateLoopRect();
-		initLoopMarkerVbs();
-		initLoopBarVb();
+		float x1 = tickToUnscaledX(MidiManager.getLoopBeginTick());
+		float x2 = tickToUnscaledX(MidiManager.getLoopEndTick());
+
+		loopBarRect.layout(x1, 0, x2 - x1, Y_OFFSET);
+		loopRect.layout(x1, Y_OFFSET, x2 - x1, allTracksHeight);
+
+		float[][] loopMarkerLines = new float[][] {
+				{ x1, 0, x1, Y_OFFSET + allTracksHeight },
+				{ x2, 0, x2, Y_OFFSET + allTracksHeight } };
+		
+		for (int i = 0; i < 2; i++) {
+			loopMarkerLineVb[i] = makeFloatBuffer(loopMarkerLines[i]);
+		}
 	}
 
 	public void noMidiMove() {
 		if (pointerCount() - getNumLoopMarkersSelected() == 1) {
-			if (selectRegion) { // update select region
+			if (selectRegionStartTick >= 0) {
 				selectRegion(pointerIdToPos.get(0).x, pointerIdToPos.get(0).y);
 			} else { // one finger scroll
 				TickWindowHelper.scroll(pointerIdToPos.get(scrollPointerId).x,
@@ -690,7 +597,7 @@ public class MidiView extends ClickableView {
 					scrollPointerId = id;
 				} else {
 					// can never select region with two pointers in midi view
-					cancelSelectRegion();
+					selectRegionRect.setFillColor(Colors.TRANSPARANT);
 					// init zoom anchors (the same ticks should be under the
 					// fingers at all times)
 					zoomLeftAnchorTick = leftTick;
@@ -749,8 +656,12 @@ public class MidiView extends ClickableView {
 		if (id == pinchLeftPointerId || id == pinchRightPointerId)
 			pinchLeftPointerId = pinchRightPointerId = -1;
 		for (int i = 0; i < 3; i++)
-			if (loopPointerIds[i] == id)
+			if (loopPointerIds[i] == id) {
 				loopPointerIds[i] = -1;
+				if (i == 1) {
+					loopBarRect.setFillColor(Colors.TICKBAR);
+				}
+			}
 		if (zoomLeftAnchorTick != -1) {
 			int otherId = id == 0 ? 1 : 0;
 			TickWindowHelper.scrollAnchorTick = xToTick(pointerIdToPos
@@ -767,11 +678,12 @@ public class MidiView extends ClickableView {
 		for (int i = 0; i < 3; i++) {
 			loopPointerIds[i] = -1;
 		}
+		loopBarRect.setFillColor(Colors.TICKBAR);
 		pinchLeftPointerId = pinchRightPointerId = -1;
-		selectRegion = false;
+		selectRegionStartTick = -1;
+		selectRegionRect.setFillColor(Colors.TRANSPARANT);
 		startOnTicks.clear();
 		touchedNotes.clear();
-		initLoopBarVb();
 		MidiManager.endMidiEvent();
 	}
 

@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.view;
 
-import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,9 +8,11 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Circle;
 import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.Shape.Type;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.page.NoteLevelsPage;
 
 public class LevelsView extends TouchableView {
@@ -37,8 +38,6 @@ public class LevelsView extends TouchableView {
 
 	private static final int LEVEL_BAR_WIDTH = LEVEL_POINT_SIZE / 2;
 
-	private FloatBuffer levelBarVb = null;
-
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedLevels = new HashMap<Integer, MidiNote>();
 
@@ -48,9 +47,11 @@ public class LevelsView extends TouchableView {
 
 	private LevelType currLevelType = LevelType.VOLUME;
 
-	private float selectRegionStartTick = -1, selectRegionStartY = -1;
+	private float selectRegionStartX = -1, selectRegionStartY = -1;
 
-	private Rectangle selectRegionShape;
+	private static ShapeGroup levelBarGroup = new ShapeGroup();
+	private Rectangle selectRegionRect, levelBarRect;
+	private Circle levelBarCircle, levelBarSelectCircle;
 
 	public LevelType getLevelType() {
 		return currLevelType;
@@ -68,48 +69,20 @@ public class LevelsView extends TouchableView {
 		return touchedLevels.get(id);
 	}
 
-	private void initLevelBarVb() {
-		float[] vertices = new float[800];
-		vertices[0] = -LEVEL_BAR_WIDTH / 2;
-		vertices[1] = height;
-		vertices[2] = LEVEL_BAR_WIDTH / 2;
-		vertices[3] = height;
-		for (int i = 1; i < vertices.length / 4; i++) {
-			vertices[i * 4] = -LEVEL_BAR_WIDTH / 2;
-			vertices[i * 4 + 1] = levelToY((float) i / (vertices.length / 4));
-			vertices[i * 4 + 2] = LEVEL_BAR_WIDTH / 2;
-			vertices[i * 4 + 3] = vertices[i * 4 + 1];
-		}
-		levelBarVb = makeFloatBuffer(vertices);
-	}
-
-	private int calcVertex(float level) {
-		int vertex = (int) (level * (levelBarVb.capacity() / 2 - 16));
-		vertex += 16;
-		vertex += vertex % 2;
-		vertex = vertex > 2 ? vertex : 2;
-		return vertex;
-	}
-
-	protected void drawLevel(float x, float level, float[] levelColor) {
-		int vertex = calcVertex(level);
-		gl.glPushMatrix();
+	protected void drawLevel(MidiNote midiNote, float[] levelColor, float[] levelColorTrans) {
+		float x = tickToX(midiNote.getOnTick());
+		float y = levelToY(midiNote.getLevel(currLevelType));
+		levelBarRect.layout(-LEVEL_BAR_WIDTH / 2, y, LEVEL_BAR_WIDTH, height
+				- y - BG_OFFSET);
+		levelBarCircle.setPosition(0, y);
+		levelBarSelectCircle.setPosition(0, y);
+		levelBarRect.setFillColor(levelColor);
+		levelBarCircle.setFillColor(levelColor);
+		levelBarSelectCircle.setFillColor(levelColorTrans);
+		push();
 		translate(x, 0);
-		drawTriangleStrip(levelBarVb, levelColor, vertex);
-
-		translate(0, levelBarVb.get(vertex * 2 - 1));
-		// draw level-colored circle at beginning and end of level
-		drawCircle(LEVEL_BAR_WIDTH / 2, levelColor, 0, 0);
-
-		drawLevelSelectionCircle(vertex - 2, levelColor);
-		gl.glPopMatrix();
-	}
-
-	protected void drawLevelSelectionCircle(int vertex, float[] levelColor) {
-		// draw bigger, translucent 'selection' circle at end of level
-		levelColor[3] = .5f;
-		drawCircle(5 * LEVEL_BAR_WIDTH / 4, levelColor, 0, 0);
-		levelColor[3] = 1;
+		levelBarGroup.draw();
+		pop();
 	}
 
 	private float[] calcLevelColor(boolean selected) {
@@ -129,12 +102,20 @@ public class LevelsView extends TouchableView {
 		}
 	}
 
-	private void drawLevels() {
-		for (int i = 0; i < TrackManager.currTrack.getMidiNotes().size(); i++) {
-			MidiNote midiNote = TrackManager.currTrack.getMidiNotes().get(i);
-			drawLevel(tickToX(midiNote.getOnTick()),
-					midiNote.getLevel(currLevelType),
-					calcLevelColor(midiNote.isSelected()));
+	private float[] calcLevelColorTrans(boolean selected) {
+		if (selected) {
+			return Colors.LEVEL_SELECTED_TRANS;
+		} else {
+			switch (currLevelType) {
+			case VOLUME:
+				return Colors.VOLUME_TRANS;
+			case PAN:
+				return Colors.PAN_TRANS;
+			case PITCH:
+				return Colors.PITCH_TRANS;
+			default:
+				return Colors.LEVEL_SELECTED_TRANS;
+			}
 		}
 	}
 
@@ -164,11 +145,12 @@ public class LevelsView extends TouchableView {
 	}
 
 	public void selectRegion(float x, float y) {
-		float tick = mainPage.midiView.xToTick(x);
-		float leftTick = Math.min(tick, selectRegionStartTick);
-		float rightTick = Math.max(tick, selectRegionStartTick);
+		float leftX = Math.min(x, selectRegionStartX);
+		float rightX = Math.max(x, selectRegionStartX);
 		float topY = Math.max(BG_OFFSET, Math.min(y, selectRegionStartY));
 		float bottomY = Math.max(y, selectRegionStartY);
+
+		float leftTick = xToTick(leftX), rightTick = xToTick(rightX);
 
 		for (MidiNote selectedNote : TrackManager.currTrack.getMidiNotes()) {
 			float levelY = levelToY(selectedNote.getLevel(currLevelType));
@@ -177,11 +159,10 @@ public class LevelsView extends TouchableView {
 					&& bottomY > levelY;
 			selectedNote.setSelected(selected);
 		}
-		selectRegionShape.layout(tickToX(leftTick), topY, tickToX(rightTick
-				- leftTick), bottomY - topY);
-		if (selectRegionShape.getFillColor() != Colors.VOLUME_TRANS) {
-			selectRegionShape.setFillColor(Colors.VOLUME_TRANS);
-		}
+
+		selectRegionRect.layout(this.x + leftX, this.y + topY, rightX - leftX,
+				bottomY - topY);
+		selectRegionRect.setFillColor(Colors.VOLUME_TRANS);
 	}
 
 	private void updateDragLine() {
@@ -233,12 +214,15 @@ public class LevelsView extends TouchableView {
 	}
 
 	private void startSelectRegion(float x, float y) {
-		selectRegionStartTick = mainPage.midiView.xToTick(x);
+		selectRegionStartX = x;
 		selectRegionStartY = y;
 	}
 
 	public void draw() {
-		drawLevels();
+		for (int i = 0; i < TrackManager.currTrack.getMidiNotes().size(); i++) {
+			MidiNote midiNote = TrackManager.currTrack.getMidiNotes().get(i);
+			drawLevel(midiNote, calcLevelColor(midiNote.isSelected()), calcLevelColorTrans(midiNote.isSelected()));
+		}
 	}
 
 	private float levelToY(float level) {
@@ -257,6 +241,11 @@ public class LevelsView extends TouchableView {
 	private float tickToX(float tick) {
 		return mainPage.midiView.tickToX(tick) + mainPage.midiView.absoluteX
 				- absoluteX;
+	}
+
+	private float xToTick(float x) {
+		return mainPage.midiView.xToTick(x + absoluteX
+				- mainPage.midiView.absoluteX);
 	}
 
 	public void handleActionPointerUp(int id, float x, float y) {
@@ -280,11 +269,6 @@ public class LevelsView extends TouchableView {
 	}
 
 	@Override
-	public synchronized void init() {
-		initLevelBarVb();
-	}
-
-	@Override
 	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
 		MidiManager.beginMidiEvent(TrackManager.currTrack);
@@ -302,17 +286,31 @@ public class LevelsView extends TouchableView {
 	public void handleActionUp(int id, float x, float y) {
 		super.handleActionUp(id, x, y);
 		clearTouchedLevels();
-		selectRegionShape.setFillColor(Colors.TRANSPARANT);
+		selectRegionRect.setFillColor(Colors.TRANSPARANT);
 		MidiManager.endMidiEvent();
 	}
 
 	@Override
 	protected synchronized void createChildren() {
 		initBgRect(Type.ROUNDED_RECT, NoteLevelsPage.shapeGroup);
-		selectRegionShape = (Rectangle) Shape.get(Type.RECTANGLE,
+		selectRegionRect = (Rectangle) Shape.get(Type.RECTANGLE,
 				NoteLevelsPage.shapeGroup, Colors.TRANSPARANT, null);
+		levelBarRect = (Rectangle) Shape.get(Type.RECTANGLE, levelBarGroup,
+				Colors.VOLUME, null);
+		levelBarCircle = (Circle) Shape.get(Type.CIRCLE, levelBarGroup,
+				Colors.VOLUME, null);
+		levelBarSelectCircle = (Circle) Shape.get(Type.CIRCLE, levelBarGroup,
+				Colors.VOLUME, null);
 	}
-	
+
+	@Override
+	public synchronized void layoutChildren() {
+		levelBarRect.layout(-LEVEL_BAR_WIDTH / 2, 0, LEVEL_BAR_WIDTH, height);
+		levelBarCircle.layout(0, 0, LEVEL_BAR_WIDTH, LEVEL_BAR_WIDTH);
+		levelBarSelectCircle.layout(0, 0, LEVEL_BAR_WIDTH * 2,
+				LEVEL_BAR_WIDTH * 2);
+	}
+
 	@Override
 	public void layoutBgRect() {
 		super.layoutBgRect();

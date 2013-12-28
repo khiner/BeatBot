@@ -7,12 +7,13 @@ import com.kh.beatbot.R;
 public class Colors {
 	public static float[] BG, BLACK, WHITE, GREEN, YELLOW, RED, MIDI_VIEW_BG,
 			MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM, NOTE, NOTE_SELECTED,
-			VOLUME, PAN, PITCH, LEVEL_SELECTED, TICK_FILL, TICK_MARKER,
-			TICKBAR, TICK_SELECTED, VOLUME_LIGHT, VOLUME_TRANS, BPM_OFF,
-			BPM_ON, BPM_ON_SELECTED, BPM_OFF_SELECTED, VIEW_BG,
-			VIEW_BG_SELECTED, LABEL_DARK, LABEL_MED, LABEL_LIGHT,
-			LABEL_VERY_LIGHT, LABEL_SELECTED, LABEL_SELECTED_TRANS,
-			MIDI_SELECTED_TRACK, TRANSPARANT = { 0, 0, 0, 0 };
+			VOLUME, PAN, PITCH, VOLUME_LIGHT, VOLUME_TRANS, PAN_TRANS,
+			PITCH_TRANS, LEVEL_SELECTED, LEVEL_SELECTED_TRANS, TICK_FILL,
+			TICK_MARKER, TICKBAR, BPM_OFF, BPM_ON, BPM_ON_SELECTED,
+			BPM_OFF_SELECTED, VIEW_BG, VIEW_BG_SELECTED, LABEL_DARK, LABEL_MED,
+			LABEL_LIGHT, LABEL_VERY_LIGHT, LABEL_SELECTED,
+			LABEL_SELECTED_TRANS, MIDI_SELECTED_TRACK, TRANSPARANT = { 0, 0, 0,
+					0 };
 
 	public static float[][] MIDI_LINES = { { 0, 0, 0, 1 },
 			{ .1f, .1f, .1f, 1 }, { .2f, .2f, .2f, 1 }, { .3f, .3f, .3f, 1 },
@@ -49,17 +50,21 @@ public class Colors {
 				R.color.midiViewLightBg);
 		GRID_LINE = colorResourceToFloats(activity, R.color.gridLine);
 		VOLUME = colorResourceToFloats(activity, R.color.volume);
-		WAVEFORM = colorResourceToFloats(activity, R.color.waveform);
+		VOLUME_TRANS = new float[] { VOLUME[0], VOLUME[1], VOLUME[2], .6f };
+		VOLUME_LIGHT = colorResourceToFloats(activity, R.color.volumeLight);
 		PAN = colorResourceToFloats(activity, R.color.pan);
+		PAN_TRANS = new float[] { PAN[0], PAN[1], PAN[2], .6f };
 		PITCH = colorResourceToFloats(activity, R.color.pitch);
+		PITCH_TRANS = new float[] { PITCH[0], PITCH[1], PITCH[2], .6f };
+
+		WAVEFORM = colorResourceToFloats(activity, R.color.waveform);
 		LEVEL_SELECTED = colorResourceToFloats(activity, R.color.levelSelected);
+		LEVEL_SELECTED_TRANS = new float[] { LEVEL_SELECTED[0],
+				LEVEL_SELECTED[1], LEVEL_SELECTED[2], .6f };
+
 		TICK_FILL = colorResourceToFloats(activity, R.color.tickFill);
 		TICK_MARKER = colorResourceToFloats(activity, R.color.tickMarker);
 		TICKBAR = colorResourceToFloats(activity, R.color.tickBar);
-		TICK_SELECTED = colorResourceToFloats(activity, R.color.tickSelected);
-
-		VOLUME_TRANS = new float[] { VOLUME[0], VOLUME[1], VOLUME[2], .6f };
-		VOLUME_LIGHT = colorResourceToFloats(activity, R.color.volumeLight);
 
 		BPM_ON = colorResourceToFloats(activity, R.color.bpmOn);
 		BPM_OFF = colorResourceToFloats(activity, R.color.bpmOff);

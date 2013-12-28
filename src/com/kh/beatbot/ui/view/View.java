@@ -38,7 +38,7 @@ public abstract class View implements Comparable<View> {
 	public static MainPage mainPage;
 	public static EffectPage effectPage;
 
-	public static final float ¹ = (float) Math.PI, CIRCLE_RADIUS = 100;
+	public static final float ¹ = (float) Math.PI;
 	public static final float BG_OFFSET = 4;
 
 	public static GL11 gl;
@@ -66,28 +66,12 @@ public abstract class View implements Comparable<View> {
 	protected float[] backgroundColor = Colors.BG, clearColor = Colors.BG,
 			strokeColor = Colors.WHITE;
 
-	protected boolean initialized = false;
-
-	protected boolean shouldClip = true;
+	protected boolean initialized = false, shouldClip = true;
 
 	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0,
 			borderHeight = 0;
 
-	// just scale and translate this circle to draw any circle for efficiency
-	private static FloatBuffer circleVb = null;
-
 	protected ColorSet bgFillColorSet, bgStrokeColorSet;
-
-	static { // init circle
-		float theta = 0;
-		float coords[] = new float[128];
-		for (int i = 0; i < coords.length; i += 2) {
-			coords[i] = (float) Math.cos(theta) * CIRCLE_RADIUS;
-			coords[i + 1] = (float) Math.sin(theta) * CIRCLE_RADIUS;
-			theta += 4 * Math.PI / coords.length;
-		}
-		circleVb = makeFloatBuffer(coords);
-	}
 
 	public View() {
 		createChildren();
@@ -188,7 +172,7 @@ public abstract class View implements Comparable<View> {
 
 	protected abstract void createChildren();
 
-	public abstract void layoutChildren();
+	protected abstract void layoutChildren();
 
 	protected abstract void initIcons();
 
@@ -219,7 +203,8 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public void initAll() {
-		initBackgroundColor();
+		gl.glClearColor(backgroundColor[0], backgroundColor[1],
+				backgroundColor[2], backgroundColor[3]);
 		init();
 		for (View child : children) {
 			child.initAll();
@@ -353,17 +338,6 @@ public abstract class View implements Comparable<View> {
 		GLSurfaceViewBase.drawText(text, height, x, y);
 	}
 
-	public static final void drawRectangle(float x1, float y1, float x2,
-			float y2, float[] color) {
-		drawTriangleFan(makeRectFloatBuffer(x1, y1, x2, y2), color);
-	}
-
-	public static void drawRectangleOutline(float x1, float y1, float x2,
-			float y2, float[] color, float width) {
-		drawLines(makeRectFloatBuffer(x1, y1, x2, y2), color, width,
-				GL10.GL_LINE_LOOP);
-	}
-
 	public static final void drawTriangleStrip(FloatBuffer vb, float[] color,
 			int numVertices) {
 		drawTriangleStrip(vb, color, 0, numVertices);
@@ -385,12 +359,6 @@ public abstract class View implements Comparable<View> {
 				- beginVertex);
 	}
 
-	public static final void drawTriangleFan(FloatBuffer vb, float[] color) {
-		setColor(color);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_FAN, 0, vb.capacity() / 2);
-	}
-
 	public static final void drawLines(FloatBuffer vb, float[] color,
 			float width, int type, int stride) {
 		setColor(color);
@@ -404,33 +372,13 @@ public abstract class View implements Comparable<View> {
 		drawLines(vb, color, width, type, 0);
 	}
 
-	public static final void drawCircle(float pointSize, float[] color,
-			float x, float y) {
-		push();
-		translate(x, y);
-		float scale = pointSize / CIRCLE_RADIUS;
-		scale(scale, scale);
-		drawTriangleFan(circleVb, color);
-		pop();
-	}
-
 	protected final float distanceFromCenterSquared(float x, float y) {
 		return (x - width / 2) * (x - width / 2) + (y - height / 2)
 				* (y - height / 2);
 	}
 
-	public final void setBackgroundColor(float[] color) {
-		backgroundColor = color;
-		initBackgroundColor();
-	}
-
 	public static final void setColor(float[] color) {
 		gl.glColor4f(color[0], color[1], color[2], color[3]);
-	}
-
-	protected void initBackgroundColor() {
-		gl.glClearColor(backgroundColor[0], backgroundColor[1],
-				backgroundColor[2], backgroundColor[3]);
 	}
 
 	public float viewX(float x) {

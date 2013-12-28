@@ -129,7 +129,7 @@ public abstract class LevelsFXPage extends TouchableView {
 		setMasterMode(masterMode);
 		Param currParam = getCurrTrack().getCurrentLevelParam();
 		levelBar.setParam(currParam);
-		levelBar.setLevelColor(getLevelColor(currParam));
+		levelBar.setLevelColor(getLevelColor(currParam), getLevelColorTrans(currParam));
 		deselectAll();
 		selectLevel(currParam);
 	}
@@ -173,6 +173,17 @@ public abstract class LevelsFXPage extends TouchableView {
 			return Colors.PITCH;
 		}
 		return Colors.VOLUME;
+	}
+
+	private float[] getLevelColorTrans(Param currParam) {
+		if (currParam.equals(getCurrTrack().volumeParam)) {
+			return Colors.VOLUME_TRANS;
+		} else if (currParam.equals(getCurrTrack().panParam)) {
+			return Colors.PAN_TRANS;
+		} else if (currParam.equals(getCurrTrack().pitchParam)) {
+			return Colors.PITCH_TRANS;
+		}
+		return Colors.VOLUME_TRANS;
 	}
 
 	// effects methods

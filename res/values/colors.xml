@@ -34,7 +34,6 @@
     <color name="tickBar">#FF999999</color>
     <color name="tickFill">#FF4D4D4D</color>
     <color name="tickMarker">#FFCCCCCC</color>
-    <color name="tickSelected">#FF69c9ff</color> <!-- same as tronBlue -->
     <color name="viewBg">#FF546672</color>
     <color name="viewBgSelected">#FF647682</color>
     
