@@ -14,8 +14,7 @@ public class ValueLabel extends ControlView1dBase {
 	private static ColorSet fillColorSet = Colors.valueLabelFillColorSet;
 
 	public ValueLabel(ShapeGroup shapeGroup) {
-		initBgRect(Type.ROUNDED_RECT, shapeGroup, fillColorSet.disabledColor,
-				Colors.VOLUME);
+		initBgRect(Type.ROUNDED_RECT, shapeGroup, fillColorSet);
 	}
 
 	@Override
@@ -53,14 +52,12 @@ public class ValueLabel extends ControlView1dBase {
 			return;
 		anchorY = y;
 		anchorLevel = param.viewLevel;
-		bgRect.setFillColor(fillColorSet.pressedColor);
 		super.handleActionDown(id, x, y);
 	}
 
 	public void handleActionUp(int id, float x, float y) {
 		if (!enabled)
 			return;
-		bgRect.setFillColor(fillColorSet.defaultColor);
 		super.handleActionUp(id, x, y);
 	}
 }

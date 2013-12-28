@@ -154,7 +154,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 
 	@Override
 	protected synchronized void createChildren() {
-		initBgRect(Type.ROUNDED_RECT, null, Colors.VIEW_BG, Colors.VOLUME);
+		initBgRect(Type.ROUNDED_RECT, null);
 	}
 
 	@Override

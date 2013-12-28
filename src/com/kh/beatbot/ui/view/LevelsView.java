@@ -299,6 +299,7 @@ public class LevelsView extends TouchableView {
 
 	@Override
 	public void handleActionDown(int id, float x, float y) {
+		super.handleActionDown(id, x, y);
 		MidiManager.beginMidiEvent(TrackManager.currTrack);
 		if (!selectLevel(x, y, id)) {
 			startSelectRegion(x, y);
@@ -312,6 +313,7 @@ public class LevelsView extends TouchableView {
 
 	@Override
 	public void handleActionUp(int id, float x, float y) {
+		super.handleActionUp(id, x, y);
 		clearTouchedLevels();
 		selectRegion = false;
 		MidiManager.endMidiEvent();
@@ -319,7 +321,7 @@ public class LevelsView extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		initBgRect(Type.ROUNDED_RECT, null, Colors.VIEW_BG, Colors.VOLUME);
+		initBgRect(Type.ROUNDED_RECT, null);
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import javax.microedition.khronos.opengles.GL11;
 import android.graphics.Typeface;
 
 import com.kh.beatbot.GeneralUtils;
+import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.RoundedRect;
 import com.kh.beatbot.ui.mesh.Shape;
@@ -62,8 +63,8 @@ public abstract class View implements Comparable<View> {
 	protected View parent;
 	protected Shape bgRect = null;
 
-	protected float[] backgroundColor = Colors.BG_COLOR,
-			clearColor = Colors.BG_COLOR, strokeColor = Colors.WHITE;
+	protected float[] backgroundColor = Colors.BG, clearColor = Colors.BG,
+			strokeColor = Colors.WHITE;
 
 	protected boolean initialized = false;
 
@@ -74,6 +75,8 @@ public abstract class View implements Comparable<View> {
 
 	// just scale and translate this circle to draw any circle for efficiency
 	private static FloatBuffer circleVb = null;
+
+	protected ColorSet bgFillColorSet, bgStrokeColorSet;
 
 	static { // init circle
 		float theta = 0;
@@ -90,9 +93,22 @@ public abstract class View implements Comparable<View> {
 		createChildren();
 	}
 
-	protected void initBgRect(Type type, ShapeGroup group, float[] fillColor,
-			float[] strokeColor) {
-		bgRect = Shape.get(type, group, fillColor, strokeColor);
+	protected void initBgRect(Type type, ShapeGroup group) {
+		initBgRect(type, group, Colors.defaultBgFillColorSet,
+				Colors.defaultBgStrokeColorSet);
+	}
+
+	protected void initBgRect(Type type, ShapeGroup group, ColorSet fillColorSet) {
+		initBgRect(type, group, fillColorSet, Colors.defaultBgStrokeColorSet);
+	}
+
+	protected void initBgRect(Type type, ShapeGroup group,
+			ColorSet fillColorSet, ColorSet strokeColorSet) {
+		this.bgFillColorSet = fillColorSet;
+		this.bgStrokeColorSet = strokeColorSet;
+		bgRect = Shape.get(type, group, fillColorSet == null ? null
+				: fillColorSet.defaultColor, strokeColorSet == null ? null
+				: strokeColorSet.defaultColor);
 	}
 
 	protected float getBgRectRadius() {
@@ -265,8 +281,8 @@ public abstract class View implements Comparable<View> {
 		if (bgRect instanceof RoundedRect) {
 			((RoundedRect) bgRect).setCornerRadius(Math.max(height / 9, 10));
 		}
-		bgRect.layout(BG_OFFSET, BG_OFFSET, width - BG_OFFSET
-				* 2, height - BG_OFFSET * 2);
+		bgRect.layout(BG_OFFSET, BG_OFFSET, width - BG_OFFSET * 2, height
+				- BG_OFFSET * 2);
 		minX = minY = getBgRectRadius() + BG_OFFSET;
 		maxX = width - getBgRectRadius() - BG_OFFSET;
 		maxY = height - getBgRectRadius() - BG_OFFSET;

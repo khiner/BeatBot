@@ -5,61 +5,69 @@ import java.util.Map;
 
 import android.view.MotionEvent;
 
-
 public abstract class TouchableView extends TextView {
 
-	// map of pointer ID #'s that this window is responsible for to their current
+	// map of pointer ID #'s that this window is responsible for to their
+	// current
 	// position relative to this window
 	protected Map<Integer, Position> pointerIdToPos = new HashMap<Integer, Position>();
-
-	protected float touchOffsetX = 0;
 
 	protected boolean shouldPropagateTouchEvents = true;
 
 	public final boolean ownsPointer(int id) {
 		return pointerIdToPos.containsKey(id);
 	}
-	
+
 	public final int pointerCount() {
 		return pointerIdToPos.size();
 	}
 
 	/********************************************************
-	 * These are the handlers that implementations should
-	 * override to actually handle touch events.  They are
-	 * not abstract here because not all TouchableViews may
-	 * want to implement each type of touch event (for example,
-	 * a view may not handle multi-touch events like pointer
-	 * up/down events.
+	 * These are the handlers that implementations should override to actually
+	 * handle touch events. They are not abstract here because not all
+	 * TouchableViews may want to implement each type of touch event (for
+	 * example, a view may not handle multi-touch events like pointer up/down
+	 * events.
 	 ********************************************************/
 	public void handleActionDown(int id, float x, float y) {
-		
+		if (bgRect != null) {
+			bgRect.setColors(bgFillColorSet == null ? null
+					: bgFillColorSet.pressedColor,
+					bgStrokeColorSet == null ? null
+							: bgStrokeColorSet.pressedColor);
+		}
 	}
 
 	public void handleActionUp(int id, float x, float y) {
-		
+		if (bgRect != null) {
+			bgRect.setColors(bgFillColorSet == null ? null
+					: bgFillColorSet.defaultColor,
+					bgStrokeColorSet == null ? null
+							: bgStrokeColorSet.defaultColor);
+		}
 	}
 
 	public void handleActionPointerDown(int id, float x, float y) {
-		
+
 	}
 
 	public void handleActionPointerUp(int id, float x, float y) {
-		
+
 	}
 
 	public void handleActionMove(int id, float x, float y) {
-		
+
 	}
-	
+
 	/**********************************************************************
-	 * Touch events are propagated to children, using coordinates relative 
-	 * to child.
+	 * Touch events are propagated to children, using coordinates relative to
+	 * child.
 	 * 
-	 * These methods also "consume" the actions, in case the view wants
-	 * to do something with these touch events.
+	 * These methods also "consume" the actions, in case the view wants to do
+	 * something with these touch events.
 	 **********************************************************************/
-	public final void propagateActionDown(MotionEvent e, int id, float x, float y) {
+	public final void propagateActionDown(MotionEvent e, int id, float x,
+			float y) {
 		consumeActionDown(id, x, y);
 		if (!shouldPropagateTouchEvents) {
 			return;
@@ -81,23 +89,26 @@ public abstract class TouchableView extends TextView {
 			child.propagateActionUp(e, id, x - child.x, y - child.y);
 	}
 
-	public final void propagateActionPointerDown(MotionEvent e, int id, float x,
-			float y) {
+	public final void propagateActionPointerDown(MotionEvent e, int id,
+			float x, float y) {
 		consumeActionPointerDown(id, x, y);
 		if (!shouldPropagateTouchEvents) {
 			return;
 		}
 		View child = findChildAt(x, y);
 		if (child instanceof TouchableView) {
-			TouchableView touchableChild = (TouchableView)child;
+			TouchableView touchableChild = (TouchableView) child;
 			if (touchableChild.pointerCount() == 0)
-				touchableChild.propagateActionDown(e, id, x - child.x, y - child.y);
+				touchableChild.propagateActionDown(e, id, x - child.x, y
+						- child.y);
 			else
-				touchableChild.propagateActionPointerDown(e, id, x - child.x, y - child.y);
+				touchableChild.propagateActionPointerDown(e, id, x - child.x, y
+						- child.y);
 		}
 	}
 
-	public final void propagateActionPointerUp(MotionEvent e, int id, float x, float y) {
+	public final void propagateActionPointerUp(MotionEvent e, int id, float x,
+			float y) {
 		consumeActionPointerUp(id, x, y);
 		if (!shouldPropagateTouchEvents) {
 			return;
@@ -110,8 +121,9 @@ public abstract class TouchableView extends TextView {
 				child.propagateActionPointerUp(e, id, x - child.x, y - child.y);
 		}
 	}
-	
-	public final void propagateActionMove(MotionEvent e, int id, float x, float y) {
+
+	public final void propagateActionMove(MotionEvent e, int id, float x,
+			float y) {
 		consumeActionMove(id, x, y);
 		if (!shouldPropagateTouchEvents) {
 			return;
@@ -122,13 +134,12 @@ public abstract class TouchableView extends TextView {
 	}
 
 	/***************************************************************
-	 * These "consume" methods are essentially wrappers around
-	 * handler methods that also take care of the business of
-	 * properly storing the pointers in the "id to position" map.
+	 * These "consume" methods are essentially wrappers around handler methods
+	 * that also take care of the business of properly storing the pointers in
+	 * the "id to position" map.
 	 ***************************************************************/
 	private final void consumeActionDown(int id, float x, float y) {
 		pointerIdToPos.put(id, new Position(x, y));
-		touchOffsetX = x - this.x;
 		handleActionDown(id, x, y);
 	}
 
@@ -153,15 +164,16 @@ public abstract class TouchableView extends TextView {
 		pointerIdToPos.get(id).set(x, y);
 		handleActionMove(id, x, y);
 	}
-	
+
 	/**
-	 * Find which child is responsible for touch events from
-	 * the pointer with the given id.
-	 *  
-	 * @param id the pointer id
-	 * @return the Touchable view child responsible for
-	 * handling actions from the given pointer id, or null
-	 * if no such Touchable child view exists
+	 * Find which child is responsible for touch events from the pointer with
+	 * the given id.
+	 * 
+	 * @param id
+	 *            the pointer id
+	 * @return the Touchable view child responsible for handling actions from
+	 *         the given pointer id, or null if no such Touchable child view
+	 *         exists
 	 */
 	protected TouchableView whichChildOwnsPointer(int id) {
 		for (View child : children) {

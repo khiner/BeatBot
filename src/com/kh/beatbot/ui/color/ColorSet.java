@@ -3,6 +3,10 @@ package com.kh.beatbot.ui.color;
 public class ColorSet {
 	public float[] defaultColor, pressedColor, selectedColor, disabledColor;
 
+	public ColorSet(float[] defaultColor) {
+		this(defaultColor, defaultColor);
+	}
+
 	public ColorSet(float[] defaultColor, float[] pressedColor) {
 		this(defaultColor, pressedColor, null);
 	}

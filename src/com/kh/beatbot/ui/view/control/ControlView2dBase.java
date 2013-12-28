@@ -26,13 +26,6 @@ public abstract class ControlView2dBase extends ControlViewBase implements
 	}
 
 	@Override
-	public void handleActionDown(int id, float x, float y) {
-		super.handleActionDown(id, x, y);
-		params[0].setLevel(xToLevel(x));
-		params[1].setLevel(yToLevel(y));
-	}
-
-	@Override
 	public void handleActionMove(int id, float x, float y) {
 		params[0].setLevel(xToLevel(x));
 		params[1].setLevel(yToLevel(y));

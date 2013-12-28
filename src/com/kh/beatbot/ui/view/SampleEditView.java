@@ -10,6 +10,7 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.RoundedRectIcon;
+import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.Shape.Type;
@@ -144,7 +145,8 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	public void layout(View parent, float x, float y, float width, float height) {
-		initBgRect(Type.RECTANGLE, null, Colors.LABEL_VERY_LIGHT, null);
+		bgFillColorSet = new ColorSet(Colors.LABEL_LIGHT, Colors.LABEL_VERY_LIGHT);
+		initBgRect(Type.RECTANGLE, null, bgFillColorSet, null);
 		waveformShape = Shape.createWaveform(shapeGroup, width,
 				Colors.LABEL_SELECTED, Colors.BLACK);
 		waveformShape.setStrokeWeight(2);
@@ -251,6 +253,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void handleActionDown(int id, float x, float y) {
+		super.handleActionDown(id, x, y);
 		if (!hasSample()) {
 			press();
 			return;
@@ -260,6 +263,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void handleActionUp(int id, float x, float y) {
+		super.handleActionUp(id, x, y);
 		if (!hasSample()) {
 			if (pressed) {
 				View.mainPage.pageSelectGroup
@@ -321,11 +325,11 @@ public class SampleEditView extends ControlView2dBase {
 
 	private void press() {
 		pressed = true;
-		bgRect.setFillColor(Colors.LABEL_SELECTED);
+		bgRect.setFillColor(bgFillColorSet.pressedColor);
 	}
 
 	private void release() {
-		bgRect.setFillColor(Colors.LABEL_VERY_LIGHT);
+		bgRect.setFillColor(bgFillColorSet.defaultColor);
 		pressed = false;
 	}
 

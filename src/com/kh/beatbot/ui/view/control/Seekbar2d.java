@@ -20,7 +20,7 @@ public class Seekbar2d extends ControlView2dBase {
 
 	public synchronized void createChildren() {
 		shapeGroup = new ShapeGroup();
-		initBgRect(Type.ROUNDED_RECT, shapeGroup, Colors.VIEW_BG, Colors.VOLUME);
+		initBgRect(Type.ROUNDED_RECT, shapeGroup);
 		intersectingLines = (IntersectingLines) Shape.get(
 				Type.INTERSECTING_LINES, shapeGroup, null, Colors.VOLUME);
 		circle = (Circle) Shape.get(Type.CIRCLE, shapeGroup, Colors.VOLUME,
@@ -37,8 +37,7 @@ public class Seekbar2d extends ControlView2dBase {
 	public void onParamChanged(Param param) {
 		float viewX = viewX(params[0].viewLevel);
 		float viewY = viewY(params[1].viewLevel);
-		circle.setPosition(BG_OFFSET + viewX - circle.width / 2, BG_OFFSET
-				+ viewY - circle.height / 2);
+		circle.setPosition(BG_OFFSET + viewX, BG_OFFSET + viewY);
 		intersectingLines.setIntersect(viewX, viewY);
 	}
 
@@ -58,6 +57,8 @@ public class Seekbar2d extends ControlView2dBase {
 	@Override
 	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
+		params[0].setLevel(xToLevel(x));
+		params[1].setLevel(yToLevel(y));
 		intersectingLines.setStrokeColor(selectColor);
 		circle.setFillColor(selectColor);
 	}

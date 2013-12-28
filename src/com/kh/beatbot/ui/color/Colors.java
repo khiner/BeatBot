@@ -5,12 +5,12 @@ import android.app.Activity;
 import com.kh.beatbot.R;
 
 public class Colors {
-	public static float[] BG_COLOR, BLACK, WHITE, GREEN, YELLOW, RED,
-			MIDI_VIEW_BG, MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM,
-			SELECT_REGION, NOTE, NOTE_SELECTED, VOLUME, PAN, PITCH,
-			LEVEL_SELECTED, TICK_FILL, TICK_MARKER, TICKBAR, TICK_SELECTED,
-			VOLUME_LIGHT, VOLUME_TRANS, BPM_OFF, BPM_ON, BPM_ON_SELECTED,
-			BPM_OFF_SELECTED, VIEW_BG, LABEL_DARK, LABEL_MED, LABEL_LIGHT,
+	public static float[] BG, BLACK, WHITE, GREEN, YELLOW, RED, MIDI_VIEW_BG,
+			MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM, SELECT_REGION, NOTE,
+			NOTE_SELECTED, VOLUME, PAN, PITCH, LEVEL_SELECTED, TICK_FILL,
+			TICK_MARKER, TICKBAR, TICK_SELECTED, VOLUME_LIGHT, VOLUME_TRANS,
+			BPM_OFF, BPM_ON, BPM_ON_SELECTED, BPM_OFF_SELECTED, VIEW_BG,
+			VIEW_BG_SELECTED, LABEL_DARK, LABEL_MED, LABEL_LIGHT,
 			LABEL_VERY_LIGHT, LABEL_SELECTED, LABEL_SELECTED_TRANS,
 			MIDI_SELECTED_TRACK, TRANSPARANT = { 0, 0, 0, 0 };
 
@@ -27,7 +27,8 @@ public class Colors {
 			effectLabelStrokeColorSet, effectLabelTouchedFillColorSet,
 			effectLabelTouchedStrokeColorSet, iconFillColorSet,
 			deleteFillColorSet, deleteStrokeColorSet, menuItemFillColorSet,
-			menuToggleFillColorSet, loopSelectionColorSet, loopSelectionStrokeColorSet;
+			menuToggleFillColorSet, loopSelectionColorSet,
+			loopSelectionStrokeColorSet, defaultBgFillColorSet, defaultBgStrokeColorSet;
 
 	public static void initColors(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
@@ -36,9 +37,10 @@ public class Colors {
 		YELLOW = colorResourceToFloats(activity, R.color.yellow);
 		GREEN = colorResourceToFloats(activity, R.color.green);
 
-		BG_COLOR = colorResourceToFloats(activity, R.color.background);
+		BG = colorResourceToFloats(activity, R.color.background);
 		VIEW_BG = colorResourceToFloats(activity, R.color.viewBg);
-
+		VIEW_BG_SELECTED = colorResourceToFloats(activity,
+				R.color.viewBgSelected);
 		NOTE = colorResourceToFloats(activity, R.color.note);
 		NOTE_SELECTED = colorResourceToFloats(activity, R.color.noteSelected);
 		MIDI_VIEW_BG = colorResourceToFloats(activity, R.color.midiViewBg);
@@ -112,9 +114,12 @@ public class Colors {
 
 		menuItemFillColorSet = new ColorSet(null, VOLUME);
 		menuToggleFillColorSet = new ColorSet(null, LABEL_LIGHT, VOLUME);
-		
+
 		loopSelectionColorSet = new ColorSet(VOLUME_TRANS, VOLUME);
 		loopSelectionStrokeColorSet = new ColorSet(VOLUME, VOLUME);
+		
+		defaultBgFillColorSet = new ColorSet(VIEW_BG, VIEW_BG_SELECTED);
+		defaultBgStrokeColorSet = new ColorSet(VOLUME);
 	}
 
 	public static float[] colorResourceToFloats(Activity activity,

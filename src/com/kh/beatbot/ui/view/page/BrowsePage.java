@@ -3,15 +3,19 @@ package com.kh.beatbot.ui.view.page;
 import java.io.File;
 
 import android.annotation.SuppressLint;
+
 import com.kh.beatbot.event.SampleSetEvent;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.view.Menu;
 import com.kh.beatbot.ui.view.menu.FileMenuItem;
 
 public class BrowsePage extends Menu {
+
+	private static ColorSet bgColorSet = new ColorSet(Colors.LABEL_SELECTED);
 
 	protected synchronized void createMenuItems() {
 		File[] topLevelDirs = new File[] { FileManager.drumsDirectory,
@@ -21,7 +25,7 @@ public class BrowsePage extends Menu {
 			topLevelItems.add(new FileMenuItem(this, null, topLevelDir));
 		}
 
-		initBgRect(Type.ROUNDED_RECT, null, Colors.LABEL_SELECTED, null);
+		initBgRect(Type.ROUNDED_RECT, null, bgColorSet, null);
 	}
 
 	public void fileItemReleased(FileMenuItem fileItem) {

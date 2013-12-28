@@ -42,6 +42,7 @@ public abstract class ClickableView extends TouchableView {
 
 	@Override
 	public void handleActionDown(int id, float x, float y) {
+		super.handleActionDown(id, x, y);
 		handler.postDelayed(longPressed, LONG_PRESS_TIME);
 		lastDownTime = System.currentTimeMillis();
 		lastTapX = x;
@@ -59,6 +60,7 @@ public abstract class ClickableView extends TouchableView {
 
 	@Override
 	public void handleActionUp(int id, float x, float y) {
+		super.handleActionUp(id, x, y);
 		long time = System.currentTimeMillis();
 		if (Math.abs(time - lastDownTime) < SINGLE_TAP_TIME) {
 			// if the second tap is not in the same location as the first tap,

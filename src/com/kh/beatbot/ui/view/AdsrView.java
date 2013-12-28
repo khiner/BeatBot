@@ -39,6 +39,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	@Override
 	public void handleActionDown(int id, float x, float y) {
+		super.handleActionDown(id, x, y);
 		selectAdsrPoint(id, clipX(x), clipY(y));
 	}
 
@@ -59,6 +60,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	@Override
 	public void handleActionUp(int id, float x, float y) {
+		super.handleActionUp(id, x, y);
 		clearAdsrSelected();
 	}
 
@@ -71,7 +73,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	protected synchronized void createChildren() {
 		shapeGroup = new ShapeGroup();
 		shapeGroup.setStrokeWeight(3);
-		initBgRect(Type.ROUNDED_RECT, shapeGroup, Colors.VIEW_BG, Colors.VOLUME);
+		initBgRect(Type.ROUNDED_RECT, shapeGroup);
 		adsrShape = (AdsrShape) Shape.get(Type.BEZIER, shapeGroup,
 				Colors.VOLUME, Colors.VOLUME);
 	}

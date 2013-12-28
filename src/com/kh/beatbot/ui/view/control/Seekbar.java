@@ -30,7 +30,7 @@ public class Seekbar extends ControlView1dBase {
 	public void setLevelColor(float[] newLevelColor) {
 		super.setLevelColor(newLevelColor);
 		foregroundRect.setFillColor(levelColor);
-		levelCircle.setFillColor(selectColor);
+		levelCircle.setFillColor(levelColorTrans);
 	}
 
 	@Override
@@ -69,13 +69,13 @@ public class Seekbar extends ControlView1dBase {
 	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
 		foregroundRect.setFillColor(selectColor);
-		levelCircle.setFillColor(levelColor);
+		levelCircle.setFillColor(selectColorTrans);
 	}
 
 	@Override
 	public void handleActionUp(int id, float x, float y) {
 		super.handleActionUp(id, x, y);
 		foregroundRect.setFillColor(levelColor);
-		levelCircle.setFillColor(selectColor);
+		levelCircle.setFillColor(levelColorTrans);
 	}
 }
