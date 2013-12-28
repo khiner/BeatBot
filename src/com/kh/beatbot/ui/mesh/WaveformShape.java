@@ -41,6 +41,7 @@ public class WaveformShape extends Shape {
 					TrackManager.currTrack.getSample(sampleIndex, 0));
 		}
 
+		resetIndices();
 		updateWaveformVertices();
 	}
 
