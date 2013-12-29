@@ -75,7 +75,7 @@ public class MainPage extends TouchableView {
 	@Override
 	protected synchronized void createChildren() {
 		foregroundRect = (Rectangle) Shape.get(Type.RECTANGLE, null,
-				Colors.TRANSPARANT, null);
+				Colors.TRANSPARENT, null);
 		tab = (SlideTab) Shape.get(Shape.Type.SLIDE_TAB, null,
 				Colors.LABEL_SELECTED, null);
 

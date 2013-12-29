@@ -286,7 +286,7 @@ public class LevelsView extends TouchableView {
 	public void handleActionUp(int id, float x, float y) {
 		super.handleActionUp(id, x, y);
 		clearTouchedLevels();
-		selectRegionRect.setFillColor(Colors.TRANSPARANT);
+		selectRegionRect.setFillColor(Colors.TRANSPARENT);
 		MidiManager.endMidiEvent();
 	}
 
@@ -294,7 +294,7 @@ public class LevelsView extends TouchableView {
 	protected synchronized void createChildren() {
 		initBgRect(Type.ROUNDED_RECT, NoteLevelsPage.shapeGroup);
 		selectRegionRect = (Rectangle) Shape.get(Type.RECTANGLE,
-				NoteLevelsPage.shapeGroup, Colors.TRANSPARANT, null);
+				NoteLevelsPage.shapeGroup, Colors.TRANSPARENT, null);
 		levelBarRect = (Rectangle) Shape.get(Type.RECTANGLE, levelBarGroup,
 				Colors.VOLUME, null);
 		levelBarCircle = (Circle) Shape.get(Type.CIRCLE, levelBarGroup,

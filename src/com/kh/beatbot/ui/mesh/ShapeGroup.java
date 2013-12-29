@@ -66,25 +66,6 @@ public class ShapeGroup {
 		}
 	}
 
-	public void replace(Shape oldShape, Shape newShape) {
-		if (newShape == null) {
-			remove(oldShape);
-			return;
-		}
-		if (oldShape == null) {
-			add(newShape);
-			return;
-		}
-		fillGroup.replace(oldShape.getFillMesh(), newShape.getFillMesh());
-		strokeGroup.replace(oldShape.getStrokeMesh(), newShape.getStrokeMesh());
-
-		if (oldShape.getFillMesh() == null || newShape.getFillMesh() != null
-				|| oldShape.getStrokeMesh() == null
-				|| newShape.getStrokeMesh() != null) {
-			newShape.update();
-		}
-	}
-
 	// put at the top of the stack, so it is displayed ontop of all others
 	public void push(Shape shape) {
 		fillGroup.push(shape.fillMesh);

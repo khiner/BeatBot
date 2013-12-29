@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui;
 
+import com.kh.beatbot.ui.IconResource.State;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Shape;
@@ -7,8 +8,13 @@ import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public abstract class ShapeIcon extends Icon {
 
+	protected final float OFFSET = 2;
+
 	protected ShapeGroup shapeGroup;
+	protected ColorSet fillColorSet, strokeColorSet;
 	protected boolean shouldDraw;
+
+	protected float pressedX, pressedY, pressedWidth, pressedHeight;
 
 	protected ShapeIcon(ShapeGroup shapeGroup, Shape.Type type,
 			ColorSet bgColorSet) {
@@ -16,28 +22,67 @@ public abstract class ShapeIcon extends Icon {
 	}
 
 	protected ShapeIcon(ShapeGroup shapeGroup, Shape.Type type,
-			ColorSet bgColorSet, ColorSet strokeColorSet) {
+			ColorSet fillColorSet, ColorSet strokeColorSet) {
 		// if there is already a global group, then it will be drawn elsewhere.
 		// otherwise, we create a new group to share amongst all icons
 		shouldDraw = (shapeGroup == null);
 		this.shapeGroup = shouldDraw ? new ShapeGroup() : shapeGroup;
 		this.shapeGroup.setStrokeWeight(1);
-		Shape defaultShape = Shape.get(type, this.shapeGroup,
-				bgColorSet == null ? null : bgColorSet.defaultColor,
-				strokeColorSet == null ? null : strokeColorSet.defaultColor);
+		this.fillColorSet = fillColorSet;
+		this.strokeColorSet = strokeColorSet;
+		currentDrawable = Shape.get(type, this.shapeGroup,
+				fillColorSet == null ? null : Colors.TRANSPARENT,
+				strokeColorSet == null ? null : Colors.TRANSPARENT);
+	}
 
-		this.shapeGroup.remove(defaultShape);
-		Shape pressedShape = Shape.get(type, this.shapeGroup,
-				bgColorSet == null ? null : bgColorSet.pressedColor,
-				strokeColorSet == null ? null : strokeColorSet.pressedColor);
-		this.shapeGroup.remove(pressedShape);
-		Shape selectedShape = Shape.get(type, this.shapeGroup,
-				bgColorSet == null ? null : bgColorSet.selectedColor,
-				strokeColorSet == null ? null : strokeColorSet.selectedColor);
-		this.shapeGroup.remove(selectedShape);
-		this.resource = new IconResource(defaultShape, pressedShape,
-				selectedShape, null);
-		setState(IconResource.State.DEFAULT);
+	@Override
+	public void setState(IconResource.State state) {
+		this.state = lockedState != null ? lockedState : state;
+
+		float[] fillColor = getCurrFillColor();
+		float[] strokeColor = getCurrStrokeColor();
+		if (null == fillColor && null == strokeColor
+				&& this.state == State.PRESSED) {
+			fillColor = getFillColor(State.SELECTED);
+			strokeColor = getStrokeColor(State.SELECTED);
+		}
+		if (null == fillColor && null == strokeColor) {
+			fillColor = getFillColor(State.DEFAULT);
+			strokeColor = getStrokeColor(State.DEFAULT);
+		}
+
+		switch (this.state) {
+		case DEFAULT:
+		case DISABLED:
+			currentDrawable.layout(x + OFFSET, y + OFFSET, width - OFFSET * 2,
+					height - OFFSET * 2);
+			break;
+		case PRESSED:
+		case SELECTED:
+			currentDrawable.layout(pressedX, pressedY, pressedWidth,
+					pressedHeight);
+			break;
+		}
+
+		((Shape) currentDrawable).setColors(
+				fillColor == null ? Colors.TRANSPARENT : fillColor,
+				strokeColor == null ? Colors.TRANSPARENT : strokeColor);
+	}
+
+	@Override
+	public void layout(float x, float y, float width, float height) {
+		this.x = shouldDraw ? 0 : x;
+		this.y = shouldDraw ? 0 : y;
+		this.width = width;
+		this.height = height;
+
+		float pressedScale = Math.min(width, height) * .1f;
+		pressedWidth = width - OFFSET * 2 - pressedScale;
+		pressedHeight = height - OFFSET * 2 - pressedScale;
+		pressedX = this.x + width / 2 - pressedWidth / 2;
+		pressedY = this.y + height / 2 - pressedHeight / 2;
+
+		setState(state);
 	}
 
 	@Override
@@ -47,73 +92,29 @@ public abstract class ShapeIcon extends Icon {
 		}
 	}
 
-	@Override
-	protected void setDrawable(Drawable icon) {
-		Shape prevShape = (Shape) currentDrawable;
-		super.setDrawable(icon);
-		shapeGroup.replace(prevShape, (Shape) currentDrawable);
-	}
-
 	public void setFillColorSet(ColorSet fillColorSet) {
-		Drawable prevIcon = currentDrawable;
-		if (resource.defaultDrawable != null) {
-			setDrawable(resource.defaultDrawable);
-			((Shape) resource.defaultDrawable)
-					.setFillColor(fillColorSet.defaultColor);
-		}
-		if (resource.pressedDrawable != null) {
-			setDrawable(resource.pressedDrawable);
-			((Shape) resource.pressedDrawable)
-					.setFillColor(fillColorSet.pressedColor);
-		}
-		if (fillColorSet.selectedColor != null) {
-			setDrawable(resource.selectedDrawable);
-			((Shape) resource.selectedDrawable)
-					.setFillColor(fillColorSet.selectedColor);
-		}
-		setDrawable(prevIcon);
-	}
-
-	public void setColors(ColorSet fillColorSet, ColorSet outlineColorSet) {
-		Drawable prevIcon = currentDrawable;
-		if (resource.defaultDrawable != null) {
-			setDrawable(resource.defaultDrawable);
-			((Shape) resource.defaultDrawable).setColors(
-					fillColorSet.defaultColor, outlineColorSet.defaultColor);
-		}
-		if (resource.pressedDrawable != null) {
-			setDrawable(resource.pressedDrawable);
-			((Shape) resource.pressedDrawable).setColors(
-					fillColorSet.pressedColor, outlineColorSet.pressedColor);
-		}
-		if (fillColorSet.selectedColor != null
-				&& outlineColorSet.selectedColor != null) {
-			setDrawable(resource.selectedDrawable);
-			((Shape) resource.selectedDrawable).setColors(
-					fillColorSet.selectedColor, outlineColorSet.selectedColor);
-		}
-		setDrawable(prevIcon);
-	}
-
-	public float[] getCurrStrokeColor() {
-		if (currentDrawable != null) {
-			return ((Shape) currentDrawable).getStrokeColor();
-		} else {
-			return Colors.BLACK;
-		}
-	}
-
-	public float[] getCurrFillColor() {
-		if (currentDrawable != null) {
-			return ((Shape) currentDrawable).getFillColor();
-		} else {
-			return Colors.WHITE;
-		}
+		this.fillColorSet = fillColorSet;
 	}
 
 	public void destroy() {
 		if (currentDrawable != null) {
-			shapeGroup.remove((Shape) currentDrawable);
+			((Shape) currentDrawable).destroy();
 		}
+	}
+
+	public float[] getCurrFillColor() {
+		return getFillColor(state);
+	}
+
+	public float[] getCurrStrokeColor() {
+		return getStrokeColor(state);
+	}
+
+	private float[] getFillColor(State state) {
+		return fillColorSet == null ? null : fillColorSet.getColor(state);
+	}
+
+	private float[] getStrokeColor(State state) {
+		return strokeColorSet == null ? null : strokeColorSet.getColor(state);
 	}
 }

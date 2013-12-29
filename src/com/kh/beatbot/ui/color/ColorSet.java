@@ -1,5 +1,7 @@
 package com.kh.beatbot.ui.color;
 
+import com.kh.beatbot.ui.IconResource.State;
+
 public class ColorSet {
 	public float[] defaultColor, pressedColor, selectedColor, disabledColor;
 
@@ -22,5 +24,20 @@ public class ColorSet {
 		this.pressedColor = pressedColor;
 		this.selectedColor = selectedColor;
 		this.disabledColor = disabledColor;
+	}
+
+	public float[] getColor(State state) {
+		switch (state) {
+		case DEFAULT:
+			return defaultColor;
+		case PRESSED:
+			return pressedColor;
+		case SELECTED:
+			return selectedColor;
+		case DISABLED:
+			return disabledColor;
+		default:
+			return defaultColor;
+		}
 	}
 }

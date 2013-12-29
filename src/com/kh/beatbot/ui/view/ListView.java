@@ -21,7 +21,7 @@ public class ListView extends TouchableView implements OnPressListener {
 			lastY = 0;
 	private RoundedRect scrollBar = null;
 	private ColorTransition tabColorTransition = new ColorTransition(20, 20,
-			Colors.TRANSPARANT, END_TRANS_COLOR);
+			Colors.TRANSPARENT, END_TRANS_COLOR);
 
 	protected ImageButton selectedButton = null;
 
@@ -98,7 +98,7 @@ public class ListView extends TouchableView implements OnPressListener {
 	private RoundedRect getScrollTab() {
 		if (scrollBar == null) {
 			scrollBar = (RoundedRect) Shape.get(Type.ROUNDED_RECT, null,
-					Colors.TRANSPARANT, null);
+					Colors.TRANSPARENT, null);
 		}
 		return scrollBar;
 	}

@@ -124,30 +124,6 @@ public class MeshGroup {
 		dirty = true;
 	}
 
-	public synchronized void replace(Mesh2D oldMesh, Mesh2D newMesh) {
-		if (newMesh == null) {
-			remove(oldMesh);
-			return;
-		}
-		if (oldMesh == null) {
-			add(newMesh);
-			return;
-		}
-		if (oldMesh.getNumVertices() != newMesh.getNumVertices()) {
-			Log.e("MeshGroup",
-					"Attempting to replace a mesh with a new one with different num vertices");
-			return;
-		}
-		if (!children.contains(oldMesh)) {
-			Log.e("MeshGroup",
-					"Attempting to update a mesh that is not a child.");
-			return;
-		}
-
-		newMesh.parentVertexIndex = oldMesh.parentVertexIndex;
-		children.set(children.indexOf(oldMesh), newMesh);
-	}
-
 	public synchronized void push(Mesh2D mesh) {
 		if (mesh == null || !children.contains(mesh))
 			return;

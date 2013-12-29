@@ -281,7 +281,7 @@ public class MidiView extends ClickableView {
 		loopBarRect = (Rectangle) Shape.get(Type.RECTANGLE, bgShapeGroup,
 				Colors.TICKBAR, null);
 		selectRegionRect = (Rectangle) Shape.get(Type.RECTANGLE, bgShapeGroup,
-				Colors.TRANSPARANT, null);
+				Colors.TRANSPARENT, null);
 	}
 
 	@Override
@@ -586,7 +586,7 @@ public class MidiView extends ClickableView {
 					scrollPointerId = id;
 				} else {
 					// can never select region with two pointers in midi view
-					selectRegionRect.setFillColor(Colors.TRANSPARANT);
+					selectRegionRect.setFillColor(Colors.TRANSPARENT);
 					// init zoom anchors (the same ticks should be under the
 					// fingers at all times)
 					zoomLeftAnchorTick = leftTick;
@@ -670,7 +670,7 @@ public class MidiView extends ClickableView {
 		loopBarRect.setFillColor(Colors.TICKBAR);
 		pinchLeftPointerId = pinchRightPointerId = -1;
 		selectRegionStartTick = -1;
-		selectRegionRect.setFillColor(Colors.TRANSPARANT);
+		selectRegionRect.setFillColor(Colors.TRANSPARENT);
 		startOnTicks.clear();
 		touchedNotes.clear();
 		MidiManager.endMidiEvent();
