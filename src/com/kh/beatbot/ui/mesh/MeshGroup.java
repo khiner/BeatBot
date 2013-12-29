@@ -32,8 +32,8 @@ public class MeshGroup {
 		return vertices[index * 2 + 1];
 	}
 
-	protected synchronized void vertex(Mesh2D mesh, float x, float y, float[] color) {
-		dirty = true;
+	protected synchronized void vertex(Mesh2D mesh, float x, float y,
+			float[] color) {
 		int index = mesh.index + mesh.parentVertexIndex;
 		int vertexOffset = index * 2;
 		int colorOffset = index * 4;
@@ -43,6 +43,7 @@ public class MeshGroup {
 		colors[colorOffset + 1] = color[1];
 		colors[colorOffset + 2] = color[2];
 		colors[colorOffset + 3] = color[3];
+		dirty = true;
 	}
 
 	protected synchronized void translate(Mesh2D mesh, float x, float y) {
@@ -103,16 +104,14 @@ public class MeshGroup {
 					"Attempting to remove a mesh that is not a child.");
 			return;
 		}
-		children.remove(mesh);
 
-		for (int i = mesh.parentVertexIndex; i < numVertices - mesh.numVertices; i++) {
-			vertices[i * 2] = vertices[(i + mesh.numVertices) * 2];
-			vertices[i * 2 + 1] = vertices[(i + mesh.numVertices) * 2 + 1];
-			colors[i * 4] = colors[(i + mesh.numVertices) * 4];
-			colors[i * 4 + 1] = colors[(i + mesh.numVertices) * 4 + 1];
-			colors[i * 4 + 2] = colors[(i + mesh.numVertices) * 4 + 2];
-			colors[i * 4 + 3] = colors[(i + mesh.numVertices) * 4 + 3];
-		}
+		int dst = mesh.parentVertexIndex + mesh.numVertices;
+		System.arraycopy(vertices, dst * 2, vertices,
+				mesh.parentVertexIndex * 2, vertices.length - dst * 2);
+		System.arraycopy(colors, dst * 4, colors, mesh.parentVertexIndex * 4,
+				colors.length - dst * 4);
+
+		children.remove(mesh);
 
 		int currVertexIndex = 0;
 		for (Mesh2D child : children) {
@@ -144,6 +143,38 @@ public class MeshGroup {
 
 		newMesh.parentVertexIndex = oldMesh.parentVertexIndex;
 		children.set(children.indexOf(oldMesh), newMesh);
+	}
+
+	public synchronized void push(Mesh2D mesh) {
+		if (mesh == null)
+			return;
+
+		int dst = mesh.parentVertexIndex + mesh.numVertices;
+
+		// move vertices to the end of the array
+		float[] tmp = Arrays.copyOfRange(vertices, mesh.parentVertexIndex * 2,
+				dst * 2);
+		System.arraycopy(vertices, dst * 2, vertices,
+				mesh.parentVertexIndex * 2, vertices.length - dst * 2);
+		System.arraycopy(tmp, 0, vertices, vertices.length - mesh.numVertices
+				* 2, mesh.numVertices * 2);
+
+		// move colors to the end of the array
+		tmp = Arrays.copyOfRange(colors, mesh.parentVertexIndex * 4, dst * 4);
+		System.arraycopy(colors, dst * 4, colors, mesh.parentVertexIndex * 4,
+				colors.length - dst * 4);
+		System.arraycopy(tmp, 0, colors, colors.length - mesh.numVertices * 4,
+				mesh.numVertices * 4);
+
+		children.remove(mesh);
+		children.add(mesh);
+
+		int currVertexIndex = 0;
+		for (Mesh2D child : children) {
+			child.parentVertexIndex = currVertexIndex;
+			currVertexIndex += child.getNumVertices();
+		}
+		dirty = true;
 	}
 
 	private synchronized void updateVertices() {
