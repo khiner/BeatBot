@@ -4,7 +4,6 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class ValueLabel extends ControlView1dBase {
@@ -14,7 +13,7 @@ public class ValueLabel extends ControlView1dBase {
 	private static ColorSet fillColorSet = Colors.valueLabelFillColorSet;
 
 	public ValueLabel(ShapeGroup shapeGroup) {
-		initBgRect(Type.ROUNDED_RECT, shapeGroup, fillColorSet);
+		initBgRect(true, shapeGroup, fillColorSet);
 	}
 
 	@Override

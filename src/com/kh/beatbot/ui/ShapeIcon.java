@@ -16,13 +16,12 @@ public abstract class ShapeIcon extends Icon {
 
 	protected float pressedX, pressedY, pressedWidth, pressedHeight;
 
-	protected ShapeIcon(ShapeGroup shapeGroup, Shape.Type type,
-			ColorSet bgColorSet) {
-		this(shapeGroup, type, bgColorSet, null);
+	protected ShapeIcon(ShapeGroup shapeGroup, ColorSet bgColorSet) {
+		this(shapeGroup, bgColorSet, null);
 	}
 
-	protected ShapeIcon(ShapeGroup shapeGroup, Shape.Type type,
-			ColorSet fillColorSet, ColorSet strokeColorSet) {
+	protected ShapeIcon(ShapeGroup shapeGroup, ColorSet fillColorSet,
+			ColorSet strokeColorSet) {
 		// if there is already a global group, then it will be drawn elsewhere.
 		// otherwise, we create a new group to share amongst all icons
 		shouldDraw = (shapeGroup == null);
@@ -30,10 +29,10 @@ public abstract class ShapeIcon extends Icon {
 		this.shapeGroup.setStrokeWeight(1);
 		this.fillColorSet = fillColorSet;
 		this.strokeColorSet = strokeColorSet;
-		currentDrawable = Shape.get(type, this.shapeGroup,
-				fillColorSet == null ? null : Colors.TRANSPARENT,
-				strokeColorSet == null ? null : Colors.TRANSPARENT);
+		currentDrawable = initShape();
 	}
+
+	protected abstract Shape initShape();
 
 	@Override
 	public void setState(IconResource.State state) {

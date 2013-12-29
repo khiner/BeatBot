@@ -10,8 +10,6 @@ import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Circle;
 import com.kh.beatbot.ui.mesh.Rectangle;
-import com.kh.beatbot.ui.mesh.Shape;
-import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.page.NoteLevelsPage;
 
@@ -69,7 +67,8 @@ public class LevelsView extends TouchableView {
 		return touchedLevels.get(id);
 	}
 
-	protected void drawLevel(MidiNote midiNote, float[] levelColor, float[] levelColorTrans) {
+	protected void drawLevel(MidiNote midiNote, float[] levelColor,
+			float[] levelColorTrans) {
 		float x = tickToX(midiNote.getOnTick());
 		float y = levelToY(midiNote.getLevel(currLevelType));
 		levelBarRect.layout(-LEVEL_BAR_WIDTH / 2, y, LEVEL_BAR_WIDTH, height
@@ -221,7 +220,8 @@ public class LevelsView extends TouchableView {
 	public void draw() {
 		for (int i = 0; i < TrackManager.currTrack.getMidiNotes().size(); i++) {
 			MidiNote midiNote = TrackManager.currTrack.getMidiNotes().get(i);
-			drawLevel(midiNote, calcLevelColor(midiNote.isSelected()), calcLevelColorTrans(midiNote.isSelected()));
+			drawLevel(midiNote, calcLevelColor(midiNote.isSelected()),
+					calcLevelColorTrans(midiNote.isSelected()));
 		}
 	}
 
@@ -292,15 +292,12 @@ public class LevelsView extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		initBgRect(Type.ROUNDED_RECT, NoteLevelsPage.shapeGroup);
-		selectRegionRect = (Rectangle) Shape.get(Type.RECTANGLE,
-				NoteLevelsPage.shapeGroup, Colors.TRANSPARENT, null);
-		levelBarRect = (Rectangle) Shape.get(Type.RECTANGLE, levelBarGroup,
-				Colors.VOLUME, null);
-		levelBarCircle = (Circle) Shape.get(Type.CIRCLE, levelBarGroup,
-				Colors.VOLUME, null);
-		levelBarSelectCircle = (Circle) Shape.get(Type.CIRCLE, levelBarGroup,
-				Colors.VOLUME, null);
+		initBgRect(true, NoteLevelsPage.shapeGroup);
+		selectRegionRect = new Rectangle(NoteLevelsPage.shapeGroup,
+				Colors.TRANSPARENT, null);
+		levelBarRect = new Rectangle(levelBarGroup, Colors.VOLUME, null);
+		levelBarCircle = new Circle(levelBarGroup, Colors.VOLUME, null);
+		levelBarSelectCircle = new Circle(levelBarGroup, Colors.VOLUME, null);
 	}
 
 	@Override

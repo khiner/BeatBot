@@ -5,12 +5,12 @@ import com.kh.beatbot.ui.view.View;
 
 public class SlideTab extends Shape {
 
-	private static RoundedRect roundedRect = (RoundedRect) Shape.get(
-			Type.ROUNDED_RECT, null, Colors.LABEL_SELECTED, null);
+	private static RoundedRect roundedRect = new RoundedRect(null,
+			Colors.LABEL_SELECTED, null);
 
 	private float cornerRadius = 12;
 
-	protected SlideTab(ShapeGroup group, float[] fillColor, float[] strokeColor) {
+	public SlideTab(ShapeGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor);
 	}
 

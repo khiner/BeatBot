@@ -4,7 +4,7 @@ public class IntersectingLines extends Shape {
 
 	float intersectX = 0, intersectY = 0;
 
-	protected IntersectingLines(ShapeGroup group, float[] fillColor,
+	public IntersectingLines(ShapeGroup group, float[] fillColor,
 			float[] strokeColor) {
 		super(group, fillColor, strokeColor);
 	}

@@ -5,7 +5,7 @@ public class RoundedRect extends Shape {
 	public float roundThresh = 0;
 	public float cornerRadius = -1;
 
-	protected RoundedRect(ShapeGroup group, float[] fillColor, float[] strokeColor) {
+	public RoundedRect(ShapeGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor);
 	}
 

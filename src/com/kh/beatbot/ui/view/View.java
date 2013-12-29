@@ -14,9 +14,9 @@ import android.graphics.Typeface;
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.RoundedRect;
 import com.kh.beatbot.ui.mesh.Shape;
-import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.page.MainPage;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
@@ -77,22 +77,25 @@ public abstract class View implements Comparable<View> {
 		createChildren();
 	}
 
-	protected void initBgRect(Type type, ShapeGroup group) {
-		initBgRect(type, group, Colors.defaultBgFillColorSet,
+	protected void initBgRect(boolean rounded, ShapeGroup group) {
+		initBgRect(rounded, group, Colors.defaultBgFillColorSet,
 				Colors.defaultBgStrokeColorSet);
 	}
 
-	protected void initBgRect(Type type, ShapeGroup group, ColorSet fillColorSet) {
-		initBgRect(type, group, fillColorSet, Colors.defaultBgStrokeColorSet);
+	protected void initBgRect(boolean rounded, ShapeGroup group,
+			ColorSet fillColorSet) {
+		initBgRect(rounded, group, fillColorSet, Colors.defaultBgStrokeColorSet);
 	}
 
-	protected void initBgRect(Type type, ShapeGroup group,
+	protected void initBgRect(boolean rounded, ShapeGroup group,
 			ColorSet fillColorSet, ColorSet strokeColorSet) {
 		this.bgFillColorSet = fillColorSet;
 		this.bgStrokeColorSet = strokeColorSet;
-		bgRect = Shape.get(type, group, fillColorSet == null ? null
+		bgRect = rounded ? new RoundedRect(group, fillColorSet == null ? null
 				: fillColorSet.defaultColor, strokeColorSet == null ? null
-				: strokeColorSet.defaultColor);
+				: strokeColorSet.defaultColor) : new Rectangle(group,
+				fillColorSet == null ? null : fillColorSet.defaultColor,
+				strokeColorSet == null ? null : strokeColorSet.defaultColor);
 	}
 
 	protected float getBgRectRadius() {

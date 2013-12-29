@@ -13,7 +13,6 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Shape;
-import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.mesh.WaveformShape;
 import com.kh.beatbot.ui.view.control.Button;
@@ -146,7 +145,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	public void layout(View parent, float x, float y, float width, float height) {
 		bgFillColorSet = new ColorSet(Colors.LABEL_LIGHT, Colors.LABEL_VERY_LIGHT);
-		initBgRect(Type.RECTANGLE, null, bgFillColorSet, null);
+		initBgRect(false, null, bgFillColorSet, null);
 		waveformShape = Shape.createWaveform(shapeGroup, width,
 				Colors.LABEL_SELECTED, Colors.BLACK);
 		waveformShape.setStrokeWeight(2);

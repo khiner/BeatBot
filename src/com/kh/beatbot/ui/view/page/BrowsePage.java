@@ -2,14 +2,11 @@ package com.kh.beatbot.ui.view.page;
 
 import java.io.File;
 
-import android.annotation.SuppressLint;
-
 import com.kh.beatbot.event.SampleSetEvent;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.view.Menu;
 import com.kh.beatbot.ui.view.menu.FileMenuItem;
 
@@ -25,7 +22,7 @@ public class BrowsePage extends Menu {
 			topLevelItems.add(new FileMenuItem(this, null, topLevelDir));
 		}
 
-		initBgRect(Type.ROUNDED_RECT, null, bgColorSet, null);
+		initBgRect(true, null, bgColorSet, null);
 	}
 
 	public void fileItemReleased(FileMenuItem fileItem) {
@@ -33,7 +30,6 @@ public class BrowsePage extends Menu {
 				.execute();
 	}
 
-	@SuppressLint("DefaultLocale")
 	@Override
 	public boolean accept(File file) {
 		if (file.isDirectory()) {

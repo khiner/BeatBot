@@ -11,7 +11,6 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.ShapeIcon;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.view.ClickableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
@@ -154,7 +153,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 
 	@Override
 	protected synchronized void createChildren() {
-		initBgRect(Type.ROUNDED_RECT, null);
+		initBgRect(true, null);
 	}
 
 	@Override

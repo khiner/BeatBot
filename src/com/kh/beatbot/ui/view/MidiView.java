@@ -15,8 +15,6 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Rectangle;
-import com.kh.beatbot.ui.mesh.Shape;
-import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.helper.ScrollBarHelper;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
@@ -270,18 +268,14 @@ public class MidiView extends ClickableView {
 
 	@Override
 	public synchronized void createChildren() {
-		bgRect = (Rectangle) Shape.get(Type.RECTANGLE, bgShapeGroup,
-				Colors.MIDI_VIEW_BG, null);
-		loopRect = (Rectangle) Shape.get(Type.RECTANGLE, bgShapeGroup,
-				Colors.MIDI_VIEW_LIGHT_BG, null);
-		selectedTrackRect = (Rectangle) Shape.get(Type.RECTANGLE, bgShapeGroup,
+		bgRect = new Rectangle(bgShapeGroup, Colors.MIDI_VIEW_BG, null);
+		loopRect = new Rectangle(bgShapeGroup, Colors.MIDI_VIEW_LIGHT_BG, null);
+		selectedTrackRect = new Rectangle(bgShapeGroup,
 				Colors.MIDI_SELECTED_TRACK, Colors.BLACK);
-		tickBarRect = (Rectangle) Shape.get(Type.RECTANGLE, bgShapeGroup,
-				Colors.TICK_FILL, Colors.BLACK);
-		loopBarRect = (Rectangle) Shape.get(Type.RECTANGLE, bgShapeGroup,
-				Colors.TICKBAR, null);
-		selectRegionRect = (Rectangle) Shape.get(Type.RECTANGLE, bgShapeGroup,
-				Colors.TRANSPARENT, null);
+		tickBarRect = new Rectangle(bgShapeGroup, Colors.TICK_FILL,
+				Colors.BLACK);
+		loopBarRect = new Rectangle(bgShapeGroup, Colors.TICKBAR, null);
+		selectRegionRect = new Rectangle(bgShapeGroup, Colors.TRANSPARENT, null);
 	}
 
 	@Override
@@ -385,8 +379,8 @@ public class MidiView extends ClickableView {
 		float y1 = noteToUnscaledY(note.getNoteValue());
 		float width = tickToUnscaledX(note.getOffTick()) - x1;
 
-		Rectangle rect = (Rectangle) Shape.get(Shape.Type.RECTANGLE,
-				noteRectangles, whichColor(note), Colors.BLACK);
+		Rectangle rect = new Rectangle(noteRectangles, whichColor(note),
+				Colors.BLACK);
 		rect.layout(x1, y1, width, trackHeight);
 		rect.destroy();
 		return rect;

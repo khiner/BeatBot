@@ -8,8 +8,6 @@ import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Rectangle;
-import com.kh.beatbot.ui.mesh.Shape;
-import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.mesh.SlideTab;
 import com.kh.beatbot.ui.view.MidiTrackView;
 import com.kh.beatbot.ui.view.MidiView;
@@ -74,10 +72,8 @@ public class MainPage extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		foregroundRect = (Rectangle) Shape.get(Type.RECTANGLE, null,
-				Colors.TRANSPARENT, null);
-		tab = (SlideTab) Shape.get(Shape.Type.SLIDE_TAB, null,
-				Colors.LABEL_SELECTED, null);
+		foregroundRect = new Rectangle(null, Colors.TRANSPARENT, null);
+		tab = new SlideTab(null, Colors.LABEL_SELECTED, null);
 
 		midiView = new MidiView();
 		controlButtonGroup = new ControlButtonGroup();

@@ -4,8 +4,6 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.RoundedRect;
-import com.kh.beatbot.ui.mesh.Shape;
-import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.transition.ColorTransition;
 import com.kh.beatbot.ui.transition.Transition;
 import com.kh.beatbot.ui.view.control.Button;
@@ -97,8 +95,7 @@ public class ListView extends TouchableView implements OnPressListener {
 
 	private RoundedRect getScrollTab() {
 		if (scrollBar == null) {
-			scrollBar = (RoundedRect) Shape.get(Type.ROUNDED_RECT, null,
-					Colors.TRANSPARENT, null);
+			scrollBar = new RoundedRect(null, Colors.TRANSPARENT, null);
 		}
 		return scrollBar;
 	}

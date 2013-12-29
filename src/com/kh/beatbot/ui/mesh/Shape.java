@@ -3,10 +3,6 @@ package com.kh.beatbot.ui.mesh;
 import com.kh.beatbot.ui.Drawable;
 
 public abstract class Shape extends Drawable {
-	public static enum Type {
-		RECTANGLE, ROUNDED_RECT, CIRCLE, SLIDE_TAB, INTERSECTING_LINES, BEZIER
-	};
-
 	public static final float ¹ = (float) Math.PI;
 	protected Mesh2D fillMesh, strokeMesh;
 	private float[] fillColor, strokeColor;
@@ -33,32 +29,6 @@ public abstract class Shape extends Drawable {
 			this.strokeColor = strokeColor;
 		}
 		this.group.add(this);
-	}
-
-	public static Shape get(Type type, ShapeGroup group, float[] fillColor,
-			float[] strokeColor) {
-		return fillColor == null && strokeColor == null ? null : create(type,
-				group, fillColor, strokeColor);
-	}
-
-	protected static Shape create(Type type, ShapeGroup group,
-			float[] fillColor, float[] strokeColor) {
-		switch (type) {
-		case RECTANGLE:
-			return new Rectangle(group, fillColor, strokeColor);
-		case ROUNDED_RECT:
-			return new RoundedRect(group, fillColor, strokeColor);
-		case CIRCLE:
-			return new Circle(group, fillColor, strokeColor);
-		case SLIDE_TAB:
-			return new SlideTab(group, fillColor, strokeColor);
-		case INTERSECTING_LINES:
-			return new IntersectingLines(group, fillColor, strokeColor);
-		case BEZIER:
-			return new AdsrShape(group, fillColor, strokeColor);
-		default:
-			return null;
-		}
 	}
 
 	public static WaveformShape createWaveform(ShapeGroup group, float width,

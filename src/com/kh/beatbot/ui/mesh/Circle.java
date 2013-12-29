@@ -3,7 +3,7 @@ package com.kh.beatbot.ui.mesh;
 public class Circle extends Shape {
 	public static final float ¹ = (float) Math.PI, CIRCLE_RADIUS = 100;
 
-	protected Circle(ShapeGroup group, float[] fillColor, float[] strokeColor) {
+	public Circle(ShapeGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor);
 	}
 

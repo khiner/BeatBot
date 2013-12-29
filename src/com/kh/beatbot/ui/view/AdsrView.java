@@ -8,8 +8,6 @@ import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.AdsrShape;
-import com.kh.beatbot.ui.mesh.Shape;
-import com.kh.beatbot.ui.mesh.Shape.Type;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class AdsrView extends TouchableView implements ParamListener {
@@ -73,9 +71,8 @@ public class AdsrView extends TouchableView implements ParamListener {
 	protected synchronized void createChildren() {
 		shapeGroup = new ShapeGroup();
 		shapeGroup.setStrokeWeight(3);
-		initBgRect(Type.ROUNDED_RECT, shapeGroup);
-		adsrShape = (AdsrShape) Shape.get(Type.BEZIER, shapeGroup,
-				Colors.VOLUME, Colors.VOLUME);
+		initBgRect(true, shapeGroup);
+		adsrShape = new AdsrShape(shapeGroup, Colors.VOLUME, Colors.VOLUME);
 	}
 
 	@Override
