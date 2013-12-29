@@ -156,6 +156,23 @@ public class MeshGroup {
 		dirty = true;
 	}
 
+	// expand the space allotted for the given mesh so it fits :)
+	protected synchronized void expand(Mesh2D mesh, int oldSize, int newSize) {
+		int currVertexIndex = 0;
+		for (Mesh2D child : children) {
+			child.parentVertexIndex = currVertexIndex;
+			currVertexIndex += child.getNumVertices();
+		}
+		numVertices = currVertexIndex;
+		vertices = Arrays.copyOf(vertices, numVertices * 2);
+		colors = Arrays.copyOf(colors, numVertices * 4);
+		int dst = (mesh.parentVertexIndex + newSize) * 2;
+		System.arraycopy(vertices, (mesh.parentVertexIndex + oldSize) * 2,
+				vertices, dst, vertices.length - dst);
+		vertexBuffer = FloatBuffer.wrap(vertices);
+		colorBuffer = FloatBuffer.wrap(colors);
+	}
+
 	private synchronized void updateBuffers() {
 		initHandles();
 

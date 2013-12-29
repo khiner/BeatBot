@@ -14,6 +14,7 @@ import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Lines;
 import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.helper.ScrollBarHelper;
@@ -39,7 +40,7 @@ public class MidiView extends ClickableView {
 	private static ShapeGroup noteRectangles = new ShapeGroup(),
 			bgShapeGroup = new ShapeGroup();
 
-	private FloatBuffer currTickVb = null, hLineVb = null;
+	private FloatBuffer currTickVb = null;
 
 	// vertical line loop markers
 	private FloatBuffer[] loopMarkerLineVb = new FloatBuffer[2];
@@ -47,16 +48,14 @@ public class MidiView extends ClickableView {
 	private Rectangle selectedTrackRect, bgRect, loopRect, tickBarRect,
 			loopBarRect, selectRegionRect;
 
+	private Lines horizontalLines;
+
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedNotes = new HashMap<Integer, MidiNote>();
 
 	// map of pointerIds to the original on-ticks of the notes they are touching
 	// (before dragging)
 	private Map<Integer, Float> startOnTicks = new HashMap<Integer, Float>();
-
-	public enum State {
-		LEVELS_VIEW, NORMAL_VIEW, TO_LEVELS_VIEW, TO_NORMAL_VIEW
-	};
 
 	public float getMidiHeight() {
 		return Math.min(height - Y_OFFSET, allTracksHeight);
@@ -155,10 +154,6 @@ public class MidiView extends ClickableView {
 		}
 	}
 
-	private void drawHorizontalLines() {
-		drawLines(hLineVb, Colors.BLACK, 2, GL10.GL_LINES);
-	}
-
 	private void drawCurrentTick() {
 		float xLoc = tickToX(MidiManager.getCurrTick());
 		translate(xLoc, 0);
@@ -185,20 +180,6 @@ public class MidiView extends ClickableView {
 		float[] vertLine = new float[] { 0, Y_OFFSET, 0,
 				Y_OFFSET + allTracksHeight };
 		currTickVb = makeFloatBuffer(vertLine);
-	}
-
-	private void initHLineVb() {
-		float[] hLines = new float[(TrackManager.getNumTracks()) * 4];
-
-		float y = Y_OFFSET;
-		for (int i = 1; i < TrackManager.getNumTracks(); i++) {
-			y += trackHeight;
-			hLines[i * 4] = 0;
-			hLines[i * 4 + 1] = y;
-			hLines[i * 4 + 2] = width;
-			hLines[i * 4 + 3] = y;
-		}
-		hLineVb = makeFloatBuffer(hLines);
 	}
 
 	public float tickToUnscaledX(float tick) {
@@ -255,7 +236,7 @@ public class MidiView extends ClickableView {
 
 	public void initAllVbs() {
 		initCurrTickVb();
-		initHLineVb();
+		horizontalLines.update();
 		updateLoopUi();
 		TickWindowHelper.initVLineVbs();
 	}
@@ -270,12 +251,15 @@ public class MidiView extends ClickableView {
 	public synchronized void createChildren() {
 		bgRect = new Rectangle(bgShapeGroup, Colors.MIDI_VIEW_BG, null);
 		loopRect = new Rectangle(bgShapeGroup, Colors.MIDI_VIEW_LIGHT_BG, null);
+
 		selectedTrackRect = new Rectangle(bgShapeGroup,
 				Colors.MIDI_SELECTED_TRACK, Colors.BLACK);
 		tickBarRect = new Rectangle(bgShapeGroup, Colors.TICK_FILL,
 				Colors.BLACK);
 		loopBarRect = new Rectangle(bgShapeGroup, Colors.TICKBAR, null);
 		selectRegionRect = new Rectangle(bgShapeGroup, Colors.TRANSPARENT, null);
+
+		horizontalLines = new Lines(bgShapeGroup, null, Colors.BLACK);
 	}
 
 	@Override
@@ -283,6 +267,7 @@ public class MidiView extends ClickableView {
 		tickBarRect.layout(0, 0, width, Y_OFFSET);
 		bgRect.layout(0, Y_OFFSET, tickToUnscaledX(MidiManager.MAX_TICKS - 1),
 				allTracksHeight);
+		horizontalLines.layout(0, 0, width, height);
 	}
 
 	@Override
@@ -302,7 +287,6 @@ public class MidiView extends ClickableView {
 
 		push();
 		translate(0, -TickWindowHelper.getYOffset());
-		drawHorizontalLines();
 		noteRectangles.draw();
 		pop();
 
@@ -382,7 +366,6 @@ public class MidiView extends ClickableView {
 		Rectangle rect = new Rectangle(noteRectangles, whichColor(note),
 				Colors.BLACK);
 		rect.layout(x1, y1, width, trackHeight);
-		rect.destroy();
 		return rect;
 	}
 

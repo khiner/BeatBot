@@ -17,7 +17,7 @@ public abstract class Shape extends Drawable {
 		this.group = group != null ? group : new ShapeGroup();
 	}
 
-	protected Shape(ShapeGroup group, float[] fillColor, float[] strokeColor) {
+	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor) {
 		this(group);
 		if (fillColor != null) {
 			fillMesh = new Mesh2D(this.group.fillGroup, getNumFillVertices());
@@ -97,7 +97,7 @@ public abstract class Shape extends Drawable {
 		}
 	}
 
-	protected synchronized void update() {
+	public synchronized void update() {
 		if (width > 0 && height > 0) {
 			resetIndices();
 			updateVertices();
@@ -140,7 +140,6 @@ public abstract class Shape extends Drawable {
 		return strokeColor;
 	}
 
-
 	// set "z-index" of this shape to the top of the stack
 	public void bringToTop() {
 		group.push(this);
@@ -165,8 +164,7 @@ public abstract class Shape extends Drawable {
 		super.setDimensions(width, height);
 		update();
 	}
-	
-	
+
 	@Override
 	public synchronized void layout(float x, float y, float width, float height) {
 		if (width <= 0 || height <= 0)

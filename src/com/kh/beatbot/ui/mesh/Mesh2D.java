@@ -22,6 +22,10 @@ public class Mesh2D {
 	}
 
 	public void vertex(float x, float y, float[] color) {
+		if (index >= numVertices) {
+			numVertices = index + 1;
+			group.expand(this, numVertices - 1, numVertices);
+		}
 		group.vertex(this, x, y, color);
 		index++;
 	}
