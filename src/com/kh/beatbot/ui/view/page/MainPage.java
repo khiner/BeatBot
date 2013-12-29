@@ -30,6 +30,8 @@ public class MainPage extends TouchableView {
 	private MenuButton menuButton;
 	private Rectangle foregroundRect;
 
+	private static float[] fillColor = Colors.TRANSPARENT.clone();
+
 	private float trackControlWidth = 0, controlButtonHeight = 0,
 			menuOffset = 0;
 
@@ -72,7 +74,7 @@ public class MainPage extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		foregroundRect = new Rectangle(null, Colors.TRANSPARENT, null);
+		foregroundRect = new Rectangle(null, fillColor, null);
 		tab = new SlideTab(null, Colors.LABEL_SELECTED, null);
 
 		midiView = new MidiView();
@@ -148,8 +150,9 @@ public class MainPage extends TouchableView {
 		menuButton.setPosition(x + menuButton.velocity, y + menuOffset / 2);
 		tab.layout(x - width, y + menuOffset / 2, tab.width, tab.height);
 
-		foregroundRect.setFillAlpha(GeneralUtils.clipToUnit(menuButton.x
-				/ slideMenu.width) * .8f);
+		fillColor[3] = GeneralUtils.clipToUnit(menuButton.x
+				/ slideMenu.width) * .8f;
+		foregroundRect.setFillColor(fillColor);
 	}
 
 	private class MenuButton extends ImageButton {
