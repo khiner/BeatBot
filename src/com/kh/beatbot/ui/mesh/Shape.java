@@ -98,8 +98,10 @@ public abstract class Shape extends Drawable {
 	}
 
 	protected synchronized void update() {
-		resetIndices();
-		updateVertices();
+		if (width > 0 && height > 0) {
+			resetIndices();
+			updateVertices();
+		}
 	}
 
 	public synchronized void setFillAlpha(float alpha) {

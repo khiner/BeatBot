@@ -98,9 +98,8 @@ public abstract class View implements Comparable<View> {
 				strokeColorSet == null ? null : strokeColorSet.defaultColor);
 	}
 
-	protected float getBgRectRadius() {
-		return bgRect instanceof RoundedRect ? ((RoundedRect) bgRect).cornerRadius
-				: 0;
+	protected float calcBgRectRadius() {
+		return Math.max(height / 9, 10);
 	}
 
 	public boolean hasChildren() {
@@ -265,14 +264,16 @@ public abstract class View implements Comparable<View> {
 	protected void layoutBgRect() {
 		if (bgRect == null)
 			return;
+		float bgRectRadius = 0;
 		if (bgRect instanceof RoundedRect) {
-			((RoundedRect) bgRect).setCornerRadius(Math.max(height / 9, 10));
+			bgRectRadius = calcBgRectRadius();
+			((RoundedRect) bgRect).setCornerRadius(bgRectRadius);
 		}
 		bgRect.layout(BG_OFFSET, BG_OFFSET, width - BG_OFFSET * 2, height
 				- BG_OFFSET * 2);
-		minX = minY = getBgRectRadius() + BG_OFFSET;
-		maxX = width - getBgRectRadius() - BG_OFFSET;
-		maxY = height - getBgRectRadius() - BG_OFFSET;
+		minX = minY = bgRectRadius + BG_OFFSET;
+		maxX = width - bgRectRadius - BG_OFFSET;
+		maxY = height - bgRectRadius - BG_OFFSET;
 		borderWidth = width - 2 * minX;
 		borderHeight = height - 2 * minY;
 	}

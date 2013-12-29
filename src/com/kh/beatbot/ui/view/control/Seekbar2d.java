@@ -27,7 +27,7 @@ public class Seekbar2d extends ControlView2dBase {
 	public synchronized void layoutChildren() {
 		intersectingLines.layout(BG_OFFSET, BG_OFFSET, width - BG_OFFSET * 2,
 				height - BG_OFFSET * 2);
-		float circleDiameter = 4 * getBgRectRadius() / 3;
+		float circleDiameter = 4 * calcBgRectRadius() / 3;
 		circle.layout(0, 0, circleDiameter, circleDiameter);
 	}
 

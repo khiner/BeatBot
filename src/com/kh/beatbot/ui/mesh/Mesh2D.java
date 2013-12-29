@@ -15,6 +15,8 @@ public class Mesh2D {
 	}
 
 	public void setGroup(MeshGroup group) {
+		if (this.group == group)
+			return;
 		this.group = group;
 		group.add(this);
 	}
