@@ -84,4 +84,10 @@ public class ShapeGroup {
 			newShape.update();
 		}
 	}
+
+	// put at the top of the stack, so it is displayed ontop of all others
+	public void push(Shape shape) {
+		remove(shape);
+		add(shape);
+	}
 }

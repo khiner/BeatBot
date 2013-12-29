@@ -177,17 +177,13 @@ public abstract class Shape extends Drawable {
 		return strokeColor;
 	}
 
-	public synchronized void setGroup(ShapeGroup group) {
-		if (this.group == group) {
-			return; // already a member of this group
-		}
-		if (this.group != null) {
-			this.group.remove(this);
-		}
-		this.group = group;
-		group.add(this);
+
+	// set "z-index" of this shape to the top of the stack
+	public void bringToTop() {
+		group.push(this);
 	}
 
+	@Override
 	public synchronized void setPosition(float x, float y) {
 		if (fillMesh != null) {
 			fillMesh.translate(x - this.x, y - this.y);
@@ -198,6 +194,7 @@ public abstract class Shape extends Drawable {
 		super.setPosition(x, y);
 	}
 
+	@Override
 	public synchronized void setDimensions(float width, float height) {
 		boolean dimChanged = width != this.width || height != this.height;
 		if (width <= 0 || height <= 0 || !dimChanged)
@@ -205,7 +202,9 @@ public abstract class Shape extends Drawable {
 		super.setDimensions(width, height);
 		update();
 	}
-
+	
+	
+	@Override
 	public synchronized void layout(float x, float y, float width, float height) {
 		if (width <= 0 || height <= 0)
 			return;

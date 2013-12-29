@@ -54,13 +54,6 @@ public abstract class ShapeIcon extends Icon {
 		shapeGroup.replace(prevShape, (Shape) currentDrawable);
 	}
 
-	public void setShapeGroup(ShapeGroup shapeGroup) {
-		this.shapeGroup = shapeGroup;
-		if (currentDrawable != null) {
-			((Shape) currentDrawable).setGroup(shapeGroup);
-		}
-	}
-
 	public void setFillColorSet(ColorSet fillColorSet) {
 		Drawable prevIcon = currentDrawable;
 		if (resource.defaultDrawable != null) {

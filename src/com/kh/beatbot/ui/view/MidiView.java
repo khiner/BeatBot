@@ -38,8 +38,7 @@ public class MidiView extends ClickableView {
 
 	private static int[] loopPointerIds = { -1, -1, -1 };
 
-	private static ShapeGroup unselectedRectangles = new ShapeGroup(),
-			selectedRectangles = new ShapeGroup(),
+	private static ShapeGroup noteRectangles = new ShapeGroup(),
 			bgShapeGroup = new ShapeGroup();
 
 	private FloatBuffer currTickVb = null, hLineVb = null;
@@ -184,11 +183,6 @@ public class MidiView extends ClickableView {
 		selectedTrackRect.layout(x1, y1, width, trackHeight);
 	}
 
-	private void drawAllMidiNotes() {
-		unselectedRectangles.draw();
-		selectedRectangles.draw();
-	}
-
 	private void initCurrTickVb() {
 		float[] vertLine = new float[] { 0, Y_OFFSET, 0,
 				Y_OFFSET + allTracksHeight };
@@ -270,8 +264,7 @@ public class MidiView extends ClickableView {
 
 	public synchronized void init() {
 		TickWindowHelper.init(this);
-		selectedRectangles.setStrokeWeight(MidiNote.BORDER_WIDTH);
-		unselectedRectangles.setStrokeWeight(MidiNote.BORDER_WIDTH);
+		noteRectangles.setStrokeWeight(MidiNote.BORDER_WIDTH);
 		initAllVbs();
 	}
 
@@ -316,7 +309,7 @@ public class MidiView extends ClickableView {
 		push();
 		translate(0, -TickWindowHelper.getYOffset());
 		drawHorizontalLines();
-		drawAllMidiNotes();
+		noteRectangles.draw();
 		pop();
 
 		drawLoopMarker();
@@ -393,7 +386,7 @@ public class MidiView extends ClickableView {
 		float width = tickToUnscaledX(note.getOffTick()) - x1;
 
 		Rectangle rect = (Rectangle) Shape.get(Shape.Type.RECTANGLE,
-				whichRectangleGroup(note), whichColor(note), Colors.BLACK);
+				noteRectangles, whichColor(note), Colors.BLACK);
 		rect.layout(x1, y1, width, trackHeight);
 		rect.destroy();
 		return rect;
@@ -412,7 +405,7 @@ public class MidiView extends ClickableView {
 	public void updateNoteViewSelected(MidiNote note) {
 		if (note.getRectangle() != null) {
 			note.getRectangle().setFillColor(whichColor(note));
-			note.getRectangle().setGroup(whichRectangleGroup(note));
+			note.getRectangle().bringToTop();
 		}
 	}
 
@@ -427,10 +420,6 @@ public class MidiView extends ClickableView {
 
 	private static float[] whichColor(MidiNote note) {
 		return note.isSelected() ? Colors.NOTE_SELECTED : Colors.NOTE;
-	}
-
-	private static ShapeGroup whichRectangleGroup(MidiNote note) {
-		return note.isSelected() ? selectedRectangles : unselectedRectangles;
 	}
 
 	private void dragNotes(boolean dragAllSelected, int pointerId,
@@ -518,7 +507,7 @@ public class MidiView extends ClickableView {
 		float[][] loopMarkerLines = new float[][] {
 				{ x1, 0, x1, Y_OFFSET + allTracksHeight },
 				{ x2, 0, x2, Y_OFFSET + allTracksHeight } };
-		
+
 		for (int i = 0; i < 2; i++) {
 			loopMarkerLineVb[i] = makeFloatBuffer(loopMarkerLines[i]);
 		}
