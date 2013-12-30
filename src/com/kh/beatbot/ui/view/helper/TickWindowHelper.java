@@ -138,8 +138,8 @@ public class TickWindowHelper {
 	public static void setYOffset(float yOffset) {
 		if (yOffset < 0) {
 			currYOffset = 0;
-		} else if (yOffset + midiView.getMidiHeight() > MidiView.allTracksHeight) {
-			currYOffset = MidiView.allTracksHeight - midiView.getMidiHeight();
+		} else if (yOffset + midiView.getMidiHeight() > midiView.getTotalTrackHeight()) {
+			currYOffset = midiView.getTotalTrackHeight() - midiView.getMidiHeight();
 		} else {
 			currYOffset = yOffset;
 		}
@@ -226,7 +226,7 @@ public class TickWindowHelper {
 					allVertices.get(i).add(x);
 					allVertices.get(i).add(MidiView.Y_OFFSET);
 					allVertices.get(i).add(x);
-					allVertices.get(i).add(MidiView.Y_OFFSET + MidiView.allTracksHeight);
+					allVertices.get(i).add(MidiView.Y_OFFSET + midiView.getTotalTrackHeight());
 					break; // each line goes in only ONE line set
 				}
 			}

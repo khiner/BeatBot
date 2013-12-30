@@ -14,10 +14,12 @@ import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.IconResources;
+import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.view.TrackButtonRow;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
@@ -31,11 +33,14 @@ public class Track extends BaseTrack {
 		ERROR_ALERT.setPositiveButton("OK", null);
 	}
 
-	private boolean adsrEnabled = false, reverse = false, previewing = false;
+	private boolean adsrEnabled = false, reverse = false, previewing = false,
+			muted = false, soloing = false;
+
 	private TrackButtonRow buttonRow;
 	private List<MidiNote> notes = new ArrayList<MidiNote>();
 	private Map<File, SampleParams> paramsForSample = new HashMap<File, SampleParams>();
 	private File currSampleFile;
+	private Rectangle rectangle;
 
 	public ADSR adsr;
 
@@ -64,20 +69,20 @@ public class Track extends BaseTrack {
 		adsr.update();
 	}
 
-	public void select() {
-		buttonRow.instrumentButton.trigger(false);
-	}
-
 	public TrackButtonRow getButtonRow() {
 		return buttonRow;
 	}
 
-	public Icon getIcon() {
-		return buttonRow.instrumentButton.getIcon();
+	public Rectangle getRectangle() {
+		return rectangle;
 	}
 
-	public void updateIcon() {
-		buttonRow.updateInstrumentIcon();
+	public void setRectangle(Rectangle rectangle) {
+		this.rectangle = rectangle;
+	}
+
+	public Icon getIcon() {
+		return buttonRow.instrumentButton.getIcon();
 	}
 
 	public void removeNote(MidiNote note) {
@@ -180,7 +185,7 @@ public class Track extends BaseTrack {
 			currSampleFile = sampleFile;
 			update();
 		}
-
+		TrackManager.get().onSampleChange(this);
 	}
 
 	public Param getLoopBeginParam() {
@@ -232,16 +237,36 @@ public class Track extends BaseTrack {
 		previewing = false;
 	}
 
+	public void select() {
+		TrackManager.get().onSelect(this);
+	}
+
 	public void mute(boolean mute) {
 		muteTrack(id, mute);
+		this.muted = mute;
+		TrackManager.get().onMuteChange(this, mute);
 	}
 
 	public void solo(boolean solo) {
 		soloTrack(id, solo);
+		this.soloing = solo;
+		TrackManager.get().onSoloChange(this, solo);
 	}
 
 	public void toggleLooping() {
 		toggleTrackLooping(id);
+	}
+
+	public boolean isMuted() {
+		return muted;
+	}
+	
+	public boolean isSoloing() {
+		return soloing;
+	}
+	
+	public boolean isSelected() {
+		return this.equals(TrackManager.currTrack);
 	}
 
 	public boolean isLooping() {
@@ -277,7 +302,7 @@ public class Track extends BaseTrack {
 					.put(currSampleFile, new SampleParams(getFrames(id)));
 		}
 	}
-	
+
 	public float getNumFrames() {
 		return getFrames(id);
 	}
@@ -300,6 +325,13 @@ public class Track extends BaseTrack {
 	public float getCurrentFrame() {
 		return getCurrentFrame(id);
 	}
+
+	public void destroy() {
+		deleteTrack(id);
+		TrackManager.get().onDestroy(this);
+	}
+
+	public static native void deleteTrack(int trackNum);
 
 	public static native void toggleTrackLooping(int trackNum);
 

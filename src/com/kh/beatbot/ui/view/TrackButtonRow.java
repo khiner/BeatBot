@@ -54,8 +54,7 @@ public class TrackButtonRow extends TouchableView {
 		instrumentButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				TrackManager.selectInstrumentButton(instrumentButton);
-				TrackManager.setTrack(track);
+				track.select();
 			}
 		});
 		muteButton.setOnReleaseListener(new OnReleaseListener() {
@@ -67,11 +66,6 @@ public class TrackButtonRow extends TouchableView {
 		soloButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				if (soloButton.isChecked()) {
-					// if this track is soloing, set all other solo icons to
-					// inactive.
-					TrackManager.selectSoloButton(soloButton);
-				}
 				track.solo(soloButton.isChecked());
 			}
 		});

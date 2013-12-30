@@ -2,17 +2,29 @@ package com.kh.beatbot.manager;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.event.TrackCreateEvent;
+import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.midi.MidiNote;
-import com.kh.beatbot.ui.view.TrackButtonRow;
-import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.control.ToggleButton;
 
-public class TrackManager {
+public class TrackManager implements TrackListener {
+
+	private static TrackManager instance;
+
+	private TrackManager() {
+	}
+
+	public synchronized static TrackManager get() {
+		if (instance == null) {
+			instance = new TrackManager();
+		}
+		return instance;
+	}
 
 	public static final int MASTER_TRACK_ID = -1;
 
@@ -21,33 +33,26 @@ public class TrackManager {
 	// need to persist state
 	private static List<Track> tracks = new ArrayList<Track>();
 	public static BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
-	public static Track currTrack;
+	public static Track currTrack, soloingTrack;
+
+	private static Set<TrackListener> trackListeners = new HashSet<TrackListener>();
+
+	public static void addTrackListener(TrackListener trackListener) {
+		trackListeners.add(trackListener);
+	}
 
 	public static synchronized void init() {
 		for (File drumDirectory : FileManager.drumsDirectory.listFiles()) {
 			final TrackCreateEvent trackCreateEvent = new TrackCreateEvent();
 			trackCreateEvent.doExecute();
-			tracks.get(tracks.size() - 1).setSample(drumDirectory.listFiles()[0]);
 			trackCreateEvent.updateUi();
+			tracks.get(tracks.size() - 1).setSample(
+					drumDirectory.listFiles()[0]);
 		}
 	}
 
 	public static synchronized Track getTrack(int trackNum) {
 		return tracks.get(trackNum);
-	}
-
-	public static synchronized void quantizeEffectParams() {
-		for (Track track : tracks) {
-			track.quantizeEffectParams();
-		}
-	}
-
-	public static synchronized void setTrack(Track track) {
-		if (track == currTrack)
-			return;
-		currTrack = track;
-		track.select();
-		View.mainPage.notifyTrackChanged(currTrack);
 	}
 
 	public static synchronized BaseTrack getBaseTrack(int trackNum) {
@@ -56,14 +61,23 @@ public class TrackManager {
 		return tracks.get(trackNum);
 	}
 
+	public static Track getSoloingTrack() {
+		return soloingTrack;
+	}
+
 	public static synchronized int getNumTracks() {
 		return tracks.size();
+	}
+
+	public static List<Track> getTracks() {
+		return tracks;
 	}
 
 	public static synchronized Track createTrack() {
 		createTrackNative();
 		final Track newTrack = new Track(tracks.size());
 		tracks.add(newTrack);
+		get().onCreate(newTrack);
 		return newTrack;
 	}
 
@@ -73,23 +87,17 @@ public class TrackManager {
 		tracks.add(track);
 		track.setSample(track.getCurrSampleFile());
 		track.updateNextNote();
-	}
-
-	public static synchronized void deleteCurrTrack() {
-		if (tracks.size() <= 1) {
-			return; // not allowed to delete last track
-		}
-		int currTrackNum = currTrack.getId();
-		tracks.remove(currTrack);
-		for (int i = currTrackNum; i < tracks.size(); i++) {
-			tracks.get(i).setId(i);
-		}
-		setTrack(tracks.get(Math.min(currTrackNum, tracks.size() - 1)));
-		deleteTrack(currTrackNum);
+		get().onCreate(track);
 	}
 
 	public static boolean trackExists(Track track) {
 		return tracks.contains(track);
+	}
+
+	public static synchronized void quantizeEffectParams() {
+		for (Track track : tracks) {
+			track.quantizeEffectParams();
+		}
 	}
 
 	public static MidiNote getNextMidiNote(int trackNum, long currTick) {
@@ -102,29 +110,58 @@ public class TrackManager {
 		}
 	}
 
-	public static synchronized void selectInstrumentButton(ToggleButton button) {
-		button.setChecked(true);
-		for (Track track : tracks) {
-			TrackButtonRow buttonRow = track.getButtonRow();
-			if (!button.equals(buttonRow.instrumentButton)) {
-				buttonRow.instrumentButton.setChecked(false);
-			}
-		}
-	}
-
-	public static synchronized void selectSoloButton(ToggleButton button) {
-		button.setChecked(true);
-		for (Track track : tracks) {
-			TrackButtonRow buttonRow = track.getButtonRow();
-			if (!button.equals(buttonRow.soloButton)) {
-				buttonRow.soloButton.setChecked(false);
-			}
-		}
-	}
-
 	/******* These methods are called FROM native code via JNI ********/
 
 	public static native void createTrackNative();
 
-	public static native void deleteTrack(int trackNum);
+	@Override
+	public void onCreate(Track track) {
+		currTrack = track;
+		for (TrackListener trackListener : trackListeners) {
+			trackListener.onCreate(track);
+		}
+	}
+
+	@Override
+	public void onDestroy(Track track) {
+		tracks.remove(track);
+		for (int i = track.getId(); i < tracks.size(); i++) {
+			tracks.get(i).setId(i);
+		}
+		tracks.get(Math.min(track.getId(), tracks.size() - 1)).select();
+
+		for (TrackListener trackListener : trackListeners) {
+			trackListener.onDestroy(track);
+		}
+	}
+
+	@Override
+	public void onSelect(Track track) {
+		currTrack = track;
+		for (TrackListener trackListener : trackListeners) {
+			trackListener.onSelect(track);
+		}
+	}
+
+	@Override
+	public void onSampleChange(Track track) {
+		for (TrackListener trackListener : trackListeners) {
+			trackListener.onSampleChange(track);
+		}
+	}
+
+	@Override
+	public void onMuteChange(Track track, boolean mute) {
+		for (TrackListener trackListener : trackListeners) {
+			trackListener.onMuteChange(track, mute);
+		}
+	}
+
+	@Override
+	public void onSoloChange(Track track, boolean solo) {
+		soloingTrack = solo ? track : null;
+		for (TrackListener trackListener : trackListeners) {
+			trackListener.onSoloChange(track, solo);
+		}
+	}
 }

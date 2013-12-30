@@ -2,7 +2,6 @@ package com.kh.beatbot.event;
 
 import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.view.View;
 
 public class TrackDestroyEvent implements Executable, Stateful {
 
@@ -16,29 +15,26 @@ public class TrackDestroyEvent implements Executable, Stateful {
 	public void doUndo() {
 		TrackCreateEvent createEvent = new TrackCreateEvent(track);
 		createEvent.doExecute();
-		createEvent.updateUi();
 	}
 
 	@Override
 	public void doRedo() {
 		doExecute();
-		updateUi();
 	}
 
 	@Override
 	public void updateUi() {
-		View.mainPage.notifyTrackDeleted(track);
 	}
 
 	@Override
 	public void execute() {
 		doExecute();
 		EventManager.eventCompleted(this);
-		updateUi();
 	}
 
 	public void doExecute() {
-		TrackManager.setTrack(TrackManager.getTrack(track.getId()));
-		TrackManager.deleteCurrTrack();
+		if (TrackManager.getNumTracks() > 1) {
+			track.destroy(); // not allowed to delete last track
+		}
 	}
 }

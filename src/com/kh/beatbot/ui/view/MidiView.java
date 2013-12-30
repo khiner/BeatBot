@@ -9,21 +9,21 @@ import java.util.Map;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.Track;
+import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.Lines;
 import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.helper.ScrollBarHelper;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
 
-public class MidiView extends ClickableView {
+public class MidiView extends ClickableView implements TrackListener {
 
 	public static final float Y_OFFSET = 21, LOOP_SELECT_SNAP_DIST = 30;
-	public static float trackHeight, allTracksHeight;
+	public static float trackHeight;
 
 	private static float dragOffsetTick[] = { 0, 0, 0, 0, 0 };
 
@@ -45,10 +45,8 @@ public class MidiView extends ClickableView {
 	// vertical line loop markers
 	private FloatBuffer[] loopMarkerLineVb = new FloatBuffer[2];
 
-	private Rectangle selectedTrackRect, bgRect, loopRect, tickBarRect,
-			loopBarRect, selectRegionRect;
-
-	private Lines horizontalLines;
+	private Rectangle backgroundRect, loopRect, tickBarRect, loopBarRect,
+			selectRegionRect;
 
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedNotes = new HashMap<Integer, MidiNote>();
@@ -58,7 +56,11 @@ public class MidiView extends ClickableView {
 	private Map<Integer, Float> startOnTicks = new HashMap<Integer, Float>();
 
 	public float getMidiHeight() {
-		return Math.min(height - Y_OFFSET, allTracksHeight);
+		return Math.min(height - Y_OFFSET, getTotalTrackHeight());
+	}
+
+	public float getTotalTrackHeight() {
+		return trackHeight * TrackManager.getNumTracks();
 	}
 
 	public int getNumLoopMarkersSelected() {
@@ -82,7 +84,8 @@ public class MidiView extends ClickableView {
 		// make sure select rect doesn't go into the tick view
 		topY = Math.max(topY + .01f, Y_OFFSET);
 		// make sure select rect doesn't go past the last track/note
-		bottomY = Math.min(bottomY + .01f, Y_OFFSET + allTracksHeight - .01f);
+		bottomY = Math.min(bottomY + .01f, Y_OFFSET + getTotalTrackHeight()
+				- .01f);
 		int topNote = yToNote(topY);
 		int bottomNote = yToNote(bottomY);
 		MidiManager.selectRegion((long) leftTick, (long) rightTick, topNote,
@@ -169,16 +172,9 @@ public class MidiView extends ClickableView {
 		}
 	}
 
-	private void initSelectedTrackVb(int selectedTrack) {
-		float x1 = 0;
-		float y1 = noteToUnscaledY(selectedTrack);
-		float width = tickToUnscaledX(MidiManager.MAX_TICKS - 1);
-		selectedTrackRect.layout(x1, y1, width, trackHeight);
-	}
-
 	private void initCurrTickVb() {
 		float[] vertLine = new float[] { 0, Y_OFFSET, 0,
-				Y_OFFSET + allTracksHeight };
+				Y_OFFSET + getTotalTrackHeight() };
 		currTickVb = makeFloatBuffer(vertLine);
 	}
 
@@ -209,65 +205,32 @@ public class MidiView extends ClickableView {
 		return note * trackHeight + Y_OFFSET;
 	}
 
-	public void notifyTrackCreated(Track track) {
-		allTracksHeight += trackHeight;
-		if (initialized) {
-			initAllVbs();
-			TickWindowHelper.setYOffset(Float.MAX_VALUE);
-			for (MidiNote note : track.getMidiNotes()) {
-				createNoteView(note);
-			}
-		}
-	}
-
-	public void notifyTrackDeleted(Track track) {
-		allTracksHeight -= trackHeight;
-		initAllVbs();
-		TickWindowHelper.setYOffset(TickWindowHelper.getYOffset());
-		for (MidiNote note : track.getMidiNotes()) {
-			note.getRectangle().destroy();
-		}
-		updateNoteRects();
-	}
-
-	public void notifyTrackChanged(int newTrackNum) {
-		initSelectedTrackVb(newTrackNum);
-	}
-
 	public void initAllVbs() {
 		initCurrTickVb();
-		horizontalLines.update();
 		updateLoopUi();
-		TickWindowHelper.initVLineVbs();
+		TickWindowHelper.init(this);
 	}
 
 	public synchronized void init() {
-		TickWindowHelper.init(this);
 		noteRectangles.setStrokeWeight(MidiNote.BORDER_WIDTH);
 		initAllVbs();
 	}
 
 	@Override
 	public synchronized void createChildren() {
-		bgRect = new Rectangle(bgShapeGroup, Colors.MIDI_VIEW_BG, null);
+		backgroundRect = new Rectangle(bgShapeGroup, Colors.MIDI_VIEW_BG, null);
 		loopRect = new Rectangle(bgShapeGroup, Colors.MIDI_VIEW_LIGHT_BG, null);
 
-		selectedTrackRect = new Rectangle(bgShapeGroup,
-				Colors.MIDI_SELECTED_TRACK, Colors.BLACK);
 		tickBarRect = new Rectangle(bgShapeGroup, Colors.TICK_FILL,
 				Colors.BLACK);
 		loopBarRect = new Rectangle(bgShapeGroup, Colors.TICKBAR, null);
 		selectRegionRect = new Rectangle(bgShapeGroup, Colors.TRANSPARENT, null);
-
-		horizontalLines = new Lines(bgShapeGroup, null, Colors.BLACK);
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
 		tickBarRect.layout(0, 0, width, Y_OFFSET);
-		bgRect.layout(0, Y_OFFSET, tickToUnscaledX(MidiManager.MAX_TICKS - 1),
-				allTracksHeight);
-		horizontalLines.layout(0, 0, width, height);
+		backgroundRect.setPosition(0, Y_OFFSET);
 	}
 
 	@Override
@@ -387,8 +350,7 @@ public class MidiView extends ClickableView {
 	}
 
 	public void updateNoteRects() {
-		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
-			Track track = TrackManager.getTrack(i);
+		for (Track track : TrackManager.getTracks()) {
 			for (MidiNote note : track.getMidiNotes()) {
 				updateNoteView(note);
 			}
@@ -397,6 +359,17 @@ public class MidiView extends ClickableView {
 
 	private static float[] whichColor(MidiNote note) {
 		return note.isSelected() ? Colors.NOTE_SELECTED : Colors.NOTE;
+	}
+
+	private static float[] whichColor(Track track) {
+		Track soloingTrack = TrackManager.getSoloingTrack();
+		if (track.isSelected()) {
+			return Colors.LABEL_SELECTED_TRANS;
+		} else if (track.isMuted() || (soloingTrack != null && !soloingTrack.equals(track))) {
+			return Colors.DARK_TRANS;
+		} else {
+			return Colors.TRANSPARENT;
+		}
 	}
 
 	private void dragNotes(boolean dragAllSelected, int pointerId,
@@ -426,7 +399,13 @@ public class MidiView extends ClickableView {
 				(long) onTickDiff, (long) offTickDiff);
 	}
 
-	public void updateLoopMarkers() {
+	private void updateTrackColors() {
+		for (Track track : TrackManager.getTracks()) {
+			track.getRectangle().setFillColor(whichColor(track));
+		}
+	}
+
+	private void updateLoopMarkers() {
 		if (loopPointerIds[0] != -1 && loopPointerIds[2] != -1) {
 			float leftX = pointerIdToPos.get(loopPointerIds[0]).x;
 			float rightX = pointerIdToPos.get(loopPointerIds[2]).x;
@@ -479,18 +458,18 @@ public class MidiView extends ClickableView {
 		float x2 = tickToUnscaledX(MidiManager.getLoopEndTick());
 
 		loopBarRect.layout(x1, 0, x2 - x1, Y_OFFSET);
-		loopRect.layout(x1, Y_OFFSET, x2 - x1, allTracksHeight);
+		loopRect.layout(x1, Y_OFFSET, x2 - x1, getTotalTrackHeight());
 
 		float[][] loopMarkerLines = new float[][] {
-				{ x1, 0, x1, Y_OFFSET + allTracksHeight },
-				{ x2, 0, x2, Y_OFFSET + allTracksHeight } };
+				{ x1, 0, x1, Y_OFFSET + getTotalTrackHeight() },
+				{ x2, 0, x2, Y_OFFSET + getTotalTrackHeight() } };
 
 		for (int i = 0; i < 2; i++) {
 			loopMarkerLineVb[i] = makeFloatBuffer(loopMarkerLines[i]);
 		}
 	}
 
-	public void noMidiMove() {
+	private void noMidiMove() {
 		if (pointerCount() - getNumLoopMarkersSelected() == 1) {
 			if (selectRegionStartTick >= 0) {
 				selectRegion(pointerIdToPos.get(0).x, pointerIdToPos.get(0).y);
@@ -692,5 +671,55 @@ public class MidiView extends ClickableView {
 		if (touchedNote != null) {
 			MidiManager.deleteNote(touchedNote);
 		}
+	}
+
+	@Override
+	public void onCreate(Track track) {
+		initAllVbs();
+		backgroundRect.setDimensions(
+				tickToUnscaledX(MidiManager.MAX_TICKS - 1),
+				getTotalTrackHeight());
+		loopRect.setDimensions(loopRect.width, getTotalTrackHeight());
+		TickWindowHelper.setYOffset(Float.MAX_VALUE);
+		float x1 = 0;
+		float y1 = noteToUnscaledY(track.getId());
+		float width = tickToUnscaledX(MidiManager.MAX_TICKS - 1);
+		Rectangle trackRect = new Rectangle(bgShapeGroup, Colors.TRANSPARENT,
+				Colors.BLACK);
+		trackRect.layout(x1, y1, width, trackHeight);
+		track.setRectangle(trackRect);
+		for (MidiNote note : track.getMidiNotes()) {
+			createNoteView(note);
+		}
+	}
+
+	@Override
+	public void onDestroy(Track track) {
+		initAllVbs();
+		TickWindowHelper.setYOffset(TickWindowHelper.getYOffset());
+		track.getRectangle().destroy();
+		for (MidiNote note : track.getMidiNotes()) {
+			note.getRectangle().destroy();
+		}
+		updateNoteRects();
+	}
+
+	@Override
+	public void onSelect(Track track) {
+		updateTrackColors();
+	}
+
+	@Override
+	public void onSampleChange(Track track) {
+	}
+
+	@Override
+	public void onMuteChange(Track track, boolean mute) {
+		updateTrackColors();
+	}
+
+	@Override
+	public void onSoloChange(Track track, boolean solo) {
+		updateTrackColors();
 	}
 }

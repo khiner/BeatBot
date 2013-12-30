@@ -1,8 +1,6 @@
 package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.GeneralUtils;
-import com.kh.beatbot.Track;
-import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
@@ -35,36 +33,8 @@ public class MainPage extends TouchableView {
 	private float trackControlWidth = 0, controlButtonHeight = 0,
 			menuOffset = 0;
 
-	public void notifyTrackCreated(Track track) {
-		midiTrackView.notifyTrackCreated(track);
-		midiView.notifyTrackCreated(track);
-		pageSelectGroup.updateAll();
-	}
-
-	public void notifyTrackChanged(Track track) {
-		midiView.notifyTrackChanged(track.getId());
-		pageSelectGroup.updateAll();
-	}
-
-	public void notifyTrackUpdated(Track track) {
-		midiView.notifyTrackChanged(track.getId());
-		midiTrackView.notifyTrackUpdated(track);
-		pageSelectGroup.updateAll();
-	}
-
-	public void notifyTrackDeleted(Track track) {
-		midiTrackView.notifyTrackDeleted(track);
-		midiView.notifyTrackDeleted(track);
-	}
-
 	public void notifyMenuExpanded() {
 		menuButton.snap(1);
-	}
-
-	@Override
-	public void initAll() {
-		super.initAll();
-		BeatBotActivity.mainActivity.setupProject();
 	}
 
 	@Override
@@ -84,6 +54,10 @@ public class MainPage extends TouchableView {
 		slideMenu = new MainMenu();
 		menuButton = new MenuButton();
 
+		TrackManager.addTrackListener(midiView);
+		TrackManager.addTrackListener(midiTrackView);
+		TrackManager.addTrackListener(pageSelectGroup);
+
 		slideMenu.setClip(false);
 		menuButton.setClip(false);
 
@@ -97,9 +71,7 @@ public class MainPage extends TouchableView {
 		controlButtonHeight = height / 10;
 		float midiHeight = 3 * (height - controlButtonHeight) / 5;
 		float pageSelectGroupHeight = height - midiHeight - controlButtonHeight;
-		MidiView.allTracksHeight = midiHeight - MidiView.Y_OFFSET;
-		MidiView.trackHeight = MidiView.allTracksHeight
-				/ TrackManager.getNumTracks();
+		MidiView.trackHeight = (midiHeight - MidiView.Y_OFFSET) / 5f;
 		View.LABEL_HEIGHT = pageSelectGroupHeight / 5;
 
 		trackControlWidth = MidiView.trackHeight * 2.5f;

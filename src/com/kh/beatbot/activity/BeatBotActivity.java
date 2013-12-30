@@ -16,11 +16,13 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.event.SampleRenameEvent;
+import com.kh.beatbot.listener.ViewListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
@@ -57,9 +59,9 @@ public class BeatBotActivity extends Activity {
 		mainActivity = this;
 
 		GeneralUtils.initAndroidSettings(this);
+		Colors.init(this);
 		View.font = Typeface.createFromAsset(getAssets(),
 				"REDRING-1969-v03.ttf");
-		Colors.initColors(this);
 
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.FILL_PARENT,
@@ -84,14 +86,20 @@ public class BeatBotActivity extends Activity {
 
 		((GLSurfaceViewGroup) View.root).setBBRenderer(activityPager);
 
-		if (savedInstanceState == null) {
-			initNativeAudio();
-		}
+		activityPager.addListener(new ViewListener() {
+			
+			@Override
+			public void onGlReady(View view) {
+				IconResources.init();
+				TrackManager.init();
+				MidiManager.init();
 
-		TrackManager.init();
-		MidiManager.init();
+				arm();
+				setupProject();
+			}
+		});
 
-		arm();
+		initNativeAudio();
 	}
 
 	@Override

@@ -3,7 +3,6 @@ package com.kh.beatbot.event;
 import java.io.File;
 
 import com.kh.beatbot.Track;
-import com.kh.beatbot.ui.view.View;
 
 public class SampleSetEvent implements Executable, Stateful {
 
@@ -19,25 +18,17 @@ public class SampleSetEvent implements Executable, Stateful {
 	@Override
 	public void doUndo() {
 		doExecute(originalSample);
-		updateUi();
 	}
 
 	@Override
 	public void doRedo() {
 		doExecute(newSample);
-		updateUi();
-	}
-
-	@Override
-	public void updateUi() {
-		View.mainPage.notifyTrackUpdated(track);
 	}
 
 	@Override
 	public void execute() {
 		if (doExecute(newSample)) {
 			EventManager.eventCompleted(this);
-			updateUi();
 		}
 	}
 
@@ -47,5 +38,9 @@ public class SampleSetEvent implements Executable, Stateful {
 		}
 		track.setSample(sample);
 		return true;
+	}
+
+	@Override
+	public void updateUi() {
 	}
 }

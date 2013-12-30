@@ -5,11 +5,11 @@ import android.app.Activity;
 import com.kh.beatbot.R;
 
 public class Colors {
-	public static float[] BG, BLACK, WHITE, GREEN, YELLOW, RED, MIDI_VIEW_BG,
-			MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM, NOTE, NOTE_SELECTED,
-			VOLUME, PAN, PITCH, VOLUME_LIGHT, VOLUME_TRANS, PAN_TRANS,
-			PITCH_TRANS, LEVEL_SELECTED, LEVEL_SELECTED_TRANS, TICK_FILL,
-			TICK_MARKER, TICKBAR, BPM_OFF, BPM_ON, BPM_ON_SELECTED,
+	public static float[] BG, BLACK, WHITE, GREEN, YELLOW, RED, DARK_TRANS,
+			MIDI_VIEW_BG, MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM, NOTE,
+			NOTE_SELECTED, VOLUME, PAN, PITCH, VOLUME_LIGHT, VOLUME_TRANS,
+			PAN_TRANS, PITCH_TRANS, LEVEL_SELECTED, LEVEL_SELECTED_TRANS,
+			TICK_FILL, TICK_MARKER, TICKBAR, BPM_OFF, BPM_ON, BPM_ON_SELECTED,
 			BPM_OFF_SELECTED, VIEW_BG, VIEW_BG_SELECTED, LABEL_DARK, LABEL_MED,
 			LABEL_LIGHT, LABEL_VERY_LIGHT, LABEL_SELECTED,
 			LABEL_SELECTED_TRANS, MIDI_SELECTED_TRACK, TRANSPARENT = { 0, 0, 0,
@@ -32,13 +32,14 @@ public class Colors {
 			loopSelectionStrokeColorSet, defaultBgFillColorSet,
 			defaultBgStrokeColorSet;
 
-	public static void initColors(Activity activity) {
+	public static void init(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
 		WHITE = colorResourceToFloats(activity, R.color.white);
 		RED = colorResourceToFloats(activity, R.color.red);
 		YELLOW = colorResourceToFloats(activity, R.color.yellow);
 		GREEN = colorResourceToFloats(activity, R.color.green);
 
+		DARK_TRANS = new float[] { 0, 0, 0, .2f };
 		BG = colorResourceToFloats(activity, R.color.background);
 		VIEW_BG = colorResourceToFloats(activity, R.color.viewBg);
 		VIEW_BG_SELECTED = colorResourceToFloats(activity,

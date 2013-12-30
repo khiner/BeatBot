@@ -2,7 +2,6 @@ package com.kh.beatbot.event;
 
 import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.view.View;
 
 public class TrackCreateEvent implements Executable, Stateful {
 
@@ -20,36 +19,22 @@ public class TrackCreateEvent implements Executable, Stateful {
 		if (createdTrack != null) {
 			TrackDestroyEvent trackDestroyEvent = new TrackDestroyEvent(createdTrack);
 			trackDestroyEvent.doExecute(); 
-			trackDestroyEvent.updateUi();
 		}
 	}
 
 	@Override
 	public void doRedo() {
 		doExecute();
-		updateUi();
 	}
 
 	@Override
 	public void updateUi() {
-		if (!TrackManager.trackExists(createdTrack)) {
-			return;
-		}
-		// needed to avoid "no current context" opengl error
-		View.root.queueEvent(new Runnable() {
-			@Override
-			public void run() {
-				View.mainPage.notifyTrackCreated(createdTrack);
-				TrackManager.setTrack(createdTrack);
-			}
-		});
 	}
 
 	@Override
 	public void execute() {
 		doExecute();
 		EventManager.eventCompleted(this);
-		updateUi();
 	}
 
 	public void doExecute() {

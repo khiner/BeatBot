@@ -1,7 +1,9 @@
 package com.kh.beatbot.ui.view.group;
 
+import com.kh.beatbot.Track;
 import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
@@ -21,7 +23,7 @@ import com.kh.beatbot.ui.view.page.NoteLevelsPage;
 import com.kh.beatbot.ui.view.page.SampleEditPage;
 import com.kh.beatbot.ui.view.page.TrackPage;
 
-public class PageSelectGroup extends TouchableView {
+public class PageSelectGroup extends TouchableView implements TrackListener {
 	public static final int BROWSE_PAGE_ID = 0, TRACK_PAGE_ID = 1,
 			EDIT_PAGE_ID = 2, ADSR_PAGE_ID = 3, MASTER_PAGE_ID = 4,
 			NOTE_LEVELS_PAGE_ID = 5;
@@ -180,5 +182,31 @@ public class PageSelectGroup extends TouchableView {
 	private void updateSampleText() {
 		pageButtons[BROWSE_PAGE_ID].setText(FileManager
 				.formatSampleName(TrackManager.currTrack.getCurrSampleName()));
+	}
+
+	@Override
+	public void onCreate(Track track) {
+		updateAll();
+	}
+
+	@Override
+	public void onDestroy(Track track) {
+	}
+
+	@Override
+	public void onSelect(Track track) {
+		updateAll();
+	}
+
+	@Override
+	public void onSampleChange(Track track) {
+	}
+
+	@Override
+	public void onMuteChange(Track track, boolean mute) {
+	}
+
+	@Override
+	public void onSoloChange(Track track, boolean solo) {
 	}
 }

@@ -4,7 +4,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
@@ -12,6 +14,7 @@ import javax.microedition.khronos.opengles.GL11;
 import android.graphics.Typeface;
 
 import com.kh.beatbot.GeneralUtils;
+import com.kh.beatbot.listener.ViewListener;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Rectangle;
@@ -73,8 +76,14 @@ public abstract class View implements Comparable<View> {
 
 	protected ColorSet bgFillColorSet, bgStrokeColorSet;
 
+	protected Set<ViewListener> listeners = new HashSet<ViewListener>();
+
 	public View() {
 		createChildren();
+	}
+
+	public void addListener(ViewListener listener) {
+		listeners.add(listener);
 	}
 
 	protected void initBgRect(boolean rounded, ShapeGroup group) {
@@ -255,6 +264,9 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public synchronized void loadAllIcons() {
+		for (ViewListener listener : listeners) {
+			listener.onGlReady(this);
+		}
 		initIcons();
 		for (View child : children) {
 			child.loadAllIcons();
