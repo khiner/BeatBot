@@ -21,12 +21,7 @@ public class GLSurfaceViewGroup extends TouchableSurfaceView {
 	public void setBBRenderer(TouchableView renderer) {
 		this.renderer = renderer;
 	}
-	
-	@Override
-	protected void init() {
-		renderer.initAll();
-	}
-	
+
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		super.surfaceChanged(holder, format, w, h);

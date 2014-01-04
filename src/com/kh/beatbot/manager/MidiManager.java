@@ -23,7 +23,6 @@ import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.helper.TickWindowHelper;
 
 public class MidiManager {
 
@@ -35,7 +34,7 @@ public class MidiManager {
 	public static final float MIN_TICKS = TICKS_IN_ONE_MEASURE / 8,
 			MAX_TICKS = TICKS_IN_ONE_MEASURE * 4;
 
-	public static float currBeatDivision;
+	private static float beatDivision = 1;
 
 	private static boolean snapToGrid = true;
 
@@ -250,10 +249,10 @@ public class MidiManager {
 		if (offTick <= onTick)
 			offTick = onTick + 4;
 		if (snapToGrid) {
-			onTick = (long) TickWindowHelper.getMajorTickNearestTo(onTick);
-			offTick = (long) TickWindowHelper.getMajorTickNearestTo(offTick) - 1;
+			onTick = (long) getMajorTickNearestTo(onTick);
+			offTick = (long) getMajorTickNearestTo(offTick) - 1;
 			if (offTick == onTick - 1) {
-				offTick += getTicksPerBeat(currBeatDivision);
+				offTick += getTicksPerBeat();
 			}
 		}
 		if (maintainNoteLength)
@@ -273,12 +272,41 @@ public class MidiManager {
 				.execute();
 	}
 
-	public static long getTicksPerBeat(float beatDivision) {
+	public static float getBeatDivision() {
+		return beatDivision;
+	}
+
+	public static void increaseBeatDivision() {
+		beatDivision *= 2;
+	}
+
+	public static void decreaseBeatDivision() {
+		beatDivision /= 2;
+	}
+
+	public static long getTicksPerBeat() {
 		return (long) (RESOLUTION / beatDivision);
 	}
 
 	public static long millisToTick(long millis) {
 		return (long) ((RESOLUTION * 1000f / tempo.getMpqn()) * millis);
+	}
+
+	public static float getMajorTickSpacing() {
+		return TICKS_IN_ONE_MEASURE / (beatDivision * 2);
+	}
+
+	public static float getMajorTickNearestTo(float tick) {
+		float spacing = getMajorTickSpacing();
+		if (tick % spacing > spacing / 2) {
+			return tick + spacing - tick % spacing;
+		} else {
+			return tick - tick % spacing;
+		}
+	}
+
+	public static float getMajorTickToLeftOf(float tick) {
+		return tick - tick % getMajorTickSpacing();
 	}
 
 	public static long getLeftmostSelectedTick() {
@@ -294,8 +322,8 @@ public class MidiManager {
 	 * given the provided beat division
 	 */
 	public static void quantize(MidiNote midiNote, float beatDivision) {
-		long diff = (long) TickWindowHelper.getMajorTickNearestTo(midiNote
-				.getOnTick()) - midiNote.getOnTick();
+		long diff = (long) getMajorTickNearestTo(midiNote.getOnTick())
+				- midiNote.getOnTick();
 		setNoteTicks(midiNote, midiNote.getOnTick() + diff,
 				midiNote.getOffTick() + diff, true);
 	}
@@ -326,7 +354,7 @@ public class MidiManager {
 	}
 
 	public static void quantize() {
-		quantize(currBeatDivision);
+		quantize(beatDivision);
 	}
 
 	/*
@@ -387,7 +415,7 @@ public class MidiManager {
 				}
 			}
 		}
-		
+
 		if (!newNotes.isEmpty()) {
 			beginMidiEvent(null);
 			new MidiNotesCreateEvent(newNotes).execute();

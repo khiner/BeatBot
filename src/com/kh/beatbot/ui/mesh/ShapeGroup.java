@@ -26,7 +26,7 @@ public class ShapeGroup {
 		strokeGroup.setPrimitiveType(primitiveType);
 	}
 
-	public void draw(View parent, int borderWeight) {
+	public void draw(View parent) {
 		View.push();
 		View.translate(-parent.absoluteX, -parent.absoluteY);
 		draw();

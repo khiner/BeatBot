@@ -42,7 +42,6 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		gl.glViewport(0, 0, this.width, this.height);
 		GLU.gluOrtho2D(gl, 0, this.width, this.height, 0);
 		initGl(gl);
-		init();
 	}
 
 	public void onSurfaceCreated(GL10 _gl, EGLConfig config) {
@@ -124,8 +123,6 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 	public final static GL10 getGL10() {
 		return gl;
 	}
-
-	protected abstract void init();
 
 	protected abstract void draw();
 }

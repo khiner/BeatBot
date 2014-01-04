@@ -1,8 +1,5 @@
 package com.kh.beatbot.ui.view;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -13,7 +10,7 @@ import javax.microedition.khronos.opengles.GL11;
 
 import android.graphics.Typeface;
 
-import com.kh.beatbot.GeneralUtils;
+import com.kh.beatbot.listener.ScrollableViewListener;
 import com.kh.beatbot.listener.ViewListener;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
@@ -69,7 +66,8 @@ public abstract class View implements Comparable<View> {
 	protected float[] backgroundColor = Colors.BG, clearColor = Colors.BG,
 			strokeColor = Colors.WHITE;
 
-	protected boolean initialized = false, shouldClip = true;
+	private boolean initialized = false;
+	protected boolean shouldClip = true;
 
 	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0,
 			borderHeight = 0;
@@ -123,6 +121,7 @@ public abstract class View implements Comparable<View> {
 		children.add(child);
 		if (initialized) {
 			child.initAll();
+			child.initAllIcons();
 		}
 	}
 
@@ -175,7 +174,7 @@ public abstract class View implements Comparable<View> {
 		return id;
 	}
 
-	public abstract void init();
+	protected abstract void init();
 
 	public abstract void update();
 
@@ -224,8 +223,6 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public synchronized void drawAll() {
-		if (!initialized)
-			return;
 		// scissor ensures that each view can only draw within its rect
 		if (shouldClip) {
 			gl.glEnable(GL10.GL_SCISSOR_TEST);
@@ -260,16 +257,20 @@ public abstract class View implements Comparable<View> {
 
 	public void initGl(GL11 _gl) {
 		gl = _gl;
-		loadAllIcons();
-	}
-
-	public synchronized void loadAllIcons() {
 		for (ViewListener listener : listeners) {
 			listener.onGlReady(this);
 		}
+		initAllIcons();
+		initAll();
+		for (ViewListener listener : listeners) {
+			listener.onInitialize(this);
+		}
+	}
+
+	public synchronized void initAllIcons() {
 		initIcons();
 		for (View child : children) {
-			child.loadAllIcons();
+			child.initAllIcons();
 		}
 	}
 
@@ -309,29 +310,6 @@ public abstract class View implements Comparable<View> {
 		return null;
 	}
 
-	public static final FloatBuffer makeFloatBuffer(List<Float> vertices) {
-		return makeFloatBuffer(GeneralUtils.floatListToArray(vertices));
-	}
-
-	public static final FloatBuffer makeFloatBuffer(float[] vertices) {
-		return makeFloatBuffer(vertices, 0);
-	}
-
-	public static final FloatBuffer makeFloatBuffer(float[] vertices,
-			int position) {
-		ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
-		bb.order(ByteOrder.nativeOrder());
-		FloatBuffer fb = bb.asFloatBuffer();
-		fb.put(vertices);
-		fb.position(position);
-		return fb;
-	}
-
-	public static final FloatBuffer makeRectFloatBuffer(float x1, float y1,
-			float x2, float y2) {
-		return makeFloatBuffer(new float[] { x1, y1, x1, y2, x2, y2, x2, y1 });
-	}
-
 	public static final void translate(float x, float y) {
 		gl.glTranslatef(x, y, 0);
 	}
@@ -352,40 +330,6 @@ public abstract class View implements Comparable<View> {
 			float x, float y) {
 		setColor(color);
 		GLSurfaceViewBase.drawText(text, height, x, y);
-	}
-
-	public static final void drawTriangleStrip(FloatBuffer vb, float[] color,
-			int numVertices) {
-		drawTriangleStrip(vb, color, 0, numVertices);
-	}
-
-	public static final void drawTriangleStrip(FloatBuffer vb, float[] color) {
-		if (vb == null)
-			return;
-		drawTriangleStrip(vb, color, vb.capacity() / 2);
-	}
-
-	public static final void drawTriangleStrip(FloatBuffer vb, float[] color,
-			int beginVertex, int endVertex) {
-		if (vb == null)
-			return;
-		setColor(color);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vb);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, beginVertex, endVertex
-				- beginVertex);
-	}
-
-	public static final void drawLines(FloatBuffer vb, float[] color,
-			float width, int type, int stride) {
-		setColor(color);
-		gl.glLineWidth(width);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, stride, vb);
-		gl.glDrawArrays(type, 0, vb.capacity() / (2 + stride / 8));
-	}
-
-	public static final void drawLines(FloatBuffer vb, float[] color,
-			float width, int type) {
-		drawLines(vb, color, width, type, 0);
 	}
 
 	protected final float distanceFromCenterSquared(float x, float y) {
@@ -440,5 +384,21 @@ public abstract class View implements Comparable<View> {
 			return 1;
 		else
 			return -1;
+	}
+	
+	public void notifyScrollX() {
+		for (ViewListener listener : listeners) {
+			if (listener instanceof ScrollableViewListener) {
+				((ScrollableViewListener)listener).onScrollX(this);
+			}
+		}
+	}
+	
+	public void notifyScrollY() {
+		for (ViewListener listener : listeners) {
+			if (listener instanceof ScrollableViewListener) {
+				((ScrollableViewListener)listener).onScrollY(this);
+			}
+		}
 	}
 }

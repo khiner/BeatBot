@@ -1,35 +1,61 @@
 package com.kh.beatbot.ui.view;
 
-import java.nio.FloatBuffer;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.NumberSegment;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class BpmView extends ClickableView {
 
 	private static final float INC_BPM_THRESH = 15;
-	private static boolean[][] segments = new boolean[3][7];
-	private static FloatBuffer longSegmentVB = null;
-	private static FloatBuffer shortSegmentVB = null;
+	private static NumberSegment[][] numberSegments = new NumberSegment[3][7];
 
-	private static float lastFrameY = -1;
-	private static float currYDragTotal = 0;
+	private static ShapeGroup shapeGroup = new ShapeGroup();
+
+	private static float lastFrameY = -1, currYDragTotal = 0;
 
 	private long lastTapTime = 0;
-	
+
 	public void setBPM(float bpm) {
 		setText(String.valueOf((int) MidiManager.setBPM(bpm)));
 	}
-	
+
 	@Override
-	public synchronized void init() {
-		initSegmentVBs();
+	public synchronized void createChildren() {
+		for (int i = 0; i < numberSegments.length; i++) {
+			for (int j = 0; j < numberSegments[i].length; j++) {
+				numberSegments[i][j] = new NumberSegment(shapeGroup, Colors.BPM_OFF, null);
+			}
+		}
+	}
+
+	@Override
+	public synchronized void layoutChildren() {
+		float longW = width / 16;
+		float longH = height / 2;
+		float shortW = longW * 3;
+		float shortH = height / 6;
+
+		for (int i = 0; i < numberSegments.length; i++) {
+			float x = i * 4 * longW;
+			numberSegments[i][0].layout(x, 0, longW, longH);
+			numberSegments[i][1].layout(x, height / 2, longW, longH);
+			numberSegments[i][2].layout(x + longW * 2, 0, longW, longH);
+			numberSegments[i][3].layout(x + longW * 2, height / 2, longW, longH);
+			numberSegments[i][4].layout(x, 0, shortW, shortH);
+			numberSegments[i][4].layout(x, height / 2 - shortH / 2, shortW, shortH);
+			numberSegments[i][4].layout(x, height - shortH / 2, shortW, shortH);
+		}
 	}
 
 	@Override
 	public void draw() {
-		drawSegments();
+		shapeGroup.draw();
 	}
 
 	@Override
@@ -59,7 +85,7 @@ public class BpmView extends ClickableView {
 	public void handleActionUp(int id, float x, float y) {
 		super.handleActionUp(id, x, y);
 	}
-	
+
 	@Override
 	protected void singleTap(int id, float x, float y) {
 		long tapTime = System.currentTimeMillis();
@@ -82,155 +108,88 @@ public class BpmView extends ClickableView {
 	protected void longPress(int id, float x, float y) {
 		BeatBotActivity.mainActivity.showDialog(BeatBotActivity.BPM_DIALOG_ID);
 	}
-	
-	private void initSegmentVBs() {
-		// for use with GL_TRIANGLE_FAN - first is middle, the rest are edges
-		float[] longSegmentBuf = new float[] { 0, 0, -4, 4, 4, 4, -4,
-				(height - 2) / 2 - 10, 4, (height - 2) / 2 - 10, 0,
-				(height - 2) / 2 - 5 };
-		float[] shortSegmentBuf = new float[] { 0, 0, 4, -4, 4, 4,
-				(width - 8 * 5) / 3 - 7, -4, (width - 8 * 5) / 3 - 7, 4,
-				(width - 8 * 5) / 3 - 2, 0 };
-		longSegmentVB = makeFloatBuffer(longSegmentBuf);
-		shortSegmentVB = makeFloatBuffer(shortSegmentBuf);
-	}
 
 	public void setText(String text) {
-		if (text.length() > 3)
-			return;
-		for (int i = 0; i < 3 - text.length(); i++) {
-			setSegments(i, 0); // pad with zeros
+		for (int i = 0; i < numberSegments.length; i++) {
+			for (int j = 0; j < numberSegments[i].length; j++) {
+				numberSegments[i][i].setFillColor(Colors.BPM_OFF);
+			}
 		}
-		for (int i = 3 - text.length(), j = 0; i < 3; i++, j++) {
-			setSegments(i, Character.digit(text.charAt(j), 10));
-		}
-	}
-
-	private static void setSegments(int position, int digit) {
-		switch (digit) {
-		case 0:
-			segments[position][0] = true;
-			segments[position][1] = true;
-			segments[position][2] = true;
-			segments[position][3] = true;
-			segments[position][4] = true;
-			segments[position][5] = false;
-			segments[position][6] = true;
-			break;
-		case 1:
-			segments[position][0] = false;
-			segments[position][1] = false;
-			segments[position][2] = true;
-			segments[position][3] = true;
-			segments[position][4] = false;
-			segments[position][5] = false;
-			segments[position][6] = false;
-			break;
-		case 2:
-			segments[position][0] = false;
-			segments[position][1] = true;
-			segments[position][2] = true;
-			segments[position][3] = false;
-			segments[position][4] = true;
-			segments[position][5] = true;
-			segments[position][6] = true;
-			break;
-		case 3:
-			segments[position][0] = false;
-			segments[position][1] = false;
-			segments[position][2] = true;
-			segments[position][3] = true;
-			segments[position][4] = true;
-			segments[position][5] = true;
-			segments[position][6] = true;
-			break;
-		case 4:
-			segments[position][0] = true;
-			segments[position][1] = false;
-			segments[position][2] = true;
-			segments[position][3] = true;
-			segments[position][4] = false;
-			segments[position][5] = true;
-			segments[position][6] = false;
-			break;
-		case 5:
-			segments[position][0] = true;
-			segments[position][1] = false;
-			segments[position][2] = false;
-			segments[position][3] = true;
-			segments[position][4] = true;
-			segments[position][5] = true;
-			segments[position][6] = true;
-			break;
-		case 6:
-			segments[position][0] = true;
-			segments[position][1] = true;
-			segments[position][2] = false;
-			segments[position][3] = true;
-			segments[position][4] = true;
-			segments[position][5] = true;
-			segments[position][6] = true;
-			break;
-		case 7:
-			segments[position][0] = false;
-			segments[position][1] = false;
-			segments[position][2] = true;
-			segments[position][3] = true;
-			segments[position][4] = true;
-			segments[position][5] = false;
-			segments[position][6] = false;
-			break;
-		case 8:
-			segments[position][0] = true;
-			segments[position][1] = true;
-			segments[position][2] = true;
-			segments[position][3] = true;
-			segments[position][4] = true;
-			segments[position][5] = true;
-			segments[position][6] = true;
-			break;
-		case 9:
-			segments[position][0] = true;
-			segments[position][1] = false;
-			segments[position][2] = true;
-			segments[position][3] = true;
-			segments[position][4] = true;
-			segments[position][5] = true;
-			segments[position][6] = false;
-			break;
+		for (NumberSegment selectedSegment : getSelectedSegments(text)) {
+			selectedSegment.setFillColor(Colors.BPM_ON);
 		}
 	}
 
-	private void drawSegments() {
-		gl.glPushMatrix();
-		for (int i = 0; i < 3; i++) {
-			gl.glPushMatrix();
-			// long segments
-			gl.glTranslatef(4, 4, 0);
-			drawTriangleStrip(longSegmentVB, calculateSegmentColor(segments[i][0]));
-			gl.glPushMatrix();
-			gl.glTranslatef(0, (height - 9) / 2, 0);
-			drawTriangleStrip(longSegmentVB, calculateSegmentColor(segments[i][1]));
-			gl.glTranslatef((width - 10) / 3 - 10, -(height - 9) / 2, 0);
-			drawTriangleStrip(longSegmentVB, calculateSegmentColor(segments[i][2]));
-			gl.glTranslatef(0, (height - 9) / 2, 0);
-			drawTriangleStrip(longSegmentVB, calculateSegmentColor(segments[i][3]));
-			// short segments
-			gl.glPopMatrix();
-			gl.glTranslatef(1, 0, 0);
-			drawTriangleStrip(shortSegmentVB, calculateSegmentColor(segments[i][4]));
-			gl.glTranslatef(0, (height - 9) / 2 - 1, 0);
-			drawTriangleStrip(shortSegmentVB, calculateSegmentColor(segments[i][5]));
-			gl.glTranslatef(0, (height - 9) / 2, 0);
-			drawTriangleStrip(shortSegmentVB, calculateSegmentColor(segments[i][6]));
-			gl.glPopMatrix();
-			// translate for next digit
-			gl.glTranslatef((width - 8) / 3, 0, 0);
+	private static Set<NumberSegment> getSelectedSegments(String text) {
+		Set<NumberSegment> selectedSegments = new HashSet<NumberSegment>();
+
+		for (int i = 0; i < text.length(); i++) {
+			NumberSegment[] charSegments = numberSegments[text.length() - i - 1];
+			switch (text.charAt(i)) {
+			case 0:
+				selectedSegments.add(charSegments[0]);
+				selectedSegments.add(charSegments[1]);
+				selectedSegments.add(charSegments[2]);
+				selectedSegments.add(charSegments[3]);
+				selectedSegments.add(charSegments[4]);
+				selectedSegments.add(charSegments[6]);
+				break;
+			case 1:
+				selectedSegments.add(charSegments[2]);
+				selectedSegments.add(charSegments[3]);
+				break;
+			case 2:
+				selectedSegments.add(charSegments[1]);
+				selectedSegments.add(charSegments[2]);
+				selectedSegments.add(charSegments[4]);
+				selectedSegments.add(charSegments[5]);
+				selectedSegments.add(charSegments[6]);
+				break;
+			case 3:
+				selectedSegments.add(charSegments[2]);
+				selectedSegments.add(charSegments[3]);
+				selectedSegments.add(charSegments[4]);
+				selectedSegments.add(charSegments[5]);
+				selectedSegments.add(charSegments[6]);
+				break;
+			case 4:
+				selectedSegments.add(charSegments[0]);
+				selectedSegments.add(charSegments[2]);
+				selectedSegments.add(charSegments[3]);
+				selectedSegments.add(charSegments[5]);
+				break;
+			case 5:
+				selectedSegments.add(charSegments[0]);
+				selectedSegments.add(charSegments[3]);
+				selectedSegments.add(charSegments[4]);
+				selectedSegments.add(charSegments[5]);
+				selectedSegments.add(charSegments[6]);
+				break;
+			case 6:
+				selectedSegments.add(charSegments[0]);
+				selectedSegments.add(charSegments[1]);
+				selectedSegments.add(charSegments[3]);
+				selectedSegments.add(charSegments[4]);
+				selectedSegments.add(charSegments[5]);
+				selectedSegments.add(charSegments[6]);
+				break;
+			case 7:
+				selectedSegments.add(charSegments[2]);
+				selectedSegments.add(charSegments[3]);
+				selectedSegments.add(charSegments[4]);
+				break;
+			case 8:
+				selectedSegments.addAll(Arrays.asList(charSegments));
+				break;
+			case 9:
+				selectedSegments.add(charSegments[0]);
+				selectedSegments.add(charSegments[2]);
+				selectedSegments.add(charSegments[3]);
+				selectedSegments.add(charSegments[4]);
+				selectedSegments.add(charSegments[5]);
+				break;
+			}			
 		}
-		gl.glPopMatrix();
-	}
-	
-	private float[] calculateSegmentColor(boolean on) {
-		return pointerCount() > 0 ? on ? Colors.BPM_ON_SELECTED : Colors.BPM_OFF_SELECTED : on ? Colors.BPM_ON : Colors.BPM_OFF;
+		return selectedSegments;
 	}
 }

@@ -237,7 +237,7 @@ public abstract class LevelsFXPage extends TouchableView {
 
 	@Override
 	public void draw() {
-		labelGroup.draw(this, 2);
+		labelGroup.draw(this);
 	}
 
 	@Override

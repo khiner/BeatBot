@@ -83,7 +83,7 @@ public class AdsrPage extends TouchableView implements OnReleaseListener {
 
 	@Override
 	public void draw() {
-		iconGroup.draw(this, 1);
+		iconGroup.draw(this);
 	}
 
 	@Override

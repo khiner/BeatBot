@@ -7,8 +7,6 @@
     <color name="green">#FF00FF00</color>
     <color name="bpmOn">#FFFF0000</color>
     <color name="bpmOff">#4EFF0000</color>
-    <color name="bpmOnSelected">#FFFF4E3F</color>
-    <color name="bpmOffSelected">#4EFF4E3F</color>
     <color name="gridLine">#FF000000</color>
     <color name="waveform">#FF000000</color>
     <color name="midiViewBg">#FF808080</color>

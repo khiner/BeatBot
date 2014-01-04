@@ -9,11 +9,10 @@ public class Colors {
 			MIDI_VIEW_BG, MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM, NOTE,
 			NOTE_SELECTED, VOLUME, PAN, PITCH, VOLUME_LIGHT, VOLUME_TRANS,
 			PAN_TRANS, PITCH_TRANS, LEVEL_SELECTED, LEVEL_SELECTED_TRANS,
-			TICK_FILL, TICK_MARKER, TICKBAR, BPM_OFF, BPM_ON, BPM_ON_SELECTED,
-			BPM_OFF_SELECTED, VIEW_BG, VIEW_BG_SELECTED, LABEL_DARK, LABEL_MED,
-			LABEL_LIGHT, LABEL_VERY_LIGHT, LABEL_SELECTED,
-			LABEL_SELECTED_TRANS, MIDI_SELECTED_TRACK, TRANSPARENT = { 0, 0, 0,
-					0 };
+			TICK_FILL, TICK_MARKER, TICKBAR, BPM_OFF, BPM_ON, VIEW_BG,
+			VIEW_BG_SELECTED, LABEL_DARK, LABEL_MED, LABEL_LIGHT,
+			LABEL_VERY_LIGHT, LABEL_SELECTED, LABEL_SELECTED_TRANS,
+			MIDI_SELECTED_TRACK, TRANSPARENT = { 0, 0, 0, 0 };
 
 	public static float[][] MIDI_LINES = { { 0, 0, 0, 1 },
 			{ .1f, .1f, .1f, 1 }, { .2f, .2f, .2f, 1 }, { .3f, .3f, .3f, 1 },
@@ -69,9 +68,6 @@ public class Colors {
 
 		BPM_ON = colorResourceToFloats(activity, R.color.bpmOn);
 		BPM_OFF = colorResourceToFloats(activity, R.color.bpmOff);
-		BPM_ON_SELECTED = colorResourceToFloats(activity, R.color.bpmOnSelected);
-		BPM_OFF_SELECTED = colorResourceToFloats(activity,
-				R.color.bpmOffSelected);
 		// VIEW_BG = new float[] { 0.3275f, 0.3994f, 0.4465f, 1 };
 
 		LABEL_DARK = colorResourceToFloats(activity, R.color.labelDark);

@@ -1,26 +1,23 @@
 package com.kh.beatbot.ui.view.helper;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.microedition.khronos.opengles.GL10;
-
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Line;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.MidiView;
-import com.kh.beatbot.ui.view.View;
 
 public class TickWindowHelper {
 
 	private static MidiView midiView = null;
 
-	public static final int NUM_VERTICAL_LINE_SETS = 8;
-	public static final int MIN_LINES_DISPLAYED = 8;
-	public static final int MAX_LINES_DISPLAYED = 32;
+	public static final int NUM_VERTICAL_LINE_SETS = 8,
+			MIN_LINES_DISPLAYED = 8, MAX_LINES_DISPLAYED = 32;
 
 	public static float scrollAnchorTick = 0, scrollAnchorY = 0;
-			
+
 	// leftmost tick to display
 	private static float currTickOffset = 0;
 	private static float currYOffset = 0;
@@ -28,20 +25,8 @@ public class TickWindowHelper {
 	// current number of ticks within the window
 	private static float currNumTicks = MidiManager.TICKS_IN_ONE_MEASURE;
 
-	// number of quarter notes per beat division - i.e. the "current grid granularity"
-	// can be < 1
-	private static float currNumQuarterNotes = 1;
+	private static List<Line>[] vLines = (List<Line>[]) new ArrayList[NUM_VERTICAL_LINE_SETS];
 
-	private static FloatBuffer[] vLineVbs = new FloatBuffer[NUM_VERTICAL_LINE_SETS];
-
-	public static void drawVerticalLines() {
-		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
-			if (1 << i > currNumQuarterNotes * 4)
-				break; // break when lines go below current granulariy
-			View.drawLines(vLineVbs[i], Colors.MIDI_LINES[i], 2, GL10.GL_LINES);
-		}
-	}
-	
 	public static float getNumTicks() {
 		return currNumTicks;
 	}
@@ -54,9 +39,9 @@ public class TickWindowHelper {
 		return currYOffset;
 	}
 
-	public static void init(MidiView _midiView) {
+	public static void init(MidiView _midiView, ShapeGroup shapeGroup) {
 		midiView = _midiView;
-		initVLineVbs();
+		createVLines(shapeGroup);
 		updateGranularity();
 	}
 
@@ -68,7 +53,9 @@ public class TickWindowHelper {
 		if (newTickOffset < 0) {
 			currTickOffset = 0;
 			currNumTicks = ZRAT * midiView.width / rightX;
-			currNumTicks = currNumTicks <= MidiManager.MAX_TICKS ? (currNumTicks >= MidiManager.MIN_TICKS ? currNumTicks : MidiManager.MIN_TICKS) : MidiManager.MAX_TICKS;
+			currNumTicks = currNumTicks <= MidiManager.MAX_TICKS ? (currNumTicks >= MidiManager.MIN_TICKS ? currNumTicks
+					: MidiManager.MIN_TICKS)
+					: MidiManager.MAX_TICKS;
 		} else if (newNumTicks > MidiManager.MAX_TICKS) {
 			currTickOffset = newTickOffset;
 			currNumTicks = MidiManager.MAX_TICKS - currTickOffset;
@@ -109,22 +96,6 @@ public class TickWindowHelper {
 		setYOffset(newYOffset);
 	}
 
-	public static void updateGranularity() {
-		// x-coord width of one quarter note
-		float spacing = (MidiManager.TICKS_IN_ONE_MEASURE * midiView.width)
-				/ (currNumTicks * 8);
-		// after algebra, this condition says: if more than maxLines will
-		// display, reduce the granularity by one half, else if less than
-		// maxLines will display, increase the granularity by one half
-		// so that (minLinesDisplayed <= lines-displayed <=
-		// maxLinesDisplayed) at all times
-		if ((MAX_LINES_DISPLAYED * spacing * 2) / currNumQuarterNotes < midiView.width)
-			currNumQuarterNotes /= 2;
-		else if ((MIN_LINES_DISPLAYED * spacing * 2) / currNumQuarterNotes > midiView.width)
-			currNumQuarterNotes *= 2;
-		MidiManager.currBeatDivision = currNumQuarterNotes;
-	}
-
 	public static void setTickOffset(float tickOffset) {
 		if (tickOffset < 0) {
 			currTickOffset = 0;
@@ -133,46 +104,28 @@ public class TickWindowHelper {
 		} else {
 			currTickOffset = tickOffset;
 		}
+		midiView.notifyScrollX();
+	}
+
+	public static void setHeight(float height) {
+		for (List<Line> lines : vLines) {
+			for (Line line : lines) {
+				line.setDimensions(2, height);
+			}
+		}
 	}
 
 	public static void setYOffset(float yOffset) {
 		if (yOffset < 0) {
 			currYOffset = 0;
-		} else if (yOffset + midiView.getMidiHeight() > midiView.getTotalTrackHeight()) {
-			currYOffset = midiView.getTotalTrackHeight() - midiView.getMidiHeight();
+		} else if (yOffset + midiView.getMidiHeight() > midiView
+				.getTotalTrackHeight()) {
+			currYOffset = midiView.getTotalTrackHeight()
+					- midiView.getMidiHeight();
 		} else {
 			currYOffset = yOffset;
 		}
-	}
-
-	public static void setNumTicks(float numTicks) {
-		if (numTicks > MidiManager.MAX_TICKS || numTicks < MidiManager.MIN_TICKS) {
-			return;
-		}
-		currNumTicks = numTicks;
-		updateGranularity();
-	}
-
-	public static float getCurrentBeatDivision() {
-		// granularity is relative to one quarter note
-		return currNumQuarterNotes;
-	}
-
-	public static float getMajorTickSpacing() {
-		return MidiManager.TICKS_IN_ONE_MEASURE / (currNumQuarterNotes * 2);
-	}
-
-	public static float getMajorTickNearestTo(float tick) {
-		float spacing = getMajorTickSpacing(); 
-		if (tick % spacing > spacing / 2) {
-			return tick + spacing - tick % spacing;
-		} else {
-			return tick - tick % spacing;
-		}
-	}
-	
-	public static float getMajorTickToLeftOf(float tick) {
-		return tick - tick % getMajorTickSpacing();
+		midiView.notifyScrollY();
 	}
 
 	public static void updateView(float tick) {
@@ -183,10 +136,11 @@ public class TickWindowHelper {
 			setTickOffset(tick - currNumTicks);
 		}
 	}
-	
+
 	public static void updateView(float leftTick, float rightTick) {
 		// if we are dragging out of view, scroll appropriately
-		if (leftTick <= currTickOffset && rightTick >= currTickOffset + currNumTicks) {
+		if (leftTick <= currTickOffset
+				&& rightTick >= currTickOffset + currNumTicks) {
 			setTickOffset(leftTick);
 			setNumTicks(rightTick - leftTick);
 		} else if (leftTick < currTickOffset) {
@@ -198,8 +152,7 @@ public class TickWindowHelper {
 
 	// translates the tickOffset to ensure that leftTick, rightTick, topY and
 	// bottomY are all in view
-	public static void updateView(float tick, float topY,
-			float bottomY) {
+	public static void updateView(float tick, float topY, float bottomY) {
 		updateView(tick);
 		if (topY < currYOffset
 				&& bottomY < currYOffset + midiView.getMidiHeight()) {
@@ -210,30 +163,65 @@ public class TickWindowHelper {
 		}
 	}
 
-	public static void initVLineVbs() {
-		List<List<Float>> allVertices = new ArrayList<List<Float>>();
-		
-		long minTickSpacing = (long)(MidiManager.MIN_TICKS / 8);
+	private static void setNumTicks(float numTicks) {
+		if (numTicks > MidiManager.MAX_TICKS
+				|| numTicks < MidiManager.MIN_TICKS) {
+			return;
+		}
+		currNumTicks = numTicks;
+		updateGranularity();
+	}
+
+	private static void updateGranularity() {
+		// x-coord width of one quarter note
+		float spacing = (MidiManager.TICKS_IN_ONE_MEASURE * midiView.width)
+				/ (currNumTicks * 8);
+		// after algebra, this condition says: if more than maxLines will
+		// display, reduce the granularity by one half, else if less than
+		// maxLines will display, increase the granularity by one half
+		// so that (minLinesDisplayed <= lines-displayed <=
+		// maxLinesDisplayed) at all times
+		if ((MAX_LINES_DISPLAYED * spacing * 2) / MidiManager.getBeatDivision() < midiView.width)
+			MidiManager.decreaseBeatDivision();
+		else if ((MIN_LINES_DISPLAYED * spacing * 2)
+				/ MidiManager.getBeatDivision() > midiView.width)
+			MidiManager.increaseBeatDivision();
+		updateVerticalLineColors();
+	}
+
+	private static void createVLines(ShapeGroup shapeGroup) {
+		long minTickSpacing = (long) (MidiManager.MIN_TICKS / 8);
 		long[] tickSpacings = new long[NUM_VERTICAL_LINE_SETS];
 		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
-			allVertices.add(new ArrayList<Float>());
-			tickSpacings[i] = minTickSpacing * (1 << (NUM_VERTICAL_LINE_SETS - i - 1));
+			tickSpacings[i] = minTickSpacing
+					* (1 << (NUM_VERTICAL_LINE_SETS - i - 1));
+			vLines[i] = new ArrayList<Line>();
 		}
 		for (long currTick = 0; currTick < MidiManager.MAX_TICKS; currTick += minTickSpacing) {
 			for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
 				if (currTick % tickSpacings[i] == 0) {
 					float x = midiView.tickToUnscaledX(currTick);
-					allVertices.get(i).add(x);
-					allVertices.get(i).add(MidiView.Y_OFFSET);
-					allVertices.get(i).add(x);
-					allVertices.get(i).add(MidiView.Y_OFFSET + midiView.getTotalTrackHeight());
+					Line line = new Line(shapeGroup, null, Colors.TRANSPARENT);
+					line.layout(x, MidiView.Y_OFFSET, 2, 1);
+					vLines[i].add(line);
 					break; // each line goes in only ONE line set
 				}
 			}
 		}
-		// convert the list of float lists into a list of FloatBuffers
-		for (int i = 0; i < allVertices.size(); i++) {
-			vLineVbs[i] = MidiView.makeFloatBuffer(allVertices.get(i));
+	}
+
+	private static void updateVerticalLineColors() {
+		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
+			if (1 << i > MidiManager.getBeatDivision() * 4) {
+				// lines are invisible below current granulariy
+				for (Line line : vLines[i]) {
+					line.setStrokeColor(Colors.TRANSPARENT);
+				}
+			} else {
+				for (Line line : vLines[i]) {
+					line.setStrokeColor(Colors.MIDI_LINES[i]);
+				}
+			}
 		}
 	}
 }

@@ -95,6 +95,10 @@ public class BeatBotActivity extends Activity {
 				MidiManager.init();
 
 				arm();
+			}
+			
+			@Override
+			public void onInitialize(View view) {
 				setupProject();
 			}
 		});

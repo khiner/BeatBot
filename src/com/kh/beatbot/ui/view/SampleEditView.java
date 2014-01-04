@@ -1,9 +1,5 @@
 package com.kh.beatbot.ui.view;
 
-import java.nio.FloatBuffer;
-
-import javax.microedition.khronos.opengles.GL10;
-
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.Param;
@@ -12,6 +8,7 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.mesh.WaveformShape;
@@ -30,7 +27,7 @@ public class SampleEditView extends ControlView2dBase {
 	private static ShapeGroup shapeGroup = new ShapeGroup();
 	private static WaveformShape waveformShape;
 	private static ImageButton[] loopButtons = new ImageButton[2];
-	private static FloatBuffer currSampleLineVb = null;
+	private static Rectangle currSampleRect = null;
 
 	private boolean pressed = false;
 
@@ -100,14 +97,9 @@ public class SampleEditView extends ControlView2dBase {
 		updateLoopSelectionVbs();
 	}
 
-	private void initCurrSampleLineVb() {
-		currSampleLineVb = makeFloatBuffer(new float[] { 0, 0, 0, height });
-	}
-
 	@Override
 	public synchronized void init() {
 		setStrokeColor(Colors.BLACK);
-		initCurrSampleLineVb();
 		// find view level for 32 samples
 		minLoopWindow = params[0].getViewLevel(Track.MIN_LOOP_WINDOW);
 		update();
@@ -123,6 +115,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public synchronized void createChildren() {
+		currSampleRect = new Rectangle(shapeGroup, Colors.VOLUME, null);
 		for (int i = 0; i < loopButtons.length; i++) {
 			loopButtons[i] = new ImageButton();
 			loopButtons[i].setOnPressListener(new OnPressListener() {
@@ -144,27 +137,25 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	public void layout(View parent, float x, float y, float width, float height) {
-		bgFillColorSet = new ColorSet(Colors.LABEL_LIGHT, Colors.LABEL_VERY_LIGHT);
+		bgFillColorSet = new ColorSet(Colors.LABEL_LIGHT,
+				Colors.LABEL_VERY_LIGHT);
 		initBgRect(false, null, bgFillColorSet, null);
 		waveformShape = Shape.createWaveform(shapeGroup, width,
 				Colors.LABEL_SELECTED, Colors.BLACK);
-		waveformShape.setStrokeWeight(2);
 		waveformWidth = width - SNAP_DIST;
 		super.layout(parent, x, y, width, height);
 	}
 
 	public synchronized void layoutChildren() {
 		waveformShape.layout(0, 0, width, height);
+		currSampleRect.layout(0, 0, 4, height);
 		loopButtons[0].layout(null, 0, 0, X_OFFSET * 2, height);
 		loopButtons[1].layout(null, width - X_OFFSET, 0, X_OFFSET * 2, height);
 	}
 
-	private void drawCurrSampleLine() {
-		push();
-		translate(levelToX(params[0].getViewLevel(TrackManager.currTrack
-				.getCurrentFrame())), 0);
-		drawLines(currSampleLineVb, Colors.VOLUME, 4, GL10.GL_LINES);
-		pop();
+	private void updateCurrSample() {
+		currSampleRect.setPosition(levelToX(params[0]
+				.getViewLevel(TrackManager.currTrack.getCurrentFrame())), 0);
 	}
 
 	@Override
@@ -174,11 +165,11 @@ public class SampleEditView extends ControlView2dBase {
 			super.draw();
 			return;
 		}
-		shapeGroup.draw();
 		if (TrackManager.currTrack.isPlaying()
 				|| TrackManager.currTrack.isPreviewing()) {
-			drawCurrSampleLine();
+			updateCurrSample();
 		}
+		shapeGroup.draw();
 	}
 
 	private boolean moveLoopMarker(int id, float x) {

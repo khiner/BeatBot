@@ -66,8 +66,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	}
 
 	public void updateAll() {
-		if (!initialized)
-			return;
 		update();
 		updateLevelsFXPage();
 		editPage.update();
@@ -77,7 +75,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 
 	@Override
 	public void draw() {
-		roundedRectGroup.draw(this, 1);
+		roundedRectGroup.draw(this);
 	}
 
 	@Override

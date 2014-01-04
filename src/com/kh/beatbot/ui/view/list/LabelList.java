@@ -97,7 +97,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 		newLabel.setOnReleaseListener(this);
 		addChild(newLabel);
 		layoutChildren();
-		newLabel.loadAllIcons();
+		newLabel.initAllIcons();
 		return newLabel;
 	}
 

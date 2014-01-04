@@ -1,22 +1,16 @@
 package com.kh.beatbot.ui.view;
 
 import com.kh.beatbot.Track;
+import com.kh.beatbot.listener.ScrollableViewListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.view.helper.TickWindowHelper;
 
-public class MidiTrackView extends TouchableView implements TrackListener {
-
-	private float lastY = 0;
+public class MidiTrackView extends TouchableView implements TrackListener, ScrollableViewListener {
 
 	@Override
 	public void draw() {
-		float newY = -absoluteY - TickWindowHelper.getYOffset();
-		if (newY != lastY) {
-			layoutChildren();
-		}
-		TrackButtonRow.roundedRectGroup.draw(this, 1);
-		lastY = newY;
+		TrackButtonRow.roundedRectGroup.draw(this);
 	}
 
 	@Override
@@ -31,10 +25,7 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 	@Override
 	public void onCreate(Track track) {
 		addChild(track.getButtonRow());
-		if (initialized) {
-			track.getButtonRow().loadAllIcons();
-			layoutChildren();
-		}
+		layoutChildren();
 	}
 
 	@Override
@@ -77,5 +68,25 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void onGlReady(View view) {
+		
+	}
+
+	@Override
+	public void onInitialize(View view) {
+		
+	}
+
+	@Override
+	public void onScrollX(View view) {
+		
+	}
+
+	@Override
+	public void onScrollY(View view) {
+		layoutChildren();
 	}
 }

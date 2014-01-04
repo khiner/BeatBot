@@ -31,7 +31,7 @@ public class ToggleKnob extends Knob implements ParamToggleListener {
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	public synchronized void createChildren() {
 		super.createChildren();
 		centerButton = new ToggleButton();
 		centerButton.setOnReleaseListener(new OnReleaseListener() {

@@ -1,52 +1,22 @@
 package com.kh.beatbot.ui.view.control;
 
-import java.nio.FloatBuffer;
-
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.KnobShape;
 
 public class Knob extends ControlView1dBase {
 
-	private FloatBuffer circleVb;
-
-	private int drawIndex = 0;
-
-	private void initCircleVbs(float width, float height) {
-		float[] circleVertices = new float[128];
-		float theta = 3 * ¹ / 4; // start at 1/8 around the circle
-		for (int i = 0; i < circleVertices.length / 4; i++) {
-			// theta will range from ¹/4 to 7¹/8,
-			// with the ¹/8 gap at the "bottom" of the view
-			theta += 6 * ¹ / circleVertices.length;
-			// main circles will show when user is not touching
-			circleVertices[i * 4] = (float) Math.cos(theta) * width / 2.3f
-					+ width / 2;
-			circleVertices[i * 4 + 1] = (float) Math.sin(theta) * width / 2.3f
-					+ width / 2;
-			circleVertices[i * 4 + 2] = (float) Math.cos(theta) * width / 3.3f
-					+ width / 2;
-			circleVertices[i * 4 + 3] = (float) Math.sin(theta) * width / 3.3f
-					+ width / 2;
-		}
-		circleVb = makeFloatBuffer(circleVertices);
-	}
+	private KnobShape knobShape;
 
 	@Override
 	public void draw() {
-		// level background
-		drawTriangleStrip(circleVb, Colors.VIEW_BG);
-		// main selection
-		drawTriangleStrip(circleVb, selected ? Colors.LABEL_SELECTED
-				: levelColor, drawIndex);
+		knobShape.draw();
 	}
 
 	@Override
 	public void onParamChanged(Param param) {
-		if (circleVb == null)
-			return;
-		drawIndex = (int) (circleVb.capacity() * param.viewLevel / 2);
-		drawIndex += drawIndex % 2;
+		knobShape.setLevel(param.viewLevel);
 	}
 
 	@Override
@@ -65,7 +35,24 @@ public class Knob extends ControlView1dBase {
 	}
 
 	@Override
+	public synchronized void createChildren() {
+		knobShape = new KnobShape(null, Colors.VOLUME, null);
+	}
+
+	@Override
 	public synchronized void layoutChildren() {
-		initCircleVbs(width, height);
+		knobShape.layout(0, 0, width, height);
+	}
+	
+	@Override
+	public void handleActionDown(int id, float x, float y) {
+		super.handleActionDown(id, x, y);
+		knobShape.setFillColor(selectColor);
+	}
+
+	@Override
+	public void handleActionUp(int id, float x, float y) {
+		super.handleActionUp(id, x, y);
+		knobShape.setFillColor(levelColor);
 	}
 }

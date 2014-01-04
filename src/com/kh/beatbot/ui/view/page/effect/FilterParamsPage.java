@@ -37,7 +37,7 @@ public class FilterParamsPage extends EffectParamsPage {
 	@Override
 	public void draw() {
 		super.draw();
-		iconGroup.draw(this, 2);
+		iconGroup.draw(this);
 	}
 
 	@Override

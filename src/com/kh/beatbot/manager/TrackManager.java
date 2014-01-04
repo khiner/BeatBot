@@ -120,6 +120,7 @@ public class TrackManager implements TrackListener {
 		for (TrackListener trackListener : trackListeners) {
 			trackListener.onCreate(track);
 		}
+		track.select();
 	}
 
 	@Override
