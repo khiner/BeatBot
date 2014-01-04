@@ -3,6 +3,8 @@ package com.kh.beatbot.ui.mesh;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kh.beatbot.ui.color.Colors;
+
 public class KnobShape extends Shape {
 
 	class Vertex {
@@ -15,7 +17,7 @@ public class KnobShape extends Shape {
 	}
 
 	private List<Vertex> tempVertices = new ArrayList<Vertex>();
-	private float level = 1;
+	private int colorChangeVertex = 0;
 
 	public KnobShape(ShapeGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor);
@@ -34,15 +36,21 @@ public class KnobShape extends Shape {
 	@Override
 	protected void updateVertices() {
 		initTempVertices();
+
 		for (int i = 2; i < tempVertices.size(); i++) {
-			fillVertex(tempVertices.get(i - 2).x, tempVertices.get(i - 2).y);
-			fillVertex(tempVertices.get(i - 1).x, tempVertices.get(i - 1).y);
-			fillVertex(tempVertices.get(i).x, tempVertices.get(i).y);
+			vertex(i - 2);
+			vertex(i - 1);
+			vertex(i);
 		}
 	}
 
 	public void setLevel(float level) {
-		this.level = level;
+		colorChangeVertex = (int) (getNumFillVertices() * level) / 3;
+		if ((colorChangeVertex & 1) == 0) { // even
+			colorChangeVertex += 1; // cci should be odd
+		}
+		resetIndices();
+		updateVertices();
 	}
 
 	private void initTempVertices() {
@@ -52,15 +60,26 @@ public class KnobShape extends Shape {
 		for (int i = 0; i < getNumFillVertices() / 6; i++) {
 			// theta will range from ¹/4 to 7¹/8,
 			// with the ¹/8 gap at the "bottom" of the view
-			theta += 4 * ¹ / getNumFillVertices();
+			theta += 9 * ¹ / getNumFillVertices();
 			// main circles will show when user is not touching
-			tempVertices.add(new Vertex((float) Math.cos(theta) * width / 2.3f
-					+ width / 2, (float) Math.sin(theta) * width / 2.3f + width
-					/ 2));
-			tempVertices.add(new Vertex((float) Math.cos(theta) * width / 3.3f
-					+ width / 2, (float) Math.sin(theta) * width / 3.3f + width
-					/ 2));
+			tempVertex(theta, width / 2.3f);
+			tempVertex(theta, width / 3.3f);
 		}
+	}
+
+	private void tempVertex(float theta, float radius) {
+		tempVertices.add(new Vertex((float) Math.cos(theta) * radius + width
+				/ 2, (float) Math.sin(theta) * radius + width / 2));
+	}
+
+	private void vertex(int tempIndex) {
+		fillVertex(tempVertices.get(tempIndex).x,
+				tempVertices.get(tempIndex).y,
+				getColor(tempIndex <= colorChangeVertex));
+	}
+
+	private float[] getColor(boolean selected) {
+		return selected ? getFillColor() : Colors.VIEW_BG;
 	}
 
 	@Override
