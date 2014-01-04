@@ -27,29 +27,36 @@ public class BpmView extends ClickableView {
 
 	@Override
 	public synchronized void createChildren() {
+		initBgRect(true, shapeGroup);
 		for (int i = 0; i < numberSegments.length; i++) {
 			for (int j = 0; j < numberSegments[i].length; j++) {
-				numberSegments[i][j] = new NumberSegment(shapeGroup, Colors.BPM_OFF, null);
+				numberSegments[i][j] = new NumberSegment(shapeGroup,
+						Colors.BPM_OFF, null);
 			}
 		}
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
-		float longW = width / 16;
-		float longH = height / 2;
+		float height = this.height - BG_OFFSET * 2;
+		float longW = (width - BG_OFFSET * 2) / 12;
+		float longH = height / 2 - longW / 2;
 		float shortW = longW * 3;
-		float shortH = height / 6;
+		float shortH = longW;
 
 		for (int i = 0; i < numberSegments.length; i++) {
-			float x = i * 4 * longW;
-			numberSegments[i][0].layout(x, 0, longW, longH);
-			numberSegments[i][1].layout(x, height / 2, longW, longH);
-			numberSegments[i][2].layout(x + longW * 2, 0, longW, longH);
-			numberSegments[i][3].layout(x + longW * 2, height / 2, longW, longH);
-			numberSegments[i][4].layout(x, 0, shortW, shortH);
-			numberSegments[i][4].layout(x, height / 2 - shortH / 2, shortW, shortH);
-			numberSegments[i][4].layout(x, height - shortH / 2, shortW, shortH);
+			float x = BG_OFFSET + i * 3.5f * longW + longW;
+			float y = BG_OFFSET;
+			numberSegments[i][0].layout(x, y + longW / 2, longW, longH);
+			numberSegments[i][1].layout(x, y + height / 2, longW, longH);
+			numberSegments[i][2].layout(x + longW * 2, y + longW / 2, longW,
+					longH);
+			numberSegments[i][3].layout(x + longW * 2, y + height / 2, longW,
+					longH);
+			numberSegments[i][4].layout(x, y, shortW, shortH);
+			numberSegments[i][5].layout(x, y + height / 2 - shortH / 2, shortW,
+					shortH);
+			numberSegments[i][6].layout(x, y + height - shortH, shortW, shortH);
 		}
 	}
 
@@ -112,7 +119,7 @@ public class BpmView extends ClickableView {
 	public void setText(String text) {
 		for (int i = 0; i < numberSegments.length; i++) {
 			for (int j = 0; j < numberSegments[i].length; j++) {
-				numberSegments[i][i].setFillColor(Colors.BPM_OFF);
+				numberSegments[i][j].setFillColor(Colors.BPM_OFF);
 			}
 		}
 		for (NumberSegment selectedSegment : getSelectedSegments(text)) {
@@ -123,9 +130,13 @@ public class BpmView extends ClickableView {
 	private static Set<NumberSegment> getSelectedSegments(String text) {
 		Set<NumberSegment> selectedSegments = new HashSet<NumberSegment>();
 
+		while (text.length() < 3) {
+			// prepend with 0's until the string is 3 digits long
+			text = "0" + text;
+		}
 		for (int i = 0; i < text.length(); i++) {
-			NumberSegment[] charSegments = numberSegments[text.length() - i - 1];
-			switch (text.charAt(i)) {
+			NumberSegment[] charSegments = numberSegments[i];
+			switch (Character.getNumericValue(text.charAt(i))) {
 			case 0:
 				selectedSegments.add(charSegments[0]);
 				selectedSegments.add(charSegments[1]);
@@ -188,7 +199,7 @@ public class BpmView extends ClickableView {
 				selectedSegments.add(charSegments[4]);
 				selectedSegments.add(charSegments[5]);
 				break;
-			}			
+			}
 		}
 		return selectedSegments;
 	}

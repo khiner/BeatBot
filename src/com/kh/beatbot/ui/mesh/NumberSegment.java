@@ -39,14 +39,14 @@ public class NumberSegment extends Shape {
 		// bottom triangle
 		fillVertex(x + width / 2, y + height);
 		fillVertex(x, y + height - width / 2);
-		fillVertex(x + width, height - width / 2);
+		fillVertex(x + width, y + height - width / 2);
 		// middle square
+		fillVertex(x + width, y + width / 2);
 		fillVertex(x, y + width / 2);
-		fillVertex(x + width, y + width / 2);
-		fillVertex(x + width, height - width / 2);
-		fillVertex(x + width, y + width / 2);
-		fillVertex(x + width, height - width / 2);
-		fillVertex(x, height - width / 2);
+		fillVertex(x + width, y + height - width / 2);
+		fillVertex(x, y + width / 2);
+		fillVertex(x + width, y + height - width / 2);
+		fillVertex(x, y + height - width / 2);
 	}
 	
 	/*      * *
@@ -54,6 +54,8 @@ public class NumberSegment extends Shape {
 	 *      * *
 	 */
 	private void updateVerticesHorizontal() {
+		float x = this.x + height / 2 + 1;
+		float width = this.width - height - 2;
 		// left triangle
 		fillVertex(x, y + height / 2);
 		fillVertex(x + height / 2, y);
