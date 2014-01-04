@@ -8,7 +8,6 @@ import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.AdsrView;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
@@ -17,7 +16,6 @@ import com.kh.beatbot.ui.view.control.param.SeekbarParamControl;
 
 public class AdsrPage extends TouchableView implements OnReleaseListener {
 
-	private ShapeGroup iconGroup = new ShapeGroup();
 	private ToggleButton[] adsrButtons;
 	private AdsrView adsrView;
 	private SeekbarParamControl paramControl;
@@ -54,10 +52,9 @@ public class AdsrPage extends TouchableView implements OnReleaseListener {
 	@Override
 	protected synchronized void initIcons() {
 		for (int i = 0; i < adsrButtons.length; i++) {
-			adsrButtons[i]
-					.setBgIcon(new RoundedRectIcon(iconGroup,
-							Colors.instrumentFillColorSet,
-							Colors.buttonRowStrokeColorSet));
+			adsrButtons[i].setBgIcon(new RoundedRectIcon(shapeGroup,
+					Colors.instrumentFillColorSet,
+					Colors.buttonRowStrokeColorSet));
 			if (i < adsrButtons.length - 2) {
 				adsrButtons[i].setIcon(new Icon(whichAdsrIconResource(i)));
 			}
@@ -83,7 +80,7 @@ public class AdsrPage extends TouchableView implements OnReleaseListener {
 
 	@Override
 	public void draw() {
-		iconGroup.draw(this);
+		shapeGroup.draw(this);
 	}
 
 	@Override
@@ -105,7 +102,8 @@ public class AdsrPage extends TouchableView implements OnReleaseListener {
 		float thirdHeight = height / 3;
 		float pos = width - thirdHeight * (adsrButtons.length + 1);
 		adsrView.layout(this, 0, 0, pos, height);
-		paramControl.layout(this, pos, thirdHeight, width - pos, 2 * thirdHeight);
+		paramControl.layout(this, pos, thirdHeight, width - pos,
+				2 * thirdHeight);
 		pos += thirdHeight / 2;
 		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i].layout(this, pos, 0, thirdHeight, thirdHeight);

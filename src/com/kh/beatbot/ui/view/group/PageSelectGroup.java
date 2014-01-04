@@ -11,7 +11,6 @@ import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
@@ -38,8 +37,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 
 	private static ImageButton addTrackButton;
 	private static ToggleButton[] pageButtons = new ToggleButton[6];
-
-	private static ShapeGroup roundedRectGroup = new ShapeGroup();
 
 	public void selectPage(int pageNum) {
 		if (pageNum >= 0 && pageNum < pageButtons.length) {
@@ -75,7 +72,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 
 	@Override
 	public void draw() {
-		roundedRectGroup.draw(this);
+		shapeGroup.draw(this);
 	}
 
 	@Override
@@ -152,14 +149,14 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	@Override
 	protected synchronized void initIcons() {
 		addTrackButton.setIcon(new Icon(IconResources.ADD));
-		addTrackButton.setBgIcon(new RoundedRectIcon(roundedRectGroup,
+		addTrackButton.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.labelFillColorSet, Colors.labelStrokeColorSet));
 
 		pageButtons[EDIT_PAGE_ID].setIcon(new Icon(IconResources.SAMPLE));
 		pageButtons[NOTE_LEVELS_PAGE_ID]
 				.setIcon(new Icon(IconResources.LEVELS));
 		for (int i = 0; i < pageButtons.length; i++) {
-			pageButtons[i].setBgIcon(new RoundedRectIcon(roundedRectGroup,
+			pageButtons[i].setBgIcon(new RoundedRectIcon(shapeGroup,
 					Colors.labelFillColorSet, Colors.labelStrokeColorSet));
 		}
 	}

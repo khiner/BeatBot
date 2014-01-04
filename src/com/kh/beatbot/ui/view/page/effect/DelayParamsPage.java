@@ -5,7 +5,6 @@ import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
-import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 

@@ -11,7 +11,6 @@ import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Circle;
 import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
-import com.kh.beatbot.ui.view.page.NoteLevelsPage;
 
 public class LevelsView extends TouchableView {
 
@@ -47,9 +46,14 @@ public class LevelsView extends TouchableView {
 
 	private float selectRegionStartX = -1, selectRegionStartY = -1;
 
-	private static ShapeGroup levelBarGroup = new ShapeGroup();
 	private Rectangle selectRegionRect, levelBarRect;
 	private Circle levelBarCircle, levelBarSelectCircle;
+
+	private static ShapeGroup levelBarGroup = new ShapeGroup();
+
+	public LevelsView(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
 
 	public LevelType getLevelType() {
 		return currLevelType;
@@ -292,9 +296,8 @@ public class LevelsView extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		initBgRect(true, NoteLevelsPage.shapeGroup);
-		selectRegionRect = new Rectangle(NoteLevelsPage.shapeGroup,
-				Colors.TRANSPARENT, null);
+		initBgRect(true);
+		selectRegionRect = new Rectangle(shapeGroup, Colors.TRANSPARENT, null);
 		levelBarRect = new Rectangle(levelBarGroup, Colors.VOLUME, null);
 		levelBarCircle = new Circle(levelBarGroup, Colors.VOLUME, null);
 		levelBarSelectCircle = new Circle(levelBarGroup, Colors.VOLUME, null);

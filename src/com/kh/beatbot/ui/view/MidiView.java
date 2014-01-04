@@ -35,8 +35,7 @@ public class MidiView extends ClickableView implements TrackListener {
 
 	private static int[] loopPointerIds = { -1, -1, -1 };
 
-	private static ShapeGroup noteRectangles = new ShapeGroup(),
-			bgShapeGroup = new ShapeGroup();
+	private static ShapeGroup noteRectangles = new ShapeGroup();
 
 	// vertical line loop markers
 	private Line[] loopMarkerLines;
@@ -197,17 +196,16 @@ public class MidiView extends ClickableView implements TrackListener {
 	@Override
 	public synchronized void createChildren() {
 		noteRectangles.setStrokeWeight(MidiNote.BORDER_WIDTH);
-		backgroundRect = new Rectangle(bgShapeGroup, Colors.MIDI_VIEW_BG, null);
-		loopRect = new Rectangle(bgShapeGroup, Colors.MIDI_VIEW_LIGHT_BG, null);
+		backgroundRect = new Rectangle(shapeGroup, Colors.MIDI_VIEW_BG, null);
+		loopRect = new Rectangle(shapeGroup, Colors.MIDI_VIEW_LIGHT_BG, null);
 
-		tickBarRect = new Rectangle(bgShapeGroup, Colors.TICK_FILL,
-				Colors.BLACK);
-		loopBarRect = new Rectangle(bgShapeGroup, Colors.TICKBAR, null);
-		selectRegionRect = new Rectangle(bgShapeGroup, Colors.TRANSPARENT, null);
-		currTickLine = new Line(bgShapeGroup, null, Colors.VOLUME);
+		tickBarRect = new Rectangle(shapeGroup, Colors.TICK_FILL, Colors.BLACK);
+		loopBarRect = new Rectangle(shapeGroup, Colors.TICKBAR, null);
+		selectRegionRect = new Rectangle(shapeGroup, Colors.TRANSPARENT, null);
+		currTickLine = new Line(shapeGroup, null, Colors.VOLUME);
 		loopMarkerLines = new Line[2];
 		for (int i = 0; i < loopMarkerLines.length; i++) {
-			loopMarkerLines[i] = new Line(bgShapeGroup, null, Colors.VOLUME);
+			loopMarkerLines[i] = new Line(shapeGroup, null, Colors.VOLUME);
 		}
 	}
 
@@ -219,7 +217,7 @@ public class MidiView extends ClickableView implements TrackListener {
 		for (int i = 0; i < loopMarkerLines.length; i++) {
 			loopMarkerLines[i].layout(0, 0, 3, height);
 		}
-		TickWindowHelper.init(this, bgShapeGroup);
+		TickWindowHelper.init(this, shapeGroup);
 	}
 
 	@Override
@@ -237,7 +235,7 @@ public class MidiView extends ClickableView implements TrackListener {
 				/ (float) TickWindowHelper.getNumTicks(), 1);
 
 		// draws all rect children in one call
-		bgShapeGroup.draw();
+		shapeGroup.draw();
 
 		push();
 		translate(0, -TickWindowHelper.getYOffset());
@@ -663,7 +661,7 @@ public class MidiView extends ClickableView implements TrackListener {
 		loopRect.setDimensions(loopRect.width, getTotalTrackHeight());
 		TickWindowHelper.setYOffset(Float.MAX_VALUE);
 		TickWindowHelper.setHeight(getTotalTrackHeight());
-		Rectangle trackRect = new Rectangle(bgShapeGroup, Colors.TRANSPARENT,
+		Rectangle trackRect = new Rectangle(shapeGroup, Colors.TRANSPARENT,
 				Colors.BLACK);
 		track.setRectangle(trackRect);
 		layoutTrackRects();

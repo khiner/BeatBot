@@ -10,7 +10,6 @@ import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.Shape;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.mesh.WaveformShape;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
@@ -24,7 +23,6 @@ public class SampleEditView extends ControlView2dBase {
 	// min distance for pointer to select loop markers
 	private static final float SNAP_DIST = 32f, X_OFFSET = SNAP_DIST / 2;
 	private static float minLoopWindow;
-	private static ShapeGroup shapeGroup = new ShapeGroup();
 	private static WaveformShape waveformShape;
 	private static ImageButton[] loopButtons = new ImageButton[2];
 	private static Rectangle currSampleRect = null;

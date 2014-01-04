@@ -76,7 +76,14 @@ public abstract class View implements Comparable<View> {
 
 	protected Set<ViewListener> listeners = new HashSet<ViewListener>();
 
+	protected ShapeGroup shapeGroup;
+
 	public View() {
+		this(new ShapeGroup());
+	}
+
+	public View(ShapeGroup shapeGroup) {
+		this.shapeGroup = shapeGroup;
 		createChildren();
 	}
 
@@ -84,14 +91,13 @@ public abstract class View implements Comparable<View> {
 		listeners.add(listener);
 	}
 
-	protected void initBgRect(boolean rounded, ShapeGroup group) {
-		initBgRect(rounded, group, Colors.defaultBgFillColorSet,
+	protected void initBgRect(boolean rounded) {
+		initBgRect(rounded, shapeGroup, Colors.defaultBgFillColorSet,
 				Colors.defaultBgStrokeColorSet);
 	}
 
-	protected void initBgRect(boolean rounded, ShapeGroup group,
-			ColorSet fillColorSet) {
-		initBgRect(rounded, group, fillColorSet, Colors.defaultBgStrokeColorSet);
+	protected void initBgRect(boolean rounded, ColorSet fillColorSet) {
+		initBgRect(rounded, shapeGroup, fillColorSet, Colors.defaultBgStrokeColorSet);
 	}
 
 	protected void initBgRect(boolean rounded, ShapeGroup group,
@@ -385,19 +391,19 @@ public abstract class View implements Comparable<View> {
 		else
 			return -1;
 	}
-	
+
 	public void notifyScrollX() {
 		for (ViewListener listener : listeners) {
 			if (listener instanceof ScrollableViewListener) {
-				((ScrollableViewListener)listener).onScrollX(this);
+				((ScrollableViewListener) listener).onScrollX(this);
 			}
 		}
 	}
-	
+
 	public void notifyScrollY() {
 		for (ViewListener listener : listeners) {
 			if (listener instanceof ScrollableViewListener) {
-				((ScrollableViewListener)listener).onScrollY(this);
+				((ScrollableViewListener) listener).onScrollY(this);
 			}
 		}
 	}

@@ -19,7 +19,6 @@ public class AdsrView extends TouchableView implements ParamListener {
 	// init to -1 to indicate no pointer is selecting
 	private int[] adsrSelected = new int[] { -1, -1, -1, -1, -1 };
 
-	private ShapeGroup shapeGroup;
 	private AdsrShape adsrShape;
 
 	public synchronized void update() {
@@ -70,7 +69,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	@Override
 	protected synchronized void createChildren() {
 		shapeGroup = new ShapeGroup();
-		initBgRect(true, shapeGroup);
+		initBgRect(true);
 		adsrShape = new AdsrShape(shapeGroup, Colors.VOLUME, Colors.VOLUME);
 	}
 

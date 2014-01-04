@@ -6,7 +6,6 @@ import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.KnobShape;
 
 public class Knob extends ControlView1dBase {
-
 	private KnobShape knobShape;
 
 	@Override

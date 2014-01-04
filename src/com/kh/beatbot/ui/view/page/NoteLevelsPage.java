@@ -4,7 +4,6 @@ import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.LevelsView;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
@@ -12,7 +11,6 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class NoteLevelsPage extends TouchableView {
 
-	public static ShapeGroup shapeGroup = new ShapeGroup();
 	private LevelsView levelsView;
 	private ToggleButton volumeToggle, panToggle, pitchToggle;
 	
@@ -64,7 +62,7 @@ public class NoteLevelsPage extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		levelsView = new LevelsView();
+		levelsView = new LevelsView(shapeGroup);
 		volumeToggle = new ToggleButton();
 		panToggle = new ToggleButton();
 		pitchToggle = new ToggleButton();

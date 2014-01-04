@@ -21,7 +21,6 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.TextView;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
@@ -105,8 +104,6 @@ public abstract class LevelsFXPage extends TouchableView {
 	protected TextView effectLabel;
 	protected boolean masterMode = false;
 
-	protected ShapeGroup labelGroup;
-
 	// effects attrs
 	protected DraggableLabelList effectLabelList;
 	protected String[] effectNames;
@@ -129,7 +126,8 @@ public abstract class LevelsFXPage extends TouchableView {
 		setMasterMode(masterMode);
 		Param currParam = getCurrTrack().getCurrentLevelParam();
 		levelBar.setParam(currParam);
-		levelBar.setLevelColor(getLevelColor(currParam), getLevelColorTrans(currParam));
+		levelBar.setLevelColor(getLevelColor(currParam),
+				getLevelColorTrans(currParam));
 		deselectAll();
 		selectLevel(currParam);
 	}
@@ -227,22 +225,21 @@ public abstract class LevelsFXPage extends TouchableView {
 		volumeToggle.setText("Vol");
 		panToggle.setText("Pan");
 		pitchToggle.setText("Pit");
-		volumeToggle.setBgIcon(new RoundedRectIcon(labelGroup,
+		volumeToggle.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.volumeFillColorSet, Colors.volumeStrokeColorSet));
-		panToggle.setBgIcon(new RoundedRectIcon(labelGroup,
+		panToggle.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.panFillColorSet, Colors.panStrokeColorSet));
-		pitchToggle.setBgIcon(new RoundedRectIcon(labelGroup,
+		pitchToggle.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.pitchFillColorSet, Colors.pitchStrokeColorSet));
 	}
 
 	@Override
 	public void draw() {
-		labelGroup.draw(this);
+		shapeGroup.draw(this);
 	}
 
 	@Override
 	protected synchronized void createChildren() {
-		labelGroup = new ShapeGroup();
 		effectLabel = new TextView();
 		levelBar = new Seekbar();
 		volumeToggle = new ToggleButton();

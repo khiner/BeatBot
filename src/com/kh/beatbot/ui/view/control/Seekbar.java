@@ -4,18 +4,15 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Circle;
 import com.kh.beatbot.ui.mesh.RoundedRect;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class Seekbar extends ControlView1dBase {
 
-	private ShapeGroup shapeGroup;
 	private RoundedRect backgroundRect, foregroundRect;
 	private Circle levelCircle;
 	protected float levelBarHeight;
 
 	@Override
 	protected synchronized void createChildren() {
-		shapeGroup = new ShapeGroup();
 		backgroundRect = new RoundedRect(shapeGroup, Colors.VIEW_BG, null);
 		foregroundRect = new RoundedRect(shapeGroup, Colors.VOLUME, null);
 		levelCircle = new Circle(shapeGroup, Colors.VOLUME, null);

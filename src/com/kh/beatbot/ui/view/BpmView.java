@@ -8,14 +8,11 @@ import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.NumberSegment;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class BpmView extends ClickableView {
 
 	private static final float INC_BPM_THRESH = 15;
 	private static NumberSegment[][] numberSegments = new NumberSegment[3][7];
-
-	private static ShapeGroup shapeGroup = new ShapeGroup();
 
 	private static float lastFrameY = -1, currYDragTotal = 0;
 
@@ -27,7 +24,7 @@ public class BpmView extends ClickableView {
 
 	@Override
 	public synchronized void createChildren() {
-		initBgRect(true, shapeGroup);
+		initBgRect(true);
 		for (int i = 0; i < numberSegments.length; i++) {
 			for (int j = 0; j < numberSegments[i].length; j++) {
 				numberSegments[i][j] = new NumberSegment(shapeGroup,

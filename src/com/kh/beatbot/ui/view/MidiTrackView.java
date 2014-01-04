@@ -10,7 +10,7 @@ public class MidiTrackView extends TouchableView implements TrackListener, Scrol
 
 	@Override
 	public void draw() {
-		TrackButtonRow.roundedRectGroup.draw(this);
+		shapeGroup.draw(this);
 	}
 
 	@Override

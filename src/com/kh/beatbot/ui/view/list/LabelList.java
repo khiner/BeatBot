@@ -153,7 +153,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 
 	@Override
 	protected synchronized void createChildren() {
-		initBgRect(true, null);
+		initBgRect(true);
 	}
 
 	@Override
@@ -173,6 +173,12 @@ public class LabelList extends ClickableView implements OnPressListener,
 		}
 	}
 
+	@Override
+	public void draw() {
+		shapeGroup.draw();
+	}
+
+	@Override
 	protected synchronized void drawChildren() {
 		for (View label : children) {
 			if (label.equals(touchedLabel))

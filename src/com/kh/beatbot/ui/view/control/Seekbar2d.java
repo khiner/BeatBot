@@ -4,10 +4,8 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Circle;
 import com.kh.beatbot.ui.mesh.IntersectingLines;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class Seekbar2d extends ControlView2dBase {
-	private ShapeGroup shapeGroup;
 	private IntersectingLines intersectingLines;
 	private Circle circle;
 
@@ -17,8 +15,7 @@ public class Seekbar2d extends ControlView2dBase {
 	}
 
 	public synchronized void createChildren() {
-		shapeGroup = new ShapeGroup();
-		initBgRect(true, shapeGroup);
+		initBgRect(true);
 		intersectingLines = new IntersectingLines(shapeGroup, null,
 				Colors.VOLUME);
 		circle = new Circle(shapeGroup, Colors.VOLUME, null);

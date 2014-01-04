@@ -6,7 +6,6 @@ import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -15,7 +14,7 @@ public class FilterParamsPage extends EffectParamsPage {
 	public FilterParamsPage(Filter filter) {
 		super(filter);
 	}
-	
+
 	private class FilterToggleListener implements OnReleaseListener {
 		@Override
 		public void onRelease(Button button) {
@@ -31,19 +30,17 @@ public class FilterParamsPage extends EffectParamsPage {
 	}
 
 	private ToggleButton[] filterToggles;
-	private ShapeGroup iconGroup;
 	private FilterToggleListener filterToggleListener;
 
 	@Override
 	public void draw() {
 		super.draw();
-		iconGroup.draw(this);
+		shapeGroup.draw(this);
 	}
 
 	@Override
 	public synchronized void createChildren() {
 		super.createChildren();
-		iconGroup = new ShapeGroup();
 		filterToggles = new ToggleButton[3];
 		filterToggleListener = new FilterToggleListener();
 		for (int i = 0; i < filterToggles.length; i++) {
@@ -56,7 +53,7 @@ public class FilterParamsPage extends EffectParamsPage {
 	@Override
 	protected synchronized void initIcons() {
 		for (ToggleButton filterToggle : filterToggles) {
-			filterToggle.setBgIcon(new RoundedRectIcon(iconGroup,
+			filterToggle.setBgIcon(new RoundedRectIcon(shapeGroup,
 					Colors.instrumentFillColorSet,
 					Colors.buttonRowStrokeColorSet));
 		}

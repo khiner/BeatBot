@@ -11,7 +11,6 @@ import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.view.TouchableView;
-import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;

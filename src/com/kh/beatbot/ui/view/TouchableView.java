@@ -5,6 +5,8 @@ import java.util.Map;
 
 import android.view.MotionEvent;
 
+import com.kh.beatbot.ui.mesh.ShapeGroup;
+
 public abstract class TouchableView extends TextView {
 
 	// map of pointer ID #'s that this window is responsible for to their
@@ -13,6 +15,14 @@ public abstract class TouchableView extends TextView {
 	protected Map<Integer, Position> pointerIdToPos = new HashMap<Integer, Position>();
 
 	protected boolean shouldPropagateTouchEvents = true;
+
+	public TouchableView() {
+		super();
+	}
+
+	public TouchableView(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
 
 	public final boolean ownsPointer(int id) {
 		return pointerIdToPos.containsKey(id);

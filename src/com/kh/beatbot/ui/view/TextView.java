@@ -1,5 +1,7 @@
 package com.kh.beatbot.ui.view;
 
+import com.kh.beatbot.ui.mesh.ShapeGroup;
+
 public class TextView extends View {
 	// kludgey magic number
 	// but it corrects for something weird in
@@ -9,6 +11,14 @@ public class TextView extends View {
 	protected String text = "";
 	protected float textWidth = 0, textHeight = 0, textXOffset = 0,
 			textYOffset = 0;
+
+	public TextView() {
+		super();
+	}
+
+	public TextView(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
 
 	public String getText() {
 		return text;

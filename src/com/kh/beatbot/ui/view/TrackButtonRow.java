@@ -2,19 +2,15 @@ package com.kh.beatbot.ui.view;
 
 import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.ShapeIcon;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class TrackButtonRow extends TouchableView {
-	public static ShapeGroup roundedRectGroup = new ShapeGroup();
-
 	public ToggleButton instrumentButton, muteButton, soloButton;
 	private Track track;
 
@@ -38,11 +34,14 @@ public class TrackButtonRow extends TouchableView {
 		updateInstrumentIcon();
 		muteButton.setText("M");
 		soloButton.setText("S");
-		instrumentButton.setBgIcon(new RoundedRectIcon(roundedRectGroup,
+		instrumentButton.setBgIcon(new RoundedRectIcon(
+				View.mainPage.midiTrackView.shapeGroup,
 				Colors.instrumentFillColorSet, Colors.buttonRowStrokeColorSet));
-		muteButton.setBgIcon(new RoundedRectIcon(roundedRectGroup,
+		muteButton.setBgIcon(new RoundedRectIcon(
+				View.mainPage.midiTrackView.shapeGroup,
 				Colors.muteButtonColorSet, Colors.buttonRowStrokeColorSet));
-		soloButton.setBgIcon(new RoundedRectIcon(roundedRectGroup,
+		soloButton.setBgIcon(new RoundedRectIcon(
+				View.mainPage.midiTrackView.shapeGroup,
 				Colors.soloButtonColorSet, Colors.buttonRowStrokeColorSet));
 	}
 

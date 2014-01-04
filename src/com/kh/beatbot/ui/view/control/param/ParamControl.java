@@ -8,24 +8,24 @@ import com.kh.beatbot.ui.view.control.ValueLabel;
 public class ParamControl extends TouchableView {
 	protected ValueLabel valueLabel;
 	protected TextView label;
-	
+
 	public ParamControl() {
 		label = new TextView();
-		valueLabel = new ValueLabel(null);
+		valueLabel = new ValueLabel();
 		addChildren(label, valueLabel);
 	}
-	
+
 	@Override
 	public void setId(int id) {
 		super.setId(id);
 		valueLabel.setId(id);
 	}
-	
+
 	public void setParam(Param param) {
 		valueLabel.setParam(param);
 		label.setText(param == null ? "" : param.name);
 	}
-	
+
 	public void setLabelText(String text) {
 		label.setText(text);
 	}
@@ -35,7 +35,7 @@ public class ParamControl extends TouchableView {
 		label.layout(this, 0, 0, width / 2, height);
 		valueLabel.layout(this, width / 2, 0, width / 2, height);
 	}
-	
+
 	public float getLevel() {
 		return valueLabel.getLevel();
 	}
