@@ -67,7 +67,7 @@ public abstract class View implements Comparable<View> {
 			strokeColor = Colors.WHITE;
 
 	private boolean initialized = false;
-	protected boolean shouldClip = true;
+	protected boolean shouldClip = true, shouldDraw = true;
 
 	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0,
 			borderHeight = 0;
@@ -79,11 +79,12 @@ public abstract class View implements Comparable<View> {
 	protected ShapeGroup shapeGroup;
 
 	public View() {
-		this(new ShapeGroup());
+		this(null);
 	}
 
 	public View(ShapeGroup shapeGroup) {
-		this.shapeGroup = shapeGroup;
+		shouldDraw = (null == shapeGroup);
+		this.shapeGroup = shouldDraw ? new ShapeGroup() : shapeGroup;
 		createChildren();
 	}
 
@@ -232,7 +233,7 @@ public abstract class View implements Comparable<View> {
 		// scissor ensures that each view can only draw within its rect
 		if (shouldClip) {
 			gl.glEnable(GL10.GL_SCISSOR_TEST);
-			if (parent != null) {
+			if (null != parent) {
 				clipWindow(parent.currClipX, parent.currClipY,
 						parent.currClipW, parent.currClipH);
 			} else {
@@ -248,17 +249,20 @@ public abstract class View implements Comparable<View> {
 	}
 
 	protected synchronized void drawChildren() {
-		for (int i = 0; i < children.size(); i++) {
-			// not using foreach to avoid concurrent modification
-			drawChild(children.get(i));
+		for (View child : children) {
+			drawChild(child);
 		}
 	}
 
 	protected final void drawChild(View child) {
-		push();
-		translate(child.x, child.y);
-		child.drawAll();
-		pop();
+		if (child.parent != null) {
+			push();
+			translate(child.x, child.y);
+			child.drawAll();
+			pop();
+		} else {
+			child.drawAll();
+		}
 	}
 
 	public void initGl(GL11 _gl) {
@@ -280,7 +284,7 @@ public abstract class View implements Comparable<View> {
 		}
 	}
 
-	protected void layoutBgRect() {
+	private void layoutBgRect() {
 		if (bgRect == null)
 			return;
 		float bgRectRadius = 0;
@@ -288,7 +292,12 @@ public abstract class View implements Comparable<View> {
 			bgRectRadius = calcBgRectRadius();
 			((RoundedRect) bgRect).setCornerRadius(bgRectRadius);
 		}
-		bgRect.layout(BG_OFFSET, BG_OFFSET, width - BG_OFFSET * 2, height
+		float x = BG_OFFSET, y = BG_OFFSET;
+		if (!shouldDraw) {
+			x += this.absoluteX;
+			y += this.absoluteY;
+		}
+		bgRect.layout(x, y, width - BG_OFFSET * 2, height
 				- BG_OFFSET * 2);
 		minX = minY = bgRectRadius + BG_OFFSET;
 		maxX = width - bgRectRadius - BG_OFFSET;

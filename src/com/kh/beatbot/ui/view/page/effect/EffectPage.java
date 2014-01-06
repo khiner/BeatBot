@@ -44,14 +44,19 @@ public class EffectPage extends TouchableView {
 	@Override
 	protected synchronized void initIcons() {
 		toggleButton.setIcon(new Icon(IconResources.ON_OFF));
-		toggleButton.setBgIcon(new RoundedRectIcon(null,
+		toggleButton.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.labelFillColorSet, Colors.labelStrokeColorSet));
+	}
+
+	@Override
+	public void draw() {
+		shapeGroup.draw(this);
 	}
 
 	@Override
 	protected synchronized void createChildren() {
 		paramsPager = new ViewPager();
-		level2d = new Seekbar2d();
+		level2d = new Seekbar2d(shapeGroup);
 
 		chorusPage = new EffectParamsPage(new Chorus(null));
 		decimatePage = new EffectParamsPage(new Decimate(null));
@@ -64,7 +69,7 @@ public class EffectPage extends TouchableView {
 		paramsPager.addPages(chorusPage, decimatePage, delayPage, filterPage,
 				flangerPage, reverbPage, tremeloPage);
 
-		toggleButton = new ToggleButton();
+		toggleButton = new ToggleButton(shapeGroup);
 		toggleButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {

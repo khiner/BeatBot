@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 
 public abstract class Button extends TouchableView {
@@ -9,6 +10,14 @@ public abstract class Button extends TouchableView {
 	private OnReleaseListener releaseListener;
 	
 	protected boolean enabled = true, pressed = false;
+
+	public Button() {
+		super();
+	}
+
+	public Button(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
 
 	public final OnPressListener getOnPressListener() {
 		return pressListener;

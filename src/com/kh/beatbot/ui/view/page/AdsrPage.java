@@ -85,11 +85,11 @@ public class AdsrPage extends TouchableView implements OnReleaseListener {
 
 	@Override
 	protected synchronized void createChildren() {
-		adsrView = new AdsrView();
-		paramControl = new SeekbarParamControl();
+		adsrView = new AdsrView(shapeGroup);
+		paramControl = new SeekbarParamControl(shapeGroup);
 		adsrButtons = new ToggleButton[ADSR.NUM_PARAMS];
 		for (int i = 0; i < adsrButtons.length; i++) {
-			adsrButtons[i] = new ToggleButton();
+			adsrButtons[i] = new ToggleButton(shapeGroup);
 			adsrButtons[i].setId(i);
 			adsrButtons[i].setOnReleaseListener(this);
 		}

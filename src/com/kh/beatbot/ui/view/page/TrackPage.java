@@ -17,7 +17,7 @@ public class TrackPage extends LevelsFXPage {
 	@Override
 	public synchronized void createChildren() {
 		super.createChildren();
-		deleteButton = new ImageButton();
+		deleteButton = new ImageButton(shapeGroup);
 
 		deleteButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override

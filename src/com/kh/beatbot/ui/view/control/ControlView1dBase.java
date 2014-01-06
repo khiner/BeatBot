@@ -2,12 +2,21 @@ package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 
 public abstract class ControlView1dBase extends ControlViewBase implements ParamListener {
 
 	protected Param param;
 	protected abstract float posToLevel(float x, float y);
+
+	public ControlView1dBase() {
+		super();
+	}
+
+	public ControlView1dBase(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
 
 	public synchronized void setParam(Param param) {
 		if (this.param != null) {

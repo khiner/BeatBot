@@ -67,8 +67,13 @@ public class TextView extends View {
 	private void drawText() {
 		if (text == null || text.isEmpty())
 			return;
-		drawText(text, getStrokeColor(), (int) textHeight, textXOffset,
-				textYOffset);
+		float textX = textXOffset;
+		float textY = textYOffset;
+		if (parent == null) {
+			textX += this.x;
+			textY += this.y;
+		}
+		drawText(text, getStrokeColor(), (int) textHeight, textX, textY);
 	}
 
 	private void initText() {

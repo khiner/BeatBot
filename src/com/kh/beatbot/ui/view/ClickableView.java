@@ -2,6 +2,8 @@ package com.kh.beatbot.ui.view;
 
 import android.os.Handler;
 
+import com.kh.beatbot.ui.mesh.ShapeGroup;
+
 public abstract class ClickableView extends TouchableView {
 
 	Runnable longPressed = new Runnable() { 
@@ -14,6 +16,14 @@ public abstract class ClickableView extends TouchableView {
 	    }   
 	};
 	
+	public ClickableView() {
+		super();
+	}
+
+	public ClickableView(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
+
 	// time (in millis) between pointer down and pointer up to be considered a
 	// tap
 	public final static long SINGLE_TAP_TIME = 200;

@@ -4,6 +4,7 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class ValueLabel extends ControlView1dBase {
 	private float anchorY = 0, anchorLevel;
@@ -11,16 +12,14 @@ public class ValueLabel extends ControlView1dBase {
 
 	private static ColorSet fillColorSet = Colors.valueLabelFillColorSet;
 
+	public ValueLabel(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
+
 	@Override
 	public synchronized void init() {
 		super.init();
 		setStrokeColor(Colors.BLACK);
-	}
-
-	@Override
-	public void draw() {
-		shapeGroup.draw();
-		super.draw();
 	}
 
 	@Override

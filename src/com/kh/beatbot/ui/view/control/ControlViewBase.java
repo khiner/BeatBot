@@ -1,6 +1,7 @@
 package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 
 public abstract class ControlViewBase extends TouchableView {
@@ -12,6 +13,14 @@ public abstract class ControlViewBase extends TouchableView {
 	protected static float[] selectColorTrans = Colors.LABEL_SELECTED_TRANS;
 
 	protected boolean selected = false;
+
+	public ControlViewBase() {
+		super();
+	}
+
+	public ControlViewBase(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
 
 	public void setLevelColor(float[] newLevelColor, float[] newLevelColorTrans) {
 		levelColor = newLevelColor;

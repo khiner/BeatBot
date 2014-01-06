@@ -10,6 +10,7 @@ import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.Shape;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.mesh.WaveformShape;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
@@ -38,6 +39,10 @@ public class SampleEditView extends ControlView2dBase {
 	// zooming/scrolling will change the view window of the samples
 	// keep track of that with offset and width
 	private float levelOffset = 0, levelWidth = 0, waveformWidth = 0;
+
+	public SampleEditView(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
 
 	public synchronized void update() {
 		if (!hasSample())
@@ -113,9 +118,8 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public synchronized void createChildren() {
-		currSampleRect = new Rectangle(shapeGroup, Colors.VOLUME, null);
 		for (int i = 0; i < loopButtons.length; i++) {
-			loopButtons[i] = new ImageButton();
+			loopButtons[i] = new ImageButton(shapeGroup);
 			loopButtons[i].setOnPressListener(new OnPressListener() {
 				@Override
 				public void onPress(Button button) {
@@ -131,13 +135,14 @@ public class SampleEditView extends ControlView2dBase {
 				}
 			});
 		}
+		currSampleRect = new Rectangle(shapeGroup, Colors.VOLUME, null);
 		addChildren(loopButtons);
 	}
 
 	public void layout(View parent, float x, float y, float width, float height) {
 		bgFillColorSet = new ColorSet(Colors.LABEL_LIGHT,
 				Colors.LABEL_VERY_LIGHT);
-		initBgRect(false, null, bgFillColorSet, null);
+		initBgRect(false, shapeGroup, bgFillColorSet, null);
 		waveformShape = Shape.createWaveform(shapeGroup, width,
 				Colors.LABEL_SELECTED, Colors.BLACK);
 		waveformWidth = width - SNAP_DIST;

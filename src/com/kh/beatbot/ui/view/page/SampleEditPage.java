@@ -53,15 +53,15 @@ public class SampleEditPage extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		sampleEdit = new SampleEditView();
-		previewButton = new ImageButton();
-		loopButton = new ToggleButton();
-		reverseButton = new ToggleButton();
-		editButton = new ImageButton();
+		sampleEdit = new SampleEditView(shapeGroup);
+		previewButton = new ImageButton(shapeGroup);
+		loopButton = new ToggleButton(shapeGroup);
+		reverseButton = new ToggleButton(shapeGroup);
+		editButton = new ImageButton(shapeGroup);
 
-		loopBeginControl = new ParamControl();
-		loopEndControl = new ParamControl();
-		gainControl = new ParamControl();
+		loopBeginControl = new ParamControl(shapeGroup);
+		loopEndControl = new ParamControl(shapeGroup);
+		gainControl = new ParamControl(shapeGroup);
 
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override
@@ -99,6 +99,11 @@ public class SampleEditPage extends TouchableView {
 
 		addChildren(previewButton, loopButton, reverseButton, sampleEdit,
 				editButton, loopBeginControl, loopEndControl, gainControl);
+	}
+
+	@Override
+	public void draw() {
+		shapeGroup.draw(this);
 	}
 
 	@Override

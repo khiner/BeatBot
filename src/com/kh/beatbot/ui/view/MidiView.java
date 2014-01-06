@@ -212,7 +212,8 @@ public class MidiView extends ClickableView implements TrackListener {
 	@Override
 	public synchronized void layoutChildren() {
 		tickBarRect.layout(0, 0, width, Y_OFFSET);
-		backgroundRect.setPosition(0, Y_OFFSET);
+		backgroundRect.layout(0, Y_OFFSET,
+				tickToUnscaledX(MidiManager.MAX_TICKS - 1), 1);
 		currTickLine.layout(0, 0, 3, height);
 		for (int i = 0; i < loopMarkerLines.length; i++) {
 			loopMarkerLines[i].layout(0, 0, 3, height);
@@ -654,13 +655,8 @@ public class MidiView extends ClickableView implements TrackListener {
 
 	@Override
 	public void onCreate(Track track) {
-		initAllVbs();
-		backgroundRect.setDimensions(
-				tickToUnscaledX(MidiManager.MAX_TICKS - 1),
-				getTotalTrackHeight());
-		loopRect.setDimensions(loopRect.width, getTotalTrackHeight());
+		onTrackHeightChange();
 		TickWindowHelper.setYOffset(Float.MAX_VALUE);
-		TickWindowHelper.setHeight(getTotalTrackHeight());
 		Rectangle trackRect = new Rectangle(shapeGroup, Colors.TRANSPARENT,
 				Colors.BLACK);
 		track.setRectangle(trackRect);
@@ -672,13 +668,14 @@ public class MidiView extends ClickableView implements TrackListener {
 
 	@Override
 	public void onDestroy(Track track) {
-		initAllVbs();
+		onTrackHeightChange();
 		TickWindowHelper.setYOffset(TickWindowHelper.getYOffset());
 		track.getRectangle().destroy();
 		for (MidiNote note : track.getMidiNotes()) {
 			note.getRectangle().destroy();
 		}
 		updateNoteRects();
+		layoutTrackRects();
 	}
 
 	@Override
@@ -698,6 +695,19 @@ public class MidiView extends ClickableView implements TrackListener {
 	@Override
 	public void onSoloChange(Track track, boolean solo) {
 		updateTrackColors();
+	}
+
+	private void onTrackHeightChange() {
+		initAllVbs();
+		float trackHeight = getTotalTrackHeight();
+		backgroundRect.setDimensions(backgroundRect.width, trackHeight);
+		currTickLine.setDimensions(currTickLine.width, trackHeight);
+		loopRect.setDimensions(loopRect.width, trackHeight);
+		for (int i = 0; i < loopMarkerLines.length; i++) {
+			loopMarkerLines[i].setDimensions(loopMarkerLines[i].width,
+					trackHeight);
+		}
+		TickWindowHelper.setHeight(trackHeight);
 	}
 
 	private void layoutTrackRects() {

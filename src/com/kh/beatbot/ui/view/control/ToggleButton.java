@@ -2,9 +2,18 @@ package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResource;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class ToggleButton extends ImageButton {
 	boolean checked = false;
+
+	public ToggleButton() {
+		super();
+	}
+
+	public ToggleButton(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
 
 	public void setIcon(Icon newIconSource) {
 		super.setIcon(newIconSource);

@@ -53,19 +53,15 @@ public class NoteLevelsPage extends TouchableView {
 
 	@Override
 	public void draw() {
-		shapeGroup.draw();
-	}
-
-	public synchronized void drawChildren() {
-		super.drawChildren();
+		shapeGroup.draw(this);
 	}
 
 	@Override
 	protected synchronized void createChildren() {
 		levelsView = new LevelsView(shapeGroup);
-		volumeToggle = new ToggleButton();
-		panToggle = new ToggleButton();
-		pitchToggle = new ToggleButton();
+		volumeToggle = new ToggleButton(shapeGroup);
+		panToggle = new ToggleButton(shapeGroup);
+		pitchToggle = new ToggleButton(shapeGroup);
 		
 		volumeToggle.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
@@ -93,9 +89,9 @@ public class NoteLevelsPage extends TouchableView {
 		float toggleHeight = height / 3;
 		float toggleWidth = 2 * toggleHeight;
 		float viewW = toggleWidth + 5;
-		volumeToggle.layout(null, 0, 0, toggleWidth, toggleHeight);
-		panToggle.layout(null, 0, toggleHeight, toggleWidth, toggleHeight);
-		pitchToggle.layout(null, 0, toggleHeight * 2, toggleWidth, toggleHeight);
+		volumeToggle.layout(this, 0, 0, toggleWidth, toggleHeight);
+		panToggle.layout(this, 0, toggleHeight, toggleWidth, toggleHeight);
+		pitchToggle.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
 		levelsView.layout(this, viewW, 0, width - viewW, height);
 	}
 }

@@ -24,7 +24,7 @@ public class DelayParamsPage extends EffectParamsPage {
 	@Override
 	public synchronized void createChildren() {
 		super.createChildren();
-		linkToggle = new ToggleButton();
+		linkToggle = new ToggleButton(shapeGroup);
 		linkToggle.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {

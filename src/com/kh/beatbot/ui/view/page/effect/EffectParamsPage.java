@@ -5,16 +5,19 @@ import com.kh.beatbot.effect.EffectParam;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.listener.ParamToggleListener;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.param.KnobParamControl;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
 
-public class EffectParamsPage extends TouchableView implements
-		ParamListener, ParamToggleListener {
+public class EffectParamsPage extends TouchableView implements ParamListener,
+		ParamToggleListener {
 	protected KnobParamControl[] paramControls;
 	protected Effect effect;
 
 	public EffectParamsPage(Effect effect) {
+		shapeGroup = new ShapeGroup();
+		shouldDraw = true;
 		this.effect = effect;
 		createChildren();
 	}
@@ -38,21 +41,32 @@ public class EffectParamsPage extends TouchableView implements
 	}
 
 	@Override
+	public void draw() {
+		shapeGroup.draw(this);
+	}
+
+	@Override
 	public synchronized void createChildren() {
 		if (effect == null)
 			return;
-		createParamControls();
+		paramControls = new KnobParamControl[effect.getNumParams()];
+		for (int i = 0; i < paramControls.length; i++) {
+			paramControls[i] = new KnobParamControl(shapeGroup,
+					effect.getParam(i).beatSyncable);
+			paramControls[i].setId(i);
+		}
+		setEffect(effect);
 		addChildren(paramControls);
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
 		int halfParams = (effect.getNumParams() + 1) / 2;
-		float paramW = effect.getNumParams() <= 3 ? width / effect.getNumParams() : width
-				/ halfParams;
+		float paramW = effect.getNumParams() <= 3 ? width
+				/ effect.getNumParams() : width / halfParams;
 		float paramH = 3 * paramW / 2;
-		float y = effect.getNumParams() <= 3 ? height / 2 - paramH / 2 : height / 2
-				- paramH;
+		float y = effect.getNumParams() <= 3 ? height / 2 - paramH / 2 : height
+				/ 2 - paramH;
 		for (int i = 0; i < effect.getNumParams(); i++) {
 			if (i == 3)
 				y += paramH;
@@ -85,14 +99,5 @@ public class EffectParamsPage extends TouchableView implements
 				effect.getParam(0).unignoreListener(this);
 			}
 		}
-	}
-
-	private void createParamControls() {
-		paramControls = new KnobParamControl[effect.getNumParams()];
-		for (int i = 0; i < paramControls.length; i++) {
-			paramControls[i] = new KnobParamControl(effect.getParam(i).beatSyncable);
-			paramControls[i].setId(i);
-		}
-		setEffect(effect);
 	}
 }

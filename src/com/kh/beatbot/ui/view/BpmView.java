@@ -8,6 +8,7 @@ import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.NumberSegment;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class BpmView extends ClickableView {
 
@@ -17,6 +18,10 @@ public class BpmView extends ClickableView {
 	private static float lastFrameY = -1, currYDragTotal = 0;
 
 	private long lastTapTime = 0;
+
+	public BpmView(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
 
 	public void setBPM(float bpm) {
 		setText(String.valueOf((int) MidiManager.setBPM(bpm)));
@@ -42,8 +47,8 @@ public class BpmView extends ClickableView {
 		float shortH = longW;
 
 		for (int i = 0; i < numberSegments.length; i++) {
-			float x = BG_OFFSET + i * 3.5f * longW + longW;
-			float y = BG_OFFSET;
+			float x = absoluteX + BG_OFFSET + i * 3.5f * longW + longW;
+			float y = absoluteY + BG_OFFSET;
 			numberSegments[i][0].layout(x, y + longW / 2, longW, longH);
 			numberSegments[i][1].layout(x, y + height / 2, longW, longH);
 			numberSegments[i][2].layout(x + longW * 2, y + longW / 2, longW,
@@ -55,11 +60,6 @@ public class BpmView extends ClickableView {
 					shortH);
 			numberSegments[i][6].layout(x, y + height - shortH, shortW, shortH);
 		}
-	}
-
-	@Override
-	public void draw() {
-		shapeGroup.draw();
 	}
 
 	@Override

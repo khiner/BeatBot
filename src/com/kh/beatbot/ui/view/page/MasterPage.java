@@ -8,11 +8,11 @@ public class MasterPage extends LevelsFXPage {
 
 	private TextView bpmLabel;
 	private BpmView bpmView;
-	
+
 	public void setBPM(float bpm) {
 		bpmView.setBPM(bpm);
 	}
-	
+
 	@Override
 	public synchronized void init() {
 		setBPM(MidiManager.getBPM());
@@ -22,17 +22,12 @@ public class MasterPage extends LevelsFXPage {
 	@Override
 	public synchronized void createChildren() {
 		super.createChildren();
-		bpmLabel = new TextView();
-		bpmView = new BpmView();
+		bpmLabel = new TextView(shapeGroup);
+		bpmView = new BpmView(shapeGroup);
+		bpmLabel.setText("BPM");
 		addChildren(bpmView, bpmLabel);
 	}
-	
-	@Override
-	public synchronized void initIcons() {
-		super.initIcons();
-		bpmLabel.setText("BPM");
-	}
-	
+
 	@Override
 	public synchronized void layoutChildren() {
 		float thirdHeight = height / 3;
@@ -45,8 +40,9 @@ public class MasterPage extends LevelsFXPage {
 				thirdHeight);
 		levelBar.layout(this, 6 * thirdHeight, levelHeight, width - 10
 				* thirdHeight, thirdHeight);
-		
-		bpmLabel.layout(this, width - 4 * thirdHeight, levelHeight, thirdHeight * 2, thirdHeight);
+
+		bpmLabel.layout(this, width - 4 * thirdHeight, levelHeight,
+				thirdHeight * 2, thirdHeight);
 		bpmView.layout(this, width - 2 * thirdHeight, levelHeight,
 				2 * thirdHeight, thirdHeight);
 		effectLabel.layout(this, 0, 13 * height / 24, width / 5, thirdHeight);

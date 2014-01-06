@@ -21,17 +21,16 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	private AdsrShape adsrShape;
 
+	public AdsrView(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
+
 	public synchronized void update() {
 		for (int i = 0; i < ADSR.NUM_PARAMS; i++) {
 			TrackManager.currTrack.adsr.getParam(i).removeListener(this);
 			TrackManager.currTrack.adsr.getParam(i).addListener(this);
 		}
 		initAdsrVb();
-	}
-
-	@Override
-	public void draw() {
-		shapeGroup.draw();
 	}
 
 	@Override
@@ -68,14 +67,13 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	@Override
 	protected synchronized void createChildren() {
-		shapeGroup = new ShapeGroup();
 		initBgRect(true);
 		adsrShape = new AdsrShape(shapeGroup, Colors.VOLUME, Colors.VOLUME);
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
-		adsrShape.layout(0, 0, width, height);
+		adsrShape.layout(absoluteX, absoluteY, width, height);
 	}
 
 	private void initAdsrVb() {

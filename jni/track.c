@@ -431,8 +431,8 @@ void Java_com_kh_beatbot_manager_TrackManager_createTrackNative(JNIEnv *env,
 	pthread_mutex_unlock(&openSlOut->trackMutex);
 }
 
-void Java_com_kh_beatbot_manager_TrackManager_deleteTrack(JNIEnv *env,
-		jclass clazz, int trackNum) {
+void Java_com_kh_beatbot_Track_deleteTrack(JNIEnv *env, jclass clazz,
+		int trackNum) {
 	TrackNode *trackNode = getTrackNode(trackNum);
 	pthread_mutex_lock(&openSlOut->trackMutex);
 	removeTrack(trackNode);
@@ -456,7 +456,8 @@ jboolean Java_com_kh_beatbot_Track_isTrackPlaying(JNIEnv *env, jclass clazz,
 		return false;
 	}
 
-	return currSample >= track->nextStartSample && currSample <= track->nextStopSample;
+	return currSample >= track->nextStartSample
+			&& currSample <= track->nextStopSample;
 }
 
 jboolean Java_com_kh_beatbot_Track_isTrackLooping(JNIEnv *env, jclass clazz,

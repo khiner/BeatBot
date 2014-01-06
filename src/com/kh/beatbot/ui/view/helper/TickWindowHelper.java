@@ -215,11 +215,13 @@ public class TickWindowHelper {
 			if (1 << i > MidiManager.getBeatDivision() * 4) {
 				// lines are invisible below current granulariy
 				for (Line line : vLines[i]) {
-					line.setStrokeColor(Colors.TRANSPARENT);
+					if (!line.getStrokeColor().equals(Colors.TRANSPARENT))
+						line.setStrokeColor(Colors.TRANSPARENT);
 				}
 			} else {
 				for (Line line : vLines[i]) {
-					line.setStrokeColor(Colors.MIDI_LINES[i]);
+					if (!line.getStrokeColor().equals(Colors.MIDI_LINES[i]))
+						line.setStrokeColor(Colors.MIDI_LINES[i]);
 				}
 			}
 		}

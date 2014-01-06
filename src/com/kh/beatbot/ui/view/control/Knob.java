@@ -4,13 +4,13 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.KnobShape;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class Knob extends ControlView1dBase {
 	private KnobShape knobShape;
 
-	@Override
-	public void draw() {
-		knobShape.draw();
+	public Knob(ShapeGroup shapeGroup) {
+		super(shapeGroup);
 	}
 
 	@Override
@@ -35,12 +35,12 @@ public class Knob extends ControlView1dBase {
 
 	@Override
 	public synchronized void createChildren() {
-		knobShape = new KnobShape(null, Colors.VOLUME, null);
+		knobShape = new KnobShape(shapeGroup, Colors.VOLUME, null);
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
-		knobShape.layout(0, 0, width, height);
+		knobShape.layout(absoluteX, absoluteY, width, height);
 	}
 	
 	@Override

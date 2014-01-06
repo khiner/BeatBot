@@ -310,11 +310,4 @@ public class LevelsView extends TouchableView {
 		levelBarSelectCircle.layout(0, 0, LEVEL_BAR_WIDTH * 2,
 				LEVEL_BAR_WIDTH * 2);
 	}
-
-	@Override
-	public void layoutBgRect() {
-		super.layoutBgRect();
-		// XXX need to be more general
-		bgRect.setPosition(x + BG_OFFSET, y + BG_OFFSET);
-	}
 }

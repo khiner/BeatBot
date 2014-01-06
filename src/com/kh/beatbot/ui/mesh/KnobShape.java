@@ -68,8 +68,8 @@ public class KnobShape extends Shape {
 	}
 
 	private void tempVertex(float theta, float radius) {
-		tempVertices.add(new Vertex((float) Math.cos(theta) * radius + width
-				/ 2, (float) Math.sin(theta) * radius + width / 2));
+		tempVertices.add(new Vertex(x + (float) Math.cos(theta) * radius
+				+ width / 2, y + (float) Math.sin(theta) * radius + width / 2));
 	}
 
 	private void vertex(int tempIndex) {

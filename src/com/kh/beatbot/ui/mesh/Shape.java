@@ -105,17 +105,11 @@ public abstract class Shape extends Drawable {
 	}
 
 	public synchronized void setFillColor(float[] fillColor) {
-		if (fillColor != null && fillColor.equals(this.fillColor)) {
-			return;
-		}
 		this.fillColor = fillColor;
 		updateGroup();
 	}
 
 	public synchronized void setStrokeColor(float[] strokeColor) {
-		if (strokeColor != null && strokeColor.equals(this.strokeColor)) {
-			return;
-		}
 		this.strokeColor = strokeColor;
 		updateGroup();
 	}

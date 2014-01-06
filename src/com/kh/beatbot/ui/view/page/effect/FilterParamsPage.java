@@ -33,18 +33,12 @@ public class FilterParamsPage extends EffectParamsPage {
 	private FilterToggleListener filterToggleListener;
 
 	@Override
-	public void draw() {
-		super.draw();
-		shapeGroup.draw(this);
-	}
-
-	@Override
 	public synchronized void createChildren() {
 		super.createChildren();
 		filterToggles = new ToggleButton[3];
 		filterToggleListener = new FilterToggleListener();
 		for (int i = 0; i < filterToggles.length; i++) {
-			filterToggles[i] = new ToggleButton();
+			filterToggles[i] = new ToggleButton(shapeGroup);
 			filterToggles[i].setOnReleaseListener(filterToggleListener);
 		}
 		addChildren(filterToggles);

@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view.control;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResource.State;
 import com.kh.beatbot.ui.ShapeIcon;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class ImageButton extends Button {
 
@@ -10,6 +11,11 @@ public class ImageButton extends Button {
 	protected float iconXOffset = 0, iconYOffset = 0, iconW = 0, iconH = 0;
 	// two icon sources - foreground and background
 	protected Icon[] icons;
+
+	public ImageButton(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+		icons = new Icon[2];
+	}
 
 	public ImageButton() {
 		super();

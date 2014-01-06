@@ -1,15 +1,21 @@
 package com.kh.beatbot.ui.view.control.param;
 
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.control.Seekbar;
 
 public class SeekbarParamControl extends LevelParamControl {
 
-	public SeekbarParamControl() {
-		super();
-		levelControl = new Seekbar();
+	public SeekbarParamControl(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
+
+	@Override
+	public synchronized void createChildren(){
+		super.createChildren();
+		levelControl = new Seekbar(shapeGroup);
 		addChild(levelControl);
 	}
-	
+
 	@Override
 	public synchronized void layoutChildren() {
 		label.layout(this, 0, 0, width / 2, height / 2);

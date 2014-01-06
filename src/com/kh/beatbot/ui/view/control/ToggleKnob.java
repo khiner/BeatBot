@@ -5,12 +5,17 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.ParamToggleListener;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class ToggleKnob extends Knob implements ParamToggleListener {
 
 	private ToggleButton centerButton;
 	private float snapDistSquared;
 	private boolean centerButtonTouched = false;
+
+	public ToggleKnob(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
 
 	@Override
 	public void setId(int id) {
