@@ -7,7 +7,7 @@ import com.kh.beatbot.activity.BeatBotActivity;
 
 public class Tremelo extends Effect {
 
-	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.tremelo);
+	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.tremolo);
 	public static final int EFFECT_NUM = 6, NUM_PARAMS = 3;
 
 	public Tremelo(BaseTrack track) {

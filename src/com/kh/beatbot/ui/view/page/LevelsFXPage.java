@@ -28,6 +28,7 @@ import com.kh.beatbot.ui.view.control.Seekbar;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.list.DraggableLabelList;
 import com.kh.beatbot.ui.view.list.LabelList;
+import com.kh.beatbot.ui.view.list.LabelList.LabelState;
 
 public abstract class LevelsFXPage extends TouchableView {
 
@@ -41,20 +42,17 @@ public abstract class LevelsFXPage extends TouchableView {
 			builder.setItems(effectNames,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int item) {
-							if (effectNames[item].equals("NONE")) {
-								effectLabelList
-										.setLabelText(lastClickedPos, "");
+							if (effectNames[item].toLowerCase().equals("none")) {
 								Effect effect = getCurrTrack()
 										.findEffectByPosition(lastClickedPos);
 								if (effect != null) {
 									effect.removeEffect();
 								}
 							} else {
-								launchEffectIntent(effectNames[item],
-										lastClickedPos, true);
-								effectLabelList.setLabelText(lastClickedPos,
-										effectNames[item]);
+								launchEffect(effectNames[item], lastClickedPos,
+										true);
 							}
+							updateEffectLabels();
 						}
 					});
 			selectEffectAlert = builder.create();
@@ -62,17 +60,8 @@ public abstract class LevelsFXPage extends TouchableView {
 
 		@Override
 		public void labelListInitialized(LabelList labelList) {
-			effectLabelList = (DraggableLabelList) labelList;
-			if (effectLabelList.numChildren() > 0) {
-				for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {
-					Effect effect = getCurrTrack().findEffectByPosition(i);
-					if (effect != null)
-						labelList.setLabelOn(i, effect.isOn());
-				}
-			} else {
-				for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {
-					labelList.addLabel("", false);
-				}
+			for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {
+				labelList.addLabel("", false);
 			}
 		}
 
@@ -87,7 +76,7 @@ public abstract class LevelsFXPage extends TouchableView {
 			if (text.isEmpty() || text.equalsIgnoreCase("Add")) {
 				selectEffectAlert.show();
 			} else {
-				launchEffectIntent(text, position, false);
+				launchEffect(text, position, false);
 			}
 		}
 
@@ -111,7 +100,7 @@ public abstract class LevelsFXPage extends TouchableView {
 	@Override
 	public synchronized void update() {
 		updateLevels();
-		updateEffects();
+		updateEffectLabels();
 	}
 
 	public void setMasterMode(boolean masterMode) {
@@ -132,7 +121,7 @@ public abstract class LevelsFXPage extends TouchableView {
 		selectLevel(currParam);
 	}
 
-	private void updateEffects() {
+	private void updateEffectLabels() {
 		if (effectLabelList.numChildren() <= 0)
 			return;
 		for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {
@@ -141,7 +130,7 @@ public abstract class LevelsFXPage extends TouchableView {
 				effectLabelList.setLabelText(i, "");
 			} else {
 				effectLabelList.setLabelText(i, effect.getName());
-				effectLabelList.setLabelOn(i, effect.isOn());
+				effectLabelList.setLabelState(i, effect.isOn() ? LabelState.ON : LabelState.OFF);
 			}
 		}
 	}
@@ -185,7 +174,7 @@ public abstract class LevelsFXPage extends TouchableView {
 	}
 
 	// effects methods
-	private void launchEffectIntent(String effectName, int effectPosition,
+	private void launchEffect(String effectName, int effectPosition,
 			boolean setOn) {
 		Effect effect = getEffect(effectName, effectPosition);
 		if (effectName != effect.getName()) {
@@ -261,7 +250,8 @@ public abstract class LevelsFXPage extends TouchableView {
 		// effects
 		effectNames = BeatBotActivity.mainActivity.getResources()
 				.getStringArray(R.array.effect_names);
-		effectLabelList = new DraggableLabelList();
+		effectLabelList = new DraggableLabelList(shapeGroup); // uses its own
+																// shapeGroup
 		effectLabelList.setListener(new EffectLabelListListener(
 				BeatBotActivity.mainActivity));
 

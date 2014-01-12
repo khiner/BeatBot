@@ -1,6 +1,7 @@
 package com.kh.beatbot.ui.view.list;
 
 import com.kh.beatbot.listener.DraggableLabelListListener;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.control.Button;
 
 public class DraggableLabelList extends LabelList {
@@ -8,7 +9,11 @@ public class DraggableLabelList extends LabelList {
 	private int initialTouchedPosition = -1;
 	private float dragOffset = 0;
 	private LabelState prevTouchedLabelState = LabelState.EMPTY;
-	
+
+	public DraggableLabelList(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
+
 	@Override
 	public synchronized void handleActionMove(int id, float x, float y) {
 		super.handleActionMove(id, x, y);
@@ -35,7 +40,7 @@ public class DraggableLabelList extends LabelList {
 			((DraggableLabelListListener)listener).labelMoved(initialTouchedPosition, newPosition);
 		}
 		touchedLabel.setState(prevTouchedLabelState);
-		touchedLabel = null;
+		super.onRelease(button);
 		layoutChildren();
 	}
 }

@@ -93,6 +93,16 @@ public abstract class ShapeIcon extends Icon {
 
 	public void setFillColorSet(ColorSet fillColorSet) {
 		this.fillColorSet = fillColorSet;
+		setState(state);
+	}
+
+	public void bringToTop() {
+		((Shape) currentDrawable).bringToTop();
+	}
+
+	public synchronized void setGroup(ShapeGroup shapeGroup) {
+		destroy();
+		shapeGroup.add((Shape)currentDrawable);
 	}
 
 	public void destroy() {

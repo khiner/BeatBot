@@ -11,6 +11,7 @@ import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.ShapeIcon;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.ClickableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
@@ -19,7 +20,7 @@ import com.kh.beatbot.ui.view.control.ImageButton;
 public class LabelList extends ClickableView implements OnPressListener,
 		OnReleaseListener {
 
-	static enum LabelState {
+	public static enum LabelState {
 		ON, OFF, EMPTY
 	};
 
@@ -31,13 +32,14 @@ public class LabelList extends ClickableView implements OnPressListener,
 			Colors.LABEL_DARK, Colors.LABEL_MED);
 
 	protected class Label extends ImageButton {
+		private final static String EMPTY_TEXT = "ADD";
 		private LabelState state = LabelState.EMPTY;
 
 		public Label() {
 			super();
 			setIcon(addIcon);
 			setBgIcon(new RoundedRectIcon(null, emptyColorSet));
-			setText("Add");
+			setText(EMPTY_TEXT);
 		}
 
 		public void setState(LabelState state) {
@@ -71,8 +73,13 @@ public class LabelList extends ClickableView implements OnPressListener,
 	protected static final float GAP_BETWEEN_LABELS = 5;
 	protected static final float TEXT_Y_OFFSET = 3;
 	protected static Icon addIcon;
+	protected float labelWidth = 0;
 	protected Label touchedLabel = null;
 	protected LabelListListener listener = null;
+
+	public LabelList(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
 
 	public void setListener(LabelListListener listener) {
 		this.listener = listener;
@@ -82,10 +89,10 @@ public class LabelList extends ClickableView implements OnPressListener,
 		return (Label) children.get(position);
 	}
 
-	public void setLabelOn(int position, boolean on) {
+	public void setLabelState(int position, LabelState labelState) {
 		Label label = getLabel(position);
 		if (label != null) {
-			label.setState(on ? LabelState.ON : LabelState.OFF);
+			label.setState(labelState);
 		}
 	}
 
@@ -96,6 +103,9 @@ public class LabelList extends ClickableView implements OnPressListener,
 		newLabel.setOnPressListener(this);
 		newLabel.setOnReleaseListener(this);
 		addChild(newLabel);
+		labelWidth = (width - BG_OFFSET * 3 - (children.size() - 1)
+				* GAP_BETWEEN_LABELS)
+				/ children.size();
 		layoutChildren();
 		newLabel.initAllIcons();
 		return newLabel;
@@ -109,7 +119,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 			return;
 		if (text.isEmpty()) {
 			label.setIcon(addIcon);
-			label.setText("Add");
+			label.setText(Label.EMPTY_TEXT);
 			label.setState(LabelState.EMPTY);
 		} else {
 			label.setIcon(null);
@@ -158,24 +168,15 @@ public class LabelList extends ClickableView implements OnPressListener,
 
 	@Override
 	public synchronized void layoutChildren() {
-		float labelW = (width - BG_OFFSET * 3 - (children.size() - 1)
-				* GAP_BETWEEN_LABELS)
-				/ children.size();
-
 		Collections.sort(children); // sort children by position
 		float xTotal = 3 * BG_OFFSET / 2;
 		for (View label : children) {
 			if (touchedLabel == null || !label.equals(touchedLabel)) {
-				label.layout(this, xTotal, 3 * BG_OFFSET / 2, labelW,
+				label.layout(this, xTotal, 3 * BG_OFFSET / 2, labelWidth,
 						height - BG_OFFSET * 3);
 			}
-			xTotal += labelW + GAP_BETWEEN_LABELS;
+			xTotal += labelWidth + GAP_BETWEEN_LABELS;
 		}
-	}
-
-	@Override
-	public void draw() {
-		shapeGroup.draw();
 	}
 
 	@Override
