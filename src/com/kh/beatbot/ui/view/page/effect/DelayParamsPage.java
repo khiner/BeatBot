@@ -23,6 +23,8 @@ public class DelayParamsPage extends EffectParamsPage {
 
 	@Override
 	public synchronized void createChildren() {
+		if (effect == null)
+			return;
 		super.createChildren();
 		linkToggle = new ToggleButton(shapeGroup, true);
 		linkToggle.setOnReleaseListener(new OnReleaseListener() {
@@ -47,14 +49,15 @@ public class DelayParamsPage extends EffectParamsPage {
 				effectPage.setLevel2dParams(effect.getXParam(), effect.getYParam());
 			}
 		});
-
+		linkToggle.setChecked(effect.paramsLinked());
 		addChild(linkToggle);
 	}
 
 	@Override
 	public void setEffect(Effect effect) {
 		super.setEffect(effect);
-		linkToggle.setChecked(effect.paramsLinked());
+		if (linkToggle != null)
+			linkToggle.setChecked(effect.paramsLinked());
 	}
 
 	public synchronized void layoutChildren() {

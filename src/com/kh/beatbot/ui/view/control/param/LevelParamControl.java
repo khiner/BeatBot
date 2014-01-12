@@ -7,6 +7,10 @@ import com.kh.beatbot.ui.view.control.ControlView1dBase;
 public abstract class LevelParamControl extends ParamControl {
 	protected ControlView1dBase levelControl;
 
+	public LevelParamControl() {
+		super();
+	}
+
 	public LevelParamControl(ShapeGroup shapeGroup) {
 		super(shapeGroup);
 	}

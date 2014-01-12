@@ -10,6 +10,10 @@ public class ParamControl extends TouchableView {
 	protected ValueLabel valueLabel;
 	protected TextView label;
 
+	public ParamControl() {
+		super();
+	}
+	
 	public ParamControl(ShapeGroup shapeGroup) {
 		super(shapeGroup);
 	}

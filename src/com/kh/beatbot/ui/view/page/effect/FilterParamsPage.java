@@ -33,6 +33,8 @@ public class FilterParamsPage extends EffectParamsPage {
 
 	@Override
 	public synchronized void createChildren() {
+		if (effect == null)
+			return;
 		super.createChildren();
 		filterToggles = new ToggleButton[3];
 		filterToggleListener = new FilterToggleListener();

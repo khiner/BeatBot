@@ -6,11 +6,13 @@ import com.kh.beatbot.ui.view.control.ToggleKnob;
 
 public class KnobParamControl extends LevelParamControl {
 
-	private boolean beatSync = false;
+	private boolean beatSync;
 
 	public KnobParamControl(ShapeGroup shapeGroup, boolean beatSync) {
-		super(shapeGroup);
 		this.beatSync = beatSync;
+		shouldDraw = (null == shapeGroup);
+		this.shapeGroup = shouldDraw ? new ShapeGroup() : shapeGroup;
+		createChildren();
 	}
 
 	@Override
