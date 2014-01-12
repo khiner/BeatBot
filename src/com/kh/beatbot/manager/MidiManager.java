@@ -8,6 +8,7 @@ import android.util.Log;
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.event.LoopWindowSetEvent;
+import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesCreateEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesDestroyEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesGroupEvent;
@@ -387,9 +388,7 @@ public class MidiManager {
 		tempo = (Tempo) tempoTrack.getEvents().get(1);
 		setNativeMSPT(tempo.getMpqn() / RESOLUTION);
 		ArrayList<MidiEvent> events = midiTracks.get(1).getEvents();
-		beginMidiEvent(null);
-		new MidiNotesDestroyEvent(getMidiNotes()).execute();
-		endMidiEvent();
+
 		// midiEvents are ordered by tick, so on/off events don't
 		// necessarily
 		// alternate if there are interleaving notes (with different "notes"
@@ -416,11 +415,20 @@ public class MidiManager {
 			}
 		}
 
-		if (!newNotes.isEmpty()) {
-			beginMidiEvent(null);
-			new MidiNotesCreateEvent(newNotes).execute();
-			endMidiEvent();
+		// create any necessary tracks
+		for (MidiNote note : newNotes) {
+			while (note.getNoteValue() >= TrackManager.getNumTracks()) {
+				new TrackCreateEvent().execute();
+			}
 		}
+
+		beginMidiEvent(null);
+		new MidiNotesDestroyEvent(getMidiNotes()).execute();
+
+		if (!newNotes.isEmpty()) {
+			new MidiNotesCreateEvent(newNotes).execute();
+		}
+		endMidiEvent();
 	}
 
 	public static void setLoopBeginTick(long loopBeginTick) {
