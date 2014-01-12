@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.view.group;
 
 import com.kh.beatbot.Track;
 import com.kh.beatbot.event.TrackCreateEvent;
+import com.kh.beatbot.event.TrackDestroyEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.FileManager;
@@ -35,7 +36,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	public static AdsrPage adsrPage;
 	public static ViewPager pager;
 
-	private static ImageButton addTrackButton;
+	private static ImageButton addTrackButton, deleteTrackButton;
 	private static ToggleButton[] pageButtons = new ToggleButton[6];
 
 	public void selectPage(int pageNum) {
@@ -72,15 +73,23 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 
 	@Override
 	protected synchronized void createChildren() {
-		addTrackButton = new ImageButton();
+		addTrackButton = new ImageButton(shapeGroup);
+		deleteTrackButton = new ImageButton(shapeGroup);
 		for (int i = 0; i < pageButtons.length; i++) {
-			pageButtons[i] = new ToggleButton(false);
+			pageButtons[i] = new ToggleButton(shapeGroup, false);
 		}
 
 		addTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
 				new TrackCreateEvent().execute();
+			}
+		});
+
+		deleteTrackButton.setOnReleaseListener(new OnReleaseListener() {
+			@Override
+			public void onRelease(Button button) {
+				new TrackDestroyEvent(TrackManager.currTrack).execute();
 			}
 		});
 
@@ -118,13 +127,13 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 		pageButtons[ADSR_PAGE_ID].setText("ADSR");
 		pageButtons[MASTER_PAGE_ID].setText("Master");
 
-		addChildren(addTrackButton, pager);
+		addChildren(addTrackButton, deleteTrackButton, pager);
 		addChildren(pageButtons);
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
-		float labelWidth = (width - 3 * LABEL_HEIGHT) / 4;
+		float labelWidth = (width - 4 * LABEL_HEIGHT) / 4;
 		float labelYOffset = 2;
 		addTrackButton
 				.layout(this, 0, labelYOffset, LABEL_HEIGHT, LABEL_HEIGHT);
@@ -138,6 +147,9 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 		}
 		pager.layout(this, 0, LABEL_HEIGHT + 2 * labelYOffset, width, height
 				- LABEL_HEIGHT - 2 * labelYOffset);
+
+		deleteTrackButton.layout(this, width - LABEL_HEIGHT, labelYOffset,
+				LABEL_HEIGHT, LABEL_HEIGHT);
 	}
 
 	@Override
@@ -145,6 +157,10 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 		addTrackButton.setIcon(new Icon(IconResources.ADD));
 		addTrackButton.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.labelFillColorSet, Colors.labelStrokeColorSet));
+
+		deleteTrackButton.setBgIcon(new RoundedRectIcon(shapeGroup,
+				Colors.deleteFillColorSet, Colors.deleteStrokeColorSet));
+		deleteTrackButton.setIcon(new Icon(IconResources.DELETE_TRACK));
 
 		pageButtons[EDIT_PAGE_ID].setIcon(new Icon(IconResources.SAMPLE));
 		pageButtons[NOTE_LEVELS_PAGE_ID]

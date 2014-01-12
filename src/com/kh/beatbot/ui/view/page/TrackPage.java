@@ -1,42 +1,6 @@
 package com.kh.beatbot.ui.view.page;
 
-import com.kh.beatbot.event.TrackDestroyEvent;
-import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.Icon;
-import com.kh.beatbot.ui.IconResources;
-import com.kh.beatbot.ui.RoundedRectIcon;
-import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.ImageButton;
-
 public class TrackPage extends LevelsFXPage {
-
-	private ImageButton deleteButton;
-
-	@Override
-	public synchronized void createChildren() {
-		super.createChildren();
-		deleteButton = new ImageButton(shapeGroup);
-
-		deleteButton.setOnReleaseListener(new OnReleaseListener() {
-			@Override
-			public void onRelease(Button button) {
-				new TrackDestroyEvent(TrackManager.currTrack).execute();
-			}
-		});
-
-		children.add(deleteButton);
-	}
-
-	@Override
-	public synchronized void initIcons() {
-		super.initIcons();
-
-		deleteButton.setBgIcon(new RoundedRectIcon(shapeGroup,
-				Colors.deleteFillColorSet, Colors.deleteStrokeColorSet));
-		deleteButton.setIcon(new Icon(IconResources.DELETE_TRACK));
-	}
 
 	@Override
 	public synchronized void layoutChildren() {
@@ -50,11 +14,7 @@ public class TrackPage extends LevelsFXPage {
 				thirdHeight);
 
 		float levelX = 6 * thirdHeight;
-		levelBar.layout(this, levelX, topRowY, width - levelX - thirdHeight,
-				thirdHeight);
-
-		deleteButton.layout(this, width - thirdHeight, topRowY, thirdHeight,
-				thirdHeight);
+		levelBar.layout(this, levelX, topRowY, width - levelX, thirdHeight);
 
 		effectLabel.layout(this, 0, 13 * height / 24, width / 5, thirdHeight);
 		effectLabelList.layout(this, width / 5, height / 2, 4 * width / 5,
