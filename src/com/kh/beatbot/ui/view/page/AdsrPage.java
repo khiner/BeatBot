@@ -79,11 +79,6 @@ public class AdsrPage extends TouchableView implements OnReleaseListener {
 	}
 
 	@Override
-	public void draw() {
-		shapeGroup.draw(this);
-	}
-
-	@Override
 	protected synchronized void createChildren() {
 		adsrView = new AdsrView(shapeGroup);
 		paramControl = new SeekbarParamControl(shapeGroup);

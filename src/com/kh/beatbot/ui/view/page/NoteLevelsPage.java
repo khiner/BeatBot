@@ -52,11 +52,6 @@ public class NoteLevelsPage extends TouchableView {
 	}
 
 	@Override
-	public void draw() {
-		shapeGroup.draw(this);
-	}
-
-	@Override
 	protected synchronized void createChildren() {
 		levelsView = new LevelsView(shapeGroup);
 		volumeToggle = new ToggleButton(shapeGroup);

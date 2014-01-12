@@ -49,11 +49,6 @@ public class EffectPage extends TouchableView {
 	}
 
 	@Override
-	public void draw() {
-		shapeGroup.draw(this);
-	}
-
-	@Override
 	protected synchronized void createChildren() {
 		paramsPager = new ViewPager();
 		level2d = new Seekbar2d(shapeGroup);

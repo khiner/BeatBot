@@ -243,6 +243,9 @@ public abstract class View implements Comparable<View> {
 		if (bgRect != null) {
 			bgRect.draw();
 		}
+		if (shouldDraw) {
+			shapeGroup.draw(this);
+		}
 		draw();
 		drawChildren();
 		gl.glDisable(GL10.GL_SCISSOR_TEST);
@@ -347,13 +350,13 @@ public abstract class View implements Comparable<View> {
 		GLSurfaceViewBase.drawText(text, height, x, y);
 	}
 
+	public static final void setColor(float[] color) {
+		gl.glColor4f(color[0], color[1], color[2], color[3]);
+	}
+
 	protected final float distanceFromCenterSquared(float x, float y) {
 		return (x - width / 2) * (x - width / 2) + (y - height / 2)
 				* (y - height / 2);
-	}
-
-	public static final void setColor(float[] color) {
-		gl.glColor4f(color[0], color[1], color[2], color[3]);
 	}
 
 	public float viewX(float x) {

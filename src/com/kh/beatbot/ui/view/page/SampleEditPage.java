@@ -102,11 +102,6 @@ public class SampleEditPage extends TouchableView {
 	}
 
 	@Override
-	public void draw() {
-		shapeGroup.draw(this);
-	}
-
-	@Override
 	public synchronized void layoutChildren() {
 		float topBarH = height * .29f;
 		float fillH = height - topBarH;

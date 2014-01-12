@@ -234,11 +234,6 @@ public abstract class LevelsFXPage extends TouchableView {
 	}
 
 	@Override
-	public void draw() {
-		shapeGroup.draw(this);
-	}
-
-	@Override
 	protected synchronized void createChildren() {
 		effectLabel = new TextView(shapeGroup);
 		levelBar = new Seekbar(shapeGroup);

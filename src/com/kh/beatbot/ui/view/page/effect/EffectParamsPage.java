@@ -41,11 +41,6 @@ public class EffectParamsPage extends TouchableView implements ParamListener,
 	}
 
 	@Override
-	public void draw() {
-		shapeGroup.draw(this);
-	}
-
-	@Override
 	public synchronized void createChildren() {
 		if (effect == null)
 			return;

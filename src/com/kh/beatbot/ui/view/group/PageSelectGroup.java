@@ -71,11 +71,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	}
 
 	@Override
-	public void draw() {
-		shapeGroup.draw(this);
-	}
-
-	@Override
 	protected synchronized void createChildren() {
 		addTrackButton = new ImageButton();
 		for (int i = 0; i < pageButtons.length; i++) {
