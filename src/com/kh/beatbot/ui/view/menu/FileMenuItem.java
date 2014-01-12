@@ -17,7 +17,7 @@ public class FileMenuItem extends MenuItem {
 	private File file;
 
 	public FileMenuItem(Menu menu, MenuItem parent, File file) {
-		super(menu, parent, file.isDirectory() ? new ToggleButton()
+		super(menu, parent, file.isDirectory() ? new ToggleButton(false)
 				: new ImageButton());
 		this.file = file;
 		setText(file.getName().isEmpty() ? file.getPath() : file.getName());

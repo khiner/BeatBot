@@ -23,9 +23,9 @@ public class MainMenu extends Menu {
 			midiExportItem;
 
 	protected synchronized void createMenuItems() {
-		fileItem = new MenuItem(this, null, new ToggleButton());
-		settingsItem = new MenuItem(this, null, new ToggleButton());
-		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton());
+		fileItem = new MenuItem(this, null, new ToggleButton(false));
+		settingsItem = new MenuItem(this, null, new ToggleButton(false));
+		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton(false));
 		midiImportItem = new FileMenuItem(this, fileItem, new File(
 				FileManager.midiDirectory.getPath()));
 		midiExportItem = new MenuItem(this, fileItem, new ImageButton());

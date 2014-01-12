@@ -74,7 +74,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	protected synchronized void createChildren() {
 		addTrackButton = new ImageButton();
 		for (int i = 0; i < pageButtons.length; i++) {
-			pageButtons[i] = new ToggleButton();
+			pageButtons[i] = new ToggleButton(false);
 		}
 
 		addTrackButton.setOnReleaseListener(new OnReleaseListener() {
@@ -89,7 +89,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 			pageButtons[i].setOnReleaseListener(new OnReleaseListener() {
 				@Override
 				public void onRelease(Button button) {
-					pageButtons[id].setChecked(true);
 					// deselect all buttons except this one.
 					for (ToggleButton otherToggleButton : pageButtons) {
 						if (!button.equals(otherToggleButton)) {

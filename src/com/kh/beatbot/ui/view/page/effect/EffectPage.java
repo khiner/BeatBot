@@ -64,7 +64,7 @@ public class EffectPage extends TouchableView {
 		paramsPager.addPages(chorusPage, decimatePage, delayPage, filterPage,
 				flangerPage, reverbPage, tremeloPage);
 
-		toggleButton = new ToggleButton(shapeGroup);
+		toggleButton = new ToggleButton(shapeGroup, true);
 		toggleButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {

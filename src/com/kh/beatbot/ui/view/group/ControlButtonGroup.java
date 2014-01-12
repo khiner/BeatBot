@@ -23,10 +23,10 @@ public class ControlButtonGroup extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		playButton = new ToggleButton();
+		playButton = new ToggleButton(false);
 		stopButton = new ImageButton();
-		recordButton = new ToggleButton();
-		copyButton = new ToggleButton();
+		recordButton = new ToggleButton(true);
+		copyButton = new ToggleButton(false);
 		deleteButton = new ImageButton();
 		quantizeButton = new ImageButton();
 		undoButton = new ImageButton();
@@ -35,7 +35,6 @@ public class ControlButtonGroup extends TouchableView {
 		playButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				((ToggleButton) button).setChecked(true);
 				PlaybackManager.play();
 			}
 		});

@@ -21,7 +21,6 @@ public class FilterParamsPage extends EffectParamsPage {
 			for (int i = 0; i < filterToggles.length; i++) {
 				if (button.equals(filterToggles[i])) {
 					((Filter) effect).setMode(i);
-					filterToggles[i].setChecked(true);
 				} else {
 					filterToggles[i].setChecked(false);
 				}
@@ -38,7 +37,7 @@ public class FilterParamsPage extends EffectParamsPage {
 		filterToggles = new ToggleButton[3];
 		filterToggleListener = new FilterToggleListener();
 		for (int i = 0; i < filterToggles.length; i++) {
-			filterToggles[i] = new ToggleButton(shapeGroup);
+			filterToggles[i] = new ToggleButton(shapeGroup, false);
 			filterToggles[i].setOnReleaseListener(filterToggleListener);
 		}
 		addChildren(filterToggles);

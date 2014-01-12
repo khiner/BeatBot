@@ -47,9 +47,9 @@ public class TrackButtonRow extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		instrumentButton = new ToggleButton();
-		muteButton = new ToggleButton();
-		soloButton = new ToggleButton();
+		instrumentButton = new ToggleButton(false);
+		muteButton = new ToggleButton(true);
+		soloButton = new ToggleButton(true);
 		instrumentButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {

@@ -226,9 +226,9 @@ public abstract class LevelsFXPage extends TouchableView {
 	protected synchronized void createChildren() {
 		effectLabel = new TextView(shapeGroup);
 		levelBar = new Seekbar(shapeGroup);
-		volumeToggle = new ToggleButton(shapeGroup);
-		panToggle = new ToggleButton(shapeGroup);
-		pitchToggle = new ToggleButton(shapeGroup);
+		volumeToggle = new ToggleButton(shapeGroup, false);
+		panToggle = new ToggleButton(shapeGroup, false);
+		pitchToggle = new ToggleButton(shapeGroup, false);
 		volumeToggle.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button button) {
 				getCurrTrack().setLevelType(Effect.LevelType.VOLUME);

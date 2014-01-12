@@ -53,7 +53,6 @@ public class MenuItem {
 	}
 
 	public void onRelease(Button button) {
-		setChecked(true);
 		select();
 		menu.onMenuItemReleased(this);
 	}
@@ -130,7 +129,6 @@ public class MenuItem {
 	public void select() {
 		for (MenuItem sibling : getSiblings()) {
 			if (sibling.equals(this)) {
-				setChecked(true);
 				for (MenuItem subMenuItem : subMenuItems) {
 					subMenuItem.show();
 					if (subMenuItem.isChecked()) {

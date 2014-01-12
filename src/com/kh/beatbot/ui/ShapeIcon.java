@@ -100,11 +100,6 @@ public abstract class ShapeIcon extends Icon {
 		((Shape) currentDrawable).bringToTop();
 	}
 
-	public synchronized void setGroup(ShapeGroup shapeGroup) {
-		destroy();
-		shapeGroup.add((Shape)currentDrawable);
-	}
-
 	public void destroy() {
 		if (currentDrawable != null) {
 			((Shape) currentDrawable).destroy();

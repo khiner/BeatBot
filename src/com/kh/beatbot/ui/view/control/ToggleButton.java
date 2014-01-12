@@ -6,13 +6,16 @@ import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class ToggleButton extends ImageButton {
 	boolean checked = false;
+	boolean oscillating = false;
 
-	public ToggleButton() {
+	public ToggleButton(boolean oscillating) {
 		super();
+		this.oscillating = oscillating;
 	}
 
-	public ToggleButton(ShapeGroup shapeGroup) {
+	public ToggleButton(ShapeGroup shapeGroup, boolean oscillating) {
 		super(shapeGroup);
+		this.oscillating = oscillating;
 	}
 
 	public void setIcon(Icon newIconSource) {
@@ -44,7 +47,8 @@ public class ToggleButton extends ImageButton {
 	
 	@Override
 	protected void notifyReleased() {
-		setChecked(!checked);
+		if (oscillating || !checked)
+			setChecked(!checked);
 		super.notifyReleased();
 	}
 
