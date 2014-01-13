@@ -5,6 +5,7 @@ import java.io.File;
 import android.annotation.SuppressLint;
 
 import com.kh.beatbot.activity.BeatBotActivity;
+import com.kh.beatbot.listener.FileMenuItemListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.MidiFileManager;
@@ -17,7 +18,7 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
-public class MainMenu extends Menu {
+public class MainMenu extends Menu implements FileMenuItemListener {
 
 	private MenuItem fileItem, settingsItem, snapToGridItem, midiImportItem,
 			midiExportItem;
@@ -84,8 +85,13 @@ public class MainMenu extends Menu {
 		width = maxX;
 	}
 
-	public void fileItemReleased(FileMenuItem fileItem) {
+	@Override
+	public void onFileMenuItemReleased(FileMenuItem fileItem) {
 		MidiFileManager.importMidi(fileItem.getText());
+	}
+
+	@Override
+	public void onFileMenuItemLongPressed(FileMenuItem menuItem) {
 	}
 
 	@Override

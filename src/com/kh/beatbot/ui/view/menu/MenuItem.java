@@ -14,7 +14,7 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
-public class MenuItem {
+public class MenuItem implements OnPressListener, OnReleaseListener {
 	protected Menu menu = null;
 	private MenuItem parent = null;
 	protected ImageButton button;
@@ -26,22 +26,10 @@ public class MenuItem {
 		this.menu = menu;
 		this.parent = parent;
 		this.level = parent == null ? 0 : parent.level + 1;
-		final MenuItem menuItem = this;
 		this.button = button;
 
-		button.setOnPressListener(new OnPressListener() {
-			@Override
-			public void onPress(Button button) {
-				menuItem.onPress(button);
-			}
-		});
-
-		button.setOnReleaseListener(new OnReleaseListener() {
-			@Override
-			public void onRelease(Button button) {
-				menuItem.onRelease(button);
-			}
-		});
+		button.setOnPressListener(this);
+		button.setOnReleaseListener(this);
 
 		container = menu.getListAtLevel(this, level);
 	}
@@ -57,10 +45,19 @@ public class MenuItem {
 		menu.onMenuItemReleased(this);
 	}
 
+	public void trigger() {
+		setChecked(true);
+		onRelease(button);
+	}
+
 	public void addSubMenuItems(final MenuItem... subMenuItems) {
 		for (MenuItem menuItem : subMenuItems) {
 			this.subMenuItems.add(menuItem);
 		}
+	}
+
+	public List<MenuItem> getSubMenuItems() {
+		return subMenuItems;
 	}
 
 	public void loadIcons() {
@@ -154,7 +151,7 @@ public class MenuItem {
 				if (button instanceof ToggleButton) {
 					((ToggleButton) button).setBgIcon(new RoundedRectIcon(null,
 							Colors.menuToggleFillColorSet));
-				} else if (button instanceof ImageButton) {
+				} else {
 					((ImageButton) button).setBgIcon(new RoundedRectIcon(null,
 							Colors.menuItemFillColorSet));
 				}

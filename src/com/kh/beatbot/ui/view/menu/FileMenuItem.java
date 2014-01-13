@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view.menu;
 import java.io.File;
 import java.util.Arrays;
 
+import com.kh.beatbot.listener.OnLongPressListener;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.IconResource.State;
@@ -12,7 +13,7 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
-public class FileMenuItem extends MenuItem {
+public class FileMenuItem extends MenuItem implements OnLongPressListener {
 
 	private File file;
 
@@ -20,6 +21,9 @@ public class FileMenuItem extends MenuItem {
 		super(menu, parent, file.isDirectory() ? new ToggleButton(false)
 				: new ImageButton());
 		this.file = file;
+		if (file.isFile()) {
+			button.setOnLongPressListener(this);
+		}
 		setText(file.getName().isEmpty() ? file.getPath() : file.getName());
 	}
 
@@ -28,9 +32,14 @@ public class FileMenuItem extends MenuItem {
 		if (file.isDirectory()) {
 			expand();
 		} else {
-			menu.fileItemReleased(this);
+			menu.onFileMenuItemReleased(this);
 		}
 		super.onRelease(button);
+	}
+
+	@Override
+	public void onLongPress(Button button) {
+		menu.onFileMenuItemLongPressed(this);
 	}
 
 	private void expand() {

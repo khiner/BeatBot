@@ -1,7 +1,9 @@
 package com.kh.beatbot.ui.view.page;
 
 import java.io.File;
+import java.util.List;
 
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.event.SampleSetEvent;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
@@ -9,6 +11,7 @@ import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.Menu;
 import com.kh.beatbot.ui.view.menu.FileMenuItem;
+import com.kh.beatbot.ui.view.menu.MenuItem;
 
 public class BrowsePage extends Menu {
 
@@ -25,9 +28,41 @@ public class BrowsePage extends Menu {
 		initBgRect(true, null, bgColorSet, null);
 	}
 
-	public void fileItemReleased(FileMenuItem fileItem) {
+	@Override
+	public synchronized void update() {
+		// ûrecursively select file menu items based on current sample
+		File currSampleFile = TrackManager.currTrack.getCurrSampleFile();
+		if (null == currSampleFile)
+			return;
+		String currSamplePath = currSampleFile.getAbsolutePath();
+
+		FileMenuItem match = null;
+		while ((match = findMatchingChild(match, currSamplePath)) != null) {
+			match.trigger();
+		}
+	}
+
+	private FileMenuItem findMatchingChild(FileMenuItem parent, String path) {
+		List<MenuItem> children = parent == null ? topLevelItems : parent
+				.getSubMenuItems();
+		for (MenuItem child : children) {
+			FileMenuItem fileChild = (FileMenuItem) child;
+			if (path.startsWith(fileChild.getFile().getAbsolutePath())) {
+				return fileChild;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public void onFileMenuItemReleased(FileMenuItem fileItem) {
 		new SampleSetEvent(TrackManager.currTrack, fileItem.getFile())
 				.execute();
+	}
+
+	@Override
+	public void onFileMenuItemLongPressed(FileMenuItem fileItem) {
+		BeatBotActivity.mainActivity.editFileName(fileItem.getFile());
 	}
 
 	@Override

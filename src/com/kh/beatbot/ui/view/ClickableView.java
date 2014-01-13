@@ -2,26 +2,34 @@ package com.kh.beatbot.ui.view;
 
 import android.os.Handler;
 
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public abstract class ClickableView extends TouchableView {
 
-	Runnable longPressed = new Runnable() { 
-	    public void run() {
-	    	if (pointerIdToPos.isEmpty())
-	    		return;
-	    	int id = pointerIdToPos.keySet().iterator().next();
-	    	Position pos = pointerIdToPos.get(id);
-	        longPress(id, pos.x, pos.y);
-	    }   
+	Runnable longPressed = new Runnable() {
+		public void run() {
+			if (pointerIdToPos.isEmpty())
+				return;
+			int id = pointerIdToPos.keySet().iterator().next();
+			Position pos = pointerIdToPos.get(id);
+			longPress(id, pos.x, pos.y);
+			longPressing = false;
+		}
 	};
-	
+
 	public ClickableView() {
-		super();
+		this(null);
+
 	}
 
 	public ClickableView(ShapeGroup shapeGroup) {
 		super(shapeGroup);
+		BeatBotActivity.mainActivity.runOnUiThread(new Runnable() {
+			public void run() {
+				handler = new Handler();
+			}
+		});
 	}
 
 	// time (in millis) between pointer down and pointer up to be considered a
@@ -32,16 +40,17 @@ public abstract class ClickableView extends TouchableView {
 	// time (in millis) for a long press in one location
 	public final static long LONG_PRESS_TIME = 600;
 
-	// if pointers go out of this radius, they will cancel taps, double taps and long presses
+	// if pointers go out of this radius, they will cancel taps, double taps and
+	// long presses
 	public final static float SNAP_DIST = 30;
-	
+
 	// handler for timed events
-	private final Handler handler = new Handler();
-	
+	private Handler handler;
+
 	/** State Variables for Clicking/Pressing **/
 	private long lastDownTime = 0, lastTapTime = 0;
 	private float lastTapX = -1, lastTapY = -1;
-
+	private boolean longPressing = false;
 
 	/****************** Clickable Methods ********************/
 	protected abstract void singleTap(int id, float x, float y);
@@ -50,10 +59,26 @@ public abstract class ClickableView extends TouchableView {
 
 	protected abstract void longPress(int id, float x, float y);
 
+	private void beginLongPress() {
+		handler.postDelayed(longPressed, LONG_PRESS_TIME);
+		longPressing = true;
+	}
+
+	protected void releaseLongPress() {
+		if (null != handler) {
+			handler.removeCallbacks(longPressed);
+		}
+		longPressing = false;
+	}
+	
+	protected boolean isLongPressing() {
+		return longPressing;
+	}
+
 	@Override
 	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
-		handler.postDelayed(longPressed, LONG_PRESS_TIME);
+		beginLongPress();
 		lastDownTime = System.currentTimeMillis();
 		lastTapX = x;
 		lastTapY = y;
@@ -63,7 +88,7 @@ public abstract class ClickableView extends TouchableView {
 	public void handleActionMove(int id, float x, float y) {
 		if (Math.abs(x - lastTapX) > SNAP_DIST
 				|| Math.abs(y - lastTapY) > SNAP_DIST) {
-			handler.removeCallbacks(longPressed);
+			releaseLongPress();
 			lastDownTime = Long.MAX_VALUE;
 		}
 	}
@@ -89,7 +114,7 @@ public abstract class ClickableView extends TouchableView {
 				singleTap(id, x, y);
 			}
 		}
-		handler.removeCallbacks(longPressed);
+		releaseLongPress();
 		lastDownTime = Long.MAX_VALUE;
 	}
 }

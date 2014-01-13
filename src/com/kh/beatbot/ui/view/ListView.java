@@ -84,7 +84,7 @@ public class ListView extends TouchableView implements OnPressListener {
 		updateYOffset(y);
 		layoutChildren();
 		if (selectedButton != null && selectedButton.isPressed()
-				&& Math.abs(y - yAnchor) > LABEL_HEIGHT / 2) {
+				&& Math.abs(y - yAnchor) > LABEL_HEIGHT) {
 			// scrolling, release the pressed button
 			selectedButton.release();
 			selectedButton.setBgIcon(null);

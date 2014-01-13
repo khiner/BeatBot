@@ -63,8 +63,13 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 		trackPage.update();
 	}
 
+	public void updateBrowsePage() {
+		browsePage.update();
+	}
+
 	public void updateAll() {
 		update();
+		updateBrowsePage();
 		updateLevelsFXPage();
 		editPage.update();
 		adsrPage.update();

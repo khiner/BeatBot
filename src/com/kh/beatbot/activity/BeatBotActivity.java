@@ -1,5 +1,7 @@
 package com.kh.beatbot.activity;
 
+import java.io.File;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -87,7 +89,7 @@ public class BeatBotActivity extends Activity {
 		((GLSurfaceViewGroup) View.root).setBBRenderer(activityPager);
 
 		activityPager.addListener(new ViewListener() {
-			
+
 			@Override
 			public void onGlReady(View view) {
 				IconResources.init();
@@ -96,7 +98,7 @@ public class BeatBotActivity extends Activity {
 
 				arm();
 			}
-			
+
 			@Override
 			public void onInitialize(View view) {
 				setupProject();
@@ -151,7 +153,7 @@ public class BeatBotActivity extends Activity {
 			bpmInput.setText(String.valueOf((int) MidiManager.getBPM()));
 			break;
 		case SAMPLE_NAME_EDIT_DIALOG_ID:
-			sampleNameInput.setText(TrackManager.currTrack.getCurrSampleName());
+			sampleNameInput.setText(fileToEdit.getName());
 			break;
 		case MIDI_FILE_NAME_EDIT_DIALOG_ID:
 
@@ -207,9 +209,8 @@ public class BeatBotActivity extends Activity {
 										int which) {
 									String sampleName = sampleNameInput
 											.getText().toString();
-									new SampleRenameEvent(
-											TrackManager.currTrack, sampleName)
-											.execute();
+									new SampleRenameEvent(fileToEdit,
+											sampleName).execute();
 								}
 							})
 					.setNegativeButton("Cancel",
@@ -273,6 +274,13 @@ public class BeatBotActivity extends Activity {
 			return true;
 		}
 		return super.onKeyUp(keyCode, event);
+	}
+
+	private File fileToEdit;
+
+	public void editFileName(File file) {
+		fileToEdit = file;
+		showDialog(SAMPLE_NAME_EDIT_DIALOG_ID);
 	}
 
 	/*

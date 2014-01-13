@@ -1,14 +1,16 @@
 package com.kh.beatbot.ui.view.control;
 
+import com.kh.beatbot.listener.OnLongPressListener;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
-import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.ClickableView;
 
-public abstract class Button extends TouchableView {
+public abstract class Button extends ClickableView {
 	private OnPressListener pressListener;
 	private OnReleaseListener releaseListener;
-	
+	private OnLongPressListener longPressListener;
+
 	protected boolean enabled = true, pressed = false;
 
 	public Button() {
@@ -22,40 +24,46 @@ public abstract class Button extends TouchableView {
 	public final OnPressListener getOnPressListener() {
 		return pressListener;
 	}
-	
+
 	public final OnReleaseListener getOnReleaseListener() {
 		return releaseListener;
 	}
-	
+
 	public final void setOnPressListener(OnPressListener pressListener) {
 		this.pressListener = pressListener;
 	}
-	
+
 	public final void setOnReleaseListener(OnReleaseListener releaseListener) {
 		this.releaseListener = releaseListener;
 	}
-	
+
+	public final void setOnLongPressListener(
+			OnLongPressListener longPressListener) {
+		this.longPressListener = longPressListener;
+	}
+
 	public void press() {
 		pressed = true;
-		notifyPressed(); // always notify press events 
+		notifyPressed(); // always notify press events
 	}
 
 	public void release() {
+		releaseLongPress();
 		pressed = false;
 	}
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-	
+
 	public boolean isEnabled() {
 		return enabled;
 	}
-	
+
 	public boolean isPressed() {
 		return pressed;
 	}
-	
+
 	/*
 	 * Trigger a touch event (calls the onReleaseListener())
 	 */
@@ -63,13 +71,13 @@ public abstract class Button extends TouchableView {
 		release();
 		notifyReleased();
 	}
-	
+
 	protected void notifyPressed() {
 		if (pressListener != null) {
 			pressListener.onPress(this);
 		}
 	}
-	
+
 	protected void notifyReleased() {
 		if (releaseListener != null) {
 			releaseListener.onRelease(this);
@@ -78,6 +86,7 @@ public abstract class Button extends TouchableView {
 
 	@Override
 	public void handleActionDown(int id, float x, float y) {
+		super.handleActionDown(id, x, y);
 		if (!enabled) {
 			return;
 		}
@@ -90,13 +99,18 @@ public abstract class Button extends TouchableView {
 			return;
 		}
 		if (pressed) {
+			if (isLongPressing() || longPressListener == null) {
+				// only release if long press hasn't happened yet
+				notifyReleased();
+			}
 			release();
-			notifyReleased();
 		}
+		super.handleActionUp(id, x, y);
 	}
 
 	@Override
 	public void handleActionMove(int id, float x, float y) {
+		super.handleActionMove(id, x, y);
 		if (!enabled) {
 			return;
 		}
@@ -109,6 +123,21 @@ public abstract class Button extends TouchableView {
 			if (!pressed) { // pointer was dragged away and back IN to button
 				press();
 			}
+		}
+	}
+
+	/****************** Clickable Methods ********************/
+	protected void singleTap(int id, float x, float y) {
+		// noop
+	}
+
+	protected void doubleTap(int id, float x, float y) {
+		// noop
+	}
+
+	protected void longPress(int id, float x, float y) {
+		if (longPressListener != null) {
+			longPressListener.onLongPress(this);
 		}
 	}
 }

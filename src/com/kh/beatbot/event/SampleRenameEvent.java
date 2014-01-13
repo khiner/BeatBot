@@ -1,16 +1,19 @@
 package com.kh.beatbot.event;
 
+import java.io.File;
+
 import com.kh.beatbot.Track;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.view.View;
 
 public class SampleRenameEvent implements Executable, Stateful {
 
 	private String originalSampleName, newSampleName;
-	private Track track;
+	private File file;
 
-	public SampleRenameEvent(Track track, String sampleName) {
-		this.track = track;
-		originalSampleName = track.getCurrSampleName();
+	public SampleRenameEvent(File file, String sampleName) {
+		this.file = file;
+		originalSampleName = file.getName();
 		newSampleName = sampleName;
 	}
 
@@ -29,6 +32,7 @@ public class SampleRenameEvent implements Executable, Stateful {
 	@Override
 	public void updateUi() {
 		View.mainPage.pageSelectGroup.update();
+		View.mainPage.pageSelectGroup.updateBrowsePage();
 	}
 
 	@Override
@@ -40,11 +44,19 @@ public class SampleRenameEvent implements Executable, Stateful {
 	}
 
 	private boolean doExecute(String sampleName) {
-		if (track == null || sampleName == null || sampleName.isEmpty()
+		if (file == null || sampleName == null || sampleName.isEmpty()
 				|| newSampleName.equals(originalSampleName)) {
 			return false;
 		}
-		track.setCurrSampleName(sampleName);
+
+		File newFile = new File(file.getParent() + "/" + sampleName);
+		file.renameTo(newFile);
+		for (Track track : TrackManager.getTracks()) {
+			if (track.getCurrSampleFile().equals(file)) {
+				track.updateSampleFile(newFile);
+			}
+		}
+		file = newFile;
 		return true;
 	}
 }

@@ -5,11 +5,11 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kh.beatbot.ui.view.menu.FileMenuItem;
+import com.kh.beatbot.listener.FileMenuItemListener;
+import com.kh.beatbot.listener.MenuItemListener;
 import com.kh.beatbot.ui.view.menu.MenuItem;
-import com.kh.beatbot.ui.view.menu.MenuItemListener;
 
-public abstract class Menu extends TouchableView implements MenuItemListener, FileFilter {
+public abstract class Menu extends TouchableView implements MenuItemListener, FileMenuItemListener, FileFilter {
 	protected List<ListView> menuLists;
 	protected List<MenuItem> topLevelItems;
 	protected float columnWidth = 0;
@@ -19,8 +19,6 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 	protected abstract void createMenuItems();
 
 	protected abstract float getWidthForLevel(int level);
-
-	public abstract void fileItemReleased(FileMenuItem fileItem);
 
 	public List<MenuItem> getTopLevelItems() {
 		return topLevelItems;

@@ -1,4 +1,6 @@
-package com.kh.beatbot.ui.view.menu;
+package com.kh.beatbot.listener;
+
+import com.kh.beatbot.ui.view.menu.MenuItem;
 
 public interface MenuItemListener {
 	public void onMenuItemPressed(MenuItem menuItem);

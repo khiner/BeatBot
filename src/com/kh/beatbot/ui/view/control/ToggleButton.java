@@ -18,13 +18,19 @@ public class ToggleButton extends ImageButton {
 		this.oscillating = oscillating;
 	}
 
-	public void setIcon(Icon newIconSource) {
-		super.setIcon(newIconSource);
+	public void setIcon(Icon icon) {
+		super.setIcon(icon);
+		refreshIcons();
+	}
+
+	public void setBgIcon(Icon icon) {
+		super.setBgIcon(icon);
 		refreshIcons();
 	}
 
 	public void release() {
 		pressed = false;
+		releaseLongPress();
 		refreshIcons();
 	}
 

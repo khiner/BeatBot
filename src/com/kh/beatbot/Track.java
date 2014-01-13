@@ -211,14 +211,14 @@ public class Track extends BaseTrack {
 		return currSampleFile == null ? "" : currSampleFile.getName();
 	}
 
-	public void setCurrSampleName(String name) {
-		File newFile = new File(currSampleFile.getParent() + name);
-		currSampleFile.renameTo(newFile);
-		currSampleFile = newFile;
-	}
-
 	public File getCurrSampleFile() {
 		return currSampleFile;
+	}
+
+	public synchronized void updateSampleFile(File file) {
+		SampleParams params = paramsForSample.remove(currSampleFile);
+		currSampleFile = file;
+		paramsForSample.put(currSampleFile, params);
 	}
 
 	/** Wrappers around native JNI methods **/
