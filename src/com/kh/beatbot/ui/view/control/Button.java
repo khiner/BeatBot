@@ -4,9 +4,9 @@ import com.kh.beatbot.listener.OnLongPressListener;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
-import com.kh.beatbot.ui.view.ClickableView;
+import com.kh.beatbot.ui.view.LongPressableView;
 
-public abstract class Button extends ClickableView {
+public abstract class Button extends LongPressableView {
 	private OnPressListener pressListener;
 	private OnReleaseListener releaseListener;
 	private OnLongPressListener longPressListener;
@@ -126,15 +126,7 @@ public abstract class Button extends ClickableView {
 		}
 	}
 
-	/****************** Clickable Methods ********************/
-	protected void singleTap(int id, float x, float y) {
-		// noop
-	}
-
-	protected void doubleTap(int id, float x, float y) {
-		// noop
-	}
-
+	@Override
 	protected void longPress(int id, float x, float y) {
 		if (longPressListener != null) {
 			longPressListener.onLongPress(this);
