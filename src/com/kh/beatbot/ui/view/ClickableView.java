@@ -41,7 +41,7 @@ public abstract class ClickableView extends LongPressableView {
 
 	@Override
 	public void handleActionUp(int id, float x, float y) {
-		super.handleActionUp(id, x, y);
+		super.releaseLongPress();
 		long time = System.currentTimeMillis();
 		if (Math.abs(time - lastDownTime) < SINGLE_TAP_TIME) {
 			// if the second tap is not in the same location as the first tap,
