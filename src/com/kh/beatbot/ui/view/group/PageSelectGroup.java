@@ -6,47 +6,52 @@ import com.kh.beatbot.event.TrackDestroyEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.FileManager;
+import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.view.BpmView;
+import com.kh.beatbot.ui.view.TextView;
 import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.page.AdsrPage;
 import com.kh.beatbot.ui.view.page.BrowsePage;
-import com.kh.beatbot.ui.view.page.MasterPage;
+import com.kh.beatbot.ui.view.page.LevelsFXPage;
 import com.kh.beatbot.ui.view.page.NoteLevelsPage;
 import com.kh.beatbot.ui.view.page.SampleEditPage;
-import com.kh.beatbot.ui.view.page.TrackPage;
 
 public class PageSelectGroup extends TouchableView implements TrackListener {
-	public static final int BROWSE_PAGE_ID = 0, TRACK_PAGE_ID = 1,
-			EDIT_PAGE_ID = 2, ADSR_PAGE_ID = 3, MASTER_PAGE_ID = 4,
-			NOTE_LEVELS_PAGE_ID = 5;
+	public static final int BROWSE_PAGE_ID = 0, LEVELS_FX_PAGE_ID = 1,
+			EDIT_PAGE_ID = 2, ADSR_PAGE_ID = 3, NOTE_LEVELS_PAGE_ID = 4;
 
 	public static NoteLevelsPage levelsPage;
-	public static MasterPage masterPage;
-	public static TrackPage trackPage;
+	public static LevelsFXPage levelsFxPage;
 	public static BrowsePage browsePage;
 	public static SampleEditPage editPage;
 	public static AdsrPage adsrPage;
 	public static ViewPager pager;
 
+	private static TextView bpmLabel;
+	private static BpmView bpmView;
+
+	public static ToggleButton masterButton;
 	private static ImageButton addTrackButton, deleteTrackButton;
-	private static ToggleButton[] pageButtons = new ToggleButton[6];
+	private static ToggleButton[] pageButtons = new ToggleButton[5];
+
+	public void setBPM(float bpm) {
+		bpmView.setBPM(bpm);
+	}
 
 	public void selectPage(int pageNum) {
 		if (pageNum >= 0 && pageNum < pageButtons.length) {
 			pageButtons[pageNum].trigger(false);
 		}
-	}
-
-	public MasterPage getMasterPage() {
-		return masterPage;
 	}
 
 	public synchronized void update() {
@@ -59,8 +64,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	}
 
 	public void updateLevelsFXPage() {
-		masterPage.update();
-		trackPage.update();
+		levelsFxPage.update();
 	}
 
 	public void updateBrowsePage() {
@@ -80,6 +84,17 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	protected synchronized void createChildren() {
 		addTrackButton = new ImageButton(shapeGroup);
 		deleteTrackButton = new ImageButton(shapeGroup);
+		masterButton = new ToggleButton(shapeGroup, false);
+
+		masterButton.setOnReleaseListener(new OnReleaseListener() {
+			@Override
+			public void onRelease(Button button) {
+				levelsFxPage.setMasterMode(true);
+				TrackManager.currTrack.getButtonRow().instrumentButton.setChecked(false);
+				updateAll();
+			}
+		});
+
 		for (int i = 0; i < pageButtons.length; i++) {
 			pageButtons[i] = new ToggleButton(shapeGroup, false);
 		}
@@ -114,36 +129,43 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 			});
 		}
 
-		trackPage = new TrackPage();
+		levelsFxPage = new LevelsFXPage();
 		browsePage = new BrowsePage();
 		editPage = new SampleEditPage();
 		adsrPage = new AdsrPage();
-		masterPage = new MasterPage();
 		levelsPage = new NoteLevelsPage();
 
-		masterPage.setMasterMode(true);
-		trackPage.setMasterMode(false);
+		levelsFxPage.setMasterMode(false);
 
 		pager = new ViewPager();
-		pager.addPages(browsePage, trackPage, editPage, adsrPage, masterPage,
-				levelsPage);
+		pager.addPages(browsePage, levelsFxPage, editPage, adsrPage, levelsPage);
 
-		pageButtons[TRACK_PAGE_ID].setText("Track");
+		masterButton.setText("Master");
+		pageButtons[LEVELS_FX_PAGE_ID].setText("FX");
 		pageButtons[ADSR_PAGE_ID].setText("ADSR");
-		pageButtons[MASTER_PAGE_ID].setText("Master");
 
-		addChildren(addTrackButton, deleteTrackButton, pager);
+		bpmLabel = new TextView(shapeGroup);
+		bpmView = new BpmView(shapeGroup);
+		bpmLabel.setText("BPM");
+
+		addChildren(masterButton, addTrackButton, deleteTrackButton, pager,
+				bpmView, bpmLabel);
 		addChildren(pageButtons);
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
-		float labelWidth = (width - 4 * LABEL_HEIGHT) / 4;
 		float labelYOffset = 2;
-		addTrackButton
-				.layout(this, 0, labelYOffset, LABEL_HEIGHT, LABEL_HEIGHT);
 
-		float x = addTrackButton.width;
+		masterButton.layout(this, 0, labelYOffset,
+				View.mainPage.getTrackControlWidth(), LABEL_HEIGHT);
+
+		addTrackButton.layout(this, masterButton.width, labelYOffset,
+				LABEL_HEIGHT, LABEL_HEIGHT);
+
+		float labelWidth = (width - 4 * LABEL_HEIGHT - masterButton.width) / 4;
+
+		float x = masterButton.width + addTrackButton.width;
 		for (int i = 0; i < pageButtons.length; i++) {
 			float w = pageButtons[i].getText().isEmpty() && i != BROWSE_PAGE_ID ? LABEL_HEIGHT
 					: labelWidth;
@@ -152,6 +174,11 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 		}
 		pager.layout(this, 0, LABEL_HEIGHT + 2 * labelYOffset, width, height
 				- LABEL_HEIGHT - 2 * labelYOffset);
+
+		bpmLabel.layout(this, width - 5 * LABEL_HEIGHT, labelYOffset,
+				2 * LABEL_HEIGHT, LABEL_HEIGHT);
+		bpmView.layout(this, width - 3 * LABEL_HEIGHT, labelYOffset,
+				2 * LABEL_HEIGHT, LABEL_HEIGHT);
 
 		deleteTrackButton.layout(this, width - LABEL_HEIGHT, labelYOffset,
 				LABEL_HEIGHT, LABEL_HEIGHT);
@@ -162,7 +189,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 		addTrackButton.setIcon(new Icon(IconResources.ADD));
 		addTrackButton.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.labelFillColorSet, Colors.labelStrokeColorSet));
-
+		masterButton.setBgIcon(new RoundedRectIcon(shapeGroup,
+				Colors.labelFillColorSet, Colors.labelStrokeColorSet));
 		deleteTrackButton.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.deleteFillColorSet, Colors.deleteStrokeColorSet));
 		deleteTrackButton.setIcon(new Icon(IconResources.DELETE_TRACK));
@@ -174,6 +202,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 			pageButtons[i].setBgIcon(new RoundedRectIcon(shapeGroup,
 					Colors.labelFillColorSet, Colors.labelStrokeColorSet));
 		}
+
+		setBPM(MidiManager.getBPM());
 	}
 
 	private void updateInstrumentIcon() {
@@ -205,6 +235,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 
 	@Override
 	public void onSelect(Track track) {
+		masterButton.setChecked(false);
+		levelsFxPage.setMasterMode(false);
 		updateAll();
 	}
 

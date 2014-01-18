@@ -182,7 +182,6 @@ public class BeatBotActivity extends Activity {
 											.toString();
 									if (!bpmString.isEmpty()) {
 										View.mainPage.pageSelectGroup
-												.getMasterPage()
 												.setBPM(Integer
 														.valueOf(bpmString));
 									}

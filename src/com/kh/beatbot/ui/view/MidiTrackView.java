@@ -55,8 +55,7 @@ public class MidiTrackView extends TouchableView implements TrackListener, Scrol
 		if (solo) {
 			// if this track is soloing, set all other solo icons to
 			// inactive.
-			for (int i = 0; i < TrackManager.getNumTracks(); i++) {
-				Track otherTrack = TrackManager.getTrack(i);
+			for (Track otherTrack : TrackManager.getTracks()) {
 				if (!track.equals(otherTrack)) {
 					otherTrack.getButtonRow().soloButton.setChecked(false);
 				}

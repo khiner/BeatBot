@@ -33,6 +33,10 @@ public class MainPage extends TouchableView {
 	private float trackControlWidth = 0, controlButtonHeight = 0,
 			menuOffset = 0;
 
+	public float getTrackControlWidth() {
+		return trackControlWidth;
+	}
+
 	public void notifyMenuExpanded() {
 		menuButton.snap(1);
 	}
