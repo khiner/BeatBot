@@ -12,7 +12,8 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.page.AdsrPage;
 import com.kh.beatbot.ui.view.page.BrowsePage;
-import com.kh.beatbot.ui.view.page.LevelsFXPage;
+import com.kh.beatbot.ui.view.page.EffectsPage;
+import com.kh.beatbot.ui.view.page.LevelsPage;
 import com.kh.beatbot.ui.view.page.NoteLevelsPage;
 import com.kh.beatbot.ui.view.page.SampleEditPage;
 
@@ -21,7 +22,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	private static final String TRACK_PAGE_ID = "track";
 
 	public static NoteLevelsPage noteLevelsPage;
-	public static LevelsFXPage levelsFxPage;
+	public static LevelsPage levelsPage;
+	public static EffectsPage effectsPage;
 	public static BrowsePage browsePage;
 	public static SampleEditPage editPage;
 	public static AdsrPage adsrPage;
@@ -44,7 +46,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	}
 
 	public void updateLevelsFXPage() {
-		levelsFxPage.update();
+		levelsPage.update();
+		effectsPage.update();
 	}
 
 	public void updateBrowsePage() {
@@ -76,7 +79,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 			@Override
 			public void onRelease(Button button) {
 				buttonRowPager.setPage(button);
-				levelsFxPage.setMasterMode(true);
+				levelsPage.setMasterMode(true);
+				effectsPage.setMasterMode(true);
 				TrackManager.currTrack.getButtonRow().instrumentButton
 						.setChecked(false);
 				updateAll();
@@ -85,13 +89,12 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 
 		masterButton.setText("Master");
 
-		levelsFxPage = new LevelsFXPage();
+		levelsPage = new LevelsPage();
+		effectsPage = new EffectsPage();
 		browsePage = new BrowsePage();
 		editPage = new SampleEditPage();
 		adsrPage = new AdsrPage();
 		noteLevelsPage = new NoteLevelsPage();
-
-		levelsFxPage.setMasterMode(false);
 
 		pager = new ViewPager();
 		buttonRowPager = new ViewPager();
@@ -103,12 +106,14 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 		buttonRowPager.addPage(TRACK_PAGE_ID, trackButtonRow);
 
 		pager.addPage(trackButtonRow.getBrowseButton(), browsePage);
-		pager.addPage(trackButtonRow.getLevelsFxButton(), levelsFxPage);
+		pager.addPage(trackButtonRow.getLevelsButton(), levelsPage);
+		pager.addPage(trackButtonRow.getEffectsButton(), effectsPage);
 		pager.addPage(trackButtonRow.getEditButton(), editPage);
 		pager.addPage(trackButtonRow.getAdsrButton(), adsrPage);
 		pager.addPage(trackButtonRow.getNoteLevelsButton(), noteLevelsPage);
 
-		pager.addPage(masterButtonRow.getLevelsFxButton(), levelsFxPage);
+		pager.addPage(masterButtonRow.getLevelsButton(), levelsPage);
+		pager.addPage(masterButtonRow.getEffectsButton(), effectsPage);
 
 		addChildren(masterButton, pager, buttonRowPager);
 	}
@@ -144,7 +149,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	public void onSelect(Track track) {
 		buttonRowPager.setPage(TRACK_PAGE_ID);
 		masterButton.setChecked(false);
-		levelsFxPage.setMasterMode(false);
+		levelsPage.setMasterMode(false);
+		effectsPage.setMasterMode(false);
 		updateAll();
 	}
 

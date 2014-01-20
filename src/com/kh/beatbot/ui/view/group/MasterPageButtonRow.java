@@ -8,7 +8,7 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class MasterPageButtonRow extends PageButtonRow {
 
-	private static final int LEVELS_FX_PAGE_ID = 0;
+	private static final int LEVELS_PAGE_ID = 0, EFFECTS_PAGE_ID = 1;
 
 	private TextView bpmLabel;
 	private BpmView bpmView;
@@ -21,8 +21,12 @@ public class MasterPageButtonRow extends PageButtonRow {
 		bpmView.setBPM(bpm);
 	}
 
-	public ToggleButton getLevelsFxButton() {
-		return pageButtons[LEVELS_FX_PAGE_ID];
+	public ToggleButton getLevelsButton() {
+		return pageButtons[LEVELS_PAGE_ID];
+	}
+	
+	public ToggleButton getEffectsButton() {
+		return pageButtons[EFFECTS_PAGE_ID];
 	}
 
 	@Override
@@ -51,13 +55,15 @@ public class MasterPageButtonRow extends PageButtonRow {
 	protected synchronized void initIcons() {
 		super.initIcons();
 
-		pageButtons[LEVELS_FX_PAGE_ID].setText("FX");
+		getLevelsButton().setText("Levels");
+		getEffectsButton().setText("FX");
+
 		bpmLabel.setText("BPM");
 		setBPM(MidiManager.getBPM());
 	}
 
 	@Override
 	protected int getNumPages() {
-		return 1;
+		return 2;
 	}
 }

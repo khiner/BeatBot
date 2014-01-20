@@ -16,8 +16,9 @@ import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class TrackPageButtonRow extends PageButtonRow {
-	private static final int BROWSE_PAGE_ID = 0, LEVELS_FX_PAGE_ID = 1,
-			EDIT_PAGE_ID = 2, ADSR_PAGE_ID = 3, NOTE_LEVELS_PAGE_ID = 4;
+	private static final int BROWSE_PAGE_ID = 0, LEVELS_PAGE_ID = 1,
+			EFFECTS_PAGE_ID = 2, EDIT_PAGE_ID = 3, ADSR_PAGE_ID = 4,
+			NOTE_LEVELS_PAGE_ID = 5;
 
 	private ImageButton addTrackButton, deleteTrackButton;
 
@@ -29,8 +30,12 @@ public class TrackPageButtonRow extends PageButtonRow {
 		return pageButtons[BROWSE_PAGE_ID];
 	}
 
-	public ToggleButton getLevelsFxButton() {
-		return pageButtons[LEVELS_FX_PAGE_ID];
+	public ToggleButton getLevelsButton() {
+		return pageButtons[LEVELS_PAGE_ID];
+	}
+
+	public ToggleButton getEffectsButton() {
+		return pageButtons[EFFECTS_PAGE_ID];
 	}
 
 	public ToggleButton getEditButton() {
@@ -114,16 +119,16 @@ public class TrackPageButtonRow extends PageButtonRow {
 				Colors.deleteFillColorSet, Colors.deleteStrokeColorSet));
 		deleteTrackButton.setIcon(new Icon(IconResources.DELETE_TRACK));
 
-		pageButtons[EDIT_PAGE_ID].setIcon(new Icon(IconResources.SAMPLE));
-		pageButtons[NOTE_LEVELS_PAGE_ID]
-				.setIcon(new Icon(IconResources.LEVELS));
+		getEditButton().setIcon(new Icon(IconResources.SAMPLE));
+		getNoteLevelsButton().setIcon(new Icon(IconResources.LEVELS));
 
-		pageButtons[LEVELS_FX_PAGE_ID].setText("FX");
-		pageButtons[ADSR_PAGE_ID].setText("ADSR");
+		getLevelsButton().setText("Levels");
+		getEffectsButton().setText("FX");
+		getAdsrButton().setText("ADSR");
 	}
 
 	@Override
 	protected int getNumPages() {
-		return 5;
+		return 6;
 	}
 }
