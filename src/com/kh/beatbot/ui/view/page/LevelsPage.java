@@ -1,26 +1,27 @@
 package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.BaseTrack;
-import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.listener.ControlViewListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.RoundedRectIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.TouchableView;
-import com.kh.beatbot.ui.view.control.Button;
+import com.kh.beatbot.ui.view.control.ControlViewBase;
+import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.Seekbar;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
-public class LevelsPage extends TouchableView {
+public class LevelsPage extends TouchableView implements ControlViewListener {
 	// levels attrs
-	protected Seekbar levelBar;
-	protected ToggleButton volumeToggle, panToggle, pitchToggle;
+	protected Seekbar volumeLevelBar, panLevelBar, pitchLevelBar;
+	protected ImageButton volumeButton, panButton, pitchButton;
 	protected boolean masterMode = false;
 
 	@Override
 	public synchronized void update() {
-		updateLevels();
+		volumeLevelBar.setParam(getCurrTrack().getVolumeParam());
+		panLevelBar.setParam(getCurrTrack().getPanParam());
+		pitchLevelBar.setParam(getCurrTrack().getPitchParam());
 	}
 
 	public void setMasterMode(boolean masterMode) {
@@ -31,105 +32,80 @@ public class LevelsPage extends TouchableView {
 		return masterMode ? TrackManager.masterTrack : TrackManager.currTrack;
 	}
 
-	private void updateLevels() {
-		Param currParam = getCurrTrack().getCurrentLevelParam();
-		levelBar.setParam(currParam);
-		levelBar.setLevelColor(getLevelColor(currParam),
-				getLevelColorTrans(currParam));
-		deselectAll();
-		selectLevel(currParam);
-	}
-
-	private void deselectAll() {
-		volumeToggle.setChecked(false);
-		panToggle.setChecked(false);
-		pitchToggle.setChecked(false);
-	}
-
-	private void selectLevel(Param currParam) {
-		if (currParam.equals(getCurrTrack().volumeParam)) {
-			volumeToggle.setChecked(true);
-		} else if (currParam.equals(getCurrTrack().panParam)) {
-			panToggle.setChecked(true);
-		} else if (currParam.equals(getCurrTrack().pitchParam)) {
-			pitchToggle.setChecked(true);
-		}
-	}
-
-	private float[] getLevelColor(Param currParam) {
-		if (currParam.equals(getCurrTrack().volumeParam)) {
-			return Colors.VOLUME;
-		} else if (currParam.equals(getCurrTrack().panParam)) {
-			return Colors.PAN;
-		} else if (currParam.equals(getCurrTrack().pitchParam)) {
-			return Colors.PITCH;
-		}
-		return Colors.VOLUME;
-	}
-
-	private float[] getLevelColorTrans(Param currParam) {
-		if (currParam.equals(getCurrTrack().volumeParam)) {
-			return Colors.VOLUME_TRANS;
-		} else if (currParam.equals(getCurrTrack().panParam)) {
-			return Colors.PAN_TRANS;
-		} else if (currParam.equals(getCurrTrack().pitchParam)) {
-			return Colors.PITCH_TRANS;
-		}
-		return Colors.VOLUME_TRANS;
-	}
-
 	@Override
 	protected synchronized void initIcons() {
-		volumeToggle.setText("Vol");
-		panToggle.setText("Pan");
-		pitchToggle.setText("Pit");
-		volumeToggle.setBgIcon(new RoundedRectIcon(shapeGroup,
+		volumeButton.setText("Vol");
+		panButton.setText("Pan");
+		pitchButton.setText("Pit");
+		volumeButton.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.volumeFillColorSet, Colors.volumeStrokeColorSet));
-		panToggle.setBgIcon(new RoundedRectIcon(shapeGroup,
+		panButton.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.panFillColorSet, Colors.panStrokeColorSet));
-		pitchToggle.setBgIcon(new RoundedRectIcon(shapeGroup,
+		pitchButton.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.pitchFillColorSet, Colors.pitchStrokeColorSet));
+		
+		volumeButton.setEnabled(false);
+		panButton.setEnabled(false);
+		pitchButton.setEnabled(false);
 	}
 
 	@Override
 	protected synchronized void createChildren() {
-		levelBar = new Seekbar(shapeGroup);
-		volumeToggle = new ToggleButton(shapeGroup, false);
-		panToggle = new ToggleButton(shapeGroup, false);
-		pitchToggle = new ToggleButton(shapeGroup, false);
-		volumeToggle.setOnReleaseListener(new OnReleaseListener() {
-			public void onRelease(Button button) {
-				getCurrTrack().setLevelType(Effect.LevelType.VOLUME);
-				updateLevels();
-			}
-		});
-		panToggle.setOnReleaseListener(new OnReleaseListener() {
-			public void onRelease(Button button) {
-				getCurrTrack().setLevelType(Effect.LevelType.PAN);
-				updateLevels();
-			}
-		});
-		pitchToggle.setOnReleaseListener(new OnReleaseListener() {
-			public void onRelease(Button button) {
-				getCurrTrack().setLevelType(Effect.LevelType.PITCH);
-				updateLevels();
-			}
-		});
-		addChildren(levelBar, volumeToggle, panToggle, pitchToggle);
+		volumeButton = new ToggleButton(shapeGroup, false);
+		panButton = new ToggleButton(shapeGroup, false);
+		pitchButton = new ToggleButton(shapeGroup, false);
+
+		volumeLevelBar = new Seekbar(shapeGroup);
+		panLevelBar = new Seekbar(shapeGroup);
+		pitchLevelBar = new Seekbar(shapeGroup);
+
+		volumeLevelBar.setLevelColor(Colors.VOLUME, Colors.VOLUME_TRANS);
+		panLevelBar.setLevelColor(Colors.PAN, Colors.PAN_TRANS);
+		pitchLevelBar.setLevelColor(Colors.PITCH, Colors.PITCH_TRANS);
+
+		volumeLevelBar.setListener(this);
+		panLevelBar.setListener(this);
+		pitchLevelBar.setListener(this);
+
+		addChildren(volumeButton, panButton, pitchButton, volumeLevelBar,
+				panLevelBar, pitchLevelBar);
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
-		float thirdHeight = height / 3;
-		float topRowY = height / 12;
 
-		volumeToggle.layout(this, 0, topRowY, 2 * thirdHeight, thirdHeight);
-		panToggle.layout(this, 2 * thirdHeight, topRowY, 2 * thirdHeight,
-				thirdHeight);
-		pitchToggle.layout(this, 4 * thirdHeight, topRowY, 2 * thirdHeight,
-				thirdHeight);
+		float toggleHeight = height / 3;
+		float toggleWidth = 2 * toggleHeight;
+		volumeButton.layout(this, 0, 0, toggleWidth, toggleHeight);
+		panButton.layout(this, 0, toggleHeight, toggleWidth, toggleHeight);
+		pitchButton
+				.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
 
-		float levelX = 6 * thirdHeight;
-		levelBar.layout(this, levelX, topRowY, width - levelX, thirdHeight);
+		volumeLevelBar.layout(this, toggleWidth, 0, width - toggleWidth,
+				toggleHeight);
+		panLevelBar.layout(this, toggleWidth, toggleHeight,
+				width - toggleWidth, toggleHeight);
+		pitchLevelBar.layout(this, toggleWidth, toggleHeight * 2, width
+				- toggleWidth, toggleHeight);
+	}
+
+	@Override
+	public void onPress(ControlViewBase control) {
+		getButton((Seekbar) control).press();
+	}
+
+	@Override
+	public void onRelease(ControlViewBase control) {
+		getButton((Seekbar) control).release();
+	}
+	
+	private ImageButton getButton(Seekbar seekbar) {
+		if (seekbar.equals(volumeLevelBar)) {
+			return volumeButton;
+		} else if (seekbar.equals(panLevelBar)) {
+			return panButton;
+		} else {
+			return pitchButton;
+		}
 	}
 }

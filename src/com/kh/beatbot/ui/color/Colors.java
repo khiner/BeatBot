@@ -101,13 +101,13 @@ public class Colors {
 
 		instrumentFillColorSet = new ColorSet(null, LABEL_SELECTED, VOLUME);
 
-		panFillColorSet = new ColorSet(null, LABEL_SELECTED, PAN);
-		pitchFillColorSet = new ColorSet(null, LABEL_SELECTED, PITCH);
-		volumeFillColorSet = new ColorSet(null, LABEL_SELECTED, VOLUME);
+		panFillColorSet = new ColorSet(null, PAN, PAN);
+		pitchFillColorSet = new ColorSet(null, PITCH, PITCH);
+		volumeFillColorSet = new ColorSet(null, VOLUME, VOLUME);
 
-		panStrokeColorSet = new ColorSet(PAN, PAN, BLACK);
-		pitchStrokeColorSet = new ColorSet(PITCH, PITCH, BLACK);
-		volumeStrokeColorSet = new ColorSet(VOLUME, VOLUME, BLACK);
+		panStrokeColorSet = new ColorSet(PAN, BLACK, BLACK, PAN);
+		pitchStrokeColorSet = new ColorSet(PITCH, BLACK, BLACK, PITCH);
+		volumeStrokeColorSet = new ColorSet(VOLUME, BLACK, BLACK, VOLUME);
 
 		iconFillColorSet = new ColorSet(null, LABEL_SELECTED);
 

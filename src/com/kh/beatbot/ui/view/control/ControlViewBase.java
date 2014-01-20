@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.view.control;
 
+import com.kh.beatbot.listener.ControlViewListener;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.TouchableView;
@@ -14,8 +15,14 @@ public abstract class ControlViewBase extends TouchableView {
 
 	protected boolean selected = false;
 
+	protected ControlViewListener listener;
+
 	public ControlViewBase() {
 		super();
+	}
+
+	public void setListener(ControlViewListener listener) {
+		this.listener = listener;
 	}
 
 	public ControlViewBase(ShapeGroup shapeGroup) {
@@ -31,11 +38,17 @@ public abstract class ControlViewBase extends TouchableView {
 	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
 		selected = true;
+		if (listener != null) {
+			listener.onPress(this);
+		}
 	}
 
 	@Override
 	public void handleActionUp(int id, float x, float y) {
 		super.handleActionUp(id, x, y);
 		selected = false;
+		if (listener != null) {
+			listener.onRelease(this);
+		}
 	}
 }

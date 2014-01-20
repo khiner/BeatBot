@@ -11,7 +11,7 @@ import com.kh.beatbot.listener.ParamListener;
 public class BaseTrack {
 	protected int id;
 	protected List<Effect> effects = new ArrayList<Effect>();
-	public Param volumeParam, panParam, pitchParam, currLevelParam;
+	public Param volumeParam, panParam, pitchParam;
 
 	public BaseTrack(final int id) {
 		this.id = id;
@@ -84,19 +84,16 @@ public class BaseTrack {
 		return null;
 	}
 
-	public Param getCurrentLevelParam() {
-		if (currLevelParam == null) {
-			setLevelType(Effect.LevelType.VOLUME);
-		}
-		return currLevelParam;
+	public Param getVolumeParam() {
+		return volumeParam;
 	}
-
-	public void setLevelType(Effect.LevelType levelType) {
-		switch(levelType) {
-		case VOLUME: currLevelParam = volumeParam; break;
-		case PAN: currLevelParam = panParam; break;
-		case PITCH: currLevelParam = pitchParam; break;
-		}
+	
+	public Param getPanParam() {
+		return panParam;
+	}
+	
+	public Param getPitchParam() {
+		return pitchParam;
 	}
 
 	public static native void setTrackVolume(int trackId, float volume);

@@ -12,71 +12,72 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 public class NoteLevelsPage extends TouchableView {
 
 	private LevelsView levelsView;
-	private ToggleButton volumeToggle, panToggle, pitchToggle;
-	
+	private ToggleButton volumeButton, panButton, pitchButton;
+
 	@Override
 	public synchronized void update() {
-		shouldClip = false;
 		deselectAll();
-		selectActiveLevel();
+		getActiveLevelButton().setChecked(true);
 	}
 
 	private void deselectAll() {
-		volumeToggle.setChecked(false);
-		panToggle.setChecked(false);
-		pitchToggle.setChecked(false);
+		volumeButton.setChecked(false);
+		panButton.setChecked(false);
+		pitchButton.setChecked(false);
 	}
 
-	private void selectActiveLevel() {
+	private ToggleButton getActiveLevelButton() {
 		switch (levelsView.getLevelType()) {
 		case VOLUME:
-			volumeToggle.setChecked(true);
-			return;
+			return volumeButton;
 		case PAN:
-			panToggle.setChecked(true);
-			return;
+			return panButton;
 		case PITCH:
-			pitchToggle.setChecked(true);
-			return;
+			return pitchButton;
+		default:
+			return volumeButton;
 		}
 	}
 
 	@Override
 	protected synchronized void initIcons() {
-		volumeToggle.setText("Vol");
-		panToggle.setText("Pan");
-		pitchToggle.setText("Pit");
-		volumeToggle.setBgIcon(new RoundedRectIcon(shapeGroup, Colors.volumeFillColorSet, Colors.volumeStrokeColorSet));
-		panToggle.setBgIcon(new RoundedRectIcon(shapeGroup, Colors.panFillColorSet, Colors.panStrokeColorSet));
-		pitchToggle.setBgIcon(new RoundedRectIcon(shapeGroup, Colors.pitchFillColorSet, Colors.pitchStrokeColorSet));
+		volumeButton.setText("Vol");
+		panButton.setText("Pan");
+		pitchButton.setText("Pit");
+		volumeButton.setBgIcon(new RoundedRectIcon(shapeGroup,
+				Colors.volumeFillColorSet, Colors.volumeStrokeColorSet));
+		panButton.setBgIcon(new RoundedRectIcon(shapeGroup,
+				Colors.panFillColorSet, Colors.panStrokeColorSet));
+		pitchButton.setBgIcon(new RoundedRectIcon(shapeGroup,
+				Colors.pitchFillColorSet, Colors.pitchStrokeColorSet));
 	}
 
 	@Override
 	protected synchronized void createChildren() {
 		levelsView = new LevelsView(shapeGroup);
-		volumeToggle = new ToggleButton(shapeGroup, false);
-		panToggle = new ToggleButton(shapeGroup, false);
-		pitchToggle = new ToggleButton(shapeGroup, false);
-		
-		volumeToggle.setOnReleaseListener(new OnReleaseListener() {
+		volumeButton = new ToggleButton(shapeGroup, false);
+		panButton = new ToggleButton(shapeGroup, false);
+		pitchButton = new ToggleButton(shapeGroup, false);
+
+		volumeButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
 				levelsView.setLevelType(LevelType.VOLUME);
 				update();
 			}
 		});
-		panToggle.setOnReleaseListener(new OnReleaseListener() {
+		panButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
 				levelsView.setLevelType(LevelType.PAN);
 				update();
 			}
 		});
-		pitchToggle.setOnReleaseListener(new OnReleaseListener() {
+		pitchButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
 				levelsView.setLevelType(LevelType.PITCH);
 				update();
 			}
 		});
-		addChildren(levelsView, volumeToggle, panToggle, pitchToggle);
+		addChildren(levelsView, volumeButton, panButton, pitchButton);
 	}
 
 	@Override
@@ -84,9 +85,10 @@ public class NoteLevelsPage extends TouchableView {
 		float toggleHeight = height / 3;
 		float toggleWidth = 2 * toggleHeight;
 		float viewW = toggleWidth + 5;
-		volumeToggle.layout(this, 0, 0, toggleWidth, toggleHeight);
-		panToggle.layout(this, 0, toggleHeight, toggleWidth, toggleHeight);
-		pitchToggle.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
+		volumeButton.layout(this, 0, 0, toggleWidth, toggleHeight);
+		panButton.layout(this, 0, toggleHeight, toggleWidth, toggleHeight);
+		pitchButton
+				.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
 		levelsView.layout(this, viewW, 0, width - viewW, height);
 	}
 }

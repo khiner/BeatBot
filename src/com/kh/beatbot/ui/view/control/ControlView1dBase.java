@@ -8,6 +8,7 @@ import com.kh.beatbot.ui.mesh.ShapeGroup;
 public abstract class ControlView1dBase extends ControlViewBase implements ParamListener {
 
 	protected Param param;
+
 	protected abstract float posToLevel(float x, float y);
 
 	public ControlView1dBase() {
@@ -51,5 +52,6 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 		param.setLevel(posToLevel(x, y));
 	}
 	
+	@Override
 	public abstract void onParamChanged(Param param);
 }
