@@ -54,7 +54,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	public void selectBrowsePage() {
 		trackButtonRow.getBrowseButton().trigger(true);
 	}
-	
+
 	public void selectNoteLevelsPage() {
 		trackButtonRow.getNoteLevelsButton().trigger(true);
 	}
@@ -119,8 +119,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 
 		masterButton.layout(this, 0, labelYOffset,
 				View.mainPage.getTrackControlWidth(), LABEL_HEIGHT);
-		buttonRowPager.layout(this, masterButton.width, labelYOffset,
-				width - masterButton.width, LABEL_HEIGHT);
+		buttonRowPager.layout(this, masterButton.width, labelYOffset, width
+				- masterButton.width, LABEL_HEIGHT);
 		pager.layout(this, 0, LABEL_HEIGHT + 2 * labelYOffset, width, height
 				- LABEL_HEIGHT - 2 * labelYOffset);
 	}
@@ -128,7 +128,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	@Override
 	protected synchronized void initIcons() {
 		masterButton.setBgIcon(new RoundedRectIcon(shapeGroup,
-				Colors.labelFillColorSet, Colors.labelStrokeColorSet));
+				Colors.instrumentFillColorSet, Colors.buttonRowStrokeColorSet));
 	}
 
 	@Override

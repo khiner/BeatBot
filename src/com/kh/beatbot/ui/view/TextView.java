@@ -57,11 +57,15 @@ public class TextView extends View {
 	}
 
 	protected float calcTextXOffset() {
-		return (width - textWidth) / 2;
+		return 3 * X_OFFSET + (calcNonIconWidth() - textWidth) / 2;
 	}
 
 	protected float calcTextYOffset() {
 		return (height - textHeight) / 2;
+	}
+
+	protected float calcNonIconWidth() {
+		return width - X_OFFSET * 4;
 	}
 
 	private void drawText() {
@@ -83,8 +87,8 @@ public class TextView extends View {
 
 		textHeight = height;
 		textWidth = GLSurfaceViewBase.getTextWidth(text, textHeight);
-		if (textWidth > width - X_OFFSET * 3) {
-			float scaleRatio = (width - X_OFFSET * 3) / textWidth;
+		if (textWidth > calcNonIconWidth()) {
+			float scaleRatio = calcNonIconWidth() / textWidth;
 			textWidth *= scaleRatio;
 			textHeight *= scaleRatio;
 		}
@@ -92,7 +96,7 @@ public class TextView extends View {
 	}
 
 	protected void updateTextOffset() {
-		textXOffset = calcTextXOffset() + X_OFFSET;
+		textXOffset = calcTextXOffset();
 		textYOffset = calcTextYOffset();
 	}
 }
