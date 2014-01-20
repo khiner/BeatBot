@@ -5,16 +5,16 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.activity.BeatBotActivity;
 
 
-public class Tremelo extends Effect {
+public class Tremolo extends Effect {
 
 	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.tremolo);
 	public static final int EFFECT_NUM = 6, NUM_PARAMS = 3;
 
-	public Tremelo(BaseTrack track) {
+	public Tremolo(BaseTrack track) {
 		super(track);
 	}
 	
-	public Tremelo(BaseTrack track, int position) {
+	public Tremolo(BaseTrack track, int position) {
 		super(track, position);
 	}
 

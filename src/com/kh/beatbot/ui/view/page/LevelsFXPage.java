@@ -15,7 +15,7 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.effect.Reverb;
-import com.kh.beatbot.effect.Tremelo;
+import com.kh.beatbot.effect.Tremolo;
 import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
@@ -201,8 +201,8 @@ public class LevelsFXPage extends TouchableView {
 			effect = new Filter(track, position);
 		else if (effectName.equals(Reverb.NAME))
 			effect = new Reverb(track, position);
-		else if (effectName.equals(Tremelo.NAME))
-			effect = new Tremelo(track, position);
+		else if (effectName.equals(Tremolo.NAME))
+			effect = new Tremolo(track, position);
 		getCurrTrack().addEffect(effect);
 		return effect;
 	}

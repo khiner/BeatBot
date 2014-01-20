@@ -15,8 +15,7 @@ public class MidiNotesLevelsSetEvent extends MidiNotesGroupEvent {
 	@Override
 	public void updateUi() {
 		super.updateUi();
-		View.mainPage.pageSelectGroup
-				.selectPage(PageSelectGroup.NOTE_LEVELS_PAGE_ID);
+		View.mainPage.pageSelectGroup.selectNoteLevelsPage();
 		if (track != null) {
 			track.select();
 		}

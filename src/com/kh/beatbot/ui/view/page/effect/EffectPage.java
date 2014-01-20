@@ -8,7 +8,7 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.effect.Reverb;
-import com.kh.beatbot.effect.Tremelo;
+import com.kh.beatbot.effect.Tremolo;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResources;
@@ -36,7 +36,7 @@ public class EffectPage extends TouchableView {
 	public void loadEffect(Effect effect) {
 		toggleButton.setChecked(effect.isOn());
 		toggleButton.setText(effect.getName());
-		paramsPager.setPage(effect.getNum());
+		paramsPager.setPage(effect.getName());
 		setLevel2dParams(effect.getXParam(), effect.getYParam());
 		((EffectParamsPage) paramsPager.getCurrPage()).setEffect(effect);
 	}
@@ -59,10 +59,15 @@ public class EffectPage extends TouchableView {
 		filterPage = new FilterParamsPage(new Filter(null));
 		flangerPage = new EffectParamsPage(new Flanger(null));
 		reverbPage = new EffectParamsPage(new Reverb(null));
-		tremeloPage = new EffectParamsPage(new Tremelo(null));
+		tremeloPage = new EffectParamsPage(new Tremolo(null));
 
-		paramsPager.addPages(chorusPage, decimatePage, delayPage, filterPage,
-				flangerPage, reverbPage, tremeloPage);
+		paramsPager.addPage(Chorus.NAME, chorusPage);
+		paramsPager.addPage(Decimate.NAME, decimatePage);
+		paramsPager.addPage(Delay.NAME, delayPage);
+		paramsPager.addPage(Filter.NAME, filterPage);
+		paramsPager.addPage(Flanger.NAME, flangerPage);
+		paramsPager.addPage(Reverb.NAME, reverbPage);
+		paramsPager.addPage(Tremolo.NAME, tremeloPage);
 
 		toggleButton = new ToggleButton(shapeGroup, true);
 		toggleButton.setOnReleaseListener(new OnReleaseListener() {

@@ -259,8 +259,7 @@ public class SampleEditView extends ControlView2dBase {
 		super.handleActionUp(id, x, y);
 		if (!hasSample()) {
 			if (pressed) {
-				View.mainPage.pageSelectGroup
-						.selectPage(PageSelectGroup.BROWSE_PAGE_ID);
+				View.mainPage.pageSelectGroup.selectBrowsePage();
 			}
 			release();
 			return;

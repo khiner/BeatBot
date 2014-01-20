@@ -37,7 +37,7 @@ public class BeatBotActivity extends Activity {
 	public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1,
 			SAMPLE_NAME_EDIT_DIALOG_ID = 2, MIDI_FILE_NAME_EDIT_DIALOG_ID = 3;
 
-	private static final int MAIN_PAGE_NUM = 0, EFFECT_PAGE_NUM = 1;
+	private static final String MAIN_PAGE_ID = "main", EFFECT_PAGE_ID = "effect";
 
 	private static ViewPager activityPager;
 	private static EditText bpmInput, midiFileNameInput, sampleNameInput;
@@ -83,8 +83,9 @@ public class BeatBotActivity extends Activity {
 		View.effectPage = new EffectPage();
 
 		activityPager = new ViewPager();
-		activityPager.addPages(View.mainPage, View.effectPage);
-		activityPager.setPage(0);
+		activityPager.addPage(MAIN_PAGE_ID, View.mainPage);
+		activityPager.addPage(EFFECT_PAGE_ID, View.effectPage);
+		activityPager.setPage(MAIN_PAGE_ID);
 
 		((GLSurfaceViewGroup) View.root).setBBRenderer(activityPager);
 
@@ -119,11 +120,11 @@ public class BeatBotActivity extends Activity {
 
 	@Override
 	public void onBackPressed() {
-		if (activityPager.getCurrPageNum() == MAIN_PAGE_NUM) {
+		if (activityPager.getCurrPageId() == MAIN_PAGE_ID) {
 			showDialog(EXIT_DIALOG_ID);
-		} else if (activityPager.getCurrPageNum() == EFFECT_PAGE_NUM) {
+		} else if (activityPager.getCurrPageId() == EFFECT_PAGE_ID) {
 			View.mainPage.pageSelectGroup.updateLevelsFXPage();
-			activityPager.setPage(MAIN_PAGE_NUM);
+			activityPager.setPage(MAIN_PAGE_ID);
 		}
 	}
 
@@ -287,12 +288,12 @@ public class BeatBotActivity extends Activity {
 	 */
 	public void setupProject() {
 		TrackManager.getTrack(0).select();
-		View.mainPage.pageSelectGroup.selectPage(0);
+		View.mainPage.pageSelectGroup.selectBrowsePage();
 	}
 
 	public void launchEffect(Effect effect) {
 		View.effectPage.loadEffect(effect);
-		activityPager.setPage(EFFECT_PAGE_NUM);
+		activityPager.setPage(EFFECT_PAGE_ID);
 	}
 
 	private void initNativeAudio() {
