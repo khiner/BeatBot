@@ -74,17 +74,15 @@ public class SpriteBatch {
 	// D: batch specified sprite to batch. adds vertices for sprite to vertex
 	// buffer
 	// NOTE: MUST be called after beginBatch(), and before endBatch()!
-	// A: x, y - the x,y position of the sprite (center)
+	// A: x, y - the x,y position of the sprite
 	// width, height - the width and height of the sprite
 	// region - the texture region to use for sprite
 	public void initSprite(float x, float y, float width, float height,
 			TextureRegion region) {
-		float halfWidth = width / 2.0f;
-		float halfHeight = height / 2.0f;
-		float x1 = x - halfWidth; // Left X
-		float y1 = y - halfHeight; // Top Y
-		float x2 = x + halfWidth; // Right X
-		float y2 = y + halfHeight; // Bottom Y
+		float x1 = x; // Left X
+		float y1 = y; // Top Y
+		float x2 = x + width; // Right X
+		float y2 = y + height; // Bottom Y
 
 		vertices[vertexBufferIndex++] = x1; // Add X for Vertex 0
 		vertices[vertexBufferIndex++] = y2; // Add Y for Vertex 0

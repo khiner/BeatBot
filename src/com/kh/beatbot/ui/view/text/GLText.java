@@ -16,7 +16,6 @@ import android.graphics.Typeface;
 
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.ui.view.GLSurfaceViewBase;
-import com.kh.beatbot.ui.view.View;
 
 public class GLText {
 
@@ -130,29 +129,25 @@ public class GLText {
 	// A: text - the string to draw
 	// x, y - the x,y position to draw text at (bottom left of text; including
 	// descent)
-	private void initTextInBatch(String text, SpriteBatch batch) {
-		float x = cellWidth / 2, y = cellHeight / 2;
-		batch.beginBatch();
-		for (char character : text.toCharArray()) {
-			int c = (int) character - CHAR_START;
-			batch.initSprite(x, y, cellWidth, cellHeight, charRgn[c]);
-			x += charWidths[c];
-		}
-		batch.complete();
+	public void draw(String text, float x, float y, float height) {
+		initTextInBatch(text, genericBatch, x, y, height);
+		genericBatch.endBatch(textureIds[0]);
 	}
 
 	// D: draw text at the specified x,y position
 	// A: text - the string to draw
 	// x, y - the x,y position to draw text at (bottom left of text; including
 	// descent)
-	public void draw(String text, float height, float x, float y) {
+	private void initTextInBatch(String text, SpriteBatch batch, float x, float y, float height) {
 		final float scale = height / cellHeight;
-		View.push();
-		View.translate(x, y);
-		View.scale(scale, scale);
-		initTextInBatch(text, genericBatch);
-		genericBatch.endBatch(textureIds[0]);
-		View.pop();
+
+		batch.beginBatch();
+		for (char character : text.toCharArray()) {
+			int c = (int) character - CHAR_START;
+			batch.initSprite(x, y, cellWidth * scale, cellHeight * scale, charRgn[c]);
+			x += charWidths[c] * scale;
+		}
+		batch.complete();
 	}
 
 	// D: return the width/height of a character, or max character width

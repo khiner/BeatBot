@@ -77,7 +77,7 @@ public class TextView extends View {
 			textX += this.x;
 			textY += this.y;
 		}
-		drawText(text, getStrokeColor(), (int) textHeight, textX, textY);
+		drawText(text, getStrokeColor(), textX, textY, textHeight);
 	}
 
 	private void initText() {

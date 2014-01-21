@@ -98,7 +98,8 @@ public abstract class View implements Comparable<View> {
 	}
 
 	protected void initBgRect(boolean rounded, ColorSet fillColorSet) {
-		initBgRect(rounded, shapeGroup, fillColorSet, Colors.defaultBgStrokeColorSet);
+		initBgRect(rounded, shapeGroup, fillColorSet,
+				Colors.defaultBgStrokeColorSet);
 	}
 
 	protected void initBgRect(boolean rounded, ShapeGroup group,
@@ -301,8 +302,7 @@ public abstract class View implements Comparable<View> {
 			x += this.absoluteX;
 			y += this.absoluteY;
 		}
-		bgRect.layout(x, y, width - BG_OFFSET * 2, height
-				- BG_OFFSET * 2);
+		bgRect.layout(x, y, width - BG_OFFSET * 2, height - BG_OFFSET * 2);
 		minX = minY = bgRectRadius + BG_OFFSET;
 		maxX = width - bgRectRadius - BG_OFFSET;
 		maxY = height - bgRectRadius - BG_OFFSET;
@@ -345,10 +345,10 @@ public abstract class View implements Comparable<View> {
 		gl.glPopMatrix();
 	}
 
-	public static final void drawText(String text, float[] color, float height,
-			float x, float y) {
+	public static final void drawText(String text, float[] color, float x,
+			float y, float height) {
 		setColor(color);
-		GLSurfaceViewBase.drawText(text, height, x, y);
+		GLSurfaceViewBase.drawText(text, x, y, height);
 	}
 
 	public static final void setColor(float[] color) {
