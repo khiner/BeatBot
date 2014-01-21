@@ -21,19 +21,14 @@ public class GLText {
 
 	public final static int CHAR_START = 32, // First Character (ASCII Code)
 			CHAR_END = 126, // Last Character (ASCII Code)
-			CHAR_CNT = CHAR_END - CHAR_START + 2, CHAR_NONE = 32, // Character
-																	// to Use
-																	// for
-																	// Unknown
-																	// (ASCII
-																	// Code)
+			CHAR_CNT = CHAR_END - CHAR_START + 2, CHAR_NONE = 32,
 			CHAR_UNKNOWN = (CHAR_CNT - 1), CHAR_BATCH_SIZE = 100;
 
 	private static Bitmap bitmap = null;
 
 	private static SpriteBatch genericBatch;
 	// region of each character (texture coordinates)
-	private static TextureRegion[] charRgn = new TextureRegion[CHAR_CNT];
+	private static TextureRegion[] charRegion = new TextureRegion[CHAR_CNT];
 
 	private static int[] textureIds; // Font Texture ID
 	private static int textureSize = 0, // Texture Size for Font (Square)
@@ -111,7 +106,7 @@ public class GLText {
 		x = y = 0;
 		// setup the array of character texture regions
 		for (int c = 0; c < CHAR_CNT; c++) {
-			charRgn[c] = new TextureRegion(textureSize, textureSize, x, y,
+			charRegion[c] = new TextureRegion(textureSize, textureSize, x, y,
 					cellWidth - 1, cellHeight - 1);
 			x += cellWidth;
 			if (x + cellWidth > textureSize) {
@@ -149,7 +144,7 @@ public class GLText {
 		for (char character : text.toCharArray()) {
 			int c = (int) character - CHAR_START;
 			batch.initSprite(x, y, cellWidth * scale, cellHeight * scale,
-					charRgn[c], color);
+					charRegion[c], color);
 			x += charWidths[c] * scale;
 		}
 		batch.endBatch();

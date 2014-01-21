@@ -9,8 +9,7 @@ public class TextView extends View {
 	private final float X_OFFSET = 2;
 
 	protected String text = "";
-	protected float textWidth = 0, textHeight = 0, textXOffset = 0,
-			textYOffset = 0;
+	protected float textWidth = 0, textHeight = 0, textX = 0, textY = 0;
 
 	public TextView() {
 		super();
@@ -56,11 +55,11 @@ public class TextView extends View {
 		initText();
 	}
 
-	protected float calcTextXOffset() {
+	protected float calcTextX() {
 		return 3 * X_OFFSET + (calcNonIconWidth() - textWidth) / 2;
 	}
 
-	protected float calcTextYOffset() {
+	protected float calcTextY() {
 		return (height - textHeight) / 2;
 	}
 
@@ -71,19 +70,12 @@ public class TextView extends View {
 	private void drawText() {
 		if (text == null || text.isEmpty())
 			return;
-		float textX = textXOffset;
-		float textY = textYOffset;
-		if (parent == null) {
-			textX += this.x;
-			textY += this.y;
-		}
 		drawText(text, getStrokeColor(), textX, textY, textHeight);
 	}
 
 	private void initText() {
-		if (text == null || text.isEmpty()) {
+		if (text == null || text.isEmpty())
 			return;
-		}
 
 		textHeight = height;
 		textWidth = GLSurfaceViewBase.getTextWidth(text, textHeight);
@@ -96,7 +88,7 @@ public class TextView extends View {
 	}
 
 	protected void updateTextOffset() {
-		textXOffset = calcTextXOffset();
-		textYOffset = calcTextYOffset();
+		textX = calcTextX();
+		textY = calcTextY();
 	}
 }

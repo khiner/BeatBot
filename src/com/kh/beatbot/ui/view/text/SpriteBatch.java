@@ -10,7 +10,7 @@ import javax.microedition.khronos.opengles.GL10;
 import com.kh.beatbot.ui.view.View;
 
 public class SpriteBatch {
-	private final static int CHAR_BATCH_SIZE = 100, VERTICES_PER_SPRITE = 4,
+	private final static int CHAR_BATCH_SIZE = 128, VERTICES_PER_SPRITE = 4,
 			INDICES_PER_SPRITE = 6, VERTEX_BYTES = 32;
 
 	private int vertexBufferIndex = 0, numSprites = 0;

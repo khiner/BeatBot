@@ -108,8 +108,8 @@ public class ImageButton extends Button {
 
 	@Override
 	// text goes to the right of the icon
-	protected float calcTextXOffset() {
-		float textXOffset = super.calcTextXOffset();
+	protected float calcTextX() {
+		float textXOffset = super.calcTextX();
 		if (getIcon() != null) {
 			textXOffset += iconXOffset + iconW;
 		}
