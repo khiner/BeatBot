@@ -17,8 +17,8 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class TrackPageButtonRow extends PageButtonRow {
 	private static final int BROWSE_PAGE_ID = 0, LEVELS_PAGE_ID = 1,
-			EFFECTS_PAGE_ID = 2, EDIT_PAGE_ID = 3, ADSR_PAGE_ID = 4,
-			NOTE_LEVELS_PAGE_ID = 5;
+			NOTE_LEVELS_PAGE_ID = 2, EFFECTS_PAGE_ID = 3, EDIT_PAGE_ID = 4,
+			ADSR_PAGE_ID = 5;
 
 	private ImageButton addTrackButton, deleteTrackButton;
 
@@ -120,11 +120,11 @@ public class TrackPageButtonRow extends PageButtonRow {
 		deleteTrackButton.setIcon(new Icon(IconResources.DELETE_TRACK));
 
 		getEditButton().setIcon(new Icon(IconResources.SAMPLE));
-		getNoteLevelsButton().setIcon(new Icon(IconResources.LEVELS));
+		getNoteLevelsButton().setIcon(new Icon(IconResources.NOTE_LEVELS));
+		getLevelsButton().setIcon(new Icon(IconResources.LEVELS));
+		getAdsrButton().setIcon(new Icon(IconResources.ADSR));
 
-		getLevelsButton().setText("Levels");
 		getEffectsButton().setText("FX");
-		getAdsrButton().setText("ADSR");
 	}
 
 	@Override

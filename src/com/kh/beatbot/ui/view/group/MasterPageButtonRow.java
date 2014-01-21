@@ -1,6 +1,8 @@
 package com.kh.beatbot.ui.view.group;
 
 import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.ui.Icon;
+import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.BpmView;
 import com.kh.beatbot.ui.view.TextView;
@@ -55,7 +57,7 @@ public class MasterPageButtonRow extends PageButtonRow {
 	protected synchronized void initIcons() {
 		super.initIcons();
 
-		getLevelsButton().setText("Levels");
+		getLevelsButton().setIcon(new Icon(IconResources.LEVELS));
 		getEffectsButton().setText("FX");
 
 		bpmLabel.setText("BPM");
