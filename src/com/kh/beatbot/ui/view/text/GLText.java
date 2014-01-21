@@ -21,10 +21,13 @@ public class GLText {
 
 	public final static int CHAR_START = 32, // First Character (ASCII Code)
 			CHAR_END = 126, // Last Character (ASCII Code)
-			CHAR_CNT = CHAR_END - CHAR_START + 2,
-			CHAR_NONE = 32,	// Character to Use for Unknown (ASCII Code)
-			CHAR_UNKNOWN = (CHAR_CNT - 1),
-			CHAR_BATCH_SIZE = 100;
+			CHAR_CNT = CHAR_END - CHAR_START + 2, CHAR_NONE = 32, // Character
+																	// to Use
+																	// for
+																	// Unknown
+																	// (ASCII
+																	// Code)
+			CHAR_UNKNOWN = (CHAR_CNT - 1), CHAR_BATCH_SIZE = 100;
 
 	private static Bitmap bitmap = null;
 
@@ -129,25 +132,27 @@ public class GLText {
 	// A: text - the string to draw
 	// x, y - the x,y position to draw text at (bottom left of text; including
 	// descent)
-	public void draw(String text, float x, float y, float height) {
-		initTextInBatch(text, genericBatch, x, y, height);
-		genericBatch.endBatch(textureIds[0]);
+	public void draw(String text, float x, float y, float height, float[] color) {
+		initTextInBatch(text, genericBatch, x, y, height, color);
+		genericBatch.render(textureIds[0]);
 	}
 
 	// D: draw text at the specified x,y position
 	// A: text - the string to draw
 	// x, y - the x,y position to draw text at (bottom left of text; including
 	// descent)
-	private void initTextInBatch(String text, SpriteBatch batch, float x, float y, float height) {
+	private void initTextInBatch(String text, SpriteBatch batch, float x,
+			float y, float height, float[] color) {
 		final float scale = height / cellHeight;
 
 		batch.beginBatch();
 		for (char character : text.toCharArray()) {
 			int c = (int) character - CHAR_START;
-			batch.initSprite(x, y, cellWidth * scale, cellHeight * scale, charRgn[c]);
+			batch.initSprite(x, y, cellWidth * scale, cellHeight * scale,
+					charRgn[c], color);
 			x += charWidths[c] * scale;
 		}
-		batch.complete();
+		batch.endBatch();
 	}
 
 	// D: return the width/height of a character, or max character width

@@ -347,12 +347,7 @@ public abstract class View implements Comparable<View> {
 
 	public static final void drawText(String text, float[] color, float x,
 			float y, float height) {
-		setColor(color);
-		GLSurfaceViewBase.drawText(text, x, y, height);
-	}
-
-	public static final void setColor(float[] color) {
-		gl.glColor4f(color[0], color[1], color[2], color[3]);
+		GLSurfaceViewBase.drawText(text, x, y, height, color);
 	}
 
 	protected final float distanceFromCenterSquared(float x, float y) {

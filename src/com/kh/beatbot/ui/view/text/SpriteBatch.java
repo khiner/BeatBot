@@ -7,18 +7,13 @@ import java.nio.ShortBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import com.kh.beatbot.ui.view.GLSurfaceViewBase;
+import com.kh.beatbot.ui.view.View;
 
 public class SpriteBatch {
-	// number of characters to render per batch
-	private final static int CHAR_BATCH_SIZE = 100,
-			VERTICES_PER_SPRITE = 4, // Vertices Per Sprite
-			INDICES_PER_SPRITE = 6, // Indices Per Sprite
-			VERTEX_SIZE = 16; // Bytesize of a Single Vertex
+	private final static int CHAR_BATCH_SIZE = 100, VERTICES_PER_SPRITE = 4,
+			INDICES_PER_SPRITE = 6, VERTEX_BYTES = 32;
 
-	private int vertexBufferIndex = 0,
-			numSprites = 0; // Number of Sprites Currently in Buffer
-
+	private int vertexBufferIndex = 0, numSprites = 0;
 	private float[] vertices;
 
 	private FloatBuffer vertexBuffer;
@@ -28,9 +23,9 @@ public class SpriteBatch {
 	// A: gl - the gl instance to use for rendering
 	// maxSprites - the maximum allowed sprites per batch
 	public SpriteBatch() {
-		vertices = new float[CHAR_BATCH_SIZE * VERTICES_PER_SPRITE * 4];
+		vertices = new float[CHAR_BATCH_SIZE * VERTICES_PER_SPRITE * 8];
 		ByteBuffer buffer = ByteBuffer.allocateDirect(CHAR_BATCH_SIZE
-				* VERTICES_PER_SPRITE * VERTEX_SIZE);
+				* VERTICES_PER_SPRITE * VERTEX_BYTES);
 		buffer.order(ByteOrder.nativeOrder());
 		vertexBuffer = buffer.asFloatBuffer();
 		buffer = ByteBuffer.allocateDirect(CHAR_BATCH_SIZE * INDICES_PER_SPRITE
@@ -57,58 +52,50 @@ public class SpriteBatch {
 		vertexBufferIndex = 0;
 	}
 
-	// D: signal the end of a batch. render the batched sprites
-	public void endBatch(int textureId) {
-		vertexBuffer.position(0);
-		GL10 gl = GLSurfaceViewBase.getGL10();
+	public void endBatch() {
+		vertexBuffer.clear();
+		vertexBuffer.put(vertices, 0, vertexBufferIndex);
+	}
+
+	public void render(int textureId) {
+		GL10 gl = View.gl;
 		gl.glEnable(GL10.GL_TEXTURE_2D);
+		gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureId);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, VERTEX_SIZE, vertexBuffer);
+
+		vertexBuffer.position(0);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, VERTEX_BYTES, vertexBuffer);
 		vertexBuffer.position(2);
-		gl.glTexCoordPointer(2, GL10.GL_FLOAT, VERTEX_SIZE, vertexBuffer);
+		gl.glTexCoordPointer(2, GL10.GL_FLOAT, VERTEX_BYTES, vertexBuffer);
+		vertexBuffer.position(4);
+		gl.glColorPointer(4, GL10.GL_FLOAT, VERTEX_BYTES, vertexBuffer);
+
 		gl.glDrawElements(GL10.GL_TRIANGLES, numSprites * INDICES_PER_SPRITE,
 				GL10.GL_UNSIGNED_SHORT, indices);
+
+		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		gl.glDisable(GL10.GL_TEXTURE_2D);
 	}
 
-	// D: batch specified sprite to batch. adds vertices for sprite to vertex
-	// buffer
-	// NOTE: MUST be called after beginBatch(), and before endBatch()!
-	// A: x, y - the x,y position of the sprite
-	// width, height - the width and height of the sprite
-	// region - the texture region to use for sprite
 	public void initSprite(float x, float y, float width, float height,
-			TextureRegion region) {
-		float x1 = x; // Left X
-		float y1 = y; // Top Y
-		float x2 = x + width; // Right X
-		float y2 = y + height; // Bottom Y
-
-		vertices[vertexBufferIndex++] = x1; // Add X for Vertex 0
-		vertices[vertexBufferIndex++] = y2; // Add Y for Vertex 0
-		vertices[vertexBufferIndex++] = region.u1; // Add U for Vertex 0
-		vertices[vertexBufferIndex++] = region.v2; // Add V for Vertex 0
-
-		vertices[vertexBufferIndex++] = x2; // Add X for Vertex 1
-		vertices[vertexBufferIndex++] = y2; // Add Y for Vertex 1
-		vertices[vertexBufferIndex++] = region.u2; // Add U for Vertex 1
-		vertices[vertexBufferIndex++] = region.v2; // Add V for Vertex 1
-
-		vertices[vertexBufferIndex++] = x2; // Add X for Vertex 2
-		vertices[vertexBufferIndex++] = y1; // Add Y for Vertex 2
-		vertices[vertexBufferIndex++] = region.u2; // Add U for Vertex 2
-		vertices[vertexBufferIndex++] = region.v1; // Add V for Vertex 2
-
-		vertices[vertexBufferIndex++] = x1; // Add X for Vertex 3
-		vertices[vertexBufferIndex++] = y1; // Add Y for Vertex 3
-		vertices[vertexBufferIndex++] = region.u1; // Add U for Vertex 3
-		vertices[vertexBufferIndex++] = region.v1; // Add V for Vertex 3
+			TextureRegion region, float[] color) {
+		vertex(x, y + height, region.u1, region.v2, color);
+		vertex(x + width, y + height, region.u2, region.v2, color);
+		vertex(x + width, y, region.u2, region.v1, color);
+		vertex(x, y, region.u1, region.v1, color);
 
 		numSprites++;
 	}
-	
-	public void complete() {
-		vertexBuffer.clear();
-		vertexBuffer.put(vertices, 0, vertexBufferIndex);
+
+	private void vertex(float x, float y, float textureX, float textureY,
+			float[] color) {
+		vertices[vertexBufferIndex++] = x;
+		vertices[vertexBufferIndex++] = y;
+		vertices[vertexBufferIndex++] = textureX;
+		vertices[vertexBufferIndex++] = textureY;
+		vertices[vertexBufferIndex++] = color[0];
+		vertices[vertexBufferIndex++] = color[1];
+		vertices[vertexBufferIndex++] = color[2];
+		vertices[vertexBufferIndex++] = color[3];
 	}
 }
