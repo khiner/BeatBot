@@ -5,7 +5,6 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.Icon;
 import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.RoundedRectIcon;
-import com.kh.beatbot.ui.ShapeIcon;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
@@ -15,7 +14,7 @@ public class TrackButtonRow extends TouchableView {
 	private Track track;
 
 	public TrackButtonRow(Track track) {
-		super();
+		super(View.mainPage.midiTrackView.shapeGroup);
 		this.track = track;
 	}
 
@@ -34,22 +33,19 @@ public class TrackButtonRow extends TouchableView {
 		updateInstrumentIcon();
 		muteButton.setText("M");
 		soloButton.setText("S");
-		instrumentButton.setBgIcon(new RoundedRectIcon(
-				View.mainPage.midiTrackView.shapeGroup,
+		instrumentButton.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.instrumentFillColorSet, Colors.buttonRowStrokeColorSet));
-		muteButton.setBgIcon(new RoundedRectIcon(
-				View.mainPage.midiTrackView.shapeGroup,
+		muteButton.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.muteButtonColorSet, Colors.buttonRowStrokeColorSet));
-		soloButton.setBgIcon(new RoundedRectIcon(
-				View.mainPage.midiTrackView.shapeGroup,
+		soloButton.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.soloButtonColorSet, Colors.buttonRowStrokeColorSet));
 	}
 
 	@Override
 	protected synchronized void createChildren() {
-		instrumentButton = new ToggleButton(false);
-		muteButton = new ToggleButton(true);
-		soloButton = new ToggleButton(true);
+		instrumentButton = new ToggleButton(shapeGroup, false);
+		muteButton = new ToggleButton(shapeGroup, true);
+		soloButton = new ToggleButton(shapeGroup, true);
 		instrumentButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
@@ -77,11 +73,5 @@ public class TrackButtonRow extends TouchableView {
 		muteButton.layout(this, height, 0, height * .72f, height);
 		soloButton.layout(this, height + muteButton.width, 0, height * .72f,
 				height);
-	}
-
-	public synchronized void destroy() {
-		((ShapeIcon) muteButton.getBgIcon()).destroy();
-		((ShapeIcon) soloButton.getBgIcon()).destroy();
-		((ShapeIcon) instrumentButton.getBgIcon()).destroy();
 	}
 }

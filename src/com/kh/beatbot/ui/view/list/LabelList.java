@@ -38,12 +38,14 @@ public class LabelList extends ClickableView implements OnPressListener,
 		public Label() {
 			super();
 			setIcon(addIcon);
-			setBgIcon(new RoundedRectIcon(null, emptyColorSet));
+			setBgIcon(new RoundedRectIcon(shapeGroup, emptyColorSet));
 			setText(EMPTY_TEXT);
 		}
 
 		public void setState(LabelState state) {
 			ShapeIcon bgShape = ((ShapeIcon) getBgIcon());
+			if (null == bgShape)
+				return;
 			this.state = state;
 			switch (state) {
 			case ON:

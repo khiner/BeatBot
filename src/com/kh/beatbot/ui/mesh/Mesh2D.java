@@ -6,7 +6,6 @@ public class Mesh2D {
 	/** vertex index at which the next vertex gets inserted (and parent) **/
 	protected int index = 0, parentVertexIndex = -1;
 
-	/** number of vertices defined for the mesh **/
 	protected int numVertices = 0;
 
 	public Mesh2D(MeshGroup group, int numVertices) {

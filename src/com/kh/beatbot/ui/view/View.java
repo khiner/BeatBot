@@ -18,6 +18,7 @@ import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.RoundedRect;
 import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.mesh.TextMesh;
 import com.kh.beatbot.ui.view.page.MainPage;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
@@ -78,6 +79,8 @@ public abstract class View implements Comparable<View> {
 
 	protected ShapeGroup shapeGroup;
 
+	protected TextMesh textMesh; // TODO this assumes only one string per view
+
 	public View() {
 		this(null);
 	}
@@ -90,6 +93,10 @@ public abstract class View implements Comparable<View> {
 
 	public void addListener(ViewListener listener) {
 		listeners.add(listener);
+	}
+
+	public ShapeGroup getShapeGroup() {
+		return shapeGroup;
 	}
 
 	protected void initBgRect(boolean rounded) {
@@ -140,7 +147,19 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public synchronized void removeChild(View child) {
+		child.destroy();
 		children.remove(child);
+	}
+
+	protected synchronized void destroy() {
+		if (textMesh != null) {
+			textMesh.destroy();
+			textMesh = null;
+		}
+		
+		for (View child : children) {
+			child.destroy();
+		}
 	}
 
 	public synchronized int numChildren() {
@@ -241,9 +260,6 @@ public abstract class View implements Comparable<View> {
 				gl.glDisable(GL10.GL_SCISSOR_TEST);
 			}
 		}
-		if (bgRect != null) {
-			bgRect.draw();
-		}
 
 		if (shouldDraw) {
 			shapeGroup.draw(this);
@@ -297,11 +313,8 @@ public abstract class View implements Comparable<View> {
 			bgRectRadius = calcBgRectRadius();
 			((RoundedRect) bgRect).setCornerRadius(bgRectRadius);
 		}
-		float x = BG_OFFSET, y = BG_OFFSET;
-		if (!shouldDraw) {
-			x += this.absoluteX;
-			y += this.absoluteY;
-		}
+		float x = BG_OFFSET + this.absoluteX, y = BG_OFFSET + this.absoluteY;
+
 		bgRect.layout(x, y, width - BG_OFFSET * 2, height - BG_OFFSET * 2);
 		minX = minY = bgRectRadius + BG_OFFSET;
 		maxX = width - bgRectRadius - BG_OFFSET;
@@ -345,9 +358,15 @@ public abstract class View implements Comparable<View> {
 		gl.glPopMatrix();
 	}
 
-	public static final void drawText(String text, float[] color, float x,
-			float y, float height) {
-		GLSurfaceViewBase.drawText(text, x, y, height, color);
+	public final void setText(String text, float[] color, float x, float y,
+			float height) {
+		if (textMesh == null) {
+			textMesh = new TextMesh(shapeGroup.getTextGroup(), text);
+		}
+
+		x += this.absoluteX;
+		y += this.absoluteY;
+		textMesh.setText(text, x, y, height, color);
 	}
 
 	protected final float distanceFromCenterSquared(float x, float y) {
@@ -383,6 +402,9 @@ public abstract class View implements Comparable<View> {
 
 	public void setStrokeColor(float[] strokeColor) {
 		this.strokeColor = strokeColor;
+		if (null != textMesh) {
+			textMesh.setColor(strokeColor);
+		}
 	}
 
 	public float[] getStrokeColor() {

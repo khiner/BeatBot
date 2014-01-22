@@ -87,8 +87,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 			}
 		});
 
-		masterButton.setText("Master");
-
 		levelsPage = new LevelsPage();
 		effectsPage = new EffectsPage();
 		browsePage = new BrowsePage();
@@ -132,6 +130,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 
 	@Override
 	protected synchronized void initIcons() {
+		masterButton.setText("Master");
 		masterButton.setBgIcon(new RoundedRectIcon(shapeGroup,
 				Colors.instrumentFillColorSet, Colors.buttonRowStrokeColorSet));
 	}

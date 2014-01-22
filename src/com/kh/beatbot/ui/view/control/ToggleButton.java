@@ -66,5 +66,6 @@ public class ToggleButton extends ImageButton {
 						: IconResource.State.DISABLED);
 			}
 		}
+		setStrokeColor(getStrokeColor());
 	}
 }

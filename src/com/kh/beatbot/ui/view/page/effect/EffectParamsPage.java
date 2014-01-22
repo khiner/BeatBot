@@ -50,8 +50,12 @@ public class EffectParamsPage extends TouchableView implements ParamListener,
 					effect.getParam(i).beatSyncable);
 			paramControls[i].setId(i);
 		}
-		setEffect(effect);
 		addChildren(paramControls);
+	}
+
+	@Override
+	protected synchronized void initIcons() {
+		setEffect(effect);
 	}
 
 	@Override

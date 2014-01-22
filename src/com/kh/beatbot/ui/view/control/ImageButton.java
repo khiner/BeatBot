@@ -36,28 +36,45 @@ public class ImageButton extends Button {
 	}
 
 	public void setBgIcon(Icon bgIcon) {
+		if (null == bgIcon) {
+			destroyBgIcon();
+		}
 		icons[BACKGROUND_ICON_INDEX] = bgIcon;
 		layoutIcons();
 	}
 
 	@Override
+	public synchronized void destroy() {
+		super.destroy();
+		destroyBgIcon();
+	}
+
+	protected void destroyBgIcon() {
+		if (getBgIcon() instanceof ShapeIcon) {
+			((ShapeIcon) getBgIcon()).destroy();
+		}
+	}
+
+	@Override
 	public void press() {
 		super.press();
-		for (Icon iconSource : icons) {
-			if (iconSource != null) {
-				iconSource.setState(State.PRESSED);
+		for (Icon icon : icons) {
+			if (icon != null) {
+				icon.setState(State.PRESSED);
 			}
 		}
+		setStrokeColor(getStrokeColor());
 	}
 
 	@Override
 	public void release() {
 		super.release();
-		for (Icon iconSource : icons) {
-			if (iconSource != null) {
-				iconSource.setState(State.DEFAULT);
+		for (Icon icon : icons) {
+			if (icon != null) {
+				icon.setState(State.DEFAULT);
 			}
 		}
+		setStrokeColor(getStrokeColor());
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -67,6 +84,7 @@ public class ImageButton extends Button {
 				iconSource.setState(enabled ? State.DEFAULT : State.DISABLED);
 			}
 		}
+		setStrokeColor(getStrokeColor());
 	}
 
 	@Override
@@ -80,7 +98,6 @@ public class ImageButton extends Button {
 			foregroundIconSource.draw(absoluteX + iconXOffset, root.getHeight()
 					- absoluteY - height + iconYOffset, iconW, iconH);
 		}
-		super.draw();
 	}
 
 	@Override
@@ -103,7 +120,7 @@ public class ImageButton extends Button {
 			iconW = height;
 			iconH = height;
 		}
-		updateTextOffset();
+		initText();
 	}
 
 	@Override

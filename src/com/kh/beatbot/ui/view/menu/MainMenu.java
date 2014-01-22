@@ -52,10 +52,6 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 
 		fileItem.addSubMenuItems(midiImportItem, midiExportItem);
 		settingsItem.addSubMenuItems(snapToGridItem);
-
-		snapToGridItem.setText("Snap-to-grid");
-		midiImportItem.setText("Import MIDI");
-		midiExportItem.setText("Export MIDI");
 	}
 
 	protected float getWidthForLevel(int level) {
@@ -64,6 +60,11 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 
 	public synchronized void initIcons() {
 		super.initIcons();
+
+		snapToGridItem.setText("Snap-to-grid");
+		midiImportItem.setText("Import MIDI");
+		midiExportItem.setText("Export MIDI");
+
 		fileItem.setIcon(new Icon(IconResources.FILE));
 		settingsItem.setIcon(new Icon(IconResources.SETTINGS));
 

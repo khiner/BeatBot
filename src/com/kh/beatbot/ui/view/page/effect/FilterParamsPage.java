@@ -47,6 +47,8 @@ public class FilterParamsPage extends EffectParamsPage {
 
 	@Override
 	protected synchronized void initIcons() {
+		super.initIcons();
+
 		for (ToggleButton filterToggle : filterToggles) {
 			filterToggle.setBgIcon(new RoundedRectIcon(shapeGroup,
 					Colors.instrumentFillColorSet,

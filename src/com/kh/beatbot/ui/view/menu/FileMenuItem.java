@@ -18,13 +18,12 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
 	private File file;
 
 	public FileMenuItem(Menu menu, MenuItem parent, File file) {
-		super(menu, parent, file.isDirectory() ? new ToggleButton(false)
-				: new ImageButton());
+		super(menu, parent, file.isDirectory() ? new ToggleButton(menu.getShapeGroup(), false)
+				: new ImageButton(menu.getShapeGroup()));
 		this.file = file;
 		if (file.isFile()) {
 			button.setOnLongPressListener(this);
 		}
-		setText(file.getName().isEmpty() ? file.getPath() : file.getName());
 	}
 
 	@Override
@@ -59,6 +58,7 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
 	public void loadIcons() {
 		super.loadIcons();
 
+		setText(file.getName().isEmpty() ? file.getPath() : file.getName());
 		if (file.isDirectory()) {
 			IconResource resource = IconResources.forDirectory(getText());
 			if (resource != null) {

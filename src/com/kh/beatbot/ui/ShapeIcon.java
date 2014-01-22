@@ -11,7 +11,6 @@ public abstract class ShapeIcon extends Icon {
 	protected final float OFFSET = 2;
 
 	protected ShapeGroup shapeGroup;
-	protected ColorSet fillColorSet, strokeColorSet;
 	protected boolean shouldDraw;
 
 	protected float pressedX, pressedY, pressedWidth, pressedHeight;
@@ -84,13 +83,6 @@ public abstract class ShapeIcon extends Icon {
 		setState(state);
 	}
 
-	@Override
-	public void draw() {
-		if (shouldDraw) {
-			shapeGroup.draw();
-		}
-	}
-
 	public void setFillColorSet(ColorSet fillColorSet) {
 		this.fillColorSet = fillColorSet;
 		setState(state);
@@ -104,21 +96,5 @@ public abstract class ShapeIcon extends Icon {
 		if (currentDrawable != null) {
 			((Shape) currentDrawable).destroy();
 		}
-	}
-
-	public float[] getCurrFillColor() {
-		return getFillColor(state);
-	}
-
-	public float[] getCurrStrokeColor() {
-		return getStrokeColor(state);
-	}
-
-	private float[] getFillColor(State state) {
-		return fillColorSet == null ? null : fillColorSet.getColor(state);
-	}
-
-	private float[] getStrokeColor(State state) {
-		return strokeColorSet == null ? null : strokeColorSet.getColor(state);
 	}
 }

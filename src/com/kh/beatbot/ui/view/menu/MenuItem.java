@@ -61,10 +61,6 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 	}
 
 	public void loadIcons() {
-		if (!button.getText().isEmpty()) {
-			button.setStrokeColor(Colors.BLACK);
-		}
-
 		for (MenuItem subMenuItem : subMenuItems) {
 			subMenuItem.loadIcons();
 		}
@@ -79,6 +75,7 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 	}
 
 	public void setText(final String text) {
+		button.setStrokeColor(Colors.BLACK);
 		button.setText(text);
 	}
 
@@ -149,10 +146,10 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 		if ((button.isPressed() || isChecked()) && !button.getText().isEmpty()) {
 			if (((ImageButton) button).getBgIcon() == null) {
 				if (button instanceof ToggleButton) {
-					((ToggleButton) button).setBgIcon(new RoundedRectIcon(null,
+					((ToggleButton) button).setBgIcon(new RoundedRectIcon(container.getShapeGroup(),
 							Colors.menuToggleFillColorSet));
 				} else {
-					((ImageButton) button).setBgIcon(new RoundedRectIcon(null,
+					((ImageButton) button).setBgIcon(new RoundedRectIcon(container.getShapeGroup(),
 							Colors.menuItemFillColorSet));
 				}
 			}

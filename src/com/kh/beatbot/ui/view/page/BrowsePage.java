@@ -18,14 +18,14 @@ public class BrowsePage extends Menu {
 	private static ColorSet bgColorSet = new ColorSet(Colors.LABEL_SELECTED);
 
 	protected synchronized void createMenuItems() {
+		initBgRect(true, shapeGroup, bgColorSet, null);
+
 		File[] topLevelDirs = new File[] { FileManager.drumsDirectory,
 				FileManager.recordDirectory, FileManager.rootDirectory };
-
+		
 		for (File topLevelDir : topLevelDirs) {
 			topLevelItems.add(new FileMenuItem(this, null, topLevelDir));
 		}
-
-		initBgRect(true, null, bgColorSet, null);
 	}
 
 	@Override

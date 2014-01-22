@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui.view.text;
+package com.kh.beatbot.ui.mesh;
 
 class TextureRegion {
 	

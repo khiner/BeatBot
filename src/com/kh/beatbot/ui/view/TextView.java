@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.view;
 
+import com.kh.beatbot.ui.mesh.GLText;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class TextView extends View {
@@ -9,7 +10,7 @@ public class TextView extends View {
 	private final float X_OFFSET = 2;
 
 	protected String text = "";
-	protected float textWidth = 0, textHeight = 0, textX = 0, textY = 0;
+	protected float textWidth = 0, textHeight = 0;
 
 	public TextView() {
 		super();
@@ -38,7 +39,6 @@ public class TextView extends View {
 
 	@Override
 	public void draw() {
-		drawText();
 	}
 
 	@Override
@@ -67,28 +67,18 @@ public class TextView extends View {
 		return width - X_OFFSET * 4;
 	}
 
-	private void drawText() {
-		if (text == null || text.isEmpty())
-			return;
-		drawText(text, getStrokeColor(), textX, textY, textHeight);
-	}
-
-	private void initText() {
+	protected void initText() {
 		if (text == null || text.isEmpty())
 			return;
 
 		textHeight = height;
-		textWidth = GLSurfaceViewBase.getTextWidth(text, textHeight);
+		textWidth = GLText.getTextWidth(text, textHeight);
 		if (textWidth > calcNonIconWidth()) {
 			float scaleRatio = calcNonIconWidth() / textWidth;
 			textWidth *= scaleRatio;
 			textHeight *= scaleRatio;
 		}
-		updateTextOffset();
-	}
 
-	protected void updateTextOffset() {
-		textX = calcTextX();
-		textY = calcTextY();
+		setText(text, getStrokeColor(), calcTextX(), calcTextY(), textHeight);
 	}
 }

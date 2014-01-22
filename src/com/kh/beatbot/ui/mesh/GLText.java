@@ -7,7 +7,7 @@
 // origin, and the (x,y) positions are relative to that, as well as the
 // bottom-left of the string to render.
 
-package com.kh.beatbot.ui.view.text;
+package com.kh.beatbot.ui.mesh;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -21,14 +21,14 @@ public class GLText {
 
 	public final static int CHAR_START = 32, // First Character (ASCII Code)
 			CHAR_END = 126, // Last Character (ASCII Code)
-			CHAR_CNT = CHAR_END - CHAR_START + 2, CHAR_NONE = 32,
+			CHAR_CNT = CHAR_END - CHAR_START + 2,
+			CHAR_NONE = 32,
 			CHAR_UNKNOWN = (CHAR_CNT - 1), CHAR_BATCH_SIZE = 100;
 
 	private static Bitmap bitmap = null;
 
-	private static SpriteBatch genericBatch;
 	// region of each character (texture coordinates)
-	private static TextureRegion[] charRegion = new TextureRegion[CHAR_CNT];
+	private static TextureRegion[] charRegions = new TextureRegion[CHAR_CNT];
 
 	private static int[] textureIds; // Font Texture ID
 	private static int textureSize = 0, // Texture Size for Font (Square)
@@ -47,7 +47,6 @@ public class GLText {
 	}
 
 	private GLText(String file, int size) {
-		genericBatch = new SpriteBatch();
 		load(file, size);
 	}
 
@@ -106,7 +105,7 @@ public class GLText {
 		x = y = 0;
 		// setup the array of character texture regions
 		for (int c = 0; c < CHAR_CNT; c++) {
-			charRegion[c] = new TextureRegion(textureSize, textureSize, x, y,
+			charRegions[c] = new TextureRegion(textureSize, textureSize, x, y,
 					cellWidth - 1, cellHeight - 1);
 			x += cellWidth;
 			if (x + cellWidth > textureSize) {
@@ -118,50 +117,36 @@ public class GLText {
 		textureIds = new int[1];
 	}
 
-	public void loadTexture() {
+	public static void loadTexture() {
 		// load bitmap texture in OpenGL
 		GLSurfaceViewBase.loadTexture(bitmap, textureIds, 0);
 	}
 
-	// D: draw text at the specified x,y position
-	// A: text - the string to draw
-	// x, y - the x,y position to draw text at (bottom left of text; including
-	// descent)
-	public void draw(String text, float x, float y, float height, float[] color) {
-		initTextInBatch(text, genericBatch, x, y, height, color);
-		genericBatch.render(textureIds[0]);
+	public static int getTextureId() {
+		return textureIds[0];
 	}
 
-	// D: draw text at the specified x,y position
-	// A: text - the string to draw
-	// x, y - the x,y position to draw text at (bottom left of text; including
-	// descent)
-	private void initTextInBatch(String text, SpriteBatch batch, float x,
-			float y, float height, float[] color) {
-		final float scale = height / cellHeight;
-
-		batch.beginBatch();
-		for (char character : text.toCharArray()) {
-			int c = (int) character - CHAR_START;
-			batch.initSprite(x, y, cellWidth * scale, cellHeight * scale,
-					charRegion[c], color);
-			x += charWidths[c] * scale;
-		}
-		batch.endBatch();
+	public static TextureRegion getCharRegion(char chr) {
+		return charRegions[chr - CHAR_START];
 	}
 
-	// D: return the width/height of a character, or max character width
-	// A: chr - the character to get width for
-	// R: the requested character size (scaled)
-	public float getCharWidth(char chr) {
+	public static float getCharWidth(char chr) {
 		return charWidths[chr - CHAR_START];
 	}
 
-	public float getTextWidth(String text, float height) {
+	public static float getTextWidth(String text, float height) {
 		float total = 0;
 		for (char character : text.toCharArray()) {
 			total += getCharWidth(character);
 		}
 		return total * height / cellHeight;
+	}
+	
+	public static float getCellWidth() {
+		return cellWidth;
+	}
+	
+	public static float getCellHeight() {
+		return cellHeight;
 	}
 }

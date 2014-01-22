@@ -15,7 +15,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.kh.beatbot.activity.BeatBotActivity;
-import com.kh.beatbot.ui.view.text.GLText;
+import com.kh.beatbot.ui.mesh.GLText;
 
 public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		GLSurfaceView.Renderer {
@@ -74,18 +74,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		glText = GLText.getInstance("REDRING-1969-v03.ttf", 30);
 		// since the GL10 instance potentially has changed,
 		// we need to reload the bitmap texture for the font
-		glText.loadTexture();
-	}
-
-	public static final void drawText(String text, float x, float y,
-			float height, float[] color) {
-		if (glText != null) {
-			glText.draw(text, x, y, height, color);
-		}
-	}
-
-	public static final float getTextWidth(String text, float height) {
-		return glText != null ? glText.getTextWidth(text, height) : 0;
+		GLText.loadTexture();
 	}
 
 	public static final void loadTexture(Bitmap bitmap, int[] textureHandlers,

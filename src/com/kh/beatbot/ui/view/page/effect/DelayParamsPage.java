@@ -18,6 +18,7 @@ public class DelayParamsPage extends EffectParamsPage {
 	
 	@Override
 	protected synchronized void initIcons() {
+		super.initIcons();
 		linkToggle.setIcon(new Icon(IconResources.LINK));
 	}
 

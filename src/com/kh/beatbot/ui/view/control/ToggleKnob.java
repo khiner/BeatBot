@@ -25,7 +25,6 @@ public class ToggleKnob extends Knob implements ParamToggleListener {
 
 	@Override
 	public void draw() {
-		super.draw();
 		centerButton.draw();
 	}
 

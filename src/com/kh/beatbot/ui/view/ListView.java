@@ -4,6 +4,7 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.RoundedRect;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.transition.ColorTransition;
 import com.kh.beatbot.ui.transition.Transition;
 import com.kh.beatbot.ui.view.control.Button;
@@ -21,7 +22,11 @@ public class ListView extends TouchableView implements OnPressListener {
 	private ColorTransition tabColorTransition = new ColorTransition(20, 20,
 			Colors.TRANSPARENT, END_TRANS_COLOR);
 
-	protected ImageButton selectedButton = null;
+	private ImageButton selectedButton = null;
+
+	public ListView(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
 
 	public synchronized void drawChildren() {
 		if (pointerCount() == 0 && Math.abs(velocity) > THRESH) {

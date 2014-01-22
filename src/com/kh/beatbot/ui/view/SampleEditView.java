@@ -167,7 +167,6 @@ public class SampleEditView extends ControlView2dBase {
 	public void draw() {
 		if (!hasSample()) {
 			setText(NO_SAMPLE_MESSAGE);
-			super.draw();
 			return;
 		}
 		if (TrackManager.currTrack.isPlaying()

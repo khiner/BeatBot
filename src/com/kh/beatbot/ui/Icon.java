@@ -1,12 +1,14 @@
 package com.kh.beatbot.ui;
 
 import com.kh.beatbot.ui.IconResource.State;
+import com.kh.beatbot.ui.color.ColorSet;
 
 public class Icon extends Drawable {
 	protected Drawable currentDrawable;
 	protected IconResource resource;
 	protected IconResource.State state = State.DEFAULT;
 	protected IconResource.State lockedState = null;
+	protected ColorSet fillColorSet, strokeColorSet;
 
 	public Icon() {
 	};
@@ -48,5 +50,22 @@ public class Icon extends Drawable {
 	public void lockState(State state) {
 		lockedState = state;
 		setState(lockedState);
+	}
+	
+
+	public float[] getCurrFillColor() {
+		return getFillColor(state);
+	}
+
+	public float[] getCurrStrokeColor() {
+		return getStrokeColor(state);
+	}
+	
+	protected float[] getFillColor(State state) {
+		return fillColorSet == null ? null : fillColorSet.getColor(state);
+	}
+
+	protected float[] getStrokeColor(State state) {
+		return strokeColorSet == null ? null : strokeColorSet.getColor(state);
 	}
 }

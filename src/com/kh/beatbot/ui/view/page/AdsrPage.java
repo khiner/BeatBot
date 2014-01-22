@@ -59,6 +59,7 @@ public class AdsrPage extends TouchableView implements OnReleaseListener {
 				adsrButtons[i].setIcon(new Icon(whichAdsrIconResource(i)));
 			}
 		}
+
 		adsrButtons[ADSR.START_ID].setText("S");
 		adsrButtons[ADSR.PEAK_ID].setText("P");
 	}
