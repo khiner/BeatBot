@@ -15,7 +15,6 @@ import com.kh.beatbot.ui.mesh.WaveformShape;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
 import com.kh.beatbot.ui.view.control.ImageButton;
-import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
 public class SampleEditView extends ControlView2dBase {
 
@@ -135,7 +134,6 @@ public class SampleEditView extends ControlView2dBase {
 				}
 			});
 		}
-		currSampleRect = new Rectangle(shapeGroup, Colors.VOLUME, null);
 		addChildren(loopButtons);
 	}
 
@@ -145,20 +143,24 @@ public class SampleEditView extends ControlView2dBase {
 		initBgRect(false, shapeGroup, bgFillColorSet, null);
 		waveformShape = Shape.createWaveform(shapeGroup, width,
 				Colors.LABEL_SELECTED, Colors.BLACK);
+		currSampleRect = new Rectangle(shapeGroup, Colors.VOLUME, null);
 		waveformWidth = width - SNAP_DIST;
 		super.layout(parent, x, y, width, height);
 	}
 
 	public synchronized void layoutChildren() {
-		waveformShape.layout(0, 0, width, height);
-		currSampleRect.layout(0, 0, 4, height);
-		loopButtons[0].layout(null, 0, 0, X_OFFSET * 2, height);
-		loopButtons[1].layout(null, width - X_OFFSET, 0, X_OFFSET * 2, height);
+		waveformShape.layout(absoluteX, absoluteY, width, height);
+		currSampleRect.layout(absoluteX, absoluteY, 4, height);
+		loopButtons[0].layout(this, 0, 0, X_OFFSET * 2, height);
+		loopButtons[1].layout(this, width - X_OFFSET, 0, X_OFFSET * 2, height);
 	}
 
 	private void updateCurrSample() {
-		currSampleRect.setPosition(levelToX(params[0]
-				.getViewLevel(TrackManager.currTrack.getCurrentFrame())), 0);
+		currSampleRect.setPosition(
+				absoluteX
+						+ levelToX(params[0]
+								.getViewLevel(TrackManager.currTrack
+										.getCurrentFrame())), absoluteY);
 	}
 
 	@Override
@@ -172,7 +174,6 @@ public class SampleEditView extends ControlView2dBase {
 				|| TrackManager.currTrack.isPreviewing()) {
 			updateCurrSample();
 		}
-		shapeGroup.draw();
 	}
 
 	private boolean moveLoopMarker(int id, float x) {

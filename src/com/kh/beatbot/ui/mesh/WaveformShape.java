@@ -51,16 +51,16 @@ public class WaveformShape extends Shape {
 	}
 
 	private synchronized void updateWaveformVertices() {
-		float lastX = 0;
-		float lastY = height / 2;
+		float lastX = x;
+		float lastY = y + height / 2;
 		for (int i = 0; i < sampleBuffer.size(); i++) {
 			int sampleIndex = sampleBuffer.keyAt(i);
 			float sample = sampleBuffer.get(sampleIndex);
 
 			float percent = (float) (sampleIndex - offsetInSamples)
 					/ (float) widthInSamples;
-			float x = percent * width + xOffset;
-			float y = height * (1 - sample) / 2;
+			float x = this.x + percent * width + xOffset;
+			float y = this.y + height * (1 - sample) / 2;
 
 			strokeVertex(x, y);
 			strokeVertex(lastX, lastY);
@@ -68,19 +68,19 @@ public class WaveformShape extends Shape {
 			lastY = y;
 		}
 		while (strokeMesh.index < strokeMesh.numVertices) {
-			strokeVertex(Float.MAX_VALUE, height / 2);
+			strokeVertex(this.x + Float.MAX_VALUE, this.y + height / 2);
 		}
 	}
 
 	private synchronized void updateLoopSelectionVertices() {
 		// fill triangle 1
-		fillVertex(loopBeginX, View.BG_OFFSET);
-		fillVertex(loopEndX, View.BG_OFFSET);
-		fillVertex(loopBeginX, height - View.BG_OFFSET);
+		fillVertex(x + loopBeginX, y + View.BG_OFFSET);
+		fillVertex(x + loopEndX, y + View.BG_OFFSET);
+		fillVertex(x + loopBeginX, y + height - View.BG_OFFSET);
 		// fill triangle 2
-		fillVertex(loopBeginX, height - View.BG_OFFSET);
-		fillVertex(loopEndX, View.BG_OFFSET);
-		fillVertex(loopEndX, height - View.BG_OFFSET);
+		fillVertex(x + loopBeginX, y + height - View.BG_OFFSET);
+		fillVertex(x + loopEndX, y + View.BG_OFFSET);
+		fillVertex(x + loopEndX, y + height - View.BG_OFFSET);
 	}
 
 	public synchronized void update(long offsetInSamples, long widthInSamples, float xOffset) {

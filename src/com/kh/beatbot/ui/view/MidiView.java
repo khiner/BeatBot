@@ -190,6 +190,7 @@ public class MidiView extends ClickableView implements TrackListener {
 	}
 
 	public synchronized void init() {
+		shouldDraw = false;
 		initAllVbs();
 	}
 

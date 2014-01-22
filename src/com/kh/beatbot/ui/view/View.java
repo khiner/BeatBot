@@ -243,6 +243,7 @@ public abstract class View implements Comparable<View> {
 		if (bgRect != null) {
 			bgRect.draw();
 		}
+
 		if (shouldDraw) {
 			shapeGroup.draw(this);
 		}
