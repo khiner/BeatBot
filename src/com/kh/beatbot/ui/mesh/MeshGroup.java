@@ -13,11 +13,15 @@ import android.util.Log;
 import com.kh.beatbot.ui.view.View;
 
 public class MeshGroup {
+	private static final int INDICES_PER_VERTEX = 6; // x, y + color
+	private static final int FLOAT_BYTES = Float.SIZE / 8;
+	private static final int COLOR_OFFSET_BYTES = FLOAT_BYTES * 2;
+	private static final int VERTEX_BYTES = INDICES_PER_VERTEX * FLOAT_BYTES;
+
 	private List<Mesh2D> children = new ArrayList<Mesh2D>();
-	private FloatBuffer vertexBuffer, colorBuffer;
-	private float[] vertices = new float[0], colors = new float[0];
-	private int vertexHandle = -1, colorHandle = -1, numVertices = 0,
-			primitiveType;
+	private FloatBuffer vertexBuffer;
+	private float[] vertices = new float[0];
+	private int vertexHandle = -1, numVertices = 0, primitiveType;
 	private boolean dirty = false;
 
 	public MeshGroup(int primitiveType) {
@@ -25,25 +29,30 @@ public class MeshGroup {
 	}
 
 	protected float getVertexX(int index) {
-		return vertices[index * 2];
+		return vertices[index * INDICES_PER_VERTEX];
 	}
 
 	protected float getVertexY(int index) {
-		return vertices[index * 2 + 1];
+		return vertices[index * INDICES_PER_VERTEX + 1];
 	}
 
 	protected synchronized void vertex(Mesh2D mesh, float x, float y,
 			float[] color) {
-		int index = mesh.index + mesh.parentVertexIndex;
-		int vertexOffset = index * 2;
-		vertices[vertexOffset] = x;
-		vertices[vertexOffset + 1] = y;
-		System.arraycopy(color, 0, colors, index * 4, 4);
+		int vertex = (mesh.index + mesh.parentVertexIndex) * INDICES_PER_VERTEX;
+
+		vertices[vertex] = x;
+		vertices[vertex + 1] = y;
+		vertices[vertex + 2] = color[0];
+		vertices[vertex + 3] = color[1];
+		vertices[vertex + 4] = color[2];
+		vertices[vertex + 5] = color[3];
+
 		dirty = true;
 	}
 
 	protected synchronized void translate(Mesh2D mesh, float x, float y) {
-		for (int i = mesh.parentVertexIndex * 2; i < (mesh.parentVertexIndex + mesh.numVertices) * 2; i += 2) {
+		for (int i = mesh.parentVertexIndex * INDICES_PER_VERTEX; i < (mesh.parentVertexIndex + mesh.numVertices)
+				* INDICES_PER_VERTEX; i += INDICES_PER_VERTEX) {
 			vertices[i] += x;
 			vertices[i + 1] += y;
 		}
@@ -65,12 +74,10 @@ public class MeshGroup {
 		}
 
 		View.gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
-		View.gl.glVertexPointer(2, GL10.GL_FLOAT, 0, 0);
-
 		View.gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 
-		View.gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, colorHandle);
-		View.gl.glColorPointer(4, GL10.GL_FLOAT, 0, 0);
+		View.gl.glVertexPointer(2, GL10.GL_FLOAT, VERTEX_BYTES, 0);
+		View.gl.glColorPointer(4, GL10.GL_FLOAT, VERTEX_BYTES, COLOR_OFFSET_BYTES);
 
 		View.gl.glDrawArrays(primitiveType, 0, numVertices);
 
@@ -89,10 +96,8 @@ public class MeshGroup {
 		mesh.parentVertexIndex = numVertices;
 		children.add(mesh);
 		numVertices += mesh.getNumVertices();
-		vertices = Arrays.copyOf(vertices, numVertices * 2);
-		colors = Arrays.copyOf(colors, numVertices * 4);
+		vertices = Arrays.copyOf(vertices, numVertices * INDICES_PER_VERTEX);
 		vertexBuffer = FloatBuffer.wrap(vertices);
-		colorBuffer = FloatBuffer.wrap(colors);
 		dirty = true;
 	}
 
@@ -105,11 +110,10 @@ public class MeshGroup {
 			return;
 		}
 
-		int dst = mesh.parentVertexIndex + mesh.numVertices;
-		System.arraycopy(vertices, dst * 2, vertices,
-				mesh.parentVertexIndex * 2, vertices.length - dst * 2);
-		System.arraycopy(colors, dst * 4, colors, mesh.parentVertexIndex * 4,
-				colors.length - dst * 4);
+		int src = mesh.parentVertexIndex * INDICES_PER_VERTEX;
+		int dst = (mesh.parentVertexIndex + mesh.numVertices)
+				* INDICES_PER_VERTEX;
+		System.arraycopy(vertices, dst, vertices, src, vertices.length - dst);
 
 		children.remove(mesh);
 
@@ -119,8 +123,8 @@ public class MeshGroup {
 			currVertexIndex += child.getNumVertices();
 		}
 		numVertices = currVertexIndex;
-		vertexBuffer.limit(numVertices * 2);
-		colorBuffer.limit(numVertices * 4);
+		vertexBuffer.limit(numVertices * INDICES_PER_VERTEX);
+
 		dirty = true;
 	}
 
@@ -128,22 +132,17 @@ public class MeshGroup {
 		if (mesh == null || !children.contains(mesh))
 			return;
 
-		int dst = mesh.parentVertexIndex + mesh.numVertices;
+		int src = mesh.parentVertexIndex * INDICES_PER_VERTEX;
+		int dst = (mesh.parentVertexIndex + mesh.numVertices)
+				* INDICES_PER_VERTEX;
 
 		// move vertices to the end of the array
-		float[] tmp = Arrays.copyOfRange(vertices, mesh.parentVertexIndex * 2,
-				dst * 2);
-		System.arraycopy(vertices, dst * 2, vertices,
-				mesh.parentVertexIndex * 2, vertexBuffer.limit() - dst * 2);
+		float[] tmp = Arrays.copyOfRange(vertices, src, dst);
+		System.arraycopy(vertices, dst, vertices, src, vertexBuffer.limit()
+				- dst);
 		System.arraycopy(tmp, 0, vertices, vertexBuffer.limit()
-				- mesh.numVertices * 2, mesh.numVertices * 2);
-
-		// move colors to the end of the array
-		tmp = Arrays.copyOfRange(colors, mesh.parentVertexIndex * 4, dst * 4);
-		System.arraycopy(colors, dst * 4, colors, mesh.parentVertexIndex * 4,
-				colorBuffer.limit() - dst * 4);
-		System.arraycopy(tmp, 0, colors, colorBuffer.limit() - mesh.numVertices
-				* 4, mesh.numVertices * 4);
+				- mesh.numVertices * INDICES_PER_VERTEX, mesh.numVertices
+				* INDICES_PER_VERTEX);
 
 		children.remove(mesh);
 		children.add(mesh);
@@ -164,37 +163,30 @@ public class MeshGroup {
 			currVertexIndex += child.getNumVertices();
 		}
 		numVertices = currVertexIndex;
-		vertices = Arrays.copyOf(vertices, numVertices * 2);
-		colors = Arrays.copyOf(colors, numVertices * 4);
-		int dst = (mesh.parentVertexIndex + newSize) * 2;
-		System.arraycopy(vertices, (mesh.parentVertexIndex + oldSize) * 2,
-				vertices, dst, vertices.length - dst);
+		vertices = Arrays.copyOf(vertices, numVertices * INDICES_PER_VERTEX);
+
+		int src = (mesh.parentVertexIndex + oldSize) * INDICES_PER_VERTEX;
+		int dst = (mesh.parentVertexIndex + newSize) * INDICES_PER_VERTEX;
+		System.arraycopy(vertices, src, vertices, dst, vertices.length - dst);
+
 		vertexBuffer = FloatBuffer.wrap(vertices);
-		colorBuffer = FloatBuffer.wrap(colors);
 	}
 
 	private synchronized void updateBuffers() {
 		initHandles();
 
 		View.gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
-		View.gl.glBufferData(GL11.GL_ARRAY_BUFFER, vertexBuffer.limit() * 4,
-				vertexBuffer, GL11.GL_DYNAMIC_DRAW);
-
-		View.gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, colorHandle);
-		View.gl.glBufferData(GL11.GL_ARRAY_BUFFER, colorBuffer.limit() * 4,
-				colorBuffer, GL11.GL_DYNAMIC_DRAW);
+		View.gl.glBufferData(GL11.GL_ARRAY_BUFFER, vertexBuffer.limit()
+				* FLOAT_BYTES, vertexBuffer, GL11.GL_DYNAMIC_DRAW);
 	}
 
 	private void initHandles() {
-		if (vertexHandle != -1 && colorHandle != -1) {
+		if (vertexHandle != -1) {
 			return; // already initialized
 		}
 		int[] buffer = new int[1];
 
 		View.gl.glGenBuffers(1, buffer, 0);
 		vertexHandle = buffer[0];
-
-		View.gl.glGenBuffers(1, buffer, 0);
-		colorHandle = buffer[0];
 	}
 }

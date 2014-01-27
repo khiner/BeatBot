@@ -17,8 +17,12 @@ import com.kh.beatbot.ui.view.View;
 public class TextGroup {
 	private List<TextMesh> children = new ArrayList<TextMesh>();
 
-	private final static int VERTICES_PER_SPRITE = 4, INDICES_PER_SPRITE = 6,
-			VERTEX_BYTES = 32;
+	private final static int VERTICES_PER_SPRITE = 4;
+	private final static int INDICES_PER_SPRITE = 6;
+	private final static int INDICES_PER_VERTEX = 8;
+	private final static int SHORT_BYTES = Short.SIZE / 8;
+	private final static int FLOAT_BYTES = Float.SIZE / 8;
+	private final static int VERTEX_BYTES = INDICES_PER_VERTEX * FLOAT_BYTES;
 
 	private boolean dirty = false;
 	private int numChars = 0;
@@ -26,13 +30,16 @@ public class TextGroup {
 	private FloatBuffer vertexBuffer;
 	private ShortBuffer indexBuffer;
 
-	public synchronized void initChar(int charIndex, float x, float y, float width,
-			float height, TextureRegion region, float[] color) {
+	public synchronized void initChar(int charIndex, float x, float y,
+			float width, float height, TextureRegion region, float[] color) {
 		int index = charIndex * VERTEX_BYTES;
 		vertex(index, x, y + height, region.u1, region.v2, color);
-		vertex(index + 8, x + width, y + height, region.u2, region.v2, color);
-		vertex(index + 16, x + width, y, region.u2, region.v1, color);
-		vertex(index + 24, x, y, region.u1, region.v1, color);
+		vertex(index + INDICES_PER_VERTEX, x + width, y + height, region.u2,
+				region.v2, color);
+		vertex(index + INDICES_PER_VERTEX * 2, x + width, y, region.u2,
+				region.v1, color);
+		vertex(index + INDICES_PER_VERTEX * 3, x, y, region.u1, region.v1,
+				color);
 	}
 
 	public synchronized void add(TextMesh mesh) {
@@ -55,8 +62,8 @@ public class TextGroup {
 		}
 
 		int dst = (mesh.parentCharIndex + mesh.getNumChars()) * VERTEX_BYTES;
-		System.arraycopy(vertices, dst, vertices,
-				mesh.parentCharIndex * VERTEX_BYTES, vertices.length - dst);
+		System.arraycopy(vertices, dst, vertices, mesh.parentCharIndex
+				* VERTEX_BYTES, vertices.length - dst);
 
 		children.remove(mesh);
 
@@ -107,8 +114,8 @@ public class TextGroup {
 		dirty = true;
 	}
 
-	public synchronized void setText(TextMesh mesh, String text, float x, float y,
-			float height, float[] color) {
+	public synchronized void setText(TextMesh mesh, String text, float x,
+			float y, float height, float[] color) {
 
 		int charIndex = mesh.parentCharIndex;
 
@@ -128,7 +135,7 @@ public class TextGroup {
 				+ mesh.getNumChars(); charIndex++) {
 			for (int vertexIndex = 0; vertexIndex < VERTICES_PER_SPRITE; vertexIndex++) {
 				System.arraycopy(color, 0, vertices, charIndex * VERTEX_BYTES
-						+ vertexIndex * 8 + 4, color.length);
+						+ vertexIndex * INDICES_PER_VERTEX + 4, color.length);
 			}
 		}
 
@@ -163,8 +170,8 @@ public class TextGroup {
 		gl.glDisable(GL10.GL_TEXTURE_2D);
 	}
 
-	private synchronized void vertex(int index, float x, float y, float textureX,
-			float textureY, float[] color) {
+	private synchronized void vertex(int index, float x, float y,
+			float textureX, float textureY, float[] color) {
 		vertices[index] = x;
 		vertices[index + 1] = y;
 		vertices[index + 2] = textureX;
@@ -191,8 +198,7 @@ public class TextGroup {
 	}
 
 	private FloatBuffer createFloatBuffer(float[] floats) {
-		FloatBuffer fb = ByteBuffer
-				.allocateDirect(floats.length * Float.SIZE / 8)
+		FloatBuffer fb = ByteBuffer.allocateDirect(floats.length * FLOAT_BYTES)
 				.order(ByteOrder.nativeOrder()).asFloatBuffer();
 		fb.clear();
 		fb.put(floats);
@@ -202,8 +208,7 @@ public class TextGroup {
 	}
 
 	private ShortBuffer createShortBuffer(short[] shorts) {
-		ShortBuffer sb = ByteBuffer
-				.allocateDirect(numChars * INDICES_PER_SPRITE * Short.SIZE / 8)
+		ShortBuffer sb = ByteBuffer.allocateDirect(shorts.length * SHORT_BYTES)
 				.order(ByteOrder.nativeOrder()).asShortBuffer();
 		sb.clear();
 		sb.put(shorts);
