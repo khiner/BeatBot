@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.kh.beatbot.activity.BeatBotActivity;
@@ -30,6 +31,9 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 	protected static GL11 gl = null;
 	protected static GLText glText;
 
+	private long frameCount = 0;
+	private long averageFrameTime = 0;
+
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		super.surfaceChanged(holder, format, width, height);
@@ -48,8 +52,16 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 	}
 
 	public final void onDrawFrame(GL10 _gl) {
+		/* uncomment for timing logs */
+//		long startTime = System.nanoTime();
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		draw();
+//		long frameTime = System.nanoTime() - startTime;
+
+//		if (frameCount++ < 200)
+//			return;
+//		averageFrameTime += (frameTime - averageFrameTime) / (frameCount - 200);
+//		Log.i("Avg Frame time: ", String.valueOf(averageFrameTime) + ", " + frameCount);
 	}
 
 	protected void initGl(GL10 _gl) {
