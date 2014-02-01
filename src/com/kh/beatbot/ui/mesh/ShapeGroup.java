@@ -6,14 +6,14 @@ import com.kh.beatbot.ui.view.View;
 
 public class ShapeGroup {
 
-	protected MeshGroup fillGroup, strokeGroup;
+	protected Mesh2DGroup fillGroup, strokeGroup;
 	protected TextGroup textGroup;
 	private int strokeWeight = 0;
 
 	public ShapeGroup() {
-		fillGroup = new MeshGroup(GL10.GL_TRIANGLES);
-		strokeGroup = new MeshGroup(GL10.GL_LINES);
-		textGroup = new TextGroup();
+		fillGroup = new Mesh2DGroup(GL10.GL_TRIANGLES);
+		strokeGroup = new Mesh2DGroup(GL10.GL_LINES);
+		textGroup = new TextGroup(GL10.GL_TRIANGLES);
 	}
 
 	public TextGroup getTextGroup() {
@@ -22,14 +22,6 @@ public class ShapeGroup {
 
 	public void setStrokeWeight(final int strokeWeight) {
 		this.strokeWeight = strokeWeight;
-	}
-
-	public void setFillPrimitiveType(final int primitiveType) {
-		fillGroup.setPrimitiveType(primitiveType);
-	}
-
-	public void setStrokePrimitiveType(int primitiveType) {
-		strokeGroup.setPrimitiveType(primitiveType);
 	}
 
 	public void add(TextMesh textMesh) {

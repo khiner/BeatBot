@@ -1,39 +1,21 @@
 package com.kh.beatbot.ui.mesh;
 
-public class Mesh2D {
+public class Mesh2D extends Mesh {
 
-	protected MeshGroup group;
 	/** vertex index at which the next vertex gets inserted (and parent) **/
-	protected int index = 0, parentVertexIndex = -1;
+	protected int index = 0;
 
-	protected int numVertices = 0;
-
-	public Mesh2D(MeshGroup group, int numVertices) {
+	public Mesh2D(Mesh2DGroup group, int numVertices) {
 		this.numVertices = numVertices;
 		setGroup(group);
-	}
-
-	public void setGroup(MeshGroup group) {
-		if (this.group == group)
-			return;
-		this.group = group;
-		group.add(this);
 	}
 
 	public void vertex(float x, float y, float[] color) {
 		if (index >= numVertices) {
 			numVertices = index + 1;
-			group.expand(this, numVertices - 1, numVertices);
+			group.changeSize(this, numVertices - 1, numVertices);
 		}
-		group.vertex(this, x, y, color);
+		((Mesh2DGroup)group).vertex(this, x, y, color);
 		index++;
-	}
-
-	public int getNumVertices() {
-		return numVertices;
-	}
-
-	public void translate(float x, float y) {
-		group.translate(this, x, y);
 	}
 }

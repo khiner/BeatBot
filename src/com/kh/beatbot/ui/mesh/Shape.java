@@ -89,14 +89,6 @@ public abstract class Shape extends Drawable {
 		}
 	}
 
-	protected synchronized void updateGroup() {
-		if (!group.contains(this)) {
-			group.add(this);
-		} else {
-			update();
-		}
-	}
-
 	public synchronized void update() {
 		if (width > 0 && height > 0) {
 			resetIndices();
@@ -106,18 +98,21 @@ public abstract class Shape extends Drawable {
 
 	public synchronized void setFillColor(float[] fillColor) {
 		this.fillColor = fillColor;
-		updateGroup();
+		if (fillMesh != null) {
+			fillMesh.setColor(fillColor);
+		}
 	}
 
 	public synchronized void setStrokeColor(float[] strokeColor) {
 		this.strokeColor = strokeColor;
-		updateGroup();
+		if (strokeMesh != null) {
+			strokeMesh.setColor(strokeColor);
+		}
 	}
 
 	public synchronized void setColors(float[] fillColor, float[] strokeColor) {
-		this.fillColor = fillColor;
-		this.strokeColor = strokeColor;
-		updateGroup();
+		setFillColor(fillColor);
+		setStrokeColor(strokeColor);
 	}
 
 	public synchronized void setStrokeWeight(int strokeWeight) {
