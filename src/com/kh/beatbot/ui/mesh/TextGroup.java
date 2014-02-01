@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.opengles.GL11;
 
 import android.util.Log;
 
@@ -23,6 +24,10 @@ public class TextGroup {
 	private final static int SHORT_BYTES = Short.SIZE / 8;
 	private final static int FLOAT_BYTES = Float.SIZE / 8;
 	private final static int VERTEX_BYTES = INDICES_PER_VERTEX * FLOAT_BYTES;
+	private static final int TEX_OFFSET_BYTES = 2 * FLOAT_BYTES;
+	private static final int COLOR_OFFSET_BYTES = 4 * FLOAT_BYTES;
+
+	private int vertexHandle = -1, indexHandle = -1;
 
 	private boolean dirty = false;
 	private int numChars = 0;
@@ -148,26 +153,28 @@ public class TextGroup {
 
 		if (dirty) {
 			updateIndices();
+			updateBuffers();
 			dirty = false;
 		}
 
-		GL10 gl = View.gl;
+		GL11 gl = View.gl;
 		gl.glEnable(GL10.GL_TEXTURE_2D);
-		gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, GLText.getTextureId());
+		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
+		gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 
-		vertexBuffer.position(0);
-		gl.glVertexPointer(2, GL10.GL_FLOAT, VERTEX_BYTES, vertexBuffer);
-		vertexBuffer.position(2);
-		gl.glTexCoordPointer(2, GL10.GL_FLOAT, VERTEX_BYTES, vertexBuffer);
-		vertexBuffer.position(4);
-		gl.glColorPointer(4, GL10.GL_FLOAT, VERTEX_BYTES, vertexBuffer);
+		gl.glVertexPointer(2, GL10.GL_FLOAT, VERTEX_BYTES, 0);
+		gl.glTexCoordPointer(2, GL10.GL_FLOAT, VERTEX_BYTES, TEX_OFFSET_BYTES);
+		gl.glColorPointer(4, GL10.GL_FLOAT, VERTEX_BYTES, COLOR_OFFSET_BYTES);
 
-		gl.glDrawElements(GL10.GL_TRIANGLES, numChars * INDICES_PER_SPRITE,
-				GL10.GL_UNSIGNED_SHORT, indexBuffer);
+		gl.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, indexHandle);
+		gl.glDrawElements(GL10.GL_TRIANGLES, numChars * INDICES_PER_SPRITE, GL10.GL_UNSIGNED_SHORT, 0);
 
 		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		gl.glDisable(GL10.GL_TEXTURE_2D);
+
+		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
+		gl.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	private synchronized void vertex(int index, float x, float y,
@@ -215,5 +222,30 @@ public class TextGroup {
 		sb.position(0);
 
 		return sb;
+	}
+
+	private synchronized void updateBuffers() {
+		initHandles();
+
+		View.gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
+		View.gl.glBufferData(GL11.GL_ARRAY_BUFFER, vertexBuffer.limit()
+				* FLOAT_BYTES, vertexBuffer, GL11.GL_DYNAMIC_DRAW);
+
+		View.gl.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, indexHandle);
+		View.gl.glBufferData(GL11.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.limit()
+				* SHORT_BYTES, indexBuffer, GL11.GL_DYNAMIC_DRAW);
+	}
+
+	private void initHandles() {
+		if (vertexHandle != -1) {
+			return; // already initialized
+		}
+		int[] buffer = new int[1];
+
+		View.gl.glGenBuffers(1, buffer, 0);
+		vertexHandle = buffer[0];
+
+		View.gl.glGenBuffers(1, buffer, 0);
+		indexHandle = buffer[0];
 	}
 }
