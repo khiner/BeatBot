@@ -1,6 +1,7 @@
 package com.kh.beatbot.ui.mesh;
 
 import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,13 +16,16 @@ import com.kh.beatbot.ui.view.View;
 public class MeshGroup {
 	private static final int INDICES_PER_VERTEX = 6; // x, y + color
 	private static final int FLOAT_BYTES = Float.SIZE / 8;
+	private static final int SHORT_BYTES = Short.SIZE / 8;
 	private static final int COLOR_OFFSET_BYTES = FLOAT_BYTES * 2;
 	private static final int VERTEX_BYTES = INDICES_PER_VERTEX * FLOAT_BYTES;
 
 	private List<Mesh2D> children = new ArrayList<Mesh2D>();
 	private FloatBuffer vertexBuffer;
+	private ShortBuffer indexBuffer;
 	private float[] vertices = new float[0];
-	private int vertexHandle = -1, numVertices = 0, primitiveType;
+	private int vertexHandle = -1, indexHandle = -1, numVertices = 0,
+			primitiveType;
 	private boolean dirty = false;
 
 	public MeshGroup(int primitiveType) {
@@ -69,6 +73,7 @@ public class MeshGroup {
 		}
 
 		if (dirty) {
+			updateIndices();
 			updateBuffers();
 			dirty = false;
 		}
@@ -77,12 +82,15 @@ public class MeshGroup {
 		View.gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 
 		View.gl.glVertexPointer(2, GL10.GL_FLOAT, VERTEX_BYTES, 0);
-		View.gl.glColorPointer(4, GL10.GL_FLOAT, VERTEX_BYTES, COLOR_OFFSET_BYTES);
+		View.gl.glColorPointer(4, GL10.GL_FLOAT, VERTEX_BYTES,
+				COLOR_OFFSET_BYTES);
 
-		View.gl.glDrawArrays(primitiveType, 0, numVertices);
+		View.gl.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, indexHandle);
+		View.gl.glDrawElements(primitiveType, numVertices, GL10.GL_UNSIGNED_SHORT, 0);
 
 		View.gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		View.gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
+		View.gl.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	public synchronized boolean contains(Mesh2D mesh) {
@@ -178,6 +186,19 @@ public class MeshGroup {
 		View.gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
 		View.gl.glBufferData(GL11.GL_ARRAY_BUFFER, vertexBuffer.limit()
 				* FLOAT_BYTES, vertexBuffer, GL11.GL_DYNAMIC_DRAW);
+
+		View.gl.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, indexHandle);
+		View.gl.glBufferData(GL11.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.limit()
+				* SHORT_BYTES, indexBuffer, GL11.GL_DYNAMIC_DRAW);
+	}
+
+	private synchronized void updateIndices() {
+		short[] indices = new short[numVertices];
+		for (short i = 0; i < indices.length; i++) {
+			indices[i] = i;
+		}
+
+		indexBuffer = ShortBuffer.wrap(indices);
 	}
 
 	private void initHandles() {
@@ -188,5 +209,8 @@ public class MeshGroup {
 
 		View.gl.glGenBuffers(1, buffer, 0);
 		vertexHandle = buffer[0];
+
+		View.gl.glGenBuffers(1, buffer, 0);
+		indexHandle = buffer[0];
 	}
 }
