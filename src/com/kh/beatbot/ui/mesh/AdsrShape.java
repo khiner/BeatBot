@@ -1,24 +1,13 @@
 package com.kh.beatbot.ui.mesh;
 
 public class AdsrShape extends Shape {
-
-	Circle[] circles = new Circle[4];
+	private Circle[] circles = new Circle[4];
 
 	public AdsrShape(ShapeGroup group, float[] fillColor, float[] strokeColor) {
-		super(group, fillColor, strokeColor);
+		super(group, fillColor, strokeColor, 0, 10);
 		for (int i = 0; i < circles.length; i++) {
 			circles[i] = new Circle(group, fillColor, null);
 		}
-	}
-
-	@Override
-	protected int getNumFillVertices() {
-		return 0;
-	}
-
-	@Override
-	protected int getNumStrokeVertices() {
-		return 10;
 	}
 
 	@Override

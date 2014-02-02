@@ -10,18 +10,13 @@ public class WaveformShape extends Shape {
 	private long offsetInSamples, widthInSamples;
 	private float xOffset, numSamples, loopBeginX, loopEndX;
 	private SparseArray<Float> sampleBuffer = new SparseArray<Float>();
-	
-	public WaveformShape(ShapeGroup group, float width) {
-		super(group);
+
+	public WaveformShape(ShapeGroup group, float width, float[] fillColor,
+			float[] strokeColor) {
+		super(group, fillColor, strokeColor, Rectangle.FILL_INDICES, null,
+				Rectangle.NUM_FILL_VERTICES, (int) (width * MAX_SPP * 3 * 2));
 		this.width = width;
-	}
-
-	protected int getNumFillVertices() {
-		return 6; // two triangles
-	}
-
-	protected int getNumStrokeVertices() {
-		return (int) (width * MAX_SPP * 3 * 2); // 3 window-lengths, 2 vertices for each sample
+		// 3 window-lengths, 2 vertices for each sample
 	}
 
 	/*
@@ -73,17 +68,14 @@ public class WaveformShape extends Shape {
 	}
 
 	private synchronized void updateLoopSelectionVertices() {
-		// fill triangle 1
 		fillVertex(x + loopBeginX, y + View.BG_OFFSET);
-		fillVertex(x + loopEndX, y + View.BG_OFFSET);
 		fillVertex(x + loopBeginX, y + height - View.BG_OFFSET);
-		// fill triangle 2
-		fillVertex(x + loopBeginX, y + height - View.BG_OFFSET);
-		fillVertex(x + loopEndX, y + View.BG_OFFSET);
 		fillVertex(x + loopEndX, y + height - View.BG_OFFSET);
+		fillVertex(x + loopEndX, y + View.BG_OFFSET);
 	}
 
-	public synchronized void update(long offsetInSamples, long widthInSamples, float xOffset) {
+	public synchronized void update(long offsetInSamples, long widthInSamples,
+			float xOffset) {
 		this.offsetInSamples = offsetInSamples;
 		this.widthInSamples = widthInSamples;
 		this.xOffset = xOffset;

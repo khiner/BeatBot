@@ -4,17 +4,7 @@ public class NumberSegment extends Shape {
 
 	public NumberSegment(ShapeGroup group, float[] fillColor,
 			float[] strokeColor) {
-		super(group, fillColor, strokeColor);
-	}
-
-	@Override
-	protected int getNumFillVertices() {
-		return 6;
-	}
-
-	@Override
-	protected int getNumStrokeVertices() {
-		return 0;
+		super(group, fillColor, strokeColor, 6, 0);
 	}
 
 	@Override

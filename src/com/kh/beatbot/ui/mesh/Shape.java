@@ -17,38 +17,26 @@ public abstract class Shape extends Drawable {
 		this.group = group != null ? group : new ShapeGroup();
 	}
 
-	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor) {
-		this(group, fillColor, strokeColor, null, null);
+	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor, int numFillVertices, int numStrokeVertices) {
+		this(group, fillColor, strokeColor, null, null, numFillVertices, numStrokeVertices);
 	}
 
-	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor, short[] fillIndices, short[] strokeIndices) {
+	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor,
+			short[] fillIndices, short[] strokeIndices, int numFillVertices,
+			int numStrokeVertices) {
 		this(group);
 		if (fillColor != null) {
-			fillMesh = new Mesh2D(this.group.fillGroup, getNumFillVertices(), fillIndices);
+			fillMesh = new Mesh2D(this.group.fillGroup, numFillVertices,
+					fillIndices);
 			this.fillColor = fillColor;
 		}
 		if (strokeColor != null) {
-			strokeMesh = new Mesh2D(this.group.strokeGroup,
-					getNumStrokeVertices(), strokeIndices);
+			strokeMesh = new Mesh2D(this.group.strokeGroup, numStrokeVertices,
+					strokeIndices);
 			this.strokeColor = strokeColor;
 		}
 		this.group.add(this);
 	}
-
-	public static WaveformShape createWaveform(ShapeGroup group, float width,
-			float[] fillColor, float[] strokeColor) {
-		Shape waveform = new WaveformShape(group, width);
-		waveform.fillMesh = new Mesh2D(waveform.group.fillGroup,
-				waveform.getNumFillVertices());
-		waveform.strokeMesh = new Mesh2D(waveform.group.strokeGroup,
-				waveform.getNumStrokeVertices());
-		waveform.setColors(fillColor, strokeColor);
-		return (WaveformShape) waveform;
-	}
-
-	protected abstract int getNumFillVertices();
-
-	protected abstract int getNumStrokeVertices();
 
 	protected abstract void updateVertices();
 

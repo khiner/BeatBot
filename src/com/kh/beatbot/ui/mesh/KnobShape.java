@@ -6,6 +6,7 @@ import java.util.List;
 import com.kh.beatbot.ui.color.Colors;
 
 public class KnobShape extends Shape {
+	private static final int NUM_FILL_VERTICES = 128 * 3;
 
 	class Vertex {
 		float x, y;
@@ -20,17 +21,7 @@ public class KnobShape extends Shape {
 	private int colorChangeVertex = 0;
 
 	public KnobShape(ShapeGroup group, float[] fillColor, float[] strokeColor) {
-		super(group, fillColor, strokeColor);
-	}
-
-	@Override
-	protected int getNumFillVertices() {
-		return 128 * 3;
-	}
-
-	@Override
-	protected int getNumStrokeVertices() {
-		return 0;
+		super(group, fillColor, strokeColor, NUM_FILL_VERTICES, 0);
 	}
 
 	@Override
@@ -45,7 +36,7 @@ public class KnobShape extends Shape {
 	}
 
 	public void setLevel(float level) {
-		colorChangeVertex = (int) (getNumFillVertices() * level) / 3;
+		colorChangeVertex = (int) (NUM_FILL_VERTICES * level) / 3;
 		if ((colorChangeVertex & 1) == 0) { // even
 			colorChangeVertex += 1; // cci should be odd
 		}
@@ -57,10 +48,10 @@ public class KnobShape extends Shape {
 		if (!tempVertices.isEmpty())
 			return;
 		float theta = 3 * ¹ / 4; // start at 1/8 around the circle
-		for (int i = 0; i < getNumFillVertices() / 6; i++) {
+		for (int i = 0; i < NUM_FILL_VERTICES / 6; i++) {
 			// theta will range from ¹/4 to 7¹/8,
 			// with the ¹/8 gap at the "bottom" of the view
-			theta += 9 * ¹ / getNumFillVertices();
+			theta += 9 * ¹ / NUM_FILL_VERTICES;
 			// main circles will show when user is not touching
 			tempVertex(theta, width / 2.3f);
 			tempVertex(theta, width / 3.3f);

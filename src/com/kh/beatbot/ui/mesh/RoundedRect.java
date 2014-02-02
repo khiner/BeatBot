@@ -5,18 +5,21 @@ public class RoundedRect extends Shape {
 	public static final short[] STROKE_INDICES = getStrokeIndices();
 
 	public static final int NUM_CORNER_VERTICES = 6;
+	public static final int NUM_FILL_VERTICES = NUM_CORNER_VERTICES * 4 + 1;
+	public static final int NUM_STROKE_VERTICES = NUM_CORNER_VERTICES * 4;
 
 	public float roundThresh = 0;
 	public float cornerRadius = -1;
 
 	public RoundedRect(ShapeGroup group, float[] fillColor, float[] strokeColor) {
-		super(group, fillColor, strokeColor, FILL_INDICES, STROKE_INDICES);
+		super(group, fillColor, strokeColor, FILL_INDICES, STROKE_INDICES,
+				NUM_FILL_VERTICES, NUM_STROKE_VERTICES);
 	}
 
 	private static short[] getFillIndices() {
-		short[] fillIndices = new short[(NUM_CORNER_VERTICES * 4 + 1) * 3];
+		short[] fillIndices = new short[NUM_FILL_VERTICES * 3];
 
-		for (int i = 0; i < NUM_CORNER_VERTICES * 4; i++) {
+		for (int i = 0; i < NUM_STROKE_VERTICES; i++) {
 			fillIndices[i * 3] = 0; // first is center
 			fillIndices[i * 3 + 1] = (short) i;
 			fillIndices[i * 3 + 2] = (short) (i + 1);
@@ -30,9 +33,9 @@ public class RoundedRect extends Shape {
 	}
 
 	private static short[] getStrokeIndices() {
-		short[] strokeIndices = new short[NUM_CORNER_VERTICES * 4 * 2];
+		short[] strokeIndices = new short[NUM_STROKE_VERTICES * 2];
 
-		for (int i = 0; i < NUM_CORNER_VERTICES * 4; i++) {
+		for (int i = 0; i < NUM_STROKE_VERTICES; i++) {
 			strokeIndices[i * 2] = (short) i;
 			strokeIndices[i * 2 + 1] = (short) (i + 1);
 		}
@@ -43,20 +46,12 @@ public class RoundedRect extends Shape {
 		return strokeIndices;
 	}
 
-	protected int getNumFillVertices() {
-		return NUM_CORNER_VERTICES * 4 + 1;
-	}
-
-	protected int getNumStrokeVertices() {
-		return NUM_CORNER_VERTICES * 4;
-	}
-
 	protected synchronized void updateVertices() {
 		fillVertex(x + width / 2, y + height / 2); // center
 
 		roundThresh = cornerRadius / 20;
 		float theta = 0, addX, addY, vertexX, vertexY;
-		for (int i = 0; i < getNumFillVertices() - 1; i++) {
+		for (int i = 0; i < NUM_STROKE_VERTICES; i++) {
 			if (theta < ¹ / 2) { // lower right
 				addX = width - cornerRadius;
 				addY = height - cornerRadius;
@@ -76,7 +71,7 @@ public class RoundedRect extends Shape {
 			fillVertex(vertexX, vertexY);
 			strokeVertex(vertexX, vertexY);
 
-			theta += 2 * ¹ / (getNumFillVertices() - 1);
+			theta += 2 * ¹ / NUM_STROKE_VERTICES;
 		}
 	}
 

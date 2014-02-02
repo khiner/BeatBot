@@ -8,7 +8,8 @@ public class Circle extends Shape {
 	private static final int NUM_FILL_VERTICES = 18;
 
 	public Circle(ShapeGroup group, float[] fillColor, float[] strokeColor) {
-		super(group, fillColor, strokeColor, FILL_INDICES, null);
+		super(group, fillColor, strokeColor, FILL_INDICES, null,
+				NUM_FILL_VERTICES, 0);
 	}
 
 	private static short[] getFillIndices() {
@@ -28,25 +29,15 @@ public class Circle extends Shape {
 	}
 
 	@Override
-	protected int getNumFillVertices() {
-		return NUM_FILL_VERTICES;
-	}
-
-	@Override
-	protected int getNumStrokeVertices() {
-		return 0;
-	}
-
-	@Override
 	protected void updateVertices() {
 		fillVertex(this.x, this.y); // center
 
 		float theta = 0;
-		for (int i = 0; i < getNumFillVertices() - 1; i++) {
+		for (int i = 0; i < NUM_FILL_VERTICES - 1; i++) {
 			float x = (float) Math.cos(theta) * width / 2 + this.x;
 			float y = (float) Math.sin(theta) * height / 2 + this.y;
 			fillVertex(x, y);
-			theta += 2 * Math.PI / (getNumFillVertices() - 1);
+			theta += 2 * Math.PI / (NUM_FILL_VERTICES - 1);
 		}
 	}
 }

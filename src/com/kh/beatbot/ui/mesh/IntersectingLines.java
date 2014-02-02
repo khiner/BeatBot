@@ -6,17 +6,7 @@ public class IntersectingLines extends Shape {
 
 	public IntersectingLines(ShapeGroup group, float[] fillColor,
 			float[] strokeColor) {
-		super(group, fillColor, strokeColor);
-	}
-
-	@Override
-	protected int getNumFillVertices() {
-		return 0;
-	}
-
-	@Override
-	protected int getNumStrokeVertices() {
-		return 4;
+		super(group, fillColor, strokeColor, 0, 4);
 	}
 
 	@Override
