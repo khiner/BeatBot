@@ -13,10 +13,20 @@ public class WaveformShape extends Shape {
 
 	public WaveformShape(ShapeGroup group, float width, float[] fillColor,
 			float[] strokeColor) {
-		super(group, fillColor, strokeColor, Rectangle.FILL_INDICES, null,
-				Rectangle.NUM_FILL_VERTICES, (int) (width * MAX_SPP * 3 * 2));
+		super(group, fillColor, strokeColor, Rectangle.FILL_INDICES, getStrokeIndices(width),
+				Rectangle.NUM_FILL_VERTICES, (int) (width * MAX_SPP * 3));
 		this.width = width;
-		// 3 window-lengths, 2 vertices for each sample
+		// 3 window-lengths
+	}
+
+	private static short[] getStrokeIndices(float width) {
+		short[] strokeIndices = new short[(int) (width * MAX_SPP * 3 * 2)];
+		for (int i = 0; i < strokeIndices.length / 2; i++) {
+			strokeIndices[i * 2] = (short) i;
+			strokeIndices[i * 2 + 1] = (short) (i + 1);
+		}
+
+		return strokeIndices;
 	}
 
 	/*
@@ -46,22 +56,20 @@ public class WaveformShape extends Shape {
 	}
 
 	private synchronized void updateWaveformVertices() {
-		float lastX = x;
-		float lastY = y + height / 2;
+		float x = this.x;
+		float y = this.y + height / 2;
+
 		for (int i = 0; i < sampleBuffer.size(); i++) {
 			int sampleIndex = sampleBuffer.keyAt(i);
 			float sample = sampleBuffer.get(sampleIndex);
-
 			float percent = (float) (sampleIndex - offsetInSamples)
 					/ (float) widthInSamples;
-			float x = this.x + percent * width + xOffset;
-			float y = this.y + height * (1 - sample) / 2;
 
 			strokeVertex(x, y);
-			strokeVertex(lastX, lastY);
-			lastX = x;
-			lastY = y;
+			x = this.x + percent * width + xOffset;
+			y = this.y + height * (1 - sample) / 2;
 		}
+
 		while (strokeMesh.index < strokeMesh.numVertices) {
 			strokeVertex(this.x + Float.MAX_VALUE, this.y + height / 2);
 		}
