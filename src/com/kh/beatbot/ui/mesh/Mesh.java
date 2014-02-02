@@ -1,8 +1,6 @@
 package com.kh.beatbot.ui.mesh;
 
 public abstract class Mesh {
-	public static final short[] RECT_INDICES = { 0, 1, 2, 2, 3, 0 };
-
 	protected MeshGroup group;
 	protected int parentVertexIndex = -1, parentIndexOffset = -1;
 	protected int numVertices = 0;

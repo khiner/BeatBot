@@ -18,14 +18,18 @@ public abstract class Shape extends Drawable {
 	}
 
 	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor) {
+		this(group, fillColor, strokeColor, null, null);
+	}
+
+	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor, short[] fillIndices, short[] strokeIndices) {
 		this(group);
 		if (fillColor != null) {
-			fillMesh = new Mesh2D(this.group.fillGroup, getNumFillVertices());
+			fillMesh = new Mesh2D(this.group.fillGroup, getNumFillVertices(), fillIndices);
 			this.fillColor = fillColor;
 		}
 		if (strokeColor != null) {
 			strokeMesh = new Mesh2D(this.group.strokeGroup,
-					getNumStrokeVertices());
+					getNumStrokeVertices(), strokeIndices);
 			this.strokeColor = strokeColor;
 		}
 		this.group.add(this);

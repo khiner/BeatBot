@@ -1,18 +1,34 @@
 package com.kh.beatbot.ui.mesh;
 
+import android.util.Log;
+
 public class Mesh2D extends Mesh {
 
 	/** vertex index at which the next vertex gets inserted (and parent) **/
 	protected int index = 0;
+	boolean customIndices = false;
 
 	public Mesh2D(Mesh2DGroup group, int numVertices) {
 		setNumVertices(numVertices);
-
+		setGroup(group);
+	}
+	
+	public Mesh2D(Mesh2DGroup group, int numVertices, short[] indices) {
+		if (null != indices) {
+			customIndices = true;
+			this.indices = indices;
+			this.numVertices = numVertices;
+		} else {
+			setNumVertices(numVertices);
+		}
 		setGroup(group);
 	}
 
 	public void vertex(float x, float y, float[] color) {
 		if (index >= numVertices) {
+			if (customIndices) {
+				Log.e("Mesh2D", "trying to expand custom indices");
+			}
 			setNumVertices(index + 1);
 			group.changeSize(this, numVertices - 1, numVertices, numVertices - 1, numVertices);
 		}
