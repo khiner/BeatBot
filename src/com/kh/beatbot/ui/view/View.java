@@ -129,9 +129,8 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public synchronized void addChild(View child) {
-		if (children.contains(child)) {
+		if (children.contains(child))
 			return;
-		}
 
 		children.add(child);
 		if (initialized) {
@@ -147,6 +146,8 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public synchronized void removeChild(View child) {
+		if (!children.contains(child))
+			return;
 		child.destroy();
 		children.remove(child);
 	}

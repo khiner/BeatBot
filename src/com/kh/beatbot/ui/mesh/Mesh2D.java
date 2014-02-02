@@ -6,16 +6,25 @@ public class Mesh2D extends Mesh {
 	protected int index = 0;
 
 	public Mesh2D(Mesh2DGroup group, int numVertices) {
-		this.numVertices = numVertices;
+		setNumVertices(numVertices);
+
 		setGroup(group);
 	}
 
 	public void vertex(float x, float y, float[] color) {
 		if (index >= numVertices) {
-			numVertices = index + 1;
-			group.changeSize(this, numVertices - 1, numVertices);
+			setNumVertices(index + 1);
+			group.changeSize(this, numVertices - 1, numVertices, numVertices - 1, numVertices);
 		}
-		((Mesh2DGroup)group).vertex(this, x, y, color);
+		((Mesh2DGroup) group).vertex(this, x, y, color);
 		index++;
+	}
+	
+	private void setNumVertices(int numVertices) {
+		this.numVertices = numVertices;
+		this.indices = new short[numVertices];
+		for (short i = 0; i < this.indices.length; i++) {
+			this.indices[i] = i;
+		}
 	}
 }

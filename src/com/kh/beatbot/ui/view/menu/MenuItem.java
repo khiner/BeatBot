@@ -99,8 +99,8 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 	}
 
 	public void show() {
-		container.add(button);
 		menu.addChild(container);
+		container.add(button);
 	}
 
 	public void hide() {

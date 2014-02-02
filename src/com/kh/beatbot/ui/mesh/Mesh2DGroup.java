@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.mesh;
 
-import java.nio.ShortBuffer;
 
 public class Mesh2DGroup extends MeshGroup {
 
@@ -20,14 +19,5 @@ public class Mesh2DGroup extends MeshGroup {
 		vertices[vertex + 5] = color[3];
 
 		dirty = true;
-	}
-
-	protected synchronized void updateIndices() {
-		short[] indices = new short[numVertices];
-		for (short i = 0; i < indices.length; i++) {
-			indices[i] = i;
-		}
-
-		indexBuffer = ShortBuffer.wrap(indices);
 	}
 }

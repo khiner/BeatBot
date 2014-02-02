@@ -16,7 +16,7 @@ import android.util.Log;
 public abstract class MeshGroup {
 	public final static int SHORT_BYTES = Short.SIZE / 8;
 	public final static int FLOAT_BYTES = Float.SIZE / 8;
-	
+
 	protected final static int COLOR_OFFSET = 2;
 	protected final static int COLOR_OFFSET_BYTES = COLOR_OFFSET * FLOAT_BYTES;
 
@@ -25,29 +25,28 @@ public abstract class MeshGroup {
 
 	protected boolean dirty = false, hasTextures = false;
 	protected int indicesPerVertex, vertexBytes, primitiveType,
-			vertexHandle = -1, indexHandle = -1, numVertices = 0;
+			vertexHandle = -1, indexHandle = -1;
 
+	protected short[] indices = new short[0];
 	protected float[] vertices = new float[0];
 	protected FloatBuffer vertexBuffer;
 	protected ShortBuffer indexBuffer;
 
 	protected List<Mesh> children = new ArrayList<Mesh>();
 
-	protected MeshGroup(int primitiveType, int indicesPerVertex, boolean hasTextures) {
+	protected MeshGroup(int primitiveType, int indicesPerVertex,
+			boolean hasTextures) {
 		this.primitiveType = primitiveType;
 		this.indicesPerVertex = indicesPerVertex;
 		this.vertexBytes = this.indicesPerVertex * FLOAT_BYTES;
 		this.hasTextures = hasTextures;
 	}
 
-	protected abstract void updateIndices();
-
 	public synchronized void draw() {
 		if (children.isEmpty())
 			return;
 
 		if (dirty) {
-			updateIndices();
 			updateBuffers();
 			dirty = false;
 		}
@@ -64,7 +63,8 @@ public abstract class MeshGroup {
 		gl.glVertexPointer(2, GL10.GL_FLOAT, vertexBytes, 0);
 		gl.glColorPointer(4, GL10.GL_FLOAT, vertexBytes, COLOR_OFFSET_BYTES);
 		if (hasTextures) {
-			gl.glTexCoordPointer(2, GL10.GL_FLOAT, vertexBytes, TEX_OFFSET_BYTES);
+			gl.glTexCoordPointer(2, GL10.GL_FLOAT, vertexBytes,
+					TEX_OFFSET_BYTES);
 		}
 
 		gl.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, indexHandle);
@@ -88,11 +88,17 @@ public abstract class MeshGroup {
 		if (null == mesh || children.contains(mesh)) {
 			return;
 		}
-		mesh.parentVertexIndex = numVertices;
+		vertices = Arrays.copyOf(vertices,
+				vertices.length + (mesh.getNumVertices() * indicesPerVertex));
+
+		indices = Arrays.copyOf(indices, indices.length + mesh.getNumIndices());
+		
 		children.add(mesh);
-		numVertices += mesh.getNumVertices();
-		vertices = Arrays.copyOf(vertices, numVertices * indicesPerVertex);
+		resetIndices();
+
 		vertexBuffer = FloatBuffer.wrap(vertices);
+		indexBuffer = ShortBuffer.wrap(indices);
+
 		dirty = true;
 	}
 
@@ -105,17 +111,21 @@ public abstract class MeshGroup {
 			return;
 		}
 
-		int src = mesh.parentVertexIndex * indicesPerVertex;
-		int dst = (mesh.parentVertexIndex + mesh.numVertices)
+		int src = (mesh.parentVertexIndex + mesh.numVertices)
 				* indicesPerVertex;
-		System.arraycopy(vertices, dst, vertices, src, vertices.length - dst);
+		int dst = mesh.parentVertexIndex * indicesPerVertex;
+
+		System.arraycopy(vertices, src, vertices, dst, vertices.length - src);
 
 		children.remove(mesh);
+		resetIndices();
 
-		resetChildIndices();
+		vertices = Arrays.copyOf(vertices,
+				vertices.length - (mesh.getNumVertices() * indicesPerVertex));
+		indices = Arrays.copyOf(indices, indices.length - mesh.getNumIndices());
 
-		vertexBuffer.limit(numVertices * indicesPerVertex);
-
+		vertexBuffer = FloatBuffer.wrap(vertices);
+		indexBuffer = ShortBuffer.wrap(indices);
 		dirty = true;
 	}
 
@@ -138,7 +148,7 @@ public abstract class MeshGroup {
 		children.remove(mesh);
 		children.add(mesh);
 
-		resetChildIndices();
+		resetIndices();
 		dirty = true;
 	}
 
@@ -154,7 +164,8 @@ public abstract class MeshGroup {
 		for (int vertexIndex = mesh.parentVertexIndex; vertexIndex < mesh.parentVertexIndex
 				+ mesh.getNumVertices(); vertexIndex++) {
 			System.arraycopy(color, 0, vertices,
-					(vertexIndex * indicesPerVertex) + COLOR_OFFSET, color.length);
+					(vertexIndex * indicesPerVertex) + COLOR_OFFSET,
+					color.length);
 		}
 		dirty = true;
 	}
@@ -168,34 +179,60 @@ public abstract class MeshGroup {
 		dirty = true;
 	}
 
-	protected synchronized void changeSize(Mesh mesh, int oldSize, int newSize) {
+	protected synchronized void changeSize(Mesh mesh, int oldSize, int newSize,
+			int oldNumIndices, int newNumIndices) {
 		if (oldSize == newSize)
 			return;
-		resetChildIndices();
 
 		int src = (mesh.parentVertexIndex + oldSize) * indicesPerVertex;
 		int dst = (mesh.parentVertexIndex + newSize) * indicesPerVertex;
 
 		if (newSize > oldSize) {
-			vertices = Arrays.copyOf(vertices, numVertices * indicesPerVertex);
+			vertices = Arrays.copyOf(vertices, vertices.length
+					+ (newSize - oldSize) * indicesPerVertex);
 			System.arraycopy(vertices, src, vertices, dst, vertices.length
 					- dst);
+
+			indices = Arrays.copyOf(indices, indices.length
+					+ (newNumIndices - oldNumIndices));
+			resetIndices(mesh);
 		} else {
 			System.arraycopy(vertices, src, vertices, dst, vertices.length
 					- src);
-			vertices = Arrays.copyOf(vertices, numVertices * indicesPerVertex);
+			vertices = Arrays.copyOf(vertices, vertices.length
+					- (oldSize - newSize) * indicesPerVertex);
+
+			indices = Arrays.copyOf(indices, indices.length
+					- (oldNumIndices - newNumIndices));
+			resetIndices(mesh);
 		}
 
+		resetIndices();
+
+		vertexBuffer = FloatBuffer.wrap(vertices);
+		indexBuffer = ShortBuffer.wrap(indices);
 		dirty = true;
 	}
 
-	private void resetChildIndices() {
-		int currVertexIndex = 0;
+	private synchronized void resetIndices() {
+		int numVertices = 0;
+		int numIndices = 0;
 		for (Mesh child : children) {
-			child.parentVertexIndex = currVertexIndex;
-			currVertexIndex += child.getNumVertices();
+			child.parentVertexIndex = numVertices;
+			if (child.parentIndexOffset != numIndices) {
+				child.parentIndexOffset = numIndices;
+				resetIndices(child);
+			}
+			numVertices += child.getNumVertices();
+			numIndices += child.getNumIndices();
 		}
-		numVertices = currVertexIndex;
+	}
+
+	private synchronized void resetIndices(Mesh mesh) {
+		short[] childIndices = mesh.getIndices();
+		for (int i = 0; i < childIndices.length; i++) {
+			indices[mesh.parentIndexOffset + i] = (short) (childIndices[i] + mesh.parentVertexIndex);
+		}
 	}
 
 	private synchronized void updateBuffers() {
