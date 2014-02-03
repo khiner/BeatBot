@@ -92,7 +92,7 @@ public abstract class MeshGroup {
 				vertices.length + (mesh.getNumVertices() * indicesPerVertex));
 
 		indices = Arrays.copyOf(indices, indices.length + mesh.getNumIndices());
-		
+
 		children.add(mesh);
 		resetIndices();
 
@@ -161,12 +161,21 @@ public abstract class MeshGroup {
 	}
 
 	protected synchronized void setColor(Mesh mesh, float[] color) {
-		for (int vertexIndex = mesh.parentVertexIndex; vertexIndex < mesh.parentVertexIndex
-				+ mesh.getNumVertices(); vertexIndex++) {
-			System.arraycopy(color, 0, vertices,
-					(vertexIndex * indicesPerVertex) + COLOR_OFFSET,
-					color.length);
+		for (int vertexIndex = 0; vertexIndex < mesh.getNumVertices(); vertexIndex++) {
+			setColor(mesh, vertexIndex, color);
 		}
+		dirty = true;
+	}
+
+	protected synchronized void setColor(Mesh mesh, int vertexIndex,
+			float[] color) {
+		int offset = (mesh.parentVertexIndex + vertexIndex) * indicesPerVertex
+				+ COLOR_OFFSET;
+		vertices[offset] = color[0];
+		vertices[offset + 1] = color[1];
+		vertices[offset + 2] = color[2];
+		vertices[offset + 3] = color[3];
+
 		dirty = true;
 	}
 

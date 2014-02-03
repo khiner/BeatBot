@@ -19,6 +19,10 @@ public abstract class Mesh {
 	public void setColor(float[] color) {
 		group.setColor(this, color);
 	}
+	
+	public void setColor(int vertexIndex, float[] color) {
+		group.setColor(this, vertexIndex, color);
+	}
 
 	public void destroy() {
 		if (group == null)

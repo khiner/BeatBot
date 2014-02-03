@@ -5,7 +5,7 @@ import com.kh.beatbot.ui.Drawable;
 public abstract class Shape extends Drawable {
 	public static final float ¹ = (float) Math.PI;
 	protected Mesh2D fillMesh, strokeMesh;
-	private float[] fillColor, strokeColor;
+	protected float[] fillColor, strokeColor;
 
 	protected ShapeGroup group;
 	private boolean shouldDraw;
@@ -54,21 +54,9 @@ public abstract class Shape extends Drawable {
 		}
 	}
 
-	protected synchronized void fillVertex(float x, float y, float[] color) {
-		if (fillMesh != null) {
-			fillMesh.vertex(x, y, color);
-		}
-	}
-
 	protected synchronized void strokeVertex(float x, float y) {
 		if (strokeMesh != null) {
 			strokeMesh.vertex(x, y, strokeColor);
-		}
-	}
-
-	protected synchronized void strokeVertex(float x, float y, float[] color) {
-		if (strokeMesh != null) {
-			strokeMesh.vertex(x, y, color);
 		}
 	}
 
@@ -85,6 +73,12 @@ public abstract class Shape extends Drawable {
 		if (width > 0 && height > 0) {
 			resetIndices();
 			updateVertices();
+		}
+	}
+
+	protected synchronized void setFillColor(int vertexIndex, float[] fillColor) {
+		if (fillMesh != null) {
+			fillMesh.setColor(vertexIndex, fillColor);
 		}
 	}
 
