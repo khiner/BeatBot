@@ -19,7 +19,7 @@ public class SlideTab extends Shape {
 
 	private static short[] getFillIndices() {
 		short[] fillIndices = new short[RoundedRect.FILL_INDICES.length * 2
-				+ RoundedRect.NUM_CORNER_VERTICES * 3 + 1];
+				+ RoundedRect.NUM_CORNER_VERTICES * 2];
 		for (int i = 0; i < 3; i++) {
 			short[] indices = RoundedRect.FILL_INDICES;
 			for (int j = 0; j < indices.length; j++) {

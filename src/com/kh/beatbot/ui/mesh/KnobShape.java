@@ -13,14 +13,13 @@ public class KnobShape extends Shape {
 	}
 
 	private static short[] getFillIndices() {
-		short[] fillIndices = new short[(NUM_FILL_VERTICES - 2) * 3];
+		short[] fillIndices = new short[NUM_FILL_VERTICES + 2];
 
-		for (int i = 0; i < NUM_FILL_VERTICES - 2; i++) {
-			fillIndices[i * 3] = (short) i;
-			fillIndices[i * 3 + 1] = (short) (i + 1);
-			fillIndices[i * 3 + 2] = (short) (i + 2);
+		fillIndices[0] = 0;
+		for (int i = 1; i < NUM_FILL_VERTICES + 1; i++) {
+			fillIndices[i] = (short) (i - 1);
 		}
-
+		fillIndices[fillIndices.length - 1] = fillIndices[fillIndices.length - 2];
 		return fillIndices;
 	}
 

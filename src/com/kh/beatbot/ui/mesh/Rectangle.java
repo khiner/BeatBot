@@ -4,7 +4,7 @@ public class Rectangle extends Shape {
 	public static final int NUM_FILL_VERTICES = 4;
 	public static final int NUM_STROKE_VERTICES = 4;
 
-	public static final short[] FILL_INDICES = { 0, 1, 2, 2, 3, 0 };
+	public static final short[] FILL_INDICES = { 0, 0, 1, 3, 2, 2 };
 	public static final short[] STROKE_INDICES = { 0, 1, 1, 2, 2, 3, 3, 0 };
 
 	public Rectangle(ShapeGroup group, float[] fillColor, float[] strokeColor) {

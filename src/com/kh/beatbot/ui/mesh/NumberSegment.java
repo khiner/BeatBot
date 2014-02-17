@@ -1,10 +1,13 @@
 package com.kh.beatbot.ui.mesh;
 
 public class NumberSegment extends Shape {
+	public static final short[] FILL_INDICES = { 0, 0, 1, 2, 3, 4, 5, 5 };
+	public static final int NUM_FILL_VERTICES = 6;
 
 	public NumberSegment(ShapeGroup group, float[] fillColor,
 			float[] strokeColor) {
-		super(group, fillColor, strokeColor, 6, 0);
+		super(group, fillColor, strokeColor, FILL_INDICES, null,
+				NUM_FILL_VERTICES, 0);
 	}
 
 	@Override
@@ -27,16 +30,9 @@ public class NumberSegment extends Shape {
 		fillVertex(x, y + width / 2);
 		fillVertex(x + width, y + width / 2);
 		// bottom triangle
+		fillVertex(x, y + height - width / 2);
+		fillVertex(x + width, y + height - width / 2);
 		fillVertex(x + width / 2, y + height);
-		fillVertex(x, y + height - width / 2);
-		fillVertex(x + width, y + height - width / 2);
-		// middle square
-		fillVertex(x + width, y + width / 2);
-		fillVertex(x, y + width / 2);
-		fillVertex(x + width, y + height - width / 2);
-		fillVertex(x, y + width / 2);
-		fillVertex(x + width, y + height - width / 2);
-		fillVertex(x, y + height - width / 2);
 	}
 	
 	/*      * *
@@ -51,15 +47,8 @@ public class NumberSegment extends Shape {
 		fillVertex(x + height / 2, y);
 		fillVertex(x + height / 2, y + height);
 		// right triangle
+		fillVertex(x + width - height / 2, y);
+		fillVertex(x + width - height / 2, y + height);
 		fillVertex(x + width, y + height / 2);
-		fillVertex(x + width - height / 2, y);
-		fillVertex(x + width - height / 2, y + height);
-		// middle square
-		fillVertex(x + height / 2, y);
-		fillVertex(x + height / 2, y + height);
-		fillVertex(x + width - height / 2, y);
-		fillVertex(x + height / 2, y + height);
-		fillVertex(x + width - height / 2, y);
-		fillVertex(x + width - height / 2, y + height);
 	}
 }

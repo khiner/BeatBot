@@ -13,16 +13,17 @@ public class Circle extends Shape {
 	}
 
 	private static short[] getFillIndices() {
-		short[] fillIndices = new short[NUM_FILL_VERTICES * 3];
+		short[] fillIndices = new short[(NUM_FILL_VERTICES + 1) * 2 + 1];
 
-		for (int i = 0; i < NUM_FILL_VERTICES - 1; i++) {
-			fillIndices[i * 3] = 0; // first is center
-			fillIndices[i * 3 + 1] = (short) i;
-			fillIndices[i * 3 + 2] = (short) (i + 1);
+		fillIndices[0] = 0; // first is center
+		fillIndices[1] = 0; // first is center
+		for (int i = 1; i < NUM_FILL_VERTICES; i++) {
+			fillIndices[i * 2] = 0; // first is center
+			fillIndices[i * 2 + 1] = (short) i;
 		}
 
 		fillIndices[fillIndices.length - 3] = 0;
-		fillIndices[fillIndices.length - 2] = fillIndices[fillIndices.length - 4];
+		fillIndices[fillIndices.length - 2] = 1;
 		fillIndices[fillIndices.length - 1] = 1;
 
 		return fillIndices;

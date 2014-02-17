@@ -11,9 +11,9 @@ public class ShapeGroup {
 	private int strokeWeight = 0;
 
 	public ShapeGroup() {
-		fillGroup = new Mesh2DGroup(GL10.GL_TRIANGLES);
+		fillGroup = new Mesh2DGroup(GL10.GL_TRIANGLE_STRIP);
 		strokeGroup = new Mesh2DGroup(GL10.GL_LINES);
-		textGroup = new TextGroup(GL10.GL_TRIANGLES);
+		textGroup = new TextGroup(GL10.GL_TRIANGLE_STRIP);
 	}
 
 	public TextGroup getTextGroup() {
