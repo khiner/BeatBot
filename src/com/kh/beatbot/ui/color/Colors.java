@@ -49,9 +49,9 @@ public class Colors {
 		MIDI_VIEW_LIGHT_BG = colorResourceToFloats(activity,
 				R.color.midiViewLightBg);
 		GRID_LINE = colorResourceToFloats(activity, R.color.gridLine);
-		VOLUME = colorResourceToFloats(activity, R.color.volume);
+		VOLUME = colorResourceToFloats(activity, R.color.tronBlue);
 		VOLUME_TRANS = new float[] { VOLUME[0], VOLUME[1], VOLUME[2], .6f };
-		VOLUME_LIGHT = colorResourceToFloats(activity, R.color.volumeLight);
+		VOLUME_LIGHT = colorResourceToFloats(activity, R.color.tronBlueLight);
 		PAN = colorResourceToFloats(activity, R.color.pan);
 		PAN_TRANS = new float[] { PAN[0], PAN[1], PAN[2], .6f };
 		PITCH = colorResourceToFloats(activity, R.color.pitch);

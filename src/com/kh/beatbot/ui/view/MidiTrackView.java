@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.view;
 
+import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.ScrollableViewListener;
 import com.kh.beatbot.listener.TrackListener;
@@ -30,8 +31,8 @@ public class MidiTrackView extends TouchableView implements TrackListener, Scrol
 	}
 
 	@Override
-	public void onSelect(Track track) {
-		track.getButtonRow().instrumentButton.setChecked(true);
+	public void onSelect(BaseTrack track) {
+		track.checkInstrumentButton();
 		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
 			Track otherTrack = TrackManager.getTrack(i);
 			if (!track.equals(otherTrack)) {
@@ -60,16 +61,6 @@ public class MidiTrackView extends TouchableView implements TrackListener, Scrol
 				}
 			}
 		}
-	}
-
-	@Override
-	public void onGlReady(View view) {
-		
-	}
-
-	@Override
-	public void onInitialize(View view) {
-		
 	}
 
 	@Override

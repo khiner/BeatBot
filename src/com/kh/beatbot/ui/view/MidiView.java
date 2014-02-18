@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.MidiManager;
@@ -680,7 +681,7 @@ public class MidiView extends ClickableView implements TrackListener {
 	}
 
 	@Override
-	public void onSelect(Track track) {
+	public void onSelect(BaseTrack track) {
 		updateTrackColors();
 	}
 

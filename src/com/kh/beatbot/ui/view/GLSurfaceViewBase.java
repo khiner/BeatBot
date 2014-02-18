@@ -26,9 +26,9 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 	}
 
-	protected int width, height;
+	public static GL11 gl;
 
-	protected static GL11 gl = null;
+	protected int width, height;
 	protected static GLText glText;
 
 	private long frameCount = 0;
@@ -119,10 +119,6 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		gl.glColor4f(1, 1, 1, 1);
 		((GL11Ext) gl).glDrawTexfOES(x, y, 0, width, height);
 		gl.glDisable(GL10.GL_TEXTURE_2D);
-	}
-
-	public final static GL10 getGL10() {
-		return gl;
 	}
 
 	protected abstract void draw();

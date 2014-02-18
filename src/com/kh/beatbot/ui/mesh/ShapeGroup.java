@@ -41,7 +41,7 @@ public class ShapeGroup {
 
 	public void draw() {
 		fillGroup.draw();
-		View.gl.glLineWidth(strokeWeight);
+		View.getGl().glLineWidth(strokeWeight);
 		strokeGroup.draw();
 		textGroup.draw();
 	}

@@ -11,7 +11,6 @@ import javax.microedition.khronos.opengles.GL11;
 import android.graphics.Typeface;
 
 import com.kh.beatbot.listener.ScrollableViewListener;
-import com.kh.beatbot.listener.ViewListener;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Rectangle;
@@ -42,7 +41,6 @@ public abstract class View implements Comparable<View> {
 	public static final float ¹ = (float) Math.PI;
 	public static final float BG_OFFSET = 4;
 
-	public static GL11 gl;
 	public static GLSurfaceViewBase root;
 	public static Typeface font;
 
@@ -75,7 +73,7 @@ public abstract class View implements Comparable<View> {
 
 	protected ColorSet bgFillColorSet, bgStrokeColorSet;
 
-	protected Set<ViewListener> listeners = new HashSet<ViewListener>();
+	protected Set<ScrollableViewListener> listeners = new HashSet<ScrollableViewListener>();
 
 	protected ShapeGroup shapeGroup;
 
@@ -91,7 +89,11 @@ public abstract class View implements Comparable<View> {
 		createChildren();
 	}
 
-	public void addListener(ViewListener listener) {
+	public static GL11 getGl() {
+		return GLSurfaceViewBase.gl;
+	}
+
+	public void addScrollListener(ScrollableViewListener listener) {
 		listeners.add(listener);
 	}
 
@@ -157,7 +159,7 @@ public abstract class View implements Comparable<View> {
 			textMesh.destroy();
 			textMesh = null;
 		}
-		
+
 		for (View child : children) {
 			child.destroy();
 		}
@@ -237,11 +239,11 @@ public abstract class View implements Comparable<View> {
 			currClipH = parentClipY + parentClipH - currClipY;
 		}
 
-		gl.glScissor(currClipX, currClipY, currClipW, currClipH);
+		getGl().glScissor(currClipX, currClipY, currClipW, currClipH);
 	}
 
 	public void initAll() {
-		gl.glClearColor(backgroundColor[0], backgroundColor[1],
+		getGl().glClearColor(backgroundColor[0], backgroundColor[1],
 				backgroundColor[2], backgroundColor[3]);
 		init();
 		for (View child : children) {
@@ -253,12 +255,12 @@ public abstract class View implements Comparable<View> {
 	public synchronized void drawAll() {
 		// scissor ensures that each view can only draw within its rect
 		if (shouldClip) {
-			gl.glEnable(GL10.GL_SCISSOR_TEST);
+			getGl().glEnable(GL10.GL_SCISSOR_TEST);
 			if (null != parent) {
 				clipWindow(parent.currClipX, parent.currClipY,
 						parent.currClipW, parent.currClipH);
 			} else {
-				gl.glDisable(GL10.GL_SCISSOR_TEST);
+				getGl().glDisable(GL10.GL_SCISSOR_TEST);
 			}
 		}
 
@@ -267,7 +269,7 @@ public abstract class View implements Comparable<View> {
 		}
 		draw();
 		drawChildren();
-		gl.glDisable(GL10.GL_SCISSOR_TEST);
+		getGl().glDisable(GL10.GL_SCISSOR_TEST);
 	}
 
 	protected synchronized void drawChildren() {
@@ -287,16 +289,9 @@ public abstract class View implements Comparable<View> {
 		}
 	}
 
-	public void initGl(GL11 _gl) {
-		gl = _gl;
-		for (ViewListener listener : listeners) {
-			listener.onGlReady(this);
-		}
+	public void initGl() {
 		initAllIcons();
 		initAll();
-		for (ViewListener listener : listeners) {
-			listener.onInitialize(this);
-		}
 	}
 
 	public synchronized void initAllIcons() {
@@ -344,19 +339,19 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public static final void translate(float x, float y) {
-		gl.glTranslatef(x, y, 0);
+		getGl().glTranslatef(x, y, 0);
 	}
 
 	public static final void scale(float x, float y) {
-		gl.glScalef(x, y, 1);
+		getGl().glScalef(x, y, 1);
 	}
 
 	public static final void push() {
-		gl.glPushMatrix();
+		getGl().glPushMatrix();
 	}
 
 	public static final void pop() {
-		gl.glPopMatrix();
+		getGl().glPopMatrix();
 	}
 
 	public final void setText(String text, float[] color, float x, float y,
@@ -424,7 +419,7 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public void notifyScrollX() {
-		for (ViewListener listener : listeners) {
+		for (ScrollableViewListener listener : listeners) {
 			if (listener instanceof ScrollableViewListener) {
 				((ScrollableViewListener) listener).onScrollX(this);
 			}
@@ -432,7 +427,7 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public void notifyScrollY() {
-		for (ViewListener listener : listeners) {
+		for (ScrollableViewListener listener : listeners) {
 			if (listener instanceof ScrollableViewListener) {
 				((ScrollableViewListener) listener).onScrollY(this);
 			}

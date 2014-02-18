@@ -16,8 +16,7 @@
     <color name="background">#FF20303a</color>
     
     <color name="tronBlue">#FF69c9ff</color>
-    <color name="volume">#FF69c9ff</color> <!-- same as tronBlue -->
-    <color name="volumeLight">#FF95E5FA</color>
+    <color name="tronBlueLight">#FF95E5FA</color>
     
     <color name="pan">#FFFFC964</color>
     <color name="pitch">#FF71FF88</color>

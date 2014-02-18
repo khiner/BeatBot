@@ -85,6 +85,10 @@ public class Track extends BaseTrack {
 		return buttonRow.instrumentButton.getIcon();
 	}
 
+	public void checkInstrumentButton() {
+		buttonRow.instrumentButton.setChecked(true);
+	}
+
 	public void removeNote(MidiNote note) {
 		notes.remove(note);
 		notifyNoteRemoved(id, note.getOnTick(), note.getOffTick());
@@ -235,10 +239,6 @@ public class Track extends BaseTrack {
 	public void stopPreviewing() {
 		stopPreviewingTrack(id);
 		previewing = false;
-	}
-
-	public void select() {
-		TrackManager.get().onSelect(this);
 	}
 
 	public void mute(boolean mute) {

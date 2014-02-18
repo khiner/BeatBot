@@ -42,7 +42,9 @@ public class ViewPager extends TouchableView {
 
 	@Override
 	public synchronized void drawAll() {
-		getCurrPage().drawAll();
+		View currPage = getCurrPage();
+		if (null != currPage)
+			currPage.drawAll();
 	}
 
 	@Override

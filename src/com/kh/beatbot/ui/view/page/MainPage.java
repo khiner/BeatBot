@@ -58,7 +58,7 @@ public class MainPage extends TouchableView {
 		slideMenu = new MainMenu();
 		menuButton = new MenuButton();
 		
-		midiView.addListener(midiTrackView);
+		midiView.addScrollListener(midiTrackView);
 		TrackManager.addTrackListener(midiView);
 		TrackManager.addTrackListener(midiTrackView);
 		TrackManager.addTrackListener(pageSelectGroup);

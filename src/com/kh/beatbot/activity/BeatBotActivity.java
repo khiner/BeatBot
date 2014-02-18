@@ -18,7 +18,7 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.event.SampleRenameEvent;
-import com.kh.beatbot.listener.ViewListener;
+import com.kh.beatbot.listener.GLSurfaceViewGroupListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
@@ -33,7 +33,6 @@ import com.kh.beatbot.ui.view.page.MainPage;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
 public class BeatBotActivity extends Activity {
-
 	public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1,
 			SAMPLE_NAME_EDIT_DIALOG_ID = 2, MIDI_FILE_NAME_EDIT_DIALOG_ID = 3;
 
@@ -89,20 +88,23 @@ public class BeatBotActivity extends Activity {
 
 		((GLSurfaceViewGroup) View.root).setBBRenderer(activityPager);
 
-		activityPager.addListener(new ViewListener() {
+		((GLSurfaceViewGroup) View.root).addListener(new GLSurfaceViewGroupListener() {
 
 			@Override
-			public void onGlReady(View view) {
+			public void onGlReady(GLSurfaceViewGroup view) {
 				IconResources.init();
 				TrackManager.init();
 				MidiManager.init();
+				activityPager.initGl();
 
 				arm();
+				
+				setupProject();
 			}
 
 			@Override
-			public void onInitialize(View view) {
-				setupProject();
+			public void onLayout(GLSurfaceViewGroup view) {
+				
 			}
 		});
 
@@ -287,8 +289,10 @@ public class BeatBotActivity extends Activity {
 	 * Set up the project. For now, this just means setting track 0, page 0 view
 	 */
 	public void setupProject() {
-		TrackManager.getTrack(0).select();
-		View.mainPage.pageSelectGroup.selectBrowsePage();
+		if (TrackManager.getNumTracks() <= 0)
+			return;
+		TrackManager.masterTrack.select();
+		View.mainPage.pageSelectGroup.selectLevelsPage();
 	}
 
 	public void launchEffect(Effect effect) {

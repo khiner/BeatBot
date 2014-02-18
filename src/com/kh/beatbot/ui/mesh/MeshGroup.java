@@ -51,7 +51,7 @@ public abstract class MeshGroup {
 			dirty = false;
 		}
 
-		GL11 gl = View.gl;
+		GL11 gl = View.getGl();
 		if (hasTextures) {
 			gl.glEnable(GL10.GL_TEXTURE_2D);
 			gl.glBindTexture(GL10.GL_TEXTURE_2D, GLText.getTextureId());
@@ -247,12 +247,13 @@ public abstract class MeshGroup {
 	private synchronized void updateBuffers() {
 		initHandles();
 
-		View.gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
-		View.gl.glBufferData(GL11.GL_ARRAY_BUFFER, vertexBuffer.limit()
+		GL11 gl = View.getGl();
+		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
+		gl.glBufferData(GL11.GL_ARRAY_BUFFER, vertexBuffer.limit()
 				* FLOAT_BYTES, vertexBuffer, GL11.GL_DYNAMIC_DRAW);
 
-		View.gl.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, indexHandle);
-		View.gl.glBufferData(GL11.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.limit()
+		gl.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, indexHandle);
+		gl.glBufferData(GL11.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.limit()
 				* SHORT_BYTES, indexBuffer, GL11.GL_DYNAMIC_DRAW);
 	}
 
@@ -262,10 +263,11 @@ public abstract class MeshGroup {
 		}
 		int[] buffer = new int[1];
 
-		View.gl.glGenBuffers(1, buffer, 0);
+		GL11 gl = View.getGl();
+		gl.glGenBuffers(1, buffer, 0);
 		vertexHandle = buffer[0];
 
-		View.gl.glGenBuffers(1, buffer, 0);
+		gl.glGenBuffers(1, buffer, 0);
 		indexHandle = buffer[0];
 	}
 }

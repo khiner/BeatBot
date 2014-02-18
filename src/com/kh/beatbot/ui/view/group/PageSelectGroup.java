@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.view.group;
 
+import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.TrackListener;
@@ -61,6 +62,10 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	public void selectNoteLevelsPage() {
 		trackButtonRow.getNoteLevelsButton().trigger(true);
 	}
+	
+	public void selectLevelsPage() {
+		trackButtonRow.getLevelsButton().trigger(true);
+	}
 
 	public void updateAll() {
 		update();
@@ -78,12 +83,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 		masterButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				buttonRowPager.setPage(button);
-				levelsPage.setMasterMode(true);
-				effectsPage.setMasterMode(true);
-				TrackManager.currTrack.getButtonRow().instrumentButton
-						.setChecked(false);
-				updateAll();
+				TrackManager.masterTrack.select();
 			}
 		});
 
@@ -145,11 +145,12 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	}
 
 	@Override
-	public void onSelect(Track track) {
-		buttonRowPager.setPage(TRACK_PAGE_ID);
-		masterButton.setChecked(false);
-		levelsPage.setMasterMode(false);
-		effectsPage.setMasterMode(false);
+	public void onSelect(BaseTrack track) {
+		boolean isMaster = !(track instanceof Track);
+		buttonRowPager.setPage(isMaster ? masterButton : TRACK_PAGE_ID);
+		masterButton.setChecked(isMaster);
+		levelsPage.setMasterMode(isMaster);
+		effectsPage.setMasterMode(isMaster);
 		updateAll();
 	}
 

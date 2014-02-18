@@ -7,6 +7,7 @@ import java.util.List;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
+import com.kh.beatbot.manager.TrackManager;
 
 public class BaseTrack {
 	protected int id;
@@ -94,6 +95,14 @@ public class BaseTrack {
 	
 	public Param getPitchParam() {
 		return pitchParam;
+	}
+
+	public void select() {
+		TrackManager.get().onSelect(this);
+	}
+
+	public void checkInstrumentButton() {
+		
 	}
 
 	public static native void setTrackVolume(int trackId, float volume);

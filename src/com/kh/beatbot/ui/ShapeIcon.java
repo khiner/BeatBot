@@ -13,8 +13,6 @@ public abstract class ShapeIcon extends Icon {
 	protected ShapeGroup shapeGroup;
 	protected boolean shouldDraw;
 
-	protected float pressedX, pressedY, pressedWidth, pressedHeight;
-
 	protected ShapeIcon(ShapeGroup shapeGroup, ColorSet bgColorSet) {
 		this(shapeGroup, bgColorSet, null);
 	}
@@ -49,18 +47,8 @@ public abstract class ShapeIcon extends Icon {
 			strokeColor = getStrokeColor(State.DEFAULT);
 		}
 
-		switch (this.state) {
-		case DEFAULT:
-		case DISABLED:
-			currentDrawable.layout(x + OFFSET, y + OFFSET, width - OFFSET * 2,
-					height - OFFSET * 2);
-			break;
-		case PRESSED:
-		case SELECTED:
-			currentDrawable.layout(pressedX, pressedY, pressedWidth,
-					pressedHeight);
-			break;
-		}
+		currentDrawable.layout(x + OFFSET, y + OFFSET, width - OFFSET * 2,
+				height - OFFSET * 2);
 
 		((Shape) currentDrawable).setColors(
 				fillColor == null ? Colors.TRANSPARENT : fillColor,
@@ -73,12 +61,6 @@ public abstract class ShapeIcon extends Icon {
 		this.y = shouldDraw ? 0 : y;
 		this.width = width;
 		this.height = height;
-
-		float pressedScale = Math.min(width, height) * .1f;
-		pressedWidth = width - OFFSET * 2 - pressedScale;
-		pressedHeight = height - OFFSET * 2 - pressedScale;
-		pressedX = this.x + width / 2 - pressedWidth / 2;
-		pressedY = this.y + height / 2 - pressedHeight / 2;
 
 		setState(state);
 	}

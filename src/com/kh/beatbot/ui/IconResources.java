@@ -9,9 +9,9 @@ public class IconResources {
 	public static IconResource BANDPASS_FILTER, HIGHPASS_FILTER,
 			LOWPASS_FILTER, ADSR, ATTACK, DECAY, SUSTAIN, RELEASE, BEAT_SYNC,
 			LINK, ON_OFF, PLAY, STOP, RECORD, ADD, COPY, DELETE_NOTE,
-			DELETE_TRACK, UNDO, REDO, EDIT, QUANTIZE, LEVELS, NOTE_LEVELS,
-			PREVIEW, LOOP, REVERSE, BROWSE, DRUMS, KICK, SNARE, HH_CLOSED,
-			HH_OPEN, RIMSHOT, SAMPLE, MICROPHONE, BEAT, FILE, MENU, SETTINGS,
+			DELETE_TRACK, UNDO, REDO, QUANTIZE, LEVELS, NOTE_LEVELS, PREVIEW,
+			LOOP, REVERSE, BROWSE, DRUMS, KICK, SNARE, HH_CLOSED, HH_OPEN,
+			RIMSHOT, SAMPLE, MICROPHONE, BEAT, FILE, MENU, SETTINGS,
 			SNAP_TO_GRID, MIDI_IMPORT, MIDI_EXPORT;
 
 	private static Map<String, IconResource> DIRECTORY_ICON_RESOURCES;
@@ -38,23 +38,24 @@ public class IconResources {
 				R.drawable.release_icon_selected);
 
 		BEAT_SYNC = new IconResource(R.drawable.clock, -1, R.drawable.note_icon);
-		LINK = new IconResource(R.drawable.link_broken, -1, R.drawable.link);
+		LINK = new IconResource(R.drawable.link_icon, -1, R.drawable.link_icon_selected);
 		ON_OFF = new IconResource(R.drawable.off_icon, -1, R.drawable.on_icon);
 
 		PLAY = new IconResource(R.drawable.play_icon,
-				R.drawable.play_icon_pressed, R.drawable.play_icon_selected);
-		RECORD = new IconResource(R.drawable.rec_off_icon,
-				R.drawable.rec_icon_pressed, R.drawable.rec_on_icon_selected);
+				R.drawable.play_icon_selected, R.drawable.play_icon_selected);
+		RECORD = new IconResource(R.drawable.record_icon,
+				R.drawable.record_icon_selected,
+				R.drawable.record_icon_selected);
 		STOP = new IconResource(R.drawable.stop_icon,
-				R.drawable.stop_icon_pressed);
+				R.drawable.stop_icon_selected);
 
 		ADD = new IconResource(R.drawable.plus_outline);
 		COPY = new IconResource(R.drawable.copy_icon,
-				R.drawable.copy_icon_pressed, R.drawable.copy_icon_pressed,
-				R.drawable.copy_icon_inactive);
+				R.drawable.copy_icon_selected, -1,
+				R.drawable.copy_icon_disabled);
 		DELETE_NOTE = new IconResource(R.drawable.delete_icon,
-				R.drawable.delete_icon_pressed, -1,
-				R.drawable.delete_icon_inactive);
+				R.drawable.delete_icon_selected, -1,
+				R.drawable.delete_icon_disabled);
 		DELETE_TRACK = new IconResource(R.drawable.delete_track_icon,
 				R.drawable.delete_track_icon_selected);
 		UNDO = new IconResource(R.drawable.undo_icon,
@@ -77,8 +78,6 @@ public class IconResources {
 				R.drawable.reverse_icon_selected);
 		BROWSE = new IconResource(R.drawable.browse_icon,
 				R.drawable.browse_icon_selected);
-		EDIT = new IconResource(R.drawable.edit_icon,
-				R.drawable.edit_icon_selected);
 
 		DRUMS = new IconResource(R.drawable.drums_icon, -1,
 				R.drawable.drums_icon_selected);

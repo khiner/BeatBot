@@ -137,8 +137,9 @@ public class TrackManager implements TrackListener {
 	}
 
 	@Override
-	public void onSelect(Track track) {
-		currTrack = track;
+	public void onSelect(BaseTrack track) {
+		if (track instanceof Track)
+			currTrack = (Track) track;
 		for (TrackListener trackListener : trackListeners) {
 			trackListener.onSelect(track);
 		}
