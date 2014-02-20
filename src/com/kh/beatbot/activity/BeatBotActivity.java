@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.method.DigitsKeyListener;
 import android.util.Log;
@@ -26,6 +25,7 @@ import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.GLText;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
 import com.kh.beatbot.ui.view.group.ViewPager;
@@ -61,8 +61,9 @@ public class BeatBotActivity extends Activity {
 
 		GeneralUtils.initAndroidSettings(this);
 		Colors.init(this);
-		View.font = Typeface.createFromAsset(getAssets(),
-				"REDRING-1969-v03.ttf");
+		// load font file once, with static height
+		// to change height, simply use gl.scale()
+		GLText.load("REDRING-1969-v03.ttf");
 
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.FILL_PARENT,
@@ -92,6 +93,8 @@ public class BeatBotActivity extends Activity {
 
 			@Override
 			public void onGlReady(GLSurfaceViewGroup view) {
+				GLText.loadTexture();
+
 				IconResources.init();
 				TrackManager.init();
 				MidiManager.init();

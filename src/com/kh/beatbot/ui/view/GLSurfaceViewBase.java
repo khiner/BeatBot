@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.kh.beatbot.activity.BeatBotActivity;
-import com.kh.beatbot.ui.mesh.GLText;
 
 public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		GLSurfaceView.Renderer {
@@ -29,10 +28,8 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 	public static GL11 gl;
 
 	protected int width, height;
-	protected static GLText glText;
 
-	private long frameCount = 0;
-	private long averageFrameTime = 0;
+	// private long frameCount = 0, averageFrameTime = 0;
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
@@ -53,15 +50,15 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 
 	public final void onDrawFrame(GL10 _gl) {
 		/* uncomment for timing logs */
-//		long startTime = System.nanoTime();
+		//long startTime = System.nanoTime();
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		draw();
-//		long frameTime = System.nanoTime() - startTime;
+		//long frameTime = System.nanoTime() - startTime;
 
-//		if (frameCount++ < 200)
+		//if (frameCount++ < 200)
 //			return;
-//		averageFrameTime += (frameTime - averageFrameTime) / (frameCount - 200);
-//		Log.i("Avg Frame time: ", String.valueOf(averageFrameTime) + ", " + frameCount);
+		//averageFrameTime += (frameTime - averageFrameTime) / (frameCount - 200);
+		//Log.i("Avg Frame time: ", String.valueOf(averageFrameTime) + ", " + frameCount);
 	}
 
 	protected void initGl(GL10 _gl) {
@@ -69,12 +66,6 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-		// load font file once, with static height
-		// to change height, simply use gl.scale()
-		glText = GLText.getInstance("REDRING-1969-v03.ttf", 30);
-		// since the GL10 instance potentially has changed,
-		// we need to reload the bitmap texture for the font
-		GLText.loadTexture();
 	}
 
 	public static final void loadTexture(Bitmap bitmap, int[] textureHandlers,
@@ -87,7 +78,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 				GL10.GL_LINEAR);
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
 				GL10.GL_LINEAR);
-		// allow non-power-of-2 images to render with hardware accelleration
+		// allow non-power-of-2 images to render with hardware acceleration
 		// enabled
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
 				GL10.GL_CLAMP_TO_EDGE);

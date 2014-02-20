@@ -8,8 +8,6 @@ import java.util.Set;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
-import android.graphics.Typeface;
-
 import com.kh.beatbot.listener.ScrollableViewListener;
 import com.kh.beatbot.ui.color.ColorSet;
 import com.kh.beatbot.ui.color.Colors;
@@ -42,7 +40,6 @@ public abstract class View implements Comparable<View> {
 	public static final float BG_OFFSET = 4;
 
 	public static GLSurfaceViewBase root;
-	public static Typeface font;
 
 	// where is the view currently clipped to?
 	// used to keep track of SCISSOR clipping of parent views,

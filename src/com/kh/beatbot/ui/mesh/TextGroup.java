@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.mesh;
 
-
 public class TextGroup extends MeshGroup {
 	private final static int VERTICES_PER_SPRITE = 4;
 
@@ -10,11 +9,9 @@ public class TextGroup extends MeshGroup {
 
 	public synchronized void setText(TextMesh mesh, String text, float x,
 			float y, float height, float[] color) {
-
-		int charIndex = mesh.parentVertexIndex / VERTICES_PER_SPRITE;
-
 		final float scale = height / GLText.getCellHeight();
 
+		int charIndex = mesh.parentVertexIndex / VERTICES_PER_SPRITE;
 		for (char character : text.toCharArray()) {
 			initChar(charIndex++, x, y, GLText.getCellWidth() * scale, height,
 					GLText.getCharRegion(character), color);
