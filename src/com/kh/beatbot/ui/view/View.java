@@ -354,7 +354,7 @@ public abstract class View implements Comparable<View> {
 	public final void setText(String text, float[] color, float x, float y,
 			float height) {
 		if (textMesh == null) {
-			textMesh = new TextMesh(shapeGroup.getTextGroup(), text);
+			textMesh = new TextMesh(shapeGroup.getTextureGroup(), text);
 		}
 
 		x += this.absoluteX;

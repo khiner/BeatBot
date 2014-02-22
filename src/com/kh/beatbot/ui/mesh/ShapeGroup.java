@@ -7,29 +7,21 @@ import com.kh.beatbot.ui.view.View;
 public class ShapeGroup {
 
 	protected Mesh2DGroup fillGroup, strokeGroup;
-	protected TextGroup textGroup;
+	protected TextureGroup textureGroup;
 	private int strokeWeight = 0;
 
 	public ShapeGroup() {
 		fillGroup = new Mesh2DGroup(GL10.GL_TRIANGLE_STRIP);
 		strokeGroup = new Mesh2DGroup(GL10.GL_LINES);
-		textGroup = new TextGroup(GL10.GL_TRIANGLE_STRIP);
+		textureGroup = new TextureGroup(GL10.GL_TRIANGLE_STRIP);
 	}
 
-	public TextGroup getTextGroup() {
-		return textGroup;
+	public TextureGroup getTextureGroup() {
+		return textureGroup;
 	}
 
 	public void setStrokeWeight(final int strokeWeight) {
 		this.strokeWeight = strokeWeight;
-	}
-
-	public void add(TextMesh textMesh) {
-		textGroup.add(textMesh);
-	}
-
-	public void remove(TextMesh textMesh) {
-		textGroup.remove(textMesh);
 	}
 
 	public void draw(View parent) {
@@ -43,7 +35,7 @@ public class ShapeGroup {
 		fillGroup.draw();
 		View.getGl().glLineWidth(strokeWeight);
 		strokeGroup.draw();
-		textGroup.draw();
+		textureGroup.draw();
 	}
 
 	public boolean contains(Shape shape) {

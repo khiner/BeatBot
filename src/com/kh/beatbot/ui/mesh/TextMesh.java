@@ -4,7 +4,7 @@ public class TextMesh extends Mesh {
 	protected String text;
 	protected float x, y, height;
 
-	public TextMesh(TextGroup group, String text) {
+	public TextMesh(TextureGroup group, String text) {
 		this.text = text;
 		updateIndices();
 		setGroup(group);
@@ -32,7 +32,7 @@ public class TextMesh extends Mesh {
 					getNumIndices());
 		}
 
-		((TextGroup) group).setText(this, text, x, y, height, color);
+		((TextureGroup) group).setText(this, text, x, y, height, color);
 	}
 
 	private synchronized void updateIndices() {
