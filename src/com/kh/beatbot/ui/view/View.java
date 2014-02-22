@@ -160,6 +160,11 @@ public abstract class View implements Comparable<View> {
 			textMesh = null;
 		}
 
+		if (textureMesh != null) {
+			textureMesh.destroy();
+			textureMesh = null;
+		}
+
 		for (View child : children) {
 			child.destroy();
 		}
@@ -357,7 +362,7 @@ public abstract class View implements Comparable<View> {
 	public final void setText(String text, float[] color, float x, float y,
 			float height) {
 		if (textMesh == null) {
-			textMesh = new TextMesh(shapeGroup.getTextureGroup(), text);
+			textMesh = new TextMesh(shapeGroup.getTextGroup(), text);
 		}
 
 		x += this.absoluteX;
@@ -365,8 +370,8 @@ public abstract class View implements Comparable<View> {
 		textMesh.setText(text, x, y, height, color);
 	}
 
-	public final void setTexture(int resourceId, float[] color, float x,
-			float y, float width, float height) {
+	public final void setResource(int resourceId, float x,
+			float y, float width, float height, float[] color) {
 
 		if (textureMesh == null) {
 			textureMesh = new TextureMesh(shapeGroup.getTextureGroup(),
@@ -374,7 +379,7 @@ public abstract class View implements Comparable<View> {
 		}
 		x += this.absoluteX;
 		y += this.absoluteY;
-		textureMesh.setTexture(resourceId, x, y, width, height, color);
+		textureMesh.setResource(resourceId, x, y, width, height, Colors.WHITE); // XXX color
 	}
 
 	protected final float distanceFromCenterSquared(float x, float y) {

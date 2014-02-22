@@ -2,7 +2,6 @@ package com.kh.beatbot.ui.mesh;
 
 public class TextMesh extends Mesh {
 	protected String text;
-	protected float x, y, height;
 
 	public TextMesh(TextureGroup group, String text) {
 		this.text = text;
@@ -12,10 +11,9 @@ public class TextMesh extends Mesh {
 
 	public synchronized void setText(String text, float x, float y,
 			float height, float[] color) {
-		if (text.equals(this.text) && height == this.height && (y != this.y || x != this.x)) {
-			translate(x - this.x, y - this.y);
-			this.x = x;
-			this.y = y;
+
+		if (text.equals(this.text) && height == this.height) {
+			setPosition(x, y);
 			return;
 		}
 

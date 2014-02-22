@@ -23,6 +23,11 @@ public class ToggleButton extends ImageButton {
 		refreshIcons();
 	}
 
+	public void setIconResource(IconResource iconResource) {
+		super.setIconResource(iconResource);
+		refreshIcons();
+	}
+
 	public void setBgIcon(Icon icon) {
 		super.setBgIcon(icon);
 		refreshIcons();

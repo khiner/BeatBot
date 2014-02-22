@@ -3,8 +3,8 @@ package com.kh.beatbot.ui.mesh;
 public class TextureGroup extends MeshGroup {
 	private final static int VERTICES_PER_TEXTURE = 4;
 
-	public TextureGroup(int primitiveType) {
-		super(primitiveType, 8, true);
+	public TextureGroup(int primitiveType, int[] textureId) {
+		super(primitiveType, 8, textureId);
 	}
 
 	public synchronized void setText(TextMesh mesh, String text, float x,
@@ -22,7 +22,7 @@ public class TextureGroup extends MeshGroup {
 		dirty = true;
 	}
 
-	public synchronized void setTexture(Mesh mesh, int resourceId, float x,
+	public synchronized void setResource(Mesh mesh, int resourceId, float x,
 			float y, float width, float height, float[] color) {
 		textureVertices(mesh.parentVertexIndex,
 				TextureAtlas.getTextureRegion(resourceId), x, y, width, height,

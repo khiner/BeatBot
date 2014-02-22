@@ -1,6 +1,7 @@
 package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.ui.Icon;
+import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.IconResource.State;
 import com.kh.beatbot.ui.ShapeIcon;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
@@ -35,6 +36,14 @@ public class ImageButton extends Button {
 		layoutIcons();
 	}
 
+	public void setIconResource(IconResource iconResource) {
+		Icon icon = getIcon();
+		if (null != icon) {
+			icon.setResource(iconResource);
+		}
+		updateState();
+	}
+
 	public void setBgIcon(Icon bgIcon) {
 		if (null == bgIcon) {
 			destroyBgIcon();
@@ -63,7 +72,7 @@ public class ImageButton extends Button {
 				icon.setState(State.PRESSED);
 			}
 		}
-		setStrokeColor(getStrokeColor());
+		updateState();
 	}
 
 	@Override
@@ -74,7 +83,7 @@ public class ImageButton extends Button {
 				icon.setState(State.DEFAULT);
 			}
 		}
-		setStrokeColor(getStrokeColor());
+		updateState();
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -84,20 +93,7 @@ public class ImageButton extends Button {
 				iconSource.setState(enabled ? State.DEFAULT : State.DISABLED);
 			}
 		}
-		setStrokeColor(getStrokeColor());
-	}
-
-	@Override
-	public void draw() {
-		Icon foregroundIconSource = getIcon(), bgIconSource = getBgIcon();
-
-		if (bgIconSource != null) {
-			bgIconSource.draw();
-		}
-		if (foregroundIconSource != null) {
-			foregroundIconSource.draw(absoluteX + iconXOffset, root.getHeight()
-					- absoluteY - height + iconYOffset, iconW, iconH);
-		}
+		updateState();
 	}
 
 	@Override
@@ -108,7 +104,7 @@ public class ImageButton extends Button {
 
 	protected void layoutIcons() {
 		Icon bgIconSource = getBgIcon();
-		if (bgIconSource != null) {
+		if (null != bgIconSource) {
 			// if there is a bg shape, we shrink the icon a bit to avoid overlap
 			iconXOffset = iconYOffset = height / 10;
 			iconW = 4 * height / 5;
@@ -119,6 +115,9 @@ public class ImageButton extends Button {
 			iconYOffset = 0;
 			iconW = height;
 			iconH = height;
+		}
+		if (null != textureMesh) {
+			textureMesh.layout(absoluteX, absoluteY, iconW, iconH);
 		}
 		initText();
 	}
@@ -153,5 +152,14 @@ public class ImageButton extends Button {
 			}
 		}
 		return super.getStrokeColor();
+	}
+
+	private synchronized void updateState() {
+		setStrokeColor(getStrokeColor());
+		Icon icon = getIcon();
+		if (null != icon) {
+			setResource(icon.getCurrResourceId(), iconXOffset, iconYOffset,
+					iconW, iconH, icon.getCurrStrokeColor());
+		}
 	}
 }

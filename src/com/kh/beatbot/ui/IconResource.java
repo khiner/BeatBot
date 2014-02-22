@@ -5,8 +5,8 @@ public class IconResource {
 		DEFAULT, PRESSED, SELECTED, DISABLED
 	}
 	
-	public Drawable defaultDrawable, pressedDrawable, selectedDrawable,
-			disabledDrawable;
+	public int defaultResource, pressedResource, selectedResource,
+			disabledResource;
 
 	public IconResource(int defaultIcon) {
 		this(defaultIcon, -1);
@@ -23,32 +23,24 @@ public class IconResource {
 
 	public IconResource(int defaultResource, int pressedResource,
 			int selectedResource, int disabledResource) {
-		this(defaultResource == -1 ? null : new Image(defaultResource),
-			 pressedResource == -1 ? null : new Image(pressedResource),
-			 selectedResource == -1 ? null : new Image(selectedResource),
-			 disabledResource == -1 ? null : new Image(disabledResource));
+		this.defaultResource = defaultResource;
+		this.pressedResource = pressedResource;
+		this.selectedResource = selectedResource;
+		this.disabledResource = disabledResource;
 	}
 
-	public IconResource(Drawable defaultDrawable, Drawable pressedDrawable,
-			Drawable selectedDrawable, Drawable disabledDrawable) {
-		this.defaultDrawable = defaultDrawable;
-		this.pressedDrawable = pressedDrawable;
-		this.selectedDrawable = selectedDrawable;
-		this.disabledDrawable = disabledDrawable;
-	}
-	
-	public Drawable whichIcon(State state) {
+	public int whichResource(State state) {
 		switch (state) {
 		case DEFAULT:
-			return defaultDrawable;
+			return defaultResource;
 		case PRESSED:
-			return pressedDrawable;
+			return pressedResource;
 		case SELECTED:
-			return selectedDrawable;
+			return selectedResource;
 		case DISABLED:
-			return disabledDrawable;
+			return disabledResource;
 		default:
-			return defaultDrawable;
+			return defaultResource;
 		}
 	}
 }

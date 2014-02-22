@@ -3,12 +3,14 @@ package com.kh.beatbot.ui;
 import com.kh.beatbot.ui.IconResource.State;
 import com.kh.beatbot.ui.color.ColorSet;
 
-public class Icon extends Drawable {
-	protected Drawable currentDrawable;
+public class Icon {
+	protected int currentResourceId;
 	protected IconResource resource;
 	protected IconResource.State state = State.DEFAULT;
 	protected IconResource.State lockedState = null;
 	protected ColorSet fillColorSet, strokeColorSet;
+
+	protected float x, y, width, height;
 
 	public Icon() {
 	};
@@ -25,33 +27,20 @@ public class Icon extends Drawable {
 	public void setState(IconResource.State state) {
 		this.state = lockedState != null ? lockedState : state;
 		if (resource == null) {
-			currentDrawable = null;
+			currentResourceId = -1;
 		} else {
-			setDrawable(resource.whichIcon(this.state));
+			setResourceId(resource.whichResource(this.state));
 		}
 	}
 
-	public void draw() {
-		draw(x, y, width, height);
-	}
-
-	public void draw(float x, float y, float width, float height) {
-		if (currentDrawable != null) {
-			currentDrawable.draw(x, y, width, height);
-		}
-	}
-
-	protected void setDrawable(Drawable drawable) {
-		currentDrawable = drawable != null ? drawable
-				: (state == State.PRESSED && resource.selectedDrawable != null) ? resource.selectedDrawable
-						: resource.defaultDrawable;
-	}
-	
 	public void lockState(State state) {
 		lockedState = state;
 		setState(lockedState);
 	}
-	
+
+	public int getCurrResourceId() {
+		return currentResourceId;
+	}
 
 	public float[] getCurrFillColor() {
 		return getFillColor(state);
@@ -60,12 +49,25 @@ public class Icon extends Drawable {
 	public float[] getCurrStrokeColor() {
 		return getStrokeColor(state);
 	}
-	
+
 	protected float[] getFillColor(State state) {
 		return fillColorSet == null ? null : fillColorSet.getColor(state);
 	}
 
 	protected float[] getStrokeColor(State state) {
 		return strokeColorSet == null ? null : strokeColorSet.getColor(state);
+	}
+	
+	public void layout(float x, float y, float width, float height) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+	}
+	
+	private void setResourceId(int resourceId) {
+		currentResourceId = resourceId != -1 ? resourceId
+				: (state == State.PRESSED && resource.selectedResource != -1) ? resource.selectedResource
+						: resource.defaultResource;
 	}
 }

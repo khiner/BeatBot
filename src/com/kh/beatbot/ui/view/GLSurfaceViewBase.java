@@ -3,18 +3,13 @@ package com.kh.beatbot.ui.view;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
-import javax.microedition.khronos.opengles.GL11Ext;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
-import android.util.Log;
 import android.view.SurfaceHolder;
-
-import com.kh.beatbot.activity.BeatBotActivity;
 
 public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		GLSurfaceView.Renderer {
@@ -80,36 +75,12 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 				GL10.GL_LINEAR);
 		// allow non-power-of-2 images to render with hardware acceleration
 		// enabled
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
-				GL10.GL_CLAMP_TO_EDGE);
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
-				GL10.GL_CLAMP_TO_EDGE);
+//		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
+//				GL10.GL_CLAMP_TO_EDGE);
+//		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
+//				GL10.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
 		bitmap.recycle();
-	}
-
-	public static final void loadTexture(int resourceId, int[] textureHandlers,
-			int textureId, int[] crop) {
-		Bitmap bitmap = BitmapFactory.decodeResource(
-				BeatBotActivity.mainActivity.getResources(), resourceId);
-
-		// Build our crop texture to be the size of the bitmap (ie full texture)
-		crop[0] = 0;
-		crop[1] = bitmap.getHeight();
-		crop[2] = bitmap.getWidth();
-		crop[3] = -bitmap.getHeight();
-		loadTexture(bitmap, textureHandlers, textureId);
-	}
-
-	public static final void drawTexture(int textureId, int[] textureHandlers,
-			int[] crop, float x, float y, float width, float height) {
-		gl.glEnable(GL10.GL_TEXTURE_2D);
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[textureId]);
-		gl.glTexParameteriv(GL10.GL_TEXTURE_2D,
-				GL11Ext.GL_TEXTURE_CROP_RECT_OES, crop, 0);
-		gl.glColor4f(1, 1, 1, 1);
-		((GL11Ext) gl).glDrawTexfOES(x, y, 0, width, height);
-		gl.glDisable(GL10.GL_TEXTURE_2D);
 	}
 
 	protected abstract void draw();

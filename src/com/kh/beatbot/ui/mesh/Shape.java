@@ -1,14 +1,14 @@
 package com.kh.beatbot.ui.mesh;
 
-import com.kh.beatbot.ui.Drawable;
-
-public abstract class Shape extends Drawable {
+public abstract class Shape {
 	public static final float ¹ = (float) Math.PI;
 	protected Mesh2D fillMesh, strokeMesh;
 	protected float[] fillColor, strokeColor;
 
 	protected ShapeGroup group;
-	private boolean shouldDraw;
+	private boolean shouldDraw = false;
+
+	public float x, y, width, height;
 
 	protected Shape(ShapeGroup group) {
 		// must draw via some parent group. if one is given, use that,
@@ -17,8 +17,10 @@ public abstract class Shape extends Drawable {
 		this.group = group != null ? group : new ShapeGroup();
 	}
 
-	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor, int numFillVertices, int numStrokeVertices) {
-		this(group, fillColor, strokeColor, null, null, numFillVertices, numStrokeVertices);
+	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor,
+			int numFillVertices, int numStrokeVertices) {
+		this(group, fillColor, strokeColor, null, null, numFillVertices,
+				numStrokeVertices);
 	}
 
 	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor,
@@ -126,44 +128,37 @@ public abstract class Shape extends Drawable {
 		group.push(this);
 	}
 
-	@Override
 	public synchronized void setPosition(float x, float y) {
+		this.x = x;
+		this.y = y;
 		if (fillMesh != null) {
-			fillMesh.translate(x - this.x, y - this.y);
+			fillMesh.setPosition(x, y);
 		}
 		if (strokeMesh != null) {
-			strokeMesh.translate(x - this.x, y - this.y);
+			strokeMesh.setPosition(x, y);
 		}
-		super.setPosition(x, y);
 	}
 
-	@Override
 	public synchronized void setDimensions(float width, float height) {
-		boolean dimChanged = width != this.width || height != this.height;
-		if (width <= 0 || height <= 0 || !dimChanged)
-			return;
-		super.setDimensions(width, height);
-		update();
+		this.width = width;
+		this.height = height;
+		boolean fillChanged = fillMesh != null
+				&& fillMesh.setDimensions(width, height);
+		boolean strokeChanged = strokeMesh != null
+				&& strokeMesh.setDimensions(width, height);
+		if (fillChanged || strokeChanged) {
+			update();
+		}
 	}
 
-	@Override
 	public synchronized void layout(float x, float y, float width, float height) {
 		if (width <= 0 || height <= 0)
 			return;
-		boolean dimChanged = width != this.width || height != this.height;
-		boolean posChanged = x != this.x || y != this.y;
-		if (dimChanged && posChanged) {
-			super.layout(x, y, width, height);
-			update();
-		} else if (dimChanged) {
-			setDimensions(width, height);
-		} else if (posChanged) {
-			setPosition(x, y);
-		}
+		setPosition(x, y);
+		setDimensions(width, height);
 	}
 
-	@Override
-	public synchronized void draw(float x, float y, float width, float height) {
+	public void draw() {
 		if (shouldDraw) {
 			group.draw();
 		}

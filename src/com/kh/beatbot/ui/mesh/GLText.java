@@ -82,8 +82,8 @@ public class GLText {
 		GLSurfaceViewBase.loadTexture(bitmap, textureId, 0);
 	}
 
-	public static int getTextureId() {
-		return textureId[0];
+	public static int[] getTextureId() {
+		return textureId;
 	}
 
 	public static TextureRegion getCharRegion(char chr) {

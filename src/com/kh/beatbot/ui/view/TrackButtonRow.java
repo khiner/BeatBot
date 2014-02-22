@@ -20,11 +20,10 @@ public class TrackButtonRow extends TouchableView {
 
 	public void updateInstrumentIcon() {
 		IconResource newResource = track.getIconResource();
-		Icon instrumentIcon = instrumentButton.getIcon();
-		if (instrumentIcon == null) {
+		if (instrumentButton.getIcon() == null) {
 			instrumentButton.setIcon(new Icon(newResource));
 		} else {
-			instrumentIcon.setResource(newResource);
+			instrumentButton.setIconResource(newResource);
 		}
 	}
 

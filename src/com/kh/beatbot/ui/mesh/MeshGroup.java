@@ -23,7 +23,7 @@ public abstract class MeshGroup {
 	protected final static int TEX_OFFSET = 6;
 	protected final static int TEX_OFFSET_BYTES = TEX_OFFSET * FLOAT_BYTES;
 
-	protected boolean dirty = false, hasTextures = false;
+	protected boolean dirty = false;
 	protected int indicesPerVertex, vertexBytes, primitiveType,
 			vertexHandle = -1, indexHandle = -1;
 
@@ -32,14 +32,19 @@ public abstract class MeshGroup {
 	protected FloatBuffer vertexBuffer;
 	protected ShortBuffer indexBuffer;
 
+	protected int[] textureId;
+
 	protected List<Mesh> children = new ArrayList<Mesh>();
 
-	protected MeshGroup(int primitiveType, int indicesPerVertex,
-			boolean hasTextures) {
+	protected MeshGroup(int primitiveType, int indicesPerVertex) {
+		this(primitiveType, indicesPerVertex, null);
+	}
+
+	protected MeshGroup(int primitiveType, int indicesPerVertex, int[] textureId) {
 		this.primitiveType = primitiveType;
 		this.indicesPerVertex = indicesPerVertex;
 		this.vertexBytes = this.indicesPerVertex * FLOAT_BYTES;
-		this.hasTextures = hasTextures;
+		this.textureId = textureId;
 	}
 
 	public synchronized void draw() {
@@ -52,9 +57,9 @@ public abstract class MeshGroup {
 		}
 
 		GL11 gl = View.getGl();
-		if (hasTextures) {
+		if (hasTexture()) {
 			gl.glEnable(GL10.GL_TEXTURE_2D);
-			gl.glBindTexture(GL10.GL_TEXTURE_2D, GLText.getTextureId());
+			gl.glBindTexture(GL10.GL_TEXTURE_2D, textureId[0]);
 		}
 
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
@@ -62,7 +67,7 @@ public abstract class MeshGroup {
 
 		gl.glVertexPointer(2, GL10.GL_FLOAT, vertexBytes, 0);
 		gl.glColorPointer(4, GL10.GL_FLOAT, vertexBytes, COLOR_OFFSET_BYTES);
-		if (hasTextures) {
+		if (hasTexture()) {
 			gl.glTexCoordPointer(2, GL10.GL_FLOAT, vertexBytes,
 					TEX_OFFSET_BYTES);
 		}
@@ -72,7 +77,7 @@ public abstract class MeshGroup {
 				GL10.GL_UNSIGNED_SHORT, 0);
 
 		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
-		if (hasTextures) {
+		if (hasTexture()) {
 			gl.glDisable(GL10.GL_TEXTURE_2D);
 		}
 
@@ -269,5 +274,9 @@ public abstract class MeshGroup {
 
 		gl.glGenBuffers(1, buffer, 0);
 		indexHandle = buffer[0];
+	}
+
+	private boolean hasTexture() {
+		return null != textureId;
 	}
 }

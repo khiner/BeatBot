@@ -59,8 +59,8 @@ public class TextureAtlas {
 		GLSurfaceViewBase.loadTexture(bitmap, textureId, 0);
 	}
 
-	public static int getTextureId() {
-		return textureId[0];
+	public static int[] getTextureId() {
+		return textureId;
 	}
 
 	public static TextureRegion getTextureRegion(int resourceId) {

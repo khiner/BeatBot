@@ -11,6 +11,7 @@ public abstract class ShapeIcon extends Icon {
 	protected final float OFFSET = 2;
 
 	protected ShapeGroup shapeGroup;
+	protected Shape currentShape;
 	protected boolean shouldDraw;
 
 	protected ShapeIcon(ShapeGroup shapeGroup, ColorSet bgColorSet) {
@@ -26,7 +27,7 @@ public abstract class ShapeIcon extends Icon {
 		this.shapeGroup.setStrokeWeight(1);
 		this.fillColorSet = fillColorSet;
 		this.strokeColorSet = strokeColorSet;
-		currentDrawable = initShape();
+		currentShape = initShape();
 	}
 
 	protected abstract Shape initShape();
@@ -47,10 +48,10 @@ public abstract class ShapeIcon extends Icon {
 			strokeColor = getStrokeColor(State.DEFAULT);
 		}
 
-		currentDrawable.layout(x + OFFSET, y + OFFSET, width - OFFSET * 2,
+		currentShape.layout(x + OFFSET, y + OFFSET, width - OFFSET * 2,
 				height - OFFSET * 2);
 
-		((Shape) currentDrawable).setColors(
+		((Shape) currentShape).setColors(
 				fillColor == null ? Colors.TRANSPARENT : fillColor,
 				strokeColor == null ? Colors.TRANSPARENT : strokeColor);
 	}
@@ -71,12 +72,12 @@ public abstract class ShapeIcon extends Icon {
 	}
 
 	public void bringToTop() {
-		((Shape) currentDrawable).bringToTop();
+		((Shape) currentShape).bringToTop();
 	}
 
 	public void destroy() {
-		if (currentDrawable != null) {
-			((Shape) currentDrawable).destroy();
+		if (currentShape != null) {
+			((Shape) currentShape).destroy();
 		}
 	}
 }

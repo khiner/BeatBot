@@ -4,7 +4,7 @@ package com.kh.beatbot.ui.mesh;
 public class Mesh2DGroup extends MeshGroup {
 
 	public Mesh2DGroup(int primitiveType) {
-		super(primitiveType, 6, false);
+		super(primitiveType, 6);
 	}
 
 	protected synchronized void vertex(Mesh2D mesh, float x, float y,
