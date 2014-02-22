@@ -16,6 +16,7 @@ import com.kh.beatbot.ui.mesh.RoundedRect;
 import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.mesh.TextMesh;
+import com.kh.beatbot.ui.mesh.TextureMesh;
 import com.kh.beatbot.ui.view.page.MainPage;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
@@ -75,6 +76,8 @@ public abstract class View implements Comparable<View> {
 	protected ShapeGroup shapeGroup;
 
 	protected TextMesh textMesh; // TODO this assumes only one string per view
+	protected TextureMesh textureMesh; // TODO this assumes only one texture per
+										// view
 
 	public View() {
 		this(null);
@@ -360,6 +363,18 @@ public abstract class View implements Comparable<View> {
 		x += this.absoluteX;
 		y += this.absoluteY;
 		textMesh.setText(text, x, y, height, color);
+	}
+
+	public final void setTexture(int resourceId, float[] color, float x,
+			float y, float width, float height) {
+
+		if (textureMesh == null) {
+			textureMesh = new TextureMesh(shapeGroup.getTextureGroup(),
+					resourceId);
+		}
+		x += this.absoluteX;
+		y += this.absoluteY;
+		textureMesh.setTexture(resourceId, x, y, width, height, color);
 	}
 
 	protected final float distanceFromCenterSquared(float x, float y) {
