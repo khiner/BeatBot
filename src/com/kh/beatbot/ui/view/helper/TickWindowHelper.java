@@ -107,7 +107,7 @@ public class TickWindowHelper {
 		midiView.notifyScrollX();
 	}
 
-	public static void setHeight(float height) {
+	public synchronized static void setHeight(float height) {
 		for (List<Line> lines : vLines) {
 			for (Line line : lines) {
 				line.setDimensions(2, height);
@@ -189,7 +189,7 @@ public class TickWindowHelper {
 		updateVerticalLineColors();
 	}
 
-	private static void createVLines(ShapeGroup shapeGroup) {
+	private synchronized static void createVLines(ShapeGroup shapeGroup) {
 		long minTickSpacing = (long) (MidiManager.MIN_TICKS / 8);
 		long[] tickSpacings = new long[NUM_VERTICAL_LINE_SETS];
 		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
@@ -210,7 +210,7 @@ public class TickWindowHelper {
 		}
 	}
 
-	private static void updateVerticalLineColors() {
+	private synchronized static void updateVerticalLineColors() {
 		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
 			if (1 << i > MidiManager.getBeatDivision() * 4) {
 				// lines are invisible below current granulariy
