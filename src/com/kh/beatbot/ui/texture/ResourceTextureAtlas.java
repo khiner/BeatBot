@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui.mesh;
+package com.kh.beatbot.ui.texture;
 
 import java.lang.reflect.Field;
 
@@ -13,7 +13,7 @@ import com.kh.beatbot.R;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.ui.view.GLSurfaceViewBase;
 
-public class TextureAtlas {
+public class ResourceTextureAtlas {
 	private static Bitmap bitmap = null;
 	private static int[] textureId = new int[1],
 			resourceIds = getAllResourceIds();

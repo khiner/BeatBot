@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.view;
 
-import com.kh.beatbot.ui.mesh.GLText;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.texture.FontTextureAtlas;
 
 public class TextView extends View {
 	// kludgey magic number
@@ -72,7 +72,7 @@ public class TextView extends View {
 			return;
 
 		textHeight = height;
-		textWidth = GLText.getTextWidth(text, textHeight);
+		textWidth = FontTextureAtlas.getTextWidth(text, textHeight);
 		if (textWidth > calcNonIconWidth()) {
 			float scaleRatio = calcNonIconWidth() / textWidth;
 			textWidth *= scaleRatio;

@@ -1,5 +1,7 @@
 package com.kh.beatbot.ui.mesh;
 
+import com.kh.beatbot.ui.texture.TextureGroup;
+
 public class TextureMesh extends Mesh {
 	protected int resourceId;
 

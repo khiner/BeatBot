@@ -7,7 +7,7 @@
 // origin, and the (x,y) positions are relative to that, as well as the
 // bottom-left of the string to render.
 
-package com.kh.beatbot.ui.mesh;
+package com.kh.beatbot.ui.texture;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -17,7 +17,7 @@ import android.graphics.Typeface;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.ui.view.GLSurfaceViewBase;
 
-public class GLText {
+public class FontTextureAtlas {
 	private final static int CHAR_START = 32, // First Character (ASCII Code)
 			CHAR_END = 126, // Last Character (ASCII Code)
 			CHAR_CNT = CHAR_END - CHAR_START + 1, DEFAULT_TEXT_SIZE = 26;

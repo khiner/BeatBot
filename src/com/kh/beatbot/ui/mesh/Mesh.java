@@ -44,6 +44,10 @@ public abstract class Mesh {
 		return indices;
 	}
 
+	public int getParentVertexIndex() {
+		return parentVertexIndex;
+	}
+
 	private void translate(float x, float y) {
 		group.translate(this, x, y);
 	}

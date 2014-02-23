@@ -1,4 +1,8 @@
-package com.kh.beatbot.ui.mesh;
+package com.kh.beatbot.ui.texture;
+
+import com.kh.beatbot.ui.mesh.Mesh;
+import com.kh.beatbot.ui.mesh.MeshGroup;
+import com.kh.beatbot.ui.mesh.TextMesh;
 
 public class TextureGroup extends MeshGroup {
 	private final static int VERTICES_PER_TEXTURE = 4;
@@ -9,13 +13,13 @@ public class TextureGroup extends MeshGroup {
 
 	public synchronized void setText(TextMesh mesh, String text, float x,
 			float y, float height, float[] color) {
-		final float scale = height / GLText.getCellHeight();
+		final float scale = height / FontTextureAtlas.getCellHeight();
 
-		int textureIndex = mesh.parentVertexIndex;
+		int textureIndex = mesh.getParentVertexIndex();
 		for (char character : text.toCharArray()) {
-			textureVertices(textureIndex, GLText.getCharRegion(character), x,
-					y, GLText.getCellWidth() * scale, height, color);
-			x += GLText.getCharWidth(character) * scale;
+			textureVertices(textureIndex, FontTextureAtlas.getCharRegion(character), x,
+					y, FontTextureAtlas.getCellWidth() * scale, height, color);
+			x += FontTextureAtlas.getCharWidth(character) * scale;
 			textureIndex += VERTICES_PER_TEXTURE;
 		}
 
@@ -24,8 +28,8 @@ public class TextureGroup extends MeshGroup {
 
 	public synchronized void setResource(Mesh mesh, int resourceId, float x,
 			float y, float width, float height, float[] color) {
-		textureVertices(mesh.parentVertexIndex,
-				TextureAtlas.getTextureRegion(resourceId), x, y, width, height,
+		textureVertices(mesh.getParentVertexIndex(),
+				ResourceTextureAtlas.getTextureRegion(resourceId), x, y, width, height,
 				color);
 
 		dirty = true;

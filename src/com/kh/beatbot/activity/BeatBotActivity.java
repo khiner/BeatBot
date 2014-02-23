@@ -25,8 +25,8 @@ import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.GLText;
-import com.kh.beatbot.ui.mesh.TextureAtlas;
+import com.kh.beatbot.ui.texture.FontTextureAtlas;
+import com.kh.beatbot.ui.texture.ResourceTextureAtlas;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
 import com.kh.beatbot.ui.view.group.ViewPager;
@@ -64,8 +64,8 @@ public class BeatBotActivity extends Activity {
 		Colors.init(this);
 		// load font file once, with static height
 		// to change height, simply use gl.scale()
-		GLText.load("REDRING-1969-v03.ttf");
-		TextureAtlas.loadAllResources();
+		FontTextureAtlas.load("REDRING-1969-v03.ttf");
+		ResourceTextureAtlas.loadAllResources();
 
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.FILL_PARENT,
@@ -95,8 +95,8 @@ public class BeatBotActivity extends Activity {
 
 			@Override
 			public void onGlReady(GLSurfaceViewGroup view) {
-				GLText.loadTexture();
-				TextureAtlas.loadTexture();
+				FontTextureAtlas.loadTexture();
+				ResourceTextureAtlas.loadTexture();
 
 				IconResources.init();
 				TrackManager.init();
