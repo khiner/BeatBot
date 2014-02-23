@@ -2,8 +2,7 @@ package com.kh.beatbot.ui.mesh;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import com.kh.beatbot.ui.texture.FontTextureAtlas;
-import com.kh.beatbot.ui.texture.ResourceTextureAtlas;
+import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.texture.TextureGroup;
 import com.kh.beatbot.ui.view.View;
 
@@ -16,8 +15,8 @@ public class ShapeGroup {
 	public ShapeGroup() {
 		fillGroup = new Mesh2DGroup(GL10.GL_TRIANGLE_STRIP);
 		strokeGroup = new Mesh2DGroup(GL10.GL_LINES);
-		textureGroup = new TextureGroup(GL10.GL_TRIANGLE_STRIP, ResourceTextureAtlas.getTextureId());
-		textGroup = new TextureGroup(GL10.GL_TRIANGLE_STRIP, FontTextureAtlas.getTextureId());
+		textureGroup = new TextureGroup(GL10.GL_TRIANGLE_STRIP, TextureAtlas.resource.getTextureId());
+		textGroup = new TextureGroup(GL10.GL_TRIANGLE_STRIP, TextureAtlas.font.getTextureId());
 	}
 
 	public TextureGroup getTextureGroup() {

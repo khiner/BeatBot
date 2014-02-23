@@ -13,12 +13,13 @@ public class TextureGroup extends MeshGroup {
 
 	public synchronized void setText(TextMesh mesh, String text, float x,
 			float y, float height, float[] color) {
-		final float scale = height / FontTextureAtlas.getCellHeight();
+		final float scale = height / TextureAtlas.font.getCellHeight();
 
 		int textureIndex = mesh.getParentVertexIndex();
 		for (char character : text.toCharArray()) {
-			textureVertices(textureIndex, FontTextureAtlas.getCharRegion(character), x,
-					y, FontTextureAtlas.getCellWidth() * scale, height, color);
+			textureVertices(textureIndex,
+					TextureAtlas.font.getTextureRegion(character), x, y,
+					TextureAtlas.font.getCellWidth() * scale, height, color);
 			x += FontTextureAtlas.getCharWidth(character) * scale;
 			textureIndex += VERTICES_PER_TEXTURE;
 		}
@@ -29,8 +30,8 @@ public class TextureGroup extends MeshGroup {
 	public synchronized void setResource(Mesh mesh, int resourceId, float x,
 			float y, float width, float height, float[] color) {
 		textureVertices(mesh.getParentVertexIndex(),
-				ResourceTextureAtlas.getTextureRegion(resourceId), x, y, width, height,
-				color);
+				TextureAtlas.resource.getTextureRegion(resourceId), x, y,
+				width, height, color);
 
 		dirty = true;
 	}

@@ -2,69 +2,43 @@ package com.kh.beatbot.ui.texture;
 
 import java.lang.reflect.Field;
 
+import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.util.SparseArray;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.activity.BeatBotActivity;
-import com.kh.beatbot.ui.view.GLSurfaceViewBase;
 
-public class ResourceTextureAtlas {
-	private static Bitmap bitmap = null;
-	private static int[] textureId = new int[1],
-			resourceIds = getAllResourceIds();
+public class ResourceTextureAtlas extends TextureAtlas {
+	private final static int[] RESOURCE_IDS = getAllResourceIds();
+	private Resources resources = null;
 
-	private static SparseArray<TextureRegion> textureRegions = new SparseArray<TextureRegion>();
+	public void initConfig() {
+		config = new Config();
+		Bitmap first = BitmapFactory.decodeResource(resources, RESOURCE_IDS[0]);
 
-	public static void loadAllResources() {
-		Resources resources = BeatBotActivity.mainActivity.getResources();
+		config.numRegions = RESOURCE_IDS.length;
+		config.regionIdOffset = RESOURCE_IDS[0];
+		config.bitmapConfig = Bitmap.Config.ARGB_4444;
+		config.cellWidth = first.getWidth();
+		config.cellHeight = first.getHeight();
 
-		Bitmap first = BitmapFactory.decodeResource(resources, resourceIds[0]);
-
+		config.textureYOffset = 0;
 		// assume all resources are squares of the same width
-		int textureSize = (int) Math.ceil(Math.sqrt(resourceIds.length))
-				* first.getWidth();
-
-		bitmap = Bitmap.createBitmap(textureSize, textureSize,
-				first.getConfig());
-		bitmap.eraseColor(0x00000000); // Set Transparent Background (ARGB)
-
-		Canvas canvas = new Canvas(bitmap);
-		Paint paint = new Paint();
-
-		float x = 0, y = 0;
-		for (int resourceId : resourceIds) {
-			Bitmap resourceBitmap = BitmapFactory.decodeResource(resources,
-					resourceId);
-			canvas.drawBitmap(resourceBitmap, x, y, paint);
-
-			textureRegions.put(resourceId, new TextureRegion(textureSize,
-					textureSize, x, y, resourceBitmap.getWidth(),
-					resourceBitmap.getHeight()));
-
-			x += resourceBitmap.getWidth();
-			if (x + resourceBitmap.getWidth() > textureSize) {
-				x = 0; // Set X for New Row
-				y += resourceBitmap.getHeight(); // Move Down a Row
-			}
-		}
+		config.textureSize = (int) Math.ceil(Math.sqrt(RESOURCE_IDS.length))
+				* config.cellWidth;
 	}
 
-	public static void loadTexture() {
-		// load bitmap texture in OpenGL
-		GLSurfaceViewBase.loadTexture(bitmap, textureId, 0);
+	public void load(Activity activity) {
+		resources = activity.getResources();
+		super.load(activity);
 	}
 
-	public static int[] getTextureId() {
-		return textureId;
-	}
-
-	public static TextureRegion getTextureRegion(int resourceId) {
-		return textureRegions.get(resourceId);
+	@Override
+	protected void drawTextureRegion(int regionId, float x, float y) {
+		Bitmap resourceBitmap = BitmapFactory.decodeResource(resources,
+				regionId);
+		canvas.drawBitmap(resourceBitmap, x, y, paint);
 	}
 
 	private static int[] getAllResourceIds() {
