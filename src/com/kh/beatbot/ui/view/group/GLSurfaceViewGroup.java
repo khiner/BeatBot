@@ -34,9 +34,6 @@ public class GLSurfaceViewGroup extends TouchableSurfaceView {
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		super.surfaceChanged(holder, format, w, h);
 		renderer.layout(null, 0, 0, w, h);
-		for (GLSurfaceViewGroupListener listener : listeners) {
-			listener.onLayout(this);
-		}
 	}
 
 	public void initGl(GL10 gl) {

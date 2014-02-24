@@ -14,12 +14,6 @@ public class TextureMesh extends Mesh {
 
 	public synchronized void setResource(int resourceId, float x, float y,
 			float width, float height, float[] color) {
-		if (resourceId == this.resourceId && width == this.width
-				&& height == this.height) {
-			setPosition(x, y);
-			return;
-		}
-
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -27,5 +21,20 @@ public class TextureMesh extends Mesh {
 
 		((TextureGroup) group).setResource(this, resourceId, x, y, width,
 				height, color);
+	}
+	
+	public synchronized void setResource(int resourceId) {
+		((TextureGroup) group).setResource(this, resourceId);
+	}
+	
+	@Override
+	public synchronized boolean layout(float x, float y, float width, float height) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+
+		((TextureGroup) group).layout(this, resourceId, x, y, width, height);
+		return true;
 	}
 }

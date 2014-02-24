@@ -2,8 +2,7 @@ package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.ui.RoundedRectIcon;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.view.LevelsView;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
@@ -40,24 +39,19 @@ public class NoteLevelsPage extends TouchableView {
 	}
 
 	@Override
-	protected synchronized void initIcons() {
-		volumeButton.setText("Vol");
-		panButton.setText("Pan");
-		pitchButton.setText("Pit");
-		volumeButton.setBgIcon(new RoundedRectIcon(shapeGroup,
-				Colors.volumeFillColorSet, Colors.volumeStrokeColorSet));
-		panButton.setBgIcon(new RoundedRectIcon(shapeGroup,
-				Colors.panFillColorSet, Colors.panStrokeColorSet));
-		pitchButton.setBgIcon(new RoundedRectIcon(shapeGroup,
-				Colors.pitchFillColorSet, Colors.pitchStrokeColorSet));
-	}
-
-	@Override
 	protected synchronized void createChildren() {
 		levelsView = new LevelsView(shapeGroup);
 		volumeButton = new ToggleButton(shapeGroup, false);
 		panButton = new ToggleButton(shapeGroup, false);
 		pitchButton = new ToggleButton(shapeGroup, false);
+
+		volumeButton.setIcon(IconResourceSets.VOLUME);
+		panButton.setIcon(IconResourceSets.PAN);
+		pitchButton.setIcon(IconResourceSets.PITCH);
+
+		volumeButton.setText("Vol");
+		panButton.setText("Pan");
+		pitchButton.setText("Pit");
 
 		volumeButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {

@@ -6,19 +6,16 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.LongPressableView;
 
-public abstract class Button extends LongPressableView {
+public class Button extends LongPressableView {
 	private OnPressListener pressListener;
 	private OnReleaseListener releaseListener;
 	private OnLongPressListener longPressListener;
 
 	protected boolean enabled = true, pressed = false;
 
-	public Button() {
-		super();
-	}
-
 	public Button(ShapeGroup shapeGroup) {
 		super(shapeGroup);
+		initRoundedRect();
 	}
 
 	public final OnPressListener getOnPressListener() {

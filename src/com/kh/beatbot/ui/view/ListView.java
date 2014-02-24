@@ -8,7 +8,6 @@ import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.transition.ColorTransition;
 import com.kh.beatbot.ui.transition.Transition;
 import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.ImageButton;
 
 public class ListView extends TouchableView implements OnPressListener {
 
@@ -22,7 +21,7 @@ public class ListView extends TouchableView implements OnPressListener {
 	private ColorTransition tabColorTransition = new ColorTransition(20, 20,
 			Colors.TRANSPARENT, END_TRANS_COLOR);
 
-	private ImageButton selectedButton = null;
+	private Button selectedButton = null;
 
 	public ListView(ShapeGroup shapeGroup) {
 		super(shapeGroup);
@@ -92,7 +91,7 @@ public class ListView extends TouchableView implements OnPressListener {
 				&& Math.abs(y - yAnchor) > LABEL_HEIGHT) {
 			// scrolling, release the pressed button
 			selectedButton.release();
-			selectedButton.setBgIcon(null);
+			selectedButton.setIcon(null);
 			shouldPropagateTouchEvents = false;
 		}
 		lastY = y;
@@ -120,7 +119,7 @@ public class ListView extends TouchableView implements OnPressListener {
 		if (button.equals(selectedButton)) {
 			return;
 		}
-		selectedButton = (ImageButton) button;
+		selectedButton = button;
 	}
 
 	private synchronized void updateYOffset() {

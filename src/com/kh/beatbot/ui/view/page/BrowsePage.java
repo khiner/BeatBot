@@ -7,18 +7,16 @@ import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.event.SampleSetEvent;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.color.ColorSet;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.view.Menu;
 import com.kh.beatbot.ui.view.menu.FileMenuItem;
 import com.kh.beatbot.ui.view.menu.MenuItem;
 
 public class BrowsePage extends Menu {
 
-	private static ColorSet bgColorSet = new ColorSet(Colors.LABEL_SELECTED);
-
 	protected synchronized void createMenuItems() {
-		initBgRect(true, shapeGroup, bgColorSet, null);
+		setIcon(IconResourceSets.BROWSE_PAGE);
+		initRoundedRect();
 
 		File[] topLevelDirs = new File[] { FileManager.drumsDirectory,
 				FileManager.recordDirectory, FileManager.rootDirectory };

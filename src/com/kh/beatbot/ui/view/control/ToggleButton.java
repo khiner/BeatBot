@@ -1,42 +1,19 @@
 package com.kh.beatbot.ui.view.control;
 
-import com.kh.beatbot.ui.Icon;
-import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 
-public class ToggleButton extends ImageButton {
+public class ToggleButton extends Button {
 	boolean checked = false;
 	boolean oscillating = false;
-
-	public ToggleButton(boolean oscillating) {
-		super();
-		this.oscillating = oscillating;
-	}
 
 	public ToggleButton(ShapeGroup shapeGroup, boolean oscillating) {
 		super(shapeGroup);
 		this.oscillating = oscillating;
 	}
 
-	public void setIcon(Icon icon) {
-		super.setIcon(icon);
-		refreshIcons();
-	}
-
-	public void setIconResource(IconResource iconResource) {
-		super.setIconResource(iconResource);
-		refreshIcons();
-	}
-
-	public void setBgIcon(Icon icon) {
-		super.setBgIcon(icon);
-		refreshIcons();
-	}
-
 	public void release() {
 		pressed = false;
 		releaseLongPress();
-		refreshIcons();
 	}
 
 	public boolean isChecked() {
@@ -55,22 +32,11 @@ public class ToggleButton extends ImageButton {
 		setChecked(checked);
 		super.notifyReleased();
 	}
-	
+
 	@Override
 	protected void notifyReleased() {
 		if (oscillating || !checked)
 			setChecked(!checked);
 		super.notifyReleased();
-	}
-
-	protected void refreshIcons() {
-		for (Icon icon : icons) {
-			if (icon != null) {
-				icon.setState(enabled ? (checked ? IconResource.State.SELECTED
-						: IconResource.State.DEFAULT)
-						: IconResource.State.DISABLED);
-			}
-		}
-		setStrokeColor(getStrokeColor());
 	}
 }

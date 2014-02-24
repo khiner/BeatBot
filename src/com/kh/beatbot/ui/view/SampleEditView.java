@@ -5,15 +5,13 @@ import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.RoundedRectIcon;
-import com.kh.beatbot.ui.color.ColorSet;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.mesh.WaveformShape;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
-import com.kh.beatbot.ui.view.control.ImageButton;
 
 public class SampleEditView extends ControlView2dBase {
 
@@ -23,7 +21,7 @@ public class SampleEditView extends ControlView2dBase {
 	private static final float SNAP_DIST = 32f, X_OFFSET = SNAP_DIST / 2;
 	private static float minLoopWindow;
 	private static WaveformShape waveformShape;
-	private static ImageButton[] loopButtons = new ImageButton[2];
+	private static Button[] loopButtons = new Button[2];
 	private static Rectangle currSampleRect = null;
 
 	private boolean pressed = false;
@@ -100,24 +98,16 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public synchronized void init() {
-		setStrokeColor(Colors.BLACK);
 		// find view level for 32 samples
 		minLoopWindow = params[0].getViewLevel(Track.MIN_LOOP_WINDOW);
 		update();
 	}
 
 	@Override
-	public synchronized void initIcons() {
-		for (ImageButton loopButton : loopButtons) {
-			loopButton.setBgIcon(new RoundedRectIcon(shapeGroup,
-					Colors.loopSelectionColorSet));
-		}
-	}
-
-	@Override
 	public synchronized void createChildren() {
 		for (int i = 0; i < loopButtons.length; i++) {
-			loopButtons[i] = new ImageButton(shapeGroup);
+			loopButtons[i] = new Button(shapeGroup);
+			loopButtons[i].setIcon(IconResourceSets.SAMPLE_LOOP);
 			loopButtons[i].setOnPressListener(new OnPressListener() {
 				@Override
 				public void onPress(Button button) {
@@ -137,9 +127,8 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	public void layout(View parent, float x, float y, float width, float height) {
-		bgFillColorSet = new ColorSet(Colors.LABEL_LIGHT,
-				Colors.LABEL_VERY_LIGHT);
-		initBgRect(false, shapeGroup, bgFillColorSet, null);
+		setIcon(IconResourceSets.SAMPLE_BG);
+		initRect();
 		waveformShape = new WaveformShape(shapeGroup, width,
 				Colors.LABEL_SELECTED, Colors.BLACK);
 		currSampleRect = new Rectangle(shapeGroup, Colors.VOLUME, null);
@@ -247,7 +236,6 @@ public class SampleEditView extends ControlView2dBase {
 	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);
 		if (!hasSample()) {
-			press();
 			return;
 		}
 		setScrollAnchor(id);
@@ -260,7 +248,6 @@ public class SampleEditView extends ControlView2dBase {
 			if (pressed) {
 				View.mainPage.pageSelectGroup.selectBrowsePage();
 			}
-			release();
 			return;
 		}
 		waveformShape.resample();
@@ -293,16 +280,8 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void handleActionMove(int id, float x, float y) {
+		super.handleActionMove(id, x, y);
 		if (!hasSample()) {
-			if (!containsPoint(this.x + x, this.y + y)) {
-				if (pressed) {
-					release();
-				}
-			} else { // pointer inside button
-				if (!pressed) {
-					press();
-				}
-			}
 			return;
 		}
 		if (id == zoomLeftPointerId) {
@@ -312,16 +291,6 @@ public class SampleEditView extends ControlView2dBase {
 		} else if (!moveLoopMarker(id, x)) {
 			scroll(x);
 		}
-	}
-
-	private void press() {
-		pressed = true;
-		bgRect.setFillColor(bgFillColorSet.pressedColor);
-	}
-
-	private void release() {
-		bgRect.setFillColor(bgFillColorSet.defaultColor);
-		pressed = false;
 	}
 
 	@Override

@@ -197,7 +197,6 @@ public class MidiView extends ClickableView implements TrackListener {
 
 	@Override
 	public synchronized void createChildren() {
-		noteRectangles.setStrokeWeight(MidiNote.BORDER_WIDTH);
 		backgroundRect = new Rectangle(shapeGroup, Colors.MIDI_VIEW_BG, null);
 		loopRect = new Rectangle(shapeGroup, Colors.MIDI_VIEW_LIGHT_BG, null);
 

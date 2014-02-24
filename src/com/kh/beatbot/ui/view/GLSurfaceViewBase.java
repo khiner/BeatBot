@@ -14,29 +14,25 @@ import android.view.SurfaceHolder;
 public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		GLSurfaceView.Renderer {
 
+	public static GL11 gl;
+
+	// private long frameCount = 0, averageFrameTime = 0;
+
 	public GLSurfaceViewBase(Context context) {
 		super(context);
 		setRenderer(this);
 		setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 	}
 
-	public static GL11 gl;
-
-	protected int width, height;
-
-	// private long frameCount = 0, averageFrameTime = 0;
-
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		super.surfaceChanged(holder, format, width, height);
-		this.width = width;
-		this.height = height;
 	}
 
 	public void onSurfaceChanged(GL10 _gl, int width, int height) {
 		gl = (GL11) _gl;
-		gl.glViewport(0, 0, this.width, this.height);
-		GLU.gluOrtho2D(gl, 0, this.width, this.height, 0);
+		gl.glViewport(0, 0, width, height);
+		GLU.gluOrtho2D(gl, 0, width, height, 0);
 		initGl(gl);
 	}
 
@@ -45,15 +41,17 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 
 	public final void onDrawFrame(GL10 _gl) {
 		/* uncomment for timing logs */
-		//long startTime = System.nanoTime();
+		// long startTime = System.nanoTime();
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		draw();
-		//long frameTime = System.nanoTime() - startTime;
+		// long frameTime = System.nanoTime() - startTime;
 
-		//if (frameCount++ < 200)
-//			return;
-		//averageFrameTime += (frameTime - averageFrameTime) / (frameCount - 200);
-		//Log.i("Avg Frame time: ", String.valueOf(averageFrameTime) + ", " + frameCount);
+		// if (frameCount++ < 200)
+		// return;
+		// averageFrameTime += (frameTime - averageFrameTime) / (frameCount -
+		// 200);
+		// Log.i("Avg Frame time: ", String.valueOf(averageFrameTime) + ", " +
+		// frameCount);
 	}
 
 	protected void initGl(GL10 _gl) {
@@ -75,10 +73,10 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 				GL10.GL_LINEAR);
 		// allow non-power-of-2 images to render with hardware acceleration
 		// enabled
-//		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
-//				GL10.GL_CLAMP_TO_EDGE);
-//		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
-//				GL10.GL_CLAMP_TO_EDGE);
+		// gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
+		// GL10.GL_CLAMP_TO_EDGE);
+		// gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
+		// GL10.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
 		bitmap.recycle();
 	}

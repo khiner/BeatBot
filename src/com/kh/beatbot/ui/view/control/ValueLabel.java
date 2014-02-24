@@ -2,24 +2,15 @@ package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.ui.color.ColorSet;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.IconResourceSet.State;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class ValueLabel extends ControlView1dBase {
 	private float anchorY = 0, anchorLevel;
-	private boolean enabled = false;
-
-	private static ColorSet fillColorSet = Colors.valueLabelFillColorSet;
 
 	public ValueLabel(ShapeGroup shapeGroup) {
 		super(shapeGroup);
-	}
-
-	@Override
-	public synchronized void init() {
-		super.init();
-		setStrokeColor(Colors.BLACK);
 	}
 
 	@Override
@@ -34,25 +25,24 @@ public class ValueLabel extends ControlView1dBase {
 
 	@Override
 	public synchronized void createChildren() {
-		initBgRect(true, fillColorSet);
+		setIcon(IconResourceSets.VALUE_LABEL);
+		initRoundedRect();
 	}
 
 	@Override
 	public synchronized void setParam(Param param) {
 		super.setParam(param);
 		if (param == null) {
-			enabled = false;
-			bgRect.setFillColor(fillColorSet.disabledColor);
+			setState(State.DISABLED);
 			setText("");
 		} else {
-			enabled = true;
-			bgRect.setFillColor(fillColorSet.defaultColor);
+			setState(State.DEFAULT);
 		}
 	}
 
 	@Override
 	public void handleActionDown(int id, float x, float y) {
-		if (!enabled)
+		if (getState() == State.DISABLED)
 			return;
 		anchorY = y;
 		anchorLevel = param.viewLevel;
@@ -60,7 +50,7 @@ public class ValueLabel extends ControlView1dBase {
 	}
 
 	public void handleActionUp(int id, float x, float y) {
-		if (!enabled)
+		if (getState() == State.DISABLED)
 			return;
 		super.handleActionUp(id, x, y);
 	}

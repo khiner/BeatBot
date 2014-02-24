@@ -1,8 +1,7 @@
 package com.kh.beatbot.ui.view.group;
 
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.ui.RoundedRectIcon;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
@@ -28,6 +27,7 @@ public abstract class PageButtonRow extends TouchableView {
 
 		for (int i = 0; i < getNumPages(); i++) {
 			pageButtons[i] = new ToggleButton(shapeGroup, false);
+			pageButtons[i].setIcon(IconResourceSets.LABEL_BASE);
 		}
 
 		for (ToggleButton pageButton : pageButtons) {
@@ -46,13 +46,5 @@ public abstract class PageButtonRow extends TouchableView {
 		}
 
 		addChildren(pageButtons);
-	}
-	
-	@Override
-	protected synchronized void initIcons() {
-		for (int i = 0; i < pageButtons.length; i++) {
-			pageButtons[i].setBgIcon(new RoundedRectIcon(shapeGroup,
-					Colors.labelFillColorSet, Colors.labelStrokeColorSet));
-		}
 	}
 }

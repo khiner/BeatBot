@@ -10,12 +10,10 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.ui.Icon;
-import com.kh.beatbot.ui.IconResources;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.view.Menu;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class MainMenu extends Menu implements FileMenuItemListener {
@@ -24,12 +22,12 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 			midiExportItem;
 
 	protected synchronized void createMenuItems() {
-		fileItem = new MenuItem(this, null, new ToggleButton(false));
-		settingsItem = new MenuItem(this, null, new ToggleButton(false));
-		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton(false));
+		fileItem = new MenuItem(this, null, new ToggleButton(shapeGroup, false));
+		settingsItem = new MenuItem(this, null, new ToggleButton(shapeGroup, false));
+		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton(shapeGroup, false));
 		midiImportItem = new FileMenuItem(this, fileItem, new File(
 				FileManager.midiDirectory.getPath()));
-		midiExportItem = new MenuItem(this, fileItem, new ImageButton());
+		midiExportItem = new MenuItem(this, fileItem, new Button(shapeGroup));
 
 		topLevelItems.add(fileItem);
 		topLevelItems.add(settingsItem);
@@ -61,18 +59,18 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	public synchronized void initIcons() {
 		super.initIcons();
 
+		fileItem.setIcon(IconResourceSets.FILE);
+		settingsItem.setIcon(IconResourceSets.SETTINGS);
+
+		snapToGridItem.setIcon(IconResourceSets.SNAP_TO_GRID);
+		snapToGridItem.setChecked(MidiManager.isSnapToGrid());
+
+		midiImportItem.setIcon(IconResourceSets.MIDI_IMPORT);
+		midiExportItem.setIcon(IconResourceSets.MIDI_EXPORT);
+
 		snapToGridItem.setText("Snap-to-grid");
 		midiImportItem.setText("Import MIDI");
 		midiExportItem.setText("Export MIDI");
-
-		fileItem.setIcon(new Icon(IconResources.FILE));
-		settingsItem.setIcon(new Icon(IconResources.SETTINGS));
-
-		snapToGridItem.setIcon(new Icon(IconResources.SNAP_TO_GRID));
-		snapToGridItem.setChecked(MidiManager.isSnapToGrid());
-
-		midiImportItem.setIcon(new Icon(IconResources.MIDI_IMPORT));
-		midiExportItem.setIcon(new Icon(IconResources.MIDI_EXPORT));
 	}
 
 	// adjust width of this view to fit all children

@@ -19,18 +19,6 @@ public class Colors {
 			{ .4f, .4f, .4f, 1 }, { .5f, .5f, .5f, 1 }, { .6f, .6f, .6f, 1 },
 			{ .7f, .7f, .7f, 1 } };
 
-	public static ColorSet labelFillColorSet, labelStrokeColorSet,
-			valueLabelFillColorSet, muteButtonColorSet, soloButtonColorSet,
-			buttonRowStrokeColorSet, instrumentFillColorSet, panFillColorSet,
-			panStrokeColorSet, pitchFillColorSet, pitchStrokeColorSet,
-			volumeFillColorSet, volumeStrokeColorSet, effectLabelFillColorSet,
-			effectLabelStrokeColorSet, effectLabelTouchedFillColorSet,
-			effectLabelTouchedStrokeColorSet, iconFillColorSet,
-			deleteFillColorSet, deleteStrokeColorSet, menuItemFillColorSet,
-			menuToggleFillColorSet, loopSelectionColorSet,
-			loopSelectionStrokeColorSet, defaultBgFillColorSet,
-			defaultBgStrokeColorSet;
-
 	public static void init(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);
 		WHITE = colorResourceToFloats(activity, R.color.white);
@@ -81,47 +69,6 @@ public class Colors {
 
 		MIDI_SELECTED_TRACK = new float[] { YELLOW[0], YELLOW[1], YELLOW[2],
 				.38f };
-		labelFillColorSet = new ColorSet(LABEL_DARK, VOLUME, LABEL_SELECTED);
-		labelStrokeColorSet = new ColorSet(WHITE, BLACK, BLACK);
-
-		valueLabelFillColorSet = new ColorSet(LABEL_VERY_LIGHT, LABEL_SELECTED,
-				null, LABEL_DARK);
-
-		buttonRowStrokeColorSet = new ColorSet(WHITE, BLACK, BLACK);
-
-		effectLabelFillColorSet = new ColorSet(LABEL_DARK, LABEL_LIGHT, VOLUME);
-		effectLabelStrokeColorSet = new ColorSet(WHITE, WHITE, WHITE);
-
-		effectLabelTouchedFillColorSet = new ColorSet(LABEL_MED,
-				LABEL_VERY_LIGHT, VOLUME_LIGHT);
-		effectLabelTouchedStrokeColorSet = new ColorSet(WHITE, WHITE, WHITE);
-
-		muteButtonColorSet = new ColorSet(null, LABEL_SELECTED, PAN);
-		soloButtonColorSet = new ColorSet(null, LABEL_SELECTED, PITCH);
-
-		instrumentFillColorSet = new ColorSet(null, LABEL_SELECTED, VOLUME);
-
-		panFillColorSet = new ColorSet(null, PAN, PAN);
-		pitchFillColorSet = new ColorSet(null, PITCH, PITCH);
-		volumeFillColorSet = new ColorSet(null, VOLUME, VOLUME);
-
-		panStrokeColorSet = new ColorSet(PAN, BLACK, BLACK, PAN);
-		pitchStrokeColorSet = new ColorSet(PITCH, BLACK, BLACK, PITCH);
-		volumeStrokeColorSet = new ColorSet(VOLUME, BLACK, BLACK, VOLUME);
-
-		iconFillColorSet = new ColorSet(null, LABEL_SELECTED);
-
-		deleteFillColorSet = new ColorSet(null, RED);
-		deleteStrokeColorSet = new ColorSet(RED, BLACK);
-
-		menuItemFillColorSet = new ColorSet(null, VOLUME);
-		menuToggleFillColorSet = new ColorSet(null, LABEL_LIGHT, VOLUME);
-
-		loopSelectionColorSet = new ColorSet(VOLUME_TRANS, VOLUME);
-		loopSelectionStrokeColorSet = new ColorSet(VOLUME, VOLUME);
-
-		defaultBgFillColorSet = new ColorSet(VIEW_BG, VIEW_BG_SELECTED);
-		defaultBgStrokeColorSet = new ColorSet(VOLUME);
 	}
 
 	public static float[] colorResourceToFloats(Activity activity,

@@ -8,29 +8,36 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
-import com.kh.beatbot.ui.Icon;
-import com.kh.beatbot.ui.IconResources;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class ControlButtonGroup extends TouchableView {
 
 	public ToggleButton playButton, recordButton, copyButton;
-	public ImageButton stopButton, undoButton, redoButton, deleteButton,
+	public Button stopButton, undoButton, redoButton, deleteButton,
 			quantizeButton;
 
 	@Override
 	protected synchronized void createChildren() {
-		playButton = new ToggleButton(false);
-		stopButton = new ImageButton();
-		recordButton = new ToggleButton(true);
-		copyButton = new ToggleButton(false);
-		deleteButton = new ImageButton();
-		quantizeButton = new ImageButton();
-		undoButton = new ImageButton();
-		redoButton = new ImageButton();
+		playButton = new ToggleButton(shapeGroup, false);
+		stopButton = new Button(shapeGroup);
+		recordButton = new ToggleButton(shapeGroup, true);
+		copyButton = new ToggleButton(shapeGroup, false);
+		deleteButton = new Button(shapeGroup);
+		quantizeButton = new Button(shapeGroup);
+		undoButton = new Button(shapeGroup);
+		redoButton = new Button(shapeGroup);
+
+		playButton.setIcon(IconResourceSets.PLAY);
+		stopButton.setIcon(IconResourceSets.STOP);
+		recordButton.setIcon(IconResourceSets.RECORD);
+		copyButton.setIcon(IconResourceSets.COPY);
+		deleteButton.setIcon(IconResourceSets.DELETE_NOTE);
+		quantizeButton.setIcon(IconResourceSets.QUANTIZE);
+		undoButton.setIcon(IconResourceSets.UNDO);
+		redoButton.setIcon(IconResourceSets.REDO);
 
 		playButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
@@ -124,6 +131,9 @@ public class ControlButtonGroup extends TouchableView {
 
 		addChildren(playButton, stopButton, recordButton, copyButton,
 				deleteButton, quantizeButton, undoButton, redoButton);
+
+		setEditIconsEnabled(false);
+		notifyMidiChange();
 	}
 
 	public void setEditIconsEnabled(final boolean enabled) {
@@ -145,21 +155,6 @@ public class ControlButtonGroup extends TouchableView {
 
 	public void uncheckCopyButton() {
 		copyButton.setChecked(false);
-	}
-
-	@Override
-	protected synchronized void initIcons() {
-		playButton.setIcon(new Icon(IconResources.PLAY));
-		stopButton.setIcon(new Icon(IconResources.STOP));
-		recordButton.setIcon(new Icon(IconResources.RECORD));
-		copyButton.setIcon(new Icon(IconResources.COPY));
-		deleteButton.setIcon(new Icon(IconResources.DELETE_NOTE));
-		quantizeButton.setIcon(new Icon(IconResources.QUANTIZE));
-		undoButton.setIcon(new Icon(IconResources.UNDO));
-		redoButton.setIcon(new Icon(IconResources.REDO));
-
-		setEditIconsEnabled(false);
-		notifyMidiChange();
 	}
 
 	@Override

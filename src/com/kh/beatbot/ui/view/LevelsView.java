@@ -296,7 +296,7 @@ public class LevelsView extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		initBgRect(true);
+		initRoundedRect();
 		selectRegionRect = new Rectangle(shapeGroup, Colors.TRANSPARENT, null);
 		levelBarRect = new Rectangle(levelBarGroup, Colors.VOLUME, null);
 		levelBarCircle = new Circle(levelBarGroup, Colors.VOLUME, null);

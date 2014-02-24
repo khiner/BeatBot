@@ -2,16 +2,16 @@ package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.Icon;
-import com.kh.beatbot.ui.IconResources;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Rectangle;
+import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.mesh.SlideTab;
 import com.kh.beatbot.ui.view.MidiTrackView;
 import com.kh.beatbot.ui.view.MidiView;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.control.ImageButton;
+import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.group.ControlButtonGroup;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 import com.kh.beatbot.ui.view.menu.MainMenu;
@@ -42,11 +42,6 @@ public class MainPage extends TouchableView {
 	}
 
 	@Override
-	public synchronized void initIcons() {
-		menuButton.setIcon(new Icon(IconResources.MENU));
-	}
-
-	@Override
 	protected synchronized void createChildren() {
 		foregroundRect = new Rectangle(null, fillColor, null);
 		tab = new SlideTab(null, Colors.LABEL_SELECTED, null);
@@ -56,8 +51,10 @@ public class MainPage extends TouchableView {
 		midiTrackView = new MidiTrackView();
 		pageSelectGroup = new PageSelectGroup();
 		slideMenu = new MainMenu();
-		menuButton = new MenuButton();
+		menuButton = new MenuButton(shapeGroup);
 		
+		menuButton.setIcon(IconResourceSets.MENU);
+
 		midiView.addScrollListener(midiTrackView);
 		TrackManager.addTrackListener(midiView);
 		TrackManager.addTrackListener(midiTrackView);
@@ -102,7 +99,7 @@ public class MainPage extends TouchableView {
 
 	@Override
 	public void draw() {
-		menuButton.updateState();
+		menuButton.updatePhysicsState();
 		if (menuButton.snap) {
 			setMenuPosition(menuButton.x, y);
 		}
@@ -132,14 +129,18 @@ public class MainPage extends TouchableView {
 		foregroundRect.setFillColor(fillColor);
 	}
 
-	private class MenuButton extends ImageButton {
+	private class MenuButton extends Button {
+		public MenuButton(ShapeGroup shapeGroup) {
+			super(shapeGroup);
+		}
+
 		private final float SPRING_CONST = .1f, DAMP = .65f,
 				STOP_THRESH = 0.001f;
 
 		private float velocity = 0, downX = 0, lastX = 0, goalX = 0;
 		private boolean snap = true;
 
-		public void updateState() {
+		public void updatePhysicsState() {
 			if (!snap)
 				return;
 

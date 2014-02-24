@@ -2,10 +2,7 @@ package com.kh.beatbot.ui.view.page.effect;
 
 import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.ui.Icon;
-import com.kh.beatbot.ui.IconResources;
-import com.kh.beatbot.ui.RoundedRectIcon;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -42,22 +39,13 @@ public class FilterParamsPage extends EffectParamsPage {
 			filterToggles[i] = new ToggleButton(shapeGroup, false);
 			filterToggles[i].setOnReleaseListener(filterToggleListener);
 		}
-		addChildren(filterToggles);
-	}
-
-	@Override
-	protected synchronized void initIcons() {
-		super.initIcons();
-
-		for (ToggleButton filterToggle : filterToggles) {
-			filterToggle.setBgIcon(new RoundedRectIcon(shapeGroup,
-					Colors.instrumentFillColorSet,
-					Colors.buttonRowStrokeColorSet));
-		}
-		filterToggles[0].setIcon(new Icon(IconResources.LOWPASS_FILTER));
-		filterToggles[1].setIcon(new Icon(IconResources.BANDPASS_FILTER));
-		filterToggles[2].setIcon(new Icon(IconResources.HIGHPASS_FILTER));
+		
+		filterToggles[0].setIcon(IconResourceSets.LOWPASS_FILTER);
+		filterToggles[1].setIcon(IconResourceSets.BANDPASS_FILTER);
+		filterToggles[2].setIcon(IconResourceSets.HIGHPASS_FILTER);
 		filterToggles[0].setChecked(true);
+
+		addChildren(filterToggles);
 	}
 
 	public synchronized void layoutChildren() {

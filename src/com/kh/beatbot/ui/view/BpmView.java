@@ -29,7 +29,7 @@ public class BpmView extends ClickableView {
 
 	@Override
 	public synchronized void createChildren() {
-		initBgRect(true);
+		initRoundedRect();
 		for (int i = 0; i < numberSegments.length; i++) {
 			for (int j = 0; j < numberSegments[i].length; j++) {
 				numberSegments[i][j] = new NumberSegment(shapeGroup,

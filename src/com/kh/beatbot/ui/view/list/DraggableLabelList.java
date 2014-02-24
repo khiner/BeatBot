@@ -26,7 +26,7 @@ public class DraggableLabelList extends LabelList {
 	
 	@Override
 	public void onPress(Button button) {
-		prevTouchedLabelState = ((Label)button).getState();
+		prevTouchedLabelState = ((Label)button).getLabelState();
 		super.onPress(button);
 		initialTouchedPosition = children.indexOf(button);
 		dragOffset = touchedLabel.x - this.pointerIdToPos.get(0).x;

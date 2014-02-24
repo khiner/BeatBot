@@ -3,18 +3,18 @@ package com.kh.beatbot.ui.view.page;
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.listener.ControlViewListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.RoundedRectIcon;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
-import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.Seekbar;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class LevelsPage extends TouchableView implements ControlViewListener {
 	// levels attrs
 	protected Seekbar volumeLevelBar, panLevelBar, pitchLevelBar;
-	protected ImageButton volumeButton, panButton, pitchButton;
+	protected Button volumeButton, panButton, pitchButton;
 	protected boolean masterMode = false;
 
 	@Override
@@ -33,23 +33,6 @@ public class LevelsPage extends TouchableView implements ControlViewListener {
 	}
 
 	@Override
-	protected synchronized void initIcons() {
-		volumeButton.setText("Vol");
-		panButton.setText("Pan");
-		pitchButton.setText("Pit");
-		volumeButton.setBgIcon(new RoundedRectIcon(shapeGroup,
-				Colors.volumeFillColorSet, Colors.volumeStrokeColorSet));
-		panButton.setBgIcon(new RoundedRectIcon(shapeGroup,
-				Colors.panFillColorSet, Colors.panStrokeColorSet));
-		pitchButton.setBgIcon(new RoundedRectIcon(shapeGroup,
-				Colors.pitchFillColorSet, Colors.pitchStrokeColorSet));
-		
-		volumeButton.setEnabled(false);
-		panButton.setEnabled(false);
-		pitchButton.setEnabled(false);
-	}
-
-	@Override
 	protected synchronized void createChildren() {
 		volumeButton = new ToggleButton(shapeGroup, false);
 		panButton = new ToggleButton(shapeGroup, false);
@@ -58,6 +41,18 @@ public class LevelsPage extends TouchableView implements ControlViewListener {
 		volumeLevelBar = new Seekbar(shapeGroup);
 		panLevelBar = new Seekbar(shapeGroup);
 		pitchLevelBar = new Seekbar(shapeGroup);
+
+		volumeButton.setIcon(IconResourceSets.VOLUME);
+		panButton.setIcon(IconResourceSets.PAN);
+		pitchButton.setIcon(IconResourceSets.PITCH);
+
+		volumeButton.setText("Vol");
+		panButton.setText("Pan");
+		pitchButton.setText("Pit");
+
+		volumeButton.setEnabled(false);
+		panButton.setEnabled(false);
+		pitchButton.setEnabled(false);
 
 		volumeLevelBar.setLevelColor(Colors.VOLUME, Colors.VOLUME_TRANS);
 		panLevelBar.setLevelColor(Colors.PAN, Colors.PAN_TRANS);
@@ -98,8 +93,8 @@ public class LevelsPage extends TouchableView implements ControlViewListener {
 	public void onRelease(ControlViewBase control) {
 		getButton((Seekbar) control).release();
 	}
-	
-	private ImageButton getButton(Seekbar seekbar) {
+
+	private Button getButton(Seekbar seekbar) {
 		if (seekbar.equals(volumeLevelBar)) {
 			return volumeButton;
 		} else if (seekbar.equals(panLevelBar)) {

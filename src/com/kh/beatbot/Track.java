@@ -16,9 +16,8 @@ import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
-import com.kh.beatbot.ui.Icon;
-import com.kh.beatbot.ui.IconResource;
-import com.kh.beatbot.ui.IconResources;
+import com.kh.beatbot.ui.IconResourceSet;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.view.TrackButtonRow;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
@@ -57,14 +56,6 @@ public class Track extends BaseTrack {
 		}
 	}
 
-	public IconResource getIconResource() {
-		if (currSampleFile == null) {
-			return null;
-		}
-		return IconResources.forDirectory(currSampleFile.getParentFile()
-				.getName());
-	}
-
 	private void updateADSR() {
 		adsr.update();
 	}
@@ -81,8 +72,10 @@ public class Track extends BaseTrack {
 		this.rectangle = rectangle;
 	}
 
-	public Icon getIcon() {
-		return buttonRow.instrumentButton.getIcon();
+	public IconResourceSet getIcon() {
+		return null == currSampleFile ? IconResourceSets.INSTRUMENT_BASE
+				: IconResourceSets.forDirectory(currSampleFile.getParentFile()
+						.getName());
 	}
 
 	public void checkInstrumentButton() {
@@ -260,11 +253,11 @@ public class Track extends BaseTrack {
 	public boolean isMuted() {
 		return muted;
 	}
-	
+
 	public boolean isSoloing() {
 		return soloing;
 	}
-	
+
 	public boolean isSelected() {
 		return this.equals(TrackManager.currTrack);
 	}

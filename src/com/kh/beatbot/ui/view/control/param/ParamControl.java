@@ -2,13 +2,13 @@ package com.kh.beatbot.ui.view.control.param;
 
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
-import com.kh.beatbot.ui.view.TextView;
 import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.ValueLabel;
 
 public class ParamControl extends TouchableView {
+	protected View label;
 	protected ValueLabel valueLabel;
-	protected TextView label;
 
 	public ParamControl() {
 		super();
@@ -21,7 +21,7 @@ public class ParamControl extends TouchableView {
 	@Override
 	public synchronized void createChildren() {
 		valueLabel = new ValueLabel(shapeGroup);
-		label = new TextView(shapeGroup);
+		label = new View(shapeGroup);
 		addChildren(valueLabel, label);
 	}
 

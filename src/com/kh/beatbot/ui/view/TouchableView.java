@@ -5,9 +5,22 @@ import java.util.Map;
 
 import android.view.MotionEvent;
 
+import com.kh.beatbot.ui.IconResourceSet.State;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 
-public abstract class TouchableView extends TextView {
+public abstract class TouchableView extends View {
+	public class Position {
+		public float x, y;
+
+		public Position(float x, float y) {
+			set(x, y);
+		}
+
+		public void set(float x, float y) {
+			this.x = x;
+			this.y = y;
+		}
+	}
 
 	// map of pointer ID #'s that this window is responsible for to their
 	// current
@@ -40,21 +53,11 @@ public abstract class TouchableView extends TextView {
 	 * events.
 	 ********************************************************/
 	public void handleActionDown(int id, float x, float y) {
-		if (bgRect != null) {
-			bgRect.setColors(bgFillColorSet == null ? null
-					: bgFillColorSet.pressedColor,
-					bgStrokeColorSet == null ? null
-							: bgStrokeColorSet.pressedColor);
-		}
+		setState(State.PRESSED);
 	}
 
 	public void handleActionUp(int id, float x, float y) {
-		if (bgRect != null) {
-			bgRect.setColors(bgFillColorSet == null ? null
-					: bgFillColorSet.defaultColor,
-					bgStrokeColorSet == null ? null
-							: bgStrokeColorSet.defaultColor);
-		}
+		setState(State.DEFAULT);
 	}
 
 	public void handleActionPointerDown(int id, float x, float y) {

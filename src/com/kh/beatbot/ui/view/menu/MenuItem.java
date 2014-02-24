@@ -5,24 +5,24 @@ import java.util.List;
 
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.ui.Icon;
-import com.kh.beatbot.ui.RoundedRectIcon;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.IconResourceSet;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.view.ListView;
 import com.kh.beatbot.ui.view.Menu;
 import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class MenuItem implements OnPressListener, OnReleaseListener {
 	protected Menu menu = null;
 	private MenuItem parent = null;
-	protected ImageButton button;
+	protected Button button;
 	protected List<MenuItem> subMenuItems = new ArrayList<MenuItem>();
 	private ListView container = null;
 	private int level = 0;
 
-	public MenuItem(Menu menu, MenuItem parent, ImageButton button) {
+	protected IconResourceSet selectedIcon = IconResourceSets.MENU_ITEM;
+
+	public MenuItem(Menu menu, MenuItem parent, Button button) {
 		this.menu = menu;
 		this.parent = parent;
 		this.level = parent == null ? 0 : parent.level + 1;
@@ -70,12 +70,11 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 		button.setOnReleaseListener(listener);
 	}
 
-	public void setIcon(final Icon icon) {
+	public void setIcon(final IconResourceSet icon) {
 		button.setIcon(icon);
 	}
 
 	public void setText(final String text) {
-		button.setStrokeColor(Colors.BLACK);
 		button.setText(text);
 	}
 
@@ -144,17 +143,9 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 
 	private void updateIcon() {
 		if ((button.isPressed() || isChecked()) && !button.getText().isEmpty()) {
-			if (((ImageButton) button).getBgIcon() == null) {
-				if (button instanceof ToggleButton) {
-					((ToggleButton) button).setBgIcon(new RoundedRectIcon(container.getShapeGroup(),
-							Colors.menuToggleFillColorSet));
-				} else {
-					((ImageButton) button).setBgIcon(new RoundedRectIcon(container.getShapeGroup(),
-							Colors.menuItemFillColorSet));
-				}
-			}
+			button.setFillColors(selectedIcon);
 		} else {
-			button.setBgIcon(null);
+			button.setIcon(null);
 		}
 	}
 }

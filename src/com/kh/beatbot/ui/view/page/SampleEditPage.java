@@ -1,22 +1,23 @@
 package com.kh.beatbot.ui.view.page;
 
+import android.widget.ImageButton;
+
 import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.Icon;
-import com.kh.beatbot.ui.IconResources;
+import com.kh.beatbot.ui.IconResourceSet;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.view.SampleEditView;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.ImageButton;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
 
 public class SampleEditPage extends TouchableView {
 
 	public SampleEditView sampleEdit;
-	private ImageButton previewButton;
+	private Button previewButton;
 	private ToggleButton loopButton, reverseButton;
 	private ParamControl loopBeginControl, loopEndControl, gainControl;
 
@@ -38,23 +39,21 @@ public class SampleEditPage extends TouchableView {
 			sampleEdit.update();
 	}
 
-	@Override
-	protected synchronized void initIcons() {
-		previewButton.setIcon(new Icon(IconResources.PREVIEW));
-		loopButton.setIcon(new Icon(IconResources.LOOP));
-		reverseButton.setIcon(new Icon(IconResources.REVERSE));
-	}
 
 	@Override
 	protected synchronized void createChildren() {
 		sampleEdit = new SampleEditView(shapeGroup);
-		previewButton = new ImageButton(shapeGroup);
+		previewButton = new Button(shapeGroup);
 		loopButton = new ToggleButton(shapeGroup, true);
 		reverseButton = new ToggleButton(shapeGroup, true);
 
 		loopBeginControl = new ParamControl(shapeGroup);
 		loopEndControl = new ParamControl(shapeGroup);
 		gainControl = new ParamControl(shapeGroup);
+
+		previewButton.setIcon(IconResourceSets.PREVIEW);
+		loopButton.setIcon(IconResourceSets.LOOP);
+		reverseButton.setIcon(IconResourceSets.REVERSE);
 
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override

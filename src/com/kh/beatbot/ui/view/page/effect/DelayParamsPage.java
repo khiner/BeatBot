@@ -3,8 +3,7 @@ package com.kh.beatbot.ui.view.page.effect;
 import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.ui.Icon;
-import com.kh.beatbot.ui.IconResources;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -15,12 +14,6 @@ public class DelayParamsPage extends EffectParamsPage {
 	public DelayParamsPage(Delay delay) {
 		super(delay);
 	}
-	
-	@Override
-	protected synchronized void initIcons() {
-		super.initIcons();
-		linkToggle.setIcon(new Icon(IconResources.LINK));
-	}
 
 	@Override
 	public synchronized void createChildren() {
@@ -28,6 +21,7 @@ public class DelayParamsPage extends EffectParamsPage {
 			return;
 		super.createChildren();
 		linkToggle = new ToggleButton(shapeGroup, true);
+		linkToggle.setIcon(IconResourceSets.LINK);
 		linkToggle.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {

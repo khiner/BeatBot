@@ -5,8 +5,7 @@ import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.RoundedRectIcon;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
@@ -62,7 +61,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	public void selectNoteLevelsPage() {
 		trackButtonRow.getNoteLevelsButton().trigger(true);
 	}
-	
+
 	public void selectLevelsPage() {
 		trackButtonRow.getLevelsButton().trigger(true);
 	}
@@ -113,6 +112,10 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 		pager.addPage(masterButtonRow.getLevelsButton(), levelsPage);
 		pager.addPage(masterButtonRow.getEffectsButton(), effectsPage);
 
+
+		masterButton.setIcon(IconResourceSets.INSTRUMENT_BASE);
+		masterButton.setText("Master");
+
 		addChildren(masterButton, pager, buttonRowPager);
 	}
 
@@ -126,13 +129,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 				- masterButton.width, LABEL_HEIGHT);
 		pager.layout(this, 0, LABEL_HEIGHT + 2 * labelYOffset, width, height
 				- LABEL_HEIGHT - 2 * labelYOffset);
-	}
-
-	@Override
-	protected synchronized void initIcons() {
-		masterButton.setText("Master");
-		masterButton.setBgIcon(new RoundedRectIcon(shapeGroup,
-				Colors.instrumentFillColorSet, Colors.buttonRowStrokeColorSet));
 	}
 
 	@Override

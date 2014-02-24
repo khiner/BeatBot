@@ -10,7 +10,6 @@ public class ShapeGroup {
 
 	protected Mesh2DGroup fillGroup, strokeGroup;
 	protected TextureGroup textureGroup, textGroup;
-	private int strokeWeight = 0;
 
 	public ShapeGroup() {
 		fillGroup = new Mesh2DGroup(GL10.GL_TRIANGLE_STRIP);
@@ -27,10 +26,6 @@ public class ShapeGroup {
 		return textGroup;
 	}
 
-	public void setStrokeWeight(final int strokeWeight) {
-		this.strokeWeight = strokeWeight;
-	}
-
 	public void draw(View parent) {
 		View.push();
 		View.translate(-parent.absoluteX, -parent.absoluteY);
@@ -40,7 +35,6 @@ public class ShapeGroup {
 
 	public void draw() {
 		fillGroup.draw();
-		View.getGl().glLineWidth(strokeWeight);
 		strokeGroup.draw();
 		textureGroup.draw();
 		textGroup.draw();

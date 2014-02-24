@@ -23,7 +23,6 @@ import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.IconResources;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.view.View;
@@ -97,7 +96,6 @@ public class BeatBotActivity extends Activity {
 				TextureAtlas.font.loadTexture();
 				TextureAtlas.resource.loadTexture();
 
-				IconResources.init();
 				TrackManager.init();
 				MidiManager.init();
 				activityPager.initGl();
@@ -105,11 +103,6 @@ public class BeatBotActivity extends Activity {
 				arm();
 				
 				setupProject();
-			}
-
-			@Override
-			public void onLayout(GLSurfaceViewGroup view) {
-				
 			}
 		});
 

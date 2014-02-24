@@ -3,11 +3,8 @@ package com.kh.beatbot.ui.view.page;
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.Icon;
-import com.kh.beatbot.ui.IconResource;
-import com.kh.beatbot.ui.IconResources;
-import com.kh.beatbot.ui.RoundedRectIcon;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.IconResourceSet;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.view.AdsrView;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
@@ -49,31 +46,16 @@ public class AdsrPage extends TouchableView implements OnReleaseListener {
 		updateParamView();
 	}
 
-	@Override
-	protected synchronized void initIcons() {
-		for (int i = 0; i < adsrButtons.length; i++) {
-			adsrButtons[i].setBgIcon(new RoundedRectIcon(shapeGroup,
-					Colors.instrumentFillColorSet,
-					Colors.buttonRowStrokeColorSet));
-			if (i < adsrButtons.length - 2) {
-				adsrButtons[i].setIcon(new Icon(whichAdsrIconResource(i)));
-			}
-		}
-
-		adsrButtons[ADSR.START_ID].setText("S");
-		adsrButtons[ADSR.PEAK_ID].setText("P");
-	}
-
-	private IconResource whichAdsrIconResource(int adsrParamId) {
+	private IconResourceSet whichAdsrIconResource(int adsrParamId) {
 		switch (adsrParamId) {
 		case ADSR.ATTACK_ID:
-			return IconResources.ATTACK;
+			return IconResourceSets.ATTACK;
 		case ADSR.DECAY_ID:
-			return IconResources.DECAY;
+			return IconResourceSets.DECAY;
 		case ADSR.SUSTAIN_ID:
-			return IconResources.SUSTAIN;
+			return IconResourceSets.SUSTAIN;
 		case ADSR.RELEASE_ID:
-			return IconResources.RELEASE;
+			return IconResourceSets.RELEASE;
 		default:
 			return null;
 		}
@@ -89,6 +71,18 @@ public class AdsrPage extends TouchableView implements OnReleaseListener {
 			adsrButtons[i].setId(i);
 			adsrButtons[i].setOnReleaseListener(this);
 		}
+
+		for (int i = 0; i < adsrButtons.length; i++) {
+			if (i < adsrButtons.length - 2) {
+				adsrButtons[i].setIcon(whichAdsrIconResource(i));
+			} else {
+				adsrButtons[i].setIcon(IconResourceSets.INSTRUMENT_BASE);
+			}
+		}
+
+		adsrButtons[ADSR.START_ID].setText("S");
+		adsrButtons[ADSR.PEAK_ID].setText("P");
+
 		addChildren(adsrView, paramControl);
 		addChildren(adsrButtons);
 	}

@@ -9,7 +9,10 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.listener.ScrollableViewListener;
-import com.kh.beatbot.ui.color.ColorSet;
+import com.kh.beatbot.ui.IconResource;
+import com.kh.beatbot.ui.IconResourceSet;
+import com.kh.beatbot.ui.IconResourceSet.State;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.RoundedRect;
@@ -17,29 +20,15 @@ import com.kh.beatbot.ui.mesh.Shape;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.mesh.TextMesh;
 import com.kh.beatbot.ui.mesh.TextureMesh;
+import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.view.page.MainPage;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
-public abstract class View implements Comparable<View> {
-	public class Position {
-		public float x, y;
-
-		public Position(float x, float y) {
-			set(x, y);
-		}
-
-		public void set(float x, float y) {
-			this.x = x;
-			this.y = y;
-		}
-	}
+public class View implements Comparable<View> {
+	public static final float ¹ = (float) Math.PI, BG_OFFSET = 4;
 
 	public static MainPage mainPage;
 	public static EffectPage effectPage;
-
-	public static final float ¹ = (float) Math.PI;
-	public static final float BG_OFFSET = 4;
-
 	public static GLSurfaceViewBase root;
 
 	// where is the view currently clipped to?
@@ -51,33 +40,33 @@ public abstract class View implements Comparable<View> {
 
 	public int id = -1; // optional
 
+	// kludgey magic number
+	// but it corrects for something weird in
+	// GLSurfaceViewBase.getTextWidth
+	protected static float X_OFFSET = 2, LABEL_HEIGHT = 0;
+
 	public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0,
 			height = 0;
+	protected float textWidth = 0, textHeight = 0, minX = 0, maxX = 0,
+			minY = 0, maxY = 0, borderWidth = 0, borderHeight = 0;
 
-	protected static float LABEL_HEIGHT = 0;
-
-	protected List<View> children = new ArrayList<View>();
 	protected View parent;
-	protected Shape bgRect = null;
-
-	protected float[] backgroundColor = Colors.BG, clearColor = Colors.BG,
-			strokeColor = Colors.WHITE;
+	protected List<View> children = new ArrayList<View>();
 
 	private boolean initialized = false;
 	protected boolean shouldClip = true, shouldDraw = true;
 
-	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0,
-			borderHeight = 0;
-
-	protected ColorSet bgFillColorSet, bgStrokeColorSet;
-
+	protected String text = "";
 	protected Set<ScrollableViewListener> listeners = new HashSet<ScrollableViewListener>();
 
+	protected Shape shape;
+	protected TextMesh textMesh;
+	protected TextureMesh textureMesh;
 	protected ShapeGroup shapeGroup;
 
-	protected TextMesh textMesh; // TODO this assumes only one string per view
-	protected TextureMesh textureMesh; // TODO this assumes only one texture per
-										// view
+	private IconResourceSet icon = new IconResourceSet(IconResourceSets.DEFAULT);
+	private State state = State.DEFAULT;
+	private State lockedState = null;
 
 	public View() {
 		this(null);
@@ -101,29 +90,91 @@ public abstract class View implements Comparable<View> {
 		return shapeGroup;
 	}
 
-	protected void initBgRect(boolean rounded) {
-		initBgRect(rounded, shapeGroup, Colors.defaultBgFillColorSet,
-				Colors.defaultBgStrokeColorSet);
+	protected void setShape(Shape shape) {
+		this.shape = shape;
 	}
 
-	protected void initBgRect(boolean rounded, ColorSet fillColorSet) {
-		initBgRect(rounded, shapeGroup, fillColorSet,
-				Colors.defaultBgStrokeColorSet);
+	public final void setState(State state) {
+		this.state = lockedState != null ? lockedState : state;
+		stateChanged();
 	}
 
-	protected void initBgRect(boolean rounded, ShapeGroup group,
-			ColorSet fillColorSet, ColorSet strokeColorSet) {
-		this.bgFillColorSet = fillColorSet;
-		this.bgStrokeColorSet = strokeColorSet;
-		bgRect = rounded ? new RoundedRect(group, fillColorSet == null ? null
-				: fillColorSet.defaultColor, strokeColorSet == null ? null
-				: strokeColorSet.defaultColor) : new Rectangle(group,
-				fillColorSet == null ? null : fillColorSet.defaultColor,
-				strokeColorSet == null ? null : strokeColorSet.defaultColor);
+	public void setText(String text) {
+		this.text = text;
+		initText();
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	protected float calcTextX() {
+		return 3 * X_OFFSET + (calcNonIconWidth() - textWidth) / 2;
+	}
+
+	protected float calcTextY() {
+		return (height - textHeight) / 2;
+	}
+
+	protected float calcNonIconWidth() {
+		return width - X_OFFSET * 4;
+	}
+
+	protected void initText() {
+		if (text == null || text.isEmpty())
+			return;
+
+		textHeight = height;
+		textWidth = TextureAtlas.font.getTextWidth(text, textHeight);
+		if (textWidth > calcNonIconWidth()) {
+			float scaleRatio = calcNonIconWidth() / textWidth;
+			textWidth *= scaleRatio;
+			textHeight *= scaleRatio;
+		}
+
+		setText(text, calcTextX(), calcTextY(), textHeight);
+	}
+
+	public State getState() {
+		return state;
+	}
+
+	public void lockState(State state) {
+		lockedState = state;
+		setState(lockedState);
+	}
+
+	protected void initRoundedRect() {
+		shape = new RoundedRect(shapeGroup, icon.getResource(state).fillColor,
+				icon.getResource(state).strokeColor);
+	}
+
+	protected void initRect() {
+		shape = new Rectangle(shapeGroup, icon.getResource(state).fillColor,
+				icon.getResource(state).strokeColor);
+	}
+
+	public final synchronized void setIcon(IconResourceSet resourceSet) {
+		if (null == resourceSet) {
+			destroyIcon();
+			return;
+		}
+		icon = new IconResourceSet(resourceSet);
+		setState(state);
+	}
+
+	public final void setResourceId(IconResourceSet resourceSet) {
+		icon.setResourceId(resourceSet);
+		stateChanged();
+	}
+
+	public final void setFillColors(IconResourceSet resourceSet) {
+		icon.setFillColors(resourceSet);
+		stateChanged();
 	}
 
 	protected float calcBgRectRadius() {
-		return Math.max(height / 9, 10);
+		return Math.min(width, height) * .15f;
 	}
 
 	public boolean hasChildren() {
@@ -137,7 +188,6 @@ public abstract class View implements Comparable<View> {
 		children.add(child);
 		if (initialized) {
 			child.initAll();
-			child.initAllIcons();
 		}
 	}
 
@@ -155,18 +205,27 @@ public abstract class View implements Comparable<View> {
 	}
 
 	protected synchronized void destroy() {
+		destroyIcon();
+
 		if (textMesh != null) {
 			textMesh.destroy();
 			textMesh = null;
 		}
 
+		for (View child : children) {
+			child.destroy();
+		}
+	}
+
+	private synchronized void destroyIcon() {
 		if (textureMesh != null) {
 			textureMesh.destroy();
 			textureMesh = null;
 		}
 
-		for (View child : children) {
-			child.destroy();
+		if (shape != null) {
+			shape.destroy();
+			shape = null;
 		}
 	}
 
@@ -209,17 +268,20 @@ public abstract class View implements Comparable<View> {
 		return id;
 	}
 
-	protected abstract void init();
+	protected void init() {
+	}
 
-	public abstract void update();
+	public void update() {
+	}
 
-	public abstract void draw();
+	public void draw() {
+	}
 
-	protected abstract void createChildren();
+	protected void createChildren() {
+	}
 
-	protected abstract void layoutChildren();
-
-	protected abstract void initIcons();
+	protected void layoutChildren() {
+	}
 
 	public void clipWindow(int parentClipX, int parentClipY, int parentClipW,
 			int parentClipH) {
@@ -248,8 +310,8 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public void initAll() {
-		getGl().glClearColor(backgroundColor[0], backgroundColor[1],
-				backgroundColor[2], backgroundColor[3]);
+		getGl().glClearColor(Colors.BG[0], Colors.BG[1], Colors.BG[2],
+				Colors.BG[3]);
 		init();
 		for (View child : children) {
 			child.initAll();
@@ -295,28 +357,25 @@ public abstract class View implements Comparable<View> {
 	}
 
 	public void initGl() {
-		initAllIcons();
+		getGl().glLineWidth(1);
 		initAll();
 	}
 
-	public synchronized void initAllIcons() {
-		initIcons();
-		for (View child : children) {
-			child.initAllIcons();
-		}
-	}
+	private void layoutShape() {
+		float x = BG_OFFSET + absoluteX, y = BG_OFFSET + absoluteY;
 
-	private void layoutBgRect() {
-		if (bgRect == null)
-			return;
 		float bgRectRadius = 0;
-		if (bgRect instanceof RoundedRect) {
+		if (shape instanceof RoundedRect) {
 			bgRectRadius = calcBgRectRadius();
-			((RoundedRect) bgRect).setCornerRadius(bgRectRadius);
+			((RoundedRect) shape).setCornerRadius(bgRectRadius);
+			shape.layout(x, y, width - BG_OFFSET * 2, height - BG_OFFSET * 2);
 		}
-		float x = BG_OFFSET + this.absoluteX, y = BG_OFFSET + this.absoluteY;
 
-		bgRect.layout(x, y, width - BG_OFFSET * 2, height - BG_OFFSET * 2);
+		if (null != textureMesh) {
+			float textureSize = height - BG_OFFSET * 2;
+			textureMesh.layout(x, y, textureSize, textureSize);
+		}
+
 		minX = minY = bgRectRadius + BG_OFFSET;
 		maxX = width - bgRectRadius - BG_OFFSET;
 		maxY = height - bgRectRadius - BG_OFFSET;
@@ -328,7 +387,8 @@ public abstract class View implements Comparable<View> {
 		this.parent = parent;
 		setDimensions(width, height);
 		setPosition(x, y);
-		layoutBgRect();
+		initText();
+		layoutShape();
 	}
 
 	protected synchronized View findChildAt(float x, float y) {
@@ -359,27 +419,16 @@ public abstract class View implements Comparable<View> {
 		getGl().glPopMatrix();
 	}
 
-	public final void setText(String text, float[] color, float x, float y,
-			float height) {
-		if (textMesh == null) {
+	public final void setText(String text, float x, float y, float height) {
+		if (null == textMesh) {
 			textMesh = new TextMesh(shapeGroup.getTextGroup(), text);
 		}
 
 		x += this.absoluteX;
 		y += this.absoluteY;
+		float[] color = null == icon || null == icon.getResource(state) ? Colors.BLACK
+				: icon.getResource(state).strokeColor;
 		textMesh.setText(text, x, y, height, color);
-	}
-
-	public final void setResource(int resourceId, float x,
-			float y, float width, float height, float[] color) {
-
-		if (textureMesh == null) {
-			textureMesh = new TextureMesh(shapeGroup.getTextureGroup(),
-					resourceId);
-		}
-		x += this.absoluteX;
-		y += this.absoluteY;
-		textureMesh.setResource(resourceId, x, y, width, height, Colors.WHITE); // XXX color
 	}
 
 	protected final float distanceFromCenterSquared(float x, float y) {
@@ -413,17 +462,6 @@ public abstract class View implements Comparable<View> {
 		return y < minY ? minY : (y > maxY ? maxY : y);
 	}
 
-	public void setStrokeColor(float[] strokeColor) {
-		this.strokeColor = strokeColor;
-		if (null != textMesh) {
-			textMesh.setColor(strokeColor);
-		}
-	}
-
-	public float[] getStrokeColor() {
-		return strokeColor;
-	}
-
 	@Override
 	public int compareTo(View another) {
 		float diff = this.x - another.x;
@@ -448,6 +486,33 @@ public abstract class View implements Comparable<View> {
 			if (listener instanceof ScrollableViewListener) {
 				((ScrollableViewListener) listener).onScrollY(this);
 			}
+		}
+	}
+
+	private final void stateChanged() {
+		IconResource currResource = icon.getResource(state);
+		float[] fillColor = null == currResource
+				|| null == currResource.fillColor ? Colors.TRANSPARENT
+				: currResource.fillColor;
+		float[] strokeColor = null == currResource
+				|| null == currResource.strokeColor ? Colors.TRANSPARENT
+				: currResource.strokeColor;
+		int iconResourceId = null == currResource ? -1
+				: currResource.resourceId;
+
+		if (null != shape) {
+			shape.setColors(fillColor, strokeColor);
+		}
+		if (null == textureMesh && -1 != iconResourceId) {
+			textureMesh = new TextureMesh(shapeGroup.getTextureGroup(),
+					iconResourceId);
+		}
+		if (null != textureMesh) {
+			textureMesh.setResource(iconResourceId, absoluteX, absoluteY,
+					height, height, Colors.WHITE);
+		}
+		if (null != textMesh) {
+			textMesh.setColor(strokeColor);
 		}
 	}
 }

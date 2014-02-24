@@ -10,10 +10,7 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremolo;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.ui.Icon;
-import com.kh.beatbot.ui.IconResources;
-import com.kh.beatbot.ui.RoundedRectIcon;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.Seekbar2d;
@@ -39,13 +36,6 @@ public class EffectPage extends TouchableView {
 		paramsPager.setPage(effect.getName());
 		setLevel2dParams(effect.getXParam(), effect.getYParam());
 		((EffectParamsPage) paramsPager.getCurrPage()).setEffect(effect);
-	}
-
-	@Override
-	protected synchronized void initIcons() {
-		toggleButton.setIcon(new Icon(IconResources.ON_OFF));
-		toggleButton.setBgIcon(new RoundedRectIcon(shapeGroup,
-				Colors.labelFillColorSet, Colors.labelStrokeColorSet));
 	}
 
 	@Override
@@ -77,6 +67,8 @@ public class EffectPage extends TouchableView {
 						.setOn(toggleButton.isChecked());
 			}
 		});
+
+		toggleButton.setIcon(IconResourceSets.TOGGLE);
 
 		addChildren(toggleButton, level2d, paramsPager);
 	}

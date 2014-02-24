@@ -5,17 +5,14 @@ import java.util.Collections;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.ui.Icon;
-import com.kh.beatbot.ui.IconResources;
-import com.kh.beatbot.ui.RoundedRectIcon;
-import com.kh.beatbot.ui.ShapeIcon;
-import com.kh.beatbot.ui.color.ColorSet;
+import com.kh.beatbot.ui.IconResource;
+import com.kh.beatbot.ui.IconResourceSet;
+import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.ClickableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.ImageButton;
 
 public class LabelList extends ClickableView implements OnPressListener,
 		OnReleaseListener {
@@ -24,43 +21,45 @@ public class LabelList extends ClickableView implements OnPressListener,
 		ON, OFF, EMPTY
 	};
 
-	private static final ColorSet onColorSet = new ColorSet(Colors.VOLUME,
-			Colors.VOLUME_LIGHT);
-	private static final ColorSet offColorSet = new ColorSet(
-			Colors.LABEL_LIGHT, Colors.LABEL_VERY_LIGHT);
-	private static final ColorSet emptyColorSet = new ColorSet(
-			Colors.LABEL_DARK, Colors.LABEL_MED);
+	private static final IconResourceSet onIcon = new IconResourceSet(
+			new IconResource(-1, Colors.VOLUME, null), new IconResource(
+					-1, Colors.VOLUME_LIGHT, null));
+	
+	private static final IconResourceSet offIcon = new IconResourceSet(
+			new IconResource(-1, Colors.LABEL_LIGHT, null), new IconResource(
+					-1, Colors.LABEL_VERY_LIGHT, null));
 
-	protected class Label extends ImageButton {
+	private static final IconResourceSet emptyIcon = new IconResourceSet(
+			new IconResource(-1, Colors.LABEL_DARK, null), new IconResource(
+					-1, Colors.LABEL_MED, null));
+
+	protected class Label extends Button {
 		private final static String EMPTY_TEXT = "ADD";
 		private LabelState state = LabelState.EMPTY;
 
 		public Label() {
-			super();
-			setIcon(addIcon);
-			setBgIcon(new RoundedRectIcon(shapeGroup, emptyColorSet));
+			super(null);
+			setResourceId(IconResourceSets.ADD);
+			setFillColors(emptyIcon);
 			setText(EMPTY_TEXT);
 		}
 
 		public void setState(LabelState state) {
-			ShapeIcon bgShape = ((ShapeIcon) getBgIcon());
-			if (null == bgShape)
-				return;
 			this.state = state;
 			switch (state) {
 			case ON:
-				bgShape.setFillColorSet(onColorSet);
+				setIcon(onIcon);
 				break;
 			case OFF:
-				bgShape.setFillColorSet(offColorSet);
+				setIcon(offIcon);
 				break;
 			case EMPTY:
-				bgShape.setFillColorSet(emptyColorSet);
+				setIcon(emptyIcon);
 				break;
 			}
 		}
 
-		public LabelState getState() {
+		public LabelState getLabelState() {
 			return state;
 		}
 
@@ -74,7 +73,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 
 	protected static final float GAP_BETWEEN_LABELS = 5;
 	protected static final float TEXT_Y_OFFSET = 3;
-	protected static Icon addIcon;
+	protected static IconResourceSet addIcon;
 	protected float labelWidth = 0;
 	protected Label touchedLabel = null;
 	protected LabelListListener listener = null;
@@ -109,7 +108,6 @@ public class LabelList extends ClickableView implements OnPressListener,
 				* GAP_BETWEEN_LABELS)
 				/ children.size();
 		layoutChildren();
-		newLabel.initAllIcons();
 		return newLabel;
 	}
 
@@ -121,18 +119,12 @@ public class LabelList extends ClickableView implements OnPressListener,
 			return;
 		if (text.isEmpty()) {
 			label.setIcon(addIcon);
-			label.setText(Label.EMPTY_TEXT);
 			label.setState(LabelState.EMPTY);
+			label.setText(Label.EMPTY_TEXT);
 		} else {
 			label.setIcon(null);
 			label.setText(text);
 		}
-	}
-
-	@Override
-	protected synchronized void initIcons() {
-		super.initIcons();
-		addIcon = new Icon(IconResources.ADD);
 	}
 
 	@Override
@@ -165,7 +157,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 
 	@Override
 	protected synchronized void createChildren() {
-		initBgRect(true);
+		initRoundedRect();
 	}
 
 	@Override
