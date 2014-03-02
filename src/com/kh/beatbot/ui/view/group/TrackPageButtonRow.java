@@ -99,8 +99,7 @@ public class TrackPageButtonRow extends PageButtonRow {
 		float x = addTrackButton.width;
 
 		for (int i = 0; i < pageButtons.length; i++) {
-			float w = pageButtons[i].getText().isEmpty() && i != BROWSE_PAGE_ID ? height
-					: labelWidth;
+			float w = i != BROWSE_PAGE_ID ? height : labelWidth;
 			pageButtons[i].layout(this, x, 0, w, height);
 			x += pageButtons[i].width;
 		}
