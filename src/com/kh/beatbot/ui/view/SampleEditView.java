@@ -106,7 +106,7 @@ public class SampleEditView extends ControlView2dBase {
 	@Override
 	public synchronized void createChildren() {
 		for (int i = 0; i < loopButtons.length; i++) {
-			loopButtons[i] = new Button(shapeGroup, true);
+			loopButtons[i] = new Button(shapeGroup);
 			loopButtons[i].setIcon(IconResourceSets.SAMPLE_LOOP);
 			loopButtons[i].setOnPressListener(new OnPressListener() {
 				@Override

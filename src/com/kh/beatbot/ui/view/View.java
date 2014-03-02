@@ -144,7 +144,9 @@ public class View implements Comparable<View> {
 		setState(lockedState);
 	}
 
-	protected void initRoundedRect() {
+	public void initRoundedRect() {
+		if (null != shape)
+			return;
 		shape = new RoundedRect(shapeGroup, icon.getResource(state).fillColor,
 				icon.getResource(state).strokeColor);
 	}
@@ -157,6 +159,7 @@ public class View implements Comparable<View> {
 	public final synchronized void setIcon(IconResourceSet resourceSet) {
 		if (null == resourceSet) {
 			destroyIcon();
+			destroyShape();
 			return;
 		}
 		icon = new IconResourceSet(resourceSet);
@@ -207,7 +210,7 @@ public class View implements Comparable<View> {
 
 	protected synchronized void destroy() {
 		destroyIcon();
-
+		destroyShape();
 		if (textMesh != null) {
 			textMesh.destroy();
 			textMesh = null;
@@ -223,7 +226,9 @@ public class View implements Comparable<View> {
 			textureMesh.destroy();
 			textureMesh = null;
 		}
-
+	}
+	
+	public synchronized void destroyShape() {
 		if (shape != null) {
 			shape.destroy();
 			shape = null;
@@ -498,20 +503,26 @@ public class View implements Comparable<View> {
 		}
 	}
 
-	private final void stateChanged() {
-		IconResource currResource = icon.getResource(state);
-		float[] fillColor = null == currResource
-				|| null == currResource.fillColor ? Colors.TRANSPARENT
-				: currResource.fillColor;
+	protected IconResource getIconResource() {
+		return icon.getResource(state);
+	}
+
+	protected void stateChanged() {
+		IconResource currResource = getIconResource();
 		float[] strokeColor = null == currResource
 				|| null == currResource.strokeColor ? Colors.TRANSPARENT
 				: currResource.strokeColor;
+
+		if (null == currResource
+				|| null == currResource.fillColor) {
+			destroyShape();
+		} else if (null != shape) {
+			shape.setColors(currResource.fillColor, strokeColor);
+		}
+
 		int iconResourceId = null == currResource ? -1
 				: currResource.resourceId;
 
-		if (null != shape) {
-			shape.setColors(fillColor, strokeColor);
-		}
 		if (null == textureMesh && -1 != iconResourceId) {
 			textureMesh = new TextureMesh(shapeGroup.getTextureGroup(),
 					iconResourceId);

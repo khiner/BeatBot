@@ -21,14 +21,14 @@ public class ControlButtonGroup extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		playButton = new ToggleButton(shapeGroup, false, false);
-		stopButton = new Button(shapeGroup, false);
-		recordButton = new ToggleButton(shapeGroup, false, true);
-		copyButton = new ToggleButton(shapeGroup, false, false);
-		deleteButton = new Button(shapeGroup, false);
-		quantizeButton = new Button(shapeGroup, false);
-		undoButton = new Button(shapeGroup, false);
-		redoButton = new Button(shapeGroup, false);
+		playButton = new ToggleButton(shapeGroup, false);
+		stopButton = new Button(shapeGroup);
+		recordButton = new ToggleButton(shapeGroup, true);
+		copyButton = new ToggleButton(shapeGroup, false);
+		deleteButton = new Button(shapeGroup);
+		quantizeButton = new Button(shapeGroup);
+		undoButton = new Button(shapeGroup);
+		redoButton = new Button(shapeGroup);
 
 		playButton.setIcon(IconResourceSets.PLAY);
 		stopButton.setIcon(IconResourceSets.STOP);

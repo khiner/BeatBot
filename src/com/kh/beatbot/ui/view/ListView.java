@@ -8,6 +8,7 @@ import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.transition.ColorTransition;
 import com.kh.beatbot.ui.transition.Transition;
 import com.kh.beatbot.ui.view.control.Button;
+import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class ListView extends TouchableView implements OnPressListener {
 
@@ -15,8 +16,8 @@ public class ListView extends TouchableView implements OnPressListener {
 	public static final float DRAG = .9f, THRESH = 0.01f;
 	public static float displayOffset = 0;
 
-	private float yAnchor = 0, yOffset = 0, childHeight = 0, velocity = 0,
-			lastY = 0;
+	private float yAnchor = 0, yOffset = 0, yOffsetAnchor = 0, childHeight = 0,
+			velocity = 0, lastY = 0;
 	private RoundedRect scrollBar = null;
 	private ColorTransition tabColorTransition = new ColorTransition(20, 20,
 			Colors.TRANSPARENT, END_TRANS_COLOR);
@@ -66,7 +67,8 @@ public class ListView extends TouchableView implements OnPressListener {
 	}
 
 	public void handleActionDown(int index, float x, float y) {
-		yAnchor = y - yOffset;
+		yAnchor = y;
+		yOffsetAnchor = yOffset;
 		lastY = y;
 		tabColorTransition.begin();
 	}
@@ -87,11 +89,13 @@ public class ListView extends TouchableView implements OnPressListener {
 		velocity = y - lastY;
 		updateYOffset(y);
 		layoutChildren();
-		if (selectedButton != null && selectedButton.isPressed()
-				&& Math.abs(y - yAnchor) > LABEL_HEIGHT) {
+		if (null != selectedButton
+				&& selectedButton.isPressed()
+				&& !(selectedButton instanceof ToggleButton && ((ToggleButton) selectedButton)
+						.isChecked())
+				&& Math.abs(y - yAnchor) > LABEL_HEIGHT / 2) {
 			// scrolling, release the pressed button
 			selectedButton.release();
-			selectedButton.setIcon(null);
 			shouldPropagateTouchEvents = false;
 		}
 		lastY = y;
@@ -110,7 +114,8 @@ public class ListView extends TouchableView implements OnPressListener {
 			float y = Math.max(1, -yOffset * height / childHeight);
 			float h = Math.max(rad * 2, height * height / childHeight);
 			getScrollTab().setCornerRadius(rad);
-			getScrollTab().layout(absoluteX + width - 3 * rad, absoluteY + y, 2 * rad, h);
+			getScrollTab().layout(absoluteX + width - 3 * rad, absoluteY + y,
+					2 * rad, h);
 		}
 	}
 
@@ -132,7 +137,7 @@ public class ListView extends TouchableView implements OnPressListener {
 			newY = yOffset + velocity;
 			velocity *= DRAG;
 		} else {
-			newY = pointerY - yAnchor;
+			newY = pointerY - yAnchor + yOffsetAnchor;
 		}
 
 		yOffset = GeneralUtils.clipTo(newY, height - childHeight, 0);

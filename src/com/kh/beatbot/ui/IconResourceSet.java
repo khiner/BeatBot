@@ -14,7 +14,8 @@ public class IconResourceSet {
 	public IconResourceSet(IconResourceSet resourceSet) {
 		for (State state : State.values()) {
 			IconResource otherResource = resourceSet.getResource(state);
-			resources.put(state, otherResource == null ? null : otherResource.copy());
+			resources.put(state,
+					otherResource == null ? null : otherResource.copy());
 		}
 	}
 
@@ -69,11 +70,12 @@ public class IconResourceSet {
 
 	public void setResourceId(IconResourceSet resourceSet) {
 		for (Entry<State, IconResource> resourcePair : resources.entrySet()) {
-			IconResource otherResource = resourceSet.getResource(resourcePair
-					.getKey());
 			IconResource resource = resourcePair.getValue();
-			if (null != resource && null != otherResource) {
-				resource.resourceId = otherResource.resourceId;
+			if (null != resource) {
+				IconResource otherResource = null == resourceSet ? null
+						: resourceSet.getResource(resourcePair.getKey());
+				resource.resourceId = null == otherResource ? -1
+						: otherResource.resourceId;
 			}
 		}
 	}

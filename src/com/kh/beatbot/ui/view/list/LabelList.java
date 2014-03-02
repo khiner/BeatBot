@@ -38,7 +38,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 		private LabelState state = LabelState.EMPTY;
 
 		public Label(ShapeGroup shapeGroup) {
-			super(shapeGroup, true);
+			super(shapeGroup);
 			setResourceId(IconResourceSets.ADD);
 			setFillColors(emptyIcon);
 			setText(EMPTY_TEXT);

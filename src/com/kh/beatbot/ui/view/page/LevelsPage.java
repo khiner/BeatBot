@@ -34,9 +34,9 @@ public class LevelsPage extends TouchableView implements ControlViewListener {
 
 	@Override
 	protected synchronized void createChildren() {
-		volumeButton = new ToggleButton(shapeGroup, true, false);
-		panButton = new ToggleButton(shapeGroup, true, false);
-		pitchButton = new ToggleButton(shapeGroup, true, false);
+		volumeButton = new ToggleButton(shapeGroup, false);
+		panButton = new ToggleButton(shapeGroup, false);
+		pitchButton = new ToggleButton(shapeGroup, false);
 
 		volumeLevelBar = new Seekbar(shapeGroup);
 		panLevelBar = new Seekbar(shapeGroup);

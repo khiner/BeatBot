@@ -21,9 +21,9 @@ public class TrackButtonRow extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		instrumentButton = new ToggleButton(shapeGroup, true, false);
-		muteButton = new ToggleButton(shapeGroup, true, true);
-		soloButton = new ToggleButton(shapeGroup, true, true);
+		instrumentButton = new ToggleButton(shapeGroup, false);
+		muteButton = new ToggleButton(shapeGroup, true);
+		soloButton = new ToggleButton(shapeGroup, true);
 		
 		instrumentButton.setIcon(IconResourceSets.INSTRUMENT_BASE);
 		muteButton.setIcon(IconResourceSets.MUTE);

@@ -40,6 +40,7 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 		for (MenuItem topLevelItem : topLevelItems) {
 			topLevelItem.show();
 		}
+		initIcons();
 	}
 
 	public synchronized void initIcons() {

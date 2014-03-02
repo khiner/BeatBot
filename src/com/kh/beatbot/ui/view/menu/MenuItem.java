@@ -20,14 +20,13 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 	private ListView container = null;
 	private int level = 0;
 
-	protected IconResourceSet selectedIcon = IconResourceSets.MENU_ITEM;
-
 	public MenuItem(Menu menu, MenuItem parent, Button button) {
 		this.menu = menu;
 		this.parent = parent;
 		this.level = parent == null ? 0 : parent.level + 1;
 		this.button = button;
 
+		button.setIcon(IconResourceSets.MENU_ITEM);
 		button.setOnPressListener(this);
 		button.setOnReleaseListener(this);
 
@@ -35,7 +34,6 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 	}
 
 	public void onPress(Button button) {
-		updateIcon();
 		menu.onMenuItemPressed(this);
 		container.onPress(button);
 	}
@@ -86,7 +84,6 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 		if (button instanceof ToggleButton) {
 			((ToggleButton) button).setChecked(checked);
 		}
-		updateIcon();
 	}
 
 	public boolean isChecked() {
@@ -139,13 +136,5 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 
 	private List<MenuItem> getSiblings() {
 		return parent == null ? menu.getTopLevelItems() : parent.subMenuItems;
-	}
-
-	private void updateIcon() {
-		if ((button.isPressed() || isChecked()) && !button.getText().isEmpty()) {
-			button.setFillColors(selectedIcon);
-		} else {
-			button.setIcon(null);
-		}
 	}
 }

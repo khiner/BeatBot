@@ -131,7 +131,7 @@ public class MainPage extends TouchableView {
 
 	private class MenuButton extends Button {
 		public MenuButton(ShapeGroup shapeGroup) {
-			super(shapeGroup, false);
+			super(shapeGroup);
 		}
 
 		private final float SPRING_CONST = .1f, DAMP = .65f,

@@ -32,7 +32,7 @@ public class IconResourceSets {
 			SNARE= s(r(R.drawable.snare_icon), r(R.drawable.snare_icon_selected), r(R.drawable.snare_icon_selected)),
 			HH_CLOSED = s(r(R.drawable.hh_closed_icon), r(R.drawable.hh_closed_icon_selected), r(R.drawable.hh_closed_icon_selected)),
 			HH_OPEN = s(r(R.drawable.hh_open_icon), r(R.drawable.hh_open_icon_selected), r(R.drawable.hh_open_icon_selected)),
-			RIMSHOT = s(r(R.drawable.rimshot_icon, Colors.TRANSPARENT, Colors.WHITE), r(R.drawable.rimshot_icon_selected, Colors.LABEL_SELECTED, Colors.BLACK), r(R.drawable.rimshot_icon_selected, Colors.VOLUME, Colors.BLACK)),
+			RIMSHOT = s(r(R.drawable.rimshot_icon), r(R.drawable.rimshot_icon_selected), r(R.drawable.rimshot_icon_selected)),
 			MICROPHONE = s(r(R.drawable.microphone_icon), r(R.drawable.microphone_icon_selected), r(R.drawable.microphone_icon_selected)),
 			BEAT = s(r(R.drawable.beat_icon), r(R.drawable.beat_icon_selected), r(R.drawable.beat_icon_selected)),
 			SAMPLE = s(r(R.drawable.sample_icon), r(R.drawable.sample_icon_selected), r(R.drawable.sample_icon_selected)),
@@ -47,7 +47,7 @@ public class IconResourceSets {
 			ADSR = s(r(R.drawable.adsr_icon), r(R.drawable.adsr_icon_selected), r(R.drawable.adsr_icon_selected)),
 			LEVELS = s(r(R.drawable.levels_icon), r(R.drawable.levels_icon), r(R.drawable.levels_icon)),
 
-			MENU_ITEM = s(r(Colors.TRANSPARENT), r(Colors.LABEL_LIGHT), r(Colors.VOLUME)),
+			MENU_ITEM = s(r(null, Colors.BLACK), r(Colors.LABEL_LIGHT, Colors.BLACK), r(Colors.VOLUME, Colors.BLACK)),
 			
 			FILE = s(r(R.drawable.browse_icon_selected), r(R.drawable.browse_icon_menu_selected)),
 	        MENU = s(r(R.drawable.menu_icon)),

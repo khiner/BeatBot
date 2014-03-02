@@ -20,7 +20,7 @@ public class DelayParamsPage extends EffectParamsPage {
 		if (effect == null)
 			return;
 		super.createChildren();
-		linkToggle = new ToggleButton(shapeGroup, false, true);
+		linkToggle = new ToggleButton(shapeGroup, true);
 		linkToggle.setIcon(IconResourceSets.LINK);
 		linkToggle.setOnReleaseListener(new OnReleaseListener() {
 			@Override

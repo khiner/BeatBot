@@ -62,8 +62,8 @@ public class TrackPageButtonRow extends PageButtonRow {
 	protected synchronized void createChildren() {
 		super.createChildren();
 
-		addTrackButton = new Button(shapeGroup, true);
-		deleteTrackButton = new Button(shapeGroup, true);
+		addTrackButton = new Button(shapeGroup);
+		deleteTrackButton = new Button(shapeGroup);
 
 		addTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override

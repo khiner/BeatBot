@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view.control;
 import com.kh.beatbot.listener.OnLongPressListener;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.IconResourceSet.State;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 import com.kh.beatbot.ui.view.LongPressableView;
@@ -14,11 +15,8 @@ public class Button extends LongPressableView {
 
 	protected boolean enabled = true;
 
-	public Button(ShapeGroup shapeGroup, boolean bgIcon) {
+	public Button(ShapeGroup shapeGroup) {
 		super(shapeGroup);
-		if (bgIcon) {
-			initRoundedRect();
-		}
 	}
 
 	public final OnPressListener getOnPressListener() {
@@ -132,5 +130,14 @@ public class Button extends LongPressableView {
 		if (longPressListener != null) {
 			longPressListener.onLongPress(this);
 		}
+	}
+	
+	@Override
+	protected void stateChanged() {
+		IconResource resource = getIconResource();
+		if (null != resource && null != resource.fillColor) {
+			initRoundedRect();
+		}
+		super.stateChanged();
 	}
 }

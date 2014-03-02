@@ -40,9 +40,9 @@ public class SampleEditPage extends TouchableView {
 	@Override
 	protected synchronized void createChildren() {
 		sampleEdit = new SampleEditView(shapeGroup);
-		previewButton = new Button(shapeGroup, false);
-		loopButton = new ToggleButton(shapeGroup, false, true);
-		reverseButton = new ToggleButton(shapeGroup, false, true);
+		previewButton = new Button(shapeGroup);
+		loopButton = new ToggleButton(shapeGroup, true);
+		reverseButton = new ToggleButton(shapeGroup, true);
 
 		loopBeginControl = new ParamControl(shapeGroup);
 		loopEndControl = new ParamControl(shapeGroup);
