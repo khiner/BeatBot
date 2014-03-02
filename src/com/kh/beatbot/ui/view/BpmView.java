@@ -86,11 +86,6 @@ public class BpmView extends ClickableView {
 	}
 
 	@Override
-	public void handleActionUp(int id, float x, float y) {
-		super.handleActionUp(id, x, y);
-	}
-
-	@Override
 	protected void singleTap(int id, float x, float y) {
 		long tapTime = System.currentTimeMillis();
 		float millisElapsed = tapTime - lastTapTime;
