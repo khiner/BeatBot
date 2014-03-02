@@ -99,7 +99,7 @@ public class ListView extends TouchableView implements OnPressListener {
 
 	private RoundedRect getScrollTab() {
 		if (scrollBar == null) {
-			scrollBar = new RoundedRect(null, Colors.TRANSPARENT, null);
+			scrollBar = new RoundedRect(shapeGroup, Colors.TRANSPARENT, null);
 		}
 		return scrollBar;
 	}
@@ -110,7 +110,7 @@ public class ListView extends TouchableView implements OnPressListener {
 			float y = Math.max(1, -yOffset * height / childHeight);
 			float h = Math.max(rad * 2, height * height / childHeight);
 			getScrollTab().setCornerRadius(rad);
-			getScrollTab().layout(width - 3 * rad, y, 2 * rad, h);
+			getScrollTab().layout(absoluteX + width - 3 * rad, absoluteY + y, 2 * rad, h);
 		}
 	}
 

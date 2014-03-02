@@ -37,7 +37,7 @@ public class IconResourceSets {
 			BEAT = s(r(R.drawable.beat_icon), r(R.drawable.beat_icon_selected), r(R.drawable.beat_icon_selected)),
 			SAMPLE = s(r(R.drawable.sample_icon), r(R.drawable.sample_icon_selected), r(R.drawable.sample_icon_selected)),
 			
-			BROWSE_PAGE = s(r(Colors.LABEL_SELECTED)),
+			BROWSE_PAGE = s(r(Colors.LABEL_SELECTED), r(Colors.LABEL_SELECTED)),
 
 			DELETE_TRACK = s(r(R.drawable.delete_track_icon, Colors.TRANSPARENT, Colors.RED), r(R.drawable.delete_track_icon_selected, Colors.RED, Colors.BLACK)),
 
