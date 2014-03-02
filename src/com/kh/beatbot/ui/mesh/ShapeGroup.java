@@ -4,7 +4,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.texture.TextureGroup;
-import com.kh.beatbot.ui.view.View;
 
 public class ShapeGroup {
 
@@ -24,13 +23,6 @@ public class ShapeGroup {
 	
 	public TextureGroup getTextGroup() {
 		return textGroup;
-	}
-
-	public void draw(View parent) {
-		View.push();
-		View.translate(-parent.absoluteX, -parent.absoluteY);
-		draw();
-		View.pop();
 	}
 
 	public void draw() {

@@ -333,7 +333,7 @@ public class View implements Comparable<View> {
 		}
 
 		if (shouldDraw) {
-			shapeGroup.draw(this);
+			shapeGroup.draw();
 		}
 		draw();
 		drawChildren();
@@ -342,17 +342,6 @@ public class View implements Comparable<View> {
 
 	protected synchronized void drawChildren() {
 		for (View child : children) {
-			drawChild(child);
-		}
-	}
-
-	protected final void drawChild(View child) {
-		if (child.parent != null) {
-			push();
-			translate(child.x, child.y);
-			child.drawAll();
-			pop();
-		} else {
 			child.drawAll();
 		}
 	}

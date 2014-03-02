@@ -109,13 +109,13 @@ public class MainPage extends TouchableView {
 	public synchronized void drawChildren() {
 		for (View child : children) {
 			if (!child.equals(slideMenu) && !child.equals(menuButton)) {
-				drawChild(child);
+				child.drawAll();
 			}
 		}
 		foregroundRect.draw();
 		tab.draw();
-		drawChild(slideMenu);
-		drawChild(menuButton);
+		slideMenu.drawAll();
+		menuButton.drawAll();
 	}
 
 	private synchronized void setMenuPosition(float x, float y) {

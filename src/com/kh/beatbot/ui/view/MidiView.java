@@ -232,7 +232,7 @@ public class MidiView extends ClickableView implements TrackListener {
 		push();
 		translate(
 				-TickWindowHelper.getTickOffset()
-						/ TickWindowHelper.getNumTicks() * width, 0);
+						/ TickWindowHelper.getNumTicks() * width + absoluteX, absoluteY);
 		scale((float) MidiManager.MAX_TICKS
 				/ (float) TickWindowHelper.getNumTicks(), 1);
 
@@ -303,19 +303,10 @@ public class MidiView extends ClickableView implements TrackListener {
 	}
 
 	public void createNoteView(MidiNote note) {
-		Rectangle noteRect = makeNoteRectangle(note);
-		note.setRectangle(noteRect);
-	}
-
-	private Rectangle makeNoteRectangle(MidiNote note) {
-		float x1 = tickToUnscaledX(note.getOnTick());
-		float y1 = noteToUnscaledY(note.getNoteValue());
-		float width = tickToUnscaledX(note.getOffTick()) - x1;
-
-		Rectangle rect = new Rectangle(noteRectangles, whichColor(note),
+		Rectangle noteRect = new Rectangle(noteRectangles, whichColor(note),
 				Colors.BLACK);
-		rect.layout(x1, y1, width, trackHeight);
-		return rect;
+		note.setRectangle(noteRect);
+		updateNoteView(note);
 	}
 
 	public void updateNoteView(MidiNote note) {
