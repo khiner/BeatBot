@@ -36,7 +36,7 @@ public class FilterParamsPage extends EffectParamsPage {
 		filterToggles = new ToggleButton[3];
 		filterToggleListener = new FilterToggleListener();
 		for (int i = 0; i < filterToggles.length; i++) {
-			filterToggles[i] = new ToggleButton(shapeGroup, false);
+			filterToggles[i] = new ToggleButton(shapeGroup, true, false);
 			filterToggles[i].setOnReleaseListener(filterToggleListener);
 		}
 		

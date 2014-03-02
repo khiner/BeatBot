@@ -77,7 +77,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 
 	@Override
 	protected synchronized void createChildren() {
-		masterButton = new ToggleButton(shapeGroup, false);
+		masterButton = new ToggleButton(shapeGroup, true, false);
 
 		masterButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override

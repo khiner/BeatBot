@@ -32,7 +32,7 @@ public class Mesh2D extends Mesh {
 			setNumVertices(index + 1);
 			group.changeSize(this, numVertices - 1, numVertices, numVertices - 1, numVertices);
 		}
-		((Mesh2DGroup) group).vertex(this, x, y, color);
+		((Mesh2DGroup) group).vertex(this, index, x, y, color);
 		index++;
 	}
 	

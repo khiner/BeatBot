@@ -1,12 +1,9 @@
 package com.kh.beatbot.ui.view.page;
 
-import android.widget.ImageButton;
-
 import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.IconResourceSet;
 import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.view.SampleEditView;
 import com.kh.beatbot.ui.view.TouchableView;
@@ -43,9 +40,9 @@ public class SampleEditPage extends TouchableView {
 	@Override
 	protected synchronized void createChildren() {
 		sampleEdit = new SampleEditView(shapeGroup);
-		previewButton = new Button(shapeGroup);
-		loopButton = new ToggleButton(shapeGroup, true);
-		reverseButton = new ToggleButton(shapeGroup, true);
+		previewButton = new Button(shapeGroup, false);
+		loopButton = new ToggleButton(shapeGroup, false, true);
+		reverseButton = new ToggleButton(shapeGroup, false, true);
 
 		loopBeginControl = new ParamControl(shapeGroup);
 		loopEndControl = new ParamControl(shapeGroup);

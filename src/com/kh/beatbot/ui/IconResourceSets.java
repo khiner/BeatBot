@@ -39,9 +39,10 @@ public class IconResourceSets {
 			
 			BROWSE_PAGE = s(r(Colors.LABEL_SELECTED)),
 
+			DELETE_TRACK = s(r(R.drawable.delete_track_icon, Colors.TRANSPARENT, Colors.RED), r(R.drawable.delete_track_icon_selected, Colors.RED, Colors.BLACK)),
+
 			LABEL_BASE = s(r(Colors.LABEL_DARK, Colors.WHITE), r(Colors.VOLUME, Colors.BLACK), r(Colors.LABEL_SELECTED, Colors.BLACK)),
 			ADD = s(r(R.drawable.plus_outline), r(R.drawable.plus_outline), r(R.drawable.plus_outline)),
-			DELETE_TRACK = s(r(R.drawable.delete_track_icon), r(R.drawable.delete_icon_selected)),
 			NOTE_LEVELS = s(r(R.drawable.note_levels_icon), r(R.drawable.note_levels_icon), r(R.drawable.note_levels_icon)),
 			ADSR = s(r(R.drawable.adsr_icon), r(R.drawable.adsr_icon_selected), r(R.drawable.adsr_icon_selected)),
 			LEVELS = s(r(R.drawable.levels_icon), r(R.drawable.levels_icon), r(R.drawable.levels_icon)),

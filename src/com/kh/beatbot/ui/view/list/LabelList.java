@@ -37,8 +37,8 @@ public class LabelList extends ClickableView implements OnPressListener,
 		private final static String EMPTY_TEXT = "ADD";
 		private LabelState state = LabelState.EMPTY;
 
-		public Label() {
-			super(null);
+		public Label(ShapeGroup shapeGroup) {
+			super(shapeGroup, true);
 			setResourceId(IconResourceSets.ADD);
 			setFillColors(emptyIcon);
 			setText(EMPTY_TEXT);
@@ -98,7 +98,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 	}
 
 	public Label addLabel(String text, boolean on) {
-		Label newLabel = new Label();
+		Label newLabel = new Label(shapeGroup);
 		// need onPressListener as well as the onReleaseListener to notify
 		// when a label becomes touched
 		newLabel.setOnPressListener(this);

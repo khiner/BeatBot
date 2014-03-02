@@ -7,8 +7,8 @@ public class ToggleButton extends Button {
 	boolean oscillating = false;
 	boolean checked = false;
 
-	public ToggleButton(ShapeGroup shapeGroup, boolean oscillating) {
-		super(shapeGroup);
+	public ToggleButton(ShapeGroup shapeGroup, boolean bgIcon, boolean oscillating) {
+		super(shapeGroup, bgIcon);
 		this.oscillating = oscillating;
 	}
 

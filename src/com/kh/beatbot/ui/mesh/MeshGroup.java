@@ -165,6 +165,26 @@ public abstract class MeshGroup {
 		return vertices[index * indicesPerVertex + 1];
 	}
 
+	protected synchronized void vertex(Mesh mesh, int index, float x, float y) {
+		vertex(mesh, index, x, y, null);
+	}
+
+	protected synchronized void vertex(Mesh mesh, int index, float x, float y,
+			float[] color) {
+		int vertex = (mesh.parentVertexIndex + index) * indicesPerVertex;
+
+		vertices[vertex] = x;
+		vertices[vertex + 1] = y;
+		if (null != color) {
+			vertices[vertex + 2] = color[0];
+			vertices[vertex + 3] = color[1];
+			vertices[vertex + 4] = color[2];
+			vertices[vertex + 5] = color[3];
+		}
+
+		dirty = true;
+	}
+
 	protected synchronized void setColor(Mesh mesh, float[] color) {
 		for (int vertexIndex = 0; vertexIndex < mesh.getNumVertices(); vertexIndex++) {
 			setColor(mesh, vertexIndex, color);

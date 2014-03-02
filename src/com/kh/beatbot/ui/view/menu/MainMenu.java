@@ -22,12 +22,12 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 			midiExportItem;
 
 	protected synchronized void createMenuItems() {
-		fileItem = new MenuItem(this, null, new ToggleButton(shapeGroup, false));
-		settingsItem = new MenuItem(this, null, new ToggleButton(shapeGroup, false));
-		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton(shapeGroup, false));
+		fileItem = new MenuItem(this, null, new ToggleButton(shapeGroup, false, false));
+		settingsItem = new MenuItem(this, null, new ToggleButton(shapeGroup, false, false));
+		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton(shapeGroup, false, false));
 		midiImportItem = new FileMenuItem(this, fileItem, new File(
 				FileManager.midiDirectory.getPath()));
-		midiExportItem = new MenuItem(this, fileItem, new Button(shapeGroup));
+		midiExportItem = new MenuItem(this, fileItem, new Button(shapeGroup, false));
 
 		topLevelItems.add(fileItem);
 		topLevelItems.add(settingsItem);

@@ -2,7 +2,7 @@ package com.kh.beatbot.ui.mesh;
 
 public abstract class Mesh {
 	protected MeshGroup group;
-	protected int parentVertexIndex = -1, parentIndexOffset = -1;
+	public int parentVertexIndex = -1, parentIndexOffset = -1;
 	protected int numVertices = 0;
 	protected short[] indices;
 	protected float x, y, width, height;

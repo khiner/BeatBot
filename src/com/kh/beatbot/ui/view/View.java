@@ -25,7 +25,7 @@ import com.kh.beatbot.ui.view.page.MainPage;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
 public class View implements Comparable<View> {
-	public static final float ¹ = (float) Math.PI, BG_OFFSET = 4;
+	public static final float ¹ = (float) Math.PI, BG_OFFSET = 3;
 
 	public static MainPage mainPage;
 	public static EffectPage effectPage;
@@ -160,6 +160,7 @@ public class View implements Comparable<View> {
 			return;
 		}
 		icon = new IconResourceSet(resourceSet);
+
 		setState(state);
 	}
 
@@ -362,25 +363,44 @@ public class View implements Comparable<View> {
 	}
 
 	private void layoutShape() {
-		float x = BG_OFFSET + absoluteX, y = BG_OFFSET + absoluteY;
+		float bgRectRadius = calcBgRectRadius();
+		float x = absoluteX, y = absoluteY;
+		float width = this.width, height = this.height;
 
-		float bgRectRadius = 0;
-		if (shape instanceof RoundedRect) {
-			bgRectRadius = calcBgRectRadius();
-			((RoundedRect) shape).setCornerRadius(bgRectRadius);
-			shape.layout(x, y, width - BG_OFFSET * 2, height - BG_OFFSET * 2);
+		if (null != shape) {
+			x += BG_OFFSET;
+			y += BG_OFFSET;
+			width -= BG_OFFSET * 2;
+			height -= BG_OFFSET * 2;
+			if (shape instanceof RoundedRect) {
+				((RoundedRect) shape).setCornerRadius(bgRectRadius);
+			}
+		}
+
+		if (shouldShrink()) {
+			x += width * .04f;
+			y += height * .04f;
+			width *= .92f;
+			height *= .92f;
+		}
+		
+		if (null != shape) {
+			shape.layout(x, y, width, height);
 		}
 
 		if (null != textureMesh) {
-			float textureSize = height - BG_OFFSET * 2;
-			textureMesh.layout(x, y, textureSize, textureSize);
+			textureMesh.layout(x, y, height, height);
 		}
 
 		minX = minY = bgRectRadius + BG_OFFSET;
-		maxX = width - bgRectRadius - BG_OFFSET;
-		maxY = height - bgRectRadius - BG_OFFSET;
-		borderWidth = width - 2 * minX;
-		borderHeight = height - 2 * minY;
+		maxX = this.width - bgRectRadius - BG_OFFSET;
+		maxY = this.height - bgRectRadius - BG_OFFSET;
+		borderWidth = this.width - 2 * minX;
+		borderHeight = this.height - 2 * minY;
+	}
+
+	protected boolean shouldShrink() {
+		return false;
 	}
 
 	public void layout(View parent, float x, float y, float width, float height) {
