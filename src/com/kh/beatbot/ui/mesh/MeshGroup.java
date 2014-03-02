@@ -13,7 +13,7 @@ import com.kh.beatbot.ui.view.View;
 
 import android.util.Log;
 
-public abstract class MeshGroup {
+public class MeshGroup {
 	public final static int SHORT_BYTES = Short.SIZE / 8;
 	public final static int FLOAT_BYTES = Float.SIZE / 8;
 
@@ -35,6 +35,10 @@ public abstract class MeshGroup {
 	protected int[] textureId;
 
 	protected List<Mesh> children = new ArrayList<Mesh>();
+
+	protected MeshGroup(int primitiveType) {
+		this(primitiveType, 6);
+	}
 
 	protected MeshGroup(int primitiveType, int indicesPerVertex) {
 		this(primitiveType, indicesPerVertex, null);

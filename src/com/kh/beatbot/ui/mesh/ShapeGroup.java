@@ -8,12 +8,12 @@ import com.kh.beatbot.ui.view.View;
 
 public class ShapeGroup {
 
-	protected Mesh2DGroup fillGroup, strokeGroup;
+	protected MeshGroup fillGroup, strokeGroup;
 	protected TextureGroup textureGroup, textGroup;
 
 	public ShapeGroup() {
-		fillGroup = new Mesh2DGroup(GL10.GL_TRIANGLE_STRIP);
-		strokeGroup = new Mesh2DGroup(GL10.GL_LINES);
+		fillGroup = new MeshGroup(GL10.GL_TRIANGLE_STRIP);
+		strokeGroup = new MeshGroup(GL10.GL_LINES);
 		textureGroup = new TextureGroup(GL10.GL_TRIANGLE_STRIP, TextureAtlas.resource.getTextureId());
 		textGroup = new TextureGroup(GL10.GL_TRIANGLE_STRIP, TextureAtlas.font.getTextureId());
 	}

@@ -21,7 +21,6 @@ public class TextureGroup extends MeshGroup {
 					TextureAtlas.font.getTextureRegion(character), x, y,
 					TextureAtlas.font.getCellWidth() * scale, height, color);
 			x += FontTextureAtlas.getCharWidth(character) * scale;
-
 			textureIndex += VERTICES_PER_TEXTURE;
 		}
 
