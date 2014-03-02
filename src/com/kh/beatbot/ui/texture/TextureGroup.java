@@ -38,16 +38,16 @@ public class TextureGroup extends MeshGroup {
 		dirty = true;
 	}
 
-	public synchronized void layout(Mesh mesh, int resourceId, float x,
-			float y, float width, float height) {
-		textureVertices(mesh.getParentVertexIndex(),
-				TextureAtlas.resource.getTextureRegion(resourceId), x, y,
-				width, height, null);
+	public synchronized void layout(Mesh mesh, float x, float y, float width,
+			float height) {
+		layout(mesh.getParentVertexIndex(), x, y, width, height);
 
 		dirty = true;
 	}
 
 	public synchronized void setResource(Mesh mesh, int resourceId) {
+		if (-1 == resourceId)
+			return;
 		setTexture(mesh.getParentVertexIndex(),
 				TextureAtlas.resource.getTextureRegion(resourceId));
 
@@ -66,12 +66,20 @@ public class TextureGroup extends MeshGroup {
 		vertex(i + indicesPerVertex * 3, x, y, color, region.u1, region.v1);
 	}
 
+	private synchronized void layout(int textureIndex, float x, float y, float width, float height) {
+		int i = textureIndex * indicesPerVertex;
+		vertex(i, x, y + height);
+		vertex(i + indicesPerVertex, x + width, y + height);
+		vertex(i + indicesPerVertex * 2, x + width, y);
+		vertex(i + indicesPerVertex * 3, x, y);
+	}
+
 	private synchronized void setTexture(int textureIndex, TextureRegion region) {
 		int i = textureIndex * indicesPerVertex;
-		vertex(i, region.u1, region.v2);
-		vertex(i + indicesPerVertex, region.u2, region.v2);
-		vertex(i + indicesPerVertex * 2, region.u2, region.v1);
-		vertex(i + indicesPerVertex * 3, region.u1, region.v1);
+		textureVertex(i, region.u1, region.v2);
+		textureVertex(i + indicesPerVertex, region.u2, region.v2);
+		textureVertex(i + indicesPerVertex * 2, region.u2, region.v1);
+		textureVertex(i + indicesPerVertex * 3, region.u1, region.v1);
 	}
 
 	private synchronized void vertex(int index, float x, float y,
@@ -88,7 +96,12 @@ public class TextureGroup extends MeshGroup {
 		vertices[index + 7] = textureY;
 	}
 
-	private synchronized void vertex(int index, float textureX, float textureY) {
+	private synchronized void vertex(int index, float x, float y) {
+		vertices[index] = x;
+		vertices[index + 1] = y;
+	}
+
+	private synchronized void textureVertex(int index, float textureX, float textureY) {
 		vertices[index + 6] = textureX;
 		vertices[index + 7] = textureY;
 	}

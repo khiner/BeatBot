@@ -1,19 +1,15 @@
 package com.kh.beatbot.ui.view.control;
 
+import com.kh.beatbot.ui.IconResourceSet.State;
 import com.kh.beatbot.ui.mesh.ShapeGroup;
 
 public class ToggleButton extends Button {
-	boolean checked = false;
 	boolean oscillating = false;
+	boolean checked = false;
 
 	public ToggleButton(ShapeGroup shapeGroup, boolean oscillating) {
 		super(shapeGroup);
 		this.oscillating = oscillating;
-	}
-
-	public void release() {
-		pressed = false;
-		releaseLongPress();
 	}
 
 	public boolean isChecked() {
@@ -22,7 +18,7 @@ public class ToggleButton extends Button {
 
 	public void setChecked(boolean checked) {
 		this.checked = checked;
-		release();
+		setState(checked ? State.SELECTED : State.DEFAULT);
 	}
 
 	/*
@@ -35,8 +31,15 @@ public class ToggleButton extends Button {
 
 	@Override
 	protected void notifyReleased() {
-		if (oscillating || !checked)
+		if (oscillating || !checked) {
 			setChecked(!checked);
+		}
 		super.notifyReleased();
+	}
+
+	@Override
+	public void release() {
+		releaseLongPress();
+		setChecked(checked);
 	}
 }

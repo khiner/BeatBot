@@ -11,7 +11,7 @@ public class Button extends LongPressableView {
 	private OnReleaseListener releaseListener;
 	private OnLongPressListener longPressListener;
 
-	protected boolean enabled = true, pressed = false;
+	protected boolean enabled = true;
 
 	public Button(ShapeGroup shapeGroup) {
 		super(shapeGroup);
@@ -39,14 +39,16 @@ public class Button extends LongPressableView {
 		this.longPressListener = longPressListener;
 	}
 
+	@Override
 	public void press() {
-		pressed = true;
+		super.press();
 		notifyPressed(); // always notify press events
 	}
 
+	@Override
 	public void release() {
 		releaseLongPress();
-		pressed = false;
+		super.release();
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -55,10 +57,6 @@ public class Button extends LongPressableView {
 
 	public boolean isEnabled() {
 		return enabled;
-	}
-
-	public boolean isPressed() {
-		return pressed;
 	}
 
 	/*
@@ -83,10 +81,11 @@ public class Button extends LongPressableView {
 
 	@Override
 	public void handleActionDown(int id, float x, float y) {
-		super.handleActionDown(id, x, y);
 		if (!enabled) {
 			return;
 		}
+
+		super.handleActionDown(id, x, y);
 		press();
 	}
 
@@ -95,12 +94,9 @@ public class Button extends LongPressableView {
 		if (!enabled) {
 			return;
 		}
-		if (pressed) {
-			if (isLongPressing() || longPressListener == null) {
-				// only release if long press hasn't happened yet
-				notifyReleased();
-			}
-			release();
+		if (isPressed() && (isLongPressing() || longPressListener == null)) {
+			// only release if long press hasn't happened yet
+			notifyReleased();
 		}
 		super.handleActionUp(id, x, y);
 	}
@@ -113,11 +109,11 @@ public class Button extends LongPressableView {
 		}
 		// x / y are relative to this view but containsPoint is absolute
 		if (!containsPoint(this.x + x, this.y + y)) {
-			if (pressed) { // pointer dragged away from button - signal release
+			if (isPressed()) { // pointer dragged away from button - signal release
 				release();
 			}
 		} else { // pointer inside button
-			if (!pressed) { // pointer was dragged away and back IN to button
+			if (!isPressed()) { // pointer was dragged away and back IN to button
 				press();
 			}
 		}

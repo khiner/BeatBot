@@ -3,10 +3,8 @@ package com.kh.beatbot.ui.mesh;
 import com.kh.beatbot.ui.texture.TextureGroup;
 
 public class TextureMesh extends Mesh {
-	protected int resourceId;
 
 	public TextureMesh(TextureGroup group, int resourceId) {
-		this.resourceId = resourceId;
 		this.numVertices = Rectangle.NUM_FILL_VERTICES;
 		indices = Rectangle.FILL_INDICES;
 		setGroup(group);
@@ -34,7 +32,7 @@ public class TextureMesh extends Mesh {
 		this.width = width;
 		this.height = height;
 
-		((TextureGroup) group).layout(this, resourceId, x, y, width, height);
+		((TextureGroup) group).layout(this, x, y, width, height);
 		return true;
 	}
 }

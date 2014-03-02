@@ -53,11 +53,11 @@ public abstract class TouchableView extends View {
 	 * events.
 	 ********************************************************/
 	public void handleActionDown(int id, float x, float y) {
-		setState(State.PRESSED);
+		press();
 	}
 
 	public void handleActionUp(int id, float x, float y) {
-		setState(State.DEFAULT);
+		release();
 	}
 
 	public void handleActionPointerDown(int id, float x, float y) {
@@ -197,4 +197,17 @@ public abstract class TouchableView extends View {
 		}
 		return null;
 	}
+	
+	protected void press() {
+		setState(State.PRESSED);
+	}
+	
+	protected void release() {
+		setState(State.DEFAULT);
+	}
+
+	public boolean isPressed() {
+		return getState() == State.PRESSED;
+	}
+
 }

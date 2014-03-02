@@ -508,11 +508,12 @@ public class View implements Comparable<View> {
 					iconResourceId);
 		}
 		if (null != textureMesh) {
-			textureMesh.setResource(iconResourceId, absoluteX, absoluteY,
-					height, height, Colors.WHITE);
+			textureMesh.setResource(iconResourceId);
+			textureMesh.setColor(Colors.WHITE);
 		}
 		if (null != textMesh) {
 			textMesh.setColor(strokeColor);
 		}
+		layoutShape();
 	}
 }

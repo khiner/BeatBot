@@ -79,8 +79,8 @@ public class TrackPageButtonRow extends PageButtonRow {
 			}
 		});
 
+		deleteTrackButton.setIcon(IconResourceSets.DELETE_TRACK);
 		addTrackButton.setResourceId(IconResourceSets.ADD);
-		deleteTrackButton.setResourceId(IconResourceSets.DELETE_TRACK);
 		getEditButton().setResourceId(IconResourceSets.SAMPLE);
 		getNoteLevelsButton().setResourceId(IconResourceSets.NOTE_LEVELS);
 		getLevelsButton().setResourceId(IconResourceSets.LEVELS);
