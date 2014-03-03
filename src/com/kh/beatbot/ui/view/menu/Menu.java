@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui.view;
+package com.kh.beatbot.ui.view.menu;
 
 import java.io.FileFilter;
 import java.io.FilenameFilter;
@@ -7,7 +7,8 @@ import java.util.List;
 
 import com.kh.beatbot.listener.FileMenuItemListener;
 import com.kh.beatbot.listener.MenuItemListener;
-import com.kh.beatbot.ui.view.menu.MenuItem;
+import com.kh.beatbot.ui.view.ListView;
+import com.kh.beatbot.ui.view.TouchableView;
 
 public abstract class Menu extends TouchableView implements MenuItemListener, FileMenuItemListener, FileFilter {
 	protected List<ListView> menuLists;
@@ -39,18 +40,13 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 		createMenuItems();
 		for (MenuItem topLevelItem : topLevelItems) {
 			topLevelItem.show();
-		}
-		initIcons();
-	}
-
-	public synchronized void initIcons() {
-		columnWidth = width;
-		for (MenuItem menuItem : topLevelItems) {
-			menuItem.loadIcons();
-		}
+		}		
 	}
 
 	public synchronized void layoutChildren() {
+		if (columnWidth == 0) {
+			columnWidth = width;
+		}
 		float yOffset = LABEL_HEIGHT / 3;
 		float displayHeight = height - 2 * yOffset;
 		float x = 0;

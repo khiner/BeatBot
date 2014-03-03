@@ -5,7 +5,12 @@ public abstract class Mesh {
 	public int parentVertexIndex = -1, parentIndexOffset = -1;
 	protected int numVertices = 0;
 	protected short[] indices;
-	protected float x, y, width, height;
+	public float x, y, width, height;
+
+	public boolean containsPoint(float x, float y) {
+		return this.x < x && this.x + width > x && this.y < y
+				&& this.y + height > y;
+	}
 
 	public void setGroup(MeshGroup group) {
 		if (this.group == group)
@@ -20,7 +25,7 @@ public abstract class Mesh {
 	public void setColor(float[] color) {
 		group.setColor(this, color);
 	}
-	
+
 	public void setColor(int vertexIndex, float[] color) {
 		group.setColor(this, vertexIndex, color);
 	}
@@ -51,7 +56,7 @@ public abstract class Mesh {
 	private void translate(float x, float y) {
 		group.translate(this, x, y);
 	}
-	
+
 	public boolean setPosition(float x, float y) {
 		boolean posChanged = x != this.x || y != this.y;
 		if (posChanged) {
@@ -75,7 +80,8 @@ public abstract class Mesh {
 		}
 	}
 
-	public synchronized boolean layout(float x, float y, float width, float height) {
+	public synchronized boolean layout(float x, float y, float width,
+			float height) {
 		boolean dimChanged = setDimensions(width, height);
 		boolean posChanged = setPosition(x, y);
 		return dimChanged || posChanged;

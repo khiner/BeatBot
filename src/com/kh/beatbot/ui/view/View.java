@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
+import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.listener.ScrollableViewListener;
 import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.IconResourceSet;
@@ -55,8 +56,7 @@ public class View implements Comparable<View> {
 
 	private boolean initialized = false;
 	protected boolean shouldClip = true, shouldDraw = true;
-
-	protected String text = "";
+	private String text = "";
 	protected Set<ScrollableViewListener> listeners = new HashSet<ScrollableViewListener>();
 
 	protected Shape shape;
@@ -66,7 +66,6 @@ public class View implements Comparable<View> {
 
 	private IconResourceSet icon = new IconResourceSet(IconResourceSets.DEFAULT);
 	private State state = State.DEFAULT;
-	private State lockedState = null;
 
 	public View() {
 		this(null);
@@ -95,17 +94,8 @@ public class View implements Comparable<View> {
 	}
 
 	public final void setState(State state) {
-		this.state = lockedState != null ? lockedState : state;
+		this.state = state;
 		stateChanged();
-	}
-
-	public void setText(String text) {
-		this.text = text;
-		initText();
-	}
-
-	public String getText() {
-		return text;
 	}
 
 	protected float calcTextX() {
@@ -120,28 +110,8 @@ public class View implements Comparable<View> {
 		return width - X_OFFSET * 4;
 	}
 
-	protected void initText() {
-		if (text == null || text.isEmpty())
-			return;
-
-		textHeight = height;
-		textWidth = TextureAtlas.font.getTextWidth(text, textHeight);
-		if (textWidth > calcNonIconWidth()) {
-			float scaleRatio = calcNonIconWidth() / textWidth;
-			textWidth *= scaleRatio;
-			textHeight *= scaleRatio;
-		}
-
-		setText(text, calcTextX(), calcTextY(), textHeight);
-	}
-
 	public State getState() {
 		return state;
-	}
-
-	public void lockState(State state) {
-		lockedState = state;
-		setState(lockedState);
 	}
 
 	public void initRoundedRect() {
@@ -154,6 +124,15 @@ public class View implements Comparable<View> {
 	protected void initRect() {
 		shape = new Rectangle(shapeGroup, icon.getResource(state).fillColor,
 				icon.getResource(state).strokeColor);
+	}
+
+	public void setText(String text) {
+		this.text = text;
+		setState(state);
+	}
+
+	public String getText() {
+		return text;
 	}
 
 	public final synchronized void setIcon(IconResourceSet resourceSet) {
@@ -192,6 +171,7 @@ public class View implements Comparable<View> {
 		children.add(child);
 		if (initialized) {
 			child.initAll();
+			child.stateChanged();
 		}
 	}
 
@@ -211,27 +191,31 @@ public class View implements Comparable<View> {
 	protected synchronized void destroy() {
 		destroyIcon();
 		destroyShape();
-		if (textMesh != null) {
-			textMesh.destroy();
-			textMesh = null;
-		}
+		destroyText();
 
 		for (View child : children) {
 			child.destroy();
 		}
 	}
 
+	public synchronized void destroyShape() {
+		if (null != shape) {
+			shape.destroy();
+			shape = null;
+		}
+	}
+
 	private synchronized void destroyIcon() {
-		if (textureMesh != null) {
+		if (null != textureMesh) {
 			textureMesh.destroy();
 			textureMesh = null;
 		}
 	}
-	
-	public synchronized void destroyShape() {
-		if (shape != null) {
-			shape.destroy();
-			shape = null;
+
+	public synchronized void destroyText() {
+		if (null != textMesh) {
+			textMesh.destroy();
+			textMesh = null;
 		}
 	}
 
@@ -245,14 +229,12 @@ public class View implements Comparable<View> {
 	}
 
 	public void setPosition(float x, float y) {
-		this.x = x;
-		this.y = y;
-		if (parent != null) {
-			this.absoluteX = parent.absoluteX + x;
-			this.absoluteY = parent.absoluteY + y;
-		} else {
-			this.absoluteX = x;
-			this.absoluteY = y;
+		this.x = absoluteX = x;
+		this.y = absoluteY = y;
+
+		if (null != parent) {
+			absoluteX += parent.absoluteX;
+			absoluteY += parent.absoluteY;
 		}
 		layoutChildren();
 	}
@@ -356,10 +338,13 @@ public class View implements Comparable<View> {
 		initAll();
 	}
 
-	private void layoutShape() {
+	protected synchronized void layoutShape() {
 		float bgRectRadius = calcBgRectRadius();
 		float x = absoluteX, y = absoluteY;
 		float width = this.width, height = this.height;
+
+		if (width <= 0 || height <= 0)
+			return;
 
 		if (null != shape) {
 			x += BG_OFFSET;
@@ -377,15 +362,25 @@ public class View implements Comparable<View> {
 			width *= .92f;
 			height *= .92f;
 		}
-		
+
 		if (null != shape) {
 			shape.layout(x, y, width, height);
 		}
-
 		if (null != textureMesh) {
 			textureMesh.layout(x, y, height, height);
 		}
+		if (null != textMesh) {
+			textHeight = this.height;
+			textWidth = TextureAtlas.font.getTextWidth(text, textHeight);
+			if (textWidth > calcNonIconWidth()) {
+				float scaleRatio = calcNonIconWidth() / textWidth;
+				textWidth *= scaleRatio;
+				textHeight *= scaleRatio;
+			}
 
+			textMesh.setText(text, absoluteX + calcTextX(), absoluteY
+					+ calcTextY(), textHeight);
+		}
 		minX = minY = bgRectRadius + BG_OFFSET;
 		maxX = this.width - bgRectRadius - BG_OFFSET;
 		maxY = this.height - bgRectRadius - BG_OFFSET;
@@ -401,7 +396,6 @@ public class View implements Comparable<View> {
 		this.parent = parent;
 		setDimensions(width, height);
 		setPosition(x, y);
-		initText();
 		layoutShape();
 	}
 
@@ -433,18 +427,6 @@ public class View implements Comparable<View> {
 		getGl().glPopMatrix();
 	}
 
-	public final void setText(String text, float x, float y, float height) {
-		if (null == textMesh) {
-			textMesh = new TextMesh(shapeGroup.getTextGroup(), text);
-		}
-
-		x += this.absoluteX;
-		y += this.absoluteY;
-		float[] color = null == icon || null == icon.getResource(state) ? Colors.BLACK
-				: icon.getResource(state).strokeColor;
-		textMesh.setText(text, x, y, height, color);
-	}
-
 	protected final float distanceFromCenterSquared(float x, float y) {
 		return (x - width / 2) * (x - width / 2) + (y - height / 2)
 				* (y - height / 2);
@@ -469,11 +451,11 @@ public class View implements Comparable<View> {
 	}
 
 	public float clipX(float x) {
-		return x < minX ? minX : (x > maxX ? maxX : x);
+		return GeneralUtils.clipTo(x, minX, maxX);
 	}
 
 	public float clipY(float y) {
-		return y < minY ? minY : (y > maxY ? maxY : y);
+		return GeneralUtils.clipTo(y, minY, maxY);
 	}
 
 	@Override
@@ -503,37 +485,45 @@ public class View implements Comparable<View> {
 		}
 	}
 
-	protected IconResource getIconResource() {
+	protected final IconResource getIconResource() {
 		return icon.getResource(state);
 	}
 
-	protected void stateChanged() {
+	protected synchronized void stateChanged() {
 		IconResource currResource = getIconResource();
-		float[] strokeColor = null == currResource
-				|| null == currResource.strokeColor ? Colors.TRANSPARENT
-				: currResource.strokeColor;
+		float[] strokeColor = getStrokeColor();
 
-		if (null == currResource
-				|| null == currResource.fillColor) {
+		if (null == currResource || null == currResource.fillColor) {
 			destroyShape();
 		} else if (null != shape) {
 			shape.setColors(currResource.fillColor, strokeColor);
 		}
 
-		int iconResourceId = null == currResource ? -1
-				: currResource.resourceId;
-
-		if (null == textureMesh && -1 != iconResourceId) {
-			textureMesh = new TextureMesh(shapeGroup.getTextureGroup(),
-					iconResourceId);
+		if (null == textureMesh && null != currResource) {
+			textureMesh = new TextureMesh(shapeGroup.getTextureGroup());
+		}
+		if (null == textMesh && !text.isEmpty()) {
+			textMesh = new TextMesh(shapeGroup.getTextGroup(), text);
 		}
 		if (null != textureMesh) {
-			textureMesh.setResource(iconResourceId);
+			textureMesh.setResource(null == currResource ? -1
+					: currResource.resourceId);
 			textureMesh.setColor(Colors.WHITE);
 		}
 		if (null != textMesh) {
-			textMesh.setColor(strokeColor);
+			textMesh.setColor(getTextColor());
 		}
+
 		layoutShape();
+	}
+
+	private final float[] getStrokeColor() {
+		final IconResource currResource = getIconResource();
+		return null == currResource ? null : currResource.strokeColor;
+	}
+
+	private final float[] getTextColor() {
+		final float[] strokeColor = getStrokeColor();
+		return null == strokeColor ? Colors.BLACK : strokeColor;
 	}
 }

@@ -8,7 +8,6 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.IconResourceSet;
 import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.view.ListView;
-import com.kh.beatbot.ui.view.Menu;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -58,18 +57,16 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 		return subMenuItems;
 	}
 
-	public void loadIcons() {
-		for (MenuItem subMenuItem : subMenuItems) {
-			subMenuItem.loadIcons();
-		}
-	}
-
 	public void setOnReleaseListener(OnReleaseListener listener) {
 		button.setOnReleaseListener(listener);
 	}
 
-	public void setIcon(final IconResourceSet icon) {
+	public void setIcon(IconResourceSet icon) {
 		button.setIcon(icon);
+	}
+
+	public void setResourceId(final IconResourceSet icon) {
+		button.setResourceId(icon);
 	}
 
 	public void setText(final String text) {

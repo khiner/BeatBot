@@ -8,8 +8,8 @@ import com.kh.beatbot.event.SampleSetEvent;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.IconResourceSets;
-import com.kh.beatbot.ui.view.Menu;
 import com.kh.beatbot.ui.view.menu.FileMenuItem;
+import com.kh.beatbot.ui.view.menu.Menu;
 import com.kh.beatbot.ui.view.menu.MenuItem;
 
 public class BrowsePage extends Menu {

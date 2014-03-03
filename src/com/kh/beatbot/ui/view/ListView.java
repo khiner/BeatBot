@@ -152,4 +152,13 @@ public class ListView extends TouchableView implements OnPressListener {
 		return scrollBar != null && childHeight > height
 				&& tabColorTransition.getState() != Transition.State.OFF;
 	}
+
+	@Override
+	protected synchronized void destroy() {
+		super.destroy();
+		if (null != scrollBar) {
+			scrollBar.destroy();
+			scrollBar = null;
+		}
+	}
 }

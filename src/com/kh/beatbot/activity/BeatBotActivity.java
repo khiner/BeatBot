@@ -270,7 +270,7 @@ public class BeatBotActivity extends Activity {
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_MENU) {
-			View.mainPage.notifyMenuExpanded();
+			View.mainPage.expandMenu();
 			return true;
 		}
 		return super.onKeyUp(keyCode, event);

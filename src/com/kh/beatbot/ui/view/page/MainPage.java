@@ -1,17 +1,12 @@
 package com.kh.beatbot.ui.view.page;
 
-import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.Rectangle;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
-import com.kh.beatbot.ui.mesh.SlideTab;
 import com.kh.beatbot.ui.view.MidiTrackView;
 import com.kh.beatbot.ui.view.MidiView;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.group.ControlButtonGroup;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 import com.kh.beatbot.ui.view.menu.MainMenu;
@@ -24,36 +19,24 @@ public class MainPage extends TouchableView {
 	public PageSelectGroup pageSelectGroup;
 	public MainMenu slideMenu;
 
-	private SlideTab tab;
-	private MenuButton menuButton;
 	private Rectangle foregroundRect;
 
 	private static float[] fillColor = Colors.TRANSPARENT.clone();
 
-	private float trackControlWidth = 0, controlButtonHeight = 0,
-			menuOffset = 0;
+	public static float controlButtonHeight = 0;
+	private float trackControlWidth = 0;
 
 	public float getTrackControlWidth() {
 		return trackControlWidth;
 	}
 
-	public void notifyMenuExpanded() {
-		menuButton.snap(1);
-	}
-
 	@Override
 	protected synchronized void createChildren() {
-		foregroundRect = new Rectangle(null, fillColor, null);
-		tab = new SlideTab(null, Colors.LABEL_SELECTED, null);
-
 		midiView = new MidiView();
 		controlButtonGroup = new ControlButtonGroup();
 		midiTrackView = new MidiTrackView();
 		pageSelectGroup = new PageSelectGroup();
 		slideMenu = new MainMenu();
-		menuButton = new MenuButton(shapeGroup);
-		
-		menuButton.setIcon(IconResourceSets.MENU);
 
 		midiView.addScrollListener(midiTrackView);
 		TrackManager.addTrackListener(midiView);
@@ -61,10 +44,11 @@ public class MainPage extends TouchableView {
 		TrackManager.addTrackListener(pageSelectGroup);
 
 		slideMenu.setClip(false);
-		menuButton.setClip(false);
+
+		foregroundRect = new Rectangle(shapeGroup, fillColor, null);
 
 		addChildren(controlButtonGroup, midiTrackView, midiView,
-				pageSelectGroup, slideMenu, menuButton);
+				pageSelectGroup, slideMenu);
 	}
 
 	@Override
@@ -77,7 +61,6 @@ public class MainPage extends TouchableView {
 		View.LABEL_HEIGHT = pageSelectGroupHeight / 5;
 
 		trackControlWidth = MidiView.trackHeight * 2.5f;
-		menuOffset = MidiView.Y_OFFSET / 4;
 
 		midiTrackView.layout(this, 0, controlButtonHeight, trackControlWidth,
 				midiHeight);
@@ -89,90 +72,15 @@ public class MainPage extends TouchableView {
 		pageSelectGroup.layout(this, 0, controlButtonHeight + midiHeight,
 				width, pageSelectGroupHeight);
 
-		slideMenu
-				.layout(this, 0, 0, trackControlWidth + menuOffset * 2, height);
-		tab.layout(0, 0, slideMenu.width, controlButtonHeight + menuOffset * 2);
-		menuButton.layout(this, 0, 0, tab.height * 1.75f, tab.height);
-
-		setMenuPosition(0, 0);
+		slideMenu.layout(this, -width, 0, trackControlWidth, height);
 	}
 
-	@Override
-	public void draw() {
-		menuButton.updatePhysicsState();
-		if (menuButton.snap) {
-			setMenuPosition(menuButton.x, y);
-		}
-	}
-
-	@Override
-	public synchronized void drawChildren() {
-		for (View child : children) {
-			if (!child.equals(slideMenu) && !child.equals(menuButton)) {
-				child.drawAll();
-			}
-		}
-		foregroundRect.draw();
-		tab.draw();
-		slideMenu.drawAll();
-		menuButton.drawAll();
-	}
-
-	private synchronized void setMenuPosition(float x, float y) {
-		slideMenu.setPosition(Math.min(0, x - slideMenu.width), y + menuOffset
-				/ 2);
-		menuButton.setPosition(x + menuButton.velocity, y + menuOffset / 2);
-		tab.layout(x - width, y + menuOffset / 2, tab.width, tab.height);
-
-		fillColor[3] = GeneralUtils.clipToUnit(menuButton.x
-				/ slideMenu.width) * .8f;
+	public void dim(float amount) {
+		fillColor[3] = amount;
 		foregroundRect.setFillColor(fillColor);
 	}
-
-	private class MenuButton extends Button {
-		public MenuButton(ShapeGroup shapeGroup) {
-			super(shapeGroup);
-		}
-
-		private final float SPRING_CONST = .1f, DAMP = .65f,
-				STOP_THRESH = 0.001f;
-
-		private float velocity = 0, downX = 0, lastX = 0, goalX = 0;
-		private boolean snap = true;
-
-		public void updatePhysicsState() {
-			if (!snap)
-				return;
-
-			velocity += SPRING_CONST * (goalX - this.x);
-			velocity *= DAMP;
-			if (Math.abs(velocity) < STOP_THRESH) {
-				snap = false;
-			}
-		}
-
-		@Override
-		public void handleActionDown(int id, float x, float y) {
-			downX = x;
-			snap = false;
-			lastX = this.x;
-		}
-
-		@Override
-		public void handleActionMove(int pointerId, float x, float y) {
-			velocity = this.x - lastX;
-			lastX = this.x;
-			setMenuPosition(this.x + x - downX - velocity, 0);
-		}
-
-		@Override
-		public void handleActionUp(int pointerId, float x, float y) {
-			snap(velocity);
-		}
-
-		public void snap(float velocity) {
-			goalX = velocity >= 0 ? slideMenu.width : 0;
-			snap = true;
-		}
+	
+	public void expandMenu() {
+		slideMenu.expand();
 	}
 }

@@ -4,9 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 
 import com.kh.beatbot.listener.OnLongPressListener;
-import com.kh.beatbot.ui.IconResourceSet;
 import com.kh.beatbot.ui.IconResourceSets;
-import com.kh.beatbot.ui.view.Menu;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -15,8 +13,8 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
 	private File file;
 
 	public FileMenuItem(Menu menu, MenuItem parent, File file) {
-		super(menu, parent, file.isDirectory() ? new ToggleButton(menu.getShapeGroup(), false)
-				: new Button(menu.getShapeGroup()));
+		super(menu, parent, file.isDirectory() ? new ToggleButton(
+				menu.getShapeGroup(), false) : new Button(menu.getShapeGroup()));
 		this.file = file;
 		if (file.isFile()) {
 			button.setOnLongPressListener(this);
@@ -44,26 +42,37 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
 		Arrays.sort(files);
 		FileMenuItem[] subMenuItems = new FileMenuItem[files.length];
 		for (int i = 0; i < files.length; i++) {
-			FileMenuItem childFileItem = new FileMenuItem(menu, this, files[i]);
-			childFileItem.loadIcons();
-			subMenuItems[i] = childFileItem;
+			subMenuItems[i] = new FileMenuItem(menu, this, files[i]);
 		}
 		addSubMenuItems(subMenuItems);
 	}
 
 	@Override
-	public void loadIcons() {
-		super.loadIcons();
-
-		setText(file.getName().isEmpty() ? file.getPath() : file.getName());
+	public void select() {
+		super.select();
 		if (file.isDirectory()) {
-			IconResourceSet icon = IconResourceSets.forDirectory(getText());
-			button.setResourceId(icon);
-			//button.lockState(State.PRESSED);
+			for (MenuItem subMenuItem : subMenuItems) {
+				((FileMenuItem) subMenuItem).loadIcons();
+			}
 		}
+	}
+
+	@Override
+	public void show() {
+		super.show();
+		loadIcons();
 	}
 
 	public File getFile() {
 		return file;
+	}
+
+	private void loadIcons() {
+		if (button.getText().isEmpty()) {
+			setText(file.getName().isEmpty() ? file.getPath() : file.getName());
+			if (file.isDirectory()) {
+				setResourceId(IconResourceSets.forDirectory(getText()));
+			}
+		}
 	}
 }

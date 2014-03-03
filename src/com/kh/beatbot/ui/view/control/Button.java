@@ -133,7 +133,7 @@ public class Button extends LongPressableView {
 	}
 	
 	@Override
-	protected void stateChanged() {
+	protected synchronized void stateChanged() {
 		IconResource resource = getIconResource();
 		if (null != resource && null != resource.fillColor) {
 			initRoundedRect();

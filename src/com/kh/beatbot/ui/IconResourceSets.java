@@ -38,7 +38,8 @@ public class IconResourceSets {
 			SAMPLE = s(r(R.drawable.sample_icon), r(R.drawable.sample_icon_selected), r(R.drawable.sample_icon_selected)),
 			
 			BROWSE_PAGE = s(r(Colors.LABEL_SELECTED), r(Colors.LABEL_SELECTED)),
-
+			SLIDE_MENU = s(r(R.drawable.menu_icon, Colors.LABEL_SELECTED, null), r(R.drawable.menu_icon, Colors.LABEL_SELECTED, null)),
+					
 			DELETE_TRACK = s(r(R.drawable.delete_track_icon, Colors.TRANSPARENT, Colors.RED), r(R.drawable.delete_track_icon_selected, Colors.RED, Colors.BLACK)),
 
 			LABEL_BASE = s(r(Colors.LABEL_DARK, Colors.WHITE), r(Colors.VOLUME, Colors.BLACK), r(Colors.LABEL_SELECTED, Colors.BLACK)),
@@ -47,13 +48,12 @@ public class IconResourceSets {
 			ADSR = s(r(R.drawable.adsr_icon), r(R.drawable.adsr_icon_selected), r(R.drawable.adsr_icon_selected)),
 			LEVELS = s(r(R.drawable.levels_icon), r(R.drawable.levels_icon), r(R.drawable.levels_icon)),
 
-			MENU_ITEM = s(r(null, Colors.BLACK), r(Colors.LABEL_LIGHT, Colors.BLACK), r(Colors.VOLUME, Colors.BLACK)),
+			MENU_ITEM = s(r(null), r(Colors.LABEL_LIGHT), r(Colors.VOLUME)),
 			
 			FILE = s(r(R.drawable.browse_icon_selected), r(R.drawable.browse_icon_menu_selected)),
-	        MENU = s(r(R.drawable.menu_icon)),
 			SETTINGS = s(r(R.drawable.settings_icon), r(R.drawable.settings_icon_selected)),
-			SNAP_TO_GRID = s(r(R.drawable.snap_to_grid_icon)),
-			MIDI_IMPORT = s(r(R.drawable.midi_import_icon)),
+			SNAP_TO_GRID = s(r(R.drawable.snap_to_grid_icon), null, r(R.drawable.snap_to_grid_icon)),
+			MIDI_IMPORT = s(r(R.drawable.midi_import_icon), null, r(R.drawable.midi_import_icon)),
 			MIDI_EXPORT = s(r(R.drawable.midi_export_icon)),
 
 			ATTACK = s(r(R.drawable.attack_icon, Colors.TRANSPARENT, Colors.WHITE), r(R.drawable.attack_icon_selected, Colors.LABEL_SELECTED, Colors.BLACK), r(R.drawable.attack_icon_selected, Colors.VOLUME, Colors.BLACK)),

@@ -11,8 +11,7 @@ public class TextMesh extends Mesh {
 		setGroup(group);
 	}
 
-	public synchronized void setText(String text, float x, float y,
-			float height, float[] color) {
+	public synchronized void setText(String text, float x, float y, float height) {
 
 		if (text.equals(this.text) && height == this.height) {
 			setPosition(x, y);
@@ -32,7 +31,7 @@ public class TextMesh extends Mesh {
 					getNumIndices());
 		}
 
-		((TextureGroup) group).setText(this, text, x, y, height, color);
+		((TextureGroup) group).setText(this, text, x, y, height);
 	}
 
 	private synchronized void updateIndices() {
