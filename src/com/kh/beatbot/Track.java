@@ -32,8 +32,8 @@ public class Track extends BaseTrack {
 		ERROR_ALERT.setPositiveButton("OK", null);
 	}
 
-	private boolean adsrEnabled = false, reverse = false, previewing = false,
-			muted = false, soloing = false;
+	private boolean adsrEnabled = false, reverse = false, previewing = false, muted = false,
+			soloing = false;
 
 	private TrackButtonRow buttonRow;
 	private List<MidiNote> notes = new ArrayList<MidiNote>();
@@ -73,9 +73,8 @@ public class Track extends BaseTrack {
 	}
 
 	public IconResourceSet getIcon() {
-		return null == currSampleFile ? IconResourceSets.INSTRUMENT_BASE
-				: IconResourceSets.forDirectory(currSampleFile.getParentFile()
-						.getName());
+		return null == currSampleFile ? IconResourceSets.INSTRUMENT_BASE : IconResourceSets
+				.forDirectory(currSampleFile.getParentFile().getName());
 	}
 
 	public void checkInstrumentButton() {
@@ -100,8 +99,7 @@ public class Track extends BaseTrack {
 		}
 		// if we're changing the stop tick on a note that's already playing to a
 		// note before the current tick, stop the track
-		notifyNoteMoved(midiNote.getOnTick(), midiNote.getOffTick(), onTick,
-				offTick);
+		notifyNoteMoved(midiNote.getOnTick(), midiNote.getOffTick(), onTick, offTick);
 		// move Java note ticks
 		midiNote.setOnTick(onTick);
 		midiNote.setOffTick(offTick);
@@ -111,10 +109,8 @@ public class Track extends BaseTrack {
 	public void handleNoteCollisions() {
 		for (int i = 0; i < notes.size(); i++) {
 			MidiNote note = notes.get(i);
-			long newOnTick = note.isSelected() ? note.getOnTick() : note
-					.getSavedOnTick();
-			long newOffTick = note.isSelected() ? note.getOffTick() : note
-					.getSavedOffTick();
+			long newOnTick = note.isSelected() ? note.getOnTick() : note.getSavedOnTick();
+			long newOffTick = note.isSelected() ? note.getOffTick() : note.getSavedOffTick();
 			for (int j = 0; j < notes.size(); j++) {
 				MidiNote otherNote = notes.get(j);
 				if (note.equals(otherNote) || !otherNote.isSelected()) {
@@ -122,14 +118,12 @@ public class Track extends BaseTrack {
 				}
 				// if a selected note begins in the middle of another note,
 				// clip the covered note
-				if (otherNote.getOnTick() > newOnTick
-						&& otherNote.getOnTick() - 1 < newOffTick) {
+				if (otherNote.getOnTick() > newOnTick && otherNote.getOnTick() - 1 < newOffTick) {
 					newOffTick = otherNote.getOnTick() - 1;
 					// otherwise, if a selected note overlaps with the beginning
 					// of another note, delete the note
 					// (CAN NEVER DELETE SELECTED NOTES THIS WAY!)
-				} else if (!note.isSelected()
-						&& otherNote.getOnTick() <= newOnTick
+				} else if (!note.isSelected() && otherNote.getOnTick() <= newOnTick
 						&& otherNote.getOffTick() > newOnTick) {
 					// we 'delete' the note temporarily by moving
 					// it offscreen, so it won't ever be played or drawn
@@ -176,8 +170,8 @@ public class Track extends BaseTrack {
 			return;
 		String error = setSample(id, sampleFile.getPath());
 		if (!error.equals("No Error.")) {
-			ERROR_ALERT.setTitle("Error loading " + sampleFile.getName() + ".")
-					.setMessage(error).create().show();
+			ERROR_ALERT.setTitle("Error loading " + sampleFile.getName() + ".").setMessage(error)
+					.create().show();
 		} else {
 			currSampleFile = sampleFile;
 			update();
@@ -285,14 +279,12 @@ public class Track extends BaseTrack {
 	}
 
 	private void updateLoopWindow() {
-		setTrackLoopWindow(id, (long) getLoopBeginParam().level,
-				(long) getLoopEndParam().level);
+		setTrackLoopWindow(id, (long) getLoopBeginParam().level, (long) getLoopEndParam().level);
 	}
 
 	private void updateSampleParams() {
 		if (!paramsForSample.containsKey(currSampleFile)) {
-			paramsForSample
-					.put(currSampleFile, new SampleParams(getFrames(id)));
+			paramsForSample.put(currSampleFile, new SampleParams(getFrames(id)));
 		}
 	}
 
@@ -300,8 +292,7 @@ public class Track extends BaseTrack {
 		return getFrames(id);
 	}
 
-	public void notifyNoteMoved(long oldNoteOn, long oldNoteOff,
-			long newNoteOn, long newNoteOff) {
+	public void notifyNoteMoved(long oldNoteOn, long oldNoteOff, long newNoteOn, long newNoteOff) {
 		notifyNoteMoved(id, oldNoteOn, oldNoteOff, newNoteOn, newNoteOff);
 	}
 
@@ -332,14 +323,12 @@ public class Track extends BaseTrack {
 
 	public static native boolean isTrackPlaying(int trackNum);
 
-	public static native void notifyNoteMoved(int trackNum, long oldNoteOn,
-			long oldNoteOff, long newNoteOn, long newNoteOff);
+	public static native void notifyNoteMoved(int trackNum, long oldNoteOn, long oldNoteOff,
+			long newNoteOn, long newNoteOff);
 
-	public static native void notifyNoteRemoved(int trackNum, long noteOn,
-			long noteOff);
+	public static native void notifyNoteRemoved(int trackNum, long noteOn, long noteOff);
 
-	public static native void setTrackLoopWindow(int trackNum, long loopBegin,
-			long loopEnd);
+	public static native void setTrackLoopWindow(int trackNum, long loopBegin, long loopEnd);
 
 	public static native void stopTrack(int trackNum);
 
@@ -357,8 +346,7 @@ public class Track extends BaseTrack {
 
 	public static native String setSample(int trackId, String sampleName);
 
-	public static native float getSample(int trackId, long sampleIndex,
-			int channel);
+	public static native float getSample(int trackId, long sampleIndex, int channel);
 
 	public static native float getCurrentFrame(int trackId);
 
@@ -392,12 +380,9 @@ public class Track extends BaseTrack {
 				setTrackGain(id, param.level);
 				PageSelectGroup.editPage.sampleEdit.onParamChanged(param);
 			} else {
-				float minLoopWindow = loopEndParam
-						.getViewLevel(MIN_LOOP_WINDOW);
-				loopBeginParam.maxViewLevel = loopEndParam.viewLevel
-						- minLoopWindow;
-				loopEndParam.minViewLevel = loopBeginParam.viewLevel
-						+ minLoopWindow;
+				float minLoopWindow = loopEndParam.getViewLevel(MIN_LOOP_WINDOW);
+				loopBeginParam.maxViewLevel = loopEndParam.viewLevel - minLoopWindow;
+				loopEndParam.minViewLevel = loopBeginParam.viewLevel + minLoopWindow;
 				updateLoopWindow();
 			}
 		}

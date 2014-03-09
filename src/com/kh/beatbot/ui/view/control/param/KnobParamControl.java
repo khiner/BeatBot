@@ -18,8 +18,7 @@ public class KnobParamControl extends LevelParamControl {
 	@Override
 	public synchronized void createChildren() {
 		super.createChildren();
-		levelControl = beatSync ? new ToggleKnob(shapeGroup) : new Knob(
-				shapeGroup);
+		levelControl = beatSync ? new ToggleKnob(shapeGroup) : new Knob(shapeGroup);
 		addChild(levelControl);
 	}
 

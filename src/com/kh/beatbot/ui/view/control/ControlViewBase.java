@@ -8,8 +8,8 @@ import com.kh.beatbot.ui.view.TouchableView;
 public abstract class ControlViewBase extends TouchableView {
 
 	protected float[] levelColor = Colors.VOLUME;
-	protected float[] levelColorTrans = new float[] { levelColor[0],
-			levelColor[1], levelColor[2], .6f };
+	protected float[] levelColorTrans = new float[] { levelColor[0], levelColor[1], levelColor[2],
+			.6f };
 	protected static float[] selectColor = Colors.LABEL_SELECTED;
 	protected static float[] selectColorTrans = Colors.LABEL_SELECTED_TRANS;
 

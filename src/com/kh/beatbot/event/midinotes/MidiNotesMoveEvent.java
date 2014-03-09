@@ -11,13 +11,11 @@ public class MidiNotesMoveEvent extends MidiNotesEvent {
 	protected long tickDiff;
 	protected int noteDiff;
 
-	public MidiNotesMoveEvent(MidiNote midiNote, long tickDiff, int noteDiff,
-			boolean snapToGrid) {
+	public MidiNotesMoveEvent(MidiNote midiNote, long tickDiff, int noteDiff, boolean snapToGrid) {
 		this(Arrays.asList(midiNote), tickDiff, noteDiff);
 	}
 
-	public MidiNotesMoveEvent(List<MidiNote> midiNotes, long tickDiff,
-			int noteDiff) {
+	public MidiNotesMoveEvent(List<MidiNote> midiNotes, long tickDiff, int noteDiff) {
 		super(midiNotes);
 		this.tickDiff = tickDiff;
 		this.noteDiff = noteDiff;
@@ -32,12 +30,11 @@ public class MidiNotesMoveEvent extends MidiNotesEvent {
 
 	private void moveMidiNote(MidiNote midiNote) {
 		if (tickDiff != 0) {
-			MidiManager.setNoteTicks(midiNote, midiNote.getOnTick()
-					+ tickDiff, midiNote.getOffTick() + tickDiff, true);
+			MidiManager.setNoteTicks(midiNote, midiNote.getOnTick() + tickDiff,
+					midiNote.getOffTick() + tickDiff, true);
 		}
 		if (noteDiff != 0) {
-			MidiManager.setNoteValue(midiNote, midiNote.getNoteValue()
-					+ noteDiff);
+			MidiManager.setNoteValue(midiNote, midiNote.getNoteValue() + noteDiff);
 		}
 	}
 }

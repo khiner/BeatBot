@@ -20,7 +20,6 @@ public abstract class ClickableView extends LongPressableView {
 
 	/** State Variables for Clicking/Pressing **/
 	private long lastDownTime = 0, lastTapTime = 0;
-	
 
 	/****************** Clickable Methods ********************/
 	protected abstract void singleTap(int id, float x, float y);
@@ -46,8 +45,7 @@ public abstract class ClickableView extends LongPressableView {
 		if (Math.abs(time - lastDownTime) < SINGLE_TAP_TIME) {
 			// if the second tap is not in the same location as the first tap,
 			// no double tap :(
-			if (time - lastTapTime < DOUBLE_TAP_TIME
-					&& Math.abs(x - lastTapX) <= SNAP_DIST
+			if (time - lastTapTime < DOUBLE_TAP_TIME && Math.abs(x - lastTapX) <= SNAP_DIST
 					&& Math.abs(y - lastTapY) <= SNAP_DIST) {
 				doubleTap(id, x, y);
 				// reset tap time so that a third tap doesn't register as

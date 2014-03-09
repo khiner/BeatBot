@@ -10,13 +10,11 @@ public class MidiNotesPinchEvent extends MidiNotesEvent {
 
 	protected long onTickDiff, offTickDiff;
 
-	public MidiNotesPinchEvent(MidiNote midiNote, long onTickDiff,
-			long offTickDiff) {
+	public MidiNotesPinchEvent(MidiNote midiNote, long onTickDiff, long offTickDiff) {
 		this(Arrays.asList(midiNote), onTickDiff, offTickDiff);
 	}
 
-	public MidiNotesPinchEvent(List<MidiNote> midiNotes, long onTickDiff,
-			long offTickDiff) {
+	public MidiNotesPinchEvent(List<MidiNote> midiNotes, long onTickDiff, long offTickDiff) {
 		super(midiNotes);
 		this.onTickDiff = onTickDiff;
 		this.offTickDiff = offTickDiff;
@@ -36,7 +34,6 @@ public class MidiNotesPinchEvent extends MidiNotesEvent {
 			newOnTick += onTickDiff;
 		if (midiNote.getOffTick() + offTickDiff <= MidiManager.MAX_TICKS)
 			newOffTick += offTickDiff;
-		MidiManager.setNoteTicks(midiNote, (long) newOnTick, (long) newOffTick,
-				false);
+		MidiManager.setNoteTicks(midiNote, (long) newOnTick, (long) newOffTick, false);
 	}
 }

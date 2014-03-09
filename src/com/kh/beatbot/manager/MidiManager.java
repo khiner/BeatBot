@@ -52,8 +52,7 @@ public class MidiManager {
 	private static LoopWindowSetEvent currLoopWindowEvent;
 
 	public static void init() {
-		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER,
-				TimeSignature.DEFAULT_DIVISION);
+		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION);
 		setBPM(120);
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
@@ -88,8 +87,8 @@ public class MidiManager {
 
 	public static synchronized void beginMidiEvent(Track track) {
 		endMidiEvent();
-		currNoteEvent = track == null ? new MidiNotesGroupEvent()
-				: new MidiNotesLevelsSetEvent(track);
+		currNoteEvent = track == null ? new MidiNotesGroupEvent() : new MidiNotesLevelsSetEvent(
+				track);
 		currNoteEvent.begin();
 		currLoopWindowEvent = new LoopWindowSetEvent();
 		currLoopWindowEvent.begin();
@@ -152,8 +151,7 @@ public class MidiManager {
 		return false;
 	}
 
-	public static void selectRegion(long leftTick, long rightTick, int topNote,
-			int bottomNote) {
+	public static void selectRegion(long leftTick, long rightTick, int topNote, int bottomNote) {
 		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
 			Track track = TrackManager.getTrack(i);
 			for (MidiNote midiNote : track.getMidiNotes()) {
@@ -176,8 +174,8 @@ public class MidiManager {
 		}
 	}
 
-	public static MidiNote addNote(long onTick, long offTick, int note,
-			float velocity, float pan, float pitch) {
+	public static MidiNote addNote(long onTick, long offTick, int note, float velocity, float pan,
+			float pitch) {
 		NoteOn on = new NoteOn(onTick, 0, note, velocity, pan, pitch);
 		NoteOff off = new NoteOff(offTick, 0, note, velocity, pan, pitch);
 		return addNote(on, off);
@@ -243,8 +241,8 @@ public class MidiManager {
 		TrackManager.getTrack(newNote).addNote(midiNote);
 	}
 
-	public static void setNoteTicks(MidiNote midiNote, long onTick,
-			long offTick, boolean maintainNoteLength) {
+	public static void setNoteTicks(MidiNote midiNote, long onTick, long offTick,
+			boolean maintainNoteLength) {
 		if (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)
 			return;
 		if (offTick <= onTick)
@@ -262,15 +260,12 @@ public class MidiManager {
 		track.setNoteTicks(midiNote, onTick, offTick);
 	}
 
-	public static void moveNotes(List<MidiNote> notes, long tickDiff,
-			int noteDiff) {
+	public static void moveNotes(List<MidiNote> notes, long tickDiff, int noteDiff) {
 		new MidiNotesMoveEvent(notes, tickDiff, noteDiff).execute();
 	}
 
-	public static void pinchNotes(List<MidiNote> notes, long onTickDiff,
-			long offTickDiff) {
-		new MidiNotesPinchEvent(getSelectedNotes(), onTickDiff, offTickDiff)
-				.execute();
+	public static void pinchNotes(List<MidiNote> notes, long onTickDiff, long offTickDiff) {
+		new MidiNotesPinchEvent(getSelectedNotes(), onTickDiff, offTickDiff).execute();
 	}
 
 	public static float getBeatDivision() {
@@ -319,14 +314,12 @@ public class MidiManager {
 	}
 
 	/*
-	 * Translate the provided midi note to its on-tick's nearest major tick
-	 * given the provided beat division
+	 * Translate the provided midi note to its on-tick's nearest major tick given the provided beat
+	 * division
 	 */
 	public static void quantize(MidiNote midiNote, float beatDivision) {
-		long diff = (long) getMajorTickNearestTo(midiNote.getOnTick())
-				- midiNote.getOnTick();
-		setNoteTicks(midiNote, midiNote.getOnTick() + diff,
-				midiNote.getOffTick() + diff, true);
+		long diff = (long) getMajorTickNearestTo(midiNote.getOnTick()) - midiNote.getOnTick();
+		setNoteTicks(midiNote, midiNote.getOnTick() + diff, midiNote.getOffTick() + diff, true);
 	}
 
 	public static void saveNoteTicks() {
@@ -359,8 +352,8 @@ public class MidiManager {
 	}
 
 	/*
-	 * Translate all midi notes to their on-ticks' nearest major ticks given the
-	 * provided beat division
+	 * Translate all midi notes to their on-ticks' nearest major ticks given the provided beat
+	 * division
 	 */
 	public static void quantize(float beatDivision) {
 		for (MidiNote midiNote : getMidiNotes()) {
@@ -486,6 +479,5 @@ public class MidiManager {
 
 	public static native long getCurrTick();
 
-	public static native void setLoopTicksNative(long loopBeginTick,
-			long loopEndTick);
+	public static native void setLoopTicksNative(long loopBeginTick, long loopEndTick);
 }

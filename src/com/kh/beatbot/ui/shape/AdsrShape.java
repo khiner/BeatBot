@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.shape;
 
-
 public class AdsrShape extends Shape {
 	private Circle[] circles = new Circle[4];
 
@@ -20,8 +19,8 @@ public class AdsrShape extends Shape {
 		resetIndices();
 		for (int i = 0; i < vertices.length / 2; i++) {
 			if (i != 3) {
-				circles[i < 3 ? i : i - 1].setPosition(vertices[i * 2] + x,
-						vertices[i * 2 + 1] + y);
+				circles[i < 3 ? i : i - 1]
+						.setPosition(vertices[i * 2] + x, vertices[i * 2 + 1] + y);
 			}
 			if (i < (vertices.length - 1) / 2) {
 				strokeVertex(vertices[i * 2] + x, vertices[i * 2 + 1] + y);

@@ -26,20 +26,18 @@ public class RecordManager implements ParamListener {
 	private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
 	private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 	private static final int CHANNELS = 2;
-	private static final long BYTE_RATE = RECORDER_BPP * RECORDER_SAMPLERATE
-			* CHANNELS / 8;
+	private static final long BYTE_RATE = RECORDER_BPP * RECORDER_SAMPLERATE * CHANNELS / 8;
 	private static final long LONG_SAMPLE_RATE = RECORDER_SAMPLERATE;
 
 	private static String currRecordFileName = null;
 
 	private static Seekbar thresholdBar;
 
-	private static int bufferSize = AudioRecord.getMinBufferSize(
-			RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
+	private static int bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
+			RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 
-	private static AudioRecord recorder = new AudioRecord(
-			MediaRecorder.AudioSource.MIC, RECORDER_SAMPLERATE,
-			RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, bufferSize);
+	private static AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
+			RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, bufferSize);
 
 	// queue of paths to raw audio data to process
 	// private static Queue<Long> recordTickQueue = new LinkedList<Long>();
@@ -51,8 +49,7 @@ public class RecordManager implements ParamListener {
 	private static short currThreshold;
 	private static int currSampleNum = 0;
 
-	private static final Pattern lastIntPattern = Pattern
-			.compile("[^0-9]+([0-9]+)$");
+	private static final Pattern lastIntPattern = Pattern.compile("[^0-9]+([0-9]+)$");
 
 	public static boolean isRecording() {
 		return state == State.RECORDING;
@@ -82,8 +79,8 @@ public class RecordManager implements ParamListener {
 				+ ".wav";
 	}
 
-	private static FileOutputStream writeWaveFileHeader(String fileName,
-			long totalAudioLen, long totalDataLen) throws IOException {
+	private static FileOutputStream writeWaveFileHeader(String fileName, long totalAudioLen,
+			long totalDataLen) throws IOException {
 		byte[] header = new byte[44];
 
 		header[0] = 'R'; // RIFF/WAVE header

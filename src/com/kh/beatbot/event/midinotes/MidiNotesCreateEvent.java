@@ -9,11 +9,11 @@ import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.view.View;
 
 public class MidiNotesCreateEvent extends MidiNotesEvent {
-	
+
 	public MidiNotesCreateEvent(MidiNote midiNote) {
 		super(midiNote);
 	}
-	
+
 	public MidiNotesCreateEvent(List<MidiNote> midiNotes) {
 		super(midiNotes);
 	}

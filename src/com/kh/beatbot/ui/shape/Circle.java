@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.shape;
 
-
 public class Circle extends Shape {
 	public static final float ¹ = (float) Math.PI, CIRCLE_RADIUS = 100;
 
@@ -9,8 +8,7 @@ public class Circle extends Shape {
 	private static final int NUM_FILL_VERTICES = 18;
 
 	public Circle(ShapeGroup group, float[] fillColor, float[] strokeColor) {
-		super(group, fillColor, strokeColor, FILL_INDICES, null,
-				NUM_FILL_VERTICES, 0);
+		super(group, fillColor, strokeColor, FILL_INDICES, null, NUM_FILL_VERTICES, 0);
 	}
 
 	private static short[] getFillIndices() {

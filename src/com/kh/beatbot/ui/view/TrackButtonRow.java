@@ -24,7 +24,7 @@ public class TrackButtonRow extends TouchableView {
 		instrumentButton = new ToggleButton(shapeGroup, false);
 		muteButton = new ToggleButton(shapeGroup, true);
 		soloButton = new ToggleButton(shapeGroup, true);
-		
+
 		instrumentButton.setIcon(IconResourceSets.INSTRUMENT_BASE);
 		muteButton.setIcon(IconResourceSets.MUTE);
 		soloButton.setIcon(IconResourceSets.SOLO);
@@ -49,7 +49,7 @@ public class TrackButtonRow extends TouchableView {
 				track.solo(soloButton.isChecked());
 			}
 		});
-		
+
 		addChildren(instrumentButton, muteButton, soloButton);
 	}
 
@@ -57,7 +57,6 @@ public class TrackButtonRow extends TouchableView {
 	public synchronized void layoutChildren() {
 		instrumentButton.layout(this, 0, 0, height, height);
 		muteButton.layout(this, height, 0, height * .72f, height);
-		soloButton.layout(this, height + muteButton.width, 0, height * .72f,
-				height);
+		soloButton.layout(this, height + muteButton.width, 0, height * .72f, height);
 	}
 }

@@ -11,8 +11,7 @@ public class WaveformShape extends Shape {
 	private float xOffset, numSamples, loopBeginX, loopEndX;
 	private SparseArray<Float> sampleBuffer = new SparseArray<Float>();
 
-	public WaveformShape(ShapeGroup group, float width, float[] fillColor,
-			float[] strokeColor) {
+	public WaveformShape(ShapeGroup group, float width, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, Rectangle.FILL_INDICES, getStrokeIndices(width),
 				Rectangle.NUM_FILL_VERTICES, (int) (width * MAX_SPP * 3));
 		this.width = width;
@@ -36,14 +35,12 @@ public class WaveformShape extends Shape {
 		sampleBuffer.clear();
 		float numFrames = TrackManager.currTrack.getNumFrames();
 		for (float s = -numSamples; s < numSamples * 2; s++) {
-			int sampleIndex = (int) (offsetInSamples + s * widthInSamples
-					/ numSamples);
+			int sampleIndex = (int) (offsetInSamples + s * widthInSamples / numSamples);
 			if (sampleIndex < 0)
 				continue;
 			else if (sampleIndex >= numFrames)
 				break;
-			sampleBuffer.put(sampleIndex,
-					TrackManager.currTrack.getSample(sampleIndex, 0));
+			sampleBuffer.put(sampleIndex, TrackManager.currTrack.getSample(sampleIndex, 0));
 		}
 
 		resetIndices();
@@ -62,8 +59,7 @@ public class WaveformShape extends Shape {
 		for (int i = 0; i < sampleBuffer.size(); i++) {
 			int sampleIndex = sampleBuffer.keyAt(i);
 			float sample = sampleBuffer.get(sampleIndex);
-			float percent = (float) (sampleIndex - offsetInSamples)
-					/ (float) widthInSamples;
+			float percent = (float) (sampleIndex - offsetInSamples) / (float) widthInSamples;
 
 			strokeVertex(x, y);
 			x = this.x + percent * width + xOffset;
@@ -82,8 +78,7 @@ public class WaveformShape extends Shape {
 		fillVertex(x + loopEndX, y + View.BG_OFFSET);
 	}
 
-	public synchronized void update(long offsetInSamples, long widthInSamples,
-			float xOffset) {
+	public synchronized void update(long offsetInSamples, long widthInSamples, float xOffset) {
 		this.offsetInSamples = offsetInSamples;
 		this.widthInSamples = widthInSamples;
 		this.xOffset = xOffset;

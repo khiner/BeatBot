@@ -73,8 +73,7 @@ public abstract class LongPressableView extends TouchableView {
 
 	@Override
 	public void handleActionMove(int id, float x, float y) {
-		if (Math.abs(x - lastTapX) > SNAP_DIST
-				|| Math.abs(y - lastTapY) > SNAP_DIST) {
+		if (Math.abs(x - lastTapX) > SNAP_DIST || Math.abs(y - lastTapY) > SNAP_DIST) {
 			releaseLongPress();
 		}
 	}

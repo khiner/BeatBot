@@ -16,11 +16,11 @@ public class ListView extends TouchableView implements OnPressListener {
 	public static final float DRAG = .9f, THRESH = 0.01f;
 	public static float displayOffset = 0;
 
-	private float yAnchor = 0, yOffset = 0, yOffsetAnchor = 0, childHeight = 0,
-			velocity = 0, lastY = 0;
+	private float yAnchor = 0, yOffset = 0, yOffsetAnchor = 0, childHeight = 0, velocity = 0,
+			lastY = 0;
 	private RoundedRect scrollBar = null;
-	private ColorTransition tabColorTransition = new ColorTransition(20, 20,
-			Colors.TRANSPARENT, END_TRANS_COLOR);
+	private ColorTransition tabColorTransition = new ColorTransition(20, 20, Colors.TRANSPARENT,
+			END_TRANS_COLOR);
 
 	private Button selectedButton = null;
 
@@ -56,10 +56,9 @@ public class ListView extends TouchableView implements OnPressListener {
 		displayOffset = LABEL_HEIGHT / 3;
 		float y = yOffset;
 		for (View child : children) {
-			float height = ((TouchableView) child).getText().isEmpty() ? width
-					- displayOffset * 2 : LABEL_HEIGHT;
-			child.layout(this, displayOffset, y, width - displayOffset * 2,
-					height);
+			float height = ((TouchableView) child).getText().isEmpty() ? width - displayOffset * 2
+					: LABEL_HEIGHT;
+			child.layout(this, displayOffset, y, width - displayOffset * 2, height);
 			y += height;
 		}
 		childHeight = y - yOffset;
@@ -92,8 +91,7 @@ public class ListView extends TouchableView implements OnPressListener {
 		if (null != selectedButton
 				&& selectedButton.isPressed()
 				&& !(selectedButton instanceof ToggleButton && ((ToggleButton) selectedButton)
-						.isChecked())
-				&& Math.abs(y - yAnchor) > LABEL_HEIGHT / 2) {
+						.isChecked()) && Math.abs(y - yAnchor) > LABEL_HEIGHT / 2) {
 			// scrolling, release the pressed button
 			selectedButton.release();
 			shouldPropagateTouchEvents = false;
@@ -114,8 +112,7 @@ public class ListView extends TouchableView implements OnPressListener {
 			float y = Math.max(1, -yOffset * height / childHeight);
 			float h = Math.max(rad * 2, height * height / childHeight);
 			getScrollTab().setCornerRadius(rad);
-			getScrollTab().layout(absoluteX + width - 3 * rad, absoluteY + y,
-					2 * rad, h);
+			getScrollTab().layout(absoluteX + width - 3 * rad, absoluteY + y, 2 * rad, h);
 		}
 	}
 

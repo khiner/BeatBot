@@ -26,7 +26,7 @@ import com.kh.beatbot.midi.util.VariableLengthInt;
 public abstract class MidiEvent implements Comparable<MidiEvent> {
 
 	public static final short LEVEL_MAX = 127;
-	
+
 	protected long mTick;
 	protected VariableLengthInt mDelta;
 
@@ -70,8 +70,7 @@ public abstract class MidiEvent implements Comparable<MidiEvent> {
 		return true;
 	}
 
-	public void writeToFile(OutputStream out, boolean writeType)
-			throws IOException {
+	public void writeToFile(OutputStream out, boolean writeType) throws IOException {
 		out.write(mDelta.getBytes());
 	}
 
@@ -79,8 +78,8 @@ public abstract class MidiEvent implements Comparable<MidiEvent> {
 	private static int sType = -1;
 	private static int sChannel = -1;
 
-	public static final MidiEvent parseEvent(long tick, long delta,
-			InputStream in) throws IOException {
+	public static final MidiEvent parseEvent(long tick, long delta, InputStream in)
+			throws IOException {
 
 		in.mark(1);
 
@@ -91,8 +90,7 @@ public abstract class MidiEvent implements Comparable<MidiEvent> {
 
 		if (sType >= 0x8 && sType <= 0xE) {
 
-			return ChannelEvent.parseChannelEvent(tick, delta, sType, sChannel,
-					in);
+			return ChannelEvent.parseChannelEvent(tick, delta, sType, sChannel, in);
 		} else if (sId == 0xFF) {
 
 			return MetaEvent.parseMetaEvent(tick, delta, in);
@@ -126,7 +124,6 @@ public abstract class MidiEvent implements Comparable<MidiEvent> {
 
 	@Override
 	public String toString() {
-		return "" + mTick + " (" + mDelta.getValue() + "): "
-				+ this.getClass().getSimpleName();
+		return "" + mTick + " (" + mDelta.getValue() + "): " + this.getClass().getSimpleName();
 	}
 }

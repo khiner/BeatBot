@@ -13,7 +13,7 @@ public class ParamControl extends TouchableView {
 	public ParamControl() {
 		super();
 	}
-	
+
 	public ParamControl(ShapeGroup shapeGroup) {
 		super(shapeGroup);
 	}

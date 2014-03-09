@@ -39,7 +39,7 @@ public class FilterParamsPage extends EffectParamsPage {
 			filterToggles[i] = new ToggleButton(shapeGroup, false);
 			filterToggles[i].setOnReleaseListener(filterToggleListener);
 		}
-		
+
 		filterToggles[0].setIcon(IconResourceSets.LOWPASS_FILTER);
 		filterToggles[1].setIcon(IconResourceSets.BANDPASS_FILTER);
 		filterToggles[2].setIcon(IconResourceSets.HIGHPASS_FILTER);
@@ -60,12 +60,9 @@ public class FilterParamsPage extends EffectParamsPage {
 		}
 
 		float paramY = toggleY + toggleW;
-		paramControls[0].layout(this, width / 2 - paramW - 10, paramY, paramW,
-				paramH);
+		paramControls[0].layout(this, width / 2 - paramW - 10, paramY, paramW, paramH);
 		paramControls[1].layout(this, width / 2 + 10, paramY, paramW, paramH);
-		paramControls[2].layout(this, width / 2 - paramW - 10, paramY + paramH,
-				paramW, paramH);
-		paramControls[3].layout(this, width / 2 + 10, paramY + paramH, paramW,
-				paramH);
+		paramControls[2].layout(this, width / 2 - paramW - 10, paramY + paramH, paramW, paramH);
+		paramControls[3].layout(this, width / 2 + 10, paramY + paramH, paramW, paramH);
 	}
 }

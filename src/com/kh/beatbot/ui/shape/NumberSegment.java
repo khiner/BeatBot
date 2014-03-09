@@ -1,14 +1,11 @@
 package com.kh.beatbot.ui.shape;
 
-
 public class NumberSegment extends Shape {
 	public static final short[] FILL_INDICES = { 0, 0, 1, 2, 3, 4, 5, 5 };
 	public static final int NUM_FILL_VERTICES = 6;
 
-	public NumberSegment(ShapeGroup group, float[] fillColor,
-			float[] strokeColor) {
-		super(group, fillColor, strokeColor, FILL_INDICES, null,
-				NUM_FILL_VERTICES, 0);
+	public NumberSegment(ShapeGroup group, float[] fillColor, float[] strokeColor) {
+		super(group, fillColor, strokeColor, FILL_INDICES, null, NUM_FILL_VERTICES, 0);
 	}
 
 	@Override
@@ -19,11 +16,11 @@ public class NumberSegment extends Shape {
 			updateVerticesVerticle();
 		}
 	}
-	
-	/*      *
-	 *    *   *
-	 *    *   *
-	 *      *
+
+	/* *
+	 * * *
+	 * * *
+	 * *
 	 */
 	private void updateVerticesVerticle() {
 		// top triangle
@@ -35,10 +32,10 @@ public class NumberSegment extends Shape {
 		fillVertex(x + width, y + height - width / 2);
 		fillVertex(x + width / 2, y + height);
 	}
-	
-	/*      * *
-	 *    *     *
-	 *      * *
+
+	/* * *
+	 * * *
+	 * * *
 	 */
 	private void updateVerticesHorizontal() {
 		float x = this.x + height / 2 + 1;

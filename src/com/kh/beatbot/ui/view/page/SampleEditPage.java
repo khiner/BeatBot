@@ -26,8 +26,7 @@ public class SampleEditPage extends TouchableView {
 		loopBeginControl.setParam(currTrack.getLoopBeginParam());
 		loopEndControl.setParam(currTrack.getLoopEndParam());
 		gainControl.setParam(currTrack.getGainParam());
-		sampleEdit.setParams(currTrack.getLoopBeginParam(),
-				currTrack.getLoopEndParam());
+		sampleEdit.setParams(currTrack.getLoopBeginParam(), currTrack.getLoopEndParam());
 		loopBeginControl.setLabelText("Begin");
 		loopEndControl.setLabelText("End");
 		gainControl.setLabelText("Gain");
@@ -35,7 +34,6 @@ public class SampleEditPage extends TouchableView {
 		if (sampleEdit != null)
 			sampleEdit.update();
 	}
-
 
 	@Override
 	protected synchronized void createChildren() {
@@ -78,8 +76,8 @@ public class SampleEditPage extends TouchableView {
 			}
 		});
 
-		addChildren(previewButton, loopButton, reverseButton, sampleEdit,
-				loopBeginControl, loopEndControl, gainControl);
+		addChildren(previewButton, loopButton, reverseButton, sampleEdit, loopBeginControl,
+				loopEndControl, gainControl);
 	}
 
 	@Override
@@ -88,17 +86,15 @@ public class SampleEditPage extends TouchableView {
 		float fillH = height - topBarH;
 		float margin = width * .02f;
 		previewButton.layout(this, 0, topBarH, fillH, fillH);
-		loopButton.layout(this, width - fillH / 2 - margin, topBarH, fillH / 2,
+		loopButton.layout(this, width - fillH / 2 - margin, topBarH, fillH / 2, fillH / 2);
+		reverseButton.layout(this, width - fillH / 2 - margin, height - fillH / 2, fillH / 2,
 				fillH / 2);
-		reverseButton.layout(this, width - fillH / 2 - margin, height - fillH
-				/ 2, fillH / 2, fillH / 2);
 
 		gainControl.layout(this, 0, 0, topBarH * 6, topBarH);
 		loopBeginControl.layout(this, topBarH * 6, 0, topBarH * 6, topBarH);
 		loopEndControl.layout(this, topBarH * 12, 0, topBarH * 6, topBarH);
 
-		sampleEdit.layout(this, fillH, topBarH, width - fillH / 2 - fillH
-				- margin * 2, fillH);
+		sampleEdit.layout(this, fillH, topBarH, width - fillH / 2 - fillH - margin * 2, fillH);
 	}
 
 	@Override

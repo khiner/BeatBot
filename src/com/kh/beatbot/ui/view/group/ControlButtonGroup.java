@@ -16,8 +16,7 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 public class ControlButtonGroup extends TouchableView {
 
 	public ToggleButton playButton, recordButton, copyButton;
-	public Button stopButton, undoButton, redoButton, deleteButton,
-			quantizeButton;
+	public Button stopButton, undoButton, redoButton, deleteButton, quantizeButton;
 
 	@Override
 	protected synchronized void createChildren() {
@@ -53,11 +52,8 @@ public class ControlButtonGroup extends TouchableView {
 					// Managers.recordManager.stopListening();
 					String fileName = RecordManager.stopRecording();
 
-					Toast.makeText(
-							BeatBotActivity.mainActivity
-									.getApplicationContext(),
-							"Recorded file to " + fileName, Toast.LENGTH_SHORT)
-							.show();
+					Toast.makeText(BeatBotActivity.mainActivity.getApplicationContext(),
+							"Recorded file to " + fileName, Toast.LENGTH_SHORT).show();
 				} else {
 					mainPage.midiView.reset();
 					playButton.setChecked(true);
@@ -108,9 +104,8 @@ public class ControlButtonGroup extends TouchableView {
 					MidiManager.cancelCopy();
 					msg = "Copy Cancelled";
 				}
-				Toast.makeText(
-						BeatBotActivity.mainActivity.getApplicationContext(),
-						msg, Toast.LENGTH_SHORT).show();
+				Toast.makeText(BeatBotActivity.mainActivity.getApplicationContext(), msg,
+						Toast.LENGTH_SHORT).show();
 			}
 		});
 
@@ -129,8 +124,8 @@ public class ControlButtonGroup extends TouchableView {
 			}
 		});
 
-		addChildren(playButton, stopButton, recordButton, copyButton,
-				deleteButton, quantizeButton, undoButton, redoButton);
+		addChildren(playButton, stopButton, recordButton, copyButton, deleteButton, quantizeButton,
+				undoButton, redoButton);
 
 		setEditIconsEnabled(false);
 		notifyMidiChange();
@@ -166,15 +161,10 @@ public class ControlButtonGroup extends TouchableView {
 
 		float rightMargin = 10;
 		// right-aligned buttons
-		quantizeButton.layout(this, width - 5 * height - rightMargin, 0,
-				height, height);
-		copyButton.layout(this, width - 4 * height - rightMargin, 0, height,
-				height);
-		undoButton.layout(this, width - 3 * height - rightMargin, 0, height,
-				height);
-		redoButton.layout(this, width - 2 * height - rightMargin, 0, height,
-				height);
-		deleteButton.layout(this, width - height - rightMargin, 0, height,
-				height);
+		quantizeButton.layout(this, width - 5 * height - rightMargin, 0, height, height);
+		copyButton.layout(this, width - 4 * height - rightMargin, 0, height, height);
+		undoButton.layout(this, width - 3 * height - rightMargin, 0, height, height);
+		redoButton.layout(this, width - 2 * height - rightMargin, 0, height, height);
+		deleteButton.layout(this, width - height - rightMargin, 0, height, height);
 	}
 }

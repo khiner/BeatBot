@@ -23,8 +23,8 @@ public class EffectPage extends TouchableView {
 	private Seekbar2d level2d;
 	private ToggleButton toggleButton;
 
-	private EffectParamsPage chorusPage, decimatePage, delayPage, filterPage,
-			flangerPage, reverbPage, tremeloPage;
+	private EffectParamsPage chorusPage, decimatePage, delayPage, filterPage, flangerPage,
+			reverbPage, tremeloPage;
 
 	public Seekbar2d getLevel2d() {
 		return level2d;
@@ -63,8 +63,8 @@ public class EffectPage extends TouchableView {
 		toggleButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				((EffectParamsPage) paramsPager.getCurrPage()).getEffect()
-						.setOn(toggleButton.isChecked());
+				((EffectParamsPage) paramsPager.getCurrPage()).getEffect().setOn(
+						toggleButton.isChecked());
 			}
 		});
 
@@ -75,10 +75,9 @@ public class EffectPage extends TouchableView {
 
 	@Override
 	public synchronized void layoutChildren() {
-		toggleButton.layout(this, 5, 5, (width - height) - 10,
-				(width - height) / 5);
-		paramsPager.layout(this, 0, (width - height) / 5 + 5, width - height,
-				height - (width - height) / 5 - 5);
+		toggleButton.layout(this, 5, 5, (width - height) - 10, (width - height) / 5);
+		paramsPager.layout(this, 0, (width - height) / 5 + 5, width - height, height
+				- (width - height) / 5 - 5);
 		level2d.layout(this, width - height, 0, height, height);
 	}
 

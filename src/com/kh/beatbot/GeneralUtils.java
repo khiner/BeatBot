@@ -13,19 +13,16 @@ public class GeneralUtils {
 		// remove title bar
 		activity.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		// remove top toolbar (with battery icon, etc)
-		activity.getWindow().setFlags(
-				WindowManager.LayoutParams.FLAG_FULLSCREEN,
+		activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		// assign hardware (ringer) volume +/- to media while this application
 		// has focus
 		activity.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		// prevent screen from turning off while this app is running
-		activity.getWindow().addFlags(
-				WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	}
 
-	public static float distanceFromPointSquared(float pointX, float pointY,
-			float x, float y) {
+	public static float distanceFromPointSquared(float pointX, float pointY, float x, float y) {
 		return (x - pointX) * (x - pointX) + (y - pointY) * (y - pointY);
 	}
 
@@ -33,7 +30,7 @@ public class GeneralUtils {
 		// db range = -60 - 0, need range 0-1
 		return db <= -60 ? 0 : db / 60 + 1;
 	}
-	
+
 	public static boolean contains(int[] ary, int val) {
 		for (int i = 0; i < ary.length; i++) {
 			if (ary[i] == val) {
@@ -42,7 +39,7 @@ public class GeneralUtils {
 		}
 		return false;
 	}
-	
+
 	public static float[] floatListToArray(List<Float> list) {
 		float[] array = new float[list.size()];
 		for (int j = 0; j < list.size(); j++) {
@@ -50,12 +47,12 @@ public class GeneralUtils {
 		}
 		return array;
 	}
-	
+
 	public static float clipToUnit(float value) {
 		return clipTo(value, 0, 1);
 	}
-	
+
 	public static float clipTo(float value, float min, float max) {
-		return value > min ? (value < max ? value: max) : min;
+		return value > min ? (value < max ? value : max) : min;
 	}
 }

@@ -10,7 +10,8 @@ import com.kh.beatbot.listener.MenuItemListener;
 import com.kh.beatbot.ui.view.ListView;
 import com.kh.beatbot.ui.view.TouchableView;
 
-public abstract class Menu extends TouchableView implements MenuItemListener, FileMenuItemListener, FileFilter {
+public abstract class Menu extends TouchableView implements MenuItemListener, FileMenuItemListener,
+		FileFilter {
 	protected List<ListView> menuLists;
 	protected List<MenuItem> topLevelItems;
 	protected float columnWidth = 0;
@@ -40,7 +41,7 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 		createMenuItems();
 		for (MenuItem topLevelItem : topLevelItems) {
 			topLevelItem.show();
-		}		
+		}
 	}
 
 	public synchronized void layoutChildren() {

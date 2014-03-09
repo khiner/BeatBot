@@ -5,9 +5,9 @@ public class PlaybackManager {
 	public static enum State {
 		PLAYING, STOPPED
 	}
-	
+
 	public static final int SAMPLE_RATE = 44100;
-	
+
 	private static PlaybackManager singletonInstance = null;
 	private static State state = State.STOPPED;
 

@@ -12,8 +12,7 @@ public class IconResource {
 	}
 
 	public IconResource copy() {
-		return new IconResource(resourceId, fillColor == null ? null
-				: fillColor.clone(), strokeColor == null ? null
-				: strokeColor.clone());
+		return new IconResource(resourceId, fillColor == null ? null : fillColor.clone(),
+				strokeColor == null ? null : strokeColor.clone());
 	}
 }

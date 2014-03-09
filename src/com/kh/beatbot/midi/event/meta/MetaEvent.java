@@ -28,8 +28,7 @@ public abstract class MetaEvent extends MidiEvent {
 	protected int mType;
 	protected VariableLengthInt mLength;
 
-	protected MetaEvent(long tick, long delta, int type,
-			VariableLengthInt length) {
+	protected MetaEvent(long tick, long delta, int type, VariableLengthInt length) {
 		super(tick, delta);
 
 		mType = type & 0xFF;
@@ -39,8 +38,7 @@ public abstract class MetaEvent extends MidiEvent {
 	protected abstract int getEventSize();
 
 	@Override
-	public void writeToFile(OutputStream out, boolean writeType)
-			throws IOException {
+	public void writeToFile(OutputStream out, boolean writeType) throws IOException {
 		writeToFile(out);
 	}
 

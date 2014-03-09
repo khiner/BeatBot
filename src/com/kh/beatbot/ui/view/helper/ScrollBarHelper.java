@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.view.helper;
 
-
 public class ScrollBarHelper {
 	private static final float DAMP_CONSTANT = 0.9f;
 

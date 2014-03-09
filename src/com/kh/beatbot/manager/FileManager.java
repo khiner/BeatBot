@@ -13,16 +13,14 @@ import com.kh.beatbot.activity.BeatBotActivity;
 
 public class FileManager {
 
-	public static final String[] SUPPORTED_EXTENSIONS = { ".wav", ".flac",
-			".ogg", ".oga", ".aif", ".aiff", ".aifc", ".au", ".snd", ".raw", ".paf",
-			".iff", ".svx", ".sf", ".voc", ".w64", ".mat4", ".mat5", ".pvf",
-			".xi", ".htk", ".caf", ".sd2" };
+	public static final String[] SUPPORTED_EXTENSIONS = { ".wav", ".flac", ".ogg", ".oga", ".aif",
+			".aiff", ".aifc", ".au", ".snd", ".raw", ".paf", ".iff", ".svx", ".sf", ".voc", ".w64",
+			".mat4", ".mat5", ".pvf", ".xi", ".htk", ".caf", ".sd2" };
 
 	public static final String[] ASSET_TYPES = { "drums" };
 
-	public static File rootDirectory, audioDirectory, midiDirectory,
-			recordDirectory, drumsDirectory, beatRecordDirectory,
-			sampleRecordDirectory;
+	public static File rootDirectory, audioDirectory, midiDirectory, recordDirectory,
+			drumsDirectory, beatRecordDirectory, sampleRecordDirectory;
 
 	private static AssetManager assetManager;
 	private static byte[] copyBuffer = new byte[1024];
@@ -57,11 +55,9 @@ public class FileManager {
 	}
 
 	private static void initDataDir() {
-		if (Environment.getExternalStorageState().equals(
-				Environment.MEDIA_MOUNTED)) {
+		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			// we can read and write to external storage
-			String extStorageDir = Environment.getExternalStorageDirectory()
-					.toString();
+			String extStorageDir = Environment.getExternalStorageDirectory().toString();
 			appDirectoryPath = extStorageDir + "/BeatBot/";
 		} else { // we need read AND write access for this app - default to
 					// internal storage
@@ -70,8 +66,7 @@ public class FileManager {
 		}
 	}
 
-	private static void copyFile(InputStream in, OutputStream out)
-			throws IOException {
+	private static void copyFile(InputStream in, OutputStream out) throws IOException {
 		int read;
 		while ((read = in.read(copyBuffer)) != -1) {
 			out.write(copyBuffer, 0, read);
@@ -83,10 +78,8 @@ public class FileManager {
 		out = null;
 	}
 
-	private static void copyFromAssetsToExternal(String assetPath)
-			throws IOException {
-		File destDir = new File(audioDirectory.getPath() + "/" + assetPath
-				+ "/");
+	private static void copyFromAssetsToExternal(String assetPath) throws IOException {
+		File destDir = new File(audioDirectory.getPath() + "/" + assetPath + "/");
 
 		// create the dir
 		destDir.mkdirs();

@@ -6,15 +6,13 @@ import com.kh.beatbot.activity.BeatBotActivity;
 
 public class ADSR extends Effect {
 
-	public static final String NAME = BeatBotActivity.mainActivity
-			.getString(R.string.adsr);
+	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.adsr);
 	public static final int EFFECT_NUM = -1, NUM_PARAMS = 6;
 
-	public static final int ATTACK_ID = 0, DECAY_ID = 1, SUSTAIN_ID = 2,
-			RELEASE_ID = 3, START_ID = 4, PEAK_ID = 5;
+	public static final int ATTACK_ID = 0, DECAY_ID = 1, SUSTAIN_ID = 2, RELEASE_ID = 3,
+			START_ID = 4, PEAK_ID = 5;
 
-	public static final int ATTACK_MAX_S = 20, DECAY_MAX_S = 30,
-			RELEASE_MAX_S = 20;
+	public static final int ATTACK_MAX_S = 20, DECAY_MAX_S = 30, RELEASE_MAX_S = 20;
 
 	public static final int LOG_SCALE = 512;
 
@@ -49,13 +47,10 @@ public class ADSR extends Effect {
 
 	@Override
 	protected void initParams() {
-		params.add(new EffectParam(0, "Attack", "s", 0, ATTACK_MAX_S, LOG_SCALE,
-				true, false));
-		params.add(new EffectParam(1, "Decay", "s", 0, DECAY_MAX_S, LOG_SCALE,
-				true, false));
+		params.add(new EffectParam(0, "Attack", "s", 0, ATTACK_MAX_S, LOG_SCALE, true, false));
+		params.add(new EffectParam(1, "Decay", "s", 0, DECAY_MAX_S, LOG_SCALE, true, false));
 		params.add(new EffectParam(2, "Sustain", "", false, false));
-		params.add(new EffectParam(3, "Release", "s", 0, RELEASE_MAX_S, LOG_SCALE,
-				true, false));
+		params.add(new EffectParam(3, "Release", "s", 0, RELEASE_MAX_S, LOG_SCALE, true, false));
 		params.add(new EffectParam(4, "Start", "", false, false));
 		params.add(new EffectParam(5, "Peak", "", false, false));
 		position = -1; // native code understands that -1 == ADSR

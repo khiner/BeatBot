@@ -4,8 +4,7 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 
-public abstract class ControlView2dBase extends ControlViewBase implements
-		ParamListener {
+public abstract class ControlView2dBase extends ControlViewBase implements ParamListener {
 
 	public ControlView2dBase() {
 		super();

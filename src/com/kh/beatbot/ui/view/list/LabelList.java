@@ -14,24 +14,20 @@ import com.kh.beatbot.ui.view.ClickableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 
-public class LabelList extends ClickableView implements OnPressListener,
-		OnReleaseListener {
+public class LabelList extends ClickableView implements OnPressListener, OnReleaseListener {
 
 	public static enum LabelState {
 		ON, OFF, EMPTY
 	};
 
-	private static final IconResourceSet onIcon = new IconResourceSet(
-			new IconResource(-1, Colors.VOLUME, null), new IconResource(
-					-1, Colors.VOLUME_LIGHT, null));
-	
-	private static final IconResourceSet offIcon = new IconResourceSet(
-			new IconResource(-1, Colors.LABEL_LIGHT, null), new IconResource(
-					-1, Colors.LABEL_VERY_LIGHT, null));
+	private static final IconResourceSet onIcon = new IconResourceSet(new IconResource(-1,
+			Colors.VOLUME, null), new IconResource(-1, Colors.VOLUME_LIGHT, null));
 
-	private static final IconResourceSet emptyIcon = new IconResourceSet(
-			new IconResource(-1, Colors.LABEL_DARK, null), new IconResource(
-					-1, Colors.LABEL_MED, null));
+	private static final IconResourceSet offIcon = new IconResourceSet(new IconResource(-1,
+			Colors.LABEL_LIGHT, null), new IconResource(-1, Colors.LABEL_VERY_LIGHT, null));
+
+	private static final IconResourceSet emptyIcon = new IconResourceSet(new IconResource(-1,
+			Colors.LABEL_DARK, null), new IconResource(-1, Colors.LABEL_MED, null));
 
 	protected class Label extends Button {
 		private final static String EMPTY_TEXT = "ADD";
@@ -104,8 +100,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 		newLabel.setOnPressListener(this);
 		newLabel.setOnReleaseListener(this);
 		addChild(newLabel);
-		labelWidth = (width - BG_OFFSET * 3 - (children.size() - 1)
-				* GAP_BETWEEN_LABELS)
+		labelWidth = (width - BG_OFFSET * 3 - (children.size() - 1) * GAP_BETWEEN_LABELS)
 				/ children.size();
 		layoutChildren();
 		return newLabel;
@@ -145,8 +140,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 	protected void singleTap(int id, float x, float y) {
 		// notify listener that the label has been single-clicked (tapped)
 		if (touchedLabel != null) {
-			listener.labelClicked(touchedLabel.getText(),
-					children.indexOf(touchedLabel));
+			listener.labelClicked(touchedLabel.getText(), children.indexOf(touchedLabel));
 		}
 	}
 
@@ -166,8 +160,7 @@ public class LabelList extends ClickableView implements OnPressListener,
 		float xTotal = 3 * BG_OFFSET / 2;
 		for (View label : children) {
 			if (touchedLabel == null || !label.equals(touchedLabel)) {
-				label.layout(this, xTotal, 3 * BG_OFFSET / 2, labelWidth,
-						height - BG_OFFSET * 3);
+				label.layout(this, xTotal, 3 * BG_OFFSET / 2, labelWidth, height - BG_OFFSET * 3);
 			}
 			xTotal += labelWidth + GAP_BETWEEN_LABELS;
 		}

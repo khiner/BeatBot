@@ -19,24 +19,20 @@ public abstract class Shape {
 		this.group = group != null ? group : new ShapeGroup();
 	}
 
-	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor,
-			int numFillVertices, int numStrokeVertices) {
-		this(group, fillColor, strokeColor, null, null, numFillVertices,
-				numStrokeVertices);
+	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor, int numFillVertices,
+			int numStrokeVertices) {
+		this(group, fillColor, strokeColor, null, null, numFillVertices, numStrokeVertices);
 	}
 
-	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor,
-			short[] fillIndices, short[] strokeIndices, int numFillVertices,
-			int numStrokeVertices) {
+	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor, short[] fillIndices,
+			short[] strokeIndices, int numFillVertices, int numStrokeVertices) {
 		this(group);
 		if (fillColor != null) {
-			fillMesh = new Mesh2D(this.group.fillGroup, numFillVertices,
-					fillIndices);
+			fillMesh = new Mesh2D(this.group.fillGroup, numFillVertices, fillIndices);
 			this.fillColor = fillColor;
 		}
 		if (strokeColor != null) {
-			strokeMesh = new Mesh2D(this.group.strokeGroup, numStrokeVertices,
-					strokeIndices);
+			strokeMesh = new Mesh2D(this.group.strokeGroup, numStrokeVertices, strokeIndices);
 			this.strokeColor = strokeColor;
 		}
 		this.group.add(this);
@@ -140,10 +136,8 @@ public abstract class Shape {
 	public synchronized void setDimensions(float width, float height) {
 		this.width = width;
 		this.height = height;
-		boolean fillChanged = fillMesh != null
-				&& fillMesh.setDimensions(width, height);
-		boolean strokeChanged = strokeMesh != null
-				&& strokeMesh.setDimensions(width, height);
+		boolean fillChanged = fillMesh != null && fillMesh.setDimensions(width, height);
+		boolean strokeChanged = strokeMesh != null && strokeMesh.setDimensions(width, height);
 		if (fillChanged || strokeChanged) {
 			update();
 		}

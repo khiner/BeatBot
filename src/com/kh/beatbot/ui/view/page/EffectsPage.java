@@ -31,22 +31,19 @@ public class EffectsPage extends TouchableView {
 		EffectLabelListListener(Context c) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(c);
 			builder.setTitle("Choose Effect");
-			builder.setItems(effectNames,
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int item) {
-							if (effectNames[item].toLowerCase().equals("none")) {
-								Effect effect = getCurrTrack()
-										.findEffectByPosition(lastClickedPos);
-								if (effect != null) {
-									effect.removeEffect();
-								}
-							} else {
-								launchEffect(effectNames[item], lastClickedPos,
-										true);
-							}
-							updateEffectLabels();
+			builder.setItems(effectNames, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
+					if (effectNames[item].toLowerCase().equals("none")) {
+						Effect effect = getCurrTrack().findEffectByPosition(lastClickedPos);
+						if (effect != null) {
+							effect.removeEffect();
 						}
-					});
+					} else {
+						launchEffect(effectNames[item], lastClickedPos, true);
+					}
+					updateEffectLabels();
+				}
+			});
 			selectEffectAlert = builder.create();
 		}
 
@@ -107,15 +104,13 @@ public class EffectsPage extends TouchableView {
 				effectLabelList.setLabelText(i, "");
 			} else {
 				effectLabelList.setLabelText(i, effect.getName());
-				effectLabelList.setLabelState(i, effect.isOn() ? LabelState.ON
-						: LabelState.OFF);
+				effectLabelList.setLabelState(i, effect.isOn() ? LabelState.ON : LabelState.OFF);
 			}
 		}
 	}
 
 	// effects methods
-	private void launchEffect(String effectName, int effectPosition,
-			boolean setOn) {
+	private void launchEffect(String effectName, int effectPosition, boolean setOn) {
 		Effect effect = getEffect(effectName, effectPosition);
 		if (effectName != effect.getName()) {
 			// different effect being added to effect slot. need to replace it
@@ -150,11 +145,10 @@ public class EffectsPage extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		effectNames = BeatBotActivity.mainActivity.getResources()
-				.getStringArray(R.array.effect_names);
+		effectNames = BeatBotActivity.mainActivity.getResources().getStringArray(
+				R.array.effect_names);
 		effectLabelList = new DraggableLabelList(shapeGroup);
-		effectLabelList.setListener(new EffectLabelListListener(
-				BeatBotActivity.mainActivity));
+		effectLabelList.setListener(new EffectLabelListListener(BeatBotActivity.mainActivity));
 
 		addChildren(effectLabelList);
 	}

@@ -81,8 +81,7 @@ public class NoteLevelsPage extends TouchableView {
 		float viewW = toggleWidth + 5;
 		volumeButton.layout(this, 0, 0, toggleWidth, toggleHeight);
 		panButton.layout(this, 0, toggleHeight, toggleWidth, toggleHeight);
-		pitchButton
-				.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
+		pitchButton.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
 		levelsView.layout(this, viewW, 0, width - viewW, height);
 	}
 }

@@ -92,8 +92,7 @@ public class AdsrPage extends TouchableView implements OnReleaseListener {
 		float thirdHeight = height / 3;
 		float pos = width - thirdHeight * (adsrButtons.length + 1);
 		adsrView.layout(this, 0, 0, pos, height);
-		paramControl.layout(this, pos, thirdHeight, width - pos,
-				2 * thirdHeight);
+		paramControl.layout(this, pos, thirdHeight, width - pos, 2 * thirdHeight);
 		pos += thirdHeight / 2;
 		for (int i = 0; i < adsrButtons.length; i++) {
 			adsrButtons[i].layout(this, pos, 0, thirdHeight, thirdHeight);

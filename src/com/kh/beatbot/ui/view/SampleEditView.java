@@ -26,11 +26,9 @@ public class SampleEditView extends ControlView2dBase {
 
 	private boolean pressed = false;
 
-	private int scrollPointerId = -1, zoomLeftPointerId = -1,
-			zoomRightPointerId = -1;
+	private int scrollPointerId = -1, zoomLeftPointerId = -1, zoomRightPointerId = -1;
 
-	private float scrollAnchorLevel = -1, zoomLeftAnchorLevel = -1,
-			zoomRightAnchorLevel = -1;
+	private float scrollAnchorLevel = -1, zoomLeftAnchorLevel = -1, zoomRightAnchorLevel = -1;
 
 	// zooming/scrolling will change the view window of the samples
 	// keep track of that with offset and width
@@ -73,22 +71,19 @@ public class SampleEditView extends ControlView2dBase {
 		// set levelOffset and levelWidth such that the zoom
 		// anchor levels stay under x1 and x2
 		float newLevelWidth = waveformWidth * (ZRAL - ZLAL) / (x2 - x1);
-		float newLevelOffset = ZRAL - newLevelWidth * (x2 - X_OFFSET)
-				/ waveformWidth;
+		float newLevelOffset = ZRAL - newLevelWidth * (x2 - X_OFFSET) / waveformWidth;
 
 		if (newLevelOffset < 0) {
 			newLevelWidth = ZRAL * waveformWidth / (x2 - X_OFFSET);
 			newLevelWidth = newLevelWidth <= 1 ? (newLevelWidth >= minLoopWindow ? newLevelWidth
-					: minLoopWindow)
-					: 1;
+					: minLoopWindow) : 1;
 			setLevel(0, newLevelWidth);
 		} else if (newLevelWidth > 1) {
 			setLevel(newLevelOffset, 1 - newLevelOffset);
 		} else if (newLevelWidth < minLoopWindow) {
 			setLevel(newLevelOffset, minLoopWindow);
 		} else if (newLevelOffset + newLevelWidth > 1) {
-			newLevelWidth = ((ZLAL - 1) * waveformWidth)
-					/ (x1 - X_OFFSET - waveformWidth);
+			newLevelWidth = ((ZLAL - 1) * waveformWidth) / (x1 - X_OFFSET - waveformWidth);
 			setLevel(1 - newLevelWidth, newLevelWidth);
 		} else {
 			setLevel(newLevelOffset, newLevelWidth);
@@ -129,8 +124,7 @@ public class SampleEditView extends ControlView2dBase {
 	public void layout(View parent, float x, float y, float width, float height) {
 		setIcon(IconResourceSets.SAMPLE_BG);
 		initRect();
-		waveformShape = new WaveformShape(shapeGroup, width,
-				Colors.LABEL_SELECTED, Colors.BLACK);
+		waveformShape = new WaveformShape(shapeGroup, width, Colors.LABEL_SELECTED, Colors.BLACK);
 		currSampleRect = new Rectangle(shapeGroup, Colors.VOLUME, null);
 		waveformWidth = width - SNAP_DIST;
 		super.layout(parent, x, y, width, height);
@@ -144,10 +138,10 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	private void updateCurrSample() {
-		currSampleRect.setPosition(
-				absoluteX
-						+ levelToX(params[0]
-								.getViewLevel(TrackManager.currTrack
+		currSampleRect
+				.setPosition(
+						absoluteX
+								+ levelToX(params[0].getViewLevel(TrackManager.currTrack
 										.getCurrentFrame())), absoluteY);
 	}
 
@@ -157,8 +151,7 @@ public class SampleEditView extends ControlView2dBase {
 			setText(NO_SAMPLE_MESSAGE);
 			return;
 		}
-		if (TrackManager.currTrack.isPlaying()
-				|| TrackManager.currTrack.isPreviewing()) {
+		if (TrackManager.currTrack.isPlaying() || TrackManager.currTrack.isPreviewing()) {
 			updateCurrSample();
 		}
 	}
@@ -169,8 +162,7 @@ public class SampleEditView extends ControlView2dBase {
 			params[0].setLevel(xToLevel(x));
 			// update ui to fit the new begin point
 			if (params[0].viewLevel < levelOffset) {
-				setLevel(params[0].viewLevel, levelWidth + levelOffset
-						- params[0].viewLevel);
+				setLevel(params[0].viewLevel, levelWidth + levelOffset - params[0].viewLevel);
 			} else if (params[0].viewLevel > levelOffset + levelWidth) {
 				setLevel(levelOffset, params[0].viewLevel - levelOffset);
 			}
@@ -182,8 +174,7 @@ public class SampleEditView extends ControlView2dBase {
 			if (params[1].viewLevel > levelOffset + levelWidth) {
 				setLevel(levelOffset, params[1].viewLevel - levelOffset);
 			} else if (params[1].viewLevel < levelOffset) {
-				setLevel(params[1].viewLevel, levelWidth + levelOffset
-						- params[1].viewLevel);
+				setLevel(params[1].viewLevel, levelWidth + levelOffset - params[1].viewLevel);
 			}
 			return true;
 		} else {
@@ -226,8 +217,8 @@ public class SampleEditView extends ControlView2dBase {
 
 		// set levelOffset such that the scroll anchor level stays under
 		// scrollX
-		float newLevelOffset = GeneralUtils.clipTo(scrollAnchorLevel
-				- xToLevel(scrollX) + levelOffset, 0, 1 - levelWidth);
+		float newLevelOffset = GeneralUtils.clipTo(scrollAnchorLevel - xToLevel(scrollX)
+				+ levelOffset, 0, 1 - levelWidth);
 		setLevel(newLevelOffset, levelWidth);
 		updateLoopSelectionVbs();
 	}
@@ -295,8 +286,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	protected float xToLevel(float x) {
-		return (x - X_OFFSET) * checkedDivide(levelWidth, waveformWidth)
-				+ levelOffset;
+		return (x - X_OFFSET) * checkedDivide(levelWidth, waveformWidth) + levelOffset;
 	}
 
 	@Override
@@ -305,9 +295,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	protected float levelToX(float level) {
-		return X_OFFSET
-				+ checkedDivide((level - levelOffset) * waveformWidth,
-						levelWidth);
+		return X_OFFSET + checkedDivide((level - levelOffset) * waveformWidth, levelWidth);
 	}
 
 	@Override

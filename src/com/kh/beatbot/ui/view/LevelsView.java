@@ -15,8 +15,8 @@ import com.kh.beatbot.ui.shape.ShapeGroup;
 public class LevelsView extends TouchableView {
 
 	private static class DragLine {
-		private static float m = 0, b = 0, leftTick = 0,
-				rightTick = Float.MAX_VALUE, leftLevel = 0, rightLevel = 0;
+		private static float m = 0, b = 0, leftTick = 0, rightTick = Float.MAX_VALUE,
+				leftLevel = 0, rightLevel = 0;
 
 		public static float getLevel(float tick) {
 			if (tick <= leftTick)
@@ -71,12 +71,10 @@ public class LevelsView extends TouchableView {
 		return touchedLevels.get(id);
 	}
 
-	protected void drawLevel(MidiNote midiNote, float[] levelColor,
-			float[] levelColorTrans) {
+	protected void drawLevel(MidiNote midiNote, float[] levelColor, float[] levelColorTrans) {
 		float x = tickToX(midiNote.getOnTick());
 		float y = levelToY(midiNote.getLevel(currLevelType));
-		levelBarRect.layout(-LEVEL_BAR_WIDTH / 2, y, LEVEL_BAR_WIDTH, height
-				- y - BG_OFFSET);
+		levelBarRect.layout(-LEVEL_BAR_WIDTH / 2, y, LEVEL_BAR_WIDTH, height - y - BG_OFFSET);
 		levelBarCircle.setPosition(0, y);
 		levelBarSelectCircle.setPosition(0, y);
 		levelBarRect.setFillColor(levelColor);
@@ -125,8 +123,7 @@ public class LevelsView extends TouchableView {
 	private boolean selectLevel(float x, float y, int pointerId) {
 		for (MidiNote midiNote : TrackManager.currTrack.getMidiNotes()) {
 			float velocityY = levelToY(midiNote.getLevel(currLevelType));
-			if (Math.abs(tickToX(midiNote.getOnTick()) - x) < 35
-					&& Math.abs(velocityY - y) < 35) {
+			if (Math.abs(tickToX(midiNote.getOnTick()) - x) < 35 && Math.abs(velocityY - y) < 35) {
 				// If this is the only touched level, and it hasn't yet
 				// been selected, make it the only selected level.
 				// If we are multi-selecting, add it to the selected list
@@ -158,13 +155,11 @@ public class LevelsView extends TouchableView {
 		for (MidiNote selectedNote : TrackManager.currTrack.getMidiNotes()) {
 			float levelY = levelToY(selectedNote.getLevel(currLevelType));
 			boolean selected = leftTick < selectedNote.getOnTick()
-					&& rightTick > selectedNote.getOnTick() && topY < levelY
-					&& bottomY > levelY;
+					&& rightTick > selectedNote.getOnTick() && topY < levelY && bottomY > levelY;
 			selectedNote.setSelected(selected);
 		}
 
-		selectRegionRect.layout(this.x + leftX, this.y + topY, rightX - leftX,
-				bottomY - topY);
+		selectRegionRect.layout(this.x + leftX, this.y + topY, rightX - leftX, bottomY - topY);
 		selectRegionRect.setFillColor(Colors.VOLUME_TRANS);
 	}
 
@@ -176,20 +171,15 @@ public class LevelsView extends TouchableView {
 			DragLine.b = touched.getLevel(currLevelType);
 			DragLine.leftTick = 0;
 			DragLine.rightTick = Float.MAX_VALUE;
-			DragLine.leftLevel = DragLine.rightLevel = touched
-					.getLevel(currLevelType);
+			DragLine.leftLevel = DragLine.rightLevel = touched.getLevel(currLevelType);
 		} else if (touchedSize == 2) {
-			MidiNote leftLevel = touchedLevels.get(0).getOnTick() < touchedLevels
-					.get(1).getOnTick() ? touchedLevels.get(0) : touchedLevels
-					.get(1);
-			MidiNote rightLevel = touchedLevels.get(0).getOnTick() < touchedLevels
-					.get(1).getOnTick() ? touchedLevels.get(1) : touchedLevels
-					.get(0);
-			DragLine.m = (rightLevel.getLevel(currLevelType) - leftLevel
-					.getLevel(currLevelType))
+			MidiNote leftLevel = touchedLevels.get(0).getOnTick() < touchedLevels.get(1)
+					.getOnTick() ? touchedLevels.get(0) : touchedLevels.get(1);
+			MidiNote rightLevel = touchedLevels.get(0).getOnTick() < touchedLevels.get(1)
+					.getOnTick() ? touchedLevels.get(1) : touchedLevels.get(0);
+			DragLine.m = (rightLevel.getLevel(currLevelType) - leftLevel.getLevel(currLevelType))
 					/ (rightLevel.getOnTick() - leftLevel.getOnTick());
-			DragLine.b = (leftLevel.getLevel(currLevelType) - DragLine.m
-					* leftLevel.getOnTick());
+			DragLine.b = (leftLevel.getLevel(currLevelType) - DragLine.m * leftLevel.getOnTick());
 			DragLine.leftTick = leftLevel.getOnTick();
 			DragLine.rightTick = rightLevel.getOnTick();
 			DragLine.leftLevel = leftLevel.getLevel(currLevelType);
@@ -201,17 +191,18 @@ public class LevelsView extends TouchableView {
 		levelOffsets.clear();
 		updateDragLine();
 		for (MidiNote selectedNote : MidiManager.getSelectedNotes()) {
-			levelOffsets.put(selectedNote, selectedNote.getLevel(currLevelType)
-					- DragLine.getLevel(selectedNote.getOnTick()));
+			levelOffsets.put(
+					selectedNote,
+					selectedNote.getLevel(currLevelType)
+							- DragLine.getLevel(selectedNote.getOnTick()));
 		}
 	}
 
 	private void setLevelsToDragLine() {
 		for (MidiNote selectedNote : MidiManager.getSelectedNotes()) {
 			if (levelOffsets.get(selectedNote) != null) {
-				selectedNote.setLevel(currLevelType,
-						DragLine.getLevel(selectedNote.getOnTick())
-								+ levelOffsets.get(selectedNote));
+				selectedNote.setLevel(currLevelType, DragLine.getLevel(selectedNote.getOnTick())
+						+ levelOffsets.get(selectedNote));
 			}
 		}
 	}
@@ -230,26 +221,22 @@ public class LevelsView extends TouchableView {
 	}
 
 	private float levelToY(float level) {
-		return height - level * (height - LEVEL_POINT_SIZE) - LEVEL_POINT_SIZE
-				/ 2;
+		return height - level * (height - LEVEL_POINT_SIZE) - LEVEL_POINT_SIZE / 2;
 	}
 
 	/*
 	 * map y value of level bar to a value in [0,1]
 	 */
 	private float yToLevel(float y) {
-		return (height - y - LEVEL_POINT_SIZE / 2)
-				/ (height - LEVEL_POINT_SIZE);
+		return (height - y - LEVEL_POINT_SIZE / 2) / (height - LEVEL_POINT_SIZE);
 	}
 
 	private float tickToX(float tick) {
-		return mainPage.midiView.tickToX(tick) + mainPage.midiView.absoluteX
-				- absoluteX;
+		return mainPage.midiView.tickToX(tick) + mainPage.midiView.absoluteX - absoluteX;
 	}
 
 	private float xToTick(float x) {
-		return mainPage.midiView.xToTick(x + absoluteX
-				- mainPage.midiView.absoluteX);
+		return mainPage.midiView.xToTick(x + absoluteX - mainPage.midiView.absoluteX);
 	}
 
 	public void handleActionPointerUp(int id, float x, float y) {
@@ -307,7 +294,6 @@ public class LevelsView extends TouchableView {
 	public synchronized void layoutChildren() {
 		levelBarRect.layout(-LEVEL_BAR_WIDTH / 2, 0, LEVEL_BAR_WIDTH, height);
 		levelBarCircle.layout(0, 0, LEVEL_BAR_WIDTH, LEVEL_BAR_WIDTH);
-		levelBarSelectCircle.layout(0, 0, LEVEL_BAR_WIDTH * 2,
-				LEVEL_BAR_WIDTH * 2);
+		levelBarSelectCircle.layout(0, 0, LEVEL_BAR_WIDTH * 2, LEVEL_BAR_WIDTH * 2);
 	}
 }

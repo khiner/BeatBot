@@ -112,7 +112,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 		pager.addPage(masterButtonRow.getLevelsButton(), levelsPage);
 		pager.addPage(masterButtonRow.getEffectsButton(), effectsPage);
 
-
 		masterButton.setIcon(IconResourceSets.INSTRUMENT_BASE);
 		masterButton.setText("Master");
 
@@ -123,12 +122,12 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	public synchronized void layoutChildren() {
 		float labelYOffset = 2;
 
-		masterButton.layout(this, 0, labelYOffset,
-				View.mainPage.getTrackControlWidth(), LABEL_HEIGHT);
-		buttonRowPager.layout(this, masterButton.width, labelYOffset, width
-				- masterButton.width, LABEL_HEIGHT);
-		pager.layout(this, 0, LABEL_HEIGHT + 2 * labelYOffset, width, height
-				- LABEL_HEIGHT - 2 * labelYOffset);
+		masterButton.layout(this, 0, labelYOffset, View.mainPage.getTrackControlWidth(),
+				LABEL_HEIGHT);
+		buttonRowPager.layout(this, masterButton.width, labelYOffset, width - masterButton.width,
+				LABEL_HEIGHT);
+		pager.layout(this, 0, LABEL_HEIGHT + 2 * labelYOffset, width, height - LABEL_HEIGHT - 2
+				* labelYOffset);
 	}
 
 	@Override

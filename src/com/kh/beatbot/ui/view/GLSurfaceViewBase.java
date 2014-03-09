@@ -11,8 +11,7 @@ import android.opengl.GLU;
 import android.opengl.GLUtils;
 import android.view.SurfaceHolder;
 
-public abstract class GLSurfaceViewBase extends GLSurfaceView implements
-		GLSurfaceView.Renderer {
+public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfaceView.Renderer {
 
 	public static GL11 gl;
 
@@ -24,8 +23,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 	}
 
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		super.surfaceChanged(holder, format, width, height);
 	}
 
@@ -61,16 +59,13 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements
 		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 	}
 
-	public static final void loadTexture(Bitmap bitmap, int[] textureHandlers,
-			int textureId) {
+	public static final void loadTexture(Bitmap bitmap, int[] textureHandlers, int textureId) {
 		// Generate Texture ID
 		gl.glGenTextures(1, textureHandlers, textureId);
 		// Bind texture id texturing target
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandlers[textureId]);
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
-				GL10.GL_LINEAR);
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
-				GL10.GL_LINEAR);
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
 		// allow non-power-of-2 images to render with hardware acceleration
 		// enabled
 		// gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,

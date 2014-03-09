@@ -14,14 +14,15 @@ public class ShapeGroup {
 	public ShapeGroup() {
 		fillGroup = new MeshGroup(GL10.GL_TRIANGLE_STRIP);
 		strokeGroup = new MeshGroup(GL10.GL_LINES);
-		textureGroup = new TextureGroup(GL10.GL_TRIANGLE_STRIP, TextureAtlas.resource.getTextureId());
+		textureGroup = new TextureGroup(GL10.GL_TRIANGLE_STRIP,
+				TextureAtlas.resource.getTextureId());
 		textGroup = new TextureGroup(GL10.GL_TRIANGLE_STRIP, TextureAtlas.font.getTextureId());
 	}
 
 	public TextureGroup getTextureGroup() {
 		return textureGroup;
 	}
-	
+
 	public TextureGroup getTextGroup() {
 		return textGroup;
 	}

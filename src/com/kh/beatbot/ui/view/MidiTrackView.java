@@ -65,7 +65,7 @@ public class MidiTrackView extends TouchableView implements TrackListener, Scrol
 
 	@Override
 	public void onScrollX(View view) {
-		
+
 	}
 
 	@Override

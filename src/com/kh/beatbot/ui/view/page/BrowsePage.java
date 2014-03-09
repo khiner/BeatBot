@@ -18,9 +18,9 @@ public class BrowsePage extends Menu {
 		setIcon(IconResourceSets.BROWSE_PAGE);
 		initRoundedRect();
 
-		File[] topLevelDirs = new File[] { FileManager.drumsDirectory,
-				FileManager.recordDirectory, FileManager.rootDirectory };
-		
+		File[] topLevelDirs = new File[] { FileManager.drumsDirectory, FileManager.recordDirectory,
+				FileManager.rootDirectory };
+
 		for (File topLevelDir : topLevelDirs) {
 			topLevelItems.add(new FileMenuItem(this, null, topLevelDir));
 		}
@@ -41,8 +41,7 @@ public class BrowsePage extends Menu {
 	}
 
 	private FileMenuItem findMatchingChild(FileMenuItem parent, String path) {
-		List<MenuItem> children = parent == null ? topLevelItems : parent
-				.getSubMenuItems();
+		List<MenuItem> children = parent == null ? topLevelItems : parent.getSubMenuItems();
 		for (MenuItem child : children) {
 			FileMenuItem fileChild = (FileMenuItem) child;
 			if (path.startsWith(fileChild.getFile().getAbsolutePath())) {
@@ -54,8 +53,7 @@ public class BrowsePage extends Menu {
 
 	@Override
 	public void onFileMenuItemReleased(FileMenuItem fileItem) {
-		new SampleSetEvent(TrackManager.currTrack, fileItem.getFile())
-				.execute();
+		new SampleSetEvent(TrackManager.currTrack, fileItem.getFile()).execute();
 	}
 
 	@Override

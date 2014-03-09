@@ -39,8 +39,7 @@ public class MainPage extends TouchableView {
 
 		slideMenu.setClip(false);
 
-		addChildren(controlButtonGroup, midiTrackView, midiView,
-				pageSelectGroup, slideMenu);
+		addChildren(controlButtonGroup, midiTrackView, midiView, pageSelectGroup, slideMenu);
 	}
 
 	@Override
@@ -53,15 +52,14 @@ public class MainPage extends TouchableView {
 
 		trackControlWidth = MidiView.trackHeight * 2.5f;
 
-		midiTrackView.layout(this, 0, controlButtonHeight, trackControlWidth,
-				midiHeight);
-		midiView.layout(this, trackControlWidth, controlButtonHeight, width
-				- trackControlWidth - 15, midiHeight);
+		midiTrackView.layout(this, 0, controlButtonHeight, trackControlWidth, midiHeight);
+		midiView.layout(this, trackControlWidth, controlButtonHeight, width - trackControlWidth
+				- 15, midiHeight);
 
-		controlButtonGroup.layout(this, trackControlWidth, 0, width
-				- trackControlWidth, controlButtonHeight);
-		pageSelectGroup.layout(this, 0, controlButtonHeight + midiHeight,
-				width, pageSelectGroupHeight);
+		controlButtonGroup.layout(this, trackControlWidth, 0, width - trackControlWidth,
+				controlButtonHeight);
+		pageSelectGroup.layout(this, 0, controlButtonHeight + midiHeight, width,
+				pageSelectGroupHeight);
 
 		slideMenu.layout(this, -width, 0, trackControlWidth, height);
 	}

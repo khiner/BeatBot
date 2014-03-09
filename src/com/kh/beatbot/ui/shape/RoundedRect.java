@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.shape;
 
-
 public class RoundedRect extends Shape {
 	public static final short[] FILL_INDICES = getFillIndices();
 	public static final short[] STROKE_INDICES = getStrokeIndices();
@@ -13,8 +12,8 @@ public class RoundedRect extends Shape {
 	public float cornerRadius = -1;
 
 	public RoundedRect(ShapeGroup group, float[] fillColor, float[] strokeColor) {
-		super(group, fillColor, strokeColor, FILL_INDICES, STROKE_INDICES,
-				NUM_FILL_VERTICES, NUM_STROKE_VERTICES);
+		super(group, fillColor, strokeColor, FILL_INDICES, STROKE_INDICES, NUM_FILL_VERTICES,
+				NUM_STROKE_VERTICES);
 	}
 
 	private static short[] getFillIndices() {

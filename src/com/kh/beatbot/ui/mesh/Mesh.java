@@ -8,8 +8,7 @@ public abstract class Mesh {
 	public float x, y, width, height;
 
 	public boolean containsPoint(float x, float y) {
-		return this.x < x && this.x + width > x && this.y < y
-				&& this.y + height > y;
+		return this.x < x && this.x + width > x && this.y < y && this.y + height > y;
 	}
 
 	public MeshGroup getGroup() {
@@ -84,8 +83,7 @@ public abstract class Mesh {
 		}
 	}
 
-	public synchronized boolean layout(float x, float y, float width,
-			float height) {
+	public synchronized boolean layout(float x, float y, float width, float height) {
 		boolean dimChanged = setDimensions(width, height);
 		boolean posChanged = setPosition(x, y);
 		return dimChanged || posChanged;

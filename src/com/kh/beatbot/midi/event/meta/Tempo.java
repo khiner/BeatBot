@@ -73,8 +73,7 @@ public class Tempo extends MetaEvent {
 		out.write(MidiUtil.intToBytes(mMPQN, 3));
 	}
 
-	public static Tempo parseTempo(long tick, long delta, InputStream in)
-			throws IOException {
+	public static Tempo parseTempo(long tick, long delta, InputStream in) throws IOException {
 
 		in.read(); // Size = 3;
 

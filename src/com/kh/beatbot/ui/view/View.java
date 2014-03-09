@@ -43,10 +43,8 @@ public class View implements Comparable<View> {
 
 	protected static float X_OFFSET = 2, LABEL_HEIGHT = 0;
 
-	public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0,
-			height = 0;
-	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0,
-			borderHeight = 0;
+	public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0, height = 0;
+	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0, borderHeight = 0;
 
 	protected View parent;
 	protected List<View> children = new ArrayList<View>();
@@ -229,8 +227,7 @@ public class View implements Comparable<View> {
 	}
 
 	public boolean containsPoint(float x, float y) {
-		return x > this.x && x < this.x + width && y > this.y
-				&& y < this.y + height;
+		return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
 	}
 
 	public void setId(int id) {
@@ -256,8 +253,7 @@ public class View implements Comparable<View> {
 	protected void layoutChildren() {
 	}
 
-	public void clipWindow(int parentClipX, int parentClipY, int parentClipW,
-			int parentClipH) {
+	public void clipWindow(int parentClipX, int parentClipY, int parentClipW, int parentClipH) {
 		currClipX = (int) absoluteX;
 		currClipY = (int) (root.getHeight() - absoluteY - height);
 		currClipW = (int) width;
@@ -283,8 +279,7 @@ public class View implements Comparable<View> {
 	}
 
 	public void initAll() {
-		getGl().glClearColor(Colors.BG[0], Colors.BG[1], Colors.BG[2],
-				Colors.BG[3]);
+		getGl().glClearColor(Colors.BG[0], Colors.BG[1], Colors.BG[2], Colors.BG[3]);
 		init();
 		for (View child : children) {
 			child.initAll();
@@ -297,8 +292,7 @@ public class View implements Comparable<View> {
 		if (shouldClip) {
 			getGl().glEnable(GL10.GL_SCISSOR_TEST);
 			if (null != parent) {
-				clipWindow(parent.currClipX, parent.currClipY,
-						parent.currClipW, parent.currClipH);
+				clipWindow(parent.currClipX, parent.currClipY, parent.currClipW, parent.currClipH);
 			} else {
 				getGl().glDisable(GL10.GL_SCISSOR_TEST);
 			}
@@ -370,8 +364,8 @@ public class View implements Comparable<View> {
 				textHeight *= scaleRatio;
 			}
 
-			textMesh.setText(text, x + (nonIconWidth - textWidth) / 2,
-					absoluteY + (this.height - textHeight) / 2, textHeight);
+			textMesh.setText(text, x + (nonIconWidth - textWidth) / 2, absoluteY
+					+ (this.height - textHeight) / 2, textHeight);
 		}
 		minX = minY = bgRectRadius + BG_OFFSET;
 		maxX = this.width - bgRectRadius - BG_OFFSET;
@@ -420,8 +414,7 @@ public class View implements Comparable<View> {
 	}
 
 	protected final float distanceFromCenterSquared(float x, float y) {
-		return (x - width / 2) * (x - width / 2) + (y - height / 2)
-				* (y - height / 2);
+		return (x - width / 2) * (x - width / 2) + (y - height / 2) * (y - height / 2);
 	}
 
 	public float viewX(float x) {
@@ -491,16 +484,14 @@ public class View implements Comparable<View> {
 			shape.setColors(currResource.fillColor, strokeColor);
 		}
 
-		if (null == textureMesh && null != currResource
-				&& currResource.resourceId != -1) {
+		if (null == textureMesh && null != currResource && currResource.resourceId != -1) {
 			textureMesh = new TextureMesh(shapeGroup.getTextureGroup());
 		}
 		if (null == textMesh && !text.isEmpty()) {
 			textMesh = new TextMesh(shapeGroup.getTextGroup(), text);
 		}
 		if (null != textureMesh) {
-			textureMesh.setResource(null == currResource ? -1
-					: currResource.resourceId);
+			textureMesh.setResource(null == currResource ? -1 : currResource.resourceId);
 			textureMesh.setColor(Colors.WHITE);
 		}
 		if (null != textMesh) {

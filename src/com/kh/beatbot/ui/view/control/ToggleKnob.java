@@ -36,7 +36,7 @@ public class ToggleKnob extends Knob implements ParamToggleListener {
 		centerButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				((EffectParam)param).toggle(((ToggleButton)button).isChecked());
+				((EffectParam) param).toggle(((ToggleButton) button).isChecked());
 			}
 		});
 		// not adding center button as child, instead manually drawing and

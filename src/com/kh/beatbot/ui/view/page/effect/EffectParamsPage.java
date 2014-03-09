@@ -10,8 +10,7 @@ import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.param.KnobParamControl;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
 
-public class EffectParamsPage extends TouchableView implements ParamListener,
-		ParamToggleListener {
+public class EffectParamsPage extends TouchableView implements ParamListener, ParamToggleListener {
 	protected KnobParamControl[] paramControls;
 	protected Effect effect;
 
@@ -46,23 +45,21 @@ public class EffectParamsPage extends TouchableView implements ParamListener,
 			return;
 		paramControls = new KnobParamControl[effect.getNumParams()];
 		for (int i = 0; i < paramControls.length; i++) {
-			paramControls[i] = new KnobParamControl(shapeGroup,
-					effect.getParam(i).beatSyncable);
+			paramControls[i] = new KnobParamControl(shapeGroup, effect.getParam(i).beatSyncable);
 			paramControls[i].setId(i);
 		}
 		addChildren(paramControls);
-		
+
 		setEffect(effect);
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
 		int halfParams = (effect.getNumParams() + 1) / 2;
-		float paramW = effect.getNumParams() <= 3 ? width
-				/ effect.getNumParams() : width / halfParams;
+		float paramW = effect.getNumParams() <= 3 ? width / effect.getNumParams() : width
+				/ halfParams;
 		float paramH = 3 * paramW / 2;
-		float y = effect.getNumParams() <= 3 ? height / 2 - paramH / 2 : height
-				/ 2 - paramH;
+		float y = effect.getNumParams() <= 3 ? height / 2 - paramH / 2 : height / 2 - paramH;
 		for (int i = 0; i < effect.getNumParams(); i++) {
 			if (i == 3)
 				y += paramH;

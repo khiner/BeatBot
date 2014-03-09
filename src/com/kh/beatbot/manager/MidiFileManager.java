@@ -22,17 +22,13 @@ public class MidiFileManager {
 	private static AlertDialog confirmImportAlert, fileExistsAlert;
 
 	public static void init() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(
-				BeatBotActivity.mainActivity);
-		builder.setMessage("The file exists. Would you like to overwrite it?")
-				.setCancelable(false)
-				.setPositiveButton("Yes",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								completeExport();
-							}
-						})
-				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(BeatBotActivity.mainActivity);
+		builder.setMessage("The file exists. Would you like to overwrite it?").setCancelable(false)
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						completeExport();
+					}
+				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.cancel();
 					}
@@ -42,15 +38,12 @@ public class MidiFileManager {
 		builder = new AlertDialog.Builder(BeatBotActivity.mainActivity);
 		builder.setMessage(
 				"Are you sure you want to import this MIDI file? "
-						+ "Your current project will be lost.")
-				.setCancelable(false)
-				.setPositiveButton("Yes",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								completeImport();
-							}
-						})
-				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+						+ "Your current project will be lost.").setCancelable(false)
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						completeImport();
+					}
+				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.cancel();
 					}
@@ -101,20 +94,18 @@ public class MidiFileManager {
 
 	private static void completeImport() {
 		try {
-			MidiFile midiFile = new MidiFile(new FileInputStream(
-					getFullPathName(inFileName)));
+			MidiFile midiFile = new MidiFile(new FileInputStream(getFullPathName(inFileName)));
 			MidiManager.importFromFile(midiFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		Toast.makeText(BeatBotActivity.mainActivity.getApplicationContext(),
-				inFileName, Toast.LENGTH_SHORT).show();
+		Toast.makeText(BeatBotActivity.mainActivity.getApplicationContext(), inFileName,
+				Toast.LENGTH_SHORT).show();
 	}
 
 	private static String getFullPathName(String fileName) {
-		String fullPathName = FileManager.midiDirectory.getPath() + "/"
-				+ fileName;
+		String fullPathName = FileManager.midiDirectory.getPath() + "/" + fileName;
 		if (!fileName.toLowerCase().endsWith(".midi")) {
 			fullPathName = fullPathName.concat(".MIDI");
 		}

@@ -12,7 +12,7 @@ public class Mesh2D extends Mesh {
 		setNumVertices(numVertices);
 		setGroup(group);
 	}
-	
+
 	public Mesh2D(MeshGroup group, int numVertices, short[] indices) {
 		if (null != indices) {
 			customIndices = true;
@@ -35,7 +35,7 @@ public class Mesh2D extends Mesh {
 		group.vertex(this, index, x, y, color);
 		index++;
 	}
-	
+
 	public void resetIndex() {
 		index = 0;
 	}

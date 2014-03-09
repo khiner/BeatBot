@@ -32,8 +32,7 @@ public class BpmView extends ClickableView {
 		initRoundedRect();
 		for (int i = 0; i < numberSegments.length; i++) {
 			for (int j = 0; j < numberSegments[i].length; j++) {
-				numberSegments[i][j] = new NumberSegment(shapeGroup,
-						Colors.BPM_OFF, null);
+				numberSegments[i][j] = new NumberSegment(shapeGroup, Colors.BPM_OFF, null);
 			}
 		}
 	}
@@ -51,13 +50,10 @@ public class BpmView extends ClickableView {
 			float y = absoluteY + BG_OFFSET;
 			numberSegments[i][0].layout(x, y + longW / 2, longW, longH);
 			numberSegments[i][1].layout(x, y + height / 2, longW, longH);
-			numberSegments[i][2].layout(x + longW * 2, y + longW / 2, longW,
-					longH);
-			numberSegments[i][3].layout(x + longW * 2, y + height / 2, longW,
-					longH);
+			numberSegments[i][2].layout(x + longW * 2, y + longW / 2, longW, longH);
+			numberSegments[i][3].layout(x + longW * 2, y + height / 2, longW, longH);
 			numberSegments[i][4].layout(x, y, shortW, shortH);
-			numberSegments[i][5].layout(x, y + height / 2 - shortH / 2, shortW,
-					shortH);
+			numberSegments[i][5].layout(x, y + height / 2 - shortH / 2, shortW, shortH);
 			numberSegments[i][6].layout(x, y + height - shortH, shortW, shortH);
 		}
 	}

@@ -32,10 +32,8 @@ public class FontTextureAtlas extends TextureAtlas {
 		config.numRegions = CHAR_CNT;
 		config.regionIdOffset = CHAR_START;
 		config.bitmapConfig = Bitmap.Config.ALPHA_8;
-		config.cellHeight = (int) Math.ceil(Math.abs(fm.bottom)
-				+ Math.abs(fm.top));
-		config.textureYOffset = config.cellHeight
-				- (float) Math.ceil(Math.abs(fm.descent)) - 1;
+		config.cellHeight = (int) Math.ceil(Math.abs(fm.bottom) + Math.abs(fm.top));
+		config.textureYOffset = config.cellHeight - (float) Math.ceil(Math.abs(fm.descent)) - 1;
 		config.textureSize = calcTextureSize(config.cellHeight);
 	}
 
@@ -64,8 +62,7 @@ public class FontTextureAtlas extends TextureAtlas {
 	protected void drawTextureRegion(int regionId, float x, float y) {
 		paint.getTextWidths(String.valueOf((char) regionId), W);
 		CHAR_WIDTHS[regionId - CHAR_START] = W[0];
-		config.cellWidth = (int) Math.max(config.cellWidth,
-				CHAR_WIDTHS[regionId - CHAR_START]);
+		config.cellWidth = (int) Math.max(config.cellWidth, CHAR_WIDTHS[regionId - CHAR_START]);
 		canvas.drawText(String.valueOf((char) regionId), x, y, paint);
 	}
 

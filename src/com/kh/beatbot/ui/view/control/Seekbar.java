@@ -36,21 +36,19 @@ public class Seekbar extends ControlView1dBase {
 		foregroundRect.setCornerRadius(levelBarHeight / 2);
 		backgroundRect.setCornerRadius(levelBarHeight / 2);
 
-		backgroundRect.layout(absoluteX + levelBarHeight, absoluteY
-				+ (height - levelBarHeight) / 2, width - levelBarHeight * 2,
+		backgroundRect.layout(absoluteX + levelBarHeight,
+				absoluteY + (height - levelBarHeight) / 2, width - levelBarHeight * 2,
 				levelBarHeight);
-		foregroundRect.layout(absoluteX + levelBarHeight, absoluteY
-				+ (height - levelBarHeight) / 2, width - levelBarHeight * 2,
+		foregroundRect.layout(absoluteX + levelBarHeight,
+				absoluteY + (height - levelBarHeight) / 2, width - levelBarHeight * 2,
 				levelBarHeight);
 		levelCircle.setDimensions(levelBarHeight * 2.5f, levelBarHeight * 2.5f);
 	}
 
 	public void onParamChanged(Param param) {
-		float w = levelBarHeight + param.viewLevel
-				* (width - levelBarHeight * 3);
+		float w = levelBarHeight + param.viewLevel * (width - levelBarHeight * 3);
 		foregroundRect.setDimensions(w, levelBarHeight);
-		levelCircle.setPosition(absoluteX + w + levelCircle.width / 4,
-				absoluteY + height / 2);
+		levelCircle.setPosition(absoluteX + w + levelCircle.width / 4, absoluteY + height / 2);
 	}
 
 	protected float posToLevel(float x, float y) {

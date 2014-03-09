@@ -25,8 +25,7 @@ public class ResourceTextureAtlas extends TextureAtlas {
 
 		config.textureYOffset = 0;
 		// assume all resources are squares of the same width
-		config.textureSize = (int) Math.ceil(Math.sqrt(RESOURCE_IDS.length))
-				* config.cellWidth;
+		config.textureSize = (int) Math.ceil(Math.sqrt(RESOURCE_IDS.length)) * config.cellWidth;
 	}
 
 	public void load(Activity activity) {
@@ -36,8 +35,7 @@ public class ResourceTextureAtlas extends TextureAtlas {
 
 	@Override
 	protected void drawTextureRegion(int regionId, float x, float y) {
-		Bitmap resourceBitmap = BitmapFactory.decodeResource(resources,
-				regionId);
+		Bitmap resourceBitmap = BitmapFactory.decodeResource(resources, regionId);
 		canvas.drawBitmap(resourceBitmap, x, y, paint);
 	}
 

@@ -35,8 +35,7 @@ public class Button extends LongPressableView {
 		this.releaseListener = releaseListener;
 	}
 
-	public final void setOnLongPressListener(
-			OnLongPressListener longPressListener) {
+	public final void setOnLongPressListener(OnLongPressListener longPressListener) {
 		this.longPressListener = longPressListener;
 	}
 
@@ -115,11 +114,13 @@ public class Button extends LongPressableView {
 		}
 		// x / y are relative to this view but containsPoint is absolute
 		if (!containsPoint(this.x + x, this.y + y)) {
-			if (isPressed()) { // pointer dragged away from button - signal release
+			if (isPressed()) { // pointer dragged away from button - signal
+								// release
 				release();
 			}
 		} else { // pointer inside button
-			if (!isPressed()) { // pointer was dragged away and back IN to button
+			if (!isPressed()) { // pointer was dragged away and back IN to
+								// button
 				press();
 			}
 		}
@@ -131,7 +132,7 @@ public class Button extends LongPressableView {
 			longPressListener.onLongPress(this);
 		}
 	}
-	
+
 	@Override
 	protected synchronized void stateChanged() {
 		IconResource resource = getIconResource();

@@ -10,7 +10,7 @@ public class SeekbarParamControl extends LevelParamControl {
 	}
 
 	@Override
-	public synchronized void createChildren(){
+	public synchronized void createChildren() {
 		super.createChildren();
 		levelControl = new Seekbar(shapeGroup);
 		addChild(levelControl);

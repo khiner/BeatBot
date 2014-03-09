@@ -14,8 +14,7 @@ public class IconResourceSet {
 	public IconResourceSet(IconResourceSet resourceSet) {
 		for (State state : State.values()) {
 			IconResource otherResource = resourceSet.getResource(state);
-			resources.put(state,
-					otherResource == null ? null : otherResource.copy());
+			resources.put(state, otherResource == null ? null : otherResource.copy());
 		}
 	}
 
@@ -23,19 +22,17 @@ public class IconResourceSet {
 		this(defaultResource, null);
 	}
 
-	public IconResourceSet(IconResource defaultResource,
-			IconResource pressedResource) {
+	public IconResourceSet(IconResource defaultResource, IconResource pressedResource) {
 		this(defaultResource, pressedResource, null);
 	}
 
-	public IconResourceSet(IconResource defaultResource,
-			IconResource pressedResource, IconResource selectedResource) {
+	public IconResourceSet(IconResource defaultResource, IconResource pressedResource,
+			IconResource selectedResource) {
 		this(defaultResource, pressedResource, selectedResource, null);
 	}
 
-	public IconResourceSet(IconResource defaultResource,
-			IconResource pressedResource, IconResource selectedResource,
-			IconResource disabledResource) {
+	public IconResourceSet(IconResource defaultResource, IconResource pressedResource,
+			IconResource selectedResource, IconResource disabledResource) {
 		resources.put(State.DEFAULT, defaultResource);
 		resources.put(State.PRESSED, pressedResource);
 		resources.put(State.SELECTED, selectedResource);
@@ -48,8 +45,7 @@ public class IconResourceSet {
 
 	public synchronized void setFillColors(IconResourceSet resourceSet) {
 		for (Entry<State, IconResource> resourcePair : resources.entrySet()) {
-			IconResource otherResource = resourceSet.getResource(resourcePair
-					.getKey());
+			IconResource otherResource = resourceSet.getResource(resourcePair.getKey());
 			IconResource resource = resourcePair.getValue();
 			if (null != resource && null != otherResource) {
 				resource.fillColor = otherResource.fillColor;
@@ -59,8 +55,7 @@ public class IconResourceSet {
 
 	public synchronized void setStrokeColors(IconResourceSet resourceSet) {
 		for (Entry<State, IconResource> resourcePair : resources.entrySet()) {
-			IconResource otherResource = resourceSet.getResource(resourcePair
-					.getKey());
+			IconResource otherResource = resourceSet.getResource(resourcePair.getKey());
 			IconResource resource = resourcePair.getValue();
 			if (null != resource && null != otherResource) {
 				resource.strokeColor = otherResource.strokeColor;
@@ -72,10 +67,9 @@ public class IconResourceSet {
 		for (Entry<State, IconResource> resourcePair : resources.entrySet()) {
 			IconResource resource = resourcePair.getValue();
 			if (null != resource) {
-				IconResource otherResource = null == resourceSet ? null
-						: resourceSet.getResource(resourcePair.getKey());
-				resource.resourceId = null == otherResource ? -1
-						: otherResource.resourceId;
+				IconResource otherResource = null == resourceSet ? null : resourceSet
+						.getResource(resourcePair.getKey());
+				resource.resourceId = null == otherResource ? -1 : otherResource.resourceId;
 			}
 		}
 	}

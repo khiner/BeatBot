@@ -32,8 +32,8 @@ import com.kh.beatbot.ui.view.page.MainPage;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
 public class BeatBotActivity extends Activity {
-	public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1,
-			SAMPLE_NAME_EDIT_DIALOG_ID = 2, MIDI_FILE_NAME_EDIT_DIALOG_ID = 3;
+	public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1, SAMPLE_NAME_EDIT_DIALOG_ID = 2,
+			MIDI_FILE_NAME_EDIT_DIALOG_ID = 3;
 
 	private static final String MAIN_PAGE_ID = "main", EFFECT_PAGE_ID = "effect";
 
@@ -66,8 +66,7 @@ public class BeatBotActivity extends Activity {
 		TextureAtlas.resource.load(this);
 
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.FILL_PARENT,
-				LinearLayout.LayoutParams.FILL_PARENT);
+				LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
 
 		FileManager.init();
 		MidiFileManager.init();
@@ -101,7 +100,7 @@ public class BeatBotActivity extends Activity {
 				activityPager.initGl();
 
 				arm();
-				
+
 				setupProject();
 			}
 		});
@@ -143,8 +142,7 @@ public class BeatBotActivity extends Activity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putBoolean("playing",
-				PlaybackManager.getState() == PlaybackManager.State.PLAYING);
+		outState.putBoolean("playing", PlaybackManager.getState() == PlaybackManager.State.PLAYING);
 	}
 
 	@Override
@@ -172,95 +170,68 @@ public class BeatBotActivity extends Activity {
 			bpmInput = new EditText(this);
 
 			bpmInput.setKeyListener(DigitsKeyListener.getInstance("0123456789"));
-			builder.setTitle("Set BPM")
-					.setView(bpmInput)
-					.setPositiveButton("OK",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									String bpmString = bpmInput.getText()
-											.toString();
-									if (!bpmString.isEmpty()) {
-										View.mainPage.pageSelectGroup
-												.setBPM(Integer
-														.valueOf(bpmString));
-									}
-								}
-							})
-					.setNegativeButton("Cancel",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									dialog.cancel();
-								}
-							});
+			builder.setTitle("Set BPM").setView(bpmInput)
+					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							String bpmString = bpmInput.getText().toString();
+							if (!bpmString.isEmpty()) {
+								View.mainPage.pageSelectGroup.setBPM(Integer.valueOf(bpmString));
+							}
+						}
+					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.cancel();
+						}
+					});
 			break;
 		case SAMPLE_NAME_EDIT_DIALOG_ID:
 			sampleNameInput = new EditText(this);
 
-			builder.setTitle("Edit Sample Name")
-					.setView(sampleNameInput)
-					.setPositiveButton("OK",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									String sampleName = sampleNameInput
-											.getText().toString();
-									new SampleRenameEvent(fileToEdit,
-											sampleName).execute();
-								}
-							})
-					.setNegativeButton("Cancel",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									dialog.cancel();
-								}
-							});
+			builder.setTitle("Edit Sample Name").setView(sampleNameInput)
+					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							String sampleName = sampleNameInput.getText().toString();
+							new SampleRenameEvent(fileToEdit, sampleName).execute();
+						}
+					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.cancel();
+						}
+					});
 			break;
 		case MIDI_FILE_NAME_EDIT_DIALOG_ID:
 			midiFileNameInput = new EditText(this);
 
-			builder.setTitle("Save MIDI as:")
-					.setView(midiFileNameInput)
-					.setPositiveButton("OK",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									String midiFileName = midiFileNameInput
-											.getText().toString();
-									MidiFileManager.exportMidi(midiFileName);
-								}
-							})
-					.setNegativeButton("Cancel",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									dialog.cancel();
-								}
-							});
+			builder.setTitle("Save MIDI as:").setView(midiFileNameInput)
+					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							String midiFileName = midiFileNameInput.getText().toString();
+							MidiFileManager.exportMidi(midiFileName);
+						}
+					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.cancel();
+						}
+					});
 			break;
 
 		case EXIT_DIALOG_ID:
 			builder.setIcon(android.R.drawable.ic_dialog_alert)
 					.setTitle("Closing " + getString(R.string.app_name))
 					.setMessage(
-							"Are you sure you want to exit "
-									+ getString(R.string.app_name) + "?")
-					.setPositiveButton("Yes",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									finish();
-								}
-							}).setNegativeButton("No", null);
+							"Are you sure you want to exit " + getString(R.string.app_name) + "?")
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					}).setNegativeButton("No", null);
 			break;
 		}
 

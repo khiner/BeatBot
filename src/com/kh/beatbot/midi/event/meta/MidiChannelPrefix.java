@@ -28,8 +28,7 @@ public class MidiChannelPrefix extends MetaEvent {
 	private int mChannel;
 
 	public MidiChannelPrefix(long tick, long delta, int channel) {
-		super(tick, delta, MetaEvent.MIDI_CHANNEL_PREFIX,
-				new VariableLengthInt(4));
+		super(tick, delta, MetaEvent.MIDI_CHANNEL_PREFIX, new VariableLengthInt(4));
 
 		mChannel = channel;
 	}
@@ -55,8 +54,8 @@ public class MidiChannelPrefix extends MetaEvent {
 		out.write(mChannel);
 	}
 
-	public static MidiChannelPrefix parseMidiChannelPrefix(long tick,
-			long delta, InputStream in) throws IOException {
+	public static MidiChannelPrefix parseMidiChannelPrefix(long tick, long delta, InputStream in)
+			throws IOException {
 
 		in.read(); // Size = 1;
 		int channel = in.read();

@@ -10,9 +10,8 @@ public class EffectParam extends Param {
 	public boolean hz, beatSyncable, logScale;
 	private boolean beatSync;
 
-	public EffectParam(int id, String name, String unitString, float addValue,
-			float scaleValue, float logScaleValue, boolean logScale,
-			boolean beatSyncable) {
+	public EffectParam(int id, String name, String unitString, float addValue, float scaleValue,
+			float logScaleValue, boolean logScale, boolean beatSyncable) {
 		super(id, name, unitString, addValue, scaleValue);
 		this.name = name;
 		this.unitString = unitString;
@@ -25,8 +24,8 @@ public class EffectParam extends Param {
 		setLevel(0.5f);
 	}
 
-	public EffectParam(int id, String name, String unitString,
-			boolean logScale, boolean beatSyncable) {
+	public EffectParam(int id, String name, String unitString, boolean logScale,
+			boolean beatSyncable) {
 		this(id, name, unitString, 0, 1, 8, logScale, beatSyncable);
 	}
 
@@ -43,8 +42,7 @@ public class EffectParam extends Param {
 		if (beatSync) {
 			this.level = quantizeToBeat(level);
 		} else {
-			this.level = addValue + scaleValue
-					* (logScale ? logScaleLevel(level) : level);
+			this.level = addValue + scaleValue * (logScale ? logScaleLevel(level) : level);
 		}
 		notifyListeners();
 	}
@@ -60,8 +58,7 @@ public class EffectParam extends Param {
 	}
 
 	private float logScaleLevel(float level) {
-		float scaled = (float) (Math.pow(logScaleValue + 1, level) - 1)
-				/ logScaleValue;
+		float scaled = (float) (Math.pow(logScaleValue + 1, level) - 1) / logScaleValue;
 		if (hz)
 			scaled *= 32;
 		return scaled;
@@ -76,8 +73,7 @@ public class EffectParam extends Param {
 
 	private synchronized void notifyToggleListeners() {
 		for (ParamListener listener : listeners) {
-			if (listener instanceof ParamToggleListener
-					&& !ignoredListeners.contains(listener)) {
+			if (listener instanceof ParamToggleListener && !ignoredListeners.contains(listener)) {
 				((ParamToggleListener) listener).onParamToggled(this);
 			}
 		}

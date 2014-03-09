@@ -146,8 +146,7 @@ public class MidiFile {
 		mType = mTrackCount > 1 ? 1 : 0;
 	}
 
-	public void writeToFile(File outFile) throws FileNotFoundException,
-			IOException {
+	public void writeToFile(File outFile) throws FileNotFoundException, IOException {
 
 		FileOutputStream fout = new FileOutputStream(outFile);
 

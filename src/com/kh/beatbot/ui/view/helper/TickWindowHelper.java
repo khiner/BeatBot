@@ -13,8 +13,8 @@ public class TickWindowHelper {
 
 	private static MidiView midiView = null;
 
-	public static final int NUM_VERTICAL_LINE_SETS = 8,
-			MIN_LINES_DISPLAYED = 8, MAX_LINES_DISPLAYED = 32;
+	public static final int NUM_VERTICAL_LINE_SETS = 8, MIN_LINES_DISPLAYED = 8,
+			MAX_LINES_DISPLAYED = 32;
 
 	public static float scrollAnchorTick = 0, scrollAnchorY = 0;
 
@@ -87,8 +87,7 @@ public class TickWindowHelper {
 	}
 
 	public static void scroll(float x, float y) {
-		float newTickOffset = scrollAnchorTick - currNumTicks * x
-				/ midiView.width;
+		float newTickOffset = scrollAnchorTick - currNumTicks * x / midiView.width;
 		float newYOffset = scrollAnchorY - y;
 		ScrollBarHelper.scrollXVelocity = newTickOffset - currTickOffset;
 		ScrollBarHelper.scrollYVelocity = newYOffset - currYOffset;
@@ -118,10 +117,8 @@ public class TickWindowHelper {
 	public static void setYOffset(float yOffset) {
 		if (yOffset < 0) {
 			currYOffset = 0;
-		} else if (yOffset + midiView.getMidiHeight() > midiView
-				.getTotalTrackHeight()) {
-			currYOffset = midiView.getTotalTrackHeight()
-					- midiView.getMidiHeight();
+		} else if (yOffset + midiView.getMidiHeight() > midiView.getTotalTrackHeight()) {
+			currYOffset = midiView.getTotalTrackHeight() - midiView.getMidiHeight();
 		} else {
 			currYOffset = yOffset;
 		}
@@ -139,8 +136,7 @@ public class TickWindowHelper {
 
 	public static void updateView(float leftTick, float rightTick) {
 		// if we are dragging out of view, scroll appropriately
-		if (leftTick <= currTickOffset
-				&& rightTick >= currTickOffset + currNumTicks) {
+		if (leftTick <= currTickOffset && rightTick >= currTickOffset + currNumTicks) {
 			setTickOffset(leftTick);
 			setNumTicks(rightTick - leftTick);
 		} else if (leftTick < currTickOffset) {
@@ -154,18 +150,15 @@ public class TickWindowHelper {
 	// bottomY are all in view
 	public static void updateView(float tick, float topY, float bottomY) {
 		updateView(tick);
-		if (topY < currYOffset
-				&& bottomY < currYOffset + midiView.getMidiHeight()) {
+		if (topY < currYOffset && bottomY < currYOffset + midiView.getMidiHeight()) {
 			setYOffset(topY);
-		} else if (bottomY > currYOffset + midiView.getMidiHeight()
-				&& topY > currYOffset) {
+		} else if (bottomY > currYOffset + midiView.getMidiHeight() && topY > currYOffset) {
 			setYOffset(bottomY - midiView.getMidiHeight());
 		}
 	}
 
 	private static void setNumTicks(float numTicks) {
-		if (numTicks > MidiManager.MAX_TICKS
-				|| numTicks < MidiManager.MIN_TICKS) {
+		if (numTicks > MidiManager.MAX_TICKS || numTicks < MidiManager.MIN_TICKS) {
 			return;
 		}
 		currNumTicks = numTicks;
@@ -174,8 +167,7 @@ public class TickWindowHelper {
 
 	private static void updateGranularity() {
 		// x-coord width of one quarter note
-		float spacing = (MidiManager.TICKS_IN_ONE_MEASURE * midiView.width)
-				/ (currNumTicks * 8);
+		float spacing = (MidiManager.TICKS_IN_ONE_MEASURE * midiView.width) / (currNumTicks * 8);
 		// after algebra, this condition says: if more than maxLines will
 		// display, reduce the granularity by one half, else if less than
 		// maxLines will display, increase the granularity by one half
@@ -183,8 +175,7 @@ public class TickWindowHelper {
 		// maxLinesDisplayed) at all times
 		if ((MAX_LINES_DISPLAYED * spacing * 2) / MidiManager.getBeatDivision() < midiView.width)
 			MidiManager.decreaseBeatDivision();
-		else if ((MIN_LINES_DISPLAYED * spacing * 2)
-				/ MidiManager.getBeatDivision() > midiView.width)
+		else if ((MIN_LINES_DISPLAYED * spacing * 2) / MidiManager.getBeatDivision() > midiView.width)
 			MidiManager.increaseBeatDivision();
 		updateVerticalLineColors();
 	}
@@ -193,8 +184,7 @@ public class TickWindowHelper {
 		long minTickSpacing = (long) (MidiManager.MIN_TICKS / 8);
 		long[] tickSpacings = new long[NUM_VERTICAL_LINE_SETS];
 		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
-			tickSpacings[i] = minTickSpacing
-					* (1 << (NUM_VERTICAL_LINE_SETS - i - 1));
+			tickSpacings[i] = minTickSpacing * (1 << (NUM_VERTICAL_LINE_SETS - i - 1));
 			vLines[i] = new ArrayList<Line>();
 		}
 		for (long currTick = 0; currTick < MidiManager.MAX_TICKS; currTick += minTickSpacing) {

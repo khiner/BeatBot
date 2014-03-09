@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.shape;
 
-
 public class Line extends Shape {
 
 	public Line(ShapeGroup group, float[] fillColor, float[] strokeColor) {

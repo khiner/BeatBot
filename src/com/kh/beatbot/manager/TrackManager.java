@@ -46,8 +46,7 @@ public class TrackManager implements TrackListener {
 			final TrackCreateEvent trackCreateEvent = new TrackCreateEvent();
 			trackCreateEvent.doExecute();
 			trackCreateEvent.updateUi();
-			tracks.get(tracks.size() - 1).setSample(
-					drumDirectory.listFiles()[0]);
+			tracks.get(tracks.size() - 1).setSample(drumDirectory.listFiles()[0]);
 		}
 	}
 

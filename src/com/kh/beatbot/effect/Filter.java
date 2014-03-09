@@ -8,13 +8,13 @@ import com.kh.beatbot.manager.PlaybackManager;
 public class Filter extends Effect {
 	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.filter);
 	public static final int EFFECT_NUM = 3, NUM_PARAMS = 4;
-	
+
 	private int mode = 0;
-	
+
 	public Filter(BaseTrack track) {
 		super(track);
 	}
-	
+
 	public Filter(BaseTrack track, int position) {
 		super(track, position);
 	}
@@ -26,7 +26,7 @@ public class Filter extends Effect {
 	public String getName() {
 		return NAME;
 	}
-	
+
 	public int getMode() {
 		return mode;
 	}
@@ -35,7 +35,7 @@ public class Filter extends Effect {
 		this.mode = mode;
 		setEffectParam(track.getId(), position, 4, mode);
 	}
-	
+
 	@Override
 	protected void initParams() {
 		params.add(new EffectParam(0, "Freq", "Hz", true, false));

@@ -11,21 +11,20 @@ public class TextureMesh extends Mesh {
 		setGroup(group);
 	}
 
-	public synchronized void setResource(int resourceId, float x, float y,
-			float width, float height, float[] color) {
+	public synchronized void setResource(int resourceId, float x, float y, float width,
+			float height, float[] color) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
 
-		((TextureGroup) group).setResource(this, resourceId, x, y, width,
-				height, color);
+		((TextureGroup) group).setResource(this, resourceId, x, y, width, height, color);
 	}
-	
+
 	public synchronized void setResource(int resourceId) {
 		((TextureGroup) group).setResource(this, resourceId);
 	}
-	
+
 	@Override
 	public synchronized boolean layout(float x, float y, float width, float height) {
 		this.x = x;

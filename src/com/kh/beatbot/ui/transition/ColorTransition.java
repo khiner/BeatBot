@@ -4,8 +4,8 @@ public class ColorTransition extends Transition {
 
 	private float[] color, beginColor, endColor;
 
-	public ColorTransition(long durationInFrames, long waitFrames,
-			float[] beginColor, float[] endColor) {
+	public ColorTransition(long durationInFrames, long waitFrames, float[] beginColor,
+			float[] endColor) {
 		super(durationInFrames, waitFrames);
 		this.beginColor = beginColor;
 		this.endColor = endColor;

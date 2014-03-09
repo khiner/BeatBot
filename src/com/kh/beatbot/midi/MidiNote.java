@@ -57,12 +57,10 @@ public class MidiNote implements Comparable<MidiNote> {
 	}
 
 	public MidiNote getCopy() {
-		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0,
-				noteOn.getNoteValue(), noteOn.getVelocity(), noteOn.getPan(),
-				noteOn.getPitch());
-		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0,
-				noteOff.getNoteValue(), noteOff.getVelocity(),
-				noteOff.getPan(), noteOn.getPitch());
+		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0, noteOn.getNoteValue(),
+				noteOn.getVelocity(), noteOn.getPan(), noteOn.getPitch());
+		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0, noteOff.getNoteValue(),
+				noteOff.getVelocity(), noteOff.getPan(), noteOn.getPitch());
 		MidiNote copy = new MidiNote(noteOnCopy, noteOffCopy);
 		copy.setSelected(selected);
 		copy.setTouched(touched);
@@ -115,8 +113,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		if (this.selected == selected)
 			return;
 		this.selected = selected;
-		View.mainPage.controlButtonGroup.setEditIconsEnabled(MidiManager
-				.anyNoteSelected());
+		View.mainPage.controlButtonGroup.setEditIconsEnabled(MidiManager.anyNoteSelected());
 		View.mainPage.midiView.updateNoteViewSelected(this); // color change
 
 	}

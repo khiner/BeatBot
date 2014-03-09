@@ -62,8 +62,8 @@ public class LevelsPage extends TouchableView implements ControlViewListener {
 		panLevelBar.setListener(this);
 		pitchLevelBar.setListener(this);
 
-		addChildren(volumeButton, panButton, pitchButton, volumeLevelBar,
-				panLevelBar, pitchLevelBar);
+		addChildren(volumeButton, panButton, pitchButton, volumeLevelBar, panLevelBar,
+				pitchLevelBar);
 	}
 
 	@Override
@@ -73,15 +73,12 @@ public class LevelsPage extends TouchableView implements ControlViewListener {
 		float toggleWidth = 2 * toggleHeight;
 		volumeButton.layout(this, 0, 0, toggleWidth, toggleHeight);
 		panButton.layout(this, 0, toggleHeight, toggleWidth, toggleHeight);
-		pitchButton
-				.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
+		pitchButton.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
 
-		volumeLevelBar.layout(this, toggleWidth, 0, width - toggleWidth,
-				toggleHeight);
-		panLevelBar.layout(this, toggleWidth, toggleHeight,
-				width - toggleWidth, toggleHeight);
-		pitchLevelBar.layout(this, toggleWidth, toggleHeight * 2, width
-				- toggleWidth, toggleHeight);
+		volumeLevelBar.layout(this, toggleWidth, 0, width - toggleWidth, toggleHeight);
+		panLevelBar.layout(this, toggleWidth, toggleHeight, width - toggleWidth, toggleHeight);
+		pitchLevelBar
+				.layout(this, toggleWidth, toggleHeight * 2, width - toggleWidth, toggleHeight);
 	}
 
 	@Override

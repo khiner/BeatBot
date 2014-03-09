@@ -29,13 +29,13 @@ public class ChannelEvent extends MidiEvent {
 	protected float pan;
 	protected float pitch;
 
-	protected ChannelEvent(long tick, int type, int channel, int note,
-			float velocity, float pan, float pitch) {
+	protected ChannelEvent(long tick, int type, int channel, int note, float velocity, float pan,
+			float pitch) {
 		this(tick, 0, type, channel, note, velocity, pan, pitch);
 	}
 
-	protected ChannelEvent(long tick, long delta, int type, int channel,
-			int note, float velocity, float pan, float pitch) {
+	protected ChannelEvent(long tick, long delta, int type, int channel, int note, float velocity,
+			float pan, float pitch) {
 		super(tick, delta);
 
 		mType = type & 0x0F;
@@ -143,8 +143,7 @@ public class ChannelEvent extends MidiEvent {
 	}
 
 	@Override
-	public void writeToFile(OutputStream out, boolean writeType)
-			throws IOException {
+	public void writeToFile(OutputStream out, boolean writeType) throws IOException {
 		super.writeToFile(out, writeType);
 
 		if (writeType) {
@@ -161,8 +160,8 @@ public class ChannelEvent extends MidiEvent {
 		}
 	}
 
-	public static ChannelEvent parseChannelEvent(long tick, long delta,
-			int type, int channel, InputStream in) throws IOException {
+	public static ChannelEvent parseChannelEvent(long tick, long delta, int type, int channel,
+			InputStream in) throws IOException {
 
 		int note = in.read();
 		float velocity = (float) in.read() / (float) LEVEL_MAX;
@@ -174,8 +173,7 @@ public class ChannelEvent extends MidiEvent {
 		case NOTE_ON:
 			return new NoteOn(tick, delta, channel, note, velocity, pan, .5f);
 		default:
-			return new ChannelEvent(tick, delta, type, channel, note, velocity,
-					pan, .5f);
+			return new ChannelEvent(tick, delta, type, channel, note, velocity, pan, .5f);
 		}
 	}
 

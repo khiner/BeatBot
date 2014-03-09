@@ -13,13 +13,13 @@ public class Param {
 	public int id;
 	public String unitString, name, format = "%.2f";
 	public float level, viewLevel, addValue, scaleValue;
-	
+
 	public float minViewLevel = 0, maxViewLevel = 1;
 
 	public Param(int id, String name, String unitString) {
 		this(id, name, unitString, 0, 1);
 	}
-	
+
 	public Param(int id, String name, String unitString, float addValue, float scaleValue) {
 		this.id = id;
 		this.name = name;
@@ -28,18 +28,18 @@ public class Param {
 		this.unitString = unitString;
 		setLevel(0.5f);
 	}
-	
+
 	public void setLevel(float level) {
 		level = GeneralUtils.clipTo(level, minViewLevel, maxViewLevel);
 		viewLevel = level;
 		this.level = addValue + scaleValue * level;
 		notifyListeners();
 	}
-	
+
 	public float getLevel(float value) {
 		return addValue + scaleValue * value;
 	}
-	
+
 	public float getViewLevel(float value) {
 		return (value - addValue) / scaleValue;
 	}
@@ -47,7 +47,7 @@ public class Param {
 	public void setFormat(String format) {
 		this.format = format;
 	}
-	
+
 	public String getFormattedValue() {
 		String formattedValue = String.format(format, level);
 		if (!unitString.isEmpty()) {
@@ -55,19 +55,19 @@ public class Param {
 		}
 		return formattedValue;
 	}
-	
+
 	public synchronized void addListener(ParamListener listener) {
 		listeners.add(listener);
 	}
-	
+
 	public synchronized void removeListener(ParamListener listener) {
 		listeners.remove(listener);
 	}
-	
+
 	public synchronized void ignoreListener(ParamListener listener) {
 		ignoredListeners.add(listener);
 	}
-	
+
 	public synchronized void unignoreListener(ParamListener listener) {
 		ignoredListeners.remove(listener);
 	}

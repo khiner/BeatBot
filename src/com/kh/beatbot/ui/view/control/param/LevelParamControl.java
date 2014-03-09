@@ -20,7 +20,7 @@ public abstract class LevelParamControl extends ParamControl {
 		super.setId(id);
 		levelControl.setId(id);
 	}
-	
+
 	public void setParam(Param param) {
 		super.setParam(param);
 		levelControl.setParam(param);

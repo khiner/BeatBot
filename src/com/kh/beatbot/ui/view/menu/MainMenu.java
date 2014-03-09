@@ -26,8 +26,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	private class PhysicsState {
 		private Menu menu;
 
-		private final float SPRING_CONST = .1f, DAMP = .65f,
-				STOP_THRESH = 0.001f;
+		private final float SPRING_CONST = .1f, DAMP = .65f, STOP_THRESH = 0.001f;
 
 		private float velocity = 0, downXOffset = 0, lastX = 0, goalX = 0;
 		private boolean snap = true;
@@ -56,15 +55,13 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		}
 	}
 
-	private MenuItem fileItem, settingsItem, snapToGridItem, midiImportItem,
-			midiExportItem;
+	private MenuItem fileItem, settingsItem, snapToGridItem, midiImportItem, midiExportItem;
 
 	private SlideTab tab;
 	private PhysicsState physicsState;
 
 	private float menuOffset = MidiView.Y_OFFSET / 4;
 	private boolean menuPressed = false;
-
 
 	private Rectangle foregroundRect;
 	private static float[] fillColor = Colors.TRANSPARENT.clone();
@@ -76,10 +73,8 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		setIcon(IconResourceSets.SLIDE_MENU);
 
 		fileItem = new MenuItem(this, null, new ToggleButton(shapeGroup, false));
-		settingsItem = new MenuItem(this, null, new ToggleButton(shapeGroup,
-				false));
-		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton(
-				shapeGroup, true));
+		settingsItem = new MenuItem(this, null, new ToggleButton(shapeGroup, false));
+		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton(shapeGroup, true));
 		midiImportItem = new FileMenuItem(this, fileItem, new File(
 				FileManager.midiDirectory.getPath()));
 		midiExportItem = new MenuItem(this, fileItem, new Button(shapeGroup));
@@ -191,8 +186,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 
 		tab.layout(x - mainPage.width + width, menuOffset / 2, columnWidth,
 				MainPage.controlButtonHeight + menuOffset * 2);
-		textureMesh.layout(x + width + menuOffset * 2, menuOffset / 2,
-				tab.height, tab.height);
+		textureMesh.layout(x + width + menuOffset * 2, menuOffset / 2, tab.height, tab.height);
 
 		fillColor[3] = GeneralUtils.clipToUnit(textureMesh.x / width) * .75f;
 		foregroundRect.setFillColor(fillColor);

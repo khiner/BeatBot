@@ -18,7 +18,7 @@ public class TrackCreateEvent implements Executable, Stateful {
 	public void doUndo() {
 		if (createdTrack != null) {
 			TrackDestroyEvent trackDestroyEvent = new TrackDestroyEvent(createdTrack);
-			trackDestroyEvent.doExecute(); 
+			trackDestroyEvent.doExecute();
 		}
 	}
 

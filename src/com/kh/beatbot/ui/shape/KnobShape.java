@@ -8,8 +8,7 @@ public class KnobShape extends Shape {
 	private int colorChangeVertex = 0;
 
 	public KnobShape(ShapeGroup group, float[] fillColor, float[] strokeColor) {
-		super(group, fillColor, strokeColor, FILL_INDICES, null,
-				NUM_FILL_VERTICES, 0);
+		super(group, fillColor, strokeColor, FILL_INDICES, null, NUM_FILL_VERTICES, 0);
 	}
 
 	private static short[] getFillIndices() {
@@ -41,15 +40,15 @@ public class KnobShape extends Shape {
 		if ((colorChangeVertex & 1) == 1) { // odd
 			colorChangeVertex += 1; // ccv should be even
 		}
-		
+
 		setFillColor(fillColor);
 	}
 
 	private void vertex(int i, float theta, float radius) {
-		fillVertex(x + (float) Math.cos(theta) * radius + width / 2, y
-				+ (float) Math.sin(theta) * radius + width / 2);
+		fillVertex(x + (float) Math.cos(theta) * radius + width / 2, y + (float) Math.sin(theta)
+				* radius + width / 2);
 	}
-	
+
 	public synchronized void setFillColor(float[] fillColor) {
 		this.fillColor = fillColor;
 

@@ -10,7 +10,7 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 public class DelayParamsPage extends EffectParamsPage {
 
 	private ToggleButton linkToggle;
-	
+
 	public DelayParamsPage(Delay delay) {
 		super(delay);
 	}
@@ -35,7 +35,7 @@ public class DelayParamsPage extends EffectParamsPage {
 					((Delay) effect).rightChannelLevelMemory = newRightChannelLevel;
 					newRightChannelSynced = effect.getParam(0).isBeatSync();
 					newRightChannelLevel = effect.getParam(0).viewLevel;
-				} else if (((Delay) effect).rightChannelLevelMemory >= 0){
+				} else if (((Delay) effect).rightChannelLevelMemory >= 0) {
 					newRightChannelSynced = ((Delay) effect).rightChannelBeatSyncMemory;
 					newRightChannelLevel = ((Delay) effect).rightChannelLevelMemory;
 				}
@@ -60,16 +60,13 @@ public class DelayParamsPage extends EffectParamsPage {
 		float paramH = (height - paramY) / 2 - 10;
 		float paramW = 2 * paramH / 3;
 
-		paramControls[0].layout(this, width / 2 - paramW - 30, paramY, paramW,
-				paramH);
+		paramControls[0].layout(this, width / 2 - paramW - 30, paramY, paramW, paramH);
 		paramControls[1].layout(this, width / 2 + 30, paramY, paramW, paramH);
-		paramControls[2].layout(this, width / 2 - paramW - 30, paramY + paramH,
-				paramW, paramH);
-		paramControls[3].layout(this, width / 2 + 30, paramY + paramH, paramW,
-				paramH);
+		paramControls[2].layout(this, width / 2 - paramW - 30, paramY + paramH, paramW, paramH);
+		paramControls[3].layout(this, width / 2 + 30, paramY + paramH, paramW, paramH);
 		float linkH = paramH / 6;
 		float linkW = linkH * 2;
-		linkToggle.layout(this, width / 2 - linkW / 2, paramY + paramH / 2
-				- linkH / 2, linkW, linkH);
+		linkToggle.layout(this, width / 2 - linkW / 2, paramY + paramH / 2 - linkH / 2, linkW,
+				linkH);
 	}
 }

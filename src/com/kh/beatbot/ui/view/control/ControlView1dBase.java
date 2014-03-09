@@ -4,7 +4,6 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 
-
 public abstract class ControlView1dBase extends ControlViewBase implements ParamListener {
 
 	protected Param param;
@@ -29,11 +28,11 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 			onParamChanged(param);
 		}
 	}
-	
+
 	public float getLevel() {
 		return param.level;
 	}
-	
+
 	public Param getParam() {
 		return param;
 	}
@@ -43,7 +42,7 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 		super.handleActionDown(id, x, y);
 		param.setLevel(posToLevel(x, y));
 	}
-	
+
 	@Override
 	public void handleActionMove(int id, float x, float y) {
 		super.handleActionMove(id, x, y);
@@ -51,7 +50,7 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 			return;
 		param.setLevel(posToLevel(x, y));
 	}
-	
+
 	@Override
 	public abstract void onParamChanged(Param param);
 }

@@ -42,7 +42,7 @@ public class Knob extends ControlView1dBase {
 	public synchronized void layoutChildren() {
 		knobShape.layout(absoluteX, absoluteY, width, height);
 	}
-	
+
 	@Override
 	public void handleActionDown(int id, float x, float y) {
 		super.handleActionDown(id, x, y);

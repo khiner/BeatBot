@@ -42,13 +42,13 @@ public class BaseTrack {
 	}
 
 	public void addEffect(Effect effect) {
-		effects.add(effect);	
+		effects.add(effect);
 	}
-	
+
 	public void removeEffect(Effect effect) {
 		effects.remove(effect);
 	}
-	
+
 	public void moveEffect(int oldPosition, int newPosition) {
 		Effect effect = findEffectByPosition(oldPosition);
 		if (effect != null) {
@@ -57,11 +57,9 @@ public class BaseTrack {
 		for (Effect other : effects) {
 			if (other.equals(effect))
 				continue;
-			if (other.getPosition() >= newPosition
-					&& other.getPosition() < oldPosition) {
+			if (other.getPosition() >= newPosition && other.getPosition() < oldPosition) {
 				other.setPosition(other.getPosition() + 1);
-			} else if (other.getPosition() <= newPosition
-					&& other.getPosition() > oldPosition) {
+			} else if (other.getPosition() <= newPosition && other.getPosition() > oldPosition) {
 				other.setPosition(other.getPosition() - 1);
 			}
 		}
@@ -69,13 +67,13 @@ public class BaseTrack {
 
 		Effect.setEffectPosition(id, oldPosition, newPosition);
 	}
-	
+
 	public void quantizeEffectParams() {
 		for (Effect effect : effects) {
 			effect.quantizeParams();
 		}
 	}
-	
+
 	public Effect findEffectByPosition(int position) {
 		for (Effect effect : effects) {
 			if (effect.getPosition() == position) {
@@ -88,11 +86,11 @@ public class BaseTrack {
 	public Param getVolumeParam() {
 		return volumeParam;
 	}
-	
+
 	public Param getPanParam() {
 		return panParam;
 	}
-	
+
 	public Param getPitchParam() {
 		return pitchParam;
 	}
@@ -102,7 +100,7 @@ public class BaseTrack {
 	}
 
 	public void checkInstrumentButton() {
-		
+
 	}
 
 	public static native void setTrackVolume(int trackId, float volume);

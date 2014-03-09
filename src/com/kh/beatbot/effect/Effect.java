@@ -8,7 +8,7 @@ import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.TrackManager;
 
 public abstract class Effect implements Comparable<Effect>, ParamListener {
-	
+
 	public static enum LevelType {
 		VOLUME, PAN, PITCH
 	};
@@ -20,7 +20,7 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 	protected BaseTrack track;
 	protected int position, xParamIndex = 0, yParamIndex = 1;
 	protected boolean on, paramsLinked;
-	
+
 	public Effect(BaseTrack track) {
 		this.track = track;
 		initParams();
@@ -43,14 +43,15 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 	}
 
 	public abstract int getNum();
+
 	public abstract String getName();
-	
+
 	public int getNumParams() {
 		return params.size();
 	}
-	
+
 	protected abstract void initParams();
-	
+
 	public void setOn(boolean on) {
 		this.on = on;
 		setEffectOn(track.getId(), position, on);
@@ -88,11 +89,11 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 		removeEffect(track.getId(), position);
 		TrackManager.getBaseTrack(track.getId()).removeEffect(this);
 	}
-	
+
 	public Param getXParam() {
 		return getParam(xParamIndex);
 	}
-	
+
 	public Param getYParam() {
 		return getParam(yParamIndex);
 	}
@@ -111,7 +112,7 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 	public void onParamChanged(Param param) {
 		setEffectParam(track.getId(), position, param.id, param.level);
 	}
-	
+
 	@Override
 	public int compareTo(Effect effect) {
 		return this.position - effect.position;
@@ -123,16 +124,15 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 			setEffectParam(track.getId(), position, i, param.level);
 		}
 	}
-	
+
 	public native void addEffect(int trackNum, int effectNum, int position);
 
 	public native void removeEffect(int trackNum, int position);
 
-	public static native void setEffectPosition(int trackNum, int oldPosition,
-			int newPosition);
+	public static native void setEffectPosition(int trackNum, int oldPosition, int newPosition);
 
 	public native void setEffectOn(int trackNum, int effectPosition, boolean on);
 
-	public native void setEffectParam(int trackNum, int effectPosition,
-			int paramNum, float paramLevel);
+	public native void setEffectParam(int trackNum, int effectPosition, int paramNum,
+			float paramLevel);
 }

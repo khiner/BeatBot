@@ -10,8 +10,8 @@ import com.kh.beatbot.ui.view.GLSurfaceViewBase;
 public abstract class TextureAtlas {
 
 	protected class Config {
-		protected int numRegions = 0, regionIdOffset = 0, textureSize = 0,
-				cellWidth = 0, cellHeight = 0;
+		protected int numRegions = 0, regionIdOffset = 0, textureSize = 0, cellWidth = 0,
+				cellHeight = 0;
 		protected float textureYOffset = 0;
 		protected Bitmap.Config bitmapConfig = null;
 	}
@@ -55,9 +55,8 @@ public abstract class TextureAtlas {
 	}
 
 	protected void setTextureRegion(int regionId, float x, float y) {
-		textureRegions[regionId - config.regionIdOffset] = new TextureRegion(
-				config.textureSize, config.textureSize, x, y,
-				config.cellWidth - 1, config.cellHeight - 1);
+		textureRegions[regionId - config.regionIdOffset] = new TextureRegion(config.textureSize,
+				config.textureSize, x, y, config.cellWidth - 1, config.cellHeight - 1);
 	}
 
 	protected void initTextureRegions() {
@@ -79,8 +78,7 @@ public abstract class TextureAtlas {
 
 	protected void initBitmap() {
 		// create an empty bitmap (alpha only)
-		bitmap = Bitmap.createBitmap(config.textureSize, config.textureSize,
-				config.bitmapConfig);
+		bitmap = Bitmap.createBitmap(config.textureSize, config.textureSize, config.bitmapConfig);
 		bitmap.eraseColor(0x00000000); // Set Transparent Background (ARGB)
 	}
 

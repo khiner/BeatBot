@@ -42,8 +42,7 @@ public class TimeSignature extends MetaEvent {
 		this(0, 0, 4, 4, DEFAULT_METER, DEFAULT_DIVISION);
 	}
 
-	public TimeSignature(long tick, long delta, int num, int den, int meter,
-			int div) {
+	public TimeSignature(long tick, long delta, int num, int den, int meter, int div) {
 		super(tick, delta, MetaEvent.TIME_SIGNATURE, new VariableLengthInt(4));
 
 		setTimeSignature(num, den, meter, div);
@@ -92,8 +91,8 @@ public class TimeSignature extends MetaEvent {
 		out.write(mDivision);
 	}
 
-	public static TimeSignature parseTimeSignature(long tick, long delta,
-			InputStream in) throws IOException {
+	public static TimeSignature parseTimeSignature(long tick, long delta, InputStream in)
+			throws IOException {
 
 		in.read(); // Size = 4
 

@@ -15,8 +15,7 @@ public class ValueLabel extends ControlView1dBase {
 
 	@Override
 	protected float posToLevel(float x, float y) {
-		return GeneralUtils.clipToUnit(anchorLevel + (anchorY - y)
-				/ (root.getHeight() * 2));
+		return GeneralUtils.clipToUnit(anchorLevel + (anchorY - y) / (root.getHeight() * 2));
 	}
 
 	public void onParamChanged(Param param) {

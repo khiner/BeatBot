@@ -39,21 +39,18 @@ public class MidiNotesGroupEvent implements Stateful, Temporal {
 	}
 
 	public void updateUi() {
-		View.mainPage.controlButtonGroup.setEditIconsEnabled(MidiManager
-				.anyNoteSelected());
+		View.mainPage.controlButtonGroup.setEditIconsEnabled(MidiManager.anyNoteSelected());
 	}
 
 	private synchronized void restore() {
-		List<MidiNote> newSavedState = MidiManager.copyMidiList(MidiManager
-				.getMidiNotes());
+		List<MidiNote> newSavedState = MidiManager.copyMidiList(MidiManager.getMidiNotes());
 		// restore previous midi state
 		new MidiNotesDestroyEvent(MidiManager.getMidiNotes()).execute();
 		new MidiNotesCreateEvent(savedState).execute();
 		savedState = newSavedState;
 	}
 
-	private synchronized boolean notesEqual(List<MidiNote> notes,
-			List<MidiNote> otherNotes) {
+	private synchronized boolean notesEqual(List<MidiNote> notes, List<MidiNote> otherNotes) {
 		if (notes.size() != otherNotes.size()) {
 			return false;
 		}

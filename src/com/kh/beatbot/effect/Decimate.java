@@ -7,8 +7,7 @@ import com.kh.beatbot.manager.PlaybackManager;
 
 public class Decimate extends Effect {
 
-	public static final String NAME = BeatBotActivity.mainActivity
-			.getString(R.string.decimate);
+	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.decimate);
 	public static final int EFFECT_NUM = 1, NUM_PARAMS = 2;
 
 	public Decimate(BaseTrack track) {
@@ -29,8 +28,7 @@ public class Decimate extends Effect {
 
 	@Override
 	protected void initParams() {
-		params.add(new EffectParam(0, "Rate", "Hz", 0,
-				PlaybackManager.SAMPLE_RATE, 8, true, false));
+		params.add(new EffectParam(0, "Rate", "Hz", 0, PlaybackManager.SAMPLE_RATE, 8, true, false));
 		// bits in range [4, 32]
 		params.add(new EffectParam(1, "Bits", "Bits", 4, 28, 32, true, false));
 		// params do automatic scaling on hz params that we don't want.

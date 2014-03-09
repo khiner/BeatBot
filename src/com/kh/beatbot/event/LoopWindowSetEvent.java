@@ -6,8 +6,7 @@ import com.kh.beatbot.ui.view.helper.TickWindowHelper;
 
 public class LoopWindowSetEvent implements Stateful, Temporal {
 
-	private long initialBeginTick, initialEndTick, finalBeginTick,
-			finalEndTick;
+	private long initialBeginTick, initialEndTick, finalBeginTick, finalEndTick;
 
 	@Override
 	public void begin() {
@@ -20,8 +19,7 @@ public class LoopWindowSetEvent implements Stateful, Temporal {
 		finalBeginTick = MidiManager.getLoopBeginTick();
 		finalEndTick = MidiManager.getLoopEndTick();
 
-		if (initialBeginTick != finalBeginTick
-				|| initialEndTick != finalEndTick) {
+		if (initialBeginTick != finalBeginTick || initialEndTick != finalEndTick) {
 			EventManager.eventCompleted(this);
 		}
 	}
@@ -41,7 +39,6 @@ public class LoopWindowSetEvent implements Stateful, Temporal {
 	@Override
 	public void updateUi() {
 		View.mainPage.midiView.updateLoopUi();
-		TickWindowHelper.updateView(MidiManager.getLoopBeginTick(),
-				MidiManager.getLoopEndTick());
+		TickWindowHelper.updateView(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
 	}
 }
