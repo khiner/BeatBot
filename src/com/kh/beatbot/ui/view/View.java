@@ -41,15 +41,12 @@ public class View implements Comparable<View> {
 
 	public int id = -1; // optional
 
-	// kludgey magic number
-	// but it corrects for something weird in
-	// GLSurfaceViewBase.getTextWidth
 	protected static float X_OFFSET = 2, LABEL_HEIGHT = 0;
 
 	public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0,
 			height = 0;
-	protected float textWidth = 0, textHeight = 0, minX = 0, maxX = 0,
-			minY = 0, maxY = 0, borderWidth = 0, borderHeight = 0;
+	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0,
+			borderHeight = 0;
 
 	protected View parent;
 	protected List<View> children = new ArrayList<View>();
@@ -96,18 +93,6 @@ public class View implements Comparable<View> {
 	public final void setState(State state) {
 		this.state = state;
 		stateChanged();
-	}
-
-	protected float calcTextX() {
-		return 3 * X_OFFSET + (calcNonIconWidth() - textWidth) / 2;
-	}
-
-	protected float calcTextY() {
-		return (height - textHeight) / 2;
-	}
-
-	protected float calcNonIconWidth() {
-		return width - X_OFFSET * 4;
 	}
 
 	public State getState() {
@@ -370,16 +355,23 @@ public class View implements Comparable<View> {
 			textureMesh.layout(x, y, height, height);
 		}
 		if (null != textMesh) {
-			textHeight = this.height;
-			textWidth = TextureAtlas.font.getTextWidth(text, textHeight);
-			if (textWidth > calcNonIconWidth()) {
-				float scaleRatio = calcNonIconWidth() / textWidth;
+			float textHeight = height + BG_OFFSET;
+			float textWidth = TextureAtlas.font.getTextWidth(text, textHeight);
+
+			float nonIconWidth = width - X_OFFSET * 2;
+			x += X_OFFSET * 2;
+			if (null != textureMesh) {
+				nonIconWidth -= height;
+				x += height;
+			}
+			if (textWidth > nonIconWidth) {
+				float scaleRatio = nonIconWidth / textWidth;
 				textWidth *= scaleRatio;
 				textHeight *= scaleRatio;
 			}
 
-			textMesh.setText(text, absoluteX + calcTextX(), absoluteY
-					+ calcTextY(), textHeight);
+			textMesh.setText(text, x + (nonIconWidth - textWidth) / 2,
+					absoluteY + (this.height - textHeight) / 2, textHeight);
 		}
 		minX = minY = bgRectRadius + BG_OFFSET;
 		maxX = this.width - bgRectRadius - BG_OFFSET;
@@ -499,7 +491,8 @@ public class View implements Comparable<View> {
 			shape.setColors(currResource.fillColor, strokeColor);
 		}
 
-		if (null == textureMesh && null != currResource) {
+		if (null == textureMesh && null != currResource
+				&& currResource.resourceId != -1) {
 			textureMesh = new TextureMesh(shapeGroup.getTextureGroup());
 		}
 		if (null == textMesh && !text.isEmpty()) {
