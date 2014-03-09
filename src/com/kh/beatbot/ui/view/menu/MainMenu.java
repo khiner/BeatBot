@@ -13,6 +13,7 @@ import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.mesh.SlideTab;
 import com.kh.beatbot.ui.view.MidiView;
 import com.kh.beatbot.ui.view.View;
@@ -64,6 +65,10 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	private float menuOffset = MidiView.Y_OFFSET / 4;
 	private boolean menuPressed = false;
 
+
+	private Rectangle foregroundRect;
+	private static float[] fillColor = Colors.TRANSPARENT.clone();
+
 	protected synchronized void createMenuItems() {
 		physicsState = new PhysicsState(this);
 		tab = new SlideTab(shapeGroup, Colors.LABEL_SELECTED, null);
@@ -108,6 +113,8 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 
 	@Override
 	public synchronized void createChildren() {
+		foregroundRect = new Rectangle(shapeGroup, fillColor, null);
+
 		super.createChildren();
 
 		fileItem.setIcon(IconResourceSets.FILE);
@@ -160,7 +167,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	@Override
 	public synchronized void layoutChildren() {
 		super.layoutChildren();
-		mainPage.dim(GeneralUtils.clipToUnit(textureMesh.x / width) * .8f);
+		foregroundRect.layout(0, 0, mainPage.width, mainPage.height);
 	}
 
 	@Override
@@ -186,6 +193,9 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 				MainPage.controlButtonHeight + menuOffset * 2);
 		textureMesh.layout(x + width + menuOffset * 2, menuOffset / 2,
 				tab.height, tab.height);
+
+		fillColor[3] = GeneralUtils.clipToUnit(textureMesh.x / width) * .75f;
+		foregroundRect.setFillColor(fillColor);
 	}
 
 	public void expand() {

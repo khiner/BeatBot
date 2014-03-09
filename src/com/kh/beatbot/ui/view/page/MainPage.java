@@ -1,8 +1,6 @@
 package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.Rectangle;
 import com.kh.beatbot.ui.view.MidiTrackView;
 import com.kh.beatbot.ui.view.MidiView;
 import com.kh.beatbot.ui.view.TouchableView;
@@ -18,10 +16,6 @@ public class MainPage extends TouchableView {
 	public MidiTrackView midiTrackView;
 	public PageSelectGroup pageSelectGroup;
 	public MainMenu slideMenu;
-
-	private Rectangle foregroundRect;
-
-	private static float[] fillColor = Colors.TRANSPARENT.clone();
 
 	public static float controlButtonHeight = 0;
 	private float trackControlWidth = 0;
@@ -45,15 +39,12 @@ public class MainPage extends TouchableView {
 
 		slideMenu.setClip(false);
 
-		foregroundRect = new Rectangle(shapeGroup, fillColor, null);
-
 		addChildren(controlButtonGroup, midiTrackView, midiView,
 				pageSelectGroup, slideMenu);
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
-		foregroundRect.layout(0, 0, width, height);
 		controlButtonHeight = height / 10;
 		float midiHeight = 3 * (height - controlButtonHeight) / 5;
 		float pageSelectGroupHeight = height - midiHeight - controlButtonHeight;
@@ -75,11 +66,6 @@ public class MainPage extends TouchableView {
 		slideMenu.layout(this, -width, 0, trackControlWidth, height);
 	}
 
-	public void dim(float amount) {
-		fillColor[3] = amount;
-		foregroundRect.setFillColor(fillColor);
-	}
-	
 	public void expandMenu() {
 		slideMenu.expand();
 	}
