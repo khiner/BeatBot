@@ -2,9 +2,9 @@ package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.Circle;
-import com.kh.beatbot.ui.mesh.IntersectingLines;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.shape.Circle;
+import com.kh.beatbot.ui.shape.IntersectingLines;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 
 public class Seekbar2d extends ControlView2dBase {
 	private IntersectingLines intersectingLines;

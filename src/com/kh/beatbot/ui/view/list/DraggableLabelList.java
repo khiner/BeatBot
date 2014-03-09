@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.view.list;
 
 import com.kh.beatbot.listener.DraggableLabelListListener;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.control.Button;
 
 public class DraggableLabelList extends LabelList {

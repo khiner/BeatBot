@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.view.control.param;
 
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.control.ControlView1dBase;
 
 public abstract class LevelParamControl extends ParamControl {

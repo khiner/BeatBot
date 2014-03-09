@@ -1,4 +1,5 @@
-package com.kh.beatbot.ui.mesh;
+package com.kh.beatbot.ui.shape;
+
 
 public class RoundedRect extends Shape {
 	public static final short[] FILL_INDICES = getFillIndices();

@@ -2,7 +2,7 @@ package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.listener.ControlViewListener;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 
 public abstract class ControlViewBase extends TouchableView {

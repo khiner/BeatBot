@@ -1,4 +1,5 @@
-package com.kh.beatbot.ui.mesh;
+package com.kh.beatbot.ui.shape;
+
 
 public class AdsrShape extends Shape {
 	private Circle[] circles = new Circle[4];

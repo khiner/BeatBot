@@ -3,8 +3,8 @@ package com.kh.beatbot.ui.view.control;
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.KnobShape;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.shape.KnobShape;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 
 public class Knob extends ControlView1dBase {
 	private KnobShape knobShape;

@@ -19,12 +19,14 @@ public class TextureGroup extends MeshGroup {
 	public synchronized void setText(TextMesh mesh, String text, float x,
 			float y, float height, float[] color) {
 		final float scale = height / TextureAtlas.font.getCellHeight();
+		final float cellWidth = TextureAtlas.font.getCellWidth() * scale;
 
 		int textureIndex = 0;
 		for (char character : text.toCharArray()) {
-			textureVertices(mesh, textureIndex,
-					TextureAtlas.font.getTextureRegion(character), x, y,
-					TextureAtlas.font.getCellWidth() * scale, height, color);
+			TextureRegion charRegion = TextureAtlas.font
+					.getTextureRegion(character);
+			textureVertices(mesh, textureIndex, charRegion, x, y, cellWidth,
+					height, color);
 			x += FontTextureAtlas.getCharWidth(character) * scale;
 			textureIndex += VERTICES_PER_TEXTURE;
 		}

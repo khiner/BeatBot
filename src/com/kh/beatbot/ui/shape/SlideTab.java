@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui.mesh;
+package com.kh.beatbot.ui.shape;
 
 import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.View;

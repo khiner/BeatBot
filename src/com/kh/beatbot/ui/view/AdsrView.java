@@ -7,8 +7,8 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.AdsrShape;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.shape.AdsrShape;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 
 public class AdsrView extends TouchableView implements ParamListener {
 

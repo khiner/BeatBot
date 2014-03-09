@@ -1,4 +1,5 @@
-package com.kh.beatbot.ui.mesh;
+package com.kh.beatbot.ui.shape;
+
 
 public class IntersectingLines extends Shape {
 

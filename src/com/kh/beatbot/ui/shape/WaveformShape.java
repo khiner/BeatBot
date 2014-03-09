@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui.mesh;
+package com.kh.beatbot.ui.shape;
 
 import android.util.SparseArray;
 
@@ -70,7 +70,7 @@ public class WaveformShape extends Shape {
 			y = this.y + height * (1 - sample) / 2;
 		}
 
-		while (strokeMesh.index < strokeMesh.numVertices) {
+		while (!strokeMesh.isFull()) {
 			strokeVertex(this.x + Float.MAX_VALUE, this.y + height / 2);
 		}
 	}

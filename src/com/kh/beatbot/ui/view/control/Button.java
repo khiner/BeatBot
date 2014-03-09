@@ -5,7 +5,7 @@ import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.IconResourceSet.State;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.LongPressableView;
 
 public class Button extends LongPressableView {

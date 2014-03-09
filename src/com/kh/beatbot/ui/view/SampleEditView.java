@@ -7,9 +7,9 @@ import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.IconResourceSets;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.Rectangle;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
-import com.kh.beatbot.ui.mesh.WaveformShape;
+import com.kh.beatbot.ui.shape.Rectangle;
+import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.WaveformShape;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
 

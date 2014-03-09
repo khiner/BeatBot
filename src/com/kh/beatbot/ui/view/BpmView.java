@@ -7,8 +7,8 @@ import java.util.Set;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.NumberSegment;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.shape.NumberSegment;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 
 public class BpmView extends ClickableView {
 

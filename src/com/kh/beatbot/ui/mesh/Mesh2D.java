@@ -36,6 +36,14 @@ public class Mesh2D extends Mesh {
 		index++;
 	}
 	
+	public void resetIndex() {
+		index = 0;
+	}
+
+	public boolean isFull() {
+		return index >= numVertices;
+	}
+
 	private void setNumVertices(int numVertices) {
 		this.numVertices = numVertices;
 		this.indices = new short[numVertices];

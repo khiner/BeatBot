@@ -1,4 +1,6 @@
-package com.kh.beatbot.ui.mesh;
+package com.kh.beatbot.ui.shape;
+
+import com.kh.beatbot.ui.mesh.Mesh2D;
 
 public abstract class Shape {
 	public static final float ¹ = (float) Math.PI;
@@ -43,11 +45,11 @@ public abstract class Shape {
 	protected abstract void updateVertices();
 
 	protected float getFillVertexX(int i) {
-		return fillMesh.group.getVertexX(i);
+		return fillMesh.getGroup().getVertexX(i);
 	}
 
 	protected float getFillVertexY(int i) {
-		return fillMesh.group.getVertexY(i);
+		return fillMesh.getGroup().getVertexY(i);
 	}
 
 	protected synchronized void fillVertex(float x, float y) {
@@ -64,10 +66,10 @@ public abstract class Shape {
 
 	protected synchronized void resetIndices() {
 		if (fillMesh != null) {
-			fillMesh.index = 0;
+			fillMesh.resetIndex();
 		}
 		if (strokeMesh != null) {
-			strokeMesh.index = 0;
+			strokeMesh.resetIndex();
 		}
 	}
 

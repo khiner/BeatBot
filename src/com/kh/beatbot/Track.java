@@ -18,7 +18,7 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.IconResourceSet;
 import com.kh.beatbot.ui.IconResourceSets;
-import com.kh.beatbot.ui.mesh.Rectangle;
+import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.view.TrackButtonRow;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 

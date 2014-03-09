@@ -8,9 +8,9 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.Circle;
-import com.kh.beatbot.ui.mesh.Rectangle;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.shape.Circle;
+import com.kh.beatbot.ui.shape.Rectangle;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 
 public class LevelsView extends TouchableView {
 

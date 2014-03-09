@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.mesh;
 
+import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.texture.TextureGroup;
 
 public class TextMesh extends Mesh {

@@ -12,6 +12,10 @@ public abstract class Mesh {
 				&& this.y + height > y;
 	}
 
+	public MeshGroup getGroup() {
+		return group;
+	}
+
 	public void setGroup(MeshGroup group) {
 		if (this.group == group)
 			return;

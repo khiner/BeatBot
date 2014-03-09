@@ -6,7 +6,7 @@ import java.util.Map;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.ui.IconResourceSet.State;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 
 public abstract class TouchableView extends View {
 	public class Position {

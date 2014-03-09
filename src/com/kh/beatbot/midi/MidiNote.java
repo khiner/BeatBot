@@ -5,7 +5,7 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
-import com.kh.beatbot.ui.mesh.Rectangle;
+import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.view.View;
 
 public class MidiNote implements Comparable<MidiNote> {

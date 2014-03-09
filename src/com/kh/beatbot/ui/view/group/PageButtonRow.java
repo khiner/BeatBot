@@ -2,7 +2,7 @@ package com.kh.beatbot.ui.view.group;
 
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.IconResourceSets;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;

@@ -1,4 +1,5 @@
-package com.kh.beatbot.ui.mesh;
+package com.kh.beatbot.ui.shape;
+
 
 public class NumberSegment extends Shape {
 	public static final short[] FILL_INDICES = { 0, 0, 1, 2, 3, 4, 5, 5 };

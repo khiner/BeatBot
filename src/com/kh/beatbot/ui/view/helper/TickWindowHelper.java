@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Colors;
-import com.kh.beatbot.ui.mesh.Line;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.shape.Line;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.MidiView;
 
 public class TickWindowHelper {

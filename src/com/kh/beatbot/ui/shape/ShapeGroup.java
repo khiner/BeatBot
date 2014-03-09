@@ -1,7 +1,8 @@
-package com.kh.beatbot.ui.mesh;
+package com.kh.beatbot.ui.shape;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import com.kh.beatbot.ui.mesh.MeshGroup;
 import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.texture.TextureGroup;
 

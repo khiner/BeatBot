@@ -1,4 +1,5 @@
-package com.kh.beatbot.ui.mesh;
+package com.kh.beatbot.ui.shape;
+
 
 public class Rectangle extends Shape {
 	public static final int NUM_FILL_VERTICES = 4;

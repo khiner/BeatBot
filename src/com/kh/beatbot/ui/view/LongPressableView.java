@@ -3,7 +3,7 @@ package com.kh.beatbot.ui.view;
 import android.os.Handler;
 
 import com.kh.beatbot.activity.BeatBotActivity;
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 
 public abstract class LongPressableView extends TouchableView {
 

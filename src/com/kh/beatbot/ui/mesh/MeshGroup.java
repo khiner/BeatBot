@@ -36,7 +36,7 @@ public class MeshGroup {
 
 	protected List<Mesh> children = new ArrayList<Mesh>();
 
-	protected MeshGroup(int primitiveType) {
+	public MeshGroup(int primitiveType) {
 		this(primitiveType, 6);
 	}
 
@@ -161,11 +161,11 @@ public class MeshGroup {
 		dirty = true;
 	}
 
-	protected float getVertexX(int index) {
+	public float getVertexX(int index) {
 		return vertices[index * indicesPerVertex];
 	}
 
-	protected float getVertexY(int index) {
+	public float getVertexY(int index) {
 		return vertices[index * indicesPerVertex + 1];
 	}
 

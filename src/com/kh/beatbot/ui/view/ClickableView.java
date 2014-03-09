@@ -1,6 +1,6 @@
 package com.kh.beatbot.ui.view;
 
-import com.kh.beatbot.ui.mesh.ShapeGroup;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 
 public abstract class ClickableView extends LongPressableView {
 
