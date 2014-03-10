@@ -492,7 +492,7 @@ public class View implements Comparable<View> {
 		}
 		if (null != textureMesh) {
 			textureMesh.setResource(null == currResource ? -1 : currResource.resourceId);
-			textureMesh.setColor(Colors.WHITE);
+			textureMesh.setColor(getTextColor());
 		}
 		if (null != textMesh) {
 			textMesh.setColor(getTextColor());

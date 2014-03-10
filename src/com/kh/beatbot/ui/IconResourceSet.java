@@ -40,7 +40,8 @@ public class IconResourceSet {
 	}
 
 	public IconResource getResource(State state) {
-		return resources.get(state);
+		IconResource resource = resources.get(state);
+		return null == resource && state == State.SELECTED ? resources.get(State.PRESSED) : resource;
 	}
 
 	public synchronized void setFillColors(IconResourceSet resourceSet) {
