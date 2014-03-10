@@ -3,8 +3,8 @@ package com.kh.beatbot.ui.view.page;
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.listener.ControlViewListener;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.IconResourceSets;
-import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
@@ -54,9 +54,9 @@ public class LevelsPage extends TouchableView implements ControlViewListener {
 		panButton.setEnabled(false);
 		pitchButton.setEnabled(false);
 
-		volumeLevelBar.setLevelColor(Colors.TRON_BLUE, Colors.TRON_BLUE_TRANS);
-		panLevelBar.setLevelColor(Colors.PAN, Colors.PAN_TRANS);
-		pitchLevelBar.setLevelColor(Colors.PITCH, Colors.PITCH_TRANS);
+		volumeLevelBar.setLevelColor(Color.TRON_BLUE, Color.TRON_BLUE_TRANS);
+		panLevelBar.setLevelColor(Color.PAN, Color.PAN_TRANS);
+		pitchLevelBar.setLevelColor(Color.PITCH, Color.PITCH_TRANS);
 
 		volumeLevelBar.setListener(this);
 		panLevelBar.setListener(this);

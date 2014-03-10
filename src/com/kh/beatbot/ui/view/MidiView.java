@@ -12,7 +12,7 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.shape.Line;
 import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.shape.ShapeGroup;
@@ -88,7 +88,7 @@ public class MidiView extends ClickableView implements TrackListener {
 		TickWindowHelper.updateView(tick, topY, bottomY);
 		selectRegionRect.layout(tickToUnscaledX(leftTick), topY, tickToUnscaledX(rightTick
 				- leftTick), bottomY - topY);
-		selectRegionRect.setFillColor(Colors.TRON_BLUE_TRANS);
+		selectRegionRect.setFillColor(Color.TRON_BLUE_TRANS);
 	}
 
 	public MidiNote getMidiNote(int track, float tick) {
@@ -138,14 +138,14 @@ public class MidiView extends ClickableView implements TrackListener {
 		float loopEndX = tickToX(MidiManager.getLoopEndTick());
 		if (Math.abs(x - loopBeginX) <= LOOP_SELECT_SNAP_DIST) {
 			loopPointerIds[0] = pointerId;
-			loopMarkerLines[0].setStrokeColor(Colors.TRON_BLUE);
+			loopMarkerLines[0].setStrokeColor(Color.TRON_BLUE);
 		} else if (Math.abs(x - loopEndX) <= LOOP_SELECT_SNAP_DIST) {
 			loopPointerIds[2] = pointerId;
-			loopMarkerLines[1].setStrokeColor(Colors.TRON_BLUE);
+			loopMarkerLines[1].setStrokeColor(Color.TRON_BLUE);
 		} else if (x > loopBeginX && x < loopEndX) {
 			loopPointerIds[1] = pointerId;
 			loopSelectionOffset = x - loopBeginX;
-			loopBarRect.setFillColor(Colors.TRON_BLUE);
+			loopBarRect.setFillColor(Color.TRON_BLUE);
 		}
 	}
 
@@ -189,16 +189,16 @@ public class MidiView extends ClickableView implements TrackListener {
 
 	@Override
 	public synchronized void createChildren() {
-		backgroundRect = new Rectangle(shapeGroup, Colors.MIDI_VIEW_BG, null);
-		loopRect = new Rectangle(shapeGroup, Colors.MIDI_VIEW_LIGHT_BG, null);
+		backgroundRect = new Rectangle(shapeGroup, Color.MIDI_VIEW_BG, null);
+		loopRect = new Rectangle(shapeGroup, Color.MIDI_VIEW_LIGHT_BG, null);
 
-		tickBarRect = new Rectangle(shapeGroup, Colors.TICK_FILL, Colors.BLACK);
-		loopBarRect = new Rectangle(shapeGroup, Colors.TICKBAR, null);
-		selectRegionRect = new Rectangle(shapeGroup, Colors.TRANSPARENT, null);
-		currTickLine = new Line(shapeGroup, null, Colors.TRON_BLUE);
+		tickBarRect = new Rectangle(shapeGroup, Color.TICK_FILL, Color.BLACK);
+		loopBarRect = new Rectangle(shapeGroup, Color.TICKBAR, null);
+		selectRegionRect = new Rectangle(shapeGroup, Color.TRANSPARENT, null);
+		currTickLine = new Line(shapeGroup, null, Color.TRON_BLUE);
 		loopMarkerLines = new Line[2];
 		for (int i = 0; i < loopMarkerLines.length; i++) {
-			loopMarkerLines[i] = new Line(shapeGroup, null, Colors.TRON_BLUE);
+			loopMarkerLines[i] = new Line(shapeGroup, null, Color.TRON_BLUE);
 		}
 	}
 
@@ -287,7 +287,7 @@ public class MidiView extends ClickableView implements TrackListener {
 	}
 
 	public void createNoteView(MidiNote note) {
-		Rectangle noteRect = new Rectangle(noteRectangles, whichColor(note), Colors.BLACK);
+		Rectangle noteRect = new Rectangle(noteRectangles, whichColor(note), Color.BLACK);
 		note.setRectangle(noteRect);
 		updateNoteView(note);
 	}
@@ -318,17 +318,17 @@ public class MidiView extends ClickableView implements TrackListener {
 	}
 
 	private static float[] whichColor(MidiNote note) {
-		return note.isSelected() ? Colors.NOTE_SELECTED : Colors.NOTE;
+		return note.isSelected() ? Color.NOTE_SELECTED : Color.NOTE;
 	}
 
 	private static float[] whichColor(Track track) {
 		Track soloingTrack = TrackManager.getSoloingTrack();
 		if (track.isSelected()) {
-			return Colors.LABEL_SELECTED_TRANS;
+			return Color.LABEL_SELECTED_TRANS;
 		} else if (track.isMuted() || (soloingTrack != null && !soloingTrack.equals(track))) {
-			return Colors.DARK_TRANS;
+			return Color.DARK_TRANS;
 		} else {
-			return Colors.TRANSPARENT;
+			return Color.TRANSPARENT;
 		}
 	}
 
@@ -475,7 +475,7 @@ public class MidiView extends ClickableView implements TrackListener {
 					scrollPointerId = id;
 				} else {
 					// can never select region with two pointers in midi view
-					selectRegionRect.setFillColor(Colors.TRANSPARENT);
+					selectRegionRect.setFillColor(Color.TRANSPARENT);
 					// init zoom anchors (the same ticks should be under the
 					// fingers at all times)
 					zoomLeftAnchorTick = leftTick;
@@ -533,11 +533,11 @@ public class MidiView extends ClickableView implements TrackListener {
 			if (loopPointerIds[i] == id) {
 				loopPointerIds[i] = -1;
 				if (i == 0) {
-					loopMarkerLines[0].setStrokeColor(Colors.TICKBAR);
+					loopMarkerLines[0].setStrokeColor(Color.TICKBAR);
 				} else if (i == 1) {
-					loopMarkerLines[1].setStrokeColor(Colors.TICKBAR);
+					loopMarkerLines[1].setStrokeColor(Color.TICKBAR);
 				} else if (i == 1) {
-					loopBarRect.setFillColor(Colors.TICKBAR);
+					loopBarRect.setFillColor(Color.TICKBAR);
 				}
 			}
 		if (zoomLeftAnchorTick != -1) {
@@ -555,10 +555,10 @@ public class MidiView extends ClickableView implements TrackListener {
 		for (int i = 0; i < 3; i++) {
 			loopPointerIds[i] = -1;
 		}
-		loopBarRect.setFillColor(Colors.TICKBAR);
+		loopBarRect.setFillColor(Color.TICKBAR);
 		pinchLeftPointerId = pinchRightPointerId = -1;
 		selectRegionStartTick = -1;
-		selectRegionRect.setFillColor(Colors.TRANSPARENT);
+		selectRegionRect.setFillColor(Color.TRANSPARENT);
 		startOnTicks.clear();
 		touchedNotes.clear();
 		MidiManager.endMidiEvent();
@@ -608,7 +608,7 @@ public class MidiView extends ClickableView implements TrackListener {
 	public void onCreate(Track track) {
 		onTrackHeightChange();
 		TickWindowHelper.setYOffset(Float.MAX_VALUE);
-		Rectangle trackRect = new Rectangle(shapeGroup, Colors.TRANSPARENT, Colors.BLACK);
+		Rectangle trackRect = new Rectangle(shapeGroup, Color.TRANSPARENT, Color.BLACK);
 		track.setRectangle(trackRect);
 		layoutTrackRects();
 		for (MidiNote note : track.getMidiNotes()) {

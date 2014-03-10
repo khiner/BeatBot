@@ -2,7 +2,7 @@ package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.shape.KnobShape;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 
@@ -35,7 +35,7 @@ public class Knob extends ControlView1dBase {
 
 	@Override
 	public synchronized void createChildren() {
-		knobShape = new KnobShape(shapeGroup, Colors.TRON_BLUE, null);
+		knobShape = new KnobShape(shapeGroup, Color.TRON_BLUE, null);
 	}
 
 	@Override

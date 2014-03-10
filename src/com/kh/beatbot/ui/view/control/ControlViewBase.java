@@ -1,17 +1,17 @@
 package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.listener.ControlViewListener;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 
 public abstract class ControlViewBase extends TouchableView {
 
-	protected float[] levelColor = Colors.TRON_BLUE;
+	protected float[] levelColor = Color.TRON_BLUE;
 	protected float[] levelColorTrans = new float[] { levelColor[0], levelColor[1], levelColor[2],
 			.6f };
-	protected static float[] selectColor = Colors.LABEL_SELECTED;
-	protected static float[] selectColorTrans = Colors.LABEL_SELECTED_TRANS;
+	protected static float[] selectColor = Color.LABEL_SELECTED;
+	protected static float[] selectColorTrans = Color.LABEL_SELECTED_TRANS;
 
 	protected boolean selected = false;
 

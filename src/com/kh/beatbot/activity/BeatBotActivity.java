@@ -23,7 +23,7 @@ import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
@@ -59,7 +59,7 @@ public class BeatBotActivity extends Activity {
 		mainActivity = this;
 
 		GeneralUtils.initAndroidSettings(this);
-		Colors.init(this);
+		Color.init(this);
 		// load font file once, with static height
 		// to change height, simply use gl.scale()
 		TextureAtlas.font.load(this, "REDRING-1969-v03.ttf");

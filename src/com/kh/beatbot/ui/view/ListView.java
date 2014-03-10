@@ -2,7 +2,7 @@ package com.kh.beatbot.ui.view;
 
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.listener.OnPressListener;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.transition.ColorTransition;
@@ -19,7 +19,7 @@ public class ListView extends TouchableView implements OnPressListener {
 	private float yAnchor = 0, yOffset = 0, yOffsetAnchor = 0, childHeight = 0, velocity = 0,
 			lastY = 0;
 	private RoundedRect scrollBar = null;
-	private ColorTransition tabColorTransition = new ColorTransition(20, 20, Colors.TRANSPARENT,
+	private ColorTransition tabColorTransition = new ColorTransition(20, 20, Color.TRANSPARENT,
 			END_TRANS_COLOR);
 
 	private Button selectedButton = null;
@@ -101,7 +101,7 @@ public class ListView extends TouchableView implements OnPressListener {
 
 	private RoundedRect getScrollTab() {
 		if (scrollBar == null) {
-			scrollBar = new RoundedRect(shapeGroup, Colors.TRANSPARENT, null);
+			scrollBar = new RoundedRect(shapeGroup, Color.TRANSPARENT, null);
 		}
 		return scrollBar;
 	}

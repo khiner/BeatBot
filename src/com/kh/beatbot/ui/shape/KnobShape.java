@@ -1,6 +1,6 @@
 package com.kh.beatbot.ui.shape;
 
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.Color;
 
 public class KnobShape extends Shape {
 	private static final int NUM_FILL_VERTICES = 128;
@@ -56,7 +56,7 @@ public class KnobShape extends Shape {
 			setFillColor(vertexIndex, getFillColor());
 		}
 		for (int vertexIndex = colorChangeVertex; vertexIndex < NUM_FILL_VERTICES; vertexIndex++) {
-			setFillColor(vertexIndex, Colors.VIEW_BG);
+			setFillColor(vertexIndex, Color.VIEW_BG);
 		}
 	}
 }

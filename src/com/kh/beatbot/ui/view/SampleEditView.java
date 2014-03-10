@@ -5,8 +5,8 @@ import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.IconResourceSets;
-import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.shape.WaveformShape;
@@ -124,8 +124,8 @@ public class SampleEditView extends ControlView2dBase {
 	public void layout(View parent, float x, float y, float width, float height) {
 		setIcon(IconResourceSets.SAMPLE_BG);
 		initRect();
-		waveformShape = new WaveformShape(shapeGroup, width, Colors.LABEL_SELECTED, Colors.BLACK);
-		currSampleRect = new Rectangle(shapeGroup, Colors.TRON_BLUE, null);
+		waveformShape = new WaveformShape(shapeGroup, width, Color.LABEL_SELECTED, Color.BLACK);
+		currSampleRect = new Rectangle(shapeGroup, Color.TRON_BLUE, null);
 		waveformWidth = width - SNAP_DIST;
 		super.layout(parent, x, y, width, height);
 	}

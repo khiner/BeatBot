@@ -1,10 +1,10 @@
-package com.kh.beatbot.ui.color;
+package com.kh.beatbot.ui;
 
 import android.app.Activity;
 
 import com.kh.beatbot.R;
 
-public class Colors {
+public class Color {
 	public static float[] BG, BLACK, WHITE, GREEN, YELLOW, RED, DARK_TRANS, MIDI_VIEW_BG,
 			MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM, NOTE, NOTE_SELECTED, TRON_BLUE, PAN, PITCH,
 			TRON_BLUE_LIGHT, TRON_BLUE_TRANS, PAN_TRANS, PITCH_TRANS, LEVEL_SELECTED,

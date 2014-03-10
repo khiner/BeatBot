@@ -11,8 +11,8 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.IconResourceSets;
-import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.shape.SlideTab;
 import com.kh.beatbot.ui.view.MidiView;
@@ -64,11 +64,11 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	private boolean menuPressed = false;
 
 	private Rectangle foregroundRect;
-	private static float[] fillColor = Colors.TRANSPARENT.clone();
+	private static float[] fillColor = Color.TRANSPARENT.clone();
 
 	protected synchronized void createMenuItems() {
 		physicsState = new PhysicsState(this);
-		tab = new SlideTab(shapeGroup, Colors.LABEL_SELECTED, null);
+		tab = new SlideTab(shapeGroup, Color.LABEL_SELECTED, null);
 		setShape(tab);
 		setIcon(IconResourceSets.SLIDE_MENU);
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.shape.Line;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.MidiView;
@@ -191,7 +191,7 @@ public class TickWindowHelper {
 			for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
 				if (currTick % tickSpacings[i] == 0) {
 					float x = midiView.tickToUnscaledX(currTick);
-					Line line = new Line(shapeGroup, null, Colors.TRANSPARENT);
+					Line line = new Line(shapeGroup, null, Color.TRANSPARENT);
 					line.layout(x, MidiView.Y_OFFSET, 2, 1);
 					vLines[i].add(line);
 					break; // each line goes in only ONE line set
@@ -205,13 +205,13 @@ public class TickWindowHelper {
 			if (1 << i > MidiManager.getBeatDivision() * 4) {
 				// lines are invisible below current granulariy
 				for (Line line : vLines[i]) {
-					if (!line.getStrokeColor().equals(Colors.TRANSPARENT))
-						line.setStrokeColor(Colors.TRANSPARENT);
+					if (!line.getStrokeColor().equals(Color.TRANSPARENT))
+						line.setStrokeColor(Color.TRANSPARENT);
 				}
 			} else {
 				for (Line line : vLines[i]) {
-					if (!line.getStrokeColor().equals(Colors.MIDI_LINES[i]))
-						line.setStrokeColor(Colors.MIDI_LINES[i]);
+					if (!line.getStrokeColor().equals(Color.MIDI_LINES[i]))
+						line.setStrokeColor(Color.MIDI_LINES[i]);
 				}
 			}
 		}

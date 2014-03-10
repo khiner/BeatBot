@@ -5,10 +5,10 @@ import java.util.Collections;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.IconResourceSet;
 import com.kh.beatbot.ui.IconResourceSets;
-import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.ClickableView;
 import com.kh.beatbot.ui.view.View;
@@ -21,13 +21,13 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 	};
 
 	private static final IconResourceSet onIcon = new IconResourceSet(new IconResource(-1,
-			Colors.TRON_BLUE, null), new IconResource(-1, Colors.TRON_BLUE_LIGHT, null));
+			Color.TRON_BLUE, null), new IconResource(-1, Color.TRON_BLUE_LIGHT, null));
 
 	private static final IconResourceSet offIcon = new IconResourceSet(new IconResource(-1,
-			Colors.LABEL_LIGHT, null), new IconResource(-1, Colors.LABEL_VERY_LIGHT, null));
+			Color.LABEL_LIGHT, null), new IconResource(-1, Color.LABEL_VERY_LIGHT, null));
 
 	private static final IconResourceSet emptyIcon = new IconResourceSet(new IconResource(-1,
-			Colors.LABEL_DARK, null), new IconResource(-1, Colors.LABEL_MED, null));
+			Color.LABEL_DARK, null), new IconResource(-1, Color.LABEL_MED, null));
 
 	protected class Label extends Button {
 		private final static String EMPTY_TEXT = "ADD";

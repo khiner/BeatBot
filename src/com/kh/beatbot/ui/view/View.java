@@ -10,11 +10,11 @@ import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.listener.ScrollableViewListener;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.IconResource;
 import com.kh.beatbot.ui.IconResourceSet;
 import com.kh.beatbot.ui.IconResourceSet.State;
 import com.kh.beatbot.ui.IconResourceSets;
-import com.kh.beatbot.ui.color.Colors;
 import com.kh.beatbot.ui.mesh.TextMesh;
 import com.kh.beatbot.ui.mesh.TextureMesh;
 import com.kh.beatbot.ui.shape.Rectangle;
@@ -279,7 +279,7 @@ public class View implements Comparable<View> {
 	}
 
 	public void initAll() {
-		getGl().glClearColor(Colors.BG[0], Colors.BG[1], Colors.BG[2], Colors.BG[3]);
+		getGl().glClearColor(Color.BG[0], Color.BG[1], Color.BG[2], Color.BG[3]);
 		init();
 		for (View child : children) {
 			child.initAll();
@@ -508,6 +508,6 @@ public class View implements Comparable<View> {
 
 	private final float[] getTextColor() {
 		final float[] strokeColor = getStrokeColor();
-		return null == strokeColor ? Colors.BLACK : strokeColor;
+		return null == strokeColor ? Color.BLACK : strokeColor;
 	}
 }

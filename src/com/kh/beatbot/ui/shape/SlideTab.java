@@ -1,13 +1,13 @@
 package com.kh.beatbot.ui.shape;
 
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.view.View;
 
 public class SlideTab extends Shape {
 	private static final int NUM_FILL_VERTICES = RoundedRect.NUM_CORNER_VERTICES * 5 * 3 * 2;
 	private static final short[] FILL_INDICES = getFillIndices();
 
-	private static RoundedRect roundedRect = new RoundedRect(null, Colors.LABEL_SELECTED, null);
+	private static RoundedRect roundedRect = new RoundedRect(null, Color.LABEL_SELECTED, null);
 
 	private float cornerRadius = 12;
 

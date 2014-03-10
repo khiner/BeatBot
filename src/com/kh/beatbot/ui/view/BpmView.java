@@ -6,7 +6,7 @@ import java.util.Set;
 
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.shape.NumberSegment;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 
@@ -32,7 +32,7 @@ public class BpmView extends ClickableView {
 		initRoundedRect();
 		for (int i = 0; i < numberSegments.length; i++) {
 			for (int j = 0; j < numberSegments[i].length; j++) {
-				numberSegments[i][j] = new NumberSegment(shapeGroup, Colors.BPM_OFF, null);
+				numberSegments[i][j] = new NumberSegment(shapeGroup, Color.BPM_OFF, null);
 			}
 		}
 	}
@@ -107,11 +107,11 @@ public class BpmView extends ClickableView {
 	public void setText(String text) {
 		for (int i = 0; i < numberSegments.length; i++) {
 			for (int j = 0; j < numberSegments[i].length; j++) {
-				numberSegments[i][j].setFillColor(Colors.BPM_OFF);
+				numberSegments[i][j].setFillColor(Color.BPM_OFF);
 			}
 		}
 		for (NumberSegment selectedSegment : getSelectedSegments(text)) {
-			selectedSegment.setFillColor(Colors.BPM_ON);
+			selectedSegment.setFillColor(Color.BPM_ON);
 		}
 	}
 

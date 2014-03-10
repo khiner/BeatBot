@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.shape.Circle;
 import com.kh.beatbot.ui.shape.IntersectingLines;
 import com.kh.beatbot.ui.shape.ShapeGroup;
@@ -15,10 +15,10 @@ public class Seekbar2d extends ControlView2dBase {
 	}
 
 	public synchronized void createChildren() {
-		selectColor = Colors.LABEL_SELECTED;
+		selectColor = Color.LABEL_SELECTED;
 		initRoundedRect();
-		intersectingLines = new IntersectingLines(shapeGroup, null, Colors.TRON_BLUE);
-		circle = new Circle(shapeGroup, Colors.TRON_BLUE, null);
+		intersectingLines = new IntersectingLines(shapeGroup, null, Color.TRON_BLUE);
+		circle = new Circle(shapeGroup, Color.TRON_BLUE, null);
 	}
 
 	public synchronized void layoutChildren() {

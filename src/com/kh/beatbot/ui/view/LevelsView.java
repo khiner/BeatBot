@@ -7,7 +7,7 @@ import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
-import com.kh.beatbot.ui.color.Colors;
+import com.kh.beatbot.ui.Color;
 import com.kh.beatbot.ui.shape.Circle;
 import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.shape.ShapeGroup;
@@ -88,34 +88,34 @@ public class LevelsView extends TouchableView {
 
 	private float[] calcLevelColor(boolean selected) {
 		if (selected) {
-			return Colors.LEVEL_SELECTED;
+			return Color.LEVEL_SELECTED;
 		} else {
 			switch (currLevelType) {
 			case VOLUME:
-				return Colors.TRON_BLUE;
+				return Color.TRON_BLUE;
 			case PAN:
-				return Colors.PAN;
+				return Color.PAN;
 			case PITCH:
-				return Colors.PITCH;
+				return Color.PITCH;
 			default:
-				return Colors.LEVEL_SELECTED;
+				return Color.LEVEL_SELECTED;
 			}
 		}
 	}
 
 	private float[] calcLevelColorTrans(boolean selected) {
 		if (selected) {
-			return Colors.LEVEL_SELECTED_TRANS;
+			return Color.LEVEL_SELECTED_TRANS;
 		} else {
 			switch (currLevelType) {
 			case VOLUME:
-				return Colors.TRON_BLUE_TRANS;
+				return Color.TRON_BLUE_TRANS;
 			case PAN:
-				return Colors.PAN_TRANS;
+				return Color.PAN_TRANS;
 			case PITCH:
-				return Colors.PITCH_TRANS;
+				return Color.PITCH_TRANS;
 			default:
-				return Colors.LEVEL_SELECTED_TRANS;
+				return Color.LEVEL_SELECTED_TRANS;
 			}
 		}
 	}
@@ -160,7 +160,7 @@ public class LevelsView extends TouchableView {
 		}
 
 		selectRegionRect.layout(this.x + leftX, this.y + topY, rightX - leftX, bottomY - topY);
-		selectRegionRect.setFillColor(Colors.TRON_BLUE_TRANS);
+		selectRegionRect.setFillColor(Color.TRON_BLUE_TRANS);
 	}
 
 	private void updateDragLine() {
@@ -277,17 +277,17 @@ public class LevelsView extends TouchableView {
 	public void handleActionUp(int id, float x, float y) {
 		super.handleActionUp(id, x, y);
 		clearTouchedLevels();
-		selectRegionRect.setFillColor(Colors.TRANSPARENT);
+		selectRegionRect.setFillColor(Color.TRANSPARENT);
 		MidiManager.endMidiEvent();
 	}
 
 	@Override
 	protected synchronized void createChildren() {
 		initRoundedRect();
-		selectRegionRect = new Rectangle(shapeGroup, Colors.TRANSPARENT, null);
-		levelBarRect = new Rectangle(levelBarGroup, Colors.TRON_BLUE, null);
-		levelBarCircle = new Circle(levelBarGroup, Colors.TRON_BLUE, null);
-		levelBarSelectCircle = new Circle(levelBarGroup, Colors.TRON_BLUE, null);
+		selectRegionRect = new Rectangle(shapeGroup, Color.TRANSPARENT, null);
+		levelBarRect = new Rectangle(levelBarGroup, Color.TRON_BLUE, null);
+		levelBarCircle = new Circle(levelBarGroup, Color.TRON_BLUE, null);
+		levelBarSelectCircle = new Circle(levelBarGroup, Color.TRON_BLUE, null);
 	}
 
 	@Override
