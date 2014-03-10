@@ -5,17 +5,17 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
-import android.opengl.GLUtils;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfaceView.Renderer {
 
 	public static GL11 gl;
 
-	// private long frameCount = 0, averageFrameTime = 0;
+	//private final long BEGIN_FRAME = 200;
+	//private long frameCount = 0, averageFrameTime = 0;
 
 	public GLSurfaceViewBase(Context context) {
 		super(context);
@@ -39,17 +39,15 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
 
 	public final void onDrawFrame(GL10 _gl) {
 		/* uncomment for timing logs */
-		// long startTime = System.nanoTime();
+		//long startTime = System.nanoTime();
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		draw();
-		// long frameTime = System.nanoTime() - startTime;
+		//long frameTime = System.nanoTime() - startTime;
 
-		// if (frameCount++ < 200)
-		// return;
-		// averageFrameTime += (frameTime - averageFrameTime) / (frameCount -
-		// 200);
-		// Log.i("Avg Frame time: ", String.valueOf(averageFrameTime) + ", " +
-		// frameCount);
+		//if (frameCount++ < BEGIN_FRAME)
+		  //return;
+		//averageFrameTime += (frameTime - averageFrameTime) / (frameCount - BEGIN_FRAME);
+		//Log.i("Avg Frame time: ", String.valueOf(averageFrameTime) + ", " + frameCount);
 	}
 
 	protected void initGl(GL10 _gl) {
