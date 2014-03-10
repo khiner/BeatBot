@@ -19,8 +19,8 @@ public class Seekbar extends ControlView1dBase {
 	@Override
 	protected synchronized void createChildren() {
 		backgroundRect = new RoundedRect(shapeGroup, Colors.VIEW_BG, null);
-		foregroundRect = new RoundedRect(shapeGroup, Colors.VOLUME, null);
-		levelCircle = new Circle(shapeGroup, Colors.VOLUME, null);
+		foregroundRect = new RoundedRect(shapeGroup, Colors.TRON_BLUE, null);
+		levelCircle = new Circle(shapeGroup, Colors.TRON_BLUE, null);
 	}
 
 	@Override

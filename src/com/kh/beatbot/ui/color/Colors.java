@@ -6,8 +6,8 @@ import com.kh.beatbot.R;
 
 public class Colors {
 	public static float[] BG, BLACK, WHITE, GREEN, YELLOW, RED, DARK_TRANS, MIDI_VIEW_BG,
-			MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM, NOTE, NOTE_SELECTED, VOLUME, PAN, PITCH,
-			VOLUME_LIGHT, VOLUME_TRANS, PAN_TRANS, PITCH_TRANS, LEVEL_SELECTED,
+			MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM, NOTE, NOTE_SELECTED, TRON_BLUE, PAN, PITCH,
+			TRON_BLUE_LIGHT, TRON_BLUE_TRANS, PAN_TRANS, PITCH_TRANS, LEVEL_SELECTED,
 			LEVEL_SELECTED_TRANS, TICK_FILL, TICK_MARKER, TICKBAR, BPM_OFF, BPM_ON, VIEW_BG,
 			VIEW_BG_SELECTED, LABEL_DARK, LABEL_MED, LABEL_LIGHT, LABEL_VERY_LIGHT, LABEL_SELECTED,
 			LABEL_SELECTED_TRANS, MIDI_SELECTED_TRACK, TRANSPARENT = { 0, 0, 0, 0 },
@@ -33,9 +33,9 @@ public class Colors {
 		MIDI_VIEW_BG = colorResourceToFloats(activity, R.color.midiViewBg);
 		MIDI_VIEW_LIGHT_BG = colorResourceToFloats(activity, R.color.midiViewLightBg);
 		GRID_LINE = colorResourceToFloats(activity, R.color.gridLine);
-		VOLUME = colorResourceToFloats(activity, R.color.tronBlue);
-		VOLUME_TRANS = new float[] { VOLUME[0], VOLUME[1], VOLUME[2], .6f };
-		VOLUME_LIGHT = colorResourceToFloats(activity, R.color.tronBlueLight);
+		TRON_BLUE = colorResourceToFloats(activity, R.color.tronBlue);
+		TRON_BLUE_TRANS = new float[] { TRON_BLUE[0], TRON_BLUE[1], TRON_BLUE[2], .6f };
+		TRON_BLUE_LIGHT = colorResourceToFloats(activity, R.color.tronBlueLight);
 		PAN = colorResourceToFloats(activity, R.color.pan);
 		PAN_TRANS = new float[] { PAN[0], PAN[1], PAN[2], .6f };
 		PITCH = colorResourceToFloats(activity, R.color.pitch);

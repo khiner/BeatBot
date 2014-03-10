@@ -88,7 +88,7 @@ public class MidiView extends ClickableView implements TrackListener {
 		TickWindowHelper.updateView(tick, topY, bottomY);
 		selectRegionRect.layout(tickToUnscaledX(leftTick), topY, tickToUnscaledX(rightTick
 				- leftTick), bottomY - topY);
-		selectRegionRect.setFillColor(Colors.VOLUME_TRANS);
+		selectRegionRect.setFillColor(Colors.TRON_BLUE_TRANS);
 	}
 
 	public MidiNote getMidiNote(int track, float tick) {
@@ -138,14 +138,14 @@ public class MidiView extends ClickableView implements TrackListener {
 		float loopEndX = tickToX(MidiManager.getLoopEndTick());
 		if (Math.abs(x - loopBeginX) <= LOOP_SELECT_SNAP_DIST) {
 			loopPointerIds[0] = pointerId;
-			loopMarkerLines[0].setStrokeColor(Colors.VOLUME);
+			loopMarkerLines[0].setStrokeColor(Colors.TRON_BLUE);
 		} else if (Math.abs(x - loopEndX) <= LOOP_SELECT_SNAP_DIST) {
 			loopPointerIds[2] = pointerId;
-			loopMarkerLines[1].setStrokeColor(Colors.VOLUME);
+			loopMarkerLines[1].setStrokeColor(Colors.TRON_BLUE);
 		} else if (x > loopBeginX && x < loopEndX) {
 			loopPointerIds[1] = pointerId;
 			loopSelectionOffset = x - loopBeginX;
-			loopBarRect.setFillColor(Colors.VOLUME);
+			loopBarRect.setFillColor(Colors.TRON_BLUE);
 		}
 	}
 
@@ -195,10 +195,10 @@ public class MidiView extends ClickableView implements TrackListener {
 		tickBarRect = new Rectangle(shapeGroup, Colors.TICK_FILL, Colors.BLACK);
 		loopBarRect = new Rectangle(shapeGroup, Colors.TICKBAR, null);
 		selectRegionRect = new Rectangle(shapeGroup, Colors.TRANSPARENT, null);
-		currTickLine = new Line(shapeGroup, null, Colors.VOLUME);
+		currTickLine = new Line(shapeGroup, null, Colors.TRON_BLUE);
 		loopMarkerLines = new Line[2];
 		for (int i = 0; i < loopMarkerLines.length; i++) {
-			loopMarkerLines[i] = new Line(shapeGroup, null, Colors.VOLUME);
+			loopMarkerLines[i] = new Line(shapeGroup, null, Colors.TRON_BLUE);
 		}
 	}
 

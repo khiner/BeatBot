@@ -35,7 +35,7 @@ public class Knob extends ControlView1dBase {
 
 	@Override
 	public synchronized void createChildren() {
-		knobShape = new KnobShape(shapeGroup, Colors.VOLUME, null);
+		knobShape = new KnobShape(shapeGroup, Colors.TRON_BLUE, null);
 	}
 
 	@Override

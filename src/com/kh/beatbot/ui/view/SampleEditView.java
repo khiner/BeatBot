@@ -125,7 +125,7 @@ public class SampleEditView extends ControlView2dBase {
 		setIcon(IconResourceSets.SAMPLE_BG);
 		initRect();
 		waveformShape = new WaveformShape(shapeGroup, width, Colors.LABEL_SELECTED, Colors.BLACK);
-		currSampleRect = new Rectangle(shapeGroup, Colors.VOLUME, null);
+		currSampleRect = new Rectangle(shapeGroup, Colors.TRON_BLUE, null);
 		waveformWidth = width - SNAP_DIST;
 		super.layout(parent, x, y, width, height);
 	}

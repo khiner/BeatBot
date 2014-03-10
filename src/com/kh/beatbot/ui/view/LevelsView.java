@@ -92,7 +92,7 @@ public class LevelsView extends TouchableView {
 		} else {
 			switch (currLevelType) {
 			case VOLUME:
-				return Colors.VOLUME;
+				return Colors.TRON_BLUE;
 			case PAN:
 				return Colors.PAN;
 			case PITCH:
@@ -109,7 +109,7 @@ public class LevelsView extends TouchableView {
 		} else {
 			switch (currLevelType) {
 			case VOLUME:
-				return Colors.VOLUME_TRANS;
+				return Colors.TRON_BLUE_TRANS;
 			case PAN:
 				return Colors.PAN_TRANS;
 			case PITCH:
@@ -160,7 +160,7 @@ public class LevelsView extends TouchableView {
 		}
 
 		selectRegionRect.layout(this.x + leftX, this.y + topY, rightX - leftX, bottomY - topY);
-		selectRegionRect.setFillColor(Colors.VOLUME_TRANS);
+		selectRegionRect.setFillColor(Colors.TRON_BLUE_TRANS);
 	}
 
 	private void updateDragLine() {
@@ -285,9 +285,9 @@ public class LevelsView extends TouchableView {
 	protected synchronized void createChildren() {
 		initRoundedRect();
 		selectRegionRect = new Rectangle(shapeGroup, Colors.TRANSPARENT, null);
-		levelBarRect = new Rectangle(levelBarGroup, Colors.VOLUME, null);
-		levelBarCircle = new Circle(levelBarGroup, Colors.VOLUME, null);
-		levelBarSelectCircle = new Circle(levelBarGroup, Colors.VOLUME, null);
+		levelBarRect = new Rectangle(levelBarGroup, Colors.TRON_BLUE, null);
+		levelBarCircle = new Circle(levelBarGroup, Colors.TRON_BLUE, null);
+		levelBarSelectCircle = new Circle(levelBarGroup, Colors.TRON_BLUE, null);
 	}
 
 	@Override

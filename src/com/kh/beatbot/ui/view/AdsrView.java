@@ -68,7 +68,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	@Override
 	protected synchronized void createChildren() {
 		initRoundedRect();
-		adsrShape = new AdsrShape(shapeGroup, Colors.VOLUME, Colors.VOLUME);
+		adsrShape = new AdsrShape(shapeGroup, Colors.TRON_BLUE, Colors.TRON_BLUE);
 	}
 
 	@Override

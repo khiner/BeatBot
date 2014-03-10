@@ -21,7 +21,7 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 	};
 
 	private static final IconResourceSet onIcon = new IconResourceSet(new IconResource(-1,
-			Colors.VOLUME, null), new IconResource(-1, Colors.VOLUME_LIGHT, null));
+			Colors.TRON_BLUE, null), new IconResource(-1, Colors.TRON_BLUE_LIGHT, null));
 
 	private static final IconResourceSet offIcon = new IconResourceSet(new IconResource(-1,
 			Colors.LABEL_LIGHT, null), new IconResource(-1, Colors.LABEL_VERY_LIGHT, null));

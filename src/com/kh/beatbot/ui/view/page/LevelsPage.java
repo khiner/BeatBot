@@ -54,7 +54,7 @@ public class LevelsPage extends TouchableView implements ControlViewListener {
 		panButton.setEnabled(false);
 		pitchButton.setEnabled(false);
 
-		volumeLevelBar.setLevelColor(Colors.VOLUME, Colors.VOLUME_TRANS);
+		volumeLevelBar.setLevelColor(Colors.TRON_BLUE, Colors.TRON_BLUE_TRANS);
 		panLevelBar.setLevelColor(Colors.PAN, Colors.PAN_TRANS);
 		pitchLevelBar.setLevelColor(Colors.PITCH, Colors.PITCH_TRANS);
 
