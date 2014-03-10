@@ -15,11 +15,12 @@ public class ResourceTextureAtlas extends TextureAtlas {
 
 	public void initConfig() {
 		config = new Config();
-		Bitmap first = BitmapFactory.decodeResource(resources, RESOURCE_IDS[0]);
 
 		config.numRegions = RESOURCE_IDS.length;
 		config.regionIdOffset = RESOURCE_IDS[0];
 		config.bitmapConfig = Bitmap.Config.ARGB_4444;
+
+		Bitmap first = BitmapFactory.decodeResource(resources, RESOURCE_IDS[0]);
 		config.cellWidth = first.getWidth();
 		config.cellHeight = first.getHeight();
 

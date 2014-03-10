@@ -32,7 +32,8 @@ public abstract class TextureAtlas {
 
 	public void load(Activity activity) {
 		initConfig();
-		initBitmap();
+		// create an empty bitmap (alpha only)
+		bitmap = Bitmap.createBitmap(config.textureSize, config.textureSize, config.bitmapConfig);
 		canvas = new Canvas(bitmap);
 		initTextureRegions();
 	}
@@ -88,12 +89,6 @@ public abstract class TextureAtlas {
 				y += config.cellHeight; // Move Down a Row
 			}
 		}
-	}
-
-	protected void initBitmap() {
-		// create an empty bitmap (alpha only)
-		bitmap = Bitmap.createBitmap(config.textureSize, config.textureSize, config.bitmapConfig);
-		bitmap.eraseColor(0x00000000); // Set Transparent Background (ARGB)
 	}
 
 	protected abstract void initConfig();
