@@ -13,7 +13,6 @@ public class TextMesh extends Mesh {
 	}
 
 	public synchronized void setText(String text, float x, float y, float height) {
-
 		if (text.equals(this.text) && height == this.height) {
 			setPosition(x, y);
 			return;

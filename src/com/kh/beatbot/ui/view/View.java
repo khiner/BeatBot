@@ -98,10 +98,10 @@ public class View implements Comparable<View> {
 	}
 
 	public void initRoundedRect() {
-		if (null != shape)
-			return;
-		shape = new RoundedRect(shapeGroup, icon.getResource(state).fillColor,
-				icon.getResource(state).strokeColor);
+		if (null == shape) {
+			shape = new RoundedRect(shapeGroup, icon.getResource(state).fillColor,
+					icon.getResource(state).strokeColor);
+		}
 	}
 
 	protected void initRect() {
@@ -220,6 +220,7 @@ public class View implements Comparable<View> {
 			absoluteY += parent.absoluteY;
 		}
 		layoutChildren();
+		layoutShape();
 	}
 
 	public void setClip(boolean shouldClip) {
@@ -382,7 +383,6 @@ public class View implements Comparable<View> {
 		this.parent = parent;
 		setDimensions(width, height);
 		setPosition(x, y);
-		layoutShape();
 	}
 
 	protected synchronized View findChildAt(float x, float y) {
