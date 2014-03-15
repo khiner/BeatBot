@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.view.list;
 
 import java.util.Collections;
 
+import com.kh.beatbot.R;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -21,13 +22,14 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 	};
 
 	private static final IconResourceSet onIcon = new IconResourceSet(new IconResource(-1,
-			Color.TRON_BLUE, null), new IconResource(-1, Color.TRON_BLUE_LIGHT, null));
+			Color.TRON_BLUE, null), new IconResource(-1, Color.TRON_BLUE_LIGHT, Color.WHITE));
 
 	private static final IconResourceSet offIcon = new IconResourceSet(new IconResource(-1,
-			Color.LABEL_LIGHT, null), new IconResource(-1, Color.LABEL_VERY_LIGHT, null));
+			Color.LABEL_LIGHT, null), new IconResource(-1, Color.LABEL_VERY_LIGHT, Color.WHITE));
 
-	private static final IconResourceSet emptyIcon = new IconResourceSet(new IconResource(-1,
-			Color.LABEL_DARK, null), new IconResource(-1, Color.LABEL_MED, null));
+	private static final IconResourceSet emptyIcon = new IconResourceSet(new IconResource(
+			R.drawable.plus_outline, Color.LABEL_DARK, Color.WHITE), new IconResource(
+			R.drawable.plus_outline, Color.LABEL_MED, Color.WHITE));
 
 	protected class Label extends Button {
 		private final static String EMPTY_TEXT = "ADD";
@@ -38,6 +40,7 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 			setResourceId(IconResourceSets.ADD);
 			setFillColors(emptyIcon);
 			setText(EMPTY_TEXT);
+			shouldClip = false;
 		}
 
 		public void setState(LabelState state) {
@@ -69,7 +72,6 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 
 	protected static final float GAP_BETWEEN_LABELS = 5;
 	protected static final float TEXT_Y_OFFSET = 3;
-	protected static IconResourceSet addIcon;
 	protected float labelWidth = 0;
 	protected Label touchedLabel = null;
 	protected LabelListListener listener = null;
@@ -94,7 +96,7 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 	}
 
 	public Label addLabel(String text, boolean on) {
-		Label newLabel = new Label(shapeGroup);
+		Label newLabel = new Label(null);
 		// need onPressListener as well as the onReleaseListener to notify
 		// when a label becomes touched
 		newLabel.setOnPressListener(this);
@@ -113,11 +115,9 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 		if (label == null)
 			return;
 		if (text.isEmpty()) {
-			label.setIcon(addIcon);
 			label.setState(LabelState.EMPTY);
 			label.setText(Label.EMPTY_TEXT);
 		} else {
-			label.setIcon(null);
 			label.setText(text);
 		}
 	}
@@ -169,19 +169,13 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 	@Override
 	protected synchronized void drawChildren() {
 		for (View label : children) {
-			if (label.equals(touchedLabel))
-				continue;
-			push();
-			translate(label.x, label.y);
-			label.drawAll();
-			pop();
+			if (!label.equals(touchedLabel)) {
+				label.drawAll();
+			}
 		}
 		// draw touched label last (ontop of others)
 		if (touchedLabel != null) {
-			push();
-			translate(touchedLabel.x, touchedLabel.y);
 			touchedLabel.drawAll();
-			pop();
 		}
 	}
 

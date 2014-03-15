@@ -120,7 +120,7 @@ public class View implements Comparable<View> {
 
 	public final synchronized void setIcon(IconResourceSet resourceSet) {
 		if (null == resourceSet) {
-			destroyIcon();
+			destroyTexture();
 			destroyShape();
 			return;
 		}
@@ -172,7 +172,7 @@ public class View implements Comparable<View> {
 	}
 
 	protected synchronized void destroy() {
-		destroyIcon();
+		destroyTexture();
 		destroyShape();
 		destroyText();
 
@@ -188,7 +188,7 @@ public class View implements Comparable<View> {
 		}
 	}
 
-	private synchronized void destroyIcon() {
+	private synchronized void destroyTexture() {
 		if (null != textureMesh) {
 			textureMesh.destroy();
 			textureMesh = null;
@@ -491,8 +491,13 @@ public class View implements Comparable<View> {
 			textMesh = new TextMesh(shapeGroup.getTextGroup(), text);
 		}
 		if (null != textureMesh) {
-			textureMesh.setResource(null == currResource ? -1 : currResource.resourceId);
-			textureMesh.setColor(getTextColor());
+			int resourceId = null == currResource ? -1 : currResource.resourceId;
+			if (-1 == resourceId) {
+				destroyTexture();
+			} else {
+				textureMesh.setResource(resourceId);
+				textureMesh.setColor(getTextColor());
+			}
 		}
 		if (null != textMesh) {
 			textMesh.setColor(getTextColor());

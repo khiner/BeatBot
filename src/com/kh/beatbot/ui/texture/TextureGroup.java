@@ -42,8 +42,6 @@ public class TextureGroup extends MeshGroup {
 	}
 
 	public synchronized void setResource(Mesh mesh, int resourceId) {
-		if (-1 == resourceId)
-			return;
 		setTexture(mesh, TextureAtlas.resource.getTextureRegion(resourceId));
 
 		dirty = true;

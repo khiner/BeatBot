@@ -22,7 +22,11 @@ public class TextureMesh extends Mesh {
 	}
 
 	public synchronized void setResource(int resourceId) {
-		((TextureGroup) group).setResource(this, resourceId);
+		if (-1 == resourceId) {
+			destroy();
+		} else {
+			((TextureGroup) group).setResource(this, resourceId);
+		}
 	}
 
 	@Override

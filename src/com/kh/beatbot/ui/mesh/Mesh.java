@@ -34,10 +34,9 @@ public abstract class Mesh {
 	}
 
 	public void destroy() {
-		if (group == null)
+		if (null == group)
 			return;
 		group.remove(this);
-		group = null;
 	}
 
 	public int getNumVertices() {
