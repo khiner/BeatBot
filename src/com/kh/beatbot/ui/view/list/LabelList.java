@@ -21,15 +21,17 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 		ON, OFF, EMPTY
 	};
 
-	private static final IconResourceSet onIcon = new IconResourceSet(new IconResource(-1,
-			Color.TRON_BLUE, null), new IconResource(-1, Color.TRON_BLUE_LIGHT, Color.WHITE));
+	private static final IconResourceSet
 
-	private static final IconResourceSet offIcon = new IconResourceSet(new IconResource(-1,
-			Color.LABEL_LIGHT, null), new IconResource(-1, Color.LABEL_VERY_LIGHT, Color.WHITE));
+	onIcon = new IconResourceSet(new IconResource(-1, Color.TRON_BLUE, null, Color.WHITE),
+			new IconResource(-1, Color.TRON_BLUE_LIGHT, null, Color.WHITE)),
 
-	private static final IconResourceSet emptyIcon = new IconResourceSet(new IconResource(
-			R.drawable.plus_outline, Color.LABEL_DARK, Color.WHITE), new IconResource(
-			R.drawable.plus_outline, Color.LABEL_MED, Color.WHITE));
+	offIcon = new IconResourceSet(new IconResource(-1, Color.LABEL_LIGHT, null, Color.WHITE), new IconResource(
+			-1, Color.LABEL_VERY_LIGHT, null, Color.WHITE)),
+
+	emptyIcon = new IconResourceSet(new IconResource(R.drawable.plus_outline, Color.LABEL_DARK,
+			null, Color.WHITE), new IconResource(R.drawable.plus_outline, Color.LABEL_MED, null,
+			Color.WHITE));
 
 	protected class Label extends Button {
 		private final static String EMPTY_TEXT = "ADD";

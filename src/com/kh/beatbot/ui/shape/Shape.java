@@ -91,8 +91,14 @@ public abstract class Shape {
 
 	public synchronized void setStrokeColor(float[] strokeColor) {
 		this.strokeColor = strokeColor;
-		if (null != strokeMesh && null != strokeColor) {
+		if (null == strokeMesh) {
+			return;
+		}
+		if (null != strokeColor) {
 			strokeMesh.setColor(strokeColor);
+		} else {
+			strokeMesh.destroy();
+			strokeMesh = null;
 		}
 	}
 

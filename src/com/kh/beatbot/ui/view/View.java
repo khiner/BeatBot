@@ -512,7 +512,11 @@ public class View implements Comparable<View> {
 	}
 
 	private final float[] getTextColor() {
-		final float[] strokeColor = getStrokeColor();
-		return null == strokeColor ? Color.BLACK : strokeColor;
+		final IconResource currResource = getIconResource();
+		if (null == currResource
+				|| (null == currResource.textColor && null == currResource.strokeColor)) {
+			return Color.BLACK;
+		}
+		return null == currResource.textColor ? currResource.strokeColor : currResource.textColor;
 	}
 }
