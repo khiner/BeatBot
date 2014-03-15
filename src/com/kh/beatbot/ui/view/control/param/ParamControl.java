@@ -21,6 +21,7 @@ public class ParamControl extends TouchableView {
 	@Override
 	public synchronized void createChildren() {
 		valueLabel = new ValueLabel(shapeGroup);
+		valueLabel.setShrinkable(true);
 		label = new View(shapeGroup);
 		addChildren(valueLabel, label);
 	}

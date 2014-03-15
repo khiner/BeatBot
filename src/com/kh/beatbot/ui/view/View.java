@@ -50,7 +50,7 @@ public class View implements Comparable<View> {
 	protected List<View> children = new ArrayList<View>();
 
 	private boolean initialized = false;
-	protected boolean shouldClip = true, shouldDraw = true;
+	protected boolean shouldClip = true, shouldDraw = true, shrinkable = false;
 	private String text = "";
 	protected Set<ScrollableViewListener> listeners = new HashSet<ScrollableViewListener>();
 
@@ -204,6 +204,10 @@ public class View implements Comparable<View> {
 
 	public synchronized int numChildren() {
 		return children.size();
+	}
+
+	public void setShrinkable(boolean shrinkable) {
+		this.shrinkable = shrinkable;
 	}
 
 	public void setDimensions(float width, float height) {
@@ -375,10 +379,6 @@ public class View implements Comparable<View> {
 		borderHeight = this.height - 2 * minY;
 	}
 
-	protected boolean shouldShrink() {
-		return false;
-	}
-
 	public void layout(View parent, float x, float y, float width, float height) {
 		this.parent = parent;
 		setDimensions(width, height);
@@ -389,7 +389,7 @@ public class View implements Comparable<View> {
 		// reverse order to respect z-index (children are drawn in position
 		// order
 		for (int i = children.size() - 1; i >= 0; i--) {
-			View child = children.get(i);
+			final View child = children.get(i);
 			if (child.containsPoint(x, y)) {
 				return child;
 			}
@@ -496,7 +496,7 @@ public class View implements Comparable<View> {
 				destroyTexture();
 			} else {
 				textureMesh.setResource(resourceId);
-				textureMesh.setColor(getTextColor());
+				textureMesh.setColor(getIconColor());
 			}
 		}
 		if (null != textMesh) {
@@ -518,5 +518,15 @@ public class View implements Comparable<View> {
 			return Color.BLACK;
 		}
 		return null == currResource.textColor ? currResource.strokeColor : currResource.textColor;
+	}
+
+	private final float[] getIconColor() {
+		final IconResource currResource = getIconResource();
+		return (null == currResource || null == currResource.iconColor) ? getTextColor()
+				: currResource.iconColor;
+	}
+
+	private final boolean shouldShrink() {
+		return shrinkable ? (getState() == State.PRESSED || getState() == State.SELECTED) : false;
 	}
 }

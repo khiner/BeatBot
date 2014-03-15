@@ -14,8 +14,7 @@ public class IconResourceSets {
 			MUTE = s(r(Color.TRANSPARENT, Color.WHITE), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.PAN, Color.BLACK)),
 			SOLO = s(r(Color.TRANSPARENT, Color.WHITE), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.PITCH, Color.BLACK)),
 			BEAT_SYNC = s(r(R.drawable.clock), null, r(R.drawable.note_icon)),
-			VALUE_LABEL = s(r(Color.LABEL_VERY_LIGHT, Color.BLACK), r(Color.LABEL_SELECTED, Color.BLACK),
-					null, r(Color.LABEL_DARK, Color.BLACK)),
+			VALUE_LABEL = s(r(Color.LABEL_VERY_LIGHT), r(Color.LABEL_SELECTED), null, r(Color.LABEL_DARK)),
 			PLAY = s(r(R.drawable.play_icon, null, Color.WHITE), r(R.drawable.play_icon_selected, null, Color.WHITE), r(R.drawable.play_icon_selected, null, Color.WHITE)),
 			STOP = s(r(R.drawable.stop_icon, null, Color.WHITE), r(R.drawable.stop_icon, null, Color.LABEL_SELECTED)),
 			RECORD = s(r(R.drawable.record_icon, null, Color.WHITE), r(R.drawable.record_icon_selected, null, Color.WHITE), r(R.drawable.record_icon_selected, null, Color.WHITE)),
@@ -49,7 +48,7 @@ public class IconResourceSets {
 			LEVELS = s(r(R.drawable.levels_icon), r(R.drawable.levels_icon), r(R.drawable.levels_icon)),
 
 			MENU_ITEM = s(r(null), r(Color.LABEL_LIGHT), r(Color.TRON_BLUE)),
-			
+
 			FILE = s(r(R.drawable.browse_icon, null, Color.BLACK), r(R.drawable.browse_icon, null, Color.TRON_BLUE)),
 			SETTINGS = s(r(R.drawable.settings_icon, null, Color.BLACK), r(R.drawable.settings_icon, null, Color.TRON_BLUE)),
 			SNAP_TO_GRID = s(r(R.drawable.snap_to_grid_icon), null, r(R.drawable.snap_to_grid_icon)),
@@ -71,7 +70,7 @@ public class IconResourceSets {
 
 			LINK = s(r(R.drawable.link_icon, null, Color.WHITE), r(R.drawable.link_icon, null, Color.TRON_BLUE)),
 
-			TOGGLE = s(r(R.drawable.toggle_icon, Color.LABEL_DARK, Color.LABEL_LIGHT), r(R.drawable.toggle_icon, Color.TRON_BLUE, Color.TRON_BLUE), r(R.drawable.toggle_icon, Color.LABEL_SELECTED, Color.TRON_BLUE)),
+			TOGGLE = s(r(R.drawable.toggle_icon, Color.LABEL_DARK, Color.LABEL_VERY_LIGHT), r(R.drawable.toggle_icon, Color.TRON_BLUE, Color.BLACK), r(R.drawable.toggle_icon, Color.LABEL_SELECTED, Color.BLACK, Color.BLACK, Color.TRON_BLUE)),
 
 			BANDPASS_FILTER = s(r(R.drawable.bandpass_filter_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.bandpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.bandpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
 			HIGHPASS_FILTER = s(r(R.drawable.highpass_filter_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.highpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.highpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
@@ -108,8 +107,17 @@ public class IconResourceSets {
 		return new IconResource(-1, fillColor, strokeColor);
 	}
 
+	
 	private static IconResource r(int resourceId, float[] fillColor, float[] strokeColor) {
 		return new IconResource(resourceId, fillColor, strokeColor);
+	}
+
+	private static IconResource r(int resourceId, float[] fillColor, float[] strokeColor, float[] textColor) {
+		return new IconResource(resourceId, fillColor, strokeColor, textColor);
+	}
+	
+	private static IconResource r(int resourceId, float[] fillColor, float[] strokeColor, float[] textColor, float[] iconColor) {
+		return new IconResource(resourceId, fillColor, strokeColor, textColor, iconColor);
 	}
 
 	private static IconResourceSet s(IconResource defaultIconResource) {

@@ -8,7 +8,7 @@ import android.view.MotionEvent;
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 
-public abstract class TouchableView extends View {
+public class TouchableView extends View {
 	public class Position {
 		public float x, y;
 

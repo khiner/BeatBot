@@ -4,7 +4,6 @@ import com.kh.beatbot.listener.OnLongPressListener;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResource;
-import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.LongPressableView;
 
@@ -17,6 +16,7 @@ public class Button extends LongPressableView {
 
 	public Button(ShapeGroup shapeGroup) {
 		super(shapeGroup);
+		setShrinkable(true);
 	}
 
 	public final OnPressListener getOnPressListener() {
@@ -57,11 +57,6 @@ public class Button extends LongPressableView {
 
 	public boolean isEnabled() {
 		return enabled;
-	}
-
-	@Override
-	public boolean shouldShrink() {
-		return getState() == State.PRESSED || getState() == State.SELECTED;
 	}
 
 	/*
