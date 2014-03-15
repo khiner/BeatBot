@@ -1,9 +1,10 @@
-package com.kh.beatbot.ui;
+package com.kh.beatbot.ui.icon;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.ui.color.Color;
 
 public class IconResourceSets {
 	public static IconResourceSet

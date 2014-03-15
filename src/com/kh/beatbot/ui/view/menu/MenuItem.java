@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.ui.IconResourceSet;
-import com.kh.beatbot.ui.IconResourceSets;
+import com.kh.beatbot.ui.icon.IconResourceSet;
+import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.ListView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;

@@ -10,11 +10,11 @@ import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.listener.ScrollableViewListener;
-import com.kh.beatbot.ui.Color;
-import com.kh.beatbot.ui.IconResource;
-import com.kh.beatbot.ui.IconResourceSet;
-import com.kh.beatbot.ui.IconResourceSet.State;
-import com.kh.beatbot.ui.IconResourceSets;
+import com.kh.beatbot.ui.color.Color;
+import com.kh.beatbot.ui.icon.IconResource;
+import com.kh.beatbot.ui.icon.IconResourceSet;
+import com.kh.beatbot.ui.icon.IconResourceSets;
+import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.mesh.TextMesh;
 import com.kh.beatbot.ui.mesh.TextureMesh;
 import com.kh.beatbot.ui.shape.Rectangle;

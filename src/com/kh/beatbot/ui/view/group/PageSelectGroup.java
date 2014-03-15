@@ -5,7 +5,7 @@ import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.IconResourceSets;
+import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;

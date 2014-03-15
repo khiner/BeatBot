@@ -10,7 +10,7 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremolo;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.ui.IconResourceSets;
+import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.Seekbar2d;

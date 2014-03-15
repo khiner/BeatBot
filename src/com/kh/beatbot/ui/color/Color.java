@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui;
+package com.kh.beatbot.ui.color;
 
 import android.app.Activity;
 

@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 
 import com.kh.beatbot.listener.OnLongPressListener;
-import com.kh.beatbot.ui.IconResourceSets;
+import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 

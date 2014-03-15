@@ -2,8 +2,8 @@ package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.ui.IconResourceSet.State;
-import com.kh.beatbot.ui.IconResourceSets;
+import com.kh.beatbot.ui.icon.IconResourceSets;
+import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 
 public class ValueLabel extends ControlView1dBase {

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.ui.Color;
+import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.Line;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.MidiView;

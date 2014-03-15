@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.view.group;
 
 import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.ui.IconResourceSets;
+import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.BpmView;
 import com.kh.beatbot.ui.view.View;

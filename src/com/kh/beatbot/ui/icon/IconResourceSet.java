@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui;
+package com.kh.beatbot.ui.icon;
 
 import java.util.HashMap;
 import java.util.Map;

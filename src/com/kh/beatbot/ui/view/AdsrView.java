@@ -6,7 +6,7 @@ import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.Color;
+import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.AdsrShape;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 

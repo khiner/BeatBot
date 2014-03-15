@@ -1,6 +1,6 @@
 package com.kh.beatbot.ui.shape;
 
-import com.kh.beatbot.ui.Color;
+import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.view.View;
 
 public class SlideTab extends Shape {

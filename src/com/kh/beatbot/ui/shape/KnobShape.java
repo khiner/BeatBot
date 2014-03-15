@@ -1,6 +1,6 @@
 package com.kh.beatbot.ui.shape;
 
-import com.kh.beatbot.ui.Color;
+import com.kh.beatbot.ui.color.Color;
 
 public class KnobShape extends Shape {
 	private static final int NUM_FILL_VERTICES = 128;

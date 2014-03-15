@@ -2,7 +2,7 @@ package com.kh.beatbot.ui.view;
 
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.listener.OnPressListener;
-import com.kh.beatbot.ui.Color;
+import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.transition.ColorTransition;

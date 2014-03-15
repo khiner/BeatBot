@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui;
+package com.kh.beatbot.ui.icon;
 
 public class IconResource {
 	public int resourceId;
