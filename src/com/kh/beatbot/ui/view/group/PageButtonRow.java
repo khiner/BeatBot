@@ -11,6 +11,7 @@ public abstract class PageButtonRow extends TouchableView {
 
 	protected ViewPager pager;
 	protected ToggleButton[] pageButtons;
+	protected Button currPage;
 
 	public PageButtonRow(ShapeGroup shapeGroup, ViewPager pager) {
 		this.pager = pager;
@@ -30,6 +31,8 @@ public abstract class PageButtonRow extends TouchableView {
 			pageButtons[i].setIcon(IconResourceSets.LABEL_BASE);
 		}
 
+		currPage = pageButtons[0];
+
 		for (ToggleButton pageButton : pageButtons) {
 			pageButton.setOnReleaseListener(new OnReleaseListener() {
 				@Override
@@ -40,6 +43,7 @@ public abstract class PageButtonRow extends TouchableView {
 							otherToggleButton.setChecked(false);
 						}
 					}
+					currPage = button;
 					pager.setPage(button);
 				}
 			});

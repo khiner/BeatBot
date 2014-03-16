@@ -142,6 +142,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 		masterButton.setChecked(isMaster);
 		levelsPage.setMasterMode(isMaster);
 		effectsPage.setMasterMode(isMaster);
+		((PageButtonRow)buttonRowPager.getCurrPage()).currPage.trigger();
 		updateAll();
 	}
 

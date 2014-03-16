@@ -100,7 +100,6 @@ public class BaseTrack {
 	}
 
 	public void checkInstrumentButton() {
-
 	}
 
 	public static native void setTrackVolume(int trackId, float volume);
