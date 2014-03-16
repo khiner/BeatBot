@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -10,8 +11,8 @@ public class TrackButtonRow extends TouchableView {
 	public ToggleButton instrumentButton, muteButton, soloButton;
 	private Track track;
 
-	public TrackButtonRow(Track track) {
-		super(View.mainPage.midiTrackView.shapeGroup);
+	public TrackButtonRow(ShapeGroup shapeGroup, Track track) {
+		super(shapeGroup);
 		this.track = track;
 	}
 

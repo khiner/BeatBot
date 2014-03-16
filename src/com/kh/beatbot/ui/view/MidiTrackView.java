@@ -20,14 +20,18 @@ public class MidiTrackView extends TouchableView implements TrackListener, Scrol
 
 	@Override
 	public void onCreate(Track track) {
-		addChild(track.getButtonRow());
+		TrackButtonRow buttonRow = new TrackButtonRow(shapeGroup, track);
+		track.setButtonRow(buttonRow);
+		addChild(buttonRow);
 		layoutChildren();
 	}
 
 	@Override
 	public void onDestroy(Track track) {
-		removeChild(track.getButtonRow());
+		TrackButtonRow buttonRow = track.getButtonRow();
+		removeChild(buttonRow);
 		layoutChildren();
+		track.setButtonRow(null);
 	}
 
 	@Override

@@ -84,9 +84,10 @@ public class TrackManager implements TrackListener {
 		createTrackNative();
 		track.setId(tracks.size());
 		tracks.add(track);
-		track.setSample(track.getCurrSampleFile());
 		track.updateNextNote();
 		get().onCreate(track);
+
+		track.setSample(track.getCurrSampleFile());
 	}
 
 	public static boolean trackExists(Track track) {

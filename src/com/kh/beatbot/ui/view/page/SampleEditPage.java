@@ -30,9 +30,7 @@ public class SampleEditPage extends TouchableView {
 		loopBeginControl.setLabelText("Begin");
 		loopEndControl.setLabelText("End");
 		gainControl.setLabelText("Gain");
-
-		if (sampleEdit != null)
-			sampleEdit.update();
+		sampleEdit.update();
 	}
 
 	@Override

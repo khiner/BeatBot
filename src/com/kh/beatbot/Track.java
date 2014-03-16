@@ -46,7 +46,6 @@ public class Track extends BaseTrack {
 	public Track(int id) {
 		super(id);
 		this.adsr = new ADSR(this);
-		this.buttonRow = new TrackButtonRow(this);
 	}
 
 	public void setId(int id) {
@@ -58,6 +57,10 @@ public class Track extends BaseTrack {
 
 	private void updateADSR() {
 		adsr.update();
+	}
+
+	public void setButtonRow(TrackButtonRow buttonRow) {
+		this.buttonRow = buttonRow;
 	}
 
 	public TrackButtonRow getButtonRow() {
@@ -165,10 +168,10 @@ public class Track extends BaseTrack {
 		return null;
 	}
 
-	public void setSample(File sampleFile) {
-		if (sampleFile == null)
+	public void setSample(final File sampleFile) {
+		if (null == sampleFile)
 			return;
-		String error = setSample(id, sampleFile.getPath());
+		final String error = setSample(id, sampleFile.getPath());
 		if (!error.equals("No Error.")) {
 			ERROR_ALERT.setTitle("Error loading " + sampleFile.getName() + ".").setMessage(error)
 					.create().show();
