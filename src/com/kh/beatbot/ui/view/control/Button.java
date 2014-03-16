@@ -4,6 +4,7 @@ import com.kh.beatbot.listener.OnLongPressListener;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResource;
+import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.LongPressableView;
 
@@ -11,8 +12,6 @@ public class Button extends LongPressableView {
 	private OnPressListener pressListener;
 	private OnReleaseListener releaseListener;
 	private OnLongPressListener longPressListener;
-
-	protected boolean enabled = true;
 
 	public Button(ShapeGroup shapeGroup) {
 		super(shapeGroup);
@@ -52,11 +51,11 @@ public class Button extends LongPressableView {
 	}
 
 	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
+		setState(enabled ? State.DEFAULT : State.DISABLED);
 	}
 
-	public boolean isEnabled() {
-		return enabled;
+	public final boolean isEnabled() {
+		return getState() != State.DISABLED;
 	}
 
 	/*
@@ -81,9 +80,8 @@ public class Button extends LongPressableView {
 
 	@Override
 	public void handleActionDown(int id, float x, float y) {
-		if (!enabled) {
+		if (!isEnabled())
 			return;
-		}
 
 		super.handleActionDown(id, x, y);
 		press();
@@ -91,9 +89,8 @@ public class Button extends LongPressableView {
 
 	@Override
 	public void handleActionUp(int id, float x, float y) {
-		if (!enabled) {
+		if (!isEnabled())
 			return;
-		}
 		if (isPressed() && (isLongPressing() || longPressListener == null)) {
 			// only release if long press hasn't happened yet
 			notifyReleased();
@@ -104,9 +101,8 @@ public class Button extends LongPressableView {
 	@Override
 	public void handleActionMove(int id, float x, float y) {
 		super.handleActionMove(id, x, y);
-		if (!enabled) {
+		if (!isEnabled())
 			return;
-		}
 		// x / y are relative to this view but containsPoint is absolute
 		if (!containsPoint(this.x + x, this.y + y)) {
 			if (isPressed()) { // pointer dragged away from button - signal
