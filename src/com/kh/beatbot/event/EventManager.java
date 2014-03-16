@@ -11,7 +11,7 @@ public class EventManager {
 	private static int currEventIndex = -1;
 
 	public static final void undo() {
-		if (events.isEmpty() || events.size() <= currEventIndex) {
+		if (currEventIndex < 0 || events.size() <= currEventIndex) {
 			return;
 		}
 		events.get(currEventIndex--).doUndo();
@@ -19,7 +19,7 @@ public class EventManager {
 	}
 
 	public static final void redo() {
-		if (events.isEmpty() || currEventIndex >= events.size() - 1) {
+		if (currEventIndex >= events.size() - 1) {
 			return;
 		}
 		events.get(++currEventIndex).doRedo();
