@@ -82,7 +82,6 @@ public class EffectsPage extends TouchableView {
 	protected DraggableLabelList effectLabelList;
 	protected String[] effectNames;
 
-	@Override
 	public synchronized void update() {
 		updateEffectLabels();
 	}

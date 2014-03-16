@@ -13,7 +13,6 @@ public class NoteLevelsPage extends TouchableView {
 	private LevelsView levelsView;
 	private ToggleButton volumeButton, panButton, pitchButton;
 
-	@Override
 	public synchronized void update() {
 		deselectAll();
 		getActiveLevelButton().setChecked(true);

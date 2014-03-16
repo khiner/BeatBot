@@ -8,15 +8,17 @@ import java.util.Set;
 
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
+import com.kh.beatbot.event.FileListener;
 import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.midi.MidiNote;
 
-public class TrackManager implements TrackListener {
+public class TrackManager implements TrackListener, FileListener {
 
 	private static TrackManager instance;
 
 	private TrackManager() {
+		FileManager.addListener(this);
 	}
 
 	public synchronized static TrackManager get() {
@@ -164,6 +166,15 @@ public class TrackManager implements TrackListener {
 		soloingTrack = solo ? track : null;
 		for (TrackListener trackListener : trackListeners) {
 			trackListener.onSoloChange(track, solo);
+		}
+	}
+
+	@Override
+	public void onNameChange(File file, File newFile) {
+		for (Track track : TrackManager.getTracks()) {
+			if (track.getCurrSampleFile().equals(file)) {
+				track.onNameChange(file, newFile);
+			}
 		}
 	}
 }

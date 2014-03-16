@@ -5,13 +5,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.res.AssetManager;
 import android.os.Environment;
 
 import com.kh.beatbot.activity.BeatBotActivity;
+import com.kh.beatbot.event.FileListener;
 
-public class FileManager {
+public class FileManager implements FileListener {
 
 	public static final String[] SUPPORTED_EXTENSIONS = { ".wav", ".flac", ".ogg", ".oga", ".aif",
 			".aiff", ".aifc", ".au", ".snd", ".raw", ".paf", ".iff", ".svx", ".sf", ".voc", ".w64",
@@ -25,6 +28,16 @@ public class FileManager {
 	private static AssetManager assetManager;
 	private static byte[] copyBuffer = new byte[1024];
 	private static String appDirectoryPath;
+	private static FileManager instance;
+
+	private static List<FileListener> listeners = new ArrayList<FileListener>();
+
+	public synchronized static FileManager get() {
+		if (instance == null) {
+			instance = new FileManager();
+		}
+		return instance;
+	}
 
 	public static void init() {
 		initDataDir();
@@ -43,6 +56,10 @@ public class FileManager {
 		recordDirectory = new File(audioDirectory.getPath() + "/recorded");
 		beatRecordDirectory = new File(recordDirectory.getPath() + "/beats");
 		sampleRecordDirectory = new File(recordDirectory.getPath() + "/samples");
+	}
+
+	public static void addListener(FileListener listener) {
+		listeners.add(listener);
 	}
 
 	public static String formatSampleName(String sampleName) {
@@ -108,6 +125,13 @@ public class FileManager {
 				// create it and write all assets of this type to the folder
 				copyFromAssetsToExternal(assetType + "/" + fileName);
 			}
+		}
+	}
+
+	@Override
+	public void onNameChange(File file, File newFile) {
+		for (FileListener listener : listeners) {
+			listener.onNameChange(file, newFile);
 		}
 	}
 }

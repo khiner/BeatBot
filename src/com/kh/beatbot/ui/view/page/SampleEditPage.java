@@ -18,7 +18,6 @@ public class SampleEditPage extends TouchableView {
 	private ToggleButton loopButton, reverseButton;
 	private ParamControl loopBeginControl, loopEndControl, gainControl;
 
-	@Override
 	public synchronized void update() {
 		Track currTrack = TrackManager.currTrack;
 		loopButton.setChecked(currTrack.isLooping());
@@ -26,11 +25,14 @@ public class SampleEditPage extends TouchableView {
 		loopBeginControl.setParam(currTrack.getLoopBeginParam());
 		loopEndControl.setParam(currTrack.getLoopEndParam());
 		gainControl.setParam(currTrack.getGainParam());
-		sampleEdit.setParams(currTrack.getLoopBeginParam(), currTrack.getLoopEndParam());
 		loopBeginControl.setLabelText("Begin");
 		loopEndControl.setLabelText("End");
 		gainControl.setLabelText("Gain");
-		sampleEdit.update();
+
+		if (null != sampleEdit) {
+			sampleEdit.setParams(currTrack.getLoopBeginParam(), currTrack.getLoopEndParam());
+			sampleEdit.update();
+		}
 	}
 
 	@Override

@@ -1,9 +1,13 @@
 package com.kh.beatbot.ui.view.group;
 
+import java.io.File;
+
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
+import com.kh.beatbot.event.FileListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.TrackListener;
+import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
@@ -17,7 +21,7 @@ import com.kh.beatbot.ui.view.page.LevelsPage;
 import com.kh.beatbot.ui.view.page.NoteLevelsPage;
 import com.kh.beatbot.ui.view.page.SampleEditPage;
 
-public class PageSelectGroup extends TouchableView implements TrackListener {
+public class PageSelectGroup extends TouchableView implements TrackListener, FileListener {
 
 	private static final String TRACK_PAGE_ID = "track";
 
@@ -37,10 +41,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 		masterButtonRow.setBPM(bpm);
 	}
 
-	public synchronized void update() {
-		trackButtonRow.update();
-	}
-
 	public void updateAdsrPage() {
 		adsrPage.update();
 	}
@@ -48,10 +48,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	public void updateLevelsFXPage() {
 		levelsPage.update();
 		effectsPage.update();
-	}
-
-	public void updateBrowsePage() {
-		browsePage.update();
 	}
 
 	public void selectBrowsePage() {
@@ -67,8 +63,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	}
 
 	public void updateAll() {
-		update();
-		updateBrowsePage();
+		trackButtonRow.update();
+		browsePage.update();
 		updateLevelsFXPage();
 		editPage.update();
 		adsrPage.update();
@@ -140,7 +136,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	}
 
 	@Override
-	public void onSelect(BaseTrack track) {
+	public synchronized void onSelect(BaseTrack track) {
 		boolean isMaster = !(track instanceof Track);
 		buttonRowPager.setPage(isMaster ? masterButton : TRACK_PAGE_ID);
 		masterButton.setChecked(isMaster);
@@ -150,8 +146,10 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 	}
 
 	@Override
-	public void onSampleChange(Track track) {
+	public synchronized void onSampleChange(Track track) {
 		editPage.update();
+		trackButtonRow.update();
+		trackButtonRow.getBrowseButton().trigger();
 	}
 
 	@Override
@@ -160,5 +158,15 @@ public class PageSelectGroup extends TouchableView implements TrackListener {
 
 	@Override
 	public void onSoloChange(Track track, boolean solo) {
+	}
+
+	@Override
+	public void onNameChange(File file, File newFile) {
+		ToggleButton browseButton = trackButtonRow.getBrowseButton();
+		if (browseButton.getText().equals(FileManager.formatSampleName(file.getName()))) {
+			browseButton.setText(FileManager.formatSampleName(newFile.getName()));
+		}
+		browsePage.update();
+		trackButtonRow.getBrowseButton().trigger();
 	}
 }

@@ -17,7 +17,6 @@ public class LevelsPage extends TouchableView implements ControlViewListener {
 	protected Button volumeButton, panButton, pitchButton;
 	protected boolean masterMode = false;
 
-	@Override
 	public synchronized void update() {
 		volumeLevelBar.setParam(getCurrTrack().getVolumeParam());
 		panLevelBar.setParam(getCurrTrack().getPanParam());

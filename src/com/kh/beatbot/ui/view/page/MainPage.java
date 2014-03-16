@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.view.page;
 
+import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.view.MidiTrackView;
 import com.kh.beatbot.ui.view.MidiView;
@@ -36,6 +37,7 @@ public class MainPage extends TouchableView {
 		TrackManager.addTrackListener(midiView);
 		TrackManager.addTrackListener(midiTrackView);
 		TrackManager.addTrackListener(pageSelectGroup);
+		FileManager.addListener(pageSelectGroup);
 
 		slideMenu.setClip(false);
 

@@ -246,9 +246,6 @@ public class View implements Comparable<View> {
 	protected void init() {
 	}
 
-	public void update() {
-	}
-
 	public void draw() {
 	}
 

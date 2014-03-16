@@ -45,7 +45,6 @@ public class TrackPageButtonRow extends PageButtonRow {
 		return pageButtons[NOTE_LEVELS_PAGE_ID];
 	}
 
-	@Override
 	public synchronized void update() {
 		ToggleButton browseButton = pageButtons[BROWSE_PAGE_ID];
 

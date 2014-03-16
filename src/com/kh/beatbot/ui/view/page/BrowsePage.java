@@ -26,7 +26,6 @@ public class BrowsePage extends Menu {
 		}
 	}
 
-	@Override
 	public synchronized void update() {
 		// ûrecursively select file menu items based on current sample
 		File currSampleFile = TrackManager.currTrack.getCurrSampleFile();

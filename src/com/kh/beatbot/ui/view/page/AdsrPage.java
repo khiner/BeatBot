@@ -23,7 +23,6 @@ public class AdsrPage extends TouchableView implements OnReleaseListener {
 		updateParamView();
 	}
 
-	@Override
 	public synchronized void update() {
 		adsrView.update();
 		updateParamView();

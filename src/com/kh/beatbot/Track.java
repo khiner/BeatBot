@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.event.FileListener;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
@@ -22,7 +23,7 @@ import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.view.TrackButtonRow;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
-public class Track extends BaseTrack {
+public class Track extends BaseTrack implements FileListener {
 
 	public static float MIN_LOOP_WINDOW = 32f;
 	private static final AlertDialog.Builder ERROR_ALERT = new AlertDialog.Builder(
@@ -209,9 +210,10 @@ public class Track extends BaseTrack {
 		return currSampleFile;
 	}
 
-	public synchronized void updateSampleFile(File file) {
+	@Override
+	public void onNameChange(File file, File newFile) {
 		SampleParams params = paramsForSample.remove(currSampleFile);
-		currSampleFile = file;
+		currSampleFile = newFile;
 		paramsForSample.put(currSampleFile, params);
 	}
 
