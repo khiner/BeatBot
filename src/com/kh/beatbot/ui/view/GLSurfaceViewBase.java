@@ -7,15 +7,19 @@ import javax.microedition.khronos.opengles.GL11;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
 public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfaceView.Renderer {
 
 	public static GL11 gl;
 
-	//private final long BEGIN_FRAME = 200;
-	//private long frameCount = 0, averageFrameTime = 0;
+	// private final long BEGIN_FRAME = 200;
+	// private long frameCount = 0, averageFrameTime = 0;
+
+	private long startTime = System.currentTimeMillis(), endTime = 0, dt = 0;
+
+	private long DESIRED_FPS = 30;
+	private long DESIRED_MS_PER_FRAME = (long) (1000.0f / DESIRED_FPS);
 
 	public GLSurfaceViewBase(Context context) {
 		super(context);
@@ -38,16 +42,26 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
 	}
 
 	public final void onDrawFrame(GL10 _gl) {
+		endTime = System.currentTimeMillis();
+		dt = endTime - startTime;
+		if (dt < DESIRED_MS_PER_FRAME) {
+			try {
+				Thread.sleep(DESIRED_MS_PER_FRAME - dt);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		startTime = endTime;
 		/* uncomment for timing logs */
-		//long startTime = System.nanoTime();
+		// long startTime = System.nanoTime();
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		draw();
-		//long frameTime = System.nanoTime() - startTime;
+		// long frameTime = System.nanoTime() - startTime;
 
-		//if (frameCount++ < BEGIN_FRAME)
-		  //return;
-		//averageFrameTime += (frameTime - averageFrameTime) / (frameCount - BEGIN_FRAME);
-		//Log.i("Avg Frame time: ", String.valueOf(averageFrameTime) + ", " + frameCount);
+		// if (frameCount++ < BEGIN_FRAME)
+		// return;
+		// averageFrameTime += (frameTime - averageFrameTime) / (frameCount - BEGIN_FRAME);
+		// Log.i("Avg Frame time: ", String.valueOf(averageFrameTime) + ", " + frameCount);
 	}
 
 	protected void initGl(GL10 _gl) {
