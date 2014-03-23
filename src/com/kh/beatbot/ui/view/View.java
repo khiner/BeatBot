@@ -501,11 +501,11 @@ public class View implements Comparable<View> {
 				textureMesh.setColor(getIconColor());
 			}
 		}
+
+		layoutShape();
 		if (null != textMesh) {
 			textMesh.setColor(getTextColor());
 		}
-
-		layoutShape();
 	}
 
 	private final float[] getStrokeColor() {

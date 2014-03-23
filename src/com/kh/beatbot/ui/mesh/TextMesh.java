@@ -26,8 +26,8 @@ public class TextMesh extends Mesh {
 
 		if (oldText.length() != text.length()) {
 			updateIndices();
-			group.changeSize(this, oldText.length() * 4, numVertices, oldText.length()
-					* Rectangle.FILL_INDICES.length, getNumIndices());
+			group.changeSize(this, oldText.length() * 4, text.length() * 4, oldText.length()
+					* Rectangle.FILL_INDICES.length, text.length() * Rectangle.FILL_INDICES.length);
 		}
 
 		((TextureGroup) group).setText(this, text, x, y, height);
