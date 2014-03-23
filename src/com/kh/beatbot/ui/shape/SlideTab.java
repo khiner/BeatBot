@@ -17,14 +17,18 @@ public class SlideTab extends Shape {
 
 	private static short[] getFillIndices() {
 		short[] fillIndices = new short[RoundedRect.FILL_INDICES.length * 2
-				+ RoundedRect.NUM_CORNER_VERTICES * 2];
+				+ RoundedRect.NUM_CORNER_VERTICES * 2 + 2];
 		for (int i = 0; i < 3; i++) {
 			short[] indices = RoundedRect.FILL_INDICES;
 			for (int j = 0; j < indices.length; j++) {
 				int index = i * indices.length + j;
-				if (index >= fillIndices.length)
+				if (index < fillIndices.length - 1) {
+					fillIndices[index] = (short) (indices[j] + i * RoundedRect.NUM_FILL_VERTICES);
+				} else if (index == fillIndices.length - 1) {
+					fillIndices[index] = fillIndices[index - 1]; // degenerate triangle
+				} else {
 					break;
-				fillIndices[index] = (short) (indices[j] + i * RoundedRect.NUM_FILL_VERTICES);
+				}
 			}
 		}
 		return fillIndices;
@@ -32,8 +36,6 @@ public class SlideTab extends Shape {
 
 	@Override
 	protected void updateVertices() {
-		if (View.mainPage == null)
-			return;
 		roundedRect.setCornerRadius(cornerRadius);
 		roundedRect.layout(x + View.mainPage.width - cornerRadius * 2, y, width, height);
 

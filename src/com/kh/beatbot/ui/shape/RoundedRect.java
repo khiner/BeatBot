@@ -4,12 +4,11 @@ public class RoundedRect extends Shape {
 	public static final short[] FILL_INDICES = getFillIndices();
 	public static final short[] STROKE_INDICES = getStrokeIndices();
 
-	public static final int NUM_CORNER_VERTICES = 6;
-	public static final int NUM_FILL_VERTICES = NUM_CORNER_VERTICES * 4 + 1;
-	public static final int NUM_STROKE_VERTICES = NUM_CORNER_VERTICES * 4;
+	public static final int NUM_CORNER_VERTICES = 6,
+			NUM_FILL_VERTICES = NUM_CORNER_VERTICES * 4 + 1,
+			NUM_STROKE_VERTICES = NUM_CORNER_VERTICES * 4;
 
-	public float roundThresh = 0;
-	public float cornerRadius = -1;
+	public float roundThresh = 0, cornerRadius = -1;
 
 	public RoundedRect(ShapeGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, FILL_INDICES, STROKE_INDICES, NUM_FILL_VERTICES,
@@ -19,11 +18,12 @@ public class RoundedRect extends Shape {
 	private static short[] getFillIndices() {
 		short[] fillIndices = new short[(NUM_STROKE_VERTICES + 1) * 2 + 1];
 
-		fillIndices[0] = 0; // first is center
-		for (int i = 0; i < NUM_STROKE_VERTICES + 1; i++) {
+		for (short i = 0; i < NUM_STROKE_VERTICES + 1; i++) {
+			// first two should be 0 to make degenerate triangles
+			fillIndices[i * 2] = i;
 			fillIndices[i * 2 + 1] = 0;
-			fillIndices[i * 2 + 2] = (short) (i + 1);
 		}
+		// degenerate triangle end
 		fillIndices[fillIndices.length - 2] = 1;
 		fillIndices[fillIndices.length - 1] = 1;
 
