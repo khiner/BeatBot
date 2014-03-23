@@ -37,7 +37,7 @@ public class SampleEditPage extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		sampleEdit = new SampleEditView(null);
+		sampleEdit = new SampleEditView();
 		previewButton = new Button(shapeGroup);
 		loopButton = new ToggleButton(shapeGroup, true);
 		reverseButton = new ToggleButton(shapeGroup, true);

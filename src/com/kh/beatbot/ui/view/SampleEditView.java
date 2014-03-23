@@ -8,7 +8,6 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.Rectangle;
-import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.shape.WaveformShape;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
@@ -31,31 +30,72 @@ public class SampleEditView extends ControlView2dBase {
 	// Keep track of that with offset and width.
 	private float levelOffset = 0, levelWidth = 0, waveformWidth = 0, loopButtonW = 0;
 
-	public SampleEditView(ShapeGroup shapeGroup) {
-		super(shapeGroup);
-	}
-
 	public synchronized void update() {
-		setText(hasSample() ? "" : NO_SAMPLE_MESSAGE);
-		if (!hasSample())
-			return;
-		setLevel(0, 1);
-		updateLoopSelectionVbs();
-		waveformShape.resample();
+		loopButtonW = height / 3;
+		waveformWidth = width - loopButtonW;
+
+		if (hasSample()) {
+			if (null == waveformShape) {
+				waveformShape = new WaveformShape(shapeGroup, waveformWidth, Color.LABEL_SELECTED,
+						Color.BLACK);
+			}
+			for (int i = 0; i < loopButtons.length; i++) {
+				if (null == loopButtons[i]) {
+					loopButtons[i] = new Button(shapeGroup);
+					loopButtons[i].setIcon(IconResourceSets.SAMPLE_LOOP);
+					loopButtons[i].setOnPressListener(new OnPressListener() {
+						@Override
+						public void onPress(Button button) {
+							if (button.ownsPointer(scrollPointerId)) {
+								scrollPointerId = -1;
+							} else if (button.ownsPointer(zoomLeftPointerId)) {
+								scrollPointerId = zoomRightPointerId;
+								zoomLeftPointerId = zoomRightPointerId = -1;
+							} else if (button.ownsPointer(zoomRightPointerId)) {
+								scrollPointerId = zoomLeftPointerId;
+								zoomLeftPointerId = zoomRightPointerId = -1;
+							}
+						}
+					});
+				}
+				loopButtons[i].setState(loopButtons[i].getState());
+			}
+			addChildren(loopButtons);
+
+			waveformShape.layout(absoluteX, absoluteY, waveformWidth, height);
+
+			updateLoopSelectionVbs();
+			setLevel(0, 1);
+			waveformShape.resample();
+			setText("");
+		} else {
+			for (Button button : loopButtons) {
+				removeChild(button);
+				button = null;
+			}
+			if (null != waveformShape) {
+				waveformShape.destroy();
+				waveformShape = null;
+			}
+			setText(NO_SAMPLE_MESSAGE);
+		}
 	}
 
 	private void updateWaveformVb() {
-		waveformShape.update((long) params[0].getLevel(levelOffset),
-				(long) params[0].getLevel(levelWidth), loopButtonW / 2);
+		if (null != waveformShape) {
+			waveformShape.update((long) params[0].getLevel(levelOffset),
+					(long) params[0].getLevel(levelWidth), loopButtonW / 2);
+		}
 	}
 
 	private void updateLoopSelectionVbs() {
+		if (null == waveformShape)
+			return;
 		float beginX = levelToX(params[0].viewLevel);
 		float endX = levelToX(params[1].viewLevel);
 		waveformShape.setLoopPoints(beginX, endX);
-		loopButtons[0].setPosition(beginX - loopButtonW / 2, 0);
-		loopButtons[1].setPosition(endX - loopButtonW / 2, 0);
-		updateCurrSample();
+		loopButtons[0].layout(this, beginX - loopButtonW / 2, 0, loopButtonW, height);
+		loopButtons[1].layout(this, endX - loopButtonW / 2, 0, loopButtonW, height);
 	}
 
 	private void updateZoom() {
@@ -101,83 +141,40 @@ public class SampleEditView extends ControlView2dBase {
 	public synchronized void createChildren() {
 		setIcon(IconResourceSets.SAMPLE_BG);
 		initRect();
-
-		for (int i = 0; i < loopButtons.length; i++) {
-			loopButtons[i] = new Button(shapeGroup);
-			loopButtons[i].setIcon(IconResourceSets.SAMPLE_LOOP);
-			loopButtons[i].setOnPressListener(new OnPressListener() {
-				@Override
-				public void onPress(Button button) {
-					if (button.ownsPointer(scrollPointerId)) {
-						scrollPointerId = -1;
-					} else if (button.ownsPointer(zoomLeftPointerId)) {
-						scrollPointerId = zoomRightPointerId;
-						zoomLeftPointerId = zoomRightPointerId = -1;
-					} else if (button.ownsPointer(zoomRightPointerId)) {
-						scrollPointerId = zoomLeftPointerId;
-						zoomLeftPointerId = zoomRightPointerId = -1;
-					}
-				}
-			});
-		}
-		currSampleRect = new Rectangle(shapeGroup, Color.TRON_BLUE, null);
-		addChildren(loopButtons);
-	}
-
-	public synchronized void layoutChildren() {
-		loopButtonW = height / 3;
-		waveformWidth = width - loopButtonW;
-
-		if (null == waveformShape) {
-			waveformShape = new WaveformShape(shapeGroup, waveformWidth, Color.LABEL_SELECTED,
-					Color.BLACK);
-			for (View child : children) {
-				child.shape.bringToTop();
-			}
-			currSampleRect.bringToTop();
-		}
-
-		waveformShape.layout(absoluteX, absoluteY, waveformWidth, height);
-		currSampleRect.layout(absoluteX, absoluteY, 4, height);
-		loopButtons[0].layout(this, 0, 0, loopButtonW, height);
-		loopButtons[1].layout(this, width - loopButtonW, 0, loopButtonW, height);
 	}
 
 	private void updateCurrSample() {
-		currSampleRect
-				.setPosition(
-						absoluteX
-								+ levelToX(params[0].getViewLevel(TrackManager.currTrack
-										.getCurrentFrame())), absoluteY);
+		if (null == currSampleRect) {
+			currSampleRect = new Rectangle(shapeGroup, Color.TRON_BLUE, null);
+		}
+		float x = levelToX(params[0].getViewLevel(TrackManager.currTrack.getCurrentFrame()));
+		currSampleRect.layout(absoluteX + x, absoluteY, 4, height);
 	}
 
 	@Override
 	public void draw() {
 		if (TrackManager.currTrack.isPlaying() || TrackManager.currTrack.isPreviewing()) {
 			updateCurrSample();
+		} else if (null != currSampleRect) {
+			currSampleRect.destroy();
+			currSampleRect = null;
 		}
 	}
 
 	private boolean moveLoopMarker(int id, float x) {
-		if (loopButtons[0].isPressed() && loopButtons[0].ownsPointer(id)) {
+		return moveLoopMarker(id, x, loopButtons[0], params[0])
+				|| moveLoopMarker(id, x, loopButtons[1], params[1]) || false;
+	}
+
+	private boolean moveLoopMarker(int id, float x, Button button, Param param) {
+		if (button.isPressed() && button.ownsPointer(id)) {
 			// update track loop begin
-			params[0].setLevel(xToLevel(x));
+			param.setLevel(xToLevel(x));
 			// update ui to fit the new begin point
-			if (params[0].viewLevel < levelOffset) {
-				setLevel(params[0].viewLevel, levelWidth + levelOffset - params[0].viewLevel);
-			} else if (params[0].viewLevel > levelOffset + levelWidth) {
-				setLevel(levelOffset, params[0].viewLevel - levelOffset);
-			}
-			return true;
-		} else if (loopButtons[1].isPressed() && loopButtons[1].ownsPointer(id)) {
-			// update track loop end
-			params[1].setLevel(xToLevel(x));
-			// update ui to fit the new end point
-			if (params[1].viewLevel > levelOffset + levelWidth) {
-				setLevel(levelOffset, params[1].viewLevel - levelOffset);
-			} else if (params[1].viewLevel < levelOffset) {
-				setLevel(params[1].viewLevel, levelWidth + levelOffset - params[1].viewLevel);
-			}
+			if (param.viewLevel < levelOffset)
+				setLevel(param.viewLevel, levelWidth + levelOffset - param.viewLevel);
+			else if (param.viewLevel > levelOffset + levelWidth)
+				setLevel(levelOffset, param.viewLevel - levelOffset);
 			return true;
 		} else {
 			return false;

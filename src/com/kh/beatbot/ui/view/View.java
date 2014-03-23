@@ -164,6 +164,12 @@ public class View implements Comparable<View> {
 		}
 	}
 
+	protected synchronized void removeChildren(View ...children) {
+		for (View child : children) {
+			removeChild(child);
+		}
+	}
+
 	public synchronized void removeChild(View child) {
 		if (!children.contains(child))
 			return;
