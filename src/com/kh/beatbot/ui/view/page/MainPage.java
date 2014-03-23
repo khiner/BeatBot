@@ -39,8 +39,6 @@ public class MainPage extends TouchableView {
 		TrackManager.addTrackListener(pageSelectGroup);
 		FileManager.addListener(pageSelectGroup);
 
-		slideMenu.setClip(false);
-
 		addChildren(controlButtonGroup, midiTrackView, midiView, pageSelectGroup, slideMenu);
 	}
 

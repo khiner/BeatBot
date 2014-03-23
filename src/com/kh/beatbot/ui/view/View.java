@@ -49,8 +49,8 @@ public class View implements Comparable<View> {
 	protected View parent;
 	protected List<View> children = new ArrayList<View>();
 
-	private boolean initialized = false;
-	protected boolean shouldClip = true, shouldDraw = true, shrinkable = false;
+	private boolean initialized = false, shouldClip = false;
+	protected boolean shouldDraw = true, shrinkable = false;
 	private String text = "";
 	protected Set<ScrollableViewListener> listeners = new HashSet<ScrollableViewListener>();
 
@@ -291,13 +291,9 @@ public class View implements Comparable<View> {
 
 	public synchronized void drawAll() {
 		// scissor ensures that each view can only draw within its rect
-		if (shouldClip) {
+		if (shouldClip && null != parent) {
 			getGl().glEnable(GL10.GL_SCISSOR_TEST);
-			if (null != parent) {
-				clipWindow(parent.currClipX, parent.currClipY, parent.currClipW, parent.currClipH);
-			} else {
-				getGl().glDisable(GL10.GL_SCISSOR_TEST);
-			}
+			clipWindow(parent.currClipX, parent.currClipY, parent.currClipW, parent.currClipH);
 		}
 
 		if (shouldDraw) {
@@ -305,7 +301,10 @@ public class View implements Comparable<View> {
 		}
 		draw();
 		drawChildren();
-		getGl().glDisable(GL10.GL_SCISSOR_TEST);
+
+		if (shouldClip) {
+			getGl().glDisable(GL10.GL_SCISSOR_TEST);
+		}
 	}
 
 	protected synchronized void drawChildren() {

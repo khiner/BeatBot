@@ -183,6 +183,7 @@ public class MidiView extends ClickableView implements TrackListener {
 	}
 
 	public synchronized void init() {
+		setClip(true);
 		shouldDraw = false;
 		initAllVbs();
 	}

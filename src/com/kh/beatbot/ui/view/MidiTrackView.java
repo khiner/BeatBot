@@ -10,6 +10,11 @@ import com.kh.beatbot.ui.view.helper.TickWindowHelper;
 public class MidiTrackView extends TouchableView implements TrackListener, ScrollableViewListener {
 
 	@Override
+	protected synchronized void init() {
+		setClip(true);
+	}
+
+	@Override
 	public synchronized void layoutChildren() {
 		float yPos = MidiView.Y_OFFSET - TickWindowHelper.getYOffset();
 		for (View child : children) {

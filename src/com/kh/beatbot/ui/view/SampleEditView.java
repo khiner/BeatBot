@@ -91,6 +91,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public synchronized void init() {
+		setClip(true);
 		// find view level for 32 samples
 		minLoopWindow = params[0].getViewLevel(Track.MIN_LOOP_WINDOW);
 		update();

@@ -53,6 +53,7 @@ public class LevelsView extends TouchableView {
 
 	public LevelsView(ShapeGroup shapeGroup) {
 		super(shapeGroup);
+		setClip(true);
 	}
 
 	public LevelType getLevelType() {

@@ -42,7 +42,6 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 			setResourceId(IconResourceSets.ADD);
 			setFillColors(emptyIcon);
 			setText(EMPTY_TEXT);
-			shouldClip = false;
 		}
 
 		public void setState(LabelState state) {
@@ -126,7 +125,6 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 
 	@Override
 	public synchronized void init() {
-		super.init();
 		listener.labelListInitialized(this);
 	}
 
