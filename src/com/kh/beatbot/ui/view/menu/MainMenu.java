@@ -26,7 +26,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	private class PhysicsState {
 		private Menu menu;
 
-		private final float SPRING_CONST = .1f, DAMP = .65f, STOP_THRESH = 0.001f;
+		private final float SPRING_CONST = .4f, DAMP = .67f, STOP_THRESH = 0.001f;
 
 		private float velocity = 0, downXOffset = 0, lastX = 0, goalX = 0;
 		private boolean snap = true;
