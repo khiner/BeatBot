@@ -51,9 +51,9 @@ public class IconResourceSets {
 
 			FILE = s(r(R.drawable.browse_icon, null, Color.BLACK), r(R.drawable.browse_icon, null, Color.TRON_BLUE)),
 			SETTINGS = s(r(R.drawable.settings_icon, null, Color.BLACK), r(R.drawable.settings_icon, null, Color.TRON_BLUE)),
-			SNAP_TO_GRID = s(r(R.drawable.snap_to_grid_icon), null, r(R.drawable.snap_to_grid_icon)),
-			MIDI_IMPORT = s(r(R.drawable.midi_import_icon), null, r(R.drawable.midi_import_icon)),
-			MIDI_EXPORT = s(r(R.drawable.midi_export_icon)),
+			SNAP_TO_GRID = s(r(R.drawable.snap_to_grid_icon), r(R.drawable.snap_to_grid_icon)),
+			MIDI_IMPORT = s(r(R.drawable.midi_import_icon), r(R.drawable.midi_import_icon)),
+			MIDI_EXPORT = s(r(R.drawable.midi_export_icon), r(R.drawable.midi_export_icon)),
 
 			ATTACK = s(r(R.drawable.attack_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.attack_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.attack_icon, Color.TRON_BLUE, Color.BLACK)),
 			DECAY = s(r(R.drawable.decay_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.decay_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.decay_icon, Color.TRON_BLUE, Color.BLACK)),
@@ -112,16 +112,8 @@ public class IconResourceSets {
 		return new IconResource(resourceId, fillColor, strokeColor);
 	}
 
-	private static IconResource r(int resourceId, float[] fillColor, float[] strokeColor, float[] textColor) {
-		return new IconResource(resourceId, fillColor, strokeColor, textColor);
-	}
-	
 	private static IconResource r(int resourceId, float[] fillColor, float[] strokeColor, float[] textColor, float[] iconColor) {
 		return new IconResource(resourceId, fillColor, strokeColor, textColor, iconColor);
-	}
-
-	private static IconResourceSet s(IconResource defaultIconResource) {
-		return new IconResourceSet(defaultIconResource, null, null, null);
 	}
 
 	private static IconResourceSet s(IconResource defaultIconResource, IconResource pressedIconResource) {
