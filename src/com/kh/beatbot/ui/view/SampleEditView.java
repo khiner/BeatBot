@@ -67,7 +67,7 @@ public class SampleEditView extends ControlView2dBase {
 			updateLoopSelectionVbs();
 			setLevel(0, 1);
 			waveformShape.resample();
-			setText("");
+			destroyText();
 		} else {
 			for (Button button : loopButtons) {
 				removeChild(button);
