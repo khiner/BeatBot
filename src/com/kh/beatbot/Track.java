@@ -203,7 +203,7 @@ public class Track extends BaseTrack implements FileListener {
 	}
 
 	public String getCurrSampleName() {
-		return currSampleFile == null ? "" : currSampleFile.getName();
+		return currSampleFile == null ? "Browse" : currSampleFile.getName();
 	}
 
 	public File getCurrSampleFile() {
