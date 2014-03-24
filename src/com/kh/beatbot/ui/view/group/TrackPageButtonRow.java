@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.view.group;
 
-import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.event.TrackDestroyEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.FileManager;
@@ -15,7 +14,7 @@ public class TrackPageButtonRow extends PageButtonRow {
 	private static final int BROWSE_PAGE_ID = 0, LEVELS_PAGE_ID = 1, NOTE_LEVELS_PAGE_ID = 2,
 			EFFECTS_PAGE_ID = 3, EDIT_PAGE_ID = 4, ADSR_PAGE_ID = 5;
 
-	private Button addTrackButton, deleteTrackButton;
+	private Button deleteTrackButton;
 
 	public TrackPageButtonRow(ShapeGroup shapeGroup, ViewPager pager) {
 		super(shapeGroup, pager);
@@ -60,15 +59,7 @@ public class TrackPageButtonRow extends PageButtonRow {
 	protected synchronized void createChildren() {
 		super.createChildren();
 
-		addTrackButton = new Button(shapeGroup);
 		deleteTrackButton = new Button(shapeGroup);
-
-		addTrackButton.setOnReleaseListener(new OnReleaseListener() {
-			@Override
-			public void onRelease(Button button) {
-				new TrackCreateEvent().execute();
-			}
-		});
 
 		deleteTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
@@ -78,20 +69,19 @@ public class TrackPageButtonRow extends PageButtonRow {
 		});
 
 		deleteTrackButton.setIcon(IconResourceSets.DELETE_TRACK);
-		addTrackButton.setIcon(IconResourceSets.LABEL_BASE);
-		addTrackButton.setResourceId(IconResourceSets.ADD);
+		
 		getEditButton().setResourceId(IconResourceSets.SAMPLE);
 		getNoteLevelsButton().setResourceId(IconResourceSets.NOTE_LEVELS);
 		getLevelsButton().setResourceId(IconResourceSets.LEVELS);
 		getAdsrButton().setResourceId(IconResourceSets.ADSR);
 		getEffectsButton().setText("FX");
 
-		addChildren(addTrackButton, deleteTrackButton);
+		addChildren(deleteTrackButton);
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
-		addTrackButton.layout(this, 0, 0, height, height);
+		super.layoutChildren();
 
 		float labelWidth = (width - 4 * height) / 4;
 		float x = addTrackButton.width;

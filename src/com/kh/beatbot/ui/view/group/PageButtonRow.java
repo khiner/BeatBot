@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.view.group;
 
+import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.ShapeGroup;
@@ -11,7 +12,7 @@ public abstract class PageButtonRow extends TouchableView {
 
 	protected ViewPager pager;
 	protected ToggleButton[] pageButtons;
-	protected Button currPage;
+	protected Button currPage, addTrackButton;
 
 	public PageButtonRow(ShapeGroup shapeGroup, ViewPager pager) {
 		this.pager = pager;
@@ -49,6 +50,22 @@ public abstract class PageButtonRow extends TouchableView {
 			});
 		}
 
+		addTrackButton = new Button(shapeGroup);
+		addTrackButton.setIcon(IconResourceSets.LABEL_BASE);
+		addTrackButton.setResourceId(IconResourceSets.ADD);
+
+		addTrackButton.setOnReleaseListener(new OnReleaseListener() {
+			@Override
+			public void onRelease(Button button) {
+				new TrackCreateEvent().execute();
+			}
+		});
+
 		addChildren(pageButtons);
+		addChildren(addTrackButton);
+	}
+	
+	protected synchronized void layoutChildren() {
+		addTrackButton.layout(this, 0, 0, height, height);
 	}
 }

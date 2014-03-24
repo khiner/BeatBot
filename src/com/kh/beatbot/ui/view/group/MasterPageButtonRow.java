@@ -48,7 +48,9 @@ public class MasterPageButtonRow extends PageButtonRow {
 
 	@Override
 	public synchronized void layoutChildren() {
-		float x = 0;
+		super.layoutChildren();
+
+		float x = addTrackButton.width;
 		for (int i = 0; i < pageButtons.length; i++) {
 			pageButtons[i].layout(this, x, 0, height, height);
 			x += pageButtons[i].width;
