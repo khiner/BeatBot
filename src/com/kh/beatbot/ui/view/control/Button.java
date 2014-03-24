@@ -4,7 +4,6 @@ import com.kh.beatbot.listener.OnLongPressListener;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResource;
-import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.LongPressableView;
 
@@ -41,7 +40,7 @@ public class Button extends LongPressableView {
 	@Override
 	public void press() {
 		super.press();
-		notifyPressed(); // always notify press events
+		notifyPress(); // always notify press events
 	}
 
 	@Override
@@ -50,29 +49,21 @@ public class Button extends LongPressableView {
 		super.release();
 	}
 
-	public void setEnabled(boolean enabled) {
-		setState(enabled ? State.DEFAULT : State.DISABLED);
-	}
-
-	public final boolean isEnabled() {
-		return getState() != State.DISABLED;
-	}
-
 	/*
 	 * Trigger a touch event (calls the onReleaseListener())
 	 */
 	public void trigger() {
 		release();
-		notifyReleased();
+		notifyRelease();
 	}
 
-	protected void notifyPressed() {
+	protected void notifyPress() {
 		if (pressListener != null) {
 			pressListener.onPress(this);
 		}
 	}
 
-	protected void notifyReleased() {
+	protected void notifyRelease() {
 		if (releaseListener != null) {
 			releaseListener.onRelease(this);
 		}
@@ -93,7 +84,7 @@ public class Button extends LongPressableView {
 			return;
 		if (isPressed() && (isLongPressing() || longPressListener == null)) {
 			// only release if long press hasn't happened yet
-			notifyReleased();
+			notifyRelease();
 		}
 		super.handleActionUp(id, x, y);
 	}
@@ -101,20 +92,7 @@ public class Button extends LongPressableView {
 	@Override
 	public void handleActionMove(int id, float x, float y) {
 		super.handleActionMove(id, x, y);
-		if (!isEnabled())
-			return;
-		// x / y are relative to this view but containsPoint is absolute
-		if (!containsPoint(this.x + x, this.y + y)) {
-			if (isPressed()) { // pointer dragged away from button - signal
-								// release
-				release();
-			}
-		} else { // pointer inside button
-			if (!isPressed()) { // pointer was dragged away and back IN to
-								// button
-				press();
-			}
-		}
+		checkPointerExit(id, x, y);
 	}
 
 	@Override

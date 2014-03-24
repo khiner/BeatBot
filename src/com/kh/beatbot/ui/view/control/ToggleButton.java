@@ -26,15 +26,15 @@ public class ToggleButton extends Button {
 	 */
 	public void trigger(boolean checked) {
 		setChecked(checked);
-		super.notifyReleased();
+		super.notifyRelease();
 	}
 
 	@Override
-	protected void notifyReleased() {
+	protected void notifyRelease() {
 		if (oscillating || !checked) {
 			setChecked(!checked);
 		}
-		super.notifyReleased();
+		super.notifyRelease();
 	}
 
 	@Override

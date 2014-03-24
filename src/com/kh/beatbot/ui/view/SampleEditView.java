@@ -7,12 +7,18 @@ import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
+import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.shape.Rectangle;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.shape.WaveformShape;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
 
 public class SampleEditView extends ControlView2dBase {
+
+	public SampleEditView(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
 
 	private static final String NO_SAMPLE_MESSAGE = "Tap to load a sample.";
 
@@ -67,7 +73,7 @@ public class SampleEditView extends ControlView2dBase {
 			updateLoopSelectionVbs();
 			setLevel(0, 1);
 			waveformShape.resample();
-			destroyText();
+			setText("");
 		} else {
 			for (Button button : loopButtons) {
 				removeChild(button);
@@ -263,8 +269,10 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void handleActionMove(int id, float x, float y) {
-		if (!hasSample())
+		if (!hasSample()) {
+			checkPointerExit(id, x, y);
 			return;
+		}
 		if (id == zoomLeftPointerId) {
 			// no-op: only zoom once both actions have been handled
 		} else if (id == zoomRightPointerId) {
@@ -309,10 +317,15 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
+	protected void dragRelease() {
+		setState(State.DEFAULT);
+	}
+
+	@Override
 	protected void release() {
-		super.release();
-		if (!hasSample()) {
+		if (!hasSample() && isPressed()) {
 			View.mainPage.pageSelectGroup.selectBrowsePage();
 		}
+		super.release();
 	}
 }

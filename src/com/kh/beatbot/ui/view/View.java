@@ -93,6 +93,14 @@ public class View implements Comparable<View> {
 		stateChanged();
 	}
 
+	public void setEnabled(boolean enabled) {
+		setState(enabled ? State.DEFAULT : State.DISABLED);
+	}
+
+	public final boolean isEnabled() {
+		return getState() != State.DISABLED;
+	}
+
 	public State getState() {
 		return state;
 	}
@@ -112,6 +120,9 @@ public class View implements Comparable<View> {
 	public void setText(String text) {
 		this.text = text;
 		setState(state);
+		if (text.isEmpty()) {
+			destroyText();
+		}
 	}
 
 	public String getText() {

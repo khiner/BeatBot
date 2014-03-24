@@ -193,8 +193,27 @@ public class TouchableView extends View {
 		setState(State.DEFAULT);
 	}
 
+	/* Views can override this for different behavior when dragging away than lifting up */
+	protected void dragRelease() {
+		release();
+	}
+
 	public boolean isPressed() {
 		return getState() == State.PRESSED;
 	}
 
+	protected void checkPointerExit(int id, float x, float y) {
+		if (!isEnabled())
+			return;
+		// x / y are relative to this view but containsPoint is absolute
+		if (!containsPoint(this.x + x, this.y + y)) {
+			if (isPressed()) { // pointer dragged away from button - signal release
+				dragRelease();
+			}
+		} else { // pointer inside button
+			if (!isPressed()) { // pointer was dragged away and back IN to button
+				press();
+			}
+		}
+	}
 }

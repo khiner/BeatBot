@@ -10,10 +10,6 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 
 	protected abstract float posToLevel(float x, float y);
 
-	public ControlView1dBase() {
-		super();
-	}
-
 	public ControlView1dBase(ShapeGroup shapeGroup) {
 		super(shapeGroup);
 	}

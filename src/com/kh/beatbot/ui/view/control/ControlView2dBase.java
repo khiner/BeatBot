@@ -6,10 +6,6 @@ import com.kh.beatbot.ui.shape.ShapeGroup;
 
 public abstract class ControlView2dBase extends ControlViewBase implements ParamListener {
 
-	public ControlView2dBase() {
-		super();
-	}
-
 	public ControlView2dBase(ShapeGroup shapeGroup) {
 		super(shapeGroup);
 	}

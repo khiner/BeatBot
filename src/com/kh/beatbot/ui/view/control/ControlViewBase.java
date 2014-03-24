@@ -17,10 +17,6 @@ public abstract class ControlViewBase extends TouchableView {
 
 	protected ControlViewListener listener;
 
-	public ControlViewBase() {
-		super();
-	}
-
 	public void setListener(ControlViewListener listener) {
 		this.listener = listener;
 	}
