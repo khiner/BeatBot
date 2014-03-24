@@ -624,6 +624,7 @@ public class MidiView extends ClickableView implements TrackListener {
 		track.getRectangle().destroy();
 		for (MidiNote note : track.getMidiNotes()) {
 			note.getRectangle().destroy();
+			note.setRectangle(null);
 		}
 		updateNoteRects();
 		layoutTrackRects();
