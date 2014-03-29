@@ -14,7 +14,6 @@ public class ListView extends TouchableView implements OnPressListener {
 
 	public static final float[] END_TRANS_COLOR = new float[] { 0, 0, 0, .8f };
 	public static final float DRAG = .9f, THRESH = 0.01f;
-	public static float displayOffset = 0;
 
 	private float yAnchor = 0, yOffset = 0, yOffsetAnchor = 0, childHeight = 0, velocity = 0,
 			lastY = 0;
@@ -53,12 +52,11 @@ public class ListView extends TouchableView implements OnPressListener {
 	}
 
 	public synchronized void layoutChildren() {
-		displayOffset = LABEL_HEIGHT / 3;
 		float y = yOffset;
 		for (View child : children) {
-			float height = ((TouchableView) child).getText().isEmpty() ? width - displayOffset * 2
+			float height = ((TouchableView) child).getText().isEmpty() ? width - 2 * LABEL_HEIGHT / 3
 					: LABEL_HEIGHT;
-			child.layout(this, displayOffset, y, width - displayOffset * 2, height);
+			child.layout(this, LABEL_HEIGHT / 3, y, width - 2 * LABEL_HEIGHT / 3, height);
 			y += height;
 		}
 		childHeight = y - yOffset;
@@ -108,11 +106,11 @@ public class ListView extends TouchableView implements OnPressListener {
 
 	private void layoutScrollTab() {
 		if (childHeight > height) {
-			float rad = displayOffset * .6f;
+			float rad = LABEL_HEIGHT / 5;
 			float y = Math.max(1, -yOffset * height / childHeight);
 			float h = Math.max(rad * 2, height * height / childHeight);
 			getScrollTab().setCornerRadius(rad);
-			getScrollTab().layout(absoluteX + width - 3 * rad, absoluteY + y, 2 * rad, h);
+			getScrollTab().layout(absoluteX + width - 2.5f * rad, absoluteY + y, 2 * rad, h);
 		}
 	}
 

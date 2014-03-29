@@ -16,7 +16,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
 	// private final long BEGIN_FRAME = 200;
 	// private long frameCount = 0, averageFrameTime = 0;
 
-	private long startTime = System.currentTimeMillis(), endTime = 0, dt = 0;
+	private long startTime = System.currentTimeMillis(), endTime = 0;
 
 	private long DESIRED_FPS = 30;
 	private long DESIRED_MS_PER_FRAME = (long) (1000.0f / DESIRED_FPS);
@@ -43,10 +43,10 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
 
 	public final void onDrawFrame(GL10 _gl) {
 		endTime = System.currentTimeMillis();
-		dt = endTime - startTime;
-		if (dt < DESIRED_MS_PER_FRAME) {
+		final long deltaTime = endTime - startTime;
+		if (deltaTime < DESIRED_MS_PER_FRAME) {
 			try {
-				Thread.sleep(DESIRED_MS_PER_FRAME - dt);
+				Thread.sleep(DESIRED_MS_PER_FRAME - deltaTime);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
