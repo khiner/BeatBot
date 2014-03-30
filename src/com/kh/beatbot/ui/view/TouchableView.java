@@ -8,9 +8,12 @@ import com.kh.beatbot.ui.shape.ShapeGroup;
 
 public class TouchableView extends View {
 	public class Position {
+		public float downX, downY;
 		public float x, y;
 
 		public Position(float x, float y) {
+			downX = x;
+			downY = y;
 			set(x, y);
 		}
 
@@ -48,23 +51,23 @@ public class TouchableView extends View {
 	 * touch event (for example, a view may not handle multi-touch events like pointer up/down
 	 * events.
 	 ********************************************************/
-	public void handleActionDown(int id, float x, float y) {
+	public void handleActionDown(int id, Position pos) {
 		press();
 	}
 
-	public void handleActionUp(int id, float x, float y) {
+	public void handleActionUp(int id, Position pos) {
 		release();
 	}
 
-	public void handleActionPointerDown(int id, float x, float y) {
+	public void handleActionPointerDown(int id, Position pos) {
 
 	}
 
-	public void handleActionPointerUp(int id, float x, float y) {
+	public void handleActionPointerUp(int id, Position pos) {
 
 	}
 
-	public void handleActionMove(int id, float x, float y) {
+	public void handleActionMove(int id, Position pos) {
 
 	}
 
@@ -139,30 +142,37 @@ public class TouchableView extends View {
 	 * of the business of properly storing the pointers in the "id to position" map.
 	 ***************************************************************/
 	private final void consumeActionDown(int id, float x, float y) {
-		pointerIdToPos.put(id, new Position(x, y));
-		handleActionDown(id, x, y);
+		Position pos = new Position(x, y);
+		pointerIdToPos.put(id, pos);
+		handleActionDown(id, pos);
 	}
 
 	private final void consumeActionUp(int id, float x, float y) {
-		handleActionUp(id, x, y);
+		Position pos = pointerIdToPos.get(id);
+		if (null != pos) {
+			handleActionUp(id, pos);
+		}
 		pointerIdToPos.clear();
 	}
 
 	private final void consumeActionPointerDown(int id, float x, float y) {
-		pointerIdToPos.put(id, new Position(x, y));
-		handleActionPointerDown(id, x, y);
+		Position pos = new Position(x, y);
+		pointerIdToPos.put(id, pos);
+		handleActionPointerDown(id, pos);
 	}
 
 	private final void consumeActionPointerUp(int id, float x, float y) {
-		handleActionPointerUp(id, x, y);
+		Position pos = pointerIdToPos.get(id);
+		handleActionPointerUp(id, pos);
 		pointerIdToPos.remove(id);
 	}
 
 	private final void consumeActionMove(int id, float x, float y) {
-		if (!ownsPointer(id))
-			return;
-		pointerIdToPos.get(id).set(x, y);
-		handleActionMove(id, x, y);
+		Position pos = pointerIdToPos.get(id);
+		if (null != pos) {
+			pos.set(x, y);
+			handleActionMove(id, pos);
+		}
 	}
 
 	/**
@@ -199,11 +209,11 @@ public class TouchableView extends View {
 		return getState() == State.PRESSED;
 	}
 
-	protected void checkPointerExit(int id, float x, float y) {
+	protected void checkPointerExit(int id, Position pos) {
 		if (!isEnabled())
 			return;
 		// x / y are relative to this view but containsPoint is absolute
-		if (!containsPoint(this.x + x, this.y + y)) {
+		if (!containsPoint(this.x + pos.x, this.y + pos.y)) {
 			if (isPressed()) { // pointer dragged away from button - signal release
 				dragRelease();
 			}

@@ -44,17 +44,17 @@ public class Seekbar2d extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionDown(int id, float x, float y) {
-		super.handleActionDown(id, x, y);
-		params[0].setLevel(xToLevel(x));
-		params[1].setLevel(yToLevel(y));
+	public void handleActionDown(int id, Position pos) {
+		super.handleActionDown(id, pos);
+		params[0].setLevel(xToLevel(pos.x));
+		params[1].setLevel(yToLevel(pos.y));
 		intersectingLines.setStrokeColor(selectColor);
 		circle.setFillColor(selectColor);
 	}
 
 	@Override
-	public void handleActionUp(int id, float x, float y) {
-		super.handleActionUp(id, x, y);
+	public void handleActionUp(int id, Position pos) {
+		super.handleActionUp(id, pos);
 		intersectingLines.setStrokeColor(levelColor);
 		circle.setFillColor(levelColor);
 	}

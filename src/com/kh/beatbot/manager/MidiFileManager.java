@@ -82,7 +82,7 @@ public class MidiFileManager {
 		Collections.sort(midiTracks.get(1).getEvents());
 		midiTracks.get(1).recalculateDeltas();
 
-		MidiFile midi = new MidiFile(MidiManager.RESOLUTION, midiTracks);
+		MidiFile midi = new MidiFile(MidiManager.TICKS_PER_NOTE, midiTracks);
 
 		// Write the MIDI data to a file
 		try {

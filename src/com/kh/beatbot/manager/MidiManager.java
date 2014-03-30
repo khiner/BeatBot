@@ -28,25 +28,19 @@ import com.kh.beatbot.ui.view.View;
 public class MidiManager {
 
 	public static final int MIN_BPM = 45, MAX_BPM = 300,
-	// ticks per quarter note (I think)
-			RESOLUTION = MidiFile.DEFAULT_RESOLUTION, UNDO_STACK_SIZE = 40;
+			TICKS_PER_NOTE = MidiFile.DEFAULT_RESOLUTION, UNDO_STACK_SIZE = 40,
+			NOTES_PER_MEASURE = 4, TICKS_PER_MEASURE = TICKS_PER_NOTE * NOTES_PER_MEASURE,
+			MIN_TICKS = TICKS_PER_NOTE / 2, MAX_TICKS = TICKS_PER_MEASURE * 4;
 
-	public static final long TICKS_IN_ONE_MEASURE = RESOLUTION * 4;
-	public static final float MIN_TICKS = TICKS_IN_ONE_MEASURE / 8,
-			MAX_TICKS = TICKS_IN_ONE_MEASURE * 4;
-
-	private static float beatDivision = 1;
-
+	private static int beatDivision = 0;
 	private static boolean snapToGrid = true;
+	private static long loopBeginTick, loopEndTick;
 
 	private static TimeSignature ts = new TimeSignature();
 	private static Tempo tempo = new Tempo();
 	private static MidiTrack tempoTrack = new MidiTrack();
-
 	private static List<MidiNote> copiedNotes = new ArrayList<MidiNote>(),
 			currState = new ArrayList<MidiNote>();
-
-	private static long loopBeginTick, loopEndTick;
 
 	private static MidiNotesGroupEvent currNoteEvent;
 	private static LoopWindowSetEvent currLoopWindowEvent;
@@ -57,7 +51,7 @@ public class MidiManager {
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
 		setLoopBeginTick(0);
-		setLoopEndTick(RESOLUTION * 4);
+		setLoopEndTick(TICKS_PER_NOTE * 4);
 	}
 
 	public static boolean isSnapToGrid() {
@@ -80,7 +74,7 @@ public class MidiManager {
 		bpm = GeneralUtils.clipTo(bpm, MIN_BPM, MAX_BPM);
 		tempo.setBpm(bpm);
 		setNativeBPM(bpm);
-		setNativeMSPT(tempo.getMpqn() / RESOLUTION);
+		setNativeMSPT(tempo.getMpqn() / TICKS_PER_NOTE);
 		TrackManager.quantizeEffectParams();
 		return (int) bpm;
 	}
@@ -269,27 +263,27 @@ public class MidiManager {
 	}
 
 	public static float getBeatDivision() {
-		return beatDivision;
+		return 1 << beatDivision;
 	}
 
 	public static void increaseBeatDivision() {
-		beatDivision *= 2;
+		beatDivision++;
 	}
 
 	public static void decreaseBeatDivision() {
-		beatDivision /= 2;
+		beatDivision--;
 	}
 
 	public static long getTicksPerBeat() {
-		return (long) (RESOLUTION / beatDivision);
+		return TICKS_PER_NOTE / (1 << beatDivision);
 	}
 
 	public static long millisToTick(long millis) {
-		return (long) ((RESOLUTION * 1000f / tempo.getMpqn()) * millis);
+		return (long) ((TICKS_PER_NOTE * 1000f / tempo.getMpqn()) * millis);
 	}
 
-	public static float getMajorTickSpacing() {
-		return TICKS_IN_ONE_MEASURE / (beatDivision * 2);
+	public static long getMajorTickSpacing() {
+		return TICKS_PER_MEASURE / (2 << beatDivision);
 	}
 
 	public static float getMajorTickNearestTo(float tick) {
@@ -317,7 +311,7 @@ public class MidiManager {
 	 * Translate the provided midi note to its on-tick's nearest major tick given the provided beat
 	 * division
 	 */
-	public static void quantize(MidiNote midiNote, float beatDivision) {
+	public static void quantize(MidiNote midiNote, int beatDivision) {
 		long diff = (long) getMajorTickNearestTo(midiNote.getOnTick()) - midiNote.getOnTick();
 		setNoteTicks(midiNote, midiNote.getOnTick() + diff, midiNote.getOffTick() + diff, true);
 	}
@@ -355,7 +349,7 @@ public class MidiManager {
 	 * Translate all midi notes to their on-ticks' nearest major ticks given the provided beat
 	 * division
 	 */
-	public static void quantize(float beatDivision) {
+	public static void quantize(int beatDivision) {
 		for (MidiNote midiNote : getMidiNotes()) {
 			quantize(midiNote, beatDivision);
 		}
@@ -379,7 +373,7 @@ public class MidiManager {
 		tempoTrack = midiTracks.get(0);
 		ts = (TimeSignature) tempoTrack.getEvents().get(0);
 		tempo = (Tempo) tempoTrack.getEvents().get(1);
-		setNativeMSPT(tempo.getMpqn() / RESOLUTION);
+		setNativeMSPT(tempo.getMpqn() / TICKS_PER_NOTE);
 		ArrayList<MidiEvent> events = midiTracks.get(1).getEvents();
 
 		// midiEvents are ordered by tick, so on/off events don't

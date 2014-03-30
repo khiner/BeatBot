@@ -59,18 +59,18 @@ public class BpmView extends ClickableView {
 	}
 
 	@Override
-	public void handleActionDown(int id, float x, float y) {
-		super.handleActionDown(id, x, y);
-		lastFrameY = y;
+	public void handleActionDown(int id, Position pos) {
+		super.handleActionDown(id, pos);
+		lastFrameY = pos.y;
 	}
 
 	@Override
-	public void handleActionMove(int id, float x, float y) {
-		super.handleActionMove(id, x, y);
+	public void handleActionMove(int id, Position pos) {
+		super.handleActionMove(id, pos);
 		if (id != 0)
 			return; // only one pointer drags bpm
-		currYDragTotal += lastFrameY - y;
-		lastFrameY = y;
+		currYDragTotal += lastFrameY - pos.y;
+		lastFrameY = pos.y;
 		if (Math.abs(currYDragTotal) > INC_BPM_THRESH) {
 			if (currYDragTotal <= 0) {
 				setBPM(MidiManager.getBPM() - 1);
@@ -82,7 +82,7 @@ public class BpmView extends ClickableView {
 	}
 
 	@Override
-	protected void singleTap(int id, float x, float y) {
+	protected void singleTap(int id, Position pos) {
 		long tapTime = System.currentTimeMillis();
 		float millisElapsed = tapTime - lastTapTime;
 		lastTapTime = tapTime;
@@ -95,12 +95,12 @@ public class BpmView extends ClickableView {
 	}
 
 	@Override
-	protected void doubleTap(int id, float x, float y) {
-		singleTap(id, x, y);
+	protected void doubleTap(int id, Position pos) {
+		singleTap(id, pos);
 	}
 
 	@Override
-	protected void longPress(int id, float x, float y) {
+	protected void longPress(int id, Position pos) {
 		BeatBotActivity.mainActivity.showDialog(BeatBotActivity.BPM_DIALOG_ID);
 	}
 

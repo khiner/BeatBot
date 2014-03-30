@@ -13,8 +13,8 @@ import com.kh.beatbot.listener.ScrollableViewListener;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResource;
 import com.kh.beatbot.ui.icon.IconResourceSet;
-import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
+import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.mesh.TextMesh;
 import com.kh.beatbot.ui.mesh.TextureMesh;
 import com.kh.beatbot.ui.shape.Rectangle;
@@ -22,6 +22,7 @@ import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.shape.Shape;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.texture.TextureAtlas;
+import com.kh.beatbot.ui.view.TouchableView.Position;
 import com.kh.beatbot.ui.view.page.MainPage;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
@@ -439,8 +440,8 @@ public class View implements Comparable<View> {
 		getGl().glPopMatrix();
 	}
 
-	protected final float distanceFromCenterSquared(float x, float y) {
-		return (x - width / 2) * (x - width / 2) + (y - height / 2) * (y - height / 2);
+	protected final float distanceFromCenterSquared(Position pos) {
+		return (pos.x - width / 2) * (pos.x - width / 2) + (pos.y - height / 2) * (pos.y - height / 2);
 	}
 
 	public float viewX(float x) {

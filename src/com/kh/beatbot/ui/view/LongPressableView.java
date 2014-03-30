@@ -12,8 +12,7 @@ public abstract class LongPressableView extends TouchableView {
 			if (pointerIdToPos.size() <= 0)
 				return;
 			int id = pointerIdToPos.keyAt(0);
-			Position pos = pointerIdToPos.get(id);
-			longPress(id, pos.x, pos.y);
+			longPress(id, pointerIdToPos.get(id));
 			longPressing = false;
 		}
 	};
@@ -32,7 +31,7 @@ public abstract class LongPressableView extends TouchableView {
 
 	private boolean longPressing = false;
 
-	protected abstract void longPress(int id, float x, float y);
+	protected abstract void longPress(int id, Position pos);
 
 	public LongPressableView() {
 		this(null);
@@ -64,23 +63,23 @@ public abstract class LongPressableView extends TouchableView {
 	}
 
 	@Override
-	public void handleActionDown(int id, float x, float y) {
-		super.handleActionDown(id, x, y);
-		lastTapX = x;
-		lastTapY = y;
+	public void handleActionDown(int id, Position pos) {
+		super.handleActionDown(id, pos);
+		lastTapX = pos.x;
+		lastTapY = pos.y;
 		beginLongPress();
 	}
 
 	@Override
-	public void handleActionMove(int id, float x, float y) {
-		if (Math.abs(x - lastTapX) > SNAP_DIST || Math.abs(y - lastTapY) > SNAP_DIST) {
+	public void handleActionMove(int id, Position pos) {
+		if (Math.abs(pos.x - lastTapX) > SNAP_DIST || Math.abs(pos.y - lastTapY) > SNAP_DIST) {
 			releaseLongPress();
 		}
 	}
 
 	@Override
-	public void handleActionUp(int id, float x, float y) {
-		super.handleActionUp(id, x, y);
+	public void handleActionUp(int id, Position pos) {
+		super.handleActionUp(id, pos);
 		releaseLongPress();
 	}
 }

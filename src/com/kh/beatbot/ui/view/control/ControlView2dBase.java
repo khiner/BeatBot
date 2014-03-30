@@ -30,8 +30,8 @@ public abstract class ControlView2dBase extends ControlViewBase implements Param
 	}
 
 	@Override
-	public void handleActionMove(int id, float x, float y) {
-		params[0].setLevel(xToLevel(x));
-		params[1].setLevel(yToLevel(y));
+	public void handleActionMove(int id, Position pos) {
+		params[0].setLevel(xToLevel(pos.x));
+		params[1].setLevel(yToLevel(pos.y));
 	}
 }

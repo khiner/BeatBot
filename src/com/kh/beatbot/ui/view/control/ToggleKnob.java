@@ -46,30 +46,30 @@ public class ToggleKnob extends Knob implements ParamToggleListener {
 	}
 
 	@Override
-	public void handleActionDown(int id, float x, float y) {
-		if (distanceFromCenterSquared(x, y) < snapDistSquared) {
-			centerButton.handleActionDown(id, x, y);
+	public void handleActionDown(int id, Position pos) {
+		if (distanceFromCenterSquared(pos) < snapDistSquared) {
+			centerButton.handleActionDown(id, pos);
 			centerButtonTouched = true;
 		} else {
-			super.handleActionDown(id, x, y);
+			super.handleActionDown(id, pos);
 		}
 	}
 
 	@Override
-	public void handleActionMove(int id, float x, float y) {
+	public void handleActionMove(int id, Position pos) {
 		if (centerButtonTouched) {
-			centerButton.handleActionMove(id, x, y);
+			centerButton.handleActionMove(id, pos);
 		} else {
-			super.handleActionMove(id, x, y);
+			super.handleActionMove(id, pos);
 		}
 	}
 
 	@Override
-	public void handleActionUp(int id, float x, float y) {
+	public void handleActionUp(int id, Position pos) {
 		if (centerButtonTouched) {
-			centerButton.handleActionUp(id, x, y);
+			centerButton.handleActionUp(id, pos);
 		} else {
-			super.handleActionUp(id, x, y);
+			super.handleActionUp(id, pos);
 		}
 		centerButtonTouched = false;
 	}

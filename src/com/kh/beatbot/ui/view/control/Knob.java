@@ -19,9 +19,9 @@ public class Knob extends ControlView1dBase {
 	}
 
 	@Override
-	protected float posToLevel(float x, float y) {
-		float unitX = x / width - .5f;
-		float unitY = y / height - .5f;
+	protected float posToLevel(Position pos) {
+		float unitX = pos.x / width - .5f;
+		float unitY = pos.y / height - .5f;
 		float theta = (float) Math.atan(unitY / unitX) + ¹ / 2;
 		// atan ranges from 0 to ¹, and produces symmetric results around the y
 		// axis.
@@ -44,14 +44,14 @@ public class Knob extends ControlView1dBase {
 	}
 
 	@Override
-	public void handleActionDown(int id, float x, float y) {
-		super.handleActionDown(id, x, y);
+	public void handleActionDown(int id, Position pos) {
+		super.handleActionDown(id, pos);
 		knobShape.setFillColor(selectColor);
 	}
 
 	@Override
-	public void handleActionUp(int id, float x, float y) {
-		super.handleActionUp(id, x, y);
+	public void handleActionUp(int id, Position pos) {
+		super.handleActionUp(id, pos);
 		knobShape.setFillColor(levelColor);
 	}
 }

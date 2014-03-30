@@ -232,16 +232,16 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionDown(int id, float x, float y) {
-		super.handleActionDown(id, x, y);
+	public void handleActionDown(int id, Position pos) {
+		super.handleActionDown(id, pos);
 		if (!hasSample())
 			return;
 		setScrollAnchor(id);
 	}
 
 	@Override
-	public void handleActionUp(int id, float x, float y) {
-		super.handleActionUp(id, x, y);
+	public void handleActionUp(int id, Position pos) {
+		super.handleActionUp(id, pos);
 		if (!hasSample())
 			return;
 		waveformShape.resample();
@@ -249,7 +249,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionPointerDown(int id, float x, float y) {
+	public void handleActionPointerDown(int id, Position pos) {
 		if (!hasSample())
 			return;
 		if (!setZoomAnchor(id)) {
@@ -259,7 +259,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionPointerUp(int id, float x, float y) {
+	public void handleActionPointerUp(int id, Position pos) {
 		if (!hasSample())
 			return;
 		// stop zooming
@@ -268,17 +268,17 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionMove(int id, float x, float y) {
+	public void handleActionMove(int id, Position pos) {
 		if (!hasSample()) {
-			checkPointerExit(id, x, y);
+			checkPointerExit(id, pos);
 			return;
 		}
 		if (id == zoomLeftPointerId) {
 			// no-op: only zoom once both actions have been handled
 		} else if (id == zoomRightPointerId) {
 			updateZoom();
-		} else if (!moveLoopMarker(id, x)) {
-			scroll(x);
+		} else if (!moveLoopMarker(id, pos.x)) {
+			scroll(pos.x);
 		}
 	}
 

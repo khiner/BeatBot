@@ -14,8 +14,7 @@ public class ListView extends TouchableView implements OnPressListener {
 	public static final float[] END_TRANS_COLOR = new float[] { 0, 0, 0, .8f };
 	public static final float DRAG = .9f, THRESH = 0.01f;
 
-	private float yAnchor = 0, yOffset = 0, yOffsetAnchor = 0, childHeight = 0, velocity = 0,
-			lastY = 0;
+	private float yOffset = 0, yOffsetAnchor = 0, childHeight = 0, velocity = 0, lastY = 0;
 	private RoundedRect scrollBar = null;
 	private ColorTransition tabColorTransition = new ColorTransition(20, 20, Color.TRANSPARENT,
 			END_TRANS_COLOR);
@@ -61,14 +60,15 @@ public class ListView extends TouchableView implements OnPressListener {
 		layoutScrollTab();
 	}
 
-	public void handleActionDown(int index, float x, float y) {
-		yAnchor = y;
+	@Override
+	public void handleActionDown(int index, Position pos) {
 		yOffsetAnchor = yOffset;
-		lastY = y;
+		lastY = pos.y;
 		tabColorTransition.begin();
 	}
 
-	public void handleActionUp(int index, float x, float y) {
+	@Override
+	public void handleActionUp(int index, Position pos) {
 		if (Math.abs(velocity) < 3) {
 			velocity = 0;
 		}
@@ -76,23 +76,24 @@ public class ListView extends TouchableView implements OnPressListener {
 		shouldPropagateTouchEvents = true;
 	}
 
-	public void handleActionMove(int index, float x, float y) {
+	@Override
+	public void handleActionMove(int index, Position pos) {
 		if (childHeight <= height) {
 			return;
 		}
 
-		velocity = y - lastY;
-		updateYOffset(y);
+		velocity = pos.y - lastY;
+		updateYOffset(pos);
 		layoutChildren();
 		if (null != selectedButton
 				&& selectedButton.isPressed()
 				&& !(selectedButton instanceof ToggleButton && ((ToggleButton) selectedButton)
-						.isChecked()) && Math.abs(y - yAnchor) > LABEL_HEIGHT / 2) {
+						.isChecked()) && Math.abs(y - pos.downY) > LABEL_HEIGHT / 2) {
 			// scrolling, release the pressed button
 			selectedButton.release();
 			shouldPropagateTouchEvents = false;
 		}
-		lastY = y;
+		lastY = pos.y;
 	}
 
 	private RoundedRect getScrollTab() {
@@ -121,16 +122,16 @@ public class ListView extends TouchableView implements OnPressListener {
 	}
 
 	private synchronized void updateYOffset() {
-		updateYOffset(-1);
+		updateYOffset(null);
 	}
 
-	private synchronized void updateYOffset(float pointerY) {
+	private synchronized void updateYOffset(Position pos) {
 		float newY;
-		if (pointerY == -1) {
+		if (null == pos) {
 			newY = yOffset + velocity;
 			velocity *= DRAG;
 		} else {
-			newY = pointerY - yAnchor + yOffsetAnchor;
+			newY = pos.y - pos.downY + yOffsetAnchor;
 		}
 
 		yOffset = GeneralUtils.clipTo(newY, height - childHeight, 0);

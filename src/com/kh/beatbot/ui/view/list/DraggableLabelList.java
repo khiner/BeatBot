@@ -15,12 +15,12 @@ public class DraggableLabelList extends LabelList {
 	}
 
 	@Override
-	public synchronized void handleActionMove(int id, float x, float y) {
-		super.handleActionMove(id, x, y);
+	public synchronized void handleActionMove(int id, Position pos) {
+		super.handleActionMove(id, pos);
 		if (touchedLabel == null || id != 0) {
 			return;
 		}
-		touchedLabel.setPosition(x + dragOffset, touchedLabel.y);
+		touchedLabel.setPosition(pos.x + dragOffset, touchedLabel.y);
 		layoutChildren();
 	}
 

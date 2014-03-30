@@ -70,33 +70,33 @@ public class Button extends LongPressableView {
 	}
 
 	@Override
-	public void handleActionDown(int id, float x, float y) {
+	public void handleActionDown(int id, Position pos) {
 		if (!isEnabled())
 			return;
 
-		super.handleActionDown(id, x, y);
+		super.handleActionDown(id, pos);
 		press();
 	}
 
 	@Override
-	public void handleActionUp(int id, float x, float y) {
+	public void handleActionUp(int id, Position pos) {
 		if (!isEnabled())
 			return;
 		if (isPressed() && (isLongPressing() || longPressListener == null)) {
 			// only release if long press hasn't happened yet
 			notifyRelease();
 		}
-		super.handleActionUp(id, x, y);
+		super.handleActionUp(id, pos);
 	}
 
 	@Override
-	public void handleActionMove(int id, float x, float y) {
-		super.handleActionMove(id, x, y);
-		checkPointerExit(id, x, y);
+	public void handleActionMove(int id, Position pos) {
+		super.handleActionMove(id, pos);
+		checkPointerExit(id, pos);
 	}
 
 	@Override
-	protected void longPress(int id, float x, float y) {
+	protected void longPress(int id, Position pos) {
 		if (longPressListener != null) {
 			longPressListener.onLongPress(this);
 		}

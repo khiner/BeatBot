@@ -197,30 +197,30 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	}
 
 	@Override
-	public void handleActionDown(int id, float x, float y) {
-		super.handleActionDown(id, x, y);
-		if (!textureMesh.containsPoint(x + absoluteX, y)) {
+	public void handleActionDown(int id, Position pos) {
+		super.handleActionDown(id, pos);
+		if (!textureMesh.containsPoint(pos.x + absoluteX, pos.y)) {
 			return;
 		}
 		menuPressed = true;
-		physicsState.downXOffset = x - this.x + absoluteX;
+		physicsState.downXOffset = pos.x - this.x + absoluteX;
 		physicsState.snap = false;
 		physicsState.lastX = this.x;
 	}
 
 	@Override
-	public void handleActionMove(int pointerId, float x, float y) {
-		super.handleActionMove(pointerId, x, y);
+	public void handleActionMove(int pointerId, Position pos) {
+		super.handleActionMove(pointerId, pos);
 		if (!menuPressed)
 			return;
 		physicsState.velocity = this.x - physicsState.lastX;
 		physicsState.lastX = this.x;
-		setPosition(x + absoluteX - physicsState.downXOffset, menuOffset / 2);
+		setPosition(pos.x + absoluteX - physicsState.downXOffset, menuOffset / 2);
 	}
 
 	@Override
-	public void handleActionUp(int pointerId, float x, float y) {
-		super.handleActionUp(pointerId, x, y);
+	public void handleActionUp(int pointerId, Position pos) {
+		super.handleActionUp(pointerId, pos);
 		if (!menuPressed)
 			return;
 		physicsState.snap(width);

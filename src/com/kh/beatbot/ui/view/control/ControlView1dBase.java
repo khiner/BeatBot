@@ -8,7 +8,7 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 
 	protected Param param;
 
-	protected abstract float posToLevel(float x, float y);
+	protected abstract float posToLevel(Position pos);
 
 	public ControlView1dBase(ShapeGroup shapeGroup) {
 		super(shapeGroup);
@@ -34,17 +34,17 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 	}
 
 	@Override
-	public void handleActionDown(int id, float x, float y) {
-		super.handleActionDown(id, x, y);
-		param.setLevel(posToLevel(x, y));
+	public void handleActionDown(int id, Position pos) {
+		super.handleActionDown(id, pos);
+		param.setLevel(posToLevel(pos));
 	}
 
 	@Override
-	public void handleActionMove(int id, float x, float y) {
-		super.handleActionMove(id, x, y);
+	public void handleActionMove(int id, Position pos) {
+		super.handleActionMove(id, pos);
 		if (!selected)
 			return;
-		param.setLevel(posToLevel(x, y));
+		param.setLevel(posToLevel(pos));
 	}
 
 	@Override

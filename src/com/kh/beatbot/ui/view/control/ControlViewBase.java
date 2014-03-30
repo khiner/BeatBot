@@ -31,8 +31,8 @@ public abstract class ControlViewBase extends TouchableView {
 	}
 
 	@Override
-	public void handleActionDown(int id, float x, float y) {
-		super.handleActionDown(id, x, y);
+	public void handleActionDown(int id, Position pos) {
+		super.handleActionDown(id, pos);
 		selected = true;
 		if (listener != null) {
 			listener.onPress(this);
@@ -40,8 +40,8 @@ public abstract class ControlViewBase extends TouchableView {
 	}
 
 	@Override
-	public void handleActionUp(int id, float x, float y) {
-		super.handleActionUp(id, x, y);
+	public void handleActionUp(int id, Position pos) {
+		super.handleActionUp(id, pos);
 		selected = false;
 		if (listener != null) {
 			listener.onRelease(this);

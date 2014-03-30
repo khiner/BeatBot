@@ -120,10 +120,11 @@ public class LevelsView extends TouchableView {
 		}
 	}
 
-	private boolean selectLevel(float x, float y, int pointerId) {
+	private boolean selectLevel(int pointerId, Position pos) {
 		for (MidiNote midiNote : TrackManager.currTrack.getMidiNotes()) {
 			float velocityY = levelToY(midiNote.getLevel(currLevelType));
-			if (Math.abs(tickToX(midiNote.getOnTick()) - x) < 35 && Math.abs(velocityY - y) < 35) {
+			if (Math.abs(tickToX(midiNote.getOnTick()) - pos.x) < 35
+					&& Math.abs(velocityY - pos.y) < 35) {
 				// If this is the only touched level, and it hasn't yet
 				// been selected, make it the only selected level.
 				// If we are multi-selecting, add it to the selected list
@@ -159,7 +160,8 @@ public class LevelsView extends TouchableView {
 			selectedNote.setSelected(selected);
 		}
 
-		selectRegionRect.layout(absoluteX + leftX, absoluteY + topY, rightX - leftX, bottomY - topY);
+		selectRegionRect
+				.layout(absoluteX + leftX, absoluteY + topY, rightX - leftX, bottomY - topY);
 		selectRegionRect.setFillColor(Color.TRON_BLUE_TRANS);
 	}
 
@@ -207,9 +209,9 @@ public class LevelsView extends TouchableView {
 		}
 	}
 
-	private void startSelectRegion(float x, float y) {
-		selectRegionStartX = x;
-		selectRegionStartY = y;
+	private void startSelectRegion(Position pos) {
+		selectRegionStartX = pos.x;
+		selectRegionStartY = pos.y;
 	}
 
 	public void draw() {
@@ -239,43 +241,45 @@ public class LevelsView extends TouchableView {
 		return mainPage.midiView.xToTick(x + absoluteX - mainPage.midiView.absoluteX);
 	}
 
-	public void handleActionPointerUp(int id, float x, float y) {
+	@Override
+	public void handleActionPointerUp(int id, Position pos) {
 		touchedLevels.remove(id);
 		updateLevelOffsets();
 	}
 
-	public void handleActionMove(int id, float x, float y) {
+	@Override
+	public void handleActionMove(int id, Position pos) {
 		if (!touchedLevels.isEmpty()) {
 			MidiNote touched = touchedLevels.get(id);
 			if (touched != null) {
-				touched.setLevel(currLevelType, yToLevel(y));
+				touched.setLevel(currLevelType, yToLevel(pos.y));
 			}
 			if (id == pointerIdToPos.size() - 1) {
 				updateDragLine();
 				setLevelsToDragLine();
 			}
 		} else if (id == 0) {
-			selectRegion(x, y);
+			selectRegion(pos.x, pos.y);
 		}
 	}
 
 	@Override
-	public void handleActionDown(int id, float x, float y) {
-		super.handleActionDown(id, x, y);
+	public void handleActionDown(int id, Position pos) {
+		super.handleActionDown(id, pos);
 		MidiManager.beginMidiEvent(TrackManager.currTrack);
-		if (!selectLevel(x, y, id)) {
-			startSelectRegion(x, y);
+		if (!selectLevel(id, pos)) {
+			startSelectRegion(pos);
 		}
 	}
 
 	@Override
-	public void handleActionPointerDown(int id, float x, float y) {
-		selectLevel(x, y, id);
+	public void handleActionPointerDown(int id, Position pos) {
+		selectLevel(id, pos);
 	}
 
 	@Override
-	public void handleActionUp(int id, float x, float y) {
-		super.handleActionUp(id, x, y);
+	public void handleActionUp(int id, Position pos) {
+		super.handleActionUp(id, pos);
 		clearTouchedLevels();
 		selectRegionRect.setFillColor(Color.TRANSPARENT);
 		MidiManager.endMidiEvent();

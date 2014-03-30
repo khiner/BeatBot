@@ -129,7 +129,7 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 	}
 
 	@Override
-	protected void longPress(int id, float x, float y) {
+	protected void longPress(int id, Position pos) {
 		// notify listener that the label has been long-clicked
 		if (touchedLabel != null) {
 			listener.labelLongClicked(children.indexOf(touchedLabel));
@@ -137,7 +137,7 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 	}
 
 	@Override
-	protected void singleTap(int id, float x, float y) {
+	protected void singleTap(int id, Position pos) {
 		// notify listener that the label has been single-clicked (tapped)
 		if (touchedLabel != null) {
 			listener.labelClicked(touchedLabel.getText(), children.indexOf(touchedLabel));
@@ -145,7 +145,7 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 	}
 
 	@Override
-	protected void doubleTap(int id, float x, float y) {
+	protected void doubleTap(int id, Position pos) {
 		// no double tap for this view
 	}
 

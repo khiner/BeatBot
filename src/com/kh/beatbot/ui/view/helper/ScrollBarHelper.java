@@ -4,8 +4,7 @@ public class ScrollBarHelper {
 	private static final float DAMP_CONSTANT = 0.9f;
 
 	public static boolean scrolling = false;
-	public static float scrollXVelocity = 0;
-	public static float scrollYVelocity = 0;
+	public static float scrollXVelocity = 0, scrollYVelocity = 0;
 
 	public static void startScrollView() {
 		scrolling = true;
