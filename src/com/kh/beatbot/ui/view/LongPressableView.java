@@ -9,9 +9,9 @@ public abstract class LongPressableView extends TouchableView {
 
 	Runnable longPressed = new Runnable() {
 		public void run() {
-			if (pointerIdToPos.isEmpty())
+			if (pointerIdToPos.size() <= 0)
 				return;
-			int id = pointerIdToPos.keySet().iterator().next();
+			int id = pointerIdToPos.keyAt(0);
 			Position pos = pointerIdToPos.get(id);
 			longPress(id, pos.x, pos.y);
 			longPressing = false;

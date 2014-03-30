@@ -1,8 +1,6 @@
 package com.kh.beatbot.ui.view;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import android.util.SparseArray;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
@@ -22,10 +20,9 @@ public class TouchableView extends View {
 		}
 	}
 
-	// map of pointer ID #'s that this window is responsible for to their
-	// current
-	// position relative to this window
-	protected Map<Integer, Position> pointerIdToPos = new HashMap<Integer, Position>();
+	// map of pointer ID #'s that this window is responsible for to their current position relative
+	// to this window
+	protected SparseArray<Position> pointerIdToPos = new SparseArray<Position>();
 
 	protected boolean shouldPropagateTouchEvents = true;
 
@@ -38,7 +35,7 @@ public class TouchableView extends View {
 	}
 
 	public final boolean ownsPointer(int id) {
-		return pointerIdToPos.containsKey(id);
+		return pointerIdToPos.get(id) != null;
 	}
 
 	public final int pointerCount() {
