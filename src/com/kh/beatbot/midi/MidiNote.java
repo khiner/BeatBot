@@ -53,7 +53,7 @@ public class MidiNote implements Comparable<MidiNote> {
 	}
 
 	private void updateViewPosition() {
-		View.mainPage.midiView.updateNoteView(this);
+		View.mainPage.midiView.layoutNote(this);
 	}
 
 	public MidiNote getCopy() {

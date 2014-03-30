@@ -262,16 +262,12 @@ public class MidiManager {
 		new MidiNotesPinchEvent(getSelectedNotes(), onTickDiff, offTickDiff).execute();
 	}
 
-	public static float getBeatDivision() {
-		return 1 << beatDivision;
+	public static int getBeatDivision() {
+		return beatDivision;
 	}
 
-	public static void increaseBeatDivision() {
-		beatDivision++;
-	}
-
-	public static void decreaseBeatDivision() {
-		beatDivision--;
+	public static void adjustBeatDivision(float numTicksDisplayed) {
+		beatDivision = (int) (Math.log(MAX_TICKS / numTicksDisplayed) / Math.log(2));
 	}
 
 	public static long getTicksPerBeat() {

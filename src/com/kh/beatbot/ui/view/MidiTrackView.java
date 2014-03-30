@@ -2,12 +2,13 @@ package com.kh.beatbot.ui.view;
 
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
-import com.kh.beatbot.listener.ScrollableViewListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.view.helper.TickWindowHelper;
+import com.kh.beatbot.ui.view.helper.ScrollHelper;
 
-public class MidiTrackView extends TouchableView implements TrackListener, ScrollableViewListener {
+public class MidiTrackView extends TouchableView implements TrackListener {
+
+	private float yOffset = 0;
 
 	@Override
 	protected synchronized void init() {
@@ -16,7 +17,7 @@ public class MidiTrackView extends TouchableView implements TrackListener, Scrol
 
 	@Override
 	public synchronized void layoutChildren() {
-		float yPos = MidiView.Y_OFFSET - TickWindowHelper.getYOffset();
+		float yPos = yOffset;
 		for (View child : children) {
 			child.layout(this, 0, yPos, width, MidiView.trackHeight);
 			yPos += MidiView.trackHeight;
@@ -72,13 +73,8 @@ public class MidiTrackView extends TouchableView implements TrackListener, Scrol
 		}
 	}
 
-	@Override
-	public void onScrollX(View view) {
-
-	}
-
-	@Override
-	public void onScrollY(View view) {
+	public void onScrollY(ScrollHelper scrollHelper) {
+		yOffset = MidiView.Y_OFFSET - scrollHelper.yOffset;
 		layoutChildren();
 	}
 }

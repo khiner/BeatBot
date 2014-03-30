@@ -167,9 +167,9 @@ public class SampleEditView extends ControlView2dBase {
 		}
 	}
 
-	private boolean moveLoopMarker(int id, float x) {
-		return moveLoopMarker(id, x, loopButtons[0], params[0])
-				|| moveLoopMarker(id, x, loopButtons[1], params[1]) || false;
+	private boolean moveLoopMarker(int id, Position pos) {
+		return moveLoopMarker(id, pos.x, loopButtons[0], params[0])
+				|| moveLoopMarker(id, pos.x, loopButtons[1], params[1]) || false;
 	}
 
 	private boolean moveLoopMarker(int id, float x, Button button, Param param) {
@@ -211,21 +211,18 @@ public class SampleEditView extends ControlView2dBase {
 		updateWaveformVb();
 	}
 
-	private void setScrollAnchor(int id) {
-		if (null != pointerIdToPos.get(id)) {
+	private void setScrollAnchor(int id, Position pos) {
+		if (null != pos) {
 			scrollPointerId = id;
-			scrollAnchorLevel = xToLevel(pointerIdToPos.get(id).x);
+			scrollAnchorLevel = xToLevel(pos.x);
 		} else {
 			scrollPointerId = -1;
 		}
 	}
 
-	private void scroll(float scrollX) {
-		if (scrollPointerId == -1)
-			return; // not scrolling
-
+	private void scroll(Position pos) {
 		// set levelOffset such that the scroll anchor level stays under scrollX
-		float newLevelOffset = GeneralUtils.clipTo(scrollAnchorLevel - xToLevel(scrollX)
+		float newLevelOffset = GeneralUtils.clipTo(scrollAnchorLevel - xToLevel(pos.x)
 				+ levelOffset, 0, 1 - levelWidth);
 		setLevel(newLevelOffset, levelWidth);
 		updateLoopSelectionVbs();
@@ -236,7 +233,7 @@ public class SampleEditView extends ControlView2dBase {
 		super.handleActionDown(id, pos);
 		if (!hasSample())
 			return;
-		setScrollAnchor(id);
+		setScrollAnchor(id, pos);
 	}
 
 	@Override
@@ -254,7 +251,7 @@ public class SampleEditView extends ControlView2dBase {
 			return;
 		if (!setZoomAnchor(id)) {
 			// loop marker not close enough to select, and first pointer down. Start scrolling
-			setScrollAnchor(id);
+			setScrollAnchor(id, pos);
 		}
 	}
 
@@ -263,7 +260,8 @@ public class SampleEditView extends ControlView2dBase {
 		if (!hasSample())
 			return;
 		// stop zooming
-		setScrollAnchor(id == zoomLeftPointerId ? zoomRightPointerId : zoomLeftPointerId);
+		int scrollPointerId = id == zoomLeftPointerId ? zoomRightPointerId : zoomLeftPointerId;
+		setScrollAnchor(scrollPointerId, pointerIdToPos.get(scrollPointerId));
 		zoomLeftPointerId = zoomRightPointerId = -1;
 	}
 
@@ -277,8 +275,8 @@ public class SampleEditView extends ControlView2dBase {
 			// no-op: only zoom once both actions have been handled
 		} else if (id == zoomRightPointerId) {
 			updateZoom();
-		} else if (!moveLoopMarker(id, pos.x)) {
-			scroll(pos.x);
+		} else if (!moveLoopMarker(id, pos)) {
+			scroll(pos);
 		}
 	}
 

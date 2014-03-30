@@ -1,15 +1,12 @@
 package com.kh.beatbot.ui.view;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.GeneralUtils;
-import com.kh.beatbot.listener.ScrollableViewListener;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResource;
 import com.kh.beatbot.ui.icon.IconResourceSet;
@@ -53,7 +50,6 @@ public class View implements Comparable<View> {
 	private boolean initialized = false, shouldClip = false;
 	protected boolean shouldDraw = true, shrinkable = false;
 	private String text = "";
-	protected Set<ScrollableViewListener> listeners = new HashSet<ScrollableViewListener>();
 
 	protected Shape shape;
 	protected TextMesh textMesh;
@@ -77,8 +73,8 @@ public class View implements Comparable<View> {
 		return GLSurfaceViewBase.gl;
 	}
 
-	public void addScrollListener(ScrollableViewListener listener) {
-		listeners.add(listener);
+	public float unscaledHeight() {
+		return height;
 	}
 
 	public ShapeGroup getShapeGroup() {
@@ -479,22 +475,6 @@ public class View implements Comparable<View> {
 			return 1;
 		else
 			return -1;
-	}
-
-	public void notifyScrollX() {
-		for (ScrollableViewListener listener : listeners) {
-			if (listener instanceof ScrollableViewListener) {
-				((ScrollableViewListener) listener).onScrollX(this);
-			}
-		}
-	}
-
-	public void notifyScrollY() {
-		for (ScrollableViewListener listener : listeners) {
-			if (listener instanceof ScrollableViewListener) {
-				((ScrollableViewListener) listener).onScrollY(this);
-			}
-		}
 	}
 
 	protected final IconResource getIconResource() {
