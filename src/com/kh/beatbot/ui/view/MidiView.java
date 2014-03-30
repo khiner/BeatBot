@@ -215,12 +215,16 @@ public class MidiView extends ClickableView implements TrackListener {
 	}
 
 	@Override
-	public void draw() {
+	public void tick() {
 		if (PlaybackManager.getState() == PlaybackManager.State.PLAYING) {
 			// if playing, draw curr tick
 			updateCurrentTick();
 		}
 		TickWindowHelper.scroll(); // take care of any momentum scrolling
+	}
+
+	@Override
+	public void draw() {
 		push();
 		translate(-TickWindowHelper.getTickOffset() / TickWindowHelper.getNumTicks() * width
 				+ absoluteX, absoluteY);

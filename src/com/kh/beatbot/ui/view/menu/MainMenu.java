@@ -166,11 +166,11 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	}
 
 	@Override
-	public void draw() {
+	public void tick() {
 		if (physicsState.snap) {
 			setPosition(x + physicsState.velocity, y);
 		}
-		physicsState.update();
+		physicsState.update();		
 	}
 
 	@Override

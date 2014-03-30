@@ -48,6 +48,11 @@ public class GLSurfaceViewGroup extends TouchableSurfaceView {
 		renderer.drawAll();
 	}
 
+	@Override
+	protected void tick() {
+		renderer.tickAll();
+	}
+
 	/*
 	 * Touch events are delegated to children, using coordinates relative to child.
 	 */

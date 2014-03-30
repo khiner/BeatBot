@@ -6,7 +6,6 @@ import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.transition.ColorTransition;
-import com.kh.beatbot.ui.transition.Transition;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -27,17 +26,16 @@ public class ListView extends TouchableView implements OnPressListener {
 		super(shapeGroup);
 	}
 
-	public synchronized void drawChildren() {
+	@Override
+	public synchronized void tick() {
 		if (pointerCount() == 0 && Math.abs(velocity) > THRESH) {
 			updateYOffset();
 			layoutChildren();
 		}
-		super.drawChildren();
 
 		tabColorTransition.tick();
-		if (shouldDrawScrollBar()) {
+		if (null != scrollBar) {
 			scrollBar.setFillColor(tabColorTransition.getColor());
-			scrollBar.draw();
 		}
 	}
 
@@ -54,8 +52,8 @@ public class ListView extends TouchableView implements OnPressListener {
 	public synchronized void layoutChildren() {
 		float y = yOffset;
 		for (View child : children) {
-			float height = ((TouchableView) child).getText().isEmpty() ? width - 2 * LABEL_HEIGHT / 3
-					: LABEL_HEIGHT;
+			float height = ((TouchableView) child).getText().isEmpty() ? width - 2 * LABEL_HEIGHT
+					/ 3 : LABEL_HEIGHT;
 			child.layout(this, LABEL_HEIGHT / 3, y, width - 2 * LABEL_HEIGHT / 3, height);
 			y += height;
 		}
@@ -141,11 +139,6 @@ public class ListView extends TouchableView implements OnPressListener {
 	private synchronized void resetScrollState() {
 		yOffset = 0;
 		velocity = 0;
-	}
-
-	private boolean shouldDrawScrollBar() {
-		return scrollBar != null && childHeight > height
-				&& tabColorTransition.getState() != Transition.State.OFF;
 	}
 
 	@Override

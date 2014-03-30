@@ -266,6 +266,8 @@ public class View implements Comparable<View> {
 	public void draw() {
 	}
 
+	public void tick() {
+	}
 	protected void createChildren() {
 	}
 
@@ -322,6 +324,17 @@ public class View implements Comparable<View> {
 		if (shouldClip) {
 			getGl().glDisable(GL10.GL_SCISSOR_TEST);
 		}
+	}
+
+	public synchronized void tickChildren() {
+		for (View child : children) {
+			child.tickAll();
+		}	
+	}
+
+	public synchronized void tickAll() {
+		tick();
+		tickChildren();
 	}
 
 	protected synchronized void drawChildren() {

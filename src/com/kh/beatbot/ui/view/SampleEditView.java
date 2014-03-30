@@ -158,7 +158,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void draw() {
+	public void tick() {
 		if (TrackManager.currTrack.isPlaying() || TrackManager.currTrack.isPreviewing()) {
 			updateCurrSample();
 		} else if (null != currSampleRect) {

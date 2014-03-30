@@ -13,13 +13,12 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
 
 	public static GL11 gl;
 
+	private static final long DESIRED_FPS = 30, TICK_MILLIS = (long) (1000.0f / DESIRED_FPS);
+
 	// private final long BEGIN_FRAME = 200;
 	// private long frameCount = 0, averageFrameTime = 0;
 
-	private long startTime = System.currentTimeMillis(), endTime = 0;
-
-	private long DESIRED_FPS = 30;
-	private long DESIRED_MS_PER_FRAME = (long) (1000.0f / DESIRED_FPS);
+	private long startTimeMillis = System.currentTimeMillis(), endTimeMillis = 0, deltaTimeMillis = 0;
 
 	public GLSurfaceViewBase(Context context) {
 		super(context);
@@ -42,20 +41,20 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
 	}
 
 	public final void onDrawFrame(GL10 _gl) {
-		endTime = System.currentTimeMillis();
-		final long deltaTime = endTime - startTime;
-		if (deltaTime < DESIRED_MS_PER_FRAME) {
-			try {
-				Thread.sleep(DESIRED_MS_PER_FRAME - deltaTime);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		startTime = endTime;
+		endTimeMillis = System.currentTimeMillis();
 		/* uncomment for timing logs */
 		// long startTime = System.nanoTime();
+		deltaTimeMillis += endTimeMillis - startTimeMillis;
+
+		while (deltaTimeMillis >= TICK_MILLIS) {
+			tick();
+			deltaTimeMillis -= TICK_MILLIS;
+		}
+
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		draw();
+
+		startTimeMillis = endTimeMillis;
 		// long frameTime = System.nanoTime() - startTime;
 
 		// if (frameCount++ < BEGIN_FRAME)
@@ -72,4 +71,6 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
 	}
 
 	protected abstract void draw();
+
+	protected abstract void tick();
 }
