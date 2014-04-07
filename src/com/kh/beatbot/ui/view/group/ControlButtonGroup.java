@@ -55,7 +55,7 @@ public class ControlButtonGroup extends TouchableView {
 					Toast.makeText(BeatBotActivity.mainActivity.getApplicationContext(),
 							"Recorded file to " + fileName, Toast.LENGTH_SHORT).show();
 				} else {
-					mainPage.midiView.reset();
+					mainPage.midiViewGroup.midiView.reset();
 					playButton.setChecked(true);
 					RecordManager.startRecording();
 					if (PlaybackManager.getState() != PlaybackManager.State.PLAYING)

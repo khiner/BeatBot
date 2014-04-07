@@ -37,6 +37,6 @@ public class LoopWindowSetEvent implements Stateful, Temporal {
 
 	@Override
 	public void updateUi() {
-		View.mainPage.midiView.updateLoopUi();
+		View.mainPage.midiViewGroup.midiView.updateLoopUi();
 	}
 }

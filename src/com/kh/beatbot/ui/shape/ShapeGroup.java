@@ -34,6 +34,13 @@ public class ShapeGroup {
 		textGroup.draw();
 	}
 
+	public void translate(float x, float y) {
+		fillGroup.translate(x, y);
+		strokeGroup.translate(x, y);
+		textureGroup.translate(x, y);
+		textGroup.translate(x, y);
+	}
+
 	public boolean contains(Shape shape) {
 		if (shape == null) {
 			return false;

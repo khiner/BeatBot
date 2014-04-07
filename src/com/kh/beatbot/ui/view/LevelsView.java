@@ -234,11 +234,13 @@ public class LevelsView extends TouchableView {
 	}
 
 	private float tickToX(float tick) {
-		return mainPage.midiView.tickToX(tick) + mainPage.midiView.absoluteX - absoluteX;
+		return mainPage.midiViewGroup.midiView.tickToX(tick)
+				+ mainPage.midiViewGroup.midiView.absoluteX - absoluteX;
 	}
 
 	private float xToTick(float x) {
-		return mainPage.midiView.xToTick(x + absoluteX - mainPage.midiView.absoluteX);
+		return mainPage.midiViewGroup.midiView.xToTick(x + absoluteX
+				- mainPage.midiViewGroup.midiView.absoluteX);
 	}
 
 	@Override

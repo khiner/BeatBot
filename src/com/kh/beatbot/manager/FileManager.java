@@ -100,7 +100,8 @@ public class FileManager implements FileListener {
 
 		// create the dir
 		destDir.mkdirs();
-		if (destDir.listFiles().length > 0) {
+		File[] files = destDir.listFiles();
+		if (null == files || files.length > 0) {
 			// Only copy files into this dir if it is empty.
 			// Files can be renamed, so we can't make assumptions
 			// about whether an individual file already exists

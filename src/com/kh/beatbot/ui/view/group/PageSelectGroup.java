@@ -118,8 +118,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 	public synchronized void layoutChildren() {
 		float labelYOffset = 2;
 
-		masterButton.layout(this, 0, labelYOffset, View.mainPage.getTrackControlWidth(),
-				LABEL_HEIGHT);
+		masterButton.layout(this, 0, labelYOffset,
+				View.mainPage.midiViewGroup.getTrackControlWidth(), LABEL_HEIGHT);
 		buttonRowPager.layout(this, masterButton.width, labelYOffset, width - masterButton.width,
 				LABEL_HEIGHT);
 		pager.layout(this, 0, LABEL_HEIGHT + 2 * labelYOffset, width, height - LABEL_HEIGHT - 2
@@ -142,7 +142,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 		masterButton.setChecked(isMaster);
 		levelsPage.setMasterMode(isMaster);
 		effectsPage.setMasterMode(isMaster);
-		((PageButtonRow)buttonRowPager.getCurrPage()).currPage.trigger();
+		((PageButtonRow) buttonRowPager.getCurrPage()).currPage.trigger();
 		updateAll();
 	}
 

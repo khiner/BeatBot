@@ -198,6 +198,14 @@ public class MeshGroup {
 		dirty = true;
 	}
 
+	public synchronized void translate(float x, float y) {
+		for (int i = 0; i < vertices.length; i += indicesPerVertex) {
+			vertices[i] += x;
+			vertices[i + 1] += y;
+		}
+		dirty = true;
+	}
+
 	protected synchronized void translate(Mesh mesh, float x, float y) {
 		for (int i = mesh.parentVertexIndex * indicesPerVertex; i < (mesh.parentVertexIndex + mesh.numVertices)
 				* indicesPerVertex; i += indicesPerVertex) {

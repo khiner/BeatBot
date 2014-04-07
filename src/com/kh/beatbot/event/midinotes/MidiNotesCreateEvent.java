@@ -31,7 +31,7 @@ public class MidiNotesCreateEvent extends MidiNotesEvent {
 	private void createNote(MidiNote midiNote) {
 		Track track = TrackManager.getTrack(midiNote.getNoteValue());
 		track.addNote(midiNote);
-		View.mainPage.midiView.createNoteView(midiNote);
+		View.mainPage.midiViewGroup.midiView.createNoteView(midiNote);
 		midiNote.setSelected(true);
 	}
 }

@@ -51,20 +51,14 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	private ScrollHelper scrollHelper;
 
-	private static List<Line>[] vLines = new ArrayList[NUM_VERTICAL_LINE_SETS];
-
-	static {
-		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
-			vLines[i] = new ArrayList<Line>();
-		}
-	}
+	private List<Line>[] vLines;
 
 	public MidiView() {
 		super();
 		scrollHelper = new ScrollHelper(this);
 	}
 
-	public synchronized static void updateVerticalLineColors() {
+	public synchronized void updateVerticalLineColors() {
 		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
 			float[] lineColor = i > MidiManager.getBeatDivision() + 2 ? Color.TRANSPARENT
 					: Color.MIDI_LINES[i];
@@ -223,6 +217,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		for (int i = 0; i < loopMarkerLines.length; i++) {
 			loopMarkerLines[i] = new Line(shapeGroup, null, Color.TRON_BLUE);
 		}
+		vLines = new ArrayList[NUM_VERTICAL_LINE_SETS];
+		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
+			vLines[i] = new ArrayList<Line>();
+		}
 	}
 
 	@Override
@@ -234,6 +232,9 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			loopMarkerLines[i].layout(0, 0, 3, height);
 		}
 		int minTickSpacing = MidiManager.MIN_TICKS / 8;
+		for (List<Line> lines : vLines) {
+			lines.clear();
+		}
 		for (long currTick = 0; currTick < MidiManager.MAX_TICKS; currTick += minTickSpacing) {
 			for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
 				if (currTick % (2 << (NUM_VERTICAL_LINE_SETS - i)) == 0) {
@@ -661,7 +662,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		updateTrackColors();
 	}
 
-	private void onTrackHeightChange() {
+	private synchronized void onTrackHeightChange() {
 		initAllVbs();
 		float trackHeight = getTotalTrackHeight();
 		backgroundRect.setDimensions(backgroundRect.width, trackHeight);
@@ -700,7 +701,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	@Override
 	public void onScrollY() {
 		layoutTrackRects();
-		mainPage.midiTrackView.onScrollY(scrollHelper);
+		mainPage.midiViewGroup.midiTrackView.onScrollY(scrollHelper);
 	}
 
 	@Override

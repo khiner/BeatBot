@@ -53,7 +53,7 @@ public class MidiNote implements Comparable<MidiNote> {
 	}
 
 	private void updateViewPosition() {
-		View.mainPage.midiView.layoutNote(this);
+		View.mainPage.midiViewGroup.midiView.layoutNote(this);
 	}
 
 	public MidiNote getCopy() {
@@ -114,7 +114,7 @@ public class MidiNote implements Comparable<MidiNote> {
 			return;
 		this.selected = selected;
 		View.mainPage.controlButtonGroup.setEditIconsEnabled(MidiManager.anyNoteSelected());
-		View.mainPage.midiView.updateNoteViewSelected(this); // color change
+		View.mainPage.midiViewGroup.midiView.updateNoteViewSelected(this); // color change
 
 	}
 
