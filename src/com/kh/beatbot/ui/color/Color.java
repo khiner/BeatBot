@@ -5,9 +5,9 @@ import android.app.Activity;
 import com.kh.beatbot.R;
 
 public class Color {
-	public static float[] BG, BLACK, WHITE, GREEN, YELLOW, RED, DARK_TRANS, MIDI_VIEW_BG,
-			MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM, NOTE, NOTE_SELECTED, TRON_BLUE, PAN, PITCH,
-			TRON_BLUE_LIGHT, TRON_BLUE_TRANS, PAN_TRANS, PITCH_TRANS, LEVEL_SELECTED,
+	public static float[] BG, BLACK, WHITE, GREEN, YELLOW, RED, DARK_TRANS, MIDI_VIEW_DARK_BG,
+			MIDI_VIEW_BG, MIDI_VIEW_LIGHT_BG, GRID_LINE, WAVEFORM, NOTE, NOTE_SELECTED, TRON_BLUE,
+			PAN, PITCH, TRON_BLUE_LIGHT, TRON_BLUE_TRANS, PAN_TRANS, PITCH_TRANS, LEVEL_SELECTED,
 			LEVEL_SELECTED_TRANS, TICK_FILL, TICK_MARKER, TICKBAR, BPM_OFF, BPM_ON, VIEW_BG,
 			VIEW_BG_SELECTED, LABEL_DARK, LABEL_MED, LABEL_LIGHT, LABEL_VERY_LIGHT, LABEL_SELECTED,
 			LABEL_SELECTED_TRANS, MIDI_SELECTED_TRACK, TRANSPARENT = { 0, 0, 0, 0 },
@@ -24,7 +24,8 @@ public class Color {
 		YELLOW = colorResourceToFloats(activity, R.color.yellow);
 		GREEN = colorResourceToFloats(activity, R.color.green);
 
-		DARK_TRANS = new float[] { 0, 0, 0, .2f };
+		DARK_TRANS = new float[] {0, 0, 0, .2f};
+		MIDI_VIEW_DARK_BG = colorResourceToFloats(activity, R.color.midiViewDarkBg);
 		BG = colorResourceToFloats(activity, R.color.background);
 		VIEW_BG = colorResourceToFloats(activity, R.color.viewBg);
 		VIEW_BG_SELECTED = colorResourceToFloats(activity, R.color.viewBgSelected);
@@ -32,6 +33,7 @@ public class Color {
 		NOTE_SELECTED = colorResourceToFloats(activity, R.color.noteSelected);
 		MIDI_VIEW_BG = colorResourceToFloats(activity, R.color.midiViewBg);
 		MIDI_VIEW_LIGHT_BG = colorResourceToFloats(activity, R.color.midiViewLightBg);
+		MIDI_VIEW_LIGHT_BG[3] = .5f;
 		GRID_LINE = colorResourceToFloats(activity, R.color.gridLine);
 		TRON_BLUE = colorResourceToFloats(activity, R.color.tronBlue);
 		TRON_BLUE_TRANS = new float[] { TRON_BLUE[0], TRON_BLUE[1], TRON_BLUE[2], .6f };

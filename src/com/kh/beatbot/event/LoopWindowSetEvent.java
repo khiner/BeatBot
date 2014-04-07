@@ -1,7 +1,6 @@
 package com.kh.beatbot.event;
 
 import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.ui.view.View;
 
 public class LoopWindowSetEvent implements Stateful, Temporal {
 
@@ -26,17 +25,14 @@ public class LoopWindowSetEvent implements Stateful, Temporal {
 	@Override
 	public void doUndo() {
 		MidiManager.setLoopTicks(initialBeginTick, initialEndTick);
-		updateUi();
 	}
 
 	@Override
 	public void doRedo() {
 		MidiManager.setLoopTicks(finalBeginTick, finalEndTick);
-		updateUi();
 	}
 
 	@Override
 	public void updateUi() {
-		View.mainPage.midiViewGroup.midiView.updateLoopUi();
 	}
 }

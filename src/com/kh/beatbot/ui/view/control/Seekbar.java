@@ -51,7 +51,7 @@ public class Seekbar extends ControlView1dBase {
 		levelCircle.setPosition(absoluteX + w + levelCircle.width / 4, absoluteY + height / 2);
 	}
 
-	protected float posToLevel(Position pos) {
+	protected float posToLevel(Pointer pos) {
 		if (pos.x > width - levelBarHeight)
 			return 1;
 		float level = (pos.x - levelBarHeight / 2) / (width - levelBarHeight * 4);
@@ -59,14 +59,14 @@ public class Seekbar extends ControlView1dBase {
 	}
 
 	@Override
-	public void handleActionDown(int id, Position pos) {
+	public void handleActionDown(int id, Pointer pos) {
 		super.handleActionDown(id, pos);
 		foregroundRect.setFillColor(selectColor);
 		levelCircle.setFillColor(selectColorTrans);
 	}
 
 	@Override
-	public void handleActionUp(int id, Position pos) {
+	public void handleActionUp(int id, Pointer pos) {
 		super.handleActionUp(id, pos);
 		foregroundRect.setFillColor(levelColor);
 		levelCircle.setFillColor(levelColorTrans);

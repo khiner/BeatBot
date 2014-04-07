@@ -70,7 +70,7 @@ public class Button extends LongPressableView {
 	}
 
 	@Override
-	public void handleActionDown(int id, Position pos) {
+	public void handleActionDown(int id, Pointer pos) {
 		if (!isEnabled())
 			return;
 
@@ -79,7 +79,7 @@ public class Button extends LongPressableView {
 	}
 
 	@Override
-	public void handleActionUp(int id, Position pos) {
+	public void handleActionUp(int id, Pointer pos) {
 		if (!isEnabled())
 			return;
 		if (isPressed() && (isLongPressing() || longPressListener == null)) {
@@ -90,13 +90,13 @@ public class Button extends LongPressableView {
 	}
 
 	@Override
-	public void handleActionMove(int id, Position pos) {
+	public void handleActionMove(int id, Pointer pos) {
 		super.handleActionMove(id, pos);
 		checkPointerExit(id, pos);
 	}
 
 	@Override
-	protected void longPress(int id, Position pos) {
+	protected void longPress(int id, Pointer pos) {
 		if (longPressListener != null) {
 			longPressListener.onLongPress(this);
 		}

@@ -15,6 +15,7 @@ import com.kh.beatbot.event.midinotes.MidiNotesGroupEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesLevelsSetEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesMoveEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesPinchEvent;
+import com.kh.beatbot.listener.LoopChangeListener;
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiTrack;
@@ -44,6 +45,7 @@ public class MidiManager {
 
 	private static MidiNotesGroupEvent currNoteEvent;
 	private static LoopWindowSetEvent currLoopWindowEvent;
+	private static List<LoopChangeListener> loopChangeListeners = new ArrayList<LoopChangeListener>();
 
 	public static void init() {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION);
@@ -52,6 +54,10 @@ public class MidiManager {
 		tempoTrack.insertEvent(tempo);
 		setLoopBeginTick(0);
 		setLoopEndTick(TICKS_PER_NOTE * 4);
+	}
+
+	public static void addLoopChangeListener(LoopChangeListener listener) {
+		loopChangeListeners.add(listener);
 	}
 
 	public static boolean isSnapToGrid() {
@@ -431,6 +437,9 @@ public class MidiManager {
 		MidiManager.loopEndTick = loopEndTick;
 		setLoopTicksNative(loopBeginTick, loopEndTick);
 		TrackManager.updateAllTrackNextNotes();
+		for (LoopChangeListener listener : loopChangeListeners) {
+			listener.onLoopChange(loopBeginTick, loopEndTick);
+		}
 	}
 
 	public static long getLoopBeginTick() {

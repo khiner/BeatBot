@@ -59,32 +59,19 @@ public abstract class Mesh {
 		group.translate(this, x, y);
 	}
 
-	public boolean setPosition(float x, float y) {
-		boolean posChanged = x != this.x || y != this.y;
-		if (posChanged) {
-			translate(x - this.x, y - this.y);
-			this.x = x;
-			this.y = y;
-			return true;
-		} else {
-			return false;
-		}
+	public void setPosition(float x, float y) {
+		translate(x - this.x, y - this.y);
+		this.x = x;
+		this.y = y;
 	}
 
-	public synchronized boolean setDimensions(float width, float height) {
-		boolean dimChanged = width != this.width || height != this.height;
-		if (width <= 0 || height <= 0 || !dimChanged)
-			return false;
-		else {
-			this.width = width;
-			this.height = height;
-			return true;
-		}
+	public synchronized void setDimensions(float width, float height) {
+		this.width = width;
+		this.height = height;
 	}
 
-	public synchronized boolean layout(float x, float y, float width, float height) {
-		boolean dimChanged = setDimensions(width, height);
-		boolean posChanged = setPosition(x, y);
-		return dimChanged || posChanged;
+	public synchronized void layout(float x, float y, float width, float height) {
+		setDimensions(width, height);
+		setPosition(x, y);
 	}
 }

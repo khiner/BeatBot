@@ -30,13 +30,12 @@ public class TextureMesh extends Mesh {
 	}
 
 	@Override
-	public synchronized boolean layout(float x, float y, float width, float height) {
+	public synchronized void layout(float x, float y, float width, float height) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
 
 		((TextureGroup) group).layout(this, x, y, width, height);
-		return true;
 	}
 }

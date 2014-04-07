@@ -20,9 +20,9 @@ public class MainPage extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		controlButtonGroup = new ControlButtonGroup();
-		midiViewGroup = new MidiViewGroup();
-		pageSelectGroup = new PageSelectGroup();
+		controlButtonGroup = new ControlButtonGroup(shapeGroup);
+		midiViewGroup = new MidiViewGroup(shapeGroup);
+		pageSelectGroup = new PageSelectGroup(shapeGroup);
 		slideMenu = new MainMenu();
 
 		TrackManager.addTrackListener(pageSelectGroup);

@@ -48,6 +48,7 @@ public class SampleEditView extends ControlView2dBase {
 			for (int i = 0; i < loopButtons.length; i++) {
 				if (null == loopButtons[i]) {
 					loopButtons[i] = new Button(shapeGroup);
+					loopButtons[i].deselectOnPointerExit = false;
 					loopButtons[i].setIcon(IconResourceSets.SAMPLE_LOOP);
 					loopButtons[i].setOnPressListener(new OnPressListener() {
 						@Override
@@ -105,8 +106,8 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	private void updateZoom() {
-		float x1 = pointerIdToPos.get(zoomLeftPointerId).x;
-		float x2 = pointerIdToPos.get(zoomRightPointerId).x;
+		float x1 = pointersById.get(zoomLeftPointerId).x;
+		float x2 = pointersById.get(zoomRightPointerId).x;
 
 		if (x1 >= x2)
 			return; // sanity check
@@ -167,7 +168,7 @@ public class SampleEditView extends ControlView2dBase {
 		}
 	}
 
-	private boolean moveLoopMarker(int id, Position pos) {
+	private boolean moveLoopMarker(int id, Pointer pos) {
 		return moveLoopMarker(id, pos.x, loopButtons[0], params[0])
 				|| moveLoopMarker(id, pos.x, loopButtons[1], params[1]) || false;
 	}
@@ -191,7 +192,7 @@ public class SampleEditView extends ControlView2dBase {
 		if (scrollPointerId == -1) {
 			return false; // need to be scrolling to start zooming
 		}
-		if (pointerIdToPos.get(scrollPointerId).x > pointerIdToPos.get(id).x) {
+		if (pointersById.get(scrollPointerId).x > pointersById.get(id).x) {
 			zoomLeftPointerId = id;
 			zoomRightPointerId = scrollPointerId;
 		} else {
@@ -200,8 +201,8 @@ public class SampleEditView extends ControlView2dBase {
 		}
 		scrollPointerId = -1; // not scrolling anymore
 
-		zoomLeftAnchorLevel = xToLevel(pointerIdToPos.get(zoomLeftPointerId).x);
-		zoomRightAnchorLevel = xToLevel(pointerIdToPos.get(zoomRightPointerId).x);
+		zoomLeftAnchorLevel = xToLevel(pointersById.get(zoomLeftPointerId).x);
+		zoomRightAnchorLevel = xToLevel(pointersById.get(zoomRightPointerId).x);
 		return true;
 	}
 
@@ -211,7 +212,7 @@ public class SampleEditView extends ControlView2dBase {
 		updateWaveformVb();
 	}
 
-	private void setScrollAnchor(int id, Position pos) {
+	private void setScrollAnchor(int id, Pointer pos) {
 		if (null != pos) {
 			scrollPointerId = id;
 			scrollAnchorLevel = xToLevel(pos.x);
@@ -220,7 +221,7 @@ public class SampleEditView extends ControlView2dBase {
 		}
 	}
 
-	private void scroll(Position pos) {
+	private void scroll(Pointer pos) {
 		// set levelOffset such that the scroll anchor level stays under scrollX
 		float newLevelOffset = GeneralUtils.clipTo(scrollAnchorLevel - xToLevel(pos.x)
 				+ levelOffset, 0, 1 - levelWidth);
@@ -229,7 +230,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionDown(int id, Position pos) {
+	public void handleActionDown(int id, Pointer pos) {
 		super.handleActionDown(id, pos);
 		if (!hasSample())
 			return;
@@ -237,7 +238,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionUp(int id, Position pos) {
+	public void handleActionUp(int id, Pointer pos) {
 		super.handleActionUp(id, pos);
 		if (!hasSample())
 			return;
@@ -246,7 +247,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionPointerDown(int id, Position pos) {
+	public void handleActionPointerDown(int id, Pointer pos) {
 		if (!hasSample())
 			return;
 		if (!setZoomAnchor(id)) {
@@ -256,17 +257,17 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionPointerUp(int id, Position pos) {
+	public void handleActionPointerUp(int id, Pointer pos) {
 		if (!hasSample())
 			return;
 		// stop zooming
 		int scrollPointerId = id == zoomLeftPointerId ? zoomRightPointerId : zoomLeftPointerId;
-		setScrollAnchor(scrollPointerId, pointerIdToPos.get(scrollPointerId));
+		setScrollAnchor(scrollPointerId, pointersById.get(scrollPointerId));
 		zoomLeftPointerId = zoomRightPointerId = -1;
 	}
 
 	@Override
-	public void handleActionMove(int id, Position pos) {
+	public void handleActionMove(int id, Pointer pos) {
 		if (!hasSample()) {
 			checkPointerExit(id, pos);
 			return;

@@ -19,7 +19,7 @@ public class Knob extends ControlView1dBase {
 	}
 
 	@Override
-	protected float posToLevel(Position pos) {
+	protected float posToLevel(Pointer pos) {
 		float unitX = pos.x / width - .5f;
 		float unitY = pos.y / height - .5f;
 		float theta = (float) Math.atan(unitY / unitX) + ¹ / 2;
@@ -44,13 +44,13 @@ public class Knob extends ControlView1dBase {
 	}
 
 	@Override
-	public void handleActionDown(int id, Position pos) {
+	public void handleActionDown(int id, Pointer pos) {
 		super.handleActionDown(id, pos);
 		knobShape.setFillColor(selectColor);
 	}
 
 	@Override
-	public void handleActionUp(int id, Position pos) {
+	public void handleActionUp(int id, Pointer pos) {
 		super.handleActionUp(id, pos);
 		knobShape.setFillColor(levelColor);
 	}

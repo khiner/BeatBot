@@ -31,7 +31,7 @@ public abstract class ControlViewBase extends TouchableView {
 	}
 
 	@Override
-	public void handleActionDown(int id, Position pos) {
+	public void handleActionDown(int id, Pointer pos) {
 		super.handleActionDown(id, pos);
 		selected = true;
 		if (listener != null) {
@@ -40,7 +40,7 @@ public abstract class ControlViewBase extends TouchableView {
 	}
 
 	@Override
-	public void handleActionUp(int id, Position pos) {
+	public void handleActionUp(int id, Pointer pos) {
 		super.handleActionUp(id, pos);
 		selected = false;
 		if (listener != null) {

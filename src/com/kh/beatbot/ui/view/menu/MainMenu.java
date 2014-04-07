@@ -15,7 +15,6 @@ import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.shape.SlideTab;
-import com.kh.beatbot.ui.view.MidiView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
@@ -26,7 +25,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	private class PhysicsState {
 		private Menu menu;
 
-		private final float SPRING_CONST = .4f, DAMP = .67f, STOP_THRESH = 0.001f;
+		private final float SPRING_CONST = .6f, DAMP = .57f, STOP_THRESH = 0.001f;
 
 		private float velocity = 0, downXOffset = 0, lastX = 0, goalX = 0;
 		private boolean snap = true;
@@ -60,7 +59,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	private SlideTab tab;
 	private PhysicsState physicsState;
 
-	private float menuOffset = MidiView.Y_OFFSET / 4;
+	private float menuOffset = 4;
 	private boolean menuPressed = false;
 
 	private Rectangle foregroundRect;
@@ -197,7 +196,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	}
 
 	@Override
-	public void handleActionDown(int id, Position pos) {
+	public void handleActionDown(int id, Pointer pos) {
 		super.handleActionDown(id, pos);
 		if (!textureMesh.containsPoint(pos.x + absoluteX, pos.y)) {
 			return;
@@ -209,7 +208,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	}
 
 	@Override
-	public void handleActionMove(int pointerId, Position pos) {
+	public void handleActionMove(int pointerId, Pointer pos) {
 		super.handleActionMove(pointerId, pos);
 		if (!menuPressed)
 			return;
@@ -219,7 +218,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	}
 
 	@Override
-	public void handleActionUp(int pointerId, Position pos) {
+	public void handleActionUp(int pointerId, Pointer pos) {
 		super.handleActionUp(pointerId, pos);
 		if (!menuPressed)
 			return;

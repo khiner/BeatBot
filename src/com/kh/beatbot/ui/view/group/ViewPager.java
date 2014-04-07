@@ -15,7 +15,7 @@ public class ViewPager extends TouchableView {
 		addChildren(page);
 	}
 
-	public int numPages() {
+	public int pageCount() {
 		return children.size();
 	}
 
@@ -43,8 +43,9 @@ public class ViewPager extends TouchableView {
 	@Override
 	public synchronized void drawAll() {
 		View currPage = getCurrPage();
-		if (null != currPage)
+		if (null != currPage) {
 			currPage.drawAll();
+		}
 	}
 
 	@Override

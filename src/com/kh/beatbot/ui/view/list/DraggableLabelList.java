@@ -15,7 +15,7 @@ public class DraggableLabelList extends LabelList {
 	}
 
 	@Override
-	public synchronized void handleActionMove(int id, Position pos) {
+	public synchronized void handleActionMove(int id, Pointer pos) {
 		super.handleActionMove(id, pos);
 		if (touchedLabel == null || id != 0) {
 			return;
@@ -29,7 +29,7 @@ public class DraggableLabelList extends LabelList {
 		prevTouchedLabelState = ((Label) button).getLabelState();
 		super.onPress(button);
 		initialTouchedPosition = children.indexOf(button);
-		dragOffset = touchedLabel.x - this.pointerIdToPos.get(0).x;
+		dragOffset = touchedLabel.x - this.pointersById.get(0).x;
 	}
 
 	@Override

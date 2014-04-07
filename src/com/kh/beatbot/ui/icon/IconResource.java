@@ -7,6 +7,10 @@ public class IconResource {
 	public float[] textColor;
 	public float[] iconColor;
 
+	public IconResource(float[] fillColor, float[] strokeColor) {
+		this(-1, fillColor, strokeColor);
+	}
+
 	public IconResource(int resourceId, float[] fillColor, float[] strokeColor) {
 		this(resourceId, fillColor, strokeColor, null, null);
 	}

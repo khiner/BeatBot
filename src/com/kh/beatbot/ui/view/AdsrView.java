@@ -34,28 +34,28 @@ public class AdsrView extends TouchableView implements ParamListener {
 	}
 
 	@Override
-	public void handleActionDown(int id, Position pos) {
+	public void handleActionDown(int id, Pointer pos) {
 		super.handleActionDown(id, pos);
 		selectAdsrPoint(id, clipX(pos.x), clipY(pos.y));
 	}
 
 	@Override
-	public void handleActionPointerDown(int id, Position pos) {
+	public void handleActionPointerDown(int id, Pointer pos) {
 		selectAdsrPoint(id, clipX(pos.x), clipY(pos.y));
 	}
 
 	@Override
-	public void handleActionMove(int id, Position pos) {
+	public void handleActionMove(int id, Pointer pos) {
 		moveAdsrPoint(id, clipX(pos.x), clipY(pos.y));
 	}
 
 	@Override
-	public void handleActionPointerUp(int id, Position pos) {
+	public void handleActionPointerUp(int id, Pointer pos) {
 		deselectAdsrPoint(id);
 	}
 
 	@Override
-	public void handleActionUp(int id, Position pos) {
+	public void handleActionUp(int id, Pointer pos) {
 		super.handleActionUp(id, pos);
 		clearAdsrSelected();
 	}

@@ -9,6 +9,7 @@ import com.kh.beatbot.ui.color.Color;
 public class IconResourceSets {
 	public static IconResourceSet
 			DEFAULT = s(r(Color.VIEW_BG, Color.TRON_BLUE), r(Color.VIEW_BG_SELECTED, Color.TRON_BLUE)),
+			INVISIBLE = s(r(Color.TRANSPARENT), r(Color.TRANSPARENT)),
 			SAMPLE_LOOP = s(r(Color.TRON_BLUE_TRANS), r(Color.TRON_BLUE)),
 			SAMPLE_BG = s(r(Color.LABEL_LIGHT), r(Color.LABEL_VERY_LIGHT)),
 			MUTE = s(r(Color.TRANSPARENT, Color.WHITE), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.PAN, Color.BLACK)),
@@ -74,7 +75,11 @@ public class IconResourceSets {
 
 			BANDPASS_FILTER = s(r(R.drawable.bandpass_filter_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.bandpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.bandpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
 			HIGHPASS_FILTER = s(r(R.drawable.highpass_filter_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.highpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.highpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
-			LOWPASS_FILTER = s(r(R.drawable.lowpass_filter_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.lowpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.lowpass_filter_icon, Color.TRON_BLUE, Color.BLACK));
+			LOWPASS_FILTER = s(r(R.drawable.lowpass_filter_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.lowpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.lowpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
+			
+			MIDI_TICK_BAR = s(r(Color.TICK_FILL), r(Color.TICK_FILL)),
+			MIDI_LOOP_BAR = s(r(Color.TICKBAR), r(Color.TRON_BLUE)),
+			MIDI_LOOP_BUTTONS = s(r(Color.TRANSPARENT, Color.RED), r(Color.TRANSPARENT, Color.RED));
 
 	private static Map<String, IconResourceSet> DIRECTORY_ICON_RESOURCES = new HashMap<String, IconResourceSet>() {
 		{
@@ -107,7 +112,6 @@ public class IconResourceSets {
 		return new IconResource(-1, fillColor, strokeColor);
 	}
 
-	
 	private static IconResource r(int resourceId, float[] fillColor, float[] strokeColor) {
 		return new IconResource(resourceId, fillColor, strokeColor);
 	}

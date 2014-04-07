@@ -22,9 +22,9 @@ public abstract class ClickableView extends LongPressableView {
 	private long lastDownTime = 0, lastTapTime = 0;
 
 	/****************** Clickable Methods ********************/
-	protected abstract void singleTap(int id, Position pos);
+	protected abstract void singleTap(int id, Pointer pos);
 
-	protected abstract void doubleTap(int id, Position pos);
+	protected abstract void doubleTap(int id, Pointer pos);
 
 	@Override
 	public void releaseLongPress() {
@@ -33,13 +33,13 @@ public abstract class ClickableView extends LongPressableView {
 	}
 
 	@Override
-	public void handleActionDown(int id, Position pos) {
+	public void handleActionDown(int id, Pointer pos) {
 		super.handleActionDown(id, pos);
 		lastDownTime = System.currentTimeMillis();
 	}
 
 	@Override
-	public void handleActionUp(int id, Position pos) {
+	public void handleActionUp(int id, Pointer pos) {
 		super.releaseLongPress();
 		long time = System.currentTimeMillis();
 		if (Math.abs(time - lastDownTime) < SINGLE_TAP_TIME) {

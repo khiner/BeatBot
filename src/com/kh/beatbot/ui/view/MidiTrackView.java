@@ -4,19 +4,16 @@ import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.view.helper.ScrollHelper;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 
 public class MidiTrackView extends TouchableView implements TrackListener {
-	private float yOffset = 0;
-
-	@Override
-	protected synchronized void init() {
-		setClip(true);
+	public MidiTrackView(ShapeGroup shapeGroup) {
+		super(shapeGroup);
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
-		float yPos = yOffset;
+		float yPos = 0; // yOffset
 		for (View child : children) {
 			child.layout(this, 0, yPos, width, MidiView.trackHeight);
 			yPos += MidiView.trackHeight;
@@ -69,10 +66,5 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 				}
 			}
 		}
-	}
-
-	public void onScrollY(ScrollHelper scrollHelper) {
-		yOffset = MidiView.Y_OFFSET - scrollHelper.yOffset;
-		layoutChildren();
 	}
 }

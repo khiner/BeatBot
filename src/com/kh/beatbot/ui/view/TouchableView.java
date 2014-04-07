@@ -7,11 +7,13 @@ import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 
 public class TouchableView extends View {
-	public class Position {
+	public class Pointer {
+		public int id;
 		public float downX, downY;
 		public float x, y;
 
-		public Position(float x, float y) {
+		public Pointer(int id, float x, float y) {
+			this.id = id;
 			downX = x;
 			downY = y;
 			set(x, y);
@@ -21,13 +23,21 @@ public class TouchableView extends View {
 			this.x = x;
 			this.y = y;
 		}
+
+		public boolean equals(Pointer another) {
+			if (null == another) {
+				return false;
+			} else {
+				return this.id == another.id;
+			}
+		}
 	}
 
 	// map of pointer ID #'s that this window is responsible for to their current position relative
 	// to this window
-	protected SparseArray<Position> pointerIdToPos = new SparseArray<Position>();
+	protected SparseArray<Pointer> pointersById = new SparseArray<Pointer>();
 
-	protected boolean shouldPropagateTouchEvents = true;
+	protected boolean shouldPropagateTouchEvents = true, deselectOnPointerExit = true;
 
 	public TouchableView() {
 		super();
@@ -37,12 +47,16 @@ public class TouchableView extends View {
 		super(shapeGroup);
 	}
 
+	public final Pointer getPointer() {
+		return pointersById.valueAt(0);
+	}
+
 	public final boolean ownsPointer(int id) {
-		return pointerIdToPos.get(id) != null;
+		return pointersById.get(id) != null;
 	}
 
 	public final int pointerCount() {
-		return pointerIdToPos.size();
+		return pointersById.size();
 	}
 
 	/********************************************************
@@ -51,23 +65,23 @@ public class TouchableView extends View {
 	 * touch event (for example, a view may not handle multi-touch events like pointer up/down
 	 * events.
 	 ********************************************************/
-	public void handleActionDown(int id, Position pos) {
+	public void handleActionDown(int id, Pointer pos) {
 		press();
 	}
 
-	public void handleActionUp(int id, Position pos) {
+	public void handleActionUp(int id, Pointer pos) {
 		release();
 	}
 
-	public void handleActionPointerDown(int id, Position pos) {
+	public void handleActionPointerDown(int id, Pointer pos) {
 
 	}
 
-	public void handleActionPointerUp(int id, Position pos) {
+	public void handleActionPointerUp(int id, Pointer pos) {
 
 	}
 
-	public void handleActionMove(int id, Position pos) {
+	public void handleActionMove(int id, Pointer pos) {
 
 	}
 
@@ -142,33 +156,33 @@ public class TouchableView extends View {
 	 * of the business of properly storing the pointers in the "id to position" map.
 	 ***************************************************************/
 	private final void consumeActionDown(int id, float x, float y) {
-		Position pos = new Position(x, y);
-		pointerIdToPos.put(id, pos);
+		Pointer pos = new Pointer(id, x, y);
+		pointersById.put(id, pos);
 		handleActionDown(id, pos);
 	}
 
 	private final void consumeActionUp(int id, float x, float y) {
-		Position pos = pointerIdToPos.get(id);
+		Pointer pos = pointersById.get(id);
 		if (null != pos) {
 			handleActionUp(id, pos);
 		}
-		pointerIdToPos.clear();
+		pointersById.clear();
 	}
 
 	private final void consumeActionPointerDown(int id, float x, float y) {
-		Position pos = new Position(x, y);
-		pointerIdToPos.put(id, pos);
+		Pointer pos = new Pointer(id, x, y);
+		pointersById.put(id, pos);
 		handleActionPointerDown(id, pos);
 	}
 
 	private final void consumeActionPointerUp(int id, float x, float y) {
-		Position pos = pointerIdToPos.get(id);
+		Pointer pos = pointersById.get(id);
 		handleActionPointerUp(id, pos);
-		pointerIdToPos.remove(id);
+		pointersById.remove(id);
 	}
 
 	private final void consumeActionMove(int id, float x, float y) {
-		Position pos = pointerIdToPos.get(id);
+		Pointer pos = pointersById.get(id);
 		if (null != pos) {
 			pos.set(x, y);
 			handleActionMove(id, pos);
@@ -209,8 +223,8 @@ public class TouchableView extends View {
 		return getState() == State.PRESSED;
 	}
 
-	protected void checkPointerExit(int id, Position pos) {
-		if (!isEnabled())
+	protected void checkPointerExit(int id, Pointer pos) {
+		if (!(isEnabled() && deselectOnPointerExit))
 			return;
 		// x / y are relative to this view but containsPoint is absolute
 		if (!containsPoint(this.x + pos.x, this.y + pos.y)) {

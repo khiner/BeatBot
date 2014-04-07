@@ -2,7 +2,7 @@ package com.kh.beatbot.ui.view.helper;
 
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.ui.view.TouchableView.Position;
+import com.kh.beatbot.ui.view.TouchableView.Pointer;
 
 public class ScrollHelper {
 	private static final float DAMP_CONSTANT = 0.9f;
@@ -53,7 +53,7 @@ public class ScrollHelper {
 		}
 	}
 
-	public void scroll(Position pos) {
+	public void scroll(Pointer pos) {
 		float newXOffset = scrollAnchorX - numTicks * pos.x / scrollable.width();
 		float newYOffset = scrollAnchorY - pos.y;
 		scrollXVelocity = newXOffset - xOffset;

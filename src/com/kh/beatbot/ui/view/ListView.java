@@ -61,14 +61,14 @@ public class ListView extends TouchableView implements OnPressListener {
 	}
 
 	@Override
-	public void handleActionDown(int index, Position pos) {
+	public void handleActionDown(int index, Pointer pos) {
 		yOffsetAnchor = yOffset;
 		lastY = pos.y;
 		tabColorTransition.begin();
 	}
 
 	@Override
-	public void handleActionUp(int index, Position pos) {
+	public void handleActionUp(int index, Pointer pos) {
 		if (Math.abs(velocity) < 3) {
 			velocity = 0;
 		}
@@ -77,7 +77,7 @@ public class ListView extends TouchableView implements OnPressListener {
 	}
 
 	@Override
-	public void handleActionMove(int index, Position pos) {
+	public void handleActionMove(int index, Pointer pos) {
 		if (childHeight <= height) {
 			return;
 		}
@@ -125,7 +125,7 @@ public class ListView extends TouchableView implements OnPressListener {
 		updateYOffset(null);
 	}
 
-	private synchronized void updateYOffset(Position pos) {
+	private synchronized void updateYOffset(Pointer pos) {
 		float newY;
 		if (null == pos) {
 			newY = yOffset + velocity;

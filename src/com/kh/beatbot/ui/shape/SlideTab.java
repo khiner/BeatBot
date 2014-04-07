@@ -36,6 +36,8 @@ public class SlideTab extends Shape {
 
 	@Override
 	protected void updateVertices() {
+		if (null == View.mainPage)
+			return;
 		roundedRect.setCornerRadius(cornerRadius);
 		roundedRect.layout(x + View.mainPage.width - cornerRadius * 2, y, width, height);
 

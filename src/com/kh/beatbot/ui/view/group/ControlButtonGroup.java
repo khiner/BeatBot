@@ -9,6 +9,7 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
+import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
@@ -17,6 +18,10 @@ public class ControlButtonGroup extends TouchableView {
 
 	public ToggleButton playButton, recordButton, copyButton;
 	public Button stopButton, undoButton, redoButton, deleteButton, quantizeButton;
+
+	public ControlButtonGroup(ShapeGroup shapeGroup) {
+		super(shapeGroup);
+	}
 
 	@Override
 	protected synchronized void createChildren() {

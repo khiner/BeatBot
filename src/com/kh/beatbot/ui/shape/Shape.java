@@ -70,10 +70,8 @@ public abstract class Shape {
 	}
 
 	public synchronized void update() {
-		if (width > 0 && height > 0) {
-			resetIndices();
-			updateVertices();
-		}
+		resetIndices();
+		updateVertices();
 	}
 
 	protected synchronized void setFillColor(int vertexIndex, float[] fillColor) {
@@ -142,16 +140,14 @@ public abstract class Shape {
 	public synchronized void setDimensions(float width, float height) {
 		this.width = width;
 		this.height = height;
-		boolean fillChanged = fillMesh != null && fillMesh.setDimensions(width, height);
-		boolean strokeChanged = strokeMesh != null && strokeMesh.setDimensions(width, height);
-		if (fillChanged || strokeChanged) {
-			update();
-		}
+		if (null != fillMesh)
+			fillMesh.setDimensions(width, height);
+		if (null != strokeMesh)
+			strokeMesh.setDimensions(width, height);
+		update();
 	}
 
 	public synchronized void layout(float x, float y, float width, float height) {
-		if (width <= 0 || height <= 0)
-			return;
 		setPosition(x, y);
 		setDimensions(width, height);
 	}

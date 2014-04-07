@@ -53,6 +53,9 @@ public class WaveformShape extends Shape {
 	}
 
 	private synchronized void updateWaveformVertices() {
+		if (null == sampleBuffer)
+			return;
+
 		float x = this.x;
 		float y = this.y + height / 2;
 

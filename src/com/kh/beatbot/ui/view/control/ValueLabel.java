@@ -14,7 +14,7 @@ public class ValueLabel extends ControlView1dBase {
 	}
 
 	@Override
-	protected float posToLevel(Position pos) {
+	protected float posToLevel(Pointer pos) {
 		return GeneralUtils.clipToUnit(anchorLevel + (anchorY - pos.y) / (root.getHeight() * 2));
 	}
 
@@ -40,7 +40,7 @@ public class ValueLabel extends ControlView1dBase {
 	}
 
 	@Override
-	public void handleActionDown(int id, Position pos) {
+	public void handleActionDown(int id, Pointer pos) {
 		if (getState() == State.DISABLED)
 			return;
 		anchorY = pos.y;
@@ -48,7 +48,7 @@ public class ValueLabel extends ControlView1dBase {
 		super.handleActionDown(id, pos);
 	}
 
-	public void handleActionUp(int id, Position pos) {
+	public void handleActionUp(int id, Pointer pos) {
 		if (getState() == State.DISABLED)
 			return;
 		super.handleActionUp(id, pos);

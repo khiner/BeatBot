@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
+import com.kh.beatbot.listener.LoopChangeListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -17,45 +18,40 @@ import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.Line;
 import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.view.group.MidiViewGroup;
 import com.kh.beatbot.ui.view.helper.ScrollHelper;
 import com.kh.beatbot.ui.view.helper.Scrollable;
 
-public class MidiView extends ClickableView implements TrackListener, Scrollable {
+public class MidiView extends ClickableView implements TrackListener, Scrollable,
+		LoopChangeListener {
 
-	public static final float Y_OFFSET = 21, LOOP_SELECT_SNAP_DIST = 30;
+	public static final float LOOP_SELECT_SNAP_DIST = 30;
 	public static final int NUM_VERTICAL_LINE_SETS = 8;
-
 	public static float trackHeight;
 
-	private static float dragOffsetTick[] = { 0, 0, 0, 0, 0 };
-	private static float pinchLeftOffset = 0, pinchRightOffset = 0, zoomLeftAnchorTick = 0,
-			zoomRightAnchorTick = 0, loopSelectionOffset = 0, selectRegionStartTick = -1,
-			selectRegionStartY = -1;
+	private float dragOffsetTick[] = { 0, 0, 0, 0, 0 };
+	private float pinchLeftOffset = 0, pinchRightOffset = 0, zoomLeftAnchorTick = 0,
+			zoomRightAnchorTick = 0, selectRegionStartTick = -1, selectRegionStartY = -1;
 
-	private static int[] loopPointerIds = { -1, -1, -1 };
-	private static int pinchLeftPointerId = -1, pinchRightPointerId = -1;
+	private int pinchLeftPointerId = -1, pinchRightPointerId = -1;
 
-	private static ShapeGroup noteRectangles = new ShapeGroup();
-
-	// vertical line loop markers
 	private Line[] loopMarkerLines;
+	private List<Line>[] vLines;
 	private Line currTickLine;
-	private Rectangle backgroundRect, loopRect, tickBarRect, loopBarRect, selectRegionRect;
+	private Rectangle leftLoopRect, rightLoopRect, selectRegionRect;
 
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedNotes = new HashMap<Integer, MidiNote>();
-
 	// map of pointerIds to the original on-ticks of the notes they are touching
 	// (before dragging)
 	private Map<Integer, Float> startOnTicks = new HashMap<Integer, Float>();
 
-	private ScrollHelper scrollHelper;
+	protected ScrollHelper scrollHelper;
 
-	private List<Line>[] vLines;
-
-	public MidiView() {
-		super();
+	public MidiView(ShapeGroup shapeGroup) {
+		super(shapeGroup);
 		scrollHelper = new ScrollHelper(this);
+		MidiManager.addLoopChangeListener(this);
 	}
 
 	public synchronized void updateVerticalLineColors() {
@@ -74,30 +70,20 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		return trackHeight * TrackManager.getNumTracks();
 	}
 
-	public int getNumLoopMarkersSelected() {
-		int numSelected = 0;
-		for (int i = 0; i < 3; i++) {
-			if (loopPointerIds[i] != -1) {
-				numSelected++;
-			}
-		}
-		return numSelected;
-	}
-
 	public void reset() {
 		scrollHelper.setXOffset(0);
 	}
 
-	private void selectRegion(Position pos) {
+	private void selectRegion(Pointer pos) {
 		float tick = xToTick(pos.x);
 		float leftTick = Math.min(tick, selectRegionStartTick);
 		float rightTick = Math.max(tick, selectRegionStartTick);
 		float topY = Math.min(pos.y, selectRegionStartY);
 		float bottomY = Math.max(pos.y, selectRegionStartY);
 		// make sure select rect doesn't go into the tick view
-		topY = Math.max(topY + .01f, Y_OFFSET);
+		topY = Math.max(topY + .01f, 0);
 		// make sure select rect doesn't go past the last track/note
-		bottomY = Math.min(bottomY + .01f, Y_OFFSET + getTotalTrackHeight() - .01f);
+		bottomY = Math.min(bottomY + .01f, getTotalTrackHeight() - .01f);
 		int topNote = yToNote(topY);
 		int bottomNote = yToNote(bottomY);
 		MidiManager.selectRegion((long) leftTick, (long) rightTick, topNote, bottomNote);
@@ -106,9 +92,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		bottomY = noteToY(bottomNote + 1);
 		// make room in the view window if we are dragging out of the view
 		scrollHelper.updateView(tick, topY, bottomY);
-		selectRegionRect.layout(tickToUnscaledX(leftTick), topY, tickToUnscaledX(rightTick
-				- leftTick), bottomY - topY);
-		selectRegionRect.setFillColor(Color.TRON_BLUE_TRANS);
+		selectRegionRect.layout(tickToUnscaledX(leftTick), absoluteY + topY,
+				tickToUnscaledX(rightTick - leftTick), bottomY - topY);
 	}
 
 	public MidiNote getMidiNote(int track, float tick) {
@@ -125,7 +110,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		return null;
 	}
 
-	private void selectMidiNote(int pointerId, Position pos) {
+	private void selectMidiNote(int pointerId, Pointer pos) {
 		final float tick = xToTick(pos.x);
 		MidiNote selectedNote = getMidiNote(yToNote(pos.y), tick);
 
@@ -148,30 +133,16 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		touchedNotes.put(pointerId, selectedNote);
 	}
 
-	public void selectLoopMarker(int pointerId, float x) {
-		if (loopPointerIds[1] != -1)
-			return; // middle loop marker already being dragged
-		float loopBeginX = tickToX(MidiManager.getLoopBeginTick());
-		float loopEndX = tickToX(MidiManager.getLoopEndTick());
-		if (Math.abs(x - loopBeginX) <= LOOP_SELECT_SNAP_DIST) {
-			loopPointerIds[0] = pointerId;
-			loopMarkerLines[0].setStrokeColor(Color.TRON_BLUE);
-		} else if (Math.abs(x - loopEndX) <= LOOP_SELECT_SNAP_DIST) {
-			loopPointerIds[2] = pointerId;
-			loopMarkerLines[1].setStrokeColor(Color.TRON_BLUE);
-		} else if (x > loopBeginX && x < loopEndX) {
-			loopPointerIds[1] = pointerId;
-			loopSelectionOffset = x - loopBeginX;
-			loopBarRect.setFillColor(Color.TRON_BLUE);
-		}
-	}
-
 	private void updateCurrentTick() {
-		currTickLine.setPosition(tickToUnscaledX(MidiManager.getCurrTick()), 0);
+		currTickLine.setPosition(tickToUnscaledX(MidiManager.getCurrTick()), absoluteY);
 	}
 
 	public float tickToUnscaledX(float tick) {
-		return tick / MidiManager.MAX_TICKS * width;
+		return tick * width / MidiManager.MAX_TICKS;
+	}
+
+	public float unscaledXToTick(float x) {
+		return x * MidiManager.MAX_TICKS / width;
 	}
 
 	public float tickToX(float tick) {
@@ -183,39 +154,45 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	public int yToNote(float y) {
-		float f = ((y + scrollHelper.yOffset - Y_OFFSET) / trackHeight);
+		float f = ((y + scrollHelper.yOffset) / trackHeight);
 		return f < 0 ? -1 : (int) f;
 	}
 
 	public float noteToY(int note) {
-		return note * trackHeight + Y_OFFSET - scrollHelper.yOffset;
+		return note * trackHeight - scrollHelper.yOffset;
 	}
 
 	public float noteToUnscaledY(int note) {
-		return note * trackHeight + Y_OFFSET;
+		return note * trackHeight;
 	}
 
-	public void initAllVbs() {
-		updateLoopUi();
+	public float getXOffset() {
+		return scrollHelper.xOffset;
+	}
+
+	public float getYOffset() {
+		return scrollHelper.yOffset;
+	}
+
+	public float getNumTicks() {
+		return scrollHelper.numTicks;
 	}
 
 	public synchronized void init() {
 		setClip(true);
 		shouldDraw = false;
-		initAllVbs();
 	}
 
 	@Override
 	public synchronized void createChildren() {
-		backgroundRect = new Rectangle(shapeGroup, Color.MIDI_VIEW_BG, null);
-		loopRect = new Rectangle(shapeGroup, Color.MIDI_VIEW_LIGHT_BG, null);
-		tickBarRect = new Rectangle(shapeGroup, Color.TICK_FILL, Color.BLACK);
-		loopBarRect = new Rectangle(shapeGroup, Color.TICKBAR, null);
-		selectRegionRect = new Rectangle(shapeGroup, Color.TRANSPARENT, null);
-		currTickLine = new Line(shapeGroup, null, Color.TRON_BLUE);
+		leftLoopRect = new Rectangle(MidiViewGroup.scaleGroup, Color.DARK_TRANS, null);
+		rightLoopRect = new Rectangle(MidiViewGroup.scaleGroup, Color.DARK_TRANS, null);
+		selectRegionRect = new Rectangle(MidiViewGroup.translateScaleGroup, Color.TRANSPARENT,
+				Color.TRON_BLUE);
+		currTickLine = new Line(MidiViewGroup.scaleGroup, null, Color.TRON_BLUE);
 		loopMarkerLines = new Line[2];
 		for (int i = 0; i < loopMarkerLines.length; i++) {
-			loopMarkerLines[i] = new Line(shapeGroup, null, Color.TRON_BLUE);
+			loopMarkerLines[i] = new Line(MidiViewGroup.scaleGroup, null, Color.TRON_BLUE);
 		}
 		vLines = new ArrayList[NUM_VERTICAL_LINE_SETS];
 		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
@@ -225,11 +202,9 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public synchronized void layoutChildren() {
-		tickBarRect.layout(0, 0, width, Y_OFFSET);
-		backgroundRect.layout(0, Y_OFFSET, tickToUnscaledX(MidiManager.MAX_TICKS - 1), 1);
-		currTickLine.layout(0, 0, 3, height);
+		currTickLine.layout(absoluteX, absoluteY, 3, height);
 		for (int i = 0; i < loopMarkerLines.length; i++) {
-			loopMarkerLines[i].layout(0, 0, 3, height);
+			loopMarkerLines[i].layout(absoluteX, absoluteY, 3, height);
 		}
 		int minTickSpacing = MidiManager.MIN_TICKS / 8;
 		for (List<Line> lines : vLines) {
@@ -238,8 +213,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		for (long currTick = 0; currTick < MidiManager.MAX_TICKS; currTick += minTickSpacing) {
 			for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
 				if (currTick % (2 << (NUM_VERTICAL_LINE_SETS - i)) == 0) {
-					Line line = new Line(shapeGroup, null, Color.TRANSPARENT);
-					line.layout(tickToUnscaledX(currTick), Y_OFFSET, 2, 1);
+					Line line = new Line(MidiViewGroup.scaleGroup, null, Color.TRANSPARENT);
+					line.layout(tickToUnscaledX(currTick), absoluteY, 2, 1);
 					vLines[i].add(line);
 					break; // each line goes in only ONE line set
 				}
@@ -255,23 +230,6 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		if (pointerCount() == 0) {
 			scrollHelper.scroll(); // take care of any momentum scrolling
 		}
-	}
-
-	@Override
-	public void draw() {
-		push();
-		translate(-scrollHelper.xOffset / scrollHelper.numTicks * width + absoluteX, absoluteY);
-		scale((float) MidiManager.MAX_TICKS / (float) scrollHelper.numTicks, 1);
-
-		// draws all rect children in one call
-		shapeGroup.draw();
-
-		push();
-		translate(0, -scrollHelper.yOffset);
-		noteRectangles.draw();
-		pop();
-
-		pop();
 	}
 
 	private float getAdjustedTickDiff(float tickDiff, int pointerId, MidiNote singleNote) {
@@ -309,9 +267,18 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		return adjustedNoteDiff;
 	}
 
-	private void startSelectRegion(Position pos) {
+	private void startSelectRegion(Pointer pos) {
 		selectRegionStartTick = xToTick(pos.x);
 		selectRegionStartY = noteToY(yToNote(pos.y));
+		selectRegionRect.layout(tickToUnscaledX(selectRegionStartTick), absoluteY
+				+ selectRegionStartY, 1, trackHeight);
+		selectRegionRect.bringToTop();
+		selectRegionRect.setColors(Color.TRON_BLUE_TRANS, Color.TRON_BLUE);
+	}
+
+	private void stopSelectRegion() {
+		selectRegionStartTick = -1;
+		selectRegionRect.setColors(Color.TRANSPARENT, Color.TRANSPARENT);
 	}
 
 	// adds a note starting at the nearest major tick (nearest displayed
@@ -327,14 +294,15 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	public void createNoteView(MidiNote note) {
-		note.setRectangle(new Rectangle(noteRectangles, whichColor(note), Color.BLACK));
+		note.setRectangle(new Rectangle(MidiViewGroup.translateScaleGroup, whichColor(note),
+				Color.BLACK));
 		layoutNote(note);
 	}
 
 	public void layoutNote(MidiNote note) {
 		if (note.getRectangle() != null) {
 			note.getRectangle().layout(tickToUnscaledX(note.getOnTick()),
-					noteToUnscaledY(note.getNoteValue()),
+					absoluteY + noteToUnscaledY(note.getNoteValue()),
 					tickToUnscaledX(note.getOffTick() - note.getOnTick()), trackHeight);
 		}
 	}
@@ -361,11 +329,11 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	private static float[] whichColor(Track track) {
 		Track soloingTrack = TrackManager.getSoloingTrack();
 		if (track.isSelected()) {
-			return Color.LABEL_SELECTED_TRANS;
+			return Color.LABEL_SELECTED;
 		} else if (track.isMuted() || (soloingTrack != null && !soloingTrack.equals(track))) {
-			return Color.DARK_TRANS;
+			return Color.MIDI_VIEW_DARK_BG;
 		} else {
-			return Color.TRANSPARENT;
+			return Color.MIDI_VIEW_BG;
 		}
 	}
 
@@ -398,121 +366,71 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		}
 	}
 
-	private void updateLoopMarkers() {
-		if (loopPointerIds[0] != -1 && loopPointerIds[2] != -1) {
-			float leftX = pointerIdToPos.get(loopPointerIds[0]).x;
-			float rightX = pointerIdToPos.get(loopPointerIds[2]).x;
-			float leftTick = xToTick(leftX);
-			float rightTick = xToTick(rightX);
-			float leftMajorTick = MidiManager.getMajorTickNearestTo(leftTick);
-			float rightMajorTick = MidiManager.getMajorTickNearestTo(rightTick);
-			MidiManager.setLoopTicks((long) leftMajorTick, (long) rightMajorTick);
-			scrollHelper.updateView(leftTick, rightTick);
-		} else if (loopPointerIds[0] != -1) {
-			float leftX = pointerIdToPos.get(loopPointerIds[0]).x;
-			float leftTick = xToTick(leftX);
-			float leftMajorTick = MidiManager.getMajorTickNearestTo(leftTick);
-			MidiManager.setLoopBeginTick((long) leftMajorTick);
-			scrollHelper.updateView(leftTick);
-		} else if (loopPointerIds[2] != -1) {
-			float rightX = pointerIdToPos.get(loopPointerIds[2]).x;
-			float rightTick = xToTick(rightX);
-			float rightMajorTick = MidiManager.getMajorTickNearestTo(rightTick);
-			MidiManager.setLoopEndTick((long) rightMajorTick);
-			scrollHelper.updateView(rightTick);
-		} else if (loopPointerIds[1] != -1) {
-			float x = pointerIdToPos.get(loopPointerIds[1]).x;
-			// middle selected. move begin and end
-			// preserve current loop length
-			float loopLength = MidiManager.getLoopEndTick() - MidiManager.getLoopBeginTick();
-			float newBeginTick = MidiManager.getMajorTickToLeftOf(xToTick(x - loopSelectionOffset));
-			newBeginTick = newBeginTick >= 0 ? (newBeginTick <= MidiManager.MAX_TICKS - loopLength ? newBeginTick
-					: MidiManager.MAX_TICKS - loopLength)
-					: 0;
-			MidiManager.setLoopTicks((long) newBeginTick, (long) (newBeginTick + loopLength));
-			scrollHelper.updateView(xToTick(x));
-		} else {
-			return;
-		}
-		updateLoopUi();
+	public void updateView(float tick) {
+		scrollHelper.updateView(tick);
 	}
 
-	public void updateLoopUi() {
-		float x1 = tickToUnscaledX(MidiManager.getLoopBeginTick());
-		float x2 = tickToUnscaledX(MidiManager.getLoopEndTick());
-
-		loopBarRect.layout(x1, 0, x2 - x1, Y_OFFSET);
-		loopRect.layout(x1, Y_OFFSET, x2 - x1, getTotalTrackHeight());
-		loopMarkerLines[0].setPosition(x1, 0);
-		loopMarkerLines[1].setPosition(x2, 0);
-
-		scrollHelper.updateView(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
+	public void updateView(float leftTick, float rightTick) {
+		scrollHelper.updateView(leftTick, rightTick);
 	}
 
 	private synchronized void noMidiMove() {
-		if (pointerCount() - getNumLoopMarkersSelected() == 1) {
+		if (pointerCount() == 1) {
 			if (selectRegionStartTick >= 0) {
-				selectRegion(pointerIdToPos.get(0));
+				selectRegion(pointersById.get(0));
 			} else { // one finger scroll
-				scrollHelper.scroll(pointerIdToPos.get(scrollHelper.scrollPointerId));
+				scrollHelper.scroll(pointersById.get(scrollHelper.scrollPointerId));
 			}
-		} else if (pointerCount() - getNumLoopMarkersSelected() == 2) {
+		} else if (pointerCount() == 2) {
 			// two finger zoom
-			float leftX = Math.min(pointerIdToPos.get(0).x, pointerIdToPos.get(1).x);
-			float rightX = Math.max(pointerIdToPos.get(0).x, pointerIdToPos.get(1).x);
+			float leftX = Math.min(pointersById.get(0).x, pointersById.get(1).x);
+			float rightX = Math.max(pointersById.get(0).x, pointersById.get(1).x);
 			scrollHelper.zoom(leftX, rightX, zoomLeftAnchorTick, zoomRightAnchorTick);
 		}
 	}
 
 	@Override
-	public void handleActionDown(int id, Position pos) {
+	public void handleActionDown(int id, Pointer pos) {
 		super.handleActionDown(id, pos);
 		MidiManager.beginMidiEvent(null);
 		selectMidiNote(id, pos);
-		if (touchedNotes.get(id) == null) { // no note selected.
-			if (yToNote(pos.y) == -1) { // check if loop marker selected
-				selectLoopMarker(id, pos.x);
-			} else { // otherwise, enable scrolling
-				scrollHelper.setScrollAnchor(id, xToTick(pos.x), pos.y + scrollHelper.yOffset);
-			}
+		if (touchedNotes.get(id) == null) { // no note selected. enable scrolling
+			scrollHelper.setScrollAnchor(id, xToTick(pos.x), pos.y + scrollHelper.yOffset);
 		}
 	}
 
 	@Override
-	public void handleActionPointerDown(int id, Position pos) {
+	public void handleActionPointerDown(int id, Pointer pos) {
 		super.handleActionPointerDown(id, pos);
 		selectMidiNote(id, pos);
 		if (pointerCount() > 2 || null != touchedNotes.get(id))
 			return;
-		if (yToNote(pos.y) == -1) {
-			selectLoopMarker(id, pos.x);
+		// TODO might cause problems
+		float leftTick = xToTick(Math.min(pointersById.get(0).x, pointersById.get(1).x));
+		float rightTick = xToTick(Math.max(pointersById.get(0).x, pointersById.get(1).x));
+		if (!touchedNotes.isEmpty()) {
+			// note is selected with one pointer, but this pointer
+			// did not select a note. start pinching all selected notes.
+			pinchLeftPointerId = pointersById.get(0).x <= pointersById.get(1).x ? 0 : 1;
+			pinchRightPointerId = (pinchLeftPointerId + 1) % 2;
+			pinchLeftOffset = leftTick - MidiManager.getLeftmostSelectedTick();
+			pinchRightOffset = MidiManager.getRightmostSelectedTick() - rightTick;
+		} else if (pointerCount() == 1) {
+			// otherwise, enable scrolling
+			scrollHelper.setScrollAnchor(id, xToTick(pos.x));
 		} else {
-			// TODO might cause problems
-			float leftTick = xToTick(Math.min(pointerIdToPos.get(0).x, pointerIdToPos.get(1).x));
-			float rightTick = xToTick(Math.max(pointerIdToPos.get(0).x, pointerIdToPos.get(1).x));
-			if (!touchedNotes.isEmpty()) {
-				// note is selected with one pointer, but this pointer
-				// did not select a note. start pinching all selected notes.
-				pinchLeftPointerId = pointerIdToPos.get(0).x <= pointerIdToPos.get(1).x ? 0 : 1;
-				pinchRightPointerId = (pinchLeftPointerId + 1) % 2;
-				pinchLeftOffset = leftTick - MidiManager.getLeftmostSelectedTick();
-				pinchRightOffset = MidiManager.getRightmostSelectedTick() - rightTick;
-			} else if (pointerCount() - getNumLoopMarkersSelected() == 1) {
-				// otherwise, enable scrolling
-				scrollHelper.setScrollAnchor(id, xToTick(pos.x));
-			} else {
-				// can never select region with two pointers in midi view
-				selectRegionRect.setFillColor(Color.TRANSPARENT);
-				// init zoom anchors (the same ticks should be under the
-				// fingers at all times)
-				zoomLeftAnchorTick = leftTick;
-				zoomRightAnchorTick = rightTick;
-			}
+			// can never select region with two pointers in midi view
+			stopSelectRegion();
+			// init zoom anchors (the same ticks should be under the
+			// fingers at all times)
+			zoomLeftAnchorTick = leftTick;
+			zoomRightAnchorTick = rightTick;
 		}
+
 	}
 
 	@Override
-	public void handleActionMove(int id, Position pos) {
+	public void handleActionMove(int id, Pointer pos) {
 		super.handleActionMove(id, pos);
 		if (id == pinchLeftPointerId) {
 			float leftTick = xToTick(pos.x);
@@ -537,64 +455,46 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 				dragNotes(false, id, tick, note);
 				if (id == 0) {
 					// need to make room for two pointers in this case.
-					float otherTick = xToTick(pointerIdToPos.get(1).x);
+					float otherTick = xToTick(pointersById.get(1).x);
 					scrollHelper.updateView(Math.min(tick, otherTick), Math.max(tick, otherTick));
 				}
 			}
 		}
-		updateLoopMarkers();
 	}
 
 	@Override
-	public void handleActionPointerUp(int id, Position pos) {
+	public void handleActionPointerUp(int id, Pointer pos) {
 		scrollHelper.pointerUp(id);
 		if (id == pinchLeftPointerId || id == pinchRightPointerId) {
 			pinchLeftPointerId = pinchRightPointerId = -1;
 		}
-		for (int i = 0; i < 3; i++) {
-			if (loopPointerIds[i] == id) {
-				loopPointerIds[i] = -1;
-				if (i == 0) {
-					loopMarkerLines[0].setStrokeColor(Color.TICKBAR);
-				} else if (i == 1) {
-					loopMarkerLines[1].setStrokeColor(Color.TICKBAR);
-				} else if (i == 1) {
-					loopBarRect.setFillColor(Color.TICKBAR);
-				}
-			}
-		}
 		if (zoomLeftAnchorTick != -1) {
 			int otherId = id == 0 ? 1 : 0;
-			scrollHelper.setScrollAnchor(otherId, xToTick(pointerIdToPos.get(otherId).x));
+			scrollHelper.setScrollAnchor(otherId, xToTick(pointersById.get(otherId).x));
 		}
 		touchedNotes.remove(id);
 	}
 
 	@Override
-	public void handleActionUp(int id, Position pos) {
+	public void handleActionUp(int id, Pointer pos) {
 		super.handleActionUp(id, pos);
 		scrollHelper.handleActionUp();
-		for (int i = 0; i < 3; i++) {
-			loopPointerIds[i] = -1;
-		}
-		loopBarRect.setFillColor(Color.TICKBAR);
 		pinchLeftPointerId = pinchRightPointerId = -1;
-		selectRegionStartTick = -1;
-		selectRegionRect.setFillColor(Color.TRANSPARENT);
+		stopSelectRegion();
 		startOnTicks.clear();
 		touchedNotes.clear();
 		MidiManager.endMidiEvent();
 	}
 
 	@Override
-	protected void longPress(int id, Position pos) {
+	protected void longPress(int id, Pointer pos) {
 		if (pointerCount() == 1) {
 			startSelectRegion(pos);
 		}
 	}
 
 	@Override
-	protected void singleTap(int id, Position pos) {
+	protected void singleTap(int id, Pointer pos) {
 		MidiNote touchedNote = touchedNotes.get(id);
 		if (MidiManager.isCopying()) {
 			MidiManager.paste((long) MidiManager.getMajorTickToLeftOf(xToTick(pos.x)));
@@ -614,7 +514,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	@Override
-	protected void doubleTap(int id, Position pos) {
+	protected void doubleTap(int id, Pointer pos) {
 		MidiNote touchedNote = touchedNotes.get(id);
 		if (touchedNote != null) {
 			MidiManager.deleteNote(touchedNote);
@@ -623,8 +523,9 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public void onCreate(Track track) {
+		track.setRectangle(new Rectangle(MidiViewGroup.translateYGroup, Color.TRANSPARENT,
+				Color.BLACK));
 		onTrackHeightChange();
-		track.setRectangle(new Rectangle(shapeGroup, Color.TRANSPARENT, Color.BLACK));
 		scrollHelper.setYOffset(Float.MAX_VALUE);
 		for (MidiNote note : track.getMidiNotes()) {
 			createNoteView(note);
@@ -663,27 +564,27 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	private synchronized void onTrackHeightChange() {
-		initAllVbs();
-		float trackHeight = getTotalTrackHeight();
-		backgroundRect.setDimensions(backgroundRect.width, trackHeight);
+		float trackHeight = Math.min(getTotalTrackHeight(), height);
 		currTickLine.setDimensions(currTickLine.width, trackHeight);
-		loopRect.setDimensions(loopRect.width, trackHeight);
+		leftLoopRect.setDimensions(leftLoopRect.width, trackHeight);
+		rightLoopRect.setDimensions(rightLoopRect.width, trackHeight);
 		for (int i = 0; i < loopMarkerLines.length; i++) {
 			loopMarkerLines[i].setDimensions(loopMarkerLines[i].width, trackHeight);
 		}
 		for (List<Line> lines : vLines) {
 			for (Line line : lines) {
-				line.setDimensions(2, height);
+				line.setDimensions(2, trackHeight);
 			}
 		}
+		layoutTrackRects();
 	}
 
 	private void layoutTrackRects() {
 		for (Track track : TrackManager.getTracks()) {
 			Rectangle trackRect = track.getRectangle();
 			if (trackRect != null) {
-				trackRect.layout(0, noteToY(track.getId()),
-						tickToUnscaledX(MidiManager.MAX_TICKS - 1), trackHeight);
+				trackRect.layout(absoluteX, absoluteY + noteToUnscaledY(track.getId()), width,
+						trackHeight);
 			}
 		}
 	}
@@ -695,13 +596,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public void onScrollX() {
-
 	}
 
 	@Override
 	public void onScrollY() {
-		layoutTrackRects();
-		mainPage.midiViewGroup.midiTrackView.onScrollY(scrollHelper);
 	}
 
 	@Override
@@ -717,6 +615,20 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public float height() {
-		return height - Y_OFFSET;
+		return height;
+	}
+
+	@Override
+	public void onLoopChange(long loopBeginTick, long loopEndTick) {
+		float x1 = tickToUnscaledX(loopBeginTick);
+		float x2 = tickToUnscaledX(loopEndTick);
+		float height = getTotalTrackHeight();
+
+		leftLoopRect.layout(0, absoluteY, x1, height);
+		rightLoopRect.layout(x2, absoluteY, width - x2, height);
+		loopMarkerLines[0].setPosition(x1, absoluteY);
+		loopMarkerLines[1].setPosition(x2, absoluteY);
+
+		// scrollHelper.updateView(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
 	}
 }

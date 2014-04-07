@@ -19,7 +19,7 @@ import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.shape.Shape;
 import com.kh.beatbot.ui.shape.ShapeGroup;
 import com.kh.beatbot.ui.texture.TextureAtlas;
-import com.kh.beatbot.ui.view.TouchableView.Position;
+import com.kh.beatbot.ui.view.TouchableView.Pointer;
 import com.kh.beatbot.ui.view.page.MainPage;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
@@ -353,21 +353,23 @@ public class View implements Comparable<View> {
 		if (width <= 0 || height <= 0)
 			return;
 
-		if (null != shape) {
+		if (null != shape && shrinkable) {
 			x += BG_OFFSET;
 			y += BG_OFFSET;
 			width -= BG_OFFSET * 2;
 			height -= BG_OFFSET * 2;
-			if (shape instanceof RoundedRect) {
-				((RoundedRect) shape).setCornerRadius(bgRectRadius);
-			}
+		}
+
+		if (null != shape && shape instanceof RoundedRect) {
+			((RoundedRect) shape).setCornerRadius(bgRectRadius);
 		}
 
 		if (shouldShrink()) {
-			x += width * .04f;
-			y += height * .04f;
-			width *= .92f;
-			height *= .92f;
+			float shrink = height * 0.1f;
+			x += shrink / 2;
+			y += shrink / 2;
+			width -= shrink;
+			height -= shrink;
 		}
 
 		if (null != shape) {
@@ -436,7 +438,7 @@ public class View implements Comparable<View> {
 		getGl().glPopMatrix();
 	}
 
-	protected final float distanceFromCenterSquared(Position pos) {
+	protected final float distanceFromCenterSquared(Pointer pos) {
 		return (pos.x - width / 2) * (pos.x - width / 2) + (pos.y - height / 2) * (pos.y - height / 2);
 	}
 

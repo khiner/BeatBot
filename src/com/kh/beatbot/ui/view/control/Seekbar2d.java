@@ -44,7 +44,7 @@ public class Seekbar2d extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionDown(int id, Position pos) {
+	public void handleActionDown(int id, Pointer pos) {
 		super.handleActionDown(id, pos);
 		params[0].setLevel(xToLevel(pos.x));
 		params[1].setLevel(yToLevel(pos.y));
@@ -53,7 +53,7 @@ public class Seekbar2d extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionUp(int id, Position pos) {
+	public void handleActionUp(int id, Pointer pos) {
 		super.handleActionUp(id, pos);
 		intersectingLines.setStrokeColor(levelColor);
 		circle.setFillColor(levelColor);

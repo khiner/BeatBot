@@ -120,7 +120,7 @@ public class LevelsView extends TouchableView {
 		}
 	}
 
-	private boolean selectLevel(int pointerId, Position pos) {
+	private boolean selectLevel(int pointerId, Pointer pos) {
 		for (MidiNote midiNote : TrackManager.currTrack.getMidiNotes()) {
 			float velocityY = levelToY(midiNote.getLevel(currLevelType));
 			if (Math.abs(tickToX(midiNote.getOnTick()) - pos.x) < 35
@@ -209,7 +209,7 @@ public class LevelsView extends TouchableView {
 		}
 	}
 
-	private void startSelectRegion(Position pos) {
+	private void startSelectRegion(Pointer pos) {
 		selectRegionStartX = pos.x;
 		selectRegionStartY = pos.y;
 	}
@@ -244,19 +244,19 @@ public class LevelsView extends TouchableView {
 	}
 
 	@Override
-	public void handleActionPointerUp(int id, Position pos) {
+	public void handleActionPointerUp(int id, Pointer pos) {
 		touchedLevels.remove(id);
 		updateLevelOffsets();
 	}
 
 	@Override
-	public void handleActionMove(int id, Position pos) {
+	public void handleActionMove(int id, Pointer pos) {
 		if (!touchedLevels.isEmpty()) {
 			MidiNote touched = touchedLevels.get(id);
 			if (touched != null) {
 				touched.setLevel(currLevelType, yToLevel(pos.y));
 			}
-			if (id == pointerIdToPos.size() - 1) {
+			if (id == pointersById.size() - 1) {
 				updateDragLine();
 				setLevelsToDragLine();
 			}
@@ -266,7 +266,7 @@ public class LevelsView extends TouchableView {
 	}
 
 	@Override
-	public void handleActionDown(int id, Position pos) {
+	public void handleActionDown(int id, Pointer pos) {
 		super.handleActionDown(id, pos);
 		MidiManager.beginMidiEvent(TrackManager.currTrack);
 		if (!selectLevel(id, pos)) {
@@ -275,12 +275,12 @@ public class LevelsView extends TouchableView {
 	}
 
 	@Override
-	public void handleActionPointerDown(int id, Position pos) {
+	public void handleActionPointerDown(int id, Pointer pos) {
 		selectLevel(id, pos);
 	}
 
 	@Override
-	public void handleActionUp(int id, Position pos) {
+	public void handleActionUp(int id, Pointer pos) {
 		super.handleActionUp(id, pos);
 		clearTouchedLevels();
 		selectRegionRect.setFillColor(Color.TRANSPARENT);
