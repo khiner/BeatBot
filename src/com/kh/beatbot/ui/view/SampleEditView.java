@@ -47,6 +47,7 @@ public class SampleEditView extends ControlView2dBase {
 			for (int i = 0; i < loopButtons.length; i++) {
 				if (null == loopButtons[i]) {
 					loopButtons[i] = new Button(renderGroup);
+					loopButtons[i].setShrinkable(false);
 					loopButtons[i].deselectOnPointerExit = false;
 					loopButtons[i].setIcon(IconResourceSets.SAMPLE_LOOP);
 					loopButtons[i].setOnPressListener(new OnPressListener() {

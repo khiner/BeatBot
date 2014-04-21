@@ -3,7 +3,6 @@ package com.kh.beatbot.ui.shape;
 import android.util.SparseArray;
 
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.view.View;
 
 public class WaveformShape extends Shape {
 	private final static float MAX_SPP = 0.5f;
@@ -75,10 +74,10 @@ public class WaveformShape extends Shape {
 	}
 
 	private synchronized void updateLoopSelectionVertices() {
-		fillVertex(x + loopBeginX, y + View.BG_OFFSET);
-		fillVertex(x + loopBeginX, y + height - View.BG_OFFSET);
-		fillVertex(x + loopEndX, y + height - View.BG_OFFSET);
-		fillVertex(x + loopEndX, y + View.BG_OFFSET);
+		fillVertex(x + loopBeginX, y);
+		fillVertex(x + loopBeginX, y + height);
+		fillVertex(x + loopEndX, y + height);
+		fillVertex(x + loopEndX, y);
 	}
 
 	public synchronized void update(long offsetInSamples, long widthInSamples, float xOffset) {
