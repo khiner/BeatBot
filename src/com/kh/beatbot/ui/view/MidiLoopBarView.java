@@ -67,7 +67,7 @@ public class MidiLoopBarView extends TouchableView implements LoopChangeListener
 					- selectionOffsetTick);
 			newBeginTick = GeneralUtils.clipTo(newBeginTick, 0, MidiManager.MAX_TICKS - loopLength);
 			MidiManager.setLoopTicks((long) newBeginTick, (long) (newBeginTick + loopLength));
-			// midiView.updateView(newBeginTick, newBeginTick + loopLength);
+			midiView.updateView(newBeginTick, newBeginTick + loopLength);
 		}
 	}
 

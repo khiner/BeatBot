@@ -629,6 +629,6 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		loopMarkerLines[0].setPosition(x1, absoluteY);
 		loopMarkerLines[1].setPosition(x2, absoluteY);
 
-		// scrollHelper.updateView(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
+		//scrollHelper.updateView(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
 	}
 }
