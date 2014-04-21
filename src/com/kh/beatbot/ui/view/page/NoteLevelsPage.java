@@ -1,19 +1,20 @@
 package com.kh.beatbot.ui.view.page;
 
+import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.LevelsView;
-import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
-public class NoteLevelsPage extends TouchableView {
+public class NoteLevelsPage extends TrackPage {
 
 	private LevelsView levelsView;
 	private ToggleButton volumeButton, panButton, pitchButton;
 
-	public synchronized void update() {
+	@Override
+	public void onSelect(BaseTrack track) {
 		deselectAll();
 		getActiveLevelButton().setChecked(true);
 	}
@@ -55,19 +56,19 @@ public class NoteLevelsPage extends TouchableView {
 		volumeButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
 				levelsView.setLevelType(LevelType.VOLUME);
-				update();
+				onSelect(null);
 			}
 		});
 		panButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
 				levelsView.setLevelType(LevelType.PAN);
-				update();
+				onSelect(null);
 			}
 		});
 		pitchButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
 				levelsView.setLevelType(LevelType.PITCH);
-				update();
+				onSelect(null);
 			}
 		});
 		addChildren(levelsView, volumeButton, panButton, pitchButton);

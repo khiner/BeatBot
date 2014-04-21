@@ -17,11 +17,10 @@ import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremolo;
 import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.list.DraggableLabelList;
 import com.kh.beatbot.ui.view.list.LabelList.LabelState;
 
-public class EffectsPage extends TouchableView {
+public class EffectsPage extends TrackPage {
 
 	class EffectLabelListListener implements DraggableLabelListListener {
 		private AlertDialog selectEffectAlert = null;
@@ -74,7 +73,8 @@ public class EffectsPage extends TouchableView {
 	protected DraggableLabelList effectLabelList;
 	protected String[] effectNames;
 
-	public synchronized void update() {
+	@Override
+	public void onSelect(BaseTrack track) {
 		updateEffectLabels();
 	}
 

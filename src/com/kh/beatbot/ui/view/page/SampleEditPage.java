@@ -1,33 +1,31 @@
 package com.kh.beatbot.ui.view.page;
 
+import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.SampleEditView;
-import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
 
-public class SampleEditPage extends TouchableView {
+public class SampleEditPage extends TrackPage {
 
 	public SampleEditView sampleEdit;
 	private Button previewButton;
 	private ToggleButton loopButton, reverseButton;
 	private ParamControl loopBeginControl, loopEndControl, gainControl;
 
-	public synchronized void update() {
-		Track currTrack = TrackManager.currTrack;
+	@Override
+	public void onSelect(BaseTrack track) {
+		Track currTrack = (Track) track;
 		loopButton.setChecked(currTrack.isLooping());
 		reverseButton.setChecked(currTrack.isReverse());
 		loopBeginControl.setParam(currTrack.getLoopBeginParam());
 		loopEndControl.setParam(currTrack.getLoopEndParam());
 		gainControl.setParam(currTrack.getGainParam());
-		loopBeginControl.setLabelText("Begin");
-		loopEndControl.setLabelText("End");
-		gainControl.setLabelText("Gain");
 
 		if (null != sampleEdit) {
 			sampleEdit.setParams(currTrack.getLoopBeginParam(), currTrack.getLoopEndParam());
@@ -76,6 +74,10 @@ public class SampleEditPage extends TouchableView {
 				TrackManager.currTrack.setReverse(reverseButton.isChecked());
 			}
 		});
+
+		loopBeginControl.setLabelText("Begin");
+		loopEndControl.setLabelText("End");
+		gainControl.setLabelText("Gain");
 
 		addChildren(previewButton, loopButton, reverseButton, sampleEdit, loopBeginControl,
 				loopEndControl, gainControl);

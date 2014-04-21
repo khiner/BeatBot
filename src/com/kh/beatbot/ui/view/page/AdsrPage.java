@@ -1,24 +1,26 @@
 package com.kh.beatbot.ui.view.page;
 
+import com.kh.beatbot.BaseTrack;
+import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.AdsrView;
-import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.SeekbarParamControl;
 
-public class AdsrPage extends TouchableView implements OnReleaseListener {
+public class AdsrPage extends TrackPage implements OnReleaseListener {
 
 	private ToggleButton[] adsrButtons;
 	private AdsrView adsrView;
 	private SeekbarParamControl paramControl;
 
-	public synchronized void update() {
-		adsrView.update();
+	@Override
+	public void onSelect(BaseTrack track) {
+		adsrView.onSelect((Track) track);
 		updateParamView();
 	}
 

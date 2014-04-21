@@ -3,8 +3,11 @@ package com.kh.beatbot.ui.view.page;
 import java.io.File;
 import java.util.List;
 
+import com.kh.beatbot.BaseTrack;
+import com.kh.beatbot.Track;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.event.SampleSetEvent;
+import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -12,7 +15,7 @@ import com.kh.beatbot.ui.view.menu.FileMenuItem;
 import com.kh.beatbot.ui.view.menu.Menu;
 import com.kh.beatbot.ui.view.menu.MenuItem;
 
-public class BrowsePage extends Menu {
+public class BrowsePage extends Menu implements TrackListener {
 	protected synchronized void createMenuItems() {
 		setIcon(IconResourceSets.BROWSE_PAGE);
 		initRoundedRect();
@@ -25,9 +28,10 @@ public class BrowsePage extends Menu {
 		}
 	}
 
-	public synchronized void update() {
+	@Override
+	public void onSelect(BaseTrack track) {
 		// ûrecursively select file menu items based on current sample
-		File currSampleFile = TrackManager.currTrack.getCurrSampleFile();
+		File currSampleFile = ((Track)track).getCurrSampleFile();
 		if (null == currSampleFile)
 			return;
 		String currSamplePath = currSampleFile.getAbsolutePath();
@@ -76,5 +80,23 @@ public class BrowsePage extends Menu {
 
 	protected float getWidthForLevel(int level) {
 		return width / 4;
+	}
+
+	@Override
+	public void onCreate(Track track) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void onDestroy(Track track) {
+	}
+
+	public void onSampleChange(Track track) {
+	}
+
+	public void onMuteChange(Track track, boolean mute) {
+	}
+
+	public void onSoloChange(Track track, boolean solo) {
 	}
 }

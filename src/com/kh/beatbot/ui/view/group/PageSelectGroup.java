@@ -6,6 +6,7 @@ import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.event.FileListener;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.listener.PagerListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
@@ -23,7 +24,8 @@ import com.kh.beatbot.ui.view.page.LevelsPage;
 import com.kh.beatbot.ui.view.page.NoteLevelsPage;
 import com.kh.beatbot.ui.view.page.SampleEditPage;
 
-public class PageSelectGroup extends TouchableView implements TrackListener, FileListener {
+public class PageSelectGroup extends TouchableView implements TrackListener, FileListener,
+		PagerListener {
 
 	private static final String TRACK_PAGE_ID = "track";
 
@@ -47,15 +49,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 		masterButtonRow.setBPM(bpm);
 	}
 
-	public void updateAdsrPage() {
-		adsrPage.update();
-	}
-
-	public void updateLevelsFXPage() {
-		levelsPage.update();
-		effectsPage.update();
-	}
-
 	public void selectBrowsePage() {
 		trackButtonRow.getBrowseButton().trigger(true);
 	}
@@ -66,15 +59,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 
 	public void selectLevelsPage() {
 		trackButtonRow.getLevelsButton().trigger(true);
-	}
-
-	public void updateAll() {
-		trackButtonRow.update();
-		browsePage.update();
-		updateLevelsFXPage();
-		editPage.update();
-		adsrPage.update();
-		noteLevelsPage.update();
 	}
 
 	@Override
@@ -97,6 +81,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 		noteLevelsPage = new NoteLevelsPage();
 
 		pager = new ViewPager();
+		pager.addListener(this);
 		buttonRowPager = new ViewPager();
 
 		trackButtonRow = new TrackPageButtonRow(null, pager);
@@ -135,7 +120,10 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 
 	@Override
 	public void onCreate(Track track) {
-		updateAll();
+		TrackListener currPage = (TrackListener) pager.getCurrPage();
+		if (null != currPage) {
+			currPage.onSelect(track);
+		}
 	}
 
 	@Override
@@ -150,12 +138,11 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 		levelsPage.setMasterMode(isMaster);
 		effectsPage.setMasterMode(isMaster);
 		((PageButtonRow) buttonRowPager.getCurrPage()).currPage.trigger();
-		updateAll();
+		((TrackListener) pager.getCurrPage()).onSelect(track);
 	}
 
 	@Override
 	public synchronized void onSampleChange(Track track) {
-		editPage.update();
 		trackButtonRow.update();
 		trackButtonRow.getBrowseButton().trigger();
 	}
@@ -174,7 +161,11 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 		if (browseButton.getText().equals(FileManager.formatSampleName(file.getName()))) {
 			browseButton.setText(FileManager.formatSampleName(newFile.getName()));
 		}
-		browsePage.update();
 		trackButtonRow.getBrowseButton().trigger();
+	}
+	
+	@Override
+	public void onPageChange(ViewPager pager, View newPage) {
+		((TrackListener) newPage).onSelect(TrackManager.currTrack);
 	}
 }

@@ -5,8 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.content.res.AssetManager;
 import android.os.Environment;
@@ -30,7 +30,7 @@ public class FileManager implements FileListener {
 	private static String appDirectoryPath;
 	private static FileManager instance;
 
-	private static List<FileListener> listeners = new ArrayList<FileListener>();
+	private static Set<FileListener> listeners = new HashSet<FileListener>();
 
 	public synchronized static FileManager get() {
 		if (instance == null) {

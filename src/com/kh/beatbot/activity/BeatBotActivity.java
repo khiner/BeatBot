@@ -122,7 +122,6 @@ public class BeatBotActivity extends Activity {
 		if (activityPager.getCurrPageId() == MAIN_PAGE_ID) {
 			showDialog(EXIT_DIALOG_ID);
 		} else if (activityPager.getCurrPageId() == EFFECT_PAGE_ID) {
-			View.mainPage.pageSelectGroup.updateLevelsFXPage();
 			activityPager.setPage(MAIN_PAGE_ID);
 		}
 	}

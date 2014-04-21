@@ -25,10 +25,10 @@ public class AdsrView extends TouchableView implements ParamListener {
 		super(renderGroup);
 	}
 
-	public synchronized void update() {
+	public synchronized void onSelect(Track track) {
 		for (int i = 0; i < ADSR.NUM_PARAMS; i++) {
-			TrackManager.currTrack.adsr.getParam(i).removeListener(this);
-			TrackManager.currTrack.adsr.getParam(i).addListener(this);
+			track.adsr.getParam(i).removeListener(this);
+			track.adsr.getParam(i).addListener(this);
 		}
 		initAdsrVb();
 	}
@@ -135,26 +135,26 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	private void moveAdsrPoint(int id, float x, float y) {
 		for (int i = 0; i < adsrSelected.length; i++) {
+			ADSR adsr = TrackManager.currTrack.adsr;
 			if (adsrSelected[i] == id) {
 				switch (i) {
 				case 0: // start level - only moves along y axis, always x == 0
-					TrackManager.currTrack.adsr.setStart(unitY(y));
+					adsr.setStart(unitY(y));
 					break;
 				case 1: // attack point - controls attack time and peak value
-					TrackManager.currTrack.adsr.setAttack(xToAttack(x));
-					TrackManager.currTrack.adsr.setPeak(unitY(y));
+					adsr.setAttack(xToAttack(x));
+					adsr.setPeak(unitY(y));
 					break;
 				case 2: // decay point - controls decay time and sustain level
-					TrackManager.currTrack.adsr.setDecay(xToDecay(x));
-					TrackManager.currTrack.adsr.setSustain(unitY(y));
+					adsr.setDecay(xToDecay(x));
+					adsr.setSustain(unitY(y));
 					break;
 				case 3: // beginning of release - user cannot set.
 					break;
 				case 4: // release time - y == 0 always.
-					TrackManager.currTrack.adsr.setRelease(xToRelease(x));
+					adsr.setRelease(xToRelease(x));
 					break;
 				}
-				mainPage.pageSelectGroup.updateAdsrPage();
 				return;
 			}
 		}
