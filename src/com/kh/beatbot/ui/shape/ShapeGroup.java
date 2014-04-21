@@ -27,6 +27,10 @@ public class ShapeGroup {
 		return textGroup;
 	}
 
+	public void setStrokeWeight(int weight) {
+		strokeGroup.setStrokeWeight(weight);
+	}
+
 	public void draw() {
 		fillGroup.draw();
 		strokeGroup.draw();

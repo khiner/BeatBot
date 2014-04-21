@@ -189,14 +189,14 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		rightLoopRect = new Rectangle(MidiViewGroup.scaleGroup, Color.DARK_TRANS, null);
 		selectRegionRect = new Rectangle(MidiViewGroup.translateScaleGroup, Color.TRANSPARENT,
 				Color.TRON_BLUE);
-		currTickLine = new Line(MidiViewGroup.scaleGroup, null, Color.TRON_BLUE);
+		currTickLine = new Line(MidiViewGroup.translateScaleGroup, null, Color.TRON_BLUE);
 		loopMarkerLines = new Line[2];
-		for (int i = 0; i < loopMarkerLines.length; i++) {
-			loopMarkerLines[i] = new Line(MidiViewGroup.scaleGroup, null, Color.TRON_BLUE);
-		}
 		vLines = new ArrayList[NUM_VERTICAL_LINE_SETS];
 		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
 			vLines[i] = new ArrayList<Line>();
+		}
+		for (int i = 0; i < loopMarkerLines.length; i++) {
+			loopMarkerLines[i] = new Line(MidiViewGroup.translateScaleGroup, null, Color.TRON_BLUE);
 		}
 	}
 
@@ -312,6 +312,11 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			note.getRectangle().setFillColor(whichColor(note));
 			note.getRectangle().bringToTop();
 		}
+		//loop/tick lines always display ontop of notes
+		currTickLine.bringToTop();
+		loopMarkerLines[0].bringToTop();
+		loopMarkerLines[1].bringToTop();
+		selectRegionRect.bringToTop();
 	}
 
 	public void layoutNotes() {
@@ -564,16 +569,17 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	private synchronized void onTrackHeightChange() {
-		float trackHeight = Math.min(getTotalTrackHeight(), height);
+		float trackHeight = getTotalTrackHeight();
 		currTickLine.setDimensions(currTickLine.width, trackHeight);
 		leftLoopRect.setDimensions(leftLoopRect.width, trackHeight);
 		rightLoopRect.setDimensions(rightLoopRect.width, trackHeight);
 		for (int i = 0; i < loopMarkerLines.length; i++) {
 			loopMarkerLines[i].setDimensions(loopMarkerLines[i].width, trackHeight);
 		}
+		float lineHeight = Math.min(trackHeight, height);
 		for (List<Line> lines : vLines) {
 			for (Line line : lines) {
-				line.setDimensions(2, trackHeight);
+				line.setDimensions(2, lineHeight);
 			}
 		}
 		layoutTrackRects();
@@ -623,12 +629,12 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		float x1 = tickToUnscaledX(loopBeginTick);
 		float x2 = tickToUnscaledX(loopEndTick);
 		float height = getTotalTrackHeight();
-
 		leftLoopRect.layout(0, absoluteY, x1, height);
 		rightLoopRect.layout(x2, absoluteY, width - x2, height);
-		loopMarkerLines[0].setPosition(x1, absoluteY);
-		loopMarkerLines[1].setPosition(x2, absoluteY);
+		float lineY = absoluteY;
+		loopMarkerLines[0].setPosition(x1, lineY);
+		loopMarkerLines[1].setPosition(x2, lineY);
 
-		//scrollHelper.updateView(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
+		// scrollHelper.updateView(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
 	}
 }

@@ -23,6 +23,8 @@ public class MeshGroup {
 	protected final static int TEX_OFFSET = 6;
 	protected final static int TEX_OFFSET_BYTES = TEX_OFFSET * FLOAT_BYTES;
 
+	protected int strokeWeight = 1;
+
 	protected boolean dirty = false;
 	protected int indicesPerVertex, vertexBytes, primitiveType, vertexHandle = -1,
 			indexHandle = -1;
@@ -50,6 +52,10 @@ public class MeshGroup {
 		this.vertexBytes = this.indicesPerVertex * FLOAT_BYTES;
 		this.textureId = textureId;
 	}
+	
+	public void setStrokeWeight(int weight) {
+		this.strokeWeight = weight;
+	}
 
 	public synchronized void draw() {
 		if (children.isEmpty())
@@ -61,6 +67,7 @@ public class MeshGroup {
 		}
 
 		GL11 gl = View.getGl();
+		gl.glLineWidth(strokeWeight);
 		if (hasTexture()) {
 			gl.glEnable(GL10.GL_TEXTURE_2D);
 			gl.glBindTexture(GL10.GL_TEXTURE_2D, textureId[0]);
