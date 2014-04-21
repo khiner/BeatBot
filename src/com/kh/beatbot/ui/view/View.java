@@ -30,13 +30,6 @@ public class View implements Comparable<View> {
 	public static EffectPage effectPage;
 	public static GLSurfaceViewBase root;
 
-	// where is the view currently clipped to?
-	// used to keep track of SCISSOR clipping of parent views,
-	// so child views don't draw outside of any parent (granparent, etc)
-	// this should be reset every frame by the parent using resetClipWindow()
-	public int currClipX = Integer.MIN_VALUE, currClipY = Integer.MIN_VALUE,
-			currClipW = Integer.MAX_VALUE, currClipH = Integer.MAX_VALUE;
-
 	public int id = -1; // optional
 
 	protected static float X_OFFSET = 2, LABEL_HEIGHT = 0;
@@ -271,31 +264,6 @@ public class View implements Comparable<View> {
 	protected void layoutChildren() {
 	}
 
-	public void clipWindow(int parentClipX, int parentClipY, int parentClipW, int parentClipH) {
-		currClipX = (int) absoluteX;
-		currClipY = (int) (root.getHeight() - absoluteY - height);
-		currClipW = (int) width;
-		currClipH = (int) height;
-		if (currClipX < parentClipX) {
-			currClipW -= parentClipX - currClipX;
-			currClipX = parentClipX;
-		}
-		float parentMaxX = parentClipX + parentClipW;
-		if (parentMaxX > 1 && currClipX + currClipW > parentMaxX) {
-			currClipW = parentClipW + parentClipW - currClipW;
-		}
-		if (currClipY < parentClipY) {
-			currClipH -= parentClipY - currClipY;
-			currClipY = parentClipY;
-		}
-		float parentMaxY = parentClipY + parentClipH;
-		if (parentMaxY > 1 && currClipY + currClipH > parentMaxY) {
-			currClipH = parentClipY + parentClipH - currClipY;
-		}
-
-		getGl().glScissor(currClipX, currClipY, currClipW, currClipH);
-	}
-
 	public void initAll() {
 		getGl().glClearColor(Color.BG[0], Color.BG[1], Color.BG[2], Color.BG[3]);
 		init();
@@ -306,11 +274,8 @@ public class View implements Comparable<View> {
 	}
 
 	public synchronized void drawAll() {
-		// scissor ensures that each view can only draw within its rect
-		if (shouldClip && null != parent) {
-			getGl().glEnable(GL10.GL_SCISSOR_TEST);
-			clipWindow(parent.currClipX, parent.currClipY, parent.currClipW, parent.currClipH);
-		}
+		if (shouldClip)
+			startClip(true, true);
 
 		if (shouldDraw) {
 			shapeGroup.draw();
@@ -318,9 +283,25 @@ public class View implements Comparable<View> {
 		draw();
 		drawChildren();
 
-		if (shouldClip) {
-			getGl().glDisable(GL10.GL_SCISSOR_TEST);
-		}
+		if (shouldClip)
+			endClip();
+	}
+	
+	public void startClip(boolean clipX, boolean clipY) {
+		if (null == parent)
+			return;
+		// scissor ensures that each view can only draw within its rect
+		getGl().glEnable(GL10.GL_SCISSOR_TEST);
+		int xClip = clipX ? (int) absoluteX : 0;
+		int yClip = clipY ? (int) (root.getHeight() - absoluteY - height) : 0;
+		int clipW = clipX ? (int) width : Integer.MAX_VALUE;
+		int clipH = clipY ? (int) height : Integer.MAX_VALUE;
+
+		getGl().glScissor(xClip, yClip, clipW, clipH);
+	}
+
+	public void endClip() {
+		getGl().glDisable(GL10.GL_SCISSOR_TEST);
 	}
 
 	public synchronized void tickChildren() {

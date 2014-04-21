@@ -1,7 +1,5 @@
 package com.kh.beatbot.ui.view;
 
-import android.util.Log;
-
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.listener.LoopChangeListener;
 import com.kh.beatbot.manager.MidiManager;
@@ -51,14 +49,12 @@ public class MidiLoopBarView extends TouchableView implements LoopChangeListener
 	public void handleActionMove(int id, Pointer pos) {
 		MidiView midiView = mainPage.midiViewGroup.midiView;
 		if (loopBeginButton.isPressed() && pos.equals(loopBeginButton.getPointer())) {
-			Log.e("LBB", "pressed");
 			float leftTick = midiView.xToTick(pos.x);
 			float leftMajorTick = MidiManager.getMajorTickNearestTo(leftTick);
 			MidiManager.setLoopBeginTick((long) leftMajorTick);
 			midiView.updateView(leftTick);
 		}
 		if (loopEndButton.isPressed() && pos.equals(loopEndButton.getPointer())) {
-			Log.e("LEB", "pressed");
 			float rightTick = midiView.xToTick(pos.x);
 			float rightMajorTick = MidiManager.getMajorTickNearestTo(rightTick);
 			MidiManager.setLoopEndTick((long) rightMajorTick);
