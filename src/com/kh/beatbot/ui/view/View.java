@@ -40,7 +40,7 @@ public class View implements Comparable<View> {
 	protected View parent;
 	protected List<View> children = new ArrayList<View>();
 
-	private boolean initialized = false, shouldClip = false;
+	private boolean shouldClip = false;
 	protected boolean shouldDraw = true, shrinkable = false;
 	private String text = "";
 
@@ -153,10 +153,7 @@ public class View implements Comparable<View> {
 			return;
 
 		children.add(child);
-		if (initialized) {
-			child.initAll();
-			child.stateChanged();
-		}
+		child.stateChanged();
 	}
 
 	protected synchronized void addChildren(View... children) {
@@ -165,7 +162,7 @@ public class View implements Comparable<View> {
 		}
 	}
 
-	protected synchronized void removeChildren(View ...children) {
+	protected synchronized void removeChildren(View... children) {
 		for (View child : children) {
 			removeChild(child);
 		}
@@ -250,27 +247,16 @@ public class View implements Comparable<View> {
 		return id;
 	}
 
-	protected void init() {
-	}
-
 	public void draw() {
 	}
 
 	public void tick() {
 	}
+
 	protected void createChildren() {
 	}
 
 	protected void layoutChildren() {
-	}
-
-	public void initAll() {
-		getGl().glClearColor(Color.BG[0], Color.BG[1], Color.BG[2], Color.BG[3]);
-		init();
-		for (View child : children) {
-			child.initAll();
-		}
-		initialized = true;
 	}
 
 	public synchronized void drawAll() {
@@ -286,7 +272,7 @@ public class View implements Comparable<View> {
 		if (shouldClip)
 			endClip();
 	}
-	
+
 	public void startClip(boolean clipX, boolean clipY) {
 		if (null == parent)
 			return;
@@ -307,7 +293,7 @@ public class View implements Comparable<View> {
 	public synchronized void tickChildren() {
 		for (View child : children) {
 			child.tickAll();
-		}	
+		}
 	}
 
 	public synchronized void tickAll() {
@@ -323,7 +309,7 @@ public class View implements Comparable<View> {
 
 	public void initGl() {
 		getGl().glLineWidth(1);
-		initAll();
+		getGl().glClearColor(Color.BG[0], Color.BG[1], Color.BG[2], Color.BG[3]);
 	}
 
 	protected synchronized void layoutShape() {
@@ -420,7 +406,8 @@ public class View implements Comparable<View> {
 	}
 
 	protected final float distanceFromCenterSquared(Pointer pos) {
-		return (pos.x - width / 2) * (pos.x - width / 2) + (pos.y - height / 2) * (pos.y - height / 2);
+		return (pos.x - width / 2) * (pos.x - width / 2) + (pos.y - height / 2)
+				* (pos.y - height / 2);
 	}
 
 	public float viewX(float x) {

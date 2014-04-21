@@ -13,12 +13,6 @@ import com.kh.beatbot.ui.view.menu.Menu;
 import com.kh.beatbot.ui.view.menu.MenuItem;
 
 public class BrowsePage extends Menu {
-
-	@Override
-	protected synchronized void init() {
-		setClip(true);
-	}
-
 	protected synchronized void createMenuItems() {
 		setIcon(IconResourceSets.BROWSE_PAGE);
 		initRoundedRect();

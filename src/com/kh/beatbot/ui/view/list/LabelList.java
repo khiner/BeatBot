@@ -26,8 +26,8 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 	onIcon = new IconResourceSet(new IconResource(-1, Color.TRON_BLUE, null, Color.WHITE),
 			new IconResource(-1, Color.TRON_BLUE_LIGHT, null, Color.WHITE)),
 
-	offIcon = new IconResourceSet(new IconResource(-1, Color.LABEL_LIGHT, null, Color.WHITE), new IconResource(
-			-1, Color.LABEL_VERY_LIGHT, null, Color.WHITE)),
+	offIcon = new IconResourceSet(new IconResource(-1, Color.LABEL_LIGHT, null, Color.WHITE),
+			new IconResource(-1, Color.LABEL_VERY_LIGHT, null, Color.WHITE)),
 
 	emptyIcon = new IconResourceSet(new IconResource(R.drawable.plus_outline, Color.LABEL_DARK,
 			null, Color.WHITE), new IconResource(R.drawable.plus_outline, Color.LABEL_MED, null,
@@ -73,12 +73,12 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 
 	protected static final float GAP_BETWEEN_LABELS = 5;
 	protected static final float TEXT_Y_OFFSET = 3;
-	protected float labelWidth = 0;
 	protected Label touchedLabel = null;
 	protected LabelListListener listener = null;
 
 	public LabelList(RenderGroup renderGroup) {
 		super(renderGroup);
+		// listener.labelListInitialized(this);
 	}
 
 	public void setListener(LabelListListener listener) {
@@ -103,8 +103,6 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 		newLabel.setOnPressListener(this);
 		newLabel.setOnReleaseListener(this);
 		addChild(newLabel);
-		labelWidth = (width - BG_OFFSET * 3 - (children.size() - 1) * GAP_BETWEEN_LABELS)
-				/ children.size();
 		layoutChildren();
 		return newLabel;
 	}
@@ -121,11 +119,6 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 		} else {
 			label.setText(text);
 		}
-	}
-
-	@Override
-	public synchronized void init() {
-		listener.labelListInitialized(this);
 	}
 
 	@Override
@@ -156,6 +149,8 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 
 	@Override
 	public synchronized void layoutChildren() {
+		float labelWidth = (width - BG_OFFSET * 3 - (children.size() - 1) * GAP_BETWEEN_LABELS)
+				/ children.size();
 		Collections.sort(children); // sort children by position
 		float xTotal = 3 * BG_OFFSET / 2;
 		for (View label : children) {

@@ -19,7 +19,6 @@ import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.list.DraggableLabelList;
-import com.kh.beatbot.ui.view.list.LabelList;
 import com.kh.beatbot.ui.view.list.LabelList.LabelState;
 
 public class EffectsPage extends TouchableView {
@@ -45,13 +44,6 @@ public class EffectsPage extends TouchableView {
 				}
 			});
 			selectEffectAlert = builder.create();
-		}
-
-		@Override
-		public void labelListInitialized(LabelList labelList) {
-			for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {
-				labelList.addLabel("", false);
-			}
 		}
 
 		@Override
@@ -148,6 +140,10 @@ public class EffectsPage extends TouchableView {
 				R.array.effect_names);
 		effectLabelList = new DraggableLabelList(renderGroup);
 		effectLabelList.setListener(new EffectLabelListListener(BeatBotActivity.mainActivity));
+
+		for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {
+			effectLabelList.addLabel("", false);
+		}
 
 		addChildren(effectLabelList);
 	}

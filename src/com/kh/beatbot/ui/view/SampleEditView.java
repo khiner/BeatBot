@@ -23,7 +23,6 @@ public class SampleEditView extends ControlView2dBase {
 	private static final String NO_SAMPLE_MESSAGE = "Tap to load a sample.";
 
 	// min distance for pointer to select loop markers
-	private static float minLoopWindow;
 	private static WaveformShape waveformShape;
 	private static Button[] loopButtons = new Button[2];
 	private static Rectangle currSampleRect = null;
@@ -118,6 +117,8 @@ public class SampleEditView extends ControlView2dBase {
 		float newLevelWidth = waveformWidth * (ZRAL - ZLAL) / (x2 - x1);
 		float newLevelOffset = ZRAL - newLevelWidth * (x2 - loopButtonW / 2) / waveformWidth;
 
+		float minLoopWindow = params[0].getViewLevel(Track.MIN_LOOP_WINDOW);
+
 		if (newLevelOffset < 0) {
 			newLevelWidth = ZRAL * waveformWidth / (x2 - loopButtonW / 2);
 			newLevelWidth = newLevelWidth <= 1 ? (newLevelWidth >= minLoopWindow ? newLevelWidth
@@ -134,14 +135,6 @@ public class SampleEditView extends ControlView2dBase {
 			setLevel(newLevelOffset, newLevelWidth);
 		}
 		updateLoopSelectionVbs();
-	}
-
-	@Override
-	public synchronized void init() {
-		setClip(true);
-		// find view level for 32 samples
-		minLoopWindow = params[0].getViewLevel(Track.MIN_LOOP_WINDOW);
-		update();
 	}
 
 	@Override

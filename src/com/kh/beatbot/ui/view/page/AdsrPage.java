@@ -17,12 +17,6 @@ public class AdsrPage extends TouchableView implements OnReleaseListener {
 	private AdsrView adsrView;
 	private SeekbarParamControl paramControl;
 
-	@Override
-	public synchronized void init() {
-		super.init();
-		updateParamView();
-	}
-
 	public synchronized void update() {
 		adsrView.update();
 		updateParamView();

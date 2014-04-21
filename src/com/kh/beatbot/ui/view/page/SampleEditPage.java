@@ -38,6 +38,7 @@ public class SampleEditPage extends TouchableView {
 	@Override
 	protected synchronized void createChildren() {
 		sampleEdit = new SampleEditView(null);
+		sampleEdit.setClip(true);
 		previewButton = new Button(renderGroup);
 		loopButton = new ToggleButton(renderGroup, true);
 		reverseButton = new ToggleButton(renderGroup, true);
@@ -95,10 +96,5 @@ public class SampleEditPage extends TouchableView {
 		loopEndControl.layout(this, topBarH * 12, 0, topBarH * 6, topBarH);
 
 		sampleEdit.layout(this, fillH, topBarH, width - fillH / 2 - fillH - margin * 2, fillH);
-	}
-
-	@Override
-	public synchronized void init() {
-		update();
 	}
 }
