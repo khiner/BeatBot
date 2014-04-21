@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view.page;
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.LevelsView;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
@@ -12,6 +13,10 @@ public class NoteLevelsPage extends TouchableView {
 
 	private LevelsView levelsView;
 	private ToggleButton volumeButton, panButton, pitchButton;
+
+	public NoteLevelsPage(RenderGroup renderGroup) {
+		super(renderGroup);
+	}
 
 	public synchronized void update() {
 		deselectAll();

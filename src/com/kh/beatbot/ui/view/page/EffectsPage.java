@@ -17,6 +17,7 @@ import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremolo;
 import com.kh.beatbot.listener.DraggableLabelListListener;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.list.DraggableLabelList;
 import com.kh.beatbot.ui.view.list.LabelList;
@@ -81,6 +82,10 @@ public class EffectsPage extends TouchableView {
 	// effects attrs
 	protected DraggableLabelList effectLabelList;
 	protected String[] effectNames;
+
+	public EffectsPage(RenderGroup renderGroup) {
+		super(renderGroup);
+	}
 
 	public synchronized void update() {
 		updateEffectLabels();

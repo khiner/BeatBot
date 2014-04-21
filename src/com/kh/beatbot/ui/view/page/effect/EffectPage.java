@@ -40,7 +40,9 @@ public class EffectPage extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		paramsPager = new ViewPager();
+		paramsPager = new ViewPager(renderGroup);
+		level2d = new Seekbar2d(renderGroup);
+		paramsPager = new ViewPager(renderGroup);
 		level2d = new Seekbar2d(renderGroup);
 
 		chorusPage = new EffectParamsPage(new Chorus(null));

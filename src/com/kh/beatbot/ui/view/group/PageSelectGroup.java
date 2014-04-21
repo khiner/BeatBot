@@ -88,18 +88,18 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 			}
 		});
 
-		levelsPage = new LevelsPage();
-		effectsPage = new EffectsPage();
-		browsePage = new BrowsePage();
-		editPage = new SampleEditPage();
-		adsrPage = new AdsrPage();
-		noteLevelsPage = new NoteLevelsPage();
+		levelsPage = new LevelsPage(renderGroup);
+		effectsPage = new EffectsPage(renderGroup);
+		browsePage = new BrowsePage(renderGroup);
+		editPage = new SampleEditPage(renderGroup);
+		adsrPage = new AdsrPage(renderGroup);
+		noteLevelsPage = new NoteLevelsPage(renderGroup);
 
-		pager = new ViewPager();
-		buttonRowPager = new ViewPager();
+		pager = new ViewPager(renderGroup);
+		buttonRowPager = new ViewPager(renderGroup);
 
-		trackButtonRow = new TrackPageButtonRow(null, pager);
-		masterButtonRow = new MasterPageButtonRow(null, pager);
+		trackButtonRow = new TrackPageButtonRow(renderGroup, pager);
+		masterButtonRow = new MasterPageButtonRow(renderGroup, pager);
 
 		buttonRowPager.addPage(masterButton, masterButtonRow);
 		buttonRowPager.addPage(TRACK_PAGE_ID, trackButtonRow);

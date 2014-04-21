@@ -5,6 +5,7 @@ import com.kh.beatbot.listener.ControlViewListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
@@ -16,6 +17,10 @@ public class LevelsPage extends TouchableView implements ControlViewListener {
 	protected Seekbar volumeLevelBar, panLevelBar, pitchLevelBar;
 	protected Button volumeButton, panButton, pitchButton;
 	protected boolean masterMode = false;
+
+	public LevelsPage(RenderGroup renderGroup) {
+		super(renderGroup);
+	}
 
 	public synchronized void update() {
 		volumeLevelBar.setParam(getCurrTrack().getVolumeParam());

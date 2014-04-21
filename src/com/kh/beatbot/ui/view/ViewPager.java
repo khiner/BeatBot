@@ -3,18 +3,23 @@ package com.kh.beatbot.ui.view;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.kh.beatbot.ui.shape.RenderGroup;
+
 
 public class ViewPager extends TouchableView {
 	private Map<Object, View> pageMap = new HashMap<Object, View>();
 	private Object currPageId;
 
+	public ViewPager(RenderGroup renderGroup) {
+		super(renderGroup);
+	}
+
 	public void addPage(Object key, View page) {
 		pageMap.put(key, page);
-		addChildren(page);
 	}
 
 	public int pageCount() {
-		return children.size();
+		return pageMap.size();
 	}
 
 	public View getCurrPage() {
@@ -26,15 +31,21 @@ public class ViewPager extends TouchableView {
 	}
 
 	public void setPage(Object key) {
-		if (pageMap.containsKey(key)) {
+		View currPage = getCurrPage();
+		removeChild(currPage);
+		View nextPage = pageMap.get(key);
+		if (null != nextPage) {
 			currPageId = key;
+			addChild(nextPage);
 		}
+		layoutChildren();
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
-		for (View page : children) {
-			page.layout(this, 0, 0, width, height);
+		View currPage = getCurrPage();
+		if (null != currPage) {
+			currPage.layout(this, 0, 0, width, height);
 		}
 	}
 
@@ -44,10 +55,5 @@ public class ViewPager extends TouchableView {
 		if (null != currPage) {
 			currPage.drawAll();
 		}
-	}
-
-	@Override
-	protected synchronized View findChildAt(float x, float y) {
-		return getCurrPage();
 	}
 }
