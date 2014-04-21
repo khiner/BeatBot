@@ -11,7 +11,7 @@ public class SlideTab extends Shape {
 
 	private float cornerRadius = 12;
 
-	public SlideTab(ShapeGroup group, float[] fillColor, float[] strokeColor) {
+	public SlideTab(RenderGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, FILL_INDICES, null, NUM_FILL_VERTICES, 0);
 	}
 

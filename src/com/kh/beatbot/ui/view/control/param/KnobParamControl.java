@@ -1,6 +1,6 @@
 package com.kh.beatbot.ui.view.control.param;
 
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.control.Knob;
 import com.kh.beatbot.ui.view.control.ToggleKnob;
 
@@ -8,17 +8,17 @@ public class KnobParamControl extends LevelParamControl {
 
 	private boolean beatSync;
 
-	public KnobParamControl(ShapeGroup shapeGroup, boolean beatSync) {
+	public KnobParamControl(RenderGroup renderGroup, boolean beatSync) {
 		this.beatSync = beatSync;
-		shouldDraw = (null == shapeGroup);
-		this.shapeGroup = shouldDraw ? new ShapeGroup() : shapeGroup;
+		shouldDraw = (null == renderGroup);
+		this.renderGroup = shouldDraw ? new RenderGroup() : renderGroup;
 		createChildren();
 	}
 
 	@Override
 	public synchronized void createChildren() {
 		super.createChildren();
-		levelControl = beatSync ? new ToggleKnob(shapeGroup) : new Knob(shapeGroup);
+		levelControl = beatSync ? new ToggleKnob(renderGroup) : new Knob(renderGroup);
 		addChild(levelControl);
 	}
 

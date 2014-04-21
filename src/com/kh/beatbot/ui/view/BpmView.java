@@ -8,7 +8,7 @@ import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.NumberSegment;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 
 public class BpmView extends ClickableView {
 
@@ -19,8 +19,8 @@ public class BpmView extends ClickableView {
 
 	private long lastTapTime = 0;
 
-	public BpmView(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public BpmView(RenderGroup renderGroup) {
+		super(renderGroup);
 	}
 
 	public void setBPM(float bpm) {
@@ -32,7 +32,7 @@ public class BpmView extends ClickableView {
 		initRoundedRect();
 		for (int i = 0; i < numberSegments.length; i++) {
 			for (int j = 0; j < numberSegments[i].length; j++) {
-				numberSegments[i][j] = new NumberSegment(shapeGroup, Color.BPM_OFF, null);
+				numberSegments[i][j] = new NumberSegment(renderGroup, Color.BPM_OFF, null);
 			}
 		}
 	}

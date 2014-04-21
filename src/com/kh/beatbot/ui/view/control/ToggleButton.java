@@ -1,14 +1,14 @@
 package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 
 public class ToggleButton extends Button {
 	boolean oscillating = false;
 	boolean checked = false;
 
-	public ToggleButton(ShapeGroup shapeGroup, boolean oscillating) {
-		super(shapeGroup);
+	public ToggleButton(RenderGroup renderGroup, boolean oscillating) {
+		super(renderGroup);
 		this.oscillating = oscillating;
 	}
 

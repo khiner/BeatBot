@@ -10,7 +10,7 @@ import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.ViewPager;
@@ -39,8 +39,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 	public static TrackPageButtonRow trackButtonRow;
 	public static MasterPageButtonRow masterButtonRow;
 
-	public PageSelectGroup(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public PageSelectGroup(RenderGroup renderGroup) {
+		super(renderGroup);
 	}
 
 	public void setBPM(float bpm) {
@@ -79,7 +79,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 
 	@Override
 	protected synchronized void createChildren() {
-		masterButton = new ToggleButton(shapeGroup, false);
+		masterButton = new ToggleButton(renderGroup, false);
 
 		masterButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override

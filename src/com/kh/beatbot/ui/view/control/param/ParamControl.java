@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.view.control.param;
 
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.ValueLabel;
@@ -14,15 +14,15 @@ public class ParamControl extends TouchableView {
 		super();
 	}
 
-	public ParamControl(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public ParamControl(RenderGroup renderGroup) {
+		super(renderGroup);
 	}
 
 	@Override
 	public synchronized void createChildren() {
-		valueLabel = new ValueLabel(shapeGroup);
+		valueLabel = new ValueLabel(renderGroup);
 		valueLabel.setShrinkable(true);
-		label = new View(shapeGroup);
+		label = new View(renderGroup);
 		addChildren(valueLabel, label);
 	}
 

@@ -38,13 +38,13 @@ public class SampleEditPage extends TouchableView {
 	@Override
 	protected synchronized void createChildren() {
 		sampleEdit = new SampleEditView(null);
-		previewButton = new Button(shapeGroup);
-		loopButton = new ToggleButton(shapeGroup, true);
-		reverseButton = new ToggleButton(shapeGroup, true);
+		previewButton = new Button(renderGroup);
+		loopButton = new ToggleButton(renderGroup, true);
+		reverseButton = new ToggleButton(renderGroup, true);
 
-		loopBeginControl = new ParamControl(shapeGroup);
-		loopEndControl = new ParamControl(shapeGroup);
-		gainControl = new ParamControl(shapeGroup);
+		loopBeginControl = new ParamControl(renderGroup);
+		loopEndControl = new ParamControl(renderGroup);
+		gainControl = new ParamControl(renderGroup);
 
 		previewButton.setIcon(IconResourceSets.PREVIEW);
 		loopButton.setIcon(IconResourceSets.LOOP);

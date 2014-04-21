@@ -67,16 +67,16 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 
 	protected synchronized void createMenuItems() {
 		physicsState = new PhysicsState(this);
-		tab = new SlideTab(shapeGroup, Color.LABEL_SELECTED, null);
+		tab = new SlideTab(renderGroup, Color.LABEL_SELECTED, null);
 		setShape(tab);
 		setIcon(IconResourceSets.SLIDE_MENU);
 
-		fileItem = new MenuItem(this, null, new ToggleButton(shapeGroup, false));
-		settingsItem = new MenuItem(this, null, new ToggleButton(shapeGroup, false));
-		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton(shapeGroup, true));
+		fileItem = new MenuItem(this, null, new ToggleButton(renderGroup, false));
+		settingsItem = new MenuItem(this, null, new ToggleButton(renderGroup, false));
+		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton(renderGroup, true));
 		midiImportItem = new FileMenuItem(this, fileItem, new File(
 				FileManager.midiDirectory.getPath()));
-		midiExportItem = new MenuItem(this, fileItem, new Button(shapeGroup));
+		midiExportItem = new MenuItem(this, fileItem, new Button(renderGroup));
 
 		topLevelItems.add(fileItem);
 		topLevelItems.add(settingsItem);
@@ -107,7 +107,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 
 	@Override
 	public synchronized void createChildren() {
-		foregroundRect = new Rectangle(shapeGroup, fillColor, null);
+		foregroundRect = new Rectangle(renderGroup, fillColor, null);
 
 		super.createChildren();
 

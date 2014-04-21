@@ -10,7 +10,7 @@ public class RoundedRect extends Shape {
 
 	public float roundThresh = 0, cornerRadius = -1;
 
-	public RoundedRect(ShapeGroup group, float[] fillColor, float[] strokeColor) {
+	public RoundedRect(RenderGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, FILL_INDICES, STROKE_INDICES, NUM_FILL_VERTICES,
 				NUM_STROKE_VERTICES);
 	}

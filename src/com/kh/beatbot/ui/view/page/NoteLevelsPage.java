@@ -39,10 +39,10 @@ public class NoteLevelsPage extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		levelsView = new LevelsView(shapeGroup);
-		volumeButton = new ToggleButton(shapeGroup, false);
-		panButton = new ToggleButton(shapeGroup, false);
-		pitchButton = new ToggleButton(shapeGroup, false);
+		levelsView = new LevelsView(renderGroup);
+		volumeButton = new ToggleButton(renderGroup, false);
+		panButton = new ToggleButton(renderGroup, false);
+		pitchButton = new ToggleButton(renderGroup, false);
 
 		volumeButton.setIcon(IconResourceSets.VOLUME);
 		panButton.setIcon(IconResourceSets.PAN);

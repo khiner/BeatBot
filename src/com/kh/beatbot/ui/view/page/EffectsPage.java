@@ -146,7 +146,7 @@ public class EffectsPage extends TouchableView {
 	protected synchronized void createChildren() {
 		effectNames = BeatBotActivity.mainActivity.getResources().getStringArray(
 				R.array.effect_names);
-		effectLabelList = new DraggableLabelList(shapeGroup);
+		effectLabelList = new DraggableLabelList(renderGroup);
 		effectLabelList.setListener(new EffectLabelListListener(BeatBotActivity.mainActivity));
 
 		addChildren(effectLabelList);

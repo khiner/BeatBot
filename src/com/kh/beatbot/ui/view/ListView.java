@@ -4,7 +4,7 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.RoundedRect;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.transition.ColorTransition;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
@@ -21,8 +21,8 @@ public class ListView extends TouchableView implements OnPressListener {
 
 	private Button selectedButton = null;
 
-	public ListView(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public ListView(RenderGroup renderGroup) {
+		super(renderGroup);
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public class ListView extends TouchableView implements OnPressListener {
 
 	private RoundedRect getScrollTab() {
 		if (scrollBar == null) {
-			scrollBar = new RoundedRect(shapeGroup, Color.TRANSPARENT, null);
+			scrollBar = new RoundedRect(renderGroup, Color.TRANSPARENT, null);
 		}
 		return scrollBar;
 	}

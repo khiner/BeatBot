@@ -8,7 +8,7 @@ import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.AdsrShape;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 
 public class AdsrView extends TouchableView implements ParamListener {
 
@@ -21,8 +21,8 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	private AdsrShape adsrShape;
 
-	public AdsrView(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public AdsrView(RenderGroup renderGroup) {
+		super(renderGroup);
 	}
 
 	public synchronized void update() {
@@ -68,7 +68,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	@Override
 	protected synchronized void createChildren() {
 		initRoundedRect();
-		adsrShape = new AdsrShape(shapeGroup, Color.TRON_BLUE, Color.TRON_BLUE);
+		adsrShape = new AdsrShape(renderGroup, Color.TRON_BLUE, Color.TRON_BLUE);
 	}
 
 	@Override

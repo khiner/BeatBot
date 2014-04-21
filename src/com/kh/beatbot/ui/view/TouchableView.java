@@ -4,7 +4,7 @@ import android.util.SparseArray;
 import android.view.MotionEvent;
 
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 
 public class TouchableView extends View {
 	public class Pointer {
@@ -43,8 +43,8 @@ public class TouchableView extends View {
 		super();
 	}
 
-	public TouchableView(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public TouchableView(RenderGroup renderGroup) {
+		super(renderGroup);
 	}
 
 	public final Pointer getPointer() {

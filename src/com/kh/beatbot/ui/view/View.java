@@ -17,7 +17,7 @@ import com.kh.beatbot.ui.mesh.TextureMesh;
 import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.shape.Shape;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.view.TouchableView.Pointer;
 import com.kh.beatbot.ui.view.page.MainPage;
@@ -47,7 +47,7 @@ public class View implements Comparable<View> {
 	protected Shape shape;
 	protected TextMesh textMesh;
 	protected TextureMesh textureMesh;
-	protected ShapeGroup shapeGroup;
+	protected RenderGroup renderGroup;
 
 	private IconResourceSet icon = new IconResourceSet(IconResourceSets.DEFAULT);
 	private State state = State.DEFAULT;
@@ -56,9 +56,9 @@ public class View implements Comparable<View> {
 		this(null);
 	}
 
-	public View(ShapeGroup shapeGroup) {
-		shouldDraw = (null == shapeGroup);
-		this.shapeGroup = shouldDraw ? new ShapeGroup() : shapeGroup;
+	public View(RenderGroup renderGroup) {
+		shouldDraw = (null == renderGroup);
+		this.renderGroup = shouldDraw ? new RenderGroup() : renderGroup;
 		createChildren();
 	}
 
@@ -70,8 +70,8 @@ public class View implements Comparable<View> {
 		return height;
 	}
 
-	public ShapeGroup getShapeGroup() {
-		return shapeGroup;
+	public RenderGroup getrenderGroup() {
+		return renderGroup;
 	}
 
 	protected void setShape(Shape shape) {
@@ -97,13 +97,13 @@ public class View implements Comparable<View> {
 
 	public void initRoundedRect() {
 		if (null == shape) {
-			shape = new RoundedRect(shapeGroup, icon.getResource(state).fillColor,
+			shape = new RoundedRect(renderGroup, icon.getResource(state).fillColor,
 					icon.getResource(state).strokeColor);
 		}
 	}
 
 	protected void initRect() {
-		shape = new Rectangle(shapeGroup, icon.getResource(state).fillColor,
+		shape = new Rectangle(renderGroup, icon.getResource(state).fillColor,
 				icon.getResource(state).strokeColor);
 	}
 
@@ -278,7 +278,7 @@ public class View implements Comparable<View> {
 			startClip(true, true);
 
 		if (shouldDraw) {
-			shapeGroup.draw();
+			renderGroup.draw();
 		}
 		draw();
 		drawChildren();
@@ -475,10 +475,10 @@ public class View implements Comparable<View> {
 		}
 
 		if (null == textureMesh && null != currResource && currResource.resourceId != -1) {
-			textureMesh = new TextureMesh(shapeGroup.getTextureGroup());
+			textureMesh = new TextureMesh(renderGroup.getTextureGroup());
 		}
 		if (null == textMesh && !text.isEmpty()) {
-			textMesh = new TextMesh(shapeGroup.getTextGroup(), text);
+			textMesh = new TextMesh(renderGroup.getTextGroup(), text);
 		}
 		if (null != textureMesh) {
 			int resourceId = null == currResource ? -1 : currResource.resourceId;

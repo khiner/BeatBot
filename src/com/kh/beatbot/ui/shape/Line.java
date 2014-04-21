@@ -2,7 +2,7 @@ package com.kh.beatbot.ui.shape;
 
 public class Line extends Shape {
 
-	public Line(ShapeGroup group, float[] fillColor, float[] strokeColor) {
+	public Line(RenderGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, 0, 2);
 	}
 

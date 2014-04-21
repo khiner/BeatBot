@@ -10,7 +10,7 @@ import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.Circle;
 import com.kh.beatbot.ui.shape.Rectangle;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 
 public class LevelsView extends TouchableView {
 
@@ -49,10 +49,10 @@ public class LevelsView extends TouchableView {
 	private Rectangle selectRegionRect, levelBarRect;
 	private Circle levelBarCircle, levelBarSelectCircle;
 
-	private static ShapeGroup levelBarGroup = new ShapeGroup();
+	private static RenderGroup levelBarGroup = new RenderGroup();
 
-	public LevelsView(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public LevelsView(RenderGroup renderGroup) {
+		super(renderGroup);
 		setClip(true);
 	}
 
@@ -290,7 +290,7 @@ public class LevelsView extends TouchableView {
 	@Override
 	protected synchronized void createChildren() {
 		initRoundedRect();
-		selectRegionRect = new Rectangle(shapeGroup, Color.TRANSPARENT, null);
+		selectRegionRect = new Rectangle(renderGroup, Color.TRANSPARENT, null);
 		levelBarRect = new Rectangle(levelBarGroup, Color.TRON_BLUE, null);
 		levelBarCircle = new Circle(levelBarGroup, Color.TRON_BLUE, null);
 		levelBarSelectCircle = new Circle(levelBarGroup, Color.TRON_BLUE, null);

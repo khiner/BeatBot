@@ -2,7 +2,7 @@ package com.kh.beatbot.ui.view.group;
 
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.MidiLoopBarView;
 import com.kh.beatbot.ui.view.MidiTrackView;
 import com.kh.beatbot.ui.view.MidiView;
@@ -13,10 +13,10 @@ public class MidiViewGroup extends TouchableView {
 	public MidiView midiView;
 	public MidiLoopBarView midiLoopBarView;
 
-	public static ShapeGroup scaleGroup, translateYGroup, translateScaleGroup;
+	public static RenderGroup scaleGroup, translateYGroup, translateScaleGroup;
 
-	public MidiViewGroup(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public MidiViewGroup(RenderGroup renderGroup) {
+		super(renderGroup);
 		setClip(true);
 	}
 
@@ -26,13 +26,13 @@ public class MidiViewGroup extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		scaleGroup = new ShapeGroup();
-		translateYGroup = new ShapeGroup();
-		translateScaleGroup = new ShapeGroup();
+		scaleGroup = new RenderGroup();
+		translateYGroup = new RenderGroup();
+		translateScaleGroup = new RenderGroup();
 
 		midiTrackView = new MidiTrackView(translateYGroup);
-		midiView = new MidiView(shapeGroup);
-		midiLoopBarView = new MidiLoopBarView(shapeGroup);
+		midiView = new MidiView(renderGroup);
+		midiLoopBarView = new MidiLoopBarView(renderGroup);
 
 		TrackManager.addTrackListener(midiView);
 		TrackManager.addTrackListener(midiTrackView);

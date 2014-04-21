@@ -9,15 +9,15 @@ import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.shape.Rectangle;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.shape.WaveformShape;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
 
 public class SampleEditView extends ControlView2dBase {
 
-	public SampleEditView(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public SampleEditView(RenderGroup renderGroup) {
+		super(renderGroup);
 	}
 
 	private static final String NO_SAMPLE_MESSAGE = "Tap to load a sample.";
@@ -42,12 +42,12 @@ public class SampleEditView extends ControlView2dBase {
 
 		if (hasSample()) {
 			if (null == waveformShape) {
-				waveformShape = new WaveformShape(shapeGroup, waveformWidth, Color.LABEL_SELECTED,
+				waveformShape = new WaveformShape(renderGroup, waveformWidth, Color.LABEL_SELECTED,
 						Color.BLACK);
 			}
 			for (int i = 0; i < loopButtons.length; i++) {
 				if (null == loopButtons[i]) {
-					loopButtons[i] = new Button(shapeGroup);
+					loopButtons[i] = new Button(renderGroup);
 					loopButtons[i].deselectOnPointerExit = false;
 					loopButtons[i].setIcon(IconResourceSets.SAMPLE_LOOP);
 					loopButtons[i].setOnPressListener(new OnPressListener() {
@@ -152,7 +152,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	private void updateCurrSample() {
 		if (null == currSampleRect) {
-			currSampleRect = new Rectangle(shapeGroup, Color.TRON_BLUE, null);
+			currSampleRect = new Rectangle(renderGroup, Color.TRON_BLUE, null);
 		}
 		float x = levelToX(params[0].getViewLevel(TrackManager.currTrack.getCurrentFrame()));
 		currSampleRect.layout(absoluteX + x, absoluteY, 4, height);

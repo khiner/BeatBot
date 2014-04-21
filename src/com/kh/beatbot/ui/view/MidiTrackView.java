@@ -4,11 +4,11 @@ import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 
 public class MidiTrackView extends TouchableView implements TrackListener {
-	public MidiTrackView(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public MidiTrackView(RenderGroup renderGroup) {
+		super(renderGroup);
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 
 	@Override
 	public void onCreate(Track track) {
-		TrackButtonRow buttonRow = new TrackButtonRow(shapeGroup, track);
+		TrackButtonRow buttonRow = new TrackButtonRow(renderGroup, track);
 		track.setButtonRow(buttonRow);
 		addChild(buttonRow);
 		layoutChildren();

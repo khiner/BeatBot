@@ -41,7 +41,7 @@ public class EffectPage extends TouchableView {
 	@Override
 	protected synchronized void createChildren() {
 		paramsPager = new ViewPager();
-		level2d = new Seekbar2d(shapeGroup);
+		level2d = new Seekbar2d(renderGroup);
 
 		chorusPage = new EffectParamsPage(new Chorus(null));
 		decimatePage = new EffectParamsPage(new Decimate(null));
@@ -59,7 +59,7 @@ public class EffectPage extends TouchableView {
 		paramsPager.addPage(Reverb.NAME, reverbPage);
 		paramsPager.addPage(Tremolo.NAME, tremeloPage);
 
-		toggleButton = new ToggleButton(shapeGroup, true);
+		toggleButton = new ToggleButton(renderGroup, true);
 		toggleButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {

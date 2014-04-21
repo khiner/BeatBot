@@ -11,7 +11,7 @@ public class WaveformShape extends Shape {
 	private float xOffset, numSamples, loopBeginX, loopEndX;
 	private SparseArray<Float> sampleBuffer = new SparseArray<Float>();
 
-	public WaveformShape(ShapeGroup group, float width, float[] fillColor, float[] strokeColor) {
+	public WaveformShape(RenderGroup group, float width, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, Rectangle.FILL_INDICES, getStrokeIndices(width),
 				Rectangle.NUM_FILL_VERTICES, (int) (width * MAX_SPP * 3));
 		this.width = width;

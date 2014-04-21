@@ -9,7 +9,7 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
@@ -19,20 +19,20 @@ public class ControlButtonGroup extends TouchableView {
 	public ToggleButton playButton, recordButton, copyButton;
 	public Button stopButton, undoButton, redoButton, deleteButton, quantizeButton;
 
-	public ControlButtonGroup(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public ControlButtonGroup(RenderGroup renderGroup) {
+		super(renderGroup);
 	}
 
 	@Override
 	protected synchronized void createChildren() {
-		playButton = new ToggleButton(shapeGroup, false);
-		stopButton = new Button(shapeGroup);
-		recordButton = new ToggleButton(shapeGroup, true);
-		copyButton = new ToggleButton(shapeGroup, false);
-		deleteButton = new Button(shapeGroup);
-		quantizeButton = new Button(shapeGroup);
-		undoButton = new Button(shapeGroup);
-		redoButton = new Button(shapeGroup);
+		playButton = new ToggleButton(renderGroup, false);
+		stopButton = new Button(renderGroup);
+		recordButton = new ToggleButton(renderGroup, true);
+		copyButton = new ToggleButton(renderGroup, false);
+		deleteButton = new Button(renderGroup);
+		quantizeButton = new Button(renderGroup);
+		undoButton = new Button(renderGroup);
+		redoButton = new Button(renderGroup);
 
 		playButton.setIcon(IconResourceSets.PLAY);
 		stopButton.setIcon(IconResourceSets.STOP);

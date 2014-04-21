@@ -4,7 +4,7 @@ public class NumberSegment extends Shape {
 	public static final short[] FILL_INDICES = { 0, 0, 1, 2, 3, 4, 5, 5 };
 	public static final int NUM_FILL_VERTICES = 6;
 
-	public NumberSegment(ShapeGroup group, float[] fillColor, float[] strokeColor) {
+	public NumberSegment(RenderGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, FILL_INDICES, null, NUM_FILL_VERTICES, 0);
 	}
 

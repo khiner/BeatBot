@@ -10,7 +10,7 @@ import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResource;
 import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.ClickableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
@@ -37,8 +37,8 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 		private final static String EMPTY_TEXT = "ADD";
 		private LabelState state = LabelState.EMPTY;
 
-		public Label(ShapeGroup shapeGroup) {
-			super(shapeGroup);
+		public Label(RenderGroup renderGroup) {
+			super(renderGroup);
 			setResourceId(IconResourceSets.ADD);
 			setFillColors(emptyIcon);
 			setText(EMPTY_TEXT);
@@ -77,8 +77,8 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 	protected Label touchedLabel = null;
 	protected LabelListListener listener = null;
 
-	public LabelList(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public LabelList(RenderGroup renderGroup) {
+		super(renderGroup);
 	}
 
 	public void setListener(LabelListListener listener) {

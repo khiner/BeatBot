@@ -33,13 +33,13 @@ public class LevelsPage extends TouchableView implements ControlViewListener {
 
 	@Override
 	protected synchronized void createChildren() {
-		volumeButton = new ToggleButton(shapeGroup, false);
-		panButton = new ToggleButton(shapeGroup, false);
-		pitchButton = new ToggleButton(shapeGroup, false);
+		volumeButton = new ToggleButton(renderGroup, false);
+		panButton = new ToggleButton(renderGroup, false);
+		pitchButton = new ToggleButton(renderGroup, false);
 
-		volumeLevelBar = new Seekbar(shapeGroup);
-		panLevelBar = new Seekbar(shapeGroup);
-		pitchLevelBar = new Seekbar(shapeGroup);
+		volumeLevelBar = new Seekbar(renderGroup);
+		panLevelBar = new Seekbar(renderGroup);
+		pitchLevelBar = new Seekbar(renderGroup);
 
 		volumeButton.setIcon(IconResourceSets.VOLUME);
 		panButton.setIcon(IconResourceSets.PAN);

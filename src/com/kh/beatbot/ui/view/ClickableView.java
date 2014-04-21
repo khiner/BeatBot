@@ -1,6 +1,6 @@
 package com.kh.beatbot.ui.view;
 
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 
 public abstract class ClickableView extends LongPressableView {
 
@@ -8,8 +8,8 @@ public abstract class ClickableView extends LongPressableView {
 		this(null);
 	}
 
-	public ClickableView(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public ClickableView(RenderGroup renderGroup) {
+		super(renderGroup);
 	}
 
 	// time (in millis) between pointer down and pointer up to be considered a

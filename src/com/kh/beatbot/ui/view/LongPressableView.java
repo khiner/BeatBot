@@ -3,7 +3,7 @@ package com.kh.beatbot.ui.view;
 import android.os.Handler;
 
 import com.kh.beatbot.activity.BeatBotActivity;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 
 public abstract class LongPressableView extends TouchableView {
 
@@ -37,8 +37,8 @@ public abstract class LongPressableView extends TouchableView {
 		this(null);
 	}
 
-	public LongPressableView(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public LongPressableView(RenderGroup renderGroup) {
+		super(renderGroup);
 		BeatBotActivity.mainActivity.runOnUiThread(new Runnable() {
 			public void run() {
 				handler = new Handler();

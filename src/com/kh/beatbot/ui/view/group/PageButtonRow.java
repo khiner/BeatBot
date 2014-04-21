@@ -3,7 +3,7 @@ package com.kh.beatbot.ui.view.group;
 import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.ViewPager;
 import com.kh.beatbot.ui.view.control.Button;
@@ -15,10 +15,10 @@ public abstract class PageButtonRow extends TouchableView {
 	protected ToggleButton[] pageButtons;
 	protected Button currPage, addTrackButton;
 
-	public PageButtonRow(ShapeGroup shapeGroup, ViewPager pager) {
+	public PageButtonRow(RenderGroup renderGroup, ViewPager pager) {
 		this.pager = pager;
-		shouldDraw = (null == shapeGroup);
-		this.shapeGroup = shouldDraw ? new ShapeGroup() : shapeGroup;
+		shouldDraw = (null == renderGroup);
+		this.renderGroup = shouldDraw ? new RenderGroup() : renderGroup;
 		createChildren();
 	}
 
@@ -29,7 +29,7 @@ public abstract class PageButtonRow extends TouchableView {
 		pageButtons = new ToggleButton[getNumPages()];
 
 		for (int i = 0; i < getNumPages(); i++) {
-			pageButtons[i] = new ToggleButton(shapeGroup, false);
+			pageButtons[i] = new ToggleButton(renderGroup, false);
 			pageButtons[i].setIcon(IconResourceSets.LABEL_BASE);
 		}
 
@@ -51,7 +51,7 @@ public abstract class PageButtonRow extends TouchableView {
 			});
 		}
 
-		addTrackButton = new Button(shapeGroup);
+		addTrackButton = new Button(renderGroup);
 		addTrackButton.setIcon(IconResourceSets.LABEL_BASE);
 		addTrackButton.setResourceId(IconResourceSets.ADD);
 

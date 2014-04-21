@@ -4,7 +4,7 @@ import com.kh.beatbot.effect.EffectParam;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.ParamToggleListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 
 public class ToggleKnob extends Knob implements ParamToggleListener {
 
@@ -12,8 +12,8 @@ public class ToggleKnob extends Knob implements ParamToggleListener {
 	private float snapDistSquared;
 	private boolean centerButtonTouched = false;
 
-	public ToggleKnob(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public ToggleKnob(RenderGroup renderGroup) {
+		super(renderGroup);
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class ToggleKnob extends Knob implements ParamToggleListener {
 	@Override
 	public synchronized void createChildren() {
 		super.createChildren();
-		centerButton = new ToggleButton(shapeGroup, true);
+		centerButton = new ToggleButton(renderGroup, true);
 		centerButton.setIcon(IconResourceSets.BEAT_SYNC);
 		centerButton.setChecked(true);
 		centerButton.setOnReleaseListener(new OnReleaseListener() {

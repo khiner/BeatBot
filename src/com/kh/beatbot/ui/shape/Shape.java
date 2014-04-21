@@ -7,24 +7,24 @@ public abstract class Shape {
 	protected Mesh2D fillMesh, strokeMesh;
 	protected float[] fillColor, strokeColor;
 
-	protected ShapeGroup group;
+	protected RenderGroup group;
 	private boolean shouldDraw = false;
 
 	public float x, y, width, height;
 
-	protected Shape(ShapeGroup group) {
+	protected Shape(RenderGroup group) {
 		// must draw via some parent group. if one is given, use that,
 		// otherwise create a new group and render upon request using that group
 		shouldDraw = group == null;
-		this.group = group != null ? group : new ShapeGroup();
+		this.group = group != null ? group : new RenderGroup();
 	}
 
-	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor, int numFillVertices,
+	public Shape(RenderGroup group, float[] fillColor, float[] strokeColor, int numFillVertices,
 			int numStrokeVertices) {
 		this(group, fillColor, strokeColor, null, null, numFillVertices, numStrokeVertices);
 	}
 
-	public Shape(ShapeGroup group, float[] fillColor, float[] strokeColor, short[] fillIndices,
+	public Shape(RenderGroup group, float[] fillColor, float[] strokeColor, short[] fillIndices,
 			short[] strokeIndices, int numFillVertices, int numStrokeVertices) {
 		this(group);
 		if (fillColor != null) {

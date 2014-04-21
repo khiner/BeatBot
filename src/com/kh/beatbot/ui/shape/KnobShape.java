@@ -7,7 +7,7 @@ public class KnobShape extends Shape {
 	private static final short[] FILL_INDICES = getFillIndices();
 	private int colorChangeVertex = 0;
 
-	public KnobShape(ShapeGroup group, float[] fillColor, float[] strokeColor) {
+	public KnobShape(RenderGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, FILL_INDICES, null, NUM_FILL_VERTICES, 0);
 	}
 

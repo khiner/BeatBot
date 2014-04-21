@@ -4,21 +4,21 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.Circle;
 import com.kh.beatbot.ui.shape.IntersectingLines;
-import com.kh.beatbot.ui.shape.ShapeGroup;
+import com.kh.beatbot.ui.shape.RenderGroup;
 
 public class Seekbar2d extends ControlView2dBase {
 	private IntersectingLines intersectingLines;
 	private Circle circle;
 
-	public Seekbar2d(ShapeGroup shapeGroup) {
-		super(shapeGroup);
+	public Seekbar2d(RenderGroup renderGroup) {
+		super(renderGroup);
 	}
 
 	public synchronized void createChildren() {
 		selectColor = Color.LABEL_SELECTED;
 		initRoundedRect();
-		intersectingLines = new IntersectingLines(shapeGroup, null, Color.TRON_BLUE);
-		circle = new Circle(shapeGroup, Color.TRON_BLUE, null);
+		intersectingLines = new IntersectingLines(renderGroup, null, Color.TRON_BLUE);
+		circle = new Circle(renderGroup, Color.TRON_BLUE, null);
 	}
 
 	public synchronized void layoutChildren() {

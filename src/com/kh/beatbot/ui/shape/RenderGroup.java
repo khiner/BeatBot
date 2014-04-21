@@ -6,12 +6,12 @@ import com.kh.beatbot.ui.mesh.MeshGroup;
 import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.texture.TextureGroup;
 
-public class ShapeGroup {
+public class RenderGroup {
 
 	protected MeshGroup fillGroup, strokeGroup;
 	protected TextureGroup textureGroup, textGroup;
 
-	public ShapeGroup() {
+	public RenderGroup() {
 		fillGroup = new MeshGroup(GL10.GL_TRIANGLE_STRIP);
 		strokeGroup = new MeshGroup(GL10.GL_LINES);
 		textureGroup = new TextureGroup(GL10.GL_TRIANGLE_STRIP,
