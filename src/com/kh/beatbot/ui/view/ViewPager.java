@@ -1,10 +1,8 @@
-package com.kh.beatbot.ui.view.group;
+package com.kh.beatbot.ui.view;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.kh.beatbot.ui.view.TouchableView;
-import com.kh.beatbot.ui.view.View;
 
 public class ViewPager extends TouchableView {
 	private Map<Object, View> pageMap = new HashMap<Object, View>();
