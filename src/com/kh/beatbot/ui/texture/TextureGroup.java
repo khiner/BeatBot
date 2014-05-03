@@ -5,25 +5,20 @@ import com.kh.beatbot.ui.mesh.MeshGroup;
 import com.kh.beatbot.ui.mesh.TextMesh;
 
 public class TextureGroup extends MeshGroup {
-	private final static int VERTICES_PER_TEXTURE = 4;
+	public final static int VERTICES_PER_TEXTURE = 4;
 
 	public TextureGroup(int primitiveType, int[] textureId) {
 		super(primitiveType, 8, textureId);
 	}
 
 	public synchronized void setText(TextMesh mesh, String text, float x, float y, float height) {
-		setText(mesh, text, x, y, height, null);
-	}
-
-	public synchronized void setText(TextMesh mesh, String text, float x, float y, float height,
-			float[] color) {
 		final float scale = height / TextureAtlas.font.getCellHeight();
 		final float cellWidth = TextureAtlas.font.getCellWidth() * scale;
 
 		int textureIndex = 0;
 		for (char character : text.toCharArray()) {
 			TextureRegion charRegion = TextureAtlas.font.getTextureRegion(character);
-			textureVertices(mesh, textureIndex, charRegion, x, y, cellWidth, height, color);
+			textureVertices(mesh, textureIndex, charRegion, x, y, cellWidth, height, null);
 			x += FontTextureAtlas.getCharWidth(character) * scale;
 			textureIndex += VERTICES_PER_TEXTURE;
 		}

@@ -6,7 +6,7 @@ import com.kh.beatbot.ui.texture.TextureGroup;
 public class TextureMesh extends Mesh {
 
 	public TextureMesh(TextureGroup group) {
-		this.numVertices = Rectangle.NUM_FILL_VERTICES;
+		numVertices = Rectangle.NUM_FILL_VERTICES;
 		indices = Rectangle.FILL_INDICES;
 		setGroup(group);
 	}

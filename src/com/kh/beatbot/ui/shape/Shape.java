@@ -62,10 +62,10 @@ public abstract class Shape {
 
 	protected synchronized void resetIndices() {
 		if (fillMesh != null) {
-			fillMesh.resetIndex();
+			fillMesh.reset();
 		}
 		if (strokeMesh != null) {
-			strokeMesh.resetIndex();
+			strokeMesh.reset();
 		}
 	}
 

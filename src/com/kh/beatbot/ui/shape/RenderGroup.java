@@ -45,14 +45,6 @@ public class RenderGroup {
 		textGroup.translate(x, y);
 	}
 
-	public boolean contains(Shape shape) {
-		if (shape == null) {
-			return false;
-		}
-		return fillGroup.contains(shape.getFillMesh())
-				|| strokeGroup.contains(shape.getStrokeMesh());
-	}
-
 	public void add(Shape shape) {
 		if (shape == null)
 			return;

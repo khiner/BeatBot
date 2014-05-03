@@ -91,10 +91,15 @@ public class View implements Comparable<View> {
 
 	public void setText(String text) {
 		this.text = text;
-		setState(state);
 		if (text.isEmpty()) {
 			destroyText();
+		} else if (null == textMesh) {
+			textMesh = new TextMesh(renderGroup.getTextGroup());
+			textMesh.setText(text);
+		} else {
+			textMesh.setText(text);
 		}
+		stateChanged();
 	}
 
 	public String getText() {
@@ -108,8 +113,7 @@ public class View implements Comparable<View> {
 			return;
 		}
 		icon = new IconResourceSet(resourceSet);
-
-		setState(state);
+		stateChanged();
 	}
 
 	public final void setResourceId(IconResourceSet resourceSet) {
@@ -326,7 +330,7 @@ public class View implements Comparable<View> {
 				textHeight *= scaleRatio;
 			}
 
-			textMesh.setText(text, x + (nonIconWidth - textWidth) / 2, absoluteY
+			textMesh.layout(x + (nonIconWidth - textWidth) / 2, absoluteY
 					+ (this.height - textHeight) / 2, textHeight);
 		}
 		minX = minY = bgRectRadius + BG_OFFSET;
@@ -408,10 +412,6 @@ public class View implements Comparable<View> {
 			shape.setColors(getFillColor(), getStrokeColor());
 		}
 
-		if (null == textMesh && !text.isEmpty()) {
-			textMesh = new TextMesh(renderGroup.getTextGroup());
-			textMesh.setText(text);
-		}
 		if (null == textureMesh && null != currResource && currResource.resourceId != -1) {
 			textureMesh = new TextureMesh(renderGroup.getTextureGroup());
 		}

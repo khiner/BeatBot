@@ -30,7 +30,8 @@ public class MeshGroup {
 
 	protected FloatBuffer vertexBuffer;
 	protected ShortBuffer indexBuffer;
-	protected List<Mesh> children = new ArrayList<Mesh>();
+
+	private List<Mesh> children = new ArrayList<Mesh>();
 
 	public MeshGroup(int primitiveType) {
 		this(primitiveType, 6);
@@ -86,10 +87,6 @@ public class MeshGroup {
 
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
 		gl.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, 0);
-	}
-
-	public synchronized boolean contains(Mesh mesh) {
-		return children.contains(mesh);
 	}
 
 	public synchronized void add(Mesh mesh) {

@@ -45,11 +45,11 @@ public abstract class Mesh {
 	}
 
 	public int getNumIndices() {
-		return null == indices ? 0 : indices.length;
+		return null == indices ? getNumVertices() : indices.length;
 	}
 
 	public short getIndex(int i) {
-		return indices[i];
+		return null == indices ? (short) i : indices[i];
 	}
 
 	public int getGroupVertexOffset() {
