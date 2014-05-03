@@ -14,28 +14,22 @@ import com.kh.beatbot.ui.view.View;
 import android.util.Log;
 
 public class MeshGroup {
-	public final static int SHORT_BYTES = Short.SIZE / 8;
-	public final static int FLOAT_BYTES = Float.SIZE / 8;
+	public final static int SHORT_BYTES = Short.SIZE / 8, FLOAT_BYTES = Float.SIZE / 8;
 
-	protected final static int COLOR_OFFSET = 2;
-	protected final static int COLOR_OFFSET_BYTES = COLOR_OFFSET * FLOAT_BYTES;
+	protected final static int COLOR_OFFSET = 2, TEX_OFFSET = 6;
+	protected final static int COLOR_OFFSET_BYTES = COLOR_OFFSET * FLOAT_BYTES,
+			TEX_OFFSET_BYTES = TEX_OFFSET * FLOAT_BYTES;
 
-	protected final static int TEX_OFFSET = 6;
-	protected final static int TEX_OFFSET_BYTES = TEX_OFFSET * FLOAT_BYTES;
-
-	protected int strokeWeight = 1;
-
-	protected boolean dirty = false;
-	protected int indicesPerVertex, vertexBytes, primitiveType, vertexHandle = -1,
-			indexHandle = -1;
+	protected int strokeWeight = 1, indicesPerVertex, vertexBytes, primitiveType,
+			vertexHandle = -1, indexHandle = -1;
 
 	protected short[] indices = new short[0];
 	protected float[] vertices = new float[0];
+	protected int[] textureId;
+	protected boolean dirty = false;
+
 	protected FloatBuffer vertexBuffer;
 	protected ShortBuffer indexBuffer;
-
-	protected int[] textureId;
-
 	protected List<Mesh> children = new ArrayList<Mesh>();
 
 	public MeshGroup(int primitiveType) {
@@ -102,18 +96,11 @@ public class MeshGroup {
 		if (null == mesh || children.contains(mesh)) {
 			return;
 		}
-		vertices = Arrays.copyOf(vertices, vertices.length
-				+ (mesh.getNumVertices() * indicesPerVertex));
 
-		indices = Arrays.copyOf(indices, indices.length + mesh.getNumIndices());
+		adjustVertexLength(mesh.getNumVertices(), mesh.getNumIndices());
 
 		children.add(mesh);
 		resetIndices();
-
-		vertexBuffer = FloatBuffer.wrap(vertices);
-		indexBuffer = ShortBuffer.wrap(indices);
-
-		dirty = true;
 	}
 
 	public synchronized void remove(Mesh mesh) {
@@ -130,15 +117,10 @@ public class MeshGroup {
 		System.arraycopy(vertices, src, vertices, dst, vertices.length - src);
 
 		children.remove(mesh);
+
+		adjustVertexLength(-mesh.getNumVertices(), -mesh.getNumIndices());
+
 		resetIndices();
-
-		vertices = Arrays.copyOf(vertices, vertices.length
-				- (mesh.getNumVertices() * indicesPerVertex));
-		indices = Arrays.copyOf(indices, indices.length - mesh.getNumIndices());
-
-		vertexBuffer = FloatBuffer.wrap(vertices);
-		indexBuffer = ShortBuffer.wrap(indices);
-		dirty = true;
 	}
 
 	public synchronized void push(Mesh2D mesh) {
@@ -158,7 +140,6 @@ public class MeshGroup {
 		children.add(mesh);
 
 		resetIndices();
-		dirty = true;
 	}
 
 	public float getVertexX(int index) {
@@ -230,26 +211,22 @@ public class MeshGroup {
 		int dst = getVertexIndex(mesh, newSize);
 
 		if (newSize > oldSize) {
-			vertices = Arrays.copyOf(vertices, vertices.length + (newSize - oldSize)
-					* indicesPerVertex);
+			adjustVertexLength(newSize - oldSize, newNumIndices - oldNumIndices);
 			System.arraycopy(vertices, src, vertices, dst, vertices.length - dst);
 
-			indices = Arrays.copyOf(indices, indices.length + (newNumIndices - oldNumIndices));
 			resetIndices(mesh);
 		} else {
 			System.arraycopy(vertices, src, vertices, dst, vertices.length - src);
-			vertices = Arrays.copyOf(vertices, vertices.length - (oldSize - newSize)
-					* indicesPerVertex);
+			adjustVertexLength(-(oldSize - newSize), -(oldNumIndices - newNumIndices));
 
-			indices = Arrays.copyOf(indices, indices.length - (oldNumIndices - newNumIndices));
 			resetIndices(mesh);
 		}
 
 		resetIndices();
+	}
 
-		vertexBuffer = FloatBuffer.wrap(vertices);
-		indexBuffer = ShortBuffer.wrap(indices);
-		dirty = true;
+	protected int getVertexIndex(Mesh mesh, int index) {
+		return (mesh.getGroupVertexOffset() + index) * indicesPerVertex;
 	}
 
 	private synchronized void resetIndices() {
@@ -271,6 +248,7 @@ public class MeshGroup {
 			indices[mesh.getGroupIndexOffset() + i] = (short) (mesh.getIndex(i) + mesh
 					.getGroupVertexOffset());
 		}
+		dirty = true;
 	}
 
 	private synchronized void updateBuffers() {
@@ -304,7 +282,11 @@ public class MeshGroup {
 		return null != textureId;
 	}
 
-	private int getVertexIndex(Mesh mesh, int index) {
-		return (mesh.getGroupVertexOffset() + index) * indicesPerVertex;
+	private void adjustVertexLength(int vertexDiff, int indexDiff) {
+		vertices = Arrays.copyOf(vertices, vertices.length + vertexDiff * indicesPerVertex);
+		indices = Arrays.copyOf(indices, indices.length + indexDiff);
+
+		vertexBuffer = FloatBuffer.wrap(vertices);
+		indexBuffer = ShortBuffer.wrap(indices);
 	}
 }
