@@ -44,11 +44,11 @@ public abstract class Mesh {
 	}
 
 	public int getNumIndices() {
-		return indices.length;
+		return null == indices ? 0 : indices.length;
 	}
 
-	public short[] getIndices() {
-		return indices;
+	public short getIndex(int i) {
+		return indices[i];
 	}
 
 	public int getParentVertexIndex() {

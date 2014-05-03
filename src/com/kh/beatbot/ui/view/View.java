@@ -409,7 +409,8 @@ public class View implements Comparable<View> {
 		}
 
 		if (null == textMesh && !text.isEmpty()) {
-			textMesh = new TextMesh(renderGroup.getTextGroup(), text);
+			textMesh = new TextMesh(renderGroup.getTextGroup());
+			textMesh.setText(text);
 		}
 		if (null == textureMesh && null != currResource && currResource.resourceId != -1) {
 			textureMesh = new TextureMesh(renderGroup.getTextureGroup());

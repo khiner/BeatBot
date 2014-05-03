@@ -52,7 +52,7 @@ public class MeshGroup {
 		this.vertexBytes = this.indicesPerVertex * FLOAT_BYTES;
 		this.textureId = textureId;
 	}
-	
+
 	public void setStrokeWeight(int weight) {
 		this.strokeWeight = weight;
 	}
@@ -268,9 +268,8 @@ public class MeshGroup {
 	}
 
 	private synchronized void resetIndices(Mesh mesh) {
-		short[] childIndices = mesh.getIndices();
-		for (int i = 0; i < childIndices.length; i++) {
-			indices[mesh.parentIndexOffset + i] = (short) (childIndices[i] + mesh.parentVertexIndex);
+		for (int i = 0; i < mesh.getNumIndices(); i++) {
+			indices[mesh.parentIndexOffset + i] = (short) (mesh.getIndex(i) + mesh.parentVertexIndex);
 		}
 	}
 
