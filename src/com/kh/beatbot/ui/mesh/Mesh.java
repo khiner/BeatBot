@@ -2,10 +2,11 @@ package com.kh.beatbot.ui.mesh;
 
 public abstract class Mesh {
 	protected MeshGroup group;
-	public int parentVertexIndex = -1, parentIndexOffset = -1;
 	protected int numVertices = 0;
 	protected short[] indices;
 	public float x, y, width, height;
+
+	private int groupVertexOffset = -1, groupIndexOffset = -1;
 
 	public boolean containsPoint(float x, float y) {
 		return this.x < x && this.x + width > x && this.y < y && this.y + height > y;
@@ -51,8 +52,20 @@ public abstract class Mesh {
 		return indices[i];
 	}
 
-	public int getParentVertexIndex() {
-		return parentVertexIndex;
+	public int getGroupVertexOffset() {
+		return groupVertexOffset;
+	}
+	
+	public int getGroupIndexOffset() {
+		return groupIndexOffset;
+	}
+	
+	public void setGroupVertexOffset(int groupVertexOffset) {
+		this.groupVertexOffset = groupVertexOffset;
+	}
+	
+	public void setGroupIndexOffset(int groupIndexOffset) {
+		this.groupIndexOffset = groupIndexOffset;
 	}
 
 	private void translate(float x, float y) {

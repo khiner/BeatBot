@@ -76,7 +76,7 @@ public class TextureGroup extends MeshGroup {
 	}
 
 	private synchronized void textureVertex(Mesh mesh, int index, float textureX, float textureY) {
-		int vertex = (mesh.parentVertexIndex + index) * indicesPerVertex;
+		int vertex = (mesh.getGroupVertexOffset() + index) * indicesPerVertex;
 
 		vertices[vertex + 6] = textureX;
 		vertices[vertex + 7] = textureY;

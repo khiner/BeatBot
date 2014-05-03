@@ -124,8 +124,8 @@ public class MeshGroup {
 			return;
 		}
 
-		int src = (mesh.parentVertexIndex + mesh.numVertices) * indicesPerVertex;
-		int dst = mesh.parentVertexIndex * indicesPerVertex;
+		int src = getVertexIndex(mesh, mesh.getNumVertices());
+		int dst = getVertexIndex(mesh, 0);
 
 		System.arraycopy(vertices, src, vertices, dst, vertices.length - src);
 
@@ -145,8 +145,8 @@ public class MeshGroup {
 		if (null == mesh || !children.contains(mesh))
 			return;
 
-		int src = mesh.parentVertexIndex * indicesPerVertex;
-		int dst = (mesh.parentVertexIndex + mesh.numVertices) * indicesPerVertex;
+		int src = getVertexIndex(mesh, 0);
+		int dst = getVertexIndex(mesh, mesh.getNumVertices());
 
 		// move vertices to the end of the array
 		float[] tmp = Arrays.copyOfRange(vertices, src, dst);
@@ -174,15 +174,15 @@ public class MeshGroup {
 	}
 
 	protected synchronized void vertex(Mesh mesh, int index, float x, float y, float[] color) {
-		int vertex = (mesh.parentVertexIndex + index) * indicesPerVertex;
+		int offset = getVertexIndex(mesh, index);
 
-		vertices[vertex] = x;
-		vertices[vertex + 1] = y;
+		vertices[offset] = x;
+		vertices[offset + 1] = y;
 		if (null != color) {
-			vertices[vertex + 2] = color[0];
-			vertices[vertex + 3] = color[1];
-			vertices[vertex + 4] = color[2];
-			vertices[vertex + 5] = color[3];
+			vertices[offset + 2] = color[0];
+			vertices[offset + 3] = color[1];
+			vertices[offset + 4] = color[2];
+			vertices[offset + 5] = color[3];
 		}
 
 		dirty = true;
@@ -195,8 +195,8 @@ public class MeshGroup {
 		dirty = true;
 	}
 
-	protected synchronized void setColor(Mesh mesh, int vertexIndex, float[] color) {
-		int offset = (mesh.parentVertexIndex + vertexIndex) * indicesPerVertex + COLOR_OFFSET;
+	protected synchronized void setColor(Mesh mesh, int index, float[] color) {
+		int offset = getVertexIndex(mesh, index) + COLOR_OFFSET;
 		vertices[offset] = color[0];
 		vertices[offset + 1] = color[1];
 		vertices[offset + 2] = color[2];
@@ -214,8 +214,7 @@ public class MeshGroup {
 	}
 
 	protected synchronized void translate(Mesh mesh, float x, float y) {
-		for (int i = mesh.parentVertexIndex * indicesPerVertex; i < (mesh.parentVertexIndex + mesh.numVertices)
-				* indicesPerVertex; i += indicesPerVertex) {
+		for (int i = getVertexIndex(mesh, 0); i < getVertexIndex(mesh, mesh.getNumVertices()); i += indicesPerVertex) {
 			vertices[i] += x;
 			vertices[i + 1] += y;
 		}
@@ -227,8 +226,8 @@ public class MeshGroup {
 		if (oldSize == newSize)
 			return;
 
-		int src = (mesh.parentVertexIndex + oldSize) * indicesPerVertex;
-		int dst = (mesh.parentVertexIndex + newSize) * indicesPerVertex;
+		int src = getVertexIndex(mesh, oldSize);
+		int dst = getVertexIndex(mesh, newSize);
 
 		if (newSize > oldSize) {
 			vertices = Arrays.copyOf(vertices, vertices.length + (newSize - oldSize)
@@ -257,9 +256,9 @@ public class MeshGroup {
 		int numVertices = 0;
 		int numIndices = 0;
 		for (Mesh child : children) {
-			child.parentVertexIndex = numVertices;
-			if (child.parentIndexOffset != numIndices) {
-				child.parentIndexOffset = numIndices;
+			child.setGroupVertexOffset(numVertices);
+			if (child.getGroupIndexOffset() != numIndices) {
+				child.setGroupIndexOffset(numIndices);
 				resetIndices(child);
 			}
 			numVertices += child.getNumVertices();
@@ -269,7 +268,8 @@ public class MeshGroup {
 
 	private synchronized void resetIndices(Mesh mesh) {
 		for (int i = 0; i < mesh.getNumIndices(); i++) {
-			indices[mesh.parentIndexOffset + i] = (short) (mesh.getIndex(i) + mesh.parentVertexIndex);
+			indices[mesh.getGroupIndexOffset() + i] = (short) (mesh.getIndex(i) + mesh
+					.getGroupVertexOffset());
 		}
 	}
 
@@ -302,5 +302,9 @@ public class MeshGroup {
 
 	private boolean hasTexture() {
 		return null != textureId;
+	}
+
+	private int getVertexIndex(Mesh mesh, int index) {
+		return (mesh.getGroupVertexOffset() + index) * indicesPerVertex;
 	}
 }
