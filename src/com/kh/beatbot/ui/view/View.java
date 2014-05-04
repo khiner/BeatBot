@@ -92,7 +92,7 @@ public class View implements Comparable<View> {
 	public void setText(String text) {
 		this.text = text;
 		if (text.isEmpty()) {
-			destroyText();
+			hideText();
 		} else if (null == textMesh) {
 			textMesh = new TextMesh(renderGroup.getTextGroup());
 			textMesh.setText(text);
@@ -108,8 +108,8 @@ public class View implements Comparable<View> {
 
 	public final synchronized void setIcon(IconResourceSet resourceSet) {
 		if (null == resourceSet) {
-			destroyTexture();
-			destroyShape();
+			hideTexture();
+			hideShape();
 			return;
 		}
 		icon = new IconResourceSet(resourceSet);
@@ -145,7 +145,7 @@ public class View implements Comparable<View> {
 	public synchronized void removeChild(View child) {
 		if (!children.contains(child))
 			return;
-		child.destroy();
+		child.hide();
 		children.remove(child);
 	}
 
@@ -405,7 +405,7 @@ public class View implements Comparable<View> {
 
 	protected synchronized void stateChanged() {
 		if (null == getFillColor() && null == getStrokeColor()) {
-			destroyShape();
+			hideShape();
 		} else if (null != shape) {
 			shape.setColors(getFillColor(), getStrokeColor());
 		}
@@ -417,7 +417,7 @@ public class View implements Comparable<View> {
 		}
 		if (null != textureMesh) {
 			if (null == currResource || currResource.resourceId == -1) {
-				destroyTexture();
+				hideTexture();
 			} else {
 				textureMesh.setResource(currResource.resourceId);
 				textureMesh.setColor(getIconColor());
@@ -447,33 +447,33 @@ public class View implements Comparable<View> {
 		}
 	}
 
-	protected synchronized void destroy() {
-		destroyTexture();
-		destroyShape();
-		destroyText();
+	protected synchronized void hide() {
+		hideTexture();
+		hideShape();
+		hideText();
 
 		for (View child : children) {
-			child.destroy();
+			child.hide();
 		}
 	}
 
-	protected synchronized void destroyShape() {
+	protected synchronized void hideShape() {
 		if (null != shape) {
-			shape.destroy();
+			shape.hide();
 			shape = null;
 		}
 	}
 
-	protected synchronized void destroyTexture() {
+	protected synchronized void hideTexture() {
 		if (null != textureMesh) {
-			textureMesh.destroy();
+			textureMesh.hide();
 			textureMesh = null;
 		}
 	}
 
-	protected synchronized void destroyText() {
+	protected synchronized void hideText() {
 		if (null != textMesh) {
-			textMesh.destroy();
+			textMesh.hide();
 			textMesh = null;
 		}
 	}

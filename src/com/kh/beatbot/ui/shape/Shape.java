@@ -95,7 +95,7 @@ public abstract class Shape {
 		if (null != strokeColor) {
 			strokeMesh.setColor(strokeColor);
 		} else {
-			strokeMesh.destroy();
+			strokeMesh.hide();
 			strokeMesh = null;
 		}
 	}
@@ -158,7 +158,7 @@ public abstract class Shape {
 		}
 	}
 
-	public void destroy() {
+	public void hide() {
 		group.remove(this);
 	}
 }

@@ -34,7 +34,7 @@ public abstract class Mesh {
 		group.setColor(this, vertexIndex, color);
 	}
 
-	public void destroy() {
+	public void hide() {
 		if (null == group)
 			return;
 		group.remove(this);

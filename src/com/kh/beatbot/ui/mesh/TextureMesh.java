@@ -23,7 +23,7 @@ public class TextureMesh extends Mesh {
 
 	public synchronized void setResource(int resourceId) {
 		if (-1 == resourceId) {
-			destroy();
+			hide();
 		} else {
 			((TextureGroup) group).setResource(this, resourceId);
 		}

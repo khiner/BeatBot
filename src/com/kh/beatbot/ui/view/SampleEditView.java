@@ -81,7 +81,7 @@ public class SampleEditView extends ControlView2dBase {
 				button = null;
 			}
 			if (null != waveformShape) {
-				waveformShape.destroy();
+				waveformShape.hide();
 				waveformShape = null;
 			}
 			setText(NO_SAMPLE_MESSAGE);
@@ -157,7 +157,7 @@ public class SampleEditView extends ControlView2dBase {
 		if (TrackManager.currTrack.isPlaying() || TrackManager.currTrack.isPreviewing()) {
 			updateCurrSample();
 		} else if (null != currSampleRect) {
-			currSampleRect.destroy();
+			currSampleRect.hide();
 			currSampleRect = null;
 		}
 	}

@@ -539,9 +539,9 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public void onDestroy(Track track) {
-		track.getRectangle().destroy();
+		track.getRectangle().hide();
 		for (MidiNote note : track.getMidiNotes()) {
-			note.getRectangle().destroy();
+			note.getRectangle().hide();
 			note.setRectangle(null);
 		}
 		onTrackHeightChange();

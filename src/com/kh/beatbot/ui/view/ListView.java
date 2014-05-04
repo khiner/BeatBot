@@ -143,10 +143,10 @@ public class ListView extends TouchableView implements OnPressListener {
 	}
 
 	@Override
-	protected synchronized void destroy() {
-		super.destroy();
+	protected synchronized void hide() {
+		super.hide();
 		if (null != scrollBar) {
-			scrollBar.destroy();
+			scrollBar.hide();
 			scrollBar = null;
 		}
 	}

@@ -29,8 +29,8 @@ public class MidiLoopBarView extends TouchableView implements LoopChangeListener
 		loopBeginButton = new Button(MidiViewGroup.scaleGroup);
 		loopEndButton = new Button(MidiViewGroup.scaleGroup);
 		loopBarButton.initRect();
-		loopBeginButton.destroyShape();
-		loopEndButton.destroyShape();
+		loopBeginButton.hideShape();
+		loopEndButton.hideShape();
 		loopBarButton.deselectOnPointerExit = false;
 		loopBeginButton.deselectOnPointerExit = false;
 		loopEndButton.deselectOnPointerExit = false;
