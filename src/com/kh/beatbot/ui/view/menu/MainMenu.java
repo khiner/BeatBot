@@ -71,9 +71,9 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		setShape(tab);
 		setIcon(IconResourceSets.SLIDE_MENU);
 
-		fileItem = new MenuItem(this, null, new ToggleButton(renderGroup, false));
-		settingsItem = new MenuItem(this, null, new ToggleButton(renderGroup, false));
-		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton(renderGroup, true));
+		fileItem = new MenuItem(this, null, new ToggleButton(renderGroup));
+		settingsItem = new MenuItem(this, null, new ToggleButton(renderGroup));
+		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton(renderGroup).oscillating());
 		midiImportItem = new FileMenuItem(this, fileItem, new File(
 				FileManager.midiDirectory.getPath()));
 		midiExportItem = new MenuItem(this, fileItem, new Button(renderGroup));

@@ -41,9 +41,9 @@ public class NoteLevelsPage extends TrackPage {
 	@Override
 	protected synchronized void createChildren() {
 		levelsView = new LevelsView(renderGroup);
-		volumeButton = new ToggleButton(renderGroup, false);
-		panButton = new ToggleButton(renderGroup, false);
-		pitchButton = new ToggleButton(renderGroup, false);
+		volumeButton = new ToggleButton(renderGroup);
+		panButton = new ToggleButton(renderGroup);
+		pitchButton = new ToggleButton(renderGroup);
 
 		volumeButton.setIcon(IconResourceSets.VOLUME);
 		panButton.setIcon(IconResourceSets.PAN);

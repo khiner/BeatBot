@@ -38,8 +38,8 @@ public class SampleEditPage extends TrackPage {
 		sampleEdit = new SampleEditView(null);
 		sampleEdit.setClip(true);
 		previewButton = new Button(renderGroup);
-		loopButton = new ToggleButton(renderGroup, true);
-		reverseButton = new ToggleButton(renderGroup, true);
+		loopButton = new ToggleButton(renderGroup).oscillating();
+		reverseButton = new ToggleButton(renderGroup).oscillating();
 
 		loopBeginControl = new ParamControl(renderGroup);
 		loopEndControl = new ParamControl(renderGroup);

@@ -29,7 +29,7 @@ public abstract class PageButtonRow extends TouchableView {
 		pageButtons = new ToggleButton[getNumPages()];
 
 		for (int i = 0; i < getNumPages(); i++) {
-			pageButtons[i] = new ToggleButton(renderGroup, false);
+			pageButtons[i] = new ToggleButton(renderGroup);
 			pageButtons[i].setIcon(IconResourceSets.LABEL_BASE);
 		}
 

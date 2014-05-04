@@ -33,9 +33,9 @@ public class LevelsPage extends TrackPage implements ControlViewListener {
 
 	@Override
 	protected synchronized void createChildren() {
-		volumeButton = new ToggleButton(renderGroup, false);
-		panButton = new ToggleButton(renderGroup, false);
-		pitchButton = new ToggleButton(renderGroup, false);
+		volumeButton = new ToggleButton(renderGroup);
+		panButton = new ToggleButton(renderGroup);
+		pitchButton = new ToggleButton(renderGroup);
 
 		volumeLevelBar = new Seekbar(renderGroup);
 		panLevelBar = new Seekbar(renderGroup);

@@ -25,10 +25,10 @@ public class ControlButtonGroup extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		playButton = new ToggleButton(renderGroup, false);
+		playButton = new ToggleButton(renderGroup);
 		stopButton = new Button(renderGroup);
-		recordButton = new ToggleButton(renderGroup, true);
-		copyButton = new ToggleButton(renderGroup, false);
+		recordButton = new ToggleButton(renderGroup).oscillating();
+		copyButton = new ToggleButton(renderGroup);
 		deleteButton = new Button(renderGroup);
 		quantizeButton = new Button(renderGroup);
 		undoButton = new Button(renderGroup);

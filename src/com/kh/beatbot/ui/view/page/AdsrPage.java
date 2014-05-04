@@ -62,7 +62,7 @@ public class AdsrPage extends TrackPage implements OnReleaseListener {
 		paramControl = new SeekbarParamControl(renderGroup);
 		adsrButtons = new ToggleButton[ADSR.NUM_PARAMS];
 		for (int i = 0; i < adsrButtons.length; i++) {
-			adsrButtons[i] = new ToggleButton(renderGroup, false);
+			adsrButtons[i] = new ToggleButton(renderGroup);
 			adsrButtons[i].setId(i);
 			adsrButtons[i].setOnReleaseListener(this);
 		}
