@@ -7,7 +7,8 @@ public class TextMesh extends Mesh {
 	protected String text;
 
 	public TextMesh(TextureGroup group) {
-		setGroup(group);
+		this.group = group;
+		show();
 	}
 
 	public synchronized void setText(String text) {
@@ -25,10 +26,10 @@ public class TextMesh extends Mesh {
 	}
 
 	public synchronized void layout(float x, float y, float height) {
-		if (height == this.height) {
-			setPosition(x, y);
-			return;
-		}
+//		if (height == this.height) {
+//			setPosition(x, y);
+//			return;
+//		}
 
 		this.x = x;
 		this.y = y;

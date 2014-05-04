@@ -16,16 +16,6 @@ public abstract class Mesh {
 		return group;
 	}
 
-	public void setGroup(MeshGroup group) {
-		if (this.group == group)
-			return;
-		if (null != this.group) {
-			this.group.remove(this);
-		}
-		this.group = group;
-		group.add(this);
-	}
-
 	public void setColor(float[] color) {
 		group.setColor(this, color);
 	}
@@ -38,6 +28,14 @@ public abstract class Mesh {
 		if (null == group)
 			return;
 		group.remove(this);
+	}
+
+	public void show() {
+		group.add(this);
+	}
+
+	public boolean isVisible() {
+		return null != group && group.contains(this) && getNumVertices() > 0;
 	}
 
 	public int getNumVertices() {

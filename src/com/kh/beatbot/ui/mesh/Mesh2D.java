@@ -7,7 +7,8 @@ public class Mesh2D extends Mesh {
 	public Mesh2D(MeshGroup group, int numVertices, short[] indices) {
 		this.indices = indices;
 		this.numVertices = numVertices;
-		setGroup(group);
+		this.group = group;
+		show();
 	}
 
 	public void vertex(float x, float y, float[] color) {
@@ -17,6 +18,14 @@ public class Mesh2D extends Mesh {
 		}
 		group.vertex(this, index, x, y, color);
 		index++;
+	}
+
+	public void push() {
+		group.push(this);
+	}
+
+	public void setStrokeWeight(int weight) {
+		group.setStrokeWeight(weight);
 	}
 
 	public void reset() {

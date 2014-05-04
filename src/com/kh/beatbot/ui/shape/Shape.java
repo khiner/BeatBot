@@ -7,17 +7,7 @@ public abstract class Shape {
 	protected Mesh2D fillMesh, strokeMesh;
 	protected float[] fillColor, strokeColor;
 
-	protected RenderGroup group;
-	private boolean shouldDraw = false;
-
 	public float x, y, width, height;
-
-	protected Shape(RenderGroup group) {
-		// must draw via some parent group. if one is given, use that,
-		// otherwise create a new group and render upon request using that group
-		shouldDraw = group == null;
-		this.group = group != null ? group : new RenderGroup();
-	}
 
 	public Shape(RenderGroup group, float[] fillColor, float[] strokeColor, int numFillVertices,
 			int numStrokeVertices) {
@@ -26,16 +16,17 @@ public abstract class Shape {
 
 	public Shape(RenderGroup group, float[] fillColor, float[] strokeColor, short[] fillIndices,
 			short[] strokeIndices, int numFillVertices, int numStrokeVertices) {
-		this(group);
+		RenderGroup myGroup = null == group ? new RenderGroup() : group;
+
 		if (fillColor != null) {
-			fillMesh = new Mesh2D(this.group.fillGroup, numFillVertices, fillIndices);
+			fillMesh = new Mesh2D(myGroup.getFillGroup(), numFillVertices, fillIndices);
 			this.fillColor = fillColor;
 		}
 		if (strokeColor != null) {
-			strokeMesh = new Mesh2D(this.group.strokeGroup, numStrokeVertices, strokeIndices);
+			strokeMesh = new Mesh2D(myGroup.getStrokeGroup(), numStrokeVertices, strokeIndices);
 			this.strokeColor = strokeColor;
 		}
-		this.group.add(this);
+		show();
 	}
 
 	protected abstract void updateVertices();
@@ -49,24 +40,22 @@ public abstract class Shape {
 	}
 
 	protected synchronized void fillVertex(float x, float y) {
-		if (fillMesh != null) {
+		if (null != fillMesh) {
 			fillMesh.vertex(x, y, fillColor);
 		}
 	}
 
 	protected synchronized void strokeVertex(float x, float y) {
-		if (strokeMesh != null) {
+		if (null != strokeMesh) {
 			strokeMesh.vertex(x, y, strokeColor);
 		}
 	}
 
 	protected synchronized void resetIndices() {
-		if (fillMesh != null) {
+		if (null != fillMesh)
 			fillMesh.reset();
-		}
-		if (strokeMesh != null) {
+		if (null != strokeMesh)
 			strokeMesh.reset();
-		}
 	}
 
 	public synchronized void update() {
@@ -105,25 +94,28 @@ public abstract class Shape {
 		setStrokeColor(strokeColor);
 	}
 
-	public synchronized Mesh2D getFillMesh() {
+	public Mesh2D getFillMesh() {
 		return fillMesh;
 	}
 
-	public synchronized Mesh2D getStrokeMesh() {
+	public Mesh2D getStrokeMesh() {
 		return strokeMesh;
 	}
 
-	public synchronized float[] getFillColor() {
+	public float[] getFillColor() {
 		return fillColor;
 	}
 
-	public synchronized float[] getStrokeColor() {
+	public float[] getStrokeColor() {
 		return strokeColor;
 	}
 
 	// set "z-index" of this shape to the top of the stack
 	public void bringToTop() {
-		group.push(this);
+		if (null != fillMesh)
+			fillMesh.push();
+		if (null != strokeMesh)
+			strokeMesh.push();
 	}
 
 	public synchronized void setPosition(float x, float y) {
@@ -152,13 +144,23 @@ public abstract class Shape {
 		setDimensions(width, height);
 	}
 
-	public void draw() {
-		if (shouldDraw) {
-			group.draw();
-		}
+	public void hide() {
+		if (null != fillMesh)
+			fillMesh.hide();
+		if (null != strokeMesh)
+			strokeMesh.hide();
 	}
 
-	public void hide() {
-		group.remove(this);
+	public void show() {
+		if (null != fillMesh)
+			fillMesh.show();
+		if (null != strokeMesh)
+			strokeMesh.show();
+		update();
+	}
+
+	public boolean isVisible() {
+		return (null != fillMesh && fillMesh.isVisible())
+				|| (null != strokeMesh && strokeMesh.isVisible());
 	}
 }

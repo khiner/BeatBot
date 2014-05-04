@@ -1,7 +1,9 @@
 package com.kh.beatbot.ui.view;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
@@ -15,9 +17,9 @@ import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.mesh.TextMesh;
 import com.kh.beatbot.ui.mesh.TextureMesh;
 import com.kh.beatbot.ui.shape.Rectangle;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.shape.Shape;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.view.TouchableView.Pointer;
 import com.kh.beatbot.ui.view.page.MainPage;
@@ -28,10 +30,10 @@ public class View implements Comparable<View> {
 	public static EffectPage effectPage;
 	public static GLSurfaceViewBase root;
 
-	public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0, height = 0;
-
 	protected static final float ¹ = (float) Math.PI, BG_OFFSET = 3, X_OFFSET = 2;
 	protected static float LABEL_HEIGHT = 0;
+
+	public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0, height = 0;
 
 	protected int id = -1; // optional
 	protected boolean shouldDraw = true, shrinkable = false;
@@ -39,11 +41,12 @@ public class View implements Comparable<View> {
 
 	protected View parent;
 	protected List<View> children = new ArrayList<View>();
+	protected Set<Shape> shapes = new HashSet<Shape>();
 
-	protected Shape shape;
-	protected TextMesh textMesh;
+	protected Shape bgShape;
 	protected TextureMesh textureMesh;
 	protected RenderGroup renderGroup;
+	private TextMesh textMesh;
 
 	private boolean shouldClip = false;
 	private String text = "";
@@ -57,6 +60,9 @@ public class View implements Comparable<View> {
 	public View(RenderGroup renderGroup) {
 		shouldDraw = (null == renderGroup);
 		this.renderGroup = shouldDraw ? new RenderGroup() : renderGroup;
+		textMesh = new TextMesh(this.renderGroup.getTextGroup());
+		textureMesh = new TextureMesh(this.renderGroup.getTextureGroup());
+		hide();
 		createChildren();
 	}
 
@@ -91,14 +97,7 @@ public class View implements Comparable<View> {
 
 	public void setText(String text) {
 		this.text = text;
-		if (text.isEmpty()) {
-			hideText();
-		} else if (null == textMesh) {
-			textMesh = new TextMesh(renderGroup.getTextGroup());
-			textMesh.setText(text);
-		} else {
-			textMesh.setText(text);
-		}
+		textMesh.setText(text);
 		stateChanged();
 	}
 
@@ -108,11 +107,11 @@ public class View implements Comparable<View> {
 
 	public final synchronized void setIcon(IconResourceSet resourceSet) {
 		if (null == resourceSet) {
-			hideTexture();
-			hideShape();
+			textureMesh.hide();
+			bgShape.hide();
 			return;
 		}
-		icon = new IconResourceSet(resourceSet);
+		icon.set(resourceSet);
 		stateChanged();
 	}
 
@@ -139,6 +138,7 @@ public class View implements Comparable<View> {
 			return;
 
 		children.add(child);
+		child.show();
 		child.stateChanged();
 	}
 
@@ -158,6 +158,12 @@ public class View implements Comparable<View> {
 	public synchronized void removeChildren(View... children) {
 		for (View child : children) {
 			removeChild(child);
+		}
+	}
+
+	public synchronized void addShapes(Shape... shapes) {
+		for (Shape shape : shapes) {
+			this.shapes.add(shape);
 		}
 	}
 
@@ -287,7 +293,7 @@ public class View implements Comparable<View> {
 		if (width <= 0 || height <= 0)
 			return;
 
-		if (null != shape && shrinkable) {
+		if (shrinkable && null != bgShape && bgShape.isVisible()) {
 			x += BG_OFFSET;
 			y += BG_OFFSET;
 			width -= BG_OFFSET * 2;
@@ -296,8 +302,8 @@ public class View implements Comparable<View> {
 
 		float bgRectRadius = Math.min(width, height) * .15f;
 
-		if (null != shape && shape instanceof RoundedRect) {
-			((RoundedRect) shape).setCornerRadius(bgRectRadius);
+		if (null != bgShape && bgShape instanceof RoundedRect) {
+			((RoundedRect) bgShape).setCornerRadius(bgRectRadius);
 		}
 
 		if (shouldShrink()) {
@@ -308,19 +314,21 @@ public class View implements Comparable<View> {
 			height -= shrink;
 		}
 
-		if (null != shape) {
-			shape.layout(x, y, width, height);
+		if (null != bgShape && bgShape.isVisible()) {
+			bgShape.layout(x, y, width, height);
 		}
-		if (null != textureMesh) {
+
+		if (textureMesh.isVisible()) {
 			textureMesh.layout(x, y, height, height);
 		}
-		if (null != textMesh) {
+
+		if (textMesh.isVisible()) {
 			float textHeight = height + BG_OFFSET;
 			float textWidth = TextureAtlas.font.getTextWidth(text, textHeight);
 
 			float nonIconWidth = width - X_OFFSET * 2;
 			x += X_OFFSET * 2;
-			if (null != textureMesh) {
+			if (textureMesh.isVisible()) {
 				nonIconWidth -= height;
 				x += height;
 			}
@@ -404,77 +412,67 @@ public class View implements Comparable<View> {
 	}
 
 	protected synchronized void stateChanged() {
-		if (null == getFillColor() && null == getStrokeColor()) {
-			hideShape();
-		} else if (null != shape) {
-			shape.setColors(getFillColor(), getStrokeColor());
+		if (null != bgShape && null == getFillColor() && null == getStrokeColor()) {
+			bgShape.hide();
+		} else if (null != bgShape) {
+			if (!bgShape.isVisible())
+				bgShape.show();
+			bgShape.setColors(getFillColor(), getStrokeColor());
 		}
 
-		final IconResource currResource = getIconResource();
-
-		if (null == textureMesh && null != currResource && currResource.resourceId != -1) {
-			textureMesh = new TextureMesh(renderGroup.getTextureGroup());
-		}
-		if (null != textureMesh) {
-			if (null == currResource || currResource.resourceId == -1) {
-				hideTexture();
-			} else {
-				textureMesh.setResource(currResource.resourceId);
-				textureMesh.setColor(getIconColor());
-			}
+		textureMesh.setResource(getResourceId());
+		if (textureMesh.isVisible()) {
+			textureMesh.setColor(getIconColor());
 		}
 
-		if (null != textMesh) {
-			textMesh.setColor(getTextColor());
-		}
+		textMesh.setColor(getTextColor());
 
 		layoutShape();
 	}
 
 	protected void setShape(Shape shape) {
-		this.shape = shape;
+		this.bgShape = shape;
 	}
 
 	protected void initRect() {
-		if (null == shape) {
-			shape = new Rectangle(renderGroup, getFillColor(), getStrokeColor());
+		if (null == bgShape) {
+			bgShape = new Rectangle(renderGroup, getFillColor(), getStrokeColor());
 		}
 	}
 
 	protected void initRoundedRect() {
-		if (null == shape) {
-			shape = new RoundedRect(renderGroup, getFillColor(), getStrokeColor());
+		if (null == bgShape) {
+			bgShape = new RoundedRect(renderGroup, getFillColor(), getStrokeColor());
+		}
+	}
+
+	private synchronized void show() {
+		if (null != bgShape) {
+			bgShape.show();
+		}
+		textureMesh.show();
+		textMesh.show();
+
+		for (Shape shape : shapes) {
+			shape.show();
+		}
+		for (View child : children) {
+			child.show();
 		}
 	}
 
 	protected synchronized void hide() {
-		hideTexture();
-		hideShape();
-		hideText();
+		if (null != bgShape) {
+			bgShape.hide();
+		}
+		textureMesh.hide();
+		textMesh.hide();
 
+		for (Shape shape : shapes) {
+			shape.hide();
+		}
 		for (View child : children) {
 			child.hide();
-		}
-	}
-
-	protected synchronized void hideShape() {
-		if (null != shape) {
-			shape.hide();
-			shape = null;
-		}
-	}
-
-	protected synchronized void hideTexture() {
-		if (null != textureMesh) {
-			textureMesh.hide();
-			textureMesh = null;
-		}
-	}
-
-	protected synchronized void hideText() {
-		if (null != textMesh) {
-			textMesh.hide();
-			textMesh = null;
 		}
 	}
 
@@ -501,6 +499,11 @@ public class View implements Comparable<View> {
 		final IconResource currResource = getIconResource();
 		return (null == currResource || null == currResource.iconColor) ? getTextColor()
 				: currResource.iconColor;
+	}
+
+	private final int getResourceId() {
+		final IconResource currResource = getIconResource();
+		return null == currResource ? -1 : currResource.resourceId;
 	}
 
 	private final boolean shouldShrink() {

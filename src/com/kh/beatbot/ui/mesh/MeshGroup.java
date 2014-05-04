@@ -11,8 +11,6 @@ import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.ui.view.View;
 
-import android.util.Log;
-
 public class MeshGroup {
 	public final static int SHORT_BYTES = Short.SIZE / 8, FLOAT_BYTES = Float.SIZE / 8;
 
@@ -89,8 +87,12 @@ public class MeshGroup {
 		gl.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
+	public boolean contains(Mesh mesh) {
+		return children.contains(mesh);
+	}
+
 	public synchronized void add(Mesh mesh) {
-		if (null == mesh || children.contains(mesh)) {
+		if (null == mesh || contains(mesh)) {
 			return;
 		}
 
@@ -101,10 +103,7 @@ public class MeshGroup {
 	}
 
 	public synchronized void remove(Mesh mesh) {
-		if (null == mesh) {
-			return;
-		} else if (!children.contains(mesh)) {
-			Log.e("MeshGroup", "Attempting to remove a mesh that is not a child.");
+		if (null == mesh || !contains(mesh)) {
 			return;
 		}
 

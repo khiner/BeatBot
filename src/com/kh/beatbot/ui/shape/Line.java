@@ -9,7 +9,7 @@ public class Line extends Shape {
 	@Override
 	public synchronized void layout(float x, float y, float width, float height) {
 		super.layout(x, y, width, height);
-		group.setStrokeWeight((int) width);
+		this.strokeMesh.setStrokeWeight((int) width);
 	}
 
 	@Override

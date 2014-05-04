@@ -64,6 +64,20 @@ public class IconResourceSet {
 		}
 	}
 
+	public synchronized void set(IconResourceSet resourceSet) {
+		for (Entry<State, IconResource> resourcePair : resources.entrySet()) {
+			IconResource otherResource = resourceSet.getResource(resourcePair.getKey());
+			IconResource resource = resourcePair.getValue();
+			if (null != resource && null != otherResource) {
+				resource.fillColor = otherResource.fillColor;
+				resource.strokeColor = otherResource.strokeColor;
+				resource.iconColor = otherResource.iconColor;
+				resource.resourceId = otherResource.resourceId;
+				resource.textColor = otherResource.textColor;
+			}
+		}
+	}
+
 	public void setResourceId(IconResourceSet resourceSet) {
 		for (Entry<State, IconResource> resourcePair : resources.entrySet()) {
 			IconResource resource = resourcePair.getValue();

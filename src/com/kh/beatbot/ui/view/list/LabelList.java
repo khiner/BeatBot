@@ -9,7 +9,6 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResource;
 import com.kh.beatbot.ui.icon.IconResourceSet;
-import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.ClickableView;
 import com.kh.beatbot.ui.view.View;
@@ -30,8 +29,8 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 			new IconResource(-1, Color.LABEL_VERY_LIGHT, null, Color.WHITE)),
 
 	emptyIcon = new IconResourceSet(new IconResource(R.drawable.plus_outline, Color.LABEL_DARK,
-			null, Color.WHITE), new IconResource(R.drawable.plus_outline, Color.LABEL_MED, null,
-			Color.WHITE));
+			null, Color.WHITE, Color.WHITE), new IconResource(R.drawable.plus_outline,
+			Color.LABEL_MED, null, Color.WHITE, Color.WHITE));
 
 	protected class Label extends Button {
 		private final static String EMPTY_TEXT = "ADD";
@@ -39,8 +38,7 @@ public class LabelList extends ClickableView implements OnPressListener, OnRelea
 
 		public Label(RenderGroup renderGroup) {
 			super(renderGroup);
-			setResourceId(IconResourceSets.ADD);
-			setFillColors(emptyIcon);
+			setIcon(emptyIcon);
 			setText(EMPTY_TEXT);
 		}
 

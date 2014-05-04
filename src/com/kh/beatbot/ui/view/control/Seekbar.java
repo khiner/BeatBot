@@ -21,6 +21,8 @@ public class Seekbar extends ControlView1dBase {
 		backgroundRect = new RoundedRect(renderGroup, Color.VIEW_BG, null);
 		foregroundRect = new RoundedRect(renderGroup, Color.TRON_BLUE, null);
 		levelCircle = new Circle(renderGroup, Color.TRON_BLUE_TRANS, null);
+		
+		addShapes(backgroundRect, foregroundRect, levelCircle);
 	}
 
 	@Override

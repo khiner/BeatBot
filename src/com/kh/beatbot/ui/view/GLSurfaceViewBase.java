@@ -13,7 +13,7 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
 
 	public static GL11 gl;
 
-	private static final long DESIRED_FPS = 30, TICK_MILLIS = (long) (1000.0f / DESIRED_FPS);
+	private static final long DESIRED_FPS = 45, TICK_MILLIS = (long) (1000.0f / DESIRED_FPS);
 
 	// private final long BEGIN_FRAME = 200;
 	// private long frameCount = 0, averageFrameTime = 0;

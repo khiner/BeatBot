@@ -141,13 +141,4 @@ public class ListView extends TouchableView implements OnPressListener {
 		yOffset = 0;
 		velocity = 0;
 	}
-
-	@Override
-	protected synchronized void hide() {
-		super.hide();
-		if (null != scrollBar) {
-			scrollBar.hide();
-			scrollBar = null;
-		}
-	}
 }
