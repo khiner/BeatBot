@@ -27,8 +27,8 @@ public class Tremolo extends Effect {
 
 	@Override
 	protected void initParams() {
-		params.add(new EffectParam(0, "Rate", "Hz", true, true));
-		params.add(new EffectParam(1, "Phase", "", false, false));
-		params.add(new EffectParam(2, "Depth", "", false, false));
+		params.add(new Param(0, "Rate").withUnits("Hz").logScale().beatSyncable().withLevel(0.5f));
+		params.add(new Param(1, "Phase").withLevel(0.5f));
+		params.add(new Param(2, "Depth").withLevel(0.5f));
 	}
 }

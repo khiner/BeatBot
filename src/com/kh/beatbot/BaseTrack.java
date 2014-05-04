@@ -16,10 +16,9 @@ public class BaseTrack {
 
 	public BaseTrack(final int id) {
 		this.id = id;
-		volumeParam = new Param(0, "Volume", "");
-		panParam = new Param(1, "Pan", "");
-		pitchParam = new Param(2, "Pitch", "");
-		volumeParam.setLevel(.8f); // pan/pitch default to .5
+		volumeParam = new Param(0, "Volume").withLevel(0.8f);
+		panParam = new Param(1, "Pan").withLevel(0.5f);
+		pitchParam = new Param(2, "Pitch").withLevel(0.5f);
 		volumeParam.addListener(new ParamListener() {
 			public void onParamChanged(Param param) {
 				setTrackVolume(getId(), param.level);

@@ -45,9 +45,9 @@ public class Delay extends Effect {
 
 	@Override
 	protected void initParams() {
-		params.add(new EffectParam(0, "Left", "ms", true, true));
-		params.add(new EffectParam(1, "Right", "ms", true, true));
-		params.add(new EffectParam(2, "Feedback", "", false, false));
-		params.add(new EffectParam(3, "Wet", "", false, false));
+		params.add(new Param(0, "Left").withUnits("ms").logScale().beatSyncable().withLevel(0.5f));
+		params.add(new Param(1, "Right").withUnits("ms").logScale().beatSyncable().withLevel(0.5f));
+		params.add(new Param(2, "Feedback").withLevel(0.5f));
+		params.add(new Param(3, "Wet").withLevel(0.5f));
 	}
 }

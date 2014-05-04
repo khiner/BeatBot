@@ -27,7 +27,7 @@ public class Reverb extends Effect {
 
 	@Override
 	protected void initParams() {
-		params.add(new EffectParam(0, "HF DAMP", "", false, false));
-		params.add(new EffectParam(1, "FEEDBACK", "", false, false));
+		params.add(new Param(0, "HF Damp").withLevel(0.5f));
+		params.add(new Param(1, "Feedback").withLevel(0.5f));
 	}
 }

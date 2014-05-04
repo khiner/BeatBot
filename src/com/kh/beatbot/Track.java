@@ -363,15 +363,13 @@ public class Track extends BaseTrack implements FileListener {
 		private Param loopBeginParam, loopEndParam, gainParam;
 
 		public SampleParams(float numSamples) {
-			loopBeginParam = new Param(0, "Begin", "", 0, numSamples);
-			loopBeginParam.setFormat("%.0f");
+			loopBeginParam = new Param(0, "Begin").scale(numSamples).withFormat("%.0f");
 			loopBeginParam.setLevel(0);
 
-			loopEndParam = new Param(1, "End", "", 0, numSamples);
-			loopEndParam.setFormat("%.0f");
+			loopEndParam = new Param(1, "End").scale(numSamples).withFormat("%.0f");
 			loopEndParam.setLevel(1);
 
-			gainParam = new Param(2, "Gain", "", 0, 2);
+			gainParam = new Param(2, "Gain").scale(2);
 			gainParam.setLevel(0.5f);
 
 			gainParam.addListener(this);

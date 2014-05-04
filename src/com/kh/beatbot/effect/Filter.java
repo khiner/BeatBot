@@ -38,11 +38,12 @@ public class Filter extends Effect {
 
 	@Override
 	protected void initParams() {
-		params.add(new EffectParam(0, "Freq", "Hz", true, false));
-		params.add(new EffectParam(1, "Res", "", false, false));
-		params.add(new EffectParam(2, "Mod Rate", "Hz", true, true));
-		params.add(new EffectParam(3, "Mod Amt", "", false, false));
-		params.get(0).scaleValue = PlaybackManager.SAMPLE_RATE / 2;
+		params.add(new Param(0, "Freq").withUnits("Hz").scale(PlaybackManager.SAMPLE_RATE / 2)
+				.logScale().withLevel(0.5f));
+		params.add(new Param(1, "Res").withLevel(0.5f));
+		params.add(new Param(2, "Mod Rate").withUnits("Hz").logScale().beatSyncable()
+				.withLevel(0.5f));
+		params.add(new Param(3, "Mod Amt").withLevel(0.5f));
 		params.get(0).hz = false;
 	}
 }

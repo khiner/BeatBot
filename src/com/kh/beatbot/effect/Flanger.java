@@ -27,11 +27,12 @@ public class Flanger extends Effect {
 
 	@Override
 	protected void initParams() {
-		params.add(new EffectParam(0, "Time", "ms", true, false));
-		params.add(new EffectParam(1, "Feedback", "", false, false));
-		params.add(new EffectParam(2, "Wet", "", false, false));
-		params.add(new EffectParam(3, "Mod Rate", "Hz", true, true));
-		params.add(new EffectParam(4, "Mod Amt", "", false, false));
-		params.add(new EffectParam(5, "Phase", "", false, false));
+		params.add(new Param(0, "Time").withUnits("ms").logScale().withLevel(0.5f));
+		params.add(new Param(1, "Feedback").withLevel(0.5f));
+		params.add(new Param(2, "Wet").withLevel(0.5f));
+		params.add(new Param(3, "Mod Rate").withUnits("Hz").logScale().beatSyncable()
+				.withLevel(0.5f));
+		params.add(new Param(4, "Mod Amt").withLevel(0.5f));
+		params.add(new Param(5, "Phase").withLevel(0.5f));
 	}
 }

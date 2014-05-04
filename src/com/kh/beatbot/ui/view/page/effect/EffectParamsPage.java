@@ -1,7 +1,6 @@
 package com.kh.beatbot.ui.view.page.effect;
 
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.effect.EffectParam;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.listener.ParamToggleListener;
@@ -45,7 +44,8 @@ public class EffectParamsPage extends TouchableView implements ParamListener, Pa
 			return;
 		paramControls = new KnobParamControl[effect.getNumParams()];
 		for (int i = 0; i < paramControls.length; i++) {
-			paramControls[i] = new KnobParamControl(renderGroup, effect.getParam(i).beatSyncable);
+			paramControls[i] = new KnobParamControl(renderGroup, effect.getParam(i)
+					.isBeatSyncable());
 			paramControls[i].setId(i);
 		}
 		addChildren(paramControls);
@@ -82,7 +82,7 @@ public class EffectParamsPage extends TouchableView implements ParamListener, Pa
 	}
 
 	@Override
-	public void onParamToggled(EffectParam param) {
+	public void onParamToggled(Param param) {
 		if (effect.paramsLinked()) {
 			if (param.id == 0) {
 				effect.getParam(1).toggle(param.isBeatSync());

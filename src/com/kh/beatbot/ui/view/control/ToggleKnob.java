@@ -1,6 +1,6 @@
 package com.kh.beatbot.ui.view.control;
 
-import com.kh.beatbot.effect.EffectParam;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.ParamToggleListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -31,7 +31,7 @@ public class ToggleKnob extends Knob implements ParamToggleListener {
 		centerButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				((EffectParam) param).toggle(((ToggleButton) button).isChecked());
+				((Param) param).toggle(((ToggleButton) button).isChecked());
 			}
 		});
 		// not adding center button as child, instead manually drawing and
@@ -75,7 +75,7 @@ public class ToggleKnob extends Knob implements ParamToggleListener {
 	}
 
 	@Override
-	public void onParamToggled(EffectParam param) {
+	public void onParamToggled(Param param) {
 		centerButton.setChecked(param.isBeatSync());
 	}
 }

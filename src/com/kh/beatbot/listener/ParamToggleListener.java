@@ -1,7 +1,8 @@
 package com.kh.beatbot.listener;
 
-import com.kh.beatbot.effect.EffectParam;
+import com.kh.beatbot.effect.Param;
+
 
 public interface ParamToggleListener {
-	public void onParamToggled(EffectParam param);
+	public void onParamToggled(Param param);
 }

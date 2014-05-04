@@ -10,22 +10,13 @@ public class ADSR extends Effect {
 	public static final int EFFECT_NUM = -1, NUM_PARAMS = 6;
 
 	public static final int ATTACK_ID = 0, DECAY_ID = 1, SUSTAIN_ID = 2, RELEASE_ID = 3,
-			START_ID = 4, PEAK_ID = 5;
-
-	public static final int ATTACK_MAX_S = 20, DECAY_MAX_S = 30, RELEASE_MAX_S = 20;
-
-	public static final int LOG_SCALE = 512;
+			START_ID = 4, PEAK_ID = 5, ATTACK_MAX_S = 20, DECAY_MAX_S = 30, RELEASE_MAX_S = 20,
+			LOG_SCALE = 512;
 
 	private int currParamId = ATTACK_ID;
 
 	public ADSR(BaseTrack track) {
 		super(track);
-		setAttack(0);
-		setDecay(1);
-		setSustain(1);
-		setRelease(0);
-		setStart(0);
-		setPeak(1);
 	}
 
 	public void update() {
@@ -47,12 +38,15 @@ public class ADSR extends Effect {
 
 	@Override
 	protected void initParams() {
-		params.add(new EffectParam(0, "Attack", "s", 0, ATTACK_MAX_S, LOG_SCALE, true, false));
-		params.add(new EffectParam(1, "Decay", "s", 0, DECAY_MAX_S, LOG_SCALE, true, false));
-		params.add(new EffectParam(2, "Sustain", "", false, false));
-		params.add(new EffectParam(3, "Release", "s", 0, RELEASE_MAX_S, LOG_SCALE, true, false));
-		params.add(new EffectParam(4, "Start", "", false, false));
-		params.add(new EffectParam(5, "Peak", "", false, false));
+		params.add(new Param(0, "Attack").scale(ATTACK_MAX_S).withUnits("s").logScale(LOG_SCALE)
+				.withLevel(0));
+		params.add(new Param(1, "Decay").scale(DECAY_MAX_S).withUnits("s").logScale(LOG_SCALE)
+				.withLevel(1));
+		params.add(new Param(2, "Sustain").withLevel(1));
+		params.add(new Param(3, "Release").scale(RELEASE_MAX_S).withUnits("s").logScale(LOG_SCALE)
+				.withLevel(0));
+		params.add(new Param(4, "Start").withLevel(0));
+		params.add(new Param(5, "Peak").withLevel(1));
 		position = -1; // native code understands that -1 == ADSR
 	}
 
@@ -60,7 +54,7 @@ public class ADSR extends Effect {
 		currParamId = paramId;
 	}
 
-	public EffectParam getCurrParam() {
+	public Param getCurrParam() {
 		return getParam(currParamId);
 	}
 
