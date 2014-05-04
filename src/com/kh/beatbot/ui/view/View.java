@@ -404,32 +404,31 @@ public class View implements Comparable<View> {
 	}
 
 	protected synchronized void stateChanged() {
-		final IconResource currResource = getIconResource();
-
 		if (null == getFillColor() && null == getStrokeColor()) {
 			destroyShape();
 		} else if (null != shape) {
 			shape.setColors(getFillColor(), getStrokeColor());
 		}
 
+		final IconResource currResource = getIconResource();
+
 		if (null == textureMesh && null != currResource && currResource.resourceId != -1) {
 			textureMesh = new TextureMesh(renderGroup.getTextureGroup());
 		}
 		if (null != textureMesh) {
-			int resourceId = null == currResource ? -1 : currResource.resourceId;
-			if (resourceId == -1) {
+			if (null == currResource || currResource.resourceId == -1) {
 				destroyTexture();
 			} else {
-				textureMesh.setResource(resourceId);
+				textureMesh.setResource(currResource.resourceId);
 				textureMesh.setColor(getIconColor());
 			}
 		}
 
-		layoutShape();
-
 		if (null != textMesh) {
 			textMesh.setColor(getTextColor());
 		}
+
+		layoutShape();
 	}
 
 	protected void setShape(Shape shape) {
