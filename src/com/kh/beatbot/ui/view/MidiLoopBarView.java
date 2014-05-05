@@ -41,7 +41,7 @@ public class MidiLoopBarView extends TouchableView implements LoopChangeListener
 	}
 
 	@Override
-	protected synchronized void layoutChildren() {
+	public synchronized void layoutChildren() {
 		onLoopChange(0, 1);
 	}
 

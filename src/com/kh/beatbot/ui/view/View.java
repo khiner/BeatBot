@@ -262,10 +262,14 @@ public class View implements Comparable<View> {
 			return -1;
 	}
 
+	public int indexOf(View child) {
+		return children.indexOf(child);
+	}
+
 	protected void createChildren() {
 	}
 
-	protected void layoutChildren() {
+	public void layoutChildren() {
 	}
 
 	protected void tick() {

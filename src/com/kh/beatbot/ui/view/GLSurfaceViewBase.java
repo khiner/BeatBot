@@ -46,10 +46,10 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
 		// long startTime = System.nanoTime();
 		deltaTimeMillis += endTimeMillis - startTimeMillis;
 
-		while (deltaTimeMillis >= TICK_MILLIS) {
+//		while (deltaTimeMillis >= TICK_MILLIS) {
 			tick();
-			deltaTimeMillis -= TICK_MILLIS;
-		}
+//			deltaTimeMillis -= TICK_MILLIS;
+//		}
 
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		draw();

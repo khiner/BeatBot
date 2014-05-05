@@ -27,7 +27,7 @@ public abstract class ClickableView extends LongPressableView {
 	protected abstract void doubleTap(int id, Pointer pos);
 
 	@Override
-	public void releaseLongPress() {
+	public synchronized void releaseLongPress() {
 		super.releaseLongPress();
 		lastDownTime = Long.MAX_VALUE;
 	}
@@ -58,5 +58,6 @@ public abstract class ClickableView extends LongPressableView {
 				singleTap(id, pos);
 			}
 		}
+		release();
 	}
 }

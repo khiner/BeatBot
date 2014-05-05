@@ -15,14 +15,14 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremolo;
-import com.kh.beatbot.listener.DraggableLabelListListener;
+import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.view.list.DraggableLabelList;
+import com.kh.beatbot.ui.view.list.LabelList;
 import com.kh.beatbot.ui.view.list.LabelList.LabelState;
 
 public class EffectsPage extends TrackPage {
 
-	class EffectLabelListListener implements DraggableLabelListListener {
+	class EffectLabelListListener implements LabelListListener {
 		private AlertDialog selectEffectAlert = null;
 		private int lastClickedPos = -1;
 
@@ -70,7 +70,7 @@ public class EffectsPage extends TrackPage {
 	protected boolean masterMode = false;
 
 	// effects attrs
-	protected DraggableLabelList effectLabelList;
+	protected LabelList effectLabelList;
 	protected String[] effectNames;
 
 	@Override
@@ -138,7 +138,7 @@ public class EffectsPage extends TrackPage {
 	protected synchronized void createChildren() {
 		effectNames = BeatBotActivity.mainActivity.getResources().getStringArray(
 				R.array.effect_names);
-		effectLabelList = new DraggableLabelList(renderGroup);
+		effectLabelList = new LabelList(renderGroup);
 		effectLabelList.setListener(new EffectLabelListListener(BeatBotActivity.mainActivity));
 
 		for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {

@@ -9,10 +9,13 @@ public class TextureMesh extends Mesh {
 	public TextureMesh(TextureGroup group) {
 		numVertices = Rectangle.NUM_FILL_VERTICES;
 		this.group = group;
-		show();
 	}
 
 	public synchronized void setResource(int resourceId) {
+		if (resourceId == this.resourceId) {
+			show();
+			return;
+		}
 		this.resourceId = resourceId;
 		if (resourceId == -1) {
 			hide();

@@ -66,7 +66,7 @@ public abstract class PageButtonRow extends TouchableView {
 		addChildren(addTrackButton);
 	}
 	
-	protected synchronized void layoutChildren() {
+	public synchronized void layoutChildren() {
 		addTrackButton.layout(this, 0, 0, height, height);
 	}
 }
