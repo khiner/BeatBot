@@ -70,8 +70,6 @@ public class SampleEditView extends ControlView2dBase {
 			addChildren(loopButtons);
 
 			waveformShape.layout(absoluteX, absoluteY, waveformWidth, height);
-
-			updateLoopSelectionVbs();
 			setLevel(0, 1);
 			waveformShape.resample();
 			setText("");
@@ -135,7 +133,6 @@ public class SampleEditView extends ControlView2dBase {
 		} else {
 			setLevel(newLevelOffset, newLevelWidth);
 		}
-		updateLoopSelectionVbs();
 	}
 
 	@Override
@@ -204,6 +201,7 @@ public class SampleEditView extends ControlView2dBase {
 		this.levelOffset = levelOffset;
 		this.levelWidth = levelWidth;
 		updateWaveformVb();
+		updateLoopSelectionVbs();
 	}
 
 	private void setScrollAnchor(int id, Pointer pos) {
@@ -220,7 +218,6 @@ public class SampleEditView extends ControlView2dBase {
 		float newLevelOffset = GeneralUtils.clipTo(scrollAnchorLevel - xToLevel(pos.x)
 				+ levelOffset, 0, 1 - levelWidth);
 		setLevel(newLevelOffset, levelWidth);
-		updateLoopSelectionVbs();
 	}
 
 	@Override
