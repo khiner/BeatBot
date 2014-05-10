@@ -31,7 +31,9 @@ public abstract class Mesh {
 	}
 
 	public void show() {
-		group.add(this);
+		if (!isVisible()) {
+			group.add(this);
+		}
 	}
 
 	public boolean isVisible() {
@@ -82,7 +84,9 @@ public abstract class Mesh {
 	}
 
 	public synchronized void layout(float x, float y, float width, float height) {
-		setDimensions(width, height);
-		setPosition(x, y);
+		if (isVisible()) {
+			setDimensions(width, height);
+			setPosition(x, y);
+		}
 	}
 }

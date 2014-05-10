@@ -31,6 +31,8 @@ public class TextMesh extends Mesh {
 //			return;
 //		}
 
+		if (!isVisible())
+			return;
 		this.x = x;
 		this.y = y;
 		this.height = height;

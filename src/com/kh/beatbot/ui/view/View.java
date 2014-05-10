@@ -330,13 +330,11 @@ public class View implements Comparable<View> {
 			height -= shrink;
 		}
 
-		if (null != bgShape && bgShape.isVisible()) {
+		if (null != bgShape) {
 			bgShape.layout(x, y, width, height);
 		}
 
-		if (textureMesh.isVisible()) {
-			textureMesh.layout(x, y, height, height);
-		}
+		textureMesh.layout(x, y, height, height);
 
 		if (textMesh.isVisible()) {
 			float textHeight = height + BG_OFFSET;
@@ -431,8 +429,7 @@ public class View implements Comparable<View> {
 		if (null != bgShape && null == getFillColor() && null == getStrokeColor()) {
 			bgShape.hide();
 		} else if (null != bgShape) {
-			if (!bgShape.isVisible())
-				bgShape.show();
+			bgShape.show();
 			bgShape.setColors(getFillColor(), getStrokeColor());
 		}
 

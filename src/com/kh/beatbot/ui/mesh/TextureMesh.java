@@ -21,18 +21,20 @@ public class TextureMesh extends Mesh {
 			hide();
 		} else {
 			show();
-			((TextureGroup) group).setResource(this, resourceId);
 		}
 	}
 
 	public void show() {
-		if (resourceId != -1) {
+		if (resourceId != -1 && !isVisible()) {
 			super.show();
+			((TextureGroup) group).setResource(this, resourceId);
 		}
 	}
 
 	@Override
 	public synchronized void layout(float x, float y, float width, float height) {
+		if (!isVisible())
+			return;
 		this.x = x;
 		this.y = y;
 		this.width = width;
