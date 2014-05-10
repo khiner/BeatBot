@@ -91,6 +91,8 @@ public class Button extends LongPressableView {
 
 	@Override
 	public void handleActionMove(int id, Pointer pos) {
+		if (!isEnabled())
+			return;
 		super.handleActionMove(id, pos);
 		checkPointerExit(id, pos);
 	}

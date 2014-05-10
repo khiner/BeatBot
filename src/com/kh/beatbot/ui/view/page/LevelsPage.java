@@ -87,7 +87,7 @@ public class LevelsPage extends TrackPage implements ControlViewListener {
 
 	@Override
 	public void onRelease(ControlViewBase control) {
-		getButton((Seekbar) control).release();
+		getButton((Seekbar) control).disable();
 	}
 
 	private Button getButton(Seekbar seekbar) {

@@ -88,7 +88,19 @@ public class View implements Comparable<View> {
 	}
 
 	public void setEnabled(boolean enabled) {
-		setState(enabled ? State.DEFAULT : State.DISABLED);
+		if (enabled) {
+			enable();
+		} else {
+			disable();
+		}
+	}
+
+	public void enable() {
+		setState(State.DEFAULT);
+	}
+
+	public void disable() {
+		setState(State.DISABLED);
 	}
 
 	public final boolean isEnabled() {
