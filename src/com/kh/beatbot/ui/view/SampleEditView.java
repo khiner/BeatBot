@@ -142,6 +142,8 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	private void updateCurrSample() {
+		if (!hasSample())
+			return;
 		if (null == currSampleRect) {
 			currSampleRect = new Rectangle(renderGroup, Color.TRON_BLUE, null);
 		}
