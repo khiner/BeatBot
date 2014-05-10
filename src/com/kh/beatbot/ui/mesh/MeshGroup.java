@@ -100,6 +100,7 @@ public class MeshGroup {
 
 		children.add(mesh);
 		resetIndices();
+		resetIndices(mesh); // TODO only needed when numChildren == 1 ?
 	}
 
 	public synchronized void remove(Mesh mesh) {
