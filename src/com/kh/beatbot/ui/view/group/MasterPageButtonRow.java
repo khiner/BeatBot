@@ -5,7 +5,6 @@ import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.BpmView;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.ViewPager;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class MasterPageButtonRow extends PageButtonRow {
@@ -15,8 +14,8 @@ public class MasterPageButtonRow extends PageButtonRow {
 	private View bpmLabel;
 	private BpmView bpmView;
 
-	public MasterPageButtonRow(RenderGroup renderGroup, ViewPager pager) {
-		super(renderGroup, pager);
+	public MasterPageButtonRow(RenderGroup renderGroup) {
+		super(renderGroup);
 	}
 
 	public void setBPM(float bpm) {

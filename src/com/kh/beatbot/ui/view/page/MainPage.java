@@ -23,7 +23,7 @@ public class MainPage extends TouchableView {
 		controlButtonGroup = new ControlButtonGroup(renderGroup);
 		midiViewGroup = new MidiViewGroup(renderGroup);
 		pageSelectGroup = new PageSelectGroup(renderGroup);
-		slideMenu = new MainMenu();
+		slideMenu = new MainMenu(null);
 
 		TrackManager.addTrackListener(pageSelectGroup);
 		FileManager.addListener(pageSelectGroup);

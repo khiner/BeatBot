@@ -43,6 +43,7 @@ public class SampleEditView extends ControlView2dBase {
 			if (null == waveformShape) {
 				waveformShape = new WaveformShape(renderGroup, waveformWidth, Color.LABEL_SELECTED,
 						Color.BLACK);
+				addShapes(waveformShape);
 			}
 			for (int i = 0; i < loopButtons.length; i++) {
 				if (null == loopButtons[i]) {
@@ -139,25 +140,23 @@ public class SampleEditView extends ControlView2dBase {
 	public synchronized void createChildren() {
 		setIcon(IconResourceSets.SAMPLE_BG);
 		initRect();
+		currSampleRect = new Rectangle(renderGroup, Color.TRON_BLUE, null);
+		addShapes(currSampleRect);
 	}
 
-	private void updateCurrSample() {
-		if (!hasSample())
-			return;
-		if (null == currSampleRect) {
-			currSampleRect = new Rectangle(renderGroup, Color.TRON_BLUE, null);
-		}
-		float x = levelToX(params[0].getViewLevel(TrackManager.currTrack.getCurrentFrame()));
-		currSampleRect.layout(absoluteX + x, absoluteY, 4, height);
+	@Override
+	public synchronized void layoutChildren() {
+		currSampleRect.layout(absoluteX, absoluteY, 4, height);
 	}
 
 	@Override
 	public void tick() {
-		if (TrackManager.currTrack.isPlaying() || TrackManager.currTrack.isPreviewing()) {
-			updateCurrSample();
-		} else if (null != currSampleRect) {
+		if (hasSample() && (TrackManager.currTrack.isSounding())) {
+			currSampleRect.show();
+			float x = levelToX(params[0].getViewLevel(TrackManager.currTrack.getCurrentFrame()));
+			currSampleRect.setPosition(absoluteX + x, absoluteY);
+		} else {
 			currSampleRect.hide();
-			currSampleRect = null;
 		}
 	}
 

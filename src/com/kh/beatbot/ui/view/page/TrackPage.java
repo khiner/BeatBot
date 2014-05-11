@@ -3,9 +3,14 @@ package com.kh.beatbot.ui.view.page;
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.TrackListener;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 
 public class TrackPage extends TouchableView implements TrackListener {
+
+	public TrackPage(RenderGroup renderGroup) {
+		super(renderGroup);
+	}
 
 	@Override
 	public void onCreate(Track track) {

@@ -17,17 +17,21 @@ public abstract class Mesh {
 	}
 
 	public void setColor(float[] color) {
-		group.setColor(this, color);
+		if (isVisible()) {
+			group.setColor(this, color);
+		}
 	}
 
 	public void setColor(int vertexIndex, float[] color) {
-		group.setColor(this, vertexIndex, color);
+		if (isVisible()) {
+			group.setColor(this, vertexIndex, color);
+		}
 	}
 
 	public void hide() {
-		if (null == group)
-			return;
-		group.remove(this);
+		if (isVisible()) {
+			group.remove(this);
+		}
 	}
 
 	public void show() {
@@ -69,7 +73,9 @@ public abstract class Mesh {
 	}
 
 	private void translate(float x, float y) {
-		group.translate(this, x, y);
+		if (isVisible()) {
+			group.translate(this, x, y);
+		}
 	}
 
 	public void setPosition(float x, float y) {
@@ -84,9 +90,7 @@ public abstract class Mesh {
 	}
 
 	public synchronized void layout(float x, float y, float width, float height) {
-		if (isVisible()) {
-			setDimensions(width, height);
-			setPosition(x, y);
-		}
+		setDimensions(width, height);
+		setPosition(x, y);
 	}
 }

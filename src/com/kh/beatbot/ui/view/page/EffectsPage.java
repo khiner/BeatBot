@@ -17,10 +17,15 @@ import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremolo;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.list.LabelList;
 import com.kh.beatbot.ui.view.list.LabelList.LabelState;
 
 public class EffectsPage extends TrackPage {
+
+	public EffectsPage(RenderGroup renderGroup) {
+		super(renderGroup);
+	}
 
 	class EffectLabelListListener implements LabelListListener {
 		private AlertDialog selectEffectAlert = null;

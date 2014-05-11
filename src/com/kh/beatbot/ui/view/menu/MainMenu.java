@@ -14,6 +14,7 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.Rectangle;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.shape.SlideTab;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
@@ -21,38 +22,6 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.page.MainPage;
 
 public class MainMenu extends Menu implements FileMenuItemListener {
-
-	private class PhysicsState {
-		private Menu menu;
-
-		private final float SPRING_CONST = .6f, DAMP = .57f, STOP_THRESH = 0.001f;
-
-		private float velocity = 0, downXOffset = 0, lastX = 0, goalX = 0;
-		private boolean snap = true;
-
-		public PhysicsState(Menu menu) {
-			this.menu = menu;
-		}
-
-		public void update() {
-			if (!snap)
-				return;
-			velocity += SPRING_CONST * (goalX - menu.x - menu.width);
-			velocity *= DAMP;
-			if (Math.abs(velocity) < STOP_THRESH) {
-				snap = false;
-			}
-		}
-
-		public void snap(float goalX) {
-			snap(goalX, velocity);
-		}
-
-		public void snap(float goalX, float velocity) {
-			this.goalX = velocity >= 0 ? goalX : 0;
-			snap = true;
-		}
-	}
 
 	private MenuItem fileItem, settingsItem, snapToGridItem, midiImportItem, midiExportItem;
 
@@ -65,15 +34,15 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	private Rectangle foregroundRect;
 	private static float[] fillColor = Color.TRANSPARENT.clone();
 
-	protected synchronized void createMenuItems() {
-		physicsState = new PhysicsState(this);
-		tab = new SlideTab(renderGroup, Color.LABEL_SELECTED, null);
-		setShape(tab);
-		setIcon(IconResourceSets.SLIDE_MENU);
+	public MainMenu(RenderGroup renderGroup) {
+		super(renderGroup);
+	}
 
+	protected synchronized void createMenuItems() {
 		fileItem = new MenuItem(this, null, new ToggleButton(renderGroup));
 		settingsItem = new MenuItem(this, null, new ToggleButton(renderGroup));
-		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton(renderGroup).oscillating());
+		snapToGridItem = new MenuItem(this, settingsItem,
+				new ToggleButton(renderGroup).oscillating());
 		midiImportItem = new FileMenuItem(this, fileItem, new File(
 				FileManager.midiDirectory.getPath()));
 		midiExportItem = new MenuItem(this, fileItem, new Button(renderGroup));
@@ -108,6 +77,12 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	@Override
 	public synchronized void createChildren() {
 		foregroundRect = new Rectangle(renderGroup, fillColor, null);
+		addShapes(foregroundRect);
+
+		physicsState = new PhysicsState(this);
+		tab = new SlideTab(renderGroup, Color.LABEL_SELECTED, null);
+		setShape(tab);
+		setIcon(IconResourceSets.SLIDE_MENU);
 
 		super.createChildren();
 
@@ -169,7 +144,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		if (physicsState.snap) {
 			setPosition(x + physicsState.velocity, y);
 		}
-		physicsState.update();		
+		physicsState.update();
 	}
 
 	@Override
@@ -229,5 +204,37 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	@Override
 	public boolean containsPoint(float x, float y) {
 		return super.containsPoint(x, y) || textureMesh.containsPoint(x, y);
+	}
+
+	private class PhysicsState {
+		private Menu menu;
+
+		private final float SPRING_CONST = .6f, DAMP = .57f, STOP_THRESH = 0.001f;
+
+		private float velocity = 0, downXOffset = 0, lastX = 0, goalX = 0;
+		private boolean snap = true;
+
+		public PhysicsState(Menu menu) {
+			this.menu = menu;
+		}
+
+		public void update() {
+			if (!snap)
+				return;
+			velocity += SPRING_CONST * (goalX - menu.x - menu.width);
+			velocity *= DAMP;
+			if (Math.abs(velocity) < STOP_THRESH) {
+				snap = false;
+			}
+		}
+
+		public void snap(float goalX) {
+			snap(goalX, velocity);
+		}
+
+		public void snap(float goalX, float velocity) {
+			this.goalX = velocity >= 0 ? goalX : 0;
+			snap = true;
+		}
 	}
 }

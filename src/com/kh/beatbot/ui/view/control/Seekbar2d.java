@@ -20,6 +20,7 @@ public class Seekbar2d extends ControlView2dBase {
 		initRoundedRect();
 		intersectingLines = new IntersectingLines(renderGroup, null, Color.TRON_BLUE);
 		circle = new Circle(renderGroup, Color.TRON_BLUE, null);
+		addShapes(intersectingLines, circle);
 	}
 
 	public synchronized void layoutChildren() {

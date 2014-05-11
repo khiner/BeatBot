@@ -98,9 +98,6 @@ public class BaseTrack {
 		TrackManager.get().onSelect(this);
 	}
 
-	public void checkInstrumentButton() {
-	}
-
 	public static native void setTrackVolume(int trackId, float volume);
 
 	public static native void setTrackPan(int trackId, float pan);

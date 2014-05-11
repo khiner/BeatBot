@@ -10,19 +10,14 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public abstract class PageButtonRow extends TouchableView {
-
-	protected ViewPager pager;
 	protected ToggleButton[] pageButtons;
 	protected Button currPage, addTrackButton;
 
-	public PageButtonRow(RenderGroup renderGroup, ViewPager pager) {
-		this.pager = pager;
-		shouldDraw = (null == renderGroup);
-		this.renderGroup = shouldDraw ? new RenderGroup() : renderGroup;
-		createChildren();
-	}
-
 	protected abstract int getNumPages();
+
+	public PageButtonRow(RenderGroup renderGroup) {
+		super(renderGroup);
+	}
 
 	@Override
 	protected synchronized void createChildren() {
@@ -34,22 +29,6 @@ public abstract class PageButtonRow extends TouchableView {
 		}
 
 		currPage = pageButtons[0];
-
-		for (ToggleButton pageButton : pageButtons) {
-			pageButton.setOnReleaseListener(new OnReleaseListener() {
-				@Override
-				public void onRelease(Button button) {
-					// deselect all buttons except this one.
-					for (ToggleButton otherToggleButton : pageButtons) {
-						if (!button.equals(otherToggleButton)) {
-							otherToggleButton.setChecked(false);
-						}
-					}
-					currPage = button;
-					pager.setPage(button);
-				}
-			});
-		}
 
 		addTrackButton = new Button(renderGroup);
 		addTrackButton.setIcon(IconResourceSets.LABEL_BASE);
@@ -65,7 +44,25 @@ public abstract class PageButtonRow extends TouchableView {
 		addChildren(pageButtons);
 		addChildren(addTrackButton);
 	}
-	
+
+	public void setPager(final ViewPager pager) {
+		for (ToggleButton pageButton : pageButtons) {
+			pageButton.setOnReleaseListener(new OnReleaseListener() {
+				@Override
+				public void onRelease(Button button) {
+					// deselect all buttons except this one.
+					for (ToggleButton otherToggleButton : pageButtons) {
+						if (!button.equals(otherToggleButton)) {
+							otherToggleButton.setChecked(false);
+						}
+					}
+					currPage = button;
+					pager.setPage(button);
+				}
+			});
+		}
+	}
+
 	public synchronized void layoutChildren() {
 		addTrackButton.layout(this, 0, 0, height, height);
 	}

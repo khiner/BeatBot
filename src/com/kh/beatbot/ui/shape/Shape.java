@@ -52,6 +52,8 @@ public abstract class Shape {
 	}
 
 	protected synchronized void resetIndices() {
+		if (!isVisible())
+			return;
 		if (null != fillMesh)
 			fillMesh.reset();
 		if (null != strokeMesh)
@@ -64,12 +66,14 @@ public abstract class Shape {
 	}
 
 	protected synchronized void setFillColor(int vertexIndex, float[] fillColor) {
-		if (fillMesh != null) {
+		if (fillMesh != null && isVisible()) {
 			fillMesh.setColor(vertexIndex, fillColor);
 		}
 	}
 
 	public synchronized void setFillColor(float[] fillColor) {
+		if (!isVisible())
+			return;
 		this.fillColor = fillColor;
 		if (fillMesh != null) {
 			fillMesh.setColor(fillColor);
@@ -77,6 +81,8 @@ public abstract class Shape {
 	}
 
 	public synchronized void setStrokeColor(float[] strokeColor) {
+		if (!isVisible())
+			return;
 		this.strokeColor = strokeColor;
 		if (null == strokeMesh) {
 			return;
@@ -112,6 +118,8 @@ public abstract class Shape {
 
 	// set "z-index" of this shape to the top of the stack
 	public void bringToTop() {
+		if (!isVisible())
+			return;
 		if (null != fillMesh)
 			fillMesh.push();
 		if (null != strokeMesh)
@@ -119,6 +127,8 @@ public abstract class Shape {
 	}
 
 	public synchronized void setPosition(float x, float y) {
+		if (!isVisible())
+			return;
 		this.x = x;
 		this.y = y;
 		if (fillMesh != null) {
@@ -130,6 +140,8 @@ public abstract class Shape {
 	}
 
 	public synchronized void setDimensions(float width, float height) {
+		if (!isVisible())
+			return;
 		this.width = width;
 		this.height = height;
 		if (null != fillMesh)
@@ -140,11 +152,15 @@ public abstract class Shape {
 	}
 
 	public synchronized void layout(float x, float y, float width, float height) {
+		if (!isVisible())
+			return;
 		setPosition(x, y);
 		setDimensions(width, height);
 	}
 
 	public void hide() {
+		if (!isVisible())
+			return;
 		if (null != fillMesh)
 			fillMesh.hide();
 		if (null != strokeMesh)
@@ -152,6 +168,8 @@ public abstract class Shape {
 	}
 
 	public void show() {
+		if (isVisible())
+			return;
 		if (null != fillMesh)
 			fillMesh.show();
 		if (null != strokeMesh)

@@ -1,9 +1,7 @@
 package com.kh.beatbot.ui.view;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
@@ -41,7 +39,7 @@ public class View implements Comparable<View> {
 
 	protected View parent;
 	protected List<View> children = new ArrayList<View>();
-	protected Set<Shape> shapes = new HashSet<Shape>();
+	protected List<Shape> shapes = new ArrayList<Shape>();
 
 	protected Shape bgShape;
 	protected TextureMesh textureMesh;
@@ -62,7 +60,6 @@ public class View implements Comparable<View> {
 		this.renderGroup = shouldDraw ? new RenderGroup() : renderGroup;
 		textMesh = new TextMesh(this.renderGroup.getTextGroup());
 		textureMesh = new TextureMesh(this.renderGroup.getTextureGroup());
-		hide();
 		createChildren();
 	}
 
@@ -151,7 +148,6 @@ public class View implements Comparable<View> {
 
 		children.add(child);
 		child.show();
-		child.stateChanged();
 	}
 
 	public synchronized void removeChild(View child) {
@@ -175,7 +171,9 @@ public class View implements Comparable<View> {
 
 	public synchronized void addShapes(Shape... shapes) {
 		for (Shape shape : shapes) {
-			this.shapes.add(shape);
+			if (!this.shapes.contains(shape)) {
+				this.shapes.add(shape);
+			}
 		}
 	}
 
@@ -434,9 +432,7 @@ public class View implements Comparable<View> {
 		}
 
 		textureMesh.setResource(getResourceId());
-		if (textureMesh.isVisible()) {
-			textureMesh.setColor(getIconColor());
-		}
+		textureMesh.setColor(getIconColor());
 
 		textMesh.setColor(getTextColor());
 
@@ -459,7 +455,7 @@ public class View implements Comparable<View> {
 		}
 	}
 
-	private synchronized void show() {
+	protected synchronized void show() {
 		if (null != bgShape) {
 			bgShape.show();
 		}
@@ -472,6 +468,7 @@ public class View implements Comparable<View> {
 		for (View child : children) {
 			child.show();
 		}
+		stateChanged();
 	}
 
 	protected synchronized void hide() {

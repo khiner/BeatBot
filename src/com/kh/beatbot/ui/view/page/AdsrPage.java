@@ -7,6 +7,7 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSets;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.AdsrView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
@@ -17,6 +18,10 @@ public class AdsrPage extends TrackPage implements OnReleaseListener {
 	private ToggleButton[] adsrButtons;
 	private AdsrView adsrView;
 	private SeekbarParamControl paramControl;
+
+	public AdsrPage(RenderGroup renderGroup) {
+		super(renderGroup);
+	}
 
 	@Override
 	public void onSelect(BaseTrack track) {

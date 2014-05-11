@@ -81,7 +81,7 @@ public class BeatBotActivity extends Activity {
 		View.mainPage = new MainPage();
 		View.effectPage = new EffectPage();
 
-		activityPager = new ViewPager();
+		activityPager = new ViewPager(null);
 		activityPager.addPage(MAIN_PAGE_ID, View.mainPage);
 		activityPager.addPage(EFFECT_PAGE_ID, View.effectPage);
 		activityPager.setPage(MAIN_PAGE_ID);
