@@ -34,6 +34,7 @@ public class BpmView extends ClickableView {
 			for (int j = 0; j < numberSegments[i].length; j++) {
 				numberSegments[i][j] = new NumberSegment(renderGroup, Color.BPM_OFF, null);
 			}
+			addShapes(numberSegments[i]);
 		}
 	}
 

@@ -6,6 +6,7 @@ import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.SampleEditView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
@@ -17,6 +18,10 @@ public class SampleEditPage extends TrackPage {
 	private Button previewButton;
 	private ToggleButton loopButton, reverseButton;
 	private ParamControl loopBeginControl, loopEndControl, gainControl;
+
+	public SampleEditPage(RenderGroup renderGroup) {
+		super(renderGroup);
+	}
 
 	@Override
 	public void onSelect(BaseTrack track) {

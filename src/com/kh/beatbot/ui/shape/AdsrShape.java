@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.shape;
 
 public class AdsrShape extends Shape {
-	private Circle[] circles = new Circle[4];
+	private final Circle[] circles = new Circle[4];
 
 	public AdsrShape(RenderGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, 0, 10);
@@ -29,10 +29,31 @@ public class AdsrShape extends Shape {
 		}
 	}
 
+	@Override
 	public synchronized void layout(float x, float y, float width, float height) {
 		super.layout(x, y, width, height);
 		for (Circle circle : circles) {
 			circle.setDimensions(width / 30, width / 30);
+		}
+	}
+
+	@Override
+	public void show() {
+		super.show();
+		if (null != circles) {
+			for (Circle circle : circles) {
+				circle.show();
+			}
+		}
+	}
+
+	@Override
+	public void hide() {
+		super.hide();
+		if (null != circles) {
+			for (Circle circle : circles) {
+				circle.hide();
+			}
 		}
 	}
 }

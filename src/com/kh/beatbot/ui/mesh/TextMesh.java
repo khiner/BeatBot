@@ -18,6 +18,8 @@ public class TextMesh extends Mesh {
 		String oldText = this.text;
 		this.text = text;
 
+		if (!isVisible())
+			return;
 		if (null == oldText || oldText.length() != text.length()) {
 			group.changeSize(this, getNumVertices(oldText), getNumVertices(),
 					getNumIndices(oldText), getNumIndices());
@@ -26,11 +28,6 @@ public class TextMesh extends Mesh {
 	}
 
 	public synchronized void layout(float x, float y, float height) {
-//		if (height == this.height) {
-//			setPosition(x, y);
-//			return;
-//		}
-
 		if (!isVisible())
 			return;
 		this.x = x;

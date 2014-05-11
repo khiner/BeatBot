@@ -277,6 +277,10 @@ public class Track extends BaseTrack implements FileListener {
 		return isTrackPlaying(id);
 	}
 
+	public boolean isSounding() {
+		return isPreviewing() || isPlaying();
+	}
+
 	private void update() {
 		updateSampleParams();
 		updateLoopWindow();

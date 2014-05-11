@@ -38,9 +38,7 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 
 	@Override
 	public void onSelect(BaseTrack track) {
-		track.checkInstrumentButton();
-		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
-			Track otherTrack = TrackManager.getTrack(i);
+		for (Track otherTrack : TrackManager.getTracks()) {
 			if (!track.equals(otherTrack)) {
 				otherTrack.getButtonRow().instrumentButton.setChecked(false);
 			}

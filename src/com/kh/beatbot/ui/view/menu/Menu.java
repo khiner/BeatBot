@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.kh.beatbot.listener.FileMenuItemListener;
 import com.kh.beatbot.listener.MenuItemListener;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.ListView;
 import com.kh.beatbot.ui.view.TouchableView;
 
@@ -21,6 +22,10 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 	protected abstract void createMenuItems();
 
 	protected abstract float getWidthForLevel(int level);
+
+	public Menu(RenderGroup renderGroup) {
+		super(renderGroup);
+	}
 
 	public List<MenuItem> getTopLevelItems() {
 		return topLevelItems;
@@ -45,7 +50,7 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 	}
 
 	public synchronized void layoutChildren() {
-		if (columnWidth == 0) {
+		if (columnWidth <= 0) {
 			columnWidth = width;
 		}
 		float yOffset = LABEL_HEIGHT / 3;

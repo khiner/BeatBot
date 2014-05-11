@@ -13,7 +13,7 @@ public class IconResourceSets {
 			SAMPLE_BG = s(r(Color.LABEL_LIGHT), r(Color.LABEL_VERY_LIGHT)),
 			MUTE = s(r(Color.TRANSPARENT, Color.WHITE), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.PAN, Color.BLACK)),
 			SOLO = s(r(Color.TRANSPARENT, Color.WHITE), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.PITCH, Color.BLACK)),
-			BEAT_SYNC = s(r(R.drawable.clock), null, r(R.drawable.note_icon)),
+			BEAT_SYNC = s(r(R.drawable.clock, null, null, null, Color.WHITE), null, r(R.drawable.note_icon, null, null, null, Color.WHITE)),
 			VALUE_LABEL = s(r(Color.LABEL_VERY_LIGHT), r(Color.LABEL_SELECTED), null, r(Color.LABEL_DARK)),
 			PLAY = s(r(R.drawable.play_icon, null, Color.WHITE), r(R.drawable.play_icon_selected, null, Color.WHITE), r(R.drawable.play_icon_selected, null, Color.WHITE)),
 			STOP = s(r(R.drawable.stop_icon, null, Color.WHITE), r(R.drawable.stop_icon, null, Color.LABEL_SELECTED)),

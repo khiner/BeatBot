@@ -6,23 +6,23 @@ import java.util.Map;
 import java.util.Set;
 
 import com.kh.beatbot.listener.PagerListener;
+import com.kh.beatbot.ui.shape.RenderGroup;
 
 public class ViewPager extends TouchableView {
 	private Map<Object, View> pageMap = new HashMap<Object, View>();
 	private Object currPageId;
 	private Set<PagerListener> listeners = new HashSet<PagerListener>();
 
+	public ViewPager(RenderGroup renderGroup) {
+		super(renderGroup);
+	}
+
 	public void addPage(Object key, View page) {
 		pageMap.put(key, page);
-		addChildren(page);
 	}
 
 	public void addListener(PagerListener listener) {
 		listeners.add(listener);
-	}
-
-	public int pageCount() {
-		return children.size();
 	}
 
 	public View getCurrPage() {
@@ -34,32 +34,24 @@ public class ViewPager extends TouchableView {
 	}
 
 	public void setPage(Object key) {
-		if (!pageMap.containsKey(key))
+		if (null == key || key.equals(currPageId) || !pageMap.containsKey(key))
 			return;
-		currPageId = key;
-		for (PagerListener listener : listeners) {
-			listener.onPageChange(this, getCurrPage());
-		}
 
+		removeChild(getCurrPage());
+		currPageId = key;
+		View currPage = getCurrPage();
+		addChild(currPage);
+		layoutChildren();
+		for (PagerListener listener : listeners) {
+			listener.onPageChange(this, currPage);
+		}
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
-		for (View page : children) {
-			page.layout(this, 0, 0, width, height);
-		}
-	}
-
-	@Override
-	public synchronized void drawAll() {
 		View currPage = getCurrPage();
 		if (null != currPage) {
-			currPage.drawAll();
+			currPage.layout(this, 0, 0, width, height);
 		}
-	}
-
-	@Override
-	protected synchronized View findChildAt(float x, float y) {
-		return getCurrPage();
 	}
 }
