@@ -44,18 +44,22 @@ public class FileManager implements FileListener {
 
 		rootDirectory = new File("/");
 		audioDirectory = new File(appDirectoryPath + "/audio");
+		midiDirectory = new File(appDirectoryPath + "/midi");
+		drumsDirectory = new File(audioDirectory.getPath() + "/drums");
+		recordDirectory = new File(audioDirectory.getPath() + "/recorded");
+		beatRecordDirectory = new File(recordDirectory.getPath() + "/beats");
+		sampleRecordDirectory = new File(recordDirectory.getPath() + "/samples");
+
+		drumsDirectory.mkdirs();
+		midiDirectory.mkdirs();
+		beatRecordDirectory.mkdirs();
+		sampleRecordDirectory.mkdirs();
 
 		try {
 			copyAllSamplesToStorage();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		midiDirectory = new File(appDirectoryPath + "/midi");
-		drumsDirectory = new File(audioDirectory.getPath() + "/drums");
-		recordDirectory = new File(audioDirectory.getPath() + "/recorded");
-		beatRecordDirectory = new File(recordDirectory.getPath() + "/beats");
-		sampleRecordDirectory = new File(recordDirectory.getPath() + "/samples");
 	}
 
 	public static void addListener(FileListener listener) {
