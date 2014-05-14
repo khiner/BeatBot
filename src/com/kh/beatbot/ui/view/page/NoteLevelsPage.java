@@ -5,13 +5,13 @@ import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.RenderGroup;
-import com.kh.beatbot.ui.view.LevelsView;
+import com.kh.beatbot.ui.view.NoteLevelsView;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class NoteLevelsPage extends TrackPage {
 
-	private LevelsView levelsView;
+	private NoteLevelsView levelsView;
 	private ToggleButton volumeButton, panButton, pitchButton;
 
 	public NoteLevelsPage(RenderGroup renderGroup) {
@@ -45,7 +45,7 @@ public class NoteLevelsPage extends TrackPage {
 
 	@Override
 	protected synchronized void createChildren() {
-		levelsView = new LevelsView(renderGroup);
+		levelsView = new NoteLevelsView(renderGroup);
 		volumeButton = new ToggleButton(renderGroup);
 		panButton = new ToggleButton(renderGroup);
 		pitchButton = new ToggleButton(renderGroup);

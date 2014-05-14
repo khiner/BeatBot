@@ -12,7 +12,7 @@ import com.kh.beatbot.ui.shape.Circle;
 import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.shape.RenderGroup;
 
-public class LevelsView extends TouchableView {
+public class NoteLevelsView extends TouchableView {
 
 	private static class DragLine {
 		private static float m = 0, b = 0, leftTick = 0, rightTick = Float.MAX_VALUE,
@@ -38,8 +38,7 @@ public class LevelsView extends TouchableView {
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedLevels = new HashMap<Integer, MidiNote>();
 
-	// map Midi Note to the offset of their level relative to the touched
-	// level(s)
+	// map Midi Note to the offset of their level relative to the touched level(s)
 	private Map<MidiNote, Float> levelOffsets = new HashMap<MidiNote, Float>();
 
 	private LevelType currLevelType = LevelType.VOLUME;
@@ -51,7 +50,7 @@ public class LevelsView extends TouchableView {
 
 	private static RenderGroup levelBarGroup = new RenderGroup();
 
-	public LevelsView(RenderGroup renderGroup) {
+	public NoteLevelsView(RenderGroup renderGroup) {
 		super(renderGroup);
 		setClip(true);
 	}
@@ -294,6 +293,7 @@ public class LevelsView extends TouchableView {
 		levelBarRect = new Rectangle(levelBarGroup, Color.TRON_BLUE, null);
 		levelBarCircle = new Circle(levelBarGroup, Color.TRON_BLUE, null);
 		levelBarSelectCircle = new Circle(levelBarGroup, Color.TRON_BLUE, null);
+		addShapes(selectRegionRect);
 	}
 
 	@Override
