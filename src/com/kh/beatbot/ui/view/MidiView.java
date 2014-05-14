@@ -146,11 +146,11 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	public float tickToX(float tick) {
-		return (tick - scrollHelper.xOffset) / scrollHelper.numTicks * width;
+		return (tick - scrollHelper.xOffset) / getNumTicks() * width;
 	}
 
 	public float xToTick(float x) {
-		return scrollHelper.numTicks * x / width + scrollHelper.xOffset;
+		return getNumTicks() * x / width + scrollHelper.xOffset;
 	}
 
 	public int yToNote(float y) {
@@ -178,13 +178,9 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		return scrollHelper.numTicks;
 	}
 
-	public synchronized void init() {
-		setClip(true);
-		shouldDraw = false;
-	}
-
 	@Override
 	public synchronized void createChildren() {
+		setClip(true);
 		leftLoopRect = new Rectangle(MidiViewGroup.scaleGroup, Color.DARK_TRANS, null);
 		rightLoopRect = new Rectangle(MidiViewGroup.scaleGroup, Color.DARK_TRANS, null);
 		selectRegionRect = new Rectangle(MidiViewGroup.translateScaleGroup, Color.TRANSPARENT,
@@ -220,6 +216,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 				}
 			}
 		}
+		onScaleX();
 	}
 
 	@Override
@@ -611,7 +608,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	@Override
 	public void onScaleX() {
 		updateVerticalLineColors();
-		MidiManager.adjustBeatDivision(scrollHelper.numTicks);
+		MidiManager.adjustBeatDivision(getNumTicks());
 	}
 
 	@Override
