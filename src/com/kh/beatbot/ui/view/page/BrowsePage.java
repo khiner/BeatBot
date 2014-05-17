@@ -11,7 +11,6 @@ import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.menu.FileMenuItem;
 import com.kh.beatbot.ui.view.menu.Menu;
@@ -19,8 +18,8 @@ import com.kh.beatbot.ui.view.menu.MenuItem;
 
 public class BrowsePage extends Menu implements TrackListener {
 	
-	public BrowsePage(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public BrowsePage(View view) {
+		super(view);
 	}
 
 	protected synchronized void createMenuItems() {

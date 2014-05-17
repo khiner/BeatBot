@@ -4,7 +4,6 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.listener.LoopChangeListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.group.MidiViewGroup;
 
@@ -15,8 +14,8 @@ public class MidiLoopBarView extends TouchableView implements LoopChangeListener
 
 	private float selectionOffsetTick = 0;
 
-	public MidiLoopBarView(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public MidiLoopBarView(View view) {
+		super(view);
 		MidiManager.addLoopChangeListener(this);
 	}
 

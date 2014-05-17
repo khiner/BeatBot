@@ -16,8 +16,8 @@ public class MidiViewGroup extends TouchableView {
 
 	public static RenderGroup scaleGroup, translateYGroup, translateScaleGroup;
 
-	public MidiViewGroup(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public MidiViewGroup(View view) {
+		super(view);
 		setClip(true);
 	}
 
@@ -32,8 +32,8 @@ public class MidiViewGroup extends TouchableView {
 		translateScaleGroup = new RenderGroup();
 
 		midiTrackView = new MidiTrackView(this, translateYGroup);
-		midiView = new MidiView(this, renderGroup);
-		midiLoopBarView = new MidiLoopBarView(this, renderGroup);
+		midiView = new MidiView(this);
+		midiLoopBarView = new MidiLoopBarView(this);
 
 		TrackManager.addTrackListener(midiView);
 		TrackManager.addTrackListener(midiTrackView);

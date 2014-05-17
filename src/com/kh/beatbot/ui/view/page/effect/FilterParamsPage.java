@@ -5,7 +5,6 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
@@ -15,8 +14,8 @@ public class FilterParamsPage extends EffectParamsPage {
 	private ToggleButton[] filterToggles;
 	private FilterToggleListener filterToggleListener;
 
-	public FilterParamsPage(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public FilterParamsPage(View view) {
+		super(view);
 	}
 
 	@Override
@@ -28,7 +27,7 @@ public class FilterParamsPage extends EffectParamsPage {
 		filterToggles = new ToggleButton[3];
 		filterToggleListener = new FilterToggleListener();
 		for (int i = 0; i < filterToggles.length; i++) {
-			filterToggles[i] = new ToggleButton(this, renderGroup).withIcon(iconForFilterButton(i));
+			filterToggles[i] = new ToggleButton(this).withIcon(iconForFilterButton(i));
 			filterToggles[i].setOnReleaseListener(filterToggleListener);
 		}
 

@@ -45,16 +45,16 @@ public class EffectPage extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		paramsPager = new ViewPager(this, renderGroup);
-		level2d = new Seekbar2d(this, renderGroup);
+		paramsPager = new ViewPager(this);
+		level2d = new Seekbar2d(this);
 
-		chorusPage = new EffectParamsPage(this, renderGroup).withEffect(new Chorus(null));
-		decimatePage = new EffectParamsPage(this, renderGroup).withEffect(new Decimate(null));
-		delayPage = new DelayParamsPage(this, renderGroup).withEffect(new Delay(null));
-		filterPage = new FilterParamsPage(this, renderGroup).withEffect(new Filter(null));
-		flangerPage = new EffectParamsPage(this, renderGroup).withEffect(new Flanger(null));
-		reverbPage = new EffectParamsPage(this, renderGroup).withEffect(new Reverb(null));
-		tremeloPage = new EffectParamsPage(this, renderGroup).withEffect(new Tremolo(null));
+		chorusPage = new EffectParamsPage(this).withEffect(new Chorus(null));
+		decimatePage = new EffectParamsPage(this).withEffect(new Decimate(null));
+		delayPage = new DelayParamsPage(this).withEffect(new Delay(null));
+		filterPage = new FilterParamsPage(this).withEffect(new Filter(null));
+		flangerPage = new EffectParamsPage(this).withEffect(new Flanger(null));
+		reverbPage = new EffectParamsPage(this).withEffect(new Reverb(null));
+		tremeloPage = new EffectParamsPage(this).withEffect(new Tremolo(null));
 
 		paramsPager.addPage(Chorus.NAME, chorusPage);
 		paramsPager.addPage(Decimate.NAME, decimatePage);
@@ -64,8 +64,7 @@ public class EffectPage extends TouchableView {
 		paramsPager.addPage(Reverb.NAME, reverbPage);
 		paramsPager.addPage(Tremolo.NAME, tremeloPage);
 
-		toggleButton = new ToggleButton(this, renderGroup).oscillating().withIcon(
-				IconResourceSets.TOGGLE);
+		toggleButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.TOGGLE);
 		toggleButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {

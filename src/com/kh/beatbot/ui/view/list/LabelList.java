@@ -33,8 +33,8 @@ public class LabelList extends TouchableView {
 	protected static final float GAP_BETWEEN_LABELS = 5, TEXT_Y_OFFSET = 3;
 	protected LabelListListener listener = null;
 
-	public LabelList(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public LabelList(View view) {
+		super(view);
 	}
 
 	public void setListener(LabelListListener listener) {

@@ -4,7 +4,6 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.RoundedRect;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.transition.ColorTransition;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
@@ -21,8 +20,8 @@ public class ListView extends TouchableView implements OnPressListener {
 
 	private Button selectedButton = null;
 
-	public ListView(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public ListView(View view) {
+		super(view);
 	}
 
 	@Override

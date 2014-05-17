@@ -2,7 +2,6 @@ package com.kh.beatbot.ui.view.group;
 
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.BpmView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.ToggleButton;
@@ -14,8 +13,8 @@ public class MasterPageButtonRow extends PageButtonRow {
 	private View bpmLabel;
 	private BpmView bpmView;
 
-	public MasterPageButtonRow(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public MasterPageButtonRow(View view) {
+		super(view);
 	}
 
 	public void setBPM(float bpm) {
@@ -34,8 +33,8 @@ public class MasterPageButtonRow extends PageButtonRow {
 	protected synchronized void createChildren() {
 		super.createChildren();
 
-		bpmLabel = new View(this, renderGroup);
-		bpmView = new BpmView(this, renderGroup);
+		bpmLabel = new View(this);
+		bpmView = new BpmView(this);
 
 		getLevelsButton().setResourceId(IconResourceSets.LEVELS);
 		getEffectsButton().setText("FX");

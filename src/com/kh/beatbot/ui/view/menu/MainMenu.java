@@ -34,18 +34,21 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	private Rectangle foregroundRect;
 	private static float[] fillColor = Color.TRANSPARENT.clone();
 
+	public MainMenu(View view) {
+		super(view);
+	}
+
 	public MainMenu(View view, RenderGroup renderGroup) {
 		super(view, renderGroup);
 	}
 
 	protected synchronized void createMenuItems() {
-		fileItem = new MenuItem(this, null, new ToggleButton(this, renderGroup));
-		settingsItem = new MenuItem(this, null, new ToggleButton(this, renderGroup));
-		snapToGridItem = new MenuItem(this, settingsItem,
-				new ToggleButton(this, renderGroup).oscillating());
+		fileItem = new MenuItem(this, null, new ToggleButton(this));
+		settingsItem = new MenuItem(this, null, new ToggleButton(this));
+		snapToGridItem = new MenuItem(this, settingsItem, new ToggleButton(this).oscillating());
 		midiImportItem = new FileMenuItem(this, fileItem, new File(
 				FileManager.midiDirectory.getPath()));
-		midiExportItem = new MenuItem(this, fileItem, new Button(this, renderGroup));
+		midiExportItem = new MenuItem(this, fileItem, new Button(this));
 
 		topLevelItems.add(fileItem);
 		topLevelItems.add(settingsItem);

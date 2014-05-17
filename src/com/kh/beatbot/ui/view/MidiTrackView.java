@@ -22,7 +22,7 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 
 	@Override
 	public void onCreate(Track track) {
-		TrackButtonRow buttonRow = new TrackButtonRow(this, renderGroup, track);
+		TrackButtonRow buttonRow = new TrackButtonRow(this, track);
 		track.setButtonRow(buttonRow);
 		addChild(buttonRow);
 		layoutChildren();

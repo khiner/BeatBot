@@ -9,7 +9,6 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
@@ -20,21 +19,20 @@ public class ControlButtonGroup extends TouchableView {
 	public ToggleButton playButton, recordButton, copyButton;
 	public Button stopButton, undoButton, redoButton, deleteButton, quantizeButton;
 
-	public ControlButtonGroup(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public ControlButtonGroup(View view) {
+		super(view);
 	}
 
 	@Override
 	protected synchronized void createChildren() {
-		playButton = new ToggleButton(this, renderGroup).withIcon(IconResourceSets.PLAY);
-		stopButton = new Button(this, renderGroup).withIcon(IconResourceSets.STOP);
-		recordButton = new ToggleButton(this, renderGroup).oscillating().withIcon(
-				IconResourceSets.RECORD);
-		copyButton = new ToggleButton(this, renderGroup).withIcon(IconResourceSets.COPY);
-		deleteButton = new Button(this, renderGroup).withIcon(IconResourceSets.DELETE_NOTE);
-		quantizeButton = new Button(this, renderGroup).withIcon(IconResourceSets.QUANTIZE);
-		undoButton = new Button(this, renderGroup).withIcon(IconResourceSets.UNDO);
-		redoButton = new Button(this, renderGroup).withIcon(IconResourceSets.REDO);
+		playButton = new ToggleButton(this).withIcon(IconResourceSets.PLAY);
+		stopButton = new Button(this).withIcon(IconResourceSets.STOP);
+		recordButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.RECORD);
+		copyButton = new ToggleButton(this).withIcon(IconResourceSets.COPY);
+		deleteButton = new Button(this).withIcon(IconResourceSets.DELETE_NOTE);
+		quantizeButton = new Button(this).withIcon(IconResourceSets.QUANTIZE);
+		undoButton = new Button(this).withIcon(IconResourceSets.UNDO);
+		redoButton = new Button(this).withIcon(IconResourceSets.REDO);
 
 		playButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override

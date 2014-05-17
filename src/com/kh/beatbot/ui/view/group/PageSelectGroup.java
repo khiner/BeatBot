@@ -11,7 +11,6 @@ import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.ViewPager;
@@ -41,8 +40,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 	public static TrackPageButtonRow trackButtonRow;
 	public static MasterPageButtonRow masterButtonRow;
 
-	public PageSelectGroup(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public PageSelectGroup(View view) {
+		super(view);
 	}
 
 	public void setBPM(float bpm) {
@@ -63,7 +62,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 
 	@Override
 	protected synchronized void createChildren() {
-		masterButton = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
+		masterButton = new ToggleButton(this).withRoundedRect().withIcon(
 				IconResourceSets.INSTRUMENT_BASE);
 
 		masterButton.setOnReleaseListener(new OnReleaseListener() {
@@ -73,21 +72,21 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 			}
 		});
 
-		buttonRowPager = new ViewPager(this, renderGroup);
-		pager = new ViewPager(this, renderGroup);
+		buttonRowPager = new ViewPager(this);
+		pager = new ViewPager(this);
 
-		trackButtonRow = new TrackPageButtonRow(buttonRowPager, renderGroup);
-		masterButtonRow = new MasterPageButtonRow(buttonRowPager, renderGroup);
+		trackButtonRow = new TrackPageButtonRow(buttonRowPager);
+		masterButtonRow = new MasterPageButtonRow(buttonRowPager);
 		trackButtonRow.setPager(pager);
 		masterButtonRow.setPager(pager);
 
-		levelsPage = new LevelsPage(pager, renderGroup);
-		effectsPage = new EffectsPage(pager, renderGroup);
-		browsePage = new BrowsePage(pager, renderGroup);
+		levelsPage = new LevelsPage(pager);
+		effectsPage = new EffectsPage(pager);
+		browsePage = new BrowsePage(pager);
 		browsePage.setClip(true);
-		editPage = new SampleEditPage(pager, renderGroup);
-		adsrPage = new AdsrPage(pager, renderGroup);
-		noteLevelsPage = new NoteLevelsPage(pager, renderGroup);
+		editPage = new SampleEditPage(pager);
+		adsrPage = new AdsrPage(pager);
+		noteLevelsPage = new NoteLevelsPage(pager);
 
 		pager.addListener(this);
 

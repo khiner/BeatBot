@@ -7,32 +7,6 @@ import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.shape.RenderGroup;
 
 public class TouchableView extends View {
-	public class Pointer {
-		public int id;
-		public float downX, downY;
-		public float x, y;
-
-		public Pointer(int id, float x, float y) {
-			this.id = id;
-			downX = x;
-			downY = y;
-			set(x, y);
-		}
-
-		public void set(float x, float y) {
-			this.x = x;
-			this.y = y;
-		}
-
-		public boolean equals(Pointer another) {
-			if (null == another) {
-				return false;
-			} else {
-				return this.id == another.id;
-			}
-		}
-	}
-
 	// map of pointer ID #'s that this window is responsible for to their current position relative
 	// to this window
 	protected SparseArray<Pointer> pointersById = new SparseArray<Pointer>();
@@ -42,7 +16,7 @@ public class TouchableView extends View {
 	public TouchableView(View view) {
 		super(view);
 	}
-
+	
 	public TouchableView(View view, RenderGroup renderGroup) {
 		super(view, renderGroup);
 	}
@@ -234,6 +208,32 @@ public class TouchableView extends View {
 		} else { // pointer inside button
 			if (!isPressed()) { // pointer was dragged away and back IN to button
 				press();
+			}
+		}
+	}
+
+	public class Pointer {
+		public int id;
+		public float downX, downY;
+		public float x, y;
+
+		public Pointer(int id, float x, float y) {
+			this.id = id;
+			downX = x;
+			downY = y;
+			set(x, y);
+		}
+
+		public void set(float x, float y) {
+			this.x = x;
+			this.y = y;
+		}
+
+		public boolean equals(Pointer another) {
+			if (null == another) {
+				return false;
+			} else {
+				return this.id == another.id;
 			}
 		}
 	}

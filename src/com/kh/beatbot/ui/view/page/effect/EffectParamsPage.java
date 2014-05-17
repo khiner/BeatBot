@@ -4,7 +4,6 @@ import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.listener.ParamToggleListener;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.param.KnobParamControl;
@@ -14,8 +13,8 @@ public class EffectParamsPage extends TouchableView implements ParamListener, Pa
 	protected KnobParamControl[] paramControls;
 	protected Effect effect;
 
-	public EffectParamsPage(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public EffectParamsPage(View view) {
+		super(view);
 	}
 
 	public Effect getEffect() {
@@ -26,8 +25,8 @@ public class EffectParamsPage extends TouchableView implements ParamListener, Pa
 		if (null == this.effect) {
 			paramControls = new KnobParamControl[effect.getNumParams()];
 			for (int i = 0; i < paramControls.length; i++) {
-				paramControls[i] = new KnobParamControl(this, renderGroup).withBeatSync(effect
-						.getParam(i).isBeatSyncable());
+				paramControls[i] = new KnobParamControl(this).withBeatSync(effect.getParam(i)
+						.isBeatSyncable());
 				paramControls[i].setId(i);
 			}
 		}

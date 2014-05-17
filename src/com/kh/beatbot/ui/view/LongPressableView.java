@@ -34,7 +34,7 @@ public abstract class LongPressableView extends TouchableView {
 	protected abstract void longPress(int id, Pointer pos);
 
 	public LongPressableView(View view) {
-		this(view, null);
+		this(view, view.getRenderGroup());
 	}
 
 	public LongPressableView(View view, RenderGroup renderGroup) {

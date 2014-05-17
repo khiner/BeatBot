@@ -3,7 +3,6 @@ package com.kh.beatbot.ui.view;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -11,8 +10,8 @@ public class TrackButtonRow extends TouchableView {
 	public ToggleButton instrumentButton, muteButton, soloButton;
 	private Track track;
 
-	public TrackButtonRow(View view, RenderGroup renderGroup, Track track) {
-		super(view, renderGroup);
+	public TrackButtonRow(View view, Track track) {
+		super(view);
 		this.track = track;
 	}
 
@@ -22,11 +21,11 @@ public class TrackButtonRow extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		instrumentButton = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
+		instrumentButton = new ToggleButton(this).withRoundedRect().withIcon(
 				IconResourceSets.INSTRUMENT_BASE);
-		muteButton = new ToggleButton(this, renderGroup).oscillating().withRoundedRect()
+		muteButton = new ToggleButton(this).oscillating().withRoundedRect()
 				.withIcon(IconResourceSets.MUTE);
-		soloButton = new ToggleButton(this, renderGroup).oscillating().withRoundedRect()
+		soloButton = new ToggleButton(this).oscillating().withRoundedRect()
 				.withIcon(IconResourceSets.SOLO);
 
 		muteButton.setText("M");

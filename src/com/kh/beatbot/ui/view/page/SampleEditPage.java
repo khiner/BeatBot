@@ -6,7 +6,6 @@ import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.SampleEditView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
@@ -20,8 +19,8 @@ public class SampleEditPage extends TrackPage {
 	private ToggleButton loopButton, reverseButton;
 	private ParamControl loopBeginControl, loopEndControl, gainControl;
 
-	public SampleEditPage(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public SampleEditPage(View view) {
+		super(view);
 	}
 
 	@Override
@@ -43,15 +42,13 @@ public class SampleEditPage extends TrackPage {
 	protected synchronized void createChildren() {
 		sampleEdit = new SampleEditView(this, null);
 		sampleEdit.setClip(true);
-		previewButton = new Button(this, renderGroup).withIcon(IconResourceSets.PREVIEW);
-		loopButton = new ToggleButton(this, renderGroup).oscillating().withIcon(
-				IconResourceSets.LOOP);
-		reverseButton = new ToggleButton(this, renderGroup).oscillating().withIcon(
-				IconResourceSets.REVERSE);
+		previewButton = new Button(this).withIcon(IconResourceSets.PREVIEW);
+		loopButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.LOOP);
+		reverseButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.REVERSE);
 
-		loopBeginControl = new ParamControl(this, renderGroup);
-		loopEndControl = new ParamControl(this, renderGroup);
-		gainControl = new ParamControl(this, renderGroup);
+		loopBeginControl = new ParamControl(this);
+		loopEndControl = new ParamControl(this);
+		gainControl = new ParamControl(this);
 
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override

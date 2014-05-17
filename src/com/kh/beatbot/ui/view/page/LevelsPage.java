@@ -5,7 +5,6 @@ import com.kh.beatbot.listener.ControlViewListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
@@ -18,8 +17,8 @@ public class LevelsPage extends TrackPage implements ControlViewListener {
 	protected Button volumeButton, panButton, pitchButton;
 	protected boolean masterMode = false;
 
-	public LevelsPage(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public LevelsPage(View view) {
+		super(view);
 	}
 
 	@Override
@@ -39,16 +38,13 @@ public class LevelsPage extends TrackPage implements ControlViewListener {
 
 	@Override
 	protected synchronized void createChildren() {
-		volumeButton = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
-				IconResourceSets.VOLUME);
-		panButton = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
-				IconResourceSets.PAN);
-		pitchButton = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
-				IconResourceSets.PITCH);
+		volumeButton = new ToggleButton(this).withRoundedRect().withIcon(IconResourceSets.VOLUME);
+		panButton = new ToggleButton(this).withRoundedRect().withIcon(IconResourceSets.PAN);
+		pitchButton = new ToggleButton(this).withRoundedRect().withIcon(IconResourceSets.PITCH);
 
-		volumeLevelBar = new Seekbar(this, renderGroup);
-		panLevelBar = new Seekbar(this, renderGroup);
-		pitchLevelBar = new Seekbar(this, renderGroup);
+		volumeLevelBar = new Seekbar(this);
+		panLevelBar = new Seekbar(this);
+		pitchLevelBar = new Seekbar(this);
 
 		volumeButton.setText("Vol");
 		panButton.setText("Pan");

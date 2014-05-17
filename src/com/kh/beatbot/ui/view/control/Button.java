@@ -13,6 +13,11 @@ public class Button extends LongPressableView {
 	private OnReleaseListener releaseListener;
 	private OnLongPressListener longPressListener;
 
+	public Button(View view) {
+		super(view);
+		setShrinkable(true);
+	}
+
 	public Button(View view, RenderGroup renderGroup) {
 		super(view, renderGroup);
 		setShrinkable(true);

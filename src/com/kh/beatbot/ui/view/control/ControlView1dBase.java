@@ -2,7 +2,6 @@ package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.View;
 
 public abstract class ControlView1dBase extends ControlViewBase implements ParamListener {
@@ -11,8 +10,8 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 
 	protected abstract float posToLevel(Pointer pos);
 
-	public ControlView1dBase(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public ControlView1dBase(View view) {
+		super(view);
 	}
 
 	public synchronized void setParam(Param param) {

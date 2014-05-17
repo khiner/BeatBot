@@ -18,12 +18,16 @@ public abstract class ControlViewBase extends TouchableView {
 
 	protected ControlViewListener listener;
 
-	public void setListener(ControlViewListener listener) {
-		this.listener = listener;
+	public ControlViewBase(View view) {
+		super(view);
 	}
-
+	
 	public ControlViewBase(View view, RenderGroup renderGroup) {
 		super(view, renderGroup);
+	}
+
+	public void setListener(ControlViewListener listener) {
+		this.listener = listener;
 	}
 
 	public void setLevelColor(float[] newLevelColor, float[] newLevelColorTrans) {

@@ -7,7 +7,6 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.AdsrView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
@@ -20,8 +19,8 @@ public class AdsrPage extends TrackPage implements OnReleaseListener {
 	private AdsrView adsrView;
 	private SeekbarParamControl paramControl;
 
-	public AdsrPage(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public AdsrPage(View view) {
+		super(view);
 	}
 
 	@Override
@@ -64,11 +63,11 @@ public class AdsrPage extends TrackPage implements OnReleaseListener {
 
 	@Override
 	protected synchronized void createChildren() {
-		adsrView = new AdsrView(this, renderGroup);
-		paramControl = new SeekbarParamControl(this, renderGroup);
+		adsrView = new AdsrView(this);
+		paramControl = new SeekbarParamControl(this);
 		adsrButtons = new ToggleButton[ADSR.NUM_PARAMS];
 		for (int i = 0; i < adsrButtons.length; i++) {
-			adsrButtons[i] = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
+			adsrButtons[i] = new ToggleButton(this).withRoundedRect().withIcon(
 					whichAdsrIconResource(i));
 			adsrButtons[i].setId(i);
 			adsrButtons[i].setOnReleaseListener(this);

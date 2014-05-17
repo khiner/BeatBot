@@ -4,14 +4,13 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.View;
 
 public class ValueLabel extends ControlView1dBase {
 	private float anchorY = 0, anchorLevel;
 
-	public ValueLabel(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public ValueLabel(View view) {
+		super(view);
 	}
 
 	@Override

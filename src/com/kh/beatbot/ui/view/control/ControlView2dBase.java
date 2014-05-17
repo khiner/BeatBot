@@ -7,6 +7,10 @@ import com.kh.beatbot.ui.view.View;
 
 public abstract class ControlView2dBase extends ControlViewBase implements ParamListener {
 
+	public ControlView2dBase(View view) {
+		super(view);
+	}
+	
 	public ControlView2dBase(View view, RenderGroup renderGroup) {
 		super(view, renderGroup);
 	}

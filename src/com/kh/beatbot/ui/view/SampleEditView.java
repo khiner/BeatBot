@@ -6,8 +6,8 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Color;
-import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
+import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.shape.WaveformShape;
@@ -47,8 +47,7 @@ public class SampleEditView extends ControlView2dBase {
 			}
 			for (int i = 0; i < loopButtons.length; i++) {
 				if (null == loopButtons[i]) {
-					loopButtons[i] = new Button(this, renderGroup)
-							.withIcon(IconResourceSets.SAMPLE_LOOP);
+					loopButtons[i] = new Button(this).withIcon(IconResourceSets.SAMPLE_LOOP);
 					loopButtons[i].setShrinkable(false);
 					loopButtons[i].deselectOnPointerExit = false;
 					loopButtons[i].setOnPressListener(new OnPressListener() {

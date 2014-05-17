@@ -24,6 +24,10 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 
 	protected abstract float getWidthForLevel(int level);
 
+	public Menu(View view) {
+		super(view);
+	}
+
 	public Menu(View view, RenderGroup renderGroup) {
 		super(view, renderGroup);
 	}
@@ -34,7 +38,7 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 
 	public ListView getListAtLevel(final MenuItem item, final int level) {
 		while (level >= menuLists.size()) {
-			ListView menuList = new ListView(this, renderGroup);
+			ListView menuList = new ListView(this);
 			menuLists.add(menuList);
 		}
 

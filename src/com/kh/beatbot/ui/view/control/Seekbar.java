@@ -3,7 +3,6 @@ package com.kh.beatbot.ui.view.control;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.Circle;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.view.View;
 
@@ -13,8 +12,8 @@ public class Seekbar extends ControlView1dBase {
 	private Circle levelCircle;
 	protected float levelBarHeight;
 
-	public Seekbar(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public Seekbar(View view) {
+		super(view);
 	}
 
 	@Override

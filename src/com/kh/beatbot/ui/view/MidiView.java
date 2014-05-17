@@ -17,7 +17,6 @@ import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.Line;
 import com.kh.beatbot.ui.shape.Rectangle;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.group.MidiViewGroup;
 import com.kh.beatbot.ui.view.helper.ScrollHelper;
 import com.kh.beatbot.ui.view.helper.Scrollable;
@@ -48,8 +47,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	protected ScrollHelper scrollHelper;
 
-	public MidiView(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public MidiView(View view) {
+		super(view);
 		scrollHelper = new ScrollHelper(this);
 		MidiManager.addLoopChangeListener(this);
 	}

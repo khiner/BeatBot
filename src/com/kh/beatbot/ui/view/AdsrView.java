@@ -8,7 +8,6 @@ import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.AdsrShape;
-import com.kh.beatbot.ui.shape.RenderGroup;
 
 public class AdsrView extends TouchableView implements ParamListener {
 
@@ -21,8 +20,8 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	private AdsrShape adsrShape;
 
-	public AdsrView(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public AdsrView(View view) {
+		super(view);
 	}
 
 	public synchronized void onSelect(Track track) {

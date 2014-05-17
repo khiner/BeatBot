@@ -5,7 +5,7 @@ import com.kh.beatbot.ui.shape.RenderGroup;
 public abstract class ClickableView extends LongPressableView {
 
 	public ClickableView(View view) {
-		this(view, null);
+		super(view);
 	}
 
 	public ClickableView(View view, RenderGroup renderGroup) {
