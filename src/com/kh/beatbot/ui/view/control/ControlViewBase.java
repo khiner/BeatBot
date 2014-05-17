@@ -4,6 +4,7 @@ import com.kh.beatbot.listener.ControlViewListener;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.View;
 
 public abstract class ControlViewBase extends TouchableView {
 
@@ -21,8 +22,8 @@ public abstract class ControlViewBase extends TouchableView {
 		this.listener = listener;
 	}
 
-	public ControlViewBase(RenderGroup renderGroup) {
-		super(renderGroup);
+	public ControlViewBase(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	public void setLevelColor(float[] newLevelColor, float[] newLevelColorTrans) {

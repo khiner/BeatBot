@@ -16,8 +16,8 @@ import com.kh.beatbot.ui.view.control.ControlView2dBase;
 
 public class SampleEditView extends ControlView2dBase {
 
-	public SampleEditView(RenderGroup renderGroup) {
-		super(renderGroup);
+	public SampleEditView(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	private static final String NO_SAMPLE_MESSAGE = "Tap to load a sample.";
@@ -47,10 +47,10 @@ public class SampleEditView extends ControlView2dBase {
 			}
 			for (int i = 0; i < loopButtons.length; i++) {
 				if (null == loopButtons[i]) {
-					loopButtons[i] = new Button(renderGroup);
+					loopButtons[i] = new Button(this, renderGroup)
+							.withIcon(IconResourceSets.SAMPLE_LOOP);
 					loopButtons[i].setShrinkable(false);
 					loopButtons[i].deselectOnPointerExit = false;
-					loopButtons[i].setIcon(IconResourceSets.SAMPLE_LOOP);
 					loopButtons[i].setOnPressListener(new OnPressListener() {
 						@Override
 						public void onPress(Button button) {
@@ -68,7 +68,6 @@ public class SampleEditView extends ControlView2dBase {
 				}
 				loopButtons[i].setState(loopButtons[i].getState());
 			}
-			addChildren(loopButtons);
 
 			waveformShape.layout(absoluteX, absoluteY, waveformWidth, height);
 			setLevel(0, 1);

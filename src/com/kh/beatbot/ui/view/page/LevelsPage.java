@@ -6,6 +6,7 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.RenderGroup;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
 import com.kh.beatbot.ui.view.control.Seekbar;
@@ -17,8 +18,8 @@ public class LevelsPage extends TrackPage implements ControlViewListener {
 	protected Button volumeButton, panButton, pitchButton;
 	protected boolean masterMode = false;
 
-	public LevelsPage(RenderGroup renderGroup) {
-		super(renderGroup);
+	public LevelsPage(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	@Override
@@ -38,17 +39,16 @@ public class LevelsPage extends TrackPage implements ControlViewListener {
 
 	@Override
 	protected synchronized void createChildren() {
-		volumeButton = new ToggleButton(renderGroup);
-		panButton = new ToggleButton(renderGroup);
-		pitchButton = new ToggleButton(renderGroup);
+		volumeButton = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
+				IconResourceSets.VOLUME);
+		panButton = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
+				IconResourceSets.PAN);
+		pitchButton = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
+				IconResourceSets.PITCH);
 
-		volumeLevelBar = new Seekbar(renderGroup);
-		panLevelBar = new Seekbar(renderGroup);
-		pitchLevelBar = new Seekbar(renderGroup);
-
-		volumeButton.setIcon(IconResourceSets.VOLUME);
-		panButton.setIcon(IconResourceSets.PAN);
-		pitchButton.setIcon(IconResourceSets.PITCH);
+		volumeLevelBar = new Seekbar(this, renderGroup);
+		panLevelBar = new Seekbar(this, renderGroup);
+		pitchLevelBar = new Seekbar(this, renderGroup);
 
 		volumeButton.setText("Vol");
 		panButton.setText("Pan");
@@ -65,9 +65,6 @@ public class LevelsPage extends TrackPage implements ControlViewListener {
 		volumeLevelBar.setListener(this);
 		panLevelBar.setListener(this);
 		pitchLevelBar.setListener(this);
-
-		addChildren(volumeButton, panButton, pitchButton, volumeLevelBar, panLevelBar,
-				pitchLevelBar);
 	}
 
 	@Override

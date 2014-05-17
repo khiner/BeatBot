@@ -19,8 +19,8 @@ public class BpmView extends ClickableView {
 
 	private long lastTapTime = 0;
 
-	public BpmView(RenderGroup renderGroup) {
-		super(renderGroup);
+	public BpmView(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	public void setBPM(float bpm) {

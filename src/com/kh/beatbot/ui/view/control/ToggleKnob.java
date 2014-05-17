@@ -5,6 +5,7 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.ParamToggleListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.RenderGroup;
+import com.kh.beatbot.ui.view.View;
 
 public class ToggleKnob extends Knob implements ParamToggleListener {
 
@@ -12,8 +13,8 @@ public class ToggleKnob extends Knob implements ParamToggleListener {
 	private float snapDistSquared;
 	private boolean centerButtonTouched = false;
 
-	public ToggleKnob(RenderGroup renderGroup) {
-		super(renderGroup);
+	public ToggleKnob(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	@Override
@@ -25,8 +26,7 @@ public class ToggleKnob extends Knob implements ParamToggleListener {
 	@Override
 	public synchronized void createChildren() {
 		super.createChildren();
-		centerButton = new ToggleButton(renderGroup).oscillating();
-		centerButton.setIcon(IconResourceSets.BEAT_SYNC);
+		centerButton = new ToggleButton(this, renderGroup).oscillating().withIcon(IconResourceSets.BEAT_SYNC);
 		centerButton.setChecked(true);
 		centerButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override

@@ -15,8 +15,8 @@ public class MidiLoopBarView extends TouchableView implements LoopChangeListener
 
 	private float selectionOffsetTick = 0;
 
-	public MidiLoopBarView(RenderGroup renderGroup) {
-		super(renderGroup);
+	public MidiLoopBarView(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 		MidiManager.addLoopChangeListener(this);
 	}
 
@@ -25,19 +25,16 @@ public class MidiLoopBarView extends TouchableView implements LoopChangeListener
 		initRect();
 		setIcon(IconResourceSets.MIDI_TICK_BAR);
 
-		loopBarButton = new Button(MidiViewGroup.scaleGroup);
-		loopBeginButton = new Button(MidiViewGroup.scaleGroup);
-		loopEndButton = new Button(MidiViewGroup.scaleGroup);
-		loopBarButton.initRect();
+		loopBarButton = new Button(this, MidiViewGroup.scaleGroup).withRect().withIcon(IconResourceSets.MIDI_LOOP_BAR);
+		loopBeginButton = new Button(this, MidiViewGroup.scaleGroup);
+		loopEndButton = new Button(this, MidiViewGroup.scaleGroup);
+		
 		loopBeginButton.hide();
 		loopEndButton.hide();
 		loopBarButton.deselectOnPointerExit = false;
 		loopBeginButton.deselectOnPointerExit = false;
 		loopEndButton.deselectOnPointerExit = false;
 		loopBarButton.setShrinkable(false);
-		loopBarButton.setIcon(IconResourceSets.MIDI_LOOP_BAR);
-
-		addChildren(loopBarButton, loopBeginButton, loopEndButton);
 	}
 
 	@Override

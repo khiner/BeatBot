@@ -18,13 +18,14 @@ import com.kh.beatbot.effect.Tremolo;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.shape.RenderGroup;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.list.LabelList;
 import com.kh.beatbot.ui.view.list.LabelList.LabelState;
 
 public class EffectsPage extends TrackPage {
 
-	public EffectsPage(RenderGroup renderGroup) {
-		super(renderGroup);
+	public EffectsPage(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	class EffectLabelListListener implements LabelListListener {
@@ -143,14 +144,12 @@ public class EffectsPage extends TrackPage {
 	protected synchronized void createChildren() {
 		effectNames = BeatBotActivity.mainActivity.getResources().getStringArray(
 				R.array.effect_names);
-		effectLabelList = new LabelList(renderGroup);
+		effectLabelList = new LabelList(this, renderGroup);
 		effectLabelList.setListener(new EffectLabelListListener(BeatBotActivity.mainActivity));
 
 		for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {
 			effectLabelList.addLabel("", false);
 		}
-
-		addChildren(effectLabelList);
 	}
 
 	@Override

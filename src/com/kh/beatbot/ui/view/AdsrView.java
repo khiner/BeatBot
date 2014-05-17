@@ -21,8 +21,8 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	private AdsrShape adsrShape;
 
-	public AdsrView(RenderGroup renderGroup) {
-		super(renderGroup);
+	public AdsrView(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	public synchronized void onSelect(Track track) {

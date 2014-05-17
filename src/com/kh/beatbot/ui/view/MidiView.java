@@ -48,8 +48,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	protected ScrollHelper scrollHelper;
 
-	public MidiView(RenderGroup renderGroup) {
-		super(renderGroup);
+	public MidiView(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 		scrollHelper = new ScrollHelper(this);
 		MidiManager.addLoopChangeListener(this);
 	}

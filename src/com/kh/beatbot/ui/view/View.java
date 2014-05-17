@@ -51,16 +51,19 @@ public class View implements Comparable<View> {
 	private IconResourceSet icon = new IconResourceSet(IconResourceSets.DEFAULT);
 	private State state = State.DEFAULT;
 
-	public View() {
-		this(null);
+	public View(View parent) {
+		this(parent, null);
 	}
 
-	public View(RenderGroup renderGroup) {
+	public View(View parent, RenderGroup renderGroup) {
 		shouldDraw = (null == renderGroup);
 		this.renderGroup = shouldDraw ? new RenderGroup() : renderGroup;
 		textMesh = new TextMesh(this.renderGroup.getTextGroup());
 		textureMesh = new TextureMesh(this.renderGroup.getTextureGroup());
 		createChildren();
+		if (null != parent) {
+			parent.addChild(this);
+		}
 	}
 
 	public static GL11 getGl() {
@@ -114,6 +117,11 @@ public class View implements Comparable<View> {
 		return text;
 	}
 
+	public synchronized View withIcon(IconResourceSet resourceSet) {
+		setIcon(resourceSet);
+		return this;
+	}
+
 	public final synchronized void setIcon(IconResourceSet resourceSet) {
 		if (null == resourceSet) {
 			textureMesh.hide();
@@ -155,12 +163,6 @@ public class View implements Comparable<View> {
 			return;
 		child.hide();
 		children.remove(child);
-	}
-
-	public synchronized void addChildren(View... children) {
-		for (View child : children) {
-			addChild(child);
-		}
 	}
 
 	public synchronized void removeChildren(View... children) {
@@ -441,6 +443,16 @@ public class View implements Comparable<View> {
 
 	protected void setShape(Shape shape) {
 		this.bgShape = shape;
+	}
+
+	protected View withRect() {
+		initRect();
+		return this;
+	}
+
+	protected View withRoundedRect() {
+		initRoundedRect();
+		return this;
 	}
 
 	protected void initRect() {

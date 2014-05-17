@@ -14,8 +14,8 @@ public class MasterPageButtonRow extends PageButtonRow {
 	private View bpmLabel;
 	private BpmView bpmView;
 
-	public MasterPageButtonRow(RenderGroup renderGroup) {
-		super(renderGroup);
+	public MasterPageButtonRow(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	public void setBPM(float bpm) {
@@ -34,16 +34,14 @@ public class MasterPageButtonRow extends PageButtonRow {
 	protected synchronized void createChildren() {
 		super.createChildren();
 
-		bpmLabel = new View(renderGroup);
-		bpmView = new BpmView(renderGroup);
+		bpmLabel = new View(this, renderGroup);
+		bpmView = new BpmView(this, renderGroup);
 
 		getLevelsButton().setResourceId(IconResourceSets.LEVELS);
 		getEffectsButton().setText("FX");
 
 		bpmLabel.setText("BPM");
 		setBPM(MidiManager.getBPM());
-
-		addChildren(bpmView, bpmLabel);
 	}
 
 	@Override

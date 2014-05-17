@@ -6,6 +6,7 @@ import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.listener.ParamToggleListener;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.param.KnobParamControl;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
 
@@ -13,18 +14,24 @@ public class EffectParamsPage extends TouchableView implements ParamListener, Pa
 	protected KnobParamControl[] paramControls;
 	protected Effect effect;
 
-	public EffectParamsPage(Effect effect) {
-		renderGroup = new RenderGroup();
-		shouldDraw = true;
-		this.effect = effect;
-		createChildren();
+	public EffectParamsPage(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	public Effect getEffect() {
 		return effect;
 	}
 
-	public void setEffect(Effect effect) {
+	public EffectParamsPage withEffect(Effect effect) {
+		if (null == this.effect) {
+			paramControls = new KnobParamControl[effect.getNumParams()];
+			for (int i = 0; i < paramControls.length; i++) {
+				paramControls[i] = new KnobParamControl(this, renderGroup).withBeatSync(effect
+						.getParam(i).isBeatSyncable());
+				paramControls[i].setId(i);
+			}
+		}
+
 		if (this.effect != null) {
 			for (ParamControl paramControl : paramControls) {
 				effect.getParam(paramControl.getId()).removeListener(this);
@@ -36,21 +43,7 @@ public class EffectParamsPage extends TouchableView implements ParamListener, Pa
 			paramControl.setParam(param);
 			param.addListener(this);
 		}
-	}
-
-	@Override
-	public synchronized void createChildren() {
-		if (effect == null)
-			return;
-		paramControls = new KnobParamControl[effect.getNumParams()];
-		for (int i = 0; i < paramControls.length; i++) {
-			paramControls[i] = new KnobParamControl(renderGroup, effect.getParam(i)
-					.isBeatSyncable());
-			paramControls[i].setId(i);
-		}
-		addChildren(paramControls);
-
-		setEffect(effect);
+		return this;
 	}
 
 	@Override

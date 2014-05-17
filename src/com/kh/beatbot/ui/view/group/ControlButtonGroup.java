@@ -11,6 +11,7 @@ import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -19,29 +20,21 @@ public class ControlButtonGroup extends TouchableView {
 	public ToggleButton playButton, recordButton, copyButton;
 	public Button stopButton, undoButton, redoButton, deleteButton, quantizeButton;
 
-	public ControlButtonGroup(RenderGroup renderGroup) {
-		super(renderGroup);
+	public ControlButtonGroup(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	@Override
 	protected synchronized void createChildren() {
-		playButton = new ToggleButton(renderGroup);
-		stopButton = new Button(renderGroup);
-		recordButton = new ToggleButton(renderGroup).oscillating();
-		copyButton = new ToggleButton(renderGroup);
-		deleteButton = new Button(renderGroup);
-		quantizeButton = new Button(renderGroup);
-		undoButton = new Button(renderGroup);
-		redoButton = new Button(renderGroup);
-
-		playButton.setIcon(IconResourceSets.PLAY);
-		stopButton.setIcon(IconResourceSets.STOP);
-		recordButton.setIcon(IconResourceSets.RECORD);
-		copyButton.setIcon(IconResourceSets.COPY);
-		deleteButton.setIcon(IconResourceSets.DELETE_NOTE);
-		quantizeButton.setIcon(IconResourceSets.QUANTIZE);
-		undoButton.setIcon(IconResourceSets.UNDO);
-		redoButton.setIcon(IconResourceSets.REDO);
+		playButton = new ToggleButton(this, renderGroup).withIcon(IconResourceSets.PLAY);
+		stopButton = new Button(this, renderGroup).withIcon(IconResourceSets.STOP);
+		recordButton = new ToggleButton(this, renderGroup).oscillating().withIcon(
+				IconResourceSets.RECORD);
+		copyButton = new ToggleButton(this, renderGroup).withIcon(IconResourceSets.COPY);
+		deleteButton = new Button(this, renderGroup).withIcon(IconResourceSets.DELETE_NOTE);
+		quantizeButton = new Button(this, renderGroup).withIcon(IconResourceSets.QUANTIZE);
+		undoButton = new Button(this, renderGroup).withIcon(IconResourceSets.UNDO);
+		redoButton = new Button(this, renderGroup).withIcon(IconResourceSets.REDO);
 
 		playButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
@@ -128,9 +121,6 @@ public class ControlButtonGroup extends TouchableView {
 										// 1/8, 1/16, 1/32)
 			}
 		});
-
-		addChildren(playButton, stopButton, recordButton, copyButton, deleteButton, quantizeButton,
-				undoButton, redoButton);
 
 		setEditIconsEnabled(false);
 		notifyMidiChange();

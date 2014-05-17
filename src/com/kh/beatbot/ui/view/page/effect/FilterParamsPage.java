@@ -1,51 +1,39 @@
 package com.kh.beatbot.ui.view.page.effect;
 
+import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSets;
+import com.kh.beatbot.ui.shape.RenderGroup;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class FilterParamsPage extends EffectParamsPage {
 
-	public FilterParamsPage(Filter filter) {
-		super(filter);
-	}
-
-	private class FilterToggleListener implements OnReleaseListener {
-		@Override
-		public void onRelease(Button button) {
-			for (int i = 0; i < filterToggles.length; i++) {
-				if (button.equals(filterToggles[i])) {
-					((Filter) effect).setMode(i);
-				} else {
-					filterToggles[i].setChecked(false);
-				}
-			}
-		}
-	}
-
 	private ToggleButton[] filterToggles;
 	private FilterToggleListener filterToggleListener;
 
+	public FilterParamsPage(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
+	}
+
 	@Override
-	public synchronized void createChildren() {
-		if (effect == null)
-			return;
-		super.createChildren();
+	public EffectParamsPage withEffect(final Effect effect) {
+		super.withEffect(effect);
+
+		if (null != filterToggles)
+			return this;
 		filterToggles = new ToggleButton[3];
 		filterToggleListener = new FilterToggleListener();
 		for (int i = 0; i < filterToggles.length; i++) {
-			filterToggles[i] = new ToggleButton(renderGroup);
+			filterToggles[i] = new ToggleButton(this, renderGroup).withIcon(iconForFilterButton(i));
 			filterToggles[i].setOnReleaseListener(filterToggleListener);
 		}
 
-		filterToggles[0].setIcon(IconResourceSets.LOWPASS_FILTER);
-		filterToggles[1].setIcon(IconResourceSets.BANDPASS_FILTER);
-		filterToggles[2].setIcon(IconResourceSets.HIGHPASS_FILTER);
 		filterToggles[0].setChecked(true);
-
-		addChildren(filterToggles);
+		return this;
 	}
 
 	public synchronized void layoutChildren() {
@@ -64,5 +52,31 @@ public class FilterParamsPage extends EffectParamsPage {
 		paramControls[1].layout(this, width / 2 + 10, paramY, paramW, paramH);
 		paramControls[2].layout(this, width / 2 - paramW - 10, paramY + paramH, paramW, paramH);
 		paramControls[3].layout(this, width / 2 + 10, paramY + paramH, paramW, paramH);
+	}
+
+	private class FilterToggleListener implements OnReleaseListener {
+		@Override
+		public void onRelease(Button button) {
+			for (int i = 0; i < filterToggles.length; i++) {
+				if (button.equals(filterToggles[i])) {
+					((Filter) effect).setMode(i);
+				} else {
+					filterToggles[i].setChecked(false);
+				}
+			}
+		}
+	}
+
+	private IconResourceSet iconForFilterButton(int i) {
+		switch (i) {
+		case 0:
+			return IconResourceSets.LOWPASS_FILTER;
+		case 1:
+			return IconResourceSets.BANDPASS_FILTER;
+		case 2:
+			return IconResourceSets.HIGHPASS_FILTER;
+		default:
+			return null;
+		}
 	}
 }

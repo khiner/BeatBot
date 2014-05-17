@@ -33,8 +33,8 @@ public class LabelList extends TouchableView {
 	protected static final float GAP_BETWEEN_LABELS = 5, TEXT_Y_OFFSET = 3;
 	protected LabelListListener listener = null;
 
-	public LabelList(RenderGroup renderGroup) {
-		super(renderGroup);
+	public LabelList(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	public void setListener(LabelListListener listener) {
@@ -53,7 +53,7 @@ public class LabelList extends TouchableView {
 	}
 
 	public Label addLabel(String text, boolean on) {
-		Label newLabel = new Label(null);
+		Label newLabel = new Label(this, null);
 		// need onPressListener as well as the onReleaseListener to notify
 		// when a label becomes touched
 		addChild(newLabel);
@@ -115,8 +115,8 @@ public class LabelList extends TouchableView {
 
 		private float originalX = 0;
 
-		public Label(RenderGroup renderGroup) {
-			super(renderGroup);
+		public Label(View view, RenderGroup renderGroup) {
+			super(view, renderGroup);
 			initRoundedRect();
 			setIcon(emptyIcon);
 			setText(EMPTY_TEXT);

@@ -9,6 +9,7 @@ import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.AdsrView;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.SeekbarParamControl;
@@ -19,8 +20,8 @@ public class AdsrPage extends TrackPage implements OnReleaseListener {
 	private AdsrView adsrView;
 	private SeekbarParamControl paramControl;
 
-	public AdsrPage(RenderGroup renderGroup) {
-		super(renderGroup);
+	public AdsrPage(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	@Override
@@ -57,34 +58,24 @@ public class AdsrPage extends TrackPage implements OnReleaseListener {
 		case ADSR.RELEASE_ID:
 			return IconResourceSets.RELEASE;
 		default:
-			return null;
+			return IconResourceSets.INSTRUMENT_BASE;
 		}
 	}
 
 	@Override
 	protected synchronized void createChildren() {
-		adsrView = new AdsrView(renderGroup);
-		paramControl = new SeekbarParamControl(renderGroup);
+		adsrView = new AdsrView(this, renderGroup);
+		paramControl = new SeekbarParamControl(this, renderGroup);
 		adsrButtons = new ToggleButton[ADSR.NUM_PARAMS];
 		for (int i = 0; i < adsrButtons.length; i++) {
-			adsrButtons[i] = new ToggleButton(renderGroup);
+			adsrButtons[i] = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
+					whichAdsrIconResource(i));
 			adsrButtons[i].setId(i);
 			adsrButtons[i].setOnReleaseListener(this);
 		}
 
-		for (int i = 0; i < adsrButtons.length; i++) {
-			if (i < adsrButtons.length - 2) {
-				adsrButtons[i].setIcon(whichAdsrIconResource(i));
-			} else {
-				adsrButtons[i].setIcon(IconResourceSets.INSTRUMENT_BASE);
-			}
-		}
-
 		adsrButtons[ADSR.START_ID].setText("S");
 		adsrButtons[ADSR.PEAK_ID].setText("P");
-
-		addChildren(adsrView, paramControl);
-		addChildren(adsrButtons);
 	}
 
 	@Override

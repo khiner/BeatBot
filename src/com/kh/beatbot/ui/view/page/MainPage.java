@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.group.ControlButtonGroup;
@@ -10,7 +11,6 @@ import com.kh.beatbot.ui.view.group.PageSelectGroup;
 import com.kh.beatbot.ui.view.menu.MainMenu;
 
 public class MainPage extends TouchableView {
-
 	public ControlButtonGroup controlButtonGroup;
 	public MidiViewGroup midiViewGroup;
 	public PageSelectGroup pageSelectGroup;
@@ -18,17 +18,19 @@ public class MainPage extends TouchableView {
 
 	public static float controlButtonHeight = 0;
 
+	public MainPage(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
+	}
+
 	@Override
 	protected synchronized void createChildren() {
-		controlButtonGroup = new ControlButtonGroup(renderGroup);
-		midiViewGroup = new MidiViewGroup(renderGroup);
-		pageSelectGroup = new PageSelectGroup(renderGroup);
-		slideMenu = new MainMenu(null);
+		controlButtonGroup = new ControlButtonGroup(this, renderGroup);
+		midiViewGroup = new MidiViewGroup(this, renderGroup);
+		pageSelectGroup = new PageSelectGroup(this, renderGroup);
+		slideMenu = new MainMenu(this, null);
 
 		TrackManager.addTrackListener(pageSelectGroup);
 		FileManager.addListener(pageSelectGroup);
-
-		addChildren(controlButtonGroup, midiViewGroup, pageSelectGroup, slideMenu);
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.RenderGroup;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -16,8 +17,8 @@ public class TrackPageButtonRow extends PageButtonRow {
 
 	private Button deleteTrackButton;
 
-	public TrackPageButtonRow(RenderGroup renderGroup) {
-		super(renderGroup);
+	public TrackPageButtonRow(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	public ToggleButton getBrowseButton() {
@@ -59,7 +60,7 @@ public class TrackPageButtonRow extends PageButtonRow {
 	protected synchronized void createChildren() {
 		super.createChildren();
 
-		deleteTrackButton = new Button(renderGroup);
+		deleteTrackButton = new Button(this, renderGroup).withRoundedRect().withIcon(IconResourceSets.DELETE_TRACK);
 
 		deleteTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
@@ -68,15 +69,11 @@ public class TrackPageButtonRow extends PageButtonRow {
 			}
 		});
 
-		deleteTrackButton.setIcon(IconResourceSets.DELETE_TRACK);
-		
 		getEditButton().setResourceId(IconResourceSets.SAMPLE);
 		getNoteLevelsButton().setResourceId(IconResourceSets.NOTE_LEVELS);
 		getLevelsButton().setResourceId(IconResourceSets.LEVELS);
 		getAdsrButton().setResourceId(IconResourceSets.ADSR);
 		getEffectsButton().setText("FX");
-
-		addChildren(deleteTrackButton);
 	}
 
 	@Override

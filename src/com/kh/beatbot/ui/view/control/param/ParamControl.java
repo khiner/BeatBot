@@ -10,20 +10,19 @@ public class ParamControl extends TouchableView {
 	protected View label;
 	protected ValueLabel valueLabel;
 
-	public ParamControl() {
-		super();
+	public ParamControl(View view) {
+		super(view);
 	}
 
-	public ParamControl(RenderGroup renderGroup) {
-		super(renderGroup);
+	public ParamControl(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	@Override
 	public synchronized void createChildren() {
-		valueLabel = new ValueLabel(renderGroup);
+		valueLabel = new ValueLabel(this, renderGroup);
 		valueLabel.setShrinkable(true);
-		label = new View(renderGroup);
-		addChildren(valueLabel, label);
+		label = new View(this, renderGroup);
 	}
 
 	@Override

@@ -13,8 +13,8 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
 	private File file;
 
 	public FileMenuItem(Menu menu, MenuItem parent, File file) {
-		super(menu, parent, file.isDirectory() ? new ToggleButton(menu.getRenderGroup())
-				: new Button(menu.getRenderGroup()));
+		super(menu, parent, file.isDirectory() ? new ToggleButton(menu, menu.getRenderGroup())
+				: new Button(menu, menu.getRenderGroup()));
 		this.file = file;
 		if (file.isFile()) {
 			button.setOnLongPressListener(this);

@@ -13,8 +13,8 @@ public class ViewPager extends TouchableView {
 	private Object currPageId;
 	private Set<PagerListener> listeners = new HashSet<PagerListener>();
 
-	public ViewPager(RenderGroup renderGroup) {
-		super(renderGroup);
+	public ViewPager(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	public void addPage(Object key, View page) {
@@ -52,6 +52,13 @@ public class ViewPager extends TouchableView {
 		View currPage = getCurrPage();
 		if (null != currPage) {
 			currPage.layout(this, 0, 0, width, height);
+		}
+	}
+	
+	@Override
+	public synchronized void addChild(View child) {
+		if (pageMap.containsValue(child)) {
+			super.addChild(child);
 		}
 	}
 }

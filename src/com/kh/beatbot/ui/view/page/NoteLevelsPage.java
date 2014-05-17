@@ -6,6 +6,7 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.NoteLevelsView;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -14,8 +15,8 @@ public class NoteLevelsPage extends TrackPage {
 	private NoteLevelsView levelsView;
 	private ToggleButton volumeButton, panButton, pitchButton;
 
-	public NoteLevelsPage(RenderGroup renderGroup) {
-		super(renderGroup);
+	public NoteLevelsPage(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	@Override
@@ -45,14 +46,13 @@ public class NoteLevelsPage extends TrackPage {
 
 	@Override
 	protected synchronized void createChildren() {
-		levelsView = new NoteLevelsView(renderGroup);
-		volumeButton = new ToggleButton(renderGroup);
-		panButton = new ToggleButton(renderGroup);
-		pitchButton = new ToggleButton(renderGroup);
-
-		volumeButton.setIcon(IconResourceSets.VOLUME);
-		panButton.setIcon(IconResourceSets.PAN);
-		pitchButton.setIcon(IconResourceSets.PITCH);
+		levelsView = new NoteLevelsView(this, renderGroup);
+		volumeButton = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
+				IconResourceSets.VOLUME);
+		panButton = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
+				IconResourceSets.PAN);
+		pitchButton = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
+				IconResourceSets.PITCH);
 
 		volumeButton.setText("Vol");
 		panButton.setText("Pan");
@@ -76,7 +76,6 @@ public class NoteLevelsPage extends TrackPage {
 				onSelect(null);
 			}
 		});
-		addChildren(levelsView, volumeButton, panButton, pitchButton);
 	}
 
 	@Override

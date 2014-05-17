@@ -41,8 +41,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 	public static TrackPageButtonRow trackButtonRow;
 	public static MasterPageButtonRow masterButtonRow;
 
-	public PageSelectGroup(RenderGroup renderGroup) {
-		super(renderGroup);
+	public PageSelectGroup(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	public void setBPM(float bpm) {
@@ -63,7 +63,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 
 	@Override
 	protected synchronized void createChildren() {
-		masterButton = new ToggleButton(renderGroup);
+		masterButton = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
+				IconResourceSets.INSTRUMENT_BASE);
 
 		masterButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
@@ -72,23 +73,23 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 			}
 		});
 
-		levelsPage = new LevelsPage(renderGroup);
-		effectsPage = new EffectsPage(renderGroup);
-		browsePage = new BrowsePage(renderGroup);
-		browsePage.setClip(true);
-		editPage = new SampleEditPage(renderGroup);
-		adsrPage = new AdsrPage(renderGroup);
-		noteLevelsPage = new NoteLevelsPage(renderGroup);
+		buttonRowPager = new ViewPager(this, renderGroup);
+		pager = new ViewPager(this, renderGroup);
 
-		pager = new ViewPager(renderGroup);
-		pager.addListener(this);
-		buttonRowPager = new ViewPager(renderGroup);
-
-		trackButtonRow = new TrackPageButtonRow(renderGroup);
-		masterButtonRow = new MasterPageButtonRow(renderGroup);
-
+		trackButtonRow = new TrackPageButtonRow(buttonRowPager, renderGroup);
+		masterButtonRow = new MasterPageButtonRow(buttonRowPager, renderGroup);
 		trackButtonRow.setPager(pager);
 		masterButtonRow.setPager(pager);
+
+		levelsPage = new LevelsPage(pager, renderGroup);
+		effectsPage = new EffectsPage(pager, renderGroup);
+		browsePage = new BrowsePage(pager, renderGroup);
+		browsePage.setClip(true);
+		editPage = new SampleEditPage(pager, renderGroup);
+		adsrPage = new AdsrPage(pager, renderGroup);
+		noteLevelsPage = new NoteLevelsPage(pager, renderGroup);
+
+		pager.addListener(this);
 
 		buttonRowPager.addPage(masterButton, masterButtonRow);
 		buttonRowPager.addPage(TRACK_PAGE_ID, trackButtonRow);
@@ -103,10 +104,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 		pager.addPage(masterButtonRow.getLevelsButton(), levelsPage);
 		pager.addPage(masterButtonRow.getEffectsButton(), effectsPage);
 
-		masterButton.setIcon(IconResourceSets.INSTRUMENT_BASE);
 		masterButton.setText("Master");
-
-		addChildren(masterButton, pager, buttonRowPager);
 	}
 
 	@Override
@@ -166,7 +164,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 		}
 		trackButtonRow.getBrowseButton().trigger();
 	}
-	
+
 	@Override
 	public void onPageChange(ViewPager pager, View newPage) {
 		((TrackListener) newPage).onSelect(TrackManager.currTrack);

@@ -5,11 +5,12 @@ import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.View;
 
 public class TrackPage extends TouchableView implements TrackListener {
 
-	public TrackPage(RenderGroup renderGroup) {
-		super(renderGroup);
+	public TrackPage(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	@Override

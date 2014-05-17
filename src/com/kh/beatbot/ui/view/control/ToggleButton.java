@@ -1,13 +1,15 @@
 package com.kh.beatbot.ui.view.control;
 
+import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.shape.RenderGroup;
+import com.kh.beatbot.ui.view.View;
 
 public class ToggleButton extends Button {
 	private boolean oscillating = false, checked = false;
 
-	public ToggleButton(RenderGroup renderGroup) {
-		super(renderGroup);
+	public ToggleButton(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	public ToggleButton oscillating() {
@@ -44,5 +46,20 @@ public class ToggleButton extends Button {
 	public void release() {
 		releaseLongPress();
 		setChecked(checked);
+	}
+
+	@Override
+	public synchronized ToggleButton withIcon(IconResourceSet resourceSet) {
+		return (ToggleButton) super.withIcon(resourceSet);
+	}
+
+	@Override
+	public synchronized ToggleButton withRect() {
+		return (ToggleButton) super.withRect();
+	}
+	
+	@Override
+	public synchronized ToggleButton withRoundedRect() {
+		return (ToggleButton) super.withRoundedRect();
 	}
 }

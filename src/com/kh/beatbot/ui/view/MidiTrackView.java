@@ -7,8 +7,8 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.shape.RenderGroup;
 
 public class MidiTrackView extends TouchableView implements TrackListener {
-	public MidiTrackView(RenderGroup renderGroup) {
-		super(renderGroup);
+	public MidiTrackView(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 
 	@Override
 	public void onCreate(Track track) {
-		TrackButtonRow buttonRow = new TrackButtonRow(renderGroup, track);
+		TrackButtonRow buttonRow = new TrackButtonRow(this, renderGroup, track);
 		track.setButtonRow(buttonRow);
 		addChild(buttonRow);
 		layoutChildren();

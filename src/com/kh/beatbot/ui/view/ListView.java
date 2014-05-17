@@ -21,8 +21,8 @@ public class ListView extends TouchableView implements OnPressListener {
 
 	private Button selectedButton = null;
 
-	public ListView(RenderGroup renderGroup) {
-		super(renderGroup);
+	public ListView(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	@Override

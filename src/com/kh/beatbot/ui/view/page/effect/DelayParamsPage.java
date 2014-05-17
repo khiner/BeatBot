@@ -4,6 +4,8 @@ import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
+import com.kh.beatbot.ui.shape.RenderGroup;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -11,17 +13,19 @@ public class DelayParamsPage extends EffectParamsPage {
 
 	private ToggleButton linkToggle;
 
-	public DelayParamsPage(Delay delay) {
-		super(delay);
+	public DelayParamsPage(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	@Override
-	public synchronized void createChildren() {
-		if (effect == null)
-			return;
-		super.createChildren();
-		linkToggle = new ToggleButton(renderGroup).oscillating();
-		linkToggle.setIcon(IconResourceSets.LINK);
+	public DelayParamsPage withEffect(final Effect effect) {
+		super.withEffect(effect);
+
+		if (null == linkToggle) {
+			linkToggle = new ToggleButton(this, renderGroup).oscillating().withIcon(
+					IconResourceSets.LINK);
+		}
+
 		linkToggle.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
@@ -45,14 +49,7 @@ public class DelayParamsPage extends EffectParamsPage {
 			}
 		});
 		linkToggle.setChecked(effect.paramsLinked());
-		addChild(linkToggle);
-	}
-
-	@Override
-	public void setEffect(Effect effect) {
-		super.setEffect(effect);
-		if (linkToggle != null)
-			linkToggle.setChecked(effect.paramsLinked());
+		return this;
 	}
 
 	public synchronized void layoutChildren() {

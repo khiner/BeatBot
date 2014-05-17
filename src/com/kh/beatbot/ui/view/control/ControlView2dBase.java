@@ -3,11 +3,12 @@ package com.kh.beatbot.ui.view.control;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.ui.shape.RenderGroup;
+import com.kh.beatbot.ui.view.View;
 
 public abstract class ControlView2dBase extends ControlViewBase implements ParamListener {
 
-	public ControlView2dBase(RenderGroup renderGroup) {
-		super(renderGroup);
+	public ControlView2dBase(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	protected Param[] params = new Param[2];

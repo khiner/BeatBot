@@ -11,8 +11,8 @@ public class TrackButtonRow extends TouchableView {
 	public ToggleButton instrumentButton, muteButton, soloButton;
 	private Track track;
 
-	public TrackButtonRow(RenderGroup renderGroup, Track track) {
-		super(renderGroup);
+	public TrackButtonRow(View view, RenderGroup renderGroup, Track track) {
+		super(view, renderGroup);
 		this.track = track;
 	}
 
@@ -22,13 +22,13 @@ public class TrackButtonRow extends TouchableView {
 
 	@Override
 	protected synchronized void createChildren() {
-		instrumentButton = new ToggleButton(renderGroup);
-		muteButton = new ToggleButton(renderGroup).oscillating();
-		soloButton = new ToggleButton(renderGroup).oscillating();
+		instrumentButton = new ToggleButton(this, renderGroup).withRoundedRect().withIcon(
+				IconResourceSets.INSTRUMENT_BASE);
+		muteButton = new ToggleButton(this, renderGroup).oscillating().withRoundedRect()
+				.withIcon(IconResourceSets.MUTE);
+		soloButton = new ToggleButton(this, renderGroup).oscillating().withRoundedRect()
+				.withIcon(IconResourceSets.SOLO);
 
-		instrumentButton.setIcon(IconResourceSets.INSTRUMENT_BASE);
-		muteButton.setIcon(IconResourceSets.MUTE);
-		soloButton.setIcon(IconResourceSets.SOLO);
 		muteButton.setText("M");
 		soloButton.setText("S");
 
@@ -50,8 +50,6 @@ public class TrackButtonRow extends TouchableView {
 				track.solo(soloButton.isChecked());
 			}
 		});
-
-		addChildren(instrumentButton, muteButton, soloButton);
 	}
 
 	@Override

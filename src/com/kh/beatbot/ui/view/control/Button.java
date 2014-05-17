@@ -3,17 +3,18 @@ package com.kh.beatbot.ui.view.control;
 import com.kh.beatbot.listener.OnLongPressListener;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.ui.icon.IconResource;
+import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.LongPressableView;
+import com.kh.beatbot.ui.view.View;
 
 public class Button extends LongPressableView {
 	private OnPressListener pressListener;
 	private OnReleaseListener releaseListener;
 	private OnLongPressListener longPressListener;
 
-	public Button(RenderGroup renderGroup) {
-		super(renderGroup);
+	public Button(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 		setShrinkable(true);
 	}
 
@@ -103,13 +104,19 @@ public class Button extends LongPressableView {
 			longPressListener.onLongPress(this);
 		}
 	}
+	
+	@Override
+	public synchronized Button withIcon(IconResourceSet resourceSet) {
+		return (Button) super.withIcon(resourceSet);
+	}
 
 	@Override
-	protected synchronized void stateChanged() {
-		IconResource resource = getIconResource();
-		if (null != resource && null != resource.fillColor) {
-			initRoundedRect();
-		}
-		super.stateChanged();
+	public synchronized Button withRect() {
+		return (Button) super.withRect();
+	}
+	
+	@Override
+	public synchronized Button withRoundedRect() {
+		return (Button) super.withRoundedRect();
 	}
 }

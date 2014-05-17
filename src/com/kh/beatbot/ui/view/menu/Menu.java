@@ -10,6 +10,7 @@ import com.kh.beatbot.listener.MenuItemListener;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.ListView;
 import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.View;
 
 public abstract class Menu extends TouchableView implements MenuItemListener, FileMenuItemListener,
 		FileFilter {
@@ -23,8 +24,8 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 
 	protected abstract float getWidthForLevel(int level);
 
-	public Menu(RenderGroup renderGroup) {
-		super(renderGroup);
+	public Menu(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	public List<MenuItem> getTopLevelItems() {
@@ -33,7 +34,7 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 
 	public ListView getListAtLevel(final MenuItem item, final int level) {
 		while (level >= menuLists.size()) {
-			ListView menuList = new ListView(renderGroup);
+			ListView menuList = new ListView(this, renderGroup);
 			menuLists.add(menuList);
 		}
 

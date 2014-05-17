@@ -5,12 +5,13 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.KnobShape;
 import com.kh.beatbot.ui.shape.RenderGroup;
+import com.kh.beatbot.ui.view.View;
 
 public class Knob extends ControlView1dBase {
 	private KnobShape knobShape;
 
-	public Knob(RenderGroup renderGroup) {
-		super(renderGroup);
+	public Knob(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	@Override

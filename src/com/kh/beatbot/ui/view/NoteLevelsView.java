@@ -50,8 +50,8 @@ public class NoteLevelsView extends TouchableView {
 
 	private static RenderGroup levelBarGroup = new RenderGroup();
 
-	public NoteLevelsView(RenderGroup renderGroup) {
-		super(renderGroup);
+	public NoteLevelsView(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 		setClip(true);
 	}
 

@@ -33,12 +33,12 @@ public abstract class LongPressableView extends TouchableView {
 
 	protected abstract void longPress(int id, Pointer pos);
 
-	public LongPressableView() {
-		this(null);
+	public LongPressableView(View view) {
+		this(view, null);
 	}
 
-	public LongPressableView(RenderGroup renderGroup) {
-		super(renderGroup);
+	public LongPressableView(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 		BeatBotActivity.mainActivity.runOnUiThread(new Runnable() {
 			public void run() {
 				handler = new Handler();

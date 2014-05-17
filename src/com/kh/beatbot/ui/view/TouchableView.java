@@ -39,12 +39,12 @@ public class TouchableView extends View {
 
 	protected boolean shouldPropagateTouchEvents = true, deselectOnPointerExit = true;
 
-	public TouchableView() {
-		super();
+	public TouchableView(View view) {
+		super(view);
 	}
 
-	public TouchableView(RenderGroup renderGroup) {
-		super(renderGroup);
+	public TouchableView(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	public final Pointer getPointer() {

@@ -8,6 +8,7 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.SampleEditView;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
@@ -19,8 +20,8 @@ public class SampleEditPage extends TrackPage {
 	private ToggleButton loopButton, reverseButton;
 	private ParamControl loopBeginControl, loopEndControl, gainControl;
 
-	public SampleEditPage(RenderGroup renderGroup) {
-		super(renderGroup);
+	public SampleEditPage(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	@Override
@@ -40,19 +41,17 @@ public class SampleEditPage extends TrackPage {
 
 	@Override
 	protected synchronized void createChildren() {
-		sampleEdit = new SampleEditView(null);
+		sampleEdit = new SampleEditView(this, null);
 		sampleEdit.setClip(true);
-		previewButton = new Button(renderGroup);
-		loopButton = new ToggleButton(renderGroup).oscillating();
-		reverseButton = new ToggleButton(renderGroup).oscillating();
+		previewButton = new Button(this, renderGroup).withIcon(IconResourceSets.PREVIEW);
+		loopButton = new ToggleButton(this, renderGroup).oscillating().withIcon(
+				IconResourceSets.LOOP);
+		reverseButton = new ToggleButton(this, renderGroup).oscillating().withIcon(
+				IconResourceSets.REVERSE);
 
-		loopBeginControl = new ParamControl(renderGroup);
-		loopEndControl = new ParamControl(renderGroup);
-		gainControl = new ParamControl(renderGroup);
-
-		previewButton.setIcon(IconResourceSets.PREVIEW);
-		loopButton.setIcon(IconResourceSets.LOOP);
-		reverseButton.setIcon(IconResourceSets.REVERSE);
+		loopBeginControl = new ParamControl(this, renderGroup);
+		loopEndControl = new ParamControl(this, renderGroup);
+		gainControl = new ParamControl(this, renderGroup);
 
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override
@@ -83,9 +82,6 @@ public class SampleEditPage extends TrackPage {
 		loopBeginControl.setLabelText("Begin");
 		loopEndControl.setLabelText("End");
 		gainControl.setLabelText("Gain");
-
-		addChildren(previewButton, loopButton, reverseButton, sampleEdit, loopBeginControl,
-				loopEndControl, gainControl);
 	}
 
 	@Override
