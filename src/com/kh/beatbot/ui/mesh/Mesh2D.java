@@ -12,6 +12,8 @@ public class Mesh2D extends Mesh {
 	}
 
 	public void vertex(float x, float y, float[] color) {
+		if (!isVisible())
+			return;
 		if (isFull()) {
 			numVertices = index + 1;
 			group.changeSize(this, numVertices - 1, numVertices, numVertices - 1, numVertices);

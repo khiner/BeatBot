@@ -17,7 +17,9 @@ public abstract class Mesh {
 	}
 
 	public void setColor(float[] color) {
-		if (isVisible()) {
+		if (null == color) {
+			hide();
+		} else if (isVisible()) {
 			group.setColor(this, color);
 		}
 	}

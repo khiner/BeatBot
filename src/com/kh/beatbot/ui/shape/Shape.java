@@ -18,14 +18,10 @@ public abstract class Shape {
 			short[] strokeIndices, int numFillVertices, int numStrokeVertices) {
 		RenderGroup myGroup = null == group ? new RenderGroup() : group;
 
-		if (fillColor != null) {
-			fillMesh = new Mesh2D(myGroup.getFillGroup(), numFillVertices, fillIndices);
-			this.fillColor = fillColor;
-		}
-		if (strokeColor != null) {
-			strokeMesh = new Mesh2D(myGroup.getStrokeGroup(), numStrokeVertices, strokeIndices);
-			this.strokeColor = strokeColor;
-		}
+		fillMesh = new Mesh2D(myGroup.getFillGroup(), numFillVertices, fillIndices);
+		setFillColor(fillColor);
+		strokeMesh = new Mesh2D(myGroup.getStrokeGroup(), numStrokeVertices, strokeIndices);
+		setStrokeColor(strokeColor);
 		show();
 	}
 
@@ -40,59 +36,39 @@ public abstract class Shape {
 	}
 
 	protected synchronized void fillVertex(float x, float y) {
-		if (null != fillMesh) {
-			fillMesh.vertex(x, y, fillColor);
-		}
+		fillMesh.vertex(x, y, fillColor);
 	}
 
 	protected synchronized void strokeVertex(float x, float y) {
-		if (null != strokeMesh) {
-			strokeMesh.vertex(x, y, strokeColor);
-		}
+		strokeMesh.vertex(x, y, strokeColor);
 	}
 
 	protected synchronized void resetIndices() {
 		if (!isVisible())
 			return;
-		if (null != fillMesh)
-			fillMesh.reset();
-		if (null != strokeMesh)
-			strokeMesh.reset();
+		fillMesh.reset();
+		strokeMesh.reset();
 	}
 
 	public synchronized void update() {
-		resetIndices();
-		updateVertices();
+		if (isVisible()) {
+			resetIndices();
+			updateVertices();
+		}
 	}
 
 	protected synchronized void setFillColor(int vertexIndex, float[] fillColor) {
-		if (fillMesh != null && isVisible()) {
-			fillMesh.setColor(vertexIndex, fillColor);
-		}
+		fillMesh.setColor(vertexIndex, fillColor);
 	}
 
 	public synchronized void setFillColor(float[] fillColor) {
-		if (!isVisible())
-			return;
 		this.fillColor = fillColor;
-		if (fillMesh != null) {
-			fillMesh.setColor(fillColor);
-		}
+		fillMesh.setColor(fillColor);
 	}
 
 	public synchronized void setStrokeColor(float[] strokeColor) {
-		if (!isVisible())
-			return;
 		this.strokeColor = strokeColor;
-		if (null == strokeMesh) {
-			return;
-		}
-		if (null != strokeColor) {
-			strokeMesh.setColor(strokeColor);
-		} else {
-			strokeMesh.hide();
-			strokeMesh = null;
-		}
+		strokeMesh.setColor(strokeColor);
 	}
 
 	public synchronized void setColors(float[] fillColor, float[] strokeColor) {
@@ -118,42 +94,26 @@ public abstract class Shape {
 
 	// set "z-index" of this shape to the top of the stack
 	public void bringToTop() {
-		if (!isVisible())
-			return;
-		if (null != fillMesh)
-			fillMesh.push();
-		if (null != strokeMesh)
-			strokeMesh.push();
+		fillMesh.push();
+		strokeMesh.push();
 	}
 
 	public synchronized void setPosition(float x, float y) {
-		if (!isVisible())
-			return;
 		this.x = x;
 		this.y = y;
-		if (fillMesh != null) {
-			fillMesh.setPosition(x, y);
-		}
-		if (strokeMesh != null) {
-			strokeMesh.setPosition(x, y);
-		}
+		fillMesh.setPosition(x, y);
+		strokeMesh.setPosition(x, y);
 	}
 
 	public synchronized void setDimensions(float width, float height) {
-		if (!isVisible())
-			return;
 		this.width = width;
 		this.height = height;
-		if (null != fillMesh)
-			fillMesh.setDimensions(width, height);
-		if (null != strokeMesh)
-			strokeMesh.setDimensions(width, height);
+		fillMesh.setDimensions(width, height);
+		strokeMesh.setDimensions(width, height);
 		update();
 	}
 
 	public synchronized void layout(float x, float y, float width, float height) {
-		if (!isVisible())
-			return;
 		setPosition(x, y);
 		setDimensions(width, height);
 	}
@@ -161,19 +121,15 @@ public abstract class Shape {
 	public void hide() {
 		if (!isVisible())
 			return;
-		if (null != fillMesh)
-			fillMesh.hide();
-		if (null != strokeMesh)
-			strokeMesh.hide();
+		fillMesh.hide();
+		strokeMesh.hide();
 	}
 
 	public void show() {
 		if (isVisible())
 			return;
-		if (null != fillMesh)
-			fillMesh.show();
-		if (null != strokeMesh)
-			strokeMesh.show();
+		fillMesh.show();
+		strokeMesh.show();
 		update();
 	}
 

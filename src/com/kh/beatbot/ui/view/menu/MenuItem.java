@@ -23,9 +23,8 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 		this.menu = menu;
 		this.parent = parent;
 		this.level = parent == null ? 0 : parent.level + 1;
-		this.button = button;
+		this.button = button.withIcon(IconResourceSets.MENU_ITEM).withRoundedRect();
 
-		button.setIcon(IconResourceSets.MENU_ITEM);
 		button.setOnPressListener(this);
 		button.setOnReleaseListener(this);
 
