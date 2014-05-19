@@ -6,14 +6,12 @@ import java.util.Arrays;
 import com.kh.beatbot.listener.OnLongPressListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.control.Button;
-import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class FileMenuItem extends MenuItem implements OnLongPressListener {
-
 	private File file;
 
 	public FileMenuItem(Menu menu, MenuItem parent, File file) {
-		super(menu, parent, file.isDirectory() ? new ToggleButton(menu) : new Button(menu));
+		super(menu, parent, file.isDirectory());
 		this.file = file;
 		if (file.isFile()) {
 			button.setOnLongPressListener(this);

@@ -19,16 +19,18 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 	private ListView container = null;
 	private int level = 0;
 
-	public MenuItem(Menu menu, MenuItem parent, Button button) {
+	public MenuItem(Menu menu, MenuItem parent, boolean toggle) {
 		this.menu = menu;
 		this.parent = parent;
-		this.level = parent == null ? 0 : parent.level + 1;
-		this.button = button.withIcon(IconResourceSets.MENU_ITEM).withRoundedRect();
+		this.level = null == parent ? 0 : parent.level + 1;
+		container = menu.getListAtLevel(level);
 
+		this.button = toggle ? new ToggleButton(container) : new Button(container);
+		this.button = button.withIcon(IconResourceSets.MENU_ITEM).withRoundedRect();
 		button.setOnPressListener(this);
 		button.setOnReleaseListener(this);
 
-		container = menu.getListAtLevel(this, level);
+		hide();
 	}
 
 	public void onPress(Button button) {

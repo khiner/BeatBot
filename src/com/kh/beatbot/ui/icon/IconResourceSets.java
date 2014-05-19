@@ -49,8 +49,8 @@ public class IconResourceSets {
 
 			MENU_ITEM = s(r(null), r(Color.LABEL_LIGHT), r(Color.TRON_BLUE)),
 
-			FILE = s(r(R.drawable.browse_icon, null, Color.BLACK), r(R.drawable.browse_icon, null, Color.TRON_BLUE)),
-			SETTINGS = s(r(R.drawable.settings_icon, null, Color.BLACK), r(R.drawable.settings_icon, null, Color.TRON_BLUE)),
+			FILE = s(r(R.drawable.browse_icon, null, null, null, Color.BLACK), r(R.drawable.browse_icon, null, null, null, Color.TRON_BLUE)),
+			SETTINGS = s(r(R.drawable.settings_icon, null, null, null, Color.BLACK), r(R.drawable.settings_icon, null, null, null, Color.TRON_BLUE)),
 			SNAP_TO_GRID = s(r(R.drawable.snap_to_grid_icon), r(R.drawable.snap_to_grid_icon)),
 			MIDI_IMPORT = s(r(R.drawable.midi_import_icon), r(R.drawable.midi_import_icon)),
 			MIDI_EXPORT = s(r(R.drawable.midi_export_icon), r(R.drawable.midi_export_icon)),

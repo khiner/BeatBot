@@ -36,7 +36,7 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 		return topLevelItems;
 	}
 
-	public ListView getListAtLevel(final MenuItem item, final int level) {
+	public ListView getListAtLevel(final int level) {
 		while (level >= menuLists.size()) {
 			ListView menuList = new ListView(this);
 			menuLists.add(menuList);
