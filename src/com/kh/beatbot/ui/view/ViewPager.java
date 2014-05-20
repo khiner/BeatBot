@@ -37,7 +37,7 @@ public class ViewPager extends TouchableView {
 		return currPageId;
 	}
 
-	public void setPage(Object key) {
+	public synchronized void setPage(Object key) {
 		if (null == key || key.equals(currPageId) || !pageMap.containsKey(key))
 			return;
 

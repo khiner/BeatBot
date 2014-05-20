@@ -259,7 +259,7 @@ public class BeatBotActivity extends Activity {
 	public void setupProject() {
 		if (TrackManager.getNumTracks() <= 0)
 			return;
-		TrackManager.masterTrack.select();
+		TrackManager.getTrack(0).select();
 		View.mainPage.pageSelectGroup.selectLevelsPage();
 	}
 
