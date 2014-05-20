@@ -64,7 +64,8 @@ public class EffectPage extends TouchableView {
 		paramsPager.addPage(Reverb.NAME, reverbPage);
 		paramsPager.addPage(Tremolo.NAME, tremeloPage);
 
-		toggleButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.TOGGLE);
+		toggleButton = new ToggleButton(this).oscillating().withRoundedRect()
+				.withIcon(IconResourceSets.TOGGLE);
 		toggleButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
