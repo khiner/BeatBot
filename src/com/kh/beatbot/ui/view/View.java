@@ -179,6 +179,13 @@ public class View implements Comparable<View> {
 		}
 	}
 
+	public synchronized void removeShape(Shape shape) {
+		if (null != shape) {
+			shape.hide();
+			shapes.remove(shape);
+		}
+	}
+
 	public void setShrinkable(boolean shrinkable) {
 		this.shrinkable = shrinkable;
 	}

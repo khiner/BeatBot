@@ -15,14 +15,14 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 	}
 
 	public synchronized void setParam(Param param) {
-		if (this.param != null) {
+		if (null == param)
+			return;
+		if (null != this.param) {
 			this.param.removeListener(this);
 		}
 		this.param = param;
-		if (this.param != null) {
-			this.param.addListener(this);
-			onParamChanged(param);
-		}
+		this.param.addListener(this);
+		onParamChanged(param);
 	}
 
 	public float getLevel() {

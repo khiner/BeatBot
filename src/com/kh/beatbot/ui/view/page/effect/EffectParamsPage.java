@@ -29,9 +29,7 @@ public class EffectParamsPage extends TouchableView implements ParamListener, Pa
 						.isBeatSyncable());
 				paramControls[i].setId(i);
 			}
-		}
-
-		if (this.effect != null) {
+		} else {
 			for (ParamControl paramControl : paramControls) {
 				effect.getParam(paramControl.getId()).removeListener(this);
 			}

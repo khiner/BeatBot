@@ -35,7 +35,7 @@ public class EffectPage extends TouchableView {
 		return level2d;
 	}
 
-	public void loadEffect(Effect effect) {
+	public void setEffect(Effect effect) {
 		toggleButton.setChecked(effect.isOn());
 		toggleButton.setText(effect.getName());
 		paramsPager.setPage(effect.getName());

@@ -193,6 +193,9 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		for (int i = 0; i < loopMarkerLines.length; i++) {
 			loopMarkerLines[i] = new Line(MidiViewGroup.translateScaleGroup, null, Color.TRON_BLUE);
 		}
+
+		addShapes(leftLoopRect, rightLoopRect, selectRegionRect, currTickLine, loopMarkerLines[0],
+				loopMarkerLines[1]);
 	}
 
 	@Override
@@ -209,6 +212,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
 				if (currTick % (2 << (NUM_VERTICAL_LINE_SETS - i)) == 0) {
 					Line line = new Line(MidiViewGroup.scaleGroup, null, Color.TRANSPARENT);
+					addShapes(line);
 					line.layout(tickToUnscaledX(currTick), absoluteY, 2, 1);
 					vLines[i].add(line);
 					break; // each line goes in only ONE line set
@@ -290,8 +294,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	public void createNoteView(MidiNote note) {
-		note.setRectangle(new Rectangle(MidiViewGroup.translateScaleGroup, whichColor(note),
-				Color.BLACK));
+		Rectangle noteRect = new Rectangle(MidiViewGroup.translateScaleGroup, whichColor(note),
+				Color.BLACK); 
+		note.setRectangle(noteRect);
+		addShapes(noteRect);
 		layoutNote(note);
 	}
 
@@ -308,7 +314,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			note.getRectangle().setFillColor(whichColor(note));
 			note.getRectangle().bringToTop();
 		}
-		//loop/tick lines always display ontop of notes
+		// loop/tick lines always display ontop of notes
 		currTickLine.bringToTop();
 		loopMarkerLines[0].bringToTop();
 		loopMarkerLines[1].bringToTop();
@@ -524,8 +530,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public void onCreate(Track track) {
-		track.setRectangle(new Rectangle(MidiViewGroup.translateYGroup, Color.TRANSPARENT,
-				Color.BLACK));
+		Rectangle trackRect = new Rectangle(MidiViewGroup.translateYGroup, Color.TRANSPARENT,
+				Color.BLACK);
+		addShapes(trackRect);
+		track.setRectangle(trackRect);
 		onTrackHeightChange();
 		scrollHelper.setYOffset(Float.MAX_VALUE);
 		for (MidiNote note : track.getMidiNotes()) {
@@ -535,9 +543,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public void onDestroy(Track track) {
-		track.getRectangle().hide();
+		removeShape(track.getRectangle());
+		
 		for (MidiNote note : track.getMidiNotes()) {
-			note.getRectangle().hide();
+			removeShape(note.getRectangle());
 			note.setRectangle(null);
 		}
 		onTrackHeightChange();

@@ -264,8 +264,8 @@ public class BeatBotActivity extends Activity {
 	}
 
 	public void launchEffect(Effect effect) {
-		View.effectPage.loadEffect(effect);
 		activityPager.setPage(EFFECT_PAGE_ID);
+		View.effectPage.setEffect(effect);
 	}
 
 	private void initNativeAudio() {
