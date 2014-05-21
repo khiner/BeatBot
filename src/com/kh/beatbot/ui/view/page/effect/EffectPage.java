@@ -11,7 +11,6 @@ import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremolo;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.ViewPager;
@@ -27,8 +26,8 @@ public class EffectPage extends TouchableView {
 	private EffectParamsPage chorusPage, decimatePage, delayPage, filterPage, flangerPage,
 			reverbPage, tremeloPage;
 
-	public EffectPage(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public EffectPage(View view) {
+		super(view);
 	}
 
 	public Seekbar2d getLevel2d() {

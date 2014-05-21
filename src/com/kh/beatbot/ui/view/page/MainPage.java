@@ -2,7 +2,6 @@ package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.group.ControlButtonGroup;
@@ -16,10 +15,8 @@ public class MainPage extends TouchableView {
 	public PageSelectGroup pageSelectGroup;
 	public MainMenu slideMenu;
 
-	public static float controlButtonHeight = 0;
-
-	public MainPage(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
+	public MainPage(View view) {
+		super(view);
 	}
 
 	@Override
@@ -35,7 +32,7 @@ public class MainPage extends TouchableView {
 
 	@Override
 	public synchronized void layoutChildren() {
-		controlButtonHeight = height / 10;
+		float controlButtonHeight = height / 10;
 		float midiHeight = 3 * (height - controlButtonHeight) / 5;
 		float pageSelectGroupHeight = height - midiHeight - controlButtonHeight;
 		View.LABEL_HEIGHT = pageSelectGroupHeight / 5;

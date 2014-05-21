@@ -19,7 +19,6 @@ import com.kh.beatbot.ui.shape.SlideTab;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
-import com.kh.beatbot.ui.view.page.MainPage;
 
 public class MainMenu extends Menu implements FileMenuItemListener {
 
@@ -42,7 +41,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		fileItem = new MenuItem(this, null, true);
 		settingsItem = new MenuItem(this, null, true);
 		snapToGridItem = new MenuItem(this, settingsItem, true);
-		((ToggleButton)snapToGridItem.button).oscillating();
+		((ToggleButton) snapToGridItem.button).oscillating();
 		midiImportItem = new FileMenuItem(this, fileItem, new File(
 				FileManager.midiDirectory.getPath()));
 		midiExportItem = new MenuItem(this, fileItem, false);
@@ -159,7 +158,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 			return;
 
 		tab.layout(x - mainPage.width + width, menuOffset / 2, columnWidth,
-				MainPage.controlButtonHeight + menuOffset * 2);
+				mainPage.controlButtonGroup.height + menuOffset * 2);
 		textureMesh.layout(x + width + menuOffset * 2, menuOffset / 2, tab.height, tab.height);
 
 		fillColor[3] = GeneralUtils.clipToUnit(textureMesh.x / width) * .75f;

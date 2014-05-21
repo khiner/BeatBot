@@ -13,9 +13,9 @@ public class Color {
 			LABEL_SELECTED_TRANS, MIDI_SELECTED_TRACK, TRANSPARENT = { 0, 0, 0, 0 },
 			SEMI_TRANSPARENT = { 1, 1, 1, .4f };
 
-	public static float[][] MIDI_LINES = { { 0, 0, 0, 1 }, { .1f, .1f, .1f, 1 },
-			{ .2f, .2f, .2f, 1 }, { .3f, .3f, .3f, 1 }, { .4f, .4f, .4f, 1 }, { .5f, .5f, .5f, 1 },
-			{ .6f, .6f, .6f, 1 }, { .7f, .7f, .7f, 1 } };
+	public static float[][] MIDI_LINES = { { 0, 0, 0, 1 }, { .05f, .05f, .05f, 1 },
+			{ .1f, .1f, .1f, 1 }, { .15f, .15f, .15f, 1 }, { .2f, .2f, .2f, 1 }, { .25f, .25f, .25f, 1 },
+			{ .3f, .3f, .3f, 1 }, { .35f, .35f, .35f, 1 } };
 
 	public static void init(Activity activity) {
 		BLACK = colorResourceToFloats(activity, R.color.black);

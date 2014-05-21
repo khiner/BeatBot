@@ -52,7 +52,7 @@ public class View implements Comparable<View> {
 	private State state = State.DEFAULT;
 
 	public View(View parent) {
-		this(parent, parent.getRenderGroup());
+		this(parent, null == parent ? null : parent.getRenderGroup());
 	}
 
 	public View(View parent, RenderGroup renderGroup) {

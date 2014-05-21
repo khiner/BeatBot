@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.kh.beatbot.listener.PagerListener;
-import com.kh.beatbot.ui.shape.RenderGroup;
 
 public class ViewPager extends TouchableView {
 	private Map<Object, View> pageMap = new HashMap<Object, View>();
@@ -15,10 +14,6 @@ public class ViewPager extends TouchableView {
 
 	public ViewPager(View view) {
 		super(view);
-	}
-
-	public ViewPager(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
 	}
 
 	public void addPage(Object key, View page) {

@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.view;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -34,15 +33,13 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	private int pinchLeftPointerId = -1, pinchRightPointerId = -1;
 
-	private Line[] loopMarkerLines;
-	private List<Line>[] vLines;
+	private Line[] loopMarkerLines, vLines;
 	private Line currTickLine;
 	private Rectangle leftLoopRect, rightLoopRect, selectRegionRect;
 
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedNotes = new HashMap<Integer, MidiNote>();
-	// map of pointerIds to the original on-ticks of the notes they are touching
-	// (before dragging)
+	// map of pointerIds to the original on-ticks of the notes they are touching (before dragging)
 	private Map<Integer, Float> startOnTicks = new HashMap<Integer, Float>();
 
 	protected ScrollHelper scrollHelper;
@@ -54,15 +51,23 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	public synchronized void updateVerticalLineColors() {
-		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
-			float[] lineColor = i > MidiManager.getBeatDivision() + 2 ? Color.TRANSPARENT
-					: Color.MIDI_LINES[i];
-			for (Line line : vLines[i]) {
-				if (!line.getStrokeColor().equals(lineColor)) {
-					line.setStrokeColor(lineColor);
-				}
+		for (int i = 0; i < vLines.length; i++) {
+			float[] lineColor = lineColor(i);
+			if (!vLines[i].getStrokeColor().equals(lineColor)) {
+				vLines[i].setStrokeColor(lineColor);
 			}
 		}
+	}
+
+	private float[] lineColor(int lineIndex) {
+		for (int i = 0; i < Color.MIDI_LINES.length; i++) {
+			if (i > MidiManager.getBeatDivision() + 3) {
+				return Color.TRANSPARENT;
+			} else if (lineIndex % (vLines.length / (1 << i)) == 0) {
+				return Color.MIDI_LINES[i];
+			}
+		}
+		return Color.TRANSPARENT;
 	}
 
 	public float getTotalTrackHeight() {
@@ -182,20 +187,21 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		setClip(true);
 		leftLoopRect = new Rectangle(MidiViewGroup.scaleGroup, Color.DARK_TRANS, null);
 		rightLoopRect = new Rectangle(MidiViewGroup.scaleGroup, Color.DARK_TRANS, null);
-		selectRegionRect = new Rectangle(MidiViewGroup.translateScaleGroup, Color.TRANSPARENT,
+		selectRegionRect = new Rectangle(MidiViewGroup.translateScaleGroup, Color.TRON_BLUE_TRANS,
 				Color.TRON_BLUE);
 		currTickLine = new Line(MidiViewGroup.translateScaleGroup, null, Color.TRON_BLUE);
+		vLines = new Line[(MidiManager.MAX_TICKS * 8) / MidiManager.MIN_TICKS];
 		loopMarkerLines = new Line[2];
-		vLines = new ArrayList[NUM_VERTICAL_LINE_SETS];
-		for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
-			vLines[i] = new ArrayList<Line>();
+		for (int i = 0; i < vLines.length; i++) {
+			vLines[i] = new Line(MidiViewGroup.scaleGroup, null, Color.TRANSPARENT);
 		}
 		for (int i = 0; i < loopMarkerLines.length; i++) {
 			loopMarkerLines[i] = new Line(MidiViewGroup.translateScaleGroup, null, Color.TRON_BLUE);
 		}
 
-		addShapes(leftLoopRect, rightLoopRect, selectRegionRect, currTickLine, loopMarkerLines[0],
-				loopMarkerLines[1]);
+		addShapes(leftLoopRect, rightLoopRect, selectRegionRect, currTickLine);
+		addShapes(vLines);
+		addShapes(loopMarkerLines);
 	}
 
 	@Override
@@ -205,21 +211,13 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			loopMarkerLines[i].layout(absoluteX, absoluteY, 3, height);
 		}
 		int minTickSpacing = MidiManager.MIN_TICKS / 8;
-		for (List<Line> lines : vLines) {
-			lines.clear();
-		}
-		for (long currTick = 0; currTick < MidiManager.MAX_TICKS; currTick += minTickSpacing) {
-			for (int i = 0; i < NUM_VERTICAL_LINE_SETS; i++) {
-				if (currTick % (2 << (NUM_VERTICAL_LINE_SETS - i)) == 0) {
-					Line line = new Line(MidiViewGroup.scaleGroup, null, Color.TRANSPARENT);
-					addShapes(line);
-					line.layout(tickToUnscaledX(currTick), absoluteY, 2, 1);
-					vLines[i].add(line);
-					break; // each line goes in only ONE line set
-				}
-			}
+
+		for (int i = 0, currTick = 0; currTick < MidiManager.MAX_TICKS; i++, currTick += minTickSpacing) {
+			vLines[i].layout(tickToUnscaledX(currTick), absoluteY, 2, 1);
 		}
 		onScaleX();
+		onTrackHeightChange();
+		onLoopChange(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
 	}
 
 	@Override
@@ -272,13 +270,13 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		selectRegionStartY = noteToY(yToNote(pos.y));
 		selectRegionRect.layout(tickToUnscaledX(selectRegionStartTick), absoluteY
 				+ selectRegionStartY, 1, trackHeight);
+		selectRegionRect.show();
 		selectRegionRect.bringToTop();
-		selectRegionRect.setColors(Color.TRON_BLUE_TRANS, Color.TRON_BLUE);
 	}
 
 	private void stopSelectRegion() {
 		selectRegionStartTick = -1;
-		selectRegionRect.setColors(Color.TRANSPARENT, Color.TRANSPARENT);
+		selectRegionRect.hide();
 	}
 
 	// adds a note starting at the nearest major tick (nearest displayed
@@ -295,7 +293,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	public void createNoteView(MidiNote note) {
 		Rectangle noteRect = new Rectangle(MidiViewGroup.translateScaleGroup, whichColor(note),
-				Color.BLACK); 
+				Color.BLACK);
 		note.setRectangle(noteRect);
 		addShapes(noteRect);
 		layoutNote(note);
@@ -544,7 +542,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	@Override
 	public void onDestroy(Track track) {
 		removeShape(track.getRectangle());
-		
+
 		for (MidiNote note : track.getMidiNotes()) {
 			removeShape(note.getRectangle());
 			note.setRectangle(null);
@@ -582,10 +580,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			loopMarkerLines[i].setDimensions(loopMarkerLines[i].width, trackHeight);
 		}
 		float lineHeight = Math.min(trackHeight, height);
-		for (List<Line> lines : vLines) {
-			for (Line line : lines) {
-				line.setDimensions(2, lineHeight);
-			}
+		for (Line line : vLines) {
+			line.setDimensions(2, lineHeight);
 		}
 		layoutTrackRects();
 	}
