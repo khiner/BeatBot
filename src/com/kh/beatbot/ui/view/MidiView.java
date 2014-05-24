@@ -50,95 +50,12 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		MidiManager.addLoopChangeListener(this);
 	}
 
-	public synchronized void updateVerticalLineColors() {
-		for (int i = 0; i < vLines.length; i++) {
-			float[] lineColor = lineColor(i);
-			if (!vLines[i].getStrokeColor().equals(lineColor)) {
-				vLines[i].setStrokeColor(lineColor);
-			}
-		}
-	}
-
-	private float[] lineColor(int lineIndex) {
-		for (int i = 0; i < Color.MIDI_LINES.length; i++) {
-			if (i > MidiManager.getBeatDivision() + 3) {
-				return Color.TRANSPARENT;
-			} else if (lineIndex % (vLines.length / (1 << i)) == 0) {
-				return Color.MIDI_LINES[i];
-			}
-		}
-		return Color.TRANSPARENT;
-	}
-
 	public float getTotalTrackHeight() {
 		return trackHeight * TrackManager.getNumTracks();
 	}
 
 	public void reset() {
 		scrollHelper.setXOffset(0);
-	}
-
-	private void selectRegion(Pointer pos) {
-		float tick = xToTick(pos.x);
-		float leftTick = Math.min(tick, selectRegionStartTick);
-		float rightTick = Math.max(tick, selectRegionStartTick);
-		float topY = Math.min(pos.y, selectRegionStartY);
-		float bottomY = Math.max(pos.y, selectRegionStartY);
-		// make sure select rect doesn't go into the tick view
-		topY = Math.max(topY + .01f, 0);
-		// make sure select rect doesn't go past the last track/note
-		bottomY = Math.min(bottomY + .01f, getTotalTrackHeight() - .01f);
-		int topNote = yToNote(topY);
-		int bottomNote = yToNote(bottomY);
-		MidiManager.selectRegion((long) leftTick, (long) rightTick, topNote, bottomNote);
-		// for normal view, round the drawn rectangle to nearest notes
-		topY = noteToY(topNote);
-		bottomY = noteToY(bottomNote + 1);
-		// make room in the view window if we are dragging out of the view
-		scrollHelper.updateView(tick, topY, bottomY);
-		selectRegionRect.layout(tickToUnscaledX(leftTick), absoluteY + topY,
-				tickToUnscaledX(rightTick - leftTick), bottomY - topY);
-	}
-
-	public MidiNote getMidiNote(int track, float tick) {
-		if (track < 0 || track >= TrackManager.getNumTracks()) {
-			return null;
-		}
-		for (int i = 0; i < MidiManager.getMidiNotes().size(); i++) {
-			MidiNote midiNote = MidiManager.getMidiNotes().get(i);
-			if (midiNote.getNoteValue() == track && midiNote.getOnTick() <= tick
-					&& midiNote.getOffTick() >= tick) {
-				return midiNote;
-			}
-		}
-		return null;
-	}
-
-	private void selectMidiNote(int pointerId, Pointer pos) {
-		final float tick = xToTick(pos.x);
-		MidiNote selectedNote = getMidiNote(yToNote(pos.y), tick);
-
-		if (selectedNote == null || selectedNote.isTouched())
-			return;
-
-		startOnTicks.put(pointerId, (float) selectedNote.getOnTick());
-		dragOffsetTick[pointerId] = tick - selectedNote.getOnTick();
-		// don't need right offset for simple drag (one finger select)
-
-		// If this is the only touched midi note, and it hasn't yet
-		// been selected, make it the only selected note.
-		// If we are multi-selecting, add it to the selected list
-		if (!selectedNote.isSelected()) {
-			if (touchedNotes.isEmpty()) {
-				MidiManager.deselectAllNotes();
-			}
-			selectedNote.setSelected(true);
-		}
-		touchedNotes.put(pointerId, selectedNote);
-	}
-
-	private void updateCurrentTick() {
-		currTickLine.setPosition(tickToUnscaledX(MidiManager.getCurrTick()), absoluteY);
 	}
 
 	public float tickToUnscaledX(float tick) {
@@ -230,67 +147,6 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		}
 	}
 
-	private float getAdjustedTickDiff(float tickDiff, int pointerId, MidiNote singleNote) {
-		if (tickDiff == 0)
-			return 0;
-		float adjustedTickDiff = tickDiff;
-		for (MidiNote selectedNote : MidiManager.getSelectedNotes()) {
-			if (singleNote != null && !selectedNote.equals(singleNote))
-				continue;
-			if (Math.abs(startOnTicks.get(pointerId) - selectedNote.getOnTick())
-					+ Math.abs(tickDiff) <= 10) {
-				// inside threshold distance - set to original position
-				return startOnTicks.get(pointerId) - selectedNote.getOnTick();
-			}
-			if (selectedNote.getOnTick() < -adjustedTickDiff) {
-				adjustedTickDiff = -selectedNote.getOnTick();
-			} else if (MidiManager.MAX_TICKS - selectedNote.getOffTick() < adjustedTickDiff) {
-				adjustedTickDiff = MidiManager.MAX_TICKS - selectedNote.getOffTick();
-			}
-		}
-		return adjustedTickDiff;
-	}
-
-	private int getAdjustedNoteDiff(int noteDiff, MidiNote singleNote) {
-		int adjustedNoteDiff = noteDiff;
-		for (MidiNote selectedNote : MidiManager.getSelectedNotes()) {
-			if (singleNote != null && !selectedNote.equals(singleNote))
-				continue;
-			if (selectedNote.getNoteValue() < -adjustedNoteDiff) {
-				adjustedNoteDiff = -selectedNote.getNoteValue();
-			} else if (TrackManager.getNumTracks() - 1 - selectedNote.getNoteValue() < adjustedNoteDiff) {
-				adjustedNoteDiff = TrackManager.getNumTracks() - 1 - selectedNote.getNoteValue();
-			}
-		}
-		return adjustedNoteDiff;
-	}
-
-	private void startSelectRegion(Pointer pos) {
-		selectRegionStartTick = xToTick(pos.x);
-		selectRegionStartY = noteToY(yToNote(pos.y));
-		selectRegionRect.layout(tickToUnscaledX(selectRegionStartTick), absoluteY
-				+ selectRegionStartY, 1, trackHeight);
-		selectRegionRect.show();
-		selectRegionRect.bringToTop();
-	}
-
-	private void stopSelectRegion() {
-		selectRegionStartTick = -1;
-		selectRegionRect.hide();
-	}
-
-	// adds a note starting at the nearest major tick (nearest displayed
-	// grid line) to the left and ending one tick before the nearest major
-	// tick to the right of the given tick
-	private void addMidiNote(int track, float tick) {
-		if (track < 0 || track >= TrackManager.getNumTracks())
-			return;
-		long spacing = MidiManager.getMajorTickSpacing();
-		long onTick = (long) (tick - tick % spacing);
-		long offTick = onTick + spacing - 1;
-		MidiManager.addNote(onTick, offTick, track, .75f, .5f, .5f);
-	}
-
 	public void createNoteView(MidiNote note) {
 		Rectangle noteRect = new Rectangle(MidiViewGroup.translateScaleGroup, whichColor(note),
 				Color.BLACK);
@@ -327,71 +183,12 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		}
 	}
 
-	private static float[] whichColor(MidiNote note) {
-		return note.isSelected() ? Color.NOTE_SELECTED : Color.NOTE;
-	}
-
-	private static float[] whichColor(Track track) {
-		Track soloingTrack = TrackManager.getSoloingTrack();
-		if (track.isSelected()) {
-			return Color.LABEL_SELECTED;
-		} else if (track.isMuted() || (soloingTrack != null && !soloingTrack.equals(track))) {
-			return Color.MIDI_VIEW_DARK_BG;
-		} else {
-			return Color.MIDI_VIEW_BG;
-		}
-	}
-
-	private void dragNotes(boolean dragAllSelected, int pointerId, float currTick, int currNote) {
-		MidiNote touchedNote = touchedNotes.get(pointerId);
-		if (touchedNote == null)
-			return;
-		int noteDiff = currNote - touchedNote.getNoteValue();
-		float tickDiff = currTick - dragOffsetTick[pointerId] - touchedNote.getOnTick();
-		if (noteDiff == 0 && tickDiff == 0)
-			return;
-		tickDiff = getAdjustedTickDiff(tickDiff, pointerId, dragAllSelected ? null : touchedNote);
-		noteDiff = getAdjustedNoteDiff(noteDiff, dragAllSelected ? null : touchedNote);
-		List<MidiNote> notesToDrag = dragAllSelected ? MidiManager.getSelectedNotes() : Arrays
-				.asList(touchedNote);
-
-		MidiManager.moveNotes(notesToDrag, (long) tickDiff, noteDiff);
-	}
-
-	private void pinchSelectedNotes(float onTickDiff, float offTickDiff) {
-		if (onTickDiff == 0 && offTickDiff == 0)
-			return;
-		MidiManager.pinchNotes(MidiManager.getSelectedNotes(), (long) onTickDiff,
-				(long) offTickDiff);
-	}
-
-	private void updateTrackColors() {
-		for (Track track : TrackManager.getTracks()) {
-			track.getRectangle().setFillColor(whichColor(track));
-		}
-	}
-
 	public void updateView(float tick) {
 		scrollHelper.updateView(tick);
 	}
 
 	public void updateView(float leftTick, float rightTick) {
 		scrollHelper.updateView(leftTick, rightTick);
-	}
-
-	private synchronized void noMidiMove() {
-		if (pointerCount() == 1) {
-			if (selectRegionStartTick >= 0) {
-				selectRegion(pointersById.get(0));
-			} else { // one finger scroll
-				scrollHelper.scroll(pointersById.get(scrollHelper.scrollPointerId));
-			}
-		} else if (pointerCount() == 2) {
-			// two finger zoom
-			float leftX = Math.min(pointersById.get(0).x, pointersById.get(1).x);
-			float rightX = Math.max(pointersById.get(0).x, pointersById.get(1).x);
-			scrollHelper.zoom(leftX, rightX, zoomLeftAnchorTick, zoomRightAnchorTick);
-		}
 	}
 
 	@Override
@@ -571,31 +368,6 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		updateTrackColors();
 	}
 
-	private synchronized void onTrackHeightChange() {
-		float trackHeight = getTotalTrackHeight();
-		currTickLine.setDimensions(currTickLine.width, trackHeight);
-		leftLoopRect.setDimensions(leftLoopRect.width, trackHeight);
-		rightLoopRect.setDimensions(rightLoopRect.width, trackHeight);
-		for (int i = 0; i < loopMarkerLines.length; i++) {
-			loopMarkerLines[i].setDimensions(loopMarkerLines[i].width, trackHeight);
-		}
-		float lineHeight = Math.min(trackHeight, height);
-		for (Line line : vLines) {
-			line.setDimensions(2, lineHeight);
-		}
-		layoutTrackRects();
-	}
-
-	private void layoutTrackRects() {
-		for (Track track : TrackManager.getTracks()) {
-			Rectangle trackRect = track.getRectangle();
-			if (trackRect != null) {
-				trackRect.layout(absoluteX, absoluteY + noteToUnscaledY(track.getId()), width,
-						trackHeight);
-			}
-		}
-	}
-
 	@Override
 	public float unscaledHeight() {
 		return getTotalTrackHeight();
@@ -637,5 +409,233 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		loopMarkerLines[1].setPosition(x2, lineY);
 
 		// scrollHelper.updateView(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
+	}
+
+	private synchronized void noMidiMove() {
+		if (pointerCount() == 1) {
+			if (selectRegionStartTick >= 0) {
+				selectRegion(pointersById.get(0));
+			} else { // one finger scroll
+				scrollHelper.scroll(pointersById.get(scrollHelper.scrollPointerId));
+			}
+		} else if (pointerCount() == 2) {
+			// two finger zoom
+			float leftX = Math.min(pointersById.get(0).x, pointersById.get(1).x);
+			float rightX = Math.max(pointersById.get(0).x, pointersById.get(1).x);
+			scrollHelper.zoom(leftX, rightX, zoomLeftAnchorTick, zoomRightAnchorTick);
+		}
+	}
+
+	private static float[] whichColor(MidiNote note) {
+		return note.isSelected() ? Color.NOTE_SELECTED : Color.NOTE;
+	}
+
+	private static float[] whichColor(Track track) {
+		Track soloingTrack = TrackManager.getSoloingTrack();
+		if (track.isSelected()) {
+			return Color.LABEL_SELECTED;
+		} else if (track.isMuted() || (soloingTrack != null && !soloingTrack.equals(track))) {
+			return Color.MIDI_VIEW_DARK_BG;
+		} else {
+			return Color.MIDI_VIEW_BG;
+		}
+	}
+
+	private void dragNotes(boolean dragAllSelected, int pointerId, float currTick, int currNote) {
+		MidiNote touchedNote = touchedNotes.get(pointerId);
+		if (touchedNote == null)
+			return;
+		int noteDiff = currNote - touchedNote.getNoteValue();
+		float tickDiff = currTick - dragOffsetTick[pointerId] - touchedNote.getOnTick();
+		if (noteDiff == 0 && tickDiff == 0)
+			return;
+		tickDiff = getAdjustedTickDiff(tickDiff, pointerId, dragAllSelected ? null : touchedNote);
+		noteDiff = getAdjustedNoteDiff(noteDiff, dragAllSelected ? null : touchedNote);
+		List<MidiNote> notesToDrag = dragAllSelected ? MidiManager.getSelectedNotes() : Arrays
+				.asList(touchedNote);
+
+		MidiManager.moveNotes(notesToDrag, (long) tickDiff, noteDiff);
+	}
+
+	private void pinchSelectedNotes(float onTickDiff, float offTickDiff) {
+		if (onTickDiff == 0 && offTickDiff == 0)
+			return;
+		MidiManager.pinchNotes(MidiManager.getSelectedNotes(), (long) onTickDiff,
+				(long) offTickDiff);
+	}
+
+	private void updateTrackColors() {
+		for (Track track : TrackManager.getTracks()) {
+			track.getRectangle().setFillColor(whichColor(track));
+		}
+	}
+
+	private synchronized void onTrackHeightChange() {
+		float trackHeight = getTotalTrackHeight();
+		currTickLine.setDimensions(currTickLine.width, trackHeight);
+		leftLoopRect.setDimensions(leftLoopRect.width, trackHeight);
+		rightLoopRect.setDimensions(rightLoopRect.width, trackHeight);
+		for (int i = 0; i < loopMarkerLines.length; i++) {
+			loopMarkerLines[i].setDimensions(loopMarkerLines[i].width, trackHeight);
+		}
+		float lineHeight = Math.min(trackHeight, height);
+		for (Line line : vLines) {
+			line.setDimensions(2, lineHeight);
+		}
+		layoutTrackRects();
+	}
+
+	private void selectRegion(Pointer pos) {
+		float tick = xToTick(pos.x);
+		float leftTick = Math.min(tick, selectRegionStartTick);
+		float rightTick = Math.max(tick, selectRegionStartTick);
+		float topY = Math.min(pos.y, selectRegionStartY);
+		float bottomY = Math.max(pos.y, selectRegionStartY);
+		// make sure select rect doesn't go into the tick view
+		topY = Math.max(topY + .01f, 0);
+		// make sure select rect doesn't go past the last track/note
+		bottomY = Math.min(bottomY + .01f, getTotalTrackHeight() - .01f);
+		int topNote = yToNote(topY);
+		int bottomNote = yToNote(bottomY);
+		MidiManager.selectRegion((long) leftTick, (long) rightTick, topNote, bottomNote);
+		// for normal view, round the drawn rectangle to nearest notes
+		topY = noteToY(topNote);
+		bottomY = noteToY(bottomNote + 1);
+		// make room in the view window if we are dragging out of the view
+		scrollHelper.updateView(tick, topY, bottomY);
+		selectRegionRect.layout(tickToUnscaledX(leftTick), absoluteY + topY,
+				tickToUnscaledX(rightTick - leftTick), bottomY - topY);
+	}
+
+	private float getAdjustedTickDiff(float tickDiff, int pointerId, MidiNote singleNote) {
+		if (tickDiff == 0)
+			return 0;
+		float adjustedTickDiff = tickDiff;
+		for (MidiNote selectedNote : MidiManager.getSelectedNotes()) {
+			if (singleNote != null && !selectedNote.equals(singleNote))
+				continue;
+			if (Math.abs(startOnTicks.get(pointerId) - selectedNote.getOnTick())
+					+ Math.abs(tickDiff) <= 10) {
+				// inside threshold distance - set to original position
+				return startOnTicks.get(pointerId) - selectedNote.getOnTick();
+			}
+			if (selectedNote.getOnTick() < -adjustedTickDiff) {
+				adjustedTickDiff = -selectedNote.getOnTick();
+			} else if (MidiManager.MAX_TICKS - selectedNote.getOffTick() < adjustedTickDiff) {
+				adjustedTickDiff = MidiManager.MAX_TICKS - selectedNote.getOffTick();
+			}
+		}
+		return adjustedTickDiff;
+	}
+
+	private int getAdjustedNoteDiff(int noteDiff, MidiNote singleNote) {
+		int adjustedNoteDiff = noteDiff;
+		for (MidiNote selectedNote : MidiManager.getSelectedNotes()) {
+			if (singleNote != null && !selectedNote.equals(singleNote))
+				continue;
+			if (selectedNote.getNoteValue() < -adjustedNoteDiff) {
+				adjustedNoteDiff = -selectedNote.getNoteValue();
+			} else if (TrackManager.getNumTracks() - 1 - selectedNote.getNoteValue() < adjustedNoteDiff) {
+				adjustedNoteDiff = TrackManager.getNumTracks() - 1 - selectedNote.getNoteValue();
+			}
+		}
+		return adjustedNoteDiff;
+	}
+
+	private void startSelectRegion(Pointer pos) {
+		selectRegionStartTick = xToTick(pos.x);
+		selectRegionStartY = noteToY(yToNote(pos.y));
+		selectRegionRect.layout(tickToUnscaledX(selectRegionStartTick), absoluteY
+				+ selectRegionStartY, 1, trackHeight);
+		selectRegionRect.show();
+		selectRegionRect.bringToTop();
+	}
+
+	private void stopSelectRegion() {
+		selectRegionStartTick = -1;
+		selectRegionRect.hide();
+	}
+
+	// adds a note starting at the nearest major tick (nearest displayed
+	// grid line) to the left and ending one tick before the nearest major
+	// tick to the right of the given tick
+	private void addMidiNote(int track, float tick) {
+		if (track < 0 || track >= TrackManager.getNumTracks())
+			return;
+		long spacing = MidiManager.getMajorTickSpacing();
+		long onTick = (long) (tick - tick % spacing);
+		long offTick = onTick + spacing - 1;
+		MidiManager.addNote(onTick, offTick, track, .75f, .5f, .5f);
+	}
+
+	private MidiNote getMidiNote(int track, float tick) {
+		if (track < 0 || track >= TrackManager.getNumTracks()) {
+			return null;
+		}
+		for (int i = 0; i < MidiManager.getMidiNotes().size(); i++) {
+			MidiNote midiNote = MidiManager.getMidiNotes().get(i);
+			if (midiNote.getNoteValue() == track && midiNote.getOnTick() <= tick
+					&& midiNote.getOffTick() >= tick) {
+				return midiNote;
+			}
+		}
+		return null;
+	}
+
+	private void selectMidiNote(int pointerId, Pointer pos) {
+		final float tick = xToTick(pos.x);
+		MidiNote selectedNote = getMidiNote(yToNote(pos.y), tick);
+
+		if (selectedNote == null || selectedNote.isTouched())
+			return;
+
+		startOnTicks.put(pointerId, (float) selectedNote.getOnTick());
+		dragOffsetTick[pointerId] = tick - selectedNote.getOnTick();
+		// don't need right offset for simple drag (one finger select)
+
+		// If this is the only touched midi note, and it hasn't yet
+		// been selected, make it the only selected note.
+		// If we are multi-selecting, add it to the selected list
+		if (!selectedNote.isSelected()) {
+			if (touchedNotes.isEmpty()) {
+				MidiManager.deselectAllNotes();
+			}
+			selectedNote.setSelected(true);
+		}
+		touchedNotes.put(pointerId, selectedNote);
+	}
+
+	private void updateCurrentTick() {
+		currTickLine.setPosition(tickToUnscaledX(MidiManager.getCurrTick()), absoluteY);
+	}
+
+	private void layoutTrackRects() {
+		for (Track track : TrackManager.getTracks()) {
+			Rectangle trackRect = track.getRectangle();
+			if (trackRect != null) {
+				trackRect.layout(absoluteX, absoluteY + noteToUnscaledY(track.getId()), width,
+						trackHeight);
+			}
+		}
+	}
+
+	private synchronized void updateVerticalLineColors() {
+		for (int i = 0; i < vLines.length; i++) {
+			float[] lineColor = lineColor(i);
+			if (!vLines[i].getStrokeColor().equals(lineColor)) {
+				vLines[i].setStrokeColor(lineColor);
+			}
+		}
+	}
+
+	private float[] lineColor(int lineIndex) {
+		for (int i = 0; i < Color.MIDI_LINES.length; i++) {
+			if (i > MidiManager.getBeatDivision() + 3) {
+				return Color.TRANSPARENT;
+			} else if (lineIndex % (vLines.length / (1 << i)) == 0) {
+				return Color.MIDI_LINES[i];
+			}
+		}
+		return Color.TRANSPARENT;
 	}
 }
