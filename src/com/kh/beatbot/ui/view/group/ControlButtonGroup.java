@@ -4,17 +4,19 @@ import android.widget.Toast;
 
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.event.EventManager;
+import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
+import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
-public class ControlButtonGroup extends TouchableView {
+public class ControlButtonGroup extends TouchableView implements MidiNoteListener {
 
 	public ToggleButton playButton, recordButton, copyButton;
 	public Button stopButton, undoButton, redoButton, deleteButton, quantizeButton;
@@ -121,16 +123,12 @@ public class ControlButtonGroup extends TouchableView {
 		});
 
 		setEditIconsEnabled(false);
-		notifyMidiChange();
+		quantizeButton.setEnabled(false);
 	}
 
-	public void setEditIconsEnabled(final boolean enabled) {
+	private void setEditIconsEnabled(final boolean enabled) {
 		deleteButton.setEnabled(enabled);
 		copyButton.setEnabled(enabled);
-	}
-
-	public void notifyMidiChange() {
-		quantizeButton.setEnabled(!MidiManager.getMidiNotes().isEmpty());
 	}
 
 	public void setUndoIconEnabled(final boolean enabled) {
@@ -159,5 +157,25 @@ public class ControlButtonGroup extends TouchableView {
 		undoButton.layout(this, width - 3 * height - rightMargin, 0, height, height);
 		redoButton.layout(this, width - 2 * height - rightMargin, 0, height, height);
 		deleteButton.layout(this, width - height - rightMargin, 0, height, height);
+	}
+
+	@Override
+	public void onCreate(MidiNote note) {
+		quantizeButton.setEnabled(true);
+	}
+
+	@Override
+	public void onDestroy(MidiNote note) {
+		quantizeButton.setEnabled(MidiManager.anyNotes());
+	}
+
+	@Override
+	public void onMove(MidiNote note) {
+		//no-op
+	}
+
+	@Override
+	public void onSelectStateChange(MidiNote note) {
+		setEditIconsEnabled(MidiManager.anyNoteSelected());
 	}
 }

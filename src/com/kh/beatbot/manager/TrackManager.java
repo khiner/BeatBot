@@ -86,7 +86,6 @@ public class TrackManager implements TrackListener, FileListener {
 		createTrackNative();
 		track.setId(tracks.size());
 		tracks.add(track);
-		track.updateNextNote();
 		get().onCreate(track);
 
 		track.setSample(track.getCurrSampleFile());
@@ -122,6 +121,7 @@ public class TrackManager implements TrackListener, FileListener {
 		for (TrackListener trackListener : trackListeners) {
 			trackListener.onCreate(track);
 		}
+		track.updateNextNote();
 		track.select();
 	}
 

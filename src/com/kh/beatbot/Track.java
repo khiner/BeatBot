@@ -13,6 +13,7 @@ import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.event.FileListener;
+import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
@@ -23,7 +24,7 @@ import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.view.TrackButtonRow;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
-public class Track extends BaseTrack implements FileListener {
+public class Track extends BaseTrack implements FileListener, MidiNoteListener {
 
 	public static float MIN_LOOP_WINDOW = 32f;
 	private static final AlertDialog.Builder ERROR_ALERT = new AlertDialog.Builder(
@@ -85,29 +86,17 @@ public class Track extends BaseTrack implements FileListener {
 		buttonRow.instrumentButton.setChecked(true);
 	}
 
-	public void removeNote(MidiNote note) {
-		notes.remove(note);
-		notifyNoteRemoved(id, note.getOnTick(), note.getOffTick());
-		updateNextNote();
-	}
-
-	public void addNote(MidiNote note) {
-		notes.add(note);
-		updateNextNote();
-	}
-
 	public void setNoteTicks(MidiNote midiNote, long onTick, long offTick) {
 		if (!notes.contains(midiNote)
 				|| (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)) {
 			return;
 		}
+		long prevOnTick = midiNote.getOnTick();
+		long prevOffTick = midiNote.getOffTick();
+		midiNote.setTicks(onTick, offTick);
 		// if we're changing the stop tick on a note that's already playing to a
 		// note before the current tick, stop the track
-		notifyNoteMoved(midiNote.getOnTick(), midiNote.getOffTick(), onTick, offTick);
-		// move Java note ticks
-		midiNote.setOnTick(onTick);
-		midiNote.setOffTick(offTick);
-		updateNextNote();
+		notifyNoteMoved(id, prevOnTick, prevOffTick, midiNote.getOnTick(), midiNote.getOffTick());
 	}
 
 	public void handleNoteCollisions() {
@@ -152,8 +141,7 @@ public class Track extends BaseTrack implements FileListener {
 	}
 
 	public MidiNote getNextMidiNote(long currTick) {
-		// is there another note starting between the current tick and the end
-		// of the loop?
+		// is there another note starting between the current tick and the end of the loop?
 		for (MidiNote midiNote : notes) {
 			if (midiNote.getOnTick() >= currTick
 					&& midiNote.getOnTick() < MidiManager.getLoopEndTick()) {
@@ -301,10 +289,6 @@ public class Track extends BaseTrack implements FileListener {
 		return getFrames(id);
 	}
 
-	public void notifyNoteMoved(long oldNoteOn, long oldNoteOff, long newNoteOn, long newNoteOff) {
-		notifyNoteMoved(id, oldNoteOn, oldNoteOff, newNoteOn, newNoteOff);
-	}
-
 	// set play mode to reverse
 	public void setReverse(boolean reverse) {
 		this.reverse = reverse;
@@ -393,5 +377,30 @@ public class Track extends BaseTrack implements FileListener {
 				updateLoopWindow();
 			}
 		}
+	}
+
+	@Override
+	public void onCreate(MidiNote note) {
+		if (!notes.contains(note)) {
+			notes.add(note);
+		}
+	}
+
+	@Override
+	public void onDestroy(MidiNote note) {
+		if (notes.contains(note)) {
+			notes.remove(note);
+			notifyNoteRemoved(id, note.getOnTick(), note.getOffTick());
+		}
+	}
+
+	@Override
+	public void onMove(MidiNote note) {
+		updateNextNote();
+	}
+
+	@Override
+	public void onSelectStateChange(MidiNote note) {
+		// no-op
 	}
 }

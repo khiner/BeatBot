@@ -138,6 +138,17 @@ public class MidiManager {
 		}
 	}
 
+	// return true if any Midi note exists
+	public static boolean anyNotes() {
+		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
+			Track track = TrackManager.getTrack(i);
+			if (!track.getMidiNotes().isEmpty()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	// return true if any Midi note is selected
 	public static boolean anyNoteSelected() {
 		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
@@ -216,8 +227,8 @@ public class MidiManager {
 
 		long tickOffset = startTick - getLeftmostTick(copiedNotes);
 		for (MidiNote copiedNote : copiedNotes) {
-			copiedNote.setOnTick(copiedNote.getOnTick() + tickOffset);
-			copiedNote.setOffTick(copiedNote.getOffTick() + tickOffset);
+			copiedNote.setTicks(copiedNote.getOnTick() + tickOffset, copiedNote.getOffTick()
+					+ tickOffset);
 		}
 
 		beginMidiEvent(null);
@@ -230,15 +241,6 @@ public class MidiManager {
 		beginMidiEvent(null);
 		new MidiNotesDestroyEvent(getSelectedNotes()).execute();
 		endMidiEvent();
-	}
-
-	public static void setNoteValue(MidiNote midiNote, int newNote) {
-		int oldNote = midiNote.getNoteValue();
-		if (oldNote == newNote)
-			return;
-		midiNote.setNote(newNote);
-		TrackManager.getTrack(oldNote).removeNote(midiNote);
-		TrackManager.getTrack(newNote).addNote(midiNote);
 	}
 
 	public static void setNoteTicks(MidiNote midiNote, long onTick, long offTick,

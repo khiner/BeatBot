@@ -34,7 +34,7 @@ public class MidiNotesMoveEvent extends MidiNotesEvent {
 					midiNote.getOffTick() + tickDiff, true);
 		}
 		if (noteDiff != 0) {
-			MidiManager.setNoteValue(midiNote, midiNote.getNoteValue() + noteDiff);
+			midiNote.setNote(midiNote.getNoteValue() + noteDiff);
 		}
 	}
 }

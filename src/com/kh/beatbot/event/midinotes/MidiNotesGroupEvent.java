@@ -7,10 +7,8 @@ import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.event.Temporal;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
-import com.kh.beatbot.ui.view.View;
 
 public class MidiNotesGroupEvent implements Stateful, Temporal {
-
 	private List<MidiNote> savedState = null;
 
 	public synchronized final void begin() {
@@ -23,23 +21,20 @@ public class MidiNotesGroupEvent implements Stateful, Temporal {
 		if (savedState != null && !notesEqual(savedState, MidiManager.getMidiNotes())) {
 			EventManager.eventCompleted(this);
 		}
-		updateUi();
 	}
 
 	@Override
 	public synchronized void doRedo() {
 		restore();
-		updateUi();
 	}
 
 	@Override
 	public synchronized void doUndo() {
 		restore();
-		updateUi();
 	}
 
 	public void updateUi() {
-		View.mainPage.controlButtonGroup.setEditIconsEnabled(MidiManager.anyNoteSelected());
+		// no-op
 	}
 
 	private synchronized void restore() {

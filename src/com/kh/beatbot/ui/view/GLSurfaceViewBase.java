@@ -7,7 +7,6 @@ import javax.microedition.khronos.opengles.GL11;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
-import android.view.SurfaceHolder;
 
 public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfaceView.Renderer {
 
@@ -24,10 +23,6 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
 		super(context);
 		setRenderer(this);
 		setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-	}
-
-	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-		super.surfaceChanged(holder, format, width, height);
 	}
 
 	public void onSurfaceChanged(GL10 _gl, int width, int height) {

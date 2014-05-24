@@ -8,6 +8,7 @@ import java.util.Map;
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.LoopChangeListener;
+import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
@@ -21,7 +22,7 @@ import com.kh.beatbot.ui.view.helper.ScrollHelper;
 import com.kh.beatbot.ui.view.helper.Scrollable;
 
 public class MidiView extends ClickableView implements TrackListener, Scrollable,
-		LoopChangeListener {
+		LoopChangeListener, MidiNoteListener {
 
 	public static final float LOOP_SELECT_SNAP_DIST = 30;
 	public static final int NUM_VERTICAL_LINE_SETS = 8;
@@ -147,38 +148,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		}
 	}
 
-	public void createNoteView(MidiNote note) {
-		Rectangle noteRect = new Rectangle(MidiViewGroup.translateScaleGroup, whichColor(note),
-				Color.BLACK);
-		note.setRectangle(noteRect);
-		addShapes(noteRect);
-		layoutNote(note);
-	}
-
-	public void layoutNote(MidiNote note) {
-		if (note.getRectangle() != null) {
-			note.getRectangle().layout(tickToUnscaledX(note.getOnTick()),
-					absoluteY + noteToUnscaledY(note.getNoteValue()),
-					tickToUnscaledX(note.getOffTick() - note.getOnTick()), trackHeight);
-		}
-	}
-
-	public void updateNoteViewSelected(MidiNote note) {
-		if (note.getRectangle() != null) {
-			note.getRectangle().setFillColor(whichColor(note));
-			note.getRectangle().bringToTop();
-		}
-		// loop/tick lines always display ontop of notes
-		currTickLine.bringToTop();
-		loopMarkerLines[0].bringToTop();
-		loopMarkerLines[1].bringToTop();
-		selectRegionRect.bringToTop();
-	}
-
 	public void layoutNotes() {
 		for (Track track : TrackManager.getTracks()) {
 			for (MidiNote note : track.getMidiNotes()) {
-				layoutNote(note);
+				onMove(note);
 			}
 		}
 	}
@@ -332,18 +305,13 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		onTrackHeightChange();
 		scrollHelper.setYOffset(Float.MAX_VALUE);
 		for (MidiNote note : track.getMidiNotes()) {
-			createNoteView(note);
+			onCreate(note);
 		}
 	}
 
 	@Override
 	public void onDestroy(Track track) {
 		removeShape(track.getRectangle());
-
-		for (MidiNote note : track.getMidiNotes()) {
-			removeShape(note.getRectangle());
-			note.setRectangle(null);
-		}
 		onTrackHeightChange();
 		layoutNotes();
 		scrollHelper.setYOffset(scrollHelper.yOffset);
@@ -637,5 +605,44 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			}
 		}
 		return Color.TRANSPARENT;
+	}
+
+	@Override
+	public void onCreate(MidiNote note) {
+		if (null == note.getRectangle()) {
+			Rectangle noteRect = new Rectangle(MidiViewGroup.translateScaleGroup, whichColor(note),
+					Color.BLACK);
+			note.setRectangle(noteRect);
+			addShapes(noteRect);
+			onMove(note);
+		}
+	}
+
+	@Override
+	public void onDestroy(MidiNote note) {
+		removeShape(note.getRectangle());
+		note.setRectangle(null);
+	}
+
+	@Override
+	public void onMove(MidiNote note) {
+		if (null != note.getRectangle()) {
+			note.getRectangle().layout(tickToUnscaledX(note.getOnTick()),
+					absoluteY + noteToUnscaledY(note.getNoteValue()),
+					tickToUnscaledX(note.getOffTick() - note.getOnTick()), trackHeight);
+		}
+	}
+
+	@Override
+	public void onSelectStateChange(MidiNote note) {
+		if (note.getRectangle() != null) {
+			note.getRectangle().setFillColor(whichColor(note));
+			note.getRectangle().bringToTop();
+		}
+		// loop/tick lines always display ontop of notes
+		currTickLine.bringToTop();
+		loopMarkerLines[0].bringToTop();
+		loopMarkerLines[1].bringToTop();
+		selectRegionRect.bringToTop();
 	}
 }

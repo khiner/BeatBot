@@ -1,7 +1,9 @@
 package com.kh.beatbot.ui.view.page;
 
+import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.group.ControlButtonGroup;
@@ -9,7 +11,7 @@ import com.kh.beatbot.ui.view.group.MidiViewGroup;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 import com.kh.beatbot.ui.view.menu.MainMenu;
 
-public class MainPage extends TouchableView {
+public class MainPage extends TouchableView implements MidiNoteListener {
 	public ControlButtonGroup controlButtonGroup;
 	public MidiViewGroup midiViewGroup;
 	public PageSelectGroup pageSelectGroup;
@@ -48,5 +50,28 @@ public class MainPage extends TouchableView {
 
 	public void expandMenu() {
 		slideMenu.expand();
+	}
+
+	@Override
+	public void onCreate(MidiNote note) {
+		controlButtonGroup.onCreate(note);
+		midiViewGroup.midiView.onCreate(note);
+	}
+
+	@Override
+	public void onDestroy(MidiNote note) {
+		controlButtonGroup.onDestroy(note);
+		midiViewGroup.midiView.onDestroy(note);
+	}
+
+	@Override
+	public void onMove(MidiNote note) {
+		midiViewGroup.midiView.onMove(note);
+	}
+
+	@Override
+	public void onSelectStateChange(MidiNote note) {
+		controlButtonGroup.onSelectStateChange(note);
+		midiViewGroup.midiView.onSelectStateChange(note);
 	}
 }

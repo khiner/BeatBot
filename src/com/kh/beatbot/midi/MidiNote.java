@@ -1,7 +1,13 @@
 package com.kh.beatbot.midi;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import com.kh.beatbot.GeneralUtils;
+import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.Effect.LevelType;
-import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.listener.MidiNoteListener;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
@@ -9,21 +15,38 @@ import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.view.View;
 
 public class MidiNote implements Comparable<MidiNote> {
-	public static final int BORDER_WIDTH = 2;
+	private Track track;
+	private Rectangle rectangle;
+	private NoteOn noteOn;
+	private NoteOff noteOff;
+	private boolean selected = false, touched = false;
 
-	Rectangle rectangle; // rectangle for drawing
-	NoteOn noteOn;
-	NoteOff noteOff;
-	boolean selected = false, touched = false;
-
+	private Set<MidiNoteListener> listeners = new HashSet<MidiNoteListener>();
 	// while moving notes in the ui, they can overlap, but we keep
 	// a memory of the old note ticks while we manipulate the new note ticks
-	long savedOnTick, savedOffTick;
+	private long savedOnTick, savedOffTick;
 
 	public MidiNote(NoteOn noteOn, NoteOff noteOff) {
+		this(noteOn, noteOff, true);
+	}
+
+	private MidiNote(NoteOn noteOn, NoteOff noteOff, boolean notifyCreate) {
 		this.noteOn = noteOn;
 		this.noteOff = noteOff;
 		savedOnTick = savedOffTick = -1;
+		this.track = TrackManager.getTrack(noteOn.getNoteValue());
+		listeners.add(View.mainPage);
+		listeners.add(track);
+	}
+
+	public void create() {
+		selected = true;
+		notifyCreated();
+		notifyMoved();
+	}
+
+	public void destroy() {
+		notifyDestroyed();
 	}
 
 	public void saveTicks() {
@@ -52,16 +75,12 @@ public class MidiNote implements Comparable<MidiNote> {
 		this.rectangle = rectangle;
 	}
 
-	private void updateViewPosition() {
-		View.mainPage.midiViewGroup.midiView.layoutNote(this);
-	}
-
 	public MidiNote getCopy() {
 		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0, noteOn.getNoteValue(),
 				noteOn.getVelocity(), noteOn.getPan(), noteOn.getPitch());
 		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0, noteOff.getNoteValue(),
 				noteOff.getVelocity(), noteOff.getPan(), noteOn.getPitch());
-		MidiNote copy = new MidiNote(noteOnCopy, noteOffCopy);
+		MidiNote copy = new MidiNote(noteOnCopy, noteOffCopy, false);
 		copy.setSelected(selected);
 		copy.setTouched(touched);
 		copy.savedOnTick = this.savedOnTick;
@@ -113,9 +132,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		if (this.selected == selected)
 			return;
 		this.selected = selected;
-		View.mainPage.controlButtonGroup.setEditIconsEnabled(MidiManager.anyNoteSelected());
-		View.mainPage.midiViewGroup.midiView.updateNoteViewSelected(this); // color change
-
+		notifySelectStateChanged();
 	}
 
 	public void setTouched(boolean touched) {
@@ -123,50 +140,52 @@ public class MidiNote implements Comparable<MidiNote> {
 	}
 
 	public void setVelocity(float velocity) {
-		velocity = clipLevel(velocity);
+		velocity = GeneralUtils.clipToUnit(velocity);
 		noteOn.setVelocity(velocity);
 		noteOff.setVelocity(velocity);
 	}
 
 	public void setPan(float pan) {
-		pan = clipLevel(pan);
+		pan = GeneralUtils.clipToUnit(pan);
 		noteOn.setPan(pan);
 		noteOff.setPan(pan);
 	}
 
 	public void setPitch(float pitch) {
-		pitch = clipLevel(pitch);
+		pitch = GeneralUtils.clipToUnit(pitch);
 		noteOn.setPitch(pitch);
 		noteOff.setPitch(pitch);
 	}
 
-	// clip the level to be within the min/max allowed
-	// (0-1)
-	private float clipLevel(float level) {
-		if (level < 0)
-			return 0;
-		if (level > 1)
-			return 1;
-		return level;
-	}
-
-	public void setOnTick(long onTick) {
+	public void setTicks(long onTick, long offTick) {
 		noteOn.setTick(onTick >= 0 ? onTick : 0);
-		updateViewPosition();
-	}
-
-	public void setOffTick(long offTick) {
-		if (offTick > getOnTick())
-			this.noteOff.setTick(offTick);
-		updateViewPosition();
+		if (offTick > getOnTick()) {
+			noteOff.setTick(offTick);
+		}
+		notifyMoved();
 	}
 
 	public void setNote(int note) {
-		if (note < 0)
+		if (note < 0 || noteOn.getNoteValue() == note)
 			return;
-		this.noteOn.setNoteValue(note);
-		this.noteOff.setNoteValue(note);
-		updateViewPosition();
+
+		noteOn.setNoteValue(note);
+		noteOff.setNoteValue(note);
+		setTrack(TrackManager.getTrack(note));
+		notifyMoved();
+	}
+
+	private void setTrack(Track track) {
+		if (null == track || track.equals(this.track))
+			return;
+		if (null != this.track) { 
+			this.track.onDestroy(this);
+			listeners.remove(this.track);
+		}
+
+		this.track = track;
+		listeners.add(this.track);
+		this.track.onCreate(this);
 	}
 
 	public long getNoteLength() {
@@ -187,7 +206,7 @@ public class MidiNote implements Comparable<MidiNote> {
 	}
 
 	public void setLevel(LevelType levelType, float level) {
-		float clippedLevel = clipLevel(level);
+		float clippedLevel = GeneralUtils.clipToUnit(level);
 		switch (levelType) {
 		case VOLUME:
 			setVelocity(clippedLevel);
@@ -215,6 +234,30 @@ public class MidiNote implements Comparable<MidiNote> {
 			return this.getPan() - otherNote.getPan() < 0 ? -1 : 1;
 		} else {
 			return this.getPitch() - otherNote.getPitch() < 0 ? -1 : 1;
+		}
+	}
+
+	private void notifyCreated() {
+		for (MidiNoteListener listener : listeners) {
+			listener.onCreate(this);
+		}
+	}
+
+	private void notifyDestroyed() {
+		for (MidiNoteListener listener : listeners) {
+			listener.onDestroy(this);
+		}
+	}
+
+	private void notifyMoved() {
+		for (MidiNoteListener listener : listeners) {
+			listener.onMove(this);
+		}
+	}
+
+	private void notifySelectStateChanged() {
+		for (MidiNoteListener listener : listeners) {
+			listener.onSelectStateChange(this);
 		}
 	}
 }
