@@ -26,7 +26,7 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.ViewPager;
+import com.kh.beatbot.ui.view.ViewFlipper;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
 import com.kh.beatbot.ui.view.page.MainPage;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
@@ -37,7 +37,7 @@ public class BeatBotActivity extends Activity {
 
 	private static final String MAIN_PAGE_ID = "main", EFFECT_PAGE_ID = "effect";
 
-	private static ViewPager activityPager;
+	private static ViewFlipper activityPager;
 	private static EditText bpmInput, midiFileNameInput, sampleNameInput;
 
 	public static BeatBotActivity mainActivity;
@@ -78,10 +78,10 @@ public class BeatBotActivity extends Activity {
 		layout.addView(View.root);
 		setContentView(layout, lp);
 
-		activityPager = new ViewPager(null);
+		activityPager = new ViewFlipper(null);
 
-		View.mainPage = new MainPage(activityPager);
-		View.effectPage = new EffectPage(activityPager);
+		View.mainPage = new MainPage(null);
+		View.effectPage = new EffectPage(null);
 
 		activityPager.addPage(MAIN_PAGE_ID, View.mainPage);
 		activityPager.addPage(EFFECT_PAGE_ID, View.effectPage);
@@ -120,9 +120,9 @@ public class BeatBotActivity extends Activity {
 
 	@Override
 	public void onBackPressed() {
-		if (activityPager.getCurrPageId() == MAIN_PAGE_ID) {
+		if (activityPager.getCurrPage().equals(View.mainPage)) {
 			showDialog(EXIT_DIALOG_ID);
-		} else if (activityPager.getCurrPageId() == EFFECT_PAGE_ID) {
+		} else if (activityPager.getCurrPage().equals(View.effectPage)) {
 			activityPager.setPage(MAIN_PAGE_ID);
 		}
 	}
