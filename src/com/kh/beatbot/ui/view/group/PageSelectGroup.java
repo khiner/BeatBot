@@ -82,7 +82,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 
 		levelsPage = new LevelsPage(pager);
 		effectsPage = new EffectsPage(pager);
-		browsePage = new BrowsePage(pager);
+		browsePage = new BrowsePage(pager, null);
 		browsePage.setClip(true);
 		editPage = new SampleEditPage(pager);
 		adsrPage = new AdsrPage(pager);
