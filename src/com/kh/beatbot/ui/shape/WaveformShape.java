@@ -18,12 +18,18 @@ public class WaveformShape extends Shape {
 	}
 
 	private static short[] getStrokeIndices(float width) {
-		short[] strokeIndices = new short[(int) (width * MAX_SPP * 3 * 2)];
-		for (int i = 0; i < strokeIndices.length / 2; i++) {
+		short[] strokeIndices = new short[(int) (width * MAX_SPP * 3 * 2) + 2];
+		// degenerate line begin
+		strokeIndices[0] = 0;
+		strokeIndices[1] = 1;
+		for (int i = 1; i < (strokeIndices.length - 1) / 2; i++) {
 			strokeIndices[i * 2] = (short) i;
 			strokeIndices[i * 2 + 1] = (short) (i + 1);
 		}
 
+		// degenerate line end
+		strokeIndices[strokeIndices.length - 2] = strokeIndices[strokeIndices.length - 4];
+		strokeIndices[strokeIndices.length - 1] = strokeIndices[strokeIndices.length - 3];
 		return strokeIndices;
 	}
 
@@ -58,6 +64,7 @@ public class WaveformShape extends Shape {
 		float x = this.x;
 		float y = this.y + height / 2;
 
+		strokeVertex(x, y);
 		for (int i = 0; i < sampleBuffer.size(); i++) {
 			int sampleIndex = sampleBuffer.keyAt(i);
 			float sample = sampleBuffer.get(sampleIndex);
