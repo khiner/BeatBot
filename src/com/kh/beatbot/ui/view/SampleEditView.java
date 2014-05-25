@@ -45,41 +45,21 @@ public class SampleEditView extends ControlView2dBase {
 						Color.BLACK);
 				addShapes(waveformShape);
 			}
-			for (int i = 0; i < loopButtons.length; i++) {
-				if (null == loopButtons[i]) {
-					loopButtons[i] = new Button(this).withIcon(IconResourceSets.SAMPLE_LOOP);
-					loopButtons[i].setShrinkable(false);
-					loopButtons[i].deselectOnPointerExit = false;
-					loopButtons[i].setOnPressListener(new OnPressListener() {
-						@Override
-						public void onPress(Button button) {
-							if (button.ownsPointer(scrollPointerId)) {
-								scrollPointerId = -1;
-							} else if (button.ownsPointer(zoomLeftPointerId)) {
-								scrollPointerId = zoomRightPointerId;
-								zoomLeftPointerId = zoomRightPointerId = -1;
-							} else if (button.ownsPointer(zoomRightPointerId)) {
-								scrollPointerId = zoomLeftPointerId;
-								zoomLeftPointerId = zoomRightPointerId = -1;
-							}
-						}
-					});
-				}
-				loopButtons[i].setState(loopButtons[i].getState());
-			}
-
 			waveformShape.layout(absoluteX, absoluteY, waveformWidth, height);
+			for (int i = 0; i < loopButtons.length; i++) {
+				loopButtons[i].show();
+				loopButtons[i].bgShape.bringToTop();
+			}
 			setLevel(0, 1);
 			waveformShape.resample();
 			setText("");
 		} else {
-			for (Button button : loopButtons) {
-				removeChild(button);
-				button = null;
-			}
 			if (null != waveformShape) {
-				waveformShape.hide();
+				removeShape(waveformShape);
 				waveformShape = null;
+			}
+			for (Button button : loopButtons) {
+				button.hide();
 			}
 			setText(NO_SAMPLE_MESSAGE);
 		}
@@ -140,6 +120,26 @@ public class SampleEditView extends ControlView2dBase {
 		initRect();
 		currSampleRect = new Rectangle(renderGroup, Color.TRON_BLUE, null);
 		addShapes(currSampleRect);
+		for (int i = 0; i < loopButtons.length; i++) {
+			loopButtons[i] = new Button(this).withRoundedRect().withIcon(
+					IconResourceSets.SAMPLE_LOOP);
+			loopButtons[i].setShrinkable(false);
+			loopButtons[i].deselectOnPointerExit = false;
+			loopButtons[i].setOnPressListener(new OnPressListener() {
+				@Override
+				public void onPress(Button button) {
+					if (button.ownsPointer(scrollPointerId)) {
+						scrollPointerId = -1;
+					} else if (button.ownsPointer(zoomLeftPointerId)) {
+						scrollPointerId = zoomRightPointerId;
+						zoomLeftPointerId = zoomRightPointerId = -1;
+					} else if (button.ownsPointer(zoomRightPointerId)) {
+						scrollPointerId = zoomLeftPointerId;
+						zoomLeftPointerId = zoomRightPointerId = -1;
+					}
+				}
+			});
+		}
 	}
 
 	@Override
