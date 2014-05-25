@@ -43,7 +43,7 @@ public class TrackManager implements TrackListener, FileListener {
 		trackListeners.add(trackListener);
 	}
 
-	public static synchronized void init() {
+	public static void init() {
 		for (File drumDirectory : FileManager.drumsDirectory.listFiles()) {
 			final TrackCreateEvent trackCreateEvent = new TrackCreateEvent();
 			trackCreateEvent.doExecute();
@@ -52,7 +52,7 @@ public class TrackManager implements TrackListener, FileListener {
 		}
 	}
 
-	public static synchronized Track getTrack(int trackNum) {
+	public static Track getTrack(int trackNum) {
 		return tracks.get(trackNum);
 	}
 
@@ -66,7 +66,7 @@ public class TrackManager implements TrackListener, FileListener {
 		return soloingTrack;
 	}
 
-	public static synchronized int getNumTracks() {
+	public static int getNumTracks() {
 		return tracks.size();
 	}
 
@@ -74,7 +74,7 @@ public class TrackManager implements TrackListener, FileListener {
 		return tracks;
 	}
 
-	public static synchronized Track createTrack() {
+	public static Track createTrack() {
 		createTrackNative();
 		final Track newTrack = new Track(tracks.size());
 		tracks.add(newTrack);
@@ -82,7 +82,7 @@ public class TrackManager implements TrackListener, FileListener {
 		return newTrack;
 	}
 
-	public static synchronized void createTrack(Track track) {
+	public static void createTrack(Track track) {
 		createTrackNative();
 		track.setId(tracks.size());
 		tracks.add(track);
