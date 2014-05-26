@@ -1,6 +1,7 @@
 package com.kh.beatbot.ui.view.control.param;
 
 import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.ValueLabel;
@@ -17,7 +18,7 @@ public class ParamControl extends TouchableView {
 	public synchronized void createChildren() {
 		valueLabel = new ValueLabel(this);
 		valueLabel.setShrinkable(true);
-		label = new View(this);
+		label = new View(this).withIcon(IconResourceSets.CONTROL_LABEL);
 	}
 
 	@Override

@@ -64,12 +64,13 @@ public class IconResourceSets {
 			PAN = s(r(Color.TRANSPARENT, Color.PAN), r(Color.PAN, Color.BLACK), r(Color.PAN, Color.BLACK), r(Color.TRANSPARENT, Color.PAN)),
 			PITCH = s(r(Color.TRANSPARENT, Color.PITCH), r(Color.PITCH, Color.BLACK), r(Color.PITCH, Color.BLACK), r(Color.TRANSPARENT, Color.PITCH)),
 
-			LOOP = s(r(R.drawable.loop_icon, null, Color.WHITE), r(R.drawable.loop_icon, null, Color.TRON_BLUE)),
 			PREVIEW = s(r(R.drawable.preview_icon, null, Color.WHITE), r(R.drawable.preview_icon_selected, null, Color.WHITE)),
-			REVERSE = s(r(R.drawable.reverse_icon, null, Color.WHITE), r(R.drawable.reverse_icon, null, Color.TRON_BLUE)),
+			LOOP = s(r(R.drawable.loop_icon, null, Color.LABEL_VERY_LIGHT), r(R.drawable.loop_icon, null, Color.LABEL_SELECTED)),
+			REVERSE = s(r(R.drawable.reverse_icon, null, Color.LABEL_VERY_LIGHT), r(R.drawable.reverse_icon, null, Color.LABEL_SELECTED)),
 
 			LINK = s(r(R.drawable.link_icon, null, Color.WHITE), r(R.drawable.link_icon, null, Color.TRON_BLUE)),
 
+			CONTROL_LABEL = s(r(-1, null, null, Color.TRON_BLUE, null), null),
 			TOGGLE = s(r(R.drawable.toggle_icon, Color.LABEL_DARK, Color.LABEL_VERY_LIGHT), r(R.drawable.toggle_icon, Color.TRON_BLUE, Color.BLACK), r(R.drawable.toggle_icon, Color.LABEL_SELECTED, Color.BLACK, Color.BLACK, Color.TRON_BLUE)),
 
 			BANDPASS_FILTER = s(r(R.drawable.bandpass_filter_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.bandpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.bandpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
