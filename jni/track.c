@@ -475,11 +475,17 @@ void Java_com_kh_beatbot_Track_notifyNoteMoved(JNIEnv *env, jclass clazz,
 		jlong newOffTick) {
 	Track *track = getTrack(env, clazz, trackNum);
 
-	if ((track->nextStartSample == tickToSample(oldOnTick)
-			&& tickToSample(newOnTick) > currSample)
-			|| (track->nextStopSample == tickToSample(oldOffTick)
-					&& tickToSample(newOffTick) < currSample))
+	long oldOnSample = tickToSample(oldOnTick);
+	long newOnSample = tickToSample(newOnTick);
+	long oldOffSample = tickToSample(oldOffTick);
+	long newOffSample = tickToSample(newOffTick);
+	if ((track->nextStartSample == oldOnSample && newOnSample > currSample)
+			|| (track->nextStopSample == oldOffSample
+					&& newOffSample < currSample)) {
 		stopTrack(track);
+	} else if (track->nextStopSample == oldOffSample && newOnSample < currSample) {
+		track->nextStopSample = newOffSample;
+	}
 }
 
 void Java_com_kh_beatbot_Track_notifyNoteRemoved(JNIEnv *env, jclass clazz,
