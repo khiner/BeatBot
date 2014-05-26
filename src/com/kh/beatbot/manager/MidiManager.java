@@ -22,7 +22,6 @@ import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
-import com.kh.beatbot.ui.view.View;
 
 public class MidiManager {
 
@@ -150,7 +149,6 @@ public class MidiManager {
 	}
 
 	public static void paste(long startTick) {
-		View.mainPage.controlButtonGroup.uncheckCopyButton();
 		if (copiedNotes.isEmpty())
 			return;
 

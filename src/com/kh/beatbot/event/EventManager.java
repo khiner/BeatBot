@@ -1,29 +1,40 @@
 package com.kh.beatbot.event;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import com.kh.beatbot.ui.view.View;
+import com.kh.beatbot.listener.StatefulEventListener;
 
 public class EventManager {
 	private static final int MAX_EVENTS = 100;
 	private static List<Stateful> events = new ArrayList<Stateful>();
 	private static int currEventIndex = -1;
+	private static Set<StatefulEventListener> listeners = new HashSet<StatefulEventListener>();
+
+	public static void addListener(StatefulEventListener listener) {
+		listeners.add(listener);
+	}
+
+	public static boolean hasUndo() {
+		return currEventIndex >= 0;
+	}
+	
+	public static boolean hasRedo() {
+		return currEventIndex < events.size() - 1;
+	}
 
 	public static final void undo() {
-		if (currEventIndex < 0 || events.size() <= currEventIndex) {
-			return;
+		if (hasUndo()) {
+			events.get(currEventIndex--).doUndo();	
 		}
-		events.get(currEventIndex--).doUndo();
-		updateUi();
 	}
 
 	public static final void redo() {
-		if (currEventIndex >= events.size() - 1) {
-			return;
+		if (hasRedo()) {
+			events.get(++currEventIndex).doRedo();
 		}
-		events.get(++currEventIndex).doRedo();
-		updateUi();
 	}
 
 	public static void eventCompleted(Stateful event) {
@@ -36,11 +47,12 @@ public class EventManager {
 			events.remove(0); // drop the oldest event to save space
 			currEventIndex--;
 		}
-		updateUi();
+		notifyEventCompleted();
 	}
-
-	private static void updateUi() {
-		View.mainPage.controlButtonGroup.setUndoIconEnabled(currEventIndex >= 0);
-		View.mainPage.controlButtonGroup.setRedoIconEnabled(currEventIndex < events.size() - 1);
+	
+	private static void notifyEventCompleted() {
+		for (StatefulEventListener listener : listeners) {
+			listener.onEventCompleted();
+		}
 	}
 }

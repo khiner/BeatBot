@@ -181,11 +181,15 @@ public class TouchableView extends View {
 	}
 
 	protected void press() {
-		setState(State.PRESSED);
+		if (isEnabled()) {
+			setState(State.PRESSED);
+		}
 	}
 
 	protected void release() {
-		setState(State.DEFAULT);
+		if (isEnabled()) {
+			setState(State.DEFAULT);
+		}
 	}
 
 	/* Views can override this for different behavior when dragging away than lifting up */
