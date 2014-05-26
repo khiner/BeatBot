@@ -73,7 +73,7 @@ public class NoteLevelsView extends TouchableView {
 
 	protected void drawLevel(MidiNote midiNote, float[] levelColor, float[] levelColorTrans) {
 		float y = levelToY(midiNote.getLevel(currLevelType));
-		levelBarRect.layout(-LEVEL_BAR_WIDTH / 2, y, LEVEL_BAR_WIDTH, height - y - BG_OFFSET);
+		levelBarRect.layout(-LEVEL_BAR_WIDTH / 2, y, LEVEL_BAR_WIDTH, height - y - 1);
 		levelBarCircle.setPosition(0, y);
 		levelBarSelectCircle.setPosition(0, y);
 		levelBarRect.setFillColor(levelColor);

@@ -38,7 +38,7 @@ public class MainPage extends TouchableView implements MidiNoteListener {
 		float midiHeight = 3 * (height - controlButtonHeight) / 5;
 		float pageSelectGroupHeight = height - midiHeight - controlButtonHeight;
 		View.LABEL_HEIGHT = pageSelectGroupHeight / 5;
-
+		View.BG_OFFSET = height / 180;
 		midiViewGroup.layout(this, 0, controlButtonHeight, width - 15, midiHeight);
 		controlButtonGroup.layout(this, midiViewGroup.getTrackControlWidth(), 0, width
 				- midiViewGroup.getTrackControlWidth(), controlButtonHeight);

@@ -153,6 +153,6 @@ public class EffectsPage extends TrackPage {
 
 	@Override
 	public synchronized void layoutChildren() {
-		effectLabelList.layout(this, 0, height / 4, width, height / 2);
+		effectLabelList.layout(this, BG_OFFSET, height / 4, width - BG_OFFSET * 2, height / 2);
 	}
 }

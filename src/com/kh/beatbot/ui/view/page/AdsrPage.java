@@ -81,7 +81,7 @@ public class AdsrPage extends TrackPage implements OnReleaseListener {
 	public synchronized void layoutChildren() {
 		float thirdHeight = height / 3;
 		float pos = width - thirdHeight * (adsrButtons.length + 1);
-		adsrView.layout(this, 0, 0, pos, height);
+		adsrView.layout(this, BG_OFFSET, BG_OFFSET, pos - BG_OFFSET * 2, height - BG_OFFSET * 2);
 		paramControl.layout(this, pos, thirdHeight, width - pos, 2 * thirdHeight);
 		pos += thirdHeight / 2;
 		for (int i = 0; i < adsrButtons.length; i++) {

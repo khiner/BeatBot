@@ -28,8 +28,8 @@ public class View implements Comparable<View> {
 	public static EffectPage effectPage;
 	public static GLSurfaceViewBase root;
 
-	protected static final float ¹ = (float) Math.PI, BG_OFFSET = 3, X_OFFSET = 2;
-	protected static float LABEL_HEIGHT = 0;
+	protected static final float ¹ = (float) Math.PI, X_OFFSET = 2;
+	protected static float LABEL_HEIGHT = 0, BG_OFFSET = 0;
 
 	public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0, height = 0;
 
