@@ -5,20 +5,20 @@ import java.util.List;
 import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.event.Temporal;
-import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 
 public class MidiNotesGroupEvent implements Stateful, Temporal {
 	private List<MidiNote> savedState = null;
 
 	public synchronized final void begin() {
-		savedState = MidiManager.copyMidiList(MidiManager.getMidiNotes());
-		MidiManager.saveNoteTicks();
+		savedState = TrackManager.copyMidiNotes();
+		TrackManager.saveNoteTicks();
 	}
 
 	public synchronized final void end() {
-		MidiManager.finalizeNoteTicks();
-		if (savedState != null && !notesEqual(savedState, MidiManager.getMidiNotes())) {
+		TrackManager.finalizeNoteTicks();
+		if (savedState != null && !TrackManager.notesEqual(savedState)) {
 			EventManager.eventCompleted(this);
 		}
 	}
@@ -38,23 +38,10 @@ public class MidiNotesGroupEvent implements Stateful, Temporal {
 	}
 
 	private synchronized void restore() {
-		List<MidiNote> newSavedState = MidiManager.copyMidiList(MidiManager.getMidiNotes());
+		List<MidiNote> newSavedState = TrackManager.copyMidiNotes();
 		// restore previous midi state
-		new MidiNotesDestroyEvent(MidiManager.getMidiNotes()).execute();
+		new MidiNotesDestroyEvent(TrackManager.getMidiNotes()).execute();
 		new MidiNotesCreateEvent(savedState).execute();
 		savedState = newSavedState;
-	}
-
-	private synchronized boolean notesEqual(List<MidiNote> notes, List<MidiNote> otherNotes) {
-		if (notes.size() != otherNotes.size()) {
-			return false;
-		}
-
-		for (int i = 0; i < notes.size(); i++) {
-			if (notes.get(i).compareTo(otherNotes.get(i)) != 0) {
-				return false;
-			}
-		}
-		return true;
 	}
 }

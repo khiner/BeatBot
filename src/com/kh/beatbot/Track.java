@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.AlertDialog;
+import android.util.Log;
 
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.event.FileListener;
-import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
@@ -24,7 +24,7 @@ import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.view.TrackButtonRow;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
-public class Track extends BaseTrack implements FileListener, MidiNoteListener {
+public class Track extends BaseTrack implements FileListener {
 
 	public static float MIN_LOOP_WINDOW = 32f;
 	private static final AlertDialog.Builder ERROR_ALERT = new AlertDialog.Builder(
@@ -38,7 +38,7 @@ public class Track extends BaseTrack implements FileListener, MidiNoteListener {
 			soloing = false;
 
 	private TrackButtonRow buttonRow;
-	private List<MidiNote> notes = new ArrayList<MidiNote>();
+	private List<MidiNote> notes = Collections.synchronizedList(new ArrayList<MidiNote>());
 	private Map<File, SampleParams> paramsForSample = new HashMap<File, SampleParams>();
 	private File currSampleFile;
 	private Rectangle rectangle;
@@ -52,8 +52,28 @@ public class Track extends BaseTrack implements FileListener, MidiNoteListener {
 
 	public void setId(int id) {
 		this.id = id;
-		for (MidiNote note : notes) {
-			note.setNote(id);
+		synchronized (notes) {
+			for (MidiNote note : notes) {
+				note.setNote(id);
+			}
+		}
+	}
+
+	public void addNote(MidiNote note) {
+		synchronized (notes) {
+			if (!notes.contains(note)) {
+				notes.add(note);
+			}
+		}
+		updateNextNote();
+	}
+
+	public void removeNote(MidiNote note) {
+		synchronized (notes) {
+			if (notes.contains(note)) {
+				notes.remove(note);
+				notifyNoteRemoved(id, note.getOnTick(), note.getOffTick());
+			}
 		}
 	}
 
@@ -86,10 +106,25 @@ public class Track extends BaseTrack implements FileListener, MidiNoteListener {
 		buttonRow.instrumentButton.setChecked(true);
 	}
 
-	public void setNoteTicks(MidiNote midiNote, long onTick, long offTick) {
+	public void setNoteTicks(MidiNote midiNote, long onTick, long offTick,
+			boolean maintainNoteLength) {
 		if (!notes.contains(midiNote)
 				|| (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)) {
 			return;
+		}
+		if (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)
+			return;
+		if (offTick <= onTick)
+			offTick = onTick + 4;
+		if (MidiManager.isSnapToGrid()) {
+			onTick = (long) MidiManager.getMajorTickNearestTo(onTick);
+			offTick = (long) MidiManager.getMajorTickNearestTo(offTick) - 1;
+			if (offTick == onTick - 1) {
+				offTick += MidiManager.getTicksPerBeat();
+			}
+		}
+		if (maintainNoteLength) {
+			offTick = midiNote.getOffTick() + onTick - midiNote.getOnTick();
 		}
 		long prevOnTick = midiNote.getOnTick();
 		long prevOffTick = midiNote.getOffTick();
@@ -104,9 +139,9 @@ public class Track extends BaseTrack implements FileListener, MidiNoteListener {
 			MidiNote note = notes.get(i);
 			long newOnTick = note.isSelected() ? note.getOnTick() : note.getSavedOnTick();
 			long newOffTick = note.isSelected() ? note.getOffTick() : note.getSavedOffTick();
-			for (int j = 0; j < notes.size(); j++) {
+			for (int j = i + 1; j < notes.size(); j++) {
 				MidiNote otherNote = notes.get(j);
-				if (note.equals(otherNote) || !otherNote.isSelected()) {
+				if (!otherNote.isSelected()) {
 					continue;
 				}
 				// if a selected note begins in the middle of another note,
@@ -125,12 +160,23 @@ public class Track extends BaseTrack implements FileListener, MidiNoteListener {
 					break;
 				}
 			}
-			setNoteTicks(note, newOnTick, newOffTick);
+			setNoteTicks(note, newOnTick, newOffTick, false);
 		}
 	}
 
 	public List<MidiNote> getMidiNotes() {
 		return notes;
+	}
+
+	public MidiNote getMidiNote(long tick) {
+		synchronized (notes) {
+			for (MidiNote note : notes) {
+				if (note.getOnTick() <= tick && note.getOffTick() >= tick) {
+					return note;
+				}
+			}
+		}
+		return null;
 	}
 
 	public void selectAllNotes() {
@@ -156,6 +202,74 @@ public class Track extends BaseTrack implements FileListener, MidiNoteListener {
 			}
 		}
 		return false;
+	}
+
+	public void selectRegion(long leftTick, long rightTick, int topNote, int bottomNote) {
+		for (MidiNote midiNote : notes) {
+			// conditions for region selection
+			boolean a = leftTick < midiNote.getOffTick();
+			boolean b = rightTick > midiNote.getOffTick();
+			boolean c = leftTick < midiNote.getOnTick();
+			boolean d = rightTick > midiNote.getOnTick();
+			boolean selected = id >= topNote && id <= bottomNote
+					&& ((a && b) || (c && d) || (!b && !c));
+			midiNote.setSelected(selected);
+		}
+	}
+
+	public void moveSelectedNotes(int noteDiff, long tickDiff) {
+		for (MidiNote note : notes) {
+			if (note.isSelected()) {
+				moveNote(note, noteDiff, tickDiff);
+			}
+		}
+	}
+
+	public void resetSelectedNotes() {
+		List<MidiNote> notesToRemove = new ArrayList<MidiNote>();
+		synchronized (notes) {
+			for (MidiNote note : notes) {
+				if (note.isSelected() && id != note.getNoteValue()) {
+					notesToRemove.add(note);
+					TrackManager.getTrack(note).addNote(note);
+				}
+			}
+		}
+		for (MidiNote note : notesToRemove) {
+			removeNote(note);
+		}
+	}
+
+	public void moveNote(MidiNote note, int noteDiff, long tickDiff) {
+		if (tickDiff != 0) {
+			setNoteTicks(note, note.getOnTick() + tickDiff, note.getOffTick() + tickDiff, true);
+		}
+		if (noteDiff != 0) {
+			note.setNote(note.getNoteValue() + noteDiff);
+		}
+	}
+
+	public void saveNoteTicks() {
+		for (MidiNote note : notes) {
+			note.saveTicks();
+		}
+	}
+
+	public void finalizeNoteTicks() {
+		for (MidiNote note : notes) {
+			if (note.getOnTick() > MidiManager.MAX_TICKS) {
+				Log.d("Track", "Deleting note in finalize!");
+				MidiManager.deleteNote(note);
+			} else {
+				note.finalizeTicks();
+			}
+		}
+	}
+
+	public void quantize(int beatDivision) {
+		for (MidiNote note : notes) {
+			MidiManager.quantize(note, beatDivision);
+		}
 	}
 
 	public void updateNextNote() {
@@ -402,30 +516,5 @@ public class Track extends BaseTrack implements FileListener, MidiNoteListener {
 				updateLoopWindow();
 			}
 		}
-	}
-
-	@Override
-	public void onCreate(MidiNote note) {
-		if (!notes.contains(note)) {
-			notes.add(note);
-		}
-	}
-
-	@Override
-	public void onDestroy(MidiNote note) {
-		if (notes.contains(note)) {
-			notes.remove(note);
-			notifyNoteRemoved(id, note.getOnTick(), note.getOffTick());
-		}
-	}
-
-	@Override
-	public void onMove(MidiNote note) {
-		updateNextNote();
-	}
-
-	@Override
-	public void onSelectStateChange(MidiNote note) {
-		// no-op
 	}
 }

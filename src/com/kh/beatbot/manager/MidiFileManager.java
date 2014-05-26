@@ -63,7 +63,7 @@ public class MidiFileManager {
 
 	public static void importMidi(String fileName) {
 		inFileName = fileName;
-		if (MidiManager.getMidiNotes().isEmpty()) {
+		if (!TrackManager.anyNotes()) {
 			completeImport();
 		} else {
 			confirmImportAlert.show();
@@ -75,7 +75,7 @@ public class MidiFileManager {
 		ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
 		midiTracks.add(MidiManager.getTempoTrack());
 		midiTracks.add(new MidiTrack());
-		for (MidiNote midiNote : MidiManager.getMidiNotes()) {
+		for (MidiNote midiNote : TrackManager.getMidiNotes()) {
 			midiTracks.get(1).insertEvent(midiNote.getOnEvent());
 			midiTracks.get(1).insertEvent(midiNote.getOffEvent());
 		}

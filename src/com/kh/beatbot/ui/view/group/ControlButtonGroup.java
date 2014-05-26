@@ -9,6 +9,7 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.RecordManager;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
@@ -166,7 +167,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 
 	@Override
 	public void onDestroy(MidiNote note) {
-		quantizeButton.setEnabled(MidiManager.anyNotes());
+		quantizeButton.setEnabled(TrackManager.anyNotes());
 		onSelectStateChange(note);
 	}
 
@@ -177,6 +178,6 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 
 	@Override
 	public void onSelectStateChange(MidiNote note) {
-		setEditIconsEnabled(MidiManager.anyNoteSelected());
+		setEditIconsEnabled(TrackManager.anyNoteSelected());
 	}
 }

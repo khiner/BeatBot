@@ -10,6 +10,9 @@ public abstract class MidiNotesEvent implements Executable {
 
 	protected List<MidiNote> midiNotes;
 
+	public MidiNotesEvent() {
+	}
+
 	public MidiNotesEvent(MidiNote midiNote) {
 		this.midiNotes = Arrays.asList(midiNote);
 	}

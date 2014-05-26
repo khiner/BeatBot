@@ -191,7 +191,7 @@ public class NoteLevelsView extends TouchableView {
 	private void updateLevelOffsets() {
 		levelOffsets.clear();
 		updateDragLine();
-		for (MidiNote selectedNote : MidiManager.getSelectedNotes()) {
+		for (MidiNote selectedNote : TrackManager.getSelectedNotes()) {
 			levelOffsets.put(
 					selectedNote,
 					selectedNote.getLevel(currLevelType)
@@ -200,7 +200,7 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	private void setLevelsToDragLine() {
-		for (MidiNote selectedNote : MidiManager.getSelectedNotes()) {
+		for (MidiNote selectedNote : TrackManager.getSelectedNotes()) {
 			if (levelOffsets.get(selectedNote) != null) {
 				selectedNote.setLevel(currLevelType, DragLine.getLevel(selectedNote.getOnTick())
 						+ levelOffsets.get(selectedNote));

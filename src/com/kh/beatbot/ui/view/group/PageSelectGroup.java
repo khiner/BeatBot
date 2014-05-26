@@ -68,7 +68,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 		masterButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				TrackManager.masterTrack.select();
+				TrackManager.getMasterTrack().select();
 			}
 		});
 

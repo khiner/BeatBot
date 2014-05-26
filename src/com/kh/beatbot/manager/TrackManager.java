@@ -2,6 +2,7 @@ package com.kh.beatbot.manager;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,34 +11,34 @@ import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.event.FileListener;
 import com.kh.beatbot.event.TrackCreateEvent;
+import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.midi.MidiNote;
 
-public class TrackManager implements TrackListener, FileListener {
+public class TrackManager implements TrackListener, FileListener, MidiNoteListener {
+	public static final int MASTER_TRACK_ID = -1;
+	public static Track currTrack, soloingTrack;
 
-	private static TrackManager instance;
+	private static final TrackManager instance = new TrackManager();
+	private static final BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
+	private static final List<Track> tracks = Collections.synchronizedList(new ArrayList<Track>());
+	private static final Set<TrackListener> trackListeners = new HashSet<TrackListener>();
 
 	private TrackManager() {
 		FileManager.addListener(this);
 	}
 
-	public synchronized static TrackManager get() {
-		if (instance == null) {
-			instance = new TrackManager();
-		}
+	public static TrackManager get() {
 		return instance;
 	}
 
-	public static final int MASTER_TRACK_ID = -1;
+	public static BaseTrack getMasterTrack() {
+		return masterTrack;
+	}
 
-	// effect settings are stored here instead of in the effect activities
-	// because the activities are destroyed after clicking 'back', and we
-	// need to persist state
-	private static List<Track> tracks = new ArrayList<Track>();
-	public static BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
-	public static Track currTrack, soloingTrack;
-
-	private static Set<TrackListener> trackListeners = new HashSet<TrackListener>();
+	public static List<Track> getTracks() {
+		return tracks; // XXX shouldn't provide full list - concurrency threat
+	}
 
 	public static void addTrackListener(TrackListener trackListener) {
 		trackListeners.add(trackListener);
@@ -52,14 +53,260 @@ public class TrackManager implements TrackListener, FileListener {
 		}
 	}
 
-	public static Track getTrack(int trackNum) {
-		return tracks.get(trackNum);
+	public static List<MidiNote> getMidiNotes() {
+		List<MidiNote> midiNotes = new ArrayList<MidiNote>();
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				midiNotes.addAll(track.getMidiNotes());
+			}
+		}
+		return midiNotes;
 	}
 
-	public static synchronized BaseTrack getBaseTrack(int trackNum) {
-		if (trackNum == MASTER_TRACK_ID)
-			return masterTrack;
-		return tracks.get(trackNum);
+	public static MidiNote getMidiNote(int trackNum, long tick) {
+		Track track = getTrack(trackNum);
+		return null == track ? null : track.getMidiNote(tick);
+	}
+
+	public static boolean notesEqual(List<MidiNote> otherNotes) {
+		List<MidiNote> notes = getMidiNotes();
+		if (notes.size() != otherNotes.size())
+			return false;
+		for (int i = 0; i < notes.size(); i++) {
+			if (notes.get(i).compareTo(otherNotes.get(i)) != 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static List<MidiNote> copySelectedNotes() {
+		List<MidiNote> selectedNotesCopy = new ArrayList<MidiNote>();
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				for (MidiNote note : track.getMidiNotes()) {
+					if (note.isSelected()) {
+						selectedNotesCopy.add(note.getCopy());
+					}
+				}
+			}
+		}
+		return selectedNotesCopy;
+	}
+
+	public static List<MidiNote> copyMidiNotes() {
+		List<MidiNote> midiNotesCopy = new ArrayList<MidiNote>();
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				for (MidiNote note : track.getMidiNotes()) {
+					midiNotesCopy.add(note.getCopy());
+				}
+			}
+		}
+		return midiNotesCopy;
+	}
+
+	public static List<MidiNote> getSelectedNotes() {
+		ArrayList<MidiNote> selectedNotes = new ArrayList<MidiNote>();
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				for (MidiNote note : track.getMidiNotes()) {
+					if (note.isSelected()) {
+						selectedNotes.add(note);
+					}
+				}
+			}
+		}
+		return selectedNotes;
+	}
+
+	public static float getAdjustedTickDiff(float tickDiff, long startOnTick, MidiNote singleNote) {
+		if (tickDiff == 0)
+			return 0;
+		float adjustedTickDiff = tickDiff;
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				for (MidiNote note : track.getMidiNotes()) {
+					if (note.isSelected()) {
+						if (null != singleNote && !note.equals(singleNote))
+							continue;
+						if (Math.abs(startOnTick - note.getOnTick()) + Math.abs(tickDiff) <= 10) {
+							// inside threshold distance - set to original position
+							return startOnTick - note.getOnTick();
+						}
+						if (note.getOnTick() < -adjustedTickDiff) {
+							adjustedTickDiff = -note.getOnTick();
+						} else if (MidiManager.MAX_TICKS - note.getOffTick() < adjustedTickDiff) {
+							adjustedTickDiff = MidiManager.MAX_TICKS - note.getOffTick();
+						}
+					}
+				}
+			}
+		}
+		return adjustedTickDiff;
+	}
+
+	public static int getAdjustedNoteDiff(int noteDiff, MidiNote singleNote) {
+		int adjustedNoteDiff = noteDiff;
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				for (MidiNote note : track.getMidiNotes()) {
+					if (note.isSelected()) {
+						if (singleNote != null && !note.equals(singleNote))
+							continue;
+						if (note.getNoteValue() < -adjustedNoteDiff) {
+							adjustedNoteDiff = -note.getNoteValue();
+						} else if (tracks.size() - 1 - note.getNoteValue() < adjustedNoteDiff) {
+							adjustedNoteDiff = tracks.size() - 1 - note.getNoteValue();
+						}
+					}
+				}
+			}
+		}
+		return adjustedNoteDiff;
+	}
+
+	public static void moveNote(MidiNote note, int noteDiff, long tickDiff) {
+		Track track = getTrack(note);
+		if (null != track) {
+			track.moveNote(note, noteDiff, tickDiff);
+			track.removeNote(note);
+			track = getTrack(note);
+			if (null != track) {
+				track.addNote(note);
+			}
+		}
+	}
+
+	public static void moveSelectedNotes(int noteDiff, long tickDiff) {
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				track.moveSelectedNotes(noteDiff, tickDiff);
+			}
+			for (Track track : tracks) {
+				track.resetSelectedNotes();
+			}
+		}
+	}
+
+	public static void setNoteTicks(MidiNote midiNote, long onTick, long offTick,
+			boolean maintainNoteLength) {
+		Track track = getTrack(midiNote);
+		track.setNoteTicks(midiNote, onTick, offTick, maintainNoteLength);
+	}
+
+	public static void pinchSelectedNotes(long onTickDiff, long offTickDiff) {
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				for (MidiNote note : track.getMidiNotes()) {
+					if (note.isSelected()) {
+						pinchNote(note, onTickDiff, offTickDiff);
+					}
+				}
+			}
+		}
+	}
+
+	public static void selectRegion(long leftTick, long rightTick, int topNote, int bottomNote) {
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				track.selectRegion(leftTick, rightTick, topNote, bottomNote);
+			}
+		}
+	}
+
+	public static void saveNoteTicks() {
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				track.saveNoteTicks();
+			}
+		}
+	}
+
+	// called after release of touch event - this
+	// finalizes the note on/off ticks of all notes
+	public static void finalizeNoteTicks() {
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				track.finalizeNoteTicks();
+			}
+		}
+	}
+
+	// return true if any Midi note exists
+	public static boolean anyNotes() {
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				if (track.anyNotes()) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+
+	// return true if any Midi note is selected
+	public static boolean anyNoteSelected() {
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				if (track.anyNoteSelected()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public static long getLeftmostSelectedTick() {
+		long leftMostTick = Long.MAX_VALUE;
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				for (MidiNote note : track.getMidiNotes()) {
+					if (note.isSelected() && note.getOnTick() < leftMostTick) {
+						leftMostTick = note.getOnTick();
+					}
+				}
+			}
+		}
+		return leftMostTick;
+	}
+
+	public static long getRightmostSelectedTick() {
+		long rightMostTick = Long.MIN_VALUE;
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				for (MidiNote note : track.getMidiNotes()) {
+					if (note.isSelected() && note.getOffTick() > rightMostTick) {
+						rightMostTick = note.getOffTick();
+					}
+				}
+			}
+		}
+		return rightMostTick;
+	}
+
+	/*
+	 * Translate all midi notes to their on-ticks' nearest major ticks given the provided beat
+	 * division
+	 */
+	public static void quantize(int beatDivision) {
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				track.quantize(beatDivision);
+			}
+		}
+	}
+
+	public static Track getTrack(int noteValue) {
+		return tracks.get(noteValue);
+	}
+
+	public static Track getTrack(MidiNote note) {
+		return getTrack(note.getNoteValue());
+	}
+
+	public static BaseTrack getBaseTrack(int trackNum) {
+		return trackNum == MASTER_TRACK_ID ? masterTrack : tracks.get(trackNum);
 	}
 
 	public static Track getSoloingTrack() {
@@ -70,34 +317,33 @@ public class TrackManager implements TrackListener, FileListener {
 		return tracks.size();
 	}
 
-	public static List<Track> getTracks() {
-		return tracks;
-	}
-
 	public static Track createTrack() {
 		createTrackNative();
-		final Track newTrack = new Track(tracks.size());
-		tracks.add(newTrack);
+		final Track newTrack;
+		synchronized (tracks) {
+			newTrack = new Track(tracks.size());
+			tracks.add(newTrack);
+		}
 		get().onCreate(newTrack);
 		return newTrack;
 	}
 
 	public static void createTrack(Track track) {
 		createTrackNative();
-		track.setId(tracks.size());
-		tracks.add(track);
+		synchronized (tracks) {
+			track.setId(tracks.size());
+			tracks.add(track);
+		}
 		get().onCreate(track);
 
 		track.setSample(track.getCurrSampleFile());
 	}
 
-	public static boolean trackExists(Track track) {
-		return tracks.contains(track);
-	}
-
-	public static synchronized void quantizeEffectParams() {
-		for (Track track : tracks) {
-			track.quantizeEffectParams();
+	public static void quantizeEffectParams() {
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				track.quantizeEffectParams();
+			}
 		}
 	}
 
@@ -105,9 +351,11 @@ public class TrackManager implements TrackListener, FileListener {
 		return tracks.get(trackNum).getNextMidiNote(currTick);
 	}
 
-	public static synchronized void updateAllTrackNextNotes() {
-		for (Track track : tracks) {
-			track.updateNextNote();
+	public static void updateAllTrackNextNotes() {
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				track.updateNextNote();
+			}
 		}
 	}
 
@@ -127,11 +375,13 @@ public class TrackManager implements TrackListener, FileListener {
 
 	@Override
 	public void onDestroy(Track track) {
-		tracks.remove(track);
-		for (int i = track.getId(); i < tracks.size(); i++) {
-			tracks.get(i).setId(i);
+		synchronized (tracks) {
+			tracks.remove(track);
+			for (int i = track.getId(); i < tracks.size(); i++) {
+				tracks.get(i).setId(i);
+			}
+			tracks.get(Math.min(track.getId(), tracks.size() - 1)).select();
 		}
-		tracks.get(Math.min(track.getId(), tracks.size() - 1)).select();
 
 		for (TrackListener trackListener : trackListeners) {
 			trackListener.onDestroy(track);
@@ -140,8 +390,18 @@ public class TrackManager implements TrackListener, FileListener {
 
 	@Override
 	public void onSelect(BaseTrack track) {
-		if (track instanceof Track)
+		if (track instanceof Track) {
 			currTrack = (Track) track;
+			currTrack.getButtonRow().instrumentButton.setChecked(true);
+		}
+
+		synchronized (tracks) {
+			for (Track otherTrack : tracks) {
+				if (!track.equals(otherTrack)) {
+					otherTrack.getButtonRow().instrumentButton.setChecked(false);
+				}
+			}
+		}
 		for (TrackListener trackListener : trackListeners) {
 			trackListener.onSelect(track);
 		}
@@ -164,6 +424,16 @@ public class TrackManager implements TrackListener, FileListener {
 	@Override
 	public void onSoloChange(Track track, boolean solo) {
 		soloingTrack = solo ? track : null;
+		if (solo) {
+			synchronized (tracks) {
+				// if this track is soloing, set all other solo icons to inactive.
+				for (Track otherTrack : tracks) {
+					if (!track.equals(otherTrack)) {
+						otherTrack.getButtonRow().soloButton.setChecked(false);
+					}
+				}
+			}
+		}
 		for (TrackListener trackListener : trackListeners) {
 			trackListener.onSoloChange(track, solo);
 		}
@@ -171,10 +441,48 @@ public class TrackManager implements TrackListener, FileListener {
 
 	@Override
 	public void onNameChange(File file, File newFile) {
-		for (Track track : TrackManager.getTracks()) {
-			if (track.getCurrSampleFile().equals(file)) {
-				track.onNameChange(file, newFile);
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				if (track.getCurrSampleFile().equals(file)) {
+					track.onNameChange(file, newFile);
+				}
 			}
 		}
+	}
+
+	private static void pinchNote(MidiNote midiNote, long onTickDiff, long offTickDiff) {
+		float newOnTick = midiNote.getOnTick();
+		float newOffTick = midiNote.getOffTick();
+		if (midiNote.getOnTick() + onTickDiff >= 0)
+			newOnTick += onTickDiff;
+		if (midiNote.getOffTick() + offTickDiff <= MidiManager.MAX_TICKS)
+			newOffTick += offTickDiff;
+		setNoteTicks(midiNote, (long) newOnTick, (long) newOffTick, false);
+	}
+
+	@Override
+	public void onCreate(MidiNote note) {
+		Track track = getTrack(note);
+		if (null != track) {
+			track.addNote(note);
+		}
+	}
+
+	@Override
+	public void onDestroy(MidiNote note) {
+		Track track = getTrack(note);
+		if (null != track) {
+			track.removeNote(note);
+		}
+	}
+
+	@Override
+	public void onMove(MidiNote note) {
+		// no-op
+	}
+
+	@Override
+	public void onSelectStateChange(MidiNote note) {
+		// no-op
 	}
 }

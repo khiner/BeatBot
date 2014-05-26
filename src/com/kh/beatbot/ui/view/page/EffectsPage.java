@@ -88,7 +88,7 @@ public class EffectsPage extends TrackPage {
 	}
 
 	public BaseTrack getCurrTrack() {
-		return masterMode ? TrackManager.masterTrack : TrackManager.currTrack;
+		return masterMode ? TrackManager.getMasterTrack() : TrackManager.currTrack;
 	}
 
 	private void updateEffectLabels() {

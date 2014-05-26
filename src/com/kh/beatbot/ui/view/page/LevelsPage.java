@@ -33,7 +33,7 @@ public class LevelsPage extends TrackPage implements ControlViewListener {
 	}
 
 	public BaseTrack getCurrTrack() {
-		return masterMode ? TrackManager.masterTrack : TrackManager.currTrack;
+		return masterMode ? TrackManager.getMasterTrack() : TrackManager.currTrack;
 	}
 
 	@Override

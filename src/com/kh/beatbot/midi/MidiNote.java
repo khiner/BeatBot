@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.GeneralUtils;
-import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.manager.TrackManager;
@@ -15,7 +14,7 @@ import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.view.View;
 
 public class MidiNote implements Comparable<MidiNote> {
-	private Track track;
+
 	private Rectangle rectangle;
 	private NoteOn noteOn;
 	private NoteOff noteOff;
@@ -35,8 +34,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		this.noteOn = noteOn;
 		this.noteOff = noteOff;
 		savedOnTick = savedOffTick = -1;
-		this.track = TrackManager.getTrack(noteOn.getNoteValue());
-		listeners.add(track);
+		listeners.add(TrackManager.get());
 		listeners.add(View.mainPage);
 	}
 
@@ -172,21 +170,7 @@ public class MidiNote implements Comparable<MidiNote> {
 
 		noteOn.setNoteValue(note);
 		noteOff.setNoteValue(note);
-		setTrack(TrackManager.getTrack(note));
 		notifyMoved();
-	}
-
-	private void setTrack(Track track) {
-		if (null == track || track.equals(this.track))
-			return;
-		if (null != this.track) { 
-			this.track.onDestroy(this);
-			listeners.remove(this.track);
-		}
-
-		this.track = track;
-		listeners.add(this.track);
-		this.track.onCreate(this);
 	}
 
 	public long getNoteLength() {
