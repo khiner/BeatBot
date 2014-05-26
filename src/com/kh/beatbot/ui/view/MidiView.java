@@ -123,7 +123,6 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public synchronized void layoutChildren() {
-		currTickLine.layout(absoluteX, absoluteY, 3, height);
 		for (int i = 0; i < loopMarkerLines.length; i++) {
 			loopMarkerLines[i].layout(absoluteX, absoluteY, 3, height);
 		}
@@ -135,6 +134,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		onScaleX();
 		onTrackHeightChange();
 		onLoopChange(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
+		updateCurrentTick();
 	}
 
 	@Override
