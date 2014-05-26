@@ -64,13 +64,13 @@ public class Button extends LongPressableView {
 	}
 
 	protected void notifyPress() {
-		if (pressListener != null) {
+		if (null != pressListener) {
 			pressListener.onPress(this);
 		}
 	}
 
 	protected void notifyRelease() {
-		if (releaseListener != null) {
+		if (null != releaseListener) {
 			releaseListener.onRelease(this);
 		}
 	}
@@ -105,7 +105,7 @@ public class Button extends LongPressableView {
 
 	@Override
 	protected void longPress(int id, Pointer pos) {
-		if (longPressListener != null) {
+		if (null != longPressListener) {
 			longPressListener.onLongPress(this);
 		}
 	}

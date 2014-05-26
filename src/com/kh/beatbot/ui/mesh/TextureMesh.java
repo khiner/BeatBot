@@ -25,7 +25,7 @@ public class TextureMesh extends Mesh {
 	}
 
 	public void show() {
-		if (resourceId != -1 && !isVisible()) {
+		if (resourceId != -1) {
 			super.show();
 			((TextureGroup) group).setResource(this, resourceId);
 		}
