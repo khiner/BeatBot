@@ -9,8 +9,8 @@ public class Flanger extends Effect {
 	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.flanger);
 	public static final int EFFECT_NUM = 4, NUM_PARAMS = 6;
 
-	public Flanger(BaseTrack track) {
-		super(track);
+	public Flanger() {
+		super();
 	}
 
 	public Flanger(BaseTrack track, int position) {

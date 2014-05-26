@@ -21,6 +21,10 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 	protected int position, xParamIndex = 0, yParamIndex = 1;
 	protected boolean on, paramsLinked;
 
+	public Effect() {
+		this(null);
+	}
+
 	public Effect(BaseTrack track) {
 		this.track = track;
 		initParams();

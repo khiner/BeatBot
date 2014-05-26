@@ -8,8 +8,8 @@ public class Chorus extends Effect {
 	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.chorus);
 	public static final int EFFECT_NUM = 0, NUM_PARAMS = 5;
 
-	public Chorus(BaseTrack track) {
-		super(track);
+	public Chorus() {
+		super();
 	}
 
 	public Chorus(BaseTrack track, int position) {

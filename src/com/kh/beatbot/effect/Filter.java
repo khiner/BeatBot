@@ -11,8 +11,8 @@ public class Filter extends Effect {
 
 	private int mode = 0;
 
-	public Filter(BaseTrack track) {
-		super(track);
+	public Filter() {
+		super();
 	}
 
 	public Filter(BaseTrack track, int position) {

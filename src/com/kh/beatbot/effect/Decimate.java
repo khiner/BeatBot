@@ -10,8 +10,8 @@ public class Decimate extends Effect {
 	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.decimate);
 	public static final int EFFECT_NUM = 1, NUM_PARAMS = 2;
 
-	public Decimate(BaseTrack track) {
-		super(track);
+	public Decimate() {
+		super();
 	}
 
 	public Decimate(BaseTrack track, int position) {

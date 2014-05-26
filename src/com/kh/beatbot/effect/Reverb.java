@@ -9,8 +9,8 @@ public class Reverb extends Effect {
 	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.reverb);
 	public static final int EFFECT_NUM = 5, NUM_PARAMS = 2;
 
-	public Reverb(BaseTrack track) {
-		super(track);
+	public Reverb() {
+		super();
 	}
 
 	public Reverb(BaseTrack track, int position) {

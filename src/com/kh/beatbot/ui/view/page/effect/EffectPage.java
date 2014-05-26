@@ -47,13 +47,13 @@ public class EffectPage extends TouchableView {
 		paramsPager = new ViewPager(this);
 		level2d = new Seekbar2d(this);
 
-		chorusPage = new EffectParamsPage(this).withEffect(new Chorus(null));
-		decimatePage = new EffectParamsPage(this).withEffect(new Decimate(null));
-		delayPage = new DelayParamsPage(this).withEffect(new Delay(null));
-		filterPage = new FilterParamsPage(this).withEffect(new Filter(null));
-		flangerPage = new EffectParamsPage(this).withEffect(new Flanger(null));
-		reverbPage = new EffectParamsPage(this).withEffect(new Reverb(null));
-		tremeloPage = new EffectParamsPage(this).withEffect(new Tremolo(null));
+		chorusPage = new EffectParamsPage(paramsPager).withEffect(new Chorus());
+		decimatePage = new EffectParamsPage(paramsPager).withEffect(new Decimate());
+		delayPage = new DelayParamsPage(paramsPager).withEffect(new Delay());
+		filterPage = new FilterParamsPage(paramsPager).withEffect(new Filter());
+		flangerPage = new EffectParamsPage(paramsPager).withEffect(new Flanger());
+		reverbPage = new EffectParamsPage(paramsPager).withEffect(new Reverb());
+		tremeloPage = new EffectParamsPage(paramsPager).withEffect(new Tremolo());
 
 		paramsPager.addPage(Chorus.NAME, chorusPage);
 		paramsPager.addPage(Decimate.NAME, decimatePage);

@@ -15,8 +15,8 @@ public class Delay extends Effect {
 	public float rightChannelLevelMemory = -1;
 	public boolean rightChannelBeatSyncMemory = true;
 
-	public Delay(BaseTrack track) {
-		super(track);
+	public Delay() {
+		super();
 	}
 
 	public Delay(BaseTrack track, int position) {
