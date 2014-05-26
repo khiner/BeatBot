@@ -18,7 +18,7 @@ public class MidiNotesGroupEvent implements Stateful, Temporal {
 
 	public synchronized final void end() {
 		TrackManager.finalizeNoteTicks();
-		if (savedState != null && !TrackManager.notesEqual(savedState)) {
+		if (null != savedState && !TrackManager.notesEqual(savedState)) {
 			EventManager.eventCompleted(this);
 		}
 	}

@@ -217,8 +217,10 @@ public class MidiNote implements Comparable<MidiNote> {
 			return this.getVelocity() - otherNote.getVelocity() < 0 ? -1 : 1;
 		} else if (this.getPan() != otherNote.getPan()) {
 			return this.getPan() - otherNote.getPan() < 0 ? -1 : 1;
-		} else {
+		} else if (this.getPitch() != otherNote.getPitch()) {
 			return this.getPitch() - otherNote.getPitch() < 0 ? -1 : 1;
+		} else {
+			return 0;
 		}
 	}
 
