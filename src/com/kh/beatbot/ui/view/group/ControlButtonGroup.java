@@ -182,6 +182,6 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 	
 	@Override
 	public void onEventCompleted() {
-		updateStateStackIcons(EventManager.hasUndo(), EventManager.hasRedo());
+		updateStateStackIcons(EventManager.canUndo(), EventManager.canRedo());
 	}
 }

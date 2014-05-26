@@ -102,17 +102,6 @@ public class MidiManager {
 		}
 	}
 
-	public static void deselectAllNotes() {
-		for (Track track : TrackManager.getTracks()) {
-			track.deselectAllNotes();
-		}
-	}
-
-	public static void selectRow(int rowNum) {
-		deselectAllNotes();
-		TrackManager.getTrack(rowNum).selectAllNotes();
-	}
-
 	public static MidiNote addNote(long onTick, long offTick, int note, float velocity, float pan,
 			float pitch) {
 		NoteOn on = new NoteOn(onTick, 0, note, velocity, pan, pitch);

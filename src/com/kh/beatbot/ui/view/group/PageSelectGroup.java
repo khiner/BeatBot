@@ -8,6 +8,7 @@ import com.kh.beatbot.event.FileListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.PagerListener;
 import com.kh.beatbot.listener.TrackListener;
+import com.kh.beatbot.listener.TrackNoteLevelsEventListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -23,8 +24,8 @@ import com.kh.beatbot.ui.view.page.LevelsPage;
 import com.kh.beatbot.ui.view.page.NoteLevelsPage;
 import com.kh.beatbot.ui.view.page.SampleEditPage;
 
-public class PageSelectGroup extends TouchableView implements TrackListener, FileListener,
-		PagerListener {
+public class PageSelectGroup extends TouchableView implements TrackListener,
+		TrackNoteLevelsEventListener, FileListener, PagerListener {
 
 	private static final String TRACK_PAGE_ID = "track";
 
@@ -42,6 +43,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 
 	public PageSelectGroup(View view) {
 		super(view);
+		TrackManager.addTrackNoteLevelsEventListener(this);
 	}
 
 	public void setBPM(float bpm) {
@@ -50,10 +52,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 
 	public void selectBrowsePage() {
 		trackButtonRow.getBrowseButton().trigger(true);
-	}
-
-	public void selectNoteLevelsPage() {
-		trackButtonRow.getNoteLevelsButton().trigger(true);
 	}
 
 	public void selectLevelsPage() {
@@ -165,5 +163,11 @@ public class PageSelectGroup extends TouchableView implements TrackListener, Fil
 	@Override
 	public void onPageChange(ViewPager pager, View newPage) {
 		((TrackListener) newPage).onSelect(TrackManager.currTrack);
+	}
+
+	@Override
+	public void onNoteLevelsChange(Track track) {
+		// select note levels page whenever a note levels change event occurs
+		trackButtonRow.getNoteLevelsButton().trigger(true);
 	}
 }

@@ -17,22 +17,22 @@ public class EventManager {
 		listeners.add(listener);
 	}
 
-	public static boolean hasUndo() {
+	public static boolean canUndo() {
 		return currEventIndex >= 0;
 	}
 	
-	public static boolean hasRedo() {
+	public static boolean canRedo() {
 		return currEventIndex < events.size() - 1;
 	}
 
 	public static final void undo() {
-		if (hasUndo()) {
+		if (canUndo()) {
 			events.get(currEventIndex--).doUndo();	
 		}
 	}
 
 	public static final void redo() {
-		if (hasRedo()) {
+		if (canRedo()) {
 			events.get(++currEventIndex).doRedo();
 		}
 	}

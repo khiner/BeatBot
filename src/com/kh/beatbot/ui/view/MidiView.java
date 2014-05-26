@@ -273,12 +273,12 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		} else if (touchedNote != null) {
 			// single tapping a note always makes it the only selected note
 			if (touchedNote.isSelected()) {
-				MidiManager.deselectAllNotes();
+				TrackManager.deselectAllNotes();
 			}
 			touchedNote.setSelected(true);
 		} else { // if no note is touched, than this tap deselects all notes
 			if (TrackManager.anyNoteSelected()) {
-				MidiManager.deselectAllNotes();
+				TrackManager.deselectAllNotes();
 			} else { // add a note based on the current tick granularity
 				addMidiNote(yToNote(pos.y), xToTick(pos.x));
 			}
@@ -515,7 +515,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		// If we are multi-selecting, add it to the selected list
 		if (!selectedNote.isSelected()) {
 			if (touchedNotes.isEmpty()) {
-				MidiManager.deselectAllNotes();
+				TrackManager.deselectAllNotes();
 			}
 			selectedNote.setSelected(true);
 		}

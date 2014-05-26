@@ -13,6 +13,7 @@ import com.kh.beatbot.event.FileListener;
 import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.TrackListener;
+import com.kh.beatbot.listener.TrackNoteLevelsEventListener;
 import com.kh.beatbot.midi.MidiNote;
 
 public class TrackManager implements TrackListener, FileListener, MidiNoteListener {
@@ -23,6 +24,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	private static final BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
 	private static final List<Track> tracks = Collections.synchronizedList(new ArrayList<Track>());
 	private static final Set<TrackListener> trackListeners = new HashSet<TrackListener>();
+	private static final Set<TrackNoteLevelsEventListener> trackNoteLevelsEventListeners = new HashSet<TrackNoteLevelsEventListener>();
 
 	private TrackManager() {
 		FileManager.addListener(this);
@@ -44,12 +46,34 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		trackListeners.add(trackListener);
 	}
 
+	public static void addTrackNoteLevelsEventListener(TrackNoteLevelsEventListener listener) {
+		trackNoteLevelsEventListeners.add(listener);
+	}
+
+	public static void notifyNoteLevelsSetEvent(Track track) {
+		track.select();
+		for (TrackNoteLevelsEventListener listener : trackNoteLevelsEventListeners) {
+			listener.onNoteLevelsChange(track);
+		}
+	}
+
 	public static void init() {
 		for (File drumDirectory : FileManager.drumsDirectory.listFiles()) {
-			final TrackCreateEvent trackCreateEvent = new TrackCreateEvent();
-			trackCreateEvent.doExecute();
-			trackCreateEvent.updateUi();
+			new TrackCreateEvent().doExecute();
 			tracks.get(tracks.size() - 1).setSample(drumDirectory.listFiles()[0]);
+		}
+	}
+
+	public static void selectRow(int rowNum) {
+		deselectAllNotes();
+		getTrack(rowNum).selectAllNotes();
+	}
+
+	public static void deselectAllNotes() {
+		synchronized (tracks) {
+			for (Track track : tracks) {
+				track.deselectAllNotes();
+			}
 		}
 	}
 

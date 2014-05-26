@@ -39,8 +39,4 @@ public class SampleSetEvent implements Executable, Stateful {
 		track.setSample(sample);
 		return true;
 	}
-
-	@Override
-	public void updateUi() {
-	}
 }

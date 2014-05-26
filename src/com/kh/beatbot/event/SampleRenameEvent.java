@@ -18,17 +18,11 @@ public class SampleRenameEvent implements Executable, Stateful {
 	@Override
 	public void doUndo() {
 		doExecute(originalSampleName);
-		updateUi();
 	}
 
 	@Override
 	public void doRedo() {
 		doExecute(newSampleName);
-		updateUi();
-	}
-
-	@Override
-	public void updateUi() {
 	}
 
 	@Override

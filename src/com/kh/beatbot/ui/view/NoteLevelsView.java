@@ -129,7 +129,7 @@ public class NoteLevelsView extends TouchableView {
 				// If we are multi-selecting, add it to the selected list
 				if (!midiNote.isSelected()) {
 					if (touchedLevels.isEmpty()) {
-						MidiManager.deselectAllNotes();
+						TrackManager.deselectAllNotes();
 					}
 					midiNote.setSelected(true);
 				}
@@ -139,7 +139,7 @@ public class NoteLevelsView extends TouchableView {
 			}
 		}
 		if (touchedLevels.isEmpty()) {
-			MidiManager.deselectAllNotes();
+			TrackManager.deselectAllNotes();
 		}
 		return false;
 	}

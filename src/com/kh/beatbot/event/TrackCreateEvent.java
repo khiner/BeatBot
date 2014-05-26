@@ -28,10 +28,6 @@ public class TrackCreateEvent implements Executable, Stateful {
 	}
 
 	@Override
-	public void updateUi() {
-	}
-
-	@Override
 	public void execute() {
 		doExecute();
 		EventManager.eventCompleted(this);

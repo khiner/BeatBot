@@ -31,8 +31,4 @@ public class LoopWindowSetEvent implements Stateful, Temporal {
 	public void doRedo() {
 		MidiManager.setLoopTicks(finalBeginTick, finalEndTick);
 	}
-
-	@Override
-	public void updateUi() {
-	}
 }

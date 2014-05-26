@@ -33,11 +33,7 @@ public class MidiNotesGroupEvent implements Stateful, Temporal {
 		restore();
 	}
 
-	public void updateUi() {
-		// no-op
-	}
-
-	private synchronized void restore() {
+	protected synchronized void restore() {
 		List<MidiNote> newSavedState = TrackManager.copyMidiNotes();
 		// restore previous midi state
 		new MidiNotesDestroyEvent(TrackManager.getMidiNotes()).execute();
