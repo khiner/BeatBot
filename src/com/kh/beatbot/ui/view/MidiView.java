@@ -25,7 +25,6 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		LoopChangeListener, MidiNoteListener {
 
 	public static final float LOOP_SELECT_SNAP_DIST = 30;
-	public static final int NUM_VERTICAL_LINE_SETS = 8;
 	public static float trackHeight;
 
 	private float dragOffsetTick[] = { 0, 0, 0, 0, 0 };
@@ -34,7 +33,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	private int pinchLeftPointerId = -1, pinchRightPointerId = -1;
 
-	private Line[] loopMarkerLines, vLines;
+	private Line[] loopMarkerLines, tickLines;
 	private Line currTickLine;
 	private Rectangle leftLoopRect, rightLoopRect, selectRegionRect;
 
@@ -108,17 +107,17 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		selectRegionRect = new Rectangle(MidiViewGroup.translateScaleGroup, Color.TRON_BLUE_TRANS,
 				Color.TRON_BLUE);
 		currTickLine = new Line(MidiViewGroup.translateScaleGroup, null, Color.TRON_BLUE);
-		vLines = new Line[(MidiManager.MAX_TICKS * 8) / MidiManager.MIN_TICKS];
+		tickLines = new Line[(MidiManager.MAX_TICKS * 8) / MidiManager.MIN_TICKS];
 		loopMarkerLines = new Line[2];
-		for (int i = 0; i < vLines.length; i++) {
-			vLines[i] = new Line(MidiViewGroup.scaleGroup, null, Color.TRANSPARENT);
+		for (int i = 0; i < tickLines.length; i++) {
+			tickLines[i] = new Line(MidiViewGroup.scaleGroup, null, Color.TRANSPARENT);
 		}
 		for (int i = 0; i < loopMarkerLines.length; i++) {
 			loopMarkerLines[i] = new Line(MidiViewGroup.translateScaleGroup, null, Color.TRON_BLUE);
 		}
 
 		addShapes(leftLoopRect, rightLoopRect, selectRegionRect, currTickLine);
-		addShapes(vLines);
+		addShapes(tickLines);
 		addShapes(loopMarkerLines);
 	}
 
@@ -131,7 +130,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		int minTickSpacing = MidiManager.MIN_TICKS / 8;
 
 		for (int i = 0, currTick = 0; currTick < MidiManager.MAX_TICKS; i++, currTick += minTickSpacing) {
-			vLines[i].layout(tickToUnscaledX(currTick), absoluteY, 2, 1);
+			tickLines[i].layout(tickToUnscaledX(currTick), absoluteY, 2, 1);
 		}
 		onScaleX();
 		onTrackHeightChange();
@@ -351,8 +350,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public void onScaleX() {
-		updateVerticalLineColors();
 		MidiManager.adjustBeatDivision(getNumTicks());
+		updateTickLineColors();
 	}
 
 	@Override
@@ -447,7 +446,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			loopMarkerLines[i].setDimensions(loopMarkerLines[i].width, trackHeight);
 		}
 		float lineHeight = Math.min(trackHeight, height);
-		for (Line line : vLines) {
+		for (Line line : tickLines) {
 			line.setDimensions(2, lineHeight);
 		}
 		layoutTrackRects();
@@ -587,11 +586,11 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		}
 	}
 
-	private synchronized void updateVerticalLineColors() {
-		for (int i = 0; i < vLines.length; i++) {
+	private synchronized void updateTickLineColors() {
+		for (int i = 0; i < tickLines.length; i++) {
 			float[] lineColor = lineColor(i);
-			if (!vLines[i].getStrokeColor().equals(lineColor)) {
-				vLines[i].setStrokeColor(lineColor);
+			if (!tickLines[i].getStrokeColor().equals(lineColor)) {
+				tickLines[i].setStrokeColor(lineColor);
 			}
 		}
 	}
@@ -600,7 +599,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		for (int i = 0; i < Color.MIDI_LINES.length; i++) {
 			if (i > MidiManager.getBeatDivision() + 3) {
 				return Color.TRANSPARENT;
-			} else if (lineIndex % (vLines.length / (1 << i)) == 0) {
+			} else if (lineIndex % (tickLines.length / (1 << i)) == 0) {
 				return Color.MIDI_LINES[i];
 			}
 		}
