@@ -11,12 +11,13 @@ import com.kh.beatbot.ui.shape.AdsrShape;
 
 public class AdsrView extends TouchableView implements ParamListener {
 
+	private static final int NUM_VERTICES = 5;
 	private static final int SNAP_DIST_SQUARED = 1024;
-	private static float[] pointVertices = new float[10];
+	private static final float[] POINT_VERTICES = new float[NUM_VERTICES * 2];
 
 	// keep track of which pointer ids are selecting which ADSR points
 	// init to -1 to indicate no pointer is selecting
-	private int[] adsrSelected = new int[] { -1, -1, -1, -1, -1 };
+	private int[] adsrSelected = new int[] { -1, -1, -1, -1 };
 
 	private AdsrShape adsrShape;
 
@@ -56,7 +57,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	@Override
 	public void handleActionUp(int id, Pointer pos) {
 		super.handleActionUp(id, pos);
-		clearAdsrSelected();
+		deselectAdsrPoint(id);
 	}
 
 	@Override
@@ -67,8 +68,9 @@ public class AdsrView extends TouchableView implements ParamListener {
 	@Override
 	protected synchronized void createChildren() {
 		initRoundedRect();
-		adsrShape = new AdsrShape(renderGroup, Color.TRON_BLUE, Color.TRON_BLUE);
-		
+		adsrShape = new AdsrShape(renderGroup, Color.TRON_BLUE, Color.TRON_BLUE_TRANS,
+				Color.TRON_BLUE);
+
 		addShapes(adsrShape);
 	}
 
@@ -81,18 +83,18 @@ public class AdsrView extends TouchableView implements ParamListener {
 		Track track = TrackManager.currTrack;
 		float attackX = getAttackX(track.adsr);
 		float decayX = getDecayX(track.adsr);
-		pointVertices[0] = viewX(0);
-		pointVertices[1] = viewY(track.adsr.getStart());
-		pointVertices[2] = attackX;
-		pointVertices[3] = viewY(track.adsr.getPeak());
-		pointVertices[4] = decayX;
-		pointVertices[5] = viewY(track.adsr.getSustain());
-		pointVertices[6] = viewX(2f / 3f); // fixed x for release begin
-		pointVertices[7] = viewY(track.adsr.getSustain());
-		pointVertices[8] = getReleaseX(track.adsr);
-		pointVertices[9] = viewY(0);
+		POINT_VERTICES[0] = viewX(0);
+		POINT_VERTICES[1] = viewY(track.adsr.getStart());
+		POINT_VERTICES[2] = attackX;
+		POINT_VERTICES[3] = viewY(track.adsr.getPeak());
+		POINT_VERTICES[4] = decayX;
+		POINT_VERTICES[5] = viewY(track.adsr.getSustain());
+		POINT_VERTICES[6] = viewX(2f / 3f); // fixed x for release begin
+		POINT_VERTICES[7] = viewY(track.adsr.getSustain());
+		POINT_VERTICES[8] = getReleaseX(track.adsr);
+		POINT_VERTICES[9] = viewY(0);
 
-		adsrShape.update(pointVertices);
+		adsrShape.update(POINT_VERTICES);
 	}
 
 	private float getAttackX(ADSR adsr) {
@@ -112,25 +114,35 @@ public class AdsrView extends TouchableView implements ParamListener {
 	}
 
 	private float xToDecay(float x) {
-		return GeneralUtils.clipToUnit(unitX(x - pointVertices[2]) * 3);
+		return GeneralUtils.clipToUnit(unitX(x - POINT_VERTICES[2]) * 3);
 	}
 
 	private float xToRelease(float x) {
 		return GeneralUtils.clipToUnit((unitX(x) - 2f / 3f) * 3);
 	}
 
-	private void deselectAdsrPoint(int id) {
-		for (int i = 0; i < adsrSelected.length; i++) {
-			if (adsrSelected[i] == id) {
-				adsrSelected[i] = -1;
+	private void selectAdsrPoint(int id, float x, float y) {
+		for (int i = 0; i < NUM_VERTICES; i++) {
+			if (i == 3)
+				// cannot be set by user (beginning of release / end of sustain)
+				continue;
+			if (GeneralUtils.distanceFromPointSquared(POINT_VERTICES[i * 2],
+					POINT_VERTICES[i * 2 + 1], x, y) < SNAP_DIST_SQUARED) {
+				int selectIndex = vertexIndexToSelectIndex(i);
+				adsrSelected[selectIndex] = id;
+				adsrShape.select(selectIndex);
 				return;
 			}
 		}
 	}
 
-	private void clearAdsrSelected() {
+	private void deselectAdsrPoint(int id) {
 		for (int i = 0; i < adsrSelected.length; i++) {
-			adsrSelected[i] = -1;
+			if (adsrSelected[i] == id) {
+				adsrSelected[i] = -1;
+				adsrShape.deselect(i);
+				return;
+			}
 		}
 	}
 
@@ -150,9 +162,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 					adsr.setDecay(xToDecay(x));
 					adsr.setSustain(unitY(y));
 					break;
-				case 3: // beginning of release - user cannot set.
-					break;
-				case 4: // release time - y == 0 always.
+				case 3: // release time - y == 0 always.
 					adsr.setRelease(xToRelease(x));
 					break;
 				}
@@ -161,16 +171,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 		}
 	}
 
-	private void selectAdsrPoint(int id, float x, float y) {
-		for (int i = 0; i < 5; i++) {
-			if (i == 3)
-				// cannot be set by user (beginning of release / end of sustain)
-				continue;
-			if (GeneralUtils.distanceFromPointSquared(pointVertices[i * 2],
-					pointVertices[i * 2 + 1], x, y) < SNAP_DIST_SQUARED) {
-				adsrSelected[i] = id;
-				return;
-			}
-		}
+	private int vertexIndexToSelectIndex(int vertexIndex) {
+		return vertexIndex > 3 ? vertexIndex - 1 : vertexIndex;
 	}
 }
