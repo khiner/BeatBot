@@ -139,9 +139,9 @@ public class Track extends BaseTrack implements FileListener {
 			MidiNote note = notes.get(i);
 			long newOnTick = note.isSelected() ? note.getOnTick() : note.getSavedOnTick();
 			long newOffTick = note.isSelected() ? note.getOffTick() : note.getSavedOffTick();
-			for (int j = i + 1; j < notes.size(); j++) {
+			for (int j = 0; j < notes.size(); j++) {
 				MidiNote otherNote = notes.get(j);
-				if (!otherNote.isSelected()) {
+				if (note.equals(otherNote) || !otherNote.isSelected()) {
 					continue;
 				}
 				// if a selected note begins in the middle of another note,
@@ -256,13 +256,17 @@ public class Track extends BaseTrack implements FileListener {
 	}
 
 	public void finalizeNoteTicks() {
+		List<MidiNote> notesToDelete = new ArrayList<MidiNote>();
 		for (MidiNote note : notes) {
 			if (note.getOnTick() > MidiManager.MAX_TICKS) {
-				Log.d("Track", "Deleting note in finalize!");
-				MidiManager.deleteNote(note);
+				notesToDelete.add(note);
 			} else {
 				note.finalizeTicks();
 			}
+		}
+		for (MidiNote note : notesToDelete) {
+			Log.d("Track", "Deleting note in finalize!");
+			MidiManager.deleteNote(note);
 		}
 	}
 
