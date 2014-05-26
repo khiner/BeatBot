@@ -133,6 +133,31 @@ public class Track extends BaseTrack implements FileListener, MidiNoteListener {
 		return notes;
 	}
 
+	public void selectAllNotes() {
+		for (MidiNote midiNote : notes) {
+			midiNote.setSelected(true);
+		}
+	}
+
+	public void deselectAllNotes() {
+		for (MidiNote midiNote : notes) {
+			midiNote.setSelected(false);
+		}
+	}
+
+	public boolean anyNotes() {
+		return !notes.isEmpty();
+	}
+
+	public boolean anyNoteSelected() {
+		for (MidiNote midiNote : notes) {
+			if (midiNote.isSelected()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void updateNextNote() {
 		Collections.sort(notes);
 		long currTick = MidiManager.getCurrTick();

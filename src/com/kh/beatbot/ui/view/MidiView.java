@@ -291,7 +291,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	@Override
 	protected void doubleTap(int id, Pointer pos) {
 		MidiNote touchedNote = touchedNotes.get(id);
-		if (touchedNote != null) {
+		if (null != touchedNote) {
 			MidiManager.deleteNote(touchedNote);
 		}
 	}

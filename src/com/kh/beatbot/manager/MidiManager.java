@@ -105,10 +105,9 @@ public class MidiManager {
 		}
 	}
 
-	public static List<MidiNote> getMidiNotes() {
+	public static synchronized List<MidiNote> getMidiNotes() {
 		List<MidiNote> midiNotes = new ArrayList<MidiNote>();
-		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
-			Track track = TrackManager.getTrack(i);
+		for (Track track : TrackManager.getTracks()) {
 			for (MidiNote midiNote : track.getMidiNotes()) {
 				midiNotes.add(midiNote);
 			}
@@ -118,8 +117,7 @@ public class MidiManager {
 
 	public static List<MidiNote> getSelectedNotes() {
 		ArrayList<MidiNote> selectedNotes = new ArrayList<MidiNote>();
-		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
-			Track track = TrackManager.getTrack(i);
+		for (Track track : TrackManager.getTracks()) {
 			for (MidiNote midiNote : track.getMidiNotes()) {
 				if (midiNote.isSelected()) {
 					selectedNotes.add(midiNote);
@@ -132,46 +130,38 @@ public class MidiManager {
 	public static void deselectAllNotes() {
 		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
 			Track track = TrackManager.getTrack(i);
-			for (MidiNote midiNote : track.getMidiNotes()) {
-				midiNote.setSelected(false);
-			}
+			track.deselectAllNotes();
 		}
 	}
 
 	// return true if any Midi note exists
 	public static boolean anyNotes() {
-		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
-			Track track = TrackManager.getTrack(i);
-			if (!track.getMidiNotes().isEmpty()) {
+		for (Track track : TrackManager.getTracks()) {
+			if (track.anyNotes())
+				return true;
+		}
+		return false;
+	}
+
+	// return true if any Midi note is selected
+	public static synchronized boolean anyNoteSelected() {
+		for (Track track : TrackManager.getTracks()) {
+			if (track.anyNoteSelected()) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	// return true if any Midi note is selected
-	public static boolean anyNoteSelected() {
-		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
-			Track track = TrackManager.getTrack(i);
-			for (MidiNote midiNote : track.getMidiNotes()) {
-				if (midiNote.isSelected()) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
 	public static void selectRegion(long leftTick, long rightTick, int topNote, int bottomNote) {
-		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
-			Track track = TrackManager.getTrack(i);
+		for (Track track : TrackManager.getTracks()) {
 			for (MidiNote midiNote : track.getMidiNotes()) {
 				// conditions for region selection
 				boolean a = leftTick < midiNote.getOffTick();
 				boolean b = rightTick > midiNote.getOffTick();
 				boolean c = leftTick < midiNote.getOnTick();
 				boolean d = rightTick > midiNote.getOnTick();
-				boolean selected = i >= topNote && i <= bottomNote
+				boolean selected = track.getId() >= topNote && track.getId() <= bottomNote
 						&& ((a && b) || (c && d) || (!b && !c));
 				midiNote.setSelected(selected);
 			}
@@ -180,9 +170,7 @@ public class MidiManager {
 
 	public static void selectRow(int rowNum) {
 		deselectAllNotes();
-		for (MidiNote midiNote : TrackManager.getTrack(rowNum).getMidiNotes()) {
-			midiNote.setSelected(true);
-		}
+		TrackManager.getTrack(rowNum).selectAllNotes();
 	}
 
 	public static MidiNote addNote(long onTick, long offTick, int note, float velocity, float pan,

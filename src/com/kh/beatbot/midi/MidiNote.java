@@ -1,7 +1,7 @@
 package com.kh.beatbot.midi;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.Track;
@@ -21,7 +21,8 @@ public class MidiNote implements Comparable<MidiNote> {
 	private NoteOff noteOff;
 	private boolean selected = false, touched = false;
 
-	private Set<MidiNoteListener> listeners = new HashSet<MidiNoteListener>();
+	// order matters - notify tracks of deletion before UI
+	private List<MidiNoteListener> listeners = new ArrayList<MidiNoteListener>();
 	// while moving notes in the ui, they can overlap, but we keep
 	// a memory of the old note ticks while we manipulate the new note ticks
 	private long savedOnTick, savedOffTick;
@@ -35,8 +36,8 @@ public class MidiNote implements Comparable<MidiNote> {
 		this.noteOff = noteOff;
 		savedOnTick = savedOffTick = -1;
 		this.track = TrackManager.getTrack(noteOn.getNoteValue());
-		listeners.add(View.mainPage);
 		listeners.add(track);
+		listeners.add(View.mainPage);
 	}
 
 	public void create() {

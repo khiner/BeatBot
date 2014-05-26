@@ -167,6 +167,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 	@Override
 	public void onDestroy(MidiNote note) {
 		quantizeButton.setEnabled(MidiManager.anyNotes());
+		onSelectStateChange(note);
 	}
 
 	@Override
