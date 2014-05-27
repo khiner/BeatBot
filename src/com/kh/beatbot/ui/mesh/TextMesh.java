@@ -18,8 +18,6 @@ public class TextMesh extends Mesh {
 		String oldText = this.text;
 		this.text = text;
 
-		if (!isVisible())
-			return;
 		if (null == oldText || oldText.length() != text.length()) {
 			group.changeSize(this, getNumVertices(oldText), getNumVertices(),
 					getNumIndices(oldText), getNumIndices());
