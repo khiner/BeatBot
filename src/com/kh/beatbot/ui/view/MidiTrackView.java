@@ -12,10 +12,8 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 
 	@Override
 	public synchronized void layoutChildren() {
-		float yPos = 0; // yOffset
-		for (View child : children) {
-			child.layout(this, 0, yPos, width, MidiView.trackHeight);
-			yPos += MidiView.trackHeight;
+		for (int i = 0; i < children.size(); i++) {
+			children.get(i).layout(this, 0, MidiView.trackHeight * i, width, MidiView.trackHeight);
 		}
 	}
 
@@ -37,7 +35,6 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 
 	@Override
 	public void onSelect(BaseTrack track) {
-		// no-op
 	}
 
 	@Override
@@ -51,6 +48,10 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 
 	@Override
 	public void onSoloChange(Track track, boolean solo) {
-		// no-op
+	}
+
+	@Override
+	public float getYTouchTransform() {
+		return mainPage.midiViewGroup.midiView.getYOffset();
 	}
 }
