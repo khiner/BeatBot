@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view;
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.event.SampleLoopWindowSetEvent;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Color;
@@ -15,11 +16,6 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlView2dBase;
 
 public class SampleEditView extends ControlView2dBase {
-
-	public SampleEditView(View view, RenderGroup renderGroup) {
-		super(view, renderGroup);
-	}
-
 	private static final String NO_SAMPLE_MESSAGE = "Tap to load a sample.";
 
 	// min distance for pointer to select loop markers
@@ -28,12 +24,15 @@ public class SampleEditView extends ControlView2dBase {
 	private static Rectangle currSampleRect = null;
 
 	private int scrollPointerId = -1, zoomLeftPointerId = -1, zoomRightPointerId = -1;
-
 	private float scrollAnchorLevel = -1, zoomLeftAnchorLevel = -1, zoomRightAnchorLevel = -1;
 
 	// Zooming/scrolling will change the view window of the samples.
 	// Keep track of that with offset and width.
 	private float levelOffset = 0, levelWidth = 0, waveformWidth = 0, loopButtonW = 0;
+
+	public SampleEditView(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
+	}
 
 	public synchronized void update() {
 		loopButtonW = height / 3;
@@ -219,8 +218,12 @@ public class SampleEditView extends ControlView2dBase {
 		setLevel(newLevelOffset, levelWidth);
 	}
 
+	private SampleLoopWindowSetEvent loopWindowEvent;
+
 	@Override
 	public void handleActionDown(int id, Pointer pos) {
+		loopWindowEvent = new SampleLoopWindowSetEvent(TrackManager.currTrack);
+		loopWindowEvent.begin();
 		super.handleActionDown(id, pos);
 		if (!hasSample())
 			return;
@@ -234,6 +237,8 @@ public class SampleEditView extends ControlView2dBase {
 			return;
 		waveformShape.resample();
 		scrollPointerId = zoomLeftPointerId = zoomRightPointerId = -1;
+		
+		loopWindowEvent.end();
 	}
 
 	@Override

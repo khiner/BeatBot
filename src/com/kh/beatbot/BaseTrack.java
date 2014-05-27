@@ -98,6 +98,13 @@ public class BaseTrack {
 		TrackManager.get().onSelect(this);
 	}
 
+	public void setLevels(float volume, float pan, float pitch) {
+		volumeParam.setLevel(volume);
+		panParam.setLevel(pan);
+		pitchParam.setLevel(pitch);
+		TrackManager.notifyTrackLevelsSetEvent(this);
+	}
+
 	public static native void setTrackVolume(int trackId, float volume);
 
 	public static native void setTrackPan(int trackId, float pan);

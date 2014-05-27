@@ -12,8 +12,8 @@ import com.kh.beatbot.Track;
 import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.listener.FileListener;
 import com.kh.beatbot.listener.MidiNoteListener;
+import com.kh.beatbot.listener.TrackLevelsEventListener;
 import com.kh.beatbot.listener.TrackListener;
-import com.kh.beatbot.listener.TrackNoteLevelsEventListener;
 import com.kh.beatbot.midi.MidiNote;
 
 public class TrackManager implements TrackListener, FileListener, MidiNoteListener {
@@ -24,7 +24,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	private static final BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
 	private static final List<Track> tracks = Collections.synchronizedList(new ArrayList<Track>());
 	private static final Set<TrackListener> trackListeners = new HashSet<TrackListener>();
-	private static final Set<TrackNoteLevelsEventListener> trackNoteLevelsEventListeners = new HashSet<TrackNoteLevelsEventListener>();
+	private static final Set<TrackLevelsEventListener> trackLevelsEventListeners = new HashSet<TrackLevelsEventListener>();
 
 	private TrackManager() {
 		FileManager.addListener(this);
@@ -46,14 +46,28 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		trackListeners.add(trackListener);
 	}
 
-	public static void addTrackNoteLevelsEventListener(TrackNoteLevelsEventListener listener) {
-		trackNoteLevelsEventListeners.add(listener);
+	public static void addTrackLevelsEventListener(TrackLevelsEventListener listener) {
+		trackLevelsEventListeners.add(listener);
+	}
+
+	public static void notifyTrackLevelsSetEvent(BaseTrack track) {
+		track.select();
+		for (TrackLevelsEventListener listener : trackLevelsEventListeners) {
+			listener.onTrackLevelsChange(track);
+		}
 	}
 
 	public static void notifyNoteLevelsSetEvent(Track track) {
 		track.select();
-		for (TrackNoteLevelsEventListener listener : trackNoteLevelsEventListeners) {
+		for (TrackLevelsEventListener listener : trackLevelsEventListeners) {
 			listener.onNoteLevelsChange(track);
+		}
+	}
+
+	public static void notifyLoopWindowSetEvent(Track track) {
+		track.select();
+		for (TrackLevelsEventListener listener : trackLevelsEventListeners) {
+			listener.onSampleLoopWindowChange(track);
 		}
 	}
 
@@ -417,6 +431,8 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		if (track instanceof Track) {
 			currTrack = (Track) track;
 			currTrack.getButtonRow().instrumentButton.setChecked(true);
+		} else {
+			currTrack = null;
 		}
 
 		synchronized (tracks) {

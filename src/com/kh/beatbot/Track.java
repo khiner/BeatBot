@@ -329,6 +329,12 @@ public class Track extends BaseTrack implements FileListener {
 		return sampleParams == null ? null : sampleParams.gainParam;
 	}
 
+	public void setSampleLoopWindow(float beginLevel, float endLevel) {
+		getLoopBeginParam().setLevel(beginLevel);
+		getLoopEndParam().setLevel(endLevel);
+		TrackManager.notifyLoopWindowSetEvent(this);
+	}
+
 	public SampleParams getCurrSampleParams() {
 		return paramsForSample.get(currSampleFile);
 	}
@@ -490,8 +496,8 @@ public class Track extends BaseTrack implements FileListener {
 
 	public native void setNextNote(int trackId, MidiNote midiNote);
 
-	private class SampleParams implements ParamListener {
-		private Param loopBeginParam, loopEndParam, gainParam;
+	public class SampleParams implements ParamListener {
+		public Param loopBeginParam, loopEndParam, gainParam;
 
 		public SampleParams(float numSamples) {
 			loopBeginParam = new Param(0, "Begin").scale(numSamples).withFormat("%.0f");

@@ -19,6 +19,8 @@ public abstract class PageButtonRow extends TouchableView {
 		super(view);
 	}
 
+	public abstract ToggleButton getLevelsButton();
+
 	@Override
 	protected synchronized void createChildren() {
 		pageButtons = new ToggleButton[getNumPages()];

@@ -396,7 +396,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	private static float[] whichColor(Track track) {
-		Track soloingTrack = TrackManager.getSoloingTrack();
+		BaseTrack soloingTrack = TrackManager.getSoloingTrack();
 		if (track.isSelected()) {
 			return Color.LABEL_SELECTED;
 		} else if (track.isMuted() || (soloingTrack != null && !soloingTrack.equals(track))) {

@@ -1,6 +1,9 @@
 package com.kh.beatbot.ui.view.page;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.kh.beatbot.BaseTrack;
+import com.kh.beatbot.event.TrackLevelsSetEvent;
 import com.kh.beatbot.listener.ControlViewListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Color;
@@ -78,13 +81,23 @@ public class LevelsPage extends TrackPage implements ControlViewListener {
 				.layout(this, toggleWidth, toggleHeight * 2, width - toggleWidth, toggleHeight);
 	}
 
+	private AtomicInteger numControlsPressed = new AtomicInteger(0);
+	private TrackLevelsSetEvent levelsSetEvent = null;
+
 	@Override
 	public void onPress(ControlViewBase control) {
+		if (numControlsPressed.getAndIncrement() == 0) {
+			levelsSetEvent = new TrackLevelsSetEvent(getCurrTrack());
+			levelsSetEvent.begin();
+		}
 		getButton((Seekbar) control).press();
 	}
 
 	@Override
 	public void onRelease(ControlViewBase control) {
+		if (numControlsPressed.decrementAndGet() == 0) {
+			levelsSetEvent.end();
+		}
 		getButton((Seekbar) control).disable();
 	}
 

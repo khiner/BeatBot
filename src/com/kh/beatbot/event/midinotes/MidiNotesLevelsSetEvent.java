@@ -11,7 +11,7 @@ public class MidiNotesLevelsSetEvent extends MidiNotesGroupEvent {
 	}
 
 	public synchronized void restore() {
-		super.restore();
 		TrackManager.notifyNoteLevelsSetEvent(track);
+		super.restore();
 	}
 }
