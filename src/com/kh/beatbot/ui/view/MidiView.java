@@ -295,11 +295,15 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		scrollHelper.setYOffset(Float.MAX_VALUE);
 		for (MidiNote note : track.getMidiNotes()) {
 			onCreate(note);
+			onSelectStateChange(note);
 		}
 	}
 
 	@Override
 	public void onDestroy(Track track) {
+		for (MidiNote note : track.getMidiNotes()) {
+			onDestroy(note);
+		}
 		removeShape(track.getRectangle());
 		onTrackHeightChange();
 		layoutNotes();

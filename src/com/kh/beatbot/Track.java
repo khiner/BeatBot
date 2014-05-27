@@ -70,8 +70,7 @@ public class Track extends BaseTrack implements FileListener {
 
 	public void removeNote(MidiNote note) {
 		synchronized (notes) {
-			if (notes.contains(note)) {
-				notes.remove(note);
+			if (notes.remove(note)) {
 				notifyNoteRemoved(id, note.getOnTick(), note.getOffTick());
 			}
 		}
