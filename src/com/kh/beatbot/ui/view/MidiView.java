@@ -173,12 +173,13 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		float leftTick = xToTick(Math.min(pointersById.get(0).x, pointersById.get(1).x));
 		float rightTick = xToTick(Math.max(pointersById.get(0).x, pointersById.get(1).x));
 		if (!touchedNotes.isEmpty()) {
+			long[] selectedTickWindow = TrackManager.getSelectedTickWindow();
 			// note is selected with one pointer, but this pointer
 			// did not select a note. start pinching all selected notes.
 			pinchLeftPointerId = pointersById.get(0).x <= pointersById.get(1).x ? 0 : 1;
 			pinchRightPointerId = (pinchLeftPointerId + 1) % 2;
-			pinchLeftOffset = leftTick - TrackManager.getLeftmostSelectedTick();
-			pinchRightOffset = TrackManager.getRightmostSelectedTick() - rightTick;
+			pinchLeftOffset = leftTick - selectedTickWindow[0];
+			pinchRightOffset = selectedTickWindow[1] - rightTick;
 		} else if (pointerCount() == 1) {
 			// otherwise, enable scrolling
 			scrollHelper.setScrollAnchor(id, xToTick(pos.x));
@@ -190,20 +191,18 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			zoomLeftAnchorTick = leftTick;
 			zoomRightAnchorTick = rightTick;
 		}
-
 	}
 
 	@Override
 	public void handleActionMove(int id, Pointer pos) {
 		super.handleActionMove(id, pos);
+		long[] selectedTickWindow = TrackManager.getSelectedTickWindow();
 		if (id == pinchLeftPointerId) {
 			float leftTick = xToTick(pos.x);
-			pinchSelectedNotes(leftTick - pinchLeftOffset - TrackManager.getLeftmostSelectedTick(),
-					0);
+			pinchSelectedNotes(leftTick - pinchLeftOffset - selectedTickWindow[0], 0);
 		} else if (id == pinchRightPointerId) {
 			float rightTick = xToTick(pos.x);
-			pinchSelectedNotes(0,
-					rightTick + pinchRightOffset - TrackManager.getRightmostSelectedTick());
+			pinchSelectedNotes(0, rightTick + pinchRightOffset - selectedTickWindow[1]);
 		} else if (touchedNotes.isEmpty()) {
 			// no midi selected. scroll, zoom, or update select region
 			noMidiMove();
@@ -435,13 +434,14 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	private synchronized void onTrackHeightChange() {
 		float trackHeight = getTotalTrackHeight();
+		float lineHeight = Math.min(trackHeight, height);
 		currTickLine.setDimensions(currTickLine.width, trackHeight);
-		leftLoopRect.setDimensions(leftLoopRect.width, trackHeight);
-		rightLoopRect.setDimensions(rightLoopRect.width, trackHeight);
+		leftLoopRect.setDimensions(leftLoopRect.width, lineHeight);
+		rightLoopRect.setDimensions(rightLoopRect.width, lineHeight);
 		for (int i = 0; i < loopMarkerLines.length; i++) {
 			loopMarkerLines[i].setDimensions(loopMarkerLines[i].width, trackHeight);
 		}
-		float lineHeight = Math.min(trackHeight, height);
+
 		for (Line line : tickLines) {
 			line.setDimensions(2, lineHeight);
 		}

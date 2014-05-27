@@ -132,9 +132,8 @@ public class MidiManager {
 	public static void paste(long startTick) {
 		if (copiedNotes.isEmpty())
 			return;
-
 		// Copied notes should still be selected, so leftmostSelectedTick should be accurate
-		long tickOffset = startTick - TrackManager.getLeftmostSelectedTick();
+		long tickOffset = startTick - TrackManager.getSelectedTickWindow()[0];
 		for (MidiNote copiedNote : copiedNotes) {
 			copiedNote.setTicks(copiedNote.getOnTick() + tickOffset, copiedNote.getOffTick()
 					+ tickOffset);

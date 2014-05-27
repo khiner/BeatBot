@@ -119,8 +119,7 @@ public class ScrollHelper {
 		}
 	}
 
-	// translates the tickOffset to ensure that leftTick, rightTick, topY and
-	// bottomY are all in view
+	// translates the tickOffset to ensure that tick, topY and bottomY are all in view
 	public void updateView(float tick, float topY, float bottomY) {
 		updateView(tick);
 		if (topY < yOffset && bottomY < yOffset + scrollable.unscaledHeight()) {
@@ -129,7 +128,7 @@ public class ScrollHelper {
 			setYOffset(bottomY - scrollable.unscaledHeight());
 		}
 	}
-	
+
 	public void setXOffset(float xOffset) {
 		this.xOffset = GeneralUtils.clipTo(xOffset, 0, MidiManager.MAX_TICKS - numTicks);
 		scrollable.onScrollX();

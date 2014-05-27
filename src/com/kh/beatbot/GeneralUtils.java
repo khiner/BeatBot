@@ -53,6 +53,8 @@ public class GeneralUtils {
 	}
 
 	public static float clipTo(float value, float min, float max) {
+		if (min > max)
+			return min; // sanity check, always favor min
 		return value > min ? (value < max ? value : max) : min;
 	}
 }
