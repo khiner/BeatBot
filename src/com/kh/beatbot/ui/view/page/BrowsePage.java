@@ -18,10 +18,6 @@ import com.kh.beatbot.ui.view.menu.Menu;
 import com.kh.beatbot.ui.view.menu.MenuItem;
 
 public class BrowsePage extends Menu implements TrackListener {
-	
-	public BrowsePage(View view) {
-		super(view);
-	}
 
 	public BrowsePage(View view, RenderGroup renderGroup) {
 		super(view, renderGroup);
@@ -41,8 +37,8 @@ public class BrowsePage extends Menu implements TrackListener {
 
 	@Override
 	public void onSelect(BaseTrack track) {
-		// ûrecursively select file menu items based on current sample
-		File currSampleFile = ((Track)track).getCurrSampleFile();
+		// recursively select file menu items based on current sample
+		File currSampleFile = ((Track) track).getCurrSampleFile();
 		if (null == currSampleFile)
 			return;
 		String currSamplePath = currSampleFile.getAbsolutePath();
@@ -93,10 +89,7 @@ public class BrowsePage extends Menu implements TrackListener {
 		return width / 4;
 	}
 
-	@Override
 	public void onCreate(Track track) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public void onDestroy(Track track) {

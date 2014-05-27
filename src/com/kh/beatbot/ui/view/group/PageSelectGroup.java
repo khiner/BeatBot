@@ -9,7 +9,6 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.PagerListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.listener.TrackNoteLevelsEventListener;
-import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
@@ -135,12 +134,14 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		effectsPage.setMasterMode(isMaster);
 		((PageButtonRow) buttonRowPager.getCurrPage()).currPage.trigger();
 		((TrackListener) pager.getCurrPage()).onSelect(track);
+		if (!isMaster) {
+			trackButtonRow.update();
+		}
 	}
 
 	@Override
 	public synchronized void onSampleChange(Track track) {
-		trackButtonRow.update();
-		trackButtonRow.getBrowseButton().trigger();
+		updateBrowsePage();
 	}
 
 	@Override
@@ -153,11 +154,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	@Override
 	public void onNameChange(File file, File newFile) {
-		ToggleButton browseButton = trackButtonRow.getBrowseButton();
-		if (browseButton.getText().equals(FileManager.formatSampleName(file.getName()))) {
-			browseButton.setText(FileManager.formatSampleName(newFile.getName()));
-		}
-		trackButtonRow.getBrowseButton().trigger();
+		updateBrowsePage();
 	}
 
 	@Override
@@ -169,5 +166,14 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	public void onNoteLevelsChange(Track track) {
 		// select note levels page whenever a note levels change event occurs
 		trackButtonRow.getNoteLevelsButton().trigger(true);
+	}
+
+	private void updateBrowsePage() {
+		trackButtonRow.update();
+		if (pager.getCurrPage().equals(browsePage)) {
+			browsePage.onSelect(TrackManager.currTrack);
+		} else {
+			trackButtonRow.getBrowseButton().trigger();
+		}
 	}
 }
