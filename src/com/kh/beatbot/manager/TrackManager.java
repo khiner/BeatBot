@@ -325,7 +325,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	public static Track getTrack(int noteValue) {
-		return tracks.get(noteValue);
+		return noteValue < tracks.size() ? tracks.get(noteValue) : null;
 	}
 
 	public static Track getTrack(MidiNote note) {
