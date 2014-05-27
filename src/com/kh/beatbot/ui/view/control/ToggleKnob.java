@@ -33,8 +33,8 @@ public class ToggleKnob extends Knob implements ParamToggleListener {
 				((Param) param).toggle(((ToggleButton) button).isChecked());
 			}
 		});
-		// not adding center button as child, instead manually drawing and
-		// handling touch events
+		// not adding center button as child, instead manually drawing and handling touch events
+		children.remove(centerButton);
 	}
 
 	@Override

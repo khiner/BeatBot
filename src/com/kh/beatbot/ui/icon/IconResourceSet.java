@@ -74,6 +74,8 @@ public class IconResourceSet {
 				resource.iconColor = otherResource.iconColor;
 				resource.resourceId = otherResource.resourceId;
 				resource.textColor = otherResource.textColor;
+			} else if (null != resource && null == otherResource) {
+				resourcePair.setValue(null);
 			}
 		}
 	}

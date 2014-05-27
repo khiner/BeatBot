@@ -46,7 +46,7 @@ public class Button extends LongPressableView {
 	@Override
 	public void press() {
 		super.press();
-		notifyPress(); // always notify press events
+		notifyPressed(); // always notify press events
 	}
 
 	@Override
@@ -60,16 +60,16 @@ public class Button extends LongPressableView {
 	 */
 	public void trigger() {
 		release();
-		notifyRelease();
+		notifyReleased();
 	}
 
-	protected void notifyPress() {
+	protected void notifyPressed() {
 		if (null != pressListener) {
 			pressListener.onPress(this);
 		}
 	}
 
-	protected void notifyRelease() {
+	protected void notifyReleased() {
 		if (null != releaseListener) {
 			releaseListener.onRelease(this);
 		}
@@ -90,7 +90,7 @@ public class Button extends LongPressableView {
 			return;
 		if (isPressed() && (isLongPressing() || longPressListener == null)) {
 			// only release if long press hasn't happened yet
-			notifyRelease();
+			notifyReleased();
 		}
 		super.handleActionUp(id, pos);
 	}

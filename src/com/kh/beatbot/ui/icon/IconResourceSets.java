@@ -65,8 +65,8 @@ public class IconResourceSets {
 			PITCH = s(r(Color.TRANSPARENT, Color.PITCH), r(Color.PITCH, Color.BLACK), r(Color.PITCH, Color.BLACK), r(Color.TRANSPARENT, Color.PITCH)),
 
 			PREVIEW = s(r(R.drawable.preview_icon, null, Color.WHITE), r(R.drawable.preview_icon_selected, null, Color.WHITE)),
-			LOOP = s(r(R.drawable.loop_icon, null, Color.LABEL_VERY_LIGHT), r(R.drawable.loop_icon, null, Color.LABEL_SELECTED)),
-			REVERSE = s(r(R.drawable.reverse_icon, null, Color.LABEL_VERY_LIGHT), r(R.drawable.reverse_icon, null, Color.LABEL_SELECTED)),
+			LOOP = s(r(R.drawable.loop_icon, null, Color.LABEL_VERY_LIGHT), null, r(R.drawable.loop_icon, null, Color.LABEL_SELECTED)),
+			REVERSE = s(r(R.drawable.reverse_icon, null, Color.LABEL_VERY_LIGHT), null, r(R.drawable.reverse_icon, null, Color.LABEL_SELECTED)),
 
 			LINK = s(r(R.drawable.link_icon, null, Color.WHITE), r(R.drawable.link_icon, null, Color.TRON_BLUE)),
 

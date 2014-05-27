@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.view.control;
 
+import com.kh.beatbot.ui.icon.IconResource;
 import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.view.View;
@@ -30,15 +31,24 @@ public class ToggleButton extends Button {
 	 */
 	public void trigger(boolean checked) {
 		setChecked(checked);
-		super.notifyRelease();
+		super.notifyReleased();
 	}
 
 	@Override
-	protected void notifyRelease() {
+	protected IconResource getIconResource() {
+		if (oscillating && isPressed() && null == icon.getResource(State.PRESSED)) {
+			return icon.getResource(checked ? State.DEFAULT : State.SELECTED);
+		} else {
+			return super.getIconResource();
+		}
+	}
+
+	@Override
+	protected void notifyReleased() {
 		if (oscillating || !checked) {
 			setChecked(!checked);
 		}
-		super.notifyRelease();
+		super.notifyReleased();
 	}
 
 	@Override

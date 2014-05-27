@@ -46,9 +46,10 @@ public class View implements Comparable<View> {
 	protected RenderGroup renderGroup;
 	private TextMesh textMesh;
 
+	protected IconResourceSet icon = new IconResourceSet(IconResourceSets.DEFAULT);
 	private boolean shouldClip = false;
 	private String text = "";
-	private IconResourceSet icon = new IconResourceSet(IconResourceSets.DEFAULT);
+	
 	private State state = State.DEFAULT;
 
 	public View(View parent) {
@@ -428,7 +429,7 @@ public class View implements Comparable<View> {
 		return GeneralUtils.clipTo(y, minY, maxY);
 	}
 
-	protected final IconResource getIconResource() {
+	protected IconResource getIconResource() {
 		return icon.getResource(state);
 	}
 
