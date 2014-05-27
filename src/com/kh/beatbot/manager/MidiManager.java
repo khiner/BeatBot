@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.Track;
-import com.kh.beatbot.event.LoopWindowSetEvent;
 import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesCreateEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesDestroyEvent;
@@ -13,7 +12,7 @@ import com.kh.beatbot.event.midinotes.MidiNotesGroupEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesLevelsSetEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesMoveEvent;
 import com.kh.beatbot.event.midinotes.SelectedMidiNotesPinchEvent;
-import com.kh.beatbot.listener.LoopChangeListener;
+import com.kh.beatbot.listener.LoopWindowListener;
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiTrack;
@@ -41,8 +40,7 @@ public class MidiManager {
 			currState = new ArrayList<MidiNote>();
 
 	private static MidiNotesGroupEvent currNoteEvent;
-	private static LoopWindowSetEvent currLoopWindowEvent;
-	private static List<LoopChangeListener> loopChangeListeners = new ArrayList<LoopChangeListener>();
+	private static List<LoopWindowListener> loopChangeListeners = new ArrayList<LoopWindowListener>();
 
 	public static void init() {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION);
@@ -53,7 +51,7 @@ public class MidiManager {
 		setLoopEndTick(TICKS_PER_NOTE * 4);
 	}
 
-	public static void addLoopChangeListener(LoopChangeListener listener) {
+	public static void addLoopChangeListener(LoopWindowListener listener) {
 		loopChangeListeners.add(listener);
 	}
 
@@ -87,18 +85,12 @@ public class MidiManager {
 		currNoteEvent = track == null ? new MidiNotesGroupEvent() : new MidiNotesLevelsSetEvent(
 				track);
 		currNoteEvent.begin();
-		currLoopWindowEvent = new LoopWindowSetEvent();
-		currLoopWindowEvent.begin();
 	}
 
 	public static synchronized void endMidiEvent() {
 		if (currNoteEvent != null) {
 			currNoteEvent.end();
 			currNoteEvent = null;
-		}
-		if (currLoopWindowEvent != null) {
-			currLoopWindowEvent.end();
-			currLoopWindowEvent = null;
 		}
 	}
 
@@ -293,8 +285,8 @@ public class MidiManager {
 		MidiManager.loopEndTick = loopEndTick;
 		setLoopTicksNative(loopBeginTick, loopEndTick);
 		TrackManager.updateAllTrackNextNotes();
-		for (LoopChangeListener listener : loopChangeListeners) {
-			listener.onLoopChange(loopBeginTick, loopEndTick);
+		for (LoopWindowListener listener : loopChangeListeners) {
+			listener.onLoopWindowChange(loopBeginTick, loopEndTick);
 		}
 	}
 

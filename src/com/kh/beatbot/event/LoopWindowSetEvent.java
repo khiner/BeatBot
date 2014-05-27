@@ -3,7 +3,6 @@ package com.kh.beatbot.event;
 import com.kh.beatbot.manager.MidiManager;
 
 public class LoopWindowSetEvent implements Stateful, Temporal {
-
 	private long initialBeginTick, initialEndTick, finalBeginTick, finalEndTick;
 
 	@Override

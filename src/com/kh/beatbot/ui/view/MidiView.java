@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
-import com.kh.beatbot.listener.LoopChangeListener;
+import com.kh.beatbot.listener.LoopWindowListener;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.MidiManager;
@@ -20,7 +20,7 @@ import com.kh.beatbot.ui.view.helper.ScrollHelper;
 import com.kh.beatbot.ui.view.helper.Scrollable;
 
 public class MidiView extends ClickableView implements TrackListener, Scrollable,
-		LoopChangeListener, MidiNoteListener {
+		LoopWindowListener, MidiNoteListener {
 
 	public static final float LOOP_SELECT_SNAP_DIST = 30;
 	public static float trackHeight;
@@ -131,7 +131,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		}
 		onScaleX();
 		onTrackHeightChange();
-		onLoopChange(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
+		onLoopWindowChange(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
 		updateCurrentTick();
 	}
 
@@ -151,14 +151,6 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 				onMove(note);
 			}
 		}
-	}
-
-	public void updateView(float tick) {
-		scrollHelper.updateView(tick);
-	}
-
-	public void updateView(float leftTick, float rightTick) {
-		scrollHelper.updateView(leftTick, rightTick);
 	}
 
 	@Override
@@ -363,7 +355,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	@Override
-	public void onLoopChange(long loopBeginTick, long loopEndTick) {
+	public void onLoopWindowChange(long loopBeginTick, long loopEndTick) {
 		float x1 = tickToUnscaledX(loopBeginTick);
 		float x2 = tickToUnscaledX(loopEndTick);
 		float height = getTotalTrackHeight();
@@ -373,7 +365,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		loopMarkerLines[0].setPosition(x1, lineY);
 		loopMarkerLines[1].setPosition(x2, lineY);
 
-		// scrollHelper.updateView(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
+		// TODO refine
+		scrollHelper.updateView(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
 	}
 
 	private synchronized void noMidiMove() {

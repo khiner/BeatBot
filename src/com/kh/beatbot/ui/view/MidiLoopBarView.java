@@ -1,13 +1,15 @@
 package com.kh.beatbot.ui.view;
 
 import com.kh.beatbot.GeneralUtils;
-import com.kh.beatbot.listener.LoopChangeListener;
+import com.kh.beatbot.event.LoopWindowSetEvent;
+import com.kh.beatbot.listener.LoopWindowListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.group.MidiViewGroup;
 
-public class MidiLoopBarView extends TouchableView implements LoopChangeListener {
+public class MidiLoopBarView extends TouchableView implements LoopWindowListener {
+	private LoopWindowSetEvent currLoopWindowEvent;
 
 	private Button loopBarButton;
 	private Button loopBeginButton, loopEndButton;
@@ -24,10 +26,11 @@ public class MidiLoopBarView extends TouchableView implements LoopChangeListener
 		initRect();
 		setIcon(IconResourceSets.MIDI_TICK_BAR);
 
-		loopBarButton = new Button(this, MidiViewGroup.scaleGroup).withRect().withIcon(IconResourceSets.MIDI_LOOP_BAR);
+		loopBarButton = new Button(this, MidiViewGroup.scaleGroup).withRect().withIcon(
+				IconResourceSets.MIDI_LOOP_BAR);
 		loopBeginButton = new Button(this, MidiViewGroup.scaleGroup);
 		loopEndButton = new Button(this, MidiViewGroup.scaleGroup);
-		
+
 		loopBeginButton.hide();
 		loopEndButton.hide();
 		loopBarButton.deselectOnPointerExit = false;
@@ -38,7 +41,14 @@ public class MidiLoopBarView extends TouchableView implements LoopChangeListener
 
 	@Override
 	public synchronized void layoutChildren() {
-		onLoopChange(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
+		onLoopWindowChange(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
+	}
+
+	@Override
+	public void handleActionDown(int id, Pointer pos) {
+		super.handleActionDown(id, pos);
+		currLoopWindowEvent = new LoopWindowSetEvent();
+		currLoopWindowEvent.begin();
 	}
 
 	@Override
@@ -48,13 +58,11 @@ public class MidiLoopBarView extends TouchableView implements LoopChangeListener
 			float leftTick = midiView.xToTick(pos.x);
 			float leftMajorTick = MidiManager.getMajorTickNearestTo(leftTick);
 			MidiManager.setLoopBeginTick((long) leftMajorTick);
-			midiView.updateView(leftTick);
 		}
 		if (loopEndButton.isPressed() && pos.equals(loopEndButton.getPointer())) {
 			float rightTick = midiView.xToTick(pos.x);
 			float rightMajorTick = MidiManager.getMajorTickNearestTo(rightTick);
 			MidiManager.setLoopEndTick((long) rightMajorTick);
-			midiView.updateView(rightTick);
 		}
 		if (loopBarButton.isPressed() && pos.equals(loopBarButton.getPointer())) {
 			// middle selected. move begin and end preserve current loop length
@@ -63,8 +71,16 @@ public class MidiLoopBarView extends TouchableView implements LoopChangeListener
 					- selectionOffsetTick);
 			newBeginTick = GeneralUtils.clipTo(newBeginTick, 0, MidiManager.MAX_TICKS - loopLength);
 			MidiManager.setLoopTicks((long) newBeginTick, (long) (newBeginTick + loopLength));
-			midiView.updateView(newBeginTick, newBeginTick + loopLength);
 		}
+	}
+
+	@Override
+	public void handleActionUp(int id, Pointer pos) {
+		if (null != currLoopWindowEvent) {
+			currLoopWindowEvent.end();
+			currLoopWindowEvent = null;
+		}
+		super.handleActionUp(id, pos);
 	}
 
 	@Override
@@ -87,7 +103,7 @@ public class MidiLoopBarView extends TouchableView implements LoopChangeListener
 	}
 
 	@Override
-	public void onLoopChange(long loopBeginTick, long loopEndTick) {
+	public void onLoopWindowChange(long loopBeginTick, long loopEndTick) {
 		MidiView midiView = mainPage.midiViewGroup.midiView;
 		float beginX = midiView.tickToUnscaledX(loopBeginTick);
 		float endX = midiView.tickToUnscaledX(loopEndTick);
