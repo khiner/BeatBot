@@ -33,7 +33,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	private Line[] loopMarkerLines, tickLines;
 	private Line currTickLine;
-	private Rectangle leftLoopRect, rightLoopRect, selectRegionRect;
+	private Rectangle leftLoopRect, rightLoopRect, selectRect;
 
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedNotes = new HashMap<Integer, MidiNote>();
@@ -102,7 +102,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		setClip(true);
 		leftLoopRect = new Rectangle(MidiViewGroup.scaleGroup, Color.DARK_TRANS, null);
 		rightLoopRect = new Rectangle(MidiViewGroup.scaleGroup, Color.DARK_TRANS, null);
-		selectRegionRect = new Rectangle(MidiViewGroup.translateScaleGroup, Color.TRON_BLUE_TRANS,
+		selectRect = new Rectangle(MidiViewGroup.translateScaleGroup, Color.TRON_BLUE_TRANS,
 				Color.TRON_BLUE);
 		currTickLine = new Line(MidiViewGroup.translateScaleGroup, null, Color.TRON_BLUE);
 		tickLines = new Line[(MidiManager.MAX_TICKS * 8) / MidiManager.MIN_TICKS];
@@ -114,7 +114,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			loopMarkerLines[i] = new Line(MidiViewGroup.translateScaleGroup, null, Color.TRON_BLUE);
 		}
 
-		addShapes(leftLoopRect, rightLoopRect, selectRegionRect, currTickLine);
+		addShapes(leftLoopRect, rightLoopRect, selectRect, currTickLine);
 		addShapes(tickLines);
 		addShapes(loopMarkerLines);
 	}
@@ -251,7 +251,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	protected void longPress(int id, Pointer pos) {
-		if (pointerCount() == 1) {
+		if (pointerCount() == 1 && null == touchedNotes.get(id)) {
 			startSelectRegion(pos);
 		}
 	}
@@ -466,22 +466,22 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		bottomY = noteToY(bottomNote + 1);
 		// make room in the view window if we are dragging out of the view
 		scrollHelper.updateView(tick, topY, bottomY);
-		selectRegionRect.layout(tickToUnscaledX(leftTick), absoluteY + topY,
-				tickToUnscaledX(rightTick - leftTick), bottomY - topY);
+		selectRect.layout(tickToUnscaledX(leftTick), absoluteY + topY, tickToUnscaledX(rightTick
+				- leftTick), bottomY - topY);
 	}
 
 	private void startSelectRegion(Pointer pos) {
 		selectRegionStartTick = xToTick(pos.x);
 		selectRegionStartY = noteToY(yToNote(pos.y));
-		selectRegionRect.layout(tickToUnscaledX(selectRegionStartTick), absoluteY
-				+ selectRegionStartY, 1, trackHeight);
-		selectRegionRect.show();
-		selectRegionRect.bringToTop();
+		selectRect.layout(tickToUnscaledX(selectRegionStartTick), absoluteY + selectRegionStartY,
+				1, trackHeight);
+		selectRect.show();
+		selectRect.bringToTop();
 	}
 
 	private void stopSelectRegion() {
 		selectRegionStartTick = -1;
-		selectRegionRect.hide();
+		selectRect.hide();
 	}
 
 	// adds a note starting at the nearest major tick (nearest displayed
@@ -589,6 +589,6 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		currTickLine.bringToTop();
 		loopMarkerLines[0].bringToTop();
 		loopMarkerLines[1].bringToTop();
-		selectRegionRect.bringToTop();
+		selectRect.bringToTop();
 	}
 }
