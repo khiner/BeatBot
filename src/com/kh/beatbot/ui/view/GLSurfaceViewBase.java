@@ -26,13 +26,13 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
 	}
 
 	public void onSurfaceChanged(GL10 _gl, int width, int height) {
-		gl = (GL11) _gl;
 		gl.glViewport(0, 0, width, height);
 		GLU.gluOrtho2D(gl, 0, width, height, 0);
-		initGl(gl);
 	}
 
 	public void onSurfaceCreated(GL10 _gl, EGLConfig config) {
+		gl = (GL11) _gl;
+		initGl(gl);
 	}
 
 	public final void onDrawFrame(GL10 _gl) {

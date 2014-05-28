@@ -44,14 +44,6 @@ public class BeatBotActivity extends Activity {
 
 	private Thread janitor;
 
-	private final Runnable cleanup = new Runnable() {
-		@Override
-		public void run() {
-			Log.d("Janitor", "shutting down");
-			shutdown();
-		}
-	};
-
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -95,27 +87,11 @@ public class BeatBotActivity extends Activity {
 			public void onGlReady(GLSurfaceViewGroup view) {
 				TextureAtlas.font.loadTexture();
 				TextureAtlas.resource.loadTexture();
-
-				TrackManager.init();
-				MidiManager.init();
 				activityPager.initGl();
-
-				arm();
-
-				setupProject();
 			}
 		});
 
 		initNativeAudio();
-	}
-
-	@Override
-	public void onDestroy() {
-		if (janitor == null) {
-			janitor = new Thread(cleanup);
-		}
-		janitor.start();
-		super.onDestroy();
 	}
 
 	@Override
@@ -128,15 +104,23 @@ public class BeatBotActivity extends Activity {
 	}
 
 	@Override
-	public void onPause() {
-		View.root.onPause();
-		super.onPause();
+	public void onResume() {
+		super.onResume();
+		TrackManager.init();
+		MidiManager.init();
+
+		arm();
+		setupProject();
+		View.root.onResume();
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
-		View.root.onResume();
+	public void onPause() {
+		View.root.onPause();
+		TrackManager.destroy();
+		Log.d("Janitor", "shutting down");
+		shutdown();
+		super.onPause();
 	}
 
 	@Override

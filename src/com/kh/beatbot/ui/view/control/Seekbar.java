@@ -45,6 +45,9 @@ public class Seekbar extends ControlView1dBase {
 				absoluteY + (height - levelBarHeight) / 2, width - levelBarHeight * 2,
 				levelBarHeight);
 		levelCircle.setDimensions(levelBarHeight * 2.5f, levelBarHeight * 2.5f);
+		if (null != param) {
+			onParamChanged(param);
+		}
 	}
 
 	public void onParamChanged(Param param) {

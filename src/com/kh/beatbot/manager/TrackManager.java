@@ -78,6 +78,14 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
+	public static void destroy() {
+		List<Track> tracksToDestroy = new ArrayList<Track>();
+		tracksToDestroy.addAll(tracks);
+		for (Track track : tracksToDestroy) {
+			track.destroy();
+		}
+	}
+
 	public static void selectRow(int rowNum) {
 		deselectAllNotes();
 		getTrack(rowNum).selectAllNotes();
@@ -407,7 +415,9 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 			for (int i = track.getId(); i < tracks.size(); i++) {
 				tracks.get(i).setId(i);
 			}
-			tracks.get(Math.min(track.getId(), tracks.size() - 1)).select();
+			if (!tracks.isEmpty()) {
+				tracks.get(Math.min(track.getId(), tracks.size() - 1)).select();
+			}
 		}
 
 		for (TrackListener trackListener : trackListeners) {
