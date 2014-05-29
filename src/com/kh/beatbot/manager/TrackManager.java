@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import android.app.AlertDialog;
+import android.content.Context;
+
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
 import com.kh.beatbot.event.TrackCreateEvent;
@@ -25,6 +28,8 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	private static final List<Track> tracks = Collections.synchronizedList(new ArrayList<Track>());
 	private static final Set<TrackListener> trackListeners = new HashSet<TrackListener>();
 	private static final Set<TrackLevelsEventListener> trackLevelsEventListeners = new HashSet<TrackLevelsEventListener>();
+
+	private static AlertDialog.Builder sampleSaveErrorAlert;
 
 	private TrackManager() {
 		FileManager.addListener(this);
@@ -71,10 +76,23 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
-	public static void init() {
+	public static void init(Context context) {
+		sampleSaveErrorAlert = new AlertDialog.Builder(context);
+		sampleSaveErrorAlert.setPositiveButton("OK", null);
+
 		for (File drumDirectory : FileManager.drumsDirectory.listFiles()) {
 			new TrackCreateEvent().doExecute();
-			tracks.get(tracks.size() - 1).setSample(drumDirectory.listFiles()[0]);
+			final File sampleFile = drumDirectory.listFiles()[0];
+			setSample(tracks.get(tracks.size() - 1), sampleFile);
+		}
+	}
+
+	public static void setSample(Track track, File sampleFile) {
+		try {
+			tracks.get(tracks.size() - 1).setSample(sampleFile);
+		} catch (Exception e) {
+			sampleSaveErrorAlert.setTitle("Error loading " + sampleFile.getName() + ".")
+					.setMessage(e.getMessage()).create().show();
 		}
 	}
 
@@ -371,7 +389,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 		get().onCreate(track);
 
-		track.setSample(track.getCurrSampleFile());
+		setSample(track, track.getCurrSampleFile());
 	}
 
 	public static void quantizeEffectParams() {

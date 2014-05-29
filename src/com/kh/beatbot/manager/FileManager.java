@@ -8,10 +8,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Environment;
 
-import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.FileListener;
 
 public class FileManager implements FileListener {
@@ -40,7 +40,7 @@ public class FileManager implements FileListener {
 		return instance;
 	}
 
-	public static void init() {
+	public static void init(Context context) {
 		initDataDir();
 
 		rootDirectory = new File("/");
@@ -57,7 +57,7 @@ public class FileManager implements FileListener {
 		sampleRecordDirectory.mkdirs();
 
 		try {
-			copyAllSamplesToStorage();
+			copyAllSamplesToStorage(context);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -122,8 +122,8 @@ public class FileManager implements FileListener {
 		}
 	}
 
-	private static void copyAllSamplesToStorage() throws IOException {
-		assetManager = BeatBotActivity.mainActivity.getAssets();
+	private static void copyAllSamplesToStorage(Context context) throws IOException {
+		assetManager = context.getAssets();
 
 		for (String assetType : ASSET_TYPES) {
 			for (String fileName : assetManager.list(assetType)) {

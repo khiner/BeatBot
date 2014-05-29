@@ -3,6 +3,7 @@ package com.kh.beatbot.event;
 import java.io.File;
 
 import com.kh.beatbot.Track;
+import com.kh.beatbot.manager.TrackManager;
 
 public class SampleSetEvent implements Executable, Stateful {
 
@@ -36,7 +37,7 @@ public class SampleSetEvent implements Executable, Stateful {
 		if (sample == null || sample.equals(track.getCurrSampleFile())) {
 			return false;
 		}
-		track.setSample(sample);
+		TrackManager.setSample(track, sample);
 		return true;
 	}
 }

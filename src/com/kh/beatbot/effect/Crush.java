@@ -1,20 +1,18 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.BaseTrack;
-import com.kh.beatbot.R;
-import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.manager.PlaybackManager;
 
-public class Decimate extends Effect {
+public class Crush extends Effect {
 
-	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.decimate);
+	public static final String NAME = "Crush";
 	public static final int EFFECT_NUM = 1, NUM_PARAMS = 2;
 
-	public Decimate() {
+	public Crush() {
 		super();
 	}
 
-	public Decimate(BaseTrack track, int position) {
+	public Crush(BaseTrack track, int position) {
 		super(track, position);
 	}
 

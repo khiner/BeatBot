@@ -6,9 +6,8 @@ import android.content.DialogInterface;
 
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.R;
-import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.effect.Chorus;
-import com.kh.beatbot.effect.Decimate;
+import com.kh.beatbot.effect.Crush;
 import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Filter;
@@ -113,7 +112,8 @@ public class EffectsPage extends TrackPage {
 			effect.removeEffect();
 			effect = getEffect(effectName, effectPosition);
 		}
-		BeatBotActivity.mainActivity.launchEffect(effect);
+
+		context.launchEffect(effect);
 	}
 
 	private Effect getEffect(String effectName, int position) {
@@ -121,8 +121,8 @@ public class EffectsPage extends TrackPage {
 		if (effect != null)
 			return effect;
 		BaseTrack track = getCurrTrack();
-		if (effectName.equals(Decimate.NAME))
-			effect = new Decimate(track, position);
+		if (effectName.equals(Crush.NAME))
+			effect = new Crush(track, position);
 		else if (effectName.equals(Chorus.NAME))
 			effect = new Chorus(track, position);
 		else if (effectName.equals(Delay.NAME))
@@ -141,10 +141,9 @@ public class EffectsPage extends TrackPage {
 
 	@Override
 	protected synchronized void createChildren() {
-		effectNames = BeatBotActivity.mainActivity.getResources().getStringArray(
-				R.array.effect_names);
+		effectNames = context.getResources().getStringArray(R.array.effect_names);
 		effectLabelList = new LabelList(this);
-		effectLabelList.setListener(new EffectLabelListListener(BeatBotActivity.mainActivity));
+		effectLabelList.setListener(new EffectLabelListListener(context));
 
 		for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {
 			effectLabelList.addLabel("", false);

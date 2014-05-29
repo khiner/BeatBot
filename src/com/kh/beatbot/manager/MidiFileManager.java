@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.widget.Toast;
 
-import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.midi.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiTrack;
@@ -21,8 +21,8 @@ public class MidiFileManager {
 
 	private static AlertDialog confirmImportAlert, fileExistsAlert;
 
-	public static void init() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(BeatBotActivity.mainActivity);
+	public static void init(final Context context) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage("The file exists. Would you like to overwrite it?").setCancelable(false)
 				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
@@ -35,13 +35,13 @@ public class MidiFileManager {
 				});
 		fileExistsAlert = builder.create();
 
-		builder = new AlertDialog.Builder(BeatBotActivity.mainActivity);
+		builder = new AlertDialog.Builder(context);
 		builder.setMessage(
 				"Are you sure you want to import this MIDI file? "
 						+ "Your current project will be lost.").setCancelable(false)
 				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						completeImport();
+						completeImport(context);
 					}
 				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
@@ -61,10 +61,10 @@ public class MidiFileManager {
 		}
 	}
 
-	public static void importMidi(String fileName) {
+	public static void importMidi(Context context, String fileName) {
 		inFileName = fileName;
 		if (!TrackManager.anyNotes()) {
-			completeImport();
+			completeImport(context);
 		} else {
 			confirmImportAlert.show();
 		}
@@ -92,7 +92,7 @@ public class MidiFileManager {
 		}
 	}
 
-	private static void completeImport() {
+	private static void completeImport(Context context) {
 		try {
 			MidiFile midiFile = new MidiFile(new FileInputStream(getFullPathName(inFileName)));
 			MidiManager.importFromFile(midiFile);
@@ -100,8 +100,7 @@ public class MidiFileManager {
 			e.printStackTrace();
 		}
 
-		Toast.makeText(BeatBotActivity.mainActivity.getApplicationContext(), inFileName,
-				Toast.LENGTH_SHORT).show();
+		Toast.makeText(context, inFileName, Toast.LENGTH_SHORT).show();
 	}
 
 	private static String getFullPathName(String fileName) {

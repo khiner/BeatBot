@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.view.page.effect;
 
 import com.kh.beatbot.effect.Chorus;
-import com.kh.beatbot.effect.Decimate;
+import com.kh.beatbot.effect.Crush;
 import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Filter;
@@ -48,7 +48,7 @@ public class EffectPage extends TouchableView {
 		level2d = new Seekbar2d(this);
 
 		chorusPage = new EffectParamsPage(paramsPager).withEffect(new Chorus());
-		decimatePage = new EffectParamsPage(paramsPager).withEffect(new Decimate());
+		decimatePage = new EffectParamsPage(paramsPager).withEffect(new Crush());
 		delayPage = new DelayParamsPage(paramsPager).withEffect(new Delay());
 		filterPage = new FilterParamsPage(paramsPager).withEffect(new Filter());
 		flangerPage = new EffectParamsPage(paramsPager).withEffect(new Flanger());
@@ -56,7 +56,7 @@ public class EffectPage extends TouchableView {
 		tremeloPage = new EffectParamsPage(paramsPager).withEffect(new Tremolo());
 
 		paramsPager.addPage(Chorus.NAME, chorusPage);
-		paramsPager.addPage(Decimate.NAME, decimatePage);
+		paramsPager.addPage(Crush.NAME, decimatePage);
 		paramsPager.addPage(Delay.NAME, delayPage);
 		paramsPager.addPage(Filter.NAME, filterPage);
 		paramsPager.addPage(Flanger.NAME, flangerPage);

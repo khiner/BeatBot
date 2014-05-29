@@ -1,12 +1,9 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.BaseTrack;
-import com.kh.beatbot.R;
-import com.kh.beatbot.activity.BeatBotActivity;
 
 public class Delay extends Effect {
-
-	public static final String NAME = BeatBotActivity.mainActivity.getString(R.string.delay);
+	public static final String NAME = "Delay";
 	public static final int EFFECT_NUM = 2, NUM_PARAMS = 4;
 
 	// keep track of what right channel was before linking

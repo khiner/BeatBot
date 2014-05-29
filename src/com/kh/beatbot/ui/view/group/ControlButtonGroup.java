@@ -18,7 +18,8 @@ import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
-public class ControlButtonGroup extends TouchableView implements MidiNoteListener, StatefulEventListener {
+public class ControlButtonGroup extends TouchableView implements MidiNoteListener,
+		StatefulEventListener {
 
 	private ToggleButton playButton, recordButton, copyButton;
 	private Button stopButton, undoButton, redoButton, deleteButton, quantizeButton;
@@ -53,8 +54,8 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 					// Managers.recordManager.stopListening();
 					String fileName = RecordManager.stopRecording();
 
-					Toast.makeText(BeatBotActivity.mainActivity.getApplicationContext(),
-							"Recorded file to " + fileName, Toast.LENGTH_SHORT).show();
+					Toast.makeText(context, "Recorded file to " + fileName, Toast.LENGTH_SHORT)
+							.show();
 				} else {
 					mainPage.midiViewGroup.midiView.reset();
 					playButton.setChecked(true);
@@ -107,8 +108,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 					MidiManager.cancelCopy();
 					msg = "Copy Cancelled";
 				}
-				Toast.makeText(BeatBotActivity.mainActivity.getApplicationContext(), msg,
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
 			}
 		});
 
@@ -179,7 +179,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 		undoButton.setEnabled(hasUndo);
 		redoButton.setEnabled(hasRedo);
 	}
-	
+
 	@Override
 	public void onEventCompleted() {
 		updateStateStackIcons(EventManager.canUndo(), EventManager.canRedo());

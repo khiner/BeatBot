@@ -7,10 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.app.AlertDialog;
 import android.util.Log;
 
-import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.FileListener;
@@ -25,15 +23,7 @@ import com.kh.beatbot.ui.view.TrackButtonRow;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
 public class Track extends BaseTrack implements FileListener {
-
 	public static float MIN_LOOP_WINDOW = 32f;
-	private static final AlertDialog.Builder ERROR_ALERT = new AlertDialog.Builder(
-			BeatBotActivity.mainActivity);
-
-	static {
-		ERROR_ALERT.setPositiveButton("OK", null);
-	}
-
 	private boolean adsrEnabled = false, reverse = false, previewing = false, muted = false,
 			soloing = false;
 
@@ -299,13 +289,12 @@ public class Track extends BaseTrack implements FileListener {
 		return null;
 	}
 
-	public void setSample(final File sampleFile) {
+	public void setSample(final File sampleFile) throws Exception {
 		if (null == sampleFile)
 			return;
-		final String error = setSample(id, sampleFile.getPath());
-		if (!error.equals("No Error.")) {
-			ERROR_ALERT.setTitle("Error loading " + sampleFile.getName() + ".").setMessage(error)
-					.create().show();
+		final String errorMsg = setSample(id, sampleFile.getPath());
+		if (!errorMsg.equals("No Error.")) {
+			throw new Exception(errorMsg);
 		} else {
 			currSampleFile = sampleFile;
 			update();

@@ -58,8 +58,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 			@Override
 			public void onRelease(Button button) {
 				midiExportItem.onRelease(button);
-				BeatBotActivity.mainActivity
-						.showDialog(BeatBotActivity.MIDI_FILE_NAME_EDIT_DIALOG_ID);
+				context.showDialog(BeatBotActivity.MIDI_FILE_NAME_EDIT_DIALOG_ID);
 			}
 		});
 
@@ -110,7 +109,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 
 	@Override
 	public void onFileMenuItemReleased(FileMenuItem fileItem) {
-		MidiFileManager.importMidi(fileItem.getText());
+		MidiFileManager.importMidi(context, fileItem.getText());
 	}
 
 	@Override

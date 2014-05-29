@@ -36,20 +36,13 @@ public class BeatBotActivity extends Activity {
 			MIDI_FILE_NAME_EDIT_DIALOG_ID = 3;
 
 	private static final String MAIN_PAGE_ID = "main", EFFECT_PAGE_ID = "effect";
-
 	private static ViewFlipper activityPager;
 	private static EditText bpmInput, midiFileNameInput, sampleNameInput;
-
-	public static BeatBotActivity mainActivity;
-
-	private Thread janitor;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mainActivity = this;
-
 		GeneralUtils.initAndroidSettings(this);
 		Color.init(this);
 		// load font file once, with static height
@@ -60,9 +53,10 @@ public class BeatBotActivity extends Activity {
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
 
-		FileManager.init();
-		MidiFileManager.init();
+		FileManager.init(this);
+		MidiFileManager.init(this);
 
+		View.context = this;
 		View.root = new GLSurfaceViewGroup(this);
 		View.root.setLayoutParams(lp);
 
@@ -106,7 +100,7 @@ public class BeatBotActivity extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		TrackManager.init();
+		TrackManager.init(this);
 		MidiManager.init();
 
 		arm();

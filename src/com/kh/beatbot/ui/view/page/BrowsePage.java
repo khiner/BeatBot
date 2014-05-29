@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
-import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.event.SampleSetEvent;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.FileManager;
@@ -67,7 +66,7 @@ public class BrowsePage extends Menu implements TrackListener {
 
 	@Override
 	public void onFileMenuItemLongPressed(FileMenuItem fileItem) {
-		BeatBotActivity.mainActivity.editFileName(fileItem.getFile());
+		context.editFileName(fileItem.getFile());
 	}
 
 	@Override

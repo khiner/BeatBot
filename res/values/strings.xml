@@ -15,16 +15,6 @@
 	<string name="sample_edit_activity">Sample Edit</string>
 	<string name="preview_sample">Preview</string>
 	<string name="loop_sample">Loop Sample</string>
-	<string name="adsr">ADSR</string>
-	<string name="reverse">Reverse</string>
-	<string name="normalize">Normalize</string>
-	<string name="chorus">Chorus</string>
-	<string name="decimate">Crush</string>
-	<string name="delay">Delay</string>
-	<string name="flanger">Flanger</string>
-	<string name="filter">Filter</string>
-	<string name="reverb">Reverb</string>
-	<string name="tremolo">Tremolo</string>
 
 	<string-array name="effect_names">
 		<item name="chorus">Chorus</item>

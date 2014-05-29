@@ -7,6 +7,7 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.GeneralUtils;
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResource;
 import com.kh.beatbot.ui.icon.IconResourceSet;
@@ -24,12 +25,13 @@ import com.kh.beatbot.ui.view.page.MainPage;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
 public class View implements Comparable<View> {
+	protected static final float ¹ = (float) Math.PI, X_OFFSET = 2;
+	protected static float LABEL_HEIGHT = 0, BG_OFFSET = 0;
+
 	public static MainPage mainPage;
 	public static EffectPage effectPage;
 	public static GLSurfaceViewBase root;
-
-	protected static final float ¹ = (float) Math.PI, X_OFFSET = 2;
-	protected static float LABEL_HEIGHT = 0, BG_OFFSET = 0;
+	public static BeatBotActivity context;
 
 	public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0, height = 0;
 
@@ -49,7 +51,7 @@ public class View implements Comparable<View> {
 	protected IconResourceSet icon = new IconResourceSet(IconResourceSets.DEFAULT);
 	private boolean shouldClip = false;
 	private String text = "";
-	
+
 	private State state = State.DEFAULT;
 
 	public View(View parent) {
@@ -68,7 +70,7 @@ public class View implements Comparable<View> {
 	}
 
 	public static GL11 getGl() {
-		return GLSurfaceViewBase.gl;
+		return root.getGl();
 	}
 
 	public float unscaledHeight() {

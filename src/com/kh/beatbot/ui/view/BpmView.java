@@ -101,7 +101,7 @@ public class BpmView extends ClickableView {
 
 	@Override
 	protected void longPress(int id, Pointer pos) {
-		BeatBotActivity.mainActivity.showDialog(BeatBotActivity.BPM_DIALOG_ID);
+		context.showDialog(BeatBotActivity.BPM_DIALOG_ID);
 	}
 
 	public void setText(String text) {

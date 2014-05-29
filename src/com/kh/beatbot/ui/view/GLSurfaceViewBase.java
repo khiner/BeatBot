@@ -10,7 +10,7 @@ import android.opengl.GLU;
 
 public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfaceView.Renderer {
 
-	public static GL11 gl;
+	public GL11 gl;
 
 	private static final long DESIRED_FPS = 45, TICK_MILLIS = (long) (1000.0f / DESIRED_FPS);
 
@@ -33,6 +33,10 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
 	public void onSurfaceCreated(GL10 _gl, EGLConfig config) {
 		gl = (GL11) _gl;
 		initGl(gl);
+	}
+
+	public GL11 getGl() {
+		return gl;
 	}
 
 	public final void onDrawFrame(GL10 _gl) {
