@@ -2,8 +2,6 @@ package com.kh.beatbot.ui.view.menu;
 
 import java.io.File;
 
-import android.annotation.SuppressLint;
-
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.FileMenuItemListener;
@@ -126,7 +124,6 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		expand();
 	}
 
-	@SuppressLint("DefaultLocale")
 	@Override
 	public boolean accept(File file) {
 		return file.getName().toLowerCase().endsWith(".midi");
