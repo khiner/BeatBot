@@ -23,14 +23,13 @@ import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
 
 public class MidiManager {
-
 	public static final int MIN_BPM = 45, MAX_BPM = 300,
 			TICKS_PER_NOTE = MidiFile.DEFAULT_RESOLUTION, UNDO_STACK_SIZE = 40,
 			NOTES_PER_MEASURE = 4, TICKS_PER_MEASURE = TICKS_PER_NOTE * NOTES_PER_MEASURE,
 			MIN_TICKS = TICKS_PER_NOTE / 2, MAX_TICKS = TICKS_PER_MEASURE * 4;
 
-	private static int beatDivision = 0;
 	private static boolean snapToGrid = true;
+	private static int beatDivision = 0;
 	private static long loopBeginTick, loopEndTick;
 
 	private static TimeSignature ts = new TimeSignature();

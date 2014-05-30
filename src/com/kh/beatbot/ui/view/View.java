@@ -6,6 +6,8 @@ import java.util.List;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
+import android.view.ViewGroup.LayoutParams;
+
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.ui.color.Color;
@@ -21,6 +23,7 @@ import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.shape.Shape;
 import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.view.TouchableView.Pointer;
+import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
 import com.kh.beatbot.ui.view.page.MainPage;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
@@ -67,6 +70,20 @@ public class View implements Comparable<View> {
 		if (null != parent) {
 			parent.addChild(this);
 		}
+	}
+
+	public static ViewFlipper init(BeatBotActivity context) {
+		View.context = context;
+		root = new GLSurfaceViewGroup(context);
+		mainPage = new MainPage(null);
+		effectPage = new EffectPage(null);
+
+		ViewFlipper rootFlipper = new ViewFlipper(null);
+		rootFlipper.addPage(mainPage);
+		rootFlipper.addPage(effectPage);
+		rootFlipper.setPage(mainPage);
+
+		return rootFlipper;
 	}
 
 	public static GL11 getGl() {

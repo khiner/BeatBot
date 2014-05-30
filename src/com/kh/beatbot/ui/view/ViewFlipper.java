@@ -1,10 +1,7 @@
 package com.kh.beatbot.ui.view;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class ViewFlipper extends TouchableView {
-	private Map<Object, View> pageMap = new HashMap<Object, View>();
 	private View currPage;
 
 	public ViewFlipper(View view) {
@@ -12,8 +9,7 @@ public class ViewFlipper extends TouchableView {
 		shouldDraw = false;
 	}
 
-	public void addPage(Object key, View page) {
-		pageMap.put(key, page);
+	public void addPage(View page) {
 		children.add(page);
 	}
 
@@ -21,10 +17,10 @@ public class ViewFlipper extends TouchableView {
 		return currPage;
 	}
 
-	public synchronized void setPage(Object key) {
-		if (null == key || !pageMap.containsKey(key))
+	public synchronized void setPage(View view) {
+		if (!children.contains(view))
 			return;
-		currPage = pageMap.get(key);
+		currPage = view;
 	}
 
 	@Override

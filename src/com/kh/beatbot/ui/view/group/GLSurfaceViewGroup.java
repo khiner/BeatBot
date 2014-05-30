@@ -14,8 +14,7 @@ import com.kh.beatbot.ui.view.TouchableSurfaceView;
 import com.kh.beatbot.ui.view.TouchableView;
 
 public class GLSurfaceViewGroup extends TouchableSurfaceView {
-
-	protected TouchableView renderer;
+	private TouchableView renderer;
 	private Set<GLSurfaceViewGroupListener> listeners = new HashSet<GLSurfaceViewGroupListener>();
 
 	public GLSurfaceViewGroup(Context context) {

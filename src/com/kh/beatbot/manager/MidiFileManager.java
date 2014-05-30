@@ -16,9 +16,7 @@ import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiTrack;
 
 public class MidiFileManager {
-
 	private static String inFileName, outFileName;
-
 	private static AlertDialog confirmImportAlert, fileExistsAlert;
 
 	public static void init(final Context context) {

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.text.method.DigitsKeyListener;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.ViewParent;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -28,14 +29,13 @@ import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.ViewFlipper;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
-import com.kh.beatbot.ui.view.page.MainPage;
-import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
 public class BeatBotActivity extends Activity {
 	public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1, SAMPLE_NAME_EDIT_DIALOG_ID = 2,
 			MIDI_FILE_NAME_EDIT_DIALOG_ID = 3;
 
-	private static final String MAIN_PAGE_ID = "main", EFFECT_PAGE_ID = "effect";
+	private static boolean initialized = false;
+
 	private static ViewFlipper activityPager;
 	private static EditText bpmInput, midiFileNameInput, sampleNameInput;
 
@@ -44,48 +44,47 @@ public class BeatBotActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		GeneralUtils.initAndroidSettings(this);
-		Color.init(this);
-		// load font file once, with static height
-		// to change height, simply use gl.scale()
+
 		TextureAtlas.font.load(this, "REDRING-1969-v03.ttf");
 		TextureAtlas.resource.load(this);
 
-		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
+		if (!initialized) {
+			initNativeAudio();
 
-		FileManager.init(this);
-		MidiFileManager.init(this);
+			Color.init(this);
+			FileManager.init(this);
+			MidiFileManager.init(this);
+			activityPager = View.init(this);
 
-		View.context = this;
-		View.root = new GLSurfaceViewGroup(this);
-		View.root.setLayoutParams(lp);
+			MidiManager.init();
+			TrackManager.init(this);
 
-		LinearLayout layout = new LinearLayout(this);
-		layout.addView(View.root);
-		setContentView(layout, lp);
+			arm();
 
-		activityPager = new ViewFlipper(null);
+			setupProject();
 
-		View.mainPage = new MainPage(null);
-		View.effectPage = new EffectPage(null);
+			((GLSurfaceViewGroup) View.root).setBBRenderer(activityPager);
+			((GLSurfaceViewGroup) View.root).addListener(new GLSurfaceViewGroupListener() {
+				@Override
+				public void onGlReady(GLSurfaceViewGroup view) {
+					TextureAtlas.font.loadTexture();
+					TextureAtlas.resource.loadTexture();
+					activityPager.initGl();
+				}
+			});
+		}
 
-		activityPager.addPage(MAIN_PAGE_ID, View.mainPage);
-		activityPager.addPage(EFFECT_PAGE_ID, View.effectPage);
-		activityPager.setPage(MAIN_PAGE_ID);
+		ViewParent viewParent = ((GLSurfaceViewGroup) View.root).getParent();
+		if (null == viewParent) {
+			LinearLayout layout = new LinearLayout(this);
+			LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+					LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
+			View.root.setLayoutParams(lp);
+			layout.addView(View.root);
+			setContentView(layout, lp);
+		}
 
-		((GLSurfaceViewGroup) View.root).setBBRenderer(activityPager);
-
-		((GLSurfaceViewGroup) View.root).addListener(new GLSurfaceViewGroupListener() {
-
-			@Override
-			public void onGlReady(GLSurfaceViewGroup view) {
-				TextureAtlas.font.loadTexture();
-				TextureAtlas.resource.loadTexture();
-				activityPager.initGl();
-			}
-		});
-
-		initNativeAudio();
+		initialized = true;
 	}
 
 	@Override
@@ -93,28 +92,29 @@ public class BeatBotActivity extends Activity {
 		if (activityPager.getCurrPage().equals(View.mainPage)) {
 			showDialog(EXIT_DIALOG_ID);
 		} else if (activityPager.getCurrPage().equals(View.effectPage)) {
-			activityPager.setPage(MAIN_PAGE_ID);
+			activityPager.setPage(View.mainPage);
 		}
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		TrackManager.init(this);
-		MidiManager.init();
-
-		arm();
-		setupProject();
 		View.root.onResume();
 	}
 
 	@Override
 	public void onPause() {
 		View.root.onPause();
-		TrackManager.destroy();
-		Log.d("Janitor", "shutting down");
-		shutdown();
 		super.onPause();
+	}
+
+	@Override
+	public void onDestroy() {
+		if (isFinishing()) {
+			Log.d("Janitor", "shutting down");
+			shutdown();
+		}
+		super.onDestroy();
 	}
 
 	@Override
@@ -243,7 +243,7 @@ public class BeatBotActivity extends Activity {
 	}
 
 	public void launchEffect(Effect effect) {
-		activityPager.setPage(EFFECT_PAGE_ID);
+		activityPager.setPage(View.effectPage);
 		View.effectPage.setEffect(effect);
 	}
 
