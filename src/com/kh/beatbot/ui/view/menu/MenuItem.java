@@ -94,11 +94,11 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 
 	public void show() {
 		menu.addChild(container);
-		container.add(button);
+		container.addChild(button);
 	}
 
 	public void hide() {
-		container.remove(button);
+		container.removeChild(button);
 		for (MenuItem child : subMenuItems) {
 			child.hide();
 		}

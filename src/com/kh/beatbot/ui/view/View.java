@@ -6,8 +6,6 @@ import java.util.List;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
-import android.view.ViewGroup.LayoutParams;
-
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.ui.color.Color;
@@ -233,6 +231,14 @@ public class View implements Comparable<View> {
 
 	public boolean containsPoint(float x, float y) {
 		return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
+	}
+
+	public float getChildHeight() {
+		float totalChildHeight = 0;
+		for (View child : children) {
+			totalChildHeight += child.height;
+		}
+		return totalChildHeight;
 	}
 
 	public void setId(int id) {
