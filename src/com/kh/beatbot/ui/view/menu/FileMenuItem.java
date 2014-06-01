@@ -6,9 +6,12 @@ import java.util.Arrays;
 import com.kh.beatbot.listener.OnLongPressListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.control.Button;
+import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class FileMenuItem extends MenuItem implements OnLongPressListener {
 	private File file;
+
+	private boolean ignoreRelease = false;
 
 	public FileMenuItem(Menu menu, MenuItem parent, File file) {
 		super(menu, parent, file.isDirectory());
@@ -19,7 +22,16 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
 	}
 
 	@Override
+	public void onPress(Button button) {
+		super.onPress(button);
+		// ignore if the button is already checked
+		ignoreRelease = button instanceof ToggleButton && ((ToggleButton) button).isChecked();
+	}
+
+	@Override
 	public void onRelease(Button button) {
+		if (ignoreRelease)
+			return;
 		if (file.isDirectory()) {
 			expand();
 		} else {

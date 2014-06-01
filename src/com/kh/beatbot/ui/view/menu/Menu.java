@@ -9,11 +9,11 @@ import com.kh.beatbot.listener.FileMenuItemListener;
 import com.kh.beatbot.listener.MenuItemListener;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.ListView;
-import com.kh.beatbot.ui.view.TouchableView;
+import com.kh.beatbot.ui.view.ScrollableView;
 import com.kh.beatbot.ui.view.View;
 
-public abstract class Menu extends TouchableView implements MenuItemListener, FileMenuItemListener,
-		FileFilter {
+public abstract class Menu extends ScrollableView implements MenuItemListener,
+		FileMenuItemListener, FileFilter {
 	protected List<ListView> menuLists;
 	protected List<MenuItem> topLevelItems;
 	protected float columnWidth = 0;
@@ -23,10 +23,6 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 	protected abstract void createMenuItems();
 
 	protected abstract float getWidthForLevel(int level);
-
-	public Menu(View view) {
-		super(view);
-	}
 
 	public Menu(View view, RenderGroup renderGroup) {
 		super(view, renderGroup);
@@ -58,14 +54,15 @@ public abstract class Menu extends TouchableView implements MenuItemListener, Fi
 		if (columnWidth <= 0) {
 			columnWidth = width;
 		}
-		float yOffset = LABEL_HEIGHT / 3;
-		float displayHeight = height - 2 * yOffset;
-		float x = 0;
+
+		float displayHeight = height - 2 * BG_OFFSET;
+		float x = xOffset;
 		for (int i = 0; i < menuLists.size(); i++) {
 			ListView list = menuLists.get(i);
-			list.layout(this, x, yOffset, getWidthForLevel(i), displayHeight);
+			list.layout(this, x, BG_OFFSET, getWidthForLevel(i), displayHeight);
 			x += list.width;
 		}
+		super.layoutChildren();
 	}
 
 	@Override

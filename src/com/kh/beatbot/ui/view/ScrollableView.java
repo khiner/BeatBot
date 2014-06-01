@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.view;
 
 import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.transition.ColorTransition;
 
@@ -11,7 +12,7 @@ public abstract class ScrollableView extends TouchableView {
 
 	private static final float DRAG = .9f, THRESH = 0.01f;
 	private float xOffsetAnchor = 0, yOffsetAnchor = 0, xVelocity = 0, yVelocity = 0, lastX = 0,
-			lastY = 0;
+			lastY = 0, childWidth = 0, childHeight = 0;
 
 	private boolean horizontal = false, vertical = false;
 
@@ -23,6 +24,10 @@ public abstract class ScrollableView extends TouchableView {
 		super(view);
 	}
 
+	public ScrollableView(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
+	}
+
 	public void setScrollable(boolean xScrollable, boolean yScrollable) {
 		this.horizontal = xScrollable;
 		this.vertical = yScrollable;
@@ -30,11 +35,51 @@ public abstract class ScrollableView extends TouchableView {
 
 	@Override
 	public synchronized void layoutChildren() {
-		layoutScrollBars();
+		float prevChildWidth = childWidth;
+		float prevChildHeight = childHeight;
+		childWidth = getChildWidth();
+		childHeight = getChildHeight();
+
+		boolean childWidthChanged = childWidth != prevChildWidth;
+		boolean childHeightChanged = childHeight != prevChildHeight;
+
+		if (horizontal && childWidthChanged) {
+			setXOffset(childWidth > width ? width - childWidth : 0);
+
+			if (childWidth < width) {
+				removeShape(horizontalScrollBar);
+				horizontalScrollBar = null;
+			}
+		}
+
+		if (vertical && childHeightChanged) {
+			setYOffset(childHeight > height ? height - childHeight : 0);
+
+			if (childHeight < height) {
+				removeShape(verticalScrollBar);
+				verticalScrollBar = null;
+			}
+		}
+
+		if (horizontal && childWidth > width) {
+			float rad = LABEL_HEIGHT / 5;
+			float x = Math.max(1, -xOffset * width / childWidth);
+			float w = Math.max(rad * 2, width * width / childWidth);
+			getXScrollBar().setCornerRadius(rad);
+			getXScrollBar().layout(absoluteX + x, absoluteY + height - 2.5f * rad, w, 2 * rad);
+		}
+
+		if (vertical && childHeight > height) {
+			float rad = LABEL_HEIGHT / 5;
+			float y = Math.max(1, -yOffset * height / childHeight);
+			float h = Math.max(rad * 2, height * height / childHeight);
+			getYScrollBar().setCornerRadius(rad);
+			getYScrollBar().layout(absoluteX + width - 2.5f * rad, absoluteY + y, 2 * rad, h);
+		}
 	}
 
 	@Override
-	public synchronized void tick() {
+	public void tick() {
 		if (pointerCount() == 0
 				&& ((horizontal && Math.abs(xVelocity) > THRESH) || (vertical && Math
 						.abs(yVelocity) > THRESH))) {
@@ -48,18 +93,6 @@ public abstract class ScrollableView extends TouchableView {
 		if (null != verticalScrollBar) {
 			verticalScrollBar.setFillColor(tabColorTransition.getColor());
 		}
-	}
-
-	@Override
-	public synchronized void addChild(View view) {
-		super.addChild(view);
-		resetScrollState();
-	}
-
-	@Override
-	public synchronized void removeChild(View view) {
-		super.removeChild(view);
-		resetScrollState();
 	}
 
 	@Override
@@ -84,7 +117,7 @@ public abstract class ScrollableView extends TouchableView {
 
 	@Override
 	public void handleActionMove(int index, Pointer pos) {
-		if (getChildHeight() <= height) {
+		if (childHeight <= height) {
 			return;
 		}
 
@@ -97,12 +130,8 @@ public abstract class ScrollableView extends TouchableView {
 		updateOffsets(pos);
 	}
 
-	private synchronized void resetScrollState() {
-		xOffset = yOffset = xVelocity = yVelocity = 0;
-	}
-
 	private synchronized void updateOffsets(Pointer pos) {
-		if (horizontal) {
+		if (horizontal && childWidth > width) {
 			float newX;
 			if (null == pos) {
 				newX = xOffset + xVelocity;
@@ -110,11 +139,10 @@ public abstract class ScrollableView extends TouchableView {
 			} else {
 				newX = pos.x - pos.downX + xOffsetAnchor;
 			}
-
-			xOffset = GeneralUtils.clipTo(newX, width - getChildWidth(), 0);
+			setXOffset(GeneralUtils.clipTo(newX, width - childWidth, 0));
 		}
 
-		if (vertical) {
+		if (vertical && childHeight > height) {
 			float newY;
 			if (null == pos) {
 				newY = yOffset + yVelocity;
@@ -123,32 +151,7 @@ public abstract class ScrollableView extends TouchableView {
 				newY = pos.y - pos.downY + yOffsetAnchor;
 			}
 
-			yOffset = GeneralUtils.clipTo(newY, height - getChildHeight(), 0);
-		}
-		layoutChildren();
-	}
-
-	private void layoutScrollBars() {
-		if (horizontal) {
-			float childWidth = getChildWidth();
-			if (childWidth > width) {
-				float rad = LABEL_HEIGHT / 5;
-				float x = Math.max(1, -xOffset * width / childWidth);
-				float w = Math.max(rad * 2, width * width / childWidth);
-				getXScrollBar().setCornerRadius(rad);
-				getXScrollBar().layout(absoluteX + x, absoluteY + height - 2.5f * rad, w, 2 * rad);
-			}
-		}
-
-		if (vertical) {
-			float childHeight = getChildHeight();
-			if (childHeight > height) {
-				float rad = LABEL_HEIGHT / 5;
-				float y = Math.max(1, -yOffset * height / childHeight);
-				float h = Math.max(rad * 2, height * height / childHeight);
-				getYScrollBar().setCornerRadius(rad);
-				getYScrollBar().layout(absoluteX + width - 2.5f * rad, absoluteY + y, 2 * rad, h);
-			}
+			setYOffset(GeneralUtils.clipTo(newY, height - childHeight, 0));
 		}
 	}
 
@@ -166,5 +169,21 @@ public abstract class ScrollableView extends TouchableView {
 			addShapes(verticalScrollBar);
 		}
 		return verticalScrollBar;
+	}
+
+	private void setXOffset(float xOffset) {
+		if (this.xOffset == xOffset)
+			return;
+		this.xOffset = xOffset;
+
+		layoutChildren();
+	}
+
+	private void setYOffset(float yOffset) {
+		if (this.yOffset == yOffset)
+			return;
+		this.yOffset = yOffset;
+
+		layoutChildren();
 	}
 }

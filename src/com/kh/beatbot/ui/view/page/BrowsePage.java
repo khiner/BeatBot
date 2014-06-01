@@ -17,9 +17,11 @@ import com.kh.beatbot.ui.view.menu.Menu;
 import com.kh.beatbot.ui.view.menu.MenuItem;
 
 public class BrowsePage extends Menu implements TrackListener {
+	private Track currTrack;
 
 	public BrowsePage(View view, RenderGroup renderGroup) {
 		super(view, renderGroup);
+		setScrollable(true, false);
 	}
 
 	protected synchronized void createMenuItems() {
@@ -36,6 +38,11 @@ public class BrowsePage extends Menu implements TrackListener {
 
 	@Override
 	public void onSelect(BaseTrack track) {
+		if (null == track || track.equals(currTrack)) {
+			return;
+		}
+
+		this.currTrack = (Track) track;
 		// recursively select file menu items based on current sample
 		File currSampleFile = ((Track) track).getCurrSampleFile();
 		if (null == currSampleFile)
