@@ -9,6 +9,7 @@ public class ListView extends ScrollableView implements OnPressListener {
 
 	public ListView(View view) {
 		super(view);
+		setScrollable(false, true);
 	}
 
 	@Override

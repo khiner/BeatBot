@@ -233,7 +233,15 @@ public class View implements Comparable<View> {
 		return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
 	}
 
-	public float getChildHeight() {
+	protected float getChildWidth() {
+		float totalChildWidth = 0;
+		for (View child : children) {
+			totalChildWidth += child.width;
+		}
+		return totalChildWidth;
+	}
+
+	protected float getChildHeight() {
 		float totalChildHeight = 0;
 		for (View child : children) {
 			totalChildHeight += child.height;
