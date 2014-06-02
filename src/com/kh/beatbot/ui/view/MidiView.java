@@ -361,12 +361,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	public void onLoopWindowChange(long loopBeginTick, long loopEndTick) {
 		float x1 = tickToUnscaledX(loopBeginTick);
 		float x2 = tickToUnscaledX(loopEndTick);
-		float height = getTotalTrackHeight();
-		leftLoopRect.layout(0, absoluteY, x1, height);
-		rightLoopRect.layout(x2, absoluteY, width - x2, height);
-		float lineY = absoluteY;
-		loopMarkerLines[0].setPosition(x1, lineY);
-		loopMarkerLines[1].setPosition(x2, lineY);
+		leftLoopRect.layout(0, absoluteY, x1, leftLoopRect.height);
+		rightLoopRect.layout(x2, absoluteY, width - x2, rightLoopRect.height);
+		loopMarkerLines[0].setPosition(x1, absoluteY);
+		loopMarkerLines[1].setPosition(x2, absoluteY);
 
 		// TODO refine
 		scrollHelper.updateView(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
