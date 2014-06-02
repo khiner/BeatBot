@@ -89,7 +89,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	public static void setSample(Track track, File sampleFile) {
 		try {
-			tracks.get(tracks.size() - 1).setSample(sampleFile);
+			track.setSample(sampleFile);
 		} catch (Exception e) {
 			sampleSaveErrorAlert.setTitle("Error loading " + sampleFile.getName() + ".")
 					.setMessage(e.getMessage()).create().show();
