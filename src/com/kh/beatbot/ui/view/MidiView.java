@@ -15,6 +15,8 @@ import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.Line;
 import com.kh.beatbot.ui.shape.Rectangle;
+import com.kh.beatbot.ui.shape.RoundedRect;
+import com.kh.beatbot.ui.transition.ColorTransition;
 import com.kh.beatbot.ui.view.group.MidiViewGroup;
 import com.kh.beatbot.ui.view.helper.ScrollHelper;
 import com.kh.beatbot.ui.view.helper.Scrollable;
@@ -34,6 +36,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	private Line[] loopMarkerLines, tickLines;
 	private Line currTickLine;
 	private Rectangle leftLoopRect, rightLoopRect, selectRect;
+	private RoundedRect horizontalScrollBar;
 
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedNotes = new HashMap<Integer, MidiNote>();
@@ -41,6 +44,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	private Map<Integer, Float> startOnTicks = new HashMap<Integer, Float>();
 
 	protected ScrollHelper scrollHelper;
+	public ColorTransition scrollBarColorTrans = new ColorTransition(20, 20, Color.TRANSPARENT,
+			new float[] { 0, 0, 0, .7f });
 
 	public MidiView(View view) {
 		super(view);
@@ -100,6 +105,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	@Override
 	public synchronized void createChildren() {
 		setClip(true);
+
 		leftLoopRect = new Rectangle(MidiViewGroup.scaleGroup, Color.DARK_TRANS, null);
 		rightLoopRect = new Rectangle(MidiViewGroup.scaleGroup, Color.DARK_TRANS, null);
 		selectRect = new Rectangle(MidiViewGroup.translateScaleGroup, Color.TRON_BLUE_TRANS,
@@ -114,7 +120,9 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			loopMarkerLines[i] = new Line(MidiViewGroup.translateScaleGroup, null, Color.TRON_BLUE);
 		}
 
-		addShapes(leftLoopRect, rightLoopRect, selectRect, currTickLine);
+		horizontalScrollBar = new RoundedRect(renderGroup, Color.TRANSPARENT, null);
+
+		addShapes(leftLoopRect, rightLoopRect, selectRect, currTickLine, horizontalScrollBar);
 		addShapes(tickLines);
 		addShapes(loopMarkerLines);
 	}
@@ -142,7 +150,12 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		}
 		if (pointerCount() == 0) {
 			scrollHelper.scroll(); // take care of any momentum scrolling
+			if (scrollHelper.scrollXVelocity == 0) {
+				scrollBarColorTrans.end();
+			}
 		}
+		scrollBarColorTrans.tick();
+		horizontalScrollBar.setFillColor(scrollBarColorTrans.getColor());
 	}
 
 	public void layoutNotes() {
@@ -335,6 +348,12 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public void onScrollX() {
+		float rad = LABEL_HEIGHT / 5;
+		float x = tickToUnscaledX(scrollHelper.xOffset);
+		float w = tickToUnscaledX(scrollHelper.numTicks);
+		horizontalScrollBar.setCornerRadius(rad);
+		horizontalScrollBar.layout(absoluteX + x, absoluteY + height - 2.5f * rad, w, 2 * rad);
+		horizontalScrollBar.bringToTop();
 	}
 
 	@Override

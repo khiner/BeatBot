@@ -4,7 +4,9 @@ import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.event.LoopWindowSetEvent;
 import com.kh.beatbot.listener.LoopWindowListener;
 import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
+import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.group.MidiViewGroup;
 
@@ -23,7 +25,7 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
 
 	@Override
 	protected synchronized void createChildren() {
-		initRect();
+		bgShape = new Rectangle(MidiViewGroup.scaleGroup, Color.TRANSPARENT, Color.TRANSPARENT);
 		setIcon(IconResourceSets.MIDI_TICK_BAR);
 
 		loopBarButton = new Button(this, MidiViewGroup.scaleGroup).withRect().withIcon(

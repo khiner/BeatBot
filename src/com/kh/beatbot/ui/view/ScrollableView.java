@@ -17,7 +17,7 @@ public abstract class ScrollableView extends TouchableView {
 	private boolean horizontal = false, vertical = false;
 
 	private RoundedRect horizontalScrollBar, verticalScrollBar;
-	private ColorTransition tabColorTransition = new ColorTransition(20, 20, Color.TRANSPARENT,
+	private ColorTransition scrollBarColorTrans = new ColorTransition(20, 20, Color.TRANSPARENT,
 			new float[] { 0, 0, 0, .7f });
 
 	public ScrollableView(View view) {
@@ -86,12 +86,25 @@ public abstract class ScrollableView extends TouchableView {
 			updateOffsets(null);
 		}
 
-		tabColorTransition.tick();
+		if (pointerCount() == 0) {
+			xVelocity *= DRAG;
+			if (Math.abs(xVelocity) < 1) {
+				xVelocity = 0;
+			}
+			yVelocity *= DRAG;
+			if (Math.abs(yVelocity) < 1) {
+				yVelocity = 0;
+			}
+			if (xVelocity == 0 && yVelocity == 0) {
+				scrollBarColorTrans.end();
+			}
+		}
+		scrollBarColorTrans.tick();
 		if (null != horizontalScrollBar) {
-			horizontalScrollBar.setFillColor(tabColorTransition.getColor());
+			horizontalScrollBar.setFillColor(scrollBarColorTrans.getColor());
 		}
 		if (null != verticalScrollBar) {
-			verticalScrollBar.setFillColor(tabColorTransition.getColor());
+			verticalScrollBar.setFillColor(scrollBarColorTrans.getColor());
 		}
 	}
 
@@ -101,18 +114,7 @@ public abstract class ScrollableView extends TouchableView {
 		yOffsetAnchor = yOffset;
 		lastX = pos.x;
 		lastY = pos.y;
-		tabColorTransition.begin();
-	}
-
-	@Override
-	public void handleActionUp(int index, Pointer pos) {
-		if (Math.abs(xVelocity) < 3) {
-			xVelocity = 0;
-		}
-		if (Math.abs(yVelocity) < 3) {
-			yVelocity = 0;
-		}
-		tabColorTransition.end();
+		scrollBarColorTrans.begin();
 	}
 
 	@Override
@@ -135,7 +137,6 @@ public abstract class ScrollableView extends TouchableView {
 			float newX;
 			if (null == pos) {
 				newX = xOffset + xVelocity;
-				xVelocity *= DRAG;
 			} else {
 				newX = pos.x - pos.downX + xOffsetAnchor;
 			}
@@ -146,7 +147,6 @@ public abstract class ScrollableView extends TouchableView {
 			float newY;
 			if (null == pos) {
 				newY = yOffset + yVelocity;
-				yVelocity *= DRAG;
 			} else {
 				newY = pos.y - pos.downY + yOffsetAnchor;
 			}

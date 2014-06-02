@@ -48,6 +48,15 @@ public class MainPage extends TouchableView implements MidiNoteListener {
 		slideMenu.layout(this, -width, 0, midiViewGroup.getTrackControlWidth(), height);
 	}
 
+	@Override
+	public synchronized void drawAll() {
+		controlButtonGroup.drawAll();
+		midiViewGroup.drawAll();
+		renderGroup.draw();
+		pageSelectGroup.drawAll();
+		slideMenu.drawAll();
+	}
+
 	public void expandMenu() {
 		slideMenu.expand();
 	}

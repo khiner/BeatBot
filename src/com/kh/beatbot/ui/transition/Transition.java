@@ -50,15 +50,17 @@ public abstract class Transition {
 		update();
 	}
 
-	public synchronized void begin() {
+	public void begin() {
 		released = false;
 		if (currState != State.COMPLETE)
 			currState = State.UP;
 	}
 
-	public synchronized void end() {
-		waitCount = 0;
-		released = true;
+	public void end() {
+		if (!released) {
+			waitCount = 0;
+			released = true;
+		}
 	}
 
 	protected abstract void update();

@@ -18,7 +18,6 @@ public class MidiViewGroup extends TouchableView {
 
 	public MidiViewGroup(View view) {
 		super(view);
-		setClip(true);
 	}
 
 	public float getTrackControlWidth() {
@@ -73,5 +72,11 @@ public class MidiViewGroup extends TouchableView {
 		translateScaleGroup.draw();
 		midiView.endClip();
 		pop();
+	}
+
+	@Override
+	public void handleActionDown(int id, Pointer pos) {
+		super.handleActionDown(id, pos);
+		midiView.scrollBarColorTrans.begin();
 	}
 }
