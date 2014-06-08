@@ -90,7 +90,7 @@ public class EffectsPage extends TrackPage {
 		return masterMode ? TrackManager.getMasterTrack() : TrackManager.currTrack;
 	}
 
-	private void updateEffectLabels() {
+	public void updateEffectLabels() {
 		if (effectLabelList.numChildren() <= 0)
 			return;
 		for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {

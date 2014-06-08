@@ -178,6 +178,10 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		trackButtonRow.getEditButton().trigger(true);
 	}
 
+	public void updateEffectsPage() {
+		effectsPage.updateEffectLabels();
+	}
+
 	private void updateBrowsePage() {
 		trackButtonRow.update();
 		if (pager.getCurrPage().equals(browsePage)) {

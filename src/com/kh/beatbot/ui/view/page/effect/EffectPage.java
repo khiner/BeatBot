@@ -70,6 +70,7 @@ public class EffectPage extends TouchableView {
 			public void onRelease(Button button) {
 				((EffectParamsPage) paramsPager.getCurrPage()).getEffect().setOn(
 						toggleButton.isChecked());
+				View.mainPage.pageSelectGroup.updateEffectsPage();
 			}
 		});
 	}
