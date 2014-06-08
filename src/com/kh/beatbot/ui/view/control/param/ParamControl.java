@@ -1,12 +1,13 @@
 package com.kh.beatbot.ui.view.control.param;
 
 import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.listener.TouchableViewListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.ValueLabel;
 
-public class ParamControl extends TouchableView {
+public class ParamControl extends TouchableView implements TouchableViewListener {
 	protected View label;
 	protected ValueLabel valueLabel;
 
@@ -18,7 +19,9 @@ public class ParamControl extends TouchableView {
 	public synchronized void createChildren() {
 		valueLabel = new ValueLabel(this);
 		valueLabel.setShrinkable(true);
-		label = new View(this).withIcon(IconResourceSets.CONTROL_LABEL);
+		valueLabel.setListener(this);
+		label = new View(this).withRoundedRect().withIcon(IconResourceSets.CONTROL_LABEL);
+		label.setShrinkable(true);
 	}
 
 	@Override
@@ -44,5 +47,15 @@ public class ParamControl extends TouchableView {
 
 	public float getLevel() {
 		return valueLabel.getLevel();
+	}
+
+	@Override
+	public void onPress(TouchableView view) {
+		label.press();
+	}
+
+	@Override
+	public void onRelease(TouchableView view) {
+		label.release();
 	}
 }

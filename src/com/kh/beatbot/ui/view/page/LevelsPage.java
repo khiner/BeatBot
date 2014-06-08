@@ -4,15 +4,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.event.TrackLevelsSetEvent;
-import com.kh.beatbot.listener.ControlViewListener;
+import com.kh.beatbot.listener.TouchableViewListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
+import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.control.ControlViewBase;
 import com.kh.beatbot.ui.view.control.Seekbar;
 
-public class LevelsPage extends TrackPage implements ControlViewListener {
+public class LevelsPage extends TrackPage implements TouchableViewListener {
 	// levels attrs
 	protected Seekbar volumeLevelBar, panLevelBar, pitchLevelBar;
 	protected View volumeButton, panButton, pitchButton;
@@ -83,20 +83,20 @@ public class LevelsPage extends TrackPage implements ControlViewListener {
 	private TrackLevelsSetEvent levelsSetEvent = null;
 
 	@Override
-	public void onPress(ControlViewBase control) {
+	public void onPress(TouchableView view) {
 		if (numControlsPressed.getAndIncrement() == 0) {
 			levelsSetEvent = new TrackLevelsSetEvent(getCurrTrack());
 			levelsSetEvent.begin();
 		}
-		getButton((Seekbar) control).press();
+		getButton((Seekbar) view).press();
 	}
 
 	@Override
-	public void onRelease(ControlViewBase control) {
+	public void onRelease(TouchableView view) {
 		if (numControlsPressed.decrementAndGet() == 0) {
 			levelsSetEvent.end();
 		}
-		getButton((Seekbar) control).release();
+		getButton((Seekbar) view).release();
 	}
 
 	private View getButton(Seekbar seekbar) {

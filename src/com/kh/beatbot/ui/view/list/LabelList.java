@@ -31,14 +31,14 @@ public class LabelList extends TouchableView {
 			Color.LABEL_MED, null, Color.WHITE, Color.WHITE));
 
 	protected static final float GAP_BETWEEN_LABELS = 5, TEXT_Y_OFFSET = 3;
-	protected LabelListListener listener = null;
+	protected LabelListListener labelListListener = null;
 
 	public LabelList(View view) {
 		super(view);
 	}
 
 	public void setListener(LabelListListener listener) {
-		this.listener = listener;
+		this.labelListListener = listener;
 	}
 
 	public Label getLabel(int position) {
@@ -151,7 +151,7 @@ public class LabelList extends TouchableView {
 		@Override
 		protected void singleTap(int id, Pointer pos) {
 			// notify listener that the label has been single-clicked (tapped)
-			listener.labelClicked(getText(), this.parent.indexOf(this));
+			labelListListener.labelClicked(getText(), this.parent.indexOf(this));
 		}
 
 		@Override
@@ -160,7 +160,7 @@ public class LabelList extends TouchableView {
 
 		@Override
 		protected void longPress(int id, Pointer pos) {
-			listener.labelLongClicked(parent.indexOf(this));
+			labelListListener.labelLongClicked(parent.indexOf(this));
 		}
 
 		@Override
@@ -176,7 +176,7 @@ public class LabelList extends TouchableView {
 			// notify listener of the touched label's old and new position in list
 			int newPosition = parent.indexOf(this);
 			if (newPosition != initialTouchedPosition) {
-				listener.labelMoved(initialTouchedPosition, newPosition);
+				labelListListener.labelMoved(initialTouchedPosition, newPosition);
 			}
 			parent.layoutChildren();
 		}

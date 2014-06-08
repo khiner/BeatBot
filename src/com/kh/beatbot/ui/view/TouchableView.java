@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 
+import com.kh.beatbot.listener.TouchableViewListener;
 import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.shape.RenderGroup;
@@ -13,6 +14,8 @@ public class TouchableView extends View {
 	protected SparseArray<Pointer> pointersById = new SparseArray<Pointer>();
 
 	protected boolean shouldPropagateTouchEvents = true, deselectOnPointerExit = true;
+
+	protected TouchableViewListener listener;
 
 	public TouchableView(View view) {
 		super(view);
@@ -28,6 +31,10 @@ public class TouchableView extends View {
 
 	public TouchableView withIcon(IconResourceSet resourceSet) {
 		return (TouchableView) super.withIcon(resourceSet);
+	}
+
+	public void setListener(TouchableViewListener listener) {
+		this.listener = listener;
 	}
 
 	public final Pointer getPointer() {
@@ -50,10 +57,16 @@ public class TouchableView extends View {
 	 ********************************************************/
 	public void handleActionDown(int id, Pointer pos) {
 		press();
+		if (listener != null) {
+			listener.onPress(this);
+		}
 	}
 
 	public void handleActionUp(int id, Pointer pos) {
 		release();
+		if (listener != null) {
+			listener.onRelease(this);
+		}
 	}
 
 	public void handleActionPointerDown(int id, Pointer pos) {
