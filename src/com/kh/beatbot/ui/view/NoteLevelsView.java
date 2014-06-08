@@ -145,8 +145,8 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	public void selectRegion(float x, float y) {
-		float leftX = Math.min(x, selectRegionStartX);
-		float rightX = Math.max(x, selectRegionStartX);
+		float leftX = Math.min(Math.max(x, BG_OFFSET), selectRegionStartX);
+		float rightX = Math.max(Math.min(x, width - BG_OFFSET), selectRegionStartX);
 		float topY = Math.max(BG_OFFSET, Math.min(y, selectRegionStartY));
 		float bottomY = Math.max(y, selectRegionStartY);
 
