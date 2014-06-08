@@ -9,15 +9,13 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ControlViewBase;
 import com.kh.beatbot.ui.view.control.Seekbar;
-import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class LevelsPage extends TrackPage implements ControlViewListener {
 	// levels attrs
 	protected Seekbar volumeLevelBar, panLevelBar, pitchLevelBar;
-	protected Button volumeButton, panButton, pitchButton;
+	protected View volumeButton, panButton, pitchButton;
 	protected boolean masterMode = false;
 
 	public LevelsPage(View view) {
@@ -41,21 +39,21 @@ public class LevelsPage extends TrackPage implements ControlViewListener {
 
 	@Override
 	protected synchronized void createChildren() {
-		volumeButton = new ToggleButton(this).withRoundedRect().withIcon(IconResourceSets.VOLUME);
-		panButton = new ToggleButton(this).withRoundedRect().withIcon(IconResourceSets.PAN);
-		pitchButton = new ToggleButton(this).withRoundedRect().withIcon(IconResourceSets.PITCH);
+		volumeButton = new View(this).withRoundedRect().withIcon(IconResourceSets.VOLUME);
+		panButton = new View(this).withRoundedRect().withIcon(IconResourceSets.PAN);
+		pitchButton = new View(this).withRoundedRect().withIcon(IconResourceSets.PITCH);
 
-		volumeLevelBar = new Seekbar(this);
-		panLevelBar = new Seekbar(this);
-		pitchLevelBar = new Seekbar(this);
+		volumeButton.setShrinkable(true);
+		panButton.setShrinkable(true);
+		pitchButton.setShrinkable(true);
+
+		volumeLevelBar = new Seekbar(this, Seekbar.BasePosition.LEFT);
+		panLevelBar = new Seekbar(this, Seekbar.BasePosition.CENTER);
+		pitchLevelBar = new Seekbar(this, Seekbar.BasePosition.CENTER);
 
 		volumeButton.setText("Vol");
 		panButton.setText("Pan");
 		pitchButton.setText("Pit");
-
-		volumeButton.setEnabled(false);
-		panButton.setEnabled(false);
-		pitchButton.setEnabled(false);
 
 		volumeLevelBar.setLevelColor(Color.TRON_BLUE, Color.TRON_BLUE_TRANS);
 		panLevelBar.setLevelColor(Color.PAN, Color.PAN_TRANS);
@@ -98,10 +96,10 @@ public class LevelsPage extends TrackPage implements ControlViewListener {
 		if (numControlsPressed.decrementAndGet() == 0) {
 			levelsSetEvent.end();
 		}
-		getButton((Seekbar) control).disable();
+		getButton((Seekbar) control).release();
 	}
 
-	private Button getButton(Seekbar seekbar) {
+	private View getButton(Seekbar seekbar) {
 		if (seekbar.equals(volumeLevelBar)) {
 			return volumeButton;
 		} else if (seekbar.equals(panLevelBar)) {

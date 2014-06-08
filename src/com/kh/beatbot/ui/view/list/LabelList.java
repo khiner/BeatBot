@@ -164,7 +164,7 @@ public class LabelList extends TouchableView {
 		}
 
 		@Override
-		protected void press() {
+		public void press() {
 			super.press();
 			initialTouchedPosition = parent.indexOf(this);
 			originalX = x;

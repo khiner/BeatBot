@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 
+import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.shape.RenderGroup;
 
@@ -19,6 +20,14 @@ public class TouchableView extends View {
 
 	public TouchableView(View view, RenderGroup renderGroup) {
 		super(view, renderGroup);
+	}
+
+	public TouchableView withRoundedRect() {
+		return (TouchableView) super.withRoundedRect();
+	}
+
+	public TouchableView withIcon(IconResourceSet resourceSet) {
+		return (TouchableView) super.withIcon(resourceSet);
 	}
 
 	public final Pointer getPointer() {
@@ -185,18 +194,6 @@ public class TouchableView extends View {
 			}
 		}
 		return null;
-	}
-
-	protected void press() {
-		if (isEnabled()) {
-			setState(State.PRESSED);
-		}
-	}
-
-	protected void release() {
-		if (isEnabled()) {
-			setState(State.DEFAULT);
-		}
 	}
 
 	/* Views can override this for different behavior when dragging away than lifting up */

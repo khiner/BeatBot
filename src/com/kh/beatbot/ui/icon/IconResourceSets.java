@@ -60,9 +60,9 @@ public class IconResourceSets {
 			SUSTAIN = s(r(R.drawable.sustain_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.sustain_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.sustain_icon, Color.TRON_BLUE, Color.BLACK)),
 			RELEASE = s(r(R.drawable.release_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.release_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.release_icon, Color.TRON_BLUE, Color.BLACK)),
 			
-			VOLUME = s(r(Color.TRANSPARENT, Color.TRON_BLUE), r(Color.TRON_BLUE, Color.BLACK), r(Color.TRON_BLUE, Color.BLACK), r(Color.TRANSPARENT, Color.TRON_BLUE)),
-			PAN = s(r(Color.TRANSPARENT, Color.PAN), r(Color.PAN, Color.BLACK), r(Color.PAN, Color.BLACK), r(Color.TRANSPARENT, Color.PAN)),
-			PITCH = s(r(Color.TRANSPARENT, Color.PITCH), r(Color.PITCH, Color.BLACK), r(Color.PITCH, Color.BLACK), r(Color.TRANSPARENT, Color.PITCH)),
+			VOLUME = s(r(Color.TRANSPARENT, Color.TRON_BLUE), r(Color.TRON_BLUE, Color.BLACK), r(Color.TRON_BLUE, Color.BLACK)),
+			PAN = s(r(Color.TRANSPARENT, Color.PAN), r(Color.PAN, Color.BLACK), r(Color.PAN, Color.BLACK)),
+			PITCH = s(r(Color.TRANSPARENT, Color.PITCH), r(Color.PITCH, Color.BLACK), r(Color.PITCH, Color.BLACK)),
 
 			PREVIEW = s(r(R.drawable.preview_icon, null, Color.WHITE), r(R.drawable.preview_icon_selected, null, Color.WHITE)),
 			LOOP = s(r(R.drawable.loop_icon, null, Color.LABEL_VERY_LIGHT), null, r(R.drawable.loop_icon, null, Color.LABEL_SELECTED)),

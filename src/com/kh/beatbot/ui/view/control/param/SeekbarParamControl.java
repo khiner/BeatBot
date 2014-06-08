@@ -4,15 +4,13 @@ import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Seekbar;
 
 public class SeekbarParamControl extends LevelParamControl {
-
 	public SeekbarParamControl(View view) {
-		super(view);
+		this(view, Seekbar.BasePosition.LEFT);
 	}
 
-	@Override
-	public synchronized void createChildren() {
-		super.createChildren();
-		levelControl = new Seekbar(this);
+	public SeekbarParamControl(View view, Seekbar.BasePosition basePosition) {
+		super(view);
+		levelControl = new Seekbar(this, basePosition);
 		addChild(levelControl);
 	}
 

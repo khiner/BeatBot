@@ -105,6 +105,18 @@ public class View implements Comparable<View> {
 		stateChanged();
 	}
 
+	public void press() {
+		if (isEnabled()) {
+			setState(State.PRESSED);
+		}
+	}
+
+	public void release() {
+		if (isEnabled()) {
+			setState(State.DEFAULT);
+		}
+	}
+
 	public void setEnabled(boolean enabled) {
 		if (enabled) {
 			enable();
@@ -135,7 +147,7 @@ public class View implements Comparable<View> {
 		return text;
 	}
 
-	public synchronized View withIcon(IconResourceSet resourceSet) {
+	public View withIcon(IconResourceSet resourceSet) {
 		setIcon(resourceSet);
 		return this;
 	}
@@ -486,12 +498,12 @@ public class View implements Comparable<View> {
 		this.bgShape = shape;
 	}
 
-	protected View withRect() {
+	public View withRect() {
 		initRect();
 		return this;
 	}
 
-	protected View withRoundedRect() {
+	public View withRoundedRect() {
 		initRoundedRect();
 		return this;
 	}
