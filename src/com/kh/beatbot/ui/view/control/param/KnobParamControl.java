@@ -12,6 +12,7 @@ public class KnobParamControl extends LevelParamControl {
 
 	public KnobParamControl withBeatSync(boolean beatSync) {
 		levelControl = beatSync ? new ToggleKnob(this) : new Knob(this);
+		levelControl.setListener(this);
 		return this;
 	}
 

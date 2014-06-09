@@ -10,12 +10,13 @@ import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.control.Seekbar;
+import com.kh.beatbot.ui.view.control.Seekbar.BasePosition;
+import com.kh.beatbot.ui.view.control.param.SeekbarParamControl;
+import com.kh.beatbot.ui.view.control.param.SeekbarParamControl.SeekbarPosition;
 
 public class LevelsPage extends TrackPage implements TouchableViewListener {
 	// levels attrs
-	protected Seekbar volumeLevelBar, panLevelBar, pitchLevelBar;
-	protected View volumeButton, panButton, pitchButton;
+	protected SeekbarParamControl volumeParamControl, panParamControl, pitchParamControl;
 	protected boolean masterMode = false;
 
 	public LevelsPage(View view) {
@@ -24,9 +25,9 @@ public class LevelsPage extends TrackPage implements TouchableViewListener {
 
 	@Override
 	public void onSelect(BaseTrack track) {
-		volumeLevelBar.setParam(getCurrTrack().getVolumeParam());
-		panLevelBar.setParam(getCurrTrack().getPanParam());
-		pitchLevelBar.setParam(getCurrTrack().getPitchParam());
+		volumeParamControl.setParam(getCurrTrack().getVolumeParam());
+		panParamControl.setParam(getCurrTrack().getPanParam());
+		pitchParamControl.setParam(getCurrTrack().getPitchParam());
 	}
 
 	public void setMasterMode(boolean masterMode) {
@@ -39,44 +40,28 @@ public class LevelsPage extends TrackPage implements TouchableViewListener {
 
 	@Override
 	protected synchronized void createChildren() {
-		volumeButton = new View(this).withRoundedRect().withIcon(IconResourceSets.VOLUME);
-		panButton = new View(this).withRoundedRect().withIcon(IconResourceSets.PAN);
-		pitchButton = new View(this).withRoundedRect().withIcon(IconResourceSets.PITCH);
+		volumeParamControl = new SeekbarParamControl(this, SeekbarPosition.CENTER,
+				BasePosition.LEFT).withLabelIcon(IconResourceSets.VOLUME);
+		panParamControl = new SeekbarParamControl(this, SeekbarPosition.CENTER, BasePosition.CENTER)
+				.withLabelIcon(IconResourceSets.PAN);
+		pitchParamControl = new SeekbarParamControl(this, SeekbarPosition.CENTER,
+				BasePosition.CENTER).withLabelIcon(IconResourceSets.PITCH);
 
-		volumeButton.setShrinkable(true);
-		panButton.setShrinkable(true);
-		pitchButton.setShrinkable(true);
+		volumeParamControl.setLevelColor(Color.TRON_BLUE, Color.TRON_BLUE_TRANS);
+		panParamControl.setLevelColor(Color.PAN, Color.PAN_TRANS);
+		pitchParamControl.setLevelColor(Color.PITCH, Color.PITCH_TRANS);
 
-		volumeLevelBar = new Seekbar(this, Seekbar.BasePosition.LEFT);
-		panLevelBar = new Seekbar(this, Seekbar.BasePosition.CENTER);
-		pitchLevelBar = new Seekbar(this, Seekbar.BasePosition.CENTER);
-
-		volumeButton.setText("Vol");
-		panButton.setText("Pan");
-		pitchButton.setText("Pit");
-
-		volumeLevelBar.setLevelColor(Color.TRON_BLUE, Color.TRON_BLUE_TRANS);
-		panLevelBar.setLevelColor(Color.PAN, Color.PAN_TRANS);
-		pitchLevelBar.setLevelColor(Color.PITCH, Color.PITCH_TRANS);
-
-		volumeLevelBar.setListener(this);
-		panLevelBar.setListener(this);
-		pitchLevelBar.setListener(this);
+		volumeParamControl.setTouchListener(this);
+		panParamControl.setTouchListener(this);
+		pitchParamControl.setTouchListener(this);
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
-
 		float toggleHeight = height / 3;
-		float toggleWidth = 2 * toggleHeight;
-		volumeButton.layout(this, 0, 0, toggleWidth, toggleHeight);
-		panButton.layout(this, 0, toggleHeight, toggleWidth, toggleHeight);
-		pitchButton.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
-
-		volumeLevelBar.layout(this, toggleWidth, 0, width - toggleWidth, toggleHeight);
-		panLevelBar.layout(this, toggleWidth, toggleHeight, width - toggleWidth, toggleHeight);
-		pitchLevelBar
-				.layout(this, toggleWidth, toggleHeight * 2, width - toggleWidth, toggleHeight);
+		volumeParamControl.layout(this, 0, 0, width, toggleHeight);
+		panParamControl.layout(this, 0, toggleHeight, width, toggleHeight);
+		pitchParamControl.layout(this, 0, toggleHeight * 2, width, toggleHeight);
 	}
 
 	private AtomicInteger numControlsPressed = new AtomicInteger(0);
@@ -88,24 +73,12 @@ public class LevelsPage extends TrackPage implements TouchableViewListener {
 			levelsSetEvent = new TrackLevelsSetEvent(getCurrTrack());
 			levelsSetEvent.begin();
 		}
-		getButton((Seekbar) view).press();
 	}
 
 	@Override
 	public void onRelease(TouchableView view) {
 		if (numControlsPressed.decrementAndGet() == 0) {
 			levelsSetEvent.end();
-		}
-		getButton((Seekbar) view).release();
-	}
-
-	private View getButton(Seekbar seekbar) {
-		if (seekbar.equals(volumeLevelBar)) {
-			return volumeButton;
-		} else if (seekbar.equals(panLevelBar)) {
-			return panButton;
-		} else {
-			return pitchButton;
 		}
 	}
 }

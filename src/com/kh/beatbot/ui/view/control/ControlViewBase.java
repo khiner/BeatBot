@@ -13,8 +13,6 @@ public abstract class ControlViewBase extends TouchableView {
 	protected static float[] selectColor = Color.LABEL_SELECTED;
 	protected static float[] selectColorTrans = Color.LABEL_SELECTED_TRANS;
 
-	protected boolean selected = false;
-
 	public ControlViewBase(View view) {
 		super(view);
 	}
@@ -26,17 +24,5 @@ public abstract class ControlViewBase extends TouchableView {
 	public void setLevelColor(float[] newLevelColor, float[] newLevelColorTrans) {
 		levelColor = newLevelColor;
 		levelColorTrans = newLevelColorTrans;
-	}
-
-	@Override
-	public void handleActionDown(int id, Pointer pos) {
-		selected = true;
-		super.handleActionDown(id, pos);
-	}
-
-	@Override
-	public void handleActionUp(int id, Pointer pos) {
-		selected = false;
-		super.handleActionUp(id, pos);
 	}
 }

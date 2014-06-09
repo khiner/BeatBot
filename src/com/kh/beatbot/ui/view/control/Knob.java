@@ -45,14 +45,14 @@ public class Knob extends ControlView1dBase {
 	}
 
 	@Override
-	public void handleActionDown(int id, Pointer pos) {
-		super.handleActionDown(id, pos);
-		knobShape.setFillColor(selectColor);
+	public void press() {
+		super.press();
+		knobShape.setFillColor(selectColor);		
 	}
 
 	@Override
-	public void handleActionUp(int id, Pointer pos) {
-		super.handleActionUp(id, pos);
-		knobShape.setFillColor(levelColor);
+	public void release() {
+		super.release();
+		knobShape.setFillColor(levelColor);		
 	}
 }

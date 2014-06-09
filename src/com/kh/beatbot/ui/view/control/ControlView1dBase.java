@@ -42,8 +42,6 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 	@Override
 	public void handleActionMove(int id, Pointer pos) {
 		super.handleActionMove(id, pos);
-		if (!selected)
-			return;
 		param.setLevel(posToLevel(pos));
 	}
 

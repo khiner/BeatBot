@@ -85,16 +85,16 @@ public class Seekbar extends ControlView1dBase {
 	}
 
 	@Override
-	public void handleActionDown(int id, Pointer pos) {
-		super.handleActionDown(id, pos);
+	public void press() {
+		super.press();
 		foregroundRect.setFillColor(selectColor);
 		levelCircle.setFillColor(selectColorTrans);
 	}
 
 	@Override
-	public void handleActionUp(int id, Pointer pos) {
-		super.handleActionUp(id, pos);
+	public void release() {
+		super.release();
 		foregroundRect.setFillColor(levelColor);
-		levelCircle.setFillColor(levelColorTrans);
+		levelCircle.setFillColor(levelColorTrans);		
 	}
 }
