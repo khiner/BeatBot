@@ -23,8 +23,7 @@ public class Knob extends ControlView1dBase {
 		float unitX = pos.x / width - .5f;
 		float unitY = pos.y / height - .5f;
 		float theta = (float) Math.atan(unitY / unitX) + ¹ / 2;
-		// atan ranges from 0 to ¹, and produces symmetric results around the y
-		// axis.
+		// atan ranges from 0 to ¹, and produces symmetric results around the y axis.
 		// we need 0 to 2*¹, so ad ¹ if right of x axis.
 		if (unitX > 0)
 			theta += ¹;
@@ -47,12 +46,12 @@ public class Knob extends ControlView1dBase {
 	@Override
 	public void press() {
 		super.press();
-		knobShape.setFillColor(selectColor);		
+		knobShape.setFillColor(selectColor);
 	}
 
 	@Override
 	public void release() {
 		super.release();
-		knobShape.setFillColor(levelColor);		
+		knobShape.setFillColor(levelColor);
 	}
 }

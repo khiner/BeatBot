@@ -2,7 +2,6 @@ package com.kh.beatbot.ui.view.group;
 
 import android.widget.Toast;
 
-import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.OnReleaseListener;

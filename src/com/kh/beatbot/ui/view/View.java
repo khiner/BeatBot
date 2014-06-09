@@ -444,8 +444,11 @@ public class View implements Comparable<View> {
 	}
 
 	protected final float distanceFromCenterSquared(Pointer pos) {
-		return (pos.x - width / 2) * (pos.x - width / 2) + (pos.y - height / 2)
-				* (pos.y - height / 2);
+		return distanceFromCenterSquared(pos.x, pos.y);
+	}
+
+	protected final float distanceFromCenterSquared(float x, float y) {
+		return (x - width / 2) * (x - width / 2) + (y - height / 2) * (y - height / 2);
 	}
 
 	protected float viewX(float x) {
