@@ -5,6 +5,10 @@ static jclass trackClass = NULL;
 static jmethodID getNextMidiNote = NULL;
 static JavaVM* javaVm = NULL;
 
+static float dbToLinear(float db) {
+	return pow(10, db / 20);
+}
+
 jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 	JNIEnv* env;
 	if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
@@ -161,7 +165,7 @@ Levels *initLevels() {
 	Levels *levels = malloc(sizeof(Levels));
 	pthread_mutex_init(&levels->effectMutex, NULL );
 	levels->effectHead = NULL;
-	levels->volume = .8f;
+	levels->volume = dbToLinear(0);
 	levels->pan = levels->pitch = .5f;
 	int effectNum;
 	for (effectNum = 0; effectNum < MAX_EFFECTS_PER_TRACK; effectNum++) {
@@ -184,7 +188,7 @@ Track *initTrack() {
 	track->currBufferFloat[1] = (float *) calloc(BUFF_SIZE, sizeof(float));
 	track->mute = track->solo = false;
 	track->shouldSound = true;
-	track->nextEvent->volume = .8f;
+	track->nextEvent->volume = dbToLinear(0);
 	track->nextEvent->pitch = track->nextEvent->pan = .5f;
 	return track;
 }
@@ -378,9 +382,13 @@ void updateAllLevels() {
 }
 
 void Java_com_kh_beatbot_BaseTrack_setTrackVolume(JNIEnv *env, jclass clazz,
-		jint trackNum, jfloat volume) {
+		jint trackNum, jfloat dbVolume) {
 	Levels *levels = getLevels(env, clazz, trackNum);
-	levels->volume = volume;
+	if (dbVolume < -144) {
+		levels->volume = 0;
+	} else {
+		levels->volume = dbToLinear(dbVolume);
+	}
 	updateLevels(trackNum);
 }
 
@@ -483,7 +491,8 @@ void Java_com_kh_beatbot_Track_notifyNoteMoved(JNIEnv *env, jclass clazz,
 			|| (track->nextStopSample == oldOffSample
 					&& newOffSample < currSample)) {
 		stopTrack(track);
-	} else if (track->nextStopSample == oldOffSample && newOnSample < currSample) {
+	} else if (track->nextStopSample == oldOffSample
+			&& newOnSample < currSample) {
 		track->nextStopSample = newOffSample;
 	}
 }
@@ -514,12 +523,12 @@ void Java_com_kh_beatbot_Track_setTrackReverse(JNIEnv *env, jclass clazz,
 }
 
 void Java_com_kh_beatbot_Track_setTrackGain(JNIEnv *env, jclass clazz,
-		jint trackNum, jfloat gain) {
+		jint trackNum, jfloat dbGain) {
 	Track *track = getTrack(env, clazz, trackNum);
 	if (track->generator == NULL )
 		return;
 	FileGen *fileGen = (FileGen *) track->generator->config;
-	fileGen->gain = gain;
+	fileGen->gain = dbToLinear(dbGain);
 }
 
 float Java_com_kh_beatbot_Track_getSample(JNIEnv *env, jclass clazz,
@@ -547,3 +556,4 @@ float Java_com_kh_beatbot_Track_getFrames(JNIEnv *env, jclass clazz,
 		return 0;
 	return ((FileGen *) track->generator->config)->frames;
 }
+

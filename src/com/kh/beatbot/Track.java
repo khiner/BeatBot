@@ -494,8 +494,7 @@ public class Track extends BaseTrack implements FileListener {
 			loopEndParam = new Param(1, "End").scale(numSamples).withFormat("%.0f");
 			loopEndParam.setLevel(1);
 
-			gainParam = new Param(2, "Gain").scale(2);
-			gainParam.setLevel(0.5f);
+			gainParam = new Param(2, "Gain").withUnits("Db").withLevel(Param.dbToView(0));
 
 			gainParam.addListener(this);
 			loopBeginParam.addListener(this);

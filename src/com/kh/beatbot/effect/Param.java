@@ -9,7 +9,8 @@ import com.kh.beatbot.listener.ParamToggleListener;
 import com.kh.beatbot.manager.MidiManager;
 
 public class Param {
-	public static final float DEFAULT_LOG_SCALE = 8;
+	public static final float DEFAULT_LOG_SCALE = 8, DB_LOG_SCALE = 10 * 10, MAX_DB = 24,
+			DB_SCALE = dbToLinear(MAX_DB);
 
 	public int id;
 	public float level = 0, viewLevel = 0;
@@ -33,6 +34,9 @@ public class Param {
 	public Param withUnits(final String units) {
 		this.unitString = units;
 		this.hz = unitString.equalsIgnoreCase("hz");
+		if (isDb()) {
+			logScaleValue = DB_LOG_SCALE;
+		}
 		return this;
 	}
 
@@ -82,7 +86,9 @@ public class Param {
 	public void setLevel(float level) {
 		level = GeneralUtils.clipTo(level, minViewLevel, maxViewLevel);
 		viewLevel = level;
-		if (beatSync) {
+		if (isDb()) {
+			this.level = linearToDb(DB_SCALE * logScaleLevel(level));
+		} else if (beatSync) {
 			this.level = quantizeToBeat(level);
 		} else {
 			this.level = addValue + scaleValue * (logScale ? logScaleLevel(level) : level);
@@ -233,5 +239,22 @@ public class Param {
 		default:
 			return 1;
 		}
+	}
+
+	private boolean isDb() {
+		return unitString.toLowerCase().equals("db");
+	}
+
+	public static float dbToView(float db) {
+		return (float) Math.log((DB_LOG_SCALE * dbToLinear(db)) / DB_SCALE + 1)
+				/ (float) Math.log(DB_LOG_SCALE + 1);
+	}
+
+	public static float dbToLinear(float db) {
+		return (float) Math.pow(10, db / 20);
+	}
+
+	public static float linearToDb(float linear) {
+		return 20 * (float) Math.log10(linear);
 	}
 }
