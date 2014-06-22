@@ -176,6 +176,19 @@ public class MidiNote implements Comparable<MidiNote> {
 		return GeneralUtils.byteToLinear(getLevel(levelType));
 	}
 
+	public String getLevelDisplay(LevelType levelType) {
+		switch (levelType) {
+		case VOLUME:
+			return String.valueOf(getVelocity());
+		case PAN:
+			return String.valueOf(getPan());
+		case PITCH:
+			// for pitch, show transpose amt in semitones
+			return String.valueOf((int) getPitch() - Byte.MAX_VALUE / 2 - 1);
+		}
+		return null;
+	}
+
 	public void setLevel(LevelType levelType, byte level) {
 		switch (levelType) {
 		case VOLUME:

@@ -263,7 +263,7 @@ public class NoteLevelsView extends TouchableView {
 	private void updateValueLabel(MidiNote touchedNote) {
 		valueLabel.setPosition(absoluteX + tickToX(touchedNote.getOnTick()) + width / 40, absoluteY
 				+ levelToLabelY(touchedNote.getLinearLevel(currLevelType)));
-		valueLabel.setText(String.valueOf(touchedNote.getLevel(currLevelType)));
+		valueLabel.setText(touchedNote.getLevelDisplay(currLevelType));
 	}
 
 	@Override
