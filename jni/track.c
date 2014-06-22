@@ -5,10 +5,6 @@ static jclass trackClass = NULL;
 static jmethodID getNextMidiNote = NULL;
 static JavaVM* javaVm = NULL;
 
-static float dbToLinear(float db) {
-	return pow(10, db / 20);
-}
-
 jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 	JNIEnv* env;
 	if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
@@ -188,8 +184,8 @@ Track *initTrack() {
 	track->currBufferFloat[1] = (float *) calloc(BUFF_SIZE, sizeof(float));
 	track->mute = track->solo = false;
 	track->shouldSound = true;
-	track->nextEvent->volume = dbToLinear(0);
-	track->nextEvent->pitch = track->nextEvent->pan = .5f;
+	track->nextEvent->volume = dbToByte(0);
+	track->nextEvent->pitch = track->nextEvent->pan = linearToByte(.5f);
 	return track;
 }
 
@@ -301,11 +297,11 @@ void Java_com_kh_beatbot_Track_soloTrack(JNIEnv *env, jclass clazz,
 	}
 }
 
-void setNextNoteInfo(Track *track, jlong onTick, jlong offTick, jfloat vol,
-		jfloat pan, jfloat pitch) {
+void setNextNoteInfo(Track *track, jlong onTick, jlong offTick, jbyte volume,
+		jbyte pan, jbyte pitch) {
 	track->nextStartSample = onTick;
 	track->nextStopSample = offTick;
-	track->nextEvent->volume = vol;
+	track->nextEvent->volume = volume;
 	track->nextEvent->pan = pan;
 	track->nextEvent->pitch = pitch;
 }
@@ -325,14 +321,14 @@ void setNextNote(Track *track, jobject obj) {
 	long offSample = tickToSample(
 			(*env)->CallLongMethod(env, obj,
 					(*env)->GetMethodID(env, cls, "getOffTick", "()J")));
-	float vol = (*env)->CallFloatMethod(env, obj,
-			(*env)->GetMethodID(env, cls, "getVelocity", "()F"));
-	float pan = (*env)->CallFloatMethod(env, obj,
-			(*env)->GetMethodID(env, cls, "getPan", "()F"));
-	float pitch = (*env)->CallFloatMethod(env, obj,
-			(*env)->GetMethodID(env, cls, "getPitch", "()F"));
+	jbyte volume = (*env)->CallByteMethod(env, obj,
+			(*env)->GetMethodID(env, cls, "getVelocity", "()B"));
+	jbyte pan = (*env)->CallByteMethod(env, obj,
+			(*env)->GetMethodID(env, cls, "getPan", "()B"));
+	jbyte pitch = (*env)->CallByteMethod(env, obj,
+			(*env)->GetMethodID(env, cls, "getPitch", "()B"));
 
-	setNextNoteInfo(track, onSample, offSample, vol, pan, pitch);
+	setNextNoteInfo(track, onSample, offSample, volume, pan, pitch);
 	(*env)->DeleteLocalRef(env, cls);
 }
 
@@ -351,12 +347,15 @@ void Java_com_kh_beatbot_Track_setNextNote(JNIEnv *env, jclass clazz,
 }
 
 void setLevels(Track *track, MidiEvent *midiEvent) {
-	track->levels->volPan->set(track->levels->volPan->config, midiEvent->volume,
-			(masterLevels->pan + track->levels->pan + midiEvent->pan) / 3);
-	if (track->generator == NULL )
-		return;
-	((FileGen *) track->generator->config)->sampleRate = masterLevels->pitch
-			* track->levels->pitch * midiEvent->pitch * 8;
+	float volume = byteToLinear(midiEvent->volume);
+	float pan = (masterLevels->pan + track->levels->pan
+			+ byteToLinear(midiEvent->pan)) / 3;
+	float pitch = masterLevels->pitch * track->levels->pitch
+			* byteToLinear(midiEvent->pitch) * 8;
+	track->levels->volPan->set(track->levels->volPan->config, volume, pan);
+	if (NULL != track->generator) {
+		((FileGen *) track->generator->config)->sampleRate = pitch;
+	}
 }
 
 void updateLevels(int trackNum) {

@@ -22,20 +22,16 @@ import java.io.OutputStream;
 
 public class ChannelEvent extends MidiEvent {
 
-	protected int mType;
-	protected int mChannel;
-	protected int note;
-	protected float velocity;
-	protected float pan;
-	protected float pitch;
+	protected int mType, mChannel, note;
+	protected byte velocity, pan, pitch;
 
-	protected ChannelEvent(long tick, int type, int channel, int note, float velocity, float pan,
-			float pitch) {
+	protected ChannelEvent(long tick, int type, int channel, int note, byte velocity, byte pan,
+			byte pitch) {
 		this(tick, 0, type, channel, note, velocity, pan, pitch);
 	}
 
-	protected ChannelEvent(long tick, long delta, int type, int channel, int note, float velocity,
-			float pan, float pitch) {
+	protected ChannelEvent(long tick, long delta, int type, int channel, int note, byte velocity,
+			byte pan, byte pitch) {
 		super(tick, delta);
 
 		mType = type & 0x0F;
@@ -54,15 +50,15 @@ public class ChannelEvent extends MidiEvent {
 		return note;
 	}
 
-	public float getVelocity() {
+	public byte getVelocity() {
 		return velocity;
 	}
 
-	public float getPan() {
+	public byte getPan() {
 		return pan;
 	}
 
-	public float getPitch() {
+	public byte getPitch() {
 		return pitch;
 	}
 
@@ -70,16 +66,16 @@ public class ChannelEvent extends MidiEvent {
 		note = p;
 	}
 
-	public void setVelocity(float velocity) {
-		this.velocity = velocity;
+	public void setVelocity(byte velocity) {
+		this.velocity = clip(velocity);
 	}
 
-	public void setPan(float pan) {
-		this.pan = pan;
+	public void setPan(byte pan) {
+		this.pan = clip(pan);
 	}
 
-	public void setPitch(float pitch) {
-		this.pitch = pitch;
+	public void setPitch(byte pitch) {
+		this.pitch = clip(pitch);
 	}
 
 	public void setChannel(int c) {
@@ -153,8 +149,8 @@ public class ChannelEvent extends MidiEvent {
 
 		out.write(note);
 		if (mType != PROGRAM_CHANGE && mType != CHANNEL_AFTERTOUCH) {
-			int int_vel = (int) (velocity * LEVEL_MAX) & 0xFF;
-			int int_pan = (int) (pan * LEVEL_MAX) & 0xFF;
+			int int_vel = (int) velocity & 0xFF;
+			int int_pan = (int) pan & 0xFF;
 			out.write(int_vel);
 			out.write(int_pan);
 		}
@@ -164,16 +160,17 @@ public class ChannelEvent extends MidiEvent {
 			InputStream in) throws IOException {
 
 		int note = in.read();
-		float velocity = (float) in.read() / (float) LEVEL_MAX;
-		float pan = (float) in.read() / (float) LEVEL_MAX;
+		byte velocity = (byte) in.read();
+		byte pan = (byte) in.read();
+		byte pitch = 64;
 
 		switch (type) {
 		case NOTE_OFF:
-			return new NoteOff(tick, delta, channel, note, velocity, pan, .5f);
+			return new NoteOff(tick, delta, channel, note, velocity, pan, pitch);
 		case NOTE_ON:
-			return new NoteOn(tick, delta, channel, note, velocity, pan, .5f);
+			return new NoteOn(tick, delta, channel, note, velocity, pan, pitch);
 		default:
-			return new ChannelEvent(tick, delta, type, channel, note, velocity, pan, .5f);
+			return new ChannelEvent(tick, delta, type, channel, note, velocity, pan, pitch);
 		}
 	}
 

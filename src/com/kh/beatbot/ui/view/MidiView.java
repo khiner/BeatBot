@@ -510,7 +510,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		long spacing = MidiManager.getMajorTickSpacing();
 		long onTick = (long) (tick - tick % spacing);
 		long offTick = onTick + spacing - 1;
-		MidiManager.addNote(onTick, offTick, track, .75f, .5f, .5f);
+		MidiManager.addNote(onTick, offTick, track);
 	}
 
 	private void selectMidiNote(int pointerId, Pointer pos) {

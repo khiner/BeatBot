@@ -26,6 +26,14 @@ public class GeneralUtils {
 		return (x - pointX) * (x - pointX) + (y - pointY) * (y - pointY);
 	}
 
+	public static float byteToLinear(byte value) {
+		return (float) value / (float) Byte.MAX_VALUE;
+	}
+
+	public static byte linearToByte(float linear) {
+		return (byte) (clipToUnit(linear) * Byte.MAX_VALUE);
+	}
+
 	public static float dbToUnit(float db) {
 		// db range = -60 - 0, need range 0-1
 		return db <= -60 ? 0 : db / 60 + 1;

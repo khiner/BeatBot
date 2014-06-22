@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
@@ -72,7 +73,7 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	protected void drawLevel(MidiNote midiNote, float[] levelColor, float[] levelColorTrans) {
-		float y = levelToY(midiNote.getLevel(currLevelType));
+		float y = levelToY(midiNote.getLinearLevel(currLevelType));
 		levelBarRect.layout(-LEVEL_BAR_WIDTH / 2, y, LEVEL_BAR_WIDTH, height - y - 1);
 		levelBarCircle.setPosition(0, y);
 		levelBarSelectCircle.setPosition(0, y);
@@ -121,7 +122,7 @@ public class NoteLevelsView extends TouchableView {
 
 	private boolean selectLevel(int pointerId, Pointer pos) {
 		for (MidiNote midiNote : TrackManager.currTrack.getMidiNotes()) {
-			float velocityY = levelToY(midiNote.getLevel(currLevelType));
+			float velocityY = levelToY(midiNote.getLinearLevel(currLevelType));
 			if (Math.abs(tickToX(midiNote.getOnTick()) - pos.x) < 35
 					&& Math.abs(velocityY - pos.y) < 35) {
 				// If this is the only touched level, and it hasn't yet
@@ -153,7 +154,7 @@ public class NoteLevelsView extends TouchableView {
 		float leftTick = xToTick(leftX), rightTick = xToTick(rightX);
 
 		for (MidiNote selectedNote : TrackManager.currTrack.getMidiNotes()) {
-			float levelY = levelToY(selectedNote.getLevel(currLevelType));
+			float levelY = levelToY(selectedNote.getLinearLevel(currLevelType));
 			boolean selected = leftTick < selectedNote.getOnTick()
 					&& rightTick > selectedNote.getOnTick() && topY < levelY && bottomY > levelY;
 			selectedNote.setSelected(selected);
@@ -169,22 +170,23 @@ public class NoteLevelsView extends TouchableView {
 		if (touchedSize == 1) {
 			DragLine.m = 0;
 			MidiNote touched = (MidiNote) touchedLevels.values().toArray()[0];
-			DragLine.b = touched.getLevel(currLevelType);
+			DragLine.b = touched.getLinearLevel(currLevelType);
 			DragLine.leftTick = 0;
 			DragLine.rightTick = Float.MAX_VALUE;
-			DragLine.leftLevel = DragLine.rightLevel = touched.getLevel(currLevelType);
+			DragLine.leftLevel = DragLine.rightLevel = touched.getLinearLevel(currLevelType);
 		} else if (touchedSize == 2) {
 			MidiNote leftLevel = touchedLevels.get(0).getOnTick() < touchedLevels.get(1)
 					.getOnTick() ? touchedLevels.get(0) : touchedLevels.get(1);
 			MidiNote rightLevel = touchedLevels.get(0).getOnTick() < touchedLevels.get(1)
 					.getOnTick() ? touchedLevels.get(1) : touchedLevels.get(0);
-			DragLine.m = (rightLevel.getLevel(currLevelType) - leftLevel.getLevel(currLevelType))
+			DragLine.m = (rightLevel.getLinearLevel(currLevelType) - leftLevel
+					.getLinearLevel(currLevelType))
 					/ (rightLevel.getOnTick() - leftLevel.getOnTick());
-			DragLine.b = (leftLevel.getLevel(currLevelType) - DragLine.m * leftLevel.getOnTick());
+			DragLine.b = (leftLevel.getLinearLevel(currLevelType) - DragLine.m * leftLevel.getOnTick());
 			DragLine.leftTick = leftLevel.getOnTick();
 			DragLine.rightTick = rightLevel.getOnTick();
-			DragLine.leftLevel = leftLevel.getLevel(currLevelType);
-			DragLine.rightLevel = rightLevel.getLevel(currLevelType);
+			DragLine.leftLevel = leftLevel.getLinearLevel(currLevelType);
+			DragLine.rightLevel = rightLevel.getLinearLevel(currLevelType);
 		}
 	}
 
@@ -194,7 +196,7 @@ public class NoteLevelsView extends TouchableView {
 		for (MidiNote selectedNote : TrackManager.getSelectedNotes()) {
 			levelOffsets.put(
 					selectedNote,
-					selectedNote.getLevel(currLevelType)
+					selectedNote.getLinearLevel(currLevelType)
 							- DragLine.getLevel(selectedNote.getOnTick()));
 		}
 	}
@@ -202,8 +204,9 @@ public class NoteLevelsView extends TouchableView {
 	private void setLevelsToDragLine() {
 		for (MidiNote selectedNote : TrackManager.getSelectedNotes()) {
 			if (levelOffsets.get(selectedNote) != null) {
-				selectedNote.setLevel(currLevelType, DragLine.getLevel(selectedNote.getOnTick())
-						+ levelOffsets.get(selectedNote));
+				float linear = DragLine.getLevel(selectedNote.getOnTick())
+						+ levelOffsets.get(selectedNote);
+				selectedNote.setLevel(currLevelType, GeneralUtils.linearToByte(linear));
 			}
 		}
 	}
@@ -221,8 +224,8 @@ public class NoteLevelsView extends TouchableView {
 		}
 	}
 
-	private float levelToY(float level) {
-		return height - level * (height - LEVEL_POINT_SIZE) - LEVEL_POINT_SIZE / 2;
+	private float levelToY(float linearLevel) {
+		return height - linearLevel * (height - LEVEL_POINT_SIZE) - LEVEL_POINT_SIZE / 2;
 	}
 
 	/*
@@ -253,7 +256,7 @@ public class NoteLevelsView extends TouchableView {
 		if (!touchedLevels.isEmpty()) {
 			MidiNote touched = touchedLevels.get(id);
 			if (touched != null) {
-				touched.setLevel(currLevelType, yToLevel(pos.y));
+				touched.setLevel(currLevelType, GeneralUtils.linearToByte(yToLevel(pos.y)));
 			}
 			if (id == pointersById.size() - 1) {
 				updateDragLine();

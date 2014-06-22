@@ -107,15 +107,15 @@ public class MidiNote implements Comparable<MidiNote> {
 		return noteOn.getNoteValue();
 	}
 
-	public float getVelocity() {
+	public byte getVelocity() {
 		return noteOn.getVelocity();
 	}
 
-	public float getPan() {
+	public byte getPan() {
 		return noteOn.getPan();
 	}
 
-	public float getPitch() {
+	public byte getPitch() {
 		return noteOn.getPitch();
 	}
 
@@ -136,24 +136,6 @@ public class MidiNote implements Comparable<MidiNote> {
 
 	public void setTouched(boolean touched) {
 		this.touched = touched;
-	}
-
-	public void setVelocity(float velocity) {
-		velocity = GeneralUtils.clipToUnit(velocity);
-		noteOn.setVelocity(velocity);
-		noteOff.setVelocity(velocity);
-	}
-
-	public void setPan(float pan) {
-		pan = GeneralUtils.clipToUnit(pan);
-		noteOn.setPan(pan);
-		noteOff.setPan(pan);
-	}
-
-	public void setPitch(float pitch) {
-		pitch = GeneralUtils.clipToUnit(pitch);
-		noteOn.setPitch(pitch);
-		noteOff.setPitch(pitch);
 	}
 
 	public void setTicks(long onTick, long offTick) {
@@ -177,7 +159,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		return noteOff.getTick() - noteOn.getTick();
 	}
 
-	public float getLevel(LevelType levelType) {
+	public byte getLevel(LevelType levelType) {
 		switch (levelType) {
 		case VOLUME:
 			return noteOn.getVelocity();
@@ -190,17 +172,20 @@ public class MidiNote implements Comparable<MidiNote> {
 		}
 	}
 
-	public void setLevel(LevelType levelType, float level) {
-		float clippedLevel = GeneralUtils.clipToUnit(level);
+	public float getLinearLevel(LevelType levelType) {
+		return GeneralUtils.byteToLinear(getLevel(levelType));
+	}
+
+	public void setLevel(LevelType levelType, byte level) {
 		switch (levelType) {
 		case VOLUME:
-			setVelocity(clippedLevel);
+			setVelocity(level);
 			break;
 		case PAN:
-			setPan(clippedLevel);
+			setPan(level);
 			break;
 		case PITCH:
-			setPitch(clippedLevel);
+			setPitch(level);
 			break;
 		}
 	}
@@ -246,5 +231,20 @@ public class MidiNote implements Comparable<MidiNote> {
 		for (MidiNoteListener listener : listeners) {
 			listener.onSelectStateChange(this);
 		}
+	}
+
+	private void setVelocity(byte velocity) {
+		noteOn.setVelocity(velocity);
+		noteOff.setVelocity(velocity);
+	}
+
+	private void setPan(byte pan) {
+		noteOn.setPan(pan);
+		noteOff.setPan(pan);
+	}
+
+	private void setPitch(byte pitch) {
+		noteOn.setPitch(pitch);
+		noteOff.setPitch(pitch);
 	}
 }

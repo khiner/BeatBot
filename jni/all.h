@@ -32,7 +32,6 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <math.h>
-#include <float.h>
 #include <pthread.h>
 #include <android/log.h>
 #include <android/asset_manager_jni.h>
@@ -41,6 +40,7 @@
 #include <SLES/OpenSLES_Android.h>
 
 
+#include "utils.h"
 #include "effects/effects.h"
 #include "effects/adsr.h"
 #include "effects/chorus.h"

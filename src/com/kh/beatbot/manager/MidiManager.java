@@ -93,8 +93,12 @@ public class MidiManager {
 		}
 	}
 
-	public static MidiNote addNote(long onTick, long offTick, int note, float velocity, float pan,
-			float pitch) {
+	public static MidiNote addNote(long onTick, long offTick, int note) {
+		return addNote(onTick, offTick, note, MidiEvent.HALF_LEVEL, MidiEvent.HALF_LEVEL, MidiEvent.HALF_LEVEL);
+	}
+
+	public static MidiNote addNote(long onTick, long offTick, int note, byte velocity, byte pan,
+			byte pitch) {
 		NoteOn on = new NoteOn(onTick, 0, note, velocity, pan, pitch);
 		NoteOff off = new NoteOff(offTick, 0, note, velocity, pan, pitch);
 		return addNote(on, off);

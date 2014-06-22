@@ -2,9 +2,9 @@
 #define MIDIEVENT_H
 
 typedef struct MidiEvent_ {
-	float volume;
-	float pan;
-	float pitch;
+	unsigned char volume;
+	unsigned char pan;
+	unsigned char pitch;
 } MidiEvent;
 
 MidiEvent *previewEvent;
