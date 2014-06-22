@@ -78,11 +78,11 @@ public class RoundedRect extends Shape {
 	}
 
 	@Override
-	public synchronized void layout(float x, float y, float width, float height) {
+	public synchronized void setDimensions(float width, float height) {
 		if (cornerRadius < 0) {
 			cornerRadius = width > height ? height / 4 : width / 4;
 		}
-		super.layout(x, y, width, height);
+		super.setDimensions(width, height);
 	}
 
 	private float roundX(float vertexX) {

@@ -9,9 +9,11 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.color.Color;
+import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.Circle;
 import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.shape.RenderGroup;
+import com.kh.beatbot.ui.view.control.ValueLabel;
 
 public class NoteLevelsView extends TouchableView {
 
@@ -48,6 +50,7 @@ public class NoteLevelsView extends TouchableView {
 
 	private Rectangle selectRegionRect, levelBarRect;
 	private Circle levelBarCircle, levelBarSelectCircle;
+	private ValueLabel valueLabel;
 
 	private static RenderGroup levelBarGroup = new RenderGroup();
 
@@ -134,6 +137,8 @@ public class NoteLevelsView extends TouchableView {
 					}
 					midiNote.setSelected(true);
 				}
+				valueLabel.show();
+				updateValueLabel(midiNote);
 				touchedLevels.put(pointerId, midiNote);
 				updateLevelOffsets();
 				return true;
@@ -182,7 +187,8 @@ public class NoteLevelsView extends TouchableView {
 			DragLine.m = (rightLevel.getLinearLevel(currLevelType) - leftLevel
 					.getLinearLevel(currLevelType))
 					/ (rightLevel.getOnTick() - leftLevel.getOnTick());
-			DragLine.b = (leftLevel.getLinearLevel(currLevelType) - DragLine.m * leftLevel.getOnTick());
+			DragLine.b = (leftLevel.getLinearLevel(currLevelType) - DragLine.m
+					* leftLevel.getOnTick());
 			DragLine.leftTick = leftLevel.getOnTick();
 			DragLine.rightTick = rightLevel.getOnTick();
 			DragLine.leftLevel = leftLevel.getLinearLevel(currLevelType);
@@ -225,14 +231,19 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	private float levelToY(float linearLevel) {
-		return height - linearLevel * (height - LEVEL_POINT_SIZE) - LEVEL_POINT_SIZE / 2;
+		return height - linearLevel * getLevelHeight() - LEVEL_POINT_SIZE / 2;
+	}
+
+	private float levelToLabelY(float linearLevel) {
+		return height - linearLevel * (getLevelHeight() - valueLabel.height) - LEVEL_POINT_SIZE / 2
+				- valueLabel.height;
 	}
 
 	/*
 	 * map y value of level bar to a value in [0,1]
 	 */
 	private float yToLevel(float y) {
-		return (height - y - LEVEL_POINT_SIZE / 2) / (height - LEVEL_POINT_SIZE);
+		return (height - y - LEVEL_POINT_SIZE / 2) / getLevelHeight();
 	}
 
 	private float tickToX(float tick) {
@@ -243,6 +254,16 @@ public class NoteLevelsView extends TouchableView {
 	private float xToTick(float x) {
 		return mainPage.midiViewGroup.midiView.xToTick(x + absoluteX
 				- mainPage.midiViewGroup.midiView.absoluteX);
+	}
+
+	private float getLevelHeight() {
+		return height - LEVEL_POINT_SIZE;
+	}
+
+	private void updateValueLabel(MidiNote touchedNote) {
+		valueLabel.setPosition(absoluteX + tickToX(touchedNote.getOnTick()) + width / 40, absoluteY
+				+ levelToLabelY(touchedNote.getLinearLevel(currLevelType)));
+		valueLabel.setText(String.valueOf(touchedNote.getLevel(currLevelType)));
 	}
 
 	@Override
@@ -257,6 +278,7 @@ public class NoteLevelsView extends TouchableView {
 			MidiNote touched = touchedLevels.get(id);
 			if (touched != null) {
 				touched.setLevel(currLevelType, GeneralUtils.linearToByte(yToLevel(pos.y)));
+				updateValueLabel(touched);
 			}
 			if (id == pointersById.size() - 1) {
 				updateDragLine();
@@ -286,6 +308,7 @@ public class NoteLevelsView extends TouchableView {
 		super.handleActionUp(id, pos);
 		clearTouchedLevels();
 		selectRegionRect.setFillColor(Color.TRANSPARENT);
+		valueLabel.hide();
 		MidiManager.endMidiEvent();
 	}
 
@@ -296,6 +319,9 @@ public class NoteLevelsView extends TouchableView {
 		levelBarRect = new Rectangle(levelBarGroup, Color.TRON_BLUE, null);
 		levelBarCircle = new Circle(levelBarGroup, Color.TRON_BLUE, null);
 		levelBarSelectCircle = new Circle(levelBarGroup, Color.TRON_BLUE, null);
+		valueLabel = new ValueLabel(this);
+		valueLabel.setIcon(IconResourceSets.VALUE_LABEL_VIEW_ONLY);
+		valueLabel.disable();
 		addShapes(selectRegionRect);
 	}
 
@@ -304,5 +330,7 @@ public class NoteLevelsView extends TouchableView {
 		levelBarRect.layout(-LEVEL_BAR_WIDTH / 2, 0, LEVEL_BAR_WIDTH, height);
 		levelBarCircle.layout(0, 0, LEVEL_BAR_WIDTH, LEVEL_BAR_WIDTH);
 		levelBarSelectCircle.layout(0, 0, LEVEL_BAR_WIDTH * 2, LEVEL_BAR_WIDTH * 2);
+		valueLabel.setDimensions(width / 12, width / 26);
+		valueLabel.hide();
 	}
 }
