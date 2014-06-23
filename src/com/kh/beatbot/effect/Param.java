@@ -20,7 +20,7 @@ public class Param {
 
 	private int topBeatNum = 1, bottomBeatNum = 1;
 	private float addValue = 0, scaleValue = 1, logScaleValue = 8;
-	private boolean beatSync, beatSyncable, logScale;
+	private boolean beatSync = false, beatSyncable = false, logScale = false, snap = false;
 	private String unitString = "", name = "", format = "%.2f";
 
 	private Set<ParamListener> listeners = new HashSet<ParamListener>();
@@ -75,6 +75,11 @@ public class Param {
 		return this;
 	}
 
+	public Param snap() {
+		this.snap = true;
+		return this;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -92,6 +97,9 @@ public class Param {
 			this.level = quantizeToBeat(level);
 		} else {
 			this.level = addValue + scaleValue * (logScale ? logScaleLevel(level) : level);
+		}
+		if (snap) {
+			this.level = Math.round(this.level);
 		}
 		notifyListeners();
 	}

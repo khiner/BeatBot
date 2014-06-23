@@ -30,11 +30,8 @@ public abstract class LevelParamControl extends ParamControl {
 	@Override
 	public void onPress(TouchableView view) {
 		super.onPress(view);
-		if (view.equals(levelControl)) {
-			valueLabel.press();
-		} else if (view.equals(valueLabel)) {
-			levelControl.press();
-		}
+		valueLabel.press();
+		levelControl.press();
 		if (null != touchListener) {
 			touchListener.onPress(view);
 		}
@@ -43,11 +40,8 @@ public abstract class LevelParamControl extends ParamControl {
 	@Override
 	public void onRelease(TouchableView view) {
 		super.onRelease(view);
-		if (view.equals(levelControl)) {
-			valueLabel.release();
-		} else if (view.equals(valueLabel)) {
-			levelControl.release();
-		}
+		valueLabel.release();
+		levelControl.release();
 		if (null != touchListener) {
 			touchListener.onRelease(view);
 		}

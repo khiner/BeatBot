@@ -35,22 +35,23 @@ public class TrackLevelsSetEvent implements Stateful, Temporal {
 	}
 
 	private class Levels implements Comparable<Levels> {
-		float volume, pan, pitch;
+		float volume, pan, pitchStep, pitchCent;
 
 		public Levels(BaseTrack track) {
 			this.volume = track.volumeParam.viewLevel;
 			this.pan = track.panParam.viewLevel;
-			this.pitch = track.pitchParam.viewLevel;
+			this.pitchStep = track.pitchStepParam.viewLevel;
+			this.pitchCent = track.pitchCentParam.viewLevel;
 		}
 
 		public void setTrackLevels(BaseTrack track) {
-			track.setLevels(volume, pan, pitch);
+			track.setLevels(volume, pan, pitchStep, pitchCent);
 		}
 
 		@Override
 		public int compareTo(Levels another) {
 			if (this.volume == another.volume && this.pan == another.pan
-					&& this.pitch == another.pitch) {
+					&& this.pitchStep == another.pitchStep && this.pitchCent == another.pitchCent) {
 				return 0;
 			} else {
 				return -1;

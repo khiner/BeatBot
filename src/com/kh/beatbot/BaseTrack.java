@@ -12,13 +12,15 @@ import com.kh.beatbot.manager.TrackManager;
 public class BaseTrack {
 	protected int id;
 	protected List<Effect> effects = new ArrayList<Effect>();
-	public Param volumeParam, panParam, pitchParam;
+	public Param volumeParam, panParam, pitchStepParam, pitchCentParam;
 
 	public BaseTrack(final int id) {
 		this.id = id;
 		volumeParam = new Param(0, "Vol").withUnits("Db").withLevel(Param.dbToView(0));
 		panParam = new CenteredParam(1, "Pan");
-		pitchParam = new Param(2, "Pit").scale(96).add(-48).withLevel(.5f);
+		pitchStepParam = new Param(2, "Pit").scale(96).add(-48).withLevel(.5f).snap().withUnits("st");
+		pitchCentParam = new Param(3, "Cent").add(-.5f).withLevel(.5f).withUnits("cent");
+
 		volumeParam.addListener(new ParamListener() {
 			public void onParamChanged(Param param) {
 				setTrackVolume(getId(), param.level);
@@ -29,9 +31,14 @@ public class BaseTrack {
 				setTrackPan(getId(), param.level);
 			}
 		});
-		pitchParam.addListener(new ParamListener() {
+		pitchStepParam.addListener(new ParamListener() {
 			public void onParamChanged(Param param) {
-				setTrackPitch(getId(), param.level);
+				setTrackPitch(getId(), param.level + pitchCentParam.level);
+			}
+		});
+		pitchCentParam.addListener(new ParamListener() {
+			public void onParamChanged(Param param) {
+				setTrackPitch(getId(), pitchStepParam.level + param.level);
 			}
 		});
 	}
@@ -91,17 +98,22 @@ public class BaseTrack {
 	}
 
 	public Param getPitchParam() {
-		return pitchParam;
+		return pitchStepParam;
+	}
+
+	public Param getPitchCentParam() {
+		return pitchCentParam;
 	}
 
 	public void select() {
 		TrackManager.get().onSelect(this);
 	}
 
-	public void setLevels(float volume, float pan, float pitch) {
+	public void setLevels(float volume, float pan, float pitchStep, float pitchCent) {
 		volumeParam.setLevel(volume);
 		panParam.setLevel(pan);
-		pitchParam.setLevel(pitch);
+		pitchStepParam.setLevel(pitchStep);
+		pitchCentParam.setLevel(pitchCent);
 		TrackManager.notifyTrackLevelsSetEvent(this);
 	}
 
