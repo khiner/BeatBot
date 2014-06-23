@@ -350,8 +350,8 @@ void setLevels(Track *track, MidiEvent *midiEvent) {
 	float volume = byteToLinear(midiEvent->volume);
 	float pan = (masterLevels->pan + track->levels->pan
 			+ byteToLinear(midiEvent->pan)) / 3;
-	float pitch = masterLevels->pitch * track->levels->pitch
-			* byteToLinear(midiEvent->pitch) * 8;
+	float pitch = masterLevels->pitch * track->levels->pitch * 4;
+	pitch *= pitchToTranspose(midiEvent->pitch);
 	track->levels->volPan->set(track->levels->volPan->config, volume, pan);
 	if (NULL != track->generator) {
 		((FileGen *) track->generator->config)->sampleRate = pitch;
