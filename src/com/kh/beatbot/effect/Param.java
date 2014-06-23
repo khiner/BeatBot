@@ -108,11 +108,7 @@ public class Param {
 		if (beatSync) {
 			return topBeatNum + (bottomBeatNum == 1 ? "" : "/" + bottomBeatNum);
 		} else {
-			String formattedValue = String.format(format, level);
-			if (!unitString.isEmpty()) {
-				formattedValue += " " + unitString;
-			}
-			return formattedValue;
+			return formatValue(level);
 		}
 	}
 
@@ -256,5 +252,13 @@ public class Param {
 
 	public static float linearToDb(float linear) {
 		return 20 * (float) Math.log10(linear);
+	}
+	
+	protected final String formatValue(float level) {
+		String formattedValue = String.format(format, level);
+		if (!unitString.isEmpty()) {
+			formattedValue += " " + unitString;
+		}
+		return formattedValue;
 	}
 }

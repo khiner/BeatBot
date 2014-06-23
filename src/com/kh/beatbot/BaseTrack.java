@@ -17,8 +17,8 @@ public class BaseTrack {
 	public BaseTrack(final int id) {
 		this.id = id;
 		volumeParam = new Param(0, "Vol").withUnits("Db").withLevel(Param.dbToView(0));
-		panParam = new Param(1, "Pan").withLevel(0.5f);
-		pitchParam = new Param(2, "Pit").withLevel(0.5f);
+		panParam = new CenteredParam(1, "Pan");
+		pitchParam = new Param(2, "Pit").scale(96).add(-48).withLevel(.5f);
 		volumeParam.addListener(new ParamListener() {
 			public void onParamChanged(Param param) {
 				setTrackVolume(getId(), param.level);
@@ -110,4 +110,17 @@ public class BaseTrack {
 	public static native void setTrackPan(int trackId, float pan);
 
 	public static native void setTrackPitch(int trackId, float pitch);
+
+	private class CenteredParam extends Param {
+		public CenteredParam(int id, String name) {
+			super(id, name);
+			setLevel(0.5f);
+		}
+
+		@Override
+		public String getFormattedValue() {
+			// centered params still have values in [0,1], but the diplayed value is [-.5,.5]
+			return formatValue(level - .5f);
+		}
+	}
 }
