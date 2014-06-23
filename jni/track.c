@@ -162,7 +162,8 @@ Levels *initLevels() {
 	pthread_mutex_init(&levels->effectMutex, NULL );
 	levels->effectHead = NULL;
 	levels->volume = dbToLinear(0);
-	levels->pan = levels->pitch = .5f;
+	levels->pan = 0;
+	levels->pitch = 0.5f;
 	int effectNum;
 	for (effectNum = 0; effectNum < MAX_EFFECTS_PER_TRACK; effectNum++) {
 		addEffect(levels, NULL );
@@ -348,8 +349,9 @@ void Java_com_kh_beatbot_Track_setNextNote(JNIEnv *env, jclass clazz,
 
 void setLevels(Track *track, MidiEvent *midiEvent) {
 	float volume = byteToLinear(midiEvent->volume);
-	float pan = (masterLevels->pan + track->levels->pan
-			+ byteToLinear(midiEvent->pan)) / 3;
+	float pan = panToScaleValue(
+			masterLevels->pan + track->levels->pan
+					+ byteToLinear(midiEvent->pan) * 2 - 1);
 	float pitch = transposeToScaleValue(
 			masterLevels->pitch + track->levels->pitch
 					+ (midiEvent->pitch - 64));
