@@ -45,16 +45,29 @@ public class EffectParamsPage extends TouchableView implements ParamListener, Pa
 
 	@Override
 	public synchronized void layoutChildren() {
-		int halfParams = (effect.getNumParams() + 1) / 2;
-		float paramW = effect.getNumParams() <= 3 ? width / effect.getNumParams() : width
-				/ halfParams;
-		float paramH = 3 * paramW / 2;
-		float y = effect.getNumParams() <= 3 ? height / 2 - paramH / 2 : height / 2 - paramH;
-		for (int i = 0; i < effect.getNumParams(); i++) {
-			if (i == 3)
-				y += paramH;
-			int index = effect.getNumParams() <= 3 ? i : i % halfParams;
-			paramControls[i].layout(this, index * paramW, y, paramW, paramH);
+		if (effect.getNumParams() < 8) {
+			int halfParams = (effect.getNumParams() + 1) / 2;
+			float paramW = effect.getNumParams() <= 3 ? width / effect.getNumParams() : width
+					/ halfParams;
+			float paramH = 3 * paramW / 2;
+			float y = effect.getNumParams() <= 3 ? height / 2 - paramH / 2 : height / 2 - paramH;
+			for (int i = 0; i < effect.getNumParams(); i++) {
+				if (i == 3)
+					y += paramH;
+				int index = effect.getNumParams() <= 3 ? i : i % halfParams;
+				paramControls[i].layout(this, index * paramW, y, paramW, paramH);
+			}
+		} else {
+			float paramW = width / 3;
+			float paramH = height / 3;
+			for (int i = 0; i < 3; i++) {
+				for (int j = 0; j < 3; j++) {
+					int index = i * 3 + j;
+					if (index < effect.getNumParams()) {
+						paramControls[index].layout(this, j * paramW, i * paramH, paramW, paramH);
+					}
+				}
+			}
 		}
 	}
 

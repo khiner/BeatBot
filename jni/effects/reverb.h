@@ -7,16 +7,15 @@
 #include <errno.h>
 
 /* Indexes when setting or getting all params */
-#define REVPARAM_INPUTVOL 0
-#define REVPARAM_REVERBVOL 1
-#define REVPARAM_SIZE 2
-#define REVPARAM_DECAY 3
-#define REVPARAM_DENSITY 4
-#define REVPARAM_PREDELAY 5
-#define REVPARAM_EARLYLATE 6
-#define REVPARAM_DAMPINGFREQ 7
-#define REVPARAM_BANDWIDTHFREQ 8
-#define REV_NUM_PARAMS 9
+#define REVPARAM_REVERBVOL 0
+#define REVPARAM_SIZE 1
+#define REVPARAM_DECAY 2
+#define REVPARAM_DENSITY 3
+#define REVPARAM_PREDELAY 4
+#define REVPARAM_EARLYLATE 5
+#define REVPARAM_DAMPINGFREQ 6
+#define REVPARAM_BANDWIDTHFREQ 7
+#define REV_NUM_PARAMS 8
 
 struct AUDIO_FILTER {
 	float low, high, band /* , Notch */;
@@ -84,7 +83,7 @@ typedef struct ReverbConfig_t {
 	struct AUDIO_DELAY allpass[6];
 	struct AUDIO_DELAY3 allpass3Tap[2];
 	struct AUDIO_DELAY4 staticDelay[4];
-	char *bufferPtr;
+	float *bufferPtr;
 	float settings[REV_NUM_PARAMS];
 	float runtime[REVRUN_NUM_PARAMS];
 	unsigned int bufferSize;
@@ -215,10 +214,8 @@ static inline void reverb_process(ReverbConfig *rev, float **buffers,
 	do {
 		float smearedInput, earlyReflectionsL, earlyReflectionsR;
 
-		float left = buffers[0][sampleFrames]
-				* rev->settings[REVPARAM_INPUTVOL];
-		float right = buffers[1][sampleFrames]
-				* rev->settings[REVPARAM_INPUTVOL];
+		float left = buffers[0][sampleFrames];
+		float right = buffers[1][sampleFrames];
 
 		if (rev->bufferPtr) {
 			rev->runtime[REVRUN_EarlyLateSmooth] += earlyLateDelta;

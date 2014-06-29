@@ -69,7 +69,7 @@ static void setNewRevLengths(ReverbConfig *rev, unsigned int *lengths) {
 static void allocRevBuffers(ReverbConfig *rev, unsigned int * lengths) {
 	unsigned int totalLen;
 	unsigned int i;
-	char *buffer;
+	float *buffer;
 
 	// Calc how many floats we need to store
 	totalLen = REVSIZE_PREDELAY;
@@ -84,10 +84,10 @@ static void allocRevBuffers(ReverbConfig *rev, unsigned int * lengths) {
 			free(rev->bufferPtr);
 		}
 
-		rev->bufferPtr = buffer = calloc(totalLen, sizeof(float));
+		rev->bufferPtr = buffer = (float *) calloc(totalLen, sizeof(float));
 		rev->bufferSize = totalLen;
 		// Update all ptrs to buffers
-		rev->preDelay.buffer = (float *) buffer;
+		rev->preDelay.buffer = buffer;
 		buffer += (REVSIZE_PREDELAY * sizeof(float));
 		for (i = 0; i < 2; i++) {
 			rev->earlyReflectionsDelay[i].buffer = (float *) buffer;
@@ -131,11 +131,11 @@ void reverbReset(ReverbConfig *rev) {
 		filterReset(&rev->dampingFilter[i]);
 		rev->bandwidthFilter[i].f = 2.f
 				* (float) sin(
-						3.141592654 * rev->bandwidthFilter[i].frequency
+						M_PI * rev->bandwidthFilter[i].frequency
 								/ (SAMPLE_RATE * FILTER_OVERSAMPLECOUNT));
 		rev->dampingFilter[i].f = 2.f
 				* (float) sin(
-						3.141592654 * rev->dampingFilter[i].frequency
+						M_PI * rev->dampingFilter[i].frequency
 								/ (SAMPLE_RATE * FILTER_OVERSAMPLECOUNT));
 		rev->earlyReflectionsDelay[i].length = lengths[i];
 	}
@@ -231,7 +231,6 @@ ReverbConfig *reverbconfig_create() {
 	for (i = 0; i < REV_NUM_PARAMS; i++) {
 		rev->settings[i] = 0.5f;
 	}
-	rev->settings[REVPARAM_INPUTVOL] = 1.f;
 	rev->settings[REVPARAM_PREDELAY] = .25f;
 
 	rev->bufferSize = 0;
