@@ -81,7 +81,7 @@ Effect *createEffect(int effectNum) {
 				delayi_process, delayconfigi_destroy);
 	case FILTER:
 		return initEffect(filterconfig_create(), filterconfig_setParam,
-				filter_process, filterconfig_destroy);
+				revfilter_process, filterconfig_destroy);
 	case FLANGER:
 		return initEffect(flangerconfig_create(), flangerconfig_setParam,
 				flanger_process, flangerconfig_destroy);

@@ -109,8 +109,8 @@ public class EffectsPage extends TrackPage {
 		Effect effect = getEffect(effectName, effectPosition);
 		if (effectName != effect.getName()) {
 			// different effect being added to effect slot. need to replace it
-			effect.removeEffect();
-			effect = getEffect(effectName, effectPosition);
+			// effect.removeEffect();
+			//TODO fix
 		}
 
 		context.launchEffect(effect);
