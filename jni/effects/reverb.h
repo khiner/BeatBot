@@ -88,6 +88,7 @@ typedef struct ReverbConfig_t {
 	float settings[REV_NUM_PARAMS];
 	float runtime[REVRUN_NUM_PARAMS];
 	unsigned int bufferSize;
+	unsigned char controlRate, controlRateCounter;
 } ReverbConfig;
 
 #define FILTER_OVERSAMPLECOUNT 4
@@ -226,6 +227,35 @@ static inline void reverb_process(ReverbConfig *rev, float **buffers,
 			rev->runtime[REVRUN_SizeSmooth] += sizeDelta;
 			rev->runtime[REVRUN_DecaySmooth] += decayDelta;
 			rev->runtime[REVRUN_DensitySmooth] += densityDelta;
+
+			if (rev->controlRateCounter >= rev->controlRate) {
+				rev->controlRateCounter = 0;
+
+				rev->bandwidthFilter[0].frequency =
+						rev->bandwidthFilter[1].frequency =
+								rev->runtime[REVRUN_BandwidthSmooth];
+				rev->bandwidthFilter[0].f =
+						rev->bandwidthFilter[1].f =
+								2.f
+										* (float) sin(
+												3.141592654
+														* rev->runtime[REVRUN_BandwidthSmooth]
+														/ (SAMPLE_RATE
+																* FILTER_OVERSAMPLECOUNT));
+				rev->dampingFilter[0].frequency =
+						rev->dampingFilter[1].frequency =
+								rev->runtime[REVRUN_DampingSmooth];
+				rev->dampingFilter[0].f =
+						rev->dampingFilter[1].f =
+								2.f
+										* (float) sin(
+												3.141592654
+														* rev->runtime[REVRUN_DampingSmooth]
+														/ (SAMPLE_RATE
+																* FILTER_OVERSAMPLECOUNT));
+			}
+			++rev->controlRateCounter;
+
 			if (rev->runtime[REVRUN_PredelaySmooth] > REVSIZE_PREDELAY)
 				rev->runtime[REVRUN_PredelaySmooth] = REVSIZE_PREDELAY;
 			rev->preDelay.length =

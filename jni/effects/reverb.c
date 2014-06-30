@@ -125,6 +125,7 @@ void reverbReset(ReverbConfig *rev) {
 
 	getNewRevLengths(rev, &lengths[6]);
 	allocRevBuffers(rev, &lengths[0]);
+	rev->controlRateCounter = 0;
 	memset(&rev->runtime[0], 0, REVRUN_NUM_PARAMS * sizeof(float));
 	for (i = 0; i < 2; i++) {
 		filterReset(&rev->bandwidthFilter[i]);
@@ -215,7 +216,10 @@ void reverbconfig_setParam(void *p, float paramNumFloat, float value) {
 
 ReverbConfig *reverbconfig_create() {
 	ReverbConfig *rev = malloc(sizeof(ReverbConfig));
-	pthread_mutex_init(&rev->mutex, NULL);
+	pthread_mutex_init(&rev->mutex, NULL );
+
+	rev->controlRate = (unsigned char) (SAMPLE_RATE / 1000);
+
 	unsigned int i;
 	for (i = 0; i < 2; i++) {
 		rev->bandwidthFilter[i].frequency = rev->dampingFilter[i].frequency =
