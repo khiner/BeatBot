@@ -177,12 +177,18 @@ void reverbconfig_setParam(void *p, float paramNumFloat, float value) {
 	ReverbConfig *rev = (ReverbConfig *) p;
 
 	int paramNum = (int) paramNumFloat;
-	if (paramNum == REVPARAM_SIZE && value == 0.0f) {
+	if (paramNum == REVPARAM_SIZE) {
 		// size needs to be rounded to .05 or algorithm adds "distortion"
-		value = .05f;
+		value = ((((int) (100 * value)) / 5) * 5) / 100.0f;
+		if (value == 0.0f)
+			value = 0.05f;
+		else if (value >= 0.90f)
+			value = 0.90f;
 	} else if (value > 1.f) {
 		value = 1.f;
 	}
+
+	pthread_mutex_lock(&rev->mutex);
 
 	rev->settings[paramNum] =
 			paramNum == REVPARAM_DAMPINGFREQ ? 1.f - value : value;
@@ -200,6 +206,7 @@ void reverbconfig_setParam(void *p, float paramNumFloat, float value) {
 		allocRevBuffers(rev, &lengths[0]);
 		setNewRevLengths(rev, &lengths[6]);
 	}
+	pthread_mutex_unlock(&rev->mutex);
 }
 
 /******************** ReverbAlloc() ******************
@@ -208,7 +215,7 @@ void reverbconfig_setParam(void *p, float paramNumFloat, float value) {
 
 ReverbConfig *reverbconfig_create() {
 	ReverbConfig *rev = malloc(sizeof(ReverbConfig));
-
+	pthread_mutex_init(&rev->mutex, NULL);
 	unsigned int i;
 	for (i = 0; i < 2; i++) {
 		rev->bandwidthFilter[i].frequency = rev->dampingFilter[i].frequency =

@@ -83,6 +83,7 @@ typedef struct ReverbConfig_t {
 	struct AUDIO_DELAY allpass[6];
 	struct AUDIO_DELAY3 allpass3Tap[2];
 	struct AUDIO_DELAY4 staticDelay[4];
+	pthread_mutex_t mutex; // mutex since sets happen on a different thread than processing
 	float *bufferPtr;
 	float settings[REV_NUM_PARAMS];
 	float runtime[REVRUN_NUM_PARAMS];
@@ -110,7 +111,6 @@ void reverbconfig_setParam(void *p, float paramNum, float param);
 static inline float revfilter_process(struct AUDIO_FILTER *filter,
 		float input) {
 	unsigned int i;
-
 	for (i = 0; i < FILTER_OVERSAMPLECOUNT; i++) {
 		filter->low += (filter->f * filter->band) + 1e-25;
 		filter->high = input - filter->low - filter->q * filter->band;
@@ -122,9 +122,14 @@ static inline float revfilter_process(struct AUDIO_FILTER *filter,
 
 // ============================== Delay =============================
 
+static inline float delayGetIndex(struct AUDIO_DELAY *delay,
+		unsigned int which) {
+	return delay->buffer[delay->index[which]];
+}
+
 // For "Static" filters without feedback
 static inline float delay_process(struct AUDIO_DELAY *delay, float input) {
-	float output = delay->buffer[delay->index[0]];
+	float output = delayGetIndex(delay, 0);
 	delay->buffer[delay->index[0]] = input;
 
 	unsigned int i;
@@ -140,7 +145,7 @@ static inline float delay_process(struct AUDIO_DELAY *delay, float input) {
 // For "All Pass" filters with feedback
 static inline float delayallpass_process(struct AUDIO_DELAY *delay,
 		float input) {
-	float bufout = delay->buffer[delay->index[0]];
+	float bufout = delayGetIndex(delay, 0);
 	float temp = input * (-delay->feedback);
 	float output = bufout + temp;
 
@@ -155,11 +160,6 @@ static inline float delayallpass_process(struct AUDIO_DELAY *delay,
 	}
 
 	return output;
-}
-
-static inline float delayGetIndex(struct AUDIO_DELAY * delay,
-		unsigned int which) {
-	return delay->buffer[delay->index[which]];
 }
 
 static inline void delayClear(struct AUDIO_DELAY * delay) {
@@ -217,6 +217,7 @@ static inline void reverb_process(ReverbConfig *rev, float **buffers,
 		float left = buffers[0][sampleFrames];
 		float right = buffers[1][sampleFrames];
 
+		pthread_mutex_lock(&rev->mutex);
 		if (rev->bufferPtr) {
 			rev->runtime[REVRUN_EarlyLateSmooth] += earlyLateDelta;
 			rev->runtime[REVRUN_BandwidthSmooth] += bandwidthDelta;
@@ -372,9 +373,9 @@ static inline void reverb_process(ReverbConfig *rev, float **buffers,
 				right = accumulatorR - right;
 			}
 		}
-
-		buffers[0][sampleFrames] = (float) left;
-		buffers[1][sampleFrames] = (float) right;
+		pthread_mutex_unlock(&rev->mutex);
+		buffers[0][sampleFrames] = left;
+		buffers[1][sampleFrames] = right;
 	} while (--sampleFrames);
 }
 
