@@ -41,12 +41,12 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 		for (Param param : params) {
 			param.addListener(this);
 		}
-		addEffect(track.getId(), getNum(), position);
+		addEffect(track.getId(), getId(), position);
 		setDefaultParams();
 		setOn(true);
 	}
 
-	public abstract int getNum();
+	public abstract int getId();
 
 	public abstract String getName();
 
@@ -129,7 +129,7 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 		}
 	}
 
-	public native void addEffect(int trackNum, int effectNum, int position);
+	public native void addEffect(int trackNum, int effectId, int position);
 
 	public native void removeEffect(int trackNum, int position);
 

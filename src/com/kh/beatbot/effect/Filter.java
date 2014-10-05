@@ -17,7 +17,7 @@ public class Filter extends Effect {
 		super(track, position);
 	}
 
-	public int getNum() {
+	public int getId() {
 		return EFFECT_NUM;
 	}
 

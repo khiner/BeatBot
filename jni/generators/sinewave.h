@@ -3,11 +3,7 @@
 
 typedef struct SineWave_t {
 	float *table;
-	float alpha;
-	float frequency;
-	float phaseOffset;
-	float rate;
-	float time;
+	float alpha, frequency, phaseOffset, rate, time;
 	unsigned int iIndex;
 } SineWave;
 
@@ -19,8 +15,9 @@ void sinewave_addTimeInPhase(SineWave *config, float phase);
 void sinewave_addPhaseOffset(SineWave *config, float phaseOffset);
 
 static inline float sinewave_tick(SineWave *config) {
-	while (config->time >= TABLE_SIZE)
+	while (config->time >= TABLE_SIZE) {
 		config->time -= TABLE_SIZE;
+	}
 
 	config->iIndex = (unsigned int)config->time;
 	config->alpha = config->time - config->iIndex;

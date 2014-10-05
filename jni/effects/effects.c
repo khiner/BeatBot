@@ -67,8 +67,8 @@ EffectNode *findEffectNodeByPosition(Levels *levels, int position) {
 	return cur_ptr;
 }
 
-Effect *createEffect(int effectNum) {
-	switch (effectNum) {
+Effect *createEffect(int effectId) {
+	switch (effectId) {
 	case CHORUS:
 		return initEffect(chorusconfig_create(), chorusconfig_setParam,
 				chorus_process, chorusconfig_destroy);
@@ -81,7 +81,7 @@ Effect *createEffect(int effectNum) {
 				delayi_process, delayconfigi_destroy);
 	case FILTER:
 		return initEffect(filterconfig_create(), filterconfig_setParam,
-				revfilter_process, filterconfig_destroy);
+				filter_process, filterconfig_destroy);
 	case FLANGER:
 		return initEffect(flangerconfig_create(), flangerconfig_setParam,
 				flanger_process, flangerconfig_destroy);
@@ -146,9 +146,9 @@ EffectNode *removeEffect(Levels *levels, int effectPosition) {
 
 /********* JNI METHODS **********/
 void Java_com_kh_beatbot_effect_Effect_addEffect(JNIEnv *env, jclass clazz,
-		jint trackNum, jint effectNum, jint position) {
+		jint trackNum, jint effectId, jint position) {
 	Levels *levels = getLevels(env, clazz, trackNum);
-	Effect *effect = createEffect(effectNum);
+	Effect *effect = createEffect(effectId);
 	setEffect(levels, position, effect);
 }
 

@@ -51,6 +51,7 @@ void addEffect(Levels *levels, Effect *effect) {
 	EffectNode *new = (EffectNode *) malloc(sizeof(EffectNode));
 	new->effect = effect;
 	new->next = NULL;
+
 	pthread_mutex_lock(&levels->effectMutex);
 	// check for first insertion
 	if (levels->effectHead == NULL ) {
@@ -78,8 +79,6 @@ TrackNode *getTrackNode(int trackNum) {
 }
 
 Track *getTrack(JNIEnv *env, jclass clazz, int trackNum) {
-	(void *) env; // avoid warnings about unused paramaters
-	(void *) clazz; // avoid warnings about unused paramaters
 	TrackNode *trackNode = getTrackNode(trackNum);
 	return trackNode->track;
 }
@@ -107,6 +106,15 @@ void createTrack(Track *track) {
 		}
 		cur_ptr->next = new;
 	}
+}
+
+void destroyTrack(Track *track) {
+	free(track->currBufferFloat[0]);
+	free(track->currBufferFloat[1]);
+	free(track->currBufferFloat);
+	freeEffects(track->levels);
+	if (track->generator != NULL )
+		track->generator->destroy(track->generator->config);
 }
 
 void removeTrack(TrackNode *trackNode) {
@@ -166,7 +174,7 @@ Levels *initLevels() {
 	levels->pitch = 0.5f;
 	int effectNum;
 	for (effectNum = 0; effectNum < MAX_EFFECTS_PER_TRACK; effectNum++) {
-		addEffect(levels, NULL );
+		addEffect(levels, NULL);
 	}
 	levels->volPan = initEffect(volumepanconfig_create(), volumepanconfig_set,
 			volumepan_process, volumepanconfig_destroy);
@@ -188,15 +196,6 @@ Track *initTrack() {
 	track->nextEvent->volume = dbToByte(0);
 	track->nextEvent->pitch = track->nextEvent->pan = linearToByte(.5f);
 	return track;
-}
-
-void destroyTrack(Track *track) {
-	free(track->currBufferFloat[0]);
-	free(track->currBufferFloat[1]);
-	free(track->currBufferFloat);
-	freeEffects(track->levels);
-	if (track->generator != NULL )
-		track->generator->destroy(track->generator->config);
 }
 
 void setSample(Track *track, const char *sampleName) {

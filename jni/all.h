@@ -20,6 +20,7 @@
 #define MAX_CHANNELS 2
 #define MAX_EFFECTS_PER_TRACK 3 // also need to change GlobalVars.MAX_EFFECT_PER_TRACK
 #define TABLE_SIZE 2048
+#define INV_TABLE_SIZE 1.0 / TABLE_SIZE
 #define BUFF_SIZE 1024 // each sample has one short for each channel
 #define CONVMYFLT (1./32768.)
 #define ONE_FLOAT_SZ sizeof(float)

@@ -25,7 +25,7 @@ public class Delay extends Effect {
 		paramsLinked = true;
 	}
 
-	public int getNum() {
+	public int getId() {
 		return EFFECT_NUM;
 	}
 

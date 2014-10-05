@@ -14,15 +14,12 @@ public class DelayParamsPage extends EffectParamsPage {
 
 	public DelayParamsPage(View view) {
 		super(view);
+		linkToggle = new ToggleButton(this).oscillating().withIcon(IconResourceSets.LINK);
 	}
 
 	@Override
 	public DelayParamsPage withEffect(final Effect effect) {
 		super.withEffect(effect);
-
-		if (null == linkToggle) {
-			linkToggle = new ToggleButton(this).oscillating().withIcon(IconResourceSets.LINK);
-		}
 
 		linkToggle.setOnReleaseListener(new OnReleaseListener() {
 			@Override
@@ -46,6 +43,7 @@ public class DelayParamsPage extends EffectParamsPage {
 				effectPage.setLevel2dParams(effect.getXParam(), effect.getYParam());
 			}
 		});
+
 		linkToggle.setChecked(effect.paramsLinked());
 		return this;
 	}

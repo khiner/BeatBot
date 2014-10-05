@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.view.page.effect;
 
-import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResourceSet;
@@ -10,29 +9,26 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class FilterParamsPage extends EffectParamsPage {
-
 	private ToggleButton[] filterToggles;
 	private FilterToggleListener filterToggleListener;
 
+	private final IconResourceSet[] FILTER_ICONS = {
+			IconResourceSets.LOWPASS_FILTER,
+			IconResourceSets.BANDPASS_FILTER,
+			IconResourceSets.HIGHPASS_FILTER,
+	};
+	
 	public FilterParamsPage(View view) {
 		super(view);
-	}
 
-	@Override
-	public EffectParamsPage withEffect(final Effect effect) {
-		super.withEffect(effect);
-
-		if (null != filterToggles)
-			return this;
 		filterToggles = new ToggleButton[3];
 		filterToggleListener = new FilterToggleListener();
 		for (int i = 0; i < filterToggles.length; i++) {
-			filterToggles[i] = new ToggleButton(this).withIcon(iconForFilterButton(i));
+			filterToggles[i] = new ToggleButton(this).withIcon(FILTER_ICONS[i]);
 			filterToggles[i].setOnReleaseListener(filterToggleListener);
 		}
 
 		filterToggles[0].setChecked(true);
-		return this;
 	}
 
 	public synchronized void layoutChildren() {
@@ -63,19 +59,6 @@ public class FilterParamsPage extends EffectParamsPage {
 					filterToggles[i].setChecked(false);
 				}
 			}
-		}
-	}
-
-	private IconResourceSet iconForFilterButton(int i) {
-		switch (i) {
-		case 0:
-			return IconResourceSets.LOWPASS_FILTER;
-		case 1:
-			return IconResourceSets.BANDPASS_FILTER;
-		case 2:
-			return IconResourceSets.HIGHPASS_FILTER;
-		default:
-			return null;
 		}
 	}
 }

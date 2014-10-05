@@ -26,7 +26,7 @@ public class ADSR extends Effect {
 		setPeak(getPeak());
 	}
 
-	public int getNum() {
+	public int getId() {
 		return EFFECT_NUM;
 	}
 

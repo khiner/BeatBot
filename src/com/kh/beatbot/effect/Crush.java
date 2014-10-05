@@ -20,7 +20,7 @@ public class Crush extends Effect {
 		return NAME;
 	}
 
-	public int getNum() {
+	public int getId() {
 		return EFFECT_NUM;
 	}
 

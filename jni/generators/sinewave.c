@@ -2,26 +2,25 @@
 
 SineWave *sinewave_create() {
 	SineWave *sineWave = (SineWave *) malloc(sizeof(SineWave));
-	sineWave->time = 0;
 	sinewave_setFrequency(sineWave, 1);
+	sineWave->time = 0;
 	sineWave->phaseOffset = 0;
 	sineWave->table = (float *) malloc((TABLE_SIZE + 1) * sizeof(float));
-	float tmp = 1.0f / TABLE_SIZE;
 	int i;
 	for (i = 0; i < TABLE_SIZE; i++) {
-		sineWave->table[i] = sin(M_PI * 2 * i * tmp);
+		sineWave->table[i] = sin(M_2_PI * i * INV_TABLE_SIZE);
 	}
 	return sineWave;
 }
 
 void sinewave_setRate(SineWave *config, float rate) {
 	config->rate = rate;
-	config->frequency = rate * SAMPLE_RATE / TABLE_SIZE;
+	config->frequency = rate * SAMPLE_RATE * INV_TABLE_SIZE;
 }
 
 void sinewave_setFrequency(SineWave *config, float frequency) {
 	config->frequency = frequency;
-	config->rate = TABLE_SIZE * frequency / SAMPLE_RATE;
+	config->rate = frequency * INV_SAMPLE_RATE * TABLE_SIZE;
 }
 
 void sinewave_addTimeInSamples(SineWave *config, float timeInSamples) {
