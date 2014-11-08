@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.view.helper;
 
-import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.view.TouchableView.Pointer;
 
 public class ScrollHelper {

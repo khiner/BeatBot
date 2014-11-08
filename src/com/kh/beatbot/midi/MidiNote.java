@@ -3,13 +3,13 @@ package com.kh.beatbot.midi;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
+import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.view.View;
 

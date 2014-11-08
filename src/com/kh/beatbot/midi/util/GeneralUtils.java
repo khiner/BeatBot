@@ -1,4 +1,4 @@
-package com.kh.beatbot;
+package com.kh.beatbot.midi.util;
 
 import java.util.List;
 
@@ -30,6 +30,13 @@ public class GeneralUtils {
 		return (float) value / (float) Byte.MAX_VALUE;
 	}
 
+	/*
+	 * Converts two bytes to a short, in LITTLE_ENDIAN format
+	 */
+	public static short bytesToShort(byte argB1, byte argB2) {
+		return (short) (argB1 | (argB2 << 8));
+	}
+
 	public static byte linearToByte(float linear) {
 		return (byte) (clipToUnit(linear) * Byte.MAX_VALUE);
 	}
@@ -37,6 +44,14 @@ public class GeneralUtils {
 	public static float dbToUnit(float db) {
 		// db range = -60 - 0, need range 0-1
 		return db <= -60 ? 0 : db / 60 + 1;
+	}
+
+	public static short dbToShort(float db) {
+		return (short) (32768 * Math.pow(10, db / 20));
+	}
+
+	public static float shortToDb(short amp) {
+		return 20 * (float) Math.log10(Math.abs(amp) / 32768f);
 	}
 
 	public static boolean contains(int[] ary, int val) {

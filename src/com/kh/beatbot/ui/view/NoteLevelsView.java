@@ -3,11 +3,11 @@ package com.kh.beatbot.ui.view;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.Circle;

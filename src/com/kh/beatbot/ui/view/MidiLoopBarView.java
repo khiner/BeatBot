@@ -1,9 +1,9 @@
 package com.kh.beatbot.ui.view;
 
-import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.event.LoopWindowSetEvent;
 import com.kh.beatbot.listener.LoopWindowListener;
 import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.Rectangle;

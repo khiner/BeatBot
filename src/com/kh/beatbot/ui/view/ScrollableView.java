@@ -1,6 +1,6 @@
 package com.kh.beatbot.ui.view;
 
-import com.kh.beatbot.GeneralUtils;
+import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.shape.RoundedRect;

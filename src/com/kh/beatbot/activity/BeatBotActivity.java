@@ -14,7 +14,6 @@ import android.view.ViewParent;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.event.SampleRenameEvent;
@@ -24,6 +23,7 @@ import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.view.View;

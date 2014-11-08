@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.view.control;
 
-import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.KnobShape;
 import com.kh.beatbot.ui.view.View;

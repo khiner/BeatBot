@@ -3,10 +3,10 @@ package com.kh.beatbot.effect;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.listener.ParamToggleListener;
 import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.midi.util.GeneralUtils;
 
 public class Param {
 	public static final float DEFAULT_LOG_SCALE = 8, DB_LOG_SCALE = 10 * 10, MAX_DB = 24,

@@ -88,20 +88,17 @@ static inline void mixTracks() {
 
 void Java_com_kh_beatbot_Track_previewTrack(JNIEnv *env, jclass clazz,
 		jint trackNum) {
-	Track *track = getTrack(env, clazz, trackNum);
-	previewTrack(track);
+	previewTrack(getTrack(env, clazz, trackNum));
 }
 
 void Java_com_kh_beatbot_Track_stopPreviewingTrack(JNIEnv *env, jclass clazz,
 		jint trackNum) {
-	Track *track = getTrack(env, clazz, trackNum);
-	stopPreviewingTrack(track);
+	stopPreviewingTrack(getTrack(env, clazz, trackNum));
 }
 
 void Java_com_kh_beatbot_Track_stopTrack(JNIEnv *env, jclass clazz,
 		jint trackNum) {
-	Track *track = getTrack(env, clazz, trackNum);
-	stopTrack(track);
+	stopTrack(getTrack(env, clazz, trackNum));
 }
 
 void stopAllTracks() {
@@ -139,8 +136,9 @@ static inline void generateNextBuffer() {
 			}
 			cur_ptr = cur_ptr->next;
 		}
-		if (playing)
+		if (playing) {
 			currSample++;
+		}
 	}
 }
 

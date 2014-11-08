@@ -6,8 +6,8 @@ import java.util.List;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
-import com.kh.beatbot.GeneralUtils;
 import com.kh.beatbot.activity.BeatBotActivity;
+import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResource;
 import com.kh.beatbot.ui.icon.IconResourceSet;
