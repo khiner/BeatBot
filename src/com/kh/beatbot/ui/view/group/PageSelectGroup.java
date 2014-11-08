@@ -21,6 +21,7 @@ import com.kh.beatbot.ui.view.page.BrowsePage;
 import com.kh.beatbot.ui.view.page.EffectsPage;
 import com.kh.beatbot.ui.view.page.LevelsPage;
 import com.kh.beatbot.ui.view.page.NoteLevelsPage;
+import com.kh.beatbot.ui.view.page.RecordPage;
 import com.kh.beatbot.ui.view.page.SampleEditPage;
 
 public class PageSelectGroup extends TouchableView implements TrackListener,
@@ -34,6 +35,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	public static BrowsePage browsePage;
 	public static SampleEditPage editPage;
 	public static AdsrPage adsrPage;
+	public static RecordPage recordPage;
+
 	public static ToggleButton masterButton;
 
 	public static ViewPager pager, buttonRowPager;
@@ -84,6 +87,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		editPage = new SampleEditPage(pager);
 		adsrPage = new AdsrPage(pager);
 		noteLevelsPage = new NoteLevelsPage(pager);
+		recordPage = new RecordPage(pager);
 
 		pager.addListener(this);
 
@@ -96,6 +100,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		pager.addPage(trackButtonRow.getEditButton(), editPage);
 		pager.addPage(trackButtonRow.getAdsrButton(), adsrPage);
 		pager.addPage(trackButtonRow.getNoteLevelsButton(), noteLevelsPage);
+		pager.addPage(trackButtonRow.getRecordButton(), recordPage);
 
 		pager.addPage(masterButtonRow.getLevelsButton(), levelsPage);
 		pager.addPage(masterButtonRow.getEffectsButton(), effectsPage);

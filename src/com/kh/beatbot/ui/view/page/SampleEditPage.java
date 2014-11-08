@@ -13,7 +13,6 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
 
 public class SampleEditPage extends TrackPage {
-
 	public SampleEditView sampleEdit;
 	private Button previewButton;
 	private ToggleButton loopButton, reverseButton;

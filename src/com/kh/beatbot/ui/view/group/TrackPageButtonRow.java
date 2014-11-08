@@ -12,7 +12,7 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class TrackPageButtonRow extends PageButtonRow {
 	private static final int BROWSE_PAGE_ID = 0, LEVELS_PAGE_ID = 1, NOTE_LEVELS_PAGE_ID = 2,
-			EFFECTS_PAGE_ID = 3, EDIT_PAGE_ID = 4, ADSR_PAGE_ID = 5;
+			EFFECTS_PAGE_ID = 3, EDIT_PAGE_ID = 4, ADSR_PAGE_ID = 5, RECORD_PAGE_ID = 6;
 
 	private Button deleteTrackButton;
 
@@ -42,6 +42,10 @@ public class TrackPageButtonRow extends PageButtonRow {
 
 	public ToggleButton getNoteLevelsButton() {
 		return pageButtons[NOTE_LEVELS_PAGE_ID];
+	}
+	
+	public ToggleButton getRecordButton() {
+		return pageButtons[RECORD_PAGE_ID];
 	}
 
 	public synchronized void update() {
@@ -73,6 +77,7 @@ public class TrackPageButtonRow extends PageButtonRow {
 		getNoteLevelsButton().setResourceId(IconResourceSets.NOTE_LEVELS);
 		getLevelsButton().setResourceId(IconResourceSets.LEVELS);
 		getAdsrButton().setResourceId(IconResourceSets.ADSR);
+		getRecordButton().setResourceId(IconResourceSets.MICROPHONE);
 		getEffectsButton().setText("FX");
 	}
 
@@ -94,6 +99,6 @@ public class TrackPageButtonRow extends PageButtonRow {
 
 	@Override
 	protected int getNumPages() {
-		return 6;
+		return 7;
 	}
 }
