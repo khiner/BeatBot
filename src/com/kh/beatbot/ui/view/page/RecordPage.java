@@ -28,6 +28,8 @@ public class RecordPage extends TrackPage {
 	protected synchronized void createChildren() {
 		sampleView = new SampleView(this, null);
 		sampleView.setClip(true);
+		sampleView.setText("Ready to record");
+
 		recordButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.RECORD);
 
 		recordButton.setOnReleaseListener(new OnReleaseListener() {
@@ -35,8 +37,10 @@ public class RecordPage extends TrackPage {
 			public void onRelease(Button button) {
 				if (((ToggleButton)button).isChecked()) {
 					RecordManager.startRecording();
+					sampleView.setText("Recording");
 				} else {
 					RecordManager.stopRecording();
+					sampleView.setText("");
 				}
 			}
 		});

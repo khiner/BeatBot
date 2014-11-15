@@ -6,8 +6,6 @@ import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.shape.WaveformShape;
 
 public class SampleView extends View {
-	private static final String NO_SAMPLE_MESSAGE = "Tap to load a sample.";
-
 	// min distance for pointer to select loop markers
 	private static WaveformShape waveformShape;
 
@@ -23,7 +21,15 @@ public class SampleView extends View {
 		loopButtonW = height / 3;
 		waveformWidth = width - loopButtonW;
 
-		if (true/*hasSample()*/) {
+		setText(text);
+	}
+
+	/*
+	 * Sample views *either* show sample waveform *or* text, never both simultaneously
+	 */
+	@Override
+	public void setText(final String text) {
+		if (text.isEmpty()) { // no text, create empty waveform shape
 			if (null == waveformShape) {
 				waveformShape = new WaveformShape(renderGroup, waveformWidth, Color.LABEL_SELECTED,
 						Color.BLACK);
@@ -31,14 +37,13 @@ public class SampleView extends View {
 			}
 			waveformShape.layout(absoluteX, absoluteY, waveformWidth, height);
 			waveformShape.resample();
-			setText("");
 		} else {
 			if (null != waveformShape) {
 				removeShape(waveformShape);
 				waveformShape = null;
 			}
-			setText(NO_SAMPLE_MESSAGE);
 		}
+		super.setText(text);
 	}
 
 	@Override

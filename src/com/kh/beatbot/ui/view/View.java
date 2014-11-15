@@ -51,7 +51,7 @@ public class View implements Comparable<View> {
 
 	protected IconResourceSet icon = new IconResourceSet(IconResourceSets.DEFAULT);
 	private boolean shouldClip = false;
-	private String text = "";
+	protected String text = "";
 
 	private State state = State.DEFAULT;
 
