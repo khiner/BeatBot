@@ -50,11 +50,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 			@Override
 			public void onRelease(Button button) {
 				if (RecordManager.isRecording()) {
-					// Managers.recordManager.stopListening();
-					String fileName = RecordManager.stopRecording();
-
-					Toast.makeText(context, "Recorded file to " + fileName, Toast.LENGTH_SHORT)
-							.show();
+					RecordManager.stopRecording();
 				} else {
 					mainPage.midiViewGroup.midiView.reset();
 					playButton.setChecked(true);

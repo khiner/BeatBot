@@ -22,6 +22,7 @@ import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
+import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
@@ -54,6 +55,7 @@ public class BeatBotActivity extends Activity {
 			Color.init(this);
 			FileManager.init(this);
 			MidiFileManager.init(this);
+			RecordManager.init(this);
 			activityPager = View.init(this);
 
 			MidiManager.init();

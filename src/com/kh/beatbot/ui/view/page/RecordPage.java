@@ -1,17 +1,17 @@
 package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.BaseTrack;
-import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.SampleView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
+import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class RecordPage extends TrackPage {
 	private SampleView sampleView;
-	private Button recordButton;
+	private ToggleButton recordButton;
 
 	public RecordPage(View view) {
 		super(view);
@@ -28,19 +28,16 @@ public class RecordPage extends TrackPage {
 	protected synchronized void createChildren() {
 		sampleView = new SampleView(this, null);
 		sampleView.setClip(true);
-		recordButton = new Button(this).withIcon(IconResourceSets.RECORD);
-
-		recordButton.setOnPressListener(new OnPressListener() {
-			@Override
-			public void onPress(Button button) {
-				RecordManager.startRecording();
-			}
-		});
+		recordButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.RECORD);
 
 		recordButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				RecordManager.stopRecording();
+				if (((ToggleButton)button).isChecked()) {
+					RecordManager.startRecording();
+				} else {
+					RecordManager.stopRecording();
+				}
 			}
 		});
 	}
