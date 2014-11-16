@@ -146,7 +146,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	@Override
 	public synchronized void onSampleChange(Track track) {
-		updateBrowsePage();
+		trackButtonRow.update();
+		((TrackListener) pager.getCurrPage()).onSelect(track);
 	}
 
 	@Override
@@ -159,7 +160,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	@Override
 	public void onNameChange(File file, File newFile) {
-		updateBrowsePage();
+		trackButtonRow.update();
+		((TrackListener) pager.getCurrPage()).onSelect(TrackManager.currTrack);
 	}
 
 	@Override
@@ -187,12 +189,4 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		effectsPage.updateEffectLabels();
 	}
 
-	private void updateBrowsePage() {
-		trackButtonRow.update();
-		if (pager.getCurrPage().equals(browsePage)) {
-			browsePage.onSelect(TrackManager.currTrack);
-		} else {
-			trackButtonRow.getBrowseButton().trigger();
-		}
-	}
 }

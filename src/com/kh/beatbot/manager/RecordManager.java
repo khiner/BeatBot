@@ -1,5 +1,6 @@
 package com.kh.beatbot.manager;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -40,14 +41,15 @@ public class RecordManager {
 		state = State.RECORDING;
 	}
 
-	public static void stopRecording() {
+	public static File stopRecording() {
 		if (!isRecording())
-			return;
+			return null;
 		stopRecordingNative();
-		WavFileUtil.insertLengthDataIntoWavFile(currRecordFileName);
+		File file = WavFileUtil.insertLengthDataIntoWavFile(currRecordFileName);
 		state = State.INITIALIZING;
 		Toast.makeText(context, "Recorded file to " + currRecordFileName, Toast.LENGTH_SHORT)
 				.show();
+		return file;
 	}
 
 	private static void updateFileNames() {

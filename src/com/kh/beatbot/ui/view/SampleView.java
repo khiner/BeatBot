@@ -7,7 +7,7 @@ import com.kh.beatbot.ui.shape.WaveformShape;
 
 public class SampleView extends View {
 	// min distance for pointer to select loop markers
-	private static WaveformShape waveformShape;
+	private WaveformShape waveformShape;
 
 	// Zooming/scrolling will change the view window of the samples.
 	// Keep track of that with offset and width.
@@ -21,7 +21,12 @@ public class SampleView extends View {
 		loopButtonW = height / 3;
 		waveformWidth = width - loopButtonW;
 
-		setText(text);
+		if (waveformShape != null) {
+			waveformShape.layout(absoluteX, absoluteY, waveformWidth, height);
+			waveformShape.update(0, Long.MAX_VALUE, loopButtonW / 2);
+			waveformShape.resample();
+			waveformShape.setLoopPoints(0,  width);
+		}
 	}
 
 	/*
@@ -35,8 +40,6 @@ public class SampleView extends View {
 						Color.BLACK);
 				addShapes(waveformShape);
 			}
-			waveformShape.layout(absoluteX, absoluteY, waveformWidth, height);
-			waveformShape.resample();
 		} else {
 			if (null != waveformShape) {
 				removeShape(waveformShape);

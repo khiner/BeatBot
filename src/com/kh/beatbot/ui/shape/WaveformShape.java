@@ -6,7 +6,7 @@ import com.kh.beatbot.manager.TrackManager;
 
 public class WaveformShape extends Shape {
 	private final static float MAX_SPP = 0.5f;
-	private long offsetInSamples, widthInSamples;
+	private long offsetInFrames, widthInFrames;
 	private float xOffset, numSamples, loopBeginX, loopEndX;
 	private SparseArray<Float> sampleBuffer = new SparseArray<Float>();
 
@@ -40,7 +40,7 @@ public class WaveformShape extends Shape {
 		sampleBuffer.clear();
 		float numFrames = TrackManager.currTrack.getNumFrames();
 		for (float s = -numSamples; s < numSamples * 2; s++) {
-			int sampleIndex = (int) (offsetInSamples + s * widthInSamples / numSamples);
+			int sampleIndex = (int) (offsetInFrames + s * widthInFrames / numSamples);
 			if (sampleIndex < 0)
 				continue;
 			else if (sampleIndex >= numFrames)
@@ -68,7 +68,7 @@ public class WaveformShape extends Shape {
 		for (int i = 0; i < sampleBuffer.size(); i++) {
 			int sampleIndex = sampleBuffer.keyAt(i);
 			float sample = sampleBuffer.get(sampleIndex);
-			float percent = (float) (sampleIndex - offsetInSamples) / (float) widthInSamples;
+			float percent = (float) (sampleIndex - offsetInFrames) / (float) widthInFrames;
 
 			strokeVertex(x, y);
 			x = this.x + percent * width + xOffset;
@@ -87,11 +87,11 @@ public class WaveformShape extends Shape {
 		fillVertex(x + loopEndX, y);
 	}
 
-	public synchronized void update(long offsetInSamples, long widthInSamples, float xOffset) {
-		this.offsetInSamples = offsetInSamples;
-		this.widthInSamples = widthInSamples;
+	public synchronized void update(long offsetInFrames, long widthInFrames, float xOffset) {
+		this.offsetInFrames = offsetInFrames;
+		this.widthInFrames = (long) Math.min(widthInFrames, TrackManager.currTrack.getNumFrames());
 		this.xOffset = xOffset;
-		float spp = Math.min(MAX_SPP, widthInSamples / width);
+		float spp = Math.min(MAX_SPP, widthInFrames / width);
 		numSamples = (int) (width * spp);
 		resetIndices();
 		updateWaveformVertices();

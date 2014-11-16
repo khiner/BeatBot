@@ -1,8 +1,11 @@
 package com.kh.beatbot.ui.view.page;
 
+import java.io.File;
+
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.RecordManager;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.SampleView;
 import com.kh.beatbot.ui.view.View;
@@ -39,8 +42,13 @@ public class RecordPage extends TrackPage {
 					RecordManager.startRecording();
 					sampleView.setText("Recording");
 				} else {
-					RecordManager.stopRecording();
-					sampleView.setText("");
+					File sampleFile = RecordManager.stopRecording();
+					try {
+						sampleView.setText("");
+						TrackManager.currTrack.setSample(sampleFile);
+					} catch (Exception e) {
+						sampleView.setText("Error saving file");
+					}
 				}
 			}
 		});

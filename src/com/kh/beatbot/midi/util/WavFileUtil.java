@@ -1,5 +1,6 @@
 package com.kh.beatbot.midi.util;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -67,7 +68,8 @@ public class WavFileUtil {
 		return out;
 	}
 
-	public static void insertLengthDataIntoWavFile(String fileName) {
+	public static File insertLengthDataIntoWavFile(String fileName) {
+		File file = null;
 		try {
 			FileInputStream in = new FileInputStream(fileName);
 			long totalAudioLen = in.getChannel().size() - 36;
@@ -91,8 +93,12 @@ public class WavFileUtil {
 			headerLengthData[3] = (byte) ((totalAudioLen >> 24) & 0xff);
 			wavFile.write(headerLengthData);
 			wavFile.close();
+			
+			file = new File(fileName);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		return file;
 	}
 }

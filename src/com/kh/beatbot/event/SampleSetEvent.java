@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.view.View;
 
 public class SampleSetEvent implements Executable, Stateful {
 
@@ -38,6 +39,7 @@ public class SampleSetEvent implements Executable, Stateful {
 			return false;
 		}
 		TrackManager.setSample(track, sample);
+		View.mainPage.pageSelectGroup.selectBrowsePage();
 		return true;
 	}
 }
