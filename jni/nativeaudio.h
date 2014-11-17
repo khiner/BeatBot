@@ -2,6 +2,8 @@
 #define NATIVEAUDIO_H
 
 #define CONV16BIT 32768
+#define RECORD_SOURCE_GLOBAL 0
+#define RECORD_SOURCE_MICROPHONE 1
 
 #include "ticker.h"
 #include "track.h"

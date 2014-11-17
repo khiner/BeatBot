@@ -353,3 +353,17 @@ void Java_com_kh_beatbot_manager_RecordManager_stopRecordingNative(JNIEnv *env,
 	recordOutFile = NULL;
 	pthread_mutex_unlock(&recordMutex);
 }
+
+void Java_com_kh_beatbot_manager_RecordManager_setRecordSourceNative(
+		JNIEnv *env, jclass clazz, jint recordSourceId) {
+	switch (recordSourceId) {
+	case RECORD_SOURCE_GLOBAL:
+		__android_log_print(ANDROID_LOG_INFO, "JNI",
+				"Setting record source to GLOBAL");
+		break;
+	case RECORD_SOURCE_MICROPHONE:
+		__android_log_print(ANDROID_LOG_INFO, "JNI",
+				"Setting record source to MIC");
+		break;
+	}
+}

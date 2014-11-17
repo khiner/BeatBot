@@ -13,6 +13,7 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class RecordPage extends TrackPage {
+	private Button recordSourceSelectButton;
 	private SampleView sampleView;
 	private ToggleButton recordButton;
 
@@ -33,14 +34,17 @@ public class RecordPage extends TrackPage {
 		sampleView.setClip(true);
 		sampleView.setText("Ready to record");
 
+		recordSourceSelectButton = new Button(this).withIcon(IconResourceSets.INSTRUMENT_BASE);
 		recordButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.RECORD);
+		recordSourceSelectButton.setText("Global");
+		recordSourceSelectButton.setOnReleaseListener(RecordManager.getRecordSourceListener());
 
 		recordButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
 				if (((ToggleButton)button).isChecked()) {
 					RecordManager.startRecording();
-					sampleView.setText("Recording");
+					sampleView.setText("Recording...");
 				} else {
 					File sampleFile = RecordManager.stopRecording();
 					try {
@@ -59,6 +63,7 @@ public class RecordPage extends TrackPage {
 		float topBarH = height * .29f;
 		float fillH = height - topBarH;
 		float margin = width * .02f;
+		recordSourceSelectButton.layout(this, 0, 0, topBarH * 4, topBarH);
 		recordButton.layout(this, 0, topBarH, fillH, fillH);
 		sampleView.layout(this, fillH, topBarH, width - fillH / 2 - fillH - margin * 2, fillH);
 	}
