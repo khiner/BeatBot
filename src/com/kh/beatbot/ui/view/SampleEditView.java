@@ -65,20 +65,15 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	private void updateWaveformVb() {
-		if (null != waveformShape) {
-			waveformShape.update((long) params[0].getLevel(levelOffset),
-					(long) params[0].getLevel(levelWidth), loopButtonW / 2);
-		}
-	}
-
-	private void updateLoopSelectionVbs() {
 		if (null == waveformShape)
 			return;
 		float beginX = levelToX(params[0].viewLevel);
 		float endX = levelToX(params[1].viewLevel);
-		waveformShape.setLoopPoints(beginX, endX);
 		loopButtons[0].layout(this, beginX - loopButtonW / 2, 0, loopButtonW, height);
 		loopButtons[1].layout(this, endX - loopButtonW / 2, 0, loopButtonW, height);
+		waveformShape.update(beginX, endX, (long) params[0].getLevel(levelOffset),
+				(long) params[0].getLevel(levelWidth), loopButtonW / 2);
+
 	}
 
 	private void updateZoom() {
@@ -199,7 +194,6 @@ public class SampleEditView extends ControlView2dBase {
 		this.levelOffset = levelOffset;
 		this.levelWidth = levelWidth;
 		updateWaveformVb();
-		updateLoopSelectionVbs();
 	}
 
 	private void setScrollAnchor(int id, Pointer pos) {
@@ -237,7 +231,7 @@ public class SampleEditView extends ControlView2dBase {
 			return;
 		waveformShape.resample();
 		scrollPointerId = zoomLeftPointerId = zoomRightPointerId = -1;
-		
+
 		loopWindowEvent.end();
 	}
 
@@ -297,7 +291,7 @@ public class SampleEditView extends ControlView2dBase {
 		if (param.equals(TrackManager.currTrack.getGainParam())) {
 			waveformShape.resample();
 		} else {
-			updateLoopSelectionVbs();
+			updateWaveformVb();
 		}
 	}
 

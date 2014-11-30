@@ -57,6 +57,32 @@ public class WaveformShape extends Shape {
 		updateWaveformVertices();
 	}
 
+	public synchronized void update(float loopBeginX, float loopEndX, long offsetInFrames,
+			long widthInFrames, float xOffset) {
+		boolean loopSelectionChanged = this.loopBeginX != loopBeginX || this.loopEndX != loopEndX;
+		this.loopBeginX = loopBeginX;
+		this.loopEndX = loopEndX;
+
+		long newWidthInFrames = (long) Math.min(widthInFrames,
+				TrackManager.currTrack.getNumFrames());
+		boolean waveformChanged = this.offsetInFrames != offsetInFrames
+				|| this.widthInFrames != newWidthInFrames || this.xOffset != xOffset;
+		this.offsetInFrames = offsetInFrames;
+		this.widthInFrames = newWidthInFrames;
+		this.xOffset = xOffset;
+
+		if (waveformChanged) {
+			float spp = Math.min(MAX_SPP, widthInFrames / width);
+			numSamples = (int) (width * spp);
+		}
+		if (loopSelectionChanged || waveformChanged)
+			resetIndices();
+		if (loopSelectionChanged)
+			updateLoopSelectionVertices();
+		if (waveformChanged)
+			updateWaveformVertices();
+	}
+
 	private synchronized void updateWaveformVertices() {
 		if (null == sampleBuffer)
 			return;
@@ -85,22 +111,5 @@ public class WaveformShape extends Shape {
 		fillVertex(x + loopBeginX, y + height);
 		fillVertex(x + loopEndX, y + height);
 		fillVertex(x + loopEndX, y);
-	}
-
-	public synchronized void update(long offsetInFrames, long widthInFrames, float xOffset) {
-		this.offsetInFrames = offsetInFrames;
-		this.widthInFrames = (long) Math.min(widthInFrames, TrackManager.currTrack.getNumFrames());
-		this.xOffset = xOffset;
-		float spp = Math.min(MAX_SPP, widthInFrames / width);
-		numSamples = (int) (width * spp);
-		resetIndices();
-		updateWaveformVertices();
-	}
-
-	public synchronized void setLoopPoints(float beginX, float endX) {
-		loopBeginX = beginX;
-		loopEndX = endX;
-		resetIndices();
-		updateLoopSelectionVertices();
 	}
 }

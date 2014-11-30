@@ -23,9 +23,8 @@ public class SampleView extends View {
 
 		if (waveformShape != null) {
 			waveformShape.layout(absoluteX, absoluteY, waveformWidth, height);
-			waveformShape.update(0, Long.MAX_VALUE, loopButtonW / 2);
+			waveformShape.update(0, width, 0, Long.MAX_VALUE, loopButtonW / 2);
 			waveformShape.resample();
-			waveformShape.setLoopPoints(0,  width);
 		}
 	}
 
