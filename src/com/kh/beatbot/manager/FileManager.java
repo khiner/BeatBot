@@ -67,6 +67,13 @@ public class FileManager implements FileListener {
 		listeners.add(listener);
 	}
 
+	public static String recordPathForSource(String source) {
+		File recordDirectory = source.equals(RecordManager.GLOBAL_RECORD_SOURCE) ? beatRecordDirectory
+				: sampleRecordDirectory;
+
+		return recordDirectory.getPath();
+	}
+
 	public static String formatSampleName(String sampleName) {
 		for (String extension : SUPPORTED_EXTENSIONS) {
 			if (sampleName.endsWith(extension)) {

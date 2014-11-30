@@ -40,12 +40,16 @@ public class RecordManager {
 		LISTENING, RECORDING, INITIALIZING
 	};
 
+	public static String GLOBAL_RECORD_SOURCE = "Global", MICROPHONE_RECORD_SOURCE = "Microphone";
 	private static Context context = null;
 	private static String currRecordFileName = null;
 	private static State state = State.INITIALIZING;
 	private static int currFileNum = 0;
-	private static List<String> recordSources = Arrays.asList(new String[]{"Global", "Microphone"});
+	private static final List<String> RECORD_SOURCES = Arrays.asList(new String[] {
+			GLOBAL_RECORD_SOURCE, MICROPHONE_RECORD_SOURCE });
 	private static RecordSourceListener recordSourceListener;
+
+	private static String currRecordSource = GLOBAL_RECORD_SOURCE;
 
 	public static void init(Context context) {
 		RecordManager.context = context;
@@ -63,8 +67,8 @@ public class RecordManager {
 	public static void startRecording() {
 		if (isRecording())
 			return;
-		currRecordFileName = FileManager.beatRecordDirectory.getPath() + "/R" + (currFileNum++)
-				+ ".wav";
+		String recordDirectory = FileManager.recordPathForSource(currRecordSource);
+		currRecordFileName = recordDirectory + "/R" + (currFileNum++) + ".wav";
 		try {
 			FileOutputStream out = WavFileUtil.writeWavFileHeader(currRecordFileName, 0, 0);
 			out.close();
@@ -87,10 +91,11 @@ public class RecordManager {
 	}
 
 	public static String[] getRecordSources() {
-		return (String[])recordSources.toArray();
+		return (String[]) RECORD_SOURCES.toArray();
 	}
 
-	public static void setRecordSource(int recordSourceIndex) {
+	public static void setRecordSource(final int recordSourceIndex) {
+		currRecordSource = RECORD_SOURCES.get(recordSourceIndex);
 		setRecordSourceNative(recordSourceIndex);
 	}
 
