@@ -13,8 +13,7 @@ import com.kh.beatbot.ui.view.group.MidiViewGroup;
 public class MidiLoopBarView extends TouchableView implements LoopWindowListener {
 	private LoopWindowSetEvent currLoopWindowEvent;
 
-	private Button loopBarButton;
-	private Button loopBeginButton, loopEndButton;
+	private Button loopBarButton, loopBeginButton, loopEndButton;
 
 	private float selectionOffsetTick = 0;
 
@@ -55,22 +54,17 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
 
 	@Override
 	public void handleActionMove(int id, Pointer pos) {
-		MidiView midiView = mainPage.midiViewGroup.midiView;
+		float tick = xToTick(pos.x);
 		if (loopBeginButton.isPressed() && pos.equals(loopBeginButton.getPointer())) {
-			float leftTick = midiView.xToTick(pos.x);
-			float leftMajorTick = MidiManager.getMajorTickNearestTo(leftTick);
-			MidiManager.setLoopBeginTick((long) leftMajorTick);
+			MidiManager.setLoopBeginTick((long) MidiManager.getMajorTickNearestTo(tick));
 		}
 		if (loopEndButton.isPressed() && pos.equals(loopEndButton.getPointer())) {
-			float rightTick = midiView.xToTick(pos.x);
-			float rightMajorTick = MidiManager.getMajorTickNearestTo(rightTick);
-			MidiManager.setLoopEndTick((long) rightMajorTick);
+			MidiManager.setLoopEndTick((long) MidiManager.getMajorTickNearestTo(tick));
 		}
 		if (loopBarButton.isPressed() && pos.equals(loopBarButton.getPointer())) {
 			// middle selected. move begin and end preserve current loop length
 			float loopLength = MidiManager.getLoopEndTick() - MidiManager.getLoopBeginTick();
-			float newBeginTick = MidiManager.getMajorTickToLeftOf(midiView.xToTick(pos.x)
-					- selectionOffsetTick);
+			float newBeginTick = MidiManager.getMajorTickToLeftOf(tick - selectionOffsetTick);
 			newBeginTick = GeneralUtils.clipTo(newBeginTick, 0, MidiManager.MAX_TICKS - loopLength);
 			MidiManager.setLoopTicks((long) newBeginTick, (long) (newBeginTick + loopLength));
 		}
@@ -88,7 +82,7 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
 	@Override
 	protected synchronized View findChildAt(float x, float y) {
 		MidiView midiView = mainPage.midiViewGroup.midiView;
-		float tick = midiView.xToTick(x);
+		float tick = xToTick(x);
 		float tickWidth = midiView.unscaledXToTick(height / 2);
 		if (tick >= MidiManager.getLoopBeginTick() - tickWidth
 				&& tick <= MidiManager.getLoopBeginTick() + tickWidth) {
@@ -97,7 +91,7 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
 				&& tick <= MidiManager.getLoopEndTick() + tickWidth) {
 			return loopEndButton;
 		} else if (tick >= MidiManager.getLoopBeginTick() && tick <= MidiManager.getLoopEndTick()) {
-			selectionOffsetTick = midiView.xToTick(x) - MidiManager.getLoopBeginTick();
+			selectionOffsetTick = tick - MidiManager.getLoopBeginTick();
 			return loopBarButton;
 		} else {
 			return null;
@@ -112,5 +106,11 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
 		loopBarButton.layout(this, beginX - absoluteX, 0, endX - beginX, height);
 		// loopBeginButton.layout(this, beginX - absoluteX, 0, height, height);
 		// loopEndButton.layout(this, endX - absoluteX, 0, height, height);
+	}
+
+	// need to account for midiTrackView width offset (hack to group this draw into the parent)
+	private float xToTick(float x) {
+		return mainPage.midiViewGroup.midiView.xToTick(x
+				- mainPage.midiViewGroup.midiTrackView.width);
 	}
 }
