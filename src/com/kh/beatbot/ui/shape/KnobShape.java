@@ -5,7 +5,7 @@ import com.kh.beatbot.ui.color.Color;
 public class KnobShape extends Shape {
 	private static final int NUM_FILL_VERTICES = 128;
 	private static final short[] FILL_INDICES = getFillIndices();
-	private int colorChangeVertex = 0;
+	private int levelVertex = 0;
 
 	public KnobShape(RenderGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, FILL_INDICES, null, NUM_FILL_VERTICES, 0);
@@ -36,9 +36,9 @@ public class KnobShape extends Shape {
 	}
 
 	public void setLevel(float level) {
-		colorChangeVertex = (int) (NUM_FILL_VERTICES * level);
-		if ((colorChangeVertex & 1) == 1) { // odd
-			colorChangeVertex += 1; // ccv should be even
+		levelVertex = (int) (NUM_FILL_VERTICES * level);
+		if ((levelVertex & 1) == 1) { // odd
+			levelVertex += 1; // ccv should be even
 		}
 
 		setFillColor(fillColor);
@@ -52,10 +52,10 @@ public class KnobShape extends Shape {
 	public synchronized void setFillColor(float[] fillColor) {
 		this.fillColor = fillColor;
 
-		for (int vertexIndex = 0; vertexIndex < colorChangeVertex; vertexIndex++) {
+		for (int vertexIndex = 0; vertexIndex < levelVertex; vertexIndex++) {
 			setFillColor(vertexIndex, getFillColor());
 		}
-		for (int vertexIndex = colorChangeVertex; vertexIndex < NUM_FILL_VERTICES; vertexIndex++) {
+		for (int vertexIndex = levelVertex; vertexIndex < NUM_FILL_VERTICES; vertexIndex++) {
 			setFillColor(vertexIndex, Color.VIEW_BG);
 		}
 	}
