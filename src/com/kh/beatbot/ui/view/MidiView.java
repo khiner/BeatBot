@@ -352,7 +352,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		float x = tickToUnscaledX(scrollHelper.xOffset);
 		float w = tickToUnscaledX(scrollHelper.numTicks);
 		horizontalScrollBar.setCornerRadius(rad);
-		horizontalScrollBar.layout(absoluteX + x, absoluteY + height - 2.5f * rad, w, 2 * rad);
+		horizontalScrollBar.layout(absoluteX + x, absoluteY + getTotalTrackHeight() - 2.5f * rad, w, 2 * rad);
 		horizontalScrollBar.bringToTop();
 	}
 
@@ -385,7 +385,6 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		loopMarkerLines[0].setPosition(x1, absoluteY);
 		loopMarkerLines[1].setPosition(x2, absoluteY);
 
-		// TODO refine
 		scrollHelper.updateView(MidiManager.getLoopBeginTick(), MidiManager.getLoopEndTick());
 	}
 
@@ -463,6 +462,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			line.setDimensions(2, lineHeight);
 		}
 		layoutTrackRects();
+		horizontalScrollBar.setPosition(horizontalScrollBar.x, absoluteY + trackHeight - 2.5f * horizontalScrollBar.cornerRadius);
 	}
 
 	private void selectRegion(Pointer pos) {
