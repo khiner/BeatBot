@@ -32,7 +32,7 @@ public class EffectsPage extends TrackPage {
 
 		EffectLabelListListener(Context c) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(c);
-			builder.setTitle("Choose Effect");
+			builder.setTitle("Choose effect");
 			builder.setItems(effectNames, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
 					if (effectNames[item].toLowerCase().equals("none")) {

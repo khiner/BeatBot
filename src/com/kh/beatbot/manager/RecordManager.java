@@ -18,13 +18,17 @@ import com.kh.beatbot.ui.view.control.Button;
 public class RecordManager {
 	static class RecordSourceListener implements OnReleaseListener {
 		private AlertDialog selectRecordSourceAlert = null;
+		private Button button;
 
 		public RecordSourceListener(final Context c) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(c);
-			builder.setTitle("Choose Effect");
+			builder.setTitle("Choose record source");
 			builder.setItems(getRecordSources(), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
 					setRecordSource(item);
+					if (button != null) {
+						button.setText(currRecordSource);
+					}
 				}
 			});
 			selectRecordSourceAlert = builder.create();
@@ -32,6 +36,7 @@ public class RecordManager {
 
 		@Override
 		public void onRelease(Button button) {
+			this.button = button;
 			selectRecordSourceAlert.show();
 		}
 	}

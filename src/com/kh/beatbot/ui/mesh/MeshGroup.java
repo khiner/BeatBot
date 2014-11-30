@@ -210,15 +210,12 @@ public class MeshGroup {
 		if (newSize > oldSize) {
 			adjustVertexLength(newSize - oldSize, newNumIndices - oldNumIndices);
 			System.arraycopy(vertices, src, vertices, dst, vertices.length - dst);
-
-			resetIndices(mesh);
 		} else {
 			System.arraycopy(vertices, src, vertices, dst, vertices.length - src);
 			adjustVertexLength(-(oldSize - newSize), -(oldNumIndices - newNumIndices));
-
-			resetIndices(mesh);
 		}
 
+		resetIndices(mesh);
 		resetIndices();
 	}
 
