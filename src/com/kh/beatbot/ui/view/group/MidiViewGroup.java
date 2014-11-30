@@ -40,7 +40,7 @@ public class MidiViewGroup extends TouchableView {
 
 	@Override
 	public synchronized void layoutChildren() {
-		float loopBarHeight = 21;
+		float loopBarHeight = height / 12f;
 		MidiView.trackHeight = (height - loopBarHeight) / 5f;
 		float trackControlWidth = MidiView.trackHeight * 2.5f;
 
