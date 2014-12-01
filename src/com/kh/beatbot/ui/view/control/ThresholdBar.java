@@ -7,13 +7,13 @@ import com.kh.beatbot.ui.shape.AudioMeter;
 import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.view.View;
 
-public class ThresholdBarView extends ControlView1dBase {
+public class ThresholdBar extends ControlView1dBase {
 	private AudioMeter audioMeter;
 	private RoundedRect thresholdSelectTab;
 
 	private float levelBarHeight;
 
-	public ThresholdBarView(View view) {
+	public ThresholdBar(View view) {
 		super(view);
 	}
 
