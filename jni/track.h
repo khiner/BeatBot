@@ -15,6 +15,7 @@ typedef struct OpenSlOut_ {
 	SLAndroidSimpleBufferQueueItf outputBufferQueue;
 	SLAndroidSimpleBufferQueueItf micBufferQueue;
 	pthread_mutex_t trackMutex;
+	float maxFrameInCurrentBuffer;
 } OpenSlOut;
 
 /*

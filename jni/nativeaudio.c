@@ -14,6 +14,7 @@ static bool recording = false;
 static FILE *recordOutFile = NULL;
 static pthread_mutex_t recordMutex, bufferFillMutex;
 static pthread_cond_t bufferFillCond = PTHREAD_COND_INITIALIZER;
+static JNIEnv *env;
 
 bool isPlaying() {
 	return playing;
@@ -66,6 +67,7 @@ static inline void processMasterEffects() {
 }
 
 static inline void mixTracks() {
+	openSlOut->maxFrameInCurrentBuffer = 0;
 	int channel, samp;
 	float total;
 	for (channel = 0; channel < 2; channel++) {
@@ -82,6 +84,9 @@ static inline void mixTracks() {
 			total *= masterLevels->volume;
 			openSlOut->currBufferFloat[channel][samp] =
 					total > -1 ? (total < 1 ? total : 1) : -1;
+			if (total > openSlOut->maxFrameInCurrentBuffer) {
+				openSlOut->maxFrameInCurrentBuffer = total;
+			}
 		}
 	}
 }
@@ -168,6 +173,7 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	}
 
 	fillBuffer();
+
 	// write to record out file if recording
 	if (recording && recordOutFile != NULL
 			&& openSlOut->recordBufferShort == openSlOut->currBufferShort) {
@@ -330,9 +336,11 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 	return JNI_TRUE;
 }
 
-void Java_com_kh_beatbot_activity_BeatBotActivity_arm(JNIEnv *env, jclass clazz) {
+void Java_com_kh_beatbot_activity_BeatBotActivity_arm(JNIEnv *_env,
+		jclass clazz) {
 	if (openSlOut->armed)
 		return; // only need to arm once
+	env = _env;
 	openSlOut->armed = true;
 	// we need to fill the buffer once before calling the OpenSL callback
 	fillBuffer();
@@ -441,7 +449,8 @@ void Java_com_kh_beatbot_manager_RecordManager_stopRecordingNative(JNIEnv *env,
 }
 
 void Java_com_kh_beatbot_manager_RecordManager_setRecordSourceNative(
-		JNIEnv *env, jclass clazz, jint recordSourceId) {
+		JNIEnv *_env, jclass clazz, jint recordSourceId) {
+	env = _env;
 	switch (recordSourceId) {
 	case RECORD_SOURCE_GLOBAL:
 		setRecordBuffer(openSlOut->currBufferShort);
@@ -450,4 +459,9 @@ void Java_com_kh_beatbot_manager_RecordManager_setRecordSourceNative(
 		setRecordBuffer(openSlOut->micBufferShort);
 		break;
 	}
+}
+
+jfloat Java_com_kh_beatbot_manager_RecordManager_getMaxFrameInRecordSourceBuffer(
+		JNIEnv *env, jclass clazz) {
+	return openSlOut->maxFrameInCurrentBuffer;
 }

@@ -16,11 +16,11 @@ import com.kh.beatbot.midi.util.WavFileUtil;
 import com.kh.beatbot.ui.view.control.Button;
 
 public class RecordManager {
-	static class RecordSourceListener implements OnReleaseListener {
+	static class RecordSourceButtonListener implements OnReleaseListener {
 		private AlertDialog selectRecordSourceAlert = null;
 		private Button button;
 
-		public RecordSourceListener(final Context c) {
+		public RecordSourceButtonListener(final Context c) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(c);
 			builder.setTitle("Choose record source");
 			builder.setItems(getRecordSources(), new DialogInterface.OnClickListener() {
@@ -52,17 +52,17 @@ public class RecordManager {
 	private static int currFileNum = 0;
 	private static final List<String> RECORD_SOURCES = Arrays.asList(new String[] {
 			GLOBAL_RECORD_SOURCE, MICROPHONE_RECORD_SOURCE });
-	private static RecordSourceListener recordSourceListener;
+	private static RecordSourceButtonListener recordSourceButtonListener;
 
 	private static String currRecordSource = GLOBAL_RECORD_SOURCE;
 
 	public static void init(Context context) {
 		RecordManager.context = context;
-		recordSourceListener = new RecordSourceListener(context);
+		recordSourceButtonListener = new RecordSourceButtonListener(context);
 	}
 
-	public static OnReleaseListener getRecordSourceListener() {
-		return recordSourceListener;
+	public static OnReleaseListener getRecordSourceButtonListener() {
+		return recordSourceButtonListener;
 	}
 
 	public static boolean isRecording() {
@@ -103,6 +103,8 @@ public class RecordManager {
 		currRecordSource = RECORD_SOURCES.get(recordSourceIndex);
 		setRecordSourceNative(recordSourceIndex);
 	}
+
+	public static native float getMaxFrameInRecordSourceBuffer();
 
 	public static native void setRecordSourceNative(int recordSourceId);
 

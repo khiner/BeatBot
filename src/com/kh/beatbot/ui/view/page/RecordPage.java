@@ -41,7 +41,8 @@ public class RecordPage extends TrackPage {
 				.withRoundedRect();
 		recordButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.RECORD);
 		recordSourceSelectButton.setText(RecordManager.GLOBAL_RECORD_SOURCE);
-		recordSourceSelectButton.setOnReleaseListener(RecordManager.getRecordSourceListener());
+		recordSourceSelectButton
+				.setOnReleaseListener(RecordManager.getRecordSourceButtonListener());
 
 		recordButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override

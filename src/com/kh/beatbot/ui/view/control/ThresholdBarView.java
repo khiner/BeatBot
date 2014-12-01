@@ -1,6 +1,7 @@
 package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.AudioMeter;
 import com.kh.beatbot.ui.shape.RoundedRect;
@@ -70,6 +71,7 @@ public class ThresholdBarView extends ControlView1dBase {
 
 	@Override
 	public void tick() {
+		param.setLevel(RecordManager.getMaxFrameInRecordSourceBuffer());
 		audioMeter.tick();
 	}
 }
