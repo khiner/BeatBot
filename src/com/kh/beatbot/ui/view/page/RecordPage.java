@@ -5,6 +5,8 @@ import java.io.File;
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.listener.ParamListener;
+import com.kh.beatbot.listener.RecordStateListener;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -14,7 +16,7 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.ThresholdParamControl;
 
-public class RecordPage extends TrackPage {
+public class RecordPage extends TrackPage implements RecordStateListener {
 	private Button recordSourceSelectButton;
 	private SampleView sampleView;
 	private ToggleButton recordButton;
@@ -22,6 +24,7 @@ public class RecordPage extends TrackPage {
 
 	public RecordPage(View view) {
 		super(view);
+		RecordManager.setListener(this);
 	}
 
 	@Override
@@ -48,22 +51,22 @@ public class RecordPage extends TrackPage {
 			@Override
 			public void onRelease(Button button) {
 				if (((ToggleButton) button).isChecked()) {
-					RecordManager.startRecording();
-					sampleView.setText("Recording...");
+					RecordManager.startListening();
 				} else {
-					File sampleFile = RecordManager.stopRecording();
-					try {
-						sampleView.setText("");
-						TrackManager.currTrack.setSample(sampleFile);
-					} catch (Exception e) {
-						sampleView.setText("Error saving file");
-					}
+					RecordManager.stopRecording();
 				}
 			}
 		});
 
 		thresholdParamControl = new ThresholdParamControl(this);
-		thresholdParamControl.setParam(new Param(0, "Threshold").withUnits("db"));
+		Param thresholdParam = new Param(0, "Threshold").withUnits("db");
+		thresholdParamControl.setParam(thresholdParam);
+		thresholdParam.addListener(new ParamListener() {
+			@Override
+			public void onParamChanged(Param param) {
+				RecordManager.setThresholdLevel(param.viewLevel);
+			}
+		});
 	}
 
 	@Override
@@ -75,5 +78,30 @@ public class RecordPage extends TrackPage {
 
 		recordButton.layout(this, 0, topBarH, fillH, fillH);
 		sampleView.layout(this, fillH, topBarH, width - fillH, fillH);
+	}
+
+	@Override
+	public void onListenStart() {
+		sampleView.setText("Waiting for threshold...");
+	}
+
+	@Override
+	public void onListenStop() {
+		sampleView.setText("Ready to record");
+	}
+
+	@Override
+	public void onRecordStart() {
+		sampleView.setText("Recording...");
+	}
+
+	@Override
+	public void onRecordStop(File recordedSampleFile) {
+		try {
+			sampleView.setText("");
+			TrackManager.currTrack.setSample(recordedSampleFile);
+		} catch (Exception e) {
+			sampleView.setText("Error saving file");
+		}
 	}
 }

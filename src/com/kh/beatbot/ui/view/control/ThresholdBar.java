@@ -74,7 +74,7 @@ public class ThresholdBar extends ControlView1dBase {
 
 	@Override
 	public void tick() {
-		setLevelInUnits(RecordManager.getMaxFrameInRecordSourceBuffer());
+		setLevelInUnits(RecordManager.getCurrentLevel());
 		audioMeter.tick();
 	}
 }
