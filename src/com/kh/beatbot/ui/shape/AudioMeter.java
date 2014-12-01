@@ -7,7 +7,7 @@ public class AudioMeter extends Shape {
 	public static final short[] FILL_INDICES = getFillIndices();
 	private static final int WARNING_VERTEX_INDEX = 100;
 	private static final int CLIPPING_VERTEX_INDEX = 200;
-	private int levelVertex = 0;
+	private float levelVertex = 0;
 
 	public AudioMeter(RenderGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, FILL_INDICES, null, NUM_FILL_VERTICES, 0);
@@ -36,22 +36,35 @@ public class AudioMeter extends Shape {
 
 	public void setLevel(final float level) {
 		// Only see channel level changing if the 'spike' is greater than the current level
-		levelVertex = Math.max(levelVertex, (int) (NUM_FILL_VERTICES * level));
-		if ((levelVertex & 1) == 1) { // odd
-			levelVertex += 1; // ccv should be even
-		}
-		updateFillColors();
+		setLevelVertex(Math.max(levelVertex, NUM_FILL_VERTICES * level));
 	}
 
 	public void tick() {
 		// dampen level to emulate physical level meter
-		levelVertex = Math.max(0, levelVertex - 2);
-		updateFillColors();
+		setLevelVertex(levelVertex * 0.9f);
 	}
 
-	private void updateFillColors() {
-		for (int vertexIndex = 0; vertexIndex < NUM_FILL_VERTICES; vertexIndex++) {
-			if (vertexIndex >= levelVertex) {
+	private int getAdjustedLevelVertex() {
+		if (levelVertex < 0) {
+			levelVertex = 0; // must be >= 0
+		}
+
+		int evenLevelIndex = (int) levelVertex;
+		if ((evenLevelIndex & 1) == 1) { // odd
+			evenLevelIndex += 1; // must be even
+		}
+		return evenLevelIndex;
+	}
+
+	private void setLevelVertex(float levelVertex) {
+		int prevAdjustedLevelVertex = getAdjustedLevelVertex();
+		this.levelVertex = levelVertex;
+		int adjustedLevelVertex = getAdjustedLevelVertex();
+
+		// only update fill colors of changed indices
+		for (int vertexIndex = Math.min(prevAdjustedLevelVertex, adjustedLevelVertex); vertexIndex < Math
+				.max(prevAdjustedLevelVertex, adjustedLevelVertex); vertexIndex++) {
+			if (vertexIndex >= adjustedLevelVertex) {
 				setFillColor(vertexIndex, Color.VIEW_BG);
 			} else if (vertexIndex < WARNING_VERTEX_INDEX) {
 				setFillColor(vertexIndex, Color.GREEN);

@@ -18,7 +18,7 @@ public class ThresholdBarView extends ControlView1dBase {
 
 	@Override
 	protected synchronized void createChildren() {
-		audioMeter = new AudioMeter(renderGroup, Color.TRON_BLUE, null);
+		audioMeter = new AudioMeter(renderGroup, Color.VIEW_BG, null);
 		thresholdSelectTab = new RoundedRect(renderGroup, Color.TRON_BLUE_TRANS, null);
 
 		addShapes(audioMeter, thresholdSelectTab);
