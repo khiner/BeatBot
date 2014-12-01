@@ -43,7 +43,6 @@ public class ThresholdBar extends ControlView1dBase {
 		float levelPos = levelToX(param.viewLevel);
 		thresholdSelectTab.setPosition(absoluteX + levelPos - thresholdSelectTab.width / 2,
 				thresholdSelectTab.y);
-		audioMeter.setLevel(param.viewLevel);
 	}
 
 	protected float posToLevel(Pointer pos) {
@@ -55,6 +54,10 @@ public class ThresholdBar extends ControlView1dBase {
 
 	private float levelToX(float viewLevel) {
 		return thresholdSelectTab.width / 2 + viewLevel * (width - thresholdSelectTab.width);
+	}
+
+	private void setLevelInUnits(float levelUnits) {
+		audioMeter.setLevel(levelUnits);
 	}
 
 	@Override
@@ -71,7 +74,7 @@ public class ThresholdBar extends ControlView1dBase {
 
 	@Override
 	public void tick() {
-		param.setLevel(RecordManager.getMaxFrameInRecordSourceBuffer());
+		setLevelInUnits(RecordManager.getMaxFrameInRecordSourceBuffer());
 		audioMeter.tick();
 	}
 }
