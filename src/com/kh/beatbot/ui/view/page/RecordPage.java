@@ -38,7 +38,6 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 	protected synchronized void createChildren() {
 		sampleView = new SampleView(this, renderGroup);
 		sampleView.setClip(true);
-		sampleView.setText("Ready to record");
 
 		recordSourceSelectButton = new Button(this).withIcon(IconResourceSets.VALUE_LABEL)
 				.withRoundedRect();
@@ -51,7 +50,7 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 			@Override
 			public void onRelease(Button button) {
 				if (((ToggleButton) button).isChecked()) {
-					RecordManager.startListening();
+					RecordManager.arm();
 				} else {
 					RecordManager.stopRecording();
 				}
@@ -82,12 +81,22 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 
 	@Override
 	public void onListenStart() {
+		sampleView.setText("Ready to record");
+	}
+
+	@Override
+	public void onRecordArmed() {
 		sampleView.setText("Waiting for threshold...");
+	}
+	
+	@Override
+	public void onRecordDisarmed() {
+		sampleView.setText("Ready to record");
 	}
 
 	@Override
 	public void onListenStop() {
-		sampleView.setText("Ready to record");
+		sampleView.setText("Select record source");
 	}
 
 	@Override
@@ -103,5 +112,17 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 		} catch (Exception e) {
 			sampleView.setText("Error saving file");
 		}
+	}
+
+	@Override
+	public synchronized void show() {
+		super.show();
+		RecordManager.startListening(); // listen to RecordSource to start populating ThresholdBar
+	}
+
+	@Override
+	public synchronized void hide() {
+		RecordManager.stopListening();
+		super.hide();
 	}
 }

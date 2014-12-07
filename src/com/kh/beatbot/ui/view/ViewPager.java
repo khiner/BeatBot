@@ -36,13 +36,14 @@ public class ViewPager extends TouchableView {
 		if (null == key || key.equals(currPageId) || !pageMap.containsKey(key))
 			return;
 
-		removeChild(getCurrPage());
+		View prevPage = getCurrPage();
+		removeChild(prevPage);
 		currPageId = key;
 		View currPage = getCurrPage();
 		addChild(currPage);
 		layoutChildren();
 		for (PagerListener listener : listeners) {
-			listener.onPageChange(this, currPage);
+			listener.onPageChange(this, prevPage, currPage);
 		}
 	}
 

@@ -165,7 +165,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	}
 
 	@Override
-	public void onPageChange(ViewPager pager, View newPage) {
+	public void onPageChange(ViewPager pager, View prevPage, View newPage) {
 		((TrackListener) newPage).onSelect(TrackManager.currTrack);
 	}
 

@@ -48,21 +48,22 @@ public class RecordManager {
 		@Override
 		public void run() {
 			currentLevel = getMaxFrameInRecordSourceBuffer();
-			if (currentLevel > thresholdLevel) {
+			if (isArmed() && currentLevel > thresholdLevel) {
 				startRecording();
 			}
 		}
 	}
 
 	public static enum State {
-		LISTENING, RECORDING, INITIALIZING
+		OFF, LISTENING, ARMED, RECORDING
 	};
 
 	public static String GLOBAL_RECORD_SOURCE = "Global", MICROPHONE_RECORD_SOURCE = "Microphone";
 
+	private static final int RECORD_SOURCE_POLL_INTERVAL_MILLIS = 50;
 	private static Context context = null;
 	private static String currRecordFileName = null;
-	private static State state = State.INITIALIZING;
+	private static State state = State.OFF;
 	private static int currFileNum = 0;
 	private static final List<String> RECORD_SOURCES = Arrays.asList(new String[] {
 			GLOBAL_RECORD_SOURCE, MICROPHONE_RECORD_SOURCE });
@@ -86,8 +87,16 @@ public class RecordManager {
 		return recordSourceButtonListener;
 	}
 
+	public synchronized static boolean isOff() {
+		return state == State.OFF;
+	}
+
 	public synchronized static boolean isListening() {
 		return state == State.LISTENING;
+	}
+
+	public synchronized static boolean isArmed() {
+		return state == State.ARMED;
 	}
 
 	public synchronized static boolean isRecording() {
@@ -102,14 +111,15 @@ public class RecordManager {
 		return currentLevel;
 	}
 
-	// in LISTEN mode, recorder waits for RecordSource to exceed threshold before recording
+	// in LISTEN mode, recorder listens to (polls) the RecordSource to display the current level
 	public synchronized static void startListening() {
-		if (isListening())
+		if (!isOff())
 			return;
 
 		// running timer task as daemon thread
 		thresholdListenerTask = new RecordSourceAudioListener();
-		timer.scheduleAtFixedRate(thresholdListenerTask, 100, 100); // poll threshold every 0.1 sec
+		timer.scheduleAtFixedRate(thresholdListenerTask, RECORD_SOURCE_POLL_INTERVAL_MILLIS,
+				RECORD_SOURCE_POLL_INTERVAL_MILLIS);
 		state = State.LISTENING;
 
 		if (listener != null) {
@@ -117,23 +127,30 @@ public class RecordManager {
 		}
 	}
 
-	public synchronized static void stopListening() {
+	// in ARMED mode, recorder waits for RecordSource to exceed threshold before recording
+	public synchronized static void arm() {
 		if (!isListening())
 			return;
 
-		thresholdListenerTask.cancel();
-		state = State.INITIALIZING;
+		state = State.ARMED;
 		if (listener != null) {
-			listener.onListenStop();
+			listener.onRecordArmed();
+		}
+	}
+
+	public synchronized static void disarm() {
+		if (!isArmed())
+			return;
+		
+		state = State.LISTENING;
+		if (listener != null) {
+			listener.onRecordDisarmed();
 		}
 	}
 
 	public synchronized static void startRecording() {
-		if (isRecording())
+		if (!isArmed())
 			return;
-		if (isListening()) {
-			thresholdListenerTask.cancel();
-		}
 
 		String recordDirectory = FileManager.recordPathForSource(currRecordSource);
 		currRecordFileName = recordDirectory + "/R" + (currFileNum++) + ".wav";
@@ -150,9 +167,21 @@ public class RecordManager {
 		}
 	}
 
+	public synchronized static void stopListening() {
+		if (!isListening())
+			return;
+
+		thresholdListenerTask.cancel();
+		state = State.OFF;
+
+		if (listener != null) {
+			listener.onListenStop();
+		}
+	}
+
 	public synchronized static File stopRecording() {
-		if (isListening()) {
-			stopListening();
+		if (isArmed()) {
+			disarm();
 			return null;
 		}
 		if (!isRecording()) {
@@ -160,7 +189,7 @@ public class RecordManager {
 		}
 		stopRecordingNative();
 		File file = WavFileUtil.insertLengthDataIntoWavFile(currRecordFileName);
-		state = State.INITIALIZING;
+		state = State.LISTENING;
 		if (listener != null) {
 			listener.onRecordStop(file);
 		}
