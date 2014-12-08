@@ -5,7 +5,7 @@ typedef struct OpenSlOut_ {
 	bool armed;
 	short *recordBufferShort;
 	float **currBufferFloat;
-	short currBufferShort[BUFF_SIZE * 2];
+	short globalBufferShort[BUFF_SIZE * 2];
 	short micBufferShort[BUFF_SIZE * 2];
 	SLObjectItf outputPlayerObject;
 	SLObjectItf recorderObject;
@@ -15,7 +15,7 @@ typedef struct OpenSlOut_ {
 	SLAndroidSimpleBufferQueueItf outputBufferQueue;
 	SLAndroidSimpleBufferQueueItf micBufferQueue;
 	pthread_mutex_t trackMutex;
-	float maxFrameInCurrentBuffer;
+	float maxFrameInGlobalBuffer, maxFrameInMicBuffer;
 } OpenSlOut;
 
 /*

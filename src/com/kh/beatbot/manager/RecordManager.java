@@ -121,6 +121,7 @@ public class RecordManager {
 		timer.scheduleAtFixedRate(thresholdListenerTask, RECORD_SOURCE_POLL_INTERVAL_MILLIS,
 				RECORD_SOURCE_POLL_INTERVAL_MILLIS);
 		state = State.LISTENING;
+		startListeningNative();
 
 		if (listener != null) {
 			listener.onListenStart();
@@ -141,7 +142,7 @@ public class RecordManager {
 	public synchronized static void disarm() {
 		if (!isArmed())
 			return;
-		
+
 		state = State.LISTENING;
 		if (listener != null) {
 			listener.onRecordDisarmed();
@@ -167,18 +168,6 @@ public class RecordManager {
 		}
 	}
 
-	public synchronized static void stopListening() {
-		if (!isListening())
-			return;
-
-		thresholdListenerTask.cancel();
-		state = State.OFF;
-
-		if (listener != null) {
-			listener.onListenStop();
-		}
-	}
-
 	public synchronized static File stopRecording() {
 		if (isArmed()) {
 			disarm();
@@ -187,6 +176,7 @@ public class RecordManager {
 		if (!isRecording()) {
 			return null;
 		}
+
 		stopRecordingNative();
 		File file = WavFileUtil.insertLengthDataIntoWavFile(currRecordFileName);
 		state = State.LISTENING;
@@ -198,6 +188,19 @@ public class RecordManager {
 		return file;
 	}
 
+	public synchronized static void stopListening() {
+		if (!isListening())
+			return;
+
+		stopListeningNative();
+		thresholdListenerTask.cancel();
+		state = State.OFF;
+
+		if (listener != null) {
+			listener.onListenStop();
+		}
+	}
+
 	public static String[] getRecordSources() {
 		return (String[]) RECORD_SOURCES.toArray();
 	}
@@ -205,11 +208,18 @@ public class RecordManager {
 	public static void setRecordSource(final int recordSourceIndex) {
 		currRecordSource = RECORD_SOURCES.get(recordSourceIndex);
 		setRecordSourceNative(recordSourceIndex);
+		if (currRecordSource.equals(MICROPHONE_RECORD_SOURCE)) {
+			startListeningNative();
+		}
 	}
 
 	public static native float getMaxFrameInRecordSourceBuffer();
 
 	public static native void setRecordSourceNative(int recordSourceId);
+
+	public static native void startListeningNative();
+
+	public static native void stopListeningNative();
 
 	public static native void startRecordingNative(String recordFileName);
 
