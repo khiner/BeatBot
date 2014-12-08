@@ -281,8 +281,8 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env,
 	trackHead = NULL;
 	masterLevels = initLevels();
 	previewEvent = malloc(sizeof(MidiEvent));
-	previewEvent->volume = .8f;
-	previewEvent->pitch = previewEvent->pan = .5f;
+	previewEvent->volume = 128 * 0.8f;
+	previewEvent->pitch = previewEvent->pan = 64;
 }
 
 jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
