@@ -32,12 +32,18 @@ static inline void interleaveFloatsToShorts(float left[], float right[],
 	}
 }
 
-static inline void writeBytesToFile(short buffer[], int size, FILE *out) {
-	int i = 0;
-	for (i = 0; i < size; i++) {
-		// write the chars of the short to file, little endian
-		fputc((char) buffer[i] & 0xff, out);
-		fputc((char) (buffer[i] >> 8) & 0xff, out);
+static inline void writeBufferToRecordFile(short buffer[]) {
+	// write to record out file if recording
+	if (recording && recordOutFile != NULL
+			&& openSlOut->recordBufferShort == buffer) {
+		pthread_mutex_lock(&recordMutex);
+		int i = 0;
+		for (i = 0; i < BUFF_SIZE_SHORTS; i++) {
+			// write the chars of the short to file, little endian
+			fputc((char) buffer[i] & 0xff, recordOutFile);
+			fputc((char) (buffer[i] >> 8) & 0xff, recordOutFile);
+		}
+		pthread_mutex_unlock(&recordMutex);
 	}
 }
 
@@ -205,27 +211,11 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 
 	fillBuffer();
 
-	// write to record out file if recording
-	if (recording && recordOutFile != NULL
-			&& openSlOut->recordBufferShort == openSlOut->globalBufferShort) {
-		pthread_mutex_lock(&recordMutex);
-		writeBytesToFile(openSlOut->globalBufferShort, BUFF_SIZE_SHORTS,
-				recordOutFile);
-		pthread_mutex_unlock(&recordMutex);
-	}
+	writeBufferToRecordFile(openSlOut->globalBufferShort);
 }
 
 // this callback handler is called every time a buffer fills
 void micBufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
-	// write to record out file if recording
-	if (recording && recordOutFile != NULL
-			&& openSlOut->recordBufferShort == openSlOut->micBufferShort) {
-		pthread_mutex_lock(&recordMutex);
-		writeBytesToFile(openSlOut->micBufferShort, BUFF_SIZE_SHORTS,
-				recordOutFile);
-		pthread_mutex_unlock(&recordMutex);
-	}
-
 	if (listening
 			&& openSlOut->recordBufferShort == openSlOut->micBufferShort) {
 		short maxFrameShort = 0;
@@ -237,6 +227,7 @@ void micBufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 		}
 		float maxFrameFloat = (float) maxFrameShort * SHORT_TO_FLOAT;
 		notifyMaxFrame(maxFrameFloat);
+		writeBufferToRecordFile(openSlOut->micBufferShort);
 	}
 
 	// re-enqueue the buffer
