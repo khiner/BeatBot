@@ -5,8 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -44,23 +42,12 @@ public class RecordManager {
 		}
 	}
 
-	static class RecordSourceAudioListener extends TimerTask {
-		@Override
-		public void run() {
-			currentLevel = getMaxFrameInRecordSourceBuffer();
-			if (isArmed() && currentLevel > thresholdLevel) {
-				startRecording();
-			}
-		}
-	}
-
 	public static enum State {
 		OFF, LISTENING, ARMED, RECORDING
 	};
 
 	public static String GLOBAL_RECORD_SOURCE = "Global", MICROPHONE_RECORD_SOURCE = "Microphone";
 
-	private static final int RECORD_SOURCE_POLL_INTERVAL_MILLIS = 50;
 	private static Context context = null;
 	private static String currRecordFileName = null;
 	private static State state = State.OFF;
@@ -69,10 +56,7 @@ public class RecordManager {
 			GLOBAL_RECORD_SOURCE, MICROPHONE_RECORD_SOURCE });
 	private static RecordStateListener listener;
 	private static RecordSourceButtonListener recordSourceButtonListener;
-	private static TimerTask thresholdListenerTask;
-	private static Timer timer = new Timer(true);
 	private static String currRecordSource = GLOBAL_RECORD_SOURCE;
-	private static float currentLevel = 0, thresholdLevel = 0;
 
 	public static void init(Context context) {
 		RecordManager.context = context;
@@ -103,23 +87,12 @@ public class RecordManager {
 		return state == State.RECORDING;
 	}
 
-	public static void setThresholdLevel(float thresholdLevel) {
-		RecordManager.thresholdLevel = thresholdLevel;
-	}
-
-	public static float getCurrentLevel() {
-		return currentLevel;
-	}
-
 	// in LISTEN mode, recorder listens to (polls) the RecordSource to display the current level
 	public synchronized static void startListening() {
 		if (!isOff())
 			return;
 
 		// running timer task as daemon thread
-		thresholdListenerTask = new RecordSourceAudioListener();
-		timer.scheduleAtFixedRate(thresholdListenerTask, RECORD_SOURCE_POLL_INTERVAL_MILLIS,
-				RECORD_SOURCE_POLL_INTERVAL_MILLIS);
 		state = State.LISTENING;
 		startListeningNative();
 
@@ -134,6 +107,7 @@ public class RecordManager {
 			return;
 
 		state = State.ARMED;
+		armNative();
 		if (listener != null) {
 			listener.onRecordArmed();
 		}
@@ -144,15 +118,17 @@ public class RecordManager {
 			return;
 
 		state = State.LISTENING;
+		disarmNative();
 		if (listener != null) {
 			listener.onRecordDisarmed();
 		}
 	}
 
-	public synchronized static void startRecording() {
-		if (!isArmed())
-			return;
-
+	public static String startRecording() {
+		if (!isArmed()) {
+			return null;
+		}
+		
 		String recordDirectory = FileManager.recordPathForSource(currRecordSource);
 		currRecordFileName = recordDirectory + "/R" + (currFileNum++) + ".wav";
 		try {
@@ -161,11 +137,11 @@ public class RecordManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		startRecordingNative(currRecordFileName);
 		state = State.RECORDING;
 		if (listener != null) {
 			listener.onRecordStart();
 		}
+		return currRecordFileName;
 	}
 
 	public synchronized static File stopRecording() {
@@ -177,7 +153,6 @@ public class RecordManager {
 			return null;
 		}
 
-		stopRecordingNative();
 		File file = WavFileUtil.insertLengthDataIntoWavFile(currRecordFileName);
 		state = State.LISTENING;
 		if (listener != null) {
@@ -193,7 +168,6 @@ public class RecordManager {
 			return;
 
 		stopListeningNative();
-		thresholdListenerTask.cancel();
 		state = State.OFF;
 
 		if (listener != null) {
@@ -213,7 +187,13 @@ public class RecordManager {
 		}
 	}
 
-	public static native float getMaxFrameInRecordSourceBuffer();
+	public static void notifyRecordSourceBufferFilled(float recordSourceMaxFrame) {
+		if (listener != null) {
+			listener.onRecordSourceBufferFilled(recordSourceMaxFrame);
+		}
+	}
+
+	public static native void setThresholdLevel(float thresholdLevel);
 
 	public static native void setRecordSourceNative(int recordSourceId);
 
@@ -221,7 +201,9 @@ public class RecordManager {
 
 	public static native void stopListeningNative();
 
-	public static native void startRecordingNative(String recordFileName);
-
 	public static native void stopRecordingNative();
+
+	public static native void armNative();
+
+	public static native void disarmNative();
 }

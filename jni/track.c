@@ -1,32 +1,6 @@
 #include "all.h"
 #include "libsndfile/sndfile.h"
-
-static jclass trackClass = NULL;
-static jmethodID getNextMidiNote = NULL;
-static JavaVM* javaVm = NULL;
-
-jint JNI_OnLoad(JavaVM* vm, void* reserved) {
-	JNIEnv* env;
-	if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
-		return -1;
-
-	trackClass = (*env)->NewGlobalRef(env,
-			(*env)->FindClass(env, "com/kh/beatbot/manager/TrackManager"));
-	getNextMidiNote = (*env)->GetStaticMethodID(env, trackClass,
-			"getNextMidiNote", "(IJ)Lcom/kh/beatbot/midi/MidiNote;");
-
-	javaVm = vm;
-	return JNI_VERSION_1_6;
-}
-
-JNIEnv *getJniEnv() {
-	JNIEnv* env;
-	if ((*javaVm)->GetEnv(javaVm, (void**) &env,
-			JNI_VERSION_1_6) == JNI_EDETACHED) {
-		(*javaVm)->AttachCurrentThread(javaVm, &env, NULL );
-	}
-	return env;
-}
+#include "jni_load.h"
 
 jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size) {
 	jfloatArray result = (*env)->NewFloatArray(env, size);
@@ -336,8 +310,9 @@ void setNextNote(Track *track, jobject obj) {
 
 void updateNextNote(Track *track) {
 	JNIEnv* env = getJniEnv();
-	jobject obj = (*env)->CallStaticObjectMethod(env, trackClass,
-			getNextMidiNote, track->num, (jlong) sampleToTick(currSample));
+	jobject obj = (*env)->CallStaticObjectMethod(env, getTrackClass(),
+			getNextMidiNoteMethod(), track->num,
+			(jlong) sampleToTick(currSample));
 	setNextNote(track, obj);
 	(*env)->DeleteLocalRef(env, obj);
 }

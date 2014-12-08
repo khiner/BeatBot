@@ -1,7 +1,6 @@
 package com.kh.beatbot.ui.view.control;
 
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.AudioMeter;
 import com.kh.beatbot.ui.shape.RoundedRect;
@@ -45,6 +44,11 @@ public class ThresholdBar extends ControlView1dBase {
 				thresholdSelectTab.y);
 	}
 
+	// normalized level is [0,1].  Param handles DB conversion automagically
+	public void setLevelNormalized(float levelNormalized) {
+		audioMeter.setLevel(levelNormalized);
+	}
+
 	protected float posToLevel(Pointer pos) {
 		if (pos.x > width - levelBarHeight)
 			return 1;
@@ -54,10 +58,6 @@ public class ThresholdBar extends ControlView1dBase {
 
 	private float levelToX(float viewLevel) {
 		return thresholdSelectTab.width / 2 + viewLevel * (width - thresholdSelectTab.width);
-	}
-
-	private void setLevelInUnits(float levelUnits) {
-		audioMeter.setLevel(levelUnits);
 	}
 
 	@Override
@@ -74,7 +74,6 @@ public class ThresholdBar extends ControlView1dBase {
 
 	@Override
 	public void tick() {
-		setLevelInUnits(RecordManager.getCurrentLevel());
 		audioMeter.tick();
 	}
 }

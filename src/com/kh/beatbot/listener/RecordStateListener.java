@@ -9,4 +9,5 @@ public interface RecordStateListener {
 	void onRecordDisarmed();
 	void onRecordStart();
 	void onRecordStop(File recordedSampleFile);
+	void onRecordSourceBufferFilled(float maxFrame);
 }

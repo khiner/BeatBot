@@ -17,4 +17,8 @@ public class ThresholdParamControl extends LevelParamControl {
 		levelControl.layout(this, height * 2, 0, width - height * 4, height);
 		valueLabel.layout(this, width - height * 2, 0, height * 2, height);
 	}
+
+	public void setLevel(float level) {
+		((ThresholdBar) levelControl).setLevelNormalized(level);
+	}
 }

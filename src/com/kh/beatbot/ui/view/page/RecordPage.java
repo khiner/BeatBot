@@ -115,6 +115,11 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 	}
 
 	@Override
+	public void onRecordSourceBufferFilled(float maxFrame) {
+		thresholdParamControl.setLevel(maxFrame);
+	}
+
+	@Override
 	public synchronized void show() {
 		super.show();
 		RecordManager.startListening(); // listen to RecordSource to start populating ThresholdBar

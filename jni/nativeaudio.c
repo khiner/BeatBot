@@ -1,4 +1,5 @@
 #include "all.h"
+#include "jni_load.h"
 
 // __android_log_print(ANDROID_LOG_INFO, "YourApp", "formatted message");
 
@@ -10,7 +11,10 @@ static SLEngineItf engineEngine = NULL;
 static SLObjectItf outputMixObject = NULL;
 
 static bool playing = false;
+static bool recordArmed = false;
+static bool listening = false;
 static bool recording = false;
+static float thresholdLevel = 0;
 static FILE *recordOutFile = NULL;
 static pthread_mutex_t recordMutex, bufferFillMutex;
 static pthread_cond_t bufferFillCond = PTHREAD_COND_INITIALIZER;
@@ -34,6 +38,32 @@ static inline void writeBytesToFile(short buffer[], int size, FILE *out) {
 		// write the chars of the short to file, little endian
 		fputc((char) buffer[i] & 0xff, out);
 		fputc((char) (buffer[i] >> 8) & 0xff, out);
+	}
+}
+
+static inline void startRecording() {
+	pthread_mutex_lock(&recordMutex);
+	recordArmed = false;
+	JNIEnv* env = getJniEnv();
+	jstring recordFilePath = (*env)->CallStaticObjectMethod(env,
+			getRecordManagerClass(), getStartRecordingJavaMethod());
+
+	const char *cRecordFilePath = (*env)->GetStringUTFChars(env, recordFilePath,
+			0);
+
+	cRecordFilePath = (*env)->GetStringUTFChars(env, recordFilePath, 0);
+	// append to end of file, since header is written in Java
+	recordOutFile = fopen(cRecordFilePath, "a+");
+	recording = true;
+	pthread_mutex_unlock(&recordMutex);
+}
+
+static inline void notifyMaxFrame(float maxFrame) {
+	JNIEnv* env = getJniEnv();
+	(*env)->CallStaticVoidMethod(env, getRecordManagerClass(),
+			getNotifyRecordSourceBufferFilledMethod(), maxFrame);
+	if (recordArmed && maxFrame > thresholdLevel) {
+		startRecording();
 	}
 }
 
@@ -65,7 +95,7 @@ static inline void processMasterEffects() {
 }
 
 static inline void mixTracks() {
-	openSlOut->maxFrameInGlobalBuffer = 0;
+	float maxFrame = 0;
 	int channel, samp;
 	float total;
 	for (channel = 0; channel < 2; channel++) {
@@ -82,10 +112,14 @@ static inline void mixTracks() {
 			total *= masterLevels->volume;
 			openSlOut->currBufferFloat[channel][samp] =
 					total > -1 ? (total < 1 ? total : 1) : -1;
-			if (total > openSlOut->maxFrameInGlobalBuffer) {
-				openSlOut->maxFrameInGlobalBuffer = total;
+			if (total > maxFrame) {
+				maxFrame = total;
 			}
 		}
+	}
+	if (listening
+			&& openSlOut->recordBufferShort == openSlOut->globalBufferShort) {
+		notifyMaxFrame(maxFrame);
 	}
 }
 
@@ -184,25 +218,26 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 // this callback handler is called every time a buffer fills
 void micBufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	// write to record out file if recording
-	pthread_mutex_lock(&recordMutex);
 	if (recording && recordOutFile != NULL
 			&& openSlOut->recordBufferShort == openSlOut->micBufferShort) {
+		pthread_mutex_lock(&recordMutex);
 		writeBytesToFile(openSlOut->micBufferShort, BUFF_SIZE_SHORTS,
 				recordOutFile);
+		pthread_mutex_unlock(&recordMutex);
 	}
 
-	// find max frame
-	short maxFrameInMicBufferShort = 0;
-	int i;
-	for (i = 0; i < BUFF_SIZE_SHORTS; i++) {
-		if (openSlOut->micBufferShort[i] > openSlOut->maxFrameInMicBuffer) {
-			maxFrameInMicBufferShort = openSlOut->micBufferShort[i];
+	if (listening
+			&& openSlOut->recordBufferShort == openSlOut->micBufferShort) {
+		short maxFrameShort = 0;
+		int i;
+		for (i = 0; i < BUFF_SIZE_SHORTS; i++) {
+			if (openSlOut->micBufferShort[i] > maxFrameShort) {
+				maxFrameShort = openSlOut->micBufferShort[i];
+			}
 		}
+		float maxFrameFloat = (float) maxFrameShort * SHORT_TO_FLOAT;
+		notifyMaxFrame(maxFrameFloat);
 	}
-
-	openSlOut->maxFrameInMicBuffer = ((float) maxFrameInMicBufferShort)
-			* SHORT_TO_FLOAT;
-	pthread_mutex_unlock(&recordMutex);
 
 	// re-enqueue the buffer
 	(*bq)->Enqueue(bq, openSlOut->micBufferShort, BUFF_SIZE_BYTES);
@@ -410,28 +445,6 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_nativeShutdown(JNIEnv *env,
 /****************************************************************************************
  Java RecordManager JNI methods
  ****************************************************************************************/
-void Java_com_kh_beatbot_manager_RecordManager_startRecordingNative(JNIEnv *env,
-		jclass clazz, jstring recordFilePath) {
-	pthread_mutex_lock(&recordMutex);
-	const char *cRecordFilePath = (*env)->GetStringUTFChars(env, recordFilePath,
-			0);
-	cRecordFilePath = (*env)->GetStringUTFChars(env, recordFilePath, 0);
-	// append to end of file, since header is written in Java
-	recordOutFile = fopen(cRecordFilePath, "a+");
-	recording = true;
-	pthread_mutex_unlock(&recordMutex);
-}
-
-void Java_com_kh_beatbot_manager_RecordManager_stopRecordingNative(JNIEnv *env,
-		jclass clazz) {
-	pthread_mutex_lock(&recordMutex);
-	recording = false;
-	fflush(recordOutFile);
-	fclose(recordOutFile);
-	recordOutFile = NULL;
-	pthread_mutex_unlock(&recordMutex);
-}
-
 void Java_com_kh_beatbot_manager_RecordManager_startListeningNative(JNIEnv *env,
 		jclass clazz) {
 	// listening means to track the max frame of the current record source
@@ -451,12 +464,14 @@ void Java_com_kh_beatbot_manager_RecordManager_startListeningNative(JNIEnv *env,
 					openSlOut->micBufferShort, BUFF_SIZE_BYTES);
 		}
 	}
+	listening = true;
 	pthread_mutex_unlock(&recordMutex);
 }
 
 void Java_com_kh_beatbot_manager_RecordManager_stopListeningNative(JNIEnv *env,
 		jclass clazz) {
 	pthread_mutex_lock(&recordMutex);
+	listening = false;
 	if (openSlOut->recordBufferShort == openSlOut->micBufferShort) {
 		SLuint32 state;
 		(*openSlOut->recordInterface)->GetRecordState(
@@ -467,6 +482,16 @@ void Java_com_kh_beatbot_manager_RecordManager_stopListeningNative(JNIEnv *env,
 					openSlOut->recordInterface, SL_RECORDSTATE_STOPPED );
 		}
 	}
+	pthread_mutex_unlock(&recordMutex);
+}
+
+void Java_com_kh_beatbot_manager_RecordManager_stopRecordingNative(JNIEnv *env,
+		jclass clazz) {
+	pthread_mutex_lock(&recordMutex);
+	recordArmed = recording = false;
+	fflush(recordOutFile);
+	fclose(recordOutFile);
+	recordOutFile = NULL;
 	pthread_mutex_unlock(&recordMutex);
 }
 
@@ -482,12 +507,18 @@ void Java_com_kh_beatbot_manager_RecordManager_setRecordSourceNative(
 	}
 }
 
-jfloat Java_com_kh_beatbot_manager_RecordManager_getMaxFrameInRecordSourceBuffer(
-		JNIEnv *env, jclass clazz) {
-	if (openSlOut->recordBufferShort == openSlOut->globalBufferShort)
-		return openSlOut->maxFrameInGlobalBuffer;
-	else if (openSlOut->recordBufferShort == openSlOut->micBufferShort)
-		return openSlOut->maxFrameInMicBuffer;
-	else
-		return 0;
+void Java_com_kh_beatbot_manager_RecordManager_armNative(JNIEnv *env,
+		jclass clazz) {
+	recordArmed = true;
 }
+
+void Java_com_kh_beatbot_manager_RecordManager_disarmNative(JNIEnv *env,
+		jclass clazz) {
+	recordArmed = false;
+}
+
+void Java_com_kh_beatbot_manager_RecordManager_setThresholdLevel(JNIEnv *env,
+		jclass clazz, jfloat _thresholdLevel) {
+	thresholdLevel = _thresholdLevel;
+}
+

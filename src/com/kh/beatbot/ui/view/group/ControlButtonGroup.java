@@ -20,7 +20,7 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 public class ControlButtonGroup extends TouchableView implements MidiNoteListener,
 		StatefulEventListener {
 
-	private ToggleButton playButton, recordButton, copyButton;
+	private ToggleButton playButton, copyButton;
 	private Button stopButton, undoButton, redoButton, deleteButton, quantizeButton;
 
 	public ControlButtonGroup(View view) {
@@ -32,7 +32,6 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 	protected synchronized void createChildren() {
 		playButton = new ToggleButton(this).withIcon(IconResourceSets.PLAY);
 		stopButton = new Button(this).withIcon(IconResourceSets.STOP);
-		recordButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.RECORD);
 		copyButton = new ToggleButton(this).withIcon(IconResourceSets.COPY);
 		deleteButton = new Button(this).withIcon(IconResourceSets.DELETE_NOTE);
 		quantizeButton = new Button(this).withIcon(IconResourceSets.QUANTIZE);
@@ -46,27 +45,11 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 			}
 		});
 
-		recordButton.setOnReleaseListener(new OnReleaseListener() {
-			@Override
-			public void onRelease(Button button) {
-				if (RecordManager.isRecording()) {
-					RecordManager.stopRecording();
-				} else {
-					mainPage.midiViewGroup.midiView.reset();
-					playButton.setChecked(true);
-					RecordManager.startRecording();
-					if (PlaybackManager.getState() != PlaybackManager.State.PLAYING)
-						playButton.getOnReleaseListener().onRelease(playButton);
-				}
-			}
-		});
-
 		stopButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
 				playButton.setChecked(false);
 				if (RecordManager.isRecording()) {
-					recordButton.trigger(false);
 					playButton.setChecked(false);
 				}
 				if (PlaybackManager.getState() == PlaybackManager.State.PLAYING) {
@@ -133,7 +116,6 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 		// left-aligned buttons
 		playButton.layout(this, 0, 0, height, height);
 		stopButton.layout(this, height, 0, height, height);
-		recordButton.layout(this, 2 * height, 0, height, height);
 
 		float rightMargin = 10;
 		// right-aligned buttons
