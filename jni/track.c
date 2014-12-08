@@ -174,7 +174,7 @@ Levels *initLevels() {
 	levels->pitch = 0.5f;
 	int effectNum;
 	for (effectNum = 0; effectNum < MAX_EFFECTS_PER_TRACK; effectNum++) {
-		addEffect(levels, NULL);
+		addEffect(levels, NULL );
 	}
 	levels->volPan = initEffect(volumepanconfig_create(), volumepanconfig_set,
 			volumepan_process, volumepanconfig_destroy);
@@ -189,8 +189,10 @@ Track *initTrack() {
 	track->nextEvent = malloc(sizeof(MidiEvent));
 	track->nextStartSample = track->nextStopSample = -1;
 	track->currBufferFloat = (float **) malloc(2 * sizeof(float *));
-	track->currBufferFloat[0] = (float *) calloc(BUFF_SIZE, sizeof(float));
-	track->currBufferFloat[1] = (float *) calloc(BUFF_SIZE, sizeof(float));
+	track->currBufferFloat[0] = (float *) calloc(BUFF_SIZE_FRAMES,
+			ONE_FLOAT_SIZE);
+	track->currBufferFloat[1] = (float *) calloc(BUFF_SIZE_FRAMES,
+			ONE_FLOAT_SIZE);
 	track->mute = track->solo = false;
 	track->shouldSound = true;
 	track->nextEvent->volume = dbToByte(0);

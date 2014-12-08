@@ -18,7 +18,7 @@ void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 	config->channels = sfinfo.channels;
 	config->frames = sfinfo.frames;
 	config->sampleFile = infile;
-	config->buffer = malloc(BUFF_SIZE * config->channels * ONE_FLOAT_SZ);
+	config->buffer = malloc(BUFF_SIZE_FLOATS);
 	config->loopBegin = 0;
 	config->loopEnd = config->frames;
 	if (config->currFrame > config->loopEnd) {

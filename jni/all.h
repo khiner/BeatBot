@@ -16,18 +16,23 @@
 #define REVERB   5
 #define TREMELO  6
 
-#define RESOLUTION 480
-#define MAX_CHANNELS 2
+#define ONE_SHORT_SIZE        sizeof(short)
+#define ONE_FLOAT_SIZE        sizeof(float)
+#define TWO_FLOAT_SIZE        2 * ONE_FLOAT_SIZE
+#define FOUR_FLOAT_SIZE       4 * ONE_FLOAT_SIZE
+#define RESOLUTION            480
+#define MAX_CHANNELS          2
 #define MAX_EFFECTS_PER_TRACK 3 // also need to change GlobalVars.MAX_EFFECT_PER_TRACK
-#define TABLE_SIZE 2048
-#define INV_TABLE_SIZE 1.0 / TABLE_SIZE
-#define BUFF_SIZE 1024 // each sample has one short for each channel
-#define CONVMYFLT (1./32768.)
-#define ONE_FLOAT_SZ sizeof(float)
-#define TWO_FLOAT_SZ 2 * sizeof(float)
-#define FOUR_FLOAT_SZ 4 * sizeof(float)
-#define MIN_FLANGER_DELAY 0.0006f*SAMPLE_RATE
-#define MAX_FLANGER_DELAY 0.007f*SAMPLE_RATE
+#define TABLE_SIZE            2048
+#define INV_TABLE_SIZE        1.0f / TABLE_SIZE
+#define BUFF_SIZE_FRAMES      1024 // each frame has one short for each channel
+#define BUFF_SIZE_SHORTS      BUFF_SIZE_FRAMES * 2
+#define BUFF_SIZE_BYTES       BUFF_SIZE_SHORTS * ONE_SHORT_SIZE
+#define BUFF_SIZE_FLOATS      BUFF_SIZE_SHORTS * ONE_FLOAT_SIZE
+#define SHORT_TO_FLOAT        (1.0f / 32768.0f)
+#define FLOAT_TO_SHORT        32768
+#define MIN_FLANGER_DELAY     0.0006f * SAMPLE_RATE
+#define MAX_FLANGER_DELAY     0.007f * SAMPLE_RATE
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -39,7 +44,6 @@
 #include <jni.h>
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
-
 
 #include "utils.h"
 #include "effects/effects.h"

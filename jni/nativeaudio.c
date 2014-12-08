@@ -23,30 +23,29 @@ static inline void interleaveFloatsToShorts(float left[], float right[],
 		short interleaved[], int size) {
 	int i;
 	for (i = 0; i < size; i++) {
-		interleaved[i * 2] = left[i] * CONV16BIT;
-		interleaved[i * 2 + 1] = right[i] * CONV16BIT;
+		interleaved[i * 2] = left[i] * FLOAT_TO_SHORT;
+		interleaved[i * 2 + 1] = right[i] * FLOAT_TO_SHORT;
 	}
 }
 
 static inline void writeBytesToFile(short buffer[], int size, FILE *out) {
 	int i = 0;
-	short scaled;
 	for (i = 0; i < size; i++) {
 		// write the chars of the short to file, little endian
-		scaled = buffer[i] * 2;
-		fputc((char) scaled & 0xff, out);
-		fputc((char) (scaled >> 8) & 0xff, out);
+		fputc((char) buffer[i] & 0xff, out);
+		fputc((char) (buffer[i] >> 8) & 0xff, out);
 	}
 }
 
 static inline void processEffects(Levels *levels, float **floatBuffer) {
-	levels->volPan->process(levels->volPan->config, floatBuffer, BUFF_SIZE);
+	levels->volPan->process(levels->volPan->config, floatBuffer,
+			BUFF_SIZE_FRAMES);
 	pthread_mutex_lock(&levels->effectMutex);
 	EffectNode *effectNode = levels->effectHead;
 	while (effectNode != NULL ) {
 		if (effectNode->effect != NULL && effectNode->effect->on) {
 			effectNode->effect->process(effectNode->effect->config, floatBuffer,
-					BUFF_SIZE);
+					BUFF_SIZE_FRAMES);
 		}
 		effectNode = effectNode->next;
 	}
@@ -70,7 +69,7 @@ static inline void mixTracks() {
 	int channel, samp;
 	float total;
 	for (channel = 0; channel < 2; channel++) {
-		for (samp = 0; samp < BUFF_SIZE; samp++) {
+		for (samp = 0; samp < BUFF_SIZE_FRAMES; samp++) {
 			total = 0;
 			TrackNode *cur_ptr = trackHead;
 			while (cur_ptr != NULL ) {
@@ -121,7 +120,7 @@ void disarm() {
 
 static inline void generateNextBuffer() {
 	int samp, channel;
-	for (samp = 0; samp < BUFF_SIZE; samp++) {
+	for (samp = 0; samp < BUFF_SIZE_FRAMES; samp++) {
 		if (currSample > loopEndSample) {
 			stopAllTracks();
 		}
@@ -159,7 +158,7 @@ void fillBuffer() {
 	// interleaving L and R samples
 	interleaveFloatsToShorts(openSlOut->currBufferFloat[0],
 			openSlOut->currBufferFloat[1], openSlOut->globalBufferShort,
-			BUFF_SIZE);
+			BUFF_SIZE_FRAMES);
 	pthread_mutex_unlock(&openSlOut->trackMutex);
 }
 
@@ -167,8 +166,7 @@ void fillBuffer() {
 void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	// enqueue the buffer
 	if (openSlOut->armed) {
-		(*bq)->Enqueue(bq, openSlOut->globalBufferShort,
-				BUFF_SIZE * 2 * sizeof(short));
+		(*bq)->Enqueue(bq, openSlOut->globalBufferShort, BUFF_SIZE_BYTES);
 	}
 
 	fillBuffer();
@@ -177,7 +175,7 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	if (recording && recordOutFile != NULL
 			&& openSlOut->recordBufferShort == openSlOut->globalBufferShort) {
 		pthread_mutex_lock(&recordMutex);
-		writeBytesToFile(openSlOut->globalBufferShort, BUFF_SIZE * 2,
+		writeBytesToFile(openSlOut->globalBufferShort, BUFF_SIZE_SHORTS,
 				recordOutFile);
 		pthread_mutex_unlock(&recordMutex);
 	}
@@ -189,26 +187,25 @@ void micBufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	pthread_mutex_lock(&recordMutex);
 	if (recording && recordOutFile != NULL
 			&& openSlOut->recordBufferShort == openSlOut->micBufferShort) {
-		writeBytesToFile(openSlOut->micBufferShort, BUFF_SIZE * 2,
+		writeBytesToFile(openSlOut->micBufferShort, BUFF_SIZE_SHORTS,
 				recordOutFile);
 	}
 
 	// find max frame
 	short maxFrameInMicBufferShort = 0;
 	int i;
-	for (i = 0; i < BUFF_SIZE * 2; i++) {
+	for (i = 0; i < BUFF_SIZE_SHORTS; i++) {
 		if (openSlOut->micBufferShort[i] > openSlOut->maxFrameInMicBuffer) {
 			maxFrameInMicBufferShort = openSlOut->micBufferShort[i];
 		}
 	}
 
 	openSlOut->maxFrameInMicBuffer = ((float) maxFrameInMicBufferShort)
-			/ CONV16BIT;
+			* SHORT_TO_FLOAT;
 	pthread_mutex_unlock(&recordMutex);
 
 	// re-enqueue the buffer
-	(*bq)->Enqueue(bq, openSlOut->micBufferShort,
-			BUFF_SIZE * 2 * sizeof(short));
+	(*bq)->Enqueue(bq, openSlOut->micBufferShort, BUFF_SIZE_BYTES);
 }
 
 void setRecordBuffer(short *recordBuffer) {
@@ -266,8 +263,10 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 		JNIEnv *env, jclass clazz) {
 	openSlOut = malloc(sizeof(OpenSlOut));
 	openSlOut->currBufferFloat = (float **) malloc(2 * sizeof(float *));
-	openSlOut->currBufferFloat[0] = (float *) calloc(BUFF_SIZE, sizeof(float));
-	openSlOut->currBufferFloat[1] = (float *) calloc(BUFF_SIZE, sizeof(float));
+	openSlOut->currBufferFloat[0] = (float *) calloc(BUFF_SIZE_FRAMES,
+			ONE_FLOAT_SIZE);
+	openSlOut->currBufferFloat[1] = (float *) calloc(BUFF_SIZE_FRAMES,
+			ONE_FLOAT_SIZE);
 	memset(openSlOut->globalBufferShort, 0,
 			sizeof(openSlOut->globalBufferShort));
 	memset(openSlOut->micBufferShort, 0, sizeof(openSlOut->micBufferShort));
@@ -449,7 +448,7 @@ void Java_com_kh_beatbot_manager_RecordManager_startListeningNative(JNIEnv *env,
 			(*openSlOut->recordInterface)->SetRecordState(
 					openSlOut->recordInterface, SL_RECORDSTATE_RECORDING );
 			(*openSlOut->micBufferQueue)->Enqueue(openSlOut->micBufferQueue,
-					openSlOut->micBufferShort, BUFF_SIZE * 2 * sizeof(short));
+					openSlOut->micBufferShort, BUFF_SIZE_BYTES);
 		}
 	}
 	pthread_mutex_unlock(&recordMutex);

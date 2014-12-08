@@ -5,8 +5,8 @@ typedef struct OpenSlOut_ {
 	bool armed;
 	short *recordBufferShort;
 	float **currBufferFloat;
-	short globalBufferShort[BUFF_SIZE * 2];
-	short micBufferShort[BUFF_SIZE * 2];
+	short globalBufferShort[BUFF_SIZE_SHORTS];
+	short micBufferShort[BUFF_SIZE_SHORTS];
 	SLObjectItf outputPlayerObject;
 	SLObjectItf recorderObject;
 	SLPlayItf outputPlayerPlay;

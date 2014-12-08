@@ -34,7 +34,7 @@ public class WavFileUtil {
 		header[13] = 'm';
 		header[14] = 't';
 		header[15] = ' ';
-		header[16] = 16; // 4 bytes: size of 'fmt ' chunk
+		header[16] = 2 * Byte.SIZE; // 2 bytes: size of 'fmt ' chunk
 		header[17] = 0;
 		header[18] = 0;
 		header[19] = 0;
@@ -50,7 +50,7 @@ public class WavFileUtil {
 		header[29] = (byte) ((BYTE_RATE >> 8) & 0xff);
 		header[30] = (byte) ((BYTE_RATE >> 16) & 0xff);
 		header[31] = (byte) ((BYTE_RATE >> 24) & 0xff);
-		header[32] = (byte) (2 * 16 / 8); // block align
+		header[32] = (byte) 4; // block align
 		header[33] = 0;
 		header[34] = BITS_PER_SAMPLE; // bits per sample
 		header[35] = 0;

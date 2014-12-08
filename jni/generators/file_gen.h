@@ -36,14 +36,16 @@ void filegen_reset(FileGen *config);
 static inline void filegen_sndFileRead(FileGen *config, long frame,
 		float *sample) {
 
-	if (frame >= config->bufferStartFrame + BUFF_SIZE
+	if (frame >= config->bufferStartFrame + BUFF_SIZE_FRAMES
 			|| frame < config->bufferStartFrame) {
-		long seekTo =
-				config->reverse ?
-						(frame - BUFF_SIZE >= 0 ? frame - BUFF_SIZE : 0) :
-						frame;
+		long seekTo = frame;
+		if (config->reverse) {
+			seekTo =
+					frame - BUFF_SIZE_FRAMES >= 0 ?
+							frame - BUFF_SIZE_FRAMES : 0;
+		}
 		sf_seek(config->sampleFile, seekTo, SEEK_SET);
-		sf_readf_float(config->sampleFile, config->buffer, BUFF_SIZE);
+		sf_readf_float(config->sampleFile, config->buffer, BUFF_SIZE_FRAMES);
 		config->bufferStartFrame = seekTo;
 	}
 	frame -= config->bufferStartFrame;
