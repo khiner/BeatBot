@@ -8,6 +8,7 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.manager.ProjectFileManager;
 import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -20,7 +21,8 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class MainMenu extends Menu implements FileMenuItemListener {
 
-	private MenuItem fileItem, settingsItem, snapToGridItem, midiImportItem, midiExportItem;
+	private MenuItem fileItem, settingsItem, snapToGridItem, saveProjectItem, loadProjectItem,
+			midiImportItem, midiExportItem;
 
 	private SlideTab tab;
 	private PhysicsState physicsState;
@@ -40,6 +42,10 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		settingsItem = new MenuItem(this, null, true);
 		snapToGridItem = new MenuItem(this, settingsItem, true);
 		((ToggleButton) snapToGridItem.button).oscillating();
+		saveProjectItem = new MenuItem(this, fileItem, false);
+		loadProjectItem = new FileMenuItem(this, fileItem, new File(
+				FileManager.projectDirectory.getPath()));
+
 		midiImportItem = new FileMenuItem(this, fileItem, new File(
 				FileManager.midiDirectory.getPath()));
 		midiExportItem = new MenuItem(this, fileItem, false);
@@ -54,6 +60,14 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 			}
 		});
 
+		saveProjectItem.setOnReleaseListener(new OnReleaseListener() {
+			@Override
+			public void onRelease(Button button) {
+				saveProjectItem.onRelease(button);
+				context.showDialog(BeatBotActivity.PROJECT_FILE_NAME_EDIT_DIALOG_ID);
+			}
+		});
+
 		midiExportItem.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
@@ -62,7 +76,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 			}
 		});
 
-		fileItem.addSubMenuItems(midiImportItem, midiExportItem);
+		fileItem.addSubMenuItems(saveProjectItem, loadProjectItem, midiImportItem, midiExportItem);
 		settingsItem.addSubMenuItems(snapToGridItem);
 	}
 
@@ -88,10 +102,16 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		snapToGridItem.setResourceId(IconResourceSets.SNAP_TO_GRID);
 		snapToGridItem.setChecked(MidiManager.isSnapToGrid());
 
+		// TODO
+		//saveProjectItem.setResourceId(IconResourceSets.SAVE_PROJECT);
+		//loadProjectItem.setResourceId(IconResourceSets.LOAD_PROJECT);
 		midiImportItem.setResourceId(IconResourceSets.MIDI_IMPORT);
 		midiExportItem.setResourceId(IconResourceSets.MIDI_EXPORT);
 
 		snapToGridItem.setText("Snap-to-grid");
+
+		saveProjectItem.setText("Save project");
+		loadProjectItem.setText("Load project");
 		midiImportItem.setText("Import MIDI");
 		midiExportItem.setText("Export MIDI");
 	}
@@ -109,7 +129,10 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 
 	@Override
 	public void onFileMenuItemReleased(FileMenuItem fileItem) {
-		MidiFileManager.importMidi(context, fileItem.getText());
+		if (fileItem.equals(midiImportItem))
+			MidiFileManager.importMidi(context, fileItem.getText());
+		else
+			ProjectFileManager.importProject(context, fileItem.getText());
 	}
 
 	@Override

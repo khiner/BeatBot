@@ -22,13 +22,13 @@ public class Knob extends ControlView1dBase {
 	protected float posToLevel(Pointer pos) {
 		float unitX = pos.x / width - .5f;
 		float unitY = pos.y / height - .5f;
-		float theta = (float) Math.atan(unitY / unitX) + ¹ / 2;
-		// atan ranges from 0 to ¹, and produces symmetric results around the y axis.
-		// we need 0 to 2*¹, so ad ¹ if right of x axis.
+		float theta = (float) Math.atan(unitY / unitX) + Ï€ / 2;
+		// atan ranges from 0 to Ï€, and produces symmetric results around the y axis.
+		// we need 0 to 2Ï€, so add Ï€ if right of x axis.
 		if (unitX > 0)
-			theta += ¹;
-		// convert to level - remember, min theta is ¹/4, max is 7¹/8
-		float level = (4 * theta / ¹ - 1) / 6;
+			theta += Ï€;
+		// convert to level - remember, min theta is Ï€/4, max is 7Ï€/8
+		float level = (4 * theta / Ï€ - 1) / 6;
 		return GeneralUtils.clipToUnit(level);
 	}
 

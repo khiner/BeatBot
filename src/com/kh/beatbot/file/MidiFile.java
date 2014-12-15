@@ -14,7 +14,7 @@
 //	limitations under the License.
 //////////////////////////////////////////////////////////////////////////////
 
-package com.kh.beatbot.midi;
+package com.kh.beatbot.file;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -25,10 +25,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import com.kh.beatbot.midi.MidiTrack;
 import com.kh.beatbot.midi.util.MidiUtil;
 
 public class MidiFile {
-
 	public static final int HEADER_SIZE = 14;
 	public static final byte[] IDENTIFIER = { 'M', 'T', 'h', 'd' };
 
@@ -62,7 +62,6 @@ public class MidiFile {
 	}
 
 	public MidiFile(InputStream rawIn) throws IOException {
-
 		BufferedInputStream in = new BufferedInputStream(rawIn);
 
 		byte[] buffer = new byte[HEADER_SIZE];

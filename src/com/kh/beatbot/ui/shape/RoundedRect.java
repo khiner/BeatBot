@@ -50,13 +50,13 @@ public class RoundedRect extends Shape {
 		roundThresh = cornerRadius / 20;
 		float theta = 0, addX, addY, vertexX, vertexY;
 		for (int i = 0; i < NUM_STROKE_VERTICES; i++) {
-			if (theta < ¹ / 2) { // lower right
+			if (theta < Ï€ / 2) { // lower right
 				addX = width - cornerRadius;
 				addY = height - cornerRadius;
-			} else if (theta < ¹) { // lower left
+			} else if (theta < Ï€) { // lower left
 				addX = cornerRadius;
 				addY = height - cornerRadius;
-			} else if (theta < 3 * ¹ / 2) { // upper left
+			} else if (theta < 3 * Ï€ / 2) { // upper left
 				addX = addY = cornerRadius;
 			} else { // upper right
 				addX = width - cornerRadius;
@@ -69,7 +69,7 @@ public class RoundedRect extends Shape {
 			fillVertex(vertexX, vertexY);
 			strokeVertex(vertexX, vertexY);
 
-			theta += 2 * ¹ / NUM_STROKE_VERTICES;
+			theta += 2 * Ï€ / NUM_STROKE_VERTICES;
 		}
 	}
 

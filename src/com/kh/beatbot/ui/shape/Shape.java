@@ -3,7 +3,7 @@ package com.kh.beatbot.ui.shape;
 import com.kh.beatbot.ui.mesh.Mesh2D;
 
 public abstract class Shape {
-	public static final float ¹ = (float) Math.PI;
+	public static final float Ï€ = (float) Math.PI;
 	protected Mesh2D fillMesh, strokeMesh;
 	protected float[] fillColor, strokeColor;
 

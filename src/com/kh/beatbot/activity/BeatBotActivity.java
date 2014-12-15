@@ -22,6 +22,7 @@ import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
+import com.kh.beatbot.manager.ProjectFileManager;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.util.GeneralUtils;
@@ -33,12 +34,12 @@ import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
 
 public class BeatBotActivity extends Activity {
 	public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1, SAMPLE_NAME_EDIT_DIALOG_ID = 2,
-			MIDI_FILE_NAME_EDIT_DIALOG_ID = 3;
+			PROJECT_FILE_NAME_EDIT_DIALOG_ID = 3, MIDI_FILE_NAME_EDIT_DIALOG_ID = 4;
 
 	private static boolean initialized = false;
 
 	private static ViewFlipper activityPager;
-	private static EditText bpmInput, midiFileNameInput, sampleNameInput;
+	private static EditText bpmInput, projectFileNameInput, midiFileNameInput, sampleNameInput;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -54,6 +55,7 @@ public class BeatBotActivity extends Activity {
 
 			Color.init(this);
 			FileManager.init(this);
+			ProjectFileManager.init(this);
 			MidiFileManager.init(this);
 			RecordManager.init(this);
 			activityPager = View.init(this);
@@ -134,8 +136,8 @@ public class BeatBotActivity extends Activity {
 		case SAMPLE_NAME_EDIT_DIALOG_ID:
 			sampleNameInput.setText(fileToEdit.getName());
 			break;
+		case PROJECT_FILE_NAME_EDIT_DIALOG_ID:
 		case MIDI_FILE_NAME_EDIT_DIALOG_ID:
-
 		case EXIT_DIALOG_ID:
 			break;
 		}
@@ -183,6 +185,24 @@ public class BeatBotActivity extends Activity {
 						}
 					});
 			break;
+		case PROJECT_FILE_NAME_EDIT_DIALOG_ID:
+			projectFileNameInput = new EditText(this);
+
+			builder.setTitle("Save project as:").setView(projectFileNameInput)
+					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							String projectFileName = projectFileNameInput.getText().toString();
+							ProjectFileManager.exportProject(projectFileName);
+						}
+					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.cancel();
+						}
+					});
+			break;
+
 		case MIDI_FILE_NAME_EDIT_DIALOG_ID:
 			midiFileNameInput = new EditText(this);
 

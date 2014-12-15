@@ -26,7 +26,7 @@ import com.kh.beatbot.ui.view.page.MainPage;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
 public class View implements Comparable<View> {
-	protected static final float ¹ = (float) Math.PI, X_OFFSET = 2;
+	protected static final float Ï€ = (float) Math.PI, X_OFFSET = 2;
 	protected static float LABEL_HEIGHT = 0, BG_OFFSET = 0;
 
 	public static MainPage mainPage;

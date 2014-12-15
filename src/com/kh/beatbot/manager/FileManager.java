@@ -22,8 +22,8 @@ public class FileManager implements FileListener {
 
 	public static final String[] ASSET_TYPES = { "drums" };
 
-	public static File rootDirectory, audioDirectory, midiDirectory, recordDirectory,
-			drumsDirectory, beatRecordDirectory, sampleRecordDirectory;
+	public static File rootDirectory, audioDirectory, projectDirectory, midiDirectory,
+			recordDirectory, drumsDirectory, beatRecordDirectory, sampleRecordDirectory;
 
 	private static AssetManager assetManager;
 	private static byte[] copyBuffer = new byte[1024];
@@ -45,6 +45,7 @@ public class FileManager implements FileListener {
 
 		rootDirectory = new File("/");
 		audioDirectory = new File(appDirectoryPath + "/audio");
+		projectDirectory = new File(appDirectoryPath + "/projects");
 		midiDirectory = new File(appDirectoryPath + "/midi");
 		drumsDirectory = new File(audioDirectory.getPath() + "/drums");
 		recordDirectory = new File(audioDirectory.getPath() + "/recorded");
@@ -52,6 +53,7 @@ public class FileManager implements FileListener {
 		sampleRecordDirectory = new File(recordDirectory.getPath() + "/samples");
 
 		drumsDirectory.mkdirs();
+		projectDirectory.mkdirs();
 		midiDirectory.mkdirs();
 		beatRecordDirectory.mkdirs();
 		sampleRecordDirectory.mkdirs();

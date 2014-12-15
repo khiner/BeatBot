@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.shape;
 
 public class Circle extends Shape {
-	public static final float ¹ = (float) Math.PI, CIRCLE_RADIUS = 100;
+	public static final float Ï€ = (float) Math.PI, CIRCLE_RADIUS = 100;
 
 	public static final short[] FILL_INDICES = getFillIndices();
 

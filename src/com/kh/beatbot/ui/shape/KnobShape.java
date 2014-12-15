@@ -24,11 +24,11 @@ public class KnobShape extends Shape {
 
 	@Override
 	protected void updateVertices() {
-		float theta = 3 * ¹ / 4; // start at 1/8 around the circle
+		float theta = 3 * Ï€ / 4; // start at 1/8 around the circle
 		for (int i = 0; i < NUM_FILL_VERTICES / 2; i++) {
-			// theta will range from ¹/4 to 7¹/8,
-			// with the ¹/8 gap at the "bottom" of the view
-			theta += 3 * ¹ / NUM_FILL_VERTICES;
+			// theta will range from Ï€/4 to 7Ï€/8,
+			// with the Ï€/8 gap at the "bottom" of the view
+			theta += 3 * Ï€ / NUM_FILL_VERTICES;
 			// main circles will show when user is not touching
 			vertex(i, theta, width / 2.3f);
 			vertex(i, theta, width / 3.3f);
