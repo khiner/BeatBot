@@ -56,7 +56,6 @@ public class LabelList extends TouchableView {
 		Label newLabel = new Label(this, null);
 		// need onPressListener as well as the onReleaseListener to notify
 		// when a label becomes touched
-		addChild(newLabel);
 		layoutChildren();
 		return newLabel;
 	}

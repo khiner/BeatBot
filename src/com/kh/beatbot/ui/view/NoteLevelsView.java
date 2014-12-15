@@ -31,12 +31,8 @@ public class NoteLevelsView extends TouchableView {
 		}
 	}
 
-	// the size of the "dots" at the top of level display
-	public static final int LEVEL_POINT_SIZE = 16;
-	// the width of the lines for note levels
-	public static final int LEVEL_LINE_WIDTH = 7;
-
-	private static final int LEVEL_BAR_WIDTH = LEVEL_POINT_SIZE / 2;
+	public static final int LEVEL_POINT_SIZE = 16, LEVEL_LINE_WIDTH = 7,
+			LEVEL_BAR_WIDTH = LEVEL_POINT_SIZE / 2;
 
 	// map of pointerIds to the notes they are selecting
 	private Map<Integer, MidiNote> touchedLevels = new HashMap<Integer, MidiNote>();
@@ -319,7 +315,7 @@ public class NoteLevelsView extends TouchableView {
 		levelBarRect = new Rectangle(levelBarGroup, Color.TRON_BLUE, null);
 		levelBarCircle = new Circle(levelBarGroup, Color.TRON_BLUE, null);
 		levelBarSelectCircle = new Circle(levelBarGroup, Color.TRON_BLUE, null);
-		valueLabel = new ValueLabel(this);
+		valueLabel = new ValueLabel(this, null);
 		valueLabel.setIcon(IconResourceSets.VALUE_LABEL_VIEW_ONLY);
 		valueLabel.disable();
 		addShapes(selectRegionRect);

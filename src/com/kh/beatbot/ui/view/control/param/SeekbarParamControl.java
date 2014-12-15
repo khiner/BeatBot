@@ -20,7 +20,6 @@ public class SeekbarParamControl extends LevelParamControl {
 		super(view);
 		levelControl = new Seekbar(this, basePosition);
 		levelControl.setListener(this);
-		addChild(levelControl);
 		this.seekbarPosition = seekbarPosition;
 	}
 

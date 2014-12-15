@@ -4,6 +4,7 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.icon.IconResourceSets;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.View;
 
 public class ValueLabel extends ControlView1dBase {
@@ -11,6 +12,10 @@ public class ValueLabel extends ControlView1dBase {
 
 	public ValueLabel(View view) {
 		super(view);
+	}
+
+	public ValueLabel(View view, RenderGroup renderGroup) {
+		super(view, renderGroup);
 	}
 
 	@Override

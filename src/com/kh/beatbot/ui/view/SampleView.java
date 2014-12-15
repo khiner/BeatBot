@@ -33,16 +33,15 @@ public class SampleView extends View {
 	 */
 	@Override
 	public void setText(final String text) {
+		if (null != waveformShape) {
+			removeShape(waveformShape);
+			waveformShape = null;
+		}
 		if (text.isEmpty()) { // no text, create empty waveform shape
 			if (null == waveformShape) {
 				waveformShape = new WaveformShape(renderGroup, waveformWidth, Color.LABEL_SELECTED,
 						Color.BLACK);
 				addShapes(waveformShape);
-			}
-		} else {
-			if (null != waveformShape) {
-				removeShape(waveformShape);
-				waveformShape = null;
 			}
 		}
 		super.setText(text);

@@ -21,7 +21,6 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 	public void onCreate(Track track) {
 		TrackButtonRow buttonRow = new TrackButtonRow(this, track);
 		track.setButtonRow(buttonRow);
-		addChild(buttonRow);
 		layoutChildren();
 	}
 

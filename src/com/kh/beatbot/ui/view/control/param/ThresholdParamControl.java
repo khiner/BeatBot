@@ -8,7 +8,6 @@ public class ThresholdParamControl extends LevelParamControl {
 		super(view);
 		levelControl = new ThresholdBar(this);
 		levelControl.setListener(this);
-		addChild(levelControl);
 	}
 
 	@Override
