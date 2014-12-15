@@ -12,6 +12,7 @@ import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.midi.TouchedNotes;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.Line;
 import com.kh.beatbot.ui.shape.Rectangle;
@@ -39,7 +40,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	private RoundedRect horizontalScrollBar;
 
 	// map of pointerIds to the notes they are selecting
-	private Map<Integer, MidiNote> touchedNotes = new HashMap<Integer, MidiNote>();
+	private TouchedNotes touchedNotes = new TouchedNotes();
 	// map of pointerIds to the original on-ticks of the notes they are touching (before dragging)
 	private Map<Integer, Float> startOnTicks = new HashMap<Integer, Float>();
 
@@ -219,12 +220,12 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		} else if (touchedNotes.isEmpty()) {
 			// no midi selected. scroll, zoom, or update select region
 			noMidiMove();
-		} else if (touchedNotes.containsKey(id)) { // at least one midi selected
+		} else if (touchedNotes.get(id) != null) { // at least one midi selected
 			int note = yToNote(pos.y);
 			float tick = xToTick(pos.x);
 			if (touchedNotes.size() == 1) {
 				// exactly one pointer not dragging loop markers - drag all selected notes together
-				dragNotes(true, touchedNotes.keySet().iterator().next(), note, tick);
+				dragNotes(true, touchedNotes.keyAt(0), note, tick);
 				// make room in the view window if we are dragging out of the view
 				scrollHelper.updateView(tick);
 			} else if (touchedNotes.size() > 1) { // drag each touched note separately

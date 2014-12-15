@@ -7,6 +7,7 @@ import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.midi.TouchedNotes;
 import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -16,7 +17,6 @@ import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.control.ValueLabel;
 
 public class NoteLevelsView extends TouchableView {
-
 	private static class DragLine {
 		private static float m = 0, b = 0, leftTick = 0, rightTick = Float.MAX_VALUE,
 				leftLevel = 0, rightLevel = 0;
@@ -35,7 +35,7 @@ public class NoteLevelsView extends TouchableView {
 			LEVEL_BAR_WIDTH = LEVEL_POINT_SIZE / 2;
 
 	// map of pointerIds to the notes they are selecting
-	private Map<Integer, MidiNote> touchedLevels = new HashMap<Integer, MidiNote>();
+	private TouchedNotes touchedNotes = new TouchedNotes();
 
 	// map Midi Note to the offset of their level relative to the touched level(s)
 	private Map<MidiNote, Float> levelOffsets = new HashMap<MidiNote, Float>();
@@ -64,11 +64,11 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	public void clearTouchedLevels() {
-		touchedLevels.clear();
+		touchedNotes.clear();
 	}
 
 	public MidiNote getTouchedLevel(int id) {
-		return touchedLevels.get(id);
+		return touchedNotes.get(id);
 	}
 
 	protected void drawLevel(MidiNote midiNote, float[] levelColor, float[] levelColorTrans) {
@@ -128,19 +128,19 @@ public class NoteLevelsView extends TouchableView {
 				// been selected, make it the only selected level.
 				// If we are multi-selecting, add it to the selected list
 				if (!midiNote.isSelected()) {
-					if (touchedLevels.isEmpty()) {
+					if (touchedNotes.isEmpty()) {
 						TrackManager.deselectAllNotes();
 					}
 					midiNote.setSelected(true);
 				}
 				valueLabel.show();
 				updateValueLabel(midiNote);
-				touchedLevels.put(pointerId, midiNote);
+				touchedNotes.put(pointerId, midiNote);
 				updateLevelOffsets();
 				return true;
 			}
 		}
-		if (touchedLevels.isEmpty()) {
+		if (touchedNotes.isEmpty()) {
 			TrackManager.deselectAllNotes();
 		}
 		return false;
@@ -167,19 +167,19 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	private void updateDragLine() {
-		int touchedSize = touchedLevels.values().size();
+		int touchedSize = touchedNotes.size();
 		if (touchedSize == 1) {
 			DragLine.m = 0;
-			MidiNote touched = (MidiNote) touchedLevels.values().toArray()[0];
+			MidiNote touched = (MidiNote) touchedNotes.valueAt(0);
 			DragLine.b = touched.getLinearLevel(currLevelType);
 			DragLine.leftTick = 0;
 			DragLine.rightTick = Float.MAX_VALUE;
 			DragLine.leftLevel = DragLine.rightLevel = touched.getLinearLevel(currLevelType);
 		} else if (touchedSize == 2) {
-			MidiNote leftLevel = touchedLevels.get(0).getOnTick() < touchedLevels.get(1)
-					.getOnTick() ? touchedLevels.get(0) : touchedLevels.get(1);
-			MidiNote rightLevel = touchedLevels.get(0).getOnTick() < touchedLevels.get(1)
-					.getOnTick() ? touchedLevels.get(1) : touchedLevels.get(0);
+			MidiNote first = touchedNotes.valueAt(0);
+			MidiNote second = touchedNotes.valueAt(1);
+			MidiNote leftLevel = first.getOnTick() < second.getOnTick() ? first : second;
+			MidiNote rightLevel = first.getOnTick() < second.getOnTick() ? second : first;
 			DragLine.m = (rightLevel.getLinearLevel(currLevelType) - leftLevel
 					.getLinearLevel(currLevelType))
 					/ (rightLevel.getOnTick() - leftLevel.getOnTick());
@@ -264,14 +264,14 @@ public class NoteLevelsView extends TouchableView {
 
 	@Override
 	public void handleActionPointerUp(int id, Pointer pos) {
-		touchedLevels.remove(id);
+		touchedNotes.remove(id);
 		updateLevelOffsets();
 	}
 
 	@Override
 	public void handleActionMove(int id, Pointer pos) {
-		if (!touchedLevels.isEmpty()) {
-			MidiNote touched = touchedLevels.get(id);
+		if (!touchedNotes.isEmpty()) {
+			MidiNote touched = touchedNotes.get(id);
 			if (touched != null) {
 				touched.setLevel(currLevelType, GeneralUtils.linearToByte(yToLevel(pos.y)));
 				updateValueLabel(touched);
