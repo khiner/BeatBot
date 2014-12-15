@@ -1,7 +1,6 @@
 package com.kh.beatbot.ui.view;
 
-import java.util.HashMap;
-import java.util.Map;
+import android.util.SparseArray;
 
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
@@ -42,7 +41,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	// map of pointerIds to the notes they are selecting
 	private TouchedNotes touchedNotes = new TouchedNotes();
 	// map of pointerIds to the original on-ticks of the notes they are touching (before dragging)
-	private Map<Integer, Float> startOnTicks = new HashMap<Integer, Float>();
+	private SparseArray<Float> startOnTicks = new SparseArray<Float>();
 
 	protected ScrollHelper scrollHelper;
 	public ColorTransition scrollBarColorTrans = new ColorTransition(20, 20, Color.TRANSPARENT,
