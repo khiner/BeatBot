@@ -1,34 +1,55 @@
 package com.kh.beatbot.event.midinotes;
 
+import com.kh.beatbot.event.Executable;
+import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 
-public class MidiNotesMoveEvent extends MidiNotesEvent {
+public class MidiNotesMoveEvent implements Stateful, Executable {
 
-	protected long tickDiff;
-	protected int noteDiff;
+	protected long beginOnTick, beginOffTick, endOnTick, endOffTick;
+	protected int beginNoteValue, endNoteValue;
 
-	public MidiNotesMoveEvent(MidiNote midiNote, int noteDiff, long tickDiff) {
-		super(midiNote);
-		this.noteDiff = noteDiff;
-		this.tickDiff = tickDiff;
+	public MidiNotesMoveEvent(int beginNoteValue, long beginOnTick, long beginOffTick,
+			int endNoteValue, long endOnTick, long endOffTick) {
+		this.beginNoteValue = beginNoteValue;
+		this.beginOnTick = beginOnTick;
+		this.beginOffTick = beginOffTick;
+		this.endNoteValue = endNoteValue;
+		this.endOnTick = endOnTick;
+		this.endOffTick = endOffTick;
 	}
 
-	public MidiNotesMoveEvent(int noteDiff, long tickDiff) {
-		this.noteDiff = noteDiff;
-		this.tickDiff = tickDiff;
+	@Override
+	public void undo() {
+		new MidiNotesMoveEvent(endNoteValue, endOnTick, endOffTick, beginNoteValue, beginOnTick,
+				beginOffTick).doExecute();
+	}
+
+	@Override
+	public void redo() {
+		doExecute();
 	}
 
 	public void execute() {
-		if (null != midiNotes && !midiNotes.isEmpty()) {
-			for (MidiNote midiNote : midiNotes) {
-				TrackManager.moveNote(midiNote, noteDiff, tickDiff);
-			}
-		} else {
-			TrackManager.moveSelectedNotes(noteDiff, tickDiff);
+		doExecute();
+		MidiNotesEventManager.eventCompleted(this);
+	}
+
+	public void doExecute() {
+		MidiNote midiNote = MidiManager.findNote(beginNoteValue, beginOnTick);
+
+		if (midiNote != null) {
+			TrackManager.saveNoteTicks();
+
+			midiNote.setSelected(true);
+			midiNote.setNote(endNoteValue);
+			midiNote.setTicks(endOnTick, endOffTick);
+
+			MidiManager.handleMidiCollisions();
+			midiNote.setSelected(false);
+			TrackManager.finalizeNoteTicks();
 		}
-		
-		MidiManager.handleMidiCollisions();
 	}
 }

@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view.group;
 import android.widget.Toast;
 
 import com.kh.beatbot.event.EventManager;
+import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.StatefulEventListener;
@@ -63,7 +64,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 			@Override
 			public void onRelease(Button button) {
 				EventManager.undo();
-				onEventCompleted();
+				onEventCompleted(null);
 			}
 		});
 
@@ -71,7 +72,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 			@Override
 			public void onRelease(Button button) {
 				EventManager.redo();
-				onEventCompleted();
+				onEventCompleted(null);
 			}
 		});
 
@@ -138,7 +139,8 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 	}
 
 	@Override
-	public void onMove(MidiNote note) {
+	public void onMove(MidiNote note, int beginNoteValue, long beginOnTick, long beginOffTick,
+			int endNoteValue, long endOnTick, long endOffTick) {
 		// no-op
 	}
 
@@ -158,7 +160,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 	}
 
 	@Override
-	public void onEventCompleted() {
+	public void onEventCompleted(Stateful event) {
 		updateStateStackIcons(EventManager.canUndo(), EventManager.canRedo());
 	}
 }

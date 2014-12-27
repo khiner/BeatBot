@@ -25,12 +25,12 @@ public class TrackLevelsSetEvent implements Stateful, Temporal {
 	}
 
 	@Override
-	public void doUndo() {
+	public void undo() {
 		initialLevels.setTrackLevels(track);
 	}
 
 	@Override
-	public void doRedo() {
+	public void redo() {
 		finalLevels.setTrackLevels(track);
 	}
 

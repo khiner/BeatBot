@@ -5,12 +5,7 @@ import java.util.List;
 
 import com.kh.beatbot.Track;
 import com.kh.beatbot.event.TrackCreateEvent;
-import com.kh.beatbot.event.midinotes.MidiNotesCreateEvent;
-import com.kh.beatbot.event.midinotes.MidiNotesDestroyEvent;
-import com.kh.beatbot.event.midinotes.MidiNotesGroupEvent;
-import com.kh.beatbot.event.midinotes.MidiNotesLevelsSetEvent;
-import com.kh.beatbot.event.midinotes.MidiNotesMoveEvent;
-import com.kh.beatbot.event.midinotes.SelectedMidiNotesPinchEvent;
+import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.file.MidiFile;
 import com.kh.beatbot.listener.LoopWindowListener;
 import com.kh.beatbot.midi.MidiNote;
@@ -38,7 +33,6 @@ public class MidiManager {
 	private static List<MidiNote> copiedNotes = new ArrayList<MidiNote>(),
 			currState = new ArrayList<MidiNote>();
 
-	private static MidiNotesGroupEvent currNoteEvent;
 	private static List<LoopWindowListener> loopChangeListeners = new ArrayList<LoopWindowListener>();
 
 	public static void init() {
@@ -79,43 +73,30 @@ public class MidiManager {
 		return (int) bpm;
 	}
 
-	public static synchronized void beginMidiEvent(Track track) {
-		endMidiEvent();
-		currNoteEvent = track == null ? new MidiNotesGroupEvent() : new MidiNotesLevelsSetEvent(
-				track);
-		currNoteEvent.begin();
-	}
-
-	public static synchronized void endMidiEvent() {
-		if (currNoteEvent != null) {
-			currNoteEvent.end();
-			currNoteEvent = null;
-		}
-	}
-
 	public static MidiNote addNote(long onTick, long offTick, int note) {
-		return addNote(onTick, offTick, note, MidiEvent.HALF_LEVEL, MidiEvent.HALF_LEVEL, MidiEvent.HALF_LEVEL);
+		return addNote(onTick, offTick, note, MidiEvent.HALF_LEVEL, MidiEvent.HALF_LEVEL,
+				MidiEvent.HALF_LEVEL);
 	}
 
-	public static MidiNote addNote(long onTick, long offTick, int note, byte velocity, byte pan,
+	private static MidiNote addNote(long onTick, long offTick, int note, byte velocity, byte pan,
 			byte pitch) {
 		NoteOn on = new NoteOn(onTick, 0, note, velocity, pan, pitch);
 		NoteOff off = new NoteOff(offTick, 0, note, velocity, pan, pitch);
-		return addNote(on, off);
-	}
-
-	private static MidiNote addNote(NoteOn on, NoteOff off) {
 		MidiNote midiNote = new MidiNote(on, off);
-		addNote(midiNote);
+		MidiNotesEventManager.createNote(midiNote);
 		return midiNote;
 	}
 
-	private static void addNote(MidiNote midiNote) {
-		new MidiNotesCreateEvent(midiNote).execute();
+	public static MidiNote findNote(int noteValue, long onTick) {
+		Track track = TrackManager.getTrack(noteValue);
+		if (null == track)
+			return null;
+
+		return track.findNote(onTick);
 	}
 
 	public static void deleteNote(MidiNote midiNote) {
-		new MidiNotesDestroyEvent(midiNote).execute();
+		MidiNotesEventManager.destroyNote(midiNote);
 	}
 
 	public static void copy() {
@@ -142,28 +123,35 @@ public class MidiManager {
 					+ tickOffset);
 		}
 
-		beginMidiEvent(null);
-		new MidiNotesCreateEvent(copiedNotes).execute();
-		endMidiEvent();
+		MidiNotesEventManager.createNotes(copiedNotes);
 		copiedNotes.clear();
 	}
 
 	public static void deleteSelectedNotes() {
-		beginMidiEvent(null);
-		new MidiNotesDestroyEvent(TrackManager.getSelectedNotes()).execute();
-		endMidiEvent();
+		MidiNotesEventManager.destroyNotes(TrackManager.getSelectedNotes());
 	}
 
 	public static void moveNote(MidiNote note, int noteDiff, long tickDiff) {
-		new MidiNotesMoveEvent(note, noteDiff, tickDiff).execute();
+		if (noteDiff != 0 || tickDiff != 0) {
+			TrackManager.moveNote(note, noteDiff, tickDiff);
+			handleMidiCollisions();
+		}
 	}
 
 	public static void moveSelectedNotes(int noteDiff, long tickDiff) {
-		new MidiNotesMoveEvent(noteDiff, tickDiff).execute();
+		if (noteDiff != 0 || tickDiff != 0) {
+			for (MidiNote selectedNote : TrackManager.getSelectedNotes()) {
+				TrackManager.moveNote(selectedNote, noteDiff, tickDiff);
+			}
+			handleMidiCollisions();
+		}
 	}
 
 	public static void pinchSelectedNotes(long onTickDiff, long offTickDiff) {
-		new SelectedMidiNotesPinchEvent(onTickDiff, offTickDiff).execute();
+		if (onTickDiff != 0 || offTickDiff != 0) {
+			TrackManager.pinchSelectedNotes(onTickDiff, offTickDiff);
+			handleMidiCollisions();
+		}
 	}
 
 	public static int getBeatDivision() {
@@ -261,13 +249,10 @@ public class MidiManager {
 			}
 		}
 
-		beginMidiEvent(null);
-		new MidiNotesDestroyEvent(TrackManager.getMidiNotes()).execute();
-
-		if (!newNotes.isEmpty()) {
-			new MidiNotesCreateEvent(newNotes).execute();
-		}
-		endMidiEvent();
+		MidiNotesEventManager.begin();
+		MidiNotesEventManager.destroyNotes(TrackManager.getMidiNotes());
+		MidiNotesEventManager.createNotes(newNotes);
+		MidiNotesEventManager.end();
 	}
 
 	public static void setLoopBeginTick(long loopBeginTick) {

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.kh.beatbot.effect.Effect.LevelType;
-import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.event.midinotes.MidiNotesLevelsSetEvent;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.TouchedNotes;
@@ -49,6 +49,8 @@ public class NoteLevelsView extends TouchableView {
 	private ValueLabel valueLabel;
 
 	private static RenderGroup levelBarGroup = new RenderGroup();
+
+	private MidiNotesLevelsSetEvent levelsSetEvent = null;
 
 	public NoteLevelsView(View view) {
 		super(view);
@@ -288,7 +290,8 @@ public class NoteLevelsView extends TouchableView {
 	@Override
 	public void handleActionDown(int id, Pointer pos) {
 		super.handleActionDown(id, pos);
-		MidiManager.beginMidiEvent(TrackManager.currTrack);
+		levelsSetEvent = new MidiNotesLevelsSetEvent(TrackManager.currTrack);
+		levelsSetEvent.begin();
 		if (!selectLevel(id, pos)) {
 			startSelectRegion(pos);
 		}
@@ -305,7 +308,12 @@ public class NoteLevelsView extends TouchableView {
 		clearTouchedLevels();
 		selectRegionRect.setFillColor(Color.TRANSPARENT);
 		valueLabel.hide();
-		MidiManager.endMidiEvent();
+		if (null != levelsSetEvent) {
+			levelsSetEvent.end();
+			levelsSetEvent.execute(); // TODO unnecessary levels set happens here, but needed for
+										// notifications
+			levelsSetEvent = null;
+		}
 	}
 
 	@Override

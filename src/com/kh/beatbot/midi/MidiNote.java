@@ -1,10 +1,7 @@
 package com.kh.beatbot.midi;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.kh.beatbot.effect.Effect.LevelType;
-import com.kh.beatbot.listener.MidiNoteListener;
+import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
@@ -14,34 +11,26 @@ import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.view.View;
 
 public class MidiNote implements Comparable<MidiNote> {
-
-	private Rectangle rectangle;
+	// private Rectangle rectangle;
 	private NoteOn noteOn;
 	private NoteOff noteOff;
 	private boolean selected = false, touched = false;
 
-	// order matters - notify tracks of deletion before UI
-	private List<MidiNoteListener> listeners = new ArrayList<MidiNoteListener>();
+	private transient Rectangle rectangle;
+
 	// while moving notes in the ui, they can overlap, but we keep
 	// a memory of the old note ticks while we manipulate the new note ticks
 	private long savedOnTick, savedOffTick;
 
 	public MidiNote(NoteOn noteOn, NoteOff noteOff) {
-		this(noteOn, noteOff, true);
-	}
-
-	private MidiNote(NoteOn noteOn, NoteOff noteOff, boolean notifyCreate) {
 		this.noteOn = noteOn;
 		this.noteOff = noteOff;
 		savedOnTick = savedOffTick = -1;
-		listeners.add(TrackManager.get());
-		listeners.add(View.mainPage);
 	}
 
 	public void create() {
 		selected = true;
 		notifyCreated();
-		notifyMoved();
 	}
 
 	public void destroy() {
@@ -66,20 +55,12 @@ public class MidiNote implements Comparable<MidiNote> {
 		savedOnTick = savedOffTick = -1;
 	}
 
-	public Rectangle getRectangle() {
-		return rectangle;
-	}
-
-	public void setRectangle(Rectangle rectangle) {
-		this.rectangle = rectangle;
-	}
-
 	public MidiNote getCopy() {
 		NoteOn noteOnCopy = new NoteOn(noteOn.getTick(), 0, noteOn.getNoteValue(),
 				noteOn.getVelocity(), noteOn.getPan(), noteOn.getPitch());
 		NoteOff noteOffCopy = new NoteOff(noteOff.getTick(), 0, noteOff.getNoteValue(),
 				noteOff.getVelocity(), noteOff.getPan(), noteOn.getPitch());
-		MidiNote copy = new MidiNote(noteOnCopy, noteOffCopy, false);
+		MidiNote copy = new MidiNote(noteOnCopy, noteOffCopy);
 		copy.setSelected(selected);
 		copy.setTouched(touched);
 		copy.savedOnTick = this.savedOnTick;
@@ -139,24 +120,41 @@ public class MidiNote implements Comparable<MidiNote> {
 	}
 
 	public void setTicks(long onTick, long offTick) {
+		long prevOnTick = getOnTick();
+		long prevOffTick = getOffTick();
+
 		noteOn.setTick(onTick >= 0 ? onTick : 0);
 		if (offTick > getOnTick()) {
 			noteOff.setTick(offTick);
 		}
-		notifyMoved();
+
+		if (prevOnTick != getOnTick() || prevOffTick != getOffTick()) {
+			notifyMoved(getNoteValue(), prevOnTick, prevOffTick, getNoteValue(), getOnTick(),
+					getOffTick());
+		}
 	}
 
 	public void setNote(int note) {
-		if (note < 0 || noteOn.getNoteValue() == note)
+		if (note < 0 || getNoteValue() == note)
 			return;
 
+		int prevNoteValue = getNoteValue();
 		noteOn.setNoteValue(note);
 		noteOff.setNoteValue(note);
-		notifyMoved();
+		notifyMoved(prevNoteValue, getOnTick(), getOffTick(), getNoteValue(), getOnTick(),
+				getOffTick());
 	}
 
 	public long getNoteLength() {
 		return noteOff.getTick() - noteOn.getTick();
+	}
+
+	public Rectangle getRectangle() {
+		return rectangle;
+	}
+
+	public void setRectangle(Rectangle rectangle) {
+		this.rectangle = rectangle;
 	}
 
 	public byte getLevel(LevelType levelType) {
@@ -223,27 +221,28 @@ public class MidiNote implements Comparable<MidiNote> {
 	}
 
 	private void notifyCreated() {
-		for (MidiNoteListener listener : listeners) {
-			listener.onCreate(this);
-		}
+		TrackManager.get().onCreate(this);
+		View.mainPage.onCreate(this);
 	}
 
 	private void notifyDestroyed() {
-		for (MidiNoteListener listener : listeners) {
-			listener.onDestroy(this);
-		}
+		TrackManager.get().onDestroy(this);
+		View.mainPage.onDestroy(this);
 	}
 
-	private void notifyMoved() {
-		for (MidiNoteListener listener : listeners) {
-			listener.onMove(this);
-		}
+	private void notifyMoved(int beginNoteValue, long beginOnTick, long beginOffTick,
+			int endNoteValue, long endOnTick, long endOffTick) {
+		TrackManager.get().onMove(this, beginNoteValue, beginOnTick, beginOffTick, endNoteValue,
+				endOnTick, endOffTick);
+		View.mainPage.onMove(this, beginNoteValue, beginOnTick, beginOffTick, endNoteValue,
+				endOnTick, endOffTick);
+		MidiNotesEventManager.onMove(beginNoteValue, beginOnTick, beginOffTick, endNoteValue,
+				endOnTick, endOffTick);
 	}
 
 	private void notifySelectStateChanged() {
-		for (MidiNoteListener listener : listeners) {
-			listener.onSelectStateChange(this);
-		}
+		TrackManager.get().onSelectStateChange(this);
+		View.mainPage.onSelectStateChange(this);
 	}
 
 	private void setVelocity(byte velocity) {
@@ -259,5 +258,48 @@ public class MidiNote implements Comparable<MidiNote> {
 	private void setPitch(byte pitch) {
 		noteOn.setPitch(pitch);
 		noteOff.setPitch(pitch);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((noteOff == null) ? 0 : noteOff.hashCode());
+		result = prime * result + ((noteOn == null) ? 0 : noteOn.hashCode());
+		result = prime * result + (int) (savedOffTick ^ (savedOffTick >>> 32));
+		result = prime * result + (int) (savedOnTick ^ (savedOnTick >>> 32));
+		result = prime * result + (selected ? 1231 : 1237);
+		result = prime * result + (touched ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MidiNote other = (MidiNote) obj;
+		if (noteOff == null) {
+			if (other.noteOff != null)
+				return false;
+		} else if (!noteOff.equals(other.noteOff))
+			return false;
+		if (noteOn == null) {
+			if (other.noteOn != null)
+				return false;
+		} else if (!noteOn.equals(other.noteOn))
+			return false;
+		if (savedOffTick != other.savedOffTick)
+			return false;
+		if (savedOnTick != other.savedOnTick)
+			return false;
+		if (selected != other.selected)
+			return false;
+		if (touched != other.touched)
+			return false;
+		return true;
 	}
 }

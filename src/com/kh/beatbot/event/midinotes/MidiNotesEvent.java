@@ -4,14 +4,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.kh.beatbot.event.Executable;
+import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.midi.MidiNote;
 
-public abstract class MidiNotesEvent implements Executable {
+public abstract class MidiNotesEvent implements Stateful, Executable {
 
-	protected List<MidiNote> midiNotes;
-
-	public MidiNotesEvent() {
-	}
+	protected final List<MidiNote> midiNotes;
 
 	public MidiNotesEvent(MidiNote midiNote) {
 		this.midiNotes = Arrays.asList(midiNote);

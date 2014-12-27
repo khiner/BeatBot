@@ -74,8 +74,10 @@ public class MainPage extends TouchableView implements MidiNoteListener {
 	}
 
 	@Override
-	public void onMove(MidiNote note) {
-		midiViewGroup.midiView.onMove(note);
+	public void onMove(MidiNote note, int beginNoteValue, long beginOnTick, long beginOffTick,
+			int endNoteValue, long endOnTick, long endOffTick) {
+		midiViewGroup.midiView.onMove(note, beginNoteValue, beginOnTick, endOffTick, endNoteValue,
+				endOnTick, endOffTick);
 	}
 
 	@Override

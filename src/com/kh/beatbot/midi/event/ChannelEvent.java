@@ -126,6 +126,46 @@ public class ChannelEvent extends MidiEvent {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) mTick;
+		result = prime * result + mChannel;
+		result = prime * result + mType;
+		result = prime * result + note;
+		result = prime * result + pan;
+		result = prime * result + pitch;
+		result = prime * result + velocity;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ChannelEvent other = (ChannelEvent) obj;
+		if (mTick != other.mTick)
+			return false;
+		if (mChannel != other.mChannel)
+			return false;
+		if (mType != other.mType)
+			return false;
+		if (note != other.note)
+			return false;
+		if (pan != other.pan)
+			return false;
+		if (pitch != other.pitch)
+			return false;
+		if (velocity != other.velocity)
+			return false;
+		return true;
+	}
+
+	@Override
 	public boolean requiresStatusByte(MidiEvent prevEvent) {
 		if (prevEvent == null) {
 			return true;

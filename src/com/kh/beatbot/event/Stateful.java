@@ -1,7 +1,7 @@
 package com.kh.beatbot.event;
 
 public interface Stateful {
-	public abstract void doUndo();
+	public abstract void undo();
 
-	public abstract void doRedo();
+	public abstract void redo();
 }

@@ -7,15 +7,15 @@ public class TrackCreateEvent implements Executable, Stateful {
 
 	private Track createdTrack = null;
 
+	public TrackCreateEvent() {
+	}
+
 	public TrackCreateEvent(Track track) {
 		this.createdTrack = track;
 	}
 
-	public TrackCreateEvent() {
-	}
-
 	@Override
-	public void doUndo() {
+	public void undo() {
 		if (createdTrack != null) {
 			TrackDestroyEvent trackDestroyEvent = new TrackDestroyEvent(createdTrack);
 			trackDestroyEvent.doExecute();
@@ -23,7 +23,7 @@ public class TrackCreateEvent implements Executable, Stateful {
 	}
 
 	@Override
-	public void doRedo() {
+	public void redo() {
 		doExecute();
 	}
 

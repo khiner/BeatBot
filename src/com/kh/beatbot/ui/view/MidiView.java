@@ -4,6 +4,7 @@ import android.util.SparseArray;
 
 import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.Track;
+import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.listener.LoopWindowListener;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.TrackListener;
@@ -158,18 +159,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		horizontalScrollBar.setFillColor(scrollBarColorTrans.getColor());
 	}
 
-	public void layoutNotes() {
-		for (Track track : TrackManager.getTracks()) {
-			for (MidiNote note : track.getMidiNotes()) {
-				onMove(note);
-			}
-		}
-	}
-
 	@Override
 	public void handleActionDown(int id, Pointer pos) {
 		super.handleActionDown(id, pos);
-		MidiManager.beginMidiEvent(null);
+		MidiNotesEventManager.begin();
 		selectMidiNote(id, pos);
 		if (touchedNotes.get(id) == null) { // no note selected. enable scrolling
 			scrollHelper.setScrollAnchor(id, xToTick(pos.x), pos.y + scrollHelper.yOffset);
@@ -259,7 +252,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		stopSelectRegion();
 		startOnTicks.clear();
 		touchedNotes.clear();
-		MidiManager.endMidiEvent();
+		MidiNotesEventManager.end();
 	}
 
 	@Override
@@ -352,7 +345,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		float x = tickToUnscaledX(scrollHelper.xOffset);
 		float w = tickToUnscaledX(scrollHelper.numTicks);
 		horizontalScrollBar.setCornerRadius(rad);
-		horizontalScrollBar.layout(absoluteX + x, absoluteY + getTotalTrackHeight() - 2.5f * rad, w, 2 * rad);
+		horizontalScrollBar.layout(absoluteX + x, absoluteY + getTotalTrackHeight() - 2.5f * rad,
+				w, 2 * rad);
 		horizontalScrollBar.bringToTop();
 	}
 
@@ -462,7 +456,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			line.setDimensions(2, lineHeight);
 		}
 		layoutTrackRects();
-		horizontalScrollBar.setPosition(horizontalScrollBar.x, absoluteY + trackHeight - 2.5f * horizontalScrollBar.cornerRadius);
+		horizontalScrollBar.setPosition(horizontalScrollBar.x, absoluteY + trackHeight - 2.5f
+				* horizontalScrollBar.cornerRadius);
 	}
 
 	private void selectRegion(Pointer pos) {
@@ -572,12 +567,12 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public void onCreate(MidiNote note) {
-		if (null == note.getRectangle()) {
+		if (note.getRectangle() == null) {
 			Rectangle noteRect = new Rectangle(MidiViewGroup.translateScaleGroup, whichColor(note),
 					Color.BLACK);
 			note.setRectangle(noteRect);
 			addShapes(noteRect);
-			onMove(note);
+			layoutNoteRectangle(note);
 		}
 	}
 
@@ -588,9 +583,23 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	@Override
-	public void onMove(MidiNote note) {
-		if (null != note.getRectangle()) {
-			note.getRectangle().layout(tickToUnscaledX(note.getOnTick()),
+	public void onMove(MidiNote note, int beginNoteValue, long beginOnTick, long beginOffTick,
+			int endNoteValue, long endOnTick, long endOffTick) {
+		layoutNoteRectangle(note);
+	}
+
+	private void layoutNotes() {
+		for (Track track : TrackManager.getTracks()) {
+			for (MidiNote note : track.getMidiNotes()) {
+				layoutNoteRectangle(note);
+			}
+		}
+	}
+
+	private void layoutNoteRectangle(MidiNote note) {
+		Rectangle rectangle = note.getRectangle();
+		if (rectangle != null) {
+			rectangle.layout(tickToUnscaledX(note.getOnTick()),
 					absoluteY + noteToUnscaledY(note.getNoteValue()),
 					tickToUnscaledX(note.getOffTick() - note.getOnTick()), trackHeight);
 		}
@@ -598,9 +607,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public void onSelectStateChange(MidiNote note) {
-		if (note.getRectangle() != null) {
-			note.getRectangle().setFillColor(whichColor(note));
-			note.getRectangle().bringToTop();
+		Rectangle rectangle = note.getRectangle();
+		if (rectangle != null) {
+			rectangle.setFillColor(whichColor(note));
+			rectangle.bringToTop();
 		}
 		// loop/tick lines always display ontop of notes
 		currTickLine.bringToTop();

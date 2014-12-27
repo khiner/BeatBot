@@ -234,11 +234,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		Track track = getTrack(note);
 		if (null != track) {
 			track.moveNote(note, noteDiff, tickDiff);
-			track.removeNote(note);
-			track = getTrack(note);
-			if (null != track) {
-				track.addNote(note);
-			}
 		}
 	}
 
@@ -534,8 +529,14 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	@Override
-	public void onMove(MidiNote note) {
-		// no-op
+	public void onMove(MidiNote note, int beginNoteValue, long beginOnTick, long beginOffTick,
+			int endNoteValue, long endOnTick, long endOffTick) {
+		Track oldTrack = getTrack(beginNoteValue);
+		Track newTrack = getTrack(endNoteValue);
+		if (null != oldTrack)
+			oldTrack.removeNote(note);
+		if (null != newTrack)
+			newTrack.addNote(note);
 	}
 
 	@Override

@@ -14,7 +14,22 @@ public class MidiNotesDestroyEvent extends MidiNotesEvent {
 		super(midiNotes);
 	}
 
+	@Override
+	public void undo() {
+		new MidiNotesCreateEvent(midiNotes).doExecute();
+	}
+
+	@Override
+	public void redo() {
+		doExecute();
+	}
+
 	public void execute() {
+		doExecute();
+		MidiNotesEventManager.eventCompleted(this);
+	}
+	
+	public void doExecute() {
 		for (MidiNote midiNote : midiNotes) {
 			midiNote.destroy();
 		}

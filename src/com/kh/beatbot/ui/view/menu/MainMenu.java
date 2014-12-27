@@ -148,7 +148,8 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 
 	@Override
 	public boolean accept(File file) {
-		return file.getName().toLowerCase().endsWith(".midi");
+		String fileName = file.getName().toLowerCase();
+		return fileName.endsWith(".midi") || fileName.endsWith(".bb");
 	}
 
 	@Override

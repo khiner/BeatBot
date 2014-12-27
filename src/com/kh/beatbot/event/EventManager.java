@@ -27,13 +27,13 @@ public class EventManager {
 
 	public static final void undo() {
 		if (canUndo()) {
-			events.get(currEventIndex--).doUndo();	
+			events.get(currEventIndex--).undo();	
 		}
 	}
 
 	public static final void redo() {
 		if (canRedo()) {
-			events.get(++currEventIndex).doRedo();
+			events.get(++currEventIndex).redo();
 		}
 	}
 
@@ -47,12 +47,12 @@ public class EventManager {
 			events.remove(0); // drop the oldest event to save space
 			currEventIndex--;
 		}
-		notifyEventCompleted();
+		notifyEventCompleted(event);
 	}
 	
-	private static void notifyEventCompleted() {
+	private static void notifyEventCompleted(Stateful event) {
 		for (StatefulEventListener listener : listeners) {
-			listener.onEventCompleted();
+			listener.onEventCompleted(event);
 		}
 	}
 }

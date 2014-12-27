@@ -66,6 +66,17 @@ public class Track extends BaseTrack implements FileListener {
 		}
 	}
 
+	public MidiNote findNote(long onTick) {
+		synchronized (notes) {
+			for (MidiNote note : notes) {
+				if (note.getOnTick() == onTick) {
+					return note;
+				}
+			}
+			return null;
+		}
+	}
+
 	private void updateADSR() {
 		adsr.update();
 	}
@@ -97,12 +108,11 @@ public class Track extends BaseTrack implements FileListener {
 
 	public void setNoteTicks(MidiNote midiNote, long onTick, long offTick,
 			boolean maintainNoteLength) {
-		if (!notes.contains(midiNote)
-				|| (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)) {
+		if ((midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)
+				|| !notes.contains(midiNote)) {
 			return;
 		}
-		if (midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)
-			return;
+
 		if (offTick <= onTick)
 			offTick = onTick + 4;
 		if (MidiManager.isSnapToGrid()) {

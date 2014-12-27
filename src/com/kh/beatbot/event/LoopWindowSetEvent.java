@@ -22,12 +22,12 @@ public class LoopWindowSetEvent implements Stateful, Temporal {
 	}
 
 	@Override
-	public void doUndo() {
+	public void undo() {
 		MidiManager.setLoopTicks(initialBeginTick, initialEndTick);
 	}
 
 	@Override
-	public void doRedo() {
+	public void redo() {
 		MidiManager.setLoopTicks(finalBeginTick, finalEndTick);
 	}
 }

@@ -9,11 +9,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.widget.Toast;
 
+import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.file.ProjectFile;
 
 public class ProjectFileManager {
 	private static String inFileName, outFileName;
 	private static AlertDialog confirmImportAlert, fileExistsAlert;
+
+	private static ProjectFile eventTrackerFile;
 
 	public static void init(final Context context) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -43,6 +46,9 @@ public class ProjectFileManager {
 					}
 				});
 		confirmImportAlert = builder.create();
+		
+		eventTrackerFile = new ProjectFile(FileManager.projectDirectory.getAbsolutePath() + "/project");
+		EventManager.addListener(eventTrackerFile);
 	}
 
 	public static void exportProject(String fileName) {
@@ -65,10 +71,8 @@ public class ProjectFileManager {
 	}
 
 	private static void completeExport() {
-		// Create a project file with all events serialized
-		ProjectFile project = new ProjectFile();
 		try {
-			project.writeToFile(new File(getFullPathName(outFileName)));
+			eventTrackerFile.writeToFile(new File(getFullPathName(outFileName)));
 		} catch (IOException e) {
 			System.err.println(e);
 		}
@@ -76,8 +80,7 @@ public class ProjectFileManager {
 
 	private static void completeImport(Context context) {
 		try {
-			ProjectFile project = new ProjectFile(new FileInputStream(getFullPathName(inFileName)));
-			// TODO
+			new ProjectFile(new FileInputStream(getFullPathName(inFileName)));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

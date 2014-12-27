@@ -12,13 +12,13 @@ public class TrackDestroyEvent implements Executable, Stateful {
 	}
 
 	@Override
-	public void doUndo() {
+	public void undo() {
 		TrackCreateEvent createEvent = new TrackCreateEvent(track);
 		createEvent.doExecute();
 	}
 
 	@Override
-	public void doRedo() {
+	public void redo() {
 		doExecute();
 	}
 

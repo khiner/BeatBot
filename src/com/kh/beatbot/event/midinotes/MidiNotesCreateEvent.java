@@ -16,12 +16,29 @@ public class MidiNotesCreateEvent extends MidiNotesEvent {
 		super(midiNotes);
 	}
 
+	@Override
+	public void undo() {
+		new MidiNotesDestroyEvent(midiNotes).doExecute();
+	}
+
+	@Override
+	public void redo() {
+		doExecute();
+	}
+
 	public void execute() {
+		doExecute();
+		MidiNotesEventManager.eventCompleted(this);
+	}
+	
+	public void doExecute() {
+		TrackManager.saveNoteTicks();
 		TrackManager.deselectAllNotes();
 		for (MidiNote midiNote : midiNotes) {
 			midiNote.create();
 		}
 		MidiManager.handleMidiCollisions();
 		TrackManager.deselectAllNotes();
+		TrackManager.finalizeNoteTicks();
 	}
 }
