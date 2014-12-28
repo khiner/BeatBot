@@ -1,7 +1,7 @@
 package com.kh.beatbot.listener;
 
-import com.kh.beatbot.BaseTrack;
-import com.kh.beatbot.Track;
+import com.kh.beatbot.track.BaseTrack;
+import com.kh.beatbot.track.Track;
 
 public interface TrackLevelsEventListener {
 	public void onTrackLevelsChange(BaseTrack track);

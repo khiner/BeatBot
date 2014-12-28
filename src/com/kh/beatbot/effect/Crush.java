@@ -1,7 +1,7 @@
 package com.kh.beatbot.effect;
 
-import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.manager.PlaybackManager;
+import com.kh.beatbot.track.BaseTrack;
 
 public class Crush extends Effect {
 

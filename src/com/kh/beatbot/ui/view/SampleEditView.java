@@ -1,11 +1,11 @@
 package com.kh.beatbot.ui.view;
 
-import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.event.SampleLoopWindowSetEvent;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.util.GeneralUtils;
+import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.icon.IconResourceSets;

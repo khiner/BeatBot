@@ -1,6 +1,6 @@
 package com.kh.beatbot.event;
 
-import com.kh.beatbot.Track;
+import com.kh.beatbot.track.Track;
 
 public class SampleLoopWindowSetEvent implements Stateful, Temporal {
 	private Track track;

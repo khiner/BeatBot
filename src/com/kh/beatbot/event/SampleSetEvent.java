@@ -2,8 +2,8 @@ package com.kh.beatbot.event;
 
 import java.io.File;
 
-import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.view.View;
 
 public class SampleSetEvent implements Executable, Stateful {

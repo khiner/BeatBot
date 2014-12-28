@@ -2,11 +2,11 @@ package com.kh.beatbot.ui.view.page;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.event.TrackLevelsSetEvent;
 import com.kh.beatbot.listener.TouchableViewListener;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;

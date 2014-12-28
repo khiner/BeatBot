@@ -3,7 +3,6 @@ package com.kh.beatbot.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kh.beatbot.Track;
 import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.file.MidiFile;
@@ -16,6 +15,7 @@ import com.kh.beatbot.midi.event.NoteOn;
 import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
 import com.kh.beatbot.midi.util.GeneralUtils;
+import com.kh.beatbot.track.Track;
 
 public class MidiManager {
 	public static final int MIN_BPM = 45, MAX_BPM = 300,

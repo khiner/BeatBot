@@ -1,8 +1,8 @@
 package com.kh.beatbot.ui.view.page;
 
-import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.NoteLevelsView;
 import com.kh.beatbot.ui.view.View;

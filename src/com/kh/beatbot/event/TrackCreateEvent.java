@@ -1,7 +1,7 @@
 package com.kh.beatbot.event;
 
-import com.kh.beatbot.Track;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.track.Track;
 
 public class TrackCreateEvent implements Executable, Stateful {
 

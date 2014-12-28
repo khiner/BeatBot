@@ -1,6 +1,6 @@
 package com.kh.beatbot.event;
 
-import com.kh.beatbot.BaseTrack;
+import com.kh.beatbot.track.BaseTrack;
 
 public class TrackLevelsSetEvent implements Stateful, Temporal {
 	private BaseTrack track;

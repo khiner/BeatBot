@@ -3,9 +3,9 @@ package com.kh.beatbot.effect;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.track.BaseTrack;
 
 public abstract class Effect implements Comparable<Effect>, ParamListener {
 

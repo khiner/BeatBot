@@ -2,8 +2,6 @@ package com.kh.beatbot.ui.view;
 
 import android.util.SparseArray;
 
-import com.kh.beatbot.BaseTrack;
-import com.kh.beatbot.Track;
 import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.listener.LoopWindowListener;
 import com.kh.beatbot.listener.MidiNoteListener;
@@ -13,6 +11,8 @@ import com.kh.beatbot.manager.PlaybackManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.TouchedNotes;
+import com.kh.beatbot.track.BaseTrack;
+import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.Line;
 import com.kh.beatbot.ui.shape.Rectangle;

@@ -1,8 +1,8 @@
 package com.kh.beatbot.ui.view;
 
-import com.kh.beatbot.BaseTrack;
-import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.TrackListener;
+import com.kh.beatbot.track.BaseTrack;
+import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.shape.RenderGroup;
 
 public class MidiTrackView extends TouchableView implements TrackListener {

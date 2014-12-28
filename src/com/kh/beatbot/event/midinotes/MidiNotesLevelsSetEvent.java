@@ -3,12 +3,12 @@ package com.kh.beatbot.event.midinotes;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kh.beatbot.Track;
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Temporal;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.track.Track;
 
 public class MidiNotesLevelsSetEvent extends MidiNotesEvent implements Temporal {
 	private class MidiNoteLevelsDiff {

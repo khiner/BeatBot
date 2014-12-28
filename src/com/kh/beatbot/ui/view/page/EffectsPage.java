@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
-import com.kh.beatbot.BaseTrack;
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Chorus;
 import com.kh.beatbot.effect.Crush;
@@ -16,6 +15,7 @@ import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremolo;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.list.LabelList;
 import com.kh.beatbot.ui.view.list.LabelList.LabelState;

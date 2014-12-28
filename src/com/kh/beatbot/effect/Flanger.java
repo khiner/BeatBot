@@ -1,6 +1,6 @@
 package com.kh.beatbot.effect;
 
-import com.kh.beatbot.BaseTrack;
+import com.kh.beatbot.track.BaseTrack;
 
 public class Flanger extends Effect {
 	public static final String NAME = "Flanger";

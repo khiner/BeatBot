@@ -129,17 +129,17 @@ static inline void mixTracks() {
 	}
 }
 
-void Java_com_kh_beatbot_Track_previewTrack(JNIEnv *env, jclass clazz,
+void Java_com_kh_beatbot_track_Track_previewTrack(JNIEnv *env, jclass clazz,
 		jint trackNum) {
 	previewTrack(getTrack(env, clazz, trackNum));
 }
 
-void Java_com_kh_beatbot_Track_stopPreviewingTrack(JNIEnv *env, jclass clazz,
+void Java_com_kh_beatbot_track_Track_stopPreviewingTrack(JNIEnv *env, jclass clazz,
 		jint trackNum) {
 	stopPreviewingTrack(getTrack(env, clazz, trackNum));
 }
 
-void Java_com_kh_beatbot_Track_stopTrack(JNIEnv *env, jclass clazz,
+void Java_com_kh_beatbot_track_Track_stopTrack(JNIEnv *env, jclass clazz,
 		jint trackNum) {
 	stopTrack(getTrack(env, clazz, trackNum));
 }

@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.view;
 
-import com.kh.beatbot.Track;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;

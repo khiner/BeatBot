@@ -10,14 +10,14 @@ import java.util.Set;
 import android.app.AlertDialog;
 import android.content.Context;
 
-import com.kh.beatbot.BaseTrack;
-import com.kh.beatbot.Track;
 import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.listener.FileListener;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.TrackLevelsEventListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.track.BaseTrack;
+import com.kh.beatbot.track.Track;
 
 public class TrackManager implements TrackListener, FileListener, MidiNoteListener {
 	public static final int MASTER_TRACK_ID = -1;
