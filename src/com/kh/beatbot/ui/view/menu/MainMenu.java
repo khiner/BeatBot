@@ -104,8 +104,8 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		snapToGridItem.setChecked(MidiManager.isSnapToGrid());
 
 		// TODO
-		//saveProjectItem.setResourceId(IconResourceSets.SAVE_PROJECT);
-		//loadProjectItem.setResourceId(IconResourceSets.LOAD_PROJECT);
+		// saveProjectItem.setResourceId(IconResourceSets.SAVE_PROJECT);
+		// loadProjectItem.setResourceId(IconResourceSets.LOAD_PROJECT);
 		midiImportItem.setResourceId(IconResourceSets.MIDI_IMPORT);
 		midiExportItem.setResourceId(IconResourceSets.MIDI_EXPORT);
 
@@ -150,8 +150,8 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 
 	@Override
 	public boolean accept(File file) {
-		String fileName = file.getName().toLowerCase();
-		return fileName.endsWith(".midi") || fileName.endsWith(".bb");
+		return MidiFileManager.isMidiFileName(file.getName())
+				|| ProjectFileManager.isProjectFileName(file.getName());
 	}
 
 	@Override

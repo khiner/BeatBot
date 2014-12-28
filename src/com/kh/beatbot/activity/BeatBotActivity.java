@@ -137,6 +137,8 @@ public class BeatBotActivity extends Activity {
 			sampleNameInput.setText(fileToEdit.getName());
 			break;
 		case PROJECT_FILE_NAME_EDIT_DIALOG_ID:
+			projectFileNameInput.setText(ProjectFileManager.getProjectName());
+			break;
 		case MIDI_FILE_NAME_EDIT_DIALOG_ID:
 		case EXIT_DIALOG_ID:
 			break;
@@ -202,7 +204,6 @@ public class BeatBotActivity extends Activity {
 						}
 					});
 			break;
-
 		case MIDI_FILE_NAME_EDIT_DIALOG_ID:
 			midiFileNameInput = new EditText(this);
 

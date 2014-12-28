@@ -16,6 +16,7 @@ import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiTrack;
 
 public class MidiFileManager {
+	private static final String MIDI_FILE_EXTENSION = ".midi";
 	private static String inFileName, outFileName;
 	private static AlertDialog confirmImportAlert, fileExistsAlert;
 
@@ -68,6 +69,10 @@ public class MidiFileManager {
 		}
 	}
 
+	public static boolean isMidiFileName(String fileName) {
+		return fileName.toLowerCase().endsWith(MIDI_FILE_EXTENSION);
+	}
+
 	private static void completeExport() {
 		// Create a MidiFile with the tracks we created
 		ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
@@ -102,11 +107,10 @@ public class MidiFileManager {
 	}
 
 	private static String getFullPathName(String fileName) {
-		String fullPathName = FileManager.midiDirectory.getPath() + "/" + fileName;
-		if (!fileName.toLowerCase().endsWith(".midi")) {
-			fullPathName = fullPathName.concat(".MIDI");
+		if (!isMidiFileName(fileName)) {
+			fileName = fileName.concat(MIDI_FILE_EXTENSION);
 		}
 
-		return fullPathName;
+		return FileManager.midiDirectory.getPath() + "/" + fileName;
 	}
 }

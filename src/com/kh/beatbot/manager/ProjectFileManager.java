@@ -14,14 +14,19 @@ import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.file.ProjectFile;
 
 public class ProjectFileManager {
-	private static String inFileName, outFileName;
+	private static final String PROJECT_FILE_EXTENSION = ".bb";
+	private static final String WORKING_PROJECT_FILE_NAME = ".working_project";
+
+	private static String projectFileName, pendingFileName;
 	private static AlertDialog confirmLoadAlert, fileExistsAlert;
 
 	private static ProjectFile eventTrackerFile;
 
 	public static void init(final Context context) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setMessage("A project with this name already exists. Would you like to overwrite it?").setCancelable(false)
+		builder.setMessage(
+				"A project with this name already exists. Would you like to overwrite it?")
+				.setCancelable(false)
 				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						completeSave();
@@ -47,13 +52,20 @@ public class ProjectFileManager {
 					}
 				});
 		confirmLoadAlert = builder.create();
-		
-		eventTrackerFile = new ProjectFile(FileManager.projectDirectory.getAbsolutePath() + "/project");
+
+		eventTrackerFile = new ProjectFile(FileManager.projectDirectory.getAbsolutePath() + "/"
+				+ WORKING_PROJECT_FILE_NAME);
 		EventManager.addListener(eventTrackerFile);
+		
+		projectFileName = "temp_project";
+	}
+
+	public static String getProjectName() {
+		return projectFileName;
 	}
 
 	public static void saveProject(String fileName) {
-		outFileName = fileName;
+		pendingFileName = fileName;
 		if (!new File(getFullPathName(fileName)).exists()) {
 			completeSave();
 		} else {
@@ -63,7 +75,7 @@ public class ProjectFileManager {
 	}
 
 	public static void loadProject(Context context, String fileName) {
-		inFileName = fileName;
+		pendingFileName = fileName;
 		if (!TrackManager.anyNotes()) {
 			completeLoad(context);
 		} else {
@@ -71,31 +83,36 @@ public class ProjectFileManager {
 		}
 	}
 
+	public static boolean isProjectFileName(String fileName) {
+		return fileName.toLowerCase().endsWith(PROJECT_FILE_EXTENSION);
+	}
+
 	private static void completeSave() {
+		projectFileName = pendingFileName;
 		try {
-			eventTrackerFile.writeToFile(new File(getFullPathName(outFileName)));
+			eventTrackerFile.writeToFile(new File(getFullPathName(projectFileName)));
 		} catch (IOException e) {
 			System.err.println(e);
 		}
 	}
 
 	private static void completeLoad(Context context) {
+		projectFileName = pendingFileName;
 		try {
 			MidiNotesEventManager.destroyNotes(MidiManager.allNotes()); // TODO fresh state
-			new ProjectFile(new FileInputStream(getFullPathName(inFileName)));
+			new ProjectFile(new FileInputStream(getFullPathName(projectFileName)));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		Toast.makeText(context, inFileName, Toast.LENGTH_SHORT).show();
+		Toast.makeText(context, getFullPathName(projectFileName), Toast.LENGTH_SHORT).show();
 	}
 
 	private static String getFullPathName(String fileName) {
-		String fullPathName = FileManager.projectDirectory.getPath() + "/" + fileName;
-		if (!fileName.toLowerCase().endsWith(".bb")) {
-			fullPathName = fullPathName.concat(".bb");
+		if (!isProjectFileName(fileName)) {
+			fileName = fileName.concat(PROJECT_FILE_EXTENSION);
 		}
 
-		return fullPathName;
+		return FileManager.projectDirectory.getPath() + "/" + fileName;
 	}
 }
