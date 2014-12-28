@@ -1,12 +1,13 @@
 package com.kh.beatbot.event.midinotes;
 
+import com.kh.beatbot.event.Combinable;
 import com.kh.beatbot.event.Executable;
 import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 
-public class MidiNotesMoveEvent implements Stateful, Executable {
+public class MidiNotesMoveEvent implements Stateful, Executable, Combinable {
 
 	protected long beginOnTick, beginOffTick, endOnTick, endOffTick;
 	protected int beginNoteValue, endNoteValue;
@@ -51,5 +52,14 @@ public class MidiNotesMoveEvent implements Stateful, Executable {
 			midiNote.setSelected(false);
 			TrackManager.finalizeNoteTicks();
 		}
+	}
+	
+	public void combine(Combinable other) {
+		if (!(other instanceof MidiNotesMoveEvent))
+			return;
+		MidiNotesMoveEvent otherMoveEvent = (MidiNotesMoveEvent) other;
+		endNoteValue = otherMoveEvent.endNoteValue;
+		endOnTick = otherMoveEvent.endOnTick;
+		endOffTick = otherMoveEvent.endOffTick;
 	}
 }

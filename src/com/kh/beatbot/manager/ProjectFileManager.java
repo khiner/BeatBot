@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.widget.Toast;
 
 import com.kh.beatbot.event.EventManager;
+import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.file.ProjectFile;
 
 public class ProjectFileManager {
@@ -80,6 +81,7 @@ public class ProjectFileManager {
 
 	private static void completeImport(Context context) {
 		try {
+			MidiNotesEventManager.destroyNotes(MidiManager.allNotes()); // TODO fresh state
 			new ProjectFile(new FileInputStream(getFullPathName(inFileName)));
 		} catch (IOException e) {
 			e.printStackTrace();

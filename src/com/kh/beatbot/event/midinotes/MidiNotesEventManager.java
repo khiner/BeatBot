@@ -3,6 +3,7 @@ package com.kh.beatbot.event.midinotes;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kh.beatbot.event.Combinable;
 import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.manager.TrackManager;
@@ -30,7 +31,7 @@ public class MidiNotesEventManager {
 	}
 
 	public static void eventCompleted(Stateful event) {
-		if (inProgress) {
+		if (inProgress && !combineEvent(event)) {
 			midiEvents.add(event);
 		}
 	}
@@ -74,6 +75,18 @@ public class MidiNotesEventManager {
 			begin();
 			new MidiNotesDestroyEvent(midiNotes).execute();
 			end();
+		}
+	}
+	
+	private static boolean combineEvent(Stateful event) {
+		if (midiEvents.isEmpty())
+			return false;
+		Stateful latestEvent = midiEvents.get(midiEvents.size() - 1);
+		if (event instanceof Combinable && latestEvent instanceof Combinable) {
+			((Combinable)latestEvent).combine((Combinable) event);
+			return true;
+		} else {
+			return false;
 		}
 	}
 }

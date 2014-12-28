@@ -73,7 +73,7 @@ public class MidiFileManager {
 		ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
 		midiTracks.add(MidiManager.getTempoTrack());
 		midiTracks.add(new MidiTrack());
-		for (MidiNote midiNote : TrackManager.getMidiNotes()) {
+		for (MidiNote midiNote : MidiManager.allNotes()) {
 			midiTracks.get(1).insertEvent(midiNote.getOnEvent());
 			midiTracks.get(1).insertEvent(midiNote.getOffEvent());
 		}

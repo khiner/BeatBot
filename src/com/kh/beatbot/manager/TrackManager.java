@@ -127,23 +127,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		return midiNotes;
 	}
 
-	public static MidiNote getMidiNote(int trackNum, long tick) {
-		Track track = getTrack(trackNum);
-		return null == track ? null : track.getMidiNote(tick);
-	}
-
-	public static boolean notesEqual(List<MidiNote> otherNotes) {
-		List<MidiNote> notes = getMidiNotes();
-		if (notes.size() != otherNotes.size())
-			return false;
-		for (int i = 0; i < notes.size(); i++) {
-			if (notes.get(i).compareTo(otherNotes.get(i)) != 0) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	public static List<MidiNote> copySelectedNotes() {
 		List<MidiNote> selectedNotesCopy = new ArrayList<MidiNote>();
 		synchronized (tracks) {

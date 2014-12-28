@@ -510,7 +510,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	private void selectMidiNote(int pointerId, Pointer pos) {
 		final float tick = xToTick(pos.x);
-		MidiNote selectedNote = TrackManager.getMidiNote(yToNote(pos.y), (long) tick);
+		MidiNote selectedNote = MidiManager.findNoteContaining(yToNote(pos.y), (long) tick);
 
 		if (selectedNote == null || selectedNote.isTouched())
 			return;

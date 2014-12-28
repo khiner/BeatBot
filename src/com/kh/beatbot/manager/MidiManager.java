@@ -87,12 +87,18 @@ public class MidiManager {
 		return midiNote;
 	}
 
-	public static MidiNote findNote(int noteValue, long onTick) {
-		Track track = TrackManager.getTrack(noteValue);
-		if (null == track)
-			return null;
+	public static List<MidiNote> allNotes() {
+		return TrackManager.getMidiNotes();
+	}
 
-		return track.findNote(onTick);
+	public static MidiNote findNote(int noteValue, long onTick) {
+		final Track track = TrackManager.getTrack(noteValue);
+		return null == track ? null : track.findNoteStarting(onTick);
+	}
+
+	public static MidiNote findNoteContaining(int noteValue, long tick) {
+		final Track track = TrackManager.getTrack(noteValue);
+		return null == track ? null : track.findNoteContaining(tick);
 	}
 
 	public static void deleteNote(MidiNote midiNote) {
@@ -250,7 +256,7 @@ public class MidiManager {
 		}
 
 		MidiNotesEventManager.begin();
-		MidiNotesEventManager.destroyNotes(TrackManager.getMidiNotes());
+		MidiNotesEventManager.destroyNotes(allNotes());
 		MidiNotesEventManager.createNotes(newNotes);
 		MidiNotesEventManager.end();
 	}

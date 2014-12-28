@@ -66,7 +66,7 @@ public class Track extends BaseTrack implements FileListener {
 		}
 	}
 
-	public MidiNote findNote(long onTick) {
+	public MidiNote findNoteStarting(long onTick) {
 		synchronized (notes) {
 			for (MidiNote note : notes) {
 				if (note.getOnTick() == onTick) {
@@ -75,6 +75,21 @@ public class Track extends BaseTrack implements FileListener {
 			}
 			return null;
 		}
+	}
+
+	public MidiNote findNoteContaining(long tick) {
+		synchronized (notes) {
+			for (MidiNote note : notes) {
+				if (note.getOnTick() <= tick && note.getOffTick() >= tick) {
+					return note;
+				}
+			}
+			return null;
+		}
+	}
+
+	public List<MidiNote> getMidiNotes() {
+		return notes;
 	}
 
 	private void updateADSR() {
@@ -161,21 +176,6 @@ public class Track extends BaseTrack implements FileListener {
 			}
 			setNoteTicks(note, newOnTick, newOffTick, false);
 		}
-	}
-
-	public List<MidiNote> getMidiNotes() {
-		return notes;
-	}
-
-	public MidiNote getMidiNote(long tick) {
-		synchronized (notes) {
-			for (MidiNote note : notes) {
-				if (note.getOnTick() <= tick && note.getOffTick() >= tick) {
-					return note;
-				}
-			}
-		}
-		return null;
 	}
 
 	public void selectAllNotes() {
@@ -276,10 +276,10 @@ public class Track extends BaseTrack implements FileListener {
 	}
 
 	public void updateNextNote() {
-		Collections.sort(notes);
-		long currTick = MidiManager.getCurrTick();
-		MidiNote nextNote = getNextMidiNote(currTick);
-		setNextNote(id, nextNote);
+		synchronized (notes) {
+			Collections.sort(notes);
+			setNextNote(id, getNextMidiNote(MidiManager.getCurrTick()));
+		}
 	}
 
 	public MidiNote getNextMidiNote(long currTick) {
