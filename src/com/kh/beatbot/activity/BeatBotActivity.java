@@ -193,7 +193,7 @@ public class BeatBotActivity extends Activity {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							String projectFileName = projectFileNameInput.getText().toString();
-							ProjectFileManager.exportProject(projectFileName);
+							ProjectFileManager.saveProject(projectFileName);
 						}
 					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 						@Override

@@ -42,13 +42,14 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		settingsItem = new MenuItem(this, null, true);
 		snapToGridItem = new MenuItem(this, settingsItem, true);
 		((ToggleButton) snapToGridItem.button).oscillating();
+
 		saveProjectItem = new MenuItem(this, fileItem, false);
 		loadProjectItem = new FileMenuItem(this, fileItem, new File(
 				FileManager.projectDirectory.getPath()));
 
+		midiExportItem = new MenuItem(this, fileItem, false);
 		midiImportItem = new FileMenuItem(this, fileItem, new File(
 				FileManager.midiDirectory.getPath()));
-		midiExportItem = new MenuItem(this, fileItem, false);
 
 		topLevelItems.add(fileItem);
 		topLevelItems.add(settingsItem);
@@ -76,7 +77,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 			}
 		});
 
-		fileItem.addSubMenuItems(saveProjectItem, loadProjectItem, midiImportItem, midiExportItem);
+		fileItem.addSubMenuItems(saveProjectItem, loadProjectItem, midiExportItem, midiImportItem);
 		settingsItem.addSubMenuItems(snapToGridItem);
 	}
 
@@ -112,6 +113,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 
 		saveProjectItem.setText("Save project");
 		loadProjectItem.setText("Load project");
+
 		midiImportItem.setText("Import MIDI");
 		midiExportItem.setText("Export MIDI");
 	}
@@ -132,7 +134,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		if (fileItem.equals(midiImportItem))
 			MidiFileManager.importMidi(context, fileItem.getText());
 		else
-			ProjectFileManager.importProject(context, fileItem.getText());
+			ProjectFileManager.loadProject(context, fileItem.getText());
 	}
 
 	@Override

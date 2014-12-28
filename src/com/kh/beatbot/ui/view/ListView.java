@@ -36,7 +36,7 @@ public class ListView extends ScrollableView implements OnPressListener {
 		if (null != selectedButton
 				&& selectedButton.isPressed()
 				&& !(selectedButton instanceof ToggleButton && ((ToggleButton) selectedButton)
-						.isChecked()) && Math.abs(y - pos.downY) > LABEL_HEIGHT / 2) {
+						.isChecked()) && Math.abs(pos.y - pos.downY) > LABEL_HEIGHT / 2) {
 			// scrolling, release the pressed button
 			selectedButton.release();
 			shouldPropagateTouchEvents = false;
