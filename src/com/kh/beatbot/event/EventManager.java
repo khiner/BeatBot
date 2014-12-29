@@ -16,6 +16,10 @@ public class EventManager {
 		return events;
 	}
 
+	public static int getCurrentEventIndex() {
+		return currEventIndex;
+	}
+
 	public static void clearEvents() {
 		events.clear();
 		currEventIndex = -1;
@@ -35,13 +39,27 @@ public class EventManager {
 
 	public static final void undo() {
 		if (canUndo()) {
-			events.get(currEventIndex--).undo();	
+			events.get(currEventIndex--).undo();
+			notifyEventCompleted(null);
 		}
 	}
 
 	public static final void redo() {
 		if (canRedo()) {
 			events.get(++currEventIndex).redo();
+			notifyEventCompleted(null);
+		}
+	}
+
+	public static final void jumpTo(int eventIndex) {
+		if (eventIndex < 0 || eventIndex >= events.size())
+			return;
+		
+		while (currEventIndex != eventIndex) {
+			if (currEventIndex > eventIndex)
+				undo();
+			else
+				redo();
 		}
 	}
 

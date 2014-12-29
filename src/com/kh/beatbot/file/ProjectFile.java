@@ -23,11 +23,16 @@ public class ProjectFile {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
 		String serializedEvent;
 		while ((serializedEvent = reader.readLine()) != null) {
-			final Stateful event = EventJsonFactory.fromJson(serializedEvent);
-			// XXX not using simple execute() since midi events won't make it to the EventManager
-			// if there's no batch midi event
-			((Executable) event).doExecute();
-			EventManager.eventCompleted(event);
+			try {
+				Integer eventIndex = Integer.valueOf(serializedEvent);
+				EventManager.jumpTo(eventIndex);
+			} catch (NumberFormatException e) { // this is an event, not the event index
+				final Stateful event = EventJsonFactory.fromJson(serializedEvent);
+				// XXX not using simple execute() since midi events won't make it to the
+				// EventManager if there's no batch midi event
+				((Executable) event).doExecute();
+				EventManager.eventCompleted(event);
+			}
 		}
 		reader.close();
 	}
@@ -38,6 +43,8 @@ public class ProjectFile {
 			String eventJson = EventJsonFactory.toJson(event) + "\n";
 			outputStream.write(eventJson.getBytes());
 		}
+
+		outputStream.write(String.valueOf(EventManager.getCurrentEventIndex()).getBytes());
 		outputStream.close();
 	}
 }

@@ -64,7 +64,6 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 			@Override
 			public void onRelease(Button button) {
 				EventManager.undo();
-				onEventCompleted(null);
 			}
 		});
 
@@ -72,7 +71,6 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 			@Override
 			public void onRelease(Button button) {
 				EventManager.redo();
-				onEventCompleted(null);
 			}
 		});
 
