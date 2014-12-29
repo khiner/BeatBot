@@ -31,8 +31,14 @@ public class MidiNotesEventManager {
 	}
 
 	public static void eventCompleted(Stateful event) {
-		if (inProgress && !combineEvent(event)) {
-			midiEvents.add(event);
+		if (inProgress) {
+			if (!combineEvent(event)) {
+				midiEvents.add(event);
+			}
+		} else if (!(event instanceof MidiNotesMoveEvent)) { // XXX
+			begin();
+			eventCompleted(event);
+			end();
 		}
 	}
 
@@ -51,13 +57,7 @@ public class MidiNotesEventManager {
 	public static void createNotes(List<MidiNote> midiNotes) {
 		if (midiNotes.isEmpty())
 			return;
-		if (inProgress) {
-			new MidiNotesCreateEvent(midiNotes).execute();
-		} else {
-			begin();
-			new MidiNotesCreateEvent(midiNotes).execute();
-			end();
-		}
+		new MidiNotesCreateEvent(midiNotes).execute();
 	}
 
 	public static void destroyNote(MidiNote midiNote) {
@@ -69,13 +69,7 @@ public class MidiNotesEventManager {
 	public static void destroyNotes(List<MidiNote> midiNotes) {
 		if (midiNotes.isEmpty())
 			return;
-		if (inProgress) {
-			new MidiNotesDestroyEvent(midiNotes).execute();
-		} else {
-			begin();
-			new MidiNotesDestroyEvent(midiNotes).execute();
-			end();
-		}
+		new MidiNotesDestroyEvent(midiNotes).execute();
 	}
 	
 	private static boolean combineEvent(Stateful event) {

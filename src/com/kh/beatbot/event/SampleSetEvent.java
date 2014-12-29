@@ -34,6 +34,10 @@ public class SampleSetEvent implements Executable, Stateful {
 		}
 	}
 
+	public void doExecute() {
+		doExecute(newSample);
+	}
+
 	public boolean doExecute(File sample) {
 		if (sample == null || sample.equals(track.getCurrSampleFile())) {
 			return false;

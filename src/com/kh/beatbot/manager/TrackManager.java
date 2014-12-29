@@ -10,7 +10,6 @@ import java.util.Set;
 import android.app.AlertDialog;
 import android.content.Context;
 
-import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.listener.FileListener;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.TrackLevelsEventListener;
@@ -79,12 +78,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	public static void init(Context context) {
 		sampleSaveErrorAlert = new AlertDialog.Builder(context);
 		sampleSaveErrorAlert.setPositiveButton("OK", null);
-
-		for (File drumDirectory : FileManager.drumsDirectory.listFiles()) {
-			new TrackCreateEvent().doExecute();
-			final File sampleFile = drumDirectory.listFiles()[0];
-			setSample(tracks.get(tracks.size() - 1), sampleFile);
-		}
 	}
 
 	public static void setSample(Track track, File sampleFile) {

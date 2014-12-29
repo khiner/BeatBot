@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import com.kh.beatbot.event.EventJsonFactory;
+import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Executable;
 import com.kh.beatbot.event.Stateful;
 
@@ -28,10 +29,13 @@ public class ProjectFile {
 	public ProjectFile(InputStream in) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		String serializedEvent;
-        while ((serializedEvent = reader.readLine()) != null) {
-            final Stateful event = EventJsonFactory.fromJson(serializedEvent);
-            ((Executable)event).execute();
-        }
+		while ((serializedEvent = reader.readLine()) != null) {
+			final Stateful event = EventJsonFactory.fromJson(serializedEvent);
+			// XXX not using simple execute() since midi events won't make it to the EventManager
+			// if there's no batch midi event
+			((Executable) event).doExecute();
+			EventManager.eventCompleted(event);
+		}
 	}
 
 	public void writeEvent(Stateful event) {

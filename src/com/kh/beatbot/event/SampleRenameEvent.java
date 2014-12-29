@@ -32,6 +32,10 @@ public class SampleRenameEvent implements Executable, Stateful {
 		}
 	}
 
+	public void doExecute() {
+		doExecute(newSampleName);
+	}
+
 	private boolean doExecute(String sampleName) {
 		if (file == null || sampleName == null || sampleName.isEmpty()
 				|| newSampleName.equals(originalSampleName)) {

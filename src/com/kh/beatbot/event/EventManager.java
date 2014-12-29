@@ -8,13 +8,17 @@ import java.util.Set;
 import com.kh.beatbot.listener.StatefulEventListener;
 
 public class EventManager {
-	private static final int MAX_EVENTS = 100;
 	private static List<Stateful> events = new ArrayList<Stateful>();
 	private static int currEventIndex = -1;
 	private static Set<StatefulEventListener> listeners = new HashSet<StatefulEventListener>();
 
 	public static List<Stateful> getEvents() {
 		return events;
+	}
+
+	public static void clearEvents() {
+		events.clear();
+		currEventIndex = -1;
 	}
 
 	public static void addListener(StatefulEventListener listener) {
@@ -47,10 +51,12 @@ public class EventManager {
 			events.remove(events.size() - 1);
 		}
 		events.add(event);
-		if (events.size() > MAX_EVENTS) {
-			events.remove(0); // drop the oldest event to save space
-			currEventIndex--;
-		}
+
+		// Not limiting events since project saves depend on full history being here
+//		if (events.size() > MAX_EVENTS) {
+//			events.remove(0); // drop the oldest event to save space
+//			currEventIndex--;
+//		}
 		notifyEventCompleted(event);
 	}
 

@@ -9,9 +9,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.widget.Toast;
 
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Stateful;
-import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.file.ProjectFile;
 
 public class ProjectFileManager {
@@ -97,8 +97,7 @@ public class ProjectFileManager {
 	private static void completeLoad(Context context) {
 		projectFileName = pendingFileName;
 		try {
-			
-			MidiNotesEventManager.destroyNotes(MidiManager.allNotes()); // TODO fresh state
+			BeatBotActivity.setupDefaultProject();
 			new ProjectFile(new FileInputStream(getFullPathName(projectFileName)));
 		} catch (IOException e) {
 			e.printStackTrace();

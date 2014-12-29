@@ -16,7 +16,9 @@ import android.widget.LinearLayout;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.SampleRenameEvent;
+import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.listener.GLSurfaceViewGroupListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.MidiFileManager;
@@ -51,7 +53,8 @@ public class BeatBotActivity extends Activity {
 		TextureAtlas.resource.load(this);
 
 		if (!initialized) {
-			initNativeAudio();
+			createEngine();
+			createAudioPlayer();
 
 			Color.init(this);
 			FileManager.init(this);
@@ -65,7 +68,7 @@ public class BeatBotActivity extends Activity {
 
 			arm();
 
-			setupProject();
+			setupDefaultProject();
 
 			((GLSurfaceViewGroup) View.root).setBBRenderer(activityPager);
 			((GLSurfaceViewGroup) View.root).addListener(new GLSurfaceViewGroupListener() {
@@ -255,12 +258,16 @@ public class BeatBotActivity extends Activity {
 		showDialog(SAMPLE_NAME_EDIT_DIALOG_ID);
 	}
 
-	/*
-	 * Set up the project. For now, this just means setting track 0, page 0 view
-	 */
-	public void setupProject() {
-		if (TrackManager.getNumTracks() <= 0)
-			return;
+	public static void setupDefaultProject() {
+		EventManager.clearEvents();
+		TrackManager.destroy();
+
+		for (int trackNum = 0; trackNum < FileManager.drumsDirectory.listFiles().length; trackNum++) {
+			new TrackCreateEvent().doExecute();
+			final File sampleFile = FileManager.drumsDirectory.listFiles()[trackNum].listFiles()[0];
+			TrackManager.setSample(TrackManager.getTrack(trackNum), sampleFile);
+		}
+
 		TrackManager.getTrack(0).select();
 		View.mainPage.pageSelectGroup.selectLevelsPage();
 	}
@@ -268,11 +275,6 @@ public class BeatBotActivity extends Activity {
 	public void launchEffect(Effect effect) {
 		activityPager.setPage(View.effectPage);
 		View.effectPage.setEffect(effect);
-	}
-
-	private void initNativeAudio() {
-		createEngine();
-		createAudioPlayer();
 	}
 
 	private void shutdown() {
