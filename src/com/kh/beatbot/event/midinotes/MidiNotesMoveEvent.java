@@ -7,11 +7,10 @@ import com.kh.beatbot.event.Combinable;
 import com.kh.beatbot.event.Executable;
 import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 
 public class MidiNotesMoveEvent implements Stateful, Executable, Combinable {
-	private class Move {
+	public static class Move {
 		long beginOnTick, beginOffTick, endOnTick, endOffTick;
 		int beginNoteValue, endNoteValue;
 
@@ -56,15 +55,12 @@ public class MidiNotesMoveEvent implements Stateful, Executable, Combinable {
 			MidiNote midiNote = MidiManager.findNote(move.endNoteValue, move.endOnTick);
 
 			if (midiNote != null) {
-				TrackManager.saveNoteTicks();
-
 				midiNote.setSelected(true);
 				midiNote.setNote(move.beginNoteValue);
 				midiNote.setTicks(move.beginOnTick, move.beginOffTick);
 
 				MidiManager.handleMidiCollisions();
 				midiNote.setSelected(false);
-				TrackManager.finalizeNoteTicks();
 			}
 		}
 	}
@@ -84,38 +80,37 @@ public class MidiNotesMoveEvent implements Stateful, Executable, Combinable {
 			MidiNote midiNote = MidiManager.findNote(move.beginNoteValue, move.beginOnTick);
 
 			if (midiNote != null) {
-				TrackManager.saveNoteTicks();
-
 				midiNote.setSelected(true);
 				midiNote.setNote(move.endNoteValue);
 				midiNote.setTicks(move.endOnTick, move.endOffTick);
 
 				MidiManager.handleMidiCollisions();
 				midiNote.setSelected(false);
-				TrackManager.finalizeNoteTicks();
 			}
 		}
 	}
 
+	// Not actually used. combineMove is used directly for efficiency
 	public void combine(Combinable other) {
 		if (!(other instanceof MidiNotesMoveEvent))
 			return;
 		MidiNotesMoveEvent otherMoveEvent = (MidiNotesMoveEvent) other;
 		// try combining each event
 		for (Move otherMove : otherMoveEvent.moves) {
-			if (!combineMove(otherMove)) {
-				moves.add(otherMove);
-			}
+			combineMove(otherMove);
 		}
 	}
 
-	private boolean combineMove(Move otherMove) {
+	public void combineMove(Move otherMove) {
+		boolean combined = false;
 		for (Move move : moves) {
 			if (move.combineWith(otherMove)) {
-				return true;
+				combined = true;
 			}
 		}
 
-		return false;
+		if (!combined) {
+			moves.add(otherMove);
+		}
 	}
 }

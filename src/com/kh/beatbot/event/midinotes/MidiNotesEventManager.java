@@ -35,7 +35,7 @@ public class MidiNotesEventManager {
 			if (!combineEvent(event)) {
 				midiEvents.add(event);
 			}
-		} else if (!(event instanceof MidiNotesMoveEvent)) { // XXX
+		} else {
 			begin();
 			eventCompleted(event);
 			end();
@@ -44,8 +44,18 @@ public class MidiNotesEventManager {
 
 	public static void onMove(int beginNoteValue, long beginOnTick, long beginOffTick,
 			int endNoteValue, long endOnTick, long endOffTick) {
-		eventCompleted(new MidiNotesMoveEvent(beginNoteValue, beginOnTick, beginOffTick,
-				endNoteValue, endOnTick, endOffTick));
+		if (inProgress) {
+			if (midiEvents.isEmpty()
+					|| !(midiEvents.get(midiEvents.size() - 1) instanceof MidiNotesMoveEvent)) {
+				// optimization to avoid extra instantiation & looping
+				midiEvents.add(new MidiNotesMoveEvent(beginNoteValue, beginOnTick, beginOffTick,
+						endNoteValue, endOnTick, endOffTick));
+			} else {
+				((MidiNotesMoveEvent) midiEvents.get(midiEvents.size() - 1))
+						.combineMove(new MidiNotesMoveEvent.Move(beginNoteValue, beginOnTick,
+								beginOffTick, endNoteValue, endOnTick, endOffTick));
+			}
+		}
 	}
 
 	public static void createNote(MidiNote midiNote) {
@@ -71,13 +81,13 @@ public class MidiNotesEventManager {
 			return;
 		new MidiNotesDestroyEvent(midiNotes).execute();
 	}
-	
+
 	private static boolean combineEvent(Stateful event) {
 		if (midiEvents.isEmpty())
 			return false;
 		Stateful latestEvent = midiEvents.get(midiEvents.size() - 1);
 		if (event instanceof Combinable && latestEvent instanceof Combinable) {
-			((Combinable)latestEvent).combine((Combinable) event);
+			((Combinable) latestEvent).combine((Combinable) event);
 			return true;
 		} else {
 			return false;
