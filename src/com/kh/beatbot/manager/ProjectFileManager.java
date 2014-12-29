@@ -1,7 +1,6 @@
 package com.kh.beatbot.manager;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 import android.app.AlertDialog;
@@ -10,8 +9,6 @@ import android.content.DialogInterface;
 import android.widget.Toast;
 
 import com.kh.beatbot.activity.BeatBotActivity;
-import com.kh.beatbot.event.EventManager;
-import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.file.ProjectFile;
 
 public class ProjectFileManager {
@@ -50,7 +47,7 @@ public class ProjectFileManager {
 					}
 				});
 		confirmLoadAlert = builder.create();
-		
+
 		projectFileName = "temp_project";
 	}
 
@@ -84,11 +81,7 @@ public class ProjectFileManager {
 	private static void completeSave() {
 		projectFileName = pendingFileName;
 		try {
-			ProjectFile projectFile = new ProjectFile(getFullPathName(projectFileName));
-			for (Stateful event : EventManager.getEvents()) {
-				projectFile.writeEvent(event);
-			}
-			projectFile.close();
+			new ProjectFile(getFullPathName(projectFileName)).save();
 		} catch (IOException e) {
 			System.err.println(e);
 		}
@@ -98,9 +91,9 @@ public class ProjectFileManager {
 		projectFileName = pendingFileName;
 		try {
 			BeatBotActivity.setupDefaultProject();
-			new ProjectFile(new FileInputStream(getFullPathName(projectFileName)));
+			new ProjectFile(getFullPathName(projectFileName)).load();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println(e);
 		}
 
 		Toast.makeText(context, getFullPathName(projectFileName), Toast.LENGTH_SHORT).show();

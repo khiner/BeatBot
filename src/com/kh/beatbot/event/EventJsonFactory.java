@@ -14,28 +14,30 @@ import com.kh.beatbot.event.midinotes.MidiNotesLevelsSetEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesMoveEvent;
 
 public class EventJsonFactory {
-	private static Gson gson = new GsonBuilder().create();
-
-	public static String toJson(Stateful event) {
-		JsonElement json = gson.toJsonTree(event);
-		json.getAsJsonObject().addProperty("class", event.getClass().getName());
-		return gson.toJson(json);
-	}
-	
-	public static Stateful fromJson(String json) {
-		JsonObject o = new JsonParser().parse(json).getAsJsonObject();
-		String className = o.remove("class").getAsString();
-
-		List<Class> eventClasses = new ArrayList<Class>() {{
+	private static final String CLASS_KEY = "class";
+	private static final List<Class> eventClasses = new ArrayList<Class>() {
+		{
 			add(MidiNotesCreateEvent.class);
 			add(MidiNotesDestroyEvent.class);
 			add(MidiNotesLevelsSetEvent.class);
 			add(MidiNotesMoveEvent.class);
-		}};
-		
+		}
+	};
+
+	private static final Gson GSON = new GsonBuilder().create();
+
+	public static String toJson(Stateful event) {
+		JsonElement json = GSON.toJsonTree(event);
+		json.getAsJsonObject().addProperty(CLASS_KEY, event.getClass().getName());
+		return GSON.toJson(json);
+	}
+
+	public static Stateful fromJson(String json) {
+		JsonObject eventJsonObject = new JsonParser().parse(json).getAsJsonObject();
+		String eventClassName = eventJsonObject.remove(CLASS_KEY).getAsString();
 		for (Class<Stateful> eventClass : eventClasses) {
-			if (className.equals(eventClass.getName())) {
-				return gson.fromJson(json, eventClass);
+			if (eventClassName.equals(eventClass.getName())) {
+				return GSON.fromJson(json, eventClass);
 			}
 		}
 
