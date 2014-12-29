@@ -1,5 +1,8 @@
 package com.kh.beatbot.event.midinotes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.kh.beatbot.event.Combinable;
 import com.kh.beatbot.event.Executable;
 import com.kh.beatbot.event.Stateful;
@@ -8,24 +11,62 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 
 public class MidiNotesMoveEvent implements Stateful, Executable, Combinable {
+	private class Move {
+		long beginOnTick, beginOffTick, endOnTick, endOffTick;
+		int beginNoteValue, endNoteValue;
 
-	protected long beginOnTick, beginOffTick, endOnTick, endOffTick;
-	protected int beginNoteValue, endNoteValue;
+		public Move(int beginNoteValue, long beginOnTick, long beginOffTick, int endNoteValue,
+				long endOnTick, long endOffTick) {
+			this.beginNoteValue = beginNoteValue;
+			this.beginOnTick = beginOnTick;
+			this.beginOffTick = beginOffTick;
+			this.endNoteValue = endNoteValue;
+			this.endOnTick = endOnTick;
+			this.endOffTick = endOffTick;
+		}
+
+		public boolean combineWith(Move otherMove) {
+			if (combinableWith(otherMove)) {
+				endNoteValue = otherMove.endNoteValue;
+				endOnTick = otherMove.endOnTick;
+				endOffTick = otherMove.endOffTick;
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		private boolean combinableWith(Move otherMove) {
+			return endNoteValue == otherMove.beginNoteValue && endOnTick == otherMove.beginOnTick
+					&& endOffTick == otherMove.beginOffTick;
+		}
+	}
+
+	private List<Move> moves = new ArrayList<Move>();
 
 	public MidiNotesMoveEvent(int beginNoteValue, long beginOnTick, long beginOffTick,
 			int endNoteValue, long endOnTick, long endOffTick) {
-		this.beginNoteValue = beginNoteValue;
-		this.beginOnTick = beginOnTick;
-		this.beginOffTick = beginOffTick;
-		this.endNoteValue = endNoteValue;
-		this.endOnTick = endOnTick;
-		this.endOffTick = endOffTick;
+		moves.add(new Move(beginNoteValue, beginOnTick, beginOffTick, endNoteValue, endOnTick,
+				endOffTick));
 	}
 
 	@Override
 	public void undo() {
-		new MidiNotesMoveEvent(endNoteValue, endOnTick, endOffTick, beginNoteValue, beginOnTick,
-				beginOffTick).doExecute();
+		for (Move move : moves) {
+			MidiNote midiNote = MidiManager.findNote(move.endNoteValue, move.endOnTick);
+
+			if (midiNote != null) {
+				TrackManager.saveNoteTicks();
+
+				midiNote.setSelected(true);
+				midiNote.setNote(move.beginNoteValue);
+				midiNote.setTicks(move.beginOnTick, move.beginOffTick);
+
+				MidiManager.handleMidiCollisions();
+				midiNote.setSelected(false);
+				TrackManager.finalizeNoteTicks();
+			}
+		}
 	}
 
 	@Override
@@ -39,27 +80,42 @@ public class MidiNotesMoveEvent implements Stateful, Executable, Combinable {
 	}
 
 	public void doExecute() {
-		MidiNote midiNote = MidiManager.findNote(beginNoteValue, beginOnTick);
+		for (Move move : moves) {
+			MidiNote midiNote = MidiManager.findNote(move.beginNoteValue, move.beginOnTick);
 
-		if (midiNote != null) {
-			TrackManager.saveNoteTicks();
+			if (midiNote != null) {
+				TrackManager.saveNoteTicks();
 
-			midiNote.setSelected(true);
-			midiNote.setNote(endNoteValue);
-			midiNote.setTicks(endOnTick, endOffTick);
+				midiNote.setSelected(true);
+				midiNote.setNote(move.endNoteValue);
+				midiNote.setTicks(move.endOnTick, move.endOffTick);
 
-			MidiManager.handleMidiCollisions();
-			midiNote.setSelected(false);
-			TrackManager.finalizeNoteTicks();
+				MidiManager.handleMidiCollisions();
+				midiNote.setSelected(false);
+				TrackManager.finalizeNoteTicks();
+			}
 		}
 	}
-	
+
 	public void combine(Combinable other) {
 		if (!(other instanceof MidiNotesMoveEvent))
 			return;
 		MidiNotesMoveEvent otherMoveEvent = (MidiNotesMoveEvent) other;
-		endNoteValue = otherMoveEvent.endNoteValue;
-		endOnTick = otherMoveEvent.endOnTick;
-		endOffTick = otherMoveEvent.endOffTick;
+		// try combining each event
+		for (Move otherMove : otherMoveEvent.moves) {
+			if (!combineMove(otherMove)) {
+				moves.add(otherMove);
+			}
+		}
+	}
+
+	private boolean combineMove(Move otherMove) {
+		for (Move move : moves) {
+			if (move.combineWith(otherMove)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
