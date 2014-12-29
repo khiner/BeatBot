@@ -2,27 +2,24 @@ package com.kh.beatbot.file;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.channels.FileChannel;
 
 import com.kh.beatbot.event.EventJsonFactory;
 import com.kh.beatbot.event.Executable;
 import com.kh.beatbot.event.Stateful;
-import com.kh.beatbot.listener.StatefulEventListener;
 
-public class ProjectFile implements StatefulEventListener {
-	private File workingFile;
-	private FileOutputStream workingOutputStream;
+public class ProjectFile {
+	private File projectFile;
+	private FileOutputStream outputStream;
 
 	public ProjectFile(String path) {
-		workingFile = new File(path);
+		projectFile = new File(path);
 		try {
-			workingOutputStream = new FileOutputStream(workingFile);
+			outputStream = new FileOutputStream(projectFile);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -40,40 +37,13 @@ public class ProjectFile implements StatefulEventListener {
 	public void writeEvent(Stateful event) {
 		String eventJson = EventJsonFactory.toJson(event) + "\n";
 		try {
-			workingOutputStream.write(eventJson.getBytes());
+			outputStream.write(eventJson.getBytes());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void writeToFile(File outFile) throws FileNotFoundException, IOException {
-		copyFile(workingFile, outFile);
-	}
-
-	public static void copyFile(File sourceFile, File destFile) throws IOException {
-		if (!destFile.exists()) {
-			destFile.createNewFile();
-		}
-
-		FileChannel source = null;
-		FileChannel destination = null;
-
-		try {
-			source = new FileInputStream(sourceFile).getChannel();
-			destination = new FileOutputStream(destFile).getChannel();
-			destination.transferFrom(source, 0, source.size());
-		} finally {
-			if (source != null) {
-				source.close();
-			}
-			if (destination != null) {
-				destination.close();
-			}
-		}
-	}
-
-	@Override
-	public void onEventCompleted(Stateful event) {
-		writeEvent(event);
+	public void close() throws IOException {
+		outputStream.close();
 	}
 }

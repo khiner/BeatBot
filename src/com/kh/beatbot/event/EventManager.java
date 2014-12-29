@@ -13,6 +13,10 @@ public class EventManager {
 	private static int currEventIndex = -1;
 	private static Set<StatefulEventListener> listeners = new HashSet<StatefulEventListener>();
 
+	public static List<Stateful> getEvents() {
+		return events;
+	}
+
 	public static void addListener(StatefulEventListener listener) {
 		listeners.add(listener);
 	}
@@ -49,7 +53,7 @@ public class EventManager {
 		}
 		notifyEventCompleted(event);
 	}
-	
+
 	private static void notifyEventCompleted(Stateful event) {
 		for (StatefulEventListener listener : listeners) {
 			listener.onEventCompleted(event);

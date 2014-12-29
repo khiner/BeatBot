@@ -10,17 +10,15 @@ import android.content.DialogInterface;
 import android.widget.Toast;
 
 import com.kh.beatbot.event.EventManager;
+import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.file.ProjectFile;
 
 public class ProjectFileManager {
 	private static final String PROJECT_FILE_EXTENSION = ".bb";
-	private static final String WORKING_PROJECT_FILE_NAME = ".working_project";
 
 	private static String projectFileName, pendingFileName;
 	private static AlertDialog confirmLoadAlert, fileExistsAlert;
-
-	private static ProjectFile eventTrackerFile;
 
 	public static void init(final Context context) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -52,10 +50,6 @@ public class ProjectFileManager {
 					}
 				});
 		confirmLoadAlert = builder.create();
-
-		eventTrackerFile = new ProjectFile(FileManager.projectDirectory.getAbsolutePath() + "/"
-				+ WORKING_PROJECT_FILE_NAME);
-		EventManager.addListener(eventTrackerFile);
 		
 		projectFileName = "temp_project";
 	}
@@ -90,7 +84,11 @@ public class ProjectFileManager {
 	private static void completeSave() {
 		projectFileName = pendingFileName;
 		try {
-			eventTrackerFile.writeToFile(new File(getFullPathName(projectFileName)));
+			ProjectFile projectFile = new ProjectFile(getFullPathName(projectFileName));
+			for (Stateful event : EventManager.getEvents()) {
+				projectFile.writeEvent(event);
+			}
+			projectFile.close();
 		} catch (IOException e) {
 			System.err.println(e);
 		}
@@ -99,6 +97,7 @@ public class ProjectFileManager {
 	private static void completeLoad(Context context) {
 		projectFileName = pendingFileName;
 		try {
+			
 			MidiNotesEventManager.destroyNotes(MidiManager.allNotes()); // TODO fresh state
 			new ProjectFile(new FileInputStream(getFullPathName(projectFileName)));
 		} catch (IOException e) {
