@@ -8,19 +8,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.kh.beatbot.event.midinotes.MidiNotesCreateEvent;
-import com.kh.beatbot.event.midinotes.MidiNotesDestroyEvent;
-import com.kh.beatbot.event.midinotes.MidiNotesLevelsSetEvent;
-import com.kh.beatbot.event.midinotes.MidiNotesMoveEvent;
+import com.kh.beatbot.event.midinotes.MidiNotesDiffEvent;
 
 public class EventJsonFactory {
 	private static final String CLASS_KEY = "class";
 	private static final List<Class> eventClasses = new ArrayList<Class>() {
 		{
-			add(MidiNotesCreateEvent.class);
-			add(MidiNotesDestroyEvent.class);
-			add(MidiNotesLevelsSetEvent.class);
-			add(MidiNotesMoveEvent.class);
+			add(MidiNotesDiffEvent.class);
 		}
 	};
 

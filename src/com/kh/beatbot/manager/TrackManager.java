@@ -110,16 +110,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
-	public static List<MidiNote> getMidiNotes() {
-		List<MidiNote> midiNotes = new ArrayList<MidiNote>();
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				midiNotes.addAll(track.getMidiNotes());
-			}
-		}
-		return midiNotes;
-	}
-
 	public static List<MidiNote> copySelectedNotes() {
 		List<MidiNote> selectedNotesCopy = new ArrayList<MidiNote>();
 		synchronized (tracks) {
@@ -206,42 +196,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		return adjustedNoteDiff;
 	}
 
-	public static void moveNote(MidiNote note, int noteDiff, long tickDiff) {
-		Track track = getTrack(note);
-		if (null != track) {
-			track.moveNote(note, noteDiff, tickDiff);
-		}
-	}
-
-	public static void moveSelectedNotes(int noteDiff, long tickDiff) {
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				track.moveSelectedNotes(noteDiff, tickDiff);
-			}
-			for (Track track : tracks) {
-				track.resetSelectedNotes();
-			}
-		}
-	}
-
-	public static void setNoteTicks(MidiNote midiNote, long onTick, long offTick,
-			boolean maintainNoteLength) {
-		Track track = getTrack(midiNote);
-		track.setNoteTicks(midiNote, onTick, offTick, maintainNoteLength);
-	}
-
-	public static void pinchSelectedNotes(long onTickDiff, long offTickDiff) {
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				for (MidiNote note : track.getMidiNotes()) {
-					if (note.isSelected()) {
-						pinchNote(note, onTickDiff, offTickDiff);
-					}
-				}
-			}
-		}
-	}
-
 	public static void selectRegion(long leftTick, long rightTick, int topNote, int bottomNote) {
 		synchronized (tracks) {
 			for (Track track : tracks) {
@@ -307,18 +261,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 			}
 		}
 		return selectedTickWindow;
-	}
-
-	/*
-	 * Translate all midi notes to their on-ticks' nearest major ticks given the provided beat
-	 * division
-	 */
-	public static void quantize(int beatDivision) {
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				track.quantize(beatDivision);
-			}
-		}
 	}
 
 	public static Track getTrack(int noteValue) {
@@ -478,16 +420,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
-	private static void pinchNote(MidiNote midiNote, long onTickDiff, long offTickDiff) {
-		float newOnTick = midiNote.getOnTick();
-		float newOffTick = midiNote.getOffTick();
-		if (midiNote.getOnTick() + onTickDiff >= 0)
-			newOnTick += onTickDiff;
-		if (midiNote.getOffTick() + offTickDiff <= MidiManager.MAX_TICKS)
-			newOffTick += offTickDiff;
-		setNoteTicks(midiNote, (long) newOnTick, (long) newOffTick, false);
-	}
-
 	@Override
 	public void onCreate(MidiNote note) {
 		Track track = getTrack(note);
@@ -507,12 +439,19 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	@Override
 	public void onMove(MidiNote note, int beginNoteValue, long beginOnTick, long beginOffTick,
 			int endNoteValue, long endOnTick, long endOffTick) {
-		Track oldTrack = getTrack(beginNoteValue);
-		Track newTrack = getTrack(endNoteValue);
-		if (null != oldTrack)
-			oldTrack.removeNote(note);
-		if (null != newTrack)
-			newTrack.addNote(note);
+		if (beginNoteValue == endNoteValue) {
+			Track track = getTrack(beginNoteValue);
+			// if we're changing the stop tick on a note that's already playing to a
+			// note before the current tick, stop the track
+			Track.notifyNoteMoved(track.getId(), beginOnTick, beginOffTick, endOnTick, endOffTick);
+		} else {
+			Track oldTrack = getTrack(beginNoteValue);
+			Track newTrack = getTrack(endNoteValue);
+			if (null != oldTrack)
+				oldTrack.removeNote(note);
+			if (null != newTrack)
+				newTrack.addNote(note);
+		}
 	}
 
 	@Override

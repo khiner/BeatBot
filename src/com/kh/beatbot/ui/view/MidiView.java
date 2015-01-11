@@ -424,16 +424,16 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 				.longValue(), dragAllSelected ? null : touchedNote);
 		noteDiff = TrackManager.getAdjustedNoteDiff(noteDiff, dragAllSelected ? null : touchedNote);
 		if (dragAllSelected) {
-			MidiManager.moveSelectedNotes(noteDiff, (long) tickDiff);
+			MidiNotesEventManager.moveSelectedNotes(noteDiff, (long) tickDiff);
 		} else {
-			MidiManager.moveNote(touchedNote, noteDiff, (long) tickDiff);
+			MidiNotesEventManager.moveNote(touchedNote, noteDiff, (long) tickDiff);
 		}
 	}
 
 	private void pinchSelectedNotes(float onTickDiff, float offTickDiff) {
 		if (onTickDiff == 0 && offTickDiff == 0)
 			return;
-		MidiManager.pinchSelectedNotes((long) onTickDiff, (long) offTickDiff);
+		MidiNotesEventManager.pinchSelectedNotes((long) onTickDiff, (long) offTickDiff);
 	}
 
 	private void updateTrackColors() {

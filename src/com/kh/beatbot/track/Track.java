@@ -66,6 +66,10 @@ public class Track extends BaseTrack implements FileListener {
 		}
 	}
 
+	public boolean containsNote(MidiNote note) {
+		return notes.contains(note);
+	}
+
 	public MidiNote findNoteStarting(long onTick) {
 		synchronized (notes) {
 			for (MidiNote note : notes) {
@@ -121,63 +125,6 @@ public class Track extends BaseTrack implements FileListener {
 		buttonRow.instrumentButton.setChecked(true);
 	}
 
-	public void setNoteTicks(MidiNote midiNote, long onTick, long offTick,
-			boolean maintainNoteLength) {
-		if ((midiNote.getOnTick() == onTick && midiNote.getOffTick() == offTick)
-				|| !notes.contains(midiNote)) {
-			return;
-		}
-
-		if (offTick <= onTick)
-			offTick = onTick + 4;
-		if (MidiManager.isSnapToGrid()) {
-			onTick = (long) MidiManager.getMajorTickNearestTo(onTick);
-			offTick = (long) MidiManager.getMajorTickNearestTo(offTick) - 1;
-			if (offTick == onTick - 1) {
-				offTick += MidiManager.getTicksPerBeat();
-			}
-		}
-		if (maintainNoteLength) {
-			offTick = midiNote.getOffTick() + onTick - midiNote.getOnTick();
-		}
-		long prevOnTick = midiNote.getOnTick();
-		long prevOffTick = midiNote.getOffTick();
-		midiNote.setTicks(onTick, offTick);
-		// if we're changing the stop tick on a note that's already playing to a
-		// note before the current tick, stop the track
-		notifyNoteMoved(id, prevOnTick, prevOffTick, midiNote.getOnTick(), midiNote.getOffTick());
-	}
-
-	public void handleNoteCollisions() {
-		for (int i = 0; i < notes.size(); i++) {
-			MidiNote note = notes.get(i);
-			long newOnTick = note.isSelected() ? note.getOnTick() : note.getSavedOnTick();
-			long newOffTick = note.isSelected() ? note.getOffTick() : note.getSavedOffTick();
-			for (int j = 0; j < notes.size(); j++) {
-				MidiNote otherNote = notes.get(j);
-				if (note.equals(otherNote) || !otherNote.isSelected()) {
-					continue;
-				}
-				// if a selected note begins in the middle of another note,
-				// clip the covered note
-				if (otherNote.getOnTick() > newOnTick && otherNote.getOnTick() - 1 < newOffTick) {
-					newOffTick = otherNote.getOnTick() - 1;
-					// otherwise, if a selected note overlaps with the beginning
-					// of another note, delete the note
-					// (CAN NEVER DELETE SELECTED NOTES THIS WAY!)
-				} else if (!note.isSelected() && otherNote.getOnTick() <= newOnTick
-						&& otherNote.getOffTick() > newOnTick) {
-					// we 'delete' the note temporarily by moving
-					// it offscreen, so it won't ever be played or drawn
-					newOnTick = (long) MidiManager.MAX_TICKS * 2;
-					newOffTick = (long) MidiManager.MAX_TICKS * 2 + 100;
-					break;
-				}
-			}
-			setNoteTicks(note, newOnTick, newOffTick, false);
-		}
-	}
-
 	public void selectAllNotes() {
 		for (MidiNote midiNote : notes) {
 			midiNote.setSelected(true);
@@ -216,14 +163,6 @@ public class Track extends BaseTrack implements FileListener {
 		}
 	}
 
-	public void moveSelectedNotes(int noteDiff, long tickDiff) {
-		for (MidiNote note : notes) {
-			if (note.isSelected()) {
-				moveNote(note, noteDiff, tickDiff);
-			}
-		}
-	}
-
 	public void resetSelectedNotes() {
 		List<MidiNote> notesToRemove = new ArrayList<MidiNote>();
 		synchronized (notes) {
@@ -239,15 +178,6 @@ public class Track extends BaseTrack implements FileListener {
 		}
 	}
 
-	public void moveNote(MidiNote note, int noteDiff, long tickDiff) {
-		if (tickDiff != 0) {
-			setNoteTicks(note, note.getOnTick() + tickDiff, note.getOffTick() + tickDiff, true);
-		}
-		if (noteDiff != 0) {
-			note.setNote(note.getNoteValue() + noteDiff);
-		}
-	}
-
 	public void saveNoteTicks() {
 		for (MidiNote note : notes) {
 			note.saveTicks();
@@ -255,23 +185,20 @@ public class Track extends BaseTrack implements FileListener {
 	}
 
 	public void finalizeNoteTicks() {
-		List<MidiNote> notesToDelete = new ArrayList<MidiNote>();
+		List<MidiNote> notesToDestroy = new ArrayList<MidiNote>();
 		for (MidiNote note : notes) {
 			if (note.getOnTick() > MidiManager.MAX_TICKS) {
-				notesToDelete.add(note);
+				notesToDestroy.add(note);
 			} else {
 				note.finalizeTicks();
 			}
 		}
-		for (MidiNote note : notesToDelete) {
-			Log.d("Track", "Deleting note in finalize!");
-			MidiManager.deleteNote(note);
-		}
-	}
-
-	public void quantize(int beatDivision) {
-		for (MidiNote note : notes) {
-			MidiManager.quantize(note, beatDivision);
+		for (MidiNote note : notesToDestroy) {
+			Log.d("Track", "Destroying note in finalize!");
+			// destroying note directly so we can replay move events and
+			// overlapping deletes are handled as side-effects rather than
+			// first-order destroy events
+			note.destroy();
 		}
 	}
 

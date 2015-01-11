@@ -74,21 +74,7 @@ public class MidiManager {
 	}
 
 	public static MidiNote addNote(long onTick, long offTick, int note) {
-		return addNote(onTick, offTick, note, MidiEvent.HALF_LEVEL, MidiEvent.HALF_LEVEL,
-				MidiEvent.HALF_LEVEL);
-	}
-
-	private static MidiNote addNote(long onTick, long offTick, int note, byte velocity, byte pan,
-			byte pitch) {
-		NoteOn on = new NoteOn(onTick, 0, note, velocity, pan, pitch);
-		NoteOff off = new NoteOff(offTick, 0, note, velocity, pan, pitch);
-		MidiNote midiNote = new MidiNote(on, off);
-		MidiNotesEventManager.createNote(midiNote);
-		return midiNote;
-	}
-
-	public static List<MidiNote> allNotes() {
-		return TrackManager.getMidiNotes();
+		return MidiNotesEventManager.createNote(note, onTick, offTick);
 	}
 
 	public static MidiNote findNote(int noteValue, long onTick) {
@@ -133,33 +119,6 @@ public class MidiManager {
 		copiedNotes.clear();
 	}
 
-	public static void deleteSelectedNotes() {
-		MidiNotesEventManager.destroyNotes(TrackManager.getSelectedNotes());
-	}
-
-	public static void moveNote(MidiNote note, int noteDiff, long tickDiff) {
-		if (noteDiff != 0 || tickDiff != 0) {
-			TrackManager.moveNote(note, noteDiff, tickDiff);
-			handleMidiCollisions();
-		}
-	}
-
-	public static void moveSelectedNotes(int noteDiff, long tickDiff) {
-		if (noteDiff != 0 || tickDiff != 0) {
-			for (MidiNote selectedNote : TrackManager.getSelectedNotes()) {
-				TrackManager.moveNote(selectedNote, noteDiff, tickDiff);
-			}
-			handleMidiCollisions();
-		}
-	}
-
-	public static void pinchSelectedNotes(long onTickDiff, long offTickDiff) {
-		if (onTickDiff != 0 || offTickDiff != 0) {
-			TrackManager.pinchSelectedNotes(onTickDiff, offTickDiff);
-			handleMidiCollisions();
-		}
-	}
-
 	public static int getBeatDivision() {
 		return beatDivision;
 	}
@@ -193,24 +152,8 @@ public class MidiManager {
 		return tick - tick % getMajorTickSpacing();
 	}
 
-	/*
-	 * Translate the provided midi note to its on-tick's nearest major tick given the provided beat
-	 * division
-	 */
-	public static void quantize(MidiNote midiNote, int beatDivision) {
-		long diff = (long) getMajorTickNearestTo(midiNote.getOnTick()) - midiNote.getOnTick();
-		TrackManager.setNoteTicks(midiNote, midiNote.getOnTick() + diff, midiNote.getOffTick()
-				+ diff, true);
-	}
-
-	public static void handleMidiCollisions() {
-		for (Track track : TrackManager.getTracks()) {
-			track.handleNoteCollisions();
-		}
-	}
-
 	public static void quantize() {
-		TrackManager.quantize(beatDivision);
+		MidiNotesEventManager.quantize(beatDivision);
 	}
 
 	public static void importFromFile(MidiFile midiFile) {
@@ -256,7 +199,7 @@ public class MidiManager {
 		}
 
 		MidiNotesEventManager.begin();
-		MidiNotesEventManager.destroyNotes(allNotes());
+		MidiNotesEventManager.destroyAllNotes();
 		MidiNotesEventManager.createNotes(newNotes);
 		MidiNotesEventManager.end();
 	}

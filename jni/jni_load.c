@@ -39,11 +39,11 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 }
 
 jclass getTrackClass() {
-
+    return trackClass;
 }
 
 jclass getRecordManagerClass() {
-
+    return recordManagerClass;
 }
 
 jmethodID getNextMidiNoteMethod() {

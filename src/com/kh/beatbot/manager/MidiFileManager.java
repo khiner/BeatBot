@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.kh.beatbot.file.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiTrack;
+import com.kh.beatbot.track.Track;
 
 public class MidiFileManager {
 	private static final String MIDI_FILE_EXTENSION = ".midi";
@@ -78,9 +79,11 @@ public class MidiFileManager {
 		ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
 		midiTracks.add(MidiManager.getTempoTrack());
 		midiTracks.add(new MidiTrack());
-		for (MidiNote midiNote : MidiManager.allNotes()) {
-			midiTracks.get(1).insertEvent(midiNote.getOnEvent());
-			midiTracks.get(1).insertEvent(midiNote.getOffEvent());
+		for (Track track : TrackManager.getTracks()) {
+			for (MidiNote midiNote : track.getMidiNotes()) {
+				midiTracks.get(1).insertEvent(midiNote.getOnEvent());
+				midiTracks.get(1).insertEvent(midiNote.getOffEvent());
+			}
 		}
 		Collections.sort(midiTracks.get(1).getEvents());
 		midiTracks.get(1).recalculateDeltas();

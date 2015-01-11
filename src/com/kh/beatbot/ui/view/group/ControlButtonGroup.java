@@ -4,6 +4,7 @@ import android.widget.Toast;
 
 import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Stateful;
+import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.StatefulEventListener;
@@ -92,7 +93,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 		deleteButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				MidiManager.deleteSelectedNotes();
+				MidiNotesEventManager.deleteSelectedNotes();
 			}
 		});
 

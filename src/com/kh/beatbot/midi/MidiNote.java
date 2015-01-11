@@ -1,7 +1,6 @@
 package com.kh.beatbot.midi;
 
 import com.kh.beatbot.effect.Effect.LevelType;
-import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
@@ -201,20 +200,25 @@ public class MidiNote implements Comparable<MidiNote> {
 		}
 	}
 
+	public int euclideanDistance(MidiNote other) {
+		return (other.getNoteValue() - getNoteValue())
+				+ (int) ((other.getOnTick() - getOnTick()) + (other.getOffTick() - getOffTick()));
+	}
+
 	@Override
-	public int compareTo(MidiNote otherNote) {
-		if (this.getNoteValue() != otherNote.getNoteValue()) {
-			return this.getNoteValue() - otherNote.getNoteValue();
-		} else if (this.getOnTick() != otherNote.getOnTick()) {
-			return (int) (this.getOnTick() - otherNote.getOnTick());
-		} else if (this.getOffTick() != otherNote.getOffTick()) {
-			return (int) (this.getOffTick() - otherNote.getOffTick());
-		} else if (this.getVelocity() != otherNote.getVelocity()) {
-			return this.getVelocity() - otherNote.getVelocity() < 0 ? -1 : 1;
-		} else if (this.getPan() != otherNote.getPan()) {
-			return this.getPan() - otherNote.getPan() < 0 ? -1 : 1;
-		} else if (this.getPitch() != otherNote.getPitch()) {
-			return this.getPitch() - otherNote.getPitch() < 0 ? -1 : 1;
+	public int compareTo(MidiNote other) {
+		if (this.getNoteValue() != other.getNoteValue()) {
+			return this.getNoteValue() - other.getNoteValue();
+		} else if (this.getOnTick() != other.getOnTick()) {
+			return (int) (this.getOnTick() - other.getOnTick());
+		} else if (this.getOffTick() != other.getOffTick()) {
+			return (int) (this.getOffTick() - other.getOffTick());
+		} else if (this.getVelocity() != other.getVelocity()) {
+			return this.getVelocity() - other.getVelocity() < 0 ? -1 : 1;
+		} else if (this.getPan() != other.getPan()) {
+			return this.getPan() - other.getPan() < 0 ? -1 : 1;
+		} else if (this.getPitch() != other.getPitch()) {
+			return this.getPitch() - other.getPitch() < 0 ? -1 : 1;
 		} else {
 			return 0;
 		}
@@ -235,8 +239,6 @@ public class MidiNote implements Comparable<MidiNote> {
 		TrackManager.get().onMove(this, beginNoteValue, beginOnTick, beginOffTick, endNoteValue,
 				endOnTick, endOffTick);
 		View.mainPage.onMove(this, beginNoteValue, beginOnTick, beginOffTick, endNoteValue,
-				endOnTick, endOffTick);
-		MidiNotesEventManager.onMove(beginNoteValue, beginOnTick, beginOffTick, endNoteValue,
 				endOnTick, endOffTick);
 	}
 
@@ -266,10 +268,6 @@ public class MidiNote implements Comparable<MidiNote> {
 		int result = 1;
 		result = prime * result + ((noteOff == null) ? 0 : noteOff.hashCode());
 		result = prime * result + ((noteOn == null) ? 0 : noteOn.hashCode());
-		result = prime * result + (int) (savedOffTick ^ (savedOffTick >>> 32));
-		result = prime * result + (int) (savedOnTick ^ (savedOnTick >>> 32));
-		result = prime * result + (selected ? 1231 : 1237);
-		result = prime * result + (touched ? 1231 : 1237);
 		return result;
 	}
 
@@ -291,14 +289,6 @@ public class MidiNote implements Comparable<MidiNote> {
 			if (other.noteOn != null)
 				return false;
 		} else if (!noteOn.equals(other.noteOn))
-			return false;
-		if (savedOffTick != other.savedOffTick)
-			return false;
-		if (savedOnTick != other.savedOnTick)
-			return false;
-		if (selected != other.selected)
-			return false;
-		if (touched != other.touched)
 			return false;
 		return true;
 	}
