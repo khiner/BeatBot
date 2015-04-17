@@ -212,16 +212,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
-	// called after release of touch event - this
-	// finalizes the note on/off ticks of all notes
-	public static void finalizeNoteTicks() {
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				track.finalizeNoteTicks();
-			}
-		}
-	}
-
 	// return true if any Midi note exists
 	public static boolean anyNotes() {
 		synchronized (tracks) {

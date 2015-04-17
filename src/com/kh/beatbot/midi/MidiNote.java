@@ -1,6 +1,7 @@
 package com.kh.beatbot.midi;
 
 import com.kh.beatbot.effect.Effect.LevelType;
+import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
@@ -19,12 +20,13 @@ public class MidiNote implements Comparable<MidiNote> {
 
 	// while moving notes in the ui, they can overlap, but we keep
 	// a memory of the old note ticks while we manipulate the new note ticks
+	private int savedNoteValue;
 	private long savedOnTick, savedOffTick;
 
 	public MidiNote(NoteOn noteOn, NoteOff noteOff) {
 		this.noteOn = noteOn;
 		this.noteOff = noteOff;
-		savedOnTick = savedOffTick = -1;
+		finalizeTicks();
 	}
 
 	public void create() {
@@ -34,11 +36,17 @@ public class MidiNote implements Comparable<MidiNote> {
 
 	public void destroy() {
 		notifyDestroyed();
+		restoreTicks();
 	}
 
 	public void saveTicks() {
+		savedNoteValue = getNoteValue();
 		savedOnTick = getOnTick();
 		savedOffTick = getOffTick();
+	}
+
+	public int getSavedNoteValue() {
+		return savedNoteValue;
 	}
 
 	public long getSavedOnTick() {
@@ -51,7 +59,26 @@ public class MidiNote implements Comparable<MidiNote> {
 
 	public void finalizeTicks() {
 		// erase memory of temp 'old' ticks
+		savedNoteValue = -1;
 		savedOnTick = savedOffTick = -1;
+	}
+
+	public void restoreTicks() {
+		if (!isFinalized()) {
+			noteOn.setNoteValue(savedNoteValue);
+			noteOff.setNoteValue(savedNoteValue);
+			noteOn.setTick(savedOnTick);
+			noteOff.setTick(savedOffTick);
+		}
+		finalizeTicks();
+	}
+
+	public boolean isFinalized() {
+		return savedNoteValue < 0 && savedOnTick < 0 && savedOffTick < 0;
+	}
+
+	public boolean isMarkedForDeletion() {
+		return getOnTick() > MidiManager.MAX_TICKS;
 	}
 
 	public MidiNote getCopy() {
@@ -62,6 +89,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		MidiNote copy = new MidiNote(noteOnCopy, noteOffCopy);
 		copy.setSelected(selected);
 		copy.setTouched(touched);
+		copy.savedNoteValue = this.savedNoteValue;
 		copy.savedOnTick = this.savedOnTick;
 		copy.savedOffTick = this.savedOffTick;
 		return copy;
@@ -118,7 +146,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		this.touched = touched;
 	}
 
-	public void setTicks(long onTick, long offTick) {
+	public boolean setTicks(long onTick, long offTick) {
 		long prevOnTick = getOnTick();
 		long prevOffTick = getOffTick();
 
@@ -130,6 +158,9 @@ public class MidiNote implements Comparable<MidiNote> {
 		if (prevOnTick != getOnTick() || prevOffTick != getOffTick()) {
 			notifyMoved(getNoteValue(), prevOnTick, prevOffTick, getNoteValue(), getOnTick(),
 					getOffTick());
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -290,6 +321,21 @@ public class MidiNote implements Comparable<MidiNote> {
 				return false;
 		} else if (!noteOn.equals(other.noteOn))
 			return false;
+		if (savedNoteValue != other.getSavedNoteValue())
+			return false;
+		if (savedOnTick != other.getSavedOnTick())
+			return false;
+		if (savedOffTick != other.getSavedOffTick())
+			return false;
 		return true;
+	}
+
+	// includes savedTicks
+	public boolean totallyEquals(Object obj) {
+		if (!this.equals(obj))
+			return false;
+		MidiNote other = (MidiNote) obj;
+		return this.savedNoteValue == other.savedNoteValue && this.savedOnTick == other.savedOnTick
+				&& this.savedOffTick == other.savedOffTick;
 	}
 }

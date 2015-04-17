@@ -16,6 +16,6 @@ public class MidiNoteDestroyDiff extends MidiNoteDiff {
 
 	@Override
 	public MidiNoteCreateDiff opposite() {
-		return new MidiNoteCreateDiff(midiNote.getNoteValue(), midiNote.getOnTick(), midiNote.getOffTick()); 
+		return new MidiNoteCreateDiff(midiNote); 
 	}
 }

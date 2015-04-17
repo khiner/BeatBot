@@ -29,22 +29,22 @@ public class MidiNotesDiffEvent implements Stateful {
 		}
 
 		MidiNotesEventManager.handleNoteCollisions();
+		MidiNotesEventManager.finalizeNoteTicks();
 		TrackManager.deselectAllNotes();
-		TrackManager.finalizeNoteTicks();
 	}
 
 	@Override
 	public void redo() {
 		TrackManager.saveNoteTicks();
 		TrackManager.deselectAllNotes();
-
+		
 		for (MidiNoteDiff midiNoteDiff : midiNoteDiffs) {
 			midiNoteDiff.apply();
 		}
 
 		MidiNotesEventManager.handleNoteCollisions();
+		MidiNotesEventManager.finalizeNoteTicks();
 		TrackManager.deselectAllNotes();
-		TrackManager.finalizeNoteTicks();
 	}
 	
 	public void apply() {

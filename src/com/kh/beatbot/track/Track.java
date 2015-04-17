@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.util.Log;
-
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.FileListener;
@@ -163,42 +161,9 @@ public class Track extends BaseTrack implements FileListener {
 		}
 	}
 
-	public void resetSelectedNotes() {
-		List<MidiNote> notesToRemove = new ArrayList<MidiNote>();
-		synchronized (notes) {
-			for (MidiNote note : notes) {
-				if (note.isSelected() && id != note.getNoteValue()) {
-					notesToRemove.add(note);
-					TrackManager.getTrack(note).addNote(note);
-				}
-			}
-		}
-		for (MidiNote note : notesToRemove) {
-			removeNote(note);
-		}
-	}
-
 	public void saveNoteTicks() {
 		for (MidiNote note : notes) {
 			note.saveTicks();
-		}
-	}
-
-	public void finalizeNoteTicks() {
-		List<MidiNote> notesToDestroy = new ArrayList<MidiNote>();
-		for (MidiNote note : notes) {
-			if (note.getOnTick() > MidiManager.MAX_TICKS) {
-				notesToDestroy.add(note);
-			} else {
-				note.finalizeTicks();
-			}
-		}
-		for (MidiNote note : notesToDestroy) {
-			Log.d("Track", "Destroying note in finalize!");
-			// destroying note directly so we can replay move events and
-			// overlapping deletes are handled as side-effects rather than
-			// first-order destroy events
-			note.destroy();
 		}
 	}
 

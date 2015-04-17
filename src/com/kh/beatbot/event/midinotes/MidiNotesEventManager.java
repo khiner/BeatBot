@@ -1,7 +1,10 @@
 package com.kh.beatbot.event.midinotes;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import android.util.Log;
 
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.event.EventManager;
@@ -16,32 +19,51 @@ public class MidiNotesEventManager {
 
 	public static synchronized void begin() {
 		end();
-		TrackManager.saveNoteTicks();
-		midiNoteDiffs = new ArrayList<MidiNoteDiff>();
-		beginNotes = TrackManager.copyMidiNotes();
+		activate();
 	}
 
 	public static synchronized void end() {
-		if (beginNotes == null)
+		if (!isActive())
 			return;
+
+		List<MidiNoteDiff> moveDiffs = new ArrayList<MidiNoteDiff>();
+
+		for (Track track : TrackManager.getTracks()) {
+			for (MidiNote note : track.getMidiNotes()) {
+				if (!note.isFinalized()
+						&& !note.isMarkedForDeletion()
+						&& (note.getNoteValue() != note.getSavedNoteValue()
+								|| note.getOnTick() != note.getSavedOnTick() || note.getOffTick() != note
+								.getSavedOffTick())) {
+					// TODO combine into MidiNotesMoveDiff for multiple note moves with same diff
+					moveDiffs.add(new MidiNoteMoveDiff(note.getSavedNoteValue(), note
+							.getSavedOnTick(), note.getSavedOffTick(), note.getNoteValue(), note
+							.getOnTick(), note.getOffTick()));
+				}
+			}
+		}
+
+		finalizeNoteTicks();
+		addDiffs(moveDiffs);
 
 		if (!midiNoteDiffs.isEmpty()) {
 			final MidiNotesDiffEvent midiNotesDiffEvent = new MidiNotesDiffEvent(midiNoteDiffs);
 			EventManager.eventCompleted(midiNotesDiffEvent);
 		}
-		beginNotes = null;
+
+		deactivate();
 	}
 
 	public static MidiNote createNote(int note, long onTick, long offTick) {
 		MidiNoteCreateDiff createDiff = new MidiNoteCreateDiff(note, onTick, offTick);
-		midiNoteDiffs.add(createDiff);
+		addDiff(createDiff);
 		new MidiNotesDiffEvent(createDiff).apply();
 		return createDiff.getNote();
 	}
 
 	public static MidiNote createNote(MidiNote note) {
 		MidiNoteCreateDiff createDiff = new MidiNoteCreateDiff(note);
-		midiNoteDiffs.add(createDiff);
+		addDiff(createDiff);
 		new MidiNotesDiffEvent(createDiff).apply();
 		return createDiff.getNote();
 	}
@@ -52,14 +74,14 @@ public class MidiNotesEventManager {
 		for (MidiNote note : notes) {
 			createDiffs.add(new MidiNoteCreateDiff(note));
 		}
-		midiNoteDiffs.addAll(createDiffs);
+		addDiffs(createDiffs);
 		new MidiNotesDiffEvent(createDiffs).apply();
 		end();
 	}
 
 	public static void destroyNote(MidiNote note) {
 		MidiNoteDestroyDiff destroyDiff = new MidiNoteDestroyDiff(note);
-		midiNoteDiffs.add(destroyDiff);
+		addDiff(destroyDiff);
 		destroyDiff.apply();
 	}
 
@@ -86,31 +108,57 @@ public class MidiNotesEventManager {
 	}
 
 	public static void moveNote(MidiNote note, int noteDiff, long tickDiff) {
-		Track track = TrackManager.getTrack(note);
+		boolean noteChanged = false;
 		if (tickDiff != 0) {
-			setNoteTicks(track, note, note.getOnTick() + tickDiff, note.getOffTick() + tickDiff,
-					true);
+			noteChanged = setNoteTicks(note, note.getOnTick() + tickDiff, note.getOffTick()
+					+ tickDiff, true);
 		}
 		if (noteDiff != 0) {
 			note.setNote(note.getNoteValue() + noteDiff);
+			noteChanged = true;
 		}
-		// handleMidiCollisions();
+
+		if (noteChanged) {
+			handleNoteCollisions();
+		}
 	}
 
 	public static void moveSelectedNotes(int noteDiff, long tickDiff) {
+		if (noteDiff == 0 && tickDiff == 0)
+			return;
+
+		// need to keep a temp list since we can be moving notes to another track
+		List<MidiNote> selectedNotes = new ArrayList<MidiNote>();
+
 		for (Track track : TrackManager.getTracks()) {
 			for (MidiNote note : track.getMidiNotes()) {
 				if (note.isSelected()) {
-					moveNote(note, noteDiff, tickDiff);
+					selectedNotes.add(note);
 				}
 			}
 		}
-		// XXX move to this class?
-		for (Track track : TrackManager.getTracks()) {
-			track.resetSelectedNotes();
+
+		boolean noteChanged = false;
+
+		for (MidiNote note : selectedNotes) {
+			Track track = TrackManager.getTrack(note);
+			if (tickDiff != 0) {
+				if (setNoteTicks(note, note.getOnTick() + tickDiff, note.getOffTick() + tickDiff,
+						true)) {
+					noteChanged = true;
+				}
+			}
+			if (noteDiff != 0) {
+				track.removeNote(note);
+				note.setNote(note.getNoteValue() + noteDiff);
+				TrackManager.getTrack(note.getNoteValue()).addNote(note);
+				noteChanged = true;
+			}
 		}
 
-		// handleMidiCollisions();
+		if (noteChanged) {
+			handleNoteCollisions();
+		}
 	}
 
 	public static void pinchSelectedNotes(long onTickDiff, long offTickDiff) {
@@ -146,19 +194,19 @@ public class MidiNotesEventManager {
 				long newOnTick = note.isSelected() ? note.getOnTick() : note.getSavedOnTick();
 				long newOffTick = note.isSelected() ? note.getOffTick() : note.getSavedOffTick();
 				for (int j = 0; j < notes.size(); j++) {
-					MidiNote otherNote = notes.get(j);
-					if (note.equals(otherNote) || !otherNote.isSelected()) {
+					MidiNote selectedNote = notes.get(j);
+					if (!selectedNote.isSelected() || note.totallyEquals(selectedNote))
 						continue;
-					}
 					// if a selected note begins in the middle of another note,
 					// clip the covered note
-					if (otherNote.getOnTick() > newOnTick && otherNote.getOnTick() - 1 < newOffTick) {
-						newOffTick = otherNote.getOnTick() - 1;
+					if (selectedNote.getOnTick() > newOnTick
+							&& selectedNote.getOnTick() - 1 < newOffTick) {
+						newOffTick = selectedNote.getOnTick() - 1;
 						// otherwise, if a selected note overlaps with the beginning
 						// of another note, delete the note
 						// (CAN NEVER DELETE SELECTED NOTES THIS WAY!)
-					} else if (!note.isSelected() && otherNote.getOnTick() <= newOnTick
-							&& otherNote.getOffTick() > newOnTick) {
+					} else if (!note.isSelected() && selectedNote.getOnTick() <= newOnTick
+							&& selectedNote.getOffTick() > newOnTick) {
 						// we 'delete' the note temporarily by moving
 						// it offscreen, so it won't ever be played or drawn
 						newOnTick = (long) MidiManager.MAX_TICKS * 2;
@@ -168,6 +216,26 @@ public class MidiNotesEventManager {
 				}
 				setNoteTicks(note, newOnTick, newOffTick, false);
 			}
+		}
+	}
+
+	// called after release of touch event - this
+	// finalizes the note on/off ticks of all notes
+	public static void finalizeNoteTicks() {
+		List<MidiNote> notesToDestroy = new ArrayList<MidiNote>();
+		for (Track track : TrackManager.getTracks()) {
+			for (MidiNote note : track.getMidiNotes()) {
+				if (note.isMarkedForDeletion()) {
+					notesToDestroy.add(note);
+				} else {
+					note.finalizeTicks();
+				}
+			}
+		}
+
+		for (MidiNote note : notesToDestroy) {
+			Log.d("Track", "Destroying note in finalize!");
+			destroyNote(note);
 		}
 	}
 
@@ -183,22 +251,15 @@ public class MidiNotesEventManager {
 		byte endPitch = note.getPitch();
 
 		if (beginVelocity != endVelocity || beginPan != endPan || beginPitch != endPitch) {
-			midiNoteDiffs.add(new MidiNoteLevelsDiff(note, beginVelocity, beginPan, beginPitch,
-					endVelocity, endPan, endPitch));
+			addDiff(new MidiNoteLevelsDiff(note, beginVelocity, beginPan, beginPitch, endVelocity,
+					endPan, endPitch));
 		}
 	}
 
-	private static void setNoteTicks(MidiNote midiNote, long onTick, long offTick,
+	private static boolean setNoteTicks(MidiNote note, long onTick, long offTick,
 			boolean maintainNoteLength) {
-		Track track = TrackManager.getTrack(midiNote.getNoteValue());
-		setNoteTicks(track, midiNote, onTick, offTick, maintainNoteLength);
-	}
-
-	private static void setNoteTicks(Track track, MidiNote note, long onTick, long offTick,
-			boolean maintainNoteLength) {
-		if ((note.getOnTick() == onTick && note.getOffTick() == offTick)
-				|| !track.containsNote(note)) {
-			return;
+		if (note.getOnTick() == onTick && note.getOffTick() == offTick) {
+			return false;
 		}
 
 		if (offTick <= onTick)
@@ -214,12 +275,7 @@ public class MidiNotesEventManager {
 			offTick = note.getOffTick() + onTick - note.getOnTick();
 		}
 
-		long beginOnTick = note.getOnTick();
-		long beginOffTick = note.getOffTick();
-
-		note.setTicks(onTick, offTick);
-		midiNoteDiffs.add(new MidiNoteMoveDiff(note.getNoteValue(), beginOnTick, beginOffTick, note
-				.getNoteValue(), note.getOnTick(), note.getOffTick()));
+		return note.setTicks(onTick, offTick);
 	}
 
 	private static void pinchNote(MidiNote midiNote, long onTickDiff, long offTickDiff) {
@@ -230,5 +286,34 @@ public class MidiNotesEventManager {
 		if (midiNote.getOffTick() + offTickDiff <= MidiManager.MAX_TICKS)
 			newOffTick += offTickDiff;
 		setNoteTicks(midiNote, (long) newOnTick, (long) newOffTick, false);
+	}
+
+	private static void addDiff(MidiNoteDiff diff) {
+		if (isActive()) {
+			// only add diffs to list if they're coming from a begin/end session (usually touch
+			// events). This way, if we are undoing/redoing, the diff will only be applied,
+			// not added to the list
+			midiNoteDiffs.add(diff);
+		}
+	}
+
+	private static void addDiffs(Collection<MidiNoteDiff> diffs) {
+		if (isActive()) {
+			midiNoteDiffs.addAll(diffs);
+		}
+	}
+
+	private static void activate() {
+		TrackManager.saveNoteTicks();
+		midiNoteDiffs = new ArrayList<MidiNoteDiff>();
+		beginNotes = TrackManager.copyMidiNotes();
+	}
+
+	private static void deactivate() {
+		beginNotes = null;
+	}
+
+	private static boolean isActive() {
+		return beginNotes != null;
 	}
 }
