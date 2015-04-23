@@ -187,6 +187,17 @@ public class MidiNote implements Comparable<MidiNote> {
 		this.rectangle = rectangle;
 	}
 
+	public Levels getLevels() {
+		return new Levels(getLevel(LevelType.VOLUME), getLevel(LevelType.PAN),
+				getLevel(LevelType.PITCH));
+	}
+
+	public void setLevels(Levels levels) {
+		setLevel(LevelType.VOLUME, levels.velocity);
+		setLevel(LevelType.PAN, levels.pan);
+		setLevel(LevelType.PITCH, levels.pitch);
+	}
+
 	public byte getLevel(LevelType levelType) {
 		switch (levelType) {
 		case VOLUME:
@@ -291,6 +302,51 @@ public class MidiNote implements Comparable<MidiNote> {
 	private void setPitch(byte pitch) {
 		noteOn.setPitch(pitch);
 		noteOff.setPitch(pitch);
+	}
+
+	public class Levels {
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + pan;
+			result = prime * result + pitch;
+			result = prime * result + velocity;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Levels other = (Levels) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (pan != other.pan)
+				return false;
+			if (pitch != other.pitch)
+				return false;
+			if (velocity != other.velocity)
+				return false;
+			return true;
+		}
+
+		public byte velocity, pan, pitch;
+
+		public Levels(byte velocity, byte pan, byte pitch) {
+			this.velocity = velocity;
+			this.pan = pan;
+			this.pitch = pitch;
+		}
+
+		private MidiNote getOuterType() {
+			return MidiNote.this;
+		}
 	}
 
 	@Override

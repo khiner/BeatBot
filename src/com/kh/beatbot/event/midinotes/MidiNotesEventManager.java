@@ -2,7 +2,9 @@ package com.kh.beatbot.event.midinotes;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.util.Log;
 
@@ -11,10 +13,12 @@ import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.midi.MidiNote.Levels;
 import com.kh.beatbot.track.Track;
 
 public class MidiNotesEventManager {
 	private static List<MidiNoteDiff> midiNoteDiffs;
+	private static Map<MidiNote, Levels> originalNoteLevels = new HashMap<MidiNote, Levels>();
 
 	private static boolean active = false;
 
@@ -40,6 +44,14 @@ public class MidiNotesEventManager {
 					moveDiffs.add(new MidiNoteMoveDiff(note.getSavedNoteValue(), note
 							.getSavedOnTick(), note.getSavedOffTick(), note.getNoteValue(), note
 							.getOnTick(), note.getOffTick()));
+				}
+
+				if (originalNoteLevels.containsKey(note)) {
+					Levels originalLevels = originalNoteLevels.get(note);
+					Levels newLevels = note.getLevels();
+					if (!originalLevels.equals(newLevels)) {
+						addDiff(new MidiNoteLevelsDiff(note, originalLevels, newLevels));
+					}
 				}
 			}
 		}
@@ -235,20 +247,11 @@ public class MidiNotesEventManager {
 	}
 
 	public static void setNoteLevel(MidiNote note, LevelType levelType, byte level) {
-		byte beginVelocity = note.getVelocity();
-		byte beginPan = note.getPan();
-		byte beginPitch = note.getPitch();
+		if (!originalNoteLevels.containsKey(note)) {
+			originalNoteLevels.put(note, note.getLevels());
+		}
 
 		note.setLevel(levelType, level);
-
-		byte endVelocity = note.getVelocity();
-		byte endPan = note.getPan();
-		byte endPitch = note.getPitch();
-
-		if (beginVelocity != endVelocity || beginPan != endPan || beginPitch != endPitch) {
-			addDiff(new MidiNoteLevelsDiff(note, beginVelocity, beginPan, beginPitch, endVelocity,
-					endPan, endPitch));
-		}
 	}
 
 	private static boolean setNoteTicks(MidiNote note, long onTick, long offTick,
@@ -301,6 +304,7 @@ public class MidiNotesEventManager {
 	private static void activate() {
 		TrackManager.saveNoteTicks();
 		midiNoteDiffs = new ArrayList<MidiNoteDiff>();
+		originalNoteLevels.clear();
 		active = true;
 	}
 
