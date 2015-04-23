@@ -23,7 +23,7 @@ public class TrackCreateEvent implements Executable, Stateful {
 	}
 
 	@Override
-	public void redo() {
+	public void apply() {
 		doExecute();
 	}
 

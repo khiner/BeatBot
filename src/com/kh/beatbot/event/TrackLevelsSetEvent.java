@@ -30,7 +30,7 @@ public class TrackLevelsSetEvent implements Stateful, Temporal {
 	}
 
 	@Override
-	public void redo() {
+	public void apply() {
 		finalLevels.setTrackLevels(track);
 	}
 

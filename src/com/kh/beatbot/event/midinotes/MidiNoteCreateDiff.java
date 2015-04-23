@@ -12,6 +12,10 @@ public class MidiNoteCreateDiff extends MidiNoteDiff {
 
 	private MidiNote note;
 
+	public MidiNoteCreateDiff() {
+		
+	}
+
 	public MidiNoteCreateDiff(int noteValue, long onTick, long offTick) {
 		this.noteValue = noteValue;
 		this.onTick = onTick;

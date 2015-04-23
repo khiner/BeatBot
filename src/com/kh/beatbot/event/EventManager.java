@@ -46,7 +46,7 @@ public class EventManager {
 
 	public static final void redo() {
 		if (canRedo()) {
-			events.get(++currEventIndex).redo();
+			events.get(++currEventIndex).apply();
 			notifyEventCompleted(null);
 		}
 	}

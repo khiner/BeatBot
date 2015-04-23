@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 
 import com.kh.beatbot.event.EventJsonFactory;
 import com.kh.beatbot.event.EventManager;
-import com.kh.beatbot.event.Executable;
 import com.kh.beatbot.event.Stateful;
 
 public class ProjectFile {
@@ -28,9 +27,7 @@ public class ProjectFile {
 				EventManager.jumpTo(eventIndex);
 			} catch (NumberFormatException e) { // this is an event, not the event index
 				final Stateful event = EventJsonFactory.fromJson(serializedEvent);
-				// XXX not using simple execute() since midi events won't make it to the
-				// EventManager if there's no batch midi event
-				((Executable) event).doExecute();
+				((Stateful) event).apply();
 				EventManager.eventCompleted(event);
 			}
 		}

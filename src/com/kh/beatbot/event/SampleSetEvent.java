@@ -23,7 +23,7 @@ public class SampleSetEvent implements Executable, Stateful {
 	}
 
 	@Override
-	public void redo() {
+	public void apply() {
 		doExecute(newSample);
 	}
 

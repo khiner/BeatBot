@@ -18,6 +18,10 @@ public class MidiNotesDiffEvent implements Stateful {
 		this.midiNoteDiffs = midiNoteDiffs;
 	}
 
+	public List<MidiNoteDiff> getMidiNoteDiffs() {
+		return midiNoteDiffs;
+	}
+
 	@Override
 	public void undo() {
 		TrackManager.saveNoteTicks();
@@ -34,7 +38,7 @@ public class MidiNotesDiffEvent implements Stateful {
 	}
 
 	@Override
-	public void redo() {
+	public void apply() {
 		TrackManager.saveNoteTicks();
 		TrackManager.deselectAllNotes();
 		
@@ -45,9 +49,5 @@ public class MidiNotesDiffEvent implements Stateful {
 		MidiNotesEventManager.handleNoteCollisions();
 		MidiNotesEventManager.finalizeNoteTicks();
 		TrackManager.deselectAllNotes();
-	}
-	
-	public void apply() {
-		redo();
 	}
 }

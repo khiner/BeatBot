@@ -33,7 +33,7 @@ public class SampleLoopWindowSetEvent implements Stateful, Temporal {
 	}
 
 	@Override
-	public void redo() {
+	public void apply() {
 		track.setSampleLoopWindow(finalBeginLevel, finalEndLevel);
 	}
 }

@@ -21,7 +21,7 @@ public class SampleRenameEvent implements Executable, Stateful {
 	}
 
 	@Override
-	public void redo() {
+	public void apply() {
 		doExecute(newSampleName);
 	}
 
