@@ -36,12 +36,13 @@ public class ProjectFile {
 
 	public void save() throws IOException {
 		FileOutputStream outputStream = new FileOutputStream(new File(path));
-		for (Stateful event : EventManager.getEvents()) {
+		for (Stateful event : EventManager.getSerializableEvents()) {
 			String eventJson = EventJsonFactory.toJson(event) + "\n";
 			outputStream.write(eventJson.getBytes());
 		}
 
-		outputStream.write(String.valueOf(EventManager.getCurrentEventIndex()).getBytes());
+		int eventIndex = EventManager.getCurrentSerializableEventIndex();
+		outputStream.write(String.valueOf(eventIndex).getBytes());
 		outputStream.close();
 	}
 }
