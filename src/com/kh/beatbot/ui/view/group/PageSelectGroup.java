@@ -55,11 +55,18 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	}
 
 	public void selectBrowsePage() {
-		trackButtonRow.getBrowseButton().trigger(true);
+		ToggleButton browseButton = trackButtonRow.getBrowseButton();
+		if (!browseButton.isChecked()) {
+			browseButton.trigger(true);
+		}
 	}
 
 	public void selectLevelsPage() {
-		((PageButtonRow) buttonRowPager.getCurrPage()).getLevelsButton().trigger();
+		ToggleButton levelsButton = ((PageButtonRow) buttonRowPager.getCurrPage())
+				.getLevelsButton();
+		if (!levelsButton.isChecked()) {
+			levelsButton.trigger();
+		}
 	}
 
 	@Override
@@ -181,7 +188,10 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		if (!track.isSelected())
 			track.select();
 		// select note levels page whenever a note levels change event occurs
-		trackButtonRow.getNoteLevelsButton().trigger(true);
+		ToggleButton noteLevelsButton = trackButtonRow.getNoteLevelsButton();
+		if (!noteLevelsButton.isChecked()) {
+			noteLevelsButton.trigger(true);
+		}
 		noteLevelsPage.setLevelType(type);
 	}
 
@@ -192,7 +202,10 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	@Override
 	public void onSampleLoopWindowChange(Track track) {
-		trackButtonRow.getEditButton().trigger(true);
+		ToggleButton editButton = trackButtonRow.getEditButton();
+		if (!editButton.isChecked()) {
+			editButton.trigger(true);
+		}
 	}
 
 	public void updateEffectsPage() {

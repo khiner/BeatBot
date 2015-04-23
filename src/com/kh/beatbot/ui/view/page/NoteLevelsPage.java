@@ -10,7 +10,6 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class NoteLevelsPage extends TrackPage {
-
 	private NoteLevelsView noteLevelsView;
 	private ToggleButton volumeButton, panButton, pitchButton;
 
@@ -24,8 +23,10 @@ public class NoteLevelsPage extends TrackPage {
 	}
 
 	public void setLevelType(LevelType levelType) {
-		noteLevelsView.setLevelType(levelType);
-		update();
+		if (noteLevelsView.getLevelType() != levelType) {
+			noteLevelsView.setLevelType(levelType);
+			update();
+		}
 	}
 
 	private void deselectAll() {
@@ -88,7 +89,7 @@ public class NoteLevelsPage extends TrackPage {
 		noteLevelsView.layout(this, toggleWidth + BG_OFFSET, BG_OFFSET, width - toggleWidth
 				- BG_OFFSET * 2, height - BG_OFFSET * 2);
 	}
-	
+
 	private void update() {
 		deselectAll();
 		getActiveLevelButton().setChecked(true);

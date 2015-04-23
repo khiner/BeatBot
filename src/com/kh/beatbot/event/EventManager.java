@@ -16,6 +16,7 @@ public class EventManager {
 	private static final List<Class> serializableEventClasses = new ArrayList<Class>() {
 		{
 			add(MidiNotesDiffEvent.class);
+			add(SampleLoopWindowSetEvent.class);
 		}
 	};
 

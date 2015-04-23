@@ -216,7 +216,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void handleActionDown(int id, Pointer pos) {
-		loopWindowEvent = new SampleLoopWindowSetEvent(TrackManager.currTrack);
+		loopWindowEvent = new SampleLoopWindowSetEvent(TrackManager.currTrack.getId());
 		loopWindowEvent.begin();
 		super.handleActionDown(id, pos);
 		if (!hasSample())

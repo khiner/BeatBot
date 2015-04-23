@@ -56,14 +56,18 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	public static void notifyTrackLevelsSetEvent(BaseTrack track) {
-		track.select();
+		if (!track.equals(currTrack)) {
+			track.select();
+		}
 		for (TrackLevelsEventListener listener : trackLevelsEventListeners) {
 			listener.onTrackLevelsChange(track);
 		}
 	}
 
 	public static void notifyLoopWindowSetEvent(Track track) {
-		track.select();
+		if (!track.equals(currTrack)) {
+			track.select();
+		}
 		for (TrackLevelsEventListener listener : trackLevelsEventListeners) {
 			listener.onSampleLoopWindowChange(track);
 		}
