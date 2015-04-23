@@ -164,7 +164,11 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		if (masterButton.isChecked())
 			// make sure *some* track is selected.
 			TrackManager.getTrack(0).select();
-		trackButtonRow.update();
+		else {
+			trackButtonRow.update();
+		}
+		selectBrowsePage();
+		browsePage.update();
 	}
 
 	@Override

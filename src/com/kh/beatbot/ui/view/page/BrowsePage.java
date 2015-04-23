@@ -43,8 +43,12 @@ public class BrowsePage extends Menu implements TrackListener {
 		}
 
 		this.currTrack = (Track) track;
+		update();
+	}
+
+	public void update() {
 		// recursively select file menu items based on current sample
-		File currSampleFile = ((Track) track).getCurrSampleFile();
+		File currSampleFile = currTrack.getCurrSampleFile();
 		if (null == currSampleFile)
 			return;
 		String currSamplePath = currSampleFile.getAbsolutePath();
