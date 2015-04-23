@@ -37,11 +37,8 @@ public class MidiManager {
 
 	public static void init() {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION);
-		setBPM(120);
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
-		setLoopBeginTick(0);
-		setLoopEndTick(TICKS_PER_NOTE * 4);
 	}
 
 	public static void addLoopChangeListener(LoopWindowListener listener) {

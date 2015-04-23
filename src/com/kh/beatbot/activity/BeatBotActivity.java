@@ -270,6 +270,10 @@ public class BeatBotActivity extends Activity {
 
 		TrackManager.getTrack(0).select();
 		View.mainPage.pageSelectGroup.selectLevelsPage();
+
+		MidiManager.setBPM(120);
+		MidiManager.setLoopBeginTick(0);
+		MidiManager.setLoopEndTick(MidiManager.TICKS_PER_NOTE * 4);
 	}
 
 	public void launchEffect(Effect effect) {
