@@ -297,8 +297,8 @@ public class MidiNote implements Comparable<MidiNote> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((noteOff == null) ? 0 : noteOff.hashCode());
-		result = prime * result + ((noteOn == null) ? 0 : noteOn.hashCode());
+		result = prime + getNoteValue();
+		result = prime * result + (int) getOnTick();
 		return result;
 	}
 
