@@ -1,15 +1,26 @@
 package com.kh.beatbot.event.midinotes;
 
 import com.kh.beatbot.effect.Effect.LevelType;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 
 public class MidiNoteLevelsDiff extends MidiNoteDiff {
-	MidiNote midiNote;
+	// identifying info for note
+	int noteValue;
+	long onTick;
+
 	byte beginVelocity, beginPan, beginPitch, endVelocity, endPan, endPitch;
 
 	public MidiNoteLevelsDiff(MidiNote midiNote, byte beginVelocity, byte beginPan,
 			byte beginPitch, byte endVelocity, byte endPan, byte endPitch) {
-		this.midiNote = midiNote;
+		this(midiNote.getNoteValue(), midiNote.getOnTick(), beginVelocity, beginPan, beginPitch,
+				endVelocity, endPan, endPitch);
+	}
+
+	public MidiNoteLevelsDiff(int noteValue, long onTick, byte beginVelocity, byte beginPan,
+			byte beginPitch, byte endVelocity, byte endPan, byte endPitch) {
+		this.noteValue = noteValue;
+		this.onTick = onTick;
 
 		this.beginVelocity = beginVelocity;
 		this.beginPan = beginPan;
@@ -22,14 +33,16 @@ public class MidiNoteLevelsDiff extends MidiNoteDiff {
 
 	@Override
 	public void apply() {
-		midiNote.setLevel(LevelType.VOLUME, endVelocity);
-		midiNote.setLevel(LevelType.PAN, endPan);
-		midiNote.setLevel(LevelType.PITCH, endPitch);
+		// when restoring from saved file, saved ticks can be different
+		MidiNote note = TrackManager.getTrack(noteValue).findNoteStarting(onTick);
+		note.setLevel(LevelType.VOLUME, endVelocity);
+		note.setLevel(LevelType.PAN, endPan);
+		note.setLevel(LevelType.PITCH, endPitch);
 	}
 
 	@Override
 	public MidiNoteLevelsDiff opposite() {
-		return new MidiNoteLevelsDiff(midiNote, endVelocity, endPan, endPitch, beginVelocity,
-				beginPan, beginPitch);
+		return new MidiNoteLevelsDiff(noteValue, onTick, endVelocity, endPan, endPitch,
+				beginVelocity, beginPan, beginPitch);
 	}
 }
