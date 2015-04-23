@@ -73,7 +73,7 @@ public class LevelsPage extends TrackPage implements TouchableViewListener {
 	@Override
 	public void onPress(TouchableView view) {
 		if (numControlsPressed.getAndIncrement() == 0) {
-			levelsSetEvent = new TrackLevelsSetEvent(getCurrTrack());
+			levelsSetEvent = new TrackLevelsSetEvent(getCurrTrack().getId());
 			levelsSetEvent.begin();
 		}
 	}

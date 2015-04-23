@@ -4,7 +4,6 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.Track;
 
 public class TrackCreateEvent implements Executable, Stateful {
-
 	private Track createdTrack = null;
 
 	public TrackCreateEvent() {

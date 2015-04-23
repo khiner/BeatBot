@@ -18,6 +18,7 @@ public class EventManager {
 			add(MidiNotesDiffEvent.class);
 			add(LoopWindowSetEvent.class);
 			add(SampleLoopWindowSetEvent.class);
+			add(TrackLevelsSetEvent.class);
 		}
 	};
 
