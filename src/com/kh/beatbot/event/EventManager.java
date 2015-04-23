@@ -54,6 +54,9 @@ public class EventManager {
 
 	// some undoable events are not serializable
 	public static int getCurrentSerializableEventIndex() {
+		if (currEventIndex < 0)
+			return -1;
+
 		Stateful currEvent = events.get(currEventIndex);
 
 		int currSerializableEventIndex = -1;
