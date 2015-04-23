@@ -220,9 +220,9 @@ public class Track extends BaseTrack implements FileListener {
 	}
 
 	public void setSampleLoopWindow(float beginLevel, float endLevel) {
+		TrackManager.notifyLoopWindowSetEvent(this);
 		getLoopBeginParam().setLevel(beginLevel);
 		getLoopEndParam().setLevel(endLevel);
-		TrackManager.notifyLoopWindowSetEvent(this);
 	}
 
 	public SampleParams getCurrSampleParams() {

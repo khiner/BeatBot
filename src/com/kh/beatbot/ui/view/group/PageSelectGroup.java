@@ -149,7 +149,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	@Override
 	public synchronized void onSampleChange(Track track) {
 		trackButtonRow.update();
-		((TrackListener) pager.getCurrPage()).onSelect(track);
 	}
 
 	@Override
@@ -162,8 +161,10 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	@Override
 	public void onNameChange(File file, File newFile) {
+		if (masterButton.isChecked())
+			// make sure *some* track is selected.
+			TrackManager.getTrack(0).select();
 		trackButtonRow.update();
-		((TrackListener) pager.getCurrPage()).onSelect(TrackManager.currTrack);
 	}
 
 	@Override
@@ -172,7 +173,9 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	}
 
 	public void onNoteLevelsChange(MidiNote note, LevelType type) {
-		TrackManager.getTrack(note).select();
+		Track track = TrackManager.getTrack(note);
+		if (!track.isSelected())
+			track.select();
 		// select note levels page whenever a note levels change event occurs
 		trackButtonRow.getNoteLevelsButton().trigger(true);
 		noteLevelsPage.setLevelType(type);
