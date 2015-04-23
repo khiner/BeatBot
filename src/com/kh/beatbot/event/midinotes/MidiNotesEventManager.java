@@ -15,7 +15,7 @@ import com.kh.beatbot.track.Track;
 
 public class MidiNotesEventManager {
 	private static List<MidiNoteDiff> midiNoteDiffs;
-	private static List<MidiNote> beginNotes;
+	private static boolean active = false;
 
 	public static synchronized void begin() {
 		end();
@@ -300,14 +300,14 @@ public class MidiNotesEventManager {
 	private static void activate() {
 		TrackManager.saveNoteTicks();
 		midiNoteDiffs = new ArrayList<MidiNoteDiff>();
-		beginNotes = TrackManager.copyMidiNotes();
+		active = true;
 	}
 
 	private static void deactivate() {
-		beginNotes = null;
+		active = false;
 	}
 
 	private static boolean isActive() {
-		return beginNotes != null;
+		return active;
 	}
 }
