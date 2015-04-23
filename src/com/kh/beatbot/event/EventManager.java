@@ -73,6 +73,7 @@ public class EventManager {
 	public static void clearEvents() {
 		events.clear();
 		currEventIndex = -1;
+		notifyEventCompleted(null);
 	}
 
 	public static void addListener(StatefulEventListener listener) {
