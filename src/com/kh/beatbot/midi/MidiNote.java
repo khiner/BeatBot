@@ -329,13 +329,4 @@ public class MidiNote implements Comparable<MidiNote> {
 			return false;
 		return true;
 	}
-
-	// includes savedTicks
-	public boolean totallyEquals(Object obj) {
-		if (!this.equals(obj))
-			return false;
-		MidiNote other = (MidiNote) obj;
-		return this.savedNoteValue == other.savedNoteValue && this.savedOnTick == other.savedOnTick
-				&& this.savedOffTick == other.savedOffTick;
-	}
 }

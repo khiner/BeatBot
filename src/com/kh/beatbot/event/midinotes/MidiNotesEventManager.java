@@ -15,6 +15,7 @@ import com.kh.beatbot.track.Track;
 
 public class MidiNotesEventManager {
 	private static List<MidiNoteDiff> midiNoteDiffs;
+
 	private static boolean active = false;
 
 	public static synchronized void begin() {
@@ -189,7 +190,7 @@ public class MidiNotesEventManager {
 				long newOffTick = note.isSelected() ? note.getOffTick() : note.getSavedOffTick();
 				for (int j = 0; j < notes.size(); j++) {
 					MidiNote selectedNote = notes.get(j);
-					if (!selectedNote.isSelected() || note.totallyEquals(selectedNote))
+					if (!selectedNote.isSelected() || note.equals(selectedNote))
 						continue;
 					// if a selected note begins in the middle of another note,
 					// clip the covered note
@@ -204,7 +205,7 @@ public class MidiNotesEventManager {
 						// we 'delete' the note temporarily by moving
 						// it offscreen, so it won't ever be played or drawn
 						newOnTick = (long) MidiManager.MAX_TICKS * 2;
-						newOffTick = (long) MidiManager.MAX_TICKS * 2 + 100;
+						newOffTick = newOnTick + 100;
 						break;
 					}
 				}
