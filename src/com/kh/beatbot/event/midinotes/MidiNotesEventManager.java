@@ -54,18 +54,12 @@ public class MidiNotesEventManager {
 		deactivate();
 	}
 
-	public static MidiNote createNote(int note, long onTick, long offTick) {
-		MidiNoteCreateDiff createDiff = new MidiNoteCreateDiff(note, onTick, offTick);
+	public static MidiNote createNote(int noteValue, long onTick, long offTick) {
+		MidiNoteCreateDiff createDiff = new MidiNoteCreateDiff(noteValue, onTick, offTick);
 		addDiff(createDiff);
 		new MidiNotesDiffEvent(createDiff).apply();
-		return createDiff.getNote();
-	}
 
-	public static MidiNote createNote(MidiNote note) {
-		MidiNoteCreateDiff createDiff = new MidiNoteCreateDiff(note);
-		addDiff(createDiff);
-		new MidiNotesDiffEvent(createDiff).apply();
-		return createDiff.getNote();
+		return MidiManager.findNote(noteValue, onTick);
 	}
 
 	public static void createNotes(List<MidiNote> notes) {

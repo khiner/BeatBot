@@ -1,7 +1,7 @@
 package com.kh.beatbot.event.midinotes;
 
 import com.kh.beatbot.effect.Effect.LevelType;
-import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 
 public class MidiNoteLevelsDiff extends MidiNoteDiff {
@@ -34,7 +34,7 @@ public class MidiNoteLevelsDiff extends MidiNoteDiff {
 	@Override
 	public void apply() {
 		// when restoring from saved file, saved ticks can be different
-		MidiNote note = TrackManager.getTrack(noteValue).findNoteStarting(onTick);
+		MidiNote note = MidiManager.findNote(noteValue, onTick);
 		note.setLevel(LevelType.VOLUME, endVelocity);
 		note.setLevel(LevelType.PAN, endPan);
 		note.setLevel(LevelType.PITCH, endPitch);
