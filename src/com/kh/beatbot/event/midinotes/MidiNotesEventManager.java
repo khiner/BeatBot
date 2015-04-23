@@ -49,8 +49,14 @@ public class MidiNotesEventManager {
 				if (originalNoteLevels.containsKey(note)) {
 					Levels originalLevels = originalNoteLevels.get(note);
 					Levels newLevels = note.getLevels();
-					if (!originalLevels.equals(newLevels)) {
-						addDiff(new MidiNoteLevelsDiff(note, originalLevels, newLevels));
+					if (originalLevels.velocity != newLevels.velocity) {
+						addDiff(new MidiNoteLevelsDiff(note, LevelType.VOLUME, originalLevels.velocity, newLevels.velocity));
+					}
+					if (originalLevels.pan != newLevels.pan) {
+						addDiff(new MidiNoteLevelsDiff(note, LevelType.PAN, originalLevels.pan, newLevels.pan));
+					}
+					if (originalLevels.pitch != newLevels.pitch) {
+						addDiff(new MidiNoteLevelsDiff(note, LevelType.PITCH, originalLevels.pitch, newLevels.pitch));
 					}
 				}
 			}
