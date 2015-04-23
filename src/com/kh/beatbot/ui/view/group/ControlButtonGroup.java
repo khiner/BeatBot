@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.view.group;
 
 import android.widget.Toast;
 
+import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
@@ -140,6 +141,11 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 	@Override
 	public void onMove(MidiNote note, int beginNoteValue, long beginOnTick, long beginOffTick,
 			int endNoteValue, long endOnTick, long endOffTick) {
+		// no-op
+	}
+
+	@Override
+	public void onLevelChanged(MidiNote note, LevelType type) {
 		// no-op
 	}
 

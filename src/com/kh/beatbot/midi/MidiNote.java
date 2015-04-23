@@ -234,6 +234,7 @@ public class MidiNote implements Comparable<MidiNote> {
 			setPitch(level);
 			break;
 		}
+		notifyLevelSet(levelType);
 	}
 
 	public int euclideanDistance(MidiNote other) {
@@ -276,6 +277,10 @@ public class MidiNote implements Comparable<MidiNote> {
 				endOnTick, endOffTick);
 		View.mainPage.onMove(this, beginNoteValue, beginOnTick, beginOffTick, endNoteValue,
 				endOnTick, endOffTick);
+	}
+
+	private void notifyLevelSet(LevelType type) {
+		View.mainPage.onLevelChanged(this, type);
 	}
 
 	private void notifySelectStateChanged() {

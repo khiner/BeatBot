@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.view;
 
 import android.util.SparseArray;
 
+import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.listener.LoopWindowListener;
 import com.kh.beatbot.listener.MidiNoteListener;
@@ -617,5 +618,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		loopMarkerLines[0].bringToTop();
 		loopMarkerLines[1].bringToTop();
 		selectRect.bringToTop();
+	}
+
+	@Override
+	public void onLevelChanged(MidiNote note, LevelType type) {
+		// no-op
 	}
 }

@@ -10,6 +10,7 @@ import java.util.Set;
 import android.app.AlertDialog;
 import android.content.Context;
 
+import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.FileListener;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.TrackLevelsEventListener;
@@ -58,13 +59,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		track.select();
 		for (TrackLevelsEventListener listener : trackLevelsEventListeners) {
 			listener.onTrackLevelsChange(track);
-		}
-	}
-
-	public static void notifyNoteLevelsSetEvent(Track track) {
-		track.select();
-		for (TrackLevelsEventListener listener : trackLevelsEventListeners) {
-			listener.onNoteLevelsChange(track);
 		}
 	}
 
@@ -446,6 +440,11 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	@Override
 	public void onSelectStateChange(MidiNote note) {
+		// no-op
+	}
+
+	@Override
+	public void onLevelChanged(MidiNote note, LevelType type) {
 		// no-op
 	}
 }

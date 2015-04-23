@@ -20,8 +20,12 @@ public class NoteLevelsPage extends TrackPage {
 
 	@Override
 	public void onSelect(BaseTrack track) {
-		deselectAll();
-		getActiveLevelButton().setChecked(true);
+		update();
+	}
+
+	public void setLevelType(LevelType levelType) {
+		noteLevelsView.setLevelType(levelType);
+		update();
 	}
 
 	private void deselectAll() {
@@ -83,5 +87,10 @@ public class NoteLevelsPage extends TrackPage {
 		pitchButton.layout(this, 0, toggleHeight * 2, toggleWidth, toggleHeight);
 		noteLevelsView.layout(this, toggleWidth + BG_OFFSET, BG_OFFSET, width - toggleWidth
 				- BG_OFFSET * 2, height - BG_OFFSET * 2);
+	}
+	
+	private void update() {
+		deselectAll();
+		getActiveLevelButton().setChecked(true);
 	}
 }

@@ -2,12 +2,14 @@ package com.kh.beatbot.ui.view.group;
 
 import java.io.File;
 
+import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.FileListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.PagerListener;
 import com.kh.beatbot.listener.TrackLevelsEventListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -169,10 +171,11 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		((TrackListener) newPage).onSelect(TrackManager.currTrack);
 	}
 
-	@Override
-	public void onNoteLevelsChange(Track track) {
+	public void onNoteLevelsChange(MidiNote note, LevelType type) {
+		TrackManager.getTrack(note).select();
 		// select note levels page whenever a note levels change event occurs
 		trackButtonRow.getNoteLevelsButton().trigger(true);
+		noteLevelsPage.setLevelType(type);
 	}
 
 	@Override
@@ -188,5 +191,4 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	public void updateEffectsPage() {
 		effectsPage.updateEffectLabels();
 	}
-
 }

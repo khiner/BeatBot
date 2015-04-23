@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.view.page;
 
+import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
@@ -84,5 +85,10 @@ public class MainPage extends TouchableView implements MidiNoteListener {
 	public void onSelectStateChange(MidiNote note) {
 		controlButtonGroup.onSelectStateChange(note);
 		midiViewGroup.midiView.onSelectStateChange(note);
+	}
+
+	@Override
+	public void onLevelChanged(MidiNote note, LevelType type) {
+		pageSelectGroup.onNoteLevelsChange(note, type);
 	}
 }

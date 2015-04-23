@@ -1,5 +1,6 @@
 package com.kh.beatbot.listener;
 
+import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.midi.MidiNote;
 
 public interface MidiNoteListener {
@@ -11,4 +12,6 @@ public interface MidiNoteListener {
 			int endNoteValue, long endOnTick, long endOffTick);
 
 	public void onSelectStateChange(MidiNote note);
+	
+	public void onLevelChanged(MidiNote note, LevelType type);
 }
