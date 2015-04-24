@@ -16,13 +16,13 @@ import com.kh.beatbot.ui.view.control.ValueLabel;
 import com.kh.beatbot.ui.view.control.param.SeekbarParamControl;
 import com.kh.beatbot.ui.view.control.param.SeekbarParamControl.SeekbarPosition;
 
-public class LevelsPage extends TrackPage implements TouchableViewListener {
+public class TrackLevelsPage extends TrackPage implements TouchableViewListener {
 	// levels attrs
 	protected SeekbarParamControl volumeParamControl, panParamControl;
 	protected PitchParamControl pitchParamControl;
 	protected boolean masterMode = false;
 
-	public LevelsPage(View view) {
+	public TrackLevelsPage(View view) {
 		super(view);
 	}
 
