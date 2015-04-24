@@ -259,8 +259,8 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		return getTrack(note.getNoteValue());
 	}
 
-	public static BaseTrack getBaseTrack(int trackNum) {
-		return trackNum == MASTER_TRACK_ID ? masterTrack : tracks.get(trackNum);
+	public static BaseTrack getBaseTrack(int trackId) {
+		return trackId == MASTER_TRACK_ID ? masterTrack : tracks.get(trackId);
 	}
 
 	public static Track getSoloingTrack() {
@@ -301,8 +301,8 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
-	public static MidiNote getNextMidiNote(int trackNum, long currTick) {
-		return tracks.get(trackNum).getNextMidiNote(currTick);
+	public static MidiNote getNextMidiNote(int trackId, long currTick) {
+		return tracks.get(trackId).getNextMidiNote(currTick);
 	}
 
 	public static void updateAllTrackNextNotes() {

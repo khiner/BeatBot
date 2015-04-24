@@ -49,11 +49,11 @@ OpenSlOut *openSlOut;
 
 jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size);
 
-TrackNode *getTrackNode(int trackNum);
+TrackNode *getTrackNode(int trackId);
 
-Track *getTrack(JNIEnv *env, jclass clazz, int trackNum);
+Track *getTrack(JNIEnv *env, jclass clazz, int trackId);
 
-Levels *getLevels(JNIEnv *env, jclass clazz, int trackNum);
+Levels *getLevels(JNIEnv *env, jclass clazz, int trackId);
 
 void fillTempSample(Track *track);
 
@@ -79,7 +79,7 @@ void addTrack(Track *track);
 
 void removeTrack(TrackNode *trackNode);
 
-void updateLevels(int trackNum);
+void updateLevels(int trackId);
 
 void setPreviewLevels(Track *track);
 

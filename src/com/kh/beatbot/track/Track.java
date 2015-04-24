@@ -347,30 +347,30 @@ public class Track extends BaseTrack implements FileListener {
 		TrackManager.get().onDestroy(this);
 	}
 
-	public static native void deleteTrack(int trackNum);
+	public static native void deleteTrack(int trackId);
 
-	public static native void toggleTrackLooping(int trackNum);
+	public static native void toggleTrackLooping(int trackId);
 
-	public static native boolean isTrackLooping(int trackNum);
+	public static native boolean isTrackLooping(int trackId);
 
-	public static native boolean isTrackPlaying(int trackNum);
+	public static native boolean isTrackPlaying(int trackId);
 
-	public static native void notifyNoteMoved(int trackNum, long oldNoteOn, long oldNoteOff,
+	public static native void notifyNoteMoved(int trackId, long oldNoteOn, long oldNoteOff,
 			long newNoteOn, long newNoteOff);
 
-	public static native void notifyNoteRemoved(int trackNum, long noteOn);
+	public static native void notifyNoteRemoved(int trackId, long noteOn);
 
-	public static native void setTrackLoopWindow(int trackNum, long loopBegin, long loopEnd);
+	public static native void setTrackLoopWindow(int trackId, long loopBegin, long loopEnd);
 
-	public static native void stopTrack(int trackNum);
+	public static native void stopTrack(int trackId);
 
-	public static native void previewTrack(int trackNum);
+	public static native void previewTrack(int trackId);
 
-	public static native void stopPreviewingTrack(int trackNum);
+	public static native void stopPreviewingTrack(int trackId);
 
-	public static native void muteTrack(int trackNum, boolean mute);
+	public static native void muteTrack(int trackId, boolean mute);
 
-	public static native void soloTrack(int trackNum, boolean solo);
+	public static native void soloTrack(int trackId, boolean solo);
 
 	public static native void setTrackReverse(int trackId, boolean reverse);
 

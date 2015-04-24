@@ -129,14 +129,14 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 		}
 	}
 
-	public native void addEffect(int trackNum, int effectId, int position);
+	public native void addEffect(int trackId, int effectId, int position);
 
-	public native void removeEffect(int trackNum, int position);
+	public native void removeEffect(int trackId, int position);
 
-	public static native void setEffectPosition(int trackNum, int oldPosition, int newPosition);
+	public static native void setEffectPosition(int trackId, int oldPosition, int newPosition);
 
-	public native void setEffectOn(int trackNum, int effectPosition, boolean on);
+	public native void setEffectOn(int trackId, int effectPosition, boolean on);
 
-	public native void setEffectParam(int trackNum, int effectPosition, int paramNum,
+	public native void setEffectParam(int trackId, int effectPosition, int paramNum,
 			float paramLevel);
 }

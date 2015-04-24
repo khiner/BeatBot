@@ -146,15 +146,15 @@ EffectNode *removeEffect(Levels *levels, int effectPosition) {
 
 /********* JNI METHODS **********/
 void Java_com_kh_beatbot_effect_Effect_addEffect(JNIEnv *env, jclass clazz,
-		jint trackNum, jint effectId, jint position) {
-	Levels *levels = getLevels(env, clazz, trackNum);
+		jint trackId, jint effectId, jint position) {
+	Levels *levels = getLevels(env, clazz, trackId);
 	Effect *effect = createEffect(effectId);
 	setEffect(levels, position, effect);
 }
 
 void Java_com_kh_beatbot_effect_Effect_removeEffect(JNIEnv *env, jclass clazz,
-		jint trackNum, jint position) {
-	Levels *levels = getLevels(env, clazz, trackNum);
+		jint trackId, jint position) {
+	Levels *levels = getLevels(env, clazz, trackId);
 	EffectNode *effectNode = findEffectNodeByPosition(levels, position);
 	free(effectNode->effect->config);
 	free(effectNode->effect);
@@ -162,16 +162,16 @@ void Java_com_kh_beatbot_effect_Effect_removeEffect(JNIEnv *env, jclass clazz,
 }
 
 void Java_com_kh_beatbot_effect_Effect_setEffectPosition(JNIEnv *env,
-		jclass clazz, jint trackNum, jint oldPosition, jint newPosition) {
+		jclass clazz, jint trackId, jint oldPosition, jint newPosition) {
 	// find node currently at the desired position
-	Levels *levels = getLevels(env, clazz, trackNum);
+	Levels *levels = getLevels(env, clazz, trackId);
 	EffectNode *node = removeEffect(levels, oldPosition);
 	insertEffect(levels, newPosition, node);
 }
 
 void Java_com_kh_beatbot_effect_Effect_setEffectOn(JNIEnv *env, jclass clazz,
-		jint trackNum, jint effectPosition, jboolean on) {
-	Levels *levels = getLevels(env, clazz, trackNum);
+		jint trackId, jint effectPosition, jboolean on) {
+	Levels *levels = getLevels(env, clazz, trackId);
 	EffectNode *effectNode = findEffectNodeByPosition(levels, effectPosition);
 	if (effectNode != NULL) {
 		effectNode->effect->on = on;
@@ -179,16 +179,16 @@ void Java_com_kh_beatbot_effect_Effect_setEffectOn(JNIEnv *env, jclass clazz,
 }
 
 void Java_com_kh_beatbot_effect_Effect_setEffectParam(JNIEnv *env, jclass clazz,
-		jint trackNum, jint effectPosition, jint paramNum, jfloat paramValue) {
+		jint trackId, jint effectPosition, jint paramNum, jfloat paramValue) {
 	if (effectPosition == -1) { // -1 == ADSR
-		Track *track = getTrack(env, clazz, trackNum);
+		Track *track = getTrack(env, clazz, trackId);
 		if (track->generator == NULL) {
 			return;
 		}
 		adsrconfig_setParam(((FileGen *)track->generator->config)->adsr, (float) paramNum, paramValue);
 		return;
 	}
-	Levels *levels = getLevels(env, clazz, trackNum);
+	Levels *levels = getLevels(env, clazz, trackId);
 	EffectNode *effectNode = findEffectNodeByPosition(levels, effectPosition);
 	if (effectNode != NULL) {
 		effectNode->effect->set(effectNode->effect->config, (float) paramNum,

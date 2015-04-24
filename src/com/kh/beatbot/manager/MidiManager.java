@@ -231,7 +231,7 @@ public class MidiManager {
 		return loopEndTick;
 	}
 
-	public static native void isTrackPlaying(int trackNum);
+	public static native void isTrackPlaying(int trackId);
 
 	public static native void setNativeMSPT(long MSPT);
 

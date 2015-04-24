@@ -262,10 +262,10 @@ public class BeatBotActivity extends Activity {
 		EventManager.clearEvents();
 		TrackManager.destroy();
 
-		for (int trackNum = 0; trackNum < FileManager.drumsDirectory.listFiles().length; trackNum++) {
+		for (int trackId = 0; trackId < FileManager.drumsDirectory.listFiles().length; trackId++) {
 			new TrackCreateEvent().doExecute();
-			final File sampleFile = FileManager.drumsDirectory.listFiles()[trackNum].listFiles()[0];
-			TrackManager.setSample(TrackManager.getTrack(trackNum), sampleFile);
+			final File sampleFile = FileManager.drumsDirectory.listFiles()[trackId].listFiles()[0];
+			TrackManager.setSample(TrackManager.getTrack(trackId), sampleFile);
 		}
 
 		TrackManager.getTrack(0).select();
