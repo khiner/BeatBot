@@ -59,7 +59,7 @@ public class Track extends BaseTrack implements FileListener {
 	public void removeNote(MidiNote note) {
 		synchronized (notes) {
 			if (notes.remove(note)) {
-				notifyNoteRemoved(id, note.getOnTick(), note.getOffTick());
+				notifyNoteRemoved(id, note.getOnTick());
 			}
 		}
 	}
@@ -358,7 +358,7 @@ public class Track extends BaseTrack implements FileListener {
 	public static native void notifyNoteMoved(int trackNum, long oldNoteOn, long oldNoteOff,
 			long newNoteOn, long newNoteOff);
 
-	public static native void notifyNoteRemoved(int trackNum, long noteOn, long noteOff);
+	public static native void notifyNoteRemoved(int trackNum, long noteOn);
 
 	public static native void setTrackLoopWindow(int trackNum, long loopBegin, long loopEnd);
 

@@ -476,7 +476,7 @@ void Java_com_kh_beatbot_track_Track_notifyNoteMoved(JNIEnv *env, jclass clazz,
 }
 
 void Java_com_kh_beatbot_track_Track_notifyNoteRemoved(JNIEnv *env, jclass clazz,
-		jint trackNum, jlong onTick, jlong offTick) {
+		jint trackNum, jlong onTick) {
 	Track *track = getTrack(env, clazz, trackNum);
 	if (track->nextStartSample == tickToSample(onTick))
 		stopTrack(track);
