@@ -19,6 +19,7 @@ public class EventManager {
 			add(LoopWindowSetEvent.class);
 			add(SampleLoopWindowSetEvent.class);
 			add(TrackLevelsSetEvent.class);
+			add(SampleSetEvent.class);
 		}
 	};
 

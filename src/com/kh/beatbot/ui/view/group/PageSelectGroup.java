@@ -155,7 +155,10 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	@Override
 	public synchronized void onSampleChange(Track track) {
-		trackButtonRow.update();
+		if (!track.isSelected())
+			track.select();
+		selectBrowsePage();
+		browsePage.onSampleChange(track);
 	}
 
 	@Override

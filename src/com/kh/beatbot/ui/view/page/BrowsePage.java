@@ -72,7 +72,7 @@ public class BrowsePage extends Menu implements TrackListener {
 
 	@Override
 	public void onFileMenuItemReleased(FileMenuItem fileItem) {
-		new SampleSetEvent(TrackManager.currTrack, fileItem.getFile()).execute();
+		new SampleSetEvent(TrackManager.currTrack.getId(), fileItem.getFile()).execute();
 	}
 
 	@Override
@@ -106,6 +106,7 @@ public class BrowsePage extends Menu implements TrackListener {
 	}
 
 	public void onSampleChange(Track track) {
+		update();
 	}
 
 	public void onMuteChange(Track track, boolean mute) {

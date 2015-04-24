@@ -367,7 +367,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	@Override
 	public void onSampleChange(Track track) {
-		track.select();
 		for (TrackListener trackListener : trackListeners) {
 			trackListener.onSampleChange(track);
 		}

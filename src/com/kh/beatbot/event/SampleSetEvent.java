@@ -4,15 +4,14 @@ import java.io.File;
 
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.Track;
-import com.kh.beatbot.ui.view.View;
 
 public class SampleSetEvent implements Executable, Stateful {
-
-	private Track track;
+	private int trackId;
 	private File originalSample, newSample;
 
-	public SampleSetEvent(Track track, File sampleFile) {
-		this.track = track;
+	public SampleSetEvent(int trackId, File sampleFile) {
+		this.trackId = trackId;
+		Track track = TrackManager.getTrack(trackId);
 		originalSample = track.getCurrSampleFile();
 		newSample = sampleFile;
 	}
@@ -39,11 +38,11 @@ public class SampleSetEvent implements Executable, Stateful {
 	}
 
 	public boolean doExecute(File sample) {
+		Track track = TrackManager.getTrack(trackId);
 		if (sample == null || sample.equals(track.getCurrSampleFile())) {
 			return false;
 		}
 		TrackManager.setSample(track, sample);
-		View.mainPage.pageSelectGroup.selectBrowsePage();
 		return true;
 	}
 }
