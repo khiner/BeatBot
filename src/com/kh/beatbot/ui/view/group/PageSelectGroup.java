@@ -62,8 +62,10 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	}
 
 	public void selectLevelsPage() {
-		ToggleButton levelsButton = ((PageButtonRow) buttonRowPager.getCurrPage())
-				.getLevelsButton();
+		PageButtonRow pageButtonRow = ((PageButtonRow) buttonRowPager.getCurrPage());
+		if (null == pageButtonRow)
+			return;
+		ToggleButton levelsButton = pageButtonRow.getLevelsButton();
 		if (!levelsButton.isChecked()) {
 			levelsButton.trigger();
 		}

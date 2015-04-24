@@ -259,6 +259,8 @@ public class BeatBotActivity extends Activity {
 	}
 
 	public static void setupDefaultProject() {
+		// XXX loading a project when currently in the sampleEditView can cause segfault
+		View.mainPage.pageSelectGroup.selectLevelsPage();
 		EventManager.clearEvents();
 		TrackManager.destroy();
 
