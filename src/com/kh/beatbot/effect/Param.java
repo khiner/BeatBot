@@ -91,6 +91,7 @@ public class Param {
 	public void setLevel(float level) {
 		level = GeneralUtils.clipTo(level, minViewLevel, maxViewLevel);
 		viewLevel = level;
+		float prevLevel = this.level;
 		if (isDb()) {
 			this.level = linearToDb(DB_SCALE * logScaleLevel(level));
 		} else if (beatSync) {
@@ -101,7 +102,10 @@ public class Param {
 		if (snap) {
 			this.level = Math.round(this.level);
 		}
-		notifyListeners();
+
+		if (this.level != prevLevel) {
+			notifyListeners();
+		}
 	}
 
 	public float getLevel(float value) {
@@ -261,7 +265,7 @@ public class Param {
 	public static float linearToDb(float linear) {
 		return 20 * (float) Math.log10(linear);
 	}
-	
+
 	protected final String formatValue(float level) {
 		String formattedValue = String.format(format, level);
 		if (!unitString.isEmpty()) {

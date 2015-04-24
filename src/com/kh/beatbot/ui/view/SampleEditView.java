@@ -286,11 +286,13 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void onParamChanged(Param param) {
+		Track track = TrackManager.currTrack;
+
 		if (param == null)
 			return;
-		if (param.equals(TrackManager.currTrack.getGainParam())) {
+		if (param.equals(track.getGainParam())) {
 			waveformShape.resample();
-		} else {
+		} else if (param.equals(track.getLoopBeginParam()) || param.equals(track.getLoopEndParam())) {
 			updateWaveformVb();
 		}
 	}
