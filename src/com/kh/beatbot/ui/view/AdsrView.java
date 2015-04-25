@@ -102,7 +102,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	}
 
 	private float getDecayX(ADSR adsr) {
-		return getAttackX(adsr) + adsr.getDecay() * borderWidth / 3f;
+		return getAttackX(adsr) + viewX(adsr.getDecay() / 3f);
 	}
 
 	private float getReleaseX(ADSR adsr) {
