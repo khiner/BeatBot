@@ -285,8 +285,10 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	public static void createTrack(Track track) {
 		createTrackNative();
 		synchronized (tracks) {
-			track.setId(tracks.size());
-			tracks.add(track);
+			tracks.add(track.getId(), track);
+			for (int i = 0; i < tracks.size(); i++) {
+				tracks.get(i).setId(i);
+			}
 		}
 		get().onCreate(track);
 

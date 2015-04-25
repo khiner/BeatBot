@@ -1,6 +1,7 @@
 package com.kh.beatbot.ui.view;
 
 import com.kh.beatbot.listener.TrackListener;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.shape.RenderGroup;
@@ -12,8 +13,9 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 
 	@Override
 	public synchronized void layoutChildren() {
-		for (int i = 0; i < children.size(); i++) {
-			children.get(i).layout(this, 0, MidiView.trackHeight * i, width, MidiView.trackHeight);
+		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
+			TrackManager.getTrack(i).getButtonRow()
+					.layout(this, 0, MidiView.trackHeight * i, width, MidiView.trackHeight);
 		}
 	}
 
