@@ -2,7 +2,11 @@
 
 AdsrConfig *adsrconfig_create() {
 	AdsrConfig *config = (AdsrConfig *) malloc(sizeof(AdsrConfig));
-	// default values injected from Java on init
+	config->attack = 0;
+	config->decay = 1;
+	config->sustain = 1;
+	config->release = 0;
+
 	return config;
 }
 
