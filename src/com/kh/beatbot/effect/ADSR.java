@@ -1,7 +1,5 @@
 package com.kh.beatbot.effect;
 
-import com.kh.beatbot.track.BaseTrack;
-
 public class ADSR extends Effect {
 
 	public static final String NAME = "ADSR";
@@ -13,8 +11,8 @@ public class ADSR extends Effect {
 
 	private int activeParamId = ATTACK_ID;
 
-	public ADSR(BaseTrack track) {
-		super(track);
+	public ADSR(int trackId) {
+		super(trackId);
 	}
 
 	public void update() {

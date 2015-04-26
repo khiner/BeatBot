@@ -1,7 +1,6 @@
 package com.kh.beatbot.effect;
 
 import com.kh.beatbot.manager.PlaybackManager;
-import com.kh.beatbot.track.BaseTrack;
 
 public class Crush extends Effect {
 
@@ -12,8 +11,8 @@ public class Crush extends Effect {
 		super();
 	}
 
-	public Crush(BaseTrack track, int position) {
-		super(track, position);
+	public Crush(int trackId, int position) {
+		super(trackId, position);
 	}
 
 	public String getName() {

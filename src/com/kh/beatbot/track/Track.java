@@ -22,20 +22,21 @@ import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
 public class Track extends BaseTrack implements FileListener {
 	public static float MIN_LOOP_WINDOW = 32f;
+
 	private boolean adsrEnabled = false, reverse = false, previewing = false, muted = false,
 			soloing = false;
 
 	private List<MidiNote> notes = Collections.synchronizedList(new ArrayList<MidiNote>());
-	private Map<File, SampleParams> paramsForSample = new HashMap<File, SampleParams>();
 	private File currSampleFile;
 	private ADSR adsr;
 
-	private TrackButtonRow buttonRow;
-	private Rectangle rectangle;
+	private transient Map<File, SampleParams> paramsForSample = new HashMap<File, SampleParams>();
+	private transient TrackButtonRow buttonRow;
+	private transient Rectangle rectangle;
 
 	public Track(int id) {
 		super(id);
-		this.adsr = new ADSR(this);
+		this.adsr = new ADSR(id);
 	}
 
 	public void setId(int id) {
@@ -229,6 +230,10 @@ public class Track extends BaseTrack implements FileListener {
 
 	public void setActiveAdsrParam(int paramId) {
 		adsr.setActiveParam(paramId);
+	}
+
+	public ADSR getAdsr() {
+		return adsr;
 	}
 
 	public void setSampleLoopWindow(float beginLevel, float endLevel) {

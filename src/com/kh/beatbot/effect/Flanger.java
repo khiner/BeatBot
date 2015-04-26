@@ -1,7 +1,5 @@
 package com.kh.beatbot.effect;
 
-import com.kh.beatbot.track.BaseTrack;
-
 public class Flanger extends Effect {
 	public static final String NAME = "Flanger";
 	public static final int EFFECT_NUM = 4, NUM_PARAMS = 6;
@@ -10,8 +8,8 @@ public class Flanger extends Effect {
 		super();
 	}
 
-	public Flanger(BaseTrack track, int position) {
-		super(track, position);
+	public Flanger(int trackId, int position) {
+		super(trackId, position);
 	}
 
 	public String getName() {

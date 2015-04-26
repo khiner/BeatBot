@@ -1,7 +1,5 @@
 package com.kh.beatbot.effect;
 
-import com.kh.beatbot.track.BaseTrack;
-
 public class Chorus extends Effect {
 	public static final String NAME = "Chorus";
 	public static final int EFFECT_NUM = 0, NUM_PARAMS = 5;
@@ -10,8 +8,8 @@ public class Chorus extends Effect {
 		super();
 	}
 
-	public Chorus(BaseTrack track, int position) {
-		super(track, position);
+	public Chorus(int trackId, int position) {
+		super(trackId, position);
 	}
 
 	public int getId() {

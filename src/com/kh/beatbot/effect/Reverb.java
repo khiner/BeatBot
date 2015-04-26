@@ -1,7 +1,5 @@
 package com.kh.beatbot.effect;
 
-import com.kh.beatbot.track.BaseTrack;
-
 public class Reverb extends Effect {
 	public static final String NAME = "Reverb";
 	public static final int EFFECT_NUM = 5, NUM_PARAMS = 8;
@@ -10,8 +8,8 @@ public class Reverb extends Effect {
 		super();
 	}
 
-	public Reverb(BaseTrack track, int position) {
-		super(track, position);
+	public Reverb(int trackId, int position) {
+		super(trackId, position);
 	}
 
 	public String getName() {

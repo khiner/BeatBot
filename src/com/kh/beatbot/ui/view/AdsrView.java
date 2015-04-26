@@ -27,8 +27,8 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	public synchronized void onSelect(Track track) {
 		for (int i = 0; i < ADSR.NUM_PARAMS; i++) {
-			track.adsr.getParam(i).removeListener(this);
-			track.adsr.getParam(i).addListener(this);
+			track.getAdsrParam(i).removeListener(this);
+			track.getAdsrParam(i).addListener(this);
 		}
 		initAdsrVb();
 	}
@@ -81,17 +81,17 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	private void initAdsrVb() {
 		Track track = TrackManager.currTrack;
-		float attackX = getAttackX(track.adsr);
-		float decayX = getDecayX(track.adsr);
+		float attackX = getAttackX(track.getAdsr());
+		float decayX = getDecayX(track.getAdsr());
 		POINT_VERTICES[0] = viewX(0);
-		POINT_VERTICES[1] = viewY(track.adsr.getStart());
+		POINT_VERTICES[1] = viewY(track.getAdsr().getStart());
 		POINT_VERTICES[2] = attackX;
-		POINT_VERTICES[3] = viewY(track.adsr.getPeak());
+		POINT_VERTICES[3] = viewY(track.getAdsr().getPeak());
 		POINT_VERTICES[4] = decayX;
-		POINT_VERTICES[5] = viewY(track.adsr.getSustain());
+		POINT_VERTICES[5] = viewY(track.getAdsr().getSustain());
 		POINT_VERTICES[6] = viewX(2f / 3f); // fixed x for release begin
-		POINT_VERTICES[7] = viewY(track.adsr.getSustain());
-		POINT_VERTICES[8] = getReleaseX(track.adsr);
+		POINT_VERTICES[7] = viewY(track.getAdsr().getSustain());
+		POINT_VERTICES[8] = getReleaseX(track.getAdsr());
 		POINT_VERTICES[9] = viewY(0);
 
 		adsrShape.update(POINT_VERTICES);
@@ -148,7 +148,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	private void moveAdsrPoint(int id, float x, float y) {
 		for (int i = 0; i < adsrSelected.length; i++) {
-			ADSR adsr = TrackManager.currTrack.adsr;
+			ADSR adsr = TrackManager.currTrack.getAdsr();
 			if (adsrSelected[i] == id) {
 				switch (i) {
 				case 0: // start level - only moves along y axis, always x == 0

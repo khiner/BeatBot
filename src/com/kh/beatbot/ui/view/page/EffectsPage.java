@@ -120,21 +120,21 @@ public class EffectsPage extends TrackPage {
 		Effect effect = getCurrTrack().findEffectByPosition(position);
 		if (effect != null)
 			return effect;
-		BaseTrack track = getCurrTrack();
+		int trackId = getCurrTrack().getId();
 		if (effectName.equals(Crush.NAME))
-			effect = new Crush(track, position);
+			effect = new Crush(trackId, position);
 		else if (effectName.equals(Chorus.NAME))
-			effect = new Chorus(track, position);
+			effect = new Chorus(trackId, position);
 		else if (effectName.equals(Delay.NAME))
-			effect = new Delay(track, position);
+			effect = new Delay(trackId, position);
 		else if (effectName.equals(Flanger.NAME))
-			effect = new Flanger(track, position);
+			effect = new Flanger(trackId, position);
 		else if (effectName.equals(Filter.NAME))
-			effect = new Filter(track, position);
+			effect = new Filter(trackId, position);
 		else if (effectName.equals(Reverb.NAME))
-			effect = new Reverb(track, position);
+			effect = new Reverb(trackId, position);
 		else if (effectName.equals(Tremolo.NAME))
-			effect = new Tremolo(track, position);
+			effect = new Tremolo(trackId, position);
 		getCurrTrack().addEffect(effect);
 		return effect;
 	}

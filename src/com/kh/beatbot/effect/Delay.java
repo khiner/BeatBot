@@ -1,7 +1,5 @@
 package com.kh.beatbot.effect;
 
-import com.kh.beatbot.track.BaseTrack;
-
 public class Delay extends Effect {
 	public static final String NAME = "Delay";
 	public static final int EFFECT_NUM = 2, NUM_PARAMS = 4;
@@ -16,8 +14,8 @@ public class Delay extends Effect {
 		super();
 	}
 
-	public Delay(BaseTrack track, int position) {
-		super(track, position);
+	public Delay(int trackId, int position) {
+		super(trackId, position);
 		// since left/right delay times are linked by default,
 		// xy view is set to x = left channel, y = feedback
 		xParamIndex = 0;

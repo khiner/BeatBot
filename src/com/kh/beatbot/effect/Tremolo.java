@@ -1,7 +1,5 @@
 package com.kh.beatbot.effect;
 
-import com.kh.beatbot.track.BaseTrack;
-
 public class Tremolo extends Effect {
 	public static final String NAME = "Tremolo";
 	public static final int EFFECT_NUM = 6, NUM_PARAMS = 3;
@@ -10,8 +8,8 @@ public class Tremolo extends Effect {
 		super();
 	}
 
-	public Tremolo(BaseTrack track, int position) {
-		super(track, position);
+	public Tremolo(int trackId, int position) {
+		super(trackId, position);
 	}
 
 	public String getName() {

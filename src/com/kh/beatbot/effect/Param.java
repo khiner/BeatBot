@@ -15,9 +15,7 @@ public class Param {
 			DB_SCALE = dbToLinear(MAX_DB);
 
 	public int id;
-	public float level = 0, viewLevel = 0;
-
-	public float minViewLevel = 0, maxViewLevel = 1;
+	public float level = 0, viewLevel = 0, minViewLevel = 0, maxViewLevel = 1;
 	public boolean hz = false;
 
 	private int topBeatNum = 1, bottomBeatNum = 1;
@@ -25,8 +23,8 @@ public class Param {
 	private boolean beatSync = false, beatSyncable = false, logScale = false, snap = false;
 	private String unitString = "", name = "", format = "%.2f";
 
-	private List<ParamListener> listeners = new ArrayList<ParamListener>();
-	private Set<ParamListener> ignoredListeners = new HashSet<ParamListener>();
+	private transient List<ParamListener> listeners = new ArrayList<ParamListener>();
+	private transient Set<ParamListener> ignoredListeners = new HashSet<ParamListener>();
 
 	public Param(int id, String name) {
 		this.id = id;
