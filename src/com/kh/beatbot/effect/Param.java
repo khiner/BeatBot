@@ -1,6 +1,8 @@
 package com.kh.beatbot.effect;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.kh.beatbot.listener.ParamListener;
@@ -23,7 +25,7 @@ public class Param {
 	private boolean beatSync = false, beatSyncable = false, logScale = false, snap = false;
 	private String unitString = "", name = "", format = "%.2f";
 
-	private Set<ParamListener> listeners = new HashSet<ParamListener>();
+	private List<ParamListener> listeners = new ArrayList<ParamListener>();
 	private Set<ParamListener> ignoredListeners = new HashSet<ParamListener>();
 
 	public Param(int id, String name) {
@@ -141,7 +143,9 @@ public class Param {
 	}
 
 	protected synchronized void notifyListeners() {
-		for (ParamListener listener : listeners) {
+		// avoid cme
+		for (int i = 0; i < listeners.size(); i++) {
+			ParamListener listener = listeners.get(i);
 			if (!ignoredListeners.contains(listener)) {
 				listener.onParamChanged(this);
 			}

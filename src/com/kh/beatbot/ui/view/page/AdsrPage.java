@@ -1,7 +1,9 @@
 package com.kh.beatbot.ui.view.page;
 
 import com.kh.beatbot.effect.ADSR;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
@@ -13,37 +15,38 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.SeekbarParamControl;
 
-public class AdsrPage extends TrackPage implements OnReleaseListener {
-
+public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListener {
 	private ToggleButton[] adsrButtons;
 	private AdsrView adsrView;
 	private SeekbarParamControl paramControl;
+	private int currParamId = 1;
 
 	public AdsrPage(View view) {
 		super(view);
 	}
 
 	@Override
-	public void onSelect(BaseTrack track) {
-		adsrView.onSelect((Track) track);
+	public void onSelect(BaseTrack baseTrack) {
+		Track track = (Track) baseTrack;
+		adsrView.onSelect(track);
+		for (int i = 0; i < ADSR.NUM_PARAMS; i++) {
+			track.adsr.getParam(i).removeListener(this);
+			track.adsr.getParam(i).addListener(this);
+		}
 		updateParamView();
 	}
 
 	private void updateParamView() {
 		// update the displayed param label, value and checked button
-		int paramId = TrackManager.currTrack.adsr.getCurrParamId();
 		for (ToggleButton adsrButton : adsrButtons) {
-			adsrButton.setChecked(adsrButton.getId() == paramId);
+			adsrButton.setChecked(adsrButton.getId() == currParamId);
 		}
 		paramControl.setParam(TrackManager.currTrack.adsr.getCurrParam());
 	}
 
 	@Override
 	public void onRelease(Button button) {
-		int paramId = button.getId();
-		// set the current parameter so we know what to do with SeekBar events.
-		TrackManager.currTrack.adsr.setCurrParam(paramId);
-		updateParamView();
+		setParam(button.getId());
 	}
 
 	private IconResourceSet whichAdsrIconResource(int adsrParamId) {
@@ -88,5 +91,21 @@ public class AdsrPage extends TrackPage implements OnReleaseListener {
 			adsrButtons[i].layout(this, pos, 0, thirdHeight, thirdHeight);
 			pos += thirdHeight;
 		}
+	}
+
+	@Override
+	public void onParamChanged(Param param) {
+		if (param.id != currParamId && param.id != ADSR.SUSTAIN_ID && param.id != ADSR.PEAK_ID) {
+			// sustain & peak are both controlled by the same 'dots' as attack and decay
+			// to avoid switching back and forth a ton, we only switch on attack and decay changes
+			setParam(param.id);
+		}
+	}
+
+	private void setParam(int paramId) {
+		currParamId = paramId;
+		// set the current parameter so we know what to do with SeekBar events.
+		TrackManager.currTrack.adsr.setCurrParam(currParamId);
+		updateParamView();
 	}
 }
