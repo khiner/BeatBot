@@ -18,8 +18,10 @@ public class EventManager {
 			add(MidiNotesDiffEvent.class);
 			add(LoopWindowSetEvent.class);
 			add(SampleLoopWindowSetEvent.class);
-			add(TrackLevelsSetEvent.class);
 			add(SampleSetEvent.class);
+			add(TrackLevelsSetEvent.class);
+			add(TrackCreateEvent.class);
+			add(TrackDestroyEvent.class);
 		}
 	};
 

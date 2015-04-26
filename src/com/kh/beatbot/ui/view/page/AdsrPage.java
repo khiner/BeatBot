@@ -30,8 +30,8 @@ public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListe
 		Track track = (Track) baseTrack;
 		adsrView.onSelect(track);
 		for (int i = 0; i < ADSR.NUM_PARAMS; i++) {
-			track.adsr.getParam(i).removeListener(this);
-			track.adsr.getParam(i).addListener(this);
+			track.getAdsrParam(i).removeListener(this);
+			track.getAdsrParam(i).addListener(this);
 		}
 		updateParamView();
 	}
@@ -41,7 +41,7 @@ public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListe
 		for (ToggleButton adsrButton : adsrButtons) {
 			adsrButton.setChecked(adsrButton.getId() == currParamId);
 		}
-		paramControl.setParam(TrackManager.currTrack.adsr.getCurrParam());
+		paramControl.setParam(TrackManager.currTrack.getActiveAdsrParam());
 	}
 
 	@Override
@@ -105,7 +105,7 @@ public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListe
 	private void setParam(int paramId) {
 		currParamId = paramId;
 		// set the current parameter so we know what to do with SeekBar events.
-		TrackManager.currTrack.adsr.setCurrParam(currParamId);
+		TrackManager.currTrack.setActiveAdsrParam(currParamId);
 		updateParamView();
 	}
 }

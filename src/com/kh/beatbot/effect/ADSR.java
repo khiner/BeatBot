@@ -11,7 +11,7 @@ public class ADSR extends Effect {
 			START_ID = 4, PEAK_ID = 5, ATTACK_MAX_S = 20, DECAY_MAX_S = 30, RELEASE_MAX_S = 20,
 			LOG_SCALE = 512;
 
-	private int currParamId = ATTACK_ID;
+	private int activeParamId = ATTACK_ID;
 
 	public ADSR(BaseTrack track) {
 		super(track);
@@ -48,16 +48,16 @@ public class ADSR extends Effect {
 		position = -1; // native code understands that -1 == ADSR
 	}
 
-	public void setCurrParam(int paramId) {
-		currParamId = paramId;
+	public void setActiveParam(int paramId) {
+		activeParamId = paramId;
 	}
 
-	public Param getCurrParam() {
-		return getParam(currParamId);
+	public Param getActiveParam() {
+		return getParam(activeParamId);
 	}
 
-	public int getCurrParamId() {
-		return currParamId;
+	public int getActiveParamId() {
+		return activeParamId;
 	}
 
 	public float getAttack() {
@@ -85,7 +85,7 @@ public class ADSR extends Effect {
 	}
 
 	public void setCurrParamLevel(float level) {
-		getParam(currParamId).setLevel(level);
+		getParam(activeParamId).setLevel(level);
 	}
 
 	public void setAttack(float attack) {

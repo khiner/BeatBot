@@ -25,13 +25,13 @@ public class Track extends BaseTrack implements FileListener {
 	private boolean adsrEnabled = false, reverse = false, previewing = false, muted = false,
 			soloing = false;
 
-	private TrackButtonRow buttonRow;
 	private List<MidiNote> notes = Collections.synchronizedList(new ArrayList<MidiNote>());
 	private Map<File, SampleParams> paramsForSample = new HashMap<File, SampleParams>();
 	private File currSampleFile;
-	private Rectangle rectangle;
+	private ADSR adsr;
 
-	public ADSR adsr;
+	private TrackButtonRow buttonRow;
+	private Rectangle rectangle;
 
 	public Track(int id) {
 		super(id);
@@ -217,6 +217,18 @@ public class Track extends BaseTrack implements FileListener {
 	public Param getGainParam() {
 		SampleParams sampleParams = getCurrSampleParams();
 		return sampleParams == null ? null : sampleParams.gainParam;
+	}
+
+	public Param getAdsrParam(int paramNum) {
+		return adsr.getParam(paramNum);
+	}
+
+	public Param getActiveAdsrParam() {
+		return adsr.getActiveParam();
+	}
+
+	public void setActiveAdsrParam(int paramId) {
+		adsr.setActiveParam(paramId);
 	}
 
 	public void setSampleLoopWindow(float beginLevel, float endLevel) {
