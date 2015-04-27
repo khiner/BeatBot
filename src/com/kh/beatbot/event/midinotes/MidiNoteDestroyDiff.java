@@ -13,7 +13,9 @@ public class MidiNoteDestroyDiff extends MidiNoteDiff {
 	@Override
 	public void apply() {
 		// when restoring from saved file, saved ticks can be different & no Rectangle instance
-		MidiManager.findNote(note.getNoteValue(), note.getOnTick()).destroy();
+		MidiNote noteToDestroy = MidiManager.findNote(note.getNoteValue(), note.getOnTick());
+		if (noteToDestroy != null)
+			noteToDestroy.destroy();
 	}
 
 	@Override
