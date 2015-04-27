@@ -30,12 +30,18 @@ public class Track extends BaseTrack implements FileListener {
 	private File currSampleFile;
 	private ADSR adsr;
 
-	private transient Map<File, SampleParams> paramsForSample = new HashMap<File, SampleParams>();
+	private transient Map<File, SampleParams> paramsForSample;
 	private transient TrackButtonRow buttonRow;
 	private transient Rectangle rectangle;
 
+	public Track() {
+		super();
+		paramsForSample = new HashMap<File, SampleParams>();
+	}
+
 	public Track(int id) {
 		super(id);
+		paramsForSample = new HashMap<File, SampleParams>();
 		this.adsr = new ADSR(id);
 	}
 

@@ -7,12 +7,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.kh.beatbot.event.EventJsonFactory;
-import com.kh.beatbot.event.EventManager;
-import com.kh.beatbot.event.Stateful;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.track.Track;
+import com.kh.beatbot.track.TrackSerializer;
 
 public class ProjectFile {
 	private String path;
+	private final Gson GSON = new GsonBuilder().registerTypeAdapter(Track.class, new TrackSerializer()).create();
 
 	public ProjectFile(String path) {
 		this.path = path;
@@ -20,29 +23,21 @@ public class ProjectFile {
 
 	public void load() throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
-		String serializedEvent;
-		while ((serializedEvent = reader.readLine()) != null) {
-			try {
-				Integer eventIndex = Integer.valueOf(serializedEvent);
-				EventManager.jumpTo(eventIndex);
-			} catch (NumberFormatException e) { // this is an event, not the event index
-				final Stateful event = EventJsonFactory.fromJson(serializedEvent);
-				((Stateful) event).apply();
-				EventManager.eventCompleted(event);
-			}
+		String serializedTrack;
+		while ((serializedTrack = reader.readLine()) != null) {
+			final Track track = GSON.fromJson(serializedTrack, Track.class);
+			//TrackManager.createTrack(track);
 		}
 		reader.close();
 	}
 
 	public void save() throws IOException {
 		FileOutputStream outputStream = new FileOutputStream(new File(path));
-		for (Stateful event : EventManager.getSerializableEvents()) {
-			String eventJson = EventJsonFactory.toJson(event) + "\n";
+		for (Track track : TrackManager.getTracks()) {
+			String eventJson = GSON.toJson(track, Track.class) + "\n";
 			outputStream.write(eventJson.getBytes());
 		}
 
-		int eventIndex = EventManager.getCurrentSerializableEventIndex();
-		outputStream.write(String.valueOf(eventIndex).getBytes());
 		outputStream.close();
 	}
 }

@@ -23,10 +23,16 @@ public class Param {
 	private boolean beatSync = false, beatSyncable = false, logScale = false, snap = false;
 	private String unitString = "", name = "", format = "%.2f";
 
-	private transient List<ParamListener> listeners = new ArrayList<ParamListener>();
-	private transient Set<ParamListener> ignoredListeners = new HashSet<ParamListener>();
+	private transient List<ParamListener> listeners;
+	private transient Set<ParamListener> ignoredListeners;
+
+	public Param() {
+		listeners = new ArrayList<ParamListener>();
+		ignoredListeners = new HashSet<ParamListener>();
+	}
 
 	public Param(int id, String name) {
+		this();
 		this.id = id;
 		this.name = name;
 	}

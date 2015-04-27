@@ -14,6 +14,9 @@ public class BaseTrack {
 	protected List<Effect> effects = new ArrayList<Effect>();
 	public Param volumeParam, panParam, pitchStepParam, pitchCentParam;
 
+	public BaseTrack() {
+	}
+
 	public BaseTrack(final int id) {
 		this.id = id;
 		volumeParam = new Param(0, "Vol").withUnits("Db").withLevel(Param.dbToView(0));

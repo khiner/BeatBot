@@ -90,8 +90,9 @@ public class ProjectFileManager {
 	private static void completeLoad(Context context) {
 		projectFileName = pendingFileName;
 		try {
-			BeatBotActivity.setupDefaultProject();
+			BeatBotActivity.clearProject();
 			new ProjectFile(getFullPathName(projectFileName)).load();
+			TrackManager.getTrack(0).select();
 		} catch (IOException e) {
 			System.err.println(e);
 		}

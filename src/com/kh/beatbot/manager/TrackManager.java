@@ -291,8 +291,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 			}
 		}
 		get().onCreate(track);
-
-		setSample(track, track.getCurrSampleFile());
 	}
 
 	public static void quantizeEffectParams() {
