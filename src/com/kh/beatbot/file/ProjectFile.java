@@ -15,7 +15,7 @@ import com.kh.beatbot.track.TrackSerializer;
 
 public class ProjectFile {
 	private String path;
-	private final Gson GSON = new GsonBuilder().registerTypeAdapter(Track.class, new TrackSerializer()).create();
+	private final static Gson GSON = new GsonBuilder().registerTypeAdapter(Track.class, new TrackSerializer()).create();
 
 	public ProjectFile(String path) {
 		this.path = path;
@@ -25,7 +25,7 @@ public class ProjectFile {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
 		String serializedTrack;
 		while ((serializedTrack = reader.readLine()) != null) {
-			final Track track = GSON.fromJson(serializedTrack, Track.class);
+			final Track track = fromJson(serializedTrack); 
 			//TrackManager.createTrack(track);
 		}
 		reader.close();
@@ -34,10 +34,18 @@ public class ProjectFile {
 	public void save() throws IOException {
 		FileOutputStream outputStream = new FileOutputStream(new File(path));
 		for (Track track : TrackManager.getTracks()) {
-			String eventJson = GSON.toJson(track, Track.class) + "\n";
-			outputStream.write(eventJson.getBytes());
+			String trackJson = toJson(track) + "\n";
+			outputStream.write(trackJson.getBytes());
 		}
 
 		outputStream.close();
+	}
+	
+	public static String toJson(Track track) {
+		return GSON.toJson(track, Track.class);
+	}
+	
+	public static Track fromJson(String serializedTrack) {
+		return GSON.fromJson(serializedTrack, Track.class);
 	}
 }

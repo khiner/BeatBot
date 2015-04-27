@@ -14,14 +14,14 @@ public class SampleLoopWindowSetEvent implements Stateful, Temporal {
 
 	@Override
 	public void begin() {
-		Track track = TrackManager.getTrack(trackId);
+		Track track = TrackManager.getTrackById(trackId);
 		initialBeginLevel = track.getLoopBeginParam().viewLevel;
 		initialEndLevel = track.getLoopEndParam().viewLevel;
 	}
 
 	@Override
 	public void end() {
-		Track track = TrackManager.getTrack(trackId);
+		Track track = TrackManager.getTrackById(trackId);
 		finalBeginLevel = track.getLoopBeginParam().viewLevel;
 		finalEndLevel = track.getLoopEndParam().viewLevel;
 
@@ -32,13 +32,13 @@ public class SampleLoopWindowSetEvent implements Stateful, Temporal {
 
 	@Override
 	public void undo() {
-		Track track = TrackManager.getTrack(trackId);
+		Track track = TrackManager.getTrackById(trackId);
 		track.setSampleLoopWindow(initialBeginLevel, initialEndLevel);
 	}
 
 	@Override
 	public void apply() {
-		Track track = TrackManager.getTrack(trackId);
+		Track track = TrackManager.getTrackById(trackId);
 		track.setSampleLoopWindow(finalBeginLevel, finalEndLevel);
 	}
 }

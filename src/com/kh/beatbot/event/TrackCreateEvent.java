@@ -1,24 +1,25 @@
 package com.kh.beatbot.event;
 
+import com.kh.beatbot.file.ProjectFile;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.Track;
 
 public class TrackCreateEvent implements Executable, Stateful {
-	private Track createdTrack = null;
+	private int trackId;
+	private String serializedTrack = null;
 
 	public TrackCreateEvent() {
 	}
 
 	public TrackCreateEvent(Track track) {
-		this.createdTrack = track;
+		this.trackId = track.getId();
+		this.serializedTrack = ProjectFile.toJson(track);
 	}
 
 	@Override
 	public void undo() {
-		if (createdTrack != null) {
-			TrackDestroyEvent trackDestroyEvent = new TrackDestroyEvent(createdTrack);
-			trackDestroyEvent.doExecute();
-		}
+		TrackDestroyEvent trackDestroyEvent = new TrackDestroyEvent(trackId);
+		trackDestroyEvent.doExecute();
 	}
 
 	@Override
@@ -33,10 +34,10 @@ public class TrackCreateEvent implements Executable, Stateful {
 	}
 
 	public void doExecute() {
-		if (createdTrack == null) {
-			createdTrack = TrackManager.createTrack();
+		if (serializedTrack == null) {
+			TrackManager.createTrack();
 		} else {
-			TrackManager.createTrack(createdTrack);
+			ProjectFile.fromJson(serializedTrack);
 		}
 	}
 }

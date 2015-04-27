@@ -11,7 +11,7 @@ public class SampleSetEvent implements Executable, Stateful {
 
 	public SampleSetEvent(int trackId, File sampleFile) {
 		this.trackId = trackId;
-		Track track = TrackManager.getTrack(trackId);
+		Track track = TrackManager.getTrackById(trackId);
 		originalSample = track.getCurrSampleFile();
 		newSample = sampleFile;
 	}
@@ -38,7 +38,7 @@ public class SampleSetEvent implements Executable, Stateful {
 	}
 
 	public boolean doExecute(File sample) {
-		Track track = TrackManager.getTrack(trackId);
+		Track track = TrackManager.getTrackById(trackId);
 		if (sample == null || sample.equals(track.getCurrSampleFile())) {
 			return false;
 		}

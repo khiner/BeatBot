@@ -69,7 +69,7 @@ public class TrackPageButtonRow extends PageButtonRow {
 		deleteTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				new TrackDestroyEvent(TrackManager.currTrack).execute();
+				new TrackDestroyEvent(TrackManager.currTrack.getId()).execute();
 			}
 		});
 

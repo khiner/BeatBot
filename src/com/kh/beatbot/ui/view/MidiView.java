@@ -537,11 +537,11 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	private void layoutTrackRects() {
-		for (Track track : TrackManager.getTracks()) {
+		for (int i = 0; i < TrackManager.getNumTracks(); i++) {
+			Track track = TrackManager.getTrackByNoteValue(i);
 			Rectangle trackRect = track.getRectangle();
 			if (trackRect != null) {
-				trackRect.layout(absoluteX, absoluteY + noteToUnscaledY(track.getId()), width,
-						trackHeight);
+				trackRect.layout(absoluteX, absoluteY + noteToUnscaledY(i), width, trackHeight);
 			}
 		}
 	}

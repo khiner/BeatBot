@@ -39,7 +39,7 @@ public class TrackLevelsSetEvent implements Stateful, Temporal {
 		float volume, pan, pitchStep, pitchCent;
 
 		public Levels(int trackId) {
-			BaseTrack track = TrackManager.getBaseTrack(trackId);
+			BaseTrack track = TrackManager.getBaseTrackById(trackId);
 			this.volume = track.volumeParam.viewLevel;
 			this.pan = track.panParam.viewLevel;
 			this.pitchStep = track.pitchStepParam.viewLevel;
@@ -47,7 +47,7 @@ public class TrackLevelsSetEvent implements Stateful, Temporal {
 		}
 
 		public void setTrackLevels(int trackId) {
-			BaseTrack track = TrackManager.getBaseTrack(trackId);
+			BaseTrack track = TrackManager.getBaseTrackById(trackId);
 			track.setLevels(volume, pan, pitchStep, pitchCent);
 		}
 

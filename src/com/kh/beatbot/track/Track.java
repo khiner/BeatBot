@@ -45,15 +45,6 @@ public class Track extends BaseTrack implements FileListener {
 		this.adsr = new ADSR(id);
 	}
 
-	public void setId(int id) {
-		this.id = id;
-		synchronized (notes) {
-			for (MidiNote note : notes) {
-				note.setNote(id);
-			}
-		}
-	}
-
 	public void addNote(MidiNote note) {
 		synchronized (notes) {
 			if (!notes.contains(note)) {
@@ -68,6 +59,12 @@ public class Track extends BaseTrack implements FileListener {
 			if (notes.remove(note)) {
 				notifyNoteRemoved(id, note.getOnTick());
 			}
+		}
+	}
+
+	public void setNoteValue(int noteValue) {
+		for (MidiNote note : notes) {
+			note.setNote(noteValue);
 		}
 	}
 

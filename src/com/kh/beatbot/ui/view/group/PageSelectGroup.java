@@ -175,7 +175,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	public void onNameChange(File file, File newFile) {
 		if (masterButton.isChecked())
 			// make sure *some* track is selected.
-			TrackManager.getTrack(0).select();
+			TrackManager.getTrackByNoteValue(0).select();
 		else {
 			trackButtonRow.update();
 		}

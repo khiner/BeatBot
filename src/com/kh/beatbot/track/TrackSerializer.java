@@ -29,12 +29,10 @@ public class TrackSerializer implements JsonSerializer<Track>, JsonDeserializer<
 	@Override
 	public Track deserialize(JsonElement trackJson, Type type, JsonDeserializationContext context)
 			throws JsonParseException {
-		Track track = TrackManager.createTrack();
-
 		JsonObject object = trackJson.getAsJsonObject();
-
 		int id = object.get("id").getAsInt();
-		track.setId(id);
+		int position = object.get("position").getAsInt();
+		Track track = TrackManager.createTrack(id, position);
 
 		try {
 			track.setSample(new File(object.get("samplePath").getAsString()));
@@ -68,7 +66,8 @@ public class TrackSerializer implements JsonSerializer<Track>, JsonDeserializer<
 		object.addProperty("class", Track.class.getName());
 
 		object.addProperty("id", track.getId());
-		
+		object.addProperty("position", TrackManager.getTracks().indexOf(track));
+
 		object.addProperty("samplePath", track.getCurrSampleFile().getAbsolutePath());
 
 		object.add("notes", GSON.toJsonTree(track.getMidiNotes()).getAsJsonArray());

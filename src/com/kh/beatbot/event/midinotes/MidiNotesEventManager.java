@@ -164,7 +164,7 @@ public class MidiNotesEventManager {
 			if (noteDiff != 0) {
 				track.removeNote(note);
 				note.setNote(note.getNoteValue() + noteDiff);
-				TrackManager.getTrack(note.getNoteValue()).addNote(note);
+				TrackManager.getTrack(note).addNote(note);
 				noteChanged = true;
 			}
 		}

@@ -55,6 +55,10 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 
 	protected abstract void initParams();
 
+	public void setTrackId(int trackId) {
+		this.trackId = trackId;
+	}
+
 	public void setOn(boolean on) {
 		this.on = on;
 		setEffectOn(trackId, position, on);
@@ -90,7 +94,7 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 
 	public void removeEffect() {
 		removeEffect(trackId, position);
-		TrackManager.getBaseTrack(trackId).removeEffect(this);
+		TrackManager.getBaseTrackById(trackId).removeEffect(this);
 	}
 
 	public Param getXParam() {

@@ -92,7 +92,7 @@ public class ProjectFileManager {
 		try {
 			BeatBotActivity.clearProject();
 			new ProjectFile(getFullPathName(projectFileName)).load();
-			TrackManager.getTrack(0).select();
+			TrackManager.getTrackByNoteValue(0).select();
 		} catch (IOException e) {
 			System.err.println(e);
 		}

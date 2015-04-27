@@ -267,10 +267,10 @@ public class BeatBotActivity extends Activity {
 		for (int trackId = 0; trackId < FileManager.drumsDirectory.listFiles().length; trackId++) {
 			new TrackCreateEvent().doExecute();
 			final File sampleFile = FileManager.drumsDirectory.listFiles()[trackId].listFiles()[0];
-			TrackManager.setSample(TrackManager.getTrack(trackId), sampleFile);
+			TrackManager.setSample(TrackManager.getTrackByNoteValue(trackId), sampleFile);
 		}
 
-		TrackManager.getTrack(0).select();
+		TrackManager.getTrackByNoteValue(0).select();
 		View.mainPage.pageSelectGroup.selectLevelsPage();
 
 		MidiManager.setBPM(120);
@@ -282,7 +282,7 @@ public class BeatBotActivity extends Activity {
 		View.mainPage.pageSelectGroup.selectLevelsPage();
 		EventManager.clearEvents();
 		TrackManager.destroy();
-		
+
 		MidiManager.setBPM(120);
 		MidiManager.setLoopBeginTick(0);
 		MidiManager.setLoopEndTick(MidiManager.TICKS_PER_NOTE * 4);

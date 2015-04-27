@@ -106,16 +106,6 @@ void removeTrack(TrackNode *trackNode) {
 	destroyTrack(trackNode->track);
 }
 
-void numberTracks() {
-	// renumber tracks
-	TrackNode *node = trackHead;
-	int count = 0;
-	while (node != NULL ) {
-		node->track->num = count++;
-		node = node->next;
-	}
-}
-
 void freeEffects(Levels *levels) {
 	EffectNode *cur_ptr = levels->effectHead;
 	while (cur_ptr != NULL ) {
@@ -156,8 +146,9 @@ Levels *initLevels() {
 	return levels;
 }
 
-Track *initTrack() {
+Track *initTrack(int trackId) {
 	Track *track = malloc(sizeof(Track));
+	track->num = trackId;
 	track->generator = NULL;
 	track->levels = initLevels();
 	track->nextEvent = malloc(sizeof(MidiEvent));
@@ -409,11 +400,10 @@ jstring Java_com_kh_beatbot_track_Track_setSample(JNIEnv *env, jclass clazz,
 }
 
 void Java_com_kh_beatbot_manager_TrackManager_createTrackNative(JNIEnv *env,
-		jclass clazz) {
-	Track *track = initTrack();
+		jclass clazz, jint trackId) {
+	Track *track = initTrack(trackId);
 	pthread_mutex_lock(&openSlOut->trackMutex);
 	createTrack(track);
-	numberTracks();
 	pthread_mutex_unlock(&openSlOut->trackMutex);
 }
 
@@ -422,7 +412,6 @@ void Java_com_kh_beatbot_track_Track_deleteTrack(JNIEnv *env, jclass clazz,
 	TrackNode *trackNode = getTrackNode(trackId);
 	pthread_mutex_lock(&openSlOut->trackMutex);
 	removeTrack(trackNode);
-	numberTracks();
 	pthread_mutex_unlock(&openSlOut->trackMutex);
 }
 

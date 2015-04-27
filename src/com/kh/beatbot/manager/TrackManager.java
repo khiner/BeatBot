@@ -97,7 +97,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	public static void selectRow(int rowNum) {
 		deselectAllNotes();
-		getTrack(rowNum).selectAllNotes();
+		getTrackByNoteValue(rowNum).selectAllNotes();
 	}
 
 	public static void deselectAllNotes() {
@@ -251,16 +251,25 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		return selectedTickWindow;
 	}
 
-	public static Track getTrack(int noteValue) {
+	public static Track getTrackByNoteValue(int noteValue) {
 		return noteValue < tracks.size() ? tracks.get(noteValue) : null;
 	}
 
+	public static Track getTrackById(int trackId) {
+		for (Track track : tracks) {
+			if (track.getId() == trackId)
+				return track;
+		}
+		
+		return null;
+	}
+	
 	public static Track getTrack(MidiNote note) {
-		return getTrack(note.getNoteValue());
+		return getTrackByNoteValue(note.getNoteValue());
 	}
 
-	public static BaseTrack getBaseTrack(int trackId) {
-		return trackId == MASTER_TRACK_ID ? masterTrack : tracks.get(trackId);
+	public static BaseTrack getBaseTrackById(int trackId) {
+		return trackId == MASTER_TRACK_ID ? masterTrack : getTrackById(trackId);
 	}
 
 	public static Track getSoloingTrack() {
@@ -272,25 +281,19 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	public static Track createTrack() {
-		createTrackNative();
+		int id = tracks.isEmpty() ? 0 : tracks.get(tracks.size() - 1).getId() + 1;
+		return createTrack(id, tracks.size());
+	}
+
+	public static Track createTrack(int trackId, int position) {
+		createTrackNative(trackId);
 		final Track newTrack;
 		synchronized (tracks) {
-			newTrack = new Track(tracks.size());
-			tracks.add(newTrack);
+			newTrack = new Track(trackId);
+			tracks.add(position, newTrack);
 		}
 		get().onCreate(newTrack);
 		return newTrack;
-	}
-
-	public static void createTrack(Track track) {
-		createTrackNative();
-		synchronized (tracks) {
-			tracks.add(track.getId(), track);
-			for (int i = 0; i < tracks.size(); i++) {
-				tracks.get(i).setId(i);
-			}
-		}
-		get().onCreate(track);
 	}
 
 	public static void quantizeEffectParams() {
@@ -302,7 +305,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	public static MidiNote getNextMidiNote(int trackId, long currTick) {
-		return tracks.get(trackId).getNextMidiNote(currTick);
+		return getTrackById(trackId).getNextMidiNote(currTick);
 	}
 
 	public static void updateAllTrackNextNotes() {
@@ -315,11 +318,14 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	/******* These methods are called FROM native code via JNI ********/
 
-	public static native void createTrackNative();
+	public static native void createTrackNative(int trackId);
 
 	@Override
 	public void onCreate(Track track) {
 		currTrack = track;
+		for (int i = 0; i < tracks.size(); i++) {
+			tracks.get(i).setNoteValue(i);
+		}
 		for (TrackListener trackListener : trackListeners) {
 			trackListener.onCreate(track);
 		}
@@ -331,8 +337,8 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	public void onDestroy(Track track) {
 		synchronized (tracks) {
 			tracks.remove(track);
-			for (int i = track.getId(); i < tracks.size(); i++) {
-				tracks.get(i).setId(i);
+			for (int i = 0; i < tracks.size(); i++) {
+				tracks.get(i).setNoteValue(i);
 			}
 			if (!tracks.isEmpty()) {
 				tracks.get(Math.min(track.getId(), tracks.size() - 1)).select();
@@ -428,13 +434,13 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	public void onMove(MidiNote note, int beginNoteValue, long beginOnTick, long beginOffTick,
 			int endNoteValue, long endOnTick, long endOffTick) {
 		if (beginNoteValue == endNoteValue) {
-			Track track = getTrack(beginNoteValue);
+			Track track = getTrackByNoteValue(beginNoteValue);
 			// if we're changing the stop tick on a note that's already playing to a
 			// note before the current tick, stop the track
 			Track.notifyNoteMoved(track.getId(), beginOnTick, beginOffTick, endOnTick, endOffTick);
 		} else {
-			Track oldTrack = getTrack(beginNoteValue);
-			Track newTrack = getTrack(endNoteValue);
+			Track oldTrack = getTrackByNoteValue(beginNoteValue);
+			Track newTrack = getTrackByNoteValue(endNoteValue);
 			if (null != oldTrack)
 				oldTrack.removeNote(note);
 			if (null != newTrack)

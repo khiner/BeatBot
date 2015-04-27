@@ -1,20 +1,20 @@
 package com.kh.beatbot.event;
 
+import com.kh.beatbot.file.ProjectFile;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.track.Track;
 
 public class TrackDestroyEvent implements Executable, Stateful {
+	private int trackId;
+	private String serializedTrack = null;
 
-	private Track track;
-
-	public TrackDestroyEvent(Track track) {
-		this.track = track;
+	public TrackDestroyEvent(int trackId) {
+		this.trackId = trackId;
+		this.serializedTrack = ProjectFile.toJson(TrackManager.getTrackById(trackId));
 	}
 
 	@Override
 	public void undo() {
-		TrackCreateEvent createEvent = new TrackCreateEvent(track);
-		createEvent.doExecute();
+		ProjectFile.fromJson(serializedTrack);
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class TrackDestroyEvent implements Executable, Stateful {
 
 	public void doExecute() {
 		if (TrackManager.getNumTracks() > 1) {
-			track.destroy(); // not allowed to delete last track
+			TrackManager.getTrackById(trackId).destroy();
 		}
 	}
 }

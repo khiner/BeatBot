@@ -75,12 +75,12 @@ public class MidiManager {
 	}
 
 	public static MidiNote findNote(int noteValue, long onTick) {
-		final Track track = TrackManager.getTrack(noteValue);
+		final Track track = TrackManager.getTrackByNoteValue(noteValue);
 		return null == track ? null : track.findNoteStarting(onTick);
 	}
 
 	public static MidiNote findNoteContaining(int noteValue, long tick) {
-		final Track track = TrackManager.getTrack(noteValue);
+		final Track track = TrackManager.getTrackByNoteValue(noteValue);
 		return null == track ? null : track.findNoteContaining(tick);
 	}
 
