@@ -40,6 +40,7 @@ public class TrackSerializer implements JsonSerializer<Track>, JsonDeserializer<
 			Log.e(getClass().getName(), e.toString());
 		}
 		
+		track.setSampleLoopWindow(object.get("sample_loop_begin").getAsFloat(), object.get("sample_loop_end").getAsFloat());
 		List<MidiNote> notes = GSON.fromJson(object.get("notes"), noteListType);
 		for (MidiNote note : notes) {
 			note.create();
@@ -69,6 +70,9 @@ public class TrackSerializer implements JsonSerializer<Track>, JsonDeserializer<
 		object.addProperty("position", TrackManager.getTracks().indexOf(track));
 
 		object.addProperty("samplePath", track.getCurrSampleFile().getAbsolutePath());
+
+		object.addProperty("sample_loop_begin", track.getLoopBeginParam().viewLevel);
+		object.addProperty("sample_loop_end", track.getLoopEndParam().viewLevel);
 
 		object.add("notes", GSON.toJsonTree(track.getMidiNotes()).getAsJsonArray());
 		
