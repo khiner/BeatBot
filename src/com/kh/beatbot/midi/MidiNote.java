@@ -175,6 +175,15 @@ public class MidiNote implements Comparable<MidiNote> {
 				getOffTick());
 	}
 
+	public void setNoteWithoutNotify(int note) {
+		if (note < 0 || getNoteValue() == note)
+			return;
+
+		noteOn.setNoteValue(note);
+		noteOff.setNoteValue(note);
+		View.mainPage.onMove(this, 0, 0, 0, 0, 0, 0);
+	}
+
 	public long getNoteLength() {
 		return noteOff.getTick() - noteOn.getTick();
 	}
@@ -235,11 +244,6 @@ public class MidiNote implements Comparable<MidiNote> {
 			break;
 		}
 		notifyLevelSet(levelType);
-	}
-
-	public int euclideanDistance(MidiNote other) {
-		return (other.getNoteValue() - getNoteValue())
-				+ (int) ((other.getOnTick() - getOnTick()) + (other.getOffTick() - getOffTick()));
 	}
 
 	@Override
