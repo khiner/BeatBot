@@ -375,9 +375,6 @@ public class Track extends BaseTrack implements FileListener {
 
 	public static native boolean isTrackPlaying(int trackId);
 
-	public static native void notifyNoteMoved(int trackId, long oldNoteOn, long oldNoteOff,
-			long newNoteOn, long newNoteOff);
-
 	public static native void notifyNoteRemoved(int trackId, long noteOn);
 
 	public static native void setTrackLoopWindow(int trackId, long loopBegin, long loopEnd);

@@ -445,25 +445,6 @@ jboolean Java_com_kh_beatbot_track_Track_isTrackLooping(JNIEnv *env, jclass claz
 	return fileGen->looping;
 }
 
-void Java_com_kh_beatbot_track_Track_notifyNoteMoved(JNIEnv *env, jclass clazz,
-		jint trackId, jlong oldOnTick, jlong oldOffTick, jlong newOnTick,
-		jlong newOffTick) {
-	Track *track = getTrack(env, clazz, trackId);
-
-	long oldOnSample = tickToSample(oldOnTick);
-	long newOnSample = tickToSample(newOnTick);
-	long oldOffSample = tickToSample(oldOffTick);
-	long newOffSample = tickToSample(newOffTick);
-	if ((track->nextStartSample == oldOnSample && newOnSample > currSample)
-			|| (track->nextStopSample == oldOffSample
-					&& newOffSample < currSample)) {
-		stopTrack(track);
-	} else if (track->nextStopSample == oldOffSample
-			&& newOnSample < currSample) {
-		track->nextStopSample = newOffSample;
-	}
-}
-
 void Java_com_kh_beatbot_track_Track_notifyNoteRemoved(JNIEnv *env, jclass clazz,
 		jint trackId, jlong onTick) {
 	Track *track = getTrack(env, clazz, trackId);

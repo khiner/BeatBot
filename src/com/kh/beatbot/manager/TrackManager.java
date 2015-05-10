@@ -436,8 +436,15 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		if (beginNoteValue == endNoteValue) {
 			Track track = getTrackByNoteValue(beginNoteValue);
 			// if we're changing the stop tick on a note that's already playing to a
-			// note before the current tick, stop the track
-			Track.notifyNoteMoved(track.getId(), beginOnTick, beginOffTick, endOnTick, endOffTick);
+			// note before the current tick, or moving the start tick to after the playhead
+			// stop the track
+			long currTick = MidiManager.getCurrTick();
+			boolean playing = beginOnTick <= currTick && beginOffTick >= currTick;
+			if (playing && endOffTick < currTick || endOnTick > currTick) {
+				track.stop();
+			} else {
+				track.updateNextNote();
+			}
 		} else {
 			Track oldTrack = getTrackByNoteValue(beginNoteValue);
 			Track newTrack = getTrackByNoteValue(endNoteValue);
