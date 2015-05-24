@@ -19,6 +19,7 @@ import com.kh.beatbot.track.TrackSerializer;
 
 public class ProjectFile {
 	private static final String TEMPO_KEY = "tempo";
+	private static final String SNAP_TO_GRID_KEY = "snapToGrid";
 	private static final String LOOP_BEGIN_TICK_KEY = "loopBeginTick";
 	private static final String LOOP_END_TICK_KEY = "loopEndTick";
 
@@ -38,6 +39,7 @@ public class ProjectFile {
 		globalProperties.addProperty(LOOP_BEGIN_TICK_KEY, MidiManager.getLoopBeginTick());
 		globalProperties.addProperty(LOOP_END_TICK_KEY, MidiManager.getLoopEndTick());
 		globalProperties.addProperty(TEMPO_KEY, MidiManager.getBPM());
+		globalProperties.addProperty(SNAP_TO_GRID_KEY, MidiManager.isSnapToGrid());
 
 		outputStream.write((globalProperties.toString() + "\n").getBytes());
 
@@ -60,6 +62,7 @@ public class ProjectFile {
 		MidiManager.setLoopBeginTick(globalProperties.get(LOOP_BEGIN_TICK_KEY).getAsLong());
 		MidiManager.setLoopEndTick(globalProperties.get(LOOP_END_TICK_KEY).getAsLong());
 		MidiManager.setBPM(globalProperties.get(TEMPO_KEY).getAsFloat());
+		MidiManager.setSnapToGrid(globalProperties.get(SNAP_TO_GRID_KEY).getAsBoolean());
 
 		// tracks
 		String serializedTrack;

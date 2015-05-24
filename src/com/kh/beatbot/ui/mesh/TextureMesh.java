@@ -12,10 +12,9 @@ public class TextureMesh extends Mesh {
 	}
 
 	public synchronized void setResource(int resourceId) {
-		if (resourceId == this.resourceId) {
-			show();
+		if (resourceId == this.resourceId)
 			return;
-		}
+
 		this.resourceId = resourceId;
 		if (resourceId == -1) {
 			hide();

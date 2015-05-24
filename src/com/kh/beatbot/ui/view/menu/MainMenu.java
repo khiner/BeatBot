@@ -5,6 +5,7 @@ import java.io.File;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.FileMenuItemListener;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.listener.SnapToGridListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
@@ -40,7 +41,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	protected synchronized void createMenuItems() {
 		fileItem = new MenuItem(this, null, true);
 		settingsItem = new MenuItem(this, null, true);
-		snapToGridItem = new MenuItem(this, settingsItem, true);
+		snapToGridItem = new SnapToGridMenuItem(this, settingsItem, true);
 		((ToggleButton) snapToGridItem.button).oscillating();
 
 		saveProjectItem = new MenuItem(this, fileItem, false);
@@ -101,7 +102,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		settingsItem.setIcon(IconResourceSets.SETTINGS);
 
 		snapToGridItem.setResourceId(IconResourceSets.SNAP_TO_GRID);
-		snapToGridItem.setChecked(MidiManager.isSnapToGrid());
+		snapToGridItem.setChecked(MidiManager.isSnapToGrid()); // XXX use listener
 
 		// TODO
 		// saveProjectItem.setResourceId(IconResourceSets.SAVE_PROJECT);
@@ -256,6 +257,18 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		public void snap(float goalX, float velocity) {
 			this.goalX = velocity >= 0 ? goalX : 0;
 			snap = true;
+		}
+	}
+	
+	private class SnapToGridMenuItem extends MenuItem implements SnapToGridListener {
+		public SnapToGridMenuItem(Menu menu, MenuItem parent, boolean toggle) {
+			super(menu, parent, toggle);
+			MidiManager.setSnapToGridListener(this);
+		}
+
+		@Override
+		public void onSnapToGridChanged(boolean snapToGrid) {
+			((ToggleButton) button).setChecked(snapToGrid);
 		}
 	}
 }

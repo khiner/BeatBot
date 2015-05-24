@@ -7,6 +7,7 @@ import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.file.MidiFile;
 import com.kh.beatbot.listener.LoopWindowListener;
+import com.kh.beatbot.listener.SnapToGridListener;
 import com.kh.beatbot.listener.TempoListener;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiTrack;
@@ -36,6 +37,7 @@ public class MidiManager {
 
 	private static List<LoopWindowListener> loopChangeListeners = new ArrayList<LoopWindowListener>();
 	private static TempoListener tempoListener;
+	private static SnapToGridListener snapToGridListener;
 
 	public static void init() {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION);
@@ -51,12 +53,17 @@ public class MidiManager {
 		tempoListener = listener;
 	}
 
+	public static void setSnapToGridListener(SnapToGridListener listener) {
+		snapToGridListener = listener;
+	}
+
 	public static boolean isSnapToGrid() {
 		return snapToGrid;
 	}
 
 	public static void setSnapToGrid(boolean snapToGrid) {
 		MidiManager.snapToGrid = snapToGrid;
+		snapToGridListener.onSnapToGridChanged(snapToGrid);
 	}
 
 	public static MidiTrack getTempoTrack() {
