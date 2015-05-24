@@ -483,12 +483,7 @@ public class View implements Comparable<View> {
 
 	protected synchronized void stateChanged() {
 		if (null != bgShape) {
-			if (null == getFillColor() && null == getStrokeColor()) {
-				bgShape.hide();
-			} else {
-				bgShape.show();
-				bgShape.setColors(getFillColor(), getStrokeColor());
-			}
+			bgShape.setColors(getFillColor(), getStrokeColor());
 		}
 
 		textureMesh.setResource(getResourceId());
@@ -496,6 +491,8 @@ public class View implements Comparable<View> {
 
 		textMesh.setColor(getTextColor());
 
+		if (null != bgShape && (textureMesh.isVisible() || textMesh.isVisible()))
+			bgShape.show();
 		layoutShape();
 	}
 
