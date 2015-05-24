@@ -5,11 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.kh.beatbot.activity.BeatBotActivity;
+import com.kh.beatbot.listener.TempoListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.NumberSegment;
 
-public class BpmView extends ClickableView {
+public class BpmView extends ClickableView implements TempoListener {
 
 	private static final float INC_BPM_THRESH = 15;
 	private static NumberSegment[][] numberSegments = new NumberSegment[3][7];
@@ -20,10 +21,16 @@ public class BpmView extends ClickableView {
 
 	public BpmView(View view) {
 		super(view);
+		MidiManager.setTempoListener(this);
+	}
+
+	@Override
+	public void onTempoChanged(float bpm) {
+		setText(String.valueOf((int) bpm));		
 	}
 
 	public void setBPM(float bpm) {
-		setText(String.valueOf((int) MidiManager.setBPM(bpm)));
+		MidiManager.setBPM(bpm);
 	}
 
 	@Override

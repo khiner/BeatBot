@@ -18,6 +18,7 @@ import com.kh.beatbot.track.Track;
 import com.kh.beatbot.track.TrackSerializer;
 
 public class ProjectFile {
+	private static final String TEMPO_KEY = "tempo";
 	private static final String LOOP_BEGIN_TICK_KEY = "loopBeginTick";
 	private static final String LOOP_END_TICK_KEY = "loopEndTick";
 
@@ -33,10 +34,12 @@ public class ProjectFile {
 		FileOutputStream outputStream = new FileOutputStream(new File(path));
 
 		// global properties
-		JsonObject loopWindowJson = new JsonObject();
-		loopWindowJson.addProperty(LOOP_BEGIN_TICK_KEY, MidiManager.getLoopBeginTick());
-		loopWindowJson.addProperty(LOOP_END_TICK_KEY, MidiManager.getLoopEndTick());
-		outputStream.write((loopWindowJson.toString() + "\n").getBytes());
+		JsonObject globalProperties = new JsonObject();
+		globalProperties.addProperty(LOOP_BEGIN_TICK_KEY, MidiManager.getLoopBeginTick());
+		globalProperties.addProperty(LOOP_END_TICK_KEY, MidiManager.getLoopEndTick());
+		globalProperties.addProperty(TEMPO_KEY, MidiManager.getBPM());
+
+		outputStream.write((globalProperties.toString() + "\n").getBytes());
 
 		// tracks
 		BaseTrack masterTrack = TrackManager.getMasterTrack();
@@ -53,9 +56,10 @@ public class ProjectFile {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
 
 		// global properties
-		JsonObject loopWindow = parser.parse(reader.readLine()).getAsJsonObject();
-		MidiManager.setLoopBeginTick(loopWindow.get(LOOP_BEGIN_TICK_KEY).getAsLong());
-		MidiManager.setLoopEndTick(loopWindow.get(LOOP_END_TICK_KEY).getAsLong());
+		JsonObject globalProperties = parser.parse(reader.readLine()).getAsJsonObject();
+		MidiManager.setLoopBeginTick(globalProperties.get(LOOP_BEGIN_TICK_KEY).getAsLong());
+		MidiManager.setLoopEndTick(globalProperties.get(LOOP_END_TICK_KEY).getAsLong());
+		MidiManager.setBPM(globalProperties.get(TEMPO_KEY).getAsFloat());
 
 		// tracks
 		String serializedTrack;

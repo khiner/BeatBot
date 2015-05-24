@@ -7,6 +7,7 @@ import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.file.MidiFile;
 import com.kh.beatbot.listener.LoopWindowListener;
+import com.kh.beatbot.listener.TempoListener;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiTrack;
 import com.kh.beatbot.midi.event.MidiEvent;
@@ -34,6 +35,7 @@ public class MidiManager {
 			currState = new ArrayList<MidiNote>();
 
 	private static List<LoopWindowListener> loopChangeListeners = new ArrayList<LoopWindowListener>();
+	private static TempoListener tempoListener;
 
 	public static void init() {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION);
@@ -43,6 +45,10 @@ public class MidiManager {
 
 	public static void addLoopChangeListener(LoopWindowListener listener) {
 		loopChangeListeners.add(listener);
+	}
+
+	public static void setTempoListener(TempoListener listener) {
+		tempoListener = listener;
 	}
 
 	public static boolean isSnapToGrid() {
@@ -61,13 +67,14 @@ public class MidiManager {
 		return tempo.getBpm();
 	}
 
-	public static int setBPM(float bpm) {
+	public static void setBPM(float bpm) {
 		bpm = GeneralUtils.clipTo(bpm, MIN_BPM, MAX_BPM);
 		tempo.setBpm(bpm);
 		setNativeBPM(bpm);
 		setNativeMSPT(tempo.getMpqn() / TICKS_PER_NOTE);
 		TrackManager.quantizeEffectParams();
-		return (int) bpm;
+
+		tempoListener.onTempoChanged(bpm);
 	}
 
 	public static MidiNote addNote(long onTick, long offTick, int note) {
