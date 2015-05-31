@@ -305,7 +305,7 @@ public class Track extends BaseTrack implements FileListener {
 	}
 
 	public boolean isSelected() {
-		return this.equals(TrackManager.currTrack);
+		return this.equals(TrackManager.getCurrTrack());
 	}
 
 	public boolean isLooping() {

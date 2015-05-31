@@ -119,6 +119,16 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		masterButton.setText("Master");
 	}
 
+	public int getCurrPageIndex() {
+		PageButtonRow currPage = ((PageButtonRow) buttonRowPager.getCurrPage());
+		return currPage.indexOf((View) pager.getCurrPageId());
+	}
+
+	public void selectPage(int pageIndex) {
+		PageButtonRow currPage = ((PageButtonRow) buttonRowPager.getCurrPage());
+		((ToggleButton) currPage.getChild(pageIndex)).trigger();
+	}
+
 	@Override
 	public synchronized void layoutChildren() {
 		masterButton.layout(this, 0, BG_OFFSET, View.mainPage.midiViewGroup.getTrackControlWidth(),
@@ -185,7 +195,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	@Override
 	public void onPageChange(ViewPager pager, View prevPage, View newPage) {
-		((TrackListener) newPage).onSelect(TrackManager.currTrack);
+		((TrackListener) newPage).onSelect(TrackManager.getCurrTrack());
 	}
 
 	public void onNoteLevelsChange(MidiNote note, LevelType type) {

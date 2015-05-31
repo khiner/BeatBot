@@ -331,6 +331,10 @@ public class View implements Comparable<View> {
 		return children.indexOf(child);
 	}
 
+	public View getChild(int index) {
+		return children.get(index);
+	}
+
 	protected void createChildren() {
 	}
 

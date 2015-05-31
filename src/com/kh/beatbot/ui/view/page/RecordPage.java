@@ -9,6 +9,7 @@ import com.kh.beatbot.listener.RecordStateListener;
 import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
+import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.SampleView;
 import com.kh.beatbot.ui.view.View;
@@ -88,7 +89,7 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 	public void onRecordArmed() {
 		sampleView.setText("Waiting for threshold...");
 	}
-	
+
 	@Override
 	public void onRecordDisarmed() {
 		sampleView.setText("Ready to record");
@@ -108,7 +109,7 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 	public void onRecordStop(File recordedSampleFile) {
 		try {
 			sampleView.setText("");
-			TrackManager.currTrack.setSample(recordedSampleFile);
+			((Track) TrackManager.getCurrTrack()).setSample(recordedSampleFile);
 		} catch (Exception e) {
 			sampleView.setText("Error saving file");
 		}

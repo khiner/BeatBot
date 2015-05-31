@@ -72,7 +72,7 @@ public class BrowsePage extends Menu implements TrackListener {
 
 	@Override
 	public void onFileMenuItemReleased(FileMenuItem fileItem) {
-		new SampleSetEvent(TrackManager.currTrack.getId(), fileItem.getFile()).execute();
+		new SampleSetEvent(TrackManager.getCurrTrack().getId(), fileItem.getFile()).execute();
 	}
 
 	@Override

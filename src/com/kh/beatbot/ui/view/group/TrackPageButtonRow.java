@@ -4,6 +4,7 @@ import com.kh.beatbot.event.TrackDestroyEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.View;
@@ -43,7 +44,7 @@ public class TrackPageButtonRow extends PageButtonRow {
 	public ToggleButton getNoteLevelsButton() {
 		return pageButtons[NOTE_LEVELS_PAGE_ID];
 	}
-	
+
 	public ToggleButton getRecordButton() {
 		return pageButtons[RECORD_PAGE_ID];
 	}
@@ -52,11 +53,11 @@ public class TrackPageButtonRow extends PageButtonRow {
 		ToggleButton browseButton = pageButtons[BROWSE_PAGE_ID];
 
 		// update the browse pager instrument icon
-		IconResourceSet instrumentIcon = TrackManager.currTrack.getIcon();
+		Track track = (Track) TrackManager.getCurrTrack();
+		IconResourceSet instrumentIcon = track.getIcon();
 
 		browseButton.setResourceId(instrumentIcon);
-		browseButton.setText(FileManager.formatSampleName(TrackManager.currTrack
-				.getCurrSampleName()));
+		browseButton.setText(FileManager.formatSampleName(track.getCurrSampleName()));
 	}
 
 	@Override
@@ -69,7 +70,7 @@ public class TrackPageButtonRow extends PageButtonRow {
 		deleteTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				new TrackDestroyEvent(TrackManager.currTrack.getId()).execute();
+				new TrackDestroyEvent(TrackManager.getCurrTrack().getId()).execute();
 			}
 		});
 

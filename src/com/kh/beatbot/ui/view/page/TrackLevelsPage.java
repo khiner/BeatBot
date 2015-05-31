@@ -28,18 +28,13 @@ public class TrackLevelsPage extends TrackPage implements TouchableViewListener 
 
 	@Override
 	public void onSelect(BaseTrack track) {
-		volumeParamControl.setParam(getCurrTrack().getVolumeParam());
-		panParamControl.setParam(getCurrTrack().getPanParam());
-		pitchParamControl.setParams(getCurrTrack().getPitchParam(), getCurrTrack()
-				.getPitchCentParam());
+		volumeParamControl.setParam(track.getVolumeParam());
+		panParamControl.setParam(track.getPanParam());
+		pitchParamControl.setParams(track.getPitchParam(), track.getPitchCentParam());
 	}
 
 	public void setMasterMode(boolean masterMode) {
 		this.masterMode = masterMode;
-	}
-
-	public BaseTrack getCurrTrack() {
-		return masterMode ? TrackManager.getMasterTrack() : TrackManager.currTrack;
 	}
 
 	@Override
@@ -73,7 +68,7 @@ public class TrackLevelsPage extends TrackPage implements TouchableViewListener 
 	@Override
 	public void onPress(TouchableView view) {
 		if (numControlsPressed.getAndIncrement() == 0) {
-			levelsSetEvent = new TrackLevelsSetEvent(getCurrTrack().getId());
+			levelsSetEvent = new TrackLevelsSetEvent(TrackManager.getCurrTrack().getId());
 			levelsSetEvent.begin();
 		}
 	}

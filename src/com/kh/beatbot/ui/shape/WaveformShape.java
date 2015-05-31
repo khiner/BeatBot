@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.shape;
 import android.util.SparseArray;
 
 import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.track.Track;
 
 public class WaveformShape extends Shape {
 	private final static float MAX_SPP = 0.5f;
@@ -37,15 +38,16 @@ public class WaveformShape extends Shape {
 	 * Read samples from disk at the current granularity
 	 */
 	public synchronized void resample() {
+		Track track = (Track) TrackManager.getCurrTrack();
 		sampleBuffer.clear();
-		float numFrames = TrackManager.currTrack.getNumFrames();
+		float numFrames = track.getNumFrames();
 		for (float s = -numSamples; s < numSamples * 2; s++) {
 			int sampleIndex = (int) (offsetInFrames + s * widthInFrames / numSamples);
 			if (sampleIndex < 0)
 				continue;
 			else if (sampleIndex >= numFrames)
 				break;
-			sampleBuffer.put(sampleIndex, TrackManager.currTrack.getSample(sampleIndex, 0));
+			sampleBuffer.put(sampleIndex, track.getSample(sampleIndex, 0));
 		}
 
 		resetIndices();
@@ -63,8 +65,8 @@ public class WaveformShape extends Shape {
 		this.loopBeginX = loopBeginX;
 		this.loopEndX = loopEndX;
 
-		long newWidthInFrames = (long) Math.min(widthInFrames,
-				TrackManager.currTrack.getNumFrames());
+		Track track = (Track) TrackManager.getCurrTrack();
+		long newWidthInFrames = (long) Math.min(widthInFrames, track.getNumFrames());
 		boolean waveformChanged = this.offsetInFrames != offsetInFrames
 				|| this.widthInFrames != newWidthInFrames || this.xOffset != xOffset;
 		this.offsetInFrames = offsetInFrames;

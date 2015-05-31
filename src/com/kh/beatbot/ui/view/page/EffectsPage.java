@@ -36,7 +36,8 @@ public class EffectsPage extends TrackPage {
 			builder.setItems(effectNames, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
 					if (effectNames[item].toLowerCase().equals("none")) {
-						Effect effect = getCurrTrack().findEffectByPosition(lastClickedPos);
+						Effect effect = TrackManager.getCurrTrack().findEffectByPosition(
+								lastClickedPos);
 						if (effect != null) {
 							effect.removeEffect();
 						}
@@ -51,7 +52,7 @@ public class EffectsPage extends TrackPage {
 
 		@Override
 		public void labelMoved(int oldPosition, int newPosition) {
-			getCurrTrack().moveEffect(oldPosition, newPosition);
+			TrackManager.getCurrTrack().moveEffect(oldPosition, newPosition);
 		}
 
 		@Override
@@ -86,15 +87,11 @@ public class EffectsPage extends TrackPage {
 		this.masterMode = masterMode;
 	}
 
-	public BaseTrack getCurrTrack() {
-		return masterMode ? TrackManager.getMasterTrack() : TrackManager.currTrack;
-	}
-
 	public void updateEffectLabels() {
 		if (effectLabelList.numChildren() <= 0)
 			return;
 		for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {
-			Effect effect = getCurrTrack().findEffectByPosition(i);
+			Effect effect = TrackManager.getCurrTrack().findEffectByPosition(i);
 			if (effect == null) {
 				effectLabelList.setLabelText(i, "");
 			} else {
@@ -110,17 +107,18 @@ public class EffectsPage extends TrackPage {
 		if (effectName != effect.getName()) {
 			// different effect being added to effect slot. need to replace it
 			// effect.removeEffect();
-			//TODO fix
+			// TODO fix
 		}
 
 		context.launchEffect(effect);
 	}
 
 	private Effect getEffect(String effectName, int position) {
-		Effect effect = getCurrTrack().findEffectByPosition(position);
+		BaseTrack track = TrackManager.getCurrTrack();
+		Effect effect = track.findEffectByPosition(position);
 		if (effect != null)
 			return effect;
-		int trackId = getCurrTrack().getId();
+		int trackId = track.getId();
 		if (effectName.equals(Crush.NAME))
 			effect = new Crush(trackId, position);
 		else if (effectName.equals(Chorus.NAME))
@@ -135,7 +133,7 @@ public class EffectsPage extends TrackPage {
 			effect = new Reverb(trackId, position);
 		else if (effectName.equals(Tremolo.NAME))
 			effect = new Tremolo(trackId, position);
-		getCurrTrack().addEffect(effect);
+		track.addEffect(effect);
 		return effect;
 	}
 

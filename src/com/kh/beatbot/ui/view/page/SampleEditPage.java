@@ -52,26 +52,26 @@ public class SampleEditPage extends TrackPage {
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override
 			public void onPress(Button button) {
-				TrackManager.currTrack.preview();
+				((Track) TrackManager.getCurrTrack()).preview();
 			}
 		});
 
 		previewButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				TrackManager.currTrack.stopPreviewing();
+				((Track) TrackManager.getCurrTrack()).stopPreviewing();
 			}
 		});
 
 		loopButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
-				TrackManager.currTrack.toggleLooping();
+				((Track) TrackManager.getCurrTrack()).toggleLooping();
 			}
 		});
 
 		reverseButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
-				TrackManager.currTrack.setReverse(reverseButton.isChecked());
+				((Track) TrackManager.getCurrTrack()).setReverse(reverseButton.isChecked());
 			}
 		});
 

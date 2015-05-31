@@ -80,7 +80,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	}
 
 	private void initAdsrVb() {
-		Track track = TrackManager.currTrack;
+		Track track = (Track) TrackManager.getCurrTrack();
 		float attackX = getAttackX(track.getAdsr());
 		float decayX = getDecayX(track.getAdsr());
 		POINT_VERTICES[0] = viewX(0);
@@ -148,7 +148,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	private void moveAdsrPoint(int id, float x, float y) {
 		for (int i = 0; i < adsrSelected.length; i++) {
-			ADSR adsr = TrackManager.currTrack.getAdsr();
+			ADSR adsr = ((Track) TrackManager.getCurrTrack()).getAdsr();
 			if (adsrSelected[i] == id) {
 				switch (i) {
 				case 0: // start level - only moves along y axis, always x == 0

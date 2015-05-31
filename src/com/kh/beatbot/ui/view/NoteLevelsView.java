@@ -1,6 +1,7 @@
 package com.kh.beatbot.ui.view;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.kh.beatbot.effect.Effect.LevelType;
@@ -9,6 +10,7 @@ import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.TouchedNotes;
 import com.kh.beatbot.midi.util.GeneralUtils;
+import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.Circle;
@@ -120,7 +122,8 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	private boolean selectLevel(int pointerId, Pointer pos) {
-		for (MidiNote midiNote : TrackManager.currTrack.getMidiNotes()) {
+		Track track = (Track) TrackManager.getCurrTrack();
+		for (MidiNote midiNote : track.getMidiNotes()) {
 			float velocityY = levelToY(midiNote.getLinearLevel(currLevelType));
 			if (Math.abs(tickToX(midiNote.getOnTick()) - pos.x) < 35
 					&& Math.abs(velocityY - pos.y) < 35) {
@@ -154,7 +157,8 @@ public class NoteLevelsView extends TouchableView {
 
 		float leftTick = xToTick(leftX), rightTick = xToTick(rightX);
 
-		for (MidiNote selectedNote : TrackManager.currTrack.getMidiNotes()) {
+		Track track = (Track) TrackManager.getCurrTrack();
+		for (MidiNote selectedNote : track.getMidiNotes()) {
 			float levelY = levelToY(selectedNote.getLinearLevel(currLevelType));
 			boolean selected = leftTick < selectedNote.getOnTick()
 					&& rightTick > selectedNote.getOnTick() && topY < levelY && bottomY > levelY;
@@ -208,7 +212,8 @@ public class NoteLevelsView extends TouchableView {
 			if (levelOffsets.get(selectedNote) != null) {
 				float linear = DragLine.getLevel(selectedNote.getOnTick())
 						+ levelOffsets.get(selectedNote);
-				MidiNotesEventManager.setNoteLevel(selectedNote, currLevelType, GeneralUtils.linearToByte(linear));
+				MidiNotesEventManager.setNoteLevel(selectedNote, currLevelType,
+						GeneralUtils.linearToByte(linear));
 			}
 		}
 	}
@@ -219,10 +224,12 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	public void draw() {
-		for (int i = 0; i < TrackManager.currTrack.getMidiNotes().size(); i++) {
-			MidiNote midiNote = TrackManager.currTrack.getMidiNotes().get(i);
-			drawLevel(midiNote, calcLevelColor(midiNote.isSelected()),
-					calcLevelColorTrans(midiNote.isSelected()));
+		List<MidiNote> notes = ((Track) TrackManager.getCurrTrack()).getMidiNotes();
+		synchronized (notes) {
+			for (MidiNote note : notes) {
+				drawLevel(note, calcLevelColor(note.isSelected()),
+						calcLevelColorTrans(note.isSelected()));
+			}
 		}
 	}
 
@@ -273,7 +280,8 @@ public class NoteLevelsView extends TouchableView {
 		if (!touchedNotes.isEmpty()) {
 			MidiNote touched = touchedNotes.get(id);
 			if (touched != null) {
-				MidiNotesEventManager.setNoteLevel(touched, currLevelType, GeneralUtils.linearToByte(yToLevel(pos.y)));
+				MidiNotesEventManager.setNoteLevel(touched, currLevelType,
+						GeneralUtils.linearToByte(yToLevel(pos.y)));
 				updateValueLabel(touched);
 			}
 			if (id == pointersById.size() - 1) {

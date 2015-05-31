@@ -21,7 +21,7 @@ import com.kh.beatbot.track.Track;
 
 public class TrackManager implements TrackListener, FileListener, MidiNoteListener {
 	public static final int MASTER_TRACK_ID = -1;
-	public static Track currTrack, soloingTrack;
+	public static Track soloingTrack;
 
 	private static final TrackManager instance = new TrackManager();
 	private static final BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
@@ -30,6 +30,8 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	private static final Set<TrackLevelsEventListener> trackLevelsEventListeners = new HashSet<TrackLevelsEventListener>();
 
 	private static AlertDialog.Builder sampleSaveErrorAlert;
+
+	private static Track currTrack;
 
 	private TrackManager() {
 		FileManager.addListener(this);
@@ -253,6 +255,10 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	public static Track getTrackByNoteValue(int noteValue) {
 		return noteValue < tracks.size() ? tracks.get(noteValue) : null;
+	}
+
+	public static BaseTrack getCurrTrack() {
+		return currTrack == null ? masterTrack : currTrack;
 	}
 
 	public static Track getTrackById(int trackId) {

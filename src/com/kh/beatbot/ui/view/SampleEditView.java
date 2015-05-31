@@ -143,9 +143,10 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void tick() {
-		if (hasSample() && (TrackManager.currTrack.isSounding())) {
+		Track track = (Track) TrackManager.getCurrTrack();
+		if (hasSample() && (track.isSounding())) {
 			currSampleRect.show();
-			float x = levelToX(params[0].getViewLevel(TrackManager.currTrack.getCurrentFrame()));
+			float x = levelToX(params[0].getViewLevel(track.getCurrentFrame()));
 			currSampleRect.setPosition(absoluteX + x, absoluteY);
 		} else {
 			currSampleRect.hide();
@@ -216,7 +217,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void handleActionDown(int id, Pointer pos) {
-		loopWindowEvent = new SampleLoopWindowSetEvent(TrackManager.currTrack.getId());
+		loopWindowEvent = new SampleLoopWindowSetEvent(TrackManager.getCurrTrack().getId());
 		loopWindowEvent.begin();
 		super.handleActionDown(id, pos);
 		if (!hasSample())
@@ -286,8 +287,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void onParamChanged(Param param) {
-		Track track = TrackManager.currTrack;
-
+		Track track = (Track) TrackManager.getCurrTrack();
 		if (param == null)
 			return;
 		if (param.equals(track.getGainParam())) {
