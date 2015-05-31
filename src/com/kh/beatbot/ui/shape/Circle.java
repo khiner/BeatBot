@@ -5,7 +5,7 @@ public class Circle extends Shape {
 
 	public static final short[] FILL_INDICES = getFillIndices();
 
-	private static final int NUM_FILL_VERTICES = 18;
+	private static final int NUM_FILL_VERTICES = 32;
 
 	public Circle(RenderGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, FILL_INDICES, null, NUM_FILL_VERTICES, 0);

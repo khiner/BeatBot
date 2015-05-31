@@ -8,7 +8,7 @@ import com.kh.beatbot.ui.view.View;
 
 public class Seekbar2d extends ControlView2dBase {
 	private IntersectingLines intersectingLines;
-	private Circle circle;
+	private Circle circle, selectedCircle;
 
 	public Seekbar2d(View view) {
 		super(view);
@@ -17,9 +17,11 @@ public class Seekbar2d extends ControlView2dBase {
 	public synchronized void createChildren() {
 		selectColor = Color.LABEL_SELECTED;
 		initRoundedRect();
+		bgShape.setStrokeColor(null);
 		intersectingLines = new IntersectingLines(renderGroup, null, Color.TRON_BLUE);
 		circle = new Circle(renderGroup, Color.TRON_BLUE, null);
-		addShapes(intersectingLines, circle);
+		selectedCircle = new Circle(renderGroup, selectColorTrans, null);
+		addShapes(intersectingLines, circle, selectedCircle);
 	}
 
 	public void setDimensions(float width, float height) {
@@ -32,12 +34,15 @@ public class Seekbar2d extends ControlView2dBase {
 				* 2, height - BG_OFFSET * 2);
 
 		circle.setDimensions(getBgRectRadius(), getBgRectRadius());
+		selectedCircle.setDimensions(getBgRectRadius() * 2, getBgRectRadius() * 2);
+		selectedCircle.hide();
 	}
 
 	public void onParamChanged(Param param) {
 		float viewX = viewX(params[0].viewLevel);
 		float viewY = viewY(params[1].viewLevel);
 		circle.setPosition(absoluteX + BG_OFFSET + viewX, absoluteY + BG_OFFSET + viewY);
+		selectedCircle.setPosition(absoluteX + BG_OFFSET + viewX, absoluteY + BG_OFFSET + viewY);
 		intersectingLines.setIntersect(viewX, viewY);
 	}
 
@@ -56,6 +61,7 @@ public class Seekbar2d extends ControlView2dBase {
 		params[1].setLevel(yToLevel(pos.y));
 		intersectingLines.setStrokeColor(selectColor);
 		circle.setFillColor(selectColor);
+		selectedCircle.show();
 	}
 
 	@Override
@@ -63,5 +69,6 @@ public class Seekbar2d extends ControlView2dBase {
 		super.handleActionUp(id, pos);
 		intersectingLines.setStrokeColor(levelColor);
 		circle.setFillColor(levelColor);
+		selectedCircle.hide();
 	}
 }
