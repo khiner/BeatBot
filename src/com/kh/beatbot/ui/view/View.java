@@ -422,7 +422,7 @@ public class View implements Comparable<View> {
 			textMesh.layout(x + (nonIconWidth - textWidth) / 2, absoluteY
 					+ (this.height - textHeight) / 2, textHeight);
 		}
-		minX = minY = getBgRectRadius() + BG_OFFSET;
+		minX = minY = getBgRectRadius() - BG_OFFSET;
 		maxX = this.width - getBgRectRadius() - BG_OFFSET;
 		maxY = this.height - getBgRectRadius() - BG_OFFSET;
 		borderWidth = this.width - 2 * minX;
