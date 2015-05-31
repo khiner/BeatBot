@@ -55,6 +55,8 @@ public class View implements Comparable<View> {
 
 	private State state = State.DEFAULT;
 
+	protected float bgRectRadius = 0;
+
 	public View(View parent) {
 		this(parent, null == parent ? null : parent.getRenderGroup());
 	}
@@ -359,6 +361,16 @@ public class View implements Comparable<View> {
 		}
 	}
 
+	public void setBgRectRadius(float bgRectRadius) {
+		this.bgRectRadius = bgRectRadius;
+	}
+
+	public float getBgRectRadius() {
+		if (bgRectRadius == 0)
+			bgRectRadius = Math.min(width, height) * .15f;
+		return bgRectRadius;
+	}
+
 	protected synchronized void layoutShape() {
 		float x = absoluteX, y = absoluteY;
 		float width = this.width, height = this.height;
@@ -373,10 +385,8 @@ public class View implements Comparable<View> {
 			height -= BG_OFFSET * 2;
 		}
 
-		float bgRectRadius = Math.min(width, height) * .15f;
-
 		if (null != bgShape && bgShape instanceof RoundedRect) {
-			((RoundedRect) bgShape).setCornerRadius(bgRectRadius);
+			((RoundedRect) bgShape).setCornerRadius(getBgRectRadius());
 		}
 
 		if (shouldShrink()) {
@@ -412,9 +422,9 @@ public class View implements Comparable<View> {
 			textMesh.layout(x + (nonIconWidth - textWidth) / 2, absoluteY
 					+ (this.height - textHeight) / 2, textHeight);
 		}
-		minX = minY = bgRectRadius + BG_OFFSET;
-		maxX = this.width - bgRectRadius - BG_OFFSET;
-		maxY = this.height - bgRectRadius - BG_OFFSET;
+		minX = minY = getBgRectRadius() + BG_OFFSET;
+		maxX = this.width - getBgRectRadius() - BG_OFFSET;
+		maxY = this.height - getBgRectRadius() - BG_OFFSET;
 		borderWidth = this.width - 2 * minX;
 		borderHeight = this.height - 2 * minY;
 	}

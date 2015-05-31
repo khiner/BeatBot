@@ -4,7 +4,6 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.Circle;
 import com.kh.beatbot.ui.shape.IntersectingLines;
-import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.view.View;
 
 public class Seekbar2d extends ControlView2dBase {
@@ -23,12 +22,16 @@ public class Seekbar2d extends ControlView2dBase {
 		addShapes(intersectingLines, circle);
 	}
 
+	public void setDimensions(float width, float height) {
+		setBgRectRadius(height / 10);
+		super.setDimensions(width, height);
+	}
+
 	public synchronized void layoutChildren() {
 		intersectingLines.layout(absoluteX + BG_OFFSET, absoluteY + BG_OFFSET, width - BG_OFFSET
 				* 2, height - BG_OFFSET * 2);
 
-		float circleDiameter = ((RoundedRect) bgShape).cornerRadius;
-		circle.setDimensions(circleDiameter, circleDiameter);
+		circle.setDimensions(getBgRectRadius(), getBgRectRadius());
 	}
 
 	public void onParamChanged(Param param) {
