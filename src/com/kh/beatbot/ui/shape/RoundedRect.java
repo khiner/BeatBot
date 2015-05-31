@@ -4,7 +4,7 @@ public class RoundedRect extends Shape {
 	public static final short[] FILL_INDICES = getFillIndices();
 	public static final short[] STROKE_INDICES = getStrokeIndices();
 
-	public static final int NUM_CORNER_VERTICES = 6,
+	public static final int NUM_CORNER_VERTICES = 12,
 			NUM_FILL_VERTICES = NUM_CORNER_VERTICES * 4 + 1,
 			NUM_STROKE_VERTICES = NUM_CORNER_VERTICES * 4;
 
@@ -47,7 +47,7 @@ public class RoundedRect extends Shape {
 	protected synchronized void updateVertices() {
 		fillVertex(x + width / 2, y + height / 2); // center
 
-		roundThresh = cornerRadius / 20;
+		roundThresh = cornerRadius / 30;
 		float theta = 0, addX, addY, vertexX, vertexY;
 		for (int i = 0; i < NUM_STROKE_VERTICES; i++) {
 			if (theta < π / 2) { // lower right
