@@ -598,6 +598,6 @@ public class View implements Comparable<View> {
 	}
 
 	private final boolean shouldShrink() {
-		return shrinkable ? (getState() == State.PRESSED || getState() == State.SELECTED) : false;
+		return shrinkable ? (getState() == State.PRESSED) : false;
 	}
 }

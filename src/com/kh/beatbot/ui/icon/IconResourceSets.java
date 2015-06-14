@@ -61,9 +61,9 @@ public class IconResourceSets {
 			SUSTAIN = s(r(R.drawable.sustain_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.sustain_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.sustain_icon, Color.TRON_BLUE, Color.BLACK)),
 			RELEASE = s(r(R.drawable.release_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.release_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.release_icon, Color.TRON_BLUE, Color.BLACK)),
 			
-			VOLUME = s(r(Color.TRANSPARENT, Color.TRON_BLUE), r(Color.TRON_BLUE, Color.BLACK), r(Color.TRON_BLUE, Color.BLACK)),
-			PAN = s(r(Color.TRANSPARENT, Color.PAN), r(Color.PAN, Color.BLACK), r(Color.PAN, Color.BLACK)),
-			PITCH = s(r(Color.TRANSPARENT, Color.PITCH), r(Color.PITCH, Color.BLACK), r(Color.PITCH, Color.BLACK)),
+			VOLUME = s(r(Color.TRANSPARENT, null, Color.TRON_BLUE), r(Color.TRON_BLUE, null, Color.BLACK), r(Color.TRON_BLUE, null, Color.BLACK)),
+			PAN = s(r(Color.TRANSPARENT, null, Color.PAN), r(Color.PAN, null, Color.BLACK), r(Color.PAN, null, Color.BLACK)),
+			PITCH = s(r(Color.TRANSPARENT, null, Color.PITCH), r(Color.PITCH, null, Color.BLACK), r(Color.PITCH, null, Color.BLACK)),
 
 			PREVIEW = s(r(R.drawable.preview_icon, null, Color.WHITE), r(R.drawable.preview_icon_selected, null, Color.WHITE)),
 			LOOP = s(r(R.drawable.loop_icon, null, Color.LABEL_VERY_LIGHT), null, r(R.drawable.loop_icon, null, Color.LABEL_SELECTED)),
@@ -71,7 +71,7 @@ public class IconResourceSets {
 
 			LINK = s(r(R.drawable.link_icon, null, Color.WHITE), r(R.drawable.link_icon, null, Color.LABEL_SELECTED), r(R.drawable.link_icon, null, Color.TRON_BLUE)),
 
-			CONTROL_LABEL = s(r(-1, Color.TRANSPARENT, null, Color.WHITE, null), r(-1, Color.TRON_BLUE, null, Color.BLACK, null)),
+			CONTROL_LABEL = s(r(Color.TRANSPARENT, null, Color.WHITE), r(Color.TRON_BLUE, null, Color.BLACK)),
 			TOGGLE = s(r(R.drawable.toggle_icon, Color.LABEL_DARK, Color.LABEL_VERY_LIGHT), r(R.drawable.toggle_icon, Color.TRON_BLUE, Color.BLACK), r(R.drawable.toggle_icon, Color.LABEL_SELECTED, Color.BLACK, Color.BLACK, Color.TRON_BLUE)),
 			TOGGLE_WITHOUT_BORDER = s(r(R.drawable.toggle_icon, Color.LABEL_DARK, null, Color.LABEL_VERY_LIGHT, Color.LABEL_VERY_LIGHT), r(R.drawable.toggle_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK), r(R.drawable.toggle_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.TRON_BLUE)),
 			BANDPASS_FILTER = s(r(R.drawable.bandpass_filter_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.bandpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.bandpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
@@ -111,6 +111,10 @@ public class IconResourceSets {
 	
 	private static IconResource r(float[] fillColor, float[] strokeColor) {
 		return new IconResource(-1, fillColor, strokeColor);
+	}
+
+	private static IconResource r(float[] fillColor, float[] strokeColor, float[] textColor) {
+		return new IconResource(-1, fillColor, strokeColor, textColor);
 	}
 
 	private static IconResource r(int resourceId, float[] fillColor, float[] strokeColor) {
