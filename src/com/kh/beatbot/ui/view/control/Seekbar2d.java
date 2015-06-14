@@ -17,7 +17,6 @@ public class Seekbar2d extends ControlView2dBase {
 	public synchronized void createChildren() {
 		selectColor = Color.LABEL_SELECTED;
 		initRoundedRect();
-		bgShape.setStrokeColor(null);
 		intersectingLines = new IntersectingLines(renderGroup, null, Color.TRON_BLUE);
 		circle = new Circle(renderGroup, Color.TRON_BLUE, null);
 		selectedCircle = new Circle(renderGroup, selectColorTrans, null);

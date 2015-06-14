@@ -10,7 +10,7 @@ public class Color {
 			PAN, PITCH, TRON_BLUE_LIGHT, TRON_BLUE_TRANS, PAN_TRANS, PITCH_TRANS, LEVEL_SELECTED,
 			LEVEL_SELECTED_TRANS, TICK_FILL, TICK_MARKER, TICKBAR, BPM_OFF, BPM_ON, VIEW_BG,
 			VIEW_BG_SELECTED, LABEL_DARK, LABEL_MED, LABEL_LIGHT, LABEL_VERY_LIGHT, LABEL_SELECTED,
-			LABEL_SELECTED_TRANS, MIDI_SELECTED_TRACK, TRANSPARENT = { 0, 0, 0, 0 },
+			LABEL_TRANS, LABEL_SELECTED_TRANS, MIDI_SELECTED_TRACK, TRANSPARENT = { 0, 0, 0, 0 },
 			SEMI_TRANSPARENT = { 1, 1, 1, .4f };
 
 	public static float[][] MIDI_LINES = { { 0, 0, 0, 1 }, { .05f, .05f, .05f, 1 },
@@ -61,6 +61,8 @@ public class Color {
 		LABEL_LIGHT = colorResourceToFloats(activity, R.color.labelLight);
 		LABEL_VERY_LIGHT = colorResourceToFloats(activity, R.color.labelVeryLight);
 		LABEL_SELECTED = colorResourceToFloats(activity, R.color.labelSelected);
+		LABEL_TRANS = new float[] { LABEL_DARK[0], LABEL_DARK[1],
+				LABEL_DARK[2], .48f };
 		LABEL_SELECTED_TRANS = new float[] { LABEL_SELECTED[0], LABEL_SELECTED[1],
 				LABEL_SELECTED[2], .38f };
 

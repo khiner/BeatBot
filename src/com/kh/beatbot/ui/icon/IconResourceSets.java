@@ -8,7 +8,7 @@ import com.kh.beatbot.ui.color.Color;
 
 public class IconResourceSets {
 	public static IconResourceSet
-			DEFAULT = s(r(Color.VIEW_BG, Color.TRON_BLUE), r(Color.VIEW_BG_SELECTED, Color.TRON_BLUE), r(Color.VIEW_BG_SELECTED, Color.TRON_BLUE), r(Color.VIEW_BG, Color.TRON_BLUE)),
+			DEFAULT = s(r(Color.VIEW_BG), r(Color.VIEW_BG_SELECTED), r(Color.VIEW_BG_SELECTED), r(Color.VIEW_BG)),
 			SAMPLE_LOOP = s(r(Color.TRON_BLUE_TRANS), r(Color.TRON_BLUE)),
 			SAMPLE_BG = s(r(Color.LABEL_LIGHT), r(Color.LABEL_VERY_LIGHT)),
 			MUTE = s(r(Color.TRANSPARENT, Color.WHITE), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.PAN, Color.BLACK)),
@@ -25,7 +25,7 @@ public class IconResourceSets {
 			QUANTIZE = s(r(R.drawable.quantize_icon, null, Color.WHITE), r(R.drawable.quantize_icon, null, Color.TRON_BLUE), null, r(R.drawable.quantize_icon, null, Color.SEMI_TRANSPARENT)),
 			DELETE_NOTE = s(r(R.drawable.delete_icon, null, Color.WHITE), r(R.drawable.delete_icon, null, Color.LEVEL_SELECTED), null, r(R.drawable.delete_icon, null, Color.SEMI_TRANSPARENT)),
 
-			INSTRUMENT_BASE = s(r(Color.TRANSPARENT, Color.WHITE), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.TRON_BLUE, Color.BLACK)),
+			INSTRUMENT_BASE = s(r(Color.LABEL_TRANS, null, Color.WHITE), r(Color.LABEL_SELECTED), r(Color.TRON_BLUE)),
 			BROWSE = s(r(R.drawable.browse_icon), r(R.drawable.browse_icon), r(R.drawable.browse_icon)),
 			DRUMS= s(r(R.drawable.drums_icon), r(R.drawable.drums_icon), r(R.drawable.drums_icon)),
 			KICK= s(r(R.drawable.kick_icon), r(R.drawable.kick_icon), r(R.drawable.kick_icon)),
@@ -56,10 +56,10 @@ public class IconResourceSets {
 			MIDI_IMPORT = s(r(R.drawable.midi_import_icon), r(R.drawable.midi_import_icon)),
 			MIDI_EXPORT = s(r(R.drawable.midi_export_icon), r(R.drawable.midi_export_icon)),
 
-			ATTACK = s(r(R.drawable.attack_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.attack_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.attack_icon, Color.TRON_BLUE, Color.BLACK)),
-			DECAY = s(r(R.drawable.decay_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.decay_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.decay_icon, Color.TRON_BLUE, Color.BLACK)),
-			SUSTAIN = s(r(R.drawable.sustain_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.sustain_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.sustain_icon, Color.TRON_BLUE, Color.BLACK)),
-			RELEASE = s(r(R.drawable.release_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.release_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.release_icon, Color.TRON_BLUE, Color.BLACK)),
+			ATTACK = s(r(R.drawable.attack_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.attack_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK), r(R.drawable.attack_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK)),
+			DECAY = s(r(R.drawable.decay_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.decay_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK), r(R.drawable.decay_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK)),
+			SUSTAIN = s(r(R.drawable.sustain_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.sustain_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK), r(R.drawable.sustain_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK)),
+			RELEASE = s(r(R.drawable.release_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.release_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK), r(R.drawable.release_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK)),
 			
 			VOLUME = s(r(Color.TRANSPARENT, null, Color.TRON_BLUE), r(Color.TRON_BLUE, null, Color.BLACK), r(Color.TRON_BLUE, null, Color.BLACK)),
 			PAN = s(r(Color.TRANSPARENT, null, Color.PAN), r(Color.PAN, null, Color.BLACK), r(Color.PAN, null, Color.BLACK)),

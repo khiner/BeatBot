@@ -54,6 +54,7 @@ public class LabelList extends TouchableView {
 
 	public Label addLabel(String text, boolean on) {
 		Label newLabel = new Label(this, null);
+		newLabel.setShrinkable(true);
 		// need onPressListener as well as the onReleaseListener to notify
 		// when a label becomes touched
 		layoutChildren();
@@ -87,7 +88,7 @@ public class LabelList extends TouchableView {
 		float xTotal = 3 * BG_OFFSET / 2;
 		for (View label : children) {
 			if (!((TouchableView) label).isPressed()) {
-				label.layout(this, xTotal, 3 * BG_OFFSET / 2, labelWidth, height - BG_OFFSET * 3);
+				label.layout(this, xTotal, BG_OFFSET, labelWidth, height - BG_OFFSET * 2);
 			}
 			xTotal += labelWidth + GAP_BETWEEN_LABELS;
 		}
