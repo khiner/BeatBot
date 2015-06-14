@@ -69,7 +69,7 @@ public class IconResourceSets {
 			LOOP = s(r(R.drawable.loop_icon, null, Color.LABEL_VERY_LIGHT), null, r(R.drawable.loop_icon, null, Color.LABEL_SELECTED)),
 			REVERSE = s(r(R.drawable.reverse_icon, null, Color.LABEL_VERY_LIGHT), null, r(R.drawable.reverse_icon, null, Color.LABEL_SELECTED)),
 
-			LINK = s(r(R.drawable.link_icon, null, Color.WHITE), r(R.drawable.link_icon, null, Color.TRON_BLUE)),
+			LINK = s(r(R.drawable.link_icon, null, Color.WHITE), r(R.drawable.link_icon, null, Color.LABEL_SELECTED), r(R.drawable.link_icon, null, Color.TRON_BLUE)),
 
 			CONTROL_LABEL = s(r(-1, Color.TRANSPARENT, null, Color.WHITE, null), r(-1, Color.TRON_BLUE, null, Color.BLACK, null)),
 			TOGGLE = s(r(R.drawable.toggle_icon, Color.LABEL_DARK, Color.LABEL_VERY_LIGHT), r(R.drawable.toggle_icon, Color.TRON_BLUE, Color.BLACK), r(R.drawable.toggle_icon, Color.LABEL_SELECTED, Color.BLACK, Color.BLACK, Color.TRON_BLUE)),
