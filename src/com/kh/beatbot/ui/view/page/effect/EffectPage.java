@@ -82,8 +82,8 @@ public class EffectPage extends TouchableView {
 		toggleButton.layout(this, BG_OFFSET, BG_OFFSET, toggleWidth - BG_OFFSET * 2, toggleHeight);
 		paramsPager.layout(this, BG_OFFSET, toggleHeight + BG_OFFSET, toggleWidth - BG_OFFSET * 2,
 				height - toggleHeight - BG_OFFSET * 2);
-		level2d.layout(this, toggleWidth + BG_OFFSET, BG_OFFSET, height - BG_OFFSET * 2, height
-				- BG_OFFSET * 2);
+		level2d.layout(this, toggleWidth + BG_OFFSET * 2, BG_OFFSET * 2, height - BG_OFFSET * 4,
+				height - BG_OFFSET * 4);
 	}
 
 	public void setLevel2dParams(Param xParam, Param yParam) {
