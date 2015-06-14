@@ -14,6 +14,8 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 
 	// also in jni/Track.h: ugly but necessary
 	public final static int MAX_EFFECTS_PER_TRACK = 3;
+	public final static String NEW_EFFECT_LABEL = "Effect";
+
 	protected List<Param> params = new ArrayList<Param>();
 
 	protected int trackId;

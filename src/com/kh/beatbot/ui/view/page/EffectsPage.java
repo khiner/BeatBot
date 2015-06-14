@@ -58,7 +58,7 @@ public class EffectsPage extends TrackPage {
 		@Override
 		public void labelClicked(String text, int position) {
 			lastClickedPos = position;
-			if (text.isEmpty() || text.equalsIgnoreCase("Add")) {
+			if (text.isEmpty() || text.equalsIgnoreCase(Effect.NEW_EFFECT_LABEL)) {
 				selectEffectAlert.show();
 			} else {
 				launchEffect(text, position, false);

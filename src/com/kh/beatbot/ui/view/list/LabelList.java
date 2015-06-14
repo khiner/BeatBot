@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view.list;
 import java.util.Collections;
 
 import com.kh.beatbot.R;
+import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResource;
@@ -109,7 +110,7 @@ public class LabelList extends TouchableView {
 	}
 
 	protected class Label extends ClickableView {
-		private final static String EMPTY_TEXT = "ADD";
+		private final static String EMPTY_TEXT = Effect.NEW_EFFECT_LABEL;
 		private LabelState state = LabelState.EMPTY;
 		private int initialTouchedPosition = -1;
 
