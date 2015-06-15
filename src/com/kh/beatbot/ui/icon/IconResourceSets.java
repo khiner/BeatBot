@@ -11,8 +11,8 @@ public class IconResourceSets {
 			DEFAULT = s(r(Color.VIEW_BG), r(Color.VIEW_BG_SELECTED), r(Color.VIEW_BG_SELECTED), r(Color.VIEW_BG)),
 			SAMPLE_LOOP = s(r(Color.TRON_BLUE_TRANS), r(Color.TRON_BLUE)),
 			SAMPLE_BG = s(r(Color.LABEL_LIGHT), r(Color.LABEL_VERY_LIGHT)),
-			MUTE = s(r(Color.TRANSPARENT, Color.WHITE), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.PAN, Color.BLACK)),
-			SOLO = s(r(Color.TRANSPARENT, Color.WHITE), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.PITCH, Color.BLACK)),
+			MUTE = s(r(Color.LABEL_TRANS, null, Color.PAN_TRANS), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.PAN, Color.BLACK)),
+			SOLO = s(r(Color.LABEL_TRANS, null, Color.PITCH_TRANS), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.PITCH, Color.BLACK)),
 			BEAT_SYNC = s(r(R.drawable.clock, null, null, null, Color.WHITE), null, r(R.drawable.note_icon, null, null, null, Color.WHITE)),
 			VALUE_LABEL = s(r(Color.LABEL_VERY_LIGHT), r(Color.LABEL_SELECTED), null, r(Color.LABEL_DARK)),
 			VALUE_LABEL_VIEW_ONLY = s(null, null, null, r(Color.LABEL_VERY_LIGHT)),
@@ -42,10 +42,10 @@ public class IconResourceSets {
 					
 			DELETE_TRACK = s(r(R.drawable.delete_track_icon, Color.TRANSPARENT, Color.RED), r(R.drawable.delete_track_icon, Color.RED, Color.BLACK)),
 
-			LABEL_BASE = s(r(Color.LABEL_DARK, Color.WHITE), r(Color.TRON_BLUE, Color.BLACK), r(Color.LABEL_SELECTED, Color.BLACK)),
+			LABEL_BASE = s(r(Color.LABEL_DARK, null, Color.WHITE), r(Color.TRON_BLUE), r(Color.LABEL_SELECTED)),
 			ADD = s(r(R.drawable.plus_outline), r(R.drawable.plus_outline), r(R.drawable.plus_outline)),
 			NOTE_LEVELS = s(r(R.drawable.note_levels_icon), r(R.drawable.note_levels_icon), r(R.drawable.note_levels_icon)),
-			ADSR = s(r(R.drawable.adsr_icon, null, Color.WHITE), r(R.drawable.adsr_icon, null, Color.BLACK), r(R.drawable.adsr_icon, null, Color.BLACK)),
+			ADSR = s(r(R.drawable.adsr_icon), r(R.drawable.adsr_icon), r(R.drawable.adsr_icon)),
 			LEVELS = s(r(R.drawable.levels_icon), r(R.drawable.levels_icon), r(R.drawable.levels_icon)),
 
 			MENU_ITEM = s(r(null), r(Color.LABEL_LIGHT), r(Color.TRON_BLUE)),
