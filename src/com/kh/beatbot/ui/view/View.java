@@ -407,22 +407,25 @@ public class View implements Comparable<View> {
 			float textHeight = height + BG_OFFSET;
 			if (TextureAtlas.font.hasDescent(text))
 				textHeight *= .9f;
-
 			float textWidth = TextureAtlas.font.getTextWidth(text, textHeight);
-
 			float nonIconWidth = width - X_OFFSET * 2;
-			x += X_OFFSET * 2;
 			if (textureMesh.isVisible()) {
 				nonIconWidth -= height;
 				x += height;
 			}
 			if (textWidth > nonIconWidth) {
-				float scaleRatio = nonIconWidth / textWidth;
-				textWidth *= scaleRatio;
-				textHeight *= scaleRatio;
+				float scale = nonIconWidth / textWidth;
+				textWidth *= scale;
+				textHeight *= scale;
 			}
 
-			textMesh.layout(x + (nonIconWidth - textWidth) / 2, absoluteY
+			if (textHeight > mainPage.height / 10) { // text should only be so big, I mean c'mon
+				float scale = (mainPage.height / 10) / textHeight;
+				textWidth *= scale;
+				textHeight *= scale;
+			}
+
+			textMesh.layout(2 * X_OFFSET + x + (nonIconWidth - textWidth) / 2, absoluteY
 					+ (this.height - textHeight) / 2, textHeight);
 		}
 		minX = minY = getBgRectRadius() - BG_OFFSET;
@@ -433,8 +436,7 @@ public class View implements Comparable<View> {
 	}
 
 	protected synchronized View findChildAt(float x, float y) {
-		// reverse order to respect z-index (children are drawn in position
-		// order
+		// reverse order to respect z-index (children are drawn in position order
 		for (int i = children.size() - 1; i >= 0; i--) {
 			final View child = children.get(i);
 			if (child.containsPoint(x, y)) {
