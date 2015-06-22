@@ -399,7 +399,12 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	private static float[] whichColor(MidiNote note) {
-		return note.isSelected() ? Color.NOTE_SELECTED : Color.NOTE;
+		boolean selected = TrackManager.getTrackByNoteValue(note.getNoteValue()).isSelected();
+		if (selected) {
+			return note.isSelected() ? Color.NOTE_SELECTED_LIGHT : Color.NOTE_LIGHT;
+		} else {
+			return note.isSelected() ? Color.NOTE_SELECTED : Color.NOTE;
+		}
 	}
 
 	private static float[] whichColor(Track track) {
@@ -440,6 +445,9 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	private void updateTrackColors() {
 		for (Track track : TrackManager.getTracks()) {
 			track.getRectangle().setFillColor(whichColor(track));
+			for (MidiNote note : track.getMidiNotes()) {
+				note.getRectangle().setFillColor(whichColor(note));
+			}
 		}
 	}
 

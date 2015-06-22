@@ -12,8 +12,8 @@
     <color name="midiViewDarkBg">#FF757575</color>
     <color name="midiViewBg">#FF909090</color>
     <color name="midiViewLightBg">#FFC3C3C3</color>
-    <color name="note">#FFFF0000</color>
-    <color name="noteSelected">#FF0000FF</color>
+    <color name="note">#E35152</color><!--  hematite  -->
+    <color name="noteSelected">#FF69c9ff</color>
     <color name="background">#FF20303a</color>
     
     <color name="tronBlue">#FF69c9ff</color>
