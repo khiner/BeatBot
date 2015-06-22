@@ -405,6 +405,9 @@ public class View implements Comparable<View> {
 
 		if (textMesh.isVisible()) {
 			float textHeight = height + BG_OFFSET;
+			if (TextureAtlas.font.hasDescent(text))
+				textHeight *= .9f;
+
 			float textWidth = TextureAtlas.font.getTextWidth(text, textHeight);
 
 			float nonIconWidth = width - X_OFFSET * 2;

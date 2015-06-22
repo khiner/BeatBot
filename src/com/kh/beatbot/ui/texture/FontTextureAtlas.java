@@ -17,9 +17,11 @@ import android.graphics.Typeface;
 public class FontTextureAtlas extends TextureAtlas {
 	private final static int CHAR_START = 32, // First Character (ASCII Code)
 			CHAR_CNT = 126 - CHAR_START + 1, DEFAULT_TEXT_SIZE = 26;
+	private final static String CHARS_WITH_DESCENT = ".*[gjpqy].*";
 	// Width of Each Character (Actual; Pixels)
 	private final static float[] CHAR_WIDTHS = new float[CHAR_CNT];
 	private final float[] W = new float[1]; // Working Width Value
+	
 	private Typeface tf = null;
 
 	public void initConfig() {
@@ -56,6 +58,10 @@ public class FontTextureAtlas extends TextureAtlas {
 			total += getCharWidth(character);
 		}
 		return total * height / config.cellHeight;
+	}
+
+	public boolean hasDescent(String text) {
+		return text.matches(CHARS_WITH_DESCENT);
 	}
 
 	@Override
