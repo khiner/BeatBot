@@ -56,10 +56,10 @@ public class IconResourceSets {
 			MIDI_IMPORT = s(r(R.drawable.midi_import_icon), r(R.drawable.midi_import_icon)),
 			MIDI_EXPORT = s(r(R.drawable.midi_export_icon), r(R.drawable.midi_export_icon)),
 
-			ATTACK = s(r(R.drawable.attack_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.attack_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK), r(R.drawable.attack_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK)),
-			DECAY = s(r(R.drawable.decay_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.decay_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK), r(R.drawable.decay_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK)),
-			SUSTAIN = s(r(R.drawable.sustain_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.sustain_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK), r(R.drawable.sustain_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK)),
-			RELEASE = s(r(R.drawable.release_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.release_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK), r(R.drawable.release_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK)),
+			ATTACK = s(r(R.drawable.attack_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.attack_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK), r(R.drawable.attack_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK)),
+			DECAY = s(r(R.drawable.decay_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.decay_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK), r(R.drawable.decay_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK)),
+			SUSTAIN = s(r(R.drawable.sustain_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.sustain_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK), r(R.drawable.sustain_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK)),
+			RELEASE = s(r(R.drawable.release_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.release_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK), r(R.drawable.release_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK)),
 			
 			VOLUME = s(r(Color.TRANSPARENT, null, Color.TRON_BLUE), r(Color.TRON_BLUE, null, Color.BLACK), r(Color.TRON_BLUE, null, Color.BLACK)),
 			PAN = s(r(Color.TRANSPARENT, null, Color.PAN), r(Color.PAN, null, Color.BLACK), r(Color.PAN, null, Color.BLACK)),
