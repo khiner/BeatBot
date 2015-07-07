@@ -21,10 +21,10 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.page.AdsrPage;
 import com.kh.beatbot.ui.view.page.BrowsePage;
 import com.kh.beatbot.ui.view.page.EffectsPage;
-import com.kh.beatbot.ui.view.page.TrackLevelsPage;
 import com.kh.beatbot.ui.view.page.NoteLevelsPage;
 import com.kh.beatbot.ui.view.page.RecordPage;
 import com.kh.beatbot.ui.view.page.SampleEditPage;
+import com.kh.beatbot.ui.view.page.TrackLevelsPage;
 
 public class PageSelectGroup extends TouchableView implements TrackListener,
 		TrackLevelsEventListener, FileListener, PagerListener {
@@ -47,7 +47,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	public PageSelectGroup(View view) {
 		super(view);
-		TrackManager.addTrackLevelsEventListener(this);
 	}
 
 	public void setBPM(float bpm) {

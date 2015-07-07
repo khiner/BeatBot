@@ -1,9 +1,18 @@
 package com.kh.beatbot.ui.view.page;
 
+import java.io.File;
+
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Effect.LevelType;
+import com.kh.beatbot.listener.FileListener;
 import com.kh.beatbot.listener.MidiNoteListener;
+import com.kh.beatbot.listener.TrackLevelsEventListener;
+import com.kh.beatbot.listener.TrackListener;
+import com.kh.beatbot.manager.FileManager;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.track.BaseTrack;
+import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.view.MidiTrackView;
 import com.kh.beatbot.ui.view.MidiView;
 import com.kh.beatbot.ui.view.TouchableView;
@@ -16,7 +25,8 @@ import com.kh.beatbot.ui.view.group.PageSelectGroup;
 import com.kh.beatbot.ui.view.menu.MainMenu;
 import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
-public class MainPage extends TouchableView implements MidiNoteListener {
+public class MainPage extends TouchableView implements MidiNoteListener, TrackListener,
+		TrackLevelsEventListener, FileListener {
 	public ControlButtonGroup controlButtonGroup;
 	public ViewFlipper mainContentFlipper;
 	public EditGroup editGroup;
@@ -38,6 +48,14 @@ public class MainPage extends TouchableView implements MidiNoteListener {
 		mainContentFlipper.setPage(editGroup);
 		controlButtonGroup.hideEffectToggle();
 		slideMenu = new MainMenu(this, null);
+
+		TrackManager.addTrackLevelsEventListener(this);
+		TrackManager.addTrackListener(this);
+		FileManager.addListener(this);
+		// ORDER IS IMPORTANT! (add child page after parent)
+		TrackManager.addTrackLevelsEventListener(getPageSelectGroup());
+		TrackManager.addTrackListener(getPageSelectGroup());
+		FileManager.addListener(getPageSelectGroup());
 	}
 
 	@Override
@@ -45,7 +63,8 @@ public class MainPage extends TouchableView implements MidiNoteListener {
 		float controlButtonHeight = height / 10;
 		View.LABEL_HEIGHT = height / 12;
 		View.BG_OFFSET = height / 180;
-		mainContentFlipper.layout(this, 0, controlButtonHeight, width, height - controlButtonHeight);
+		mainContentFlipper
+				.layout(this, 0, controlButtonHeight, width, height - controlButtonHeight);
 		float trackControlWidth = getMidiViewGroup().getTrackControlWidth();
 		controlButtonGroup.layout(this, trackControlWidth, 0, width - trackControlWidth,
 				controlButtonHeight);
@@ -93,6 +112,11 @@ public class MainPage extends TouchableView implements MidiNoteListener {
 		controlButtonGroup.hideEffectToggle();
 	}
 
+	public void selectEditPage() {
+		if (effectIsShowing())
+			hideEffect();
+	}
+
 	public void launchEffect(Effect effect) {
 		mainContentFlipper.setPage(effectPage);
 		effectPage.setEffect(effect);
@@ -101,12 +125,14 @@ public class MainPage extends TouchableView implements MidiNoteListener {
 
 	@Override
 	public void onCreate(MidiNote note) {
+		selectEditPage();
 		controlButtonGroup.onCreate(note);
 		getMidiView().onCreate(note);
 	}
 
 	@Override
 	public void onDestroy(MidiNote note) {
+		selectEditPage();
 		controlButtonGroup.onDestroy(note);
 		getMidiView().onDestroy(note);
 	}
@@ -114,18 +140,65 @@ public class MainPage extends TouchableView implements MidiNoteListener {
 	@Override
 	public void onMove(MidiNote note, int beginNoteValue, long beginOnTick, long beginOffTick,
 			int endNoteValue, long endOnTick, long endOffTick) {
+		selectEditPage();
 		getMidiView().onMove(note, beginNoteValue, beginOnTick, beginOffTick, endNoteValue,
 				endOnTick, endOffTick);
 	}
 
 	@Override
 	public void onSelectStateChange(MidiNote note) {
+		selectEditPage();
 		controlButtonGroup.onSelectStateChange(note);
 		getMidiView().onSelectStateChange(note);
 	}
 
 	@Override
 	public void onLevelChanged(MidiNote note, LevelType type) {
-		getPageSelectGroup().onNoteLevelsChange(note, type);
+		selectEditPage();
+	}
+
+	@Override
+	public void onNameChange(File file, File newFile) {
+		selectEditPage();
+	}
+
+	@Override
+	public void onCreate(Track track) {
+		selectEditPage();
+	}
+
+	@Override
+	public void onDestroy(Track track) {
+		selectEditPage();
+	}
+
+	@Override
+	public void onSelect(BaseTrack track) {
+		selectEditPage();
+	}
+
+	@Override
+	public void onSampleChange(Track track) {
+		selectEditPage();
+	}
+
+	@Override
+	public void onMuteChange(Track track, boolean mute) {
+		selectEditPage();
+	}
+
+	@Override
+	public void onSoloChange(Track track, boolean solo) {
+		selectEditPage();
+	}
+
+	@Override
+	public void onTrackLevelsChange(BaseTrack track) {
+		selectEditPage();
+	}
+
+	@Override
+	public void onSampleLoopWindowChange(Track track) {
+		selectEditPage();
 	}
 }

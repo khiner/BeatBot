@@ -1,7 +1,5 @@
 package com.kh.beatbot.ui.view.group;
 
-import com.kh.beatbot.manager.FileManager;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 
@@ -17,9 +15,6 @@ public class EditGroup extends TouchableView {
 	protected synchronized void createChildren() {
 		midiViewGroup = new MidiViewGroup(this);
 		pageSelectGroup = new PageSelectGroup(this);
-
-		TrackManager.addTrackListener(pageSelectGroup);
-		FileManager.addListener(pageSelectGroup);
 	}
 
 	@Override
