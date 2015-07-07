@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui.view.page.effect;
+package com.kh.beatbot.ui.view.group.effect;
 
 import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -8,7 +8,7 @@ import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
-public class FilterParamsPage extends EffectParamsPage {
+public class FilterParamsGroup extends EffectParamsGroup {
 	private ToggleButton[] filterToggles;
 	private FilterToggleListener filterToggleListener;
 
@@ -18,7 +18,7 @@ public class FilterParamsPage extends EffectParamsPage {
 			IconResourceSets.HIGHPASS_FILTER,
 	};
 	
-	public FilterParamsPage(View view) {
+	public FilterParamsGroup(View view) {
 		super(view);
 
 		filterToggles = new ToggleButton[3];

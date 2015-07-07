@@ -18,13 +18,13 @@ import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.ViewPager;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
-import com.kh.beatbot.ui.view.page.AdsrPage;
-import com.kh.beatbot.ui.view.page.BrowsePage;
-import com.kh.beatbot.ui.view.page.EffectsPage;
-import com.kh.beatbot.ui.view.page.NoteLevelsPage;
-import com.kh.beatbot.ui.view.page.RecordPage;
-import com.kh.beatbot.ui.view.page.SampleEditPage;
-import com.kh.beatbot.ui.view.page.TrackLevelsPage;
+import com.kh.beatbot.ui.view.page.track.AdsrPage;
+import com.kh.beatbot.ui.view.page.track.BrowsePage;
+import com.kh.beatbot.ui.view.page.track.EffectSelectPage;
+import com.kh.beatbot.ui.view.page.track.NoteLevelsPage;
+import com.kh.beatbot.ui.view.page.track.RecordPage;
+import com.kh.beatbot.ui.view.page.track.SampleEditPage;
+import com.kh.beatbot.ui.view.page.track.TrackLevelsPage;
 
 public class PageSelectGroup extends TouchableView implements TrackListener,
 		TrackLevelsEventListener, FileListener, PagerListener {
@@ -33,7 +33,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	public static NoteLevelsPage noteLevelsPage;
 	public static TrackLevelsPage levelsPage;
-	public static EffectsPage effectsPage;
+	public static EffectSelectPage effectSelectPage;
 	public static BrowsePage browsePage;
 	public static SampleEditPage editPage;
 	public static AdsrPage adsrPage;
@@ -91,7 +91,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		masterButtonRow.setPager(pager);
 
 		levelsPage = new TrackLevelsPage(pager);
-		effectsPage = new EffectsPage(pager);
+		effectSelectPage = new EffectSelectPage(pager);
 		browsePage = new BrowsePage(pager, null);
 		browsePage.setClip(true);
 		editPage = new SampleEditPage(pager);
@@ -106,14 +106,14 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 		pager.addPage(trackButtonRow.getBrowseButton(), browsePage);
 		pager.addPage(trackButtonRow.getLevelsButton(), levelsPage);
-		pager.addPage(trackButtonRow.getEffectsButton(), effectsPage);
+		pager.addPage(trackButtonRow.getEffectsButton(), effectSelectPage);
 		pager.addPage(trackButtonRow.getEditButton(), editPage);
 		pager.addPage(trackButtonRow.getAdsrButton(), adsrPage);
 		pager.addPage(trackButtonRow.getNoteLevelsButton(), noteLevelsPage);
 		pager.addPage(trackButtonRow.getRecordButton(), recordPage);
 
 		pager.addPage(masterButtonRow.getLevelsButton(), levelsPage);
-		pager.addPage(masterButtonRow.getEffectsButton(), effectsPage);
+		pager.addPage(masterButtonRow.getEffectsButton(), effectSelectPage);
 
 		masterButton.setText("Master");
 	}
@@ -156,7 +156,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		buttonRowPager.setPage(isMaster ? masterButton : TRACK_PAGE_ID);
 		masterButton.setChecked(isMaster);
 		levelsPage.setMasterMode(isMaster);
-		effectsPage.setMasterMode(isMaster);
+		effectSelectPage.setMasterMode(isMaster);
 		((PageButtonRow) buttonRowPager.getCurrPage()).currPage.trigger();
 		((TrackListener) pager.getCurrPage()).onSelect(track);
 		if (!isMaster) {
@@ -223,6 +223,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	}
 
 	public void updateEffectsPage() {
-		effectsPage.updateEffectLabels();
+		effectSelectPage.updateEffectLabels();
 	}
 }

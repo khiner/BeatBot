@@ -22,7 +22,7 @@ import com.kh.beatbot.ui.shape.Shape;
 import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.view.TouchableView.Pointer;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
-import com.kh.beatbot.ui.view.page.MainPage;
+import com.kh.beatbot.ui.view.page.main.MainPage;
 
 public class View implements Comparable<View> {
 	protected static final float π = (float) Math.PI, X_OFFSET = 2;

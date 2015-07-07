@@ -1,13 +1,15 @@
-package com.kh.beatbot.ui.view.group;
+package com.kh.beatbot.ui.view.page.main;
 
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
+import com.kh.beatbot.ui.view.group.MidiViewGroup;
+import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
-public class EditGroup extends TouchableView {
+public class EditPage extends TouchableView {
 	public MidiViewGroup midiViewGroup;
 	public PageSelectGroup pageSelectGroup;
 
-	public EditGroup(View view) {
+	public EditPage(View view) {
 		super(view);
 	}
 

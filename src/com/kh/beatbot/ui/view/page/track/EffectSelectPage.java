@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui.view.page;
+package com.kh.beatbot.ui.view.page.track;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -20,9 +20,9 @@ import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.list.LabelList;
 import com.kh.beatbot.ui.view.list.LabelList.LabelState;
 
-public class EffectsPage extends TrackPage {
+public class EffectSelectPage extends TrackPage {
 
-	public EffectsPage(View view) {
+	public EffectSelectPage(View view) {
 		super(view);
 	}
 

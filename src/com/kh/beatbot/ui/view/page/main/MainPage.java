@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui.view.page;
+package com.kh.beatbot.ui.view.page.main;
 
 import java.io.File;
 
@@ -20,17 +20,15 @@ import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.ViewFlipper;
 import com.kh.beatbot.ui.view.group.ControlButtonGroup;
-import com.kh.beatbot.ui.view.group.EditGroup;
 import com.kh.beatbot.ui.view.group.MidiViewGroup;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 import com.kh.beatbot.ui.view.menu.MainMenu;
-import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
 public class MainPage extends TouchableView implements MidiNoteListener, TrackListener,
 		TrackLevelsEventListener, FileListener {
 	public ControlButtonGroup controlButtonGroup;
-	public ViewFlipper mainContentFlipper;
-	public EditGroup editGroup;
+	public ViewFlipper mainPageFlipper;
+	public EditPage editPage;
 	public EffectPage effectPage;
 	public MainMenu slideMenu;
 
@@ -41,12 +39,12 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 	@Override
 	protected synchronized void createChildren() {
 		controlButtonGroup = new ControlButtonGroup(this);
-		mainContentFlipper = new ViewFlipper(this);
-		editGroup = new EditGroup(null);
+		mainPageFlipper = new ViewFlipper(this);
+		editPage = new EditPage(null);
 		effectPage = new EffectPage(null);
-		mainContentFlipper.addPage(editGroup);
-		mainContentFlipper.addPage(effectPage);
-		mainContentFlipper.setPage(editGroup);
+		mainPageFlipper.addPage(editPage);
+		mainPageFlipper.addPage(effectPage);
+		mainPageFlipper.setPage(editPage);
 		controlButtonGroup.hideEffectToggle();
 		slideMenu = new MainMenu(this, null);
 
@@ -69,7 +67,7 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 		float controlButtonHeight = height / 10;
 		View.LABEL_HEIGHT = height / 12;
 		View.BG_OFFSET = height / 180;
-		mainContentFlipper
+		mainPageFlipper
 				.layout(this, 0, controlButtonHeight, width, height - controlButtonHeight);
 		float trackControlWidth = getMidiViewGroup().getTrackControlWidth();
 		controlButtonGroup.layout(this, trackControlWidth, 0, width - trackControlWidth,
@@ -80,17 +78,17 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 	@Override
 	public synchronized void drawAll() {
 		controlButtonGroup.drawAll();
-		mainContentFlipper.drawAll();
+		mainPageFlipper.drawAll();
 		renderGroup.draw();
 		slideMenu.drawAll();
 	}
 
 	public MidiViewGroup getMidiViewGroup() {
-		return editGroup.midiViewGroup;
+		return editPage.midiViewGroup;
 	}
 
 	public PageSelectGroup getPageSelectGroup() {
-		return editGroup.pageSelectGroup;
+		return editPage.pageSelectGroup;
 	}
 
 	public MidiView getMidiView() {
@@ -110,11 +108,11 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 	}
 
 	public boolean effectIsShowing() {
-		return mainContentFlipper.getCurrPage().equals(effectPage);
+		return mainPageFlipper.getCurrPage().equals(effectPage);
 	}
 
 	public void hideEffect() {
-		mainContentFlipper.setPage(editGroup);
+		mainPageFlipper.setPage(editPage);
 		controlButtonGroup.hideEffectToggle();
 	}
 
@@ -124,7 +122,7 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 	}
 
 	public void launchEffect(Effect effect) {
-		mainContentFlipper.setPage(effectPage);
+		mainPageFlipper.setPage(effectPage);
 		effectPage.setEffect(effect);
 		controlButtonGroup.updateEffectToggle(effect);
 	}

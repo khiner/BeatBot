@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui.view.page;
+package com.kh.beatbot.ui.view.page.track;
 
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;

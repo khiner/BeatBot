@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui.view.page.effect;
+package com.kh.beatbot.ui.view.group.effect;
 
 import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
@@ -8,16 +8,16 @@ import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
-public class DelayParamsPage extends EffectParamsPage {
+public class DelayParamsGroup extends EffectParamsGroup {
 	private ToggleButton linkToggle;
 
-	public DelayParamsPage(View view) {
+	public DelayParamsGroup(View view) {
 		super(view);
 		linkToggle = new ToggleButton(this).oscillating().withIcon(IconResourceSets.LINK);
 	}
 
 	@Override
-	public DelayParamsPage withEffect(final Effect effect) {
+	public DelayParamsGroup withEffect(final Effect effect) {
 		super.withEffect(effect);
 
 		linkToggle.setOnReleaseListener(new OnReleaseListener() {

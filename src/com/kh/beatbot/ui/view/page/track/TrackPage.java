@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui.view.page;
+package com.kh.beatbot.ui.view.page.track;
 
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.track.BaseTrack;

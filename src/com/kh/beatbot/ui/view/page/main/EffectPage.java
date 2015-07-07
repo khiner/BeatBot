@@ -1,4 +1,4 @@
-package com.kh.beatbot.ui.view.page.effect;
+package com.kh.beatbot.ui.view.page.main;
 
 import com.kh.beatbot.effect.Chorus;
 import com.kh.beatbot.effect.Crush;
@@ -13,13 +13,16 @@ import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.ViewPager;
 import com.kh.beatbot.ui.view.control.Seekbar2d;
+import com.kh.beatbot.ui.view.group.effect.DelayParamsGroup;
+import com.kh.beatbot.ui.view.group.effect.EffectParamsGroup;
+import com.kh.beatbot.ui.view.group.effect.FilterParamsGroup;
 
 public class EffectPage extends TouchableView {
 	private ViewPager paramsPager;
 	private Seekbar2d level2d;
 
-	private EffectParamsPage chorusPage, decimatePage, delayPage, filterPage, flangerPage,
-			reverbPage, tremeloPage;
+	private EffectParamsGroup chorusGroup, decimateGroup, delayGroup, filterGroup, flangerGroup,
+			reverbGroup, tremeloGroup;
 
 	public EffectPage(View view) {
 		super(view);
@@ -30,13 +33,13 @@ public class EffectPage extends TouchableView {
 	}
 
 	public Effect getEffect() {
-		return ((EffectParamsPage) paramsPager.getCurrPage()).getEffect();
+		return ((EffectParamsGroup) paramsPager.getCurrPage()).getEffect();
 	}
 
 	public void setEffect(Effect effect) {
 		paramsPager.setPage(effect.getName());
 		setLevel2dParams(effect.getXParam(), effect.getYParam());
-		((EffectParamsPage) paramsPager.getCurrPage()).withEffect(effect);
+		((EffectParamsGroup) paramsPager.getCurrPage()).withEffect(effect);
 	}
 
 	@Override
@@ -44,21 +47,21 @@ public class EffectPage extends TouchableView {
 		paramsPager = new ViewPager(this);
 		level2d = new Seekbar2d(this);
 
-		chorusPage = new EffectParamsPage(paramsPager).withEffect(new Chorus());
-		decimatePage = new EffectParamsPage(paramsPager).withEffect(new Crush());
-		delayPage = new DelayParamsPage(paramsPager).withEffect(new Delay());
-		filterPage = new FilterParamsPage(paramsPager).withEffect(new Filter());
-		flangerPage = new EffectParamsPage(paramsPager).withEffect(new Flanger());
-		reverbPage = new EffectParamsPage(paramsPager).withEffect(new Reverb());
-		tremeloPage = new EffectParamsPage(paramsPager).withEffect(new Tremolo());
+		chorusGroup = new EffectParamsGroup(paramsPager).withEffect(new Chorus());
+		decimateGroup = new EffectParamsGroup(paramsPager).withEffect(new Crush());
+		delayGroup = new DelayParamsGroup(paramsPager).withEffect(new Delay());
+		filterGroup = new FilterParamsGroup(paramsPager).withEffect(new Filter());
+		flangerGroup = new EffectParamsGroup(paramsPager).withEffect(new Flanger());
+		reverbGroup = new EffectParamsGroup(paramsPager).withEffect(new Reverb());
+		tremeloGroup = new EffectParamsGroup(paramsPager).withEffect(new Tremolo());
 
-		paramsPager.addPage(Chorus.NAME, chorusPage);
-		paramsPager.addPage(Crush.NAME, decimatePage);
-		paramsPager.addPage(Delay.NAME, delayPage);
-		paramsPager.addPage(Filter.NAME, filterPage);
-		paramsPager.addPage(Flanger.NAME, flangerPage);
-		paramsPager.addPage(Reverb.NAME, reverbPage);
-		paramsPager.addPage(Tremolo.NAME, tremeloPage);
+		paramsPager.addPage(Chorus.NAME, chorusGroup);
+		paramsPager.addPage(Crush.NAME, decimateGroup);
+		paramsPager.addPage(Delay.NAME, delayGroup);
+		paramsPager.addPage(Filter.NAME, filterGroup);
+		paramsPager.addPage(Flanger.NAME, flangerGroup);
+		paramsPager.addPage(Reverb.NAME, reverbGroup);
+		paramsPager.addPage(Tremolo.NAME, tremeloGroup);
 	}
 
 	@Override
