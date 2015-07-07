@@ -96,8 +96,8 @@ public class Param {
 
 	public void setLevel(float level) {
 		level = GeneralUtils.clipTo(level, minViewLevel, maxViewLevel);
+		float prevLevel = this.viewLevel;
 		viewLevel = level;
-		float prevLevel = this.level;
 		if (isDb()) {
 			this.level = linearToDb(DB_SCALE * logScaleLevel(level));
 		} else if (beatSync) {
@@ -109,7 +109,7 @@ public class Param {
 			this.level = Math.round(this.level);
 		}
 
-		if (this.level != prevLevel) {
+		if (this.viewLevel != prevLevel) {
 			notifyListeners();
 		}
 	}
