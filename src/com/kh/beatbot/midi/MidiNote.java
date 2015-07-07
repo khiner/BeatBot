@@ -2,7 +2,6 @@ package com.kh.beatbot.midi;
 
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
@@ -31,11 +30,11 @@ public class MidiNote implements Comparable<MidiNote> {
 
 	public void create() {
 		selected = true;
-		notifyCreated();
+		MidiManager.get().onCreate(this);
 	}
 
 	public void destroy() {
-		notifyDestroyed();
+		MidiManager.get().onDestroy(this);
 		restoreTicks();
 	}
 
@@ -139,7 +138,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		if (this.selected == selected)
 			return;
 		this.selected = selected;
-		notifySelectStateChanged();
+		MidiManager.get().onSelectStateChange(this);
 	}
 
 	public void setTouched(boolean touched) {
@@ -156,8 +155,8 @@ public class MidiNote implements Comparable<MidiNote> {
 		}
 
 		if (prevOnTick != getOnTick() || prevOffTick != getOffTick()) {
-			notifyMoved(getNoteValue(), prevOnTick, prevOffTick, getNoteValue(), getOnTick(),
-					getOffTick());
+			MidiManager.get().onMove(this, getNoteValue(), prevOnTick, prevOffTick, getNoteValue(),
+					getOnTick(), getOffTick());
 			return true;
 		} else {
 			return false;
@@ -171,8 +170,8 @@ public class MidiNote implements Comparable<MidiNote> {
 		int prevNoteValue = getNoteValue();
 		noteOn.setNoteValue(note);
 		noteOff.setNoteValue(note);
-		notifyMoved(prevNoteValue, getOnTick(), getOffTick(), getNoteValue(), getOnTick(),
-				getOffTick());
+		MidiManager.get().onMove(this, prevNoteValue, getOnTick(), getOffTick(), getNoteValue(),
+				getOnTick(), getOffTick());
 	}
 
 	public void setNoteWithoutNotify(int note) {
@@ -243,7 +242,8 @@ public class MidiNote implements Comparable<MidiNote> {
 			setPitch(level);
 			break;
 		}
-		notifyLevelSet(levelType);
+
+		MidiManager.get().onLevelChanged(this, levelType);
 	}
 
 	@Override
@@ -263,33 +263,6 @@ public class MidiNote implements Comparable<MidiNote> {
 		} else {
 			return 0;
 		}
-	}
-
-	private void notifyCreated() {
-		TrackManager.get().onCreate(this);
-		View.mainPage.onCreate(this);
-	}
-
-	private void notifyDestroyed() {
-		TrackManager.get().onDestroy(this);
-		View.mainPage.onDestroy(this);
-	}
-
-	private void notifyMoved(int beginNoteValue, long beginOnTick, long beginOffTick,
-			int endNoteValue, long endOnTick, long endOffTick) {
-		TrackManager.get().onMove(this, beginNoteValue, beginOnTick, beginOffTick, endNoteValue,
-				endOnTick, endOffTick);
-		View.mainPage.onMove(this, beginNoteValue, beginOnTick, beginOffTick, endNoteValue,
-				endOnTick, endOffTick);
-	}
-
-	private void notifyLevelSet(LevelType type) {
-		View.mainPage.onLevelChanged(this, type);
-	}
-
-	private void notifySelectStateChanged() {
-		TrackManager.get().onSelectStateChange(this);
-		View.mainPage.onSelectStateChange(this);
 	}
 
 	private void setVelocity(byte velocity) {

@@ -9,6 +9,7 @@ import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.TrackLevelsEventListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.FileManager;
+import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.track.BaseTrack;
@@ -49,13 +50,18 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 		controlButtonGroup.hideEffectToggle();
 		slideMenu = new MainMenu(this, null);
 
+		// ORDER IS IMPORTANT! (add child page after parent)
 		TrackManager.addTrackLevelsEventListener(this);
 		TrackManager.addTrackListener(this);
 		FileManager.addListener(this);
-		// ORDER IS IMPORTANT! (add child page after parent)
+
 		TrackManager.addTrackLevelsEventListener(getPageSelectGroup());
 		TrackManager.addTrackListener(getPageSelectGroup());
 		FileManager.addListener(getPageSelectGroup());
+		
+		MidiManager.addMidiNoteListener(this);
+		MidiManager.addMidiNoteListener(controlButtonGroup);
+		MidiManager.addMidiNoteListener(getMidiView());
 	}
 
 	@Override
@@ -126,30 +132,22 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 	@Override
 	public void onCreate(MidiNote note) {
 		selectEditPage();
-		controlButtonGroup.onCreate(note);
-		getMidiView().onCreate(note);
 	}
 
 	@Override
 	public void onDestroy(MidiNote note) {
 		selectEditPage();
-		controlButtonGroup.onDestroy(note);
-		getMidiView().onDestroy(note);
 	}
 
 	@Override
 	public void onMove(MidiNote note, int beginNoteValue, long beginOnTick, long beginOffTick,
 			int endNoteValue, long endOnTick, long endOffTick) {
 		selectEditPage();
-		getMidiView().onMove(note, beginNoteValue, beginOnTick, beginOffTick, endNoteValue,
-				endOnTick, endOffTick);
 	}
 
 	@Override
 	public void onSelectStateChange(MidiNote note) {
 		selectEditPage();
-		controlButtonGroup.onSelectStateChange(note);
-		getMidiView().onSelectStateChange(note);
 	}
 
 	@Override

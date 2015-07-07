@@ -3,10 +3,12 @@ package com.kh.beatbot.manager;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.event.TrackCreateEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.file.MidiFile;
 import com.kh.beatbot.listener.LoopWindowListener;
+import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.SnapToGridListener;
 import com.kh.beatbot.listener.TempoListener;
 import com.kh.beatbot.midi.MidiNote;
@@ -19,7 +21,7 @@ import com.kh.beatbot.midi.event.meta.TimeSignature;
 import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.track.Track;
 
-public class MidiManager {
+public class MidiManager implements MidiNoteListener {
 	public static final int MIN_BPM = 45, MAX_BPM = 300,
 			TICKS_PER_NOTE = MidiFile.DEFAULT_RESOLUTION, UNDO_STACK_SIZE = 40,
 			NOTES_PER_MEASURE = 4, TICKS_PER_MEASURE = TICKS_PER_NOTE * NOTES_PER_MEASURE,
@@ -35,14 +37,24 @@ public class MidiManager {
 	private static List<MidiNote> copiedNotes = new ArrayList<MidiNote>(),
 			currState = new ArrayList<MidiNote>();
 
+	private static List<MidiNoteListener> midiNoteListeners = new ArrayList<MidiNoteListener>();
 	private static List<LoopWindowListener> loopChangeListeners = new ArrayList<LoopWindowListener>();
 	private static TempoListener tempoListener;
 	private static SnapToGridListener snapToGridListener;
+	private static MidiManager instance = new MidiManager();
+
+	public static MidiManager get() {
+		return instance;
+	}
 
 	public static void init() {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION);
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
+	}
+
+	public static void addMidiNoteListener(MidiNoteListener listener) {
+		midiNoteListeners.add(listener);
 	}
 
 	public static void addLoopChangeListener(LoopWindowListener listener) {
@@ -243,6 +255,43 @@ public class MidiManager {
 
 	public static long getLoopEndTick() {
 		return loopEndTick;
+	}
+
+	@Override
+	public void onCreate(MidiNote note) {
+		for (MidiNoteListener listener : midiNoteListeners) {
+			listener.onCreate(note);
+		}
+	}
+
+	@Override
+	public void onDestroy(MidiNote note) {
+		for (MidiNoteListener listener : midiNoteListeners) {
+			listener.onDestroy(note);
+		}
+	}
+
+	@Override
+	public void onMove(MidiNote note, int beginNoteValue, long beginOnTick, long beginOffTick,
+			int endNoteValue, long endOnTick, long endOffTick) {
+		for (MidiNoteListener listener : midiNoteListeners) {
+			listener.onMove(note, beginNoteValue, beginOnTick, beginOffTick, endNoteValue,
+					endOnTick, endOffTick);
+		}
+	}
+
+	@Override
+	public void onSelectStateChange(MidiNote note) {
+		for (MidiNoteListener listener : midiNoteListeners) {
+			listener.onSelectStateChange(note);
+		}
+	}
+
+	@Override
+	public void onLevelChanged(MidiNote note, LevelType type) {
+		for (MidiNoteListener listener : midiNoteListeners) {
+			listener.onLevelChanged(note, type);
+		}
 	}
 
 	public static native void isTrackPlaying(int trackId);
