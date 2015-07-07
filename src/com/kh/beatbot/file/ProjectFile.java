@@ -44,7 +44,7 @@ public class ProjectFile {
 		globalProperties.addProperty(TEMPO, MidiManager.getBPM());
 		globalProperties.addProperty(SNAP_TO_GRID, MidiManager.isSnapToGrid());
 		globalProperties.addProperty(CURR_TRACK_ID, TrackManager.getCurrTrack().getId());
-		globalProperties.addProperty(CURR_PAGE_INDEX, View.mainPage.pageSelectGroup.getCurrPageIndex());
+		globalProperties.addProperty(CURR_PAGE_INDEX, View.mainPage.getPageSelectGroup().getCurrPageIndex());
 
 		outputStream.write((globalProperties.toString() + "\n").getBytes());
 
@@ -76,7 +76,7 @@ public class ProjectFile {
 		}
 
 		TrackManager.getBaseTrackById(globalProperties.get(CURR_TRACK_ID).getAsInt()).select();
-		View.mainPage.pageSelectGroup.selectPage(globalProperties.get(CURR_PAGE_INDEX).getAsInt());
+		View.mainPage.getPageSelectGroup().selectPage(globalProperties.get(CURR_PAGE_INDEX).getAsInt());
 
 		reader.close();
 	}

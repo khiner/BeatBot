@@ -314,7 +314,7 @@ public class SampleEditView extends ControlView2dBase {
 	@Override
 	public void release() {
 		if (!hasSample() && isPressed()) {
-			View.mainPage.pageSelectGroup.selectBrowsePage();
+			View.mainPage.getPageSelectGroup().selectBrowsePage();
 		}
 		super.release();
 	}

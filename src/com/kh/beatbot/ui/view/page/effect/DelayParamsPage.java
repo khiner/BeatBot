@@ -39,7 +39,7 @@ public class DelayParamsPage extends EffectParamsPage {
 				}
 				effect.getParam(1).toggle(newRightChannelSynced);
 				effect.getParam(1).setLevel(newRightChannelLevel);
-				effectPage.setLevel2dParams(effect.getXParam(), effect.getYParam());
+				mainPage.effectPage.setLevel2dParams(effect.getXParam(), effect.getYParam());
 			}
 		});
 

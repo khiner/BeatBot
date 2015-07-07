@@ -23,14 +23,12 @@ import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.view.TouchableView.Pointer;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
 import com.kh.beatbot.ui.view.page.MainPage;
-import com.kh.beatbot.ui.view.page.effect.EffectPage;
 
 public class View implements Comparable<View> {
 	protected static final float π = (float) Math.PI, X_OFFSET = 2;
 	protected static float LABEL_HEIGHT = 0, BG_OFFSET = 0;
 
 	public static MainPage mainPage;
-	public static EffectPage effectPage;
 	public static GLSurfaceViewBase root;
 	public static BeatBotActivity context;
 
@@ -76,11 +74,10 @@ public class View implements Comparable<View> {
 		View.context = context;
 		root = new GLSurfaceViewGroup(context);
 		mainPage = new MainPage(null);
-		effectPage = new EffectPage(null);
 
 		ViewFlipper rootFlipper = new ViewFlipper(null);
+		// only single page for now
 		rootFlipper.addPage(mainPage);
-		rootFlipper.addPage(effectPage);
 		rootFlipper.setPage(mainPage);
 
 		return rootFlipper;
@@ -541,7 +538,7 @@ public class View implements Comparable<View> {
 		}
 	}
 
-	protected synchronized void show() {
+	public synchronized void show() {
 		if (null != bgShape) {
 			bgShape.show();
 		}
@@ -557,7 +554,7 @@ public class View implements Comparable<View> {
 		stateChanged();
 	}
 
-	protected synchronized void hide() {
+	public synchronized void hide() {
 		if (null != bgShape) {
 			bgShape.hide();
 		}

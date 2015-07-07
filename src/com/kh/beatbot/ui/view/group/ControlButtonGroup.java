@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.view.group;
 
 import android.widget.Toast;
 
+import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Stateful;
@@ -23,7 +24,7 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 public class ControlButtonGroup extends TouchableView implements MidiNoteListener,
 		StatefulEventListener {
 
-	private ToggleButton playButton, copyButton;
+	private ToggleButton playButton, copyButton, effectToggle;
 	private Button stopButton, undoButton, redoButton, deleteButton, quantizeButton;
 
 	public ControlButtonGroup(View view) {
@@ -106,6 +107,16 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 			}
 		});
 
+		effectToggle = new ToggleButton(this).oscillating().withRoundedRect()
+				.withIcon(IconResourceSets.TOGGLE_WITHOUT_BORDER);
+		effectToggle.setOnReleaseListener(new OnReleaseListener() {
+			@Override
+			public void onRelease(Button button) {
+				View.mainPage.getCurrEffect().setOn(effectToggle.isChecked());
+				View.mainPage.getPageSelectGroup().updateEffectsPage();
+			}
+		});
+
 		setEditIconsEnabled(false);
 		undoButton.setEnabled(false);
 		redoButton.setEnabled(false);
@@ -118,8 +129,9 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 		playButton.layout(this, 0, 0, height, height);
 		stopButton.layout(this, height, 0, height, height);
 
-		float rightMargin = 10;
+		float rightMargin = BG_OFFSET * 2;
 		// right-aligned buttons
+		effectToggle.layout(this, width - 9 * height - rightMargin, 0, height * 4, height);
 		quantizeButton.layout(this, width - 5 * height - rightMargin, 0, height, height);
 		copyButton.layout(this, width - 4 * height - rightMargin, 0, height, height);
 		undoButton.layout(this, width - 3 * height - rightMargin, 0, height, height);
@@ -152,6 +164,18 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 	@Override
 	public void onSelectStateChange(MidiNote note) {
 		setEditIconsEnabled(TrackManager.anyNoteSelected());
+	}
+
+	public void updateEffectToggle(Effect effect) {
+		effectToggle.show();
+		effectToggle.enable();
+		effectToggle.setChecked(effect.isOn());
+		effectToggle.setText(effect.getName());
+	}
+
+	public void hideEffectToggle() {
+		effectToggle.disable();
+		effectToggle.hide();
 	}
 
 	private void setEditIconsEnabled(final boolean enabled) {

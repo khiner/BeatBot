@@ -96,10 +96,10 @@ public class BeatBotActivity extends Activity {
 
 	@Override
 	public void onBackPressed() {
-		if (activityPager.getCurrPage().equals(View.mainPage)) {
+		if (View.mainPage.effectIsShowing()) {
+			View.mainPage.hideEffect();
+		} else {
 			showDialog(EXIT_DIALOG_ID);
-		} else if (activityPager.getCurrPage().equals(View.effectPage)) {
-			activityPager.setPage(View.mainPage);
 		}
 	}
 
@@ -163,7 +163,8 @@ public class BeatBotActivity extends Activity {
 						public void onClick(DialogInterface dialog, int which) {
 							String bpmString = bpmInput.getText().toString();
 							if (!bpmString.isEmpty()) {
-								View.mainPage.pageSelectGroup.setBPM(Integer.valueOf(bpmString));
+								View.mainPage.getPageSelectGroup().setBPM(
+										Integer.valueOf(bpmString));
 							}
 						}
 					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -260,7 +261,7 @@ public class BeatBotActivity extends Activity {
 
 	public static void setupDefaultProject() {
 		// XXX loading a project when currently in the sampleEditView can cause segfault
-		View.mainPage.pageSelectGroup.selectLevelsPage();
+		View.mainPage.getPageSelectGroup().selectLevelsPage();
 		EventManager.clearEvents();
 		TrackManager.destroy();
 
@@ -271,7 +272,7 @@ public class BeatBotActivity extends Activity {
 		}
 
 		TrackManager.getTrackByNoteValue(0).select();
-		View.mainPage.pageSelectGroup.selectLevelsPage();
+		View.mainPage.getPageSelectGroup().selectLevelsPage();
 
 		MidiManager.setBPM(120);
 		MidiManager.setLoopBeginTick(0);
@@ -279,7 +280,7 @@ public class BeatBotActivity extends Activity {
 	}
 
 	public static void clearProject() {
-		View.mainPage.pageSelectGroup.selectLevelsPage();
+		View.mainPage.getPageSelectGroup().selectLevelsPage();
 		EventManager.clearEvents();
 		TrackManager.destroy();
 
@@ -289,8 +290,7 @@ public class BeatBotActivity extends Activity {
 	}
 
 	public void launchEffect(Effect effect) {
-		activityPager.setPage(View.effectPage);
-		View.effectPage.setEffect(effect);
+		View.mainPage.launchEffect(effect);
 	}
 
 	private void shutdown() {

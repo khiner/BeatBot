@@ -81,7 +81,7 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
 
 	@Override
 	protected synchronized View findChildAt(float x, float y) {
-		MidiView midiView = mainPage.midiViewGroup.midiView;
+		MidiView midiView = mainPage.getMidiView();
 		float tick = xToTick(x);
 		float tickWidth = midiView.unscaledXToTick(height / 2);
 		if (tick >= MidiManager.getLoopBeginTick() - tickWidth
@@ -100,7 +100,7 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
 
 	@Override
 	public void onLoopWindowChange(long loopBeginTick, long loopEndTick) {
-		MidiView midiView = mainPage.midiViewGroup.midiView;
+		MidiView midiView = mainPage.getMidiView();
 		float beginX = midiView.tickToUnscaledX(loopBeginTick);
 		float endX = midiView.tickToUnscaledX(loopEndTick);
 		loopBarButton.layout(this, beginX - absoluteX, 0, endX - beginX, height);
@@ -110,7 +110,6 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
 
 	// need to account for midiTrackView width offset (hack to group this draw into the parent)
 	private float xToTick(float x) {
-		return mainPage.midiViewGroup.midiView.xToTick(x
-				- mainPage.midiViewGroup.midiTrackView.width);
+		return mainPage.getMidiView().xToTick(x - mainPage.getMidiTrackView().width);
 	}
 }

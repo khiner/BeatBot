@@ -250,13 +250,11 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	private float tickToX(float tick) {
-		return mainPage.midiViewGroup.midiView.tickToX(tick)
-				+ mainPage.midiViewGroup.midiView.absoluteX - absoluteX;
+		return mainPage.getMidiView().tickToX(tick) + mainPage.getMidiView().absoluteX - absoluteX;
 	}
 
 	private float xToTick(float x) {
-		return mainPage.midiViewGroup.midiView.xToTick(x + absoluteX
-				- mainPage.midiViewGroup.midiView.absoluteX);
+		return mainPage.getMidiView().xToTick(x + absoluteX - mainPage.getMidiView().absoluteX);
 	}
 
 	private float getLevelHeight() {

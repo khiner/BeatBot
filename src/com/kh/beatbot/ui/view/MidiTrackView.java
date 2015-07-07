@@ -54,6 +54,6 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 
 	@Override
 	public float getYTouchTransform() {
-		return mainPage.midiViewGroup.midiView.getYOffset();
+		return mainPage.getMidiView().getYOffset();
 	}
 }
