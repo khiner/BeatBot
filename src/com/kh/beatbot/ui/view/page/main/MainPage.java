@@ -197,4 +197,10 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 	public void onSampleLoopWindowChange(Track track) {
 		selectEditPage();
 	}
+
+	@Override
+	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition,
+			int endEffectPosition) {
+		selectEditPage();
+	}
 }

@@ -632,4 +632,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	public void onLevelChanged(MidiNote note, LevelType type) {
 		// no-op
 	}
+
+	@Override
+	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition,
+			int endEffectPosition) {
+		// no-op
+	}
 }

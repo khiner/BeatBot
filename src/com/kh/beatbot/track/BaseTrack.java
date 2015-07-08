@@ -74,8 +74,8 @@ public class BaseTrack {
 			}
 		}
 		Collections.sort(effects);
-
 		Effect.setEffectPosition(id, oldPosition, newPosition);
+		TrackManager.get().onEffectOrderChange(this, oldPosition, newPosition);
 	}
 
 	public void quantizeEffectParams() {

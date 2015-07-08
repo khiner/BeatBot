@@ -21,6 +21,11 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 	}
 
 	@Override
+	public float getYTouchTransform() {
+		return mainPage.getMidiView().getYOffset();
+	}
+
+	@Override
 	public void onCreate(Track track) {
 		TrackButtonRow buttonRow = new TrackButtonRow(this, track);
 		track.setButtonRow(buttonRow);
@@ -53,7 +58,7 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 	}
 
 	@Override
-	public float getYTouchTransform() {
-		return mainPage.getMidiView().getYOffset();
+	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition,
+			int endEffectPosition) {
 	}
 }

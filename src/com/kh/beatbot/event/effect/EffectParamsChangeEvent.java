@@ -1,17 +1,16 @@
-package com.kh.beatbot.event;
+package com.kh.beatbot.event.effect;
 
-import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.event.EventManager;
+import com.kh.beatbot.event.Stateful;
+import com.kh.beatbot.event.Temporal;
 import com.kh.beatbot.manager.TrackManager;
-import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.ui.view.View;
 
-public class EffectParamsChangeEvent implements Stateful, Temporal {
-	private int trackId, effectPosition;
+public class EffectParamsChangeEvent extends EffectEvent implements Stateful, Temporal {
 	private Levels initialLevels, finalLevels;
 
 	public EffectParamsChangeEvent(int trackId, int effectPosition) {
-		this.trackId = trackId;
-		this.effectPosition = effectPosition;
+		super(trackId, effectPosition);
 	}
 
 	@Override
@@ -46,14 +45,13 @@ public class EffectParamsChangeEvent implements Stateful, Temporal {
 		}
 
 		public void apply() {
-			TrackManager.getTrackById(trackId).select();
-			View.mainPage.launchEffect(getEffect());
+			updateUi();
 			getEffect().setLevels(levels);
 		}
 
-		private Effect getEffect() {
-			BaseTrack track = TrackManager.getBaseTrackById(trackId);
-			return track.findEffectByPosition(effectPosition);
+		private void updateUi() {
+			TrackManager.getTrackById(trackId).select();
+			View.mainPage.launchEffect(getEffect());
 		}
 
 		@Override

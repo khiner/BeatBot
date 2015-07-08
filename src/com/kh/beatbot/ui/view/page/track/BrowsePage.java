@@ -114,4 +114,9 @@ public class BrowsePage extends Menu implements TrackListener {
 
 	public void onSoloChange(Track track, boolean solo) {
 	}
+
+	@Override
+	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition,
+			int endEffectPosition) {
+	}
 }

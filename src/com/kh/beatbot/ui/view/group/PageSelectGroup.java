@@ -70,6 +70,13 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		}
 	}
 
+	public void selectEditPage() {
+		ToggleButton editButton = trackButtonRow.getEditButton();
+		if (!editButton.isChecked()) {
+			editButton.trigger(true);
+		}
+	}
+
 	@Override
 	protected synchronized void createChildren() {
 		masterButton = new ToggleButton(this).withRoundedRect().withIcon(
@@ -216,13 +223,17 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	@Override
 	public void onSampleLoopWindowChange(Track track) {
-		ToggleButton editButton = trackButtonRow.getEditButton();
-		if (!editButton.isChecked()) {
-			editButton.trigger(true);
-		}
+		selectEditPage();
 	}
 
-	public void updateEffectsPage() {
-		effectSelectPage.updateEffectLabels();
+	@Override
+	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition,
+			int endEffectPosition) {
+		ToggleButton effectsButton = trackButtonRow.getEffectsButton();
+		if (!effectsButton.isChecked()) {
+			effectsButton.trigger(true);
+		} else {
+			effectSelectPage.onEffectOrderChange(track, initialEffectPosition, endEffectPosition);
+		}
 	}
 }

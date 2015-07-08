@@ -15,4 +15,6 @@ public interface TrackListener {
 	void onMuteChange(Track track, boolean mute);
 
 	void onSoloChange(Track track, boolean solo);
+
+	void onEffectOrderChange(BaseTrack track, int initialEffectPosition, int endEffectPosition);
 }

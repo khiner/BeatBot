@@ -329,7 +329,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	@Override
 	public void onCreate(Track track) {
-		currTrack = track;
 		for (int i = 0; i < tracks.size(); i++) {
 			tracks.get(i).setNoteValue(i);
 		}
@@ -359,6 +358,9 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	@Override
 	public void onSelect(BaseTrack track) {
+		if (currTrack == track)
+			return; // already selected
+
 		if (track instanceof Track) {
 			currTrack = (Track) track;
 			currTrack.getButtonRow().instrumentButton.setChecked(true);
@@ -375,6 +377,13 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 		for (TrackListener trackListener : trackListeners) {
 			trackListener.onSelect(track);
+		}
+	}
+
+	@Override
+	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition, int endEffectPosition) {
+		for (TrackListener trackListener : trackListeners) {
+			trackListener.onEffectOrderChange(track, initialEffectPosition, endEffectPosition);
 		}
 	}
 

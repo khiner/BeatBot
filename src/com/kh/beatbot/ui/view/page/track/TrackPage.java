@@ -35,4 +35,9 @@ public class TrackPage extends TouchableView implements TrackListener {
 	@Override
 	public void onSoloChange(Track track, boolean solo) {
 	}
+
+	@Override
+	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition,
+			int endEffectPosition) {
+	}
 }

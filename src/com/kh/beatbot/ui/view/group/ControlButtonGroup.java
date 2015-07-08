@@ -113,7 +113,6 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 			@Override
 			public void onRelease(Button button) {
 				View.mainPage.getCurrEffect().setOn(effectToggle.isChecked());
-				View.mainPage.getPageSelectGroup().updateEffectsPage();
 			}
 		});
 

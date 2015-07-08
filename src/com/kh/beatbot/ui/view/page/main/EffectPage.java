@@ -9,7 +9,7 @@ import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremolo;
-import com.kh.beatbot.event.EffectParamsChangeEvent;
+import com.kh.beatbot.event.effect.EffectParamsChangeEvent;
 import com.kh.beatbot.listener.MultiViewTouchTracker;
 import com.kh.beatbot.listener.TouchableViewsListener;
 import com.kh.beatbot.manager.TrackManager;

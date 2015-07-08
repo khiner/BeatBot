@@ -13,6 +13,8 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremolo;
+import com.kh.beatbot.event.EventManager;
+import com.kh.beatbot.event.effect.EffectMoveEvent;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
@@ -52,7 +54,10 @@ public class EffectSelectPage extends TrackPage {
 
 		@Override
 		public void labelMoved(int oldPosition, int newPosition) {
-			TrackManager.getCurrTrack().moveEffect(oldPosition, newPosition);
+			int trackId = TrackManager.getCurrTrack().getId();
+			EffectMoveEvent moveEvent = new EffectMoveEvent(trackId, oldPosition, newPosition);
+			moveEvent.apply();
+			EventManager.eventCompleted(moveEvent);
 		}
 
 		@Override
@@ -83,11 +88,17 @@ public class EffectSelectPage extends TrackPage {
 		updateEffectLabels();
 	}
 
+	@Override
+	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition,
+			int endEffectPosition) {
+		updateEffectLabels();
+	}
+
 	public void setMasterMode(boolean masterMode) {
 		this.masterMode = masterMode;
 	}
 
-	public void updateEffectLabels() {
+	private void updateEffectLabels() {
 		if (effectLabelList.numChildren() <= 0)
 			return;
 		for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {
