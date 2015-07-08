@@ -1,10 +1,9 @@
 package com.kh.beatbot.ui.view.page.track;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.event.TrackLevelsSetEvent;
-import com.kh.beatbot.listener.TouchableViewListener;
+import com.kh.beatbot.listener.MultiViewTouchTracker;
+import com.kh.beatbot.listener.TouchableViewsListener;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.ui.color.Color;
@@ -16,8 +15,7 @@ import com.kh.beatbot.ui.view.control.ValueLabel;
 import com.kh.beatbot.ui.view.control.param.SeekbarParamControl;
 import com.kh.beatbot.ui.view.control.param.SeekbarParamControl.SeekbarPosition;
 
-public class TrackLevelsPage extends TrackPage implements TouchableViewListener {
-	// levels attrs
+public class TrackLevelsPage extends TrackPage implements TouchableViewsListener {
 	protected SeekbarParamControl volumeParamControl, panParamControl;
 	protected PitchParamControl pitchParamControl;
 	protected boolean masterMode = false;
@@ -49,9 +47,20 @@ public class TrackLevelsPage extends TrackPage implements TouchableViewListener 
 		panParamControl.setLevelColor(Color.PAN, Color.PAN_TRANS);
 		pitchParamControl.setLevelColor(Color.PITCH, Color.PITCH_TRANS);
 
-		volumeParamControl.setTouchListener(this);
-		panParamControl.setTouchListener(this);
-		pitchParamControl.setTouchListener(this);
+		new MultiViewTouchTracker(this).trackViews(volumeParamControl, panParamControl, pitchParamControl);
+	}
+
+	private TrackLevelsSetEvent levelsSetEvent = null;
+
+	@Override
+	public void onFirstPress() {
+		levelsSetEvent = new TrackLevelsSetEvent(TrackManager.getCurrTrack().getId());
+		levelsSetEvent.begin();
+	}
+
+	@Override
+	public void onLastRelease() {
+		levelsSetEvent.end();
 	}
 
 	@Override
@@ -60,24 +69,6 @@ public class TrackLevelsPage extends TrackPage implements TouchableViewListener 
 		volumeParamControl.layout(this, 0, 0, width, toggleHeight);
 		panParamControl.layout(this, 0, toggleHeight, width, toggleHeight);
 		pitchParamControl.layout(this, 0, toggleHeight * 2, width, toggleHeight);
-	}
-
-	private AtomicInteger numControlsPressed = new AtomicInteger(0);
-	private TrackLevelsSetEvent levelsSetEvent = null;
-
-	@Override
-	public void onPress(TouchableView view) {
-		if (numControlsPressed.getAndIncrement() == 0) {
-			levelsSetEvent = new TrackLevelsSetEvent(TrackManager.getCurrTrack().getId());
-			levelsSetEvent.begin();
-		}
-	}
-
-	@Override
-	public void onRelease(TouchableView view) {
-		if (numControlsPressed.decrementAndGet() == 0) {
-			levelsSetEvent.end();
-		}
 	}
 
 	// Pitch has two params/value-labels that can be switched between (steps/cents)
