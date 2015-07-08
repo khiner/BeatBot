@@ -3,6 +3,7 @@ package com.kh.beatbot.event;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
+import com.kh.beatbot.ui.view.View;
 
 public class EffectParamsChangeEvent implements Stateful, Temporal {
 	private int trackId, effectPosition;
@@ -45,6 +46,8 @@ public class EffectParamsChangeEvent implements Stateful, Temporal {
 		}
 
 		public void apply() {
+			TrackManager.getTrackById(trackId).select();
+			View.mainPage.launchEffect(getEffect());
 			getEffect().setLevels(levels);
 		}
 
