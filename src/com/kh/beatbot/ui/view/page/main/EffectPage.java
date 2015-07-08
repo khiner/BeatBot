@@ -9,6 +9,10 @@ import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremolo;
+import com.kh.beatbot.event.EffectParamsChangeEvent;
+import com.kh.beatbot.listener.MultiViewTouchTracker;
+import com.kh.beatbot.listener.TouchableViewsListener;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.ViewPager;
@@ -17,7 +21,7 @@ import com.kh.beatbot.ui.view.group.effect.DelayParamsGroup;
 import com.kh.beatbot.ui.view.group.effect.EffectParamsGroup;
 import com.kh.beatbot.ui.view.group.effect.FilterParamsGroup;
 
-public class EffectPage extends TouchableView {
+public class EffectPage extends TouchableView implements TouchableViewsListener {
 	private ViewPager paramsPager;
 	private Seekbar2d level2d;
 
@@ -62,6 +66,8 @@ public class EffectPage extends TouchableView {
 		paramsPager.addPage(Flanger.NAME, flangerGroup);
 		paramsPager.addPage(Reverb.NAME, reverbGroup);
 		paramsPager.addPage(Tremolo.NAME, tremeloGroup);
+
+		new MultiViewTouchTracker(this).trackViews(level2d, paramsPager);
 	}
 
 	@Override
@@ -74,5 +80,19 @@ public class EffectPage extends TouchableView {
 
 	public void setLevel2dParams(Param xParam, Param yParam) {
 		level2d.setParams(xParam, yParam);
+	}
+
+	private EffectParamsChangeEvent effectParamsChangeEvent = null;
+
+	@Override
+	public void onFirstPress() {
+		effectParamsChangeEvent = new EffectParamsChangeEvent(TrackManager.getCurrTrack().getId(),
+				getEffect().getPosition());
+		effectParamsChangeEvent.begin();
+	}
+
+	@Override
+	public void onLastRelease() {
+		effectParamsChangeEvent.end();
 	}
 }

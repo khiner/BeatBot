@@ -2,8 +2,12 @@ package com.kh.beatbot.ui.view.group.effect;
 
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Param;
+import com.kh.beatbot.event.EffectParamsChangeEvent;
+import com.kh.beatbot.listener.MultiViewTouchTracker;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.listener.ParamToggleListener;
+import com.kh.beatbot.listener.TouchableViewsListener;
+import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.param.KnobParamControl;

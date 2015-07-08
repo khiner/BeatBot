@@ -74,6 +74,23 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 		return position;
 	}
 
+	public float[] getLevels() {
+		float[] levels = new float[params.size()];
+		for (int i = 0; i < params.size(); i++) {
+			levels[i] = params.get(i).viewLevel;
+		}
+		return levels;
+	}
+
+	public void setLevels(float[] levels) {
+		for (int i = 0; i < levels.length; i++) {
+			if (i < params.size()) {
+				Param param = params.get(i);
+				param.setLevel(levels[i]);
+			}
+		}
+	}
+
 	public boolean paramsLinked() {
 		return paramsLinked;
 	}
