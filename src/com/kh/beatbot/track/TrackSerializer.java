@@ -27,8 +27,8 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 	}.getType();
 
 	@Override
-	public BaseTrack deserialize(JsonElement trackJson, Type type, JsonDeserializationContext context)
-			throws JsonParseException {
+	public BaseTrack deserialize(JsonElement trackJson, Type type,
+			JsonDeserializationContext context) throws JsonParseException {
 		JsonObject object = trackJson.getAsJsonObject();
 		int id = object.get("id").getAsInt();
 		int position = object.get("position").getAsInt();
@@ -38,23 +38,29 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 		float pitchCent = object.get("pitchCent").getAsFloat();
 
 		boolean isMaster = id == TrackManager.MASTER_TRACK_ID;
-		BaseTrack track = isMaster ? TrackManager.getMasterTrack() : TrackManager.createTrack(id, position);
+		BaseTrack track = isMaster ? TrackManager.getMasterTrack() : TrackManager.createTrack(id,
+				position);
 
 		track.getVolumeParam().setLevel(volume);
 		track.getPanParam().setLevel(pan);
 		track.getPitchParam().setLevel(pitch);
 		track.getPitchCentParam().setLevel(pitchCent);
 
-		if (isMaster) return track;
+		if (isMaster)
+			return track;
 
 		Track t = (Track) track;
-		try {
-			t.setSample(new File(object.get("samplePath").getAsString()));
-		} catch (Exception e) {
-			Log.e(getClass().getName(), e.toString());
+		if (object.has("samplePath")) {
+			try {
+				t.setSample(new File(object.get("samplePath").getAsString()));
+			} catch (Exception e) {
+				Log.e(getClass().getName(), e.toString());
+			}
+
+			t.setSampleLoopWindow(object.get("sample_loop_begin").getAsFloat(),
+					object.get("sample_loop_end").getAsFloat());
 		}
-		
-		t.setSampleLoopWindow(object.get("sample_loop_begin").getAsFloat(), object.get("sample_loop_end").getAsFloat());
+
 		List<MidiNote> notes = GSON.fromJson(object.get("notes"), noteListType);
 		for (MidiNote note : notes) {
 			note.create();
@@ -77,20 +83,21 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 
 		object.addProperty("id", track.getId());
 		object.addProperty("position", TrackManager.getTracks().indexOf(track));
-		
+
 		object.addProperty("volume", track.getVolumeParam().viewLevel);
 		object.addProperty("pan", track.getPanParam().viewLevel);
 		object.addProperty("pitch", track.getPitchParam().viewLevel);
 		object.addProperty("pitchCent", track.getPitchCentParam().viewLevel);
-		
+
 		if (track instanceof Track) {
 			Track t = (Track) track;
 			object.addProperty("class", Track.class.getName());
 
-			object.addProperty("samplePath", t.getCurrSampleFile().getAbsolutePath());
-
-			object.addProperty("sample_loop_begin", t.getLoopBeginParam().viewLevel);
-			object.addProperty("sample_loop_end", t.getLoopEndParam().viewLevel);
+			if (t.getCurrSampleFile() != null) {
+				object.addProperty("samplePath", t.getCurrSampleFile().getAbsolutePath());
+				object.addProperty("sample_loop_begin", t.getLoopBeginParam().viewLevel);
+				object.addProperty("sample_loop_end", t.getLoopEndParam().viewLevel);
+			}
 
 			object.add("notes", GSON.toJsonTree(t.getMidiNotes()).getAsJsonArray());
 
@@ -103,7 +110,7 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 			object.addProperty("adsrPeak", adsr.getPeak());
 
 		} else {
-			object.addProperty("class", BaseTrack.class.getName());			
+			object.addProperty("class", BaseTrack.class.getName());
 		}
 
 		return object;

@@ -35,7 +35,8 @@ public class TrackCreateEvent implements Executable, Stateful {
 
 	public void doExecute() {
 		if (serializedTrack == null) {
-			TrackManager.createTrack();
+			Track track = TrackManager.createTrack();
+			trackId = track.getId();
 		} else {
 			ProjectFile.fromJson(serializedTrack);
 		}
