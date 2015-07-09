@@ -6,6 +6,8 @@ import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Stateful;
+import com.kh.beatbot.event.effect.EffectCreateEvent;
+import com.kh.beatbot.event.effect.EffectToggleEvent;
 import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -112,7 +114,9 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 		effectToggle.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				View.mainPage.getCurrEffect().setOn(effectToggle.isChecked());
+				int trackId = TrackManager.getCurrTrack().getId();
+				int effectPosition = View.mainPage.getCurrEffect().getPosition();
+				new EffectToggleEvent(trackId, effectPosition).execute();
 			}
 		});
 
@@ -190,5 +194,9 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 	@Override
 	public void onEventCompleted(Stateful event) {
 		updateStateStackIcons(EventManager.canUndo(), EventManager.canRedo());
+		if (event instanceof EffectCreateEvent || event instanceof EffectToggleEvent) {
+			Effect effect = View.mainPage.getCurrEffect();
+			effectToggle.setChecked(effect.isOn());
+		}
 	}
 }

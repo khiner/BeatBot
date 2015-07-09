@@ -44,8 +44,8 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 		}
 		addEffect(trackId, getId(), position);
 		setDefaultParams();
-		setOn(true);
 		TrackManager.getTrackById(trackId).addEffect(this);
+		setOn(true);
 	}
 
 	public abstract int getId();
@@ -64,6 +64,7 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 
 	public void setOn(boolean on) {
 		this.on = on;
+		TrackManager.get().onEffectCreate(TrackManager.getTrackById(trackId), this);
 		setEffectOn(trackId, position, on);
 	}
 
@@ -84,6 +85,7 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 	}
 
 	public void setLevels(float[] levels) {
+		TrackManager.get().onEffectCreate(TrackManager.getTrackById(trackId), this);
 		for (int i = 0; i < levels.length; i++) {
 			if (i < params.size()) {
 				Param param = params.get(i);

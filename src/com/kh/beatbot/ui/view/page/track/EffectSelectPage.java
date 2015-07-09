@@ -113,10 +113,13 @@ public class EffectSelectPage extends TrackPage {
 		Effect effect = track.findEffectByPosition(position);
 		if (effect == null) {
 			new EffectCreateEvent(track.getId(), position, effectName).execute();
-		} else if (effectName != effect.getName()) {
+		} else {
+			View.mainPage.launchEffect(effect);
 			// different effect being added to effect slot. need to replace it
 			// effect.removeEffect();
-			// TODO fix			
+			// TODO fix
+			if (effectName != effect.getName()) {
+			}			
 		}
 	}
 
