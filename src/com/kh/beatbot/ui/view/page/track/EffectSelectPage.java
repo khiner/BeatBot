@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.event.effect.EffectChangeEvent;
 import com.kh.beatbot.event.effect.EffectCreateEvent;
 import com.kh.beatbot.event.effect.EffectDestroyEvent;
 import com.kh.beatbot.event.effect.EffectMoveEvent;
@@ -113,13 +114,10 @@ public class EffectSelectPage extends TrackPage {
 		Effect effect = track.findEffectByPosition(position);
 		if (effect == null) {
 			new EffectCreateEvent(track.getId(), position, effectName).execute();
-		} else {
+		} else if (effectName != effect.getName()) { // replace effect
+			new EffectChangeEvent(track.getId(), position, effect.getName(), effectName).execute();
+		} else { // select effect
 			View.mainPage.launchEffect(effect);
-			// different effect being added to effect slot. need to replace it
-			// effect.removeEffect();
-			// TODO fix
-			if (effectName != effect.getName()) {
-			}			
 		}
 	}
 
