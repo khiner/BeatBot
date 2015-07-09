@@ -25,6 +25,11 @@ public class EffectParamsChangeEvent extends EffectEvent implements Stateful, Te
 	}
 
 	@Override
+	public void doExecute() {
+		apply();
+	}
+
+	@Override
 	public void undo() {
 		initialLevels.apply();
 	}

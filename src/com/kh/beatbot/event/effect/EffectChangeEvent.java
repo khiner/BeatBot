@@ -1,6 +1,5 @@
 package com.kh.beatbot.event.effect;
 
-import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Executable;
 import com.kh.beatbot.event.Stateful;
 
@@ -17,17 +16,6 @@ public class EffectChangeEvent extends EffectEvent implements Stateful, Executab
 	@Override
 	public void undo() {
 		new EffectChangeEvent(trackId, effectPosition, endEffectName, initialEffectName).apply();
-	}
-
-	@Override
-	public void apply() {
-		doExecute();
-	}
-
-	@Override
-	public void execute() {
-		doExecute();
-		EventManager.eventCompleted(this);
 	}
 
 	@Override

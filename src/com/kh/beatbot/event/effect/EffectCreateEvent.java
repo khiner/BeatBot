@@ -7,7 +7,6 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremolo;
-import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Executable;
 import com.kh.beatbot.event.Stateful;
 
@@ -20,19 +19,8 @@ public class EffectCreateEvent extends EffectEvent implements Stateful, Executab
 	}
 
 	@Override
-	public void apply() {
-		doExecute();
-	}
-
-	@Override
 	public void undo() {
 		new EffectDestroyEvent(trackId, effectPosition).apply();
-	}
-
-	@Override
-	public void execute() {
-		doExecute();
-		EventManager.eventCompleted(this);
 	}
 
 	@Override
