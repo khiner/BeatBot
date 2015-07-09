@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.view.control.param;
 
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Knob;
@@ -18,6 +19,14 @@ public class KnobParamControl extends LevelParamControl {
 				: (Knob) levelControlView;
 		levelControl.setListener(this);
 		return this;
+	}
+
+	@Override
+	public void setParam(Param param) {
+		super.setParam(param);
+		if (levelControlView instanceof ToggleKnob) {
+			((ToggleKnob) levelControlView).onParamToggle(param);
+		}
 	}
 
 	@Override
