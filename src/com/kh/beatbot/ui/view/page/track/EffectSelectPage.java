@@ -90,6 +90,12 @@ public class EffectSelectPage extends TrackPage {
 		updateEffectLabels();
 	}
 
+	@Override
+	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition,
+			int endEffectPosition) {
+		updateEffectLabels();
+	}
+
 	public void setMasterMode(boolean masterMode) {
 		this.masterMode = masterMode;
 	}
