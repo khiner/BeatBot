@@ -199,6 +199,16 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 	}
 
 	@Override
+	public void onEffectCreate(BaseTrack track, Effect effect) {
+		launchEffect(effect);
+	}
+
+	@Override
+	public void onEffectDestroy(BaseTrack track, Effect effect) {
+		selectEditPage();
+	}
+
+	@Override
 	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition,
 			int endEffectPosition) {
 		selectEditPage();

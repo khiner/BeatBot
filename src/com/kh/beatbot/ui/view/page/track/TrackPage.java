@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.view.page.track;
 
+import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
@@ -34,6 +35,14 @@ public class TrackPage extends TouchableView implements TrackListener {
 
 	@Override
 	public void onSoloChange(Track track, boolean solo) {
+	}
+
+	@Override
+	public void onEffectCreate(BaseTrack track, Effect effect) {
+	}
+
+	@Override
+	public void onEffectDestroy(BaseTrack track, Effect effect) {
 	}
 
 	@Override

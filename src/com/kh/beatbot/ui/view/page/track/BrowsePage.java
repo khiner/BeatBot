@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view.page.track;
 import java.io.File;
 import java.util.List;
 
+import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.event.SampleSetEvent;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.FileManager;
@@ -113,6 +114,14 @@ public class BrowsePage extends Menu implements TrackListener {
 	}
 
 	public void onSoloChange(Track track, boolean solo) {
+	}
+
+	@Override
+	public void onEffectCreate(BaseTrack track, Effect effect) {
+	}
+
+	@Override
+	public void onEffectDestroy(BaseTrack track, Effect effect) {
 	}
 
 	@Override

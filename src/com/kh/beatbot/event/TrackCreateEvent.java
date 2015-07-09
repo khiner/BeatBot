@@ -18,8 +18,7 @@ public class TrackCreateEvent implements Executable, Stateful {
 
 	@Override
 	public void undo() {
-		TrackDestroyEvent trackDestroyEvent = new TrackDestroyEvent(trackId);
-		trackDestroyEvent.doExecute();
+		new TrackDestroyEvent(trackId).apply();
 	}
 
 	@Override
@@ -33,6 +32,7 @@ public class TrackCreateEvent implements Executable, Stateful {
 		EventManager.eventCompleted(this);
 	}
 
+	@Override
 	public void doExecute() {
 		if (serializedTrack == null) {
 			Track track = TrackManager.createTrack();

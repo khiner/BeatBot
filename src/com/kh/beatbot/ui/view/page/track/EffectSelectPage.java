@@ -5,15 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.effect.Chorus;
-import com.kh.beatbot.effect.Crush;
-import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.effect.Filter;
-import com.kh.beatbot.effect.Flanger;
-import com.kh.beatbot.effect.Reverb;
-import com.kh.beatbot.effect.Tremolo;
-import com.kh.beatbot.event.EventManager;
+import com.kh.beatbot.event.effect.EffectCreateEvent;
+import com.kh.beatbot.event.effect.EffectDestroyEvent;
 import com.kh.beatbot.event.effect.EffectMoveEvent;
 import com.kh.beatbot.listener.LabelListListener;
 import com.kh.beatbot.manager.TrackManager;
@@ -41,12 +35,11 @@ public class EffectSelectPage extends TrackPage {
 						Effect effect = TrackManager.getCurrTrack().findEffectByPosition(
 								lastClickedPos);
 						if (effect != null) {
-							effect.removeEffect();
+							destroyEffect(effect);
 						}
 					} else {
 						launchEffect(effectNames[item], lastClickedPos, true);
 					}
-					updateEffectLabels();
 				}
 			});
 			selectEffectAlert = builder.create();
@@ -55,9 +48,7 @@ public class EffectSelectPage extends TrackPage {
 		@Override
 		public void labelMoved(int oldPosition, int newPosition) {
 			int trackId = TrackManager.getCurrTrack().getId();
-			EffectMoveEvent moveEvent = new EffectMoveEvent(trackId, oldPosition, newPosition);
-			moveEvent.apply();
-			EventManager.eventCompleted(moveEvent);
+			new EffectMoveEvent(trackId, oldPosition, newPosition).execute();
 		}
 
 		@Override
@@ -89,8 +80,12 @@ public class EffectSelectPage extends TrackPage {
 	}
 
 	@Override
-	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition,
-			int endEffectPosition) {
+	public void onEffectCreate(BaseTrack track, Effect effect) {
+		updateEffectLabels();
+	}
+
+	@Override
+	public void onEffectDestroy(BaseTrack track, Effect effect) {
 		updateEffectLabels();
 	}
 
@@ -113,39 +108,21 @@ public class EffectSelectPage extends TrackPage {
 	}
 
 	// effects methods
-	private void launchEffect(String effectName, int effectPosition, boolean setOn) {
-		Effect effect = getEffect(effectName, effectPosition);
-		if (effectName != effect.getName()) {
-			// different effect being added to effect slot. need to replace it
-			// effect.removeEffect();
-			// TODO fix
-		}
-
-		context.launchEffect(effect);
-	}
-
-	private Effect getEffect(String effectName, int position) {
+	private void launchEffect(String effectName, int position, boolean setOn) {
 		BaseTrack track = TrackManager.getCurrTrack();
 		Effect effect = track.findEffectByPosition(position);
-		if (effect != null)
-			return effect;
-		int trackId = track.getId();
-		if (effectName.equals(Crush.NAME))
-			effect = new Crush(trackId, position);
-		else if (effectName.equals(Chorus.NAME))
-			effect = new Chorus(trackId, position);
-		else if (effectName.equals(Delay.NAME))
-			effect = new Delay(trackId, position);
-		else if (effectName.equals(Flanger.NAME))
-			effect = new Flanger(trackId, position);
-		else if (effectName.equals(Filter.NAME))
-			effect = new Filter(trackId, position);
-		else if (effectName.equals(Reverb.NAME))
-			effect = new Reverb(trackId, position);
-		else if (effectName.equals(Tremolo.NAME))
-			effect = new Tremolo(trackId, position);
-		track.addEffect(effect);
-		return effect;
+		if (effect == null) {
+			new EffectCreateEvent(track.getId(), position, effectName).execute();
+		} else if (effectName != effect.getName()) {
+			// different effect being added to effect slot. need to replace it
+			// effect.removeEffect();
+			// TODO fix			
+		}
+	}
+
+	private void destroyEffect(Effect effect) {
+		BaseTrack track = TrackManager.getCurrTrack();
+		new EffectDestroyEvent(track.getId(), effect.getPosition()).execute();
 	}
 
 	@Override

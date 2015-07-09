@@ -53,10 +53,12 @@ public class BaseTrack {
 
 	public void addEffect(Effect effect) {
 		effects.add(effect);
+		TrackManager.get().onEffectCreate(this, effect);
 	}
 
 	public void removeEffect(Effect effect) {
 		effects.remove(effect);
+		TrackManager.get().onEffectDestroy(this, effect);
 	}
 
 	public void moveEffect(int oldPosition, int newPosition) {

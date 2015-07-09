@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.view.group;
 
 import java.io.File;
 
+import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.FileListener;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -51,6 +52,13 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	public void setBPM(float bpm) {
 		masterButtonRow.setBPM(bpm);
+	}
+
+	public void selectEffectPage() {
+		ToggleButton effectsButton = trackButtonRow.getEffectsButton();
+		if (!effectsButton.isChecked()) {
+			effectsButton.trigger(true);
+		}
 	}
 
 	public void selectBrowsePage() {
@@ -173,8 +181,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	@Override
 	public synchronized void onSampleChange(Track track) {
-		if (!track.isSelected())
-			track.select();
 		selectBrowsePage();
 		browsePage.onSampleChange(track);
 	}
@@ -227,13 +233,21 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	}
 
 	@Override
+	public void onEffectCreate(BaseTrack track, Effect effect) {
+		selectEffectPage();
+		effectSelectPage.onEffectCreate(track, effect);
+	}
+
+	@Override
+	public void onEffectDestroy(BaseTrack track, Effect effect) {
+		selectEffectPage();
+		effectSelectPage.onEffectDestroy(track, effect);
+	}
+
+	@Override
 	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition,
 			int endEffectPosition) {
-		ToggleButton effectsButton = trackButtonRow.getEffectsButton();
-		if (!effectsButton.isChecked()) {
-			effectsButton.trigger(true);
-		} else {
-			effectSelectPage.onEffectOrderChange(track, initialEffectPosition, endEffectPosition);
-		}
+		selectEffectPage();
+		effectSelectPage.onEffectOrderChange(track, initialEffectPosition, endEffectPosition);
 	}
 }

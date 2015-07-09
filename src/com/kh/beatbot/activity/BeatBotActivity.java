@@ -15,7 +15,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.kh.beatbot.R;
-import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.SampleRenameEvent;
 import com.kh.beatbot.event.TrackCreateEvent;
@@ -287,10 +286,6 @@ public class BeatBotActivity extends Activity {
 		MidiManager.setBPM(120);
 		MidiManager.setLoopBeginTick(0);
 		MidiManager.setLoopEndTick(MidiManager.TICKS_PER_NOTE * 4);
-	}
-
-	public void launchEffect(Effect effect) {
-		View.mainPage.launchEffect(effect);
 	}
 
 	private void shutdown() {

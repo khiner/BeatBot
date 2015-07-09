@@ -10,6 +10,7 @@ import java.util.Set;
 import android.app.AlertDialog;
 import android.content.Context;
 
+import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.FileListener;
 import com.kh.beatbot.listener.MidiNoteListener;
@@ -381,7 +382,24 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	@Override
+	public void onEffectCreate(BaseTrack track, Effect effect) {
+		track.select();
+		for (TrackListener trackListener : trackListeners) {
+			trackListener.onEffectCreate(track, effect);
+		}
+	}
+
+	@Override
+	public void onEffectDestroy(BaseTrack track, Effect effect) {
+		track.select();
+		for (TrackListener trackListener : trackListeners) {
+			trackListener.onEffectDestroy(track, effect);
+		}
+	}
+
+	@Override
 	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition, int endEffectPosition) {
+		track.select();
 		for (TrackListener trackListener : trackListeners) {
 			trackListener.onEffectOrderChange(track, initialEffectPosition, endEffectPosition);
 		}
@@ -389,6 +407,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	@Override
 	public void onSampleChange(Track track) {
+		track.select();
 		for (TrackListener trackListener : trackListeners) {
 			trackListener.onSampleChange(track);
 		}

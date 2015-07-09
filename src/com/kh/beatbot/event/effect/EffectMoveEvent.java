@@ -1,9 +1,11 @@
 package com.kh.beatbot.event.effect;
 
+import com.kh.beatbot.event.EventManager;
+import com.kh.beatbot.event.Executable;
 import com.kh.beatbot.event.Stateful;
 
 
-public class EffectMoveEvent extends EffectEvent implements Stateful {
+public class EffectMoveEvent extends EffectEvent implements Stateful, Executable {
 	private int finalPosition;
 
 	public EffectMoveEvent(int trackId, int initialPosition, int finalPosition) {
@@ -13,11 +15,22 @@ public class EffectMoveEvent extends EffectEvent implements Stateful {
 
 	@Override
 	public void apply() {
-		getTrack().moveEffect(effectPosition, finalPosition);
+		doExecute();
 	}
 
 	@Override
 	public void undo() {
-		getTrack().moveEffect(finalPosition, effectPosition);
+		new EffectMoveEvent(trackId, finalPosition, effectPosition).apply();
+	}
+
+	@Override
+	public void execute() {
+		doExecute();
+		EventManager.eventCompleted(this);
+	}
+
+	@Override
+	public void doExecute() {
+		getTrack().moveEffect(effectPosition, finalPosition);
 	}
 }
