@@ -36,7 +36,7 @@ public class Seekbar2d extends ControlView2dBase {
 		selectedCircle.hide();
 	}
 
-	public void onParamChanged(Param param) {
+	public void onParamChange(Param param) {
 		float viewX = viewX(params[0].viewLevel);
 		float viewY = viewY(params[1].viewLevel);
 		circle.setPosition(absoluteX + BG_OFFSET + viewX, absoluteY + BG_OFFSET + viewY);

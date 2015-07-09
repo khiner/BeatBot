@@ -4,5 +4,5 @@ import com.kh.beatbot.effect.Param;
 
 
 public interface ParamToggleListener {
-	public void onParamToggled(Param param);
+	public void onParamToggle(Param param);
 }

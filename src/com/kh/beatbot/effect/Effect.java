@@ -148,7 +148,7 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 	}
 
 	@Override
-	public void onParamChanged(Param param) {
+	public void onParamChange(Param param) {
 		setEffectParam(trackId, position, param.id, param.level);
 	}
 

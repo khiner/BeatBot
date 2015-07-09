@@ -26,22 +26,22 @@ public class BaseTrack {
 		pitchCentParam = new Param(3, "Cent").add(-.5f).withLevel(.5f).withUnits("cent");
 
 		volumeParam.addListener(new ParamListener() {
-			public void onParamChanged(Param param) {
+			public void onParamChange(Param param) {
 				setTrackVolume(getId(), param.level);
 			}
 		});
 		panParam.addListener(new ParamListener() {
-			public void onParamChanged(Param param) {
+			public void onParamChange(Param param) {
 				setTrackPan(getId(), param.level);
 			}
 		});
 		pitchStepParam.addListener(new ParamListener() {
-			public void onParamChanged(Param param) {
+			public void onParamChange(Param param) {
 				setTrackPitch(getId(), param.level + pitchCentParam.level);
 			}
 		});
 		pitchCentParam.addListener(new ParamListener() {
-			public void onParamChanged(Param param) {
+			public void onParamChange(Param param) {
 				setTrackPitch(getId(), pitchStepParam.level + param.level);
 			}
 		});

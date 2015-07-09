@@ -63,7 +63,7 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 		thresholdParamControl.setParam(thresholdParam);
 		thresholdParam.addListener(new ParamListener() {
 			@Override
-			public void onParamChanged(Param param) {
+			public void onParamChange(Param param) {
 				RecordManager.setThresholdLevel(param.viewLevel);
 			}
 		});

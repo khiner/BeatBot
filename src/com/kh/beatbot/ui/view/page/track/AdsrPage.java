@@ -95,7 +95,7 @@ public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListe
 	}
 
 	@Override
-	public void onParamChanged(Param param) {
+	public void onParamChange(Param param) {
 		if (param.id != currParamId && param.id != ADSR.SUSTAIN_ID && param.id != ADSR.PEAK_ID) {
 			// sustain & peak are both controlled by the same 'dots' as attack and decay
 			// to avoid switching back and forth a ton, we only switch on attack and decay changes

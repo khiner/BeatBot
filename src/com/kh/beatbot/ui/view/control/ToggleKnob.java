@@ -52,7 +52,7 @@ public class ToggleKnob extends TouchableView implements ParamToggleListener {
 	}
 
 	@Override
-	public void onParamToggled(Param param) {
+	public void onParamToggle(Param param) {
 		centerButton.setChecked(param.isBeatSync());
 	}
 }

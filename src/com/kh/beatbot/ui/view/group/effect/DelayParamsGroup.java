@@ -76,7 +76,7 @@ public class DelayParamsGroup extends EffectParamsGroup implements ParamListener
 	}
 
 	@Override
-	public void onParamChanged(Param param) {
+	public void onParamChange(Param param) {
 		Delay delay = (Delay) effect;
 		if (delay.paramsLinked()) {
 			if (param.id == 0) {
@@ -90,7 +90,7 @@ public class DelayParamsGroup extends EffectParamsGroup implements ParamListener
 	}
 
 	@Override
-	public void onParamToggled(Param param) {
+	public void onParamToggle(Param param) {
 		Delay delay = (Delay) effect;
 		if (delay.paramsLinked()) {
 			if (param.id == 0) {

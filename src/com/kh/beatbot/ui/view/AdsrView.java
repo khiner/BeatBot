@@ -61,7 +61,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	}
 
 	@Override
-	public void onParamChanged(Param param) {
+	public void onParamChange(Param param) {
 		initAdsrVb();
 	}
 

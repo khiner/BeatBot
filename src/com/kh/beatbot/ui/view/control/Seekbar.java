@@ -51,11 +51,11 @@ public class Seekbar extends ControlView1dBase {
 				backgroundRect.height);
 		levelCircle.setDimensions(levelBarHeight * 2.5f, levelBarHeight * 2.5f);
 		if (null != param) {
-			onParamChanged(param);
+			onParamChange(param);
 		}
 	}
 
-	public void onParamChanged(Param param) {
+	public void onParamChange(Param param) {
 		float levelPos = levelToX(param.viewLevel);
 		levelCircle.setPosition(absoluteX + levelPos + levelCircle.width / 4, absoluteY + height
 				/ 2);

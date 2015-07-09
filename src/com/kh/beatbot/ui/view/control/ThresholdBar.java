@@ -34,11 +34,11 @@ public class ThresholdBar extends ControlView1dBase {
 				+ (height - levelBarHeight) / 2, width - thresholdSelectTab.width, levelBarHeight);
 
 		if (null != param) {
-			onParamChanged(param);
+			onParamChange(param);
 		}
 	}
 
-	public void onParamChanged(Param param) {
+	public void onParamChange(Param param) {
 		float levelPos = levelToX(param.viewLevel);
 		thresholdSelectTab.setPosition(absoluteX + levelPos - thresholdSelectTab.width / 2,
 				thresholdSelectTab.y);

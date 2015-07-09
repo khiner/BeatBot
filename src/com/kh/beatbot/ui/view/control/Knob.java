@@ -14,7 +14,7 @@ public class Knob extends ControlView1dBase {
 	}
 
 	@Override
-	public void onParamChanged(Param param) {
+	public void onParamChange(Param param) {
 		knobShape.setLevel(param.viewLevel);
 	}
 

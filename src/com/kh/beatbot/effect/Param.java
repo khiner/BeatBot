@@ -151,7 +151,7 @@ public class Param {
 		for (int i = 0; i < listeners.size(); i++) {
 			ParamListener listener = listeners.get(i);
 			if (!ignoredListeners.contains(listener)) {
-				listener.onParamChanged(this);
+				listener.onParamChange(this);
 			}
 		}
 	}
@@ -183,7 +183,7 @@ public class Param {
 	private synchronized void notifyToggleListeners() {
 		for (ParamListener listener : listeners) {
 			if (listener instanceof ParamToggleListener && !ignoredListeners.contains(listener)) {
-				((ParamToggleListener) listener).onParamToggled(this);
+				((ParamToggleListener) listener).onParamToggle(this);
 			}
 		}
 	}

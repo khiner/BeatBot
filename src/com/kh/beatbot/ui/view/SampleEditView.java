@@ -286,7 +286,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void onParamChanged(Param param) {
+	public void onParamChange(Param param) {
 		Track track = (Track) TrackManager.getCurrTrack();
 		if (param == null)
 			return;

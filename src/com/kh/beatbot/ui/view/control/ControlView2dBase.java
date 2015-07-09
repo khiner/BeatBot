@@ -31,7 +31,7 @@ public abstract class ControlView2dBase extends ControlViewBase implements Param
 				params[i].addListener(this);
 			}
 		}
-		onParamChanged(params[0]);
+		onParamChange(params[0]);
 	}
 
 	@Override

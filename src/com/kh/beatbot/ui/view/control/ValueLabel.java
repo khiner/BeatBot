@@ -23,7 +23,7 @@ public class ValueLabel extends ControlView1dBase {
 		return GeneralUtils.clipToUnit(anchorLevel + (anchorY - pos.y) / (root.getHeight() * 2));
 	}
 
-	public void onParamChanged(Param param) {
+	public void onParamChange(Param param) {
 		setText(param.getFormattedValue());
 	}
 

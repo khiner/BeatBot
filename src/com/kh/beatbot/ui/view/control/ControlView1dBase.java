@@ -27,7 +27,7 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 		}
 		this.param = param;
 		this.param.addListener(this);
-		onParamChanged(param);
+		onParamChange(param);
 	}
 
 	public float getLevel() {
@@ -51,5 +51,5 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 	}
 
 	@Override
-	public abstract void onParamChanged(Param param);
+	public abstract void onParamChange(Param param);
 }
