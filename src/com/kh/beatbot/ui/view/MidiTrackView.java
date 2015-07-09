@@ -22,7 +22,7 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 	}
 
 	@Override
-	public float getYTouchTransform() {
+	public float getYTouchTranslate() {
 		return mainPage.getMidiView().getYOffset();
 	}
 

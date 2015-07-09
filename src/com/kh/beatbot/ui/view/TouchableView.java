@@ -92,8 +92,8 @@ public class TouchableView extends View {
 		if (!shouldPropagateTouchEvents) {
 			return;
 		}
-		x += getXTouchTransform();
-		y += getYTouchTransform();
+		x += getXTouchTranslate();
+		y += getYTouchTranslate();
 		View child = findChildAt(x, y);
 		if (child instanceof TouchableView) {
 			((TouchableView) child).propagateActionDown(e, id, x - child.x, y - child.y);
@@ -114,8 +114,8 @@ public class TouchableView extends View {
 		if (!shouldPropagateTouchEvents) {
 			return;
 		}
-		x += getXTouchTransform();
-		y += getYTouchTransform();
+		x += getXTouchTranslate();
+		y += getYTouchTranslate();
 		View child = findChildAt(x, y);
 		if (child instanceof TouchableView) {
 			TouchableView touchableChild = (TouchableView) child;
@@ -147,8 +147,8 @@ public class TouchableView extends View {
 		}
 		TouchableView child = whichChildOwnsPointer(id);
 		if (child != null) {
-			x += getXTouchTransform();
-			y += getYTouchTransform();
+			x += getXTouchTranslate();
+			y += getYTouchTranslate();
 			child.propagateActionMove(e, id, x - child.x, y - child.y);
 		}
 	}
@@ -232,11 +232,11 @@ public class TouchableView extends View {
 		}
 	}
 
-	protected float getXTouchTransform() {
+	protected float getXTouchTranslate() {
 		return 0;
 	}
 
-	protected float getYTouchTransform() {
+	protected float getYTouchTranslate() {
 		return 0;
 	}
 
