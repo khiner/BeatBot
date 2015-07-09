@@ -9,6 +9,9 @@ import com.kh.beatbot.track.BaseTrack;
 public abstract class EffectEvent implements Stateful {
 	protected int trackId, effectPosition;
 
+	public EffectEvent() {
+	}
+
 	public EffectEvent(int trackId, int effectPosition) {
 		this.trackId = trackId;
 		this.effectPosition = effectPosition;

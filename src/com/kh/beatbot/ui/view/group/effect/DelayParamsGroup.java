@@ -2,13 +2,18 @@ package com.kh.beatbot.ui.view.group.effect;
 
 import com.kh.beatbot.effect.Delay;
 import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.listener.ParamListener;
+import com.kh.beatbot.listener.ParamToggleListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.control.param.ParamControl;
 
-public class DelayParamsGroup extends EffectParamsGroup {
+public class DelayParamsGroup extends EffectParamsGroup implements ParamListener,
+		ParamToggleListener {
 	private ToggleButton linkToggle;
 
 	public DelayParamsGroup(View view) {
@@ -20,30 +25,36 @@ public class DelayParamsGroup extends EffectParamsGroup {
 	public DelayParamsGroup withEffect(final Effect effect) {
 		super.withEffect(effect);
 
+		final Delay delay = (Delay) effect;
+
+		for (ParamControl paramControl : paramControls) {
+			delay.getParam(paramControl.getId()).removeListener(this);
+			delay.getParam(paramControl.getId()).addListener(this);
+		}
+
 		linkToggle.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				boolean newRightChannelSynced = effect.getParam(1).isBeatSync();
-				float newRightChannelLevel = effect.getParam(1).viewLevel;
+				boolean newRightChannelSynced = delay.getParam(1).isBeatSync();
+				float newRightChannelLevel = delay.getParam(1).viewLevel;
 
-				effect.setParamsLinked(linkToggle.isChecked());
+				delay.setParamsLinked(linkToggle.isChecked());
 
-				if (effect.paramsLinked()) {
-					((Delay) effect).rightChannelBeatSyncMemory = newRightChannelSynced;
-					((Delay) effect).rightChannelLevelMemory = newRightChannelLevel;
-					newRightChannelSynced = effect.getParam(0).isBeatSync();
-					newRightChannelLevel = effect.getParam(0).viewLevel;
-				} else if (((Delay) effect).rightChannelLevelMemory >= 0) {
-					newRightChannelSynced = ((Delay) effect).rightChannelBeatSyncMemory;
-					newRightChannelLevel = ((Delay) effect).rightChannelLevelMemory;
+				if (delay.paramsLinked()) {
+					delay.rightChannelBeatSyncMemory = newRightChannelSynced;
+					delay.rightChannelLevelMemory = newRightChannelLevel;
+					newRightChannelSynced = delay.getParam(0).isBeatSync();
+					newRightChannelLevel = delay.getParam(0).viewLevel;
+				} else if (delay.rightChannelLevelMemory >= 0) {
+					newRightChannelSynced = delay.rightChannelBeatSyncMemory;
+					newRightChannelLevel = delay.rightChannelLevelMemory;
 				}
-				effect.getParam(1).toggle(newRightChannelSynced);
-				effect.getParam(1).setLevel(newRightChannelLevel);
-				mainPage.effectPage.setLevel2dParams(effect.getXParam(), effect.getYParam());
+				delay.getParam(1).setBeatSync(newRightChannelSynced);
+				delay.getParam(1).setLevel(newRightChannelLevel);
+				mainPage.effectPage.setLevel2dParams(delay.getXParam(), delay.getYParam());
 			}
 		});
-
-		linkToggle.setChecked(effect.paramsLinked());
+		linkToggle.setChecked(delay.paramsLinked());
 		return this;
 	}
 
@@ -55,11 +66,40 @@ public class DelayParamsGroup extends EffectParamsGroup {
 
 		paramControls[0].layout(this, width / 2 - paramW - offset, paramY, paramW, paramH);
 		paramControls[1].layout(this, width / 2 + offset, paramY, paramW, paramH);
-		paramControls[2].layout(this, width / 2 - paramW - offset, paramY + paramH + offset, paramW, paramH);
+		paramControls[2].layout(this, width / 2 - paramW - offset, paramY + paramH + offset,
+				paramW, paramH);
 		paramControls[3].layout(this, width / 2 + offset, paramY + paramH + offset, paramW, paramH);
 		float linkH = paramH / 6;
 		float linkW = linkH * 2;
-		linkToggle.layout(this, width / 2 - linkW / 2 + offset / 2, paramY + paramH / 2 - linkH / 2, linkW,
-				linkH);
+		linkToggle.layout(this, width / 2 - linkW / 2 + offset / 2,
+				paramY + paramH / 2 - linkH / 2, linkW, linkH);
+	}
+
+	@Override
+	public void onParamChanged(Param param) {
+		Delay delay = (Delay) effect;
+		if (delay.paramsLinked()) {
+			if (param.id == 0) {
+				delay.getParam(1).setLevel(param.viewLevel);
+			} else if (param.id == 1) {
+				delay.getParam(0).ignoreListener(this);
+				delay.getParam(0).setLevel(param.viewLevel);
+				delay.getParam(0).unignoreListener(this);
+			}
+		}
+	}
+
+	@Override
+	public void onParamToggled(Param param) {
+		Delay delay = (Delay) effect;
+		if (delay.paramsLinked()) {
+			if (param.id == 0) {
+				delay.getParam(1).setBeatSync(param.isBeatSync());
+			} else if (param.id == 1) {
+				delay.getParam(0).ignoreListener(this);
+				delay.getParam(0).setBeatSync(param.isBeatSync());
+				delay.getParam(0).unignoreListener(this);
+			}
+		}
 	}
 }

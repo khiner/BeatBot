@@ -12,7 +12,6 @@ import com.kh.beatbot.effect.Tremolo;
 import com.kh.beatbot.event.effect.EffectParamsChangeEvent;
 import com.kh.beatbot.listener.MultiViewTouchTracker;
 import com.kh.beatbot.listener.TouchableViewsListener;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.ViewPager;
@@ -86,8 +85,9 @@ public class EffectPage extends TouchableView implements TouchableViewsListener 
 
 	@Override
 	public void onFirstPress() {
-		effectParamsChangeEvent = new EffectParamsChangeEvent(TrackManager.getCurrTrack().getId(),
-				getEffect().getPosition());
+		Effect effect = getEffect();
+		effectParamsChangeEvent = new EffectParamsChangeEvent(effect.getTrackId(),
+				effect.getPosition());
 		effectParamsChangeEvent.begin();
 	}
 

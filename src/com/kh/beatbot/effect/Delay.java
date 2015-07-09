@@ -1,5 +1,8 @@
 package com.kh.beatbot.effect;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 public class Delay extends Effect {
 	public static final String NAME = "Delay";
 	public static final int EFFECT_NUM = 2, NUM_PARAMS = 4;
@@ -9,6 +12,8 @@ public class Delay extends Effect {
 	// by default, channels are linked, so no memory is needed
 	public float rightChannelLevelMemory = -1;
 	public boolean rightChannelBeatSyncMemory = true;
+
+	private boolean paramsLinked;
 
 	public Delay() {
 		super();
@@ -31,9 +36,12 @@ public class Delay extends Effect {
 		return NAME;
 	}
 
-	@Override
+	public boolean paramsLinked() {
+		return paramsLinked;
+	}
+
 	public void setParamsLinked(boolean linked) {
-		super.setParamsLinked(linked);
+		paramsLinked = linked;
 		// y = feedback when linked / right delay time when not linked
 		yParamIndex = linked ? 2 : 1;
 	}
@@ -44,5 +52,25 @@ public class Delay extends Effect {
 		params.add(new Param(1, "Right").withUnits("ms").logScale().beatSyncable().withLevel(0.5f));
 		params.add(new Param(2, "Feedback").withLevel(0.5f));
 		params.add(new Param(3, "Wet").withLevel(0.5f));
+	}
+	
+	@Override
+	public JsonObject serialize(Gson gson) {
+		JsonObject object = super.serialize(gson);
+		object.addProperty("paramsLinked", paramsLinked());
+		object.addProperty("leftChannelBeatSync", getParam(0).isBeatSync());
+		object.addProperty("rightChannelBeatSync", getParam(1).isBeatSync());
+		object.addProperty("rightChannelLevelMemory", rightChannelLevelMemory);
+		object.addProperty("rightChannelBeatSyncMemory", rightChannelBeatSyncMemory);
+		return object;
+	}
+
+	public void deserialize(Gson gson, JsonObject jsonObject) {
+		super.deserialize(gson, jsonObject);
+		getParam(0).setBeatSync(jsonObject.get("leftChannelBeatSync").getAsBoolean());
+		getParam(1).setBeatSync(jsonObject.get("rightChannelBeatSync").getAsBoolean());
+		setParamsLinked(jsonObject.get("paramsLinked").getAsBoolean());
+		rightChannelBeatSyncMemory = jsonObject.get("rightChannelBeatSyncMemory").getAsBoolean();
+		rightChannelLevelMemory = jsonObject.get("rightChannelLevelMemory").getAsFloat();
 	}
 }

@@ -1,5 +1,8 @@
 package com.kh.beatbot.effect;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 public class Flanger extends Effect {
 	public static final String NAME = "Flanger";
 	public static final int EFFECT_NUM = 4, NUM_PARAMS = 6;
@@ -29,5 +32,18 @@ public class Flanger extends Effect {
 				.withLevel(0.5f));
 		params.add(new Param(4, "Mod Amt").withLevel(0.5f));
 		params.add(new Param(5, "Phase").withLevel(0.5f));
+	}
+
+	@Override
+	public JsonObject serialize(Gson gson) {
+		JsonObject object = super.serialize(gson);
+		object.addProperty("modRateSync", getParam(3).isBeatSync());
+		return object;
+	}
+
+	@Override
+	public void deserialize(Gson gson, JsonObject jsonObject) {
+		super.deserialize(gson, jsonObject);
+		getParam(3).setBeatSync(jsonObject.get("modRateSync").getAsBoolean());
 	}
 }

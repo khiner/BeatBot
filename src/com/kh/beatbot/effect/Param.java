@@ -160,7 +160,7 @@ public class Param {
 		return beatSync;
 	}
 
-	public void toggle(boolean state) {
+	public void setBeatSync(boolean state) {
 		beatSync = state;
 		notifyToggleListeners();
 		notifyListeners();

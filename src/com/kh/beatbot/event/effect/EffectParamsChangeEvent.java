@@ -1,11 +1,14 @@
 package com.kh.beatbot.event.effect;
 
+import com.google.gson.JsonObject;
+import com.kh.beatbot.effect.EffectSerializer;
 import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.event.Temporal;
+import com.kh.beatbot.manager.TrackManager;
 
 public class EffectParamsChangeEvent extends EffectEvent implements Stateful, Temporal {
-	private Levels initialLevels, finalLevels;
+	private JsonObject beginSerializedParams, endSerializedParams;
 
 	public EffectParamsChangeEvent(int trackId, int effectPosition) {
 		super(trackId, effectPosition);
@@ -13,13 +16,13 @@ public class EffectParamsChangeEvent extends EffectEvent implements Stateful, Te
 
 	@Override
 	public void begin() {
-		initialLevels = new Levels();
+		beginSerializedParams = getEffect().serialize(EffectSerializer.GSON);
 	}
 
 	@Override
 	public void end() {
-		finalLevels = new Levels();
-		if (!finalLevels.equals(initialLevels)) {
+		endSerializedParams = getEffect().serialize(EffectSerializer.GSON);
+		if (!endSerializedParams.equals(beginSerializedParams)) {
 			EventManager.eventCompleted(this);
 		}
 	}
@@ -31,42 +34,15 @@ public class EffectParamsChangeEvent extends EffectEvent implements Stateful, Te
 
 	@Override
 	public void undo() {
-		initialLevels.apply();
+		getEffect().deserialize(EffectSerializer.GSON, beginSerializedParams);
+		TrackManager.get().onEffectCreate(getTrack(), getEffect());
+//		View.mainPage.effectPage.updateParams();
 	}
 
 	@Override
 	public void apply() {
-		finalLevels.apply();
-	}
-
-	private class Levels {
-		float[] levels;
-
-		public Levels() {
-			this.levels = getEffect().getLevels();
-		}
-
-		public void apply() {
-			getEffect().setLevels(levels);
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (!(obj instanceof Levels))
-				return false;
-			Levels other = (Levels) obj;
-			if (levels.length != other.levels.length)
-				return false;
-			for (int i = 0; i < levels.length; i++) {
-				if (levels[i] != other.levels[i])
-					return false;
-			}
-			return true;
-		}
-
-		@Override
-		public int hashCode() {
-			return super.hashCode();
-		}
+		getEffect().deserialize(EffectSerializer.GSON, endSerializedParams);
+		TrackManager.get().onEffectCreate(getTrack(), getEffect());
+//		View.mainPage.effectPage.updateParams();
 	}
 }

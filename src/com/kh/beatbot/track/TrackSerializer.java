@@ -18,12 +18,18 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 import com.kh.beatbot.effect.ADSR;
+import com.kh.beatbot.effect.Effect;
+import com.kh.beatbot.effect.EffectSerializer;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 
 public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeserializer<BaseTrack> {
-	private static final Gson GSON = new GsonBuilder().create();
+	private final static Gson GSON = new GsonBuilder().registerTypeAdapter(Effect.class,
+			new EffectSerializer()).create();
+
 	private Type noteListType = new TypeToken<ArrayList<MidiNote>>() {
+	}.getType();
+	private Type effectListType = new TypeToken<ArrayList<Effect>>() {
 	}.getType();
 
 	@Override
@@ -45,6 +51,9 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 		track.getPanParam().setLevel(pan);
 		track.getPitchParam().setLevel(pitch);
 		track.getPitchCentParam().setLevel(pitchCent);
+
+		// effects are added to the track in the Effect constructor called by EffectSerializer
+		GSON.fromJson(object.get("effects"), effectListType);
 
 		if (isMaster)
 			return track;
@@ -88,6 +97,8 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 		object.addProperty("pan", track.getPanParam().viewLevel);
 		object.addProperty("pitch", track.getPitchParam().viewLevel);
 		object.addProperty("pitchCent", track.getPitchCentParam().viewLevel);
+
+		object.add("effects", GSON.toJsonTree(track.getEffects(), effectListType).getAsJsonArray());
 
 		if (track instanceof Track) {
 			Track t = (Track) track;

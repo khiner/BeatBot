@@ -3,6 +3,8 @@ package com.kh.beatbot.effect;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.TrackManager;
 
@@ -18,9 +20,9 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 
 	protected List<Param> params = new ArrayList<Param>();
 
-	protected int trackId;
-	protected int position, xParamIndex = 0, yParamIndex = 1;
-	protected boolean on, paramsLinked;
+	protected int trackId, position;
+	protected int xParamIndex = 0, yParamIndex = 1;
+	protected boolean on;
 
 	public Effect() {
 		this(-2);
@@ -37,26 +39,44 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 	public Effect(int trackId, int position) {
 		this.trackId = trackId;
 		this.position = position;
-		paramsLinked = false;
 		initParams();
 		for (Param param : params) {
 			param.addListener(this);
 		}
 		addEffect(trackId, getId(), position);
 		setDefaultParams();
-		TrackManager.getTrackById(trackId).addEffect(this);
 		setOn(true);
+	}
+
+	public JsonObject serialize(Gson gson) {
+		JsonObject object = new JsonObject();
+		object.addProperty("name", getName());
+		object.addProperty("trackId", getTrackId());
+		object.addProperty("position", getPosition());
+		object.addProperty("on", isOn());
+		object.add("levels", gson.toJsonTree(getLevels()).getAsJsonArray());
+		object.addProperty("class", getClass().getName());
+		return object;
+	}
+
+	public void deserialize(Gson gson, JsonObject jsonObject) {
+		setOn(jsonObject.get("on").getAsBoolean());
+		setLevels(gson.fromJson(jsonObject.get("levels"), float[].class));
 	}
 
 	public abstract int getId();
 
 	public abstract String getName();
 
+	protected abstract void initParams();
+
 	public int getNumParams() {
 		return params.size();
 	}
 
-	protected abstract void initParams();
+	public int getTrackId() {
+		return trackId;
+	}
 
 	public void setTrackId(int trackId) {
 		this.trackId = trackId;
@@ -64,7 +84,6 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 
 	public void setOn(boolean on) {
 		this.on = on;
-		TrackManager.get().onEffectCreate(TrackManager.getTrackById(trackId), this);
 		setEffectOn(trackId, position, on);
 	}
 
@@ -85,7 +104,6 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 	}
 
 	public void setLevels(float[] levels) {
-		TrackManager.get().onEffectCreate(TrackManager.getTrackById(trackId), this);
 		for (int i = 0; i < levels.length; i++) {
 			if (i < params.size()) {
 				Param param = params.get(i);
@@ -94,16 +112,8 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 		}
 	}
 
-	public boolean paramsLinked() {
-		return paramsLinked;
-	}
-
 	public void setPosition(int position) {
 		this.position = position;
-	}
-
-	public void setParamsLinked(boolean linked) {
-		this.paramsLinked = linked;
 	}
 
 	public Param getParam(int paramNum) {

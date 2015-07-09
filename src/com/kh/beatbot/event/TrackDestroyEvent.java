@@ -9,12 +9,12 @@ public class TrackDestroyEvent implements Executable, Stateful {
 
 	public TrackDestroyEvent(int trackId) {
 		this.trackId = trackId;
-		this.serializedTrack = ProjectFile.toJson(TrackManager.getTrackById(trackId));
+		this.serializedTrack = ProjectFile.trackToJson(TrackManager.getTrackById(trackId));
 	}
 
 	@Override
 	public void undo() {
-		ProjectFile.fromJson(serializedTrack);
+		ProjectFile.trackFromJson(serializedTrack);
 	}
 
 	@Override

@@ -2,14 +2,12 @@ package com.kh.beatbot.ui.view.group.effect;
 
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.listener.ParamListener;
-import com.kh.beatbot.listener.ParamToggleListener;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.param.KnobParamControl;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
 
-public class EffectParamsGroup extends TouchableView implements ParamListener, ParamToggleListener {
+public class EffectParamsGroup extends TouchableView {
 	protected KnobParamControl[] paramControls;
 	protected Effect effect;
 
@@ -29,16 +27,11 @@ public class EffectParamsGroup extends TouchableView implements ParamListener, P
 						.isBeatSyncable());
 				paramControls[i].setId(i);
 			}
-		} else {
-			for (ParamControl paramControl : paramControls) {
-				effect.getParam(paramControl.getId()).removeListener(this);
-			}
 		}
 		this.effect = effect;
 		for (ParamControl paramControl : paramControls) {
 			Param param = effect.getParam(paramControl.getId());
 			paramControl.setParam(param);
-			param.addListener(this);
 		}
 		return this;
 	}
@@ -67,32 +60,6 @@ public class EffectParamsGroup extends TouchableView implements ParamListener, P
 						paramControls[index].layout(this, j * paramW, i * paramH, paramW, paramH);
 					}
 				}
-			}
-		}
-	}
-
-	@Override
-	public void onParamChanged(Param param) {
-		if (effect.paramsLinked()) {
-			if (param.id == 0) {
-				effect.getParam(1).setLevel(param.viewLevel);
-			} else if (param.id == 1) {
-				effect.getParam(0).ignoreListener(this);
-				effect.getParam(0).setLevel(param.viewLevel);
-				effect.getParam(0).unignoreListener(this);
-			}
-		}
-	}
-
-	@Override
-	public void onParamToggled(Param param) {
-		if (effect.paramsLinked()) {
-			if (param.id == 0) {
-				effect.getParam(1).toggle(param.isBeatSync());
-			} else if (param.id == 1) {
-				effect.getParam(0).ignoreListener(this);
-				effect.getParam(0).toggle(param.isBeatSync());
-				effect.getParam(0).unignoreListener(this);
 			}
 		}
 	}

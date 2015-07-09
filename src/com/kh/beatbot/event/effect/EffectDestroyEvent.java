@@ -2,18 +2,19 @@ package com.kh.beatbot.event.effect;
 
 import com.kh.beatbot.event.Executable;
 import com.kh.beatbot.event.Stateful;
+import com.kh.beatbot.file.ProjectFile;
 
 public class EffectDestroyEvent extends EffectEvent implements Stateful, Executable {
-	private String effectName;
+	final String serializedEffect;
 
 	public EffectDestroyEvent(int trackId, int effectPosition) {
 		super(trackId, effectPosition);
-		this.effectName = getEffect().getName();
+		this.serializedEffect = ProjectFile.effectToJson(getEffect());
 	}
 
 	@Override
 	public void undo() {
-		new EffectCreateEvent(trackId, effectPosition, effectName).apply();
+		ProjectFile.effectFromJson(serializedEffect);
 	}
 
 	@Override

@@ -34,7 +34,7 @@ public class ToggleKnob extends TouchableView implements ParamToggleListener {
 		centerButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				((Param) knob.param).toggle(((ToggleButton) button).isChecked());
+				((Param) knob.param).setBeatSync(((ToggleButton) button).isChecked());
 			}
 		});
 	}

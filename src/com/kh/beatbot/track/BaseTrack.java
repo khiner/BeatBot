@@ -51,6 +51,14 @@ public class BaseTrack {
 		return id;
 	}
 
+	public List<Effect> getEffects() {
+		return effects;
+	}
+
+	public Effect getEffectByPosition(int position) {
+		return effects.get(position);
+	}
+
 	public void addEffect(Effect effect) {
 		effects.add(effect);
 		TrackManager.get().onEffectCreate(this, effect);

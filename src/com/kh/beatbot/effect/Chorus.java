@@ -1,5 +1,8 @@
 package com.kh.beatbot.effect;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 public class Chorus extends Effect {
 	public static final String NAME = "Chorus";
 	public static final int EFFECT_NUM = 0, NUM_PARAMS = 5;
@@ -27,5 +30,18 @@ public class Chorus extends Effect {
 		params.add(new Param(2, "Time").withUnits("ms").logScale().withLevel(0.5f));
 		params.add(new Param(3, "Feedback").withLevel(0.5f));
 		params.add(new Param(4, "Wet").withLevel(0.5f));
+	}
+
+	@Override
+	public JsonObject serialize(Gson gson) {
+		JsonObject object = super.serialize(gson);
+		object.addProperty("modRateSync", getParam(0).isBeatSync());
+		return object;
+	}
+
+	@Override
+	public void deserialize(Gson gson, JsonObject jsonObject) {
+		super.deserialize(gson, jsonObject);
+		getParam(0).setBeatSync(jsonObject.get("modRateSync").getAsBoolean());
 	}
 }

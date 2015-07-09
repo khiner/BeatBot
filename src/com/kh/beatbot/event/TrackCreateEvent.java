@@ -13,7 +13,7 @@ public class TrackCreateEvent implements Executable, Stateful {
 
 	public TrackCreateEvent(Track track) {
 		this.trackId = track.getId();
-		this.serializedTrack = ProjectFile.toJson(track);
+		this.serializedTrack = ProjectFile.trackToJson(track);
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class TrackCreateEvent implements Executable, Stateful {
 			Track track = TrackManager.createTrack();
 			trackId = track.getId();
 		} else {
-			ProjectFile.fromJson(serializedTrack);
+			ProjectFile.trackFromJson(serializedTrack);
 		}
 	}
 }
