@@ -1,12 +1,10 @@
 package com.kh.beatbot.event.track;
 
-import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Executable;
-import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.Track;
 
-public class TrackMuteEvent implements Executable, Stateful {
+public class TrackMuteEvent extends Executable {
 	private int trackId;
 
 	public TrackMuteEvent(Track track) {
@@ -19,19 +17,9 @@ public class TrackMuteEvent implements Executable, Stateful {
 	}
 
 	@Override
-	public void apply() {
-		doExecute();
-	}
-
-	@Override
-	public void execute() {
-		doExecute();
-		EventManager.eventCompleted(this);
-	}
-
-	@Override
-	public void doExecute() {
+	public boolean doExecute() {
 		Track track = TrackManager.getTrackById(trackId);
 		track.mute(!track.isMuted());
+		return true;
 	}
 }

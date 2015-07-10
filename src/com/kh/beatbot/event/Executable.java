@@ -1,7 +1,16 @@
 package com.kh.beatbot.event;
 
-public interface Executable {
-	public abstract void execute();
+public abstract class Executable implements Stateful {
+	public void execute() {
+		if (doExecute()) {
+			EventManager.eventCompleted(this);
+		}
+	}
 
-	public abstract void doExecute();
+	@Override
+	public void apply() {
+		doExecute();
+	}
+
+	public abstract boolean doExecute();
 }

@@ -1,10 +1,8 @@
 package com.kh.beatbot.event.effect;
 
-import com.kh.beatbot.event.Executable;
-import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.file.ProjectFile;
 
-public class EffectDestroyEvent extends EffectEvent implements Stateful, Executable {
+public class EffectDestroyEvent extends EffectEvent {
 	final String serializedEffect;
 
 	public EffectDestroyEvent(int trackId, int effectPosition) {
@@ -18,7 +16,8 @@ public class EffectDestroyEvent extends EffectEvent implements Stateful, Executa
 	}
 
 	@Override
-	public void doExecute() {
+	public boolean doExecute() {
 		getEffect().destroy();
+		return true;
 	}
 }

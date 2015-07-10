@@ -1,11 +1,9 @@
 package com.kh.beatbot.event.effect;
 
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.event.Executable;
-import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.manager.TrackManager;
 
-public class EffectToggleEvent extends EffectEvent implements Stateful, Executable {
+public class EffectToggleEvent extends EffectEvent {
 	public EffectToggleEvent(int trackId, int effectPosition) {
 		super(trackId, effectPosition);
 	}
@@ -16,9 +14,10 @@ public class EffectToggleEvent extends EffectEvent implements Stateful, Executab
 	}
 
 	@Override
-	public void doExecute() {
+	public boolean doExecute() {
 		Effect effect = getEffect();
 		effect.setOn(!effect.isOn());
 		TrackManager.get().onEffectCreate(getTrack(), getEffect());
+		return true;
 	}
 }

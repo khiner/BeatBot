@@ -5,7 +5,7 @@ import java.io.File;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.Track;
 
-public class SampleSetEvent implements Executable, Stateful {
+public class SampleSetEvent extends Executable {
 	private int trackId;
 	private File originalSample, newSample;
 
@@ -21,23 +21,11 @@ public class SampleSetEvent implements Executable, Stateful {
 		doExecute(originalSample);
 	}
 
-	@Override
-	public void apply() {
-		doExecute(newSample);
+	public boolean doExecute() {
+		return doExecute(newSample);
 	}
 
-	@Override
-	public void execute() {
-		if (doExecute(newSample)) {
-			EventManager.eventCompleted(this);
-		}
-	}
-
-	public void doExecute() {
-		doExecute(newSample);
-	}
-
-	public boolean doExecute(File sample) {
+	private boolean doExecute(File sample) {
 		Track track = TrackManager.getTrackById(trackId);
 		if (sample == null || sample.equals(track.getCurrSampleFile())) {
 			return false;

@@ -8,11 +8,9 @@ import com.kh.beatbot.effect.Filter;
 import com.kh.beatbot.effect.Flanger;
 import com.kh.beatbot.effect.Reverb;
 import com.kh.beatbot.effect.Tremolo;
-import com.kh.beatbot.event.Executable;
-import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.file.ProjectFile;
 
-public class EffectCreateEvent extends EffectEvent implements Stateful, Executable {
+public class EffectCreateEvent extends EffectEvent {
 	final String effectName;
 	final String serializedEffect;
 
@@ -34,10 +32,15 @@ public class EffectCreateEvent extends EffectEvent implements Stateful, Executab
 	}
 
 	@Override
-	public void doExecute() {
+	public boolean doExecute() {
 		Effect effect = serializedEffect != null ? ProjectFile.effectFromJson(serializedEffect)
 				: createEffect();
-		getTrack().addEffect(effect);
+		if (effect != null) {
+			getTrack().addEffect(effect);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private Effect createEffect() {

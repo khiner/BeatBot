@@ -4,8 +4,7 @@ import java.io.File;
 
 import com.kh.beatbot.manager.FileManager;
 
-public class SampleRenameEvent implements Executable, Stateful {
-
+public class SampleRenameEvent extends Executable {
 	private String originalSampleName, newSampleName;
 	private File file;
 
@@ -20,20 +19,8 @@ public class SampleRenameEvent implements Executable, Stateful {
 		doExecute(originalSampleName);
 	}
 
-	@Override
-	public void apply() {
-		doExecute(newSampleName);
-	}
-
-	@Override
-	public void execute() {
-		if (doExecute(newSampleName)) {
-			EventManager.eventCompleted(this);
-		}
-	}
-
-	public void doExecute() {
-		doExecute(newSampleName);
+	public boolean doExecute() {
+		return doExecute(newSampleName);
 	}
 
 	private boolean doExecute(String sampleName) {

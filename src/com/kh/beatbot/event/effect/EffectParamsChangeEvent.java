@@ -3,11 +3,10 @@ package com.kh.beatbot.event.effect;
 import com.google.gson.JsonObject;
 import com.kh.beatbot.effect.EffectSerializer;
 import com.kh.beatbot.event.EventManager;
-import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.event.Temporal;
 import com.kh.beatbot.manager.TrackManager;
 
-public class EffectParamsChangeEvent extends EffectEvent implements Stateful, Temporal {
+public class EffectParamsChangeEvent extends EffectEvent implements Temporal {
 	private JsonObject beginSerializedParams, endSerializedParams;
 
 	public EffectParamsChangeEvent(int trackId, int effectPosition) {
@@ -28,21 +27,15 @@ public class EffectParamsChangeEvent extends EffectEvent implements Stateful, Te
 	}
 
 	@Override
-	public void doExecute() {
-		apply();
+	public boolean doExecute() {
+		getEffect().deserialize(EffectSerializer.GSON, endSerializedParams);
+		TrackManager.get().onEffectCreate(getTrack(), getEffect());
+		return true;
 	}
 
 	@Override
 	public void undo() {
 		getEffect().deserialize(EffectSerializer.GSON, beginSerializedParams);
 		TrackManager.get().onEffectCreate(getTrack(), getEffect());
-//		View.mainPage.effectPage.updateParams();
-	}
-
-	@Override
-	public void apply() {
-		getEffect().deserialize(EffectSerializer.GSON, endSerializedParams);
-		TrackManager.get().onEffectCreate(getTrack(), getEffect());
-//		View.mainPage.effectPage.updateParams();
 	}
 }
