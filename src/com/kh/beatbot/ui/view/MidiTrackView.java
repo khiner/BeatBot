@@ -52,10 +52,12 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 
 	@Override
 	public void onMuteChange(Track track, boolean mute) {
+		track.getButtonRow().muteButton.setChecked(mute);
 	}
 
 	@Override
 	public void onSoloChange(Track track, boolean solo) {
+		track.getButtonRow().soloButton.setChecked(solo);
 	}
 
 	@Override

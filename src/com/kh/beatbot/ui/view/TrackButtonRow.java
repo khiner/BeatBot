@@ -1,5 +1,7 @@
 package com.kh.beatbot.ui.view;
 
+import com.kh.beatbot.event.track.TrackMuteEvent;
+import com.kh.beatbot.event.track.TrackSoloEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -14,7 +16,7 @@ public class TrackButtonRow extends TouchableView {
 		super(view);
 		this.track = track;
 	}
-
+	
 	public void updateInstrumentIcon() {
 		instrumentButton.setResourceId(track.getIcon());
 	}
@@ -40,13 +42,13 @@ public class TrackButtonRow extends TouchableView {
 		muteButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				track.mute(muteButton.isChecked());
+				new TrackMuteEvent(track).execute();
 			}
 		});
 		soloButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				track.solo(soloButton.isChecked());
+				new TrackSoloEvent(track).execute();
 			}
 		});
 	}
