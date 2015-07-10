@@ -24,7 +24,7 @@ public class FilterParamsGroup extends EffectParamsGroup {
 		filterToggles = new ToggleButton[3];
 		filterToggleListener = new FilterToggleListener();
 		for (int i = 0; i < filterToggles.length; i++) {
-			filterToggles[i] = new ToggleButton(this).withIcon(FILTER_ICONS[i]);
+			filterToggles[i] = new ToggleButton(this).withRoundedRect().withIcon(FILTER_ICONS[i]);
 			filterToggles[i].setOnReleaseListener(filterToggleListener);
 		}
 
@@ -36,10 +36,10 @@ public class FilterParamsGroup extends EffectParamsGroup {
 		float toggleW = width / 6;
 		float paramH = (height - toggleY - toggleW) / 2 - 10;
 		float paramW = 2 * paramH / 3;
-		float x = width / 2 - toggleW * 2;
+		float x = width / 2 - 3 * toggleW / 2;
 		for (Button toggle : filterToggles) {
 			toggle.layout(this, x, toggleY, toggleW, toggleW);
-			x += 3 * toggleW / 2;
+			x += toggleW;
 		}
 
 		float paramY = toggleY + toggleW;

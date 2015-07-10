@@ -74,9 +74,9 @@ public class IconResourceSets {
 			CONTROL_LABEL = s(r(Color.TRANSPARENT, null, Color.WHITE), r(Color.TRON_BLUE, null, Color.BLACK)),
 			TOGGLE = s(r(R.drawable.toggle_icon, Color.LABEL_DARK, Color.LABEL_VERY_LIGHT), r(R.drawable.toggle_icon, Color.TRON_BLUE, Color.BLACK), r(R.drawable.toggle_icon, Color.LABEL_SELECTED, Color.BLACK, Color.BLACK, Color.TRON_BLUE)),
 			TOGGLE_WITHOUT_BORDER = s(r(R.drawable.toggle_icon, Color.LABEL_DARK, null, Color.LABEL_VERY_LIGHT, Color.LABEL_VERY_LIGHT), r(R.drawable.toggle_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK), r(R.drawable.toggle_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.TRON_BLUE)),
-			BANDPASS_FILTER = s(r(R.drawable.bandpass_filter_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.bandpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.bandpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
-			HIGHPASS_FILTER = s(r(R.drawable.highpass_filter_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.highpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.highpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
-			LOWPASS_FILTER = s(r(R.drawable.lowpass_filter_icon, Color.TRANSPARENT, Color.WHITE), r(R.drawable.lowpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.lowpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
+			BANDPASS_FILTER = s(r(R.drawable.bandpass_filter_icon, Color.LABEL_DARK, Color.WHITE), r(R.drawable.bandpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.bandpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
+			HIGHPASS_FILTER = s(r(R.drawable.highpass_filter_icon, Color.LABEL_DARK, Color.WHITE), r(R.drawable.highpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.highpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
+			LOWPASS_FILTER = s(r(R.drawable.lowpass_filter_icon, Color.LABEL_DARK, Color.WHITE), r(R.drawable.lowpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.lowpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
 			
 			MIDI_TICK_BAR = s(r(Color.TICK_FILL), r(Color.TICK_FILL)),
 			MIDI_LOOP_BAR = s(r(Color.TICKBAR), r(Color.TRON_BLUE)),
