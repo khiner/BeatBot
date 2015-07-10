@@ -22,7 +22,6 @@ import com.kh.beatbot.track.Track;
 
 public class TrackManager implements TrackListener, FileListener, MidiNoteListener {
 	public static final int MASTER_TRACK_ID = -1;
-	public static Track soloingTrack;
 
 	private static final TrackManager instance = new TrackManager();
 	private static final BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
@@ -268,10 +267,10 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 			if (track.getId() == trackId)
 				return track;
 		}
-		
+
 		return null;
 	}
-	
+
 	public static Track getTrack(MidiNote note) {
 		return getTrackByNoteValue(note.getNoteValue());
 	}
@@ -281,7 +280,11 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	public static Track getSoloingTrack() {
-		return soloingTrack;
+		for (Track track : tracks) {
+			if (track.isSoloing())
+				return track;
+		}
+		return null;
 	}
 
 	public static int getNumTracks() {
@@ -398,7 +401,8 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	@Override
-	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition, int endEffectPosition) {
+	public void onEffectOrderChange(BaseTrack track, int initialEffectPosition,
+			int endEffectPosition) {
 		track.select();
 		for (TrackListener trackListener : trackListeners) {
 			trackListener.onEffectOrderChange(track, initialEffectPosition, endEffectPosition);
@@ -422,14 +426,10 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	@Override
 	public void onSoloChange(Track track, boolean solo) {
-		soloingTrack = solo ? track : null;
 		if (solo) {
-			synchronized (tracks) {
-				// if this track is soloing, set all other solo icons to inactive.
-				for (Track otherTrack : tracks) {
-					if (!track.equals(otherTrack)) {
-						otherTrack.getButtonRow().soloButton.setChecked(false);
-					}
+			for (Track otherTrack : tracks) {
+				if (!otherTrack.equals(track) && otherTrack.isSoloing()) {
+					otherTrack.solo(false);
 				}
 			}
 		}

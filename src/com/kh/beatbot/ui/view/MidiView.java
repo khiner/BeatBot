@@ -466,6 +466,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			line.setDimensions(2, lineHeight);
 		}
 		layoutTrackRects();
+		updateTrackColors();
 		horizontalScrollBar.setPosition(horizontalScrollBar.x, absoluteY + trackHeight - 2.5f
 				* horizontalScrollBar.cornerRadius);
 	}

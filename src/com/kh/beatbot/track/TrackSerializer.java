@@ -59,6 +59,9 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 			return track;
 
 		Track t = (Track) track;
+		t.mute(object.get("muted").getAsBoolean());
+		t.solo(object.get("soloing").getAsBoolean());
+
 		if (object.has("samplePath")) {
 			try {
 				t.setSample(new File(object.get("samplePath").getAsString()));
@@ -103,6 +106,8 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 		if (track instanceof Track) {
 			Track t = (Track) track;
 			object.addProperty("class", Track.class.getName());
+			object.addProperty("muted", t.isMuted());
+			object.addProperty("soloing", t.isSoloing());
 
 			if (t.getCurrSampleFile() != null) {
 				object.addProperty("samplePath", t.getCurrSampleFile().getAbsolutePath());
