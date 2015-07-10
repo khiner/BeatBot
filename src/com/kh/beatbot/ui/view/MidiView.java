@@ -596,12 +596,16 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	public void onMove(MidiNote note, int beginNoteValue, long beginOnTick, long beginOffTick,
 			int endNoteValue, long endOnTick, long endOffTick) {
 		layoutNoteRectangle(note);
+		if (beginNoteValue != endNoteValue) { // could be moving into/out of selected tack
+			note.getRectangle().setFillColor(whichColor(note));
+		}
 	}
 
 	private void layoutNotes() {
 		for (Track track : TrackManager.getTracks()) {
 			for (MidiNote note : track.getMidiNotes()) {
 				layoutNoteRectangle(note);
+				note.getRectangle().setFillColor(whichColor(note));
 			}
 		}
 	}
