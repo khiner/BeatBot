@@ -38,17 +38,22 @@ public class EffectParamsGroup extends TouchableView {
 
 	@Override
 	public synchronized void layoutChildren() {
-		if (effect.getNumParams() < 8) {
+		if (effect.getNumParams() < 8) { // two rows
 			int halfParams = (effect.getNumParams() + 1) / 2;
 			float paramW = effect.getNumParams() <= 3 ? width / effect.getNumParams() : width
 					/ halfParams;
 			float paramH = 3 * paramW / 2;
-			float y = effect.getNumParams() <= 3 ? height / 2 - paramH / 2 : height / 2 - paramH;
+
+			float x = 0;
+			float y = effect.getNumParams() < 3 ? height / 2 - paramH / 2 : height / 2 - paramH;
 			for (int i = 0; i < effect.getNumParams(); i++) {
-				if (i == 3)
+				if (effect.getNumParams() > 2 && i == halfParams) { // next row
+					x = effect.getNumParams() % 2 != 0 ? paramW / 2 : 0;
 					y += paramH;
-				int index = effect.getNumParams() <= 3 ? i : i % halfParams;
-				paramControls[i].layout(this, index * paramW, y, paramW, paramH);
+				}
+				paramControls[i].layout(this, effect.getNumParams() == 3 ? x + paramW / 2 : x, y,
+						paramW, paramH);
+				x += paramW;
 			}
 		} else {
 			float paramW = width / 3;
