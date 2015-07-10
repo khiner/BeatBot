@@ -29,7 +29,9 @@ public class DelayParamsGroup extends EffectParamsGroup implements ParamListener
 
 		for (ParamControl paramControl : paramControls) {
 			delay.getParam(paramControl.getId()).removeListener(this);
+			delay.getParam(paramControl.getId()).removeToggleListener(this);
 			delay.getParam(paramControl.getId()).addListener(this);
+			delay.getParam(paramControl.getId()).addToggleListener(this);
 		}
 
 		linkToggle.setOnReleaseListener(new OnReleaseListener() {

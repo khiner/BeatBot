@@ -24,10 +24,12 @@ public class Param {
 	private String unitString = "", name = "", format = "%.2f";
 
 	private transient List<ParamListener> listeners;
+	private transient List<ParamToggleListener> toggleListeners;
 	private transient Set<ParamListener> ignoredListeners;
 
 	public Param() {
 		listeners = new ArrayList<ParamListener>();
+		toggleListeners = new ArrayList<ParamToggleListener>();
 		ignoredListeners = new HashSet<ParamListener>();
 	}
 
@@ -138,6 +140,14 @@ public class Param {
 		listeners.remove(listener);
 	}
 
+	public synchronized void addToggleListener(ParamToggleListener listener) {
+		toggleListeners.add(listener);
+	}
+
+	public synchronized void removeToggleListener(ParamToggleListener listener) {
+		toggleListeners.remove(listener);
+	}
+
 	public synchronized void ignoreListener(ParamListener listener) {
 		ignoredListeners.add(listener);
 	}
@@ -181,9 +191,9 @@ public class Param {
 	}
 
 	private synchronized void notifyToggleListeners() {
-		for (ParamListener listener : listeners) {
-			if (listener instanceof ParamToggleListener && !ignoredListeners.contains(listener)) {
-				((ParamToggleListener) listener).onParamToggle(this);
+		for (ParamToggleListener listener : toggleListeners) {
+			if (!ignoredListeners.contains(listener)) {
+				listener.onParamToggle(this);
 			}
 		}
 	}

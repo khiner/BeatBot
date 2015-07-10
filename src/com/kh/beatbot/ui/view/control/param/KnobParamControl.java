@@ -15,8 +15,12 @@ public class KnobParamControl extends LevelParamControl {
 
 	public KnobParamControl withBeatSync(boolean beatSync) {
 		levelControlView = beatSync ? new ToggleKnob(this) : new Knob(this);
-		levelControl = beatSync ? (Knob) ((ToggleKnob) levelControlView).getKnob()
-				: (Knob) levelControlView;
+		if (beatSync) {
+			levelControl = ((ToggleKnob) levelControlView).getKnob();
+		} else {
+			levelControl = (Knob) levelControlView;
+		}
+
 		levelControl.setListener(this);
 		return this;
 	}
@@ -25,7 +29,9 @@ public class KnobParamControl extends LevelParamControl {
 	public void setParam(Param param) {
 		super.setParam(param);
 		if (levelControlView instanceof ToggleKnob) {
-			((ToggleKnob) levelControlView).onParamToggle(param);
+			ToggleKnob toggleKnob = (ToggleKnob) levelControlView;
+			param.addToggleListener(toggleKnob);
+			toggleKnob.onParamToggle(param);
 		}
 	}
 
