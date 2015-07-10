@@ -73,8 +73,8 @@ public class DelayParamsGroup extends EffectParamsGroup implements ParamListener
 		paramControls[3].layout(this, width / 2 + offset, paramY + paramH + offset, paramW, paramH);
 		float linkH = paramH / 6;
 		float linkW = linkH * 2;
-		linkToggle.layout(this, width / 2 - linkW / 2 + offset / 2,
-				paramY + paramH / 2 - linkH / 2, linkW, linkH);
+		linkToggle.layout(this, width / 2 - linkW / 2 + 2 * offset / 3, paramY + paramH / 2 - linkH
+				/ 2, linkW, linkH);
 	}
 
 	@Override
