@@ -1,6 +1,6 @@
 package com.kh.beatbot.ui.view.group;
 
-import com.kh.beatbot.event.TrackCreateEvent;
+import com.kh.beatbot.event.track.TrackCreateEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;

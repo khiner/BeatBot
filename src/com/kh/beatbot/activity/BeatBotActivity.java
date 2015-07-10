@@ -17,7 +17,7 @@ import android.widget.LinearLayout;
 import com.kh.beatbot.R;
 import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.SampleRenameEvent;
-import com.kh.beatbot.event.TrackCreateEvent;
+import com.kh.beatbot.event.track.TrackCreateEvent;
 import com.kh.beatbot.listener.GLSurfaceViewGroupListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.MidiFileManager;

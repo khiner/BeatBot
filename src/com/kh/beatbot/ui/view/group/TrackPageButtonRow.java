@@ -1,6 +1,6 @@
 package com.kh.beatbot.ui.view.group;
 
-import com.kh.beatbot.event.TrackDestroyEvent;
+import com.kh.beatbot.event.track.TrackDestroyEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;

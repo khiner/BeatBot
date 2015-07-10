@@ -1,5 +1,8 @@
-package com.kh.beatbot.event;
+package com.kh.beatbot.event.track;
 
+import com.kh.beatbot.event.EventManager;
+import com.kh.beatbot.event.Executable;
+import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.file.ProjectFile;
 import com.kh.beatbot.manager.TrackManager;
 
@@ -24,13 +27,19 @@ public class TrackDestroyEvent implements Executable, Stateful {
 
 	@Override
 	public void execute() {
-		doExecute();
-		EventManager.eventCompleted(this);
+		if (allowed()) {
+			doExecute();
+			EventManager.eventCompleted(this);
+		}
 	}
 
 	public void doExecute() {
-		if (TrackManager.getNumTracks() > 1) {
+		if (allowed()) {
 			TrackManager.getTrackById(trackId).destroy();
 		}
+	}
+	
+	private boolean allowed() {
+		return TrackManager.getNumTracks() > 1;
 	}
 }

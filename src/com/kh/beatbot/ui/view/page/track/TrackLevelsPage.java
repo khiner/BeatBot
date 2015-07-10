@@ -1,7 +1,7 @@
 package com.kh.beatbot.ui.view.page.track;
 
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.event.TrackLevelsSetEvent;
+import com.kh.beatbot.event.track.TrackLevelsSetEvent;
 import com.kh.beatbot.listener.MultiViewTouchTracker;
 import com.kh.beatbot.listener.TouchableViewsListener;
 import com.kh.beatbot.manager.TrackManager;

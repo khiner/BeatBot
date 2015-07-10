@@ -1,5 +1,8 @@
-package com.kh.beatbot.event;
+package com.kh.beatbot.event.track;
 
+import com.kh.beatbot.event.EventManager;
+import com.kh.beatbot.event.Stateful;
+import com.kh.beatbot.event.Temporal;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
 
