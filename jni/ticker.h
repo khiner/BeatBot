@@ -3,10 +3,6 @@
 
 void initTicker();
 
-long loopBeginTick, loopEndTick, currTick, currSample;
-
-float BPM;
-long MSPT; // microseconds per tick
-long SPT;  // samples per tick
+long samplesPerTick, loopBeginTick, loopEndTick, currTick, currSample;
 
 #endif // TICKER_H

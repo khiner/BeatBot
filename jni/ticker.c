@@ -15,9 +15,9 @@ void Java_com_kh_beatbot_manager_MidiManager_setCurrTick(JNIEnv *env,
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_setNativeMSPT(JNIEnv *env,
-		jclass clazz, jlong _MSPT) {
-	MSPT = _MSPT;
-	SPT = (MSPT * SAMPLE_RATE) / 1000000;
+		jclass clazz, jlong MSPT) {
+	// MSPT = microseconds-per-tick
+	samplesPerTick = (MSPT * SAMPLE_RATE) / 1000000;
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_setLoopTicksNative(JNIEnv *env,

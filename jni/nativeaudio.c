@@ -180,7 +180,7 @@ static inline void generateNextBuffer() {
 			cur_ptr = cur_ptr->next;
 		}
 		if (playing) {
-			if (++currSample >= SPT) { // samples-per-tick reached.  next tick
+			if (++currSample >= samplesPerTick) {
 				currTick++;
 				currSample = 0;
 			}
