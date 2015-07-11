@@ -15,18 +15,12 @@ void Java_com_kh_beatbot_manager_MidiManager_setCurrTick(JNIEnv *env,
 	currSample = tickToSample(currTick);
 }
 
-void Java_com_kh_beatbot_manager_MidiManager_setNativeBPM(JNIEnv *env,
-		jclass clazz, jfloat _BPM) {
-	BPM = _BPM;
-}
-
 void Java_com_kh_beatbot_manager_MidiManager_setNativeMSPT(JNIEnv *env,
 		jclass clazz, jlong _MSPT) {
 	MSPT = _MSPT;
 	SPT = (MSPT * SAMPLE_RATE) / 1000000;
 	loopBeginSample = tickToSample(loopBeginTick);
 	loopEndSample = tickToSample(loopEndTick);
-	//updateNextNoteSamples();
 }
 
 void Java_com_kh_beatbot_manager_MidiManager_setLoopTicksNative(JNIEnv *env,

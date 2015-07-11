@@ -90,7 +90,6 @@ public class MidiManager implements MidiNoteListener {
 	public static void setBPM(float bpm) {
 		bpm = GeneralUtils.clipTo(bpm, MIN_BPM, MAX_BPM);
 		tempo.setBpm(bpm);
-		setNativeBPM(bpm);
 		setNativeMSPT(tempo.getMpqn() / TICKS_PER_NOTE);
 		TrackManager.quantizeEffectParams();
 
@@ -298,8 +297,6 @@ public class MidiManager implements MidiNoteListener {
 	public static native void isTrackPlaying(int trackId);
 
 	public static native void setNativeMSPT(long MSPT);
-
-	public static native void setNativeBPM(float BPM);
 
 	public static native void setCurrTick(long currTick);
 
