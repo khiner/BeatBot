@@ -98,15 +98,15 @@ public class AdsrView extends TouchableView implements ParamListener {
 	}
 
 	private float getAttackX(ADSR adsr) {
-		return viewX(adsr.getAttack() / 3f);
+		return viewX(adsr.getAttack() / 3);
 	}
 
 	private float getDecayX(ADSR adsr) {
-		return getAttackX(adsr) + viewX(adsr.getDecay() / 3f);
+		return viewX((adsr.getAttack() + adsr.getDecay()) / 3);
 	}
 
 	private float getReleaseX(ADSR adsr) {
-		return viewX(2f / 3f + adsr.getRelease() / 3f);
+		return viewX((2 + adsr.getRelease()) / 3);
 	}
 
 	private float xToAttack(float x) {
@@ -118,7 +118,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	}
 
 	private float xToRelease(float x) {
-		return GeneralUtils.clipToUnit((unitX(x) - 2f / 3f) * 3);
+		return GeneralUtils.clipToUnit(unitX(x) * 3 - 2f);
 	}
 
 	private void selectAdsrPoint(int id, float x, float y) {
