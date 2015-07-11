@@ -51,6 +51,7 @@ public class MidiManager implements MidiNoteListener {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION);
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
+		setBPM(getBPM()); // set native bpm & trigger event notification
 	}
 
 	public static void addMidiNoteListener(MidiNoteListener listener) {
@@ -93,7 +94,7 @@ public class MidiManager implements MidiNoteListener {
 		setNativeMSPT(tempo.getMpqn() / TICKS_PER_NOTE);
 		TrackManager.quantizeEffectParams();
 
-		tempoListener.onTempoChanged(bpm);
+		tempoListener.onTempoChange(bpm);
 	}
 
 	public static MidiNote addNote(long onTick, long offTick, int note) {

@@ -25,6 +25,7 @@ import com.kh.beatbot.ui.view.page.track.EffectSelectPage;
 import com.kh.beatbot.ui.view.page.track.NoteLevelsPage;
 import com.kh.beatbot.ui.view.page.track.RecordPage;
 import com.kh.beatbot.ui.view.page.track.SampleEditPage;
+import com.kh.beatbot.ui.view.page.track.TempoPage;
 import com.kh.beatbot.ui.view.page.track.TrackLevelsPage;
 
 public class PageSelectGroup extends TouchableView implements TrackListener,
@@ -40,6 +41,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	public static AdsrPage adsrPage;
 	public static RecordPage recordPage;
 
+	public static TempoPage tempoPage;
+
 	public static ToggleButton masterButton;
 
 	public static ViewPager pager, buttonRowPager;
@@ -48,10 +51,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	public PageSelectGroup(View view) {
 		super(view);
-	}
-
-	public void setBPM(float bpm) {
-		masterButtonRow.setBPM(bpm);
 	}
 
 	public void selectEffectPage() {
@@ -114,6 +113,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		noteLevelsPage = new NoteLevelsPage(pager);
 		recordPage = new RecordPage(pager);
 
+		tempoPage = new TempoPage(pager);
+
 		pager.addListener(this);
 
 		buttonRowPager.addPage(masterButton, masterButtonRow);
@@ -129,6 +130,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 		pager.addPage(masterButtonRow.getLevelsButton(), levelsPage);
 		pager.addPage(masterButtonRow.getEffectsButton(), effectSelectPage);
+		pager.addPage(masterButtonRow.getTempoButton(), tempoPage);
 
 		masterButton.setText("Master");
 	}

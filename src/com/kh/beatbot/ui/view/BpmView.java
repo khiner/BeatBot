@@ -8,16 +8,15 @@ import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.TempoListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Color;
+import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.NumberSegment;
 
-public class BpmView extends ClickableView implements TempoListener {
+public class BpmView extends LongPressableView implements TempoListener {
 
 	private static final float INC_BPM_THRESH = 15;
 	private static NumberSegment[][] numberSegments = new NumberSegment[3][7];
 
 	private static float lastFrameY = -1, currYDragTotal = 0;
-
-	private long lastTapTime = 0;
 
 	public BpmView(View view) {
 		super(view);
@@ -25,20 +24,17 @@ public class BpmView extends ClickableView implements TempoListener {
 	}
 
 	@Override
-	public void onTempoChanged(float bpm) {
+	public void onTempoChange(float bpm) {
 		setText(String.valueOf((int) bpm));		
-	}
-
-	public void setBPM(float bpm) {
-		MidiManager.setBPM(bpm);
 	}
 
 	@Override
 	public synchronized void createChildren() {
+		setIcon(IconResourceSets.SEVEN_SEGMENT_BG);
 		initRoundedRect();
 		for (int i = 0; i < numberSegments.length; i++) {
 			for (int j = 0; j < numberSegments[i].length; j++) {
-				numberSegments[i][j] = new NumberSegment(renderGroup, Color.BPM_OFF, null);
+				numberSegments[i][j] = new NumberSegment(renderGroup, Color.SEVEN_SEGMENT_OFF, null);
 			}
 			addShapes(numberSegments[i]);
 		}
@@ -80,30 +76,12 @@ public class BpmView extends ClickableView implements TempoListener {
 		lastFrameY = pos.y;
 		if (Math.abs(currYDragTotal) > INC_BPM_THRESH) {
 			if (currYDragTotal <= 0) {
-				setBPM(MidiManager.getBPM() - 1);
+				MidiManager.setBPM(MidiManager.getBPM() - 1);
 			} else {
-				setBPM(MidiManager.getBPM() + 1);
+				MidiManager.setBPM(MidiManager.getBPM() + 1);
 			}
 			currYDragTotal %= INC_BPM_THRESH;
 		}
-	}
-
-	@Override
-	protected void singleTap(int id, Pointer pos) {
-		long tapTime = System.currentTimeMillis();
-		float millisElapsed = tapTime - lastTapTime;
-		lastTapTime = tapTime;
-		float bpm = 60000 / millisElapsed;
-		if (bpm <= MidiManager.MAX_BPM + 20 && bpm >= MidiManager.MIN_BPM - 20) {
-			// if we are far outside of the range, don't change the tempo.
-			// otherwise, midiManager will take care of clipping the result
-			setBPM(bpm);
-		}
-	}
-
-	@Override
-	protected void doubleTap(int id, Pointer pos) {
-		singleTap(id, pos);
 	}
 
 	@Override
@@ -114,11 +92,11 @@ public class BpmView extends ClickableView implements TempoListener {
 	public void setText(String text) {
 		for (int i = 0; i < numberSegments.length; i++) {
 			for (int j = 0; j < numberSegments[i].length; j++) {
-				numberSegments[i][j].setFillColor(Color.BPM_OFF);
+				numberSegments[i][j].setFillColor(Color.SEVEN_SEGMENT_OFF);
 			}
 		}
 		for (NumberSegment selectedSegment : getSelectedSegments(text)) {
-			selectedSegment.setFillColor(Color.BPM_ON);
+			selectedSegment.setFillColor(Color.SEVEN_SEGMENT_ON);
 		}
 	}
 

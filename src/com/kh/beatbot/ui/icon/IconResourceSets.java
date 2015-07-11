@@ -48,6 +48,8 @@ public class IconResourceSets {
 			ADSR = s(r(R.drawable.adsr_icon), r(R.drawable.adsr_icon), r(R.drawable.adsr_icon)),
 			LEVELS = s(r(R.drawable.levels_icon), r(R.drawable.levels_icon), r(R.drawable.levels_icon)),
 
+			CLOCK = s(r(R.drawable.clock_icon), r(R.drawable.clock_icon), r(R.drawable.clock_icon)),
+
 			MENU_ITEM = s(r(null), r(Color.LABEL_LIGHT), r(Color.TRON_BLUE)),
 
 			FILE = s(r(R.drawable.browse_icon, null, null, null, Color.BLACK), r(R.drawable.browse_icon, null, null, null, Color.TRON_BLUE)),
@@ -80,7 +82,10 @@ public class IconResourceSets {
 			
 			MIDI_TICK_BAR = s(r(Color.TICK_FILL), r(Color.TICK_FILL)),
 			MIDI_LOOP_BAR = s(r(Color.TICKBAR), r(Color.TRON_BLUE)),
-			MIDI_LOOP_BUTTONS = s(r(Color.TRANSPARENT, Color.RED), r(Color.TRANSPARENT, Color.RED));
+			MIDI_LOOP_BUTTONS = s(r(Color.TRANSPARENT, Color.RED), r(Color.TRANSPARENT, Color.RED)),
+			SEVEN_SEGMENT_BG = s(r(Color.darken(Color.VIEW_BG, 0.7f)), r(Color.darken(Color.VIEW_BG_SELECTED, 0.5f))),
+			TAP_TEMPO_BUTTON = s(r(Color.LABEL_VERY_LIGHT, Color.BG), r(Color.LABEL_SELECTED, Color.BG), null, r(Color.LABEL_DARK, Color.BG))
+			;
 
 	private static Map<String, IconResourceSet> DIRECTORY_ICON_RESOURCES = new HashMap<String, IconResourceSet>() {
 		{

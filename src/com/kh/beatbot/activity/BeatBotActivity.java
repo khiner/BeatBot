@@ -162,8 +162,7 @@ public class BeatBotActivity extends Activity {
 						public void onClick(DialogInterface dialog, int which) {
 							String bpmString = bpmInput.getText().toString();
 							if (!bpmString.isEmpty()) {
-								View.mainPage.getPageSelectGroup().setBPM(
-										Integer.valueOf(bpmString));
+								MidiManager.setBPM(Integer.valueOf(bpmString));
 							}
 						}
 					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
