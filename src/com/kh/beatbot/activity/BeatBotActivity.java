@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import com.kh.beatbot.R;
 import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.SampleRenameEvent;
+import com.kh.beatbot.event.TempoChangeEvent;
 import com.kh.beatbot.event.track.TrackCreateEvent;
 import com.kh.beatbot.listener.GLSurfaceViewGroupListener;
 import com.kh.beatbot.manager.FileManager;
@@ -162,7 +163,7 @@ public class BeatBotActivity extends Activity {
 						public void onClick(DialogInterface dialog, int which) {
 							String bpmString = bpmInput.getText().toString();
 							if (!bpmString.isEmpty()) {
-								MidiManager.setBPM(Integer.valueOf(bpmString));
+								new TempoChangeEvent(Integer.valueOf(bpmString)).execute();
 							}
 						}
 					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
