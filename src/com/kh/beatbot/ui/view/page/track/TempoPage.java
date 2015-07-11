@@ -11,6 +11,7 @@ public class TempoPage extends TrackPage {
 	private Button tapTempoButton;
 	private BpmView bpmView;
 	private long lastTapTime = 0;
+	private final int ONE_MINUTE_MILLIS = 60000;
 
 	public TempoPage(View view) {
 		super(view);
@@ -28,14 +29,14 @@ public class TempoPage extends TrackPage {
 			@Override
 			public void onRelease(Button button) {
 				long tapTime = System.currentTimeMillis();
-				float millisElapsed = tapTime - lastTapTime;
-				lastTapTime = tapTime;
-				float bpm = 60000 / millisElapsed;
+				float elapsedMillis = tapTime - lastTapTime;
+				float bpm = ONE_MINUTE_MILLIS / elapsedMillis; // TODO average across last 3/4 taps
 				if (bpm <= MidiManager.MAX_BPM + 20 && bpm >= MidiManager.MIN_BPM - 20) {
 					// if we are far outside of the range, don't change the tempo.
 					// otherwise, midiManager will take care of clipping the result
 					MidiManager.setBPM(bpm);
 				}
+				lastTapTime = tapTime;
 			}
 		});
 	}
