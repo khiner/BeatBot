@@ -152,7 +152,7 @@ Track *initTrack(int trackId) {
 	track->generator = NULL;
 	track->levels = initLevels();
 	track->nextEvent = malloc(sizeof(MidiEvent));
-	track->nextStartSample = track->nextStopSample = -1;
+	track->nextStartTick  = track->nextStopTick = -1;
 	track->currBufferFloat = (float **) malloc(2 * sizeof(float *));
 	track->currBufferFloat[0] = (float *) calloc(BUFF_SIZE_FRAMES,
 			ONE_FLOAT_SIZE);
@@ -266,8 +266,8 @@ void Java_com_kh_beatbot_track_Track_soloTrack(JNIEnv *env, jclass clazz,
 
 void setNextNoteInfo(Track *track, jlong onTick, jlong offTick, jbyte volume,
 		jbyte pan, jbyte pitch) {
-	track->nextStartSample = onTick;
-	track->nextStopSample = offTick;
+	track->nextStartTick = onTick;
+	track->nextStopTick = offTick;
 	track->nextEvent->volume = volume;
 	track->nextEvent->pan = pan;
 	track->nextEvent->pitch = pitch;
@@ -276,18 +276,16 @@ void setNextNoteInfo(Track *track, jlong onTick, jlong offTick, jbyte volume,
 void setNextNote(Track *track, jobject obj) {
 	JNIEnv* env = getJniEnv();
 	if (obj == NULL ) {
-		track->nextStartSample = -1;
-		track->nextStopSample = -1;
+		track->nextStartTick = -1;
+		track->nextStopTick = -1;
 		return;
 	}
 	jclass cls = (*env)->GetObjectClass(env, obj);
 
-	long onSample = tickToSample(
-			(*env)->CallLongMethod(env, obj,
-					(*env)->GetMethodID(env, cls, "getOnTick", "()J")));
-	long offSample = tickToSample(
-			(*env)->CallLongMethod(env, obj,
-					(*env)->GetMethodID(env, cls, "getOffTick", "()J")));
+	long onTick = (*env)->CallLongMethod(env, obj,
+					(*env)->GetMethodID(env, cls, "getOnTick", "()J"));
+	long offTick = (*env)->CallLongMethod(env, obj,
+					(*env)->GetMethodID(env, cls, "getOffTick", "()J"));
 	jbyte volume = (*env)->CallByteMethod(env, obj,
 			(*env)->GetMethodID(env, cls, "getVelocity", "()B"));
 	jbyte pan = (*env)->CallByteMethod(env, obj,
@@ -295,15 +293,14 @@ void setNextNote(Track *track, jobject obj) {
 	jbyte pitch = (*env)->CallByteMethod(env, obj,
 			(*env)->GetMethodID(env, cls, "getPitch", "()B"));
 
-	setNextNoteInfo(track, onSample, offSample, volume, pan, pitch);
+	setNextNoteInfo(track, onTick, offTick, volume, pan, pitch);
 	(*env)->DeleteLocalRef(env, cls);
 }
 
 void updateNextNote(Track *track) {
 	JNIEnv* env = getJniEnv();
 	jobject obj = (*env)->CallStaticObjectMethod(env, getTrackClass(),
-			getNextMidiNoteMethod(), track->num,
-			(jlong) sampleToTick(currSample));
+			getNextMidiNoteMethod(), track->num, (jlong) currTick);
 	setNextNote(track, obj);
 	(*env)->DeleteLocalRef(env, obj);
 }
@@ -431,8 +428,7 @@ jboolean Java_com_kh_beatbot_track_Track_isTrackPlaying(JNIEnv *env, jclass claz
 		return false;
 	}
 
-	return currSample >= track->nextStartSample
-			&& currSample <= track->nextStopSample;
+	return currTick >= track->nextStartTick && currTick <= track->nextStopTick;
 }
 
 jboolean Java_com_kh_beatbot_track_Track_isTrackLooping(JNIEnv *env, jclass clazz,
@@ -448,7 +444,7 @@ jboolean Java_com_kh_beatbot_track_Track_isTrackLooping(JNIEnv *env, jclass claz
 void Java_com_kh_beatbot_track_Track_notifyNoteRemoved(JNIEnv *env, jclass clazz,
 		jint trackId, jlong onTick) {
 	Track *track = getTrack(env, clazz, trackId);
-	if (track->nextStartSample == tickToSample(onTick))
+	if (track->nextStartTick == onTick)
 		stopTrack(track);
 }
 

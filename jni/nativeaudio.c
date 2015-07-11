@@ -145,7 +145,7 @@ void Java_com_kh_beatbot_track_Track_stopTrack(JNIEnv *env, jclass clazz,
 }
 
 void stopAllTracks() {
-	currSample = loopBeginSample;
+	currTick = loopBeginTick;
 	TrackNode *cur_ptr = trackHead;
 	while (cur_ptr != NULL ) {
 		stopTrack(cur_ptr->track);
@@ -161,15 +161,15 @@ void disarm() {
 static inline void generateNextBuffer() {
 	int samp, channel;
 	for (samp = 0; samp < BUFF_SIZE_FRAMES; samp++) {
-		if (currSample > loopEndSample) {
+		if (currTick > loopEndTick) {
 			stopAllTracks();
 		}
 		TrackNode *cur_ptr = trackHead;
 		while (cur_ptr != NULL ) {
 			Track *track = cur_ptr->track;
-			if (playing && currSample == track->nextStartSample) {
+			if (playing && currTick == track->nextStartTick) {
 				playTrack(track);
-			} else if (currSample == track->nextStopSample) {
+			} else if (currTick == track->nextStopTick) {
 				stopTrack(track);
 			}
 			fillTempSample(track);
@@ -180,7 +180,10 @@ static inline void generateNextBuffer() {
 			cur_ptr = cur_ptr->next;
 		}
 		if (playing) {
-			currSample++;
+			if (++currSample % SPT == 0) {
+				currTick++;
+				currSample = 0;
+			}
 		}
 	}
 }

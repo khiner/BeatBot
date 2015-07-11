@@ -21,7 +21,7 @@ static inline long sampleToTick(long sample) {
 }
 
 bool isPlaying();
-void updateNextNoteSamples();
+void updateNextNoteTicks();
 void updateNextNote(Track *track);
 void arm();
 void stopTrack(Track *track);
