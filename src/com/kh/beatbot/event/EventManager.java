@@ -12,12 +12,8 @@ public class EventManager {
 	private static int currEventIndex = -1;
 	private static Set<StatefulEventListener> listeners = new HashSet<StatefulEventListener>();
 
-	public static List<Stateful> getEvents() {
-		return events;
-	}
-
-	public static int getCurrentEventIndex() {
-		return currEventIndex;
+	public static Stateful getLastEvent() {
+		return events.isEmpty() ? null : events.get(currEventIndex);
 	}
 
 	public static void clearEvents() {

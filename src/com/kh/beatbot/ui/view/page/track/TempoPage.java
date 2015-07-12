@@ -1,5 +1,8 @@
 package com.kh.beatbot.ui.view.page.track;
 
+import com.kh.beatbot.event.EventManager;
+import com.kh.beatbot.event.Stateful;
+import com.kh.beatbot.event.TempoChangeEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -11,7 +14,10 @@ public class TempoPage extends TrackPage {
 	private Button tapTempoButton;
 	private BpmView bpmView;
 	private long lastTapTime = 0;
+	private long lastTempoSetEventMillis = 0;
 	private final int ONE_MINUTE_MILLIS = 60000;
+	// group any tempo-tap set events in this time period together
+	private final long EVENT_CONSOLIDATION_MILLIS = 1500;
 
 	public TempoPage(View view) {
 		super(view);
@@ -29,12 +35,21 @@ public class TempoPage extends TrackPage {
 			@Override
 			public void onRelease(Button button) {
 				long tapTime = System.currentTimeMillis();
-				float elapsedMillis = tapTime - lastTapTime;
-				float bpm = ONE_MINUTE_MILLIS / elapsedMillis; // TODO average across last 3/4 taps
+				float bpm = ONE_MINUTE_MILLIS / (tapTime - lastTapTime);
+				// if we are far outside of the range, don't change the tempo.
+				// otherwise, midiManager will take care of clipping the result
 				if (bpm <= MidiManager.MAX_BPM + 20 && bpm >= MidiManager.MIN_BPM - 20) {
-					// if we are far outside of the range, don't change the tempo.
-					// otherwise, midiManager will take care of clipping the result
-					MidiManager.setBPM(bpm);
+					Stateful latestEvent = EventManager.getLastEvent();
+					if (latestEvent instanceof TempoChangeEvent
+							&& tapTime - lastTempoSetEventMillis < EVENT_CONSOLIDATION_MILLIS) {
+						// group close tempo-tap events together on the undo-stack
+						TempoChangeEvent tempoChangeEvent = (TempoChangeEvent) latestEvent;
+						tempoChangeEvent.setEndBpm(bpm);
+						tempoChangeEvent.doExecute();
+					} else {
+						new TempoChangeEvent(bpm).execute();
+					}
+					lastTempoSetEventMillis = tapTime;
 				}
 				lastTapTime = tapTime;
 			}

@@ -13,6 +13,10 @@ public class TempoChangeEvent extends Executable implements Temporal {
 		this.endBpm = newBpm;
 	}
 
+	public void setEndBpm(float bpm) {
+		endBpm = bpm;
+	}
+
 	@Override
 	public void undo() {
 		new TempoChangeEvent(beginBpm).apply();
