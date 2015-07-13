@@ -41,7 +41,7 @@ public class FileManager implements FileListener {
 	}
 
 	public static void init(Context context) {
-		initDataDir();
+		initDataDir(context);
 
 		rootDirectory = new File("/");
 		audioDirectory = new File(appDirectoryPath + "/audio");
@@ -85,14 +85,14 @@ public class FileManager implements FileListener {
 		return sampleName;
 	}
 
-	private static void initDataDir() {
+	private static void initDataDir(Context context) {
 		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			// we can read and write to external storage
 			String extStorageDir = Environment.getExternalStorageDirectory().toString();
 			appDirectoryPath = extStorageDir + "/BeatBot/";
 		} else { // we need read AND write access for this app - default to
 					// internal storage
-			// appDirectoryPath = getFilesDir().toString() + "/";
+			appDirectoryPath = context.getApplicationContext().getFilesDir().toString() + "/";
 			// TODO throw / catch exception - need External SD Card!
 		}
 	}
@@ -138,7 +138,8 @@ public class FileManager implements FileListener {
 			for (String fileName : assetManager.list(assetType)) {
 				// the sample folder for this sample type does not yet exist.
 				// create it and write all assets of this type to the folder
-				copyFromAssetsToExternal(assetType + "/" + fileName);
+				String assetPath = assetType + "/" + fileName;
+				copyFromAssetsToExternal(assetPath);
 			}
 		}
 	}
