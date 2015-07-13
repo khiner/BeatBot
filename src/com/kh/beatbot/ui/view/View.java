@@ -161,8 +161,18 @@ public class View implements Comparable<View> {
 		stateChanged();
 	}
 
+	public IconResourceSet getIcon() {
+		return icon;
+	}
+
 	public final void setResourceId(IconResourceSet resourceSet) {
 		icon.setResourceId(resourceSet);
+		stateChanged();
+	}
+
+	public final synchronized void setColors(IconResourceSet resourceSet) {
+		icon.setFillColors(resourceSet);
+		icon.setStrokeColors(resourceSet);
 		stateChanged();
 	}
 

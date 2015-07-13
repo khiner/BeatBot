@@ -10,7 +10,6 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class FileMenuItem extends MenuItem implements OnLongPressListener {
 	private File file;
-
 	private boolean ignoreRelease = false;
 
 	public FileMenuItem(Menu menu, MenuItem parent, File file) {
@@ -18,6 +17,9 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
 		this.file = file;
 		if (file.isFile()) {
 			button.setOnLongPressListener(this);
+		}
+		if (parent != null) {
+			setIconColors(parent.getIcon());
 		}
 	}
 

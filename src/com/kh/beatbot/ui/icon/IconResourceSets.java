@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.kh.beatbot.R;
 import com.kh.beatbot.ui.color.Color;
+import com.kh.beatbot.ui.icon.IconResourceSet.State;
 
 public class IconResourceSets {
 	public static IconResourceSet
@@ -25,43 +26,49 @@ public class IconResourceSets {
 			QUANTIZE = s(r(R.drawable.quantize_icon, null, Color.WHITE), r(R.drawable.quantize_icon, null, Color.TRON_BLUE), null, r(R.drawable.quantize_icon, null, Color.SEMI_TRANSPARENT)),
 			DELETE_NOTE = s(r(R.drawable.delete_icon, null, Color.WHITE), r(R.drawable.delete_icon, null, Color.LEVEL_SELECTED), null, r(R.drawable.delete_icon, null, Color.SEMI_TRANSPARENT)),
 
+			TOGGLE= s(r(R.drawable.toggle_icon, Color.LABEL_MED, null, Color.WHITE, Color.WHITE), r(R.drawable.toggle_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK), r(R.drawable.toggle_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.TRON_BLUE)),
+
 			INSTRUMENT_BASE = s(r(Color.LABEL_TRANS, null, Color.WHITE), r(Color.LABEL_SELECTED), r(Color.TRON_BLUE)),
-			BROWSE = s(r(R.drawable.browse_icon), r(R.drawable.browse_icon), r(R.drawable.browse_icon)),
-			DRUMS= s(r(R.drawable.drums_icon), r(R.drawable.drums_icon), r(R.drawable.drums_icon)),
-			KICK= s(r(R.drawable.kick_icon), r(R.drawable.kick_icon), r(R.drawable.kick_icon)),
-			SNARE= s(r(R.drawable.snare_icon), r(R.drawable.snare_icon), r(R.drawable.snare_icon)),
-			HH_CLOSED = s(r(R.drawable.hh_closed_icon), r(R.drawable.hh_closed_icon), r(R.drawable.hh_closed_icon)),
-			HH_OPEN = s(r(R.drawable.hh_open_icon), r(R.drawable.hh_open_icon), r(R.drawable.hh_open_icon)),
-			RIMSHOT = s(r(R.drawable.rimshot_icon), r(R.drawable.rimshot_icon), r(R.drawable.rimshot_icon)),
-			MICROPHONE = s(r(R.drawable.microphone_icon), r(R.drawable.microphone_icon), r(R.drawable.microphone_icon)),
-			BEAT = s(r(R.drawable.beat_icon), r(R.drawable.beat_icon), r(R.drawable.beat_icon)),
-			SAMPLE = s(r(R.drawable.sample_icon), r(R.drawable.sample_icon), r(R.drawable.sample_icon)),
+			BROWSE = s(r(R.drawable.browse_icon)),
+			DRUMS= s(r(R.drawable.drums_icon)),
+			KICK= s(r(R.drawable.kick_icon)),
+			SNARE= s(r(R.drawable.snare_icon)),
+			HH_CLOSED = s(r(R.drawable.hh_closed_icon)),
+			HH_OPEN = s(r(R.drawable.hh_open_icon)),
+			RIMSHOT = s(r(R.drawable.rimshot_icon)),
+			MICROPHONE = s(r(R.drawable.microphone_icon)),
+			BEAT = s(r(R.drawable.beat_icon)),
+			SAMPLE = s(r(R.drawable.sample_icon)),
 			
-			BROWSE_PAGE = s(r(Color.LABEL_SELECTED), r(Color.LABEL_SELECTED)),
+			BROWSE_PAGE = s(r(Color.VIEW_BG), r(Color.LABEL_LIGHT)),
 			SLIDE_MENU = s(r(R.drawable.menu_icon, Color.LABEL_SELECTED, null), r(R.drawable.menu_icon, Color.LABEL_SELECTED, null)),
-					
+
 			DELETE_TRACK = s(r(R.drawable.delete_track_icon, Color.TRANSPARENT, Color.RED), r(R.drawable.delete_track_icon, Color.RED, Color.BLACK)),
 
-			LABEL_BASE = s(r(Color.LABEL_DARK, null, Color.WHITE), r(Color.TRON_BLUE), r(Color.LABEL_SELECTED)),
-			ADD = s(r(R.drawable.plus_outline), r(R.drawable.plus_outline), r(R.drawable.plus_outline)),
-			NOTE_LEVELS = s(r(R.drawable.note_levels_icon), r(R.drawable.note_levels_icon), r(R.drawable.note_levels_icon)),
-			ADSR = s(r(R.drawable.adsr_icon), r(R.drawable.adsr_icon), r(R.drawable.adsr_icon)),
-			LEVELS = s(r(R.drawable.levels_icon), r(R.drawable.levels_icon), r(R.drawable.levels_icon)),
+			LABEL_BASE = s(r(Color.LABEL_DARK, null, Color.WHITE), r(Color.LABEL_SELECTED), r(Color.TRON_BLUE)),
+			ADD = s(r(R.drawable.plus_outline)),
+			NOTE_LEVELS = s(r(R.drawable.note_levels_icon)),
+			ADSR = s(r(R.drawable.adsr_icon)),
+			LEVELS = s(r(R.drawable.levels_icon)),
 
-			CLOCK = s(r(R.drawable.clock_icon), r(R.drawable.clock_icon), r(R.drawable.clock_icon)),
+			CLOCK = s(r(R.drawable.clock_icon)),
 
 			MENU_ITEM = s(r(null), r(Color.LABEL_LIGHT), r(Color.TRON_BLUE)),
+			FILE_MENU_ITEM = s(r(Color.LABEL_DARK, null, Color.WHITE), r(Color.LABEL_MED, null, Color.BLACK)),
+			LIST_ITEM_EMPTY = s(r(R.drawable.plus_outline, Color.LABEL_DARK, null, Color.WHITE, Color.WHITE), r(R.drawable.plus_outline, Color.LABEL_MED, null, Color.WHITE, Color.WHITE)),
+			LIST_ITEM_OFF = s(TOGGLE.getResource(State.DEFAULT)),
+			LIST_ITEM_ON = s(TOGGLE.getResource(State.SELECTED)),
 
 			FILE = s(r(R.drawable.browse_icon, null, null, null, Color.BLACK), r(R.drawable.browse_icon, null, null, null, Color.TRON_BLUE)),
 			SETTINGS = s(r(R.drawable.settings_icon, null, null, null, Color.BLACK), r(R.drawable.settings_icon, null, null, null, Color.TRON_BLUE)),
-			SNAP_TO_GRID = s(r(R.drawable.snap_to_grid_icon), r(R.drawable.snap_to_grid_icon)),
-			MIDI_IMPORT = s(r(R.drawable.midi_import_icon), r(R.drawable.midi_import_icon)),
-			MIDI_EXPORT = s(r(R.drawable.midi_export_icon), r(R.drawable.midi_export_icon)),
+			SNAP_TO_GRID = s(r(R.drawable.snap_to_grid_icon)),
+			MIDI_IMPORT = s(r(R.drawable.midi_import_icon)),
+			MIDI_EXPORT = s(r(R.drawable.midi_export_icon)),
 
-			ATTACK = s(r(R.drawable.attack_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.attack_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK), r(R.drawable.attack_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK)),
-			DECAY = s(r(R.drawable.decay_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.decay_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK), r(R.drawable.decay_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK)),
-			SUSTAIN = s(r(R.drawable.sustain_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.sustain_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK), r(R.drawable.sustain_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK)),
-			RELEASE = s(r(R.drawable.release_icon, Color.LABEL_TRANS, null, Color.WHITE, Color.WHITE), r(R.drawable.release_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK), r(R.drawable.release_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.BLACK)),
+			ATTACK = s(r(R.drawable.attack_icon)),
+			DECAY = s(r(R.drawable.decay_icon)),
+			SUSTAIN = s(r(R.drawable.sustain_icon)),
+			RELEASE = s(r(R.drawable.release_icon)),
 			
 			VOLUME = s(r(Color.TRANSPARENT, null, Color.TRON_BLUE), r(Color.TRON_BLUE, null, Color.BLACK), r(Color.TRON_BLUE, null, Color.BLACK)),
 			PAN = s(r(Color.TRANSPARENT, null, Color.PAN), r(Color.PAN, null, Color.BLACK), r(Color.PAN, null, Color.BLACK)),
@@ -73,9 +80,8 @@ public class IconResourceSets {
 
 			LINK = s(r(R.drawable.link_icon, null, Color.WHITE), r(R.drawable.link_icon, null, Color.LABEL_SELECTED), r(R.drawable.link_icon, null, Color.TRON_BLUE)),
 
-			CONTROL_LABEL = s(r(Color.TRANSPARENT, null, Color.WHITE), r(Color.TRON_BLUE, null, Color.BLACK)),
-			TOGGLE = s(r(R.drawable.toggle_icon, Color.LABEL_DARK, Color.LABEL_VERY_LIGHT), r(R.drawable.toggle_icon, Color.TRON_BLUE, Color.BLACK), r(R.drawable.toggle_icon, Color.LABEL_SELECTED, Color.BLACK, Color.BLACK, Color.TRON_BLUE)),
-			TOGGLE_WITHOUT_BORDER = s(r(R.drawable.toggle_icon, Color.LABEL_DARK, null, Color.LABEL_VERY_LIGHT, Color.LABEL_VERY_LIGHT), r(R.drawable.toggle_icon, Color.TRON_BLUE, null, Color.BLACK, Color.BLACK), r(R.drawable.toggle_icon, Color.LABEL_SELECTED, null, Color.BLACK, Color.TRON_BLUE)),
+			CONTROL_LABEL = s(r(Color.TRANSPARENT, null, Color.WHITE), r(Color.LABEL_SELECTED, null, Color.BLACK)),
+
 			BANDPASS_FILTER = s(r(R.drawable.bandpass_filter_icon, Color.LABEL_DARK, Color.WHITE), r(R.drawable.bandpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.bandpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
 			HIGHPASS_FILTER = s(r(R.drawable.highpass_filter_icon, Color.LABEL_DARK, Color.WHITE), r(R.drawable.highpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.highpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
 			LOWPASS_FILTER = s(r(R.drawable.lowpass_filter_icon, Color.LABEL_DARK, Color.WHITE), r(R.drawable.lowpass_filter_icon, Color.LABEL_SELECTED, Color.BLACK), r(R.drawable.lowpass_filter_icon, Color.TRON_BLUE, Color.BLACK)),
@@ -126,8 +132,16 @@ public class IconResourceSets {
 		return new IconResource(resourceId, fillColor, strokeColor);
 	}
 
+	private static IconResource r(int resourceId, float[] fillColor, float[] strokeColor, float[] textColor) {
+		return new IconResource(resourceId, fillColor, strokeColor, textColor);
+	}
+
 	private static IconResource r(int resourceId, float[] fillColor, float[] strokeColor, float[] textColor, float[] iconColor) {
 		return new IconResource(resourceId, fillColor, strokeColor, textColor, iconColor);
+	}
+
+	private static IconResourceSet s(IconResource defaultIconResource) {
+		return new IconResourceSet(defaultIconResource, defaultIconResource);
 	}
 
 	private static IconResourceSet s(IconResource defaultIconResource, IconResource pressedIconResource) {

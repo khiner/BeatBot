@@ -33,7 +33,9 @@ public class BrowsePage extends Menu implements TrackListener {
 				FileManager.rootDirectory };
 
 		for (File topLevelDir : topLevelDirs) {
-			topLevelItems.add(new FileMenuItem(this, null, topLevelDir));
+			FileMenuItem fileMenuItem = new FileMenuItem(this, null, topLevelDir);
+			fileMenuItem.setIcon(IconResourceSets.FILE_MENU_ITEM);
+			topLevelItems.add(fileMenuItem);
 		}
 	}
 

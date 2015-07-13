@@ -182,7 +182,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 
 		tab.layout(x - mainPage.width + width, menuOffset / 2, columnWidth,
 				mainPage.controlButtonGroup.height + menuOffset * 2);
-		textureMesh.layout(x + width + menuOffset * 2, menuOffset / 2, tab.height, tab.height);
+		textureMesh.layout(x + width + menuOffset * 8, menuOffset / 2, tab.height, tab.height);
 
 		fillColor[3] = GeneralUtils.clipToUnit(textureMesh.x / width) * .75f;
 		foregroundRect.setFillColor(fillColor);

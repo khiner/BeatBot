@@ -110,7 +110,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 		});
 
 		effectToggle = new ToggleButton(this).oscillating().withRoundedRect()
-				.withIcon(IconResourceSets.TOGGLE_WITHOUT_BORDER);
+				.withIcon(IconResourceSets.TOGGLE);
 		effectToggle.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {

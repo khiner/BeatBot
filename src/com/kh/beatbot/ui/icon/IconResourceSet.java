@@ -60,6 +60,7 @@ public class IconResourceSet {
 			IconResource resource = resourcePair.getValue();
 			if (null != resource && null != otherResource) {
 				resource.strokeColor = otherResource.strokeColor;
+				resource.textColor = otherResource.textColor;
 			}
 		}
 	}

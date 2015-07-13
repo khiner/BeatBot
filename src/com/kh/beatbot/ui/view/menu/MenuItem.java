@@ -62,8 +62,16 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 		button.setOnReleaseListener(listener);
 	}
 
+	public IconResourceSet getIcon() {
+		return button.getIcon();
+	}
+
 	public void setIcon(IconResourceSet icon) {
 		button.setIcon(icon);
+	}
+
+	public void setIconColors(IconResourceSet icon) {
+		button.setColors(icon);
 	}
 
 	public void setResourceId(final IconResourceSet icon) {

@@ -61,7 +61,7 @@ public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListe
 		case ADSR.RELEASE_ID:
 			return IconResourceSets.RELEASE;
 		default:
-			return IconResourceSets.INSTRUMENT_BASE;
+			return null;
 		}
 	}
 
@@ -71,8 +71,8 @@ public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListe
 		paramControl = new SeekbarParamControl(this);
 		adsrButtons = new ToggleButton[ADSR.NUM_PARAMS];
 		for (int i = 0; i < adsrButtons.length; i++) {
-			adsrButtons[i] = new ToggleButton(this).withRoundedRect().withIcon(
-					whichAdsrIconResource(i));
+			adsrButtons[i] = new ToggleButton(this).withRoundedRect().withIcon(IconResourceSets.INSTRUMENT_BASE);
+			adsrButtons[i].setResourceId(whichAdsrIconResource(i));
 			adsrButtons[i].setId(i);
 			adsrButtons[i].setOnReleaseListener(this);
 		}

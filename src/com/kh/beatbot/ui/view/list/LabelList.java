@@ -2,12 +2,9 @@ package com.kh.beatbot.ui.view.list;
 
 import java.util.Collections;
 
-import com.kh.beatbot.R;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.listener.LabelListListener;
-import com.kh.beatbot.ui.color.Color;
-import com.kh.beatbot.ui.icon.IconResource;
-import com.kh.beatbot.ui.icon.IconResourceSet;
+import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.ClickableView;
 import com.kh.beatbot.ui.view.TouchableView;
@@ -18,18 +15,6 @@ public class LabelList extends TouchableView {
 	public static enum LabelState {
 		ON, OFF, EMPTY
 	};
-
-	private static final IconResourceSet
-
-	onIcon = new IconResourceSet(new IconResource(-1, Color.TRON_BLUE, null, Color.WHITE),
-			new IconResource(-1, Color.TRON_BLUE_LIGHT, null, Color.WHITE)),
-
-	offIcon = new IconResourceSet(new IconResource(-1, Color.LABEL_LIGHT, null, Color.WHITE),
-			new IconResource(-1, Color.LABEL_VERY_LIGHT, null, Color.WHITE)),
-
-	emptyIcon = new IconResourceSet(new IconResource(R.drawable.plus_outline, Color.LABEL_DARK,
-			null, Color.WHITE, Color.WHITE), new IconResource(R.drawable.plus_outline,
-			Color.LABEL_MED, null, Color.WHITE, Color.WHITE));
 
 	protected static final float GAP_BETWEEN_LABELS = 5, TEXT_Y_OFFSET = 3;
 	protected LabelListListener labelListListener = null;
@@ -119,7 +104,7 @@ public class LabelList extends TouchableView {
 		public Label(View view, RenderGroup renderGroup) {
 			super(view, renderGroup);
 			initRoundedRect();
-			setIcon(emptyIcon);
+			setIcon(IconResourceSets.LIST_ITEM_EMPTY);
 			setText(EMPTY_TEXT);
 		}
 
@@ -127,13 +112,13 @@ public class LabelList extends TouchableView {
 			this.state = state;
 			switch (state) {
 			case ON:
-				setIcon(onIcon);
+				setIcon(IconResourceSets.LIST_ITEM_ON);
 				break;
 			case OFF:
-				setIcon(offIcon);
+				setIcon(IconResourceSets.LIST_ITEM_OFF);
 				break;
 			case EMPTY:
-				setIcon(emptyIcon);
+				setIcon(IconResourceSets.LIST_ITEM_EMPTY);
 				break;
 			}
 		}
