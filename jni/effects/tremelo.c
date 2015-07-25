@@ -23,20 +23,23 @@ void tremeloconfig_setDepth(TremeloConfig *config, float depth) {
 }
 
 void tremeloconfig_destroy(void *p) {
-	TremeloConfig *config = (TremeloConfig *)p;
+	TremeloConfig *config = (TremeloConfig *) p;
 	free(config->mod[0]);
 	free(config->mod[1]);
 	free(config);
 }
 
 void tremeloconfig_setParam(void *p, float paramNumFloat, float param) {
-	int paramNum = (int)paramNumFloat;
-	TremeloConfig *config = (TremeloConfig *)p;
-	if (paramNum == 0) { // mod frequency
+	TremeloConfig *config = (TremeloConfig *) p;
+	switch ((int) paramNumFloat) {
+	case 0: // mod frequency
 		tremeloconfig_setFrequency(config, param);
-	} else if (paramNum == 1) { // phase
+		break;
+	case 1: // phase
 		tremeloconfig_setPhase(config, param);
-	} else if (paramNum == 2) { // depth
+		break;
+	case 2: // depth
 		tremeloconfig_setDepth(config, param);
+		break;
 	}
 }

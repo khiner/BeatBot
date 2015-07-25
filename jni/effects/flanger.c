@@ -4,7 +4,7 @@ FlangerConfig *flangerconfig_create() {
 	FlangerConfig *flangerConfig = (FlangerConfig *) malloc(
 			sizeof(FlangerConfig));
 	flangerConfig->delayConfig = delayconfigi_create(0.003f, 0.5f,
-			MAX_FLANGER_DELAY + 512);
+	MAX_FLANGER_DELAY + 512);
 	float delayTimeInSamples = 0.003f * SAMPLE_RATE;
 	flangerconfig_setBaseTime(flangerConfig, delayTimeInSamples);
 	delayconfigi_setDelaySamples(flangerConfig->delayConfig, delayTimeInSamples,
@@ -17,7 +17,8 @@ FlangerConfig *flangerconfig_create() {
 }
 
 void flangerconfig_setBaseTime(FlangerConfig *config, float baseTime) {
-	config->baseTime = MIN_FLANGER_DELAY + baseTime*(MAX_FLANGER_DELAY - MIN_FLANGER_DELAY);
+	config->baseTime = MIN_FLANGER_DELAY
+			+ baseTime * (MAX_FLANGER_DELAY - MIN_FLANGER_DELAY);
 }
 
 void flangerconfig_setFeedback(FlangerConfig *config, float feedback) {
@@ -45,20 +46,26 @@ void flangerconfig_destroy(void *p) {
 }
 
 void flangerconfig_setParam(void *p, float paramNumFloat, float param) {
-	int paramNum = (int)paramNumFloat;
 	FlangerConfig *config = (FlangerConfig *) p;
-	if (paramNum == 0) { // delay time
+	switch ((int) paramNumFloat) {
+	case 0:  // delay time
 		flangerconfig_setBaseTime(config, param);
-	} else if (paramNum == 1) { // feedback
+		break;
+	case 1: // feedback
 		delayconfigi_setFeedback(config->delayConfig, param);
-	} else if (paramNum == 2) { // wet/dry
+		break;
+	case 2: // wet/dry
 		config->delayConfig->wet = param;
-	} else if (paramNum == 3) { // modulation rate
+		break;
+	case 3: // modulation rate
 		flangerconfig_setModFreq(config, param);
-	} else if (paramNum == 4) { // modulation amount
+		break;
+	case 4: // modulation amount
 		flangerconfig_setModAmt(config, param);
-	} else if (paramNum == 5) { // phase offset
+		break;
+	case 5: // phase offset
 		flangerconfig_setPhaseShift(config, param);
+		break;
 	}
 }
 

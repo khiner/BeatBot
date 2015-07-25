@@ -9,6 +9,8 @@
 
 #include <math.h>
 
+static const float MIN_DB = -144;
+
 static inline float clipTo(float value, float min, float max) {
 	return value > min ? (value < max ? value : max) : min;
 }
@@ -22,7 +24,11 @@ static inline unsigned char linearToByte(float linear) {
 }
 
 static inline float dbToLinear(float db) {
-	return pow(10, db / 20);
+	if (db < MIN_DB) {
+		return 0;
+	} else {
+		return pow(10, db / 20);
+	}
 }
 
 static inline unsigned char dbToByte(float db) {

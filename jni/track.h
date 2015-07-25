@@ -21,9 +21,9 @@ typedef struct OpenSlOut_ {
  * Hold levels and effects, used for both normal tracks and master track
  */
 typedef struct Levels_ {
+	float scaleChannels[2];
 	float volume, pan, pitch;
 	EffectNode *effectHead;
-	Effect *volPan;
 	// mutex for effects since insertion/setting/removing effects happens on diff thread than processing
 	pthread_mutex_t effectMutex;
 } Levels;

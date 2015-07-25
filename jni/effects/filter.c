@@ -26,9 +26,8 @@ void filterconfig_destroy(void *p) {
 }
 
 void filterconfig_setParam(void *p, float paramNumFloat, float param) {
-	int paramNum = (int) paramNumFloat;
 	FilterConfig *config = (FilterConfig *) p;
-	switch (paramNum) {
+	switch ((int) paramNumFloat) {
 	case 0:
 		config->baseF = param; // frequency
 		break;

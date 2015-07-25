@@ -74,8 +74,6 @@ static inline void notifyMaxFrame(float maxFrame) {
 }
 
 static inline void processEffects(Levels *levels, float **floatBuffer) {
-	levels->volPan->process(levels->volPan->config, floatBuffer,
-			BUFF_SIZE_FRAMES);
 	pthread_mutex_lock(&levels->effectMutex);
 	EffectNode *effectNode = levels->effectHead;
 	while (effectNode != NULL ) {
@@ -101,26 +99,24 @@ static inline void processMasterEffects() {
 }
 
 static inline void mixTracks() {
-	float maxFrame = 0;
+	float maxFrame = 0, total = 0;
 	int channel, samp;
-	float total;
 	for (channel = 0; channel < 2; channel++) {
 		for (samp = 0; samp < BUFF_SIZE_FRAMES; samp++) {
 			total = 0;
-			TrackNode *cur_ptr = trackHead;
-			while (cur_ptr != NULL ) {
-				if (cur_ptr->track->shouldSound) {
-					total += cur_ptr->track->currBufferFloat[channel][samp]
-							* cur_ptr->track->levels->volume;
+			TrackNode *trackNode = trackHead;
+			while (trackNode != NULL ) {
+				Track *track = trackNode->track;
+				if (track->shouldSound) {
+					total += track->currBufferFloat[channel][samp]
+							* track->levels->scaleChannels[channel];
 				}
-				cur_ptr = cur_ptr->next;
+				trackNode = trackNode->next;
 			}
-			total *= masterLevels->volume;
-			openSlOut->currBufferFloat[channel][samp] =
-					total > -1 ? (total < 1 ? total : 1) : -1;
-			if (total > maxFrame) {
+			total = clipTo(total * masterLevels->scaleChannels[channel], -1, 1);
+			openSlOut->currBufferFloat[channel][samp] = total;
+			if (total > maxFrame)
 				maxFrame = total;
-			}
 		}
 	}
 	if (listening
@@ -134,8 +130,8 @@ void Java_com_kh_beatbot_track_Track_previewTrack(JNIEnv *env, jclass clazz,
 	previewTrack(getTrack(env, clazz, trackId));
 }
 
-void Java_com_kh_beatbot_track_Track_stopPreviewingTrack(JNIEnv *env, jclass clazz,
-		jint trackId) {
+void Java_com_kh_beatbot_track_Track_stopPreviewingTrack(JNIEnv *env,
+		jclass clazz, jint trackId) {
 	stopPreviewingTrack(getTrack(env, clazz, trackId));
 }
 
@@ -284,8 +280,9 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env,
 	trackHead = NULL;
 	masterLevels = initLevels();
 	previewEvent = malloc(sizeof(MidiEvent));
-	previewEvent->volume = 128 * 0.8f;
-	previewEvent->pitch = previewEvent->pan = 64;
+	previewEvent->volume = dbToLinear(0);
+	previewEvent->pan = panToScaleValue(0);
+	previewEvent->pitch = .5f;
 }
 
 jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(

@@ -129,20 +129,57 @@ void destroyTracks() {	// destroy all tracks
 	freeEffects(masterLevels);
 }
 
+
+void updateChannelScaleValues(Levels *levels, MidiEvent *midiEvent) {
+	float pan = midiEvent != NULL ? (levels->pan + midiEvent->pan) / 2 : levels->pan;
+	levels->scaleChannels[0] = (1 - pan);
+	levels->scaleChannels[1] = pan;
+
+	int channel;
+	for (channel = 0; channel < 2; channel++) {
+		float volume =
+				midiEvent != NULL ?
+						levels->volume * midiEvent->volume : levels->volume;
+		levels->scaleChannels[channel] *= volume;
+	}
+}
+
+void setPitch(Track *track, MidiEvent *midiEvent) {
+	if (NULL != track->generator) {
+		float pitch = transposeToScaleValue(
+				masterLevels->pitch + track->levels->pitch
+						+ (midiEvent->pitch - .5f));
+		((FileGen *) track->generator->config)->sampleRate = pitch;
+	}
+}
+
+void updatePitch(int trackId) {
+	if (trackId == -1) {
+		// master track - update all pitches
+		TrackNode *cur_ptr = trackHead;
+		while (cur_ptr != NULL ) {
+			updatePitch(cur_ptr->track->num);
+			cur_ptr = cur_ptr->next;
+		}
+	} else {
+		Track *track = getTrack(NULL, NULL, trackId);
+		setPitch(track, track->nextEvent);
+	}
+}
+
 Levels *initLevels() {
 	Levels *levels = malloc(sizeof(Levels));
 	pthread_mutex_init(&levels->effectMutex, NULL );
 	levels->effectHead = NULL;
 	levels->volume = dbToLinear(0);
-	levels->pan = 0;
+	levels->pan = panToScaleValue(0);
 	levels->pitch = 0.5f;
+	updateChannelScaleValues(levels, NULL);
+
 	int effectNum;
 	for (effectNum = 0; effectNum < MAX_EFFECTS_PER_TRACK; effectNum++) {
 		addEffect(levels, NULL );
 	}
-	levels->volPan = initEffect(volumepanconfig_create(), volumepanconfig_set,
-			volumepan_process, volumepanconfig_destroy);
-	levels->volPan->on = true;
 	return levels;
 }
 
@@ -151,8 +188,7 @@ Track *initTrack(int trackId) {
 	track->num = trackId;
 	track->generator = NULL;
 	track->levels = initLevels();
-	track->nextEvent = malloc(sizeof(MidiEvent));
-	track->nextStartTick  = track->nextStopTick = -1;
+	track->nextStartTick = track->nextStopTick = -1;
 	track->currBufferFloat = (float **) malloc(2 * sizeof(float *));
 	track->currBufferFloat[0] = (float *) calloc(BUFF_SIZE_FRAMES,
 			ONE_FLOAT_SIZE);
@@ -160,8 +196,10 @@ Track *initTrack(int trackId) {
 			ONE_FLOAT_SIZE);
 	track->mute = track->solo = false;
 	track->shouldSound = true;
-	track->nextEvent->volume = dbToByte(0);
-	track->nextEvent->pitch = track->nextEvent->pan = linearToByte(.5f);
+	track->nextEvent = malloc(sizeof(MidiEvent));
+	track->nextEvent->volume = dbToLinear(0);
+	track->nextEvent->pan = panToScaleValue(0);
+	track->nextEvent->pitch = .5f;
 	return track;
 }
 
@@ -179,10 +217,11 @@ void fillTempSample(Track *track) {
 }
 
 void soundTrack(Track *track) {
-	if (track->generator == NULL )
-		return;
-	updateLevels(track->num);
-	filegen_start((FileGen *) track->generator->config);
+	if (track->generator != NULL ) {
+		updatePitch(track->num);
+		updateChannelScaleValues(track->levels, track->nextEvent);
+		filegen_start((FileGen *) track->generator->config);
+	}
 }
 
 void stopSoundingTrack(Track *track) {
@@ -203,10 +242,11 @@ void playTrack(Track *track) {
 }
 
 void previewTrack(Track *track) {
-	setPreviewLevels(track);
-	if (track->generator == NULL )
-		return;
-	filegen_start((FileGen *) track->generator->config);
+	updatePitch(track->num);
+	updateChannelScaleValues(track->levels, previewEvent);
+	if (track->generator != NULL ) {
+		filegen_start((FileGen *) track->generator->config);
+	}
 }
 
 void stopPreviewingTrack(Track *track) {
@@ -268,9 +308,9 @@ void setNextNoteInfo(Track *track, jlong onTick, jlong offTick, jbyte volume,
 		jbyte pan, jbyte pitch) {
 	track->nextStartTick = onTick;
 	track->nextStopTick = offTick;
-	track->nextEvent->volume = volume;
-	track->nextEvent->pan = pan;
-	track->nextEvent->pitch = pitch;
+	track->nextEvent->volume = byteToLinear(volume);
+	track->nextEvent->pan = byteToLinear(pan);
+	track->nextEvent->pitch = byteToLinear(pitch);
 }
 
 void setNextNote(Track *track, jobject obj) {
@@ -283,9 +323,9 @@ void setNextNote(Track *track, jobject obj) {
 	jclass cls = (*env)->GetObjectClass(env, obj);
 
 	long onTick = (*env)->CallLongMethod(env, obj,
-					(*env)->GetMethodID(env, cls, "getOnTick", "()J"));
+			(*env)->GetMethodID(env, cls, "getOnTick", "()J"));
 	long offTick = (*env)->CallLongMethod(env, obj,
-					(*env)->GetMethodID(env, cls, "getOffTick", "()J"));
+			(*env)->GetMethodID(env, cls, "getOffTick", "()J"));
 	jbyte volume = (*env)->CallByteMethod(env, obj,
 			(*env)->GetMethodID(env, cls, "getVelocity", "()B"));
 	jbyte pan = (*env)->CallByteMethod(env, obj,
@@ -311,65 +351,29 @@ void Java_com_kh_beatbot_track_Track_setNextNote(JNIEnv *env, jclass clazz,
 	setNextNote(track, midiNote);
 }
 
-void setLevels(Track *track, MidiEvent *midiEvent) {
-	float volume = byteToLinear(midiEvent->volume);
-	float pan = panToScaleValue(
-			masterLevels->pan + track->levels->pan
-					+ byteToLinear(midiEvent->pan) * 2 - 1);
-	float pitch = transposeToScaleValue(
-			masterLevels->pitch + track->levels->pitch
-					+ (midiEvent->pitch - 64));
-	track->levels->volPan->set(track->levels->volPan->config, volume, pan);
-	if (NULL != track->generator) {
-		((FileGen *) track->generator->config)->sampleRate = pitch;
-	}
-}
-
-void updateLevels(int trackId) {
-	if (trackId == -1) {
-		// master track - update all levels
-		updateAllLevels();
-		return;
-	}
-	Track *track = getTrack(NULL, NULL, trackId);
-	setLevels(track, track->nextEvent);
-}
-
-void setPreviewLevels(Track *track) {
-	setLevels(track, previewEvent);
-}
-
-void updateAllLevels() {
-	TrackNode *cur_ptr = trackHead;
-	while (cur_ptr != NULL ) {
-		updateLevels(cur_ptr->track->num);
-		cur_ptr = cur_ptr->next;
-	}
-}
-
-void Java_com_kh_beatbot_track_BaseTrack_setTrackVolume(JNIEnv *env, jclass clazz,
-		jint trackId, jfloat dbVolume) {
+void Java_com_kh_beatbot_track_BaseTrack_setTrackVolume(JNIEnv *env,
+		jclass clazz, jint trackId, jfloat dbVolume) {
 	Levels *levels = getLevels(env, clazz, trackId);
-	if (dbVolume < -144) {
-		levels->volume = 0;
-	} else {
-		levels->volume = dbToLinear(dbVolume);
-	}
-	updateLevels(trackId);
+	levels->volume = dbToLinear(dbVolume);
+	MidiEvent *midiEvent =
+			trackId != -1 ? getTrack(NULL, NULL, trackId)->nextEvent : NULL;
+	updateChannelScaleValues(levels, midiEvent);
 }
 
 void Java_com_kh_beatbot_track_BaseTrack_setTrackPan(JNIEnv *env, jclass clazz,
 		jint trackId, jfloat pan) {
 	Levels *levels = getLevels(env, clazz, trackId);
-	levels->pan = pan;
-	updateLevels(trackId);
+	levels->pan = panToScaleValue(pan);
+	MidiEvent *midiEvent =
+			trackId != -1 ? getTrack(NULL, NULL, trackId)->nextEvent : NULL;
+	updateChannelScaleValues(levels, midiEvent);
 }
 
-void Java_com_kh_beatbot_track_BaseTrack_setTrackPitch(JNIEnv *env, jclass clazz,
-		jint trackId, jfloat pitch) {
+void Java_com_kh_beatbot_track_BaseTrack_setTrackPitch(JNIEnv *env,
+		jclass clazz, jint trackId, jfloat pitch) {
 	Levels *levels = getLevels(env, clazz, trackId);
 	levels->pitch = pitch;
-	updateLevels(trackId);
+	updatePitch(trackId);
 }
 
 jstring Java_com_kh_beatbot_track_Track_setSample(JNIEnv *env, jclass clazz,
@@ -412,8 +416,8 @@ void Java_com_kh_beatbot_track_Track_deleteTrack(JNIEnv *env, jclass clazz,
 	pthread_mutex_unlock(&openSlOut->trackMutex);
 }
 
-void Java_com_kh_beatbot_track_Track_toggleTrackLooping(JNIEnv *env, jclass clazz,
-		jint trackId) {
+void Java_com_kh_beatbot_track_Track_toggleTrackLooping(JNIEnv *env,
+		jclass clazz, jint trackId) {
 	Track *track = getTrack(env, clazz, trackId);
 	if (track->generator == NULL )
 		return;
@@ -421,8 +425,8 @@ void Java_com_kh_beatbot_track_Track_toggleTrackLooping(JNIEnv *env, jclass claz
 	fileGen->looping = !fileGen->looping;
 }
 
-jboolean Java_com_kh_beatbot_track_Track_isTrackPlaying(JNIEnv *env, jclass clazz,
-		jint trackId) {
+jboolean Java_com_kh_beatbot_track_Track_isTrackPlaying(JNIEnv *env,
+		jclass clazz, jint trackId) {
 	Track *track = getTrack(env, clazz, trackId);
 	if (track->generator == NULL ) {
 		return false;
@@ -431,8 +435,8 @@ jboolean Java_com_kh_beatbot_track_Track_isTrackPlaying(JNIEnv *env, jclass claz
 	return currTick >= track->nextStartTick && currTick <= track->nextStopTick;
 }
 
-jboolean Java_com_kh_beatbot_track_Track_isTrackLooping(JNIEnv *env, jclass clazz,
-		jint trackId) {
+jboolean Java_com_kh_beatbot_track_Track_isTrackLooping(JNIEnv *env,
+		jclass clazz, jint trackId) {
 	Track *track = getTrack(env, clazz, trackId);
 	if (track->generator == NULL ) {
 		return false;
@@ -441,15 +445,15 @@ jboolean Java_com_kh_beatbot_track_Track_isTrackLooping(JNIEnv *env, jclass claz
 	return fileGen->looping;
 }
 
-void Java_com_kh_beatbot_track_Track_notifyNoteRemoved(JNIEnv *env, jclass clazz,
-		jint trackId, jlong onTick) {
+void Java_com_kh_beatbot_track_Track_notifyNoteRemoved(JNIEnv *env,
+		jclass clazz, jint trackId, jlong onTick) {
 	Track *track = getTrack(env, clazz, trackId);
 	if (track->nextStartTick == onTick)
 		stopTrack(track);
 }
 
-void Java_com_kh_beatbot_track_Track_setTrackLoopWindow(JNIEnv *env, jclass clazz,
-		jint trackId, jlong loopBeginSample, jlong loopEndSample) {
+void Java_com_kh_beatbot_track_Track_setTrackLoopWindow(JNIEnv *env,
+		jclass clazz, jint trackId, jlong loopBeginSample, jlong loopEndSample) {
 	Track *track = getTrack(env, clazz, trackId);
 	if (track->generator == NULL )
 		return;

@@ -3,8 +3,8 @@
 DelayConfigI *delayconfigi_create() {
 	// allocate memory and set feedback parameter
 	DelayConfigI *p = (DelayConfigI *) malloc(sizeof(DelayConfigI));
-	pthread_mutex_init(&p->mutex, NULL);
-	p->maxSamples = (int)(4.5f * SAMPLE_RATE);
+	pthread_mutex_init(&p->mutex, NULL );
+	p->maxSamples = (int) (4.5f * SAMPLE_RATE);
 	p->delayBuffer = (float **) malloc(2 * sizeof(float *));
 	p->delayBuffer[0] = (float *) malloc(p->maxSamples * sizeof(float));
 	p->delayBuffer[1] = (float *) malloc(p->maxSamples * sizeof(float));
@@ -30,15 +30,19 @@ void delayconfigi_destroy(void *p) {
 }
 
 void delayconfigi_setParam(void *p, float paramNumFloat, float param) {
-	int paramNum = (int)paramNumFloat;
 	DelayConfigI *config = (DelayConfigI *) p;
-	if (paramNum == 0) { // delay time left
+	switch ((int) paramNumFloat) {
+	case 0: // delay time left
 		delayconfigi_setDelayTimeLeft(config, param);
-	} if (paramNum == 1) { // delay time right
+		break;
+	case 1: // delay time right
 		delayconfigi_setDelayTimeRight(config, param);
-	} else if (paramNum == 2) { // feedback
+		break;
+	case 2: // feedback
 		delayconfigi_setFeedback(config, param);
-	} else if (paramNum == 3) { // wet/dry
+		break;
+	case 3: // wet/dry
 		config->wet = param;
+		break;
 	}
 }

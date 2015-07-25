@@ -35,7 +35,6 @@ void filegen_reset(FileGen *config);
 
 static inline void filegen_sndFileRead(FileGen *config, long frame,
 		float *sample) {
-
 	if (frame >= config->bufferStartFrame + BUFF_SIZE_FRAMES
 			|| frame < config->bufferStartFrame) {
 		long seekTo = frame;
@@ -57,7 +56,6 @@ static inline void filegen_sndFileRead(FileGen *config, long frame,
 }
 
 static inline void filegen_tick(FileGen *config, float *sample) {
-
 	// wrap sample around loop window
 	if (config->looping) {
 		if (config->currFrame >= config->loopEnd) {
@@ -103,6 +101,7 @@ static inline void filegen_tick(FileGen *config, float *sample) {
 	} else {
 		config->currFrame += config->sampleRate;
 	}
+
 	float gain = adsr_tick(config->adsr) * config->gain;
 	sample[0] *= gain;
 	sample[1] *= gain;
