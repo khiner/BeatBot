@@ -40,10 +40,7 @@ public abstract class ScrollableView extends TouchableView {
 		childWidth = getChildWidth();
 		childHeight = getChildHeight();
 
-		boolean childWidthChanged = childWidth != prevChildWidth;
-		boolean childHeightChanged = childHeight != prevChildHeight;
-
-		if (horizontal && childWidthChanged) {
+		if (horizontal && childWidth != prevChildWidth) {
 			setXOffset(childWidth > width ? width - childWidth : 0);
 
 			if (childWidth < width) {
@@ -52,7 +49,7 @@ public abstract class ScrollableView extends TouchableView {
 			}
 		}
 
-		if (vertical && childHeightChanged) {
+		if (vertical && childHeight != prevChildHeight) {
 			setYOffset(childHeight > height ? height - childHeight : 0);
 
 			if (childHeight < height) {
@@ -61,8 +58,8 @@ public abstract class ScrollableView extends TouchableView {
 			}
 		}
 
+		float rad = LABEL_HEIGHT / 5;
 		if (horizontal && childWidth > width) {
-			float rad = LABEL_HEIGHT / 5;
 			float x = Math.max(1, -xOffset * width / childWidth);
 			float w = Math.max(rad * 2, width * width / childWidth);
 			getXScrollBar().setCornerRadius(rad);
@@ -70,11 +67,10 @@ public abstract class ScrollableView extends TouchableView {
 		}
 
 		if (vertical && childHeight > height) {
-			float rad = LABEL_HEIGHT / 5;
 			float y = Math.max(1, -yOffset * height / childHeight);
 			float h = Math.max(rad * 2, height * height / childHeight);
 			getYScrollBar().setCornerRadius(rad);
-			getYScrollBar().layout(absoluteX + width - 2.5f * rad, absoluteY + y, 2 * rad, h);
+			getYScrollBar().layout(absoluteX + width - 1.5f * rad, absoluteY + y, 2 * rad, h);
 		}
 	}
 
