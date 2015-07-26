@@ -6,6 +6,7 @@ AdsrConfig *adsrconfig_create() {
 	config->decay = 1;
 	config->sustain = 1;
 	config->release = 0;
+	config->currSample = config->stoppedSample = 0;
 
 	return config;
 }
