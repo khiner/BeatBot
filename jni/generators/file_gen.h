@@ -74,16 +74,22 @@ static inline void filegen_tick(FileGen *config, float *sample) {
 	// perform linear interpolation on the next two samples
 	// (ignoring wrapping around loop - this is close enough and we avoid an extra
 	//  read from disk)
-
-	long frame = (long) config->currFrame;
-	float remainder = config->currFrame - frame;
-	long nextFrame = config->reverse ? frame - 1 : frame + 1;
+	long frame, nextFrame;
+	float remainder;
+	if (config->reverse) {
+		frame = ceil(config->currFrame);
+		remainder = frame - config->currFrame;
+		nextFrame = frame - 1;
+	} else {
+		frame = floor(config->currFrame);
+		remainder = config->currFrame - frame;
+		nextFrame = frame + 1;
+	}
 
 	// read next two samples from current sample (rounded down)
-	int channel;
-
 	filegen_sndFileRead(config, frame, config->tempSample);
 	filegen_sndFileRead(config, nextFrame, config->otherTempSample);
+	int channel;
 	for (channel = 0; channel < config->channels; channel++) {
 		float samp1 = config->tempSample[channel];
 		float samp2 = config->otherTempSample[channel];
