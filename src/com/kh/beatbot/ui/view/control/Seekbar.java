@@ -76,7 +76,7 @@ public class Seekbar extends ControlView1dBase {
 	protected float posToLevel(Pointer pos) {
 		if (pos.x > width - levelBarHeight)
 			return 1;
-		float level = (pos.x - levelBarHeight / 2) / (width - levelBarHeight * 4);
+		float level = (pos.x - levelBarHeight * 2) / (width - levelBarHeight * 4);
 		return level < 0 ? 0 : (level > 1 ? 1 : level);
 	}
 
