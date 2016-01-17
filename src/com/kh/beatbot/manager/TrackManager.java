@@ -237,21 +237,21 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		return false;
 	}
 
-	public static long[] getSelectedTickWindow() {
-		long[] selectedTickWindow = { Long.MAX_VALUE, Long.MIN_VALUE };
+	public static long[] getSelectedNoteTickWindow() {
+		long[] selectedNoteTickWindow = { Long.MAX_VALUE, Long.MIN_VALUE };
 		synchronized (tracks) {
 			for (Track track : tracks) {
 				for (MidiNote note : track.getMidiNotes()) {
-					if (note.isSelected() && note.getOnTick() < selectedTickWindow[0]) {
-						selectedTickWindow[0] = note.getOnTick();
+					if (note.isSelected() && note.getOnTick() < selectedNoteTickWindow[0]) {
+						selectedNoteTickWindow[0] = note.getOnTick();
 					}
-					if (note.isSelected() && note.getOffTick() > selectedTickWindow[1]) {
-						selectedTickWindow[1] = note.getOffTick();
+					if (note.isSelected() && note.getOffTick() > selectedNoteTickWindow[1]) {
+						selectedNoteTickWindow[1] = note.getOffTick();
 					}
 				}
 			}
 		}
-		return selectedTickWindow;
+		return selectedNoteTickWindow;
 	}
 
 	public static Track getTrackByNoteValue(int noteValue) {

@@ -11,7 +11,7 @@ import com.kh.beatbot.ui.shape.RenderGroup;
 public class TouchableView extends View {
 	// map of pointer ID #'s that this window is responsible for to their current position relative
 	// to this window
-	protected SparseArray<Pointer> pointersById = new SparseArray<Pointer>();
+	protected SparseArray<Pointer> pointerById = new SparseArray<Pointer>();
 
 	protected boolean shouldPropagateTouchEvents = true, deselectOnPointerExit = true;
 
@@ -38,15 +38,15 @@ public class TouchableView extends View {
 	}
 
 	public final Pointer getPointer() {
-		return pointersById.valueAt(0);
+		return pointerById.valueAt(0);
 	}
 
 	public final boolean ownsPointer(int id) {
-		return pointersById.get(id) != null;
+		return pointerById.get(id) != null;
 	}
 
 	public final int pointerCount() {
-		return pointersById.size();
+		return pointerById.size();
 	}
 
 	/********************************************************
@@ -159,32 +159,32 @@ public class TouchableView extends View {
 	 ***************************************************************/
 	private final void consumeActionDown(int id, float x, float y) {
 		Pointer pos = new Pointer(id, x, y);
-		pointersById.put(id, pos);
+		pointerById.put(id, pos);
 		handleActionDown(id, pos);
 	}
 
 	private final void consumeActionUp(int id, float x, float y) {
-		Pointer pos = pointersById.get(id);
+		Pointer pos = pointerById.get(id);
 		if (null != pos) {
 			handleActionUp(id, pos);
 		}
-		pointersById.clear();
+		pointerById.clear();
 	}
 
 	private final void consumeActionPointerDown(int id, float x, float y) {
 		Pointer pos = new Pointer(id, x, y);
-		pointersById.put(id, pos);
+		pointerById.put(id, pos);
 		handleActionPointerDown(id, pos);
 	}
 
 	private final void consumeActionPointerUp(int id, float x, float y) {
-		Pointer pos = pointersById.get(id);
+		Pointer pos = pointerById.get(id);
 		handleActionPointerUp(id, pos);
-		pointersById.remove(id);
+		pointerById.remove(id);
 	}
 
 	private final void consumeActionMove(int id, float x, float y) {
-		Pointer pos = pointersById.get(id);
+		Pointer pos = pointerById.get(id);
 		if (null != pos) {
 			pos.set(x, y);
 			handleActionMove(id, pos);

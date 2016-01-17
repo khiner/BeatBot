@@ -283,8 +283,8 @@ public class MidiNotesEventManager {
 	}
 
 	private static void pinchNote(MidiNote midiNote, long onTickDiff, long offTickDiff) {
-		float newOnTick = midiNote.getOnTick();
-		float newOffTick = midiNote.getOffTick();
+		long newOnTick = midiNote.getOnTick();
+		long newOffTick = midiNote.getOffTick();
 		if (midiNote.getOnTick() + onTickDiff >= 0)
 			newOnTick += onTickDiff;
 		if (midiNote.getOffTick() + offTickDiff <= MidiManager.MAX_TICKS)

@@ -282,7 +282,7 @@ public class NoteLevelsView extends TouchableView {
 						GeneralUtils.linearToByte(yToLevel(pos.y)));
 				updateValueLabel(touched);
 			}
-			if (id == pointersById.size() - 1) {
+			if (id == pointerById.size() - 1) {
 				updateDragLine();
 				setLevelsToDragLine();
 			}

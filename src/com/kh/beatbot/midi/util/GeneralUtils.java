@@ -80,4 +80,10 @@ public class GeneralUtils {
 			return min; // sanity check, always favor min
 		return value > min ? (value < max ? value : max) : min;
 	}
+	
+	public static long clipTo(long value, long min, long max) {
+		if (min > max)
+			return min;
+		return value > min ? (value < max ? value : max) : min;
+	}
 }

@@ -8,10 +8,10 @@ public abstract class LongPressableView extends TouchableView {
 
 	Runnable longPressed = new Runnable() {
 		public void run() {
-			if (pointersById.size() <= 0)
+			if (pointerById.size() <= 0)
 				return;
-			int id = pointersById.keyAt(0);
-			longPress(id, pointersById.get(id));
+			int id = pointerById.keyAt(0);
+			longPress(id, pointerById.get(id));
 			longPressing = false;
 		}
 	};

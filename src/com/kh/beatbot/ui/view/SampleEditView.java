@@ -77,8 +77,8 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	private void updateZoom() {
-		float x1 = pointersById.get(zoomLeftPointerId).x;
-		float x2 = pointersById.get(zoomRightPointerId).x;
+		float x1 = pointerById.get(zoomLeftPointerId).x;
+		float x2 = pointerById.get(zoomRightPointerId).x;
 
 		if (x1 >= x2)
 			return; // sanity check
@@ -177,7 +177,7 @@ public class SampleEditView extends ControlView2dBase {
 		if (scrollPointerId == -1) {
 			return false; // need to be scrolling to start zooming
 		}
-		if (pointersById.get(scrollPointerId).x > pointersById.get(id).x) {
+		if (pointerById.get(scrollPointerId).x > pointerById.get(id).x) {
 			zoomLeftPointerId = id;
 			zoomRightPointerId = scrollPointerId;
 		} else {
@@ -186,8 +186,8 @@ public class SampleEditView extends ControlView2dBase {
 		}
 		scrollPointerId = -1; // not scrolling anymore
 
-		zoomLeftAnchorLevel = xToLevel(pointersById.get(zoomLeftPointerId).x);
-		zoomRightAnchorLevel = xToLevel(pointersById.get(zoomRightPointerId).x);
+		zoomLeftAnchorLevel = xToLevel(pointerById.get(zoomLeftPointerId).x);
+		zoomRightAnchorLevel = xToLevel(pointerById.get(zoomRightPointerId).x);
 		return true;
 	}
 
@@ -252,7 +252,7 @@ public class SampleEditView extends ControlView2dBase {
 			return;
 		// stop zooming
 		int scrollPointerId = id == zoomLeftPointerId ? zoomRightPointerId : zoomLeftPointerId;
-		setScrollAnchor(scrollPointerId, pointersById.get(scrollPointerId));
+		setScrollAnchor(scrollPointerId, pointerById.get(scrollPointerId));
 		zoomLeftPointerId = zoomRightPointerId = -1;
 	}
 

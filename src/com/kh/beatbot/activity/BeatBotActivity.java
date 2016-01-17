@@ -274,8 +274,7 @@ public class BeatBotActivity extends Activity {
 		View.mainPage.getPageSelectGroup().selectLevelsPage();
 
 		MidiManager.setBPM(120);
-		MidiManager.setLoopBeginTick(0);
-		MidiManager.setLoopEndTick(MidiManager.TICKS_PER_NOTE * 4);
+		MidiManager.setLoopTicks(0, MidiManager.TICKS_PER_NOTE * 4);
 	}
 
 	public static void clearProject() {
@@ -284,8 +283,7 @@ public class BeatBotActivity extends Activity {
 		TrackManager.destroy();
 
 		MidiManager.setBPM(120);
-		MidiManager.setLoopBeginTick(0);
-		MidiManager.setLoopEndTick(MidiManager.TICKS_PER_NOTE * 4);
+		MidiManager.setLoopTicks(0, MidiManager.TICKS_PER_NOTE * 4);
 	}
 
 	private void shutdown() {

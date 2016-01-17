@@ -69,8 +69,7 @@ public class ProjectFile {
 
 		// global properties
 		JsonObject globalProperties = parser.parse(reader.readLine()).getAsJsonObject();
-		MidiManager.setLoopBeginTick(globalProperties.get(LOOP_BEGIN_TICK).getAsLong());
-		MidiManager.setLoopEndTick(globalProperties.get(LOOP_END_TICK).getAsLong());
+		MidiManager.setLoopTicks(globalProperties.get(LOOP_BEGIN_TICK).getAsLong(), globalProperties.get(LOOP_END_TICK).getAsLong());
 		MidiManager.setBPM(globalProperties.get(TEMPO).getAsFloat());
 		MidiManager.setSnapToGrid(globalProperties.get(SNAP_TO_GRID).getAsBoolean());
 

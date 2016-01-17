@@ -26,7 +26,7 @@ public class MidiManager implements MidiNoteListener {
 			TICKS_PER_NOTE = MidiFile.DEFAULT_RESOLUTION, UNDO_STACK_SIZE = 40,
 			NOTES_PER_MEASURE = 4, TICKS_PER_MEASURE = TICKS_PER_NOTE * NOTES_PER_MEASURE,
 			MIN_TICKS = TICKS_PER_NOTE / 2, MAX_TICKS = TICKS_PER_MEASURE * 4;
-	
+
 	public static final double LOG_2 = Math.log(2);
 
 	private static boolean snapToGrid = true;
@@ -134,7 +134,7 @@ public class MidiManager implements MidiNoteListener {
 		if (copiedNotes.isEmpty())
 			return;
 		// Copied notes should still be selected, so leftmostSelectedTick should be accurate
-		long tickOffset = startTick - TrackManager.getSelectedTickWindow()[0];
+		long tickOffset = startTick - TrackManager.getSelectedNoteTickWindow()[0];
 		for (MidiNote copiedNote : copiedNotes) {
 			copiedNote.setTicks(copiedNote.getOnTick() + tickOffset, copiedNote.getOffTick()
 					+ tickOffset);
@@ -156,16 +156,17 @@ public class MidiManager implements MidiNoteListener {
 		return TICKS_PER_NOTE / (1 << beatDivision);
 	}
 
-	public static float getMajorTickNearestTo(float tick) {
-		float spacing = getMajorTickSpacing();
-		return tick % spacing > spacing / 2 ? getMajorTickAfter(tick) : getMajorTickBefore(tick);
+	public static long getMajorTickNearestTo(long tick) {
+		long spacing = getMajorTickSpacing();
+		long remainder = tick % spacing;
+		return remainder == 0 ? tick : (remainder > spacing / 2 ? getMajorTickAfter(tick) : getMajorTickBefore(tick));
 	}
 
-	public static float getMajorTickBefore(float tick) {
+	public static long getMajorTickBefore(long tick) {
 		return tick - tick % getMajorTickSpacing();
 	}
 
-	public static float getMajorTickAfter(float tick) {
+	public static long getMajorTickAfter(long tick) {
 		return getMajorTickBefore(tick) + getMajorTickSpacing();
 	}
 
@@ -221,24 +222,33 @@ public class MidiManager implements MidiNoteListener {
 		MidiNotesEventManager.end();
 	}
 
-	public static void setLoopBeginTick(long loopBeginTick) {
-		if (loopBeginTick < loopEndTick)
-			setLoopTicks(loopBeginTick, loopEndTick);
-	}
-
-	public static void setLoopEndTick(long loopEndTick) {
-		if (loopEndTick > loopBeginTick)
-			setLoopTicks(loopBeginTick, loopEndTick);
-	}
-
 	public static void setLoopTicks(long loopBeginTick, long loopEndTick) {
-		MidiManager.loopBeginTick = loopBeginTick;
-		MidiManager.loopEndTick = loopEndTick;
-		setLoopTicksNative(loopBeginTick, loopEndTick);
-		TrackManager.updateAllTrackNextNotes();
-		for (LoopWindowListener listener : loopChangeListeners) {
-			listener.onLoopWindowChange(loopBeginTick, loopEndTick);
+		boolean changed = false;
+		long quantizedBeginTick = (long) getMajorTickNearestTo(loopBeginTick);
+		long quantizedEndTick = (long) getMajorTickNearestTo(loopEndTick);
+		if (quantizedBeginTick != MidiManager.loopBeginTick && quantizedBeginTick < quantizedEndTick) {
+			MidiManager.loopBeginTick = quantizedBeginTick;
+			changed = true;
 		}
+		
+		if (quantizedEndTick != MidiManager.loopEndTick && quantizedEndTick > quantizedBeginTick) {
+			MidiManager.loopEndTick = quantizedEndTick;
+			changed = true;
+		}
+
+		if (changed)
+			notifyLoopWindowChanged();
+	}
+
+	// set new loop begin point, preserving loop length
+	public static void translateLoopWindowTo(long tick) {
+		long loopLength = getLoopLength();
+		long newBeginTick = GeneralUtils.clipTo(tick, 0, MAX_TICKS - loopLength);
+		MidiManager.setLoopTicks(newBeginTick, newBeginTick + loopLength);
+	}
+
+	public static void pinchLoopWindow(long beginTickDiff, long endTickDiff) {
+		setLoopTicks(getLoopBeginTick() + beginTickDiff, getLoopEndTick() + endTickDiff);
 	}
 
 	public static long getLoopBeginTick() {
@@ -247,6 +257,10 @@ public class MidiManager implements MidiNoteListener {
 
 	public static long getLoopEndTick() {
 		return loopEndTick;
+	}
+
+	public static long getLoopLength() {
+		return getLoopEndTick() - getLoopBeginTick();
 	}
 
 	private static long getMajorTickSpacing() {
@@ -287,6 +301,14 @@ public class MidiManager implements MidiNoteListener {
 	public void onLevelChanged(MidiNote note, LevelType type) {
 		for (MidiNoteListener listener : midiNoteListeners) {
 			listener.onLevelChanged(note, type);
+		}
+	}
+
+	private static void notifyLoopWindowChanged() {
+		setLoopTicksNative(loopBeginTick, loopEndTick);
+		TrackManager.updateAllTrackNextNotes();
+		for (LoopWindowListener listener : loopChangeListeners) {
+			listener.onLoopWindowChange(loopBeginTick, loopEndTick);
 		}
 	}
 
