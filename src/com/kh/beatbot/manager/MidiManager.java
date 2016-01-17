@@ -26,6 +26,8 @@ public class MidiManager implements MidiNoteListener {
 			TICKS_PER_NOTE = MidiFile.DEFAULT_RESOLUTION, UNDO_STACK_SIZE = 40,
 			NOTES_PER_MEASURE = 4, TICKS_PER_MEASURE = TICKS_PER_NOTE * NOTES_PER_MEASURE,
 			MIN_TICKS = TICKS_PER_NOTE / 2, MAX_TICKS = TICKS_PER_MEASURE * 4;
+	
+	public static final double LOG_2 = Math.log(2);
 
 	private static boolean snapToGrid = true;
 	private static int beatDivision = 0;
@@ -147,15 +149,11 @@ public class MidiManager implements MidiNoteListener {
 	}
 
 	public static void adjustBeatDivision(float numTicksDisplayed) {
-		beatDivision = (int) (Math.log(MAX_TICKS / numTicksDisplayed) / Math.log(2));
+		beatDivision = (int) (Math.log(MAX_TICKS / numTicksDisplayed) / LOG_2);
 	}
 
 	public static long getTicksPerBeat() {
 		return TICKS_PER_NOTE / (1 << beatDivision);
-	}
-
-	public static long millisToTick(long millis) {
-		return (long) ((TICKS_PER_NOTE * 1000f / tempo.getMpqn()) * millis);
 	}
 
 	public static long getMajorTickSpacing() {
