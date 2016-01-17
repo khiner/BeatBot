@@ -64,7 +64,7 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
 		if (loopBarButton.isPressed() && pos.equals(loopBarButton.getPointer())) {
 			// middle selected. move begin and end preserve current loop length
 			float loopLength = MidiManager.getLoopEndTick() - MidiManager.getLoopBeginTick();
-			float newBeginTick = MidiManager.getMajorTickToLeftOf(tick - selectionOffsetTick);
+			float newBeginTick = MidiManager.getMajorTickBefore(tick - selectionOffsetTick);
 			newBeginTick = GeneralUtils.clipTo(newBeginTick, 0, MidiManager.MAX_TICKS - loopLength);
 			MidiManager.setLoopTicks((long) newBeginTick, (long) (newBeginTick + loopLength));
 		}

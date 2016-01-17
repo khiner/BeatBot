@@ -268,7 +268,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	protected void singleTap(int id, Pointer pos) {
 		MidiNote touchedNote = touchedNotes.get(id);
 		if (MidiManager.isCopying()) {
-			MidiManager.paste((long) MidiManager.getMajorTickToLeftOf(xToTick(pos.x)));
+			MidiManager.paste((long) MidiManager.getMajorTickBefore(xToTick(pos.x)));
 		} else if (touchedNote != null) {
 			// single tapping a note always makes it the only selected note
 			if (touchedNote.isSelected()) {
@@ -513,9 +513,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	private void addMidiNote(int track, float tick) {
 		if (track < 0 || track >= TrackManager.getNumTracks())
 			return;
-		long spacing = MidiManager.getMajorTickSpacing();
-		long onTick = (long) (tick - tick % spacing);
-		long offTick = onTick + spacing - 1;
+		long onTick = (long) MidiManager.getMajorTickBefore(tick);
+		long offTick = (long) MidiManager.getMajorTickAfter(tick) - 1;
 		MidiManager.addNote(onTick, offTick, track);
 	}
 

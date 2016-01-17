@@ -156,21 +156,17 @@ public class MidiManager implements MidiNoteListener {
 		return TICKS_PER_NOTE / (1 << beatDivision);
 	}
 
-	public static long getMajorTickSpacing() {
-		return TICKS_PER_MEASURE / (2 << beatDivision);
-	}
-
 	public static float getMajorTickNearestTo(float tick) {
 		float spacing = getMajorTickSpacing();
-		if (tick % spacing > spacing / 2) {
-			return tick + spacing - tick % spacing;
-		} else {
-			return tick - tick % spacing;
-		}
+		return tick % spacing > spacing / 2 ? getMajorTickAfter(tick) : getMajorTickBefore(tick);
 	}
 
-	public static float getMajorTickToLeftOf(float tick) {
+	public static float getMajorTickBefore(float tick) {
 		return tick - tick % getMajorTickSpacing();
+	}
+
+	public static float getMajorTickAfter(float tick) {
+		return getMajorTickBefore(tick) + getMajorTickSpacing();
 	}
 
 	public static void quantize() {
@@ -226,15 +222,13 @@ public class MidiManager implements MidiNoteListener {
 	}
 
 	public static void setLoopBeginTick(long loopBeginTick) {
-		if (loopBeginTick >= loopEndTick)
-			return;
-		setLoopTicks(loopBeginTick, loopEndTick);
+		if (loopBeginTick < loopEndTick)
+			setLoopTicks(loopBeginTick, loopEndTick);
 	}
 
 	public static void setLoopEndTick(long loopEndTick) {
-		if (loopEndTick <= loopBeginTick)
-			return;
-		setLoopTicks(loopBeginTick, loopEndTick);
+		if (loopEndTick > loopBeginTick)
+			setLoopTicks(loopBeginTick, loopEndTick);
 	}
 
 	public static void setLoopTicks(long loopBeginTick, long loopEndTick) {
@@ -253,6 +247,10 @@ public class MidiManager implements MidiNoteListener {
 
 	public static long getLoopEndTick() {
 		return loopEndTick;
+	}
+
+	private static long getMajorTickSpacing() {
+		return TICKS_PER_MEASURE / (2 << beatDivision);
 	}
 
 	@Override
