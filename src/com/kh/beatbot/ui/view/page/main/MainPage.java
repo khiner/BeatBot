@@ -9,7 +9,9 @@ import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.TrackLevelsEventListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.FileManager;
+import com.kh.beatbot.manager.MidiFileManager;
 import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.manager.ProjectFileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.track.BaseTrack;
@@ -32,8 +34,25 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 	public EffectPage effectPage;
 	public MainMenu slideMenu;
 
-	public MainPage(View view) {
+	public MainPage(View view, FileManager fileManager, MidiFileManager midiFileManager,
+			ProjectFileManager projectFileManager) {
 		super(view);
+
+		// XXX don't think this will work, since 'show()' is already called in `super`.  Probably needs more thinking
+		slideMenu = new MainMenu(this, null, fileManager, midiFileManager, projectFileManager);
+
+		// ORDER IS IMPORTANT! (add child page after parent)
+		TrackManager.addTrackLevelsEventListener(this);
+		TrackManager.addTrackListener(this);
+		fileManager.addListener(this);
+
+		TrackManager.addTrackLevelsEventListener(getPageSelectGroup());
+		TrackManager.addTrackListener(getPageSelectGroup());
+		fileManager.addListener(getPageSelectGroup());
+
+		MidiManager.addMidiNoteListener(this);
+		MidiManager.addMidiNoteListener(controlButtonGroup);
+		MidiManager.addMidiNoteListener(getMidiView());
 	}
 
 	@Override
@@ -46,20 +65,6 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 		mainPageFlipper.addPage(effectPage);
 		mainPageFlipper.setPage(editPage);
 		controlButtonGroup.hideEffectToggle();
-		slideMenu = new MainMenu(this, null);
-
-		// ORDER IS IMPORTANT! (add child page after parent)
-		TrackManager.addTrackLevelsEventListener(this);
-		TrackManager.addTrackListener(this);
-		FileManager.addListener(this);
-
-		TrackManager.addTrackLevelsEventListener(getPageSelectGroup());
-		TrackManager.addTrackListener(getPageSelectGroup());
-		FileManager.addListener(getPageSelectGroup());
-		
-		MidiManager.addMidiNoteListener(this);
-		MidiManager.addMidiNoteListener(controlButtonGroup);
-		MidiManager.addMidiNoteListener(getMidiView());
 	}
 
 	@Override
@@ -67,8 +72,7 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 		float controlButtonHeight = height / 10;
 		View.LABEL_HEIGHT = height / 12;
 		View.BG_OFFSET = height / 180;
-		mainPageFlipper
-				.layout(this, 0, controlButtonHeight, width, height - controlButtonHeight);
+		mainPageFlipper.layout(this, 0, controlButtonHeight, width, height - controlButtonHeight);
 		float trackControlWidth = getMidiViewGroup().getTrackControlWidth();
 		controlButtonGroup.layout(this, trackControlWidth, 0, width - trackControlWidth,
 				controlButtonHeight);

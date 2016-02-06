@@ -18,10 +18,13 @@ import com.kh.beatbot.track.Track;
 
 public class MidiFileManager {
 	private static final String MIDI_FILE_EXTENSION = ".midi";
-	private static String inFileName, outFileName;
-	private static AlertDialog confirmImportAlert, fileExistsAlert;
 
-	public static void init(final Context context) {
+	private String inFileName, outFileName;
+	private AlertDialog confirmImportAlert, fileExistsAlert;
+	private FileManager fileManager;
+	
+	public MidiFileManager(final Context context, final FileManager fileManager) {
+		this.fileManager = fileManager;
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage("The file exists. Would you like to overwrite it?").setCancelable(false)
 				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -51,7 +54,7 @@ public class MidiFileManager {
 		confirmImportAlert = builder.create();
 	}
 
-	public static void exportMidi(String fileName) {
+	public void exportMidi(String fileName) {
 		outFileName = fileName;
 		if (!new File(getFullPathName(fileName)).exists()) {
 			completeExport();
@@ -61,7 +64,7 @@ public class MidiFileManager {
 		}
 	}
 
-	public static void importMidi(Context context, String fileName) {
+	public void importMidi(Context context, String fileName) {
 		inFileName = fileName;
 		if (!TrackManager.anyNotes()) {
 			completeImport(context);
@@ -74,7 +77,7 @@ public class MidiFileManager {
 		return fileName.toLowerCase().endsWith(MIDI_FILE_EXTENSION);
 	}
 
-	private static void completeExport() {
+	private void completeExport() {
 		// Create a MidiFile with the tracks we created
 		ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
 		midiTracks.add(MidiManager.getTempoTrack());
@@ -98,7 +101,7 @@ public class MidiFileManager {
 		}
 	}
 
-	private static void completeImport(Context context) {
+	private void completeImport(Context context) {
 		try {
 			MidiFile midiFile = new MidiFile(new FileInputStream(getFullPathName(inFileName)));
 			MidiManager.importFromFile(midiFile);
@@ -109,11 +112,11 @@ public class MidiFileManager {
 		Toast.makeText(context, inFileName, Toast.LENGTH_SHORT).show();
 	}
 
-	private static String getFullPathName(String fileName) {
+	private String getFullPathName(String fileName) {
 		if (!isMidiFileName(fileName)) {
 			fileName = fileName.concat(MIDI_FILE_EXTENSION);
 		}
 
-		return FileManager.midiDirectory.getPath() + "/" + fileName;
+		return fileManager.getMidiDirectory().getPath() + "/" + fileName;
 	}
 }

@@ -22,25 +22,17 @@ public class FileManager implements FileListener {
 
 	public static final String[] ASSET_TYPES = { "drums" };
 
-	public static File rootDirectory, audioDirectory, projectDirectory, midiDirectory,
+	private File rootDirectory, audioDirectory, projectDirectory, midiDirectory,
 			recordDirectory, drumsDirectory, beatRecordDirectory, sampleRecordDirectory;
 
-	private static AssetManager assetManager;
-	private static byte[] copyBuffer = new byte[1024];
-	private static String appDirectoryPath;
-	private static FileManager instance;
+	private AssetManager assetManager;
+	private byte[] copyBuffer = new byte[1024];
+	private String appDirectoryPath;
 
 	// order matters here - track should always be updated first
-	private static List<FileListener> listeners = new ArrayList<FileListener>();
+	private List<FileListener> listeners = new ArrayList<FileListener>();
 
-	public synchronized static FileManager get() {
-		if (instance == null) {
-			instance = new FileManager();
-		}
-		return instance;
-	}
-
-	public static void init(Context context) {
+	public FileManager(Context context) {
 		initDataDir(context);
 
 		rootDirectory = new File("/");
@@ -65,14 +57,33 @@ public class FileManager implements FileListener {
 		}
 	}
 
-	public static void addListener(FileListener listener) {
+	public void addListener(FileListener listener) {
 		listeners.add(listener);
 	}
 
-	public static String recordPathForSource(String source) {
+	public File getRootDirectory() {
+		return rootDirectory;
+	}
+
+	public File getDrumsDirectory() {
+		return drumsDirectory;
+	}
+
+	public File getMidiDirectory() {
+		return midiDirectory;
+	}
+
+	public File getProjectDirectory() {
+		return projectDirectory;
+	}
+
+	public File getRecordDirectory() {
+		return recordDirectory;
+	}
+
+	public String recordPathForSource(String source) {
 		File recordDirectory = source.equals(RecordManager.GLOBAL_RECORD_SOURCE) ? beatRecordDirectory
 				: sampleRecordDirectory;
-
 		return recordDirectory.getPath();
 	}
 
@@ -85,7 +96,7 @@ public class FileManager implements FileListener {
 		return sampleName;
 	}
 
-	private static void initDataDir(Context context) {
+	private void initDataDir(Context context) {
 		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			// we can read and write to external storage
 			String extStorageDir = Environment.getExternalStorageDirectory().toString();
@@ -97,7 +108,7 @@ public class FileManager implements FileListener {
 		}
 	}
 
-	private static void copyFile(InputStream in, OutputStream out) throws IOException {
+	private void copyFile(InputStream in, OutputStream out) throws IOException {
 		int read;
 		while ((read = in.read(copyBuffer)) != -1) {
 			out.write(copyBuffer, 0, read);
@@ -109,7 +120,7 @@ public class FileManager implements FileListener {
 		out = null;
 	}
 
-	private static void copyFromAssetsToExternal(String assetPath) throws IOException {
+	private void copyFromAssetsToExternal(String assetPath) throws IOException {
 		File destDir = new File(audioDirectory.getPath() + "/" + assetPath + "/");
 
 		// create the dir
@@ -131,7 +142,7 @@ public class FileManager implements FileListener {
 		}
 	}
 
-	private static void copyAllSamplesToStorage(Context context) throws IOException {
+	private void copyAllSamplesToStorage(Context context) throws IOException {
 		assetManager = context.getAssets();
 
 		for (String assetType : ASSET_TYPES) {

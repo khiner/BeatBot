@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.widget.Toast;
 
@@ -14,10 +13,12 @@ import com.kh.beatbot.file.ProjectFile;
 public class ProjectFileManager {
 	private static final String PROJECT_FILE_EXTENSION = ".bb";
 
-	private static String projectFileName, pendingFileName;
-	private static AlertDialog confirmLoadAlert, fileExistsAlert;
+	private FileManager fileManager;
+	private String projectFileName, pendingFileName;
+	private AlertDialog confirmLoadAlert, fileExistsAlert;
 
-	public static void init(final Context context) {
+	public ProjectFileManager(final BeatBotActivity context, final FileManager fileManager) {
+		this.fileManager = fileManager;
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage(
 				"A project with this name already exists. Would you like to overwrite it?")
@@ -51,11 +52,11 @@ public class ProjectFileManager {
 		projectFileName = "temp_project";
 	}
 
-	public static String getProjectName() {
+	public String getProjectName() {
 		return projectFileName;
 	}
 
-	public static void saveProject(String fileName) {
+	public void saveProject(String fileName) {
 		pendingFileName = fileName;
 		if (!new File(getFullPathName(fileName)).exists()) {
 			completeSave();
@@ -65,7 +66,7 @@ public class ProjectFileManager {
 		}
 	}
 
-	public static void loadProject(Context context, String fileName) {
+	public void loadProject(BeatBotActivity context, String fileName) {
 		pendingFileName = fileName;
 		if (!TrackManager.anyNotes()) {
 			completeLoad(context);
@@ -78,7 +79,7 @@ public class ProjectFileManager {
 		return fileName.toLowerCase().endsWith(PROJECT_FILE_EXTENSION);
 	}
 
-	private static void completeSave() {
+	private void completeSave() {
 		projectFileName = pendingFileName;
 		try {
 			new ProjectFile(getFullPathName(projectFileName)).save();
@@ -87,10 +88,10 @@ public class ProjectFileManager {
 		}
 	}
 
-	private static void completeLoad(Context context) {
+	private void completeLoad(BeatBotActivity context) {
 		projectFileName = pendingFileName;
 		try {
-			BeatBotActivity.clearProject();
+			context.clearProject();
 			new ProjectFile(getFullPathName(projectFileName)).load();
 		} catch (IOException e) {
 			System.err.println(e);
@@ -99,11 +100,11 @@ public class ProjectFileManager {
 		Toast.makeText(context, getFullPathName(projectFileName), Toast.LENGTH_SHORT).show();
 	}
 
-	private static String getFullPathName(String fileName) {
+	private String getFullPathName(String fileName) {
 		if (!isProjectFileName(fileName)) {
 			fileName = fileName.concat(PROJECT_FILE_EXTENSION);
 		}
 
-		return FileManager.projectDirectory.getPath() + "/" + fileName;
+		return fileManager.getProjectDirectory().getPath() + "/" + fileName;
 	}
 }

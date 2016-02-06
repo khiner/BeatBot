@@ -7,6 +7,9 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.activity.BeatBotActivity;
+import com.kh.beatbot.manager.FileManager;
+import com.kh.beatbot.manager.MidiFileManager;
+import com.kh.beatbot.manager.ProjectFileManager;
 import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResource;
@@ -64,16 +67,19 @@ public class View implements Comparable<View> {
 		this.renderGroup = shouldDraw ? new RenderGroup() : renderGroup;
 		textMesh = new TextMesh(this.renderGroup.getTextGroup());
 		textureMesh = new TextureMesh(this.renderGroup.getTextureGroup());
+	}
+
+	public void init() {
 		createChildren();
 		if (null != parent) {
 			parent.addChild(this);
 		}
 	}
 
-	public static ViewFlipper init(BeatBotActivity context) {
+	public static ViewFlipper init(BeatBotActivity context, FileManager fileManager, MidiFileManager midiFileManager, ProjectFileManager projectFileManager) {
 		View.context = context;
 		root = new GLSurfaceViewGroup(context);
-		mainPage = new MainPage(null);
+		mainPage = new MainPage(null, fileManager, midiFileManager, projectFileManager);
 
 		ViewFlipper rootFlipper = new ViewFlipper(null);
 		// only single page for now

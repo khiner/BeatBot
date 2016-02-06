@@ -34,7 +34,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	private static Track currTrack;
 
 	private TrackManager() {
-		FileManager.addListener(this);
 		MidiManager.addMidiNoteListener(this);
 	}
 

@@ -9,6 +9,7 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.PagerListener;
 import com.kh.beatbot.listener.TrackLevelsEventListener;
 import com.kh.beatbot.listener.TrackListener;
+import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.track.BaseTrack;
@@ -49,8 +50,15 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	public static TrackPageButtonRow trackButtonRow;
 	public static MasterPageButtonRow masterButtonRow;
 
-	public PageSelectGroup(View view) {
+	public PageSelectGroup(View view, FileManager fileManager) {
 		super(view);
+	}
+
+	public PageSelectGroup withFileManager(FileManager fileManager) {
+		browsePage = new BrowsePage(pager, null).withFileManager(fileManager);
+		browsePage.setClip(true);
+		
+		return this;
 	}
 
 	public void selectEffectPage() {
@@ -106,8 +114,6 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 		levelsPage = new TrackLevelsPage(pager);
 		effectSelectPage = new EffectSelectPage(pager);
-		browsePage = new BrowsePage(pager, null);
-		browsePage.setClip(true);
 		editPage = new SampleEditPage(pager);
 		adsrPage = new AdsrPage(pager);
 		noteLevelsPage = new NoteLevelsPage(pager);

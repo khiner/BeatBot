@@ -43,6 +43,10 @@ public class BeatBotActivity extends Activity {
 	private static ViewFlipper activityPager;
 	private static EditText bpmInput, projectFileNameInput, midiFileNameInput, sampleNameInput;
 
+	private FileManager fileManager;
+	private MidiFileManager midiFileManager;
+	private ProjectFileManager projectFileManager;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -57,15 +61,15 @@ public class BeatBotActivity extends Activity {
 			createAudioPlayer();
 
 			Color.init(this);
-			FileManager.init(this);
-			ProjectFileManager.init(this);
-			MidiFileManager.init(this);
+			fileManager = new FileManager(this);
+			projectFileManager = new ProjectFileManager(this, fileManager);
+			midiFileManager = new MidiFileManager(this, fileManager);
 			RecordManager.init(this);
-			activityPager = View.init(this);
+			activityPager = View.init(this, fileManager, midiFileManager, projectFileManager);
 
 			MidiManager.init();
 			TrackManager.init(this);
-
+			fileManager.addListener(TrackManager.get()); // XXX
 			arm();
 
 			setupDefaultProject();
@@ -140,7 +144,7 @@ public class BeatBotActivity extends Activity {
 			sampleNameInput.setText(fileToEdit.getName());
 			break;
 		case PROJECT_FILE_NAME_EDIT_DIALOG_ID:
-			projectFileNameInput.setText(ProjectFileManager.getProjectName());
+			projectFileNameInput.setText(projectFileManager.getProjectName());
 			break;
 		case MIDI_FILE_NAME_EDIT_DIALOG_ID:
 		case EXIT_DIALOG_ID:
@@ -181,7 +185,7 @@ public class BeatBotActivity extends Activity {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							String sampleName = sampleNameInput.getText().toString();
-							new SampleRenameEvent(fileToEdit, sampleName).execute();
+							new SampleRenameEvent(fileManager, fileToEdit, sampleName).execute();
 						}
 					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 						@Override
@@ -198,7 +202,7 @@ public class BeatBotActivity extends Activity {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							String projectFileName = projectFileNameInput.getText().toString();
-							ProjectFileManager.saveProject(projectFileName);
+							projectFileManager.saveProject(projectFileName);
 						}
 					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 						@Override
@@ -215,7 +219,7 @@ public class BeatBotActivity extends Activity {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							String midiFileName = midiFileNameInput.getText().toString();
-							MidiFileManager.exportMidi(midiFileName);
+							midiFileManager.exportMidi(midiFileName);
 						}
 					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 						@Override
@@ -258,15 +262,15 @@ public class BeatBotActivity extends Activity {
 		showDialog(SAMPLE_NAME_EDIT_DIALOG_ID);
 	}
 
-	public static void setupDefaultProject() {
+	public void setupDefaultProject() {
 		// XXX loading a project when currently in the sampleEditView can cause segfault
 		View.mainPage.getPageSelectGroup().selectLevelsPage();
 		EventManager.clearEvents();
 		TrackManager.destroy();
 
-		for (int trackId = 0; trackId < FileManager.drumsDirectory.listFiles().length; trackId++) {
+		for (int trackId = 0; trackId < fileManager.getDrumsDirectory().listFiles().length; trackId++) {
 			new TrackCreateEvent().doExecute();
-			final File sampleFile = FileManager.drumsDirectory.listFiles()[trackId].listFiles()[0];
+			final File sampleFile = fileManager.getDrumsDirectory().listFiles()[trackId].listFiles()[0];
 			TrackManager.setSample(TrackManager.getTrackByNoteValue(trackId), sampleFile);
 		}
 
@@ -277,7 +281,7 @@ public class BeatBotActivity extends Activity {
 		MidiManager.setLoopTicks(0, MidiManager.TICKS_PER_NOTE * 4);
 	}
 
-	public static void clearProject() {
+	public void clearProject() {
 		View.mainPage.getPageSelectGroup().selectLevelsPage();
 		EventManager.clearEvents();
 		TrackManager.destroy();

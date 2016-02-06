@@ -8,7 +8,7 @@ import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.shape.RenderGroup;
 
-public class TouchableView extends View {
+public abstract class TouchableView extends View {
 	// map of pointer ID #'s that this window is responsible for to their current position relative
 	// to this window
 	protected SparseArray<Pointer> pointerById = new SparseArray<Pointer>();

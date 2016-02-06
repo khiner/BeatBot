@@ -19,24 +19,28 @@ import com.kh.beatbot.ui.view.menu.MenuItem;
 
 public class BrowsePage extends Menu implements TrackListener {
 	private Track currTrack;
+	private File[] topLevelDirectories; 
 
 	public BrowsePage(View view, RenderGroup renderGroup) {
 		super(view, renderGroup);
 		setScrollable(true, false);
 	}
 
-	protected synchronized void createMenuItems() {
-		setIcon(IconResourceSets.BROWSE_PAGE);
-		initRoundedRect();
-
-		File[] topLevelDirs = new File[] { FileManager.drumsDirectory, FileManager.recordDirectory,
-				FileManager.rootDirectory };
-
-		for (File topLevelDir : topLevelDirs) {
+	public BrowsePage withFileManager(FileManager fileManager) {
+		topLevelDirectories = new File[] { fileManager.getDrumsDirectory(), fileManager.getRecordDirectory(),
+				fileManager.getRootDirectory() };
+		for (File topLevelDir : topLevelDirectories) {
 			FileMenuItem fileMenuItem = new FileMenuItem(this, null, topLevelDir);
 			fileMenuItem.setIcon(IconResourceSets.FILE_MENU_ITEM);
 			topLevelItems.add(fileMenuItem);
 		}
+		
+		return this;
+	}
+
+	protected synchronized void createMenuItems() {
+		setIcon(IconResourceSets.BROWSE_PAGE);
+		initRoundedRect();
 	}
 
 	@Override

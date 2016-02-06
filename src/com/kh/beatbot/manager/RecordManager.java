@@ -124,12 +124,12 @@ public class RecordManager {
 		}
 	}
 
-	public static String startRecording() {
+	public static String startRecording(FileManager fileManager) {
 		if (!isArmed()) {
 			return null;
 		}
 		
-		String recordDirectory = FileManager.recordPathForSource(currRecordSource);
+		String recordDirectory = fileManager.recordPathForSource(currRecordSource);
 		currRecordFileName = recordDirectory + "/R" + (currFileNum++) + ".wav";
 		try {
 			FileOutputStream out = WavFileUtil.writeWavFileHeader(currRecordFileName, 0, 0);

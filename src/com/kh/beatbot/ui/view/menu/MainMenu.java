@@ -21,7 +21,6 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
 public class MainMenu extends Menu implements FileMenuItemListener {
-
 	private MenuItem fileItem, settingsItem, snapToGridItem, saveProjectItem, loadProjectItem,
 			midiImportItem, midiExportItem;
 
@@ -34,8 +33,16 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	private Rectangle foregroundRect;
 	private static float[] fillColor = Color.TRANSPARENT.clone();
 
-	public MainMenu(View view, RenderGroup renderGroup) {
+	private FileManager fileManager;
+	private MidiFileManager midiFileManager;
+	private ProjectFileManager projectFileManager;
+
+	public MainMenu(View view, RenderGroup renderGroup, FileManager fileManager,
+			MidiFileManager midiFileManager, ProjectFileManager projectFileManager) {
 		super(view, renderGroup);
+		this.fileManager = fileManager;
+		this.midiFileManager = midiFileManager;
+		this.projectFileManager = projectFileManager;
 	}
 
 	protected synchronized void createMenuItems() {
@@ -45,12 +52,12 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		((ToggleButton) snapToGridItem.button).oscillating();
 
 		saveProjectItem = new MenuItem(this, fileItem, false);
-		loadProjectItem = new FileMenuItem(this, fileItem, new File(
-				FileManager.projectDirectory.getPath()));
+		loadProjectItem = new FileMenuItem(this, fileItem, new File(fileManager
+				.getProjectDirectory().getPath()));
 
 		midiExportItem = new MenuItem(this, fileItem, false);
-		midiImportItem = new FileMenuItem(this, fileItem, new File(
-				FileManager.midiDirectory.getPath()));
+		midiImportItem = new FileMenuItem(this, fileItem, new File(fileManager.getMidiDirectory()
+				.getPath()));
 
 		topLevelItems.add(fileItem);
 		topLevelItems.add(settingsItem);
@@ -133,9 +140,9 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	@Override
 	public void onFileMenuItemReleased(FileMenuItem fileItem) {
 		if (fileItem.equals(midiImportItem))
-			MidiFileManager.importMidi(context, fileItem.getText());
+			midiFileManager.importMidi(context, fileItem.getText());
 		else
-			ProjectFileManager.loadProject(context, fileItem.getText());
+			projectFileManager.loadProject(context, fileItem.getText());
 	}
 
 	@Override
@@ -259,7 +266,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 			snap = true;
 		}
 	}
-	
+
 	private class SnapToGridMenuItem extends MenuItem implements SnapToGridListener {
 		public SnapToGridMenuItem(Menu menu, MenuItem parent, boolean toggle) {
 			super(menu, parent, toggle);
