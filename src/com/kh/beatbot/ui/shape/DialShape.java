@@ -2,12 +2,12 @@ package com.kh.beatbot.ui.shape;
 
 import com.kh.beatbot.ui.color.Color;
 
-public class KnobShape extends Shape {
+public class DialShape extends Shape {
 	private static final int NUM_FILL_VERTICES = 128;
 	private static final short[] FILL_INDICES = getFillIndices();
 	private int levelVertex = 0;
 
-	public KnobShape(RenderGroup group, float[] fillColor, float[] strokeColor) {
+	public DialShape(RenderGroup group, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, FILL_INDICES, null, NUM_FILL_VERTICES, 0);
 	}
 

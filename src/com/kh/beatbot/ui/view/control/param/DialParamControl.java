@@ -3,22 +3,22 @@ package com.kh.beatbot.ui.view.control.param;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.control.Knob;
-import com.kh.beatbot.ui.view.control.ToggleKnob;
+import com.kh.beatbot.ui.view.control.Dial;
+import com.kh.beatbot.ui.view.control.ToggleDial;
 
-public class KnobParamControl extends LevelParamControl {
+public class DialParamControl extends LevelParamControl {
 	private TouchableView levelControlView;
 
-	public KnobParamControl(View view) {
+	public DialParamControl(View view) {
 		super(view);
 	}
 
-	public KnobParamControl withBeatSync(boolean beatSync) {
-		levelControlView = beatSync ? new ToggleKnob(this) : new Knob(this);
+	public DialParamControl withBeatSync(boolean beatSync) {
+		levelControlView = beatSync ? new ToggleDial(this) : new Dial(this);
 		if (beatSync) {
-			levelControl = ((ToggleKnob) levelControlView).getKnob();
+			levelControl = ((ToggleDial) levelControlView).getDial();
 		} else {
-			levelControl = (Knob) levelControlView;
+			levelControl = (Dial) levelControlView;
 		}
 
 		levelControl.setListener(this);
@@ -28,10 +28,10 @@ public class KnobParamControl extends LevelParamControl {
 	@Override
 	public void setParam(Param param) {
 		super.setParam(param);
-		if (levelControlView instanceof ToggleKnob) {
-			ToggleKnob toggleKnob = (ToggleKnob) levelControlView;
-			param.addToggleListener(toggleKnob);
-			toggleKnob.onParamToggle(param);
+		if (levelControlView instanceof ToggleDial) {
+			final ToggleDial toggleDial = (ToggleDial) levelControlView;
+			param.addToggleListener(toggleDial);
+			toggleDial.onParamToggle(param);
 		}
 	}
 

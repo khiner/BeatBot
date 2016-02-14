@@ -3,13 +3,13 @@ package com.kh.beatbot.ui.view.control;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
-import com.kh.beatbot.ui.shape.KnobShape;
+import com.kh.beatbot.ui.shape.DialShape;
 import com.kh.beatbot.ui.view.View;
 
-public class Knob extends ControlView1dBase {
-	private KnobShape knobShape;
+public class Dial extends ControlView1dBase {
+	private DialShape knobShape;
 
-	public Knob(View view) {
+	public Dial(View view) {
 		super(view);
 	}
 
@@ -34,7 +34,7 @@ public class Knob extends ControlView1dBase {
 
 	@Override
 	public synchronized void createChildren() {
-		knobShape = new KnobShape(renderGroup, Color.TRON_BLUE, null);
+		knobShape = new DialShape(renderGroup, Color.TRON_BLUE, null);
 		addShapes(knobShape);
 	}
 

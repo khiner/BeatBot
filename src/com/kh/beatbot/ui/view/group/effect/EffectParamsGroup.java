@@ -4,11 +4,11 @@ import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.control.param.KnobParamControl;
+import com.kh.beatbot.ui.view.control.param.DialParamControl;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
 
 public class EffectParamsGroup extends TouchableView {
-	protected KnobParamControl[] paramControls;
+	protected DialParamControl[] paramControls;
 	protected Effect effect;
 
 	public EffectParamsGroup(View view) {
@@ -21,9 +21,9 @@ public class EffectParamsGroup extends TouchableView {
 
 	public EffectParamsGroup withEffect(Effect effect) {
 		if (null == this.effect) {
-			paramControls = new KnobParamControl[effect.getNumParams()];
+			paramControls = new DialParamControl[effect.getNumParams()];
 			for (int i = 0; i < paramControls.length; i++) {
-				paramControls[i] = new KnobParamControl(this).withBeatSync(effect.getParam(i)
+				paramControls[i] = new DialParamControl(this).withBeatSync(effect.getParam(i)
 						.isBeatSyncable());
 				paramControls[i].setId(i);
 			}
