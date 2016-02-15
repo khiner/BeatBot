@@ -9,20 +9,17 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 
 public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfaceView.Renderer {
-
-	public GL11 gl;
-
 	private static final long DESIRED_FPS = 45, TICK_MILLIS = (long) (1000.0f / DESIRED_FPS);
-
+	private GL11 gl;
 	// private final long BEGIN_FRAME = 200;
 	// private long frameCount = 0, averageFrameTime = 0;
-
 	private long startTimeMillis = System.currentTimeMillis(), endTimeMillis = 0, deltaTimeMillis = 0;
 
 	public GLSurfaceViewBase(Context context) {
 		super(context);
 		setRenderer(this);
 		setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+		//setPreserveEGLContextOnPause(true);
 	}
 
 	public void onSurfaceChanged(GL10 _gl, int width, int height) {

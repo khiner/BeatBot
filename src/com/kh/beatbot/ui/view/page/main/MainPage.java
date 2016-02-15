@@ -18,7 +18,6 @@ import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.ViewFlipper;
 import com.kh.beatbot.ui.view.group.ControlButtonGroup;
 import com.kh.beatbot.ui.view.group.MidiViewGroup;
-import com.kh.beatbot.ui.view.group.PageSelectGroup;
 import com.kh.beatbot.ui.view.menu.MainMenu;
 
 public class MainPage extends TouchableView implements MidiNoteListener, TrackListener,
@@ -50,9 +49,9 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 		context.getTrackManager().addTrackListener(this);
 		context.getFileManager().addListener(this);
 
-		context.getTrackManager().addTrackLevelsEventListener(getPageSelectGroup());
-		context.getTrackManager().addTrackListener(getPageSelectGroup());
-		context.getFileManager().addListener(getPageSelectGroup());
+		context.getTrackManager().addTrackLevelsEventListener(editPage.pageSelectGroup);
+		context.getTrackManager().addTrackListener(editPage.pageSelectGroup);
+		context.getFileManager().addListener(editPage.pageSelectGroup);
 
 		context.getMidiManager().addMidiNoteListener(this);
 		context.getMidiManager().addMidiNoteListener(controlButtonGroup);
@@ -81,10 +80,6 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 
 	public MidiViewGroup getMidiViewGroup() {
 		return editPage.midiViewGroup;
-	}
-
-	public PageSelectGroup getPageSelectGroup() {
-		return editPage.pageSelectGroup;
 	}
 
 	public MidiView getMidiView() {

@@ -58,8 +58,15 @@ public class BeatBotActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		GeneralUtils.initAndroidSettings(this);
 
-		fontTextureAtlas = new FontTextureAtlas(this, "REDRING-1969-v03.ttf");
-		resourceTextureAtlas = new ResourceTextureAtlas(this);
+		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread thread, Throwable ex) {
+				Log.e("here", ex.getMessage());
+			}
+		});
+
+		fontTextureAtlas = new FontTextureAtlas(getAssets(), "REDRING-1969-v03.ttf");
+		resourceTextureAtlas = new ResourceTextureAtlas(getResources());
 
 		createEngine();
 		createAudioPlayer();
@@ -84,8 +91,18 @@ public class BeatBotActivity extends Activity {
 		arm();
 		setupDefaultProject();
 
-		((GLSurfaceViewGroup) View.root).setBBRenderer(activityPager);
-		((GLSurfaceViewGroup) View.root).addListener(new GLSurfaceViewGroupListener() {
+		final ViewParent viewParent = ((GLSurfaceViewGroup) View.getRoot()).getParent();
+		if (viewParent == null) {
+			final LinearLayout layout = new LinearLayout(this);
+			final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+					LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
+			View.getRoot().setLayoutParams(lp);
+			layout.addView(View.getRoot());
+			setContentView(layout, lp);
+		}
+
+		((GLSurfaceViewGroup) View.getRoot()).setBBRenderer(activityPager);
+		((GLSurfaceViewGroup) View.getRoot()).addListener(new GLSurfaceViewGroupListener() {
 			@Override
 			public void onGlReady(GLSurfaceViewGroup view) {
 				fontTextureAtlas.loadTexture();
@@ -93,37 +110,30 @@ public class BeatBotActivity extends Activity {
 				activityPager.initGl();
 			}
 		});
-
-		ViewParent viewParent = ((GLSurfaceViewGroup) View.root).getParent();
-		if (null == viewParent) {
-			final LinearLayout layout = new LinearLayout(this);
-			final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-					LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
-			View.root.setLayoutParams(lp);
-			layout.addView(View.root);
-			setContentView(layout, lp);
-		}
 	}
 
 	@Override
 	public void onBackPressed() {
-		if (View.mainPage.effectIsShowing()) {
-			View.mainPage.hideEffect();
+		if (View.getMainPage().effectIsShowing()) {
+			View.getMainPage().hideEffect();
 		} else {
 			showDialog(EXIT_DIALOG_ID);
 		}
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
-		View.root.onResume();
+	public void onPause() {
+		View.getRoot().setVisibility(android.view.View.GONE);
+		//View.onPause();
+		super.onPause();
 	}
 
 	@Override
-	public void onPause() {
-		View.root.onPause();
-		super.onPause();
+	public void onWindowFocusChanged(boolean hasFocus) {
+	    super.onWindowFocusChanged(hasFocus);
+	    if (hasFocus && View.getRoot().getVisibility() == android.view.View.GONE) {
+	         View.getRoot().setVisibility(android.view.View.VISIBLE);
+	    }
 	}
 
 	@Override
@@ -256,7 +266,7 @@ public class BeatBotActivity extends Activity {
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_MENU) {
-			View.mainPage.expandMenu();
+			View.getMainPage().expandMenu();
 			return true;
 		}
 		return super.onKeyUp(keyCode, event);
@@ -271,7 +281,7 @@ public class BeatBotActivity extends Activity {
 
 	public void setupDefaultProject() {
 		// XXX loading a project when currently in the sampleEditView can cause segfault
-		View.mainPage.getPageSelectGroup().selectLevelsPage();
+		View.getPageSelectGroup().selectLevelsPage();
 		EventManager.clearEvents();
 		trackManager.destroy();
 
@@ -283,14 +293,14 @@ public class BeatBotActivity extends Activity {
 		}
 
 		trackManager.getTrackByNoteValue(0).select();
-		View.mainPage.getPageSelectGroup().selectLevelsPage();
+		View.getPageSelectGroup().selectLevelsPage();
 
 		midiManager.setBpm(120);
 		midiManager.setLoopTicks(0, MidiManager.TICKS_PER_NOTE * 4);
 	}
 
 	public void clearProject() {
-		View.mainPage.getPageSelectGroup().selectLevelsPage();
+		View.getPageSelectGroup().selectLevelsPage();
 		EventManager.clearEvents();
 		trackManager.destroy();
 

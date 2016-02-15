@@ -21,14 +21,12 @@ import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.shape.Shape;
 import com.kh.beatbot.ui.view.TouchableView.Pointer;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
+import com.kh.beatbot.ui.view.group.PageSelectGroup;
 import com.kh.beatbot.ui.view.page.main.MainPage;
 
 public class View implements Comparable<View> {
 	protected static final float π = (float) Math.PI, X_OFFSET = 2;
 	protected static float LABEL_HEIGHT = 0, BG_OFFSET = 0;
-
-	public static MainPage mainPage;
-	public static GLSurfaceViewBase root;
 	public static BeatBotActivity context;
 
 	public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0, height = 0;
@@ -50,20 +48,22 @@ public class View implements Comparable<View> {
 	protected IconResourceSet icon = new IconResourceSet(IconResourceSets.DEFAULT);
 	protected String text = "";
 
+	protected static MainPage mainPage;
+	private static GLSurfaceViewBase root;
 	private boolean shouldClip = false;
 	private State state = State.DEFAULT;
 
 	public View(View parent) {
-		this(parent, null == parent ? null : parent.getRenderGroup());
+		this(parent, parent == null ? null : parent.getRenderGroup());
 	}
 
 	public View(View parent, RenderGroup renderGroup) {
-		shouldDraw = (null == renderGroup);
+		shouldDraw = (renderGroup == null);
 		this.renderGroup = shouldDraw ? new RenderGroup() : renderGroup;
 		textMesh = new TextMesh(this.renderGroup.getTextGroup());
 		textureMesh = new TextureMesh(this.renderGroup.getTextureGroup());
 		createChildren();
-		if (null != parent) {
+		if (parent != null) {
 			parent.addChild(this);
 		}
 	}
@@ -73,12 +73,32 @@ public class View implements Comparable<View> {
 		root = new GLSurfaceViewGroup(context);
 		mainPage = new MainPage(null);
 
-		ViewFlipper rootFlipper = new ViewFlipper(null);
+		final ViewFlipper rootFlipper = new ViewFlipper(null);
 		// only single page for now
 		rootFlipper.addPage(mainPage);
 		rootFlipper.setPage(mainPage);
 
 		return rootFlipper;
+	}
+
+	public static void onPause() {
+		root.onPause();
+	}
+	
+	public static void onResume() {
+		root.onResume();
+	}
+
+	public static GLSurfaceViewBase getRoot() {
+		return root;
+	}
+
+	public static MainPage getMainPage() {
+		return mainPage;
+	}
+
+	public static PageSelectGroup getPageSelectGroup() {
+		return mainPage.editPage.pageSelectGroup;
 	}
 
 	public static GL11 getGl() {
@@ -87,6 +107,10 @@ public class View implements Comparable<View> {
 
 	public float unscaledHeight() {
 		return height;
+	}
+
+	public float getTotalHeight() {
+		return root.getHeight();
 	}
 
 	public RenderGroup getRenderGroup() {
@@ -150,7 +174,7 @@ public class View implements Comparable<View> {
 	}
 
 	public final synchronized void setIcon(IconResourceSet resourceSet) {
-		if (null == resourceSet) {
+		if (resourceSet == null) {
 			textureMesh.hide();
 			bgShape.hide();
 			return;
@@ -217,7 +241,7 @@ public class View implements Comparable<View> {
 	}
 
 	public synchronized void removeShape(Shape shape) {
-		if (null != shape) {
+		if (shape != null) {
 			shape.hide();
 			shapes.remove(shape);
 		}
@@ -236,7 +260,7 @@ public class View implements Comparable<View> {
 		this.x = absoluteX = x;
 		this.y = absoluteY = y;
 
-		if (null != parent) {
+		if (parent != null) {
 			absoluteX += parent.absoluteX;
 			absoluteY += parent.absoluteY;
 		}
@@ -290,7 +314,6 @@ public class View implements Comparable<View> {
 	public synchronized void drawAll() {
 		if (shouldClip)
 			startClip(true, true);
-
 		if (shouldDraw)
 			renderGroup.draw();
 
@@ -302,12 +325,12 @@ public class View implements Comparable<View> {
 	}
 
 	public void startClip(boolean clipX, boolean clipY) {
-		if (null == parent)
+		if (parent == null)
 			return;
 		// scissor ensures that each view can only draw within its rect
 		getGl().glEnable(GL10.GL_SCISSOR_TEST);
 		int xClip = clipX ? (int) absoluteX : 0;
-		int yClip = clipY ? (int) (root.getHeight() - absoluteY - height) : 0;
+		int yClip = clipY ? (int) (getTotalHeight() - absoluteY - height) : 0;
 		int clipW = clipX ? (int) width : Integer.MAX_VALUE;
 		int clipH = clipY ? (int) height : Integer.MAX_VALUE;
 
@@ -383,14 +406,14 @@ public class View implements Comparable<View> {
 		if (width <= 0 || height <= 0)
 			return;
 
-		if (shrinkable && null != bgShape && bgShape.isVisible()) {
+		if (shrinkable && bgShape != null && bgShape.isVisible()) {
 			x += BG_OFFSET;
 			y += BG_OFFSET;
 			width -= BG_OFFSET * 2;
 			height -= BG_OFFSET * 2;
 		}
 
-		if (null != bgShape && bgShape instanceof RoundedRect) {
+		if (bgShape != null && bgShape instanceof RoundedRect) {
 			((RoundedRect) bgShape).setCornerRadius(getBgRectRadius());
 		}
 
@@ -402,7 +425,7 @@ public class View implements Comparable<View> {
 			height -= shrink;
 		}
 
-		if (null != bgShape) {
+		if (bgShape != null) {
 			bgShape.layout(x, y, width, height);
 		}
 
@@ -506,7 +529,7 @@ public class View implements Comparable<View> {
 	}
 
 	protected synchronized void stateChanged() {
-		if (null != bgShape) {
+		if (bgShape != null) {
 			bgShape.setColors(getFillColor(), getStrokeColor());
 		}
 
@@ -515,7 +538,7 @@ public class View implements Comparable<View> {
 
 		textMesh.setColor(getTextColor());
 
-		if (null != bgShape && (textureMesh.isVisible() || textMesh.isVisible()))
+		if (bgShape != null && (textureMesh.isVisible() || textMesh.isVisible()))
 			bgShape.show();
 		layoutShape();
 	}
@@ -535,19 +558,19 @@ public class View implements Comparable<View> {
 	}
 
 	protected void initRect() {
-		if (null == bgShape) {
+		if (bgShape == null) {
 			bgShape = new Rectangle(renderGroup, getFillColor(), getStrokeColor());
 		}
 	}
 
 	protected void initRoundedRect() {
-		if (null == bgShape) {
+		if (bgShape == null) {
 			bgShape = new RoundedRect(renderGroup, getFillColor(), getStrokeColor());
 		}
 	}
 
 	public synchronized void show() {
-		if (null != bgShape) {
+		if (bgShape != null) {
 			bgShape.show();
 		}
 		textureMesh.show();
@@ -563,7 +586,7 @@ public class View implements Comparable<View> {
 	}
 
 	public synchronized void hide() {
-		if (null != bgShape) {
+		if (bgShape != null) {
 			bgShape.hide();
 		}
 		textureMesh.hide();
@@ -579,32 +602,32 @@ public class View implements Comparable<View> {
 
 	private float[] getFillColor() {
 		final IconResource currResource = getIconResource();
-		return null == currResource ? null : currResource.fillColor;
+		return currResource == null ? null : currResource.fillColor;
 	}
 
 	private final float[] getStrokeColor() {
 		final IconResource currResource = getIconResource();
-		return null == currResource ? null : currResource.strokeColor;
+		return currResource == null ? null : currResource.strokeColor;
 	}
 
 	private final float[] getTextColor() {
 		final IconResource currResource = getIconResource();
-		if (null == currResource
-				|| (null == currResource.textColor && null == currResource.strokeColor)) {
+		if (currResource == null
+				|| (currResource.textColor == null && currResource.strokeColor == null)) {
 			return Color.BLACK;
 		}
-		return null == currResource.textColor ? currResource.strokeColor : currResource.textColor;
+		return currResource.textColor == null ? currResource.strokeColor : currResource.textColor;
 	}
 
 	private final float[] getIconColor() {
 		final IconResource currResource = getIconResource();
-		return (null == currResource || null == currResource.iconColor) ? getTextColor()
+		return (currResource == null || currResource.iconColor == null) ? getTextColor()
 				: currResource.iconColor;
 	}
 
 	private final int getResourceId() {
 		final IconResource currResource = getIconResource();
-		return null == currResource ? -1 : currResource.resourceId;
+		return currResource == null ? -1 : currResource.resourceId;
 	}
 
 	private final boolean shouldShrink() {

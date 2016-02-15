@@ -9,7 +9,7 @@
 
 package com.kh.beatbot.ui.texture;
 
-import android.app.Activity;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -22,23 +22,18 @@ public class FontTextureAtlas extends TextureAtlas {
 	private final static float[] CHAR_WIDTHS = new float[CHAR_CNT];
 	private final float[] W = new float[1]; // Working Width Value
 	
-	private Typeface tf = null;
-
+	private final Typeface tf;
 
 	// this will load the specified font file, create a texture for the defined
 	// character range, and setup all required values used to render with it.
 	// file - Filename of the font (.ttf, .otf) to use. In 'Assets' folder.
-	public FontTextureAtlas(Activity activity, String fontFilePath) {
+	public FontTextureAtlas(final AssetManager assetManager, final String fontFilePath) {
 		// load the font and setup paint instance for drawing
-		tf = Typeface.createFromAsset(activity.getAssets(), fontFilePath);
-		super.load(activity);
-	}
-
-	public void initConfig() {
+		tf = Typeface.createFromAsset(assetManager, fontFilePath);
 		paint.setAntiAlias(true);
 		paint.setTextSize(DEFAULT_TEXT_SIZE);
 		paint.setTypeface(tf);
-		Paint.FontMetrics fm = paint.getFontMetrics();
+		final Paint.FontMetrics fm = paint.getFontMetrics();
 
 		config = new Config();
 		config.numRegions = CHAR_CNT;
@@ -47,6 +42,9 @@ public class FontTextureAtlas extends TextureAtlas {
 		config.cellHeight = (int) Math.ceil(Math.abs(fm.bottom) + Math.abs(fm.top));
 		config.textureYOffset = config.cellHeight - (float) Math.ceil(Math.abs(fm.descent)) - 1;
 		config.textureSize = calcTextureSize(config.cellHeight);
+
+		super.createCanvas();
+		initTextureRegions();
 	}
 
 	public static float getCharWidth(char chr) {

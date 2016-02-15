@@ -3,7 +3,6 @@ package com.kh.beatbot.ui.texture;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -12,7 +11,6 @@ import android.opengl.GLUtils;
 import com.kh.beatbot.ui.view.View;
 
 public abstract class TextureAtlas {
-
 	protected class Config {
 		protected int numRegions = 0, regionIdOffset = 0, textureSize = 0, cellWidth = 0,
 				cellHeight = 0;
@@ -22,21 +20,21 @@ public abstract class TextureAtlas {
 
 	protected final int[] textureId = new int[1];
 	protected TextureRegion[] textureRegions;
-	protected Bitmap bitmap = null;
-	protected Paint paint = new Paint();
-	protected Canvas canvas = null;
+	protected final Paint paint = new Paint();
+	protected Bitmap bitmap;
+	protected Canvas canvas;
 	protected Config config;
 
-	public void load(Activity activity) {
-		initConfig();
+	protected void createCanvas() {
 		// create an empty bitmap (alpha only)
 		bitmap = Bitmap.createBitmap(config.textureSize, config.textureSize, config.bitmapConfig);
 		canvas = new Canvas(bitmap);
-		initTextureRegions();
 	}
 
 	public void loadTexture() {
-		GL11 gl = View.getGl();
+		if (bitmap.isRecycled())
+			return;
+		final GL11 gl = View.getGl();
 		// Generate Texture ID
 		gl.glGenTextures(1, textureId, 0);
 		// Bind texture id texturing target
@@ -87,8 +85,6 @@ public abstract class TextureAtlas {
 			}
 		}
 	}
-
-	protected abstract void initConfig();
 
 	protected abstract void drawTextureRegion(int regionId, float x, float y);
 }

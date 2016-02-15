@@ -2,7 +2,6 @@ package com.kh.beatbot.ui.texture;
 
 import java.lang.reflect.Field;
 
-import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,27 +10,26 @@ import com.kh.beatbot.R;
 
 public class ResourceTextureAtlas extends TextureAtlas {
 	private final static int[] RESOURCE_IDS = getAllResourceIds();
-	private Resources resources = null;
+	private final Resources resources;
 
-	public ResourceTextureAtlas(Activity activity) {
-		resources = activity.getResources();
-		super.load(activity);
-	}
+	public ResourceTextureAtlas(Resources resources) {
+		this.resources = resources;
 
-	public void initConfig() {
 		config = new Config();
 
 		config.numRegions = RESOURCE_IDS.length;
 		config.regionIdOffset = RESOURCE_IDS[0];
 		config.bitmapConfig = Bitmap.Config.ARGB_4444;
 
-		Bitmap first = BitmapFactory.decodeResource(resources, RESOURCE_IDS[0]);
+		final Bitmap first = BitmapFactory.decodeResource(resources, RESOURCE_IDS[0]);
 		config.cellWidth = first.getWidth();
 		config.cellHeight = first.getHeight();
-
 		config.textureYOffset = 0;
 		// assume all resources are squares of the same width
 		config.textureSize = (int) Math.ceil(Math.sqrt(RESOURCE_IDS.length)) * config.cellWidth;
+
+		super.createCanvas();
+		initTextureRegions();
 	}
 
 	@Override
