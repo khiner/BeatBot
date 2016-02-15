@@ -29,7 +29,8 @@ import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
-import com.kh.beatbot.ui.texture.TextureAtlas;
+import com.kh.beatbot.ui.texture.FontTextureAtlas;
+import com.kh.beatbot.ui.texture.ResourceTextureAtlas;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.ViewFlipper;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
@@ -38,10 +39,18 @@ public class BeatBotActivity extends Activity {
 	public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1, SAMPLE_NAME_EDIT_DIALOG_ID = 2,
 			PROJECT_FILE_NAME_EDIT_DIALOG_ID = 3, MIDI_FILE_NAME_EDIT_DIALOG_ID = 4;
 
-	private static boolean initialized = false;
+	private ViewFlipper activityPager;
+	private EditText bpmInput, projectFileNameInput, midiFileNameInput, sampleNameInput;
 
-	private static ViewFlipper activityPager;
-	private static EditText bpmInput, projectFileNameInput, midiFileNameInput, sampleNameInput;
+	private FileManager fileManager;
+	private ProjectFileManager projectFileManager;
+	private MidiFileManager midiFileManager;
+	private RecordManager recordManager;
+	private MidiManager midiManager;
+	private TrackManager trackManager;
+
+	private FontTextureAtlas fontTextureAtlas;
+	private ResourceTextureAtlas resourceTextureAtlas;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -49,49 +58,51 @@ public class BeatBotActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		GeneralUtils.initAndroidSettings(this);
 
-		TextureAtlas.font.load(this, "REDRING-1969-v03.ttf");
-		TextureAtlas.resource.load(this);
+		fontTextureAtlas = new FontTextureAtlas(this, "REDRING-1969-v03.ttf");
+		resourceTextureAtlas = new ResourceTextureAtlas(this);
 
-		if (!initialized) {
-			createEngine();
-			createAudioPlayer();
+		createEngine();
+		createAudioPlayer();
 
-			Color.init(this);
-			FileManager.init(this);
-			ProjectFileManager.init(this);
-			MidiFileManager.init(this);
-			RecordManager.init(this);
-			activityPager = View.init(this);
+		Color.init(this);
+		fileManager = new FileManager(getApplicationContext(), getAssets());
+		projectFileManager = new ProjectFileManager(this);
+		midiFileManager = new MidiFileManager(this);
+		recordManager = new RecordManager(this);
+		onRecordManagerInit(recordManager);
 
-			MidiManager.init();
-			TrackManager.init(this);
+		midiManager = new MidiManager();
+		trackManager = new TrackManager();
+		onTrackManagerInit(trackManager);
 
-			arm();
+		fileManager.addListener(trackManager);
+		midiManager.addMidiNoteListener(trackManager);
+		midiManager.addTempoListener(trackManager);
 
-			setupDefaultProject();
+		activityPager = View.init(this);
 
-			((GLSurfaceViewGroup) View.root).setBBRenderer(activityPager);
-			((GLSurfaceViewGroup) View.root).addListener(new GLSurfaceViewGroupListener() {
-				@Override
-				public void onGlReady(GLSurfaceViewGroup view) {
-					TextureAtlas.font.loadTexture();
-					TextureAtlas.resource.loadTexture();
-					activityPager.initGl();
-				}
-			});
-		}
+		arm();
+		setupDefaultProject();
+
+		((GLSurfaceViewGroup) View.root).setBBRenderer(activityPager);
+		((GLSurfaceViewGroup) View.root).addListener(new GLSurfaceViewGroupListener() {
+			@Override
+			public void onGlReady(GLSurfaceViewGroup view) {
+				fontTextureAtlas.loadTexture();
+				resourceTextureAtlas.loadTexture();
+				activityPager.initGl();
+			}
+		});
 
 		ViewParent viewParent = ((GLSurfaceViewGroup) View.root).getParent();
 		if (null == viewParent) {
-			LinearLayout layout = new LinearLayout(this);
-			LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+			final LinearLayout layout = new LinearLayout(this);
+			final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 					LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
 			View.root.setLayoutParams(lp);
 			layout.addView(View.root);
 			setContentView(layout, lp);
 		}
-
-		initialized = true;
 	}
 
 	@Override
@@ -134,13 +145,13 @@ public class BeatBotActivity extends Activity {
 	protected void onPrepareDialog(int id, Dialog dialog) {
 		switch (id) {
 		case BPM_DIALOG_ID:
-			bpmInput.setText(String.valueOf((int) MidiManager.getBPM()));
+			bpmInput.setText(String.valueOf((int) midiManager.getBpm()));
 			break;
 		case SAMPLE_NAME_EDIT_DIALOG_ID:
 			sampleNameInput.setText(fileToEdit.getName());
 			break;
 		case PROJECT_FILE_NAME_EDIT_DIALOG_ID:
-			projectFileNameInput.setText(ProjectFileManager.getProjectName());
+			projectFileNameInput.setText(projectFileManager.getProjectName());
 			break;
 		case MIDI_FILE_NAME_EDIT_DIALOG_ID:
 		case EXIT_DIALOG_ID:
@@ -150,7 +161,7 @@ public class BeatBotActivity extends Activity {
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 		switch (id) {
 		case BPM_DIALOG_ID:
@@ -198,7 +209,7 @@ public class BeatBotActivity extends Activity {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							String projectFileName = projectFileNameInput.getText().toString();
-							ProjectFileManager.saveProject(projectFileName);
+							projectFileManager.saveProject(projectFileName);
 						}
 					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 						@Override
@@ -214,8 +225,8 @@ public class BeatBotActivity extends Activity {
 					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							String midiFileName = midiFileNameInput.getText().toString();
-							MidiFileManager.exportMidi(midiFileName);
+							final String midiFileName = midiFileNameInput.getText().toString();
+							midiFileManager.exportMidi(midiFileName);
 						}
 					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 						@Override
@@ -258,45 +269,82 @@ public class BeatBotActivity extends Activity {
 		showDialog(SAMPLE_NAME_EDIT_DIALOG_ID);
 	}
 
-	public static void setupDefaultProject() {
+	public void setupDefaultProject() {
 		// XXX loading a project when currently in the sampleEditView can cause segfault
 		View.mainPage.getPageSelectGroup().selectLevelsPage();
 		EventManager.clearEvents();
-		TrackManager.destroy();
+		trackManager.destroy();
 
-		for (int trackId = 0; trackId < FileManager.drumsDirectory.listFiles().length; trackId++) {
+		for (int trackId = 0; trackId < fileManager.getDrumsDirectory().listFiles().length; trackId++) {
 			new TrackCreateEvent().doExecute();
-			final File sampleFile = FileManager.drumsDirectory.listFiles()[trackId].listFiles()[0];
-			TrackManager.setSample(TrackManager.getTrackByNoteValue(trackId), sampleFile);
+			final File sampleFile = fileManager.getDrumsDirectory().listFiles()[trackId]
+					.listFiles()[0];
+			trackManager.setSample(trackManager.getTrackByNoteValue(trackId), sampleFile);
 		}
 
-		TrackManager.getTrackByNoteValue(0).select();
+		trackManager.getTrackByNoteValue(0).select();
 		View.mainPage.getPageSelectGroup().selectLevelsPage();
 
-		MidiManager.setBPM(120);
-		MidiManager.setLoopTicks(0, MidiManager.TICKS_PER_NOTE * 4);
+		midiManager.setBpm(120);
+		midiManager.setLoopTicks(0, MidiManager.TICKS_PER_NOTE * 4);
 	}
 
-	public static void clearProject() {
+	public void clearProject() {
 		View.mainPage.getPageSelectGroup().selectLevelsPage();
 		EventManager.clearEvents();
-		TrackManager.destroy();
+		trackManager.destroy();
 
-		MidiManager.setBPM(120);
-		MidiManager.setLoopTicks(0, MidiManager.TICKS_PER_NOTE * 4);
+		midiManager.setBpm(120);
+		midiManager.setLoopTicks(0, MidiManager.TICKS_PER_NOTE * 4);
+	}
+
+	public FontTextureAtlas getFontTextureAtlas() {
+		return fontTextureAtlas;
+	}
+
+	public ResourceTextureAtlas getResourceTextureAtlas() {
+		return resourceTextureAtlas;
+	}
+
+	public RecordManager getRecordManager() {
+		return recordManager;
+	}
+
+	public MidiManager getMidiManager() {
+		return midiManager;
+	}
+
+	public TrackManager getTrackManager() {
+		return trackManager;
+	}
+
+	public FileManager getFileManager() {
+		return fileManager;
+	}
+
+	public void importProject(final String fileName) {
+		projectFileManager.importProject(this, fileName);
+	}
+
+	public void importMidi(final String fileName) {
+		midiFileManager.importMidi(this, fileName);
 	}
 
 	private void shutdown() {
 		nativeShutdown();
 	}
 
-	public static native boolean createAudioPlayer();
+	public native void onRecordManagerInit(RecordManager recordManager);
 
-	public static native void createEngine();
+	public native void onTrackManagerInit(TrackManager trackManager);
 
-	public static native void arm();
+	public native boolean createAudioPlayer();
 
-	public static native void nativeShutdown();
+	public native void createEngine();
+
+	public native void arm();
+
+	public native void nativeShutdown();
 
 	/** Load jni .so on initialization */
 	static {

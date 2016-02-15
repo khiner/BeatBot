@@ -2,7 +2,7 @@ package com.kh.beatbot.event.track;
 
 import com.kh.beatbot.event.Executable;
 import com.kh.beatbot.file.ProjectFile;
-import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.view.View;
 
 public class TrackDestroyEvent extends Executable {
 	private int trackId;
@@ -10,7 +10,7 @@ public class TrackDestroyEvent extends Executable {
 
 	public TrackDestroyEvent(int trackId) {
 		this.trackId = trackId;
-		this.serializedTrack = ProjectFile.trackToJson(TrackManager.getTrackById(trackId));
+		this.serializedTrack = ProjectFile.trackToJson(View.context.getTrackManager().getTrackById(trackId));
 	}
 
 	@Override
@@ -19,8 +19,8 @@ public class TrackDestroyEvent extends Executable {
 	}
 
 	public boolean doExecute() {
-		if (TrackManager.getNumTracks() > 1) {
-			TrackManager.getTrackById(trackId).destroy();
+		if (View.context.getTrackManager().getNumTracks() > 1) {
+			View.context.getTrackManager().getTrackById(trackId).destroy();
 			return true;
 		} else {
 			return false;

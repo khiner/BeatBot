@@ -9,7 +9,6 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.PagerListener;
 import com.kh.beatbot.listener.TrackLevelsEventListener;
 import com.kh.beatbot.listener.TrackListener;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
@@ -92,7 +91,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		masterButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				TrackManager.getMasterTrack().select();
+				context.getTrackManager().getMasterTrack().select();
 			}
 		});
 
@@ -199,7 +198,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	public void onNameChange(File file, File newFile) {
 		if (masterButton.isChecked())
 			// make sure *some* track is selected.
-			TrackManager.getTrackByNoteValue(0).select();
+			context.getTrackManager().getTrackByNoteValue(0).select();
 		else {
 			trackButtonRow.update();
 		}
@@ -209,11 +208,11 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	@Override
 	public void onPageChange(ViewPager pager, View prevPage, View newPage) {
-		((TrackListener) newPage).onSelect(TrackManager.getCurrTrack());
+		((TrackListener) newPage).onSelect(context.getTrackManager().getCurrTrack());
 	}
 
 	public void onNoteLevelsChange(MidiNote note, LevelType type) {
-		Track track = TrackManager.getTrack(note);
+		final Track track = context.getTrackManager().getTrack(note);
 		if (!track.isSelected())
 			track.select();
 		// select note levels page whenever a note levels change event occurs

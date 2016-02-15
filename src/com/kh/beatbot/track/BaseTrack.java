@@ -7,7 +7,7 @@ import java.util.List;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
-import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.view.View;
 
 public class BaseTrack {
 	protected int id;
@@ -61,12 +61,12 @@ public class BaseTrack {
 
 	public void addEffect(Effect effect) {
 		effects.add(effect);
-		TrackManager.get().onEffectCreate(this, effect);
+		View.context.getTrackManager().onEffectCreate(this, effect);
 	}
 
 	public void removeEffect(Effect effect) {
 		effects.remove(effect);
-		TrackManager.get().onEffectDestroy(this, effect);
+		View.context.getTrackManager().onEffectDestroy(this, effect);
 	}
 
 	public void moveEffect(int oldPosition, int newPosition) {
@@ -85,7 +85,7 @@ public class BaseTrack {
 		}
 		Collections.sort(effects);
 		Effect.setEffectPosition(id, oldPosition, newPosition);
-		TrackManager.get().onEffectOrderChange(this, oldPosition, newPosition);
+		View.context.getTrackManager().onEffectOrderChange(this, oldPosition, newPosition);
 	}
 
 	public void quantizeEffectParams() {
@@ -120,11 +120,11 @@ public class BaseTrack {
 	}
 
 	public void select() {
-		TrackManager.get().onSelect(this);
+		View.context.getTrackManager().onSelect(this);
 	}
 
 	public void setLevels(float volume, float pan, float pitchStep, float pitchCent) {
-		TrackManager.notifyTrackLevelsSetEvent(this);
+		View.context.getTrackManager().notifyTrackLevelsSetEvent(this);
 
 		volumeParam.setLevel(volume);
 		panParam.setLevel(pan);

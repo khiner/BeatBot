@@ -24,6 +24,16 @@ public class FontTextureAtlas extends TextureAtlas {
 	
 	private Typeface tf = null;
 
+
+	// this will load the specified font file, create a texture for the defined
+	// character range, and setup all required values used to render with it.
+	// file - Filename of the font (.ttf, .otf) to use. In 'Assets' folder.
+	public FontTextureAtlas(Activity activity, String fontFilePath) {
+		// load the font and setup paint instance for drawing
+		tf = Typeface.createFromAsset(activity.getAssets(), fontFilePath);
+		super.load(activity);
+	}
+
 	public void initConfig() {
 		paint.setAntiAlias(true);
 		paint.setTextSize(DEFAULT_TEXT_SIZE);
@@ -37,15 +47,6 @@ public class FontTextureAtlas extends TextureAtlas {
 		config.cellHeight = (int) Math.ceil(Math.abs(fm.bottom) + Math.abs(fm.top));
 		config.textureYOffset = config.cellHeight - (float) Math.ceil(Math.abs(fm.descent)) - 1;
 		config.textureSize = calcTextureSize(config.cellHeight);
-	}
-
-	// this will load the specified font file, create a texture for the defined
-	// character range, and setup all required values used to render with it.
-	// file - Filename of the font (.ttf, .otf) to use. In 'Assets' folder.
-	public void load(Activity activity, String fontFilePath) {
-		// load the font and setup paint instance for drawing
-		tf = Typeface.createFromAsset(activity.getAssets(), fontFilePath);
-		super.load(activity);
 	}
 
 	public static float getCharWidth(char chr) {

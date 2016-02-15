@@ -7,7 +7,6 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.listener.RecordStateListener;
 import com.kh.beatbot.manager.RecordManager;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -25,7 +24,7 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 
 	public RecordPage(View view) {
 		super(view);
-		RecordManager.setListener(this);
+		context.getRecordManager().setListener(this);
 	}
 
 	@Override
@@ -44,16 +43,16 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 				.withRoundedRect();
 		recordButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.RECORD);
 		recordSourceSelectButton.setText(RecordManager.GLOBAL_RECORD_SOURCE);
-		recordSourceSelectButton
-				.setOnReleaseListener(RecordManager.getRecordSourceButtonListener());
+		recordSourceSelectButton.setOnReleaseListener(context.getRecordManager()
+				.getRecordSourceButtonListener());
 
 		recordButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
 				if (((ToggleButton) button).isChecked()) {
-					RecordManager.arm();
+					context.getRecordManager().arm();
 				} else {
-					RecordManager.stopRecording();
+					context.getRecordManager().stopRecording();
 				}
 			}
 		});
@@ -109,7 +108,7 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 	public void onRecordStop(File recordedSampleFile) {
 		try {
 			sampleView.setText("");
-			((Track) TrackManager.getCurrTrack()).setSample(recordedSampleFile);
+			((Track) context.getTrackManager().getCurrTrack()).setSample(recordedSampleFile);
 		} catch (Exception e) {
 			sampleView.setText("Error saving file");
 		}
@@ -123,12 +122,13 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 	@Override
 	public synchronized void show() {
 		super.show();
-		RecordManager.startListening(); // listen to RecordSource to start populating ThresholdBar
+		context.getRecordManager().startListening(); // listen to RecordSource to start
+														// populating ThresholdBar
 	}
 
 	@Override
 	public synchronized void hide() {
-		RecordManager.stopListening();
+		context.getRecordManager().stopListening();
 		super.hide();
 	}
 }

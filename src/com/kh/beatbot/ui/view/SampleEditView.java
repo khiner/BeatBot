@@ -3,7 +3,6 @@ package com.kh.beatbot.ui.view;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.event.SampleLoopWindowSetEvent;
 import com.kh.beatbot.listener.OnPressListener;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.color.Color;
@@ -143,7 +142,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void tick() {
-		Track track = (Track) TrackManager.getCurrTrack();
+		Track track = (Track) context.getTrackManager().getCurrTrack();
 		if (hasSample() && (track.isSounding())) {
 			currSampleRect.show();
 			float x = levelToX(params[0].getViewLevel(track.getCurrentFrame()));
@@ -217,7 +216,8 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void handleActionDown(int id, Pointer pos) {
-		loopWindowEvent = new SampleLoopWindowSetEvent(TrackManager.getCurrTrack().getId());
+		loopWindowEvent = new SampleLoopWindowSetEvent(context.getTrackManager().getCurrTrack()
+				.getId());
 		loopWindowEvent.begin();
 		super.handleActionDown(id, pos);
 		if (!hasSample())
@@ -287,7 +287,7 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void onParamChange(Param param) {
-		Track track = (Track) TrackManager.getCurrTrack();
+		final Track track = (Track) context.getTrackManager().getCurrTrack();
 		if (param == null)
 			return;
 		if (param.equals(track.getGainParam())) {

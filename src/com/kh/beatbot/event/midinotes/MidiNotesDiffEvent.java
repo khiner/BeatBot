@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.event.Stateful;
-import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.view.View;
 
 public class MidiNotesDiffEvent implements Stateful {
 	private final List<MidiNoteDiff> midiNoteDiffs;
@@ -24,30 +24,16 @@ public class MidiNotesDiffEvent implements Stateful {
 
 	@Override
 	public void undo() {
-		TrackManager.saveNoteTicks();
-		TrackManager.deselectAllNotes();
-
+		final List<MidiNoteDiff> oppositeDiffs = new ArrayList<MidiNoteDiff>(midiNoteDiffs.size());
 		// apply opposites in reverse order
 		for (int i = midiNoteDiffs.size() - 1; i >= 0; i--) {
-			midiNoteDiffs.get(i).opposite().apply();
+			oppositeDiffs.add(midiNoteDiffs.get(i).opposite());
 		}
-
-		MidiNotesEventManager.handleNoteCollisions();
-		MidiNotesEventManager.finalizeNoteTicks();
-		TrackManager.deselectAllNotes();
+		View.context.getMidiManager().applyDiffs(oppositeDiffs);
 	}
 
 	@Override
 	public void apply() {
-		TrackManager.saveNoteTicks();
-		TrackManager.deselectAllNotes();
-		
-		for (MidiNoteDiff midiNoteDiff : midiNoteDiffs) {
-			midiNoteDiff.apply();
-		}
-
-		MidiNotesEventManager.handleNoteCollisions();
-		MidiNotesEventManager.finalizeNoteTicks();
-		TrackManager.deselectAllNotes();
+		View.context.getMidiManager().applyDiffs(midiNoteDiffs);
 	}
 }

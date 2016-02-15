@@ -19,7 +19,6 @@ import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.shape.Shape;
-import com.kh.beatbot.ui.texture.TextureAtlas;
 import com.kh.beatbot.ui.view.TouchableView.Pointer;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
 import com.kh.beatbot.ui.view.page.main.MainPage;
@@ -412,9 +411,9 @@ public class View implements Comparable<View> {
 
 		if (textMesh.isVisible()) {
 			float textHeight = height + BG_OFFSET;
-			if (TextureAtlas.font.hasDescent(text))
+			if (context.getFontTextureAtlas().hasDescent(text))
 				textHeight *= .9f;
-			float textWidth = TextureAtlas.font.getTextWidth(text, textHeight);
+			float textWidth = context.getFontTextureAtlas().getTextWidth(text, textHeight);
 			float nonIconWidth = width - X_OFFSET * 2;
 			if (textureMesh.isVisible()) {
 				nonIconWidth -= height;

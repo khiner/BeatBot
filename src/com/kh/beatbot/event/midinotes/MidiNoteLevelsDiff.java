@@ -1,8 +1,8 @@
 package com.kh.beatbot.event.midinotes;
 
 import com.kh.beatbot.effect.Effect.LevelType;
-import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.ui.view.View;
 
 public class MidiNoteLevelsDiff extends MidiNoteDiff {
 	// identifying info for note
@@ -16,7 +16,8 @@ public class MidiNoteLevelsDiff extends MidiNoteDiff {
 		this(midiNote.getNoteValue(), midiNote.getOnTick(), type, beginLevel, endLevel);
 	}
 
-	public MidiNoteLevelsDiff(int noteValue, long onTick, LevelType type, byte beginLevel, byte endLevel) {
+	public MidiNoteLevelsDiff(int noteValue, long onTick, LevelType type, byte beginLevel,
+			byte endLevel) {
 		this.noteValue = noteValue;
 		this.onTick = onTick;
 		this.type = type;
@@ -28,7 +29,7 @@ public class MidiNoteLevelsDiff extends MidiNoteDiff {
 	@Override
 	public void apply() {
 		// when restoring from saved file, saved ticks can be different
-		MidiNote note = MidiManager.findNote(noteValue, onTick);
+		final MidiNote note = View.context.getMidiManager().findNote(noteValue, onTick);
 		note.setLevel(type, endLevel);
 	}
 

@@ -13,6 +13,11 @@ public class ResourceTextureAtlas extends TextureAtlas {
 	private final static int[] RESOURCE_IDS = getAllResourceIds();
 	private Resources resources = null;
 
+	public ResourceTextureAtlas(Activity activity) {
+		resources = activity.getResources();
+		super.load(activity);
+	}
+
 	public void initConfig() {
 		config = new Config();
 
@@ -27,11 +32,6 @@ public class ResourceTextureAtlas extends TextureAtlas {
 		config.textureYOffset = 0;
 		// assume all resources are squares of the same width
 		config.textureSize = (int) Math.ceil(Math.sqrt(RESOURCE_IDS.length)) * config.cellWidth;
-	}
-
-	public void load(Activity activity) {
-		resources = activity.getResources();
-		super.load(activity);
 	}
 
 	@Override

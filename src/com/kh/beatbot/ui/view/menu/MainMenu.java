@@ -6,9 +6,7 @@ import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.FileMenuItemListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.SnapToGridListener;
-import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.manager.MidiFileManager;
-import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.ProjectFileManager;
 import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
@@ -45,12 +43,12 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		((ToggleButton) snapToGridItem.button).oscillating();
 
 		saveProjectItem = new MenuItem(this, fileItem, false);
-		loadProjectItem = new FileMenuItem(this, fileItem, new File(
-				FileManager.projectDirectory.getPath()));
+		loadProjectItem = new FileMenuItem(this, fileItem, new File(context.getFileManager()
+				.getProjectDirectory().getPath()));
 
 		midiExportItem = new MenuItem(this, fileItem, false);
-		midiImportItem = new FileMenuItem(this, fileItem, new File(
-				FileManager.midiDirectory.getPath()));
+		midiImportItem = new FileMenuItem(this, fileItem, new File(context.getFileManager()
+				.getMidiDirectory().getPath()));
 
 		topLevelItems.add(fileItem);
 		topLevelItems.add(settingsItem);
@@ -58,7 +56,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		snapToGridItem.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				MidiManager.setSnapToGrid(((ToggleButton) button).isChecked());
+				context.getMidiManager().setSnapToGrid(((ToggleButton) button).isChecked());
 			}
 		});
 
@@ -102,7 +100,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		settingsItem.setIcon(IconResourceSets.SETTINGS);
 
 		snapToGridItem.setResourceId(IconResourceSets.SNAP_TO_GRID);
-		snapToGridItem.setChecked(MidiManager.isSnapToGrid()); // XXX use listener
+		snapToGridItem.setChecked(context.getMidiManager().isSnapToGrid()); // XXX use listener
 
 		// TODO
 		// saveProjectItem.setResourceId(IconResourceSets.SAVE_PROJECT);
@@ -133,9 +131,9 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	@Override
 	public void onFileMenuItemReleased(FileMenuItem fileItem) {
 		if (fileItem.equals(midiImportItem))
-			MidiFileManager.importMidi(context, fileItem.getText());
+			context.importMidi(fileItem.getText());
 		else
-			ProjectFileManager.loadProject(context, fileItem.getText());
+			context.importProject(fileItem.getText());
 	}
 
 	@Override
@@ -259,11 +257,11 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 			snap = true;
 		}
 	}
-	
+
 	private class SnapToGridMenuItem extends MenuItem implements SnapToGridListener {
 		public SnapToGridMenuItem(Menu menu, MenuItem parent, boolean toggle) {
 			super(menu, parent, toggle);
-			MidiManager.setSnapToGridListener(this);
+			context.getMidiManager().setSnapToGridListener(this);
 		}
 
 		@Override

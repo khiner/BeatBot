@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kh.beatbot.effect.Effect.LevelType;
+import com.kh.beatbot.event.midinotes.MidiNoteDiff;
 import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.event.track.TrackCreateEvent;
 import com.kh.beatbot.file.MidiFile;
@@ -20,6 +21,7 @@ import com.kh.beatbot.midi.event.meta.Tempo;
 import com.kh.beatbot.midi.event.meta.TimeSignature;
 import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.track.Track;
+import com.kh.beatbot.ui.view.View;
 
 public class MidiManager implements MidiNoteListener {
 	public static final int MIN_BPM = 45, MAX_BPM = 300,
@@ -29,152 +31,157 @@ public class MidiManager implements MidiNoteListener {
 
 	public static final double LOG_2 = Math.log(2);
 
-	private static boolean snapToGrid = true;
-	private static int beatDivision = 0;
-	private static long loopBeginTick, loopEndTick;
+	private boolean snapToGrid = true;
+	private int beatDivision = 0;
+	private long loopBeginTick, loopEndTick;
 
-	private static TimeSignature ts = new TimeSignature();
-	private static Tempo tempo = new Tempo();
-	private static MidiTrack tempoTrack = new MidiTrack();
-	private static List<MidiNote> copiedNotes = new ArrayList<MidiNote>(),
+	private TimeSignature ts = new TimeSignature();
+	private Tempo tempo = new Tempo();
+	private MidiTrack tempoTrack = new MidiTrack();
+	private List<MidiNote> copiedNotes = new ArrayList<MidiNote>(),
 			currState = new ArrayList<MidiNote>();
 
-	private static List<MidiNoteListener> midiNoteListeners = new ArrayList<MidiNoteListener>();
-	private static List<LoopWindowListener> loopChangeListeners = new ArrayList<LoopWindowListener>();
-	private static TempoListener tempoListener;
-	private static SnapToGridListener snapToGridListener;
-	private static MidiManager instance = new MidiManager();
+	private List<MidiNoteListener> midiNoteListeners = new ArrayList<MidiNoteListener>();
+	private List<LoopWindowListener> loopChangeListeners = new ArrayList<LoopWindowListener>();
+	private List<TempoListener> tempoListeners = new ArrayList<TempoListener>();
+	private SnapToGridListener snapToGridListener;
 
-	public static MidiManager get() {
-		return instance;
-	}
+	private MidiNotesEventManager midiNotesEventManager;
 
-	public static void init() {
+	public MidiManager() {
 		ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION);
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
-		setBPM(getBPM()); // set native bpm & trigger event notification
+		setBpm(getBpm()); // set native bpm & trigger event notification
+		
+		midiNotesEventManager = new MidiNotesEventManager(this);
 	}
 
-	public static void addMidiNoteListener(MidiNoteListener listener) {
+	public void addMidiNoteListener(MidiNoteListener listener) {
 		midiNoteListeners.add(listener);
 	}
 
-	public static void addLoopChangeListener(LoopWindowListener listener) {
+	public void addLoopChangeListener(LoopWindowListener listener) {
 		loopChangeListeners.add(listener);
 	}
 
-	public static void setTempoListener(TempoListener listener) {
-		tempoListener = listener;
+	public void addTempoListener(TempoListener listener) {
+		tempoListeners.add(listener);
 	}
 
-	public static void setSnapToGridListener(SnapToGridListener listener) {
+	public void setSnapToGridListener(SnapToGridListener listener) {
 		snapToGridListener = listener;
 	}
 
-	public static boolean isSnapToGrid() {
+	public boolean isSnapToGrid() {
 		return snapToGrid;
 	}
 
-	public static void setSnapToGrid(boolean snapToGrid) {
-		MidiManager.snapToGrid = snapToGrid;
+	public void setSnapToGrid(boolean snapToGrid) {
+		this.snapToGrid = snapToGrid;
 		snapToGridListener.onSnapToGridChanged(snapToGrid);
 	}
 
-	public static MidiTrack getTempoTrack() {
+	public MidiTrack getTempoTrack() {
 		return tempoTrack;
 	}
 
-	public static float getBPM() {
+	public float getBpm() {
 		return tempo.getBpm();
 	}
 
-	public static void setBPM(float bpm) {
+	public void setBpm(float bpm) {
 		bpm = GeneralUtils.clipTo(bpm, MIN_BPM, MAX_BPM);
 		tempo.setBpm(bpm);
 		setNativeMSPT(tempo.getMpqn() / TICKS_PER_NOTE);
-		TrackManager.quantizeEffectParams();
-
-		tempoListener.onTempoChange(bpm);
+		onTempoChange(bpm);
 	}
 
-	public static MidiNote addNote(long onTick, long offTick, int note) {
-		return MidiNotesEventManager.createNote(note, onTick, offTick);
+	public void incrementBpm() {
+		setBpm(getBpm() + 1);
+	}
+	
+	public void decrementBpm() {
+		setBpm(getBpm() - 1);
 	}
 
-	public static MidiNote findNote(int noteValue, long onTick) {
-		final Track track = TrackManager.getTrackByNoteValue(noteValue);
+	public MidiNote addNote(long onTick, long offTick, int note) {
+		return midiNotesEventManager.createNote(note, onTick, offTick);
+	}
+
+	public MidiNote findNote(int noteValue, long onTick) {
+		final Track track = View.context.getTrackManager().getTrackByNoteValue(noteValue);
 		return null == track ? null : track.findNoteStarting(onTick);
 	}
 
-	public static MidiNote findNoteContaining(int noteValue, long tick) {
-		final Track track = TrackManager.getTrackByNoteValue(noteValue);
+	public MidiNote findNoteContaining(int noteValue, long tick) {
+		final Track track = View.context.getTrackManager().getTrackByNoteValue(noteValue);
 		return null == track ? null : track.findNoteContaining(tick);
 	}
 
-	public static void deleteNote(MidiNote midiNote) {
-		MidiNotesEventManager.destroyNote(midiNote);
+	public void deleteNote(MidiNote midiNote) {
+		midiNotesEventManager.destroyNote(midiNote);
 	}
 
-	public static void copy() {
-		if (TrackManager.anyNoteSelected()) {
-			copiedNotes = TrackManager.copySelectedNotes();
+	public void copy() {
+		if (View.context.getTrackManager().anyNoteSelected()) {
+			copiedNotes = View.context.getTrackManager().copySelectedNotes();
 		}
 	}
 
-	public static boolean isCopying() {
+	public boolean isCopying() {
 		return !copiedNotes.isEmpty();
 	}
 
-	public static void cancelCopy() {
+	public void cancelCopy() {
 		copiedNotes.clear();
 	}
 
-	public static void paste(long startTick) {
+	public void paste(long startTick) {
 		if (copiedNotes.isEmpty())
 			return;
 		// Copied notes should still be selected, so leftmostSelectedTick should be accurate
-		long tickOffset = startTick - TrackManager.getSelectedNoteTickWindow()[0];
+		long tickOffset = startTick - View.context.getTrackManager().getSelectedNoteTickWindow()[0];
 		for (MidiNote copiedNote : copiedNotes) {
 			copiedNote.setTicks(copiedNote.getOnTick() + tickOffset, copiedNote.getOffTick()
 					+ tickOffset);
 		}
 
-		MidiNotesEventManager.createNotes(copiedNotes);
+		midiNotesEventManager.createNotes(copiedNotes);
 		copiedNotes.clear();
 	}
 
-	public static int getBeatDivision() {
+	public int getBeatDivision() {
 		return beatDivision;
 	}
 
-	public static void adjustBeatDivision(float numTicksDisplayed) {
+	public void adjustBeatDivision(float numTicksDisplayed) {
 		beatDivision = (int) (Math.log(MAX_TICKS / numTicksDisplayed) / LOG_2);
 	}
 
-	public static long getTicksPerBeat() {
+	public long getTicksPerBeat() {
 		return TICKS_PER_NOTE / (1 << beatDivision);
 	}
 
-	public static long getMajorTickNearestTo(long tick) {
+	public long getMajorTickNearestTo(long tick) {
 		long spacing = getMajorTickSpacing();
 		long remainder = tick % spacing;
 		return remainder == 0 ? tick : (remainder > spacing / 2 ? getMajorTickAfter(tick) : getMajorTickBefore(tick));
 	}
 
-	public static long getMajorTickBefore(long tick) {
+	public long getMajorTickBefore(long tick) {
 		return tick - tick % getMajorTickSpacing();
 	}
 
-	public static long getMajorTickAfter(long tick) {
+	public long getMajorTickAfter(long tick) {
 		return getMajorTickBefore(tick) + getMajorTickSpacing();
 	}
 
-	public static void quantize() {
-		MidiNotesEventManager.quantize(beatDivision);
+	public void quantize() {
+		midiNotesEventManager.quantize(beatDivision);
 	}
 
-	public static void importFromFile(MidiFile midiFile) {
+	public void importFromFile(MidiFile midiFile) {
 		List<MidiNote> newNotes = new ArrayList<MidiNote>();
 		ArrayList<MidiTrack> midiTracks = midiFile.getTracks();
 		tempoTrack = midiTracks.get(0);
@@ -211,28 +218,69 @@ public class MidiManager implements MidiNoteListener {
 
 		// create any necessary tracks
 		for (MidiNote note : newNotes) {
-			while (note.getNoteValue() >= TrackManager.getNumTracks()) {
+			while (note.getNoteValue() >= View.context.getTrackManager().getNumTracks()) {
 				new TrackCreateEvent().execute();
 			}
 		}
 
-		MidiNotesEventManager.begin();
-		MidiNotesEventManager.destroyAllNotes();
-		MidiNotesEventManager.createNotes(newNotes);
-		MidiNotesEventManager.end();
+		beginEvent();
+		midiNotesEventManager.destroyAllNotes();
+		midiNotesEventManager.createNotes(newNotes);
+		endEvent();
 	}
 
-	public static void setLoopTicks(long loopBeginTick, long loopEndTick) {
+	public void beginEvent() {
+		midiNotesEventManager.begin();
+	}
+
+	public void endEvent() {
+		midiNotesEventManager.end();
+	}
+
+	public void moveNote(MidiNote note, int noteDiff, long tickDiff) {
+		midiNotesEventManager.moveNote(note, noteDiff, tickDiff);
+	}
+
+	public void moveSelectedNotes(int noteDiff, long tickDiff) {
+		midiNotesEventManager.moveSelectedNotes(noteDiff, tickDiff);
+	}
+
+	public void pinchSelectedNotes(long onTickDiff, long offTickDiff) {
+		midiNotesEventManager.pinchSelectedNotes(onTickDiff, offTickDiff);
+	}
+
+	public void setNoteLevel(MidiNote note, LevelType levelType, byte level) {
+		midiNotesEventManager.setNoteLevel(note, levelType, level);
+	}
+
+	public void applyDiffs(final List<MidiNoteDiff> diffs) {
+		View.context.getTrackManager().saveNoteTicks();
+		View.context.getTrackManager().deselectAllNotes();
+		
+		for (MidiNoteDiff midiNoteDiff : diffs) {
+			midiNoteDiff.apply();
+		}
+
+		midiNotesEventManager.handleNoteCollisions();
+		midiNotesEventManager.finalizeNoteTicks();
+		View.context.getTrackManager().deselectAllNotes();	
+	}
+
+	public void deleteSelectedNotes() {
+		midiNotesEventManager.deleteSelectedNotes();
+	}
+
+	public void setLoopTicks(long loopBeginTick, long loopEndTick) {
 		boolean changed = false;
 		long quantizedBeginTick = (long) getMajorTickNearestTo(loopBeginTick);
 		long quantizedEndTick = (long) getMajorTickNearestTo(loopEndTick);
-		if (quantizedBeginTick != MidiManager.loopBeginTick && quantizedBeginTick < quantizedEndTick) {
-			MidiManager.loopBeginTick = quantizedBeginTick;
+		if (quantizedBeginTick != this.loopBeginTick && quantizedBeginTick < quantizedEndTick) {
+			this.loopBeginTick = quantizedBeginTick;
 			changed = true;
 		}
 		
-		if (quantizedEndTick != MidiManager.loopEndTick && quantizedEndTick > quantizedBeginTick) {
-			MidiManager.loopEndTick = quantizedEndTick;
+		if (quantizedEndTick != this.loopEndTick && quantizedEndTick > quantizedBeginTick) {
+			this.loopEndTick = quantizedEndTick;
 			changed = true;
 		}
 
@@ -241,30 +289,36 @@ public class MidiManager implements MidiNoteListener {
 	}
 
 	// set new loop begin point, preserving loop length
-	public static void translateLoopWindowTo(long tick) {
+	public void translateLoopWindowTo(long tick) {
 		long loopLength = getLoopLength();
 		long newBeginTick = GeneralUtils.clipTo(tick, 0, MAX_TICKS - loopLength);
-		MidiManager.setLoopTicks(newBeginTick, newBeginTick + loopLength);
+		setLoopTicks(newBeginTick, newBeginTick + loopLength);
 	}
 
-	public static void pinchLoopWindow(long beginTickDiff, long endTickDiff) {
+	public void pinchLoopWindow(long beginTickDiff, long endTickDiff) {
 		setLoopTicks(getLoopBeginTick() + beginTickDiff, getLoopEndTick() + endTickDiff);
 	}
 
-	public static long getLoopBeginTick() {
+	public long getLoopBeginTick() {
 		return loopBeginTick;
 	}
 
-	public static long getLoopEndTick() {
+	public long getLoopEndTick() {
 		return loopEndTick;
 	}
 
-	public static long getLoopLength() {
+	public long getLoopLength() {
 		return getLoopEndTick() - getLoopBeginTick();
 	}
 
-	private static long getMajorTickSpacing() {
+	private long getMajorTickSpacing() {
 		return TICKS_PER_MEASURE / (2 << beatDivision);
+	}
+
+	private void onTempoChange(final float bpm) {
+		for (final TempoListener tempoListener : tempoListeners) {
+			tempoListener.onTempoChange(bpm);
+		}
 	}
 
 	@Override
@@ -304,9 +358,9 @@ public class MidiManager implements MidiNoteListener {
 		}
 	}
 
-	private static void notifyLoopWindowChanged() {
+	private void notifyLoopWindowChanged() {
 		setLoopTicksNative(loopBeginTick, loopEndTick);
-		TrackManager.updateAllTrackNextNotes();
+		View.context.getTrackManager().updateAllTrackNextNotes();
 		for (LoopWindowListener listener : loopChangeListeners) {
 			listener.onLoopWindowChange(loopBeginTick, loopEndTick);
 		}

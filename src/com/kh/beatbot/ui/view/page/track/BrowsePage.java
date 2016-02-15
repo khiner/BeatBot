@@ -7,7 +7,6 @@ import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.event.SampleSetEvent;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.manager.FileManager;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -29,8 +28,9 @@ public class BrowsePage extends Menu implements TrackListener {
 		setIcon(IconResourceSets.BROWSE_PAGE);
 		initRoundedRect();
 
-		File[] topLevelDirs = new File[] { FileManager.drumsDirectory, FileManager.recordDirectory,
-				FileManager.rootDirectory };
+		File[] topLevelDirs = new File[] { context.getFileManager().getDrumsDirectory(),
+				context.getFileManager().getRecordDirectory(),
+				context.getFileManager().getRootDirectory() };
 
 		for (File topLevelDir : topLevelDirs) {
 			FileMenuItem fileMenuItem = new FileMenuItem(this, null, topLevelDir);
@@ -75,7 +75,8 @@ public class BrowsePage extends Menu implements TrackListener {
 
 	@Override
 	public void onFileMenuItemReleased(FileMenuItem fileItem) {
-		new SampleSetEvent(TrackManager.getCurrTrack().getId(), fileItem.getFile()).execute();
+		new SampleSetEvent(context.getTrackManager().getCurrTrack().getId(), fileItem.getFile())
+				.execute();
 	}
 
 	@Override

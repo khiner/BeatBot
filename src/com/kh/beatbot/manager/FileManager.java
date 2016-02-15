@@ -22,27 +22,21 @@ public class FileManager implements FileListener {
 
 	public static final String[] ASSET_TYPES = { "drums" };
 
-	public static File rootDirectory, audioDirectory, projectDirectory, midiDirectory,
+	private File filesDirectory, rootDirectory, audioDirectory, projectDirectory, midiDirectory,
 			recordDirectory, drumsDirectory, beatRecordDirectory, sampleRecordDirectory;
 
-	private static AssetManager assetManager;
-	private static byte[] copyBuffer = new byte[1024];
-	private static String appDirectoryPath;
-	private static FileManager instance;
+	private AssetManager assetManager;
+	private byte[] copyBuffer = new byte[1024];
+	private String appDirectoryPath;
 
 	// order matters here - track should always be updated first
 	private static List<FileListener> listeners = new ArrayList<FileListener>();
 
-	public synchronized static FileManager get() {
-		if (instance == null) {
-			instance = new FileManager();
-		}
-		return instance;
-	}
+	public FileManager(final Context context, final AssetManager assetManager) {
+		this.filesDirectory = context.getFilesDir();
+		this.assetManager = assetManager;
 
-	public static void init(Context context) {
-		initDataDir(context);
-
+		initDataDir();
 		rootDirectory = new File("/");
 		audioDirectory = new File(appDirectoryPath + "/audio");
 		projectDirectory = new File(appDirectoryPath + "/projects");
@@ -59,24 +53,44 @@ public class FileManager implements FileListener {
 		sampleRecordDirectory.mkdirs();
 
 		try {
-			copyAllSamplesToStorage(context);
+			copyAllSamplesToStorage();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void addListener(FileListener listener) {
+	public File getRootDirectory() {
+		return rootDirectory;
+	}
+
+	public File getDrumsDirectory() {
+		return drumsDirectory;
+	}
+
+	public File getRecordDirectory() {
+		return recordDirectory;
+	}
+
+	public File getMidiDirectory() {
+		return midiDirectory;
+	}
+
+	public File getProjectDirectory() {
+		return projectDirectory;
+	}
+
+	public void addListener(FileListener listener) {
 		listeners.add(listener);
 	}
 
-	public static String recordPathForSource(String source) {
+	public String recordPathForSource(String source) {
 		File recordDirectory = source.equals(RecordManager.GLOBAL_RECORD_SOURCE) ? beatRecordDirectory
 				: sampleRecordDirectory;
 
 		return recordDirectory.getPath();
 	}
 
-	public static String formatSampleName(String sampleName) {
+	public String formatSampleName(String sampleName) {
 		for (String extension : SUPPORTED_EXTENSIONS) {
 			if (sampleName.endsWith(extension)) {
 				return sampleName.replace(extension, "");
@@ -85,19 +99,19 @@ public class FileManager implements FileListener {
 		return sampleName;
 	}
 
-	private static void initDataDir(Context context) {
+	private void initDataDir() {
 		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			// we can read and write to external storage
 			String extStorageDir = Environment.getExternalStorageDirectory().toString();
 			appDirectoryPath = extStorageDir + "/BeatBot/";
 		} else { // we need read AND write access for this app - default to
 					// internal storage
-			appDirectoryPath = context.getApplicationContext().getFilesDir().toString() + "/";
+			appDirectoryPath = filesDirectory.toString() + "/";
 			// TODO throw / catch exception - need External SD Card!
 		}
 	}
 
-	private static void copyFile(InputStream in, OutputStream out) throws IOException {
+	private void copyFile(InputStream in, OutputStream out) throws IOException {
 		int read;
 		while ((read = in.read(copyBuffer)) != -1) {
 			out.write(copyBuffer, 0, read);
@@ -109,7 +123,7 @@ public class FileManager implements FileListener {
 		out = null;
 	}
 
-	private static void copyFromAssetsToExternal(String assetPath) throws IOException {
+	private void copyFromAssetsToExternal(String assetPath) throws IOException {
 		File destDir = new File(audioDirectory.getPath() + "/" + assetPath + "/");
 
 		// create the dir
@@ -131,9 +145,7 @@ public class FileManager implements FileListener {
 		}
 	}
 
-	private static void copyAllSamplesToStorage(Context context) throws IOException {
-		assetManager = context.getAssets();
-
+	private void copyAllSamplesToStorage() throws IOException {
 		for (String assetType : ASSET_TYPES) {
 			for (String fileName : assetManager.list(assetType)) {
 				// the sample folder for this sample type does not yet exist.

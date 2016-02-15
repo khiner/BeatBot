@@ -2,7 +2,7 @@ package com.kh.beatbot.event;
 
 import java.io.File;
 
-import com.kh.beatbot.manager.FileManager;
+import com.kh.beatbot.ui.view.View;
 
 public class SampleRenameEvent extends Executable {
 	private String originalSampleName, newSampleName;
@@ -31,7 +31,7 @@ public class SampleRenameEvent extends Executable {
 
 		File newFile = new File(file.getParent() + "/" + sampleName);
 		file.renameTo(newFile);
-		FileManager.get().onNameChange(file, newFile);
+		View.context.getFileManager().onNameChange(file, newFile);
 		file = newFile;
 		return true;
 	}

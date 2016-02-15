@@ -1,6 +1,6 @@
 package com.kh.beatbot.event;
 
-import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.ui.view.View;
 
 public class TempoChangeEvent extends Executable implements Temporal {
 	private float beginBpm, endBpm;
@@ -24,19 +24,19 @@ public class TempoChangeEvent extends Executable implements Temporal {
 
 	@Override
 	public void begin() {
-		beginBpm = MidiManager.getBPM();
+		beginBpm = View.context.getMidiManager().getBpm();
 	}
 
 	@Override
 	public void end() {
-		endBpm = MidiManager.getBPM();
+		endBpm = View.context.getMidiManager().getBpm();
 		execute();
 	}
 
 	@Override
 	public boolean doExecute() {
 		if (endBpm != beginBpm) {
-			MidiManager.setBPM(endBpm);
+			View.context.getMidiManager().setBpm(endBpm);
 			return true;
 		} else {
 			return false;

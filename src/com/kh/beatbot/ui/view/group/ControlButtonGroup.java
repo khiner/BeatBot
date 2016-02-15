@@ -8,14 +8,10 @@ import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.event.effect.EffectCreateEvent;
 import com.kh.beatbot.event.effect.EffectToggleEvent;
-import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.StatefulEventListener;
-import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.manager.PlaybackManager;
-import com.kh.beatbot.manager.RecordManager;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
@@ -55,7 +51,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 			@Override
 			public void onRelease(Button button) {
 				playButton.setChecked(false);
-				if (RecordManager.isRecording()) {
+				if (context.getRecordManager().isRecording()) {
 					playButton.setChecked(false);
 				}
 				if (PlaybackManager.getState() == PlaybackManager.State.PLAYING) {
@@ -84,10 +80,10 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 			public void onRelease(Button button) {
 				String msg = null;
 				if (((ToggleButton) button).isChecked()) {
-					MidiManager.copy();
+					context.getMidiManager().copy();
 					msg = "Tap To Paste";
 				} else {
-					MidiManager.cancelCopy();
+					context.getMidiManager().cancelCopy();
 					msg = "Copy Cancelled";
 				}
 				Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
@@ -97,15 +93,15 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 		deleteButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				MidiNotesEventManager.deleteSelectedNotes();
+				context.getMidiManager().deleteSelectedNotes();
 			}
 		});
 
 		quantizeButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				MidiManager.quantize(); // TODO bring back quantize list (1/4,
-										// 1/8, 1/16, 1/32)
+				context.getMidiManager().quantize(); // TODO bring back quantize list (1/4,
+				// 1/8, 1/16, 1/32)
 			}
 		});
 
@@ -114,7 +110,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 		effectToggle.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				int trackId = TrackManager.getCurrTrack().getId();
+				int trackId = context.getTrackManager().getCurrTrack().getId();
 				int effectPosition = View.mainPage.getCurrEffect().getPosition();
 				new EffectToggleEvent(trackId, effectPosition).execute();
 			}
@@ -149,7 +145,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 
 	@Override
 	public void onDestroy(MidiNote note) {
-		quantizeButton.setEnabled(TrackManager.anyNotes());
+		quantizeButton.setEnabled(context.getTrackManager().anyNotes());
 		onSelectStateChange(note);
 	}
 
@@ -166,7 +162,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 
 	@Override
 	public void onSelectStateChange(MidiNote note) {
-		setEditIconsEnabled(TrackManager.anyNoteSelected());
+		setEditIconsEnabled(context.getTrackManager().anyNoteSelected());
 	}
 
 	public void updateEffectToggle(Effect effect) {

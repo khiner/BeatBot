@@ -3,7 +3,6 @@ package com.kh.beatbot.ui.view;
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.event.TempoChangeEvent;
 import com.kh.beatbot.listener.TempoListener;
-import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.NumberSegment;
@@ -19,7 +18,7 @@ public class BpmView extends LongPressableView implements TempoListener {
 
 	public BpmView(View view) {
 		super(view);
-		MidiManager.setTempoListener(this);
+		View.context.getMidiManager().addTempoListener(this);
 	}
 
 	@Override
@@ -78,9 +77,9 @@ public class BpmView extends LongPressableView implements TempoListener {
 		lastFrameY = pos.y;
 		if (Math.abs(yDragTotal) > BPM_INCREMENT_THRESHOLD) {
 			if (yDragTotal <= 0) {
-				MidiManager.setBPM(MidiManager.getBPM() - 1);
+				View.context.getMidiManager().incrementBpm();
 			} else {
-				MidiManager.setBPM(MidiManager.getBPM() + 1);
+				View.context.getMidiManager().decrementBpm();
 			}
 			yDragTotal %= BPM_INCREMENT_THRESHOLD;
 		}

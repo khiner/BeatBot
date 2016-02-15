@@ -4,7 +4,6 @@ import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.ParamListener;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSet;
@@ -41,7 +40,7 @@ public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListe
 		for (ToggleButton adsrButton : adsrButtons) {
 			adsrButton.setChecked(adsrButton.getId() == currParamId);
 		}
-		Track track = (Track) TrackManager.getCurrTrack();
+		Track track = (Track) context.getTrackManager().getCurrTrack();
 		paramControl.setParam(track.getActiveAdsrParam());
 	}
 
@@ -71,7 +70,8 @@ public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListe
 		paramControl = new SeekbarParamControl(this);
 		adsrButtons = new ToggleButton[ADSR.NUM_PARAMS];
 		for (int i = 0; i < adsrButtons.length; i++) {
-			adsrButtons[i] = new ToggleButton(this).withRoundedRect().withIcon(IconResourceSets.INSTRUMENT_BASE);
+			adsrButtons[i] = new ToggleButton(this).withRoundedRect().withIcon(
+					IconResourceSets.INSTRUMENT_BASE);
 			adsrButtons[i].setResourceId(whichAdsrIconResource(i));
 			adsrButtons[i].setId(i);
 			adsrButtons[i].setOnReleaseListener(this);
@@ -106,7 +106,7 @@ public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListe
 	private void setParam(int paramId) {
 		currParamId = paramId;
 		// set the current parameter so we know what to do with SeekBar events.
-		Track track = (Track) TrackManager.getCurrTrack();
+		final Track track = (Track) context.getTrackManager().getCurrTrack();
 		track.setActiveAdsrParam(currParamId);
 		updateParamView();
 	}

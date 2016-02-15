@@ -1,10 +1,10 @@
 package com.kh.beatbot.event.midinotes;
 
-import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.event.MidiEvent;
 import com.kh.beatbot.midi.event.NoteOff;
 import com.kh.beatbot.midi.event.NoteOn;
+import com.kh.beatbot.ui.view.View;
 
 public class MidiNoteCreateDiff extends MidiNoteDiff {
 	int noteValue;
@@ -39,7 +39,7 @@ public class MidiNoteCreateDiff extends MidiNoteDiff {
 
 	@Override
 	public MidiNoteDestroyDiff opposite() {
-		MidiNote note = MidiManager.findNote(noteValue, onTick);
+		final MidiNote note = View.context.getMidiManager().findNote(noteValue, onTick);
 		return new MidiNoteDestroyDiff(note);
 	}
 }

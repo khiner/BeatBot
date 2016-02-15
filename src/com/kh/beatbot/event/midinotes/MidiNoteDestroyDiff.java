@@ -1,7 +1,7 @@
 package com.kh.beatbot.event.midinotes;
 
-import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.ui.view.View;
 
 public class MidiNoteDestroyDiff extends MidiNoteDiff {
 	MidiNote note;
@@ -13,7 +13,8 @@ public class MidiNoteDestroyDiff extends MidiNoteDiff {
 	@Override
 	public void apply() {
 		// when restoring from saved file, saved ticks can be different & no Rectangle instance
-		MidiNote noteToDestroy = MidiManager.findNote(note.getNoteValue(), note.getOnTick());
+		final MidiNote noteToDestroy = View.context.getMidiManager().findNote(note.getNoteValue(),
+				note.getOnTick());
 		if (noteToDestroy != null)
 			noteToDestroy.destroy();
 	}

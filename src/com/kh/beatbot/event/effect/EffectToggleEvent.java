@@ -1,7 +1,7 @@
 package com.kh.beatbot.event.effect;
 
 import com.kh.beatbot.effect.Effect;
-import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.view.View;
 
 public class EffectToggleEvent extends EffectEvent {
 	public EffectToggleEvent(int trackId, int effectPosition) {
@@ -17,7 +17,7 @@ public class EffectToggleEvent extends EffectEvent {
 	public boolean doExecute() {
 		Effect effect = getEffect();
 		effect.setOn(!effect.isOn());
-		TrackManager.get().onEffectCreate(getTrack(), getEffect());
+		View.context.getTrackManager().onEffectCreate(getTrack(), getEffect());
 		return true;
 	}
 }

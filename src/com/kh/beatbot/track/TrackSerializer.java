@@ -22,6 +22,7 @@ import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.EffectSerializer;
 import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.ui.view.View;
 
 public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeserializer<BaseTrack> {
 	private final static Gson GSON = new GsonBuilder().registerTypeAdapter(Effect.class,
@@ -44,8 +45,8 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 		float pitchCent = object.get("pitchCent").getAsFloat();
 
 		boolean isMaster = id == TrackManager.MASTER_TRACK_ID;
-		BaseTrack track = isMaster ? TrackManager.getMasterTrack() : TrackManager.createTrack(id,
-				position);
+		BaseTrack track = isMaster ? View.context.getTrackManager().getMasterTrack() : View.context
+				.getTrackManager().createTrack(id, position);
 
 		track.getVolumeParam().setLevel(volume);
 		track.getPanParam().setLevel(pan);
@@ -94,7 +95,7 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 		JsonObject object = new JsonObject();
 
 		object.addProperty("id", track.getId());
-		object.addProperty("position", TrackManager.getTracks().indexOf(track));
+		object.addProperty("position", View.context.getTrackManager().getTracks().indexOf(track));
 
 		object.addProperty("volume", track.getVolumeParam().viewLevel);
 		object.addProperty("pan", track.getPanParam().viewLevel);

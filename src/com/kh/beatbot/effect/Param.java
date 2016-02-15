@@ -7,8 +7,8 @@ import java.util.Set;
 
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.listener.ParamToggleListener;
-import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.util.GeneralUtils;
+import com.kh.beatbot.ui.view.View;
 
 public class Param {
 	public static final float DEFAULT_LOG_SCALE = 8, DB_LOG_SCALE = 10 * 10, MAX_DB = 24,
@@ -186,7 +186,7 @@ public class Param {
 	private float quantizeToBeat(float level) {
 		topBeatNum = getTopBeatNum((int) Math.ceil(level * 14));
 		bottomBeatNum = getBottomBeatNum((int) Math.ceil(level * 14));
-		float quantized = (60f / (MidiManager.getBPM()) * ((float) topBeatNum / (float) bottomBeatNum));
+		float quantized = (60f / (View.context.getMidiManager().getBpm()) * ((float) topBeatNum / (float) bottomBeatNum));
 		return hz ? 1 / quantized : quantized;
 	}
 

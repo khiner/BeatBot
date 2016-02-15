@@ -3,7 +3,6 @@ package com.kh.beatbot.ui.view;
 import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.ParamListener;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.color.Color;
@@ -80,7 +79,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	}
 
 	private void initAdsrVb() {
-		Track track = (Track) TrackManager.getCurrTrack();
+		Track track = (Track) context.getTrackManager().getCurrTrack();
 		float attackX = getAttackX(track.getAdsr());
 		float decayX = getDecayX(track.getAdsr());
 		POINT_VERTICES[0] = viewX(0);
@@ -148,7 +147,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 
 	private void moveAdsrPoint(int id, float x, float y) {
 		for (int i = 0; i < adsrSelected.length; i++) {
-			ADSR adsr = ((Track) TrackManager.getCurrTrack()).getAdsr();
+			ADSR adsr = ((Track) context.getTrackManager().getCurrTrack()).getAdsr();
 			if (adsrSelected[i] == id) {
 				switch (i) {
 				case 0: // start level - only moves along y axis, always x == 0

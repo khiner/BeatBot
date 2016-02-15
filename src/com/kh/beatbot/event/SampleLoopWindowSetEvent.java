@@ -1,7 +1,7 @@
 package com.kh.beatbot.event;
 
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.Track;
+import com.kh.beatbot.ui.view.View;
 
 public class SampleLoopWindowSetEvent implements Stateful, Temporal {
 	private int trackId;
@@ -14,14 +14,14 @@ public class SampleLoopWindowSetEvent implements Stateful, Temporal {
 
 	@Override
 	public void begin() {
-		Track track = TrackManager.getTrackById(trackId);
+		Track track = View.context.getTrackManager().getTrackById(trackId);
 		initialBeginLevel = track.getLoopBeginParam().viewLevel;
 		initialEndLevel = track.getLoopEndParam().viewLevel;
 	}
 
 	@Override
 	public void end() {
-		Track track = TrackManager.getTrackById(trackId);
+		Track track = View.context.getTrackManager().getTrackById(trackId);
 		finalBeginLevel = track.getLoopBeginParam().viewLevel;
 		finalEndLevel = track.getLoopEndParam().viewLevel;
 
@@ -32,13 +32,13 @@ public class SampleLoopWindowSetEvent implements Stateful, Temporal {
 
 	@Override
 	public void undo() {
-		Track track = TrackManager.getTrackById(trackId);
+		Track track = View.context.getTrackManager().getTrackById(trackId);
 		track.setSampleLoopWindow(initialBeginLevel, initialEndLevel);
 	}
 
 	@Override
 	public void apply() {
-		Track track = TrackManager.getTrackById(trackId);
+		Track track = View.context.getTrackManager().getTrackById(trackId);
 		track.setSampleLoopWindow(finalBeginLevel, finalEndLevel);
 	}
 }

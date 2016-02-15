@@ -30,11 +30,11 @@ public class MidiNote implements Comparable<MidiNote> {
 
 	public void create() {
 		selected = true;
-		MidiManager.get().onCreate(this);
+		View.context.getMidiManager().onCreate(this);
 	}
 
 	public void destroy() {
-		MidiManager.get().onDestroy(this);
+		View.context.getMidiManager().onDestroy(this);
 		restoreTicks();
 	}
 
@@ -138,7 +138,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		if (this.selected == selected)
 			return;
 		this.selected = selected;
-		MidiManager.get().onSelectStateChange(this);
+		View.context.getMidiManager().onSelectStateChange(this);
 	}
 
 	public void setTouched(boolean touched) {
@@ -155,8 +155,8 @@ public class MidiNote implements Comparable<MidiNote> {
 		}
 
 		if (prevOnTick != getOnTick() || prevOffTick != getOffTick()) {
-			MidiManager.get().onMove(this, getNoteValue(), prevOnTick, prevOffTick, getNoteValue(),
-					getOnTick(), getOffTick());
+			View.context.getMidiManager().onMove(this, getNoteValue(), prevOnTick, prevOffTick,
+					getNoteValue(), getOnTick(), getOffTick());
 			return true;
 		} else {
 			return false;
@@ -170,8 +170,8 @@ public class MidiNote implements Comparable<MidiNote> {
 		int prevNoteValue = getNoteValue();
 		noteOn.setNoteValue(note);
 		noteOff.setNoteValue(note);
-		MidiManager.get().onMove(this, prevNoteValue, getOnTick(), getOffTick(), getNoteValue(),
-				getOnTick(), getOffTick());
+		View.context.getMidiManager().onMove(this, prevNoteValue, getOnTick(), getOffTick(),
+				getNoteValue(), getOnTick(), getOffTick());
 	}
 
 	public void setNoteWithoutNotify(int note) {
@@ -243,7 +243,7 @@ public class MidiNote implements Comparable<MidiNote> {
 			break;
 		}
 
-		MidiManager.get().onLevelChanged(this, levelType);
+		View.context.getMidiManager().onLevelChanged(this, levelType);
 	}
 
 	@Override

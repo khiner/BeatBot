@@ -3,8 +3,8 @@ package com.kh.beatbot.event.track;
 import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.event.Temporal;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
+import com.kh.beatbot.ui.view.View;
 
 public class TrackLevelsSetEvent implements Stateful, Temporal {
 	private int trackId;
@@ -42,7 +42,7 @@ public class TrackLevelsSetEvent implements Stateful, Temporal {
 		float volume, pan, pitchStep, pitchCent;
 
 		public Levels(int trackId) {
-			BaseTrack track = TrackManager.getBaseTrackById(trackId);
+			final BaseTrack track = View.context.getTrackManager().getBaseTrackById(trackId);
 			this.volume = track.volumeParam.viewLevel;
 			this.pan = track.panParam.viewLevel;
 			this.pitchStep = track.pitchStepParam.viewLevel;
@@ -50,7 +50,7 @@ public class TrackLevelsSetEvent implements Stateful, Temporal {
 		}
 
 		public void setTrackLevels(int trackId) {
-			BaseTrack track = TrackManager.getBaseTrackById(trackId);
+			final BaseTrack track = View.context.getTrackManager().getBaseTrackById(trackId);
 			track.setLevels(volume, pan, pitchStep, pitchCent);
 		}
 

@@ -4,7 +4,6 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.event.track.TrackLevelsSetEvent;
 import com.kh.beatbot.listener.MultiViewTouchTracker;
 import com.kh.beatbot.listener.TouchableViewsListener;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -47,14 +46,15 @@ public class TrackLevelsPage extends TrackPage implements TouchableViewsListener
 		panParamControl.setLevelColor(Color.PAN, Color.PAN_TRANS);
 		pitchParamControl.setLevelColor(Color.PITCH, Color.PITCH_TRANS);
 
-		new MultiViewTouchTracker(this).trackViews(volumeParamControl, panParamControl, pitchParamControl);
+		new MultiViewTouchTracker(this).trackViews(volumeParamControl, panParamControl,
+				pitchParamControl);
 	}
 
 	private TrackLevelsSetEvent levelsSetEvent = null;
 
 	@Override
 	public void onFirstPress() {
-		levelsSetEvent = new TrackLevelsSetEvent(TrackManager.getCurrTrack().getId());
+		levelsSetEvent = new TrackLevelsSetEvent(context.getTrackManager().getCurrTrack().getId());
 		levelsSetEvent.begin();
 	}
 

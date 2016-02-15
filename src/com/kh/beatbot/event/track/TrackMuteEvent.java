@@ -1,8 +1,8 @@
 package com.kh.beatbot.event.track;
 
 import com.kh.beatbot.event.Executable;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.Track;
+import com.kh.beatbot.ui.view.View;
 
 public class TrackMuteEvent extends Executable {
 	private int trackId;
@@ -18,7 +18,7 @@ public class TrackMuteEvent extends Executable {
 
 	@Override
 	public boolean doExecute() {
-		Track track = TrackManager.getTrackById(trackId);
+		final Track track = View.context.getTrackManager().getTrackById(trackId);
 		track.mute(!track.isMuted());
 		return true;
 	}

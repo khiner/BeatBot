@@ -1,20 +1,20 @@
 package com.kh.beatbot.event;
 
-import com.kh.beatbot.manager.MidiManager;
+import com.kh.beatbot.ui.view.View;
 
 public class LoopWindowSetEvent implements Stateful, Temporal {
 	private long initialBeginTick, initialEndTick, finalBeginTick, finalEndTick;
 
 	@Override
 	public void begin() {
-		initialBeginTick = MidiManager.getLoopBeginTick();
-		initialEndTick = MidiManager.getLoopEndTick();
+		initialBeginTick = View.context.getMidiManager().getLoopBeginTick();
+		initialEndTick = View.context.getMidiManager().getLoopEndTick();
 	}
 
 	@Override
 	public void end() {
-		finalBeginTick = MidiManager.getLoopBeginTick();
-		finalEndTick = MidiManager.getLoopEndTick();
+		finalBeginTick = View.context.getMidiManager().getLoopBeginTick();
+		finalEndTick = View.context.getMidiManager().getLoopEndTick();
 
 		if (initialBeginTick != finalBeginTick || initialEndTick != finalEndTick) {
 			EventManager.eventCompleted(this);
@@ -23,11 +23,11 @@ public class LoopWindowSetEvent implements Stateful, Temporal {
 
 	@Override
 	public void undo() {
-		MidiManager.setLoopTicks(initialBeginTick, initialEndTick);
+		View.context.getMidiManager().setLoopTicks(initialBeginTick, initialEndTick);
 	}
 
 	@Override
 	public void apply() {
-		MidiManager.setLoopTicks(finalBeginTick, finalEndTick);
+		View.context.getMidiManager().setLoopTicks(finalBeginTick, finalEndTick);
 	}
 }

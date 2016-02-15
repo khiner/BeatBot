@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.RecordStateListener;
 import com.kh.beatbot.midi.util.WavFileUtil;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 
 public class RecordManager {
@@ -21,14 +22,14 @@ public class RecordManager {
 		private AlertDialog selectRecordSourceAlert = null;
 		private Button button;
 
-		public RecordSourceButtonListener(final Context c) {
+		public RecordSourceButtonListener(final RecordManager recordManager, final Context c) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(c);
 			builder.setTitle("Choose record source");
 			builder.setItems(getRecordSources(), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-					setRecordSource(item);
+					recordManager.setRecordSource(item);
 					if (button != null) {
-						button.setText(currRecordSource);
+						button.setText(recordManager.recordSource);
 					}
 				}
 			});
@@ -47,48 +48,49 @@ public class RecordManager {
 	};
 
 	public static String GLOBAL_RECORD_SOURCE = "Global", MICROPHONE_RECORD_SOURCE = "Microphone";
-
-	private static Context context = null;
-	private static String currRecordFileName = null;
-	private static State state = State.OFF;
-	private static int currFileNum = 0;
 	private static final List<String> RECORD_SOURCES = Arrays.asList(new String[] {
 			GLOBAL_RECORD_SOURCE, MICROPHONE_RECORD_SOURCE });
-	private static RecordStateListener listener;
-	private static RecordSourceButtonListener recordSourceButtonListener;
-	private static String currRecordSource = GLOBAL_RECORD_SOURCE;
 
-	public static void init(Context context) {
-		RecordManager.context = context;
-		recordSourceButtonListener = new RecordSourceButtonListener(context);
+	private Context context;
+	private String recordSource = GLOBAL_RECORD_SOURCE;
+	private String currRecordFileName = null;
+	private State state = State.OFF;
+	private int currFileNum = 0;
+
+	private RecordStateListener listener;
+	private RecordSourceButtonListener recordSourceButtonListener;
+
+	public RecordManager(Context context) {
+		this.context = context;
+		recordSourceButtonListener = new RecordSourceButtonListener(this, context);
 	}
 
-	public static void setListener(RecordStateListener listener) {
-		RecordManager.listener = listener;
+	public void setListener(final RecordStateListener listener) {
+		this.listener = listener;
 	}
 
-	public static OnReleaseListener getRecordSourceButtonListener() {
+	public OnReleaseListener getRecordSourceButtonListener() {
 		return recordSourceButtonListener;
 	}
 
-	public synchronized static boolean isOff() {
+	public synchronized boolean isOff() {
 		return state == State.OFF;
 	}
 
-	public synchronized static boolean isListening() {
+	public synchronized boolean isListening() {
 		return state == State.LISTENING;
 	}
 
-	public synchronized static boolean isArmed() {
+	public synchronized boolean isArmed() {
 		return state == State.ARMED;
 	}
 
-	public synchronized static boolean isRecording() {
+	public synchronized boolean isRecording() {
 		return state == State.RECORDING;
 	}
 
 	// in LISTEN mode, recorder listens to (polls) the RecordSource to display the current level
-	public synchronized static void startListening() {
+	public synchronized void startListening() {
 		if (!isOff())
 			return;
 
@@ -102,7 +104,7 @@ public class RecordManager {
 	}
 
 	// in ARMED mode, recorder waits for RecordSource to exceed threshold before recording
-	public synchronized static void arm() {
+	public synchronized void arm() {
 		if (!isListening())
 			return;
 
@@ -113,7 +115,7 @@ public class RecordManager {
 		}
 	}
 
-	public synchronized static void disarm() {
+	public synchronized void disarm() {
 		if (!isArmed())
 			return;
 
@@ -124,12 +126,12 @@ public class RecordManager {
 		}
 	}
 
-	public static String startRecording() {
+	public String startRecording() {
 		if (!isArmed()) {
 			return null;
 		}
 		
-		String recordDirectory = FileManager.recordPathForSource(currRecordSource);
+		String recordDirectory = View.context.getFileManager().recordPathForSource(recordSource);
 		currRecordFileName = recordDirectory + "/R" + (currFileNum++) + ".wav";
 		try {
 			FileOutputStream out = WavFileUtil.writeWavFileHeader(currRecordFileName, 0, 0);
@@ -144,7 +146,7 @@ public class RecordManager {
 		return currRecordFileName;
 	}
 
-	public synchronized static File stopRecording() {
+	public synchronized File stopRecording() {
 		if (isArmed()) {
 			disarm();
 			return null;
@@ -163,7 +165,7 @@ public class RecordManager {
 		return file;
 	}
 
-	public synchronized static void stopListening() {
+	public synchronized void stopListening() {
 		if (!isListening())
 			return;
 
@@ -175,21 +177,25 @@ public class RecordManager {
 		}
 	}
 
+	public void notifyRecordSourceBufferFilled(float recordSourceMaxFrame) {
+		if (listener != null) {
+			listener.onRecordSourceBufferFilled(recordSourceMaxFrame);
+		}
+	}
+
 	public static String[] getRecordSources() {
 		return (String[]) RECORD_SOURCES.toArray();
 	}
 
-	public static void setRecordSource(final int recordSourceIndex) {
-		currRecordSource = RECORD_SOURCES.get(recordSourceIndex);
-		setRecordSourceNative(recordSourceIndex);
-		if (currRecordSource.equals(MICROPHONE_RECORD_SOURCE)) {
-			startListeningNative();
-		}
+	public String getRecordSource() {
+		return recordSource;
 	}
 
-	public static void notifyRecordSourceBufferFilled(float recordSourceMaxFrame) {
-		if (listener != null) {
-			listener.onRecordSourceBufferFilled(recordSourceMaxFrame);
+	public void setRecordSource(final int recordSourceIndex) {
+		recordSource = RECORD_SOURCES.get(recordSourceIndex);
+		setRecordSourceNative(recordSourceIndex);
+		if (recordSource.equals(MICROPHONE_RECORD_SOURCE)) {
+			startListeningNative();
 		}
 	}
 

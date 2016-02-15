@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.kh.beatbot.listener.ParamListener;
-import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.view.View;
 
 public abstract class Effect implements Comparable<Effect>, ParamListener {
 
@@ -126,7 +126,7 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 
 	public void destroy() {
 		removeEffect(trackId, position);
-		TrackManager.getBaseTrackById(trackId).removeEffect(this);
+		View.context.getTrackManager().getBaseTrackById(trackId).removeEffect(this);
 	}
 
 	public Param getXParam() {

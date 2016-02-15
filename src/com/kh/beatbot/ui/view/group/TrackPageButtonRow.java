@@ -2,8 +2,6 @@ package com.kh.beatbot.ui.view.group;
 
 import com.kh.beatbot.event.track.TrackDestroyEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.manager.FileManager;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -53,11 +51,12 @@ public class TrackPageButtonRow extends PageButtonRow {
 		ToggleButton browseButton = pageButtons[BROWSE_PAGE_ID];
 
 		// update the browse pager instrument icon
-		Track track = (Track) TrackManager.getCurrTrack();
+		final Track track = (Track) context.getTrackManager().getCurrTrack();
 		IconResourceSet instrumentIcon = track.getIcon();
 
 		browseButton.setResourceId(instrumentIcon);
-		browseButton.setText(FileManager.formatSampleName(track.getCurrSampleName()));
+		browseButton.setText(View.context.getFileManager().formatSampleName(
+				track.getCurrSampleName()));
 	}
 
 	@Override
@@ -70,7 +69,8 @@ public class TrackPageButtonRow extends PageButtonRow {
 		deleteTrackButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				new TrackDestroyEvent(TrackManager.getCurrTrack().getId()).execute();
+				new TrackDestroyEvent(context.getTrackManager().getCurrTrack().getId())
+						.execute();
 			}
 		});
 

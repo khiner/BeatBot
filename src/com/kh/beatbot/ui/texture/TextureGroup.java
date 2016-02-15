@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.texture;
 import com.kh.beatbot.ui.mesh.Mesh;
 import com.kh.beatbot.ui.mesh.MeshGroup;
 import com.kh.beatbot.ui.mesh.TextMesh;
+import com.kh.beatbot.ui.view.View;
 
 public class TextureGroup extends MeshGroup {
 	public final static int VERTICES_PER_TEXTURE = 4;
@@ -12,12 +13,12 @@ public class TextureGroup extends MeshGroup {
 	}
 
 	public synchronized void setText(TextMesh mesh, String text, float x, float y, float height) {
-		final float scale = height / TextureAtlas.font.getCellHeight();
-		final float cellWidth = TextureAtlas.font.getCellWidth() * scale;
+		final float scale = height / View.context.getFontTextureAtlas().getCellHeight();
+		final float cellWidth = View.context.getFontTextureAtlas().getCellWidth() * scale;
 
 		int textureIndex = 0;
 		for (char character : text.toCharArray()) {
-			TextureRegion charRegion = TextureAtlas.font.getTextureRegion(character);
+			TextureRegion charRegion = View.context.getFontTextureAtlas().getTextureRegion(character);
 			textureVertices(mesh, textureIndex, charRegion, x, y, cellWidth, height, null);
 			x += FontTextureAtlas.getCharWidth(character) * scale;
 			textureIndex += VERTICES_PER_TEXTURE;
@@ -30,14 +31,14 @@ public class TextureGroup extends MeshGroup {
 			float height, float[] color) {
 		if (-1 == resourceId)
 			return;
-		textureVertices(mesh, 0, TextureAtlas.resource.getTextureRegion(resourceId), x, y, width,
+		textureVertices(mesh, 0, View.context.getResourceTextureAtlas().getTextureRegion(resourceId), x, y, width,
 				height, color);
 
 		dirty = true;
 	}
 
 	public synchronized void setResource(Mesh mesh, int resourceId) {
-		setTexture(mesh, TextureAtlas.resource.getTextureRegion(resourceId));
+		setTexture(mesh, View.context.getResourceTextureAtlas().getTextureRegion(resourceId));
 
 		dirty = true;
 	}

@@ -2,8 +2,8 @@ package com.kh.beatbot.ui.shape;
 
 import android.util.SparseArray;
 
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.Track;
+import com.kh.beatbot.ui.view.View;
 
 public class WaveformShape extends Shape {
 	private final static float MAX_SPP = 0.5f;
@@ -38,7 +38,7 @@ public class WaveformShape extends Shape {
 	 * Read samples from disk at the current granularity
 	 */
 	public synchronized void resample() {
-		Track track = (Track) TrackManager.getCurrTrack();
+		Track track = (Track) View.context.getTrackManager().getCurrTrack();
 		sampleBuffer.clear();
 		float numFrames = track.getNumFrames();
 		for (float s = -numSamples; s < numSamples * 2; s++) {
@@ -65,7 +65,7 @@ public class WaveformShape extends Shape {
 		this.loopBeginX = loopBeginX;
 		this.loopEndX = loopEndX;
 
-		Track track = (Track) TrackManager.getCurrTrack();
+		final Track track = (Track) View.context.getTrackManager().getCurrTrack();
 		long newWidthInFrames = (long) Math.min(widthInFrames, track.getNumFrames());
 		boolean waveformChanged = this.offsetInFrames != offsetInFrames
 				|| this.widthInFrames != newWidthInFrames || this.xOffset != xOffset;

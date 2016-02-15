@@ -13,8 +13,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.EffectSerializer;
-import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.track.TrackSerializer;
@@ -43,20 +41,22 @@ public class ProjectFile {
 
 		// global properties
 		JsonObject globalProperties = new JsonObject();
-		globalProperties.addProperty(LOOP_BEGIN_TICK, MidiManager.getLoopBeginTick());
-		globalProperties.addProperty(LOOP_END_TICK, MidiManager.getLoopEndTick());
-		globalProperties.addProperty(TEMPO, MidiManager.getBPM());
-		globalProperties.addProperty(SNAP_TO_GRID, MidiManager.isSnapToGrid());
-		globalProperties.addProperty(CURR_TRACK_ID, TrackManager.getCurrTrack().getId());
+		globalProperties.addProperty(LOOP_BEGIN_TICK, View.context.getMidiManager()
+				.getLoopBeginTick());
+		globalProperties.addProperty(LOOP_END_TICK, View.context.getMidiManager().getLoopEndTick());
+		globalProperties.addProperty(TEMPO, View.context.getMidiManager().getBpm());
+		globalProperties.addProperty(SNAP_TO_GRID, View.context.getMidiManager().isSnapToGrid());
+		globalProperties.addProperty(CURR_TRACK_ID, View.context.getTrackManager().getCurrTrack()
+				.getId());
 		globalProperties.addProperty(CURR_PAGE_INDEX, View.mainPage.getPageSelectGroup()
 				.getCurrPageIndex());
 
 		outputStream.write((globalProperties.toString() + "\n").getBytes());
 
 		// tracks
-		BaseTrack masterTrack = TrackManager.getMasterTrack();
+		BaseTrack masterTrack = View.context.getTrackManager().getMasterTrack();
 		outputStream.write((trackToJson(masterTrack) + "\n").getBytes());
-		for (Track track : TrackManager.getTracks()) {
+		for (Track track : View.context.getTrackManager().getTracks()) {
 			String trackJson = trackToJson(track) + "\n";
 			outputStream.write(trackJson.getBytes());
 		}
@@ -69,9 +69,12 @@ public class ProjectFile {
 
 		// global properties
 		JsonObject globalProperties = parser.parse(reader.readLine()).getAsJsonObject();
-		MidiManager.setLoopTicks(globalProperties.get(LOOP_BEGIN_TICK).getAsLong(), globalProperties.get(LOOP_END_TICK).getAsLong());
-		MidiManager.setBPM(globalProperties.get(TEMPO).getAsFloat());
-		MidiManager.setSnapToGrid(globalProperties.get(SNAP_TO_GRID).getAsBoolean());
+		View.context.getMidiManager().setLoopTicks(
+				globalProperties.get(LOOP_BEGIN_TICK).getAsLong(),
+				globalProperties.get(LOOP_END_TICK).getAsLong());
+		View.context.getMidiManager().setBpm(globalProperties.get(TEMPO).getAsFloat());
+		View.context.getMidiManager().setSnapToGrid(
+				globalProperties.get(SNAP_TO_GRID).getAsBoolean());
 
 		// tracks
 		String serializedTrack;
@@ -79,7 +82,8 @@ public class ProjectFile {
 			trackFromJson(serializedTrack);
 		}
 
-		TrackManager.getBaseTrackById(globalProperties.get(CURR_TRACK_ID).getAsInt()).select();
+		View.context.getTrackManager().getBaseTrackById(
+				globalProperties.get(CURR_TRACK_ID).getAsInt()).select();
 		View.mainPage.getPageSelectGroup().selectPage(
 				globalProperties.get(CURR_PAGE_INDEX).getAsInt());
 

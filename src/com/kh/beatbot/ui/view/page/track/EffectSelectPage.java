@@ -11,7 +11,6 @@ import com.kh.beatbot.event.effect.EffectCreateEvent;
 import com.kh.beatbot.event.effect.EffectDestroyEvent;
 import com.kh.beatbot.event.effect.EffectMoveEvent;
 import com.kh.beatbot.listener.LabelListListener;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.list.LabelList;
@@ -33,8 +32,8 @@ public class EffectSelectPage extends TrackPage {
 			builder.setItems(effectNames, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
 					if (effectNames[item].toLowerCase().equals("none")) {
-						Effect effect = TrackManager.getCurrTrack().findEffectByPosition(
-								lastClickedPos);
+						Effect effect = context.getTrackManager().getCurrTrack()
+								.findEffectByPosition(lastClickedPos);
 						if (effect != null) {
 							destroyEffect(effect);
 						}
@@ -48,7 +47,7 @@ public class EffectSelectPage extends TrackPage {
 
 		@Override
 		public void labelMoved(int oldPosition, int newPosition) {
-			int trackId = TrackManager.getCurrTrack().getId();
+			int trackId = context.getTrackManager().getCurrTrack().getId();
 			new EffectMoveEvent(trackId, oldPosition, newPosition).execute();
 		}
 
@@ -104,7 +103,7 @@ public class EffectSelectPage extends TrackPage {
 		if (effectLabelList.numChildren() <= 0)
 			return;
 		for (int i = 0; i < Effect.MAX_EFFECTS_PER_TRACK; i++) {
-			Effect effect = TrackManager.getCurrTrack().findEffectByPosition(i);
+			Effect effect = context.getTrackManager().getCurrTrack().findEffectByPosition(i);
 			if (effect == null) {
 				effectLabelList.setLabelText(i, "");
 			} else {
@@ -116,7 +115,7 @@ public class EffectSelectPage extends TrackPage {
 
 	// effects methods
 	private void launchEffect(String effectName, int position, boolean setOn) {
-		BaseTrack track = TrackManager.getCurrTrack();
+		BaseTrack track = context.getTrackManager().getCurrTrack();
 		Effect effect = track.findEffectByPosition(position);
 		if (effect == null) {
 			new EffectCreateEvent(track.getId(), position, effectName).execute();
@@ -128,7 +127,7 @@ public class EffectSelectPage extends TrackPage {
 	}
 
 	private void destroyEffect(Effect effect) {
-		BaseTrack track = TrackManager.getCurrTrack();
+		final BaseTrack track = context.getTrackManager().getCurrTrack();
 		new EffectDestroyEvent(track.getId(), effect.getPosition()).execute();
 	}
 

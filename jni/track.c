@@ -339,7 +339,7 @@ void setNextNote(Track *track, jobject obj) {
 
 void updateNextNote(Track *track) {
 	JNIEnv* env = getJniEnv();
-	jobject obj = (*env)->CallStaticObjectMethod(env, getTrackClass(),
+	jobject obj = (*env)->CallObjectMethod(env, getTrackManager(),
 			getNextMidiNoteMethod(), track->num, (jlong) currTick);
 	setNextNote(track, obj);
 	(*env)->DeleteLocalRef(env, obj);

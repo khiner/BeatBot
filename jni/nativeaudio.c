@@ -4,20 +4,20 @@
 // __android_log_print(ANDROID_LOG_INFO, "YourApp", "formatted message");
 
 // engine interfaces
-static SLObjectItf engineObject = NULL;
-static SLEngineItf engineEngine = NULL;
+SLObjectItf engineObject = NULL;
+SLEngineItf engineEngine = NULL;
 
 // output mix interfaces
-static SLObjectItf outputMixObject = NULL;
+SLObjectItf outputMixObject = NULL;
 
-static bool playing = false;
-static bool recordArmed = false;
-static bool listening = false;
-static bool recording = false;
-static float thresholdLevel = 0;
-static FILE *recordOutFile = NULL;
-static pthread_mutex_t recordMutex, bufferFillMutex;
-static pthread_cond_t bufferFillCond = PTHREAD_COND_INITIALIZER;
+bool playing = false;
+bool recordArmed = false;
+bool listening = false;
+bool recording = false;
+float thresholdLevel = 0;
+FILE *recordOutFile = NULL;
+pthread_mutex_t recordMutex, bufferFillMutex;
+pthread_cond_t bufferFillCond = PTHREAD_COND_INITIALIZER;
 
 bool isPlaying() {
 	return playing;
@@ -32,7 +32,7 @@ static inline void interleaveFloatsToShorts(float left[], float right[],
 	}
 }
 
-static inline void writeBufferToRecordFile(short buffer[]) {
+void writeBufferToRecordFile(short buffer[]) {
 	// write to record out file if recording
 	if (recording && recordOutFile != NULL
 			&& openSlOut->recordBufferShort == buffer) {
@@ -47,12 +47,12 @@ static inline void writeBufferToRecordFile(short buffer[]) {
 	}
 }
 
-static inline void startRecording() {
+void startRecording() {
 	pthread_mutex_lock(&recordMutex);
 	recordArmed = false;
 	JNIEnv* env = getJniEnv();
-	jstring recordFilePath = (*env)->CallStaticObjectMethod(env,
-			getRecordManagerClass(), getStartRecordingJavaMethod());
+	jstring recordFilePath = (*env)->CallObjectMethod(env,
+			getRecordManager(), getStartRecordingJavaMethod());
 
 	const char *cRecordFilePath = (*env)->GetStringUTFChars(env, recordFilePath,
 			0);
@@ -64,16 +64,16 @@ static inline void startRecording() {
 	pthread_mutex_unlock(&recordMutex);
 }
 
-static inline void notifyMaxFrame(float maxFrame) {
+void notifyMaxFrame(float maxFrame) {
 	JNIEnv* env = getJniEnv();
-	(*env)->CallStaticVoidMethod(env, getRecordManagerClass(),
+	(*env)->CallVoidMethod(env, getRecordManager(),
 			getNotifyRecordSourceBufferFilledMethod(), maxFrame);
 	if (recordArmed && maxFrame > thresholdLevel) {
 		startRecording();
 	}
 }
 
-static inline void processEffects(Levels *levels, float **floatBuffer) {
+void processEffects(Levels *levels, float **floatBuffer) {
 	pthread_mutex_lock(&levels->effectMutex);
 	EffectNode *effectNode = levels->effectHead;
 	while (effectNode != NULL ) {
@@ -86,7 +86,7 @@ static inline void processEffects(Levels *levels, float **floatBuffer) {
 	pthread_mutex_unlock(&levels->effectMutex);
 }
 
-static inline void processEffectsForAllTracks() {
+void processEffectsForAllTracks() {
 	TrackNode *cur_ptr = trackHead;
 	while (cur_ptr != NULL ) {
 		processEffects(cur_ptr->track->levels, cur_ptr->track->currBufferFloat);
@@ -94,11 +94,11 @@ static inline void processEffectsForAllTracks() {
 	}
 }
 
-static inline void processMasterEffects() {
+void processMasterEffects() {
 	processEffects(masterLevels, openSlOut->currBufferFloat);
 }
 
-static inline void mixTracks() {
+void mixTracks() {
 	float maxFrame = 0, total = 0;
 	int channel, samp;
 	for (channel = 0; channel < 2; channel++) {
@@ -154,7 +154,7 @@ void disarm() {
 	openSlOut->armed = false;
 }
 
-static inline void generateNextBuffer() {
+void generateNextBuffer() {
 	int samp, channel;
 	for (samp = 0; samp < BUFF_SIZE_FRAMES; samp++) {
 		if (currTick > loopEndTick) {

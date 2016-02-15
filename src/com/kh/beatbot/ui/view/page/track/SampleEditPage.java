@@ -2,7 +2,6 @@ package com.kh.beatbot.ui.view.page.track;
 
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -52,26 +51,27 @@ public class SampleEditPage extends TrackPage {
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override
 			public void onPress(Button button) {
-				((Track) TrackManager.getCurrTrack()).preview();
+				((Track) context.getTrackManager().getCurrTrack()).preview();
 			}
 		});
 
 		previewButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				((Track) TrackManager.getCurrTrack()).stopPreviewing();
+				((Track) context.getTrackManager().getCurrTrack()).stopPreviewing();
 			}
 		});
 
 		loopButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
-				((Track) TrackManager.getCurrTrack()).toggleLooping();
+				((Track) context.getTrackManager().getCurrTrack()).toggleLooping();
 			}
 		});
 
 		reverseButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
-				((Track) TrackManager.getCurrTrack()).setReverse(reverseButton.isChecked());
+				((Track) context.getTrackManager().getCurrTrack()).setReverse(reverseButton
+						.isChecked());
 			}
 		});
 

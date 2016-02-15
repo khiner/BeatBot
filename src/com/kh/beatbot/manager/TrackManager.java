@@ -14,51 +14,42 @@ import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.FileListener;
 import com.kh.beatbot.listener.MidiNoteListener;
+import com.kh.beatbot.listener.TempoListener;
 import com.kh.beatbot.listener.TrackLevelsEventListener;
 import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
 
-public class TrackManager implements TrackListener, FileListener, MidiNoteListener {
+public class TrackManager implements TrackListener, FileListener, MidiNoteListener, TempoListener {
 	public static final int MASTER_TRACK_ID = -1;
 
-	private static final TrackManager instance = new TrackManager();
-	private static final BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
-	private static final List<Track> tracks = Collections.synchronizedList(new ArrayList<Track>());
-	private static final Set<TrackListener> trackListeners = new HashSet<TrackListener>();
-	private static final Set<TrackLevelsEventListener> trackLevelsEventListeners = new HashSet<TrackLevelsEventListener>();
+	private final BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
+	private final List<Track> tracks = Collections.synchronizedList(new ArrayList<Track>());
+	private final Set<TrackListener> trackListeners = new HashSet<TrackListener>();
+	private final Set<TrackLevelsEventListener> trackLevelsEventListeners = new HashSet<TrackLevelsEventListener>();
 
-	private static AlertDialog.Builder sampleSaveErrorAlert;
+	private AlertDialog.Builder sampleSaveErrorAlert;
 
-	private static Track currTrack;
+	private Track currTrack;
 
-	private TrackManager() {
-		FileManager.addListener(this);
-		MidiManager.addMidiNoteListener(this);
-	}
-
-	public static TrackManager get() {
-		return instance;
-	}
-
-	public static BaseTrack getMasterTrack() {
+	public BaseTrack getMasterTrack() {
 		return masterTrack;
 	}
 
-	public static List<Track> getTracks() {
+	public List<Track> getTracks() {
 		return tracks; // XXX shouldn't provide full list - concurrency threat
 	}
 
-	public static void addTrackListener(TrackListener trackListener) {
+	public void addTrackListener(TrackListener trackListener) {
 		trackListeners.add(trackListener);
 	}
 
-	public static void addTrackLevelsEventListener(TrackLevelsEventListener listener) {
+	public void addTrackLevelsEventListener(TrackLevelsEventListener listener) {
 		trackLevelsEventListeners.add(listener);
 	}
 
-	public static void notifyTrackLevelsSetEvent(BaseTrack track) {
+	public void notifyTrackLevelsSetEvent(BaseTrack track) {
 		if (!track.equals(currTrack)) {
 			track.select();
 		}
@@ -67,7 +58,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
-	public static void notifyLoopWindowSetEvent(Track track) {
+	public void notifyLoopWindowSetEvent(Track track) {
 		if (!track.equals(currTrack)) {
 			track.select();
 		}
@@ -76,12 +67,12 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
-	public static void init(Context context) {
+	public void init(Context context) {
 		sampleSaveErrorAlert = new AlertDialog.Builder(context);
 		sampleSaveErrorAlert.setPositiveButton("OK", null);
 	}
 
-	public static void setSample(Track track, File sampleFile) {
+	public void setSample(Track track, File sampleFile) {
 		try {
 			track.setSample(sampleFile);
 		} catch (Exception e) {
@@ -90,7 +81,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
-	public static void destroy() {
+	public void destroy() {
 		List<Track> tracksToDestroy = new ArrayList<Track>();
 		tracksToDestroy.addAll(tracks);
 		for (Track track : tracksToDestroy) {
@@ -98,12 +89,12 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
-	public static void selectRow(int rowNum) {
+	public void selectRow(int rowNum) {
 		deselectAllNotes();
 		getTrackByNoteValue(rowNum).selectAllNotes();
 	}
 
-	public static void deselectAllNotes() {
+	public void deselectAllNotes() {
 		synchronized (tracks) {
 			for (Track track : tracks) {
 				track.deselectAllNotes();
@@ -111,7 +102,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
-	public static List<MidiNote> copySelectedNotes() {
+	public List<MidiNote> copySelectedNotes() {
 		List<MidiNote> selectedNotesCopy = new ArrayList<MidiNote>();
 		synchronized (tracks) {
 			for (Track track : tracks) {
@@ -125,7 +116,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		return selectedNotesCopy;
 	}
 
-	public static List<MidiNote> copyMidiNotes() {
+	public List<MidiNote> copyMidiNotes() {
 		List<MidiNote> midiNotesCopy = new ArrayList<MidiNote>();
 		synchronized (tracks) {
 			for (Track track : tracks) {
@@ -137,7 +128,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		return midiNotesCopy;
 	}
 
-	public static List<MidiNote> getSelectedNotes() {
+	public List<MidiNote> getSelectedNotes() {
 		ArrayList<MidiNote> selectedNotes = new ArrayList<MidiNote>();
 		synchronized (tracks) {
 			for (Track track : tracks) {
@@ -151,7 +142,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		return selectedNotes;
 	}
 
-	public static float getAdjustedTickDiff(float tickDiff, long startOnTick, MidiNote singleNote) {
+	public float getAdjustedTickDiff(float tickDiff, long startOnTick, MidiNote singleNote) {
 		if (tickDiff == 0)
 			return 0;
 		float adjustedTickDiff = tickDiff;
@@ -177,7 +168,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		return adjustedTickDiff;
 	}
 
-	public static int getAdjustedNoteDiff(int noteDiff, MidiNote singleNote) {
+	public int getAdjustedNoteDiff(int noteDiff, MidiNote singleNote) {
 		int adjustedNoteDiff = noteDiff;
 		synchronized (tracks) {
 			for (Track track : tracks) {
@@ -197,7 +188,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		return adjustedNoteDiff;
 	}
 
-	public static void selectRegion(long leftTick, long rightTick, int topNote, int bottomNote) {
+	public void selectRegion(long leftTick, long rightTick, int topNote, int bottomNote) {
 		synchronized (tracks) {
 			for (Track track : tracks) {
 				track.selectRegion(leftTick, rightTick, topNote, bottomNote);
@@ -205,7 +196,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
-	public static void saveNoteTicks() {
+	public void saveNoteTicks() {
 		synchronized (tracks) {
 			for (Track track : tracks) {
 				track.saveNoteTicks();
@@ -214,7 +205,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	// return true if any Midi note exists
-	public static boolean anyNotes() {
+	public boolean anyNotes() {
 		synchronized (tracks) {
 			for (Track track : tracks) {
 				if (track.anyNotes()) {
@@ -226,7 +217,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	// return true if any Midi note is selected
-	public static boolean anyNoteSelected() {
+	public boolean anyNoteSelected() {
 		synchronized (tracks) {
 			for (Track track : tracks) {
 				if (track.anyNoteSelected()) {
@@ -237,7 +228,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		return false;
 	}
 
-	public static long[] getSelectedNoteTickWindow() {
+	public long[] getSelectedNoteTickWindow() {
 		long[] selectedNoteTickWindow = { Long.MAX_VALUE, Long.MIN_VALUE };
 		synchronized (tracks) {
 			for (Track track : tracks) {
@@ -254,15 +245,15 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		return selectedNoteTickWindow;
 	}
 
-	public static Track getTrackByNoteValue(int noteValue) {
+	public Track getTrackByNoteValue(int noteValue) {
 		return noteValue < tracks.size() ? tracks.get(noteValue) : null;
 	}
 
-	public static BaseTrack getCurrTrack() {
+	public BaseTrack getCurrTrack() {
 		return currTrack == null ? masterTrack : currTrack;
 	}
 
-	public static Track getTrackById(int trackId) {
+	public Track getTrackById(int trackId) {
 		for (Track track : tracks) {
 			if (track.getId() == trackId)
 				return track;
@@ -271,15 +262,15 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		return null;
 	}
 
-	public static Track getTrack(MidiNote note) {
+	public Track getTrack(MidiNote note) {
 		return getTrackByNoteValue(note.getNoteValue());
 	}
 
-	public static BaseTrack getBaseTrackById(int trackId) {
+	public BaseTrack getBaseTrackById(int trackId) {
 		return trackId == MASTER_TRACK_ID ? masterTrack : getTrackById(trackId);
 	}
 
-	public static Track getSoloingTrack() {
+	public Track getSoloingTrack() {
 		for (Track track : tracks) {
 			if (track.isSoloing())
 				return track;
@@ -287,27 +278,27 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		return null;
 	}
 
-	public static int getNumTracks() {
+	public int getNumTracks() {
 		return tracks.size();
 	}
 
-	public static Track createTrack() {
+	public Track createTrack() {
 		int id = tracks.isEmpty() ? 0 : tracks.get(tracks.size() - 1).getId() + 1;
 		return createTrack(id, tracks.size());
 	}
 
-	public static Track createTrack(int trackId, int position) {
+	public Track createTrack(int trackId, int position) {
 		createTrackNative(trackId);
 		final Track newTrack;
 		synchronized (tracks) {
 			newTrack = new Track(trackId);
 			tracks.add(position, newTrack);
 		}
-		get().onCreate(newTrack);
+		onCreate(newTrack);
 		return newTrack;
 	}
 
-	public static void quantizeEffectParams() {
+	private void quantizeEffectParams() {
 		synchronized (tracks) {
 			for (Track track : tracks) {
 				track.quantizeEffectParams();
@@ -315,11 +306,11 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
-	public static MidiNote getNextMidiNote(int trackId, long currTick) {
+	public MidiNote getNextMidiNote(int trackId, long currTick) {
 		return getTrackById(trackId).getNextMidiNote(currTick);
 	}
 
-	public static void updateAllTrackNextNotes() {
+	public void updateAllTrackNextNotes() {
 		synchronized (tracks) {
 			for (Track track : tracks) {
 				track.updateNextNote();
@@ -498,5 +489,10 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	@Override
 	public void onLevelChanged(MidiNote note, LevelType type) {
 		// no-op
+	}
+
+	@Override
+	public void onTempoChange(float bpm) {
+		quantizeEffectParams();
 	}
 }

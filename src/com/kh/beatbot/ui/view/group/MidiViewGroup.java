@@ -1,7 +1,6 @@
 package com.kh.beatbot.ui.view.group;
 
 import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.MidiLoopBarView;
 import com.kh.beatbot.ui.view.MidiTrackView;
@@ -34,8 +33,8 @@ public class MidiViewGroup extends TouchableView {
 		midiView = new MidiView(this);
 		midiLoopBarView = new MidiLoopBarView(this);
 
-		TrackManager.addTrackListener(midiView);
-		TrackManager.addTrackListener(midiTrackView);
+		context.getTrackManager().addTrackListener(midiView);
+		context.getTrackManager().addTrackListener(midiTrackView);
 	}
 
 	@Override

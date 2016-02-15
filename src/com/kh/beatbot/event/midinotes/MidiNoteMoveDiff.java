@@ -1,7 +1,7 @@
 package com.kh.beatbot.event.midinotes;
 
-import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
+import com.kh.beatbot.ui.view.View;
 
 public class MidiNoteMoveDiff extends MidiNoteDiff {
 	long beginOnTick, beginOffTick, endOnTick, endOffTick;
@@ -19,7 +19,8 @@ public class MidiNoteMoveDiff extends MidiNoteDiff {
 
 	@Override
 	public void apply() {
-		MidiNote midiNote = MidiManager.findNote(beginNoteValue, beginOnTick);
+		final MidiNote midiNote = View.context.getMidiManager().findNote(beginNoteValue,
+				beginOnTick);
 
 		if (midiNote != null) { // TODO throw exception? Big deal if the state's not right
 			midiNote.setSelected(true);

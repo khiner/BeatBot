@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.kh.beatbot.effect.Effect.LevelType;
-import com.kh.beatbot.event.midinotes.MidiNotesEventManager;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.TouchedNotes;
 import com.kh.beatbot.midi.util.GeneralUtils;
@@ -122,7 +120,7 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	private boolean selectLevel(int pointerId, Pointer pos) {
-		Track track = (Track) TrackManager.getCurrTrack();
+		Track track = (Track) context.getTrackManager().getCurrTrack();
 		for (MidiNote midiNote : track.getMidiNotes()) {
 			float velocityY = levelToY(midiNote.getLinearLevel(currLevelType));
 			if (Math.abs(tickToX(midiNote.getOnTick()) - pos.x) < 35
@@ -132,7 +130,7 @@ public class NoteLevelsView extends TouchableView {
 				// If we are multi-selecting, add it to the selected list
 				if (!midiNote.isSelected()) {
 					if (touchedNotes.isEmpty()) {
-						TrackManager.deselectAllNotes();
+						context.getTrackManager().deselectAllNotes();
 					}
 					midiNote.setSelected(true);
 				}
@@ -144,7 +142,7 @@ public class NoteLevelsView extends TouchableView {
 			}
 		}
 		if (touchedNotes.isEmpty()) {
-			TrackManager.deselectAllNotes();
+			context.getTrackManager().deselectAllNotes();
 		}
 		return false;
 	}
@@ -157,7 +155,7 @@ public class NoteLevelsView extends TouchableView {
 
 		float leftTick = xToTick(leftX), rightTick = xToTick(rightX);
 
-		Track track = (Track) TrackManager.getCurrTrack();
+		Track track = (Track) context.getTrackManager().getCurrTrack();
 		for (MidiNote selectedNote : track.getMidiNotes()) {
 			float levelY = levelToY(selectedNote.getLinearLevel(currLevelType));
 			boolean selected = leftTick < selectedNote.getOnTick()
@@ -199,7 +197,7 @@ public class NoteLevelsView extends TouchableView {
 	private void updateLevelOffsets() {
 		levelOffsets.clear();
 		updateDragLine();
-		for (MidiNote selectedNote : TrackManager.getSelectedNotes()) {
+		for (MidiNote selectedNote : context.getTrackManager().getSelectedNotes()) {
 			levelOffsets.put(
 					selectedNote,
 					selectedNote.getLinearLevel(currLevelType)
@@ -208,11 +206,11 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	private void setLevelsToDragLine() {
-		for (MidiNote selectedNote : TrackManager.getSelectedNotes()) {
+		for (MidiNote selectedNote : context.getTrackManager().getSelectedNotes()) {
 			if (levelOffsets.get(selectedNote) != null) {
 				float linear = DragLine.getLevel(selectedNote.getOnTick())
 						+ levelOffsets.get(selectedNote);
-				MidiNotesEventManager.setNoteLevel(selectedNote, currLevelType,
+				context.getMidiManager().setNoteLevel(selectedNote, currLevelType,
 						GeneralUtils.linearToByte(linear));
 			}
 		}
@@ -224,7 +222,7 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	public void draw() {
-		List<MidiNote> notes = ((Track) TrackManager.getCurrTrack()).getMidiNotes();
+		List<MidiNote> notes = ((Track) context.getTrackManager().getCurrTrack()).getMidiNotes();
 		synchronized (notes) {
 			for (MidiNote note : notes) {
 				drawLevel(note, calcLevelColor(note.isSelected()),
@@ -278,7 +276,7 @@ public class NoteLevelsView extends TouchableView {
 		if (!touchedNotes.isEmpty()) {
 			MidiNote touched = touchedNotes.get(id);
 			if (touched != null) {
-				MidiNotesEventManager.setNoteLevel(touched, currLevelType,
+				context.getMidiManager().setNoteLevel(touched, currLevelType,
 						GeneralUtils.linearToByte(yToLevel(pos.y)));
 				updateValueLabel(touched);
 			}
@@ -294,7 +292,7 @@ public class NoteLevelsView extends TouchableView {
 	@Override
 	public void handleActionDown(int id, Pointer pos) {
 		super.handleActionDown(id, pos);
-		MidiNotesEventManager.begin();
+		context.getMidiManager().beginEvent();
 		if (!selectLevel(id, pos)) {
 			startSelectRegion(pos);
 		}
@@ -311,7 +309,7 @@ public class NoteLevelsView extends TouchableView {
 		clearTouchedLevels();
 		selectRegionRect.setFillColor(Color.TRANSPARENT);
 		valueLabel.hide();
-		MidiNotesEventManager.end();
+		context.getMidiManager().endEvent();
 	}
 
 	@Override

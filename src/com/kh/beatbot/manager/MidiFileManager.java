@@ -15,13 +15,15 @@ import com.kh.beatbot.file.MidiFile;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiTrack;
 import com.kh.beatbot.track.Track;
+import com.kh.beatbot.ui.view.View;
 
 public class MidiFileManager {
 	private static final String MIDI_FILE_EXTENSION = ".midi";
-	private static String inFileName, outFileName;
-	private static AlertDialog confirmImportAlert, fileExistsAlert;
 
-	public static void init(final Context context) {
+	private String inFileName, outFileName;
+	private AlertDialog confirmImportAlert, fileExistsAlert;
+
+	public MidiFileManager(final Context context) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage("The file exists. Would you like to overwrite it?").setCancelable(false)
 				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -51,7 +53,7 @@ public class MidiFileManager {
 		confirmImportAlert = builder.create();
 	}
 
-	public static void exportMidi(String fileName) {
+	public void exportMidi(String fileName) {
 		outFileName = fileName;
 		if (!new File(getFullPathName(fileName)).exists()) {
 			completeExport();
@@ -61,9 +63,9 @@ public class MidiFileManager {
 		}
 	}
 
-	public static void importMidi(Context context, String fileName) {
+	public void importMidi(Context context, String fileName) {
 		inFileName = fileName;
-		if (!TrackManager.anyNotes()) {
+		if (!View.context.getTrackManager().anyNotes()) {
 			completeImport(context);
 		} else {
 			confirmImportAlert.show();
@@ -74,12 +76,12 @@ public class MidiFileManager {
 		return fileName.toLowerCase().endsWith(MIDI_FILE_EXTENSION);
 	}
 
-	private static void completeExport() {
+	private void completeExport() {
 		// Create a MidiFile with the tracks we created
 		ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
-		midiTracks.add(MidiManager.getTempoTrack());
+		midiTracks.add(View.context.getMidiManager().getTempoTrack());
 		midiTracks.add(new MidiTrack());
-		for (Track track : TrackManager.getTracks()) {
+		for (Track track : View.context.getTrackManager().getTracks()) {
 			for (MidiNote midiNote : track.getMidiNotes()) {
 				midiTracks.get(1).insertEvent(midiNote.getOnEvent());
 				midiTracks.get(1).insertEvent(midiNote.getOffEvent());
@@ -98,10 +100,10 @@ public class MidiFileManager {
 		}
 	}
 
-	private static void completeImport(Context context) {
+	private void completeImport(Context context) {
 		try {
 			MidiFile midiFile = new MidiFile(new FileInputStream(getFullPathName(inFileName)));
-			MidiManager.importFromFile(midiFile);
+			View.context.getMidiManager().importFromFile(midiFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -109,11 +111,11 @@ public class MidiFileManager {
 		Toast.makeText(context, inFileName, Toast.LENGTH_SHORT).show();
 	}
 
-	private static String getFullPathName(String fileName) {
+	private String getFullPathName(String fileName) {
 		if (!isMidiFileName(fileName)) {
 			fileName = fileName.concat(MIDI_FILE_EXTENSION);
 		}
 
-		return FileManager.midiDirectory.getPath() + "/" + fileName;
+		return View.context.getFileManager().getMidiDirectory().getPath() + "/" + fileName;
 	}
 }

@@ -2,8 +2,8 @@ package com.kh.beatbot.event.track;
 
 import com.kh.beatbot.event.Executable;
 import com.kh.beatbot.file.ProjectFile;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.track.Track;
+import com.kh.beatbot.ui.view.View;
 
 public class TrackCreateEvent extends Executable {
 	private int trackId;
@@ -25,7 +25,7 @@ public class TrackCreateEvent extends Executable {
 	@Override
 	public boolean doExecute() {
 		if (serializedTrack == null) {
-			Track track = TrackManager.createTrack();
+			final Track track = View.context.getTrackManager().createTrack();
 			trackId = track.getId();
 		} else {
 			ProjectFile.trackFromJson(serializedTrack);

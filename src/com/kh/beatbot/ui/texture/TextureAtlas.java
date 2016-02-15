@@ -20,9 +20,6 @@ public abstract class TextureAtlas {
 		protected Bitmap.Config bitmapConfig = null;
 	}
 
-	public static final FontTextureAtlas font = new FontTextureAtlas();
-	public static final ResourceTextureAtlas resource = new ResourceTextureAtlas();
-
 	protected final int[] textureId = new int[1];
 	protected TextureRegion[] textureRegions;
 	protected Bitmap bitmap = null;

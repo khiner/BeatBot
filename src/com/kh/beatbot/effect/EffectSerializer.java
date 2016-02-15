@@ -12,7 +12,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.kh.beatbot.event.effect.EffectCreateEvent;
-import com.kh.beatbot.manager.TrackManager;
+import com.kh.beatbot.ui.view.View;
 
 public class EffectSerializer implements JsonSerializer<Effect>, JsonDeserializer<Effect> {
 	public static final Gson GSON = new GsonBuilder().create();
@@ -25,7 +25,7 @@ public class EffectSerializer implements JsonSerializer<Effect>, JsonDeserialize
 		int trackId = object.get("trackId").getAsInt();
 		int position = object.get("position").getAsInt();
 		new EffectCreateEvent(trackId, position, name).apply();
-		Effect effect = TrackManager.getTrackById(trackId).getEffectByPosition(position);
+		Effect effect = View.context.getTrackManager().getTrackById(trackId).getEffectByPosition(position);
 		effect.deserialize(GSON, object);
 
 		return effect;

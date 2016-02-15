@@ -8,9 +8,6 @@ import com.kh.beatbot.listener.FileListener;
 import com.kh.beatbot.listener.MidiNoteListener;
 import com.kh.beatbot.listener.TrackLevelsEventListener;
 import com.kh.beatbot.listener.TrackListener;
-import com.kh.beatbot.manager.FileManager;
-import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
@@ -49,17 +46,17 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 		slideMenu = new MainMenu(this, null);
 
 		// ORDER IS IMPORTANT! (add child page after parent)
-		TrackManager.addTrackLevelsEventListener(this);
-		TrackManager.addTrackListener(this);
-		FileManager.addListener(this);
+		context.getTrackManager().addTrackLevelsEventListener(this);
+		context.getTrackManager().addTrackListener(this);
+		context.getFileManager().addListener(this);
 
-		TrackManager.addTrackLevelsEventListener(getPageSelectGroup());
-		TrackManager.addTrackListener(getPageSelectGroup());
-		FileManager.addListener(getPageSelectGroup());
-		
-		MidiManager.addMidiNoteListener(this);
-		MidiManager.addMidiNoteListener(controlButtonGroup);
-		MidiManager.addMidiNoteListener(getMidiView());
+		context.getTrackManager().addTrackLevelsEventListener(getPageSelectGroup());
+		context.getTrackManager().addTrackListener(getPageSelectGroup());
+		context.getFileManager().addListener(getPageSelectGroup());
+
+		context.getMidiManager().addMidiNoteListener(this);
+		context.getMidiManager().addMidiNoteListener(controlButtonGroup);
+		context.getMidiManager().addMidiNoteListener(getMidiView());
 	}
 
 	@Override
@@ -67,8 +64,7 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 		float controlButtonHeight = height / 10;
 		View.LABEL_HEIGHT = height / 12;
 		View.BG_OFFSET = height / 180;
-		mainPageFlipper
-				.layout(this, 0, controlButtonHeight, width, height - controlButtonHeight);
+		mainPageFlipper.layout(this, 0, controlButtonHeight, width, height - controlButtonHeight);
 		float trackControlWidth = getMidiViewGroup().getTrackControlWidth();
 		controlButtonGroup.layout(this, trackControlWidth, 0, width - trackControlWidth,
 				controlButtonHeight);

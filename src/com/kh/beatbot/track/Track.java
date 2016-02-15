@@ -12,12 +12,12 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.FileListener;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.manager.MidiManager;
-import com.kh.beatbot.manager.TrackManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.view.TrackButtonRow;
+import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
 public class Track extends BaseTrack implements FileListener {
@@ -182,13 +182,13 @@ public class Track extends BaseTrack implements FileListener {
 		// is there another note starting between the current tick and the end of the loop?
 		for (MidiNote midiNote : notes) {
 			if (midiNote.getOnTick() >= currTick
-					&& midiNote.getOnTick() < MidiManager.getLoopEndTick()) {
+					&& midiNote.getOnTick() < View.context.getMidiManager().getLoopEndTick()) {
 				return midiNote;
 			}
 		}
 		// otherwise, get the first note that starts after loop begin
 		for (MidiNote midiNote : notes) {
-			if (midiNote.getOnTick() >= MidiManager.getLoopBeginTick()) {
+			if (midiNote.getOnTick() >= View.context.getMidiManager().getLoopBeginTick()) {
 				return midiNote;
 			}
 		}
@@ -205,7 +205,7 @@ public class Track extends BaseTrack implements FileListener {
 			currSampleFile = sampleFile;
 			update();
 		}
-		TrackManager.get().onSampleChange(this);
+		View.context.getTrackManager().onSampleChange(this);
 	}
 
 	public Param getLoopBeginParam() {
@@ -240,7 +240,7 @@ public class Track extends BaseTrack implements FileListener {
 	}
 
 	public void setSampleLoopWindow(float beginLevel, float endLevel) {
-		TrackManager.notifyLoopWindowSetEvent(this);
+		View.context.getTrackManager().notifyLoopWindowSetEvent(this);
 		getLoopBeginParam().setLevel(beginLevel);
 		getLoopEndParam().setLevel(endLevel);
 	}
@@ -283,13 +283,13 @@ public class Track extends BaseTrack implements FileListener {
 	public void mute(boolean mute) {
 		muteTrack(id, mute);
 		this.muted = mute;
-		TrackManager.get().onMuteChange(this, mute);
+		View.context.getTrackManager().onMuteChange(this, mute);
 	}
 
 	public void solo(boolean solo) {
 		soloTrack(id, solo);
 		this.soloing = solo;
-		TrackManager.get().onSoloChange(this, solo);
+		View.context.getTrackManager().onSoloChange(this, solo);
 	}
 
 	public void toggleLooping() {
@@ -305,7 +305,7 @@ public class Track extends BaseTrack implements FileListener {
 	}
 
 	public boolean isSelected() {
-		return this.equals(TrackManager.getCurrTrack());
+		return this.equals(View.context.getTrackManager().getCurrTrack());
 	}
 
 	public boolean isLooping() {
@@ -364,7 +364,7 @@ public class Track extends BaseTrack implements FileListener {
 
 	public void destroy() {
 		deleteTrack(id);
-		TrackManager.get().onDestroy(this);
+		View.context.getTrackManager().onDestroy(this);
 	}
 
 	public static native void deleteTrack(int trackId);
