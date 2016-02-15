@@ -26,7 +26,6 @@ public class DelayParamsGroup extends EffectParamsGroup implements ParamListener
 		super.withEffect(effect);
 
 		final Delay delay = (Delay) effect;
-
 		for (ParamControl paramControl : paramControls) {
 			delay.getParam(paramControl.getId()).removeListener(this);
 			delay.getParam(paramControl.getId()).removeToggleListener(this);
@@ -37,16 +36,16 @@ public class DelayParamsGroup extends EffectParamsGroup implements ParamListener
 		linkToggle.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				boolean newRightChannelSynced = delay.getParam(1).isBeatSync();
-				float newRightChannelLevel = delay.getParam(1).viewLevel;
+				boolean newRightChannelSynced = delay.getRightTimeParam().isBeatSync();
+				float newRightChannelLevel = delay.getRightTimeParam().viewLevel;
 
 				delay.setParamsLinked(linkToggle.isChecked());
 
 				if (delay.paramsLinked()) {
 					delay.rightChannelBeatSyncMemory = newRightChannelSynced;
 					delay.rightChannelLevelMemory = newRightChannelLevel;
-					newRightChannelSynced = delay.getParam(0).isBeatSync();
-					newRightChannelLevel = delay.getParam(0).viewLevel;
+					newRightChannelSynced = delay.getLeftTimeParam().isBeatSync();
+					newRightChannelLevel = delay.getLeftTimeParam().viewLevel;
 				} else if (delay.rightChannelLevelMemory >= 0) {
 					newRightChannelSynced = delay.rightChannelBeatSyncMemory;
 					newRightChannelLevel = delay.rightChannelLevelMemory;
@@ -61,46 +60,52 @@ public class DelayParamsGroup extends EffectParamsGroup implements ParamListener
 	}
 
 	public synchronized void layoutChildren() {
+		float halfWidth = width / 2;
 		float offset = height / 20;
 		float paramY = offset;
 		float paramH = (height - paramY) / 2 - offset;
 		float paramW = 2 * paramH / 3;
 
-		paramControls[0].layout(this, width / 2 - paramW - offset, paramY, paramW, paramH);
-		paramControls[1].layout(this, width / 2 + offset, paramY, paramW, paramH);
-		paramControls[2].layout(this, width / 2 - paramW - offset, paramY + paramH + offset,
+		paramControls[0].layout(this, halfWidth - paramW - offset, paramY, paramW, paramH);
+		paramControls[1].layout(this, halfWidth + offset, paramY, paramW, paramH);
+		paramControls[2].layout(this, halfWidth - paramW - offset, paramY + paramH + offset,
 				paramW, paramH);
-		paramControls[3].layout(this, width / 2 + offset, paramY + paramH + offset, paramW, paramH);
+		paramControls[3].layout(this, halfWidth + offset, paramY + paramH + offset, paramW, paramH);
 		float linkH = paramH / 6;
 		float linkW = linkH * 2;
-		linkToggle.layout(this, width / 2 - linkW / 2 + 2 * offset / 3, paramY + paramH / 2 - linkH
+		linkToggle.layout(this, halfWidth - linkW / 2 + 2 * offset / 3, paramY + paramH / 2 - linkH
 				/ 2, linkW, linkH);
 	}
 
 	@Override
 	public void onParamChange(Param param) {
-		Delay delay = (Delay) effect;
+		final Delay delay = (Delay) effect;
+		final Param leftTimeParam = delay.getLeftTimeParam();
+		final Param rightTimeParam = delay.getRightTimeParam();
+
 		if (delay.paramsLinked()) {
-			if (param.id == 0) {
-				delay.getParam(1).setLevel(param.viewLevel);
-			} else if (param.id == 1) {
-				delay.getParam(0).ignoreListener(this);
-				delay.getParam(0).setLevel(param.viewLevel);
-				delay.getParam(0).unignoreListener(this);
+			if (param.equals(leftTimeParam)) {
+				rightTimeParam.setLevel(param.viewLevel);
+			} else if (param.equals(rightTimeParam)) {
+				leftTimeParam.ignoreListener(this);
+				leftTimeParam.setLevel(param.viewLevel);
+				leftTimeParam.unignoreListener(this);
 			}
 		}
 	}
 
 	@Override
 	public void onParamToggle(Param param) {
-		Delay delay = (Delay) effect;
+		final Delay delay = (Delay) effect;
+		final Param leftTimeParam = delay.getLeftTimeParam();
+		final Param rightTimeParam = delay.getRightTimeParam();
 		if (delay.paramsLinked()) {
-			if (param.id == 0) {
-				delay.getParam(1).setBeatSync(param.isBeatSync());
-			} else if (param.id == 1) {
-				delay.getParam(0).ignoreListener(this);
-				delay.getParam(0).setBeatSync(param.isBeatSync());
-				delay.getParam(0).unignoreListener(this);
+			if (param.equals(leftTimeParam)) {
+				rightTimeParam.setBeatSync(param.isBeatSync());
+			} else if (param.equals(rightTimeParam)) {
+				leftTimeParam.ignoreListener(this);
+				leftTimeParam.setBeatSync(param.isBeatSync());
+				leftTimeParam.unignoreListener(this);
 			}
 		}
 	}

@@ -36,6 +36,14 @@ public class Delay extends Effect {
 		return NAME;
 	}
 
+	public Param getLeftTimeParam() {
+		return params.get(0);
+	}
+	
+	public Param getRightTimeParam() {
+		return params.get(1);
+	}
+
 	public boolean paramsLinked() {
 		return paramsLinked;
 	}
@@ -67,8 +75,8 @@ public class Delay extends Effect {
 
 	public void deserialize(Gson gson, JsonObject jsonObject) {
 		super.deserialize(gson, jsonObject);
-		getParam(0).setBeatSync(jsonObject.get("leftChannelBeatSync").getAsBoolean());
-		getParam(1).setBeatSync(jsonObject.get("rightChannelBeatSync").getAsBoolean());
+		getLeftTimeParam().setBeatSync(jsonObject.get("leftChannelBeatSync").getAsBoolean());
+		getRightTimeParam().setBeatSync(jsonObject.get("rightChannelBeatSync").getAsBoolean());
 		setParamsLinked(jsonObject.get("paramsLinked").getAsBoolean());
 		rightChannelBeatSyncMemory = jsonObject.get("rightChannelBeatSyncMemory").getAsBoolean();
 		rightChannelLevelMemory = jsonObject.get("rightChannelLevelMemory").getAsFloat();

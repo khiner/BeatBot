@@ -35,7 +35,8 @@ public class View implements Comparable<View> {
 
 	protected int id = -1; // optional
 	protected boolean shouldDraw = true, shrinkable = false;
-	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0, borderHeight = 0;
+	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0, borderHeight = 0,
+			bgRectRadius = 0;
 
 	protected View parent;
 	protected List<View> children = new ArrayList<View>();
@@ -47,12 +48,10 @@ public class View implements Comparable<View> {
 	private TextMesh textMesh;
 
 	protected IconResourceSet icon = new IconResourceSet(IconResourceSets.DEFAULT);
-	private boolean shouldClip = false;
 	protected String text = "";
 
+	private boolean shouldClip = false;
 	private State state = State.DEFAULT;
-
-	protected float bgRectRadius = 0;
 
 	public View(View parent) {
 		this(parent, null == parent ? null : parent.getRenderGroup());
