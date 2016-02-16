@@ -6,12 +6,12 @@
 #include <pthread.h>
 
 JNIEnv *getJniEnv();
+JavaVM* getJavaVm();
 
-jclass getTrackClass();
-jclass getRecordManagerClass();
+jobject getTrackManager();
+jobject getRecordManager();
 jmethodID getNextMidiNoteMethod();
 jmethodID getNotifyRecordSourceBufferFilledMethod();
 jmethodID getStartRecordingJavaMethod();
-JavaVM* getJavaVm();
 
 #endif // JNI_LOAD_H

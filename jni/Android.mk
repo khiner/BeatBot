@@ -28,7 +28,7 @@ APP_ABI := armeabi armeabi-v7a
 LOCAL_MODULE := nativeaudio
 LOCAL_SHARED_LIBRARIES := sndfile
 LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -landroid -lOpenSLES
-LOCAL_CFLAGS := -ffast-math -O3 -funroll-loops -Wall -Wextra
+LOCAL_CFLAGS := -ffast-math -O3 -funroll-loops -Wall -Wextra -Wno-unused-variable
 LOCAL_ARM_MODE := arm
 LOCAL_SRC_FILES := $(FILE_LIST:$(LOCAL_PATH)/%=%)
 

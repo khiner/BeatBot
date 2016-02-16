@@ -34,7 +34,7 @@ JNIEnv *getJniEnv() {
  return env;
 }
 
-jclass getTrackManager() {
+jobject getTrackManager() {
 	return trackManager;
 }
 

@@ -255,8 +255,6 @@ void Java_com_kh_beatbot_manager_PlaybackManager_stopNative(JNIEnv *env,
 void Java_com_kh_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env,
 		jclass clazz) {
 	SLresult result;
-	(void *) env;
-	(void *) clazz; // avoid warnings about unused paramaters
 	initTicker();
 
 	// create engine
