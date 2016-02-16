@@ -2,10 +2,12 @@
 
 AdsrConfig *adsrconfig_create() {
 	AdsrConfig *config = (AdsrConfig *) malloc(sizeof(AdsrConfig));
-	config->attack = 0;
+	config->attack = 1;
 	config->decay = 1;
 	config->sustain = 1;
-	config->release = 0;
+	config->release = 1;
+	config->start = 0;
+	config->peak = 1;
 	config->currSample = config->stoppedSample = 0;
 
 	return config;

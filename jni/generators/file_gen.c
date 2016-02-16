@@ -89,6 +89,7 @@ void filegen_destroy(void *p) {
 		fileGen->sampleFile = NULL;
 	}
 	adsrconfig_destroy(fileGen->adsr);
+	fileGen->adsr = NULL;
 	free(fileGen);
 	fileGen = NULL;
 }
