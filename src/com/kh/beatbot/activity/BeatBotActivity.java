@@ -140,7 +140,7 @@ public class BeatBotActivity extends Activity {
 	public void onDestroy() {
 		if (isFinishing()) {
 			Log.d("Janitor", "shutting down");
-			shutdown();
+			nativeShutdown();
 		}
 		super.onDestroy();
 	}
@@ -358,21 +358,17 @@ public class BeatBotActivity extends Activity {
 		midiFileManager.importMidi(this, fileName);
 	}
 
-	private void shutdown() {
-		nativeShutdown();
-	}
+	public static native void onRecordManagerInit(RecordManager recordManager);
 
-	public native void onRecordManagerInit(RecordManager recordManager);
+	public static native void onTrackManagerInit(TrackManager trackManager);
 
-	public native void onTrackManagerInit(TrackManager trackManager);
+	public static native boolean createAudioPlayer();
 
-	public native boolean createAudioPlayer();
+	public static native void createEngine();
 
-	public native void createEngine();
+	public static native void arm();
 
-	public native void arm();
-
-	public native void nativeShutdown();
+	public static native void nativeShutdown();
 
 	/** Load jni .so on initialization */
 	static {

@@ -419,6 +419,7 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_nativeShutdown(JNIEnv *env,
 		(*outputMixObject)->Destroy(outputMixObject);
 		outputMixObject = NULL;
 	}
+
 	// destroy engine object, and invalidate all associated interfaces
 	if (engineObject != NULL ) {
 		(*engineObject)->Destroy(engineObject);

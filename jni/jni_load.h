@@ -3,6 +3,7 @@
 
 #include <jni.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 JNIEnv *getJniEnv();
 

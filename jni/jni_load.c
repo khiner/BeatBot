@@ -1,4 +1,5 @@
 #include "jni_load.h"
+#include <android/log.h>
 
 jobject trackManager = NULL;
 jobject recordManager = NULL;
@@ -6,23 +7,31 @@ jmethodID getNextMidiNote = NULL;
 jmethodID notifyRecordSourceBufferFilled = NULL;
 jmethodID startRecordingJava = NULL;
 JavaVM* javaVm = NULL;
+pthread_key_t current_jni_env;
 
-JNIEnv *getJniEnv() {
-	JNIEnv* env;
-	if ((*javaVm)->GetEnv(javaVm, (void**) &env,
-			JNI_VERSION_1_6) == JNI_EDETACHED) {
-		(*javaVm)->AttachCurrentThread(javaVm, &env, NULL );
-	}
-	return env;
+void detach_current_thread(void *env) {
+  __android_log_print(ANDROID_LOG_INFO, "jni", "detaching");
+  (*javaVm)->DetachCurrentThread(javaVm);
 }
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved) {
-	JNIEnv* env;
-	if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
-		return -1;
+  JNIEnv *env = NULL;
+  javaVm = vm;
+  if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK) {
+    return -1;
+  }
 
-	javaVm = vm;
-	return JNI_VERSION_1_6;
+  pthread_key_create(&current_jni_env, detach_current_thread);
+  return JNI_VERSION_1_6;
+}
+
+JNIEnv *getJniEnv() {
+ JNIEnv *env;
+ if ((env = pthread_getspecific(current_jni_env)) == NULL) {
+	 (*javaVm)->AttachCurrentThread(javaVm, &env, NULL );
+     pthread_setspecific(current_jni_env, env);
+ }
+ return env;
 }
 
 jclass getTrackManager() {
