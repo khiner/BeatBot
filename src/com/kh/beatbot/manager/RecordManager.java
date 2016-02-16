@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.widget.Toast;
 
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.RecordStateListener;
 import com.kh.beatbot.midi.util.WavFileUtil;
@@ -61,9 +62,10 @@ public class RecordManager {
 	private RecordStateListener listener;
 	private RecordSourceButtonListener recordSourceButtonListener;
 
-	public RecordManager(Context context) {
+	public RecordManager(BeatBotActivity context) {
 		this.context = context;
 		recordSourceButtonListener = new RecordSourceButtonListener(this, context);
+		context.onRecordManagerInit(this);
 	}
 
 	public void setListener(final RecordStateListener listener) {

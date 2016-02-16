@@ -15,7 +15,7 @@ import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.ViewPager;
+import com.kh.beatbot.ui.view.SwappingViewPager;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.page.track.AdsrPage;
@@ -43,7 +43,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	
 	private ToggleButton masterButton;
 
-	private ViewPager pager, buttonRowPager;
+	private SwappingViewPager pager, buttonRowPager;
 	private TrackPageButtonRow trackButtonRow;
 	private MasterPageButtonRow masterButtonRow;
 
@@ -98,8 +98,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 			}
 		});
 
-		buttonRowPager = new ViewPager(this);
-		pager = new ViewPager(this);
+		buttonRowPager = new SwappingViewPager(this);
+		pager = new SwappingViewPager(this);
 
 		trackButtonRow = new TrackPageButtonRow(buttonRowPager);
 		masterButtonRow = new MasterPageButtonRow(buttonRowPager);
@@ -210,7 +210,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	}
 
 	@Override
-	public void onPageChange(ViewPager pager, View prevPage, View newPage) {
+	public void onPageChange(SwappingViewPager pager, View prevPage, View newPage) {
 		((TrackListener) newPage).onSelect(context.getTrackManager().getCurrTrack());
 	}
 

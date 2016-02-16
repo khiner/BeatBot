@@ -14,14 +14,14 @@ import com.kh.beatbot.listener.MultiViewTouchTracker;
 import com.kh.beatbot.listener.TouchableViewsListener;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.ViewPager;
+import com.kh.beatbot.ui.view.SwappingViewPager;
 import com.kh.beatbot.ui.view.control.Seekbar2d;
 import com.kh.beatbot.ui.view.group.effect.DelayParamsGroup;
 import com.kh.beatbot.ui.view.group.effect.EffectParamsGroup;
 import com.kh.beatbot.ui.view.group.effect.FilterParamsGroup;
 
 public class EffectPage extends TouchableView implements TouchableViewsListener {
-	private ViewPager paramsPager;
+	private SwappingViewPager paramsPager;
 	private Seekbar2d level2d;
 
 	private EffectParamsGroup chorusGroup, decimateGroup, delayGroup, filterGroup, flangerGroup,
@@ -47,7 +47,7 @@ public class EffectPage extends TouchableView implements TouchableViewsListener 
 
 	@Override
 	protected synchronized void createChildren() {
-		paramsPager = new ViewPager(this);
+		paramsPager = new SwappingViewPager(this);
 		level2d = new Seekbar2d(this);
 
 		chorusGroup = new EffectParamsGroup(paramsPager).withEffect(new Chorus());

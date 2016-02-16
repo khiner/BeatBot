@@ -10,6 +10,7 @@ import java.util.Set;
 import android.app.AlertDialog;
 import android.content.Context;
 
+import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Effect.LevelType;
 import com.kh.beatbot.listener.FileListener;
@@ -33,6 +34,13 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	private AlertDialog.Builder sampleSaveErrorAlert;
 
 	private Track currTrack;
+
+	public TrackManager(final BeatBotActivity context) {
+		context.getFileManager().addListener(this);
+		context.getMidiManager().addMidiNoteListener(this);
+		context.getMidiManager().addTempoListener(this);
+		context.onTrackManagerInit(this); // notify native
+	}
 
 	public BaseTrack getMasterTrack() {
 		return masterTrack;

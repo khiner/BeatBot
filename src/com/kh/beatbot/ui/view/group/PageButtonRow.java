@@ -5,7 +5,7 @@ import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.ViewPager;
+import com.kh.beatbot.ui.view.SwappingViewPager;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 
@@ -43,7 +43,7 @@ public abstract class PageButtonRow extends TouchableView {
 		});
 	}
 
-	public void setPager(final ViewPager pager) {
+	public void setPager(final SwappingViewPager pager) {
 		for (ToggleButton pageButton : pageButtons) {
 			pageButton.setOnReleaseListener(new OnReleaseListener() {
 				@Override

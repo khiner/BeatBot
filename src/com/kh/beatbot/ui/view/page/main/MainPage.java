@@ -15,7 +15,7 @@ import com.kh.beatbot.ui.view.MidiTrackView;
 import com.kh.beatbot.ui.view.MidiView;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.ViewFlipper;
+import com.kh.beatbot.ui.view.ViewPager;
 import com.kh.beatbot.ui.view.group.ControlButtonGroup;
 import com.kh.beatbot.ui.view.group.MidiViewGroup;
 import com.kh.beatbot.ui.view.menu.MainMenu;
@@ -23,7 +23,7 @@ import com.kh.beatbot.ui.view.menu.MainMenu;
 public class MainPage extends TouchableView implements MidiNoteListener, TrackListener,
 		TrackLevelsEventListener, FileListener {
 	public ControlButtonGroup controlButtonGroup;
-	public ViewFlipper mainPageFlipper;
+	public ViewPager mainPageFlipper;
 	public EditPage editPage;
 	public EffectPage effectPage;
 	public MainMenu slideMenu;
@@ -35,12 +35,11 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 	@Override
 	protected synchronized void createChildren() {
 		controlButtonGroup = new ControlButtonGroup(this);
-		mainPageFlipper = new ViewFlipper(this);
+		mainPageFlipper = new ViewPager(this);
 		editPage = new EditPage(null);
 		effectPage = new EffectPage(null);
 		mainPageFlipper.addPage(editPage);
 		mainPageFlipper.addPage(effectPage);
-		mainPageFlipper.setPage(editPage);
 		controlButtonGroup.hideEffectToggle();
 		slideMenu = new MainMenu(this, null);
 

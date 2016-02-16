@@ -35,7 +35,7 @@ import com.kh.beatbot.ui.texture.FontTextureAtlas;
 import com.kh.beatbot.ui.texture.ResourceTextureAtlas;
 import com.kh.beatbot.ui.view.GLSurfaceViewBase;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.ViewFlipper;
+import com.kh.beatbot.ui.view.ViewPager;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
 import com.kh.beatbot.ui.view.group.PageSelectGroup;
 import com.kh.beatbot.ui.view.page.main.MainPage;
@@ -44,9 +44,9 @@ public class BeatBotActivity extends Activity {
 	public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1, SAMPLE_NAME_EDIT_DIALOG_ID = 2,
 			PROJECT_FILE_NAME_EDIT_DIALOG_ID = 3, MIDI_FILE_NAME_EDIT_DIALOG_ID = 4;
 
-	private ViewFlipper activityPager;
+	private GLSurfaceViewBase surfaceViewBase;
+	private ViewPager activityPager;
 	private MainPage mainPage;
-	private GLSurfaceViewBase root;
 	private EditText bpmInput, projectFileNameInput, midiFileNameInput, sampleNameInput;
 
 	private FileManager fileManager;
@@ -66,55 +66,37 @@ public class BeatBotActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		GeneralUtils.initAndroidSettings(this);
-
+		Color.init(this);
 		fontTextureAtlas = new FontTextureAtlas(getAssets(), "REDRING-1969-v03.ttf");
 		resourceTextureAtlas = new ResourceTextureAtlas(getResources());
 
-		createEngine();
-		createAudioPlayer();
-
-		Color.init(this);
 		fileManager = new FileManager(getApplicationContext(), getAssets());
 		projectFileManager = new ProjectFileManager(this);
 		midiFileManager = new MidiFileManager(this);
 		recordManager = new RecordManager(this);
-		onRecordManagerInit(recordManager);
-
 		midiManager = new MidiManager();
-		trackManager = new TrackManager();
-		onTrackManagerInit(trackManager);
-
-		fileManager.addListener(trackManager);
-		midiManager.addMidiNoteListener(trackManager);
-		midiManager.addTempoListener(trackManager);
-
+		trackManager = new TrackManager(this);
 		eventManager = new EventManager();
 		playbackManager = new PlaybackManager();
 
 		View.context = this;
-		root = new GLSurfaceViewGroup(this);
+		surfaceViewBase = new GLSurfaceViewGroup(this);
 		mainPage = new MainPage(null);
-
-		activityPager = new ViewFlipper(null);
-		// only single page for now
+		activityPager = new ViewPager(null);
 		activityPager.addPage(mainPage);
-		activityPager.setPage(mainPage);
 
-		arm();
-		setupDefaultProject();
-
-		final ViewParent viewParent = ((GLSurfaceViewGroup) root).getParent();
+		final ViewParent viewParent = ((GLSurfaceViewGroup) surfaceViewBase).getParent();
 		if (viewParent == null) {
 			final LinearLayout layout = new LinearLayout(this);
 			final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 					LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
-			root.setLayoutParams(lp);
-			layout.addView(root);
+			surfaceViewBase.setLayoutParams(lp);
+			layout.addView(surfaceViewBase);
 			setContentView(layout, lp);
 		}
 
-		((GLSurfaceViewGroup) root).setBBRenderer(activityPager);
-		((GLSurfaceViewGroup) root).addListener(new GLSurfaceViewGroupListener() {
+		((GLSurfaceViewGroup) surfaceViewBase).setBBRenderer(activityPager);
+		((GLSurfaceViewGroup) surfaceViewBase).addListener(new GLSurfaceViewGroupListener() {
 			@Override
 			public void onGlReady(GLSurfaceViewGroup view) {
 				fontTextureAtlas.loadTexture();
@@ -123,6 +105,11 @@ public class BeatBotActivity extends Activity {
 				getGl().glClearColor(Color.BG[0], Color.BG[1], Color.BG[2], Color.BG[3]);
 			}
 		});
+
+		createEngine();
+		createAudioPlayer();
+		setupDefaultProject();
+		arm();
 	}
 
 	@Override
@@ -136,7 +123,7 @@ public class BeatBotActivity extends Activity {
 
 	@Override
 	public void onPause() {
-		root.setVisibility(android.view.View.GONE);
+		surfaceViewBase.setVisibility(android.view.View.GONE);
 		//root.onPause();
 		super.onPause();
 	}
@@ -144,8 +131,8 @@ public class BeatBotActivity extends Activity {
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 	    super.onWindowFocusChanged(hasFocus);
-	    if (hasFocus && root.getVisibility() == android.view.View.GONE) {
-	         root.setVisibility(android.view.View.VISIBLE);
+	    if (hasFocus && surfaceViewBase.getVisibility() == android.view.View.GONE) {
+	         surfaceViewBase.setVisibility(android.view.View.VISIBLE);
 	    }
 	}
 
@@ -328,11 +315,11 @@ public class BeatBotActivity extends Activity {
 	}
 
 	public GLSurfaceViewBase getRoot() {
-		return root;
+		return surfaceViewBase;
 	}
 
 	public GL11 getGl() {
-		return root.getGl();
+		return surfaceViewBase.getGl();
 	}
 
 	public PageSelectGroup getPageSelectGroup() {
