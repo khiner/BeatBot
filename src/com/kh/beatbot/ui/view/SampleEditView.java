@@ -18,9 +18,9 @@ public class SampleEditView extends ControlView2dBase {
 	private static final String NO_SAMPLE_MESSAGE = "Tap to load a sample.";
 
 	// min distance for pointer to select loop markers
-	private static WaveformShape waveformShape;
-	private static Button[] loopButtons = new Button[2];
-	private static Rectangle currSampleRect = null;
+	private WaveformShape waveformShape;
+	private Button[] loopButtons;
+	private Rectangle currSampleRect;
 
 	private int scrollPointerId = -1, zoomLeftPointerId = -1, zoomRightPointerId = -1;
 	private float scrollAnchorLevel = -1, zoomLeftAnchorLevel = -1, zoomRightAnchorLevel = -1;
@@ -113,6 +113,7 @@ public class SampleEditView extends ControlView2dBase {
 		initRect();
 		currSampleRect = new Rectangle(renderGroup, Color.TRON_BLUE, null);
 		addShapes(currSampleRect);
+		loopButtons = new Button[2];
 		for (int i = 0; i < loopButtons.length; i++) {
 			loopButtons[i] = new Button(this).withRoundedRect().withIcon(
 					IconResourceSets.SAMPLE_LOOP);
@@ -314,7 +315,7 @@ public class SampleEditView extends ControlView2dBase {
 	@Override
 	public void release() {
 		if (!hasSample() && isPressed()) {
-			View.mainPage.getPageSelectGroup().selectBrowsePage();
+			context.getPageSelectGroup().selectBrowsePage();
 		}
 		super.release();
 	}

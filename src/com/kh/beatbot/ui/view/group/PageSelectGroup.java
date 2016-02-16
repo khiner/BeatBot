@@ -32,21 +32,20 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	private static final String TRACK_PAGE_ID = "track";
 
-	public static NoteLevelsPage noteLevelsPage;
-	public static TrackLevelsPage levelsPage;
-	public static EffectSelectPage effectSelectPage;
-	public static BrowsePage browsePage;
-	public static SampleEditPage editPage;
-	public static AdsrPage adsrPage;
-	public static RecordPage recordPage;
+	private NoteLevelsPage noteLevelsPage;
+	private TrackLevelsPage levelsPage;
+	private EffectSelectPage effectSelectPage;
+	private BrowsePage browsePage;
+	private SampleEditPage editPage;
+	private AdsrPage adsrPage;
+	private RecordPage recordPage;
+	private TempoPage tempoPage;
+	
+	private ToggleButton masterButton;
 
-	public static TempoPage tempoPage;
-
-	public static ToggleButton masterButton;
-
-	public static ViewPager pager, buttonRowPager;
-	public static TrackPageButtonRow trackButtonRow;
-	public static MasterPageButtonRow masterButtonRow;
+	private ViewPager pager, buttonRowPager;
+	private TrackPageButtonRow trackButtonRow;
+	private MasterPageButtonRow masterButtonRow;
 
 	public PageSelectGroup(View view) {
 		super(view);
@@ -74,6 +73,10 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		if (!levelsButton.isChecked()) {
 			levelsButton.trigger();
 		}
+	}
+
+	public SampleEditPage getEditPage() {
+		return editPage;
 	}
 
 	public void selectEditPage() {
@@ -146,7 +149,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	@Override
 	public synchronized void layoutChildren() {
-		masterButton.layout(this, 0, BG_OFFSET, View.mainPage.getMidiViewGroup()
+		masterButton.layout(this, 0, BG_OFFSET, context.getMainPage().getMidiViewGroup()
 				.getTrackControlWidth(), LABEL_HEIGHT);
 		buttonRowPager.layout(this, masterButton.width, BG_OFFSET, width - masterButton.width,
 				LABEL_HEIGHT);

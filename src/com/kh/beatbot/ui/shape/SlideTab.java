@@ -7,7 +7,6 @@ import com.kh.beatbot.ui.view.page.main.MainPage;
 public class SlideTab extends Shape {
 	private static final int NUM_FILL_VERTICES = RoundedRect.NUM_CORNER_VERTICES * 5 * 3 * 2;
 	private static final short[] FILL_INDICES = getFillIndices();
-
 	private static RoundedRect roundedRect = new RoundedRect(null, Color.LABEL_SELECTED, null);
 
 	private float cornerRadius = 12;
@@ -37,8 +36,8 @@ public class SlideTab extends Shape {
 
 	@Override
 	protected void updateVertices() {
-		final MainPage mainPage = View.getMainPage();
-		if (View.getMainPage() == null)
+		final MainPage mainPage = View.context.getMainPage();
+		if (View.context.getMainPage() == null)
 			return;
 		roundedRect.setCornerRadius(cornerRadius);
 		roundedRect.layout(x + mainPage.width - cornerRadius * 2, y, width, height);

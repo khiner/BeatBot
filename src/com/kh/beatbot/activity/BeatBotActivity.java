@@ -2,6 +2,8 @@ package com.kh.beatbot.activity;
 
 import java.io.File;
 
+import javax.microedition.khronos.opengles.GL11;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -31,15 +33,20 @@ import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.texture.FontTextureAtlas;
 import com.kh.beatbot.ui.texture.ResourceTextureAtlas;
+import com.kh.beatbot.ui.view.GLSurfaceViewBase;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.ViewFlipper;
 import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
+import com.kh.beatbot.ui.view.group.PageSelectGroup;
+import com.kh.beatbot.ui.view.page.main.MainPage;
 
 public class BeatBotActivity extends Activity {
 	public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1, SAMPLE_NAME_EDIT_DIALOG_ID = 2,
 			PROJECT_FILE_NAME_EDIT_DIALOG_ID = 3, MIDI_FILE_NAME_EDIT_DIALOG_ID = 4;
 
 	private ViewFlipper activityPager;
+	private MainPage mainPage;
+	private GLSurfaceViewBase root;
 	private EditText bpmInput, projectFileNameInput, midiFileNameInput, sampleNameInput;
 
 	private FileManager fileManager;
@@ -48,6 +55,8 @@ public class BeatBotActivity extends Activity {
 	private RecordManager recordManager;
 	private MidiManager midiManager;
 	private TrackManager trackManager;
+	private EventManager eventManager;
+	private PlaybackManager playbackManager;
 
 	private FontTextureAtlas fontTextureAtlas;
 	private ResourceTextureAtlas resourceTextureAtlas;
@@ -57,13 +66,6 @@ public class BeatBotActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		GeneralUtils.initAndroidSettings(this);
-
-		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread thread, Throwable ex) {
-				Log.e("here", ex.getMessage());
-			}
-		});
 
 		fontTextureAtlas = new FontTextureAtlas(getAssets(), "REDRING-1969-v03.ttf");
 		resourceTextureAtlas = new ResourceTextureAtlas(getResources());
@@ -86,36 +88,47 @@ public class BeatBotActivity extends Activity {
 		midiManager.addMidiNoteListener(trackManager);
 		midiManager.addTempoListener(trackManager);
 
-		activityPager = View.init(this);
+		eventManager = new EventManager();
+		playbackManager = new PlaybackManager();
+
+		View.context = this;
+		root = new GLSurfaceViewGroup(this);
+		mainPage = new MainPage(null);
+
+		activityPager = new ViewFlipper(null);
+		// only single page for now
+		activityPager.addPage(mainPage);
+		activityPager.setPage(mainPage);
 
 		arm();
 		setupDefaultProject();
 
-		final ViewParent viewParent = ((GLSurfaceViewGroup) View.getRoot()).getParent();
+		final ViewParent viewParent = ((GLSurfaceViewGroup) root).getParent();
 		if (viewParent == null) {
 			final LinearLayout layout = new LinearLayout(this);
 			final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 					LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
-			View.getRoot().setLayoutParams(lp);
-			layout.addView(View.getRoot());
+			root.setLayoutParams(lp);
+			layout.addView(root);
 			setContentView(layout, lp);
 		}
 
-		((GLSurfaceViewGroup) View.getRoot()).setBBRenderer(activityPager);
-		((GLSurfaceViewGroup) View.getRoot()).addListener(new GLSurfaceViewGroupListener() {
+		((GLSurfaceViewGroup) root).setBBRenderer(activityPager);
+		((GLSurfaceViewGroup) root).addListener(new GLSurfaceViewGroupListener() {
 			@Override
 			public void onGlReady(GLSurfaceViewGroup view) {
 				fontTextureAtlas.loadTexture();
 				resourceTextureAtlas.loadTexture();
-				activityPager.initGl();
+				getGl().glLineWidth(1);
+				getGl().glClearColor(Color.BG[0], Color.BG[1], Color.BG[2], Color.BG[3]);
 			}
 		});
 	}
 
 	@Override
 	public void onBackPressed() {
-		if (View.getMainPage().effectIsShowing()) {
-			View.getMainPage().hideEffect();
+		if (getMainPage().effectIsShowing()) {
+			getMainPage().hideEffect();
 		} else {
 			showDialog(EXIT_DIALOG_ID);
 		}
@@ -123,16 +136,16 @@ public class BeatBotActivity extends Activity {
 
 	@Override
 	public void onPause() {
-		View.getRoot().setVisibility(android.view.View.GONE);
-		//View.onPause();
+		root.setVisibility(android.view.View.GONE);
+		//root.onPause();
 		super.onPause();
 	}
 
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 	    super.onWindowFocusChanged(hasFocus);
-	    if (hasFocus && View.getRoot().getVisibility() == android.view.View.GONE) {
-	         View.getRoot().setVisibility(android.view.View.VISIBLE);
+	    if (hasFocus && root.getVisibility() == android.view.View.GONE) {
+	         root.setVisibility(android.view.View.VISIBLE);
 	    }
 	}
 
@@ -143,12 +156,6 @@ public class BeatBotActivity extends Activity {
 			shutdown();
 		}
 		super.onDestroy();
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putBoolean("playing", PlaybackManager.getState() == PlaybackManager.State.PLAYING);
 	}
 
 	@Override
@@ -266,7 +273,7 @@ public class BeatBotActivity extends Activity {
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_MENU) {
-			View.getMainPage().expandMenu();
+			getMainPage().expandMenu();
 			return true;
 		}
 		return super.onKeyUp(keyCode, event);
@@ -281,8 +288,8 @@ public class BeatBotActivity extends Activity {
 
 	public void setupDefaultProject() {
 		// XXX loading a project when currently in the sampleEditView can cause segfault
-		View.getPageSelectGroup().selectLevelsPage();
-		EventManager.clearEvents();
+		getPageSelectGroup().selectLevelsPage();
+		eventManager.clearEvents();
 		trackManager.destroy();
 
 		for (int trackId = 0; trackId < fileManager.getDrumsDirectory().listFiles().length; trackId++) {
@@ -293,15 +300,15 @@ public class BeatBotActivity extends Activity {
 		}
 
 		trackManager.getTrackByNoteValue(0).select();
-		View.getPageSelectGroup().selectLevelsPage();
+		getPageSelectGroup().selectLevelsPage();
 
 		midiManager.setBpm(120);
 		midiManager.setLoopTicks(0, MidiManager.TICKS_PER_NOTE * 4);
 	}
 
 	public void clearProject() {
-		View.getPageSelectGroup().selectLevelsPage();
-		EventManager.clearEvents();
+		getPageSelectGroup().selectLevelsPage();
+		eventManager.clearEvents();
 		trackManager.destroy();
 
 		midiManager.setBpm(120);
@@ -316,6 +323,22 @@ public class BeatBotActivity extends Activity {
 		return resourceTextureAtlas;
 	}
 
+	public MainPage getMainPage() {
+		return mainPage;
+	}
+
+	public GLSurfaceViewBase getRoot() {
+		return root;
+	}
+
+	public GL11 getGl() {
+		return root.getGl();
+	}
+
+	public PageSelectGroup getPageSelectGroup() {
+		return mainPage.editPage.pageSelectGroup;
+	}
+
 	public RecordManager getRecordManager() {
 		return recordManager;
 	}
@@ -326,6 +349,14 @@ public class BeatBotActivity extends Activity {
 
 	public TrackManager getTrackManager() {
 		return trackManager;
+	}
+
+	public EventManager getEventManager() {
+		return eventManager;
+	}
+
+	public PlaybackManager getPlaybackManager() {
+		return playbackManager;
 	}
 
 	public FileManager getFileManager() {

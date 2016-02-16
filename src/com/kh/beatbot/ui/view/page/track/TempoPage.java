@@ -1,6 +1,5 @@
 package com.kh.beatbot.ui.view.page.track;
 
-import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.event.TempoChangeEvent;
 import com.kh.beatbot.listener.OnReleaseListener;
@@ -34,16 +33,16 @@ public class TempoPage extends TrackPage {
 		tapTempoButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				long tapTime = System.currentTimeMillis();
-				float bpm = ONE_MINUTE_MILLIS / (tapTime - lastTapTime);
+				final long tapTime = System.currentTimeMillis();
+				final float bpm = ONE_MINUTE_MILLIS / (tapTime - lastTapTime);
 				// if we are far outside of the range, don't change the tempo.
 				// otherwise, midiManager will take care of clipping the result
 				if (bpm <= MidiManager.MAX_BPM + 20 && bpm >= MidiManager.MIN_BPM - 20) {
-					Stateful latestEvent = EventManager.getLastEvent();
+					final Stateful latestEvent = context.getEventManager().getLastEvent();
 					if (latestEvent instanceof TempoChangeEvent
 							&& tapTime - lastTempoSetEventMillis < EVENT_CONSOLIDATION_MILLIS) {
 						// group close tempo-tap events together on the undo-stack
-						TempoChangeEvent tempoChangeEvent = (TempoChangeEvent) latestEvent;
+						final TempoChangeEvent tempoChangeEvent = (TempoChangeEvent) latestEvent;
 						tempoChangeEvent.setEndBpm(bpm);
 						tempoChangeEvent.doExecute();
 					} else {

@@ -26,7 +26,7 @@ public class SampleLoopWindowSetEvent implements Stateful, Temporal {
 		finalEndLevel = track.getLoopEndParam().viewLevel;
 
 		if (initialBeginLevel != finalBeginLevel || initialEndLevel != finalEndLevel) {
-			EventManager.eventCompleted(this);
+			View.context.getEventManager().eventCompleted(this);
 		}
 	}
 

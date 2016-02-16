@@ -180,7 +180,7 @@ public class MidiNote implements Comparable<MidiNote> {
 
 		noteOn.setNoteValue(note);
 		noteOff.setNoteValue(note);
-		View.getMainPage().onMove(this, 0, 0, 0, 0, 0, 0);
+		View.context.getMainPage().onMove(this, 0, 0, 0, 0, 0, 0);
 	}
 
 	public long getNoteLength() {

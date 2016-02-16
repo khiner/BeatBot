@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
-import javax.microedition.khronos.opengles.GL11;
 
 import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.midi.util.GeneralUtils;
@@ -20,14 +19,12 @@ import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.shape.Shape;
 import com.kh.beatbot.ui.view.TouchableView.Pointer;
-import com.kh.beatbot.ui.view.group.GLSurfaceViewGroup;
-import com.kh.beatbot.ui.view.group.PageSelectGroup;
-import com.kh.beatbot.ui.view.page.main.MainPage;
 
 public class View implements Comparable<View> {
+	public static BeatBotActivity context; // XXX
+
 	protected static final float π = (float) Math.PI, X_OFFSET = 2;
 	protected static float LABEL_HEIGHT = 0, BG_OFFSET = 0;
-	public static BeatBotActivity context;
 
 	public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0, height = 0;
 
@@ -48,8 +45,6 @@ public class View implements Comparable<View> {
 	protected IconResourceSet icon = new IconResourceSet(IconResourceSets.DEFAULT);
 	protected String text = "";
 
-	protected static MainPage mainPage;
-	private static GLSurfaceViewBase root;
 	private boolean shouldClip = false;
 	private State state = State.DEFAULT;
 
@@ -68,49 +63,12 @@ public class View implements Comparable<View> {
 		}
 	}
 
-	public static ViewFlipper init(BeatBotActivity context) {
-		View.context = context;
-		root = new GLSurfaceViewGroup(context);
-		mainPage = new MainPage(null);
-
-		final ViewFlipper rootFlipper = new ViewFlipper(null);
-		// only single page for now
-		rootFlipper.addPage(mainPage);
-		rootFlipper.setPage(mainPage);
-
-		return rootFlipper;
-	}
-
-	public static void onPause() {
-		root.onPause();
-	}
-	
-	public static void onResume() {
-		root.onResume();
-	}
-
-	public static GLSurfaceViewBase getRoot() {
-		return root;
-	}
-
-	public static MainPage getMainPage() {
-		return mainPage;
-	}
-
-	public static PageSelectGroup getPageSelectGroup() {
-		return mainPage.editPage.pageSelectGroup;
-	}
-
-	public static GL11 getGl() {
-		return root.getGl();
-	}
-
 	public float unscaledHeight() {
 		return height;
 	}
 
 	public float getTotalHeight() {
-		return root.getHeight();
+		return context.getRoot().getHeight();
 	}
 
 	public RenderGroup getRenderGroup() {
@@ -328,22 +286,17 @@ public class View implements Comparable<View> {
 		if (parent == null)
 			return;
 		// scissor ensures that each view can only draw within its rect
-		getGl().glEnable(GL10.GL_SCISSOR_TEST);
+		context.getGl().glEnable(GL10.GL_SCISSOR_TEST);
 		int xClip = clipX ? (int) absoluteX : 0;
 		int yClip = clipY ? (int) (getTotalHeight() - absoluteY - height) : 0;
 		int clipW = clipX ? (int) width : Integer.MAX_VALUE;
 		int clipH = clipY ? (int) height : Integer.MAX_VALUE;
 
-		getGl().glScissor(xClip, yClip, clipW, clipH);
+		context.getGl().glScissor(xClip, yClip, clipW, clipH);
 	}
 
 	public void endClip() {
-		getGl().glDisable(GL10.GL_SCISSOR_TEST);
-	}
-
-	public void initGl() {
-		getGl().glLineWidth(1);
-		getGl().glClearColor(Color.BG[0], Color.BG[1], Color.BG[2], Color.BG[3]);
+		context.getGl().glDisable(GL10.GL_SCISSOR_TEST);
 	}
 
 	@Override
@@ -447,8 +400,9 @@ public class View implements Comparable<View> {
 				textHeight *= scale;
 			}
 
-			if (textHeight > mainPage.height / 10) { // text should only be so big, I mean c'mon
-				float scale = (mainPage.height / 10) / textHeight;
+			float maxTextHeight = context.getMainPage().height / 10;
+			if (textHeight > maxTextHeight) { // text should only be so big, I mean c'mon
+				float scale = maxTextHeight / textHeight;
 				textWidth *= scale;
 				textHeight *= scale;
 			}
@@ -475,19 +429,19 @@ public class View implements Comparable<View> {
 	}
 
 	protected static final void translate(float x, float y) {
-		getGl().glTranslatef(x, y, 0);
+		context.getGl().glTranslatef(x, y, 0);
 	}
 
 	protected static final void scale(float x, float y) {
-		getGl().glScalef(x, y, 1);
+		context.getGl().glScalef(x, y, 1);
 	}
 
 	protected static final void push() {
-		getGl().glPushMatrix();
+		context.getGl().glPushMatrix();
 	}
 
 	protected static final void pop() {
-		getGl().glPopMatrix();
+		context.getGl().glPopMatrix();
 	}
 
 	protected final float distanceFromCenterSquared(Pointer pos) {

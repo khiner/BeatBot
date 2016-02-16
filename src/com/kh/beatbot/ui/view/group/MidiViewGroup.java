@@ -13,7 +13,7 @@ public class MidiViewGroup extends TouchableView {
 	public MidiView midiView;
 	public MidiLoopBarView midiLoopBarView;
 
-	public static RenderGroup scaleGroup, translateYGroup, translateScaleGroup;
+	private RenderGroup scaleGroup, translateYGroup, translateScaleGroup;
 
 	public MidiViewGroup(View view) {
 		super(view);
@@ -30,8 +30,8 @@ public class MidiViewGroup extends TouchableView {
 		translateScaleGroup = new RenderGroup();
 
 		midiTrackView = new MidiTrackView(this, translateYGroup);
-		midiView = new MidiView(this);
-		midiLoopBarView = new MidiLoopBarView(this);
+		midiView = new MidiView(this, scaleGroup, translateYGroup, translateScaleGroup);
+		midiLoopBarView = new MidiLoopBarView(this, scaleGroup);
 
 		context.getTrackManager().addTrackListener(midiView);
 		context.getTrackManager().addTrackListener(midiTrackView);

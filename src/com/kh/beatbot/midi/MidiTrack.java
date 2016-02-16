@@ -40,13 +40,11 @@ public class MidiTrack {
 	private ArrayList<MidiEvent> mEvents;
 
 	public static MidiTrack createTempoTrack() {
+		final MidiTrack midiTrack = new MidiTrack();
+		midiTrack.insertEvent(new TimeSignature());
+		midiTrack.insertEvent(new Tempo());
 
-		MidiTrack T = new MidiTrack();
-
-		T.insertEvent(new TimeSignature());
-		T.insertEvent(new Tempo());
-
-		return T;
+		return midiTrack;
 	}
 
 	public MidiTrack() {

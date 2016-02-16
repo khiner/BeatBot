@@ -1,6 +1,5 @@
 package com.kh.beatbot.event.track;
 
-import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.event.Temporal;
 import com.kh.beatbot.track.BaseTrack;
@@ -24,7 +23,7 @@ public class TrackLevelsSetEvent implements Stateful, Temporal {
 		finalLevels = new Levels(trackId);
 
 		if (!finalLevels.equals(initialLevels)) {
-			EventManager.eventCompleted(this);
+			View.context.getEventManager().eventCompleted(this);
 		}
 	}
 

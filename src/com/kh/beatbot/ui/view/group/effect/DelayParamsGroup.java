@@ -52,7 +52,8 @@ public class DelayParamsGroup extends EffectParamsGroup implements ParamListener
 				}
 				delay.getParam(1).setBeatSync(newRightChannelSynced);
 				delay.getParam(1).setLevel(newRightChannelLevel);
-				mainPage.effectPage.setLevel2dParams(delay.getXParam(), delay.getYParam());
+				context.getMainPage().effectPage.setLevel2dParams(delay.getXParam(),
+						delay.getYParam());
 			}
 		});
 		linkToggle.setChecked(delay.paramsLinked());

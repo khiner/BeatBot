@@ -17,7 +17,7 @@ public class LoopWindowSetEvent implements Stateful, Temporal {
 		finalEndTick = View.context.getMidiManager().getLoopEndTick();
 
 		if (initialBeginTick != finalBeginTick || initialEndTick != finalEndTick) {
-			EventManager.eventCompleted(this);
+			View.context.getEventManager().eventCompleted(this);
 		}
 	}
 

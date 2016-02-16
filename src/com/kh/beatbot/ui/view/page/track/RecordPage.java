@@ -58,20 +58,20 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 		});
 
 		thresholdParamControl = new ThresholdParamControl(this);
-		Param thresholdParam = new Param(0, "Threshold").withUnits("db");
+		final Param thresholdParam = new Param(0, "Threshold").withUnits("db");
 		thresholdParamControl.setParam(thresholdParam);
 		thresholdParam.addListener(new ParamListener() {
 			@Override
 			public void onParamChange(Param param) {
-				RecordManager.setThresholdLevel(param.viewLevel);
+				View.context.getRecordManager().setThresholdLevel(param.viewLevel);
 			}
 		});
 	}
 
 	@Override
 	public synchronized void layoutChildren() {
-		float topBarH = height * .29f;
-		float fillH = height - topBarH;
+		final float topBarH = height * .29f;
+		final float fillH = height - topBarH;
 		recordSourceSelectButton.layout(this, 0, 0, topBarH * 4, topBarH);
 		thresholdParamControl.layout(this, topBarH * 4, 0, width - topBarH * 4, topBarH);
 

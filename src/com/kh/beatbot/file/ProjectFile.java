@@ -48,7 +48,7 @@ public class ProjectFile {
 		globalProperties.addProperty(SNAP_TO_GRID, View.context.getMidiManager().isSnapToGrid());
 		globalProperties.addProperty(CURR_TRACK_ID, View.context.getTrackManager().getCurrTrack()
 				.getId());
-		globalProperties.addProperty(CURR_PAGE_INDEX, View.getPageSelectGroup()
+		globalProperties.addProperty(CURR_PAGE_INDEX, View.context.getPageSelectGroup()
 				.getCurrPageIndex());
 
 		outputStream.write((globalProperties.toString() + "\n").getBytes());
@@ -84,7 +84,7 @@ public class ProjectFile {
 
 		View.context.getTrackManager().getBaseTrackById(
 				globalProperties.get(CURR_TRACK_ID).getAsInt()).select();
-		View.getPageSelectGroup().selectPage(
+		View.context.getPageSelectGroup().selectPage(
 				globalProperties.get(CURR_PAGE_INDEX).getAsInt());
 
 		reader.close();

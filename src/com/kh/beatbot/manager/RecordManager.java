@@ -25,14 +25,15 @@ public class RecordManager {
 		public RecordSourceButtonListener(final RecordManager recordManager, final Context c) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(c);
 			builder.setTitle("Choose record source");
-			builder.setItems(getRecordSources(), new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int item) {
-					recordManager.setRecordSource(item);
-					if (button != null) {
-						button.setText(recordManager.recordSource);
-					}
-				}
-			});
+			builder.setItems((String[]) RECORD_SOURCES.toArray(),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int item) {
+							recordManager.setRecordSource(item);
+							if (button != null) {
+								button.setText(recordManager.recordSource);
+							}
+						}
+					});
 			selectRecordSourceAlert = builder.create();
 		}
 
@@ -130,7 +131,7 @@ public class RecordManager {
 		if (!isArmed()) {
 			return null;
 		}
-		
+
 		String recordDirectory = View.context.getFileManager().recordPathForSource(recordSource);
 		currRecordFileName = recordDirectory + "/R" + (currFileNum++) + ".wav";
 		try {
@@ -183,10 +184,6 @@ public class RecordManager {
 		}
 	}
 
-	public static String[] getRecordSources() {
-		return (String[]) RECORD_SOURCES.toArray();
-	}
-
 	public String getRecordSource() {
 		return recordSource;
 	}
@@ -199,17 +196,17 @@ public class RecordManager {
 		}
 	}
 
-	public static native void setThresholdLevel(float thresholdLevel);
+	public native void setThresholdLevel(float thresholdLevel);
 
-	public static native void setRecordSourceNative(int recordSourceId);
+	private native void setRecordSourceNative(int recordSourceId);
 
-	public static native void startListeningNative();
+	private native void startListeningNative();
 
-	public static native void stopListeningNative();
+	private native void stopListeningNative();
 
-	public static native void stopRecordingNative();
+	private native void stopRecordingNative();
 
-	public static native void armNative();
+	private native void armNative();
 
-	public static native void disarmNative();
+	private native void disarmNative();
 }

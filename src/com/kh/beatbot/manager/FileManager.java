@@ -30,7 +30,7 @@ public class FileManager implements FileListener {
 	private String appDirectoryPath;
 
 	// order matters here - track should always be updated first
-	private static List<FileListener> listeners = new ArrayList<FileListener>();
+	private List<FileListener> listeners = new ArrayList<FileListener>();
 
 	public FileManager(final Context context, final AssetManager assetManager) {
 		this.filesDirectory = context.getFilesDir();

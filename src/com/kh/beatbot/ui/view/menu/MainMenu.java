@@ -17,6 +17,7 @@ import com.kh.beatbot.ui.shape.SlideTab;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
+import com.kh.beatbot.ui.view.page.main.MainPage;
 
 public class MainMenu extends Menu implements FileMenuItemListener {
 
@@ -156,6 +157,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	@Override
 	public synchronized void layoutChildren() {
 		super.layoutChildren();
+		final MainPage mainPage = context.getMainPage();
 		foregroundRect.layout(0, 0, mainPage.width, mainPage.height);
 	}
 
@@ -175,7 +177,8 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 
 	@Override
 	protected synchronized void layoutShape() {
-		if (null == mainPage)
+		final MainPage mainPage = context.getMainPage();
+		if (mainPage == null)
 			return;
 
 		tab.layout(x - mainPage.width + width, menuOffset / 2, columnWidth,

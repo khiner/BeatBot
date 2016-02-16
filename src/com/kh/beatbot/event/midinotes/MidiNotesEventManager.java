@@ -9,7 +9,6 @@ import java.util.Map;
 import android.util.Log;
 
 import com.kh.beatbot.effect.Effect.LevelType;
-import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.midi.MidiNote.Levels;
@@ -76,7 +75,7 @@ public class MidiNotesEventManager {
 
 		if (!midiNoteDiffs.isEmpty()) {
 			final MidiNotesDiffEvent midiNotesDiffEvent = new MidiNotesDiffEvent(midiNoteDiffs);
-			EventManager.eventCompleted(midiNotesDiffEvent);
+			View.context.getEventManager().eventCompleted(midiNotesDiffEvent);
 		}
 
 		deactivate();

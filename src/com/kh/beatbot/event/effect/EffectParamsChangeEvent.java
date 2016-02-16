@@ -2,7 +2,6 @@ package com.kh.beatbot.event.effect;
 
 import com.google.gson.JsonObject;
 import com.kh.beatbot.effect.EffectSerializer;
-import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Temporal;
 import com.kh.beatbot.ui.view.View;
 
@@ -22,7 +21,7 @@ public class EffectParamsChangeEvent extends EffectEvent implements Temporal {
 	public void end() {
 		endSerializedParams = getEffect().serialize(EffectSerializer.GSON);
 		if (!endSerializedParams.equals(beginSerializedParams)) {
-			EventManager.eventCompleted(this);
+			View.context.getEventManager().eventCompleted(this);
 		}
 	}
 

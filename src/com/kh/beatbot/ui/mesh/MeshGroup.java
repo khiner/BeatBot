@@ -59,7 +59,7 @@ public class MeshGroup {
 			dirty = false;
 		}
 
-		GL11 gl = View.getGl();
+		final GL11 gl = View.context.getGl();
 		gl.glLineWidth(strokeWeight);
 		if (hasTexture()) {
 			gl.glEnable(GL10.GL_TEXTURE_2D);
@@ -248,7 +248,7 @@ public class MeshGroup {
 	private synchronized void updateBuffers() {
 		initHandles();
 
-		GL11 gl = View.getGl();
+		final GL11 gl = View.context.getGl();
 		gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
 		gl.glBufferData(GL11.GL_ARRAY_BUFFER, vertexBuffer.limit() * FLOAT_BYTES, vertexBuffer,
 				GL11.GL_DYNAMIC_DRAW);
@@ -262,9 +262,9 @@ public class MeshGroup {
 		if (vertexHandle != -1) {
 			return; // already initialized
 		}
-		int[] buffer = new int[1];
+		final int[] buffer = new int[1];
 
-		GL11 gl = View.getGl();
+		final GL11 gl = View.context.getGl();
 		gl.glGenBuffers(1, buffer, 0);
 		vertexHandle = buffer[0];
 

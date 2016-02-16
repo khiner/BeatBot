@@ -16,9 +16,9 @@ import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.color.Color;
 import com.kh.beatbot.ui.shape.Line;
 import com.kh.beatbot.ui.shape.Rectangle;
+import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.transition.ColorTransition;
-import com.kh.beatbot.ui.view.group.MidiViewGroup;
 import com.kh.beatbot.ui.view.helper.ScrollHelper;
 import com.kh.beatbot.ui.view.helper.Scrollable;
 
@@ -45,11 +45,37 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	private SparseArray<Float> startOnTicks = new SparseArray<Float>();
 
 	protected ScrollHelper scrollHelper;
+
+	private RenderGroup translateYGroup, translateScaleGroup;
+
 	public ColorTransition scrollBarColorTrans = new ColorTransition(20, 20, Color.TRANSPARENT,
 			new float[] { 0, 0, 0, .7f });
 
-	public MidiView(View view) {
+	public MidiView(View view, RenderGroup scaleGroup, RenderGroup translateYGroup,
+			RenderGroup translateScaleGroup) {
 		super(view);
+		this.translateYGroup = translateYGroup;
+		this.translateScaleGroup = translateScaleGroup;
+		
+		setClip(true);
+
+		leftLoopRect = new Rectangle(scaleGroup, Color.DARK_TRANS, null);
+		rightLoopRect = new Rectangle(scaleGroup, Color.DARK_TRANS, null);
+		selectRect = new Rectangle(translateScaleGroup, Color.TRON_BLUE_TRANS, Color.TRON_BLUE);
+		currTickLine = new Line(translateScaleGroup, null, Color.TRON_BLUE);
+		tickLines = new Line[(MidiManager.MAX_TICKS * 8) / MidiManager.MIN_TICKS];
+		loopMarkerLines = new Line[2];
+		for (int i = 0; i < tickLines.length; i++)
+			tickLines[i] = new Line(scaleGroup, null, Color.TRANSPARENT);
+		for (int i = 0; i < loopMarkerLines.length; i++)
+			loopMarkerLines[i] = new Line(translateScaleGroup, null, Color.TRON_BLUE);
+
+		horizontalScrollBar = new RoundedRect(renderGroup, Color.TRANSPARENT, null);
+
+		addShapes(leftLoopRect, rightLoopRect, selectRect, currTickLine, horizontalScrollBar);
+		addShapes(tickLines);
+		addShapes(loopMarkerLines);
+		
 		scrollHelper = new ScrollHelper(this);
 		context.getMidiManager().addLoopChangeListener(this);
 	}
@@ -111,30 +137,6 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		return pinchRightOffset;
 	}
 
-	@Override
-	public synchronized void createChildren() {
-		setClip(true);
-
-		leftLoopRect = new Rectangle(MidiViewGroup.scaleGroup, Color.DARK_TRANS, null);
-		rightLoopRect = new Rectangle(MidiViewGroup.scaleGroup, Color.DARK_TRANS, null);
-		selectRect = new Rectangle(MidiViewGroup.translateScaleGroup, Color.TRON_BLUE_TRANS,
-				Color.TRON_BLUE);
-		currTickLine = new Line(MidiViewGroup.translateScaleGroup, null, Color.TRON_BLUE);
-		tickLines = new Line[(MidiManager.MAX_TICKS * 8) / MidiManager.MIN_TICKS];
-		loopMarkerLines = new Line[2];
-		for (int i = 0; i < tickLines.length; i++) {
-			tickLines[i] = new Line(MidiViewGroup.scaleGroup, null, Color.TRANSPARENT);
-		}
-		for (int i = 0; i < loopMarkerLines.length; i++) {
-			loopMarkerLines[i] = new Line(MidiViewGroup.translateScaleGroup, null, Color.TRON_BLUE);
-		}
-
-		horizontalScrollBar = new RoundedRect(renderGroup, Color.TRANSPARENT, null);
-
-		addShapes(leftLoopRect, rightLoopRect, selectRect, currTickLine, horizontalScrollBar);
-		addShapes(tickLines);
-		addShapes(loopMarkerLines);
-	}
 
 	@Override
 	public synchronized void layoutChildren() {
@@ -155,7 +157,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public void tick() {
-		if (PlaybackManager.getState() == PlaybackManager.State.PLAYING) {
+		if (context.getPlaybackManager().getState() == PlaybackManager.State.PLAYING) {
 			updateCurrentTick();
 		}
 		if (pointerCount() == 0) {
@@ -196,8 +198,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		float leftTick = xToTick(Math.min(pointerById.get(0).x, pointerById.get(1).x));
 		float rightTick = xToTick(Math.max(pointerById.get(0).x, pointerById.get(1).x));
 		if (!touchedNotes.isEmpty()) {
-			long[] selectedNoteTickWindow = context.getTrackManager()
-					.getSelectedNoteTickWindow();
+			long[] selectedNoteTickWindow = context.getTrackManager().getSelectedNoteTickWindow();
 			// note is selected with one pointer, but this pointer
 			// did not select a note. start pinching all selected notes.
 			pinchLeftPointerId = pointerById.get(0).x <= pointerById.get(1).x ? 0 : 1;
@@ -322,8 +323,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public void onCreate(Track track) {
-		Rectangle trackRect = new Rectangle(MidiViewGroup.translateYGroup, Color.TRANSPARENT,
-				Color.BLACK);
+		Rectangle trackRect = new Rectangle(translateYGroup, Color.TRANSPARENT, Color.BLACK);
 		addShapes(trackRect);
 		track.setRectangle(trackRect);
 		onTrackHeightChange();
@@ -574,7 +574,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	private void updateCurrentTick() {
-		currTickLine.setPosition(tickToUnscaledX(MidiManager.getCurrTick()), absoluteY);
+		currTickLine
+				.setPosition(tickToUnscaledX(context.getMidiManager().getCurrTick()), absoluteY);
 	}
 
 	private void layoutTrackRects() {
@@ -610,8 +611,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	@Override
 	public void onCreate(MidiNote note) {
 		if (note.getRectangle() == null) {
-			Rectangle noteRect = new Rectangle(MidiViewGroup.translateScaleGroup, whichColor(note),
-					Color.BLACK);
+			Rectangle noteRect = new Rectangle(translateScaleGroup, whichColor(note), Color.BLACK);
 			note.setRectangle(noteRect);
 			addShapes(noteRect);
 			layoutNoteRectangle(note);
@@ -687,6 +687,6 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	private MidiLoopBarView getMidiLoopBarView() {
-		return mainPage.getMidiViewGroup().midiLoopBarView;
+		return context.getMainPage().getMidiViewGroup().midiLoopBarView;
 	}
 }

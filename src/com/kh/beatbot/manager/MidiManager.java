@@ -366,13 +366,13 @@ public class MidiManager implements MidiNoteListener {
 		}
 	}
 
-	public static native void isTrackPlaying(int trackId);
+	public native long getCurrTick();
 
-	public static native void setNativeMSPT(long MSPT);
+	private native void isTrackPlaying(int trackId);
 
-	public static native void setCurrTick(long currTick);
+	private native void setNativeMSPT(long MSPT);
 
-	public static native long getCurrTick();
+	private native void setCurrTick(long currTick);
 
-	public static native void setLoopTicksNative(long loopBeginTick, long loopEndTick);
+	private native void setLoopTicksNative(long loopBeginTick, long loopEndTick);
 }

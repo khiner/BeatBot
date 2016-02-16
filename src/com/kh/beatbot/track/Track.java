@@ -11,14 +11,12 @@ import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.FileListener;
 import com.kh.beatbot.listener.ParamListener;
-import com.kh.beatbot.manager.MidiManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.shape.Rectangle;
 import com.kh.beatbot.ui.view.TrackButtonRow;
 import com.kh.beatbot.ui.view.View;
-import com.kh.beatbot.ui.view.group.PageSelectGroup;
 
 public class Track extends BaseTrack implements FileListener {
 	public static float MIN_LOOP_WINDOW = 32f;
@@ -174,7 +172,7 @@ public class Track extends BaseTrack implements FileListener {
 	public void updateNextNote() {
 		synchronized (notes) {
 			Collections.sort(notes);
-			setNextNote(id, getNextMidiNote(MidiManager.getCurrTick()));
+			setNextNote(id, getNextMidiNote(View.context.getMidiManager().getCurrTick()));
 		}
 	}
 
@@ -367,41 +365,41 @@ public class Track extends BaseTrack implements FileListener {
 		View.context.getTrackManager().onDestroy(this);
 	}
 
-	public static native void deleteTrack(int trackId);
+	private native void deleteTrack(int trackId);
 
-	public static native void toggleTrackLooping(int trackId);
+	private native void toggleTrackLooping(int trackId);
 
-	public static native boolean isTrackLooping(int trackId);
+	private native boolean isTrackLooping(int trackId);
 
-	public static native boolean isTrackPlaying(int trackId);
+	private native boolean isTrackPlaying(int trackId);
 
-	public static native void notifyNoteRemoved(int trackId, long noteOn);
+	private native void notifyNoteRemoved(int trackId, long noteOn);
 
-	public static native void setTrackLoopWindow(int trackId, long loopBegin, long loopEnd);
+	private native void setTrackLoopWindow(int trackId, long loopBegin, long loopEnd);
 
-	public static native void stopTrack(int trackId);
+	private native void stopTrack(int trackId);
 
-	public static native void previewTrack(int trackId);
+	private native void previewTrack(int trackId);
 
-	public static native void stopPreviewingTrack(int trackId);
+	private native void stopPreviewingTrack(int trackId);
 
-	public static native void muteTrack(int trackId, boolean mute);
+	private native void muteTrack(int trackId, boolean mute);
 
-	public static native void soloTrack(int trackId, boolean solo);
+	private native void soloTrack(int trackId, boolean solo);
 
-	public static native void setTrackReverse(int trackId, boolean reverse);
+	private native void setTrackReverse(int trackId, boolean reverse);
 
-	public static native void setTrackGain(int trackId, float gain);
+	private native void setTrackGain(int trackId, float gain);
 
-	public static native String setSample(int trackId, String sampleName);
+	private native String setSample(int trackId, String sampleName);
 
-	public static native float getSample(int trackId, long sampleIndex, int channel);
+	private native float getSample(int trackId, long sampleIndex, int channel);
 
-	public static native float getCurrentFrame(int trackId);
+	private native float getCurrentFrame(int trackId);
 
-	public static native float getFrames(int trackId);
+	private native float getFrames(int trackId);
 
-	public native void setNextNote(int trackId, MidiNote midiNote);
+	private native void setNextNote(int trackId, MidiNote midiNote);
 
 	public class SampleParams implements ParamListener {
 		public Param loopBeginParam, loopEndParam, gainParam;
@@ -424,7 +422,7 @@ public class Track extends BaseTrack implements FileListener {
 		public void onParamChange(Param param) {
 			if (param.equals(gainParam)) {
 				setTrackGain(id, param.level);
-				PageSelectGroup.editPage.sampleEdit.onParamChange(param);
+				View.context.getPageSelectGroup().getEditPage().sampleEdit.onParamChange(param);
 			} else {
 				float minLoopWindow = loopEndParam.getViewLevel(MIN_LOOP_WINDOW);
 				loopBeginParam.maxViewLevel = loopEndParam.viewLevel - minLoopWindow;

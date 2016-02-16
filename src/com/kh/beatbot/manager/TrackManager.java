@@ -20,6 +20,7 @@ import com.kh.beatbot.listener.TrackListener;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
+import com.kh.beatbot.ui.view.View;
 
 public class TrackManager implements TrackListener, FileListener, MidiNoteListener, TempoListener {
 	public static final int MASTER_TRACK_ID = -1;
@@ -318,10 +319,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
-	/******* These methods are called FROM native code via JNI ********/
-
-	public static native void createTrackNative(int trackId);
-
 	@Override
 	public void onCreate(Track track) {
 		for (int i = 0; i < tracks.size(); i++) {
@@ -464,8 +461,8 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 			// if we're changing the stop tick on a note that's already playing to a
 			// note before the current tick, or moving the start tick to after the playhead
 			// stop the track
-			long currTick = MidiManager.getCurrTick();
-			boolean playing = beginOnTick <= currTick && beginOffTick >= currTick;
+			final long currTick = View.context.getMidiManager().getCurrTick();
+			final boolean playing = beginOnTick <= currTick && beginOffTick >= currTick;
 			if (playing && endOffTick < currTick || endOnTick > currTick) {
 				track.stop();
 			} else {
@@ -495,4 +492,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	public void onTempoChange(float bpm) {
 		quantizeEffectParams();
 	}
+
+	private native void createTrackNative(int trackId);
 }

@@ -8,47 +8,47 @@ import java.util.Set;
 import com.kh.beatbot.listener.StatefulEventListener;
 
 public class EventManager {
-	private static List<Stateful> events = new ArrayList<Stateful>();
-	private static int currEventIndex = -1;
-	private static Set<StatefulEventListener> listeners = new HashSet<StatefulEventListener>();
+	private List<Stateful> events = new ArrayList<Stateful>();
+	private int currEventIndex = -1;
+	private Set<StatefulEventListener> listeners = new HashSet<StatefulEventListener>();
 
-	public static Stateful getLastEvent() {
+	public Stateful getLastEvent() {
 		return events.isEmpty() ? null : events.get(currEventIndex);
 	}
 
-	public static void clearEvents() {
+	public void clearEvents() {
 		events.clear();
 		currEventIndex = -1;
 		notifyEventCompleted(null);
 	}
 
-	public static void addListener(StatefulEventListener listener) {
+	public void addListener(StatefulEventListener listener) {
 		listeners.add(listener);
 	}
 
-	public static boolean canUndo() {
+	public boolean canUndo() {
 		return currEventIndex >= 0;
 	}
 
-	public static boolean canRedo() {
+	public boolean canRedo() {
 		return currEventIndex < events.size() - 1;
 	}
 
-	public static final void undo() {
+	public final void undo() {
 		if (canUndo()) {
 			events.get(currEventIndex--).undo();
 			notifyEventCompleted(null);
 		}
 	}
 
-	public static final void redo() {
+	public final void redo() {
 		if (canRedo()) {
 			events.get(++currEventIndex).apply();
 			notifyEventCompleted(null);
 		}
 	}
 
-	public static final void jumpTo(int eventIndex) {
+	public final void jumpTo(int eventIndex) {
 		if (eventIndex < 0 || eventIndex >= events.size())
 			return;
 
@@ -60,7 +60,7 @@ public class EventManager {
 		}
 	}
 
-	public static void eventCompleted(Stateful event) {
+	public void eventCompleted(Stateful event) {
 		currEventIndex++;
 		while (events.size() > currEventIndex) {
 			events.remove(events.size() - 1);
@@ -75,7 +75,7 @@ public class EventManager {
 		notifyEventCompleted(event);
 	}
 
-	private static void notifyEventCompleted(Stateful event) {
+	private void notifyEventCompleted(Stateful event) {
 		for (StatefulEventListener listener : listeners) {
 			listener.onEventCompleted(event);
 		}

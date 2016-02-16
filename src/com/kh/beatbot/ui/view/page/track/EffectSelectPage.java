@@ -122,7 +122,7 @@ public class EffectSelectPage extends TrackPage {
 		} else if (effectName != effect.getName()) { // replace effect
 			new EffectChangeEvent(track.getId(), position, effect.getName(), effectName).execute();
 		} else { // select effect
-			View.mainPage.launchEffect(effect);
+			context.getMainPage().launchEffect(effect);
 		}
 	}
 

@@ -48,7 +48,7 @@ public class NoteLevelsView extends TouchableView {
 	private Circle levelBarCircle, levelBarSelectCircle;
 	private ValueLabel valueLabel;
 
-	private static RenderGroup levelBarGroup = new RenderGroup();
+	private RenderGroup levelBarGroup = new RenderGroup();
 
 	public NoteLevelsView(View view) {
 		super(view);
@@ -248,11 +248,13 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	private float tickToX(float tick) {
-		return mainPage.getMidiView().tickToX(tick) + mainPage.getMidiView().absoluteX - absoluteX;
+		final MidiView midiView = context.getMainPage().getMidiView();
+		return midiView.tickToX(tick) + midiView.absoluteX - absoluteX;
 	}
 
 	private float xToTick(float x) {
-		return mainPage.getMidiView().xToTick(x + absoluteX - mainPage.getMidiView().absoluteX);
+		final MidiView midiView = context.getMainPage().getMidiView();
+		return midiView.xToTick(x + absoluteX - midiView.absoluteX);
 	}
 
 	private float getLevelHeight() {

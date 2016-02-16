@@ -132,9 +132,9 @@ public class BaseTrack {
 		pitchCentParam.setLevel(pitchCent);
 	}
 
-	public static native void setTrackVolume(int trackId, float volume);
+	private native void setTrackVolume(int trackId, float volume);
 
-	public static native void setTrackPan(int trackId, float pan);
+	private native void setTrackPan(int trackId, float pan);
 
-	public static native void setTrackPitch(int trackId, float pitch);
+	private native void setTrackPitch(int trackId, float pitch);
 }

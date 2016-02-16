@@ -34,7 +34,7 @@ public abstract class TextureAtlas {
 	public void loadTexture() {
 		if (bitmap.isRecycled())
 			return;
-		final GL11 gl = View.getGl();
+		final GL11 gl = View.context.getGl();
 		// Generate Texture ID
 		gl.glGenTextures(1, textureId, 0);
 		// Bind texture id texturing target

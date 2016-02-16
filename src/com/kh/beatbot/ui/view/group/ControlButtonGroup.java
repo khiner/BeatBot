@@ -4,7 +4,6 @@ import android.widget.Toast;
 
 import com.kh.beatbot.effect.Effect;
 import com.kh.beatbot.effect.Effect.LevelType;
-import com.kh.beatbot.event.EventManager;
 import com.kh.beatbot.event.Stateful;
 import com.kh.beatbot.event.effect.EffectCreateEvent;
 import com.kh.beatbot.event.effect.EffectToggleEvent;
@@ -27,7 +26,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 
 	public ControlButtonGroup(View view) {
 		super(view);
-		EventManager.addListener(this);
+		context.getEventManager().addListener(this);
 	}
 
 	@Override
@@ -43,7 +42,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 		playButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				PlaybackManager.play();
+				context.getPlaybackManager().play();
 			}
 		});
 
@@ -54,9 +53,9 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 				if (context.getRecordManager().isRecording()) {
 					playButton.setChecked(false);
 				}
-				if (PlaybackManager.getState() == PlaybackManager.State.PLAYING) {
+				if (context.getPlaybackManager().getState() == PlaybackManager.State.PLAYING) {
 					playButton.setChecked(false);
-					PlaybackManager.stop();
+					context.getPlaybackManager().stop();
 				}
 			}
 		});
@@ -64,14 +63,14 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 		undoButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				EventManager.undo();
+				context.getEventManager().undo();
 			}
 		});
 
 		redoButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {
-				EventManager.redo();
+				context.getEventManager().redo();
 			}
 		});
 
@@ -111,7 +110,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 			@Override
 			public void onRelease(Button button) {
 				int trackId = context.getTrackManager().getCurrTrack().getId();
-				int effectPosition = View.mainPage.getCurrEffect().getPosition();
+				int effectPosition = context.getMainPage().getCurrEffect().getPosition();
 				new EffectToggleEvent(trackId, effectPosition).execute();
 			}
 		});
@@ -189,9 +188,10 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 
 	@Override
 	public void onEventCompleted(Stateful event) {
-		updateStateStackIcons(EventManager.canUndo(), EventManager.canRedo());
+		updateStateStackIcons(context.getEventManager().canUndo(), context.getEventManager()
+				.canRedo());
 		if (event instanceof EffectCreateEvent || event instanceof EffectToggleEvent) {
-			Effect effect = View.mainPage.getCurrEffect();
+			final Effect effect = context.getMainPage().getCurrEffect();
 			effectToggle.setChecked(effect.isOn());
 		}
 	}
