@@ -7,14 +7,15 @@ import com.kh.beatbot.ui.shape.RoundedRect;
 import com.kh.beatbot.ui.transition.ColorTransition;
 
 public abstract class ScrollableView extends TouchableView {
+	private static final float DRAG = .9f, THRESH = 0.01f;
+
 	// only offsets are exposed to descendants
 	protected float xOffset = 0, yOffset = 0;
 
-	private static final float DRAG = .9f, THRESH = 0.01f;
 	private float xOffsetAnchor = 0, yOffsetAnchor = 0, xVelocity = 0, yVelocity = 0, lastX = 0,
 			lastY = 0, childWidth = 0, childHeight = 0;
 
-	private boolean horizontal = false, vertical = false;
+	private boolean horizontal = false, vertical = false, firstRender = true;
 
 	private RoundedRect horizontalScrollBar, verticalScrollBar;
 	private ColorTransition scrollBarColorTrans = new ColorTransition(20, 20, Color.TRANSPARENT,
@@ -75,10 +76,20 @@ public abstract class ScrollableView extends TouchableView {
 	}
 
 	@Override
+	public void draw() {
+		if (firstRender) {
+			// XXX hack, bad initial state on load after at least on shutdown
+			setXOffset(0);
+			setYOffset(0);
+		}
+		firstRender = false;
+	}
+
+	@Override
 	public void tick() {
-		if (pointerCount() == 0
-				&& ((horizontal && Math.abs(xVelocity) > THRESH) || (vertical && Math
-						.abs(yVelocity) > THRESH))) {
+		if ((pointerCount() == 0
+				&& ((horizontal && Math.abs(xVelocity) >= THRESH) || (vertical && Math
+						.abs(yVelocity) >= THRESH)))) {
 			updateOffsets(null);
 		}
 

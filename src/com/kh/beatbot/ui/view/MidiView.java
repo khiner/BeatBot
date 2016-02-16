@@ -153,6 +153,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		onLoopWindowChange(context.getMidiManager().getLoopBeginTick(), context.getMidiManager()
 				.getLoopEndTick());
 		updateCurrentTick();
+		scrollHelper.setYOffset(0);
 	}
 
 	@Override
