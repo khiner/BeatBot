@@ -4,7 +4,7 @@
 typedef struct MidiEvent_ {
 	float volume;
 	float pan;
-	float pitch;
+	float pitchSteps;
 } MidiEvent;
 
 MidiEvent *previewEvent;

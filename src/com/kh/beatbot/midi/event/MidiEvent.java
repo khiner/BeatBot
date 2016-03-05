@@ -24,8 +24,6 @@ import com.kh.beatbot.midi.event.meta.MetaEvent;
 import com.kh.beatbot.midi.util.VariableLengthInt;
 
 public abstract class MidiEvent implements Comparable<MidiEvent> {
-	public static final byte MAX_LEVEL = 127, HALF_LEVEL = 64;
-
 	protected long mTick;
 	protected VariableLengthInt mDelta;
 
@@ -127,6 +125,6 @@ public abstract class MidiEvent implements Comparable<MidiEvent> {
 	}
 
 	public static byte clip(byte value) {
-		return value > 0 ? (value < MAX_LEVEL ? value : MAX_LEVEL) : 0;
+		return value > 0 ? (value < Byte.MAX_VALUE ? value : Byte.MAX_VALUE) : 0;
 	}
 }

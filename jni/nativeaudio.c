@@ -280,7 +280,7 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env,
 	previewEvent = malloc(sizeof(MidiEvent));
 	previewEvent->volume = dbToLinear(0);
 	previewEvent->pan = panToScaleValue(0);
-	previewEvent->pitch = .5f;
+	previewEvent->pitchSteps = .5f;
 }
 
 jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(

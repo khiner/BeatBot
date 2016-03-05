@@ -4,17 +4,19 @@
 #include <math.h>
 
 static const float MIN_DB = -144;
+static const float MAX_BYTE_VALUE = 127;
+static const float HALF_BYTE_VALUE = 64;
 
 static inline float clipTo(float value, float min, float max) {
 	return value > min ? (value < max ? value : max) : min;
 }
 
 static inline float byteToLinear(unsigned char byte) {
-	return (float) byte / 124.0f;
+	return (float) byte / MAX_BYTE_VALUE;
 }
 
 static inline unsigned char linearToByte(float linear) {
-	return (unsigned char) linear * 124;
+	return (unsigned char) (linear * MAX_BYTE_VALUE);
 }
 
 static inline float dbToLinear(float db) {
@@ -29,8 +31,8 @@ static inline unsigned char dbToByte(float db) {
 	return linearToByte(dbToLinear(db));
 }
 
-static inline float transposeToScaleValue(float transpose) {
-	return pow(2, transpose / 12.0);
+static inline float transposeStepsToScaleValue(float transposeSteps) {
+	return pow(2, transposeSteps / 12.0);
 }
 
 static inline float panToScaleValue(float pan) {

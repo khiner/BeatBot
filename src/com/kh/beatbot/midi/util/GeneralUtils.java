@@ -8,6 +8,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 public class GeneralUtils {
+	public static final byte HALF_BYTE = 64;
 
 	public static void initAndroidSettings(Activity activity) {
 		// remove title bar
@@ -38,20 +39,20 @@ public class GeneralUtils {
 	}
 
 	public static byte linearToByte(float linear) {
-		return (byte) (clipToUnit(linear) * Byte.MAX_VALUE);
+		return (byte) Math.ceil(clipToUnit(linear) * Byte.MAX_VALUE);
 	}
 
 	public static float dbToUnit(float db) {
 		// db range = -60 - 0, need range 0-1
-		return db <= -60 ? 0 : db / 60 + 1;
+		return db <= -60f ? 0 : db / 60f + 1f;
 	}
 
 	public static short dbToShort(float db) {
-		return (short) (32768 * Math.pow(10, db / 20));
+		return (short) ((double) Short.MAX_VALUE * Math.pow(10f, db / 20f));
 	}
 
 	public static float shortToDb(short amp) {
-		return 20 * (float) Math.log10(Math.abs(amp) / 32768f);
+		return 20f * (float) Math.log10(Math.abs(amp) / (double) Short.MAX_VALUE);
 	}
 
 	public static boolean contains(int[] ary, int val) {
@@ -80,7 +81,7 @@ public class GeneralUtils {
 			return min; // sanity check, always favor min
 		return value > min ? (value < max ? value : max) : min;
 	}
-	
+
 	public static long clipTo(long value, long min, long max) {
 		if (min > max)
 			return min;

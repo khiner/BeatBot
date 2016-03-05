@@ -129,9 +129,10 @@ void destroyTracks() {	// destroy all tracks
 	freeEffects(masterLevels);
 }
 
-
 void updateChannelScaleValues(Levels *levels, MidiEvent *midiEvent) {
-	float pan = midiEvent != NULL ? (levels->pan + midiEvent->pan) / 2 : levels->pan;
+	float pan =
+			midiEvent != NULL ?
+					(levels->pan + midiEvent->pan) / 2 : levels->pan;
 	levels->scaleChannels[0] = (1 - pan);
 	levels->scaleChannels[1] = pan;
 
@@ -146,10 +147,10 @@ void updateChannelScaleValues(Levels *levels, MidiEvent *midiEvent) {
 
 void setPitch(Track *track, MidiEvent *midiEvent) {
 	if (NULL != track->generator) {
-		float pitch = transposeToScaleValue(
-				masterLevels->pitch + track->levels->pitch
-						+ (midiEvent->pitch - .5f));
-		((FileGen *) track->generator->config)->sampleRate = pitch;
+		float sampleRate = transposeStepsToScaleValue(
+				masterLevels->pitchSteps + track->levels->pitchSteps
+						+ midiEvent->pitchSteps);
+		((FileGen *) track->generator->config)->sampleRate = sampleRate;
 	}
 }
 
@@ -173,8 +174,8 @@ Levels *initLevels() {
 	levels->effectHead = NULL;
 	levels->volume = dbToLinear(0);
 	levels->pan = panToScaleValue(0);
-	levels->pitch = 0.5f;
-	updateChannelScaleValues(levels, NULL);
+	levels->pitchSteps = 0;
+	updateChannelScaleValues(levels, NULL );
 
 	int effectNum;
 	for (effectNum = 0; effectNum < MAX_EFFECTS_PER_TRACK; effectNum++) {
@@ -199,7 +200,7 @@ Track *initTrack(int trackId) {
 	track->nextEvent = malloc(sizeof(MidiEvent));
 	track->nextEvent->volume = dbToLinear(0);
 	track->nextEvent->pan = panToScaleValue(0);
-	track->nextEvent->pitch = .5f;
+	track->nextEvent->pitchSteps = 0;
 	return track;
 }
 
@@ -225,9 +226,9 @@ void soundTrack(Track *track) {
 }
 
 void stopSoundingTrack(Track *track) {
-	if (track->generator == NULL )
-		return;
-	filegen_reset((FileGen *) track->generator->config);
+	if (track->generator != NULL ) {
+		filegen_reset((FileGen *) track->generator->config);
+	}
 }
 
 void stopTrack(Track *track) {
@@ -305,12 +306,12 @@ void Java_com_kh_beatbot_track_Track_soloTrack(JNIEnv *env, jclass clazz,
 }
 
 void setNextNoteInfo(Track *track, jlong onTick, jlong offTick, jbyte volume,
-		jbyte pan, jbyte pitch) {
+		jbyte pan, jbyte pitchSteps) {
 	track->nextStartTick = onTick;
 	track->nextStopTick = offTick;
 	track->nextEvent->volume = byteToLinear(volume);
 	track->nextEvent->pan = byteToLinear(pan);
-	track->nextEvent->pitch = byteToLinear(pitch);
+	track->nextEvent->pitchSteps = (float) pitchSteps - HALF_BYTE_VALUE;
 }
 
 void setNextNote(Track *track, jobject obj) {
@@ -370,9 +371,9 @@ void Java_com_kh_beatbot_track_BaseTrack_setTrackPan(JNIEnv *env, jclass clazz,
 }
 
 void Java_com_kh_beatbot_track_BaseTrack_setTrackPitch(JNIEnv *env,
-		jclass clazz, jint trackId, jfloat pitch) {
+		jclass clazz, jint trackId, jfloat pitchSteps) {
 	Levels *levels = getLevels(env, clazz, trackId);
-	levels->pitch = pitch;
+	levels->pitchSteps = pitchSteps;
 	updatePitch(trackId);
 }
 

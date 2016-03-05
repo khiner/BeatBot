@@ -136,5 +136,5 @@ public class BaseTrack {
 
 	private native void setTrackPan(int trackId, float pan);
 
-	private native void setTrackPitch(int trackId, float pitch);
+	private native void setTrackPitch(int trackId, float pitchSteps);
 }

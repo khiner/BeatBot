@@ -22,7 +22,7 @@ typedef struct OpenSlOut_ {
  */
 typedef struct Levels_ {
 	float scaleChannels[2];
-	float volume, pan, pitch;
+	float volume, pan, pitchSteps;
 	EffectNode *effectHead;
 	// mutex for effects since insertion/setting/removing effects happens on diff thread than processing
 	pthread_mutex_t effectMutex;
