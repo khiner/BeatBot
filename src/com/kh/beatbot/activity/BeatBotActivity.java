@@ -89,7 +89,7 @@ public class BeatBotActivity extends Activity {
 		if (viewParent == null) {
 			final LinearLayout layout = new LinearLayout(this);
 			final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-					LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
+					LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 			surfaceViewBase.setLayoutParams(lp);
 			layout.addView(surfaceViewBase);
 			setContentView(layout, lp);
@@ -124,16 +124,16 @@ public class BeatBotActivity extends Activity {
 	@Override
 	public void onPause() {
 		surfaceViewBase.setVisibility(android.view.View.GONE);
-		//root.onPause();
+		// root.onPause();
 		super.onPause();
 	}
 
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
-	    super.onWindowFocusChanged(hasFocus);
-	    if (hasFocus && surfaceViewBase.getVisibility() == android.view.View.GONE) {
-	         surfaceViewBase.setVisibility(android.view.View.VISIBLE);
-	    }
+		super.onWindowFocusChanged(hasFocus);
+		if (hasFocus && surfaceViewBase.getVisibility() == android.view.View.GONE) {
+			surfaceViewBase.setVisibility(android.view.View.VISIBLE);
+		}
 	}
 
 	@Override

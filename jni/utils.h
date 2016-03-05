@@ -1,9 +1,3 @@
-/*
-
- *
- *  Created on: Jun 22, 2014
- *      Author: khiner
- */
 #ifndef UTILS_H_
 #define UTILS_H_
 

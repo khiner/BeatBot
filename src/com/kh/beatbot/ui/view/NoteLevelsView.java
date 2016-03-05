@@ -17,11 +17,11 @@ import com.kh.beatbot.ui.shape.RenderGroup;
 import com.kh.beatbot.ui.view.control.ValueLabel;
 
 public class NoteLevelsView extends TouchableView {
-	private static class DragLine {
-		private static float m = 0, b = 0, leftTick = 0, rightTick = Float.MAX_VALUE,
+	private class DragLine {
+		private float m = 0, b = 0, leftTick = 0, rightTick = Float.MAX_VALUE,
 				leftLevel = 0, rightLevel = 0;
 
-		public static float getLevel(float tick) {
+		public float getLevel(float tick) {
 			if (tick <= leftTick)
 				return leftLevel;
 			if (tick >= rightTick)
@@ -44,15 +44,16 @@ public class NoteLevelsView extends TouchableView {
 
 	private float selectRegionStartX = -1, selectRegionStartY = -1;
 
+	private RenderGroup levelBarGroup;
 	private Rectangle selectRegionRect, levelBarRect;
 	private Circle levelBarCircle, levelBarSelectCircle;
 	private ValueLabel valueLabel;
-
-	private RenderGroup levelBarGroup = new RenderGroup();
+	private DragLine dragLine;
 
 	public NoteLevelsView(View view) {
 		super(view);
 		setClip(true);
+		dragLine = new DragLine();
 	}
 
 	public LevelType getLevelType() {
@@ -171,26 +172,26 @@ public class NoteLevelsView extends TouchableView {
 	private void updateDragLine() {
 		int touchedSize = touchedNotes.size();
 		if (touchedSize == 1) {
-			DragLine.m = 0;
+			dragLine.m = 0;
 			MidiNote touched = (MidiNote) touchedNotes.valueAt(0);
-			DragLine.b = touched.getLinearLevel(currLevelType);
-			DragLine.leftTick = 0;
-			DragLine.rightTick = Float.MAX_VALUE;
-			DragLine.leftLevel = DragLine.rightLevel = touched.getLinearLevel(currLevelType);
+			dragLine.b = touched.getLinearLevel(currLevelType);
+			dragLine.leftTick = 0;
+			dragLine.rightTick = Float.MAX_VALUE;
+			dragLine.leftLevel = dragLine.rightLevel = touched.getLinearLevel(currLevelType);
 		} else if (touchedSize == 2) {
 			MidiNote first = touchedNotes.valueAt(0);
 			MidiNote second = touchedNotes.valueAt(1);
 			MidiNote leftLevel = first.getOnTick() < second.getOnTick() ? first : second;
 			MidiNote rightLevel = first.getOnTick() < second.getOnTick() ? second : first;
-			DragLine.m = (rightLevel.getLinearLevel(currLevelType) - leftLevel
+			dragLine.m = (rightLevel.getLinearLevel(currLevelType) - leftLevel
 					.getLinearLevel(currLevelType))
 					/ (rightLevel.getOnTick() - leftLevel.getOnTick());
-			DragLine.b = (leftLevel.getLinearLevel(currLevelType) - DragLine.m
+			dragLine.b = (leftLevel.getLinearLevel(currLevelType) - dragLine.m
 					* leftLevel.getOnTick());
-			DragLine.leftTick = leftLevel.getOnTick();
-			DragLine.rightTick = rightLevel.getOnTick();
-			DragLine.leftLevel = leftLevel.getLinearLevel(currLevelType);
-			DragLine.rightLevel = rightLevel.getLinearLevel(currLevelType);
+			dragLine.leftTick = leftLevel.getOnTick();
+			dragLine.rightTick = rightLevel.getOnTick();
+			dragLine.leftLevel = leftLevel.getLinearLevel(currLevelType);
+			dragLine.rightLevel = rightLevel.getLinearLevel(currLevelType);
 		}
 	}
 
@@ -201,14 +202,14 @@ public class NoteLevelsView extends TouchableView {
 			levelOffsets.put(
 					selectedNote,
 					selectedNote.getLinearLevel(currLevelType)
-							- DragLine.getLevel(selectedNote.getOnTick()));
+							- dragLine.getLevel(selectedNote.getOnTick()));
 		}
 	}
 
 	private void setLevelsToDragLine() {
 		for (MidiNote selectedNote : context.getTrackManager().getSelectedNotes()) {
 			if (levelOffsets.get(selectedNote) != null) {
-				float linear = DragLine.getLevel(selectedNote.getOnTick())
+				float linear = dragLine.getLevel(selectedNote.getOnTick())
 						+ levelOffsets.get(selectedNote);
 				context.getMidiManager().setNoteLevel(selectedNote, currLevelType,
 						GeneralUtils.linearToByte(linear));
@@ -317,6 +318,8 @@ public class NoteLevelsView extends TouchableView {
 	@Override
 	protected synchronized void createChildren() {
 		initRoundedRect();
+
+		levelBarGroup = new RenderGroup();
 		selectRegionRect = new Rectangle(renderGroup, Color.TRANSPARENT, null);
 		levelBarRect = new Rectangle(levelBarGroup, Color.TRON_BLUE, null);
 		levelBarCircle = new Circle(levelBarGroup, Color.TRON_BLUE, null);
