@@ -498,7 +498,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	@Override
 	public void onLevelChange(MidiNote note, LevelType type) {
-		// no-op
+		getTrack(note).updateNextNote();
 	}
 
 	@Override
