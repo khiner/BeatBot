@@ -139,7 +139,12 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 	}
 
 	@Override
-	public void onLevelChanged(MidiNote note, LevelType type) {
+	public void beforeLevelChange(MidiNote note) {
+		// no-op
+	}
+
+	@Override
+	public void onLevelChange(MidiNote note, LevelType type) {
 		selectEditPage();
 	}
 

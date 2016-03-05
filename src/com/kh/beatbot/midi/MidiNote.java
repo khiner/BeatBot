@@ -231,6 +231,8 @@ public class MidiNote implements Comparable<MidiNote> {
 	}
 
 	public void setLevel(LevelType levelType, byte level) {
+		View.context.getMidiManager().beforeLevelChange(this);
+
 		switch (levelType) {
 		case VOLUME:
 			setVelocity(level);
@@ -243,7 +245,7 @@ public class MidiNote implements Comparable<MidiNote> {
 			break;
 		}
 
-		View.context.getMidiManager().onLevelChanged(this, levelType);
+		View.context.getMidiManager().onLevelChange(this, levelType);
 	}
 
 	@Override

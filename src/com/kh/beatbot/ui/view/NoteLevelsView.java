@@ -18,8 +18,8 @@ import com.kh.beatbot.ui.view.control.ValueLabel;
 
 public class NoteLevelsView extends TouchableView {
 	private class DragLine {
-		private float m = 0, b = 0, leftTick = 0, rightTick = Float.MAX_VALUE,
-				leftLevel = 0, rightLevel = 0;
+		private float m = 0, b = 0, leftTick = 0, rightTick = Float.MAX_VALUE, leftLevel = 0,
+				rightLevel = 0;
 
 		public float getLevel(float tick) {
 			if (tick <= leftTick)
@@ -211,8 +211,7 @@ public class NoteLevelsView extends TouchableView {
 			if (levelOffsets.get(selectedNote) != null) {
 				float linear = dragLine.getLevel(selectedNote.getOnTick())
 						+ levelOffsets.get(selectedNote);
-				context.getMidiManager().setNoteLevel(selectedNote, currLevelType,
-						GeneralUtils.linearToByte(linear));
+				selectedNote.setLevel(currLevelType, GeneralUtils.linearToByte(linear));
 			}
 		}
 	}
@@ -279,8 +278,7 @@ public class NoteLevelsView extends TouchableView {
 		if (!touchedNotes.isEmpty()) {
 			MidiNote touched = touchedNotes.get(id);
 			if (touched != null) {
-				context.getMidiManager().setNoteLevel(touched, currLevelType,
-						GeneralUtils.linearToByte(yToLevel(pos.y)));
+				touched.setLevel(currLevelType, GeneralUtils.linearToByte(yToLevel(pos.y)));
 				updateValueLabel(touched);
 			}
 			if (id == pointerById.size() - 1) {

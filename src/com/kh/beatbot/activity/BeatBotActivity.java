@@ -358,9 +358,9 @@ public class BeatBotActivity extends Activity {
 		midiFileManager.importMidi(this, fileName);
 	}
 
-	public static native void onRecordManagerInit(RecordManager recordManager);
+	public native void onRecordManagerInit(RecordManager recordManager);
 
-	public static native void onTrackManagerInit(TrackManager trackManager);
+	public native void onTrackManagerInit(TrackManager trackManager);
 
 	public static native boolean createAudioPlayer();
 

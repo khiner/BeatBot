@@ -227,12 +227,10 @@ public class MidiNotesEventManager {
 		}
 	}
 
-	public void setNoteLevel(MidiNote note, LevelType levelType, byte level) {
+	public void beforeLevelChange(MidiNote note) {
 		if (!originalNoteLevels.containsKey(note)) {
 			originalNoteLevels.put(note, note.getLevels());
 		}
-
-		note.setLevel(levelType, level);
 	}
 
 	public void handleNoteCollisions() {

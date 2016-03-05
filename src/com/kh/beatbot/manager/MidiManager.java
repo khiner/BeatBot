@@ -249,10 +249,6 @@ public class MidiManager implements MidiNoteListener {
 		midiNotesEventManager.pinchSelectedNotes(onTickDiff, offTickDiff);
 	}
 
-	public void setNoteLevel(MidiNote note, LevelType levelType, byte level) {
-		midiNotesEventManager.setNoteLevel(note, levelType, level);
-	}
-
 	public void applyDiffs(final List<MidiNoteDiff> diffs) {
 		View.context.getTrackManager().saveNoteTicks();
 		View.context.getTrackManager().deselectAllNotes();
@@ -352,9 +348,14 @@ public class MidiManager implements MidiNoteListener {
 	}
 
 	@Override
-	public void onLevelChanged(MidiNote note, LevelType type) {
+	public void beforeLevelChange(MidiNote note) {
+		midiNotesEventManager.beforeLevelChange(note);
+	}
+
+	@Override
+	public void onLevelChange(MidiNote note, LevelType type) {
 		for (MidiNoteListener listener : midiNoteListeners) {
-			listener.onLevelChanged(note, type);
+			listener.onLevelChange(note, type);
 		}
 	}
 

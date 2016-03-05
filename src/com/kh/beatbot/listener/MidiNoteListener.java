@@ -12,6 +12,8 @@ public interface MidiNoteListener {
 			int endNoteValue, long endOnTick, long endOffTick);
 
 	public void onSelectStateChange(MidiNote note);
-	
-	public void onLevelChanged(MidiNote note, LevelType type);
+
+	public void beforeLevelChange(MidiNote note);
+
+	public void onLevelChange(MidiNote note, LevelType type);
 }
