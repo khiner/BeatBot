@@ -7,6 +7,7 @@
 
 #define SAMPLE_RATE 44100.0f
 #define INV_SAMPLE_RATE 1.0f / SAMPLE_RATE
+#define RADIANS_PER_SAMPLE M_2_PI / SAMPLE_RATE
 
 #define CHORUS   0
 #define DECIMATE 1

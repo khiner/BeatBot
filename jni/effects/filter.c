@@ -4,11 +4,12 @@ FilterConfig *filterconfig_create() {
 	FilterConfig *config = (FilterConfig *) malloc(sizeof(FilterConfig));
 	config->mode = 0;
 	config->baseF = SAMPLE_RATE / 4;
-	config->modDepth = .5f;
+	config->q = 0.5f;
+	config->modDepth = 0.5f;
 	config->mod = sinewave_create();
-	sinewave_setFrequency(config->mod, SAMPLE_RATE / 2);
+	sinewave_setFrequency(config->mod, 0.5f);
 	config->y1[0] = config->y1[1] = config->y2[0] = config->y2[1] = 0;
-	filterconfig_set(config, SAMPLE_RATE / 2, .5f);
+	filterconfig_set(config, config->baseF, config->q);
 	return config;
 }
 
@@ -32,7 +33,7 @@ void filterconfig_setParam(void *p, float paramNumFloat, float param) {
 		config->baseF = param; // frequency
 		break;
 	case 1:
-		config->r = 1 - param; // resonance
+		config->q = 1 - param; // resonance
 		break;
 	case 2:
 		filterconfig_setModRate(config, param); // mod rate
@@ -42,7 +43,7 @@ void filterconfig_setParam(void *p, float paramNumFloat, float param) {
 		break;
 	case 4:
 		config->mode = (int) param; // mode
-		filterconfig_set(config, config->baseF, config->r);
+		filterconfig_set(config, config->baseF, config->q);
 		break;
 	}
 }
