@@ -1,15 +1,23 @@
 #include "../all.h"
 
 FilterConfig *filterconfig_create() {
-	FilterConfig *config = (FilterConfig *) malloc(sizeof(FilterConfig));
-	config->mode = 0;
-	config->baseF = SAMPLE_RATE / 4;
-	config->q = 0.5f;
-	config->modDepth = 0.5f;
-	config->mod = sinewave_create();
-	sinewave_setFrequency(config->mod, 0.5f);
-	config->y1[0] = config->y1[1] = config->y2[0] = config->y2[1] = 0;
-	filterconfig_set(config, config->baseF, config->q);
+ 	FilterConfig *config = (FilterConfig *) malloc(sizeof(FilterConfig));
+	config->rScale = .7f;
+  	config->mode = 0;
+  	config->baseF = SAMPLE_RATE / 4;
+  	config->r = 0.5f;
+  	config->modDepth = .5f;
+  	config->mod = sinewave_create();
+    sinewave_setFrequency(config->mod, config->baseF);
+ 	int filterNum;
+ 	for (filterNum = 0; filterNum < 2; filterNum++) {
+ 		config->inner[filterNum] = malloc(sizeof(InnerFilterConfig));
+ 		config->inner[filterNum]->in1[filterNum] = 0;
+ 		config->inner[filterNum]->in2[filterNum] = 0;
+ 		config->inner[filterNum]->out1[filterNum] = 0;
+ 		config->inner[filterNum]->out2[filterNum] = 0;
+ 	}
+ 	filterconfig_set(config, config->baseF, config->r);
 	return config;
 }
 
@@ -23,27 +31,30 @@ void filterconfig_setModDepth(FilterConfig *config, float depth) {
 
 void filterconfig_destroy(void *p) {
 	FilterConfig *config = (FilterConfig *) p;
+	free(config->inner[0]);
+	free(config->inner[1]);
 	free(config);
 }
 
 void filterconfig_setParam(void *p, float paramNumFloat, float param) {
 	FilterConfig *config = (FilterConfig *) p;
-	switch ((int) paramNumFloat) {
-	case 0:
-		config->baseF = param; // frequency
-		break;
-	case 1:
-		config->q = 1 - param; // resonance
-		break;
-	case 2:
-		filterconfig_setModRate(config, param); // mod rate
-		break;
-	case 3:
-		filterconfig_setModDepth(config, param); // mod depth
-		break;
-	case 4:
-		config->mode = (int) param; // mode
-		filterconfig_set(config, config->baseF, config->q);
-		break;
+ 	int paramNum = (int) paramNumFloat;
+	if (paramNum == 0) { // frequency
+		config->baseF = param;
+	} else if (paramNum == 1) { // resonance
+		param = 1 - param * config->rScale; // flip and scale to .3 to 1
+		config->r = param;
+	} else if (paramNum == 2) { // mod rate
+		filterconfig_setModRate(config, param);
+	} else if (paramNum == 3) { // mod depth
+		filterconfig_setModDepth(config, param);
+	} else if (paramNum == 4) { // mode
+		config->mode = (int) param;
+		if ((int) param == LP_MODE || (int)param == HP_MODE) {
+			config->rScale = .7f;
+		} else if ((int) param == BP_MODE) { // bandpass filter
+			// lp and hp are chained, so reduce resonance to avoid clipping
+			config->rScale = .4f;
+		}
 	}
 }
