@@ -37,7 +37,7 @@ public class TempoPage extends TrackPage {
 				final float bpm = ONE_MINUTE_MILLIS / (tapTime - lastTapTime);
 				// if we are far outside of the range, don't change the tempo.
 				// otherwise, midiManager will take care of clipping the result
-				if (bpm <= MidiManager.MAX_BPM + 20 && bpm >= MidiManager.MIN_BPM - 20) {
+				if (bpm >= MidiManager.MIN_BPM - 20 && bpm <= MidiManager.MAX_BPM + 20) {
 					final Stateful latestEvent = context.getEventManager().getLastEvent();
 					if (latestEvent instanceof TempoChangeEvent
 							&& tapTime - lastTempoSetEventMillis < EVENT_CONSOLIDATION_MILLIS) {

@@ -13,7 +13,7 @@ public class EventManager {
 	private Set<StatefulEventListener> listeners = new HashSet<StatefulEventListener>();
 
 	public Stateful getLastEvent() {
-		return events.isEmpty() ? null : events.get(currEventIndex);
+		return !events.isEmpty() && currEventIndex >= 0 && currEventIndex < events.size() ? events.get(currEventIndex) : null;
 	}
 
 	public void clearEvents() {
