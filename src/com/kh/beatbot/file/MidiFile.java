@@ -24,21 +24,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.kh.beatbot.midi.MidiTrack;
 import com.kh.beatbot.midi.util.MidiUtil;
 
 public class MidiFile {
-	public static final int HEADER_SIZE = 14;
+	public static final int HEADER_SIZE = 14, DEFAULT_RESOLUTION = 320;
 	public static final byte[] IDENTIFIER = { 'M', 'T', 'h', 'd' };
 
-	public static final int DEFAULT_RESOLUTION = 320;
-
-	private int mType;
-	private int mTrackCount;
-	private int mResolution;
-
-	private ArrayList<MidiTrack> mTracks;
+	private int type, trackCount, resolution;
+	private List<MidiTrack> tracks;
 
 	public MidiFile() {
 		this(DEFAULT_RESOLUTION);
@@ -48,115 +44,107 @@ public class MidiFile {
 		this(resolution, new ArrayList<MidiTrack>());
 	}
 
-	public MidiFile(int resolution, ArrayList<MidiTrack> tracks) {
-
-		mResolution = resolution >= 0 ? resolution : DEFAULT_RESOLUTION;
-
-		mTracks = tracks != null ? tracks : new ArrayList<MidiTrack>();
-		mTrackCount = tracks.size();
-		mType = mTrackCount > 1 ? 1 : 0;
+	public MidiFile(final int resolution, List<MidiTrack> tracks) {
+		this.resolution = resolution >= 0 ? resolution : DEFAULT_RESOLUTION;
+		this.tracks = tracks != null ? tracks : new ArrayList<MidiTrack>();
+		trackCount = tracks.size();
+		type = trackCount > 1 ? 1 : 0;
 	}
 
 	public MidiFile(File fileIn) throws FileNotFoundException, IOException {
 		this(new FileInputStream(fileIn));
 	}
 
-	public MidiFile(InputStream rawIn) throws IOException {
-		BufferedInputStream in = new BufferedInputStream(rawIn);
+	public MidiFile(final InputStream rawIn) throws IOException {
+		final BufferedInputStream in = new BufferedInputStream(rawIn);
 
-		byte[] buffer = new byte[HEADER_SIZE];
+		final byte[] buffer = new byte[HEADER_SIZE];
 		in.read(buffer);
-
 		initFromBuffer(buffer);
 
-		mTracks = new ArrayList<MidiTrack>();
-		for (int i = 0; i < mTrackCount; i++) {
-			mTracks.add(new MidiTrack(in));
+		tracks = new ArrayList<MidiTrack>(trackCount);
+		for (int i = 0; i < trackCount; i++) {
+			tracks.add(new MidiTrack(in));
 		}
 	}
 
-	public void setType(int type) {
+	public void setType(final int type) {
 		if (type < 0) {
-			type = 0;
-		} else if (type > 2) {
-			type = 1;
-		} else if (type == 0 && mTrackCount > 1) {
-			type = 1;
+			this.type = 0;
+		} else if (type > 2 || (type == 0 && trackCount > 1)) {
+			this.type = 1;
+		} else {
+			this.type = type;
 		}
-		mType = type;
 	}
 
 	public int getType() {
-		return mType;
+		return type;
 	}
 
 	public int getTrackCount() {
-		return mTrackCount;
+		return trackCount;
 	}
 
-	public void setResolution(int res) {
-		if (res >= 0) {
-			mResolution = res;
-		}
+	public void setResolution(final int res) {
+		if (res >= 0)
+			resolution = res;
 	}
 
 	public int getResolution() {
-		return mResolution;
+		return resolution;
 	}
 
 	public long getLengthInTicks() {
-		long length = 0;
-		for (MidiTrack T : mTracks) {
-			long l = T.getLengthInTicks();
-			if (l > length) {
-				length = l;
+		long maxLength = 0;
+		for (final MidiTrack track : tracks) {
+			if (track.getLengthInTicks() > maxLength) {
+				maxLength = track.getLengthInTicks();
 			}
 		}
-		return length;
+		return maxLength;
 	}
 
-	public ArrayList<MidiTrack> getTracks() {
-		return mTracks;
+	public List<MidiTrack> getTracks() {
+		return tracks;
 	}
 
-	public void addTrack(MidiTrack T) {
-		addTrack(T, mTracks.size());
+	public void addTrack(final MidiTrack track) {
+		addTrack(track, tracks.size());
 	}
 
-	public void addTrack(MidiTrack T, int pos) {
-
-		if (pos > mTracks.size()) {
-			pos = mTracks.size();
+	public void addTrack(final MidiTrack track, int pos) {
+		if (pos > tracks.size()) {
+			pos = tracks.size();
 		} else if (pos < 0) {
 			pos = 0;
 		}
 
-		mTracks.add(pos, T);
-		mTrackCount = mTracks.size();
-		mType = mTrackCount > 1 ? 1 : 0;
+		tracks.add(pos, track);
+		trackCount = tracks.size();
+		type = trackCount > 1 ? 1 : 0;
 	}
 
-	public void removeTrack(int pos) {
-		if (pos < 0 || pos >= mTracks.size()) {
+	public void removeTrack(final int pos) {
+		if (pos < 0 || pos >= tracks.size())
 			return;
-		}
-		mTracks.remove(pos);
-		mTrackCount = mTracks.size();
-		mType = mTrackCount > 1 ? 1 : 0;
+
+		tracks.remove(pos);
+		trackCount = tracks.size();
+		type = trackCount > 1 ? 1 : 0;
 	}
 
-	public void writeToFile(File outFile) throws FileNotFoundException, IOException {
-
-		FileOutputStream fout = new FileOutputStream(outFile);
+	public void writeToFile(final File outFile) throws FileNotFoundException, IOException {
+		final FileOutputStream fout = new FileOutputStream(outFile);
 
 		fout.write(IDENTIFIER);
 		fout.write(MidiUtil.intToBytes(6, 4));
-		fout.write(MidiUtil.intToBytes(mType, 2));
-		fout.write(MidiUtil.intToBytes(mTrackCount, 2));
-		fout.write(MidiUtil.intToBytes(mResolution, 2));
+		fout.write(MidiUtil.intToBytes(type, 2));
+		fout.write(MidiUtil.intToBytes(trackCount, 2));
+		fout.write(MidiUtil.intToBytes(resolution, 2));
 
-		for (MidiTrack T : mTracks) {
-			T.writeToFile(fout);
+		for (final MidiTrack track : tracks) {
+			track.writeToFile(fout);
 		}
 
 		fout.flush();
@@ -166,14 +154,14 @@ public class MidiFile {
 	private void initFromBuffer(byte[] buffer) {
 		if (!MidiUtil.bytesEqual(buffer, IDENTIFIER, 0, 4)) {
 			System.out.println("File identifier not MThd. Exiting");
-			mType = 0;
-			mTrackCount = 0;
-			mResolution = DEFAULT_RESOLUTION;
+			type = 0;
+			trackCount = 0;
+			resolution = DEFAULT_RESOLUTION;
 			return;
 		}
 
-		mType = MidiUtil.bytesToInt(buffer, 8, 2);
-		mTrackCount = MidiUtil.bytesToInt(buffer, 10, 2);
-		mResolution = MidiUtil.bytesToInt(buffer, 12, 2);
+		type = MidiUtil.bytesToInt(buffer, 8, 2);
+		trackCount = MidiUtil.bytesToInt(buffer, 10, 2);
+		resolution = MidiUtil.bytesToInt(buffer, 12, 2);
 	}
 }

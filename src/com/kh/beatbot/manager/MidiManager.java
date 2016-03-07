@@ -53,7 +53,7 @@ public class MidiManager implements MidiNoteListener {
 		tempoTrack.insertEvent(ts);
 		tempoTrack.insertEvent(tempo);
 		setBpm(getBpm()); // set native bpm & trigger event notification
-		
+
 		midiNotesEventManager = new MidiNotesEventManager(this);
 	}
 
@@ -100,7 +100,7 @@ public class MidiManager implements MidiNoteListener {
 	public void incrementBpm() {
 		setBpm(getBpm() + 1);
 	}
-	
+
 	public void decrementBpm() {
 		setBpm(getBpm() - 1);
 	}
@@ -166,7 +166,8 @@ public class MidiManager implements MidiNoteListener {
 	public long getMajorTickNearestTo(long tick) {
 		long spacing = getMajorTickSpacing();
 		long remainder = tick % spacing;
-		return remainder == 0 ? tick : (remainder > spacing / 2 ? getMajorTickAfter(tick) : getMajorTickBefore(tick));
+		return remainder == 0 ? tick : (remainder > spacing / 2 ? getMajorTickAfter(tick)
+				: getMajorTickBefore(tick));
 	}
 
 	public long getMajorTickBefore(long tick) {
@@ -181,33 +182,31 @@ public class MidiManager implements MidiNoteListener {
 		midiNotesEventManager.quantize(beatDivision);
 	}
 
-	public void importFromFile(MidiFile midiFile) {
-		List<MidiNote> newNotes = new ArrayList<MidiNote>();
-		ArrayList<MidiTrack> midiTracks = midiFile.getTracks();
+	public void importFromFile(final MidiFile midiFile) {
+		final List<MidiNote> newNotes = new ArrayList<MidiNote>();
+		final List<MidiTrack> midiTracks = midiFile.getTracks();
 		tempoTrack = midiTracks.get(0);
 		ts = (TimeSignature) tempoTrack.getEvents().get(0);
 		tempo = (Tempo) tempoTrack.getEvents().get(1);
 		setNativeMSPT(tempo.getMpqn() / TICKS_PER_NOTE);
-		ArrayList<MidiEvent> events = midiTracks.get(1).getEvents();
+		final List<MidiEvent> events = midiTracks.get(1).getEvents();
 
 		// midiEvents are ordered by tick, so on/off events don't
-		// necessarily
-		// alternate if there are interleaving notes (with different "notes"
-		// - pitches)
-		// thus, we need to keep track of notes that have an on event, but
+		// necessarily alternate if there are interleaving notes (with different "notes"
+		// - pitches) thus, we need to keep track of notes that have an on event, but
 		// are waiting for the off event
-		ArrayList<NoteOn> unfinishedNotes = new ArrayList<NoteOn>();
-		for (int i = 0; i < events.size(); i++) {
-			if (events.get(i) instanceof NoteOn)
-				unfinishedNotes.add((NoteOn) events.get(i));
-			else if (events.get(i) instanceof NoteOff) {
-				NoteOff off = (NoteOff) events.get(i);
+		final List<NoteOn> unfinishedNotes = new ArrayList<NoteOn>();
+		for (final MidiEvent event : events) {
+			if (event instanceof NoteOn)
+				unfinishedNotes.add((NoteOn) event);
+			else if (event instanceof NoteOff) {
+				final NoteOff off = (NoteOff) event;
 				for (int j = 0; j < unfinishedNotes.size(); j++) {
-					NoteOn on = unfinishedNotes.get(j);
+					final NoteOn on = unfinishedNotes.get(j);
 					if (on.getNoteValue() == off.getNoteValue()) {
 						// TODO store all midi notes and then add them
 						// together in one event
-						MidiNote note = new MidiNote(on, off);
+						final MidiNote note = new MidiNote(on, off);
 						newNotes.add(note);
 						unfinishedNotes.remove(j);
 						break;
@@ -217,7 +216,7 @@ public class MidiManager implements MidiNoteListener {
 		}
 
 		// create any necessary tracks
-		for (MidiNote note : newNotes) {
+		for (final MidiNote note : newNotes) {
 			while (note.getNoteValue() >= View.context.getTrackManager().getNumTracks()) {
 				new TrackCreateEvent().execute();
 			}
@@ -252,14 +251,14 @@ public class MidiManager implements MidiNoteListener {
 	public void applyDiffs(final List<MidiNoteDiff> diffs) {
 		View.context.getTrackManager().saveNoteTicks();
 		View.context.getTrackManager().deselectAllNotes();
-		
+
 		for (MidiNoteDiff midiNoteDiff : diffs) {
 			midiNoteDiff.apply();
 		}
 
 		midiNotesEventManager.handleNoteCollisions();
 		midiNotesEventManager.finalizeNoteTicks();
-		View.context.getTrackManager().deselectAllNotes();	
+		View.context.getTrackManager().deselectAllNotes();
 	}
 
 	public void deleteSelectedNotes() {
@@ -274,7 +273,7 @@ public class MidiManager implements MidiNoteListener {
 			this.loopBeginTick = quantizedBeginTick;
 			changed = true;
 		}
-		
+
 		if (quantizedEndTick != this.loopEndTick && quantizedEndTick > quantizedBeginTick) {
 			this.loopEndTick = quantizedEndTick;
 			changed = true;

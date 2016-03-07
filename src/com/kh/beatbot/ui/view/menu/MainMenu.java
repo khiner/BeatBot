@@ -110,31 +110,28 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 		midiExportItem.setResourceId(IconResourceSets.MIDI_EXPORT);
 
 		snapToGridItem.setText("Snap-to-grid");
-
 		saveProjectItem.setText("Save project");
 		loadProjectItem.setText("Load project");
-
 		midiImportItem.setText("Import MIDI");
 		midiExportItem.setText("Export MIDI");
 	}
 
 	// adjust width of this view to fit all children
 	public synchronized void adjustWidth() {
-		float maxX = 0;
-		for (View child : children) {
-			if (child.absoluteX + child.width > maxX) {
-				maxX = child.absoluteX + child.width;
+		for (final View child : children) {
+			if (child.absoluteX + child.width > width) {
+				width = child.absoluteX + child.width;
 			}
 		}
-		width = maxX;
 	}
 
 	@Override
-	public void onFileMenuItemReleased(FileMenuItem fileItem) {
-		if (fileItem.equals(midiImportItem))
+	public void onFileMenuItemReleased(final FileMenuItem fileItem) {
+		if (MidiFileManager.isMidiFileName(fileItem.getText())) {
 			context.importMidi(fileItem.getText());
-		else
+		} else { 
 			context.importProject(fileItem.getText());
+		}
 	}
 
 	@Override

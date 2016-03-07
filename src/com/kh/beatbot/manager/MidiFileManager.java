@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -78,7 +79,7 @@ public class MidiFileManager {
 
 	private void completeExport() {
 		// Create a MidiFile with the tracks we created
-		ArrayList<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
+		final List<MidiTrack> midiTracks = new ArrayList<MidiTrack>();
 		midiTracks.add(View.context.getMidiManager().getTempoTrack());
 		midiTracks.add(new MidiTrack());
 		for (Track track : View.context.getTrackManager().getTracks()) {
@@ -90,7 +91,7 @@ public class MidiFileManager {
 		Collections.sort(midiTracks.get(1).getEvents());
 		midiTracks.get(1).recalculateDeltas();
 
-		MidiFile midi = new MidiFile(MidiManager.TICKS_PER_NOTE, midiTracks);
+		final MidiFile midi = new MidiFile(MidiManager.TICKS_PER_NOTE, midiTracks);
 
 		// Write the MIDI data to a file
 		try {
@@ -100,9 +101,9 @@ public class MidiFileManager {
 		}
 	}
 
-	private void completeImport(Context context) {
+	private void completeImport(final Context context) {
 		try {
-			MidiFile midiFile = new MidiFile(new FileInputStream(getFullPathName(inFileName)));
+			final MidiFile midiFile = new MidiFile(new FileInputStream(getFullPathName(inFileName)));
 			View.context.getMidiManager().importFromFile(midiFile);
 		} catch (IOException e) {
 			e.printStackTrace();
