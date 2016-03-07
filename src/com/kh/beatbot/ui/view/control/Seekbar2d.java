@@ -24,15 +24,15 @@ public class Seekbar2d extends ControlView2dBase {
 	}
 
 	public void setDimensions(float width, float height) {
-		setBgRectRadius(height / 10);
+		withCornerRadius(height / 10);
 		super.setDimensions(width, height);
 	}
 
 	public synchronized void layoutChildren() {
 		intersectingLines.layout(absoluteX, absoluteY, width, height);
 
-		circle.setDimensions(getBgRectRadius(), getBgRectRadius());
-		selectedCircle.setDimensions(getBgRectRadius() * 2, getBgRectRadius() * 2);
+		circle.setDimensions(getCornerRadius(), getCornerRadius());
+		selectedCircle.setDimensions(getCornerRadius() * 2, getCornerRadius() * 2);
 		selectedCircle.hide();
 	}
 

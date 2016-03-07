@@ -90,9 +90,9 @@ public class SampleEditPage extends TrackPage {
 		reverseButton.layout(this, width - fillH / 2 - margin, height - fillH / 2, fillH / 2,
 				fillH / 2);
 
-		gainControl.layout(this, 0, 0, topBarH * 6, topBarH);
-		loopBeginControl.layout(this, topBarH * 6, 0, topBarH * 6, topBarH);
-		loopEndControl.layout(this, topBarH * 12, 0, topBarH * 6, topBarH);
+		gainControl.layout(this, fillH, 0, topBarH * 5, topBarH);
+		loopEndControl.layout(this, width - fillH / 2 - margin * 2 - topBarH * 5, 0, topBarH * 5, topBarH);
+		loopBeginControl.layout(this, loopEndControl.x - topBarH * 5 - margin, 0, topBarH * 5, topBarH);
 
 		sampleEdit.layout(this, fillH, topBarH, width - fillH / 2 - fillH - margin * 2, fillH);
 	}

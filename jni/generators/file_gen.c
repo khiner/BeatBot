@@ -7,13 +7,8 @@ void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 
 	sf_close(config->sampleFile);
 
-	if (!(infile = sf_open(sampleFileName, SFM_READ, &sfinfo))) { /* Open failed so print an error message. */
+	if (!(infile = sf_open(sampleFileName, SFM_READ, &sfinfo)) || sfinfo.channels > MAX_CHANNELS) /* Open failed so print an error message. */
 		return;
-	};
-
-	if (sfinfo.channels > MAX_CHANNELS) {
-		return;
-	};
 
 	config->channels = sfinfo.channels;
 	config->frames = sfinfo.frames;
@@ -27,7 +22,6 @@ void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 		config->currFrame = config->loopBegin;
 	}
 	config->loopLength = config->loopEnd - config->loopBegin;
-
 	config->bufferStartFrame = LONG_MIN; // forces the buffer to be reloaded
 }
 

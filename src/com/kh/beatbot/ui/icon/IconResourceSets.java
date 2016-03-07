@@ -10,7 +10,7 @@ import com.kh.beatbot.ui.icon.IconResourceSet.State;
 public class IconResourceSets {
 	public static IconResourceSet
 			DEFAULT = s(r(Color.VIEW_BG), r(Color.VIEW_BG_SELECTED), r(Color.VIEW_BG_SELECTED), r(Color.VIEW_BG)),
-			SAMPLE_LOOP = s(r(Color.TRON_BLUE_TRANS), r(Color.TRON_BLUE)),
+			SAMPLE_LOOP = s(r(Color.TRON_BLUE_TRANS), r(Color.transparentize(Color.TRON_BLUE, 0.25f))),
 			SAMPLE_BG = s(r(Color.LABEL_LIGHT), r(Color.LABEL_VERY_LIGHT)),
 			MUTE = s(r(Color.LABEL_TRANS, null, Color.PAN_TRANS), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.PAN, Color.BLACK)),
 			SOLO = s(r(Color.LABEL_TRANS, null, Color.PITCH_TRANS), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.PITCH, Color.BLACK)),

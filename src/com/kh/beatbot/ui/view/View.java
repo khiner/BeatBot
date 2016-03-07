@@ -31,7 +31,7 @@ public class View implements Comparable<View> {
 	protected int id = -1; // optional
 	protected boolean shouldDraw = true, shrinkable = false;
 	protected float minX = 0, maxX = 0, minY = 0, maxY = 0, borderWidth = 0, borderHeight = 0,
-			bgRectRadius = 0;
+			cornerRadius = 0;
 
 	protected View parent;
 	protected List<View> children = new ArrayList<View>();
@@ -342,14 +342,13 @@ public class View implements Comparable<View> {
 		}
 	}
 
-	public void setBgRectRadius(float bgRectRadius) {
-		this.bgRectRadius = bgRectRadius;
+	public View withCornerRadius(float cornerRadius) {
+		this.cornerRadius = cornerRadius;
+		return this;
 	}
 
-	public float getBgRectRadius() {
-		if (bgRectRadius == 0)
-			bgRectRadius = Math.min(width, height) * .15f;
-		return bgRectRadius;
+	public float getCornerRadius() {
+		return cornerRadius;
 	}
 
 	protected synchronized void layoutShape() {
@@ -367,7 +366,9 @@ public class View implements Comparable<View> {
 		}
 
 		if (bgShape != null && bgShape instanceof RoundedRect) {
-			((RoundedRect) bgShape).setCornerRadius(getBgRectRadius());
+			if (getCornerRadius() == 0)
+				withCornerRadius(Math.min(width, height) * .15f);
+			((RoundedRect) bgShape).setCornerRadius(getCornerRadius());
 		}
 
 		if (shouldShrink()) {
@@ -410,9 +411,9 @@ public class View implements Comparable<View> {
 			textMesh.layout(2 * X_OFFSET + x + (nonIconWidth - textWidth) / 2, absoluteY
 					+ (this.height - textHeight) / 2, textHeight);
 		}
-		minX = minY = getBgRectRadius() - BG_OFFSET;
-		maxX = this.width - getBgRectRadius() - BG_OFFSET;
-		maxY = this.height - getBgRectRadius() - BG_OFFSET;
+		minX = minY = getCornerRadius() - BG_OFFSET;
+		maxX = this.width - getCornerRadius() - BG_OFFSET;
+		maxY = this.height - getCornerRadius() - BG_OFFSET;
 		borderWidth = this.width - 2 * minX;
 		borderHeight = this.height - 2 * minY;
 	}

@@ -44,9 +44,9 @@ public class SampleEditView extends ControlView2dBase {
 				addShapes(waveformShape);
 			}
 			waveformShape.layout(absoluteX, absoluteY, waveformWidth, height);
-			for (int i = 0; i < loopButtons.length; i++) {
-				loopButtons[i].show();
-				loopButtons[i].bgShape.bringToTop();
+			for (final Button loopButton : loopButtons) {
+				loopButton.show();
+				loopButton.bgShape.bringToTop();
 			}
 			setLevel(0, 1);
 			waveformShape.resample();
@@ -110,13 +110,13 @@ public class SampleEditView extends ControlView2dBase {
 	@Override
 	public synchronized void createChildren() {
 		setIcon(IconResourceSets.SAMPLE_BG);
-		initRect();
+		initRoundedRect();
 		currSampleRect = new Rectangle(renderGroup, Color.TRON_BLUE, null);
 		addShapes(currSampleRect);
 		loopButtons = new Button[2];
 		for (int i = 0; i < loopButtons.length; i++) {
-			loopButtons[i] = new Button(this).withRoundedRect().withIcon(
-					IconResourceSets.SAMPLE_LOOP);
+			loopButtons[i] = new Button(this).withRoundedRect()
+					.withIcon(IconResourceSets.SAMPLE_LOOP);
 			loopButtons[i].setShrinkable(false);
 			loopButtons[i].deselectOnPointerExit = false;
 			loopButtons[i].setOnPressListener(new OnPressListener() {
@@ -139,11 +139,14 @@ public class SampleEditView extends ControlView2dBase {
 	@Override
 	public synchronized void layoutChildren() {
 		currSampleRect.layout(absoluteX, absoluteY, 4, height);
+		for (final Button loopButton : loopButtons) {
+			loopButton.withCornerRadius(this.getCornerRadius());
+		}
 	}
 
 	@Override
 	public void tick() {
-		Track track = (Track) context.getTrackManager().getCurrTrack();
+		final Track track = (Track) context.getTrackManager().getCurrTrack();
 		if (hasSample() && (track.isSounding())) {
 			currSampleRect.show();
 			float x = levelToX(params[0].getViewLevel(track.getCurrentFrame()));

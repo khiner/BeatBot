@@ -111,17 +111,22 @@ public class Button extends LongPressableView {
 	}
 	
 	@Override
-	public synchronized Button withIcon(IconResourceSet resourceSet) {
+	public Button withIcon(IconResourceSet resourceSet) {
 		return (Button) super.withIcon(resourceSet);
 	}
 
 	@Override
-	public synchronized Button withRect() {
+	public Button withRect() {
 		return (Button) super.withRect();
 	}
 	
 	@Override
-	public synchronized Button withRoundedRect() {
+	public Button withRoundedRect() {
 		return (Button) super.withRoundedRect();
+	}
+
+	@Override
+	public Button withCornerRadius(float cornerRadius) {
+		return (Button) super.withCornerRadius(cornerRadius);
 	}
 }

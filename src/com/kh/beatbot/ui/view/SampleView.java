@@ -50,6 +50,6 @@ public class SampleView extends View {
 	@Override
 	public synchronized void createChildren() {
 		setIcon(IconResourceSets.SAMPLE_BG);
-		initRect();
+		initRoundedRect();
 	}
 }
