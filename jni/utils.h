@@ -3,7 +3,7 @@
 
 #include <math.h>
 
-static const float MIN_DB = -144;
+static const float MIN_DB = -60;
 static const float MAX_BYTE_VALUE = 127;
 static const float HALF_BYTE_VALUE = 64;
 
@@ -20,11 +20,7 @@ static inline unsigned char linearToByte(float linear) {
 }
 
 static inline float dbToLinear(float db) {
-	if (db < MIN_DB) {
-		return 0;
-	} else {
-		return pow(10, db / 20);
-	}
+	return db < MIN_DB ? 0 :  pow(10, db / 20);
 }
 
 static inline unsigned char dbToByte(float db) {

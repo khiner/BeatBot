@@ -113,6 +113,7 @@ void mixTracks() {
 				}
 				trackNode = trackNode->next;
 			}
+
 			total = clipTo(total * masterLevels->scaleChannels[channel], -1, 1);
 			openSlOut->currBufferFloat[channel][samp] = total;
 			if (total > maxFrame)
@@ -209,7 +210,6 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	}
 
 	fillBuffer();
-
 	writeBufferToRecordFile(openSlOut->globalBufferShort);
 }
 

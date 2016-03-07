@@ -11,7 +11,7 @@ import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.ui.view.View;
 
 public class Param {
-	public static final float DEFAULT_LOG_SCALE = 8, DB_LOG_SCALE = 10 * 10, MAX_DB = 24,
+	public static final float DEFAULT_LOG_SCALE = 8, DB_LOG_SCALE = 10 * 10, MAX_DB = 12,
 			DB_SCALE = dbToLinear(MAX_DB);
 
 	public int id;

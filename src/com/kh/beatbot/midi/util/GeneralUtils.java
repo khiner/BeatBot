@@ -9,6 +9,7 @@ import android.view.WindowManager;
 
 public class GeneralUtils {
 	public static final byte HALF_BYTE = 64;
+	public static final float MIN_DB = -60;
 
 	public static void initAndroidSettings(Activity activity) {
 		// remove title bar
@@ -43,18 +44,18 @@ public class GeneralUtils {
 	}
 
 	public static float dbToUnit(float db) {
-		// db range = -60 - 0, need range 0-1
-		return db <= -60f ? 0 : db / 60f + 1f;
+		// db range = -60 - 0, need range 0-1 (not a conversion to linear scale! used for UI)
+		return db <= MIN_DB ? 0 : db / MIN_DB + 1f;
 	}
 
 	public static short dbToShort(float db) {
-		return (short) ((double) Short.MAX_VALUE * Math.pow(10f, db / 20f));
+		return db <= MIN_DB ? 0 : (short) ((double) Short.MAX_VALUE * Math.pow(10f, db / 20f));
 	}
 
 	public static float shortToDb(short amp) {
-		return 20f * (float) Math.log10(Math.abs(amp) / (double) Short.MAX_VALUE);
+		return (float) (20 * Math.log10(Math.abs(amp) / (double) Short.MAX_VALUE));
 	}
-
+	
 	public static boolean contains(int[] ary, int val) {
 		for (int i = 0; i < ary.length; i++) {
 			if (ary[i] == val) {
