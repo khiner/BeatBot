@@ -10,6 +10,8 @@ import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.ui.view.View;
 
 public class BaseTrack {
+	public static final String MASTER_TRACK_NAME = "Master";
+
 	protected int id;
 	protected List<Effect> effects = new ArrayList<Effect>();
 	public Param volumeParam, panParam, pitchStepParam, pitchCentParam;
@@ -49,6 +51,10 @@ public class BaseTrack {
 
 	public int getId() {
 		return id;
+	}
+
+	public String getName() {
+		return MASTER_TRACK_NAME;
 	}
 
 	public List<Effect> getEffects() {

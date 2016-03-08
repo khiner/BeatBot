@@ -1,9 +1,11 @@
 #ifndef TRACK_H
 #define TRACK_H
 
+#define MASTER_TRACK_ID -1
+
 typedef struct OpenSlOut_ {
 	bool armed;
-	short *recordBufferShort;
+	int recordSourceId;
 	float **currBufferFloat;
 	short globalBufferShort[BUFF_SIZE_SHORTS];
 	short micBufferShort[BUFF_SIZE_SHORTS];
@@ -51,9 +53,9 @@ jfloatArray makejFloatArray(JNIEnv * env, float floatAry[], int size);
 
 TrackNode *getTrackNode(int trackId);
 
-Track *getTrack(JNIEnv *env, jclass clazz, int trackId);
+Track *getTrack(int trackId);
 
-Levels *getLevels(JNIEnv *env, jclass clazz, int trackId);
+Levels *getLevels(int trackId);
 
 void fillTempSample(Track *track);
 

@@ -3,7 +3,7 @@ package com.kh.beatbot.manager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -15,33 +15,36 @@ import com.kh.beatbot.activity.BeatBotActivity;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.RecordStateListener;
 import com.kh.beatbot.midi.util.WavFileUtil;
+import com.kh.beatbot.track.BaseTrack;
+import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 
 public class RecordManager {
 	static class RecordSourceButtonListener implements OnReleaseListener {
-		private AlertDialog selectRecordSourceAlert = null;
-		private Button button;
+		final RecordManager recordManager;
+		final AlertDialog.Builder builder;
 
-		public RecordSourceButtonListener(final RecordManager recordManager, final Context c) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(c);
+		public RecordSourceButtonListener(final RecordManager recordManager, final Context context) {
+			this.recordManager = recordManager;
+			builder = new AlertDialog.Builder(context);
 			builder.setTitle("Choose record source");
-			builder.setItems((String[]) RECORD_SOURCES.toArray(),
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int item) {
-							recordManager.setRecordSource(item);
-							if (button != null) {
-								button.setText(recordManager.recordSource);
-							}
-						}
-					});
-			selectRecordSourceAlert = builder.create();
 		}
 
 		@Override
-		public void onRelease(Button button) {
-			this.button = button;
-			selectRecordSourceAlert.show();
+		public void onRelease(final Button button) {
+			builder.setItems(recordManager.getRecordSourceLabels(),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int item) {
+							// first two are microphone and master track
+							final int recordSourceId = item - 2;
+							recordManager.setRecordSourceId(recordSourceId);
+							if (button != null) {
+								button.setText(recordManager.getRecordSourceLabel());
+							}
+						}
+					});
+			builder.create().show();
 		}
 	}
 
@@ -49,12 +52,11 @@ public class RecordManager {
 		OFF, LISTENING, ARMED, RECORDING
 	};
 
-	public static String GLOBAL_RECORD_SOURCE = "Global", MICROPHONE_RECORD_SOURCE = "Microphone";
-	private static final List<String> RECORD_SOURCES = Arrays.asList(new String[] {
-			GLOBAL_RECORD_SOURCE, MICROPHONE_RECORD_SOURCE });
+	public static final int MICROPHONE_RECORD_SOURCE_ID = -2;
+	public static final String MICROPHONE_RECORD_SOURCE_LABEL = "Microphone";
 
-	private Context context;
-	private String recordSource = GLOBAL_RECORD_SOURCE;
+	private BeatBotActivity context;
+	private int recordSourceId = TrackManager.MASTER_TRACK_ID;
 	private String currRecordFileName = null;
 	private State state = State.OFF;
 	private int currFileNum = 0;
@@ -134,7 +136,7 @@ public class RecordManager {
 			return null;
 		}
 
-		String recordDirectory = View.context.getFileManager().recordPathForSource(recordSource);
+		String recordDirectory = View.context.getFileManager().recordPathForSource(recordSourceId);
 		currRecordFileName = recordDirectory + "/R" + (currFileNum++) + ".wav";
 		try {
 			FileOutputStream out = WavFileUtil.writeWavFileHeader(currRecordFileName, 0, 0);
@@ -186,16 +188,32 @@ public class RecordManager {
 		}
 	}
 
-	public String getRecordSource() {
-		return recordSource;
+	public int getRecordSourceId() {
+		return recordSourceId;
 	}
 
-	public void setRecordSource(final int recordSourceIndex) {
-		recordSource = RECORD_SOURCES.get(recordSourceIndex);
-		setRecordSourceNative(recordSourceIndex);
-		if (recordSource.equals(MICROPHONE_RECORD_SOURCE)) {
+	public void setRecordSourceId(final int recordSourceId) {
+		this.recordSourceId = recordSourceId;
+		setRecordSourceNative(recordSourceId);
+		if (recordSourceId == MICROPHONE_RECORD_SOURCE_ID) {
 			startListeningNative();
 		}
+	}
+
+	public String[] getRecordSourceLabels() {
+		final List<String> recordSourceLabels = new ArrayList<String>();
+		recordSourceLabels.add(MICROPHONE_RECORD_SOURCE_LABEL);
+		recordSourceLabels.add(BaseTrack.MASTER_TRACK_NAME);
+		for (final Track track : context.getTrackManager().getTracks()) {
+			recordSourceLabels.add(track.getName());
+		}
+		
+		return recordSourceLabels.toArray(new String[recordSourceLabels.size()]);
+	}
+
+	public String getRecordSourceLabel() {
+		return recordSourceId == MICROPHONE_RECORD_SOURCE_ID ? MICROPHONE_RECORD_SOURCE_LABEL
+				: context.getTrackManager().getBaseTrackById(recordSourceId).getName();
 	}
 
 	public native void setThresholdLevel(float thresholdLevel);

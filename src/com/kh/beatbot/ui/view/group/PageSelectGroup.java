@@ -40,7 +40,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	private AdsrPage adsrPage;
 	private RecordPage recordPage;
 	private TempoPage tempoPage;
-	
+
 	private ToggleButton masterButton;
 
 	private SwappingViewPager pager, buttonRowPager;
@@ -134,7 +134,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		pager.addPage(masterButtonRow.getEffectsButton(), effectSelectPage);
 		pager.addPage(masterButtonRow.getTempoButton(), tempoPage);
 
-		masterButton.setText("Master");
+		masterButton.setText(context.getTrackManager().getMasterTrack().getName());
 	}
 
 	public int getCurrPageIndex() {

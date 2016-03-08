@@ -1,8 +1,7 @@
 #ifndef NATIVEAUDIO_H
 #define NATIVEAUDIO_H
 
-#define RECORD_SOURCE_GLOBAL 0
-#define RECORD_SOURCE_MICROPHONE 1
+#define RECORD_SOURCE_MICROPHONE -2
 
 #include "ticker.h"
 #include "track.h"

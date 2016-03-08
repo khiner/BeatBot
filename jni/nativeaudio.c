@@ -32,27 +32,37 @@ static inline void interleaveFloatsToShorts(float left[], float right[],
 	}
 }
 
-void writeBufferToRecordFile(short buffer[]) {
-	// write to record out file if recording
-	if (recording && recordOutFile != NULL
-			&& openSlOut->recordBufferShort == buffer) {
-		pthread_mutex_lock(&recordMutex);
-		int i = 0;
-		for (i = 0; i < BUFF_SIZE_SHORTS; i++) {
-			// write the chars of the short to file, little endian
-			fputc((char) buffer[i] & 0xff, recordOutFile);
-			fputc((char) (buffer[i] >> 8) & 0xff, recordOutFile);
-		}
-		pthread_mutex_unlock(&recordMutex);
+// write the chars of the short to file, little endian
+void writeShortToFile(short s, FILE *file) {
+	fputc((char) s & 0xff, file);
+	fputc((char) (s >> 8) & 0xff, file);
+}
+
+void writeShortBufferToRecordFile(short buffer[]) {
+	pthread_mutex_lock(&recordMutex);
+	int i = 0;
+	for (i = 0; i < BUFF_SIZE_SHORTS; i++) {
+		writeShortToFile(buffer[i], recordOutFile);
 	}
+	pthread_mutex_unlock(&recordMutex);
+}
+
+void writeFloatBufferToRecordFile(float left[], float right[], int size) {
+	pthread_mutex_lock(&recordMutex);
+	int i = 0;
+	for (i = 0; i < size; i++) {
+		writeShortToFile(left[i] * FLOAT_TO_SHORT, recordOutFile);
+		writeShortToFile(right[i] * FLOAT_TO_SHORT, recordOutFile);
+	}
+	pthread_mutex_unlock(&recordMutex);
 }
 
 void startRecording() {
 	pthread_mutex_lock(&recordMutex);
 	recordArmed = false;
 	JNIEnv* env = getJniEnv();
-	jstring recordFilePath = (*env)->CallObjectMethod(env,
-			getRecordManager(), getStartRecordingJavaMethod());
+	jstring recordFilePath = (*env)->CallObjectMethod(env, getRecordManager(),
+			getStartRecordingJavaMethod());
 
 	const char *cRecordFilePath = (*env)->GetStringUTFChars(env, recordFilePath,
 			0);
@@ -108,37 +118,43 @@ void mixTracks() {
 			while (trackNode != NULL ) {
 				Track *track = trackNode->track;
 				if (track->shouldSound) {
-					total += track->currBufferFloat[channel][samp]
+					float trackLevel = track->currBufferFloat[channel][samp]
 							* track->levels->scaleChannels[channel];
+					if (openSlOut->recordSourceId == trackNode->track->num
+							&& trackLevel > maxFrame)
+						maxFrame = trackLevel;
+					total += trackLevel;
 				}
 				trackNode = trackNode->next;
 			}
 
 			total = clipTo(total * masterLevels->scaleChannels[channel], -1, 1);
 			openSlOut->currBufferFloat[channel][samp] = total;
-			if (total > maxFrame)
+			if (openSlOut->recordSourceId == MASTER_TRACK_ID
+					&& total > maxFrame)
+				// XXX at this stage, we are post-FX on each track but pre-FX on the master track,
+				// so we're listening at different stages for different sources
 				maxFrame = total;
 		}
 	}
-	if (listening
-			&& openSlOut->recordBufferShort == openSlOut->globalBufferShort) {
+	if (listening && openSlOut->recordSourceId != RECORD_SOURCE_MICROPHONE) {
 		notifyMaxFrame(maxFrame);
 	}
 }
 
 void Java_com_kh_beatbot_track_Track_previewTrack(JNIEnv *env, jclass clazz,
 		jint trackId) {
-	previewTrack(getTrack(env, clazz, trackId));
+	previewTrack(getTrack(trackId));
 }
 
 void Java_com_kh_beatbot_track_Track_stopPreviewingTrack(JNIEnv *env,
 		jclass clazz, jint trackId) {
-	stopPreviewingTrack(getTrack(env, clazz, trackId));
+	stopPreviewingTrack(getTrack(trackId));
 }
 
 void Java_com_kh_beatbot_track_Track_stopTrack(JNIEnv *env, jclass clazz,
 		jint trackId) {
-	stopTrack(getTrack(env, clazz, trackId));
+	stopTrack(getTrack(trackId));
 }
 
 void stopAllTracks() {
@@ -210,13 +226,22 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	}
 
 	fillBuffer();
-	writeBufferToRecordFile(openSlOut->globalBufferShort);
+	if (recording && recordOutFile != NULL ) {
+		if (openSlOut->recordSourceId == MASTER_TRACK_ID) {
+			writeShortBufferToRecordFile(openSlOut->globalBufferShort);
+		} else if (openSlOut->recordSourceId != RECORD_SOURCE_MICROPHONE) {
+			Track *track = getTrack(openSlOut->recordSourceId);
+			if (track != NULL ) {
+				writeFloatBufferToRecordFile(track->currBufferFloat[0],
+						track->currBufferFloat[1], BUFF_SIZE_FRAMES);
+			}
+		}
+	}
 }
 
 // this callback handler is called every time a buffer fills
 void micBufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
-	if (listening
-			&& openSlOut->recordBufferShort == openSlOut->micBufferShort) {
+	if (listening && openSlOut->recordSourceId == RECORD_SOURCE_MICROPHONE) {
 		short maxFrameShort = 0;
 		int i;
 		for (i = 0; i < BUFF_SIZE_SHORTS; i++) {
@@ -224,19 +249,14 @@ void micBufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 				maxFrameShort = openSlOut->micBufferShort[i];
 			}
 		}
-		float maxFrameFloat = (float) maxFrameShort * SHORT_TO_FLOAT;
-		notifyMaxFrame(maxFrameFloat);
-		writeBufferToRecordFile(openSlOut->micBufferShort);
+		notifyMaxFrame((float) maxFrameShort * SHORT_TO_FLOAT);
+		if (recording && recordOutFile != NULL ) {
+			writeShortBufferToRecordFile(openSlOut->micBufferShort);
+		}
 	}
 
 	// re-enqueue the buffer
 	(*bq)->Enqueue(bq, openSlOut->micBufferShort, BUFF_SIZE_BYTES);
-}
-
-void setRecordBuffer(short *recordBuffer) {
-	pthread_mutex_lock(&recordMutex);
-	openSlOut->recordBufferShort = recordBuffer;
-	pthread_mutex_unlock(&recordMutex);
 }
 
 void Java_com_kh_beatbot_manager_PlaybackManager_playNative(JNIEnv *env,
@@ -294,8 +314,7 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 	memset(openSlOut->globalBufferShort, 0,
 			sizeof(openSlOut->globalBufferShort));
 	memset(openSlOut->micBufferShort, 0, sizeof(openSlOut->micBufferShort));
-	setRecordBuffer(openSlOut->globalBufferShort);
-
+	openSlOut->recordSourceId = MASTER_TRACK_ID;
 	openSlOut->armed = false;
 	pthread_mutex_init(&openSlOut->trackMutex, NULL );
 
@@ -441,7 +460,7 @@ void Java_com_kh_beatbot_manager_RecordManager_startListeningNative(JNIEnv *env,
 	// if the current record source is the microphone, we need to enqueue
 	// the micBufferQueue and start listening to the device's mic
 	pthread_mutex_lock(&recordMutex);
-	if (openSlOut->recordBufferShort == openSlOut->micBufferShort) {
+	if (openSlOut->recordSourceId == RECORD_SOURCE_MICROPHONE) {
 		// record from microphone.
 		SLuint32 state;
 		(*openSlOut->recordInterface)->GetRecordState(
@@ -462,7 +481,7 @@ void Java_com_kh_beatbot_manager_RecordManager_stopListeningNative(JNIEnv *env,
 		jclass clazz) {
 	pthread_mutex_lock(&recordMutex);
 	listening = false;
-	if (openSlOut->recordBufferShort == openSlOut->micBufferShort) {
+	if (openSlOut->recordSourceId == RECORD_SOURCE_MICROPHONE) {
 		SLuint32 state;
 		(*openSlOut->recordInterface)->GetRecordState(
 				openSlOut->recordInterface, &state);
@@ -487,14 +506,9 @@ void Java_com_kh_beatbot_manager_RecordManager_stopRecordingNative(JNIEnv *env,
 
 void Java_com_kh_beatbot_manager_RecordManager_setRecordSourceNative(
 		JNIEnv *_env, jclass clazz, jint recordSourceId) {
-	switch (recordSourceId) {
-	case RECORD_SOURCE_GLOBAL:
-		setRecordBuffer(openSlOut->globalBufferShort);
-		break;
-	case RECORD_SOURCE_MICROPHONE:
-		setRecordBuffer(openSlOut->micBufferShort);
-		break;
-	}
+	pthread_mutex_lock(&recordMutex);
+	openSlOut->recordSourceId = recordSourceId;
+	pthread_mutex_unlock(&recordMutex);
 }
 
 void Java_com_kh_beatbot_manager_RecordManager_armNative(JNIEnv *env,

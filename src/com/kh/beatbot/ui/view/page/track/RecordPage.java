@@ -6,7 +6,6 @@ import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.listener.ParamListener;
 import com.kh.beatbot.listener.RecordStateListener;
-import com.kh.beatbot.manager.RecordManager;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -42,7 +41,7 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 		recordSourceSelectButton = new Button(this).withIcon(IconResourceSets.VALUE_LABEL)
 				.withRoundedRect();
 		recordButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.RECORD);
-		recordSourceSelectButton.setText(RecordManager.GLOBAL_RECORD_SOURCE);
+		recordSourceSelectButton.setText(context.getTrackManager().getMasterTrack().getName());
 		recordSourceSelectButton.setOnReleaseListener(context.getRecordManager()
 				.getRecordSourceButtonListener());
 

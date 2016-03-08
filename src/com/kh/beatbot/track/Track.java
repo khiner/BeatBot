@@ -247,7 +247,8 @@ public class Track extends BaseTrack implements FileListener {
 		return paramsForSample.get(currSampleFile);
 	}
 
-	public String getCurrSampleName() {
+	@Override
+	public String getName() {
 		return currSampleFile == null ? "Browse" : currSampleFile.getName();
 	}
 
