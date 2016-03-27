@@ -12,8 +12,8 @@ public class ThresholdParamControl extends LevelParamControl {
 
 	@Override
 	public synchronized void layoutChildren() {
-		label.layout(this, 0, 0, height * 2, height);
-		levelControl.layout(this, height * 2, 0, width - height * 4, height);
+		label.layout(this, 0, 0, height * 3, height);
+		levelControl.layout(this, height * 3, 0, width - height * 5, height);
 		valueLabel.layout(this, width - height * 2, 0, height * 2, height);
 	}
 
