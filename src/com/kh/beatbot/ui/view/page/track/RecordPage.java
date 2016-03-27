@@ -16,6 +16,7 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.ThresholdParamControl;
 
 public class RecordPage extends TrackPage implements RecordStateListener {
+	private View recordSourceSelectLabel;
 	private Button recordSourceSelectButton;
 	private SampleView sampleView;
 	private ToggleButton recordButton;
@@ -38,6 +39,8 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 		sampleView = new SampleView(this, renderGroup);
 		sampleView.setClip(true);
 
+		recordSourceSelectLabel = new View(this).withIcon(IconResourceSets.CONTROL_LABEL);
+		recordSourceSelectLabel.setText("Source");
 		recordSourceSelectButton = new Button(this).withIcon(IconResourceSets.VALUE_LABEL)
 				.withRoundedRect();
 		recordButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.RECORD);
@@ -71,8 +74,9 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 	public synchronized void layoutChildren() {
 		final float topBarH = height * .29f;
 		final float fillH = height - topBarH;
-		recordSourceSelectButton.layout(this, 0, 0, topBarH * 4, topBarH);
-		thresholdParamControl.layout(this, topBarH * 4, 0, width - topBarH * 4, topBarH);
+		recordSourceSelectLabel.layout(this, 0, 0, topBarH * 2, topBarH);
+		recordSourceSelectButton.layout(this, topBarH * 2, 0, topBarH * 4, topBarH);
+		thresholdParamControl.layout(this, topBarH * 6, 0, width - topBarH * 6, topBarH);
 
 		recordButton.layout(this, 0, topBarH, fillH, fillH);
 		sampleView.layout(this, fillH, topBarH, width - fillH, fillH);
@@ -121,8 +125,8 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 	@Override
 	public synchronized void show() {
 		super.show();
-		context.getRecordManager().startListening(); // listen to RecordSource to start
-														// populating ThresholdBar
+		// listen to RecordSource to start populating ThresholdBar
+		context.getRecordManager().startListening();
 	}
 
 	@Override
