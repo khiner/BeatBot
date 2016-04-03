@@ -46,7 +46,7 @@ public class TrackLevelsPage extends TrackPage implements TouchableViewsListener
 		panParamControl.setLevelColor(Color.PAN, Color.PAN_TRANS);
 		pitchParamControl.setLevelColor(Color.PITCH, Color.PITCH_TRANS);
 
-		new MultiViewTouchTracker(this).trackViews(volumeParamControl, panParamControl,
+		new MultiViewTouchTracker(this).monitorViews(volumeParamControl, panParamControl,
 				pitchParamControl);
 	}
 

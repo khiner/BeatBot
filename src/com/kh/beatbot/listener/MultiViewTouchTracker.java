@@ -11,7 +11,7 @@ public class MultiViewTouchTracker implements TouchableViewListener {
 		this.touchableViewsListener = touchableViewsListener;
 	}
 
-	public void trackViews(TouchableView ... views) {
+	public void monitorViews(TouchableView ... views) {
 		for (TouchableView view : views) {
 			view.setListener(this);
 		}

@@ -1,9 +1,12 @@
 package com.kh.beatbot.ui.view.page.track;
 
+import com.kh.beatbot.event.track.TrackSetLoopWindowEvent;
 import com.kh.beatbot.event.track.TrackToggleLoopEvent;
 import com.kh.beatbot.event.track.TrackToggleReverseEvent;
+import com.kh.beatbot.listener.MultiViewTouchTracker;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.listener.TouchableViewsListener;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -13,11 +16,12 @@ import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
 
-public class SampleEditPage extends TrackPage {
+public class SampleEditPage extends TrackPage implements TouchableViewsListener {
 	public SampleEditView sampleEdit;
 	private Button previewButton;
 	private ToggleButton loopButton, reverseButton;
 	private ParamControl loopBeginControl, loopEndControl, gainControl;
+	private TrackSetLoopWindowEvent loopWindowEvent;
 
 	public SampleEditPage(View view) {
 		super(view);
@@ -76,19 +80,23 @@ public class SampleEditPage extends TrackPage {
 
 		loopButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
-				new TrackToggleLoopEvent((Track) context.getTrackManager().getCurrTrack()).execute();
+				new TrackToggleLoopEvent((Track) context.getTrackManager().getCurrTrack())
+						.execute();
 			}
 		});
 
 		reverseButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
-				new TrackToggleReverseEvent((Track) context.getTrackManager().getCurrTrack()).execute();
+				new TrackToggleReverseEvent((Track) context.getTrackManager().getCurrTrack())
+						.execute();
 			}
 		});
 
 		loopBeginControl.setLabelText("Begin");
 		loopEndControl.setLabelText("End");
 		gainControl.setLabelText("Gain");
+
+		new MultiViewTouchTracker(this).monitorViews(loopBeginControl, loopEndControl, sampleEdit);
 	}
 
 	@Override
@@ -102,9 +110,23 @@ public class SampleEditPage extends TrackPage {
 				fillH / 2);
 
 		gainControl.layout(this, fillH, 0, topBarH * 5, topBarH);
-		loopEndControl.layout(this, width - fillH / 2 - margin * 2 - topBarH * 5, 0, topBarH * 5, topBarH);
-		loopBeginControl.layout(this, loopEndControl.x - topBarH * 5 - margin, 0, topBarH * 5, topBarH);
+		loopEndControl.layout(this, width - fillH / 2 - margin * 2 - topBarH * 5, 0, topBarH * 5,
+				topBarH);
+		loopBeginControl.layout(this, loopEndControl.x - topBarH * 5 - margin, 0, topBarH * 5,
+				topBarH);
 
 		sampleEdit.layout(this, fillH, topBarH, width - fillH / 2 - fillH - margin * 2, fillH);
+	}
+
+	@Override
+	public void onFirstPress() {
+		loopWindowEvent = new TrackSetLoopWindowEvent(context.getTrackManager().getCurrTrack()
+				.getId());
+		loopWindowEvent.begin();
+	}
+
+	@Override
+	public void onLastRelease() {
+		loopWindowEvent.end();
 	}
 }

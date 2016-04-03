@@ -1,14 +1,16 @@
-package com.kh.beatbot.event;
+package com.kh.beatbot.event.track;
 
+import com.kh.beatbot.event.Stateful;
+import com.kh.beatbot.event.Temporal;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.view.View;
 
-public class SampleLoopWindowSetEvent implements Stateful, Temporal {
+public class TrackSetLoopWindowEvent implements Stateful, Temporal {
 	private int trackId;
 	private float initialBeginLevel = 0, initialEndLevel = 0, finalBeginLevel = 0,
 			finalEndLevel = 0;
 
-	public SampleLoopWindowSetEvent(int trackId) {
+	public TrackSetLoopWindowEvent(int trackId) {
 		this.trackId = trackId;
 	}
 

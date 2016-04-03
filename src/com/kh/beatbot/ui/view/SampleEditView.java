@@ -1,7 +1,6 @@
 package com.kh.beatbot.ui.view;
 
 import com.kh.beatbot.effect.Param;
-import com.kh.beatbot.event.SampleLoopWindowSetEvent;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.midi.util.GeneralUtils;
 import com.kh.beatbot.track.Track;
@@ -216,13 +215,8 @@ public class SampleEditView extends ControlView2dBase {
 		setLevel(newLevelOffset, levelWidth);
 	}
 
-	private SampleLoopWindowSetEvent loopWindowEvent;
-
 	@Override
 	public void handleActionDown(int id, Pointer pos) {
-		loopWindowEvent = new SampleLoopWindowSetEvent(context.getTrackManager().getCurrTrack()
-				.getId());
-		loopWindowEvent.begin();
 		super.handleActionDown(id, pos);
 		if (!hasSample())
 			return;
@@ -236,8 +230,6 @@ public class SampleEditView extends ControlView2dBase {
 			return;
 		waveformShape.resample();
 		scrollPointerId = zoomLeftPointerId = zoomRightPointerId = -1;
-
-		loopWindowEvent.end();
 	}
 
 	@Override

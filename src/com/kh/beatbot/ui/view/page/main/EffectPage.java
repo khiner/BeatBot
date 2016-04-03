@@ -66,7 +66,7 @@ public class EffectPage extends TouchableView implements TouchableViewsListener 
 		paramsPager.addPage(Reverb.NAME, reverbGroup);
 		paramsPager.addPage(Tremolo.NAME, tremeloGroup);
 
-		new MultiViewTouchTracker(this).trackViews(level2d, paramsPager);
+		new MultiViewTouchTracker(this).monitorViews(level2d, paramsPager);
 	}
 
 	@Override
