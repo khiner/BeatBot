@@ -1,16 +1,19 @@
 package com.kh.beatbot.ui.view.page.track;
 
-import com.kh.beatbot.event.track.TrackSetLoopWindowEvent;
+import com.kh.beatbot.event.track.TrackGainSetEvent;
+import com.kh.beatbot.event.track.TrackLoopWindowSetEvent;
 import com.kh.beatbot.event.track.TrackToggleLoopEvent;
 import com.kh.beatbot.event.track.TrackToggleReverseEvent;
 import com.kh.beatbot.listener.MultiViewTouchTracker;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
+import com.kh.beatbot.listener.TouchableViewListener;
 import com.kh.beatbot.listener.TouchableViewsListener;
 import com.kh.beatbot.track.BaseTrack;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.SampleEditView;
+import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
@@ -21,7 +24,8 @@ public class SampleEditPage extends TrackPage implements TouchableViewsListener 
 	private Button previewButton;
 	private ToggleButton loopButton, reverseButton;
 	private ParamControl loopBeginControl, loopEndControl, gainControl;
-	private TrackSetLoopWindowEvent loopWindowEvent;
+	private TrackLoopWindowSetEvent loopWindowEvent;
+	private TrackGainSetEvent gainEvent;
 
 	public SampleEditPage(View view) {
 		super(view);
@@ -63,6 +67,20 @@ public class SampleEditPage extends TrackPage implements TouchableViewsListener 
 		loopBeginControl = new ParamControl(this);
 		loopEndControl = new ParamControl(this);
 		gainControl = new ParamControl(this);
+
+		gainControl.setListener(new TouchableViewListener() {
+			@Override
+			public void onPress(TouchableView view) {
+				gainEvent = new TrackGainSetEvent(context.getTrackManager().getCurrTrack()
+						.getId());
+				gainEvent.begin();
+			}
+
+			@Override
+			public void onRelease(TouchableView view) {
+				gainEvent.end();
+			}
+		});
 
 		previewButton.setOnPressListener(new OnPressListener() {
 			@Override
@@ -120,7 +138,7 @@ public class SampleEditPage extends TrackPage implements TouchableViewsListener 
 
 	@Override
 	public void onFirstPress() {
-		loopWindowEvent = new TrackSetLoopWindowEvent(context.getTrackManager().getCurrTrack()
+		loopWindowEvent = new TrackLoopWindowSetEvent(context.getTrackManager().getCurrTrack()
 				.getId());
 		loopWindowEvent.begin();
 	}

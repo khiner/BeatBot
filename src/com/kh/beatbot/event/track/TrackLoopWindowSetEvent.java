@@ -5,12 +5,12 @@ import com.kh.beatbot.event.Temporal;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.view.View;
 
-public class TrackSetLoopWindowEvent implements Stateful, Temporal {
+public class TrackLoopWindowSetEvent implements Stateful, Temporal {
 	private int trackId;
 	private float initialBeginLevel = 0, initialEndLevel = 0, finalBeginLevel = 0,
 			finalEndLevel = 0;
 
-	public TrackSetLoopWindowEvent(int trackId) {
+	public TrackLoopWindowSetEvent(int trackId) {
 		this.trackId = trackId;
 	}
 
