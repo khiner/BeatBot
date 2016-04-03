@@ -198,6 +198,18 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	}
 
 	@Override
+	public void onReverseChange(Track track, boolean reverse) {
+		selectEditPage();
+		editPage.onReverseChange(track, reverse);
+	}
+
+	@Override
+	public void onLoopChange(Track track, boolean loop) {
+		selectEditPage();
+		editPage.onLoopChange(track, loop);
+	}
+
+	@Override
 	public void onNameChange(File file, File newFile) {
 		if (masterButton.isChecked())
 			// make sure *some* track is selected.

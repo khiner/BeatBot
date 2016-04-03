@@ -207,17 +207,17 @@ public class Track extends BaseTrack implements FileListener {
 	}
 
 	public Param getLoopBeginParam() {
-		SampleParams sampleParams = getCurrSampleParams();
+		final SampleParams sampleParams = getCurrSampleParams();
 		return sampleParams == null ? null : sampleParams.loopBeginParam;
 	}
 
 	public Param getLoopEndParam() {
-		SampleParams sampleParams = getCurrSampleParams();
+		final SampleParams sampleParams = getCurrSampleParams();
 		return sampleParams == null ? null : sampleParams.loopEndParam;
 	}
 
 	public Param getGainParam() {
-		SampleParams sampleParams = getCurrSampleParams();
+		final SampleParams sampleParams = getCurrSampleParams();
 		return sampleParams == null ? null : sampleParams.gainParam;
 	}
 
@@ -245,6 +245,10 @@ public class Track extends BaseTrack implements FileListener {
 
 	public SampleParams getCurrSampleParams() {
 		return paramsForSample.get(currSampleFile);
+	}
+
+	public void setSampleGain(float gain) {
+		getGainParam().setLevel(gain);
 	}
 
 	@Override
@@ -293,6 +297,14 @@ public class Track extends BaseTrack implements FileListener {
 
 	public void toggleLooping() {
 		toggleTrackLooping(id);
+		View.context.getTrackManager().onLoopChange(this, isLooping());
+	}
+
+	// set play mode to reverse
+	public void setReverse(boolean reverse) {
+		setTrackReverse(id, reverse);
+		this.reverse = reverse;
+		View.context.getTrackManager().onReverseChange(this, reverse);
 	}
 
 	public boolean isMuted() {
@@ -345,12 +357,6 @@ public class Track extends BaseTrack implements FileListener {
 
 	public float getNumFrames() {
 		return getFrames(id);
-	}
-
-	// set play mode to reverse
-	public void setReverse(boolean reverse) {
-		this.reverse = reverse;
-		setTrackReverse(id, reverse);
 	}
 
 	public float getSample(long sampleIndex, int channel) {

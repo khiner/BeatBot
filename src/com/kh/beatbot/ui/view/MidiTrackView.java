@@ -60,6 +60,14 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 	}
 
 	@Override
+	public void onReverseChange(Track track, boolean reverse) {
+	}
+
+	@Override
+	public void onLoopChange(Track track, boolean loop) {
+	}
+
+	@Override
 	public void onEffectCreate(BaseTrack track, Effect effect) {
 	}
 

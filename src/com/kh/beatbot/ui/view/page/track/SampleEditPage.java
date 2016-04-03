@@ -1,5 +1,7 @@
 package com.kh.beatbot.ui.view.page.track;
 
+import com.kh.beatbot.event.track.TrackToggleLoopEvent;
+import com.kh.beatbot.event.track.TrackToggleReverseEvent;
 import com.kh.beatbot.listener.OnPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.track.BaseTrack;
@@ -37,6 +39,16 @@ public class SampleEditPage extends TrackPage {
 	}
 
 	@Override
+	public void onReverseChange(Track track, boolean reverse) {
+		reverseButton.setChecked(reverse);
+	}
+
+	@Override
+	public void onLoopChange(Track track, boolean loop) {
+		loopButton.setChecked(loop);
+	}
+
+	@Override
 	protected synchronized void createChildren() {
 		sampleEdit = new SampleEditView(this, null);
 		sampleEdit.setClip(true);
@@ -64,14 +76,13 @@ public class SampleEditPage extends TrackPage {
 
 		loopButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
-				((Track) context.getTrackManager().getCurrTrack()).toggleLooping();
+				new TrackToggleLoopEvent((Track) context.getTrackManager().getCurrTrack()).execute();
 			}
 		});
 
 		reverseButton.setOnReleaseListener(new OnReleaseListener() {
 			public void onRelease(Button arg0) {
-				((Track) context.getTrackManager().getCurrTrack()).setReverse(reverseButton
-						.isChecked());
+				new TrackToggleReverseEvent((Track) context.getTrackManager().getCurrTrack()).execute();
 			}
 		});
 

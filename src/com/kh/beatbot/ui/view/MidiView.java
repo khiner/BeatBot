@@ -366,6 +366,14 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	@Override
+	public void onReverseChange(Track track, boolean reverse) {
+	}
+
+	@Override
+	public void onLoopChange(Track track, boolean loop) {
+	}
+
+	@Override
 	public float unscaledHeight() {
 		return getTotalTrackHeight();
 	}

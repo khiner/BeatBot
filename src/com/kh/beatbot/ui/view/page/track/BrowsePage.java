@@ -119,6 +119,12 @@ public class BrowsePage extends Menu implements TrackListener {
 	public void onSoloChange(Track track, boolean solo) {
 	}
 
+	public void onReverseChange(Track track, boolean reverse) {
+	}
+
+	public void onLoopChange(Track track, boolean loop) {
+	}
+
 	@Override
 	public void onEffectCreate(BaseTrack track, Effect effect) {
 	}

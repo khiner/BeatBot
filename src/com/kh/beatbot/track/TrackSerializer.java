@@ -72,6 +72,8 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 
 			t.setSampleLoopWindow(object.get("sample_loop_begin").getAsFloat(),
 					object.get("sample_loop_end").getAsFloat());
+			t.setSampleGain(object.get("gain").getAsFloat());
+			t.setReverse(object.get("reverse").getAsBoolean());
 		}
 
 		List<MidiNote> notes = GSON.fromJson(object.get("notes"), noteListType);
@@ -114,6 +116,8 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 				object.addProperty("samplePath", t.getCurrSampleFile().getAbsolutePath());
 				object.addProperty("sample_loop_begin", t.getLoopBeginParam().viewLevel);
 				object.addProperty("sample_loop_end", t.getLoopEndParam().viewLevel);
+				object.addProperty("gain", t.getGainParam().viewLevel);
+				object.addProperty("reverse", t.isReverse());
 			}
 
 			object.add("notes", GSON.toJsonTree(t.getMidiNotes()).getAsJsonArray());

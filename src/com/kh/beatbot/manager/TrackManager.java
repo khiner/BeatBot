@@ -435,6 +435,20 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	@Override
+	public void onReverseChange(Track track, boolean reverse) {
+		for (TrackListener trackListener : trackListeners) {
+			trackListener.onReverseChange(track, reverse);
+		}
+	}
+
+	@Override
+	public void onLoopChange(Track track, boolean loop) {
+		for (TrackListener trackListener : trackListeners) {
+			trackListener.onLoopChange(track, loop);
+		}
+	}
+
+	@Override
 	public void onNameChange(File file, File newFile) {
 		synchronized (tracks) {
 			for (Track track : tracks) {

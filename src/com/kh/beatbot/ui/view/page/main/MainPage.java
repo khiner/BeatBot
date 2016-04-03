@@ -184,6 +184,14 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 	}
 
 	@Override
+	public void onReverseChange(Track track, boolean reverse) {
+	}
+
+	@Override
+	public void onLoopChange(Track track, boolean loop) {
+	}
+
+	@Override
 	public void onTrackLevelsChange(BaseTrack track) {
 		selectEditPage();
 	}

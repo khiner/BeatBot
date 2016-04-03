@@ -17,6 +17,10 @@ public interface TrackListener {
 
 	void onSoloChange(Track track, boolean solo);
 
+	void onReverseChange(Track track, boolean reverse);
+	
+	void onLoopChange(Track track, boolean loop);
+
 	void onEffectCreate(BaseTrack track, Effect effect);
 
 	void onEffectDestroy(BaseTrack track, Effect effect);
