@@ -3,6 +3,7 @@ package com.kh.beatbot.ui.view.control.param;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.TouchableViewListener;
 import com.kh.beatbot.ui.icon.IconResourceSet;
+import com.kh.beatbot.ui.icon.IconResourceSet.State;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.TouchableView;
 import com.kh.beatbot.ui.view.View;
@@ -42,6 +43,9 @@ public class ParamControl extends TouchableView implements TouchableViewListener
 	}
 
 	public void setParam(Param param) {
+		if (param == null) {
+			setState(State.DISABLED);
+		}
 		valueLabel.setParam(param);
 		label.setText(param == null ? "" : param.getName());
 	}
@@ -62,6 +66,8 @@ public class ParamControl extends TouchableView implements TouchableViewListener
 
 	@Override
 	public void onPress(TouchableView view) {
+		if (!isEnabled())
+			return;
 		label.press();
 		if (null != touchListener) {
 			touchListener.onPress(view);
@@ -70,6 +76,8 @@ public class ParamControl extends TouchableView implements TouchableViewListener
 
 	@Override
 	public void onRelease(TouchableView view) {
+		if (!isEnabled())
+			return;
 		label.release();
 		if (null != touchListener) {
 			touchListener.onRelease(view);

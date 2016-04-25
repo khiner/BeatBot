@@ -60,7 +60,7 @@ public class SampleEditPage extends TrackPage implements TouchableViewsListener 
 	protected synchronized void createChildren() {
 		sampleEdit = new SampleEditView(this, null);
 		sampleEdit.setClip(true);
-		previewButton = new Button(this).withIcon(IconResourceSets.PREVIEW);
+		previewButton = new Button(this).withIcon(IconResourceSets.PREVIEW).withReleaseOnDragExit();
 		loopButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.LOOP);
 		reverseButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.REVERSE);
 

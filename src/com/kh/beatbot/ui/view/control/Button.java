@@ -13,6 +13,8 @@ public class Button extends LongPressableView {
 	private OnReleaseListener releaseListener;
 	private OnLongPressListener longPressListener;
 
+	private boolean releaseOnDragExit = false;
+
 	public Button(View view) {
 		super(view);
 		setShrinkable(true);
@@ -21,6 +23,11 @@ public class Button extends LongPressableView {
 	public Button(View view, RenderGroup renderGroup) {
 		super(view, renderGroup);
 		setShrinkable(true);
+	}
+
+	public Button withReleaseOnDragExit() {
+		this.releaseOnDragExit = true;
+		return this;
 	}
 
 	public final OnPressListener getOnPressListener() {
@@ -110,6 +117,14 @@ public class Button extends LongPressableView {
 		}
 	}
 	
+	@Override
+	public void dragRelease() {
+		super.dragRelease();
+		if (releaseOnDragExit) {
+			notifyReleased();
+		}
+	}
+
 	@Override
 	public Button withIcon(IconResourceSet resourceSet) {
 		return (Button) super.withIcon(resourceSet);

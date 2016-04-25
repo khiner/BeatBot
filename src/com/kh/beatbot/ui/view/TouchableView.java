@@ -56,6 +56,8 @@ public class TouchableView extends View {
 	 * events.
 	 ********************************************************/
 	public void handleActionDown(int id, Pointer pos) {
+		if (!isEnabled())
+			return;
 		press();
 		if (listener != null) {
 			listener.onPress(this);
@@ -63,6 +65,8 @@ public class TouchableView extends View {
 	}
 
 	public void handleActionUp(int id, Pointer pos) {
+		if (!isEnabled())
+			return;
 		release();
 		if (listener != null) {
 			listener.onRelease(this);

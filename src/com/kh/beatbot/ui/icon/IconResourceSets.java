@@ -15,7 +15,7 @@ public class IconResourceSets {
 			MUTE = s(r(Color.LABEL_TRANS, null, Color.PAN_TRANS), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.PAN, Color.BLACK)),
 			SOLO = s(r(Color.LABEL_TRANS, null, Color.PITCH_TRANS), r(Color.LABEL_SELECTED, Color.BLACK), r(Color.PITCH, Color.BLACK)),
 			BEAT_SYNC = s(r(R.drawable.clock, null, null, null, Color.WHITE), null, r(R.drawable.note_icon, null, null, null, Color.WHITE)),
-			VALUE_LABEL = s(r(Color.LABEL_VERY_LIGHT), r(Color.LABEL_SELECTED), null, r(Color.LABEL_DARK)),
+			VALUE_LABEL = s(r(Color.LABEL_VERY_LIGHT), r(Color.LABEL_SELECTED), null, r(Color.TRANSPARENT)),
 			VALUE_LABEL_VIEW_ONLY = s(null, null, null, r(Color.LABEL_VERY_LIGHT)),
 			PLAY = s(r(R.drawable.play_icon, null, Color.WHITE), r(R.drawable.play_icon_selected, null, Color.WHITE), r(R.drawable.play_icon_selected, null, Color.WHITE)),
 			STOP = s(r(R.drawable.stop_icon, null, Color.WHITE), r(R.drawable.stop_icon, null, Color.LABEL_SELECTED)),
