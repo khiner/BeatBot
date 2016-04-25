@@ -55,7 +55,7 @@ public class EffectPage extends TouchableView implements TouchableViewsListener 
 		delayGroup = new DelayParamsGroup(paramsPager).withEffect(new Delay());
 		filterGroup = new FilterParamsGroup(paramsPager).withEffect(new Filter());
 		flangerGroup = new EffectParamsGroup(paramsPager).withEffect(new Flanger());
-		reverbGroup = new EffectParamsGroup(paramsPager).withEffect(new Reverb());
+		//reverbGroup = new EffectParamsGroup(paramsPager).withEffect(new Reverb());
 		tremeloGroup = new EffectParamsGroup(paramsPager).withEffect(new Tremolo());
 
 		paramsPager.addPage(Chorus.NAME, chorusGroup);
@@ -63,7 +63,7 @@ public class EffectPage extends TouchableView implements TouchableViewsListener 
 		paramsPager.addPage(Delay.NAME, delayGroup);
 		paramsPager.addPage(Filter.NAME, filterGroup);
 		paramsPager.addPage(Flanger.NAME, flangerGroup);
-		paramsPager.addPage(Reverb.NAME, reverbGroup);
+		//paramsPager.addPage(Reverb.NAME, reverbGroup);
 		paramsPager.addPage(Tremolo.NAME, tremeloGroup);
 
 		new MultiViewTouchTracker(this).monitorViews(level2d, paramsPager);
