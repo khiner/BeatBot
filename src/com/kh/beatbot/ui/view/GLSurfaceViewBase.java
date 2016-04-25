@@ -7,13 +7,16 @@ import javax.microedition.khronos.opengles.GL11;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
+import android.util.Log;
 
 public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfaceView.Renderer {
-	private static final long DESIRED_FPS = 45, TICK_MILLIS = (long) (1000.0f / DESIRED_FPS);
+	private static final int DESIRED_FPS = 45;
+	private static final int FRAME_PERIOD_MILLIS = 1000 / DESIRED_FPS;
+	private static final int MAX_FRAME_SKIPS = 5;
+
 	private GL11 gl;
-	// private final long BEGIN_FRAME = 200;
-	// private long frameCount = 0, averageFrameTime = 0;
-	private long startTimeMillis = System.currentTimeMillis(), endTimeMillis = 0, deltaTimeMillis = 0;
+	private long beginTimeMillis = System.currentTimeMillis(), deltaTimeMillis = 0;
+	private int framesSkipped = 0, sleepTimeMillis = 0;
 
 	public GLSurfaceViewBase(Context context) {
 		super(context);
@@ -37,26 +40,28 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
 	}
 
 	public final void onDrawFrame(GL10 _gl) {
-		endTimeMillis = System.currentTimeMillis();
-		/* uncomment for timing logs */
-		// long startTime = System.nanoTime();
-		deltaTimeMillis += endTimeMillis - startTimeMillis;
-
-//		while (deltaTimeMillis >= TICK_MILLIS) {
-			tick();
-//			deltaTimeMillis -= TICK_MILLIS;
-//		}
-
+		beginTimeMillis = System.currentTimeMillis();
+		framesSkipped = 0;
+		tick();
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		draw();
+		deltaTimeMillis = System.currentTimeMillis() - beginTimeMillis;
+		sleepTimeMillis = (int) (FRAME_PERIOD_MILLIS - deltaTimeMillis);
 
-		startTimeMillis = endTimeMillis;
-		// long frameTime = System.nanoTime() - startTime;
+		if (sleepTimeMillis > 0) {
+			try {
+				Thread.sleep(sleepTimeMillis);
+			} catch (InterruptedException e) {
+				Log.e("", e.getMessage());
+			}
+		}
 
-		// if (frameCount++ < BEGIN_FRAME)
-		// return;
-		// averageFrameTime += (frameTime - averageFrameTime) / (frameCount - BEGIN_FRAME);
-		// Log.i("Avg Frame time: ", String.valueOf(averageFrameTime) + ", " + frameCount);
+        while (sleepTimeMillis < 0 && framesSkipped < MAX_FRAME_SKIPS) {
+            // we need to catch up. update without rendering
+            tick();
+            sleepTimeMillis += FRAME_PERIOD_MILLIS;
+            framesSkipped++;
+        }
 	}
 
 	protected void initGl(GL10 _gl) {
