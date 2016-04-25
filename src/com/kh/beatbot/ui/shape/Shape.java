@@ -119,15 +119,11 @@ public abstract class Shape {
 	}
 
 	public void hide() {
-		if (!isVisible())
-			return;
 		fillMesh.hide();
 		strokeMesh.hide();
 	}
 
 	public void show() {
-		if (isVisible())
-			return;
 		fillMesh.show();
 		strokeMesh.show();
 		update();

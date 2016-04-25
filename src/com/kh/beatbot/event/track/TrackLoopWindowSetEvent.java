@@ -17,6 +17,8 @@ public class TrackLoopWindowSetEvent implements Stateful, Temporal {
 	@Override
 	public void begin() {
 		Track track = View.context.getTrackManager().getTrackById(trackId);
+		if (track == null || track.getLoopBeginParam() == null)
+			return;
 		initialBeginLevel = track.getLoopBeginParam().viewLevel;
 		initialEndLevel = track.getLoopEndParam().viewLevel;
 	}
@@ -24,6 +26,9 @@ public class TrackLoopWindowSetEvent implements Stateful, Temporal {
 	@Override
 	public void end() {
 		Track track = View.context.getTrackManager().getTrackById(trackId);
+		if (track == null || track.getLoopBeginParam() == null)
+			return;
+
 		finalBeginLevel = track.getLoopBeginParam().viewLevel;
 		finalEndLevel = track.getLoopEndParam().viewLevel;
 
