@@ -159,10 +159,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	@Override
 	public void onCreate(Track track) {
-		TrackListener currPage = (TrackListener) pager.getCurrPage();
-		if (null != currPage) {
-			currPage.onSelect(track);
-		}
+		// no-op
 	}
 
 	@Override
