@@ -70,6 +70,7 @@ public class MidiViewGroup extends TouchableView {
 		translateScaleGroup.draw();
 		midiView.endClip();
 		pop();
+		midiView.getRenderGroup().draw();
 	}
 
 	@Override

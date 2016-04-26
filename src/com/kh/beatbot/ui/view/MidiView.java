@@ -54,9 +54,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	public MidiView(View view, RenderGroup scaleGroup, RenderGroup translateYGroup,
 			RenderGroup translateScaleGroup) {
 		super(view);
+		shouldDraw = false; // drawing handled by MidiViewGroup (parent) 
 		this.translateYGroup = translateYGroup;
 		this.translateScaleGroup = translateScaleGroup;
-		
+
 		setClip(true);
 
 		leftLoopRect = new Rectangle(scaleGroup, Color.DARK_TRANS, null);
@@ -75,7 +76,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		addShapes(leftLoopRect, rightLoopRect, selectRect, currTickLine, horizontalScrollBar);
 		addShapes(tickLines);
 		addShapes(loopMarkerLines);
-		
+
 		scrollHelper = new ScrollHelper(this);
 		context.getMidiManager().addLoopChangeListener(this);
 	}
@@ -136,7 +137,6 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	public float getPinchRightOffset() {
 		return pinchRightOffset;
 	}
-
 
 	@Override
 	public synchronized void layoutChildren() {
@@ -381,12 +381,12 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	@Override
 	public void onScrollX() {
 		float rad = LABEL_HEIGHT / 5;
-		float x = tickToUnscaledX(scrollHelper.xOffset);
-		float w = tickToUnscaledX(scrollHelper.numTicks);
+		float displayOffsetX = width / 50;
+		float x = tickToUnscaledX(scrollHelper.xOffset) + displayOffsetX;
+		float w = scrollHelper.numTicks * (width - displayOffsetX * 2) / MidiManager.MAX_TICKS;
 		horizontalScrollBar.setCornerRadius(rad);
-		horizontalScrollBar.layout(absoluteX + x, absoluteY + getTotalTrackHeight() - 2.5f * rad,
-				w, 2 * rad);
-		horizontalScrollBar.bringToTop();
+		horizontalScrollBar.layout(absoluteX + x, absoluteY + Math.min(unscaledHeight(), height)
+				- 2.5f * rad, w, 2 * rad);
 	}
 
 	@Override
