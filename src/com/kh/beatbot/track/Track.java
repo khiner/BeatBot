@@ -194,15 +194,16 @@ public class Track extends BaseTrack implements FileListener {
 	}
 
 	public void setSample(final File sampleFile) throws Exception {
-		if (null == sampleFile)
+		if (sampleFile == null)
 			return;
 		final String errorMsg = setSample(id, sampleFile.getPath());
-		if (!errorMsg.equals("No Error.")) {
-			throw new Exception(errorMsg);
-		} else {
+		if (errorMsg.equals("No Error.")) {
 			currSampleFile = sampleFile;
 			update();
+		} else {
+			throw new Exception(errorMsg);
 		}
+		select();
 		View.context.getTrackManager().onSampleChange(this);
 	}
 
@@ -341,7 +342,6 @@ public class Track extends BaseTrack implements FileListener {
 
 	private void update() {
 		updateSampleParams();
-		updateLoopWindow();
 		updateADSR();
 	}
 
@@ -349,10 +349,16 @@ public class Track extends BaseTrack implements FileListener {
 		setTrackLoopWindow(id, (long) getLoopBeginParam().level, (long) getLoopEndParam().level);
 	}
 
+	private void updateGain() {
+		setTrackGain(id, getGainParam().level);
+	}
+
 	private void updateSampleParams() {
 		if (!paramsForSample.containsKey(currSampleFile)) {
 			paramsForSample.put(currSampleFile, new SampleParams(getFrames(id)));
 		}
+		updateLoopWindow();
+		updateGain();
 	}
 
 	public float getNumFrames() {
@@ -428,7 +434,7 @@ public class Track extends BaseTrack implements FileListener {
 		@Override
 		public void onParamChange(Param param) {
 			if (param.equals(gainParam)) {
-				setTrackGain(id, param.level);
+				updateGain();
 				View.context.getPageSelectGroup().getEditPage().sampleEdit.onParamChange(param);
 			} else {
 				float minLoopWindow = loopEndParam.getViewLevel(MIN_LOOP_WINDOW);

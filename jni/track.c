@@ -394,18 +394,16 @@ jstring Java_com_kh_beatbot_track_Track_setSample(JNIEnv *env, jclass clazz,
 				filegen_generate, filegen_destroy);
 	}
 
-	const char *nativeSampleName = (*env)->GetStringUTFChars(env, sampleName,
-			0);
-
+	FileGen *fileGen = (FileGen *) track->generator->config;
+	fileGen->gain = dbToLinear(0); // reset gain to 0
+	const char *nativeSampleName = (*env)->GetStringUTFChars(env, sampleName, 0);
 	setSample(track, nativeSampleName);
 
 	// release string memory
 	(*env)->ReleaseStringUTFChars(env, sampleName, nativeSampleName);
 	pthread_mutex_unlock(&openSlOut->trackMutex); // TODO try moving up
 
-	jstring retn = (*env)->NewStringUTF(env, sf_strerror(NULL ));
-
-	return retn;
+	return (*env)->NewStringUTF(env, sf_strerror(NULL ));
 }
 
 void Java_com_kh_beatbot_manager_TrackManager_createTrackNative(JNIEnv *env,
