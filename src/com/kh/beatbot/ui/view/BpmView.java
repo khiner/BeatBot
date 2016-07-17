@@ -77,9 +77,9 @@ public class BpmView extends LongPressableView implements TempoListener {
 		lastFrameY = pos.y;
 		if (Math.abs(yDragTotal) > BPM_INCREMENT_THRESHOLD) {
 			if (yDragTotal <= 0) {
-				View.context.getMidiManager().incrementBpm();
-			} else {
 				View.context.getMidiManager().decrementBpm();
+			} else {
+				View.context.getMidiManager().incrementBpm();
 			}
 			yDragTotal %= BPM_INCREMENT_THRESHOLD;
 		}
