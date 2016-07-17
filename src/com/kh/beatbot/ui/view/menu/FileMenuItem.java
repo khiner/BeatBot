@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 
 import com.kh.beatbot.listener.OnLongPressListener;
+import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.ui.icon.IconResourceSets;
 import com.kh.beatbot.ui.view.control.Button;
 import com.kh.beatbot.ui.view.control.ToggleButton;
@@ -80,7 +81,7 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
 
 	private void loadIcons() {
 		if (button.getText().isEmpty()) {
-			setText(file.getName().isEmpty() ? file.getPath() : file.getName());
+			setText(file.getName().isEmpty() ? file.getPath() : FileManager.formatSampleName(file.getName()));
 			if (file.isDirectory()) {
 				setResourceId(IconResourceSets.forDirectory(getText()));
 			}

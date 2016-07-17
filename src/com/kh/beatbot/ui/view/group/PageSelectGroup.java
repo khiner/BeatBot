@@ -134,7 +134,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		pager.addPage(masterButtonRow.getEffectsButton(), effectSelectPage);
 		pager.addPage(masterButtonRow.getTempoButton(), tempoPage);
 
-		masterButton.setText(context.getTrackManager().getMasterTrack().getName());
+		masterButton.setText(context.getTrackManager().getMasterTrack().getFormattedName());
 	}
 
 	public int getCurrPageIndex() {

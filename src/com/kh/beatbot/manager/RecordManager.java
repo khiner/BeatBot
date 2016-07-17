@@ -205,7 +205,7 @@ public class RecordManager {
 		recordSourceLabels.add(MICROPHONE_RECORD_SOURCE_LABEL);
 		recordSourceLabels.add(BaseTrack.MASTER_TRACK_NAME);
 		for (final Track track : context.getTrackManager().getTracks()) {
-			recordSourceLabels.add(track.getName());
+			recordSourceLabels.add(track.getFormattedName());
 		}
 		
 		return recordSourceLabels.toArray(new String[recordSourceLabels.size()]);
@@ -213,7 +213,7 @@ public class RecordManager {
 
 	public String getRecordSourceLabel() {
 		return recordSourceId == MICROPHONE_RECORD_SOURCE_ID ? MICROPHONE_RECORD_SOURCE_LABEL
-				: context.getTrackManager().getBaseTrackById(recordSourceId).getName();
+				: context.getTrackManager().getBaseTrackById(recordSourceId).getFormattedName();
 	}
 
 	public native void setThresholdLevel(float thresholdLevel);

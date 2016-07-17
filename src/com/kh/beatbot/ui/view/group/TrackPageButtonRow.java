@@ -55,7 +55,7 @@ public class TrackPageButtonRow extends PageButtonRow {
 		IconResourceSet instrumentIcon = track.getIcon();
 
 		browseButton.setResourceId(instrumentIcon);
-		browseButton.setText(context.getFileManager().formatSampleName(track.getName()));
+		browseButton.setText(track.getFormattedName());
 	}
 
 	@Override

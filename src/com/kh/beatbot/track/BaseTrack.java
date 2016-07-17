@@ -57,6 +57,10 @@ public class BaseTrack {
 		return MASTER_TRACK_NAME;
 	}
 
+	public String getFormattedName() {
+		return getName();
+	}
+
 	public List<Effect> getEffects() {
 		return effects;
 	}

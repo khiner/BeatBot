@@ -44,7 +44,7 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 		recordSourceSelectButton = new Button(this).withIcon(IconResourceSets.VALUE_LABEL)
 				.withRoundedRect();
 		recordButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.RECORD);
-		recordSourceSelectButton.setText(context.getTrackManager().getMasterTrack().getName());
+		recordSourceSelectButton.setText(context.getTrackManager().getMasterTrack().getFormattedName());
 		recordSourceSelectButton.setOnReleaseListener(context.getRecordManager()
 				.getRecordSourceButtonListener());
 

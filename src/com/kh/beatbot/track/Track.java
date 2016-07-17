@@ -11,6 +11,7 @@ import com.kh.beatbot.effect.ADSR;
 import com.kh.beatbot.effect.Param;
 import com.kh.beatbot.listener.FileListener;
 import com.kh.beatbot.listener.ParamListener;
+import com.kh.beatbot.manager.FileManager;
 import com.kh.beatbot.midi.MidiNote;
 import com.kh.beatbot.ui.icon.IconResourceSet;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -255,6 +256,10 @@ public class Track extends BaseTrack implements FileListener {
 	@Override
 	public String getName() {
 		return currSampleFile == null ? "Browse" : currSampleFile.getName();
+	}
+
+	public String getFormattedName() {
+		return FileManager.formatSampleName(getName());
 	}
 
 	public File getCurrSampleFile() {

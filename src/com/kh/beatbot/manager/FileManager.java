@@ -90,7 +90,7 @@ public class FileManager implements FileListener {
 		return recordDirectory.getPath();
 	}
 
-	public String formatSampleName(String sampleName) {
+	public static String formatSampleName(String sampleName) {
 		for (String extension : SUPPORTED_EXTENSIONS) {
 			if (sampleName.endsWith(extension)) {
 				return sampleName.replace(extension, "");
