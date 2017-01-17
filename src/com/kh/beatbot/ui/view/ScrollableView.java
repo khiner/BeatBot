@@ -59,7 +59,7 @@ public abstract class ScrollableView extends TouchableView {
 			}
 		}
 
-		float rad = LABEL_HEIGHT / 5;
+		float rad = getLabelHeight() / 5;
 		if (horizontal && childWidth > width) {
 			float x = Math.max(1, -xOffset * width / childWidth);
 			float w = Math.max(rad * 2, width * width / childWidth);

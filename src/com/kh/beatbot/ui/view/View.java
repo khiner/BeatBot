@@ -63,11 +63,15 @@ public class View implements Comparable<View> {
 		}
 	}
 
+	public static float getLabelHeight() {
+		return getTotalHeight() / 12;
+	}
+
 	public float unscaledHeight() {
 		return height;
 	}
 
-	public float getTotalHeight() {
+	public static float getTotalHeight() {
 		return context.getRoot().getHeight();
 	}
 

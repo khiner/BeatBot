@@ -149,12 +149,13 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	@Override
 	public synchronized void layoutChildren() {
+		float labelHeight = getLabelHeight();
 		masterButton.layout(this, 0, BG_OFFSET, context.getMainPage().getMidiViewGroup()
-				.getTrackControlWidth(), LABEL_HEIGHT);
+				.getTrackControlWidth(), labelHeight);
 		buttonRowPager.layout(this, masterButton.width, BG_OFFSET, width - masterButton.width,
-				LABEL_HEIGHT);
-		pager.layout(this, BG_OFFSET, LABEL_HEIGHT + BG_OFFSET, width - 2 * BG_OFFSET, height
-				- LABEL_HEIGHT - 2 * BG_OFFSET);
+				labelHeight);
+		pager.layout(this, BG_OFFSET, labelHeight + BG_OFFSET, width - 2 * BG_OFFSET, height
+				- labelHeight - 2 * BG_OFFSET);
 	}
 
 	@Override

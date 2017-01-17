@@ -26,6 +26,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		LoopWindowListener, MidiNoteListener {
 
 	public static final float LOOP_SELECT_SNAP_DIST = 30;
+	
 	public static float trackHeight;
 
 	private float dragOffsetTick[] = { 0, 0, 0, 0, 0 };
@@ -140,6 +141,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public synchronized void layoutChildren() {
+		horizontalScrollBar.setCornerRadius(getLabelHeight() / 5f);
 		for (int i = 0; i < loopMarkerLines.length; i++) {
 			loopMarkerLines[i].layout(absoluteX, absoluteY, 3, height);
 		}
@@ -380,13 +382,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
 	@Override
 	public void onScrollX() {
-		float rad = LABEL_HEIGHT / 5;
 		float displayOffsetX = width / 50;
-		float x = tickToUnscaledX(scrollHelper.xOffset) + displayOffsetX;
 		float w = scrollHelper.numTicks * (width - displayOffsetX * 2) / MidiManager.MAX_TICKS;
-		horizontalScrollBar.setCornerRadius(rad);
-		horizontalScrollBar.layout(absoluteX + x, absoluteY + Math.min(unscaledHeight(), height)
-				- 2.5f * rad, w, 2 * rad);
+		updateHorizontalScrollBarPosition();
+		horizontalScrollBar.setDimensions(w, 2 * horizontalScrollBar.cornerRadius);
 	}
 
 	@Override
@@ -507,8 +506,14 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		}
 		layoutTrackRects();
 		updateTrackColors();
-		horizontalScrollBar.setPosition(horizontalScrollBar.x, absoluteY + trackHeight - 2.5f
-				* horizontalScrollBar.cornerRadius);
+		updateHorizontalScrollBarPosition();
+	}
+
+	private void updateHorizontalScrollBarPosition() {
+		float displayOffsetX = width / 50;
+		float x = tickToUnscaledX(scrollHelper.xOffset) + displayOffsetX;
+		horizontalScrollBar.setPosition(absoluteX + x, absoluteY + Math.min(unscaledHeight(), height)
+				- 2.5f * horizontalScrollBar.cornerRadius);
 	}
 
 	private void selectRegion(Pointer pos) {

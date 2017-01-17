@@ -4,8 +4,8 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="17"
-        android:targetSdkVersion="17" />
+    <uses-sdk android:minSdkVersion="10"
+        android:targetSdkVersion="10" />
 
 	<uses-permission android:name="android.permission.SET_DEBUG_APP" />    
     <uses-permission android:name="android.permission.RECORD_AUDIO" />

@@ -14,11 +14,12 @@ public class ListView extends ScrollableView implements OnPressListener {
 
 	@Override
 	public synchronized void layoutChildren() {
+		float labelHeight = getLabelHeight();
 		float y = yOffset;
 		for (View child : children) {
-			float height = ((TouchableView) child).getText().isEmpty() ? width - 2 * LABEL_HEIGHT
-					/ 3 : LABEL_HEIGHT;
-			child.layout(this, LABEL_HEIGHT / 3, y, width - 2 * LABEL_HEIGHT / 3, height);
+			float height = ((TouchableView) child).getText().isEmpty() ? width - 2 * labelHeight
+					/ 3 : labelHeight;
+			child.layout(this, labelHeight / 3, y, width - 2 * labelHeight / 3, height);
 			y += height;
 		}
 		super.layoutChildren();
@@ -36,7 +37,7 @@ public class ListView extends ScrollableView implements OnPressListener {
 		if (null != selectedButton
 				&& selectedButton.isPressed()
 				&& !(selectedButton instanceof ToggleButton && ((ToggleButton) selectedButton)
-						.isChecked()) && Math.abs(pos.y - pos.downY) > LABEL_HEIGHT / 2) {
+						.isChecked()) && Math.abs(pos.y - pos.downY) > getLabelHeight() / 2) {
 			// scrolling, release the pressed button
 			selectedButton.release();
 			shouldPropagateTouchEvents = false;
