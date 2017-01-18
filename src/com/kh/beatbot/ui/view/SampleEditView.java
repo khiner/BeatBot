@@ -224,7 +224,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionUp(int id, Pointer pos) {
+	public synchronized void handleActionUp(int id, Pointer pos) {
 		super.handleActionUp(id, pos);
 		if (!hasSample())
 			return;
@@ -282,7 +282,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void onParamChange(Param param) {
+	public synchronized void onParamChange(Param param) {
 		final Track track = (Track) context.getTrackManager().getCurrTrack();
 		if (param == null)
 			return;

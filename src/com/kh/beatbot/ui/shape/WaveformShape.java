@@ -6,30 +6,29 @@ import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.view.View;
 
 public class WaveformShape extends Shape {
-	private final static float MAX_SPP = 1f;
+	private final static float MAX_SPP = 1, BUFFER_RATIO = 4;
 	private long offsetInFrames, widthInFrames;
 	private float xOffset, numSamples, loopBeginX, loopEndX;
 	private SparseArray<Float> sampleBuffer = new SparseArray<Float>();
 
 	public WaveformShape(RenderGroup group, float width, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, Rectangle.FILL_INDICES, getStrokeIndices(width),
-				Rectangle.NUM_FILL_VERTICES, (int) (width * MAX_SPP * 3));
+				Rectangle.NUM_FILL_VERTICES, (int) (width * MAX_SPP * BUFFER_RATIO));
 		this.width = width;
-		// 3 window-lengths
 	}
 
 	private static short[] getStrokeIndices(float width) {
-		short[] strokeIndices = new short[(int) (width * MAX_SPP * 3 * 2) + 2];
+		short[] strokeIndices = new short[(int) (width * MAX_SPP * BUFFER_RATIO) * 2 + 2];
 		// degenerate line begin
 		strokeIndices[0] = 0;
-		strokeIndices[1] = 1;
-		for (int i = 1; i < (strokeIndices.length - 1) / 2; i++) {
-			strokeIndices[i * 2] = (short) i;
-			strokeIndices[i * 2 + 1] = (short) (i + 1);
+		strokeIndices[1] = 0;
+		for (int i = 1; i < (strokeIndices.length - 2) / 2; i++) {
+			strokeIndices[i * 2] = (short) (i - 1);
+			strokeIndices[i * 2 + 1] = (short) i;
 		}
 
 		// degenerate line end
-		strokeIndices[strokeIndices.length - 2] = strokeIndices[strokeIndices.length - 4];
+		strokeIndices[strokeIndices.length - 2] = strokeIndices[strokeIndices.length - 3];
 		strokeIndices[strokeIndices.length - 1] = strokeIndices[strokeIndices.length - 3];
 		return strokeIndices;
 	}
@@ -41,7 +40,7 @@ public class WaveformShape extends Shape {
 		Track track = (Track) View.context.getTrackManager().getCurrTrack();
 		sampleBuffer.clear();
 		float numFrames = track.getNumFrames();
-		for (float s = -numSamples; s < numSamples * 2; s++) {
+		for (float s = -numSamples * BUFFER_RATIO / 2; s < numSamples * BUFFER_RATIO / 2; s++) {
 			int sampleIndex = (int) (offsetInFrames + s * widthInFrames / numSamples);
 			if (sampleIndex < 0)
 				continue;
@@ -89,23 +88,24 @@ public class WaveformShape extends Shape {
 		if (null == sampleBuffer)
 			return;
 
-		float x = this.x;
-		float y = this.y + height / 2;
+		float x = 0;
+		float y = 0;
 
-		strokeVertex(x, y);
 		for (int i = 0; i < sampleBuffer.size(); i++) {
 			int sampleIndex = sampleBuffer.keyAt(i);
 			float sample = sampleBuffer.get(sampleIndex);
 			float percent = (float) (sampleIndex - offsetInFrames) / (float) widthInFrames;
-
-			strokeVertex(x, y);
 			x = this.x + percent * width + xOffset;
 			y = this.y + height * (1 - sample) / 2;
+			if (i == 0) {
+				strokeVertex(x, y); // starting degenerate line
+			}
+			strokeVertex(x, y);
 		}
+		strokeVertex(x, y); // terminating degenerate line
 
-		while (!strokeMesh.isFull()) {
-			strokeVertex(this.x + Float.MAX_VALUE, this.y + height / 2);
-		}
+		while (!strokeMesh.isFull())
+			strokeVertex(x, y);
 	}
 
 	private void updateLoopSelectionVertices() {
