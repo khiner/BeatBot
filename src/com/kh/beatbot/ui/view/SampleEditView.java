@@ -216,7 +216,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionDown(int id, Pointer pos) {
+	public synchronized void handleActionDown(int id, Pointer pos) {
 		super.handleActionDown(id, pos);
 		if (!hasSample())
 			return;
@@ -233,7 +233,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionPointerDown(int id, Pointer pos) {
+	public synchronized void handleActionPointerDown(int id, Pointer pos) {
 		if (!hasSample())
 			return;
 		if (!setZoomAnchor(id)) {
@@ -243,7 +243,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionPointerUp(int id, Pointer pos) {
+	public synchronized void handleActionPointerUp(int id, Pointer pos) {
 		if (!hasSample())
 			return;
 		// stop zooming
@@ -253,7 +253,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public void handleActionMove(int id, Pointer pos) {
+	public synchronized void handleActionMove(int id, Pointer pos) {
 		if (!hasSample()) {
 			checkPointerExit(id, pos);
 			return;

@@ -494,6 +494,36 @@ float Java_com_kh_beatbot_track_Track_getSample(JNIEnv *env, jclass clazz,
 	return filegen_getSample(fileGen, frame, channel);
 }
 
+jfloatArray Java_com_kh_beatbot_track_Track_getMaxSample(JNIEnv *env, jclass clazz,
+		jint trackId, jlong beginFrame, jlong endFrame, jint channel) {
+	Track *track = getTrack(trackId);
+	if (track->generator == NULL )
+		return 0;
+	FileGen *fileGen = (FileGen *) track->generator->config;
+	float maxSample = filegen_getSample(fileGen, beginFrame, channel);
+	float maxFrameIndex = beginFrame;
+
+	int i;
+	for (i = beginFrame + 1; i < endFrame; i++) {
+		float candidateSample = filegen_getSample(fileGen, i, channel);
+		if (fabs(candidateSample) > fabs(maxSample)) {
+			maxSample = candidateSample;
+			maxFrameIndex = i;
+		}
+	}
+
+	jfloatArray maxFrameIndexAndSample = (*env)->NewFloatArray(env, 2);
+	float* data = malloc(sizeof(float) * 2);
+	data[0] = maxFrameIndex;
+	data[1] = maxSample;
+
+	(*env)->SetFloatArrayRegion(env, maxFrameIndexAndSample, 0, 2, data);
+	free(data);
+
+	return maxFrameIndexAndSample;
+}
+
+
 float Java_com_kh_beatbot_track_Track_getCurrentFrame(JNIEnv *env, jclass clazz,
 		jint trackId) {
 	Track *track = getTrack(trackId);

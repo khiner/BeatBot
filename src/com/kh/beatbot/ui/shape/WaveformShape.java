@@ -1,5 +1,6 @@
 package com.kh.beatbot.ui.shape;
 
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.kh.beatbot.track.Track;
@@ -40,13 +41,15 @@ public class WaveformShape extends Shape {
 		Track track = (Track) View.context.getTrackManager().getCurrTrack();
 		sampleBuffer.clear();
 		float numFrames = track.getNumFrames();
-		for (float s = -numSamples * BUFFER_RATIO / 2; s < numSamples * BUFFER_RATIO / 2; s++) {
-			int sampleIndex = (int) (offsetInFrames + s * widthInFrames / numSamples);
-			if (sampleIndex < 0)
+
+		for (int frameIndex = (int) (offsetInFrames - widthInFrames * BUFFER_RATIO / 2); frameIndex < offsetInFrames
+				+ widthInFrames * BUFFER_RATIO / 2; frameIndex += widthInFrames / numSamples) {
+			if (frameIndex < 0)
 				continue;
-			else if (sampleIndex >= numFrames)
+			else if (frameIndex >= numFrames)
 				break;
-			sampleBuffer.put(sampleIndex, track.getSample(sampleIndex, 0));
+			float[] maxSample = track.getMaxSample(frameIndex, (long) (frameIndex + widthInFrames / numSamples), 0);
+			sampleBuffer.put((int) maxSample[0], maxSample[1]);
 		}
 
 		resetIndices();
@@ -58,8 +61,8 @@ public class WaveformShape extends Shape {
 		updateWaveformVertices();
 	}
 
-	public void update(float loopBeginX, float loopEndX, long offsetInFrames,
-			long widthInFrames, float xOffset) {
+	public void update(float loopBeginX, float loopEndX, long offsetInFrames, long widthInFrames,
+			float xOffset) {
 		boolean loopSelectionChanged = this.loopBeginX != loopBeginX || this.loopEndX != loopEndX;
 		this.loopBeginX = loopBeginX;
 		this.loopEndX = loopEndX;
