@@ -153,12 +153,12 @@ public class Track extends BaseTrack implements FileListener {
 
 	public void selectRegion(long leftTick, long rightTick, int topNote, int bottomNote) {
 		for (MidiNote midiNote : notes) {
-			// conditions for region selection
 			boolean a = leftTick < midiNote.getOffTick();
 			boolean b = rightTick > midiNote.getOffTick();
 			boolean c = leftTick < midiNote.getOnTick();
 			boolean d = rightTick > midiNote.getOnTick();
-			boolean selected = id >= topNote && id <= bottomNote
+			boolean selected = midiNote.getNoteValue() >= topNote
+					&& midiNote.getNoteValue() <= bottomNote
 					&& ((a && b) || (c && d) || (!b && !c));
 			midiNote.setSelected(selected);
 		}
