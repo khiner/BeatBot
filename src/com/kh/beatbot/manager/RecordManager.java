@@ -78,24 +78,24 @@ public class RecordManager {
 		return recordSourceButtonListener;
 	}
 
-	public synchronized boolean isOff() {
+	public boolean isOff() {
 		return state == State.OFF;
 	}
 
-	public synchronized boolean isListening() {
+	public boolean isListening() {
 		return state == State.LISTENING;
 	}
 
-	public synchronized boolean isArmed() {
+	public boolean isArmed() {
 		return state == State.ARMED;
 	}
 
-	public synchronized boolean isRecording() {
+	public boolean isRecording() {
 		return state == State.RECORDING;
 	}
 
 	// in LISTEN mode, recorder listens to (polls) the RecordSource to display the current level
-	public synchronized void startListening() {
+	public void startListening() {
 		if (!isOff())
 			return;
 
@@ -109,7 +109,7 @@ public class RecordManager {
 	}
 
 	// in ARMED mode, recorder waits for RecordSource to exceed threshold before recording
-	public synchronized void arm() {
+	public void arm() {
 		if (!isListening())
 			return;
 
@@ -120,7 +120,7 @@ public class RecordManager {
 		}
 	}
 
-	public synchronized void disarm() {
+	public void disarm() {
 		if (!isArmed())
 			return;
 
@@ -151,7 +151,7 @@ public class RecordManager {
 		return currRecordFileName;
 	}
 
-	public synchronized File stopRecording() {
+	public File stopRecording() {
 		if (isArmed()) {
 			disarm();
 			return null;
@@ -170,7 +170,7 @@ public class RecordManager {
 		return file;
 	}
 
-	public synchronized void stopListening() {
+	public void stopListening() {
 		if (!isListening())
 			return;
 

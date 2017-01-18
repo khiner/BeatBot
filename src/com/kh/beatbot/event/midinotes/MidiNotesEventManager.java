@@ -27,12 +27,12 @@ public class MidiNotesEventManager {
 		this.midiManager = midiManager;
 	}
 
-	public synchronized void begin() {
+	public void begin() {
 		end();
 		activate();
 	}
 
-	public synchronized void end() {
+	public void end() {
 		if (!isActive())
 			return;
 

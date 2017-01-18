@@ -132,31 +132,31 @@ public class Param {
 		}
 	}
 
-	public synchronized void addListener(ParamListener listener) {
+	public void addListener(ParamListener listener) {
 		listeners.add(listener);
 	}
 
-	public synchronized void removeListener(ParamListener listener) {
+	public void removeListener(ParamListener listener) {
 		listeners.remove(listener);
 	}
 
-	public synchronized void addToggleListener(ParamToggleListener listener) {
+	public void addToggleListener(ParamToggleListener listener) {
 		toggleListeners.add(listener);
 	}
 
-	public synchronized void removeToggleListener(ParamToggleListener listener) {
+	public void removeToggleListener(ParamToggleListener listener) {
 		toggleListeners.remove(listener);
 	}
 
-	public synchronized void ignoreListener(ParamListener listener) {
+	public void ignoreListener(ParamListener listener) {
 		ignoredListeners.add(listener);
 	}
 
-	public synchronized void unignoreListener(ParamListener listener) {
+	public void unignoreListener(ParamListener listener) {
 		ignoredListeners.remove(listener);
 	}
 
-	protected synchronized void notifyListeners() {
+	protected void notifyListeners() {
 		// avoid cme
 		for (int i = 0; i < listeners.size(); i++) {
 			ParamListener listener = listeners.get(i);
@@ -190,7 +190,7 @@ public class Param {
 		return hz ? 1 / quantized : quantized;
 	}
 
-	private synchronized void notifyToggleListeners() {
+	private void notifyToggleListeners() {
 		for (ParamToggleListener listener : toggleListeners) {
 			if (!ignoredListeners.contains(listener)) {
 				listener.onParamToggle(this);

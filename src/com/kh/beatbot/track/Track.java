@@ -25,7 +25,7 @@ public class Track extends BaseTrack implements FileListener {
 	private boolean adsrEnabled = false, reverse = false, previewing = false, muted = false,
 			soloing = false;
 
-	private List<MidiNote> notes = Collections.synchronizedList(new ArrayList<MidiNote>());
+	private List<MidiNote> notes = new ArrayList<MidiNote>();
 	private File currSampleFile;
 	private ADSR adsr;
 
@@ -45,19 +45,15 @@ public class Track extends BaseTrack implements FileListener {
 	}
 
 	public void addNote(MidiNote note) {
-		synchronized (notes) {
-			if (!notes.contains(note)) {
-				notes.add(note);
-			}
+		if (!notes.contains(note)) {
+			notes.add(note);
 		}
 		updateNextNote();
 	}
 
 	public void removeNote(MidiNote note) {
-		synchronized (notes) {
-			if (notes.remove(note)) {
-				notifyNoteRemoved(id, note.getOnTick());
-			}
+		if (notes.remove(note)) {
+			notifyNoteRemoved(id, note.getOnTick());
 		}
 	}
 
@@ -72,25 +68,21 @@ public class Track extends BaseTrack implements FileListener {
 	}
 
 	public MidiNote findNoteStarting(long onTick) {
-		synchronized (notes) {
-			for (MidiNote note : notes) {
-				if (note.getOnTick() == onTick) {
-					return note;
-				}
+		for (MidiNote note : notes) {
+			if (note.getOnTick() == onTick) {
+				return note;
 			}
-			return null;
 		}
+		return null;
 	}
 
 	public MidiNote findNoteContaining(long tick) {
-		synchronized (notes) {
-			for (MidiNote note : notes) {
-				if (note.getOnTick() <= tick && note.getOffTick() >= tick) {
-					return note;
-				}
+		for (MidiNote note : notes) {
+			if (note.getOnTick() <= tick && note.getOffTick() >= tick) {
+				return note;
 			}
-			return null;
 		}
+		return null;
 	}
 
 	public List<MidiNote> getMidiNotes() {
@@ -171,10 +163,8 @@ public class Track extends BaseTrack implements FileListener {
 	}
 
 	public void updateNextNote() {
-		synchronized (notes) {
-			Collections.sort(notes);
-			setNextNote(id, getNextMidiNote(View.context.getMidiManager().getCurrTick()));
-		}
+		Collections.sort(notes);
+		setNextNote(id, getNextMidiNote(View.context.getMidiManager().getCurrTick()));
 	}
 
 	public MidiNote getNextMidiNote(long currTick) {

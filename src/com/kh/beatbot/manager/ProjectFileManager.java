@@ -100,7 +100,8 @@ public class ProjectFileManager {
 	}
 
 	private String getFullPathName(final String fileName) {
-		final String projectDirectoryPath = View.context.getFileManager().getProjectDirectory().getPath();
+		final String projectDirectoryPath = View.context.getFileManager().getProjectDirectory()
+				.getPath();
 		if (!isProjectFileName(fileName)) {
 			return projectDirectoryPath + "/" + fileName + PROJECT_FILE_EXTENSION;
 		} else {
