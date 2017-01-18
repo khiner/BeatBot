@@ -364,8 +364,8 @@ public class Track extends BaseTrack implements FileListener {
 		return getSample(id, sampleIndex, channel);
 	}
 
-	public float[] getMaxSample(long beginSampleIndex, long endSampleIndex, int channel) {
-		return getMaxSample(id, beginSampleIndex, endSampleIndex, channel);
+	public void fillSampleBuffer(float[] sampleBuffer, int startFrame, int endFrame, int jumpFrames) {
+		fillSampleBuffer(id, sampleBuffer, startFrame, endFrame, jumpFrames);
 	}
 
 	public float getCurrentFrame() {
@@ -407,7 +407,7 @@ public class Track extends BaseTrack implements FileListener {
 
 	private native float getSample(int trackId, long sampleIndex, int channel);
 
-	private native float[] getMaxSample(int trackId, long beginSampleIndex, long endSampleIndex, int channel);
+	private native void fillSampleBuffer(int trackId, float[] sampleBuffer, int startFrame, int endFrame, int jumpFrames);
 
 	private native float getCurrentFrame(int trackId);
 

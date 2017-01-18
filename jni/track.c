@@ -494,35 +494,44 @@ float Java_com_kh_beatbot_track_Track_getSample(JNIEnv *env, jclass clazz,
 	return filegen_getSample(fileGen, frame, channel);
 }
 
-jfloatArray Java_com_kh_beatbot_track_Track_getMaxSample(JNIEnv *env, jclass clazz,
-		jint trackId, jlong beginFrame, jlong endFrame, jint channel) {
+void Java_com_kh_beatbot_track_Track_fillSampleBuffer(JNIEnv *env, jclass clazz,
+		jint trackId, jfloatArray sampleBuffer, jint startFrame, jint endFrame,
+		jint jumpFrames) {
 	Track *track = getTrack(trackId);
 	if (track->generator == NULL )
-		return 0;
+		return;
 	FileGen *fileGen = (FileGen *) track->generator->config;
-	float maxSample = filegen_getSample(fileGen, beginFrame, channel);
-	float maxFrameIndex = beginFrame;
+	long numFrames = fileGen->frames;
+	startFrame = startFrame < 0 ? 0 : startFrame;
+	endFrame = endFrame > numFrames ? numFrames : endFrame;
 
-	int i;
-	for (i = beginFrame + 1; i < endFrame; i++) {
-		float candidateSample = filegen_getSample(fileGen, i, channel);
-		if (fabs(candidateSample) > fabs(maxSample)) {
-			maxSample = candidateSample;
-			maxFrameIndex = i;
+	float* maxFrameIndexAndSample = malloc(sizeof(float) * 2);
+
+	int i = 0;
+	int frameIndex;
+	for (frameIndex = startFrame; frameIndex < endFrame; frameIndex += jumpFrames) {
+		maxFrameIndexAndSample[0] = frameIndex;
+		maxFrameIndexAndSample[1] = filegen_getSample(fileGen, frameIndex, 0);
+
+		int j;
+		int segmentEndFrame = frameIndex + jumpFrames > numFrames ? numFrames : frameIndex + jumpFrames;
+		for (j = frameIndex + 1; j < segmentEndFrame; j++) {
+			float candidateSample = filegen_getSample(fileGen, j, 0);
+			if (fabs(candidateSample) > fabs(maxFrameIndexAndSample[1])) {
+				maxFrameIndexAndSample[0] = (float) j;
+				maxFrameIndexAndSample[1] = candidateSample;
+			}
 		}
+
+		(*env)->SetFloatArrayRegion(env, sampleBuffer, i * 2, 2, maxFrameIndexAndSample);
+		i++;
 	}
 
-	jfloatArray maxFrameIndexAndSample = (*env)->NewFloatArray(env, 2);
-	float* data = malloc(sizeof(float) * 2);
-	data[0] = maxFrameIndex;
-	data[1] = maxSample;
-
-	(*env)->SetFloatArrayRegion(env, maxFrameIndexAndSample, 0, 2, data);
-	free(data);
-
-	return maxFrameIndexAndSample;
+	maxFrameIndexAndSample[0] = (float) -1.0; // end code
+	maxFrameIndexAndSample[1] = (float) 0.0;
+	(*env)->SetFloatArrayRegion(env, sampleBuffer, i * 2, 2, maxFrameIndexAndSample);
+	free(maxFrameIndexAndSample);
 }
-
 
 float Java_com_kh_beatbot_track_Track_getCurrentFrame(JNIEnv *env, jclass clazz,
 		jint trackId) {

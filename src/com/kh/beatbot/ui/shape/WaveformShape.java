@@ -1,21 +1,19 @@
 package com.kh.beatbot.ui.shape;
 
-import android.util.Log;
-import android.util.SparseArray;
-
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.view.View;
 
 public class WaveformShape extends Shape {
 	private final static float MAX_SPP = 1, BUFFER_RATIO = 4;
-	private long offsetInFrames, widthInFrames;
+	private float offsetInFrames, widthInFrames;
 	private float xOffset, numSamples, loopBeginX, loopEndX;
-	private SparseArray<Float> sampleBuffer = new SparseArray<Float>();
+	private float[] sampleBuffer;
 
 	public WaveformShape(RenderGroup group, float width, float[] fillColor, float[] strokeColor) {
 		super(group, fillColor, strokeColor, Rectangle.FILL_INDICES, getStrokeIndices(width),
 				Rectangle.NUM_FILL_VERTICES, (int) (width * MAX_SPP * BUFFER_RATIO));
 		this.width = width;
+		this.sampleBuffer = new float[2 * (int) (width * MAX_SPP * BUFFER_RATIO)];
 	}
 
 	private static short[] getStrokeIndices(float width) {
@@ -38,20 +36,13 @@ public class WaveformShape extends Shape {
 	 * Read samples from disk at the current granularity
 	 */
 	public void resample() {
+		float numBufferFrames = widthInFrames * BUFFER_RATIO / 2;
+		int startFrame = (int) Math.floor(offsetInFrames - numBufferFrames);
+		int endFrame = (int) Math.ceil(offsetInFrames + numBufferFrames);
+		int stepFrames = (int) Math.ceil(widthInFrames / numSamples);
+
 		Track track = (Track) View.context.getTrackManager().getCurrTrack();
-		sampleBuffer.clear();
-		float numFrames = track.getNumFrames();
-
-		for (int frameIndex = (int) (offsetInFrames - widthInFrames * BUFFER_RATIO / 2); frameIndex < offsetInFrames
-				+ widthInFrames * BUFFER_RATIO / 2; frameIndex += widthInFrames / numSamples) {
-			if (frameIndex < 0)
-				continue;
-			else if (frameIndex >= numFrames)
-				break;
-			float[] maxSample = track.getMaxSample(frameIndex, (long) (frameIndex + widthInFrames / numSamples), 0);
-			sampleBuffer.put((int) maxSample[0], maxSample[1]);
-		}
-
+		track.fillSampleBuffer(sampleBuffer, startFrame, endFrame, stepFrames);
 		resetIndices();
 		updateWaveformVertices();
 	}
@@ -61,14 +52,14 @@ public class WaveformShape extends Shape {
 		updateWaveformVertices();
 	}
 
-	public void update(float loopBeginX, float loopEndX, long offsetInFrames, long widthInFrames,
+	public void update(float loopBeginX, float loopEndX, float offsetInFrames, float widthInFrames,
 			float xOffset) {
 		boolean loopSelectionChanged = this.loopBeginX != loopBeginX || this.loopEndX != loopEndX;
 		this.loopBeginX = loopBeginX;
 		this.loopEndX = loopEndX;
 
 		final Track track = (Track) View.context.getTrackManager().getCurrTrack();
-		long newWidthInFrames = (long) Math.min(widthInFrames, track.getNumFrames());
+		float newWidthInFrames = Math.min(widthInFrames, track.getNumFrames());
 		boolean waveformChanged = this.offsetInFrames != offsetInFrames
 				|| this.widthInFrames != newWidthInFrames || this.xOffset != xOffset;
 		this.offsetInFrames = offsetInFrames;
@@ -91,13 +82,14 @@ public class WaveformShape extends Shape {
 		if (null == sampleBuffer)
 			return;
 
-		float x = 0;
-		float y = 0;
+		float x = 0, y = 0;
 
-		for (int i = 0; i < sampleBuffer.size(); i++) {
-			int sampleIndex = sampleBuffer.keyAt(i);
-			float sample = sampleBuffer.get(sampleIndex);
-			float percent = (float) (sampleIndex - offsetInFrames) / (float) widthInFrames;
+		for (int i = 0; i < sampleBuffer.length / 2; i++) {
+			int sampleIndex = (int) sampleBuffer[i * 2];
+			if (sampleIndex == -1)
+				break;
+			float sample = sampleBuffer[i * 2 + 1];
+			float percent = (sampleIndex - offsetInFrames) / widthInFrames;
 			x = this.x + percent * width + xOffset;
 			y = this.y + height * (1 - sample) / 2;
 			if (i == 0) {
