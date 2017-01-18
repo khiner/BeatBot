@@ -58,17 +58,17 @@ public class ToggleButton extends Button {
 	}
 
 	@Override
-	public synchronized ToggleButton withIcon(IconResourceSet resourceSet) {
+	public ToggleButton withIcon(IconResourceSet resourceSet) {
 		return (ToggleButton) super.withIcon(resourceSet);
 	}
 
 	@Override
-	public synchronized ToggleButton withRect() {
+	public ToggleButton withRect() {
 		return (ToggleButton) super.withRect();
 	}
 	
 	@Override
-	public synchronized ToggleButton withRoundedRect() {
+	public ToggleButton withRoundedRect() {
 		return (ToggleButton) super.withRoundedRect();
 	}
 }

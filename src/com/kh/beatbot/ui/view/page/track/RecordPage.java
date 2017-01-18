@@ -35,7 +35,7 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		sampleView = new SampleView(this, renderGroup);
 		sampleView.setClip(true);
 
@@ -71,7 +71,7 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		final float topBarH = height * .29f;
 		final float fillH = height - topBarH;
 		recordSourceSelectLabel.layout(this, 0, 0, topBarH * 2, topBarH);

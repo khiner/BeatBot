@@ -27,7 +27,7 @@ public class ToggleDial extends TouchableView implements ParamToggleListener {
 	}
 
 	@Override
-	public synchronized void createChildren() {
+	public void createChildren() {
 		dial = new Dial(this);
 		centerButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.BEAT_SYNC);
 		centerButton.setChecked(true);
@@ -40,14 +40,14 @@ public class ToggleDial extends TouchableView implements ParamToggleListener {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		dial.layout(this, 0, 0, width, height);
 		centerButton.layout(this, width / 16, width / 16, 7 * width / 8, 7 * width / 8);
 		snapDistSquared = (width / 4) * (width / 4);
 	}
 
 	@Override
-	public synchronized View findChildAt(float x, float y) {
+	public View findChildAt(float x, float y) {
 		return distanceFromCenterSquared(x, y) < snapDistSquared ? centerButton : dial;
 	}
 

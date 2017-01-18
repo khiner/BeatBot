@@ -14,13 +14,13 @@ public class EditPage extends TouchableView {
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		midiViewGroup = new MidiViewGroup(this);
 		pageSelectGroup = new PageSelectGroup(this);
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		float midiHeight = 3 * height / 5;
 		float pageSelectGroupHeight = height - midiHeight;
 		midiViewGroup.layout(this, 0, 0, width - 15, midiHeight);

@@ -36,7 +36,7 @@ public class DialParamControl extends LevelParamControl {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		label.layout(this, 0, 0, width, height / 5);
 		levelControlView.layout(this, 0, height / 5, width, 3 * height / 5);
 		valueLabel.layout(this, 0, 5 * height / 6, width, height / 6);

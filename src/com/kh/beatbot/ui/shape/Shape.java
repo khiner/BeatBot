@@ -35,43 +35,43 @@ public abstract class Shape {
 		return fillMesh.getGroup().getVertexY(i);
 	}
 
-	protected synchronized void fillVertex(float x, float y) {
+	protected void fillVertex(float x, float y) {
 		fillMesh.vertex(x, y, fillColor);
 	}
 
-	protected synchronized void strokeVertex(float x, float y) {
+	protected void strokeVertex(float x, float y) {
 		strokeMesh.vertex(x, y, strokeColor);
 	}
 
-	protected synchronized void resetIndices() {
+	protected void resetIndices() {
 		if (!isVisible())
 			return;
 		fillMesh.reset();
 		strokeMesh.reset();
 	}
 
-	public synchronized void update() {
+	public void update() {
 		if (isVisible()) {
 			resetIndices();
 			updateVertices();
 		}
 	}
 
-	protected synchronized void setFillColor(int vertexIndex, float[] fillColor) {
+	protected void setFillColor(int vertexIndex, float[] fillColor) {
 		fillMesh.setColor(vertexIndex, fillColor);
 	}
 
-	public synchronized void setFillColor(float[] fillColor) {
+	public void setFillColor(float[] fillColor) {
 		this.fillColor = fillColor;
 		fillMesh.setColor(fillColor);
 	}
 
-	public synchronized void setStrokeColor(float[] strokeColor) {
+	public void setStrokeColor(float[] strokeColor) {
 		this.strokeColor = strokeColor;
 		strokeMesh.setColor(strokeColor);
 	}
 
-	public synchronized void setColors(float[] fillColor, float[] strokeColor) {
+	public void setColors(float[] fillColor, float[] strokeColor) {
 		setFillColor(fillColor);
 		setStrokeColor(strokeColor);
 	}
@@ -98,14 +98,14 @@ public abstract class Shape {
 		strokeMesh.push();
 	}
 
-	public synchronized void setPosition(float x, float y) {
+	public void setPosition(float x, float y) {
 		this.x = x;
 		this.y = y;
 		fillMesh.setPosition(x, y);
 		strokeMesh.setPosition(x, y);
 	}
 
-	public synchronized void setDimensions(float width, float height) {
+	public void setDimensions(float width, float height) {
 		this.width = width;
 		this.height = height;
 		fillMesh.setDimensions(width, height);
@@ -113,7 +113,7 @@ public abstract class Shape {
 		update();
 	}
 
-	public synchronized void layout(float x, float y, float width, float height) {
+	public void layout(float x, float y, float width, float height) {
 		setPosition(x, y);
 		setDimensions(width, height);
 	}

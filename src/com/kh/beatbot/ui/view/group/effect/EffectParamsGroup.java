@@ -37,7 +37,7 @@ public class EffectParamsGroup extends TouchableView {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		if (effect.getNumParams() < 8) { // two rows
 			int halfParams = (effect.getNumParams() + 1) / 2;
 			float paramW = effect.getNumParams() <= 3 ? width / effect.getNumParams() : width

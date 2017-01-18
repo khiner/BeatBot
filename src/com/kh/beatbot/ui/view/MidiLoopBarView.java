@@ -28,7 +28,7 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		onLoopWindowChange(context.getMidiManager().getLoopBeginTick(), context.getMidiManager()
 				.getLoopEndTick());
 	}
@@ -79,7 +79,7 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
 	}
 
 	@Override
-	protected synchronized View findChildAt(float x, float y) {
+	protected View findChildAt(float x, float y) {
 		float tick = xToTick(x - context.getMainPage().getMidiTrackView().width);
 		if (tick >= context.getMidiManager().getLoopBeginTick()
 				&& tick <= context.getMidiManager().getLoopEndTick()) {

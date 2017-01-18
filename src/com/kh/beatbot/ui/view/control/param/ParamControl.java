@@ -19,7 +19,7 @@ public class ParamControl extends TouchableView implements TouchableViewListener
 	}
 
 	@Override
-	public synchronized void createChildren() {
+	public void createChildren() {
 		valueLabel = new ValueLabel(this);
 		valueLabel.setShrinkable(true);
 		valueLabel.setListener(this);
@@ -55,7 +55,7 @@ public class ParamControl extends TouchableView implements TouchableViewListener
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		label.layout(this, 0, 0, width / 2, height);
 		valueLabel.layout(this, width / 2, 0, width / 2, height);
 	}

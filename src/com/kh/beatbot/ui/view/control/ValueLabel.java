@@ -28,13 +28,13 @@ public class ValueLabel extends ControlView1dBase {
 	}
 
 	@Override
-	public synchronized void createChildren() {
+	public void createChildren() {
 		setIcon(IconResourceSets.VALUE_LABEL);
 		initRoundedRect();
 	}
 
 	@Override
-	public synchronized void setParam(Param param) {
+	public void setParam(Param param) {
 		super.setParam(param);
 		if (param == null) {
 			setState(State.DISABLED);

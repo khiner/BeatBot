@@ -14,7 +14,7 @@ public class Seekbar2d extends ControlView2dBase {
 		super(view);
 	}
 
-	public synchronized void createChildren() {
+	public void createChildren() {
 		selectColor = Color.LABEL_SELECTED;
 		initRoundedRect();
 		intersectingLines = new IntersectingLines(renderGroup, Color.TRON_BLUE, null);
@@ -28,7 +28,7 @@ public class Seekbar2d extends ControlView2dBase {
 		super.setDimensions(width, height);
 	}
 
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		intersectingLines.layout(absoluteX, absoluteY, width, height);
 
 		circle.setDimensions(getCornerRadius(), getCornerRadius());

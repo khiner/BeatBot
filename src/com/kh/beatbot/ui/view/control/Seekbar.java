@@ -23,7 +23,7 @@ public class Seekbar extends ControlView1dBase {
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		backgroundRect = new RoundedRect(renderGroup, Color.VIEW_BG, null);
 		foregroundRect = new RoundedRect(renderGroup, Color.TRON_BLUE, null);
 		levelCircle = new Circle(renderGroup, Color.TRON_BLUE_TRANS, null);
@@ -39,7 +39,7 @@ public class Seekbar extends ControlView1dBase {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		levelBarHeight = height / 4;
 		foregroundRect.setCornerRadius(levelBarHeight / 2);
 		backgroundRect.setCornerRadius(levelBarHeight / 2);

@@ -11,7 +11,7 @@ public class TextureMesh extends Mesh {
 		this.group = group;
 	}
 
-	public synchronized void setResource(int resourceId) {
+	public void setResource(int resourceId) {
 		if (resourceId == this.resourceId)
 			return;
 
@@ -31,7 +31,7 @@ public class TextureMesh extends Mesh {
 	}
 
 	@Override
-	public synchronized void layout(float x, float y, float width, float height) {
+	public void layout(float x, float y, float width, float height) {
 		if (!isVisible())
 			return;
 		this.x = x;

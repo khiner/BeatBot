@@ -47,7 +47,7 @@ public class TrackPageButtonRow extends PageButtonRow {
 		return pageButtons[RECORD_PAGE_ID];
 	}
 
-	public synchronized void update() {
+	public void update() {
 		ToggleButton browseButton = pageButtons[BROWSE_PAGE_ID];
 
 		// update the browse pager instrument icon
@@ -59,7 +59,7 @@ public class TrackPageButtonRow extends PageButtonRow {
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		super.createChildren();
 
 		deleteTrackButton = new Button(this).withRoundedRect().withIcon(
@@ -81,7 +81,7 @@ public class TrackPageButtonRow extends PageButtonRow {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		super.layoutChildren();
 
 		float labelWidth = (width - 4 * height) / 4;

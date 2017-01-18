@@ -159,7 +159,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 	}
 
 	@Override
-	public void tick() {
+	public synchronized void tick() {
 		if (physicsState.snap) {
 			setPosition(x + physicsState.velocity, y);
 		}

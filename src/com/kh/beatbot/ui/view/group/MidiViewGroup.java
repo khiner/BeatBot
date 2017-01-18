@@ -24,7 +24,7 @@ public class MidiViewGroup extends TouchableView {
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		scaleGroup = new RenderGroup();
 		translateYGroup = new RenderGroup();
 		translateScaleGroup = new RenderGroup();
@@ -38,7 +38,7 @@ public class MidiViewGroup extends TouchableView {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		float loopBarHeight = height / 12f;
 		MidiView.trackHeight = (height - loopBarHeight) / 5f;
 		float trackControlWidth = MidiView.trackHeight * 2.5f;

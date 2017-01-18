@@ -87,7 +87,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		masterButton = new ToggleButton(this).withRoundedRect().withIcon(
 				IconResourceSets.INSTRUMENT_BASE);
 
@@ -148,7 +148,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		float labelHeight = getLabelHeight();
 		masterButton.layout(this, 0, BG_OFFSET, context.getMainPage().getMidiViewGroup()
 				.getTrackControlWidth(), labelHeight);
@@ -168,7 +168,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	}
 
 	@Override
-	public synchronized void onSelect(BaseTrack track) {
+	public void onSelect(BaseTrack track) {
 		boolean isMaster = !(track instanceof Track);
 		buttonRowPager.setPage(isMaster ? masterButton : TRACK_PAGE_ID);
 		masterButton.setChecked(isMaster);
@@ -182,7 +182,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	}
 
 	@Override
-	public synchronized void onSampleChange(Track track) {
+	public void onSampleChange(Track track) {
 		selectBrowsePage();
 		browsePage.onSampleChange(track);
 		trackButtonRow.update();

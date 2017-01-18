@@ -32,7 +32,7 @@ public class SwappingViewPager extends TouchableView {
 		return currPageId;
 	}
 
-	public synchronized void setPage(Object key) {
+	public void setPage(Object key) {
 		if (null == key || key.equals(currPageId) || !pageMap.containsKey(key))
 			return;
 
@@ -48,7 +48,7 @@ public class SwappingViewPager extends TouchableView {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		View currPage = getCurrPage();
 		if (null != currPage) {
 			currPage.layout(this, 0, 0, width, height);

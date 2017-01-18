@@ -23,7 +23,7 @@ public class TempoPage extends TrackPage {
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		tapTempoButton = new Button(this).withRoundedRect().withIcon(
 				IconResourceSets.TAP_TEMPO_BUTTON);
 		bpmView = new BpmView(this);
@@ -56,7 +56,7 @@ public class TempoPage extends TrackPage {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		float bpmHeight = 3 * height / 4;
 		float bpmWidth = bpmHeight * 2;
 		float tapDim = 11 * height / 16;

@@ -6,7 +6,7 @@ import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.view.View;
 
 public class WaveformShape extends Shape {
-	private final static float MAX_SPP = 0.5f;
+	private final static float MAX_SPP = 1f;
 	private long offsetInFrames, widthInFrames;
 	private float xOffset, numSamples, loopBeginX, loopEndX;
 	private SparseArray<Float> sampleBuffer = new SparseArray<Float>();
@@ -37,7 +37,7 @@ public class WaveformShape extends Shape {
 	/*
 	 * Read samples from disk at the current granularity
 	 */
-	public synchronized void resample() {
+	public void resample() {
 		Track track = (Track) View.context.getTrackManager().getCurrTrack();
 		sampleBuffer.clear();
 		float numFrames = track.getNumFrames();
@@ -54,12 +54,12 @@ public class WaveformShape extends Shape {
 		updateWaveformVertices();
 	}
 
-	protected synchronized void updateVertices() {
+	protected void updateVertices() {
 		updateLoopSelectionVertices();
 		updateWaveformVertices();
 	}
 
-	public synchronized void update(float loopBeginX, float loopEndX, long offsetInFrames,
+	public void update(float loopBeginX, float loopEndX, long offsetInFrames,
 			long widthInFrames, float xOffset) {
 		boolean loopSelectionChanged = this.loopBeginX != loopBeginX || this.loopEndX != loopEndX;
 		this.loopBeginX = loopBeginX;
@@ -85,7 +85,7 @@ public class WaveformShape extends Shape {
 			updateWaveformVertices();
 	}
 
-	private synchronized void updateWaveformVertices() {
+	private void updateWaveformVertices() {
 		if (null == sampleBuffer)
 			return;
 
@@ -108,7 +108,7 @@ public class WaveformShape extends Shape {
 		}
 	}
 
-	private synchronized void updateLoopSelectionVertices() {
+	private void updateLoopSelectionVertices() {
 		fillVertex(x + loopBeginX, y);
 		fillVertex(x + loopBeginX, y + height);
 		fillVertex(x + loopEndX, y + height);

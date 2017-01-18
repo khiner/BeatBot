@@ -15,7 +15,8 @@ public class Rectangle extends Shape {
 	/********
 	 * ^--^ * |1/| * |/2| * ^--^ *
 	 ********/
-	protected synchronized void updateVertices() {
+	@Override
+	protected void updateVertices() {
 		fillVertex(x, y);
 		fillVertex(x, y + height);
 		fillVertex(x + width, y + height);

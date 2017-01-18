@@ -140,7 +140,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		horizontalScrollBar.setCornerRadius(getLabelHeight() / 5f);
 		for (int i = 0; i < loopMarkerLines.length; i++) {
 			loopMarkerLines[i].layout(absoluteX, absoluteY, 3, height);
@@ -425,7 +425,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		return loopPinchPointerId != -1;
 	}
 
-	private synchronized void noMidiMove() {
+	private void noMidiMove() {
 		if (pointerCount() == 1) {
 			if (selectRegionStartTick >= 0) {
 				selectRegion(getPointer());
@@ -491,7 +491,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		}
 	}
 
-	private synchronized void onTrackHeightChange() {
+	private void onTrackHeightChange() {
 		float trackHeight = getTotalTrackHeight();
 		float lineHeight = Math.min(trackHeight, height);
 		currTickLine.setDimensions(currTickLine.width, trackHeight);
@@ -602,7 +602,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		}
 	}
 
-	private synchronized void updateTickLineColors() {
+	private void updateTickLineColors() {
 		for (int i = 0; i < tickLines.length; i++) {
 			float[] lineColor = lineColor(i);
 			if (!tickLines[i].getStrokeColor().equals(lineColor)) {

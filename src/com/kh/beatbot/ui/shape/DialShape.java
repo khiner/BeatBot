@@ -49,7 +49,8 @@ public class DialShape extends Shape {
 				* radius + width / 2);
 	}
 
-	public synchronized void setFillColor(float[] fillColor) {
+	@Override
+	public void setFillColor(float[] fillColor) {
 		this.fillColor = fillColor;
 
 		for (int vertexIndex = 0; vertexIndex < levelVertex; vertexIndex++) {

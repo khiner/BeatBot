@@ -46,7 +46,7 @@ public class EffectPage extends TouchableView implements TouchableViewsListener 
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		paramsPager = new SwappingViewPager(this);
 		level2d = new Seekbar2d(this);
 
@@ -70,7 +70,7 @@ public class EffectPage extends TouchableView implements TouchableViewsListener 
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		float paramsPageWidth = width - height - BG_OFFSET * 2;
 		paramsPager.layout(this, BG_OFFSET, BG_OFFSET, paramsPageWidth, height - BG_OFFSET * 2);
 		level2d.layout(this, paramsPageWidth + BG_OFFSET * 4, BG_OFFSET * 2,

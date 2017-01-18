@@ -24,7 +24,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 		super(view);
 	}
 
-	public synchronized void onSelect(Track track) {
+	public void onSelect(Track track) {
 		for (int i = 0; i < ADSR.NUM_PARAMS; i++) {
 			track.getAdsrParam(i).removeListener(this);
 			track.getAdsrParam(i).addListener(this);
@@ -65,7 +65,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		initRoundedRect();
 		adsrShape = new AdsrShape(renderGroup, Color.TRON_BLUE, Color.TRON_BLUE_TRANS,
 				Color.TRON_BLUE);
@@ -74,7 +74,7 @@ public class AdsrView extends TouchableView implements ParamListener {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		adsrShape.layout(absoluteX, absoluteY, width, height);
 	}
 

@@ -22,7 +22,7 @@ public class TrackButtonRow extends TouchableView {
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		instrumentButton = new ToggleButton(this).withRoundedRect().withIcon(
 				IconResourceSets.INSTRUMENT_BASE);
 		muteButton = new ToggleButton(this).oscillating().withRoundedRect()
@@ -54,7 +54,7 @@ public class TrackButtonRow extends TouchableView {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		instrumentButton.layout(this, 0, 0, height, height);
 		muteButton.layout(this, height, 0, height * .72f, height);
 		soloButton.layout(this, height + muteButton.width, 0, height * .72f, height);

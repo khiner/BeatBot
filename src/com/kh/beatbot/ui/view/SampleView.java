@@ -48,7 +48,7 @@ public class SampleView extends View {
 	}
 
 	@Override
-	public synchronized void createChildren() {
+	public void createChildren() {
 		setIcon(IconResourceSets.SAMPLE_BG);
 		initRoundedRect();
 	}

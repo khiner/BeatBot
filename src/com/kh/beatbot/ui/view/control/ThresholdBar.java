@@ -18,7 +18,7 @@ public class ThresholdBar extends ControlView1dBase {
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		audioMeter = new AudioMeter(renderGroup, Color.VIEW_BG, null);
 		thresholdSelectTab = new RoundedRect(renderGroup, Color.TRON_BLUE_TRANS, null);
 
@@ -26,7 +26,7 @@ public class ThresholdBar extends ControlView1dBase {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		levelBarHeight = height / 3;
 
 		thresholdSelectTab.layout(absoluteX, absoluteY + (height - levelBarHeight * 2.5f) / 2,

@@ -30,7 +30,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		playButton = new ToggleButton(this).withIcon(IconResourceSets.PLAY);
 		stopButton = new Button(this).withIcon(IconResourceSets.STOP);
 		copyButton = new ToggleButton(this).withIcon(IconResourceSets.COPY);
@@ -122,7 +122,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		// left-aligned buttons
 		playButton.layout(this, 0, 0, height, height);
 		stopButton.layout(this, height, 0, height, height);

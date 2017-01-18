@@ -132,7 +132,7 @@ public class EffectSelectPage extends TrackPage {
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		effectNames = context.getResources().getStringArray(R.array.effect_names);
 		effectLabelList = new LabelList(this);
 		effectLabelList.setListener(new EffectLabelListListener(context));
@@ -143,7 +143,7 @@ public class EffectSelectPage extends TrackPage {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		effectLabelList.layout(this, BG_OFFSET, height / 4, width - BG_OFFSET * 2, height / 2);
 	}
 }

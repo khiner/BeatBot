@@ -49,7 +49,7 @@ public class NoteLevelsPage extends TrackPage {
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		noteLevelsView = new NoteLevelsView(this);
 		volumeButton = new ToggleButton(this).withRoundedRect().withIcon(IconResourceSets.VOLUME);
 		panButton = new ToggleButton(this).withRoundedRect().withIcon(IconResourceSets.PAN);
@@ -80,7 +80,7 @@ public class NoteLevelsPage extends TrackPage {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		float toggleHeight = height / 3;
 		float toggleWidth = 2 * toggleHeight;
 		volumeButton.layout(this, 0, 0, toggleWidth, toggleHeight);

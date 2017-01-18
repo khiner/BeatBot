@@ -19,14 +19,14 @@ public class ViewPager extends TouchableView {
 		return currPage;
 	}
 
-	public synchronized void setPage(View view) {
+	public void setPage(View view) {
 		if (!children.contains(view))
 			return;
 		currPage = view;
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		for (View child : children) {
 			child.layout(this, 0, 0, width, height);
 		}
@@ -40,7 +40,7 @@ public class ViewPager extends TouchableView {
 	}
 	
 	@Override
-	public synchronized View findChildAt(float x, float y) {
+	public View findChildAt(float x, float y) {
 		return currPage;
 	}
 }

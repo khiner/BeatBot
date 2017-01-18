@@ -21,7 +21,7 @@ public abstract class ControlView2dBase extends ControlViewBase implements Param
 
 	protected abstract float yToLevel(float y);
 
-	public synchronized void setParams(Param xParam, Param yParam) {
+	public void setParams(Param xParam, Param yParam) {
 		for (int i = 0; i < params.length; i++) {
 			if (params[i] != null) {
 				params[i].removeListener(this);

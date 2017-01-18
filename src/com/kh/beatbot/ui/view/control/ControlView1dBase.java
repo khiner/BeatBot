@@ -19,7 +19,7 @@ public abstract class ControlView1dBase extends ControlViewBase implements Param
 		super(view, renderGroup);
 	}
 
-	public synchronized void setParam(Param param) {
+	public void setParam(Param param) {
 		if (null == param)
 			return;
 		if (null != this.param) {

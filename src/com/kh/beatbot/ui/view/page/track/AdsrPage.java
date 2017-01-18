@@ -65,7 +65,7 @@ public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListe
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		adsrView = new AdsrView(this);
 		paramControl = new SeekbarParamControl(this);
 		adsrButtons = new ToggleButton[ADSR.NUM_PARAMS];
@@ -82,7 +82,7 @@ public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListe
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		float thirdHeight = height / 3;
 		float pos = width - thirdHeight * (adsrButtons.length + 1);
 		adsrView.layout(this, BG_OFFSET, BG_OFFSET, pos - BG_OFFSET * 2, height - BG_OFFSET * 2);

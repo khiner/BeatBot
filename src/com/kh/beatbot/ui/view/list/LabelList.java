@@ -164,7 +164,7 @@ public class LabelList extends TouchableView {
 			if (newPosition != initialTouchedPosition) {
 				labelListListener.labelMoved(initialTouchedPosition, newPosition);
 			}
-			parent.layoutChildren();
+			parent.layoutChildrenSynchronized();
 		}
 
 		@Override
@@ -173,7 +173,7 @@ public class LabelList extends TouchableView {
 			setPosition(x + pos.x - getPointer().downX, y);
 			if (Math.abs(x - originalX) > SNAP_DIST)
 				releaseLongPress();
-			parent.layoutChildren();
+			parent.layoutChildrenSynchronized();
 		}
 	}
 }

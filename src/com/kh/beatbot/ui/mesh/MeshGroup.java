@@ -162,7 +162,6 @@ public class MeshGroup {
 			vertices[offset + 4] = color[2];
 			vertices[offset + 5] = color[3];
 		}
-
 		dirty = true;
 	}
 

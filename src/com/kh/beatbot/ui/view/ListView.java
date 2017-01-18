@@ -13,7 +13,7 @@ public class ListView extends ScrollableView implements OnPressListener {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		float labelHeight = getLabelHeight();
 		float y = yOffset;
 		for (View child : children) {

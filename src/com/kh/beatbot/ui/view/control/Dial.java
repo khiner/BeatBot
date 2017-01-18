@@ -33,13 +33,13 @@ public class Dial extends ControlView1dBase {
 	}
 
 	@Override
-	public synchronized void createChildren() {
+	public void createChildren() {
 		knobShape = new DialShape(renderGroup, Color.TRON_BLUE, null);
 		addShapes(knobShape);
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		knobShape.layout(absoluteX, absoluteY, width, height);
 	}
 

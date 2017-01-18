@@ -31,7 +31,7 @@ public class FilterParamsGroup extends EffectParamsGroup {
 		filterToggles[0].setChecked(true);
 	}
 
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		float toggleY = 5;
 		float toggleW = width / 6;
 		float paramH = (height - toggleY - toggleW) / 2 - 10;

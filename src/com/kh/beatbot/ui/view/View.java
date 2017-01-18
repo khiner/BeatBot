@@ -57,7 +57,7 @@ public class View implements Comparable<View> {
 		this.renderGroup = shouldDraw ? new RenderGroup() : renderGroup;
 		textMesh = new TextMesh(this.renderGroup.getTextGroup());
 		textureMesh = new TextureMesh(this.renderGroup.getTextureGroup());
-		createChildren();
+		createChildrenSynchronized();
 		if (parent != null) {
 			parent.addChild(this);
 		}
@@ -135,7 +135,7 @@ public class View implements Comparable<View> {
 		return this;
 	}
 
-	public final synchronized void setIcon(IconResourceSet resourceSet) {
+	public final void setIcon(IconResourceSet resourceSet) {
 		if (resourceSet == null) {
 			textureMesh.hide();
 			bgShape.hide();
@@ -154,7 +154,7 @@ public class View implements Comparable<View> {
 		stateChanged();
 	}
 
-	public final synchronized void setColors(IconResourceSet resourceSet) {
+	public final void setColors(IconResourceSet resourceSet) {
 		icon.setFillColors(resourceSet);
 		icon.setStrokeColors(resourceSet);
 		stateChanged();
@@ -194,7 +194,7 @@ public class View implements Comparable<View> {
 		}
 	}
 
-	public synchronized void addShapes(Shape... shapes) {
+	public void addShapes(Shape... shapes) {
 		for (Shape shape : shapes) {
 			if (!this.shapes.contains(shape)) {
 				this.shapes.add(shape);
@@ -202,7 +202,7 @@ public class View implements Comparable<View> {
 		}
 	}
 
-	public synchronized void removeShape(Shape shape) {
+	public void removeShape(Shape shape) {
 		if (shape != null) {
 			shape.hide();
 			shapes.remove(shape);
@@ -218,7 +218,7 @@ public class View implements Comparable<View> {
 		this.height = height;
 	}
 
-	public void setPosition(float x, float y) {
+	public synchronized void setPosition(float x, float y) {
 		this.x = absoluteX = x;
 		this.y = absoluteY = y;
 
@@ -227,7 +227,7 @@ public class View implements Comparable<View> {
 			absoluteY += parent.absoluteY;
 		}
 		layoutShape();
-		layoutChildren();
+		layoutChildrenSynchronized();
 	}
 
 	public void setClip(boolean shouldClip) {
@@ -325,19 +325,27 @@ public class View implements Comparable<View> {
 	protected void createChildren() {
 	}
 
+	private synchronized void createChildrenSynchronized() {
+		createChildren();
+	}
+
+	public synchronized void layoutChildrenSynchronized() {
+		layoutChildren();
+	}
+
 	public void layoutChildren() {
 	}
 
 	protected void tick() {
 	}
 
-	protected synchronized void tickChildren() {
+	protected void draw() {
+	}
+
+	private synchronized void tickChildren() {
 		for (View child : children) {
 			child.tickAll();
 		}
-	}
-
-	protected void draw() {
 	}
 
 	protected synchronized void drawChildren() {
@@ -422,7 +430,7 @@ public class View implements Comparable<View> {
 		borderHeight = this.height - 2 * minY;
 	}
 
-	protected synchronized View findChildAt(float x, float y) {
+	protected View findChildAt(float x, float y) {
 		// reverse order to respect z-index (children are drawn in position order
 		for (int i = children.size() - 1; i >= 0; i--) {
 			final View child = children.get(i);

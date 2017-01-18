@@ -24,7 +24,7 @@ public class BrowsePage extends Menu implements TrackListener {
 		setScrollable(true, false);
 	}
 
-	protected synchronized void createMenuItems() {
+	protected void createMenuItems() {
 		setIcon(IconResourceSets.BROWSE_PAGE);
 		initRoundedRect();
 

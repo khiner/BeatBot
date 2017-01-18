@@ -35,7 +35,7 @@ public abstract class ScrollableView extends TouchableView {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		float prevChildWidth = childWidth;
 		float prevChildHeight = childHeight;
 		childWidth = getChildWidth();
@@ -86,7 +86,7 @@ public abstract class ScrollableView extends TouchableView {
 	}
 
 	@Override
-	public void tick() {
+	public synchronized void tick() {
 		if ((pointerCount() == 0
 				&& ((horizontal && Math.abs(xVelocity) >= THRESH) || (vertical && Math
 						.abs(yVelocity) >= THRESH)))) {
@@ -139,7 +139,7 @@ public abstract class ScrollableView extends TouchableView {
 		updateOffsets(pos);
 	}
 
-	private synchronized void updateOffsets(Pointer pos) {
+	private void updateOffsets(Pointer pos) {
 		if (horizontal && childWidth > width) {
 			float newX;
 			if (null == pos) {

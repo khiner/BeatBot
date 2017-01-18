@@ -35,7 +35,7 @@ public class TrackLevelsPage extends TrackPage implements TouchableViewsListener
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		volumeParamControl = new SeekbarParamControl(this, SeekbarPosition.CENTER,
 				BasePosition.LEFT).withLabelIcon(IconResourceSets.VOLUME);
 		panParamControl = new SeekbarParamControl(this, SeekbarPosition.CENTER, BasePosition.CENTER)
@@ -64,7 +64,7 @@ public class TrackLevelsPage extends TrackPage implements TouchableViewsListener
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		float toggleHeight = height / 3;
 		volumeParamControl.layout(this, 0, 0, width, toggleHeight);
 		panParamControl.layout(this, 0, toggleHeight, width, toggleHeight);
@@ -81,7 +81,7 @@ public class TrackLevelsPage extends TrackPage implements TouchableViewsListener
 		}
 
 		@Override
-		public synchronized void createChildren() {
+		public void createChildren() {
 			super.createChildren();
 			centValueLabel = new ValueLabel(this);
 			centValueLabel.setShrinkable(true);
@@ -121,7 +121,7 @@ public class TrackLevelsPage extends TrackPage implements TouchableViewsListener
 		}
 
 		@Override
-		public synchronized void layoutChildren() {
+		public void layoutChildren() {
 			label.layout(this, 0, 0, height * 2, height);
 			levelControl.layout(this, height * 2, 0, width - height * 6, height);
 			valueLabel.layout(this, width - height * 4, 0, height * 2, height);

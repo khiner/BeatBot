@@ -60,7 +60,7 @@ public class DelayParamsGroup extends EffectParamsGroup implements ParamListener
 		return this;
 	}
 
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		float halfWidth = width / 2;
 		float offset = height / 20;
 		float paramY = offset;

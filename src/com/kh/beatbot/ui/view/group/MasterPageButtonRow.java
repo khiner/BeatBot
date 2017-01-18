@@ -24,7 +24,7 @@ public class MasterPageButtonRow extends PageButtonRow {
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		super.createChildren();
 
 		getLevelsButton().setResourceId(IconResourceSets.LEVELS);
@@ -33,7 +33,7 @@ public class MasterPageButtonRow extends PageButtonRow {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		super.layoutChildren();
 
 		float x = addTrackButton.width;

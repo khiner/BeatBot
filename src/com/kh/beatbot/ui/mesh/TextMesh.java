@@ -11,7 +11,7 @@ public class TextMesh extends Mesh {
 		show();
 	}
 
-	public synchronized void setText(String text) {
+	public void setText(String text) {
 		if (null == text)
 			return;
 
@@ -25,7 +25,7 @@ public class TextMesh extends Mesh {
 		((TextureGroup) group).setText(this, text, x, y, height);
 	}
 
-	public synchronized void layout(float x, float y, float height) {
+	public void layout(float x, float y, float height) {
 		if (!isVisible())
 			return;
 		this.x = x;

@@ -22,7 +22,7 @@ public abstract class PageButtonRow extends TouchableView {
 	public abstract ToggleButton getLevelsButton();
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		pageButtons = new ToggleButton[getNumPages()];
 
 		for (int i = 0; i < getNumPages(); i++) {
@@ -61,7 +61,7 @@ public abstract class PageButtonRow extends TouchableView {
 		}
 	}
 
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		addTrackButton.layout(this, 0, 0, height, height);
 	}
 }

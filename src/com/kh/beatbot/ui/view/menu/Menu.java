@@ -41,7 +41,7 @@ public abstract class Menu extends ScrollableView implements MenuItemListener,
 		return menuLists.get(level);
 	}
 
-	public synchronized void createChildren() {
+	public void createChildren() {
 		menuLists = new ArrayList<ListView>();
 		topLevelItems = new ArrayList<MenuItem>();
 		createMenuItems();
@@ -50,7 +50,7 @@ public abstract class Menu extends ScrollableView implements MenuItemListener,
 		}
 	}
 
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		if (columnWidth <= 0) {
 			columnWidth = width;
 		}

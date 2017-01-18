@@ -12,7 +12,7 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		for (int i = 0; i < context.getTrackManager().getNumTracks(); i++) {
 			final Track track = context.getTrackManager().getTrackByNoteValue(i);
 			final TrackButtonRow buttonRow = track.getButtonRow();

@@ -27,7 +27,7 @@ public class BpmView extends LongPressableView implements TempoListener {
 	}
 
 	@Override
-	public synchronized void createChildren() {
+	public void createChildren() {
 		allNumberSegments = new NumberSegment[NUM_DIGITS][NUM_SEGMENTS];
 		setIcon(IconResourceSets.SEVEN_SEGMENT_BG);
 		initRoundedRect();
@@ -40,7 +40,7 @@ public class BpmView extends LongPressableView implements TempoListener {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		float height = this.height - BG_OFFSET * 2;
 		float longW = (width - BG_OFFSET * 2) / 12;
 		float longH = (height - longW) / 2;

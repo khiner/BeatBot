@@ -47,7 +47,7 @@ public class AdsrShape extends Shape {
 	}
 
 	@Override
-	public synchronized void layout(float x, float y, float width, float height) {
+	public void layout(float x, float y, float width, float height) {
 		super.layout(x, y, width, height);
 		for (Circle circle : circles) {
 			circle.setDimensions(width / 30, width / 30);

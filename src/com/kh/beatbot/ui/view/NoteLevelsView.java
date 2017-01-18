@@ -223,11 +223,9 @@ public class NoteLevelsView extends TouchableView {
 
 	public void draw() {
 		List<MidiNote> notes = ((Track) context.getTrackManager().getCurrTrack()).getMidiNotes();
-		synchronized (notes) {
-			for (MidiNote note : notes) {
-				drawLevel(note, calcLevelColor(note.isSelected()),
-						calcLevelColorTrans(note.isSelected()));
-			}
+		for (MidiNote note : notes) {
+			drawLevel(note, calcLevelColor(note.isSelected()),
+					calcLevelColorTrans(note.isSelected()));
 		}
 	}
 
@@ -314,7 +312,7 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		initRoundedRect();
 
 		levelBarGroup = new RenderGroup();
@@ -329,7 +327,7 @@ public class NoteLevelsView extends TouchableView {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		levelBarRect.layout(-LEVEL_BAR_WIDTH / 2, 0, LEVEL_BAR_WIDTH, height);
 		levelBarCircle.layout(0, 0, LEVEL_BAR_WIDTH, LEVEL_BAR_WIDTH);
 		levelBarSelectCircle.layout(0, 0, LEVEL_BAR_WIDTH * 2, LEVEL_BAR_WIDTH * 2);

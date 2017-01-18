@@ -86,12 +86,12 @@ public abstract class Mesh {
 		this.y = y;
 	}
 
-	public synchronized void setDimensions(float width, float height) {
+	public void setDimensions(float width, float height) {
 		this.width = width;
 		this.height = height;
 	}
 
-	public synchronized void layout(float x, float y, float width, float height) {
+	public void layout(float x, float y, float width, float height) {
 		setDimensions(width, height);
 		setPosition(x, y);
 	}

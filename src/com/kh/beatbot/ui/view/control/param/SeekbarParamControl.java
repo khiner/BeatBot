@@ -28,7 +28,7 @@ public class SeekbarParamControl extends LevelParamControl {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		switch (seekbarPosition) {
 		case BOTTOM:
 			layoutWithBottomSeekbar();

@@ -44,7 +44,8 @@ public class RoundedRect extends Shape {
 		return strokeIndices;
 	}
 
-	protected synchronized void updateVertices() {
+	@Override
+	protected void updateVertices() {
 		fillVertex(x + width / 2, y + height / 2); // center
 
 		roundThresh = cornerRadius / 30;
@@ -73,12 +74,12 @@ public class RoundedRect extends Shape {
 		}
 	}
 
-	public synchronized void setCornerRadius(float cornerRadius) {
+	public void setCornerRadius(float cornerRadius) {
 		this.cornerRadius = cornerRadius;
 	}
 
 	@Override
-	public synchronized void setDimensions(float width, float height) {
+	public void setDimensions(float width, float height) {
 		if (cornerRadius < 0) {
 			cornerRadius = width > height ? height / 4 : width / 4;
 		}

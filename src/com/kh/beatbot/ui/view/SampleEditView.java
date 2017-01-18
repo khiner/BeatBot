@@ -107,7 +107,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public synchronized void createChildren() {
+	public void createChildren() {
 		setIcon(IconResourceSets.SAMPLE_BG);
 		initRoundedRect();
 		currSampleRect = new Rectangle(renderGroup, Color.TRON_BLUE, null);
@@ -136,7 +136,7 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		currSampleRect.layout(absoluteX, absoluteY, 4, height);
 		for (final Button loopButton : loopButtons) {
 			loopButton.withCornerRadius(this.getCornerRadius());

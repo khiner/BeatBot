@@ -24,7 +24,7 @@ public abstract class Transition {
 		return currState;
 	}
 
-	public synchronized void tick() {
+	public void tick() {
 		switch (currState) {
 		case OFF:
 			return;

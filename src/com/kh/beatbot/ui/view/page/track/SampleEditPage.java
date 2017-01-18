@@ -57,7 +57,7 @@ public class SampleEditPage extends TrackPage implements TouchableViewsListener 
 	}
 
 	@Override
-	protected synchronized void createChildren() {
+	protected void createChildren() {
 		sampleEdit = new SampleEditView(this, null);
 		sampleEdit.setClip(true);
 		previewButton = new Button(this).withIcon(IconResourceSets.PREVIEW).withReleaseOnDragExit();
@@ -118,7 +118,7 @@ public class SampleEditPage extends TrackPage implements TouchableViewsListener 
 	}
 
 	@Override
-	public synchronized void layoutChildren() {
+	public void layoutChildren() {
 		float topBarH = height * .29f;
 		float fillH = height - topBarH;
 		float margin = width * .02f;
