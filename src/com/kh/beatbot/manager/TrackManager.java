@@ -2,7 +2,6 @@ package com.kh.beatbot.manager;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +26,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	public static final int MASTER_TRACK_ID = -1;
 
 	private final BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
-	private final List<Track> tracks = Collections.synchronizedList(new ArrayList<Track>());
+	private final List<Track> tracks = new ArrayList<Track>();
 	private final Set<TrackListener> trackListeners = new HashSet<TrackListener>();
 	private final Set<TrackLevelsEventListener> trackLevelsEventListeners = new HashSet<TrackLevelsEventListener>();
 
@@ -104,21 +103,17 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	public void deselectAllNotes() {
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				track.deselectAllNotes();
-			}
+		for (Track track : tracks) {
+			track.deselectAllNotes();
 		}
 	}
 
 	public List<MidiNote> copySelectedNotes() {
 		List<MidiNote> selectedNotesCopy = new ArrayList<MidiNote>();
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				for (MidiNote note : track.getMidiNotes()) {
-					if (note.isSelected()) {
-						selectedNotesCopy.add(note.getCopy());
-					}
+		for (Track track : tracks) {
+			for (MidiNote note : track.getMidiNotes()) {
+				if (note.isSelected()) {
+					selectedNotesCopy.add(note.getCopy());
 				}
 			}
 		}
@@ -127,11 +122,9 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	public List<MidiNote> copyMidiNotes() {
 		List<MidiNote> midiNotesCopy = new ArrayList<MidiNote>();
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				for (MidiNote note : track.getMidiNotes()) {
-					midiNotesCopy.add(note.getCopy());
-				}
+		for (Track track : tracks) {
+			for (MidiNote note : track.getMidiNotes()) {
+				midiNotesCopy.add(note.getCopy());
 			}
 		}
 		return midiNotesCopy;
@@ -139,12 +132,10 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	public List<MidiNote> getSelectedNotes() {
 		ArrayList<MidiNote> selectedNotes = new ArrayList<MidiNote>();
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				for (MidiNote note : track.getMidiNotes()) {
-					if (note.isSelected()) {
-						selectedNotes.add(note);
-					}
+		for (Track track : tracks) {
+			for (MidiNote note : track.getMidiNotes()) {
+				if (note.isSelected()) {
+					selectedNotes.add(note);
 				}
 			}
 		}
@@ -155,21 +146,19 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		if (tickDiff == 0)
 			return 0;
 		float adjustedTickDiff = tickDiff;
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				for (MidiNote note : track.getMidiNotes()) {
-					if (note.isSelected()) {
-						if (null != singleNote && !note.equals(singleNote))
-							continue;
-						if (Math.abs(startOnTick - note.getOnTick()) + Math.abs(tickDiff) <= 10) {
-							// inside threshold distance - set to original position
-							return startOnTick - note.getOnTick();
-						}
-						if (note.getOnTick() < -adjustedTickDiff) {
-							adjustedTickDiff = -note.getOnTick();
-						} else if (MidiManager.MAX_TICKS - note.getOffTick() < adjustedTickDiff) {
-							adjustedTickDiff = MidiManager.MAX_TICKS - note.getOffTick();
-						}
+		for (Track track : tracks) {
+			for (MidiNote note : track.getMidiNotes()) {
+				if (note.isSelected()) {
+					if (null != singleNote && !note.equals(singleNote))
+						continue;
+					if (Math.abs(startOnTick - note.getOnTick()) + Math.abs(tickDiff) <= 10) {
+						// inside threshold distance - set to original position
+						return startOnTick - note.getOnTick();
+					}
+					if (note.getOnTick() < -adjustedTickDiff) {
+						adjustedTickDiff = -note.getOnTick();
+					} else if (MidiManager.MAX_TICKS - note.getOffTick() < adjustedTickDiff) {
+						adjustedTickDiff = MidiManager.MAX_TICKS - note.getOffTick();
 					}
 				}
 			}
@@ -179,17 +168,15 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	public int getAdjustedNoteDiff(int noteDiff, MidiNote singleNote) {
 		int adjustedNoteDiff = noteDiff;
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				for (MidiNote note : track.getMidiNotes()) {
-					if (note.isSelected()) {
-						if (singleNote != null && !note.equals(singleNote))
-							continue;
-						if (note.getNoteValue() < -adjustedNoteDiff) {
-							adjustedNoteDiff = -note.getNoteValue();
-						} else if (tracks.size() - 1 - note.getNoteValue() < adjustedNoteDiff) {
-							adjustedNoteDiff = tracks.size() - 1 - note.getNoteValue();
-						}
+		for (Track track : tracks) {
+			for (MidiNote note : track.getMidiNotes()) {
+				if (note.isSelected()) {
+					if (singleNote != null && !note.equals(singleNote))
+						continue;
+					if (note.getNoteValue() < -adjustedNoteDiff) {
+						adjustedNoteDiff = -note.getNoteValue();
+					} else if (tracks.size() - 1 - note.getNoteValue() < adjustedNoteDiff) {
+						adjustedNoteDiff = tracks.size() - 1 - note.getNoteValue();
 					}
 				}
 			}
@@ -198,40 +185,32 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	public void selectRegion(long leftTick, long rightTick, int topNote, int bottomNote) {
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				track.selectRegion(leftTick, rightTick, topNote, bottomNote);
-			}
+		for (Track track : tracks) {
+			track.selectRegion(leftTick, rightTick, topNote, bottomNote);
 		}
 	}
 
 	public void saveNoteTicks() {
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				track.saveNoteTicks();
-			}
+		for (Track track : tracks) {
+			track.saveNoteTicks();
 		}
 	}
 
 	// return true if any Midi note exists
 	public boolean anyNotes() {
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				if (track.anyNotes()) {
-					return true;
-				}
+		for (Track track : tracks) {
+			if (track.anyNotes()) {
+				return true;
 			}
-			return false;
 		}
+		return false;
 	}
 
 	// return true if any Midi note is selected
 	public boolean anyNoteSelected() {
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				if (track.anyNoteSelected()) {
-					return true;
-				}
+		for (Track track : tracks) {
+			if (track.anyNoteSelected()) {
+				return true;
 			}
 		}
 		return false;
@@ -239,15 +218,13 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	public long[] getSelectedNoteTickWindow() {
 		long[] selectedNoteTickWindow = { Long.MAX_VALUE, Long.MIN_VALUE };
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				for (MidiNote note : track.getMidiNotes()) {
-					if (note.isSelected() && note.getOnTick() < selectedNoteTickWindow[0]) {
-						selectedNoteTickWindow[0] = note.getOnTick();
-					}
-					if (note.isSelected() && note.getOffTick() > selectedNoteTickWindow[1]) {
-						selectedNoteTickWindow[1] = note.getOffTick();
-					}
+		for (Track track : tracks) {
+			for (MidiNote note : track.getMidiNotes()) {
+				if (note.isSelected() && note.getOnTick() < selectedNoteTickWindow[0]) {
+					selectedNoteTickWindow[0] = note.getOnTick();
+				}
+				if (note.isSelected() && note.getOffTick() > selectedNoteTickWindow[1]) {
+					selectedNoteTickWindow[1] = note.getOffTick();
 				}
 			}
 		}
@@ -299,19 +276,15 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	public Track createTrack(int trackId, int position) {
 		createTrackNative(trackId);
 		final Track newTrack;
-		synchronized (tracks) {
-			newTrack = new Track(trackId);
-			tracks.add(position, newTrack);
-		}
+		newTrack = new Track(trackId);
+		tracks.add(position, newTrack);
 		onCreate(newTrack);
 		return newTrack;
 	}
 
 	private void quantizeEffectParams() {
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				track.quantizeEffectParams();
-			}
+		for (Track track : tracks) {
+			track.quantizeEffectParams();
 		}
 	}
 
@@ -320,10 +293,8 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	public void updateAllTrackNextNotes() {
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				track.updateNextNote();
-			}
+		for (Track track : tracks) {
+			track.updateNextNote();
 		}
 	}
 
@@ -341,14 +312,12 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	@Override
 	public void onDestroy(Track track) {
-		synchronized (tracks) {
-			tracks.remove(track);
-			for (int i = 0; i < tracks.size(); i++) {
-				tracks.get(i).setNoteValue(i);
-			}
-			if (!tracks.isEmpty()) {
-				tracks.get(Math.min(track.getId(), tracks.size() - 1)).select();
-			}
+		tracks.remove(track);
+		for (int i = 0; i < tracks.size(); i++) {
+			tracks.get(i).setNoteValue(i);
+		}
+		if (!tracks.isEmpty()) {
+			tracks.get(Math.min(track.getId(), tracks.size() - 1)).select();
 		}
 
 		for (TrackListener trackListener : trackListeners) {
@@ -368,11 +337,9 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 			currTrack = null;
 		}
 
-		synchronized (tracks) {
-			for (Track otherTrack : tracks) {
-				if (!track.equals(otherTrack)) {
-					otherTrack.getButtonRow().instrumentButton.setChecked(false);
-				}
+		for (Track otherTrack : tracks) {
+			if (!track.equals(otherTrack)) {
+				otherTrack.getButtonRow().instrumentButton.setChecked(false);
 			}
 		}
 		for (TrackListener trackListener : trackListeners) {
@@ -449,11 +416,9 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
 	@Override
 	public void onNameChange(File file, File newFile) {
-		synchronized (tracks) {
-			for (Track track : tracks) {
-				if (track.getCurrSampleFile().equals(file)) {
-					track.onNameChange(file, newFile);
-				}
+		for (Track track : tracks) {
+			if (track.getCurrSampleFile().equals(file)) {
+				track.onNameChange(file, newFile);
 			}
 		}
 	}
