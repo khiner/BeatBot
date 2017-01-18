@@ -20,6 +20,10 @@ public class FileManager implements FileListener {
 			".aiff", ".aifc", ".au", ".snd", ".raw", ".paf", ".iff", ".svx", ".sf", ".voc", ".w64",
 			".mat4", ".mat5", ".pvf", ".xi", ".htk", ".caf", ".sd2" };
 
+	public static final String[] SYSTEM_DIRECTORY_NAMES = {
+		"acct", "proc", "app-cache", "dev", "etc", "mnt", "sys", "system"
+	};
+
 	public static final String[] ASSET_TYPES = { "drums" };
 
 	private File filesDirectory, rootDirectory, audioDirectory, projectDirectory, midiDirectory,

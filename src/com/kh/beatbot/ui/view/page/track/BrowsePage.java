@@ -84,18 +84,32 @@ public class BrowsePage extends Menu implements TrackListener {
 		context.editFileName(fileItem.getFile());
 	}
 
+	private boolean isAudioFile(File file) {
+		for (String extension : FileManager.SUPPORTED_EXTENSIONS) {
+			if (file.getName().toLowerCase().endsWith(extension)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// exclude known system directories
+	private boolean isSystemDirectory(File file) {
+		for (String systemDirectoryName : FileManager.SYSTEM_DIRECTORY_NAMES) {
+			if (file.getName().toLowerCase().equals(systemDirectoryName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public boolean accept(File file) {
 		if (file.isDirectory()) {
 			File[] children = file.listFiles();
-			return children != null && children.length > 0;
+			return children != null && children.length > 0 && !isSystemDirectory(file);
 		} else {
-			for (String extension : FileManager.SUPPORTED_EXTENSIONS) {
-				if (file.getName().toLowerCase().endsWith(extension)) {
-					return true;
-				}
-			}
-			return false;
+			return isAudioFile(file);
 		}
 	}
 
