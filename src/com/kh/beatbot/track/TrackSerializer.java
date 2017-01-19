@@ -78,7 +78,7 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 
 		List<MidiNote> notes = GSON.fromJson(object.get("notes"), noteListType);
 		for (MidiNote note : notes) {
-			note.create();
+			note.createWithoutSelecting();
 		}
 
 		ADSR adsr = t.getAdsr();
