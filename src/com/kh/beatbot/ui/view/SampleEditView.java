@@ -35,6 +35,8 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	public synchronized void update() {
+		if (height <= 0) // uninitialized
+			return;
 		loopButtonW = height / 3;
 		waveformWidth = width - loopButtonW;
 

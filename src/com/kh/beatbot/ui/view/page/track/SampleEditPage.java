@@ -40,8 +40,13 @@ public class SampleEditPage extends TrackPage implements TouchableViewsListener 
 		loopEndControl.setParam(currTrack.getLoopEndParam());
 		gainControl.setParam(currTrack.getGainParam());
 
+		onSampleChange(currTrack);
+	}
+
+	@Override
+	public void onSampleChange(Track track) {
 		if (null != sampleEditView) {
-			sampleEditView.setParams(currTrack.getLoopBeginParam(), currTrack.getLoopEndParam());
+			sampleEditView.setParams(track.getLoopBeginParam(), track.getLoopEndParam());
 			sampleEditView.update();
 		}
 	}
