@@ -28,7 +28,7 @@ public class ListView extends ScrollableView implements OnPressListener {
 	@Override
 	public void handleActionUp(int index, Pointer pos) {
 		super.handleActionUp(index, pos);
-		shouldPropagateTouchEvents = true;
+		shouldPropagateMoveEvents = true;
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class ListView extends ScrollableView implements OnPressListener {
 						.isChecked()) && Math.abs(pos.y - pos.downY) > getLabelHeight() / 2) {
 			// scrolling, release the pressed button
 			selectedButton.release();
-			shouldPropagateTouchEvents = false;
+			shouldPropagateMoveEvents = false;
 		}
 	}
 

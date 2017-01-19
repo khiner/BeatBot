@@ -13,7 +13,7 @@ public class TouchableView extends View {
 	// to this window
 	protected SparseArray<Pointer> pointerById = new SparseArray<Pointer>();
 
-	protected boolean shouldPropagateTouchEvents = true, deselectOnPointerExit = true;
+	protected boolean shouldPropagateMoveEvents = true, deselectOnPointerExit = true;
 
 	protected TouchableViewListener listener;
 
@@ -93,9 +93,6 @@ public class TouchableView extends View {
 	 **********************************************************************/
 	public final void propagateActionDown(MotionEvent e, int id, float x, float y) {
 		consumeActionDown(id, x, y);
-		if (!shouldPropagateTouchEvents) {
-			return;
-		}
 		x += getXTouchTranslate();
 		y += getYTouchTranslate();
 		View child = findChildAt(x, y);
@@ -105,19 +102,14 @@ public class TouchableView extends View {
 	}
 
 	public final void propagateActionUp(MotionEvent e, int id, float x, float y) {
-		if (shouldPropagateTouchEvents) {
-			TouchableView child = whichChildOwnsPointer(id);
-			if (child != null)
-				child.propagateActionUp(e, id, x - child.x, y - child.y);
-		}
+		TouchableView child = whichChildOwnsPointer(id);
+		if (child != null)
+			child.propagateActionUp(e, id, x - child.x, y - child.y);
 		consumeActionUp(id, x, y);
 	}
 
 	public final void propagateActionPointerDown(MotionEvent e, int id, float x, float y) {
 		consumeActionPointerDown(id, x, y);
-		if (!shouldPropagateTouchEvents) {
-			return;
-		}
 		x += getXTouchTranslate();
 		y += getYTouchTranslate();
 		View child = findChildAt(x, y);
@@ -131,14 +123,12 @@ public class TouchableView extends View {
 	}
 
 	public final void propagateActionPointerUp(MotionEvent e, int id, float x, float y) {
-		if (shouldPropagateTouchEvents) {
-			TouchableView child = whichChildOwnsPointer(id);
-			if (child != null) {
-				if (child.pointerCount() == 1)
-					child.propagateActionUp(e, id, x - child.x, y - child.y);
-				else
-					child.propagateActionPointerUp(e, id, x - child.x, y - child.y);
-			}
+		TouchableView child = whichChildOwnsPointer(id);
+		if (child != null) {
+			if (child.pointerCount() == 1)
+				child.propagateActionUp(e, id, x - child.x, y - child.y);
+			else
+				child.propagateActionPointerUp(e, id, x - child.x, y - child.y);
 		}
 
 		consumeActionPointerUp(id, x, y);
@@ -146,7 +136,7 @@ public class TouchableView extends View {
 
 	public final void propagateActionMove(MotionEvent e, int id, float x, float y) {
 		consumeActionMove(id, x, y);
-		if (!shouldPropagateTouchEvents) {
+		if (!shouldPropagateMoveEvents) {
 			return;
 		}
 		TouchableView child = whichChildOwnsPointer(id);
