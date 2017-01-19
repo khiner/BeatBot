@@ -96,7 +96,7 @@ public class Param {
 		return beatSyncable;
 	}
 
-	public void setLevel(float level) {
+	public boolean setLevelWithoutNotify(float level) {
 		level = GeneralUtils.clipTo(level, minViewLevel, maxViewLevel);
 		float prevLevel = this.viewLevel;
 		viewLevel = level;
@@ -110,8 +110,11 @@ public class Param {
 		if (snap) {
 			this.level = Math.round(this.level);
 		}
+		return this.viewLevel != prevLevel;
+	}
 
-		if (this.viewLevel != prevLevel) {
+	public void setLevel(float level) {
+		if (setLevelWithoutNotify(level)) {
 			notifyListeners();
 		}
 	}

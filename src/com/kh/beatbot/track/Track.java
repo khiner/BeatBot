@@ -296,10 +296,13 @@ public class Track extends BaseTrack implements FileListener {
 		View.context.getTrackManager().onLoopChange(this, isLooping());
 	}
 
-	// set play mode to reverse
-	public void setReverse(boolean reverse) {
+	public void setReverseWithoutNotify(boolean reverse) {
 		setTrackReverse(id, reverse);
 		this.reverse = reverse;
+	}
+
+	public void setReverse(boolean reverse) {
+		setReverseWithoutNotify(reverse);
 		View.context.getTrackManager().onReverseChange(this, reverse);
 	}
 

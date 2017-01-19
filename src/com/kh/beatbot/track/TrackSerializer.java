@@ -70,10 +70,10 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 				Log.e(getClass().getName(), e.toString());
 			}
 
-			t.setSampleLoopWindow(object.get("sampleLoopBegin").getAsFloat(),
-					object.get("sampleLoopEnd").getAsFloat());
-			t.setSampleGain(object.get("gain").getAsFloat());
-			t.setReverse(object.get("reverse").getAsBoolean());
+			t.getLoopBeginParam().setLevelWithoutNotify(object.get("sampleLoopBegin").getAsFloat());
+			t.getLoopEndParam().setLevelWithoutNotify(object.get("sampleLoopEnd").getAsFloat());
+			t.getGainParam().setLevelWithoutNotify(object.get("gain").getAsFloat());
+			t.setReverseWithoutNotify(object.get("reverse").getAsBoolean());
 		}
 
 		List<MidiNote> notes = GSON.fromJson(object.get("notes"), noteListType);
