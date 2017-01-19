@@ -99,6 +99,8 @@ public abstract class Shape {
 	}
 
 	public void setPosition(float x, float y) {
+		if (this.x == x && this.y == y)
+			return;
 		this.x = x;
 		this.y = y;
 		fillMesh.setPosition(x, y);
@@ -106,6 +108,8 @@ public abstract class Shape {
 	}
 
 	public void setDimensions(float width, float height) {
+		if (this.width == width && this.height == height)
+			return;
 		this.width = width;
 		this.height = height;
 		fillMesh.setDimensions(width, height);
