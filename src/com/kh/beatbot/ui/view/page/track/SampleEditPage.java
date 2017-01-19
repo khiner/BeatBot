@@ -20,7 +20,7 @@ import com.kh.beatbot.ui.view.control.ToggleButton;
 import com.kh.beatbot.ui.view.control.param.ParamControl;
 
 public class SampleEditPage extends TrackPage implements TouchableViewsListener {
-	public SampleEditView sampleEdit;
+	public SampleEditView sampleEditView;
 	private Button previewButton;
 	private ToggleButton loopButton, reverseButton;
 	private ParamControl loopBeginControl, loopEndControl, gainControl;
@@ -40,9 +40,9 @@ public class SampleEditPage extends TrackPage implements TouchableViewsListener 
 		loopEndControl.setParam(currTrack.getLoopEndParam());
 		gainControl.setParam(currTrack.getGainParam());
 
-		if (null != sampleEdit) {
-			sampleEdit.setParams(currTrack.getLoopBeginParam(), currTrack.getLoopEndParam());
-			sampleEdit.update();
+		if (null != sampleEditView) {
+			sampleEditView.setParams(currTrack.getLoopBeginParam(), currTrack.getLoopEndParam());
+			sampleEditView.update();
 		}
 	}
 
@@ -58,8 +58,8 @@ public class SampleEditPage extends TrackPage implements TouchableViewsListener 
 
 	@Override
 	protected void createChildren() {
-		sampleEdit = new SampleEditView(this, null);
-		sampleEdit.setClip(true);
+		sampleEditView = new SampleEditView(this, null);
+		sampleEditView.setClip(true);
 		previewButton = new Button(this).withIcon(IconResourceSets.PREVIEW).withReleaseOnDragExit();
 		loopButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.LOOP);
 		reverseButton = new ToggleButton(this).oscillating().withIcon(IconResourceSets.REVERSE);
@@ -114,7 +114,7 @@ public class SampleEditPage extends TrackPage implements TouchableViewsListener 
 		loopEndControl.setLabelText("End");
 		gainControl.setLabelText("Gain");
 
-		new MultiViewTouchTracker(this).monitorViews(loopBeginControl, loopEndControl, sampleEdit);
+		new MultiViewTouchTracker(this).monitorViews(loopBeginControl, loopEndControl, sampleEditView);
 	}
 
 	@Override
@@ -133,7 +133,7 @@ public class SampleEditPage extends TrackPage implements TouchableViewsListener 
 		loopBeginControl.layout(this, loopEndControl.x - topBarH * 5 - margin, 0, topBarH * 5,
 				topBarH);
 
-		sampleEdit.layout(this, fillH, topBarH, width - fillH / 2 - fillH - margin * 2, fillH);
+		sampleEditView.layout(this, fillH, topBarH, width - fillH / 2 - fillH - margin * 2, fillH);
 	}
 
 	@Override

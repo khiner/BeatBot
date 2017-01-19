@@ -36,7 +36,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	private TrackLevelsPage levelsPage;
 	private EffectSelectPage effectSelectPage;
 	private BrowsePage browsePage;
-	private SampleEditPage editPage;
+	private SampleEditPage sampleEditPage;
 	private AdsrPage adsrPage;
 	private RecordPage recordPage;
 	private TempoPage tempoPage;
@@ -76,7 +76,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	}
 
 	public SampleEditPage getEditPage() {
-		return editPage;
+		return sampleEditPage;
 	}
 
 	public void selectEditPage() {
@@ -110,7 +110,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		effectSelectPage = new EffectSelectPage(pager);
 		browsePage = new BrowsePage(pager, null);
 		browsePage.setClip(true);
-		editPage = new SampleEditPage(pager);
+		sampleEditPage = new SampleEditPage(pager);
 		adsrPage = new AdsrPage(pager);
 		noteLevelsPage = new NoteLevelsPage(pager);
 		recordPage = new RecordPage(pager);
@@ -125,7 +125,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 		pager.addPage(trackButtonRow.getBrowseButton(), browsePage);
 		pager.addPage(trackButtonRow.getLevelsButton(), levelsPage);
 		pager.addPage(trackButtonRow.getEffectsButton(), effectSelectPage);
-		pager.addPage(trackButtonRow.getEditButton(), editPage);
+		pager.addPage(trackButtonRow.getEditButton(), sampleEditPage);
 		pager.addPage(trackButtonRow.getAdsrButton(), adsrPage);
 		pager.addPage(trackButtonRow.getNoteLevelsButton(), noteLevelsPage);
 		pager.addPage(trackButtonRow.getRecordButton(), recordPage);
@@ -199,13 +199,13 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 	@Override
 	public void onReverseChange(Track track, boolean reverse) {
 		selectEditPage();
-		editPage.onReverseChange(track, reverse);
+		sampleEditPage.onReverseChange(track, reverse);
 	}
 
 	@Override
 	public void onLoopChange(Track track, boolean loop) {
 		selectEditPage();
-		editPage.onLoopChange(track, loop);
+		sampleEditPage.onLoopChange(track, loop);
 	}
 
 	@Override

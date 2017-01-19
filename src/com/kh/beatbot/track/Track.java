@@ -436,7 +436,7 @@ public class Track extends BaseTrack implements FileListener {
 		public void onParamChange(Param param) {
 			if (param.equals(gainParam)) {
 				updateGain();
-				View.context.getPageSelectGroup().getEditPage().sampleEdit.onParamChange(param);
+				View.context.getPageSelectGroup().getEditPage().sampleEditView.onParamChange(param);
 			} else {
 				float minLoopWindow = loopEndParam.getViewLevel(MIN_LOOP_WINDOW);
 				loopBeginParam.maxViewLevel = loopEndParam.viewLevel - minLoopWindow;
