@@ -149,6 +149,8 @@ public class SampleEditView extends ControlView2dBase {
 
 	@Override
 	public void tick() {
+		if (!(context.getTrackManager().getCurrTrack() instanceof Track))
+			return;
 		final Track track = (Track) context.getTrackManager().getCurrTrack();
 		if (hasSample() && (track.isSounding())) {
 			currSampleRect.show();
