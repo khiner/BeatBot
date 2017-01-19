@@ -2,6 +2,7 @@ package com.kh.beatbot.ui.view;
 
 import com.kh.beatbot.event.track.TrackMuteEvent;
 import com.kh.beatbot.event.track.TrackSoloEvent;
+import com.kh.beatbot.listener.OnLongPressListener;
 import com.kh.beatbot.listener.OnReleaseListener;
 import com.kh.beatbot.track.Track;
 import com.kh.beatbot.ui.icon.IconResourceSets;
@@ -39,6 +40,14 @@ public class TrackButtonRow extends TouchableView {
 				track.select();
 			}
 		});
+		
+		instrumentButton.setOnLongPressListener(new OnLongPressListener() {
+			@Override
+			public void onLongPress(Button button) {
+				View.context.getTrackManager().selectTrackNotesExclusive(track);
+			}
+		});
+
 		muteButton.setOnReleaseListener(new OnReleaseListener() {
 			@Override
 			public void onRelease(Button button) {

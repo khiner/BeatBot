@@ -97,9 +97,9 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 		}
 	}
 
-	public void selectRow(int rowNum) {
+	public void selectTrackNotesExclusive(Track track) {
 		deselectAllNotes();
-		getTrackByNoteValue(rowNum).selectAllNotes();
+		track.selectAllNotes();
 	}
 
 	public void deselectAllNotes() {
