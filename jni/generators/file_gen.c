@@ -33,6 +33,7 @@ FileGen *filegen_create() {
 	fileGen->sampleFile = NULL;
 	fileGen->looping = fileGen->reverse = false;
 	fileGen->adsr = adsrconfig_create();
+	fileGen->sampleRate = 1;
 	return fileGen;
 }
 

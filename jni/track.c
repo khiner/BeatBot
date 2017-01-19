@@ -73,7 +73,7 @@ void createTrack(Track *track) {
 	if (trackHead == NULL ) {
 		trackHead = new;
 	} else {
-		// insert as last effect
+		// insert as last track
 		TrackNode *cur_ptr = trackHead;
 		while (cur_ptr->next != NULL ) {
 			cur_ptr = cur_ptr->next;
@@ -155,9 +155,10 @@ void updateChannelScaleValues(Levels *levels, MidiEvent *midiEvent) {
 
 void setPitch(Track *track, MidiEvent *midiEvent) {
 	if (NULL != track->generator) {
-		float sampleRate = transposeStepsToScaleValue(
-				masterLevels->pitchSteps + track->levels->pitchSteps
-						+ midiEvent->pitchSteps);
+		float totalPitchSteps = masterLevels->pitchSteps + track->levels->pitchSteps;
+		if (midiEvent != NULL)
+			totalPitchSteps += midiEvent->pitchSteps;
+		float sampleRate = transposeStepsToScaleValue(totalPitchSteps);
 		((FileGen *) track->generator->config)->sampleRate = sampleRate;
 	}
 }
@@ -183,6 +184,7 @@ Levels *initLevels() {
 	levels->volume = dbToLinear(0);
 	levels->pan = panToScaleValue(0);
 	levels->pitchSteps = 0;
+
 	updateChannelScaleValues(levels, NULL );
 
 	int effectNum;
@@ -398,10 +400,10 @@ jstring Java_com_kh_beatbot_track_Track_setSample(JNIEnv *env, jclass clazz,
 	fileGen->gain = dbToLinear(0); // reset gain to 0
 	const char *nativeSampleName = (*env)->GetStringUTFChars(env, sampleName, 0);
 	setSample(track, nativeSampleName);
+	pthread_mutex_unlock(&openSlOut->trackMutex);
 
 	// release string memory
 	(*env)->ReleaseStringUTFChars(env, sampleName, nativeSampleName);
-	pthread_mutex_unlock(&openSlOut->trackMutex); // TODO try moving up
 
 	return (*env)->NewStringUTF(env, sf_strerror(NULL ));
 }

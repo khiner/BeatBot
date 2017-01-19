@@ -70,8 +70,8 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 				Log.e(getClass().getName(), e.toString());
 			}
 
-			t.setSampleLoopWindow(object.get("sample_loop_begin").getAsFloat(),
-					object.get("sample_loop_end").getAsFloat());
+			t.setSampleLoopWindow(object.get("sampleLoopBegin").getAsFloat(),
+					object.get("sampleLoopEnd").getAsFloat());
 			t.setSampleGain(object.get("gain").getAsFloat());
 			t.setReverse(object.get("reverse").getAsBoolean());
 		}
@@ -114,8 +114,8 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
 
 			if (t.getCurrSampleFile() != null) {
 				object.addProperty("samplePath", t.getCurrSampleFile().getAbsolutePath());
-				object.addProperty("sample_loop_begin", t.getLoopBeginParam().viewLevel);
-				object.addProperty("sample_loop_end", t.getLoopEndParam().viewLevel);
+				object.addProperty("sampleLoopBegin", t.getLoopBeginParam().viewLevel);
+				object.addProperty("sampleLoopEnd", t.getLoopEndParam().viewLevel);
 				object.addProperty("gain", t.getGainParam().viewLevel);
 				object.addProperty("reverse", t.isReverse());
 			}
