@@ -174,15 +174,6 @@ public class MidiNote implements Comparable<MidiNote> {
 				getNoteValue(), getOnTick(), getOffTick());
 	}
 
-	public void setNoteWithoutNotify(int note) {
-		if (note < 0 || getNoteValue() == note)
-			return;
-
-		noteOn.setNoteValue(note);
-		noteOff.setNoteValue(note);
-		View.context.getMainPage().onMove(this, 0, 0, 0, 0, 0, 0);
-	}
-
 	public long getNoteLength() {
 		return noteOff.getTick() - noteOn.getTick();
 	}
