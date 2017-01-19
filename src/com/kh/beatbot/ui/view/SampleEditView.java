@@ -28,6 +28,8 @@ public class SampleEditView extends ControlView2dBase {
 	// Keep track of that with offset and width.
 	private float levelOffset = 0, levelWidth = 0, waveformWidth = 0, loopButtonW = 0;
 
+	private boolean needsResample = false;
+
 	public SampleEditView(View view, RenderGroup renderGroup) {
 		super(view, renderGroup);
 	}
@@ -194,8 +196,11 @@ public class SampleEditView extends ControlView2dBase {
 	}
 
 	private void setLevel(float levelOffset, float levelWidth) {
-		this.levelOffset = levelOffset;
-		this.levelWidth = levelWidth;
+		if (this.levelOffset != levelOffset || this.levelWidth != levelWidth) {
+			this.levelOffset = levelOffset;
+			this.levelWidth = levelWidth;
+			needsResample = true;
+		}
 		updateWaveformVb();
 	}
 
@@ -228,7 +233,10 @@ public class SampleEditView extends ControlView2dBase {
 		super.handleActionUp(id, pos);
 		if (!hasSample())
 			return;
-		waveformShape.resample();
+		if (needsResample) {
+			waveformShape.resample();
+		}
+		needsResample = false;
 		scrollPointerId = zoomLeftPointerId = zoomRightPointerId = -1;
 	}
 
