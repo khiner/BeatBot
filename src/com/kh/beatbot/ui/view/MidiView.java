@@ -156,6 +156,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 				.getLoopEndTick());
 		updateCurrentTick();
 		scrollHelper.setYOffset(0);
+		layoutNotes();
 	}
 
 	@Override

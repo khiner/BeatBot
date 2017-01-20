@@ -82,6 +82,7 @@ public class ProjectFile {
 			trackFromJson(serializedTrack);
 		}
 
+		View.context.getTrackManager().deselectAllNotes();
 		View.context.getTrackManager().getBaseTrackById(
 				globalProperties.get(CURR_TRACK_ID).getAsInt()).select();
 		View.context.getPageSelectGroup().selectPage(

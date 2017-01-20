@@ -32,11 +32,6 @@ public class MidiNote implements Comparable<MidiNote> {
 		selected = true;
 		View.context.getMidiManager().onCreate(this);
 	}
-	
-	// useful for track loading rather than live (manual) note additions
-	public void createWithoutSelecting() {
-		View.context.getMidiManager().onCreate(this);
-	}
 
 	public void destroy() {
 		View.context.getMidiManager().onDestroy(this);
