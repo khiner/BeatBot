@@ -156,8 +156,13 @@ public class SampleEditView extends ControlView2dBase {
 		final Track track = (Track) context.getTrackManager().getCurrTrack();
 		if (hasSample() && (track.isSounding())) {
 			currSampleRect.show();
-			float x = levelToX(params[0].getViewLevel(track.getCurrentFrame()));
-			currSampleRect.setPosition(absoluteX + x, absoluteY);
+			final float currentFrameViewLevel = params[0].getViewLevel(track.getCurrentFrame());
+			if (currentFrameViewLevel >= track.getLoopEndParam().viewLevel) {
+				track.stopPreviewing();
+				currSampleRect.hide();
+			} else { 
+				currSampleRect.setPosition(absoluteX + levelToX(currentFrameViewLevel), absoluteY);
+			}
 		} else {
 			currSampleRect.hide();
 		}
