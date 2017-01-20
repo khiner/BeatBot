@@ -54,6 +54,8 @@ public class SampleEditView extends ControlView2dBase {
 			setLevel(0, 1);
 			waveformShape.resample();
 			setText("");
+			currSampleRect.show(); // total hack to fix an extra line at the end of waveform :( has something to do with resetting indices
+			currSampleRect.hide();
 		} else {
 			if (null != waveformShape) {
 				removeShape(waveformShape);
