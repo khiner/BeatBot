@@ -199,13 +199,18 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		selectMidiNote(id, pos);
 		if (pointerCount() > 2 || null != touchedNotes.get(id))
 			return;
-		float leftTick = xToTick(Math.min(pointerById.get(0).x, pointerById.get(1).x));
-		float rightTick = xToTick(Math.max(pointerById.get(0).x, pointerById.get(1).x));
+		Pointer firstPointer = pointerById.get(0);
+		Pointer secondPointer = pointerById.get(1);
+		if (firstPointer == null || secondPointer == null)
+			return; // shouldn't ever happen
+
+		float leftTick = xToTick(Math.min(firstPointer.x, secondPointer.x));
+		float rightTick = xToTick(Math.max(firstPointer.x, secondPointer.x));
 		if (!touchedNotes.isEmpty()) {
 			long[] selectedNoteTickWindow = context.getTrackManager().getSelectedNoteTickWindow();
 			// note is selected with one pointer, but this pointer
 			// did not select a note. start pinching all selected notes.
-			pinchLeftPointerId = pointerById.get(0).x <= pointerById.get(1).x ? 0 : 1;
+			pinchLeftPointerId = firstPointer.x <= secondPointer.x ? 0 : 1;
 			pinchRightPointerId = (pinchLeftPointerId + 1) % 2;
 			pinchLeftOffset = leftTick - selectedNoteTickWindow[0];
 			pinchRightOffset = selectedNoteTickWindow[1] - rightTick;
@@ -272,7 +277,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 		}
 		if (zoomLeftAnchorTick != -1) {
 			int otherId = id == 0 ? 1 : 0;
-			scrollHelper.setScrollAnchor(otherId, xToTick(pointerById.get(otherId).x));
+			Pointer otherPointer = pointerById.get(otherId);
+			if (otherPointer != null) {
+				scrollHelper.setScrollAnchor(otherId, xToTick(otherPointer.x));
+			}
 		}
 		touchedNotes.remove(id);
 	}
@@ -435,9 +443,13 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 			}
 		} else if (pointerCount() == 2) {
 			// two finger zoom
-			float leftX = Math.min(pointerById.get(0).x, pointerById.get(1).x);
-			float rightX = Math.max(pointerById.get(0).x, pointerById.get(1).x);
-			scrollHelper.zoom(leftX, rightX, zoomLeftAnchorTick, zoomRightAnchorTick);
+			Pointer leftPointer = pointerById.get(0);
+			Pointer rightPointer = pointerById.get(1);
+			if (leftPointer != null && rightPointer != null) {
+				float leftX = Math.min(pointerById.get(0).x, pointerById.get(1).x);
+				float rightX = Math.max(pointerById.get(0).x, pointerById.get(1).x);
+				scrollHelper.zoom(leftX, rightX, zoomLeftAnchorTick, zoomRightAnchorTick);
+			}
 		}
 	}
 
