@@ -13,6 +13,7 @@ import com.kh.beatbot.ui.view.View;
 
 public class ProjectFileManager {
 	private static final String PROJECT_FILE_EXTENSION = ".bb";
+	private static final String RECOVER_PROJECT_NAME = "recover_project";
 
 	private String projectFileName, pendingFileName;
 	private AlertDialog confirmLoadAlert, fileExistsAlert;
@@ -55,9 +56,9 @@ public class ProjectFileManager {
 		return projectFileName;
 	}
 
-	public void saveProject(final String fileName) {
+	public void saveProject(final String fileName, final boolean force) {
 		pendingFileName = fileName;
-		if (!new File(getFullPathName(fileName)).exists()) {
+		if (force || !new File(getFullPathName(fileName)).exists()) {
 			completeSave();
 		} else {
 			// file exists - popup dialog confirming overwrite of existing file
@@ -74,6 +75,25 @@ public class ProjectFileManager {
 		}
 	}
 
+	public void saveRecoverProject() {
+		saveProject(RECOVER_PROJECT_NAME, true);
+	}
+
+	public boolean importRecoverProject(final BeatBotActivity context) {
+		if (!new File(getFullPathName(RECOVER_PROJECT_NAME)).exists())
+			return false;
+		pendingFileName = RECOVER_PROJECT_NAME;
+		completeLoad(context);
+		return true;
+	}
+
+	public void deleteRecoverProject() {
+		final File recoverProjectFile = new File(getFullPathName(RECOVER_PROJECT_NAME));
+		if (recoverProjectFile.exists()) {
+			recoverProjectFile.delete();
+		}
+	}
+	
 	public static boolean isProjectFileName(final String fileName) {
 		return fileName.toLowerCase().endsWith(PROJECT_FILE_EXTENSION);
 	}

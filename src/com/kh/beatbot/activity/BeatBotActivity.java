@@ -61,6 +61,8 @@ public class BeatBotActivity extends Activity {
 	private FontTextureAtlas fontTextureAtlas;
 	private ResourceTextureAtlas resourceTextureAtlas;
 
+	private boolean intentionalClose = false;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -108,7 +110,9 @@ public class BeatBotActivity extends Activity {
 
 		createEngine();
 		createAudioPlayer();
-		setupDefaultProject();
+		if (!projectFileManager.importRecoverProject(this)) {
+			setupDefaultProject();
+		}
 		arm();
 	}
 
@@ -123,8 +127,13 @@ public class BeatBotActivity extends Activity {
 
 	@Override
 	public void onPause() {
-		surfaceViewBase.setVisibility(android.view.View.GONE);
-		// root.onPause();
+		// Don't deal with EGL context restoring/etc, which is a fucking nightmare.
+		// Instead, save and restore entire project if we have time
+		// and load it up again on the next startup
+		if (!intentionalClose) {
+			projectFileManager.saveRecoverProject();
+		}
+		finish();
 		super.onPause();
 	}
 
@@ -213,7 +222,7 @@ public class BeatBotActivity extends Activity {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							String projectFileName = projectFileNameInput.getText().toString();
-							projectFileManager.saveProject(projectFileName);
+							projectFileManager.saveProject(projectFileName, false);
 						}
 					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 						@Override
@@ -248,6 +257,8 @@ public class BeatBotActivity extends Activity {
 					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
+							projectFileManager.deleteRecoverProject();
+							intentionalClose = true;
 							finish();
 						}
 					}).setNegativeButton("No", null);
