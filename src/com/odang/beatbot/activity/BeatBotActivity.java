@@ -127,6 +127,7 @@ public class BeatBotActivity extends Activity {
 
 	@Override
 	public void onPause() {
+		surfaceViewBase.setVisibility(android.view.View.GONE);
 		// Don't deal with EGL context restoring/etc, which is a fucking nightmare.
 		// Instead, save and restore entire project if we have time
 		// and load it up again on the next startup
