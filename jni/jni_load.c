@@ -58,7 +58,7 @@ JavaVM* getJavaVm() {
 	return javaVm;
 }
 
-void Java_com_kh_beatbot_activity_BeatBotActivity_onRecordManagerInit(
+void Java_com_odang_beatbot_activity_BeatBotActivity_onRecordManagerInit(
 		JNIEnv *env, jclass clazz, jobject _recordManager) {
 	recordManager = (jobject) (*env)->NewGlobalRef(env, _recordManager);
 	jclass recordManagerClass = (*env)->GetObjectClass(env, recordManager);
@@ -68,10 +68,10 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_onRecordManagerInit(
 			"startRecording", "()Ljava/lang/String;");
 }
 
-void Java_com_kh_beatbot_activity_BeatBotActivity_onTrackManagerInit(
+void Java_com_odang_beatbot_activity_BeatBotActivity_onTrackManagerInit(
 		JNIEnv *env, jclass clazz, jobject _trackManager) {
 	trackManager = (jobject) (*env)->NewGlobalRef(env, _trackManager);
 	jclass trackManagerClass = (*env)->GetObjectClass(env, trackManager);
 	getNextMidiNote = (*env)->GetMethodID(env, trackManagerClass,
-			"getNextMidiNote", "(IJ)Lcom/kh/beatbot/midi/MidiNote;");
+			"getNextMidiNote", "(IJ)Lcom/odang/beatbot/midi/MidiNote;");
 }

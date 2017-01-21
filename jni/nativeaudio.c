@@ -142,17 +142,17 @@ void mixTracks() {
 	}
 }
 
-void Java_com_kh_beatbot_track_Track_previewTrack(JNIEnv *env, jclass clazz,
+void Java_com_odang_beatbot_track_Track_previewTrack(JNIEnv *env, jclass clazz,
 		jint trackId) {
 	previewTrack(getTrack(trackId));
 }
 
-void Java_com_kh_beatbot_track_Track_stopPreviewingTrack(JNIEnv *env,
+void Java_com_odang_beatbot_track_Track_stopPreviewingTrack(JNIEnv *env,
 		jclass clazz, jint trackId) {
 	stopPreviewingTrack(getTrack(trackId));
 }
 
-void Java_com_kh_beatbot_track_Track_stopTrack(JNIEnv *env, jclass clazz,
+void Java_com_odang_beatbot_track_Track_stopTrack(JNIEnv *env, jclass clazz,
 		jint trackId) {
 	stopTrack(getTrack(trackId));
 }
@@ -259,20 +259,20 @@ void micBufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 	(*bq)->Enqueue(bq, openSlOut->micBufferShort, BUFF_SIZE_BYTES);
 }
 
-void Java_com_kh_beatbot_manager_PlaybackManager_playNative(JNIEnv *env,
+void Java_com_odang_beatbot_manager_PlaybackManager_playNative(JNIEnv *env,
 		jclass clazz) {
 	stopAllTracks();
 	playing = true;
 }
 
-void Java_com_kh_beatbot_manager_PlaybackManager_stopNative(JNIEnv *env,
+void Java_com_odang_beatbot_manager_PlaybackManager_stopNative(JNIEnv *env,
 		jclass clazz) {
 	playing = false;
 	stopAllTracks();
 }
 
 // create the engine and output mix objects
-void Java_com_kh_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env,
+void Java_com_odang_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env,
 		jclass clazz) {
 	SLresult result;
 	initTicker();
@@ -303,7 +303,7 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env,
 	previewEvent->pitchSteps = .5f;
 }
 
-jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
+jboolean Java_com_odang_beatbot_activity_BeatBotActivity_createAudioPlayer(
 		JNIEnv *env, jclass clazz) {
 	openSlOut = malloc(sizeof(OpenSlOut));
 	openSlOut->currBufferFloat = (float **) malloc(2 * sizeof(float *));
@@ -390,7 +390,7 @@ jboolean Java_com_kh_beatbot_activity_BeatBotActivity_createAudioPlayer(
 	return JNI_TRUE;
 }
 
-void Java_com_kh_beatbot_activity_BeatBotActivity_arm(JNIEnv *_env,
+void Java_com_odang_beatbot_activity_BeatBotActivity_arm(JNIEnv *_env,
 		jclass clazz) {
 	if (openSlOut->armed)
 		return; // only need to arm once
@@ -402,7 +402,7 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_arm(JNIEnv *_env,
 }
 
 // shut down the native audio system
-void Java_com_kh_beatbot_activity_BeatBotActivity_nativeShutdown(JNIEnv *env,
+void Java_com_odang_beatbot_activity_BeatBotActivity_nativeShutdown(JNIEnv *env,
 		jclass clazz) {
 	playing = false;
 	stopAllTracks();
@@ -454,7 +454,7 @@ void Java_com_kh_beatbot_activity_BeatBotActivity_nativeShutdown(JNIEnv *env,
 /****************************************************************************************
  Java RecordManager JNI methods
  ****************************************************************************************/
-void Java_com_kh_beatbot_manager_RecordManager_startListeningNative(JNIEnv *env,
+void Java_com_odang_beatbot_manager_RecordManager_startListeningNative(JNIEnv *env,
 		jclass clazz) {
 	// listening means to track the max frame of the current record source
 	// if the current record source is the microphone, we need to enqueue
@@ -477,7 +477,7 @@ void Java_com_kh_beatbot_manager_RecordManager_startListeningNative(JNIEnv *env,
 	pthread_mutex_unlock(&recordMutex);
 }
 
-void Java_com_kh_beatbot_manager_RecordManager_stopListeningNative(JNIEnv *env,
+void Java_com_odang_beatbot_manager_RecordManager_stopListeningNative(JNIEnv *env,
 		jclass clazz) {
 	pthread_mutex_lock(&recordMutex);
 	listening = false;
@@ -494,7 +494,7 @@ void Java_com_kh_beatbot_manager_RecordManager_stopListeningNative(JNIEnv *env,
 	pthread_mutex_unlock(&recordMutex);
 }
 
-void Java_com_kh_beatbot_manager_RecordManager_stopRecordingNative(JNIEnv *env,
+void Java_com_odang_beatbot_manager_RecordManager_stopRecordingNative(JNIEnv *env,
 		jclass clazz) {
 	pthread_mutex_lock(&recordMutex);
 	recordArmed = recording = false;
@@ -504,24 +504,24 @@ void Java_com_kh_beatbot_manager_RecordManager_stopRecordingNative(JNIEnv *env,
 	pthread_mutex_unlock(&recordMutex);
 }
 
-void Java_com_kh_beatbot_manager_RecordManager_setRecordSourceNative(
+void Java_com_odang_beatbot_manager_RecordManager_setRecordSourceNative(
 		JNIEnv *_env, jclass clazz, jint recordSourceId) {
 	pthread_mutex_lock(&recordMutex);
 	openSlOut->recordSourceId = recordSourceId;
 	pthread_mutex_unlock(&recordMutex);
 }
 
-void Java_com_kh_beatbot_manager_RecordManager_armNative(JNIEnv *env,
+void Java_com_odang_beatbot_manager_RecordManager_armNative(JNIEnv *env,
 		jclass clazz) {
 	recordArmed = true;
 }
 
-void Java_com_kh_beatbot_manager_RecordManager_disarmNative(JNIEnv *env,
+void Java_com_odang_beatbot_manager_RecordManager_disarmNative(JNIEnv *env,
 		jclass clazz) {
 	recordArmed = false;
 }
 
-void Java_com_kh_beatbot_manager_RecordManager_setThresholdLevel(JNIEnv *env,
+void Java_com_odang_beatbot_manager_RecordManager_setThresholdLevel(JNIEnv *env,
 		jclass clazz, jfloat _thresholdLevel) {
 	thresholdLevel = _thresholdLevel;
 }

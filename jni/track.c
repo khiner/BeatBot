@@ -275,7 +275,7 @@ int getSoloingTrackNum() {
 	return MASTER_TRACK_ID;
 }
 
-void Java_com_kh_beatbot_track_Track_muteTrack(JNIEnv *env, jclass clazz,
+void Java_com_odang_beatbot_track_Track_muteTrack(JNIEnv *env, jclass clazz,
 		jint trackId, jboolean mute) {
 	Track *track = getTrack(trackId);
 	if (mute) {
@@ -288,7 +288,7 @@ void Java_com_kh_beatbot_track_Track_muteTrack(JNIEnv *env, jclass clazz,
 	track->mute = mute;
 }
 
-void Java_com_kh_beatbot_track_Track_soloTrack(JNIEnv *env, jclass clazz,
+void Java_com_odang_beatbot_track_Track_soloTrack(JNIEnv *env, jclass clazz,
 		jint trackId, jboolean solo) {
 	Track *track = getTrack(trackId);
 	track->solo = solo;
@@ -355,13 +355,13 @@ void updateNextNote(Track *track) {
 	(*env)->DeleteLocalRef(env, obj);
 }
 
-void Java_com_kh_beatbot_track_Track_setNextNote(JNIEnv *env, jclass clazz,
+void Java_com_odang_beatbot_track_Track_setNextNote(JNIEnv *env, jclass clazz,
 		jint trackId, jobject midiNote) {
 	Track *track = getTrack(trackId);
 	setNextNote(track, midiNote);
 }
 
-void Java_com_kh_beatbot_track_BaseTrack_setTrackVolume(JNIEnv *env,
+void Java_com_odang_beatbot_track_BaseTrack_setTrackVolume(JNIEnv *env,
 		jclass clazz, jint trackId, jfloat dbVolume) {
 	Levels *levels = getLevels(trackId);
 	levels->volume = dbToLinear(dbVolume);
@@ -370,7 +370,7 @@ void Java_com_kh_beatbot_track_BaseTrack_setTrackVolume(JNIEnv *env,
 	updateChannelScaleValues(levels, midiEvent);
 }
 
-void Java_com_kh_beatbot_track_BaseTrack_setTrackPan(JNIEnv *env, jclass clazz,
+void Java_com_odang_beatbot_track_BaseTrack_setTrackPan(JNIEnv *env, jclass clazz,
 		jint trackId, jfloat pan) {
 	Levels *levels = getLevels(trackId);
 	levels->pan = panToScaleValue(pan);
@@ -379,14 +379,14 @@ void Java_com_kh_beatbot_track_BaseTrack_setTrackPan(JNIEnv *env, jclass clazz,
 	updateChannelScaleValues(levels, midiEvent);
 }
 
-void Java_com_kh_beatbot_track_BaseTrack_setTrackPitch(JNIEnv *env,
+void Java_com_odang_beatbot_track_BaseTrack_setTrackPitch(JNIEnv *env,
 		jclass clazz, jint trackId, jfloat pitchSteps) {
 	Levels *levels = getLevels(trackId);
 	levels->pitchSteps = pitchSteps;
 	updatePitch(trackId);
 }
 
-jstring Java_com_kh_beatbot_track_Track_setSample(JNIEnv *env, jclass clazz,
+jstring Java_com_odang_beatbot_track_Track_setSample(JNIEnv *env, jclass clazz,
 		jint trackId, jstring sampleName) {
 	Track *track = getTrack(trackId);
 	pthread_mutex_lock(&openSlOut->trackMutex);
@@ -408,7 +408,7 @@ jstring Java_com_kh_beatbot_track_Track_setSample(JNIEnv *env, jclass clazz,
 	return (*env)->NewStringUTF(env, sf_strerror(NULL ));
 }
 
-void Java_com_kh_beatbot_manager_TrackManager_createTrackNative(JNIEnv *env,
+void Java_com_odang_beatbot_manager_TrackManager_createTrackNative(JNIEnv *env,
 		jclass clazz, jint trackId) {
 	Track *track = initTrack(trackId);
 	pthread_mutex_lock(&openSlOut->trackMutex);
@@ -416,7 +416,7 @@ void Java_com_kh_beatbot_manager_TrackManager_createTrackNative(JNIEnv *env,
 	pthread_mutex_unlock(&openSlOut->trackMutex);
 }
 
-void Java_com_kh_beatbot_track_Track_deleteTrack(JNIEnv *env, jclass clazz,
+void Java_com_odang_beatbot_track_Track_deleteTrack(JNIEnv *env, jclass clazz,
 		int trackId) {
 	TrackNode *trackNode = getTrackNode(trackId);
 	pthread_mutex_lock(&openSlOut->trackMutex);
@@ -424,7 +424,7 @@ void Java_com_kh_beatbot_track_Track_deleteTrack(JNIEnv *env, jclass clazz,
 	pthread_mutex_unlock(&openSlOut->trackMutex);
 }
 
-void Java_com_kh_beatbot_track_Track_toggleTrackLooping(JNIEnv *env,
+void Java_com_odang_beatbot_track_Track_toggleTrackLooping(JNIEnv *env,
 		jclass clazz, jint trackId) {
 	Track *track = getTrack(trackId);
 	if (track->generator == NULL )
@@ -433,7 +433,7 @@ void Java_com_kh_beatbot_track_Track_toggleTrackLooping(JNIEnv *env,
 	fileGen->looping = !fileGen->looping;
 }
 
-jboolean Java_com_kh_beatbot_track_Track_isTrackPlaying(JNIEnv *env,
+jboolean Java_com_odang_beatbot_track_Track_isTrackPlaying(JNIEnv *env,
 		jclass clazz, jint trackId) {
 	Track *track = getTrack(trackId);
 	if (track->generator == NULL ) {
@@ -443,7 +443,7 @@ jboolean Java_com_kh_beatbot_track_Track_isTrackPlaying(JNIEnv *env,
 	return currTick >= track->nextStartTick && currTick <= track->nextStopTick;
 }
 
-jboolean Java_com_kh_beatbot_track_Track_isTrackLooping(JNIEnv *env,
+jboolean Java_com_odang_beatbot_track_Track_isTrackLooping(JNIEnv *env,
 		jclass clazz, jint trackId) {
 	Track *track = getTrack(trackId);
 	if (track->generator == NULL ) {
@@ -453,14 +453,14 @@ jboolean Java_com_kh_beatbot_track_Track_isTrackLooping(JNIEnv *env,
 	return fileGen->looping;
 }
 
-void Java_com_kh_beatbot_track_Track_notifyNoteRemoved(JNIEnv *env,
+void Java_com_odang_beatbot_track_Track_notifyNoteRemoved(JNIEnv *env,
 		jclass clazz, jint trackId, jlong onTick) {
 	Track *track = getTrack(trackId);
 	if (track->nextStartTick == onTick)
 		stopTrack(track);
 }
 
-void Java_com_kh_beatbot_track_Track_setTrackLoopWindow(JNIEnv *env,
+void Java_com_odang_beatbot_track_Track_setTrackLoopWindow(JNIEnv *env,
 		jclass clazz, jint trackId, jlong loopBeginSample, jlong loopEndSample) {
 	Track *track = getTrack(trackId);
 	if (track->generator == NULL )
@@ -469,7 +469,7 @@ void Java_com_kh_beatbot_track_Track_setTrackLoopWindow(JNIEnv *env,
 	filegen_setLoopWindow(fileGen, loopBeginSample, loopEndSample);
 }
 
-void Java_com_kh_beatbot_track_Track_setTrackReverse(JNIEnv *env, jclass clazz,
+void Java_com_odang_beatbot_track_Track_setTrackReverse(JNIEnv *env, jclass clazz,
 		jint trackId, jboolean reverse) {
 	Track *track = getTrack(trackId);
 	if (track->generator == NULL )
@@ -478,7 +478,7 @@ void Java_com_kh_beatbot_track_Track_setTrackReverse(JNIEnv *env, jclass clazz,
 	filegen_setReverse(fileGen, reverse);
 }
 
-void Java_com_kh_beatbot_track_Track_setTrackGain(JNIEnv *env, jclass clazz,
+void Java_com_odang_beatbot_track_Track_setTrackGain(JNIEnv *env, jclass clazz,
 		jint trackId, jfloat dbGain) {
 	Track *track = getTrack(trackId);
 	if (track->generator == NULL )
@@ -487,7 +487,7 @@ void Java_com_kh_beatbot_track_Track_setTrackGain(JNIEnv *env, jclass clazz,
 	fileGen->gain = dbToLinear(dbGain);
 }
 
-float Java_com_kh_beatbot_track_Track_getSample(JNIEnv *env, jclass clazz,
+float Java_com_odang_beatbot_track_Track_getSample(JNIEnv *env, jclass clazz,
 		jint trackId, jlong frame, jint channel) {
 	Track *track = getTrack(trackId);
 	if (track->generator == NULL )
@@ -496,7 +496,7 @@ float Java_com_kh_beatbot_track_Track_getSample(JNIEnv *env, jclass clazz,
 	return filegen_getSample(fileGen, frame, channel);
 }
 
-void Java_com_kh_beatbot_track_Track_fillSampleBuffer(JNIEnv *env, jclass clazz,
+void Java_com_odang_beatbot_track_Track_fillSampleBuffer(JNIEnv *env, jclass clazz,
 		jint trackId, jfloatArray sampleBuffer, jint startFrame, jint endFrame,
 		jint jumpFrames) {
 	Track *track = getTrack(trackId);
@@ -535,7 +535,7 @@ void Java_com_kh_beatbot_track_Track_fillSampleBuffer(JNIEnv *env, jclass clazz,
 	free(maxFrameIndexAndSample);
 }
 
-float Java_com_kh_beatbot_track_Track_getCurrentFrame(JNIEnv *env, jclass clazz,
+float Java_com_odang_beatbot_track_Track_getCurrentFrame(JNIEnv *env, jclass clazz,
 		jint trackId) {
 	Track *track = getTrack(trackId);
 	if (track->generator == NULL )
@@ -544,7 +544,7 @@ float Java_com_kh_beatbot_track_Track_getCurrentFrame(JNIEnv *env, jclass clazz,
 	return fileGen->currFrame;
 }
 
-float Java_com_kh_beatbot_track_Track_getFrames(JNIEnv *env, jclass clazz,
+float Java_com_odang_beatbot_track_Track_getFrames(JNIEnv *env, jclass clazz,
 		jint trackId) {
 	Track *track = getTrack(trackId);
 	if (track->generator == NULL )
