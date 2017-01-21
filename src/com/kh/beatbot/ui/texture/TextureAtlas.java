@@ -75,6 +75,8 @@ public abstract class TextureAtlas {
 		float x = 0, y = config.textureYOffset;
 		for (int regionId = config.regionIdOffset; regionId < config.regionIdOffset
 				+ config.numRegions; regionId++) {
+			if (shouldSkipResourceId(regionId - config.regionIdOffset))
+				continue;
 			drawTextureRegion(regionId, x, y);
 			setTextureRegion(regionId, x, y - config.textureYOffset);
 
@@ -86,5 +88,6 @@ public abstract class TextureAtlas {
 		}
 	}
 
+	protected abstract boolean shouldSkipResourceId(int resourceId);
 	protected abstract void drawTextureRegion(int regionId, float x, float y);
 }

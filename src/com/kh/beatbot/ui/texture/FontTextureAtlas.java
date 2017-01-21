@@ -71,6 +71,11 @@ public class FontTextureAtlas extends TextureAtlas {
 		canvas.drawText(String.valueOf((char) regionId), x, y, paint);
 	}
 
+	@Override
+	protected boolean shouldSkipResourceId(int id) {
+		return false;
+	}
+
 	// Texture Size for Font (Square)
 	private static int calcTextureSize(final float cellHeight) {
 		// NOTE: these values are fixed, based on the defined characters. when

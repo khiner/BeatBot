@@ -11,12 +11,12 @@ import com.kh.beatbot.R;
 public class ResourceTextureAtlas extends TextureAtlas {
 	private final static int[] RESOURCE_IDS = getAllResourceIds();
 	private final Resources resources;
+	private static int mainIconResourceId;
 
 	public ResourceTextureAtlas(Resources resources) {
 		this.resources = resources;
 
 		config = new Config();
-
 		config.numRegions = RESOURCE_IDS.length;
 		config.regionIdOffset = RESOURCE_IDS[0];
 		config.bitmapConfig = Bitmap.Config.ARGB_4444;
@@ -26,7 +26,7 @@ public class ResourceTextureAtlas extends TextureAtlas {
 		config.cellHeight = first.getHeight();
 		config.textureYOffset = 0;
 		// assume all resources are squares of the same width
-		config.textureSize = (int) Math.ceil(Math.sqrt(RESOURCE_IDS.length)) * config.cellWidth;
+		config.textureSize = (int) Math.ceil(Math.sqrt(config.numRegions)) * config.cellWidth;
 
 		super.createCanvas();
 		initTextureRegions();
@@ -38,11 +38,17 @@ public class ResourceTextureAtlas extends TextureAtlas {
 		canvas.drawBitmap(resourceBitmap, x, y, paint);
 	}
 
+	protected boolean shouldSkipResourceId(int resourceId) {
+		return resourceId == mainIconResourceId;
+	}
+	
 	private static int[] getAllResourceIds() {
 		Field[] ID_Fields = R.drawable.class.getFields();
 		int[] resourceIds = new int[ID_Fields.length];
 		for (int i = 0; i < ID_Fields.length; i++) {
 			try {
+				if (ID_Fields[i].getName().equals("beat_bot_icon_large"))
+					mainIconResourceId = i;
 				resourceIds[i] = ID_Fields[i].getInt(null);
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
