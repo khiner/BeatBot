@@ -159,16 +159,22 @@ public class MidiNotesEventManager {
 			}
 		}
 
-		boolean noteChanged = false;
+		if (selectedNotes.isEmpty())
+			return;
 
+		if (midiManager.isSnapToGrid()) {
+			final MidiNote firstSelectedNote = selectedNotes.get(0);
+			tickDiff = midiManager.getMajorTickNearestTo(firstSelectedNote.getOnTick() + tickDiff) - firstSelectedNote.getOnTick();
+		}
+
+		boolean noteChanged = false;
 		for (MidiNote note : selectedNotes) {
-			Track track = View.context.getTrackManager().getTrack(note);
 			if (tickDiff != 0) {
-				if (setNoteTicks(note, note.getOnTick() + tickDiff, note.getOffTick() + tickDiff,
-						true)) {
+				if (note.setTicks(note.getOnTick() + tickDiff, note.getOffTick() + tickDiff)) {
 					noteChanged = true;
 				}
 			}
+			Track track = View.context.getTrackManager().getTrack(note);
 			if (noteDiff != 0) {
 				track.removeNote(note);
 				note.setNote(note.getNoteValue() + noteDiff);
@@ -200,8 +206,7 @@ public class MidiNotesEventManager {
 	public void quantize(int beatDivision) {
 		for (Track track : View.context.getTrackManager().getTracks()) {
 			for (MidiNote note : track.getMidiNotes()) {
-				long diff = (long) midiManager.getMajorTickNearestTo(note.getOnTick())
-						- note.getOnTick();
+				long diff = midiManager.getMajorTickNearestTo(note.getOnTick()) - note.getOnTick();
 				setNoteTicks(note, note.getOnTick() + diff, note.getOffTick() + diff, true);
 			}
 		}
@@ -295,7 +300,7 @@ public class MidiNotesEventManager {
 			newOnTick += onTickDiff;
 		if (midiNote.getOffTick() + offTickDiff <= MidiManager.MAX_TICKS)
 			newOffTick += offTickDiff;
-		setNoteTicks(midiNote, (long) newOnTick, (long) newOffTick, false);
+		setNoteTicks(midiNote, newOnTick, newOffTick, false);
 	}
 
 	private void addDiff(MidiNoteDiff diff) {
