@@ -160,7 +160,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
 	@Override
 	public void onCreate(Track track) {
-		// no-op
+
 	}
 
 	@Override

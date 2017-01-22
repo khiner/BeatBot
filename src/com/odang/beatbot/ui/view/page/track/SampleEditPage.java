@@ -36,16 +36,15 @@ public class SampleEditPage extends TrackPage implements TouchableViewsListener 
 		Track currTrack = (Track) track;
 		loopButton.setChecked(currTrack.isLooping());
 		reverseButton.setChecked(currTrack.isReverse());
-		loopBeginControl.setParam(currTrack.getLoopBeginParam());
-		loopEndControl.setParam(currTrack.getLoopEndParam());
-		gainControl.setParam(currTrack.getGainParam());
-
 		onSampleChange(currTrack);
 	}
 
 	@Override
 	public void onSampleChange(Track track) {
 		if (null != sampleEditView) {
+			loopBeginControl.setParam(track.getLoopBeginParam());
+			loopEndControl.setParam(track.getLoopEndParam());
+			gainControl.setParam(track.getGainParam());
 			sampleEditView.setParams(track.getLoopBeginParam(), track.getLoopEndParam());
 			sampleEditView.update();
 		}
