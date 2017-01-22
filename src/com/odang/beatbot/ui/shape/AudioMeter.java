@@ -34,6 +34,10 @@ public class AudioMeter extends Shape {
 		}
 	}
 
+	public void resetLevel() {
+		setLevelVertex(0);
+	}
+
 	public void setLevel(final float level) {
 		// Only see channel level changing if the 'spike' is greater than the current level
 		setLevelVertex(Math.max(levelVertex, NUM_FILL_VERTICES * level));

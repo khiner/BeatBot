@@ -126,6 +126,7 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 	@Override
 	public synchronized void show() {
 		super.show();
+		thresholdParamControl.resetLevel();
 		// listen to RecordSource to start populating ThresholdBar
 		context.getRecordManager().startListening();
 	}

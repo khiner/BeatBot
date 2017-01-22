@@ -20,4 +20,8 @@ public class ThresholdParamControl extends LevelParamControl {
 	public void setLevel(float level) {
 		((ThresholdBar) levelControl).setLevelNormalized(level);
 	}
+
+	public void resetLevel() {
+		((ThresholdBar) levelControl).resetLevel();
+	}
 }

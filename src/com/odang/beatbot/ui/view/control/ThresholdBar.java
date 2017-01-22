@@ -49,6 +49,10 @@ public class ThresholdBar extends ControlView1dBase {
 		audioMeter.setLevel(levelNormalized);
 	}
 
+	public void resetLevel() {
+		audioMeter.resetLevel();
+	}
+
 	protected float posToLevel(Pointer pos) {
 		if (pos.x > width - thresholdSelectTab.width / 2)
 			return 1;
