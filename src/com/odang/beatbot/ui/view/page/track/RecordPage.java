@@ -112,6 +112,7 @@ public class RecordPage extends TrackPage implements RecordStateListener {
 		try {
 			sampleView.setText("");
 			((Track) context.getTrackManager().getCurrTrack()).setSample(recordedSampleFile);
+			sampleView.update();
 		} catch (Exception e) {
 			sampleView.setText("Error saving file");
 		}
