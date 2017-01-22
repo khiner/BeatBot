@@ -131,7 +131,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 	}
 
 	public List<MidiNote> getSelectedNotes() {
-		ArrayList<MidiNote> selectedNotes = new ArrayList<MidiNote>();
+		final List<MidiNote> selectedNotes = new ArrayList<MidiNote>();
 		for (Track track : tracks) {
 			for (MidiNote note : track.getMidiNotes()) {
 				if (note.isSelected()) {
