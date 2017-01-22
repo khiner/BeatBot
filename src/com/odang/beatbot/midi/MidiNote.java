@@ -163,13 +163,13 @@ public class MidiNote implements Comparable<MidiNote> {
 		}
 	}
 
-	public void setNote(int note) {
-		if (note < 0 || getNoteValue() == note)
+	public void setNoteValue(int noteValue) {
+		if (noteValue < 0 || getNoteValue() == noteValue)
 			return;
 
 		int prevNoteValue = getNoteValue();
-		noteOn.setNoteValue(note);
-		noteOff.setNoteValue(note);
+		noteOn.setNoteValue(noteValue);
+		noteOff.setNoteValue(noteValue);
 		View.context.getMidiManager().onMove(this, prevNoteValue, getOnTick(), getOffTick(),
 				getNoteValue(), getOnTick(), getOffTick());
 	}

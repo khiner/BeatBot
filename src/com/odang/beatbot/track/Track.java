@@ -59,7 +59,7 @@ public class Track extends BaseTrack implements FileListener {
 
 	public void setNoteValue(int noteValue) {
 		for (MidiNote note : notes) {
-			note.setNote(noteValue);
+			note.setNoteValue(noteValue);
 		}
 	}
 

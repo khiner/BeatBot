@@ -135,7 +135,7 @@ public class MidiNotesEventManager {
 					+ tickDiff, true);
 		}
 		if (noteDiff != 0) {
-			note.setNote(note.getNoteValue() + noteDiff);
+			note.setNoteValue(note.getNoteValue() + noteDiff);
 			noteChanged = true;
 		}
 
@@ -177,7 +177,7 @@ public class MidiNotesEventManager {
 			Track track = View.context.getTrackManager().getTrack(note);
 			if (noteDiff != 0) {
 				track.removeNote(note);
-				note.setNote(note.getNoteValue() + noteDiff);
+				note.setNoteValue(note.getNoteValue() + noteDiff);
 				View.context.getTrackManager().getTrack(note).addNote(note);
 				noteChanged = true;
 			}
@@ -189,14 +189,19 @@ public class MidiNotesEventManager {
 	}
 
 	public void pinchSelectedNotes(long onTickDiff, long offTickDiff) {
+		boolean noteChanged = false;
 		for (Track track : View.context.getTrackManager().getTracks()) {
 			for (MidiNote note : track.getMidiNotes()) {
 				if (note.isSelected()) {
-					pinchNote(note, onTickDiff, offTickDiff);
+					if (pinchNote(note, onTickDiff, offTickDiff)) {
+						noteChanged = true;
+					}
 				}
 			}
 		}
-		// handleMidiCollisions();
+		if (noteChanged) {
+			handleNoteCollisions();
+		}
 	}
 
 	/*
@@ -293,14 +298,14 @@ public class MidiNotesEventManager {
 		return note.setTicks(onTick, offTick);
 	}
 
-	private void pinchNote(MidiNote midiNote, long onTickDiff, long offTickDiff) {
+	private boolean pinchNote(MidiNote midiNote, long onTickDiff, long offTickDiff) {
 		long newOnTick = midiNote.getOnTick();
 		long newOffTick = midiNote.getOffTick();
 		if (midiNote.getOnTick() + onTickDiff >= 0)
 			newOnTick += onTickDiff;
 		if (midiNote.getOffTick() + offTickDiff <= MidiManager.MAX_TICKS)
 			newOffTick += offTickDiff;
-		setNoteTicks(midiNote, newOnTick, newOffTick, false);
+		return setNoteTicks(midiNote, newOnTick, newOffTick, false);
 	}
 
 	private void addDiff(MidiNoteDiff diff) {

@@ -24,7 +24,7 @@ public class MidiNoteMoveDiff extends MidiNoteDiff {
 
 		if (midiNote != null) { // TODO throw exception? Big deal if the state's not right
 			midiNote.setSelected(true);
-			midiNote.setNote(endNoteValue);
+			midiNote.setNoteValue(endNoteValue);
 			midiNote.setTicks(endOnTick, endOffTick);
 		}
 	}
