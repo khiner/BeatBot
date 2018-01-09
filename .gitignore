@@ -1,0 +1,8 @@
+.classpath
+bin/
+obj/
+libs/
+gen/
+.settings
+.cproject
+.project
