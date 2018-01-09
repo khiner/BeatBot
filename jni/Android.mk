@@ -24,7 +24,7 @@ FILE_LIST := $(wildcard $(LOCAL_PATH)/*.c)
 FILE_LIST += $(wildcard $(LOCAL_PATH)/effects/*.c)
 FILE_LIST += $(wildcard $(LOCAL_PATH)/generators/*.c)
 
-APP_ABI := armeabi armeabi-v7a 
+APP_ABI := armeabi armeabi-v7a x86
 LOCAL_MODULE := nativeaudio
 LOCAL_SHARED_LIBRARIES := sndfile
 LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -landroid -lOpenSLES
