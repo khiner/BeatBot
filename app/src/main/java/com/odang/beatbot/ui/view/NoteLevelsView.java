@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 public class NoteLevelsView extends TouchableView {
+
+    public static final float LEVEL_BAR_WIDTH_SCREEN_RATIO = 1f / 100f;
+
     private class DragLine {
         private float m = 0, b = 0, leftTick = 0, rightTick = Float.MAX_VALUE, leftLevel = 0,
                 rightLevel = 0;
@@ -30,9 +33,6 @@ public class NoteLevelsView extends TouchableView {
             return m * tick + b;
         }
     }
-
-    public static final int LEVEL_POINT_SIZE = 16, LEVEL_LINE_WIDTH = 7,
-            LEVEL_BAR_WIDTH = LEVEL_POINT_SIZE / 2;
 
     // map of pointerIds to the notes they are selecting
     private TouchedNotes touchedNotes = new TouchedNotes();
@@ -70,7 +70,7 @@ public class NoteLevelsView extends TouchableView {
 
     protected void drawLevel(MidiNote midiNote, float[] levelColor, float[] levelColorTrans) {
         float y = levelToY(midiNote.getLinearLevel(currLevelType));
-        levelBarRect.layout(-LEVEL_BAR_WIDTH / 2, y, LEVEL_BAR_WIDTH, height - y - 1);
+        levelBarRect.layout(levelBarRect.x, y, levelBarRect.width, height - y - 1);
         levelBarCircle.setPosition(0, y);
         levelBarSelectCircle.setPosition(0, y);
         levelBarRect.setFillColor(levelColor);
@@ -226,11 +226,11 @@ public class NoteLevelsView extends TouchableView {
     }
 
     private float levelToY(float linearLevel) {
-        return height - linearLevel * getLevelHeight() - LEVEL_POINT_SIZE / 2;
+        return height - linearLevel * getLevelHeight() - levelBarRect.width;
     }
 
     private float levelToLabelY(float linearLevel) {
-        return height - linearLevel * (getLevelHeight() - valueLabel.height) - LEVEL_POINT_SIZE / 2
+        return height - linearLevel * (getLevelHeight() - valueLabel.height) - levelBarRect.width
                 - valueLabel.height;
     }
 
@@ -238,7 +238,7 @@ public class NoteLevelsView extends TouchableView {
      * map y value of level bar to a value in [0,1]
      */
     private float yToLevel(float y) {
-        return (height - y - LEVEL_POINT_SIZE / 2) / getLevelHeight();
+        return (height - y - levelBarRect.width) / getLevelHeight();
     }
 
     private float tickToX(float tick) {
@@ -252,7 +252,7 @@ public class NoteLevelsView extends TouchableView {
     }
 
     private float getLevelHeight() {
-        return height - LEVEL_POINT_SIZE;
+        return height - levelBarSelectCircle.width;
     }
 
     private void updateValueLabel(MidiNote touchedNote) {
@@ -324,9 +324,10 @@ public class NoteLevelsView extends TouchableView {
 
     @Override
     public void layoutChildren() {
-        levelBarRect.layout(-LEVEL_BAR_WIDTH / 2, 0, LEVEL_BAR_WIDTH, height);
-        levelBarCircle.layout(0, 0, LEVEL_BAR_WIDTH, LEVEL_BAR_WIDTH);
-        levelBarSelectCircle.layout(0, 0, LEVEL_BAR_WIDTH * 2, LEVEL_BAR_WIDTH * 2);
+        final float levelBarWidth = View.context.getMainPage().width * LEVEL_BAR_WIDTH_SCREEN_RATIO;
+        levelBarRect.layout(-levelBarWidth / 2, 0, levelBarWidth, height);
+        levelBarCircle.layout(0, 0, levelBarWidth, levelBarWidth);
+        levelBarSelectCircle.layout(0, 0, levelBarWidth * 2, levelBarWidth * 2);
         valueLabel.setDimensions(width / 12, width / 26);
         valueLabel.hide();
     }

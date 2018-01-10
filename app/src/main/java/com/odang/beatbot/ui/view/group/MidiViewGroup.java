@@ -47,7 +47,7 @@ public class MidiViewGroup extends TouchableView {
         midiView.layout(this, trackControlWidth, loopBarHeight, width - trackControlWidth, height
                 - loopBarHeight);
         midiLoopBarView.layout(this, 0, 0, width - trackControlWidth, loopBarHeight);
-        translateYGroup.translate(0, -midiView.getYOffset());
+        translateYGroup.translateY(-midiView.getYOffset());
     }
 
     @Override
