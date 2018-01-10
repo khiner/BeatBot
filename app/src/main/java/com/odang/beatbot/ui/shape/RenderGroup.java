@@ -48,4 +48,11 @@ public class RenderGroup {
         textureGroup.translate(x, y);
         textGroup.translate(x, y);
     }
+
+    public void scale(float x, float y) {
+        fillGroup.scale(x, y);
+        strokeGroup.scale(x, y);
+        textureGroup.scale(x, y);
+        textGroup.scale(x, y);
+    }
 }

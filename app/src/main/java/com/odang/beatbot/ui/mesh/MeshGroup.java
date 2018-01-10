@@ -192,6 +192,14 @@ public class MeshGroup {
         dirty = true;
     }
 
+    public void scale(float x, float y) {
+        for (int i = 0; i < vertices.length; i += indicesPerVertex) {
+            vertices[i] *= x;
+            vertices[i + 1] *= y;
+        }
+        dirty = true;
+    }
+
     protected void translate(Mesh mesh, float x, float y) {
         for (int i = getVertexIndex(mesh, 0); i < getVertexIndex(mesh, mesh.getNumVertices()); i += indicesPerVertex) {
             vertices[i] += x;
