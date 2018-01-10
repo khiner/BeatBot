@@ -94,10 +94,6 @@ public class MidiTrack {
         return mEvents;
     }
 
-    public int getEventCount() {
-        return mEvents.size();
-    }
-
     public int getSize() {
         if (mSizeNeedsRecalculating) {
             recalculateSize();
@@ -165,39 +161,6 @@ public class MidiTrack {
         }
     }
 
-    public boolean removeEvent(MidiEvent E) {
-
-        Iterator<MidiEvent> it = mEvents.iterator();
-        MidiEvent prev = null, curr = null, next = null;
-
-        while (it.hasNext()) {
-            next = it.next();
-
-            if (E.equals(curr)) {
-                break;
-            }
-
-            prev = curr;
-            curr = next;
-            next = null;
-        }
-
-        if (next == null) {
-            return false;
-        }
-
-        if (!mEvents.remove(curr)) {
-            return false;
-        }
-
-        if (prev != null) {
-            next.setDelta(next.getTick() - prev.getTick());
-        } else {
-            next.setDelta(next.getTick());
-        }
-        return true;
-    }
-
     public void closeTrack() {
         long lastTick = 0;
         if (mEvents.size() > 0) {
@@ -207,13 +170,6 @@ public class MidiTrack {
 
         EndOfTrack eot = new EndOfTrack(lastTick, 0);
         insertEvent(eot);
-    }
-
-    public void dumpEvents() {
-        Iterator<MidiEvent> it = mEvents.iterator();
-        while (it.hasNext()) {
-            System.out.println(it.next());
-        }
     }
 
     public void recalculateDeltas() {

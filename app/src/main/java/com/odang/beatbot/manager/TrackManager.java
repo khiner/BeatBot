@@ -120,16 +120,6 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
         return selectedNotesCopy;
     }
 
-    public List<MidiNote> copyMidiNotes() {
-        List<MidiNote> midiNotesCopy = new ArrayList<MidiNote>();
-        for (Track track : tracks) {
-            for (MidiNote note : track.getMidiNotes()) {
-                midiNotesCopy.add(note.getCopy());
-            }
-        }
-        return midiNotesCopy;
-    }
-
     public List<MidiNote> getSelectedNotes() {
         final List<MidiNote> selectedNotes = new ArrayList<MidiNote>();
         for (Track track : tracks) {
@@ -287,6 +277,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
         }
     }
 
+    // Don't delete! Called from C through JNI
     public MidiNote getNextMidiNote(int trackId, long currTick) {
         return getTrackById(trackId).getNextMidiNote(currTick);
     }

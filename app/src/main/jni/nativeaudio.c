@@ -64,10 +64,8 @@ void startRecording() {
     jstring recordFilePath = (*env)->CallObjectMethod(env, getRecordManager(),
                                                       getStartRecordingJavaMethod());
 
-    const char *cRecordFilePath = (*env)->GetStringUTFChars(env, recordFilePath,
-                                                            0);
+    const char *cRecordFilePath = (*env)->GetStringUTFChars(env, recordFilePath, 0);
 
-    cRecordFilePath = (*env)->GetStringUTFChars(env, recordFilePath, 0);
     // append to end of file, since header is written in Java
     recordOutFile = fopen(cRecordFilePath, "a+");
     recording = true;

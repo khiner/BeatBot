@@ -26,15 +26,6 @@ public class TextureGroup extends MeshGroup {
         dirty = true;
     }
 
-    public void setResource(Mesh mesh, int resourceId, float x, float y, float width,
-                            float height, float[] color) {
-        if (-1 == resourceId)
-            return;
-        textureVertices(mesh, 0, View.context.getResourceTextureAtlas().getTextureRegion(resourceId), x, y, width,
-                height, color);
-        dirty = true;
-    }
-
     public void setResource(Mesh mesh, int resourceId) {
         setTexture(mesh, View.context.getResourceTextureAtlas().getTextureRegion(resourceId));
         dirty = true;

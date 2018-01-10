@@ -22,7 +22,6 @@ import com.odang.beatbot.midi.util.MidiUtil;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,7 +50,7 @@ public class MidiFile {
         type = trackCount > 1 ? 1 : 0;
     }
 
-    public MidiFile(File fileIn) throws FileNotFoundException, IOException {
+    public MidiFile(File fileIn) throws IOException {
         this(new FileInputStream(fileIn));
     }
 
@@ -62,7 +61,7 @@ public class MidiFile {
         in.read(buffer);
         initFromBuffer(buffer);
 
-        tracks = new ArrayList<MidiTrack>(trackCount);
+        tracks = new ArrayList<>(trackCount);
         for (int i = 0; i < trackCount; i++) {
             tracks.add(new MidiTrack(in));
         }
@@ -134,7 +133,7 @@ public class MidiFile {
         type = trackCount > 1 ? 1 : 0;
     }
 
-    public void writeToFile(final File outFile) throws FileNotFoundException, IOException {
+    public void writeToFile(final File outFile) throws IOException {
         final FileOutputStream fout = new FileOutputStream(outFile);
 
         fout.write(IDENTIFIER);

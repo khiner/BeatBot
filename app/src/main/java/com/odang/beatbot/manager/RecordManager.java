@@ -48,11 +48,9 @@ public class RecordManager {
         }
     }
 
-    public static enum State {
+    public enum State {
         OFF, LISTENING, ARMED, RECORDING
     }
-
-    ;
 
     public static final int MICROPHONE_RECORD_SOURCE_ID = -2;
     public static final String MICROPHONE_RECORD_SOURCE_LABEL = "Microphone";
@@ -133,6 +131,7 @@ public class RecordManager {
         }
     }
 
+    // Don't delete! Called from C through JNI
     public String startRecording() {
         if (!isArmed()) {
             return null;

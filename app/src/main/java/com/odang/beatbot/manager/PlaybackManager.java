@@ -3,7 +3,7 @@ package com.odang.beatbot.manager;
 public class PlaybackManager {
     public static final int SAMPLE_RATE = 44100;
 
-    public static enum State {
+    public enum State {
         PLAYING, STOPPED
     }
 

@@ -1,7 +1,7 @@
 package com.odang.beatbot.event;
 
 public interface Temporal {
-    public abstract void begin();
+    void begin();
 
-    public abstract void end();
+    void end();
 }
