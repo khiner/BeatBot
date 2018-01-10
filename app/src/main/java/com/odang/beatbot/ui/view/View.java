@@ -25,7 +25,7 @@ public class View implements Comparable<View> {
     public static BeatBotActivity context; // XXX
 
     protected static final float π = (float) Math.PI, X_OFFSET = 2;
-    protected static float LABEL_HEIGHT = 0, BG_OFFSET = 0;
+    protected static float BG_OFFSET = 0;
 
     public float absoluteX = 0, absoluteY = 0, x = 0, y = 0, width = 0, height = 0;
 
