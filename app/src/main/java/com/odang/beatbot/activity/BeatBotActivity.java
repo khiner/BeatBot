@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.opengl.GLES20;
 import android.os.Bundle;
 import android.text.method.DigitsKeyListener;
 import android.util.Log;
@@ -38,14 +39,13 @@ import com.odang.beatbot.ui.view.page.main.MainPage;
 
 import java.io.File;
 
-import javax.microedition.khronos.opengles.GL11;
+import javax.microedition.khronos.opengles.GL10;
 
 public class BeatBotActivity extends Activity {
     public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1, SAMPLE_NAME_EDIT_DIALOG_ID = 2,
             PROJECT_FILE_NAME_EDIT_DIALOG_ID = 3, MIDI_FILE_NAME_EDIT_DIALOG_ID = 4;
 
     private GLSurfaceViewBase surfaceViewBase;
-    private ViewPager activityPager;
     private MainPage mainPage;
     private EditText bpmInput, projectFileNameInput, midiFileNameInput, sampleNameInput;
 
@@ -86,10 +86,10 @@ public class BeatBotActivity extends Activity {
         View.context = this;
         surfaceViewBase = new GLSurfaceViewGroup(this);
         mainPage = new MainPage(null);
-        activityPager = new ViewPager(null);
+        final ViewPager activityPager = new ViewPager(null);
         activityPager.addPage(mainPage);
 
-        final ViewParent viewParent = ((GLSurfaceViewGroup) surfaceViewBase).getParent();
+        final ViewParent viewParent = surfaceViewBase.getParent();
         if (viewParent == null) {
             final LinearLayout layout = new LinearLayout(this);
             final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -105,8 +105,8 @@ public class BeatBotActivity extends Activity {
             public void onGlReady(GLSurfaceViewGroup view) {
                 fontTextureAtlas.loadTexture();
                 resourceTextureAtlas.loadTexture();
-                getGl().glLineWidth(1);
-                getGl().glClearColor(Color.BG[0], Color.BG[1], Color.BG[2], Color.BG[3]);
+                GLES20.glLineWidth(1);
+                GLES20.glClearColor(Color.BG[0], Color.BG[1], Color.BG[2], Color.BG[3]);
             }
         });
 
@@ -332,8 +332,8 @@ public class BeatBotActivity extends Activity {
         return surfaceViewBase;
     }
 
-    public GL11 getGl() {
-        return surfaceViewBase.getGl();
+    public GL10 get_Gl() {
+        return surfaceViewBase.get_Gl();
     }
 
     public PageSelectGroup getPageSelectGroup() {

@@ -1,5 +1,7 @@
 package com.odang.beatbot.ui.mesh;
 
+import android.opengl.GLES20;
+
 import com.odang.beatbot.ui.view.View;
 
 import java.nio.FloatBuffer;
@@ -12,22 +14,22 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
 public class MeshGroup {
-    public final static int SHORT_BYTES = Short.SIZE / 8, FLOAT_BYTES = Float.SIZE / 8;
+    private final static int SHORT_BYTES = Short.SIZE / 8, FLOAT_BYTES = Float.SIZE / 8;
 
-    protected final static int COLOR_OFFSET = 2, TEX_OFFSET = 6;
-    protected final static int COLOR_OFFSET_BYTES = COLOR_OFFSET * FLOAT_BYTES,
+    private final static int COLOR_OFFSET = 2, TEX_OFFSET = 6;
+    private final static int COLOR_OFFSET_BYTES = COLOR_OFFSET * FLOAT_BYTES,
             TEX_OFFSET_BYTES = TEX_OFFSET * FLOAT_BYTES;
 
-    protected int strokeWeight = 1, indicesPerVertex, vertexBytes, primitiveType,
+    private int strokeWeight = 1, indicesPerVertex, vertexBytes, primitiveType,
             vertexHandle = -1, indexHandle = -1;
 
-    protected short[] indices = new short[0];
+    private short[] indices = new short[0];
     protected float[] vertices = new float[0];
-    protected int[] textureId;
+    private int[] textureId;
     protected boolean dirty = false;
 
-    protected FloatBuffer vertexBuffer;
-    protected ShortBuffer indexBuffer;
+    private FloatBuffer vertexBuffer;
+    private ShortBuffer indexBuffer;
 
     private List<Mesh> children = new ArrayList<Mesh>();
 
@@ -59,32 +61,32 @@ public class MeshGroup {
             dirty = false;
         }
 
-        final GL11 gl = View.context.getGl();
-        gl.glLineWidth(strokeWeight);
+        final GL10 gl = View.context.get_Gl();
+        GLES20.glLineWidth(strokeWeight);
         if (hasTexture()) {
-            gl.glEnable(GL10.GL_TEXTURE_2D);
-            gl.glBindTexture(GL10.GL_TEXTURE_2D, textureId[0]);
+            GLES20.glEnable(GLES20.GL_TEXTURE_2D);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId[0]);
         }
 
-        gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vertexHandle);
         gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 
-        gl.glVertexPointer(2, GL10.GL_FLOAT, vertexBytes, 0);
-        gl.glColorPointer(4, GL10.GL_FLOAT, vertexBytes, COLOR_OFFSET_BYTES);
+        ((GL11) gl).glVertexPointer(2, GLES20.GL_FLOAT, vertexBytes, 0);
+        ((GL11) gl).glColorPointer(4, GLES20.GL_FLOAT, vertexBytes, COLOR_OFFSET_BYTES);
         if (hasTexture()) {
-            gl.glTexCoordPointer(2, GL10.GL_FLOAT, vertexBytes, TEX_OFFSET_BYTES);
+            ((GL11) gl).glTexCoordPointer(2, GLES20.GL_FLOAT, vertexBytes, TEX_OFFSET_BYTES);
         }
 
-        gl.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, indexHandle);
-        gl.glDrawElements(primitiveType, indexBuffer.limit(), GL10.GL_UNSIGNED_SHORT, 0);
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, indexHandle);
+        GLES20.glDrawElements(primitiveType, indexBuffer.limit(), GLES20.GL_UNSIGNED_SHORT, 0);
 
         gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
         if (hasTexture()) {
-            gl.glDisable(GL10.GL_TEXTURE_2D);
+            GLES20.glDisable(GLES20.GL_TEXTURE_2D);
         }
 
-        gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
-        gl.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     public boolean contains(Mesh mesh) {
@@ -247,14 +249,13 @@ public class MeshGroup {
     private void updateBuffers() {
         initHandles();
 
-        final GL11 gl = View.context.getGl();
-        gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexHandle);
-        gl.glBufferData(GL11.GL_ARRAY_BUFFER, vertexBuffer.limit() * FLOAT_BYTES, vertexBuffer,
-                GL11.GL_DYNAMIC_DRAW);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vertexHandle);
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, vertexBuffer.limit() * FLOAT_BYTES, vertexBuffer,
+                GLES20.GL_DYNAMIC_DRAW);
 
-        gl.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, indexHandle);
-        gl.glBufferData(GL11.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.limit() * SHORT_BYTES,
-                indexBuffer, GL11.GL_DYNAMIC_DRAW);
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, indexHandle);
+        GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.limit() * SHORT_BYTES,
+                indexBuffer, GLES20.GL_DYNAMIC_DRAW);
     }
 
     private void initHandles() {
@@ -263,11 +264,10 @@ public class MeshGroup {
         }
         final int[] buffer = new int[1];
 
-        final GL11 gl = View.context.getGl();
-        gl.glGenBuffers(1, buffer, 0);
+        GLES20.glGenBuffers(1, buffer, 0);
         vertexHandle = buffer[0];
 
-        gl.glGenBuffers(1, buffer, 0);
+        GLES20.glGenBuffers(1, buffer, 0);
         indexHandle = buffer[0];
     }
 

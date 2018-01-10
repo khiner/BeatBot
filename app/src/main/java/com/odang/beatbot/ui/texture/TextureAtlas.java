@@ -3,12 +3,8 @@ package com.odang.beatbot.ui.texture;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.opengl.GLES20;
 import android.opengl.GLUtils;
-
-import com.odang.beatbot.ui.view.View;
-
-import javax.microedition.khronos.opengles.GL10;
-import javax.microedition.khronos.opengles.GL11;
 
 public abstract class TextureAtlas {
     protected class Config {
@@ -34,17 +30,16 @@ public abstract class TextureAtlas {
     public void loadTexture() {
         if (bitmap.isRecycled())
             return;
-        final GL11 gl = View.context.getGl();
         // Generate Texture ID
-        gl.glGenTextures(1, textureId, 0);
+        GLES20.glGenTextures(1, textureId, 0);
         // Bind texture id texturing target
-        gl.glBindTexture(GL10.GL_TEXTURE_2D, textureId[0]);
-        gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
-        gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId[0]);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
         // allow non-power-of-2 images to render with hardware acceleration enabled
-        gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_CLAMP_TO_EDGE);
-        gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_CLAMP_TO_EDGE);
-        GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
         bitmap.recycle();
     }
 

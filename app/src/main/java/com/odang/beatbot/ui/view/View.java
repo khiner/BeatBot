@@ -1,5 +1,7 @@
 package com.odang.beatbot.ui.view;
 
+import android.opengl.GLES20;
+
 import com.odang.beatbot.activity.BeatBotActivity;
 import com.odang.beatbot.midi.util.GeneralUtils;
 import com.odang.beatbot.ui.color.Color;
@@ -13,7 +15,6 @@ import com.odang.beatbot.ui.shape.Rectangle;
 import com.odang.beatbot.ui.shape.RenderGroup;
 import com.odang.beatbot.ui.shape.RoundedRect;
 import com.odang.beatbot.ui.shape.Shape;
-import com.odang.beatbot.ui.view.TouchableView.Pointer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -290,17 +291,17 @@ public class View implements Comparable<View> {
         if (parent == null)
             return;
         // scissor ensures that each view can only draw within its rect
-        context.getGl().glEnable(GL10.GL_SCISSOR_TEST);
+        GLES20.glEnable(GL10.GL_SCISSOR_TEST);
         int xClip = clipX ? (int) absoluteX : 0;
         int yClip = clipY ? (int) (getTotalHeight() - absoluteY - height) : 0;
         int clipW = clipX ? (int) width : Integer.MAX_VALUE;
         int clipH = clipY ? (int) height : Integer.MAX_VALUE;
 
-        context.getGl().glScissor(xClip, yClip, clipW, clipH);
+        GLES20.glScissor(xClip, yClip, clipW, clipH);
     }
 
     public void endClip() {
-        context.getGl().glDisable(GL10.GL_SCISSOR_TEST);
+        GLES20.glDisable(GL10.GL_SCISSOR_TEST);
     }
 
     @Override
@@ -442,23 +443,19 @@ public class View implements Comparable<View> {
     }
 
     protected static final void translate(float x, float y) {
-        context.getGl().glTranslatef(x, y, 0);
+        context.get_Gl().glTranslatef(x, y, 0);
     }
 
     protected static final void scale(float x, float y) {
-        context.getGl().glScalef(x, y, 1);
+        context.get_Gl().glScalef(x, y, 1);
     }
 
     protected static final void push() {
-        context.getGl().glPushMatrix();
+        context.get_Gl().glPushMatrix();
     }
 
     protected static final void pop() {
-        context.getGl().glPopMatrix();
-    }
-
-    protected final float distanceFromCenterSquared(Pointer pos) {
-        return distanceFromCenterSquared(pos.x, pos.y);
+        context.get_Gl().glPopMatrix();
     }
 
     protected final float distanceFromCenterSquared(float x, float y) {
