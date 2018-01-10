@@ -1,8 +1,4 @@
-.classpath
-bin/
-obj/
-libs/
-gen/
-.settings
-.cproject
-.project
+.gradle/
+.idea/
+build/
+local.properties
