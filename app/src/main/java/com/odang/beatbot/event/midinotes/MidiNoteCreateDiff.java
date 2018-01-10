@@ -7,39 +7,39 @@ import com.odang.beatbot.midi.util.GeneralUtils;
 import com.odang.beatbot.ui.view.View;
 
 public class MidiNoteCreateDiff extends MidiNoteDiff {
-	int noteValue;
-	long onTick, offTick;
-	MidiNote note;
+    int noteValue;
+    long onTick, offTick;
+    MidiNote note;
 
-	public MidiNoteCreateDiff(int noteValue, long onTick, long offTick) {
-		this.noteValue = noteValue;
-		this.onTick = onTick;
-		this.offTick = offTick;
-	}
+    public MidiNoteCreateDiff(int noteValue, long onTick, long offTick) {
+        this.noteValue = noteValue;
+        this.onTick = onTick;
+        this.offTick = offTick;
+    }
 
-	public MidiNoteCreateDiff(MidiNote note) {
-		this(note.getNoteValue(), note.getOnTick(), note.getOffTick());
-		this.note = note;
-	}
+    public MidiNoteCreateDiff(MidiNote note) {
+        this(note.getNoteValue(), note.getOnTick(), note.getOffTick());
+        this.note = note;
+    }
 
-	@Override
-	public void apply() {
-		if (note == null) {
-			byte velocity = GeneralUtils.HALF_BYTE;
-			byte pan = GeneralUtils.HALF_BYTE;
-			byte pitch = GeneralUtils.HALF_BYTE;
+    @Override
+    public void apply() {
+        if (note == null) {
+            byte velocity = GeneralUtils.HALF_BYTE;
+            byte pan = GeneralUtils.HALF_BYTE;
+            byte pitch = GeneralUtils.HALF_BYTE;
 
-			NoteOn on = new NoteOn(onTick, 0, noteValue, velocity, pan, pitch);
-			NoteOff off = new NoteOff(offTick, 0, noteValue, velocity, pan, pitch);
-			new MidiNote(on, off).create();
-		} else {
-			note.create();
-		}
-	}
+            NoteOn on = new NoteOn(onTick, 0, noteValue, velocity, pan, pitch);
+            NoteOff off = new NoteOff(offTick, 0, noteValue, velocity, pan, pitch);
+            new MidiNote(on, off).create();
+        } else {
+            note.create();
+        }
+    }
 
-	@Override
-	public MidiNoteDestroyDiff opposite() {
-		final MidiNote note = View.context.getMidiManager().findNote(noteValue, onTick);
-		return new MidiNoteDestroyDiff(note);
-	}
+    @Override
+    public MidiNoteDestroyDiff opposite() {
+        final MidiNote note = View.context.getMidiManager().findNote(noteValue, onTick);
+        return new MidiNoteDestroyDiff(note);
+    }
 }

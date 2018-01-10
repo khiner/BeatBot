@@ -5,21 +5,21 @@ import com.odang.beatbot.track.Track;
 import com.odang.beatbot.ui.view.View;
 
 public class TrackToggleReverseEvent extends Executable {
-	private int trackId;
+    private int trackId;
 
-	public TrackToggleReverseEvent(Track track) {
-		this.trackId = track.getId();
-	}
+    public TrackToggleReverseEvent(Track track) {
+        this.trackId = track.getId();
+    }
 
-	@Override
-	public void undo() {
-		doExecute();
-	}
+    @Override
+    public void undo() {
+        doExecute();
+    }
 
-	@Override
-	public boolean doExecute() {
-		final Track track = View.context.getTrackManager().getTrackById(trackId);
-		track.setReverse(!track.isReverse());
-		return true;
-	}
+    @Override
+    public boolean doExecute() {
+        final Track track = View.context.getTrackManager().getTrackById(trackId);
+        track.setReverse(!track.isReverse());
+        return true;
+    }
 }

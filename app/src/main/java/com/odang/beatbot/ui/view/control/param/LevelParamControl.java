@@ -6,44 +6,44 @@ import com.odang.beatbot.ui.view.View;
 import com.odang.beatbot.ui.view.control.ControlView1dBase;
 
 public abstract class LevelParamControl extends ParamControl {
-	protected ControlView1dBase levelControl;
+    protected ControlView1dBase levelControl;
 
-	public LevelParamControl(View view) {
-		super(view);
-	}
+    public LevelParamControl(View view) {
+        super(view);
+    }
 
-	@Override
-	public void setId(int id) {
-		super.setId(id);
-		levelControl.setId(id);
-	}
+    @Override
+    public void setId(int id) {
+        super.setId(id);
+        levelControl.setId(id);
+    }
 
-	public void setParam(Param param) {
-		super.setParam(param);
-		levelControl.setParam(param);
-	}
+    public void setParam(Param param) {
+        super.setParam(param);
+        levelControl.setParam(param);
+    }
 
-	public void setLevelColor(float[] levelColor, float[] levelColorTrans) {
-		levelControl.setLevelColor(levelColor, levelColorTrans);
-	}
+    public void setLevelColor(float[] levelColor, float[] levelColorTrans) {
+        levelControl.setLevelColor(levelColor, levelColorTrans);
+    }
 
-	@Override
-	public void onPress(TouchableView view) {
-		super.onPress(view);
-		valueLabel.press();
-		levelControl.press();
-		if (null != touchListener) {
-			touchListener.onPress(view);
-		}
-	}
+    @Override
+    public void onPress(TouchableView view) {
+        super.onPress(view);
+        valueLabel.press();
+        levelControl.press();
+        if (null != touchListener) {
+            touchListener.onPress(view);
+        }
+    }
 
-	@Override
-	public void onRelease(TouchableView view) {
-		super.onRelease(view);
-		valueLabel.release();
-		levelControl.release();
-		if (null != touchListener) {
-			touchListener.onRelease(view);
-		}
-	}
+    @Override
+    public void onRelease(TouchableView view) {
+        super.onRelease(view);
+        valueLabel.release();
+        levelControl.release();
+        if (null != touchListener) {
+            touchListener.onRelease(view);
+        }
+    }
 }

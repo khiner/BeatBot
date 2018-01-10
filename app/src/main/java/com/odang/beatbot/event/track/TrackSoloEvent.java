@@ -5,21 +5,21 @@ import com.odang.beatbot.track.Track;
 import com.odang.beatbot.ui.view.View;
 
 public class TrackSoloEvent extends Executable {
-	private int trackId;
+    private int trackId;
 
-	public TrackSoloEvent(Track track) {
-		this.trackId = track.getId();
-	}
+    public TrackSoloEvent(Track track) {
+        this.trackId = track.getId();
+    }
 
-	@Override
-	public void undo() {
-		doExecute();
-	}
+    @Override
+    public void undo() {
+        doExecute();
+    }
 
-	@Override
-	public boolean doExecute() {
-		final Track track = View.context.getTrackManager().getTrackById(trackId);
-		track.solo(!track.isSoloing());
-		return true;
-	}
+    @Override
+    public boolean doExecute() {
+        final Track track = View.context.getTrackManager().getTrackById(trackId);
+        track.solo(!track.isSoloing());
+        return true;
+    }
 }

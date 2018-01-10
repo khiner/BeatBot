@@ -7,38 +7,38 @@ import com.odang.beatbot.ui.view.control.Dial;
 import com.odang.beatbot.ui.view.control.ToggleDial;
 
 public class DialParamControl extends LevelParamControl {
-	private TouchableView levelControlView;
+    private TouchableView levelControlView;
 
-	public DialParamControl(View view) {
-		super(view);
-	}
+    public DialParamControl(View view) {
+        super(view);
+    }
 
-	public DialParamControl withBeatSync(boolean beatSync) {
-		levelControlView = beatSync ? new ToggleDial(this) : new Dial(this);
-		if (beatSync) {
-			levelControl = ((ToggleDial) levelControlView).getDial();
-		} else {
-			levelControl = (Dial) levelControlView;
-		}
+    public DialParamControl withBeatSync(boolean beatSync) {
+        levelControlView = beatSync ? new ToggleDial(this) : new Dial(this);
+        if (beatSync) {
+            levelControl = ((ToggleDial) levelControlView).getDial();
+        } else {
+            levelControl = (Dial) levelControlView;
+        }
 
-		levelControl.setListener(this);
-		return this;
-	}
+        levelControl.setListener(this);
+        return this;
+    }
 
-	@Override
-	public void setParam(Param param) {
-		super.setParam(param);
-		if (levelControlView instanceof ToggleDial) {
-			final ToggleDial toggleDial = (ToggleDial) levelControlView;
-			param.addToggleListener(toggleDial);
-			toggleDial.onParamToggle(param);
-		}
-	}
+    @Override
+    public void setParam(Param param) {
+        super.setParam(param);
+        if (levelControlView instanceof ToggleDial) {
+            final ToggleDial toggleDial = (ToggleDial) levelControlView;
+            param.addToggleListener(toggleDial);
+            toggleDial.onParamToggle(param);
+        }
+    }
 
-	@Override
-	public void layoutChildren() {
-		label.layout(this, 0, 0, width, height / 5);
-		levelControlView.layout(this, 0, height / 5, width, 3 * height / 5);
-		valueLabel.layout(this, 0, 5 * height / 6, width, height / 6);
-	}
+    @Override
+    public void layoutChildren() {
+        label.layout(this, 0, 0, width, height / 5);
+        levelControlView.layout(this, 0, height / 5, width, 3 * height / 5);
+        valueLabel.layout(this, 0, 5 * height / 6, width, height / 6);
+    }
 }

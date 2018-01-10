@@ -3,5 +3,5 @@ package com.odang.beatbot.listener;
 import com.odang.beatbot.ui.view.group.GLSurfaceViewGroup;
 
 public interface GLSurfaceViewGroupListener {
-	void onGlReady(GLSurfaceViewGroup viewGroup);
+    void onGlReady(GLSurfaceViewGroup viewGroup);
 }

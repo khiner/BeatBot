@@ -16,115 +16,115 @@
 
 package com.odang.beatbot.midi.event;
 
+import com.odang.beatbot.midi.event.meta.MetaEvent;
+import com.odang.beatbot.midi.util.VariableLengthInt;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.odang.beatbot.midi.event.meta.MetaEvent;
-import com.odang.beatbot.midi.util.VariableLengthInt;
-
 public abstract class MidiEvent implements Comparable<MidiEvent> {
-	protected long mTick;
-	protected VariableLengthInt mDelta;
+    protected long mTick;
+    protected VariableLengthInt mDelta;
 
-	public MidiEvent(long tick, long delta) {
-		mTick = tick;
-		mDelta = new VariableLengthInt((int) delta);
-	}
+    public MidiEvent(long tick, long delta) {
+        mTick = tick;
+        mDelta = new VariableLengthInt((int) delta);
+    }
 
-	public void setTick(long tick) {
-		mTick = tick;
-	}
+    public void setTick(long tick) {
+        mTick = tick;
+    }
 
-	public long getTick() {
-		return mTick;
-	}
+    public long getTick() {
+        return mTick;
+    }
 
-	public long getDelta() {
-		return mDelta.getValue();
-	}
+    public long getDelta() {
+        return mDelta.getValue();
+    }
 
-	public void setDelta(long d) {
-		mDelta.setValue((int) d);
-	}
+    public void setDelta(long d) {
+        mDelta.setValue((int) d);
+    }
 
-	protected abstract int getEventSize();
+    protected abstract int getEventSize();
 
-	public int getSize() {
-		return getEventSize() + mDelta.getByteCount();
-	}
+    public int getSize() {
+        return getEventSize() + mDelta.getByteCount();
+    }
 
-	public boolean requiresStatusByte(MidiEvent prevEvent) {
-		if (prevEvent == null) {
-			return true;
-		}
-		if (this instanceof MetaEvent) {
-			return true;
-		}
-		if (this.getClass().equals(prevEvent.getClass())) {
-			return false;
-		}
-		return true;
-	}
+    public boolean requiresStatusByte(MidiEvent prevEvent) {
+        if (prevEvent == null) {
+            return true;
+        }
+        if (this instanceof MetaEvent) {
+            return true;
+        }
+        if (this.getClass().equals(prevEvent.getClass())) {
+            return false;
+        }
+        return true;
+    }
 
-	public void writeToFile(OutputStream out, boolean writeType) throws IOException {
-		out.write(mDelta.getBytes());
-	}
+    public void writeToFile(OutputStream out, boolean writeType) throws IOException {
+        out.write(mDelta.getBytes());
+    }
 
-	private static int sId = -1;
-	private static int sType = -1;
-	private static int sChannel = -1;
+    private static int sId = -1;
+    private static int sType = -1;
+    private static int sChannel = -1;
 
-	public static final MidiEvent parseEvent(long tick, long delta, InputStream in)
-			throws IOException {
+    public static final MidiEvent parseEvent(long tick, long delta, InputStream in)
+            throws IOException {
 
-		in.mark(1);
+        in.mark(1);
 
-		int id = in.read();
-		if (!verifyIdentifier(id)) {
-			in.reset();
-		}
+        int id = in.read();
+        if (!verifyIdentifier(id)) {
+            in.reset();
+        }
 
-		if (sType >= 0x8 && sType <= 0xE) {
+        if (sType >= 0x8 && sType <= 0xE) {
 
-			return ChannelEvent.parseChannelEvent(tick, delta, sType, sChannel, in);
-		} else if (sId == 0xFF) {
+            return ChannelEvent.parseChannelEvent(tick, delta, sType, sChannel, in);
+        } else if (sId == 0xFF) {
 
-			return MetaEvent.parseMetaEvent(tick, delta, in);
-		}
+            return MetaEvent.parseMetaEvent(tick, delta, in);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	private static boolean verifyIdentifier(int id) {
+    private static boolean verifyIdentifier(int id) {
 
-		int type = id >> 4;
-		int channel = id & 0x0F;
+        int type = id >> 4;
+        int channel = id & 0x0F;
 
-		if (type >= 0x8 && type <= 0xE) {
-			sId = id;
-			sType = type;
-			sChannel = channel;
-		} else if (id == 0xFF) {
-			sId = id;
-			sType = -1;
-			sChannel = -1;
-		} else if (type == 0xF) {
-			sId = id;
-			sType = type;
-			sChannel = -1;
-		} else {
-			return false;
-		}
-		return true;
-	}
+        if (type >= 0x8 && type <= 0xE) {
+            sId = id;
+            sType = type;
+            sChannel = channel;
+        } else if (id == 0xFF) {
+            sId = id;
+            sType = -1;
+            sChannel = -1;
+        } else if (type == 0xF) {
+            sId = id;
+            sType = type;
+            sChannel = -1;
+        } else {
+            return false;
+        }
+        return true;
+    }
 
-	@Override
-	public String toString() {
-		return "" + mTick + " (" + mDelta.getValue() + "): " + this.getClass().getSimpleName();
-	}
+    @Override
+    public String toString() {
+        return "" + mTick + " (" + mDelta.getValue() + "): " + this.getClass().getSimpleName();
+    }
 
-	public static byte clip(byte value) {
-		return value > 0 ? (value < Byte.MAX_VALUE ? value : Byte.MAX_VALUE) : 0;
-	}
+    public static byte clip(byte value) {
+        return value > 0 ? (value < Byte.MAX_VALUE ? value : Byte.MAX_VALUE) : 0;
+    }
 }

@@ -16,72 +16,72 @@
 
 package com.odang.beatbot.midi.event.meta;
 
+import com.odang.beatbot.midi.event.MidiEvent;
+import com.odang.beatbot.midi.util.VariableLengthInt;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.odang.beatbot.midi.event.MidiEvent;
-import com.odang.beatbot.midi.util.VariableLengthInt;
-
 public class MidiChannelPrefix extends MetaEvent {
 
-	private int mChannel;
+    private int mChannel;
 
-	public MidiChannelPrefix(long tick, long delta, int channel) {
-		super(tick, delta, MetaEvent.MIDI_CHANNEL_PREFIX, new VariableLengthInt(4));
+    public MidiChannelPrefix(long tick, long delta, int channel) {
+        super(tick, delta, MetaEvent.MIDI_CHANNEL_PREFIX, new VariableLengthInt(4));
 
-		mChannel = channel;
-	}
+        mChannel = channel;
+    }
 
-	public void setChannel(int c) {
-		mChannel = c;
-	}
+    public void setChannel(int c) {
+        mChannel = c;
+    }
 
-	public int getChannel() {
-		return mChannel;
-	}
+    public int getChannel() {
+        return mChannel;
+    }
 
-	@Override
-	protected int getEventSize() {
-		return 4;
-	}
+    @Override
+    protected int getEventSize() {
+        return 4;
+    }
 
-	@Override
-	public void writeToFile(OutputStream out) throws IOException {
-		super.writeToFile(out);
+    @Override
+    public void writeToFile(OutputStream out) throws IOException {
+        super.writeToFile(out);
 
-		out.write(1);
-		out.write(mChannel);
-	}
+        out.write(1);
+        out.write(mChannel);
+    }
 
-	public static MidiChannelPrefix parseMidiChannelPrefix(long tick, long delta, InputStream in)
-			throws IOException {
+    public static MidiChannelPrefix parseMidiChannelPrefix(long tick, long delta, InputStream in)
+            throws IOException {
 
-		in.read(); // Size = 1;
-		int channel = in.read();
+        in.read(); // Size = 1;
+        int channel = in.read();
 
-		return new MidiChannelPrefix(tick, delta, channel);
-	}
+        return new MidiChannelPrefix(tick, delta, channel);
+    }
 
-	@Override
-	public int compareTo(MidiEvent other) {
+    @Override
+    public int compareTo(MidiEvent other) {
 
-		if (mTick != other.getTick()) {
-			return mTick < other.getTick() ? -1 : 1;
-		}
-		if (mDelta.getValue() != other.getDelta()) {
-			return mDelta.getValue() < other.getDelta() ? 1 : -1;
-		}
+        if (mTick != other.getTick()) {
+            return mTick < other.getTick() ? -1 : 1;
+        }
+        if (mDelta.getValue() != other.getDelta()) {
+            return mDelta.getValue() < other.getDelta() ? 1 : -1;
+        }
 
-		if (!(other instanceof MidiChannelPrefix)) {
-			return 1;
-		}
+        if (!(other instanceof MidiChannelPrefix)) {
+            return 1;
+        }
 
-		MidiChannelPrefix o = (MidiChannelPrefix) other;
+        MidiChannelPrefix o = (MidiChannelPrefix) other;
 
-		if (mChannel != o.mChannel) {
-			return mChannel < o.mChannel ? -1 : 1;
-		}
-		return 0;
-	}
+        if (mChannel != o.mChannel) {
+            return mChannel < o.mChannel ? -1 : 1;
+        }
+        return 0;
+    }
 }

@@ -10,62 +10,62 @@ import com.odang.beatbot.ui.view.control.Button;
 import com.odang.beatbot.ui.view.control.ToggleButton;
 
 public class TrackButtonRow extends TouchableView {
-	public ToggleButton instrumentButton, muteButton, soloButton;
-	private Track track;
+    public ToggleButton instrumentButton, muteButton, soloButton;
+    private Track track;
 
-	public TrackButtonRow(View view, Track track) {
-		super(view);
-		this.track = track;
-	}
-	
-	public void updateInstrumentIcon() {
-		instrumentButton.setResourceId(track.getIcon());
-	}
+    public TrackButtonRow(View view, Track track) {
+        super(view);
+        this.track = track;
+    }
 
-	@Override
-	protected void createChildren() {
-		instrumentButton = new ToggleButton(this).withRoundedRect().withIcon(
-				IconResourceSets.INSTRUMENT_BASE);
-		muteButton = new ToggleButton(this).oscillating().withRoundedRect()
-				.withIcon(IconResourceSets.MUTE);
-		soloButton = new ToggleButton(this).oscillating().withRoundedRect()
-				.withIcon(IconResourceSets.SOLO);
+    public void updateInstrumentIcon() {
+        instrumentButton.setResourceId(track.getIcon());
+    }
 
-		muteButton.setText("M");
-		soloButton.setText("S");
+    @Override
+    protected void createChildren() {
+        instrumentButton = new ToggleButton(this).withRoundedRect().withIcon(
+                IconResourceSets.INSTRUMENT_BASE);
+        muteButton = new ToggleButton(this).oscillating().withRoundedRect()
+                .withIcon(IconResourceSets.MUTE);
+        soloButton = new ToggleButton(this).oscillating().withRoundedRect()
+                .withIcon(IconResourceSets.SOLO);
 
-		instrumentButton.setOnReleaseListener(new OnReleaseListener() {
-			@Override
-			public void onRelease(Button button) {
-				track.select();
-			}
-		});
-		
-		instrumentButton.setOnLongPressListener(new OnLongPressListener() {
-			@Override
-			public void onLongPress(Button button) {
-				View.context.getTrackManager().selectTrackNotesExclusive(track);
-			}
-		});
+        muteButton.setText("M");
+        soloButton.setText("S");
 
-		muteButton.setOnReleaseListener(new OnReleaseListener() {
-			@Override
-			public void onRelease(Button button) {
-				new TrackMuteEvent(track).execute();
-			}
-		});
-		soloButton.setOnReleaseListener(new OnReleaseListener() {
-			@Override
-			public void onRelease(Button button) {
-				new TrackSoloEvent(track).execute();
-			}
-		});
-	}
+        instrumentButton.setOnReleaseListener(new OnReleaseListener() {
+            @Override
+            public void onRelease(Button button) {
+                track.select();
+            }
+        });
 
-	@Override
-	public void layoutChildren() {
-		instrumentButton.layout(this, 0, 0, height, height);
-		muteButton.layout(this, height, 0, height * .72f, height);
-		soloButton.layout(this, height + muteButton.width, 0, height * .72f, height);
-	}
+        instrumentButton.setOnLongPressListener(new OnLongPressListener() {
+            @Override
+            public void onLongPress(Button button) {
+                View.context.getTrackManager().selectTrackNotesExclusive(track);
+            }
+        });
+
+        muteButton.setOnReleaseListener(new OnReleaseListener() {
+            @Override
+            public void onRelease(Button button) {
+                new TrackMuteEvent(track).execute();
+            }
+        });
+        soloButton.setOnReleaseListener(new OnReleaseListener() {
+            @Override
+            public void onRelease(Button button) {
+                new TrackSoloEvent(track).execute();
+            }
+        });
+    }
+
+    @Override
+    public void layoutChildren() {
+        instrumentButton.layout(this, 0, 0, height, height);
+        muteButton.layout(this, height, 0, height * .72f, height);
+        soloButton.layout(this, height + muteButton.width, 0, height * .72f, height);
+    }
 }

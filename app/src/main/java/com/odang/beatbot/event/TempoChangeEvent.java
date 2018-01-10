@@ -3,44 +3,44 @@ package com.odang.beatbot.event;
 import com.odang.beatbot.ui.view.View;
 
 public class TempoChangeEvent extends Executable implements Temporal {
-	private float beginBpm, endBpm;
+    private float beginBpm, endBpm;
 
-	public TempoChangeEvent() {
-	}
+    public TempoChangeEvent() {
+    }
 
-	public TempoChangeEvent(float newBpm) {
-		begin();
-		this.endBpm = newBpm;
-	}
+    public TempoChangeEvent(float newBpm) {
+        begin();
+        this.endBpm = newBpm;
+    }
 
-	public void setEndBpm(float bpm) {
-		endBpm = bpm;
-	}
+    public void setEndBpm(float bpm) {
+        endBpm = bpm;
+    }
 
-	@Override
-	public void undo() {
-		new TempoChangeEvent(beginBpm).apply();
-	}
+    @Override
+    public void undo() {
+        new TempoChangeEvent(beginBpm).apply();
+    }
 
-	@Override
-	public void begin() {
-		beginBpm = View.context.getMidiManager().getBpm();
-	}
+    @Override
+    public void begin() {
+        beginBpm = View.context.getMidiManager().getBpm();
+    }
 
-	@Override
-	public void end() {
-		endBpm = View.context.getMidiManager().getBpm();
-		execute();
-	}
+    @Override
+    public void end() {
+        endBpm = View.context.getMidiManager().getBpm();
+        execute();
+    }
 
-	@Override
-	public boolean doExecute() {
-		if (endBpm != beginBpm) {
-			View.context.getMidiManager().setBpm(endBpm);
-			return true;
-		} else {
-			return false;
-		}
-	}
+    @Override
+    public boolean doExecute() {
+        if (endBpm != beginBpm) {
+            View.context.getMidiManager().setBpm(endBpm);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 }

@@ -16,43 +16,43 @@
 
 package com.odang.beatbot.midi.event.meta;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import com.odang.beatbot.midi.event.MidiEvent;
 import com.odang.beatbot.midi.util.VariableLengthInt;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 public class EndOfTrack extends MetaEvent {
 
-	public EndOfTrack(long tick, long delta) {
-		super(tick, delta, MetaEvent.END_OF_TRACK, new VariableLengthInt(0));
-	}
+    public EndOfTrack(long tick, long delta) {
+        super(tick, delta, MetaEvent.END_OF_TRACK, new VariableLengthInt(0));
+    }
 
-	@Override
-	protected int getEventSize() {
-		return 3;
-	}
+    @Override
+    protected int getEventSize() {
+        return 3;
+    }
 
-	@Override
-	public void writeToFile(OutputStream out) throws IOException {
-		super.writeToFile(out);
+    @Override
+    public void writeToFile(OutputStream out) throws IOException {
+        super.writeToFile(out);
 
-		out.write(0);
-	}
+        out.write(0);
+    }
 
-	@Override
-	public int compareTo(MidiEvent other) {
+    @Override
+    public int compareTo(MidiEvent other) {
 
-		if (mTick != other.getTick()) {
-			return mTick < other.getTick() ? -1 : 1;
-		}
-		if (mDelta.getValue() != other.getDelta()) {
-			return mDelta.getValue() < other.getDelta() ? 1 : -1;
-		}
+        if (mTick != other.getTick()) {
+            return mTick < other.getTick() ? -1 : 1;
+        }
+        if (mDelta.getValue() != other.getDelta()) {
+            return mDelta.getValue() < other.getDelta() ? 1 : -1;
+        }
 
-		if (!(other instanceof EndOfTrack)) {
-			return 1;
-		}
-		return 0;
-	}
+        if (!(other instanceof EndOfTrack)) {
+            return 1;
+        }
+        return 0;
+    }
 }

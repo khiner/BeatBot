@@ -1,177 +1,179 @@
 package com.odang.beatbot.effect;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.odang.beatbot.listener.ParamListener;
 import com.odang.beatbot.ui.view.View;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class Effect implements Comparable<Effect>, ParamListener {
 
-	public static enum LevelType {
-		VOLUME, PAN, PITCH
-	};
+    public static enum LevelType {
+        VOLUME, PAN, PITCH
+    }
 
-	// also in jni/Track.h: ugly but necessary
-	public final static int MAX_EFFECTS_PER_TRACK = 3;
-	public final static String NEW_EFFECT_LABEL = "Effect";
+    ;
 
-	protected List<Param> params = new ArrayList<Param>();
+    // also in jni/Track.h: ugly but necessary
+    public final static int MAX_EFFECTS_PER_TRACK = 3;
+    public final static String NEW_EFFECT_LABEL = "Effect";
 
-	protected int trackId, position;
-	protected int xParamIndex = 0, yParamIndex = 1;
-	protected boolean on;
+    protected List<Param> params = new ArrayList<Param>();
 
-	public Effect() {
-		this(-2);
-	}
+    protected int trackId, position;
+    protected int xParamIndex = 0, yParamIndex = 1;
+    protected boolean on;
 
-	public Effect(int trackId) {
-		this.trackId = trackId;
-		initParams();
-		for (Param param : params) {
-			param.addListener(this);
-		}
-	}
+    public Effect() {
+        this(-2);
+    }
 
-	public Effect(int trackId, int position) {
-		this.trackId = trackId;
-		this.position = position;
-		initParams();
-		for (Param param : params) {
-			param.addListener(this);
-		}
-		addEffect(trackId, getId(), position);
-		setDefaultParams();
-		setOn(true);
-	}
+    public Effect(int trackId) {
+        this.trackId = trackId;
+        initParams();
+        for (Param param : params) {
+            param.addListener(this);
+        }
+    }
 
-	public JsonObject serialize(Gson gson) {
-		JsonObject object = new JsonObject();
-		object.addProperty("name", getName());
-		object.addProperty("trackId", getTrackId());
-		object.addProperty("position", getPosition());
-		object.addProperty("on", isOn());
-		object.add("levels", gson.toJsonTree(getLevels()).getAsJsonArray());
-		object.addProperty("class", getClass().getName());
-		return object;
-	}
+    public Effect(int trackId, int position) {
+        this.trackId = trackId;
+        this.position = position;
+        initParams();
+        for (Param param : params) {
+            param.addListener(this);
+        }
+        addEffect(trackId, getId(), position);
+        setDefaultParams();
+        setOn(true);
+    }
 
-	public void deserialize(Gson gson, JsonObject jsonObject) {
-		setOn(jsonObject.get("on").getAsBoolean());
-		setLevels(gson.fromJson(jsonObject.get("levels"), float[].class));
-	}
+    public JsonObject serialize(Gson gson) {
+        JsonObject object = new JsonObject();
+        object.addProperty("name", getName());
+        object.addProperty("trackId", getTrackId());
+        object.addProperty("position", getPosition());
+        object.addProperty("on", isOn());
+        object.add("levels", gson.toJsonTree(getLevels()).getAsJsonArray());
+        object.addProperty("class", getClass().getName());
+        return object;
+    }
 
-	public abstract int getId();
+    public void deserialize(Gson gson, JsonObject jsonObject) {
+        setOn(jsonObject.get("on").getAsBoolean());
+        setLevels(gson.fromJson(jsonObject.get("levels"), float[].class));
+    }
 
-	public abstract String getName();
+    public abstract int getId();
 
-	protected abstract void initParams();
+    public abstract String getName();
 
-	public int getNumParams() {
-		return params.size();
-	}
+    protected abstract void initParams();
 
-	public int getTrackId() {
-		return trackId;
-	}
+    public int getNumParams() {
+        return params.size();
+    }
 
-	public void setTrackId(int trackId) {
-		this.trackId = trackId;
-	}
+    public int getTrackId() {
+        return trackId;
+    }
 
-	public void setOn(boolean on) {
-		this.on = on;
-		setEffectOn(trackId, position, on);
-	}
+    public void setTrackId(int trackId) {
+        this.trackId = trackId;
+    }
 
-	public boolean isOn() {
-		return on;
-	}
+    public void setOn(boolean on) {
+        this.on = on;
+        setEffectOn(trackId, position, on);
+    }
 
-	public int getPosition() {
-		return position;
-	}
+    public boolean isOn() {
+        return on;
+    }
 
-	public float[] getLevels() {
-		float[] levels = new float[params.size()];
-		for (int i = 0; i < params.size(); i++) {
-			levels[i] = params.get(i).viewLevel;
-		}
-		return levels;
-	}
+    public int getPosition() {
+        return position;
+    }
 
-	public void setLevels(float[] levels) {
-		for (int i = 0; i < levels.length; i++) {
-			if (i < params.size()) {
-				Param param = params.get(i);
-				param.setLevel(levels[i]);
-			}
-		}
-	}
+    public float[] getLevels() {
+        float[] levels = new float[params.size()];
+        for (int i = 0; i < params.size(); i++) {
+            levels[i] = params.get(i).viewLevel;
+        }
+        return levels;
+    }
 
-	public void setPosition(int position) {
-		this.position = position;
-	}
+    public void setLevels(float[] levels) {
+        for (int i = 0; i < levels.length; i++) {
+            if (i < params.size()) {
+                Param param = params.get(i);
+                param.setLevel(levels[i]);
+            }
+        }
+    }
 
-	public Param getParam(int paramNum) {
-		return params.get(paramNum);
-	}
+    public void setPosition(int position) {
+        this.position = position;
+    }
 
-	public String getParamValueString(int paramNum) {
-		return getParam(paramNum).getFormattedValue();
-	}
+    public Param getParam(int paramNum) {
+        return params.get(paramNum);
+    }
 
-	public void destroy() {
-		removeEffect(trackId, position);
-		View.context.getTrackManager().getBaseTrackById(trackId).removeEffect(this);
-	}
+    public String getParamValueString(int paramNum) {
+        return getParam(paramNum).getFormattedValue();
+    }
 
-	public Param getXParam() {
-		return getParam(xParamIndex);
-	}
+    public void destroy() {
+        removeEffect(trackId, position);
+        View.context.getTrackManager().getBaseTrackById(trackId).removeEffect(this);
+    }
 
-	public Param getYParam() {
-		return getParam(yParamIndex);
-	}
+    public Param getXParam() {
+        return getParam(xParamIndex);
+    }
 
-	public void quantizeParams() {
-		for (int i = 0; i < params.size(); i++) {
-			Param param = params.get(i);
-			if (param.isBeatSync()) {
-				param.setLevel(param.viewLevel);
-				setEffectParam(trackId, position, i, param.level);
-			}
-		}
-	}
+    public Param getYParam() {
+        return getParam(yParamIndex);
+    }
 
-	@Override
-	public void onParamChange(Param param) {
-		setEffectParam(trackId, position, param.id, param.level);
-	}
+    public void quantizeParams() {
+        for (int i = 0; i < params.size(); i++) {
+            Param param = params.get(i);
+            if (param.isBeatSync()) {
+                param.setLevel(param.viewLevel);
+                setEffectParam(trackId, position, i, param.level);
+            }
+        }
+    }
 
-	@Override
-	public int compareTo(Effect effect) {
-		return this.position - effect.position;
-	}
+    @Override
+    public void onParamChange(Param param) {
+        setEffectParam(trackId, position, param.id, param.level);
+    }
 
-	private void setDefaultParams() {
-		for (int i = 0; i < params.size(); i++) {
-			Param param = params.get(i);
-			setEffectParam(trackId, position, i, param.level);
-		}
-	}
+    @Override
+    public int compareTo(Effect effect) {
+        return this.position - effect.position;
+    }
 
-	public native void addEffect(int trackId, int effectId, int position);
+    private void setDefaultParams() {
+        for (int i = 0; i < params.size(); i++) {
+            Param param = params.get(i);
+            setEffectParam(trackId, position, i, param.level);
+        }
+    }
 
-	public native void removeEffect(int trackId, int position);
+    public native void addEffect(int trackId, int effectId, int position);
 
-	public static native void setEffectPosition(int trackId, int oldPosition, int newPosition);
+    public native void removeEffect(int trackId, int position);
 
-	public native void setEffectOn(int trackId, int effectPosition, boolean on);
+    public static native void setEffectPosition(int trackId, int oldPosition, int newPosition);
 
-	public native void setEffectParam(int trackId, int effectPosition, int paramNum,
-			float paramLevel);
+    public native void setEffectOn(int trackId, int effectPosition, boolean on);
+
+    public native void setEffectParam(int trackId, int effectPosition, int paramNum,
+                                      float paramLevel);
 }

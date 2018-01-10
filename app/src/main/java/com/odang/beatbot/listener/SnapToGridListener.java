@@ -1,5 +1,5 @@
 package com.odang.beatbot.listener;
 
 public interface SnapToGridListener {
-	void onSnapToGridChanged(boolean snapToGrid);
+    void onSnapToGridChanged(boolean snapToGrid);
 }

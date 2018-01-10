@@ -1,11 +1,5 @@
 package com.odang.beatbot.manager;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,213 +14,221 @@ import com.odang.beatbot.track.Track;
 import com.odang.beatbot.ui.view.View;
 import com.odang.beatbot.ui.view.control.Button;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class RecordManager {
-	static class RecordSourceButtonListener implements OnReleaseListener {
-		final RecordManager recordManager;
-		final AlertDialog.Builder builder;
+    static class RecordSourceButtonListener implements OnReleaseListener {
+        final RecordManager recordManager;
+        final AlertDialog.Builder builder;
 
-		public RecordSourceButtonListener(final RecordManager recordManager, final Context context) {
-			this.recordManager = recordManager;
-			builder = new AlertDialog.Builder(context);
-			builder.setTitle("Choose record source");
-		}
+        public RecordSourceButtonListener(final RecordManager recordManager, final Context context) {
+            this.recordManager = recordManager;
+            builder = new AlertDialog.Builder(context);
+            builder.setTitle("Choose record source");
+        }
 
-		@Override
-		public void onRelease(final Button button) {
-			builder.setItems(recordManager.getRecordSourceLabels(),
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int item) {
-							// first two are microphone and master track
-							final int recordSourceId = item - 2;
-							recordManager.setRecordSourceId(recordSourceId);
-							if (button != null) {
-								button.setText(recordManager.getRecordSourceLabel());
-							}
-						}
-					});
-			builder.create().show();
-		}
-	}
+        @Override
+        public void onRelease(final Button button) {
+            builder.setItems(recordManager.getRecordSourceLabels(),
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int item) {
+                            // first two are microphone and master track
+                            final int recordSourceId = item - 2;
+                            recordManager.setRecordSourceId(recordSourceId);
+                            if (button != null) {
+                                button.setText(recordManager.getRecordSourceLabel());
+                            }
+                        }
+                    });
+            builder.create().show();
+        }
+    }
 
-	public static enum State {
-		OFF, LISTENING, ARMED, RECORDING
-	};
+    public static enum State {
+        OFF, LISTENING, ARMED, RECORDING
+    }
 
-	public static final int MICROPHONE_RECORD_SOURCE_ID = -2;
-	public static final String MICROPHONE_RECORD_SOURCE_LABEL = "Microphone";
+    ;
 
-	private BeatBotActivity context;
-	private int recordSourceId = TrackManager.MASTER_TRACK_ID;
-	private String currRecordFileName = null;
-	private State state = State.OFF;
-	private int currFileNum = 0;
+    public static final int MICROPHONE_RECORD_SOURCE_ID = -2;
+    public static final String MICROPHONE_RECORD_SOURCE_LABEL = "Microphone";
 
-	private RecordStateListener listener;
-	private RecordSourceButtonListener recordSourceButtonListener;
+    private BeatBotActivity context;
+    private int recordSourceId = TrackManager.MASTER_TRACK_ID;
+    private String currRecordFileName = null;
+    private State state = State.OFF;
+    private int currFileNum = 0;
 
-	public RecordManager(BeatBotActivity context) {
-		this.context = context;
-		recordSourceButtonListener = new RecordSourceButtonListener(this, context);
-		context.onRecordManagerInit(this);
-	}
+    private RecordStateListener listener;
+    private RecordSourceButtonListener recordSourceButtonListener;
 
-	public void setListener(final RecordStateListener listener) {
-		this.listener = listener;
-	}
+    public RecordManager(BeatBotActivity context) {
+        this.context = context;
+        recordSourceButtonListener = new RecordSourceButtonListener(this, context);
+        context.onRecordManagerInit(this);
+    }
 
-	public OnReleaseListener getRecordSourceButtonListener() {
-		return recordSourceButtonListener;
-	}
+    public void setListener(final RecordStateListener listener) {
+        this.listener = listener;
+    }
 
-	public boolean isOff() {
-		return state == State.OFF;
-	}
+    public OnReleaseListener getRecordSourceButtonListener() {
+        return recordSourceButtonListener;
+    }
 
-	public boolean isListening() {
-		return state == State.LISTENING;
-	}
+    public boolean isOff() {
+        return state == State.OFF;
+    }
 
-	public boolean isArmed() {
-		return state == State.ARMED;
-	}
+    public boolean isListening() {
+        return state == State.LISTENING;
+    }
 
-	public boolean isRecording() {
-		return state == State.RECORDING;
-	}
+    public boolean isArmed() {
+        return state == State.ARMED;
+    }
 
-	// in LISTEN mode, recorder listens to (polls) the RecordSource to display the current level
-	public void startListening() {
-		if (!isOff())
-			return;
+    public boolean isRecording() {
+        return state == State.RECORDING;
+    }
 
-		// running timer task as daemon thread
-		state = State.LISTENING;
-		startListeningNative();
+    // in LISTEN mode, recorder listens to (polls) the RecordSource to display the current level
+    public void startListening() {
+        if (!isOff())
+            return;
 
-		if (listener != null) {
-			listener.onListenStart();
-		}
-	}
+        // running timer task as daemon thread
+        state = State.LISTENING;
+        startListeningNative();
 
-	// in ARMED mode, recorder waits for RecordSource to exceed threshold before recording
-	public void arm() {
-		if (!isListening())
-			return;
+        if (listener != null) {
+            listener.onListenStart();
+        }
+    }
 
-		state = State.ARMED;
-		armNative();
-		if (listener != null) {
-			listener.onRecordArmed();
-		}
-	}
+    // in ARMED mode, recorder waits for RecordSource to exceed threshold before recording
+    public void arm() {
+        if (!isListening())
+            return;
 
-	public void disarm() {
-		if (!isArmed())
-			return;
+        state = State.ARMED;
+        armNative();
+        if (listener != null) {
+            listener.onRecordArmed();
+        }
+    }
 
-		state = State.LISTENING;
-		disarmNative();
-		if (listener != null) {
-			listener.onRecordDisarmed();
-		}
-	}
+    public void disarm() {
+        if (!isArmed())
+            return;
 
-	public String startRecording() {
-		if (!isArmed()) {
-			return null;
-		}
+        state = State.LISTENING;
+        disarmNative();
+        if (listener != null) {
+            listener.onRecordDisarmed();
+        }
+    }
 
-		String recordDirectory = View.context.getFileManager().recordPathForSource(recordSourceId);
-		currRecordFileName = recordDirectory + "/R" + (currFileNum++) + ".wav";
-		try {
-			FileOutputStream out = WavFileUtil.writeWavFileHeader(currRecordFileName, 0, 0);
-			out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		state = State.RECORDING;
-		if (listener != null) {
-			listener.onRecordStart();
-		}
-		return currRecordFileName;
-	}
+    public String startRecording() {
+        if (!isArmed()) {
+            return null;
+        }
 
-	public File stopRecording() {
-		if (isArmed()) {
-			disarm();
-			return null;
-		}
-		if (!isRecording()) {
-			return null;
-		}
+        String recordDirectory = View.context.getFileManager().recordPathForSource(recordSourceId);
+        currRecordFileName = recordDirectory + "/R" + (currFileNum++) + ".wav";
+        try {
+            FileOutputStream out = WavFileUtil.writeWavFileHeader(currRecordFileName, 0, 0);
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        state = State.RECORDING;
+        if (listener != null) {
+            listener.onRecordStart();
+        }
+        return currRecordFileName;
+    }
 
-		File file = WavFileUtil.insertLengthDataIntoWavFile(currRecordFileName);
-		state = State.LISTENING;
-		if (listener != null) {
-			listener.onRecordStop(file);
-		}
-		Toast.makeText(context, "Recorded file to " + currRecordFileName, Toast.LENGTH_SHORT)
-				.show();
-		return file;
-	}
+    public File stopRecording() {
+        if (isArmed()) {
+            disarm();
+            return null;
+        }
+        if (!isRecording()) {
+            return null;
+        }
 
-	public void stopListening() {
-		if (!isListening())
-			return;
+        File file = WavFileUtil.insertLengthDataIntoWavFile(currRecordFileName);
+        state = State.LISTENING;
+        if (listener != null) {
+            listener.onRecordStop(file);
+        }
+        Toast.makeText(context, "Recorded file to " + currRecordFileName, Toast.LENGTH_SHORT)
+                .show();
+        return file;
+    }
 
-		stopListeningNative();
-		state = State.OFF;
+    public void stopListening() {
+        if (!isListening())
+            return;
 
-		if (listener != null) {
-			listener.onListenStop();
-		}
-	}
+        stopListeningNative();
+        state = State.OFF;
 
-	public void notifyRecordSourceBufferFilled(float recordSourceMaxFrame) {
-		if (listener != null) {
-			listener.onRecordSourceBufferFilled(recordSourceMaxFrame);
-		}
-	}
+        if (listener != null) {
+            listener.onListenStop();
+        }
+    }
 
-	public int getRecordSourceId() {
-		return recordSourceId;
-	}
+    public void notifyRecordSourceBufferFilled(float recordSourceMaxFrame) {
+        if (listener != null) {
+            listener.onRecordSourceBufferFilled(recordSourceMaxFrame);
+        }
+    }
 
-	public void setRecordSourceId(final int recordSourceId) {
-		this.recordSourceId = recordSourceId;
-		setRecordSourceNative(recordSourceId);
-		if (recordSourceId == MICROPHONE_RECORD_SOURCE_ID) {
-			startListeningNative();
-		}
-	}
+    public int getRecordSourceId() {
+        return recordSourceId;
+    }
 
-	public String[] getRecordSourceLabels() {
-		final List<String> recordSourceLabels = new ArrayList<String>();
-		recordSourceLabels.add(MICROPHONE_RECORD_SOURCE_LABEL);
-		recordSourceLabels.add(BaseTrack.MASTER_TRACK_NAME);
-		for (final Track track : context.getTrackManager().getTracks()) {
-			recordSourceLabels.add(track.getFormattedName());
-		}
-		
-		return recordSourceLabels.toArray(new String[recordSourceLabels.size()]);
-	}
+    public void setRecordSourceId(final int recordSourceId) {
+        this.recordSourceId = recordSourceId;
+        setRecordSourceNative(recordSourceId);
+        if (recordSourceId == MICROPHONE_RECORD_SOURCE_ID) {
+            startListeningNative();
+        }
+    }
 
-	public String getRecordSourceLabel() {
-		return recordSourceId == MICROPHONE_RECORD_SOURCE_ID ? MICROPHONE_RECORD_SOURCE_LABEL
-				: context.getTrackManager().getBaseTrackById(recordSourceId).getFormattedName();
-	}
+    public String[] getRecordSourceLabels() {
+        final List<String> recordSourceLabels = new ArrayList<String>();
+        recordSourceLabels.add(MICROPHONE_RECORD_SOURCE_LABEL);
+        recordSourceLabels.add(BaseTrack.MASTER_TRACK_NAME);
+        for (final Track track : context.getTrackManager().getTracks()) {
+            recordSourceLabels.add(track.getFormattedName());
+        }
 
-	public native void setThresholdLevel(float thresholdLevel);
+        return recordSourceLabels.toArray(new String[recordSourceLabels.size()]);
+    }
 
-	private native void setRecordSourceNative(int recordSourceId);
+    public String getRecordSourceLabel() {
+        return recordSourceId == MICROPHONE_RECORD_SOURCE_ID ? MICROPHONE_RECORD_SOURCE_LABEL
+                : context.getTrackManager().getBaseTrackById(recordSourceId).getFormattedName();
+    }
 
-	private native void startListeningNative();
+    public native void setThresholdLevel(float thresholdLevel);
 
-	private native void stopListeningNative();
+    private native void setRecordSourceNative(int recordSourceId);
 
-	private native void stopRecordingNative();
+    private native void startListeningNative();
 
-	private native void armNative();
+    private native void stopListeningNative();
 
-	private native void disarmNative();
+    private native void stopRecordingNative();
+
+    private native void armNative();
+
+    private native void disarmNative();
 }

@@ -17,11 +17,11 @@
 package com.odang.beatbot.midi.event;
 
 public class NoteOn extends ChannelEvent {
-	public NoteOn(long tick, int channel, int note, byte velocity, byte pan, byte pitch) {
-		super(tick, ChannelEvent.NOTE_ON, channel, note, velocity, pan, pitch);
-	}
+    public NoteOn(long tick, int channel, int note, byte velocity, byte pan, byte pitch) {
+        super(tick, ChannelEvent.NOTE_ON, channel, note, velocity, pan, pitch);
+    }
 
-	public NoteOn(long tick, long delta, int channel, int note, byte velocity, byte pan, byte pitch) {
-		super(tick, delta, ChannelEvent.NOTE_ON, channel, note, velocity, pan, pitch);
-	}
+    public NoteOn(long tick, long delta, int channel, int note, byte velocity, byte pan, byte pitch) {
+        super(tick, delta, ChannelEvent.NOTE_ON, channel, note, velocity, pan, pitch);
+    }
 }

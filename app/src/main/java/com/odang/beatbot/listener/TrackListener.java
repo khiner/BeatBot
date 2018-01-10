@@ -5,25 +5,25 @@ import com.odang.beatbot.track.BaseTrack;
 import com.odang.beatbot.track.Track;
 
 public interface TrackListener {
-	void onCreate(Track track);
+    void onCreate(Track track);
 
-	void onDestroy(Track track);
+    void onDestroy(Track track);
 
-	void onSelect(BaseTrack track);
+    void onSelect(BaseTrack track);
 
-	void onSampleChange(Track track);
+    void onSampleChange(Track track);
 
-	void onMuteChange(Track track, boolean mute);
+    void onMuteChange(Track track, boolean mute);
 
-	void onSoloChange(Track track, boolean solo);
+    void onSoloChange(Track track, boolean solo);
 
-	void onReverseChange(Track track, boolean reverse);
-	
-	void onLoopChange(Track track, boolean loop);
+    void onReverseChange(Track track, boolean reverse);
 
-	void onEffectCreate(BaseTrack track, Effect effect);
+    void onLoopChange(Track track, boolean loop);
 
-	void onEffectDestroy(BaseTrack track, Effect effect);
+    void onEffectCreate(BaseTrack track, Effect effect);
 
-	void onEffectOrderChange(BaseTrack track, int initialEffectPosition, int endEffectPosition);
+    void onEffectDestroy(BaseTrack track, Effect effect);
+
+    void onEffectOrderChange(BaseTrack track, int initialEffectPosition, int endEffectPosition);
 }
