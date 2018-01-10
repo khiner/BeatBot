@@ -51,25 +51,33 @@ public class MidiViewGroup extends TouchableView {
 
     @Override
     public void draw() {
+        final float translateX = midiView.absoluteX - midiView.width * midiView.getXOffset()
+                / midiView.getNumTicks();
+        final float translateY = -midiView.getYOffset();
+        final float scale = MidiManager.MAX_TICKS / midiView.getNumTicks();
+
         midiView.startClip(false, true);
-        push();
-        translate(0, -midiView.getYOffset());
+        translateYGroup.translate(0, translateY);
         translateYGroup.draw();
-        pop();
+        translateYGroup.translate(0, -translateY);
         midiView.endClip();
 
-        push();
-        translate(
-                midiView.absoluteX - midiView.width * midiView.getXOffset()
-                        / midiView.getNumTicks(), 0);
-        scale(MidiManager.MAX_TICKS / midiView.getNumTicks(), 1);
         midiView.startClip(true, false);
+        scaleGroup.scale(scale, 1);
+        scaleGroup.translate(translateX, 0);
+
         scaleGroup.draw();
-        translate(0, -midiView.getYOffset());
+
+        scaleGroup.translate(-translateX, 0);
+        scaleGroup.scale(1f / scale, 1);
         midiView.startClip(true, true);
+        translateScaleGroup.scale(scale, 1);
+        translateScaleGroup.translate(translateX, translateY);
         translateScaleGroup.draw();
+        translateScaleGroup.translate(-translateX, -translateY);
+        translateScaleGroup.scale(1f / scale, 1);
         midiView.endClip();
-        pop();
+
         midiView.getRenderGroup().draw();
     }
 

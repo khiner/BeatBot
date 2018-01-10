@@ -442,22 +442,6 @@ public class View implements Comparable<View> {
         return null;
     }
 
-    protected static final void translate(float x, float y) {
-        context.get_Gl().glTranslatef(x, y, 0);
-    }
-
-    protected static final void scale(float x, float y) {
-        context.get_Gl().glScalef(x, y, 1);
-    }
-
-    protected static final void push() {
-        context.get_Gl().glPushMatrix();
-    }
-
-    protected static final void pop() {
-        context.get_Gl().glPopMatrix();
-    }
-
     protected final float distanceFromCenterSquared(float x, float y) {
         return (x - width / 2) * (x - width / 2) + (y - height / 2) * (y - height / 2);
     }
