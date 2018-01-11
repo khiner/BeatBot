@@ -1,21 +1,21 @@
 package com.odang.beatbot.ui.shape;
 
+import android.opengl.GLES20;
+
 import com.odang.beatbot.ui.mesh.MeshGroup;
 import com.odang.beatbot.ui.texture.TextureGroup;
 import com.odang.beatbot.ui.view.View;
-
-import javax.microedition.khronos.opengles.GL10;
 
 public class RenderGroup {
     private MeshGroup fillGroup, strokeGroup;
     private TextureGroup textureGroup, textGroup;
 
     public RenderGroup() {
-        fillGroup = new MeshGroup(GL10.GL_TRIANGLE_STRIP);
-        strokeGroup = new MeshGroup(GL10.GL_LINES);
-        textureGroup = new TextureGroup(GL10.GL_TRIANGLE_STRIP, View.context
+        fillGroup = new MeshGroup(GLES20.GL_TRIANGLE_STRIP);
+        strokeGroup = new MeshGroup(GLES20.GL_LINES);
+        textureGroup = new TextureGroup(GLES20.GL_TRIANGLE_STRIP, View.context
                 .getResourceTextureAtlas().getTextureId());
-        textGroup = new TextureGroup(GL10.GL_TRIANGLE_STRIP, View.context.getFontTextureAtlas()
+        textGroup = new TextureGroup(GLES20.GL_TRIANGLE_STRIP, View.context.getFontTextureAtlas()
                 .getTextureId());
     }
 

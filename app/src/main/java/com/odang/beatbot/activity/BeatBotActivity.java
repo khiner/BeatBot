@@ -39,8 +39,6 @@ import com.odang.beatbot.ui.view.page.main.MainPage;
 
 import java.io.File;
 
-import javax.microedition.khronos.opengles.GL10;
-
 public class BeatBotActivity extends Activity {
     public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1, SAMPLE_NAME_EDIT_DIALOG_ID = 2,
             PROJECT_FILE_NAME_EDIT_DIALOG_ID = 3, MIDI_FILE_NAME_EDIT_DIALOG_ID = 4;
@@ -330,10 +328,6 @@ public class BeatBotActivity extends Activity {
 
     public GLSurfaceViewBase getRoot() {
         return surfaceViewBase;
-    }
-
-    public GL10 get_Gl() {
-        return surfaceViewBase.get_Gl();
     }
 
     public PageSelectGroup getPageSelectGroup() {

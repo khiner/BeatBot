@@ -11,6 +11,7 @@ import com.odang.beatbot.ui.view.TouchableView;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class GLSurfaceViewGroup extends TouchableSurfaceView {
@@ -35,8 +36,9 @@ public class GLSurfaceViewGroup extends TouchableSurfaceView {
         renderer.layout(null, 0, 0, w, h);
     }
 
-    public void initGl(GL10 gl) {
-        super.initGl(gl);
+    @Override
+    public void onSurfaceCreated(GL10 _gl, EGLConfig config) {
+        super.onSurfaceCreated(_gl, config);
         for (GLSurfaceViewGroupListener listener : listeners) {
             listener.onGlReady(this);
         }

@@ -1,17 +1,14 @@
 package com.odang.beatbot.ui.mesh;
 
+import android.opengl.GLES10;
+import android.opengl.GLES11;
 import android.opengl.GLES20;
-
-import com.odang.beatbot.ui.view.View;
 
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.microedition.khronos.opengles.GL10;
-import javax.microedition.khronos.opengles.GL11;
 
 public class MeshGroup {
     private final static int SHORT_BYTES = Short.SIZE / 8, FLOAT_BYTES = Float.SIZE / 8;
@@ -31,7 +28,7 @@ public class MeshGroup {
     private FloatBuffer vertexBuffer;
     private ShortBuffer indexBuffer;
 
-    private List<Mesh> children = new ArrayList<Mesh>();
+    private List<Mesh> children = new ArrayList<>();
 
     public MeshGroup(int primitiveType) {
         this(primitiveType, 6);
@@ -61,7 +58,6 @@ public class MeshGroup {
             dirty = false;
         }
 
-        final GL10 gl = View.context.get_Gl();
         GLES20.glLineWidth(strokeWeight);
         if (hasTexture()) {
             GLES20.glEnable(GLES20.GL_TEXTURE_2D);
@@ -69,18 +65,18 @@ public class MeshGroup {
         }
 
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vertexHandle);
-        gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
+        GLES10.glEnableClientState(GLES10.GL_COLOR_ARRAY);
 
-        ((GL11) gl).glVertexPointer(2, GLES20.GL_FLOAT, vertexBytes, 0);
-        ((GL11) gl).glColorPointer(4, GLES20.GL_FLOAT, vertexBytes, COLOR_OFFSET_BYTES);
+        GLES11.glVertexPointer(2, GLES20.GL_FLOAT, vertexBytes, 0);
+        GLES11.glColorPointer(4, GLES20.GL_FLOAT, vertexBytes, COLOR_OFFSET_BYTES);
         if (hasTexture()) {
-            ((GL11) gl).glTexCoordPointer(2, GLES20.GL_FLOAT, vertexBytes, TEX_OFFSET_BYTES);
+            GLES11.glTexCoordPointer(2, GLES20.GL_FLOAT, vertexBytes, TEX_OFFSET_BYTES);
         }
 
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, indexHandle);
         GLES20.glDrawElements(primitiveType, indexBuffer.limit(), GLES20.GL_UNSIGNED_SHORT, 0);
 
-        gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+        GLES10.glDisableClientState(GLES10.GL_COLOR_ARRAY);
         if (hasTexture()) {
             GLES20.glDisable(GLES20.GL_TEXTURE_2D);
         }

@@ -19,8 +19,6 @@ import com.odang.beatbot.ui.shape.Shape;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.microedition.khronos.opengles.GL10;
-
 public class View implements Comparable<View> {
     public static BeatBotActivity context; // XXX
 
@@ -35,8 +33,8 @@ public class View implements Comparable<View> {
             cornerRadius = 0;
 
     protected View parent;
-    protected List<View> children = new ArrayList<View>();
-    protected List<Shape> shapes = new ArrayList<Shape>();
+    protected List<View> children = new ArrayList<>();
+    protected List<Shape> shapes = new ArrayList<>();
 
     protected Shape bgShape;
     protected TextureMesh textureMesh;
@@ -291,7 +289,7 @@ public class View implements Comparable<View> {
         if (parent == null)
             return;
         // scissor ensures that each view can only draw within its rect
-        GLES20.glEnable(GL10.GL_SCISSOR_TEST);
+        GLES20.glEnable(GLES20.GL_SCISSOR_TEST);
         int xClip = clipX ? (int) absoluteX : 0;
         int yClip = clipY ? (int) (getTotalHeight() - absoluteY - height) : 0;
         int clipW = clipX ? (int) width : Integer.MAX_VALUE;
@@ -301,7 +299,7 @@ public class View implements Comparable<View> {
     }
 
     public void endClip() {
-        GLES20.glDisable(GL10.GL_SCISSOR_TEST);
+        GLES20.glDisable(GLES20.GL_SCISSOR_TEST);
     }
 
     @Override

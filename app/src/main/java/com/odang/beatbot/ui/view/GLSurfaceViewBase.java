@@ -1,6 +1,7 @@
 package com.odang.beatbot.ui.view;
 
 import android.content.Context;
+import android.opengl.GLES10;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
@@ -17,12 +18,11 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
     private long beginTimeMillis = System.currentTimeMillis(), deltaTimeMillis = 0;
     private int framesSkipped = 0, sleepTimeMillis = 0;
 
-    private GL10 _gl;
-
     public GLSurfaceViewBase(Context context) {
         super(context);
         setRenderer(this);
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+
         //setPreserveEGLContextOnPause(true);
     }
 
@@ -32,19 +32,17 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
     }
 
     public void onSurfaceCreated(GL10 _gl, EGLConfig config) {
-        this._gl = _gl;
-        initGl(_gl);
-    }
-
-    public GL10 get_Gl() {
-        return _gl;
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES10.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+        GLES10.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     public final void onDrawFrame(GL10 _gl) {
         beginTimeMillis = System.currentTimeMillis();
         framesSkipped = 0;
         tick();
-        GLES20.glClear(GL10.GL_COLOR_BUFFER_BIT);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         draw();
         deltaTimeMillis = System.currentTimeMillis() - beginTimeMillis;
         sleepTimeMillis = (int) (FRAME_PERIOD_MILLIS - deltaTimeMillis);
@@ -63,13 +61,6 @@ public abstract class GLSurfaceViewBase extends GLSurfaceView implements GLSurfa
             sleepTimeMillis += FRAME_PERIOD_MILLIS;
             framesSkipped++;
         }
-    }
-
-    protected void initGl(GL10 _gl) {
-        GLES20.glEnable(GLES20.GL_BLEND);
-        _gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-        _gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     protected abstract void draw();
