@@ -43,6 +43,7 @@ public class WaveformShape extends Shape {
 
         Track track = (Track) View.context.getTrackManager().getCurrTrack();
         track.fillSampleBuffer(sampleBuffer, startFrame, endFrame, stepFrames);
+
         resetIndices();
         updateWaveformVertices();
     }
@@ -79,8 +80,8 @@ public class WaveformShape extends Shape {
     }
 
     private void updateWaveformVertices() {
-        if (null == sampleBuffer)
-            return;
+        if (null == sampleBuffer || this.widthInFrames <= 0 || sampleBuffer.length < 4 || sampleBuffer[0] == sampleBuffer[2])
+            return; // yes, this is a silly bad condition that isn't clear and should be handled in other ways
 
         float x = 0, y = 0;
 

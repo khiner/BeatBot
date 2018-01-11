@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "com.odang.beatbot"
         minSdkVersion 10
-        targetSdkVersion 22
+        targetSdkVersion 23
 
         ndk {
             moduleName "nativeaudio"
