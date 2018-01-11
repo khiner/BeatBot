@@ -2,3 +2,5 @@
 .idea/
 build/
 local.properties
+app/release/
+android.jks
