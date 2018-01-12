@@ -4,3 +4,4 @@ build/
 local.properties
 app/release/
 android.jks
+.DS_Store
