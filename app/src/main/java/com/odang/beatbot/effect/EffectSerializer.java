@@ -25,7 +25,7 @@ public class EffectSerializer implements JsonSerializer<Effect>, JsonDeserialize
         int trackId = object.get("trackId").getAsInt();
         int position = object.get("position").getAsInt();
         new EffectCreateEvent(trackId, position, name).apply();
-        Effect effect = View.context.getTrackManager().getTrackById(trackId).getEffectByPosition(position);
+        Effect effect = View.context.getTrackManager().getBaseTrackById(trackId).getEffectByPosition(position);
         effect.deserialize(GSON, object);
 
         return effect;
