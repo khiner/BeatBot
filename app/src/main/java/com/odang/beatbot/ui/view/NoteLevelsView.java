@@ -69,17 +69,19 @@ public class NoteLevelsView extends TouchableView {
     }
 
     protected void drawLevel(MidiNote midiNote, float[] levelColor, float[] levelColorTrans) {
-        float y = levelToY(midiNote.getLinearLevel(currLevelType));
-        levelBarRect.layout(levelBarRect.x, y, levelBarRect.width, height - y - 1);
-        levelBarCircle.setPosition(0, y);
-        levelBarSelectCircle.setPosition(0, y);
+        final float x = tickToX(midiNote.getOnTick()) + absoluteX;
+        final float y = levelToY(midiNote.getLinearLevel(currLevelType));
+
+        levelBarRect.layout(0, y, levelBarRect.width, height - y - 1);
+        levelBarCircle.setPosition(levelBarCircle.width / 2, y);
+        levelBarSelectCircle.setPosition(levelBarCircle.width / 2, y);
         levelBarRect.setFillColor(levelColor);
         levelBarCircle.setFillColor(levelColor);
         levelBarSelectCircle.setFillColor(levelColorTrans);
 
-        levelBarGroup.translate(tickToX(midiNote.getOnTick()) + absoluteX, absoluteY);
+        levelBarGroup.translate(x, absoluteY);
         levelBarGroup.draw();
-        levelBarGroup.translate(-(tickToX(midiNote.getOnTick()) + absoluteX), -absoluteY);
+        levelBarGroup.translate(-x, -absoluteY);
     }
 
     private float[] calcLevelColor(boolean selected) {
