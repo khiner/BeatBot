@@ -13,12 +13,14 @@ import com.odang.beatbot.ui.shape.RenderGroup;
 import com.odang.beatbot.ui.view.control.ValueLabel;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class NoteLevelsView extends TouchableView {
 
-    public static final float LEVEL_BAR_WIDTH_SCREEN_RATIO = 1f / 100f;
+    public static final float LEVEL_BAR_WIDTH_SCREEN_RATIO = 1f / 80f;
 
     private class DragLine {
         private float m = 0, b = 0, leftTick = 0, rightTick = Float.MAX_VALUE, leftLevel = 0,
@@ -34,11 +36,11 @@ public class NoteLevelsView extends TouchableView {
         }
     }
 
-    // map of pointerIds to the notes they are selecting
-    private TouchedNotes touchedNotes = new TouchedNotes();
+    private TouchedNotes touchedNotesById = new TouchedNotes();
+    private Set<MidiNote> touchedNotes = new HashSet<>();
 
     // map Midi Note to the offset of their level relative to the touched level(s)
-    private Map<MidiNote, Float> levelOffsets = new HashMap<MidiNote, Float>();
+    private Map<MidiNote, Float> levelOffsets = new HashMap<>();
 
     private LevelType currLevelType = LevelType.VOLUME;
 
@@ -65,11 +67,12 @@ public class NoteLevelsView extends TouchableView {
     }
 
     public void clearTouchedLevels() {
+        touchedNotesById.clear();
         touchedNotes.clear();
     }
 
     protected void drawLevel(MidiNote midiNote, float[] levelColor, float[] levelColorTrans) {
-        final float x = tickToX(midiNote.getOnTick()) + absoluteX;
+        final float x = absoluteX + tickToX(midiNote.getOnTick());
         final float y = levelToY(midiNote.getLinearLevel(currLevelType));
 
         levelBarRect.layout(0, y, levelBarRect.width, height - y - 1);
@@ -78,6 +81,15 @@ public class NoteLevelsView extends TouchableView {
         levelBarRect.setFillColor(levelColor);
         levelBarCircle.setFillColor(levelColor);
         levelBarSelectCircle.setFillColor(levelColorTrans);
+
+        if (touchedNotes.contains(midiNote)) {
+            valueLabel.setPosition(width * LEVEL_BAR_WIDTH_SCREEN_RATIO * 2,
+                    levelToLabelY(midiNote.getLinearLevel(currLevelType)));
+            valueLabel.setText(midiNote.getLevelDisplay(currLevelType));
+            valueLabel.setIcon(IconResourceSets.VALUE_LABEL_VIEW_ONLY);
+        } else {
+            valueLabel.setIcon(IconResourceSets.VALUE_LABEL_TRANSPARENT);
+        }
 
         levelBarGroup.translate(x, absoluteY);
         levelBarGroup.draw();
@@ -122,25 +134,25 @@ public class NoteLevelsView extends TouchableView {
         Track track = (Track) context.getTrackManager().getCurrTrack();
         for (MidiNote midiNote : track.getMidiNotes()) {
             float velocityY = levelToY(midiNote.getLinearLevel(currLevelType));
-            if (Math.abs(tickToX(midiNote.getOnTick()) - pos.x) < 35
-                    && Math.abs(velocityY - pos.y) < 35) {
+            if (Math.abs(tickToX(midiNote.getOnTick()) - pos.x) < levelBarCircle.width * 2
+                    && Math.abs(velocityY - pos.y) < levelBarCircle.width * 2) {
                 // If this is the only touched level, and it hasn't yet
                 // been selected, make it the only selected level.
                 // If we are multi-selecting, add it to the selected list
                 if (!midiNote.isSelected()) {
-                    if (touchedNotes.isEmpty()) {
+                    if (touchedNotesById.isEmpty()) {
                         context.getTrackManager().deselectAllNotes();
                     }
                     midiNote.setSelected(true);
                 }
                 valueLabel.show();
-                updateValueLabel(midiNote);
-                touchedNotes.put(pointerId, midiNote);
+                touchedNotesById.put(pointerId, midiNote);
+                touchedNotes.add(midiNote);
                 updateLevelOffsets();
                 return true;
             }
         }
-        if (touchedNotes.isEmpty()) {
+        if (touchedNotesById.isEmpty()) {
             context.getTrackManager().deselectAllNotes();
         }
         return false;
@@ -168,17 +180,17 @@ public class NoteLevelsView extends TouchableView {
     }
 
     private void updateDragLine() {
-        int touchedSize = touchedNotes.size();
+        int touchedSize = touchedNotesById.size();
         if (touchedSize == 1) {
             dragLine.m = 0;
-            MidiNote touched = (MidiNote) touchedNotes.valueAt(0);
+            MidiNote touched = (MidiNote) touchedNotesById.valueAt(0);
             dragLine.b = touched.getLinearLevel(currLevelType);
             dragLine.leftTick = 0;
             dragLine.rightTick = Float.MAX_VALUE;
             dragLine.leftLevel = dragLine.rightLevel = touched.getLinearLevel(currLevelType);
         } else if (touchedSize == 2) {
-            MidiNote first = touchedNotes.valueAt(0);
-            MidiNote second = touchedNotes.valueAt(1);
+            MidiNote first = touchedNotesById.valueAt(0);
+            MidiNote second = touchedNotesById.valueAt(1);
             MidiNote leftLevel = first.getOnTick() < second.getOnTick() ? first : second;
             MidiNote rightLevel = first.getOnTick() < second.getOnTick() ? second : first;
             dragLine.m = (rightLevel.getLinearLevel(currLevelType) - leftLevel
@@ -257,25 +269,22 @@ public class NoteLevelsView extends TouchableView {
         return height - levelBarSelectCircle.width;
     }
 
-    private void updateValueLabel(MidiNote touchedNote) {
-        valueLabel.setPosition(absoluteX + tickToX(touchedNote.getOnTick()) + width / 40, absoluteY
-                + levelToLabelY(touchedNote.getLinearLevel(currLevelType)));
-        valueLabel.setText(touchedNote.getLevelDisplay(currLevelType));
-    }
-
     @Override
     public void handleActionPointerUp(int id, Pointer pos) {
-        touchedNotes.remove(id);
-        updateLevelOffsets();
+        MidiNote touchedNote = touchedNotesById.get(id);
+        if (touchedNote != null) {
+            touchedNotesById.remove(id);
+            touchedNotes.remove(touchedNote);
+            updateLevelOffsets();
+        }
     }
 
     @Override
     public void handleActionMove(int id, Pointer pos) {
-        if (!touchedNotes.isEmpty()) {
-            MidiNote touched = touchedNotes.get(id);
+        if (!touchedNotesById.isEmpty()) {
+            MidiNote touched = touchedNotesById.get(id);
             if (touched != null) {
                 touched.setLevel(currLevelType, GeneralUtils.linearToByte(yToLevel(pos.y)));
-                updateValueLabel(touched);
             }
             if (id == pointerById.size() - 1) {
                 updateDragLine();
@@ -305,7 +314,6 @@ public class NoteLevelsView extends TouchableView {
         super.handleActionUp(id, pos);
         clearTouchedLevels();
         selectRegionRect.setFillColor(Color.TRANSPARENT);
-        valueLabel.hide();
         context.getMidiManager().endEvent();
     }
 
@@ -318,19 +326,19 @@ public class NoteLevelsView extends TouchableView {
         levelBarRect = new Rectangle(levelBarGroup, Color.TRON_BLUE, null);
         levelBarCircle = new Circle(levelBarGroup, Color.TRON_BLUE, null);
         levelBarSelectCircle = new Circle(levelBarGroup, Color.TRON_BLUE, null);
-        valueLabel = new ValueLabel(this, null);
-        valueLabel.setIcon(IconResourceSets.VALUE_LABEL_VIEW_ONLY);
+        valueLabel = new ValueLabel(this, levelBarGroup);
+        valueLabel.setIcon(IconResourceSets.VALUE_LABEL_TRANSPARENT);
         valueLabel.disable();
         addShapes(selectRegionRect);
     }
 
     @Override
     public void layoutChildren() {
-        final float levelBarWidth = View.context.getMainPage().width * LEVEL_BAR_WIDTH_SCREEN_RATIO;
+        final float levelBarWidth = width * LEVEL_BAR_WIDTH_SCREEN_RATIO;
         levelBarRect.layout(-levelBarWidth / 2, 0, levelBarWidth, height);
         levelBarCircle.layout(0, 0, levelBarWidth, levelBarWidth);
         levelBarSelectCircle.layout(0, 0, levelBarWidth * 2, levelBarWidth * 2);
+
         valueLabel.setDimensions(width / 12, width / 26);
-        valueLabel.hide();
     }
 }

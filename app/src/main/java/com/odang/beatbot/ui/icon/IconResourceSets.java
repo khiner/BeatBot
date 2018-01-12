@@ -17,6 +17,7 @@ public class IconResourceSets {
             BEAT_SYNC = s(r(R.drawable.clock, null, null, null, Color.WHITE), null, r(R.drawable.note_icon, null, null, null, Color.WHITE)),
             VALUE_LABEL = s(r(Color.LABEL_VERY_LIGHT), r(Color.LABEL_SELECTED), null, r(Color.TRANSPARENT)),
             VALUE_LABEL_VIEW_ONLY = s(null, null, null, r(Color.LABEL_VERY_LIGHT)),
+            VALUE_LABEL_TRANSPARENT = s(null, null, null, r(Color.TRANSPARENT, Color.TRANSPARENT)),
             PLAY = s(r(R.drawable.play_icon, null, Color.WHITE), r(R.drawable.play_icon_selected, null, Color.WHITE), r(R.drawable.play_icon_selected, null, Color.WHITE)),
             STOP = s(r(R.drawable.stop_icon, null, Color.WHITE), r(R.drawable.stop_icon, null, Color.LABEL_SELECTED)),
             RECORD = s(r(R.drawable.record_icon, null, Color.WHITE), r(R.drawable.record_icon_selected, null, Color.WHITE), r(R.drawable.record_icon_selected, null, Color.WHITE)),

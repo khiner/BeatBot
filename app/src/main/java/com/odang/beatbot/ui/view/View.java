@@ -120,6 +120,9 @@ public class View implements Comparable<View> {
     }
 
     public void setText(String text) {
+        if (text != null && text.equals(this.text))
+            return;
+
         this.text = text;
         textMesh.setText(text);
         stateChanged();
