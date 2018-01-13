@@ -317,7 +317,8 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
 
     @Override
     public void onSelect(BaseTrack track) {
-        if (currTrack == track)
+        if ((currTrack != null && currTrack.equals(track)) ||
+                (currTrack == null && masterTrack.equals(track)))
             return; // already selected
 
         if (track instanceof Track) {

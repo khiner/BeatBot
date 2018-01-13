@@ -111,8 +111,10 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
     }
 
     public void launchEffect(Effect effect) {
-        mainPageFlipper.setPage(effectPage);
-        effectPage.setEffect(effect);
+        if (!(effectIsShowing() && effect.equals(getCurrEffect()))) {
+            mainPageFlipper.setPage(effectPage);
+            effectPage.setEffect(effect);
+        }
         controlButtonGroup.updateEffectToggle(effect);
     }
 

@@ -83,8 +83,10 @@ public class View implements Comparable<View> {
     }
 
     public final void setState(State state) {
-        this.state = state;
-        stateChanged();
+        if (this.state != state) {
+            this.state = state;
+            stateChanged();
+        }
     }
 
     public void press() {
