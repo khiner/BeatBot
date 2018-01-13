@@ -12,7 +12,7 @@ jlong Java_com_odang_beatbot_manager_MidiManager_getCurrTick(JNIEnv *env,
 void Java_com_odang_beatbot_manager_MidiManager_setNativeMSPT(JNIEnv *env,
                                                               jclass clazz, jlong MSPT) {
     // MSPT = microseconds-per-tick
-    samplesPerTick = (MSPT * SAMPLE_RATE) / 1000000;
+    samplesPerTick = ((float) MSPT * SAMPLE_RATE) / (float) 1000000;
 }
 
 void Java_com_odang_beatbot_manager_MidiManager_setLoopTicksNative(JNIEnv *env,

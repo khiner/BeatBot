@@ -193,7 +193,7 @@ void generateNextBuffer() {
         if (playing) {
             if (++currSample >= samplesPerTick) {
                 currTick++;
-                currSample = 0;
+                currSample -= samplesPerTick;
             }
         }
     }
