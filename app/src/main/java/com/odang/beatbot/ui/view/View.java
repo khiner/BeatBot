@@ -192,12 +192,6 @@ public class View implements Comparable<View> {
         children.remove(child);
     }
 
-    public synchronized void removeChildren(View... children) {
-        for (View child : children) {
-            removeChild(child);
-        }
-    }
-
     public void addShapes(Shape... shapes) {
         for (Shape shape : shapes) {
             if (!this.shapes.contains(shape)) {

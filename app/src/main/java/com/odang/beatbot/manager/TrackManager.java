@@ -26,9 +26,9 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
     public static final int MASTER_TRACK_ID = -1;
 
     private final BaseTrack masterTrack = new BaseTrack(MASTER_TRACK_ID);
-    private final List<Track> tracks = new ArrayList<Track>();
-    private final Set<TrackListener> trackListeners = new HashSet<TrackListener>();
-    private final Set<TrackLevelsEventListener> trackLevelsEventListeners = new HashSet<TrackLevelsEventListener>();
+    private final List<Track> tracks = new ArrayList<>();
+    private final Set<TrackListener> trackListeners = new HashSet<>();
+    private final Set<TrackLevelsEventListener> trackLevelsEventListeners = new HashSet<>();
 
     private AlertDialog.Builder sampleSaveErrorAlert;
 

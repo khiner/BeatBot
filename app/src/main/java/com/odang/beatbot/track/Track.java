@@ -13,19 +13,18 @@ import com.odang.beatbot.ui.view.TrackButtonRow;
 import com.odang.beatbot.ui.view.View;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Track extends BaseTrack implements FileListener {
     public static float MIN_LOOP_WINDOW = 32f;
 
-    private boolean adsrEnabled = false, reverse = false, previewing = false, muted = false,
-            soloing = false;
+    private boolean reverse = false, previewing = false, muted = false, soloing = false;
 
-    private List<MidiNote> notes = new ArrayList<MidiNote>();
+    private List<MidiNote> notes = new CopyOnWriteArrayList<>();
     private File currSampleFile;
     private ADSR adsr;
 
@@ -35,12 +34,12 @@ public class Track extends BaseTrack implements FileListener {
 
     public Track() {
         super();
-        paramsForSample = new HashMap<File, SampleParams>();
+        paramsForSample = new HashMap<>();
     }
 
     public Track(int id) {
         super(id);
-        paramsForSample = new HashMap<File, SampleParams>();
+        paramsForSample = new HashMap<>();
         this.adsr = new ADSR(id);
     }
 
@@ -61,10 +60,6 @@ public class Track extends BaseTrack implements FileListener {
         for (MidiNote note : notes) {
             note.setNoteValue(noteValue);
         }
-    }
-
-    public boolean containsNote(MidiNote note) {
-        return notes.contains(note);
     }
 
     public MidiNote findNoteStarting(long onTick) {
@@ -114,10 +109,6 @@ public class Track extends BaseTrack implements FileListener {
                 .forDirectory(currSampleFile.getParentFile().getName());
     }
 
-    public void checkInstrumentButton() {
-        buttonRow.instrumentButton.setChecked(true);
-    }
-
     public void selectAllNotes() {
         for (MidiNote midiNote : notes) {
             midiNote.setSelected(true);
@@ -163,7 +154,7 @@ public class Track extends BaseTrack implements FileListener {
     }
 
     public void updateNextNote() {
-        Collections.sort(notes);
+        sortCopyOnWriteMidiNotes();
         setNextNote(id, getNextMidiNote(View.context.getMidiManager().getCurrTick()));
     }
 
@@ -365,6 +356,7 @@ public class Track extends BaseTrack implements FileListener {
         return getFrames(id);
     }
 
+    // Do not delete! Called from JNI.
     public float getSample(long sampleIndex, int channel) {
         return getSample(id, sampleIndex, channel);
     }
@@ -380,6 +372,15 @@ public class Track extends BaseTrack implements FileListener {
     public void destroy() {
         deleteTrack(id);
         View.context.getTrackManager().onDestroy(this);
+    }
+
+    // Can't use Collections.sort(...) because copyOnWrite doesn't support Iterator.set()
+    private void sortCopyOnWriteMidiNotes() {
+        Object[] a = notes.toArray();
+        Arrays.sort(a);
+        for (int i = 0; i < a.length; i++) {
+            notes.set(i, (MidiNote) a[i]);
+        }
     }
 
     private native void deleteTrack(int trackId);
