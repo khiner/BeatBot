@@ -8,7 +8,7 @@ SineWave *sinewave_create() {
     sineWave->table = (float *) malloc((TABLE_SIZE + 1) * sizeof(float));
     int i;
     for (i = 0; i < TABLE_SIZE; i++) {
-        sineWave->table[i] = sin(M_2_PI * i * INV_TABLE_SIZE);
+        sineWave->table[i] = (float) sin(M_2_PI * i * INV_TABLE_SIZE);
     }
     return sineWave;
 }

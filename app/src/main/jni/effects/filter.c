@@ -8,14 +8,16 @@ FilterConfig *filterconfig_create() {
     config->r = 0.5f;
     config->modDepth = .5f;
     config->mod = sinewave_create();
-    sinewave_setFrequency(config->mod, config->baseF);
-    int filterNum;
+    int filterNum, channel;
     for (filterNum = 0; filterNum < 2; filterNum++) {
-        config->inner[filterNum] = malloc(sizeof(InnerFilterConfig));
-        config->inner[filterNum]->in1[filterNum] = 0;
-        config->inner[filterNum]->in2[filterNum] = 0;
-        config->inner[filterNum]->out1[filterNum] = 0;
-        config->inner[filterNum]->out2[filterNum] = 0;
+        InnerFilterConfig *inner = (InnerFilterConfig *) malloc(sizeof(InnerFilterConfig));
+        for (channel = 0; channel < 2; channel++) {
+            inner->in1[channel] = 0;
+            inner->in2[channel] = 0;
+            inner->out1[channel] = 0;
+            inner->out2[channel] = 0;
+        }
+        config->inner[filterNum] = inner;
     }
     filterconfig_set(config, config->baseF, config->r);
     return config;

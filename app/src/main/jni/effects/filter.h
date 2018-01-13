@@ -27,7 +27,7 @@ void filterconfig_setParam(void *p, float paramNum, float param);
 static inline void lpfilterconfig_set(InnerFilterConfig *config, float frequency, float r) {
     float f0 = frequency * INV_SAMPLE_RATE;
     // for frequencies < ~ 4000 Hz, approximate the tan function as an optimization.
-    config->c = f0 < 0.1f ? 1.0f / (f0 * M_PI) : tan((0.5f - f0) * M_PI);
+    config->c = f0 < 0.1f ? 1.0f / (f0 * (float) M_PI) : (float) tan((0.5f - f0) * M_PI);
     config->a1 = 1.0f / (1.0f + r * config->c + config->c * config->c);
     config->a2 = 2.0f * config->a1;
     config->a3 = config->a1;
@@ -37,7 +37,7 @@ static inline void lpfilterconfig_set(InnerFilterConfig *config, float frequency
 
 static inline void hpfilterconfig_set(InnerFilterConfig *config, float frequency, float r) {
     float f0 = frequency * INV_SAMPLE_RATE;
-    config->c = f0 < 0.1f ? f0 * M_PI : tan(M_PI * f0);
+    config->c = f0 < 0.1f ? f0 * (float) M_PI : (float) tan(M_PI * f0);
     config->a1 = 1.0f / (1.0f + r * config->c + config->c * config->c);
     config->a2 = -2.0f * config->a1;
     config->a3 = config->a1;
@@ -64,25 +64,19 @@ static inline void filter_process(FilterConfig *config, float **buffers, int siz
                          config->baseF * (1.0f + config->modDepth * sinewave_tick(config->mod)),
                          config->r);
         for (filterNum = 0; filterNum < 2; filterNum++) {
+            InnerFilterConfig *inner = config->inner[filterNum];
             if (filterNum != config->mode && config->mode != BP_MODE)
                 continue; // one pass for the lp/hp filter, or one pass for each if bp mode
             for (channel = 0; channel < 2; channel++) {
-                float out = config->inner[filterNum]->a1
-                            * buffers[channel][samp]
-                            + config->inner[filterNum]->a2
-                              * config->inner[filterNum]->in1[channel]
-                            + config->inner[filterNum]->a3
-                              * config->inner[filterNum]->in2[channel]
-                            - config->inner[filterNum]->b1
-                              * config->inner[filterNum]->out1[channel]
-                            - config->inner[filterNum]->b2
-                              * config->inner[filterNum]->out2[channel];
-                config->inner[filterNum]->in2[channel] =
-                        config->inner[filterNum]->in1[channel];
-                config->inner[filterNum]->in1[channel] = buffers[channel][samp];
-                config->inner[filterNum]->out2[channel] =
-                        config->inner[filterNum]->out1[channel];
-                config->inner[filterNum]->out1[channel] = out;
+                float out = inner->a1 * buffers[channel][samp] +
+                            inner->a2 * inner->in1[channel] +
+                            inner->a3 * inner->in2[channel] -
+                            inner->b1 * inner->out1[channel] -
+                            inner->b2 * inner->out2[channel];
+                inner->in2[channel] = inner->in1[channel];
+                inner->in1[channel] = buffers[channel][samp];
+                inner->out2[channel] = inner->out1[channel];
+                inner->out1[channel] = out;
                 buffers[channel][samp] = out;
             }
         }
