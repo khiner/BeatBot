@@ -25,7 +25,7 @@ import java.util.List;
 
 public class MidiManager implements MidiNoteListener {
     public static final int MIN_BPM = 45, MAX_BPM = 300,
-            TICKS_PER_NOTE = MidiFile.DEFAULT_RESOLUTION, UNDO_STACK_SIZE = 40,
+            TICKS_PER_NOTE = MidiFile.DEFAULT_RESOLUTION,
             NOTES_PER_MEASURE = 4, TICKS_PER_MEASURE = TICKS_PER_NOTE * NOTES_PER_MEASURE,
             MIN_TICKS = TICKS_PER_NOTE / 2, MAX_TICKS = TICKS_PER_MEASURE * 4;
 
@@ -38,12 +38,11 @@ public class MidiManager implements MidiNoteListener {
     private TimeSignature ts = new TimeSignature();
     private Tempo tempo = new Tempo();
     private MidiTrack tempoTrack = new MidiTrack();
-    private List<MidiNote> copiedNotes = new ArrayList<MidiNote>(),
-            currState = new ArrayList<MidiNote>();
+    private List<MidiNote> copiedNotes = new ArrayList<>();
 
-    private List<MidiNoteListener> midiNoteListeners = new ArrayList<MidiNoteListener>();
-    private List<LoopWindowListener> loopChangeListeners = new ArrayList<LoopWindowListener>();
-    private List<TempoListener> tempoListeners = new ArrayList<TempoListener>();
+    private List<MidiNoteListener> midiNoteListeners = new ArrayList<>();
+    private List<LoopWindowListener> loopChangeListeners = new ArrayList<>();
+    private List<TempoListener> tempoListeners = new ArrayList<>();
     private SnapToGridListener snapToGridListener;
 
     private MidiNotesEventManager midiNotesEventManager;
@@ -368,11 +367,7 @@ public class MidiManager implements MidiNoteListener {
 
     public native long getCurrTick();
 
-    private native void isTrackPlaying(int trackId);
-
     private native void setNativeMSPT(long MSPT);
-
-    private native void setCurrTick(long currTick);
 
     private native void setLoopTicksNative(long loopBeginTick, long loopEndTick);
 }
