@@ -47,14 +47,15 @@ public class MidiViewGroup extends TouchableView {
         midiView.layout(this, trackControlWidth, loopBarHeight, width - trackControlWidth, height
                 - loopBarHeight);
         midiLoopBarView.layout(this, 0, 0, width - trackControlWidth, loopBarHeight);
-        translateYGroup.translateY(-midiView.getYOffset());
+        final float translateY = -midiView.getYOffset();
+        translateYGroup.translateY(translateY);
+        translateScaleGroup.translateY(translateY);
     }
 
     @Override
     public void draw() {
         final float translateX = midiView.absoluteX - midiView.width * midiView.getXOffset()
                 / midiView.getNumTicks();
-        final float translateY = -midiView.getYOffset();
         final float scale = MidiManager.MAX_TICKS / midiView.getNumTicks();
 
         midiView.startClip(false, true);
@@ -70,13 +71,11 @@ public class MidiViewGroup extends TouchableView {
 
         midiView.startClip(true, true);
         translateScaleGroup.scaleX(scale);
-        translateScaleGroup.translate(translateX, translateY);
+        translateScaleGroup.translateX(translateX);
         translateScaleGroup.draw();
-        translateScaleGroup.translate(-translateX, -translateY);
+        translateScaleGroup.translateX(-translateX);
         translateScaleGroup.scaleX(1f / scale);
         midiView.endClip();
-
-        midiView.getRenderGroup().draw();
     }
 
     @Override
