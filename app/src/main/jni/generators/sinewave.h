@@ -2,20 +2,14 @@
 #define SINEWAVE_H
 
 typedef struct SineWave_t {
-    float *table;
+    float table[TABLE_SIZE];
     float alpha, frequency, phaseOffset, rate, time;
     unsigned int iIndex;
 } SineWave;
 
 SineWave *sinewave_create();
 
-void sinewave_setRate(SineWave *config, float rate);
-
 void sinewave_setFrequency(SineWave *config, float frequency);
-
-void sinewave_addTimeInSamples(SineWave *config, float timeInSamples);
-
-void sinewave_addTimeInPhase(SineWave *config, float phase);
 
 void sinewave_addPhaseOffset(SineWave *config, float phaseOffset);
 
@@ -29,7 +23,8 @@ static inline float sinewave_tick(SineWave *config) {
 
     config->time += config->rate;
 
-    return (config->table[config->iIndex] + config->alpha * config->table[config->iIndex + 1]) /
+    return (config->table[config->iIndex] +
+            config->alpha * config->table[(config->iIndex + 1) % TABLE_SIZE]) /
            (1 + config->alpha);
 }
 
