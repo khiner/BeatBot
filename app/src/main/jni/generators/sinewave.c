@@ -7,7 +7,7 @@ SineWave *sinewave_create() {
     sineWave->phaseOffset = 0;
     int i;
     for (i = 0; i < TABLE_SIZE; i++) {
-        sineWave->table[i] = (float) sin(M_2_PI * i * INV_TABLE_SIZE);
+        sineWave->table[i] = (float) sin(2 * M_PI * i * INV_TABLE_SIZE);
     }
     return sineWave;
 }

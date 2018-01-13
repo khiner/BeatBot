@@ -27,5 +27,3 @@ void Java_com_odang_beatbot_manager_MidiManager_setLoopTicksNative(JNIEnv *env,
         currTick = loopBeginTick;
     }
 }
-
-
