@@ -29,7 +29,7 @@ public class MidiManager implements MidiNoteListener {
             NOTES_PER_MEASURE = 4, TICKS_PER_MEASURE = TICKS_PER_NOTE * NOTES_PER_MEASURE,
             MIN_TICKS = TICKS_PER_NOTE / 2, MAX_TICKS = TICKS_PER_MEASURE * 4;
 
-    public static final double LOG_2 = Math.log(2);
+    private static final double LOG_2 = Math.log(2);
 
     private boolean snapToGrid = true;
     private int beatDivision = 0;
@@ -182,7 +182,7 @@ public class MidiManager implements MidiNoteListener {
     }
 
     public void importFromFile(final MidiFile midiFile) {
-        final List<MidiNote> newNotes = new ArrayList<MidiNote>();
+        final List<MidiNote> newNotes = new ArrayList<>();
         final List<MidiTrack> midiTracks = midiFile.getTracks();
         tempoTrack = midiTracks.get(0);
         ts = (TimeSignature) tempoTrack.getEvents().get(0);
@@ -194,7 +194,7 @@ public class MidiManager implements MidiNoteListener {
         // necessarily alternate if there are interleaving notes (with different "notes"
         // - pitches) thus, we need to keep track of notes that have an on event, but
         // are waiting for the off event
-        final List<NoteOn> unfinishedNotes = new ArrayList<NoteOn>();
+        final List<NoteOn> unfinishedNotes = new ArrayList<>();
         for (final MidiEvent event : events) {
             if (event instanceof NoteOn)
                 unfinishedNotes.add((NoteOn) event);
@@ -243,8 +243,8 @@ public class MidiManager implements MidiNoteListener {
         midiNotesEventManager.moveSelectedNotes(noteDiff, tickDiff);
     }
 
-    public void pinchSelectedNotes(long onTickDiff, long offTickDiff) {
-        midiNotesEventManager.pinchSelectedNotes(onTickDiff, offTickDiff);
+    public void pinchSelectedNotes(long beginTickDiff, long endTickDiff) {
+        midiNotesEventManager.pinchSelectedNotes(beginTickDiff, endTickDiff);
     }
 
     public void applyDiffs(final List<MidiNoteDiff> diffs) {
@@ -266,8 +266,8 @@ public class MidiManager implements MidiNoteListener {
 
     public void setLoopTicks(long loopBeginTick, long loopEndTick) {
         boolean changed = false;
-        long quantizedBeginTick = (long) getMajorTickNearestTo(loopBeginTick);
-        long quantizedEndTick = (long) getMajorTickNearestTo(loopEndTick);
+        long quantizedBeginTick = getMajorTickNearestTo(loopBeginTick);
+        long quantizedEndTick = getMajorTickNearestTo(loopEndTick);
         if (quantizedBeginTick != this.loopBeginTick && quantizedBeginTick < quantizedEndTick) {
             this.loopBeginTick = quantizedBeginTick;
             changed = true;
@@ -290,7 +290,9 @@ public class MidiManager implements MidiNoteListener {
     }
 
     public void pinchLoopWindow(long beginTickDiff, long endTickDiff) {
-        setLoopTicks(getLoopBeginTick() + beginTickDiff, getLoopEndTick() + endTickDiff);
+        final long newEndTick = Math.min(getLoopEndTick() + endTickDiff, MAX_TICKS);
+        final long newBeginTick = GeneralUtils.clipTo(getLoopBeginTick() + beginTickDiff, 0, MAX_TICKS - newEndTick);
+        setLoopTicks(newBeginTick, newEndTick);
     }
 
     public long getLoopBeginTick() {
