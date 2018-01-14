@@ -264,7 +264,7 @@ public class MidiManager implements MidiNoteListener {
         midiNotesEventManager.deleteSelectedNotes();
     }
 
-    public synchronized void setLoopTicks(long loopBeginTick, long loopEndTick) {
+    public void setLoopTicks(long loopBeginTick, long loopEndTick) {
         boolean changed = false;
         long quantizedBeginTick = getMajorTickNearestTo(loopBeginTick);
         long quantizedEndTick = getMajorTickNearestTo(loopEndTick);
@@ -284,13 +284,13 @@ public class MidiManager implements MidiNoteListener {
     }
 
     // set new loop begin point, preserving loop length
-    public synchronized void translateLoopWindowTo(long tick) {
+    public void translateLoopWindowTo(long tick) {
         long loopLength = getLoopLength();
         long newBeginTick = GeneralUtils.clipTo(tick, 0, MAX_TICKS - loopLength);
         setLoopTicks(newBeginTick, newBeginTick + loopLength);
     }
 
-    public synchronized void pinchLoopWindow(long beginTickDiff, long endTickDiff) {
+    public void pinchLoopWindow(long beginTickDiff, long endTickDiff) {
         if (beginTickDiff == 0 && endTickDiff == 0)
             return;
 
@@ -370,7 +370,7 @@ public class MidiManager implements MidiNoteListener {
         }
     }
 
-    private synchronized void notifyLoopWindowChanged() {
+    private void notifyLoopWindowChanged() {
         setLoopTicksNative(loopBeginTick, loopEndTick);
         View.context.getTrackManager().updateAllTrackNextNotes();
         for (LoopWindowListener listener : loopChangeListeners) {

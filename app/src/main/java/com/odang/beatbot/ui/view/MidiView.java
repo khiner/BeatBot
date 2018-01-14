@@ -231,6 +231,12 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
     @Override
     public void handleActionMove(int id, Pointer pos) {
         super.handleActionMove(id, pos);
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            handleActionMoveInner(id, pos);
+        }
+    }
+
+    private void handleActionMoveInner(final int id, final Pointer pos) {
         if ((id == pinchLeftPointerId || id == pinchRightPointerId)) {
             if (isPinchingLoopWindow()) {
                 pinchLoopWindow(id, pos);

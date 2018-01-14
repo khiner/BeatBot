@@ -50,7 +50,7 @@ public class MidiViewGroup extends TouchableView {
     }
 
     @Override
-    public void draw() {
+    public synchronized void draw() {
         final float translateX = midiView.absoluteX - midiView.width * midiView.getXOffset()
                 / midiView.getNumTicks();
         final float translateY = -midiView.getYOffset();

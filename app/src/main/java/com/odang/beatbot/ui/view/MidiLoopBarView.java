@@ -43,15 +43,17 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
 
     @Override
     public void handleActionMove(int id, Pointer pos) {
-        long tick = (long) xToTick(pos.x);
         final MidiManager midiManager = context.getMidiManager();
         final MidiView midiView = context.getMainPage().getMidiView();
-        if (midiView.isPinchingLoopWindow()) {
-            selectionOffsetTick = tick - midiManager.getLoopBeginTick();
-            midiView.pinchLoopWindow(id, pos);
-        } else if (loopBarButton.isPressed() && pos.equals(loopBarButton.getPointer())) {
-            // middle selected. translate loop window (preserve loop length)
-            midiManager.translateLoopWindowTo(tick - (long) selectionOffsetTick);
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            long tick = (long) xToTick(pos.x);
+            if (midiView.isPinchingLoopWindow()) {
+                selectionOffsetTick = tick - midiManager.getLoopBeginTick();
+                midiView.pinchLoopWindow(id, pos);
+            } else if (loopBarButton.isPressed() && pos.equals(loopBarButton.getPointer())) {
+                // middle selected. translate loop window (preserve loop length)
+                midiManager.translateLoopWindowTo(tick - (long) selectionOffsetTick);
+            }
         }
     }
 
