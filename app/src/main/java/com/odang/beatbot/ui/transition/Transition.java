@@ -52,8 +52,8 @@ public abstract class Transition {
 
     public void begin() {
         released = false;
-        if (currState != State.COMPLETE)
-            currState = State.UP;
+        waitCount = 0;
+        currState = State.UP;
     }
 
     public void end() {
