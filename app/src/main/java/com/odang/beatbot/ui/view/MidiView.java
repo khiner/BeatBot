@@ -252,21 +252,11 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
     @Override
     public void handleActionMove(int id, Pointer pos) {
         super.handleActionMove(id, pos);
-        float tick = xToTick(pos.x);
         if ((id == pinchLeftPointerId || id == pinchRightPointerId)) {
-            final MidiManager midiManager = context.getMidiManager();
             if (isPinchingLoopWindow()) {
-                final long beginTickDiff;
-                final long endTickDiff;
-                if (id == pinchLeftPointerId) {
-                    beginTickDiff = (long) (tick - pinchLeftOffset - midiManager.getLoopBeginTick());
-                    endTickDiff = 0;
-                } else {
-                    beginTickDiff = 0;
-                    endTickDiff = (long) (tick + pinchRightOffset - midiManager.getLoopEndTick());
-                }
-                midiManager.pinchLoopWindow(beginTickDiff, endTickDiff);
+                pinchLoopWindow(id, pos);
             } else {
+                float tick = xToTick(pos.x);
                 final long[] selectedNoteTickWindow = context.getTrackManager().getSelectedNoteTickWindow();
                 final long beginTickDiff;
                 final long endTickDiff;
@@ -277,12 +267,13 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
                     beginTickDiff = 0;
                     endTickDiff = (long) (tick + pinchRightOffset - selectedNoteTickWindow[1]);
                 }
-                midiManager.pinchSelectedNotes(beginTickDiff, endTickDiff);
+                context.getMidiManager().pinchSelectedNotes(beginTickDiff, endTickDiff);
             }
         } else if (touchedNotes.isEmpty()) {
             // no midi selected. scroll, zoom, or update select region
             noMidiMove();
         } else if (touchedNotes.get(id) != null) { // at least one midi selected
+            float tick = xToTick(pos.x);
             int note = yToNote(pos.y);
             if (touchedNotes.size() == 1) {
                 // exactly one pointer not dragging loop markers - drag all selected notes together
@@ -298,6 +289,22 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
                 }
             }
         }
+    }
+
+    public void pinchLoopWindow(final int id, final Pointer pos) {
+        final MidiManager midiManager = context.getMidiManager();
+
+        float tick = xToTick(pos.x);
+        final long beginTickDiff;
+        final long endTickDiff;
+        if (id == pinchLeftPointerId) {
+            beginTickDiff = (long) (tick - pinchLeftOffset - midiManager.getLoopBeginTick());
+            endTickDiff = 0;
+        } else {
+            beginTickDiff = 0;
+            endTickDiff = (long) (tick + pinchRightOffset - midiManager.getLoopEndTick());
+        }
+        midiManager.pinchLoopWindow(beginTickDiff, endTickDiff);
     }
 
     @Override
