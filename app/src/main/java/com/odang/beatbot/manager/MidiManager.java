@@ -290,22 +290,6 @@ public class MidiManager implements MidiNoteListener {
         setLoopTicks(newBeginTick, newBeginTick + loopLength);
     }
 
-    public void pinchLoopWindow(long beginTickDiff, long endTickDiff) {
-        if (beginTickDiff == 0 && endTickDiff == 0)
-            return;
-
-        long onTickDiff = getMajorTickNearestTo(getLoopBeginTick() + beginTickDiff) - getLoopBeginTick();
-        long offTickDiff = getMajorTickNearestTo(getLoopEndTick() + endTickDiff) - getLoopEndTick();
-
-        long newBeginTick = getLoopBeginTick() + onTickDiff;
-        long newEndTick = getLoopEndTick() + offTickDiff;
-        newEndTick = Math.max(newBeginTick + getTicksPerBeat(), newEndTick);
-
-        newBeginTick = Math.max(0, newBeginTick);
-        newEndTick = Math.min(newEndTick, MAX_TICKS);
-        setLoopTicks(newBeginTick, newEndTick);
-    }
-
     public long getLoopBeginTick() {
         return loopBeginTick;
     }

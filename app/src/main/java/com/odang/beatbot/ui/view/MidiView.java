@@ -30,6 +30,9 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
     private float pinchLeftOffset = 0, pinchRightOffset = 0, zoomLeftAnchorTick = 0,
             zoomRightAnchorTick = 0, selectRegionStartTick = -1, selectRegionStartY = -1;
 
+    private float pinchLoopLeftXAnchor = 0, pinchLoopRightXAnchor = 0;
+    private long pinchLoopBeginTickAnchor = 0, pinchLoopEndTickAnchorAnchor = 0;
+
     private boolean pinchingLoopWindow = false;
 
     private int pinchLeftPointerId = -1, pinchRightPointerId = -1;
@@ -97,8 +100,12 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
         return (tick - scrollHelper.xOffset) / getNumTicks() * width;
     }
 
+    public float xToNumTicks(float x) {
+        return getNumTicks() * x / width;
+    }
+
     public float xToTick(float x) {
-        return getNumTicks() * x / width + scrollHelper.xOffset;
+        return xToNumTicks(x) + scrollHelper.xOffset;
     }
 
     public int yToNote(float y) {
@@ -169,15 +176,19 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
         if (touchedNotes.get(id) == null) { // no note selected.
             MidiLoopBarView midiLoopBarView = getMidiLoopBarView();
             if (midiLoopBarView.isPressed()) {
-                float leftTick = xToTick(Math.min(pos.x, midiLoopBarView.getPointer().x));
-                float rightTick = xToTick(Math.max(pos.x, midiLoopBarView.getPointer().x));
-                pinchLeftOffset = leftTick - context.getMidiManager().getLoopBeginTick();
-                pinchRightOffset = context.getMidiManager().getLoopEndTick() - rightTick;
+                pinchLoopBeginTickAnchor = context.getMidiManager().getLoopBeginTick();
+                pinchLoopEndTickAnchorAnchor = context.getMidiManager().getLoopEndTick();
 
-                if (pos.x < midiLoopBarView.getPointer().x) {
+                if (pos.x + absoluteX < midiLoopBarView.getPointer().x) {
+                    pinchLoopLeftXAnchor = pos.x;
+                    pinchLoopRightXAnchor = midiLoopBarView.getPointer().x;
+
                     pinchLeftPointerId = pos.id;
                     pinchRightPointerId = midiLoopBarView.getPointer().id;
                 } else {
+                    pinchLoopLeftXAnchor = midiLoopBarView.getPointer().x;
+                    pinchLoopRightXAnchor = pos.x;
+
                     pinchLeftPointerId = midiLoopBarView.getPointer().id;
                     pinchRightPointerId = pos.id;
                 }
@@ -279,17 +290,17 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
     public void pinchLoopWindow(final int id, final Pointer pos) {
         final MidiManager midiManager = context.getMidiManager();
 
-        float tick = xToTick(pos.x);
-        final long beginTickDiff;
-        final long endTickDiff;
+        long newBeginTick;
+        long newEndTick;
         if (id == pinchLeftPointerId) {
-            beginTickDiff = (long) (tick - pinchLeftOffset - midiManager.getLoopBeginTick());
-            endTickDiff = 0;
+            newBeginTick = pinchLoopBeginTickAnchor + (long) xToNumTicks(pos.x - pinchLoopLeftXAnchor);
+            newEndTick = midiManager.getLoopEndTick();
         } else {
-            beginTickDiff = 0;
-            endTickDiff = (long) (tick + pinchRightOffset - midiManager.getLoopEndTick());
+            newBeginTick = midiManager.getLoopBeginTick();
+            newEndTick = pinchLoopEndTickAnchorAnchor + (long) xToNumTicks(pos.x - pinchLoopRightXAnchor);
         }
-        midiManager.pinchLoopWindow(beginTickDiff, endTickDiff);
+        newEndTick = Math.max(newBeginTick + midiManager.getTicksPerBeat(), newEndTick);
+        midiManager.setLoopTicks(newBeginTick, newEndTick);
     }
 
     @Override
@@ -450,7 +461,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
         rightLoopRect.layout(x2, absoluteY, width - x2, rightLoopRect.height);
         loopMarkerLines[0].setPosition(x1, absoluteY);
         loopMarkerLines[1].setPosition(x2, absoluteY);
-        scrollHelper.updateView(loopBeginTick, loopEndTick + context.getMidiManager().getMajorTickSpacing());
+        final long contextTickSpacing = context.getMidiManager().getTicksPerBeat();
+        scrollHelper.updateView(loopBeginTick - contextTickSpacing, loopEndTick + contextTickSpacing);
         scrollBarColorTrans.begin();
     }
 
