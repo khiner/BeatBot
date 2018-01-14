@@ -94,10 +94,6 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
         return tick * width / MidiManager.MAX_TICKS;
     }
 
-    public float unscaledXToTick(float x) {
-        return x * MidiManager.MAX_TICKS / width;
-    }
-
     public float tickToX(float tick) {
         return (tick - scrollHelper.xOffset) / getNumTicks() * width;
     }
@@ -129,22 +125,6 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
     public float getNumTicks() {
         return scrollHelper.numTicks;
-    }
-
-    public float getPinchLeftOffset() {
-        return pinchLeftOffset;
-    }
-
-    public float getPinchRightOffset() {
-        return pinchRightOffset;
-    }
-
-    public int getPinchLeftPointerId() {
-        return pinchLeftPointerId;
-    }
-
-    public int getPinchRightPointerId() {
-        return pinchRightPointerId;
     }
 
     @Override
