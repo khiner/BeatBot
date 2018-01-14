@@ -12,7 +12,8 @@ import com.odang.beatbot.ui.view.control.Button;
 public class MidiLoopBarView extends TouchableView implements LoopWindowListener {
     private LoopWindowSetEvent currLoopWindowEvent;
     private Button loopBarButton;
-    private float selectionOffsetTick = 0;
+    private long translateTickAnchor = 0;
+    private float translateXAnchor = 0;
 
     public MidiLoopBarView(View view, RenderGroup scaleGroup) {
         super(view);
@@ -46,13 +47,13 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
         final MidiManager midiManager = context.getMidiManager();
         final MidiView midiView = context.getMainPage().getMidiView();
         synchronized (context.getMainPage().getMidiViewGroup()) {
-            long tick = (long) xToTick(pos.x);
             if (midiView.isPinchingLoopWindow()) {
-                selectionOffsetTick = tick - midiManager.getLoopBeginTick();
+                translateTickAnchor = midiManager.getLoopBeginTick();
+                translateXAnchor = pos.x;
                 midiView.pinchLoopWindow(id, pos);
             } else if (loopBarButton.isPressed() && pos.equals(loopBarButton.getPointer())) {
                 // middle selected. translate loop window (preserve loop length)
-                midiManager.translateLoopWindowTo(tick - (long) selectionOffsetTick);
+                midiManager.translateLoopWindowTo(translateTickAnchor + (long) midiView.xToNumTicks(pos.x - translateXAnchor));
             }
         }
     }
@@ -68,10 +69,11 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
 
     @Override
     protected View findChildAt(float x, float y) {
-        float tick = xToTick(x - context.getMainPage().getMidiTrackView().width);
-        if (tick >= context.getMidiManager().getLoopBeginTick()
-                && tick <= context.getMidiManager().getLoopEndTick()) {
-            selectionOffsetTick = xToTick(x) - context.getMidiManager().getLoopBeginTick();
+        float tick = context.getMainPage().getMidiView().xToTick(x - context.getMainPage().getMidiTrackView().width);
+        final MidiManager midiManager = context.getMidiManager();
+        if (tick >= midiManager.getLoopBeginTick() && tick <= midiManager.getLoopEndTick()) {
+            translateTickAnchor = midiManager.getLoopBeginTick();
+            translateXAnchor = x;
             return loopBarButton;
         } else {
             return null;
@@ -84,9 +86,5 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
         float beginX = midiView.tickToUnscaledX(loopBeginTick);
         float endX = midiView.tickToUnscaledX(loopEndTick);
         loopBarButton.layout(this, beginX - absoluteX, 0, endX - beginX, height);
-    }
-
-    private float xToTick(float x) {
-        return context.getMainPage().getMidiView().xToTick(x);
     }
 }
