@@ -9,10 +9,6 @@ public class PlaybackManager {
 
     private State state = State.STOPPED;
 
-    public State getState() {
-        return state;
-    }
-
     public void play() {
         state = State.PLAYING;
         playNative();
@@ -21,6 +17,14 @@ public class PlaybackManager {
     public void stop() {
         state = State.STOPPED;
         stopNative();
+    }
+
+    public boolean isPlaying() {
+        return state == State.PLAYING;
+    }
+
+    public State getState() {
+        return state;
     }
 
     private native void playNative();

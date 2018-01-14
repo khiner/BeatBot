@@ -370,7 +370,7 @@ public class MidiManager implements MidiNoteListener {
         }
     }
 
-    private void notifyLoopWindowChanged() {
+    private synchronized void notifyLoopWindowChanged() {
         setLoopTicksNative(loopBeginTick, loopEndTick);
         View.context.getTrackManager().updateAllTrackNextNotes();
         for (LoopWindowListener listener : loopChangeListeners) {

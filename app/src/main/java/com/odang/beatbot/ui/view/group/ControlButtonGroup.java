@@ -10,7 +10,6 @@ import com.odang.beatbot.event.effect.EffectToggleEvent;
 import com.odang.beatbot.listener.MidiNoteListener;
 import com.odang.beatbot.listener.OnReleaseListener;
 import com.odang.beatbot.listener.StatefulEventListener;
-import com.odang.beatbot.manager.PlaybackManager;
 import com.odang.beatbot.midi.MidiNote;
 import com.odang.beatbot.ui.icon.IconResourceSets;
 import com.odang.beatbot.ui.view.TouchableView;
@@ -53,7 +52,7 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
                 if (context.getRecordManager().isRecording()) {
                     playButton.setChecked(false);
                 }
-                if (context.getPlaybackManager().getState() == PlaybackManager.State.PLAYING) {
+                if (context.getPlaybackManager().isPlaying()) {
                     playButton.setChecked(false);
                     context.getPlaybackManager().stop();
                 }

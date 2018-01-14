@@ -8,7 +8,6 @@ import com.odang.beatbot.listener.LoopWindowListener;
 import com.odang.beatbot.listener.MidiNoteListener;
 import com.odang.beatbot.listener.TrackListener;
 import com.odang.beatbot.manager.MidiManager;
-import com.odang.beatbot.manager.PlaybackManager;
 import com.odang.beatbot.midi.MidiNote;
 import com.odang.beatbot.midi.TouchedNotes;
 import com.odang.beatbot.track.BaseTrack;
@@ -149,7 +148,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
     @Override
     public void tick() {
-        if (context.getPlaybackManager().getState() == PlaybackManager.State.PLAYING) {
+        if (context.getPlaybackManager().isPlaying()) {
             updateCurrentTick();
         }
         if (pointerCount() == 0) {
@@ -445,9 +444,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
         rightLoopRect.layout(x2, absoluteY, width - x2, rightLoopRect.height);
         loopMarkerLines[0].setPosition(x1, absoluteY);
         loopMarkerLines[1].setPosition(x2, absoluteY);
-
-        scrollHelper.updateView(context.getMidiManager().getLoopBeginTick(), context
-                .getMidiManager().getLoopEndTick());
+        scrollHelper.updateView(loopBeginTick, loopEndTick);
     }
 
     public boolean isPinchingLoopWindow() {
@@ -540,8 +537,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
     private void updateHorizontalScrollBarPosition() {
         float displayOffsetX = width / 50;
         float x = tickToUnscaledX(scrollHelper.xOffset) + displayOffsetX;
-        horizontalScrollBar.setPosition(absoluteX + x, absoluteY + Math.min(unscaledHeight(), height)
-                - 2.5f * horizontalScrollBar.cornerRadius);
+        float y = Math.min(unscaledHeight(), height) - 2.5f * horizontalScrollBar.cornerRadius;
+        horizontalScrollBar.setPosition(absoluteX + x, absoluteY + y);
     }
 
     private void selectRegion(Pointer pos) {

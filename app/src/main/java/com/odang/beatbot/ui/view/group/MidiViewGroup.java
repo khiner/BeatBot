@@ -76,6 +76,8 @@ public class MidiViewGroup extends TouchableView {
         translateScaleGroup.translate(-translateX, -translateY);
         translateScaleGroup.scaleX(1f / scale);
         midiView.endClip();
+
+        midiView.getRenderGroup().draw();
     }
 
     @Override
