@@ -450,7 +450,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
         rightLoopRect.layout(x2, absoluteY, width - x2, rightLoopRect.height);
         loopMarkerLines[0].setPosition(x1, absoluteY);
         loopMarkerLines[1].setPosition(x2, absoluteY);
-        scrollHelper.updateView(loopBeginTick, loopEndTick);
+        scrollHelper.updateView(loopBeginTick, loopEndTick + context.getMidiManager().getMajorTickSpacing());
         scrollBarColorTrans.begin();
     }
 

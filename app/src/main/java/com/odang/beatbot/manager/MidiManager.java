@@ -32,7 +32,7 @@ public class MidiManager implements MidiNoteListener {
     private static final double LOG_2 = Math.log(2);
 
     private boolean snapToGrid = true;
-    private int beatDivision = 0;
+    private int beatDivision = 2;
     private long loopBeginTick, loopEndTick;
 
     private TimeSignature ts = new TimeSignature();
@@ -318,7 +318,7 @@ public class MidiManager implements MidiNoteListener {
         return getLoopEndTick() - getLoopBeginTick();
     }
 
-    private long getMajorTickSpacing() {
+    public long getMajorTickSpacing() {
         return TICKS_PER_MEASURE / (2 << beatDivision);
     }
 
