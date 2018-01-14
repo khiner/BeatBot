@@ -264,7 +264,7 @@ public class MidiManager implements MidiNoteListener {
         midiNotesEventManager.deleteSelectedNotes();
     }
 
-    public void setLoopTicks(long loopBeginTick, long loopEndTick) {
+    public synchronized void setLoopTicks(long loopBeginTick, long loopEndTick) {
         boolean changed = false;
         long quantizedBeginTick = getMajorTickNearestTo(loopBeginTick);
         long quantizedEndTick = getMajorTickNearestTo(loopEndTick);
@@ -278,20 +278,31 @@ public class MidiManager implements MidiNoteListener {
             changed = true;
         }
 
-        if (changed)
+        if (changed) {
             notifyLoopWindowChanged();
+        }
     }
 
     // set new loop begin point, preserving loop length
-    public void translateLoopWindowTo(long tick) {
+    public synchronized void translateLoopWindowTo(long tick) {
         long loopLength = getLoopLength();
         long newBeginTick = GeneralUtils.clipTo(tick, 0, MAX_TICKS - loopLength);
         setLoopTicks(newBeginTick, newBeginTick + loopLength);
     }
 
-    public void pinchLoopWindow(long beginTickDiff, long endTickDiff) {
-        final long newEndTick = Math.min(getLoopEndTick() + endTickDiff, MAX_TICKS);
-        final long newBeginTick = GeneralUtils.clipTo(getLoopBeginTick() + beginTickDiff, 0, MAX_TICKS - newEndTick);
+    public synchronized void pinchLoopWindow(long beginTickDiff, long endTickDiff) {
+        if (beginTickDiff == 0 && endTickDiff == 0)
+            return;
+
+        long onTickDiff = getMajorTickNearestTo(getLoopBeginTick() + beginTickDiff) - getLoopBeginTick();
+        long offTickDiff = getMajorTickNearestTo(getLoopEndTick() + endTickDiff) - getLoopEndTick();
+
+        long newBeginTick = getLoopBeginTick() + onTickDiff;
+        long newEndTick = getLoopEndTick() + offTickDiff;
+        newEndTick = Math.max(newBeginTick + getTicksPerBeat(), newEndTick);
+
+        newBeginTick = Math.max(0, newBeginTick);
+        newEndTick = Math.min(newEndTick, MAX_TICKS);
         setLoopTicks(newBeginTick, newEndTick);
     }
 

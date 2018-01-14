@@ -25,15 +25,15 @@ import com.odang.beatbot.ui.view.helper.Scrollable;
 public class MidiView extends ClickableView implements TrackListener, Scrollable,
         LoopWindowListener, MidiNoteListener {
 
-    public static final float LOOP_SELECT_SNAP_DIST = 30;
-
     public static float trackHeight;
 
     private float dragOffsetTick[] = {0, 0, 0, 0, 0};
     private float pinchLeftOffset = 0, pinchRightOffset = 0, zoomLeftAnchorTick = 0,
             zoomRightAnchorTick = 0, selectRegionStartTick = -1, selectRegionStartY = -1;
 
-    private int pinchLeftPointerId = -1, pinchRightPointerId = -1, loopPinchPointerId = -1;
+    private boolean pinchingLoopWindow = false;
+
+    private int pinchLeftPointerId = -1, pinchRightPointerId = -1;
 
     private Line[] loopMarkerLines, tickLines;
     private Line currTickLine;
@@ -139,6 +139,14 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
         return pinchRightOffset;
     }
 
+    public int getPinchLeftPointerId() {
+        return pinchLeftPointerId;
+    }
+
+    public int getPinchRightPointerId() {
+        return pinchRightPointerId;
+    }
+
     @Override
     public void layoutChildren() {
         horizontalScrollBar.setCornerRadius(getLabelHeight() / 5f);
@@ -186,7 +194,16 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
                 float rightTick = xToTick(Math.max(pos.x, midiLoopBarView.getPointer().x));
                 pinchLeftOffset = leftTick - context.getMidiManager().getLoopBeginTick();
                 pinchRightOffset = context.getMidiManager().getLoopEndTick() - rightTick;
-                loopPinchPointerId = pos.id;
+
+                if (pos.x < midiLoopBarView.getPointer().x) {
+                    pinchLeftPointerId = pos.id;
+                    pinchRightPointerId = midiLoopBarView.getPointer().id;
+                } else {
+                    pinchLeftPointerId = midiLoopBarView.getPointer().id;
+                    pinchRightPointerId = pos.id;
+                }
+
+                pinchingLoopWindow = true;
             } else { // enable scrolling
                 scrollHelper.setScrollAnchor(id, xToTick(pos.x), pos.y + scrollHelper.yOffset);
             }
@@ -210,8 +227,13 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
             long[] selectedNoteTickWindow = context.getTrackManager().getSelectedNoteTickWindow();
             // note is selected with one pointer, but this pointer
             // did not select a note. start pinching all selected notes.
-            pinchLeftPointerId = firstPointer.x <= secondPointer.x ? 0 : 1;
-            pinchRightPointerId = (pinchLeftPointerId + 1) % 2;
+            if (firstPointer.x <= secondPointer.x) {
+                pinchLeftPointerId = firstPointer.id;
+                pinchRightPointerId = secondPointer.id;
+            } else {
+                pinchLeftPointerId = secondPointer.id;
+                pinchRightPointerId = firstPointer.id;
+            }
             pinchLeftOffset = leftTick - selectedNoteTickWindow[0];
             pinchRightOffset = selectedNoteTickWindow[1] - rightTick;
         } else if (pointerCount() == 1) {
@@ -231,34 +253,31 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
     public void handleActionMove(int id, Pointer pos) {
         super.handleActionMove(id, pos);
         float tick = xToTick(pos.x);
-        MidiLoopBarView midiLoopBarView = getMidiLoopBarView();
-        if (id == loopPinchPointerId && midiLoopBarView.isPressed()) {
+        if ((id == pinchLeftPointerId || id == pinchRightPointerId)) {
             final MidiManager midiManager = context.getMidiManager();
-            final long beginTickDiff;
-            final long endTickDiff;
-            if (pos.x < midiLoopBarView.getPointer().x) {
-                beginTickDiff = (long) (tick - pinchLeftOffset - midiManager.getLoopBeginTick());
-                endTickDiff = 0;
-            } else {
-                beginTickDiff = 0;
-                endTickDiff = (long) (tick + pinchRightOffset - midiManager.getLoopEndTick());
-            }
-            if (beginTickDiff != 0 || endTickDiff != 0) {
+            if (isPinchingLoopWindow()) {
+                final long beginTickDiff;
+                final long endTickDiff;
+                if (id == pinchLeftPointerId) {
+                    beginTickDiff = (long) (tick - pinchLeftOffset - midiManager.getLoopBeginTick());
+                    endTickDiff = 0;
+                } else {
+                    beginTickDiff = 0;
+                    endTickDiff = (long) (tick + pinchRightOffset - midiManager.getLoopEndTick());
+                }
                 midiManager.pinchLoopWindow(beginTickDiff, endTickDiff);
-            }
-        } else if (id == pinchLeftPointerId || id == pinchRightPointerId) {
-            final long[] selectedNoteTickWindow = context.getTrackManager().getSelectedNoteTickWindow();
-            final long beginTickDiff;
-            final long endTickDiff;
-            if (id == pinchLeftPointerId) {
-                beginTickDiff = (long) (tick - pinchLeftOffset - selectedNoteTickWindow[0]);
-                endTickDiff = 0;
             } else {
-                beginTickDiff = 0;
-                endTickDiff = (long) (tick + pinchRightOffset - selectedNoteTickWindow[1]);
-            }
-            if (beginTickDiff != 0 || endTickDiff != 0) {
-                context.getMidiManager().pinchSelectedNotes(beginTickDiff, endTickDiff);
+                final long[] selectedNoteTickWindow = context.getTrackManager().getSelectedNoteTickWindow();
+                final long beginTickDiff;
+                final long endTickDiff;
+                if (id == pinchLeftPointerId) {
+                    beginTickDiff = (long) (tick - pinchLeftOffset - selectedNoteTickWindow[0]);
+                    endTickDiff = 0;
+                } else {
+                    beginTickDiff = 0;
+                    endTickDiff = (long) (tick + pinchRightOffset - selectedNoteTickWindow[1]);
+                }
+                midiManager.pinchSelectedNotes(beginTickDiff, endTickDiff);
             }
         } else if (touchedNotes.isEmpty()) {
             // no midi selected. scroll, zoom, or update select region
@@ -286,6 +305,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
         scrollHelper.pointerUp(id);
         if (id == pinchLeftPointerId || id == pinchRightPointerId) {
             pinchLeftPointerId = pinchRightPointerId = -1;
+            pinchingLoopWindow = false;
         }
         if (zoomLeftAnchorTick != -1) {
             int otherId = id == 0 ? 1 : 0;
@@ -301,7 +321,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
     public void handleActionUp(int id, Pointer pos) {
         super.handleActionUp(id, pos);
         scrollHelper.handleActionUp();
-        pinchLeftPointerId = pinchRightPointerId = loopPinchPointerId = -1;
+        pinchLeftPointerId = pinchRightPointerId = -1;
+        pinchingLoopWindow = false;
         stopSelectRegion();
         startOnTicks.clear();
         touchedNotes.clear();
@@ -443,7 +464,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
     }
 
     public boolean isPinchingLoopWindow() {
-        return loopPinchPointerId != -1;
+        return pinchingLoopWindow;
     }
 
     private void noMidiMove() {

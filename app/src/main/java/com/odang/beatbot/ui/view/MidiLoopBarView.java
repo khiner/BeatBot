@@ -2,6 +2,7 @@ package com.odang.beatbot.ui.view;
 
 import com.odang.beatbot.event.LoopWindowSetEvent;
 import com.odang.beatbot.listener.LoopWindowListener;
+import com.odang.beatbot.manager.MidiManager;
 import com.odang.beatbot.ui.color.Color;
 import com.odang.beatbot.ui.icon.IconResourceSets;
 import com.odang.beatbot.ui.shape.Rectangle;
@@ -43,22 +44,23 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
     @Override
     public void handleActionMove(int id, Pointer pos) {
         long tick = (long) xToTick(pos.x);
-        if (context.getMainPage().getMidiView().isPinchingLoopWindow()) {
-            selectionOffsetTick = tick - context.getMidiManager().getLoopBeginTick();
-            // prevent loop-snapping to current x position when MidiView pointer is released
-            if (pos.x < context.getMainPage().getMidiView().getPointer().x) {
-                context.getMidiManager().pinchLoopWindow(
-                        tick - (long) context.getMainPage().getMidiView().getPinchLeftOffset()
-                                - context.getMidiManager().getLoopBeginTick(), 0);
+        final MidiManager midiManager = context.getMidiManager();
+        final MidiView midiView = context.getMainPage().getMidiView();
+        if (midiView.isPinchingLoopWindow()) {
+            selectionOffsetTick = tick - midiManager.getLoopBeginTick();
+            final long beginTickDiff;
+            final long endTickDiff;
+            if (id == midiView.getPinchLeftPointerId()) {
+                beginTickDiff = tick - (long) midiView.getPinchLeftOffset() - midiManager.getLoopBeginTick();
+                endTickDiff = 0;
             } else {
-                context.getMidiManager().pinchLoopWindow(
-                        0,
-                        tick + (long) context.getMainPage().getMidiView().getPinchRightOffset()
-                                - context.getMidiManager().getLoopEndTick());
+                beginTickDiff = 0;
+                endTickDiff = tick + (long) midiView.getPinchRightOffset() - midiManager.getLoopEndTick();
             }
+            midiManager.pinchLoopWindow(beginTickDiff, endTickDiff);
         } else if (loopBarButton.isPressed() && pos.equals(loopBarButton.getPointer())) {
             // middle selected. translate loop window (preserve loop length)
-            context.getMidiManager().translateLoopWindowTo(tick - (long) selectionOffsetTick);
+            midiManager.translateLoopWindowTo(tick - (long) selectionOffsetTick);
         }
     }
 
@@ -89,10 +91,6 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
         float beginX = midiView.tickToUnscaledX(loopBeginTick);
         float endX = midiView.tickToUnscaledX(loopEndTick);
         loopBarButton.layout(this, beginX - absoluteX, 0, endX - beginX, height);
-        if (midiView.isPinchingLoopWindow()) // prevent loop-snapping to current x position when
-            // MidiView pointer is released
-            selectionOffsetTick = xToTick(getPointer().x)
-                    - context.getMidiManager().getLoopBeginTick();
     }
 
     private float xToTick(float x) {
