@@ -54,7 +54,7 @@
 #include "effects/filter.h"
 #include "effects/flanger.h"
 #include "effects/reverb.h"
-#include "effects/tremelo.h"
+#include "effects/tremolo.h"
 #include "generators/generators.h"
 #include "generators/sinewave.h"
 #include "generators/file_gen.h"
