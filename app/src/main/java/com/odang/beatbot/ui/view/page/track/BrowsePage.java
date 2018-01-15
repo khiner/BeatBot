@@ -58,7 +58,9 @@ public class BrowsePage extends Menu implements TrackListener {
 
         FileMenuItem match = null;
         while ((match = findMatchingChild(match, currSamplePath)) != null) {
-            match.trigger();
+            if (!match.isChecked()) {
+                match.trigger();
+            }
         }
     }
 
