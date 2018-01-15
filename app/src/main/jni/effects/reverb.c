@@ -20,49 +20,23 @@ static const int allpasstuningL[numallpasses]
 static const int allpasstuningR[numallpasses]
         = {556 + stereospread, 441 + stereospread, 341 + stereospread, 225 + stereospread};
 
-static char *version = "freeverb~ v1.2";
-
-static void comb_setdamp(t_freeverb *x, float val);
-
-static void comb_setfeedback(t_freeverb *x, float val);
-
-static inline float comb_processL(t_freeverb *x, int filteridx, float input);
-
-static inline float comb_processR(t_freeverb *x, int filteridx, float input);
-
-static inline float allpass_processL(t_freeverb *x, int filteridx, float input);
-
-static inline float allpass_processR(t_freeverb *x, int filteridx, float input);
-
-static void freeverb_update(t_freeverb *x);
-
-static void freeverb_setroomsize(t_freeverb *x, float value);
-
-static void freeverb_setdamp(t_freeverb *x, float value);
-
-static void freeverb_setwet(t_freeverb *x, float value);
-
-static void freeverb_setdry(t_freeverb *x, float value);
-
-static void freeverb_setwidth(t_freeverb *x, float value);
-
-static void comb_setdamp(t_freeverb *x, float val) {
+static void comb_setdamp(ReverbConfig *x, float val) {
     x->x_combdamp1 = val;
     x->x_combdamp2 = 1 - val;
 }
 
-static void comb_setfeedback(t_freeverb *x, float val) {
+static void comb_setfeedback(ReverbConfig *x, float val) {
     x->x_combfeedback = val;
 }
 
-static void allpass_setfeedback(t_freeverb *x, float val) {
+static void allpass_setfeedback(ReverbConfig *x, float val) {
     x->x_allpassfeedback = val;
 }
 
 // ----------- general parameter & calculation stuff -----------
 
 // recalculate internal values after parameter change
-static void freeverb_update(t_freeverb *x) {
+static void freeverb_update(ReverbConfig *x) {
     x->x_wet1 = x->x_wet * (x->x_width / 2 + 0.5f);
     x->x_wet2 = x->x_wet * ((1 - x->x_width) / 2);
 
@@ -74,32 +48,28 @@ static void freeverb_update(t_freeverb *x) {
     comb_setdamp(x, x->x_damp1);
 }
 
-static void freeverb_setroomsize(t_freeverb *x, float value) {
+static void freeverb_setroomsize(ReverbConfig *x, float value) {
     x->x_roomsize = (value * scaleroom) + offsetroom;
     freeverb_update(x);
 }
 
-static void freeverb_setdamp(t_freeverb *x, float value) {
+static void freeverb_setdamp(ReverbConfig *x, float value) {
     x->x_damp = value * scaledamp;
     freeverb_update(x);
 }
 
-static void freeverb_setwet(t_freeverb *x, float value) {
+static void freeverb_setwet(ReverbConfig *x, float value) {
     x->x_wet = value;
     freeverb_update(x);
 }
 
-static void freeverb_setdry(t_freeverb *x, float value) {
-    x->x_dry = value;
-}
-
-static void freeverb_setwidth(t_freeverb *x, float value) {
+static void freeverb_setwidth(ReverbConfig *x, float value) {
     x->x_width = value;
     freeverb_update(x);
 }
 
 void reverbconfig_destroy(void *p) {
-    t_freeverb *x = (t_freeverb *) p;
+    ReverbConfig *x = (ReverbConfig *) p;
     int i;
     // free memory used by delay lines
     for (i = 0; i < numcombs; i++) {
@@ -114,22 +84,21 @@ void reverbconfig_destroy(void *p) {
     free(x);
 }
 
-t_freeverb *reverbconfig_create() {
+ReverbConfig *reverbconfig_create() {
     int i;
 
-    t_freeverb *x = (t_freeverb *) malloc(sizeof(t_freeverb));
+    ReverbConfig *x = (ReverbConfig *) malloc(sizeof(ReverbConfig));
 
-    // recalculate the reverb parameters in case we don't run at 44.1kHz
     for (i = 0; i < numcombs; i++) {
-        x->x_combtuningL[i] = (int) (combtuningL[i] * SAMPLE_RATE / 44100);
-        x->x_combtuningR[i] = (int) (combtuningR[i] * SAMPLE_RATE / 44100);
+        x->x_combtuningL[i] = (int) (combtuningL[i]);
+        x->x_combtuningR[i] = (int) (combtuningR[i]);
         x->x_filterstoreL[i] = 0;
         x->x_filterstoreR[i] = 0;
     }
 
     for (i = 0; i < numallpasses; i++) {
-        x->x_allpasstuningL[i] = (int) (allpasstuningL[i] * SAMPLE_RATE / 44100);
-        x->x_allpasstuningR[i] = (int) (allpasstuningR[i] * SAMPLE_RATE / 44100);
+        x->x_allpasstuningL[i] = (int) (allpasstuningL[i]);
+        x->x_allpasstuningR[i] = (int) (allpasstuningR[i]);
     }
 
     // get memory for delay lines
@@ -150,7 +119,6 @@ t_freeverb *reverbconfig_create() {
     x->x_allpassfeedback = 0.5;
     freeverb_setwet(x, initialwet);
     freeverb_setroomsize(x, initialroom);
-    freeverb_setdry(x, initialdry);
     freeverb_setdamp(x, initialdamp);
     freeverb_setwidth(x, initialwidth);
     freeverb_update(x);
@@ -169,7 +137,7 @@ t_freeverb *reverbconfig_create() {
 }
 
 void reverbconfig_setParam(void *p, float paramNumFloat, float value) {
-    t_freeverb *config = (t_freeverb *) p;
+    ReverbConfig *config = (ReverbConfig *) p;
     switch ((int) paramNumFloat) {
         case 0: // Room Size
             freeverb_setroomsize(config, value);

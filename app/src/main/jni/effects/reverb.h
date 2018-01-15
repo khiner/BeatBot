@@ -17,17 +17,15 @@
 #define initialroom        0.5f
 #define initialdamp        0.5f
 #define initialwet        1.0f
-#define initialdry        0.0f
 #define initialwidth    1.0f
 #define stereospread    23
 
-typedef struct _freeverb {
+typedef struct ReverbConfig_t {
     /* freeverb stuff */
     float x_gain;
     float x_roomsize, x_roomsize1;
     float x_damp, x_damp1;
     float x_wet, x_wet1, x_wet2;
-    float x_dry;
     float x_width;
 
     float x_allpassfeedback;            /* feedback of allpass filters */
@@ -55,17 +53,17 @@ typedef struct _freeverb {
 
     int x_allpasstuningL[numallpasses];
     int x_allpasstuningR[numallpasses];
-} t_freeverb;
+} ReverbConfig;
 
 void reverbconfig_setParam(void *p, float paramNum, float param);
 
-t_freeverb *reverbconfig_create();
+ReverbConfig *reverbconfig_create();
 
 void reverbconfig_destroy(void *config);
 
 void reverbconfig_setParam(void *p, float paramNum, float param);
 
-static inline float comb_processL(t_freeverb *x, int filteridx, float input) {
+static inline float comb_processL(ReverbConfig *x, int filteridx, float input) {
     float output;
     int bufidx = x->x_combidxL[filteridx];
 
@@ -81,7 +79,7 @@ static inline float comb_processL(t_freeverb *x, int filteridx, float input) {
     return output;
 }
 
-static inline float comb_processR(t_freeverb *x, int filteridx, float input) {
+static inline float comb_processR(ReverbConfig *x, int filteridx, float input) {
     float output;
     int bufidx = x->x_combidxR[filteridx];
 
@@ -97,7 +95,7 @@ static inline float comb_processR(t_freeverb *x, int filteridx, float input) {
     return output;
 }
 
-static inline float allpass_processL(t_freeverb *x, int filteridx, float input) {
+static inline float allpass_processL(ReverbConfig *x, int filteridx, float input) {
     float output;
     float bufout;
     int bufidx = x->x_allpassidxL[filteridx];
@@ -113,7 +111,7 @@ static inline float allpass_processL(t_freeverb *x, int filteridx, float input) 
     return output;
 }
 
-static inline float allpass_processR(t_freeverb *x, int filteridx, float input) {
+static inline float allpass_processR(ReverbConfig *x, int filteridx, float input) {
     float output;
     float bufout;
     int bufidx = x->x_allpassidxR[filteridx];
@@ -129,7 +127,7 @@ static inline float allpass_processR(t_freeverb *x, int filteridx, float input) 
     return output;
 }
 
-static inline void reverb_process(t_freeverb *config, float **buffers, int size) {
+static inline void reverb_process(ReverbConfig *config, float **buffers, int size) {
     int samp;
     int i;
     float outL, outR, inL, inR, input;
