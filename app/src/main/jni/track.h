@@ -96,6 +96,6 @@ void destroyTracks();
 
 Levels *initLevels();
 
-Track *initTrack();
+Track *initTrack(int trackId);
 
 #endif // TRACK_H

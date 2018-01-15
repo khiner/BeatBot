@@ -132,15 +132,14 @@ void destroyTracks() {    // destroy all tracks
 void updateChannelScaleValues(Levels *levels, MidiEvent *midiEvent) {
     float balance =
             midiEvent != NULL ?
-            (levels->pan + midiEvent->pan) / 2 : levels->pan;
-
+            (2 * levels->pan * midiEvent->pan) : levels->pan;
     // 0db at center, linear stereo balance control
     // http://www.kvraudio.com/forum/viewtopic.php?t=148865
-    if (levels->pan < 0.5f) {
+    if (balance < 0.5f) {
         levels->scaleChannels[0] = 1;
-        levels->scaleChannels[1] = levels->pan * 2;
+        levels->scaleChannels[1] = balance * 2;
     } else {
-        levels->scaleChannels[0] = (1 - levels->pan) * 2;
+        levels->scaleChannels[0] = (1 - balance) * 2;
         levels->scaleChannels[1] = 1;
     }
 

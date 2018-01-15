@@ -27,8 +27,8 @@ static inline void interleaveFloatsToShorts(float left[], float right[],
                                             short interleaved[], int size) {
     int i;
     for (i = 0; i < size; i++) {
-        interleaved[i * 2] = left[i] * FLOAT_TO_SHORT;
-        interleaved[i * 2 + 1] = right[i] * FLOAT_TO_SHORT;
+        interleaved[i * 2] = (short) (left[i] * FLOAT_TO_SHORT);
+        interleaved[i * 2 + 1] = (short) (right[i] * FLOAT_TO_SHORT);
     }
 }
 
@@ -51,8 +51,8 @@ void writeFloatBufferToRecordFile(float left[], float right[], int size) {
     pthread_mutex_lock(&recordMutex);
     int i = 0;
     for (i = 0; i < size; i++) {
-        writeShortToFile(left[i] * FLOAT_TO_SHORT, recordOutFile);
-        writeShortToFile(right[i] * FLOAT_TO_SHORT, recordOutFile);
+        writeShortToFile((short) (left[i] * FLOAT_TO_SHORT), recordOutFile);
+        writeShortToFile((short) (right[i] * FLOAT_TO_SHORT), recordOutFile);
     }
     pthread_mutex_unlock(&recordMutex);
 }
