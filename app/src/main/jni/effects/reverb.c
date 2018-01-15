@@ -1,4 +1,4 @@
-// Adapted from https://github.com/pd-l2ork/pd/blaob/master/externals/freeverb~/freeverb~.c
+// Adapted from https://github.com/pd-l2ork/pd/blob/master/externals/freeverb~/freeverb~.c
 
 #define float float
 
@@ -22,9 +22,6 @@ static const int allpasstuningR[numallpasses]
 
 static char *version = "freeverb~ v1.2";
 
-void *freeverb_class;
-
-/* we need prototypes for Mac for everything */
 static void comb_setdamp(t_freeverb *x, float val);
 
 static void comb_setfeedback(t_freeverb *x, float val);
@@ -33,39 +30,22 @@ static inline float comb_processL(t_freeverb *x, int filteridx, float input);
 
 static inline float comb_processR(t_freeverb *x, int filteridx, float input);
 
-static void allpass_setfeedback(t_freeverb *x, float val);
-
 static inline float allpass_processL(t_freeverb *x, int filteridx, float input);
 
 static inline float allpass_processR(t_freeverb *x, int filteridx, float input);
-
-int *freeverb_perform(int *w);
 
 static void freeverb_update(t_freeverb *x);
 
 static void freeverb_setroomsize(t_freeverb *x, float value);
 
-static float freeverb_getroomsize(t_freeverb *x);
-
 static void freeverb_setdamp(t_freeverb *x, float value);
-
-static float freeverb_getdamp(t_freeverb *x);
 
 static void freeverb_setwet(t_freeverb *x, float value);
 
-static float freeverb_getwet(t_freeverb *x);
-
 static void freeverb_setdry(t_freeverb *x, float value);
-
-static float freeverb_getdry(t_freeverb *x);
 
 static void freeverb_setwidth(t_freeverb *x, float value);
 
-static float freeverb_getwidth(t_freeverb *x);
-
-static float freeverb_getdb(float f);
-
-/* -------------------- comb filter stuff ----------------------- */
 static void comb_setdamp(t_freeverb *x, float val) {
     x->x_combdamp1 = val;
     x->x_combdamp2 = 1 - val;
@@ -75,7 +55,6 @@ static void comb_setfeedback(t_freeverb *x, float val) {
     x->x_combfeedback = val;
 }
 
-/* -------------------- allpass filter stuff ----------------------- */
 static void allpass_setfeedback(t_freeverb *x, float val) {
     x->x_allpassfeedback = val;
 }
@@ -95,14 +74,9 @@ static void freeverb_update(t_freeverb *x) {
     comb_setdamp(x, x->x_damp1);
 }
 
-// the following functions set / get the parameters
 static void freeverb_setroomsize(t_freeverb *x, float value) {
     x->x_roomsize = (value * scaleroom) + offsetroom;
     freeverb_update(x);
-}
-
-static float freeverb_getroomsize(t_freeverb *x) {
-    return (x->x_roomsize - offsetroom) / scaleroom;
 }
 
 static void freeverb_setdamp(t_freeverb *x, float value) {
@@ -110,25 +84,13 @@ static void freeverb_setdamp(t_freeverb *x, float value) {
     freeverb_update(x);
 }
 
-static float freeverb_getdamp(t_freeverb *x) {
-    return x->x_damp / scaledamp;
-}
-
 static void freeverb_setwet(t_freeverb *x, float value) {
-    x->x_wet = value * scalewet;
+    x->x_wet = value;
     freeverb_update(x);
 }
 
-static float freeverb_getwet(t_freeverb *x) {
-    return (x->x_wet / scalewet);
-}
-
 static void freeverb_setdry(t_freeverb *x, float value) {
-    x->x_dry = value * scaledry;
-}
-
-static float freeverb_getdry(t_freeverb *x) {
-    return (x->x_dry / scaledry);
+    x->x_dry = value;
 }
 
 static void freeverb_setwidth(t_freeverb *x, float value) {
@@ -136,11 +98,6 @@ static void freeverb_setwidth(t_freeverb *x, float value) {
     freeverb_update(x);
 }
 
-static float freeverb_getwidth(t_freeverb *x) {
-    return x->x_width;
-}
-
-// clean up
 void reverbconfig_destroy(void *p) {
     t_freeverb *x = (t_freeverb *) p;
     int i;
@@ -212,4 +169,18 @@ t_freeverb *reverbconfig_create() {
 }
 
 void reverbconfig_setParam(void *p, float paramNumFloat, float value) {
+    t_freeverb *config = (t_freeverb *) p;
+    switch ((int) paramNumFloat) {
+        case 0: // Room Size
+            freeverb_setroomsize(config, value);
+        case 1: // Damping
+            freeverb_setdamp(config, value);
+            break;
+        case 2: // Width
+            freeverb_setwidth(config, value);
+            break;
+        case 3: // Wet/Dry
+            freeverb_setwet(config, value);
+            break;
+    }
 }

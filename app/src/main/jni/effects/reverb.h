@@ -1,4 +1,4 @@
-// Adapted from https://github.com/pd-l2ork/pd/blaob/master/externals/freeverb~/freeverb~.c
+// Adapted from https://github.com/pd-l2ork/pd/blob/master/externals/freeverb~/freeverb~.c
 
 #ifndef REVERB_H
 #define REVERB_H
@@ -11,14 +11,12 @@
 #define numcombs        8
 #define numallpasses    4
 #define fixedgain        0.015f
-#define scalewet        3.0f
-#define scaledry        2.0f
 #define scaledamp        0.4f
 #define scaleroom        0.28f
 #define offsetroom        0.7f
 #define initialroom        0.5f
 #define initialdamp        0.5f
-#define initialwet        1.0f / scalewet
+#define initialwet        1.0f
 #define initialdry        0.0f
 #define initialwidth    1.0f
 #define stereospread    23
@@ -154,9 +152,10 @@ static inline void reverb_process(t_freeverb *config, float **buffers, int size)
             outR = allpass_processR(config, i, outR);
         }
 
-        // Calculate output REPLACING anything already there
-        buffers[0][samp] = outL * config->x_wet1 + outR * config->x_wet2 + inL * config->x_dry;
-        buffers[1][samp] = outR * config->x_wet1 + outL * config->x_wet2 + inR * config->x_dry;
+        buffers[0][samp] =
+                outL * config->x_wet1 + outR * config->x_wet2 + inL * (1 - config->x_wet);
+        buffers[1][samp] =
+                outR * config->x_wet1 + outL * config->x_wet2 + inR * (1 - config->x_wet);
     }
 }
 
