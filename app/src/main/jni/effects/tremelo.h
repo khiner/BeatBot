@@ -20,9 +20,9 @@ static inline void tremelo_process(TremeloConfig *config, float **buffers, int s
     int channel, samp;
     for (channel = 0; channel < 2; channel++) {
         for (samp = 0; samp < size; samp++) {
-            // TODO : how to scale amplitude from 0 to 1 without halving amp when depth is 0
-            buffers[channel][samp] *=
-                    .75f * (1 + sinewave_tick(config->mod[channel]) * config->depth);
+            buffers[channel][samp] -= buffers[channel][samp] *
+                                      ((1 + sinewave_tick(config->mod[channel]) / 2) *
+                                       config->depth);
         }
     }
 }
