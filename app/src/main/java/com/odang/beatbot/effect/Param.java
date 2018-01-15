@@ -28,9 +28,9 @@ public class Param {
     private transient Set<ParamListener> ignoredListeners;
 
     public Param() {
-        listeners = new ArrayList<ParamListener>();
-        toggleListeners = new ArrayList<ParamToggleListener>();
-        ignoredListeners = new HashSet<ParamListener>();
+        listeners = new ArrayList<>();
+        toggleListeners = new ArrayList<>();
+        ignoredListeners = new HashSet<>();
     }
 
     public Param(int id, String name) {

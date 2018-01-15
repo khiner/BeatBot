@@ -6,7 +6,7 @@ import com.odang.beatbot.manager.PlaybackManager;
 
 public class Filter extends Effect {
     public static final String NAME = "Filter";
-    public static final int EFFECT_NUM = 3, NUM_PARAMS = 4;
+    public static final int EFFECT_NUM = 3;
 
     private int mode = 0;
 

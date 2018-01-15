@@ -38,7 +38,9 @@ public class DialParamControl extends LevelParamControl {
     @Override
     public void layoutChildren() {
         label.layout(this, 0, 0, width, height / 5);
-        levelControlView.layout(this, 0, height / 5, width, 3 * height / 5);
-        valueLabel.layout(this, 0, 5 * height / 6, width, height / 6);
+
+        final float dialDim = 3 * height / 5;
+        levelControlView.layout(this, width / 2 - dialDim / 2, height / 5, dialDim, dialDim);
+        valueLabel.layout(this, width / 2 - dialDim / 2, 4 * height / 5 - View.BG_OFFSET * 4, dialDim, height / 5);
     }
 }

@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 
 public class Tremolo extends Effect {
     public static final String NAME = "Tremolo";
-    public static final int EFFECT_NUM = 6, NUM_PARAMS = 3;
+    public static final int EFFECT_NUM = 6;
 
     public Tremolo() {
         super();

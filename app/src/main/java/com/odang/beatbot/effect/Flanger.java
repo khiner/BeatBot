@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 
 public class Flanger extends Effect {
     public static final String NAME = "Flanger";
-    public static final int EFFECT_NUM = 4, NUM_PARAMS = 6;
+    public static final int EFFECT_NUM = 4;
 
     public Flanger() {
         super();

@@ -42,7 +42,7 @@ public class EffectParamsGroup extends TouchableView {
             int halfParams = (effect.getNumParams() + 1) / 2;
             float paramW = effect.getNumParams() <= 3 ? width / effect.getNumParams() : width
                     / halfParams;
-            float paramH = 3 * paramW / 2;
+            float paramH = height / 2;
 
             float x = 0;
             float y = effect.getNumParams() < 3 ? height / 2 - paramH / 2 : height / 2 - paramH;

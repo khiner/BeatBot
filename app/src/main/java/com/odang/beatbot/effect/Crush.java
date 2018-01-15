@@ -5,7 +5,7 @@ import com.odang.beatbot.manager.PlaybackManager;
 public class Crush extends Effect {
 
     public static final String NAME = "Crush";
-    public static final int EFFECT_NUM = 1, NUM_PARAMS = 2;
+    public static final int EFFECT_NUM = 1;
 
     public Crush() {
         super();

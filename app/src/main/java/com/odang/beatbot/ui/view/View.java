@@ -164,11 +164,6 @@ public class View implements Comparable<View> {
         stateChanged();
     }
 
-    public final void setFillColors(IconResourceSet resourceSet) {
-        icon.setFillColors(resourceSet);
-        stateChanged();
-    }
-
     public boolean hasChildren() {
         return !children.isEmpty();
     }

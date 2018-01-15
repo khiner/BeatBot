@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 
 public class Chorus extends Effect {
     public static final String NAME = "Chorus";
-    public static final int EFFECT_NUM = 0, NUM_PARAMS = 5;
+    public static final int EFFECT_NUM = 0;
 
     public Chorus() {
         super();

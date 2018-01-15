@@ -60,7 +60,7 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
     @Override
     public void layoutChildren() {
         float controlButtonHeight = height / 10;
-        View.BG_OFFSET = height / 180;
+        View.BG_OFFSET = height / 150;
         mainPageFlipper.layout(this, 0, controlButtonHeight, width, height - controlButtonHeight);
         float trackControlWidth = getMidiViewGroup().getTrackControlWidth();
         controlButtonGroup.layout(this, trackControlWidth, 0, width - trackControlWidth,

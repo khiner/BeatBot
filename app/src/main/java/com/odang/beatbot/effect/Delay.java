@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 
 public class Delay extends Effect {
     public static final String NAME = "Delay";
-    public static final int EFFECT_NUM = 2, NUM_PARAMS = 4;
+    public static final int EFFECT_NUM = 2;
 
     // keep track of what right channel was before linking
     // so we can go back after disabling link
