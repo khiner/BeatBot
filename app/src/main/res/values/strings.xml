@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+<resources>
 
-	<string name="app_name">BeatBot</string>
-	<string-array name="sample_types">
-		<item name="kick">Kick</item>
-		<item name="snare">Snare</item>
-		<item name="hi_hat_closed">HH Closed</item>
-		<item name="hi_hat_open">HH Open</item>
-		<item name="rim">Rim</item>
-		<item name="bass">Bass</item>
-	</string-array>
-	<string name="default_midi_file_name">MyMidi</string>
+    <string name="app_name">BeatBot</string>
+    <string-array name="sample_types">
+        <item name="kick">Kick</item>
+        <item name="snare">Snare</item>
+        <item name="hi_hat_closed">HH Closed</item>
+        <item name="hi_hat_open">HH Open</item>
+        <item name="rim">Rim</item>
+        <item name="bass">Bass</item>
+    </string-array>
+    <string name="default_midi_file_name">MyMidi</string>
 
-	<string name="sample_edit_activity">Sample Edit</string>
-	<string name="preview_sample">Preview</string>
-	<string name="loop_sample">Loop Sample</string>
+    <string name="sample_edit_activity">Sample Edit</string>
+    <string name="preview_sample">Preview</string>
+    <string name="loop_sample">Loop Sample</string>
 
-	<string-array name="effect_names">
-		<item name="chorus">Chorus</item>
-		<item name="decimate">Crush</item>
-		<item name="delay">Delay</item>>
-		<item name="flanger">Flanger</item>
-		<item name="filter">Filter</item>
-		<!-- <item name="reverb">Reverb</item>  -->
-		<item name="tremolo">Tremolo</item>
-		<item name="none">None</item>
-	</string-array>
-	
+    <string-array name="effect_names">
+        <item name="chorus">Chorus</item>
+        <item name="decimate">Crush</item>
+        <item name="delay">Delay</item>>
+        <item name="flanger">Flanger</item>
+        <item name="filter">Filter</item>
+        <item name="reverb">Reverb</item>
+        <item name="tremolo">Tremolo</item>
+        <item name="none">None</item>
+    </string-array>
+
 </resources>

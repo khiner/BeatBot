@@ -7,6 +7,7 @@ import com.odang.beatbot.effect.Effect;
 import com.odang.beatbot.effect.Filter;
 import com.odang.beatbot.effect.Flanger;
 import com.odang.beatbot.effect.Param;
+import com.odang.beatbot.effect.Reverb;
 import com.odang.beatbot.effect.Tremolo;
 import com.odang.beatbot.event.effect.EffectParamsChangeEvent;
 import com.odang.beatbot.listener.MultiViewTouchTracker;
@@ -30,10 +31,6 @@ public class EffectPage extends TouchableView implements TouchableViewsListener 
         super(view);
     }
 
-    public Seekbar2d getLevel2d() {
-        return level2d;
-    }
-
     public Effect getEffect() {
         return ((EffectParamsGroup) paramsPager.getCurrPage()).getEffect();
     }
@@ -54,7 +51,7 @@ public class EffectPage extends TouchableView implements TouchableViewsListener 
         delayGroup = new DelayParamsGroup(paramsPager).withEffect(new Delay());
         filterGroup = new FilterParamsGroup(paramsPager).withEffect(new Filter());
         flangerGroup = new EffectParamsGroup(paramsPager).withEffect(new Flanger());
-        //reverbGroup = new EffectParamsGroup(paramsPager).withEffect(new Reverb());
+        reverbGroup = new EffectParamsGroup(paramsPager).withEffect(new Reverb());
         tremeloGroup = new EffectParamsGroup(paramsPager).withEffect(new Tremolo());
 
         paramsPager.addPage(Chorus.NAME, chorusGroup);
@@ -62,7 +59,7 @@ public class EffectPage extends TouchableView implements TouchableViewsListener 
         paramsPager.addPage(Delay.NAME, delayGroup);
         paramsPager.addPage(Filter.NAME, filterGroup);
         paramsPager.addPage(Flanger.NAME, flangerGroup);
-        //paramsPager.addPage(Reverb.NAME, reverbGroup);
+        paramsPager.addPage(Reverb.NAME, reverbGroup);
         paramsPager.addPage(Tremolo.NAME, tremeloGroup);
 
         new MultiViewTouchTracker(this).monitorViews(level2d, paramsPager);

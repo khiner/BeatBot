@@ -64,10 +64,6 @@ static inline void delayconfigi_setDelayTimeRight(DelayConfigI *config, float rD
     delayconfigi_setDelayTime(config, lDelay, rDelay);
 }
 
-static inline void delayconfigi_updateDelayTime(DelayConfigI *config) {
-    delayconfigi_setDelayTime(config, config->delayTime[0], config->delayTime[1]);
-}
-
 static inline float delayi_tick(DelayConfigI *config, float in, int channel) {
     float interpolated = config->delayBuffer[channel][config->rp[channel]++]
                          * config->omAlpha[channel];

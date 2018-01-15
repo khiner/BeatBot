@@ -1,3 +1,5 @@
+// Adapted from https://github.com/pd-l2ork/pd/blaob/master/externals/freeverb~/freeverb~.c
+
 #ifndef REVERB_H
 #define REVERB_H
 
@@ -6,419 +8,156 @@
 #include <stdint.h>
 #include <errno.h>
 
-/* Indexes when setting or getting all params */
-#define REVPARAM_REVERBVOL 0
-#define REVPARAM_SIZE 1
-#define REVPARAM_DECAY 2
-#define REVPARAM_DENSITY 3
-#define REVPARAM_PREDELAY 4
-#define REVPARAM_EARLYLATE 5
-#define REVPARAM_DAMPINGFREQ 6
-#define REVPARAM_BANDWIDTHFREQ 7
-#define REV_NUM_PARAMS 8
+#define numcombs        8
+#define numallpasses    4
+#define fixedgain        0.015f
+#define scalewet        3.0f
+#define scaledry        2.0f
+#define scaledamp        0.4f
+#define scaleroom        0.28f
+#define offsetroom        0.7f
+#define initialroom        0.5f
+#define initialdamp        0.5f
+#define initialwet        1.0f / scalewet
+#define initialdry        0.0f
+#define initialwidth    1.0f
+#define stereospread    23
 
-struct AUDIO_FILTER {
-    float low, high, band /* , Notch */;
-    float frequency;
-    float q;
-    float f;
-};
+typedef struct _freeverb {
+    /* freeverb stuff */
+    float x_gain;
+    float x_roomsize, x_roomsize1;
+    float x_damp, x_damp1;
+    float x_wet, x_wet1, x_wet2;
+    float x_dry;
+    float x_width;
 
-// ============================== Delay =============================
+    float x_allpassfeedback;            /* feedback of allpass filters */
+    float x_combfeedback;                /* feedback of comb filters */
+    float x_combdamp1;
+    float x_combdamp2;
+    float x_filterstoreL[numcombs];    /* stores last sample value */
+    float x_filterstoreR[numcombs];
 
-struct AUDIO_DELAY {
-    float *buffer;
-    unsigned int length;
-    float feedback;
-    unsigned int numTaps;
-    unsigned int index[1];
-};
+    /* buffers for the combs */
+    float *x_bufcombL[numcombs];
+    float *x_bufcombR[numcombs];
+    int x_combidxL[numcombs];
+    int x_combidxR[numcombs];
 
-struct AUDIO_DELAY3 {
-    float *buffer;
-    unsigned int length;
-    float feedback;
-    unsigned int numTaps;
-    unsigned int index[3];
-};
+    /* buffers for the allpasses */
+    float *x_bufallpassL[numallpasses];
+    float *x_bufallpassR[numallpasses];
+    int x_allpassidxL[numallpasses];
+    int x_allpassidxR[numallpasses];
 
-struct AUDIO_DELAY4 {
-    float *buffer;
-    unsigned int length;
-    float feedback;
-    unsigned int numTaps;
-    unsigned int index[4];
-};
+    /* we'll make local copies adjusted to fit our sample rate */
+    int x_combtuningL[numcombs];
+    int x_combtuningR[numcombs];
 
-struct AUDIO_DELAY8 {
-    float *buffer;
-    unsigned int length;
-    float feedback;
-    unsigned int numTaps;
-    unsigned int index[8];
-};
-
-// ============================= Reverb =============================
-
-#define REVSIZE_PREDELAY    60000
-
-// REVERB->Runtime[]
-#define REVRUN_SizeSmooth        0
-#define REVRUN_DampingSmooth    1
-#define REVRUN_DensitySmooth    2
-#define REVRUN_BandwidthSmooth    3
-#define REVRUN_DecaySmooth        4
-#define REVRUN_PredelaySmooth    5
-#define REVRUN_EarlyLateSmooth    6
-#define REVRUN_Density2            7
-#define REVRUN_PrevLeftTank        8
-#define REVRUN_PrevRightTank    9
-#define REVRUN_NUM_PARAMS        10
-
-typedef struct ReverbConfig_t {
-    struct AUDIO_DELAY8 earlyReflectionsDelay[2];
-    struct AUDIO_FILTER bandwidthFilter[2];
-    struct AUDIO_FILTER dampingFilter[2];
-    struct AUDIO_DELAY preDelay;
-    struct AUDIO_DELAY allpass[6];
-    struct AUDIO_DELAY3 allpass3Tap[2];
-    struct AUDIO_DELAY4 staticDelay[4];
-    pthread_mutex_t mutex; // mutex since sets happen on a different thread than processing
-    float *bufferPtr;
-    float settings[REV_NUM_PARAMS];
-    float runtime[REVRUN_NUM_PARAMS];
-    unsigned int bufferSize;
-    unsigned char controlRate, controlRateCounter;
-} ReverbConfig;
-
-#define FILTER_OVERSAMPLECOUNT 4
-
-static const float EarlyReflectionsFactors[] = {0.f, 0.0199f, 0.0219f, 0.0354f,
-                                                0.0389f, 0.0414f, 0.0692f, 0.f, 0.f, 0.0099f,
-                                                0.011f, 0.0182f, 0.0189f,
-                                                0.0213f, 0.0431f, 0.f};
-
-typedef void ReverbProcessPtr(ReverbConfig *, const void *, void *,
-                              unsigned int);
-
-typedef void ReverbResetPtr(ReverbConfig *);
-
-typedef void ReverbSetParamsPtr(ReverbConfig *, unsigned int, unsigned int *);
-
-typedef ReverbConfig *ReverbAllocPtr(void);
-
-typedef void ReverbFreePtr(ReverbConfig *);
-
-void reverbReset(ReverbConfig *);
+    int x_allpasstuningL[numallpasses];
+    int x_allpasstuningR[numallpasses];
+} t_freeverb;
 
 void reverbconfig_setParam(void *p, float paramNum, float param);
 
-// ============================== Filter ==============================
-
-static inline float revfilter_process(struct AUDIO_FILTER *filter,
-                                      float input) {
-    unsigned int i;
-    for (i = 0; i < FILTER_OVERSAMPLECOUNT; i++) {
-        filter->low += (filter->f * filter->band) + 1e-25;
-        filter->high = input - filter->low - filter->q * filter->band;
-        filter->band += filter->f * filter->high;
-    }
-
-    return filter->low;
-}
-
-// ============================== Delay =============================
-
-static inline float delayGetIndex(struct AUDIO_DELAY *delay,
-                                  unsigned int which) {
-    return delay->buffer[delay->index[which]];
-}
-
-// For "Static" filters without feedback
-static inline float delay_process(struct AUDIO_DELAY *delay, float input) {
-    float output = delayGetIndex(delay, 0);
-    delay->buffer[delay->index[0]] = input;
-
-    unsigned int i;
-    for (i = 0; i < delay->numTaps; i++) {
-        if (++delay->index[i] >= delay->length) {
-            delay->index[i] = 0;
-        }
-    }
-
-    return output;
-}
-
-// For "All Pass" filters with feedback
-static inline float delayallpass_process(struct AUDIO_DELAY *delay,
-                                         float input) {
-    float bufout = delayGetIndex(delay, 0);
-    float temp = input * (-delay->feedback);
-    float output = bufout + temp;
-
-    delay->buffer[delay->index[0]] = input
-                                     + ((bufout + temp) * delay->feedback);
-
-    unsigned int i;
-    for (i = 0; i < delay->numTaps; i++) {
-        if (++delay->index[i] >= delay->length) {
-            delay->index[i] = 0;
-        }
-    }
-
-    return output;
-}
-
-static inline void delayClear(struct AUDIO_DELAY *delay) {
-    unsigned int i;
-
-//	memset(delay->buffer, 0, delay->length * sizeof(float));
-    for (i = 0; i < delay->numTaps; i++) {
-        delay->index[i] = 0;
-    }
-}
-
-/****************** ReverbProcess() *****************
- * Adds reverb to the waveform data in the input buffer,
- * and stores the new data in the output buffer.
- *
- * inputs =			Pointer to input buffer.
- * outputs =		Pointer to output buffer.
- * sampleFrames =	How many sample frames (not bytes)
- *					to process. For example, 16 frames
- *					of stereo 16-bit data means 64 bytes
- *					(16 frames * 2 channels * sizeof(short)).
- *
- * NOTES: "inputs" and "outputs" can both point to the
- * same buffer if desired. This means the original waveform
- * data is modified.
- *
- * Output buffer must be big enough for the processed data.
- */
-
-static inline void reverb_process(ReverbConfig *rev, float **buffers,
-                                  int sampleFrames) {
-    float inverseSampleFrames = 1.0f / sampleFrames;
-
-    float earlyLateDelta = (rev->settings[REVPARAM_EARLYLATE]
-                            - rev->runtime[REVRUN_EarlyLateSmooth]) * inverseSampleFrames;
-    float bandwidthDelta = (((rev->settings[REVPARAM_BANDWIDTHFREQ] * 18400.f)
-                             + 100.f) - rev->runtime[REVRUN_BandwidthSmooth])
-                           * inverseSampleFrames;
-    float dampingDelta = (((rev->settings[REVPARAM_DAMPINGFREQ] * 18400.f)
-                           + 100.f) - rev->runtime[REVRUN_DampingSmooth])
-                         * inverseSampleFrames;
-    float predelayDelta = ((rev->settings[REVPARAM_PREDELAY] * 200.f
-                            * (SAMPLE_RATE / 1000.f)) - rev->runtime[REVRUN_PredelaySmooth])
-                          * inverseSampleFrames;
-    float sizeDelta = (rev->settings[REVPARAM_SIZE]
-                       - rev->runtime[REVRUN_SizeSmooth]) * inverseSampleFrames;
-    float decayDelta = (((0.7995f * rev->settings[REVPARAM_DECAY]) + 0.005f)
-                        - rev->runtime[REVRUN_DecaySmooth]) * inverseSampleFrames;
-    float densityDelta = (((0.7995f * rev->settings[REVPARAM_DENSITY]) + 0.005f)
-                          - rev->runtime[REVRUN_DensitySmooth]) * inverseSampleFrames;
-
-    do {
-        float smearedInput, earlyReflectionsL, earlyReflectionsR;
-
-        float left = buffers[0][sampleFrames];
-        float right = buffers[1][sampleFrames];
-
-        pthread_mutex_lock(&rev->mutex);
-        if (rev->bufferPtr) {
-            rev->runtime[REVRUN_EarlyLateSmooth] += earlyLateDelta;
-            rev->runtime[REVRUN_BandwidthSmooth] += bandwidthDelta;
-            rev->runtime[REVRUN_DampingSmooth] += dampingDelta;
-            rev->runtime[REVRUN_PredelaySmooth] += predelayDelta;
-            rev->runtime[REVRUN_SizeSmooth] += sizeDelta;
-            rev->runtime[REVRUN_DecaySmooth] += decayDelta;
-            rev->runtime[REVRUN_DensitySmooth] += densityDelta;
-
-            if (rev->controlRateCounter >= rev->controlRate) {
-                rev->controlRateCounter = 0;
-
-                rev->bandwidthFilter[0].frequency =
-                rev->bandwidthFilter[1].frequency =
-                        rev->runtime[REVRUN_BandwidthSmooth];
-                rev->bandwidthFilter[0].f =
-                rev->bandwidthFilter[1].f =
-                        2.f
-                        * (float) sin(
-                                3.141592654
-                                * rev->runtime[REVRUN_BandwidthSmooth]
-                                / (SAMPLE_RATE
-                                   * FILTER_OVERSAMPLECOUNT));
-                rev->dampingFilter[0].frequency =
-                rev->dampingFilter[1].frequency =
-                        rev->runtime[REVRUN_DampingSmooth];
-                rev->dampingFilter[0].f =
-                rev->dampingFilter[1].f =
-                        2.f
-                        * (float) sin(
-                                3.141592654
-                                * rev->runtime[REVRUN_DampingSmooth]
-                                / (SAMPLE_RATE
-                                   * FILTER_OVERSAMPLECOUNT));
-            }
-            ++rev->controlRateCounter;
-
-            if (rev->runtime[REVRUN_PredelaySmooth] > REVSIZE_PREDELAY)
-                rev->runtime[REVRUN_PredelaySmooth] = REVSIZE_PREDELAY;
-            rev->preDelay.length =
-                    (unsigned int) rev->runtime[REVRUN_PredelaySmooth];
-
-            rev->allpass[4].feedback = rev->allpass[5].feedback =
-                    rev->settings[REVPARAM_DENSITY];
-
-            rev->runtime[REVRUN_Density2] = rev->runtime[REVRUN_DecaySmooth]
-                                            + 0.15f;
-
-            if (rev->runtime[REVRUN_Density2] > 0.5f)
-                rev->runtime[REVRUN_Density2] = 0.5f;
-            if (rev->runtime[REVRUN_Density2] < 0.25f)
-                rev->runtime[REVRUN_Density2] = 0.25f;
-            rev->allpass3Tap[0].feedback = rev->allpass3Tap[1].feedback =
-                    rev->runtime[REVRUN_Density2];
-
-            float bandwidthLeft = revfilter_process(&rev->bandwidthFilter[0],
-                                                    left);
-            float bandwidthRight = revfilter_process(&rev->bandwidthFilter[1],
-                                                     right);
-            float *buffer = rev->earlyReflectionsDelay[0].buffer;
-
-            unsigned int *index = &rev->earlyReflectionsDelay[0].index[0];
-            earlyReflectionsL = delay_process(
-                    (struct AUDIO_DELAY *) &rev->earlyReflectionsDelay[0],
-                    bandwidthLeft * 0.5f + bandwidthRight * 0.3f)
-                                + buffer[index[2]] * 0.6f + buffer[index[3]] * 0.4f
-                                + buffer[index[4]] * 0.3f + buffer[index[5]] * 0.3f
-                                + buffer[index[6]] * 0.1f + buffer[index[7]] * 0.1f
-                                + (bandwidthLeft * 0.4f + bandwidthRight * 0.2f) * 0.5f;
-            buffer = rev->earlyReflectionsDelay[1].buffer;
-            index = &rev->earlyReflectionsDelay[1].index[0];
-            earlyReflectionsR = delay_process(
-                    (struct AUDIO_DELAY *) &rev->earlyReflectionsDelay[1],
-                    bandwidthLeft * 0.3f + bandwidthRight * 0.5f)
-                                + buffer[index[2]] * 0.6f + buffer[index[3]] * 0.4f
-                                + buffer[index[4]] * 0.3f + buffer[index[5]] * 0.3f
-                                + buffer[index[6]] * 0.1f + buffer[index[7]] * 0.1f
-                                + (bandwidthLeft * 0.2f + bandwidthRight * 0.4f) * 0.5f;
-            smearedInput = delay_process(&rev->preDelay,
-                                         (bandwidthRight + bandwidthLeft) * 0.5f);
-
-            unsigned int i;
-            for (i = 0; i < 4; i++) {
-                smearedInput = delayallpass_process(&rev->allpass[i],
-                                                    smearedInput);
-            }
-
-            float leftTank = delayallpass_process(
-                    (struct AUDIO_DELAY *) &rev->allpass[4],
-                    smearedInput + rev->runtime[REVRUN_PrevRightTank]);
-            float rightTank = delayallpass_process(
-                    (struct AUDIO_DELAY *) &rev->allpass[5],
-                    smearedInput + rev->runtime[REVRUN_PrevLeftTank]);
-
-            leftTank = delay_process(
-                    (struct AUDIO_DELAY *) &rev->staticDelay[0], leftTank);
-            leftTank = revfilter_process(&rev->dampingFilter[0], leftTank);
-            leftTank = delayallpass_process(
-                    (struct AUDIO_DELAY *) &rev->allpass3Tap[0], leftTank);
-            rev->runtime[REVRUN_PrevLeftTank] = delay_process(
-                    (struct AUDIO_DELAY *) &rev->staticDelay[1], leftTank)
-                                                * rev->runtime[REVRUN_DecaySmooth];
-            rightTank = delay_process(
-                    (struct AUDIO_DELAY *) &rev->staticDelay[2], rightTank);
-            rightTank = revfilter_process(&rev->dampingFilter[1], rightTank);
-            rightTank = delayallpass_process(
-                    (struct AUDIO_DELAY *) &rev->allpass3Tap[1], rightTank);
-            rev->runtime[REVRUN_PrevRightTank] = delay_process(
-                    (struct AUDIO_DELAY *) &rev->staticDelay[3], rightTank)
-                                                 * rev->runtime[REVRUN_DecaySmooth];
-
-            float factor = 0.6f;
-
-            float accumulatorL = (factor
-                                  * delayGetIndex((struct AUDIO_DELAY *) &rev->staticDelay[2],
-                                                  1))
-                                 + (factor
-                                    * delayGetIndex(
-                    (struct AUDIO_DELAY *) &rev->staticDelay[2],
-                    2))
-                                 - (factor
-                                    * delayGetIndex(
-                    (struct AUDIO_DELAY *) &rev->allpass3Tap[1],
-                    1))
-                                 + (factor
-                                    * delayGetIndex(
-                    (struct AUDIO_DELAY *) &rev->staticDelay[3],
-                    1))
-                                 - (factor
-                                    * delayGetIndex(
-                    (struct AUDIO_DELAY *) &rev->staticDelay[0],
-                    1))
-                                 - (factor
-                                    * delayGetIndex(
-                    (struct AUDIO_DELAY *) &rev->allpass3Tap[0],
-                    1))
-                                 - (factor
-                                    * delayGetIndex(
-                    (struct AUDIO_DELAY *) &rev->staticDelay[1],
-                    1));
-
-            float accumulatorR = (factor
-                                  * delayGetIndex((struct AUDIO_DELAY *) &rev->staticDelay[0],
-                                                  2))
-                                 + (factor
-                                    * delayGetIndex(
-                    (struct AUDIO_DELAY *) &rev->staticDelay[0],
-                    3))
-                                 - (factor
-                                    * delayGetIndex(
-                    (struct AUDIO_DELAY *) &rev->allpass3Tap[0],
-                    2))
-                                 + (factor
-                                    * delayGetIndex(
-                    (struct AUDIO_DELAY *) &rev->staticDelay[1],
-                    2))
-                                 - (factor
-                                    * delayGetIndex(
-                    (struct AUDIO_DELAY *) &rev->staticDelay[2],
-                    3))
-                                 - (factor
-                                    * delayGetIndex(
-                    (struct AUDIO_DELAY *) &rev->allpass3Tap[1],
-                    2))
-                                 - (factor
-                                    * delayGetIndex(
-                    (struct AUDIO_DELAY *) &rev->staticDelay[3],
-                    2));
-            accumulatorL = accumulatorL * rev->settings[REVPARAM_EARLYLATE]
-                           + (1.f - rev->settings[REVPARAM_EARLYLATE])
-                             * earlyReflectionsL;
-            accumulatorR = accumulatorR * rev->settings[REVPARAM_EARLYLATE]
-                           + (1.f - rev->settings[REVPARAM_EARLYLATE])
-                             * earlyReflectionsR;
-            if (rev->settings[REVPARAM_REVERBVOL]) {
-                left += ((accumulatorL - left)
-                         * rev->settings[REVPARAM_REVERBVOL]);
-                right += ((accumulatorR - right)
-                          * rev->settings[REVPARAM_REVERBVOL]);
-            } else {
-                left = accumulatorL - left;
-                right = accumulatorR - right;
-            }
-        }
-        pthread_mutex_unlock(&rev->mutex);
-        buffers[0][sampleFrames] = left;
-        buffers[1][sampleFrames] = right;
-    } while (--sampleFrames);
-}
-
-ReverbConfig *reverbconfig_create();
+t_freeverb *reverbconfig_create();
 
 void reverbconfig_destroy(void *config);
 
 void reverbconfig_setParam(void *p, float paramNum, float param);
+
+static inline float comb_processL(t_freeverb *x, int filteridx, float input) {
+    float output;
+    int bufidx = x->x_combidxL[filteridx];
+
+    output = x->x_bufcombL[filteridx][bufidx];
+
+    x->x_filterstoreL[filteridx] =
+            (output * x->x_combdamp2) + (x->x_filterstoreL[filteridx] * x->x_combdamp1);
+
+    x->x_bufcombL[filteridx][bufidx] = input + (x->x_filterstoreL[filteridx] * x->x_combfeedback);
+
+    if (++x->x_combidxL[filteridx] >= x->x_combtuningL[filteridx]) x->x_combidxL[filteridx] = 0;
+
+    return output;
+}
+
+static inline float comb_processR(t_freeverb *x, int filteridx, float input) {
+    float output;
+    int bufidx = x->x_combidxR[filteridx];
+
+    output = x->x_bufcombR[filteridx][bufidx];
+
+    x->x_filterstoreR[filteridx] =
+            (output * x->x_combdamp2) + (x->x_filterstoreR[filteridx] * x->x_combdamp1);
+
+    x->x_bufcombR[filteridx][bufidx] = input + (x->x_filterstoreR[filteridx] * x->x_combfeedback);
+
+    if (++x->x_combidxR[filteridx] >= x->x_combtuningR[filteridx]) x->x_combidxR[filteridx] = 0;
+
+    return output;
+}
+
+static inline float allpass_processL(t_freeverb *x, int filteridx, float input) {
+    float output;
+    float bufout;
+    int bufidx = x->x_allpassidxL[filteridx];
+
+    bufout = x->x_bufallpassL[filteridx][bufidx];
+
+    output = -input + bufout;
+    x->x_bufallpassL[filteridx][bufidx] = input + (bufout * x->x_allpassfeedback);
+
+    if (++x->x_allpassidxL[filteridx] >= x->x_allpasstuningL[filteridx])
+        x->x_allpassidxL[filteridx] = 0;
+
+    return output;
+}
+
+static inline float allpass_processR(t_freeverb *x, int filteridx, float input) {
+    float output;
+    float bufout;
+    int bufidx = x->x_allpassidxR[filteridx];
+
+    bufout = x->x_bufallpassR[filteridx][bufidx];
+
+    output = -input + bufout;
+    x->x_bufallpassR[filteridx][bufidx] = input + (bufout * x->x_allpassfeedback);
+
+    if (++x->x_allpassidxR[filteridx] >= x->x_allpasstuningR[filteridx])
+        x->x_allpassidxR[filteridx] = 0;
+
+    return output;
+}
+
+static inline void reverb_process(t_freeverb *config, float **buffers, int size) {
+    int samp;
+    int i;
+    float outL, outR, inL, inR, input;
+
+    for (samp = 0; samp < size; samp++) {
+        outL = outR = 0.f;
+        inL = buffers[0][samp];
+        inR = buffers[1][samp];
+        input = (inL + inR) * config->x_gain;
+
+        // Accumulate comb filters in parallel
+        for (i = 0; i < numcombs; i++) {
+            outL += comb_processL(config, i, input);
+            outR += comb_processR(config, i, input);
+        }
+
+        // Feed through allpasses in series
+        for (i = 0; i < numallpasses; i++) {
+            outL = allpass_processL(config, i, outL);
+            outR = allpass_processR(config, i, outR);
+        }
+
+        // Calculate output REPLACING anything already there
+        buffers[0][samp] = outL * config->x_wet1 + outR * config->x_wet2 + inL * config->x_dry;
+        buffers[1][samp] = outR * config->x_wet1 + outL * config->x_wet2 + inR * config->x_dry;
+    }
+}
 
 #endif // REVERB_H

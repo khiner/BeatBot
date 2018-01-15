@@ -119,7 +119,7 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
     }
 
     public Param getParam(int paramNum) {
-        return params.get(paramNum);
+        return params.size() > paramNum ? params.get(paramNum) : null;
     }
 
     public String getParamValueString(int paramNum) {

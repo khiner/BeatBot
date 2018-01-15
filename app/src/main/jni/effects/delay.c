@@ -26,7 +26,7 @@ void delayconfigi_destroy(void *p) {
     for (channel = 0; channel < 2; channel++)
         free(config->delayBuffer[channel]);
     free(config->delayBuffer);
-    free((DelayConfigI *) p);
+    free(config);
 }
 
 void delayconfigi_setParam(void *p, float paramNumFloat, float param) {
