@@ -304,7 +304,7 @@ public class MidiManager implements MidiNoteListener {
     }
 
     public long getMajorTickSpacing() {
-        return TICKS_PER_MEASURE / (2 << beatDivision);
+        return TICKS_PER_MEASURE / (4 << beatDivision);
     }
 
     private void onTempoChange(final float bpm) {

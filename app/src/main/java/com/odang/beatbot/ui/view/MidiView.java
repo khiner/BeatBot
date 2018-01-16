@@ -659,7 +659,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
         for (int i = 0; i < Color.MIDI_LINES.length; i++) {
             if (i > context.getMidiManager().getBeatDivision() + 3) {
                 return Color.TRANSPARENT;
-            } else if (lineIndex % (tickLines.length / (1 << i)) == 0) {
+            } else if (lineIndex % (tickLines.length / (2 << i)) == 0) {
                 return Color.MIDI_LINES[i];
             }
         }
