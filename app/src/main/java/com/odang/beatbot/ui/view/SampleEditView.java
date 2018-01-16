@@ -306,7 +306,8 @@ public class SampleEditView extends ControlView2dBase {
         if (param == null)
             return;
         if (param.equals(track.getGainParam())) {
-            waveformShape.resample();
+            waveformShape.resetIndices();
+            waveformShape.updateWaveformVertices();
         } else if (param.equals(track.getLoopBeginParam()) || param.equals(track.getLoopEndParam())) {
             updateWaveformVb();
         }

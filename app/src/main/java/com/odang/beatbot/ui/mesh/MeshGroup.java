@@ -49,7 +49,7 @@ public class MeshGroup {
         this.strokeWeight = weight;
     }
 
-    public void draw() {
+    public synchronized void draw() {
         if (children.isEmpty())
             return;
 
@@ -89,7 +89,7 @@ public class MeshGroup {
         return children.contains(mesh);
     }
 
-    public void add(Mesh mesh) {
+    public synchronized void add(Mesh mesh) {
         if (null == mesh || contains(mesh)) {
             return;
         }
@@ -101,7 +101,7 @@ public class MeshGroup {
         resetIndices(mesh); // TODO only needed when numChildren == 1 ?
     }
 
-    public void remove(Mesh mesh) {
+    public synchronized void remove(Mesh mesh) {
         if (null == mesh || !contains(mesh)) {
             return;
         }
@@ -118,7 +118,7 @@ public class MeshGroup {
         resetIndices();
     }
 
-    public void push(Mesh2D mesh) {
+    public synchronized void push(Mesh2D mesh) {
         if (null == mesh || !children.contains(mesh))
             return;
 
@@ -163,14 +163,14 @@ public class MeshGroup {
         dirty = true;
     }
 
-    protected void setColor(Mesh mesh, float[] color) {
+    protected synchronized void setColor(Mesh mesh, float[] color) {
         for (int vertexIndex = 0; vertexIndex < mesh.getNumVertices(); vertexIndex++) {
             setColor(mesh, vertexIndex, color);
         }
         dirty = true;
     }
 
-    protected void setColor(Mesh mesh, int index, float[] color) {
+    protected synchronized void setColor(Mesh mesh, int index, float[] color) {
         int offset = getVertexIndex(mesh, index) + COLOR_OFFSET;
         vertices[offset] = color[0];
         vertices[offset + 1] = color[1];
@@ -180,7 +180,7 @@ public class MeshGroup {
         dirty = true;
     }
 
-    public void translate(float x, float y) {
+    public synchronized void translate(float x, float y) {
         for (int i = 0; i < vertices.length; i += indicesPerVertex) {
             vertices[i] += x;
             vertices[i + 1] += y;
@@ -188,7 +188,7 @@ public class MeshGroup {
         dirty = true;
     }
 
-    public void scale(float x, float y) {
+    public synchronized void scale(float x, float y) {
         for (int i = 0; i < vertices.length; i += indicesPerVertex) {
             vertices[i] *= x;
             vertices[i + 1] *= y;
@@ -197,35 +197,35 @@ public class MeshGroup {
     }
 
     // avoid a few ops...
-    public void translateX(float x) {
+    public synchronized void translateX(float x) {
         for (int i = 0; i < vertices.length; i += indicesPerVertex) {
             vertices[i] += x;
         }
         dirty = true;
     }
 
-    public void translateY(float y) {
+    public synchronized void translateY(float y) {
         for (int i = 0; i < vertices.length; i += indicesPerVertex) {
             vertices[i + 1] += y;
         }
         dirty = true;
     }
 
-    public void scaleX(float x) {
+    public synchronized void scaleX(float x) {
         for (int i = 0; i < vertices.length; i += indicesPerVertex) {
             vertices[i] *= x;
         }
         dirty = true;
     }
 
-    public void scaleY(float y) {
+    public synchronized void scaleY(float y) {
         for (int i = 0; i < vertices.length; i += indicesPerVertex) {
             vertices[i + 1] *= y;
         }
         dirty = true;
     }
 
-    protected void translate(Mesh mesh, float x, float y) {
+    protected synchronized void translate(Mesh mesh, float x, float y) {
         for (int i = getVertexIndex(mesh, 0); i < getVertexIndex(mesh, mesh.getNumVertices()); i += indicesPerVertex) {
             vertices[i] += x;
             vertices[i + 1] += y;
@@ -233,8 +233,16 @@ public class MeshGroup {
         dirty = true;
     }
 
-    protected void changeSize(Mesh mesh, int oldSize, int newSize, int oldNumIndices,
-                              int newNumIndices) {
+    protected synchronized void scale(Mesh mesh, float x, float y) {
+        for (int i = getVertexIndex(mesh, 0); i < getVertexIndex(mesh, mesh.getNumVertices()); i += indicesPerVertex) {
+            vertices[i] *= x;
+            vertices[i + 1] *= y;
+        }
+        dirty = true;
+    }
+
+    protected synchronized void changeSize(Mesh mesh, int oldSize, int newSize, int oldNumIndices,
+                                           int newNumIndices) {
         if (oldSize == newSize)
             return;
 
@@ -257,7 +265,7 @@ public class MeshGroup {
         return (mesh.getGroupVertexOffset() + index) * indicesPerVertex;
     }
 
-    private void resetIndices() {
+    private synchronized void resetIndices() {
         int numVertices = 0;
         int numIndices = 0;
         for (Mesh child : children) {
@@ -271,7 +279,7 @@ public class MeshGroup {
         }
     }
 
-    private void resetIndices(Mesh mesh) {
+    private synchronized void resetIndices(Mesh mesh) {
         for (int i = 0; i < mesh.getNumIndices(); i++) {
             indices[mesh.getGroupIndexOffset() + i] = (short) (mesh.getIndex(i) + mesh
                     .getGroupVertexOffset());
@@ -279,7 +287,7 @@ public class MeshGroup {
         dirty = true;
     }
 
-    private void updateBuffers() {
+    private synchronized void updateBuffers() {
         initHandles();
 
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vertexHandle);
@@ -308,7 +316,7 @@ public class MeshGroup {
         return null != textureId;
     }
 
-    private void adjustVertexLength(int vertexDiff, int indexDiff) {
+    private synchronized void adjustVertexLength(int vertexDiff, int indexDiff) {
         vertices = Arrays.copyOf(vertices, vertices.length + vertexDiff * indicesPerVertex);
         indices = Arrays.copyOf(indices, indices.length + indexDiff);
 

@@ -1,7 +1,9 @@
 package com.odang.beatbot.ui.shape;
 
+import com.odang.beatbot.effect.Param;
 import com.odang.beatbot.track.Track;
-import com.odang.beatbot.ui.view.View;
+
+import static com.odang.beatbot.ui.view.View.context;
 
 public class WaveformShape extends Shape {
     private final static float MAX_SPP = 1, BUFFER_RATIO = 4;
@@ -41,7 +43,7 @@ public class WaveformShape extends Shape {
         int endFrame = (int) Math.ceil(offsetInFrames + numBufferFrames);
         int stepFrames = (int) Math.ceil(widthInFrames / numSamples);
 
-        Track track = (Track) View.context.getTrackManager().getCurrTrack();
+        Track track = (Track) context.getTrackManager().getCurrTrack();
         track.fillSampleBuffer(sampleBuffer, startFrame, endFrame, stepFrames);
 
         resetIndices();
@@ -59,7 +61,7 @@ public class WaveformShape extends Shape {
         this.loopBeginX = loopBeginX;
         this.loopEndX = loopEndX;
 
-        final Track track = (Track) View.context.getTrackManager().getCurrTrack();
+        final Track track = (Track) context.getTrackManager().getCurrTrack();
         float newWidthInFrames = Math.min(widthInFrames, track.getNumFrames());
         boolean waveformChanged = this.offsetInFrames != offsetInFrames
                 || this.widthInFrames != newWidthInFrames || this.xOffset != xOffset;
@@ -79,9 +81,12 @@ public class WaveformShape extends Shape {
             updateWaveformVertices();
     }
 
-    private void updateWaveformVertices() {
+    public void updateWaveformVertices() {
         if (null == sampleBuffer || this.widthInFrames <= 0 || sampleBuffer.length < 4 || sampleBuffer[0] == sampleBuffer[2])
             return; // yes, this is a silly bad condition that isn't clear and should be handled in other ways
+
+        final Track track = (Track) context.getTrackManager().getCurrTrack();
+        final float gain = Param.dbToLinear(track.getGainParam().level);
 
         float x = 0, y = 0;
 
@@ -89,7 +94,7 @@ public class WaveformShape extends Shape {
             int sampleIndex = (int) sampleBuffer[i * 2];
             if (sampleIndex == -1)
                 break;
-            float sample = sampleBuffer[i * 2 + 1];
+            float sample = sampleBuffer[i * 2 + 1] * gain;
             float percent = (sampleIndex - offsetInFrames) / widthInFrames;
             x = this.x + percent * width + xOffset;
             y = this.y + height * (1 - sample) / 2;

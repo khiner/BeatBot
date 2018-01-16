@@ -74,9 +74,15 @@ public abstract class Mesh {
         this.groupIndexOffset = groupIndexOffset;
     }
 
-    private void translate(float x, float y) {
+    public void translate(float x, float y) {
         if (isVisible()) {
             group.translate(this, x, y);
+        }
+    }
+
+    public void scale(float x, float y) {
+        if (isVisible()) {
+            group.scale(this, x, y);
         }
     }
 

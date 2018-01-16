@@ -19,7 +19,7 @@ public class Param {
     public boolean hz = false;
 
     private int topBeatNum = 1, bottomBeatNum = 1;
-    private float addValue = 0, scaleValue = 1, logScaleValue = 8;
+    private float addValue = 0, scaleValue = 1, logScaleValue = DEFAULT_LOG_SCALE;
     private boolean beatSync = false, beatSyncable = false, logScale = false, snap = false;
     private String unitString = "", name = "", format = "%.2f";
 

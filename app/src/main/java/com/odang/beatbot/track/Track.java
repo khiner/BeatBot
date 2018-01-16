@@ -360,11 +360,6 @@ public class Track extends BaseTrack implements FileListener {
         return getFrames(id);
     }
 
-    // Do not delete! Called from JNI.
-    public float getSample(long sampleIndex, int channel) {
-        return getSample(id, sampleIndex, channel);
-    }
-
     public void fillSampleBuffer(float[] sampleBuffer, int startFrame, int endFrame, int jumpFrames) {
         fillSampleBuffer(id, sampleBuffer, startFrame, endFrame, jumpFrames);
     }

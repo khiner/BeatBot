@@ -511,9 +511,9 @@ void Java_com_odang_beatbot_track_Track_fillSampleBuffer(JNIEnv *env, jclass cla
     FileGen *fileGen = (FileGen *) track->generator->config;
     long numFrames = fileGen->frames;
     startFrame = startFrame < 0 ? 0 : startFrame;
-    endFrame = endFrame > numFrames ? numFrames : endFrame;
+    endFrame = (jint) (endFrame > numFrames ? numFrames : endFrame);
 
-    float *maxFrameIndexAndSample = malloc(sizeof(float) * 2);
+    float maxFrameIndexAndSample[] = {0, 0};
 
     int i = 0;
     int frameIndex;
@@ -523,7 +523,7 @@ void Java_com_odang_beatbot_track_Track_fillSampleBuffer(JNIEnv *env, jclass cla
 
         int j;
         int segmentEndFrame =
-                frameIndex + jumpFrames > numFrames ? numFrames : frameIndex + jumpFrames;
+                (int) (frameIndex + jumpFrames > numFrames ? numFrames : frameIndex + jumpFrames);
         for (j = frameIndex + 1; j < segmentEndFrame; j++) {
             float candidateSample = filegen_getSample(fileGen, j, 0);
             if (fabs(candidateSample) > fabs(maxFrameIndexAndSample[1])) {
@@ -539,7 +539,6 @@ void Java_com_odang_beatbot_track_Track_fillSampleBuffer(JNIEnv *env, jclass cla
     maxFrameIndexAndSample[0] = (float) -1.0; // end code
     maxFrameIndexAndSample[1] = (float) 0.0;
     (*env)->SetFloatArrayRegion(env, sampleBuffer, i * 2, 2, maxFrameIndexAndSample);
-    free(maxFrameIndexAndSample);
 }
 
 float Java_com_odang_beatbot_track_Track_getCurrentFrame(JNIEnv *env, jclass clazz,

@@ -43,7 +43,7 @@ public abstract class Shape {
         strokeMesh.vertex(x, y, strokeColor);
     }
 
-    protected void resetIndices() {
+    public void resetIndices() {
         if (!isVisible())
             return;
         fillMesh.reset();
@@ -74,14 +74,6 @@ public abstract class Shape {
     public void setColors(float[] fillColor, float[] strokeColor) {
         setFillColor(fillColor);
         setStrokeColor(strokeColor);
-    }
-
-    public Mesh2D getFillMesh() {
-        return fillMesh;
-    }
-
-    public Mesh2D getStrokeMesh() {
-        return strokeMesh;
     }
 
     public float[] getFillColor() {

@@ -44,7 +44,7 @@ float filegen_getSample(FileGen *fileGen, long frame, int channel) {
     sf_readf_float(fileGen->sampleFile, fileGen->tempSample, 1);
     pthread_mutex_unlock(&fileGen->fileMutex);
 
-    return fileGen->tempSample[channel] * fileGen->gain;
+    return fileGen->tempSample[channel];
 }
 
 void filegen_setLoopWindow(FileGen *fileGen, long loopBeginSample,
