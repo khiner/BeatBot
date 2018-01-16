@@ -198,7 +198,7 @@ Track *initTrack(int trackId) {
     track->num = trackId;
     track->generator = NULL;
     track->levels = initLevels();
-    track->nextStartTick = track->nextStopTick = -1;
+    track->nextStartSample = track->nextStopSample = -1;
     track->currBufferFloat = (float **) malloc(2 * sizeof(float *));
     track->currBufferFloat[0] = (float *) calloc(BUFF_SIZE_FRAMES,
                                                  ONE_FLOAT_SIZE);
@@ -316,17 +316,17 @@ void Java_com_odang_beatbot_track_Track_soloTrack(JNIEnv *env, jclass clazz,
 
 void setNextNoteInfo(Track *track, jlong onTick, jlong offTick, jbyte volume,
                      jbyte pan, jbyte pitchSteps) {
-    track->nextStartTick = onTick;
-    track->nextStopTick = offTick;
-    track->nextEvent->volume = byteToLinear(volume);
-    track->nextEvent->pan = byteToLinear(pan);
+    track->nextStartSample = (long) (onTick * samplesPerTick);
+    track->nextStopSample = (long) (offTick * samplesPerTick);
+    track->nextEvent->volume = byteToLinear((unsigned char) volume);
+    track->nextEvent->pan = byteToLinear((unsigned char) pan);
     track->nextEvent->pitchSteps = (float) pitchSteps - HALF_BYTE_VALUE;
 }
 
 void setNextNote(Track *track, jobject obj) {
     JNIEnv *env = getJniEnv();
     if (obj == NULL) {
-        track->nextStartTick = track->nextStopTick = -1;
+        track->nextStartSample = track->nextStopSample = -1;
         return;
     }
     jclass cls = (*env)->GetObjectClass(env, obj);
@@ -349,7 +349,8 @@ void setNextNote(Track *track, jobject obj) {
 void updateNextNote(Track *track) {
     JNIEnv *env = getJniEnv();
     jobject obj = (*env)->CallObjectMethod(env, getTrackManager(),
-                                           getNextMidiNoteMethod(), track->num, (jlong) currTick);
+                                           getNextMidiNoteMethod(), track->num,
+                                           (jlong) (currSample / samplesPerTick));
     setNextNote(track, obj);
     (*env)->DeleteLocalRef(env, obj);
 }
@@ -441,7 +442,7 @@ jboolean Java_com_odang_beatbot_track_Track_isTrackPlaying(JNIEnv *env,
         return false;
     }
 
-    return currTick >= track->nextStartTick && currTick <= track->nextStopTick;
+    return (jboolean) (currSample >= track->nextStartSample && currSample <= track->nextStopSample);
 }
 
 jboolean Java_com_odang_beatbot_track_Track_isTrackLooping(JNIEnv *env,
@@ -451,14 +452,14 @@ jboolean Java_com_odang_beatbot_track_Track_isTrackLooping(JNIEnv *env,
         return false;
     }
     FileGen *fileGen = (FileGen *) track->generator->config;
-    return fileGen->looping;
+    return (jboolean) fileGen->looping;
 }
 
 void Java_com_odang_beatbot_track_Track_notifyNoteRemoved(JNIEnv *env,
                                                           jclass clazz, jint trackId,
                                                           jlong onTick) {
     Track *track = getTrack(trackId);
-    if (track->nextStartTick == onTick)
+    if (track->nextStartSample == (long) (onTick * samplesPerTick))
         stopTrack(track);
 }
 

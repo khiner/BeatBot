@@ -12,14 +12,6 @@ static SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, 2,
                                                                    | SL_SPEAKER_FRONT_RIGHT,
                                       SL_BYTEORDER_LITTLEENDIAN};
 
-static inline long tickToSample(long tick) {
-    return tick * samplesPerTick;
-}
-
-static inline long sampleToTick(long sample) {
-    return sample / samplesPerTick;
-}
-
 bool isPlaying();
 
 void updateNextNoteTicks();

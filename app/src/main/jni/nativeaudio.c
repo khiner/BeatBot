@@ -156,7 +156,7 @@ void Java_com_odang_beatbot_track_Track_stopTrack(JNIEnv *env, jclass clazz,
 }
 
 void stopAllTracks() {
-    currTick = loopBeginTick;
+    currSample = loopBeginSample;
     TrackNode *cur_ptr = trackHead;
     while (cur_ptr != NULL) {
         stopTrack(cur_ptr->track);
@@ -172,15 +172,15 @@ void disarm() {
 void generateNextBuffer() {
     int samp, channel;
     for (samp = 0; samp < BUFF_SIZE_FRAMES; samp++) {
-        if (currTick > loopEndTick) {
+        if (currSample > loopEndSample) {
             stopAllTracks();
         }
         TrackNode *cur_ptr = trackHead;
         while (cur_ptr != NULL) {
             Track *track = cur_ptr->track;
-            if (playing && currTick == track->nextStartTick) {
+            if (playing && currSample == track->nextStartSample) {
                 playTrack(track);
-            } else if (currTick == track->nextStopTick) {
+            } else if (currSample == track->nextStopSample) {
                 stopTrack(track);
             }
             fillTempSample(track);
@@ -191,10 +191,7 @@ void generateNextBuffer() {
             cur_ptr = cur_ptr->next;
         }
         if (playing) {
-            if (++currSample >= samplesPerTick) {
-                currTick++;
-                currSample -= samplesPerTick;
-            }
+            currSample++;
         }
     }
 }
