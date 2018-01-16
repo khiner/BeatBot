@@ -280,6 +280,10 @@ public class Track extends BaseTrack implements FileListener {
 
     public void solo(boolean solo) {
         soloTrack(id, solo);
+        soloGuiOnly(solo);
+    }
+
+    public void soloGuiOnly(boolean solo) {
         this.soloing = solo;
         View.context.getTrackManager().onSoloChange(this, solo);
     }

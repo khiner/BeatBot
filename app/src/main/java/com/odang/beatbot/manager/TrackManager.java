@@ -382,7 +382,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
         if (solo) {
             for (Track otherTrack : tracks) {
                 if (!otherTrack.equals(track) && otherTrack.isSoloing()) {
-                    otherTrack.solo(false);
+                    otherTrack.soloGuiOnly(false);
                 }
             }
         }
