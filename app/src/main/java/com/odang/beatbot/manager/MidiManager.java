@@ -18,10 +18,11 @@ import com.odang.beatbot.midi.event.meta.Tempo;
 import com.odang.beatbot.midi.event.meta.TimeSignature;
 import com.odang.beatbot.midi.util.GeneralUtils;
 import com.odang.beatbot.track.Track;
-import com.odang.beatbot.ui.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.odang.beatbot.ui.view.View.context;
 
 public class MidiManager implements MidiNoteListener {
     public static final int MIN_BPM = 45, MAX_BPM = 300,
@@ -109,12 +110,12 @@ public class MidiManager implements MidiNoteListener {
     }
 
     public MidiNote findNote(int noteValue, long onTick) {
-        final Track track = View.context.getTrackManager().getTrackByNoteValue(noteValue);
+        final Track track = context.getTrackManager().getTrackByNoteValue(noteValue);
         return null == track ? null : track.findNoteStarting(onTick);
     }
 
     public MidiNote findNoteContaining(int noteValue, long tick) {
-        final Track track = View.context.getTrackManager().getTrackByNoteValue(noteValue);
+        final Track track = context.getTrackManager().getTrackByNoteValue(noteValue);
         return null == track ? null : track.findNoteContaining(tick);
     }
 
@@ -123,8 +124,8 @@ public class MidiManager implements MidiNoteListener {
     }
 
     public void copy() {
-        if (View.context.getTrackManager().anyNoteSelected()) {
-            copiedNotes = View.context.getTrackManager().copySelectedNotes();
+        if (context.getTrackManager().anyNoteSelected()) {
+            copiedNotes = context.getTrackManager().copySelectedNotes();
         }
     }
 
@@ -140,7 +141,7 @@ public class MidiManager implements MidiNoteListener {
         if (copiedNotes.isEmpty())
             return;
         // Copied notes should still be selected, so leftmostSelectedTick should be accurate
-        long tickOffset = startTick - View.context.getTrackManager().getSelectedNoteTickWindow()[0];
+        long tickOffset = startTick - context.getTrackManager().getSelectedNoteTickWindow()[0];
         for (MidiNote copiedNote : copiedNotes) {
             copiedNote.setTicks(copiedNote.getOnTick() + tickOffset, copiedNote.getOffTick()
                     + tickOffset);
@@ -216,7 +217,7 @@ public class MidiManager implements MidiNoteListener {
 
         // create any necessary tracks
         for (final MidiNote note : newNotes) {
-            while (note.getNoteValue() >= View.context.getTrackManager().getNumTracks()) {
+            while (note.getNoteValue() >= context.getTrackManager().getNumTracks()) {
                 new TrackCreateEvent().execute();
             }
         }
@@ -248,8 +249,8 @@ public class MidiManager implements MidiNoteListener {
     }
 
     public void applyDiffs(final List<MidiNoteDiff> diffs) {
-        View.context.getTrackManager().saveNoteTicks();
-        View.context.getTrackManager().deselectAllNotes();
+        context.getTrackManager().saveNoteTicks();
+        context.getTrackManager().deselectAllNotes();
 
         for (MidiNoteDiff midiNoteDiff : diffs) {
             midiNoteDiff.apply();
@@ -257,7 +258,7 @@ public class MidiManager implements MidiNoteListener {
 
         midiNotesEventManager.handleNoteCollisions();
         midiNotesEventManager.finalizeNoteTicks();
-        View.context.getTrackManager().deselectAllNotes();
+        context.getTrackManager().deselectAllNotes();
     }
 
     public void deleteSelectedNotes() {
@@ -314,31 +315,39 @@ public class MidiManager implements MidiNoteListener {
 
     @Override
     public void onCreate(MidiNote note) {
-        for (MidiNoteListener listener : midiNoteListeners) {
-            listener.onCreate(note);
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            for (MidiNoteListener listener : midiNoteListeners) {
+                listener.onCreate(note);
+            }
         }
     }
 
     @Override
     public void onDestroy(MidiNote note) {
-        for (MidiNoteListener listener : midiNoteListeners) {
-            listener.onDestroy(note);
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            for (MidiNoteListener listener : midiNoteListeners) {
+                listener.onDestroy(note);
+            }
         }
     }
 
     @Override
     public void onMove(MidiNote note, int beginNoteValue, long beginOnTick, long beginOffTick,
                        int endNoteValue, long endOnTick, long endOffTick) {
-        for (MidiNoteListener listener : midiNoteListeners) {
-            listener.onMove(note, beginNoteValue, beginOnTick, beginOffTick, endNoteValue,
-                    endOnTick, endOffTick);
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            for (MidiNoteListener listener : midiNoteListeners) {
+                listener.onMove(note, beginNoteValue, beginOnTick, beginOffTick, endNoteValue,
+                        endOnTick, endOffTick);
+            }
         }
     }
 
     @Override
     public void onSelectStateChange(MidiNote note) {
-        for (MidiNoteListener listener : midiNoteListeners) {
-            listener.onSelectStateChange(note);
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            for (MidiNoteListener listener : midiNoteListeners) {
+                listener.onSelectStateChange(note);
+            }
         }
     }
 
@@ -355,10 +364,12 @@ public class MidiManager implements MidiNoteListener {
     }
 
     private void notifyLoopWindowChanged() {
-        setLoopTicksNative(loopBeginTick, loopEndTick);
-        View.context.getTrackManager().updateAllTrackNextNotes();
-        for (LoopWindowListener listener : loopChangeListeners) {
-            listener.onLoopWindowChange(loopBeginTick, loopEndTick);
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            setLoopTicksNative(loopBeginTick, loopEndTick);
+            context.getTrackManager().updateAllTrackNextNotes();
+            for (LoopWindowListener listener : loopChangeListeners) {
+                listener.onLoopWindowChange(loopBeginTick, loopEndTick);
+            }
         }
     }
 

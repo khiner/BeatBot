@@ -82,9 +82,11 @@ public class MidiLoopBarView extends TouchableView implements LoopWindowListener
 
     @Override
     public void onLoopWindowChange(long loopBeginTick, long loopEndTick) {
-        MidiView midiView = context.getMainPage().getMidiView();
-        float beginX = midiView.tickToUnscaledX(loopBeginTick);
-        float endX = midiView.tickToUnscaledX(loopEndTick);
-        loopBarButton.layout(this, beginX - absoluteX, 0, endX - beginX, height);
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            MidiView midiView = context.getMainPage().getMidiView();
+            float beginX = midiView.tickToUnscaledX(loopBeginTick);
+            float endX = midiView.tickToUnscaledX(loopEndTick);
+            loopBarButton.layout(this, beginX - absoluteX, 0, endX - beginX, height);
+        }
     }
 }
