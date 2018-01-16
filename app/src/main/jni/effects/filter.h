@@ -61,7 +61,8 @@ static inline void filter_process(FilterConfig *config, float **buffers, int siz
     int filterNum, channel, samp;
     for (samp = 0; samp < size; samp++) {
         filterconfig_set(config,
-                         config->baseF * (1.0f + config->modDepth * sinewave_tick(config->mod)),
+                         config->baseF * (1.0f + config->modDepth *
+                                                 sinewave_valueAtOffset(config->mod, samp)),
                          config->r);
         for (filterNum = 0; filterNum < 2; filterNum++) {
             InnerFilterConfig *inner = config->inner[filterNum];

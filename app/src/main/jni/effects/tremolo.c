@@ -15,7 +15,7 @@ void tremeloconfig_setFrequency(TremeloConfig *config, float freq) {
 }
 
 void tremeloconfig_setPhase(TremeloConfig *config, float phase) {
-    sinewave_addPhaseOffset(config->mod[1], phase);
+    sinewave_setPhaseUnitScale(config->mod[1], phase);
 }
 
 void tremeloconfig_setDepth(TremeloConfig *config, float depth) {

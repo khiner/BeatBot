@@ -21,7 +21,8 @@ static inline void tremelo_process(TremeloConfig *config, float **buffers, int s
     for (channel = 0; channel < 2; channel++) {
         for (samp = 0; samp < size; samp++) {
             buffers[channel][samp] -= buffers[channel][samp] *
-                                      ((1 + sinewave_tick(config->mod[channel]) / 2) *
+                                      ((1 +
+                                        sinewave_valueAtOffset(config->mod[channel], samp) / 2) *
                                        config->depth);
         }
     }

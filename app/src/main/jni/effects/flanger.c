@@ -36,7 +36,7 @@ void flangerconfig_setModAmt(FlangerConfig *config, float modAmt) {
 }
 
 void flangerconfig_setPhaseShift(FlangerConfig *config, float phaseShift) {
-    sinewave_addPhaseOffset(config->mod[1], phaseShift);
+    sinewave_setPhaseUnitScale(config->mod[1], phaseShift);
 }
 
 void flangerconfig_destroy(void *p) {

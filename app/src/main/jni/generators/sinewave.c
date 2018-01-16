@@ -17,7 +17,6 @@ void sinewave_setFrequency(SineWave *config, float frequency) {
     config->rate = frequency * INV_SAMPLE_RATE * TABLE_SIZE;
 }
 
-void sinewave_addPhaseOffset(SineWave *config, float phaseOffset) {
-    config->time += (phaseOffset - config->phaseOffset) * TABLE_SIZE;
-    config->phaseOffset = phaseOffset;
+void sinewave_setPhaseUnitScale(SineWave *config, float phaseOffset) {
+    config->phaseOffset = phaseOffset * TABLE_SIZE;
 }

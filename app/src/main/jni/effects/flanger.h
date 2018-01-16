@@ -26,9 +26,9 @@ static inline void flanger_process(FlangerConfig *config, float **buffers, int s
     int channel, samp;
     for (samp = 0; samp < size; samp++) {
         float dTimeL = config->baseTime
-                       * (1.01f + config->modAmt * sinewave_tick(config->mod[0]));
+                       * (1.01f + config->modAmt * sinewave_valueAtOffset(config->mod[0], samp));
         float dTimeR = config->baseTime
-                       * (1.01f + config->modAmt * sinewave_tick(config->mod[1]));
+                       * (1.01f + config->modAmt * sinewave_valueAtOffset(config->mod[1], samp));
         delayconfigi_setDelaySamples(config->delayConfig, dTimeL, dTimeR);
         pthread_mutex_lock(&config->delayConfig->mutex);
         for (channel = 0; channel < 2; channel++) {
