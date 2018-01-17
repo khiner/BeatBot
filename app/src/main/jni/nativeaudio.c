@@ -163,9 +163,10 @@ void generateNextBuffer() {
         TrackNode *cur_ptr = trackHead;
         while (cur_ptr != NULL) {
             Track *track = cur_ptr->track;
-            if (playing && currSample == track->nextStartSample) {
+            long currTick = (long) (currSample / samplesPerTick);
+            if (playing && currTick == track->nextStartTick) {
                 playTrack(track);
-            } else if (currSample == track->nextStopSample) {
+            } else if (currTick == track->nextStopTick) {
                 stopTrack(track);
             }
             fillTempSample(track);

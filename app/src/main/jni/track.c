@@ -192,7 +192,7 @@ Track *initTrack(int trackId) {
     track->num = trackId;
     track->generator = NULL;
     track->levels = initLevels();
-    track->nextStartSample = track->nextStopSample = -1;
+    track->nextStartTick = track->nextStopTick = -1;
     track->currBufferFloat = (float **) malloc(2 * sizeof(float *));
     track->currBufferFloat[0] = (float *) calloc(BUFF_SIZE_FRAMES,
                                                  ONE_FLOAT_SIZE);
@@ -310,8 +310,8 @@ void Java_com_odang_beatbot_track_Track_soloTrack(JNIEnv *env, jclass clazz,
 
 void setNextNoteInfo(Track *track, jlong onTick, jlong offTick, jbyte volume,
                      jbyte pan, jbyte pitchSteps) {
-    track->nextStartSample = (long) (onTick * samplesPerTick);
-    track->nextStopSample = (long) (offTick * samplesPerTick);
+    track->nextStartTick = onTick;
+    track->nextStopTick = offTick;
     track->nextEvent->volume = byteToLinear((unsigned char) volume);
     track->nextEvent->pan = byteToLinear((unsigned char) pan);
     track->nextEvent->pitchSteps = (float) pitchSteps - HALF_BYTE_VALUE;
@@ -320,7 +320,7 @@ void setNextNoteInfo(Track *track, jlong onTick, jlong offTick, jbyte volume,
 void setNextNote(Track *track, jobject obj) {
     JNIEnv *env = getJniEnv();
     if (obj == NULL) {
-        track->nextStartSample = track->nextStopSample = -1;
+        track->nextStartTick = track->nextStopTick = -1;
         return;
     }
     jclass cls = (*env)->GetObjectClass(env, obj);
@@ -451,7 +451,8 @@ jboolean Java_com_odang_beatbot_track_Track_isTrackPlaying(JNIEnv *env,
         return false;
     }
 
-    return (jboolean) (currSample >= track->nextStartSample && currSample <= track->nextStopSample);
+    long currTick = (long) (currSample / samplesPerTick);
+    return (jboolean) (currTick >= track->nextStartTick && currTick <= track->nextStopTick);
 }
 
 jboolean Java_com_odang_beatbot_track_Track_isTrackLooping(JNIEnv *env,
@@ -468,7 +469,7 @@ void Java_com_odang_beatbot_track_Track_notifyNoteRemoved(JNIEnv *env,
                                                           jclass clazz, jint trackId,
                                                           jlong onTick) {
     Track *track = getTrack(trackId);
-    if (track->nextStartSample == (long) (onTick * samplesPerTick))
+    if (track->nextStartTick == onTick)
         stopTrack(track);
 }
 

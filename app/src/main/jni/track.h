@@ -36,7 +36,7 @@ typedef struct Track_ {
     Levels *levels;
     Generator *generator;
     MidiEvent *nextEvent;
-    long nextStartSample, nextStopSample;
+    long nextStartTick, nextStopTick;
     int num;
     bool mute;
     bool solo;
