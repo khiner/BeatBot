@@ -10,17 +10,15 @@ import java.util.List;
 
 public abstract class Effect implements Comparable<Effect>, ParamListener {
 
-    public static enum LevelType {
+    public enum LevelType {
         VOLUME, PAN, PITCH
     }
-
-    ;
 
     // also in jni/Track.h: ugly but necessary
     public final static int MAX_EFFECTS_PER_TRACK = 3;
     public final static String NEW_EFFECT_LABEL = "Effect";
 
-    protected List<Param> params = new ArrayList<Param>();
+    protected List<Param> params = new ArrayList<>();
 
     protected int trackId, position;
     protected int xParamIndex = 0, yParamIndex = 1;
@@ -120,10 +118,6 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
 
     public Param getParam(int paramNum) {
         return params.size() > paramNum ? params.get(paramNum) : null;
-    }
-
-    public String getParamValueString(int paramNum) {
-        return getParam(paramNum).getFormattedValue();
     }
 
     public void destroy() {
