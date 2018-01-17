@@ -46,7 +46,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
     // map of pointerIds to the notes they are selecting
     private TouchedNotes touchedNotes = new TouchedNotes();
     // map of pointerIds to the original on-ticks of the notes they are touching (before dragging)
-    private SparseArray<Float> startOnTicks = new SparseArray<Float>();
+    private SparseArray<Float> startOnTicks = new SparseArray<>();
 
     protected ScrollHelper scrollHelper;
 
@@ -324,10 +324,12 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
     @Override
     public void handleActionUp(int id, Pointer pos) {
         super.handleActionUp(id, pos);
+        if (stopSelectRegion()) {
+            scrollHelper.scrollYVelocity = 0;
+        }
         scrollHelper.handleActionUp();
         pinchLeftPointerId = pinchRightPointerId = -1;
         pinchingLoopWindow = false;
-        stopSelectRegion();
         startOnTicks.clear();
         touchedNotes.clear();
         context.getMidiManager().endEvent();
@@ -589,7 +591,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
         float topY = noteToY(topNote);
         float bottomY = noteToY(bottomNote + 1);
         // make room in the view window if we are dragging out of the view
-        scrollHelper.updateView(tick, noteToUnscaledY(topNote), noteToUnscaledY(bottomNote + 1));
+        scrollHelper.updateView(tick, noteToUnscaledY(topNote), noteToUnscaledY(bottomNote + 1), selectRegionStartNote < note);
         selectRect.layout(tickToUnscaledX(leftTick), absoluteY + noteToUnscaledY(topNote), tickToUnscaledX(rightTick
                 - leftTick), noteToUnscaledY(bottomNote - topNote + 1));
     }
@@ -604,9 +606,11 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
         selectRect.bringToTop();
     }
 
-    private void stopSelectRegion() {
-        selectRegionStartTick = -1;
+    private boolean stopSelectRegion() {
+        boolean wasSelecting = selectRegionStartTick >= 0;
+        selectRegionStartTick = selectRegionStartNote = -1;
         selectRect.hide();
+        return wasSelecting;
     }
 
     // adds a note starting at the nearest major tick (nearest displayed

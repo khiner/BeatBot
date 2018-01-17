@@ -34,9 +34,13 @@ public class IconResourceSets {
             DRUMS = s(r(R.drawable.drums_icon)),
             KICK = s(r(R.drawable.kick_icon)),
             SNARE = s(r(R.drawable.snare_icon)),
+            TOM = s(r(R.drawable.tom_icon)),
+            CYMBAL = s(r(R.drawable.cymbal_icon)),
             HH_CLOSED = s(r(R.drawable.hh_closed_icon)),
             HH_OPEN = s(r(R.drawable.hh_open_icon)),
             RIMSHOT = s(r(R.drawable.rimshot_icon)),
+            CLAP = s(r(R.drawable.clap_icon)),
+            PERC = s(r(R.drawable.perc_icon)),
             MICROPHONE = s(r(R.drawable.microphone_icon)),
             BEAT = s(r(R.drawable.beat_icon)),
             SAMPLE = s(r(R.drawable.sample_icon)),
@@ -102,9 +106,13 @@ public class IconResourceSets {
             put("samples", SAMPLE);
             put("kick", KICK);
             put("snare", SNARE);
+            put("tom", TOM);
+            put("cymbal", CYMBAL);
             put("hh_closed", HH_CLOSED);
             put("hh_open", HH_OPEN);
             put("rim", RIMSHOT);
+            put("clap", CLAP);
+            put("perc", PERC);
         }
     };
 
