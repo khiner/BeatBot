@@ -2,11 +2,13 @@ package com.odang.beatbot.manager;
 
 import com.odang.beatbot.effect.Effect.LevelType;
 import com.odang.beatbot.event.midinotes.MidiNoteDiff;
+import com.odang.beatbot.event.midinotes.MidiNoteLevelsDiff;
 import com.odang.beatbot.event.midinotes.MidiNotesEventManager;
 import com.odang.beatbot.event.track.TrackCreateEvent;
 import com.odang.beatbot.file.MidiFile;
 import com.odang.beatbot.listener.LoopWindowListener;
 import com.odang.beatbot.listener.MidiNoteListener;
+import com.odang.beatbot.listener.NoteLevelsChangeListener;
 import com.odang.beatbot.listener.SnapToGridListener;
 import com.odang.beatbot.listener.TempoListener;
 import com.odang.beatbot.midi.MidiNote;
@@ -44,6 +46,7 @@ public class MidiManager implements MidiNoteListener {
     private List<MidiNoteListener> midiNoteListeners = new ArrayList<>();
     private List<LoopWindowListener> loopChangeListeners = new ArrayList<>();
     private List<TempoListener> tempoListeners = new ArrayList<>();
+    private List<NoteLevelsChangeListener> noteLevelsListeners = new ArrayList<>();
     private SnapToGridListener snapToGridListener;
 
     private MidiNotesEventManager midiNotesEventManager;
@@ -67,6 +70,10 @@ public class MidiManager implements MidiNoteListener {
 
     public void addTempoListener(TempoListener listener) {
         tempoListeners.add(listener);
+    }
+
+    public void addNoteLevelsListener(NoteLevelsChangeListener noteLevelsChangeListener) {
+        noteLevelsListeners.add(noteLevelsChangeListener);
     }
 
     public void setSnapToGridListener(SnapToGridListener listener) {
@@ -179,7 +186,7 @@ public class MidiManager implements MidiNoteListener {
     }
 
     public void quantize() {
-        midiNotesEventManager.quantize(beatDivision);
+        midiNotesEventManager.quantize();
     }
 
     public void importFromFile(final MidiFile midiFile) {
@@ -249,16 +256,30 @@ public class MidiManager implements MidiNoteListener {
     }
 
     public void applyDiffs(final List<MidiNoteDiff> diffs) {
+        if (diffs.isEmpty())
+            return;
+
         context.getTrackManager().saveNoteTicks();
         context.getTrackManager().deselectAllNotes();
 
+        boolean isNoteLevelChangeEvent = true;
         for (MidiNoteDiff midiNoteDiff : diffs) {
+            if (!(midiNoteDiff instanceof MidiNoteLevelsDiff)) {
+                isNoteLevelChangeEvent = false;
+            }
             midiNoteDiff.apply();
         }
 
         midiNotesEventManager.handleNoteCollisions();
         midiNotesEventManager.finalizeNoteTicks();
         context.getTrackManager().deselectAllNotes();
+
+        if (isNoteLevelChangeEvent) {
+            for (NoteLevelsChangeListener noteLevelsChangeListener : noteLevelsListeners) {
+                final MidiNoteLevelsDiff midiNoteLevelsDiff = (MidiNoteLevelsDiff) diffs.get(0);
+                noteLevelsChangeListener.onNoteLevelsChange(midiNoteLevelsDiff.getNoteValue(), midiNoteLevelsDiff.getType());
+            }
+        }
     }
 
     public void deleteSelectedNotes() {

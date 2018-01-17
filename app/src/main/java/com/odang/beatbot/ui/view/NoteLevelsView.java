@@ -232,10 +232,14 @@ public class NoteLevelsView extends TouchableView {
     }
 
     public void draw() {
-        List<MidiNote> notes = ((Track) context.getTrackManager().getCurrTrack()).getMidiNotes();
-        for (MidiNote note : notes) {
-            drawLevel(note, calcLevelColor(note.isSelected()),
-                    calcLevelColorTrans(note.isSelected()));
+        try {
+            List<MidiNote> notes = ((Track) context.getTrackManager().getCurrTrack()).getMidiNotes();
+            for (MidiNote note : notes) {
+                drawLevel(note, calcLevelColor(note.isSelected()),
+                        calcLevelColorTrans(note.isSelected()));
+            }
+        } catch (ClassCastException e) {
+            // maybe we're drawing a few frames between setting to master track and changing the page
         }
     }
 

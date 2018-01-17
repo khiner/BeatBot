@@ -26,6 +26,14 @@ public class MidiNoteLevelsDiff extends MidiNoteDiff {
         this.endLevel = endLevel;
     }
 
+    public int getNoteValue() {
+        return noteValue;
+    }
+
+    public LevelType getType() {
+        return type;
+    }
+
     @Override
     public void apply() {
         // when restoring from saved file, saved ticks can be different

@@ -255,7 +255,7 @@ public class View implements Comparable<View> {
         return id;
     }
 
-    public void layout(View parent, float x, float y, float width, float height) {
+    public synchronized void layout(View parent, float x, float y, float width, float height) {
         this.parent = parent;
         setDimensions(width, height);
         setPosition(x, y);
@@ -545,12 +545,12 @@ public class View implements Comparable<View> {
         return currResource == null ? null : currResource.fillColor;
     }
 
-    private final float[] getStrokeColor() {
+    private float[] getStrokeColor() {
         final IconResource currResource = getIconResource();
         return currResource == null ? null : currResource.strokeColor;
     }
 
-    private final float[] getTextColor() {
+    private float[] getTextColor() {
         final IconResource currResource = getIconResource();
         if (currResource == null
                 || (currResource.textColor == null && currResource.strokeColor == null)) {
@@ -559,18 +559,18 @@ public class View implements Comparable<View> {
         return currResource.textColor == null ? currResource.strokeColor : currResource.textColor;
     }
 
-    private final float[] getIconColor() {
+    private float[] getIconColor() {
         final IconResource currResource = getIconResource();
         return (currResource == null || currResource.iconColor == null) ? getTextColor()
                 : currResource.iconColor;
     }
 
-    private final int getResourceId() {
+    private int getResourceId() {
         final IconResource currResource = getIconResource();
         return currResource == null ? -1 : currResource.resourceId;
     }
 
-    private final boolean shouldShrink() {
+    private boolean shouldShrink() {
         return shrinkable ? (getState() == State.PRESSED) : false;
     }
 }

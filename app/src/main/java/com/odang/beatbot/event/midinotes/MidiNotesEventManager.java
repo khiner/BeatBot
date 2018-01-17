@@ -19,7 +19,7 @@ public class MidiNotesEventManager {
     private final MidiManager midiManager;
 
     private List<MidiNoteDiff> midiNoteDiffs;
-    private Map<MidiNote, Levels> originalNoteLevels = new HashMap<MidiNote, Levels>();
+    private Map<MidiNote, Levels> originalNoteLevels = new HashMap<>();
 
     private boolean active = false;
 
@@ -36,7 +36,7 @@ public class MidiNotesEventManager {
         if (!isActive())
             return;
 
-        List<MidiNoteDiff> moveDiffs = new ArrayList<MidiNoteDiff>();
+        List<MidiNoteDiff> moveDiffs = new ArrayList<>();
 
         for (Track track : View.context.getTrackManager().getTracks()) {
             for (MidiNote note : track.getMidiNotes()) {
@@ -91,7 +91,7 @@ public class MidiNotesEventManager {
 
     public void createNotes(List<MidiNote> notes) {
         begin();
-        List<MidiNoteDiff> createDiffs = new ArrayList<MidiNoteDiff>(notes.size());
+        List<MidiNoteDiff> createDiffs = new ArrayList<>(notes.size());
         for (MidiNote note : notes) {
             createDiffs.add(new MidiNoteCreateDiff(note));
         }
@@ -228,7 +228,7 @@ public class MidiNotesEventManager {
      * Translate all midi notes to their on-ticks' nearest major ticks given the provided beat
      * division
      */
-    public void quantize(int beatDivision) {
+    public void quantize() {
         for (Track track : View.context.getTrackManager().getTracks()) {
             for (MidiNote note : track.getMidiNotes()) {
                 long diff = midiManager.getMajorTickNearestTo(note.getOnTick()) - note.getOnTick();
@@ -240,7 +240,7 @@ public class MidiNotesEventManager {
     // called after release of touch event - this
     // finalizes the note on/off ticks of all notes
     public void finalizeNoteTicks() {
-        List<MidiNote> notesToDestroy = new ArrayList<MidiNote>();
+        List<MidiNote> notesToDestroy = new ArrayList<>();
         for (Track track : View.context.getTrackManager().getTracks()) {
             for (MidiNote note : track.getMidiNotes()) {
                 if (note.isMarkedForDeletion()) {
@@ -335,7 +335,7 @@ public class MidiNotesEventManager {
 
     private void activate() {
         View.context.getTrackManager().saveNoteTicks();
-        midiNoteDiffs = new ArrayList<MidiNoteDiff>();
+        midiNoteDiffs = new ArrayList<>();
         originalNoteLevels.clear();
         active = true;
     }

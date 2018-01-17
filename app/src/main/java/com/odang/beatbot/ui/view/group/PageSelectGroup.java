@@ -1,14 +1,13 @@
 package com.odang.beatbot.ui.view.group;
 
 import com.odang.beatbot.effect.Effect;
-import com.odang.beatbot.effect.Effect.LevelType;
 import com.odang.beatbot.listener.FileListener;
+import com.odang.beatbot.listener.NoteLevelsChangeListener;
 import com.odang.beatbot.listener.OnReleaseListener;
 import com.odang.beatbot.listener.PagerListener;
 import com.odang.beatbot.listener.TempoListener;
 import com.odang.beatbot.listener.TrackLevelsEventListener;
 import com.odang.beatbot.listener.TrackListener;
-import com.odang.beatbot.midi.MidiNote;
 import com.odang.beatbot.track.BaseTrack;
 import com.odang.beatbot.track.Track;
 import com.odang.beatbot.ui.icon.IconResourceSets;
@@ -29,7 +28,7 @@ import com.odang.beatbot.ui.view.page.track.TrackLevelsPage;
 import java.io.File;
 
 public class PageSelectGroup extends TouchableView implements TrackListener,
-        TrackLevelsEventListener, FileListener, PagerListener, TempoListener {
+        TrackLevelsEventListener, NoteLevelsChangeListener, FileListener, PagerListener, TempoListener {
 
     private static final String TRACK_PAGE_ID = "track";
 
@@ -88,7 +87,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
     }
 
     public void selectTempoPage() {
-        buttonRowPager.setPage(masterButton);
+        masterButton.trigger();
         ToggleButton tempoButton = masterButtonRow.getTempoButton();
         if (!tempoButton.isChecked()) {
             tempoButton.trigger(true);
@@ -241,8 +240,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
         ((TrackListener) newPage).onSelect(context.getTrackManager().getCurrTrack());
     }
 
-    public void onNoteLevelsChange(MidiNote note, LevelType type) {
-        final Track track = context.getTrackManager().getTrack(note);
+    public void onNoteLevelsChange(int noteValue, Effect.LevelType type) {
+        final Track track = context.getTrackManager().getTrackByNoteValue(noteValue);
         if (!track.isSelected())
             track.select();
         // select note levels page whenever a note levels change event occurs
