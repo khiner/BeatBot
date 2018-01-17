@@ -298,11 +298,11 @@ public class BeatBotActivity extends Activity {
             trackManager.setSample(trackManager.getTrackByNoteValue(trackId), sampleFile);
         }
 
-        trackManager.getTrackByNoteValue(0).select();
-        getPageSelectGroup().selectLevelsPage();
-
         midiManager.setBpm(120);
         midiManager.setLoopTicks(0, MidiManager.TICKS_PER_NOTE * 4);
+
+        trackManager.getTrackByNoteValue(0).select();
+        getPageSelectGroup().selectLevelsPage();
     }
 
     public void clearProject() {

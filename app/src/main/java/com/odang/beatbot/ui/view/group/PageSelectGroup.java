@@ -5,6 +5,7 @@ import com.odang.beatbot.effect.Effect.LevelType;
 import com.odang.beatbot.listener.FileListener;
 import com.odang.beatbot.listener.OnReleaseListener;
 import com.odang.beatbot.listener.PagerListener;
+import com.odang.beatbot.listener.TempoListener;
 import com.odang.beatbot.listener.TrackLevelsEventListener;
 import com.odang.beatbot.listener.TrackListener;
 import com.odang.beatbot.midi.MidiNote;
@@ -28,7 +29,7 @@ import com.odang.beatbot.ui.view.page.track.TrackLevelsPage;
 import java.io.File;
 
 public class PageSelectGroup extends TouchableView implements TrackListener,
-        TrackLevelsEventListener, FileListener, PagerListener {
+        TrackLevelsEventListener, FileListener, PagerListener, TempoListener {
 
     private static final String TRACK_PAGE_ID = "track";
 
@@ -83,6 +84,14 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
         ToggleButton editButton = trackButtonRow.getEditButton();
         if (!editButton.isChecked()) {
             editButton.trigger(true);
+        }
+    }
+
+    public void selectTempoPage() {
+        buttonRowPager.setPage(masterButton);
+        ToggleButton tempoButton = masterButtonRow.getTempoButton();
+        if (!tempoButton.isChecked()) {
+            tempoButton.trigger(true);
         }
     }
 
@@ -271,5 +280,10 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
                                     int endEffectPosition) {
         selectEffectPage();
         effectSelectPage.onEffectOrderChange(track, initialEffectPosition, endEffectPosition);
+    }
+
+    @Override
+    public void onTempoChange(final float bpm) {
+        selectTempoPage();
     }
 }
