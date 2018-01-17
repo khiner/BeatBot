@@ -28,7 +28,8 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
     private float dragOffsetTick[] = {0, 0, 0, 0, 0};
     private float pinchLeftOffset = 0, pinchRightOffset = 0, zoomLeftAnchorTick = 0,
-            zoomRightAnchorTick = 0, selectRegionStartTick = -1, selectRegionStartY = -1;
+            zoomRightAnchorTick = 0, selectRegionStartTick = -1;
+    private int selectRegionStartNote = -1;
 
     private float pinchLoopLeftXAnchor = 0, pinchLoopRightXAnchor = 0;
     private long pinchLoopBeginTickAnchor = 0, pinchLoopEndTickAnchorAnchor = 0;
@@ -572,31 +573,32 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
     private void selectRegion(Pointer pos) {
         float tick = xToTick(pos.x);
+        int note = yToNote(pos.y);
+
         float leftTick = Math.min(tick, selectRegionStartTick);
         float rightTick = Math.max(tick, selectRegionStartTick);
-        float topY = Math.min(pos.y, selectRegionStartY);
-        float bottomY = Math.max(pos.y, selectRegionStartY);
+        int topNote = Math.min(note, selectRegionStartNote);
+        int bottomNote = Math.max(note, selectRegionStartNote);
         // make sure select rect doesn't go into the tick view
-        topY = Math.max(topY + .01f, 0);
+        topNote = Math.max(topNote, 0);
         // make sure select rect doesn't go past the last track/note
-        bottomY = Math.min(bottomY + .01f, getTotalTrackHeight() - .01f);
-        int topNote = yToNote(topY);
-        int bottomNote = yToNote(bottomY);
+        bottomNote = Math.min(bottomNote, context.getTrackManager().getNumTracks() - 1);
         context.getTrackManager().selectRegion((long) leftTick, (long) rightTick, topNote,
                 bottomNote);
         // for normal view, round the drawn rectangle to nearest notes
-        topY = noteToY(topNote);
-        bottomY = noteToY(bottomNote + 1);
+        float topY = noteToY(topNote);
+        float bottomY = noteToY(bottomNote + 1);
         // make room in the view window if we are dragging out of the view
-        scrollHelper.updateView(tick, topY, bottomY);
-        selectRect.layout(tickToUnscaledX(leftTick), absoluteY + topY, tickToUnscaledX(rightTick
-                - leftTick), bottomY - topY);
+        scrollHelper.updateView(tick, noteToUnscaledY(topNote), noteToUnscaledY(bottomNote + 1));
+        selectRect.layout(tickToUnscaledX(leftTick), absoluteY + noteToUnscaledY(topNote), tickToUnscaledX(rightTick
+                - leftTick), noteToUnscaledY(bottomNote - topNote + 1));
     }
 
     private void startSelectRegion(Pointer pos) {
         selectRegionStartTick = xToTick(pos.x);
-        selectRegionStartY = noteToY(yToNote(pos.y));
-        selectRect.layout(tickToUnscaledX(selectRegionStartTick), absoluteY + selectRegionStartY,
+        selectRegionStartNote = yToNote(pos.y);
+        selectRect.layout(tickToUnscaledX(selectRegionStartTick),
+                absoluteY + noteToUnscaledY(selectRegionStartNote),
                 1, trackHeight);
         selectRect.show();
         selectRect.bringToTop();
@@ -678,18 +680,22 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
     @Override
     public void onCreate(MidiNote note) {
-        if (note.getRectangle() == null) {
-            Rectangle noteRect = new Rectangle(translateScaleGroup, whichColor(note), Color.BLACK);
-            note.setRectangle(noteRect);
-            addShapes(noteRect);
-            layoutNoteRectangle(note);
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            if (note.getRectangle() == null) {
+                Rectangle noteRect = new Rectangle(translateScaleGroup, whichColor(note), Color.BLACK);
+                note.setRectangle(noteRect);
+                addShapes(noteRect);
+                layoutNoteRectangle(note);
+            }
         }
     }
 
     @Override
     public void onDestroy(MidiNote note) {
-        removeShape(note.getRectangle());
-        note.setRectangle(null);
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            removeShape(note.getRectangle());
+            note.setRectangle(null);
+        }
     }
 
     @Override

@@ -122,10 +122,10 @@ public class ScrollHelper {
     // translates the tickOffset to ensure that tick, topY and bottomY are all in view
     public void updateView(float tick, float topY, float bottomY) {
         updateView(tick);
-        if (topY < yOffset && bottomY < yOffset + scrollable.unscaledHeight()) {
+        if (topY < yOffset) {
             setYOffset(topY);
-        } else if (bottomY > yOffset + scrollable.unscaledHeight() && topY > yOffset) {
-            setYOffset(bottomY - scrollable.unscaledHeight());
+        } else if (bottomY > yOffset + scrollable.height() && topY > yOffset) {
+            setYOffset(bottomY - scrollable.height());
         }
     }
 
