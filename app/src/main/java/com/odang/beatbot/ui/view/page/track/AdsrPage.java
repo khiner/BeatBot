@@ -32,7 +32,7 @@ public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListe
             track.getAdsrParam(i).removeListener(this);
             track.getAdsrParam(i).addListener(this);
         }
-        updateParamView();
+        setParam(track.getActiveAdsrParam().id);
     }
 
     private void updateParamView() {

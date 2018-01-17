@@ -12,11 +12,9 @@ import java.util.Collections;
 
 public class LabelList extends TouchableView {
 
-    public static enum LabelState {
+    public enum LabelState {
         ON, OFF, EMPTY
     }
-
-    ;
 
     protected static final float GAP_BETWEEN_LABELS = 5, TEXT_Y_OFFSET = 3;
     protected LabelListListener labelListListener = null;
@@ -123,10 +121,6 @@ public class LabelList extends TouchableView {
                     setIcon(IconResourceSets.LIST_ITEM_EMPTY);
                     break;
             }
-        }
-
-        public LabelState getLabelState() {
-            return state;
         }
 
         // we don't want children to 'snap' back into place
