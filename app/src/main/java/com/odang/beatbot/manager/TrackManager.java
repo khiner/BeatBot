@@ -440,7 +440,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
             // stop the track
             final long currTick = View.context.getMidiManager().getCurrTick();
             final boolean playing = beginOnTick <= currTick && beginOffTick >= currTick;
-            if (playing && endOffTick < currTick || endOnTick > currTick) {
+            if (playing && (endOffTick < currTick || endOnTick > currTick)) {
                 track.stop();
             } else {
                 track.updateNextNote();

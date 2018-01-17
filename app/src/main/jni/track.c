@@ -2,12 +2,6 @@
 #include "libsndfile/sndfile.h"
 #include "jni_load.h"
 
-jfloatArray makejFloatArray(JNIEnv *env, float floatAry[], int size) {
-    jfloatArray result = (*env)->NewFloatArray(env, size);
-    (*env)->SetFloatArrayRegion(env, result, 0, size, floatAry);
-    return result;
-}
-
 void printTracks() {
     __android_log_print(ANDROID_LOG_ERROR, "tracks", "Elements:");
     TrackNode *cur_ptr = trackHead;
@@ -355,6 +349,21 @@ void updateNextNote(Track *track) {
     (*env)->DeleteLocalRef(env, obj);
 }
 
+void Java_com_odang_beatbot_track_Track_previewTrack(JNIEnv *env, jclass clazz,
+                                                     jint trackId) {
+    previewTrack(getTrack(trackId));
+}
+
+void Java_com_odang_beatbot_track_Track_stopPreviewingTrack(JNIEnv *env,
+                                                            jclass clazz, jint trackId) {
+    stopPreviewingTrack(getTrack(trackId));
+}
+
+void Java_com_odang_beatbot_track_Track_stopTrack(JNIEnv *env, jclass clazz,
+                                                  jint trackId) {
+    stopTrack(getTrack(trackId));
+}
+
 void Java_com_odang_beatbot_track_Track_setNextNote(JNIEnv *env, jclass clazz,
                                                     jint trackId, jobject midiNote) {
     Track *track = getTrack(trackId);
@@ -490,15 +499,6 @@ void Java_com_odang_beatbot_track_Track_setTrackGain(JNIEnv *env, jclass clazz,
         return;
     FileGen *fileGen = (FileGen *) track->generator->config;
     fileGen->gain = dbToLinear(dbGain);
-}
-
-float Java_com_odang_beatbot_track_Track_getSample(JNIEnv *env, jclass clazz,
-                                                   jint trackId, jlong frame, jint channel) {
-    Track *track = getTrack(trackId);
-    if (track->generator == NULL)
-        return 0;
-    FileGen *fileGen = (FileGen *) track->generator->config;
-    return filegen_getSample(fileGen, frame, channel);
 }
 
 void Java_com_odang_beatbot_track_Track_fillSampleBuffer(JNIEnv *env, jclass clazz,

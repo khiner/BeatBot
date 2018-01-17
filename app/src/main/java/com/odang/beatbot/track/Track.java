@@ -159,10 +159,10 @@ public class Track extends BaseTrack implements FileListener {
     }
 
     public MidiNote getNextMidiNote(long currTick) {
-        // is there another note starting between the current tick and the end of the loop?
+        // is there another note _ending_ between the current tick and the end of the loop?
         for (MidiNote midiNote : notes) {
-            if (midiNote.getOnTick() >= currTick
-                    && midiNote.getOnTick() < View.context.getMidiManager().getLoopEndTick()) {
+            if (midiNote.getOffTick() > currTick + 1
+                    && midiNote.getOffTick() < View.context.getMidiManager().getLoopEndTick()) {
                 return midiNote;
             }
         }
@@ -409,8 +409,6 @@ public class Track extends BaseTrack implements FileListener {
     private native void setTrackGain(int trackId, float gain);
 
     private native String setSample(int trackId, String sampleName);
-
-    private native float getSample(int trackId, long sampleIndex, int channel);
 
     private native void fillSampleBuffer(int trackId, float[] sampleBuffer, int startFrame, int endFrame, int jumpFrames);
 

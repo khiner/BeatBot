@@ -52,8 +52,6 @@ Levels *masterLevels;
 TrackNode *trackHead;
 OpenSlOut *openSlOut;
 
-jfloatArray makejFloatArray(JNIEnv *env, float floatAry[], int size);
-
 TrackNode *getTrackNode(int trackId);
 
 Track *getTrack(int trackId);
@@ -76,19 +74,9 @@ void stopPreviewingTrack(Track *track);
 
 void addEffect(Levels *levels, Effect *effect);
 
-void freeMidiEvents(Track *track);
-
 void printTracks();
 
-void addTrack(Track *track);
-
 void removeTrack(TrackNode *trackNode);
-
-void updateLevels(int trackId);
-
-void setPreviewLevels(Track *track);
-
-void updateAllLevels();
 
 void freeEffects(Levels *levels);
 

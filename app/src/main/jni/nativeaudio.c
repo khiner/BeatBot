@@ -140,21 +140,6 @@ void mixTracks() {
     }
 }
 
-void Java_com_odang_beatbot_track_Track_previewTrack(JNIEnv *env, jclass clazz,
-                                                     jint trackId) {
-    previewTrack(getTrack(trackId));
-}
-
-void Java_com_odang_beatbot_track_Track_stopPreviewingTrack(JNIEnv *env,
-                                                            jclass clazz, jint trackId) {
-    stopPreviewingTrack(getTrack(trackId));
-}
-
-void Java_com_odang_beatbot_track_Track_stopTrack(JNIEnv *env, jclass clazz,
-                                                  jint trackId) {
-    stopTrack(getTrack(trackId));
-}
-
 void stopAllTracks() {
     currSample = loopBeginSample;
     TrackNode *cur_ptr = trackHead;
