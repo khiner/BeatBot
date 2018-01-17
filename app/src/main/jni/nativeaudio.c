@@ -141,7 +141,7 @@ void mixTracks() {
 }
 
 void stopAllTracks() {
-    currSample = loopBeginSample;
+    currSample = (long) (loopBeginTick * samplesPerTick);
     TrackNode *cur_ptr = trackHead;
     while (cur_ptr != NULL) {
         stopTrack(cur_ptr->track);
@@ -157,7 +157,7 @@ void disarm() {
 void generateNextBuffer() {
     int samp, channel;
     for (samp = 0; samp < BUFF_SIZE_FRAMES; samp++) {
-        if (currSample > loopEndSample) {
+        if (currSample > (long) (loopEndTick * samplesPerTick)) {
             stopAllTracks();
         }
         TrackNode *cur_ptr = trackHead;

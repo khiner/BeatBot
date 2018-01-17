@@ -1,7 +1,7 @@
 #include "all.h"
 
 void initTicker() {
-    currSample = loopBeginSample = loopEndSample = 0;
+    currSample = loopBeginTick = loopEndTick = 0;
 }
 
 jlong Java_com_odang_beatbot_manager_MidiManager_getCurrTick(JNIEnv *env,
@@ -24,9 +24,9 @@ void Java_com_odang_beatbot_manager_MidiManager_setLoopTicksNative(JNIEnv *env,
                                                                    jlong _loopEndTick) {
     if (_loopBeginTick >= _loopEndTick)
         return;
-    loopBeginSample = (long) (_loopBeginTick * samplesPerTick);
-    loopEndSample = (long) (_loopEndTick * samplesPerTick);
+    loopBeginTick = _loopBeginTick;
+    loopEndTick = _loopEndTick;
     if (!isPlaying()) {
-        currSample = loopBeginSample;
+        currSample = (long) (loopBeginTick * samplesPerTick);
     }
 }

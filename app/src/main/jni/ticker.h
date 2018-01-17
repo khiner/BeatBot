@@ -3,7 +3,7 @@
 
 void initTicker();
 
-long loopBeginSample, loopEndSample, currSample;
+long loopBeginTick, loopEndTick, currSample;
 float samplesPerTick;
 
 #endif // TICKER_H
