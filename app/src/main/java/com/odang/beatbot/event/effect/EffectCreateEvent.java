@@ -14,12 +14,6 @@ public class EffectCreateEvent extends EffectEvent {
     final String effectName;
     final String serializedEffect;
 
-    public EffectCreateEvent(int trackId, Effect effect) {
-        super(trackId, effect.getPosition());
-        this.effectName = effect.getName();
-        this.serializedEffect = ProjectFile.effectToJson(effect);
-    }
-
     public EffectCreateEvent(int trackId, int effectPosition, String effectName) {
         super(trackId, effectPosition);
         this.effectName = effectName;

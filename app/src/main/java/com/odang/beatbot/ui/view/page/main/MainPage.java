@@ -51,6 +51,7 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
         context.getMidiManager().addTempoListener(editPage.pageSelectGroup);
         context.getTrackManager().addTrackLevelsEventListener(editPage.pageSelectGroup);
         context.getTrackManager().addTrackListener(editPage.pageSelectGroup);
+        //context.getTrackManager().addTrackListener(editPage.pageSelectGroup);
         context.getFileManager().addListener(editPage.pageSelectGroup);
 
         context.getMidiManager().addMidiNoteListener(this);

@@ -10,7 +10,7 @@ public class MidiNotesDiffEvent implements Stateful {
     private final List<MidiNoteDiff> midiNoteDiffs;
 
     public MidiNotesDiffEvent(MidiNoteDiff midiNoteDiff) {
-        midiNoteDiffs = new ArrayList<MidiNoteDiff>(1);
+        midiNoteDiffs = new ArrayList<>(1);
         midiNoteDiffs.add(midiNoteDiff);
     }
 
@@ -18,13 +18,9 @@ public class MidiNotesDiffEvent implements Stateful {
         this.midiNoteDiffs = midiNoteDiffs;
     }
 
-    public List<MidiNoteDiff> getMidiNoteDiffs() {
-        return midiNoteDiffs;
-    }
-
     @Override
     public void undo() {
-        final List<MidiNoteDiff> oppositeDiffs = new ArrayList<MidiNoteDiff>(midiNoteDiffs.size());
+        final List<MidiNoteDiff> oppositeDiffs = new ArrayList<>(midiNoteDiffs.size());
         // apply opposites in reverse order
         for (int i = midiNoteDiffs.size() - 1; i >= 0; i--) {
             oppositeDiffs.add(midiNoteDiffs.get(i).opposite());

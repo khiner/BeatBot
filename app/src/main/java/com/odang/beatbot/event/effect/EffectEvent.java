@@ -8,9 +8,6 @@ import com.odang.beatbot.ui.view.View;
 public abstract class EffectEvent extends Executable {
     protected int trackId, effectPosition;
 
-    public EffectEvent() {
-    }
-
     public EffectEvent(int trackId, int effectPosition) {
         this.trackId = trackId;
         this.effectPosition = effectPosition;

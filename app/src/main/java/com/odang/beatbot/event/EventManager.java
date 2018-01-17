@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 public class EventManager {
-    private List<Stateful> events = new ArrayList<Stateful>();
+    private List<Stateful> events = new ArrayList<>();
     private int currEventIndex = -1;
-    private Set<StatefulEventListener> listeners = new HashSet<StatefulEventListener>();
+    private Set<StatefulEventListener> listeners = new HashSet<>();
 
     public Stateful getLastEvent() {
         return !events.isEmpty() && currEventIndex >= 0 && currEventIndex < events.size() ? events.get(currEventIndex) : null;
@@ -45,18 +45,6 @@ public class EventManager {
         if (canRedo()) {
             events.get(++currEventIndex).apply();
             notifyEventCompleted(null);
-        }
-    }
-
-    public final void jumpTo(int eventIndex) {
-        if (eventIndex < 0 || eventIndex >= events.size())
-            return;
-
-        while (currEventIndex != eventIndex) {
-            if (currEventIndex > eventIndex)
-                undo();
-            else
-                redo();
         }
     }
 
