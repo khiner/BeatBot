@@ -41,7 +41,7 @@ import java.io.File;
 
 public class BeatBotActivity extends Activity {
     public static final int BPM_DIALOG_ID = 0, EXIT_DIALOG_ID = 1, SAMPLE_NAME_EDIT_DIALOG_ID = 2,
-            PROJECT_FILE_NAME_EDIT_DIALOG_ID = 3, MIDI_FILE_NAME_EDIT_DIALOG_ID = 4;
+            NEW_PROJECT_DIALOG_ID = 3, PROJECT_FILE_NAME_EDIT_DIALOG_ID = 4, MIDI_FILE_NAME_EDIT_DIALOG_ID = 5;
 
     private GLSurfaceViewBase surfaceViewBase;
     private MainPage mainPage;
@@ -167,6 +167,7 @@ public class BeatBotActivity extends Activity {
             case PROJECT_FILE_NAME_EDIT_DIALOG_ID:
                 projectFileNameInput.setText(projectFileManager.getProjectName());
                 break;
+            case NEW_PROJECT_DIALOG_ID:
             case MIDI_FILE_NAME_EDIT_DIALOG_ID:
             case EXIT_DIALOG_ID:
                 break;
@@ -215,6 +216,17 @@ public class BeatBotActivity extends Activity {
                     }
                 });
                 break;
+            case NEW_PROJECT_DIALOG_ID:
+                builder.setTitle("Create new project?")
+                        .setMessage("Any unsaved work will be lost.")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                clearProject();
+                                setupDefaultProject();
+                            }
+                        }).setNegativeButton("No", null);
+                break;
             case PROJECT_FILE_NAME_EDIT_DIALOG_ID:
                 projectFileNameInput = new EditText(this);
 
@@ -254,7 +266,7 @@ public class BeatBotActivity extends Activity {
                 builder.setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle("Closing " + getString(R.string.app_name))
                         .setMessage(
-                                "Are you sure you want to exit " + getString(R.string.app_name) + "?")
+                                "Are you sure you want to exit " + getString(R.string.app_name) + "? Any unsaved work will be lost.")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -298,20 +310,18 @@ public class BeatBotActivity extends Activity {
             trackManager.setSample(trackManager.getTrackByNoteValue(trackId), sampleFile);
         }
 
-        midiManager.setBpm(120);
         midiManager.setLoopTicks(0, MidiManager.TICKS_PER_NOTE * 4);
+        midiManager.setBpm(120);
 
         trackManager.getTrackByNoteValue(0).select();
         getPageSelectGroup().selectLevelsPage();
     }
 
     public void clearProject() {
+        playbackManager.stop();
         getPageSelectGroup().selectLevelsPage();
         eventManager.clearEvents();
         trackManager.destroy();
-
-        midiManager.setBpm(120);
-        midiManager.setLoopTicks(0, MidiManager.TICKS_PER_NOTE * 4);
     }
 
     public FontTextureAtlas getFontTextureAtlas() {

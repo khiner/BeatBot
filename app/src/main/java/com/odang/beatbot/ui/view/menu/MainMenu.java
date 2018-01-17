@@ -21,7 +21,7 @@ import java.io.File;
 
 public class MainMenu extends Menu implements FileMenuItemListener {
 
-    private MenuItem fileItem, settingsItem, snapToGridItem, saveProjectItem, loadProjectItem,
+    private MenuItem fileItem, settingsItem, snapToGridItem, newProjectItem, saveProjectItem, loadProjectItem,
             midiImportItem, midiExportItem;
 
     private SlideTab tab;
@@ -43,6 +43,8 @@ public class MainMenu extends Menu implements FileMenuItemListener {
         snapToGridItem = new SnapToGridMenuItem(this, settingsItem, true);
         ((ToggleButton) snapToGridItem.button).oscillating();
 
+
+        newProjectItem = new MenuItem(this, fileItem, false);
         saveProjectItem = new MenuItem(this, fileItem, false);
         loadProjectItem = new FileMenuItem(this, fileItem, new File(context.getFileManager()
                 .getProjectDirectory().getPath()));
@@ -58,6 +60,14 @@ public class MainMenu extends Menu implements FileMenuItemListener {
             @Override
             public void onRelease(Button button) {
                 context.getMidiManager().setSnapToGrid(((ToggleButton) button).isChecked());
+            }
+        });
+
+        newProjectItem.setOnReleaseListener(new OnReleaseListener() {
+            @Override
+            public void onRelease(Button button) {
+                newProjectItem.onRelease(button);
+                context.showDialog(BeatBotActivity.NEW_PROJECT_DIALOG_ID);
             }
         });
 
@@ -77,7 +87,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
             }
         });
 
-        fileItem.addSubMenuItems(saveProjectItem, loadProjectItem, midiExportItem, midiImportItem);
+        fileItem.addSubMenuItems(newProjectItem, saveProjectItem, loadProjectItem, midiExportItem, midiImportItem);
         settingsItem.addSubMenuItems(snapToGridItem);
     }
 
@@ -110,6 +120,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
         midiExportItem.setResourceId(IconResourceSets.MIDI_EXPORT);
 
         snapToGridItem.setText("Snap-to-grid");
+        newProjectItem.setText("New project");
         saveProjectItem.setText("Save project");
         loadProjectItem.setText("Load project");
         midiImportItem.setText("Import MIDI");

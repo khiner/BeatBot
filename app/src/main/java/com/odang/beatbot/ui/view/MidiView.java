@@ -371,26 +371,30 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
     @Override
     public void onCreate(Track track) {
-        Rectangle trackRect = new Rectangle(translateYGroup, Color.TRANSPARENT, Color.BLACK);
-        addShapes(trackRect);
-        track.setRectangle(trackRect);
-        onTrackHeightChange();
-        scrollHelper.setYOffset(Float.MAX_VALUE);
-        for (MidiNote note : track.getMidiNotes()) {
-            onCreate(note);
-            onSelectStateChange(note);
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            Rectangle trackRect = new Rectangle(translateYGroup, Color.TRANSPARENT, Color.BLACK);
+            addShapes(trackRect);
+            track.setRectangle(trackRect);
+            onTrackHeightChange();
+            scrollHelper.setYOffset(Float.MAX_VALUE);
+            for (MidiNote note : track.getMidiNotes()) {
+                onCreate(note);
+                onSelectStateChange(note);
+            }
         }
     }
 
     @Override
     public void onDestroy(Track track) {
-        for (MidiNote note : track.getMidiNotes()) {
-            onDestroy(note);
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            for (MidiNote note : track.getMidiNotes()) {
+                onDestroy(note);
+            }
+            removeShape(track.getRectangle());
+            onTrackHeightChange();
+            layoutNotes();
+            scrollHelper.setYOffset(scrollHelper.yOffset);
         }
-        removeShape(track.getRectangle());
-        onTrackHeightChange();
-        layoutNotes();
-        scrollHelper.setYOffset(scrollHelper.yOffset);
     }
 
     @Override
@@ -427,10 +431,12 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
     @Override
     public void onScrollX() {
-        float displayOffsetX = width / 50;
-        float w = scrollHelper.numTicks * (width - displayOffsetX * 2) / MidiManager.MAX_TICKS;
-        updateHorizontalScrollBarPosition();
-        horizontalScrollBar.setDimensions(w, 2 * horizontalScrollBar.cornerRadius);
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            float displayOffsetX = width / 50;
+            float w = scrollHelper.numTicks * (width - displayOffsetX * 2) / MidiManager.MAX_TICKS;
+            updateHorizontalScrollBarPosition();
+            horizontalScrollBar.setDimensions(w, 2 * horizontalScrollBar.cornerRadius);
+        }
     }
 
     @Override
@@ -439,8 +445,10 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
     @Override
     public void onScaleX() {
-        context.getMidiManager().adjustBeatDivision(getNumTicks());
-        updateTickLineColors();
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            context.getMidiManager().adjustBeatDivision(getNumTicks());
+            updateTickLineColors();
+        }
     }
 
     @Override
@@ -455,15 +463,17 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
     @Override
     public void onLoopWindowChange(long loopBeginTick, long loopEndTick) {
-        float x1 = tickToUnscaledX(loopBeginTick);
-        float x2 = tickToUnscaledX(loopEndTick);
-        leftLoopRect.layout(0, absoluteY, x1, leftLoopRect.height);
-        rightLoopRect.layout(x2, absoluteY, width - x2, rightLoopRect.height);
-        loopMarkerLines[0].setPosition(x1, absoluteY);
-        loopMarkerLines[1].setPosition(x2, absoluteY);
-        final long contextTickSpacing = context.getMidiManager().getTicksPerBeat();
-        scrollHelper.updateView(loopBeginTick - contextTickSpacing, loopEndTick + contextTickSpacing);
-        scrollBarColorTrans.begin();
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            float x1 = tickToUnscaledX(loopBeginTick);
+            float x2 = tickToUnscaledX(loopEndTick);
+            leftLoopRect.layout(0, absoluteY, x1, leftLoopRect.height);
+            rightLoopRect.layout(x2, absoluteY, width - x2, rightLoopRect.height);
+            loopMarkerLines[0].setPosition(x1, absoluteY);
+            loopMarkerLines[1].setPosition(x2, absoluteY);
+            final long contextTickSpacing = context.getMidiManager().getTicksPerBeat();
+            scrollHelper.updateView(loopBeginTick - contextTickSpacing, loopEndTick + contextTickSpacing);
+            scrollBarColorTrans.begin();
+        }
     }
 
     public boolean isPinchingLoopWindow() {
