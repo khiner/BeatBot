@@ -27,17 +27,21 @@ public class MidiTrackView extends TouchableView implements TrackListener {
 
     @Override
     public void onCreate(Track track) {
-        TrackButtonRow buttonRow = new TrackButtonRow(this, track);
-        track.setButtonRow(buttonRow);
-        layoutChildren();
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            TrackButtonRow buttonRow = new TrackButtonRow(this, track);
+            track.setButtonRow(buttonRow);
+            layoutChildren();
+        }
     }
 
     @Override
     public void onDestroy(Track track) {
-        TrackButtonRow buttonRow = track.getButtonRow();
-        removeChild(buttonRow);
-        layoutChildren();
-        track.setButtonRow(null);
+        synchronized (context.getMainPage().getMidiViewGroup()) {
+            TrackButtonRow buttonRow = track.getButtonRow();
+            removeChild(buttonRow);
+            layoutChildren();
+            track.setButtonRow(null);
+        }
     }
 
     @Override
