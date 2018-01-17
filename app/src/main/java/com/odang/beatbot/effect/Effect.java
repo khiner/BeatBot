@@ -138,7 +138,6 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
             Param param = params.get(i);
             if (param.isBeatSync()) {
                 param.setLevel(param.viewLevel);
-                setEffectParam(trackId, position, i, param.level);
             }
         }
     }

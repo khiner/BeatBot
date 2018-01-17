@@ -3,11 +3,12 @@ package com.odang.beatbot.track;
 import com.odang.beatbot.effect.Effect;
 import com.odang.beatbot.effect.Param;
 import com.odang.beatbot.listener.ParamListener;
-import com.odang.beatbot.ui.view.View;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.odang.beatbot.ui.view.View.context;
 
 public class BaseTrack {
     public static final String MASTER_TRACK_NAME = "Master";
@@ -71,12 +72,12 @@ public class BaseTrack {
 
     public void addEffect(Effect effect) {
         effects.add(effect);
-        View.context.getTrackManager().onEffectCreate(this, effect);
+        context.getTrackManager().onEffectCreate(this, effect);
     }
 
     public void removeEffect(Effect effect) {
         effects.remove(effect);
-        View.context.getTrackManager().onEffectDestroy(this, effect);
+        context.getTrackManager().onEffectDestroy(this, effect);
     }
 
     public void moveEffect(int oldPosition, int newPosition) {
@@ -95,7 +96,7 @@ public class BaseTrack {
         }
         Collections.sort(effects);
         Effect.setEffectPosition(id, oldPosition, newPosition);
-        View.context.getTrackManager().onEffectOrderChange(this, oldPosition, newPosition);
+        context.getTrackManager().onEffectOrderChange(this, oldPosition, newPosition);
     }
 
     public void quantizeEffectParams() {
@@ -130,11 +131,11 @@ public class BaseTrack {
     }
 
     public void select() {
-        View.context.getTrackManager().onSelect(this);
+        context.getTrackManager().onSelect(this);
     }
 
     public void setLevels(float volume, float pan, float pitchStep, float pitchCent) {
-        View.context.getTrackManager().notifyTrackLevelsSetEvent(this);
+        context.getTrackManager().notifyTrackLevelsSetEvent(this);
 
         volumeParam.setLevel(volume);
         panParam.setLevel(pan);

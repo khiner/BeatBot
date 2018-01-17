@@ -98,7 +98,7 @@ public class Param {
 
     public boolean setLevelWithoutNotify(float level) {
         level = GeneralUtils.clipTo(level, minViewLevel, maxViewLevel);
-        float prevLevel = this.viewLevel;
+        float prevLevel = this.level;
         viewLevel = level;
         if (isDb()) {
             this.level = linearToDb(DB_SCALE * logScaleLevel(level));
@@ -110,7 +110,7 @@ public class Param {
         if (snap) {
             this.level = Math.round(this.level);
         }
-        return this.viewLevel != prevLevel;
+        return this.level != prevLevel;
     }
 
     public void setLevel(float level) {

@@ -275,6 +275,7 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
         for (Track track : tracks) {
             track.quantizeEffectParams();
         }
+        masterTrack.quantizeEffectParams();
     }
 
     // Don't delete! Called from C through JNI
