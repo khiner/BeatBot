@@ -12,7 +12,7 @@ public class TextureGroup extends MeshGroup {
         super(primitiveType, 8, textureId);
     }
 
-    public void setText(TextMesh mesh, String text, float x, float y, float height) {
+    public synchronized void setText(TextMesh mesh, String text, float x, float y, float height) {
         final float scale = height / View.context.getFontTextureAtlas().getCellHeight();
         final float cellWidth = View.context.getFontTextureAtlas().getCellWidth() * scale;
 

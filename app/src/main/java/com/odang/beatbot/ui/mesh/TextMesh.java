@@ -18,11 +18,13 @@ public class TextMesh extends Mesh {
         String oldText = this.text;
         this.text = text;
 
-        if (null == oldText || oldText.length() != text.length()) {
-            group.changeSize(this, getNumVertices(oldText), getNumVertices(),
-                    getNumIndices(oldText), getNumIndices());
+        synchronized (group) {
+            if (null == oldText || oldText.length() != text.length()) {
+                group.changeSize(this, getNumVertices(oldText), getNumVertices(),
+                        getNumIndices(oldText), getNumIndices());
+            }
+            ((TextureGroup) group).setText(this, text, x, y, height);
         }
-        ((TextureGroup) group).setText(this, text, x, y, height);
     }
 
     public void layout(float x, float y, float height) {
