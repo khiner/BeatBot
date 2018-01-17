@@ -94,6 +94,7 @@ public class MidiManager implements MidiNoteListener {
         bpm = GeneralUtils.clipTo(bpm, MIN_BPM, MAX_BPM);
         tempo.setBpm(bpm);
         setNativeMSPT(tempo.getMpqn() / TICKS_PER_NOTE);
+        setLoopTicksNative(loopBeginTick, loopEndTick);
         onTempoChange(bpm);
     }
 
@@ -189,6 +190,7 @@ public class MidiManager implements MidiNoteListener {
         ts = (TimeSignature) tempoTrack.getEvents().get(0);
         tempo = (Tempo) tempoTrack.getEvents().get(1);
         setNativeMSPT(tempo.getMpqn() / TICKS_PER_NOTE);
+        setLoopTicksNative(loopBeginTick, loopEndTick);
         final List<MidiEvent> events = midiTracks.get(1).getEvents();
 
         // midiEvents are ordered by tick, so on/off events don't
