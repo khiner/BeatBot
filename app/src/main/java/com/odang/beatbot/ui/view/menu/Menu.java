@@ -8,7 +8,6 @@ import com.odang.beatbot.ui.view.ScrollableView;
 import com.odang.beatbot.ui.view.View;
 
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,8 +16,6 @@ public abstract class Menu extends ScrollableView implements MenuItemListener,
     protected List<ListView> menuLists;
     protected List<MenuItem> topLevelItems;
     protected float columnWidth = 0;
-
-    protected FilenameFilter filenameFilter;
 
     protected abstract void createMenuItems();
 
@@ -42,8 +39,8 @@ public abstract class Menu extends ScrollableView implements MenuItemListener,
     }
 
     public void createChildren() {
-        menuLists = new ArrayList<ListView>();
-        topLevelItems = new ArrayList<MenuItem>();
+        menuLists = new ArrayList<>();
+        topLevelItems = new ArrayList<>();
         createMenuItems();
         for (MenuItem topLevelItem : topLevelItems) {
             topLevelItem.show();
@@ -63,6 +60,13 @@ public abstract class Menu extends ScrollableView implements MenuItemListener,
             x += list.width;
         }
         super.layoutChildren();
+    }
+
+    public void scrollToMenuItem(final MenuItem menuItem) {
+        final int level = menuItem.getLevel();
+        if (level < menuLists.size()) {
+            menuLists.get(level).scrollToChild(menuItem.button);
+        }
     }
 
     @Override

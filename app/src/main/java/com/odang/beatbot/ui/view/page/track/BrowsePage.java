@@ -60,6 +60,7 @@ public class BrowsePage extends Menu implements TrackListener {
         while ((match = findMatchingChild(match, currSamplePath)) != null) {
             if (!match.isChecked()) {
                 match.trigger();
+                match.scrollTo();
             }
         }
     }

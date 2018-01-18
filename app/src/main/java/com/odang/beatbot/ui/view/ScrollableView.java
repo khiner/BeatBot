@@ -115,6 +115,12 @@ public abstract class ScrollableView extends TouchableView {
         }
     }
 
+    public void scrollToChild(View child) {
+        if (!children.contains(child))
+            return;
+        setYOffset(yOffset - child.y);
+    }
+
     @Override
     public void handleActionDown(int index, Pointer pos) {
         xOffsetAnchor = xOffset;
@@ -158,7 +164,7 @@ public abstract class ScrollableView extends TouchableView {
                 newY = pos.y - pos.downY + yOffsetAnchor;
             }
 
-            setYOffset(GeneralUtils.clipTo(newY, height - childHeight, 0));
+            setYOffset(newY);
         }
     }
 
@@ -189,7 +195,7 @@ public abstract class ScrollableView extends TouchableView {
     private void setYOffset(float yOffset) {
         if (this.yOffset == yOffset)
             return;
-        this.yOffset = yOffset;
+        this.yOffset = GeneralUtils.clipTo(yOffset, height - childHeight, 0);
 
         layoutChildren();
     }

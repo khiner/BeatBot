@@ -17,7 +17,7 @@ public class ListView extends ScrollableView implements OnPressListener {
         float labelHeight = getLabelHeight();
         float y = yOffset;
         for (View child : children) {
-            float height = ((TouchableView) child).getText().isEmpty() ? width - 2 * labelHeight
+            float height = child.getText().isEmpty() ? width - 2 * labelHeight
                     / 3 : labelHeight;
             child.layout(this, labelHeight / 3, y, width - 2 * labelHeight / 3, height);
             y += height;

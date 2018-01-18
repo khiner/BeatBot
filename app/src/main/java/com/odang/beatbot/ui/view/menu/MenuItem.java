@@ -9,13 +9,14 @@ import com.odang.beatbot.ui.view.control.Button;
 import com.odang.beatbot.ui.view.control.ToggleButton;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MenuItem implements OnPressListener, OnReleaseListener {
     protected Menu menu = null;
     private MenuItem parent = null;
     protected Button button;
-    protected List<MenuItem> subMenuItems = new ArrayList<MenuItem>();
+    protected List<MenuItem> subMenuItems = new ArrayList<>();
     private ListView container = null;
     private int level = 0;
 
@@ -49,9 +50,7 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
     }
 
     public void addSubMenuItems(final MenuItem... subMenuItems) {
-        for (MenuItem menuItem : subMenuItems) {
-            this.subMenuItems.add(menuItem);
-        }
+        Collections.addAll(this.subMenuItems, subMenuItems);
     }
 
     public List<MenuItem> getSubMenuItems() {
@@ -93,11 +92,8 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
     }
 
     public boolean isChecked() {
-        if (button instanceof ToggleButton) {
-            return ((ToggleButton) button).isChecked();
-        }
+        return button instanceof ToggleButton && ((ToggleButton) button).isChecked();
 
-        return false;
     }
 
     public void show() {
@@ -138,6 +134,18 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
                 }
             }
         }
+    }
+
+    public void scrollTo() {
+        menu.scrollToMenuItem(this);
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public Button getButton() {
+        return button;
     }
 
     private List<MenuItem> getSiblings() {
