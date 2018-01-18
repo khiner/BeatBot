@@ -356,6 +356,37 @@ public class View implements Comparable<View> {
         return cornerRadius;
     }
 
+    public void translate(float x, float y) {
+        this.x += x;
+        this.y += y;
+        absoluteX += x;
+        absoluteY += y;
+        if (bgShape != null) {
+            bgShape.translate(x, y);
+        }
+        if (textureMesh != null) {
+            textureMesh.translate(x, y);
+        }
+        if (textMesh != null) {
+            textMesh.translate(x, y);
+        }
+        layoutChildrenSynchronized();
+    }
+
+    public void translateY(float y) {
+        this.y += y;
+        absoluteY += y;
+        if (bgShape != null) {
+            bgShape.translateY(y);
+        }
+        if (textureMesh != null) {
+            textureMesh.translateY(y);
+        }
+        if (textMesh != null) {
+            textMesh.translateY(y);
+        }
+    }
+
     protected synchronized void layoutShape() {
         float x = absoluteX, y = absoluteY;
         float width = this.width, height = this.height;

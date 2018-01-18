@@ -114,6 +114,25 @@ public abstract class Shape {
         setDimensions(width, height);
     }
 
+    public void translate(float x, float y) {
+        this.x += x;
+        this.y += y;
+        fillMesh.translate(x, y);
+        strokeMesh.translate(x, y);
+    }
+
+    public void translateX(float x) {
+        this.x += x;
+        fillMesh.translateX(x);
+        strokeMesh.translateX(x);
+    }
+
+    public void translateY(float y) {
+        this.y += y;
+        fillMesh.translateY(y);
+        strokeMesh.translateY(y);
+    }
+
     public void hide() {
         fillMesh.hide();
         strokeMesh.hide();

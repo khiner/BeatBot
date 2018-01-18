@@ -12,7 +12,7 @@ public abstract class ScrollableView extends TouchableView {
     // only offsets are exposed to descendants
     protected float xOffset = 0, yOffset = 0;
 
-    private float xOffsetAnchor = 0, yOffsetAnchor = 0, xVelocity = 0, yVelocity = 0, lastX = 0,
+    protected float xOffsetAnchor = 0, yOffsetAnchor = 0, xVelocity = 0, yVelocity = 0, lastX = 0,
             lastY = 0, childWidth = 0, childHeight = 0;
 
     private boolean horizontal = false, vertical = false, firstRender = true;
@@ -36,42 +36,47 @@ public abstract class ScrollableView extends TouchableView {
 
     @Override
     public void layoutChildren() {
-        float prevChildWidth = childWidth;
-        float prevChildHeight = childHeight;
-        childWidth = getChildWidth();
-        childHeight = getChildHeight();
+        float radius = getLabelHeight() / 5;
 
-        if (horizontal && childWidth != prevChildWidth) {
-            setXOffset(childWidth > width ? width - childWidth : 0);
+        if (horizontal) {
+            float prevChildWidth = childWidth;
+            childWidth = getChildWidth();
+            if (childWidth != prevChildWidth) {
+                setXOffset(childWidth > width ? width - childWidth : 0);
 
-            if (childWidth < width) {
-                removeShape(horizontalScrollBar);
-                horizontalScrollBar = null;
+                if (childWidth < width) {
+                    removeShape(horizontalScrollBar);
+                    horizontalScrollBar = null;
+                }
+            }
+
+            if (childWidth > width) {
+                float x = Math.max(1, -xOffset * width / childWidth);
+                float w = Math.max(radius * 2, width * width / childWidth);
+                getXScrollBar().setCornerRadius(radius);
+                getXScrollBar().layout(absoluteX + x, absoluteY + height - 2.5f * radius, w, 2 * radius);
             }
         }
 
-        if (vertical && childHeight != prevChildHeight) {
-            setYOffset(childHeight > height ? height - childHeight : 0);
+        if (vertical) {
+            float prevChildHeight = childHeight;
+            childHeight = getChildHeight();
 
-            if (childHeight < height) {
-                removeShape(verticalScrollBar);
-                verticalScrollBar = null;
+            if (childHeight != prevChildHeight) {
+                setYOffset(childHeight > height ? height - childHeight : 0);
+
+                if (childHeight < height) {
+                    removeShape(verticalScrollBar);
+                    verticalScrollBar = null;
+                }
             }
-        }
 
-        float rad = getLabelHeight() / 5;
-        if (horizontal && childWidth > width) {
-            float x = Math.max(1, -xOffset * width / childWidth);
-            float w = Math.max(rad * 2, width * width / childWidth);
-            getXScrollBar().setCornerRadius(rad);
-            getXScrollBar().layout(absoluteX + x, absoluteY + height - 2.5f * rad, w, 2 * rad);
-        }
-
-        if (vertical && childHeight > height) {
-            float y = Math.max(1, -yOffset * height / childHeight);
-            float h = Math.max(rad * 2, height * height / childHeight);
-            getYScrollBar().setCornerRadius(rad);
-            getYScrollBar().layout(absoluteX + width - 1.5f * rad, absoluteY + y, 2 * rad, h);
+            if (childHeight > height) {
+                float y = Math.max(1, -yOffset * height / childHeight);
+                float h = Math.max(radius * 2, height * height / childHeight);
+                getYScrollBar().setCornerRadius(radius);
+                getYScrollBar().layout(absoluteX + width - 1.5f * radius, absoluteY + y, 2 * radius, h);
+            }
         }
     }
 
@@ -192,7 +197,7 @@ public abstract class ScrollableView extends TouchableView {
         layoutChildren();
     }
 
-    private void setYOffset(float yOffset) {
+    protected void setYOffset(float yOffset) {
         if (this.yOffset == yOffset)
             return;
         this.yOffset = GeneralUtils.clipTo(yOffset, height - childHeight, 0);
