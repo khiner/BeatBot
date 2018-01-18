@@ -17,8 +17,6 @@ import java.io.File;
 import java.util.List;
 
 public class BrowsePage extends Menu implements TrackListener {
-    private Track currTrack;
-
     public BrowsePage(View view, RenderGroup renderGroup) {
         super(view, renderGroup);
         setScrollable(true, false);
@@ -39,19 +37,13 @@ public class BrowsePage extends Menu implements TrackListener {
         }
     }
 
-    @Override
-    public void onSelect(BaseTrack track) {
-        if (null == track || track.equals(currTrack)) {
-            return;
-        }
-
-        this.currTrack = (Track) track;
-        update();
-    }
-
     public void update() {
         // recursively select file menu items based on current sample
-        File currSampleFile = currTrack.getCurrSampleFile();
+        final BaseTrack currTrack = context.getTrackManager().getCurrTrack();
+        if (!(currTrack instanceof Track))
+            return;
+
+        File currSampleFile = ((Track) currTrack).getCurrSampleFile();
         if (null == currSampleFile)
             return;
         String currSamplePath = currSampleFile.getAbsolutePath();
@@ -76,6 +68,20 @@ public class BrowsePage extends Menu implements TrackListener {
         return null;
     }
 
+    // exclude known system directories
+    private boolean isSystemDirectory(File file) {
+        for (String systemDirectoryName : FileManager.SYSTEM_DIRECTORY_NAMES) {
+            if (file.getName().toLowerCase().equals(systemDirectoryName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected float getWidthForLevel(int level) {
+        return width / 4;
+    }
+
     @Override
     public void onFileMenuItemReleased(FileMenuItem fileItem) {
         new SampleSetEvent(context.getTrackManager().getCurrTrack().getId(), fileItem.getFile())
@@ -96,16 +102,6 @@ public class BrowsePage extends Menu implements TrackListener {
         return false;
     }
 
-    // exclude known system directories
-    private boolean isSystemDirectory(File file) {
-        for (String systemDirectoryName : FileManager.SYSTEM_DIRECTORY_NAMES) {
-            if (file.getName().toLowerCase().equals(systemDirectoryName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public boolean accept(File file) {
         if (file.isDirectory()) {
@@ -116,29 +112,37 @@ public class BrowsePage extends Menu implements TrackListener {
         }
     }
 
-    protected float getWidthForLevel(int level) {
-        return width / 4;
+    @Override
+    public void onSelect(BaseTrack track) {
+        update();
     }
 
+    @Override
     public void onCreate(Track track) {
     }
 
+    @Override
     public void onDestroy(Track track) {
     }
 
+    @Override
     public void onSampleChange(Track track) {
         update();
     }
 
+    @Override
     public void onMuteChange(Track track, boolean mute) {
     }
 
+    @Override
     public void onSoloChange(Track track, boolean solo) {
     }
 
+    @Override
     public void onReverseChange(Track track, boolean reverse) {
     }
 
+    @Override
     public void onLoopChange(Track track, boolean loop) {
     }
 
