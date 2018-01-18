@@ -63,6 +63,10 @@ public class FileManager implements FileListener {
         }
     }
 
+    public File openAudioFile(final String relativeFilePath) {
+        return new File(audioDirectory.getPath() + "/" + relativeFilePath);
+    }
+
     public File getRootDirectory() {
         return rootDirectory;
     }

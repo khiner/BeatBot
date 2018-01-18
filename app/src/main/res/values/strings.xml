@@ -2,13 +2,12 @@
 <resources>
 
     <string name="app_name">BeatBot</string>
-    <string-array name="sample_types">
-        <item name="kick">Kick</item>
-        <item name="snare">Snare</item>
-        <item name="hi_hat_closed">HH Closed</item>
-        <item name="hi_hat_open">HH Open</item>
-        <item name="rim">Rim</item>
-        <item name="bass">Bass</item>
+    <string-array name="default_project_sample_directories">
+        <item name="kick">drums/kick</item>
+        <item name="snare">drums/snare</item>
+        <item name="hh_closed">drums/hh_closed</item>
+        <item name="hh_open">drums/hh_open</item>
+        <item name="clap">drums/clap</item>
     </string-array>
     <string name="default_midi_file_name">MyMidi</string>
 

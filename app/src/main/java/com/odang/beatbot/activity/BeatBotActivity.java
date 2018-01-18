@@ -298,16 +298,20 @@ public class BeatBotActivity extends Activity {
     }
 
     public void setupDefaultProject() {
-        // XXX loading a project when currently in the sampleEditView can cause segfault
         getPageSelectGroup().selectLevelsPage();
         eventManager.clearEvents();
         trackManager.destroy();
 
-        for (int trackId = 0; trackId < fileManager.getDrumsDirectory().listFiles().length; trackId++) {
+        final String[] defaultProjectSampleDirectories = getResources().getStringArray(R.array.default_project_sample_directories);
+        for (int i = 0; i < defaultProjectSampleDirectories.length; i++) {
             new TrackCreateEvent().doExecute();
-            final File sampleFile = fileManager.getDrumsDirectory().listFiles()[trackId]
-                    .listFiles()[0];
-            trackManager.setSample(trackManager.getTrackByNoteValue(trackId), sampleFile);
+            final File directory = fileManager.openAudioFile(defaultProjectSampleDirectories[i]);
+            if (directory != null && directory.exists()) {
+                final File sampleFile = directory.listFiles()[0];
+                if (sampleFile != null && sampleFile.exists()) {
+                    trackManager.setSample(trackManager.getTrackByNoteValue(i), sampleFile);
+                }
+            }
         }
 
         midiManager.setLoopTicks(0, MidiManager.TICKS_PER_NOTE * 4);
