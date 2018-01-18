@@ -18,6 +18,8 @@ float thresholdLevel = 0;
 FILE *recordOutFile = NULL;
 pthread_mutex_t recordMutex;
 
+void writeRecordBufferToRecordFile();
+
 bool isPlaying() {
     return playing;
 }
@@ -31,25 +33,31 @@ static inline void interleaveFloatsToShorts(float left[], float right[],
     }
 }
 
-// write the chars of the short to file, little endian
-void writeShortToFile(short s, FILE *file) {
-    putc_unlocked((char) s & 0xff, file);
-    putc_unlocked((char) (s >> 8) & 0xff, file);
+void writeRecordBufferToRecordFile() {
+    fwrite(openSlOut->recordBufferCharsLittleEndian, sizeof(char), BUFF_SIZE_SHORTS * 2,
+           recordOutFile);
 }
 
-void writeShortBufferToRecordFile(short buffer[]) {
+void writeShortBufferToRecordFile(short *buffer) {
     int i = 0;
     for (i = 0; i < BUFF_SIZE_SHORTS; i++) {
-        writeShortToFile(buffer[i], recordOutFile);
+        openSlOut->recordBufferCharsLittleEndian[i * 2] = (char) (buffer[i] & 0xff);
+        openSlOut->recordBufferCharsLittleEndian[i * 2 + 1] = (char) ((buffer[i] >> 8) & 0xff);
     }
+    writeRecordBufferToRecordFile();
 }
 
-void writeFloatBufferToRecordFile(float left[], float right[], int size) {
+void writeFloatBuffersToRecordFile(float *left, float *right, int size) {
     int i = 0;
     for (i = 0; i < size; i++) {
-        writeShortToFile((short) (left[i] * FLOAT_TO_SHORT), recordOutFile);
-        writeShortToFile((short) (right[i] * FLOAT_TO_SHORT), recordOutFile);
+        short leftShort = (short) (left[i] * FLOAT_TO_SHORT);
+        short rightShort = (short) (right[i] * FLOAT_TO_SHORT);
+        openSlOut->recordBufferCharsLittleEndian[i * 4] = (char) (leftShort & 0xff);
+        openSlOut->recordBufferCharsLittleEndian[i * 4 + 1] = (char) ((leftShort >> 8) & 0xff);
+        openSlOut->recordBufferCharsLittleEndian[i * 4 + 2] = (char) (rightShort & 0xff);
+        openSlOut->recordBufferCharsLittleEndian[i * 4 + 3] = (char) ((rightShort >> 8) & 0xff);
     }
+    writeRecordBufferToRecordFile();
 }
 
 void startRecording() {
@@ -211,8 +219,8 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
         } else if (openSlOut->recordSourceId != RECORD_SOURCE_MICROPHONE) {
             Track *track = getTrack(openSlOut->recordSourceId);
             if (track != NULL) {
-                writeFloatBufferToRecordFile(track->currBufferFloat[0],
-                                             track->currBufferFloat[1], BUFF_SIZE_FRAMES);
+                writeFloatBuffersToRecordFile(track->currBufferFloat[0],
+                                              track->currBufferFloat[1], BUFF_SIZE_FRAMES);
             }
         }
         pthread_mutex_unlock(&recordMutex);
@@ -293,6 +301,8 @@ jboolean Java_com_odang_beatbot_activity_BeatBotActivity_createAudioPlayer(
                                                      ONE_FLOAT_SIZE);
     memset(openSlOut->globalBufferShort, 0,
            sizeof(openSlOut->globalBufferShort));
+    memset(openSlOut->recordBufferCharsLittleEndian, 0,
+           sizeof(openSlOut->recordBufferCharsLittleEndian));
     memset(openSlOut->micBufferShort, 0, sizeof(openSlOut->micBufferShort));
     openSlOut->recordSourceId = MASTER_TRACK_ID;
     openSlOut->armed = false;

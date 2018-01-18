@@ -8,6 +8,7 @@ typedef struct OpenSlOut_ {
     int recordSourceId;
     float **currBufferFloat;
     short globalBufferShort[BUFF_SIZE_SHORTS];
+    char recordBufferCharsLittleEndian[BUFF_SIZE_SHORTS * 2]; // enough room for stereo file
     short micBufferShort[BUFF_SIZE_SHORTS];
     SLObjectItf outputPlayerObject;
     SLObjectItf recorderObject;
