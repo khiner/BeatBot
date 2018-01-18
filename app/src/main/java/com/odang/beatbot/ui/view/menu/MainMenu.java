@@ -129,6 +129,7 @@ public class MainMenu extends Menu implements FileMenuItemListener {
 
     // adjust width of this view to fit all children
     public synchronized void adjustWidth() {
+        width = 0;
         for (final View child : children) {
             if (child.absoluteX + child.width > width) {
                 width = child.absoluteX + child.width;
