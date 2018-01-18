@@ -82,20 +82,16 @@ public class TrackPageButtonRow extends PageButtonRow {
 
     @Override
     public void layoutChildren() {
-        synchronized (context.getMainPage().getMidiViewGroup()) {
-            super.layoutChildren();
+        super.layoutChildren();
 
-            float labelWidth = (width - 4 * height) / 4;
-            float x = addTrackButton.width;
-
-            for (int i = 0; i < pageButtons.length; i++) {
-                float w = i != BROWSE_PAGE_ID ? height : labelWidth;
-                pageButtons[i].layout(this, x, 0, w, height);
-                x += pageButtons[i].width;
-            }
-
-            deleteTrackButton.layout(this, width - height, 0, height, height);
+        float x = addTrackButton.width;
+        for (int i = 0; i < pageButtons.length; i++) {
+            float w = i == BROWSE_PAGE_ID ? (width - 8 * height) / 2 : height;
+            pageButtons[i].layout(this, x, 0, w, height);
+            x += pageButtons[i].width;
         }
+
+        deleteTrackButton.layout(this, width - height, 0, height, height);
     }
 
     @Override
