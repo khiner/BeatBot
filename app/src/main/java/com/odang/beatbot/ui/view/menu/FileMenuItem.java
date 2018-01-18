@@ -53,11 +53,9 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
         File[] files = file.listFiles(menu);
         Arrays.sort(files);
         int numFiles = Math.min(files.length, 100);
-        FileMenuItem[] subMenuItems = new FileMenuItem[numFiles];
-        for (int i = 0; i < subMenuItems.length; i++) {
-            subMenuItems[i] = new FileMenuItem(menu, this, files[i]);
+        for (int i = 0; i < numFiles; i++) {
+            subMenuItems.add(new FileMenuItem(menu, this, files[i]));
         }
-        addSubMenuItems(subMenuItems);
     }
 
     @Override
