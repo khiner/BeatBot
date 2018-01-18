@@ -14,7 +14,7 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
     private boolean ignoreRelease = false;
 
     public FileMenuItem(Menu menu, MenuItem parent, File file) {
-        super(menu, parent, file.isDirectory());
+        super(menu, parent, true);
         this.file = file;
         if (file.isFile()) {
             button.setOnLongPressListener(this);
@@ -30,7 +30,7 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
         // ignore if the button is already checked
         ignoreRelease = button instanceof ToggleButton && ((ToggleButton) button).isChecked();
     }
-
+    
     @Override
     public void onRelease(Button button) {
         if (ignoreRelease)
@@ -41,6 +41,9 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
             menu.onFileMenuItemReleased(this);
         }
         super.onRelease(button);
+        if (file.isDirectory()) {
+            menu.onDirectoryMenuItemReleased(this);
+        }
     }
 
     @Override

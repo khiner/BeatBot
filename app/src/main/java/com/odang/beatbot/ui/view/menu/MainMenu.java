@@ -147,6 +147,10 @@ public class MainMenu extends Menu implements FileMenuItemListener {
     }
 
     @Override
+    public void onDirectoryMenuItemReleased(FileMenuItem directoryMenuItem) {
+    }
+
+    @Override
     public void onFileMenuItemLongPressed(FileMenuItem menuItem) {
     }
 

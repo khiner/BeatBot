@@ -93,6 +93,28 @@ public class BrowsePage extends Menu implements TrackListener {
         context.editFileName(fileItem.getFile());
     }
 
+    @Override
+    public void onDirectoryMenuItemReleased(FileMenuItem directoryMenuItem) {
+        final BaseTrack currTrack = context.getTrackManager().getCurrTrack();
+        if (!(currTrack instanceof Track))
+            return;
+
+        File currSampleFile = ((Track) currTrack).getCurrSampleFile();
+        if (null == currSampleFile)
+            return;
+
+        String currSamplePath = currSampleFile.getAbsolutePath();
+        if (currSamplePath.startsWith(directoryMenuItem.getFile().getAbsolutePath())) {
+            for (MenuItem child : directoryMenuItem.getSubMenuItems()) {
+                FileMenuItem fileChild = (FileMenuItem) child;
+                if (fileChild.getFile().getAbsolutePath().equals(currSamplePath)) {
+                    fileChild.setChecked(true);
+                    fileChild.scrollTo();
+                }
+            }
+        }
+    }
+
     private boolean isAudioFile(File file) {
         for (String extension : FileManager.SUPPORTED_EXTENSIONS) {
             if (file.getName().toLowerCase().endsWith(extension)) {

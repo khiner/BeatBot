@@ -6,4 +6,6 @@ public interface FileMenuItemListener {
     void onFileMenuItemReleased(FileMenuItem menuItem);
 
     void onFileMenuItemLongPressed(FileMenuItem menuItem);
+
+    void onDirectoryMenuItemReleased(FileMenuItem directoryMenuItem);
 }
