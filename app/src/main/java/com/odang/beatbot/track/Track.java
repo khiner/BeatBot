@@ -323,16 +323,8 @@ public class Track extends BaseTrack implements FileListener {
         return reverse;
     }
 
-    public boolean isPreviewing() {
-        return previewing;
-    }
-
-    public boolean isPlaying() {
-        return isTrackPlaying(id);
-    }
-
     public boolean isSounding() {
-        return isPreviewing() || isPlaying();
+        return previewing || isTrackPlaying(id);
     }
 
     private void update() {

@@ -154,7 +154,7 @@ public class SampleEditView extends ControlView2dBase {
         if (!(context.getTrackManager().getCurrTrack() instanceof Track))
             return;
         final Track track = (Track) context.getTrackManager().getCurrTrack();
-        if (hasSample() && (track.isSounding())) {
+        if (hasSample() && track.isSounding()) {
             currSampleRect.show();
             final float currentFrameViewLevel = params[0].getViewLevel(track.getCurrentFrame());
             if (currentFrameViewLevel >= track.getLoopEndParam().viewLevel) {

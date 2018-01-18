@@ -444,7 +444,7 @@ jboolean Java_com_odang_beatbot_track_Track_isTrackPlaying(JNIEnv *env,
     }
 
     long currTick = (long) (currSample / samplesPerTick);
-    return (jboolean) (currTick >= track->nextStartTick && currTick <= track->nextStopTick);
+    return (jboolean) (currTick > track->nextStartTick && currTick <= track->nextStopTick);
 }
 
 jboolean Java_com_odang_beatbot_track_Track_isTrackLooping(JNIEnv *env,
