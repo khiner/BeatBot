@@ -47,7 +47,7 @@ public abstract class Menu extends ScrollableView implements MenuItemListener,
         }
     }
 
-    public void layoutChildren() {
+    public synchronized void layoutChildren() {
         if (columnWidth <= 0) {
             columnWidth = width;
         }
@@ -62,7 +62,7 @@ public abstract class Menu extends ScrollableView implements MenuItemListener,
         super.layoutChildren();
     }
 
-    public void scrollToMenuItem(final MenuItem menuItem) {
+    public synchronized void scrollToMenuItem(final MenuItem menuItem) {
         final int level = menuItem.getLevel();
         if (level < menuLists.size()) {
             menuLists.get(level).scrollToChild(menuItem.button);

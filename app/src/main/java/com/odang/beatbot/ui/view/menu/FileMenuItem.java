@@ -3,6 +3,7 @@ package com.odang.beatbot.ui.view.menu;
 import com.odang.beatbot.listener.OnLongPressListener;
 import com.odang.beatbot.manager.FileManager;
 import com.odang.beatbot.ui.icon.IconResourceSets;
+import com.odang.beatbot.ui.view.ListView;
 import com.odang.beatbot.ui.view.control.Button;
 import com.odang.beatbot.ui.view.control.ToggleButton;
 
@@ -30,19 +31,21 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
         // ignore if the button is already checked
         ignoreRelease = button instanceof ToggleButton && ((ToggleButton) button).isChecked();
     }
-    
+
     @Override
     public void onRelease(Button button) {
-        if (ignoreRelease)
-            return;
-        if (file.isDirectory()) {
-            expand();
-        } else {
-            menu.onFileMenuItemReleased(this);
-        }
-        super.onRelease(button);
-        if (file.isDirectory()) {
-            menu.onDirectoryMenuItemReleased(this);
+        synchronized (menu) {
+            if (ignoreRelease)
+                return;
+            if (file.isDirectory()) {
+                expand();
+            } else {
+                menu.onFileMenuItemReleased(this);
+            }
+            super.onRelease(button);
+            if (file.isDirectory()) {
+                menu.onDirectoryMenuItemReleased(this);
+            }
         }
     }
 
@@ -58,6 +61,10 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
         int numFiles = Math.min(files.length, 100);
         for (int i = 0; i < numFiles; i++) {
             subMenuItems.add(new FileMenuItem(menu, this, files[i]));
+        }
+        final ListView childList = menu.getListAtLevel(getLevel() + 1);
+        if (childList != null) {
+            childList.scrollToTop();
         }
     }
 

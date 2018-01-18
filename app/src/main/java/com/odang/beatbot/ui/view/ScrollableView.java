@@ -35,7 +35,7 @@ public abstract class ScrollableView extends TouchableView {
     }
 
     @Override
-    public void layoutChildren() {
+    public synchronized void layoutChildren() {
         float radius = getLabelHeight() / 5;
 
         if (horizontal) {
@@ -63,8 +63,6 @@ public abstract class ScrollableView extends TouchableView {
             childHeight = getChildHeight();
 
             if (childHeight != prevChildHeight) {
-                setYOffset(childHeight > height ? height - childHeight : 0);
-
                 if (childHeight < height) {
                     removeShape(verticalScrollBar);
                     verticalScrollBar = null;
@@ -120,10 +118,14 @@ public abstract class ScrollableView extends TouchableView {
         }
     }
 
+    public void scrollToTop() {
+        setYOffset(0);
+    }
+
     public void scrollToChild(View child) {
-        if (!children.contains(child))
-            return;
-        setYOffset(yOffset - child.y);
+        if (children.contains(child)) {
+            setYOffset(yOffset - child.y);
+        }
     }
 
     @Override
@@ -189,7 +191,7 @@ public abstract class ScrollableView extends TouchableView {
         return verticalScrollBar;
     }
 
-    private void setXOffset(float xOffset) {
+    private synchronized void setXOffset(float xOffset) {
         if (this.xOffset == xOffset)
             return;
         this.xOffset = xOffset;
@@ -197,7 +199,7 @@ public abstract class ScrollableView extends TouchableView {
         layoutChildren();
     }
 
-    protected void setYOffset(float yOffset) {
+    protected synchronized void setYOffset(float yOffset) {
         if (this.yOffset == yOffset)
             return;
         this.yOffset = GeneralUtils.clipTo(yOffset, height - childHeight, 0);
