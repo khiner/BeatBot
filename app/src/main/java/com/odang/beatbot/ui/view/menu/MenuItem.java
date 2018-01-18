@@ -81,6 +81,10 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
         button.setText(text);
     }
 
+    public void disable() {
+        button.disable();
+    }
+
     public String getText() {
         return button.getText();
     }
@@ -142,10 +146,6 @@ public class MenuItem implements OnPressListener, OnReleaseListener {
 
     public int getLevel() {
         return level;
-    }
-
-    public Button getButton() {
-        return button;
     }
 
     private List<MenuItem> getSiblings() {

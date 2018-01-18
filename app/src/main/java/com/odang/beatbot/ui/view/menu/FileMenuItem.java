@@ -59,8 +59,15 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
         File[] files = file.listFiles(menu);
         Arrays.sort(files);
         int numFiles = Math.min(files.length, 100);
-        for (int i = 0; i < numFiles; i++) {
-            subMenuItems.add(new FileMenuItem(menu, this, files[i]));
+        if (numFiles > 0) {
+            for (int i = 0; i < numFiles; i++) {
+                subMenuItems.add(new FileMenuItem(menu, this, files[i]));
+            }
+        } else {
+            final MenuItem emptyMenuItem = new MenuItem(menu, this, false);
+            emptyMenuItem.setText("Empty");
+            emptyMenuItem.disable();
+            subMenuItems.add(emptyMenuItem);
         }
         final ListView childList = menu.getListAtLevel(getLevel() + 1);
         if (childList != null) {
@@ -73,7 +80,9 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
         super.select();
         if (file.isDirectory()) {
             for (MenuItem subMenuItem : subMenuItems) {
-                ((FileMenuItem) subMenuItem).loadIcons();
+                if (subMenuItem instanceof FileMenuItem) {
+                    ((FileMenuItem) subMenuItem).loadIcons();
+                }
             }
         }
     }
