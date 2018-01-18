@@ -16,8 +16,7 @@ bool listening = false;
 bool recording = false;
 float thresholdLevel = 0;
 FILE *recordOutFile = NULL;
-pthread_mutex_t recordMutex, bufferFillMutex;
-pthread_cond_t bufferFillCond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t recordMutex;
 
 bool isPlaying() {
     return playing;
@@ -433,8 +432,6 @@ void Java_com_odang_beatbot_activity_BeatBotActivity_nativeShutdown(JNIEnv *env,
     destroyTracks();
 
     pthread_mutex_destroy(&openSlOut->trackMutex);
-    pthread_mutex_destroy(&bufferFillMutex);
-    pthread_cond_destroy(&bufferFillCond);
 }
 
 /****************************************************************************************
