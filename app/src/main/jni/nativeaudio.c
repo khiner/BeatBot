@@ -16,7 +16,6 @@ bool listening = false;
 bool recording = false;
 float thresholdLevel = 0;
 FILE *recordOutFile = NULL;
-pthread_mutex_t recordMutex;
 
 void writeRecordBufferToRecordFile();
 
@@ -61,7 +60,6 @@ void writeFloatBuffersToRecordFile(float *left, float *right, int size) {
 }
 
 void startRecording() {
-    pthread_mutex_lock(&recordMutex);
     recordArmed = false;
     JNIEnv *env = getJniEnv();
     jstring recordFilePath = (*env)->CallObjectMethod(env, getRecordManager(),
@@ -72,7 +70,6 @@ void startRecording() {
     // append to end of file, since header is written in Java
     recordOutFile = fopen(cRecordFilePath, "a+");
     recording = true;
-    pthread_mutex_unlock(&recordMutex);
 }
 
 void notifyMaxFrame(float maxFrame) {
@@ -213,7 +210,6 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 
     fillBuffer();
     if (recording && recordOutFile != NULL) {
-        pthread_mutex_lock(&recordMutex);
         if (openSlOut->recordSourceId == MASTER_TRACK_ID) {
             writeShortBufferToRecordFile(openSlOut->globalBufferShort);
         } else if (openSlOut->recordSourceId != RECORD_SOURCE_MICROPHONE) {
@@ -223,7 +219,6 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
                                               track->currBufferFloat[1], BUFF_SIZE_FRAMES);
             }
         }
-        pthread_mutex_unlock(&recordMutex);
     }
 }
 
@@ -450,7 +445,6 @@ void Java_com_odang_beatbot_manager_RecordManager_startListeningNative(JNIEnv *e
     // listening means to track the max frame of the current record source
     // if the current record source is the microphone, we need to enqueue
     // the micBufferQueue and start listening to the device's mic
-    pthread_mutex_lock(&recordMutex);
     if (openSlOut->recordSourceId == RECORD_SOURCE_MICROPHONE) {
         // record from microphone.
         SLuint32 state;
@@ -465,12 +459,10 @@ void Java_com_odang_beatbot_manager_RecordManager_startListeningNative(JNIEnv *e
         }
     }
     listening = true;
-    pthread_mutex_unlock(&recordMutex);
 }
 
 void Java_com_odang_beatbot_manager_RecordManager_stopListeningNative(JNIEnv *env,
                                                                       jclass clazz) {
-    pthread_mutex_lock(&recordMutex);
     listening = false;
     if (openSlOut->recordSourceId == RECORD_SOURCE_MICROPHONE) {
         SLuint32 state;
@@ -482,24 +474,19 @@ void Java_com_odang_beatbot_manager_RecordManager_stopListeningNative(JNIEnv *en
                     openSlOut->recordInterface, SL_RECORDSTATE_STOPPED);
         }
     }
-    pthread_mutex_unlock(&recordMutex);
 }
 
 void Java_com_odang_beatbot_manager_RecordManager_stopRecordingNative(JNIEnv *env,
                                                                       jclass clazz) {
-    pthread_mutex_lock(&recordMutex);
     recordArmed = recording = false;
     fflush(recordOutFile);
     fclose(recordOutFile);
     recordOutFile = NULL;
-    pthread_mutex_unlock(&recordMutex);
 }
 
 void Java_com_odang_beatbot_manager_RecordManager_setRecordSourceNative(
         JNIEnv *_env, jclass clazz, jint recordSourceId) {
-    pthread_mutex_lock(&recordMutex);
     openSlOut->recordSourceId = recordSourceId;
-    pthread_mutex_unlock(&recordMutex);
 }
 
 void Java_com_odang_beatbot_manager_RecordManager_armNative(JNIEnv *env,
