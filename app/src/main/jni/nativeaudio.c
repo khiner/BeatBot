@@ -33,8 +33,8 @@ static inline void interleaveFloatsToShorts(float left[], float right[],
 
 // write the chars of the short to file, little endian
 void writeShortToFile(short s, FILE *file) {
-    fputc((char) s & 0xff, file);
-    fputc((char) (s >> 8) & 0xff, file);
+    putc_unlocked((char) s & 0xff, file);
+    putc_unlocked((char) (s >> 8) & 0xff, file);
 }
 
 void writeShortBufferToRecordFile(short buffer[]) {
