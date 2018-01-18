@@ -58,8 +58,6 @@ Track *getTrack(int trackId);
 
 Levels *getLevels(int trackId);
 
-void fillTempSample(Track *track);
-
 void soundTrack(Track *track);
 
 void stopSoundingTrack(Track *track);

@@ -155,25 +155,27 @@ void disarm() {
 }
 
 void generateNextBuffer() {
-    int samp, channel;
+    int samp;
     for (samp = 0; samp < BUFF_SIZE_FRAMES; samp++) {
         if (currSample > (long) (loopEndTick * samplesPerTick)) {
             stopAllTracks();
         }
         TrackNode *cur_ptr = trackHead;
+        long currTick = (long) (currSample / samplesPerTick);
         while (cur_ptr != NULL) {
             Track *track = cur_ptr->track;
-            long currTick = (long) (currSample / samplesPerTick);
             if (playing && currTick == track->nextStartTick) {
                 playTrack(track);
             } else if (currTick == track->nextStopTick) {
                 stopTrack(track);
             }
-            fillTempSample(track);
-            for (channel = 0; channel < 2; channel++) {
-                track->currBufferFloat[channel][samp] =
-                        track->tempSample[channel];
+            if (track->generator != NULL) {
+                filegen_tick((FileGen *) track->generator->config, track->tempSample);
+            } else {
+                track->tempSample[0] = track->tempSample[1] = 0;
             }
+            track->currBufferFloat[0][samp] = track->tempSample[0];
+            track->currBufferFloat[1][samp] = track->tempSample[1];
             cur_ptr = cur_ptr->next;
         }
         if (playing) {

@@ -2,18 +2,25 @@
 #include "libsndfile/sndfile.h"
 
 void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
-    SNDFILE *infile;
+    SNDFILE *infile, *infileBufferCopy;
     SF_INFO sfinfo;
 
     sf_close(config->sampleFile);
+    sf_close(config->sampleFileBufferCopy);
 
-    if (!(infile = sf_open(sampleFileName, SFM_READ, &sfinfo)) ||
-        sfinfo.channels > MAX_CHANNELS) /* Open failed so print an error message. */
+    if (!(infile = sf_open(sampleFileName, SFM_READ, &sfinfo)) || sfinfo.channels > MAX_CHANNELS)
+        /* Open failed so print an error message. */
+        return;
+
+    if (!(infileBufferCopy = sf_open(sampleFileName, SFM_READ, &sfinfo)) ||
+        sfinfo.channels > MAX_CHANNELS)
+        /* Open failed so print an error message. */
         return;
 
     config->channels = sfinfo.channels;
     config->frames = sfinfo.frames;
     config->sampleFile = infile;
+    config->sampleFileBufferCopy = infileBufferCopy;
     config->buffer = malloc(BUFF_SIZE_FLOATS);
     config->loopBegin = 0;
     config->loopEnd = config->frames;
@@ -28,23 +35,14 @@ void filegen_setSampleFile(FileGen *config, const char *sampleFileName) {
 
 FileGen *filegen_create() {
     FileGen *fileGen = (FileGen *) malloc(sizeof(FileGen));
-    pthread_mutex_init(&fileGen->fileMutex, NULL);
     fileGen->currFrame = 0;
     fileGen->gain = 1;
     fileGen->sampleFile = NULL;
+    fileGen->sampleFileBufferCopy = NULL;
     fileGen->looping = fileGen->reverse = false;
     fileGen->adsr = adsrconfig_create();
     fileGen->sampleRate = 1;
     return fileGen;
-}
-
-float filegen_getSample(FileGen *fileGen, long frame, int channel) {
-    pthread_mutex_lock(&fileGen->fileMutex);
-    sf_seek(fileGen->sampleFile, frame, SEEK_SET);
-    sf_readf_float(fileGen->sampleFile, fileGen->tempSample, 1);
-    pthread_mutex_unlock(&fileGen->fileMutex);
-
-    return fileGen->tempSample[channel];
 }
 
 void filegen_setLoopWindow(FileGen *fileGen, long loopBeginSample,
@@ -79,10 +77,13 @@ void filegen_reset(FileGen *config) {
 
 void filegen_destroy(void *p) {
     FileGen *fileGen = (FileGen *) p;
-    pthread_mutex_destroy(&fileGen->fileMutex);
     if (fileGen->sampleFile != NULL) {
         sf_close(fileGen->sampleFile);
         fileGen->sampleFile = NULL;
+    }
+    if (fileGen->sampleFileBufferCopy != NULL) {
+        sf_close(fileGen->sampleFileBufferCopy);
+        fileGen->sampleFileBufferCopy = NULL;
     }
     adsrconfig_destroy(fileGen->adsr);
     fileGen->adsr = NULL;

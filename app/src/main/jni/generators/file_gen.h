@@ -5,8 +5,8 @@
 
 typedef struct FileGen_t {
     // mutex for buffer since setting the data happens on diff thread than processing
-    pthread_mutex_t fileMutex;
     SNDFILE *sampleFile;
+    SNDFILE *sampleFileBufferCopy;
     AdsrConfig *adsr;
     float tempSample[2];
     float otherTempSample[2];
@@ -21,12 +21,17 @@ typedef struct FileGen_t {
     bool reverse;
     float sampleRate;
     float gain;
-    int channels;
+    int channels, channel;
 } FileGen;
 
 FileGen *filegen_create();
 
-float filegen_getSample(FileGen *fileGen, long frame, int channel);
+static inline float
+filegen_getBufferCopySample(FileGen *fileGen, long frame, int channel, float *ptr) {
+    sf_seek(fileGen->sampleFileBufferCopy, frame, SEEK_SET);
+    sf_readf_float(fileGen->sampleFileBufferCopy, ptr, 1);
+    return ptr[channel];
+}
 
 void filegen_setSampleFile(FileGen *fileGen, const char *sampleFileName);
 
@@ -54,9 +59,8 @@ static inline void filegen_sndFileRead(FileGen *config, long frame,
     }
     frame -= config->bufferStartFrame;
 
-    int channel;
-    for (channel = 0; channel < config->channels; channel++) {
-        sample[channel] = config->buffer[frame * config->channels + channel];
+    for (config->channel = 0; config->channel < config->channels; config->channel++) {
+        sample[config->channel] = config->buffer[frame * config->channels + config->channel];
     }
 }
 
@@ -82,11 +86,11 @@ static inline void filegen_tick(FileGen *config, float *sample) {
     long frame, nextFrame;
     float remainder;
     if (config->reverse) {
-        frame = ceil(config->currFrame);
+        frame = (long) ceil(config->currFrame);
         remainder = frame - config->currFrame;
         nextFrame = frame - 1;
     } else {
-        frame = floor(config->currFrame);
+        frame = (long) floor(config->currFrame);
         remainder = config->currFrame - frame;
         nextFrame = frame + 1;
     }
@@ -94,11 +98,11 @@ static inline void filegen_tick(FileGen *config, float *sample) {
     // read next two samples from current sample (rounded down)
     filegen_sndFileRead(config, frame, config->tempSample);
     filegen_sndFileRead(config, nextFrame, config->otherTempSample);
-    int channel;
-    for (channel = 0; channel < config->channels; channel++) {
-        float samp1 = config->tempSample[channel];
-        float samp2 = config->otherTempSample[channel];
-        sample[channel] = (1.0f - remainder) * samp1 + remainder * samp2;
+
+    for (config->channel = 0; config->channel < config->channels; config->channel++) {
+        float samp1 = config->tempSample[config->channel];
+        float samp2 = config->otherTempSample[config->channel];
+        sample[config->channel] = (1.0f - remainder) * samp1 + remainder * samp2;
     }
 
     // copy left channel to right channel if mono
@@ -120,15 +124,13 @@ static inline void filegen_tick(FileGen *config, float *sample) {
 
 static inline void filegen_generate(FileGen *config, float **inBuffer,
                                     int size) {
-    int i, channel;
-    pthread_mutex_lock(&config->fileMutex);
+    int i;
     for (i = 0; i < size; i++) {
         filegen_tick(config, config->tempSample);
-        for (channel = 0; channel < 2; channel++) {
-            inBuffer[channel][i] = config->tempSample[channel];
+        for (config->channel = 0; config->channel < 2; config->channel++) {
+            inBuffer[config->channel][i] = config->tempSample[config->channel];
         }
     }
-    pthread_mutex_unlock(&config->fileMutex);
 }
 
 void filegen_destroy(void *config);

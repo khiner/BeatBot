@@ -212,14 +212,6 @@ void setSample(Track *track, const char *sampleName) {
     filegen_setSampleFile(fileGen, sampleName);
 }
 
-void fillTempSample(Track *track) {
-    if (track->generator != NULL) {
-        filegen_tick((FileGen *) track->generator->config, track->tempSample);
-    } else {
-        track->tempSample[0] = track->tempSample[1] = 0;
-    }
-}
-
 void soundTrack(Track *track) {
     if (track->generator != NULL) {
         updatePitch(track->num);
@@ -515,18 +507,19 @@ void Java_com_odang_beatbot_track_Track_fillSampleBuffer(JNIEnv *env, jclass cla
     endFrame = (jint) (endFrame > numFrames ? numFrames : endFrame);
 
     float maxFrameIndexAndSample[] = {0, 0};
+    float tempSample[] = {0.f, 0.f};
 
     int i = 0;
     int frameIndex;
     for (frameIndex = startFrame; frameIndex < endFrame; frameIndex += jumpFrames) {
         maxFrameIndexAndSample[0] = frameIndex;
-        maxFrameIndexAndSample[1] = filegen_getSample(fileGen, frameIndex, 0);
+        maxFrameIndexAndSample[1] = filegen_getBufferCopySample(fileGen, frameIndex, 0, tempSample);
 
         int j;
         int segmentEndFrame =
                 (int) (frameIndex + jumpFrames > numFrames ? numFrames : frameIndex + jumpFrames);
         for (j = frameIndex + 1; j < segmentEndFrame; j++) {
-            float candidateSample = filegen_getSample(fileGen, j, 0);
+            float candidateSample = filegen_getBufferCopySample(fileGen, j, 0, tempSample);
             if (fabs(candidateSample) > fabs(maxFrameIndexAndSample[1])) {
                 maxFrameIndexAndSample[0] = (float) j;
                 maxFrameIndexAndSample[1] = candidateSample;
@@ -536,9 +529,9 @@ void Java_com_odang_beatbot_track_Track_fillSampleBuffer(JNIEnv *env, jclass cla
         (*env)->SetFloatArrayRegion(env, sampleBuffer, i * 2, 2, maxFrameIndexAndSample);
         i++;
     }
-
     maxFrameIndexAndSample[0] = (float) -1.0; // end code
     maxFrameIndexAndSample[1] = (float) 0.0;
+
     (*env)->SetFloatArrayRegion(env, sampleBuffer, i * 2, 2, maxFrameIndexAndSample);
 }
 

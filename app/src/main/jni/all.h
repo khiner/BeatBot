@@ -18,9 +18,6 @@
 
 #define ONE_SHORT_SIZE        sizeof(short)
 #define ONE_FLOAT_SIZE        sizeof(float)
-#define TWO_FLOAT_SIZE        2 * ONE_FLOAT_SIZE
-#define FOUR_FLOAT_SIZE       4 * ONE_FLOAT_SIZE
-#define RESOLUTION            480
 #define MAX_CHANNELS          2
 #define MAX_EFFECTS_PER_TRACK 3 // also need to change GlobalVars.MAX_EFFECT_PER_TRACK
 #define TABLE_SIZE            2048
