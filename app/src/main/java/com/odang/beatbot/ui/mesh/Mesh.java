@@ -78,12 +78,30 @@ public abstract class Mesh {
         if (isVisible()) {
             group.translate(this, x, y);
         }
+        this.x += x;
+        this.y += y;
+    }
+
+    public void translateX(float x) {
+        if (isVisible()) {
+            group.translateX(this, x);
+        }
+        this.x += x;
+    }
+
+    public void translateY(float y) {
+        if (isVisible()) {
+            group.translateY(this, y);
+        }
+        this.y += y;
     }
 
     public void scale(float x, float y) {
         if (isVisible()) {
             group.scale(this, x, y);
         }
+        this.x *= x;
+        this.y *= y;
     }
 
     public void setPosition(float x, float y) {

@@ -1,6 +1,7 @@
 package com.odang.beatbot.ui.view;
 
 import com.odang.beatbot.listener.OnPressListener;
+import com.odang.beatbot.midi.util.GeneralUtils;
 import com.odang.beatbot.ui.view.control.Button;
 import com.odang.beatbot.ui.view.control.ToggleButton;
 
@@ -13,7 +14,7 @@ public class ListView extends ScrollableView implements OnPressListener {
     }
 
     @Override
-    public void layoutChildren() {
+    public synchronized void layoutChildren() {
         float labelHeight = getLabelHeight();
         float y = yOffset;
         for (View child : children) {
@@ -26,13 +27,28 @@ public class ListView extends ScrollableView implements OnPressListener {
     }
 
     @Override
-    public void handleActionUp(int index, Pointer pos) {
+    public synchronized void setYOffset(float yOffset) {
+        if (this.yOffset == yOffset)
+            return;
+
+        float newYOffset = GeneralUtils.clipTo(yOffset, height - childHeight, 0);
+
+        for (View child : children) {
+            child.translateY(newYOffset - this.yOffset);
+        }
+        this.yOffset = newYOffset;
+
+        super.layoutChildren();
+    }
+
+    @Override
+    public synchronized void handleActionUp(int index, Pointer pos) {
         super.handleActionUp(index, pos);
         shouldPropagateMoveEvents = true;
     }
 
     @Override
-    public void handleActionMove(int index, Pointer pos) {
+    public synchronized void handleActionMove(int index, Pointer pos) {
         super.handleActionMove(index, pos);
         if (null != selectedButton
                 && selectedButton.isPressed()
