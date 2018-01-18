@@ -168,6 +168,7 @@ public class RecordManager {
         }
         Toast.makeText(context, "Recorded file to " + currRecordFileName, Toast.LENGTH_SHORT)
                 .show();
+        stopRecordingNative();
         return file;
     }
 

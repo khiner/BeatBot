@@ -38,22 +38,18 @@ void writeShortToFile(short s, FILE *file) {
 }
 
 void writeShortBufferToRecordFile(short buffer[]) {
-    pthread_mutex_lock(&recordMutex);
     int i = 0;
     for (i = 0; i < BUFF_SIZE_SHORTS; i++) {
         writeShortToFile(buffer[i], recordOutFile);
     }
-    pthread_mutex_unlock(&recordMutex);
 }
 
 void writeFloatBufferToRecordFile(float left[], float right[], int size) {
-    pthread_mutex_lock(&recordMutex);
     int i = 0;
     for (i = 0; i < size; i++) {
         writeShortToFile((short) (left[i] * FLOAT_TO_SHORT), recordOutFile);
         writeShortToFile((short) (right[i] * FLOAT_TO_SHORT), recordOutFile);
     }
-    pthread_mutex_unlock(&recordMutex);
 }
 
 void startRecording() {
@@ -209,6 +205,7 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
 
     fillBuffer();
     if (recording && recordOutFile != NULL) {
+        pthread_mutex_lock(&recordMutex);
         if (openSlOut->recordSourceId == MASTER_TRACK_ID) {
             writeShortBufferToRecordFile(openSlOut->globalBufferShort);
         } else if (openSlOut->recordSourceId != RECORD_SOURCE_MICROPHONE) {
@@ -218,6 +215,7 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
                                              track->currBufferFloat[1], BUFF_SIZE_FRAMES);
             }
         }
+        pthread_mutex_unlock(&recordMutex);
     }
 }
 
