@@ -1,11 +1,11 @@
 package com.odang.beatbot.ui.view.page.track;
 
 import com.odang.beatbot.effect.Param;
+import com.odang.beatbot.event.SampleSetEvent;
 import com.odang.beatbot.listener.OnReleaseListener;
 import com.odang.beatbot.listener.ParamListener;
 import com.odang.beatbot.listener.RecordStateListener;
 import com.odang.beatbot.track.BaseTrack;
-import com.odang.beatbot.track.Track;
 import com.odang.beatbot.ui.icon.IconResourceSets;
 import com.odang.beatbot.ui.view.SampleView;
 import com.odang.beatbot.ui.view.View;
@@ -111,8 +111,9 @@ public class RecordPage extends TrackPage implements RecordStateListener {
     public void onRecordStop(File recordedSampleFile) {
         try {
             sampleView.setText("");
-            ((Track) context.getTrackManager().getCurrTrack()).setSample(recordedSampleFile);
-            sampleView.update();
+            new SampleSetEvent(context.getTrackManager().getCurrTrack().getId(),
+                    recordedSampleFile).execute();
+            context.getPageSelectGroup().selectEditPage();
         } catch (Exception e) {
             sampleView.setText("Error saving file");
         }
