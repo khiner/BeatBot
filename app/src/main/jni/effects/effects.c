@@ -11,36 +11,6 @@ Effect *initEffect(void *config, void (*set), void (*process),
     return effect;
 }
 
-void swap(float *a, float *b) {
-    float tmp;
-    tmp = *a;
-    (*a) = (*b);
-    (*b) = tmp;
-}
-
-void reverse(float buffer[], int begin, int end) {
-    int i, j;
-    //swap 1st with last, then 2nd with last-1, etc.  Till we reach the middle of the string.
-    for (i = begin, j = end - 1; i < j; i++, j--) {
-        swap(&buffer[i], &buffer[j]);
-    }
-}
-
-void normalize(float buffer[], int size) {
-    float maxSample = 0;
-    int i;
-    for (i = 0; i < size; i++) {
-        if (abs(buffer[i]) > maxSample) {
-            maxSample = abs(buffer[i]);
-        }
-    }
-    if (maxSample != 0) {
-        for (i = 0; i < size; i++) {
-            buffer[i] /= maxSample;
-        }
-    }
-}
-
 void printEffects(Levels *levels) {
     EffectNode *cur_ptr = levels->effectHead;
     int count = 0;
@@ -95,23 +65,10 @@ Effect *createEffect(int effectId) {
     return NULL;
 }
 
-void setEffect(Levels *levels, int position, Effect *effect) {
-    EffectNode *cur_ptr = levels->effectHead;
-    int count = 0;
-    pthread_mutex_lock(&levels->effectMutex);
-    while (count < position && cur_ptr != NULL) {
-        cur_ptr = cur_ptr->next;
-        count++;
-    }
-    cur_ptr->effect = effect;
-    pthread_mutex_unlock(&levels->effectMutex);
-}
-
 void insertEffect(Levels *levels, int position, EffectNode *node) {
     EffectNode *cur_ptr = levels->effectHead;
     EffectNode *prev_ptr = NULL;
     int count = 0;
-    pthread_mutex_lock(&levels->effectMutex);
     while (count < position && cur_ptr != NULL) {
         prev_ptr = cur_ptr;
         cur_ptr = cur_ptr->next;
@@ -124,13 +81,11 @@ void insertEffect(Levels *levels, int position, EffectNode *node) {
         node->next = levels->effectHead;
         levels->effectHead = node;
     }
-    pthread_mutex_unlock(&levels->effectMutex);
 }
 
 EffectNode *removeEffect(Levels *levels, int effectPosition) {
     EffectNode *one_back;
     EffectNode *node = findEffectNodeByPosition(levels, effectPosition);
-    pthread_mutex_lock(&levels->effectMutex);
     if (node == levels->effectHead) {
         levels->effectHead = levels->effectHead->next;
     } else {
@@ -140,7 +95,6 @@ EffectNode *removeEffect(Levels *levels, int effectPosition) {
         }
         one_back->next = node->next;
     }
-    pthread_mutex_unlock(&levels->effectMutex);
     return node;
 }
 
@@ -148,17 +102,19 @@ EffectNode *removeEffect(Levels *levels, int effectPosition) {
 void Java_com_odang_beatbot_effect_Effect_addEffect(JNIEnv *env, jclass clazz,
                                                     jint trackId, jint effectId, jint position) {
     Levels *levels = getLevels(trackId);
-    Effect *effect = createEffect(effectId);
-    setEffect(levels, position, effect);
+    EffectNode *cur_ptr = findEffectNodeByPosition(levels, position);
+    cur_ptr->effect = createEffect(effectId);
 }
 
 void Java_com_odang_beatbot_effect_Effect_removeEffect(JNIEnv *env, jclass clazz,
                                                        jint trackId, jint position) {
     Levels *levels = getLevels(trackId);
     EffectNode *effectNode = findEffectNodeByPosition(levels, position);
-    free(effectNode->effect->config);
+    pthread_mutex_lock(&levels->effectMutex);
+    effectNode->effect->destroy(effectNode->effect->config);
     free(effectNode->effect);
     effectNode->effect = NULL;
+    pthread_mutex_unlock(&levels->effectMutex);
 }
 
 void Java_com_odang_beatbot_effect_Effect_setEffectPosition(JNIEnv *env,
@@ -166,8 +122,10 @@ void Java_com_odang_beatbot_effect_Effect_setEffectPosition(JNIEnv *env,
                                                             jint oldPosition, jint newPosition) {
     // find node currently at the desired position
     Levels *levels = getLevels(trackId);
+    pthread_mutex_lock(&levels->effectMutex);
     EffectNode *node = removeEffect(levels, oldPosition);
     insertEffect(levels, newPosition, node);
+    pthread_mutex_unlock(&levels->effectMutex);
 }
 
 void Java_com_odang_beatbot_effect_Effect_setEffectOn(JNIEnv *env, jclass clazz,

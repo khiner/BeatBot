@@ -59,8 +59,11 @@ static inline void filegen_sndFileRead(FileGen *config, long frame,
     }
     frame -= config->bufferStartFrame;
 
-    for (config->channel = 0; config->channel < config->channels; config->channel++) {
-        sample[config->channel] = config->buffer[frame * config->channels + config->channel];
+    if (config->channels == 1) {
+        sample[0] = config->buffer[frame];
+    } else {
+        sample[0] = config->buffer[frame * 2];
+        sample[1] = config->buffer[frame * 2 + 1];
     }
 }
 
@@ -127,9 +130,8 @@ static inline void filegen_generate(FileGen *config, float **inBuffer,
     int i;
     for (i = 0; i < size; i++) {
         filegen_tick(config, config->tempSample);
-        for (config->channel = 0; config->channel < 2; config->channel++) {
-            inBuffer[config->channel][i] = config->tempSample[config->channel];
-        }
+        inBuffer[0][i] = config->tempSample[0];
+        inBuffer[1][i] = config->tempSample[1];
     }
 }
 
