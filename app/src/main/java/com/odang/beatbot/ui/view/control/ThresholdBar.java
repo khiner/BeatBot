@@ -26,7 +26,7 @@ public class ThresholdBar extends ControlView1dBase {
     }
 
     @Override
-    public void layoutChildren() {
+    public synchronized void layoutChildren() {
         levelBarHeight = height / 3;
 
         thresholdSelectTab.layout(absoluteX, absoluteY + (height - levelBarHeight * 2.5f) / 2,
@@ -39,17 +39,17 @@ public class ThresholdBar extends ControlView1dBase {
         }
     }
 
-    public void onParamChange(Param param) {
+    public synchronized void onParamChange(Param param) {
         thresholdSelectTab.setPosition(absoluteX + levelToX(param.viewLevel) - thresholdSelectTab.width / 2,
                 thresholdSelectTab.y);
     }
 
     // normalized level is [0,1]. Param handles DB conversion automagically
-    public void setLevelNormalized(float levelNormalized) {
+    public synchronized void setLevelNormalized(float levelNormalized) {
         audioMeter.setLevel(levelNormalized);
     }
 
-    public void resetLevel() {
+    public synchronized void resetLevel() {
         audioMeter.resetLevel();
     }
 
@@ -77,7 +77,7 @@ public class ThresholdBar extends ControlView1dBase {
     }
 
     @Override
-    public void tick() {
+    public synchronized void tick() {
         audioMeter.tick();
     }
 }
