@@ -63,6 +63,15 @@ public class FileManager implements FileListener {
         }
     }
 
+    public static boolean isAudioFile(File file) {
+        for (String extension : SUPPORTED_EXTENSIONS) {
+            if (file.getName().toLowerCase().endsWith(extension)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public File openAudioFile(final String relativeFilePath) {
         return new File(audioDirectory.getPath() + "/" + relativeFilePath);
     }

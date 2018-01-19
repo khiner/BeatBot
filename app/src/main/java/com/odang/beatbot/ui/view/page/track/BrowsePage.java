@@ -115,22 +115,13 @@ public class BrowsePage extends Menu implements TrackListener {
         }
     }
 
-    private boolean isAudioFile(File file) {
-        for (String extension : FileManager.SUPPORTED_EXTENSIONS) {
-            if (file.getName().toLowerCase().endsWith(extension)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public boolean accept(File file) {
         if (file.isDirectory()) {
             File[] children = file.listFiles();
             return children != null && children.length > 0 && !isSystemDirectory(file);
         } else {
-            return isAudioFile(file);
+            return FileManager.isAudioFile(file);
         }
     }
 

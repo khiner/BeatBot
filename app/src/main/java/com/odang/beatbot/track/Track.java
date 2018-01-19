@@ -105,8 +105,18 @@ public class Track extends BaseTrack implements FileListener {
     }
 
     public IconResourceSet getIcon() {
-        return null == currSampleFile ? IconResourceSets.INSTRUMENT_BASE : IconResourceSets
-                .forDirectory(currSampleFile.getParentFile().getName());
+        if (currSampleFile == null) {
+            return IconResourceSets.INSTRUMENT_BASE;
+        } else {
+            final IconResourceSet iconResourceSet = IconResourceSets.forDirectory(currSampleFile.getParentFile().getName());
+            if (iconResourceSet != null) {
+                return iconResourceSet;
+            } else if (FileManager.isAudioFile(currSampleFile)) {
+                return IconResourceSets.SAMPLE;
+            } else {
+                return IconResourceSets.INSTRUMENT_BASE;
+            }
+        }
     }
 
     public void selectAllNotes() {
