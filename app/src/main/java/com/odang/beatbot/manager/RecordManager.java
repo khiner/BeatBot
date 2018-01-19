@@ -184,22 +184,16 @@ public class RecordManager {
         }
     }
 
+    // Don't delete! Called by JNI
     public void notifyRecordSourceBufferFilled(float recordSourceMaxFrame) {
         if (listener != null) {
             listener.onRecordSourceBufferFilled(recordSourceMaxFrame);
         }
     }
 
-    public int getRecordSourceId() {
-        return recordSourceId;
-    }
-
     public void setRecordSourceId(final int recordSourceId) {
         this.recordSourceId = recordSourceId;
         setRecordSourceNative(recordSourceId);
-        if (recordSourceId == MICROPHONE_RECORD_SOURCE_ID) {
-            startListeningNative();
-        }
     }
 
     public String[] getRecordSourceLabels() {

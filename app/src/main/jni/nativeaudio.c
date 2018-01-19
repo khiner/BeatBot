@@ -242,6 +242,30 @@ void micBufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
     (*bq)->Enqueue(bq, openSlOut->micBufferShort, BUFF_SIZE_BYTES);
 }
 
+void startRecordingMicrophone() {
+    SLuint32 state;
+    (*openSlOut->recordInterface)->GetRecordState(
+            openSlOut->recordInterface, &state);
+    // check for good state (should be stopped before recording)
+    if (state != SL_RECORDSTATE_RECORDING) {
+        (*openSlOut->recordInterface)->SetRecordState(
+                openSlOut->recordInterface, SL_RECORDSTATE_RECORDING);
+        (*openSlOut->micBufferQueue)->Enqueue(openSlOut->micBufferQueue,
+                                              openSlOut->micBufferShort, BUFF_SIZE_BYTES);
+    }
+}
+
+void stopRecordingMicrophone() {
+    SLuint32 state;
+    (*openSlOut->recordInterface)->GetRecordState(
+            openSlOut->recordInterface, &state);
+    // if we're recording from the microphone, stop
+    if (state == SL_RECORDSTATE_RECORDING) {
+        (*openSlOut->recordInterface)->SetRecordState(
+                openSlOut->recordInterface, SL_RECORDSTATE_STOPPED);
+    }
+}
+
 void Java_com_odang_beatbot_manager_PlaybackManager_playNative(JNIEnv *env,
                                                                jclass clazz) {
     stopAllTracks();
@@ -446,17 +470,7 @@ void Java_com_odang_beatbot_manager_RecordManager_startListeningNative(JNIEnv *e
     // if the current record source is the microphone, we need to enqueue
     // the micBufferQueue and start listening to the device's mic
     if (openSlOut->recordSourceId == RECORD_SOURCE_MICROPHONE) {
-        // record from microphone.
-        SLuint32 state;
-        (*openSlOut->recordInterface)->GetRecordState(
-                openSlOut->recordInterface, &state);
-        // check for good state (should be stopped before recording)
-        if (state != SL_RECORDSTATE_RECORDING) {
-            (*openSlOut->recordInterface)->SetRecordState(
-                    openSlOut->recordInterface, SL_RECORDSTATE_RECORDING);
-            (*openSlOut->micBufferQueue)->Enqueue(openSlOut->micBufferQueue,
-                                                  openSlOut->micBufferShort, BUFF_SIZE_BYTES);
-        }
+        startRecordingMicrophone();
     }
     listening = true;
 }
@@ -465,14 +479,7 @@ void Java_com_odang_beatbot_manager_RecordManager_stopListeningNative(JNIEnv *en
                                                                       jclass clazz) {
     listening = false;
     if (openSlOut->recordSourceId == RECORD_SOURCE_MICROPHONE) {
-        SLuint32 state;
-        (*openSlOut->recordInterface)->GetRecordState(
-                openSlOut->recordInterface, &state);
-        // if we're recording from the microphone, stop
-        if (state == SL_RECORDSTATE_RECORDING) {
-            (*openSlOut->recordInterface)->SetRecordState(
-                    openSlOut->recordInterface, SL_RECORDSTATE_STOPPED);
-        }
+        stopRecordingMicrophone();
     }
 }
 
@@ -486,6 +493,11 @@ void Java_com_odang_beatbot_manager_RecordManager_stopRecordingNative(JNIEnv *en
 
 void Java_com_odang_beatbot_manager_RecordManager_setRecordSourceNative(
         JNIEnv *_env, jclass clazz, jint recordSourceId) {
+    if (recordSourceId == RECORD_SOURCE_MICROPHONE) {
+        startRecordingMicrophone();
+    } else {
+        stopRecordingMicrophone();
+    }
     openSlOut->recordSourceId = recordSourceId;
 }
 
