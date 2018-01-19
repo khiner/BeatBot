@@ -56,6 +56,7 @@ public abstract class ScrollableView extends TouchableView {
                 getXScrollBar().setCornerRadius(radius);
                 getXScrollBar().layout(absoluteX + x, absoluteY + height - 2.5f * radius, w, 2 * radius);
             }
+            getXScrollBar().bringToTop();
         }
 
         if (vertical) {
@@ -75,6 +76,7 @@ public abstract class ScrollableView extends TouchableView {
                 getYScrollBar().setCornerRadius(radius);
                 getYScrollBar().layout(absoluteX + width - 1.5f * radius, absoluteY + y, 2 * radius, h);
             }
+            getYScrollBar().bringToTop();
         }
     }
 
