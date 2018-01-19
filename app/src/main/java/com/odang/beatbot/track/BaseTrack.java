@@ -14,7 +14,7 @@ public class BaseTrack {
     public static final String MASTER_TRACK_NAME = "Master";
 
     protected int id;
-    protected List<Effect> effects = new ArrayList<Effect>();
+    protected List<Effect> effects = new ArrayList<>();
     public Param volumeParam, panParam, pitchStepParam, pitchCentParam;
 
     public BaseTrack() {

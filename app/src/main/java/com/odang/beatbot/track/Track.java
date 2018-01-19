@@ -283,12 +283,16 @@ public class Track extends BaseTrack implements FileListener {
     }
 
     public void mute(boolean mute) {
+        if (this.muted == muted)
+            return;
         muteTrack(id, mute);
         this.muted = mute;
         View.context.getTrackManager().onMuteChange(this, mute);
     }
 
     public void solo(boolean solo) {
+        if (this.soloing == solo)
+            return;
         soloTrack(id, solo);
         soloGuiOnly(solo);
     }

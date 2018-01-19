@@ -60,9 +60,6 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
             return track;
 
         Track t = (Track) track;
-        t.mute(object.get("muted").getAsBoolean());
-        t.solo(object.get("soloing").getAsBoolean());
-
         if (object.has("samplePath")) {
             try {
                 t.setSample(new File(object.get("samplePath").getAsString()));
@@ -88,6 +85,9 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
         adsr.setSustain(object.get("adsrSustain").getAsFloat());
         adsr.setRelease(object.get("adsrRelease").getAsFloat());
         adsr.setPeak(object.get("adsrPeak").getAsFloat());
+
+        t.mute(object.get("muted").getAsBoolean());
+        t.solo(object.get("soloing").getAsBoolean());
 
         return t;
     }
