@@ -54,7 +54,6 @@ public class SampleEditView extends ControlView2dBase {
             setLevel(0, 1);
             waveformShape.resample();
             setText("");
-            currSampleRect.show(); // total hack to fix an extra line at the end of waveform :( has something to do with resetting indices
             currSampleRect.hide();
         } else {
             if (null != waveformShape) {
@@ -170,7 +169,7 @@ public class SampleEditView extends ControlView2dBase {
 
     private boolean moveLoopMarker(int id, Pointer pos) {
         return moveLoopMarker(id, pos.x, loopButtons[0], params[0])
-                || moveLoopMarker(id, pos.x, loopButtons[1], params[1]) || false;
+                || moveLoopMarker(id, pos.x, loopButtons[1], params[1]);
     }
 
     private boolean moveLoopMarker(int id, float x, Button button, Param param) {

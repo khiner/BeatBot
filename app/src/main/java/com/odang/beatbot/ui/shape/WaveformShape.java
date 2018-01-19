@@ -6,7 +6,7 @@ import com.odang.beatbot.track.Track;
 import static com.odang.beatbot.ui.view.View.context;
 
 public class WaveformShape extends Shape {
-    private final static float MAX_SPP = 1, BUFFER_RATIO = 4;
+    private final static float MAX_SPP = 2, BUFFER_RATIO = 4;
     private float offsetInFrames, widthInFrames;
     private float xOffset, numSamples, loopBeginX, loopEndX;
     private float[] sampleBuffer;

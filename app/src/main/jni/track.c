@@ -502,26 +502,39 @@ void Java_com_odang_beatbot_track_Track_fillSampleBuffer(JNIEnv *env, jclass cla
     if (track->generator == NULL)
         return;
     FileGen *fileGen = (FileGen *) track->generator->config;
-    long numFrames = fileGen->frames;
+    int numFrames = (int) fileGen->frames;
     startFrame = startFrame < 0 ? 0 : startFrame;
-    endFrame = (jint) (endFrame > numFrames ? numFrames : endFrame);
+    endFrame = endFrame >= numFrames ? numFrames - 1 : endFrame;
 
     float maxFrameIndexAndSample[] = {0, 0};
-    float tempSample[] = {0.f, 0.f};
+
+    float segmentBuffer[jumpFrames * fileGen->channels];
 
     int i = 0;
     int frameIndex;
     for (frameIndex = startFrame; frameIndex < endFrame; frameIndex += jumpFrames) {
+        int numFramesToRead =
+                frameIndex + jumpFrames >= endFrame ? endFrame - frameIndex - 1 : jumpFrames;
+
+        filegen_getBufferCopySample(fileGen, segmentBuffer, 0, frameIndex, numFramesToRead);
+
         maxFrameIndexAndSample[0] = frameIndex;
-        maxFrameIndexAndSample[1] = filegen_getBufferCopySample(fileGen, frameIndex, 0, tempSample);
+        if (fileGen->channels == 2) {
+            maxFrameIndexAndSample[1] = (segmentBuffer[0] + segmentBuffer[1]) / 2;
+        } else {
+            maxFrameIndexAndSample[1] = segmentBuffer[0];
+        }
 
         int j;
-        int segmentEndFrame =
-                (int) (frameIndex + jumpFrames > numFrames ? numFrames : frameIndex + jumpFrames);
-        for (j = frameIndex + 1; j < segmentEndFrame; j++) {
-            float candidateSample = filegen_getBufferCopySample(fileGen, j, 0, tempSample);
+        for (j = 1; j < numFramesToRead; j++) {
+            float candidateSample;
+            if (fileGen->channels == 2) {
+                candidateSample = (segmentBuffer[j * 2] + segmentBuffer[j * 2 + 1]) / 2;
+            } else {
+                candidateSample = segmentBuffer[j];
+            }
             if (fabs(candidateSample) > fabs(maxFrameIndexAndSample[1])) {
-                maxFrameIndexAndSample[0] = (float) j;
+                maxFrameIndexAndSample[0] = frameIndex + j;
                 maxFrameIndexAndSample[1] = candidateSample;
             }
         }

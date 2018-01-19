@@ -26,11 +26,11 @@ typedef struct FileGen_t {
 
 FileGen *filegen_create();
 
-static inline float
-filegen_getBufferCopySample(FileGen *fileGen, long frame, int channel, float *ptr) {
-    sf_seek(fileGen->sampleFileBufferCopy, frame, SEEK_SET);
-    sf_readf_float(fileGen->sampleFileBufferCopy, ptr, 1);
-    return ptr[channel];
+static inline void
+filegen_getBufferCopySample(FileGen *fileGen, float *ptr, int channel, long startFrame,
+                            int numFrames) {
+    sf_seek(fileGen->sampleFileBufferCopy, startFrame, SEEK_SET);
+    sf_readf_float(fileGen->sampleFileBufferCopy, ptr, numFrames);
 }
 
 void filegen_setSampleFile(FileGen *fileGen, const char *sampleFileName);
