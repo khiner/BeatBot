@@ -199,7 +199,7 @@ Track *initTrack(int trackId) {
     track->currBufferFloat[1] = (float *) calloc(BUFF_SIZE_FRAMES,
                                                  ONE_FLOAT_SIZE);
     track->mute = track->solo = false;
-    track->shouldSound = true;
+    track->shouldSound = getSoloingTrackNum() == NULL;
     track->nextEvent = malloc(sizeof(MidiEvent));
     track->nextEvent->volume = dbToLinear(0);
     track->nextEvent->pan = panToScaleValue(0);
@@ -257,7 +257,7 @@ int getSoloingTrackNum() {
         }
         cur_ptr = cur_ptr->next;
     }
-    return MASTER_TRACK_ID;
+    return NULL;
 }
 
 void Java_com_odang_beatbot_track_Track_muteTrack(JNIEnv *env, jclass clazz,
@@ -267,7 +267,7 @@ void Java_com_odang_beatbot_track_Track_muteTrack(JNIEnv *env, jclass clazz,
         track->shouldSound = false;
     } else {
         int soloingTrackNum = getSoloingTrackNum();
-        if (soloingTrackNum == MASTER_TRACK_ID || soloingTrackNum == trackId)
+        if (soloingTrackNum == NULL || soloingTrackNum == trackId)
             track->shouldSound = true;
     }
     track->mute = mute;
