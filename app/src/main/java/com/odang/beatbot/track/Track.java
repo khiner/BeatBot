@@ -169,10 +169,10 @@ public class Track extends BaseTrack implements FileListener {
     }
 
     public MidiNote getNextMidiNote(long currTick) {
-        // is there another note beginning between the current tick and the end of the loop?
+        // is there another note ending or beginning between the current tick and the end of the loop?
         for (MidiNote midiNote : notes) {
-            if (midiNote.getOnTick() >= currTick
-                    && midiNote.getOnTick() < View.context.getMidiManager().getLoopEndTick()) {
+            if ((midiNote.getOffTick() > currTick && midiNote.getOffTick() < View.context.getMidiManager().getLoopEndTick()) ||
+                    (midiNote.getOnTick() >= currTick && midiNote.getOnTick() < View.context.getMidiManager().getLoopEndTick())) {
                 return midiNote;
             }
         }
