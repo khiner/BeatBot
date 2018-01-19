@@ -91,11 +91,9 @@ public class FileManager implements FileListener {
         listeners.add(listener);
     }
 
-    public String recordPathForSource(int recordSourceId) {
-        final File recordDirectory = recordSourceId == RecordManager.MICROPHONE_RECORD_SOURCE_ID ? sampleRecordDirectory
+    public File recordDirectoryForSource(int recordSourceId) {
+        return recordSourceId == RecordManager.MICROPHONE_RECORD_SOURCE_ID ? sampleRecordDirectory
                 : beatRecordDirectory;
-
-        return recordDirectory.getPath();
     }
 
     public static String formatSampleName(String sampleName) {

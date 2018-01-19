@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RecordManager {
@@ -137,8 +138,16 @@ public class RecordManager {
             return null;
         }
 
-        String recordDirectory = View.context.getFileManager().recordPathForSource(recordSourceId);
-        currRecordFileName = recordDirectory + "/R" + (currFileNum++) + ".wav";
+        final FileManager fileManager = View.context.getFileManager();
+        File recordDirectory = fileManager.recordDirectoryForSource(recordSourceId);
+        final String recordDirectoryPath = recordDirectory.getAbsolutePath();
+        final List<String> allRecordedFiles = Arrays.asList(recordDirectory.list());
+        String recordFileName;
+        do {
+            recordFileName = "R" + (currFileNum++) + ".wav";
+        } while (allRecordedFiles.contains(recordFileName));
+        currRecordFileName = recordDirectoryPath + "/" + recordFileName;
+
         try {
             FileOutputStream out = WavFileUtil.writeWavFileHeader(currRecordFileName, 0, 0);
             out.close();
