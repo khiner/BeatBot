@@ -1,5 +1,6 @@
 #include "all.h"
 #include "jni_load.h"
+#include <semaphore.h>
 
 // __android_log_print(ANDROID_LOG_INFO, "YourApp", "formatted message");
 
@@ -16,6 +17,8 @@ bool listening = false;
 bool recording = false;
 float thresholdLevel = 0;
 FILE *recordOutFile = NULL;
+pthread_t recordConsumerPid;
+sem_t empty, full;
 
 void writeRecordBufferToRecordFile();
 
@@ -33,6 +36,8 @@ static inline void interleaveFloatsToShorts(float left[], float right[],
 }
 
 void writeRecordBufferToRecordFile() {
+    if (!recording || recordOutFile == NULL)
+        return;
     fwrite(openSlOut->recordBufferCharsLittleEndian, sizeof(char), BUFF_SIZE_SHORTS * 2,
            recordOutFile);
 }
@@ -59,6 +64,22 @@ void writeFloatBuffersToRecordFile(float *left, float *right, int size) {
     writeRecordBufferToRecordFile();
 }
 
+void *recordWriteConsumer(void *arg) {
+    while (recording && recordOutFile != NULL) {
+        sem_wait(&full);
+        if (openSlOut->recordSourceId == MASTER_TRACK_ID) {
+            writeShortBufferToRecordFile(openSlOut->globalBufferShort);
+        } else if (openSlOut->recordSourceId != RECORD_SOURCE_MICROPHONE) {
+            Track *track = getTrack(openSlOut->recordSourceId);
+            if (track != NULL) {
+                writeFloatBuffersToRecordFile(track->currBufferFloat[0],
+                                              track->currBufferFloat[1], BUFF_SIZE_FRAMES);
+            }
+        }
+        sem_post(&empty);
+    }
+}
+
 void startRecording() {
     recordArmed = false;
     JNIEnv *env = getJniEnv();
@@ -70,6 +91,8 @@ void startRecording() {
     // append to end of file, since header is written in Java
     recordOutFile = fopen(cRecordFilePath, "a+");
     recording = true;
+    //pthread_join(recordConsumerPid, NULL);
+    pthread_create(&recordConsumerPid, NULL, recordWriteConsumer, NULL);
 }
 
 void notifyMaxFrame(float maxFrame) {
@@ -207,18 +230,12 @@ void bufferQueueCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
     if (openSlOut->armed) {
         (*bq)->Enqueue(bq, openSlOut->globalBufferShort, BUFF_SIZE_BYTES);
     }
-
+    if (recording) {
+        sem_wait(&empty);
+    }
     fillBuffer();
-    if (recording && recordOutFile != NULL) {
-        if (openSlOut->recordSourceId == MASTER_TRACK_ID) {
-            writeShortBufferToRecordFile(openSlOut->globalBufferShort);
-        } else if (openSlOut->recordSourceId != RECORD_SOURCE_MICROPHONE) {
-            Track *track = getTrack(openSlOut->recordSourceId);
-            if (track != NULL) {
-                writeFloatBuffersToRecordFile(track->currBufferFloat[0],
-                                              track->currBufferFloat[1], BUFF_SIZE_FRAMES);
-            }
-        }
+    if (recording) {
+        sem_post(&full);
     }
 }
 
@@ -308,6 +325,9 @@ void Java_com_odang_beatbot_activity_BeatBotActivity_createEngine(JNIEnv *env,
     previewEvent->volume = dbToLinear(0);
     previewEvent->pan = panToScaleValue(0);
     previewEvent->pitchSteps = .5f;
+
+    sem_init(&empty, 1, 1);
+    sem_init(&full, 1, 0);
 }
 
 jboolean Java_com_odang_beatbot_activity_BeatBotActivity_createAudioPlayer(
