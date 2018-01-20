@@ -283,7 +283,7 @@ public class Track extends BaseTrack implements FileListener {
     }
 
     public void mute(boolean mute) {
-        if (this.muted == muted)
+        if (this.muted == mute)
             return;
         muteTrack(id, mute);
         this.muted = mute;
