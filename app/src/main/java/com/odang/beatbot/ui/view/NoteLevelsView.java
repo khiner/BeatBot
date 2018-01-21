@@ -145,7 +145,6 @@ public class NoteLevelsView extends TouchableView {
                     }
                     midiNote.setSelected(true);
                 }
-                valueLabel.show();
                 touchedNotesById.put(pointerId, midiNote);
                 touchedNotes.add(midiNote);
                 updateLevelOffsets();
@@ -234,7 +233,8 @@ public class NoteLevelsView extends TouchableView {
     public void draw() {
         try {
             List<MidiNote> notes = ((Track) context.getTrackManager().getCurrTrack()).getMidiNotes();
-            for (MidiNote note : notes) {
+            for (int i = notes.size() - 1; i >= 0; i--) {
+                final MidiNote note = notes.get(i);
                 drawLevel(note, calcLevelColor(note.isSelected()),
                         calcLevelColorTrans(note.isSelected()));
             }
