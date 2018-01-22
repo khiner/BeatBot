@@ -147,7 +147,8 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
     public int getCurrPageIndex() {
         PageButtonRow currPage = ((PageButtonRow) buttonRowPager.getCurrPage());
-        return currPage.indexOf((View) pager.getCurrPageId());
+        final int i = currPage.indexOf((View) pager.getCurrPageId());
+        return i < 0 ? 0 : i;
     }
 
     public void selectPage(int pageIndex) {
