@@ -314,11 +314,13 @@ public class BeatBotActivity extends Activity {
             }
         }
 
+        trackManager.getMasterTrack().select();
         midiManager.setLoopTicks(0, MidiManager.TICKS_PER_NOTE * 4);
         midiManager.setBpm(120);
+        getPageSelectGroup().selectLevelsPage(); // select levels page for master track
 
         trackManager.getTrackByNoteValue(0).select();
-        getPageSelectGroup().selectLevelsPage();
+        getPageSelectGroup().selectLevelsPage(); // select levels page for non-master track
     }
 
     public void clearProject() {
