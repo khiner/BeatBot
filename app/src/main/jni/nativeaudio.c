@@ -163,7 +163,7 @@ void mixTracks() {
     }
 }
 
-void stopAllTracks() {
+void resetLoop() {
     currSample = (long) (loopBeginTick * samplesPerTick);
     TrackNode *cur_ptr = trackHead;
     while (cur_ptr != NULL) {
@@ -173,7 +173,7 @@ void stopAllTracks() {
 }
 
 void disarm() {
-    stopAllTracks();
+    resetLoop();
     openSlOut->armed = false;
 }
 
@@ -181,7 +181,7 @@ void generateNextBuffer() {
     int samp;
     for (samp = 0; samp < BUFF_SIZE_FRAMES; samp++) {
         if (currSample > (long) (loopEndTick * samplesPerTick)) {
-            stopAllTracks();
+            resetLoop();
         }
         TrackNode *cur_ptr = trackHead;
         long currTick = (long) (currSample / samplesPerTick);
@@ -285,14 +285,23 @@ void stopRecordingMicrophone() {
 
 void Java_com_odang_beatbot_manager_PlaybackManager_playNative(JNIEnv *env,
                                                                jclass clazz) {
-    stopAllTracks();
     playing = true;
 }
 
 void Java_com_odang_beatbot_manager_PlaybackManager_stopNative(JNIEnv *env,
                                                                jclass clazz) {
     playing = false;
-    stopAllTracks();
+    TrackNode *cur_ptr = trackHead;
+    while (cur_ptr != NULL) {
+        stopSoundingTrack(cur_ptr->track);
+        cur_ptr = cur_ptr->next;
+    }
+}
+
+void Java_com_odang_beatbot_manager_PlaybackManager_resetTicker(JNIEnv *env,
+                                                                jclass clazz) {
+    playing = false;
+    resetLoop();
 }
 
 // create the engine and output mix objects
@@ -437,7 +446,7 @@ void Java_com_odang_beatbot_activity_BeatBotActivity_arm(JNIEnv *_env,
 void Java_com_odang_beatbot_activity_BeatBotActivity_nativeShutdown(JNIEnv *env,
                                                                     jclass clazz) {
     playing = false;
-    stopAllTracks();
+    resetLoop();
 
     // lock the mutex, so openSL doesn't try to grab from empty buffers
     pthread_mutex_lock(&openSlOut->trackMutex);

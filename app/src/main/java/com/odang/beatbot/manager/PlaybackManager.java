@@ -30,4 +30,6 @@ public class PlaybackManager {
     private native void playNative();
 
     private native void stopNative();
+
+    public native void resetTicker();
 }

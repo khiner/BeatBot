@@ -156,9 +156,7 @@ public class MidiView extends ClickableView implements TrackListener, Scrollable
 
     @Override
     public void tick() {
-        if (context.getPlaybackManager().isPlaying()) {
-            updateCurrentTick();
-        }
+        updateCurrentTick();
         if (pointerCount() == 0) {
             scrollHelper.scroll(); // take care of any momentum scrolling
             if (scrollHelper.scrollXVelocity == 0) {

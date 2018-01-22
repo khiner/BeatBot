@@ -49,12 +49,10 @@ public class ControlButtonGroup extends TouchableView implements MidiNoteListene
             @Override
             public void onRelease(Button button) {
                 playButton.setChecked(false);
-                if (context.getRecordManager().isRecording()) {
-                    playButton.setChecked(false);
-                }
                 if (context.getPlaybackManager().isPlaying()) {
-                    playButton.setChecked(false);
                     context.getPlaybackManager().stop();
+                } else {
+                    context.getPlaybackManager().resetTicker();
                 }
             }
         });
