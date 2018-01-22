@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 
 import com.odang.beatbot.R;
+import com.odang.beatbot.effect.ADSR;
 import com.odang.beatbot.effect.Effect;
 import com.odang.beatbot.event.effect.EffectChangeEvent;
 import com.odang.beatbot.event.effect.EffectCreateEvent;
@@ -81,6 +82,8 @@ public class EffectSelectPage extends TrackPage {
 
     @Override
     public void onEffectCreate(BaseTrack track, Effect effect) {
+        if (effect instanceof ADSR)
+            return;
         updateEffectLabels();
     }
 

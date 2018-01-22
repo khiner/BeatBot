@@ -77,7 +77,7 @@ public class EffectPage extends TouchableView implements TouchableViewsListener 
         level2d.setParams(xParam, yParam);
     }
 
-    private EffectParamsChangeEvent effectParamsChangeEvent = null;
+    private EffectParamsChangeEvent effectParamsChangeEvent;
 
     @Override
     public void onFirstPress() {

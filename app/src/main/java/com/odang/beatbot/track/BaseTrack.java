@@ -73,10 +73,6 @@ public class BaseTrack {
         return effects;
     }
 
-    public Effect getEffectByPosition(int position) {
-        return effects.get(position);
-    }
-
     public void addEffect(Effect effect) {
         effects.add(effect);
         context.getTrackManager().onEffectCreate(this, effect);

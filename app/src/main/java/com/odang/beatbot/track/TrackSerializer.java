@@ -12,7 +12,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
-import com.odang.beatbot.effect.ADSR;
 import com.odang.beatbot.effect.Effect;
 import com.odang.beatbot.effect.EffectSerializer;
 import com.odang.beatbot.manager.TrackManager;
@@ -77,15 +76,7 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
         for (MidiNote note : notes) {
             note.create();
         }
-
-        ADSR adsr = t.getAdsr();
-        adsr.setStart(object.get("adsrStart").getAsFloat());
-        adsr.setAttack(object.get("adsrAttack").getAsFloat());
-        adsr.setDecay(object.get("adsrDecay").getAsFloat());
-        adsr.setSustain(object.get("adsrSustain").getAsFloat());
-        adsr.setRelease(object.get("adsrRelease").getAsFloat());
-        adsr.setPeak(object.get("adsrPeak").getAsFloat());
-
+        
         t.mute(object.get("muted").getAsBoolean());
         t.solo(object.get("soloing").getAsBoolean());
 
@@ -121,15 +112,6 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
             }
 
             object.add("notes", GSON.toJsonTree(t.getMidiNotes()).getAsJsonArray());
-
-            ADSR adsr = t.getAdsr();
-            object.addProperty("adsrStart", adsr.getStart());
-            object.addProperty("adsrAttack", adsr.getAttack());
-            object.addProperty("adsrDecay", adsr.getDecay());
-            object.addProperty("adsrSustain", adsr.getSustain());
-            object.addProperty("adsrRelease", adsr.getRelease());
-            object.addProperty("adsrPeak", adsr.getPeak());
-
         } else {
             object.addProperty("class", BaseTrack.class.getName());
         }

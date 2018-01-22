@@ -1,6 +1,7 @@
 package com.odang.beatbot.track;
 
 import com.odang.beatbot.effect.ADSR;
+import com.odang.beatbot.effect.Effect;
 import com.odang.beatbot.effect.Param;
 import com.odang.beatbot.listener.FileListener;
 import com.odang.beatbot.listener.ParamListener;
@@ -13,6 +14,7 @@ import com.odang.beatbot.ui.view.TrackButtonRow;
 import com.odang.beatbot.ui.view.View;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -209,6 +211,22 @@ public class Track extends BaseTrack implements FileListener {
         return sampleParams == null ? null : sampleParams.loopEndParam;
     }
 
+    @Override
+    public Effect findEffectByPosition(int position) {
+        if (position == -1) {
+            return adsr;
+        } else {
+            return super.findEffectByPosition(position);
+        }
+    }
+
+    @Override
+    public void addEffect(Effect effect) {
+        if (!(effect instanceof ADSR)) {
+            super.addEffect(effect);
+        }
+    }
+
     public Param getGainParam() {
         final SampleParams sampleParams = getCurrSampleParams();
         return sampleParams == null ? null : sampleParams.gainParam;
@@ -224,6 +242,13 @@ public class Track extends BaseTrack implements FileListener {
 
     public void setActiveAdsrParam(int paramId) {
         adsr.setActiveParam(paramId);
+    }
+
+    public List<Effect> getEffects() {
+        final List<Effect> effects = new ArrayList<>();
+        effects.addAll(effects);
+        effects.add(adsr);
+        return effects;
     }
 
     public ADSR getAdsr() {

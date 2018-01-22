@@ -2,8 +2,11 @@ package com.odang.beatbot.ui.view.page.track;
 
 import com.odang.beatbot.effect.ADSR;
 import com.odang.beatbot.effect.Param;
+import com.odang.beatbot.event.effect.EffectParamsChangeEvent;
+import com.odang.beatbot.listener.MultiViewTouchTracker;
 import com.odang.beatbot.listener.OnReleaseListener;
 import com.odang.beatbot.listener.ParamListener;
+import com.odang.beatbot.listener.TouchableViewsListener;
 import com.odang.beatbot.track.BaseTrack;
 import com.odang.beatbot.track.Track;
 import com.odang.beatbot.ui.icon.IconResourceSet;
@@ -14,7 +17,7 @@ import com.odang.beatbot.ui.view.control.Button;
 import com.odang.beatbot.ui.view.control.ToggleButton;
 import com.odang.beatbot.ui.view.control.param.SeekbarParamControl;
 
-public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListener {
+public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListener, TouchableViewsListener {
     private ToggleButton[] adsrButtons;
     private AdsrView adsrView;
     private SeekbarParamControl paramControl;
@@ -79,6 +82,8 @@ public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListe
 
         adsrButtons[ADSR.START_ID].setText("S");
         adsrButtons[ADSR.PEAK_ID].setText("P");
+
+        new MultiViewTouchTracker(this).monitorViews(adsrView, paramControl);
     }
 
     @Override
@@ -110,5 +115,20 @@ public class AdsrPage extends TrackPage implements OnReleaseListener, ParamListe
         final Track track = (Track) context.getTrackManager().getCurrTrack();
         track.setActiveAdsrParam(currParamId);
         updateParamView();
+    }
+
+    private EffectParamsChangeEvent effectParamsChangeEvent;
+
+    @Override
+    public void onFirstPress() {
+        final ADSR adsr = ((Track) context.getTrackManager().getCurrTrack()).getAdsr();
+        effectParamsChangeEvent = new EffectParamsChangeEvent(adsr.getTrackId(),
+                adsr.getPosition());
+        effectParamsChangeEvent.begin();
+    }
+
+    @Override
+    public void onLastRelease() {
+        effectParamsChangeEvent.end();
     }
 }

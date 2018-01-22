@@ -1,5 +1,6 @@
 package com.odang.beatbot.ui.view.group;
 
+import com.odang.beatbot.effect.ADSR;
 import com.odang.beatbot.effect.Effect;
 import com.odang.beatbot.listener.FileListener;
 import com.odang.beatbot.listener.NoteLevelsChangeListener;
@@ -83,6 +84,13 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
         ToggleButton editButton = trackButtonRow.getEditButton();
         if (!editButton.isChecked()) {
             editButton.trigger(true);
+        }
+    }
+
+    public void selectAdsrPage() {
+        ToggleButton adsrButton = trackButtonRow.getAdsrButton();
+        if (!adsrButton.isChecked()) {
+            adsrButton.trigger(true);
         }
     }
 
@@ -265,8 +273,12 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
 
     @Override
     public void onEffectCreate(BaseTrack track, Effect effect) {
-        selectEffectPage();
-        effectSelectPage.onEffectCreate(track, effect);
+        if (effect instanceof ADSR) {
+            selectAdsrPage();
+        } else {
+            selectEffectPage();
+            effectSelectPage.onEffectCreate(track, effect);
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.odang.beatbot.ui.view.page.main;
 
+import com.odang.beatbot.effect.ADSR;
 import com.odang.beatbot.effect.Effect;
 import com.odang.beatbot.effect.Effect.LevelType;
 import com.odang.beatbot.listener.FileListener;
@@ -206,6 +207,8 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
 
     @Override
     public void onEffectCreate(BaseTrack track, Effect effect) {
+        if (effect instanceof ADSR)
+            return;
         launchEffect(effect);
     }
 

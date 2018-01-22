@@ -60,7 +60,9 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
     }
 
     public void deserialize(Gson gson, JsonObject jsonObject) {
-        setOn(jsonObject.get("on").getAsBoolean());
+        if (!jsonObject.get("name").getAsString().equals(ADSR.NAME)) {
+            setOn(jsonObject.get("on").getAsBoolean());
+        }
         setLevels(gson.fromJson(jsonObject.get("levels"), float[].class));
     }
 

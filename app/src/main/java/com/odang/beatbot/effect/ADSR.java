@@ -46,16 +46,16 @@ public class ADSR extends Effect {
         position = -1; // native code understands that -1 == ADSR
     }
 
+    public void setParams(ADSR other) {
+
+    }
+
     public void setActiveParam(int paramId) {
         activeParamId = paramId;
     }
 
     public Param getActiveParam() {
         return getParam(activeParamId);
-    }
-
-    public int getActiveParamId() {
-        return activeParamId;
     }
 
     public float getAttack() {
@@ -80,10 +80,6 @@ public class ADSR extends Effect {
 
     public float getPeak() {
         return params.get(PEAK_ID).viewLevel;
-    }
-
-    public void setCurrParamLevel(float level) {
-        getParam(activeParamId).setLevel(level);
     }
 
     public void setAttack(float attack) {
