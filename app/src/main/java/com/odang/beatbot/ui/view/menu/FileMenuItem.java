@@ -97,6 +97,11 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
         return file;
     }
 
+    public void setFile(File file) {
+        this.file = file;
+        setText(file.getName().isEmpty() ? file.getPath() : FileManager.formatSampleName(file.getName()));
+    }
+
     private void loadIcons() {
         if (button.getText().isEmpty()) {
             setText(file.getName().isEmpty() ? file.getPath() : FileManager.formatSampleName(file.getName()));

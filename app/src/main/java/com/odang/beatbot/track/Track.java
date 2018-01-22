@@ -283,7 +283,10 @@ public class Track extends BaseTrack implements FileListener {
     }
 
     @Override
-    public void onNameChange(File file, File newFile) {
+    public void onNameChange(Track track, File file, File newFile) {
+        if (this != track)
+            return;
+
         SampleParams params = paramsForSample.remove(currSampleFile);
         currSampleFile = newFile;
         paramsForSample.put(currSampleFile, params);

@@ -207,7 +207,7 @@ public class BeatBotActivity extends Activity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 String sampleName = sampleNameInput.getText().toString();
-                                new SampleRenameEvent(fileToEdit, sampleName).execute();
+                                new SampleRenameEvent(trackManager.getCurrTrack().getId(), fileToEdit, sampleName).execute();
                             }
                         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override

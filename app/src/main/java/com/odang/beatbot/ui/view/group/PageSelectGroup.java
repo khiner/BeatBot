@@ -233,7 +233,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
     }
 
     @Override
-    public void onNameChange(File file, File newFile) {
+    public void onNameChange(Track track, File oldFile, File newFile) {
         if (masterButton.isChecked())
             // make sure *some* track is selected.
             context.getTrackManager().getTrackByNoteValue(0).select();
@@ -241,7 +241,7 @@ public class PageSelectGroup extends TouchableView implements TrackListener,
             trackButtonRow.update();
         }
         selectBrowsePage();
-        browsePage.update();
+        browsePage.update(oldFile, newFile);
     }
 
     @Override

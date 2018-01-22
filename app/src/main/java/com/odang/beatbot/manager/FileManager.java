@@ -5,6 +5,7 @@ import android.content.res.AssetManager;
 import android.os.Environment;
 
 import com.odang.beatbot.listener.FileListener;
+import com.odang.beatbot.track.Track;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -172,9 +173,10 @@ public class FileManager implements FileListener {
     }
 
     @Override
-    public void onNameChange(File file, File newFile) {
+    public void onNameChange(Track track, File file, File newFile) {
+        track.select();
         for (FileListener listener : listeners) {
-            listener.onNameChange(file, newFile);
+            listener.onNameChange(track, file, newFile);
         }
     }
 }

@@ -37,7 +37,8 @@ public class BrowsePage extends Menu implements TrackListener {
         }
     }
 
-    public void update() {
+    public void update(File oldFile, File newFile) {
+        // TODO sample name changes not being reflected
         // recursively select file menu items based on current sample
         final BaseTrack currTrack = context.getTrackManager().getCurrTrack();
         if (!(currTrack instanceof Track))
@@ -46,10 +47,11 @@ public class BrowsePage extends Menu implements TrackListener {
         File currSampleFile = ((Track) currTrack).getCurrSampleFile();
         if (null == currSampleFile)
             return;
-        String currSamplePath = currSampleFile.getAbsolutePath();
-
         FileMenuItem match = null;
-        while ((match = findMatchingChild(match, currSamplePath)) != null) {
+        while ((match = findMatchingChild(match, currSampleFile.getAbsolutePath(), oldFile != null ? oldFile.getAbsolutePath() : null)) != null) {
+            if (oldFile != null && match.getFile().equals(oldFile) && !match.getFile().exists()) {
+                match.setFile(newFile);
+            }
             if (!match.isChecked()) {
                 match.trigger();
                 match.scrollTo();
@@ -57,11 +59,12 @@ public class BrowsePage extends Menu implements TrackListener {
         }
     }
 
-    private FileMenuItem findMatchingChild(FileMenuItem parent, String path) {
+    private FileMenuItem findMatchingChild(FileMenuItem parent, String path, String otherPath) {
         List<MenuItem> children = parent == null ? topLevelItems : parent.getSubMenuItems();
         for (MenuItem child : children) {
             FileMenuItem fileChild = (FileMenuItem) child;
-            if (path.startsWith(fileChild.getFile().getAbsolutePath())) {
+            final String prefix = fileChild.getFile().getAbsolutePath();
+            if (path.startsWith(prefix) || (otherPath != null && otherPath.startsWith(prefix))) {
                 return fileChild;
             }
         }
@@ -127,7 +130,7 @@ public class BrowsePage extends Menu implements TrackListener {
 
     @Override
     public void onSelect(BaseTrack track) {
-        update();
+        update(null, null);
     }
 
     @Override
@@ -140,7 +143,7 @@ public class BrowsePage extends Menu implements TrackListener {
 
     @Override
     public void onSampleChange(Track track) {
-        update();
+        update(null, null);
     }
 
     @Override

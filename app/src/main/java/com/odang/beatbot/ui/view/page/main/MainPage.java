@@ -153,7 +153,7 @@ public class MainPage extends TouchableView implements MidiNoteListener, TrackLi
     }
 
     @Override
-    public void onNameChange(File file, File newFile) {
+    public void onNameChange(Track track, File file, File newFile) {
         selectEditPage();
     }
 

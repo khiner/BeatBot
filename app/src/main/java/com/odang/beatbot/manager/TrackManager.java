@@ -408,12 +408,8 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
     }
 
     @Override
-    public void onNameChange(File file, File newFile) {
-        for (Track track : tracks) {
-            if (track.getCurrSampleFile().equals(file)) {
-                track.onNameChange(file, newFile);
-            }
-        }
+    public void onNameChange(Track track, File file, File newFile) {
+        track.onNameChange(track, file, newFile);
     }
 
     @Override
