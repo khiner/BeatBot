@@ -44,6 +44,10 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
             }
             super.onRelease(button);
             if (file.isDirectory()) {
+                final ListView childList = menu.getListAtLevel(getLevel() + 1);
+                if (childList != null) {
+                    childList.scrollToTop();
+                }
                 menu.onDirectoryMenuItemReleased(this);
             }
         }
@@ -68,10 +72,6 @@ public class FileMenuItem extends MenuItem implements OnLongPressListener {
             emptyMenuItem.setText("Empty");
             emptyMenuItem.disable();
             subMenuItems.add(emptyMenuItem);
-        }
-        final ListView childList = menu.getListAtLevel(getLevel() + 1);
-        if (childList != null) {
-            childList.scrollToTop();
         }
     }
 
