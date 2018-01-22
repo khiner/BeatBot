@@ -76,7 +76,7 @@ public class ProjectFile {
         View.context.getMidiManager().setSnapToGrid(
                 globalProperties.get(SNAP_TO_GRID).getAsBoolean());
 
-        // tracks
+        // Tracks are added to the project in during deserialization in the TrackSerializer class
         String serializedTrack;
         while ((serializedTrack = reader.readLine()) != null) {
             trackFromJson(serializedTrack);

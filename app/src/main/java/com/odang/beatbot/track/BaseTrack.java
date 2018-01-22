@@ -50,6 +50,13 @@ public class BaseTrack {
         });
     }
 
+    public void resetToDefaults() {
+        while (!effects.isEmpty()) {
+            removeEffect(effects.get(0));
+        }
+        setLevels(Param.dbToView(0), .5f, .5f, .5f);
+    }
+
     public int getId() {
         return id;
     }

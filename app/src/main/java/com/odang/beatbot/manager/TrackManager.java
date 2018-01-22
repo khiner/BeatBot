@@ -90,11 +90,12 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
     }
 
     public void destroy() {
-        List<Track> tracksToDestroy = new ArrayList<Track>();
+        List<Track> tracksToDestroy = new ArrayList<>();
         tracksToDestroy.addAll(tracks);
         for (Track track : tracksToDestroy) {
             track.destroy();
         }
+        masterTrack.resetToDefaults();
     }
 
     public void selectTrackNotesExclusive(Track track) {
