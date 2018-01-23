@@ -207,6 +207,17 @@ public class TrackManager implements TrackListener, FileListener, MidiNoteListen
         return false;
     }
 
+    public MidiNote getTopLeftNote() {
+        MidiNote topLeftNote = null;
+        for (Track track : tracks) {
+            for (MidiNote note : track.getMidiNotes()) {
+                if (topLeftNote == null || (note.getOnTick() <= topLeftNote.getOnTick() && note.getNoteValue() <= topLeftNote.getNoteValue()))
+                    topLeftNote = note;
+            }
+        }
+        return topLeftNote;
+    }
+
     public long[] getSelectedNoteTickWindow() {
         long[] selectedNoteTickWindow = {Long.MAX_VALUE, Long.MIN_VALUE};
         for (Track track : tracks) {

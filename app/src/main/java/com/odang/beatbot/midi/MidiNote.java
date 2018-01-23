@@ -145,37 +145,53 @@ public class MidiNote implements Comparable<MidiNote> {
         this.touched = touched;
     }
 
+    public boolean set(int noteValue, long onTick, long offTick) {
+        int prevNoteValue = getNoteValue();
+        long prevOnTick = getOnTick();
+        long prevOffTick = getOffTick();
+
+        doSetTicks(onTick, offTick);
+        if (noteValue >= 0) {
+            doSetNoteValue(noteValue);
+        }
+
+        boolean ticksChanged = prevOnTick != getOnTick() || prevOffTick != getOffTick();
+        boolean noteChanged = getNoteValue() != prevNoteValue;
+        if (noteChanged || ticksChanged) {
+            View.context.getMidiManager().onMove(this, prevNoteValue, prevOnTick, prevOffTick,
+                    getNoteValue(), getOnTick(), getOffTick());
+        }
+
+        return noteChanged || ticksChanged;
+    }
+
     public boolean setTicks(long onTick, long offTick) {
         long prevOnTick = getOnTick();
         long prevOffTick = getOffTick();
 
-        noteOn.setTick(onTick >= 0 ? onTick : 0);
-        if (offTick > getOnTick()) {
-            noteOff.setTick(offTick);
-        }
+        doSetTicks(onTick, offTick);
 
-        if (prevOnTick != getOnTick() || prevOffTick != getOffTick()) {
+        boolean ticksChanged = prevOnTick != getOnTick() || prevOffTick != getOffTick();
+        if (ticksChanged) {
             View.context.getMidiManager().onMove(this, getNoteValue(), prevOnTick, prevOffTick,
                     getNoteValue(), getOnTick(), getOffTick());
-            return true;
-        } else {
-            return false;
         }
+        return ticksChanged;
     }
 
-    public void setNoteValue(int noteValue) {
-        if (noteValue < 0 || getNoteValue() == noteValue)
-            return;
+    public boolean setNoteValue(int noteValue) {
+        if (noteValue < 0)
+            return false;
 
         int prevNoteValue = getNoteValue();
-        noteOn.setNoteValue(noteValue);
-        noteOff.setNoteValue(noteValue);
-        View.context.getMidiManager().onMove(this, prevNoteValue, getOnTick(), getOffTick(),
-                getNoteValue(), getOnTick(), getOffTick());
-    }
+        doSetNoteValue(noteValue);
 
-    public long getNoteLength() {
-        return noteOff.getTick() - noteOn.getTick();
+        boolean noteChanged = getNoteValue() != prevNoteValue;
+        if (noteChanged) {
+            View.context.getMidiManager().onMove(this, prevNoteValue, getOnTick(), getOffTick(),
+                    getNoteValue(), getOnTick(), getOffTick());
+        }
+        return noteChanged;
     }
 
     public Rectangle getRectangle() {
@@ -271,6 +287,18 @@ public class MidiNote implements Comparable<MidiNote> {
     private void setPitch(byte pitch) {
         noteOn.setPitch(pitch);
         noteOff.setPitch(pitch);
+    }
+
+    private void doSetTicks(long onTick, long offTick) {
+        noteOn.setTick(onTick >= 0 ? onTick : 0);
+        if (offTick > getOnTick()) {
+            noteOff.setTick(offTick);
+        }
+    }
+
+    private void doSetNoteValue(int noteValue) {
+        noteOn.setNoteValue(noteValue);
+        noteOff.setNoteValue(noteValue);
     }
 
     public class Levels {

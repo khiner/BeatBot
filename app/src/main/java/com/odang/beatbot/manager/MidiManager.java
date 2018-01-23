@@ -144,14 +144,28 @@ public class MidiManager implements MidiNoteListener {
         copiedNotes.clear();
     }
 
-    public void paste(long startTick) {
+    public void paste(int startNote, long startTick) {
         if (copiedNotes.isEmpty())
             return;
-        // Copied notes should still be selected, so leftmostSelectedTick should be accurate
-        long tickOffset = startTick - context.getTrackManager().getSelectedNoteTickWindow()[0];
+        int lowestNoteValue = Integer.MAX_VALUE;
+        long leftmostOnTick = Long.MAX_VALUE;
         for (MidiNote copiedNote : copiedNotes) {
-            copiedNote.setTicks(copiedNote.getOnTick() + tickOffset, copiedNote.getOffTick()
-                    + tickOffset);
+            lowestNoteValue = Math.min(copiedNote.getNoteValue(), lowestNoteValue);
+            leftmostOnTick = Math.min(copiedNote.getOnTick(), leftmostOnTick);
+        }
+
+        int noteOffset = startNote - lowestNoteValue;
+        long tickOffset = startTick - leftmostOnTick;
+        for (int i = 0; i < copiedNotes.size(); i++) {
+            MidiNote copiedNote = copiedNotes.get(i);
+            final int newNoteValue = copiedNote.getNoteValue() + noteOffset;
+            if (newNoteValue >= context.getTrackManager().getNumTracks()) {
+                copiedNotes.remove(copiedNote);
+            } else {
+                copiedNote.set(newNoteValue,
+                        copiedNote.getOnTick() + tickOffset,
+                        copiedNote.getOffTick() + tickOffset);
+            }
         }
 
         midiNotesEventManager.createNotes(copiedNotes);

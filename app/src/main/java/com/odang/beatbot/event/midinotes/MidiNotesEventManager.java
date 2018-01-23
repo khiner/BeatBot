@@ -129,17 +129,9 @@ public class MidiNotesEventManager {
     }
 
     public void moveNote(MidiNote note, int noteDiff, long tickDiff) {
-        boolean noteChanged = false;
-        if (tickDiff != 0) {
-            noteChanged = setNoteTicks(note, note.getOnTick() + tickDiff, note.getOffTick()
-                    + tickDiff, true);
-        }
-        if (noteDiff != 0) {
-            note.setNoteValue(note.getNoteValue() + noteDiff);
-            noteChanged = true;
-        }
-
-        if (noteChanged) {
+        if (setNoteTicks(note, note.getOnTick() + tickDiff, note.getOffTick()
+                + tickDiff, true) ||
+                note.setNoteValue(note.getNoteValue() + noteDiff)) {
             handleNoteCollisions();
         }
     }
