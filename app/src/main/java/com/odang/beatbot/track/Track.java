@@ -246,7 +246,7 @@ public class Track extends BaseTrack implements FileListener {
 
     public List<Effect> getEffects() {
         final List<Effect> effects = new ArrayList<>();
-        effects.addAll(effects);
+        effects.addAll(this.effects);
         effects.add(adsr);
         return effects;
     }

@@ -152,6 +152,9 @@ public class MeshGroup {
     protected void vertex(Mesh mesh, int index, float x, float y, float[] color) {
         int offset = getVertexIndex(mesh, index);
 
+        if (offset >= vertices.length)
+            return;
+
         vertices[offset] = x;
         vertices[offset + 1] = y;
         if (null != color) {

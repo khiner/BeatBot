@@ -46,10 +46,6 @@ public class ADSR extends Effect {
         position = -1; // native code understands that -1 == ADSR
     }
 
-    public void setParams(ADSR other) {
-
-    }
-
     public void setActiveParam(int paramId) {
         activeParamId = paramId;
     }

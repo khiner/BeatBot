@@ -61,6 +61,8 @@ public class TextureGroup extends MeshGroup {
 
     private void textureVertex(Mesh mesh, int index, float textureX, float textureY) {
         int vertexIndex = getVertexIndex(mesh, index);
+        if (vertexIndex >= vertices.length)
+            return;
         vertices[vertexIndex + 6] = textureX;
         vertices[vertexIndex + 7] = textureY;
     }
