@@ -17,6 +17,8 @@ import java.io.File;
 import java.util.List;
 
 public class BrowsePage extends Menu implements TrackListener {
+    private String lastDirectoryPath;
+
     public BrowsePage(View view, RenderGroup renderGroup) {
         super(view, renderGroup);
         setScrollable(true, false);
@@ -38,17 +40,26 @@ public class BrowsePage extends Menu implements TrackListener {
     }
 
     public void update(File oldFile, File newFile) {
-        // TODO sample name changes not being reflected
         // recursively select file menu items based on current sample
         final BaseTrack currTrack = context.getTrackManager().getCurrTrack();
         if (!(currTrack instanceof Track))
             return;
 
         File currSampleFile = ((Track) currTrack).getCurrSampleFile();
-        if (null == currSampleFile)
-            return;
+
+        final String navigatePath;
+        if (currSampleFile == null) {
+            if (lastDirectoryPath == null) {
+                return; // no history or current file to navigate to
+            } else {
+                navigatePath = lastDirectoryPath;
+            }
+        } else {
+            navigatePath = currSampleFile.getAbsolutePath();
+        }
+
         FileMenuItem match = null;
-        while ((match = findMatchingChild(match, currSampleFile.getAbsolutePath(), oldFile != null ? oldFile.getAbsolutePath() : null)) != null) {
+        while ((match = findMatchingChild(match, navigatePath, oldFile != null ? oldFile.getAbsolutePath() : null)) != null) {
             if (oldFile != null && match.getFile().equals(oldFile) && !match.getFile().exists()) {
                 match.setFile(newFile);
             }
@@ -98,6 +109,8 @@ public class BrowsePage extends Menu implements TrackListener {
 
     @Override
     public void onDirectoryMenuItemReleased(FileMenuItem directoryMenuItem) {
+        lastDirectoryPath = directoryMenuItem.getFile().getAbsolutePath();
+
         final BaseTrack currTrack = context.getTrackManager().getCurrTrack();
         if (!(currTrack instanceof Track))
             return;
