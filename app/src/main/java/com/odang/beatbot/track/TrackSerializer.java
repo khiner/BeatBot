@@ -47,6 +47,8 @@ public class TrackSerializer implements JsonSerializer<BaseTrack>, JsonDeseriali
         BaseTrack track = isMaster ? View.context.getTrackManager().getMasterTrack() : View.context
                 .getTrackManager().createTrack(id, position);
 
+        track.select();
+        View.context.getPageSelectGroup().selectLevelsPage();
         track.getVolumeParam().setLevel(volume);
         track.getPanParam().setLevel(pan);
         track.getPitchParam().setLevel(pitch);

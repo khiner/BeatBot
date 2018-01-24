@@ -127,6 +127,11 @@ public abstract class Effect implements Comparable<Effect>, ParamListener {
         View.context.getTrackManager().getBaseTrackById(trackId).removeEffect(this);
     }
 
+    public void destroyWithoutNotify() {
+        removeEffect(trackId, position);
+        View.context.getTrackManager().getBaseTrackById(trackId).removeEffectWithoutNotify(this);
+    }
+
     public Param getXParam() {
         return getParam(xParamIndex);
     }

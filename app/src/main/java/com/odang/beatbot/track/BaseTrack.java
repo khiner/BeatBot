@@ -52,7 +52,7 @@ public class BaseTrack {
 
     public void resetToDefaults() {
         while (!effects.isEmpty()) {
-            removeEffect(effects.get(0));
+            effects.get(0).destroyWithoutNotify();
         }
         setLevels(Param.dbToView(0), .5f, .5f, .5f);
     }
@@ -79,8 +79,12 @@ public class BaseTrack {
     }
 
     public void removeEffect(Effect effect) {
-        effects.remove(effect);
+        removeEffectWithoutNotify(effect);
         context.getTrackManager().onEffectDestroy(this, effect);
+    }
+
+    public void removeEffectWithoutNotify(Effect effect) {
+        effects.remove(effect);
     }
 
     public void moveEffect(int oldPosition, int newPosition) {
