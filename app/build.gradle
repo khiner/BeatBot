@@ -5,7 +5,7 @@ android {
     buildToolsVersion "27.0.3"
 
     defaultConfig {
-        applicationId "com.odang.beat_bot"
+        applicationId "com.odang.beatbot_android"
         minSdkVersion 10
         targetSdkVersion 23
 
