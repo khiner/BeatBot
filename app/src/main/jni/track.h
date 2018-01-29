@@ -14,7 +14,6 @@ typedef struct OpenSlOut_ {
     SLObjectItf recorderObject;
     SLPlayItf outputPlayerPlay;
     SLRecordItf recordInterface;
-    SLMuteSoloItf outputPlayerMuteSolo;
     SLAndroidSimpleBufferQueueItf outputBufferQueue;
     SLAndroidSimpleBufferQueueItf micBufferQueue;
     pthread_mutex_t trackMutex;

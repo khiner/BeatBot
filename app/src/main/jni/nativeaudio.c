@@ -384,11 +384,6 @@ jboolean Java_com_odang_beatbot_activity_BeatBotActivity_createAudioPlayer(
             openSlOut->outputPlayerObject, SL_IID_PLAY,
             &(openSlOut->outputPlayerPlay));
 
-    // get the mute/solo interface
-    (*(openSlOut->outputPlayerObject))->GetInterface(
-            openSlOut->outputPlayerObject, SL_IID_MUTESOLO,
-            &(openSlOut->outputPlayerMuteSolo));
-
     // get the buffer queue interface for output
     (*(openSlOut->outputPlayerObject))->GetInterface(
             openSlOut->outputPlayerObject, SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
