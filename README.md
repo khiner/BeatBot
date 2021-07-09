@@ -1,6 +1,10 @@
 # BeatBot
 
-BeatBot is an intuitive and flexible beat production environment for Android. [Here is a Play store link](https://play.google.com/store/apps/details?id=com.odang.beatbot_android)
+BeatBot is an intuitive and flexible beat production environment for Android.
+
+~~[Here is a Play store link](https://play.google.com/store/apps/details?id=com.odang.beatbot_android)~~
+
+**This app is deprecated and I've removed it from the app store. I've moved on to other projects and don't have the time to dedicate to maintenance.**
 
 ## Demo
 [Check out the demo video!](https://youtu.be/XX6qeg30LSo)
